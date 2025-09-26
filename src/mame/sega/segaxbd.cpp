@@ -558,7 +558,7 @@ void segaxbd_state::iocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void segaxbd_state::loffire_sync0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
-	machine().scheduler().perfect_quantum(attotime::from_usec(10));
+	machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(10));
 }
 
 
@@ -600,7 +600,7 @@ TIMER_CALLBACK_MEMBER(segaxbd_state::scanline_tick)
 	int next_scanline = (scanline + 1) % 262;
 
 	// clock the timer with V0
-	m_cmptimer_1->exck_w(scanline % 2);
+	m_cmptimer_1->exck_w(scanline & 1);
 
 	// set VBLANK on scanline 223
 	if (scanline == 223)
@@ -803,7 +803,7 @@ void segaxbd_state::update_main_irqs()
 	if (irq)
 	{
 		m_maincpu->set_input_line(irq, ASSERT_LINE);
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+		machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(100));
 	}
 }
 
@@ -816,7 +816,7 @@ void segaxbd_state::update_main_irqs()
 void segaxbd_state::m68k_reset_callback(int state)
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(100));
 }
 
 
@@ -1753,18 +1753,17 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 	SEGAIC16_ROAD(config, m_segaic16road, 0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/4));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.43);
-	ymsnd.add_route(1, "rspeaker", 0.43);
+	ymsnd.add_route(0, "speaker", 0.15, 0);
+	ymsnd.add_route(1, "speaker", 0.15, 1);
 
 	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
 	pcm.set_bank(segapcm_device::BANK_512);
-	pcm.add_route(0, "lspeaker", 1.0);
-	pcm.add_route(1, "rspeaker", 1.0);
+	pcm.add_route(0, "speaker", 0.35, 0);
+	pcm.add_route(1, "speaker", 0.35, 1);
 }
 
 
@@ -1866,8 +1865,8 @@ void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
 
 	// sound hardware - ym2151 stereo is reversed
 	subdevice<ym2151_device>("ymsnd")->reset_routes();
-	subdevice<ym2151_device>("ymsnd")->add_route(0, "rspeaker", 0.43);
-	subdevice<ym2151_device>("ymsnd")->add_route(1, "lspeaker", 0.43);
+	subdevice<ym2151_device>("ymsnd")->add_route(0, "speaker", 0.15, 1);
+	subdevice<ym2151_device>("ymsnd")->add_route(1, "speaker", 0.15, 0);
 }
 
 void segaxbd_new_state::sega_lastsurv_fd1094(machine_config &config)
@@ -1895,8 +1894,8 @@ void segaxbd_lastsurv_state::device_add_mconfig(machine_config &config)
 
 	// sound hardware - ym2151 stereo is reversed
 	subdevice<ym2151_device>("ymsnd")->reset_routes();
-	subdevice<ym2151_device>("ymsnd")->add_route(0, "rspeaker", 0.43);
-	subdevice<ym2151_device>("ymsnd")->add_route(1, "lspeaker", 0.43);
+	subdevice<ym2151_device>("ymsnd")->add_route(0, "speaker", 0.15, 1);
+	subdevice<ym2151_device>("ymsnd")->add_route(1, "speaker", 0.15, 0);
 }
 
 void segaxbd_new_state::sega_lastsurv(machine_config &config)
@@ -1940,13 +1939,12 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::smgp_motor_w));
 
 	// sound hardware
-	SPEAKER(config, "rearleft").front_left();
-	SPEAKER(config, "rearright").front_right();
+	SPEAKER(config, "rear", 2).rear();
 
 	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
 	pcm2.set_bank(segapcm_device::BANK_512);
-	pcm2.add_route(0, "rearleft", 1.0);
-	pcm2.add_route(1, "rearright", 1.0);
+	pcm2.add_route(0, "rear", 0.35, 0);
+	pcm2.add_route(1, "rear", 0.35, 1);
 }
 
 void segaxbd_new_state::sega_smgp_fd1094(machine_config &config)
@@ -1985,13 +1983,12 @@ void segaxbd_smgp_state::device_add_mconfig(machine_config &config)
 	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::smgp_motor_w));
 
 	// sound hardware
-	SPEAKER(config, "rearleft").front_left();
-	SPEAKER(config, "rearright").front_right();
+	SPEAKER(config, "rear", 2).rear();
 
 	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
 	pcm2.set_bank(segapcm_device::BANK_512);
-	pcm2.add_route(0, "rearleft", 1.0);
-	pcm2.add_route(1, "rearright", 1.0);
+	pcm2.add_route(0, "rear", 0.35, 0);
+	pcm2.add_route(1, "rear", 0.35, 1);
 }
 
 void segaxbd_new_state::sega_smgp(machine_config &config)
@@ -2019,8 +2016,7 @@ void segaxbd_rascot_state::device_add_mconfig(machine_config &config)
 	config.device_remove("soundcpu");
 	config.device_remove("ymsnd");
 	config.device_remove("pcm");
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 	m_cmptimer_1->zint_callback().set_nop();
 
 	cpu_device &commcpu(Z80(config, "commcpu", 8'000'000)); // clock unknown

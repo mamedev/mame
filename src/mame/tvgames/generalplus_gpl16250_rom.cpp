@@ -169,6 +169,19 @@ static INPUT_PORTS_START( base )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dressmtv )
+	PORT_INCLUDE( base )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( jak_spmm )
 	PORT_INCLUDE( base )
 
@@ -187,6 +200,23 @@ static INPUT_PORTS_START( jak_spmm )
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( jak_bj )
+	PORT_INCLUDE( base )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hint Button") // test mode calls this B
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Menu") // test mode calls this C
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A Button") // test mode calls this A
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) // test mode calls this menu (but that seems to be 0x0010 in reality? this is unused?)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+
+INPUT_PORTS_END
+
+
 
 static INPUT_PORTS_START( smartfp )
 	PORT_INCLUDE( base )
@@ -317,6 +347,19 @@ ROM_START( jak_prr )
 	// has a ISSI 827 404 (?) to store settings
 ROM_END
 
+ROM_START( jak_tpir )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("jakkstpir.u5", 0x000000, 0x800000, CRC(1c65fffe) SHA1(32a72c8e7b02d4f17da51c284ab72f6a5264887f) )
+
+	// has a 24LC04 to store settings
+ROM_END
+
+ROM_START( jak_bj )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("jakkpopcap.bin", 0x000000, 0x200000, CRC(21e59932) SHA1(cb0854674bbaf95d45ba4702b8e9482924e3935b) )
+
+	// has a HT24LC04 to store settings
+ROM_END
 
 ROM_START( smartfp )
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
@@ -393,6 +436,14 @@ ROM_START( gameu108 )
 	ROM_LOAD16_WORD_SWAP( "s29gl256.u5", 0x000000, 0x2000000, CRC(48e727a4) SHA1(7338f8e46f794ae148adb84146cd2eddf4eba98d) )
 ROM_END
 
+ROM_START( dressmtv )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	// pinout seems correct, so upper lines are probably being swapped somewhere else
+	ROM_LOAD16_WORD_SWAP("dressmaniatv.bin", 0x000000, 0x200000, CRC(66702103) SHA1(1b55e2555b53251962e5246984339ea5718800c4) )
+	ROM_CONTINUE(0x400000,0x200000)
+	ROM_CONTINUE(0x200000,0x200000)
+	ROM_CONTINUE(0x600000,0x200000)
+ROM_END
 
 
 void tkmag220_game_state::tkmag220(machine_config &config)
@@ -675,6 +726,8 @@ void gameu_handheld_game_state::init_gameu108()
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_bj,    0,       0, base, jak_bj,    gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2009, jak_tpir,  0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -682,6 +735,9 @@ CONS(2009, smartfpf,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init,
 
 // skip the call at 6d47a to get it to show something
 CONS(2008, fpsport,   0,       0, base, base,     gcm394_game_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// uses a barcode card scanner device with custom cards
+CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gormiti_game_state, empty_init, "Tomy Takara", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
@@ -701,8 +757,6 @@ CONS(201?, bornkidh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  em
 
 // die on this one is 'GCM420'
 CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-
-// Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
 // was also available under other names, with different designs (PSP style)

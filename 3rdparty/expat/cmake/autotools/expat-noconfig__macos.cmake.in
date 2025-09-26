@@ -8,12 +8,12 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 # Import target "expat::expat" for configuration "NoConfig"
 set_property(TARGET expat::expat APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
 set_target_properties(expat::expat PROPERTIES
-  IMPORTED_LOCATION_NOCONFIG "${_IMPORT_PREFIX}/@LIBDIR_BASENAME@/libexpat.@SO_MAJOR@.@SO_MINOR@.@SO_PATCH@.dylib"
+  IMPORTED_LOCATION_NOCONFIG "${_IMPORT_PREFIX}/@LIBDIR_BASENAME@/libexpat.@SO_MAJOR@.dylib"
   IMPORTED_SONAME_NOCONFIG "@rpath/libexpat.@SO_MAJOR@.dylib"
   )
 
 list(APPEND _cmake_import_check_targets expat::expat )
-list(APPEND _cmake_import_check_files_for_expat::expat "${_IMPORT_PREFIX}/@LIBDIR_BASENAME@/libexpat.@SO_MAJOR@.@SO_MINOR@.@SO_PATCH@.dylib" )
+list(APPEND _cmake_import_check_files_for_expat::expat "${_IMPORT_PREFIX}/@LIBDIR_BASENAME@/libexpat.@SO_MAJOR@.dylib" )
 
 # Commands beyond this point should not need to know the version.
 set(CMAKE_IMPORT_FILE_VERSION)

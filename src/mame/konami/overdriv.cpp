@@ -15,14 +15,12 @@
     - The "Continue?" sprites are not visible until you press start
     - priorities
 
-
     The issues below are both IRQ timing, and relate to when the sprites get
     copied across by the DMA
-        - Some flickering sprites, this might be an interrupt/timing issue
-        - The screen is cluttered with sprites which aren't supposed to be visible,
-          increasing the coordinate mask in k053247_sprites_draw() from 0x3ff to 0xfff
-          fixes this but breaks other games (e.g. Vendetta).
-
+    - Some flickering sprites, this might be an interrupt/timing issue
+    - The screen is cluttered with sprites which aren't supposed to be visible,
+      increasing the coordinate mask in k053247_sprites_draw() from 0x3ff to 0xfff
+      fixes this but breaks other games (e.g. Vendetta).
 
 ***************************************************************************/
 
@@ -60,8 +58,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
 		, m_audiocpu(*this, "audiocpu")
-		, m_k051316_1(*this, "k051316_1")
-		, m_k051316_2(*this, "k051316_2")
+		, m_k051316(*this, "k051316_%u", 1)
 		, m_k053246(*this, "k053246")
 		, m_k053251(*this, "k053251")
 		, m_k053252(*this, "k053252")
@@ -70,6 +67,10 @@ public:
 	{ }
 
 	void overdriv(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -94,10 +95,6 @@ private:
 	void overdriv_slave_map(address_map &map) ATTR_COLD;
 	void overdriv_sound_map(address_map &map) ATTR_COLD;
 
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 	/* video-related */
 	int       m_zoom_colorbase[2]{};
 	int       m_road_colorbase[2]{};
@@ -105,20 +102,19 @@ private:
 	emu_timer *m_objdma_end_timer = nullptr;
 
 	/* misc */
-	uint16_t     m_cpuB_ctrl = 0;
+	uint16_t  m_cpuB_ctrl = 0;
+	int       m_fake_timer = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k051316_device> m_k051316_1;
-	required_device<k051316_device> m_k051316_2;
+	required_device_array<k051316_device, 2> m_k051316;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;
 	output_finder<> m_led;
-	int m_fake_timer = 0;
 };
 
 
@@ -193,7 +189,7 @@ void overdriv_state::cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
-//logerror("%s: write %04x to cpuA_ctrl_w\n",machine().describe_context(),data);
+		//logerror("%s: write %04x to cpuA_ctrl_w\n",machine().describe_context(),data);
 	}
 }
 
@@ -286,15 +282,22 @@ uint32_t overdriv_state::screen_update_overdriv(screen_device &screen, bitmap_in
 	m_sprite_colorbase  = m_k053251->get_palette_index(k053251_device::CI0);
 	m_road_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI1);
 	m_road_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
-	m_zoom_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI3);
-	m_zoom_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI4);
+
+	for (int i = 0; i < 2; i++)
+	{
+		int prev_colorbase = m_zoom_colorbase[i];
+		m_zoom_colorbase[i] = m_k053251->get_palette_index(k053251_device::CI4 - i);
+
+		if (m_zoom_colorbase[i] != prev_colorbase)
+			m_k051316[i]->mark_tmap_dirty();
+	}
 
 	screen.priority().fill(0, cliprect);
 
-	m_k051316_1->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 1);
+	m_k051316[0]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, 0, 1);
 
-	m_k053246->k053247_sprites_draw( bitmap,cliprect);
+	m_k053246->k053247_sprites_draw(bitmap,cliprect);
 	return 0;
 }
 
@@ -310,8 +313,8 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x100000, 0x10001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); /* 053252? (LSB) */
 	map(0x140000, 0x140001).nopw(); //watchdog reset?
 	map(0x180001, 0x180001).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
-	map(0x1c0000, 0x1c001f).w(m_k051316_1, FUNC(k051316_device::ctrl_w)).umask16(0xff00);
-	map(0x1c8000, 0x1c801f).w(m_k051316_2, FUNC(k051316_device::ctrl_w)).umask16(0xff00);
+	map(0x1c0000, 0x1c001f).w(m_k051316[0], FUNC(k051316_device::ctrl_w)).umask16(0xff00);
+	map(0x1c8000, 0x1c801f).w(m_k051316[1], FUNC(k051316_device::ctrl_w)).umask16(0xff00);
 	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x1d8000, 0x1d8003).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x1e0000, 0x1e0003).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
@@ -319,15 +322,15 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x1f0000, 0x1f0001).w(FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
 	map(0x1f8000, 0x1f8001).w(FUNC(overdriv_state::eeprom_w));
 	map(0x200000, 0x203fff).ram().share("share1");
-	map(0x210000, 0x210fff).rw(m_k051316_1, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
-	map(0x218000, 0x218fff).rw(m_k051316_2, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
-	map(0x220000, 0x220fff).r(m_k051316_1, FUNC(k051316_device::rom_r)).umask16(0xff00);
-	map(0x228000, 0x228fff).r(m_k051316_2, FUNC(k051316_device::rom_r)).umask16(0xff00);
+	map(0x210000, 0x210fff).rw(m_k051316[0], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
+	map(0x218000, 0x218fff).rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
+	map(0x220000, 0x220fff).r(m_k051316[0], FUNC(k051316_device::rom_r)).umask16(0xff00);
+	map(0x228000, 0x228fff).r(m_k051316[1], FUNC(k051316_device::rom_r)).umask16(0xff00);
 	map(0x230000, 0x230001).w(FUNC(overdriv_state::slave_irq4_assert_w));
 	map(0x238000, 0x238001).w(FUNC(overdriv_state::slave_irq5_assert_w));
 }
 
-TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb )
+TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb)
 {
 	m_subcpu->set_input_line(6, HOLD_LINE);
 }
@@ -337,7 +340,7 @@ void overdriv_state::objdma_w(uint8_t data)
 	if(data & 0x10)
 		m_objdma_end_timer->adjust(attotime::from_usec(100));
 
-	m_k053246->k053246_w(5,data);
+	m_k053246->k053246_w(5, data);
 }
 
 void overdriv_state::overdriv_slave_map(address_map &map)
@@ -442,20 +445,22 @@ void overdriv_state::machine_reset()
 void overdriv_state::overdriv(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/2); /* 12 MHz */
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2); /* 12 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(overdriv_state::overdriv_cpuA_scanline), "screen", 0, 1);
 
-	M68000(config, m_subcpu, XTAL(24'000'000)/2);  /* 12 MHz */
+	M68000(config, m_subcpu, 24_MHz_XTAL / 2);  /* 12 MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_slave_map);
 	//m_subcpu->set_vblank_int("screen", FUNC(overdriv_state::cpuB_interrupt));
 	/* IRQ 5 and 6 are generated by the main CPU. */
 	/* IRQ 5 is used only in test mode, to request the checksums of the gfx ROMs. */
 
-	MC6809E(config, m_audiocpu, XTAL(3'579'545));                             /* 1.789 MHz?? This might be the right speed, but ROM testing */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_sound_map); /* takes a little too much (the counter wraps from 0000 to 9999). */
-																			  /* This might just mean that the video refresh rate is less than */
-																			  /* 60 fps, that's how I fixed it for now. */
+	/* 1.789 MHz?? This might be the right speed, but ROM testing */
+	/* takes a little too much (the counter wraps from 0000 to 9999). */
+	/* This might just mean that the video refresh rate is less than */
+	/* 60 fps, that's how I fixed it for now. */
+	MC6809E(config, m_audiocpu, 3.579545_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
@@ -465,51 +470,52 @@ void overdriv_state::overdriv(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/4,384,0,305,264,0,224);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 305, 264, 0, 224);
 	screen.set_screen_update(FUNC(overdriv_state::screen_update_overdriv));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246, 24_MHz_XTAL);
 	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 77, 22);
 	m_k053246->set_palette("palette");
 
-	K051316(config, m_k051316_1, 0);
-	m_k051316_1->set_palette("palette");
-	m_k051316_1->set_offsets(14, -1);
-	m_k051316_1->set_wrap(1);
-	m_k051316_1->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1));
+	K051316(config, m_k051316[0], 24_MHz_XTAL / 2);
+	m_k051316[0]->set_palette("palette");
+	m_k051316[0]->set_offsets(110, -1);
+	m_k051316[0]->set_wrap(1);
+	m_k051316[0]->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1));
 
-	K051316(config, m_k051316_2, 0);
-	m_k051316_2->set_palette("palette");
-	m_k051316_2->set_offsets(15, 1);
-	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2));
+	K051316(config, m_k051316[1], 24_MHz_XTAL / 2);
+	m_k051316[1]->set_palette("palette");
+	m_k051316[1]->set_offsets(111, 1);
+	m_k051316[1]->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2));
 
 	K053251(config, m_k053251, 0);
 
 	K053250(config, "k053250_1", 0, "palette", m_screen, 0, 0);
 	K053250(config, "k053250_2", 0, "palette", m_screen, 0, 0);
 
-	K053252(config, m_k053252, XTAL(24'000'000)/4);
+	K053252(config, m_k053252, 24_MHz_XTAL / 4);
 	m_k053252->set_offsets(13*8, 2*8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "speaker", 0.5, 0);
+	ymsnd.add_route(1, "speaker", 0.5, 1);
 
-	k053260_device &k053260_1(K053260(config, "k053260_1", XTAL(3'579'545)));
+	k053260_device &k053260_1(K053260(config, "k053260_1", 3.579545_MHz_XTAL));
 	k053260_1.set_device_rom_tag("k053260");
-	k053260_1.add_route(0, "lspeaker", 0.35);
-	k053260_1.add_route(1, "rspeaker", 0.35);
+	k053260_1.add_route(0, "speaker", 0.35, 0);
+	k053260_1.add_route(1, "speaker", 0.35, 1);
 
-	k053260_device &k053260_2(K053260(config, "k053260_2", XTAL(3'579'545)));
+	k053260_device &k053260_2(K053260(config, "k053260_2", 3.579545_MHz_XTAL));
 	k053260_2.set_device_rom_tag("k053260");
-	k053260_2.add_route(0, "lspeaker", 0.35);
-	k053260_2.add_route(1, "rspeaker", 0.35);
+	k053260_2.add_route(0, "speaker", 0.35, 0);
+	k053260_2.add_route(1, "speaker", 0.35, 1);
 }
 
 

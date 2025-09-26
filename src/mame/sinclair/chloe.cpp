@@ -9,9 +9,9 @@
 #include "screen_ula.h"
 #include "spec128.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "machine/8042kbdc.h"
 #include "machine/spi_sdcard.h"
-#include "sound/ay8910.h"
 #include "sound/dac.h"
 
 #include "screen.h"
@@ -50,11 +50,10 @@ public:
 		, m_bank1_view(*this, "bank1_view")
 		, m_regs_map(*this, "regs_map")
 		, m_palette(*this, "palette")
-		, m_ula(*this, "ula")
+		, m_ula_scr(*this, "ula_scr")
 		, m_sdcard(*this, "sdcard")
 		, m_io_line(*this, "IO_LINE%u", 0U)
 		, m_io_mouse(*this, "mouse_input%u", 1U)
-		, m_ay(*this, "ay%u", 0U)
 		, m_covox(*this, "covox")
 		, m_kbdc(*this, "pc_kbdc")
 	{}
@@ -85,7 +84,6 @@ protected:
 	void port_f4_w(u8 data);
 	void port_ff_w(u8 data);
 	void port_e3_w(u8 data);
-	void ay_address_w(u8 data);
 	u8 spi_data_r();
 	void spi_data_w(u8 data);
 	void spi_miso_w(u8 data);
@@ -105,11 +103,10 @@ private:
 	memory_view m_bank0_view, m_bank1_view;
 	required_device<address_map_bank_device> m_regs_map;
 	required_device<device_palette_interface> m_palette;
-	required_device<screen_ula_plus_device> m_ula;
+	required_device<screen_ula_plus_device> m_ula_scr;
 	required_device<spi_sdcard_device> m_sdcard;
 	required_ioport_array<8> m_io_line;
 	required_ioport_array<3> m_io_mouse;
-	required_device_array<ay8912_device, 2> m_ay;
 	required_device<dac_byte_interface> m_covox;
 	required_device<kbdc8042_device> m_kbdc;
 
@@ -121,7 +118,6 @@ private:
 	u8 m_divmmc_ctrl;
 	u8 m_uno_regs_data[256];
 	u8 m_palpen_selected;
-	u8 m_ay_selected;
 	bool m_dma_hilo;
 	u8 m_dma_src_latch;
 	u8 m_dma_dst_latch;
@@ -143,7 +139,7 @@ private:
 void chloe_state::update_memory()
 {
 	m_screen->update_now();
-	m_ula->ula_shadow_en_w(BIT(m_port_7ffd_data, 3));
+	m_ula_scr->ula_shadow_en_w(BIT(m_port_7ffd_data, 3));
 
 	const bool ext = BIT(m_port_ff_data, 7); // 0 - DOC 7xxxx=28+; 1 - EXT 6xxxx=24+
 	m_bank0_view.disable();
@@ -229,10 +225,10 @@ u32 chloe_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	clip256x192 &= cliprect;
 
 	screen.priority().fill(0, cliprect);
-	m_ula->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
+	m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
 
 	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
-	m_ula->draw(screen, bitmap, clip256x192, flash, 0);
+	m_ula_scr->draw(screen, bitmap, clip256x192, flash, 0);
 
 	return 0;
 }
@@ -250,7 +246,7 @@ void chloe_state::port_7ffd_w(u8 data)
 
 void chloe_state::port_ff_w(u8 data)
 {
-	m_ula->port_ff_reg_w(data);
+	m_ula_scr->port_ff_reg_w(data);
 
 	m_port_ff_data = data;
 	update_memory();
@@ -273,18 +269,6 @@ void chloe_state::port_e3_w(u8 data)
 		m_divmmc_ctrl = data;
 	}
 	update_memory();
-}
-
-void chloe_state::ay_address_w(u8 data)
-{
-	if ((data & 0xfe) == 0xfe)
-	{
-		m_ay_selected = data & 1;
-	}
-	else
-	{
-		m_ay[m_ay_selected]->address_w(data);
-	}
 }
 
 u8 chloe_state::spi_data_r()
@@ -519,12 +503,8 @@ void chloe_state::map_io(address_map &map)
 		}
 	}));
 
-	map(0xbffd, 0xbffd).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
-	map(0xfffd, 0xfffd).lr8(NAME([this]()
-	{
-		return m_ay[m_ay_selected]->data_r();
-	})).w(FUNC(chloe_state::ay_address_w));
-
+	map(0xbffd, 0xbffd).w("ay_slot", FUNC(ay_slot_device::data_w));
+	map(0xfffd, 0xfffd).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
 	map(0xbf3b, 0xbf3b).lw8(NAME([this](u8 data)
 	{
 		m_palpen_selected = data;
@@ -545,7 +525,7 @@ void chloe_state::map_io(address_map &map)
 			}
 			else if ((m_palpen_selected & 0xc0) == 0x40)
 			{
-				m_ula->ulap_en_w(data & 1);
+				m_ula_scr->ulap_en_w(data & 1);
 			}
 		}));
 	map(0xfc3b, 0xfc3b).lrw8(NAME([this]() { return m_reg_selected; })
@@ -857,7 +837,6 @@ void chloe_state::machine_start()
 	save_item(NAME(m_divmmc_ctrl));
 	save_pointer(NAME(m_uno_regs_data), 256);
 	save_item(NAME(m_palpen_selected));
-	save_item(NAME(m_ay_selected));
 	save_item(NAME(m_dma_hilo));
 	save_item(NAME(m_dma_src_latch));
 	save_item(NAME(m_dma_dst_latch));
@@ -888,7 +867,6 @@ void chloe_state::machine_reset()
 	m_port_7ffd_data = 0;
 	m_divmmc_paged = 1;
 	m_divmmc_ctrl &= 0x40;
-	m_ay_selected = 0;
 
 	update_memory();
 }
@@ -911,10 +889,9 @@ GFXDECODE_END
 void chloe_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_contention_pattern = {}; // Has no contention
 
 	const u8 *ram = m_ram->pointer();
-	m_ula->set_host_ram_ptr(ram);
+	m_ula_scr->set_host_ram_ptr(ram);
 }
 
 
@@ -930,17 +907,19 @@ void chloe_state::chloe(machine_config &config)
 	m_maincpu->set_memory_map(&chloe_state::map_mem);
 	m_maincpu->set_io_map(&chloe_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(chloe_state::chloe_interrupt));
-	m_maincpu->nomreq_cb().set_nop();
+	//m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
 	ADDRESS_MAP_BANK(config, m_regs_map).set_map(&chloe_state::map_regs).set_options(ENDIANNESS_LITTLE, 8, 8, 0);
 
 	/*
-	???DMA(config, m_dma, 28_MHz_XTAL / 8);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
-	m_dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
-	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
-	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
-	m_dma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
+	???dma_slot_device &dma(DMA_SLOT(config.replace(), "dma", 28_MHz_XTAL / 8, default_dma_slot_devices, nullptr));
+	dma.set_io_space(m_maincpu, AS_IO);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 	*/
 
 	SPI_SDCARD(config, m_sdcard, 0);
@@ -951,28 +930,22 @@ void chloe_state::chloe(machine_config &config)
 	m_screen->set_raw(25.175_MHz_XTAL, CYCLES_HORIZ, CYCLES_VERT, SCR_FULL); // VGA
 	m_screen->set_screen_update(FUNC(chloe_state::screen_update));
 	m_screen->set_no_palette();
-
 	PALETTE(config, m_palette, FUNC(chloe_state::spectrum_palette), 256);
-	SCREEN_ULA_PLUS(config, m_ula, 0).set_raster_offset(SCR_256x192.left(), SCR_256x192.top()).set_palette(m_palette->device().tag(), 0x000, 0x000);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SCREEN_ULA_PLUS(config, m_ula_scr, 0).set_raster_offset(SCR_256x192.left(), SCR_256x192.top()).set_palette(m_palette->device().tag(), 0x000, 0x000);
 
-	config.device_remove("ay8912");
-	AY8912(config, m_ay[0], 28_MHz_XTAL / 16)
-		.add_route(0, "lspeaker", 0.50)
-		.add_route(2, "lspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.25)
-		.add_route(1, "rspeaker", 0.50);
-	AY8912(config, m_ay[1], 28_MHz_XTAL / 16)
-		.add_route(0, "lspeaker", 0.50)
-		.add_route(2, "lspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.25)
-		.add_route(1, "rspeaker", 0.50);
+	SPEAKER(config.replace(), "speakers", 2).front();
+
+	AY_SLOT(config.replace(), "ay_slot", 28_MHz_XTAL / 16, default_ay_slot_devices, "ay_turbosound")
+		.add_route(0, "speakers", 0.50, 0)
+		.add_route(2, "speakers", 0.25, 0)
+		.add_route(2, "speakers", 0.25, 1)
+		.add_route(1, "speakers", 0.50, 1);
 
 	DAC_8BIT_R2R(config, m_covox, 0)
-		.add_route(ALL_OUTPUTS, "lspeaker", 0.75)
-		.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+		.add_route(ALL_OUTPUTS, "speakers", 0.75, 0)
+		.add_route(ALL_OUTPUTS, "speakers", 0.75, 1);
 
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);

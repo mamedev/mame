@@ -1,39 +1,43 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders: Roberto Fresca
 /******************************************************************************
 
   Good Luck II
-  Yung Yu / CYE, 1992.
+  四色7 (Sì Sè 7)
 
+  Yung Yu / CYE, 1992.
 
   Driver by Roberto Fresca.
 
 
-  Hardware based on Golden Poker / Cal Omega, but with a lot of improvements...
+  Hardware based on Golden Poker / Cal Omega, but with a lot of improvements.
+  PCB silkscreened: "YUNGYU" "920210". There are two variants. Good Luck II
+  has 1x UM3567 (clone of Yamaha YM2413) for sound, in the Si Se 7 board, they
+  replaced the YM2413 toward a OKI6295 for sound samples support.
 
 
 *******************************************************************************
 
-
   *** Hardware notes ***
 
-  - CPU:  1x 6502 (U8). Empty socket.
+  CPU:  1x 6502 (U8). Empty socket.
 
-  - CRTC: 1x HD6845SP (U13)
+  CRTC: 1x HD6845SP (U13)
 
-  - RAM:  2x 6116. 2K*8 SRAM. (U6, U17). Empty sockets.
+  RAM:  2x 6116. 2K*8 SRAM. (U6, U17). Empty sockets.
 
-  - ROMs: 1x ST27C512 (U7)
-          3x M27C256 (U31, U32, U33)
+  ROMs: 1x ST27C512 (U7)
+        3x M27C256 (U31, U32, U33)
 
-  - PROMs: 3x Bipolar PROMs (U25, U26, U27)
+  PROMs: 3x Bipolar PROMs (U25, U26, U27)
 
-  - CLK:  1x crystal @ 10.000 MHz. (for CPU clock)
-          1x crystal @ 3.5795 MHz. (for sound circuitry)
+  CLK:  1x crystal @ 10.000 MHz. (for CPU clock)
+        1x crystal @ 3.5795 MHz. (for sound circuitry)
 
-  - SOUND: 1x AY-3-8910 (U38)
-           1x UM3567 (clone of Yamaha YM2413) (U36)
-           1x 2904D JRC (Dual Operational Amplifier) (U40)
+  SOUND: 1x AY-3-8910 (U38)
+         1x UM3567 (clone of Yamaha YM2413) (U36) --> Good Luck II PCB.
+         1x MK28 (Clone of OKI 6295) ---------------> Si Se 7 PCB.
+         1x 2904D JRC (Dual Operational Amplifier) (U40)
 
 
   Other components:
@@ -50,7 +54,7 @@
   Original stickers from CYE (Chang Yu Electronic Company) in PCB and ROMs.
 
 
-  PCB Layout:
+  PCB Layout (Good Luck II):
 
   .----------------------------------------------------------------------------------------------.
   |  U12                                U8                           U2            BT1           |
@@ -170,7 +174,7 @@
   DIP switches banks #3 and #2). Is not used as sound device, at least for
   Good Luck II.
 
-  There are pieces of code that initialize 2x PIA 6821, that are not included
+  There are pieces of code that initialize two PIA 6821s, that are not included
   in the PCB. Seems a leftover. Also the program try to handle a suppossed lamps
   system through these 'phantom' PIAs...
 
@@ -183,6 +187,7 @@
 
   TODO:
 
+  - Hook the OKI 6295 ADPCM samples system for sise7.
   - Figure out the remaining DIP switches.
   - Nothing at all... :)
 
@@ -194,6 +199,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/ymopl.h"
+#include "sound/okim6295.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -219,6 +225,7 @@ public:
 	{ }
 
 	void gluck2(machine_config &config);
+	void sise7(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -237,7 +244,9 @@ private:
 	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void gluck2_map(address_map &map) ATTR_COLD;
+	void sise7_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -269,8 +278,8 @@ TILE_GET_INFO_MEMBER(gluck2_state::get_tile_info)
 */
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
-	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   /* bits 1-6-7 handle the gfx banks */
-	int color = (attr & 0x3c) >> 2;                             /* bits 2-3-4-5 handle the color */
+	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   // bits 1-6-7 handle the gfx banks
+	int color = (attr & 0x3c) >> 2;                             // bits 2-3-4-5 handle the color
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -303,11 +312,11 @@ void gluck2_state::counters_w(uint8_t data)
     xxx- x--x   seems unused...
 
 */
-	data = data ^ 0xff; // inverted
+	data = data ^ 0xff;  // inverted
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* coins */
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);  /* notes */
-	machine().bookkeeping().coin_counter_w(2, data & 0x04);  /* payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  // coins
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);  // notes
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);  // payout
 }
 
 
@@ -320,9 +329,9 @@ void gluck2_state::gluck2_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x084b).noprw(); /* see below */
-	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram"); /* 6116 #1 (2K x 8) RAM (only 1st half used) */
-	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram"); /* 6116 #2 (2K x 8) RAM (only 1st half used) */
+	map(0x0844, 0x084b).noprw();  // see below
+	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram");  // 6116 #1 (2K x 8) RAM (only 1st half used)
+	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram");  // 6116 #2 (2K x 8) RAM (only 1st half used)
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2d00, 0x2d01).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x3400, 0x3400).portr("IN0");
@@ -338,6 +347,25 @@ void gluck2_state::gluck2_map(address_map &map)
   0848-084b    PIA1 leftover???
 
 */
+
+void gluck2_state::sise7_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x084b).noprw();  // see below
+	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram");  // 6116 #1 (2K x 8) RAM (only 1st half used)
+	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram");  // 6116 #2 (2K x 8) RAM (only 1st half used)
+	map(0x2000, 0x2000).portr("SW1");
+	map(0x2d00, 0x2d00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3400, 0x3400).portr("IN0");
+	map(0x3500, 0x3500).portr("IN1");
+	map(0x3600, 0x3600).portr("IN2");
+	map(0x3700, 0x3700).w(FUNC(gluck2_state::counters_w));
+	map(0x3d00, 0x3d01).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x4000, 0xffff).rom();
+}
+
 
 /*********************************************
 *                Input ports                 *
@@ -448,7 +476,116 @@ static INPUT_PORTS_START( gluck2 )
 	PORT_DIPNAME( 0x80, 0x80, "SW3:2" )         PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( sise7 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Repeat Bet")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Note In")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin In")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_1_PAD) PORT_NAME("PAD 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_2_PAD) PORT_NAME("PAD 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Service")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_3_PAD) PORT_NAME("PAD 3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_4_PAD) PORT_NAME("PAD 4")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PAD 5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PAD 6")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_7_PAD) PORT_NAME("PAD 7")
+
+	PORT_START("SW1")   // 2000
+	PORT_DIPNAME( 0x01, 0x01, "SW1" )               PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")   // 3D01: AY8910 port B
+	PORT_DIPNAME( 0x01, 0x01, "SW2" )               PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")   // 3D01: AY8910 port A
+	PORT_DIPNAME( 0x01, 0x01, "SW3" )               PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -483,53 +620,64 @@ static GFXDECODE_START( gfx_gluck2 )
 	GFXDECODE_ENTRY( "gfx", 0x3800, tilelayout, 0, 16 )
 GFXDECODE_END
 
+
 /*********************************************
 *              Machine Drivers               *
 *********************************************/
 
 void gluck2_state::gluck2(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, MASTER_CLOCK/16); /* guess */
+	// basic machine hardware
+	M6502(config, m_maincpu, MASTER_CLOCK / 16);  // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &gluck2_state::gluck2_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
-/* CRTC Register:  00   01   02   03   04   05   06
-   CRTC Value   : 0x27 0x20 0x23 0x03 0x26 0x00 0x20
-*/
-	screen.set_size((39+1)*8, (38+1)*8);                /* from MC6845 init, registers 00 & 04. (value - 1) */
-	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);  /* from MC6845 init, registers 01 & 06. */
+//  CRTC Register:  00   01   02   03   04   05   06
+//  CRTC Value   : 0x27 0x20 0x23 0x03 0x26 0x00 0x20
+	screen.set_size((39+1)*8, (38+1)*8);           // from MC6845 init, registers 00 & 04 (value - 1)
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);  // from MC6845 init, registers 01 & 06
 	screen.set_screen_update(FUNC(gluck2_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gluck2);
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
-	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16));    /* guess */
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));  // guess
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay8910(AY8910(config, "ay8910", MASTER_CLOCK/8));    /* guess */
+	ay8910_device &ay8910(AY8910(config, "ay8910", MASTER_CLOCK / 8));  // guess
 	ay8910.port_a_read_callback().set_ioport("SW3");
 	ay8910.port_b_read_callback().set_ioport("SW2");
-/*  Output ports have a minimal activity during init.
-    They seems unused (at least for Good Luck II)
-*/
+//  Output ports have a minimal activity during init.
+//    They seems unused (at least for Good Luck II)
+
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	YM2413(config, "ymsnd", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void gluck2_state::sise7(machine_config &config)
+{
+	gluck2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &gluck2_state::sise7_map);
+
+	config.device_remove("ymsnd");
+
+	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // pin 7 connected to GND
+
+}
 
 /*********************************************
 *                  Rom Load                  *
@@ -550,6 +698,34 @@ ROM_START( gluck2 )
 	ROM_LOAD( "v3.u25",  0x0200, 0x0100, CRC(a4d2c9c3) SHA1(a799875b8b92391696419081244da2e56216e024) )
 ROM_END
 
+/*
+   4-colors 7's
+  "四色7" (Sì Sè Qī)
+
+  Yung Yu / CYE
+
+*/
+ROM_START( sise7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // redumped...
+	ROM_LOAD( "tejiang.u7",  0x0000, 0x10000, CRC(e3fe6ca9) SHA1(32a5611c3870078b11ebe790efd12efe3b4a4fb4) )
+
+	ROM_REGION( 0x18000, "gfx", 0 )
+	ROM_LOAD( "3.u33",  0x00000, 0x4000, CRC(dedd9eeb) SHA1(14a81a3c98b10e996f0b340ce18df627d0cd7f3d) )
+	ROM_FILL(           0x04000, 0x4000, 0xff )  // filling the holes for compatibility
+	ROM_LOAD( "2.u32",  0x08000, 0x4000, CRC(0bcc2939) SHA1(8ff116acec6d75016788aa591c1dd61572366dd7) )
+	ROM_FILL(           0x0c000, 0x4000, 0xff )  // filling the holes for compatibility
+	ROM_LOAD( "1.u31",  0x10000, 0x4000, CRC(64e96912) SHA1(889ac676e4b57c5c616a0caa77553fd8a9cb488b) )
+	ROM_FILL(           0x14000, 0x4000, 0xff )  // filling the holes for compatibility
+
+	ROM_REGION( 0x0300, "proms", 0 )  // RGB
+	ROM_LOAD( "1_82s129a.u27",  0x0000, 0x0100, CRC(6aa0bd56) SHA1(b77f7c852314996c6a1821ef495f2708e7e540ac) )
+	ROM_LOAD( "2_82s129a.u26",  0x0100, 0x0100, CRC(368683e0) SHA1(3a3b3d5b9d1dc7873fc543e53e099204b361ce5c) )
+	ROM_LOAD( "3_82s129a.u25",  0x0200, 0x0100, CRC(4568c7b3) SHA1(aac422c90839af62248779869fb96930e98eba2d) )
+
+	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_LOAD( "prog.u2", 0x00000, 0x20000, CRC(3193954a) SHA1(459b099e9f3ac53d76e904cb750d6daff5f7f962) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -557,5 +733,6 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME    PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME       FLAGS...
-GAME( 1992, gluck2, 0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME                 FLAGS...
+GAME( 1992, gluck2,  0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sise7,   0,      sise7,    sise7,  gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Si Se 7",                MACHINE_SUPPORTS_SAVE )

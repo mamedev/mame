@@ -67,7 +67,6 @@ copyright-holders:m1macrophage
 	<element name="txt_tune_4"><text string="LO"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_tune_5"><text string="HI"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_tune_6"><text string="LO"><color red="0.82" green="0.43" blue="0.31"/></text></element>
-	<element name="txt_tune_7"><text string="HIHAT"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 
 	<element name="txt_mixer"><text string="MIXER"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_left_1"><text string="LEFT" align="1"><color red="0.82" green="0.43" blue="0.31"/></text></element>
@@ -146,39 +145,35 @@ copyright-holders:m1macrophage
 	<element name="screw"><rect><color red="0.19" green="0.18" blue="0.18"/></rect></element>
 	<element name="jack"><rect><color red="0.35" green="0.35" blue="0.36"/></rect></element>
 
-	<element name="outline_cassette_tempo">
+	<element name="outlines">
 		<image><data><![CDATA[
-			<rect stroke="#f28367" fill="none" stroke-width="3" width="124" height="400" rx="16" ry="16"/>
-		]]></data></image>
-	</element>
-	<element name="outline_create">
-		<image><data><![CDATA[
-			<rect stroke="#f28367" fill="none" stroke-width="3" width="706" height="400" rx="16" ry="16"/>
-		]]></data></image>
-	</element>
-	<element name="outline_drumpads">
-		<image><data><![CDATA[
-			<rect stroke="#f28367" fill="none" stroke-width="3" width="838" height="273" rx="16" ry="16"/>
-		]]></data></image>
-	</element>
-	<element name="outline_play">
-		<image><data><![CDATA[
-			<rect stroke="#f28367" fill="none" stroke-width="3" width="124" height="273" rx="16" ry="16"/>
-		]]></data></image>
-	</element>
-	<element name="outline_tuning">
-		<image><data><![CDATA[
-			<rect stroke="#f28367" fill="none" stroke-width="3" width="783" height="195" rx="16" ry="16"/>
-		]]></data></image>
-	</element>
-	<element name="outline_volume">
-		<image><data><![CDATA[
-			<rect stroke="#f28367" fill="none" stroke-width="3" width="125" height="195" rx="16" ry="16"/>
-		]]></data></image>
-	</element>
-	<element name="outline_mixer">
-		<image><data><![CDATA[
-			<rect stroke="#f28367" fill="none" stroke-width="3" width="916" height="479" rx="16" ry="16"/>
+			<svg width="2113" height="1112">
+				<g stroke="#f28367" fill="none" stroke-width="2">
+					<!-- CASSETTE -->
+					<rect x="163" y="425" width="124" height="400" rx="10" ry="10"/>
+
+					<!-- CREATE RHYTHM PATTERN / SONG -->
+					<rect x="295" y="425" width="706" height="400" rx="10" ry="10"/>
+
+					<!-- DRUM PADS -->
+					<rect x="163" y="833" width="838" height="273" rx="10" ry="10"/>
+
+					<!-- TEMPO -->
+					<rect x="1007" y="425" width="124" height="400" rx="10" ry="10"/>
+
+					<!-- PLAY / STOP -->
+					<rect x="1007" y="833" width="124" height="273" rx="10" ry="10"/>
+
+					<!-- TUNING -->
+					<rect x="1138" y="425" width="783" height="195" rx="10" ry="10"/>
+
+					<!-- VOLUME -->
+					<rect x="1929" y="425" width="125" height="195" rx="10" ry="10"/>
+
+					<!-- MIXER -->
+					<rect x="1138" y="627" width="916" height="479" rx="10" ry="10"/>
+				</g>
+			</svg>
 		]]></data></image>
 	</element>
 
@@ -217,21 +212,19 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
+	<element name="transparent"><rect><color red="0.0" green="0.0" blue="0.0" alpha="0.0"/></rect></element>
 	<element name="knob_outer"><disk><color red="0.17" green="0.16" blue="0.18"/></disk></element>
 	<element name="knob_inner"><disk><color red="0.23" green="0.22" blue="0.24"/></disk></element>
-	<element name="knob_value_background"><rect><color red="0.0" green="0.0" blue="0.0" alpha="0.0"/></rect></element>
 	<element name="knob_value">
 		<simplecounter maxstate="100" digits="1"><color red="1.0" green="0.5" blue="0.2"/></simplecounter>
 	</element>
 	<group name="knob">
 		<element ref="knob_outer" id="knob_~knob_input~"><bounds x="0" y="0" width="68" height="68"/></element>
 		<element ref="knob_inner"><bounds x="9" y="9" width="50" height="50"/></element>
-		<element ref="knob_value_background" clickthrough="no">
-			<bounds x="17" y="22" width="34" height="24"/>
-		</element>
 		<element ref="knob_value" inputtag="~knob_input~" inputmask="0x7f" inputraw="yes">
 			<bounds x="17" y="22" width="34" height="24"/>
 		</element>
+		<element ref="transparent" clickthrough="no"><bounds x="17" y="22" width="34" height="24"/></element>
 	</group>
 
 	<element name="slider_area"><rect><color red="0.0" blue="0.0" green="0.0" alpha="0.0"/></rect></element>
@@ -274,6 +267,7 @@ copyright-holders:m1macrophage
 		<element ref="wood"><bounds x="2092" y="50" width="72" height="1104"/></element>
 		<element ref="dark_line"><bounds x="160" y="283" width="1897" height="3"/></element>
 		<element ref="dark_line"><bounds x="160" y="321" width="1897" height="3"/></element>
+		<element ref="outlines"><bounds x="0" y="0" width="2113" height="1112"/></element>
 		<collection name="script warning">
 			<element ref="script_warning" id="warning"><bounds x="160" y="355" width="1897" height="30"/></element>
 		</collection>
@@ -307,7 +301,6 @@ copyright-holders:m1macrophage
 		</repeat>
 
 		<!-- CASSETTE -->
-		<element ref="outline_cassette_tempo"><bounds x="163" y="425" width="124" height="400"/></element>
 		<element ref="txt_cassette"><bounds x="166" y="435" width="118" height="24"/></element>
 		<element ref="button" inputtag="keyboard_col_2" inputmask="0x08">
 			<bounds x="185" y="487" width="80" height="76"/>
@@ -324,8 +317,6 @@ copyright-holders:m1macrophage
 		</element>
 
 		<!-- CREATE RHYTHM PATTERN / SONG -->
-
-		<element ref="outline_create"><bounds x="295" y="425" width="706" height="400"/></element>
 		<element ref="txt_create"><bounds x="463" y="435" width="355" height="24"/></element>
 		<element ref="line"><bounds x="311" y="445" width="150" height="2"/></element>
 		<element ref="line"><bounds x="819" y="445" width="165" height="2"/></element>
@@ -424,8 +415,6 @@ copyright-holders:m1macrophage
 		<element ref="line"><bounds x="787" y="805" width="183" height="2"/></element>
 
 		<!-- Drum pads -->
-
-		<element ref="outline_drumpads"><bounds x="163" y="833" width="838" height="273"/></element>
 		<element ref="led" name="led_percussion"><bounds x="955" y="851" width="24" height="24"/></element>
 		<element ref="line"><bounds x="966" y="877" width="2" height="150"/></element>
 		<element ref="line"><bounds x="940" y="1027" width="26" height="2"/></element>
@@ -506,7 +495,6 @@ copyright-holders:m1macrophage
 		<element ref="txt_percussion"><bounds x="860" y="1080" width="80" height="17"/></element>
 
 		<!-- TEMPO -->
-		<element ref="outline_cassette_tempo"><bounds x="1007" y="425" width="124" height="400"/></element>
 		<element ref="txt_tempo"><bounds x="1010" y="435" width="118" height="24"/></element>
 		<param name="knob_input" value="pot_tempo"/>
 		<group ref="knob"><bounds x="1037" y="488" width="68" height="68"/></group>
@@ -521,7 +509,6 @@ copyright-holders:m1macrophage
 		<element ref="txt_ext_sync"><bounds x="1010" y="798" width="118" height="17"/></element>
 
 		<!-- PLAY/STOP -->
-		<element ref="outline_play"><bounds x="1007" y="833" width="124" height="273"/></element>
 		<element ref="led" name="led_play_stop"><bounds x="1057" y="899" width="24" height="24"/></element>
 		<element ref="line"><bounds x="1067" y="925" width="2" height="62"/></element>
 		<element ref="button" inputtag="play_stop" inputmask="0x01">
@@ -530,17 +517,19 @@ copyright-holders:m1macrophage
 		<element ref="txt_play"><bounds x="1012" y="1068" width="114" height="24"/></element>
 
 		<!-- TUNING -->
-		<element ref="outline_tuning"><bounds x="1138" y="425" width="783" height="195"/></element>
 		<element ref="txt_tuning"><bounds x="1473" y="435" width="118" height="24"/></element>
 		<element ref="line"><bounds x="1183" y="445" width="295" height="2"/></element>
 		<element ref="line"><bounds x="1590" y="445" width="295" height="2"/></element>
-		<repeat count="7">
+		<repeat count="6">
 			<param name="i" start="1" increment="1"/>
 			<param name="x" start="1183" increment="106"/>
 			<param name="knob_input" value="pot_tuning_~i~"/>
 			<group ref="knob"><bounds x="~x~" y="495" width="54" height="54"/></group>
 			<element ref="txt_tune_~i~"><bounds x="~x~" y="560" width="54" height="17"/></element>
 		</repeat>
+		<param name="knob_input" value="pot_hihat_decay"/>
+		<group ref="knob"><bounds x="1819" y="495" width="54" height="54"/></group>
+		<element ref="txt_hihat"><bounds x="1819" y="560" width="54" height="17"/></element>
 		<element ref="txt_snare"><bounds x="1183" y="582" width="54" height="17"/></element>
 		<element ref="txt_toms"><bounds x="1395" y="582" width="54" height="17"/></element>
 		<element ref="line"><bounds x="1286" y="590" width="108" height="2"/></element>
@@ -551,14 +540,11 @@ copyright-holders:m1macrophage
 		<element ref="txt_decay"><bounds x="1819" y="582" width="54" height="17"/></element>
 
 		<!-- VOLUME -->
-		<element ref="outline_volume"><bounds x="1929" y="425" width="125" height="195"/></element>
 		<element ref="txt_volume"><bounds x="1933" y="435" width="118" height="24"/></element>
 		<param name="knob_input" value="pot_volume"/>
 		<group ref="knob"><bounds x="1960" y="488" width="68" height="68"/></group>
 
 		<!-- MIXER -->
-
-		<element ref="outline_mixer"><bounds x="1138" y="627" width="916" height="479"/></element>
 		<element ref="txt_mixer"><bounds x="1560" y="1067" width="75" height="24"/></element>
 		<element ref="line"><bounds x="1200" y="1079" width="355" height="2"/></element>
 		<element ref="line"><bounds x="1640" y="1079" width="355" height="2"/></element>
@@ -608,10 +594,11 @@ copyright-holders:m1macrophage
 
 				add_simplecounter_knob(view, "knob_pot_tempo", "pot_tempo", 1.5)
 				add_simplecounter_knob(view, "knob_pot_volume", "pot_volume", 1.5)
-				for i = 1, 7 do
+				for i = 1, 6 do
 					local knob_input = "pot_tuning_" .. i
 					add_simplecounter_knob(view, "knob_" .. knob_input, knob_input, 3.5)
 				end
+				add_simplecounter_knob(view, "knob_pot_hihat_decay", "pot_hihat_decay", 3.5)
 
 				for i = 1, 16 do
 					local pan_input = "pot_pan_" .. i

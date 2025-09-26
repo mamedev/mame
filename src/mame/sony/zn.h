@@ -52,7 +52,7 @@ protected:
 	required_device<spu_device> m_spu;
 	required_device<psxgpu_device> m_gpu;
 	required_device<screen_device> m_screen;
-	required_device_array<speaker_device, 2> m_speaker;
+	required_device<speaker_device> m_speaker;
 	required_device<at28c16_device> m_at28c16;
 	optional_device_array<cat702_device, 2> m_cat702;
 	required_device<ram_device> m_ram;

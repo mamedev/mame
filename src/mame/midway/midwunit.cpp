@@ -1749,8 +1749,8 @@ GAME( 1995, wwfmaniab,   wwfmania, wunit_picsim, wwfmania, midwunit_state, init_
 GAME( 1995, wwfmaniac,   wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wwfmaniap,   wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (proto 2.01 06/07/95)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, openice,     0,        wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, openicea,    openice,  wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openice,     0,        wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "NHL Open Ice: 2 on 2 Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openicea,    openice,  wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "NHL Open Ice: 2 on 2 Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, nbahangt,    0,        wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver L1.3 10/10/96)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, nbahangtm13, nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver M1.3 10/10/96)", MACHINE_SUPPORTS_SAVE )

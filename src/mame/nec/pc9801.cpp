@@ -5,7 +5,6 @@
     PC-9801 (c) 1981 NEC
 
     TODO:
-    - proper 8251 uart hook-up on keyboard;
     - text scrolling, μPD52611 (cfr. clipping in edge & arcus2, madoum* too?);
     - Abnormal 90 Hz refresh rate adjust for normal display mode (15KHz).
       Should really be 61.xx instead, understand how CRTC really switches clock;
@@ -35,20 +34,7 @@
           fixing in some cases;
         - Export mouse support to an actual PC9871 device;
         - Implement IF-SEGA/98 support (Sega Saturn peripheral compatibility for Windows,
-          available DOS C snippet clearly shows reading in direct mode, an actual SMPC
-          sub-device sounds unlikely but possible);
-    - Incomplete SDIP support:
-        - SDIP never returns a valid state and returns default values even if machine is
-          soft resetted. By logic should read-back the already existing state, instead
-          all machines just returns a "set SDIP" warning message at POST no matter what;
-        - SDIP bank hookup is different across machines, either unmapped or diverging
-          implementation wise both in port select and behaviour;
-        - In theory SDIP can be initialized via a BIOS menu, callable by holding down
-          HELP key at POST. This actually doesn't work for any machine, is it expected to
-          have key repeat support? Later BIOSes actually have strings for an extended menu
-          with 3 or 4 pages strings, may be also requiring a jump/bankswitch to unmapped area?
-        - Expose SDIP to an actual device_nvram_interface;
-        - Derive defaults off what the model sets up at POST;
+          cfr. BeOS PnP driver);
     - clean-up functions/variables naming by actual documentation nomenclature;
     - derive machine configs & romsets by actual default options, examples:
         - 3.5 built-in floppy drives vs. default 5.25;
@@ -77,20 +63,29 @@
       it's not a 286 CPU;
     - Floppy boot fails;
 
-    TODO (PC-9801US):
+    TODO (PC-9801US / PC-9801FS):
     - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
-    - "SYSTEM SHUTDOWN" after BIOS sets up the SDIP values;
+    - RAM check detects more RAM than what's really installed (and saves previous detection in MEMSW);
+    - pc9801fs at least: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS,
+      incompatible with 512 bps or IDE itself?
 
     TODO (PC-9801BX2)
-    - "SYSTEM SHUTDOWN" at POST, a soft reset fixes it?
+    - "SYSTEM SHUTDOWN" at POST, SDIP related, soft reset to bypass;
+    - Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
     - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
-    - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM size;
+    - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
+      size;
+
+    TODO: (PC-9801UX)
+    - "I/O Error" on any 3.5" floppy, specific to this romset (i.e. those works on pc9821).
+      It never access $4be, it must fail earlier than that.
 
 ===================================================================================================
 
     This series features a huge number of models released between 1982 and 1997. They
     were not IBM PC-compatible, but they had similar hardware (and software: in the
     1990s, they run MS Windows as OS)
+    TODO: move this table in a markdown, upgrade
 
     Models:
 
@@ -340,18 +335,6 @@ Ext Video F/F (i/o 0x6a):
 1100 010x chart GDC operating mode (?)
 (everything else is undocumented / unknown)
 
-Keyboard TX commands:
-0xfa ACK
-0xfc NACK
-0x95
----- --xx extension key settings (00 normal 11 Win and App Keys enabled)
-0x96 identification codes
-0x9c
--xx- ---- key delay (11 = 1000 ms, 10 = 500 ms, 01 = 500 ms, 00 = 250 ms)
----x xxxx repeat rate (slow 11111 -> 00001 fast)
-0x9d keyboard LED settings
-0x9f keyboard ID
-
 **************************************************************************************************/
 
 #include "emu.h"
@@ -453,11 +436,22 @@ void pc9801_state::fdc_2dd_ctrl_w(uint8_t data)
 	m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 }
 
+u8 pc9801vm_state::ide_ctrl_hack_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		// HACK: RS IDE driver will try to do 512 to 256 byte sector translations
+		// MEMSW has no setting for this, is it concealed?
+		// SDIP based machines don't need this (they will default to 512 bps, shadowed from
+		// gaiji $ac403 bit 6).
+		address_space &ram = m_maincpu->space(AS_PROGRAM);
+		ram.write_byte(0x457, ram.read_byte(0x457) | 0xc0);
+	}
+	return m_ide_sel;
+}
+
 u8 pc9801vm_state::ide_ctrl_r()
 {
-	address_space &ram = m_maincpu->space(AS_PROGRAM);
-	// this makes the ide driver not do 512 to 256 byte sector translation, the 9821 looks for bit 6 of offset 0xac403 of the kanji ram to set this, the rs unknown
-	ram.write_byte(0x457, ram.read_byte(0x457) | 0xc0);
 	return m_ide_sel;
 }
 
@@ -636,7 +630,7 @@ void pc9801_state::pc9801_common_io(address_map &map)
 //  map.unmap_value_high();
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00);
 	map(0x0000, 0x001f).rw(FUNC(pc9801_state::pic_r), FUNC(pc9801_state::pic_w)).umask16(0x00ff); // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask16(0x00ff);
+	map(0x0020, 0x0020).w(FUNC(pc9801_state::rtc_w));
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 	map(0x0030, 0x0033).rw(m_sio_rs, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -700,8 +694,7 @@ uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 	// rxtrain wants the LR setting for PCG area ...
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 	{
-		// TODO: cfr. below
-		pcg_offset |= m_video_ff[KAC_REG] << 7;
+		pcg_offset |= (!m_video_ff[KAC_REG] << 12);
 		return m_kanji_rom[pcg_offset | m_font_lr];
 	}
 
@@ -721,41 +714,40 @@ void pc9801vm_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
 	{
 		// HACK: don't know yet how KAC works
 		// 0=code access, 1=dot access
-		// os2warp expects a kanjiram flag to RAM $596 -> PCG offset 000ac429,
+		// os2warp3 expects a kanjiram flag to RAM $596 -> PCG offset 000ac429,
 		// will otherwise moan for CPU not set High.
 		// This traces back by POST routines setting that location with 0x80, then it successively
 		// wipes out a good chunk of the area with KAC mode enabled ...
-		pcg_offset |= m_video_ff[KAC_REG] << 7;
+		pcg_offset |= (!m_video_ff[KAC_REG] << 12);
 		m_kanji_rom[pcg_offset] = data;
 		m_gfxdecode->gfx(2)->mark_dirty(pcg_offset >> 5);
 	}
 }
 
-void pc9801vm_state::pc9801rs_bank_w(offs_t offset, uint8_t data)
+void pc9801vm_state::itf_43d_bank_w(offs_t offset, uint8_t data)
 {
-	if(offset == 1)
+	if((data & 0xf0) == 0x00 || (data & 0xf0) == 0x10)
 	{
-		if((data & 0xf0) == 0x00 || (data & 0xf0) == 0x10)
+		if((data & 0xed) == 0x00)
 		{
-			if((data & 0xed) == 0x00)
-			{
-				m_ipl->set_bank((data & 2) >> 1);
-				return;
-			}
+			m_ipl->set_bank((data & 2) >> 1);
+			return;
 		}
-
-		logerror("Unknown EMS ROM setting %02x\n",data);
 	}
-	if(offset == 3)
+
+	logerror("Unknown ITF $43d ROM bank setting %02x\n",data);
+}
+
+void pc9801vm_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
+{
+	if((data & 0xf0) == 0x20)
+		m_vram_bank = (data & 2) >> 1;
+	else
 	{
-		if((data & 0xf0) == 0x20)
-			m_vram_bank = (data & 2) >> 1;
-		else
-		{
-			logerror("Unknown EMS RAM setting %02x\n",data);
-		}
+		logerror("Unknown C-Bus $43f bank setting %02x\n",data);
 	}
 }
+
 
 uint8_t pc9801vm_state::a20_ctrl_r(offs_t offset)
 {
@@ -789,6 +781,8 @@ void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)
 			m_gate_a20 = 1;
 		else if(data == 0x03)
 			m_gate_a20 = 0;
+		else
+			logerror("CPU port $00f6: unmapped data write %02x\n", data);
 	}
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 }
@@ -954,6 +948,17 @@ void pc9801vm_state::fdc_mode_w(uint8_t data)
 	//  logerror("FDC ctrl called with %02x\n",data);
 }
 
+TIMER_CALLBACK_MEMBER(pc9801vm_state::fdc_trigger)
+{
+	// TODO: sorcer/hydlide definitely expects the XTMASK irq to be taken
+	// NOTE: should probably trigger the FDC irq depending on mode, i.e. use fdc_irq_w fn
+	if (BIT(m_fdc_2hd_ctrl, 2))
+	{
+		m_pic2->ir2_w(0);
+		m_pic2->ir2_w(1);
+	}
+}
+
 // TODO: undefined/disallow read/writes if I/F mode doesn't match
 // (and that applies to FDC mapping too!)
 // id port 0 -> 2DD
@@ -967,17 +972,6 @@ template <unsigned port> u8 pc9801vm_state::fdc_2hd_2dd_ctrl_r()
 		res |= fdc_drive_ready_r(m_fdc_2hd) << 4;
 	}
 	return res;
-}
-
-TIMER_CALLBACK_MEMBER(pc9801vm_state::fdc_trigger)
-{
-	// TODO: sorcer/hydlide definitely expects the XTMASK irq to be taken
-	// NOTE: should probably trigger the FDC irq depending on mode, i.e. use fdc_irq_w fn
-	if (BIT(m_fdc_2hd_ctrl, 2))
-	{
-		m_pic2->ir2_w(0);
-		m_pic2->ir2_w(1);
-	}
 }
 
 template <unsigned port> void pc9801vm_state::fdc_2hd_2dd_ctrl_w(u8 data)
@@ -1006,6 +1000,74 @@ template <unsigned port> void pc9801vm_state::fdc_2hd_2dd_ctrl_w(u8 data)
 	{
 		m_fdc_timer->reset();
 		m_fdc_timer->adjust(attotime::from_msec(100));
+	}
+}
+
+// TODO: some machines (which?) mirror 0x00be to 0x04be
+u8 pc9801vm_state::fdc_3mode_r(offs_t offset)
+{
+	// freebsd21 expects 0-fill rather than the more logical 1-fill
+	// on 5.25" floppies/ext. drive id checks, open bus?
+	// TODO: external FDD
+	if (m_fdc_3mode.dev_sel & 2)
+		return 0;
+
+	const bool is_35hd = m_fdc_2hd->subdevice<floppy_connector>(m_fdc_3mode.dev_sel ? "1" : "0")->get_device()->get_form_factor() == floppy_image::FF_35;
+
+	if (!is_35hd)
+		return 0;
+
+	u8 res = 0xee;
+
+	// Check if drive is in 2HD/1MB mode
+	if (BIT(m_fdc_mode, 1))
+		res |= 1 << 4;
+
+	if (m_fdc_3mode.access_144mb)
+		res |= 1 << 0;
+
+	return res;
+}
+
+/*
+ * -xx- ---- Drive specification
+ * -00- ---- First internal drive
+ * -01- ---- Second internal drive
+ * -10- ---- External drive
+ * ---x ---- Operation mode specification
+ * ---0 ---- no-op
+ * ---1 ---- Access Mode valid
+ * ---- ---x Access Mode specification
+ * ---- ---0 1MB/640KB
+ * ---- ---1 1.44MB
+ */
+void pc9801vm_state::fdc_3mode_w(offs_t offset, uint8_t data)
+{
+	//logerror("$4be: W %02x\n", data);
+	m_fdc_3mode.dev_sel = (data & 0x60) >> 5;
+
+	// TODO: external FDD
+	if (m_fdc_3mode.dev_sel & 2)
+		return;
+
+	if (BIT(data, 4))
+	{
+		const bool is_35hd = m_fdc_2hd->subdevice<floppy_connector>(m_fdc_3mode.dev_sel ? "1" : "0")->get_device()->get_form_factor() == floppy_image::FF_35;
+
+		if (!is_35hd)
+			return;
+
+		floppy_image_device *floppy = m_fdc_2hd->subdevice<floppy_connector>(m_fdc_3mode.dev_sel ? "1" : "0")->get_device();
+		m_fdc_3mode.access_144mb = !!(BIT(data, 0));
+		if (m_fdc_3mode.access_144mb)
+		{
+			floppy->set_rpm(300);
+			m_fdc_2hd->set_rate(500000);
+		}
+		else
+		{
+			fdc_set_density_mode(!!BIT(m_fdc_mode, 1));
+		}
 	}
 }
 
@@ -1134,8 +1196,10 @@ void pc9801vm_state::pc9801ux_io(address_map &map)
 	map(0x00cc, 0x00cc).rw(FUNC(pc9801vm_state::fdc_2hd_2dd_ctrl_r<0>), FUNC(pc9801vm_state::fdc_2hd_2dd_ctrl_w<0>));
 	map(0x00f0, 0x00ff).rw(FUNC(pc9801vm_state::a20_ctrl_r), FUNC(pc9801vm_state::a20_ctrl_w)).umask16(0x00ff);
 	map(0x0439, 0x0439).rw(FUNC(pc9801vm_state::dma_access_ctrl_r), FUNC(pc9801vm_state::dma_access_ctrl_w));
-	map(0x043c, 0x043f).w(FUNC(pc9801vm_state::pc9801rs_bank_w)); //ROM/RAM bank
+	map(0x043d, 0x043d).w(FUNC(pc9801vm_state::itf_43d_bank_w));
+	map(0x043f, 0x043f).w(FUNC(pc9801vm_state::cbus_43f_bank_w));
 	map(0x04a0, 0x04af).w(FUNC(pc9801vm_state::egc_w));
+	map(0x04be, 0x04be).rw(FUNC(pc9801vm_state::fdc_3mode_r), FUNC(pc9801vm_state::fdc_3mode_w));
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 }
 
@@ -1152,7 +1216,7 @@ void pc9801vm_state::pc9801rs_io(address_map &map)
 {
 //  map.unmap_value_high();
 	pc9801ux_io(map);
-	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
+	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_hack_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
 	map(0x0640, 0x064f).rw(FUNC(pc9801vm_state::ide_cs0_r), FUNC(pc9801vm_state::ide_cs0_w));
 	map(0x0740, 0x074f).rw(FUNC(pc9801vm_state::ide_cs1_r), FUNC(pc9801vm_state::ide_cs1_w));
 	map(0x1e8c, 0x1e8f).noprw(); // temp
@@ -1160,46 +1224,29 @@ void pc9801vm_state::pc9801rs_io(address_map &map)
 	map(0xe0d0, 0xe0d3).r(FUNC(pc9801vm_state::midi_r));
 }
 
-// SDIP handling
-// TODO: move to device
-
-template<unsigned port> u8 pc9801us_state::sdip_r(offs_t offset)
-{
-	u8 sdip_offset = port + (m_sdip_bank * 12);
-
-	return m_sdip[sdip_offset];
-}
-
-template<unsigned port> void pc9801us_state::sdip_w(offs_t offset, u8 data)
-{
-	u8 sdip_offset = port + (m_sdip_bank * 12);
-
-	m_sdip[sdip_offset] = data;
-}
-
-void pc9801us_state::sdip_bank_w(offs_t offset, u8 data)
-{
-	// TODO: depending on model type this is hooked up differently
-	// (or be not hooked up at all like in 9801US case)
-	m_sdip_bank = (data & 0x40) >> 6;
-}
-
 void pc9801us_state::pc9801us_io(address_map &map)
 {
 	pc9801rs_io(map);
-	map(0x841e, 0x841e).rw(FUNC(pc9801us_state::sdip_r<0x0>), FUNC(pc9801us_state::sdip_w<0x0>));
-	map(0x851e, 0x851e).rw(FUNC(pc9801us_state::sdip_r<0x1>), FUNC(pc9801us_state::sdip_w<0x1>));
-	map(0x861e, 0x861e).rw(FUNC(pc9801us_state::sdip_r<0x2>), FUNC(pc9801us_state::sdip_w<0x2>));
-	map(0x871e, 0x871e).rw(FUNC(pc9801us_state::sdip_r<0x3>), FUNC(pc9801us_state::sdip_w<0x3>));
-	map(0x881e, 0x881e).rw(FUNC(pc9801us_state::sdip_r<0x4>), FUNC(pc9801us_state::sdip_w<0x4>));
-	map(0x891e, 0x891e).rw(FUNC(pc9801us_state::sdip_r<0x5>), FUNC(pc9801us_state::sdip_w<0x5>));
-	map(0x8a1e, 0x8a1e).rw(FUNC(pc9801us_state::sdip_r<0x6>), FUNC(pc9801us_state::sdip_w<0x6>));
-	map(0x8b1e, 0x8b1e).rw(FUNC(pc9801us_state::sdip_r<0x7>), FUNC(pc9801us_state::sdip_w<0x7>));
-	map(0x8c1e, 0x8c1e).rw(FUNC(pc9801us_state::sdip_r<0x8>), FUNC(pc9801us_state::sdip_w<0x8>));
-	map(0x8d1e, 0x8d1e).rw(FUNC(pc9801us_state::sdip_r<0x9>), FUNC(pc9801us_state::sdip_w<0x9>));
-	map(0x8e1e, 0x8e1e).rw(FUNC(pc9801us_state::sdip_r<0xa>), FUNC(pc9801us_state::sdip_w<0xa>));
-	map(0x8f1e, 0x8f1e).rw(FUNC(pc9801us_state::sdip_r<0xb>), FUNC(pc9801us_state::sdip_w<0xb>));
-	map(0x8f1f, 0x8f1f).w(FUNC(pc9801us_state::sdip_bank_w));
+	map(0x0430, 0x0433).rw(FUNC(pc9801us_state::ide_ctrl_r), FUNC(pc9801us_state::ide_ctrl_w)).umask16(0x00ff);
+	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) {
+		// despite what undocumented mem claims US and FS actually access this for SDIP banking
+		if (data == 0xa0 || data == 0xe0)
+			m_sdip->bank_w(BIT(data, 6));
+		else
+			a20_ctrl_w(3, data);
+	}));
+
+	// 0x841e ~ 0x8f1e SDIP I/O mapping
+	// NOTE: split in half for pleasing emumem
+	map(0x841e, 0x841e).select(0x300).lrw8(
+		NAME([this] (offs_t offset) { return m_sdip->read(offset >> 8); }),
+		NAME([this] (offs_t offset, u8 data) { m_sdip->write(offset >> 8, data); })
+	);
+	map(0x881e, 0x881e).select(0x700).lrw8(
+		NAME([this] (offs_t offset) { return m_sdip->read((offset >> 8) + 4); }),
+		NAME([this] (offs_t offset, u8 data) { m_sdip->write((offset >> 8) + 4, data); })
+	);
+//  map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
 }
 
 void pc9801bx_state::pc9801bx2_map(address_map &map)
@@ -1255,8 +1302,17 @@ void pc9801bx_state::gdc_31kHz_w(offs_t offset, u8 data)
 void pc9801bx_state::pc9801bx2_io(address_map &map)
 {
 	pc9801us_io(map);
+	// NOP legacy SDIP bank access
+	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) { a20_ctrl_w(3, data); }));
 	map(0x0534, 0x0534).r(FUNC(pc9801bx_state::i486_cpu_mode_r));
 	map(0x09a8, 0x09a8).rw(FUNC(pc9801bx_state::gdc_31kHz_r), FUNC(pc9801bx_state::gdc_31kHz_w));
+	map(0x8f1f, 0x8f1f).lw8(NAME([this] (offs_t offset, u8 data) {
+		// BA2 onward and every PC-9821 uses this method for SDIP bank
+		if (data == 0x80 || data == 0xc0)
+			m_sdip->bank_w(BIT(data, 6));
+		else
+			logerror("SDIP: I/O $8f1f unrecognized write %02x\n", data);
+	}));
 }
 
 /*uint8_t pc9801_state::winram_r(offs_t offset)
@@ -1687,6 +1743,7 @@ void pc9801_state::dack3_w(int state) { /*logerror("%02x 3\n",state);*/ set_dma_
 
 u8 pc9801_state::ppi_sys_portb_r()
 {
+	// TODO: should be active low for rs232
 	u8 res = 0;
 
 	res |= BIT(m_dsw1->read(), 0) << 3;
@@ -1908,16 +1965,6 @@ void pc9801vm_state::mouse_freq_w(offs_t offset, u8 data)
 	m_mouse.freq_index = 0;
 }
 
-// standard debug catch-all handler
-// I/O mapping is byte smearing party, so logerror can possibly silently hide handler
-// accesses if they are partially handled by an umask in the mapping.
-uint8_t pc9801_state::unk_r(offs_t offset)
-{
-//  printf("%04x\n",offset);
-//  logerror("%s: I/O read access %04x\n",offset);
-	return 0xff;
-}
-
 /****************************************
 *
 * UPD765 interface
@@ -2058,8 +2105,6 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 MACHINE_START_MEMBER(pc9801us_state,pc9801us)
 {
 	MACHINE_START_CALL_MEMBER(pc9801rs);
-
-	save_pointer(NAME(m_sdip), 24);
 }
 
 MACHINE_START_MEMBER(pc9801bx_state,pc9801bx2)
@@ -2116,6 +2161,8 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 
 	m_gate_a20 = 0;
 	m_fdc_mode = 3;
+	m_fdc_3mode.dev_sel = 2;
+	m_fdc_3mode.access_144mb = false;
 	fdc_set_density_mode(true); // 2HD
 	// 0xfb on PC98XL
 	// TODO: breaks UART setup for pc9801rs
@@ -2181,15 +2228,27 @@ TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
 
 void pc9801_atapi_devices(device_slot_interface &device)
 {
-	device.option_add("pc9801_cd", PC9801_CD);
+	device.option_add("pc98_cd", PC98_CD);
 }
 
-void pc9801_state::pc9801_keyboard(machine_config &config)
+void pc9801_state::config_video(machine_config &config)
+{
+	m_hgdc[0]->set_addrmap(0, &pc9801_state::upd7220_1_map);
+	m_hgdc[0]->set_draw_text(FUNC(pc9801_state::hgdc_draw_text));
+	m_hgdc[0]->vsync_wr_callback().set(m_hgdc[1], FUNC(upd7220_device::ext_sync_w));
+	m_hgdc[0]->vsync_wr_callback().append(FUNC(pc9801_state::vrtc_irq));
+
+	m_hgdc[1]->set_addrmap(0, &pc9801_state::upd7220_2_map);
+	m_hgdc[1]->set_display_pixels(FUNC(pc9801_state::hgdc_display_pixels));
+}
+
+
+void pc9801_state::config_keyboard(machine_config &config)
 {
 	I8251(config, m_sio_kbd, 0);
-	m_sio_kbd->txd_handler().set("keyb", FUNC(pc9801_kbd_device::input_txd));
-	m_sio_kbd->dtr_handler().set("keyb", FUNC(pc9801_kbd_device::input_rty));
-	m_sio_kbd->rts_handler().set("keyb", FUNC(pc9801_kbd_device::input_kbde));
+	m_sio_kbd->txd_handler().set("keyb", FUNC(pc98_kbd_device::input_txd));
+	m_sio_kbd->dtr_handler().set("keyb", FUNC(pc98_kbd_device::input_rty));
+	m_sio_kbd->rts_handler().set("keyb", FUNC(pc98_kbd_device::input_kbde));
 	m_sio_kbd->write_cts(0);
 	m_sio_kbd->write_dsr(0);
 	m_sio_kbd->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir1_w));
@@ -2198,7 +2257,7 @@ void pc9801_state::pc9801_keyboard(machine_config &config)
 	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
 	kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
 
-	PC9801_KBD(config, m_keyb, 0);
+	PC98_KBD(config, m_keyb, 0);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 }
 
@@ -2284,22 +2343,22 @@ void pc9801_state::pc9801_sasi(machine_config &config)
 void pc9801vm_state::cdrom_headphones(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^lheadphone", 1.0);
-	cdda->add_route(1, "^^rheadphone", 1.0);
+	cdda->add_route(0, "^^headphone", 1.0, 0);
+	cdda->add_route(1, "^^headphone", 1.0, 1);
 }
 
 void pc9801vm_state::pc9801_ide(machine_config &config)
 {
-	SPEAKER(config, "lheadphone").front_left();
-	SPEAKER(config, "rheadphone").front_right();
+	SPEAKER(config, "headphone", 2).front();
 	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
 	m_ide[0]->irq_handler().set("ideirq", FUNC(input_merger_device::in_w<0>));
-	ATA_INTERFACE(config, m_ide[1]).options(pc9801_atapi_devices, "pc9801_cd", nullptr, false);
+	ATA_INTERFACE(config, m_ide[1]).options(pc9801_atapi_devices, "pc98_cd", nullptr, false);
 	m_ide[1]->irq_handler().set("ideirq", FUNC(input_merger_device::in_w<1>));
-	m_ide[1]->slot(0).set_option_machine_config("pc9801_cd", cdrom_headphones);
+	m_ide[1]->slot(0).set_option_machine_config("pc98_cd", cdrom_headphones);
 
 	INPUT_MERGER_ANY_HIGH(config, "ideirq").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
 
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc98_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("pc98_cd");
 }
 
@@ -2362,13 +2421,13 @@ void pc9801_state::pc9801_common(machine_config &config)
 	// TODO: other ports
 	m_ppi_prn->in_pb_callback().set(FUNC(pc9801_state::ppi_prn_portb_r));
 
-	pc9801_keyboard(config);
+	config_keyboard(config);
 	pc9801_mouse(config);
 	pc9801_cbus(config);
 
 	pc9801_serial(config);
 
-	PC9801_MEMSW(config, m_memsw, 0);
+	PC98_MEMSW(config, m_memsw, 0);
 
 	UPD765A(config, m_fdc_2hd, 8'000'000, true, true);
 	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));
@@ -2384,14 +2443,8 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_screen->set_screen_update(FUNC(pc9801_state::screen_update));
 
 	UPD7220(config, m_hgdc[0], 21.0526_MHz_XTAL / 8, "screen");
-	m_hgdc[0]->set_addrmap(0, &pc9801_state::upd7220_1_map);
-	m_hgdc[0]->set_draw_text(FUNC(pc9801_state::hgdc_draw_text));
-	m_hgdc[0]->vsync_wr_callback().set(m_hgdc[1], FUNC(upd7220_device::ext_sync_w));
-	m_hgdc[0]->vsync_wr_callback().append(FUNC(pc9801_state::vrtc_irq));
-
 	UPD7220(config, m_hgdc[1], 21.0526_MHz_XTAL / 8, "screen");
-	m_hgdc[1]->set_addrmap(0, &pc9801_state::upd7220_2_map);
-	m_hgdc[1]->set_display_pixels(FUNC(pc9801_state::hgdc_display_pixels));
+	config_video(config);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -2497,6 +2550,17 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801_common)
 }
 
+// UV is essentially a VM with 3.5 drives
+// Released as UV2 (384KB RAM), UV21 (640KB RAM) then UV11 (UV21 but smaller?)
+void pc9801vm_state::pc9801uv(machine_config &config)
+{
+	pc9801vm(config);
+
+	config_floppy_35hd(config);
+
+	m_ram->set_default_size("640K").set_extra_options("384K");
+}
+
 void pc9801vm_state::pc9801ux(machine_config &config)
 {
 	pc9801rs(config);
@@ -2543,21 +2607,29 @@ void pc9801vm_state::pc9801vx(machine_config &config)
 void pc9801us_state::pc9801us(machine_config &config)
 {
 	pc9801rs(config);
-	I386SX(config.replace(), m_maincpu, MAIN_CLOCK_X1*8); // unknown clock
+	const XTAL xtal = BASE_CLOCK / 2; // ~16 MHz
+	I386SX(config.replace(), m_maincpu, xtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801us_state::pc9801rs_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801us_state::pc9801us_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_35hd(config);
+
+	pit_clock_config(config, xtal / 4);
+
+	PC98_119_KBD(config.replace(), m_keyb, 0);
+	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
+
+	PC98_SDIP(config, "sdip", 0);
 }
 
-void pc9801vm_state::pc9801fs(machine_config &config)
+void pc9801us_state::pc9801fs(machine_config &config)
 {
 	pc9801rs(config);
 	const XTAL xtal = XTAL(20'000'000); // ~20 MHz
 	I386SX(config.replace(), m_maincpu, xtal);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801rs_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801rs_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801us_state::pc9801rs_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801us_state::pc9801us_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	// optional 3'5 floppies x2
@@ -2566,6 +2638,11 @@ void pc9801vm_state::pc9801fs(machine_config &config)
 	// optional SCSI HDD
 
 	pit_clock_config(config, xtal / 4);
+
+//  PC98_119_KBD(config.replace(), m_keyb, 0);
+//  m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
+
+	PC98_SDIP(config, "sdip", 0);
 }
 
 void pc9801bx_state::pc9801bx2(machine_config &config)
@@ -2581,6 +2658,8 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801bx_state, pc9801bx2)
 
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST, /4 ~ /7
+
+	PC98_SDIP(config, "sdip", 0);
 
 	// minimum RAM: 1.8 / 3.6 MB (?)
 	// maximum RAM: 19.6 MB
@@ -2669,7 +2748,8 @@ ROM_START( pc9801f )
 
 	ROM_REGION16_LE( 0x1000, "fdc_bios_2hd", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF ) // 2dd fdc bios, presumably bad size (should be 0x800 for each rom)
+	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF )
+	// 2dd fdc bios, presumably bad size (should be 0x800 for each rom)
 	ROM_LOAD16_BYTE( "urf01-01.bin", 0x00000, 0x4000, BAD_DUMP CRC(2f5ae147) SHA1(69eb264d520a8fc826310b4fce3c8323867520ee) )
 	ROM_LOAD16_BYTE( "urf02-01.bin", 0x00001, 0x4000, BAD_DUMP CRC(62a86928) SHA1(4160a6db096dbeff18e50cbee98f5d5c1a29e2d1) )
 	ROM_LOAD( "2hdif.rom", 0x10000, 0x1000, BAD_DUMP CRC(9652011b) SHA1(b607707d74b5a7d3ba211825de31a8f32aec8146) ) // needs dumping from a board
@@ -2705,6 +2785,37 @@ ROM_START( pc9801vm )
 	ROM_LOAD16_BYTE( "cpu_board_3a_23c256e.bin",   0x08000, 0x4000, CRC(4128276e) SHA1(32acb7eee779a31838a17ce51b05a9a987af4099) )
 	ROM_CONTINUE( 0x00000, 0x4000 )
 
+	ROM_REGION( 0x80000, "chargen", 0 )
+//  ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+	// TODO: contains 8x8 "graphics" characters but we don't use them
+	ROM_LOAD( "main_board_12f_d2364ec.bin", 0x000000, 0x002000, CRC(11197271) SHA1(8dbd2f25daeed545ea2c74d849f0a209ceaf4dd7) )
+
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	// on main board, uPD23100 type roms
+	// kanji and most other 16x16 characters
+	ROM_LOAD16_BYTE( "main_board_12h_231000.bin", 0x00000, 0x20000, CRC(ecc2c062) SHA1(36c935c0f26c02a2b1ea46f5b6cd03fc11c7b003) )
+	ROM_LOAD16_BYTE( "main_board_10h_231000.bin", 0x00001, 0x20000, CRC(91d78281) SHA1(85a18ad40e281e68071f91800201e43d78fb4f1c) )
+	// 8x16 characters and the remaining 16x16 characters, with inverted bit order like 12f
+	ROM_LOAD16_BYTE( "main_board_8h_d23256ac.bin", 0x40000, 0x04000, CRC(62a32ba6) SHA1(cdab480ae0dad9d128e52afb15e6c0b2b122cc3f) )
+	ROM_CONTINUE( 0x40001, 0x04000 )
+
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
+
+//  LOAD_KANJI_ROMS
+//  LOAD_IDE_ROM
+ROM_END
+
+ROM_START( pc9801uv2 )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "d23c128ec-195.bin", 0x10000, 0x4000, CRC(082c86eb) SHA1(6f503b75906fd4932152f45c6d37c1e230934773) )
+	ROM_LOAD16_BYTE( "d23c128ec-196.bin", 0x10001, 0x4000, CRC(d90b730b) SHA1(27f9b67c0454ee6107db20912f08f87ff682adcc) )
+	ROM_LOAD16_BYTE( "d23c256ec-164.bin", 0x08000, 0x4000, CRC(d6cd9fef) SHA1(4ade6f891ee4c5ccb31031a520ab5ba757a6944c) )
+	ROM_CONTINUE( 0x00000, 0x4000 )
+	ROM_LOAD16_BYTE( "d23c256ec-165.bin", 0x08001, 0x4000, CRC(2d348381) SHA1(a1c7ebb7727380bcb879b2c609a1fe6cd5bfa0bb) )
+	ROM_CONTINUE( 0x00001, 0x4000 )
+
+	// borrowed from pc9801vm
 	ROM_REGION( 0x80000, "chargen", 0 )
 //  ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 	// TODO: contains 8x8 "graphics" characters but we don't use them
@@ -2833,6 +2944,11 @@ ROM_START( pc9801fs )
 	ROM_LOAD16_BYTE( "kqx02_00.bin",  0x000001, 0x020000, CRC(f55e42d6) SHA1(2ab0ae817e9abed984544c920182689127550ce3) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// 0x0c000-0x0ffff sound ROM BIOS
+	// 0x10000-0x13fff ^ mirror
+	// 0x14000-0x16fff <unknown>
+	// 0x17000-0x17fff SCSI disk BIOS?
+	// 0x18000-0x1ffff <empty>
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )  //ITF ROM
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x08000 )  //BIOS ROM
 	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x08000 )
@@ -2912,6 +3028,7 @@ ROM_START( pc9801bx2 )
 	ROM_LOAD( "pc98bank7.bin",  0x38000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// 0x1a000: setup mode
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x8000 ) // ITF ROM
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x8000 ) // BIOS ROM
 	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x8000 )
@@ -3084,6 +3201,8 @@ COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9
 
 // VM class (V30)
 COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
+// UV class (V30)
+COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
 
 // UX class (i286)
 COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -3116,7 +3235,7 @@ COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_p
 // UF/UR/US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
 COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // FS class (i386SX + ?)
-COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // FA class (i486SX)
 // ...
 // BX class (official nickname "98 FELLOW", last releases prior to 9821 line)

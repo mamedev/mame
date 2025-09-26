@@ -1857,15 +1857,14 @@ void kaneko16_blazeon_state::blazeon(machine_config &config)
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	YM2151(config, m_ymsnd, 4000000);
-	m_ymsnd->add_route(0, "lspeaker", 1.0);
-	m_ymsnd->add_route(1, "rspeaker", 1.0);
+	m_ymsnd->add_route(0, "speaker", 1.0, 0);
+	m_ymsnd->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -3758,6 +3757,15 @@ ROM_START( mgcrystl ) /* Master Up: 92/01/10 14:21:30 */
 
 	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "mc030.u32",  0x000000, 0x040000, CRC(c165962e) SHA1(f7e130db387ae9dcb7223f7ad6e51270d3033bc9) )
+
+	ROM_REGION( 0xe00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "18cv8.u08", 0x000, 0x155, CRC(5e35733c) SHA1(b7ff6668b64993be0a662ac3d468658623864667) )
+	ROM_LOAD( "18cv8.u20", 0x200, 0x155, CRC(65b945b2) SHA1(958f2e9753b1361b1763b083cc79f5db04a7488c) )
+	ROM_LOAD( "18cv8.u41", 0x400, 0x155, CRC(0b05a7ea) SHA1(5a46907c4e359826ada87190d1041d67bcd54c63) )
+	ROM_LOAD( "18cv8.u42", 0x600, 0x155, CRC(434c0fbb) SHA1(0b4432e660a9dafbbc4acb947e3e98fd2e6e500f) )
+	ROM_LOAD( "18cv8.u50", 0x800, 0x155, CRC(2fd7e6dc) SHA1(41ab0917fc1a997e7d2d2cab75ec8681f542310e) )
+	ROM_LOAD( "18cv8.u51", 0xa00, 0x155, CRC(8d1fd79b) SHA1(ee686c8d6f740d053a4f21a0f35a01c0dbfeda70) )
+	ROM_LOAD( "18cv8.u54", 0xc00, 0x155, CRC(5e35733c) SHA1(b7ff6668b64993be0a662ac3d468658623864667) ) // identical to u08
 ROM_END
 
 ROM_START( mgcrystlo ) /* Master Up: 91/12/10 01:56:06 */
@@ -3782,6 +3790,15 @@ ROM_START( mgcrystlo ) /* Master Up: 91/12/10 01:56:06 */
 
 	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "mc030.u32",  0x000000, 0x040000, CRC(c165962e) SHA1(f7e130db387ae9dcb7223f7ad6e51270d3033bc9) )
+
+	ROM_REGION( 0xe00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "18cv8.u08", 0x000, 0x155, CRC(5e35733c) SHA1(b7ff6668b64993be0a662ac3d468658623864667) )
+	ROM_LOAD( "18cv8.u20", 0x200, 0x155, CRC(65b945b2) SHA1(958f2e9753b1361b1763b083cc79f5db04a7488c) )
+	ROM_LOAD( "18cv8.u41", 0x400, 0x155, CRC(0b05a7ea) SHA1(5a46907c4e359826ada87190d1041d67bcd54c63) )
+	ROM_LOAD( "18cv8.u42", 0x600, 0x155, CRC(434c0fbb) SHA1(0b4432e660a9dafbbc4acb947e3e98fd2e6e500f) )
+	ROM_LOAD( "18cv8.u50", 0x800, 0x155, CRC(2fd7e6dc) SHA1(41ab0917fc1a997e7d2d2cab75ec8681f542310e) )
+	ROM_LOAD( "18cv8.u51", 0xa00, 0x155, CRC(8d1fd79b) SHA1(ee686c8d6f740d053a4f21a0f35a01c0dbfeda70) )
+	ROM_LOAD( "18cv8.u54", 0xc00, 0x155, CRC(5e35733c) SHA1(b7ff6668b64993be0a662ac3d468658623864667) ) // identical to u08
 ROM_END
 
 ROM_START( mgcrystlj ) /* Master Up: 92/01/13 14:44:20 */
@@ -3806,6 +3823,15 @@ ROM_START( mgcrystlj ) /* Master Up: 92/01/13 14:44:20 */
 
 	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "kaneko__mc-030_0005_t99.u32",  0x000000, 0x040000, CRC(c165962e) SHA1(f7e130db387ae9dcb7223f7ad6e51270d3033bc9) )
+
+	ROM_REGION( 0xe00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "18cv8.u08", 0x000, 0x155, CRC(5e35733c) SHA1(b7ff6668b64993be0a662ac3d468658623864667) )
+	ROM_LOAD( "18cv8.u20", 0x200, 0x155, CRC(65b945b2) SHA1(958f2e9753b1361b1763b083cc79f5db04a7488c) )
+	ROM_LOAD( "18cv8.u41", 0x400, 0x155, CRC(0b05a7ea) SHA1(5a46907c4e359826ada87190d1041d67bcd54c63) )
+	ROM_LOAD( "18cv8.u42", 0x600, 0x155, CRC(434c0fbb) SHA1(0b4432e660a9dafbbc4acb947e3e98fd2e6e500f) )
+	ROM_LOAD( "18cv8.u50", 0x800, 0x155, CRC(2fd7e6dc) SHA1(41ab0917fc1a997e7d2d2cab75ec8681f542310e) )
+	ROM_LOAD( "18cv8.u51", 0xa00, 0x155, CRC(8d1fd79b) SHA1(ee686c8d6f740d053a4f21a0f35a01c0dbfeda70) )
+	ROM_LOAD( "18cv8.u54", 0xc00, 0x155, CRC(5e35733c) SHA1(b7ff6668b64993be0a662ac3d468658623864667) ) // identical to u08
 ROM_END
 
 

@@ -48,7 +48,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// HACK: This timer is currently used to trigger an interrupt after the auto-DMA-transferred buffer would have been
 	//       mixed and played back, as the PS2 BIOS pulls a null return address and crashes if we trigger the auto-DMA-complete

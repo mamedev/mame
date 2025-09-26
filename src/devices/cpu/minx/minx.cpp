@@ -104,6 +104,44 @@ void minx_cpu_device::wr16( uint32_t offset, uint16_t data )
 
 void minx_cpu_device::device_start()
 {
+	// zerofill
+	m_PC = 0;
+	m_SP = 0;
+	m_BA = 0;
+	m_HL = 0;
+	m_X = 0;
+	m_Y = 0;
+	m_U = 0;
+	m_V = 0;
+	m_F = 0;
+	m_E = 0;
+	m_N = 0;
+	m_I = 0;
+	m_XI = 0;
+	m_YI = 0;
+	m_halted = 0;
+	m_interrupt_pending = 0;
+	m_curpc = 0;
+	m_flags = 0;
+
+	// register for savestates
+	save_item(NAME(m_PC));
+	save_item(NAME(m_SP));
+	save_item(NAME(m_BA));
+	save_item(NAME(m_HL));
+	save_item(NAME(m_X));
+	save_item(NAME(m_Y));
+	save_item(NAME(m_U));
+	save_item(NAME(m_V));
+	save_item(NAME(m_F));
+	save_item(NAME(m_E));
+	save_item(NAME(m_N));
+	save_item(NAME(m_I));
+	save_item(NAME(m_XI));
+	save_item(NAME(m_YI));
+	save_item(NAME(m_halted));
+	save_item(NAME(m_interrupt_pending));
+
 	m_program = &space(AS_PROGRAM);
 
 	state_add( MINX_PC, "PC", m_PC ).formatstr("%04X");

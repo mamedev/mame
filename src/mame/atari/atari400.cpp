@@ -66,7 +66,6 @@
 #include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "atarifdc.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
 
@@ -276,6 +275,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_pia(*this, "pia")
 		, m_dac(*this, "dac")
+		, m_sio(*this, "sio")
 		, m_region_maincpu(*this, "maincpu")
 		, m_cartleft(*this, "cartleft")
 		, m_cart_rd4_view(*this, "cart_rd4_view")
@@ -332,6 +332,7 @@ protected:
 	optional_device<ram_device> m_ram;
 	optional_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
+	optional_device<a8sio_device> m_sio;
 	required_memory_region m_region_maincpu;
 	optional_device<a800_cart_slot_device> m_cartleft;
 	memory_view m_cart_rd4_view, m_cart_rd5_view;
@@ -1730,6 +1731,9 @@ void a400_state::machine_start()
 {
 	save_item(NAME(m_cart_rd4_enabled));
 	save_item(NAME(m_cart_rd5_enabled));
+
+	if (m_sio.found())
+		m_sio->ready_w(1);
 }
 
 void a1200xl_state::machine_start()
@@ -2009,10 +2013,6 @@ void a400_state::atari_common_nodac(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
-	m_pokey->serin_r().set("fdc", FUNC(atari_fdc_device::serin_r));
-	m_pokey->serout_w().set("fdc", FUNC(atari_fdc_device::serout_w));
-	//m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
-	//m_pokey->sod_w().set("sio", FUNC(a8sio_device::data_out_w));
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a800_keyboard));
 	m_pokey->irq_w().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2032,6 +2032,8 @@ void a400_state::atari_common(machine_config &config)
 	m_pokey->pot_r<5>().set(m_ctrl[2], FUNC(vcs_control_port_device::read_pot_x));
 	m_pokey->pot_r<6>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_y));
 	m_pokey->pot_r<7>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_x));
+	m_pokey->oclk_w().set(m_sio, FUNC(a8sio_device::clock_out_w));
+	m_pokey->sod_w().set(m_sio, FUNC(a8sio_device::data_out_w));
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
@@ -2052,19 +2054,16 @@ void a400_state::atari_common(machine_config &config)
 	m_pia->writepa_handler().set(FUNC(a400_state::djoy_0_1_w));
 	m_pia->readpb_handler().set(FUNC(a400_state::djoy_2_3_r));
 	m_pia->writepb_handler().set(FUNC(a400_state::djoy_2_3_w));
-	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
-	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
-	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
+	m_pia->ca2_handler().set(m_sio, FUNC(a8sio_device::motor_w));
+	m_pia->cb2_handler().set(m_sio, FUNC(a8sio_device::command_w));
 	m_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	a8sio_device &sio(A8SIO(config, "sio", nullptr));
+	a8sio_device &sio(A8SIO(config, m_sio, "fdc"));
 	//sio.clock_in().set(m_pokey, FUNC(pokey_device::bclk_w));
 	sio.data_in().set(m_pokey, FUNC(pokey_device::sid_w));
 	sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
 	sio.interrupt().set(m_pia, FUNC(pia6821_device::cb1_w));
-
-	ATARI_FDC(config, "fdc", 0);
 
 	A800_CART_SLOT(config, m_cartleft, a800_left, nullptr);
 	m_cartleft->rd4_callback().set(FUNC(a400_state::cart_rd4_w));
@@ -2245,8 +2244,8 @@ void a5200_state::a5200(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(a5200_state::a5200_interrupt), "screen", 0, 1);
 
 	// Not used but exposed via expansion port
-	m_pokey->serin_r().set_constant(0);
-	m_pokey->serout_w().set_nop();
+	//m_pokey->serin_r().set_constant(0);
+	//m_pokey->serout_w().set_nop();
 	m_pokey->pot_r<0>().set_ioport("analog_0");
 	m_pokey->pot_r<1>().set_ioport("analog_1");
 	m_pokey->pot_r<2>().set_ioport("analog_2");
@@ -2282,7 +2281,7 @@ From Analog Computing Magazine, issue 16 (1984-02):
   POT7, TRIG2, TRIG3, and bit 1 of CONSOL useless. A few of the
   connector pins have been redefined. Pin 2 of the I/O expansion
   connector now carries POKEY's Audio Out signal. Three pins on the
-  cartridge connector have changed to accomodate the new 2600 adapter.
+  cartridge connector have changed to accommodate the new 2600 adapter.
   The system clock, 02, is output on pin 14, isolated through a diode.
   An alternate video input is taken from pin 24 and is also isolated
   through a diode. Pin 30 provides an alternate audio input.

@@ -13,12 +13,15 @@
 
 #pragma once
 
+#include "vsystem_gga.h"
+
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
-#include "vsystem_gga.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class fromance_state : public driver_device
 {
@@ -33,7 +36,8 @@ public:
 		m_gga(*this, "gga"),
 		m_rombank(*this, "rombank"),
 		m_sublatch(*this, "sublatch"),
-		m_msm(*this, "msm")
+		m_msm(*this, "msm"),
+		m_key_matrix(*this, "KEY%u", 0U)
 	{ }
 
 	void nekkyoku(machine_config &config);
@@ -78,6 +82,7 @@ protected:
 private:
 	optional_device<generic_latch_8_device> m_sublatch;
 	optional_device<msm5205_device> m_msm;
+	optional_ioport_array<5> m_key_matrix;
 
 	// video-related
 	std::unique_ptr<uint8_t[]>   m_local_videoram[2];

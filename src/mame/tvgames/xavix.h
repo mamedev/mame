@@ -48,7 +48,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	sound_stream *m_stream = nullptr;
@@ -647,6 +647,7 @@ public:
 	superxavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag)
 		, m_xavix2002io(*this, "xavix2002io")
+		, m_allow_superxavix_extra_rom_sprites(true)
 		, m_sx_crtc_1(*this, "sx_crtc_1")
 		, m_sx_crtc_2(*this, "sx_crtc_2")
 		, m_sx_plt_loc(*this, "sx_plt_loc")
@@ -675,6 +676,16 @@ protected:
 	required_device<xavix2002_io_device> m_xavix2002io;
 
 	virtual void get_tile_pixel_dat(uint8_t &dat, int bpp) override;
+
+	bool m_allow_superxavix_extra_rom_sprites; // config does not need saving
+
+	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
+	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
+	uint8_t superxavix_read_extended_io2(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io2 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[2]->read(); }
+
+	void superxavix_write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io0 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+	void superxavix_write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io1 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+	void superxavix_write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io2 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
 
 private:
 	void ext_segment_regs_w(offs_t offset, uint8_t data);
@@ -722,14 +733,6 @@ private:
 	void extended_extbus_reg1_w(uint8_t data);
 	void extended_extbus_reg2_w(uint8_t data);
 
-	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
-	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
-	uint8_t superxavix_read_extended_io2(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io2 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[2]->read(); }
-
-	void superxavix_write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io0 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
-	void superxavix_write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io1 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
-	void superxavix_write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io2 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
-
 	void draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t get_next_bit_sx();
@@ -768,11 +771,13 @@ public:
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
+	void superxavix_i2c_24c64(machine_config &config);
 	void superxavix_i2c_24c16(machine_config &config);
 	void superxavix_i2c_24c08(machine_config &config);
 	void superxavix_i2c_24c04(machine_config &config);
 	void superxavix_i2c_24c04_4mb(machine_config &config);
 	void superxavix_i2c_24c02(machine_config &config);
+	void superxavix_i2c_24c02_4mb(machine_config &config);
 	void superxavix_i2c_mrangbat(machine_config& config);
 
 protected:
@@ -857,16 +862,7 @@ protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
 };
 
-class xavix_duelmast_state : public xavix_i2c_state
-{
-public:
-	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
 
-protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
-};
 
 class xavix_i2c_tomshoot_state : public xavix_i2c_state
 {
@@ -1154,6 +1150,23 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_duelmast_state : public xavix_i2c_cart_state
+{
+public:
+	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_cart_state(mconfig, type, tag)
+	{
+		m_cartlimit = 0x800000;
+	}
+
+	void duelmast(machine_config &config);
+
+protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+
+	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 };
 
 class xavix_popira2_cart_state : public xavix_cart_state

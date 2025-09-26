@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(TAITO_EN, taito_en_device, "taito_en", "Taito Ensoniq Sound S
 
 taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITO_EN, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_audiocpu(*this, "audiocpu")
 	, m_ensoniq(*this, "ensoniq")
 	, m_esp(*this, "esp")
@@ -241,8 +241,8 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	/* sound hardware */
 	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'180) / (2 * 16 * 32));
 	m_pump->set_esp(m_esp);
-	m_pump->add_route(0, *this, 0.5, AUTO_ALLOC_INPUT, 0);
-	m_pump->add_route(1, *this, 0.5, AUTO_ALLOC_INPUT, 1);
+	m_pump->add_route(0, *this, 0.5, 0);
+	m_pump->add_route(1, *this, 0.5, 1);
 
 	ES5505(config, m_ensoniq, XTAL(30'476'180) / 2);
 	m_ensoniq->sample_rate_changed().set(FUNC(taito_en_device::es5505_clock_changed));

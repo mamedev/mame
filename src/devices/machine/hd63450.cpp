@@ -18,6 +18,7 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, HD63450, tag, owner, clock)
 	, m_irq_callback(*this)
 	, m_dma_end(*this)
+	, m_own(*this)
 	, m_dma_read(*this, 0)
 	, m_dma_write(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
@@ -360,6 +361,9 @@ void hd63450_device::single_transfer(int x)
 		return;
 
 	m_bec = 0;
+	m_dtack = true;
+
+	m_own(0);
 
 	if (m_reg[x].ocr & 0x80)  // direction: 1 = device -> memory
 	{
@@ -439,6 +443,11 @@ void hd63450_device::single_transfer(int x)
 		}
 //              LOG("DMA#%i: byte transfer %08lx -> %08lx\n",x,m_reg[x].mar,m_reg[x].dar);
 	}
+
+	m_own(1);
+
+	if (!m_dtack)
+		return;
 
 	if (m_bec == ERR_BUS)
 	{
@@ -525,14 +534,18 @@ void hd63450_device::drq_w(int channel, int state)
 	bool ostate = m_drq_state[channel];
 	m_drq_state[channel] = state;
 
-	if ((m_reg[channel].ocr & 2) && (state && !ostate))
+	// check for external request modes
+	if (m_reg[channel].ocr & 2)
 	{
-		// in cycle steal mode DRQ is supposed to be edge triggered
-		single_transfer(channel);
-		m_timer[channel]->adjust(m_our_clock[channel], channel, m_our_clock[channel]);
+		if (state && !ostate)
+		{
+			// in cycle steal mode DRQ is supposed to be edge triggered
+			single_transfer(channel);
+			m_timer[channel]->adjust(m_our_clock[channel], channel, m_our_clock[channel]);
+		}
+		else if (!state)
+			m_timer[channel]->adjust(attotime::never);
 	}
-	else if (!state)
-		m_timer[channel]->adjust(attotime::never);
 }
 
 void hd63450_device::pcl_w(int channel, int state)

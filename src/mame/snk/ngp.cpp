@@ -164,22 +164,11 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override ATTR_COLD;
 
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
 private:
-
-	uint8_t m_io_reg[0x40] = { };
-	uint8_t m_old_to3 = 0;
-	emu_timer* m_seconds_timer = nullptr;
-
-	struct {
-		int       present = 0;
-		uint8_t   manufacturer_id = 0;
-		uint8_t   device_id = 0;
-		uint8_t   *data = nullptr;
-		uint8_t   org_data[16] = { };
-		int       state = F_READ;
-		uint8_t   command[2] = { };
-	} m_flash_chip[2];
-
 	required_device<tmp95c061_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_z80;
@@ -189,50 +178,59 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_device<k1ge_device> m_k1ge;
+	required_ioport m_io_controls;
+	required_ioport m_io_power;
 
-	uint8_t ngp_io_r(offs_t offset);
-	void ngp_io_w(offs_t offset, uint8_t data);
+	uint8_t m_io_reg[0x40] = { };
+	uint8_t m_old_to3 = 0;
+	emu_timer* m_seconds_timer = nullptr;
+
+	struct {
+		bool      present = false;
+		uint8_t   manufacturer_id = 0;
+		uint8_t   device_id = 0;
+		uint8_t   *data = nullptr;
+		uint8_t   org_data[16] = { };
+		int32_t   state = F_READ;
+		uint8_t   command[2] = { };
+	} m_flash_chip[2];
+
+	bool m_nvram_loaded = false;
+
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
 	template <int Which> void flash_w(offs_t offset, uint8_t data);
 	void flash0_w(offs_t offset, uint8_t data);
 	void flash1_w(offs_t offset, uint8_t data);
 
-	uint8_t ngp_z80_comm_r();
-	void ngp_z80_comm_w(uint8_t data);
-	void ngp_z80_signal_main_w(uint8_t data);
+	uint8_t z80_comm_r();
+	void z80_comm_w(uint8_t data);
+	void z80_signal_main_w(uint8_t data);
 
-	void ngp_z80_clear_irq(uint8_t data);
+	void z80_clear_irq(uint8_t data);
 
-	void ngp_vblank_pin_w(int state);
-	void ngp_hblank_pin_w(int state);
-	void ngp_tlcs900_porta(offs_t offset, uint8_t data);
-	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
+	void vblank_pin_w(int state);
+	void hblank_pin_w(int state);
+	void tlcs900_porta(offs_t offset, uint8_t data);
+	TIMER_CALLBACK_MEMBER(seconds_callback);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_ngp_cart);
 
-	void ngp_mem(address_map &map) ATTR_COLD;
+	void main_mem(address_map &map) ATTR_COLD;
 	void z80_io(address_map &map) ATTR_COLD;
 	void z80_mem(address_map &map) ATTR_COLD;
-
-	bool m_nvram_loaded = false;
-	required_ioport m_io_controls;
-	required_ioport m_io_power;
-
-	virtual void nvram_default() override;
-	virtual bool nvram_read(util::read_stream &file) override;
-	virtual bool nvram_write(util::write_stream &file) override;
 };
 
 
-TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
+TIMER_CALLBACK_MEMBER(ngp_state::seconds_callback)
 {
 	advance_seconds();
 }
 
 
-uint8_t ngp_state::ngp_io_r(offs_t offset)
+uint8_t ngp_state::io_r(offs_t offset)
 {
 	uint8_t data = m_io_reg[offset];
 
@@ -262,7 +260,7 @@ uint8_t ngp_state::ngp_io_r(offs_t offset)
 }
 
 
-void ngp_state::ngp_io_w(offs_t offset, uint8_t data)
+void ngp_state::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -557,11 +555,11 @@ void ngp_state::flash1_w(offs_t offset, uint8_t data)
 }
 
 
-void ngp_state::ngp_mem(address_map &map)
+void ngp_state::main_mem(address_map &map)
 {
-	map(0x000080, 0x0000bf).rw(FUNC(ngp_state::ngp_io_r), FUNC(ngp_state::ngp_io_w));                        /* ngp/c specific i/o */
-	map(0x004000, 0x006fff).ram().share("mainram");                              /* work ram */
-	map(0x007000, 0x007fff).ram().share("share1");                               /* shared with sound cpu */
+	map(0x000080, 0x0000bf).rw(FUNC(ngp_state::io_r), FUNC(ngp_state::io_w));                        /* ngp/c specific i/o */
+	map(0x004000, 0x006fff).ram().share(m_mainram);                              /* work ram */
+	map(0x007000, 0x007fff).ram().share("soundram");                             /* shared with sound cpu */
 	map(0x008000, 0x00bfff).rw(m_k1ge, FUNC(k1ge_device::read), FUNC(k1ge_device::write));       /* video chip */
 	map(0x200000, 0x3fffff).w(FUNC(ngp_state::flash0_w));   /* cart area #1 */
 	map(0x800000, 0x9fffff).w(FUNC(ngp_state::flash1_w));   /* cart area #2 */
@@ -569,19 +567,19 @@ void ngp_state::ngp_mem(address_map &map)
 }
 
 
-uint8_t ngp_state::ngp_z80_comm_r()
+uint8_t ngp_state::z80_comm_r()
 {
 	return m_io_reg[0x3c];
 }
 
 
-void ngp_state::ngp_z80_comm_w(uint8_t data)
+void ngp_state::z80_comm_w(uint8_t data)
 {
 	m_io_reg[0x3c] = data;
 }
 
 
-void ngp_state::ngp_z80_signal_main_w(uint8_t data)
+void ngp_state::z80_signal_main_w(uint8_t data)
 {
 	m_maincpu->set_input_line(TLCS900_INT5, ASSERT_LINE);
 }
@@ -589,14 +587,14 @@ void ngp_state::ngp_z80_signal_main_w(uint8_t data)
 
 void ngp_state::z80_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().share("share1");                       /* shared with tlcs900 */
+	map(0x0000, 0x0fff).ram().share("soundram");                    /* shared with tlcs900 */
 	map(0x4000, 0x4001).w(m_t6w28, FUNC(t6w28_device::write));      /* sound chip (right, left) */
-	map(0x8000, 0x8000).rw(FUNC(ngp_state::ngp_z80_comm_r), FUNC(ngp_state::ngp_z80_comm_w));  /* main-sound communication */
-	map(0xc000, 0xc000).w(FUNC(ngp_state::ngp_z80_signal_main_w));               /* signal irq to main cpu */
+	map(0x8000, 0x8000).rw(FUNC(ngp_state::z80_comm_r), FUNC(ngp_state::z80_comm_w));  /* main-sound communication */
+	map(0xc000, 0xc000).w(FUNC(ngp_state::z80_signal_main_w));               /* signal irq to main cpu */
 }
 
 
-void ngp_state::ngp_z80_clear_irq(uint8_t data)
+void ngp_state::z80_clear_irq(uint8_t data)
 {
 	m_z80->set_input_line(0, CLEAR_LINE);
 
@@ -607,7 +605,7 @@ void ngp_state::ngp_z80_clear_irq(uint8_t data)
 
 void ngp_state::z80_io(address_map &map)
 {
-	map(0x0000, 0xffff).w(FUNC(ngp_state::ngp_z80_clear_irq));
+	map(0x0000, 0xffff).w(FUNC(ngp_state::z80_clear_irq));
 }
 
 
@@ -634,19 +632,19 @@ static INPUT_PORTS_START(ngp)
 INPUT_PORTS_END
 
 
-void ngp_state::ngp_vblank_pin_w(int state)
+void ngp_state::vblank_pin_w(int state)
 {
 	m_maincpu->set_input_line(TLCS900_INT4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-void ngp_state::ngp_hblank_pin_w(int state)
+void ngp_state::hblank_pin_w(int state)
 {
 	m_maincpu->set_input_line(TLCS900_TIO, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-void ngp_state::ngp_tlcs900_porta(offs_t offset, uint8_t data)
+void ngp_state::tlcs900_porta(offs_t offset, uint8_t data)
 {
 	int to3 = BIT(data,3);
 
@@ -709,7 +707,7 @@ void ngp_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).unmap_read(0x800000, 0x9fffff);
 	}
 
-	m_seconds_timer = timer_alloc(FUNC(ngp_state::ngp_seconds_callback), this);
+	m_seconds_timer = timer_alloc(FUNC(ngp_state::seconds_callback), this);
 	m_seconds_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	save_item(NAME(m_io_reg));
@@ -744,13 +742,6 @@ void ngp_state::machine_reset()
 }
 
 
-uint32_t ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_k1ge->update(bitmap, cliprect);
-	return 0;
-}
-
-
 DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
@@ -765,7 +756,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 	//printf("%2x%2x - %x - %x\n", (unsigned int) memregion("cart")->u8(0x20), (unsigned int) memregion("cart")->u8(0x21),
 	//        (unsigned int) memregion("cart")->u8(0x22), (unsigned int) memregion("cart")->u8(0x23));
 	m_flash_chip[0].manufacturer_id = 0x98;
-	m_flash_chip[0].present = 1;
+	m_flash_chip[0].present = true;
 	m_flash_chip[0].state = F_READ;
 
 	switch (size)
@@ -787,7 +778,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 	{
 		m_flash_chip[1].manufacturer_id = 0x98;
 		m_flash_chip[1].device_id = 0x2f;
-		m_flash_chip[1].present = 1;
+		m_flash_chip[1].present = true;
 		m_flash_chip[1].state = F_READ;
 	}
 
@@ -797,10 +788,10 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 
 DEVICE_IMAGE_UNLOAD_MEMBER(ngp_state::unload_ngp_cart)
 {
-	m_flash_chip[0].present = 0;
+	m_flash_chip[0].present = false;
 	m_flash_chip[0].state = F_READ;
 
-	m_flash_chip[1].present = 0;
+	m_flash_chip[1].present = false;
 	m_flash_chip[1].state = F_READ;
 }
 
@@ -862,8 +853,8 @@ void ngp_state::ngp_common(machine_config &config)
 {
 	TMP95C061(config, m_maincpu, 6.144_MHz_XTAL);
 	m_maincpu->set_am8_16(1);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ngp_state::ngp_mem);
-	m_maincpu->porta_write().set(FUNC(ngp_state::ngp_tlcs900_porta));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ngp_state::main_mem);
+	m_maincpu->porta_write().set(FUNC(ngp_state::tlcs900_porta));
 	m_maincpu->an_read<0>().set_constant(0x3ff); // main battery power
 
 	z80_device &soundcpu(Z80(config, "soundcpu", 6.144_MHz_XTAL/2));
@@ -872,18 +863,16 @@ void ngp_state::ngp_common(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_raw(6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152);
-	m_screen->set_screen_update(FUNC(ngp_state::screen_update_ngp));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	T6W28(config, m_t6w28, 6.144_MHz_XTAL/2);
-	m_t6w28->add_route(0, "lspeaker", 0.50);
-	m_t6w28->add_route(1, "rspeaker", 0.50);
+	m_t6w28->add_route(0, "speaker", 0.50, 0);
+	m_t6w28->add_route(1, "speaker", 0.50, 1);
 
-	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0); // unknown DAC
+	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
 }
 
 
@@ -892,9 +881,10 @@ void ngp_state::ngp(machine_config &config)
 	ngp_common(config);
 
 	K1GE(config, m_k1ge, 6.144_MHz_XTAL, m_screen);
-	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
-	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::hblank_pin_w));
 
+	m_screen->set_screen_update(m_k1ge, FUNC(k1ge_device::screen_update));
 	m_screen->set_palette(m_k1ge);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
@@ -910,9 +900,10 @@ void ngp_state::ngpc(machine_config &config)
 {
 	ngp_common(config);
 	K2GE(config, m_k1ge, 6.144_MHz_XTAL, m_screen);
-	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
-	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::hblank_pin_w));
 
+	m_screen->set_screen_update(m_k1ge, FUNC(k1ge_device::screen_update));
 	m_screen->set_palette(m_k1ge);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));

@@ -89,8 +89,8 @@ void amsterdam_state::led_w(offs_t offset, u8 data)
 	// d0-d7: board leds
 	m_board->led_w(data);
 
-	// a8: lcd strobe
-	m_display->strobe_w(BIT(offset, 7));
+	// a8: lcd common
+	m_display->common_w(BIT(offset, 7));
 }
 
 void amsterdam_state::dac_w(u8 data)
@@ -101,8 +101,8 @@ void amsterdam_state::dac_w(u8 data)
 
 u8 amsterdam_state::keys_r()
 {
-	// lcd strobe is shared with keypad select
-	return m_keys[m_display->strobe_r()]->read();
+	// lcd common is shared with keypad select
+	return m_keys[m_display->common_r()]->read();
 }
 
 

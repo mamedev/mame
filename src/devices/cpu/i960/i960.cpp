@@ -4,6 +4,8 @@
 #include "i960.h"
 #include "i960dis.h"
 
+#include <algorithm>
+
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
 #include <cfloat>
@@ -11,11 +13,12 @@
 #endif
 
 
-DEFINE_DEVICE_TYPE(I960, i960_cpu_device, "i960kb", "Intel i960KB")
+DEFINE_DEVICE_TYPE(I80960KA, i80960ka_device, "i80960ka", "Intel 80960KA")
+DEFINE_DEVICE_TYPE(I80960KB, i80960kb_device, "i80960kb", "Intel 80960KB")
 
 
-i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, I960, tag, owner, clock)
+i960_cpu_device::i960_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_stalled(false), m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_immediate_irq(0)
 	, m_immediate_vector(0), m_immediate_pri(0), m_icount(0)
@@ -26,6 +29,16 @@ i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag,
 
 	for (int i = 0; i <I960_RCACHE_SIZE; i++)
 		std::fill(std::begin(m_rcache[i]), std::end(m_rcache[i]), 0);
+}
+
+i80960ka_device::i80960ka_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i960_cpu_device(mconfig, I80960KA, tag, owner, clock)
+{
+}
+
+i80960kb_device::i80960kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i960_cpu_device(mconfig, I80960KB, tag, owner, clock)
+{
 }
 
 
@@ -447,6 +460,18 @@ void i960_cpu_device::test(uint32_t opcode, int mask)
 		m_r[(opcode>>19) & 0x1f] = 0;
 }
 
+double i960_cpu_device::round_to_int(double val)
+{
+	// apply rounding mode
+	switch ((m_AC >> 30) & 3)
+	{
+	case 0: return round(val);
+	case 1: return floor(val);
+	case 2: return ceil(val);
+	default: return trunc(val);
+	}
+}
+
 
 // interrupt dispatch
 void i960_cpu_device::take_interrupt(int vector, int lvl)
@@ -469,7 +494,7 @@ void i960_cpu_device::take_interrupt(int vector, int lvl)
 	}
 
 	SP = (SP + 63) & ~63;
-	SP += 128;  // emulate ElSemi's core, this fixes the crash in sonic the fighters
+	SP += 64;   // add padding to prevent buffer underflow when saving processor state
 
 	do_call(IRQV, 7, SP);
 
@@ -1157,7 +1182,8 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, (t2 & 0x80000000) | (t1 >= 32 ? 0 : (t2<<t1) & 0x7fffffff)); // sign is preserved
+				// TODO: on later models, sign is always preserved even upon overflow
+				set_ri(opcode, t1 >= 32 ? 0 : t2<<t1);
 				break;
 
 			default:
@@ -1597,13 +1623,14 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount -= 400;
 				t1f = get_1_rif(opcode);
 				t2f = get_2_rif(opcode);
-				set_rif(opcode, t2f*log(t1f+1.0)/log(2.0));
+				set_rif(opcode, t2f*log2(t1f+1.0));
 				break;
 
 			case 0x2: // logr
-				m_icount -= 400; // checkme
+				m_icount -= 438;
 				t1f = get_1_rif(opcode);
-				set_rif(opcode, log(t1f));
+				t2f = get_2_rif(opcode);
+				set_rif(opcode, t2f*log2(t1f));
 				break;
 
 			case 0x3: // remr
@@ -1639,11 +1666,9 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				break;
 
 			case 0xb: // roundr
-				{
-					int32_t st1 = get_1_rif(opcode);
-					m_icount -= 69;
-					set_rif(opcode, (double)st1);
-				}
+				m_icount -= 69;
+				t1f = get_1_rif(opcode);
+				set_rif(opcode, round_to_int(t1f));
 				break;
 
 			case 0xc: // sinr
@@ -1681,7 +1706,8 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			case 0x2: // logrl
 				m_icount -= 438;
 				t1f = get_1_rifl(opcode);
-				set_rifl(opcode, log(t1f));
+				t2f = get_2_rifl(opcode);
+				set_rifl(opcode, t2f*log2(t1f));
 				break;
 
 			case 0x5: // cmprl
@@ -1710,11 +1736,9 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				break;
 
 			case 0xb: // roundrl
-				{
-					int32_t st1 = get_1_rifl(opcode);
-					m_icount -= 70;
-					set_rifl(opcode, (double)st1);
-				}
+				m_icount -= 70;
+				t1f = get_1_rif(opcode);
+				set_rifl(opcode, round_to_int(t1f));
 				break;
 
 			case 0xc: // sinrl
@@ -1745,17 +1769,13 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			case 0x0: // cvtri
 				m_icount -= 33;
 				t1f = get_1_rif(opcode);
-				// apply rounding mode
-				// we do this a little indirectly to avoid some odd GCC warnings
-				t2f = 0.0;
-				switch((m_AC>>30)&3)
-				{
-					case 0: t2f = floor(t1f+0.5); break;
-					case 1: t2f = floor(t1f); break;
-					case 2: t2f = ceil(t1f); break;
-					case 3: t2f = t1f; break;
-				}
-				set_ri(opcode, (int32_t)t2f);
+				set_ri(opcode, (int32_t)round_to_int(t1f));
+				break;
+
+			case 0x1: // cvtril
+				m_icount -= 35;
+				t1f = get_1_rif(opcode);
+				set_ri64(opcode, (int64_t)round_to_int(t1f));
 				break;
 
 			case 0x2: // cvtzri
@@ -2206,6 +2226,11 @@ void i960_cpu_device::execute_run()
 
 void i960_cpu_device::execute_set_input(int irqline, int state)
 {
+	if (m_irq_line_state[irqline] == state)
+		return;
+
+	m_irq_line_state[irqline] = state;
+
 	int int_tab =  m_program.read_dword(m_PRCB+20);    // interrupt table
 	int cpu_pri = (m_PC>>16)&0x1f;
 	int vector =0;
@@ -2299,55 +2324,56 @@ void i960_cpu_device::device_start()
 	save_item(NAME(m_stall_state.t1));
 	save_item(NAME(m_stall_state.t2));
 	save_item(NAME(m_stall_state.burst_mode));
+	save_item(NAME(m_irq_line_state));
 
+	state_add(I960_SAT,  "sat", m_SAT).formatstr("%08X");
+	state_add(I960_PRCB, "prcb", m_PRCB).formatstr("%08X");
+	state_add(I960_PC,   "pc", m_PC).formatstr("%08X");
+	state_add(I960_AC,   "ac", m_AC).formatstr("%08X");
+	state_add(I960_IP,   "ip", m_IP).formatstr("%08X");
+	state_add(I960_PIP,  "pip", m_PIP).formatstr("%08X");
+	state_add(I960_R0,   "pfp", m_r[ 0]).formatstr("%08X");
+	state_add(I960_R1,   "sp", m_r[ 1]).formatstr("%08X");
+	state_add(I960_R2,   "rip", m_r[ 2]).formatstr("%08X");
+	state_add(I960_R3,   "r3", m_r[ 3]).formatstr("%08X");
+	state_add(I960_R4,   "r4", m_r[ 4]).formatstr("%08X");
+	state_add(I960_R5,   "r5", m_r[ 5]).formatstr("%08X");
+	state_add(I960_R6,   "r6", m_r[ 6]).formatstr("%08X");
+	state_add(I960_R7,   "r7", m_r[ 7]).formatstr("%08X");
+	state_add(I960_R8,   "r8", m_r[ 8]).formatstr("%08X");
+	state_add(I960_R9,   "r9", m_r[ 9]).formatstr("%08X");
+	state_add(I960_R10,  "r10", m_r[10]).formatstr("%08X");
+	state_add(I960_R11,  "r11", m_r[11]).formatstr("%08X");
+	state_add(I960_R12,  "r12", m_r[12]).formatstr("%08X");
+	state_add(I960_R13,  "r13", m_r[13]).formatstr("%08X");
+	state_add(I960_R14,  "r14", m_r[14]).formatstr("%08X");
+	state_add(I960_R15,  "r15", m_r[15]).formatstr("%08X");
+	state_add(I960_G0,   "g0", m_r[16]).formatstr("%08X");
+	state_add(I960_G1,   "g1", m_r[17]).formatstr("%08X");
+	state_add(I960_G2,   "g2", m_r[18]).formatstr("%08X");
+	state_add(I960_G3,   "g3", m_r[19]).formatstr("%08X");
+	state_add(I960_G4,   "g4", m_r[20]).formatstr("%08X");
+	state_add(I960_G5,   "g5", m_r[21]).formatstr("%08X");
+	state_add(I960_G6,   "g6", m_r[22]).formatstr("%08X");
+	state_add(I960_G7,   "g7", m_r[23]).formatstr("%08X");
+	state_add(I960_G8,   "g8", m_r[24]).formatstr("%08X");
+	state_add(I960_G9,   "g9", m_r[25]).formatstr("%08X");
+	state_add(I960_G10,  "g10", m_r[26]).formatstr("%08X");
+	state_add(I960_G11,  "g11", m_r[27]).formatstr("%08X");
+	state_add(I960_G12,  "g12", m_r[28]).formatstr("%08X");
+	state_add(I960_G13,  "g13", m_r[29]).formatstr("%08X");
+	state_add(I960_G14,  "g14", m_r[30]).formatstr("%08X");
+	state_add(I960_G15,  "fp", m_r[31]).formatstr("%08X");
 
-	state_add( I960_SAT,  "sat", m_SAT).formatstr("%08X");
-	state_add( I960_PRCB, "prcb", m_PRCB).formatstr("%08X");
-	state_add( I960_PC,   "pc", m_PC).formatstr("%08X");
-	state_add( I960_AC,   "ac", m_AC).formatstr("%08X");
-	state_add( I960_IP,   "ip", m_IP).formatstr("%08X");
-	state_add( I960_PIP,  "pip", m_PIP).formatstr("%08X");
-	state_add( I960_R0,   "pfp", m_r[ 0]).formatstr("%08X");
-	state_add( I960_R1,   "sp", m_r[ 1]).formatstr("%08X");
-	state_add( I960_R2,   "rip", m_r[ 2]).formatstr("%08X");
-	state_add( I960_R3,   "r3", m_r[ 3]).formatstr("%08X");
-	state_add( I960_R4,   "r4", m_r[ 4]).formatstr("%08X");
-	state_add( I960_R5,   "r5", m_r[ 5]).formatstr("%08X");
-	state_add( I960_R6,   "r6", m_r[ 6]).formatstr("%08X");
-	state_add( I960_R7,   "r7", m_r[ 7]).formatstr("%08X");
-	state_add( I960_R8,   "r8", m_r[ 8]).formatstr("%08X");
-	state_add( I960_R9,   "r9", m_r[ 9]).formatstr("%08X");
-	state_add( I960_R10,  "r10", m_r[10]).formatstr("%08X");
-	state_add( I960_R11,  "r11", m_r[11]).formatstr("%08X");
-	state_add( I960_R12,  "r12", m_r[12]).formatstr("%08X");
-	state_add( I960_R13,  "r13", m_r[13]).formatstr("%08X");
-	state_add( I960_R14,  "r14", m_r[14]).formatstr("%08X");
-	state_add( I960_R15,  "r15", m_r[15]).formatstr("%08X");
-	state_add( I960_G0,   "g0", m_r[16]).formatstr("%08X");
-	state_add( I960_G1,   "g1", m_r[17]).formatstr("%08X");
-	state_add( I960_G2,   "g2", m_r[18]).formatstr("%08X");
-	state_add( I960_G3,   "g3", m_r[19]).formatstr("%08X");
-	state_add( I960_G4,   "g4", m_r[20]).formatstr("%08X");
-	state_add( I960_G5,   "g5", m_r[21]).formatstr("%08X");
-	state_add( I960_G6,   "g6", m_r[22]).formatstr("%08X");
-	state_add( I960_G7,   "g7", m_r[23]).formatstr("%08X");
-	state_add( I960_G8,   "g8", m_r[24]).formatstr("%08X");
-	state_add( I960_G9,   "g9", m_r[25]).formatstr("%08X");
-	state_add( I960_G10,  "g10", m_r[26]).formatstr("%08X");
-	state_add( I960_G11,  "g11", m_r[27]).formatstr("%08X");
-	state_add( I960_G12,  "g12", m_r[28]).formatstr("%08X");
-	state_add( I960_G13,  "g13", m_r[29]).formatstr("%08X");
-	state_add( I960_G14,  "g14", m_r[30]).formatstr("%08X");
-	state_add( I960_G15,  "fp", m_r[31]).formatstr("%08X");
-
-	state_add( STATE_GENPC, "GENPC", m_IP).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_IP).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_AC).noshow().formatstr("%2s");
+	state_add(STATE_GENPC, "GENPC", m_IP).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_IP).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_AC).noshow().formatstr("%2s");
 
 	m_immediate_vector = 0;
 	m_immediate_pri = 0;
-	memset(m_rcache_frame_addr, 0, sizeof(m_rcache_frame_addr));
-	memset(m_fp, 0, sizeof(m_fp));
+	std::fill(std::begin(m_rcache_frame_addr), std::end(m_rcache_frame_addr), 0);
+	std::fill(std::begin(m_fp), std::end(m_fp), 0.0);
+	std::fill(std::begin(m_irq_line_state), std::end(m_irq_line_state), CLEAR_LINE);
 	m_PIP = 0;
 
 	set_icountptr(m_icount);

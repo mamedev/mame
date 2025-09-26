@@ -344,13 +344,12 @@ void stingnet_state::stingnet(machine_config &config)
 	NS16550(config, "duart:chan0", XTAL(19'660'800));
 	NS16550(config, "duart:chan1", XTAL(19'660'800));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, m_ymz, 16934400));
 	ymz.set_addrmap(0, &stingnet_state::ymz280b_map);
-	ymz.add_route(1, "lspeaker", 1.0);
-	ymz.add_route(0, "rspeaker", 1.0);
+	ymz.add_route(1, "speaker", 1.0, 0);
+	ymz.add_route(0, "speaker", 1.0, 1);
 }
 
 ROM_START( tropchnc )

@@ -68,10 +68,10 @@ public:
 		m_has_z80_bus = true;
 	}
 
-	void neocd_ntsc(machine_config &config);
+	void neocd_ntsc(machine_config &config) ATTR_COLD;
 
-	void init_neocdz();
-	void init_neocdzj();
+	void init_neocdz() ATTR_COLD;
+	void init_neocdzj() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -124,15 +124,15 @@ private:
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
-	int get_irq_vector_ack(void) { return m_irq_vector_ack; }
+	int get_irq_vector_ack() { return m_irq_vector_ack; }
 	void set_irq_vector_ack(int val) { m_irq_vector_ack = val; }
-	int get_irq_vector(void) { return m_irq_vector; }
+	int get_irq_vector() { return m_irq_vector; }
 	void irq_update(uint8_t data);
 
 	// from the CDC
-	void interrupt_callback_type1(void);
-	void interrupt_callback_type2(void);
-	void interrupt_callback_type3(void);
+	void interrupt_callback_type1();
+	void interrupt_callback_type2();
+	void interrupt_callback_type3();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -1015,19 +1015,19 @@ uint8_t ngcd_state::cdc_irq_ack()
 	return (0x60+4*4)/4;
 }
 
-void ngcd_state::interrupt_callback_type1(void)
+void ngcd_state::interrupt_callback_type1()
 {
 	m_irq_ack &= ~0x20;
 	irq_update(0);
 }
 
-void ngcd_state::interrupt_callback_type2(void)
+void ngcd_state::interrupt_callback_type2()
 {
 	m_irq_ack &= ~0x10;
 	irq_update(0);
 }
 
-void ngcd_state::interrupt_callback_type3(void)
+void ngcd_state::interrupt_callback_type3()
 {
 	m_irq_ack &= ~0x08;
 	irq_update(0);
@@ -1127,12 +1127,14 @@ ROM_START( neocd )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "top",   "Top loading Neo-Geo CD" )
 	ROMX_LOAD("top-sp1.bin",    0x00000, 0x80000, CRC(c36a47c0) SHA1(235f4d1d74364415910f73c10ae5482d90b4274f), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "front",   "Front loading Neo-Geo CD" )
-	ROMX_LOAD("front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 2, "unibios32", "Universe BIOS (Hack, Ver. 3.2)" )
-	ROMX_LOAD("uni-bioscd32.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 3, "unibios33", "Universe BIOS (Hack, Ver. 3.3)" )
-	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 1, "topproto",   "Top loading Neo-Geo CD (prototype, ver 0.02)" )
+	ROMX_LOAD("prototype_neocd_ver_0.02.bin", 0x00000, 0x80000, CRC(0f348e10) SHA1(58f966724778d56c9c099c452e33e2264b5e1c0e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1)) // tc574200d
+	ROM_SYSTEM_BIOS( 2, "front",   "Front loading Neo-Geo CD" )
+	ROMX_LOAD("front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "unibios32", "Universe BIOS (Hack, Ver. 3.2)" )
+	ROMX_LOAD("uni-bioscd32.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 4, "unibios33", "Universe BIOS (Hack, Ver. 3.3)" )
+	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(4))
 
 	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )

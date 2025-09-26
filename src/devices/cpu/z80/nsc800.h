@@ -26,9 +26,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
+	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual void do_op() override;
 	u8 m_nsc800_irq_state[3]; // state of NSC800 restart interrupts A, B, C
 };
 

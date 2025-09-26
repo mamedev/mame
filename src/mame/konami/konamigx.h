@@ -5,21 +5,24 @@
 
 #pragma once
 
+#include "k053246_k053247_k055673.h"
+#include "k053250.h"
+#include "k054156_k054157_k056832.h"
+#include "k054338.h"
+#include "k055555.h"
+
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
 #include "machine/k053252.h"
 #include "machine/timer.h"
-#include "sound/k056800.h"
 #include "sound/k054539.h"
-#include "k053246_k053247_k055673.h"
-#include "k053250.h"
+#include "sound/k056800.h"
 #include "video/k053936.h"
-#include "k054156_k054157_k056832.h"
-#include "k054338.h"
-#include "k055555.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class konamigx_state : public driver_device
 {
@@ -115,13 +118,18 @@ public:
 	TIMER_CALLBACK_MEMBER(boothack_callback);
 	double adc0834_callback(uint8_t input);
 	K056832_CB_MEMBER(type2_tile_callback);
+	K056832_CB_MEMBER(salmndr2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
 	K055673_CB_MEMBER(type2_sprite_callback);
 	K055673_CB_MEMBER(dragoonj_sprite_callback);
 	K055673_CB_MEMBER(salmndr2_sprite_callback);
 	K055673_CB_MEMBER(le2_sprite_callback);
 
-	struct GX_OBJ { int order = 0, offs = 0, code = 0, color = 0; };
+	struct GX_OBJ
+	{
+		u32 order = 0;
+		int offs = 0, code = 0, color = 0;
+	};
 
 	void common_init();
 	uint32_t k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -130,13 +138,11 @@ public:
 						tilemap_t *sub1, int sub1flags,
 						tilemap_t *sub2, int sub2flags,
 						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
-						GX_OBJ *objpool,
-						int *objbuf,
-						int nobj
+						const std::vector<GX_OBJ> &objpool
 						);
 
 
-	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code);
+	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, uint8_t layer);
 	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
 	void gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
 
@@ -252,6 +258,7 @@ protected:
 
 	u8 m_current_brightness = 0xff;
 	u8 m_brightness[3]{};
+	u8 m_last_alpha_tile_mix_code = 0;
 
 	// mirrored K054338 settings
 	int *m_K054338_shdRGB = nullptr;
@@ -303,8 +310,6 @@ protected:
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
 
-	std::unique_ptr<GX_OBJ[]> m_gx_objpool;
-
 	u8 m_type3_psac2_bank = 0;
 	u8 m_type3_spriteram_bank = 0;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
@@ -339,6 +344,7 @@ protected:
     ----FFEEDDCCBBAA---------------- (layer A-F mix codes in forced blending)
     ---x---------------------------- (disable shadows)
     --x----------------------------- (disable z-buffering)
+    yy------------------------------ (last encountered tile mix code)
 */
 #define GXMIX_BLEND_AUTO    0           // emulate all blend effects
 #define GXMIX_BLEND_NONE    1           // disable all blend effects

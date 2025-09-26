@@ -135,7 +135,7 @@ void huangyeh_m68k_state::audio_program_map(address_map &map)
 	map(0xf880, 0xf881).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xf8a0, 0xf8a0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xf8d0, 0xf8d0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-//	map(0xf8e0, 0xf8e0).w soundlatch acknowledge or NMI ack
+//  map(0xf8e0, 0xf8e0).w soundlatch acknowledge or NMI ack
 	map(0xf8e0, 0xf8e0).lw8(NAME([this] (offs_t offset, u8 data) { m_soundlatch->acknowledge_w(); }));
 }
 

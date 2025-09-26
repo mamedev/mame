@@ -4,7 +4,8 @@
 /*
 Alone Shettle Crew
 1984
-Copyright New Digimatic but almost surely developed in Japan.
+Copyright New Digimatic but developed in Japan by Graphic Research (GRC).
+Distributed in Japan by Regal.
 
 2-PCB stack
 main PCB is marked: "PC-082A" on component side

@@ -15,7 +15,7 @@ The MCU is inside the cartridge, not the console, in theory it could have any MC
 The console itself has the video hardware and controls.
 
 TODO:
-- change cartridge to slot device? there are free homebrew games by Infuto that
+- change cartridge to slot device? there are free homebrew games by Inufuto that
   currently won't work, since cartridge PCB has an MC6803 + 32KB ROM + 8KB RAM
 
 *******************************************************************************/
@@ -58,7 +58,7 @@ protected:
 private:
 	required_device<m6801u4_cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_vram;
-	required_device<mc6847_ntsc_device> m_mc6847;
+	required_device<mc6847_device> m_mc6847;
 	required_device<screen_device> m_screen;
 	required_device<dac_bit_interface> m_dac;
 	required_device<filter_volume_device> m_volume;
@@ -239,7 +239,7 @@ void ctvboy_state::ctvboy(machine_config &config)
 	m_maincpu->in_p2_cb().set(FUNC(ctvboy_state::p2_r));
 
 	// video hardware
-	MC6847_NTSC(config, m_mc6847, 3.579545_MHz_XTAL);
+	MC6847(config, m_mc6847, 3.579545_MHz_XTAL);
 	m_mc6847->input_callback().set(FUNC(ctvboy_state::mc6847_vram_r));
 	m_mc6847->fsync_wr_callback().set(FUNC(ctvboy_state::vblank_irq));
 	m_mc6847->set_screen(m_screen);

@@ -1607,7 +1607,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 		case REG_DDFSTRT:
 			/* impose hardware limits ( HRM, page 75 ) */
-			data &= (IS_AGA() || IS_ECS()) ? 0xfe : 0xfc;
+			data &= (IS_AGA() || IS_ECS()) ? 0xfffe : 0xfc;
 			if (data < 0x18)
 			{
 				logerror("%s: Attempt to underrun DDFSTRT with %04x\n", machine().describe_context(), data);
@@ -1618,7 +1618,8 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 		case REG_DDFSTOP:
 			/* impose hardware limits ( HRM, page 75 ) */
 			// amigaaga_flop:aladdin writes 0x0100 here, expecting the HW limit to hit instead
-			data &= (IS_AGA() || IS_ECS()) ? 0xfffe : 0xfffc;
+			// TODO: ar_ldrb writes a very illegal 0x16d0, is OCS just discarding top 8 bits? Test on HW.
+			data &= (IS_AGA() || IS_ECS()) ? 0xfffe : 0xfc;
 			if (data > 0xd8)
 			{
 				logerror("%s: Attempt to overrun DDFSTOP with %04x\n", machine().describe_context(), data);

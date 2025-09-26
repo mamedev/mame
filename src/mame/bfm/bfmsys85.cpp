@@ -66,9 +66,9 @@ ___________________________________________________________________________
 #include "machine/clock.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
-#include "machine/roc10937.h"  // vfd
 #include "machine/steppers.h" // stepper motor
 #include "sound/ay8910.h"
+#include "video/roc10937.h" // vfd
 
 #include "speaker.h"
 

@@ -20,11 +20,8 @@ public:
 	mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-
-private:
-	u8 m_dummy = 0; // needed for save-state support
 };
 
 #endif // MAME_SOUND_MIXER_H

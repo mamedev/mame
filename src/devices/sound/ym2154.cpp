@@ -245,15 +245,9 @@ TIMER_CALLBACK_MEMBER(ym2154_device::delayed_irq)
 //  sound_stream_update - generate sound data
 //-------------------------------------------------
 
-void ym2154_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ym2154_device::sound_stream_update(sound_stream &stream)
 {
 	static const uint16_t voltable[8] = { 0x7fa,0x751,0x6b5,0x627,0x5a4,0x52c,0x4be,0x45a };
-
-	auto &outl = outputs[0];
-	auto &outr = outputs[1];
-
-	outl.fill(0);
-	outr.fill(0);
 
 	for (int chan = 0; chan < 12; chan++)
 	{
@@ -279,7 +273,7 @@ void ym2154_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			rvol = voltable[rvol & 7] >> (rvol >> 3);
 
 			auto &source = space(chan / 6);
-			for (int sampindex = 0; sampindex < outl.samples() && (channel.m_pos >> ADDR_SHIFT) <= channel.m_end; sampindex++)
+			for (int sampindex = 0; sampindex < stream.samples() && (channel.m_pos >> ADDR_SHIFT) <= channel.m_end; sampindex++)
 			{
 				uint8_t raw = source.read_byte(channel.m_pos++);
 
@@ -291,8 +285,8 @@ void ym2154_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				if (BIT(raw, 7))
 					sample = -sample;
 
-				outl.add_int(sampindex, sample * lvol, 0x2000 * 0x800);
-				outr.add_int(sampindex, sample * rvol, 0x2000 * 0x800);
+				stream.add_int(0, sampindex, sample * lvol, 0x2000 * 0x800);
+				stream.add_int(1, sampindex, sample * rvol, 0x2000 * 0x800);
 			}
 		}
 	}

@@ -404,9 +404,8 @@ sound.debugger_mute (read/write)
 sound.system_mute (read/write)
     A Boolean indicating whether sound output is muted at the request of the
     emulated system.
-sound.attenuation (read/write)
-    The output volume attenuation in decibels.  Should generally be a negative
-    integer or zero.
+sound.volume (read/write)
+    The output volume in decibels.  Should generally be a negative or zero.
 sound.recording (read-only)
     A Boolean indicating whether sound output is currently being recorded to a
     WAV file.

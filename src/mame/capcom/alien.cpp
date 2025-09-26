@@ -148,7 +148,7 @@ private:
 	void masmario2_map(address_map &map) ATTR_COLD;
 
 	// devices
-	required_device<sh4_device> m_maincpu;
+	required_device<sh7750s_device> m_maincpu;
 	required_shared_ptr<u64> m_workram;
 	required_device<screen_device> m_screen;
 	required_device<mb86292_device> m_gpu;
@@ -388,7 +388,7 @@ void alien_state::machine_reset()
 void alien_state::alien(machine_config &config)
 {
 	/* basic machine hardware */
-	SH4LE(config, m_maincpu, MASTER_CLOCK);    /* 200MHz */
+	SH7750S(config, m_maincpu, MASTER_CLOCK);    /* 200MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &alien_state::alien_map);
 	m_maincpu->set_periodic_int(FUNC(alien_state::sio_irq_w), attotime::from_hz(60));
 //  m_maincpu->set_force_no_drc(true);

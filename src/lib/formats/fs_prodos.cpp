@@ -128,21 +128,58 @@ char prodos_image::directory_separator() const
 	return '/';
 }
 
-// TODO: this list is incomplete
 static const std::map<u8, const char *> s_file_types =
 {
 	{ 0x00, "UNK" },
 	{ 0x01, "BAD" },
+	{ 0x02, "PCD" }, // SOS
+	{ 0x03, "PTX" }, // SOS
 	{ 0x04, "TXT" },
+	{ 0x05, "PDA" }, // SOS
 	{ 0x06, "BIN" },
+	{ 0x07, "FNT" }, // SOS
+	{ 0x08, "FOT" }, // SOS
+	{ 0x09, "BA3" }, // SOS
+	{ 0x0a, "DA3" }, // SOS
+	{ 0x0b, "WPF" }, // SOS
+	{ 0x0c, "SOS" }, // SOS
 	{ 0x0f, "DIR" },
+	{ 0x10, "RPD" }, // SOS
+	{ 0x11, "RPI" }, // SOS
+	{ 0x12, "AFD" }, // SOS
+	{ 0x13, "AFM" }, // SOS
+	{ 0x14, "AFR" }, // SOS
+	{ 0x15, "SCL" }, // SOS
 	{ 0x19, "ADB" },
 	{ 0x1a, "AWP" },
 	{ 0x1b, "ASP" },
+	{ 0xab, "GSB" },
+	{ 0xac, "TDF" },
+	{ 0xad, "BDF" },
+	{ 0xb0, "SRC" },
+	{ 0xb1, "OBJ" },
+	{ 0xb2, "LIB" },
+	{ 0xb3, "S16" },
+	{ 0xb4, "RTL" },
+	{ 0xb5, "EXE" },
+	{ 0xb6, "PIF" },
+	{ 0xb7, "TIF" },
+	{ 0xb8, "NDA" },
+	{ 0xb9, "CDA" },
+	{ 0xba, "TOL" },
+	{ 0xbb, "DRV" },
+	{ 0xbc, "GLF" },
+	{ 0xbd, "FST" },
+	{ 0xc0, "PNT" },
+	{ 0xc1, "PIC" },
+	{ 0xc8, "FON" },
 	{ 0xc9, "FND" },
 	{ 0xca, "ICN" },
+	{ 0xcb, "AIF" },
+	{ 0xee, "R16" },
 	{ 0xef, "PAS" },
 	{ 0xf0, "CMD" },
+	{ 0xf9, "P16" },
 	{ 0xfa, "INT" },
 	{ 0xfb, "IVR" },
 	{ 0xfc, "BAS" },

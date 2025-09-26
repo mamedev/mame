@@ -102,8 +102,8 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 	uint8_t lastul = 0;
 	uint16_t lasttile = -1;
 
-	int scroll_start = 33 - (m_txt_scroll_reg[4] & 0x1f);
-	int scroll_end = scroll_start + m_txt_scroll_reg[5];
+	int scroll_start = (32 - m_txt_scroll_reg[4]) & 0x1f;
+	int scroll_end = scroll_start + m_txt_scroll_reg[5] + 1;
 	int scroll = m_txt_scroll_reg[3] % 20;
 	int line = y / lr;
 	// TODO: accurate blink rate
@@ -130,7 +130,6 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			// ... but then ginga and gage expects working LR for PCG depending on the attribute.
 			// beast3 uses tile bit 7 for the heart shaped char displayed on first screen.
 			// TODO: rename pcg to gaiji (actual nomenclature)
-			const u8 pcg_lr = (BIT(knj_tile, 7) || BIT(tile, 7));
 			tile &= 0x7f;
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
@@ -141,7 +140,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 				// draws these PCG strips where first tile is identical to second,
 				// with LR disabled on both but expecting the right half at the repetition anyway.
 				// TODO: what happens with LR enabled?
-				if(lasttile == (tile | knj_tile))
+				if(lasttile == tile)
 				{
 					tile_lr = 1;
 					lasttile = -1;
@@ -149,10 +148,10 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 				}
 				else
 				{
-					if((lasttile & 0x7f7f) == tile)
+					if(lasttile == tile)
 						pair = true;
-					tile_lr = pcg_lr;
-					lasttile = (tile | knj_tile);
+					tile_lr = 0;
+					lasttile = tile;
 				}
 				x_step = 1;
 			}
@@ -401,9 +400,10 @@ uint8_t pc9801_state::pc9801_a0_r(offs_t offset)
 			{
 				uint32_t pcg_offset;
 
-				pcg_offset = (m_font_addr & 0x7f7f) << 5;
-				pcg_offset|= m_font_line;
-				pcg_offset|= m_font_lr;
+				pcg_offset  = (m_font_addr & 0x7f7f) << 5;
+				pcg_offset |= m_font_line;
+				pcg_offset |= m_font_lr;
+				pcg_offset |= (!m_video_ff[KAC_REG] << 12);
 
 				return m_kanji_rom[pcg_offset];
 			}
@@ -479,6 +479,8 @@ void pc9801_state::pc9801_a0_w(offs_t offset, uint8_t data)
 				//logerror("%04x %02x %02x %08x\n",m_font_addr,m_font_line,m_font_lr,pcg_offset);
 				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 				{
+					pcg_offset |= (!m_video_ff[KAC_REG] << 12);
+
 					m_kanji_rom[pcg_offset] = data;
 					m_gfxdecode->gfx(2)->mark_dirty(pcg_offset >> 5);
 				}

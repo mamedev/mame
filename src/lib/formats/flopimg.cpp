@@ -178,6 +178,11 @@ bool floppy_image_format_t::save(util::random_read_write &io, const std::vector<
 	return false;
 }
 
+bool floppy_image_format_t::supports_save() const noexcept
+{
+	return false;
+}
+
 bool floppy_image_format_t::extension_matches(const char *file_name) const
 {
 	const char *ext = strrchr(file_name, '.');

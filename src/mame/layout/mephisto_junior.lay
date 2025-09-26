@@ -9,6 +9,11 @@ authors:hap
 
 <!-- schach labels -->
 
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="gray1"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+	<element name="gray2"><rect><color red="0.11" green="0.105" blue="0.10" /></rect></element>
+	<element name="gray3"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
+
 	<element name="text_schach"><text string="SCHACH"><color red="0.3" green="0.3" blue="0.31" /></text></element>
 	<element name="text_matt"><text string="MATT"><color red="0.3" green="0.3" blue="0.31" /></text></element>
 	<element name="text_patt"><text string="PATT"><color red="0.3" green="0.3" blue="0.31" /></text></element>
@@ -202,11 +207,6 @@ authors:hap
 
 
 <!-- build screen -->
-
-	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="gray1"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
-	<element name="gray2"><rect><color red="0.11" green="0.105" blue="0.10" /></rect></element>
-	<element name="gray3"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
 
 	<view name="Internal Layout">
 		<bounds x="21" y="9.7" width="23" height="39.7" />

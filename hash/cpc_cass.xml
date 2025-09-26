@@ -37303,7 +37303,6 @@ Please stick to using the floppy versions for the time being...
 		<description>Thunderbirds (UK, audio tape)</description>
 		<year>1989</year>
 		<publisher>Grandslam</publisher>
-		<info name="usage" value="" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="4857121">
 				<rom name="thunderbirds (uk) (1988) (audio tape) [original] [tape].mp3" size="4857121" crc="b91dadfd" sha1="4f1fdcc50fd8ab7db06caf850d2c939880af6e02"/>

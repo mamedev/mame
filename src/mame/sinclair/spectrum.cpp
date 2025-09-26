@@ -278,6 +278,7 @@ SamRam
 #include "emu.h"
 #include "spectrum.h"
 
+#include "bus/spectrum/dma/slot.h"
 #include "cpu/z80/z80.h"
 #include "spec_snqk.h"
 
@@ -293,7 +294,7 @@ SamRam
 
 uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
+	m_ula->m1(offset);
 
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
@@ -307,7 +308,7 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 
 uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
+	m_ula->data_r(offset);
 
 	m_exp->pre_data_fetch(offset);
 	uint8_t retval = m_specmem->read8(offset);
@@ -317,7 +318,7 @@ uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 
 void spectrum_state::spectrum_data_w(offs_t offset, uint8_t data)
 {
-	if (is_contended(offset)) content_early();
+	m_ula->data_w(offset);
 	if (is_vram_write(offset)) m_screen->update_now();
 
 	m_specmem->write8(offset,data);
@@ -343,8 +344,7 @@ uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 */
 void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 {
-	if (is_contended(offset)) content_early();
-	content_early(1);
+	m_ula->ula_w(offset);
 
 	u8 changed = m_port_fe_data ^ data;
 
@@ -371,8 +371,7 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 /* DJR: Spectrum+ keys added */
 uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
-	content_early(1);
+	m_ula->ula_r(offset);
 
 	int lines = offset >> 8;
 	int data = 0xff;
@@ -448,11 +447,7 @@ uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 
 void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 {
-	if (is_contended(offset))
-	{
-		content_early();
-		content_late();
-	}
+	m_ula->io_w(offset);
 
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
@@ -461,11 +456,7 @@ void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_state::spectrum_port_r(offs_t offset)
 {
-	if (is_contended(offset))
-	{
-		content_early();
-		content_late();
-	}
+	m_ula->io_r(offset);
 
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
@@ -510,22 +501,21 @@ uint8_t spectrum_state::floating_bus_r()
 	*/
 
 	u8 data = 0xff;
-	u64 vpos = m_screen->vpos();
 
 	// peek into attribute ram when beam is in display area
 	// ula always returns ff when in border area (or h/vblank)
-	rectangle screen = get_screen_area();
-	if (!m_contention_pattern.empty() && vpos >= screen.top() && vpos <= screen.bottom())
+	if (m_ula->is_in_contended_area())
 	{
-		u64 now = m_maincpu->total_cycles() - m_int_at;
-		u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
-		u64 ct = cf + screen.width() * m_maincpu->clock() / m_screen->clock();
+		const u64 vpos = m_screen->vpos();
+		const u64 now = m_maincpu->total_cycles() - m_ula->get_irq_at();
+		const u64 cf = vpos * m_ula->get_video_line_clocks() + m_ula->get_raster_contention_offset();
+		const u64 ct = cf + m_ula->get_raster_line_clocks();
 		if (cf <= now && now < ct)
 		{
 			u64 clocks = now - cf;
 			if (!BIT(clocks, 2))
 			{
-				u16 y = vpos - screen.top();
+				u16 y = vpos - get_screen_area().top();
 				u16 x = (clocks >> 2) + BIT(clocks, 1);
 				data = clocks & 1
 					? m_screen_location[0x1800 + (((y & 0xf8) << 2) | x)]
@@ -670,9 +660,12 @@ INPUT_PORTS_START( spectrum )
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x80, 0x00, "Hardware Version" )
-	PORT_CONFSETTING(   0x00, "Issue 2" )
-	PORT_CONFSETTING(   0x80, "Issue 3" )
-	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_CONFSETTING(    0x00, "Issue 2" )
+	PORT_CONFSETTING(    0x80, "Issue 3" )
+	PORT_CONFNAME( 0x01, 0x00, "Contention" ) PORT_CHANGED_MEMBER("ula", FUNC(spectrum_ula_device::on_contention_changed), 0)
+	PORT_CONFSETTING(    0x00, "Early" )
+	PORT_CONFSETTING(    0x01, "Late" )
+	PORT_BIT(0x7e, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 /* Machine initialization */
@@ -684,7 +677,9 @@ void spectrum_state::init_spectrum()
 void spectrum_state::machine_start()
 {
 	save_item(NAME(m_port_fe_data));
-	save_item(NAME(m_int_at));
+
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
+	m_maincpu->space(AS_IO).specific(m_io);
 }
 
 void spectrum_state::machine_reset()
@@ -716,15 +711,14 @@ GFXDECODE_END
 
 TIMER_CALLBACK_MEMBER(spectrum_state::irq_on)
 {
-	m_int_at = m_maincpu->total_cycles();
-	m_int_at -= m_maincpu->attotime_to_cycles(m_maincpu->local_time() - machine().time());
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+	m_ula->on_irq();
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 + m_ula->get_irq_ext_length()));
 }
 
 TIMER_CALLBACK_MEMBER(spectrum_state::irq_off)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
@@ -740,7 +734,9 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_memory_map(&spectrum_state::spectrum_data);
 	m_maincpu->set_io_map(&spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
-	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
+	m_maincpu->refresh_cb().set(FUNC(spectrum_state::spectrum_refresh_w));
+	m_maincpu->nomreq_cb().set("ula", FUNC(spectrum_ula_device::nomem_rq));
+	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
 	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 
@@ -761,10 +757,13 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(spectrum_state::spectrum_palette), 16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_spectrum);
+	SPECTRUM_ULA_48K(config, m_ula);
+	m_ula->set_screen(m_screen, get_screen_area());
+	m_ula->set_z80(m_maincpu);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER(config, "speakers").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "speakers", 0.50);
 	static const double speaker_levels[4] = { 0.0, 0.33, 0.66, 1.0 };
 	m_speaker->set_levels(4, speaker_levels);
 
@@ -774,14 +773,22 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->fb_r_handler().set(FUNC(spectrum_state::floating_bus_r));
 
-	/* devices */
+	dma_slot_device &dma(DMA_SLOT(config, "dma", X1 / 4, default_dma_slot_devices, nullptr));
+	dma.set_io_space(m_maincpu, AS_IO);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
+
 	SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx").set_load_callback(FUNC(spectrum_state::snapshot_cb));
 	QUICKLOAD(config, "quickload", "raw,scr", attotime::from_seconds(2)).set_load_callback(FUNC(spectrum_state::quickload_cb)); // The delay prevents the screen from being cleared by the RAM test at boot
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tzx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "speakers", 0.05);
 	m_cassette->set_interface("spectrum_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spectrum_cass");

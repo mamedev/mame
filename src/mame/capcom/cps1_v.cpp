@@ -217,8 +217,10 @@ Ganbare! Marine Kun (Japan 2K0411)                           2000  91634B-2   GB
 
 @the original number (CPS-B-01) was scratched out and "04" stamped over it.
 *denotes Suicide Battery
-^c632b chips seen, but all variants of the game read the same c board io ports so the fusemap must be the same, perhaps incorrectly marked?
-#sf2 world 910204: sf2ea is official set on 90629B-2 b-board, sf2en on 89625B-1 b-board is most likely an unofficial conversion (see notes in drivers\cps1.cpp)
+^c632b chips seen, but all variants of the game read the same c board io ports so the fusemap
+must be the same, perhaps incorrectly marked?
+#sf2 world 910204: sf2ea is official set on 90629B-2 b-board, sf2en on 89625B-1 b-board is most
+likely an unofficial conversion (see notes in drivers\cps1.cpp)
 
 The C628/C632 PALs on some C-boards handle the io for games with more than 3 buttons or more than 2 players.
 
@@ -226,69 +228,75 @@ You can set the suicide CPS-B-21 chips to their default layer register and prior
 if you pull pins 45 and 46 high (floating the pins seems to work, too). The default is the same
 values as Street Fighter 2 CE/Turbo.
 
-The Pang! 3 B-board (94916-10) is unique to that game, presumably designed by Mitchell rather than Capcom.
-It uses a Mach215 pld security chip to encrypt main code and is the only non-qsound game to use an eeprom instead of dip switches.
-It is designed to allow operation with either a standard or CPS1.5/qsound A-board, in the latter case the full standard sound hardware (z80, ym, oki, audio amp etc.) can be populated on the B-board itself,
-(although to date, no example of the B-board with sound h/w populated has been found, perhaps it was never used?)
-Exact-copy bootleg B-boards exist and are quite common, bizarrely the bootleggers often crudely cut off the front/unused analog audio section of the pcb!
+The Pang! 3 B-board (94916-10) is unique to that game, presumably designed by Mitchell rather than
+Capcom. It uses a Mach215 pld security chip to encrypt main code and is the only non-qsound game
+to use an eeprom instead of dip switches. It is designed to allow operation with either a standard
+or CPS1.5/qsound A-board, in the latter case the full standard sound hardware (z80, ym, oki, audio
+amp etc.) can be populated on the B-board itself, (although to date, no example of the B-board with
+sound h/w populated has been found, perhaps it was never used?). Exact-copy bootleg B-boards exist
+and are quite common, bizarrely the bootleggers often crudely cut off the front/unused analog audio
+section of the pcb!
 
 
 CPS-A Registers
 ---------------
-0x00-0x01     OBJ RAM base (/256)
-0x02-0x03     Scroll1 (8x8) RAM base (/256)
-0x04-0x05     Scroll2 (16x16) RAM base (/256)
-0x06-0x07     Scroll3 (32x32) RAM base (/256)
-0x08-0x09     rowscroll RAM base (/256)
-0x0a-0x0b     Palette base (/256) after this register is written to, the palette
-              is copied from gfxram to the dedicated ram. The palette control
-              register (see below) determines how the copy should happen.
-              Tests on a msword pcb show that the minimum alignment for the palette
-              is 0x400 bytes. The hardware seems to ignore bit 1, while when bit 0
-              is set the palette doesn't seem to be copied. However, some games set
-              bit 0 during boot (ghouls, strider, 1941) so it still isn't clear
-              what bit 0 should actually do.
-0x0c-0x0d     Scroll 1 X
-0x0e-0x0f     Scroll 1 Y
-0x10-0x11     Scroll 2 X
-0x12-0x13     Scroll 2 Y
-0x14-0x15     Scroll 3 X
-0x16-0x17     Scroll 3 Y
-0x18-0x19     Starfield 1 X
-0x1a-0x1b     Starfield 1 Y
-0x1c-0x1d     Starfield 2 X
-0x1e-0x1f     Starfield 2 Y
-0x20-0x21     start offset for the rowscroll matrix
-0x22-0x23     video control. Usually 0x0e.
-              bit 0 enables rowscroll on layer 2.
-              bit 15 is flip screen.
-              ghouls sets bit 14. Purpose unknown.
-              1941 uses bits 1-3 by setting them to 0 on screen transitions,
-              however it also uses the normal layer control register so there
-              doesn't seem to be an obvious effect.
+0x00-0x01   OBJ RAM base (/256)
+0x02-0x03   Scroll1 (8x8) RAM base (/256)
+0x04-0x05   Scroll2 (16x16) RAM base (/256)
+0x06-0x07   Scroll3 (32x32) RAM base (/256)
+0x08-0x09   rowscroll RAM base (/256)
 
-              Games known to use rowscroll:
-              SF2
-              Mega Twins (underwater, cave)
-              Carrier Air Wing (hazy background at beginning of mission 8, put 07 at ff8501 to jump there)
-              Magic Sword (fire on floor 3; screen distort after continue)
-              Varth (title screen, end of stage 4)
-              Captain Commando (end game sequence)
+0x0a-0x0b   Palette base (/256) after this register is written to, the palette
+            is copied from gfxram to the dedicated ram. The palette control
+            register (see below) determines how the copy should happen.
+            Tests on a msword pcb show that the minimum alignment for the palette
+            is 0x400 bytes. The hardware seems to ignore bit 1, while when bit 0
+            is set the palette doesn't seem to be copied. However, some games set
+            bit 0 during boot (ghouls, strider, 1941) so it still isn't clear
+            what bit 0 should actually do.
 
-              Tests done on msword at the beginning of gameplay (many thanks to Corrado Tomaselli for these):
-              3e  is the default value set by the game (not 0e like most games)
-              3c  the last two rows of scroll1 are repeated on the whole screen
-              3a  scroll2 is disabled
-              36  scroll3 is disabled
-              2e  no visible differences
-              1e  no visible differences
-              one might suspect that bits 4&5 should disable the star layers, but
-              Strider sets this register to 0x0e so that's not possible.
+0x0c-0x0d   Scroll 1 X
+0x0e-0x0f   Scroll 1 Y
+0x10-0x11   Scroll 2 X
+0x12-0x13   Scroll 2 Y
+0x14-0x15   Scroll 3 X
+0x16-0x17   Scroll 3 Y
+0x18-0x19   Starfield 1 X
+0x1a-0x1b   Starfield 1 Y
+0x1c-0x1d   Starfield 2 X
+0x1e-0x1f   Starfield 2 Y
+0x20-0x21   Start offset for the rowscroll matrix
 
-              TODO:
-              the scroll2/scroll3 disable bits are supported by the emulation,
-              while the scroll1 weird effect is not (it doesn't seem to make a
-              difference in any game).
+0x22-0x23   video control. Usually 0x0e.
+            bit 0 enables rowscroll on layer 2.
+            bit 15 is flip screen.
+            ghouls sets bit 14. Purpose unknown.
+            1941 uses bits 1-3 by setting them to 0 on screen transitions,
+            however it also uses the normal layer control register so there
+            doesn't seem to be an obvious effect.
+
+            Games known to use rowscroll:
+            SF2
+            Mega Twins (underwater, cave)
+            Carrier Air Wing (hazy background at beginning of mission 8, put 07 at ff8501 to jump there)
+            Magic Sword (fire on floor 3; screen distort after continue)
+            Varth (title screen, end of stage 4)
+            Captain Commando (end game sequence)
+
+            Tests done on msword at the beginning of gameplay (many thanks to Corrado Tomaselli for these):
+            3e  is the default value set by the game (not 0e like most games)
+            3c  the last two rows of scroll1 are repeated on the whole screen
+            3a  scroll2 is disabled
+            36  scroll3 is disabled
+            2e  no visible differences
+            1e  no visible differences
+            one might suspect that bits 4&5 should disable the star layers, but
+            Strider sets this register to 0x0e so that's not possible.
+
+            TODO:
+            the scroll2/scroll3 disable bits are supported by the emulation,
+            while the scroll1 weird effect is not (it doesn't seem to make a
+            difference in any game).
 
 
 CPS-B Registers
@@ -296,7 +304,15 @@ CPS-B Registers
 Unlike CPS-A registers, which are at fixed addresses, CPS-B registers move from game to game.
 Following example strider
 
-0x66-0x67   Layer control register
+0x0e-0x0f   Raster counter (X offset)
+0x10-0x11   Raster counter 1
+0x12-0x13   Raster Counter 2
+            These raster counter registers are only supported on CPS-B-21. It can trigger
+            IRQ4 on a scanline. IRQ4 is usually disabled with a jumper on CPS1 boards.
+            CPS2 uses it for raster effects. Certainly used by ssf2 (Cammy, DeeJay, T.Hawk stages),
+            msh (Blackheart lava stage, Shuma-Gorath's Chaos Dimension) and maybe others.
+
+0x26-0x27   Layer control register
             bits 14-15 seem to be unused
                 ghouls sets bits 15 in service mode when you press button 2 in
                 the input test, with no apparent effect on the pcb.
@@ -310,11 +326,13 @@ Following example strider
                 kodj and sf2 do NOT set this bit while they are using rowscroll.
                 Tests on the msword pcb show that even if this bit is not set,
                 rowscroll still works. Therefore, the purpose of this bit is unclear.
-0x68-0x69   Priority mask \   Tiles in the layer just below sprites can have
-0x6a-0x6b   Priority mask |   four priority levels, each one associated with one
-0x6c-0x6d   Priority mask |   of these masks. The masks indicate pens in the tile
-0x6e-0x6f   Priority mask /   that have priority over sprites.
-0x70-0x71   Palette control register. This indicates which palette
+
+0x28-0x29   Priority mask \   Tiles in the layer just below sprites can have
+0x2a-0x2b   Priority mask |   four priority levels, each one associated with one
+0x2c-0x2d   Priority mask |   of these masks. The masks indicate pens in the tile
+0x2e-0x2f   Priority mask /   that have priority over sprites.
+
+0x30-0x31   Palette control register. This indicates which palette
             pages to copy when the palette base register is written to.
             There is one CPS2 game (Slammasters II) setting this to 0x2f; all the other
             games normally set it to 0x3f, though in some cases different values are
@@ -411,11 +429,7 @@ maps for every game.
 Known Bug List
 ==============
 CPS2:
-* CPS2 can do raster effects, certainly used by ssf2 (Cammy, DeeJay, T.Hawk stages),
-  msh (Blackheart lava stage) and maybe others (xmcotaj, vsavj).
-  IRQ4 is some sort of scanline interrupt used for that purpose.
-
-* Its unknown what CPS2_OBJ_BASE register (0x400000) does but it is not a object base
+* It's unknown what CPS2_OBJ_BASE register (0x400000) does but it is not a object base
   register. The base is 0x7000 for all games even if 0x7080 is written to this register
   (checked on real HW). Maybe it sets the object bank used when cps2_objram_bank is set.
 
@@ -428,11 +442,6 @@ Marvel Vs. Capcom
   the first 32x32 tile offset and results in data coming from 16x16 or 8x8 tiles instead.
 
 CPS1:
-SF2
-* Missing chain in the foreground in Ken's level, and sign in Chun Li's level.
-  Those graphics are in the backmost layer. Probably they are leftover from game
-  development and aren't supposed to be visible.
-
 3wonders
 * writes to output ports 42, 44, 46.
 
@@ -484,7 +493,7 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #define CPS_B_14     0x1e,0x0404,          __not_applicable__,          0x12,{0x14,0x16,0x18,0x1a},0x1c, {0x08,0x20,0x10,0x00,0x00}
 #define CPS_B_15     0x0e,0x0405,          __not_applicable__,          0x02,{0x04,0x06,0x08,0x0a},0x0c, {0x04,0x02,0x20,0x00,0x00}
 #define CPS_B_16     0x00,0x0406,          __not_applicable__,          0x0c,{0x0a,0x08,0x06,0x04},0x02, {0x10,0x0a,0x0a,0x00,0x00}
-#define CPS_B_17     0x08,0x0407,          __not_applicable__,          0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x08,0x14,0x02,0x00,0x00}   // the sf2 -> strider conversion needs 0x04 for the 2nd layer enable on one level, gfx confirmed to appear on the PCB, register at the time is 0x8e, so 0x10 is not set.
+#define CPS_B_17     0x08,0x0407,          __not_applicable__,          0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x08,0x14,0x02,0x00,0x00} // the sf2 -> strider conversion needs 0x04 for the 2nd layer enable on one level, gfx confirmed to appear on the PCB, register at the time is 0x8e, so 0x10 is not set.
 #define CPS_B_18     0x10,0x0408,          __not_applicable__,          0x1c,{0x1a,0x18,0x16,0x14},0x12, {0x10,0x08,0x02,0x00,0x00}
 #define CPS_B_21_DEF 0x32,  -1,   0x00,0x02,0x04,0x06, 0x08, -1,  -1,   0x26,{0x28,0x2a,0x2c,0x2e},0x30, {0x02,0x04,0x08,0x30,0x30} // pang3 sets layer enable to 0x26 on startup
 #define CPS_B_21_BT1 0x32,0x0800, 0x0e,0x0c,0x0a,0x08, 0x06,0x04,0x02,  0x28,{0x26,0x24,0x22,0x20},0x30, {0x20,0x04,0x08,0x12,0x12}
@@ -1243,7 +1252,7 @@ static const struct gfx_range mapper_KR22B_table[] =
 	// bank 2 = pin 14 (ROMs 3,7,11,15,19,21,26,28)
 	// bank 3 = pin 12 (ROMS 4,8,12,16,20,22,27,29)
 
-	/* type            start   end     bank */
+	/* type                              start   end     bank */
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x3fff, 0 },
 
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x4000, 0x7fff, 1 },
@@ -1542,7 +1551,7 @@ static const struct gfx_range mapper_CP1B1F_table[] =
 	//       = pin 15 (ROMs 1,7 /oe)
 	//       = pin 13 (ROMs 1,7 a19)
 	// Unlike other games which switch between 2 pairs of roms to form the full 64-bit gfx bus,
-	//  this unique B board stores the 2x 32-bit halves in the same rom pair and switches between them with the a19 line.
+	// this unique B board stores the 2x 32-bit halves in the same rom pair and switches between them with the a19 line.
 	// An a20 line is available on pin 14 for 32MBit roms but is unused (this would be bank1 if used).
 	// pins 17,18,19 are rom /ce lines to other 3 pairs of unpopulated roms.
 
@@ -2107,7 +2116,7 @@ MACHINE_RESET_MEMBER(cps_state,cps)
 }
 
 
-inline uint16_t *cps_state::cps1_base( int offset, int boundary )
+inline uint16_t *cps_state::cps1_base(int offset, int boundary)
 {
 	int base = m_cps_a_regs[offset] * 256;
 
@@ -2140,11 +2149,8 @@ void cps_state::cps1_cps_a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (offset == CPS1_PALETTE_BASE)
 		cps1_build_palette(cps1_base(CPS1_PALETTE_BASE, m_palette_align));
 
-	// pzloop2 write to register 24 on startup. This is probably just a bug.
-	if (offset == 0x24 / 2 && m_cps_version == 2)
-		return;
-
 #ifdef MAME_DEBUG
+	// pzloop2 write to register 24 on startup. This is probably just a bug.
 	if (offset > CPS1_VIDEOCONTROL)
 		popmessage("write to CPS-A register %02x contact MAMEDEV", offset * 2);
 #endif
@@ -2178,15 +2184,19 @@ uint16_t cps_state::cps1_cps_b_r(offs_t offset)
 	if (m_game_config->in3_addr != 0 && offset == m_game_config->in3_addr / 2)
 		return ioport("IN3")->read();
 
-	if (m_cps_version == 2)
+	// raster counters for cps2 & ganbare
+	if (m_raster_irq != nullptr)
 	{
-		if (offset == 0x10/2)
+		if (offset == 0x0e/2)
 		{
-			// UNKNOWN--only mmatrix appears to read this, and I'm not sure if the result is actually used
-			return m_cps_b_regs[0x10 / 2];
+			// 2-pixel hpos relative to raster counter #3
+			return ((m_raster_counter[2] - m_screen->hpos() / 2) << 1 & 0x1fe) | (m_cps_b_regs[0x0e / 2] & 1);
 		}
-		if (offset == 0x12/2)
-			return m_cps_b_regs[0x12 / 2];
+		if (offset == 0x10/2 || offset == 0x12/2)
+		{
+			// scanline relative to raster counter #1, #2
+			return m_raster_counter[offset & 1] & 0x1ff;
+		}
 	}
 #ifdef MAME_DEBUG
 	popmessage("CPS-B read port %02x contact MAMEDEV", offset * 2);
@@ -2199,40 +2209,38 @@ void cps_state::cps1_cps_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cps_b_regs[offset]);
 
-	if (m_cps_version == 2)
+	// raster counters for cps2 & ganbare
+	if (m_raster_irq != nullptr)
 	{
-		/* To mark scanlines for raster effects */
 		if (offset == 0x0e/2)
 		{
-			// UNKNOWN
+			m_raster_reload[2] = data >> 1 & 0xff;
 			return;
 		}
-		if (offset == 0x10/2)
+		if (offset == 0x10/2 || offset == 0x12/2)
 		{
-			m_scanline1 = (data & 0x1ff);
-			return;
-		}
-		if (offset == 0x12/2)
-		{
-			m_scanline2 = (data & 0x1ff);
+			m_raster_reload[offset & 1] = data & 0x1ff;
+
+			// manually reload counter
+			if (BIT(data, 15))
+				m_raster_counter[offset & 1] = m_raster_reload[offset & 1];
 			return;
 		}
 	}
-
 
 	// additional outputs on C-board
 	if (m_game_config->out2_addr != 0 && offset == m_game_config->out2_addr / 2)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			if (m_game_config->cpsb_value == 0x0402)    // Mercs (CN2 connector)
+			if (m_game_config->cpsb_value == 0x0402) // Mercs (CN2 connector)
 			{
 				machine().bookkeeping().coin_lockout_w(2, ~data & 0x01);
 				m_led_cboard[0] = BIT(data, 1);
 				m_led_cboard[1] = BIT(data, 2);
 				m_led_cboard[2] = BIT(data, 3);
 			}
-			else    // kod, captcomm, knights
+			else // kod, captcomm, knights
 			{
 				machine().bookkeeping().coin_lockout_w(2, ~data & 0x02);
 				machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
@@ -2257,15 +2265,6 @@ void cps_state::cps1_cps_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			!m_game_config->bootleg_kludge)
 		popmessage("CPS-B write %04x to port %02x contact MAMEDEV", data, offset * 2);
 #endif
-}
-
-
-void cps_state::init_cps1()
-{
-	m_scanline1 = 0;
-	m_scanline2 = 0;
-	m_scancalls = 0;
-	m_last_sprite_offset = 0;
 }
 
 
@@ -2299,37 +2298,32 @@ void cps_state::cps1_get_video_base()
 		scroll2xoff = -0x0e;
 		scroll3xoff = -0x10;
 	}
-	else
-	if (kludge == 0x0E)
+	else if (kludge == 0x0e)
 	{
 		scroll1xoff = 0xffba;
 		scroll2xoff = 0xffc0;
 		scroll3xoff = 0xffba;
 	}
-	else
-	if (kludge == 0x0F)
+	else if (kludge == 0x0f)
 	{
 		scroll1xoff = 0xffc0;
 		scroll2xoff = 0xffc0;
 		scroll3xoff = 0xffc0;
 	}
-	else
-	if (kludge == 2)
+	else if (kludge == 2)
 	{
 		m_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
 		scroll1xoff = -0x10;
 		scroll2xoff = -0x10;
 		scroll3xoff = -0x10;
 	}
-	else
-	if (kludge == 3)
+	else if (kludge == 3)
 	{
 		scroll1xoff = -0x08;
 		scroll2xoff = -0x0b;
 		scroll3xoff = -0x0c;
 	}
-	else
-	if (m_game_config->bootleg_kludge == 0x88) // 3wondersb
+	else if (m_game_config->bootleg_kludge == 0x88) // 3wondersb
 	{
 		scroll1xoff = 0x4;
 		scroll2xoff = 0x6;
@@ -2450,7 +2444,7 @@ int cps_state::gfxrom_bank_mapper( int type, int code )
 	}
 
 #ifdef MAME_DEBUG
-//  popmessage("tile %02x/%04x out of range", type, code >> shift);
+	//popmessage("tile %02x/%04x out of range", type, code >> shift);
 #endif
 
 	return -1;
@@ -2547,9 +2541,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile2_info)
 
 void cps_state::cps1_update_transmasks()
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		int mask;
 
@@ -2606,7 +2598,6 @@ void cps_state::video_start()
 	if (!m_game_config)
 		throw emu_fatalerror("cps_state::video_start: m_game_config hasn't been set up yet");
 
-
 	/* Set up old base */
 	m_scroll1 = nullptr;
 	m_scroll2 = nullptr;
@@ -2619,9 +2610,8 @@ void cps_state::video_start()
 	m_screen->register_screen_bitmap(m_dummy_bitmap);
 
 	/* state save register */
-	save_item(NAME(m_scanline1));
-	save_item(NAME(m_scanline2));
-	save_item(NAME(m_scancalls));
+	save_item(NAME(m_last_sprite_offset));
+	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
 #if 0
 	/* these do not need to be saved, because they are recovered from cps_a_regs in cps1_postload */
 	save_item(NAME(m_scroll1x));
@@ -2636,9 +2626,6 @@ void cps_state::video_start()
 	save_item(NAME(m_stars2y));
 	save_item(NAME(m_stars_enabled));
 #endif
-	save_item(NAME(m_last_sprite_offset));
-
-	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
@@ -2806,8 +2793,8 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 		int colour = *(base + 3);
 		int col = colour & 0x1f;
 
-//      x -= 0x20;
-//      y += 0x20;
+		//x -= 0x20;
+		//y += 0x20;
 
 		code = gfxrom_bank_mapper(GFXTYPE_SPRITES, code);
 
@@ -2835,7 +2822,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 								sy = (y + nys * 16) & 0x1ff;
 
 								DRAWSPRITE(
-//                                      code + (nx - 1) - nxs + 0x10 * (ny - 1 - nys),
+										//code + (nx - 1) - nxs + 0x10 * (ny - 1 - nys),
 										(code & ~0xf) + ((code + (nx - 1) - nxs) & 0xf) + 0x10 * (ny - 1 - nys),
 										(col & 0x1f),
 										1,1,
@@ -2853,7 +2840,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 								sy = (y + nys * 16) & 0x1ff;
 
 								DRAWSPRITE(
-//                                      code + nxs + 0x10 * (ny - 1 - nys),
+										//code + nxs + 0x10 * (ny - 1 - nys),
 										(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * (ny - 1 - nys),
 										(col & 0x1f),
 										0,1,
@@ -2874,7 +2861,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 								sy = (y + nys * 16) & 0x1ff;
 
 								DRAWSPRITE(
-//                                      code + (nx - 1) - nxs + 0x10 * nys,
+										//code + (nx - 1) - nxs + 0x10 * nys,
 										(code & ~0xf) + ((code + (nx - 1) - nxs) & 0xf) + 0x10 * nys,
 										(col & 0x1f),
 										1,0,
@@ -2892,8 +2879,8 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 								sy = (y + nys * 16) & 0x1ff;
 
 								DRAWSPRITE(
-//                                      code + nxs + 0x10 * nys,
-										(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys,  // fix 00406: qadjr: When playing as the ninja, there is one broken frame in his animation loop when walking.
+										//code + nxs + 0x10 * nys,
+										(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys, // fix 00406: qadjr: When playing as the ninja, there is one broken frame in his animation loop when walking.
 										(col & 0x1f),
 										0,0,
 										sx,sy);
@@ -2905,7 +2892,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 			else
 			{
 				/* Simple case... 1 sprite */
-						DRAWSPRITE(
+				DRAWSPRITE(
 						code,
 						(col & 0x1f),
 						colour&0x20,colour&0x40,
@@ -2927,7 +2914,7 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 	if (!stars_rom && (m_stars_enabled[0] || m_stars_enabled[1]))
 	{
 #ifdef MAME_DEBUG
-//      popmessage("stars enabled but no stars ROM");
+		//popmessage("stars enabled but no stars ROM");
 #endif
 		return;
 	}
@@ -3091,7 +3078,6 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x);
 	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
 
-
 	/* Blank screen */
 	if (m_cps_version == 1)
 	{
@@ -3121,16 +3107,18 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 
 void cps_state::screen_vblank_cps1(int state)
 {
-	// rising edge
 	if (state)
 	{
 		/* Get video memory base registers */
 		cps1_get_video_base();
+	}
+}
 
-		if (m_cps_version == 1)
-		{
-			/* CPS1 sprites have to be delayed one frame */
-			memcpy(m_buffered_obj.get(), m_obj, m_obj_size);
-		}
+void cps_state::cps1_objram_latch(int state)
+{
+	if (state)
+	{
+		/* CPS1 sprites have to be delayed one frame */
+		memcpy(m_buffered_obj.get(), m_obj, m_obj_size);
 	}
 }

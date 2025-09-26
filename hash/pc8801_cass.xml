@@ -66,7 +66,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 <!-- CASSETTES -->
 
 <!-- these might be 2-sided cassettes (i.e. we should merge some parts) -->
-	<software name="pacland">
+	<software name="pacland" supported="no">
 		<description>Pac-Land</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -94,7 +94,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 
 <!-- these might be 2-sided cassettes (i.e. we should merge some parts) -->
 <!-- for 8001SR? -->
-	<software name="blckonyxmk2">
+	<software name="blckonyxmk2" supported="no">
 		<description>The Black Onyx</description>
 		<year>1984</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
@@ -113,7 +113,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="3dgolf">
+	<software name="3dgolf" supported="no">
 		<description>3D Golf Simulation</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -127,7 +127,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="alphos">
+	<software name="alphos" supported="no">
 		<description>Alphos</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -141,7 +141,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="alphosa" cloneof="alphos">
+	<software name="alphosa" cloneof="alphos" supported="no">
 		<description>Alphos (Alt?)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -155,7 +155,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="apploon">
+	<software name="apploon" supported="no">
 		<description>Apploon</description>
 		<year>1984</year>
 		<publisher>タカラ (Takara)</publisher>
@@ -169,7 +169,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="ay1">
+	<software name="ay1" supported="no">
 		<description>AY-1 Fortress Solomon</description>
 		<year>1983</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -182,7 +182,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="baseblk">
+	<software name="baseblk" supported="no">
 		<description>Base-kun Block</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -193,7 +193,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="bishohip">
+	<software name="bishohip" supported="no">
 		<description>Bishojo Hippagashi Game</description>
 		<year>1983</year>
 		<publisher>ツクモ (Tsukumo)</publisher>
@@ -207,7 +207,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="bokosuka">
+	<software name="bokosuka" supported="no">
 		<description>Bokosuka Wars</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -221,7 +221,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="hauntcav">
+	<software name="hauntcav" supported="no">
 		<description>Haunted Cave</description>
 		<year>1984</year>
 		<publisher>ベルソフト (Bell Soft)</publisher>
@@ -235,7 +235,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="chinsnmj">
+	<software name="chinsnmj" supported="no">
 		<description>Chin-san Mahjong</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -246,7 +246,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="combat">
+	<software name="combat" supported="no">
 		<description>Combat</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -271,7 +271,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="cosmox">
+	<software name="cosmox" supported="no">
 		<description>Cosmo Cross</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -282,7 +282,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="cosmomu">
+	<software name="cosmomu" supported="no">
 		<description>Cosmo Mutar</description>
 		<year>1984</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -296,7 +296,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="cyclwman">
+	<software name="cyclwman" supported="no">
 		<description>Cyclops Crusher + Waterman</description>
 		<year>1983</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
@@ -316,7 +316,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="daifugo">
+	<software name="daifugo" supported="no">
 		<description>Daifugo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -329,7 +329,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 	</software>
 
 	<!-- or is it the PC8001 version? -->
-	<software name="digdug">
+	<software name="digdug" supported="no">
 		<description>Dig Dug</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -343,7 +343,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="dipper">
+	<software name="dipper" supported="no">
 		<description>Dipper</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -354,7 +354,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="donkeygo">
+	<software name="donkeygo" supported="no">
 		<description>Donkey Gorilla</description>
 		<year>1983</year>
 		<publisher>ツクモ (Tsukumo)</publisher>
@@ -367,7 +367,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="doordoor">
+	<software name="doordoor" supported="no">
 		<description>Door Door</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -381,7 +381,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="doormaze">
+	<software name="doormaze" supported="no">
 		<description>Door Maze</description>
 		<year>1984</year>
 		<publisher>ポリシー (Policy)</publisher>
@@ -395,7 +395,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="downmaze">
+	<software name="downmaze" supported="no">
 		<description>Downmaze</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -406,7 +406,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="dualaln">
+	<software name="dualaln" supported="no">
 		<description>Dual Alien</description>
 		<year>1984</year>
 		<publisher>セントラル教育 (Central Kyoku)</publisher>
@@ -420,7 +420,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="dungeon">
+	<software name="dungeon" supported="no">
 		<description>Dungeon</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -434,7 +434,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="dungeonp">
+	<software name="dungeonp" supported="no">
 		<description>Dungeon Player Tape</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -445,7 +445,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="eggy">
+	<software name="eggy" supported="no">
 		<description>Eggy</description>
 		<year>1985</year>
 		<publisher>ボーステック (Bothtec)</publisher>
@@ -459,7 +459,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="fanfun">
+	<software name="fanfun" supported="no">
 		<description>Fan Fun</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -473,7 +473,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="fanfuna" cloneof="fanfun">
+	<software name="fanfuna" cloneof="fanfun" supported="no">
 		<description>Fan Fun (alt maybe)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -487,7 +487,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="flappy">
+	<software name="flappy" supported="no">
 		<description>Flappy</description>
 		<year>1983</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
@@ -500,7 +500,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="flyingac">
+	<software name="flyingac" supported="no">
 		<description>Flying Ace</description>
 		<year>1984</year>
 		<publisher>CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
@@ -514,7 +514,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="forsice">
+	<software name="forsice" supported="no">
 		<description>Forsice</description>
 		<year>1983</year>
 		<publisher>ブレーンメディア (Brain Media)</publisher>
@@ -527,7 +527,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="galaxian">
+	<software name="galaxian" supported="no">
 		<description>Galaxian</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -541,7 +541,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="galaxiana" cloneof="galaxian">
+	<software name="galaxiana" cloneof="galaxian" supported="no">
 		<description>Galaxian (Alt?)</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -555,7 +555,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="gingasuk">
+	<software name="gingasuk" supported="no">
 		<description>Ginga wo Sukue</description>
 		<year>1984</year>
 		<publisher>日本テレネット (Nihon Telenet) / レーベンプロ (Leben Pro)</publisher>
@@ -569,7 +569,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="hitsuji">
+	<software name="hitsuji" supported="no">
 		<description>Hitsuji Yaai</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -583,7 +583,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="holein1t">
+	<software name="holein1t" supported="no">
 		<description>Hole in One</description>
 		<year>1985</year>
 		<publisher>HAL研究所 (HAL Kenkyuujo)</publisher>
@@ -597,7 +597,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="honoyaka">
+	<software name="honoyaka" supported="no">
 		<description>Honoo no Yakata</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -608,7 +608,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="horrorho">
+	<software name="horrorho" supported="no">
 		<description>Horror House</description>
 		<year>1983</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -622,7 +622,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="hosi">
+	<software name="hosi" supported="no">
 		<description>Hosi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -633,7 +633,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="jagey">
+	<software name="jagey" supported="no">
 		<description>Jagey</description>
 		<year>1985</year>
 		<publisher>MIA</publisher>
@@ -647,7 +647,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="jelda">
+	<software name="jelda" supported="no">
 		<description>Jelda</description>
 		<year>1983</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -661,7 +661,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="jelda2">
+	<software name="jelda2" supported="no">
 		<description>Jelda II</description>
 		<year>1984</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -675,7 +675,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="jelda2a" cloneof="jelda2">
+	<software name="jelda2a" cloneof="jelda2" supported="no">
 		<description>Jelda II (Alt)</description>
 		<year>1984</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -689,7 +689,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="juokaime">
+	<software name="juokaime" supported="no">
 		<description>Juo Kaimei - Jissen Tsugi no Isshu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -700,7 +700,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="kabuki">
+	<software name="kabuki" supported="no">
 		<description>Kabuki Advgame</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -711,7 +711,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="kinnikum">
+	<software name="kinnikum" supported="no">
 		<description>Kinnikuman</description>
 		<year>1984</year>
 		<publisher>バンダイ (Bandai)</publisher>
@@ -725,7 +725,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="kuchusen">
+	<software name="kuchusen" supported="no">
 		<description>Kuchusen - Sky Tactics</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -736,7 +736,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="kyokiyak">
+	<software name="kyokiyak" supported="no">
 		<description>Kyoki no Yakata</description>
 		<year>1983</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -750,7 +750,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="playboy">
+	<software name="playboy" supported="no">
 		<description>Love Adventure Playboy</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -764,7 +764,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="lunarbal">
+	<software name="lunarbal" supported="no">
 		<description>Lunar Ball</description>
 		<year>1985</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
@@ -778,7 +778,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="mariosp">
+	<software name="mariosp" supported="no">
 		<description>Mario Bros. Special</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -791,7 +791,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="max01g">
+	<software name="max01g" supported="no">
 		<description>Max-01G</description>
 		<year>1985</year>
 		<publisher>ザインソフト (Sein Soft)</publisher>
@@ -805,7 +805,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="wakumeph">
+	<software name="wakumeph" supported="no">
 		<description>Star Arthur Densetsu I - Wakusei Mephius (Alt)</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -831,7 +831,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="midmagic">
+	<software name="midmagic" supported="no">
 		<description>David's Midnight Magic</description>
 		<year>1984</year>
 		<publisher>システムソフト (System Software)</publisher>
@@ -845,7 +845,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="minami">
+	<software name="minami" supported="no">
 		<description>Minami Taihei-yo Adventure</description>
 		<year>1983</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
@@ -859,7 +859,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="moebius">
+	<software name="moebius" supported="no">
 		<description>Moebius</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -871,7 +871,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="nquest">
+	<software name="nquest" supported="no">
 		<description>N-Quest</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -882,7 +882,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="nemesis">
+	<software name="nemesis" supported="no">
 		<description>Nemesis 88</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -906,7 +906,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="newtron">
+	<software name="newtron" supported="no">
 		<description>Newtron</description>
 		<year>1984</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -920,7 +920,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="nutsmilk">
+	<software name="nutsmilk" supported="no">
 		<description>Nuts &amp; Milk</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -934,7 +934,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="pacmant">
+	<software name="pacmant" supported="no">
 		<description>Pacman</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -948,7 +948,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="parallel">
+	<software name="parallel" supported="no">
 		<description>Parallel World</description>
 		<year>1984</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -962,7 +962,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="pascomtw">
+	<software name="pascomtw" supported="no">
 		<description>Pascom Tower</description>
 		<year>1985</year>
 		<publisher>MIA</publisher>
@@ -976,7 +976,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="plazmali">
+	<software name="plazmali" supported="no">
 		<description>Plazma Line</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -990,7 +990,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="poibos">
+	<software name="poibos" supported="no">
 		<description>Poibos Part-1 - Dasshutsu</description>
 		<year>1983</year>
 		<publisher>大名マイコン学院 (Daimyo Micom Gakuen)</publisher>
@@ -1004,7 +1004,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="ponkotsu">
+	<software name="ponkotsu" supported="no">
 		<description>Ponkotsu-sen Survival</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -1018,7 +1018,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="proyakyu">
+	<software name="proyakyu" supported="no">
 		<description>Pro Yakyu (Super Simulation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1029,7 +1029,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="puzzladv">
+	<software name="puzzladv" supported="no">
 		<description>Puzzle Adventure</description>
 		<year>1983</year>
 		<publisher>マイコンシティー (Micom City)</publisher>
@@ -1043,7 +1043,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="river">
+	<software name="river" supported="no">
 		<description>River</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1054,7 +1054,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="rocketmn">
+	<software name="rocketmn" supported="no">
 		<description>Rocketman</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1066,7 +1066,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="shogid2">
+	<software name="shogid2" supported="no">
 		<!-- Or Igo Dojo 2? -->
 		<description>Shougi Dojo 2</description>
 		<year>19??</year>
@@ -1079,7 +1079,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="shogimei">
+	<software name="shogimei" supported="no">
 		<description>Shougi Meijin</description>
 		<year>1985</year>
 		<publisher>ソフトプロ (Soft Pro) / アポロテクニカ (Apollo Technica)</publisher>
@@ -1093,7 +1093,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="shogita2">
+	<software name="shogita2" supported="no">
 		<!-- or Igo Taikyoku V2? -->
 		<description>Shougi Taikyoku V2</description>
 		<year>1984</year>
@@ -1108,7 +1108,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="sokoban">
+	<software name="sokoban" supported="no">
 		<description>Sokouban</description>
 		<year>1983</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
@@ -1122,7 +1122,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="spacedia">
+	<software name="spacedia" supported="no">
 		<description>Space Diamond</description>
 		<year>1984</year>
 		<publisher>ボーステック (Bothtec)</publisher>
@@ -1136,7 +1136,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="spartanx">
+	<software name="spartanx" supported="no">
 		<description>Spartan X</description>
 		<year>1985</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
@@ -1150,7 +1150,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="starflet">
+	<software name="starflet" supported="no">
 		<description>Star Fleet</description>
 		<year>1983</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -1164,7 +1164,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="starques">
+	<software name="starques" supported="no">
 		<description>Star Quest</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1175,7 +1175,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="starligh">
+	<software name="starligh" supported="no">
 		<description>Starlight Adventure</description>
 		<year>1983</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -1189,7 +1189,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="sugarfac">
+	<software name="sugarfac" supported="no">
 		<description>Sugar Factory</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1201,7 +1201,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="survival">
+	<software name="survival" supported="no">
 		<description>Survival Game</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1212,7 +1212,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="spider">
+	<software name="spider" supported="no">
 		<description>The Spider</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -1226,7 +1226,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="straysto">
+	<software name="straysto" supported="no">
 		<description>The Stray Story</description>
 		<year>1984</year>
 		<publisher>ユニオンプランニング (Union Planning)</publisher>
@@ -1240,7 +1240,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="tforce">
+	<software name="tforce" supported="no">
 		<description>Thunder Force</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -1254,7 +1254,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="timesecr">
+	<software name="timesecr" supported="no">
 		<description>Time Secret</description>
 		<year>1984</year>
 		<publisher>ボンドソフト (Bond Soft)</publisher>
@@ -1268,7 +1268,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="tropical">
+	<software name="tropical" supported="no">
 		<description>Tropical Boy</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -1282,7 +1282,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="uchusens">
+	<software name="uchusens" supported="no">
 		<description>Uchu no Senshi</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -1296,7 +1296,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="ultraymj">
+	<software name="ultraymj" supported="no">
 		<description>Ultra Yonin Mahjong</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1308,7 +1308,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="univadv">
+	<software name="univadv" supported="no">
 		<description>Universal Adventure</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1319,7 +1319,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="zenon">
+	<software name="zenon" supported="no">
 		<description>Zenon</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -1332,7 +1332,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="4dhouset">
+	<software name="4dhouset" supported="no">
 		<description>Yojigen no Ie - 4 Dimension House</description>
 		<year>1983</year>
 		<publisher>プロシューマー (Prosumer)</publisher>
@@ -1346,7 +1346,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="zexas">
+	<software name="zexas" supported="no">
 		<description>Zexas Kosoku 2000-konen</description>
 		<year>1984</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
@@ -1360,7 +1360,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="zold">
+	<software name="zold" supported="no">
 		<description>Zold</description>
 		<year>1984</year>
 		<publisher>富士音響RAM (Fuji Onkyo RAM)</publisher>
@@ -1373,7 +1373,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="zoom">
+	<software name="zoom" supported="no">
 		<description>Zoom in Space</description>
 		<year>1983</year>
 		<publisher>ユニオンプランニング (Union Planning)</publisher>
@@ -1387,7 +1387,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="cbdash">
+	<software name="cbdash" supported="no">
 		<description>Champion Boulderdash</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1398,7 +1398,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="enterpr">
+	<software name="enterpr" supported="no">
 		<description>Enterprise</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1409,7 +1409,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="intadv">
+	<software name="intadv" supported="no">
 		<description>Intern Adventure</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1420,7 +1420,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="jump">
+	<software name="jump" supported="no">
 		<description>Jump!</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1431,7 +1431,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 		</part>
 	</software>
 
-	<software name="gundam2">
+	<software name="gundam2" supported="no">
 		<description>Kidou Senshi Gundam 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1452,7 +1452,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 	    Originally published as a type-in program in the October 1985 issue of LOGiN Magazine.
 	    Game programmed by Hiromichi Tanaka, converted to t88 format by Dustin Hubbard / Gaming Alexandria.
 	-->
-	<software name="3156coro2">
+	<software name="3156coro2" supported="no">
 		<description>3156 Coro Coro</description>
 		<year>1985</year>
 		<publisher>スクウェア (Square) / アスキー (ASCII)</publisher>

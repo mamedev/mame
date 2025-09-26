@@ -217,7 +217,7 @@ void icecold_state::machine_start()
 void icecold_state::machine_reset()
 {
 	// CH-C is used for generate a 30hz clock
-	m_ay8910[0]->set_volume(2, 0);
+	m_ay8910[0]->set_output_gain(2, 0.0);
 
 	m_rmotor = m_lmotor = 10;
 	m_sint = 0;

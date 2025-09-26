@@ -30,11 +30,11 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/meters.h"
-#include "machine/roc10937.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
+#include "video/roc10937.h"
 
 #include "speaker.h"
 
@@ -328,15 +328,14 @@ void proconn_state::proconn(machine_config &config)
 
 	Z80SIO(config, m_z80sio, 4000000); /* ?? Mhz */
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 
 	config.set_default_layout(layout_proconn);
 
 	AY8910(config, m_ay, 1000000); /* ?? Mhz */ // YM2149F on PC92?
 	m_ay->port_b_write_callback().set(FUNC(proconn_state::meter_w));
-	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.33, 1);
 
 	METERS(config, m_meters, 0);
 	m_meters->set_number(8);

@@ -56,7 +56,7 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 
-	required_ioport_array<4> m_in_key;
+	required_ioport_array<10> m_in_key;
 
 	// memory pointers
 	std::unique_ptr<uint16_t[]> m_videoram[2][4]{};

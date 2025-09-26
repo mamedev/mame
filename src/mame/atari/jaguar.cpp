@@ -40,7 +40,7 @@
     Components:
     sdt79r3041-20j
     Atari Jaguar CPU V1.0 6sc880hf106
-    Atari Jaguar DSP V1.0 sc414201ft (has Motorolla logo)
+    Atari Jaguar DSP V1.0 sc414201ft (has Motorola logo)
     Altera epm7128elc84-15 marked A-21652
     VIA vt83c461 IDE controller
     Actel a1010b marked A-22096 near IDE and gun inputs
@@ -1760,7 +1760,7 @@ void jaguar_state::video_config(machine_config &config, const XTAL clock)
 void jaguar_state::cojagr3k(machine_config &config)
 {
 	/* basic machine hardware */
-	R3041(config, m_maincpu, R3000_CLOCK).set_endianness(ENDIANNESS_BIG);
+	R3041(config, m_maincpu, R3000_CLOCK / 2).set_endianness(ENDIANNESS_BIG); // divider not verified, but chip is rated for 20 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
 	video_config(config, COJAG_CLOCK/2);
@@ -1783,10 +1783,9 @@ void jaguar_state::cojagr3k(machine_config &config)
 	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // unknown DAC
 
 	// TODO: subwoofer speaker
 }
@@ -1833,10 +1832,9 @@ void jaguar_state::jaguar(machine_config &config)
 	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // unknown DAC
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg,rom", attotime::from_seconds(1)).set_load_callback(FUNC(jaguar_state::quickload_cb));

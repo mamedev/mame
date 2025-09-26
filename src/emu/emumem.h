@@ -1877,13 +1877,13 @@ public:
 
 	// see if an address is within bounds, update it if not
 	void check_address_r(offs_t address) {
-		if(address >= m_addrstart_r && address <= m_addrend_r)
+		if(EXPECTED(address >= m_addrstart_r && address <= m_addrend_r))
 			return;
 		m_root_read->lookup(address, m_addrstart_r, m_addrend_r, m_cache_r);
 	}
 
 	void check_address_w(offs_t address) {
-		if(address >= m_addrstart_w && address <= m_addrend_w)
+		if(EXPECTED(address >= m_addrstart_w && address <= m_addrend_w))
 			return;
 		m_root_write->lookup(address, m_addrstart_w, m_addrend_w, m_cache_w);
 	}

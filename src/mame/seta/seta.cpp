@@ -4650,7 +4650,7 @@ static INPUT_PORTS_START( setaroul )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x10, 0x10, "Menu 1:Time 2:Payout" ) PORT_DIPLOCATION("SW3:4") // dsw3 4 (enable menus 1 & 2 in stats screen)
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -6975,7 +6975,7 @@ static INPUT_PORTS_START( jockeyc )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_10C ) )
 
 	PORT_DIPUNKNOWN_DIPLOC(0x0100, 0x0100, "SW3:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x0200, 0x0200, "SW3:2")
@@ -7071,9 +7071,9 @@ static INPUT_PORTS_START( inttoote )
 	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x04, "1 Coin/20 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )
 	PORT_DIPNAME( 0x20, 0x20, "Unknown SW1:6" )           PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -7805,7 +7805,7 @@ void setaroul_state::setaroul(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0, -0x1);
 	m_spritegen->set_bg_xoffsets(0, 0x2);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
@@ -7827,12 +7827,11 @@ void setaroul_state::setaroul(machine_config &config)
 	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 16_MHz_XTAL);   // 16 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 
 	// layout
 	config.set_default_layout(layout_setaroul);
@@ -7931,12 +7930,11 @@ void seta_state::extdwnhl(machine_config &config)
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 16000000);   // 16 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -8186,12 +8184,11 @@ void seta_state::orbs(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 14.318181_MHz_XTAL);   // 14.318180 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -8225,12 +8222,11 @@ void keroppi_state::keroppi(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 14318180);   // 14.318180 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -8510,12 +8506,11 @@ void seta_state::oisipuzl(machine_config &config)
 	set_tilemaps_flip(1); // flip is inverted for the tilemaps
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 16000000);   // 16 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -8557,12 +8552,11 @@ void seta_state::triplfun(machine_config &config)
 	set_tilemaps_flip(1); // flip is inverted for the tilemaps
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim6295_device &oki(OKIM6295(config, "oki", 792000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 
@@ -9103,7 +9097,7 @@ void jockeyc_state::jockeyc(machine_config &config)
 	m_spritegen->set_fg_yoffsets(-0x12+8, 0x0e);
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	// devices
@@ -9126,12 +9120,11 @@ void jockeyc_state::jockeyc(machine_config &config)
 	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 16000000);
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 
 	// layout
 	config.set_default_layout(layout_jockeyc);

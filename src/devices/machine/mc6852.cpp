@@ -51,6 +51,8 @@ mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, dev
 	m_write_irq(*this),
 	m_write_sm_dtr(*this),
 	m_write_tuf(*this),
+	m_tx_pull_mode(false),
+	m_tx_active(false),
 	m_rx_clock(0),
 	m_tx_clock(0),
 	m_cts(1),
@@ -84,6 +86,8 @@ void mc6852_device::device_start()
 	save_item(NAME(m_sm_dtr));
 	save_item(NAME(m_tuf));
 	save_item(NAME(m_in_sync));
+	save_item(NAME(m_tx_active));
+	save_item(NAME(m_tx_pull_mode));
 }
 
 
@@ -125,7 +129,39 @@ void mc6852_device::tra_callback()
 
 void mc6852_device::tra_complete()
 {
-	// TODO
+	int trigger = (m_cr[1] & C2_1_2_BYTE) ? 1 : 2;
+	int available = 3 - m_tx_fifo.size();
+	uint8_t byte_to_send;
+
+	if (available < 3)
+	{
+		// FIFO not empty - send the next byte.
+		byte_to_send = m_tx_fifo.front();
+		m_tx_fifo.pop();
+		available++;
+	}
+	else
+	{
+		// TX underflow
+		if (m_cr[1] & C2_TX_SYNC)
+		{
+			m_status |= S_TUF;
+			byte_to_send = m_scr;   // Send Sync Code
+
+			// TODO assert TUF pin for "approximately one Tx CLK high period"
+		}
+		else
+		{
+			byte_to_send = 0xff;    // Send a "Mark"
+		}
+	}
+
+	transmit_register_setup(byte_to_send);
+
+	if (available >= trigger)
+	{
+		m_status |= S_TDRA;
+	}
 }
 
 //-------------------------------------------------
@@ -234,7 +270,7 @@ uint8_t mc6852_device::read(offs_t offset)
 			// TODO this might not be quite right, the datasheet
 			// states that the RX overrun flag is cleared by
 			// reading the status, and the RX data fifo?
-			m_status &= S_RX_OVRN;
+			m_status &= ~S_RX_OVRN;
 		}
 	}
 
@@ -311,9 +347,9 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 
 			int data_bit_count = 0;
 			parity_t parity = PARITY_NONE;
-			stop_bits_t stop_bits = STOP_BITS_1;
+			stop_bits_t stop_bits = STOP_BITS_0;
 
-			switch (data & C2_WS_MASK)
+			switch ((data & C2_WS_MASK) >> C2_WS_SHIFT)
 			{
 			case 0: data_bit_count = 6; parity = PARITY_EVEN; break;
 			case 1: data_bit_count = 6; parity = PARITY_ODD; break;
@@ -325,7 +361,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 			case 7: data_bit_count = 8; parity = PARITY_ODD; break;
 			}
 
-			set_data_frame(1, data_bit_count, parity, stop_bits);
+			set_data_frame(0, data_bit_count, parity, stop_bits);
 
 			// The fifo trigger levels may have changed, so update
 			// the status bits.
@@ -374,8 +410,20 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 			if (available > 0)
 			{
 				LOG("MC6852 Transmit FIFO %02x\n", data);
-				m_tx_fifo.push(data);
-				available--;
+				if (!m_tx_pull_mode && !m_tx_active)
+				{
+					// transfer is idle: this emulates moving the first byte
+					// into the shift register, and kicking off transmission.
+					// tra_complete() will be called when the byte has been
+					// sent.
+					m_tx_active = true;
+					transmit_register_setup(data);
+				}
+				else
+				{
+					m_tx_fifo.push(data);
+					available--;
+				}
 			}
 			else
 			{
@@ -426,6 +474,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 			m_status &= ~(S_TUF | S_CTS);
 			m_status |= S_TDRA;
 			m_tx_fifo = std::queue<uint8_t>();
+			m_tx_active = false;
 
 			transmit_register_reset();
 		}

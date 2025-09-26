@@ -59,16 +59,27 @@ void mystwarr_state::decode_tiles()
 // Mystic Warriors requires tile based blending.
 K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 {
-	if (layer == 1)
+	const uint8_t mix_code = attr >> 2 & 0b11;
+	if (mix_code)
 	{
-		//* water hack (TEMPORARY)
-		if ((*code & 0xff00) + (*color) == 0x4101)
-			m_cbparam++;
-		else
-			m_cbparam--;
+		*priority = 1;
+		m_last_alpha_tile_mix_code = mix_code;
 	}
 
-	*color = m_layer_colorbase[layer] | (*color >> 1 & 0x1e);
+	*color = m_layer_colorbase[layer] | (*color >> 1 & 0x0f);
+}
+
+K056832_CB_MEMBER(mystwarr_state::viostorm_tile_callback)
+{
+	// metamrph either uses bits 0-1 or 4-5, not sure which
+	const uint8_t mix_code = attr & 0b11;
+	if (mix_code)
+	{
+		*priority = 1;
+		m_last_alpha_tile_mix_code = mix_code;
+	}
+
+	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
 // for games with 5bpp tile data
@@ -209,8 +220,6 @@ VIDEO_START_MEMBER(mystwarr_state, mystwarr)
 	m_k056832->set_layer_offs(1,  0-3, 0);
 	m_k056832->set_layer_offs(2,  2-3, 0);
 	m_k056832->set_layer_offs(3,  3-3, 0);
-
-	m_cbparam = 0;
 }
 
 VIDEO_START_MEMBER(mystwarr_state, metamrph)
@@ -262,14 +271,6 @@ VIDEO_START_MEMBER(mystwarr_state, martchmp)
 
 uint32_t mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int blendmode = 0;
-
-	//* water hack (TEMPORARY)
-	if (m_cbparam < 0)
-		m_cbparam = 0;
-	else if (m_cbparam >= 32)
-		blendmode = (1 << 16 | GXMIX_BLEND_FORCE) << 2;
-
 	for (int i = 0; i < 4; i++)
 	{
 		int old = m_layer_colorbase[i];
@@ -279,7 +280,8 @@ uint32_t mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rg
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4) << 5;
 
-	konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, blendmode, nullptr, 0);
+	int mixerflags = m_last_alpha_tile_mix_code << 30;
+	konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, mixerflags, nullptr, 0);
 	return 0;
 }
 
@@ -294,7 +296,8 @@ uint32_t mystwarr_state::screen_update_metamrph(screen_device &screen, bitmap_rg
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4) << 4;
 
-	konamigx_mixer(screen, bitmap, cliprect, nullptr, GXSUB_K053250 | GXSUB_4BPP, nullptr, 0, 0, nullptr, 0);
+	int mixerflags = m_last_alpha_tile_mix_code << 30;
+	konamigx_mixer(screen, bitmap, cliprect, nullptr, GXSUB_K053250 | GXSUB_4BPP, nullptr, 0, mixerflags, nullptr, 0);
 	return 0;
 }
 

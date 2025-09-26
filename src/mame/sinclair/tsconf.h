@@ -13,12 +13,13 @@
 #include "spec128.h"
 
 #include "glukrs.h"
-#include "tsconfdma.h"
+#include "tsconf_beta.h"
+#include "tsconf_copper.h"
+#include "tsconf_dma.h"
+#include "tsconf_rs232.h"
 
-#include "beta_m.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
-#include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "tilemap.h"
 
@@ -28,26 +29,28 @@ class tsconf_state : public spectrum_128_state
 public:
 	tsconf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
+		, m_io_shadow_view(*this, "io_shadow_view")
 		, m_bank0_rom(*this, "bank0_rom")
 		, m_tiles_raw(*this, "tiles%u_raw", 0U, 64U * 64 * 8 * 8, ENDIANNESS_LITTLE)
 		, m_sprites_raw(*this, "sprites_raw", 64U * 64 * 8 * 8, ENDIANNESS_LITTLE)
 		, m_keyboard(*this, "pc_keyboard")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
-		, m_beta(*this, BETA_DISK_TAG)
+		, m_beta(*this, "beta")
 		, m_dma(*this, "dma")
 		, m_sdcard(*this, "sdcard")
+		, m_uart(*this, "uart")
 		, m_glukrs(*this, "glukrs")
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_cram(*this, "cram")
 		, m_sfile(*this, "sfile")
 		, m_dac(*this, "dac")
-		, m_ay(*this, "ay%u", 0U)
-		, m_mod_ay(*this, "MOD_AY")
+		, m_copper(*this, "copper")
 	{
 	}
 
 	void tsconf(machine_config &config);
+	void tsconf2(machine_config &config);
 
 	static constexpr u16 with_hblank(u16 pixclocks) { return 88 + pixclocks; }
 	static constexpr u16 with_vblank(u16 pixclocks) { return 32 + pixclocks; }
@@ -101,6 +104,7 @@ private:
 		PAGE2 = 0x12,
 		PAGE3 = 0x13,
 
+		COPPER = 0x14,
 		FMAPS = 0x15,
 		T_MAP_PAGE = 0x16,
 		T0_G_PAGE = 0x17,
@@ -157,8 +161,8 @@ private:
 	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_vector);
 	u8 m_int_mask;
+	bool m_update_on_m1;
 
-	DECLARE_VIDEO_START(tsconf);
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
@@ -174,6 +178,7 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tsconf_update_video_mode();
 	void copy_tiles_to_raw(const u8 *tiles_src, u8 *raw_target);
+	attotime copper_until_pos_r(u16 pos);
 
 	u8 tsconf_port_xx1f_r(offs_t offset);
 	void tsconf_port_7ffd_w(u8 data);
@@ -187,9 +192,9 @@ private:
 	void tsconf_spi_miso_w(u8 data);
 	u8 tsconf_port_f7_r(offs_t offset);
 	void tsconf_port_f7_w(offs_t offset, u8 data);
-	void tsconf_ay_address_w(u8 data);
 
 	void tsconf_update_bank0();
+	void update_io(int dos);
 	u8 beta_neutral_r(offs_t offset);
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
@@ -198,9 +203,9 @@ private:
 	void tsconf_mem(address_map &map) ATTR_COLD;
 	void tsconf_switch(address_map &map) ATTR_COLD;
 
-	u8 mem_bank_read(u8 bank, offs_t offset);
-	template <u8 Bank>
-	void tsconf_bank_w(offs_t offset, u8 data);
+	template <u8 Bank> u8 tsconf_ram_bank_r(offs_t offset) { return ram_bank_read(Bank, offset); };
+	template <u8 Bank> void tsconf_bank_w(offs_t offset, u8 data) { ram_bank_write(Bank, offset, data); };
+	u8 ram_bank_read(u8 bank, offs_t offset);
 	void ram_bank_write(u8 bank, offs_t offset, u8 data);
 	void ram_page_write(u8 page, offs_t offset, u8 data);
 	void cram_write(u16 offset, u8 data);
@@ -214,16 +219,19 @@ private:
 	std::map<tsconf_regs, u8> m_scanline_delayed_regs_update;
 	u8 m_regs[0x100];
 
+	memory_view m_io_shadow_view;
 	memory_view m_bank0_rom;
 	memory_share_array_creator<u8, 2> m_tiles_raw;
 	memory_share_creator<u8> m_sprites_raw;
+	u16 m_cache_line_addr; // u13
 
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<3> m_io_mouse;
 
-	required_device<beta_disk_device> m_beta;
+	required_device<tsconf_beta_device> m_beta;
 	required_device<tsconfdma_device> m_dma;
 	required_device<spi_sdcard_device> m_sdcard;
+	required_device<tsconf_rs232_device> m_uart;
 	u8 m_zctl_di = 0;
 	u8 m_zctl_cs = 0;
 
@@ -239,9 +247,7 @@ private:
 	std::vector<sprite_data> m_sprites_cache;
 
 	required_device<dac_byte_interface> m_dac;
-	required_device_array<ym2149_device, 2> m_ay;
-	u8 m_ay_selected;
-	required_ioport m_mod_ay;
+	optional_device<tsconf_copper_device> m_copper;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

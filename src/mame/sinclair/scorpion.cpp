@@ -5,9 +5,9 @@
 #include "beta_m.h"
 #include "spec128.h"
 
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/ay/slot.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "machine/timer.h"
-#include "sound/ay8910.h"
 #include "speaker.h"
 
 #define LOG_IO   (1U << 1)
@@ -31,9 +31,8 @@ public:
 		, m_bank0_rom(*this, "bank0_rom")
 		, m_io_shadow_view(*this, "io_shadow_view")
 		, m_beta(*this, BETA_DISK_TAG)
-		, m_ay(*this, "ay%u", 0U)
+		, m_ay_slot(*this, "ay_slot")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
-		, m_mod_ay(*this, "MOD_AY")
 	{ }
 
 	void scorpion(machine_config &config);
@@ -60,7 +59,6 @@ protected:
 	u8 port_ff_r();
 	void port_7ffd_w(u8 data);
 	void port_1ffd_w(u8 data);
-	virtual void ay_address_w(u8 data);
 
 	virtual rectangle get_screen_area() override;
 	virtual void scorpion_update_memory();
@@ -70,12 +68,11 @@ protected:
 	memory_view m_bank0_rom;
 	memory_view m_io_shadow_view;
 	required_device<beta_disk_device> m_beta;
-	required_device_array<ay8912_device, 2> m_ay;
+	required_device<ay_slot_device> m_ay_slot;
 
 	u8 m_is_m1_even;
 	u8 m_nmi_pending;
 	u8 m_magic_lock;
-	u8 m_ay_selected;
 	u8 m_ram_banks;
 
 private:
@@ -85,7 +82,6 @@ private:
 	INTERRUPT_GEN_MEMBER(scorpion_interrupt);
 
 	required_ioport_array<3> m_io_mouse;
-	required_ioport m_mod_ay;
 };
 
 class scorpiontb_state : public scorpion_state
@@ -105,7 +101,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	virtual void scorpion_io(address_map &map) override ATTR_COLD;
-	virtual void ay_address_w(u8 data) override;
+	virtual void ay_address_w(u8 data);
 
 	virtual void scorpion_update_memory() override;
 
@@ -242,10 +238,7 @@ void scorpion_state::update_io(bool dos_enable)
 
 	scorpion_update_memory();
 
-	if (dos())
-		m_io_shadow_view.select(0);
-	else
-		m_io_shadow_view.disable();
+	m_io_shadow_view.select(dos() ?  1 : 0);
 }
 
 u8 scorpion_state::port_ff_r()
@@ -275,14 +268,6 @@ void scorpion_state::port_1ffd_w(u8 data)
 {
 	m_port_1ffd_data = data;
 	scorpion_update_memory();
-}
-
-void scorpion_state::ay_address_w(u8 data)
-{
-	if ((m_mod_ay->read() == 1) && ((data & 0xfe) == 0xfe))
-		m_ay_selected = data & 1;
-	else
-		m_ay[m_ay_selected]->address_w(data);
 }
 
 u8 scorpion_state::beta_neutral_r(offs_t offset)
@@ -336,37 +321,39 @@ void scorpion_state::scorpion_mem(address_map &map)
 void scorpion_state::scorpion_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0022, 0x0022).select(0xffdc) // FE | xxxxxxxxxx1xxx10
-		.rw(FUNC(scorpion_state::spectrum_ula_r), FUNC(scorpion_state::spectrum_ula_w));
-	map(0x0023, 0x0023).mirror(0xffdc) // FF | xxxxxxxxxx1xxx11
-		.r(FUNC(scorpion_state::port_ff_r));
+
 	map(0x0021, 0x0021).mirror(0x3fdc) // 1FFD | 00xxxxxxxx1xxx01
 		.w(FUNC(scorpion_state::port_1ffd_w));
 	map(0x4021, 0x4021).mirror(0x3fdc) // 7FFD | 01xxxxxxxx1xxx01
 		.w(FUNC(scorpion_state::port_7ffd_w));
 
 	map(0xa021, 0xa021).mirror(0x1fdc) // BFFD | 101xxxxxxx1xxx01
-		.lw8(NAME([this](u8 data) { m_ay[m_ay_selected]->data_w(data); }));
+		.w(m_ay_slot, FUNC(ay_slot_device::data_w));
 	map(0xe021, 0xe021).mirror(0x1fdc) // FFFD | 111xxxxxxx1xxx01
-		.lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); })).w(FUNC(scorpion_state::ay_address_w));
+		.rw(m_ay_slot, FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
 
-	// Mouse
-	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
-	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));
-	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
-	map(0x0003, 0x0003) // 1F | xxxxxxxx0x0xxx11
+	map(0x0000, 0xffff).view(m_io_shadow_view);
+
+	// !Shadow
+	m_io_shadow_view[0](0x0022, 0x0022).select(0xffdc) // FE | xxxxxxxxxx1xxx10
+		.rw(FUNC(scorpion_state::spectrum_ula_r), FUNC(scorpion_state::spectrum_ula_w));
+	m_io_shadow_view[0](0x0023, 0x0023).mirror(0xffdc) // FF | xxxxxxxxxx1xxx11
+		.r(FUNC(scorpion_state::port_ff_r));
+	m_io_shadow_view[0](0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
+	m_io_shadow_view[0](0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));
+	m_io_shadow_view[0](0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
+	m_io_shadow_view[0](0x0003, 0x0003) // 1F | xxxxxxxx0x0xxx11
 		.select(0xff5c).lr8(NAME([this]() -> u8 { return (m_beta->state_r() & 0xc0) | 0x00; })); // TODO Kepmston Joystick
 
 	// Shadow
 	// DOS + xxxxxxxx0nnxxx11
-	map(0x0000, 0xffff).view(m_io_shadow_view);
-	m_io_shadow_view[0](0x0003, 0x0003).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
-	m_io_shadow_view[0](0x0023, 0x0023).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
-	m_io_shadow_view[0](0x0043, 0x0043).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
-	m_io_shadow_view[0](0x0063, 0x0063).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
-	m_io_shadow_view[0](0x00e3, 0x00e3).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
+	m_io_shadow_view[1](0x0003, 0x0003).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	m_io_shadow_view[1](0x0023, 0x0023).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
+	m_io_shadow_view[1](0x0043, 0x0043).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
+	m_io_shadow_view[1](0x0063, 0x0063).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
+	m_io_shadow_view[1](0x00e3, 0x00e3).mirror(0xff1c).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
 
-	subdevice<zxbus_device>("zxbus")->install_shadow_io(m_io_shadow_view[0]);
+	subdevice<zxbus_device>("zxbus")->set_io_space(m_io_shadow_view[0], m_io_shadow_view[1]);
 }
 
 void scorpion_state::scorpion_switch(address_map &map)
@@ -383,7 +370,6 @@ void scorpion_state::machine_start()
 	save_item(NAME(m_port_1ffd_data));
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_magic_lock));
-	save_item(NAME(m_ay_selected));
 	save_item(NAME(m_ram_banks));
 
 	// reconfigure ROMs
@@ -399,7 +385,6 @@ void scorpion_state::machine_reset()
 	m_is_m1_even = 1;
 	m_nmi_pending = 0;
 	m_magic_lock = 0;
-	m_ay_selected = 0;
 
 	m_port_fe_data = 255;
 	m_port_7ffd_data = 0;
@@ -414,7 +399,6 @@ void scorpion_state::video_start()
 {
 	spectrum_state::video_start();
 	m_screen_location = m_ram->pointer() + (5 << 14);
-	m_contention_pattern = {};
 }
 
 /* F4 Character Displayer */
@@ -487,12 +471,6 @@ INPUT_PORTS_START( scorpion )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
-
-
-	PORT_START("MOD_AY")
-	PORT_CONFNAME(0x01, 0x00, "AY MOD")
-	PORT_CONFSETTING(0x00, "Single")
-	PORT_CONFSETTING(0x01, "TurboSound")
 INPUT_PORTS_END
 
 void scorpion_state::scorpion(machine_config &config)
@@ -505,32 +483,27 @@ void scorpion_state::scorpion(machine_config &config)
 	m_maincpu->set_m1_map(&scorpion_state::scorpion_switch);
 	m_maincpu->set_io_map(&scorpion_state::scorpion_io);
 	m_maincpu->set_vblank_int("screen", FUNC(scorpion_state::scorpion_interrupt));
-	m_maincpu->nomreq_cb().set_nop();
+	m_maincpu->refresh_cb().remove();
+	m_maincpu->nomreq_cb().remove();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_scorpion);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
-	AY8912(config, m_ay[0], 14_MHz_XTAL / 8) // BAC
-		.add_route(1, "lspeaker", 0.50)
-		.add_route(0, "lspeaker", 0.25)
-		.add_route(0, "rspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.50);
-	AY8912(config, m_ay[1], 14_MHz_XTAL / 8)
-		.add_route(1, "lspeaker", 0.50)
-		.add_route(0, "lspeaker", 0.25)
-		.add_route(0, "rspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.50);
+	AY_SLOT(config, "ay_slot", 14_MHz_XTAL / 8, default_ay_slot_devices, "ay_ay8912") // BAC
+		.add_route(1, "speakers", 0.50, 0)
+		.add_route(0, "speakers", 0.25, 0)
+		.add_route(0, "speakers", 0.25, 1)
+		.add_route(2, "speakers", 0.50, 1);
 
 	BETA_DISK(config, m_beta, 0);
 
 	config.device_remove("exp");
 
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace("maincpu", AS_IO);
-	ZXBUS_SLOT(config, "zxbus:1", 0, "zxbus", zxbus_gmx_cards, nullptr);
-	ZXBUS_SLOT(config, "zxbus:2", 0, "zxbus", zxbus_gmx_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus:1", 0, zxbus, zxbus_gmx_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus:2", 0, zxbus, zxbus_gmx_cards, nullptr);
 }
 
 void scorpion_state::profi(machine_config &config)
@@ -552,14 +525,14 @@ void scorpion_state::quorum(machine_config &config)
 void scorpiontb_state::ay_address_w(u8 data)
 {
 	m_ay_reg = data;
-	scorpion_state::ay_address_w(data);
+	m_ay_slot->address_w(data);
 }
 
 u8 scorpiontb_state::ay_data_r()
 {
 	return (m_ay_reg == 0x0e)
 		? (((m_port_7ffd_data & 0x10) << 1) | (m_port_1ffd_data & 0x10) | (m_port_7ffd_data & 0x0f))
-		: m_ay[m_ay_selected]->data_r();
+		: m_ay_slot->data_r();
 }
 
 INPUT_CHANGED_MEMBER(scorpiontb_state::turbo_changed)
@@ -568,7 +541,7 @@ INPUT_CHANGED_MEMBER(scorpiontb_state::turbo_changed)
 	{
 		m_turbo = !m_turbo;
 		m_maincpu->set_clock_scale(1 << m_turbo);
-		popmessage("Turbo %s\n", m_turbo ? "ON" : "OFF");
+		//popmessage("Turbo %s\n", m_turbo ? "ON" : "OFF");
 	}
 }
 

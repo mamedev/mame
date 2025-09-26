@@ -8,6 +8,9 @@
 
     driver by Nicola Salmoria
 
+    TODO:
+    - sprites should be lagging by 1 frame (eg. on the platforming levels,
+      bg scroll and sprite movement should not be in sync)
 
     Revisions:
 
@@ -87,6 +90,8 @@ private:
 	bool       m_video_enable = false;
 	int32_t    m_old_3f90 = -1;
 
+	static constexpr int m_layer_colorbase[3] = { 768 / 16, 0 / 16, 256 / 16 };
+
 	void bankswitch_w(uint8_t data);
 	void spy_3f90_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
@@ -112,11 +117,9 @@ private:
 
 K052109_CB_MEMBER(spy_state::tile_callback)
 {
-	static const int layer_colorbase[] = { 768 / 16, 0 / 16, 256 / 16 };
-
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 
@@ -130,8 +133,8 @@ K051960_CB_MEMBER(spy_state::sprite_callback)
 {
 	enum { sprite_colorbase = 512 / 16 };
 
-	/* bit 4 = priority over layer A (0 = have priority) */
-	/* bit 5 = priority over layer B (1 = have priority) */
+	// bit 4 = priority over layer A (0 = have priority)
+	// bit 5 = priority over layer B (1 = have priority)
 	*priority = 0x00;
 	if ( *color & 0x10) *priority |= GFX_PMASK_1;
 	if (~*color & 0x20) *priority |= GFX_PMASK_2;
@@ -148,19 +151,17 @@ K051960_CB_MEMBER(spy_state::sprite_callback)
 
 uint32_t spy_state::screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	screen.priority().fill(0, cliprect);
 
-	if (!m_video_enable)
-		bitmap.fill(768, cliprect); // ?
-	else
+	if (m_video_enable)
 	{
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
 		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 	}
+	else
+		bitmap.fill(m_layer_colorbase[0] * 16, cliprect);
 
 	return 0;
 }
@@ -241,22 +242,6 @@ Collision check routine:
 3f: 5f 7e 00 ce 08  ret
 */
 
-void spy_state::bankswitch_w(uint8_t data)
-{
-	/* bit 0 = RAM bank */
-	if (BIT(~data, 0))
-		popmessage("bankswitch RAM bank 0");
-
-	/* bit 1-4 = ROM bank */
-	int bank;
-	if (BIT(data, 4))
-		bank = 8 + ((data & 0x06) >> 1);
-	else
-		bank = (data & 0x0e) >> 1;
-
-	m_rombank->set_entry(bank);
-}
-
 void spy_state::pmc_run()
 {
 	constexpr uint16_t MAX_SPRITES = 64;
@@ -336,6 +321,22 @@ void spy_state::pmc_run()
 			m_pmcram[i + 0xd] = tests_failed;
 		}
 	}
+}
+
+void spy_state::bankswitch_w(uint8_t data)
+{
+	/* bit 0 = RAM bank */
+	if (BIT(~data, 0))
+		popmessage("bankswitch RAM bank 0");
+
+	/* bit 1-4 = ROM bank */
+	int bank;
+	if (BIT(data, 4))
+		bank = 8 + ((data & 0x06) >> 1);
+	else
+		bank = (data & 0x0e) >> 1;
+
+	m_rombank->set_entry(bank);
 }
 
 
@@ -568,33 +569,30 @@ void spy_state::machine_reset()
 void spy_state::spy(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, XTAL(24'000'000) / 8); // 3 MHz? (divided by 051961)
+	MC6809E(config, m_maincpu, 24_MHz_XTAL / 8); // 3 MHz? (divided by 051961)
 	m_maincpu->set_addrmap(AS_PROGRAM, &spy_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spy_state::sound_map); /* nmi by the sound chip */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(spy_state::screen_update_spy));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0); // 051961 on schematics
+	K052109(config, m_k052109, 24_MHz_XTAL); // 051961 on schematics
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(spy_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(spy_state::sprite_callback));
@@ -604,15 +602,15 @@ void spy_state::spy(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K007232(config, m_k007232[0], 3579545);
+	K007232(config, m_k007232[0], 3.579545_MHz_XTAL);
 	m_k007232[0]->port_write().set(FUNC(spy_state::volume_callback<0>));
 	m_k007232[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	K007232(config, m_k007232[1], 3579545);
+	K007232(config, m_k007232[1], 3.579545_MHz_XTAL);
 	m_k007232[1]->port_write().set(FUNC(spy_state::volume_callback<1>));
 	m_k007232[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
@@ -681,5 +679,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, spy,  0,   spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spyu, spy, spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spy,  0,   spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y.: Special Project Y. (World ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spyu, spy, spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y.: Special Project Y. (US ver. M)", MACHINE_SUPPORTS_SAVE )

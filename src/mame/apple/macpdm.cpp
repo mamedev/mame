@@ -159,9 +159,6 @@ private:
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
 
-	uint8_t scc_r(offs_t offset);
-	void scc_w(offs_t offset, uint8_t data);
-
 	uint8_t scsi_r(offs_t offset);
 	void scsi_w(offs_t offset, uint8_t data);
 
@@ -538,16 +535,6 @@ void macpdm_state::via2_sifr_w(uint8_t data)
 	}
 }
 
-
-uint8_t macpdm_state::scc_r(offs_t offset)
-{
-	return m_scc->dc_ab_r(offset >> 1);
-}
-
-void macpdm_state::scc_w(offs_t offset, uint8_t data)
-{
-	m_scc->dc_ab_w(offset, data);
-}
 
 uint8_t macpdm_state::fdc_r(offs_t offset)
 {
@@ -1121,7 +1108,7 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);
 
 	map(0x50f00000, 0x50f00000).rw(FUNC(macpdm_state::via1_r), FUNC(macpdm_state::via1_w)).select(0x1e00);
-	map(0x50f04000, 0x50f04000).rw(FUNC(macpdm_state::scc_r), FUNC(macpdm_state::scc_w)).select(0x000e);
+	map(0x50f04000, 0x50f04007).rw(m_scc, FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask64(0xff00ff00ff00ff00);
 	// 50f08000 = ethernet ID PROM
 	// 50f0a000 = MACE ethernet controller
 	map(0x50f10000, 0x50f10000).rw(FUNC(macpdm_state::scsi_r), FUNC(macpdm_state::scsi_w)).select(0xf0);
@@ -1182,8 +1169,7 @@ void macpdm_state::macpdm(machine_config &config)
 	m_video->set_PDM();
 	m_video->screen_vblank().set(FUNC(macpdm_state::vblank_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	AWACS(config, m_awacs, SOUND_CLOCK/2);
 	m_awacs->irq_out_cb().set(FUNC(macpdm_state::sndo_dma_irq));
@@ -1191,8 +1177,8 @@ void macpdm_state::macpdm(machine_config &config)
 	m_awacs->dma_output().set(FUNC(macpdm_state::sound_dma_output));
 	m_awacs->dma_input().set(FUNC(macpdm_state::sound_dma_input));
 
-	m_awacs->add_route(0, "lspeaker", 1.0);
-	m_awacs->add_route(1, "rspeaker", 1.0);
+	m_awacs->add_route(0, "speaker", 1.0, 0);
+	m_awacs->add_route(1, "speaker", 1.0, 1);
 
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
@@ -1201,8 +1187,8 @@ void macpdm_state::macpdm(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);

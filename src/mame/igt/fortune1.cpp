@@ -279,56 +279,8 @@
 
 **************************************************************************
 
-  [2025-02-14]
-
-  - Changed driver name to fortune1.cpp, being the most significative.
-  - Hooked mechanical counters to all games.
-  - Added hopper support to all games.
-  - Changed the parent/clone relationships.
-  - Hooked the new CPU and therefore all the functions.
-  - Added NVRAM support to the MSC51 family.
-  - Worked the 8155 connections.
-  - New set of inputs for bpoker.
-  - Added support of DS1215 timekeeper to the new platform.
-  - Added watchdog support.
-  - Promoted Video Poker (v1403) to working.
-  - Fix some wrong connections on the layouts.
-  - Fixed some buggy sounds.
-  - New realistic button-lamps layout for Video Poker and Fortune1.
-  - New realistic button-lamps layout for Baby Poker and Video Poker (v1403).
-  - New realistic button-lamps layout for Black Jack (Interflip).
-  - New realistic button-lamps layout for Video Dado.
-  - New realistic button-lamps layout for Baby Dado.
-  - New realistic button-lamps layout for Video Cordoba.
-  - Documented the Fortune 1 paytable.
-  - Added technical notes about all the three platforms.
-
-
-  [2008-10-08]
-
-  - Added Baby Poker Game.
-  - Added Baby Dado Game.
-  - Mapped "Hand Pay" button for Baby Games.
-  - Added decoder to Jackpot mechanical counter.
-  - Added sound support to Baby Poker Game.
-  - Added tower lamps to Baby Games layouts.
-  - Reworked layouts for Baby Games.
-  - Reworked the color routines.
-  - Added new color routines for Baby Games.
-  - Redumped the videocba color PROM.
-  - Added color switch. (It changes background color in some games).
-  - Added "hopper full" switch support (for diverter function).
-  - Added diverter function decoder.
-  - Added Button-lamps layout.
-  - Added full functional mechanical counters decoding.
-  - Added 7 Segment decoder and 7 Digit Counter functions.
-  - Added button-lamps layout & mechanical counters simulation on layout.
-     Mechanical counters to layout: Coin-In, Coin-Out and Coin to Drop.
-  - Added NVRAM support to mechanical counters.
-
-
-  TO DO
-  =====
+  TODO
+  ====
 
   * Fix some missing pulses on mechanical counters.
   * Fix the bug on bookkeeping mode (videodad & videocba).
@@ -380,23 +332,27 @@ public:
 		, m_data_ram(*this, "data_ram", 0x100, ENDIANNESS_LITTLE)
 		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_LITTLE)
 		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE)
+		, m_videobank(*this, "videobank")
+		, m_colorbank(*this, "colorbank")
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_hopper(*this, "hopper")
+		, m_inputs(*this, "IN%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
-		, m_hopper(*this, "hopper")
 	{ }
 
-	void videopkr(machine_config &config);
-	void blckjack(machine_config &config);
-	void videodad(machine_config &config);
-	void fortune1(machine_config &config);
+	void videopkr(machine_config &config) ATTR_COLD;
+	void blckjack(machine_config &config) ATTR_COLD;
+	void videodad(machine_config &config) ATTR_COLD;
+	void fortune1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	uint8_t inputs_r();
 	uint8_t videopkr_io_r(offs_t offset);
 	void videopkr_io_w(offs_t offset, uint8_t data);
 	uint8_t videopkr_p1_data_r();
@@ -425,10 +381,19 @@ protected:
 	memory_share_creator<uint8_t> m_data_ram;
 	memory_share_creator<uint8_t> m_video_ram;
 	memory_share_creator<uint8_t> m_color_ram;
+	memory_bank_creator m_videobank;
+	memory_bank_creator m_colorbank;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<ticket_dispenser_device> m_hopper;
+	required_ioport_array<2> m_inputs;
+	output_finder<28> m_digits;
+	output_finder<14> m_lamps;
+
 	uint16_t m_p1;
 	uint16_t m_p2;
 	uint8_t m_t0_latch;
-	uint16_t m_n_offs;
 	uint8_t m_vp_sound_p2;
 	uint8_t m_p24_data;
 	uint8_t m_sound_latch;
@@ -452,12 +417,6 @@ protected:
 	unsigned long m_count3;
 	unsigned long m_count4;
 	tilemap_t *m_bg_tilemap;
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<28> m_digits;
-	output_finder<14> m_lamps;
-	optional_device<ticket_dispenser_device> m_hopper;
 };
 
 
@@ -473,18 +432,15 @@ public:
 	{
 	}
 
-	void babypkr(machine_config &config);
-	void bpoker(machine_config &config);
+	void babypkr(machine_config &config) ATTR_COLD;
+	void bpoker(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
 	void prog_w(uint8_t data);
-	uint8_t bp_io_port_r(offs_t offset);
 	void bp_io_port_w(offs_t offset, uint8_t data);
-	uint8_t bp_video_io_r(offs_t offset);
 	void bp_video_io_w(offs_t offset, uint8_t data);
-	uint8_t bp_color_io_r(offs_t offset);
 	void bp_color_io_w(offs_t offset, uint8_t data);
 	void bpoker_p1_data_w(uint8_t data);
 	void bpoker_wd_reset_w(offs_t offset, uint8_t data);
@@ -513,7 +469,7 @@ private:
 
 
 /***********************************
-*          Video Hardware          *
+*  Video Hardware
 ***********************************/
 
 // BCD to 7-seg decoder
@@ -654,164 +610,97 @@ uint32_t videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_in
 
 
 /***********************************
-*           R/W Handlers           *
+* R/W Handlers
 ***********************************/
+
+uint8_t videopkr_state::inputs_r()
+{
+	uint8_t valor = 0;
+
+	const uint8_t hopper_full = BIT(m_inputs[1]->read(), 4);
+	const uint8_t coin_out = BIT(m_inputs[1]->read(), 5);
+	const uint16_t kbdin = ((m_inputs[1]->read() & 0xaf) << 8) | m_inputs[0]->read();
+
+	switch (kbdin)
+	{
+		case 0x0000: valor = 0x00; break;
+		case 0x0001: valor = 0x01; break;   // Door
+		case 0x4000: valor = 0x02; break;
+		case 0x8000: valor = 0x03; break;   // Hand Pay
+		case 0x0002: valor = 0x04; break;   // Books
+		case 0x0004: valor = 0x05; break;   // Coin In
+		case 0x0008: valor = 0x07; break;   // Start
+		case 0x0010: valor = 0x08; break;   // Discard
+		case 0x0020: valor = 0x09; break;   // Cancel
+		case 0x0040: valor = 0x0a; break;   // Hold 1
+		case 0x0080: valor = 0x0b; break;   // Hold 2
+		case 0x0100: valor = 0x0c; break;   // Hold 3
+		case 0x0200: valor = 0x0d; break;   // Hold 4
+		case 0x0400: valor = 0x0e; break;   // Hold 5
+		case 0x0800: valor = 0x06; break;   // Bet
+	}
+
+	if ((valor == 0x00) & hopper_full)
+		valor = 0x0f;
+
+	valor |= coin_out << 4;
+
+	return valor;
+}
 
 uint8_t videopkr_state::videopkr_io_r(offs_t offset)
 {
-	uint8_t valor = 0, hf, co;
+	uint8_t valor = 0xff;
 
-	uint16_t kbdin;
+	if (!BIT(m_p2, 4))  // inputs are multiplexed through a diode matrix
+		valor &= inputs_r();
 
-	switch (m_p2)
-	{
-		case 0xef:  // inputs are multiplexed through a diode matrix
-		{
-			hf = ((ioport("IN1")->read() & 0x10 ) >> 4) & 1;        // Hopper full detection
-			co = 0x10 * ((ioport("IN1")->read() & 0x20 ) >> 5);     // Coin out detection
-			kbdin = ((ioport("IN1")->read() & 0xaf ) << 8) + ioport("IN0")->read();
+	if (!BIT(m_p2, 5))
+		valor &= m_data_ram[offset];
 
-			switch (kbdin)
-			{
-				case 0x0000: valor = 0x00; break;
-				case 0x0001: valor = 0x01; break;   // Door
-				case 0x4000: valor = 0x02; break;
-				case 0x8000: valor = 0x03; break;   // Hand Pay
-				case 0x0002: valor = 0x04; break;   // Books
-				case 0x0004: valor = 0x05; break;   // Coin In
-				case 0x0008: valor = 0x07; break;   // Start
-				case 0x0010: valor = 0x08; break;   // Discard
-				case 0x0020: valor = 0x09; break;   // Cancel
-				case 0x0040: valor = 0x0a; break;   // Hold 1
-				case 0x0080: valor = 0x0b; break;   // Hold 2
-				case 0x0100: valor = 0x0c; break;   // Hold 3
-				case 0x0200: valor = 0x0d; break;   // Hold 4
-				case 0x0400: valor = 0x0e; break;   // Hold 5
-				case 0x0800: valor = 0x06; break;   // Bet
-			}
+	if (!BIT(m_p2, 6))
+		valor &= reinterpret_cast<uint8_t *>(m_videobank->base())[offset];
 
-			if ((valor == 0x00) & hf )
-			{
-				valor = 0x0f;
-			}
-
-			valor += co;
-			break;
-		}
-
-		case 0xdf:
-		{
-			m_n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
-			valor = m_data_ram[offset];
-			break;
-		}
-
-		case 0x5f:
-		{
-			m_n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
-			valor = m_data_ram[offset];
-			break;
-		}
-
-		case 0x7c:
-		case 0x7d:
-		case 0x7e:
-		case 0x7f:
-		{
-			m_n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
-			valor = m_color_ram[m_n_offs];
-			break;
-		}
-
-		case 0xbc:
-		case 0xbd:
-		case 0xbe:
-		case 0xbf:
-		{
-			m_n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
-			valor = m_video_ram[m_n_offs];
-			break;
-		}
-	}
+	if (!BIT(m_p2, 7))
+		valor &= reinterpret_cast<uint8_t *>(m_colorbank->base())[offset];
 
 	return valor;
 }
 
 void videopkr_state::videopkr_io_w(offs_t offset, uint8_t data)
 {
-	switch (m_p2)
+	if (!BIT(m_p2, 4))
 	{
-		case 0x3c:
-		case 0x3d:
-		case 0x3e:
-		case 0x3f:
-		{
-			m_n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
-			m_color_ram[m_n_offs] = data & 0x0f;
-			m_video_ram[m_n_offs] = data;
-			m_bg_tilemap->mark_tile_dirty(m_n_offs);
-			break;
-		}
+		m_lamps[0] = BIT(data, 0);    // L_1
+		m_lamps[1] = BIT(data, 1);    // L_2
+		m_lamps[2] = BIT(data, 2);    // L_3
+		m_lamps[3] = BIT(data, 3);    // L_4
+		m_lamps[4] = BIT(data, 4);    // Coin
+		m_lamps[5] = BIT(data, 5);    // Hopper_1
+		m_lamps[6] = BIT(data, 6);    // Hopper_2
+		m_lamps[7] = BIT(data, 7);    // Diverter
+		m_p24_data = data;
+		m_hp_1 = BIT(~m_p24_data, 6);
+		m_hp_2 = BIT(~m_p24_data, 5);
+		m_dvrt = BIT(~m_p24_data, 7);
 
-		case 0xdf:
-		{
-			m_data_ram[offset] = (data & 0x0f) + 0xf0;
-			break;
-		}
-
-		case 0x7c:
-		case 0x7d:
-		case 0x7e:
-		case 0x7f:
-		{
-			m_n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
-			m_color_ram[m_n_offs] = data & 0x0f;
-			m_bg_tilemap->mark_tile_dirty(m_n_offs);
-			break;
-		}
-
-		case 0xbc:
-		case 0xbd:
-		case 0xbe:
-		case 0xbf:
-		{
-			m_n_offs = ((m_p1 & 0xc0) << 2 ) + offset;
-			m_video_ram[m_n_offs] = data;
-			m_bg_tilemap->mark_tile_dirty(m_n_offs);
-			break;
-		}
-
-		case 0xef:  // Port 2.4
-		{
-			m_lamps[0] = BIT(data, 0);    // L_1
-			m_lamps[1] = BIT(data, 1);    // L_2
-			m_lamps[2] = BIT(data, 2);    // L_3
-			m_lamps[3] = BIT(data, 3);    // L_4
-			m_lamps[4] = BIT(data, 4);    // Coin
-			m_lamps[5] = BIT(data, 5);    // Hopper_1
-			m_lamps[6] = BIT(data, 6);    // Hopper_2
-			m_lamps[7] = BIT(data, 7);    // Diverter
-			m_p24_data = data;
-			m_hp_1 = (~m_p24_data >> 6) & 1;
-			m_hp_2 = (~m_p24_data >> 5) & 1;
-			m_dvrt = (~m_p24_data >> 7) & 1;
-
-			if((m_p24_data & 0x60)==0x60)
-				m_hopper->motor_w(true);
-			else
-				m_hopper->motor_w(false);
-
-			//popmessage("hopper %02x", m_p24_data & 0x60);
-
-			break;
-		}
-
-		case 0xff:
-		{
-			m_t0_latch = m_t0_latch ^ 0x01;     // fix the bookkeeping mode
-			break;
-		}
+		m_hopper->motor_w(BIT(m_p24_data, 5) && BIT(m_p24_data, 6));
 	}
+
+	if (!BIT(m_p2, 5))
+		m_data_ram[offset] = (data & 0x0f) | 0xf0;
+
+	if (!BIT(m_p2, 6))
+		reinterpret_cast<uint8_t *>(m_videobank->base())[offset] = data;
+
+	if (!BIT(m_p2, 7))
+		reinterpret_cast<uint8_t *>(m_colorbank->base())[offset] = data & 0x0f;
+
+	if (!BIT(m_p2, 6) || !BIT(m_p2, 7))
+		m_bg_tilemap->mark_tile_dirty(((m_p1 << 2) & 0x300) | offset);
+
+	if (m_p2 == 0xff)
+		m_t0_latch = m_t0_latch ^ 0x01;     // fix the bookkeeping mode
 }
 
 uint8_t videopkr_state::videopkr_p1_data_r()
@@ -827,6 +716,9 @@ uint8_t videopkr_state::videopkr_p2_data_r()
 void videopkr_state::videopkr_p1_data_w(uint8_t data)
 {
 	m_p1 = data;
+
+	m_videobank->set_entry((data >> 6) & 0x03);
+	m_colorbank->set_entry((data >> 6) & 0x03);
 
 	m_lamps[8] = BIT(data, 0);    // Aux_0 - Jackpot mech. counter (Baby Games)
 	m_lamps[9] = BIT(data, 1);    // Aux_1 -
@@ -905,7 +797,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(videopkr_state::sound_t1_callback)
 
 
 /*************************************
-*     Fortune I Sound Handlers       *
+* Fortune I Sound Handlers
 *************************************/
 /*
 
@@ -946,15 +838,17 @@ uint8_t videopkr_state::sound_io_r()
 	{
 		case 0xbf:
 		{
-			m_c_io = (m_p1 >> 5) & 1;
-			m_hp_1 = (~m_p24_data >> 6) & 1;
-			m_hp_2 = (~m_p24_data >> 5) & 1;
-			m_bell = (m_p1 >> 4) & 1;
-			m_aux3 = (m_p1 >> 3) & 1;
-			m_dvrt = (~m_p24_data >> 7) & 1;
-			m_sound_ant = m_sound_latch;
-			m_sound_latch = m_c_io + (m_hp_1 << 1) + (m_hp_2 << 2) + (m_bell << 3) + 0xf0;
-
+			if (!machine().side_effects_disabled())
+			{
+				m_c_io = BIT(m_p1, 5);
+				m_hp_1 = BIT(~m_p24_data, 6);
+				m_hp_2 = BIT(~m_p24_data, 5);
+				m_bell = BIT(m_p1, 4);
+				m_aux3 = BIT(m_p1, 3);
+				m_dvrt = BIT(~m_p24_data, 7);
+				m_sound_ant = m_sound_latch;
+				m_sound_latch = m_c_io | (m_hp_1 << 1) | (m_hp_2 << 2) | (m_bell << 3) | 0xf0;
+			}
 			break;
 		}
 	}
@@ -1007,10 +901,10 @@ void videopkr_state::sound_p2_w(uint8_t data)
 
 
 /********************************************
-*     Baby Platform with I8051 Handlers     *
+* Baby Platform with I8051 Handlers
 *********************************************/
 
-void  babypkr_state::prog_w(uint8_t data)
+void babypkr_state::prog_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);   // clear interrupt FF
 }
@@ -1066,45 +960,6 @@ void babypkr_state::bpoker_p1_data_w(uint8_t data)
 
 }
 
-uint8_t babypkr_state::bp_io_port_r(offs_t offset)
-{
-	uint8_t valor = 0;
-	uint8_t hf, co;
-	uint16_t kbdin;
-
-	hf = ((ioport("IN1")->read() & 0x10 ) >> 4) & 1;        // Hopper full detection
-	co = 0x10 * ((ioport("IN1")->read() & 0x20 ) >> 5);     // Coin Out detection
-	kbdin = ((ioport("IN1")->read() & 0xaf ) << 8) + ioport("IN0")->read();
-
-	switch (kbdin)
-	{
-		case 0x0000: valor = 0x00; break;
-		case 0x0001: valor = 0x01; break;   // Door
-		case 0x4000: valor = 0x02; break;
-		case 0x8000: valor = 0x03; break;   // Hand Pay
-		case 0x0002: valor = 0x04; break;   // Books
-		case 0x0004: valor = 0x05; break;   // Coin In
-		case 0x0008: valor = 0x07; break;   // Start
-		case 0x0010: valor = 0x08; break;   // Discard
-		case 0x0020: valor = 0x09; break;   // Cancel
-		case 0x0040: valor = 0x0a; break;   // Hold 1
-		case 0x0080: valor = 0x0b; break;   // Hold 2
-		case 0x0100: valor = 0x0c; break;   // Hold 3
-		case 0x0200: valor = 0x0d; break;   // Hold 4
-		case 0x0400: valor = 0x0e; break;   // Hold 5
-		case 0x0800: valor = 0x06; break;   // Bet
-	}
-
-	if ((valor == 0x00) & hf )
-	{
-		valor = 0x0f;
-	}
-
-	valor += co;
-
-	return valor;
-}
-
 void babypkr_state::bp_io_port_w(offs_t offset, uint8_t data)
 {
 	m_lamps[0] = BIT(data, 0);    // L_1
@@ -1121,40 +976,19 @@ void babypkr_state::bp_io_port_w(offs_t offset, uint8_t data)
 	m_dvrt = (~m_p24_data >> 7) & 1;
 
 	// bit 5 - bit 6 -> Hopper
-	if((data&0x60)==0x60)
-		m_hopper->motor_w(true);
-	else
-		m_hopper->motor_w(false);
-}
-
-uint8_t babypkr_state::bp_video_io_r(offs_t offset)
-{
-	uint8_t ret;
-	uint16_t v_addr = ((m_p1 & 0xc0) << 2 ) + offset;
-		ret = m_video_ram[v_addr];
-	return ret;
+	m_hopper->motor_w(BIT(data, 5) & BIT(data, 6));
 }
 
 void babypkr_state::bp_video_io_w(offs_t offset, uint8_t data)
 {
-	uint16_t v_addr = ((m_p1 & 0xc0) << 2 ) + offset;
-	m_video_ram[v_addr] = data;
-	m_bg_tilemap->mark_tile_dirty(v_addr);
-}
-
-uint8_t babypkr_state::bp_color_io_r(offs_t offset)
-{
-	uint8_t ret;
-	uint16_t v_addr = ((m_p1 & 0xc0) << 2 ) + offset;
-	ret = m_color_ram[v_addr];
-	return ret;
+	reinterpret_cast<uint8_t *>(m_videobank->base())[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(((m_p1 << 2) & 0x300) | offset);
 }
 
 void babypkr_state::bp_color_io_w(offs_t offset, uint8_t data)
 {
-	uint16_t v_addr = ((m_p1 & 0xc0) << 2 ) + offset;
-	m_color_ram[v_addr] = data;
-	m_bg_tilemap->mark_tile_dirty(v_addr);
+	reinterpret_cast<uint8_t *>(m_colorbank->base())[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(((m_p1 << 2) & 0x300) | offset);
 }
 
 void babypkr_state::bpoker_wd_reset_w(offs_t offset, uint8_t data)
@@ -1165,26 +999,18 @@ void babypkr_state::bpoker_wd_reset_w(offs_t offset, uint8_t data)
 
 uint8_t babypkr_state::bp_timekeep_r(offs_t offset)
 {
-	if (m_rtc->ceo_r())
-		return m_rtc->read();
-	else
-		m_rtc->read();
-	return 0;
+	const uint8_t data = m_rtc->read();
+	return m_rtc->ceo_r() ? data : 0;
 }
 
 void babypkr_state::bp_timekeep_w(offs_t offset, uint8_t data)
 {
-	if (m_rtc->ceo_r())
-	{
-		m_rtc->write(data & 0x01);
-		return;
-	}
 	m_rtc->write(data & 0x01);
 }
 
 
 /*****************************************
-*          Baby Sound Handlers           *
+* Baby Sound Handlers
 *****************************************/
 
 uint8_t babypkr_state::baby_sound_p0_r()
@@ -1199,11 +1025,14 @@ void babypkr_state::baby_sound_p0_w(uint8_t data)
 
 uint8_t babypkr_state::baby_sound_p1_r()
 {
-	m_c_io = (m_p1 >> 5) & 1;
-	m_hp_1 = (~m_p24_data >> 6) & 1;
-	m_hp_2 = (~m_p24_data >> 5) & 1;
-	m_bell = (m_p1 >> 4) & 1;
-	m_aux3 = (m_p1 >> 3) & 1;
+	if (!machine().side_effects_disabled())
+	{
+		m_c_io = BIT(m_p1, 5);
+		m_hp_1 = BIT(~m_p24_data, 6);
+		m_hp_2 = BIT(~m_p24_data, 5);
+		m_bell = BIT(m_p1, 4);
+		m_aux3 = BIT(m_p1, 3);
+	}
 	return m_c_io | (m_hp_1 << 1) | (m_hp_2 << 2) | 0xf8;
 }
 
@@ -1213,7 +1042,7 @@ void babypkr_state::baby_sound_p3_w(uint8_t data)
 	m_top_lamps[1] = BIT(data, 2);
 	m_top_lamps[2] = BIT(data, 3);
 
-	if (!(data & 0x10))
+	if (!BIT(data, 4))
 	{
 		m_aysnd->reset();
 		logerror("AY3-8910: Reset\n");
@@ -1235,7 +1064,7 @@ void babypkr_state::baby_sound_p3_w(uint8_t data)
 
 
 /*****************************************
-*         Memory Map Information         *
+* Memory Map Information
 *****************************************/
 
 void videopkr_state::i8039_map(address_map &map)
@@ -1277,17 +1106,17 @@ void babypkr_state::i8751_io_port(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("nvram");
 	map(0x4900, 0x49ff).rw(FUNC(babypkr_state::bp_timekeep_r), FUNC(babypkr_state::bp_timekeep_w));
-	map(0x8000, 0x80ff).rw(FUNC(babypkr_state::bp_io_port_r), FUNC(babypkr_state::bp_io_port_w));
+	map(0x8000, 0x80ff).rw(FUNC(babypkr_state::inputs_r), FUNC(babypkr_state::bp_io_port_w));
 	map(0x9000, 0x9000).w(FUNC(babypkr_state::prog_w));  // replaces PROG line in i8039 used to clear interrupt flip flop
-	map(0xa000, 0xa0ff).rw(FUNC(babypkr_state::bp_video_io_r), FUNC(babypkr_state::bp_video_io_w));  // partial video RAM address
-	map(0xb000, 0xb0ff).rw(FUNC(babypkr_state::bp_color_io_r), FUNC(babypkr_state::bp_color_io_w));  // Idem to color RAM
+	map(0xa000, 0xa0ff).bankr(m_videobank).w(FUNC(babypkr_state::bp_video_io_w));  // banked video RAM
+	map(0xb000, 0xb0ff).bankr(m_colorbank).w(FUNC(babypkr_state::bp_color_io_w));  // banked color RAM
 	map(0xc000, 0xc003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf000, 0xf000).w(FUNC(babypkr_state::bpoker_wd_reset_w));
 }
 
 
 /*****************************************
-*              Input Ports               *
+* Input Ports
 *****************************************/
 
 static INPUT_PORTS_START( videopkr )
@@ -1488,7 +1317,7 @@ INPUT_PORTS_END
 
 
 /*****************************************
-*            Graphics Layouts            *
+* Graphics Layouts
 *****************************************/
 
 static const gfx_layout tilelayout_16 =
@@ -1518,7 +1347,7 @@ static const gfx_layout tilelayout_8 =
 
 
 /************************************
-*    Graphics Decode Information    *
+* Graphics Decode Information
 ************************************/
 
 static GFXDECODE_START( gfx_videopkr )
@@ -1532,11 +1361,16 @@ GFXDECODE_END
 
 
 /*****************************************
-*         Machine Start / Reset          *
+* Machine Start / Reset
 *****************************************/
 
 void videopkr_state::machine_start()
 {
+	m_videobank->configure_entries(0, 4, &m_video_ram[0], 0x100);
+	m_colorbank->configure_entries(0, 4, &m_color_ram[0], 0x100);
+	m_videobank->set_entry(3);
+	m_colorbank->set_entry(3);
+
 	m_digits.resolve();
 	m_lamps.resolve();
 
@@ -1556,13 +1390,15 @@ void videopkr_state::machine_start()
 void babypkr_state::machine_start()
 {
 	videopkr_state::machine_start();
+
 	m_p24_data = 0;
+
 	m_top_lamps.resolve();
 }
 
 
 /*****************************************
-*            Machine Drivers             *
+* Machine Drivers
 *****************************************/
 
 void videopkr_state::videopkr(machine_config &config)
@@ -1705,7 +1541,7 @@ void babypkr_state::bpoker(machine_config &config)
 
 
 /*****************************************
-*                Rom Load                *
+* ROM Load
 *****************************************/
 
 ROM_START( fortune1 )
@@ -1920,11 +1756,11 @@ ROM_START( bpoker )
 	ROM_LOAD( "bpkr_col.bin", 0x0000, 0x0100, CRC(1c34f02c) SHA1(7160f2216caf4854c892601fb6977fa9ada12187) )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*****************************************
-*              Game Drivers              *
+* Game Drivers
 *****************************************/
 
 //     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                                FULLNAME                          FLAGS                LAYOUT

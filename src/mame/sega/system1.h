@@ -180,7 +180,6 @@ protected:
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	void system1_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(system2);
-	DECLARE_MACHINE_START(myherok);
 	u32 screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

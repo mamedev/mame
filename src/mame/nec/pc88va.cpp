@@ -1503,8 +1503,7 @@ void pc88va_state::pc88va(machine_config &config)
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "joystick");
 
-	SPEAKER(config, m_lspeaker).front_left();
-	SPEAKER(config, m_rspeaker).front_right();
+	SPEAKER(config, m_speaker, 2).front();
 
 	// TODO: YM2203 for vanilla pc88va
 	// PC-88VA-12 "Sound Board II", YM2608B
@@ -1515,10 +1514,10 @@ void pc88va_state::pc88va(machine_config &config)
 	m_opna->port_b_read_callback().set(FUNC(pc88va_state::opn_portb_r));
 	m_opna->port_b_write_callback().set(FUNC(pc88va_state::opn_portb_w));
 	// TODO: per-channel mixing is unconfirmed
-	m_opna->add_route(0, m_lspeaker, 0.25);
-	m_opna->add_route(0, m_rspeaker, 0.25);
-	m_opna->add_route(1, m_lspeaker, 0.75);
-	m_opna->add_route(2, m_rspeaker, 0.75);
+	m_opna->add_route(0, m_speaker, 0.75, 0);
+	m_opna->add_route(0, m_speaker, 0.75, 1);
+	m_opna->add_route(1, m_speaker, 0.75, 0);
+	m_opna->add_route(2, m_speaker, 0.75, 1);
 
 	// TODO: set pc98 compatible
 	// Needs a MS-Engine disk dump first, that applies an overlay on PC Engine OS so that it can run PC-98 software

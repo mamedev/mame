@@ -43,6 +43,7 @@ public:
 	void set_foreground() const { SetForegroundWindow(m_wnd); }
 	void redraw();
 	void destroy();
+	bool owns_window(HWND win) const;
 
 	virtual bool set_default_focus();
 	void prev_view(debugview_info *curview);
@@ -58,8 +59,8 @@ protected:
 	static DWORD const  DEBUG_WINDOW_STYLE = (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX);
 	static DWORD const  DEBUG_WINDOW_STYLE_EX = 0;
 
-	static int const    MAX_VIEWS = 4;
 	static int const    EDGE_WIDTH = 3;
+	static int const    MAX_VIEWS = 4;
 
 	enum
 	{
@@ -110,6 +111,7 @@ protected:
 		ID_SHOW_BREAKPOINTS,
 		ID_SHOW_WATCHPOINTS,
 		ID_SHOW_REGISTERPOINTS,
+		ID_SHOW_EXCEPTIONPOINTS,
 
 		ID_CLEAR_LOG,
 

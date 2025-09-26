@@ -292,6 +292,7 @@ static imgtoolerr_t pc_chd_image_open(imgtool::image &image, imgtool::stream::pt
 	if (err)
 		return err;
 
+	stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 

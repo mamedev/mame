@@ -253,7 +253,8 @@ void calculate_status_flags(Assembler &a, Operand const &dst, u8 flags)
 //  dmulu - perform a double-wide unsigned multiply
 //-------------------------------------------------
 
-int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags, bool halfmul_flags)
+template <bool HalfmulFlags>
+int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags)
 {
 	// shortcut if we don't care about the high bits or the flags
 	if (&dstlo == &dsthi && !flags)
@@ -262,27 +263,24 @@ int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool f
 		return 0;
 	}
 
-	// fetch source values
-	uint64_t a = src1;
-	uint64_t b = src2;
-	if (a == 0 || b == 0)
+	if (!src1 || !src2)
 	{
 		dsthi = dstlo = 0;
 		return FLAG_Z;
 	}
 
 	// compute high and low parts first
-	uint64_t lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
-	uint64_t hi = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 32));
+	uint64_t lo = uint64_t(uint32_t(src1 >> 0))  * uint64_t(uint32_t(src2 >> 0));
+	uint64_t hi = uint64_t(uint32_t(src1 >> 32)) * uint64_t(uint32_t(src2 >> 32));
 
 	// compute middle parts
 	uint64_t prevlo = lo;
-	uint64_t temp = uint64_t(uint32_t(a >> 32)) * uint64_t(uint32_t(b >> 0));
+	uint64_t temp = uint64_t(uint32_t(src1 >> 32)) * uint64_t(uint32_t(src2 >> 0));
 	lo += temp << 32;
 	hi += (temp >> 32) + (lo < prevlo);
 
 	prevlo = lo;
-	temp = uint64_t(uint32_t(a >> 0)) * uint64_t(uint32_t(b >> 32));
+	temp = uint64_t(uint32_t(src1 >> 0)) * uint64_t(uint32_t(src2 >> 32));
 	lo += temp << 32;
 	hi += (temp >> 32) + (lo < prevlo);
 
@@ -290,10 +288,10 @@ int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool f
 	dsthi = hi;
 	dstlo = lo;
 
-	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dstlo == 0) << 2);
-
-	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
+	if (HalfmulFlags)
+		return ((lo >> 60) & FLAG_S) | (hi ? FLAG_V : 0) | (!lo ? FLAG_Z : 0);
+	else
+		return ((hi >> 60) & FLAG_S) | (hi ? FLAG_V : 0) | ((!hi && !lo) ? FLAG_Z : 0);
 }
 
 
@@ -301,7 +299,8 @@ int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool f
 //  dmuls - perform a double-wide signed multiply
 //-------------------------------------------------
 
-int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags, bool halfmul_flags)
+template <bool HalfmulFlags>
+int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags)
 {
 	uint64_t lo, hi, prevlo;
 	uint64_t a, b, temp;
@@ -313,14 +312,15 @@ int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool fla
 		return 0;
 	}
 
-	// fetch absolute source values
-	a = src1; if (int64_t(a) < 0) a = -a;
-	b = src2; if (int64_t(b) < 0) b = -b;
-	if (a == 0 || b == 0)
+	if (!src1 || !src2)
 	{
 		dsthi = dstlo = 0;
 		return FLAG_Z;
 	}
+
+	// fetch absolute source values
+	a = src1; if (int64_t(a) < 0) a = -a;
+	b = src2; if (int64_t(b) < 0) b = -b;
 
 	// compute high and low parts first
 	lo = uint64_t(uint32_t(a >> 0))  * uint64_t(uint32_t(b >> 0));
@@ -348,10 +348,10 @@ int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool fla
 	dsthi = hi;
 	dstlo = lo;
 
-	if (halfmul_flags)
-		return ((lo >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) << 1) | ((dstlo == 0) << 2);
-
-	return ((hi >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) << 1) | ((dsthi == 0 && dstlo == 0) << 2);
+	if (HalfmulFlags)
+		return ((lo >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) ? FLAG_V : 0) | (!lo ? FLAG_Z : 0);
+	else
+		return ((hi >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) ? FLAG_V : 0) | ((!hi && !lo) ? FLAG_Z : 0);
 }
 
 
@@ -476,8 +476,8 @@ private:
 		bool is_immediate_value(uint64_t value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
 
 		// helpers
-		asmjit::x86::Gpd select_register(asmjit::x86::Gpd const &defreg) const;
-		asmjit::x86::Xmm select_register(asmjit::x86::Xmm defreg) const;
+		Gpd select_register(Gpd const &defreg) const;
+		Xmm select_register(Xmm defreg) const;
 		template <typename T> T select_register(T defreg, be_parameter const &checkparam) const;
 		template <typename T> T select_register(T defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const;
 
@@ -491,142 +491,145 @@ private:
 	};
 
 	// helpers
-	asmjit::x86::Mem MABS(void const *base, u32 const size = 0) const { return asmjit::x86::Mem(u64(base), size); }
+	Mem MABS(void const *base, u32 const size = 0) const { return Mem(uintptr_t(base), size); }
 	void normalize_commutative(be_parameter &inner, be_parameter &outer);
-	void emit_combine_z_flags(asmjit::x86::Assembler &a);
-	void emit_combine_zs_flags(asmjit::x86::Assembler &a);
-	void emit_combine_z_shl_flags(asmjit::x86::Assembler &a);
+	void emit_combine_z_flags(Assembler &a);
+	void emit_combine_zs_flags(Assembler &a);
+	void emit_combine_z_shl_flags(Assembler &a);
 	void reset_last_upper_lower_reg();
-	void set_last_lower_reg(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reglo);
-	void set_last_upper_reg(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reghi);
-	bool can_skip_lower_load(asmjit::x86::Assembler &a, uint32_t *memref, asmjit::x86::Gp const &reglo);
-	bool can_skip_upper_load(asmjit::x86::Assembler &a, uint32_t *memref, asmjit::x86::Gp const &reghi);
+	void set_last_lower_reg(Assembler &a, be_parameter const &param, Gp const &reglo);
+	void set_last_upper_reg(Assembler &a, be_parameter const &param, Gp const &reghi);
+	bool can_skip_lower_load(Assembler &a, uint32_t *memref, Gp const &reglo);
+	bool can_skip_upper_load(Assembler &a, uint32_t *memref, Gp const &reghi);
 
 	[[noreturn]] void end_of_block() const;
 	static void debug_log_hashjmp(int mode, offs_t pc);
 
+	void generate_one(Assembler &a, const uml::instruction &inst);
+
 	// code generators
-	void op_handle(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_hash(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_label(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_comment(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mapvar(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_handle(Assembler &a, const uml::instruction &inst);
+	void op_hash(Assembler &a, const uml::instruction &inst);
+	void op_label(Assembler &a, const uml::instruction &inst);
+	void op_comment(Assembler &a, const uml::instruction &inst);
+	void op_mapvar(Assembler &a, const uml::instruction &inst);
 
-	void op_nop(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_break(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_debug(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_exit(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_hashjmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_jmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_exh(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_callh(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_ret(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_callc(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_recover(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_nop(Assembler &a, const uml::instruction &inst);
+	void op_break(Assembler &a, const uml::instruction &inst);
+	void op_debug(Assembler &a, const uml::instruction &inst);
+	void op_exit(Assembler &a, const uml::instruction &inst);
+	void op_hashjmp(Assembler &a, const uml::instruction &inst);
+	void op_jmp(Assembler &a, const uml::instruction &inst);
+	void op_exh(Assembler &a, const uml::instruction &inst);
+	void op_callh(Assembler &a, const uml::instruction &inst);
+	void op_ret(Assembler &a, const uml::instruction &inst);
+	void op_callc(Assembler &a, const uml::instruction &inst);
+	void op_recover(Assembler &a, const uml::instruction &inst);
 
-	void op_setfmod(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_getfmod(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_getexp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_getflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_setflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_save(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_restore(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_setfmod(Assembler &a, const uml::instruction &inst);
+	void op_getfmod(Assembler &a, const uml::instruction &inst);
+	void op_getexp(Assembler &a, const uml::instruction &inst);
+	void op_getflgs(Assembler &a, const uml::instruction &inst);
+	void op_setflgs(Assembler &a, const uml::instruction &inst);
+	void op_save(Assembler &a, const uml::instruction &inst);
+	void op_restore(Assembler &a, const uml::instruction &inst);
 
-	void op_load(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_loads(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_store(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_read(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_readm(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_write(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_writem(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_carry(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_set(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mov(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_sext(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_roland(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_rolins(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_add(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_addc(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_sub(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_subc(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_cmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mulu(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mululw(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_muls(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mulslw(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_divu(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_divs(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_and(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_test(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_or(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_xor(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_lzcnt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_tzcnt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_bswap(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_shl(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_shr(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_sar(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_ror(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_rol(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_rorc(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_rolc(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_load(Assembler &a, const uml::instruction &inst);
+	void op_loads(Assembler &a, const uml::instruction &inst);
+	void op_store(Assembler &a, const uml::instruction &inst);
+	void op_read(Assembler &a, const uml::instruction &inst);
+	void op_readm(Assembler &a, const uml::instruction &inst);
+	void op_write(Assembler &a, const uml::instruction &inst);
+	void op_writem(Assembler &a, const uml::instruction &inst);
+	void op_carry(Assembler &a, const uml::instruction &inst);
+	void op_set(Assembler &a, const uml::instruction &inst);
+	void op_mov(Assembler &a, const uml::instruction &inst);
+	void op_sext(Assembler &a, const uml::instruction &inst);
+	void op_roland(Assembler &a, const uml::instruction &inst);
+	void op_rolins(Assembler &a, const uml::instruction &inst);
+	void op_add(Assembler &a, const uml::instruction &inst);
+	void op_addc(Assembler &a, const uml::instruction &inst);
+	void op_sub(Assembler &a, const uml::instruction &inst);
+	void op_subc(Assembler &a, const uml::instruction &inst);
+	void op_cmp(Assembler &a, const uml::instruction &inst);
+	void op_mulu(Assembler &a, const uml::instruction &inst);
+	void op_mululw(Assembler &a, const uml::instruction &inst);
+	void op_muls(Assembler &a, const uml::instruction &inst);
+	void op_mulslw(Assembler &a, const uml::instruction &inst);
+	void op_divu(Assembler &a, const uml::instruction &inst);
+	void op_divs(Assembler &a, const uml::instruction &inst);
+	void op_and(Assembler &a, const uml::instruction &inst);
+	void op_test(Assembler &a, const uml::instruction &inst);
+	void op_or(Assembler &a, const uml::instruction &inst);
+	void op_xor(Assembler &a, const uml::instruction &inst);
+	void op_lzcnt(Assembler &a, const uml::instruction &inst);
+	void op_tzcnt(Assembler &a, const uml::instruction &inst);
+	void op_bswap(Assembler &a, const uml::instruction &inst);
+	void op_shl(Assembler &a, const uml::instruction &inst);
+	void op_shr(Assembler &a, const uml::instruction &inst);
+	void op_sar(Assembler &a, const uml::instruction &inst);
+	void op_ror(Assembler &a, const uml::instruction &inst);
+	void op_rol(Assembler &a, const uml::instruction &inst);
+	void op_rorc(Assembler &a, const uml::instruction &inst);
+	void op_rolc(Assembler &a, const uml::instruction &inst);
 
-	void op_fload(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fstore(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fread(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fwrite(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fmov(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_ftoint(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_ffrint(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_ffrflt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_frnds(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fadd(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fsub(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fcmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fmul(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fdiv(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fneg(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fabs(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fsqrt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_frecip(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_frsqrt(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_fcopyi(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_icopyf(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_fload(Assembler &a, const uml::instruction &inst);
+	void op_fstore(Assembler &a, const uml::instruction &inst);
+	void op_fread(Assembler &a, const uml::instruction &inst);
+	void op_fwrite(Assembler &a, const uml::instruction &inst);
+	void op_fmov(Assembler &a, const uml::instruction &inst);
+	void op_ftoint(Assembler &a, const uml::instruction &inst);
+	void op_ffrint(Assembler &a, const uml::instruction &inst);
+	void op_ffrflt(Assembler &a, const uml::instruction &inst);
+	void op_frnds(Assembler &a, const uml::instruction &inst);
+	void op_fadd(Assembler &a, const uml::instruction &inst);
+	void op_fsub(Assembler &a, const uml::instruction &inst);
+	void op_fcmp(Assembler &a, const uml::instruction &inst);
+	void op_fmul(Assembler &a, const uml::instruction &inst);
+	void op_fdiv(Assembler &a, const uml::instruction &inst);
+	void op_fneg(Assembler &a, const uml::instruction &inst);
+	void op_fabs(Assembler &a, const uml::instruction &inst);
+	void op_fsqrt(Assembler &a, const uml::instruction &inst);
+	void op_frecip(Assembler &a, const uml::instruction &inst);
+	void op_frsqrt(Assembler &a, const uml::instruction &inst);
+	void op_fcopyi(Assembler &a, const uml::instruction &inst);
+	void op_icopyf(Assembler &a, const uml::instruction &inst);
 
 	// 32-bit code emission helpers
-	void emit_mov_r32_p32(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reg, be_parameter const &param);
-	void emit_mov_r32_p32_keepflags(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reg, be_parameter const &param);
-	void emit_mov_m32_p32(asmjit::x86::Assembler &a, asmjit::x86::Mem memref, be_parameter const &param);
-	void emit_mov_p32_r32(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reg);
+	void emit_mov_r32_p32(Assembler &a, Gp const &reg, be_parameter const &param);
+	void emit_mov_r32_p32_keepflags(Assembler &a, Gp const &reg, be_parameter const &param);
+	void emit_mov_m32_p32(Assembler &a, Mem memref, be_parameter const &param);
+	void emit_mov_p32_r32(Assembler &a, be_parameter const &param, Gp const &reg);
 
-	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param, std::function<bool(asmjit::x86::Assembler &a, asmjit::Operand const &dst, be_parameter const &src)> optimize = [](asmjit::x86::Assembler &a, asmjit::Operand dst, be_parameter const &src) { return false; });
-	void shift_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, size_t opsize, asmjit::Operand const &dst, be_parameter const &param, std::function<bool(asmjit::x86::Assembler &a, asmjit::Operand const &dst, be_parameter const &src)> optimize, bool update_flags);
+	template <typename T> void alu_op_param(Assembler &a, Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param, T &&optimize);
+	void alu_op_param(Assembler &a, Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param) { alu_op_param(a, opcode, dst, param, [](Assembler &a, asmjit::Operand dst, be_parameter const &src) { return false; }); }
+	template <typename T> void shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsize, asmjit::Operand const &dst, be_parameter const &param, T &&optimize, bool update_flags);
 
 	// 64-bit code emission helpers
-	void emit_mov_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param);
-	void emit_mov_r64_p64_keepflags(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param);
-	void emit_mov_m64_p64(asmjit::x86::Assembler &a, asmjit::x86::Mem const &memref, be_parameter const &param);
-	void emit_mov_p64_r64(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi);
-	void emit_and_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_and_m64_p64(asmjit::x86::Assembler &a, asmjit::x86::Mem const &memref_lo, asmjit::x86::Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
-	void emit_or_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_or_m64_p64(asmjit::x86::Assembler &a, asmjit::x86::Mem const &memref_lo, asmjit::x86::Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
-	void emit_xor_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_xor_m64_p64(asmjit::x86::Assembler &a, asmjit::x86::Mem const &memref_lo, asmjit::x86::Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
-	void emit_shl_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_shr_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_sar_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_rol_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_ror_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_rcl_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_rcr_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_mov_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param);
+	void emit_mov_r64_p64_keepflags(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param);
+	void emit_mov_m64_p64(Assembler &a, Mem const &memref, be_parameter const &param);
+	void emit_mov_p64_r64(Assembler &a, be_parameter const &param, Gp const &reglo, Gp const &reghi);
+	void emit_and_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_and_m64_p64(Assembler &a, Mem const &memref_lo, Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
+	void emit_or_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_or_m64_p64(Assembler &a, Mem const &memref_lo, Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
+	void emit_xor_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_xor_m64_p64(Assembler &a, Mem const &memref_lo, Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
+	void emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
 
-	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode_lo, asmjit::x86::Inst::Id const opcode_hi, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi, be_parameter const &param, bool const saveflags);
-	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode_lo, asmjit::x86::Inst::Id const opcode_hi, asmjit::x86::Mem const &lo, asmjit::x86::Mem const &hi, be_parameter const &param, bool const saveflags);
+	void alu_op_param(Assembler &a, Inst::Id const opcode_lo, Inst::Id const opcode_hi, Gp const &lo, Gp const &hi, be_parameter const &param, bool const saveflags);
+	void alu_op_param(Assembler &a, Inst::Id const opcode_lo, Inst::Id const opcode_hi, Mem const &lo, Mem const &hi, be_parameter const &param, bool const saveflags);
 
 	// floating-point code emission helpers
-	void emit_fld_p(asmjit::x86::Assembler &a, int size, be_parameter const &param);
-	void emit_fstp_p(asmjit::x86::Assembler &a, int size, be_parameter const &param);
+	void emit_fld_p(Assembler &a, int size, be_parameter const &param);
+	void emit_fstp_p(Assembler &a, int size, be_parameter const &param);
 
 	size_t emit(asmjit::CodeHolder &ch);
 
@@ -647,10 +650,10 @@ private:
 
 	uint32_t *              m_reglo[REG_MAX];       // pointer to low part of data for each register
 	uint32_t *              m_reghi[REG_MAX];       // pointer to high part of data for each register
-	asmjit::x86::Gp         m_last_lower_reg;       // last register we stored a lower from
+	Gp                      m_last_lower_reg;       // last register we stored a lower from
 	x86code *               m_last_lower_pc;        // PC after instruction where we last stored a lower register
 	uint32_t *              m_last_lower_addr;      // address where we last stored an lower register
-	asmjit::x86::Gp         m_last_upper_reg;       // last register we stored an upper from
+	Gp                      m_last_upper_reg;       // last register we stored an upper from
 	x86code *               m_last_upper_pc;        // PC after instruction where we last stored an upper register
 	uint32_t *              m_last_upper_addr;      // address where we last stored an upper register
 	double                  m_fptemp;               // temporary storage for floating point
@@ -667,25 +670,7 @@ private:
 	resolved_member_function m_debug_cpu_instruction_hook;
 	resolved_member_function m_drcmap_get_value;
 	resolved_memory_accessors_vector m_memory_accessors;
-
-	// globals
-	typedef void (drcbe_x86::*opcode_generate_func)(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	struct opcode_table_entry
-	{
-		uml::opcode_t           opcode;             // opcode in question
-		opcode_generate_func    func;               // function pointer to the work
-	};
-	static const opcode_table_entry s_opcode_table_source[];
-	static opcode_generate_func s_opcode_table[uml::OP_MAX];
 };
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-drcbe_x86::opcode_generate_func drcbe_x86::s_opcode_table[OP_MAX];
 
 
 
@@ -693,99 +678,104 @@ drcbe_x86::opcode_generate_func drcbe_x86::s_opcode_table[OP_MAX];
 //  TABLES
 //**************************************************************************
 
-const drcbe_x86::opcode_table_entry drcbe_x86::s_opcode_table_source[] =
+inline void drcbe_x86::generate_one(Assembler &a, const uml::instruction &inst)
 {
+	switch (inst.opcode())
+	{
 	// Compile-time opcodes
-	{ uml::OP_HANDLE,  &drcbe_x86::op_handle },     // HANDLE  handle
-	{ uml::OP_HASH,    &drcbe_x86::op_hash },       // HASH    mode,pc
-	{ uml::OP_LABEL,   &drcbe_x86::op_label },      // LABEL   imm
-	{ uml::OP_COMMENT, &drcbe_x86::op_comment },    // COMMENT string
-	{ uml::OP_MAPVAR,  &drcbe_x86::op_mapvar },     // MAPVAR  mapvar,value
+	case uml::OP_HANDLE:  op_handle(a, inst);     break; // HANDLE  handle
+	case uml::OP_HASH:    op_hash(a, inst);       break; // HASH    mode,pc
+	case uml::OP_LABEL:   op_label(a, inst);      break; // LABEL   imm
+	case uml::OP_COMMENT: op_comment(a, inst);    break; // COMMENT string
+	case uml::OP_MAPVAR:  op_mapvar(a, inst);     break; // MAPVAR  mapvar,value
 
 	// Control Flow Operations
-	{ uml::OP_NOP,     &drcbe_x86::op_nop },        // NOP
-	{ uml::OP_BREAK,   &drcbe_x86::op_break },      // BREAK
-	{ uml::OP_DEBUG,   &drcbe_x86::op_debug },      // DEBUG   pc
-	{ uml::OP_EXIT,    &drcbe_x86::op_exit },       // EXIT    src1[,c]
-	{ uml::OP_HASHJMP, &drcbe_x86::op_hashjmp },    // HASHJMP mode,pc,handle
-	{ uml::OP_JMP,     &drcbe_x86::op_jmp },        // JMP     imm[,c]
-	{ uml::OP_EXH,     &drcbe_x86::op_exh },        // EXH     handle,param[,c]
-	{ uml::OP_CALLH,   &drcbe_x86::op_callh },      // CALLH   handle[,c]
-	{ uml::OP_RET,     &drcbe_x86::op_ret },        // RET     [c]
-	{ uml::OP_CALLC,   &drcbe_x86::op_callc },      // CALLC   func,ptr[,c]
-	{ uml::OP_RECOVER, &drcbe_x86::op_recover },    // RECOVER dst,mapvar
+	case uml::OP_NOP:     op_nop(a, inst);        break; // NOP
+	case uml::OP_BREAK:   op_break(a, inst);      break; // BREAK
+	case uml::OP_DEBUG:   op_debug(a, inst);      break; // DEBUG   pc
+	case uml::OP_EXIT:    op_exit(a, inst);       break; // EXIT    src1[,c]
+	case uml::OP_HASHJMP: op_hashjmp(a, inst);    break; // HASHJMP mode,pc,handle
+	case uml::OP_JMP:     op_jmp(a, inst);        break; // JMP     imm[,c]
+	case uml::OP_EXH:     op_exh(a, inst);        break; // EXH     handle,param[,c]
+	case uml::OP_CALLH:   op_callh(a, inst);      break; // CALLH   handle[,c]
+	case uml::OP_RET:     op_ret(a, inst);        break; // RET     [c]
+	case uml::OP_CALLC:   op_callc(a, inst);      break; // CALLC   func,ptr[,c]
+	case uml::OP_RECOVER: op_recover(a, inst);    break; // RECOVER dst,mapvar
 
 	// Internal Register Operations
-	{ uml::OP_SETFMOD, &drcbe_x86::op_setfmod },    // SETFMOD src
-	{ uml::OP_GETFMOD, &drcbe_x86::op_getfmod },    // GETFMOD dst
-	{ uml::OP_GETEXP,  &drcbe_x86::op_getexp },     // GETEXP  dst
-	{ uml::OP_GETFLGS, &drcbe_x86::op_getflgs },    // GETFLGS dst[,f]
-	{ uml::OP_SETFLGS, &drcbe_x86::op_setflgs },    // GETFLGS src
-	{ uml::OP_SAVE,    &drcbe_x86::op_save },       // SAVE    dst
-	{ uml::OP_RESTORE, &drcbe_x86::op_restore },    // RESTORE dst
+	case uml::OP_SETFMOD: op_setfmod(a, inst);    break; // SETFMOD src
+	case uml::OP_GETFMOD: op_getfmod(a, inst);    break; // GETFMOD dst
+	case uml::OP_GETEXP:  op_getexp(a, inst);     break; // GETEXP  dst
+	case uml::OP_GETFLGS: op_getflgs(a, inst);    break; // GETFLGS dst[,f]
+	case uml::OP_SETFLGS: op_setflgs(a, inst);    break; // GETFLGS src
+	case uml::OP_SAVE:    op_save(a, inst);       break; // SAVE    dst
+	case uml::OP_RESTORE: op_restore(a, inst);    break; // RESTORE dst
 
 	// Integer Operations
-	{ uml::OP_LOAD,    &drcbe_x86::op_load },       // LOAD    dst,base,index,size
-	{ uml::OP_LOADS,   &drcbe_x86::op_loads },      // LOADS   dst,base,index,size
-	{ uml::OP_STORE,   &drcbe_x86::op_store },      // STORE   base,index,src,size
-	{ uml::OP_READ,    &drcbe_x86::op_read },       // READ    dst,src1,spacesize
-	{ uml::OP_READM,   &drcbe_x86::op_readm },      // READM   dst,src1,mask,spacesize
-	{ uml::OP_WRITE,   &drcbe_x86::op_write },      // WRITE   dst,src1,spacesize
-	{ uml::OP_WRITEM,  &drcbe_x86::op_writem },     // WRITEM  dst,src1,spacesize
-	{ uml::OP_CARRY,   &drcbe_x86::op_carry },      // CARRY   src,bitnum
-	{ uml::OP_SET,     &drcbe_x86::op_set },        // SET     dst,c
-	{ uml::OP_MOV,     &drcbe_x86::op_mov },        // MOV     dst,src[,c]
-	{ uml::OP_SEXT,    &drcbe_x86::op_sext },       // SEXT    dst,src
-	{ uml::OP_ROLAND,  &drcbe_x86::op_roland },     // ROLAND  dst,src1,src2,src3
-	{ uml::OP_ROLINS,  &drcbe_x86::op_rolins },     // ROLINS  dst,src1,src2,src3
-	{ uml::OP_ADD,     &drcbe_x86::op_add },        // ADD     dst,src1,src2[,f]
-	{ uml::OP_ADDC,    &drcbe_x86::op_addc },       // ADDC    dst,src1,src2[,f]
-	{ uml::OP_SUB,     &drcbe_x86::op_sub },        // SUB     dst,src1,src2[,f]
-	{ uml::OP_SUBB,    &drcbe_x86::op_subc },       // SUBB    dst,src1,src2[,f]
-	{ uml::OP_CMP,     &drcbe_x86::op_cmp },        // CMP     src1,src2[,f]
-	{ uml::OP_MULU,    &drcbe_x86::op_mulu },       // MULU    dst,edst,src1,src2[,f]
-	{ uml::OP_MULULW,  &drcbe_x86::op_mululw },     // MULULW  dst,src1,src2[,f]
-	{ uml::OP_MULS,    &drcbe_x86::op_muls },       // MULS    dst,edst,src1,src2[,f]
-	{ uml::OP_MULSLW,  &drcbe_x86::op_mulslw },     // MULSLW  dst,src1,src2[,f]
-	{ uml::OP_DIVU,    &drcbe_x86::op_divu },       // DIVU    dst,edst,src1,src2[,f]
-	{ uml::OP_DIVS,    &drcbe_x86::op_divs },       // DIVS    dst,edst,src1,src2[,f]
-	{ uml::OP_AND,     &drcbe_x86::op_and },        // AND     dst,src1,src2[,f]
-	{ uml::OP_TEST,    &drcbe_x86::op_test },       // TEST    src1,src2[,f]
-	{ uml::OP_OR,      &drcbe_x86::op_or },         // OR      dst,src1,src2[,f]
-	{ uml::OP_XOR,     &drcbe_x86::op_xor },        // XOR     dst,src1,src2[,f]
-	{ uml::OP_LZCNT,   &drcbe_x86::op_lzcnt },      // LZCNT   dst,src[,f]
-	{ uml::OP_TZCNT,   &drcbe_x86::op_tzcnt },      // TZCNT   dst,src[,f]
-	{ uml::OP_BSWAP,   &drcbe_x86::op_bswap },      // BSWAP   dst,src
-	{ uml::OP_SHL,     &drcbe_x86::op_shl },        // SHL     dst,src,count[,f]
-	{ uml::OP_SHR,     &drcbe_x86::op_shr },        // SHR     dst,src,count[,f]
-	{ uml::OP_SAR,     &drcbe_x86::op_sar },        // SAR     dst,src,count[,f]
-	{ uml::OP_ROL,     &drcbe_x86::op_rol },        // ROL     dst,src,count[,f]
-	{ uml::OP_ROLC,    &drcbe_x86::op_rolc },       // ROLC    dst,src,count[,f]
-	{ uml::OP_ROR,     &drcbe_x86::op_ror },        // ROR     dst,src,count[,f]
-	{ uml::OP_RORC,    &drcbe_x86::op_rorc },       // RORC    dst,src,count[,f]
+	case uml::OP_LOAD:    op_load(a, inst);       break; // LOAD    dst,base,index,size
+	case uml::OP_LOADS:   op_loads(a, inst);      break; // LOADS   dst,base,index,size
+	case uml::OP_STORE:   op_store(a, inst);      break; // STORE   base,index,src,size
+	case uml::OP_READ:    op_read(a, inst);       break; // READ    dst,src1,spacesize
+	case uml::OP_READM:   op_readm(a, inst);      break; // READM   dst,src1,mask,spacesize
+	case uml::OP_WRITE:   op_write(a, inst);      break; // WRITE   dst,src1,spacesize
+	case uml::OP_WRITEM:  op_writem(a, inst);     break; // WRITEM  dst,src1,spacesize
+	case uml::OP_CARRY:   op_carry(a, inst);      break; // CARRY   src,bitnum
+	case uml::OP_SET:     op_set(a, inst);        break; // SET     dst,c
+	case uml::OP_MOV:     op_mov(a, inst);        break; // MOV     dst,src[,c]
+	case uml::OP_SEXT:    op_sext(a, inst);       break; // SEXT    dst,src
+	case uml::OP_ROLAND:  op_roland(a, inst);     break; // ROLAND  dst,src1,src2,src3
+	case uml::OP_ROLINS:  op_rolins(a, inst);     break; // ROLINS  dst,src1,src2,src3
+	case uml::OP_ADD:     op_add(a, inst);        break; // ADD     dst,src1,src2[,f]
+	case uml::OP_ADDC:    op_addc(a, inst);       break; // ADDC    dst,src1,src2[,f]
+	case uml::OP_SUB:     op_sub(a, inst);        break; // SUB     dst,src1,src2[,f]
+	case uml::OP_SUBB:    op_subc(a, inst);       break; // SUBB    dst,src1,src2[,f]
+	case uml::OP_CMP:     op_cmp(a, inst);        break; // CMP     src1,src2[,f]
+	case uml::OP_MULU:    op_mulu(a, inst);       break; // MULU    dst,edst,src1,src2[,f]
+	case uml::OP_MULULW:  op_mululw(a, inst);     break; // MULULW  dst,src1,src2[,f]
+	case uml::OP_MULS:    op_muls(a, inst);       break; // MULS    dst,edst,src1,src2[,f]
+	case uml::OP_MULSLW:  op_mulslw(a, inst);     break; // MULSLW  dst,src1,src2[,f]
+	case uml::OP_DIVU:    op_divu(a, inst);       break; // DIVU    dst,edst,src1,src2[,f]
+	case uml::OP_DIVS:    op_divs(a, inst);       break; // DIVS    dst,edst,src1,src2[,f]
+	case uml::OP_AND:     op_and(a, inst);        break; // AND     dst,src1,src2[,f]
+	case uml::OP_TEST:    op_test(a, inst);       break; // TEST    src1,src2[,f]
+	case uml::OP_OR:      op_or(a, inst);         break; // OR      dst,src1,src2[,f]
+	case uml::OP_XOR:     op_xor(a, inst);        break; // XOR     dst,src1,src2[,f]
+	case uml::OP_LZCNT:   op_lzcnt(a, inst);      break; // LZCNT   dst,src[,f]
+	case uml::OP_TZCNT:   op_tzcnt(a, inst);      break; // TZCNT   dst,src[,f]
+	case uml::OP_BSWAP:   op_bswap(a, inst);      break; // BSWAP   dst,src
+	case uml::OP_SHL:     op_shl(a, inst);        break; // SHL     dst,src,count[,f]
+	case uml::OP_SHR:     op_shr(a, inst);        break; // SHR     dst,src,count[,f]
+	case uml::OP_SAR:     op_sar(a, inst);        break; // SAR     dst,src,count[,f]
+	case uml::OP_ROL:     op_rol(a, inst);        break; // ROL     dst,src,count[,f]
+	case uml::OP_ROLC:    op_rolc(a, inst);       break; // ROLC    dst,src,count[,f]
+	case uml::OP_ROR:     op_ror(a, inst);        break; // ROR     dst,src,count[,f]
+	case uml::OP_RORC:    op_rorc(a, inst);       break; // RORC    dst,src,count[,f]
 
 	// Floating Point Operations
-	{ uml::OP_FLOAD,   &drcbe_x86::op_fload },      // FLOAD   dst,base,index
-	{ uml::OP_FSTORE,  &drcbe_x86::op_fstore },     // FSTORE  base,index,src
-	{ uml::OP_FREAD,   &drcbe_x86::op_fread },      // FREAD   dst,space,src1
-	{ uml::OP_FWRITE,  &drcbe_x86::op_fwrite },     // FWRITE  space,dst,src1
-	{ uml::OP_FMOV,    &drcbe_x86::op_fmov },       // FMOV    dst,src1[,c]
-	{ uml::OP_FTOINT,  &drcbe_x86::op_ftoint },     // FTOINT  dst,src1,size,round
-	{ uml::OP_FFRINT,  &drcbe_x86::op_ffrint },     // FFRINT  dst,src1,size
-	{ uml::OP_FFRFLT,  &drcbe_x86::op_ffrflt },     // FFRFLT  dst,src1,size
-	{ uml::OP_FRNDS,   &drcbe_x86::op_frnds },      // FRNDS   dst,src1
-	{ uml::OP_FADD,    &drcbe_x86::op_fadd },       // FADD    dst,src1,src2
-	{ uml::OP_FSUB,    &drcbe_x86::op_fsub },       // FSUB    dst,src1,src2
-	{ uml::OP_FCMP,    &drcbe_x86::op_fcmp },       // FCMP    src1,src2
-	{ uml::OP_FMUL,    &drcbe_x86::op_fmul },       // FMUL    dst,src1,src2
-	{ uml::OP_FDIV,    &drcbe_x86::op_fdiv },       // FDIV    dst,src1,src2
-	{ uml::OP_FNEG,    &drcbe_x86::op_fneg },       // FNEG    dst,src1
-	{ uml::OP_FABS,    &drcbe_x86::op_fabs },       // FABS    dst,src1
-	{ uml::OP_FSQRT,   &drcbe_x86::op_fsqrt },      // FSQRT   dst,src1
-	{ uml::OP_FRECIP,  &drcbe_x86::op_frecip },     // FRECIP  dst,src1
-	{ uml::OP_FRSQRT,  &drcbe_x86::op_frsqrt },     // FRSQRT  dst,src1
-	{ uml::OP_FCOPYI,  &drcbe_x86::op_fcopyi },     // FCOPYI  dst,src
-	{ uml::OP_ICOPYF,  &drcbe_x86::op_icopyf },     // ICOPYF  dst,src
+	case uml::OP_FLOAD:   op_fload(a, inst);      break; // FLOAD   dst,base,index
+	case uml::OP_FSTORE:  op_fstore(a, inst);     break; // FSTORE  base,index,src
+	case uml::OP_FREAD:   op_fread(a, inst);      break; // FREAD   dst,space,src1
+	case uml::OP_FWRITE:  op_fwrite(a, inst);     break; // FWRITE  space,dst,src1
+	case uml::OP_FMOV:    op_fmov(a, inst);       break; // FMOV    dst,src1[,c]
+	case uml::OP_FTOINT:  op_ftoint(a, inst);     break; // FTOINT  dst,src1,size,round
+	case uml::OP_FFRINT:  op_ffrint(a, inst);     break; // FFRINT  dst,src1,size
+	case uml::OP_FFRFLT:  op_ffrflt(a, inst);     break; // FFRFLT  dst,src1,size
+	case uml::OP_FRNDS:   op_frnds(a, inst);      break; // FRNDS   dst,src1
+	case uml::OP_FADD:    op_fadd(a, inst);       break; // FADD    dst,src1,src2
+	case uml::OP_FSUB:    op_fsub(a, inst);       break; // FSUB    dst,src1,src2
+	case uml::OP_FCMP:    op_fcmp(a, inst);       break; // FCMP    src1,src2
+	case uml::OP_FMUL:    op_fmul(a, inst);       break; // FMUL    dst,src1,src2
+	case uml::OP_FDIV:    op_fdiv(a, inst);       break; // FDIV    dst,src1,src2
+	case uml::OP_FNEG:    op_fneg(a, inst);       break; // FNEG    dst,src1
+	case uml::OP_FABS:    op_fabs(a, inst);       break; // FABS    dst,src1
+	case uml::OP_FSQRT:   op_fsqrt(a, inst);      break; // FSQRT   dst,src1
+	case uml::OP_FRECIP:  op_frecip(a, inst);     break; // FRECIP  dst,src1
+	case uml::OP_FRSQRT:  op_frsqrt(a, inst);     break; // FRSQRT  dst,src1
+	case uml::OP_FCOPYI:  op_fcopyi(a, inst);     break; // FCOPYI  dst,src
+	case uml::OP_ICOPYF:  op_icopyf(a, inst);     break; // ICOPYF  dst,src
+
+	default: throw emu_fatalerror("drcbe_x86(%s): unhandled opcode %u\n", m_device.tag(), inst.opcode());
+	}
 };
 
 
@@ -1091,10 +1081,6 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 			m_memory_accessors[space].set(*m_space[space]);
 	}
 
-	// build the opcode table (static but it doesn't hurt to regenerate it)
-	for (auto & elem : s_opcode_table_source)
-		s_opcode_table[elem.opcode] = elem.func;
-
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
@@ -1242,7 +1228,7 @@ void drcbe_x86::reset()
 	a.pushfd();                                                                         // pushf
 	a.pop(eax);                                                                         // pop    eax
 	a.and_(eax, 0x8c5);                                                                 // and    eax,0x8c5
-	a.mov(al, ptr(u64(flags_map), eax));                                                // mov    al,[flags_map]
+	a.mov(al, ptr(uintptr_t(flags_map), eax));                                          // mov    al,[flags_map]
 	a.mov(ptr(ecx, offsetof(drcuml_machine_state, flags)), al);                         // mov    state->flags,al
 	a.mov(al, MABS(&m_state.fmod));                                                     // mov    al,[fmod]
 	a.mov(ptr(ecx, offsetof(drcuml_machine_state, fmod)), al);                          // mov    state->fmod,al
@@ -1302,11 +1288,11 @@ void drcbe_x86::reset()
 	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, fmod)));                  // movzx eax,state->fmod
 	a.and_(eax, 3);                                                                     // and    eax,3
 	a.mov(MABS(&m_state.fmod), al);                                                     // mov    [fmod],al
-	a.fldcw(word_ptr(u64(&fp_control[0]), eax, 1));                                     // fldcw  fp_control[eax*2]
+	a.fldcw(word_ptr(uintptr_t(&fp_control[0]), eax, 1));                               // fldcw  fp_control[eax*2]
 	a.mov(eax, ptr(ecx, offsetof(drcuml_machine_state, exp)));                          // mov    eax,state->exp
 	a.mov(MABS(&m_state.exp), eax);                                                     // mov    [exp],eax
 	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, flags)));                 // movzx eax,state->flags
-	a.push(dword_ptr(u64(flags_unmap), eax, 2));                                        // push   flags_unmap[eax*4]
+	a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                                  // push   flags_unmap[eax*4]
 	a.popfd();                                                                          // popf
 	a.ret();                                                                            // ret
 
@@ -1401,7 +1387,6 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
-		assert(inst.opcode() < std::size(s_opcode_table));
 
 		// must remain in scope until output
 		std::string dasm;
@@ -1424,7 +1409,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 		}
 
 		// generate code
-		(this->*s_opcode_table[inst.opcode()])(a, inst);
+		generate_one(a, inst);
 	}
 
 	// catch falling off the end of a block
@@ -1571,7 +1556,8 @@ void drcbe_x86::emit_mov_p32_r32(Assembler &a, be_parameter const &param, Gp con
 }
 
 
-void drcbe_x86::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const &dst, be_parameter const &param, std::function<bool(Assembler &a, Operand const &dst, be_parameter const &src)> optimize)
+template <typename T>
+void drcbe_x86::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const &dst, be_parameter const &param, T &&optimize)
 {
 	if (param.is_immediate())
 	{
@@ -1599,7 +1585,8 @@ void drcbe_x86::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 		a.emit(opcode, dst, Gpd(param.ireg()));                                         // op    dst,param
 }
 
-void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsize, Operand const &dst, be_parameter const &param, std::function<bool(Assembler &a, Operand const &dst, be_parameter const &src)> optimize, bool update_flags)
+template <typename T>
+void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsize, Operand const &dst, be_parameter const &param, T &&optimize, bool update_flags)
 {
 	if (param.is_immediate())
 	{
@@ -1610,7 +1597,7 @@ void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		if (update_flags)
 		{
-			if (bitshift == 0)
+			if ((bitshift == 0) && (opcode != Inst::kIdRcl) && (opcode != Inst::kIdRcr))
 				a.clc(); // throw away carry since it'll never be used
 
 			calculate_status_flags(a, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
@@ -1634,7 +1621,7 @@ void drcbe_x86::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		a.popfd(); // preserved flags not needed so throw it away
 
-		if (update_flags)
+		if (update_flags && (opcode != Inst::kIdRcl) && (opcode != Inst::kIdRcr))
 			a.clc(); // throw away carry since it'll never be used
 
 		a.short_().jmp(end);
@@ -2409,14 +2396,22 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 {
 	int saveflags = inst.flags() != 0;
 
-	Gp tempreg = esi; // TODO: try to avoid collision with reglo and reghi?
+	Gp tempreg = esi;
+	if ((reglo == tempreg) || (reghi == tempreg))
+		tempreg = edi;
+	if ((reglo == tempreg) || (reghi == tempreg))
+		tempreg = ebp;
+	assert(reglo != tempreg);
+	assert(reghi != tempreg);
 	a.push(tempreg);
 
 	if (param.is_immediate())
 	{
 		int count = param.immediate() & 63;
 		if (!inst.flags() && count == 0)
-			;// skip
+		{
+			// skip
+		}
 		else
 		{
 			while (count >= 32)
@@ -2437,13 +2432,13 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 			a.mov(ecx, reglo);
 			a.shld(reglo, reghi, count);
-			if (saveflags && count != 0) a.pushfd();
+			if (saveflags && count) a.pushfd();
 			a.shld(reghi, ecx, count);
 		}
 
 		if (saveflags)
 		{
-			if (count == 0)
+			if (!count)
 			{
 				a.test(reglo, reglo);
 				a.pushfd();
@@ -2458,10 +2453,9 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	}
 	else
 	{
-		Label skipall = a.newLabel();
-		Label end = a.newLabel();
-		Label skip1 = a.newLabel();
-		Label shift_loop = a.newLabel();
+		Label const skipall = a.newLabel();
+		Label const end = a.newLabel();
+		Label const skip1 = a.newLabel();
 
 		emit_mov_r32_p32(a, ecx, param);
 
@@ -2472,21 +2466,23 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.cmp(ecx, 32);
 		a.short_().jl(skip1);
 
-		a.bind(shift_loop);
-		if (inst.flags() != 0)
+		if (inst.flags())
 		{
+			Label const shift_loop = a.newLabel();
+
+			a.bind(shift_loop);
 			a.sub(ecx, 31);
 			a.mov(tempreg, reglo);
 			a.shld(reglo, reghi, 31);
 			a.shld(reghi, tempreg, 31);
+			a.cmp(ecx, 32);
+			a.short_().jge(shift_loop);
 		}
 		else
 		{
 			a.xchg(reghi, reglo);
 			a.sub(ecx, 32);
 		}
-		a.cmp(ecx, 32);
-		a.short_().jge(shift_loop);
 
 		a.bind(skip1);
 		reset_last_upper_lower_reg();
@@ -2527,14 +2523,22 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 {
 	int saveflags = inst.flags() != 0;
 
-	Gp tempreg = esi; // TODO: try to avoid collision with reglo and reghi?
+	Gp tempreg = esi;
+	if ((reglo == tempreg) || (reghi == tempreg))
+		tempreg = edi;
+	if ((reglo == tempreg) || (reghi == tempreg))
+		tempreg = ebp;
+	assert(reglo != tempreg);
+	assert(reghi != tempreg);
 	a.push(tempreg);
 
 	if (param.is_immediate())
 	{
 		int count = param.immediate() & 63;
 		if (!inst.flags() && count == 0)
-			;// skip
+		{
+			// skip
+		}
 		else
 		{
 			while (count >= 32)
@@ -2646,10 +2650,9 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	Label loop = a.newLabel();
 	Label skipall = a.newLabel();
 	Label skiploop = a.newLabel();
-	Label end = a.newLabel();
 
 	a.pushfd(); // keep carry flag after and
-	emit_mov_r32_p32_keepflags(a, ecx, param);
+	emit_mov_r32_p32(a, ecx, param);
 
 	a.and_(ecx, 63);
 	a.popfd();
@@ -2669,27 +2672,18 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.rcl(reglo, 1);
 	a.rcl(reghi, 1);
 
-	if (inst.flags())
-	{
-		calculate_status_flags(a, reglo, FLAG_Z);
-		a.pushfd();
-		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
-		emit_combine_z_flags(a);
-
-		a.short_().jmp(end);
-	}
-
 	a.bind(skipall);
-
 	if (inst.flags())
 	{
-		a.test(reglo, reglo);
+		if (inst.flags() & FLAG_C)
+			calculate_status_flags(a, reglo, FLAG_Z);
+		else
+			a.test(reglo, reglo);
 		a.pushfd();
 		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
 		emit_combine_z_flags(a);
 	}
 
-	a.bind(end);
 	reset_last_upper_lower_reg();
 }
 
@@ -2704,10 +2698,9 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	Label loop = a.newLabel();
 	Label skipall = a.newLabel();
 	Label skiploop = a.newLabel();
-	Label end = a.newLabel();
 
 	a.pushfd(); // keep carry flag after and
-	emit_mov_r32_p32_keepflags(a, ecx, param);
+	emit_mov_r32_p32(a, ecx, param);
 
 	a.and_(ecx, 63);
 	a.popfd();
@@ -2727,26 +2720,18 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.rcr(reghi, 1);
 	a.rcr(reglo, 1);
 
-	if (inst.flags())
-	{
-		calculate_status_flags(a, reglo, FLAG_Z);
-		a.pushfd();
-		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
-		emit_combine_z_flags(a);
-
-		a.short_().jmp(end);
-	}
-
 	a.bind(skipall);
 	if (inst.flags())
 	{
-		a.test(reglo, reglo);
+		if (inst.flags() & FLAG_C)
+			calculate_status_flags(a, reglo, FLAG_Z);
+		else
+			a.test(reglo, reglo);
 		a.pushfd();
 		calculate_status_flags(a, reghi, FLAG_S | FLAG_Z);
 		emit_combine_z_flags(a);
 	}
 
-	a.bind(end);
 	reset_last_upper_lower_reg();
 }
 
@@ -2823,7 +2808,7 @@ void drcbe_x86::emit_fld_p(Assembler &a, int size, be_parameter const &param)
 {
 	assert(param.is_memory());
 	assert(size == 4 || size == 8);
-	a.fld(ptr(u64(param.memory()), size));
+	a.fld(ptr(uintptr_t(param.memory()), size));
 }
 
 
@@ -2837,7 +2822,7 @@ void drcbe_x86::emit_fstp_p(Assembler &a, int size, be_parameter const &param)
 	assert(param.is_memory());
 	assert(size == 4 || size == 8);
 
-	a.fstp(ptr(u64(param.memory()), size));
+	a.fstp(ptr(uintptr_t(param.memory()), size));
 }
 
 
@@ -3092,26 +3077,24 @@ void drcbe_x86::op_hashjmp(Assembler &a, const instruction &inst)
 	// load the stack base one word early so we end up at the right spot after our call below
 	a.mov(esp, MABS(&m_hashstacksave));                                                 // mov   esp,[hashstacksave]
 
-	// fixed mode cases
 	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
 	{
-		// a straight immediate jump is direct, though we need the PC in EAX in case of failure
+		// fixed mode cases
 		if (pcp.is_immediate())
 		{
+			// a straight immediate jump is direct, though we need the PC in EAX in case of failure
 			uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
 			uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
 			a.call(MABS(&m_hash.base()[modep.immediate()][l1val][l2val]));              // call  hash[modep][l1val][l2val]
 		}
-
-		// a fixed mode but variable PC
 		else
 		{
+			// a fixed mode but variable PC
 			emit_mov_r32_p32(a, eax, pcp);                                              // mov   eax,pcp
 			a.mov(edx, eax);                                                            // mov   edx,eax
 			a.shr(edx, m_hash.l1shift());                                               // shr   edx,l1shift
 			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());                           // and  eax,l2mask << l2shift
-			a.mov(edx, ptr(u64(&m_hash.base()[modep.immediate()][0]), edx, 2));
-																						// mov   edx,hash[modep+edx*4]
+			a.mov(edx, ptr(uintptr_t(&m_hash.base()[modep.immediate()][0]), edx, 2));   // mov   edx,hash[modep+edx*4]
 			a.call(ptr(edx, eax, 2 - m_hash.l2shift()));                                // call  [edx+eax*shift]
 		}
 	}
@@ -3120,20 +3103,19 @@ void drcbe_x86::op_hashjmp(Assembler &a, const instruction &inst)
 		// variable mode
 		Gp const modereg = modep.select_register(ecx);
 		emit_mov_r32_p32(a, modereg, modep);                                            // mov   modereg,modep
-		a.mov(ecx, ptr(u64(m_hash.base()), modereg, 2));                                // mov   ecx,hash[modereg*4]
+		a.mov(ecx, ptr(uintptr_t(m_hash.base()), modereg, 2));                          // mov   ecx,hash[modereg*4]
 
-		// fixed PC
 		if (pcp.is_immediate())
 		{
+			// fixed PC
 			uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
 			uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
 			a.mov(edx, ptr(ecx, l1val*4));                                              // mov   edx,[ecx+l1val*4]
 			a.call(ptr(edx, l2val*4));                                                  // call  [l2val*4]
 		}
-
-		// variable PC
 		else
 		{
+			// variable PC
 			emit_mov_r32_p32(a, eax, pcp);                                              // mov   eax,pcp
 			a.mov(edx, eax);                                                            // mov   edx,eax
 			a.shr(edx, m_hash.l1shift());                                               // shr   edx,l1shift
@@ -3388,7 +3370,7 @@ void drcbe_x86::op_setfmod(Assembler &a, const instruction &inst)
 		emit_mov_r32_p32(a, eax, srcp);                                                 // mov   eax,srcp
 		a.and_(eax, 3);                                                                 // and   eax,3
 		a.mov(MABS(&m_state.fmod), al);                                                 // mov   [fmod],al
-		a.fldcw(ptr(u64(&fp_control[0]), eax, 1, 2));                                   // fldcw fp_control[eax]
+		a.fldcw(ptr(uintptr_t(&fp_control[0]), eax, 1, 2));                             // fldcw fp_control[eax]
 	}
 }
 
@@ -3562,7 +3544,7 @@ void drcbe_x86::op_getflgs(Assembler &a, const instruction &inst)
 			a.pushfd();                                                                 // pushf
 			a.pop(eax);                                                                 // pop    eax
 			a.and_(eax, flagmask);                                                      // and    eax,flagmask
-			a.movzx(dstreg, byte_ptr(u64(flags_map), eax));                             // movzx  dstreg,[flags_map]
+			a.movzx(dstreg, byte_ptr(uintptr_t(flags_map), eax));                       // movzx  dstreg,[flags_map]
 			break;
 	}
 
@@ -3599,7 +3581,7 @@ void drcbe_x86::op_setflgs(Assembler &a, const instruction &inst)
 
 	emit_mov_r32_p32(a, eax, srcp);
 
-	a.mov(eax, ptr(u64(flags_unmap), eax, 2));
+	a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
 	a.and_(dword_ptr(esp), ~0x8c5);
 	a.or_(dword_ptr(esp), eax);
 
@@ -3673,9 +3655,9 @@ void drcbe_x86::op_load(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(eax);
 
-	// immediate index
 	if (indp.is_immediate())
 	{
+		// immediate index
 		int const scale = 1 << scalesizep.scale();
 
 		if (size == SIZE_BYTE)
@@ -3690,22 +3672,21 @@ void drcbe_x86::op_load(Assembler &a, const instruction &inst)
 			a.mov(dstreg, MABS(basep.memory(scale*indp.immediate())));                  // mov   dstreg,[basep + scale*indp]
 		}
 	}
-
-	// other index
 	else
 	{
+		// other index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);
+		emit_mov_r32_p32_keepflags(a, indreg, indp);
 		if (size == SIZE_BYTE)
-			a.movzx(dstreg, ptr(u64(basep.memory()), indreg, scalesizep.scale(), 1));   // movzx dstreg,[basep + scale*indp]
+			a.movzx(dstreg, ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale(), 1));   // movzx dstreg,[basep + scale*indp]
 		else if (size == SIZE_WORD)
-			a.movzx(dstreg, ptr(u64(basep.memory()), indreg, scalesizep.scale(), 2));   // movzx dstreg,[basep + scale*indp]
+			a.movzx(dstreg, ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale(), 2));   // movzx dstreg,[basep + scale*indp]
 		else if (size == SIZE_DWORD)
-			a.mov(dstreg, ptr(u64(basep.memory()), indreg, scalesizep.scale()));        // mov   dstreg,[basep + scale*indp]
+			a.mov(dstreg, ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale()));        // mov   dstreg,[basep + scale*indp]
 		else if (size == SIZE_QWORD)
 		{
-			a.mov(edx, ptr(u64(basep.memory(4)), indreg, scalesizep.scale()));          // mov   edx,[basep + scale*indp + 4]
-			a.mov(dstreg, ptr(u64(basep.memory(0)), indreg, scalesizep.scale()));       // mov   dstreg,[basep + scale*indp]
+			a.mov(edx, ptr(uintptr_t(basep.memory(4)), indreg, scalesizep.scale()));          // mov   edx,[basep + scale*indp + 4]
+			a.mov(dstreg, ptr(uintptr_t(basep.memory(0)), indreg, scalesizep.scale()));       // mov   dstreg,[basep + scale*indp]
 		}
 	}
 
@@ -3715,18 +3696,17 @@ void drcbe_x86::op_load(Assembler &a, const instruction &inst)
 	// 64-bit form stores upper 32 bits
 	if (inst.size() == 8)
 	{
-		// 1, 2, or 4-byte case
 		if (size != SIZE_QWORD)
 		{
+			// 1, 2, or 4-byte case
 			if (dstp.is_memory())
 				a.mov(MABS(dstp.memory(4), 4), 0);                                      // mov   [dstp+4],0
 			else if (dstp.is_int_register())
 				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);                                // mov   [reghi],0
 		}
-
-		// 8-byte case
 		else
 		{
+			// 8-byte case
 			if (dstp.is_memory())
 				a.mov(MABS(dstp.memory(4)), edx);                                       // mov   [dstp+4],edx
 			else if (dstp.is_int_register())
@@ -3760,9 +3740,9 @@ void drcbe_x86::op_loads(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(eax);
 
-	// immediate index
 	if (indp.is_immediate())
 	{
+		// immediate index
 		int const scale = 1 << scalesizep.scale();
 
 		if (size == SIZE_BYTE)
@@ -3777,22 +3757,21 @@ void drcbe_x86::op_loads(Assembler &a, const instruction &inst)
 			a.mov(dstreg, MABS(basep.memory(scale*indp.immediate())));                  // mov   dstreg,[basep + scale*indp]
 		}
 	}
-
-	// other index
 	else
 	{
+		// other index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);
+		emit_mov_r32_p32_keepflags(a, indreg, indp);
 		if (size == SIZE_BYTE)
-			a.movsx(dstreg, ptr(u64(basep.memory()), indreg, scalesizep.scale(), 1));   // movsx dstreg,[basep + scale*indp]
+			a.movsx(dstreg, ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale(), 1));   // movsx dstreg,[basep + scale*indp]
 		else if (size == SIZE_WORD)
-			a.movsx(dstreg, ptr(u64(basep.memory()), indreg, scalesizep.scale(), 2));   // movsx dstreg,[basep + scale*indp]
+			a.movsx(dstreg, ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale(), 2));   // movsx dstreg,[basep + scale*indp]
 		else if (size == SIZE_DWORD)
-			a.mov(dstreg, ptr(u64(basep.memory()), indreg, scalesizep.scale()));        // mov   dstreg,[basep + scale*indp]
+			a.mov(dstreg, ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale()));        // mov   dstreg,[basep + scale*indp]
 		else if (size == SIZE_QWORD)
 		{
-			a.mov(edx, ptr(u64(basep.memory(4)), indreg, scalesizep.scale()));          // mov   edx,[basep + scale*indp + 4]
-			a.mov(dstreg, ptr(u64(basep.memory(0)), indreg, scalesizep.scale()));       // mov   dstreg,[basep + scale*indp]
+			a.mov(edx, ptr(uintptr_t(basep.memory(4)), indreg, scalesizep.scale()));          // mov   edx,[basep + scale*indp + 4]
+			a.mov(dstreg, ptr(uintptr_t(basep.memory(0)), indreg, scalesizep.scale()));       // mov   dstreg,[basep + scale*indp]
 		}
 	}
 
@@ -3866,9 +3845,9 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 		{
 			// variable source
 			if (size != SIZE_QWORD)
-				emit_mov_r32_p32(a, srcreg, srcp);                                      // mov   srcreg,srcp
+				emit_mov_r32_p32_keepflags(a, srcreg, srcp);                            // mov   srcreg,srcp
 			else
-				emit_mov_r64_p64(a, srcreg, edx, srcp);                                 // mov   edx:srcreg,srcp
+				emit_mov_r64_p64_keepflags(a, srcreg, edx, srcp);                       // mov   edx:srcreg,srcp
 
 			if (size == SIZE_BYTE)
 				a.mov(MABS(basep.memory(scale*indp.immediate())), srcreg.r8());         // mov   [basep + scale*indp],srcreg
@@ -3887,21 +3866,21 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 	{
 		// normal case: variable index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);                                              // mov   indreg,indp
+		emit_mov_r32_p32_keepflags(a, indreg, indp);                                    // mov   indreg,indp
 
 		if (srcp.is_immediate())
 		{
 			// immediate source
 			if (size == SIZE_BYTE)
-				a.mov(ptr(u64(basep.memory()), indreg, scalesizep.scale(), 1), srcp.immediate());   // mov   [basep + 1*ecx],srcp
+				a.mov(ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale(), 1), srcp.immediate());   // mov   [basep + 1*ecx],srcp
 			else if (size == SIZE_WORD)
-				a.mov(ptr(u64(basep.memory()), indreg, scalesizep.scale(), 2), srcp.immediate());  // mov   [basep + 2*ecx],srcp
+				a.mov(ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale(), 2), srcp.immediate());  // mov   [basep + 2*ecx],srcp
 			else if (size == SIZE_DWORD)
-				a.mov(ptr(u64(basep.memory()), indreg, scalesizep.scale(), 4), srcp.immediate());  // mov   [basep + 4*ecx],srcp
+				a.mov(ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale(), 4), srcp.immediate());  // mov   [basep + 4*ecx],srcp
 			else if (size == SIZE_QWORD)
 			{
-				a.mov(ptr(u64(basep.memory(0)), indreg, scalesizep.scale(), 4), srcp.immediate());  // mov   [basep + 8*ecx],srcp
-				a.mov(ptr(u64(basep.memory(4)), indreg, scalesizep.scale(), 4), srcp.immediate() >> 32);
+				a.mov(ptr(uintptr_t(basep.memory(0)), indreg, scalesizep.scale(), 4), srcp.immediate());  // mov   [basep + 8*ecx],srcp
+				a.mov(ptr(uintptr_t(basep.memory(4)), indreg, scalesizep.scale(), 4), srcp.immediate() >> 32);
 																						// mov   [basep + 8*ecx + 4],srcp >> 32
 			}
 		}
@@ -3909,19 +3888,19 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 		{
 			// variable source
 			if (size != SIZE_QWORD)
-				emit_mov_r32_p32(a, srcreg, srcp);                                      // mov   srcreg,srcp
+				emit_mov_r32_p32_keepflags(a, srcreg, srcp);                            // mov   srcreg,srcp
 			else
-				emit_mov_r64_p64(a, srcreg, edx, srcp);                                 // mov   edx:srcreg,srcp
+				emit_mov_r64_p64_keepflags(a, srcreg, edx, srcp);                       // mov   edx:srcreg,srcp
 			if (size == SIZE_BYTE)
-				a.mov(ptr(u64(basep.memory()), indreg, scalesizep.scale()), srcreg.r8());   // mov   [basep + 1*ecx],srcreg
+				a.mov(ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale()), srcreg.r8());   // mov   [basep + 1*ecx],srcreg
 			else if (size == SIZE_WORD)
-				a.mov(ptr(u64(basep.memory()), indreg, scalesizep.scale()), srcreg.r16());  // mov   [basep + 2*ecx],srcreg
+				a.mov(ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale()), srcreg.r16());  // mov   [basep + 2*ecx],srcreg
 			else if (size == SIZE_DWORD)
-				a.mov(ptr(u64(basep.memory()), indreg, scalesizep.scale()), srcreg);    // mov   [basep + 4*ecx],srcreg
+				a.mov(ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale()), srcreg);    // mov   [basep + 4*ecx],srcreg
 			else if (size == SIZE_QWORD)
 			{
-				a.mov(ptr(u64(basep.memory(0)), indreg, scalesizep.scale()), srcreg);   // mov   [basep + 8*ecx],srcreg
-				a.mov(ptr(u64(basep.memory(4)), indreg, scalesizep.scale()), edx);      // mov   [basep + 8*ecx],edx
+				a.mov(ptr(uintptr_t(basep.memory(0)), indreg, scalesizep.scale()), srcreg);   // mov   [basep + 8*ecx],srcreg
+				a.mov(ptr(uintptr_t(basep.memory(4)), indreg, scalesizep.scale()), edx);      // mov   [basep + 8*ecx],edx
 			}
 		}
 	}
@@ -4613,9 +4592,9 @@ void drcbe_x86::op_roland(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(eax, shiftp, maskp);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
+		// 32-bit form
 		emit_mov_r32_p32(a, dstreg, srcp);                                              // mov   dstreg,srcp
 		shift_op_param(a, Inst::kIdRol, inst.size(), dstreg, shiftp,                                 // rol   dstreg,shiftp
 			[inst](Assembler &a, Operand const &dst, be_parameter const &src)
@@ -4639,10 +4618,9 @@ void drcbe_x86::op_roland(Assembler &a, const instruction &inst)
 			});
 		emit_mov_p32_r32(a, dstp, dstreg);                                              // mov   dstp,dstreg
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
+		// 64-bit form
 		emit_mov_r64_p64(a, dstreg, edx, srcp);                                         // mov   edx:dstreg,srcp
 		emit_rol_r64_p64(a, dstreg, edx, shiftp, inst);                                 // rol   edx:dstreg,shiftp
 		emit_and_r64_p64(a, dstreg, edx, maskp, inst);                                  // and   edx:dstreg,maskp
@@ -4671,11 +4649,11 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(ecx, shiftp, maskp);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
+		// 32-bit form
 		emit_mov_r32_p32(a, eax, srcp);                                                 // mov   eax,srcp
-		shift_op_param(a, Inst::kIdRol, inst.size(), eax, shiftp,                                    // rol   eax,shiftp
+		shift_op_param(a, Inst::kIdRol, inst.size(), eax, shiftp,                       // rol   eax,shiftp
 			[inst](Assembler &a, Operand const &dst, be_parameter const &src)
 			{
 				// optimize zero case
@@ -4700,10 +4678,9 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 		if (inst.flags())
 			a.test(dstreg, dstreg);
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
+		// 64-bit form
 		emit_mov_r64_p64(a, eax, edx, srcp);                                            // mov   edx:eax,srcp
 		emit_rol_r64_p64(a, eax, edx, shiftp, inst);                                    // rol   edx:eax,shiftp
 		if (maskp.is_immediate())
@@ -4727,7 +4704,7 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 		}
 		else
 		{
-			a.mov(ptr(esp, -8), ebx);                                                   // mov   [esp-8],ebx
+			a.mov(ptr(esp, 0), ebx);                                                    // mov   [esp],ebx
 			emit_mov_r64_p64(a, ebx, ecx, maskp);                                       // mov   ecx:ebx,maskp
 			a.and_(eax, ebx);                                                           // and   eax,ebx
 			a.and_(edx, ecx);                                                           // and   edx,ecx
@@ -4735,9 +4712,15 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 			a.not_(ecx);                                                                // not   ecx
 			if (dstp.is_int_register())
 			{
-				a.and_(Gpd(dstp.ireg()), ebx);                                          // and   dstp.lo,ebx
+				if (dstp.ireg() == Gp::kIdBx)
+					a.and_(ptr(esp, 0), ebx);                                           // and   dstp.lo,ebx
+				else
+					a.and_(Gpd(dstp.ireg()), ebx);                                      // and   dstp.lo,ebx
 				a.and_(MABS(m_reghi[dstp.ireg()]), ecx);                                // and   dstp.hi,ecx
-				a.or_(Gpd(dstp.ireg()), eax);                                           // or    dstp.lo,eax
+				if (dstp.ireg() == Gp::kIdBx)
+					a.or_(ptr(esp, 0), eax);                                            // or    dstp.lo,eax
+				else
+					a.or_(Gpd(dstp.ireg()), eax);                                       // or    dstp.lo,eax
 				a.or_(MABS(m_reghi[dstp.ireg()]), edx);                                 // or    dstp.hi,edx
 			}
 			else
@@ -4747,6 +4730,8 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 				a.or_(MABS(dstp.memory(0)), eax);                                       // or    dstp.lo,eax
 				a.or_(MABS(dstp.memory(4)), edx);                                       // or    dstp.hi,edx
 			}
+
+			a.mov(ebx, ptr(esp, 0));                                                    // mov   ebx,[esp]
 
 			if (inst.flags())
 			{
@@ -4764,8 +4749,6 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 
 				emit_combine_z_flags(a);
 			}
-
-			a.mov(ebx, ptr(esp, -8));                                                   // mov   ebx,[esp-8]
 		}
 	}
 }
@@ -5089,12 +5072,11 @@ void drcbe_x86::op_mulu(Assembler &a, const instruction &inst)
 	be_parameter src1p(*this, inst.param(2), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
 	normalize_commutative(src1p, src2p);
-	bool compute_hi = (dstp != edstp);
+	const bool compute_hi = (dstp != edstp);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
-		// general case
+		// 32-bit form
 		emit_mov_r32_p32(a, eax, src1p);                                                // mov   eax,src1p
 		emit_mov_r32_p32(a, edx, src2p);                                                // mov   edx,src2p
 		a.mul(edx);                                                                     // mul   edx
@@ -5128,13 +5110,10 @@ void drcbe_x86::op_mulu(Assembler &a, const instruction &inst)
 			a.popfd();
 		}
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		// general case
-		a.mov(dword_ptr(esp, 28), 0);                                                   // mov   [esp+28],0 (calculate flags as 64x64=128)
-		a.mov(dword_ptr(esp, 24), inst.flags());                                        // mov   [esp+24],flags
+		// 64-bit form
+		a.mov(dword_ptr(esp, 24), inst.flags() ? 1 : 0);                                // mov   [esp+24],flags
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		if (!compute_hi)
@@ -5142,9 +5121,9 @@ void drcbe_x86::op_mulu(Assembler &a, const instruction &inst)
 		else
 			a.mov(dword_ptr(esp, 4), imm(&m_reshi));                                    // mov   [esp+4],&reshi
 		a.mov(dword_ptr(esp, 0), imm(&m_reslo));                                        // mov   [esp],&reslo
-		a.call(imm(dmulu));                                                             // call  dmulu
+		a.call(imm(dmulu<false>));                                                      // call  dmulu (calculate ZS flags as 64*64->128)
 		if (inst.flags() != 0)
-			a.push(dword_ptr(u64(flags_unmap), eax, 2));                                // push   flags_unmap[eax*4]
+			a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                          // push   flags_unmap[eax*4]
 		a.mov(eax, MABS((uint32_t *)&m_reslo + 0));                                     // mov   eax,reslo.lo
 		a.mov(edx, MABS((uint32_t *)&m_reslo + 1));                                     // mov   edx,reslo.hi
 		emit_mov_p64_r64(a, dstp, eax, edx);                                            // mov   dstp,edx:eax
@@ -5177,10 +5156,9 @@ void drcbe_x86::op_mululw(Assembler &a, const instruction &inst)
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 	normalize_commutative(src1p, src2p);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
-		// general case
+		// 32-bit form
 		emit_mov_r32_p32(a, eax, src1p);                                                // mov   eax,src1p
 		emit_mov_r32_p32(a, edx, src2p);                                                // mov   edx,src2p
 		a.mul(edx);                                                                     // mul   edx
@@ -5204,20 +5182,17 @@ void drcbe_x86::op_mululw(Assembler &a, const instruction &inst)
 			a.popfd();
 		}
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		// general case
-		a.mov(dword_ptr(esp, 28), 1);                                                   // mov   [esp+28],1 (calculate flags as 64x64=64)
-		a.mov(dword_ptr(esp, 24), inst.flags());                                        // mov   [esp+24],flags
+		// 64-bit form
+		a.mov(dword_ptr(esp, 24), inst.flags() ? 1 : 0);                                // mov   [esp+24],flags
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		a.mov(dword_ptr(esp, 4), imm(&m_reslo));                                        // mov   [esp+4],&reslo
 		a.mov(dword_ptr(esp, 0), imm(&m_reslo));                                        // mov   [esp],&reslo
-		a.call(imm(dmulu));                                                             // call  dmulu
+		a.call(imm(dmulu<true>));                                                       // call  dmulu (calculate ZS flags as 64*64->64)
 		if (inst.flags() != 0)
-			a.push(dword_ptr(u64(flags_unmap), eax, 2));                                // push   flags_unmap[eax*4]
+			a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                          // push   flags_unmap[eax*4]
 		a.mov(eax, MABS((uint32_t *)&m_reslo + 0));                                     // mov   eax,reslo.lo
 		a.mov(edx, MABS((uint32_t *)&m_reslo + 1));                                     // mov   edx,reslo.hi
 		emit_mov_p64_r64(a, dstp, eax, edx);                                            // mov   dstp,edx:eax
@@ -5245,11 +5220,11 @@ void drcbe_x86::op_muls(Assembler &a, const instruction &inst)
 	be_parameter src1p(*this, inst.param(2), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
 	normalize_commutative(src1p, src2p);
-	bool compute_hi = (dstp != edstp);
+	const bool compute_hi = (dstp != edstp);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
+		// 32-bit form
 		emit_mov_r32_p32(a, eax, src1p);                                                // mov   eax,src1p
 		emit_mov_r32_p32(a, edx, src2p);                                                // mov   edx,src2p
 		a.imul(edx);                                                                    // imul  edx
@@ -5283,13 +5258,10 @@ void drcbe_x86::op_muls(Assembler &a, const instruction &inst)
 			a.popfd();
 		}
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		// general case
-		a.mov(dword_ptr(esp, 28), 0);                                                   // mov   [esp+28],0 (calculate flags as 64x64=128)
-		a.mov(dword_ptr(esp, 24), inst.flags());                                        // mov   [esp+24],flags
+		// 64-bit form
+		a.mov(dword_ptr(esp, 24), inst.flags() ? 1 : 0);                                // mov   [esp+24],flags
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		if (!compute_hi)
@@ -5297,9 +5269,9 @@ void drcbe_x86::op_muls(Assembler &a, const instruction &inst)
 		else
 			a.mov(dword_ptr(esp, 4), imm(&m_reshi));                                    // push  [esp+4],&reshi
 		a.mov(dword_ptr(esp, 0), imm(&m_reslo));                                        // mov   [esp],&reslo
-		a.call(imm(dmuls));                                                             // call  dmuls
+		a.call(imm(dmuls<false>));                                                      // call  dmuls (calculate ZS flags as 64*64->128)
 		if (inst.flags() != 0)
-			a.push(dword_ptr(u64(flags_unmap), eax, 2));                                // push   flags_unmap[eax*4]
+			a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                          // push   flags_unmap[eax*4]
 		a.mov(eax, MABS((uint32_t *)&m_reslo + 0));                                     // mov   eax,reslo.lo
 		a.mov(edx, MABS((uint32_t *)&m_reslo + 1));                                     // mov   edx,reslo.hi
 		emit_mov_p64_r64(a, dstp, eax, edx);                                            // mov   dstp,edx:eax
@@ -5332,9 +5304,9 @@ void drcbe_x86::op_mulslw(Assembler &a, const instruction &inst)
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 	normalize_commutative(src1p, src2p);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
+		// 32-bit form
 		emit_mov_r32_p32(a, eax, src1p);                                                // mov   eax,src1p
 		emit_mov_r32_p32(a, edx, src2p);                                                // mov   edx,src2p
 		a.imul(edx);                                                                    // imul  edx
@@ -5360,20 +5332,17 @@ void drcbe_x86::op_mulslw(Assembler &a, const instruction &inst)
 			a.popfd();
 		}
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		// general case
-		a.mov(dword_ptr(esp, 28), 1);                                                   // mov   [esp+28],1 (calculate flags as 64x64=64)
-		a.mov(dword_ptr(esp, 24), inst.flags());                                        // mov   [esp+24],flags
+		// 64-bit form
+		a.mov(dword_ptr(esp, 24), inst.flags() ? 1 : 0);                                // mov   [esp+24],flags
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		a.mov(dword_ptr(esp, 4), imm(&m_reslo));                                        // mov   [esp+4],&reslo
 		a.mov(dword_ptr(esp, 0), imm(&m_reslo));                                        // mov   [esp],&reslo
-		a.call(imm(dmuls));                                                             // call  dmuls
+		a.call(imm(dmuls<true>));                                                       // call  dmuls (calculate ZS flags as 64*64->64)
 		if (inst.flags() != 0)
-			a.push(dword_ptr(u64(flags_unmap), eax, 2));                                // push   flags_unmap[eax*4]
+			a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                          // push  flags_unmap[eax*4]
 		a.mov(eax, MABS((uint32_t *)&m_reslo + 0));                                     // mov   eax,reslo.lo
 		a.mov(edx, MABS((uint32_t *)&m_reslo + 1));                                     // mov   edx,reslo.hi
 		emit_mov_p64_r64(a, dstp, eax, edx);                                            // mov   dstp,edx:eax
@@ -5401,10 +5370,9 @@ void drcbe_x86::op_divu(Assembler &a, const instruction &inst)
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
 	bool compute_rem = (dstp != edstp);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
-		// general case
+		// 32-bit form
 		emit_mov_r32_p32(a, ecx, src2p);                                                // mov   ecx,src2p
 		if (inst.flags() != 0)
 		{
@@ -5424,11 +5392,9 @@ void drcbe_x86::op_divu(Assembler &a, const instruction &inst)
 		a.bind(skip);                                                               // skip:
 		reset_last_upper_lower_reg();
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		// general case
+		// 64-bit form
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		if (!compute_rem)
@@ -5438,7 +5404,7 @@ void drcbe_x86::op_divu(Assembler &a, const instruction &inst)
 		a.mov(dword_ptr(esp, 0), imm(&m_reslo));                                        // mov   [esp],&reslo
 		a.call(imm(ddivu));                                                             // call  ddivu
 		if (inst.flags() != 0)
-			a.push(dword_ptr(u64(flags_unmap), eax, 2));                                // push   flags_unmap[eax*4]
+			a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                          // push   flags_unmap[eax*4]
 		a.mov(eax, MABS((uint32_t *)&m_reslo + 0));                                     // mov   eax,reslo.lo
 		a.mov(edx, MABS((uint32_t *)&m_reslo + 1));                                     // mov   edx,reslo.hi
 		emit_mov_p64_r64(a, dstp, eax, edx);                                            // mov   dstp,edx:eax
@@ -5472,10 +5438,9 @@ void drcbe_x86::op_divs(Assembler &a, const instruction &inst)
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
 	bool compute_rem = (dstp != edstp);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
-		// general case
+		// 32-bit form
 		emit_mov_r32_p32(a, ecx, src2p);                                                // mov   ecx,src2p
 		if (inst.flags() != 0)
 		{
@@ -5495,11 +5460,9 @@ void drcbe_x86::op_divs(Assembler &a, const instruction &inst)
 		a.bind(skip);                                                               // skip:
 		reset_last_upper_lower_reg();
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		// general case
+		// 64-bit form
 		emit_mov_m64_p64(a, qword_ptr(esp, 16), src2p);                                 // mov   [esp+16],src2p
 		emit_mov_m64_p64(a, qword_ptr(esp, 8), src1p);                                  // mov   [esp+8],src1p
 		if (!compute_rem)
@@ -5509,7 +5472,7 @@ void drcbe_x86::op_divs(Assembler &a, const instruction &inst)
 		a.mov(dword_ptr(esp, 0), imm(&m_reslo));                                        // mov   [esp],&reslo
 		a.call(imm(ddivs));                                                             // call  ddivs
 		if (inst.flags() != 0)
-			a.push(dword_ptr(u64(flags_unmap), eax, 2));                                // push   flags_unmap[eax*4]
+			a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                          // push   flags_unmap[eax*4]
 		a.mov(eax, MABS((uint32_t *)&m_reslo + 0));                                     // mov   eax,reslo.lo
 		a.mov(edx, MABS((uint32_t *)&m_reslo + 1));                                     // mov   edx,reslo.hi
 		emit_mov_p64_r64(a, dstp, eax, edx);                                            // mov   dstp,edx:eax
@@ -6197,39 +6160,48 @@ void drcbe_x86::op_shl(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(eax, src2p);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
-		// dstp == src1p in memory
+		// 32-bit form
 		if (dstp.is_memory() && dstp == src1p)
-			shift_op_param(a, Inst::kIdShl, inst.size(), MABS(dstp.memory(), 4), src2p,              // shl   [dstp],src2p
-				[inst](Assembler &a, Operand const &dst, be_parameter const &src)
-				{
-					// optimize zero case
-					return (!inst.flags() && !src.immediate());
-				}, true);
-
-		// general case
+		{
+			// dstp == src1p in memory
+			shift_op_param(a, Inst::kIdShl, inst.size(), MABS(dstp.memory(), 4), src2p,
+					[inst](Assembler &a, Operand const &dst, be_parameter const &src)
+					{
+						// optimize zero case
+						return (!inst.flags() && !src.immediate());
+					}, inst.flags() != 0);
+		}
 		else
 		{
-			emit_mov_r32_p32(a, dstreg, src1p);                                         // mov   dstreg,src1p
-			shift_op_param(a, Inst::kIdShl, inst.size(), dstreg, src2p,                              // shl   dstreg,src2p
-				[inst](Assembler &a, Operand const &dst, be_parameter const &src)
-				{
-					// optimize zero case
-					return (!inst.flags() && !src.immediate());
-				}, true);
-			emit_mov_p32_r32(a, dstp, dstreg);                                          // mov   dstp,dstreg
+			// general case
+			emit_mov_r32_p32(a, dstreg, src1p);
+			shift_op_param(a, Inst::kIdShl, inst.size(), dstreg, src2p,
+					[inst](Assembler &a, Operand const &dst, be_parameter const &src)
+					{
+						// optimize zero case
+						return (!inst.flags() && !src.immediate());
+					}, inst.flags() != 0);
+			emit_mov_p32_r32(a, dstp, dstreg);
 		}
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		// general case
-		emit_mov_r64_p64(a, dstreg, edx, src1p);                                        // mov   edx:dstreg,[src1p]
-		emit_shl_r64_p64(a, dstreg, edx, src2p, inst);                                  // shl   edx:dstreg,src2p
-		emit_mov_p64_r64(a, dstp, dstreg, edx);                                         // mov   dstp,edx:dstreg
+		// 64-bit form
+		if (src2p.is_immediate_value(32) && !inst.flags())
+		{
+			// shift by 32 bits
+			emit_mov_r32_p32(a, edx, src1p);
+			a.xor_(dstreg, dstreg);
+		}
+		else
+		{
+			// general case
+			emit_mov_r64_p64(a, dstreg, edx, src1p);
+			emit_shl_r64_p64(a, dstreg, edx, src2p, inst);
+		}
+		emit_mov_p64_r64(a, dstp, dstreg, edx);
 	}
 }
 
@@ -6263,7 +6235,7 @@ void drcbe_x86::op_shr(Assembler &a, const instruction &inst)
 				{
 					// optimize zero case
 					return (!inst.flags() && !src.immediate());
-				}, true);
+				}, inst.flags() != 0);
 
 		// general case
 		else
@@ -6274,7 +6246,7 @@ void drcbe_x86::op_shr(Assembler &a, const instruction &inst)
 				{
 					// optimize zero case
 					return (!inst.flags() && !src.immediate());
-				}, true);
+				}, inst.flags() != 0);
 			emit_mov_p32_r32(a, dstp, dstreg);                                          // mov   dstp,dstreg
 		}
 	}
@@ -6591,22 +6563,21 @@ void drcbe_x86::op_fload(Assembler &a, const instruction &inst)
 	be_parameter basep(*this, inst.param(1), PTYPE_M);
 	be_parameter indp(*this, inst.param(2), PTYPE_MRI);
 
-	// immediate index
 	if (indp.is_immediate())
 	{
+		// immediate index
 		a.mov(eax, MABS(basep.memory(inst.size()*indp.immediate())));
 		if (inst.size() == 8)
 			a.mov(edx, MABS(basep.memory(4 + inst.size()*indp.immediate())));
 	}
-
-	// other index
 	else
 	{
+		// other index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);
-		a.mov(eax, ptr(u64(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2));
+		emit_mov_r32_p32_keepflags(a, indreg, indp);
+		a.mov(eax, ptr(uintptr_t(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2));
 		if (inst.size() == 8)
-			a.mov(edx, ptr(u64(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2));
+			a.mov(edx, ptr(uintptr_t(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2));
 	}
 
 	// general case
@@ -6632,27 +6603,25 @@ void drcbe_x86::op_fstore(Assembler &a, const instruction &inst)
 	be_parameter indp(*this, inst.param(1), PTYPE_MRI);
 	be_parameter srcp(*this, inst.param(2), PTYPE_MF);
 
-	// general case
 	a.mov(eax, MABS(srcp.memory(0)));
 	if (inst.size() == 8)
 		a.mov(edx, MABS(srcp.memory(4)));
 
-	// immediate index
 	if (indp.is_immediate())
 	{
+		// immediate index
 		a.mov(MABS(basep.memory(inst.size()*indp.immediate())), eax);
 		if (inst.size() == 8)
 			a.mov(MABS(basep.memory(4 + inst.size()*indp.immediate())), edx);
 	}
-
-	// other index
 	else
 	{
+		// other index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);
-		a.mov(ptr(u64(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2), eax);
+		emit_mov_r32_p32_keepflags(a, indreg, indp);
+		a.mov(ptr(uintptr_t(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2), eax);
 		if (inst.size() == 8)
-			a.mov(ptr(u64(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2), edx);
+			a.mov(ptr(uintptr_t(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2), edx);
 	}
 }
 

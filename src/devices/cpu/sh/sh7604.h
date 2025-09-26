@@ -120,6 +120,17 @@ private:
 	uint32_t dvcr_r();
 	void dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	// UBC
+	uint16_t barah_r();
+	void barah_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t baral_r();
+	void baral_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t barbh_r();
+	void barbh_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t barbl_r();
+	void barbl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 	// DMAC
 	template <int Channel> uint32_t vcrdma_r();
 	template <int Channel> void vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -205,6 +216,10 @@ private:
 	uint8_t m_wtcnt, m_wtcsr;
 	uint8_t m_rstcsr;
 	uint16_t m_wtcw[2];
+
+	// UBC
+	uint16_t m_barah, m_baral;
+	uint16_t m_barbh, m_barbl;
 
 	// DMAC
 	struct

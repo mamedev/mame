@@ -366,8 +366,6 @@ void kenseim_state::cpu_portc_w(uint8_t data)
 
 
 
-
-
 /*******************************
   Comms
  ******************************/
@@ -455,10 +453,6 @@ void kenseim_state::cpu_porte_w(uint8_t data)
 
 
 
-
-
-
-
 void kenseim_state::kenseim_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -505,7 +499,7 @@ void kenseim_state::kenseim(machine_config &config)
 	ppi_x2.in_pe().set_ioport("MOLEB");
 	ppi_x2.out_pf().set(FUNC(kenseim_state::mb8936_portf_w));
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 }
 
 static INPUT_PORTS_START( kenseim )
@@ -697,12 +691,6 @@ ROM_END
 void kenseim_state::init_kenseim()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16s_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
-
-	init_cps1();
-
-	m_led_serial_data = 0;
-	m_led_clock = 0;
-	m_led_latch = 0;
 
 	m_lamps.resolve();
 	m_startlamp.resolve();

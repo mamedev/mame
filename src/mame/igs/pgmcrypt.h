@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: David Haywood, ElSemi
-// IGS 027 Encryptions
+// IGS 027 encryptions
 #ifndef MAME_IGS_PGMCRYPT_H
 #define MAME_IGS_PGMCRYPT_H
 
@@ -29,11 +29,8 @@ void pgm_espgal_decrypt(running_machine &machine) ATTR_COLD;
 void pgm_happy6_decrypt(running_machine &machine) ATTR_COLD;
 void pgm_dwpc_decrypt(running_machine &machine) ATTR_COLD;
 void sdwx_decrypt(running_machine &machine) ATTR_COLD;
-void hauntedh_decrypt(running_machine &machine) ATTR_COLD;
 void chessc2_decrypt(running_machine &machine) ATTR_COLD;
-void klxyj_decrypt(running_machine &machine) ATTR_COLD;
 void zhongguo_decrypt(running_machine &machine) ATTR_COLD;
-void gonefsh2_decrypt(running_machine &machine) ATTR_COLD;
 void cjddz_decrypt(running_machine &machine) ATTR_COLD;
 void cjddzp_decrypt(running_machine &machine) ATTR_COLD;
 void lhzb4_decrypt(running_machine &machine) ATTR_COLD;
@@ -50,7 +47,6 @@ void mgcs3_decrypt(running_machine &machine) ATTR_COLD;
 void crzybugs_decrypt(running_machine &machine) ATTR_COLD;
 void crzybugsj_decrypt(running_machine &machine) ATTR_COLD;
 void qlgs_decrypt(running_machine &machine) ATTR_COLD;
-void jking02_decrypt(running_machine &machine) ATTR_COLD;
 void tct2p_decrypt(running_machine &machine) ATTR_COLD;
 void xypdk_decrypt(running_machine &machine) ATTR_COLD;
 void luckycrs_decrypt(running_machine &machine) ATTR_COLD;
@@ -58,12 +54,16 @@ void olympic5_decrypt(running_machine &machine) ATTR_COLD;
 void icescape_decrypt(running_machine &machine) ATTR_COLD;
 void tripfev_decrypt(running_machine &machine) ATTR_COLD;
 void wldfruit_decrypt(running_machine &machine) ATTR_COLD;
-void lthyp_decrypt(running_machine &machine) ATTR_COLD;
 void tripslot_decrypt(running_machine &machine) ATTR_COLD;
 void extradrw_decrypt(running_machine &machine) ATTR_COLD;
 void cjddzlf_decrypt(running_machine &machine) ATTR_COLD;
 void cjtljp_decrypt(running_machine& machine) ATTR_COLD;
 void mxsqy_decrypt(running_machine& machine) ATTR_COLD;
 void qiji6_decrypt(running_machine& machine) ATTR_COLD;
+void mjzb_decrypt(running_machine& machine) ATTR_COLD;
+void tswxp_decrypt(running_machine& machine) ATTR_COLD;
+void jking04_decrypt(running_machine& machine) ATTR_COLD;
+void royal5p_decrypt(running_machine& machine) ATTR_COLD;
+void jhg3d_decrypt(running_machine& machine) ATTR_COLD;
 
 #endif // MAME_IGS_PGMCRYPT_H

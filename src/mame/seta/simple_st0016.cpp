@@ -14,6 +14,7 @@
 
 Todo:
 - find NMI source, and NMI enable/disable (timer ? video hw ?)
+- test modes for crownpkr and dcrown show flip support problems
 
 Dips verified for Neratte Chu (nratechu) from manual
 */
@@ -51,6 +52,7 @@ public:
 	void mayjinsn(machine_config &config) ATTR_COLD;
 
 	void init_crownpkr() ATTR_COLD;
+	void init_dcrown() ATTR_COLD;
 	void init_nratechu() ATTR_COLD;
 	void init_mayjinsn() ATTR_COLD;
 	void init_mayjisn2() ATTR_COLD;
@@ -445,6 +447,36 @@ static INPUT_PORTS_START( crownpkr )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW ) // only works if pressed during boot
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dcrown )
+	PORT_INCLUDE( st0016 )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Double Up")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / Bet on Black" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // TODO: hopper
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop Reel 2 / Bet on Red / Show Paytable" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Modern Equipment" ) // TODO: what's this? machine translation doesn't seem correct
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10) // TODO: simulate coin drop sensor
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( mayjisn2 )
 	PORT_INCLUDE( st0016 )
 
@@ -578,11 +610,10 @@ void st0016_state::st0016(machine_config &config)
 	m_screen->set_palette("maincpu:palette");
 
 	// TODO: Mono?
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 }
 
 void st0016_state::mayjinsn(machine_config &config)
@@ -660,6 +691,14 @@ ROM_START( crownpkr ) // PCB E56-00002. "1.20 1997/05/30 19:00 Programming by K&
 	ROM_LOAD( "cpu120.u31", 0x000000, 0x080000, CRC(9c47920b) SHA1(bdc3f16cc7bf84102a24e6f58a1fb329bf90920b) ) // hand written label NEC D27C4000D / AMD 27C400
 	// U32 not populated
 	// U33 not populated
+	// U34 not populated
+ROM_END
+
+ROM_START( premline ) // original Seta PCB with sanded logos. The spaces for the 2 banks of 8 switches aren't populated.
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "pl-0.u31", 0x000000, 0x080000, CRC(3679a297) SHA1(9f29cfecdb51babc0ad9e15b6d5000834af6f481) )
+	ROM_LOAD( "pl-1.u32", 0x080000, 0x080000, CRC(fd2b53ee) SHA1(784886f90a2b6b812a8c44de1e17a216518e1830) )
+	ROM_LOAD( "pl-2.u33", 0x100000, 0x080000, CRC(309c103c) SHA1(c17483f332e364a8664f36750bf3325c340168f5) )
 	// U34 not populated
 ROM_END
 
@@ -825,6 +864,11 @@ void st0016_state::init_crownpkr()
 	m_maincpu->set_game_flag(2);
 }
 
+void st0016_state::init_dcrown()
+{
+	m_maincpu->set_game_flag(3);
+}
+
 void st0016_state::init_mayjinsn()
 {
 	m_maincpu->set_game_flag(4 /*| 0x80*/);
@@ -853,5 +897,6 @@ GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,   
 // Not working
 GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, crownpkr,   0,      st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "<unknown>",        "Crown Poker (ver. 1.20)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
-GAME( 1994, dcrown,     0,      st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "Nippon Data Kiki", "Dream Crown (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
-GAME( 1994, dcrowna,    dcrown, st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "Nippon Data Kiki", "Dream Crown (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the Insert Coin text has been translated to English and no (c) is uploaded
+GAME( 199?, premline,   0,      st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "MK Electronics",   "Premiums Line",           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
+GAME( 1994, dcrown,     0,      st0016,   dcrown,   st0016_state, init_dcrown,   ROT0, "Nippon Data Kiki", "Dream Crown (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
+GAME( 1994, dcrowna,    dcrown, st0016,   dcrown,   st0016_state, init_dcrown,   ROT0, "Nippon Data Kiki", "Dream Crown (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the Insert Coin text has been translated to English and no (c) is uploaded

@@ -546,7 +546,7 @@ uint16_t md_rom_fram_device::read_a13(offs_t offset)
 }
 
 /*-------------------------------------------------
- SUPER STREET FIGHTERS 2
+ SUPER STREET FIGHTER 2
  -------------------------------------------------*/
 
 uint16_t md_rom_ssf2_device::read(offs_t offset)

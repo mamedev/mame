@@ -272,9 +272,8 @@ protected:
 	void recompute_palette_tables();
 
 	void vdp_sndirqline_callback_c2(int state);
-	void vdp_lv6irqline_callback_c2(int state);
-	void vdp_lv4irqline_callback_c2(int state);
-	IRQ_CALLBACK_MEMBER(int_callback);
+	void vdp_vint_cb(int state);
+	void vdp_hint_cb(int state);
 
 	uint8_t io_portc_r();
 	void io_portd_w(uint8_t data);
@@ -311,6 +310,8 @@ protected:
 
 	void segac_map(address_map &map) ATTR_COLD;
 	void segac2_map(address_map &map) ATTR_COLD;
+
+	void cpu_space_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1130,6 +1131,19 @@ static INPUT_PORTS_START( wwmarine )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wwpajero )
+	PORT_INCLUDE( systemc_generic )
+
+	// TODO: disable inputs that don't exist (test mode lists buttons + joysticks for 2 players, but I don't think this has any inputs beyond P1 Button 1 being a horn?)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x03, "Demo Sound Interval" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, "Every 8 Demo Cycles" )
+	PORT_DIPSETTING(    0x02, "Every 4 Demo Cycles" )
+	PORT_DIPSETTING(    0x03, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( sonicfgt )
 	PORT_INCLUDE( systemc_generic )
@@ -1822,27 +1836,34 @@ void segac2_state::vdp_sndirqline_callback_c2(int state)
 }
 
 // the line usually used to drive irq6 is not connected
-void segac2_state::vdp_lv6irqline_callback_c2(int state)
+void segac2_state::vdp_vint_cb(int state)
 {
 	//
 }
 
 // the scanline interrupt seems connected as usual
-void segac2_state::vdp_lv4irqline_callback_c2(int state)
+void segac2_state::vdp_hint_cb(int state)
 {
-	if (state == ASSERT_LINE)
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	else
-		m_maincpu->set_input_line(4, CLEAR_LINE);
+	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-/* Callback when the 68k takes an IRQ */
-IRQ_CALLBACK_MEMBER(segac2_state::int_callback)
+void segac2_state::cpu_space_map(address_map &map)
 {
-	if (irqline == 4)
-		m_vdp->vdp_clear_irq4_pending();
-
-	return (0x60 + irqline * 4) / 4; // vector address
+	map(0xfffff3, 0xfffff3).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 25; }));
+	// TODO: IPL0 (external irq tied to VDP IE2)
+	map(0xfffff5, 0xfffff5).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 26; }));
+	map(0xfffff7, 0xfffff7).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 27; }));
+	map(0xfffff9, 0xfffff9).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
+		m_vdp->irq_ack();
+		return 28;
+	}));
+	map(0xfffffb, 0xfffffb).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 29; }));
+	// TODO: still connected to VDP?
+	map(0xfffffd, 0xfffffd).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 {
+		//m_vdp->irq_ack();
+		return 30;
+	}));
+	map(0xffffff, 0xffffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 31; }));
 }
 
 
@@ -1868,7 +1889,7 @@ void segac2_state::segac(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XL2_CLOCK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::segac_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(segac2_state::int_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &segac2_state::cpu_space_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
@@ -1886,8 +1907,8 @@ void segac2_state::segac(machine_config &config)
 	SEGA315_5313(config, m_vdp, XL2_CLOCK, m_maincpu);
 	m_vdp->set_is_pal(false);
 	m_vdp->snd_irq().set(FUNC(segac2_state::vdp_sndirqline_callback_c2));
-	m_vdp->lv6_irq().set(FUNC(segac2_state::vdp_lv6irqline_callback_c2));
-	m_vdp->lv4_irq().set(FUNC(segac2_state::vdp_lv4irqline_callback_c2));
+	m_vdp->vint_cb().set(FUNC(segac2_state::vdp_vint_cb));
+	m_vdp->hint_cb().set(FUNC(segac2_state::vdp_hint_cb));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_screen("screen");
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -1919,6 +1940,7 @@ void segac2_state::segac2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::segac2_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &segac2_state::cpu_space_map);
 	subdevice<sega_315_5296_device>("io")->out_cnt1_callback().set(m_upd7759, FUNC(upd7759_device::reset_w));
 
 	/* sound hardware */
@@ -2187,6 +2209,21 @@ ROM_START( wwanpanmo ) /* Waku Waku Anpanman - 837-7204 PCB */
 	ROM_LOAD( "epr-14121.ic4", 0x000000, 0x040000, CRC(69adf3a1) SHA1(63233e723ab9be8d5663651cb2e6e54b64a7bb8e) )
 ROM_END
 
+
+ROM_START( wwpajero )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "epr-12925.ic32", 0x000000, 0x020000, CRC(47a814a1) SHA1(19199a13d823615fb804a2ae7896871442a844bb) )
+	ROM_LOAD16_BYTE( "epr-12924.ic31", 0x000001, 0x020000, CRC(69a5df3a) SHA1(39b082034c4800547bedffca47eb24b43f9832fc) )
+	ROM_LOAD16_BYTE( "epr-13125.ic34", 0x040000, 0x020000, CRC(a1ee9e69) SHA1(19bebb71aa3b8279b0e140f495f2df756d80c7f7) ) // tested at 0x40000
+	ROM_RELOAD(                        0x080000, 0x020000 ) // pulls gfx data at 0x80000
+	ROM_LOAD16_BYTE( "epr-13124.ic33", 0x040001, 0x020000, CRC(edf17b0d) SHA1(3709c5a31766a81baf01188d09364fce6b75dd1a) ) // tested at 0x40001
+	ROM_RELOAD(                        0x080001, 0x020000 ) // pulls gfx data at 0x80001
+
+	ROM_REGION( 0x040000, "upd", ROMREGION_ERASEFF )
+	ROM_LOAD( "epr-12923.ic4", 0x000000, 0x020000, CRC(774557a9) SHA1(e267369338717b26546cb4e4706dd04a3eee0905) )
+
+	// unmarked protection chip, seems unused?
+ROM_END
 
 ROM_START( ssonicbr ) // hack: supposedly the data ROM mapping was modified
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -3075,6 +3112,7 @@ GAME( 1994, tantrbl3,   tantr,    segac,      ichir,    segac2_state,    init_ta
 GAME( 1992, wwanpanm,   0,        segac2,     wwmarine, wwmarine_state,  init_noprot,   ROT0,   "Sega", "Waku Waku Anpanman (Rev A)", 0 )
 GAME( 1992, wwanpanmo,  wwanpanm, segac2,     wwmarine, wwmarine_state,  init_noprot,   ROT0,   "Sega", "Waku Waku Anpanman", 0 )
 GAME( 1992, wwmarine,   0,        segac2,     wwmarine, wwmarine_state,  init_noprot,   ROT0,   "Sega", "Waku Waku Marine", 0 )
+GAME( 1990, wwpajero,   0,        segac2,     wwpajero, segac2_state,    init_noprot,   ROT0,   "Sega", "Waku Waku Pajero", 0 ) // test mode shows a variety of inputs, but sequence after coin-up seems to be non-interactive?
 
 // not really sure how this should hook up, things like the 'sold out' flags could be mechanical sensors, or from another MCU / CPU board in the actual popcorn part of the machine?
 GAME( 1992, anpanman,   0,        segac2,     anpanman, segac2_state,    init_noprot,   ROT0,   "Sega", "Soreike! Anpanman Popcorn Koujou (Rev B)", MACHINE_MECHANICAL ) // 'Mechanical' part isn't emulated

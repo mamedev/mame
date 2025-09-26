@@ -939,7 +939,7 @@ void segag80v_state::elim2(machine_config &config)
 void segag80v_state::spacfury(machine_config &config)
 {
 	g80v_base(config);
-	SPACE_FURY_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 1.0);
+	SPACE_FURY_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 1.0, 1);
 	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -959,7 +959,7 @@ void segag80v_state::spacfurybl(machine_config &config)
 void segag80v_state::zektor(machine_config &config)
 {
 	g80v_base(config);
-	ZEKTOR_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 0.7);
+	ZEKTOR_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 0.7, 1);
 	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -972,7 +972,7 @@ void segag80v_state::tacscan(machine_config &config)
 void segag80v_state::startrek(machine_config &config)
 {
 	g80v_base(config);
-	SEGAUSB(config, m_usb, 0, m_maincpu).add_route(ALL_OUTPUTS, "speech", 1.0);
+	SEGAUSB(config, m_usb, 0, m_maincpu).add_route(ALL_OUTPUTS, "speech", 1.0, 1);
 	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 

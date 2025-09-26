@@ -294,6 +294,11 @@ while (0)
     look up the pen via the 'paldata' array; if the
     entry is DRAWMODE_SHADOW, generate a shadow of
     the destination pixel using 'shadowtable'
+
+    If the entry is DRAWMODE_SHADOW_PRI and priority
+    is used, shadow is reapplied to SOURCE entries
+    drawn underneath it. Otherwise, shadows are
+    presumed to be lowest priority.
 -------------------------------------------------*/
 
 #define PIXEL_OP_REBASE_TRANSTABLE16(DEST, SOURCE)                                  \
@@ -335,13 +340,18 @@ do                                                                              
 		if (entry == DRAWMODE_SOURCE)                                               \
 		{                                                                           \
 			if (((1 << (pridata & 0x1f)) & pmask) == 0)                             \
-				(DEST) = color + srcdata;                                           \
+			{                                                                       \
+				if ((pridata & 0xc0) == (DRAWMODE_SHADOW_PRI << 6))                 \
+					(DEST) = shadowtable[u16(color + srcdata)];                     \
+				else                                                                \
+					(DEST) = color + srcdata;                                       \
+			}                                                                       \
 			(PRIORITY) = 31;                                                        \
 		}                                                                           \
 		else if ((pridata & 0x80) == 0 && ((1 << (pridata & 0x1f)) & pmask) == 0)   \
 		{                                                                           \
 			(DEST) = shadowtable[DEST];                                             \
-			(PRIORITY) = pridata | 0x80;                                            \
+			(PRIORITY) = pridata | (entry << 6);                                    \
 		}                                                                           \
 	}                                                                               \
 }                                                                                   \
@@ -357,13 +367,18 @@ do                                                                              
 		if (entry == DRAWMODE_SOURCE)                                               \
 		{                                                                           \
 			if (((1 << (pridata & 0x1f)) & pmask) == 0)                             \
-				(DEST) = paldata[srcdata];                                          \
+			{                                                                       \
+				if ((pridata & 0xc0) == (DRAWMODE_SHADOW_PRI << 6))                 \
+					(DEST) = shadowtable[rgb_t(paldata[srcdata]).as_rgb15()];       \
+				else                                                                \
+					(DEST) = paldata[srcdata];                                      \
+			}                                                                       \
 			(PRIORITY) = 31;                                                        \
 		}                                                                           \
 		else if ((pridata & 0x80) == 0 && ((1 << (pridata & 0x1f)) & pmask) == 0)   \
 		{                                                                           \
 			(DEST) = shadowtable[rgb_t(DEST).as_rgb15()];                           \
-			(PRIORITY) = pridata | 0x80;                                            \
+			(PRIORITY) = pridata | (entry << 6);                                    \
 		}                                                                           \
 	}                                                                               \
 }                                                                                   \

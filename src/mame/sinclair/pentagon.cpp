@@ -3,9 +3,8 @@
 #include "emu.h"
 #include "spec128.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "beta_m.h"
-
-#include "sound/ay8910.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -141,8 +140,8 @@ void pentagon_state::pentagon_io(address_map &map)
 	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
 	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(pentagon_state::spectrum_ula_r), FUNC(pentagon_state::spectrum_ula_w));
 	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
-	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
-	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay_slot", FUNC(ay_slot_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
 }
 
 void pentagon_state::pentagon_switch(address_map &map)
@@ -168,7 +167,6 @@ void pentagon_state::machine_reset()
 void pentagon_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_contention_pattern = {};
 }
 
 static const gfx_layout spectrum_charlayout =
@@ -196,21 +194,22 @@ void pentagon_state::pentagon(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pentagon_state::pentagon_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &pentagon_state::pentagon_switch);
 	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
-	m_maincpu->nomreq_cb().set_nop();
+	m_maincpu->refresh_cb().remove();
+	m_maincpu->nomreq_cb().remove();
 
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, 320, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	BETA_DISK(config, m_beta, 0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
-	ay8912_device &ay8912(AY8912(config.replace(), "ay8912", 14_MHz_XTAL / 8));
-	ay8912.add_route(0, "lspeaker", 0.50);
-	ay8912.add_route(1, "lspeaker", 0.25);
-	ay8912.add_route(1, "rspeaker", 0.25);
-	ay8912.add_route(2, "rspeaker", 0.50);
+	AY_SLOT(config.replace(), "ay_slot", 14_MHz_XTAL / 8, default_ay_slot_devices, "ay_ay8912")
+		.add_route(0, "speakers", 0.50, 0)
+		.add_route(1, "speakers", 0.25, 0)
+		.add_route(1, "speakers", 0.25, 1)
+		.add_route(2, "speakers", 0.50, 1);
 
 	config.device_remove("exp");
 
@@ -330,6 +329,6 @@ ROM_END
 } // Anonymous namespace
 
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY             FULLNAME           FLAGS
-COMP( 1991, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "Vladimir Drozdov", "Pentagon 128K",   0 )
-COMP( 2005, pent1024, spec128, 0,      pent1024, spec_plus, pent1024_state, empty_init, "Alex Zhabin",      "Pentagon 1024SL", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT        CLASS           INIT        COMPANY             FULLNAME           FLAGS
+COMP( 1991, pentagon, spec128, 0,      pentagon, spec_plus2a, pentagon_state, empty_init, "Vladimir Drozdov", "Pentagon 128K",   0 )
+COMP( 2005, pent1024, spec128, 0,      pent1024, spec_plus2a, pent1024_state, empty_init, "Alex Zhabin",      "Pentagon 1024SL", 0 )

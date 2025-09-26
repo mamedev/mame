@@ -16,15 +16,54 @@
 #include "emu.h"
 #include "mouse.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBCMC_MOUSE, bbcmc_mouse_device, "bbcmc_mouse", "BBC Master Compact Mouse")
+namespace {
+
+class bbcmc_mouse_device : public device_t, public device_bbc_joyport_interface
+{
+public:
+	bbcmc_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBCMC_MOUSE, tag, owner, clock)
+		, device_bbc_joyport_interface(mconfig, *this)
+		, m_mouse_x(*this, "mouse_x")
+		, m_mouse_y(*this, "mouse_y")
+		, m_buttons(*this, "buttons")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual uint8_t pb_r() override
+	{
+		return (m_buttons->read() & 0x07) | (m_xdir << 3) | (m_ydir << 4) | 0xe0;
+	}
+
+	TIMER_CALLBACK_MEMBER(update);
+
+private:
+	required_ioport m_mouse_x;
+	required_ioport m_mouse_y;
+	required_ioport m_buttons;
+
+	// quadrature output
+	int m_xdir, m_ydir;
+
+	// internal quadrature state
+	int m_x, m_y;
+	int m_phase_x, m_phase_y;
+
+	emu_timer *m_mouse_timer;
+};
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( mouse )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START( mouse )
@@ -41,31 +80,9 @@ static INPUT_PORTS_START( mouse )
 INPUT_PORTS_END
 
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 ioport_constructor bbcmc_mouse_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( mouse );
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbcmc_mouse_device - constructor
-//-------------------------------------------------
-
-bbcmc_mouse_device::bbcmc_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBCMC_MOUSE, tag, owner, clock)
-	, device_bbc_joyport_interface(mconfig, *this)
-	, m_mouse_x(*this, "mouse_x")
-	, m_mouse_y(*this, "mouse_y")
-	, m_buttons(*this, "buttons")
-{
 }
 
 
@@ -172,7 +189,7 @@ TIMER_CALLBACK_MEMBER(bbcmc_mouse_device::update)
 	m_y = y;
 }
 
-uint8_t bbcmc_mouse_device::pb_r()
-{
-	return (m_buttons->read() & 0x07) | (m_xdir << 3) | (m_ydir << 4) | 0xe0;
-}
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBCMC_MOUSE, device_bbc_joyport_interface, bbcmc_mouse_device, "bbcmc_mouse", "BBC Master Compact Mouse")

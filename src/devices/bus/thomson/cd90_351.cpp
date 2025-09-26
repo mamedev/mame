@@ -10,11 +10,39 @@
 
 #include "emu.h"
 #include "cd90_351.h"
-#include "formats/sap_dsk.h"
-#include "formats/thom_dsk.h"
+
+#include "imagedev/floppy.h"
 #include "machine/thmfc1.h"
 
-DEFINE_DEVICE_TYPE(CD90_351, cd90_351_device, "cd90_351", "Thomson CD 90-351 Diskette Controller")
+#include "formats/sap_dsk.h"
+#include "formats/thom_dsk.h"
+
+namespace {
+
+class cd90_351_device : public device_t, public thomson_extension_interface
+{
+public:
+	cd90_351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~cd90_351_device() = default;
+
+	virtual void rom_map(address_map &map) override ATTR_COLD;
+	virtual void io_map(address_map &map) override ATTR_COLD;
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	required_memory_region m_rom;
+	memory_bank_creator m_rom_bank;
+
+	static void floppy_formats(format_registration &fr);
+	static void floppy_drives(device_slot_interface &device);
+
+	void bank_w(u8 data);
+};
 
 cd90_351_device::cd90_351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CD90_351, tag, owner, clock),
@@ -86,3 +114,7 @@ void cd90_351_device::bank_w(u8 data)
 	logerror("bank_w %d\n", data & 3);
 	m_rom_bank->set_entry(data & 3);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(CD90_351, thomson_extension_interface, cd90_351_device, "cd90_351", "Thomson CD 90-351 Diskette Controller")

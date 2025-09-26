@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include "pseudovia.h"
-
 #include "machine/6522via.h"
+#include "machine/pseudovia.h"
 #include "sound/asc.h"
 #include "speaker.h"
 
@@ -20,11 +19,32 @@ public:
 	// Something is definitely customized with how PB1 interrupts work in the MSC's internal VIA1.
 	// This makes CPU/PMU comms work properly and fits with what we see in the leaked System 7.1
 	// source tree, but I'm not sure it's the exact behavior of the real MSC.
-	void cb1_int_hack(int state)
+	void pmu_int(int state)
 	{
 		if (state == ASSERT_LINE)
 		{
 			set_int(0x10);              // INT_CB1
+		}
+		else
+		{
+			clear_int(0x10);
+		}
+	}
+
+	void write_cb1_noint(int state)
+	{
+		if (m_in_cb1 != state)
+		{
+			m_in_cb1 = state;
+		}
+
+		if ((m_acr & 0x1c) == 0x1c)
+		{
+			shift_out();
+		}
+		else if (((m_acr & 0x1c) == 0x0c) || (!(m_acr & 0x1c)))
+		{
+			shift_in();
 		}
 	}
 };
@@ -67,14 +87,15 @@ public:
 
 	int get_pmu_req();
 	void pmu_ack_w(int state);
-	void cb1_int_hack(int state);
+	void pmu_int(int state);
+	void write_cb1(int state);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	devcb_write_line write_pb4, write_pb5, write_cb2, write_vbl;

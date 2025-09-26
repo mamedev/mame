@@ -56,6 +56,7 @@ Softfloat 3 MAME modifications
 #include <intrin.h>
 
 // MSVC has __lzcnt16 as well, but opts-GCC.h expects __lzcnt for uint16_t and uint32_t
+// FIXME: this requires the ABM instruction set extension and shouldn't be enabled if it isn't available
 #if defined(_M_IX86) || defined(_M_AMD64)
 #define __builtin_clz __lzcnt
 #endif // defined(_M_IX86) || defined(_M_AMD64)
@@ -64,14 +65,14 @@ Softfloat 3 MAME modifications
 #define __builtin_clzll __lzcnt64
 #endif // defined(_M_AMD64)
 
-#else // defined(_MSC_VER)
+#else // defined(_MSC_VER) && !defined(__clang__))
 
-// true for GCC and Clang on Intel and ARM, and MSVC on Intel.
 #define SOFTFLOAT_BUILTIN_CLZ 1
-#if defined(PTR64)
-#define SOFTFLOAT_INTRINSIC_INT128 1
-#endif // defined(PTR64)
 
-#endif // defined(_MSC_VER)
+#if defined(__SIZEOF_INT128__)
+#define SOFTFLOAT_INTRINSIC_INT128 1
+#endif // defined(__SIZEOF_INT128__)
+
+#endif // defined(_MSC_VER) && !defined(__clang__)
 
 #include "../../source/include/opts-GCC.h"

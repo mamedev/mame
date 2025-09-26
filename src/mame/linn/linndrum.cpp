@@ -28,11 +28,12 @@ There are multiple voice architectures:
   There is a single, time-multiplexed DAC used for all voices, and each voice
   has its own output. All 8 voices can be played simultaneously, but only a
   single loudness variation of each. The bass drum is post-processed by a
-  CEM3320 VCF with a hardcoded envelope, but all other voices lack a
-  reconstruction filter. The hat is post-processed by a CEM3360 VCA, which can
-  operate in 2 variations: slow decay (open hat) and faster, user-controlled
-  decay (closed hat). There's a single clock for all voices, which is tuned by
-  a trimmer on the circuit board.
+  CEM3320 VCF with a hardcoded envelope, the output of which is routed to the
+  mixer and an individual output jack. The rest of the voices are sent to the
+  mixer unfiltered, but their individual outputs have a ~15.9KHz RC LPF. The hat
+  is post-processed by a CEM3360 VCA, which can operate in 2 variations: slow
+  decay (open hat) and faster, user-controlled decay (closed hat). There's a
+  single clock for all voices, which is tuned by a trimmer on the circuit board.
 
 * The "snare / sidestick" section consists of a single voice core (and single
   DAC) which can either play the sidestick, or the snare voice (4K samples
@@ -57,15 +58,10 @@ There are multiple voice architectures:
 The driver is based on the LinnDrum's service manual and schematics, and is
 intended as an educational tool.
 
-Most of the digital functionality is emulated. Audio is partially emulated.
-
 Reasons for MACHINE_IMPERFECT_SOUND:
 * Missing a few sample checksums.
 * Missing bass drum LPF and filter envelope.
-* Missing snare / sidestick volume envelope.
 * Missing tom / conga LPF and filter envelope.
-* Inaccurate filter for "click".
-* Linear, instead of audio-taper volume sliders and master volume knob.
 * Linear, instead of tanh response for hi-hat VCA.
 
 PCBoards:
@@ -97,10 +93,13 @@ Example:
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "sound/dac76.h"
+#include "sound/flt_biquad.h"
 #include "sound/flt_rc.h"
 #include "sound/flt_vol.h"
 #include "sound/mixer.h"
 #include "sound/spkrdev.h"
+#include "sound/va_eg.h"
+#include "sound/va_vca.h"
 #include "speaker.h"
 
 #include "linn_linndrum.lh"
@@ -113,7 +112,7 @@ Example:
 #define LOG_TAPE_SYNC_ENABLE (1U << 6)
 #define LOG_MIX              (1U << 7)
 #define LOG_PITCH            (1U << 8)
-#define LOG_HAT_VCA          (1U << 9)
+#define LOG_HAT_EG           (1U << 9)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -182,156 +181,6 @@ enum mixer_channels
 
 }  // anonymous namespace
 
-// This device combines the CEM3360 and its envelope generator (EG) that process
-// the hi-hat voice.
-// TODO: Look into implementing the CEM3360 and a generic EG as devices under
-// src/devices/sound.
-class linndrum_hat_vca_device : public device_t, public device_sound_interface
-{
-public:
-	linndrum_hat_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
-
-	void trigger();
-	void set_open(bool open_hat);
-
-protected:
-	void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	void device_start() override ATTR_COLD;
-	void device_reset() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
-private:
-	static float get_cem3360_gain(float cv);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(trigger_timer_tick);
-
-	static constexpr const float C22 = CAP_U(1);
-	static constexpr const float R33 = RES_M(1);
-	static constexpr const float R34 = RES_K(10);
-	static constexpr const float DECAY_POT_R_MAX = RES_K(100);
-
-	sound_stream *m_stream = nullptr;
-
-	required_ioport m_decay_pot;
-	required_device<timer_device> m_trigger_timer;  // U37B (LM556).
-
-	float m_rc_inv = 1.0F / (R33 * C22);
-	bool m_decaying = true;
-	bool m_decay_done = true;
-	attotime m_decay_start_time;
-};
-
-DEFINE_DEVICE_TYPE(LINNDRUM_HAT_VCA, linndrum_hat_vca_device, "linndrum_hat_vca", "LinnDrum CEM3360 VCA and EG");
-
-linndrum_hat_vca_device::linndrum_hat_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LINNDRUM_HAT_VCA, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_decay_pot(*this, ":pot_tuning_7")
-	, m_trigger_timer(*this, "hat_trigger_timer")
-{
-}
-
-void linndrum_hat_vca_device::trigger()
-{
-	m_stream->update();
-	m_decaying = false;
-	m_decay_done = false;
-	m_trigger_timer->adjust(PERIOD_OF_555_MONOSTABLE(RES_K(510), CAP_U(0.01)));  // R8, C4.
-	LOGMASKED(LOG_HAT_VCA, "Hat VCA trigerred.\n");
-}
-
-void linndrum_hat_vca_device::set_open(bool open_hat)
-{
-	// The envelope generator can run in two different modes.
-	// - Open hat: the capacitor is discharged through a 1M resistor.
-	// - Closed hat: U90 (CD4053 MUX) adds a parallel discharge path through the
-	//   "hihat decay" knob.
-	m_stream->update();
-	float r = R33;
-	if (!open_hat)
-	{
-		const float r_decay = DECAY_POT_R_MAX * m_decay_pot->read() / 100.0F;
-		r = RES_2_PARALLEL(R33, R34 + r_decay);
-	}
-	m_rc_inv = 1.0F / (r * C22);
-	LOGMASKED(LOG_HAT_VCA, "Hat decay. Open: %d, r: %g\n", open_hat, r);
-}
-
-void linndrum_hat_vca_device::device_add_mconfig(machine_config &config)
-{
-	TIMER(config, m_trigger_timer).configure_generic(FUNC(linndrum_hat_vca_device::trigger_timer_tick));
-}
-
-void linndrum_hat_vca_device::device_start()
-{
-	m_stream = stream_alloc(1, 1, machine().sample_rate());
-	save_item(NAME(m_rc_inv));
-	save_item(NAME(m_decaying));
-	save_item(NAME(m_decay_done));
-	save_item(NAME(m_decay_start_time));
-}
-
-void linndrum_hat_vca_device::device_reset()
-{
-	set_open(false);
-}
-
-void linndrum_hat_vca_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
-{
-	static constexpr const float MIN_GAIN = 0.0001F; // A gain lower than this will be treated as 0.
-	static constexpr const float MAX_EG_CV = 5;
-	static constexpr const float CV_SCALE = RES_VOLTAGE_DIVIDER(RES_K(8.2), RES_K(10));  // R67, R66.
-
-	assert(inputs.size() == 1 && outputs.size() == 1);
-	const read_stream_view &in = inputs[0];
-	write_stream_view &out = outputs[0];
-
-	if (m_decay_done)
-	{
-		out.fill(0);
-		return;
-	}
-
-	const int n = in.samples();
-	if (!m_decaying)
-	{
-		const float gain = get_cem3360_gain(MAX_EG_CV * CV_SCALE);
-		for (int i = 0; i < n; ++i)
-			out.put(i, gain * in.get(i));
-		return;
-	}
-
-	attotime t = in.start_time() - m_decay_start_time;
-	assert(t >= attotime::from_double(0));
-	float gain = 0;
-	for (int i = 0; i < n; ++i, t += in.sample_period())
-	{
-		// TODO: The CEM3360 is based on an OTA, which means it likely has a
-		// tanh, rather than a linear response. But this needs more research.
-		const float decay = expf(-t.as_double() * m_rc_inv);
-		gain = get_cem3360_gain(decay * MAX_EG_CV * CV_SCALE);
-		out.put(i, gain * in.get(i));
-	}
-
-	if (gain < MIN_GAIN)
-		m_decay_done = true;
-}
-
-float linndrum_hat_vca_device::get_cem3360_gain(float cv)
-{
-	// Typical linear CV for max gain, as reported on the CEM3360 datasheet.
-	static constexpr const float MAX_GAIN_CV = 1.93F;
-	return std::clamp<float>(cv / MAX_GAIN_CV, 0, 1);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(linndrum_hat_vca_device::trigger_timer_tick)
-{
-	m_stream->update();
-	m_decaying = true;
-	m_decay_done = false;
-	m_decay_start_time = machine().time();
-	LOGMASKED(LOG_HAT_VCA, "Hat VCA started decay.\n");
-}
 
 class linndrum_audio_device : public device_t
 {
@@ -349,6 +198,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(mux_drum_tuning_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(snare_tuning_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(tom_tuning_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(hat_decay_changed);
 
 protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -357,10 +207,10 @@ protected:
 
 private:
 	static void write_dac(dac76_device& dac, u8 sample);
-	static float get_dac_scaler(float iref);
 	static s32 get_ls267_freq(const std::array<s32, 2>& freq_range_hz, float cv);
 	static float get_snare_tom_pitch_cv(float v);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(hat_trigger_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(mux_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(snare_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(click_timer_tick);
@@ -371,14 +221,20 @@ private:
 	void update_mux_drum_pitch();
 	void update_snare_pitch();
 	void update_tom_pitch();
+	void update_hat_decay();
 
 	// Mux drums.
 	required_ioport m_mux_tuning_trimmer;
+	required_ioport m_hat_decay_pot;
 	required_memory_region_array<NUM_MUX_VOICES> m_mux_samples;
 	required_device<timer_device> m_mux_timer;  // 74LS627 (U77A).
 	required_device_array<dac76_device, NUM_MUX_VOICES> m_mux_dac;  // AM6070 (U88).
 	required_device_array<filter_volume_device, NUM_MUX_VOICES> m_mux_volume;  // CD4053 (U90), R60, R62.
-	required_device<linndrum_hat_vca_device> m_hat_vca;
+	required_device<timer_device> m_hat_trigger_timer;  // U37B (LM556).
+	required_device<va_rc_eg_device> m_hat_eg;
+	required_device<va_vca_device> m_hat_vca;  // CEM3360 (U91B).
+	bool m_hat_open = false;
+	bool m_hat_triggered = false;
 	std::array<bool, NUM_MUX_VOICES> m_mux_counting = { false, false, false, false, false, false, false, false };
 	std::array<u16, NUM_MUX_VOICES> m_mux_counters = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -387,7 +243,6 @@ private:
 	required_memory_region m_sidestick_samples;  // 2732 ROMs (U78).
 	required_device<timer_device> m_snare_timer;  // 74L627 (U80A).
 	required_device<dac76_device> m_snare_dac;  // AM6070 (U92).
-	required_device<filter_volume_device> m_snare_volume;  // R69, R72, R71, R70.
 	required_device<filter_volume_device> m_snare_out;  // U90A (CD4053) pin 12 (ax).
 	required_device<filter_volume_device> m_sidestick_out;  // U90A (CD4053) pin 13 (ay).
 	required_device<timer_device> m_click_timer;  // 556 (U65A).
@@ -413,11 +268,11 @@ private:
 	required_ioport_array<NUM_MIXER_CHANNELS> m_volume;
 	required_ioport_array<NUM_MIXER_CHANNELS> m_pan;
 	required_ioport m_master_volume;
-	required_device_array<filter_rc_device, NUM_MIXER_CHANNELS> m_voice_hpf;
+	required_device_array<filter_rc_device, NUM_MIXER_CHANNELS - 1> m_voice_hpf;
+	required_device<filter_biquad_device> m_click_bpf;
 	required_device<mixer_device> m_left_mixer;  // 4558 op-amp (U1A).
 	required_device<mixer_device> m_right_mixer;  // 4558 op-amp (U1B).
-	required_device<speaker_device> m_left_out;  // 4558 op-amp (U2A).
-	required_device<speaker_device> m_right_out;  // 4558 op-amp (U2B).
+	required_device<speaker_device> m_out;        // 4558 op-amp (U2A, U2B).
 
 	static constexpr const float MIXER_R_PRE_FADER[NUM_MIXER_CHANNELS] =
 	{
@@ -436,19 +291,30 @@ private:
 		RES_R(0),    // low conga
 		RES_K(5.1),  // cowbell
 		RES_K(2.4),  // clap
-		RES_K(0),    // click
+		RES_R(0),    // click
 	};
 
 	static constexpr const float MIXER_R_FEEDBACK = RES_K(33);
-	static constexpr const float MIXER_R_BEEP = RES_K(510);
+	static constexpr const float MIXER_R_BEEP = RES_K(510);  // Same value for left and right.
 	static constexpr const float OUTPUT_R_INPUT = RES_K(10);  // Input resistor of output stage opamp.
 	static constexpr const float OUTPUT_R_FEEDBACK = RES_K(10);
 	static constexpr const float OUTPUT_C_FEEDBACK = CAP_P(1000);
+	static constexpr const float R_ON_CD4053 = RES_R(125);  // Typical Ron resistance for 15V supply (-7.5V / 7.5V).
 
 	static constexpr const float VPLUS = 15;  // Volts.
 	static constexpr const float VCC = 5;  // Volts.
 	static constexpr const float MUX_DAC_IREF = VPLUS / (RES_K(15) + RES_K(15));  // R55 + R57.
 	static constexpr const float TOM_DAC_IREF = MUX_DAC_IREF;  // Configured in the same way.
+	// All DAC current-to-voltage converter resistors, for both positive and
+	// negative values, are 2.49 KOhm.
+	static constexpr const float R_DAC_I2V = RES_K(2.49);  // R58, R59, R127, R126, tom DAC I2V (missing designation).
+
+	// Constants for hi hat envelope generator circuit.
+	static constexpr const float HAT_C22 = CAP_U(1);
+	static constexpr const float HAT_R33 = RES_M(1);
+	static constexpr const float HAT_R34 = RES_K(10);
+	static constexpr const float HAT_DECAY_POT_R_MAX = RES_K(100);
+	static constexpr const float HAT_EG2CV_SCALER = RES_VOLTAGE_DIVIDER(RES_K(8.2), RES_K(10));  // R67, R66.
 
 	// The audio pipeline operates on voltage magnitudes. This scaler normalizes
 	// the final output's range to approximately: -1 - 1.
@@ -486,16 +352,18 @@ DEFINE_DEVICE_TYPE(LINNDRUM_AUDIO, linndrum_audio_device, "linndrum_audio_device
 linndrum_audio_device::linndrum_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, LINNDRUM_AUDIO, tag, owner, clock)
 	, m_mux_tuning_trimmer(*this, ":pot_mux_tuning")
+	, m_hat_decay_pot(*this, ":pot_hihat_decay")
 	, m_mux_samples(*this, ":sample_mux_drum_%u", 0)
 	, m_mux_timer(*this, "mux_drum_timer")
 	, m_mux_dac(*this, "mux_drums_virtual_dac_%u", 1)
 	, m_mux_volume(*this, "mux_drums_volume_control_%u", 1)
+	, m_hat_trigger_timer(*this, "hat_trigger_timer")
+	, m_hat_eg(*this, "hat_eg")
 	, m_hat_vca(*this, "hat_vca")
 	, m_snare_samples(*this, ":sample_snare")
 	, m_sidestick_samples(*this, ":sample_sidestick")
 	, m_snare_timer(*this, "snare_sidestick_timer")
 	, m_snare_dac(*this, "snare_sidestick_dac")
-	, m_snare_volume(*this, "snare_sidestick_volume")
 	, m_snare_out(*this, "snare_output")
 	, m_sidestick_out(*this, "sidestick_output")
 	, m_click_timer(*this, "click_timer")
@@ -511,10 +379,10 @@ linndrum_audio_device::linndrum_audio_device(const machine_config &mconfig, cons
 	, m_pan(*this, ":pot_pan_%u", 1)
 	, m_master_volume(*this, ":pot_volume")
 	, m_voice_hpf(*this, "voice_hpf_%u", 1)
+	, m_click_bpf(*this, "click_bpf")
 	, m_left_mixer(*this, "lmixer")
 	, m_right_mixer(*this, "rmixer")
-	, m_left_out(*this, "lspeaker")
-	, m_right_out(*this, "rspeaker")
+	, m_out(*this, "speaker")
 {
 }
 
@@ -532,15 +400,18 @@ void linndrum_audio_device::mux_drum_w(int voice, u8 data, bool is_strobe)
 	// remain unchanged, or it will get attenuated by a voltage divider.
 	// The MUX is always configured in the "no attenuation" mode for the clap
 	// and cowbell voices.
-	static constexpr const float ATTENUATION = RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(3.3));  // R60, R62.
+	static constexpr const float ATTENUATION = RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(3.3) + R_ON_CD4053);  // R60, R62.
 	const bool attenuate = !BIT(data, 1) && voice != MV_CLAP && voice != MV_COWBELL;
 	m_mux_volume[voice]->set_gain(attenuate ? ATTENUATION : 1);
 
 	if (voice == MV_HAT)
 	{
-		m_hat_vca->set_open(BIT(data, 2));
+		m_hat_open = BIT(data, 2);
+		m_hat_triggered = is_strobe;
+		update_hat_decay();
 		if (is_strobe)
-			m_hat_vca->trigger();
+			m_hat_trigger_timer->adjust(PERIOD_OF_555_MONOSTABLE(RES_K(510), CAP_U(0.01)));  // R8, C4.
+		LOGMASKED(LOG_HAT_EG, "Hat EG write: %x, %d.\n", data, is_strobe);
 	}
 
 	LOGMASKED(LOG_STROBES, "Strobed mux drum %s: %02x (gain: %f)\n",
@@ -572,6 +443,10 @@ void linndrum_audio_device::snare_w(u8 data)
 	// the DAC. Bits D2 and D3 from the voice data bus (latched by U42, 74LS74)
 	// control the voltage at the end of R72 and R71.
 
+	// While there is a capacitor (C29, 0.01 UF) attached to the DAC's Iref
+	// input, it is too small to have a musical effect. Changes in current will
+	// stablizie within 0.1 ms, and such changes only happen at voice trigger.
+
 	static constexpr const float R0 = RES_K(3.3);  // R70.
 	static constexpr const float R1 = RES_K(380);  // R69.
 	static constexpr const float R2 = RES_K(22);   // R72.
@@ -586,12 +461,9 @@ void linndrum_audio_device::snare_w(u8 data)
 	const float v2 = BIT(data, 2) ? VCC : 0;
 	const float v3 = BIT(data, 3) ? VCC : 0;
 	const float iref = (a * VPLUS + b * v2 + c * v3) / (R0 * (a + b + c + d));
+	m_snare_dac->set_fixed_iref(iref);
 
-	const float gain = get_dac_scaler(iref);
-	m_snare_volume->set_gain(gain);
-
-	LOGMASKED(LOG_STROBES, "Strobed snare / sidestick: %02x (iref: %f, gain: %f)\n",
-			  data, iref, gain);
+	LOGMASKED(LOG_STROBES, "Strobed snare / sidestick: %02x (iref: %f)\n", data, iref);
 }
 
 void linndrum_audio_device::tom_w(u8 data)
@@ -639,9 +511,7 @@ void linndrum_audio_device::tom_w(u8 data)
 
 void linndrum_audio_device::strobe_click_w(u8 /*data*/)
 {
-	static constexpr const float R10 = RES_K(100);
-	static constexpr const float C12 = CAP_U(0.01);
-	m_click_timer->adjust(PERIOD_OF_555_MONOSTABLE(R10, C12));
+	m_click_timer->adjust(PERIOD_OF_555_MONOSTABLE(RES_K(100), CAP_U(0.01)));  // R10, C12.
 	m_click->level_w(1);
 	LOGMASKED(LOG_STROBES, "Strobed click.\n");
 }
@@ -678,6 +548,11 @@ DECLARE_INPUT_CHANGED_MEMBER(linndrum_audio_device::tom_tuning_changed)
 	update_tom_pitch();
 }
 
+DECLARE_INPUT_CHANGED_MEMBER(linndrum_audio_device::hat_decay_changed)
+{
+	update_hat_decay();
+}
+
 void linndrum_audio_device::device_add_mconfig(machine_config &config)
 {
 	// *** Mux drums section.
@@ -693,28 +568,31 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	for (int voice = 0; voice < NUM_MUX_VOICES; ++voice)
 	{
 		DAC76(config, m_mux_dac[voice], 0);  // AM6070 (U88).
+		m_mux_dac[voice]->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);  // R58, R59.
+		m_mux_dac[voice]->set_fixed_iref(MUX_DAC_IREF);
 		FILTER_VOLUME(config, m_mux_volume[voice]);  // CD4053 (U90), R60, R62 (see mux_drum_w()).
-		m_mux_dac[voice]->add_route(0, m_mux_volume[voice], get_dac_scaler(MUX_DAC_IREF));
+		m_mux_dac[voice]->add_route(0, m_mux_volume[voice], 1.0);
 	}
 
-	LINNDRUM_HAT_VCA(config, m_hat_vca);
-	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0);
+	TIMER(config, m_hat_trigger_timer).configure_generic(FUNC(linndrum_audio_device::hat_trigger_timer_tick));  // LM556 (U37B).
+	VA_RC_EG(config, m_hat_eg).set_c(HAT_C22);
+	VA_VCA(config, m_hat_vca).configure_cem3360_linear_cv();
+	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0, 0);
+	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER, 1);
 
 	// *** Snare / sidestick section.
 
 	TIMER(config, m_snare_timer).configure_generic(FUNC(linndrum_audio_device::snare_timer_tick));  // 74LS627 (U80A).
 	DAC76(config, m_snare_dac, 0);  // AM6070 (U92)
-	FILTER_VOLUME(config, m_snare_volume);  // See snare_w().
-	// DAC output scaling is incorporated in m_snare_volume's gain.
-	m_snare_dac->add_route(0, m_snare_volume, 1.0);
+	m_snare_dac->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);  // R127, R126.
 
 	// The DAC's current outputs are processed by a current-to-voltage converter
 	// that embeds an RC filter. This consists of an op-amp (U103), R127 and C65
 	// (for positive voltages), and R126 and C31 (for negative voltages). The
 	// two resistors and capacitors have the same value.
 	auto &snare_dac_filter = FILTER_RC(config, "snare_sidestick_dac_filter");
-	snare_dac_filter.set_lowpass(RES_K(2.49), CAP_P(2700));  // R127-C65, R126-C31. Cutoff: ~23.7KHz.
-	m_snare_volume->add_route(0, snare_dac_filter, 1.0);
+	snare_dac_filter.set_lowpass(R_DAC_I2V, CAP_P(2700));  // R127-C65, R126-C31. Cutoff: ~23.7KHz.
+	m_snare_dac->add_route(0, snare_dac_filter, 1.0);
 
 	FILTER_VOLUME(config, m_snare_out);
 	FILTER_VOLUME(config, m_sidestick_out);
@@ -730,14 +608,17 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, m_tom_timer).configure_generic(FUNC(linndrum_audio_device::tom_timer_tick));  // 74LS627 (U77B).
 	DAC76(config, m_tom_dac, 0);  // AM6070 (U82).
+	// Schematic is missing the second resistor, but that's almost certainly an error.
+	// It is also missing component designations.
+	m_tom_dac->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);
+	m_tom_dac->set_fixed_iref(TOM_DAC_IREF);
 	for (int i = 0; i < NUM_TOM_VOICES; ++i)
 	{
 		FILTER_VOLUME(config, m_tom_out[i]);  // One of U87'S (CD4051) outputs.
-		m_tom_dac->add_route(0, m_tom_out[i], get_dac_scaler(TOM_DAC_IREF));
+		m_tom_dac->add_route(0, m_tom_out[i], 1.0);
 	}
 
 	// *** Mixer.
-
 	const std::array<device_sound_interface *, NUM_MIXER_CHANNELS> voice_outputs =
 	{
 		m_mux_volume[MV_BASS],
@@ -760,7 +641,9 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 
 	MIXER(config, m_left_mixer);  // U1A
 	MIXER(config, m_right_mixer);  // U1B
-	for (int i = 0; i < voice_outputs.size(); ++i)
+
+	assert(voice_outputs.size() - 1 == MIX_CLICK);
+	for (int i = 0; i < voice_outputs.size() - 1; ++i)  // Skip "click".
 	{
 		// The filter and gain will be configured in update_volume_and_pan().
 		FILTER_RC(config, m_voice_hpf[i]);
@@ -768,6 +651,11 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 		m_voice_hpf[i]->add_route(0, m_left_mixer, 1.0);
 		m_voice_hpf[i]->add_route(0, m_right_mixer, 1.0);
 	}
+
+	FILTER_BIQUAD(config, m_click_bpf);  // Configured in update_volume_and_pan().
+	voice_outputs[MIX_CLICK]->add_route(0, m_click_bpf, 1.0);
+	m_click_bpf->add_route(0, m_left_mixer, 1.0);
+	m_click_bpf->add_route(0, m_right_mixer, 1.0);
 
 	auto &beep_hpf = FILTER_RC(config, "beep_hpf");
 	const float rc_r = RES_2_PARALLEL(MIXER_R_BEEP, MIXER_R_BEEP);
@@ -786,15 +674,16 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	m_left_mixer->add_route(0, left_rc, 1.0);
 	m_right_mixer->add_route(0, right_rc, 1.0);
 
-	SPEAKER(config, m_left_out).front_left();
-	SPEAKER(config, m_right_out).front_right();
+	SPEAKER(config, m_out, 2).front();
 	// Gain will be set in update_master_volume().
-	left_rc.add_route(0, m_left_out, 1.0);
-	right_rc.add_route(0, m_right_out, 1.0);
+	left_rc.add_route(0, m_out, 1.0, 0);
+	right_rc.add_route(0, m_out, 1.0, 1);
 }
 
 void linndrum_audio_device::device_start()
 {
+	save_item(NAME(m_hat_open));
+	save_item(NAME(m_hat_triggered));
 	save_item(NAME(m_mux_counting));
 	save_item(NAME(m_mux_counters));
 	save_item(NAME(m_snare_counting));
@@ -814,6 +703,7 @@ void linndrum_audio_device::device_reset()
 	update_mux_drum_pitch();
 	update_snare_pitch();
 	update_tom_pitch();
+	update_hat_decay();
 }
 
 void linndrum_audio_device::write_dac(dac76_device &dac, u8 sample)
@@ -827,20 +717,6 @@ void linndrum_audio_device::write_dac(dac76_device &dac, u8 sample)
 	dac.b5_w(BIT(sample, 2));
 	dac.b6_w(BIT(sample, 1));
 	dac.b7_w(BIT(sample, 0));
-}
-
-float linndrum_audio_device::get_dac_scaler(float iref)
-{
-	// Given the reference current into the DAC, computes the scaler that needs
-	// to be applied to the dac76_device output, to convert it to a voltage.
-
-	// The maximum output current on each of the "+" and "-" outputs of the
-	// AM6070 is `3.8 * Iref`, according to the datasheet.
-	// That current gets converted to a voltage by an op-amp configured as
-	// a current-to-voltage converter (I2V). All I2Vs on the LinnDrum use
-	// 2.49K resistors for both the "+" and "-" current outputs of the DAC.
-
-	return 3.8F * iref * float(RES_K(2.49));
 }
 
 s32 linndrum_audio_device::get_ls267_freq(const std::array<s32, 2>& freq_range, float cv)
@@ -877,6 +753,13 @@ float linndrum_audio_device::get_snare_tom_pitch_cv(float v_tune)
 
 	// There are clamping diodes attached to the CV input.
 	return std::clamp<float>(cv, 0, VCC);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::hat_trigger_timer_tick)
+{
+	m_hat_triggered = false;
+	update_hat_decay();
+	LOGMASKED(LOG_HAT_EG, "Hat EG started decay.\n");
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::mux_timer_tick)
@@ -977,11 +860,12 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 	// Since we are interested in voltage gain, rather than actual voltage,
 	// use 1V as the voice's output.
 	static constexpr const float V_VOICE = 1;
-	// DC-blocking capacitor. Same value for all voice outputs.
+	// DC-blocking capacitor. Same value for all voice outputs except for the
+	// "click" and "beep" sounds.
 	static constexpr const float C_VOICE = CAP_U(10);
 
 	const s32 volume = m_volume[channel]->read();
-	const float r_vol_bottom = volume * R_VOL_MAX / 100.0F;
+	const float r_vol_bottom = R_VOL_MAX * RES_AUDIO_POT_LAW(volume / 100.0F);
 	const float r_vol_top = R_VOL_MAX - r_vol_bottom;
 	const float r_pan_left = m_pan[channel]->read() * R_PAN_MAX / 100.0F;
 	const float r_pan_right = R_PAN_MAX - r_pan_left;
@@ -990,8 +874,9 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 	const float r_right_gnd = R1 + RES_2_PARALLEL(r_pan_right, R3);
 	const float r_left_gnd = R2 + RES_2_PARALLEL(r_pan_left, R4);
 
-	// Resistance to ground as seen from the voice's output.
-	const float r_voice_gnd = r0 + RES_3_PARALLEL(r_vol_bottom, r_left_gnd, r_right_gnd);
+	// Resistance to ground as seen from the volume pot's wiper and the voice's output.
+	const float r_wiper_gnd = RES_3_PARALLEL(r_vol_bottom, r_left_gnd, r_right_gnd);
+	const float r_voice_gnd = r0 + r_wiper_gnd;
 
 	float gain_left = 0;
 	float gain_right = 0;
@@ -1014,21 +899,78 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 		gain_left = v_input_left * MIXER_R_FEEDBACK / R4;
 	}
 
-	// Using -gain_*, because the summing op-amps are inverting.
-	m_left_mixer->set_input_gain(channel, -gain_left);
-	m_right_mixer->set_input_gain(channel, -gain_right);
-	m_voice_hpf[channel]->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_voice_gnd, 0, 0, C_VOICE);
+	device_sound_interface *mixer_input = nullptr;
+	if (channel == MIX_CLICK)
+		mixer_input = m_click_bpf;
+	else
+		mixer_input = m_voice_hpf[channel];
 
-	LOGMASKED(LOG_MIX, "Gain update for %s - left: %f, right: %f, HPF cutoff: %.2f Hz\n",
-			  MIXER_CHANNEL_NAMES[channel], gain_left, gain_right,
-			  1.0F / (2 * float(M_PI) * r_voice_gnd * C_VOICE));
+	// Using -gain_*, because the summing op-amps are inverting.
+	mixer_input->set_route_gain(0, m_left_mixer, 0, -gain_left);
+	mixer_input->set_route_gain(0, m_right_mixer, 0, -gain_right);
+	LOGMASKED(LOG_MIX, "Gain update for %s - left: %f, right: %f\n",
+			  MIXER_CHANNEL_NAMES[channel], gain_left, gain_right);
+
+	if (channel == MIX_CLICK)
+	{
+		// Compared to the other voices, the click uses a different value for
+		// the DC blocking capacitor. Furthermore, there is a capacitor to ground
+		// at the volume pot wiper. The resulting filter acts as an HPF (cutoff:
+		// ~1.15 KHz) when the click volume is at max, and becomes a BPF whose
+		// characteristics change as the volume decreases.
+
+		// Capacitor at the output of the 556 timer.
+		static constexpr const float C_CLICK_DCBLOCK = CAP_U(0.01);  // C37
+		// Capacitor to ground, at the wiper of the "click" volume fader.
+		static constexpr const float C_CLICK_WIPER = CAP_U(0.047);  // No designation.
+
+		// All "click" filter configurations result in singificant attenutation
+		// (< 0.2x), which makes the click very quiet. The filter characteristics
+		// (gain and Fc) have been verified with simulations. So it is possible
+		// there is an error in the schematic. Different capacitor values, or a
+		// supply of 15V (instead of the stated 5V) for the 556 timer generating
+		// the click could explain this.
+		// For now, scale by some number to match the volume of other voices.
+		static constexpr const float CLICK_GAIN_CORRECTION = 5;
+
+		if (volume >= 100)
+		{
+			// HPF transfer function: H(s) = (g * s) / (s + w) where
+			//   g = C1 / (C1 + C2)
+			//   w = 1 / (R * (C1 + C2))
+			const float fc = 1.0F / (2 * float(M_PI) * r_voice_gnd * (C_CLICK_DCBLOCK + C_CLICK_WIPER));
+			const float gain = C_CLICK_DCBLOCK / (C_CLICK_DCBLOCK + C_CLICK_WIPER);
+			m_click_bpf->modify(filter_biquad_device::biquad_type::HIGHPASS1P1Z, fc, 1, gain * CLICK_GAIN_CORRECTION);
+			LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz, Gain: %.3f\n", fc, gain);
+		}
+		else if (volume > 0)
+		{
+			filter_biquad_device::biquad_params p = m_click_bpf->rc_rr_bandpass_calc(r0, r_wiper_gnd, C_CLICK_DCBLOCK, C_CLICK_WIPER);
+			// The filter params above include the effect of the volume
+			// potentiometer. But `gain_left` and `gain_right` already incorporate
+			// that effect. So it needs to be undone from the filter's gain.
+			p.gain /= RES_VOLTAGE_DIVIDER(r0, r_wiper_gnd);
+			// See comments for CLICK_GAIN_CORRECTION.
+			p.gain *= CLICK_GAIN_CORRECTION;
+			m_click_bpf->modify(p);
+			LOGMASKED(LOG_MIX, "- BPF cutoff: %.2f Hz, Q: %.3f, Gain: %.3f\n", p.fc, p.q, p.gain);
+		}
+		// Else, if the volume is 0, don't change the BPF's configuration to avoid divisions by 0.
+	}
+	else
+	{
+		// The rest of the voices just have a DC-blocking filter. Its exact cutoff
+		// will depend on the volume and pan settings, but it won't be audible.
+		m_voice_hpf[channel]->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_voice_gnd, 0, 0, C_VOICE);
+		LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz\n", 1.0F / (2 * float(M_PI) * r_voice_gnd * C_VOICE));
+	}
 }
 
 void linndrum_audio_device::update_master_volume()
 {
 	static constexpr const float R_MASTER_VOLUME_MAX = RES_K(10);
 
-	const float r_pot_bottom = m_master_volume->read() * R_MASTER_VOLUME_MAX / 100.0F;
+	const float r_pot_bottom = R_MASTER_VOLUME_MAX * RES_AUDIO_POT_LAW(m_master_volume->read() / 100.0F);
 	const float r_pot_top = R_MASTER_VOLUME_MAX - r_pot_bottom;
 	const float v_input = RES_VOLTAGE_DIVIDER(r_pot_top, RES_2_PARALLEL(r_pot_bottom, OUTPUT_R_INPUT));
 
@@ -1036,8 +978,8 @@ void linndrum_audio_device::update_master_volume()
 	const float final_gain = gain * VOLTAGE_TO_SOUND_SCALER;
 
 	// Using -final_gain, because the output opamps (U2A, U2B) are inverting.
-	m_left_out->set_input_gain(0, -final_gain);
-	m_right_out->set_input_gain(0, -final_gain);
+	m_out->set_input_gain(0, -final_gain);
+	m_out->set_input_gain(1, -final_gain);
 
 	LOGMASKED(LOG_MIX, "Master volume updated. Gain: %f, final gain: %f\n", gain, final_gain);
 }
@@ -1120,6 +1062,31 @@ void linndrum_audio_device::update_tom_pitch()
 
 	LOGMASKED(LOG_PITCH, "Updated tom pitch: %d, %d. CV: %f, freq: %d\n",
 			  knob_index, knob_value, cv, freq);
+}
+
+void linndrum_audio_device::update_hat_decay()
+{
+	// When the hat is configed as "open", the EG will discharge through a 1M
+	// resistor. When the hat is "closed", a CD4053 will add a parallel
+	// discharge path through the "hihat decay" pot.
+	float eg_r = HAT_R33;
+	if (!m_hat_open)
+	{
+		const float r_decay_pot = HAT_DECAY_POT_R_MAX * m_hat_decay_pot->read() / 100.0F;
+		eg_r = RES_2_PARALLEL(HAT_R33, HAT_R34 + R_ON_CD4053 + r_decay_pot);
+	}
+	m_hat_eg->set_r(eg_r);
+
+	// When the hat is strobed, it will trigger a 556 (U37A) timer in monostable
+	// mode (see mux_drum_w()). The timer's output pin is connected to the EG
+	// capacitor via a diode, and will maintain that capacitor at VCC until the
+	// timer expires. At that point, the EG capacitor will discharge through eg_r.
+	if (m_hat_triggered)
+		m_hat_eg->set_instant_v(VCC);
+	else
+		m_hat_eg->set_target_v(0);
+
+	LOGMASKED(LOG_HAT_EG, "Hat decay. Open: %d, EG R: %f\n", m_hat_open, eg_r);
 }
 
 namespace {
@@ -1569,8 +1536,8 @@ INPUT_PORTS_START(linndrum)
 	PORT_ADJUSTER(52, "HI CONGAS TUNING") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::tom_tuning_changed), 0)
 	PORT_START("pot_tuning_6")
 	PORT_ADJUSTER(40, "LO CONGAS TUNING") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::tom_tuning_changed), 0)
-	PORT_START("pot_tuning_7")
-	PORT_ADJUSTER(50, "HIHAT DECAY")
+	PORT_START("pot_hihat_decay")
+	PORT_ADJUSTER(50, "HIHAT DECAY") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::hat_decay_changed), 0)
 
 	PORT_START("pot_pan_1")
 	PORT_ADJUSTER(50, "BASS PAN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_BASS)

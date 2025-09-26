@@ -14,7 +14,7 @@
 
    Copyright (c) 2004-2006 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
    Copyright (c) 2006-2012 Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2016-2024 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2022      Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2023-2024 Sony Corporation / Snild Dolkow <snild@sony.com>
    Licensed under the MIT license:
@@ -129,8 +129,10 @@ void _check_set_test_info(char const *function, char const *filename,
  * Prototypes for the actual implementation.
  */
 
-#  if defined(__GNUC__)
+#  if defined(__has_attribute)
+#    if __has_attribute(noreturn)
 __attribute__((noreturn))
+#    endif
 #  endif
 void
 _fail(const char *file, int line, const char *msg);

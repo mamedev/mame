@@ -73,7 +73,7 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	K05324X_CB_MEMBER(sprite_callback) { *priority = ~*color >> 4 & 2; }
+	K053244_CB_MEMBER(sprite_callback) { *priority = ~*color >> 4 & 2; }
 	virtual TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	void ccu_int_time_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -103,7 +103,7 @@ protected:
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_ttlrom;
 	required_device<hopper_device> m_hopper;
-	required_device<k05324x_device> m_k053245;
+	required_device<k053244_device> m_k053245;
 	required_device<k051649_device> m_k051649;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;
@@ -522,7 +522,7 @@ static INPUT_PORTS_START( waijockey )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_9C ) )
-	PORT_DIPSETTING(    0x06, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_10C ) )
 	PORT_DIPSETTING(    0x05, "1 Coin/11 Credits" )
 	PORT_DIPSETTING(    0x04, "1 Coin/12 Credits" )
 	PORT_DIPSETTING(    0x03, "1 Coin/13 Credits" )
@@ -635,11 +635,7 @@ void waijockey_state::waijockey(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(61.04);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(20));
-	m_screen->set_size(64*8, 33*8);
-	m_screen->set_visarea(0, 400-1, 0, 226-1);
-	m_screen->set_visarea_full();
+	m_screen->set_raw(32_MHz_XTAL/4, 512, 0, 400, 256, 0, 226); // from CRTC
 	m_screen->set_screen_update(FUNC(waijockey_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -648,7 +644,7 @@ void waijockey_state::waijockey(machine_config &config)
 
 	K053245(config, m_k053245, 0);
 	m_k053245->set_palette(m_palette);
-	m_k053245->set_offsets(-96, 16);
+	m_k053245->set_offsets(0, 16);
 	m_k053245->set_sprite_callback(FUNC(waijockey_state::sprite_callback));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
@@ -667,7 +663,7 @@ void quickpick5_state::quickpick5(machine_config &config)
 	waijockey(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quickpick5_state::quickpick5_main);
 
-	m_k053245->set_offsets(-(44+80), 20);
+	m_k053245->set_offsets(-28, 20);
 	m_screen->set_visarea(0, 384-1, 0, 232-1);
 }
 

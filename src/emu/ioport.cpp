@@ -126,6 +126,7 @@ const struct
 	{ INPUT_STRING_Coinage, "Coinage" },
 	{ INPUT_STRING_Coin_A, "Coin A" },
 	{ INPUT_STRING_Coin_B, "Coin B" },
+	{ INPUT_STRING_10C_1C, "10 Coins/1 Credit" },
 	{ INPUT_STRING_9C_1C, "9 Coins/1 Credit" },
 	{ INPUT_STRING_8C_1C, "8 Coins/1 Credit" },
 	{ INPUT_STRING_7C_1C, "7 Coins/1 Credit" },
@@ -134,8 +135,8 @@ const struct
 	{ INPUT_STRING_4C_1C, "4 Coins/1 Credit" },
 	{ INPUT_STRING_3C_1C, "3 Coins/1 Credit" },
 	{ INPUT_STRING_8C_3C, "8 Coins/3 Credits" },
-	{ INPUT_STRING_4C_2C, "4 Coins/2 Credits" },
 	{ INPUT_STRING_5C_2C, "5 Coins/2 Credits" },
+	{ INPUT_STRING_4C_2C, "4 Coins/2 Credits" },
 	{ INPUT_STRING_2C_1C, "2 Coins/1 Credit" },
 	{ INPUT_STRING_5C_3C, "5 Coins/3 Credits" },
 	{ INPUT_STRING_3C_2C, "3 Coins/2 Credits" },
@@ -162,6 +163,11 @@ const struct
 	{ INPUT_STRING_1C_7C, "1 Coin/7 Credits" },
 	{ INPUT_STRING_1C_8C, "1 Coin/8 Credits" },
 	{ INPUT_STRING_1C_9C, "1 Coin/9 Credits" },
+	{ INPUT_STRING_1C_10C, "1 Coin/10 Credits" },
+	{ INPUT_STRING_1C_20C, "1 Coin/20 Credits" },
+	{ INPUT_STRING_1C_25C, "1 Coin/25 Credits" },
+	{ INPUT_STRING_1C_50C, "1 Coin/50 Credits" },
+	{ INPUT_STRING_1C_100C, "1 Coin/100 Credits" },
 	{ INPUT_STRING_Free_Play, "Free Play" },
 	{ INPUT_STRING_Cabinet, "Cabinet" },
 	{ INPUT_STRING_Upright, "Upright" },
@@ -1864,18 +1870,6 @@ time_t ioport_manager::initialize()
 	init_autoselect_devices({ IPT_DIAL,        IPT_DIAL_V },                       OPTION_DIAL_DEVICE,       "dial");
 	init_autoselect_devices({ IPT_TRACKBALL_X, IPT_TRACKBALL_Y },                  OPTION_TRACKBALL_DEVICE,  "trackball");
 	init_autoselect_devices({ IPT_MOUSE_X,     IPT_MOUSE_Y },                      OPTION_MOUSE_DEVICE,      "mouse");
-
-	// look for 4-way diagonal joysticks and change the default map if we find any
-	const char *joystick_map_default = machine().options().joystick_map();
-	if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
-		for (auto &port : m_portlist)
-			for (ioport_field const &field : port.second->fields())
-				if (field.live().joystick != nullptr && field.rotated())
-				{
-					input_class_joystick &devclass = downcast<input_class_joystick &>(machine().input().device_class(DEVICE_CLASS_JOYSTICK));
-					devclass.set_global_joystick_map(input_class_joystick::map_4way_diagonal);
-					break;
-				}
 
 	// register callbacks for when we load configurations
 	machine().configuration().config_register(

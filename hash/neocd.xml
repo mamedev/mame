@@ -340,7 +340,8 @@ license:CC0-1.0
 		<year>2011</year>
 		<publisher>Neo Conception International</publisher>
 		<info name="alt_title" value="バンバン バスターズ"/>
-		<info name="language" value="English/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="Japanese" />
 		<info name="release" value="20111222" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

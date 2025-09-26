@@ -4,21 +4,38 @@
 /*
 Sega UFO Catcher on H8 based hardware
 
+UFO 7
 Stickers on PCB:
-
 GAME BD UCS
 834-14256
 S/NO. 103294
 
+UFO 7 MAX Edition
+Stickers on PCB:
+GAME BD UCM
+834-14426
+S/NO. xxxxxx
 
-REV.B
+UFO 7 Second
+Stickers on PCB:
+GAME BD USS
+834-14486
+S/NO. xxxxxx
 
+
+UFO 7 REV.B
 Chips on PCB:
-
 1x SEGA 315-5338A
 1x SEGA 315-5296
 1x H8/3007 2D3  HD6413007F20 JAPAN
 1x YAMAHA YM3438
+
+UFO 7 Second Rev.A
+Chips on PCB:
+1x SEGA 315-5338B
+1x SEGA 315-5296A
+1x H8/3007
+1x YAMAHA YM3438C-D
 */
 
 #include "emu.h"
@@ -133,4 +150,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2001, ufo7, 0, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20011112 in string in ROM
+GAME( 2001, ufo7,  0, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20011112 in string in ROM

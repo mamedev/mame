@@ -624,11 +624,10 @@ void jornada_state::jornada720(machine_config &config)
 
 	UDA1344(config, m_codec);
 	m_codec->l3_ack_out().set(m_companion, FUNC(sa1111_device::l3wd_in));
-	m_codec->add_route(0, "lspeaker", 0.5);
-	m_codec->add_route(1, "rspeaker", 0.5);
+	m_codec->add_route(0, "speaker", 0.5, 0);
+	m_codec->add_route(1, "speaker", 0.5, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SED1356(config, m_epson);
 	m_epson->set_screen("screen");

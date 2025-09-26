@@ -74,11 +74,6 @@ const char *_86f_format::extensions() const noexcept
 	return "86f";
 }
 
-bool _86f_format::supports_save() const noexcept
-{
-	return false;
-}
-
 int _86f_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[4];

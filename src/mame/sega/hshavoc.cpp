@@ -2,6 +2,11 @@
 // copyright-holders:David Haywood
 /*
 
+TODO: finish off & clean up decryption of program ROM
+      understand purpose of PIC and hook it up
+
+-----------------------------------
+
   High Seas Havoc
    (c)1993 Data East
 
@@ -38,7 +43,8 @@ help with figuring out the encryption on the coin-op parts of the program.
 
 
 #include "emu.h"
-#include "megadriv_acbl.h"
+
+#include "megadriv.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
@@ -49,18 +55,20 @@ help with figuring out the encryption on the coin-op parts of the program.
 
 namespace {
 
-class hshavoc_state : public md_boot_state
+class hshavoc_state : public md_ctrl_state
 {
 public:
 	hshavoc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: md_boot_state(mconfig, type, tag)
+		: md_ctrl_state(mconfig, type, tag)
 	{ }
 
 	void hshavoc(machine_config &config);
 
 	void init_hshavoc();
-};
 
+private:
+	void hshavoc_map(address_map &map) ATTR_COLD;
+};
 
 INPUT_PORTS_START( hshavoc )
 	PORT_START("IN0")   // 16 bit
@@ -115,9 +123,22 @@ INPUT_PORTS_START( hshavoc )
 INPUT_PORTS_END
 
 
+void hshavoc_state::hshavoc_map(address_map &map)
+{
+	megadriv_68k_base_map(map);
+
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x2023ff).ram();
+}
+
 void hshavoc_state::hshavoc(machine_config &config)
 {
-	md_bootleg(config);
+	md_ntsc(config);
+
+	ctrl1_3button(config);
+	ctrl2_3button(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hshavoc_state::hshavoc_map);
 
 	PIC16C55(config, "pic", 4'000'000); // clock unknown
 }

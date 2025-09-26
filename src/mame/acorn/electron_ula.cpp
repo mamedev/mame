@@ -218,19 +218,14 @@ void electron_ula_device::set_cpu_clock(offs_t offset)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void electron_ula_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void electron_ula_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
-	// if we're not enabled, just fill with 0
+	// if we're not enabled, just leave the default 0-fill
 	if (!m_sound_enable || m_sound_freq == 0)
-	{
-		buffer.fill(0);
 		return;
-	}
 
 	// fill in the sample
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		m_sound_incr -= m_sound_freq;
 		while (m_sound_incr < 0)
@@ -239,7 +234,7 @@ void electron_ula_device::sound_stream_update(sound_stream &stream, std::vector<
 			m_sound_signal = -m_sound_signal;
 		}
 
-		buffer.put(sampindex, m_sound_signal);
+		stream.put(0, sampindex, m_sound_signal);
 	}
 }
 

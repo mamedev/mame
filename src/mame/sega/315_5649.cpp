@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "315_5649.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 

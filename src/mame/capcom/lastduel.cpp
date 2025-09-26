@@ -23,8 +23,10 @@ To advance test mode screens:
 - Mad Gear / LED Storm: Press P1 button 1 and hold up
 
 TODO:
-- The seem to be minor priority issues in Mad Gear, but the game might just
+- There seem to be minor priority issues in Mad Gear, but the game might just
   be like that. The priority PROM is dumped but currently not used.
+- Verify lastduel clocks, XTALs on photos are the same as leds2011 PCB notes
+  below, so: 10MHz, 3.57MHz, 24MHz, CPU is MC68000P10.
 
 **************************************************************************
 
@@ -115,8 +117,6 @@ Notes:
       6116        - 2kx8 SRAM (DIP24)
       81301       - ? (SDIP28)
       29          - 63S141 bipolar PROM (DIP16)
-
-
 
 **************************************************************************/
 
@@ -479,14 +479,20 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(lastduel_state::lastduel_timer_cb)
+void lastduel_state::lastduel_interrupt(int state)
 {
-	m_maincpu->set_input_line(4, HOLD_LINE); /* Controls */
+	if (state)
+		m_maincpu->set_input_line(2, HOLD_LINE); // vblank
+	else
+		m_maincpu->set_input_line(4, HOLD_LINE); // controls
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(lastduel_state::madgear_timer_cb)
+void lastduel_state::madgear_interrupt(int state)
 {
-	m_maincpu->set_input_line(6, HOLD_LINE); /* Controls */
+	if (state)
+		m_maincpu->set_input_line(5, HOLD_LINE); // vblank
+	else
+		m_maincpu->set_input_line(6, HOLD_LINE); // controls
 }
 
 MACHINE_START_MEMBER(lastduel_state,lastduel)
@@ -506,36 +512,29 @@ MACHINE_START_MEMBER(lastduel_state,madgear)
 
 void lastduel_state::machine_reset()
 {
-	int i;
-
 	m_tilemap_priority = 0;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		m_vctrl[i] = 0;
 }
 
 void lastduel_state::lastduel(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000); // Unconfirmed - could be 8MHz
+	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastduel_state::lastduel_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lastduel_state::irq2_line_hold));
-	TIMER(config, "timer_irq").configure_periodic(FUNC(lastduel_state::lastduel_timer_cb), attotime::from_hz(120));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_raw(24_MHz_XTAL / 3, 512, 64, 448, 272, 8, 248);
 	screen.set_screen_update(FUNC(lastduel_state::screen_update_lastduel));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.screen_vblank().set(FUNC(lastduel_state::lastduel_interrupt));
+	screen.screen_vblank().append("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -550,36 +549,31 @@ void lastduel_state::lastduel(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(3'579'545)));
+	ym2203_device &ym1(YM2203(config, "ym1", 3.579545_MHz_XTAL));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	ym2203_device &ym2(YM2203(config, "ym2", XTAL(3'579'545)));
+	ym2203_device &ym2(YM2203(config, "ym2", 3.579545_MHz_XTAL));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 void lastduel_state::madgear(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(10'000'000));
+	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastduel_state::madgear_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lastduel_state::irq5_line_hold));
-	TIMER(config, "timer_irq").configure_periodic(FUNC(lastduel_state::madgear_timer_cb), attotime::from_hz(120));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::madgear_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(lastduel_state,madgear)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(57.4444);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_raw(24_MHz_XTAL / 3, 512, 64, 448, 272, 8, 248); // measured 57.4444Hz
 	screen.set_screen_update(FUNC(lastduel_state::screen_update_madgear));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.screen_vblank().set(FUNC(lastduel_state::madgear_interrupt));
+	screen.screen_vblank().append("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -594,14 +588,14 @@ void lastduel_state::madgear(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(3'579'545)));
+	ym2203_device &ym1(YM2203(config, "ym1", 3.579545_MHz_XTAL));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	ym2203_device &ym2(YM2203(config, "ym2", XTAL(3'579'545)));
+	ym2203_device &ym2(YM2203(config, "ym2", 3.579545_MHz_XTAL));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(10'000'000)/10, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki(OKIM6295(config, "oki", 10_MHz_XTAL / 10, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.98);
 }
 

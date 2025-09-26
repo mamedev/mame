@@ -713,6 +713,11 @@ uint32_t gba_state::gba_io_r(offs_t offset, uint32_t mem_mask)
 		case 0x0200/4:
 			retval = IE | (IF << 16);
 			break;
+		case 0x0204/4:
+			// TODO: bit 15 is CGB mode (from cart IN35, read only)
+			// not being writeable fixes hang in dkkswing later stages
+			retval = WAITCNT & 0x5fff;
+			break;
 		default:
 			if( ACCESSING_BITS_0_15 )
 			{
@@ -1455,16 +1460,15 @@ void gba_state::gbadv(machine_config &config)
 	lcd.dma_hblank_callback().set(FUNC(gba_state::dma_hblank_callback));
 	lcd.dma_vblank_callback().set(FUNC(gba_state::dma_vblank_callback));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	AGB_APU(config, m_gbsound, 4.194304_MHz_XTAL);
-	m_gbsound->add_route(0, "lspeaker", 0.5);
-	m_gbsound->add_route(1, "rspeaker", 0.5);
+	m_gbsound->add_route(0, "speaker", 0.5, 0);
+	m_gbsound->add_route(1, "speaker", 0.5, 1);
 
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldac[0], 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdac[0], 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldac[1], 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdac[1], 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
 
 }
 

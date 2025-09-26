@@ -143,7 +143,7 @@ void output_input(std::ostream &out, const ioport_list &portlist);
 void output_switches(std::ostream &out, const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag);
 void output_ports(std::ostream &out, const ioport_list &portlist);
 void output_adjusters(std::ostream &out, const ioport_list &portlist);
-void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect);
+void output_driver(std::ostream &out, game_driver const &driver, device_t::flags_type flags, device_t::feature_type unemulated, device_t::feature_type imperfect);
 void output_features(std::ostream &out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect);
 void output_images(std::ostream &out, device_t &device, const char *root_tag);
 void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
@@ -246,7 +246,6 @@ constexpr char f_dtd_string[] =
 		"\t\t\t\t<!ATTLIST control type CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST control player CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control buttons CDATA #IMPLIED>\n"
-		"\t\t\t\t<!ATTLIST control reqbuttons CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control minimum CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control maximum CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control sensitivity CDATA #IMPLIED>\n"
@@ -699,6 +698,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 
 	// allocate input ports and build overall emulation status
 	ioport_list portlist;
+	device_t::flags_type overall_flags(driver.type.emulation_flags());
 	device_t::feature_type overall_unemulated(driver.type.unemulated_features());
 	device_t::feature_type overall_imperfect(driver.type.imperfect_features());
 	{
@@ -706,6 +706,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 		for (device_t &device : iter)
 		{
 			portlist.append(device, errors);
+			overall_flags |= device.type().emulation_flags() & ~device_t::flags::NOT_WORKING;
 			overall_unemulated |= device.type().unemulated_features();
 			overall_imperfect |= device.type().imperfect_features();
 
@@ -791,7 +792,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	output_switches(out, portlist, "", IPT_CONFIG, "configuration", "conflocation", "confsetting");
 	output_ports(out, portlist);
 	output_adjusters(out, portlist);
-	output_driver(out, driver, overall_unemulated, overall_imperfect);
+	output_driver(out, driver, overall_flags, overall_unemulated, overall_imperfect);
 	output_features(out, driver.type, overall_unemulated, overall_imperfect);
 	output_images(out, config.root_device(), "");
 	output_slots(out, config, config.root_device(), "", devtypes);
@@ -1257,7 +1258,7 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 	// iterate over sound devices
 	for (device_sound_interface &sound : sound_interface_enumerator(device))
 	{
-		if (strcmp(sound.device().tag(), device.tag()) != 0 && sound.issound())
+		if (strcmp(sound.device().tag(), device.tag()) != 0)
 		{
 			std::string newtag(sound.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -1462,7 +1463,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		const char *    type;           // general type of input
 		int             player;         // player which the input belongs to
 		int             nbuttons;       // total number of buttons
-		int             reqbuttons;     // total number of non-optional buttons
 		uint32_t        maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
 		int             ways;           // directions for joystick
 		bool            analog;         // is analog input?
@@ -1685,8 +1685,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				}
 				control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = std::max(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
 				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-				if (!field.optional())
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				break;
 
 			// track maximum coin index
@@ -1711,8 +1709,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keypad";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-				if (!field.optional())
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				break;
 
 			case IPT_KEYBOARD:
@@ -1720,8 +1716,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keyboard";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-				if (!field.optional())
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				break;
 
 			// additional types
@@ -1740,8 +1734,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "mahjong";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-					if (!field.optional())
-						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				}
 				else if (field.type() > IPT_HANAFUDA_FIRST && field.type() < IPT_HANAFUDA_LAST)
 				{
@@ -1749,8 +1741,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "hanafuda";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-					if (!field.optional())
-						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				}
 				else if (field.type() > IPT_GAMBLING_FIRST && field.type() < IPT_GAMBLING_LAST)
 				{
@@ -1758,8 +1748,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "gambling";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-					if (!field.optional())
-						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				}
 				break;
 			}
@@ -1784,7 +1772,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	// Clean-up those entries, if any, where buttons were defined in a separate port than the actual controller they belong to.
 	// This is quite often the case, especially for arcades where controls can be easily mapped to separate input ports on PCB.
 	// If such situation would only happen for joystick, it would be possible to work it around by initializing differently
-	// ctrl_type above, but it is quite common among analog inputs as well (for instance, this is the tipical situation
+	// ctrl_type above, but it is quite common among analog inputs as well (for instance, this is the typical situation
 	// for lightguns) and therefore we really need this separate loop.
 	for (int i = 0; i < CTRL_PCOUNT; i++)
 	{
@@ -1793,7 +1781,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 			if (control_info[i * CTRL_COUNT].type != nullptr && control_info[i * CTRL_COUNT + j].type != nullptr && !fix_done)
 			{
 				control_info[i * CTRL_COUNT + j].nbuttons += control_info[i * CTRL_COUNT].nbuttons;
-				control_info[i * CTRL_COUNT + j].reqbuttons += control_info[i * CTRL_COUNT].reqbuttons;
 				control_info[i * CTRL_COUNT + j].maxbuttons = std::max(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
 
 				memset(&control_info[i * CTRL_COUNT], 0, sizeof(control_info[0]));
@@ -1826,11 +1813,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				if (nplayer > 1)
 					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
-				{
 					util::stream_format(out, " buttons=\"%u\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
-					if (elem.reqbuttons < elem.nbuttons)
-						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
-				}
 				if (elem.min != 0 || elem.max != 0)
 					util::stream_format(out, " minimum=\"%d\" maximum=\"%d\"", elem.min, elem.max);
 				if (elem.sensitivity != 0)
@@ -1852,11 +1835,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				if (nplayer > 1)
 					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
-				{
 					util::stream_format(out, " buttons=\"%u\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
-					if (elem.reqbuttons < elem.nbuttons)
-						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
-				}
 				for (int lp = 0; lp < 3 && elem.helper[lp] != 0; lp++)
 				{
 					const char *plural = (lp==2) ? "3" : (lp==1) ? "2" : "";
@@ -1998,7 +1977,12 @@ void output_adjusters(std::ostream &out, const ioport_list &portlist)
 //  output_driver - print driver status
 //-------------------------------------------------
 
-void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect)
+void output_driver(
+		std::ostream &out,
+		game_driver const &driver,
+		device_t::flags_type flags,
+		device_t::feature_type unemulated,
+		device_t::feature_type imperfect)
 {
 	out << "\t\t<driver";
 
@@ -2011,8 +1995,9 @@ void output_driver(std::ostream &out, game_driver const &driver, device_t::featu
 	emulation problems.
 	*/
 
-	u32 const flags = driver.flags;
-	bool const machine_preliminary(flags & (machine_flags::NOT_WORKING | machine_flags::MECHANICAL));
+	u32 const driver_flags = driver.flags;
+	bool const not_working(driver.type.emulation_flags() & device_t::flags::NOT_WORKING);
+	bool const machine_preliminary(not_working || (driver_flags & machine_flags::MECHANICAL));
 	bool const unemulated_preliminary(unemulated & (device_t::feature::PALETTE | device_t::feature::GRAPHICS | device_t::feature::SOUND | device_t::feature::KEYBOARD));
 	bool const imperfect_preliminary((unemulated | imperfect) & device_t::feature::PROTECTION);
 
@@ -2023,29 +2008,29 @@ void output_driver(std::ostream &out, game_driver const &driver, device_t::featu
 	else
 		out << " status=\"good\"";
 
-	if (flags & machine_flags::NOT_WORKING)
+	if (not_working)
 		out << " emulation=\"preliminary\"";
 	else
 		out << " emulation=\"good\"";
 
-	if (flags & machine_flags::NO_COCKTAIL)
+	if (driver_flags & machine_flags::NO_COCKTAIL)
 		out << " cocktail=\"preliminary\"";
 
-	if (flags & machine_flags::SUPPORTS_SAVE)
-		out << " savestate=\"supported\"";
-	else
+	if (flags & device_t::flags::SAVE_UNSUPPORTED)
 		out << " savestate=\"unsupported\"";
+	else
+		out << " savestate=\"supported\"";
 
-	if (flags & machine_flags::REQUIRES_ARTWORK)
+	if (driver_flags & machine_flags::REQUIRES_ARTWORK)
 		out << " requiresartwork=\"yes\"";
 
-	if (flags & machine_flags::UNOFFICIAL)
+	if (driver_flags & machine_flags::UNOFFICIAL)
 		out << " unofficial=\"yes\"";
 
-	if (flags & machine_flags::NO_SOUND_HW)
+	if (driver_flags & machine_flags::NO_SOUND_HW)
 		out << " nosoundhardware=\"yes\"";
 
-	if (flags & machine_flags::IS_INCOMPLETE)
+	if (driver_flags & machine_flags::IS_INCOMPLETE)
 		out << " incomplete=\"yes\"";
 
 	out << "/>\n";

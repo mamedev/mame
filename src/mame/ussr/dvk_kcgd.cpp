@@ -141,9 +141,9 @@ private:
 
 protected:
 	required_device<k1801vm2_device> m_maincpu;
-	required_device<dl11_device> m_dl11host;
+	required_device<k1801vp065_device> m_dl11host;
 	required_device<rs232_port_device> m_rs232;
-	required_device<dl11_device> m_dl11kbd;
+	required_device<k1801vp065_device> m_dl11kbd;
 	required_device<ms7004_device> m_ms7004;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -181,7 +181,7 @@ static DEVICE_INPUT_DEFAULTS_START( host_rs232_defaults )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
-	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x01, 0x01 )
+	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x07, 0x01 )
 DEVICE_INPUT_DEFAULTS_END
 
 
@@ -405,30 +405,28 @@ void kcgd_state::kcgd(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_kcgd);
 
-	DL11(config, m_dl11host, XTAL(4'608'000));
+	K1801VP065(config, m_dl11host, XTAL(4'608'000));
 	m_dl11host->set_rxc(57600);
 	m_dl11host->set_txc(57600);
 	m_dl11host->set_rxvec(0360);
 	m_dl11host->set_txvec(0364);
 	m_dl11host->txd_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
-// future
-//  m_dl11host->rts_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
-//  m_dl11host->txrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
-//  m_dl11host->rxrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
+	m_dl11host->rts_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
+	m_dl11host->txrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
+	m_dl11host->rxrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->rxd_handler().set(m_dl11host, FUNC(dl11_device::rx_w));
 	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(host_rs232_defaults));
 
-	DL11(config, m_dl11kbd, XTAL(4'608'000));
-	m_dl11kbd->set_rxc(4960);
-	m_dl11kbd->set_txc(4960);
+	K1801VP065(config, m_dl11kbd, XTAL(4'608'000));
+	m_dl11kbd->set_rxc(4800);
+	m_dl11kbd->set_txc(4800);
 	m_dl11kbd->set_rxvec(060);
 	m_dl11kbd->set_txvec(064);
 	m_dl11kbd->txd_wr_callback().set(m_ms7004, FUNC(ms7004_device::write_rxd));
-// future
-//  m_dl11kbd->txrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
-//  m_dl11kbd->rxrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
+	m_dl11kbd->txrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
+	m_dl11kbd->rxrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
 
 	MS7004(config, m_ms7004, 0);
 	m_ms7004->tx_handler().set(m_dl11kbd, FUNC(dl11_device::rx_w));

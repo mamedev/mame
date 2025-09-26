@@ -2,21 +2,24 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC PC-9801-118 sound card  "CanBe Sound 2"
+NEC PC-9801-118 sound card  "CanBe Sound 2"
 
-    YMF297 + some extra ports, apparently derived from -86.
-    Introduced around the same time as Windows 95 release, it has various compatibility issues
-    under DOS (especially when PnP is enabled).
-    Doesn't have a sound ROM, it also cannot be installed with an environment also sporting a -86.
+References:
+- https://sammargh.github.io/pc98/ext_card_doc/9801-118.txt
 
-    TODO:
-    - Fix sound chip type (YMF297-F);
-    - Add CS-4232 support, it's an extended clone of the already emulated AD1848 used on the
-      Windows Sound System;
-    - Understand what the obfuscated NEC "ANCHOR" and "MAZE" chips really are;
-    - PnP interface (missing BIOS);
-    - verify sound irq;
-    - test if driver can be installed under Windows 95;
+YMF297 + some extra ports, apparently derived from -86.
+Introduced around the same time as Windows 95 release, it has various compatibility issues
+under DOS (especially when PnP is enabled).
+Doesn't have a sound ROM, it also cannot be installed with an environment also sporting a -86.
+
+TODO:
+- Fix sound chip type (YMF297-F);
+- Add CS-4232 support, it's an extended clone of the already emulated AD1848 used on the
+  Windows Sound System;
+- Understand what the obfuscated NEC "ANCHOR" and "MAZE" chips really are;
+- PnP interface (missing BIOS);
+- verify sound irq;
+- test if driver can be installed under Windows 95;
 
 **************************************************************************************************/
 
@@ -37,34 +40,23 @@
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118")
 
-void pc9801_118_device::sound_irq(int state)
-{
-	// TODO: sometimes misfired irq causes sound or even host hang
-	m_bus->int_w<5>(state);
-}
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
 void pc9801_118_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: "ANCHOR" & "MAZE" custom NEC chips
 	// sourced by 5D clock
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// actually YMF297-F (YMF288 + OPL3 compatible FM sources), unknown clock / divider
 	// 5B is near both CS-4232 and this
 	YM2608(config, m_opn3, XTAL_5B * 2 / 5);
-	m_opn3->irq_handler().set(FUNC(pc9801_118_device::sound_irq));
-	m_opn3->port_a_read_callback().set(FUNC(pc9801_118_device::opn_porta_r));
-	//m_opn3->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
-	//m_opn3->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
-	m_opn3->port_b_write_callback().set(FUNC(pc9801_118_device::opn_portb_w));
-	m_opn3->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
-	m_opn3->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+	m_opn3->irq_handler().set([this] (int state) { m_bus->int_w<5>(state); });
+//  m_opn3->port_a_read_callback().set(FUNC(pc9801_118_device::opn_porta_r));
+//  m_opn3->port_b_write_callback().set(FUNC(pc9801_118_device::opn_portb_w));
+	m_opn3->add_route(ALL_OUTPUTS, "speaker", 1.00, 0);
+	m_opn3->add_route(ALL_OUTPUTS, "speaker", 1.00, 1);
+
+	// TODO: DA-15 PC gameport labeled "MIDI / Joystick"
 }
 
 
@@ -73,8 +65,6 @@ void pc9801_118_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( pc9801_118 )
-	PORT_INCLUDE( pc9801_joy_port )
-
 	// 12 line Jumper settings @ 8F
 	// documented at https://sammargh.github.io/pc98/ext_card_doc/9801-118.txt
 	// TODO: understand how SW can read these
@@ -149,35 +139,16 @@ const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 //-------------------------------------------------
 
 pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc9801_snd_device(mconfig, PC9801_118, tag, owner, clock),
+	: device_t(mconfig, PC9801_118, tag, owner, clock),
 		m_bus(*this, DEVICE_SELF_OWNER),
 		m_opn3(*this, "opn3")
 {
 }
 
-
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void pc9801_118_device::device_validity_check(validity_checker &valid) const
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-u16 pc9801_118_device::read_io_base()
-{
-	// hardwired on this board
-	return 0x0188;
-}
-
 void pc9801_118_device::device_start()
 {
-	m_io_base = read_io_base();
+	// hardwired on this board
+	const u16 m_io_base = 0x0188;
 	m_bus->install_io(0xa460, 0xa463, read8sm_delegate(*this, FUNC(pc9801_118_device::id_r)), write8sm_delegate(*this, FUNC(pc9801_118_device::ext_w)));
 
 	m_bus->install_io(
@@ -190,15 +161,14 @@ void pc9801_118_device::device_start()
 	save_item(NAME(m_ext_reg));
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
 void pc9801_118_device::device_reset()
 {
 	// TODO: is this enabled or disabled at boot?
 	m_ext_reg = 1;
+}
+
+void pc9801_118_device::device_validity_check(validity_checker &valid) const
+{
 }
 
 

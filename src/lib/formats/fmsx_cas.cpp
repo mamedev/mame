@@ -2,6 +2,7 @@
 // copyright-holders:Sean Young
 
 #include "fmsx_cas.h"
+#include "tzx_cas.h"
 
 #include <cstring>
 
@@ -49,7 +50,7 @@ static int fmsx_cas_to_wav_size (const uint8_t *casdata, int caslen)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int fmsx_cas_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes)
+static int fmsx_cas_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes, int)
 {
 	int cas_pos, bit, state = 1, samples_pos, size, n, i, p;
 
@@ -144,4 +145,5 @@ static const cassette_image::Format fmsx_cas_format =
 
 CASSETTE_FORMATLIST_START(fmsx_cassette_formats)
 	CASSETTE_FORMAT(fmsx_cas_format)
+	CASSETTE_FORMAT(tsx_cassette_format)
 CASSETTE_FORMATLIST_END
