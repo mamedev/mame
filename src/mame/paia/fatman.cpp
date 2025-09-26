@@ -27,10 +27,10 @@ by the manufacturer on their website. This driver cannot replace the real
 device. Specifically, there is no attempt to emulate audio. This is just an
 educational tool.
 
-The driver emulates the digital functionality of FatMan, the analog outputs (CV
-and gate), and most of the analog functionality that has an effect on the
-firmware (the two envelope generators with all their controls, the "sustain"
-switch, and the "punch" switch).
+The driver emulates the digital functionality of the FatMan, its analog outputs
+(Pitch CV, Velocity CV and gate), and all analog functionality that affects the
+firmware (the two envelope generators with all their controls, and the "sustain"
+and "punch" switces).
 
 Usage:
 
