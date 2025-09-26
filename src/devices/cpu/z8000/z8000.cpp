@@ -294,12 +294,12 @@ void z8001_device::PUSH_PC()
 
 uint32_t z8002_device::GET_PC(uint32_t VEC)
 {
-	return RDMEM_W(m_program, VEC + 2);
+	return RDMEM_W(m_data, VEC + 2);
 }
 
 uint32_t z8001_device::GET_PC(uint32_t VEC)
 {
-	return segmented_addr(RDMEM_L(m_program, VEC + 4));
+	return segmented_addr(RDMEM_L(m_data, VEC + 4));
 }
 
 uint32_t z8002_device::get_reset_pc()
@@ -314,12 +314,12 @@ uint32_t z8001_device::get_reset_pc()
 
 uint16_t z8002_device::GET_FCW(uint32_t VEC)
 {
-	return RDMEM_W(m_program, VEC);
+	return RDMEM_W(m_data, VEC);
 }
 
 uint16_t z8001_device::GET_FCW(uint32_t VEC)
 {
-	return RDMEM_W(m_program, VEC + 2);
+	return RDMEM_W(m_data, VEC + 2);
 }
 
 uint32_t z8002_device::F_SEG_Z8001()
@@ -416,7 +416,6 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
-		m_pc = RDMEM_W(m_program, NMI);
 		m_irq_req &= ~Z8000_NMI;
 		CHANGE_FCW(GET_FCW(NMI));
 		m_pc = GET_PC(NMI);
@@ -433,9 +432,9 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
-		m_pc = GET_PC(NVI);
 		m_irq_req &= ~Z8000_NVI;
 		CHANGE_FCW(GET_FCW(NVI));
+		m_pc = GET_PC(NVI);
 		LOG("Z8K NVI $%04x\n", m_pc);
 	}
 	else
@@ -449,22 +448,22 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
-		m_pc = read_irq_vector();
 		m_irq_req &= ~Z8000_VI;
 		CHANGE_FCW(GET_FCW(VI));
+		m_pc = read_irq_vector();
 		LOG("Z8K VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", m_irq_vec, VEC00 + 2 * (m_irq_vec & 0xff), m_fcw, m_pc);
 	}
 }
 
 uint32_t z8002_device::read_irq_vector()
 {
-	return RDMEM_W(m_program, VEC00 + 2 * (m_irq_vec & 0xff));
+	return RDMEM_W(m_data, VEC00 + 2 * (m_irq_vec & 0xff));
 }
 
 
 uint32_t z8001_device::read_irq_vector()
 {
-	return segmented_addr(RDMEM_L(m_program, VEC00 + 2 * (m_irq_vec & 0xff)));
+	return segmented_addr(RDMEM_L(m_data, VEC00 + 2 * (m_irq_vec & 0xff)));
 }
 
 
