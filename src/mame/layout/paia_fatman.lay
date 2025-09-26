@@ -25,12 +25,14 @@ copyright-holders:m1macrophage
 	<!-- Silkscreen -->
 	<element name="rounded-rect-narrow">
 		<image><data><![CDATA[
-			<rect stroke="#d1dbd3" fill="none" stroke-width="4" width="260" height="539" rx="28" ry="38"/>
+			<rect fill="#d1dbd3" x="0" y="0" width="260" height="540" rx="30" ry="30"/>
+			<rect fill="#141819" x="3" y="3" width="254" height="534" rx="28" ry="28"/>
 		]]></data></image>
 	</element>
 	<element name="rounded-rect-wide">
 		<image><data><![CDATA[
-			<rect stroke="#d1dbd3" fill="none" stroke-width="4" width="441" height="539" rx="28" ry="38"/>
+			<rect fill="#d1dbd3" x="0" y="0" width="440" height="540" rx="30" ry="30"/>
+			<rect fill="#141819" x="3" y="3" width="434" height="534" rx="28" ry="28"/>
 		]]></data></image>
 	</element>
 	<element name="line">
@@ -38,8 +40,14 @@ copyright-holders:m1macrophage
 	</element>
 
 	<!-- Text -->
+	<element name="text-outputs">
+		<text string="Outputs:"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
 	<element name="text-gate">
 		<text string="Gate" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-gate-out">
+		<text string="Gate"><color red="0.820" green="0.859" blue="0.827"/></text>
 	</element>
 	<element name="text-midi">
 		<text string="MIDI In" align="2"><color red="0.820" green="0.859" blue="0.827"/></text>
@@ -63,13 +71,13 @@ copyright-holders:m1macrophage
 		<text string="Transient"><color red="0.820" green="0.859" blue="0.827"/></text>
 	</element>
 	<element name="text-unison">
+		<rect><color red="0.078" green="0.094" blue="0.098"/></rect>
 		<text string="unison"><color red="0.820" green="0.859" blue="0.827"/></text>
 	</element>
 	<element name="text-both">
+		<rect><color red="0.078" green="0.094" blue="0.098"/></rect>
 		<text string="both"><color red="0.820" green="0.859" blue="0.827"/></text>
 	</element>
-
-	<!-- Knob and switch text -->
 	<element name="text-pitch-caps">
 		<text string="PITCH" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
 	</element>
@@ -103,8 +111,14 @@ copyright-holders:m1macrophage
 	<element name="text-pitch">
 		<text string="Pitch" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
 	</element>
+	<element name="text-pitch-out">
+		<text string="Pitch"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
 	<element name="text-velocity">
 		<text string="Velocity" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="text-velocity-out">
+		<text string="Velocity"><color red="0.820" green="0.859" blue="0.827"/></text>
 	</element>
 	<element name="text-asr-paren">
 		<text string="A(S)R" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
@@ -160,17 +174,13 @@ copyright-holders:m1macrophage
 	<element name="text-slow">
 		<text string="Slow" align="1"><color red="0.820" green="0.859" blue="0.827"/></text>
 	</element>
+	<element name="script_warning" defstate="1">
+		<text state="1" string="*** to control knobs with a mouse, enable the layout plugin ***">
+			<color red="0.820" green="0.859" blue="0.827"/>
+		</text>
+	</element>
 
 	<!-- Knobs -->
-	<element name="white-disk">
-		<disk><color red="0.820" green="0.859" blue="0.827"/></disk>
-	</element>
-	<element name="blue-disk">
-		<disk><color red="0.0" green="0.090" blue="0.322"/></disk>
-	</element>
-	<element name="gray-disk">
-		<disk><color red="0.239" green="0.231" blue="0.227"/></disk>
-	</element>
 	<element name="transparent-rect">
 		<rect><color red="0" green="0" blue="0" alpha="0"/></rect>
 	</element>
@@ -179,68 +189,27 @@ copyright-holders:m1macrophage
 			<color red="0.820" green="0.859" blue="0.827"/>
 		</simplecounter>
 	</element>
-	<group name="knob">
-		<bounds width="178" height="109"/>
-		<element ref="gray-disk">
-			<bounds x="52" y="24" width="72" height="72"/>
-		</element>
-		<element ref="blue-disk">
-			<bounds x="61" y="33" width="54" height="54"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="45" y="93" width="8" height="8"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="29" y="54" width="9" height="9"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="45" y="16" width="10" height="10"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="82" y="0" width="11" height="11"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="120" y="15" width="12" height="12"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="135" y="53" width="13" height="13"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="119" y="90" width="14" height="14"/>
-		</element>
-	</group>
-	<group name="knob-no-top-circle">
-		<bounds width="178" height="109"/>
-		<element ref="gray-disk">
-			<bounds x="52" y="24" width="72" height="72"/>
-		</element>
-		<element ref="blue-disk">
-			<bounds x="61" y="33" width="54" height="54"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="45" y="93" width="8" height="8"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="29" y="54" width="9" height="9"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="45" y="16" width="10" height="10"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="120" y="15" width="12" height="12"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="135" y="53" width="13" height="13"/>
-		</element>
-		<element ref="white-disk">
-			<bounds x="119" y="90" width="14" height="14"/>
-		</element>
-	</group>
+	<element name="knob">
+		<!-- Set knob element bounds. -->
+		<rect><color red="0" green="0" blue="0" alpha="0"/><bounds width="178" height="109"/></rect>
+		<!-- Outer knob. -->
+		<disk><color red="0.239" green="0.231" blue="0.227"/><bounds x="52" y="24" width="72" height="72"/></disk>
+		<!-- Inner knob. -->
+		<disk><color red="0.0" green="0.090" blue="0.322"/><bounds x="61" y="33" width="54" height="54"/></disk>
+		<!-- Indicator circles around the knob. -->
+		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="45" y="93" width="8" height="8"/></disk>
+		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="29" y="54" width="9" height="9"/></disk>
+		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="45" y="16" width="10" height="10"/></disk>
+		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="82" y="0" width="11" height="11"/></disk>
+		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="120" y="15" width="12" height="12"/></disk>
+		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="135" y="53" width="13" height="13"/></disk>
+		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="119" y="90" width="14" height="14"/></disk>
+	</element>
 	<group name="knob-min-max">
 		<bounds width="178" height="109"/>
-		<group ref="knob">
+		<element ref="knob">
 			<bounds x="0" y="0" width="178" height="109"/>
-		</group>
+		</element>
 		<element ref="text-min">
 			<bounds x="0" y="94" width="40" height="15"/>
 		</element>
@@ -250,22 +219,22 @@ copyright-holders:m1macrophage
 	</group>
 	<group name="knob-fast-slow">
 		<bounds width="178" height="109"/>
-		<group ref="knob">
+		<element ref="knob">
 			<bounds x="0" y="0" width="178" height="109"/>
-		</group>
+		</element>
 		<element ref="text-fast">
 			<bounds x="0" y="94" width="40" height="15"/>
 		</element>
 		<element ref="text-slow">
 			<bounds x="138" y="94" width="40" height="15"/>
 		</element>
-		<element ref="knob-value" inputraw="yes" inputtag="~knob_inputtag~" inputmask="0x7f">
+		<element ref="knob-value" inputraw="yes" inputtag="~knob_id~" inputmask="0x7f">
 			<bounds x="68" y="52" width="40" height="16"/>
 		</element>
-		<element ref="transparent-rect" clickthrough="no">
+		<element ref="transparent-rect" clickthrough="no" id="~knob_id~">
 			<!-- Disable clicks on the `simplecounter` above, because they
 			change the value in an unintuitive way. -->
-			<bounds x="68" y="52" width="40" height="16"/>
+			<bounds x="61" y="33" width="54" height="54"/>
 		</element>
 	</group>
 
@@ -285,10 +254,65 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
-	<view name="fatman_desktop">
+	<!-- Voltage display -->
+	<element name="period">
+		<text string="."><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="voltage-label">
+		<text string="V"><color red="0.820" green="0.859" blue="0.827"/></text>
+	</element>
+	<element name="voltage-integer">
+		<simplecounter maxstate="99" digits="1">
+			<color red="0.820" green="0.859" blue="0.827"/>
+		</simplecounter>
+	</element>
+	<element name="voltage-fractional">
+		<simplecounter maxstate="999" digits="3">
+			<color red="0.820" green="0.859" blue="0.827"/>
+		</simplecounter>
+	</element>
+	<group name="voltage">
+		<bounds width="60" height="18"/>
+		<element ref="voltage-integer" name="~output~_cv_out_0">
+			<bounds x="0" y="0" width="10" height="18"/>
+		</element>
+		<element ref="period">
+			<bounds x="12" y="0" width="4" height="18"/>
+		</element>
+		<element ref="voltage-fractional" name="~output~_cv_out_1">
+			<bounds x="16" y="0" width="30" height="18"/>
+		</element>
+		<element ref="voltage-label">
+			<bounds x="50" y="0" width="10" height="18"/>
+		</element>
+	</group>
+	<group name="gate-voltage">
+		<bounds width="25" height="18"/>
+		<element ref="voltage-integer" name="gate_out">
+			<bounds x="0" y="0" width="10" height="18"/>
+		</element>
+		<element ref="voltage-label">
+			<bounds x="15" y="0" width="10" height="18"/>
+		</element>
+	</group>
+
+	<view name="Default Layout">
 		<bounds x="0" y="0" width="1470" height="780"/>
 
-		<!-- Chasis -->
+		<!-- Outputs -->
+		<collection name="outputs">
+			<element ref="text-outputs"><bounds x="665" y="42" width="50" height="15"/></element>
+			<element ref="text-gate-out"><bounds x="730" y="20" width="25" height="15"/></element>
+			<group ref="gate-voltage"><bounds x="730" y="40" width="25" height="18"/></group>
+			<element ref="text-velocity-out"><bounds x="780" y="20" width="60" height="15"/></element>
+			<param name="output" value="velocity"/>
+			<group ref="voltage"><bounds x="780" y="40" width="60" height="18"/></group>
+			<element ref="text-pitch-out"><bounds x="865" y="20" width="60" height="15"/></element>
+			<param name="output" value="pitch"/>
+			<group ref="voltage"><bounds x="865" y="40" width="60" height="18"/></group>
+		</collection>
+
+		<!-- Chassis -->
 		<element ref="bezel"><bounds x="22" y="42" width="35" height="719"/></element>
 		<element ref="case"><bounds x="58" y="65" width="1365" height="668"/></element>
 		<element ref="vent"><bounds x="1268" y="255" width="19" height="125"/></element>
@@ -301,17 +325,21 @@ copyright-holders:m1macrophage
 		<element ref="led" name="midi_led"><bounds x="1157" y="79" width="25" height="25"/></element>
 		<element ref="text-power"><bounds x="1310" y="82" width="90" height="17"/></element>
 		<element ref="led-power"><bounds x="1277" y="79" width="25" height="25"/></element>
+		<collection name="script warning">
+			<element ref="script_warning" id="warning"><bounds x="100" y="80" width="500" height="20"/></element>
+		</collection>
 
 		<!-- VCO Section -->
+		<element ref="rounded-rect-narrow"><bounds x="74" y="158" width="260" height="540"/></element>
 		<element ref="text-minus-half"><bounds x="89" y="268" width="40" height="15"/></element>
 		<element ref="text-minus-one"><bounds x="89" y="536" width="40" height="15"/></element>
 		<element ref="text-vco1"><bounds x="89" y="671" width="40" height="15"/></element>
-		<group ref="knob"><bounds x="89" y="174" width="178" height="109"/></group>
+		<element ref="knob"><bounds x="89" y="174" width="178" height="109"/></element>
 		<group ref="knob-min-max"><bounds x="89" y="309" width="178" height="109"/></group>
+		<element ref="knob"><bounds x="89" y="442" width="178" height="109"/></element>
 		<element ref="text-unison"><bounds x="89" y="441" width="178" height="14"/></element>
-		<group ref="knob-no-top-circle"><bounds x="89" y="442" width="178" height="109"/></group>
-		<element ref="text-both"><bounds x="89" y="573" width="178" height="14"/></element>
-		<group ref="knob-no-top-circle"><bounds x="89" y="577" width="178" height="109"/></group>
+		<element ref="knob"><bounds x="89" y="577" width="178" height="109"/></element>
+		<element ref="text-both"><bounds x="89" y="576" width="178" height="14"/></element>
 		<element ref="text-plus-half"><bounds x="227" y="268" width="40" height="15"/></element>
 		<element ref="text-plus-one"><bounds x="227" y="536" width="40" height="15"/></element>
 		<element ref="text-vco2"><bounds x="227" y="671" width="40" height="15"/></element>
@@ -320,13 +348,13 @@ copyright-holders:m1macrophage
 		<element ref="text-offset"><bounds x="249" y="489" width="70" height="17"/></element>
 		<element ref="text-mix"><bounds x="249" y="622" width="70" height="17"/></element>
 		<element ref="text-vcos"><bounds x="236" y="162" width="76" height="23"/></element>
-		<element ref="rounded-rect-narrow"><bounds x="74" y="158" width="260" height="539"/></element>
 
 		<!-- VCF Section -->
+		<element ref="rounded-rect-wide"><bounds x="348" y="158" width="440" height="540"/></element>
 		<group ref="knob-min-max"><bounds x="359" y="174" width="178" height="109"/></group>
 		<group ref="knob-min-max"><bounds x="359" y="309" width="178" height="109"/></group>
 		<group ref="knob-min-max"><bounds x="359" y="442" width="178" height="109"/></group>
-		<param name="knob_inputtag" value="VCF_attack"/>
+		<param name="knob_id" value="VCF_attack"/>
 		<group ref="knob-fast-slow"><bounds x="359" y="577" width="178" height="109"/></group>
 		<element ref="text-freq"><bounds x="519" y="221" width="70" height="17"/></element>
 		<element ref="text-pitch"><bounds x="519" y="354" width="70" height="17"/></element>
@@ -339,27 +367,29 @@ copyright-holders:m1macrophage
 			<bounds x="635" y="477" width="28" height="40"/>
 		</element>
 		<element ref="text-ar"><bounds x="635" y="522" width="28" height="15"/></element>
-		<param name="knob_inputtag" value="VCF_release"/>
+		<param name="knob_id" value="VCF_release"/>
 		<group ref="knob-fast-slow"><bounds x="560" y="577" width="178" height="109"/></group>
 		<element ref="text-res"><bounds x="720" y="221" width="70" height="17"/></element>
 		<element ref="text-velocity"><bounds x="720" y="354" width="70" height="17"/></element>
 		<element ref="text-sustain"><bounds x="695" y="489" width="70" height="17"/></element>
 		<element ref="text-release"><bounds x="720" y="622" width="70" height="17"/></element>
 		<element ref="text-vcf"><bounds x="706" y="162" width="57" height="23"/></element>
-		<element ref="rounded-rect-wide"><bounds x="348" y="158" width="441" height="539"/></element>
 		<element ref="text-modulation"><bounds x="511" y="299" width="70" height="13"/></element>
-		<element ref="line"><bounds x="364" y="290" width="411" height="3"/></element>
+		<element ref="line"><bounds x="363" y="290" width="410" height="3"/></element>
 		<element ref="text-transient"><bounds x="511" y="568" width="70" height="13"/></element>
-		<element ref="line"><bounds x="364" y="560" width="411" height="3"/></element>
+		<element ref="line"><bounds x="363" y="560" width="410" height="3"/></element>
 
 		<!-- VCA Section -->
+		<element ref="rounded-rect-wide"><bounds x="802" y="158" width="440" height="540"/></element>
 		<element ref="text-on"><bounds x="886" y="189" width="28" height="15"/></element>
-		<element ref="switch"><bounds x="886" y="209" width="28" height="40"/></element>
+		<element ref="switch" inputtag="VCA_punch" inputmask="0x01">
+			<bounds x="886" y="209" width="28" height="40"/>
+		</element>
 		<element ref="text-off"><bounds x="886" y="254" width="28" height="15"/></element>
 		<group ref="knob-min-max"><bounds x="811" y="309" width="178" height="109"/></group>
-		<param name="knob_inputtag" value="VCA_attack"/>
+		<param name="knob_id" value="VCA_attack"/>
 		<group ref="knob-fast-slow"><bounds x="811" y="442" width="178" height="109"/></group>
-		<param name="knob_inputtag" value="VCA_sustain"/>
+		<param name="knob_id" value="VCA_sustain"/>
 		<group ref="knob-fast-slow"><bounds x="811" y="577" width="178" height="109"/></group>
 		<element ref="text-punch"><bounds x="925" y="221" width="70" height="17"/></element>
 		<element ref="text-adsr"><bounds x="971" y="354" width="70" height="17"/></element>
@@ -367,20 +397,139 @@ copyright-holders:m1macrophage
 		<element ref="text-sustain"><bounds x="971" y="622" width="70" height="17"/></element>
 		<group ref="knob-min-max"><bounds x="1012" y="174" width="178" height="109"/></group>
 		<group ref="knob-min-max"><bounds x="1012" y="309" width="178" height="109"/></group>
-		<param name="knob_inputtag" value="VCA_decay"/>
+		<param name="knob_id" value="VCA_decay"/>
 		<group ref="knob-fast-slow"><bounds x="1012" y="442" width="178" height="109"/></group>
-		<param name="knob_inputtag" value="VCA_release"/>
+		<param name="knob_id" value="VCA_release"/>
 		<group ref="knob-fast-slow"><bounds x="1012" y="577" width="178" height="109"/></group>
 		<element ref="text-output"><bounds x="1172" y="221" width="70" height="17"/></element>
 		<element ref="text-velocity"><bounds x="1172" y="354" width="70" height="17"/></element>
 		<element ref="text-decay"><bounds x="1172" y="489" width="70" height="17"/></element>
 		<element ref="text-release"><bounds x="1172" y="622" width="70" height="17"/></element>
 		<element ref="text-vca"><bounds x="1161" y="162" width="56" height="23"/></element>
-		<element ref="rounded-rect-wide"><bounds x="803" y="158" width="441" height="539"/></element>
 		<element ref="text-modulation"><bounds x="963" y="299" width="70" height="13"/></element>
-		<element ref="line"><bounds x="818" y="290" width="411" height="3"/></element>
+		<element ref="line"><bounds x="817" y="290" width="410" height="3"/></element>
 		<element ref="text-transient"><bounds x="963" y="430" width="70" height="13"/></element>
-		<element ref="line"><bounds x="818" y="425" width="411" height="3"/></element>
+		<element ref="line"><bounds x="817" y="425" width="410" height="3"/></element>
 	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				local view = file.views["Default Layout"]
+				install_slider_callbacks(view)
+
+				local knobs = {"VCF_attack", "VCF_release", "VCA_attack", "VCA_decay", "VCA_sustain", "VCA_release"}
+				for i, knob_id in ipairs(knobs) do
+					add_simplecounter_knob(view, knob_id, knob_id, 1.5)
+				end
+
+				view.items["warning"]:set_state(0)
+			end)
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- This is a *trimmed down* version of the reference implementation in
+		-- linn_linndrum.lay.
+		-----------------------------------------------------------------------
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- A sweep between 0 and 100 requires moving the pointer by
+		-- `scale * clickarea.height` pixes.
+		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+			table.insert(widgets, {
+				clickarea = get_layout_item(view, clickarea_id),
+				field     = get_port_field(port_name),
+				scale     = scale })
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			if field == nil then
+				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				return nil
+			end
+			return field
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				pointers[id] = nil
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					if widgets[i].clickarea.bounds:includes(x, y) then
+						pointers[id] = {
+							selected_widget = i,
+							start_y = y,
+							start_value = widgets[i].field.user_value }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's Y
+			-- position. It is assumed the attached IO field is an
+			-- IPT_ADJUSTER with a range of 0-100 (the default).
+
+			local pointer = pointers[id]
+			local widget = widgets[pointer.selected_widget]
+			local step_y = 100.0 / (widget.scale * widget.clickarea.bounds.height)
+			local new_value = pointer.start_value + (pointer.start_y - y) * step_y
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < 0 then new_value = 0 end
+			if new_value > 100 then new_value = 100 end
+			widget.field.user_value = new_value
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function forget_pointers()
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
 </mamelayout>
 
