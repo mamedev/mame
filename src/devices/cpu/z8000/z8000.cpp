@@ -39,6 +39,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	, m_sio_config("io_spc", ENDIANNESS_BIG, 16, 16, 0)
 	, m_iack_in(*this, 0xffff)
 	, m_mo_out(*this)
+	, m_ns_out(*this)
 	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_halt(false), m_icount(0)
 	, m_vector_mult(vecmult)
 {

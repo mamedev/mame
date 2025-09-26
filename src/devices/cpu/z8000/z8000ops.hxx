@@ -24,6 +24,7 @@ void z8002_device::CHANGE_FCW(uint16_t fcw)
 		tmp = RW(15);
 		RW(15) = m_nspoff;
 		m_nspoff = tmp;
+		m_ns_out((fcw & F_S_N) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	fcw &= ~F_SEG;  /* never set segmented mode bit on Z8002 */
@@ -47,6 +48,7 @@ void z8001_device::CHANGE_FCW(uint16_t fcw)
 		tmp = RW(15);
 		RW(15) = m_nspoff;
 		m_nspoff = tmp;
+		m_ns_out((fcw & F_S_N) ? ASSERT_LINE : CLEAR_LINE);
 	}
 	/* User mode R14 is used in user mode and non-segmented system mode.
 	   System mode R14 is only used in segmented system mode.

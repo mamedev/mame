@@ -85,6 +85,7 @@ public:
 	auto viack() { return m_iack_in[3].bind(); }
 	auto mo() { return m_mo_out.bind(); }
 	void mi_w(int state) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
+	auto ns() { return m_ns_out.bind(); }
 
 protected:
 	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult);
@@ -121,6 +122,7 @@ protected:
 	address_space_config m_sio_config;
 	devcb_read16::array<4> m_iack_in;
 	devcb_write_line m_mo_out;
+	devcb_write_line m_ns_out;
 
 	uint32_t  m_op[4];      /* opcodes/data of current instruction */
 	uint32_t  m_ppc;        /* previous program counter */
