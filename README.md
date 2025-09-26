@@ -1,3 +1,3 @@
 This GitHub repository provides the Intel macOS binary release of [MAME](https://github.com/mamedev/mame)
 
-![MAME 0.280](https://github.com/appleiifanclub/mame/blob/805a173121d02c944547b4fade3beb961ceb646a/image/mame0280-x86.png?raw=true)
+![MAME 0.281](https://github.com/appleiifanclub/mame/blob/3447c5f4f168b793a0f0a828606c1796145af586/image/mame0281-x86.png?raw=true)
