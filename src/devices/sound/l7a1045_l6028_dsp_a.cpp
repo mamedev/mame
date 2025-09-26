@@ -175,7 +175,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				}
 				const uint32_t address = (start + pos) & (m_rom.length() - 1);
 				data = m_rom[address];
-				sample = int8_t(data & 0xfc) << (3 - (data & 3));
+				sample = int8_t(data);
 				frac += step;
 
 				// volume envelope processing
