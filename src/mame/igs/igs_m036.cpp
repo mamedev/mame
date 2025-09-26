@@ -518,6 +518,12 @@ ROM_END
 
 // this PCB has IGS036 MCU, R5F21256SN MCU, TT5665, ALTERA EPM3032ALC44-10N (stickered IS U15)
 // ROM labels actually are written "super 70's..."
+// X1 = 4.3520H7J
+//
+// IS U15 = ALTERA EPM3032ALC44-10N
+// F9 U28 = IGS036
+// U32 = R5F21256SN
+// U14 = TT5665 / 0749 / A78QE31
 ROM_START( super70s )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -526,18 +532,16 @@ ROM_START( super70s )
 	ROM_REGION( 0x8000, "mcu", 0 )
 	ROM_LOAD( "r5f21256sn.u32", 0x0000, 0x8000, NO_DUMP )
 
-	// this seems to be dumped half sized if compared to other dumps in the driver of this same kind of ROM
+	// this ROM is bad and can't be read correctly. Needs another PCB.
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "super_70s_v-100us.u31", 0x000000, 0x100000, BAD_DUMP CRC(60020aa3) SHA1(f6be4f9588192ef1e57182e5a61228440e5cfa64) ) // EV29LV160, BADADDR    xxxxxxxxxxxxxxxxxx-x
+	ROM_LOAD( "super_70s_v-100us.u31", 0x000000, 0x200000, BAD_DUMP CRC(0c499853) SHA1(f939dc81653680db2a8172789d9f490c0fb06f2b) ) // EV29LV160, BADADDR   xxxxxxxxxxx-xxxxxxxxx
 
-	// this seems to be dumped half sized if compared to other dumps in the driver of this same kind of ROM
-	ROM_REGION( 0x400000, "tt5665", 0 ) // samples
-	ROM_LOAD( "super_70s_v100us_u27.u27", 0x000000, 0x400000, BAD_DUMP CRC(a57fbc1c) SHA1(c7b0c72e678cd4120f576283eca8d718c058994c) ) // EV29LV640, 11xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "super_70s_v100us_u27.u27", 0x000000, 0x800000, CRC(626ea089) SHA1(3bd0c8db432d23d6482045eda0af234e2de6bdfa) ) // EV29LV640
 
-	// these seem to be dumped half sized if compared to other dumps in the driver of this same kind of ROM
-	ROM_REGION( 0x800000, "gfx", 0 )
-	ROM_LOAD( "super_70s_v100us_u25.u25", 0x000000, 0x400000, BAD_DUMP CRC(41baefa5) SHA1(1817bf43b3f72df35d50ef1ceb151d77ecfb988b) ) // EV29LV640
-	ROM_LOAD( "super_70s_v100us_u26.u26", 0x400000, 0x400000, BAD_DUMP CRC(39bb6c75) SHA1(bc52e51f1ad3588253cb42eb61baa11d0720c5a5) ) // EV29LV640
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "super_70s_v100us_u25.u25", 0x000000, 0x800000, CRC(1b8f3be3) SHA1(ce0cbe7c0ac9f103f1a621c6f9878d235bceba4c) ) // EV29LV640
+	ROM_LOAD( "super_70s_v100us_u26.u26", 0x800000, 0x800000, CRC(3f829def) SHA1(94708eef23ceca287c64dc06e9a2d21584372ba9) ) // EV29LV640
 ROM_END
 
 

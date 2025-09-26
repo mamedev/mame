@@ -391,10 +391,10 @@ static INPUT_PORTS_START( specd9 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 
 	PORT_START("DSW")
-	PORT_BIT(                      0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME(          0x0100, 0x0100, "Win Rate Configuration Screen" ) PORT_DIPLOCATION( "SW1:1" )
-	PORT_DIPSETTING(               0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(               0x0000, DEF_STR( On ) )
+	PORT_BIT(                       0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME(           0x0100, 0x0100, "Win Rate Configuration Screen" ) PORT_DIPLOCATION( "SW1:1" )
+	PORT_DIPSETTING(                0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(                0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW1:4" )
@@ -506,7 +506,7 @@ ROM_START( d9flower ) // Dream 9 Flower string, but images seem more Flower 9 Dr
 	ROM_LOAD( "5.u23", 0x000000, 0x080000, CRC(b6ad2e58) SHA1(84c0cdc155f641d4e5d8ae99acbfa5b297762418) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, CRC(c52c6e49) SHA1(7e5920baf45f68e7fc5f0b5640fa121a19608224) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "3.u37", 0x000, 0x117, BAD_DUMP CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // not dumped for this set, but marked same
@@ -544,7 +544,7 @@ ROM_START( specd9 )
 	ROM_LOAD( "t59.u23", 0x000000, 0x200000, CRC(b11857b4) SHA1(c0a6478fd8a8ef1ed35cfbfa9fd2af44eb258725) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, CRC(dba91cd8) SHA1(dfbe41e3a8d7e8ad7068d25afe10a1d93bf3cc4d) )
+	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, CRC(bdf66ef7) SHA1(a41caf78b769af3a0cdffc5e89a0dc236c21371a) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "3.u37", 0x000, 0x117, CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // PALCE16V8H
