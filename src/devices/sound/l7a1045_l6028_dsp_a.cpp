@@ -175,7 +175,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				}
 				const uint32_t address = (start + pos) & (m_rom.length() - 1);
 				data = m_rom[address];
-				sample = int8_t(data);
+				sample = int8_t(data) << 8;
 				frac += step;
 
 				// volume envelope processing
@@ -224,8 +224,8 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				vptr->y1 = output;
 
 				const int32_t fout = (output * 32768.0f);
-				const int64_t left = (fout * (uint64_t(vptr->l_volume) * uint64_t(vptr->env_volume))) >> 17;
-				const int64_t right = (fout * (uint64_t(vptr->r_volume) * uint64_t(vptr->env_volume))) >> 17;
+				const int64_t left = (fout * (uint64_t(vptr->l_volume) * uint64_t(vptr->env_volume))) >> 20;
+				const int64_t right = (fout * (uint64_t(vptr->r_volume) * uint64_t(vptr->env_volume))) >> 20;
 
 				stream.add_int(0, j, left, 32768);
 				stream.add_int(1, j, right, 32768);
