@@ -1441,7 +1441,7 @@ static std::pair<u16, char const *> const tmp95c063_syms[] = {
 	{ 0x7e, "INTETC23" }, { 0x7f, "IIMC" },
 	{ 0x80, "PACR" }, { 0x81, "PAFC" }, { 0x82, "PBCR" }, { 0x83, "PBFC" },
 	{ 0x84, "PC" }, { 0x85, "PD"}, { 0x88, "PDCR" }, { 0x8a, "PE" }, { 0x8c, "PECR" },
-	{ 0x8f, "BEXCS" }
+	{ 0x8f, "BEXCS" },
 	{ 0x90, "B0CS" }, { 0x91, "B1CS" }, { 0x92, "B2CS" }, { 0x93, "B3CS" },
 	{ 0x94, "MSAR0" }, { 0x95, "MAMR0" }, { 0x96, "MSAR1" }, { 0x97, "MAMR1" },
 	{ 0x98, "MSAR2" }, { 0x99, "MAMR2" }, { 0x9a, "MSAR3" }, { 0x9b, "MAMR3" },
