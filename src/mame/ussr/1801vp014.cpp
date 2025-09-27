@@ -196,7 +196,7 @@ void k1801vp014_device::device_start()
 void k1801vp014_device::device_reset()
 {
 	m_key_code = 0;
-	m_kbd_state = 0;
+	m_kbd_state = CSR_IE; // meaning of CSR_IE is inverted in this device
 	m_key_irq_vector = 0;
 	m_rxrdy = CLEAR_LINE;
 
