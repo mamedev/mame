@@ -918,6 +918,27 @@ ROM_START( mirworld )
 	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASEFF ) // not populated
 ROM_END
 
+ROM_START( monomedal )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// モノポリー・ザ・メダル
+	// 2ND エディション
+	// MDA-C0056
+	// REV. A
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0056a", 0, SHA1(a9698de016761eadd6d1cf2876f0bf1dc23a8a58) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0528-jpn.ic15", 0, 0x800, CRC(1af3dac5) SHA1(c9d5cf913d0839a14164409537bb941d36b9cdf0) )
+ROM_END
+
 ROM_START( ochaken )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v201" )
@@ -1271,4 +1292,5 @@ GAME( 2012, kazaaan2o,kazaaan2,  segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2009, kingyoch,kingyo,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (4-player, China, Ver 1.000)", GAME_FLAGS )
 GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
 GAME( 2010, loveber3cn,loveber3, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (China, Ver 1.001) (MDA-C0071)", GAME_FLAGS )
+GAME( 2008, monomedal,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Monopoly the Medal 2nd Edition (MDA-C0056A)", GAME_FLAGS )
 GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )
