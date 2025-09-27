@@ -364,7 +364,8 @@ void pg1000_state::pg1000(machine_config &config)
 	m_maincpu->rxd_func().set([this]() {
 		return int(
 			(m_mdin_bit && m_midi_in_enable) ||
-			(m_paramin_bit && m_param_in_enable)
+			(m_paramin_bit && m_param_in_enable) ||
+			(!m_midi_in_enable && !m_param_in_enable) /* due to pull-up */
 		);
 	});
 	m_maincpu->pc_out_cb().set([this](u8 data)
