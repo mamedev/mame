@@ -539,6 +539,28 @@ ROM_START( brickppl )
 	ROM_LOAD( "317-0558-com.ic15", 0, 0x800, BAD_DUMP CRC(7592d004) SHA1(632373d807f54953d68c95a9f874ed3e8011f085) )
 ROM_END
 
+ROM_START( btlracer )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x01000000, CRC(86c68cc9) SHA1(44acd976a8a4a18a9f963630642b03c9284b6436) )
+	ROM_LOAD( "ic63",  0x01000000, 0x01000000, CRC(e1692bce) SHA1(ff6322fb445aa0809ca391ae233328db00fd5a4d) )
+	ROM_LOAD( "ic64",  0x02000000, 0x01000000, CRC(835c458b) SHA1(b70285a833efaeef00f28af02ead58b5f0554788) )
+	ROM_LOAD( "ic65",  0x03000000, 0x01000000, CRC(66beafaf) SHA1(299e87abae11d5512d1f232a8d6ad54c449b427d) )
+	ROM_LOAD( "ic66s", 0x04000000, 0x01000000, CRC(52d0c1fc) SHA1(94cf231ae76eed9986fe7fe2f1d36ee42b9a4d25) )
+	ROM_LOAD( "ic67s", 0x05000000, 0x01000000, CRC(b8c9c038) SHA1(8fad122edbf233529feb345b9055902e67acc692) )
+	ROM_LOAD( "ic68s", 0x06000000, 0x01000000, CRC(ea7fd93b) SHA1(cfaeb06fdb035d26ad6060dcdf2487fd1e5ed870) )
+	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(43b2e726) SHA1(b7a78c7abbf6d0723eff9197028f7aa76065e25f) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0579-jpn.ic15", 0, 0x800, BAD_DUMP CRC(9482de07) SHA1(152810733e3a3e6d7fe4741a07a36d8495425a66) ) // bruteforced
+ROM_END
+
 ROM_START( bingogal )
 	SEGASP_BIOS
 	SEGASP_JP
@@ -1257,6 +1279,7 @@ GAME( 2010, arajewels,arajewel,  segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2009, bingogal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (main)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, bingogals,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
+GAME( 2009, btlracer,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Saikyou Saisoku Battle Racer", GAME_FLAGS )
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
 GAME( 2008, galilfac,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Galileo Factory (main)", GAME_FLAGS )
 GAME( 2008, isshoni,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Isshoni Wanwan Waiwai Puppy 2008", GAME_FLAGS ) // いっしょにワンワンわいわいパピー 2008
