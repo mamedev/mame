@@ -107,17 +107,17 @@ K052109_CB_MEMBER(parodius_state::tile_callback)
 
 K053244_CB_MEMBER(parodius_state::sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x1f);
+	color = m_sprite_colorbase + (color & 0x1f);
 }
 
 
