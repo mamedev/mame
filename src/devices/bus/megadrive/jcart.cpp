@@ -34,7 +34,7 @@
 
 DEFINE_DEVICE_TYPE(MD_JCART,           md_jcart_device,           "md_jcart",           "MD J-Cart games")
 DEFINE_DEVICE_TYPE(MD_SEPROM_CODEMAST, md_seprom_codemast_device, "md_seprom_codemast", "MD J-Cart games + SEPROM")
-DEFINE_DEVICE_TYPE(MD_SEPROM_MM96,     md_seprom_mm96_device,     "md_seprom_mm96",     "MD Micro Machine 96")
+DEFINE_DEVICE_TYPE(MD_SEPROM_MM96,     md_seprom_mm96_device,     "md_seprom_mm96",     "MD Micro Machines 96")
 
 // Sampras, Super Skidmarks?
 md_jcart_device::md_jcart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

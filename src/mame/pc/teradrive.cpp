@@ -51,12 +51,11 @@ TODO:
 
 #include "emu.h"
 
-#include "bus/generic/carts.h"
-#include "bus/generic/slot.h"
-
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/svga_paradise.h"
+#include "bus/megadrive/cart/options.h"
+#include "bus/megadrive/cart/slot.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/sms_ctrl/controllers.h"
@@ -465,7 +464,7 @@ private:
 	required_device<screen_device> m_mdscreen;
 	required_memory_bank m_tmss_bank;
 	memory_view m_tmss_view;
-	required_device<generic_slot_device> m_md_cart;
+	required_device<megadrive_cart_slot_device> m_md_cart;
 	required_device<ym7101_device> m_md_vdp;
 	required_device<ym_generic_device> m_opn;
 	memory_view m_md_68k_sound_view;
@@ -536,7 +535,8 @@ void teradrive_state::md_68k_map(address_map &map)
 //  m_cart_view[1](0x400000, 0x400fff).view(m_tmss_view);
 //  m_tmss_view[0](0x400000, 0x400fff).rom().region("tmss", 0);
 
-	map(0x000000, 0x3fffff).r(m_md_cart, FUNC(generic_slot_device::read_rom));
+	// TODO: implement bus conflict for 0x40'0000,0x7f'ffff area (if expansion port attached)
+	map(0x000000, 0x7fffff).rw(m_md_cart, FUNC(megadrive_cart_slot_device::base_r), FUNC(megadrive_cart_slot_device::base_w));
 	map(0x000000, 0x000fff).view(m_tmss_view);
 	m_tmss_view[0](0x000000, 0x000fff).bankr(m_tmss_bank);
 
@@ -598,7 +598,7 @@ void teradrive_state::md_68k_map(address_map &map)
 
 //  map(0xa11400, 0xa1dfff) <unmapped> (no DTACK generation, freezes machine without additional HW)
 //  map(0xa12000, 0xa120ff).m(m_exp, FUNC(...::fdc_map));
-//  map(0xa13000, 0xa130ff).m(m_cart, FUNC(...::time_map));
+	map(0xa13000, 0xa130ff).rw(m_md_cart, FUNC(megadrive_cart_slot_device::time_r), FUNC(megadrive_cart_slot_device::time_w));
 //  map(0xa14000, 0xa14003) TMSS lock
 //  map(0xa15100, 0xa153ff) 32X registers if present, <unmapped> otherwise
 //  map(0xae0000, 0xae0003) Teradrive bus switch registers
@@ -1026,11 +1026,7 @@ void teradrive_state::teradrive(machine_config &config)
 		m_md_ioports[N]->set_out_handler(m_md_ctrl_ports[N], FUNC(sms_control_port_device::out_w));
 	}
 
-	// TODO: vestigial
-	GENERIC_CARTSLOT(config, m_md_cart, generic_plain_slot, "megadriv_cart");
-	m_md_cart->set_width(GENERIC_ROM16_WIDTH);
-	// TODO: generic_cartslot has issues with softlisted endianness (use loose for now)
-	m_md_cart->set_endian(ENDIANNESS_BIG);
+	MEGADRIVE_CART_SLOT(config, m_md_cart, megadrive_cart_options, nullptr).set_must_be_loaded(false);
 
 	SPEAKER(config, "md_speaker", 2).front();
 
