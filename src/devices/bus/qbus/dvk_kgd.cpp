@@ -33,6 +33,7 @@ DEFINE_DEVICE_TYPE(DVK_KGD, dvk_kgd_device, "kgd", "DVK KGD framebuffer")
 dvk_kgd_device::dvk_kgd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DVK_KGD, tag, owner, clock)
 	, device_qbus_card_interface(mconfig, *this)
+	, m_installed(false)
 	, m_screen(*this, "screen")
 {
 }
@@ -80,10 +81,8 @@ void dvk_kgd_device::device_add_mconfig(machine_config &config)
 
 void dvk_kgd_device::device_start()
 {
-	m_bus->install_device(0176640, 0176647, read16sm_delegate(*this, FUNC(dvk_kgd_device::read)),
-		write16sm_delegate(*this, FUNC(dvk_kgd_device::write)));
-
 	// save state
+	save_item(NAME(m_installed));
 	save_item(NAME(m_cr));
 	save_item(NAME(m_dr));
 	save_item(NAME(m_ar));
@@ -91,6 +90,8 @@ void dvk_kgd_device::device_start()
 
 	m_videoram_base = std::make_unique<uint8_t[]>(16384);
 	m_videoram = m_videoram_base.get();
+
+	m_installed = false;
 }
 
 
@@ -100,6 +101,12 @@ void dvk_kgd_device::device_start()
 
 void dvk_kgd_device::device_reset()
 {
+	if (!m_installed)
+	{
+		m_bus->install_device(0176640, 0176647, read16sm_delegate(*this, FUNC(dvk_kgd_device::read)),
+			write16sm_delegate(*this, FUNC(dvk_kgd_device::write)));
+		m_installed = true;
+	}
 	m_cr = m_dr = m_ar = m_ct = 0;
 }
 
