@@ -1779,7 +1779,6 @@ bool screen_device::update_quads()
 				}
 				m_texture[m_curbitmap]->set_bitmap(m_bitmap[m_curbitmap], m_visarea, m_bitmap[m_curbitmap].texformat());
 				m_curtexture = m_curbitmap;
-				m_curbitmap = 1 - m_curbitmap;
 			}
 
 			// brightness adjusted render color
@@ -1791,10 +1790,30 @@ bool screen_device::update_quads()
 		}
 	}
 
+	return m_changed;
+}
+
+
+//-------------------------------------------------
+//  switch current bitmap
+//-------------------------------------------------
+
+void screen_device::switch_current_bitmap()
+{
+	// only updated if live
+	if (machine().render().is_live(*this))
+	{
+		// only updated if empty and not a vector game; otherwise assume the driver did it directly
+		if (m_type != SCREEN_TYPE_VECTOR && (m_video_attributes & VIDEO_SELF_RENDER) == 0)
+		{
+			// if we're not skipping the frame and if the screen actually changed, then switch the bitmap
+			if (!machine().video().skip_this_frame() && m_changed)
+				m_curbitmap = 1 - m_curbitmap;
+		}
+	}
+
 	// reset the screen changed flags
-	bool result = m_changed;
 	m_changed = false;
-	return result;
 }
 
 
