@@ -28,12 +28,13 @@
         a = sample end address, bits 23-4 if looping, ignored for one-shot
         r = sample rate in 4.12 fixed point relative to 44100 Hz (0x1000 = 44100 Hz)
 
-    2  ----------------   ????????????????   ????????????????
-        All bits unknown.  Data is usually 0000 4000 C000 for one-shot and
-        something more complex for looping samples.
-
-        Happy suggests the second word is bits 20-4 of the loop start
-        address, but that does not line up with reality.  Needs more research.
+    2  ----------------   mmmmmmmmmmmmmmmm   bbbbbbbbbbbbbbbb
+		b = loop length.  Loop start = sample end - loop length.
+		m = 2's complement negative of the loop length multiplier, in the same
+			4.12 fixed point format as the sample rate.
+			A multiplier of 0x1000 means b is exactly the loop length, whereas
+			a multiplier of 0x0800 means b is double the loop length so you must
+			divide it by 2 to get the actual loop length.
 
     3  ----------------   vvvvvvvvvvvvvvvv   ----------------
         v = volume envelope starting value (16 bit, maaaaybe signed?)
@@ -68,8 +69,6 @@
         Unknown, written once on bootup for HNG64 games.
 
     TODO:
-    - sams64 and sams64_2 sometimes have samples get stuck on.  Other games do not
-      seem to have this problem.  Why?
     - How does the delay effect work?
     - How does DMA work?
 
