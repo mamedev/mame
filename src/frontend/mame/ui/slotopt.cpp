@@ -19,6 +19,7 @@
 
 #include <algorithm>
 
+#include "../osd/modules/lib/osdlib.h"
 
 /***************************************************************************
     UTILITY
@@ -28,6 +29,7 @@ namespace {
 
 // constants
 void *const ITEMREF_RESET = ((void *)1);
+void *const ITEMREF_COPYTOCLIPBOARD = ((void *)2);
 constexpr char const DIVIDER[] = "------";
 
 } // anonymous namespace
@@ -202,6 +204,7 @@ void menu_slot_devices::populate()
 	}
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset System"), 0, ITEMREF_RESET);
+	item_append(_("Copy to Clipboard"), 0, ITEMREF_COPYTOCLIPBOARD);
 }
 
 
@@ -224,7 +227,7 @@ void menu_slot_devices::recompute_metrics(uint32_t width, uint32_t height, float
 
 void menu_slot_devices::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	if (selectedref && (ITEMREF_RESET != selectedref))
+	if (selectedref && (ITEMREF_RESET != selectedref) && (ITEMREF_COPYTOCLIPBOARD != selectedref))
 	{
 		device_slot_interface *const slot(reinterpret_cast<device_slot_interface *>(selectedref));
 		device_slot_interface::slot_option const *const option(get_current_option(*slot));
@@ -251,6 +254,26 @@ bool menu_slot_devices::handle(event const *ev)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)
 			machine().schedule_hard_reset();
+	}
+	else if (ev->itemref == ITEMREF_COPYTOCLIPBOARD)
+	{
+		if (ev->iptkey == IPT_UI_SELECT)
+		{
+			std::stringstream outss;
+			for (device_slot_interface &slot : slot_interface_enumerator(m_config->root_device()))
+			{
+				if (slot.has_selectable_options())
+				{
+					// get the slot option
+					const slot_option &opt(machine().options().slot_option(slot.slot_name()));
+
+					outss << "-" << slot.slot_name() << " " << (!opt.value().empty()  ? opt.value() : "\"\"" ) << " ";
+				}
+			}
+
+			if (!osd_set_clipboard_text(outss.str()))
+				machine().popmessage(_("Slot Options", "Copied slot options to clipboard"));
+		}
 	}
 	else if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 	{
