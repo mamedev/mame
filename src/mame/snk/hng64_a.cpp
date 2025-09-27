@@ -367,6 +367,6 @@ void hng64_state::hng64_audio(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	L7A1045(config, m_dsp, 33.8688_MHz_XTAL);
-	m_dsp->add_route(0, "speaker", 0.1, 0);
-	m_dsp->add_route(1, "speaker", 0.1, 1);
+	m_dsp->add_route(0, "speaker", 1.0, 0);
+	m_dsp->add_route(1, "speaker", 1.0, 1);
 }
