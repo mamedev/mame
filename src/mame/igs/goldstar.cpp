@@ -23534,15 +23534,19 @@ ROM_START( megaline )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "11.b1",  0x08000, 0x08000, CRC(6e7810d8) SHA1(16f1331851041b971a62f653f69b8853a2c4f868) )
-	ROM_CONTINUE(       0x00000, 0x08000)
+	ROM_CONTINUE(       0x00000, 0x08000 )
 	ROM_LOAD( "12.d1",  0x18000, 0x08000, CRC(054c6ee7) SHA1(6e91223c8f6a2dc93a39a1e6453ccd9c731b8b45) )
-	ROM_CONTINUE(       0x10000, 0x08000)
+	ROM_CONTINUE(       0x10000, 0x08000 )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "13.j1",  0x4000, 0x4000, CRC(5676ccb3) SHA1(36794c365c0b7490a9046422c0b334a3cdc15b8e) )
-	ROM_CONTINUE(       0x0000, 0x4000)
-	ROM_LOAD( "14.k1",  0xc000, 0x4000, CRC(81acfc59) SHA1(b6f94ade557a2d3ba5e358d33e83016a210890e7) )
-	ROM_CONTINUE(       0x8000, 0x4000)
+	ROM_LOAD( "13.j1",  0x6000, 0x2000, CRC(5676ccb3) SHA1(36794c365c0b7490a9046422c0b334a3cdc15b8e) )
+	ROM_CONTINUE(       0x4000, 0x2000 )
+	ROM_CONTINUE(       0x2000, 0x2000 )
+	ROM_CONTINUE(       0x0000, 0x2000 )
+	ROM_LOAD( "14.k1",  0xe000, 0x2000, CRC(81acfc59) SHA1(b6f94ade557a2d3ba5e358d33e83016a210890e7) )
+	ROM_CONTINUE(       0xc000, 0x2000 )
+	ROM_CONTINUE(       0xa000, 0x2000 )
+	ROM_CONTINUE(       0x8000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "tbp24s10n.h4", 0x0000, 0x0100, CRC(4acd5887) SHA1(dca1187a74d9f4abc53b77a1590ec726f682dd91) )
@@ -23561,17 +23565,21 @@ ROM_START( skillch )  // same PCB as megaline
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "1.b1",  0x08000, 0x08000, CRC(c2554538) SHA1(ecb5ab7f611b937a5ff6dc26c6b0cb18b82acd93) )
-	ROM_CONTINUE(      0x00000, 0x08000)
+	ROM_CONTINUE(      0x00000, 0x08000 )
 	ROM_LOAD( "2.d1",  0x18000, 0x08000, CRC(a7eb57bf) SHA1(1346b03f9540d9235c5ca41f328c39b9ac9c3b17) )
-	ROM_CONTINUE(      0x10000, 0x08000)
+	ROM_CONTINUE(      0x10000, 0x08000 )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "3.j1",  0x4000, 0x4000, CRC(1cbaaae6) SHA1(d56bb5a6a466bc74d5bbb2ba6f52a5ae8b0748a3) )  // 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(      0x0000, 0x4000)
-	ROM_IGNORE(                0x8000 )
-	ROM_LOAD( "4.k1",  0xc000, 0x4000, CRC(9640841d) SHA1(421c78148884029e15a126652679fde990a24064) )  // 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(      0x8000, 0x4000)
-	ROM_IGNORE(                0x8000 )
+	ROM_LOAD( "3.j1",   0x6000, 0x2000, CRC(1cbaaae6) SHA1(d56bb5a6a466bc74d5bbb2ba6f52a5ae8b0748a3) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(       0x4000, 0x2000 )
+	ROM_CONTINUE(       0x2000, 0x2000 )
+	ROM_CONTINUE(       0x0000, 0x2000 )
+	ROM_IGNORE(                 0x8000 )
+	ROM_LOAD( "4.k1",   0xe000, 0x2000, CRC(9640841d) SHA1(421c78148884029e15a126652679fde990a24064) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(       0xc000, 0x2000 )
+	ROM_CONTINUE(       0xa000, 0x2000 )
+	ROM_CONTINUE(       0x8000, 0x2000 )
+	ROM_IGNORE(                 0x8000 )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "tbp24s10n.h4", 0x0000, 0x0100, CRC(4acd5887) SHA1(dca1187a74d9f4abc53b77a1590ec726f682dd91) )
@@ -23595,12 +23603,16 @@ ROM_START( skillcha )  // same PCB as megaline
 	ROM_CONTINUE(      0x10000, 0x08000)
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "3.j1",  0x4000, 0x4000, CRC(1cbaaae6) SHA1(d56bb5a6a466bc74d5bbb2ba6f52a5ae8b0748a3) )  // 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(      0x0000, 0x4000)
-	ROM_IGNORE(                0x8000 )
-	ROM_LOAD( "4.k1",  0xc000, 0x4000, CRC(9640841d) SHA1(421c78148884029e15a126652679fde990a24064) )  // 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(      0x8000, 0x4000)
-	ROM_IGNORE(                0x8000 )
+	ROM_LOAD( "3.j1",   0x6000, 0x2000, CRC(1cbaaae6) SHA1(d56bb5a6a466bc74d5bbb2ba6f52a5ae8b0748a3) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(       0x4000, 0x2000 )
+	ROM_CONTINUE(       0x2000, 0x2000 )
+	ROM_CONTINUE(       0x0000, 0x2000 )
+	ROM_IGNORE(                 0x8000 )
+	ROM_LOAD( "4.k1",   0xe000, 0x2000, CRC(9640841d) SHA1(421c78148884029e15a126652679fde990a24064) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(       0xc000, 0x2000 )
+	ROM_CONTINUE(       0xa000, 0x2000 )
+	ROM_CONTINUE(       0x8000, 0x2000 )
+	ROM_IGNORE(                 0x8000 )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "tbp24s10n.h4", 0x0000, 0x0100, CRC(4acd5887) SHA1(dca1187a74d9f4abc53b77a1590ec726f682dd91) )
@@ -27548,9 +27560,9 @@ GAME(  1986, fevercha,   feverch,  feverch,  feverch,  goldstar_state, empty_ini
 GAME(  1986, feverchtw,  feverch,  feverch,  feverch,  goldstar_state, empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )  // reels scrolling, I/O
 
 // --- Wing W-7 hardware ---
-GAMEL( 1991, megaline,   0,        megaline, megaline, wingco_state,   init_mgln,      ROT0, "Fun World",         "Mega Lines (Wing W-7 System)",                             MACHINE_UNEMULATED_PROTECTION,          layout_megaline )  // reel symbols protection
-GAMEL( 1986, skillch,    0,        megaline, megaline, wingco_state,   init_skch,      ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 1, 62-98 main)",                    MACHINE_UNEMULATED_PROTECTION,          layout_skillch )   // reel symbols protection
-GAMEL( 1986, skillcha,   skillch,  megaline, skillcha, wingco_state,   init_skcha,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2, 53-98 main)",                    MACHINE_UNEMULATED_PROTECTION,          layout_skillch )   // reel symbols protection
+GAMEL( 1991, megaline,   0,        megaline, megaline, wingco_state,   init_mgln,      ROT0, "Fun World",         "Mega Lines (Wing W-7 System)",                             0,          layout_megaline )
+GAMEL( 1986, skillch,    0,        megaline, megaline, wingco_state,   init_skch,      ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 1, 62-98 main)",                    0,          layout_skillch )
+GAMEL( 1986, skillcha,   skillch,  megaline, skillcha, wingco_state,   init_skcha,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2, 53-98 main)",                    0,          layout_skillch )
 
 // --- Wing W-8 hardware ---
 GAME(  1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                MACHINE_NOT_WORKING )  // M80C51F MCU
