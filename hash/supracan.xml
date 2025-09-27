@@ -97,7 +97,7 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 	<software name="staiwbbl" supported="no">
 		<description>Super Taiwanese Baseball League ~ Chao Ji Zhong Hua Zhi Bang Lian Meng</description>
 		<year>1995</year>
-		<publisher>C&amp;E Soft</publisher>
+		<publisher>C&amp;E</publisher>
 		<notes><![CDATA[
 [video] ROZ is misaligned during intro, and initially concealed (blending?).
 [sound] missing crowd noise during gameplay, tries to play an empty buffer in the $2xxx range. (fixed with internal sound BIOS dump for attract)

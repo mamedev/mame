@@ -33,7 +33,7 @@ megadrive_unl_tilesmj2_device::megadrive_unl_tilesmj2_device(const machine_confi
 void megadrive_unl_tilesmj2_device::cart_map(address_map &map)
 {
 	map(0x00'0000, 0x3f'ffff).bankr(m_rom);
-//	map(0x40'0000, 0x40'0000) unused?
+//  map(0x40'0000, 0x40'0000) unused?
 	map(0x40'0002, 0x40'0002).lr8(NAME([] () { return 0x98; })); // PC=193c, <unknown>
 	map(0x40'0004, 0x40'0004).lr8(NAME([] () { return 0xc9; })); // PC=3ec, startup
 	map(0x40'0006, 0x40'0006).lr8(NAME([] () { return 0x18; })); // PC=1626, attract
@@ -86,9 +86,9 @@ void megadrive_unl_smouse_device::cart_map(address_map &map)
 }
 
 /*
- * Ya Se Chuan Shuo
+ * Ya Se Chuan Shuo / Wu Kong Wai Zhuan
  * https://segaretro.org/Ya_Se_Chuan_Shuo
- *
+ * https://segaretro.org/Wu_Kong_Wai_Zhuan
  *
  */
 

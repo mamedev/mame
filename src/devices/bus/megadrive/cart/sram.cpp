@@ -4,7 +4,6 @@
 #include "emu.h"
 #include "sram.h"
 
-
 /*
  * Generic ROM + SRAM (Sega style)
  *
@@ -81,8 +80,8 @@ void megadrive_rom_sram_device::cart_map(address_map &map)
 {
 	megadrive_rom_device::cart_map(map);
 	// TODO: most if not all of them really uses 8-bit interface
-	map(0x200000, 0x200001 | m_nvram_mask).view(m_sram_view);
-	m_sram_view[0](0x200000, 0x200001 | m_nvram_mask).lrw8(
+	map(0x20'0000, 0x20'0001 | m_nvram_mask).view(m_sram_view);
+	m_sram_view[0](0x20'0000, 0x20'0001 | m_nvram_mask).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_nvram_base[offset];
 		}),
@@ -212,82 +211,6 @@ void megadrive_rom_hardball95_device::cart_map(address_map &map)
 	map(0x00'0000, 0x3f'ffff).bankr(m_rom);
 	map(0x30'0000, 0x30'ffff).rw(FUNC(megadrive_rom_hardball95_device::nvram_r), FUNC(megadrive_rom_hardball95_device::nvram_w));
 }
-
-/*
- * Beggar Prince / Xin Qi Gai Wang Zi
- *
- * NVRAM at $40'0000
- * Some writes in ROM space at startup, PC=B4BEA (at least) tests that $100-$102
- * returns SW vectors 0x46fc2700 and resets if unhappy, presumably against copiers.
- *
- * NOTE:
- * - xinqig doesn't work on Teradrive TMSS, no SEGA at $100. Cursory testing was performed.
- * - beggarp (early version) just reuses this. Writes 0x8080 to $e00, which should unlock the
- *   NVRAM (currently unemulated);
- * - To quickly check saving: start a new game, skip intro with start button then go to the
- *   bottom-right house, enter into the aura circle and press start to bring inventory, select the
- *   left diary with pen icon (normally disabled).
- *
- */
-
-DEFINE_DEVICE_TYPE(MEGADRIVE_UNL_XINQIG, megadrive_unl_xinqig_device, "megadrive_unl_xinqig", "Megadrive Xin Qi Gai Wang Zi cart")
-
-megadrive_unl_xinqig_device::megadrive_unl_xinqig_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: megadrive_rom_tplay96_device(mconfig, type, tag, owner, clock)
-{
-}
-
-megadrive_unl_xinqig_device::megadrive_unl_xinqig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: megadrive_unl_xinqig_device(mconfig, MEGADRIVE_UNL_XINQIG, tag, owner, clock)
-{
-}
-
-u16 megadrive_unl_xinqig_device::get_nvram_length()
-{
-	return 0x4000;
-}
-
-void megadrive_unl_xinqig_device::cart_map(address_map &map)
-{
-	map(0x00'0000, 0x3f'ffff).bankr(m_rom);
-	map(0x40'0000, 0x40'7fff).rw(FUNC(megadrive_unl_xinqig_device::nvram_r), FUNC(megadrive_unl_xinqig_device::nvram_w));
-}
-
-/*
- * beggarp1 Beggar Prince (the Super Fighter Team rev 1 release of above)
- *
- *
- */
-
-DEFINE_DEVICE_TYPE(MEGADRIVE_HB_BEGGARP1, megadrive_hb_beggarp1_device, "megadrive_hb_beggarp1", "Megadrive Beggar Prince rev 1 cart")
-
-megadrive_hb_beggarp1_device::megadrive_hb_beggarp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: megadrive_unl_xinqig_device(mconfig, MEGADRIVE_HB_BEGGARP1, tag, owner, clock)
-	, m_sram_view(*this, "sram_view")
-{
-}
-
-void megadrive_hb_beggarp1_device::device_reset()
-{
-	megadrive_unl_xinqig_device::device_reset();
-	m_sram_view.disable();
-}
-
-void megadrive_hb_beggarp1_device::cart_map(address_map &map)
-{
-	map(0x00'0000, 0x3f'ffff).bankr(m_rom);
-	map(0x00'0e00, 0x00'0e01).lw16(
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			// Writes 0xa0a0 after the Super Fighter Team logo, that unlocks the NVRAM
-			// TODO: pinpoint what unlocks reading and writing
-			logerror("$e00 write SRAM unlock %04x & %04x\n", data, mem_mask);
-			m_sram_view.select(0);
-		})
-	);
-	map(0x3c'0000, 0x3c'7fff).view(m_sram_view);
-	m_sram_view[0](0x3c'0000, 0x3c'7fff).rw(FUNC(megadrive_hb_beggarp1_device::nvram_r), FUNC(megadrive_hb_beggarp1_device::nvram_w));
-}
-
 
 /*
  * San Guo Zhi V / Tun Shi Tian Di III

@@ -56,11 +56,16 @@ void megadrive_rom_device::cart_map(address_map &map)
 
 DEFINE_DEVICE_TYPE(MEGADRIVE_ROM_SSF2, megadrive_rom_ssf2_device, "megadrive_rom_ssf2", "Megadrive SSF2 ROM cart")
 
-megadrive_rom_ssf2_device::megadrive_rom_ssf2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MEGADRIVE_ROM_SSF2, tag, owner, clock)
+megadrive_rom_ssf2_device::megadrive_rom_ssf2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_megadrive_cart_interface( mconfig, *this )
 	, m_rom_bank(*this, "rom_bank_%u", 0U)
 	, m_sram_view(*this, "sram_view")
+{
+}
+
+megadrive_rom_ssf2_device::megadrive_rom_ssf2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: megadrive_rom_ssf2_device(mconfig, MEGADRIVE_ROM_SSF2, tag, owner, clock)
 {
 }
 
@@ -86,7 +91,8 @@ void megadrive_rom_ssf2_device::device_reset()
 	m_sram_view.disable();
 }
 
-void megadrive_rom_ssf2_device::cart_map(address_map &map)
+// need this for subclassing ("A memory_view can be present in only one address map")
+void megadrive_rom_ssf2_device::cart_bank_map(address_map &map)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -94,7 +100,11 @@ void megadrive_rom_ssf2_device::cart_map(address_map &map)
 
 		map(0x00'0000 | (page_size * i), 0x07'ffff | (page_size * i)).bankr(m_rom_bank[i]);
 	}
+}
 
+void megadrive_rom_ssf2_device::cart_map(address_map &map)
+{
+	map(0x00'0000, 0x3f'ffff).m(*this, FUNC(megadrive_rom_ssf2_device::cart_bank_map));
 	map(0x20'0000, 0x3f'ffff).view(m_sram_view);
 	m_sram_view[0](0x20'0000, 0x3f'ffff).unmaprw();
 }
@@ -107,11 +117,11 @@ void megadrive_rom_ssf2_device::time_io_map(address_map &map)
 		else
 			m_sram_view.select(0);
 	}));
-	map(0xf3, 0xf3).lw8(NAME([this] (offs_t offset, u8 data) {m_rom_bank[1]->set_entry(data & 0xf);}));
-	map(0xf5, 0xf5).lw8(NAME([this] (offs_t offset, u8 data) {m_rom_bank[2]->set_entry(data & 0xf);}));
-	map(0xf7, 0xf7).lw8(NAME([this] (offs_t offset, u8 data) {m_rom_bank[3]->set_entry(data & 0xf);}));
-	map(0xf9, 0xf9).lw8(NAME([this] (offs_t offset, u8 data) {m_rom_bank[4]->set_entry(data & 0xf);}));
-	map(0xfb, 0xfb).lw8(NAME([this] (offs_t offset, u8 data) {m_rom_bank[5]->set_entry(data & 0xf);}));
-	map(0xfd, 0xfd).lw8(NAME([this] (offs_t offset, u8 data) {m_rom_bank[6]->set_entry(data & 0xf);}));
-	map(0xff, 0xff).lw8(NAME([this] (offs_t offset, u8 data) {m_rom_bank[7]->set_entry(data & 0xf);}));
+	map(0xf3, 0xf3).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[1]->set_entry(data & 0xf); }));
+	map(0xf5, 0xf5).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[2]->set_entry(data & 0xf); }));
+	map(0xf7, 0xf7).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[3]->set_entry(data & 0xf); }));
+	map(0xf9, 0xf9).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[4]->set_entry(data & 0xf); }));
+	map(0xfb, 0xfb).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[5]->set_entry(data & 0xf); }));
+	map(0xfd, 0xfd).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[6]->set_entry(data & 0xf); }));
+	map(0xff, 0xff).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[7]->set_entry(data & 0xf); }));
 }

@@ -13685,7 +13685,7 @@ No [VDP] sprites
 		<year>1996</year>
 		<publisher>Codemasters</publisher>
 		<notes><![CDATA[
-[EEPROM] Doesn't save in megadriv, does in teradrive
+[CART] [EEPROM] Doesn't save in megadriv, does in teradrive
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_blara96"/>
@@ -13700,7 +13700,7 @@ No [VDP] sprites
 		<year>1996</year>
 		<publisher>Codemasters</publisher>
 		<notes><![CDATA[
-[EEPROM] Doesn't save in megadriv, does in teradrive
+[CART] [EEPROM] Doesn't save in megadriv, does in teradrive
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_blara96"/>
@@ -15353,7 +15353,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
-<!-- Nearly identical to final build save for a few bytes -->
+	<!-- Nearly identical to final build save for a few bytes -->
 	<software name="colleg96p" cloneof="colleg96">
 		<description>College Football USA 96 (prototype 19950621)</description>
 		<year>1995</year>
@@ -16511,7 +16511,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
-<!-- This dump comes from an internal "Confidential Preview" cart at Acclaim USA -->
+	<!-- This dump comes from an internal "Confidential Preview" cart at Acclaim USA -->
 	<software name="cutthrp" cloneof="cutthr">
 		<description>CutThroat Island (prototype)</description>
 		<year>1995</year>
@@ -16595,7 +16595,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
-<!-- This is likely a dump from one of 50 reproduction cartridges, sold on AtariAge, based on an original prototype -->
+	<!-- This is likely a dump from one of 50 reproduction cartridges, sold on AtariAge, based on an original prototype -->
 	<software name="indyheat">
 		<description>Danny Sullivan's Indy Heat (prototype) (pirate)</description>
 		<year>1992</year>
@@ -16889,8 +16889,10 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="Spanish" />
 		<info name="release" value="2020-09-13" />
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="15335424">
-				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 5) (2021-09-13) (Aftermarket) (Unl).bin" size="15335424" crc="98c8962a" sha1="8cbe02b3e6837ede936cf43961ef831c352bd818" />
+			<feature name="slot" value="ssf_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 5) (2021-09-13) (Aftermarket) (Unl).bin" size="0xea0000" crc="98c8962a" sha1="8cbe02b3e6837ede936cf43961ef831c352bd818" />
+				<rom value="0xFF" size="0x160000" offset="0xea0000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -16947,8 +16949,10 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="Spanish" />
 		<info name="release" value="2020-08-27" />
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="15335424">
-				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 3) (2021-08-27) (Aftermarket) (Unl).bin" size="15335424" crc="dda1a052" sha1="44017e148d2b8a6e07cfc9ee8269e028cb6237b7" />
+			<feature name="slot" value="ssf_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 3) (2021-08-27) (Aftermarket) (Unl).bin" size="0xea0000" crc="dda1a052" sha1="44017e148d2b8a6e07cfc9ee8269e028cb6237b7" />
+				<rom value="0xFF" size="0x160000" offset="0xea0000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -16965,8 +16969,10 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="Spanish" />
 		<info name="release" value="2020-09-03" />
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="15335424">
-				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 4) (2021-09-03) (Aftermarket) (Unl).bin" size="15335424" crc="b9a8f84a" sha1="11c42868e173c80fd0af5fb5284855762d74da80" />
+			<feature name="slot" value="ssf_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 4) (2021-09-03) (Aftermarket) (Unl).bin" size="0xea0000" crc="b9a8f84a" sha1="11c42868e173c80fd0af5fb5284855762d74da80" />
+				<rom value="0xFF" size="0x160000" offset="0xea0000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -28513,7 +28519,7 @@ Throws "this game is [...] european megadrive system" even with megadriv system 
 		<year>1997</year>
 		<publisher>Codemasters</publisher>
 		<notes><![CDATA[
-[EEPROM] Doesn't save in megadriv, does in teradrive
+[CART] [EEPROM] Doesn't save in megadriv, does in teradrive
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_blara96"/>
@@ -35599,18 +35605,22 @@ Black screen
 		<info name="language" value="English"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sf002"/>
-			<dataarea name="rom" width="16" endianness="big" size="2228224">
-				<rom name="legend of wukong (unl).bin" size="2228224" crc="72f11771" sha1="4ef41e4caccab118014abb8e079c7e5668a4f468"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x400000">
+				<rom name="legend of wukong (unl).bin" size="0x220000" crc="72f11771" sha1="4ef41e4caccab118014abb8e079c7e5668a4f468"/>
+				<rom value="0xFF" size="0x1e0000" offset="0x220000" loadflag="fill" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="wukongc" cloneof="wukong">
+	<software name="wukongc" cloneof="wukong" supported="no">
 		<description>Wùkōng Wàizhuàn (China)</description>
 		<year>1996</year>
 		<publisher>Ming</publisher>
+		<notes><![CDATA[
+[CART] cannot save in megadriv (corrupted kanjis)
+]]></notes>
 		<info name="alt_title" value="悟空外傳"/>
 		<info name="developer" value="Gamtec"/>
 		<info name="language" value="Chinese"/>
@@ -36036,7 +36046,7 @@ Black screen
 		<publisher>Ming</publisher>
 		<notes><![CDATA[
 https://segaretro.org/Ya_Se_Chuan_Shuo
-Cannot save
+[CART] cannot save in megadriv
 ]]></notes>
 		<info name="serial" value="GM-95403"/>
 		<info name="alt_title" value="亚瑟传说"/>
@@ -37266,7 +37276,7 @@ https://segaretro.org/Smash_Controller
 		<description>Magic Bubble</description>
 		<year>1993</year>
 		<publisher>C&amp;E</publisher>
-		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao (Cart)"/>
+		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="magic_bubble.bin" size="524288" crc="3ec61dc1" sha1="134086c458e20eee1ab614e2df64083942311e8c"/>
@@ -37278,7 +37288,7 @@ https://segaretro.org/Smash_Controller
 		<description>Magic Bubble (alt)</description>
 		<year>1993</year>
 		<publisher>C&amp;E</publisher>
-		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao (Cart)"/>
+		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="magic bubble [a1].bin" size="524288" crc="503e0718" sha1="de8037a8cea321ca3f0c03b7a4c36b9fa3b67be2"/>
@@ -38803,5 +38813,22 @@ Crashes at startup with megadriv (verify)
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="ssfextest" supported="no">
+		<description>SSF Extended test (v2)</description>
+		<year>2014</year>
+		<publisher>krikzz</publisher>
+		<notes><![CDATA[
+Sample cart for extended SSF support (MEGA-ED)
+[CART] unsupported by megadriv
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="ssf_ex"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="ssf-ex-test.bin" size="0x10000" crc="a819273d" sha1="2c3a8622f15ab4bcb33f0807dc78441885880dd0" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>

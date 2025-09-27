@@ -40,6 +40,9 @@ namespace bus::megadrive::slotoptions {
 	extern char const *const UNL_XINQIG;
 	extern char const *const HB_BEGGARP;
 	extern char const *const HB_BEGGARP1;
+	extern char const *const HB_WUKONG;
+	extern char const *const HB_STARODYS;
+
 	extern char const *const UNL_TILESMJ2;
 	extern char const *const UNL_ELFWOR;
 	extern char const *const UNL_SMOUSE;
@@ -72,30 +75,7 @@ namespace bus::megadrive::slotoptions {
 
 	extern char const *const ACTION_REPLAY;
 
-//	BEGGARP;                     /* Beggar Prince uses different sram start address + bankswitch tricks */
-//	WUKONG;                      /* Legend of Wukong uses different sram start address + bankswitch trick for last 128K of ROM */
-//	STARODYS;                    /* Star Odyssey */
-
-	// Cart + Slot Expansion
-//	SEGA_SK;                     /* Sonic & Knuckles pass-through cart */
-//
-//	// Cart + SVP
-//	SEGA_SVP;                    /* Virtua Racing */
-//
-//	// Cart + NVRAM
-//
-//	PSOLAR;                      /* Pier Solar (STM95 EEPROM) */
-//
-//	CHINFIGHT3;                  /* Chinese Fighters 3 */
-//	KAIJU;                       /* Pokemon Stadium */
-//	LIONK3;                      /* Lion King 3; Super Donkey Kong 99; Super King Kong 99 */
-//	SMW64;                       /* Super Mario World 64 */
-//	SRAM_ARG96;                  /* Futbol Argentino 96 (Argentina) (hack of J. League Pro Striker 2) */
-//	TC2000;                      /* TC 2000 (Argentina; protected) */
-//	TEKKENSP;                    /* Tekken Special */
-//	TOPFIGHTER;                  /* Top Fighter 2000 MK VIII */
-//
-//	TITAN;
+	extern char const *const HB_SSF;
 
 } // namespace bus::megadrive::slotoptions
 

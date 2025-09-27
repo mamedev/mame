@@ -44,3 +44,35 @@ void megadrive_unl_tc2000_device::cart_map(address_map &map)
 	map(0x10'0008, 0x10'0008).mirror(0x0f'fff0).lw8(NAME([this] (offs_t offset, u8 data) { (void)data; m_prot_latch = 0x50; }));
 	map(0x10'000c, 0x10'000c).mirror(0x0f'fff0).lw8(NAME([this] (offs_t offset, u8 data) { (void)data; m_prot_latch = 0xa0; }));
 }
+
+/*
+ * Futbol Argentino 96
+ * https://segaretro.org/J.League_Pro_Striker_2/Bootlegs
+ *
+ * TODO:
+ * - protection not really understood (game does a very small use of it)
+ *
+ */
+
+ DEFINE_DEVICE_TYPE(MEGADRIVE_UNL_FUTBOL_ARG96, megadrive_unl_futbol_arg96_device, "megadrive_unl_futbol_arg96", "Megadrive Futbol Argentino 96 cart")
+
+megadrive_unl_futbol_arg96_device::megadrive_unl_futbol_arg96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: megadrive_rom_tplay96_device(mconfig, MEGADRIVE_UNL_FUTBOL_ARG96, tag, owner, clock)
+{
+}
+
+u16 megadrive_unl_futbol_arg96_device::get_nvram_length()
+{
+	return 0x2000;
+}
+
+void megadrive_unl_futbol_arg96_device::cart_map(address_map &map)
+{
+	map(0x00'0000, 0x1f'ffff).mirror(0x20'0000).bankr(m_rom);
+	map(0x20'0000, 0x20'3fff).rw(FUNC(megadrive_unl_futbol_arg96_device::nvram_r), FUNC(megadrive_unl_futbol_arg96_device::nvram_w));
+	map(0x4c'6201, 0x4c'6201).lr8(NAME([] () { return 0xa; }));
+	map(0x4c'6601, 0x4c'6601).lr8(NAME([] () { return 0x9; }));
+	map(0x4c'6a01, 0x4c'6a01).lr8(NAME([] () { return 0x7; }));
+}
+
+

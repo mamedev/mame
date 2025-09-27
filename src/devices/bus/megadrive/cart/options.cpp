@@ -15,9 +15,11 @@
 #include "rockworld.h"
 #include "rom.h"
 #include "seganet.h"
+#include "sfteam.h"
 #include "sram.h"
 #include "smb.h"
 #include "smw64.h"
+#include "ssf.h"
 #include "tekkensp.h"
 #include "xboy.h"
 
@@ -26,6 +28,9 @@ namespace bus::megadrive::slotoptions {
 
 char const *const MD_STD                = "rom";
 char const *const MD_SSF2               = "rom_ssf2";
+char const *const HB_SSF                = "rom_titan"; // TODO: rename
+char const *const HB_SSF_SRAM           = "ssf_sram";
+char const *const HB_SSF_EX             = "ssf_ex";
 char const *const MD_SRAM               = "rom_sram";
 char const *const MD_SONIC3             = "rom_fram"; // TODO: change string
 char const *const MD_TPLAY96            = "rom_tplay96";
@@ -53,6 +58,8 @@ char const *const MC_GOLDM250           = "goldm250";
 char const *const UNL_XINQIG            = "rom_xinqig";
 char const *const HB_BEGGARP            = "rom_sf001";
 char const *const HB_BEGGARP1           = "rom_sf001_beggarp1";
+char const *const HB_WUKONG             = "rom_sf002";
+char const *const HB_STARODYS           = "rom_sf004";
 char const *const UNL_TILESMJ2          = "rom_16mj2";
 char const *const UNL_ELFWOR            = "rom_elfwor";
 char const *const UNL_SMOUSE            = "rom_smouse";
@@ -76,6 +83,7 @@ char const *const UNL_SANGUO5           = "rom_sanguo5";
 char const *const UNL_AVARTISAN         = "rom_realtec";
 char const *const UNL_TEKKENSP          = "rom_tekkensp";
 char const *const UNL_TC2000            = "rom_tc2000";
+char const *const UNL_FUTBOL_ARG96      = "rom_sram_arg96";
 char const *const UNL_TOPF              = "rom_lion3";
 char const *const UNL_POKESTAD          = "rom_pokestad"; // TODO: alias of above, probably unneeded
 char const *const UNL_CHINF3            = "rom_chinf3";
@@ -93,18 +101,15 @@ void megadrive_cart_options(device_slot_interface &device)
 	using namespace bus::megadrive;
 
 	// normal
-	device.option_add_internal(slotoptions::MD_STD, MEGADRIVE_ROM);
+	device.option_add_internal(slotoptions::MD_STD,  MEGADRIVE_ROM);
 	device.option_add_internal(slotoptions::MD_SSF2, MEGADRIVE_ROM_SSF2);
 
 	// SRAM
-	device.option_add_internal(slotoptions::MD_SRAM, MEGADRIVE_ROM_SRAM);
-	device.option_add_internal(slotoptions::MD_SONIC3, MEGADRIVE_ROM_SONIC3);
-	device.option_add_internal(slotoptions::MD_TPLAY96, MEGADRIVE_ROM_TPLAY96);
+	device.option_add_internal(slotoptions::MD_SRAM,       MEGADRIVE_ROM_SRAM);
+	device.option_add_internal(slotoptions::MD_SONIC3,     MEGADRIVE_ROM_SONIC3);
+	device.option_add_internal(slotoptions::MD_TPLAY96,    MEGADRIVE_ROM_TPLAY96);
 	device.option_add_internal(slotoptions::MD_HARDBALL95, MEGADRIVE_ROM_HARDBALL95);
-	device.option_add_internal(slotoptions::UNL_XINQIG, MEGADRIVE_UNL_XINQIG);
-	device.option_add_internal(slotoptions::HB_BEGGARP, MEGADRIVE_UNL_XINQIG);
-	device.option_add_internal(slotoptions::HB_BEGGARP1, MEGADRIVE_HB_BEGGARP1);
-	device.option_add_internal(slotoptions::UNL_SANGUO5, MEGADRIVE_UNL_SANGUO5);
+	device.option_add_internal(slotoptions::UNL_SANGUO5,   MEGADRIVE_UNL_SANGUO5);
 
 	// EEPROM
 	device.option_add_internal(slotoptions::MD_EEPROM,          MEGADRIVE_EEPROM);
@@ -115,7 +120,6 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::MD_EEPROM_NHLPA,    MEGADRIVE_EEPROM_NHLPA);
 	device.option_add_internal(slotoptions::MD_EEPROM_BLARA95,  MEGADRIVE_EEPROM_BLARA95);
 	device.option_add_internal(slotoptions::MD_EEPROM_BLARA96,  MEGADRIVE_EEPROM_BLARA96);
-
 
 	// J-Cart
 	device.option_add_internal(slotoptions::MD_JCART_SAMPRAS,    MEGADRIVE_ROM_JCART_SAMPRAS);
@@ -173,7 +177,8 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::UNL_TEKKENSP, MEGADRIVE_UNL_TEKKENSP);
 
 	// Miky
-	device.option_add_internal(slotoptions::UNL_TC2000, MEGADRIVE_UNL_TC2000);
+	device.option_add_internal(slotoptions::UNL_TC2000,       MEGADRIVE_UNL_TC2000);
+	device.option_add_internal(slotoptions::UNL_FUTBOL_ARG96, MEGADRIVE_UNL_FUTBOL_ARG96);
 
 	// Rock Heaven / Rock World
 	device.option_add_internal(slotoptions::UNL_ROCKHEAVEN, MEGADRIVE_UNL_ROCKHEAVEN);
@@ -182,4 +187,16 @@ void megadrive_cart_options(device_slot_interface &device)
 	// Action Replay
 	device.option_add_internal(slotoptions::ACTION_REPLAY, MEGADRIVE_ACTION_REPLAY);
 
+	// Homebrew
+	// Super Fighter Team
+	device.option_add_internal(slotoptions::UNL_XINQIG,    MEGADRIVE_UNL_XINQIG);
+	device.option_add_internal(slotoptions::HB_BEGGARP,    MEGADRIVE_HB_BEGGARP);
+	device.option_add_internal(slotoptions::HB_BEGGARP1,   MEGADRIVE_HB_BEGGARP1);
+	device.option_add_internal(slotoptions::HB_WUKONG,     MEGADRIVE_HB_WUKONG);
+	device.option_add_internal(slotoptions::HB_STARODYS,   MEGADRIVE_HB_STARODYS);
+
+	// krikzz "SEGA SSF"
+	device.option_add_internal(slotoptions::HB_SSF,         MEGADRIVE_HB_SSF);
+	device.option_add_internal(slotoptions::HB_SSF_SRAM,    MEGADRIVE_HB_SSF_SRAM);
+	device.option_add_internal(slotoptions::HB_SSF_EX,      MEGADRIVE_HB_SSF_EX);
 }
