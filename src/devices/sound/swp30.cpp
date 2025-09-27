@@ -1249,8 +1249,8 @@ void swp30_device::iir1_block::keyon()
 
 s32 swp30_device::iir1_block::step(s32 input)
 {
-	s32 ya = std::clamp(s32((s64(m_a[0][0]) * input + s64(m_a[0][1]) * m_hx[0] + s64(m_b[0]) * m_hy[0]) >> 13), -0x800000, 0x7fffff);
-	s32 yb = std::clamp(s32((s64(m_a[1][0]) * ya    + s64(m_a[1][1]) * m_hx[1] + s64(m_b[1]) * m_hy[1]) >> 13), -0x800000, 0x7fffff);
+	s32 ya = std::clamp<s32>((s64(m_a[0][0]) * input + s64(m_a[0][1]) * m_hx[0] + s64(m_b[0]) * m_hy[0]) >> 13, -0x800000, 0x7fffff);
+	s32 yb = std::clamp<s32>((s64(m_a[1][0]) * ya    + s64(m_a[1][1]) * m_hx[1] + s64(m_b[1]) * m_hy[1]) >> 13, -0x800000, 0x7fffff);
 
 	m_hx[0] = input;
 	m_hy[0] = ya;
@@ -3821,22 +3821,19 @@ void swp30_device::meg_state::step()
 			r <<= shift == 3 ? 4 : shift;
 
 		// wrap at 42 bits (27.15)
-		if(r  &  0x0000020000000000)
-			r |= 0xfffffe0000000000;
-		else
-			r &= 0x000001ffffffffff;
+		r = util::sext(r, 42);
 
 		switch(BIT(opcode, 0x1e, 2)) {
 		case 0:
 			break;
 		case 1:
-			r = std::clamp(r, -0x4000000000, 0x3fffffffff);
+			r = std::clamp<s64>(r, -0x4000000000, 0x3fffffffff);
 			break;
 		case 2:
-			r = std::clamp(r, s64(0), 0x3fffffffff);
+			r = std::clamp<s64>(r, 0, 0x3fffffffff);
 			break;
 		case 3:
-			r = std::min(r < 0 ? -r : r, 0x3fffffffff);
+			r = std::min<s64>(r < 0 ? -r : r, 0x3fffffffff);
 			break;
 		}
 
@@ -3981,7 +3978,7 @@ void swp30_device::execute_run()
 void swp30_device::adc_step()
 {
 	for(int i=0; i != 4; i++)
-		m_adc[i] = std::clamp(m_meg->m_m[0x30 + i] >> 4, -0x20000, +0x1ffff);
+		m_adc[i] = std::clamp<s32>(m_meg->m_m[0x30 + i] >> 4, -0x20000, +0x1ffff);
 }
 
 void swp30_device::sample_step()
