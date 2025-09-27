@@ -37,8 +37,12 @@ todo: make this actually readable, we don't support unicode source files
 
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
 100&Medal Kazaaan!!                         834-15052                 ROM  JP     253-5508-0626J  AAFE-xxxxxxxxxxx
+100&Medal Kazaaan!!                         834-15052      MDA-C0091A CF   JP     253-5508-0626J  AAFE-xxxxxxxxxxx
+100&Medal Gekikazaaan!!                     834-15148      MDA-C0098  CF   JP     253-5508-0637J  AAFE-xxxxxxxxxxx
+100&Medal Gekikazaaan!!                     834-15148      MDA-C0098C CF   JP     253-5508-0637J  AAFE-xxxxxxxxxxx
 100&Medal Gekikazaaan!!                     834-15148      MDA-C0098D CF   JP     253-5508-0637J  AAFE-xxxxxxxxxxx
 Aminosan (satellite)                        837-15041    F*           ROM  JP     253-5508-0613J  AAFG-01A40195003, Medal
+Arabian Jewel                               834-15011      MDA-C0090  CF   JP     253-5508-616J   AAFE-xxxxxxxxxxx
 Arabian Jewel (main)                        834-15011                 ROM  JP     253-5508-616J   AAFE-xxxxxxxxxxx
 Arabian Jewel (satellite)                   837-15019                 ROM  JP     not used        AAFE-xxxxxxxxxxx
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
@@ -466,6 +470,57 @@ ROM_START( aminosan )
 	ROM_LOAD( "317-0613-jpn.ic15", 0, 0x800, CRC(cf3071b9) SHA1(27044f8d51ce3d2662847ff3f58dd4302935b9c8) )
 ROM_END
 
+ROM_START( arajewel )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// ARABIAN JEWEL
+	// MDA-C0090
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0090", 0, BAD_DUMP SHA1(f06ac21b9c3ea515380c0fe322fabd28c3b479d8) ) // BAD_DUMP note: image is fully OK but not clean, was dumped using Windows without write blocker
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0616-jpn.ic15", 0, 0x800, BAD_DUMP CRC(5b7ad9f3) SHA1(9f2406141c21f8e4b30d8835d3bfae7e597ce054) ) // bruteforced
+ROM_END
+
+ROM_START( arajewelm )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(466c057e) SHA1(e5a6f9c409600c23d6bdd7eef503a01add3173ae) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(7256208a) SHA1(c970b26bd6b3859627f517ac87f61362a7d35674) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0616-jpn.ic15", 0, 0x800, BAD_DUMP CRC(5b7ad9f3) SHA1(9f2406141c21f8e4b30d8835d3bfae7e597ce054) ) // bruteforced
+ROM_END
+
+ROM_START( arajewels )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(ff14d02a) SHA1(bd1e2e991228e8f7844239d4c1d7c4c997e3bbce) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(60ca004a) SHA1(0c02875444ea0cff366dd682f1b19564f178c766) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASEFF) // not populated
+ROM_END
+
+
 ROM_START( brickppl )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v201" )
@@ -658,6 +713,101 @@ ROM_START( isshoni )
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0496-jpn.ic15", 0, 0x800, CRC(7bca4250) SHA1(241c335deeaccd079028603432bf0f87185cb46d) )
+ROM_END
+
+ROM_START( kazaaan )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(5e9a017c) SHA1(de2ab7a50af28a5105ba73424aeff0c4e7e45475) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(4d3df6ee) SHA1(bbeae24f4d2dc2891c617dcca5f017c1de5290f5) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0626-jpn.ic15", 0, 0x800, BAD_DUMP CRC(4701a7b6) SHA1(edbceb9e5ea019bd434724af69b08a5a36dc1222) ) // bruteforced
+ROM_END
+
+ROM_START( kazaaana )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// 100&メダル KAZAAAN!!
+	// MDA-C0091
+	// REV. A
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0091a", 0, BAD_DUMP SHA1(635461381d072760fafea649766763b0fb0308e4) ) // BAD_DUMP note: image is fully OK but not clean, was dumped using Windows without write blocker
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0626-jpn.ic15", 0, 0x800, BAD_DUMP CRC(4701a7b6) SHA1(edbceb9e5ea019bd434724af69b08a5a36dc1222) ) // bruteforced
+ROM_END
+
+ROM_START( kazaaan2 )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// 100&メダル 激KAZAAAN!!
+	// MDA-C0098
+	// REV. D
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0098d", 0, SHA1(015db8c344ed86df8352c1bab653dbb027336fd1) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0637-jpn.ic15", 0, 0x800, CRC(bceb801a) SHA1(ebb9b9ad50712ab4bfe2813f678e9a146490f0cd) )
+ROM_END
+
+ROM_START( kazaaan2c )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// 100&メダル 激KAZAAAN!!
+	// MDA-C0098
+	// REV. C
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0098c", 0, BAD_DUMP SHA1(08f30e1f2708b5a6d00b279ad69a9000eb582145) ) // BAD_DUMP note: image is fully OK but not clean, was dumped using Windows without write blocker
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0637-jpn.ic15", 0, 0x800, CRC(bceb801a) SHA1(ebb9b9ad50712ab4bfe2813f678e9a146490f0cd) )
+ROM_END
+
+ROM_START( kazaaan2o )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+
+	// 100&メダル 激KAZAAAN!!
+	// MDA-C0098
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0098", 0, BAD_DUMP SHA1(a0e2f2f1bc637bfc2a57342e323299deba846d4d) )  // BAD_DUMP note: image is fully OK but not clean, was dumped using Windows without write blocker
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0637-jpn.ic15", 0, 0x800, CRC(bceb801a) SHA1(ebb9b9ad50712ab4bfe2813f678e9a146490f0cd) )
 ROM_END
 
 ROM_START( kingyo )
@@ -1081,12 +1231,15 @@ ROM_END
 GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
 // These use ROMs
 GAME( 2010, aminosan,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Aminosan (satellite)", GAME_FLAGS )
+GAME( 2010, arajewelm,arajewel,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Arabian Jewel (main)", GAME_FLAGS )
+GAME( 2010, arajewels,arajewel,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Arabian Jewel (satellite)", GAME_FLAGS )
 GAME( 2009, bingogal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (main)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, bingogals,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
 GAME( 2008, galilfac,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Galileo Factory (main)", GAME_FLAGS )
 GAME( 2008, isshoni,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Isshoni Wanwan Waiwai Puppy 2008", GAME_FLAGS ) // いっしょにワンワンわいわいパピー 2008
+GAME( 2010, kazaaan,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal Kazaaan!!", GAME_FLAGS )
 GAME( 2009, kingyo,segasp,       segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (1-player, Japan, Ver 1.005)", GAME_FLAGS ) // キッズ屋台村 金魚すくい
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
 GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
@@ -1101,6 +1254,7 @@ GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2009, unomedal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "UNO the Medal", GAME_FLAGS )
 GAME( 2009, westdrmg,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Western Dream Gold", GAME_FLAGS )
 // These use a CF card
+GAME( 2010, arajewel,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Arabian Jewel (MDA-C0090)", GAME_FLAGS )
 GAME( 2007, bingogala,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (MDA-C0039A)", GAME_FLAGS ) // 31.10.2007(main)/15.11.2007(satellite)
 GAME( 2008, bingogalb,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (MDA-C0039B)", GAME_FLAGS ) // 11.03.2008(main)
 GAME( 2009, bingogalc,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (MDA-C0039C)", GAME_FLAGS ) // 28.05.2009(main)
@@ -1110,6 +1264,10 @@ GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2010, dinokich,dinoki25,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Konglongwang - D-Kids VS Alpha Yaosai (China, Ver 2.501) (MDA-C0081)", GAME_FLAGS ) // D-Kids VS 亚法要塞
 GAME( 2008, dinoki4,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)", GAME_FLAGS ) // Ancient Ruler Dinosaur King - Wake up! New Power!!
 GAME( 2019, huhimage,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Heat Up Hockey Image (Ver.1.003R)", GAME_FLAGS )
+GAME( 2010, kazaaana,kazaaan,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal Kazaaan!! (MDA-C0091A)", GAME_FLAGS )
+GAME( 2016, kazaaan2,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal GekiKazaaan!! (MDA-C0098D)", GAME_FLAGS )
+GAME( 2016, kazaaan2c,kazaaan2,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal GekiKazaaan!! (MDA-C0098C)", GAME_FLAGS )
+GAME( 2012, kazaaan2o,kazaaan2,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal GekiKazaaan!! (MDA-C0098)", GAME_FLAGS )
 GAME( 2009, kingyoch,kingyo,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (4-player, China, Ver 1.000)", GAME_FLAGS )
 GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
 GAME( 2010, loveber3cn,loveber3, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (China, Ver 1.001) (MDA-C0071)", GAME_FLAGS )
