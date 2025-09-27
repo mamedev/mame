@@ -704,6 +704,7 @@ private:
 	uint8_t m_mcu_p1;
 
 	void animalw_map(address_map &map) ATTR_COLD;
+	void bingowng_map(address_map &map) ATTR_COLD;
 	void flaming7_map(address_map &map) ATTR_COLD;
 	void lucky8_map(address_map &map) ATTR_COLD;
 	void lucky8p_map(address_map &map) ATTR_COLD;
@@ -3082,6 +3083,30 @@ void wingco_state::lucky8_map(address_map &map)
 	map(0xb860, 0xb860).w(FUNC(wingco_state::p2_lamps_w));
 	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));  // sound
 	map(0xc000, 0xf7ff).rom();  // could be used by some sets like super972.
+	map(0xf800, 0xffff).ram();
+}
+
+void wingco_state::bingowng_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
+
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input/Output Ports
+	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  // no sound... only use both ports for DSWs
+	map(0xb850, 0xb850).w(FUNC(wingco_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(wingco_state::p2_lamps_w));
+	map(0xc000, 0xf7ff).rom();
 	map(0xf800, 0xffff).ram();
 }
 
@@ -12939,54 +12964,16 @@ void wingco_state::luckybar(machine_config &config)
 
 void wingco_state::bingowng(machine_config &config)
 {
+	lucky8(config);
+
 	// basic machine hardware
-	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
-
-	I8255A(config, m_ppi[0]);
-	m_ppi[0]->in_pa_callback().set_ioport("IN0");
-	m_ppi[0]->in_pb_callback().set_ioport("IN1");
-	m_ppi[0]->in_pc_callback().set_ioport("IN2");
-
-	I8255A(config, m_ppi[1]);
-	m_ppi[1]->in_pa_callback().set_ioport("IN3");
-	m_ppi[1]->in_pb_callback().set_ioport("IN4");
-	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
-
-	I8255A(config, m_ppi[2]);
-	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
-	m_ppi[2]->out_pa_callback().set(FUNC(wingco_state::system_outputa_w));
-	m_ppi[2]->out_pb_callback().set(FUNC(wingco_state::system_outputb_w));
-	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
-
-	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(wingco_state::screen_update_bingowng));
-	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
-	PALETTE(config, m_palette, FUNC(wingco_state::lucky8_palette), 256);
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::bingowng_map);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(wingco_state::screen_update_bingowng));
+	PALETTE(config.replace(), m_palette, FUNC(wingco_state::lucky8_palette), 256);
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, bingowng)
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-
-	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
-
-	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
-	aysnd.port_a_read_callback().set_ioport("DSW3");
-	aysnd.port_b_read_callback().set_ioport("DSW4");
-	aysnd.port_a_write_callback().set(FUNC(wingco_state::ay8910_outputa_w));
-	aysnd.port_b_write_callback().set(FUNC(wingco_state::ay8910_outputb_w));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	// payout hardware
-	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200));
+	SN76489(config.replace(), "snsnd", 0);  // unused device
 }
 
 void wingco_state::bingownga(machine_config &config)
