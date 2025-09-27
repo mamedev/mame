@@ -45,15 +45,15 @@ Has word-wide registers as follows:
 // K055550/K053990 protection chips, perform simple memset() and other game logic operations
 
 
-uint16_t konamigx_state::K055550_word_r(offs_t offset)
+u16 konamigx_state::K055550_word_r(offs_t offset)
 {
 	return(m_prot_data[offset]);
 }
 
-void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void konamigx_state::K055550_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
-	uint32_t adr, bsize, count, i, lim, src, dst;
+	u32 adr, bsize, count, i, lim, src, dst;
 	int tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
 	int dx, dy, angle;
 
@@ -191,14 +191,14 @@ void konamigx_state::K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_m
 	}
 }
 
-void konamigx_state::K053990_martchmp_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void konamigx_state::K053990_martchmp_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	int src_addr, src_count, src_skip;
 	int dst_addr, /*dst_count,*/ dst_skip;
 	int mod_addr, mod_count, mod_skip, mod_offs;
 	int mode, i, element_size = 1;
-	uint16_t mod_val, mod_data;
+	u16 mod_val, mod_data;
 
 	COMBINE_DATA(m_prot_data+offset);
 
@@ -278,14 +278,14 @@ void konamigx_state::K053990_martchmp_word_w(offs_t offset, uint16_t data, uint1
 	}
 }
 
-void konamigx_state::konamigx_esc_alert(uint32_t *srcbase, int srcoffs, int count, int mode) // (WARNING: assumed big endianess)
+void konamigx_state::konamigx_esc_alert(u32 *srcbase, int srcoffs, int count, int mode) // (WARNING: assumed big endianess)
 {
-	uint16_t* k053247_ram;
+	u16* k053247_ram;
 	m_k055673->k053247_get_ram(&k053247_ram);
 
 
 // hand-filled but should be close
-static const uint8_t ztable[7][8] =
+static const u8 ztable[7][8] =
 {
 	{ 5, 4, 3, 2, 1, 7, 6, 0 },
 	{ 4, 3, 2, 1, 0, 7, 6, 5 },
@@ -296,7 +296,7 @@ static const uint8_t ztable[7][8] =
 	{ 5, 4, 3, 2, 1, 7, 6, 0 }
 };
 
-static const uint8_t ptable[7][8] =
+static const u8 ptable[7][8] =
 {
 	{ 0x00, 0x00, 0x00, 0x10, 0x20, 0x00, 0x00, 0x30 },
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x00, 0x20, 0x20 },
@@ -307,10 +307,10 @@ static const uint8_t ptable[7][8] =
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10 }
 };
 
-	int32_t data1, data2, i, j, vpos, hpos, voffs, hoffs, vcorr, hcorr, vmask, magicid;
-	uint32_t *src, *srcend, *obj, *objend;
-	uint16_t *dst;
-	const uint8_t *zcode, *pcode;
+	s32 data1, data2, i, j, vpos, hpos, voffs, hoffs, vcorr, hcorr, vmask, magicid;
+	u32 *src, *srcend, *obj, *objend;
+	u16 *dst;
+	const u8 *zcode, *pcode;
 
 	if (!count || !srcbase) return;
 
@@ -492,26 +492,26 @@ void konamigx_state::fantjour_dma_install()
 	memset(m_fantjour_dma, 0, sizeof(m_fantjour_dma));
 }
 
-void konamigx_state::fantjour_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void konamigx_state::fantjour_dma_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	COMBINE_DATA(m_fantjour_dma + offset);
 	if (!offset && ACCESSING_BITS_24_31)
 	{
-		uint32_t sa = m_fantjour_dma[1];
-		// uint16_t ss = (m_fantjour_dma[2] & 0xffff0000) >> 16;
-		// uint32_t sb = ((m_fantjour_dma[2] & 0xffff) << 16) | ((m_fantjour_dma[3] & 0xffff0000) >> 16);
+		u32 sa = m_fantjour_dma[1];
+		// u16 ss = (m_fantjour_dma[2] & 0xffff0000) >> 16;
+		// u32 sb = ((m_fantjour_dma[2] & 0xffff) << 16) | ((m_fantjour_dma[3] & 0xffff0000) >> 16);
 
-		uint32_t da = ((m_fantjour_dma[3] & 0xffff) << 16) | ((m_fantjour_dma[4] & 0xffff0000) >> 16);
-		// uint16_t ds = m_fantjour_dma[4] & 0xffff;
-		uint32_t db = m_fantjour_dma[5];
+		u32 da = ((m_fantjour_dma[3] & 0xffff) << 16) | ((m_fantjour_dma[4] & 0xffff0000) >> 16);
+		// u16 ds = m_fantjour_dma[4] & 0xffff;
+		u32 db = m_fantjour_dma[5];
 
-		// uint8_t sz1 = m_fantjour_dma[0] >> 8;
-		uint8_t sz2 = m_fantjour_dma[0] >> 16;
-		uint8_t mode = m_fantjour_dma[0] >> 24;
+		// u8 sz1 = m_fantjour_dma[0] >> 8;
+		u8 sz2 = m_fantjour_dma[0] >> 16;
+		u8 mode = m_fantjour_dma[0] >> 24;
 
-		uint32_t x = m_fantjour_dma[6];
-		uint32_t i1, i2;
+		u32 x = m_fantjour_dma[6];
+		u32 i1, i2;
 
 		if (mode == 0x93)
 		{
