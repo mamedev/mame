@@ -239,7 +239,7 @@ void orientp_state::io_map(address_map &map)
 	map(0xf900, 0xf903).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xfb02, 0xfb03).w("ay1", FUNC(ay8910_device::address_data_w));
- // map(0xfc40, 0xfc40).rw  - Read Write MCU communication to mcu p0
+ // map(0xfc40, 0xfc40).rw  - Read - input? Write - 0x16 to mcu p0
     map(0xfe00, 0xfe01).w("opll", FUNC(ym2413_device::write));
 }
 
