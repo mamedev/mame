@@ -24,7 +24,6 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "formats/pk8020_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
@@ -37,6 +36,8 @@
 
 #include "emupal.h"
 #include "screen.h"
+
+#include "formats/pk8020_dsk.h"
 
 
 #define LOG_BANK    (1U << 1)

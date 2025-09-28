@@ -5,15 +5,15 @@
  Driver by XingXing
 
  These games use the IGS027A processor.  This is an ARM7 with internal
- ROM (also used on later PGM games). The IGS027A is usually covered by
- a holographic sticker with an alphanumerical code. It has been
- confirmed that it doesn't correspond to a specific internal ROM (i.e.
- two B6-stickered IGS027As have been found to contain different internal
- ROM, while 3 differently stickered IGS027As have been found to contain
- the same internal ROM).
+ ROM (also used on later PGM games).  The IGS027A is usually covered by
+ a holographic sticker with an alphanumeric code.  It has been confirmed
+ that it doesn't correspond to a specific internal ROM (i.e. two
+ B6-stickered IGS027As have been found to contain different internal
+ ROM, while three differently stickered IGS027As have been found to
+ contain the same internal ROM).
 
- In some cases the first part of the internal ROM is execute only, and
- cannot be read out with a trojan. No games in this driver make use of
+ In some cases the first part of the internal ROM is execute-only, and
+ cannot be read out with a trojan.  No games in this driver make use of
  this feature.
 
  There are several more games on this and similar platforms.
