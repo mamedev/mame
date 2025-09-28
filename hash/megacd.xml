@@ -9637,7 +9637,7 @@ Glitchy tile in border area (verify)
 		</part>
 	</software>
 
-	<software name="monkeya">
+	<software name="monkeya" cloneof="monkey">
 		<!-- http://redump.org/disc/89210/
 		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games).cue" size="4603" crc="f701139e" md5="4ac8b47fa064192030580511ab61249c" sha1="fc0c5dd77aa0320d22a0189c05988495c60b5b87"/>
 		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 01).bin" size="13063008" crc="8a9c032d" md5="9efbaf7fa3ebe088db4deb78f93f05e4" sha1="a63fc8aad1001064f16fda2f57c4c59eb7994908"/>
