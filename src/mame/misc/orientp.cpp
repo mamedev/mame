@@ -125,12 +125,19 @@ private:
 	void program_map(address_map &map) ATTR_COLD;
 	void mcu_io_map(address_map &map) ATTR_COLD;
 	void mcu_map(address_map &map) ATTR_COLD;
+
+    uint8_t mcu_r();
+    u8 m_mcu_p0 = 00;
+	void pr_out(uint8_t data);
+
     void display_7seg_data_w(uint8_t data) ATTR_COLD;
 	void multiplex_7seg_w(uint8_t data) ATTR_COLD;
-	void ay1_port_a_w(uint8_t data) ATTR_COLD;
+	
+    void ay1_port_a_w(uint8_t data) ATTR_COLD;
 	void ay1_port_b_w(uint8_t data) ATTR_COLD;
 	uint8_t keyboard_r();
 	uint8_t m_selected_7seg_module = 0;
+
 
 	output_finder<32> m_digits;
 	output_finder<30> m_leds;
@@ -187,6 +194,18 @@ static INPUT_PORTS_START( east8 )
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+uint8_t orientp_state::mcu_r()
+{
+	return m_mcu_p0; // After read from 0x16 in p0, 0xbf is written to p2.6 and p2.7
+}
+
+
+void orientp_state::pr_out(uint8_t data)
+{
+	m_mcu_p0 = data;
+}
+
+
 void orientp_state::ay1_port_a_w(uint8_t data)
 {
 	for (uint8_t i = 0; i < 8; i++)
@@ -203,7 +222,6 @@ void orientp_state::multiplex_7seg_w(uint8_t data)
 {
 	m_selected_7seg_module = data;
 }
-
 
 uint8_t orientp_state::keyboard_r()
 {
@@ -239,7 +257,7 @@ void orientp_state::io_map(address_map &map)
 	map(0xf900, 0xf903).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xfb02, 0xfb03).w("ay1", FUNC(ay8910_device::address_data_w));
- // map(0xfc40, 0xfc40).rw  - Read - input? Write - 0x16 to mcu p0
+	map(0xfc40, 0xfc40).w(FUNC(orientp_state::pr_out)); // Read - Write - 0x16 to mcu at p0
     map(0xfe00, 0xfe01).w("opll", FUNC(ym2413_device::write));
 }
 
@@ -258,6 +276,8 @@ void orientp_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
+	save_item(NAME(m_mcu_p0));
+
 }
 
 void orientp_state::orientp(machine_config &config)
@@ -277,6 +297,7 @@ void orientp_state::orientp(machine_config &config)
     i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
     mcu.set_addrmap(AS_PROGRAM, &orientp_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &orientp_state::mcu_io_map);
+	mcu.port_in_cb<0>().set(FUNC(orientp_state::mcu_r));
 
 	// 82C55 for leds
     I8255A(config, "ppi1");
