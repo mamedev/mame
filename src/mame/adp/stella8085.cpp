@@ -33,6 +33,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 #include "machine/i8279.h"
 #include "machine/mc146818.h"
 #include "machine/msm6242.h"
+#include "bus/rs232/rs232.h"
 #include "sound/beep.h"
 
 #include "speaker.h"
@@ -91,6 +92,7 @@ private:
 
 	// I8256 ports
 	uint8_t lw_r(); //P1.0-P1.3
+	uint8_t machine_r();
 	void machine1_w(uint8_t data);
 	void machine2_w(uint8_t data);
 
@@ -193,7 +195,22 @@ uint8_t stella8085_state::lw_r()
 	//P1.6 is always low
 	// LIW5
 
-	return 0xbf;
+	return 0x00;
+}
+
+uint8_t stella8085_state::machine_r()
+{
+	// all pins pulled low through resistor pack
+	// M1A
+	// M1B
+	// M2A
+	// M2B
+	// M3A
+	// M3B
+	// M4A
+	// M4B
+
+	return 0x00;
 }
 
 void stella8085_state::machine1_w(uint8_t data)
@@ -207,7 +224,7 @@ void stella8085_state::machine2_w(uint8_t data)
 }
 
 /*********************************************
-*      I8279 Keyboard-Disply Interface       *
+*      I8279 Keyboard-Display Interface      *
 *                                            *
 *********************************************/
 
@@ -620,9 +637,14 @@ void stella8085_state::excellent(machine_config &config)
 
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
-	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
 	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
 	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
+	m_uart->in_p2_callback().set(FUNC(stella8085_state::machine_r));
+	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
+	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
