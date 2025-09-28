@@ -73,7 +73,7 @@ private:
 	uint8_t m_kbd_sl = 0x00;
 	bool m_kbd_bd = false;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8256_device> m_uart;
 	required_device<i8279_device> m_kdc;
 	required_ioport_array<8> m_tz;
@@ -294,7 +294,7 @@ TIMER_CALLBACK_MEMBER(stella8085_state::sound_stop)
 
 void stella8085_state::rst65_w(uint8_t state)
 {
-	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(I8085_RST65_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void stella8085_state::io00(uint8_t data)
