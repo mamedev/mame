@@ -800,7 +800,7 @@ The game freezes when loading (after the intro)
 	</software>
 
 	<software name="airhckey_us" cloneof="airhckey">
-		<!-- 
+		<!--
 		http://redump.org/disc/1878
 		<rom name="Air Hockey (USA).cue" size="82" crc="c2df3c01" sha1="9c9e9d36b63a1769adf0a660372da00a13a31e22"/>
 		<rom name="Air Hockey (USA).bin" size="157318224" crc="b453fcb9" sha1="4cdba4e968f03fe26ebe57d4cc02186ddccab64f"/>
@@ -932,7 +932,7 @@ The game freezes when loading (after the intro)
 	</software>
 
 	<software name="aitd2_us" cloneof="aitd2">
-		<!-- 
+		<!--
 		http://redump.org/disc/3083
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).cue" size="115" crc="e7e7f0de" sha1="4e282f1c2fe8f2252ce18601611673feceb3fb64"/>
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).bin" size="715309056" crc="83f2a2d1" sha1="d928e147ca1ef265929e1c51d8f8ae39de2a24f9"/>
@@ -28834,7 +28834,7 @@ The game freezes when loading (after the intro)
 	</software>
 
 	<software name="ult8ball" cloneof="actpool">
-		<!-- 
+		<!--
 		redump.org/disc/7723
 		<rom name="Ultimate 8 Ball (USA).cue" size="2650" crc="f00be595" sha1="058e5414628f6a53e0120328559be5aede8da8c9"/>
 		<rom name="Ultimate 8 Ball (USA) (Track 01).bin" size="63652176" crc="2dbd76d4" sha1="3eebb555ff77f3e873741735155416cb7559d036"/>
@@ -37866,7 +37866,7 @@ Battle screen status bar flickers
 	</software>
 
 	<software name="aitd2_jp" cloneof="aitd2">
-		<!-- 
+		<!--
 		http://redump.org/disc/13174
 		<rom name="Alone in the Dark 2 (Japan).cue" size="93" crc="3eaa5bd8" sha1="8cd56d33586e170116a80e8fb247be26ebadc1d9"/>
 		<rom name="Alone in the Dark 2 (Japan).bin" size="715297296" crc="2bffe515" sha1="e78721a8c4b4d16d846e111928bd7701f85e243b"/>
@@ -61409,7 +61409,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="airhckey">
-		<!-- 
+		<!--
 		http://redump.org/disc/21849
 		<rom name="Air Hockey (Europe).cue" size="208" crc="6a973291" sha1="ae7e3b6b25a6d30212b0f71b1245a82a520bb6d7"/>
 		<rom name="Air Hockey (Europe) (Track 1).bin" size="159616128" crc="1f195cf0" sha1="9146986485bc8c362f4aedbf962c77a0fec20cd3"/>
@@ -61432,7 +61432,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="pm2001">
-		<!-- 
+		<!--
 		http://redump.org/disc/795
 		<rom name="Alex Ferguson's Player Manager 2001 (Europe).cue" size="672" crc="b8883e3e" sha1="a6110b8332a4a927cadfebcafa04d3fdbc78d3e8"/>
 		<rom name="Alex Ferguson's Player Manager 2001 (Europe) (Track 1).bin" size="52221456" crc="b7519ba5" sha1="70008a947c514d3303e230432aa177271755adf3"/>
@@ -61458,7 +61458,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="pm2002">
-		<!-- 
+		<!--
 		http://redump.org/disc/3755
 		<rom name="Alex Ferguson's Player Manager 2002 (Europe).cue" size="672" crc="28a4395e" sha1="c8b731eb0af9f90fa9d94f8068fe719a70f8a608"/>
 		<rom name="Alex Ferguson's Player Manager 2002 (Europe) (Track 1).bin" size="63703920" crc="b2a33a55" sha1="433d07c33bfe200bd9cd982318d1564483002d92"/>
@@ -61484,7 +61484,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="alfredch">
-		<!-- 
+		<!--
 		http://redump.org/disc/12423
 		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It).cue" size="1737" crc="5011b3ba" sha1="541fcc29ceebe67b3bbac8d59db7a4d5378792a0"/>
 		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="43147440" crc="be439359" sha1="dcde4444488e64246888a665ce5553ef053105db"/>
@@ -61522,7 +61522,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="alienres">
-		<!-- 
+		<!--
 		http://redump.org/disc/876
 		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It).cue" size="534" crc="aacc72e6" sha1="c0ccc7192c4c99a88c3b3f3bd59d36ae52fb6096"/>
 		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It) (Track 1).bin" size="503850144" crc="03e470ae" sha1="5642c4f4ba6f06323778ae29c59c6dc863d49f55"/>
@@ -61550,7 +61550,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="alientri">
-		<!-- 
+		<!--
 		http://redump.org/disc/882
 		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It).cue" size="3388" crc="e9ed03e7" sha1="75f047e3db8b87f44d9704796df8351e69e27c8c"/>
 		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 01).bin" size="252882336" crc="fbc7c66d" sha1="edb3c1e0569bb5f7fc7af1b0edf665c686dd7004"/>
@@ -61598,7 +61598,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="alientri_fr" cloneof="alientri">
-		<!-- 
+		<!--
 		http://redump.org/disc/47280
 		<rom name="Alien Trilogy (France) (Demo).cue" size="474" crc="7bd19bcd" sha1="cdc94df25f3370c9429db98ba92c16e953588cb9"/>
 		<rom name="Alien Trilogy (France) (Demo) (Track 1).bin" size="63355824" crc="165b3bac" sha1="ec076843bb85e3053908f1b24166a0840919da62"/>
@@ -61621,7 +61621,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="alientri_de" cloneof="alientri">
-		<!-- 
+		<!--
 		http://redump.org/disc/189
 		<rom name="Alien Trilogy (Germany).cue" size="3050" crc="c4d4027c" sha1="1c7303e390a79765ab98765536c03bd76579661f"/>
 		<rom name="Alien Trilogy (Germany) (Track 01).bin" size="251562864" crc="f9679915" sha1="5cebf938d7ba9210958e49a5cc110e98ac435308"/>
@@ -61666,7 +61666,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="aitd2">
-		<!-- 
+		<!--
 		http://redump.org/disc/485
 		<rom name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It).cue" size="124" crc="f7ce671d" sha1="6ea73167cc18018d4cd0372d2a4fb990e7f86fd5"/>
 		<rom name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It).bin" size="714170688" crc="74fbb4a8" sha1="ac18785261cca340268dbd27ee156ca2436fcff2"/>
@@ -62146,7 +62146,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="fm2001" cloneof="pm2001">
-		<!-- 
+		<!--
 		http://redump.org/disc/30413
 		<rom name="DSF Fussball Manager 2001 (Germany).cue" size="627" crc="f318f4b1" sha1="209a06d704773240f0c53238cd8ea7faf2599656"/>
 		<rom name="DSF Fussball Manager 2001 (Germany) (Track 1).bin" size="50116416" crc="623d4ace" sha1="935be040f610d2df84e4fc73a01095456da06ba2"/>
@@ -62173,7 +62173,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="fm2002" cloneof="pm2002">
-		<!-- 
+		<!--
 		http://redump.org/disc/6113
 		<rom name="DSF Fussball Manager 2002 (Germany).cue" size="627" crc="68c33ee7" sha1="9aaa2399844a02713b60af758871f6593fa59bb5"/>
 		<rom name="DSF Fussball Manager 2002 (Germany) (Track 1).bin" size="63525168" crc="748ab177" sha1="71deadf79aec782c44aeca5da36260b0aefd4fb7"/>
@@ -62705,7 +62705,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="grm2001" cloneof="pm2001">
-		<!-- 
+		<!--
 		http://redump.org/disc/29319
 		<rom name="Guy Roux Manager 2001 (France).cue" size="602" crc="69b3eea3" sha1="64674c287178e9cdd0448d086c04067441cb63f3"/>
 		<rom name="Guy Roux Manager 2001 (France) (Track 1).bin" size="50109360" crc="29941264" sha1="e16f2ee2e3bbbd3527a0c31e67f91306c5e11e86"/>
@@ -62873,7 +62873,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="smcourt">
-		<!-- 
+		<!--
 		http://redump.org/disc/25906
 		<rom name="Namco Tennis Smash Court (Europe).cue" size="99" crc="a0b01ed8" sha1="1cdc9681b4041a45025b71d6f56b4a5bcdf24781"/>
 		<rom name="Namco Tennis Smash Court (Europe).bin" size="545515824" crc="d4560741" sha1="5d70c9c7a01027702e36ba06b02efd0da4fe0865"/>
@@ -63169,7 +63169,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="spm2001" cloneof="pm2001">
-		<!-- 
+		<!--
 		http://redump.org/disc/29319
 		<rom name="Sportweek Player Manager 2001 (Netherlands).cue" size="667" crc="dfbad3c8" sha1="537b3ab0c5754340e2a446da1c19fd3958f21845"/>
 		<rom name="Sportweek Player Manager 2001 (Netherlands) (Track 1).bin" size="50045856" crc="6ba38d2c" sha1="4bf70ce298440212a177ff6b75ce3ebe7c54be66"/>
@@ -63246,7 +63246,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/12627
 		<rom name="TechnoMage - Return of Eternity (Europe).cue" size="106" crc="6ed71521" sha1="71223456d07192ab9c9a24e814829fa600dd6ce6"/>
 		<rom name="TechnoMage - Return of Eternity (Europe).bin" size="682315200" crc="6010fa91" sha1="790600d94f38efd28519fef767b2c8c52526aadb"/>
@@ -63272,7 +63272,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="technomg_nl" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/27310
 		<rom name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands).cue" size="120" crc="5fa9cd4f" sha1="869470d8bf84b0742d3326dc310baa657951a5dd"/>
 		<rom name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands).bin" size="714481152" crc="1e10a432" sha1="6a9edb882ddaae2f1ae8913e179dc2be30b80e85"/>
@@ -63298,7 +63298,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="technomg_de" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/25284
 		<rom name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany).cue" size="115" crc="cf387233" sha1="29692072a8b82d95b696c0740c00023eee52df4d"/>
 		<rom name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany).bin" size="674652384" crc="9ccd3eac" sha1="5f4727482ba67c11f20f1901c0cc1f382a2f3a09"/>
@@ -63324,7 +63324,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="technomg_es" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/49569
 		<rom name="Technomage - El Retorno de la Eternidad (Spain).cue" size="113" crc="0b433ae7" sha1="0d4bfd43ff3d2984c862dfbd3f0b674741dedaff"/>
 		<rom name="Technomage - El Retorno de la Eternidad (Spain).bin" size="669393312" crc="0b82d025" sha1="02b2a823f207b1a3e42452a50df5259dbb7cf413"/>
@@ -63351,7 +63351,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="technomg_fr" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/49569
 		<rom name="TechnoMage - En Quete de L'Eternite (France).cue" size="110" crc="c17633fb" sha1="aefe1d47c49e1ef47bd6c2e059f93d39db238fd5"/>
 		<rom name="TechnoMage - En Quete de L'Eternite (France).bin" size="679666848" crc="a111b887" sha1="c54b68713ff2c4a0f43dff411243bb1ff538e6a8"/>
@@ -63377,7 +63377,7 @@ Missing subchannel Q LibCrypt protection
 	</software>
 
 	<software name="technomg_it" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/46130
 		<rom name="TechnoMage - Ritorno all'Eternita (Italy).cue" size="107" crc="3cbf68ca" sha1="69a1e3cad8753b0e82e1cf5ca434d72706a287bb"/>
 		<rom name="TechnoMage - Ritorno all'Eternita (Italy).bin" size="672236880" crc="c28f565a" sha1="a84bdb4eab9571a3baa9a663ce7b93c8c3bb6e06"/>
