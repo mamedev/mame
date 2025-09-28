@@ -14,6 +14,7 @@
 #include "bk_kmd.h"
 #include "dsd4432.h"
 #include "dvk_kgd.h"
+#include "dvk_kmd.h"
 #include "dvk_mx.h"
 #include "pc11.h"
 #include "qg640.h"
@@ -29,6 +30,7 @@ void qbus_cards(device_slot_interface &device)
 	device.option_add("dsd4432", DSD4432);
 	device.option_add("kgd", DVK_KGD);
 	device.option_add("mx", DVK_MX);
+	device.option_add("my", DVK_KMD);
 	device.option_add("mz", UKNC_KMD);
 	device.option_add("qg640", MATROX_QG640);
 	device.option_add("by", BK_KMD);
@@ -157,6 +159,16 @@ void qbus_device::add_card(device_qbus_card_interface &card)
 void qbus_device::install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask)
 {
 	m_space->install_readwrite_handler(start, end, rhandler, whandler, mask);
+}
+
+uint16_t qbus_device::read(offs_t offset, uint16_t mem_mask)
+{
+	return m_space->read_word(offset, mem_mask);
+}
+
+void qbus_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_space->write_word(offset, data, mem_mask);
 }
 
 
