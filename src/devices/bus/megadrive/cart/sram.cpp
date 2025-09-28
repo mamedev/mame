@@ -213,6 +213,32 @@ void megadrive_rom_hardball95_device::cart_map(address_map &map)
 }
 
 /*
+ * Barkley Shut Up and Jam 2
+ * header indicates $20'0001 - $20'0fff as SRAM but in-game it uses a mirror at $23'xxxx
+ *
+ */
+
+DEFINE_DEVICE_TYPE(MEGADRIVE_ROM_BARKLEY2, megadrive_rom_barkley2_device, "megadrive_rom_barkley2", "Megadrive Barkley Shut Up and Jam 2 cart")
+
+megadrive_rom_barkley2_device::megadrive_rom_barkley2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: megadrive_rom_tplay96_device(mconfig, MEGADRIVE_ROM_BARKLEY2, tag, owner, clock)
+{
+}
+
+u16 megadrive_rom_barkley2_device::get_nvram_length()
+{
+	return 0x800;
+}
+
+void megadrive_rom_barkley2_device::cart_map(address_map &map)
+{
+	map(0x00'0000, 0x1f'ffff).bankr(m_rom);
+	map(0x20'0000, 0x3f'ffff).rw(FUNC(megadrive_rom_barkley2_device::nvram_r), FUNC(megadrive_rom_barkley2_device::nvram_w));
+}
+
+
+
+/*
  * San Guo Zhi V / Tun Shi Tian Di III
  *
  * sanguo5 https://segaretro.org/San_Guo_Zhi_V

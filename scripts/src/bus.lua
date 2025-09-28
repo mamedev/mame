@@ -3920,6 +3920,8 @@ if (BUSES["MEGADRIVE_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/cart/sram.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/ssf.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/ssf.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/t5740.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/t5740.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/tekkensp.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/tekkensp.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/xboy.cpp",

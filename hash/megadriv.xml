@@ -12525,12 +12525,15 @@ No sound (btanb?)
 		</part>
 	</software>
 
-	<software name="barkley2">
+	<software name="barkley2" supported="no">
 		<description>Barkley Shut Up and Jam! 2 (USA)</description>
 		<year>1995</year>
 		<publisher>Accolade</publisher>
+		<notes><![CDATA[
+[CART] [SRAM] Doesn't save in megadriv, does in teradrive
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram"/>
+			<feature name="slot" value="barkley2"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="barkley shut up and jam 2 (usa).bin" size="2097152" crc="321bb6bd" sha1="b13f13ccc1a21dacd295f30c66695bf97bbeff8d"/>
 			</dataarea>

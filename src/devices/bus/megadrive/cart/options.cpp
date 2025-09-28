@@ -20,6 +20,7 @@
 #include "smb.h"
 #include "smw64.h"
 #include "ssf.h"
+#include "t5740.h"
 #include "tekkensp.h"
 #include "xboy.h"
 
@@ -35,6 +36,7 @@ char const *const MD_SRAM               = "rom_sram";
 char const *const MD_SONIC3             = "rom_fram"; // TODO: change string
 char const *const MD_TPLAY96            = "rom_tplay96";
 char const *const MD_HARDBALL95         = "rom_hardbl95";
+char const *const MD_BARKLEY2           = "barkley2";
 char const *const MD_EEPROM             = "rom_eeprom_mode1";
 char const *const MD_EEPROM_NBAJAM      = "rom_nbajam_alt";
 char const *const MD_EEPROM_NBAJAMTE    = "rom_nbajamte";
@@ -90,6 +92,7 @@ char const *const UNL_CHINF3            = "rom_chinf3";
 char const *const UNL_SMW64             = "rom_smw64";
 char const *const UNL_ROCKWORLD         = "rockworld";
 char const *const UNL_ROCKHEAVEN        = "rockheaven";
+char const *const HB_PSOLAR             = "rom_stm95"; // TODO: rename
 
 char const *const ACTION_REPLAY         = "ar";
 
@@ -109,6 +112,7 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::MD_SONIC3,     MEGADRIVE_ROM_SONIC3);
 	device.option_add_internal(slotoptions::MD_TPLAY96,    MEGADRIVE_ROM_TPLAY96);
 	device.option_add_internal(slotoptions::MD_HARDBALL95, MEGADRIVE_ROM_HARDBALL95);
+	device.option_add_internal(slotoptions::MD_BARKLEY2,   MEGADRIVE_ROM_BARKLEY2);
 	device.option_add_internal(slotoptions::UNL_SANGUO5,   MEGADRIVE_UNL_SANGUO5);
 
 	// EEPROM
@@ -199,4 +203,8 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::HB_SSF,         MEGADRIVE_HB_SSF);
 	device.option_add_internal(slotoptions::HB_SSF_SRAM,    MEGADRIVE_HB_SSF_SRAM);
 	device.option_add_internal(slotoptions::HB_SSF_EX,      MEGADRIVE_HB_SSF_EX);
+
+	// WaterMelon
+	device.option_add_internal(slotoptions::HB_PSOLAR,      MEGADRIVE_HB_PSOLAR);
+
 }

@@ -76,6 +76,16 @@ public:
 	virtual void cart_map(address_map &map) override ATTR_COLD;
 };
 
+class megadrive_rom_barkley2_device : public megadrive_rom_tplay96_device
+{
+public:
+	megadrive_rom_barkley2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void cart_map(address_map &map) override ATTR_COLD;
+protected:
+	virtual u16 get_nvram_length() override ATTR_COLD;
+};
+
 class megadrive_unl_sanguo5_device : public megadrive_rom_device
 {
 public:
@@ -99,6 +109,7 @@ DECLARE_DEVICE_TYPE(MEGADRIVE_ROM_SRAM,       megadrive_rom_sram_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_ROM_SONIC3,     megadrive_rom_sonic3_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_ROM_TPLAY96,    megadrive_rom_tplay96_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_ROM_HARDBALL95, megadrive_rom_hardball95_device)
+DECLARE_DEVICE_TYPE(MEGADRIVE_ROM_BARKLEY2,   megadrive_rom_barkley2_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_SANGUO5,    megadrive_unl_sanguo5_device)
 
 #endif // MAME_BUS_MEGADRIVE_CART_SRAM_H

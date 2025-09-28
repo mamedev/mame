@@ -49,8 +49,12 @@ void megadrive_unl_tc2000_device::cart_map(address_map &map)
  * Futbol Argentino 96
  * https://segaretro.org/J.League_Pro_Striker_2/Bootlegs
  *
+ * Unlike jlps2 saving a league doesn't really work without playing at least one match first.
+ * Is this is based on an undumped earlier rev? (No protection access on that)
+ *
  * TODO:
- * - protection not really understood (game does a very small use of it)
+ * - protection not really understood (game does a very small use of it, just expects the read
+ *   values to always return fixed values)
  *
  */
 
@@ -70,6 +74,12 @@ void megadrive_unl_futbol_arg96_device::cart_map(address_map &map)
 {
 	map(0x00'0000, 0x1f'ffff).mirror(0x20'0000).bankr(m_rom);
 	map(0x20'0000, 0x20'3fff).rw(FUNC(megadrive_unl_futbol_arg96_device::nvram_r), FUNC(megadrive_unl_futbol_arg96_device::nvram_w));
+	// writes (in this order, always 0):
+	// 4c'6000 x1
+	// 4c'6400 x1
+	// 4c'6800 x2
+	// 4c'6c00 x3
+	// 4c'7000 x4
 	map(0x4c'6201, 0x4c'6201).lr8(NAME([] () { return 0xa; }));
 	map(0x4c'6601, 0x4c'6601).lr8(NAME([] () { return 0x9; }));
 	map(0x4c'6a01, 0x4c'6a01).lr8(NAME([] () { return 0x7; }));

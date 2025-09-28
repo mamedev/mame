@@ -1026,7 +1026,7 @@ void teradrive_state::teradrive(machine_config &config)
 		m_md_ioports[N]->set_out_handler(m_md_ctrl_ports[N], FUNC(sms_control_port_device::out_w));
 	}
 
-	MEGADRIVE_CART_SLOT(config, m_md_cart, megadrive_cart_options, nullptr).set_must_be_loaded(false);
+	MEGADRIVE_CART_SLOT(config, m_md_cart, md_master_xtal / 7, megadrive_cart_options, nullptr).set_must_be_loaded(false);
 
 	SPEAKER(config, "md_speaker", 2).front();
 
