@@ -112,6 +112,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_check);
 
+	void reset_timer();
 	void receive_clock();
 	void sync1_rxc();
 	void sync2_rxc();
