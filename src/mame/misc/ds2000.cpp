@@ -44,7 +44,10 @@ protected:
 	required_ioport m_config;
 
 	sound_stream *m_stream;
+<<<<<<< HEAD
 	double m_mi_phase, m_mi_pll_phase, m_mi_pll_step, m_mi_y1, m_mi_y2, m_mi_z1, m_mi_z2;
+=======
+>>>>>>> 35236d6d5ba (Apologies)
 
 	u8 m_io40;
 	u32 m_emit_counter;
@@ -98,13 +101,6 @@ void ds2000_state::machine_start()
 	save_item(NAME(m_emit_counter));
 	save_item(NAME(m_emit_on));
 	save_item(NAME(m_rx));
-	save_item(NAME(m_mi_phase));
-	save_item(NAME(m_mi_pll_phase));
-	save_item(NAME(m_mi_pll_step));
-	save_item(NAME(m_mi_y1));
-	save_item(NAME(m_mi_y2));
-	save_item(NAME(m_mi_z1));
-	save_item(NAME(m_mi_z2));
 	m_stream = stream_alloc(1, 1, 48000);
 }
 
@@ -114,10 +110,6 @@ void ds2000_state::machine_reset()
 	m_emit_on = 0;
 	m_emit_counter = 0;
 	m_rx = 1;
-	m_mi_phase = 0;
-	m_mi_pll_phase = 0;
-	m_mi_pll_step = 9000.0/48000.0;
-	m_mi_y1 = m_mi_y2 = m_mi_z1 = m_mi_z2 = 0;
 }
 
 void ds2000_state::sound_stream_update(sound_stream &stream)
