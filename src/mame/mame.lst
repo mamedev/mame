@@ -30227,6 +30227,9 @@ gaialast
 rolcrush
 rolcrusha
 
+@source:misc/ds2000.cpp
+ds2000
+
 @source:misc/dwarfd.cpp
 dwarfd
 dwarfda
