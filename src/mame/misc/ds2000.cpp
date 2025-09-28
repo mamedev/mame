@@ -44,10 +44,6 @@ protected:
 	required_ioport m_config;
 
 	sound_stream *m_stream;
-<<<<<<< HEAD
-	double m_mi_phase, m_mi_pll_phase, m_mi_pll_step, m_mi_y1, m_mi_y2, m_mi_z1, m_mi_z2;
-=======
->>>>>>> 35236d6d5ba (Apologies)
 
 	u8 m_io40;
 	u32 m_emit_counter;
