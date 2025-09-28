@@ -8,7 +8,6 @@ Triple Fever (V105US) (tripfevb) hangs after paying out tickets, with the MCU
 apparently attempting serial communication with something.
 
 TODO:
-* Sound banking for Haunted House and Krazy Keno is wrong.
 * Krazy Keno touch pad is unemulated.
 * Does Crazy Bugs (V103JP) actually support a hopper?  It shows in the input
   test, but both the Payout and Ticket buttons seem to use the ticket dispenser.
@@ -52,6 +51,7 @@ public:
 		m_screen(*this, "screen"),
 		m_ticket(*this, "ticket"),
 		m_external_rom(*this, "user1"),
+		m_okibank(*this, "okibank%u", 1U),
 		m_io_test(*this, "TEST%u", 0U),
 		m_io_dsw(*this, "DSW%u", 1U),
 		m_out_lamps(*this, "lamp%u", 1U)
@@ -84,6 +84,8 @@ private:
 	optional_device<ticket_dispenser_device> m_ticket;
 	required_region_ptr<u32> m_external_rom;
 
+	optional_memory_bank_array<2> m_okibank;
+
 	optional_ioport_array<3> m_io_test;
 	optional_ioport_array<3> m_io_dsw;
 
@@ -100,6 +102,7 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void main_xor_map(address_map &map) ATTR_COLD;
 	void haunthig_map(address_map &map) ATTR_COLD;
+	void haunthig_oki_map(address_map &map) ATTR_COLD;
 	void tripfev_map(address_map &map) ATTR_COLD;
 
 	u32 external_rom_r(offs_t offset);
@@ -112,7 +115,8 @@ private:
 	void xa_irq(int state);
 
 	u32 gpio_r();
-	void oki_bank_w(offs_t offset, u8 data);
+	void oki_bank_w(u8 data);
+	void oki_split_bank_w(u8 data);
 	template <unsigned Select, unsigned First> u8 dsw_r();
 	template <unsigned Select> void io_select_w(u8 data);
 };
@@ -126,6 +130,13 @@ void igs_m027xa_state::machine_reset()
 void igs_m027xa_state::machine_start()
 {
 	m_out_lamps.resolve();
+
+	if (m_okibank[1].found())
+	{
+		u8 *samples = memregion("oki")->base();
+		m_okibank[0]->configure_entries(0, 16, samples, 0x20000);
+		m_okibank[1]->configure_entries(0, 16, samples, 0x20000);
+	}
 
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 
@@ -173,14 +184,20 @@ void igs_m027xa_state::haunthig_map(address_map &map)
 {
 	main_xor_map(map);
 
-	map(0x3800a000, 0x3800a003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_bank_w));
+	map(0x3800a000, 0x3800a000).w(FUNC(igs_m027xa_state::oki_split_bank_w));
+}
+
+void igs_m027xa_state::haunthig_oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).bankr(m_okibank[0]);
+	map(0x20000, 0x3ffff).bankr(m_okibank[1]);
 }
 
 void igs_m027xa_state::tripfev_map(address_map &map)
 {
 	main_xor_map(map);
 
-	map(0x3800c000, 0x3800c003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_bank_w));
+	map(0x3800c000, 0x3800c000).w(FUNC(igs_m027xa_state::oki_bank_w));
 }
 
 
@@ -557,9 +574,15 @@ u32 igs_m027xa_state::gpio_r()
 	return ret;
 }
 
-void igs_m027xa_state::oki_bank_w(offs_t offset, u8 data)
+void igs_m027xa_state::oki_bank_w(u8 data)
 {
 	m_oki->set_rom_bank(data & 0x07);
+}
+
+void igs_m027xa_state::oki_split_bank_w(u8 data)
+{
+	m_okibank[0]->set_entry(data & 0x0f);
+	m_okibank[1]->set_entry((data >> 4) & 0x0f);
 }
 
 template <unsigned Select, unsigned First>
@@ -668,6 +691,7 @@ void igs_m027xa_state::haunthig(machine_config &config)
 	base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::haunthig_map);
+	m_oki->set_addrmap(0, &igs_m027xa_state::haunthig_oki_map);
 }
 
 void igs_m027xa_state::tripfev(machine_config &config)
@@ -1085,9 +1109,9 @@ void igs_m027xa_state::init_krzykeno()
 
 // These use the MX10EXAQC (80c51XA from Philips)
 // the PCBs are closer to igs_fear.cpp in terms of layout
-GAMEL( 2008, haunthig,      0,        haunthig,   haunthig107us, igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_IMPERFECT_SOUND, layout_tripfev ) // IGS FOR V109US 2008 10 14
-GAMEL( 2007, haunthig107us, haunthig, haunthig,   haunthig107us, igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V107US)", MACHINE_IMPERFECT_SOUND, layout_tripfev ) // IGS FOR V107US 2007 07 03
-GAMEL( 2006, haunthig101us, haunthig, haunthig,   haunthig101us, igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_IMPERFECT_SOUND, layout_tripfev ) // IGS FOR V101US 2006 08 23
+GAMEL( 2008, haunthig,      0,        haunthig,   haunthig107us, igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", 0, layout_tripfev ) // IGS FOR V109US 2008 10 14
+GAMEL( 2007, haunthig107us, haunthig, haunthig,   haunthig107us, igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V107US)", 0, layout_tripfev ) // IGS FOR V107US 2007 07 03
+GAMEL( 2006, haunthig101us, haunthig, haunthig,   haunthig101us, igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", 0, layout_tripfev ) // IGS FOR V101US 2006 08 23
 
 GAMEL( 2009, crzybugs,      0,        tripfev,    crzybugs_us,   igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
 GAMEL( 2006, crzybugs202us, crzybugs, tripfev,    crzybugs_us,   igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
@@ -1104,4 +1128,4 @@ GAME(  200?, wldfruit,      0,        base,       base,          igs_m027xa_stat
 
 GAMEL( 2003, jking04,       0,        tripfev,    jking04,       igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", 0, layout_jking04 )
 
-GAMEL( 2006, krzykeno,      0,        haunthig,   krzykeno,      igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND, layout_krzykeno ) // Oki bank, touch pad
+GAMEL( 2006, krzykeno,      0,        haunthig,   krzykeno,      igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING, layout_krzykeno ) // touch pad
