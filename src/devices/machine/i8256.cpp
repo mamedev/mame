@@ -248,7 +248,18 @@ void i8256_device::device_reset()
 
 	m_status = 0x30; // TRE and TBE
 
-	m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
+	reset_timer();
+}
+
+void i8256_device::reset_timer()
+{
+	int divider = 64; //default is 16kHz from the datasheet, it may later be changed to a slower one
+	if (BIT(m_command1, I8256_CMD1_FRQ))
+	{
+		divider = 1024;
+	}
+	const attotime time = attotime::from_hz((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) / divider);
+	m_timer->adjust(time, 0, time);
 }
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
@@ -335,10 +346,7 @@ void i8256_device::write(offs_t offset, u8 data)
 			{
 				m_command1 = data;
 
-				if (BIT(m_command1,I8256_CMD1_FRQ))
-					m_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
-				else
-					m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
+				reset_timer();
 
 				if (BIT(m_command1,I8256_CMD1_8086))
 					LOG("I8256 Enabled 8086 mode\n");
