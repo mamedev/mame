@@ -272,8 +272,12 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 			if (m_timers[i] == 0 && BIT(m_interrupts,timer_interrupt[i])) // If the interrupt is enabled
 			{
 				m_current_interrupt_level = timer_interrupt[i];
-				m_out_int_cb(1); // it occurs when the counter changes from 1 to 0.
+				m_out_int_cb(ASSERT_LINE); // it occurs when the counter changes from 1 to 0.
 			}
+		}
+		else
+		{
+			m_out_int_cb(CLEAR_LINE);
 		}
 	}
 }
@@ -629,7 +633,7 @@ void i8256_device::receive_character(uint8_t ch)
 {
 	LOG("I8256: receive_character %02x\n", ch);
 
-	m_rx_data = ch;
+	m_rx_buffer = ch;
 
 	LOG("status RX READY test %02x\n", m_status);
 	// char has not been read and another has arrived!
