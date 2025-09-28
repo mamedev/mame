@@ -581,8 +581,8 @@ void igs_m027xa_state::oki_bank_w(u8 data)
 
 void igs_m027xa_state::oki_split_bank_w(u8 data)
 {
-	m_okibank[0]->set_entry(data & 0x0f);
-	m_okibank[1]->set_entry((data >> 4) & 0x0f);
+	m_okibank[0]->set_entry(data & 0x0f); // speech
+	m_okibank[1]->set_entry((data >> 4) & 0x0f); // music
 }
 
 template <unsigned Select, unsigned First>
@@ -683,7 +683,7 @@ void igs_m027xa_state::base(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void igs_m027xa_state::haunthig(machine_config &config)

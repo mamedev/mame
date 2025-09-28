@@ -4595,7 +4595,7 @@ void igs017_state::base_machine_oki(machine_config &config, const XTAL &xtal_oki
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, xtal_oki, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, m_oki, xtal_oki, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
