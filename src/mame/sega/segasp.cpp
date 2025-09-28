@@ -1203,8 +1203,7 @@ ROM_START( kingyoch )
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	// no PIC was provided with CF card, brute forced key
-	ROM_LOAD( "317-0563-jpn.ic15", 0, 0x800, BAD_DUMP CRC(8af67833) SHA1(0b79abf9182c249a6d4976d6fd3b90101d66354f) )
+	ROM_LOAD( "317-5142-exp.ic15", 0, 0x800, CRC(73fa744f) SHA1(c26333909d7cbef4b5b4930cea30753ef27e5185) )
 ROM_END
 
 ROM_START( loveber3 )
