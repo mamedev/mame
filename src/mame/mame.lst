@@ -36323,6 +36323,9 @@ ob8
 @source:oberheim/xpander.cpp
 xpander
 
+@source:olivetti/att6300p.cpp
+att6300p
+
 @source:olivetti/celint2k.cpp
 celint2kss
 
