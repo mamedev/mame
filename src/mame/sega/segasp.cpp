@@ -558,7 +558,7 @@ ROM_START( btlracer )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0579-jpn.ic15", 0, 0x800, BAD_DUMP CRC(9482de07) SHA1(152810733e3a3e6d7fe4741a07a36d8495425a66) ) // bruteforced
+	ROM_LOAD( "317-0579-jpn.ic15", 0, 0x800, CRC(4951c212) SHA1(cfde653ec5abca0f4bdd0cee8e297887aa57b538) )
 ROM_END
 
 ROM_START( bingogal )
