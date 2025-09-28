@@ -103,12 +103,12 @@ private:
 	void output_digit(uint8_t i, uint8_t data);
 
 	void io00(uint8_t data) ATTR_COLD;
-	void io70(uint8_t data) ATTR_COLD;
-	void io71(uint8_t data) ATTR_COLD;
+	uint8_t io70r() ATTR_COLD;
+	void io70w(uint8_t data) ATTR_COLD;
+	uint8_t io71r() ATTR_COLD;
+	void io71w(uint8_t data) ATTR_COLD;
 	void sounddev(uint8_t data) ATTR_COLD;
 	void io73(uint8_t data) ATTR_COLD;
-	uint8_t io9r() ATTR_COLD;
-	void io9w(uint8_t data) ATTR_COLD;
 
 	void makesound(uint8_t tone, uint8_t octave, uint8_t length);
 	int soundfreq(uint8_t channel, uint8_t clockdiv);
@@ -144,14 +144,20 @@ void stella8085_state::small_program_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram();
+	map(0x6000, 0x6fff).ram();
 	//map(0x6000, 0x633f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0x7000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xffff).ram();
 }
 
 void stella8085_state::io_4040_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
+	map(0x70, 0x70).rw(FUNC(stella8085_state::io70r),FUNC(stella8085_state::io70w));
+	map(0x71, 0x71).rw(FUNC(stella8085_state::io71r),FUNC(stella8085_state::io71w));
+	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
+	map(0x73, 0x73).w(FUNC(stella8085_state::io73));
 	map(0x80, 0x81).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x90, 0x9f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
@@ -161,12 +167,12 @@ void stella8085_state::io_map(address_map &map)
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
-	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
-	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
+	map(0x70, 0x70).rw(FUNC(stella8085_state::io70r),FUNC(stella8085_state::io70w));
+	map(0x71, 0x71).rw(FUNC(stella8085_state::io71r),FUNC(stella8085_state::io71w));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	map(0x73, 0x73).w(FUNC(stella8085_state::io73)); // probably extra lamps
+	map(0x73, 0x73).w(FUNC(stella8085_state::io73));
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
-	map(0x90, 0x9f).rw(FUNC(stella8085_state::io9r),FUNC(stella8085_state::io9w)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
+	//Y9 wired to rtc circuits but somehow memory mapped in hardware
 }
 
 /*********************************************
@@ -296,17 +302,12 @@ void stella8085_state::io00(uint8_t data)
 	//old boards
 }
 
-uint8_t stella8085_state::io9r()
+uint8_t stella8085_state::io70r()
 {
-	return 0xff; //old boards
+	return 0xff;
 }
 
-void stella8085_state::io9w(uint8_t data)
-{
-	//old boards
-}
-
-void stella8085_state::io70(uint8_t data)
+void stella8085_state::io70w(uint8_t data)
 {
 	const bool AW1 = BIT(data,0);
 	const bool AW2 = BIT(data,1);
@@ -333,7 +334,12 @@ void stella8085_state::io70(uint8_t data)
 		LOG("PA7 high\n");
 }
 
-void stella8085_state::io71(uint8_t data)
+uint8_t stella8085_state::io71r()
+{
+	return 0xff;
+}
+
+void stella8085_state::io71w(uint8_t data)
 {
 	const bool RS = BIT(data,0);
 	const bool GONG = BIT(data,1);
