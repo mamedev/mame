@@ -333,6 +333,7 @@ public:
 	void wcherry(machine_config &config) ATTR_COLD;
 
 	void init_chryangl() ATTR_COLD;
+	void init_chryanglb() ATTR_COLD;
 	void init_goldstar() ATTR_COLD;
 	void init_ladylinrb() ATTR_COLD;
 	void init_ladylinrc() ATTR_COLD;
@@ -432,6 +433,7 @@ public:
 	void animalhs(machine_config &config) ATTR_COLD;
 	void cd3poker(machine_config &config) ATTR_COLD;
 	void chryangl(machine_config &config) ATTR_COLD;
+	void chryanglb(machine_config &config) ATTR_COLD;
 	void cm(machine_config &config) ATTR_COLD;
 	void cmast91(machine_config &config) ATTR_COLD;
 	void cmast92(machine_config &config) ATTR_COLD;
@@ -511,6 +513,7 @@ protected:
 
 private:
 	void outport0_w(uint8_t data);
+	void chyangb_outport0_w(uint8_t data);
 	void girl_scroll_w(uint8_t data);
 	void background_col_w(uint8_t data);
 	void coincount_w(uint8_t data);
@@ -534,6 +537,7 @@ private:
 	void animalhs_map(address_map &map) ATTR_COLD;
 	void animalhs_portmap(address_map &map) ATTR_COLD;
 	void chryangl_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void chyangb_portmap(address_map &map) ATTR_COLD;
 	void clb_map(address_map &map) ATTR_COLD;
 	void cm_map(address_map &map) ATTR_COLD;
 	void cm_portmap(address_map &map) ATTR_COLD;
@@ -632,7 +636,7 @@ public:
 	void init_lucky8s() ATTR_COLD;
 	void init_magoddsc() ATTR_COLD;
 	void init_mbs2() ATTR_COLD;
-	void init_mgln() ATTR_COLD;	
+	void init_mgln() ATTR_COLD;
 	void init_luckylad() ATTR_COLD;
 	void init_nd8lines() ATTR_COLD;
 	void init_skch() ATTR_COLD;
@@ -738,6 +742,7 @@ public:
 	void init_cherrys() ATTR_COLD;
 	void init_chry10() ATTR_COLD;
 	void init_chrygld() ATTR_COLD;
+	void init_chryangla() ATTR_COLD;
 
 	void cb3c(machine_config &config) ATTR_COLD;
 	void cb3e(machine_config &config) ATTR_COLD;
@@ -1197,8 +1202,14 @@ void cmaster_state::outport0_w(uint8_t data)
   xxxx ----  unused?
 
 */
-	// popmessage("outport %02x",data);
+//	popmessage("outport %02x",data);
 	m_enable_reg = data;
+}
+
+void cmaster_state::chyangb_outport0_w(uint8_t data)
+{
+//	popmessage("outport %02x",data);
+	m_enable_reg = data & 0xef;  // mask bg register flag
 }
 
 void cmaster_state::girl_scroll_w(uint8_t data)
@@ -2270,6 +2281,7 @@ void cb3_state::chryangla_map(address_map &map) // most to be verified when the 
 	map(0xc000, 0xc7ff).ram().share("nvram");
 	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::fg_vidram_w)).share(m_fg_vidram);
 	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::fg_atrram_w)).share(m_fg_atrram);
+
 	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::reel_ram_w<0>)).share(m_reel_ram[0]);
 	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::reel_ram_w<1>)).share(m_reel_ram[1]);
 	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::reel_ram_w<2>)).share(m_reel_ram[2]);
@@ -2885,6 +2897,12 @@ void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
+void cmaster_state::chyangb_portmap(address_map &map)
+{
+	cm_portmap(map);
+	map(0x10, 0x10).w(FUNC(cmaster_state::chyangb_outport0_w));
+}
+
 void cmaster_state::crazybon_portmap(address_map &map)
 {
 	map.global_mask(0xff);
@@ -3298,7 +3316,7 @@ void wingco_state::magodds_outb850_w(uint8_t data)
 	else
 		m_tile_bank = 0;
 
-	//popmessage("magodds_outb850_w %02x\n", data);
+//	popmessage("magodds_outb850_w %02x\n", data);
 
 	m_fg_tilemap->mark_all_dirty();
 
@@ -3378,7 +3396,7 @@ void goldstar_state::ladylinr_outport_w(uint8_t data)
    .x.. ....
    x... ....
 */
-	//popmessage("Output: %02X", data);
+//	popmessage("Output: %02X", data);
 }
 #endif
 
@@ -3477,7 +3495,7 @@ void unkch_state::coincount_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // Key In counter
 	machine().bookkeeping().coin_counter_w(2, data & 0x02);  // payout counter
 
-	//popmessage("coin counters: %02x", data);
+//	popmessage("coin counters: %02x", data);
 }
 
 void unkch_state::unkcm_0x02_w(uint8_t data)
@@ -3498,7 +3516,7 @@ void unkch_state::unkcm_0x02_w(uint8_t data)
 
 */
 
-	//popmessage("unkcm_0x02_w %02x", data);
+//	popmessage("unkcm_0x02_w %02x", data);
 
 	m_vblank_irq_enable = data & 0x80;
 	if (!m_vblank_irq_enable)
@@ -3519,7 +3537,7 @@ void unkch_state::unkcm_0x03_w(uint8_t data)
 
 	m_vidreg = data;
 
-	//popmessage("unkcm_0x03_w %02x", data);
+//	popmessage("unkcm_0x03_w %02x", data);
 }
 
 
@@ -5475,7 +5493,6 @@ static INPUT_PORTS_START( super9 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
 // dip switches from manual, values & inputs are a guess from cmasterb
 static INPUT_PORTS_START( chryangl )
 	PORT_START("IN0")
@@ -5621,6 +5638,26 @@ static INPUT_PORTS_START( chryangl )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_10C ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( chryanglb )
+
+	PORT_INCLUDE( chryangl )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )      PORT_CODE(KEYCODE_C) PORT_NAME("C") // ???
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 )      PORT_CODE(KEYCODE_V) PORT_NAME("V") // ???
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )      PORT_CODE(KEYCODE_Z) PORT_NAME("Z") // ???
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )        PORT_CODE(KEYCODE_2) PORT_NAME("Bet 2")
+	//PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  // no modify
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Bet 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )      PORT_CODE(KEYCODE_X) PORT_NAME("X") // ???
+	//PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )       PORT_NAME("Start")  // no modify
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Guess")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Stop All")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Small / Info")
 INPUT_PORTS_END
 
 // no manual - best guesses
@@ -10092,7 +10129,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( skillcha )
 
-	PORT_INCLUDE( megaline )  // different DSW 
+	PORT_INCLUDE( megaline )  // different DSW
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Percentage" )   PORT_DIPLOCATION("DSW2:1,2,3,4")
@@ -12654,6 +12691,15 @@ void cmaster_state::chryangl(machine_config &config)
 	cm(config);
 
 	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
+}
+
+void cmaster_state::chryanglb(machine_config &config)
+{
+	cm(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::chyangb_portmap);
+
 }
 
 void cmaster_state::cmtetriskr(machine_config &config)
@@ -25708,6 +25754,11 @@ void goldstar_state::init_chryangl()
 		m_decrypted_opcodes[i] = x;
 	}
 
+	m_decrypted_opcodes[0xabd3] = 0xc9; // skip protection
+	m_decrypted_opcodes[0xac2b] = 0xc9; // skip protection
+	m_decrypted_opcodes[0xac41] = 0xc9; // skip stack handling protection
+	m_decrypted_opcodes[0xacb5] = 0x00; // skip protection
+
 	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = rom[i];
@@ -25725,6 +25776,112 @@ void goldstar_state::init_chryangl()
 
 		rom[i] = x;
 	}
+
+	rom[0x1784] = 0x25; // read start button
+	rom[0x1785] = 0x18; //
+	rom[0x1793] = 0x66; // autostart on max bet p1
+
+}
+
+void cb3_state::init_chryangla()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x80, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0xa0, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x02, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0xa0, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0x82, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x08, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x80, 5, 6, 3, 4, 1, 2, 7, 0); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	m_decrypted_opcodes[0xac43] = 0xc9; // skip protection
+	m_decrypted_opcodes[0x9056] = 0xc9; // skip protection
+	m_decrypted_opcodes[0x9082] = 0xc9; // skip protection
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x22, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0x2a, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x82, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0x2a, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0xa8, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x88, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x22, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x88, 1, 6, 7, 4, 5, 2, 3, 0); break;
+		}
+
+		rom[i] = x;
+	}
+
+	rom[0x0039] = 0x66; // redirect irq to nmi
+	rom[0x003a] = 0x00; //
+}
+
+void goldstar_state::init_chryanglb()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x80, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0xa0, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x02, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0xa0, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0x82, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x08, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x80, 5, 6, 3, 4, 1, 2, 7, 0); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	m_decrypted_opcodes[0x9052] = 0xc9; // skip protection
+	m_decrypted_opcodes[0x9056] = 0xc9; // skip protection
+	m_decrypted_opcodes[0x90dd] = 0xc9; // skip protection
+	m_decrypted_opcodes[0xa9a3] = 0xc9; // skip protection
+	m_decrypted_opcodes[0xb651] = 0x00; // skip protection
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x22, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0x2a, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x82, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0x2a, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0xa8, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x88, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x22, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x88, 1, 6, 7, 4, 5, 2, 3, 0); break;
+		}
+
+		rom[i] = x;
+	}
+
+	//rom[0x1784] = 0x25; // ENABLE START BUTTON (BUT FAILS)
+	//rom[0x1785] = 0x18; //
+
 }
 
 void cmaster_state::init_wcat3a()  // seems ok, but needs checking
@@ -26328,7 +26485,7 @@ void wingco_state::init_lucky8r()
 	rom[0x43a6] = 0x80;
 	rom[0x454e] = 0x00;
 	rom[0x4567] = 0x00;
-	rom[0x431f] = 0x28;  // skip checksum;
+	rom[0x431f] = 0x28;  // skip checksum;
 }
 
 void wingco_state::init_lucky8s()
@@ -27312,7 +27469,7 @@ void wingco_state::init_skch()
 
 	rom[0x3415] = 0xc9;
 	rom[0x45e4] = 0xc9;
-	
+
 	rom[0x6296] = 0x00;
 	rom[0x6297] = 0x00;
 }
@@ -27323,7 +27480,7 @@ void wingco_state::init_skcha()
 
 	rom[0x3434] = 0xc9;
 	rom[0x4608] = 0xc9;
-	
+
 	rom[0x6298] = 0x00;
 	rom[0x6299] = 0x00;
 }
@@ -27372,15 +27529,15 @@ GAMEL( 199?, cb3g,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g
 GAMEL( 199?, cb3h,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 7)",          0,                 layout_cherryb3 )
 GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.5.1)",                  0,                 layout_cherryb3 )
 GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
-GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
+GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangla, ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // DYNA CB3  V1.40 string, playable, but still has protections
 
 GAME(  1991, eldoraddoa, eldoradd, eldoraddoa,animalhs,cmaster_state,  init_eldoraddoa,ROT0, "Dyna",              "El Dorado (V1.4D)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // improve GFX drawing, correct palette decode, I/O, etc
 GAMEL( 1991, animalhs,   0,        animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 1)",                  0,                 layout_animalhs ) // improve GFX drawing, correct palette decode
 GAME(  1991, animalhsa,  animalhs, animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
 
 // looks like a hack of Cherry Bonus 3
-GAME(  1994, chryangl,   ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                        MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
-GAME(  1994, chryanglb,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg",           "Cherry Angel (set 2)",                        MACHINE_NOT_WORKING ) // ANGEL TL+YF 1.00 string, decrypted but hangs when betting
+GAME(  1994, chryangl,   ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // SKY SUPERCB 1.0 string, playable, but still has protections
+GAME(  1994, chryanglb,  ncb3,     chryanglb, chryanglb, cmaster_state, init_chryanglb, ROT0, "bootleg",          "Cherry Angel (set 2)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ANGEL TL+YF 1.00 string, playable, but still has protections
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
