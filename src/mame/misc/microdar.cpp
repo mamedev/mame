@@ -5,6 +5,8 @@
     Skeleton driver for Compumatic dart board with LED display.
 
 **************************************************************************
+
+PCB layout for regular Compumatic Microdard PCB:
 _______________________________
 |__  ________________________  |
 ||C| |_CN____________________| |
@@ -52,9 +54,10 @@ IC5 = Hitachi HD74HC08P
 IC6 = Hitachi HD74HC138P
 IC4 = LGS GM76C88ALK-15
 IC3 = Winbond W29EE011-15
-IC2 = Hitachi HD74HC373P
-IC2 = Hitachi HD74HC373P
-IC10 = Hitachi HD74HC244P
+IC2, IC10 = Hitachi HD74HC373P
+IC9 = Hitachi HD74HC244P
+IC13 = 74HC273N
+IC14 = LM358P
 
 **************************************************************************
 
@@ -417,6 +420,8 @@ ROM_END
 
 /* Compumatic Champion (Compumatic Superdard/Plus-N PCB).
  More info and schematics: https://www.recreativas.org/champion-6137-compumatic
+ The PCB layout is slighly different than the one shown on the manual (it's like
+ a standard Microdard PCB, but with an additional test switch).
 */
 ROM_START(cchampion)
 	// Philips REF34VA K0V951
