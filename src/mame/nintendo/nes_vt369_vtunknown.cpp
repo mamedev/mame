@@ -1006,6 +1006,11 @@ ROM_START( vibes240 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( t3_630 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.bin", 0x00000, 0x1000000, CRC(7458a598) SHA1(cd35dda56c4531095c7026c88e02e35b1aae730a) )
+ROM_END
+
 ROM_START( lexi30 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "lexi30.u3", 0x00000, 0x800000, CRC(0d4307ea) SHA1(0d7cf492f796b0bb871deebaca38a3ff3b2ed1e6) )
@@ -1256,6 +1261,9 @@ CONS( 2020, gbox2020, gbox2019, 0, vt36x_gbox2020_16mb, vt369, vt36x_state, empt
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
 // boots with bad colors
 CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// boots and runs, but not all games have been tested
+CONS( 202?, t3_630,   0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "630 Games in 1 Handheld (T3)", MACHINE_NOT_WORKING )
 
 // has extra protection?
 CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
