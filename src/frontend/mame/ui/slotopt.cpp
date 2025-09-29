@@ -257,8 +257,9 @@ bool menu_slot_devices::handle(event const *ev)
 	}
 	else if (ev->itemref == ITEMREF_COPYTOCLIPBOARD)
 	{
-		if (ev->iptkey == IPT_UI_SELECT)
+		if (ev->iptkey == IPT_UI_SELECT || ev->iptkey == IPT_UI_CLEAR)
 		{
+			bool inistyle = (ev->iptkey == IPT_UI_CLEAR);
 			std::stringstream outss;
 			for (device_slot_interface &slot : slot_interface_enumerator(m_config->root_device()))
 			{
@@ -267,12 +268,14 @@ bool menu_slot_devices::handle(event const *ev)
 					// get the slot option
 					const slot_option &opt(machine().options().slot_option(slot.slot_name()));
 
-					outss << "-" << slot.slot_name() << " " << (!opt.value().empty()  ? opt.value() : "\"\"" ) << " ";
+					outss << (inistyle ? "" : "-") << slot.slot_name() << " " <<
+						(!opt.value().empty()  ? opt.value() : (inistyle ? "" : "\"\"") ) << (inistyle ? "\n" : " ");
 				}
 			}
 
 			if (!osd_set_clipboard_text(outss.str()))
-				machine().popmessage(_("Slot Options", "Copied slot options to clipboard"));
+				machine().popmessage(_("Slot Options",
+					inistyle ? "Copied .ini slot options to clipboard" : "Copied command line slot options to clipboard"));
 		}
 	}
 	else if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
