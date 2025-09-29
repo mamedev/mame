@@ -3080,7 +3080,7 @@ ROM_START( soccerssu )
 	ROM_LOAD( "soccerssu.nv", 0x0000, 0x080, CRC(812f6878) SHA1(fc4975211720a7eb413bceda8109231cb1c00834) )
 ROM_END
 
-/* Soccer Superstars (94.12.19 - Japan ver JAC) Writes JAB to EEPROM and reports as JAC */
+/* Soccer Superstars (94.12.09 - Japan ver JAC) Writes JAB to EEPROM and reports as JAC */
 ROM_START( soccerssj )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
