@@ -97,6 +97,8 @@ void pgm3_state::machine_start()
 
 void pgm3_state::machine_reset()
 {
+	// if we want to boot from somewhere else, change this
+	//m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x04000000);
 }
 
 void pgm3_state::pgm3(machine_config &config)
@@ -121,7 +123,7 @@ void pgm3_state::pgm3(machine_config &config)
 #define KOV3HD_SOC_ROMS \
 	/* The mask part of the SOC38, this gets hidden by the system after use */ \
 	/* Same ROM is likely used by other games as it contains a number of unused keys, with the key to use being selected by a HW register */ \
-	/* kov3hd uses the AES keys at 0x42b8 and 0x44a8 in this rom */ \
+	/* kov3hd uses the AES keys at 0x42b8 and 0x44a8 in this ROM */ \
 	/* the only purpose of this bootloader is to decrypt the flash part of the internal ROM below, copying it into RAM */ \
 	/* (ROM was reconstructed from several decap attempts, hence BAD_DUMP as there could be errors) */ \
 	ROM_REGION32_LE( 0x8000, "internal_mask", ROMREGION_ERASE00 ) \
