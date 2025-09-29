@@ -431,7 +431,6 @@ public:
 	void amcoe1a(machine_config &config) ATTR_COLD;
 	void amcoe2(machine_config &config) ATTR_COLD;
 	void animalhs(machine_config &config) ATTR_COLD;
-	void cd3poker(machine_config &config) ATTR_COLD;
 	void chryangl(machine_config &config) ATTR_COLD;
 	void chryanglb(machine_config &config) ATTR_COLD;
 	void cm(machine_config &config) ATTR_COLD;
@@ -454,7 +453,6 @@ public:
 	void reelmg(machine_config &config) ATTR_COLD;
 	void super7(machine_config &config) ATTR_COLD;
 
-	void init_3cdp() ATTR_COLD;
 	void init_alienatt() ATTR_COLD;
 	void init_animalhs() ATTR_COLD;
 	void init_chthree() ATTR_COLD;
@@ -852,6 +850,29 @@ private:
 };
 
 
+class cd3poker_state : public cmaster_state
+{
+public:
+	cd3poker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		cmaster_state(mconfig, type, tag)
+	{ }
+
+	void cd3poker(machine_config &config) ATTR_COLD;
+
+	void init_3cdp() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void cd3poker_map(address_map &map) ATTR_COLD;
+
+	uint8_t armaly_prot_r();
+
+	uint8_t m_prot_index = 0;
+};
+
+
 void wingco_state::machine_start()
 {
 	goldstar_state::machine_start();
@@ -867,6 +888,13 @@ void unkch_state::machine_start()
 
 	save_item(NAME(m_vblank_irq_enable));
 	save_item(NAME(m_vidreg));
+}
+
+void cd3poker_state::machine_start()
+{
+	cmaster_state::machine_start();
+
+	save_item(NAME(m_prot_index));
 }
 
 
@@ -12734,9 +12762,51 @@ void cmaster_state::super7(machine_config &config)
 	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("DSW2");
 }
 
-void cmaster_state::cd3poker(machine_config &config)
+void cd3poker_state::cd3poker_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+
+	map(0xa000, 0xa000).r(FUNC(cd3poker_state::armaly_prot_r));
+
+	map(0xd000, 0xd7ff).ram().share("nvram");
+	map(0xd800, 0xdfff).ram();
+
+	map(0xe000, 0xe7ff).ram().w(FUNC(cd3poker_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(cd3poker_state::fg_atrram_w)).share(m_fg_atrram);
+
+	map(0xf000, 0xf1ff).ram().w(FUNC(cd3poker_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(cd3poker_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(cd3poker_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xf600, 0xf7ff).ram();
+
+	map(0xf800, 0xf87f).ram().share(m_reel_scroll[0]);
+	map(0xf880, 0xf9ff).ram();
+	map(0xfa00, 0xfa7f).ram().share(m_reel_scroll[1]);
+	map(0xfa80, 0xfbff).ram();
+	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
+	map(0xfc80, 0xffff).ram();
+}
+
+uint8_t cd3poker_state::armaly_prot_r()
+{
+	int index = m_prot_index;
+	if (!machine().side_effects_disabled())
+	{
+		if (++m_prot_index > 0x10)
+			m_prot_index = 0;
+	}
+
+	if (index < 0x0f)
+		return "ANISA_ARMALY<=>"[index];
+	else
+		return index == 0x0f ? 0xa5 : 0x5a;
+}
+
+void cd3poker_state::cd3poker(machine_config &config)
 {
 	cm(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cd3poker_state::cd3poker_map);
 
 	NVRAM(config.replace(), "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -25242,15 +25312,12 @@ void cmaster_state::init_crazybonb()
 
 }
 
-void cmaster_state::init_3cdp()  // v1.6 & v1.0
+void cd3poker_state::init_3cdp()  // v1.6 & v1.0
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x0209] = 0x9b; // ppi0 init
 	rom[0x020d] = 0x9b; // ppi1 init
-
-	rom[0x8193] = 0xc9; // skip protection
-	rom[0x81c3] = 0xc9; // skip protection
 }
 
 
@@ -27551,8 +27618,8 @@ GAMEL( 1992, cmv4,       0,        cm,       cmv4,     cmaster_state,  init_cmv4
 GAMEL( 1992, cmv4a,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                0,                 layout_cmv4 ) // with tetris tiles leftover
 GAMEL( 199?, cmwm,       cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                 layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
 GAMEL( 1995, cmfun,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
-GAMEL( 1996, 3cdpoker,   0,        cd3poker, cmv4,     cmaster_state,  init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     0,                 layout_cmv4 )
-GAMEL( 1996, 3cdpokera,  3cdpoker, cd3poker, cmv4,     cmaster_state,  init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     0,                 layout_cmv4 )
+GAMEL( 1996, 3cdpoker,   0,        cd3poker, cmv4,     cd3poker_state, init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     0,                 layout_cmv4 )
+GAMEL( 1996, 3cdpokera,  3cdpoker, cd3poker, cmv4,     cd3poker_state, init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     0,                 layout_cmv4 )
 GAMEL( 1991, cmaster,    0,        cm,       cmaster,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                 layout_cmaster )
 GAMEL( 1991, cmasterb,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                 layout_cmasterb )
 GAMEL( 1991, cm1codar,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "CODERE Argentina",  "Cherry Master I (ver.1.01, Spanish, CODERE, set 1)",  0,         layout_cmasterb )
