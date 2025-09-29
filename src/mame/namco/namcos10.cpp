@@ -55,7 +55,7 @@ Puzz Ball (PZB1 Ver. C)                                                       (C
 Seishun-Quiz Colorful High School (CHS1 Ver.A)                                (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                                       (C) Namco, 2004
 *Shamisen Brothers (KT-SB2 Ver.A + CDROM)                                     (C) Kato/Konami, 2003
-Slot no Oujisama / Slot Prince (SLO1 Ver.A)                                  (C) Namco, 2003
+Slot no Oujisama / Slot Prince (SLO1 Ver.A)                                   (C) Namco, 2003
 Slot no Oujisama / Slot Prince (SLO1 Ver.B)                                   (C) Namco, 2003
 Star Trigon (STT1 Ver.A)                                                      (C) Namco, 2002
 Sugorotic JAPAN (STJ1 Ver.A)                                                  (C) Namco, 2002
@@ -314,6 +314,7 @@ Puzz Ball                                           PZB1  Ver.A   KC013A   8E, 8
 Puzz Ball                                           PZB1  Ver.C   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Slot no Oujisama/Slot Prince                        SLO1  Ver.B   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Slot no Oujisama/Slot Prince                        SLO1  Ver.A   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A           I/O board = none
 Sugorotic JAPAN                                     STJ1  Ver.C   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Sugorotic JAPAN                                     STJ1  Ver.B   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
@@ -4195,7 +4196,7 @@ GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_sta
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // May 2 2003, decrypter not done yet
-GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // May 2 2003, decrypter not done yet
+GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // decrypter not done yet
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
