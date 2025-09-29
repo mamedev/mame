@@ -154,22 +154,23 @@ void specnext_sprites_device::update_sprites_cache()
 				anchor_pattern = anchor->pattern;
 			}
 
-			bool y8 = BIT(sprite_attr[3], 6) ? BIT(spr_cur_attr[4], 0) : 0;
-			spr_cur.y = (y8 << 8) | spr_cur_attr[1];
+			const u8 attr_ext = BIT(sprite_attr[3], 6) ? spr_cur_attr[4] : 0x00;
+
+			spr_cur.y = (BIT(attr_ext, 0) << 8) | spr_cur_attr[1];
 			spr_cur.x = (BIT(spr_cur_attr[2], 0) << 8) | spr_cur_attr[0];
 			spr_cur.rotate = BIT(spr_cur_attr[2], 1);
 			spr_cur.ymirror = BIT(spr_cur_attr[2], 2);
 			spr_cur.xmirror = BIT(spr_cur_attr[2], 3);
 			spr_cur.paloff = BIT(spr_cur_attr[2], 4, 4);
 
-			spr_cur.h = BIT(spr_cur_attr[4], 7) && BIT(sprite_attr[3], 6);
-			bool spr_cur_n6 = BIT(spr_cur_attr[4], 6) && spr_cur.h;
+			spr_cur.h = BIT(attr_ext, 7) && BIT(sprite_attr[3], 6);
+			bool spr_cur_n6 = BIT(attr_ext, 6) && spr_cur.h;
 			spr_cur.pattern = (BIT(spr_cur_attr[3], 0, TOTAL_PATTERN_BITS) << 1) | spr_cur_n6;
 			if (spr_relative && BIT(sprite_attr[4], 0))
 				spr_cur.pattern = (spr_cur.pattern + anchor_pattern) & 0x7f;
 
-			spr_cur.yscale = BIT(spr_cur_attr[4], 1, 2);
-			spr_cur.xscale = BIT(spr_cur_attr[4], 3, 2);
+			spr_cur.yscale = BIT(attr_ext, 1, 2);
+			spr_cur.xscale = BIT(attr_ext, 3, 2);
 			spr_cur.rel_type = BIT(sprite_attr[4], 5) && BIT(sprite_attr[3], 6);
 
 			m_sprites_cache.push_back(spr_cur);

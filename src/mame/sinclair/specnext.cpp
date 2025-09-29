@@ -2029,10 +2029,12 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		nr_33_lores_scrolly_w(nr_wr_dat);
 		break;
 	case 0x34:
+		m_screen->update_now();
 		m_sprites->mirror_data_w(nr_wr_dat);
 		break;
 	case 0x35: case 0x36:  case 0x37: case 0x38: case 0x39:
 	case 0x75: case 0x76:  case 0x77: case 0x78: case 0x79:
+		m_screen->update_now();
 		m_sprites->mirror_inc_w(BIT(nr_wr_reg, 6));
 		m_sprites->mirror_index_w((nr_wr_reg & 0x3f) - 0x35);
 		m_sprites->mirror_data_w(nr_wr_dat);
@@ -2078,9 +2080,11 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		}
 		break;
 	case 0x4b:
+		m_screen->update_now();
 		nr_4b_sprite_transparent_index_w(nr_wr_dat);
 		break;
 	case 0x4c:
+		m_screen->update_now();
 		nr_4c_tm_transparent_index_w(BIT(nr_wr_dat, 0, 4));
 		break;
 	case 0x50: case 0x51: case 0x52: case 0x53:
