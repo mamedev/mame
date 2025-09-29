@@ -514,7 +514,7 @@
       <bounds x="285" y="66" width="10" height="0.1" />
     </element>
     <element ref="rect_ffffff">
-      <bounds x="122" y="66" width="10" height="0.1" />
+      <bounds x="305" y="66" width="10" height="0.1" />
     </element>
     <group ref="vfd">
       <bounds x="37.5" y="22.678" width="205" height="17.143" />
@@ -674,7 +674,7 @@
       <bounds x="385" y="87.5" width="35" height="4.3" />
     </element>
     <element ref="text_multi">
-      <bounds x="118" y="63.9" width="10" height="4.3" />
+      <bounds x="295" y="63.9" width="10" height="4.3" />
     </element>
     <element ref="text_a">
       <bounds x="285" y="68.2" width="15" height="4.3" />
