@@ -3465,6 +3465,8 @@ if (BUSES["RS232"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/rs232/exorterm.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/exorterm.h",
+		MAME_DIR .. "src/devices/bus/rs232/heath_h19.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/heath_h19.h",
 		MAME_DIR .. "src/devices/bus/rs232/hlemouse.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/hlemouse.h",
 		MAME_DIR .. "src/devices/bus/rs232/ie15.cpp",
@@ -5891,6 +5893,8 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/opti82c861.h",
 		MAME_DIR .. "src/devices/bus/pci/pdc20262.cpp",
 		MAME_DIR .. "src/devices/bus/pci/pdc20262.h",
+		MAME_DIR .. "src/devices/bus/pci/permedia2.cpp",
+		MAME_DIR .. "src/devices/bus/pci/permedia2.h",
 		MAME_DIR .. "src/devices/bus/pci/promotion.cpp",
 		MAME_DIR .. "src/devices/bus/pci/promotion.h",
 		MAME_DIR .. "src/devices/bus/pci/riva128.cpp",

@@ -1115,19 +1115,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/permedia2.h,VIDEOS["PERMEDIA2"] = true
---------------------------------------------------
-
-if (VIDEOS["PERMEDIA2"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/permedia2.cpp",
-		MAME_DIR .. "src/devices/video/permedia2.h",
-	}
-end
-
-
---------------------------------------------------
---
 --@src/devices/video/psx.h,VIDEOS["PSX"] = true
 --------------------------------------------------
 

@@ -37,10 +37,12 @@ Main components found on its main PCB:
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sparc/sparc.h"
 
+#include "machine/pci.h"
+
 #include "softlist_dev.h"
 
 #include "sun_fcnc_270_4373_07.h"
-#include "video/permedia2.h"
+//#include "bus/pci/permedia2.h"
 
 
 namespace {
@@ -75,9 +77,11 @@ void e250_state::e250(machine_config &config)
 
 	SOFTWARE_LIST(config, "sun_sparc").set_original("sun_sparc");
 
+	PCI_ROOT(config, "pci", 0);
+
 	// PCI Cards
 	SUN_FCNC_270_4373_07(config, "sun_fcnc_270_4373_07"); // Sun Microsystems 270-4373-07 Gigabit Fiber Channel Network Card
-	PERMEDIA2(config, "permedia2"); // Raptor GFX PCI Video Card
+	//PERMEDIA2(config, "permedia2"); // Raptor GFX PCI Video Card
 }
 
 
