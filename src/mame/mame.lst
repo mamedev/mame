@@ -19434,6 +19434,7 @@ newbrainmd
 @source:handheld/st2302u_bbl_rom.cpp
 bbl338
 class200
+cutepet
 dphh8213
 
 @source:handheld/st2302u_bbl_spi.cpp
