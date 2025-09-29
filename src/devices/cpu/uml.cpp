@@ -389,6 +389,13 @@ public:
 		}
 	}
 
+	static void carry(instruction &inst)
+	{
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 0, size_mask(inst));
+		truncate_immediate(inst, 1, (inst.size() << 3) - 1);
+	}
+
 	static void set(instruction &inst)
 	{
 		// convert to MOV if the condition is constant
@@ -1311,6 +1318,7 @@ void uml::instruction::simplify()
 		case OP_READM:  simplify_op::readm(*this);                    break;
 		case OP_WRITE:  simplify_op::write(*this);                    break;
 		case OP_WRITEM: simplify_op::writem(*this);                   break;
+		case OP_CARRY:  simplify_op::carry(*this);                    break;
 		case OP_SET:    simplify_op::set(*this);                      break;
 		case OP_MOV:    simplify_op::mov(*this);                      break;
 		case OP_SEXT:   simplify_op::sext(*this);                     break;

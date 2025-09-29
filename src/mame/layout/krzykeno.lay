@@ -40,7 +40,7 @@ May or may not match arrangement/colour of real control panel
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="KEEP">
+		<text string="STOP ALL">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -180,10 +180,10 @@ May or may not match arrangement/colour of real control panel
 			<color red="0.0" green="0.0" blue="0.0" />
 		</element>
 
-		<element ref="bet_b" name="lamp3" inputtag="TEST0" inputmask="0x02">
+		<element ref="take_b" name="lamp4" inputtag="TEST2" inputmask="0x00010">
 			<bounds x="0.10" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="bet" name="lamp3" inputtag="TEST0" inputmask="0x02">
+		<element ref="take" name="lamp4" inputtag="TEST2" inputmask="0x00010">
 			<bounds x="0.12" y="3.10" width="0.46" height="0.20" />
 		</element>
 
@@ -208,10 +208,10 @@ May or may not match arrangement/colour of real control panel
 			<bounds x="2.02" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="take_b" name="lamp4" inputtag="TEST2" inputmask="0x00010">
+		<element ref="bet_b" name="lamp3" inputtag="TEST0" inputmask="0x02">
 			<bounds x="2.70" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="take" name="lamp4" inputtag="TEST2" inputmask="0x00010">
+		<element ref="bet" name="lamp3" inputtag="TEST0" inputmask="0x02">
 			<bounds x="2.72" y="3.10" width="0.46" height="0.20" />
 		</element>
 

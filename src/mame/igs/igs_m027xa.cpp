@@ -92,7 +92,7 @@ private:
 	output_finder<8> m_out_lamps;
 
 	u32 m_xor_table[0x100];
-	u8 m_io_select[2];
+	u8 m_io_select;
 
 	bool m_irq_from_igs031;
 
@@ -102,8 +102,9 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void main_xor_map(address_map &map) ATTR_COLD;
 	void haunthig_map(address_map &map) ATTR_COLD;
-	void haunthig_oki_map(address_map &map) ATTR_COLD;
 	void tripfev_map(address_map &map) ATTR_COLD;
+
+	void split_bank_oki_map(address_map &map) ATTR_COLD;
 
 	u32 external_rom_r(offs_t offset);
 
@@ -117,8 +118,8 @@ private:
 	u32 gpio_r();
 	void oki_bank_w(u8 data);
 	void oki_split_bank_w(u8 data);
-	template <unsigned Select, unsigned First> u8 dsw_r();
-	template <unsigned Select> void io_select_w(u8 data);
+	u8 dsw_r();
+	void io_select_w(u8 data);
 };
 
 
@@ -131,9 +132,9 @@ void igs_m027xa_state::machine_start()
 {
 	m_out_lamps.resolve();
 
-	if (m_okibank[1].found())
+	if (m_okibank[1])
 	{
-		u8 *samples = memregion("oki")->base();
+		u8 *const samples = memregion("oki")->base();
 		m_okibank[0]->configure_entries(0, 16, samples, 0x20000);
 		m_okibank[1]->configure_entries(0, 16, samples, 0x20000);
 	}
@@ -184,20 +185,20 @@ void igs_m027xa_state::haunthig_map(address_map &map)
 {
 	main_xor_map(map);
 
-	map(0x3800a000, 0x3800a000).w(FUNC(igs_m027xa_state::oki_split_bank_w));
-}
-
-void igs_m027xa_state::haunthig_oki_map(address_map &map)
-{
-	map(0x00000, 0x1ffff).bankr(m_okibank[0]);
-	map(0x20000, 0x3ffff).bankr(m_okibank[1]);
+	map(0x3800a000, 0x3800a003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_split_bank_w));
 }
 
 void igs_m027xa_state::tripfev_map(address_map &map)
 {
 	main_xor_map(map);
 
-	map(0x3800c000, 0x3800c000).w(FUNC(igs_m027xa_state::oki_bank_w));
+	map(0x3800c000, 0x3800c003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_bank_w));
+}
+
+void igs_m027xa_state::split_bank_oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).bankr(m_okibank[0]);
+	map(0x20000, 0x3ffff).bankr(m_okibank[1]);
 }
 
 
@@ -477,7 +478,7 @@ INPUT_PORTS_START( krzykeno )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_NAME("Call Attendant")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play / Raise")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Clear Error")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Pick / Stop Reel 1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Pick / Hold / Stop Reel 1")
 
 	PORT_MODIFY("TEST1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All")
@@ -585,21 +586,19 @@ void igs_m027xa_state::oki_split_bank_w(u8 data)
 	m_okibank[1]->set_entry((data >> 4) & 0x0f); // music
 }
 
-template <unsigned Select, unsigned First>
 u8 igs_m027xa_state::dsw_r()
 {
 	u8 data = 0xff;
 
-	for (int i = First; i < m_io_dsw.size(); i++)
-		if (!BIT(m_io_select[Select], i - First))
+	for (int i = 0; i < m_io_dsw.size(); i++)
+		if (!BIT(m_io_select, i))
 			data &= m_io_dsw[i].read_safe(0xff);
 	return data;
 }
 
-template <unsigned Select>
 void igs_m027xa_state::io_select_w(u8 data)
 {
-	m_io_select[Select] = data;
+	m_io_select = data;
 }
 
 
@@ -648,7 +647,7 @@ void igs_m027xa_state::base(machine_config &config)
 	IGS027A(config, m_maincpu, 22'000'000); // Crazy Bugs has a 22MHz crystal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_map);
 	m_maincpu->in_port().set(FUNC(igs_m027xa_state::gpio_r));
-	m_maincpu->out_port().set(FUNC(igs_m027xa_state::io_select_w<1>));
+	m_maincpu->out_port().set(FUNC(igs_m027xa_state::io_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -675,7 +674,7 @@ void igs_m027xa_state::base(machine_config &config)
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
-	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027xa_state::dsw_r<1, 0>)));
+	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027xa_state::dsw_r)));
 	m_igs017_igs031->in_pb_callback().set_ioport("TEST0");
 	m_igs017_igs031->in_pc_callback().set_ioport("TEST1");
 
@@ -691,7 +690,8 @@ void igs_m027xa_state::haunthig(machine_config &config)
 	base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::haunthig_map);
-	m_oki->set_addrmap(0, &igs_m027xa_state::haunthig_oki_map);
+
+	m_oki->set_addrmap(0, &igs_m027xa_state::split_bank_oki_map);
 }
 
 void igs_m027xa_state::tripfev(machine_config &config)

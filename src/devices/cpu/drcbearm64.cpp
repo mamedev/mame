@@ -3019,14 +3019,9 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 
 		// move carry bit to lsb
 		if (shift != 0)
-		{
-			a.lsr(scratch, src, shift);
-			store_carry_reg(a, scratch);
-		}
+			a.bfxil(FLAGS_REG, src.x(), shift, 1); // this depends on carry being the least significant bit of the flags
 		else
-		{
 			store_carry_reg(a, src);
-		}
 	}
 	else
 	{
@@ -3283,23 +3278,20 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		if (is_right_aligned)
 		{
 			// Optimize a contiguous right-aligned mask
-			const auto s2 = (instbits - s) & (instbits - 1);
+			const auto s2 = -int(s) & (instbits - 1);
 
 			if (s >= pop)
 			{
 				a.ubfx(output, src, s2, pop);
 			}
+			else if (s2 > 0)
+			{
+				a.ror(output, src, s2);
+				a.bfc(output, pop, instbits - pop);
+			}
 			else
 			{
-				if (s2 > 0)
-				{
-					a.ror(output, src, s2);
-					a.bfc(output, pop, instbits - pop);
-				}
-				else
-				{
-					a.and_(output, src, ~maskp.immediate() & instmask);
-				}
+				a.and_(output, src, ~maskp.immediate() & instmask);
 			}
 		}
 		else if (is_contiguous)
@@ -3336,7 +3328,6 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		// mask and dst could also be the same register so do this before rotating dst
 		if (!maskp.is_immediate() || !is_valid_immediate_mask(maskp.immediate(), inst.size()))
 			mov_reg_param(a, inst.size(), mask, maskp);
-
 
 		if (shiftp.is_immediate())
 		{
@@ -3411,11 +3402,11 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 			if (is_right_aligned)
 			{
 				// Optimize a contiguous right-aligned mask
-				rot = (instbits - s) & (instbits - 1);
+				rot = -int32_t(s) & (instbits - 1);
 			}
-			else if (is_contiguous)
+			else
 			{
-				// Optimize a contiguous mask
+				// Optimize a contiguous mask - rotate the field to make it right-aligned, then insert it
 				rot = -int32_t(s + pop + lz) & (instbits - 1);
 				lsb = instbits - pop - lz;
 			}
@@ -3430,19 +3421,25 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 					result = rotr_64(srcp.immediate(), rot);
 
 				a.mov(scratch, result);
-			}
-			else if (rot > 0)
-			{
-				mov_reg_param(a, inst.size(), src, srcp);
-
-				a.ror(scratch, src, rot);
+				a.bfi(dst, scratch, lsb, pop);
 			}
 			else
 			{
 				mov_reg_param(a, inst.size(), src, srcp);
-			}
 
-			a.bfi(dst, (rot > 0) ? scratch : src, lsb, pop);
+				if (is_right_aligned && ((rot + pop) <= instbits))
+				{
+					// can insert a right-aligned field directly when it doesn't wrap around
+					a.bfxil(dst, src, rot, pop);
+				}
+				else
+				{
+					if (rot > 0)
+						a.ror(scratch, src, rot);
+
+					a.bfi(dst, (rot > 0) ? scratch : src, lsb, pop);
+				}
+			}
 
 			optimized = true;
 		}
