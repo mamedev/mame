@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_1801VM1_TIMER_H
-#define MAME_MACHINE_1801VM1_TIMER_H
+#ifndef MAME_USSR_VM1TIMER_H
+#define MAME_USSR_VM1TIMER_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(K1801VM1_TIMER, k1801vm1_timer_device)
 
-#endif // MAME_MACHINE_1801VM1_TIMER_H
+#endif // MAME_USSR_VM1TIMER_H
