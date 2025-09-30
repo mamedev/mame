@@ -251,6 +251,16 @@ ROM_START( smkcatch )
 	ROM_LOAD16_WORD_SWAP( "gpr25l64.u2", 0x0000, 0x800000,  CRC(e2f52c4a) SHA1(f79862d27152cff8f96151c672d9762a3897a593) )
 ROM_END
 
+ROM_START( smkguras )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gpr25l64.u3", 0x0000, 0x800000, CRC(96b61464) SHA1(59fada02e1ea983c56304b27b3f4cb1fba221cb0) )
+ROM_END
+
+ROM_START( smkgurasa ) // code is the same, some data area differs, could be different factory defaults, or user data, remove later if redundant
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "xm25qh64c.u3", 0x0000, 0x800000, CRC(2c9e82af) SHA1(8c475783eafbeaeb88d62b145758ad3487410222) )
+ROM_END
+
 ROM_START( dsgnpal )
 	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "gpr25l64.ic2", 0x0000, 0x800000, CRC(a1017ea8) SHA1(bd4b553ff71e763cd3fd726c49f5408eac3b7984) )
@@ -309,6 +319,10 @@ CONS(2021, pokgoget, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplu
 // Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
 CONS( 2021, smkcatch, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi - Sumikko Catch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
+
+// is there a subtitle for this one? it's different to the others
+CONS( 201?, smkguras,  0,        0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, smkgurasa, smkguras, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // there seem to be different versions of this available, is the software the same?
 CONS( 201?, dsgnpal, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
