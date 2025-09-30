@@ -1377,4 +1377,4 @@ CONS( 2019, gb50_150,  0,        0,  vt36x_16mb_sdcard, vt369, vt36x_state, empt
 
 // Games are stored on an SD card (outside of the filesystem?)
 // 8Bt is as printed on the box, not a typo
-CONS( 202?, a6plus,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro Arcade FC A6Plus - 8Bt Game Console", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, a6plus,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro Arcade FC A6Plus - 8Bt Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
