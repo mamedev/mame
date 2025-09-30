@@ -432,8 +432,6 @@ ROM_START(cchampion)
 
 	ROM_REGION(0x800, "eeprom", 0)
 	ROM_LOAD("24lc16b.ic8", 0x000, 0x800, NO_DUMP)
-
-	// No PLD on the Superdard/Plus PCB
 ROM_END
 
 /* Compumatic Microdard-V5 PCB
