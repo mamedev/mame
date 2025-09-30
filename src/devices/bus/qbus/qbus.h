@@ -98,6 +98,9 @@ public:
 
 	void bdmr_w(int state) { m_out_bdmr_cb(state); }
 
+	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 	const address_space_config m_program_config;
 
 protected:
