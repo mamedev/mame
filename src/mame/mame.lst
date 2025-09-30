@@ -35685,7 +35685,6 @@ vsmaxtx2
 wfmotor
 
 @source:nintendo/nes_vt32.cpp
-a6plus
 dgun2573
 dgun2573a
 dgunl3201
@@ -35710,6 +35709,7 @@ typo240
 36pcase
 168pcase
 240in1ar
+a6plus
 d12power
 denv150
 dgun2561
@@ -40560,6 +40560,7 @@ msi_sf2
 mygalag
 mygalaga
 mympac
+mympaca
 mypac
 mypaca
 mysinv

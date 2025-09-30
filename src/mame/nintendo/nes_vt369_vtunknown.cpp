@@ -1106,6 +1106,21 @@ ROM_START( gb50_150 )
 	ROM_LOAD( "w25q128jvsiq.bin", 0x00000, 0x1000000, CRC(3cc43fcb) SHA1(6c5e09fadb14e99e6db8c316026d124326a90557) )
 ROM_END
 
+ROM_START( a6plus )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "w25q64jv.u3", 0x00000, 0x800000, CRC(c62f9570) SHA1(eed64d7b022a1274892992ec53d41f189679ebd3) )
+
+	// 512MByte SD Card, seems to contain remains of a linux install in the filesystem
+	// There are NES images also present, used by the device, but they don't seem to be in the filesystem so
+	// probably accessed directly?
+	//
+	// When a game is selected it loads from the card (showing a 'loading' screen) unless the game is the
+	// previous one loaded, in which case it boots immediately, presumably due to already existing in the
+	// flash ROM
+	DISK_REGION( "sdcard" )
+	DISK_IMAGE( "a6plus", 0, SHA1(ce8fb23443008c921c6541e71da37c1dc6a06e5f) )
+ROM_END
+
 
 void vt369_state::init_lxcmcypp()
 {
@@ -1359,3 +1374,7 @@ CONS( 201?, d12power,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init,
 // Games loaded from SD card are loaded into the QSPI flash at 0x800000 - dump is from a clean factory console
 // PCB is marked "389" so possibly VT389 but VT369 string in a debug message in firmware
 CONS( 2019, gb50_150,  0,        0,  vt36x_16mb_sdcard, vt369, vt36x_state, empty_init, "<unknown>",  "GB-50 Retro Station Pocket System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// Games are stored on an SD card (outside of the filesystem?)
+// 8Bt is as printed on the box, not a typo
+CONS( 202?, a6plus,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro Arcade FC A6Plus - 8Bt Game Console", MACHINE_IMPERFECT_GRAPHICS )
