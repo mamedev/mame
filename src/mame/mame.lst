@@ -35797,6 +35797,7 @@ mc_9x6ss
 mc_hh210
 retro400
 rfcp168
+wol260
 
 @source:nintendo/nss.cpp
 nss
