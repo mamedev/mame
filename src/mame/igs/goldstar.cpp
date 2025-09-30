@@ -295,6 +295,7 @@
 #include "skillch.lh"
 #include "tonypok.lh"
 #include "unkch.lh"
+#include "wcat3a.lh"
 
 
 constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
@@ -459,6 +460,7 @@ public:
 	void pkrmast(machine_config &config) ATTR_COLD;
 	void reelmg(machine_config &config) ATTR_COLD;
 	void super7(machine_config &config) ATTR_COLD;
+	void wcat3a(machine_config &config) ATTR_COLD;
 
 	void init_alienatt() ATTR_COLD;
 	void init_animalhs() ATTR_COLD;
@@ -519,6 +521,7 @@ protected:
 private:
 	void outport0_w(uint8_t data);
 	void chyangb_outport0_w(uint8_t data);
+	void wcat3a_outport0_w(uint8_t data);
 	void girl_scroll_w(uint8_t data);
 	void background_col_w(uint8_t data);
 	void coincount_w(uint8_t data);
@@ -566,6 +569,8 @@ private:
 	void super7_map(address_map &map) ATTR_COLD;
 	void super7_portmap(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
+	void wcat3a_map(address_map &map) ATTR_COLD;
+	void wcat3a_portmap(address_map &map) ATTR_COLD;
 
 	// installed by various driver init handlers to get stuff to work
 	template <uint8_t V> uint8_t fixedval_r() { return V; }
@@ -1887,6 +1892,12 @@ void cmaster_state::chyangb_outport0_w(uint8_t data)
 	m_enable_reg = data & 0xef;  // mask bg register flag
 }
 
+void cmaster_state::wcat3a_outport0_w(uint8_t data)
+{
+//	popmessage("outport %02x",data);
+	m_enable_reg = data & 0x0b;  // mask bg register flag
+}
+
 void cmaster_state::girl_scroll_w(uint8_t data)
 {
 /*
@@ -2886,6 +2897,30 @@ void cmaster_state::cm_map(address_map &map)
 	map(0xfc80, 0xffff).ram();
 }
 
+void cmaster_state::wcat3a_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom().nopw();
+
+	map(0xd000, 0xd7ff).ram().share("nvram");
+	map(0xd800, 0xdfff).ram();
+
+	map(0xe000, 0xe7ff).ram().w(FUNC(cmaster_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(cmaster_state::fg_atrram_w)).share(m_fg_atrram);
+
+	map(0xf000, 0xf1ff).ram().w(FUNC(cmaster_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(cmaster_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(cmaster_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xf600, 0xf7ff).ram();
+
+	map(0xf800, 0xf83f).ram();
+	map(0xf840, 0xf8bf).ram().share(m_reel_scroll[0]);
+	map(0xf8c0, 0xfa7f).ram();
+	map(0xfa80, 0xfaff).ram().share(m_reel_scroll[1]);
+	map(0xfb00, 0xfbff).ram();
+	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
+	map(0xfc80, 0xffff).ram();
+}
+
 
 void cmaster_state::clb_map(address_map &map)
 {
@@ -3187,7 +3222,16 @@ void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
 void cmaster_state::chyangb_portmap(address_map &map)
 {
 	cm_portmap(map);
+
 	map(0x10, 0x10).w(FUNC(cmaster_state::chyangb_outport0_w));
+}
+
+void cmaster_state::wcat3a_portmap(address_map &map)
+{
+	cm_portmap(map);
+
+	map(0x10, 0x10).w(FUNC(cmaster_state::wcat3a_outport0_w));
+	map(0x80, 0x80).w("snsnd", FUNC(sn76489_device::write));  // initialized, but not used
 }
 
 void cmaster_state::crazybon_portmap(address_map &map)
@@ -4989,6 +5033,22 @@ static INPUT_PORTS_START( cmasterh )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( wcat3a )
+	PORT_INCLUDE( cmaster )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_CODE(KEYCODE_C) PORT_NAME("Big / Stop 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_CODE(KEYCODE_V) PORT_NAME("D-UP / Stop 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_CODE(KEYCODE_X) PORT_NAME("Take / Stop 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_Z) PORT_NAME("Bet")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_CODE(KEYCODE_B) PORT_NAME("Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )      PORT_CODE(KEYCODE_N) PORT_NAME("Start / Stop All")
+INPUT_PORTS_END
+
 
 // only 2 banks of 8 switches
 static INPUT_PORTS_START( super7 ) // TODO: verify everything
@@ -12812,7 +12872,18 @@ void cmaster_state::chryanglb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::chyangb_portmap);
+}
 
+void cmaster_state::wcat3a(machine_config &config)
+{
+	cm(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::wcat3a_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::wcat3a_portmap);
+	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
+
+	// sound hardware
+	SN76489(config, "snsnd", CPU_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);  // clock not verified
 }
 
 void cmaster_state::cmtetriskr(machine_config &config)
@@ -20466,15 +20537,15 @@ ROM_START( wcat3a )
 	ROM_LOAD( "main program sub 27c512.bin",  0x0000, 0x10000, CRC(50b61d88) SHA1(7cea2a03d9b48a1f324171f69ae9df62cf65dc6f) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "rom7.bin",   0x10000, 0x8000, CRC(3e2ade27) SHA1(9a463219c5028ed32086c378a17079f69d1c0439) )
+	ROM_LOAD( "rom7.bin",   0x00000, 0x8000, CRC(3e2ade27) SHA1(9a463219c5028ed32086c378a17079f69d1c0439) )
 	ROM_LOAD( "rom6.bin",   0x08000, 0x8000, CRC(71ae4c3c) SHA1(7b3b0a7453e5844194f3d3ed449549e4c091b127) )
-	ROM_LOAD( "rom5.bin",   0x00000, 0x8000, CRC(8fac3f23) SHA1(e2c67620aa2ea01c2d469d963b5a34ca710742ec) )
+	ROM_LOAD( "rom5.bin",   0x10000, 0x8000, CRC(8fac3f23) SHA1(e2c67620aa2ea01c2d469d963b5a34ca710742ec) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "rom4.bin",   0x6000, 0x2000, CRC(0509d556) SHA1(c2f46d279f45b544c67b0c966659cc6d5d53c22f) )
-	ROM_LOAD( "rom3.bin",   0x4000, 0x2000, CRC(d50f3d62) SHA1(8500c7f3a2f51ea0ed7e142ecdc4e669ba3e7065) )
-	ROM_LOAD( "rom2.bin",   0x2000, 0x2000, CRC(373d9949) SHA1(ff483505fb9e86411acad7059bf5434dde290946) )
-	ROM_LOAD( "rom1.bin",   0x0000, 0x2000, CRC(50febe3b) SHA1(0479bcee53b174aa0413951e283e446b09a6f156) )
+	ROM_LOAD( "rom4.bin",   0x0000, 0x2000, CRC(0509d556) SHA1(c2f46d279f45b544c67b0c966659cc6d5d53c22f) )
+	ROM_LOAD( "rom3.bin",   0x2000, 0x2000, CRC(d50f3d62) SHA1(8500c7f3a2f51ea0ed7e142ecdc4e669ba3e7065) )
+	ROM_LOAD( "rom2.bin",   0x4000, 0x2000, CRC(373d9949) SHA1(ff483505fb9e86411acad7059bf5434dde290946) )
+	ROM_LOAD( "rom1.bin",   0x6000, 0x2000, CRC(50febe3b) SHA1(0479bcee53b174aa0413951e283e446b09a6f156) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF ) // no girls bitmap
 
@@ -25924,6 +25995,21 @@ void cmaster_state::init_wcat3a()  // seems ok, but needs checking
 		m_decrypted_opcodes[i] = x;
 	}
 
+	m_decrypted_opcodes[0x01ae] = 0xfb;
+	m_decrypted_opcodes[0x9313] = 0xc9;
+	m_decrypted_opcodes[0x9319] = 0xc9;
+	m_decrypted_opcodes[0x932a] = 0xc9;
+	m_decrypted_opcodes[0x934b] = 0xc9;
+	m_decrypted_opcodes[0x93be] = 0xc9;
+	m_decrypted_opcodes[0x93f7] = 0xc9;
+	m_decrypted_opcodes[0x9a7b] = 0xc9;
+
+	//m_decrypted_opcodes[0x9353] = 0xc9;  // to check
+	//m_decrypted_opcodes[0x936c] = 0xc9;  // to check
+	//m_decrypted_opcodes[0x9379] = 0xc9;  // to check
+	//m_decrypted_opcodes[0x9388] = 0xc9;  // to check
+
+
 	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = rom[i];
@@ -25940,6 +26026,10 @@ void cmaster_state::init_wcat3a()  // seems ok, but needs checking
 		}
 		rom[i] = x;
 	}
+
+	rom[0x00e3] = 0x38; // Enable PSG Sound ChA-ChB-ChC
+	rom[0x0785] = 0xdc; // 
+	rom[0x0786] = 0x20; //
 }
 
 void cb3_state::init_chrygld()
@@ -27675,7 +27765,7 @@ GAMEL( 1991, lonestara,  cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4
 GAMEL( 1991, skdelux2k,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 2K (FBV2 ver.T)",        0,                 layout_cmasterb )
 GAMEL( 1991, skdelux99,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 99 (FBV2 ver.T)",        0,                 layout_cmasterb )
 GAMEL( 199?, super7,     cmaster,  super7,   super7,   cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven (ver. 2.3)",                      MACHINE_NOT_WORKING, layout_cmasterb ) // inputs / outputs needs verifying
-GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
+GAMEL( 1993, wcat3a,     wcat3,    wcat3a,   wcat3a,   cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat S (CMV4 hardware)",                  0,                 layout_wcat3a ) // CAT2 101893
 GAMEL( 1993, ll3,        0,        ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 1)",            0,  layout_ll3 )
 GAMEL( 1993, ll3a,       ll3,      ll3,      ll3a,     cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 2, Macedonia)", 0,  layout_ll3 )
 GAMEL( 1993, ll3b,       ll3,      ll3,      ll3b,     cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 3)",            0,  layout_ll3 )
@@ -27775,7 +27865,7 @@ GAME(  198?, ladylinrb,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME(  198?, ladylinrc,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrc, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            0 )
 GAME(  198?, ladylinrd,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
-GAME ( 1992?,wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
+GAME( 1992?, wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
 GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
 GAMEL( 199?, animalw,    0,        animalw,  lucky8t,  wingco_state,   empty_init,     ROT0, "GPS",               "Animal Wonders (ver A900 66)",                             0,                     layout_lucky8p1 )    // DIPs need to be checked
 GAMEL( 199?, animalwbl,  animalw,  lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900, bootleg)",                       0,                     layout_lucky8p1 )    // DIPs need to be checked
