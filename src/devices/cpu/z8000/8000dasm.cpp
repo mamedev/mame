@@ -667,14 +667,15 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 						tmp = ((n[1] & 0x01) << 8) + (n[3] << 4) + (n[7] & 0x08);
 						switch (tmp)
 						{
+							// Byte forms
 							case 0x000: util::stream_format(stream, "inirb "); flags = STEP_COND; break;
 							case 0x008: util::stream_format(stream, "inib  "); break;
 							case 0x010: util::stream_format(stream, "sinirb"); flags = STEP_COND; break;
 							case 0x018: util::stream_format(stream, "sinib "); break;
 							case 0x020: util::stream_format(stream, "otirb "); flags = STEP_COND; break;
 							case 0x028: util::stream_format(stream, "outib "); break;
-							case 0x030: util::stream_format(stream, "soutib"); break;
-							case 0x038: util::stream_format(stream, "sotirb"); flags = STEP_COND; break;
+							case 0x030: util::stream_format(stream, "sotirb"); flags = STEP_COND; break;
+							case 0x038: util::stream_format(stream, "soutib"); break;
 							case 0x040: util::stream_format(stream, "inb   "); break;
 							case 0x048: util::stream_format(stream, "inb   "); break;
 							case 0x050: util::stream_format(stream, "sinb  "); break;
@@ -689,16 +690,17 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 							case 0x098: util::stream_format(stream, "sindb "); break;
 							case 0x0a0: util::stream_format(stream, "otdrb "); flags = STEP_COND; break;
 							case 0x0a8: util::stream_format(stream, "outdb "); break;
-							case 0x0b0: util::stream_format(stream, "soutdb"); break;
-							case 0x0b8: util::stream_format(stream, "sotdrb"); flags = STEP_COND; break;
+							case 0x0b0: util::stream_format(stream, "sotdrb"); flags = STEP_COND; break;
+							case 0x0b8: util::stream_format(stream, "soutdb"); break;
+							// Word forms
 							case 0x100: util::stream_format(stream, "inir  "); flags = STEP_COND; break;
 							case 0x108: util::stream_format(stream, "ini   "); break;
 							case 0x110: util::stream_format(stream, "sinir "); flags = STEP_COND; break;
 							case 0x118: util::stream_format(stream, "sini  "); break;
 							case 0x120: util::stream_format(stream, "otir  "); flags = STEP_COND; break;
 							case 0x128: util::stream_format(stream, "outi  "); break;
-							case 0x130: util::stream_format(stream, "souti "); break;
-							case 0x138: util::stream_format(stream, "sotir "); flags = STEP_COND; break;
+							case 0x130: util::stream_format(stream, "sotir "); flags = STEP_COND; break;
+							case 0x138: util::stream_format(stream, "souti "); break;
 							case 0x140: util::stream_format(stream, "in    "); break;
 							case 0x148: util::stream_format(stream, "in    "); break;
 							case 0x150: util::stream_format(stream, "sin   "); break;
@@ -713,8 +715,8 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 							case 0x198: util::stream_format(stream, "sind  "); break;
 							case 0x1a0: util::stream_format(stream, "otdr  "); flags = STEP_COND; break;
 							case 0x1a8: util::stream_format(stream, "outd  "); break;
-							case 0x1b0: util::stream_format(stream, "soutd "); break;
-							case 0x1b8: util::stream_format(stream, "sotdr "); flags = STEP_COND; break;
+							case 0x1b0: util::stream_format(stream, "sotdr "); flags = STEP_COND; break;
+							case 0x1b8: util::stream_format(stream, "soutd "); break;
 							default:
 								util::stream_format(stream, "unk(0x%x)", tmp);
 						}
