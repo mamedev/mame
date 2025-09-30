@@ -151,6 +151,46 @@ void bk_state::bk11m_sel1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
+QUICKLOAD_LOAD_MEMBER(bk_state::quickload_cb)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	uint16_t args[2];
+	uint8_t ch = 0;
+
+	image.fseek(0, SEEK_SET);
+
+	if (image.fread(args, sizeof(args)) != sizeof(args))
+	{
+		return std::make_pair(image_error::UNSPECIFIED, "Unexpected EOF while getting file size");
+	}
+
+	const uint16_t quick_addr = little_endianize_int16(args[0]);
+	const uint16_t quick_length = little_endianize_int16(args[1]);
+	const uint16_t quick_end = quick_addr + quick_length - 1;
+
+	if (quick_end > 077777)
+	{
+		return std::make_pair(image_error::INVALIDLENGTH, "File too large");
+	}
+
+	for (int i = 0; i < quick_length; i++)
+	{
+		unsigned j = (quick_addr + i);
+		if (image.fread(&ch, 1) != 1)
+		{
+			return std::make_pair(image_error::UNSPECIFIED, util::string_format("Unexpected EOF while writing byte to %06o", j));
+		}
+		space.write_byte(j, ch);
+	}
+
+	space.write_word(0264, little_endianize_int16(quick_addr));
+	space.write_word(0266, little_endianize_int16(quick_length));
+
+	image.message("loaded, start %06o size %06o end %06o\n", quick_addr, quick_length, quick_end);
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
 void bk_state::bk0010_palette(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0, 0, 0));

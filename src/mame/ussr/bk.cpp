@@ -176,6 +176,7 @@ void bk_state::bk0010(machine_config &config)
 	m_cassette->set_interface("bk0010_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("bk0010");
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(6)).set_load_callback(FUNC(bk_state::quickload_cb));
 }
 
 void bk_state::bk0010fd(machine_config &config)

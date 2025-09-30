@@ -15,6 +15,7 @@
 #include "bus/qbus/qbus.h"
 #include "cpu/t11/t11.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/pdp11.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -94,6 +95,7 @@ private:
 	memory_view m_view1, m_view2;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback_bk11);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void bk0010_mem(address_map &map) ATTR_COLD;
 	void bk0010fd_mem(address_map &map) ATTR_COLD;
