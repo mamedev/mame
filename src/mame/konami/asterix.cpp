@@ -65,20 +65,20 @@ private:
 	void z80_nmi_w(int state);
 	void sound_irq_w(uint16_t data);
 	void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint32_t screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(asterix_interrupt);
+	void spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	K053244_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
 	void reset_spritebank();
 
 	/* video-related */
-	int         m_sprite_colorbase = 0;
-	int         m_layer_colorbase[4]{};
-	int         m_layerpri[3]{};
+	uint16_t    m_sprite_colorbase = 0;
+	uint16_t    m_layer_colorbase[4]{};
+	int32_t     m_layerpri[3]{};
 	uint16_t    m_spritebank = 0U;
-	int         m_tilebanks[4]{};
-	int         m_spritebanks[4]{};
+	int32_t     m_tilebanks[4]{};
+	int32_t     m_spritebanks[4]{};
 
 	/* misc */
 	uint16_t    m_prot[2]{};
@@ -102,7 +102,7 @@ void asterix_state::reset_spritebank()
 	m_spritebanks[3] = (m_spritebank <<  3) & 0x7000;
 }
 
-void asterix_state::asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void asterix_state::spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spritebank);
 	reset_spritebank();
@@ -110,31 +110,31 @@ void asterix_state::asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t 
 
 K053244_CB_MEMBER(asterix_state::sprite_callback)
 {
-	int pri = (*color & 0x00e0) >> 2;
+	int pri = (color & 0x00e0) >> 2;
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
-	*color = m_sprite_colorbase | (*color & 0x001f);
-	*code = (*code & 0xfff) | m_spritebanks[(*code >> 12) & 3];
+		priority = 0xf0 | 0xcc | 0xaa;
+	color = m_sprite_colorbase | (color & 0x001f);
+	code = (code & 0xfff) | m_spritebanks[(code >> 12) & 3];
 }
 
 
 K056832_CB_MEMBER(asterix_state::tile_callback)
 {
-	*flags = *code & 0x1000 ? TILE_FLIPX : 0;
-	*color = (m_layer_colorbase[layer] + ((*code & 0xe000) >> 13)) & 0x7f;
-	*code = (*code & 0x03ff) | m_tilebanks[(*code >> 10) & 3];
+	flags = code & 0x1000 ? TILE_FLIPX : 0;
+	color = (m_layer_colorbase[layer] + ((code & 0xe000) >> 13)) & 0x7f;
+	code = (code & 0x03ff) | m_tilebanks[(code >> 10) & 3];
 }
 
-uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t asterix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// layer offsets are different if horizontally flipped
-	if (m_k056832->read_register(0x0) & 0x10)
+	if (m_k056832->word_r(0x0) & 0x10)
 	{
 		m_k056832->set_layer_offs(0, -7 - 177, 0);
 		m_k056832->set_layer_offs(1, -5 - 177, 0);
@@ -223,7 +223,7 @@ void asterix_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
+INTERRUPT_GEN_MEMBER(asterix_state::interrupt)
 {
 	// global interrupt masking
 	if (!m_k056832->is_irq_enabled(0))
@@ -306,7 +306,7 @@ void asterix_state::main_map(address_map &map)
 	map(0x380100, 0x380101).w(FUNC(asterix_state::control2_w));
 	map(0x380200, 0x380203).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x380300, 0x380301).w(FUNC(asterix_state::sound_irq_w));
-	map(0x380400, 0x380401).w(FUNC(asterix_state::asterix_spritebank_w));
+	map(0x380400, 0x380401).w(FUNC(asterix_state::spritebank_w));
 	map(0x380500, 0x38051f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x380600, 0x380601).noprw();                             // Watchdog
 	map(0x380700, 0x380707).w(m_k056832, FUNC(k056832_device::b_word_w));
@@ -391,7 +391,7 @@ void asterix_state::asterix(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2); // 12MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &asterix_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(asterix_state::asterix_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(asterix_state::interrupt));
 
 	Z80(config, m_audiocpu, 24_MHz_XTAL / 4); // 6MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asterix_state::sound_map);
@@ -401,7 +401,7 @@ void asterix_state::asterix(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 262, 16, 240); // not 264
-	screen.set_screen_update(FUNC(asterix_state::screen_update_asterix));
+	screen.set_screen_update(FUNC(asterix_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();

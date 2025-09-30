@@ -132,6 +132,8 @@ private:
 	int m_immediate_vector;
 	int  m_immediate_pri;
 
+	int8_t m_irq_line_state[4];
+
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 
@@ -170,6 +172,7 @@ private:
 	void bxx_s(uint32_t opcode, int mask);
 	void fxx(uint32_t opcode, int mask);
 	void test(uint32_t opcode, int mask);
+	double round_to_int(double val);
 	void execute_op(uint32_t opcode);
 	void execute_burst_stall_op(uint32_t opcode);
 	void take_interrupt(int vector, int lvl);

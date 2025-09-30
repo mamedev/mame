@@ -44,7 +44,7 @@ public:
 	virtual void program_map(address_space_installer &space) = 0;
 
 //protected:
-//	DECLARE_WRITE_LINE_MEMBER(irq_w);
+//  DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 
 DECLARE_DEVICE_TYPE(KN5000_EXTENSION, kn5000_extension_connector)

@@ -145,7 +145,7 @@ static INPUT_PORTS_START( isa_hdc )
 INPUT_PORTS_END
 
 DEFINE_DEVICE_TYPE(XT_HDC,     xt_hdc_device, "xt_hdc", "Generic PC-XT Fixed Disk Controller")
-DEFINE_DEVICE_TYPE(EC1841_HDC, ec1841_device, "ec1481", "EX1841 Fixed Disk Controller")
+DEFINE_DEVICE_TYPE(EC1841_HDC, ec1841_device, "ec1841_hdc", "EC1841 Fixed Disk Controller")
 DEFINE_DEVICE_TYPE(ST11M_HDC,  st11m_device,  "st11m",  "Seagate ST11M Fixed Disk Controller")
 
 xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

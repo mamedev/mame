@@ -24,7 +24,6 @@
 
 #include "emu.h"
 #include "lightpen.h"
-#include "screen.h"
 
 
 namespace {
@@ -35,7 +34,6 @@ protected:
 	bbc_lightpen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_bbc_analogue_interface(mconfig, *this)
-		, m_screen(*this, ":screen")
 		, m_light(*this, "LIGHT%u", 0)
 		, m_button(*this, "BUTTON")
 		, m_pen_timer(nullptr)
@@ -58,7 +56,6 @@ protected:
 	}
 
 private:
-	required_device<screen_device> m_screen;
 	required_ioport_array<2> m_light;
 	required_ioport m_button;
 
@@ -193,11 +190,14 @@ ioport_constructor bbc_stacklr_device::device_input_ports() const
 
 void bbc_lightpen_device::device_start()
 {
-	if (!m_screen->started())
+	if (!screen())
+		fatalerror("Can't find screen device required for %s\n", name());
+
+	if (!screen()->started())
 		throw device_missing_dependencies();
 
 	m_pen_timer = timer_alloc(FUNC(bbc_lightpen_device::update_pen), this);
-	m_pen_timer->adjust(attotime::zero, 0, m_screen->frame_period());
+	m_pen_timer->adjust(attotime::zero, 0, screen()->frame_period());
 
 	m_lpstb_timer = timer_alloc(FUNC(bbc_lightpen_device::lpstb), this);
 }
@@ -211,12 +211,12 @@ TIMER_CALLBACK_MEMBER(bbc_lightpen_device::update_pen)
 {
 	int x_val = m_light[0]->read();
 	int y_val = m_light[1]->read();
-	const rectangle &vis_area = m_screen->visible_area();
+	const rectangle &vis_area = screen()->visible_area();
 
 	int xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
 	int yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
 
-	m_lpstb_timer->adjust(m_screen->time_until_pos(yt, xt));
+	m_lpstb_timer->adjust(screen()->time_until_pos(yt, xt));
 }
 
 TIMER_CALLBACK_MEMBER(bbc_lightpen_device::lpstb)

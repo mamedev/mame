@@ -73,11 +73,11 @@ TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 	if (BIT(m_control, 1))
 	{
 		code |= BIT(attr, 0) << 8;
-		category = BIT(m_control, 0) ? 1 : 2;
+		category = BIT(m_control, 0) ? 2 : 1;
 	}
 	else
 	{
-		category = BIT(attr, 0) ? 1 : 2;
+		category = BIT(attr, 0) ? 2 : 1;
 	}
 	tileinfo.category = category;
 

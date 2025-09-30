@@ -500,7 +500,7 @@ void igs017_igs031_device::lhzb2_decrypt_tiles()
 
 void igs017_igs031_device::sdwx_gfx_decrypt()
 {
-	unsigned rom_size = 0x80000;
+	const int rom_size = memregion("tilemaps")->bytes();
 	u8 *src = (u8 *) (memregion("tilemaps")->base());
 	std::vector<u8> result_data(rom_size);
 

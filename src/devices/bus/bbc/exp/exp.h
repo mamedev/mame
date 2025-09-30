@@ -41,6 +41,7 @@
 
 #pragma once
 
+#include "screen.h"
 
 
 //**************************************************************************
@@ -67,6 +68,8 @@ public:
 
 	bbc_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
@@ -81,6 +84,7 @@ public:
 
 	void irq_w(int state) { m_irq_handler(state); }
 	void nmi_w(int state) { m_nmi_handler(state); }
+	void lpstb_w(int state) { m_lpstb_handler(state); }
 
 	// additional callbacks/handlers for mertec device (also connects to joyport)
 	auto cb1_handler() { return m_cb1_handler.bind(); }
@@ -93,6 +97,8 @@ public:
 	void pb_w(uint8_t data);
 	void write_cb1(int state);
 	void write_cb2(int state);
+
+	optional_device<screen_device> m_screen;
 
 protected:
 	// device_t overrides

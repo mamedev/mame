@@ -121,7 +121,7 @@ Hardware for the 760XD model.
 
 
 IBM ThinkPad 770 was a laptop designed and manufactured by IBM targeted for the business, enterprise and professional user.
-It was the last lineup in the ThinkPad 700-series, succeeding the 760 as the high-end laptop of the ThinkPad lineup. 
+It was the last lineup in the ThinkPad 700-series, succeeding the 760 as the high-end laptop of the ThinkPad lineup.
 The line was produced from October 1997 to May 2000, and eventually replaced by the ThinkPad models A20m and A20p.
 
 Hardware for the 770Z model.

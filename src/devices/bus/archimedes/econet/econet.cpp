@@ -8,15 +8,46 @@
 
 #include "emu.h"
 #include "econet.h"
+
 #include "bus/econet/econet.h"
+#include "machine/mc6854.h"
 
 
+namespace {
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+// ======================> arc_econet_adf10_device
 
-DEFINE_DEVICE_TYPE(ARC_ECONET, arc_econet_device, "arc_econet", "Acorn ADF10/AEH52 Econet Module");
+class arc_econet_device : public device_t, public device_archimedes_econet_interface
+{
+public:
+	// construction/destruction
+	arc_econet_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, ARC_ECONET, tag, owner, clock)
+		, device_archimedes_econet_interface(mconfig, *this)
+		, m_adlc(*this, "mc6854")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual u8 read(offs_t offset) override
+	{
+		return m_adlc->read(offset);
+	}
+
+	virtual void write(offs_t offset, u8 data) override
+	{
+		m_adlc->write(offset, data);
+	}
+
+private:
+	required_device<mc6854_device> m_adlc;
+};
 
 
 //-------------------------------------------------
@@ -37,41 +68,7 @@ void arc_econet_device::device_add_mconfig(machine_config &config)
 	ECONET_SLOT(config, "econet254", "econet", econet_devices);
 }
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  archimedes_econet_device - constructor
-//-------------------------------------------------
-
-arc_econet_device::arc_econet_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ARC_ECONET, tag, owner, clock)
-	, device_archimedes_econet_interface(mconfig, *this)
-	, m_adlc(*this, "mc6854")
-{
-}
+} // anonymous namespace
 
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void arc_econet_device::device_start()
-{
-}
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-u8 arc_econet_device::read(offs_t offset)
-{
-	return m_adlc->read(offset);
-}
-
-void arc_econet_device::write(offs_t offset, u8 data)
-{
-	m_adlc->write(offset, data);
-}
+DEFINE_DEVICE_TYPE_PRIVATE(ARC_ECONET, device_archimedes_econet_interface, arc_econet_device, "arc_econet", "Acorn ADF10/AEH52 Econet Module");

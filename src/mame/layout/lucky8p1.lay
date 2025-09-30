@@ -6,7 +6,7 @@ license:CC0-1.0
 
 <!--
     New Lucky 8 Lines (1 player) control panel.
-	Written by Roberto Fresca.
+    Written by Roberto Fresca.
 -->
 
 	<element name="Bet" defstate="0">

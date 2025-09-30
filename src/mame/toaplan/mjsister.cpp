@@ -318,11 +318,11 @@ static INPUT_PORTS_START( mjsister )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_OPTIONAL PORT_NAME("Memory Reset 1") // only tested in service mode?
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK ) PORT_OPTIONAL PORT_NAME("Analyzer") // only tested in service mode?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Memory Reset 1") // only tested in service mode?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK ) PORT_NAME("Analyzer") // only tested in service mode?
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_OPTIONAL PORT_NAME("Memory Reset 2") // only tested in service mode?
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) PORT_OPTIONAL // only tested in service mode?
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_NAME("Memory Reset 2") // only tested in service mode?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) // only tested in service mode?
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper") PORT_CODE(KEYCODE_8) // only tested in service mode?
 

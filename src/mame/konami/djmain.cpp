@@ -318,15 +318,15 @@ private:
 /*
     Sprite format (16 bytes per sprite)
 
-    Offset  Bits                                     Description 
+    Offset  Bits                                     Description
             1111 1111 1111 1111 0000 0000 0000 0000
             fedc ba98 7654 3210 fedc ba98 7654 3210
     0x0     x--- ---- ---- ---- ---- ---- ---- ----  Skip this sprite
-			--xx xxxx xxxx xxxx ---- ---- ---- ----  Tile index
+            --xx xxxx xxxx xxxx ---- ---- ---- ----  Tile index
             ---- ---- ---- ---- x--- ---- ---- ----  Active this sprite
-			---- ---- ---- ---- ---- x--- ---- ----  Flip Y
-			---- ---- ---- ---- ---- -x-- ---- ----  Flip X
-			---- ---- ---- ---- ---- --xx ---- ----  Size (1,2,4,8 horizontal and vertical tiles)
+            ---- ---- ---- ---- ---- x--- ---- ----  Flip Y
+            ---- ---- ---- ---- ---- -x-- ---- ----  Flip X
+            ---- ---- ---- ---- ---- --xx ---- ----  Size (1,2,4,8 horizontal and vertical tiles)
             ---- ---- ---- ---- ---- ---- -xxx xxxx  vs. Sprite priority
     0x4     xxxx xxxx xxxx xxxx ---- ---- ---- ----  Y
             ---- ---- ---- ---- xxxx xxxx xxxx xxxx  X

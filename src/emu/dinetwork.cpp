@@ -173,7 +173,7 @@ void device_network_interface::set_loopback(bool loopback)
 	}
 }
 
-void device_network_interface::log_bytes(u8 *buf, int len)
+void device_network_interface::log_bytes(const u8 *buf, int len)
 {
 	static const char *const frame_fmt = "%02x %02x %02x %02x %02x %02x %02x %02x\n";
 

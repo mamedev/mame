@@ -298,9 +298,4 @@ bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool dcp_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const dcp_format FLOPPY_DCP_FORMAT;

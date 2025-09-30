@@ -7,7 +7,7 @@
 
 #include "tilemap.h"
 
-#define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)
+#define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int &code, int &color, int &flags, int &priority)
 
 
 class k052109_device : public device_t, public device_gfx_interface, public device_video_interface
@@ -18,9 +18,9 @@ class k052109_device : public device_t, public device_gfx_interface, public devi
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_ram);
 
 public:
-	using tile_delegate = device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)>;
+	using tile_delegate = device_delegate<void (int layer, int bank, int &code, int &color, int &flags, int &priority)>;
 
-	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	~k052109_device() {}
 
 	// configuration
@@ -53,8 +53,8 @@ public:
 	void set_rmrd_line(int state) { m_rmrd_line = state; }
 	int get_rmrd_line() { return m_rmrd_line; }
 	void update_scroll();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags = 0, uint8_t priority = 0, uint8_t priority_mask = 0xff);
-	void mark_tilemap_dirty(uint8_t tmap_num);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, u32 flags = 0, u8 priority = 0, u8 priority_mask = 0xff);
+	void mark_tilemap_dirty(u8 tmap_num);
 
 protected:
 	// device-level overrides
@@ -64,27 +64,27 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<uint8_t[]> m_ram;
-	uint8_t    *m_videoram_F;
-	uint8_t    *m_videoram_A;
-	uint8_t    *m_videoram_B;
-	uint8_t    *m_videoram2_F;
-	uint8_t    *m_videoram2_A;
-	uint8_t    *m_videoram2_B;
-	uint8_t    *m_colorram_F;
-	uint8_t    *m_colorram_A;
-	uint8_t    *m_colorram_B;
+	std::unique_ptr<u8[]> m_ram;
+	u8    *m_videoram_F;
+	u8    *m_videoram_A;
+	u8    *m_videoram_B;
+	u8    *m_videoram2_F;
+	u8    *m_videoram2_A;
+	u8    *m_videoram2_B;
+	u8    *m_colorram_F;
+	u8    *m_colorram_A;
+	u8    *m_colorram_B;
 
 	tilemap_t  *m_tilemap[3];
-	uint8_t    m_tileflip_enable;
-	uint8_t    m_charrombank[4];
-	uint8_t    m_charrombank_2[4];
-	uint8_t    m_has_extra_video_ram;
-	int32_t    m_rmrd_line;
-	uint8_t    m_irq_control;
-	uint8_t    m_romsubbank, m_scrollctrl, m_addrmap;
+	u8         m_tileflip_enable;
+	u8         m_charrombank[4];
+	u8         m_charrombank_2[4];
+	u8         m_has_extra_video_ram;
+	s32        m_rmrd_line;
+	u8         m_irq_control;
+	u8         m_romsubbank, m_scrollctrl, m_addrmap;
 
-	optional_region_ptr<uint8_t> m_char_rom;
+	optional_region_ptr<u8> m_char_rom;
 
 	tile_delegate m_k052109_cb;
 
@@ -100,7 +100,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	TILE_BLITTER_MEMBER(tile_blitter);
 
-	void get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2);
+	void get_tile_info(tile_data &tileinfo, int tile_index, int layer, u8 *cram, u8 *vram1, u8 *vram2);
 	void tileflip_reset();
 
 	void vblank_callback(screen_device &screen, bool state);

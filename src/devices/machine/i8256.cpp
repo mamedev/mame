@@ -12,6 +12,184 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
+
+namespace {
+
+enum // MUART REGISTERS
+{
+	I8256_REG_CMD1,
+	I8256_REG_CMD2,
+	I8256_REG_CMD3,
+	I8256_REG_MODE,
+	I8256_REG_PORT1C,
+	I8256_REG_INTEN,
+	I8256_REG_INTAD,
+	I8256_REG_BUFFER,
+	I8256_REG_PORT1,
+	I8256_REG_PORT2,
+	I8256_REG_TIMER1,
+	I8256_REG_TIMER2,
+	I8256_REG_TIMER3,
+	I8256_REG_TIMER4,
+	I8256_REG_TIMER5,
+	I8256_REG_STATUS,
+};
+
+enum
+{
+	I8256_CMD1_FRQ,
+	I8256_CMD1_8086,
+	I8256_CMD1_BITI,
+	I8256_CMD1_BRKI,
+	I8256_CMD1_S0,
+	I8256_CMD1_S1,
+	I8256_CMD1_L0,
+	I8256_CMD1_L1
+};
+
+enum
+{
+	I8256_STOP_1,
+	I8256_STOP_15,
+	I8256_STOP_2,
+	I8256_STOP_075
+};
+
+constexpr device_serial_interface::stop_bits_t STOP_BITS[4] =
+{
+	device_serial_interface::STOP_BITS_1,
+	device_serial_interface::STOP_BITS_1_5,
+	device_serial_interface::STOP_BITS_2,
+	device_serial_interface::STOP_BITS_0
+};
+
+enum
+{
+	I8256_CHARLEN_8,
+	I8256_CHARLEN_7,
+	I8256_CHARLEN_6,
+	I8256_CHARLEN_5
+};
+
+enum
+{
+	I8256_CMD2_B0,
+	I8256_CMD2_B1,
+	I8256_CMD2_B2,
+	I8256_CMD2_B3,
+	I8256_CMD2_C0,
+	I8256_CMD2_C1,
+	I8256_CMD2_EVEN_PARITY,
+	I8256_CMD2_PARITY_ENABLE
+};
+
+enum
+{
+	I8256_BAUD_TXC,
+	I8256_BAUD_TXC64,
+	I8256_BAUD_TXC32,
+	I8256_BAUD_19200,
+	I8256_BAUD_9600,
+	I8256_BAUD_4800,
+	I8256_BAUD_2400,
+	I8256_BAUD_1200,
+	I8256_BAUD_600,
+	I8256_BAUD_300,
+	I8256_BAUD_200,
+	I8256_BAUD_150,
+	I8256_BAUD_110,
+	I8256_BAUD_100,
+	I8256_BAUD_75,
+	I8256_BAUD_50
+};
+
+constexpr int BAUD_RATES[16] = { 0, 0, 0, 19200, 9600, 4800, 2400, 1200, 600, 300, 200, 150, 110, 100, 75, 50 };
+
+enum
+{
+	I8256_SCLK_DIV5, // 5.12 MHz
+	I8256_SCLK_DIV3, // 3.072 MHz
+	I8256_SCLK_DIV2, // 2.048 MHz
+	I8256_SCLK_DIV1  // 1.024 MHz
+};
+
+constexpr int SYS_CLOCK_DIVIDER[4] = {5,3,2,1};
+
+enum
+{
+	I8256_CMD3_RST,
+	I8256_CMD3_TBRK,
+	I8256_CMD3_SBRK,
+	I8256_CMD3_END,
+	I8256_CMD3_NIE,
+	I8256_CMD3_IAE,
+	I8256_CMD3_RxE,
+	I8256_CMD3_SET
+};
+
+enum
+{
+	I8256_INT_TIMER1,
+	I8256_INT_TIMER2,
+	I8256_INT_EXTINT,
+	I8256_INT_TIMER3,
+	I8256_INT_RX,
+	I8256_INT_TX,
+	I8256_INT_TIMER4,
+	I8256_INT_TIMER5
+};
+
+const char timer_interrupt[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
+
+enum
+{
+	I8256_MODE_P2C0,
+	I8256_MODE_P2C1,
+	I8256_MODE_P2C2,
+	I8256_MODE_CT2,
+	I8256_MODE_CT3,
+	I8256_MODE_T5C,
+	I8256_MODE_T24,
+	I8256_MODE_T35
+};
+
+enum // Upper / Lower
+{
+	I8256_PORT2C_II,
+	I8256_PORT2C_IO,
+	I8256_PORT2C_OI,
+	I8256_PORT2C_OO,
+	I8256_PORT2C_HI,
+	I8256_PORT2C_HO,
+	I8256_PORT2C_DNU,
+	I8256_PORT2C_TEST
+};
+
+enum
+{
+	I8256_STATUS_FRAMING_ERROR,
+	I8256_STATUS_OVERRUN_ERROR,
+	I8256_STATUS_PARITY_ERROR,
+	I8256_STATUS_BREAK,
+	I8256_STATUS_TR_EMPTY,
+	I8256_STATUS_TB_EMPTY,
+	I8256_STATUS_RB_FULL,
+	I8256_STATUS_INT
+};
+
+enum
+{
+	I8256_MOD_DSC,
+	I8256_MOD_TME,
+	I8256_MOD_RS0,
+	I8256_MOD_RS1,
+	I8256_MOD_RS2,
+	I8256_MOD_RS3,
+	I8256_MOD_RS4,
+	I8256_MOD_0
+};
+} // anonymous namespace
+
 DEFINE_DEVICE_TYPE(I8256, i8256_device, "intel_8256", "Intel 8256AH Multifunction microprocessor support controller")
 
 i8256_device::i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -20,21 +198,22 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	m_in_inta_cb(*this, 0),
 	m_out_int_cb(*this),
 	m_in_extint_cb(*this, 0),
-	m_rxc(0),
-	m_rxd(1),
-	m_cts(1),
-	m_txc(0),
 	m_txd_handler(*this),
 	m_in_p2_cb(*this, 0),
 	m_out_p2_cb(*this),
 	m_in_p1_cb(*this, 0),
 	m_out_p1_cb(*this),
+	m_rxc(0),
+	m_rxd(1),
+	m_cts(1),
+	m_txc(0),
 	m_timer(nullptr)
 {
 }
 
 void i8256_device::device_start()
 {
+	// FIXME: not everything that needs to be is saved here
 	save_item(NAME(m_command1));
 	save_item(NAME(m_command2));
 	save_item(NAME(m_command3));
@@ -164,8 +343,8 @@ void i8256_device::write(offs_t offset, u8 data)
 				if (BIT(m_command1,I8256_CMD1_8086))
 					LOG("I8256 Enabled 8086 mode\n");
 
-				m_data_bits_count = 8-((BIT(m_command1, I8256_CMD1_L0)) | (BIT(m_command1, I8256_CMD1_L1) << 1));
-				m_stop_bits = stopBits[(BIT(m_command1, I8256_CMD1_S0)) | (BIT(m_command1, I8256_CMD1_S1) << 1)];
+				m_data_bits_count = 8 - (BIT(m_command1, I8256_CMD1_L0) | (BIT(m_command1, I8256_CMD1_L1) << 1));
+				m_stop_bits = STOP_BITS[BIT(m_command1, I8256_CMD1_S0) | (BIT(m_command1, I8256_CMD1_S1) << 1)];
 
 				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
 			}
@@ -175,7 +354,7 @@ void i8256_device::write(offs_t offset, u8 data)
 			{
 				m_command2 = data;
 
-				set_rate(baudRates[m_command2 & 0x0f]);
+				set_rate(BAUD_RATES[m_command2 & 0x0f]);
 
 				if (BIT(m_command2,I8256_CMD2_PARITY_ENABLE))
 					m_parity = BIT(m_command2,I8256_CMD2_EVEN_PARITY) ? PARITY_EVEN : PARITY_ODD;
@@ -184,9 +363,9 @@ void i8256_device::write(offs_t offset, u8 data)
 
 				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
 
-				LOG("I8256 Clock Scale: %u\n", sysclockDivider[(m_command2 & 0x30 >> 4)]);
-				if((clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]) != 1024000)
-					logerror("I8256 Internal Clock should be 1024000, calculated: %u\n", (clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]));
+				LOG("I8256 Clock Scale: %u\n", SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]);
+				if ((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) != 1024000)
+					logerror("I8256 Internal Clock should be 1024000, calculated: %u\n", (clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]));
 			}
 			break;
 		case I8256_REG_CMD3:

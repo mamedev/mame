@@ -179,7 +179,7 @@ GFXDECODE_MEMBER( k052109_device::gfxinfo_ram )
 GFXDECODE_END
 
 
-k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, K052109, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	device_video_interface(mconfig, *this, false),
@@ -247,7 +247,7 @@ void k052109_device::device_start()
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
-	m_ram = make_unique_clear<uint8_t[]>(0x6000);
+	m_ram = make_unique_clear<u8[]>(0x6000);
 	memset(m_charrombank, 0, sizeof(m_charrombank));
 	memset(m_charrombank_2, 0, sizeof(m_charrombank_2));
 
@@ -388,7 +388,7 @@ u8 k052109_device::read(offs_t offset)
 		if (m_has_extra_video_ram)
 			code |= color << 8; /* kludge for X-Men */
 		else
-			m_k052109_cb(0, bank, &code, &color, &flags, &priority);
+			m_k052109_cb(0, bank, code, color, flags, priority);
 
 		addr = (code << 5) + (offset & 0x1f);
 		addr &= m_char_rom.length() - 1;
@@ -564,15 +564,15 @@ void k052109_device::update_scroll()
 
 	for (int tmap = 0; tmap < 2; tmap++)
 	{
-		uint8_t scrollctrl = m_scrollctrl >> (tmap * 3) & 7;
+		u8 scrollctrl = m_scrollctrl >> (tmap * 3) & 7;
 
 		static int rows_table[4] = { 1, 1, 32, 256 };
 		int rows = rows_table[scrollctrl & 3];
 		int cols = BIT(scrollctrl, 2) ? 64 : 1;
 
 		const int tmap_mask = tmap ? 0x2000 : 0;
-		uint8_t *scrollram_y = &m_ram[0x1800 | tmap_mask];
-		uint8_t *scrollram_x = &m_ram[0x1a00 | tmap_mask];
+		u8 *scrollram_y = &m_ram[0x1800 | tmap_mask];
+		u8 *scrollram_x = &m_ram[0x1a00 | tmap_mask];
 
 		const int t = tmap + 1;
 
@@ -645,12 +645,12 @@ void k052109_device::update_scroll()
 	}
 }
 
-void k052109_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+void k052109_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, u32 flags, u8 priority, u8 priority_mask)
 {
 	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority, priority_mask);
 }
 
-void k052109_device::mark_tilemap_dirty(uint8_t tmap_num)
+void k052109_device::mark_tilemap_dirty(u8 tmap_num)
 {
 	assert(tmap_num <= 2);
 	m_tilemap[tmap_num]->mark_all_dirty();
@@ -681,7 +681,7 @@ void k052109_device::tileflip_reset()
   color RAM    ------xx  depends on external connections (usually banking, flip)
 */
 
-void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2)
+void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int layer, u8 *cram, u8 *vram1, u8 *vram2)
 {
 	int flipy = 0;
 	int code = vram1[tile_index] + 256 * vram2[tile_index];
@@ -698,7 +698,7 @@ void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int laye
 
 	flipy = color & 0x02;
 
-	m_k052109_cb(layer, bank, &code, &color, &flags, &priority);
+	m_k052109_cb(layer, bank, code, color, flags, priority);
 
 	/* if the callback set flip X but it is not enabled, turn it off */
 	if (!BIT(m_tileflip_enable, 1))

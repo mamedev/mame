@@ -18,7 +18,7 @@ Notes:
 #define LOG_REGSDMA     (1U << 2)
 #define LOG_DMA         (1U << 3)
 
-#define VERBOSE (LOG_GENERAL | LOG_REGS)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -104,11 +104,11 @@ void ym7101_device::device_start()
 	save_item(STRUCT_MEMBER(m_command, latch));
 	save_item(STRUCT_MEMBER(m_command, address));
 	save_item(STRUCT_MEMBER(m_command, code));
-//	save_item(STRUCT_MEMBER(m_command, write_state));
+//  save_item(STRUCT_MEMBER(m_command, write_state));
 
 	save_item(STRUCT_MEMBER(m_dma, source_address));
 	save_item(STRUCT_MEMBER(m_dma, length));
-//	save_item(STRUCT_MEMBER(m_dma, mode));
+//  save_item(STRUCT_MEMBER(m_dma, mode));
 	save_item(STRUCT_MEMBER(m_dma, active));
 	save_item(STRUCT_MEMBER(m_dma, fill));
 
@@ -254,7 +254,7 @@ u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
 	return (1 << 9)
 		| (m_vint_pending << 7)
 		| sprite_flags
-//	    | odd << 4
+//      | odd << 4
 		| (screen().vblank() << 3)
 		| in_hblank() << 2
 		| (m_dma.active << 1);
@@ -713,6 +713,7 @@ void ym7101_device::flush_screen_mode()
 
 	//this->set_unscaled_clock(target_clock);
 
+	// FIXME: really 427.5 for H40 mode
 	const int htotal = h40_mode ? 427 : 342;
 	const int vtotal = 262;
 
@@ -814,7 +815,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 			//   Looks just a quick way to draw nothing that works by chance.
 			// - rambo3 references link = 80 during attract.
 			//if (link != 0x7f)
-			//	popmessage("ym7101: attempt to access link $%d, aborted", link);
+			//  popmessage("ym7101: attempt to access link $%d, aborted", link);
 			break;
 		}
 
@@ -856,6 +857,10 @@ void ym7101_device::prepare_tile_line(int scanline)
 
 	const u16 h_page = page_masks[m_hsz];
 	const u16 v_page = page_masks[m_vsz];
+
+	// AV Artisan games will set plane B base with 0x18000
+	const u32 plane_a_name_base = (m_plane_a_name_table & m_vram_mask) >> 1;
+	const u32 plane_b_name_base = (m_plane_b_name_table & m_vram_mask) >> 1;
 
 	// talespin ignores lowest bit for status bar (writes 0x1800, wants 0x1000)
 	const u32 window_name_mask = (h40_mode ? 0x1f000 : 0x1f800) & m_vram_mask;
@@ -928,7 +933,7 @@ void ym7101_device::prepare_tile_line(int scanline)
 			scrolly_a_frac = scrolly_a & 7;
 			scrollx_a_frac = scrollx_a & 7;
 
-			id_flags_a = m_vram[((m_plane_a_name_table >> 1) + tile_offset_a) & m_vram_mask];
+			id_flags_a = m_vram[(plane_a_name_base + tile_offset_a) & m_vram_mask];
 			tile_a = id_flags_a & tile_mask;
 			flipx_a = BIT(id_flags_a, 11) ? 4 : 3;
 			flipy_a = BIT(id_flags_a, 12) ? 7 : 0;
@@ -942,7 +947,7 @@ void ym7101_device::prepare_tile_line(int scanline)
 		const u16 scrolly_b_frac = scrolly_b & 7;
 		const u16 vcolumn_b = (scrolly_b + scanline) & ((v_page * 8) - 1);
 		const u32 tile_offset_b = ((x - (scrollx_b >> 3)) & ((h_page * 1) - 1)) + ((vcolumn_b >> 3) * (h_page >> 0));
-		const u16 id_flags_b = m_vram[((m_plane_b_name_table >> 1) + tile_offset_b) & m_vram_mask];
+		const u16 id_flags_b = m_vram[(plane_b_name_base + tile_offset_b) & m_vram_mask];
 		const u16 tile_b = id_flags_b & tile_mask;
 		const u8 flipx_b = BIT(id_flags_b, 11) ? 4 : 3;
 		const u8 flipy_b = BIT(id_flags_b, 12) ? 7 : 0;

@@ -121,10 +121,10 @@ public:
 	capbowl_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_watchdog(*this, "watchdog"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tms34061(*this, "tms34061"),
-		m_screen(*this, "screen"),
 		m_rowaddress(*this, "rowaddress"),
 		m_service(*this, "SERVICE"),
 		m_trackx(*this, "TRACKX"),
@@ -139,6 +139,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
 	void base_main_map(address_map &map) ATTR_COLD;
 
@@ -147,7 +148,6 @@ private:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<cpu_device> m_audiocpu;
 	required_device<tms34061_device> m_tms34061;
-	required_device<screen_device> m_screen;
 
 	// memory pointers
 	required_shared_ptr<uint8_t> m_rowaddress;
@@ -582,7 +582,7 @@ void capbowl_base_state::base(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09EP
 	m_audiocpu->set_addrmap(AS_PROGRAM, &capbowl_base_state::sound_map);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 
@@ -593,7 +593,7 @@ void capbowl_base_state::base(machine_config &config)
 	m_screen->set_screen_update(FUNC(capbowl_base_state::screen_update));
 
 	TMS34061(config, m_tms34061, 0);
-	m_tms34061->set_rowshift(8);  // VRAM address is (row << rowshift) | col
+	m_tms34061->set_rowshift(8); // VRAM address is (row << rowshift) | col
 	m_tms34061->set_vram_size(0x10000);
 	m_tms34061->int_callback().set_inputline("maincpu", M6809_FIRQ_LINE);
 
@@ -622,7 +622,7 @@ void capbowl_state::capbowl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &capbowl_state::main_map);
 
 	// video hardware
-	subdevice<screen_device>("screen")->set_visarea(0, 359, 0, 244);
+	m_screen->set_visarea(0, 359, 0, 244);
 }
 
 void bowlrama_state::bowlrama(machine_config &config)
@@ -631,9 +631,10 @@ void bowlrama_state::bowlrama(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &bowlrama_state::main_map);
+	subdevice<nvram_device>("nvram")->set_default_value(nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	subdevice<screen_device>("screen")->set_visarea(0, 359, 0, 239);
+	m_screen->set_visarea(0, 359, 0, 239);
 }
 
 
@@ -717,6 +718,7 @@ ROM_END
 
 } // anonymous namespace
 
+
 /*************************************
  *
  *  Game drivers
@@ -728,4 +730,5 @@ GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state,  empty_init, RO
 GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
+
 GAME( 1991, bowlrama, 0,       bowlrama, capbowl, bowlrama_state, empty_init, ROT270, "P&P Marketing",                    "Bowl-O-Rama (Rev 1.0)",  MACHINE_SUPPORTS_SAVE )

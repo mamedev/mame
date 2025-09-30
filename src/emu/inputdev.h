@@ -380,12 +380,8 @@ public:
 	// construction/destruction
 	input_class_joystick(input_manager &manager);
 
-	// misc
-	bool set_global_joystick_map(const char *mapstring);
-
 	// standard joystick maps
 	static const char map_8way[];
-	static const char map_4way_diagonal[];
 
 protected:
 	// specific overrides

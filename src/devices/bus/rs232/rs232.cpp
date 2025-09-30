@@ -155,6 +155,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 
 
 #include "ie15.h"
+#include "heath_h19.h"
 #include "hlemouse.h"
 #include "keyboard.h"
 #include "loopback.h"
@@ -177,6 +178,7 @@ template class device_finder<device_rs232_port_interface, true>;
 void default_rs232_devices(device_slot_interface &device)
 {
 	device.option_add("dec_loopback",  DEC_RS232_LOOPBACK);
+	device.option_add("h19",           SERIAL_TERMINAL_H19);
 	device.option_add("ie15",          SERIAL_TERMINAL_IE15);
 	device.option_add("keyboard",      SERIAL_KEYBOARD);
 	device.option_add("loopback",      RS232_LOOPBACK);

@@ -54,9 +54,9 @@ public:
 	void gradius3(machine_config &config);
 
 protected:
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -64,9 +64,9 @@ private:
 	required_region_ptr<uint8_t> m_gfxrom;
 
 	/* misc */
-	int         m_priority = 0;
-	int         m_irqAen = 0;
-	int         m_irqBmask = 0;
+	int32_t     m_priority = 0;
+	int32_t     m_irqAen = 0;
+	int32_t     m_irqBmask = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -82,19 +82,18 @@ private:
 	void cpuB_irqenable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void cpuB_irqtrigger_w(uint16_t data);
 	void sound_irq_w(uint16_t data);
-	uint16_t gradius3_gfxrom_r(offs_t offset);
-	void gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gfxrom_r(offs_t offset);
+	void gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_bank_w(uint8_t data);
-	uint32_t screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpuA_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
-	void gradius3_postload();
+	TIMER_DEVICE_CALLBACK_MEMBER(sub_scanline);
 	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	void gradius3_map(address_map &map) ATTR_COLD;
-	void gradius3_map2(address_map &map) ATTR_COLD;
-	void gradius3_s_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -109,8 +108,8 @@ K052109_CB_MEMBER(gradius3_state::tile_callback)
 	static const int layer_colorbase[] = { 0 / 16, 512 / 16, 768 / 16 };
 
 	/* (color & 0x02) is flip y handled internally by the 052109 */
-	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
-	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x01) << 8) | ((color & 0x1c) << 7);
+	color = layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 
@@ -140,15 +139,15 @@ K051960_CB_MEMBER(gradius3_state::sprite_callback)
 		}
 	};
 
-	int pri = ((*color & 0x60) >> 5);
+	int pri = ((color & 0x60) >> 5);
 
 	if (m_priority == 0)
-		*priority = primask[0][pri];
+		priority = primask[0][pri];
 	else
-		*priority = primask[1][pri];
+		priority = primask[1][pri];
 
-	*code |= (*color & 0x01) << 13;
-	*color = sprite_colorbase + ((*color & 0x1e) >> 1);
+	code |= (color & 0x01) << 13;
+	color = sprite_colorbase + ((color & 0x1e) >> 1);
 }
 
 
@@ -158,14 +157,9 @@ K051960_CB_MEMBER(gradius3_state::sprite_callback)
 
 ***************************************************************************/
 
-void gradius3_state::gradius3_postload()
+void gradius3_state::device_post_load()
 {
 	m_k052109->gfx(0)->mark_all_dirty();
-}
-
-void gradius3_state::video_start()
-{
-	machine().save().register_postload(save_prepost_delegate(FUNC(gradius3_state::gradius3_postload), this));
 }
 
 
@@ -175,7 +169,7 @@ void gradius3_state::video_start()
 
 ***************************************************************************/
 
-uint32_t gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gradius3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
 	m_k052109->write(0x1d80, 0x10);
@@ -206,12 +200,12 @@ uint32_t gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-uint16_t gradius3_state::gradius3_gfxrom_r(offs_t offset)
+uint16_t gradius3_state::gfxrom_r(offs_t offset)
 {
 	return (m_gfxrom[2 * offset + 1] << 8) | m_gfxrom[2 * offset];
 }
 
-void gradius3_state::gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gradius3_state::gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_gfxram[offset];
 
@@ -277,7 +271,7 @@ INTERRUPT_GEN_MEMBER(gradius3_state::cpuA_interrupt)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::gradius3_sub_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::sub_scanline)
 {
 	int scanline = param;
 
@@ -321,7 +315,7 @@ void gradius3_state::sound_bank_w(uint8_t data)
 
 ***************************************************************************/
 
-void gradius3_state::gradius3_map(address_map &map)
+void gradius3_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();
@@ -339,25 +333,25 @@ void gradius3_state::gradius3_map(address_map &map)
 	map(0x0f0000, 0x0f0001).w(FUNC(gradius3_state::sound_irq_w));
 	map(0x100000, 0x103fff).ram().share("share1");
 	map(0x14c000, 0x153fff).rw(FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
-	map(0x180000, 0x19ffff).ram().w(FUNC(gradius3_state::gradius3_gfxram_w)).share("k052109");
+	map(0x180000, 0x19ffff).ram().w(FUNC(gradius3_state::gfxram_w)).share("k052109");
 }
 
 
-void gradius3_state::gradius3_map2(address_map &map)
+void gradius3_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x140000, 0x140001).w(FUNC(gradius3_state::cpuB_irqenable_w));
 	map(0x200000, 0x203fff).ram().share("share1");
 	map(0x24c000, 0x253fff).rw(FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
-	map(0x280000, 0x29ffff).ram().w(FUNC(gradius3_state::gradius3_gfxram_w)).share("k052109");
+	map(0x280000, 0x29ffff).ram().w(FUNC(gradius3_state::gfxram_w)).share("k052109");
 	map(0x2c0000, 0x2c000f).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w)).umask16(0x00ff);
 	map(0x2c0800, 0x2c0fff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w)).umask16(0x00ff);
-	map(0x400000, 0x5fffff).r(FUNC(gradius3_state::gradius3_gfxrom_r));     /* gfx ROMs are mapped here, and copied to RAM */
+	map(0x400000, 0x5fffff).r(FUNC(gradius3_state::gfxrom_r));     /* gfx ROMs are mapped here, and copied to RAM */
 }
 
 
-void gradius3_state::gradius3_s_map(address_map &map)
+void gradius3_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf000).w(FUNC(gradius3_state::sound_bank_w));             /* 007232 bankswitch */
@@ -463,16 +457,16 @@ void gradius3_state::gradius3(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gradius3_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gradius3_state::cpuA_interrupt));
 
 	M68000(config, m_subcpu, 10_MHz_XTAL);
-	m_subcpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_map2);
-	TIMER(config, "scantimer").configure_scanline(FUNC(gradius3_state::gradius3_sub_scanline), "screen", 0, 1);
+	m_subcpu->set_addrmap(AS_PROGRAM, &gradius3_state::sub_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(gradius3_state::sub_scanline), "screen", 0, 1);
 	/* 4 is triggered by cpu A, the others are unknown but required for the game to run. */
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_s_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gradius3_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -481,7 +475,7 @@ void gradius3_state::gradius3(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
-	screen.set_screen_update(FUNC(gradius3_state::screen_update_gradius3));
+	screen.set_screen_update(FUNC(gradius3_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 2048).enable_shadows();

@@ -268,5 +268,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 1996, mu90,     0, 0, mu90,  mu90, mu90_state, empty_init, "Yamaha", "MU90",  MACHINE_NOT_WORKING )
-SYST( 2005, mu90b, mu90, 0, mu90b, mu90, mu90_state, empty_init, "Yamaha", "MU90B", MACHINE_NOT_WORKING )
+SYST( 1996, mu90,     0, 0, mu90,  mu90, mu90_state, empty_init, "Yamaha", "MU90",  MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
+SYST( 2005, mu90b, mu90, 0, mu90b, mu90, mu90_state, empty_init, "Yamaha", "MU90B", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )

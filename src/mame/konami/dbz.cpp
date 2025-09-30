@@ -111,12 +111,12 @@ private:
 	/* video-related */
 	tilemap_t    *m_bg1_tilemap = nullptr;
 	tilemap_t    *m_bg2_tilemap = nullptr;
-	int          m_layer_colorbase[6]{};
-	int          m_layerpri[5]{};
-	int          m_sprite_colorbase = 0;
+	uint16_t     m_layer_colorbase[6]{};
+	int32_t      m_layerpri[5]{};
+	uint16_t     m_sprite_colorbase = 0;
 
 	/* misc */
-	int           m_control = 0;
+	uint16_t     m_control = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -131,54 +131,54 @@ private:
 
 	required_ioport m_dsw2;
 
-	void dbzcontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dbz_sound_cause_nmi(uint16_t data);
-	void dbz_bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dbz_bg1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dbz_irq2_ack_w(int state);
-	TILE_GET_INFO_MEMBER(get_dbz_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_dbz_bg1_tile_info);
-	uint32_t screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(dbz_scanline);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_cause_nmi(uint16_t data);
+	void bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void irq2_ack_w(int state);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	void dbz_map(address_map &map) ATTR_COLD;
 	void dbz2bl_map(address_map &map) ATTR_COLD;
-	void dbz_sound_io_map(address_map &map) ATTR_COLD;
-	void dbz_sound_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
 K056832_CB_MEMBER(dbz_state::tile_callback)
 {
-	*color = (m_layer_colorbase[layer] << 1) + ((*color & 0x3c) >> 2);
+	color = (m_layer_colorbase[layer] << 1) + ((color & 0x3c) >> 2);
 }
 
 K053246_CB_MEMBER(dbz_state::sprite_callback)
 {
-	int pri = (*color & 0x3c0) >> 5;
+	int pri = (color & 0x3c0) >> 5;
 
 	if (pri <= m_layerpri[3])
-		*priority_mask = 0xff00;
+		priority_mask = 0xff00;
 	else if (pri > m_layerpri[3] && pri <= m_layerpri[2])
-		*priority_mask = 0xfff0;
+		priority_mask = 0xfff0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority_mask = 0xfffc;
+		priority_mask = 0xfffc;
 	else
-		*priority_mask = 0xfffe;
+		priority_mask = 0xfffe;
 
-	*color = (m_sprite_colorbase << 1) + (*color & 0x1f);
+	color = (m_sprite_colorbase << 1) + (color & 0x1f);
 }
 
 /* Background Tilemaps */
 
-void dbz_state::dbz_bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void dbz_state::bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2_videoram[offset]);
 	m_bg2_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg2_tile_info)
+TILE_GET_INFO_MEMBER(dbz_state::get_bg2_tile_info)
 {
 	int tileno, colour, flag;
 
@@ -189,13 +189,13 @@ TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg2_tile_info)
 	tileinfo.set(0, tileno, colour + (m_layer_colorbase[5] << 1), flag);
 }
 
-void dbz_state::dbz_bg1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void dbz_state::bg1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1_videoram[offset]);
 	m_bg1_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
+TILE_GET_INFO_MEMBER(dbz_state::get_bg1_tile_info)
 {
 	int tileno, colour, flag;
 
@@ -208,8 +208,8 @@ TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
 
 void dbz_state::video_start()
 {
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_dbz_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_dbz_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
 	m_bg1_tilemap->set_transparent_pen(0);
 	m_bg2_tilemap->set_transparent_pen(0);
@@ -223,7 +223,7 @@ void dbz_state::video_start()
 	m_k056832->set_layer_offs(3, -31, -16); // ?
 }
 
-uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dbz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[6] = { k053251_device::CI3, k053251_device::CI4, k053251_device::CI4, k053251_device::CI4, k053251_device::CI2, k053251_device::CI1 };
 	int layer[5], plane, new_colorbase;
@@ -289,7 +289,7 @@ uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::scanline)
 {
 	int scanline = param;
 
@@ -307,7 +307,7 @@ uint16_t dbz_state::dbzcontrol_r()
 }
 #endif
 
-void dbz_state::dbzcontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void dbz_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 10 = enable '246 readback */
 
@@ -322,7 +322,7 @@ void dbz_state::dbzcontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-void dbz_state::dbz_sound_cause_nmi(uint16_t data)
+void dbz_state::sound_cause_nmi(uint16_t data)
 {
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
@@ -349,14 +349,14 @@ void dbz_state::dbz_map(address_map &map)
 	map(0x4e0002, 0x4e0003).portr("SYSTEM_DSW1");
 	map(0x4e4000, 0x4e4001).lr8(NAME([this]() { return uint8_t(m_dsw2->read()); }));
 	map(0x4e8000, 0x4e8001).noprw();
-	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::dbzcontrol_w));
+	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::control_w));
 	map(0x4f0000, 0x4f0000).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x4f4000, 0x4f4001).w(FUNC(dbz_state::dbz_sound_cause_nmi));
+	map(0x4f4000, 0x4f4001).w(FUNC(dbz_state::sound_cause_nmi));
 	map(0x4f8000, 0x4f801f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00);      // 252
 	map(0x4fc000, 0x4fc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);   // 251
 
-	map(0x500000, 0x501fff).ram().w(FUNC(dbz_state::dbz_bg2_videoram_w)).share("bg2_videoram");
-	map(0x508000, 0x509fff).ram().w(FUNC(dbz_state::dbz_bg1_videoram_w)).share("bg1_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(dbz_state::bg2_videoram_w)).share("bg2_videoram");
+	map(0x508000, 0x509fff).ram().w(FUNC(dbz_state::bg1_videoram_w)).share("bg1_videoram");
 	map(0x510000, 0x513fff).rw(m_k053936_1, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
 	map(0x518000, 0x51bfff).rw(m_k053936_2, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
 	map(0x600000, 0x6fffff).nopr();             // PSAC 1 ROM readback window
@@ -384,7 +384,7 @@ void dbz_state::dbz2bl_map(address_map &map)
 /* dbz sound */
 /* IRQ: from YM2151.  NMI: from 68000.  Port 0: write to ack NMI */
 
-void dbz_state::dbz_sound_map(address_map &map)
+void dbz_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).ram();
@@ -393,7 +393,7 @@ void dbz_state::dbz_sound_map(address_map &map)
 	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
-void dbz_state::dbz_sound_io_map(address_map &map)
+void dbz_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).nopw();
@@ -524,7 +524,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-void dbz_state::dbz_irq2_ack_w(int state)
+void dbz_state::irq2_ack_w(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 }
@@ -556,11 +556,11 @@ void dbz_state::dbz(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dbz_state::dbz_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(dbz_state::dbz_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(dbz_state::scanline), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, 4000000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dbz_state::dbz_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &dbz_state::dbz_sound_io_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dbz_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &dbz_state::sound_io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -568,7 +568,7 @@ void dbz_state::dbz(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 40*8);
 	screen.set_visarea(0, 48*8-1, 0, 32*8-1);
-	screen.set_screen_update(FUNC(dbz_state::screen_update_dbz));
+	screen.set_screen_update(FUNC(dbz_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_dbz);
@@ -596,7 +596,7 @@ void dbz_state::dbz(machine_config &config)
 	m_k053936_2->set_offsets(-46, -16);
 
 	K053252(config, m_k053252, 16000000/2);
-	m_k053252->int1_ack().set(FUNC(dbz_state::dbz_irq2_ack_w));
+	m_k053252->int1_ack().set(FUNC(dbz_state::irq2_ack_w));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

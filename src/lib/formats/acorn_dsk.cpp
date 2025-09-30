@@ -650,11 +650,6 @@ const char *opus_ddcpm_format::extensions() const noexcept
 	return "ssd";
 }
 
-bool opus_ddcpm_format::supports_save() const noexcept
-{
-	return false;
-}
-
 int opus_ddcpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[8];
@@ -718,11 +713,6 @@ bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const 
 	}
 
 	return true;
-}
-
-bool opus_ddcpm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
-{
-	return false;
 }
 
 

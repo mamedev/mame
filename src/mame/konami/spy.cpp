@@ -93,12 +93,12 @@ private:
 	static constexpr int m_layer_colorbase[3] = { 768 / 16, 0 / 16, 256 / 16 };
 
 	void bankswitch_w(uint8_t data);
-	void spy_3f90_w(uint8_t data);
+	void _3f90_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
 	void sound_bank_w(uint8_t data);
 	uint8_t k052109_051960_r(offs_t offset);
 	void k052109_051960_w(offs_t offset, uint8_t data);
-	uint32_t screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pmc_run();
 	template <unsigned Chip> void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
@@ -117,9 +117,9 @@ private:
 
 K052109_CB_MEMBER(spy_state::tile_callback)
 {
-	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
-	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	flags = (color & 0x20) ? TILE_FLIPX : 0;
+	code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
+	color = m_layer_colorbase[layer] + ((color & 0xc0) >> 6);
 }
 
 
@@ -135,11 +135,11 @@ K051960_CB_MEMBER(spy_state::sprite_callback)
 
 	// bit 4 = priority over layer A (0 = have priority)
 	// bit 5 = priority over layer B (1 = have priority)
-	*priority = 0x00;
-	if ( *color & 0x10) *priority |= GFX_PMASK_1;
-	if (~*color & 0x20) *priority |= GFX_PMASK_2;
+	priority = 0x00;
+	if ( color & 0x10) priority |= GFX_PMASK_1;
+	if (~color & 0x20) priority |= GFX_PMASK_2;
 
-	*color = sprite_colorbase + (*color & 0x0f);
+	color = sprite_colorbase + (color & 0x0f);
 }
 
 
@@ -149,7 +149,7 @@ K051960_CB_MEMBER(spy_state::sprite_callback)
 
 ***************************************************************************/
 
-uint32_t spy_state::screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -340,7 +340,7 @@ void spy_state::bankswitch_w(uint8_t data)
 }
 
 
-void spy_state::spy_3f90_w(uint8_t data)
+void spy_state::_3f90_w(uint8_t data)
 {
 	/*********************************************************************
 	*
@@ -458,7 +458,7 @@ void spy_state::main_map(address_map &map)
 	m_ram_view[2](0x0000, 0x07ff).ram().share(m_pmcram);
 	map(0x2000, 0x5fff).rw(FUNC(spy_state::k052109_051960_r), FUNC(spy_state::k052109_051960_w));
 	map(0x3f80, 0x3f80).w(FUNC(spy_state::bankswitch_w));
-	map(0x3f90, 0x3f90).w(FUNC(spy_state::spy_3f90_w));
+	map(0x3f90, 0x3f90).w(FUNC(spy_state::_3f90_w));
 	map(0x3fa0, 0x3fa0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3fb0, 0x3fb0).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3fc0, 0x3fc0).w(FUNC(spy_state::sh_irqtrigger_w));
@@ -580,7 +580,7 @@ void spy_state::spy(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
-	screen.set_screen_update(FUNC(spy_state::screen_update_spy));
+	screen.set_screen_update(FUNC(spy_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);

@@ -133,24 +133,7 @@ const char *a2_13sect_format::extensions() const noexcept
 	return "d13";
 }
 
-bool a2_13sect_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const a2_13sect_format FLOPPY_A213S_FORMAT;
-
-static const uint8_t translate6[0x40] =
-{
-	0x96, 0x97, 0x9a, 0x9b, 0x9d, 0x9e, 0x9f, 0xa6,
-	0xa7, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb2, 0xb3,
-	0xb4, 0xb5, 0xb6, 0xb7, 0xb9, 0xba, 0xbb, 0xbc,
-	0xbd, 0xbe, 0xbf, 0xcb, 0xcd, 0xce, 0xcf, 0xd3,
-	0xd6, 0xd7, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde,
-	0xdf, 0xe5, 0xe6, 0xe7, 0xe9, 0xea, 0xeb, 0xec,
-	0xed, 0xee, 0xef, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6,
-	0xf7, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
-};
 
 static const uint8_t dos_skewing[] =
 {
@@ -367,10 +350,10 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 							((sdata[i+0xac] & 0x01) << 5) |
 							((sdata[i+0xac] & 0x02) << 3);
 				}
-				raw_w(track_data, 8, translate6[nval ^ pval]);
+				raw_w(track_data, 8, gcr6fw_tb[nval ^ pval]);
 				pval = nval;
 			}
-			raw_w(track_data, 8, translate6[pval]);
+			raw_w(track_data, 8, gcr6fw_tb[pval]);
 			raw_w(track_data, 24, 0xdeaaeb);
 		}
 		raw_w(track_data, 8, 0xff);
@@ -1154,11 +1137,6 @@ const char *a2_edd_format::extensions() const noexcept
 	return "edd";
 }
 
-bool a2_edd_format::supports_save() const noexcept
-{
-	return false;
-}
-
 int a2_edd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
@@ -1274,11 +1252,6 @@ const char *a2_nib_format::description() const noexcept
 const char *a2_nib_format::extensions() const noexcept
 {
 	return "nib";
-}
-
-bool a2_nib_format::supports_save() const noexcept
-{
-	return false;
 }
 
 int a2_nib_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const

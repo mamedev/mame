@@ -292,6 +292,7 @@ const double XTAL::known_xtals[] = {
 	 16'588'800, // 16.5888_MHz_XTAL       SM 7238
 	 16'666'600, // 16.6666_MHz_XTAL       Firebeat GCU
 	 16'667'000, // 16.667_MHz_XTAL        Visual XDS-19P
+	 16'668'000, // 16.668_MHz_XTAL        Hoei Future Flash
 	 16'669'800, // 16.6698_MHz_XTAL       Qume QVT-102
 	 16'670'000, // 16.67_MHz_XTAL         -
 	 16'777'216, // 16.777216_MHz_XTAL     Nintendo Game Boy Advance

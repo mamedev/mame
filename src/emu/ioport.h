@@ -559,14 +559,12 @@ class ioport_field
 	friend class dynamic_field;
 
 	// flags for ioport_fields
-	static inline constexpr u32 FIELD_FLAG_OPTIONAL = 0x0001;    // set if this field is not required but recognized by hw
-	static inline constexpr u32 FIELD_FLAG_COCKTAIL = 0x0002;    // set if this field is relevant only for cocktail cabinets
-	static inline constexpr u32 FIELD_FLAG_TOGGLE =   0x0004;    // set if this field should behave as a toggle
-	static inline constexpr u32 FIELD_FLAG_ROTATED =  0x0008;    // set if this field represents a rotated control
-	static inline constexpr u32 ANALOG_FLAG_REVERSE = 0x0010;    // analog only: reverse the sense of the axis
-	static inline constexpr u32 ANALOG_FLAG_RESET =   0x0020;    // analog only: always preload in->default for relative axes, returning only deltas
-	static inline constexpr u32 ANALOG_FLAG_WRAPS =   0x0040;    // analog only: positional count wraps around
-	static inline constexpr u32 ANALOG_FLAG_INVERT =  0x0080;    // analog only: bitwise invert bits
+	static inline constexpr u32 FIELD_FLAG_COCKTAIL = 0x0001;    // set if this field is relevant only for cocktail cabinets
+	static inline constexpr u32 FIELD_FLAG_TOGGLE =   0x0002;    // set if this field should behave as a toggle
+	static inline constexpr u32 ANALOG_FLAG_REVERSE = 0x0004;    // analog only: reverse the sense of the axis
+	static inline constexpr u32 ANALOG_FLAG_RESET =   0x0008;    // analog only: always preload in->default for relative axes, returning only deltas
+	static inline constexpr u32 ANALOG_FLAG_WRAPS =   0x0010;    // analog only: positional count wraps around
+	static inline constexpr u32 ANALOG_FLAG_INVERT =  0x0020;    // analog only: bitwise invert bits
 
 public:
 	// construction/destruction
@@ -593,10 +591,8 @@ public:
 	void set_value(ioport_value value);
 	void clear_value();
 
-	bool optional() const { return ((m_flags & FIELD_FLAG_OPTIONAL) != 0); }
 	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); }
 	bool toggle() const { return ((m_flags & FIELD_FLAG_TOGGLE) != 0); }
-	bool rotated() const { return ((m_flags & FIELD_FLAG_ROTATED) != 0); }
 	bool analog_reverse() const { return ((m_flags & ANALOG_FLAG_REVERSE) != 0); }
 	bool analog_reset() const { return ((m_flags & ANALOG_FLAG_RESET) != 0); }
 	bool analog_wraps() const { return ((m_flags & ANALOG_FLAG_WRAPS) != 0); }
@@ -1051,7 +1047,6 @@ public:
 	ioport_configurer& field_add_char(std::initializer_list<char32_t> charlist);
 	ioport_configurer& field_add_code(input_seq_type which, input_code code);
 	ioport_configurer& field_set_way(int way) { m_curfield->m_way = way; return *this; }
-	ioport_configurer& field_set_rotated() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_ROTATED; return *this; }
 	ioport_configurer& field_set_name(const char *name) { assert(m_curfield != nullptr); m_curfield->m_name = string_from_token(name); return *this; }
 	ioport_configurer& field_set_player(int player) { m_curfield->m_player = player - 1; return *this; }
 	ioport_configurer& field_set_cocktail() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_COCKTAIL; field_set_player(2); return *this; }
@@ -1060,7 +1055,6 @@ public:
 	ioport_configurer& field_set_analog_reverse() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; return *this; }
 	[[deprecated("PORT_RESET is deprecated; manage counter state explicitly")]]
 	ioport_configurer& field_set_analog_reset() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; return *this; }
-	ioport_configurer& field_set_optional() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_OPTIONAL; return *this; }
 	ioport_configurer& field_set_min_max(ioport_value minval, ioport_value maxval) { m_curfield->m_min = minval; m_curfield->m_max = maxval; return *this; }
 	ioport_configurer& field_set_sensitivity(s32 sensitivity) { m_curfield->m_sensitivity = sensitivity; return *this; }
 	ioport_configurer& field_set_delta(s32 delta) { m_curfield->m_centerdelta = m_curfield->m_delta = delta; return *this; }
@@ -1179,9 +1173,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 #define PORT_16WAY \
 	configurer.field_set_way(16);
 
-#define PORT_ROTATED \
-	configurer.field_set_rotated();
-
 // general flags
 #define PORT_NAME(_name) \
 	configurer.field_set_name(_name);
@@ -1203,9 +1194,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 #define PORT_RESET \
 	configurer.field_set_analog_reset();
-
-#define PORT_OPTIONAL \
-	configurer.field_set_optional();
 
 #define PORT_GM_NOTE(_id) \
 	configurer.field_set_gm_note(_id);

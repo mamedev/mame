@@ -421,16 +421,34 @@ void tr707_audio_device::voice_trigger_w(u16 data)
 	m_mac->xst_w(m_triggers & 0xff);
 
 	// The EG capacitors for all triggered voices will charge through a
-	// single 100 Ohm resistor (R79). If more than one voice is triggered,
-	// there will be multiple capacitors charging in parallel. Treat that
-	// parallel capacitance as the effective capacitance of each triggered EG.
+	// single 100 Ohm resistor (R79). R79 will form a voltage divider with the
+	// (much larger) discharge resistor, whch will slighty affect the target
+	// voltage and charge speed. If more than one voice is triggered, there will
+	// be multiple capacitors and multiple discharge resistors connected to R79.
+	// So the effective capacitance and discharge resistance of each EG will be
+	// the parallel combination of those of individual EGs.
 	double effective_charge_c = 0;
+	double effective_discharge_r_inv = 0;
 	for (int i = 0; i < MV_COUNT; ++i)
+	{
 		if (!BIT(m_triggers, i))
+		{
 			effective_charge_c += MUX_EG_C[i];
+			effective_discharge_r_inv += 1.0 / m_mux_eg_r[i];
+		}
+	}
 	for (int i = 0; i < CV_COUNT; ++i)
+	{
 		if (!BIT(m_triggers, 8 + i))
+		{
 			effective_charge_c += CYMBAL_EG_C[i];
+			effective_discharge_r_inv += 1.0 / m_cymbal_eg_r[i];
+		}
+	}
+
+	// This will evaluate to Inf if there is no voice triggered. That's OK,
+	// because it won't be used in that case.
+	const double effective_discharge_r = 1.0 / effective_discharge_r_inv;
 
 	// Trigger amplitude EGs for MUX voices.
 	for (int i = 0; i < MV_COUNT; ++i)
@@ -439,14 +457,14 @@ void tr707_audio_device::voice_trigger_w(u16 data)
 		if (!BIT(m_triggers, i))  // EG attack
 		{
 			// When the trigger is active, the EG capacitor will be connected
-			// to both: the discharge resistor to ground (m_mux_eg_r[i]) and the
+			// to both: the effective discharge resistor to ground and the
 			// resistor to the accent voltage (R79) via a transistor. This setup
 			// affects the effective resistance and target voltage of the RC
 			// circuit as per the equations below. The effect of the transistor
 			// in the charge path is not modelled.
-			eg->set_r(RES_2_PARALLEL(R79, m_mux_eg_r[i]));
+			eg->set_r(RES_2_PARALLEL(R79, effective_discharge_r));
 			eg->set_c(effective_charge_c);
-			eg->set_target_v(m_accent_level * RES_VOLTAGE_DIVIDER(R79, m_mux_eg_r[i]));
+			eg->set_target_v(m_accent_level * RES_VOLTAGE_DIVIDER(R79, effective_discharge_r));
 		}
 		else  // EG release
 		{
@@ -471,9 +489,9 @@ void tr707_audio_device::voice_trigger_w(u16 data)
 		if (!BIT(m_triggers, trigger_index))  // EG attack
 		{
 			// See comments for MUX voice triggering above.
-			eg->set_r(RES_2_PARALLEL(R79, m_cymbal_eg_r[i]));
+			eg->set_r(RES_2_PARALLEL(R79, effective_discharge_r));
 			eg->set_c(effective_charge_c);
-			eg->set_target_v(m_accent_level * RES_VOLTAGE_DIVIDER(R79, m_cymbal_eg_r[i]));
+			eg->set_target_v(m_accent_level * RES_VOLTAGE_DIVIDER(R79, effective_discharge_r));
 		}
 		else  // EG release
 		{
@@ -529,7 +547,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	// See mux_dac_v() for its interpretation.
 	for (int i = 0; i < MV_COUNT; ++i)
 	{
-		VA_RC_EG(config, m_mux_eg[i]).set_r(m_mux_eg_r[i]).set_c(MUX_EG_C[i]);
+		VA_RC_EG(config, m_mux_eg[i]).set_c(MUX_EG_C[i]);
 		DAC08(config, m_mux_dac[i]);
 		VA_VCA(config, m_mux_vca[i]);
 		m_mux_dac[i]->add_route(0, m_mux_vca[i], 1.0, 0);
@@ -576,7 +594,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 		DAC_6BIT_R2R(config, m_cymbal_dac[i]).set_output_range(0, VCC);
 		m_cymbal_dac[i]->add_route(0, m_cymbal_hpf[i], CYMBAL_HPF_SCALE);
 
-		VA_RC_EG(config, m_cymbal_eg[i]).set_r(m_cymbal_eg_r[i]).set_c(CYMBAL_EG_C[i]);
+		VA_RC_EG(config, m_cymbal_eg[i]).set_c(CYMBAL_EG_C[i]);
 		VA_VCA(config, m_cymbal_vca[i]);  // 2SD1469R [Q14, Q15]
 		m_cymbal_hpf[i]->add_route(0, m_cymbal_vca[i], CYMBAL_VCA_SCALE, 0);
 		m_cymbal_eg[i]->add_route(0, m_cymbal_vca[i], 1.0 / VCC, 1);

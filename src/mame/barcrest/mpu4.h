@@ -14,12 +14,12 @@
 #include "machine/mc68681.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
-#include "machine/roc10937.h"
 #include "machine/steppers.h"
 #include "machine/ticket.h"
-#include "machine/timer.h" //hoppers
+#include "machine/timer.h" // hoppers
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "video/roc10937.h"
 
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)

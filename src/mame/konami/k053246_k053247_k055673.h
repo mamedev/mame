@@ -12,8 +12,8 @@
 
 #define NORMAL_PLANE_ORDER 4
 
-#define K053246_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
-#define K055673_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
+#define K053246_CB_MEMBER(_name)   void _name(int &code, int &color, int &priority_mask)
+#define K055673_CB_MEMBER(_name)   void _name(int &code, int &color, int &priority_mask)
 
 
 /**  Konami 053246 / 053247 / 055673  **/
@@ -51,7 +51,7 @@ class k053247_device : public device_t,
 						public device_gfx_interface
 {
 public:
-	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority_mask)>;
+	using sprite_delegate = device_delegate<void (int &code, int &color, int &priority_mask)>;
 
 	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -78,7 +78,7 @@ public:
 	void k053247_sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void k053247_sprites_draw(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	u16 k053247_read_register(offs_t offset);
-	void k053247_set_z_rejection(int zcode); // common to k053246/7
+	void k053247_set_z_rejection(s32 zcode); // common to k053246/7
 	void k053247_get_ram(u16 **ram);
 	int k053247_get_dx(void);
 	int k053247_get_dy(void);
@@ -96,9 +96,9 @@ public:
 
 	u8    m_kx46_regs[8];
 	u16   m_kx47_regs[16];
-	int   m_dx, m_dy;
+	s32   m_dx, m_dy;
 	u8    m_objcha_line;
-	int   m_z_rejection;
+	s32   m_z_rejection;
 
 	sprite_delegate m_k053247_cb;
 

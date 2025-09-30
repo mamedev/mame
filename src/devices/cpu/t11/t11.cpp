@@ -40,6 +40,14 @@ DEFINE_DEVICE_TYPE(K1801VM1, k1801vm1_device, "k1801vm1", "K1801VM1")
 DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 
 
+/*
+ * Not implemented:
+ *
+ * instruction timing (+ memory timing), bug compatibility (MOVB, MFPS),
+ * built-in timer, revision G (MUL instruction, timer IRQ),
+ * extra PSW bits, on-chip registers, multiprocessing support,
+ * traps: double bus error and bus error on vector fetch.
+ */
 k1801vm1_device::k1801vm1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, K1801VM1, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this)
@@ -71,6 +79,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 		reg.d = 0;
 	m_psw.d = 0;
 	m_ppc.d = 0;
+	m_cp[0] = m_cp[1] = m_cp[2] = m_cp[3] = 0;
 }
 
 t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -218,27 +227,35 @@ static const struct irq_table_entry irq_table[] =
 // PSW11 also masks IRQ1.  PSW10 also masks ACLO.
 void k1801vm1_device::t11_check_irqs()
 {
+	int8_t              mcir = MCIR_NONE;
+	uint16_t            vsel = 0;
+
+	if (m_mcir != MCIR_NONE)
+	{
+		mcir = m_mcir;
+		vsel = m_vsel;
+	}
 	// 2. bus error on vector fetch; nm, vec 160012
 	// 3. double bus error; nm, vec 160006
 	// 4. bus error; PSW11, PSW10
-	if (m_bus_error)
+	else if (m_bus_error)
 	{
 		m_bus_error = false;
-		m_mcir = MCIR_IRQ;
-		m_vsel = T11_TIMEOUT;
+		mcir = MCIR_IRQ;
+		vsel = T11_TIMEOUT;
 	}
 	// 5. illegal insn; nm
-	else if (m_mcir == MCIR_ILL)
+	else if (mcir == MCIR_ILL)
 	{
-		take_interrupt(m_vsel);
+		take_interrupt(vsel);
 	}
 	// 6. trace trap; WCPU
-	else if (m_trace_trap && m_mcir == MCIR_NONE) // allow trap_to() to execute first
+	else if (m_trace_trap)
 	{
 		if (GET_T)
 		{
-			m_mcir = MCIR_IRQ;
-			m_vsel = T11_BPT;
+			mcir = MCIR_IRQ;
+			vsel = T11_BPT;
 		}
 		else
 			m_trace_trap = false;
@@ -250,28 +267,31 @@ void k1801vm1_device::t11_check_irqs()
 	// 7. power fail (ACLO pin); PSW10
 	else if (m_power_fail)
 	{
-		m_mcir = MCIR_IRQ;
-		m_vsel = T11_PWRFAIL;
+		m_power_fail = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_PWRFAIL;
 	}
-	// 8. external HALT (nIRQ1 pin); PSW11, PSW10
+	// 8. external HALT (nIRQ1 pin, level triggered); PSW11, PSW10
 	else if (m_hlt_active)
 	{
 		m_hlt_active = 0;
-		m_mcir = MCIR_HALT;
-		m_vsel = VM1_HALT;
+		mcir = MCIR_HALT;
+		vsel = VM1_HALT;
 	}
 	// 9. internal timer, vector 0270; PSW7, PSW10
-	// 10. line clock (nIRQ2 pin); PSW7, PSW10
-	else if (BIT(m_cp_state, 2) && !GET_I)
+	// 10. line clock (nIRQ2 pin, edge triggered); PSW7, PSW10
+	else if (m_cp[2] && !GET_I)
 	{
-		m_mcir = MCIR_IRQ;
-		m_vsel = VM1_EVNT;
+		m_cp[2] = false;
+		mcir = MCIR_IRQ;
+		vsel = VM1_EVNT;
 	}
-	// 11. nIRQ3 pin; PSW7, PSW10
-	else if (BIT(m_cp_state, 3) && !GET_I)
+	// 11. nIRQ3 pin, edge triggered; PSW7, PSW10
+	else if (m_cp[3] && !GET_I)
 	{
-		m_mcir = MCIR_IRQ;
-		m_vsel = VM1_IRQ3;
+		m_cp[3] = false;
+		mcir = MCIR_IRQ;
+		vsel = VM1_IRQ3;
 	}
 	// 12. nVIRQ pin; PSW7, PSW10
 	else if (m_vec_active && !GET_I)
@@ -283,25 +303,18 @@ void k1801vm1_device::t11_check_irqs()
 			m_vec_active = 0;
 			return;
 		}
-		m_mcir = MCIR_IRQ;
-		m_vsel = vec;
+		mcir = MCIR_IRQ;
+		vsel = vec;
 	}
 
-	switch (m_mcir)
+	switch (mcir)
 	{
-	case MCIR_SET:
-		if (m_vsel >= 0160000)
-			take_interrupt_halt(m_vsel);
-		else
-			take_interrupt(m_vsel);
-		break;
-
 	case MCIR_IRQ:
-		take_interrupt(m_vsel);
+		take_interrupt(vsel);
 		break;
 
 	case MCIR_HALT:
-		take_interrupt_halt(m_vsel);
+		take_interrupt_halt(vsel);
 		break;
 	}
 
@@ -310,7 +323,7 @@ void k1801vm1_device::t11_check_irqs()
 
 void k1801vm1_device::take_interrupt_halt(uint16_t vector)
 {
-	// vectors in HALT mode are word (not doubleworld) aligned
+	// vectors in HALT mode are word (not doubleword) aligned
 	assert((vector & 1) == 0);
 
 	// enter HALT mode
@@ -599,7 +612,10 @@ void t11_device::execute_set_input(int irqline, int state)
 		if (state == CLEAR_LINE)
 			m_cp_state &= ~(1 << irqline);
 		else
+		{
 			m_cp_state |= 1 << irqline;
+			m_cp[irqline] = true;
+		}
 		break;
 
 	case VEC_LINE:

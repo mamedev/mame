@@ -176,10 +176,10 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
-	int         m_sprite_colorbase = 0;
-	int         m_layer_colorbase[4];
-	int         m_layerpri[3];
-	int         m_alpha_enabled = 0;
+	uint16_t    m_sprite_colorbase = 0;
+	uint16_t    m_layer_colorbase[4];
+	int32_t     m_layerpri[3];
+	int32_t     m_alpha_enabled = 0;
 	uint16_t    m_zmask = 0;
 
 	/* misc */
@@ -209,11 +209,11 @@ private:
 	void moobl_oki_bank_w(uint16_t data);
 	DECLARE_VIDEO_START(moo);
 	DECLARE_VIDEO_START(bucky);
-	uint32_t screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(moo_interrupt);
 	INTERRUPT_GEN_MEMBER(moobl_interrupt);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
-	void moo_objdma();
+	void object_dma();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	void bucky_map(address_map &map) ATTR_COLD;
@@ -225,23 +225,23 @@ private:
 
 K053246_CB_MEMBER(moo_state::sprite_callback)
 {
-	int pri = (*color & 0x03e0) >> 4;
+	int pri = (color & 0x03e0) >> 4;
 
 	if (pri <= m_layerpri[2])
-		*priority_mask = 0;
+		priority_mask = 0;
 	else if (pri <= m_layerpri[1])
-		*priority_mask = 0xf0;
+		priority_mask = 0xf0;
 	else if (pri <= m_layerpri[0])
-		*priority_mask = 0xf0|0xcc;
+		priority_mask = 0xf0|0xcc;
 	else
-		*priority_mask = 0xf0|0xcc|0xaa;
+		priority_mask = 0xf0|0xcc|0xaa;
 
-	*color = m_sprite_colorbase | (*color & 0x001f);
+	color = m_sprite_colorbase | (color & 0x001f);
 }
 
 K056832_CB_MEMBER(moo_state::tile_callback)
 {
-	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
+	color = m_layer_colorbase[layer] | (color >> 2 & 0x0f);
 }
 
 VIDEO_START_MEMBER(moo_state,moo)
@@ -274,7 +274,7 @@ VIDEO_START_MEMBER(moo_state,bucky)
 	m_k056832->set_layer_offs(3,  6, 0);
 }
 
-uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t moo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
 	int layers[3];
@@ -371,7 +371,7 @@ void moo_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 
-void moo_state::moo_objdma()
+void moo_state::object_dma()
 {
 	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	int num_inactive;
@@ -415,7 +415,7 @@ INTERRUPT_GEN_MEMBER(moo_state::moo_interrupt)
 {
 	if (m_k053246->k053246_is_irq_enabled())
 	{
-		moo_objdma();
+		object_dma();
 
 		// schedule DMA end interrupt (delay shortened to catch up with V-blank)
 		m_dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
@@ -428,7 +428,7 @@ INTERRUPT_GEN_MEMBER(moo_state::moo_interrupt)
 
 INTERRUPT_GEN_MEMBER(moo_state::moobl_interrupt)
 {
-	moo_objdma();
+	object_dma();
 
 	// schedule DMA end interrupt (delay shortened to catch up with V-blank)
 	m_dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
@@ -732,7 +732,7 @@ void moo_state::moo(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); // should give IRQ4 sufficient time to update scroll registers
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
-	m_screen->set_screen_update(FUNC(moo_state::screen_update_moo));
+	m_screen->set_screen_update(FUNC(moo_state::screen_update));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
@@ -784,7 +784,7 @@ void moo_state::moobl(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); // should give IRQ4 sufficient time to update scroll registers
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
-	m_screen->set_screen_update(FUNC(moo_state::screen_update_moo));
+	m_screen->set_screen_update(FUNC(moo_state::screen_update));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();

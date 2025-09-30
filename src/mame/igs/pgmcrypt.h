@@ -29,7 +29,6 @@ void pgm_espgal_decrypt(running_machine &machine) ATTR_COLD;
 void pgm_happy6_decrypt(running_machine &machine) ATTR_COLD;
 void pgm_dwpc_decrypt(running_machine &machine) ATTR_COLD;
 void sdwx_decrypt(running_machine &machine) ATTR_COLD;
-void hauntedh_decrypt(running_machine &machine) ATTR_COLD;
 void chessc2_decrypt(running_machine &machine) ATTR_COLD;
 void zhongguo_decrypt(running_machine &machine) ATTR_COLD;
 void cjddz_decrypt(running_machine &machine) ATTR_COLD;
@@ -64,9 +63,7 @@ void qiji6_decrypt(running_machine& machine) ATTR_COLD;
 void mjzb_decrypt(running_machine& machine) ATTR_COLD;
 void tswxp_decrypt(running_machine& machine) ATTR_COLD;
 void jking04_decrypt(running_machine& machine) ATTR_COLD;
-void krzykeno_decrypt(running_machine& machine) ATTR_COLD;
 void royal5p_decrypt(running_machine& machine) ATTR_COLD;
 void jhg3d_decrypt(running_machine& machine) ATTR_COLD;
-void gonefsh_decrypt(running_machine& machine) ATTR_COLD;
 
 #endif // MAME_IGS_PGMCRYPT_H

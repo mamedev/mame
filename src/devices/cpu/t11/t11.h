@@ -121,6 +121,7 @@ protected:
 	int8_t              m_mcir;
 	uint16_t            m_vsel;
 	uint8_t             m_cp_state;
+	bool                m_cp[4];
 	bool                m_vec_active;
 	bool                m_pf_active;
 	bool                m_berr_active;

@@ -29,13 +29,15 @@
 
 /* Core includes */
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/mm74c922.h"
 #include "machine/mos6551.h"
 #include "machine/ram.h"
-#include "machine/roc10937.h"
 #include "sound/spkrdev.h"
+#include "video/roc10937.h"
+
 #include "speaker.h"
 
 #include "digel804.lh"

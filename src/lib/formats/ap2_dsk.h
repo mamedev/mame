@@ -37,7 +37,6 @@ public:
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
-	virtual bool supports_save() const noexcept override;
 
 private:
 	static uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
@@ -113,7 +112,6 @@ public:
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
-	virtual bool supports_save() const noexcept override;
 
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
@@ -132,7 +130,6 @@ public:
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
-	virtual bool supports_save() const noexcept override;
 
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;

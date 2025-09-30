@@ -5,7 +5,7 @@
 益智象棋 (Yìzhì Xiàngqí)
 
 TODO:
-- Dip-switches (needs sheet);
+- DIP-switches (needs sheet);
 - Lamps;
 - Convert video to use 6845 semantics;
 - is there a way to access key test? There are strings in program ROM and GFX in the gfx2 region.
@@ -306,13 +306,14 @@ static INPUT_PORTS_START( yizhix ) // TODO: possibly some missing inputs
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red") // in roulette double up
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Red") // in roulette double up
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Black") // in roulette double up
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Black") // in roulette double up
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// TODO: these are present on PCB, but do they have any effect?
 	// Settings are done via test mode
+	// turning on both SW1:1 and SW1:2 makes the game boot into the bookkeeping screen
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC(0x0001, 0x0001, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x0002, 0x0002, "SW1:2")

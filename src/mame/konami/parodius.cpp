@@ -66,7 +66,7 @@ private:
 	// video-related
 	uint8_t m_layer_colorbase[3]{};
 	uint8_t m_sprite_colorbase = 0;
-	int m_layerpri[3]{};
+	int32_t m_layerpri[3]{};
 
 	// misc
 	emu_timer *m_nmi_blocked = nullptr;
@@ -95,8 +95,8 @@ private:
 
 K052109_CB_MEMBER(parodius_state::tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 /***************************************************************************
@@ -107,17 +107,17 @@ K052109_CB_MEMBER(parodius_state::tile_callback)
 
 K053244_CB_MEMBER(parodius_state::sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x1f);
+	color = m_sprite_colorbase + (color & 0x1f);
 }
 
 

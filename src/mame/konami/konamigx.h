@@ -64,28 +64,28 @@ public:
 		, m_lamp(*this, "lamp0")
 	{ }
 
-	void esc_w(address_space &space, uint32_t data);
-	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t le2_gun_H_r();
-	uint32_t le2_gun_V_r();
-	uint32_t type1_roz_r1(offs_t offset);
-	uint32_t type1_roz_r2(offs_t offset);
-	uint32_t type3_sync_r();
-	void type4_prot_w(address_space &space, offs_t offset, uint32_t data);
-	void type1_cablamps_w(uint32_t data);
-	uint16_t tms57002_status_word_r();
-	void tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t K055550_word_r(offs_t offset);
-	void K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void K053990_martchmp_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void fantjour_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void type3_bank_w(offs_t offset, uint8_t data);
-	[[maybe_unused]] void konamigx_555_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	[[maybe_unused]] void konamigx_555_palette2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void konamigx_t1_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void konamigx_t4_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void esc_w(address_space &space, u32 data);
+	void eeprom_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 le2_gun_H_r();
+	u32 le2_gun_V_r();
+	u32 type1_roz_r1(offs_t offset);
+	u32 type1_roz_r2(offs_t offset);
+	u32 type3_sync_r();
+	void type4_prot_w(address_space &space, offs_t offset, u32 data);
+	void type1_cablamps_w(u32 data);
+	u16 tms57002_status_word_r();
+	void tms57002_control_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 K055550_word_r(offs_t offset);
+	void K055550_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void K053990_martchmp_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void fantjour_dma_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void type3_bank_w(offs_t offset, u8 data);
+	[[maybe_unused]] void konamigx_555_palette_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	[[maybe_unused]] void konamigx_555_palette2_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void konamigx_tilebank_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void konamigx_t1_psacmap_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void konamigx_t4_psacmap_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void vblank_irq_ack_w(int state);
 	void hblank_irq_ack_w(int state);
 	ioport_value gx_rdport1_3_r();
@@ -107,16 +107,16 @@ public:
 	DECLARE_VIDEO_START(konamigx_type4);
 	DECLARE_VIDEO_START(konamigx_type4_vsn);
 	DECLARE_VIDEO_START(konamigx_type4_sd2);
-	uint32_t screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(konamigx_type2_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type2_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type4_scanline);
 	void k054539_irq_gen(int state);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
-	double adc0834_callback(uint8_t input);
+	double adc0834_callback(u8 input);
 	K056832_CB_MEMBER(type2_tile_callback);
 	K056832_CB_MEMBER(salmndr2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
@@ -132,7 +132,7 @@ public:
 	};
 
 	void common_init();
-	uint32_t k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask = ~0);
+	u32 k_6bpp_rom_long_r(offs_t offset, u32 mem_mask = ~0);
 	void konamigx_mixer     (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
 	void konamigx_mixer_draw(screen_device &Screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						tilemap_t *sub1, int sub1flags,
@@ -142,11 +142,11 @@ public:
 						);
 
 
-	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, uint8_t layer);
+	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer);
 	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
 	void gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
 
-	void konamigx_esc_alert(uint32_t *srcbase, int srcoffs, int count, int mode);
+	void konamigx_esc_alert(u32 *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);
 
 	void wipezbuf(int noshadow);
@@ -156,26 +156,26 @@ public:
 
 	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
-	void generate_sprites(address_space &space, uint32_t src, uint32_t spr, int count);
+	void generate_sprites(address_space &space, u32 src, u32 spr, int count);
 
 	void fantjour_dma_install();
 
 	void konamigx_mixer_primode(int mode);
 
-	typedef void (konamigx_state::*esc_cb)(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
+	typedef void (konamigx_state::*esc_cb)(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
 
-	void tkmmpzdm_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
-	void dragoonj_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
-	void sal2_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
-	void sexyparo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
-	void tbyahhoo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
-	void daiskiss_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
+	void tkmmpzdm_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
+	void dragoonj_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
+	void sal2_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
+	void sexyparo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
+	void tbyahhoo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
+	void daiskiss_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
 
 	inline int K053247GX_combine_c18(int attrib);
 	inline int K055555GX_decode_objcolor(int c18);
 	inline int K055555GX_decode_inpri(int c18);
-	int K055555GX_decode_vmixcolor(int layer, int *color);
-	[[maybe_unused]] int K055555GX_decode_osmixcolor(int layer, int *color);
+	int K055555GX_decode_vmixcolor(int layer, int &color);
+	[[maybe_unused]] int K055555GX_decode_osmixcolor(int layer, int &color);
 
 	void init_posthack() ATTR_COLD;
 	void konamigx_6bpp(machine_config &config) ATTR_COLD;
@@ -223,70 +223,70 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	optional_shared_ptr<uint32_t> m_workram;
-	optional_shared_ptr<uint32_t> m_psacram;
-	optional_shared_ptr<uint32_t> m_subpaletteram32;
-	optional_shared_ptr<uint32_t> m_k053936_0_ctrl;
-	optional_shared_ptr<uint32_t> m_k053936_0_linectrl;
-	optional_shared_ptr<uint16_t> m_k053936_0_ctrl_16;
-	optional_shared_ptr<uint16_t> m_k053936_0_linectrl_16;
-	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
+	optional_shared_ptr<u32> m_workram;
+	optional_shared_ptr<u32> m_psacram;
+	optional_shared_ptr<u32> m_subpaletteram32;
+	optional_shared_ptr<u32> m_k053936_0_ctrl;
+	optional_shared_ptr<u32> m_k053936_0_linectrl;
+	optional_shared_ptr<u16> m_k053936_0_ctrl_16;
+	optional_shared_ptr<u16> m_k053936_0_linectrl_16;
+	optional_shared_ptr<u32> m_generic_paletteram_32;
 
 	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
 
-	uint8_t m_sound_ctrl = 0;
-	uint8_t m_sound_intck = 0;
-	uint32_t m_fantjour_dma[8]{};
-	int m_konamigx_current_frame = 0;
-	int m_gx_objdma = 0, m_gx_primode = 0;
+	u8 m_sound_ctrl = 0;
+	u8 m_sound_intck = 0;
+	u32 m_fantjour_dma[8]{};
+	s32 m_konamigx_current_frame = 0;
+	s32 m_gx_objdma = 0, m_gx_primode = 0;
 	emu_timer *m_dmadelay_timer = nullptr;
 	emu_timer *m_boothack_timer = nullptr;
-	int m_gx_rdport1_3 = 0, m_gx_syncen = 0;
-	int m_gx_cfgport = 0;
-	int m_suspension_active = 0, m_resume_trigger = 0;
-	int m_last_prot_op = 0, m_last_prot_clk = 0;
+	s32 m_gx_rdport1_3 = 0, m_gx_syncen = 0;
+	s32 m_gx_cfgport = 0;
+	s32 m_suspension_active = 0, m_resume_trigger = 0;
+	s32 m_last_prot_op = 0, m_last_prot_clk = 0;
 	u16 m_last_prot_param = 0;
-	uint8_t m_prev_pixel_clock = 0;
+	u8 m_prev_pixel_clock = 0;
 
-	uint8_t m_esc_program[4096]{};
+	u8 m_esc_program[4096]{};
 	esc_cb m_esc_cb;
 
-	uint16_t m_prot_data[0x20]{};
+	u16 m_prot_data[0x20]{};
 
-	uint16_t *m_gx_spriteram = nullptr;
-	std::unique_ptr<uint16_t[]> m_gx_spriteram_alloc;
+	u16 *m_gx_spriteram = nullptr;
+	std::unique_ptr<u16[]> m_gx_spriteram_alloc;
 
 	u8 m_current_brightness = 0xff;
 	u8 m_brightness[3]{};
 	u8 m_last_alpha_tile_mix_code = 0;
 
 	// mirrored K054338 settings
-	int *m_K054338_shdRGB = nullptr;
+	s32 *m_K054338_shdRGB = nullptr;
 
 	// 1st-Tier GX/MW Variables
 	// frequently used registers
-	int m_k053247_vrcbk[4]{};
-	int m_k053247_coreg = 0, m_k053247_coregshift = 0, m_k053247_opset = 0;
-	int m_opri = 0, m_oinprion = 0;
-	int m_vcblk[6]{}, m_ocblk = 0;
-	int m_vinmix = 0, m_vmixon = 0, m_osinmix = 0, m_osmixon = 0;
-	uint8_t  m_gx_wrport1_0 = 0, m_gx_wrport1_1 = 0;
-	uint16_t m_gx_wrport2 = 0;
+	s32 m_k053247_vrcbk[4]{};
+	s32 m_k053247_coreg = 0, m_k053247_coregshift = 0, m_k053247_opset = 0;
+	s32 m_opri = 0, m_oinprion = 0;
+	s32 m_vcblk[6]{}, m_ocblk = 0;
+	s32 m_vinmix = 0, m_vmixon = 0, m_osinmix = 0, m_osmixon = 0;
+	u8  m_gx_wrport1_0 = 0, m_gx_wrport1_1 = 0;
+	u16 m_gx_wrport2 = 0;
 
 	// 2nd-Tier GX/MW Graphics Variables
-	uint8_t *m_gx_objzbuf = nullptr;
-	std::unique_ptr<uint8_t[]> m_gx_shdzbuf;
-	int m_layer_colorbase[4]{};
-	int32_t m_gx_tilebanks[8]{}, m_gx_oldbanks[8]{};
-	int m_gx_tilemode = 0, m_gx_rozenable = 0, m_psac_colorbase = 0, m_last_psac_colorbase = 0;
-	int m_gx_specialrozenable = 0; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
-	int m_gx_rushingheroes_hack = 0;
+	u8 *m_gx_objzbuf = nullptr;
+	std::unique_ptr<u8[]> m_gx_shdzbuf;
+	s32 m_layer_colorbase[4]{};
+	s32 m_gx_tilebanks[8]{}, m_gx_oldbanks[8]{};
+	s32 m_gx_tilemode = 0, m_gx_rozenable = 0, m_psac_colorbase = 0, m_last_psac_colorbase = 0;
+	s32 m_gx_specialrozenable = 0; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
+	s32 m_gx_rushingheroes_hack = 0;
 
 	tilemap_t *m_gx_psac_tilemap = nullptr, *m_gx_psac_tilemap2 = nullptr;
 	std::unique_ptr<bitmap_ind16> m_type3_roz_temp_bitmap;
 	tilemap_t *m_gx_psac_tilemap_alt = nullptr;
-	int m_konamigx_has_dual_screen = 0;
-	int m_konamigx_palformat = 0;
+	s32 m_konamigx_has_dual_screen = 0;
+	s32 m_konamigx_palformat = 0;
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_left_tempbitmap;
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_right_tempbitmap;
 
@@ -313,7 +313,7 @@ protected:
 	u8 m_type3_psac2_bank = 0;
 	u8 m_type3_spriteram_bank = 0;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
-	int m_use_68020_post_clock_hack = 0;
+	s32 m_use_68020_post_clock_hack = 0;
 	output_finder<> m_lamp;
 };
 

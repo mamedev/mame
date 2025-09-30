@@ -4759,6 +4759,7 @@ ROM_START( moonbase )
 	ROM_LOAD( "cv01.g7",      0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) // NEC B406 or compatible BPROM, like the 82S137
 ROM_END
 
+// set also seen on original Nichibutsu board set with 2 8516s instead of 4+5 and 9+10. Same data.
 ROM_START( moonbasea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ze3-1.a4",     0x0000, 0x0400, CRC(82dbf2c7) SHA1(c767d8b866db4a5059bd79f962a90ce3a962e1e6) )

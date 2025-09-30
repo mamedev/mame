@@ -927,7 +927,7 @@ void portfolio_state::portfolio(machine_config &config)
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 

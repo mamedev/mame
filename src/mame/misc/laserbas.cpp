@@ -82,8 +82,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac%u", 1U),
-		m_vrambank(*this, "vram"),
-		m_track(*this, { "TRACK_X", "TRACK_Y" })
+		m_vram(*this, "vram", 0x10000, ENDIANNESS_LITTLE),
+		m_vrambank(*this, "vrambank"),
+		m_track(*this, "TRACK_%c", 'X')
 	{ }
 
 	void laserbas(machine_config &config);
@@ -96,25 +97,26 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device_array<dac_byte_interface, 6> m_dac;
+	memory_share_creator<uint8_t> m_vram;
 	required_memory_bank m_vrambank;
 	required_ioport_array<2> m_track;
 
 	// misc
-	uint8_t  m_counter[6];
-	uint8_t  m_cnt_out[6];
-	int m_nmi;
+	uint8_t  m_counter[6] = { };
+	uint8_t  m_cnt_out[6] = { };
+	uint8_t  m_nmi = 0;
 
 	// input-related
-	uint8_t  m_track_prv[2];
-	int8_t   m_track_cnt[2];
+	uint8_t  m_track_prv[2] = { };
+	int8_t   m_track_cnt[2] = { };
 
 	// video-related
-	uint8_t  m_vram[0x10000];
-	uint8_t  m_hset, m_vset;
-	uint8_t  m_bset;
-	uint8_t  m_scl;
-	bool     m_flipscreen;
-	uint64_t m_z1data;
+	uint8_t  m_hset = 0;
+	uint8_t  m_vset = 0;
+	uint8_t  m_bset = 0;
+	uint8_t  m_scl = 0;
+	bool     m_flipscreen = false;
+	uint64_t m_z1data = 0;
 
 	void videoctrl1_w(offs_t offset, uint8_t data);
 	void videoctrl2_w(offs_t offset, uint8_t data);
@@ -134,15 +136,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
 {
 	int scanline = param;
 
-	if(scanline == 0 || scanline == 135)
-	{
+	if (scanline == 0 || scanline == 128)
 		m_maincpu->set_input_line(0, HOLD_LINE );
-	}
 
-	if(scanline == 240 && m_nmi)
-	{
+	if (scanline == 240 && m_nmi)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	}
 }
 
 MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
@@ -207,6 +205,7 @@ void laserbas_state::videoctrl2_w(offs_t offset, uint8_t data)
 
 uint8_t laserbas_state::z1_r(offs_t offset)
 {
+	// protection device
 	m_z1data = (m_z1data >> 10) | (uint64_t(offset & 0x03ff) << 30);
 
 	auto const x = [this] (unsigned b) { return BIT(m_z1data, b); };
@@ -242,6 +241,7 @@ uint8_t laserbas_state::track_dir_r()
 
 		m_track_cnt[i] += diff;
 	}
+
 	return ((m_track_cnt[0] < 0) ? 0x01 : 0x00) | ((m_track_cnt[1] > 0) ? 0x02 : 0x00);
 }
 
@@ -264,19 +264,11 @@ void laserbas_state::machine_start()
 {
 	m_vrambank->configure_entries(0, 2, m_vram, 0x8000);
 
-	std::fill(std::begin(m_counter), std::end(m_counter), 0);
-	std::fill(std::begin(m_cnt_out), std::end(m_cnt_out), 0);
-	m_nmi = 0;
-
-	std::fill(std::begin(m_track_prv), std::end(m_track_prv), 0);
-	std::fill(std::begin(m_track_cnt), std::end(m_track_cnt), 0);
-
 	save_item(NAME(m_counter));
 	save_item(NAME(m_cnt_out));
 	save_item(NAME(m_nmi));
 	save_item(NAME(m_track_prv));
 	save_item(NAME(m_track_cnt));
-	save_item(NAME(m_vram));
 	save_item(NAME(m_hset));
 	save_item(NAME(m_vset));
 	save_item(NAME(m_bset));
@@ -299,14 +291,21 @@ void laserbas_state::machine_reset()
 template<uint8_t Which>
 void laserbas_state::pit_out_w(int state)
 {
-	state ^= 1; // 7404  (6G)
-	if (!state && m_cnt_out[Which]) // 0->1 rising edge CLK
-		m_counter[Which] = (m_counter[Which] + 1) & 0x0f; // 4 bit counters 74393
+	state ^= 1; // 7404 (6G)
 
-	int data = state | ((m_counter[Which] & 7) << 1); // combine output from 8253 with counter bits 0-3
-	if (m_counter[Which] & 8) // counter bit 4 XORs the data (7486 x 6)
+	// increment 4-bit counters 74393 on CLK rising edge
+	if (!state && m_cnt_out[Which])
+		m_counter[Which] = (m_counter[Which] + 1) & 0x0f;
+
+	// combine output from 8253 with counter bits 0-3
+	int data = state | ((m_counter[Which] & 7) << 1);
+
+	// counter bit 4 XORs the data (7486 x 6)
+	if (m_counter[Which] & 8)
 		data ^= 0x0f;
-	m_dac[Which]->write(data); // 4 resistor packs:  47k, 100k, 220k, 470k
+
+	// 4 resistor packs: 47k, 100k, 220k, 470k
+	m_dac[Which]->write(data);
 
 	m_cnt_out[Which] = state;
 }
@@ -316,7 +315,7 @@ void laserbas_state::laserbas_memory(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xbfff).bankrw(m_vrambank);
 	map(0xc000, 0xf7ff).rom().nopw();
-	map(0xf800, 0xfbff).r(FUNC(laserbas_state::z1_r)).nopw(); /* protection device */
+	map(0xf800, 0xfbff).r(FUNC(laserbas_state::z1_r)).nopw();
 	map(0xfc00, 0xffff).ram();
 }
 
@@ -338,8 +337,8 @@ void laserbas_state::laserbas_io(address_map &map)
 }
 
 static INPUT_PORTS_START( laserbas )
-	PORT_START("DSW")   // $20
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )      PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_START("DSW") // $20
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )      PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )      PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )     PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Difficulty ) )   PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
@@ -348,7 +347,7 @@ static INPUT_PORTS_START( laserbas )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )   PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x04, "10k" )                   PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x00, "30k" )                   PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )  PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )          PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )           PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_B ) )       PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x20)
@@ -367,20 +366,20 @@ static INPUT_PORTS_START( laserbas )
 	PORT_DIPSETTING(    0xfd, "D RAM CHECK F" )         PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
 	PORT_DIPSETTING(    0xfb, "D RAM CHECK B" )         PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
 	PORT_DIPSETTING(    0xf7, "ROM CHECK" )             PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
-	PORT_DIPSETTING(    0xef, "CRT INVERT CHECK" )      PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)    // press start 2
+	PORT_DIPSETTING(    0xef, "CRT INVERT CHECK" )      PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00) // press start 2
 	PORT_DIPSETTING(    0xdf, "SWITCH CHECK" )          PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
 	PORT_DIPSETTING(    0xbf, "COLOR CHECK" )           PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x7f, "SOUND CHECK" )           PORT_CONDITION("INPUTS", 0x20, EQUALS, 0x00)
 
-	PORT_START("INPUTS")    // $21
+	PORT_START("INPUTS") // $21
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // service coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("TRACK_X")
 	PORT_BIT( 0x03f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20)
@@ -389,17 +388,18 @@ static INPUT_PORTS_START( laserbas )
 	PORT_BIT( 0x03f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
-#define CLOCK 16680000
-#define PIT_CLOCK (CLOCK/16) // 12 divider ?
-
 void laserbas_state::laserbas(machine_config &config)
 {
-	Z80(config, m_maincpu, CLOCK / 4);
+	// basic machine hardware
+	constexpr XTAL MASTER_CLOCK = 16.668_MHz_XTAL;
+	constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 3;
+	constexpr XTAL PIT_CLOCK = PIXEL_CLOCK / 4;
+
+	Z80(config, m_maincpu, PIXEL_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &laserbas_state::laserbas_memory);
 	m_maincpu->set_addrmap(AS_IO, &laserbas_state::laserbas_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(laserbas_state::laserbas_scanline), "screen", 0, 1);
 
-	/* TODO: clocks aren't known */
 	pit8253_device &pit0(PIT8253(config, "pit0", 0));
 	pit0.set_clk<0>(PIT_CLOCK);
 	pit0.set_clk<1>(PIT_CLOCK);
@@ -416,11 +416,12 @@ void laserbas_state::laserbas(machine_config &config)
 	pit1.out_handler<1>().set(FUNC(laserbas_state::pit_out_w<4>));
 	pit1.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<5>));
 
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 360, 0, 256, 274, 0, 224);
+	screen.set_raw(PIXEL_CLOCK, 360, 0, 256, 274, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* unknown clock, hand tuned to get ~60 fps */
+	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK / 8));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -428,7 +429,7 @@ void laserbas_state::laserbas(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::RGB_332, 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	for (auto &dac : m_dac)
 		DAC_4BIT_R2R(config, dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
@@ -492,14 +493,14 @@ ROM_END
 
 ROM_START( laserbasa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2732.u1",       0x0000, 0x1000, CRC(f3ab00dc) SHA1(4730b13b55c93c71ed483463e180e71e506cfbd6) )
-	ROM_LOAD( "2732.u2",       0x1000, 0x1000, CRC(0ba2236c) SHA1(416e4be957c395b05537d2e513e0c4561d8ca7c5) )
-	ROM_LOAD( "mb8532.u3",     0x2000, 0x1000, CRC(c58a7745) SHA1(382e2235d89520860335c1c2760339e116c0466f) )
-	ROM_LOAD( "mbm2732.u4",    0x3000, 0x1000, CRC(00f9d909) SHA1(90b800cc5fcea53454584f8ad93eebbd193bdd21) )
-	ROM_LOAD( "2732.u5",       0xc000, 0x1000, CRC(6459073e) SHA1(78b8a23534826dd2d3b3c6c5d5708c8a78a4b6bf) )
-	ROM_LOAD( "2732.u6",       0xd000, 0x1000, CRC(a2dc1e7e) SHA1(78643a3aa852c73dab12e09a6cfc53141c936d12) )
-	ROM_LOAD( "2732.u7",       0xe000, 0x1000, CRC(9d2148d7) SHA1(24954d82a09d9fcfdc61e91b7c824daa5dd701c3) )
-	ROM_LOAD( "mb8516.u8",     0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
+	ROM_LOAD( "2732.u1",    0x0000, 0x1000, CRC(f3ab00dc) SHA1(4730b13b55c93c71ed483463e180e71e506cfbd6) )
+	ROM_LOAD( "2732.u2",    0x1000, 0x1000, CRC(0ba2236c) SHA1(416e4be957c395b05537d2e513e0c4561d8ca7c5) )
+	ROM_LOAD( "mb8532.u3",  0x2000, 0x1000, CRC(c58a7745) SHA1(382e2235d89520860335c1c2760339e116c0466f) )
+	ROM_LOAD( "mbm2732.u4", 0x3000, 0x1000, CRC(00f9d909) SHA1(90b800cc5fcea53454584f8ad93eebbd193bdd21) )
+	ROM_LOAD( "2732.u5",    0xc000, 0x1000, CRC(6459073e) SHA1(78b8a23534826dd2d3b3c6c5d5708c8a78a4b6bf) )
+	ROM_LOAD( "2732.u6",    0xd000, 0x1000, CRC(a2dc1e7e) SHA1(78643a3aa852c73dab12e09a6cfc53141c936d12) )
+	ROM_LOAD( "2732.u7",    0xe000, 0x1000, CRC(9d2148d7) SHA1(24954d82a09d9fcfdc61e91b7c824daa5dd701c3) )
+	ROM_LOAD( "mb8516.u8",  0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
 ROM_END
 
 /*
@@ -510,14 +511,14 @@ I dumped it as a 2716 (FF.9), a 2532 like the others (FF.9A) and a 2732 (FF.9B).
 
 ROM_START( futflash )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ff.1",         0x0000, 0x1000, CRC(bcd6b998) SHA1(4a210c40ce6015e2b921558b7571b7f2a27e1815) )
-	ROM_LOAD( "ff.2",         0x1000, 0x1000, CRC(1b1f6953) SHA1(8cd7b7e2236700ce63c60b4d2286099c8091bdbd) )
-	ROM_LOAD( "ff.3",         0x2000, 0x1000, CRC(30008f04) SHA1(e03b2dbcb6d2615650cdd47ecf1d587906ce149b) )
-	ROM_LOAD( "ff.4",         0x3000, 0x1000, CRC(e559aa12) SHA1(0fecfb60b0147e8060c640f684f69503478200ff) )
-	ROM_LOAD( "ff.5",         0xc000, 0x1000, CRC(6459073e) SHA1(78b8a23534826dd2d3b3c6c5d5708c8a78a4b6bf) )
-	ROM_LOAD( "ff.6",         0xd000, 0x1000, CRC(a8b17f49) SHA1(aea349bd19d001233bfb1805e586c950275010b4) )
-	ROM_LOAD( "ff.7",         0xe000, 0x1000, CRC(9d2148d7) SHA1(24954d82a09d9fcfdc61e91b7c824daa5dd701c3) )
-	ROM_LOAD( "ff.8",         0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
+	ROM_LOAD( "ff.1",  0x0000, 0x1000, CRC(bcd6b998) SHA1(4a210c40ce6015e2b921558b7571b7f2a27e1815) )
+	ROM_LOAD( "ff.2",  0x1000, 0x1000, CRC(1b1f6953) SHA1(8cd7b7e2236700ce63c60b4d2286099c8091bdbd) )
+	ROM_LOAD( "ff.3",  0x2000, 0x1000, CRC(30008f04) SHA1(e03b2dbcb6d2615650cdd47ecf1d587906ce149b) )
+	ROM_LOAD( "ff.4",  0x3000, 0x1000, CRC(e559aa12) SHA1(0fecfb60b0147e8060c640f684f69503478200ff) )
+	ROM_LOAD( "ff.5",  0xc000, 0x1000, CRC(6459073e) SHA1(78b8a23534826dd2d3b3c6c5d5708c8a78a4b6bf) )
+	ROM_LOAD( "ff.6",  0xd000, 0x1000, CRC(a8b17f49) SHA1(aea349bd19d001233bfb1805e586c950275010b4) )
+	ROM_LOAD( "ff.7",  0xe000, 0x1000, CRC(9d2148d7) SHA1(24954d82a09d9fcfdc61e91b7c824daa5dd701c3) )
+	ROM_LOAD( "ff.8",  0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
 ROM_END
 
 ROM_START( futflasha ) // XBC-101-02-1 + XBC-102-02-1 PCBs. This set shows blue instead of black backgrounds. Seems an earlier release.

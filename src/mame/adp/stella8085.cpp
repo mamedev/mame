@@ -34,6 +34,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 #include "machine/mc146818.h"
 #include "machine/msm6242.h"
 #include "sound/beep.h"
+
 #include "speaker.h"
 
 #include "adpservice.lh"
@@ -41,6 +42,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 
 //#define VERBOSE 1
 #include "logmacro.h"
+
 
 namespace {
 
@@ -52,9 +54,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_uart(*this, "muart"),
 		m_kdc(*this, "kdc"),
+		m_tz(*this, "TZ%u", 0U),
 		m_dsw(*this, "DSW"),
 		m_digits(*this, "digit%u", 0U),
-		m_lamps(*this, "lamp%u", 0U),
+		m_lamps(*this, "lamp%u%u", 0U, 0U),
 		m_beep(*this, "beeper")
 	{ }
 
@@ -73,9 +76,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8256_device> m_uart;
 	required_device<i8279_device> m_kdc;
+	required_ioport_array<8> m_tz;
 	required_ioport m_dsw;
 	output_finder<16> m_digits;
-	output_finder<88> m_lamps;
+	output_finder<8, 8> m_lamps;
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
 
@@ -211,36 +215,10 @@ void stella8085_state::kbd_bd_w(uint8_t data)
 uint8_t stella8085_state::kbd_rl_r()
 {
 	uint8_t ret = 0xff;
-	switch (m_kbd_sl)
-	{
-	case 0:
-		ret = ioport("TZ0")->read();
-		break;
-	case 1:
-		ret = ioport("TZ1")->read();
-		break;
-	case 2:
-		ret = ioport("TZ2")->read();
-		break;
-	case 3:
-		ret = ioport("TZ3")->read();
-		break;
-	case 4:
-		ret = ioport("TZ4")->read();
-		break;
-	case 5:
-		ret = ioport("TZ5")->read();
-		break;
-	case 6:
-		ret = ioport("TZ6")->read();
-		break;
-	case 7:
-		ret = ioport("TZ7")->read();
-		break;
-	default:
-		//LOG("read unmapped line %02x\n", m_kbd_sl);
-		break;
-	}
+	if (m_kbd_sl < 8)
+		ret = m_tz[m_kbd_sl]->read();
+	else
+		LOG("read unmapped line %02x\n", m_kbd_sl);
 	return ret;
 }
 
@@ -250,13 +228,14 @@ void stella8085_state::disp_w(uint8_t data)
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			uint8_t lamp_index = (m_kbd_sl * 10) + i;
 			bool lamp_value = BIT(data, i);
-			m_lamps[lamp_index] = lamp_value;
+			m_lamps[m_kbd_sl][i] = lamp_value;
 		}
 	}
 	else
+	{
 		output_digit(m_kbd_sl, data);
+	}
 }
 
 void stella8085_state::output_digit(uint8_t i, uint8_t data)

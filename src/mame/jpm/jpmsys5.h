@@ -13,10 +13,10 @@
 #include "machine/6850acia.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
-#include "machine/roc10937.h"
 #include "machine/steppers.h"
 #include "sound/upd7759.h"
 #include "sound/ymopl.h"
+#include "video/roc10937.h"
 #include "video/tms34061.h"
 
 #include "emupal.h"

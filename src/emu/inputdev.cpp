@@ -107,7 +107,7 @@ public:
 
 // standard joystick mappings
 const char          input_class_joystick::map_8way[] = "7778...4445";
-const char          input_class_joystick::map_4way_diagonal[] = "4444s8888..444458888.444555888.ss5.222555666.222256666.2222s6666.2222s6666";
+// const char          input_class_joystick::map_4way_diagonal[] = "4444s8888..444458888.444555888.ss5.222555666.222256666.2222s6666.2222s6666";
 // const char          input_class_joystick::map_4way_sticky[] = "s8.4s8.44s8.4445";
 
 
@@ -666,28 +666,6 @@ input_class_lightgun::input_class_lightgun(input_manager &manager)
 input_class_joystick::input_class_joystick(input_manager &manager)
 	: input_class(manager, DEVICE_CLASS_JOYSTICK, "joystick", manager.machine().options().joystick(), true)
 {
-}
-
-
-//-------------------------------------------------
-//  set_global_joystick_map - set the map for all
-//  joysticks
-//-------------------------------------------------
-
-bool input_class_joystick::set_global_joystick_map(const char *mapstring)
-{
-	// parse the map
-	joystick_map map;
-	if (!map.parse(mapstring))
-		return false;
-
-	osd_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string());
-
-	// iterate over joysticks and set the map
-	for (int joynum = 0; joynum <= maxindex(); joynum++)
-		if (device(joynum) != nullptr)
-			downcast<input_device_joystick &>(*device(joynum)).set_joystick_map(map);
-	return true;
 }
 
 

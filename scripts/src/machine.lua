@@ -3083,18 +3083,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/roc10937.h,MACHINES["ROC10937"] = true
----------------------------------------------------
-
-if (MACHINES["ROC10937"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/roc10937.cpp",
-		MAME_DIR .. "src/devices/machine/roc10937.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/rp5c01.h,MACHINES["RP5C01"] = true
 ---------------------------------------------------
 
@@ -5415,21 +5403,5 @@ if (MACHINES["SCI4"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/sci4.cpp",
 		MAME_DIR .. "src/devices/machine/sci4.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/pl6_fpga.h,MACHINES["HEBER_PLUTO"] = true
---@src/devices/machine/pl6_pic.h,MACHINES["HEBER_PLUTO"] = true
----------------------------------------------------
-if (MACHINES["HEBER_PLUTO"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/pl6_fpga.cpp",
-		MAME_DIR .. "src/devices/machine/pl6_fpga.h",
-		MAME_DIR .. "src/devices/machine/pl6_pic.cpp",
-		MAME_DIR .. "src/devices/machine/pl6_pic.h",
-		MAME_DIR .. "src/devices/machine/pl6_exp.cpp",
-		MAME_DIR .. "src/devices/machine/pl6_exp.h",
 	}
 end

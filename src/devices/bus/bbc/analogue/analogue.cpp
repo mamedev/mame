@@ -43,6 +43,7 @@ device_bbc_analogue_interface::device_bbc_analogue_interface(const machine_confi
 bbc_analogue_slot_device::bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBC_ANALOGUE_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_bbc_analogue_interface>(mconfig, *this)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_card(nullptr)
 	, m_lpstb_handler(*this)
 {

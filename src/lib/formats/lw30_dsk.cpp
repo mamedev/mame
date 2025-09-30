@@ -204,10 +204,4 @@ const char *lw30_format::extensions() const noexcept
 	return "img";
 }
 
-bool lw30_format::supports_save() const noexcept
-{
-	// TODO
-	return false;
-}
-
 const lw30_format FLOPPY_LW30_FORMAT;

@@ -680,7 +680,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	case PAGE3:
 		m_bank_ram[3]->set_entry(data);
 		break;
-	
+
 	case COPPER:
 		if (m_copper != nullptr)
 			m_copper->copper_en_w(data);

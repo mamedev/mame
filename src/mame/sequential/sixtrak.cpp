@@ -199,7 +199,7 @@ void sixtrak_state::update_cvs()
 			{
 				m_cvs[voice][m_sh_param] = cv;
 				LOGMASKED(LOG_CV, "CV - voice: %u, param: %u, cv: %f - %03x - %x\n",
-				          voice, m_sh_param, cv, m_dac_value, m_voltage_mux_input);
+						  voice, m_sh_param, cv, m_dac_value, m_voltage_mux_input);
 			}
 		}
 	}
@@ -270,12 +270,12 @@ u8 sixtrak_state::misc_r()
 		if (m_voltage_mux_input == 2)
 		{
 			LOGMASKED(LOG_ADC_VALUE_KNOB, "ADC value - pot v: %f, dac v: %f, comp: %d\n",
-			          get_voltage_mux_out(), get_dac_v(true), d2);
+					  get_voltage_mux_out(), get_dac_v(true), d2);
 		}
 		else if (m_voltage_mux_input == 6)
 		{
 			LOGMASKED(LOG_ADC_PITCH_WHEEL, "ADC pitch - input: %d, pot v: %f, dac v: %f, comp: %d\n",
-			          m_pitch_wheel->read(), get_voltage_mux_out(), get_dac_v(true), d2);
+					  m_pitch_wheel->read(), get_voltage_mux_out(), get_dac_v(true), d2);
 		}
 	}
 

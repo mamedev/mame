@@ -246,6 +246,7 @@ void screen_ula_device::device_add_mconfig(machine_config &config)
 	m_ula_palette_select = 0;
 	m_ulanext_en = 0;
 	m_ulap_en = 0;
+	m_port_ff_reg = 0;
 	m_ula_shadow_en = 0;
 	m_ula_clip_x1 = 0;
 	m_ula_clip_x2 = 255;

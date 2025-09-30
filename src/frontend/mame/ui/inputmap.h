@@ -58,7 +58,6 @@ protected:
 		const device_t *    owner = nullptr;            // pointer to the owner of the item
 		ioport_group        group = IPG_INVALID;        // group type
 		uint8_t             type = 0U;                  // type of port
-		bool                is_optional = false;        // true if this input is considered optional
 	};
 	using data_vector = std::vector<input_item_data>;
 

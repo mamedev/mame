@@ -790,6 +790,7 @@ void bbcm_state::bbcm(machine_config &config)
 	upd7002.eoc_callback().set(m_sysvia, FUNC(via6522_device::write_cb1));
 
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
+	m_analog->set_screen("screen");
 	m_analog->lpstb_handler().set(m_sysvia, FUNC(via6522_device::write_cb2));
 	m_analog->lpstb_handler().append([this](int state) { if (state) m_crtc->assert_light_pen_input(); });
 

@@ -346,36 +346,6 @@ license:CC0-1.0
 		<rect state="0"><bounds x="0" y="0" width="45" height="504" /><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<rect state="1"><bounds x="0" y="0" width="45" height="504" /><color red="0.9" green="0.9" blue="0.9" /></rect>
 	</element>
-	<element name="whitekey-l" defstate="0">
-		<rect state="0"><bounds x="0" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="0" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-m" defstate="0">
-		<rect state="0"><bounds x="13" y="0" width="53" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="13" y="0" width="53" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-lm" defstate="0">
-		<rect state="0"><bounds x="10" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="10" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-rm" defstate="0">
-		<rect state="0"><bounds x="22" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="22" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-r" defstate="0">
-		<rect state="0"><bounds x="34" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="34" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
 	<element name="blackkey" defstate="0">
 		<rect state="0"><bounds x="0" y="0" width="44" height="324" /><color red="0.0" green="0.0" blue="0.0" /></rect>
 		<rect state="0"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
@@ -970,60 +940,60 @@ license:CC0-1.0
 		-->
 
 		<!-- octave 0 -->
+		<element ref="whitekey" inputtag="P1_9" inputmask="0x40"><bounds x="574" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_9" inputmask="0x10"><bounds x="656" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_9" inputmask="0x04"><bounds x="738" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_9" inputmask="0x02"><bounds x="820" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_8" inputmask="0x20"><bounds x="902" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_8" inputmask="0x08"><bounds x="984" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_8" inputmask="0x02"><bounds x="1066" y="504" width="79" height="504" /></element>
 		<element ref="blackkey" inputtag="P1_9" inputmask="0x20"><bounds x="622" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_9" inputmask="0x08"><bounds x="725" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_9" inputmask="0x01"><bounds x="865" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_8" inputmask="0x10"><bounds x="959" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_8" inputmask="0x04"><bounds x="1053" y="504" width="44" height="324" /></element>
-		<element ref="whitekey-l" inputtag="P1_9" inputmask="0x40"><bounds x="574" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-m" inputtag="P1_9" inputmask="0x10"><bounds x="656" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-r" inputtag="P1_9" inputmask="0x04"><bounds x="738" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-l" inputtag="P1_9" inputmask="0x02"><bounds x="820" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="P1_8" inputmask="0x20"><bounds x="902" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="P1_8" inputmask="0x08"><bounds x="984" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-r" inputtag="P1_8" inputmask="0x02"><bounds x="1066" y="504" width="79" height="504" /></element>
 
 		<!-- octave 1 -->
+		<element ref="whitekey" inputtag="P1_8" inputmask="0x01"><bounds x="1148" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_7" inputmask="0x10"><bounds x="1230" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_7" inputmask="0x04"><bounds x="1312" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_7" inputmask="0x02"><bounds x="1394" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_6" inputmask="0x20"><bounds x="1476" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_6" inputmask="0x08"><bounds x="1558" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_6" inputmask="0x02"><bounds x="1640" y="504" width="79" height="504" /></element>
 		<element ref="blackkey" inputtag="P1_7" inputmask="0x20"><bounds x="1196" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_7" inputmask="0x08"><bounds x="1299" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_7" inputmask="0x01"><bounds x="1439" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_6" inputmask="0x10"><bounds x="1533" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_6" inputmask="0x04"><bounds x="1627" y="504" width="44" height="324" /></element>
-		<element ref="whitekey-l" inputtag="P1_8" inputmask="0x01"><bounds x="1148" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-m" inputtag="P1_7" inputmask="0x10"><bounds x="1230" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-r" inputtag="P1_7" inputmask="0x04"><bounds x="1312" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-l" inputtag="P1_7" inputmask="0x02"><bounds x="1394" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="P1_6" inputmask="0x20"><bounds x="1476" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="P1_6" inputmask="0x08"><bounds x="1558" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-r" inputtag="P1_6" inputmask="0x02"><bounds x="1640" y="504" width="79" height="504" /></element>
 
 		<!-- octave 2 -->
+		<element ref="whitekey" inputtag="P1_6" inputmask="0x01"><bounds x="1722" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_5" inputmask="0x10"><bounds x="1804" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_5" inputmask="0x04"><bounds x="1886" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_5" inputmask="0x02"><bounds x="1968" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_4" inputmask="0x20"><bounds x="2050" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_4" inputmask="0x08"><bounds x="2132" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_4" inputmask="0x02"><bounds x="2214" y="504" width="79" height="504" /></element>
 		<element ref="blackkey" inputtag="P1_5" inputmask="0x20"><bounds x="1770" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_5" inputmask="0x08"><bounds x="1873" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_5" inputmask="0x01"><bounds x="2013" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_4" inputmask="0x10"><bounds x="2107" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_4" inputmask="0x04"><bounds x="2201" y="504" width="44" height="324" /></element>
-		<element ref="whitekey-l" inputtag="P1_6" inputmask="0x01"><bounds x="1722" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-m" inputtag="P1_5" inputmask="0x10"><bounds x="1804" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-r" inputtag="P1_5" inputmask="0x04"><bounds x="1886" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-l" inputtag="P1_5" inputmask="0x02"><bounds x="1968" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="P1_4" inputmask="0x20"><bounds x="2050" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="P1_4" inputmask="0x08"><bounds x="2132" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-r" inputtag="P1_4" inputmask="0x02"><bounds x="2214" y="504" width="79" height="504" /></element>
 
 		<!-- octave 3 -->
+		<element ref="whitekey" inputtag="P1_4" inputmask="0x01"><bounds x="2296" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_3" inputmask="0x10"><bounds x="2378" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_3" inputmask="0x04"><bounds x="2460" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_3" inputmask="0x02"><bounds x="2542" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_2" inputmask="0x20"><bounds x="2624" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_2" inputmask="0x08"><bounds x="2706" y="504" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="P1_2" inputmask="0x02"><bounds x="2788" y="504" width="79" height="504" /></element>
 		<element ref="blackkey" inputtag="P1_3" inputmask="0x20"><bounds x="2344" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_3" inputmask="0x08"><bounds x="2447" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_3" inputmask="0x01"><bounds x="2587" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_2" inputmask="0x10"><bounds x="2681" y="504" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="P1_2" inputmask="0x04"><bounds x="2775" y="504" width="44" height="324" /></element>
-		<element ref="whitekey-l" inputtag="P1_4" inputmask="0x01"><bounds x="2296" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-m" inputtag="P1_3" inputmask="0x10"><bounds x="2378" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-r" inputtag="P1_3" inputmask="0x04"><bounds x="2460" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-l" inputtag="P1_3" inputmask="0x02"><bounds x="2542" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="P1_2" inputmask="0x20"><bounds x="2624" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="P1_2" inputmask="0x08"><bounds x="2706" y="504" width="79" height="504" /></element>
-		<element ref="whitekey-r" inputtag="P1_2" inputmask="0x02"><bounds x="2788" y="504" width="79" height="504" /></element>
 
 		<!-- final key -->
 		<element ref="whitekey" inputtag="P1_2" inputmask="0x01"><bounds x="2870" y="504" width="79" height="504" /></element>

@@ -83,7 +83,7 @@ public:
 		m_io_keys(*this, "IN%u", 0U)
 	{ }
 
-	void servicet(machine_config &config);
+	void servicet(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -163,9 +163,9 @@ uint8_t servicet_state::port1_r()
 	// Column-to-Row scanning: When columns (P1.0-P1.2) are driven HIGH
 	for (int col = 0; col < 3; col++)
 	{
-		if (m_port1 & (1 << col)) // Column is driven HIGH
+		if (BIT(m_port1, col)) // Column is driven HIGH
 		{
-			uint8_t keys = m_io_keys[col]->read();
+			uint8_t const keys = m_io_keys[col]->read();
 			data |= (keys & 0x70); // Mask to only row bits (4,5,6)
 		}
 	}
@@ -173,13 +173,13 @@ uint8_t servicet_state::port1_r()
 	// Row-to-Column scanning: When rows (P1.4-P1.6) are driven HIGH
 	for (int row = 0; row < 3; row++)
 	{
-		if (m_port1 & (1 << (row + 4))) // Row is driven HIGH (bits 4,5,6)
+		if (BIT(m_port1, row + 4)) // Row is driven HIGH (bits 4,5,6)
 		{
 			// Check all columns for this row
 			for (int col = 0; col < 3; col++)
 			{
-				uint8_t keys = m_io_keys[col]->read();
-				if (keys & (1 << (row + 4))) // Key pressed in this row
+				uint8_t const keys = m_io_keys[col]->read();
+				if (BIT(keys, row + 4)) // Key pressed in this row
 				{
 					data |= (1 << col); // Set corresponding column bit HIGH
 				}
@@ -199,7 +199,7 @@ uint8_t servicet_state::port3_r()
 {
 	uint8_t data = m_port3;
 
-	uint8_t sda = m_i2cmem->read_sda();
+	uint8_t const sda = m_i2cmem->read_sda();
 
 	// Clear bit 4 (SDA) and insert actual value from EEPROM
 	data = (data & ~(1 << PORT_3_SDA)) | (sda ? (1 << PORT_3_SDA) : 0);
@@ -254,8 +254,8 @@ void servicet_state::bus_w(offs_t offset, uint8_t data)
 	if ((offset & 0x70) == 0x70)
 	{
 		// RS and RW are A1 and A0
-		bool rs = BIT(offset, 1);
-		bool rw = BIT(offset, 0);
+		bool const rs = BIT(offset, 1);
+		bool const rw = BIT(offset, 0);
 
 		if (!rw)
 		{
@@ -291,7 +291,7 @@ void servicet_state::servicet(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(servicet_state::port3_w));
 
 	// I2C EEPROM: 24C16 (2KB) - connected to P3.4 (SDA) and P3.5 (SCL)
-	I2C_24C16(config, "eeprom");
+	I2C_24C16(config, m_i2cmem);
 
 	// LCD4002A
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
