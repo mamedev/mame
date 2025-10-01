@@ -267,35 +267,35 @@ void hng64_state::hng64_sound_port_0080_w(uint16_t data)
 
 void hng64_state::sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	switch(offset*2)
+	switch(offset << 1)
 	{
+		// Data to main CPU
 		case 0x0:
 			COMBINE_DATA(&sound_latch[0]);
 			return;
+		// Latch status to main CPU
 		case 0x2:
 			COMBINE_DATA(&sound_latch[1]);
 			return;
 		case 0xa:
-			/* correct? */
 			m_audiocpu->set_input_line(5, CLEAR_LINE);
-			//if(data)
-			//  logerror("IRQ ACK %02x?\n",data);
 			return;
 	}
-
-	//logerror("SOUND W %02x %04x\n",offset*2,data);
 }
 
 uint16_t hng64_state::sound_comms_r(offs_t offset)
 {
-	switch(offset*2)
+	switch(offset << 1)
 	{
+		case 0x00:
+			return sound_latch[0];
+		case 0x02:
+			return sound_latch[1];
 		case 0x04:
 			return main_latch[0];
 		case 0x06:
 			return main_latch[1];
 	}
-	//logerror("SOUND R %02x\n",offset*2);
 
 	return 0;
 }
