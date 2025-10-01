@@ -80,6 +80,7 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
+	const rgb_t fallback_color = palette().pen_color(0x800);
 	const u16 pen_base = (m_layer2_palette_select ? m_palette_alt_offset : m_palette_base_offset) | (m_palette_offset << 4);
 	const u16 x_min = (((clip.left() - offset_h) >> 1) + m_scroll_x) % info[0];
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
@@ -106,6 +107,11 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 					blend(*(pix + 1), pen, (*(prio + 1) == priority_mask) ? mixer : 0);
 					*(prio + 1) |= prio_color ? 8 : pcode;
 				}
+			}
+			else if (mixer)
+			{
+				*pix = fallback_color;
+				*(pix + 1) = fallback_color;
 			}
 
 			++x %= info[0];
