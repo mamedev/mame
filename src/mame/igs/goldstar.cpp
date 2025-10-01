@@ -5048,6 +5048,164 @@ static INPUT_PORTS_START( wcat3a )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_Z) PORT_NAME("Bet")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_CODE(KEYCODE_B) PORT_NAME("Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )      PORT_CODE(KEYCODE_N) PORT_NAME("Start / Stop All")
+
+	PORT_MODIFY("DSW1")
+	// Min Bet To Start Play (SW1, SW2)
+	PORT_DIPNAME( 0x03, 0x03, "Min Bet To Start Play" )   PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "8" )
+	PORT_DIPSETTING(    0x01, "16" )
+	PORT_DIPSETTING(    0x00, "32" )
+	// Top Left Bonus (SW3, SW4)
+	PORT_DIPNAME( 0x0c, 0x0c, "Top Left Bonus" )          PORT_DIPLOCATION("DSW1:3,4")
+	PORT_DIPSETTING(    0x0c, "1000-2999" )
+	PORT_DIPSETTING(    0x08, "2000-3999" )
+	PORT_DIPSETTING(    0x04, "3000-4999" )
+	PORT_DIPSETTING(    0x00, "4000-5999" )
+	// key out step (SW5)
+	PORT_DIPNAME( 0x10, 0x10,  "key out step" )           PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "100" )
+	// Double Up Game (SW6)
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game" )          PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// Unknown (SW7)
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// Unknown (SW8)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	// Main Game Rate (SW1, SW2, SW3)
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate" )                        PORT_DIPLOCATION("DSW2:!1,!2,!3")
+	PORT_DIPSETTING(    0x07, "45%" )
+	PORT_DIPSETTING(    0x06, "50%" )
+	PORT_DIPSETTING(    0x05, "55%" )
+	PORT_DIPSETTING(    0x04, "60%" )
+	PORT_DIPSETTING(    0x03, "65%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x01, "75%" )
+	PORT_DIPSETTING(    0x00, "80%" )
+	// Pay Out Limit (not confirmed) (SW4, SW5)
+	PORT_DIPNAME( 0x18, 0x18, "Payout Limit (Not confirmed)" )          PORT_DIPLOCATION("DSW2:!4,!5")
+	PORT_DIPSETTING(    0x18, "300" )
+	PORT_DIPSETTING(    0x10, "500" )
+	PORT_DIPSETTING(    0x08, "1000" )
+	PORT_DIPSETTING(    0x00, "No Limit" )
+	// Sound Over 100 Odds (not confirmed) (SW6)
+	PORT_DIPNAME( 0x20, 0x20, "Sound Over 100 Odds (Not confirmed)" )   PORT_DIPLOCATION("DSW2:!6")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	// Unknown (SW7)
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )                      PORT_DIPLOCATION("DSW2:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )   // OFF = Disable
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )    // ON  = Enable
+	// Unknown (SW8)
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )                      PORT_DIPLOCATION("DSW2:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )   // OFF = Disable
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )    // ON  = Enable
+
+	PORT_MODIFY("DSW3")
+	// Coin In Limit (SW1, SW2)
+	PORT_DIPNAME( 0x03, 0x03, "Coin In Limit" ) PORT_DIPLOCATION("DSW3:!1,!2")
+	PORT_DIPSETTING(    0x03, "20000" )  // OFF,OFF
+	PORT_DIPSETTING(    0x02, "10000" )  // OFF,ON
+	PORT_DIPSETTING(    0x01, "5000" )   // ON,OFF
+	PORT_DIPSETTING(    0x00, "1000" )   // ON,ON
+	// Credits Limit (SW3, SW4, SW5)
+	PORT_DIPNAME( 0x1c, 0x18, "Credits Limit" ) PORT_DIPLOCATION("DSW3:!3,!4,!5")
+	PORT_DIPSETTING(    0x1c, "Unlimited" )  // OFF,OFF,OFF
+	PORT_DIPSETTING(    0x18, "100000" )     // OFF,ON,OFF
+	PORT_DIPSETTING(    0x14, "50000" )      // ON,OFF,OFF
+	PORT_DIPSETTING(    0x10, "40000" )      // ON,ON,OFF
+	PORT_DIPSETTING(    0x0c, "30000" )      // OFF,OFF,ON
+	PORT_DIPSETTING(    0x08, "20000" )      // OFF,ON,ON
+	PORT_DIPSETTING(    0x04, "10000" )      // ON,OFF,ON
+	PORT_DIPSETTING(    0x00, "5000" )       // ON,ON,ON
+	// Reels Speed (SW6)
+	PORT_DIPNAME( 0x20, 0x00, "Reels Speed" )   PORT_DIPLOCATION("DSW3:!6")
+	PORT_DIPSETTING(    0x20, "Slow" )   // OFF
+	PORT_DIPSETTING(    0x00, "Fast" )   // ON
+	// Max Bet (SW7, SW8)
+	PORT_DIPNAME( 0xc0, 0x00, "Max Bet" )       PORT_DIPLOCATION("DSW3:!7,!8")
+	PORT_DIPSETTING(    0xc0, "32" )  // OFF,OFF
+	PORT_DIPSETTING(    0x80, "64" )  // OFF,ON
+	PORT_DIPSETTING(    0x40, "72" )  // ON,OFF
+	PORT_DIPSETTING(    0x00, "80" )  // ON,ON
+
+	PORT_MODIFY("DSW4")
+	// Coin Rate (SW1, SW2, SW3, SW4)
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )       PORT_DIPLOCATION("DSW4:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "10 Coins / 1 Credit" )   // ON,ON,ON,ON
+	PORT_DIPSETTING(    0x01, "5 Coins / 1 Credit" )    // OFF,ON,ON,ON
+	PORT_DIPSETTING(    0x02, "5 Coins / 2 Credits" )   // ON,OFF,ON,ON
+	PORT_DIPSETTING(    0x03, "4 Coins / 1 Credit" )    // OFF,OFF,ON,ON
+	PORT_DIPSETTING(    0x04, "3 Coins / 1 Credit" )    // ON,ON,OFF,ON
+	PORT_DIPSETTING(    0x05, "2 Coins / 1 Credit" )    // OFF,ON,OFF,ON
+	PORT_DIPSETTING(    0x06, "2 Coins / 3 Credits" )   // ON,OFF,OFF,ON
+	PORT_DIPSETTING(    0x07, "1 Coin / 1 Credit" )     // OFF,OFF,OFF,ON
+	PORT_DIPSETTING(    0x08, "1 Coin / 2 Credits" )    // ON,ON,ON,OFF
+	PORT_DIPSETTING(    0x09, "1 Coin / 3 Credits" )    // OFF,ON,ON,OFF
+	PORT_DIPSETTING(    0x0a, "1 Coin / 5 Credits" )    // ON,OFF,ON,OFF
+	PORT_DIPSETTING(    0x0b, "1 Coin / 10 Credits" )   // OFF,OFF,ON,OFF
+	PORT_DIPSETTING(    0x0c, "1 Coin / 20 Credits" )   // ON,ON,OFF,OFF
+	PORT_DIPSETTING(    0x0d, "1 Coin / 25 Credits" )   // OFF,ON,OFF,OFF
+	PORT_DIPSETTING(    0x0e, "1 Coin / 50 Credits" )   // ON,OFF,OFF,OFF
+	PORT_DIPSETTING(    0x0f, "1 Coin / 80 Credits" )   // OFF,OFF,OFF,OFF
+
+	// Rotary SW / Wave Level (SW5, SW6, SW7, SW8)
+	PORT_DIPNAME( 0xf0, 0xf0, "Wave Level (Rotary SW)" ) PORT_DIPLOCATION("ROTARY:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "F (Big Wave)" )  // ON,ON,ON,ON
+	PORT_DIPSETTING(    0x10, "E" )             // OFF,ON,ON,ON
+	PORT_DIPSETTING(    0x20, "D" )             // ON,OFF,ON,ON
+	PORT_DIPSETTING(    0x30, "C" )             // OFF,OFF,ON,ON
+	PORT_DIPSETTING(    0x40, "B" )             // ON,ON,OFF,ON
+	PORT_DIPSETTING(    0x50, "A" )             // OFF,ON,OFF,ON
+	PORT_DIPSETTING(    0x60, "9" )             // ON,OFF,OFF,ON
+	PORT_DIPSETTING(    0x70, "8" )             // OFF,OFF,OFF,ON
+	PORT_DIPSETTING(    0x80, "7" )             // ON,ON,ON,OFF
+	PORT_DIPSETTING(    0x90, "6" )             // OFF,ON,ON,OFF
+	PORT_DIPSETTING(    0xa0, "5" )             // ON,OFF,ON,OFF
+	PORT_DIPSETTING(    0xb0, "4" )             // OFF,OFF,ON,OFF
+	PORT_DIPSETTING(    0xc0, "3" )             // ON,ON,OFF,OFF
+	PORT_DIPSETTING(    0xd0, "2" )             // OFF,ON,OFF,OFF
+	PORT_DIPSETTING(    0xe0, "1" )             // ON,OFF,OFF,OFF
+	PORT_DIPSETTING(    0xf0, "0 (Low Wave)" )  // OFF,OFF,OFF,OFF
+
+	PORT_MODIFY("DSW5")
+	// Key In Rate (SW1, SW2, SW3)
+	PORT_DIPNAME( 0x07, 0x07, "Key In Rate" )       PORT_DIPLOCATION("DSW5:1,2,3")
+	PORT_DIPSETTING(    0x00, "5" )       // ON,ON,ON
+	PORT_DIPSETTING(    0x01, "10" )      // OFF,ON,ON
+	PORT_DIPSETTING(    0x02, "20" )      // ON,OFF,ON
+	PORT_DIPSETTING(    0x03, "25" )      // OFF,OFF,ON
+	PORT_DIPSETTING(    0x04, "40" )      // ON,ON,OFF
+	PORT_DIPSETTING(    0x05, "50" )      // OFF,ON,OFF
+	PORT_DIPSETTING(    0x06, "60" )      // ON,OFF,OFF
+	PORT_DIPSETTING(    0x07, "100" )     // OFF,OFF,OFF
+	// Coin A Rate (SW4, SW5, SW6)
+	PORT_DIPNAME( 0x38, 0x00, "Coin A Rate" )       PORT_DIPLOCATION("DSW5:4,5,6")
+	PORT_DIPSETTING(    0x00, "1" )    // ON,ON,ON
+	PORT_DIPSETTING(    0x08, "2" )    // OFF,ON,ON
+	PORT_DIPSETTING(    0x10, "4" )    // ON,OFF,ON
+	PORT_DIPSETTING(    0x18, "5" )    // OFF,OFF,ON
+	PORT_DIPSETTING(    0x20, "6" )    // ON,ON,OFF
+	PORT_DIPSETTING(    0x28, "10" )   // OFF,ON,OFF
+	PORT_DIPSETTING(    0x30, "20" )   // ON,OFF,OFF
+	PORT_DIPSETTING(    0x38, "50" )   // OFF,OFF,OFF
+	// Unknown (SW7)
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW5:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// Unknown (SW8)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW5:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 
