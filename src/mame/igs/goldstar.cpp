@@ -295,6 +295,7 @@
 #include "skillch.lh"
 #include "tonypok.lh"
 #include "unkch.lh"
+#include "wcat3.lh"
 #include "wcat3a.lh"
 
 
@@ -7412,7 +7413,7 @@ static INPUT_PORTS_START( wcat3 )
 	PORT_MODIFY("IN0")  // b800
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 - Black / Stop 1-2-3 / Switch Controls") PORT_IMPULSE(6)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 - Black / Stop 1-2-3 / Switch Controls") PORT_IMPULSE(8)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_C) PORT_NAME("P1 - Double-Up")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_V) PORT_NAME("P1 - Take / Stop All")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("P1 - Bet")
@@ -7422,7 +7423,7 @@ static INPUT_PORTS_START( wcat3 )
 	PORT_MODIFY("IN1")  // b801
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_G) PORT_NAME("P2 - Black / Stop 1-2-3 / Switch Controls") PORT_IMPULSE(6)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_G) PORT_NAME("P2 - Black / Stop 1-2-3 / Switch Controls") PORT_IMPULSE(8)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 - Double-Up")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_CODE(KEYCODE_F) PORT_NAME("P2 - Take / Stop All")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_CODE(KEYCODE_A) PORT_NAME("P2 - Bet")
@@ -27976,8 +27977,8 @@ GAME(  198?, ladylinrb,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME(  198?, ladylinrc,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrc, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            0 )
 GAME(  198?, ladylinrd,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
-GAME( 1992?, wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
-GAME(  1995, wcat3,      0,        wcat3,    wcat3,    wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               0 )
+GAME(  1992, wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
+GAMEL( 1995, wcat3,      0,        wcat3,    wcat3,    wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               0,                     layout_wcat3 )
 GAMEL( 199?, animalw,    0,        animalw,  lucky8t,  wingco_state,   empty_init,     ROT0, "GPS",               "Animal Wonders (ver A900 66)",                             0,                     layout_lucky8p1 )    // DIPs need to be checked
 GAMEL( 199?, animalwbl,  animalw,  lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900, bootleg)",                       0,                     layout_lucky8p1 )    // DIPs need to be checked
 GAMEL( 1989, cb2,        0,        lucky8,   lucky8,   wingco_state,   init_cb2,       ROT0, "Dyna",              "Cherry Bonus II (V2.00 06/01)",                            0,                     layout_lucky8 )
