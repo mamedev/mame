@@ -7406,6 +7406,70 @@ static INPUT_PORTS_START( lucky8t )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( wcat3 )
+	PORT_INCLUDE( lucky8 )
+
+	PORT_MODIFY("IN0")  // b800
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 - Black / Stop 1-2-3 / Switch Controls") PORT_IMPULSE(6)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_C) PORT_NAME("P1 - Double-Up")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_V) PORT_NAME("P1 - Take / Stop All")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("P1 - Bet")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_N) PORT_NAME("P1 - White / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1 - Start")
+
+	PORT_MODIFY("IN1")  // b801
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_G) PORT_NAME("P2 - Black / Stop 1-2-3 / Switch Controls") PORT_IMPULSE(6)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 - Double-Up")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_CODE(KEYCODE_F) PORT_NAME("P2 - Take / Stop All")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_CODE(KEYCODE_A) PORT_NAME("P2 - Bet")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_H) PORT_NAME("P2 - White / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 - Start")
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW3:8")
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW4:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW4:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW4:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW4:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW4:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW4:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW4:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW4:8")
+INPUT_PORTS_END
+
 // TODO: everything
 static INPUT_PORTS_START( superdrg )
 	PORT_START("IN0")  // b800
@@ -25695,6 +25759,9 @@ void wingco_state::init_wcat3()
 
 	m_decrypted_opcodes[0x0000] = 0xc3; // go start address
 
+	m_decrypted_opcodes[0x00fd] = 0x3e; //fe
+	m_decrypted_opcodes[0x00ff] = 0x32; //100,101
+
 	m_decrypted_opcodes[0x0102] = 0x3e; //103
 	m_decrypted_opcodes[0x0104] = 0x32; //105,106
 
@@ -25723,6 +25790,11 @@ void wingco_state::init_wcat3()
 
 	rom[0x0001] = 0x02;  // start adddress
 	rom[0x0002] = 0x01;
+
+	rom[0x00fe] = 0x90;  // PPI2 Init data
+
+	rom[0x0100] = 0x23;  // PPI2 Data load
+	rom[0x0101] = 0xb8;
 
 	rom[0x0103] = 0x9f;  // SN Init data
 	rom[0x0108] = 0xbf;
@@ -27905,7 +27977,7 @@ GAME(  198?, ladylinrc,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME(  198?, ladylinrd,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
 GAME( 1992?, wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
-GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               0 )
+GAME(  1995, wcat3,      0,        wcat3,    wcat3,    wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               0 )
 GAMEL( 199?, animalw,    0,        animalw,  lucky8t,  wingco_state,   empty_init,     ROT0, "GPS",               "Animal Wonders (ver A900 66)",                             0,                     layout_lucky8p1 )    // DIPs need to be checked
 GAMEL( 199?, animalwbl,  animalw,  lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900, bootleg)",                       0,                     layout_lucky8p1 )    // DIPs need to be checked
 GAMEL( 1989, cb2,        0,        lucky8,   lucky8,   wingco_state,   init_cb2,       ROT0, "Dyna",              "Cherry Bonus II (V2.00 06/01)",                            0,                     layout_lucky8 )
