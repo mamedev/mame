@@ -94,10 +94,11 @@ void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const 
 void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bool flash, bitmap_ind8 &priority_bitmap, u8 pcode)
 {
 	const bool hicolor = screen_mode() == 2; // timex hicolor
+	const bool timex_alt = !m_ula_shadow_en && screen_mode() == 1;
 	flash &= !m_ulanext_en && !m_ulap_en;
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
-	const u8 *screen_location = m_host_ram_ptr + ((m_ula_shadow_en ? 7 : 5) << 14);
+	const u8 *screen_location = m_host_ram_ptr + ((m_ula_shadow_en ? 7 : 5) << 14) + (timex_alt ? 0x2000 : 0);
 
 	const u16 x_min = (((clip.left() - m_offset_h) >> 1) + m_ula_scroll_x) % SCREEN_AREA.width();
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)

@@ -1038,6 +1038,7 @@ u8 specnext_state::port_ff_r()
 
 void specnext_state::port_ff_w(u8 data)
 {
+	m_screen->update_now();
 	m_port_ff_data = data; // ==port_ff_dat_tmx
 	m_ula_scr->port_ff_reg_w(m_port_ff_data);
 	nr_6a_lores_radastan_xor_w(m_nr_6a_lores_radastan_xor);
@@ -1972,7 +1973,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
 		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x0100) | (BIT(nr_wr_dat, 0) << 8);
 		line_irq_adjust();
-		m_port_ff_data = (m_port_ff_data & 0xbf) | (BIT(nr_wr_dat, 1) << 6);
+		port_ff_w((m_port_ff_data & 0xbf) | (BIT(nr_wr_dat, 1) << 6));
 		break;
 	case 0x23:
 		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x00ff) | nr_wr_dat;
@@ -2128,7 +2129,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_68_ula_stencil_mode = BIT(nr_wr_dat, 0);
 		break;
 	case 0x69:
-		m_port_ff_data = (m_port_ff_data & 0xc0) | (nr_wr_dat & 0x3f);
+		port_ff_w((m_port_ff_data & 0xc0) | (nr_wr_dat & 0x3f));
 		port_7ffd_reg_w((m_port_7ffd_data & ~0x08) | (BIT(nr_wr_dat, 6) << 3));
 		port_123b_layer2_en_w(BIT(nr_wr_dat, 7));
 		break;
@@ -2291,7 +2292,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_c4_int_en_0_expbus = BIT(nr_wr_dat, 7);
 		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
 		line_irq_adjust();
-		m_port_ff_data = (m_port_ff_data & 0xbf) | (BIT(~nr_wr_dat, 0) << 6);
+		port_ff_w((m_port_ff_data & 0xbf) | (BIT(~nr_wr_dat, 0) << 6));
 		break;
 	case 0xc5:
 		{
