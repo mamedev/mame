@@ -6986,11 +6986,20 @@ void drcbe_x86::op_fcmp(Assembler &a, const instruction &inst)
 	be_parameter src2p(*this, inst.param(1), PTYPE_MF);
 
 	// general case
-	emit_fld_p(a, inst.size(), src2p);                                                  // fld   src2p
-	emit_fld_p(a, inst.size(), src1p);                                                  // fld   src1p
-	a.fcompp();                                                                         // fcompp
-	a.fnstsw(ax);                                                                       // fnstsw ax
-	a.sahf();                                                                           // sahf
+	emit_fld_p(a, inst.size(), src2p);
+	emit_fld_p(a, inst.size(), src1p);
+	a.fcomip(st1);
+	a.fstp(st0);
+
+	// clear Z and C if unordered
+	Label ordered = a.newLabel();
+
+	a.short_().jnp(ordered);
+	a.lahf();
+	a.and_(eax, 0x00003e00);
+	a.sahf();
+
+	a.bind(ordered);
 }
 
 

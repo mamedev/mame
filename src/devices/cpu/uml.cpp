@@ -140,13 +140,13 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	// Control Flow Operations
 	OPINFO0(NOP,     "nop",      4,   false, NONE, NONE, NONE)
 	OPINFO1(DEBUG,   "debug",    4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY)) // MAME debugger breakpoint
-	OPINFO0(BREAK,   "break",    4,   false, NONE, NONE, NONE) // (for debugging) Issues a breakpoint exception to allow for debugging the generated assembly
+	OPINFO0(BREAK,   "break",    4,   false, NONE, NONE, ALL) // (for debugging) Issues a breakpoint exception to allow for debugging the generated assembly
 	OPINFO1(EXIT,    "exit",     4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, IANY))
 	OPINFO3(HASHJMP, "hashjmp",  4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, HANDLE))
 	OPINFO1(JMP,     "jmp",      4,   true,  NONE, NONE, NONE, PINFO(IN, OP, LABEL))
 	OPINFO2(EXH,     "exh",      4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, HANDLE), PINFO(IN, OP, IANY)) // Call exception handler
 	OPINFO1(CALLH,   "callh",    4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, HANDLE)) // Call handle
-	OPINFO0(RET,     "ret",      4,   true,  NONE, NONE, ALL)
+	OPINFO0(RET,     "ret",      4,   true,  NONE, NONE, NONE)
 	OPINFO2(CALLC,   "callc",    4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, CFUNC), PINFO(IN, OP, PTR)) // Call C function
 	OPINFO2(RECOVER, "recover",  4,   false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, MVAR)) // Get value from mapvar
 
@@ -160,15 +160,15 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO1(RESTORE, "restore",  4,   false, NONE, ALL,  ALL,  PINFO(IN, OP, STATE)) // Load saved state from drcuml_machine_state
 
 	// Integer Operations
-	OPINFO4(LOAD,    "!load",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSIZE)) // Load unsigned value from specified memory location
-	OPINFO4(LOADS,   "!loads",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSIZE)) // Load signed value from specified memory location
-	OPINFO4(STORE,   "!store",   4|8, false, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SCSIZE)) // Store value to specified memory location
+	OPINFO4(LOAD,    "!load",    4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSIZE)) // Load unsigned value from specified memory location
+	OPINFO4(LOADS,   "!loads",   4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSIZE)) // Load signed value from specified memory location
+	OPINFO4(STORE,   "!store",   4|8, false, NONE, NONE, NONE, PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SCSIZE)) // Store value to specified memory location
 	OPINFO3(READ,    "!read",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSIZE)) // Read memory from emulated machine using memory space reader
 	OPINFO4(READM,   "!readm",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSIZE)) // Read memory from emulated machine using memory space reader (masked)
 	OPINFO3(WRITE,   "!write",   4|8, false, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSIZE)) // Write to emulated machine's memory using memory space writer
 	OPINFO4(WRITEM,  "!writem",  4|8, false, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSIZE)) // Write to emulated machine's memory using memory space writer (masked)
 	OPINFO2(CARRY,   "!carry",   4|8, false, NONE, C,    ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Set carry status flag on CPU
-	OPINFO1(SET,     "!set",     4|8, true,  NONE, NONE, ALL,  PINFO(OUT, OP, IRM)) // Get the state of the specified condition (e.g. calling UML_SET with COND_NZ will return 0 if the condition is not met and 1 if the condition is met)
+	OPINFO1(SET,     "!set",     4|8, true,  NONE, NONE, NONE, PINFO(OUT, OP, IRM)) // Get the state of the specified condition (e.g. calling UML_SET with COND_NZ will return 0 if the condition is not met and 1 if the condition is met)
 	OPINFO2(MOV,     "!mov",     4|8, true,  NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
 	OPINFO3(SEXT,    "!sext",    4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
 	OPINFO4(ROLAND,  "!roland",  4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Rotate left + AND (see drcbec.cpp for implementation)
@@ -200,8 +200,8 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO3(RORC,    "!rorc",    4|8, false, C,    SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 
 	// Floating Point Operations
-	OPINFO3(FLOAD,   "f#load",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY)) // Load float/double value from specified memory location
-	OPINFO3(FSTORE,  "f#store",  4|8, false, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, FRM)) // Save float/double value to specified memory location
+	OPINFO3(FLOAD,   "f#load",   4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY)) // Load float/double value from specified memory location
+	OPINFO3(FSTORE,  "f#store",  4|8, false, NONE, NONE, NONE, PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, FRM)) // Save float/double value to specified memory location
 	OPINFO3(FREAD,   "f#read",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSIZE)) // Read float/double value from emulated machine using memory space reader
 	OPINFO3(FWRITE,  "f#write",  4|8, false, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, FANY), PINFO(IN, OP, SPSIZE)) // Write float/double value to emulated machine using memory space writer
 	OPINFO2(FMOV,    "f#mov",    4|8, true,  NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
@@ -211,7 +211,7 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO2(FRNDS,   "f#rnds",     8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY)) // Convert double to float and then back to double, or float to double and back to float
 	OPINFO3(FADD,    "f#add",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
 	OPINFO3(FSUB,    "f#sub",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
-	OPINFO2(FCMP,    "f#cmp",    4|8, false, NONE, UZC,  ALL,  PINFO(IN, OP, FANY), PINFO(IN, OP, FANY)) // Note: status flags except FLAG_U are undefined when comparing with NaN
+	OPINFO2(FCMP,    "f#cmp",    4|8, false, NONE, UZC,  ALL,  PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
 	OPINFO3(FMUL,    "f#mul",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
 	OPINFO3(FDIV,    "f#div",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
 	OPINFO2(FNEG,    "f#neg",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))

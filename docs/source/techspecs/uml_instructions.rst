@@ -14,16 +14,16 @@ Introduction
 ------------
 
 UML is the instruction set used by MAME’s recompiler framework.
-Front-ends translate code running on the guest CPUs to UML instructions,
+Code running on emulated guest CPUs is translated to UML instructions,
 and back-ends convert the UML instructions to a form that can be
 executed or interpreted on the host system.
 
-Many UML instruction have multiple instruction sizes.  Integer instructions
-default to 32-bit size.  Adding a ``D`` or ``d`` prefix to the mnemonic changes
-to 64-bit size (double word).  Floating point instructions use the mnemonic
-prefix/suffix ``FS`` or ``fs`` for IEEE 754 32-bit format (single precision) or
-or the prefix/suffix ``FD`` or ``fd`` for IEEE 754 64-bit format (double
-precision).
+Many UML instruction have multiple instruction sizes.  Integer
+instructions default to 32-bit size.  Adding a ``D`` or ``d`` prefix to
+the mnemonic changes to 64-bit size (double word).  Floating point
+instructions use the mnemonic prefix/suffix ``FS`` or ``fs`` for
+IEEE 754 32-bit format (single precision) or or the prefix/suffix ``FD``
+or ``fd`` for IEEE 754 64-bit format (double precision).
 
 
 .. _umlinst-special:
@@ -708,6 +708,11 @@ sign (S)
 unordered (U)
     Undefined.
 
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
 
 .. _umlinst-control:
 
@@ -753,6 +758,11 @@ sign (S)
     Unchanged.
 unordered (U)
     Unchanged.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
 
 .. _umlinst-carry:
 
@@ -842,6 +852,11 @@ sign (S)
 unordered (U)
     Undefined.
 
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
 .. _umlinst-getfmod:
 
 GETFMOD
@@ -886,6 +901,11 @@ sign (S)
     Undefined.
 unordered (U)
     Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
 
 
 .. _umlinst-datamove:
@@ -3103,7 +3123,7 @@ Simplification rules
 .. _umlinst-rolc:
 
 ROLC
-^^^^
+~~~~
 
 Rotate an integer value concatenated with the carry flag to the left
 (toward the most significant bit position).  For each step, the carry
@@ -3174,7 +3194,7 @@ Simplification rules
 .. _umlinst-rorc:
 
 RORC
-^^^^
+~~~~
 
 Rotate an integer value concatenated with the carry flag to the right
 (toward the least significant bit position).  For each step, the carry
@@ -3241,6 +3261,85 @@ Simplification rules
   sign flags are not required.
 * Immediate values for the ``src`` operand are truncated to the
   instruction size.
+* Immediate values for the ``count`` operand are truncated to five or
+  six bits for 32-bit or 64-bit operands, respectively.
+
+.. _umlinst-roland:
+
+ROLAND
+~~~~~~
+
+Rotate and mask an integer value.  The value is rotated to the left
+(toward the most significant bit position).  Bits shifted out of the
+most significant bit position are shifted into the least significant bit
+position.  The logical conjunction of the rotated value and the mask is
+then calculated.
+
++--------------------------------+------------------------------------------------+
+| Disassembly                    | Usage                                          |
++================================+================================================+
+| .. code-block::                | .. code-block:: C++                            |
+|                                |                                                |
+|     roland  dst,src,count,mask |     UML_ROLAND(block, dst, src, count, mask);  |
+|     droland dst,src,count,mask |     UML_DROLAND(block, dst, src, count, mask); |
++--------------------------------+------------------------------------------------+
+
+Sets ``dst`` to the logical conjunction of the value of ``src`` rotated
+left by ``count`` bit positions and the value of ``mask``.
+
+Back-ends may be able to optimise some forms of this instruction, for
+example when the ``count`` and ``mask`` operands are both immediate
+values.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the rotated and masked value will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to be rotated and masked.
+count (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The number of bit positions to rotate by.  Only the least
+    significant five bits or six bits of this operand are used,
+    depending on the instruction size.
+mask (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The mask to calculate the logical conjunction with.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src`` and ``count`` operands are both
+  immediate values, or if either the ``count`` or ``mask`` operand is
+  the immediate value zero.
+* Converted to :ref:`ROL <umlinst-rol>` if the ``mask`` operand is an
+  immediate value with all bits set.
+* Converted to :ref:`SHL <umlinst-shl>` if the ``count`` operand is an
+  immediate value and the ``mask`` operand is an immediate value
+  containing a single contiguous left-aligned sequence of set bits of
+  the appropriate length for the value of the ``count`` operand.
+* Converted to :ref:`SHR <umlinst-shr>` if the ``count`` operand is an
+  immediate value and the ``mask`` operand is an immediate value
+  containing a single contiguous right-aligned sequence of set bits of
+  the appropriate length for the value of the ``count`` operand.
+* Immediate values for the ``src`` and ``mask`` operands are truncated
+  to the instruction size.
 * Immediate values for the ``count`` operand are truncated to five or
   six bits for 32-bit or 64-bit operands, respectively.
 

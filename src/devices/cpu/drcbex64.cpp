@@ -1545,29 +1545,40 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 	// caller must place non-immediate shift in ECX
 	// FIXME: upper bits may not be cleared for 32-bit form when shift count is zero
 	const bool carryin = (opcode == Inst::kIdRcl) || (opcode == Inst::kIdRcr);
+	const bool rotate = carryin || (opcode == Inst::kIdRol) || (opcode == Inst::kIdRor);
 
 	if (param.is_immediate())
 	{
 		const uint32_t bitshift = param.immediate() & (opsize * 8 - 1);
 
 		if (bitshift)
-			a.emit(opcode, dst, imm(param.immediate()));
-		else if (!carryin && (update_flags & FLAG_C))
-			a.clc(); // throw away carry since it'll never be used
-
-		if (update_flags & (FLAG_S | FLAG_Z))
 		{
-			if (update_flags & FLAG_C)
-				calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
-			else if (dst.isMem())
+			a.emit(opcode, dst, imm(param.immediate()));
+
+			if (rotate && (update_flags & (FLAG_S | FLAG_Z)))
+			{
+				if (update_flags & FLAG_C)
+					calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
+				else if (dst.isMem())
+					a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
+				else
+					a.test(dst.as<Gp>(), dst.as<Gp>());
+			}
+		}
+		else if (update_flags)
+		{
+			if (!carryin && !(update_flags & (FLAG_S | FLAG_Z)))
+				a.clc(); // throw away carry since it'll never be used
+			else if ((!carryin || !(update_flags & FLAG_C)) && dst.isMem())
 				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
-			else
+			else if (!carryin || !(update_flags & FLAG_C))
 				a.test(dst.as<Gp>(), dst.as<Gp>());
+			else if (update_flags & (FLAG_S | FLAG_Z))
+				calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
 		}
 	}
 	else if (update_flags || carryin)
 	{
-		// TODO: flag update could be optimised
 		Label end;
 
 		const Gp shift = ecx;
@@ -1586,8 +1597,12 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 			if (carryin)
 				a.shr(r10b, 1); // restore carry for rolc/rorc
-			else if (update_flags & FLAG_C)
+			else if (!(update_flags & ~FLAG_C))
 				a.clc(); // throw away carry since it'll never be used
+			else if (dst.isMem())
+				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
+			else
+				a.test(dst.as<Gp>(), dst.as<Gp>());
 
 			a.short_().jmp(end);
 
@@ -1599,10 +1614,10 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		a.emit(opcode, dst, cl);
 
-		if ((update_flags & FLAG_C) || carryin)
+		if (carryin)
 			a.bind(end);
 
-		if (update_flags & (FLAG_S | FLAG_Z))
+		if ((rotate || !(update_flags & FLAG_C)) && (update_flags & (FLAG_S | FLAG_Z)))
 		{
 			if (update_flags & FLAG_C)
 				calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
@@ -1611,6 +1626,9 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 			else
 				a.test(dst.as<Gp>(), dst.as<Gp>());
 		}
+
+		if ((update_flags & FLAG_C) && !carryin)
+			a.bind(end);
 	}
 	else
 	{
@@ -5586,21 +5604,31 @@ void drcbe_x64::op_fcmp(Assembler &a, const instruction &inst)
 	if (inst.size() == 4)
 	{
 		// 32-bit form
-		movss_r128_p32(a, src1reg, src1p);                                              // movss src1reg,src1p
+		movss_r128_p32(a, src1reg, src1p);
 		if (src2p.is_memory())
-			a.comiss(src1reg, MABS(src2p.memory()));                                    // comiss src1reg,[src2p]
+			a.comiss(src1reg, MABS(src2p.memory()));
 		else if (src2p.is_float_register())
-			a.comiss(src1reg, Xmm(src2p.freg()));                                       // comiss src1reg,src2p
+			a.comiss(src1reg, Xmm(src2p.freg()));
 	}
 	else if (inst.size() == 8)
 	{
 		// 64-bit form
-		movsd_r128_p64(a, src1reg, src1p);                                              // movsd src1reg,src1p
+		movsd_r128_p64(a, src1reg, src1p);
 		if (src2p.is_memory())
-			a.comisd(src1reg, MABS(src2p.memory()));                                    // comisd src1reg,[src2p]
+			a.comisd(src1reg, MABS(src2p.memory()));
 		else if (src2p.is_float_register())
-			a.comisd(src1reg, Xmm(src2p.freg()));                                       // comisd src1reg,src2p
+			a.comisd(src1reg, Xmm(src2p.freg()));
 	}
+
+	// clear Z and C if unordered
+	Label ordered = a.newLabel();
+
+	a.short_().jnp(ordered);
+	a.lahf();
+	a.and_(eax, 0x00003e00);
+	a.sahf();
+
+	a.bind(ordered);
 }
 
 
