@@ -5,6 +5,8 @@
     Skeleton driver for Compumatic dart board with LED display.
 
 **************************************************************************
+
+PCB layout for regular Compumatic Microdard PCB:
 _______________________________
 |__  ________________________  |
 ||C| |_CN____________________| |
@@ -52,9 +54,10 @@ IC5 = Hitachi HD74HC08P
 IC6 = Hitachi HD74HC138P
 IC4 = LGS GM76C88ALK-15
 IC3 = Winbond W29EE011-15
-IC2 = Hitachi HD74HC373P
-IC2 = Hitachi HD74HC373P
-IC10 = Hitachi HD74HC244P
+IC2, IC10 = Hitachi HD74HC373P
+IC9 = Hitachi HD74HC244P
+IC13 = 74HC273N
+IC14 = LM358P
 
 **************************************************************************
 
@@ -75,7 +78,7 @@ ________________________________________________________________________________
 |  NO   | Western Darts       | unknown           | Standard Microdar with Philips REF34VA                              | Darts                      |
 |  NO   | Diamant             | unknown           | Newer PCB with Philips REF34VA and additional Compumatic custom ICs | Darts                      |
 |  NO   | Tiger Dart          | unknown           | Standard Microdar SPD with Philips REF34VA                          | Darts                      |
-|  NO   | Champion            | unknown           | ProSPDP PCB. https://www.recreativas.org/champion-6137-compumatic   | Darts                      |
+|  YES  | Champion            | Compumatic        | Superdard/Plus-N PCB with Philips REF34VA                           | Darts                      |
 |  NO   | Paradise Dart Sport | unknown           | Standard Microdar SPD with RE34VA (without Philips logo)            | Darts                      |
 |_______|_____________________|___________________|_____________________________________________________________________|____________________________|
 
@@ -396,7 +399,7 @@ ROM_START(cfarwest)
 ROM_END
 
 
-/** Compumatic Minidart.
+/* Compumatic Minidart.
  Microdar V6 PCB. 24MHz xtal. Atmel AT89S51 intead of the usual REF34VA and a custom chip labeled "Toronto 2707"
  (but referred as REF0097 on the manual) instead of the REF0096.
 */
@@ -415,6 +418,21 @@ ROM_START(minidart)
 	ROM_LOAD("atf16v8b.ic4", 0x000, 0x117, NO_DUMP)
 ROM_END
 
+/* Compumatic Champion (Compumatic Superdard/Plus-N PCB).
+ More info and schematics: https://www.recreativas.org/champion-6137-compumatic
+ The PCB layout is slighly different than the one shown on the manual (it's like
+ a standard Microdard PCB, but with an additional test switch).
+*/
+ROM_START(cchampion)
+	// Philips REF34VA K0V951
+	PHILIPS_REF34VA
+
+	ROM_REGION(0x20000, "program", 0)
+	ROM_LOAD("7.71_f29c51001t.ic3", 0x00000, 0x20000, CRC(19b89baf) SHA1(f92614d47dd835e2669f6bc21568d035e84c93ed)) // COMPUMATIC RESEARCH S.L. (c) 1997 0/2
+
+	ROM_REGION(0x800, "eeprom", 0)
+	ROM_LOAD("24lc16b.ic8", 0x000, 0x800, NO_DUMP)
+ROM_END
 
 /* Compumatic Microdard-V5 PCB
    _______________________________________________________________________________
@@ -505,6 +523,7 @@ GAME(199?, dibifuca,   0,        microdar,  microdar, microdar_state, empty_init
 GAME(199?, dibif743,   dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.43)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(199?, dibif727,   dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1997, dibifpspdp, dibifuca, prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (unknown version, ProSPDP based)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, cchampion,  0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Champion (darts machine, v7.71)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1997, cfarwest,   0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1997, diolakoa,   0,        microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1997, diola827,   diolakoa, microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
