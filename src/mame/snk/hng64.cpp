@@ -1168,7 +1168,7 @@ void hng64_state::main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_
 			{
 				m_audiocpu->set_input_line(5, ASSERT_LINE);
 				// let the V53 catch up
-				m_maincpu->spin_until_time(attotime::from_usec(150));
+				m_maincpu->spin_until_time(attotime::from_usec(5));
 			}
 			break;
 		default:
