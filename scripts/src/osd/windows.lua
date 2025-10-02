@@ -36,6 +36,7 @@ function maintargetosdoptions(_target,_subtarget)
 		"psapi",
 		"shlwapi",
 		"uuid",
+		"setupapi"
 	}
 end
 
