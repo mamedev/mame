@@ -93,6 +93,7 @@ public:
 		
 		HRESULT result = get_xinput_devices(xinput_deviceids);
 		if (result != 0)
+		{
 			xinput_detect_failed = true;
 			xinput_deviceids.clear();
 			osd_printf_warning("XInput device detection failed. XInput won't be used. Error: 0x%X\n", uint32_t(result));
