@@ -5,9 +5,10 @@
 Amstrad MegaPC
 
 TODO:
-- MD portion;
-- chipset not extensively tested (assume broken as per pc/teradrive.cpp);
+- MD ISA8 portion (including sharing of OPN as adlib compatible, needs PAL mods for YM7101);
+- chipset not extensively tested (assume incomplete as per pc/teradrive.cpp);
 - megapcpl: floppy boot loading fails even if CMOS is setup properly;
+- front panel slide (MD on left, PC on right. Determines what is driving the monitor);
 
 **************************************************************************************************/
 
@@ -149,9 +150,10 @@ void megapc_state::megapc(machine_config &config)
 	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
 	// WD90C11A-LR
 	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "wd90c11_lr", true);
-	// TODO: motherboard ISA resource for MD portion
+	// TODO: motherboard ISA resource for MD portion (8-bit slot?)
 	// (doesn't share anything with base except drawing power)
-	// ISA cards
+	// TODO: reuses MD sound chip as Adlib-compatible sound card
+
 	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, nullptr, false);
 
 	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));

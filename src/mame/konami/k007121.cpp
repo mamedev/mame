@@ -16,7 +16,7 @@ ROM is 0x80000 bytes (addressed 16 bits at a time). Tile and sprite data both
 come from the same ROM space. Like the 005885, external circuitry can cause
 tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
 
-The chip will render a maximum of 264 64-pixel sprite blocks, presumably one
+The chip will process a maximum of 264 64-pixel sprite blocks, presumably one
 per scanline. There is no limit on the number of sprites, including per-scanline,
 other than bumping into the 264 sprite block limit. Games often append 17
 off-screen 32x32 sprites after their active sprite list so they bump into the
@@ -153,12 +153,15 @@ k007121_device::k007121_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K007121, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
+	, m_spr_dx(0)
+	, m_spr_flip_dx(0)
 	, m_flipscreen(false)
 	, m_spriteram(nullptr)
 	, m_flipscreen_cb(*this)
 	, m_irq_cb(*this)
 	, m_firq_cb(*this)
 	, m_nmi_cb(*this)
+	, m_sprite_cb(*this)
 {
 }
 
@@ -168,6 +171,8 @@ k007121_device::k007121_device(const machine_config &mconfig, const char *tag, d
 
 void k007121_device::device_start()
 {
+	m_sprite_cb.resolve();
+
 	save_item(NAME(m_ctrlram));
 	save_item(NAME(m_scrollram));
 	save_item(NAME(m_flipscreen));
@@ -251,8 +256,7 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
  *
  */
 
-void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect,
-		int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
+void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
 	// maximum number of 64-pixel sprite blocks that can be drawn
 	constexpr int MAX_SPRITE_BLOCKS = 264;
@@ -267,7 +271,7 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 	int sprite_blocks = 0;
 	while (sprite_blocks < MAX_SPRITE_BLOCKS)
 	{
-		int attr = source[(num_sprites * SPRITE_FORMAT_SIZE) + 4];
+		const int attr = source[(num_sprites * SPRITE_FORMAT_SIZE) + 4];
 		switch (attr & 0xe)
 		{
 			case 0x06:
@@ -302,35 +306,35 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 	for (int i = 0; i < num_sprites; i++)
 	{
 		int number = source[0];
-		int sprite_bank = source[1] & 0x0f;
+		const int sprite_bank = source[1] & 0x0f;
 		int sx = source[3];
 		int sy = source[2];
-		int attr = source[4];
-		int xflip = source[4] & 0x10;
-		int yflip = source[4] & 0x20;
-		int color = base_color + ((source[1] & 0xf0) >> 4);
-		int width, height;
-		int transparent_mask;
+		const int attr = source[4];
+		const bool xflip = BIT(source[4], 4);
+		const bool yflip = BIT(source[4], 5);
+		int color = (source[1] & 0xf0) >> 4;
 		static const int x_offset[4] = { 0x0, 0x1, 0x4, 0x5 };
 		static const int y_offset[4] = { 0x0, 0x2, 0x8, 0xa };
-		int flipx, flipy, destx, desty;
 
 		if (attr & 0x01) sx -= 256;
 		if (sy >= 240) sy -= 256;
-		sx += global_x_offset;
+		sx += m_flipscreen ? m_spr_flip_dx : m_spr_dx;
 
 		number += ((sprite_bank & 0x3) << 8) + ((attr & 0xc0) << 4);
 		number = number << 2;
 		number += (sprite_bank >> 2) & 3;
 
+		if (!m_sprite_cb.isnull())
+			m_sprite_cb(number, color, (m_ctrlram[6] & 0x30) << 1);
+
+		int transparent_mask;
 		// Flak Attack doesn't use a lookup PROM, it maps the color code directly to a palette entry
 		if (palette().indirect_entries() == 0)
 			transparent_mask = 1 << 0;
 		else
 			transparent_mask = palette().transpen_mask(*gfx(0), color, 0);
 
-		number += bank_base;
-
+		int width, height;
 		switch (attr & 0xe)
 		{
 			case 0x06:
@@ -367,9 +371,11 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			for (int x = 0; x < width; x++)
 			{
-				int ex = xflip ? (width - 1 - x) : x;
-				int ey = yflip ? (height - 1 - y) : y;
+				const int ex = xflip ? (width - 1 - x) : x;
+				const int ey = yflip ? (height - 1 - y) : y;
 
+				bool flipx, flipy;
+				int destx, desty;
 				if (m_flipscreen)
 				{
 					flipx = !xflip;

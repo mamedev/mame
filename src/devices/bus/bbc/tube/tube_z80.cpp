@@ -8,18 +8,86 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "tube_z80.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/tube.h"
+
 #include "softlist_dev.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(BBC_TUBE_Z80, bbc_tube_z80_device, "bbc_tube_z80", "Acorn Z80 2nd Processor")
-DEFINE_DEVICE_TYPE(BBC_TUBE_Z80W, bbc_tube_z80w_device, "bbc_tube_z80w", "Acorn Z80 2nd Processor (Winchester)")
+// ======================> bbc_tube_z80_device
+
+class bbc_tube_z80_device : public device_t, public device_bbc_tube_interface
+{
+public:
+	bbc_tube_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_tube_z80_device(mconfig, BBC_TUBE_Z80, tag, owner, clock)
+	{
+	}
+
+protected:
+	bbc_tube_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
+		, device_bbc_tube_interface(mconfig, *this)
+		, m_z80(*this, "z80")
+		, m_ula(*this, "ula")
+		, m_rom(*this, "rom")
+		, m_rom_enabled(true)
+	{
+	}
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual uint8_t host_r(offs_t offset) override;
+	virtual void host_w(offs_t offset, uint8_t data) override;
+
+private:
+	IRQ_CALLBACK_MEMBER( irq_callback );
+
+	required_device<z80_device> m_z80;
+	required_device<tube_device> m_ula;
+	required_memory_region m_rom;
+
+	std::unique_ptr<uint8_t[]> m_ram;
+
+	bool m_rom_enabled;
+
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
+	uint8_t opcode_r(offs_t offset);
+
+	void tube_z80_fetch(address_map &map) ATTR_COLD;
+	void tube_z80_io(address_map &map) ATTR_COLD;
+	void tube_z80_mem(address_map &map) ATTR_COLD;
+
+	void prst_w(int state);
+};
+
+
+// ======================> bbc_tube_z80w_device
+
+class bbc_tube_z80w_device : public bbc_tube_z80_device
+{
+public:
+	bbc_tube_z80w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_tube_z80_device(mconfig, BBC_TUBE_Z80W, tag, owner, clock)
+	{
+	}
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
 
 
 //-------------------------------------------------
@@ -49,8 +117,9 @@ void bbc_tube_z80_device::tube_z80_io(address_map &map)
 	map(0x00, 0x07).mirror(0xff00).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w));
 }
 
+
 //-------------------------------------------------
-//  ROM( tube_z80 )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START( tube_z80 )
@@ -64,6 +133,17 @@ ROM_START( tube_z80w )
 	ROM_SYSTEM_BIOS(0, "200", "Z80 v2.00") /* supplied with Acorn Business Computer */
 	ROMX_LOAD("z80_200.rom", 0x0000, 0x1000, CRC(84672c3d) SHA1(47211cead3a1b0f9830dcdef8e54e29522c69bf8), ROM_BIOS(0))
 ROM_END
+
+const tiny_rom_entry *bbc_tube_z80_device::device_rom_region() const
+{
+	return ROM_NAME( tube_z80 );
+}
+
+const tiny_rom_entry *bbc_tube_z80w_device::device_rom_region() const
+{
+	return ROM_NAME( tube_z80w );
+}
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -82,51 +162,9 @@ void bbc_tube_z80_device::device_add_mconfig(machine_config &config)
 	m_ula->pirq_handler().set_inputline(m_z80, INPUT_LINE_IRQ0);
 	m_ula->prst_handler().set(FUNC(bbc_tube_z80_device::prst_w));
 
-	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_z80").set_original("bbc_flop_z80");
 }
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *bbc_tube_z80_device::device_rom_region() const
-{
-	return ROM_NAME( tube_z80 );
-}
-
-const tiny_rom_entry *bbc_tube_z80w_device::device_rom_region() const
-{
-	return ROM_NAME( tube_z80w );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_tube_z80_device - constructor
-//-------------------------------------------------
-
-bbc_tube_z80_device::bbc_tube_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_bbc_tube_interface(mconfig, *this)
-	, m_z80(*this, "z80")
-	, m_ula(*this, "ula")
-	, m_rom(*this, "rom")
-	, m_rom_enabled(true)
-{
-}
-
-bbc_tube_z80_device::bbc_tube_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_tube_z80_device(mconfig, BBC_TUBE_Z80, tag, owner, clock)
-{
-}
-
-bbc_tube_z80w_device::bbc_tube_z80w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_tube_z80_device(mconfig, BBC_TUBE_Z80W, tag, owner, clock)
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -212,3 +250,9 @@ IRQ_CALLBACK_MEMBER(bbc_tube_z80_device::irq_callback)
 {
 	return 0xfe;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_Z80, device_bbc_tube_interface, bbc_tube_z80_device, "bbc_tube_z80", "Acorn Z80 2nd Processor")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_Z80W, device_bbc_tube_interface, bbc_tube_z80w_device, "bbc_tube_z80w", "Acorn Z80 2nd Processor (Winchester)")

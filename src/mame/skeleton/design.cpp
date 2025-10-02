@@ -20,6 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/74259.h"
@@ -28,7 +29,7 @@
 #include "machine/msm5832.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
-#include "machine/roc10937.h"
+#include "video/roc10937.h"
 
 #include "design6.lh"
 

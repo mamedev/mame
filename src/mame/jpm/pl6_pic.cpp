@@ -12,8 +12,8 @@
 
 #define LOGPIC(...)     LOGMASKED(LOG_PIC,     __VA_ARGS__)
 
-pl6pic_device::pl6pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HEBER_PLUTO6_PIC, tag, owner, clock),
+pl6pic_device::pl6pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, HEBER_PLUTO6_PIC, tag, owner, clock),
 	i2c_hle_interface(mconfig, *this, 0xc0),
 	device_rtc_interface(mconfig, *this),
 	m_timer(nullptr),

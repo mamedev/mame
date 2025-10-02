@@ -225,7 +225,6 @@ void supertnk_state::video_start()
 	for (offs_t i = 0; i < NUM_PENS; i++)
 	{
 		uint8_t data = prom[i];
-
 		m_pens[i] = rgb_t(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
 	}
 }
@@ -470,9 +469,9 @@ ROM_START( supertnk )
 	ROM_CONTINUE(             0x3800, 0x0800)
 
 	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "supertnk.clr",  0x0000, 0x0020, CRC(9ae1faee) SHA1(19de4bb8bc389d98c8f8e35c755fad96e1a6a0cd) )   // color PROM
-	ROM_LOAD( "supertnk.s",    0x0020, 0x0020, CRC(91722fcf) SHA1(f77386014b459cc151d2990ac823b91c04e8d319) )   // unknown - sync?
-	ROM_LOAD( "supertnk.t",    0x0040, 0x0020, CRC(154390bd) SHA1(4dc0fd7bd8999d2670c8d93aaada835d2a84d4db) )   // unknown - sync?
+	ROM_LOAD( "supertnk.clr", 0x0000, 0x0020, CRC(9ae1faee) SHA1(19de4bb8bc389d98c8f8e35c755fad96e1a6a0cd) ) // color PROM
+	ROM_LOAD( "supertnk.s",   0x0020, 0x0020, CRC(91722fcf) SHA1(f77386014b459cc151d2990ac823b91c04e8d319) ) // unknown - sync?
+	ROM_LOAD( "supertnk.t",   0x0040, 0x0020, CRC(154390bd) SHA1(4dc0fd7bd8999d2670c8d93aaada835d2a84d4db) ) // unknown - sync?
 ROM_END
 
 

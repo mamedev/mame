@@ -491,20 +491,26 @@ static INPUT_PORTS_START( dynashot )
 	PORT_BIT( 0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )          PORT_DIPLOCATION("DIPSW:1,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIPSW:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )          PORT_DIPLOCATION("DIPSW:7,8")
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )          PORT_DIPLOCATION("DIPSW:1,2")  // メタル
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )                                          // 5コイン　1プレイ
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )                                          // 3コイン　1プレイ
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )                                          // 2コイン　1プレイ
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )                                          // 1コイン　1プレイ
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("DIPSW:3,4")
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )                                         // 難易度　１
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )                                           // 難易度　２
+	PORT_DIPSETTING(    0x04, DEF_STR( Harder ) )                                         // 難易度　３
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )                                        // 難易度　４
+	PORT_DIPNAME( 0x30, 0x20, "Medal Payout Rate" )        PORT_DIPLOCATION("DIPSW:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )                                            // メダルペイアウトなし
+	PORT_DIPSETTING(    0x20, "1" )                                                       // ペイアウト　×1
+	PORT_DIPSETTING(    0x10, "2" )                                                       // ペイアウト　×2
+	PORT_DIPSETTING(    0x00, "Invincible" )                                              // 無敵
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )          PORT_DIPLOCATION("DIPSW:7,8")  // 100円・50円・10円
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )                                          // 2コイン　１プレイ
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )                                          // 1コイン　１プレイ
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )                                          // 1コイン　3プレイ
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )                                          // 1コイン　5プレイ
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ganjaja )

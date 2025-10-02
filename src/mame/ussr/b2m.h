@@ -54,6 +54,7 @@ private:
 	void ppi1_portc_w(uint8_t data);
 	uint8_t ppi1_portb_r();
 	void ppi2_portc_w(uint8_t data);
+	uint8_t fdc_status_hack_r();
 	uint8_t romdisk_porta_r();
 	void romdisk_portb_w(uint8_t data);
 	void romdisk_portc_w(uint8_t data);
@@ -73,6 +74,8 @@ private:
 	uint8_t m_video_scroll = 0U;
 	uint8_t m_portc = 0U;
 
+	bool m_drq_interlock = false;
+
 	uint8_t m_video_page = 0U;
 
 	uint8_t m_romdisk_lsb = 0U;
@@ -81,6 +84,7 @@ private:
 	uint8_t m_color[4]{};
 	uint8_t m_localmachine = 0U;
 	uint8_t m_vblank_state = 0U;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pit8253_device> m_pit;

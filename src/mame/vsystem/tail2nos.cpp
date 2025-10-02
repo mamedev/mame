@@ -132,8 +132,8 @@ TILE_GET_INFO_MEMBER(tail2nos_state::get_tile_info)
 
 K051316_CB_MEMBER(tail2nos_state::zoom_callback)
 {
-	*code |= ((*color & 0x03) << 8);
-	*color = 32 + ((*color & 0x38) >> 3);
+	code |= ((color & 0x03) << 8);
+	color = 32 + ((color & 0x38) >> 3);
 }
 
 /***************************************************************************

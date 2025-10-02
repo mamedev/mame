@@ -539,6 +539,19 @@ MUSIC
 		</part>
 	</software>
 
+	<software name="adventime">
+		<description>Adventure in Time</description>
+		<year>1983</year>
+		<publisher>Work Force</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="61040">
+				<rom name="Adventure In Time (Work Force).tzx" size="61040" crc="06ca60d0" sha1="85fc3ba3dbe57be70dfdf08442d6009f2d2240fe"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="adventone">
 		<description>Adventure One</description>
 		<year>1983</year>
@@ -1626,6 +1639,27 @@ MUSIC
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="5271">
 				<rom name="Byter.tzx" size="5271" crc="540854fe" sha1="ab1f4d1f13735e7ffe4e143c1ee159a2ca1a0617"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calpacpat">
+		<description>Calpac Patterns</description>
+		<year>1982</year>
+		<publisher>Calpac Computer Software</publisher>
+		<info name="developer" value="J.J. Warren" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="7545">
+				<rom name="Calpac Patterns - Side A.tzx" size="7545" crc="0ea436aa" sha1="3cf63fa7941c343ce7fbae636fb942a8e8fb75a4"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="7545">
+				<rom name="Calpac Patterns - Side B.tzx" size="7545" crc="b964e17a" sha1="5ee13daeb8929a7039d0e9a7fde700e0832b2b95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2816,6 +2850,27 @@ MUSIC
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="13587">
 				<rom name="DoNotPassGo.tzx" size="13587" crc="a2dd0f0c" sha1="45ded58ce3255e5239722c956eef084bac20ad6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drackong">
+		<description>Dracula + Kong</description>
+		<year>1981</year>
+		<publisher>Buffer Micro Shop</publisher>
+		<info name="alt_title" value="Castle Dracula + King Kong" /> <!-- In game titles -->
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Dracula"/>
+			<dataarea name="cass" size="12328">
+				<rom name="Dracula - Kong - Side 1.tzx" size="12328" crc="4daf49ef" sha1="5c483c3ddd879909bf37a08efa8140d031ffac18"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Kong"/>
+			<dataarea name="cass" size="14247">
+				<rom name="Dracula - Kong - Side 2.tzx" size="14247" crc="90a7b10e" sha1="59b3758d6a516957915b7567c5453d5a00d08a55"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4415,6 +4470,21 @@ MUSIC
 		</part>
 	</software>
 
+	<software name="guerrapa">
+		<description>Guerra no Pacífico</description>
+		<year>1983</year>
+		<publisher>Supersoft</publisher>
+		<info name="developer" value="Dalzani Lima" />
+		<info name="developer" value="Sérgio Kaminski" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9926">
+				<rom name="guerrapa.p" size="9926" crc="cc73652e" sha1="d196eff63794de778fafa409674b44b1d8fde1e5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="guitarbg">
 		<description>Guitar for Beginners</description>
 		<year>1982</year>
@@ -5859,12 +5929,33 @@ Defender: not working
 
 	<software name="inherita">
 		<description>Inheritance</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Simon W. Hessel Software</publisher>
+		<info name="language" value="English" />
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="14863">
 				<rom name="Inheritance.tzx" size="14863" crc="e7204db9" sha1="98fe80398de226167020d7818ab3c00785f21b72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inherita_a" cloneof="inherita">
+		<description>Inheritance (alt)</description>
+		<year>1981</year>
+		<publisher>Simon W. Hessel Software</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="15039">
+				<rom name="Inheritance - Side 1.tzx" size="15039" crc="a5fa9702" sha1="26fbfd62e5b638b9cad673d3a846c9d5c2628990"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="14737">
+				<rom name="Inheritance - Side 2.tzx" size="14737" crc="765d3a83" sha1="4efbed9b425186bd6ea97040d1ce3319fe362b25"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6292,6 +6383,20 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="milmilha">
+		<description>Mil Milhas</description>
+		<year>198?</year>
+		<publisher>Supersoft</publisher>
+		<info name="developer" value="Sílvio Aurich Filho" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3524">
+				<rom name="milmilhas.p" size="3524" crc="38a2017a" sha1="d44e5ffc25cd06e5a234d0b764f27acfc249a246"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mindmach">
 		<description>Mind vs. Machine</description>
 		<year>1982</year>
@@ -6328,6 +6433,37 @@ Defender: not working
 			<feature name="part_id" value="Return to Earth"/>
 			<dataarea name="cass" size="10790">
 				<rom name="MinesOfSaturnReturnToEarth.B.ReturnToEarth.tzx" size="10790" crc="1667ffa7" sha1="95a3afcd664cb8524152188ac00cc7e6192df5c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andromeda">
+		<description>Missão Andrômeda</description>
+		<year>1983</year>
+		<publisher>Supersoft</publisher>
+		<info name="developer" value="Dalzani Lima" />
+		<info name="developer" value="Sérgio Kaminski" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16108">
+				<rom name="andromeda.p" size="16108" crc="f01c3649" sha1="b77642dc082624d6a76c417cd98e9e496c987ae0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andromeda_hck" cloneof="andromeda">
+		<description>Missão Andrômeda (hack)</description>
+		<year>198?</year>
+		<publisher>Supersoft</publisher>
+		<notes>The original game doesn't detect when more than one key is pressed simultaneously. This hack allows that possibility.</notes>
+		<info name="developer" value="Dalzani Lima" />
+		<info name="developer" value="Sérgio Kaminski" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16108">
+				<rom name="andromhck.p" size="16108" crc="bc3da5fc" sha1="6dec03c27e04f8fcb0153c0a6b91c1da97dca4eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7051,6 +7187,21 @@ Defender: not working
 			<feature name="part_id" value="Bomber"/>
 			<dataarea name="cass" size="2397">
 				<rom name="PatrouilleDeLEspace.B.Bomber.tzx" size="2397" crc="6b38e0ab" sha1="0800181140382d84ac7bc3e0a37901717dc4e8e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pespacial">
+		<description>Patrulha Espacial</description>
+		<year>1983</year>
+		<publisher>Supersoft</publisher>
+		<info name="developer" value="Dalzani Lima" />
+		<info name="developer" value="Sérgio Kaminski" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11217">
+				<rom name="patrulha.p" size="11217" crc="a4495d46" sha1="1e4544078ba5690a1889886a2f47e8ccef5d95d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8719,6 +8870,24 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="stforcesb">
+		<description>Stormforce + Starbuster</description>
+		<year>1983</year>
+		<publisher>Meow Micros</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side A - Stormforce"/>
+			<dataarea name="cass" size="11659">
+				<rom name="Stormforce - Starbuster - Side A.tzx" size="11659" crc="2efa4854" sha1="2af2719f9e837e9288edff0d823b326b82c7da3a"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side B - Starbuster"/>
+			<dataarea name="cass" size="5741">
+				<rom name="Stormforce - Starbuster - Side B.tzx" size="5741" crc="ccb7933b" sha1="574376c6b80d1aebe89b63396fc5f8352ac756ee"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strfball">
 		<description>Strategy Football</description>
 		<year>1983</year>
@@ -9597,6 +9766,20 @@ Defender: not working
 			<feature name="part_id" value="Scramble"/>
 			<dataarea name="cass" size="4687">
 				<rom name="ThroTheWall.B.Scramble.tzx" size="4687" crc="1ddb4429" sha1="b0ba2b45caccde98acea961b78cf87b11aeb8840"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timeward">
+		<description>Time Warden</description>
+		<year>1982</year>
+		<publisher>Simon Wadsworth</publisher>
+		<info name="developer" value="Simon Wadsworth" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14028">
+				<rom name="timeward.p" size="14028" crc="a44a8d96" sha1="c52a2ed1afa0cd6aed5241751cc609249a7d18ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11179,6 +11362,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="casino">
+		<description>Casino (type-in?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Roulette" /> <!-- In game title -->
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2162">
+				<rom name="Casino.tzx" size="2162" crc="0542ee08" sha1="30eac06d2b2339dda7a9db6774b48c769c60ed1a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cedriccl">
 		<description>Cedric the Clown (type-in, Sinclair User № 17 - August 1983)</description>
 		<year>1983</year>
@@ -11329,6 +11525,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="mmaths">
+		<description>Monster Maths (type-in, Sinclair Programs № 5 - January 1983)</description>
+		<year>1983</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="1066">
+				<rom name="Monster Maths.tzx" size="1066" crc="d3664643" sha1="04f4bd98bb191aaa13116a16ed6a5ff42e509aa6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="onfinal">
 		<description>On Final (type-in, The ZX Collection - Winter 1984)</description>
 		<year>1984</year>
@@ -11444,6 +11653,18 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="starbatt">
+		<description>Star Battle (type-in, Sinclair Programs № 4 - November 1982)</description>
+		<year>1982</year>
+		<publisher>ECC Publications</publisher>
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3132">
+				<rom name="Star Battle.tzx" size="3132" crc="a4a308e0" sha1="70299032226fbbb20b02aa9458f519e658f73f58"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starwars">
 		<description>Star Wars (type-in)</description>
 		<year>198?</year>
@@ -11538,6 +11759,18 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="3194">
 				<rom name="Zapman.tzx" size="3194" crc="0d3e3826" sha1="27dbb02ab9f3593c201ab3c3b1a31412ee3cd1e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phonehom">
+		<description>ZX Phone Home (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3472">
+				<rom name="ZX Phone Home.tzx" size="3472" crc="cc7e348b" sha1="e8174598b2bc6a537feae6bede488dfe04dd8a8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11919,6 +12152,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="mazy2">
+		<description>Mazy 2</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8778">
+				<rom name="mazy2.p" size="8778" crc="034b6f66" sha1="4350d1f305ac0b78477155234e455ac754644d67"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mieyen">
 		<description>Mieyen</description>
 		<year>2025</year>
@@ -11941,6 +12187,36 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="17282">
 				<rom name="MinerMan.tzx" size="17282" crc="e9e151c5" sha1="73b76ddcda52cc081b18e40c6186d90dd847cf60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moskaof">
+		<description>Moskão Fighter (English)</description>
+		<year>2022</year>
+		<publisher>Toddy Software</publisher>
+		<info name="developer" value="Kelly Abrantes Murta" />
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<info name="version" value="1.2" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3667">
+				<rom name="moskaoe.p" size="3667" crc="5080b002" sha1="7e866806a2d87034388716e2751ff5234dd1677c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moskaof_pt" cloneof="moskaof">
+		<description>Moskão Fighter (Portuguese)</description>
+		<year>2022</year>
+		<publisher>Toddy Software</publisher>
+		<info name="developer" value="Kelly Abrantes Murta" />
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<info name="version" value="1.2" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3678">
+				<rom name="moskao.p" size="3678" crc="94f29899" sha1="7efa16cec30809ca74b203820061c0bbc7f273d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12100,6 +12376,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="11196">
 				<rom name="Steps.p" size="11196" crc="6570ef01" sha1="d94e8be7f6ea500ca052421c03b9b5aee9f984e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svellas">
+		<description>Svellas</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7972">
+				<rom name="svellas.p" size="7972" crc="842d518b" sha1="bcd7f1e5123f4c6bef01958ad61f3ed7fbb83a7e"/>
 			</dataarea>
 		</part>
 	</software>

@@ -13,7 +13,7 @@ enum
 };
 
 
-#define K051960_CB_MEMBER(_name) void _name(int *code, int *color, int *priority, bool *shadow)
+#define K051960_CB_MEMBER(_name) void _name(int &code, int &color, int &priority, bool &shadow)
 
 
 class k051960_device : public device_t, public device_gfx_interface, public device_video_interface
@@ -26,7 +26,7 @@ class k051960_device : public device_t, public device_gfx_interface, public devi
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_gradius3);
 
 public:
-	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority, bool *shadow)>;
+	using sprite_delegate = device_delegate<void (int &code, int &color, int &priority, bool &shadow)>;
 
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 

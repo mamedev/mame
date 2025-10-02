@@ -77,33 +77,33 @@ private:
 	void cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t cpuB_ctrl_r();
 	void cpuB_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void overdriv_soundirq_w(uint16_t data);
+	void soundirq_w(uint16_t data);
 	void sound_ack_w(uint8_t data);
-	void slave_irq4_assert_w(uint16_t data);
-	void slave_irq5_assert_w(uint16_t data);
+	void sub_irq4_assert_w(uint16_t data);
+	void sub_irq5_assert_w(uint16_t data);
 	void objdma_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(objdma_end_cb);
 
-	uint32_t screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	[[maybe_unused]] INTERRUPT_GEN_MEMBER(cpuB_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(overdriv_cpuA_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(cpuA_scanline);
 
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);
-	void overdriv_master_map(address_map &map) ATTR_COLD;
-	void overdriv_slave_map(address_map &map) ATTR_COLD;
-	void overdriv_sound_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	/* video-related */
-	int       m_zoom_colorbase[2]{};
-	int       m_road_colorbase[2]{};
-	int       m_sprite_colorbase = 0;
+	uint16_t  m_zoom_colorbase[2]{};
+	uint16_t  m_road_colorbase[2]{};
+	uint16_t  m_sprite_colorbase = 0;
 	emu_timer *m_objdma_end_timer = nullptr;
 
 	/* misc */
 	uint16_t  m_cpuB_ctrl = 0;
-	int       m_fake_timer = 0;
+	int32_t   m_fake_timer = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -149,7 +149,7 @@ void overdriv_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::cpuA_scanline)
 {
 	const int timer_threshold = 168; // fwiw matches 0 on mask ROM check, so IF it's a timer irq then should be close ...
 	int scanline = param;
@@ -213,7 +213,7 @@ void overdriv_state::cpuB_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 }
 
-void overdriv_state::overdriv_soundirq_w(uint16_t data)
+void overdriv_state::soundirq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
@@ -221,13 +221,13 @@ void overdriv_state::overdriv_soundirq_w(uint16_t data)
 
 
 
-void overdriv_state::slave_irq4_assert_w(uint16_t data)
+void overdriv_state::sub_irq4_assert_w(uint16_t data)
 {
 	// used in-game
 	m_subcpu->set_input_line(4, HOLD_LINE);
 }
 
-void overdriv_state::slave_irq5_assert_w(uint16_t data)
+void overdriv_state::sub_irq5_assert_w(uint16_t data)
 {
 	// tests GFX ROMs with this irq (indeed enabled only in test mode)
 	m_subcpu->set_input_line(5, HOLD_LINE);
@@ -242,13 +242,13 @@ void overdriv_state::slave_irq5_assert_w(uint16_t data)
 
 K053246_CB_MEMBER(overdriv_state::sprite_callback)
 {
-	int pri = (*color & 0xffe0) >> 5;   /* ??????? */
+	int pri = (color & 0xffe0) >> 5;   /* ??????? */
 	if (pri)
-		*priority_mask = 0x02;
+		priority_mask = 0x02;
 	else
-		*priority_mask = 0x00;
+		priority_mask = 0x00;
 
-	*color = m_sprite_colorbase + (*color & 0x001f);
+	color = m_sprite_colorbase + (color & 0x001f);
 }
 
 
@@ -260,14 +260,14 @@ K053246_CB_MEMBER(overdriv_state::sprite_callback)
 
 K051316_CB_MEMBER(overdriv_state::zoom_callback_1)
 {
-	*code |= ((*color & 0x03) << 8);
-	*color = m_zoom_colorbase[0] + ((*color & 0x3c) >> 2);
+	code |= ((color & 0x03) << 8);
+	color = m_zoom_colorbase[0] + ((color & 0x3c) >> 2);
 }
 
 K051316_CB_MEMBER(overdriv_state::zoom_callback_2)
 {
-	*code |= ((*color & 0x03) << 8);
-	*color = m_zoom_colorbase[1] + ((*color & 0x3c) >> 2);
+	code |= ((color & 0x03) << 8);
+	color = m_zoom_colorbase[1] + ((color & 0x3c) >> 2);
 }
 
 
@@ -277,7 +277,7 @@ K051316_CB_MEMBER(overdriv_state::zoom_callback_2)
 
 ***************************************************************************/
 
-uint32_t overdriv_state::screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t overdriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sprite_colorbase  = m_k053251->get_palette_index(k053251_device::CI0);
 	m_road_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI1);
@@ -302,7 +302,7 @@ uint32_t overdriv_state::screen_update_overdriv(screen_device &screen, bitmap_in
 }
 
 
-void overdriv_state::overdriv_master_map(address_map &map)
+void overdriv_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();                 /* work RAM */
@@ -318,7 +318,7 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x1d8000, 0x1d8003).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x1e0000, 0x1e0003).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x1e8000, 0x1e8001).w(FUNC(overdriv_state::overdriv_soundirq_w));
+	map(0x1e8000, 0x1e8001).w(FUNC(overdriv_state::soundirq_w));
 	map(0x1f0000, 0x1f0001).w(FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
 	map(0x1f8000, 0x1f8001).w(FUNC(overdriv_state::eeprom_w));
 	map(0x200000, 0x203fff).ram().share("share1");
@@ -326,8 +326,8 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x218000, 0x218fff).rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
 	map(0x220000, 0x220fff).r(m_k051316[0], FUNC(k051316_device::rom_r)).umask16(0xff00);
 	map(0x228000, 0x228fff).r(m_k051316[1], FUNC(k051316_device::rom_r)).umask16(0xff00);
-	map(0x230000, 0x230001).w(FUNC(overdriv_state::slave_irq4_assert_w));
-	map(0x238000, 0x238001).w(FUNC(overdriv_state::slave_irq5_assert_w));
+	map(0x230000, 0x230001).w(FUNC(overdriv_state::sub_irq4_assert_w));
+	map(0x238000, 0x238001).w(FUNC(overdriv_state::sub_irq5_assert_w));
 }
 
 TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb)
@@ -343,7 +343,7 @@ void overdriv_state::objdma_w(uint8_t data)
 	m_k053246->k053246_w(5, data);
 }
 
-void overdriv_state::overdriv_slave_map(address_map &map)
+void overdriv_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram(); /* work RAM */
@@ -367,7 +367,7 @@ void overdriv_state::sound_ack_w(uint8_t data)
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-void overdriv_state::overdriv_sound_map(address_map &map)
+void overdriv_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0000).w(FUNC(overdriv_state::sound_ack_w));
 	// 0x012 read during explosions
@@ -446,11 +446,11 @@ void overdriv_state::overdriv(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2); /* 12 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_master_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(overdriv_state::overdriv_cpuA_scanline), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &overdriv_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(overdriv_state::cpuA_scanline), "screen", 0, 1);
 
 	M68000(config, m_subcpu, 24_MHz_XTAL / 2);  /* 12 MHz */
-	m_subcpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_slave_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &overdriv_state::sub_map);
 	//m_subcpu->set_vblank_int("screen", FUNC(overdriv_state::cpuB_interrupt));
 	/* IRQ 5 and 6 are generated by the main CPU. */
 	/* IRQ 5 is used only in test mode, to request the checksums of the gfx ROMs. */
@@ -460,7 +460,7 @@ void overdriv_state::overdriv(machine_config &config)
 	/* This might just mean that the video refresh rate is less than */
 	/* 60 fps, that's how I fixed it for now. */
 	MC6809E(config, m_audiocpu, 3.579545_MHz_XTAL);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &overdriv_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
@@ -471,7 +471,7 @@ void overdriv_state::overdriv(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 305, 264, 0, 224);
-	screen.set_screen_update(FUNC(overdriv_state::screen_update_overdriv));
+	screen.set_screen_update(FUNC(overdriv_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();

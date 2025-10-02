@@ -1131,6 +1131,19 @@ static INPUT_PORTS_START( wwmarine )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wwpajero )
+	PORT_INCLUDE( systemc_generic )
+
+	// TODO: disable inputs that don't exist (test mode lists buttons + joysticks for 2 players, but I don't think this has any inputs beyond P1 Button 1 being a horn?)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x03, "Demo Sound Interval" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, "Every 8 Demo Cycles" )
+	PORT_DIPSETTING(    0x02, "Every 4 Demo Cycles" )
+	PORT_DIPSETTING(    0x03, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( sonicfgt )
 	PORT_INCLUDE( systemc_generic )
@@ -2197,6 +2210,21 @@ ROM_START( wwanpanmo ) /* Waku Waku Anpanman - 837-7204 PCB */
 ROM_END
 
 
+ROM_START( wwpajero )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "epr-12925.ic32", 0x000000, 0x020000, CRC(47a814a1) SHA1(19199a13d823615fb804a2ae7896871442a844bb) )
+	ROM_LOAD16_BYTE( "epr-12924.ic31", 0x000001, 0x020000, CRC(69a5df3a) SHA1(39b082034c4800547bedffca47eb24b43f9832fc) )
+	ROM_LOAD16_BYTE( "epr-13125.ic34", 0x040000, 0x020000, CRC(a1ee9e69) SHA1(19bebb71aa3b8279b0e140f495f2df756d80c7f7) ) // tested at 0x40000
+	ROM_RELOAD(                        0x080000, 0x020000 ) // pulls gfx data at 0x80000
+	ROM_LOAD16_BYTE( "epr-13124.ic33", 0x040001, 0x020000, CRC(edf17b0d) SHA1(3709c5a31766a81baf01188d09364fce6b75dd1a) ) // tested at 0x40001
+	ROM_RELOAD(                        0x080001, 0x020000 ) // pulls gfx data at 0x80001
+
+	ROM_REGION( 0x040000, "upd", ROMREGION_ERASEFF )
+	ROM_LOAD( "epr-12923.ic4", 0x000000, 0x020000, CRC(774557a9) SHA1(e267369338717b26546cb4e4706dd04a3eee0905) )
+
+	// unmarked protection chip, seems unused?
+ROM_END
+
 ROM_START( ssonicbr ) // hack: supposedly the data ROM mapping was modified
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ssonicbr.ic32", 0x000000, 0x040000, CRC(cf254ecd) SHA1(4bb295ec80f8ddfeab4e360eebf12c5e2dfb9800) )
@@ -3084,6 +3112,7 @@ GAME( 1994, tantrbl3,   tantr,    segac,      ichir,    segac2_state,    init_ta
 GAME( 1992, wwanpanm,   0,        segac2,     wwmarine, wwmarine_state,  init_noprot,   ROT0,   "Sega", "Waku Waku Anpanman (Rev A)", 0 )
 GAME( 1992, wwanpanmo,  wwanpanm, segac2,     wwmarine, wwmarine_state,  init_noprot,   ROT0,   "Sega", "Waku Waku Anpanman", 0 )
 GAME( 1992, wwmarine,   0,        segac2,     wwmarine, wwmarine_state,  init_noprot,   ROT0,   "Sega", "Waku Waku Marine", 0 )
+GAME( 1990, wwpajero,   0,        segac2,     wwpajero, segac2_state,    init_noprot,   ROT0,   "Sega", "Waku Waku Pajero", 0 ) // test mode shows a variety of inputs, but sequence after coin-up seems to be non-interactive?
 
 // not really sure how this should hook up, things like the 'sold out' flags could be mechanical sensors, or from another MCU / CPU board in the actual popcorn part of the machine?
 GAME( 1992, anpanman,   0,        segac2,     anpanman, segac2_state,    init_noprot,   ROT0,   "Sega", "Soreike! Anpanman Popcorn Koujou (Rev B)", MACHINE_MECHANICAL ) // 'Mechanical' part isn't emulated

@@ -67,9 +67,14 @@ public:
 	ioport_value egasw3_r();
 	ioport_value egasw2_r();
 	ioport_value egasw1_r();
+
+	void set_vclk2(u32 freq) { m_vclk2 = freq; }
+	void set_vclk2(const XTAL &freq) { m_vclk2 = freq.value(); }
+
 protected:
 	wd90c00_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
@@ -108,6 +113,8 @@ private:
 	devcb_read_line m_cnf13_read_cb;
 	devcb_read_line m_cnf12_read_cb;
 	devcb_read8     m_cnf_write_ddr_cb;
+
+	u32 m_vclk2;
 };
 
 class wd90c11a_vga_device : public wd90c00_vga_device

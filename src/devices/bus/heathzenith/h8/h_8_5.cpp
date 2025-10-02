@@ -176,13 +176,14 @@ void h_8_5_device::map_io(address_space_installer & space)
 // The usual baud rate is 600. The H8 supported baud rates from 110 to
 // 9600. You can change the baud rate if it is changed here and in the
 // other places that specify 600 baud.
-static DEVICE_INPUT_DEFAULTS_START(terminal)
+static DEVICE_INPUT_DEFAULTS_START(h19)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD",   0xff, RS232_BAUD_600)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD",   0xff, RS232_BAUD_600)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY",   0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
 DEVICE_INPUT_DEFAULTS_END
+
 
 void h_8_5_device::device_add_mconfig(machine_config &config)
 {
@@ -208,11 +209,11 @@ void h_8_5_device::device_add_mconfig(machine_config &config)
 	console_clock.signal_handler().set(m_console, FUNC(i8251_device::write_txc));
 	console_clock.signal_handler().append(m_console, FUNC(i8251_device::write_rxc));
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "h19"));
 	rs232.rxd_handler().set(m_console, FUNC(i8251_device::write_rxd));
 	rs232.cts_handler().set(m_console, FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set(m_console, FUNC(i8251_device::write_dsr));
-	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	rs232.set_option_device_input_defaults("h19", DEVICE_INPUT_DEFAULTS_NAME(h19));
 
 	SPEAKER(config, "mono").front_right();
 

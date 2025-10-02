@@ -1138,6 +1138,10 @@ uint16_t hng64_state::main_sound_comms_r(offs_t offset)
 {
 	switch(offset *2)
 	{
+		case 0x00:
+			return main_latch[0];
+		case 0x02:
+			return main_latch[1];
 		case 0x04:
 			return sound_latch[0];
 		case 0x06:
@@ -1160,9 +1164,12 @@ void hng64_state::main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_
 			COMBINE_DATA(&main_latch[1]);
 			break;
 		case 0x08:
-			m_audiocpu->set_input_line(5, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
-			if(data & 0xfe)
-				LOGMASKED(LOG_SNDCOM_UNKNWN, "IRQ send %02x?\n",data);
+			if (data & 1)
+			{
+				m_audiocpu->set_input_line(5, ASSERT_LINE);
+				// let the V53 catch up
+				m_maincpu->spin_until_time(attotime::from_usec(5));
+			}
 			break;
 		default:
 			LOGMASKED(LOG_SNDCOM_UNKNWN, "%02x %04x\n",offset*2,data);

@@ -101,6 +101,7 @@
 #include "finalchs.h"
 #include "hpblp.h"
 #include "opus100pm.h"
+#include "pcat512me.h"
 #include "zxbus_adapter.h"
 
 
@@ -186,6 +187,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("5080pa", ISA16_5080PA);
 	device.option_add("amgda", ISA16_AMGDA);
 	device.option_add("gus", ISA16_GUS);
+	device.option_add("pcat512me", ISA16_PCAT512ME);
 	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
 	device.option_add("svga_s3", ISA16_SVGA_S3);
 	device.option_add("svga_dm", ISA16_SVGA_CIRRUS);

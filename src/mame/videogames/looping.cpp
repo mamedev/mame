@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Stroffolino
+// copyright-holders: Phil Stroffolino
+
 /*
 
 Looping / Sky Bumper
@@ -11,7 +12,7 @@ TODO:
 ---------------------------------------------------------------
 
 Looping
-(C)1981 Venture Line
+(C)1981 Video Games GmbH
 
     Main CPU
         TMS9995
@@ -27,7 +28,7 @@ Looping
 ---------------------------------------------------------------
 
 Sky Bumper
-(C)1982 Venture Line
+(C)1982 Venture Line (did not involve Looping's designer)
 
     This is a ROM swap for Looping.  There are two 6116's on
     the CPU board, where there is only one on Looping.
@@ -61,8 +62,8 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "emu.h"
 
 #include "cpu/cop400/cop400.h"
-#include "cpu/tms9900/tms9995.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "cpu/tms9900/tms9995.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -104,9 +105,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void looping(machine_config &config);
+	void looping(machine_config &config) ATTR_COLD;
 
-	void init_looping();
+	void init_looping() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -137,7 +138,7 @@ private:
 	void ay_enable_w(int state);
 	void speech_enable_w(int state);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -154,7 +155,7 @@ private:
 	uint8_t m_cop_port_l = 0;
 
 	// tilemaps
-	tilemap_t * m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_device<tms9995_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -174,7 +175,7 @@ private:
  *
  *************************************/
 
-void looping_state::palette(palette_device &palette) const
+void looping_state::palette_init(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 	static constexpr int resistances[3] = { 1000, 470, 220 };
@@ -346,6 +347,7 @@ void looping_state::machine_reset()
 	m_cop_port_l = 0;
 }
 
+
 /*************************************
  *
  *  Interrupt handling
@@ -464,8 +466,8 @@ void looping_state::adc_w(uint8_t data) { osd_printf_debug("%04X:ADC write = %02
 
 void looping_state::plr2_w(int state)
 {
-	/* set to 1 after IDLE, cleared to 0 during processing
-	   is this an LED on the PCB? */
+	// set to 1 after IDLE, cleared to 0 during processing
+	// is this an LED on the PCB?
 }
 
 
@@ -494,22 +496,22 @@ void looping_state::cop_l_w(uint8_t data)
 
 uint8_t looping_state::protection_r()
 {
-//        The code reads ($7002) ($7004) alternately
-//        The result must change at least once every 10 reads
-//        A read from ($34b0 + result) must == $01
+	// The code reads ($7002) ($7004) alternately
+	// The result must change at least once every 10 reads
+	// A read from ($34b0 + result) must == $01
 
-//        Valid values:
-//            $61 $67
-//            $B7 $BF
-//            $DB
-//            $E1
-//            $F3 $F7 $FD $FF
+	// Valid values:
+	//     $61 $67
+	//     $B7 $BF
+	//     $DB
+	//     $E1
+	//     $F3 $F7 $FD $FF
 
-//        Because they read alternately from different locations,
-//        it is trivial to bypass the protection.
+	// Because they read alternately from different locations,
+	// it is trivial to bypass the protection.
 
-//        cop write alternately $02 $01 $08 $04 in port $102
-//        cop write randomly fc (unfortunately) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
+	// cop write alternately $02 $01 $08 $04 in port $102
+	// cop write randomly fc (unfortunately) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
 
 	// missing something
 	if(m_cop_port_l != 0xfc) return m_cop_port_l;
@@ -600,7 +602,6 @@ GFXDECODE_END
  *
  *************************************/
 
-
 void looping_state::looping(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connections
@@ -641,7 +642,7 @@ void looping_state::looping(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_looping);
-	PALETTE(config, m_palette, FUNC(looping_state::palette), 32);
+	PALETTE(config, m_palette, FUNC(looping_state::palette_init), 32);
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // E2 on video board
 	videolatch.q_out_cb<1>().set(FUNC(looping_state::level2_irq_set));
@@ -749,100 +750,127 @@ INPUT_PORTS_END
  *
  *************************************/
 
-ROM_START( loopingv )
-	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
-	ROM_LOAD( "vli3.5a",        0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
-	ROM_LOAD( "vli1.2a",        0x2000, 0x2000, CRC(97755fd4) SHA1(4a6ef02b0128cd516ff95083a7caaad8f3756f09) )
-	ROM_LOAD( "l056-6.9a",      0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
-	ROM_LOAD( "vli9-5.8a",      0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
-
-	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
-	ROM_LOAD( "i-o.13c",        0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
-	ROM_LOAD( "i-o.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
-	ROM_LOAD( "i-o.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
-
-	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
-
-	ROM_REGION( 0x1000, "gfx", 0 )
-	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
-	ROM_LOAD( "log1-9-3.6a",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
-
-	ROM_REGION( 0x0020, "proms", 0 ) // color prom
-	ROM_LOAD( "18s030.11b",     0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
-ROM_END
-
-ROM_START( loopingva )
-	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
-	ROM_LOAD( "vli3.5a",        0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
-	ROM_LOAD( "vli-4-3",        0x2000, 0x1000, CRC(f32cae2b) SHA1(2c6ef82af438e588b56fd58b95cf969c97bb9a66) )
-	ROM_LOAD( "vli-8-4",        0x3000, 0x1000, CRC(611e1dbf) SHA1(0ab6669f1dec30c3f7bca49e158e4790a78fa308) )
-	ROM_LOAD( "l056-6.9a",      0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
-	ROM_LOAD( "vli9-5.8a",      0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
-
-	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
-	ROM_LOAD( "i-o-v2.13c",     0x0000, 0x0800, CRC(09765ebe) SHA1(93b035c3a94f2f6d5e463256e26b600a4dd5d3ea) )
-	ROM_LOAD( "i-o.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) // speech
-	ROM_LOAD( "i-o.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
-
-	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
-
-	ROM_REGION( 0x1000, "gfx", 0 )
-	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
-	ROM_LOAD( "log1-9-3.6a",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
-
-	ROM_REGION( 0x0020, "proms", 0 ) // color prom
-	ROM_LOAD( "18s030.11b",     0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
-ROM_END
-
 ROM_START( looping )
 	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
-	ROM_LOAD( "loop551.bin",        0x0000, 0x1000, CRC(d6bb6db6) SHA1(074eb3bc101096bfe67c3107f306df829ae38548) )
-	ROM_LOAD( "loop552.bin",        0x1000, 0x1000, CRC(bc32956d) SHA1(6ef8d76df1d5b1ed52a4057eae2bf4eb394e4c54) )
-	ROM_LOAD( "loop553.bin",        0x2000, 0x1000, CRC(5f8b9aed) SHA1(32be61788e3d54b23d1663025365b1ab6b96dc91) )
-	ROM_LOAD( "loop554b.bin",       0x3000, 0x1000, CRC(381a9625) SHA1(07d775125be1f761dad568f8ccce600414a9d15f) )
-	ROM_LOAD( "loop555.bin",        0x4000, 0x1000, CRC(0ef4c922) SHA1(df6db0897a51aa10e106865a643588d866ef8c4e) )
-	ROM_LOAD( "loop556.bin",        0x5000, 0x1000, CRC(3419a5d5) SHA1(2b0249c54985ab5e12de17c0e3d62caa0c7575e3) )
-	ROM_LOAD( "loop557.bin",        0x6000, 0x1000, CRC(d430e287) SHA1(b0edd25ef4d2468cc1f8c10ac49c545a89d398d7) )
+	ROM_LOAD( "loop551.bin",   0x0000, 0x1000, CRC(d6bb6db6) SHA1(074eb3bc101096bfe67c3107f306df829ae38548) )
+	ROM_LOAD( "loop552.bin",   0x1000, 0x1000, CRC(bc32956d) SHA1(6ef8d76df1d5b1ed52a4057eae2bf4eb394e4c54) )
+	ROM_LOAD( "loop553.bin",   0x2000, 0x1000, CRC(5f8b9aed) SHA1(32be61788e3d54b23d1663025365b1ab6b96dc91) )
+	ROM_LOAD( "loop554b.bin",  0x3000, 0x1000, CRC(381a9625) SHA1(07d775125be1f761dad568f8ccce600414a9d15f) )
+	ROM_LOAD( "loop555.bin",   0x4000, 0x1000, CRC(0ef4c922) SHA1(df6db0897a51aa10e106865a643588d866ef8c4e) )
+	ROM_LOAD( "loop556.bin",   0x5000, 0x1000, CRC(3419a5d5) SHA1(2b0249c54985ab5e12de17c0e3d62caa0c7575e3) )
+	ROM_LOAD( "loop557.bin",   0x6000, 0x1000, CRC(d430e287) SHA1(b0edd25ef4d2468cc1f8c10ac49c545a89d398d7) )
 
 	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
-	ROM_LOAD( "loopc13.bin",        0x0000, 0x1000, CRC(ff9ac4ec) SHA1(9f8df94cd79d86fe4c384df1d5d729b58a7ca7a8) )
-	ROM_LOAD( "loopa13.bin",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
-	ROM_LOAD( "loopa11.bin",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
+	ROM_LOAD( "loopc13.bin",   0x0000, 0x1000, CRC(ff9ac4ec) SHA1(9f8df94cd79d86fe4c384df1d5d729b58a7ca7a8) )
+	ROM_LOAD( "loopa13.bin",   0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
+	ROM_LOAD( "loopa11.bin",   0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) ) // taken from the other sets
+	ROM_LOAD( "cop.bin",       0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) ) // taken from the other sets
 
 	ROM_REGION( 0x1000, "gfx", 0 )
-	ROM_LOAD( "loopaa8.bin",    0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
-	ROM_LOAD( "loopaa6.bin",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
+	ROM_LOAD( "loopaa8.bin",   0x0000, 0x0800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
+	ROM_LOAD( "loopaa6.bin",   0x0800, 0x0800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // color prom
-	ROM_LOAD( "loopvp1.bin",        0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "loopvp1.bin",   0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+ROM_START( loopingu )
+	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
+	ROM_LOAD( "vli3.5a",       0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
+	ROM_LOAD( "vli1.2a",       0x2000, 0x2000, CRC(97755fd4) SHA1(4a6ef02b0128cd516ff95083a7caaad8f3756f09) )
+	ROM_LOAD( "l056-6.9a",     0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
+	ROM_LOAD( "vli9-5.8a",     0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
+
+	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
+	ROM_LOAD( "i-o.13c",       0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
+	ROM_LOAD( "i-o.13a",       0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
+	ROM_LOAD( "i-o.11a",       0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
+
+	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
+	ROM_LOAD( "cop.bin",       0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+
+	ROM_REGION( 0x1000, "gfx", 0 )
+	ROM_LOAD( "log2.8a",       0x0000, 0x0800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
+	ROM_LOAD( "log1-9-3.6a",   0x0800, 0x0800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // color prom
+	ROM_LOAD( "18s030.11b",    0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+ROM_START( loopingua )
+	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
+	ROM_LOAD( "vli3.5a",       0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
+	ROM_LOAD( "vli-4-3",       0x2000, 0x1000, CRC(f32cae2b) SHA1(2c6ef82af438e588b56fd58b95cf969c97bb9a66) )
+	ROM_LOAD( "vli-8-4",       0x3000, 0x1000, CRC(611e1dbf) SHA1(0ab6669f1dec30c3f7bca49e158e4790a78fa308) )
+	ROM_LOAD( "l056-6.9a",     0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
+	ROM_LOAD( "vli9-5.8a",     0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
+
+	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
+	ROM_LOAD( "i-o-v2.13c",    0x0000, 0x0800, CRC(09765ebe) SHA1(93b035c3a94f2f6d5e463256e26b600a4dd5d3ea) )
+	ROM_LOAD( "i-o.13a",       0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) // speech
+	ROM_LOAD( "i-o.11a",       0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
+
+	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
+	ROM_LOAD( "cop.bin",       0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+
+	ROM_REGION( 0x1000, "gfx", 0 )
+	ROM_LOAD( "log2.8a",       0x0000, 0x0800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
+	ROM_LOAD( "log1-9-3.6a",   0x0800, 0x0800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // color prom
+	ROM_LOAD( "18s030.11b",    0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+// I/O BOARD 1250 + NR. 1110-X + NR. 1150-B REV 4 + 1150A-REV2
+ROM_START( loopingub ) // all labels handwritten unless otherwise specified
+	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
+	ROM_LOAD( "lo12-1.2a",     0x0000, 0x1000, CRC(711873ed) SHA1(0b0b913dd91030c944e9bc388dbfd884a7e4b765) )
+	ROM_LOAD( "lo12-2.4a",     0x1000, 0x1000, CRC(7427edf2) SHA1(256a38f88f585298f58f7d4a571b02ea2a2f7496) )
+	ROM_LOAD( "vli-4-3.5a",    0x2000, 0x1000, CRC(f32cae2b) SHA1(2c6ef82af438e588b56fd58b95cf969c97bb9a66) )
+	ROM_LOAD( "vli-2-4.7a",    0x3000, 0x1000, CRC(ebf41af1) SHA1(ab62d2cf20ebdc2a0fc6f01b2600d51a787072bd) )
+	ROM_LOAD( "lo56-5.8a",     0x4000, 0x1000, CRC(b377386d) SHA1(a28d5e90907f99f416062bd3f93bcffd8d21393a) )
+	ROM_LOAD( "lo56-6.9a",     0x5000, 0x1000, CRC(2b85355f) SHA1(606179bc36dc21fdd567d031cea83ccee7b29ff9) )
+	ROM_LOAD( "vli-3-7.10a",   0x6000, 0x1000, CRC(bd7a2106) SHA1(158e041d0a2af6ad2a6dcaa9dd69849a50c2393f) )
+
+	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
+	ROM_LOAD( "2v-v.13c",      0x0000, 0x1000, CRC(ff9ac4ec) SHA1(9f8df94cd79d86fe4c384df1d5d729b58a7ca7a8) ) // 1xxxxxxxxxxx = 0xFF
+	ROM_LOAD( "v-2.13a",       0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) // speech
+	ROM_LOAD( "11a",           0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // blank label
+
+	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
+	ROM_LOAD( "cop.bin",       0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+
+	ROM_REGION( 0x1000, "gfx", 0 )
+	ROM_LOAD( "8a",            0x0000, 0x0800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) ) // no label
+	ROM_LOAD( "6a",            0x0800, 0x0800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) ) // no label
+
+	ROM_REGION( 0x0020, "proms", 0 ) // color prom
+	ROM_LOAD( "tbp18s030.11b", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( skybump )
 	ROM_REGION( 0x8000, "maincpu", 0 ) // TMS9995 code
-	ROM_LOAD( "cpu.5a",         0x0000, 0x2000, CRC(dca38df0) SHA1(86abe04cbabf81399f842f53668fe7a3f7ed3757) )
-	ROM_LOAD( "cpu.2a",         0x2000, 0x2000, CRC(6bcc211a) SHA1(245ebae3934df9c3920743a941546d96bb2e7c03) )
-	ROM_LOAD( "cpu.9a",         0x4000, 0x2000, CRC(c7a50797) SHA1(60aa0a28ba970f12d0a0e538ae1c6807d105855c) )
-	ROM_LOAD( "cpu.8a",         0x6000, 0x2000, CRC(a718c6f2) SHA1(19afa8c353829232cb96c27b87f13b43166ab6fc) )
+	ROM_LOAD( "cpu.5a",        0x0000, 0x2000, CRC(dca38df0) SHA1(86abe04cbabf81399f842f53668fe7a3f7ed3757) )
+	ROM_LOAD( "cpu.2a",        0x2000, 0x2000, CRC(6bcc211a) SHA1(245ebae3934df9c3920743a941546d96bb2e7c03) )
+	ROM_LOAD( "cpu.9a",        0x4000, 0x2000, CRC(c7a50797) SHA1(60aa0a28ba970f12d0a0e538ae1c6807d105855c) )
+	ROM_LOAD( "cpu.8a",        0x6000, 0x2000, CRC(a718c6f2) SHA1(19afa8c353829232cb96c27b87f13b43166ab6fc) )
 
 	ROM_REGION( 0x3800, "audiocpu", 0 ) // TMS9980 code
-	ROM_LOAD( "snd.13c",        0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
-	ROM_LOAD( "snd.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
-	ROM_LOAD( "snd.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
+	ROM_LOAD( "snd.13c",       0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
+	ROM_LOAD( "snd.13a",       0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
+	ROM_LOAD( "snd.11a",       0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+	ROM_LOAD( "cop.bin",       0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
 	ROM_REGION( 0x1000, "gfx", 0 )
-	ROM_LOAD( "vid.8a",         0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )
-	ROM_LOAD( "vid.6a",         0x0800, 0x800, CRC(12ebbe74) SHA1(0f87c81a45d1bf3b8c6a70ee5e1a014069f67755) )
+	ROM_LOAD( "vid.8a",        0x0000, 0x0800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )
+	ROM_LOAD( "vid.6a",        0x0800, 0x0800, CRC(12ebbe74) SHA1(0f87c81a45d1bf3b8c6a70ee5e1a014069f67755) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // color prom
-	ROM_LOAD( "vid.clr",        0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "vid.clr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 
@@ -864,7 +892,7 @@ void looping_state::init_looping()
 }
 
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*************************************
@@ -873,7 +901,9 @@ void looping_state::init_looping()
  *
  *************************************/
 
-GAME( 1982, looping,   0,        looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH", "Looping", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, loopingv,  looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, loopingva, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, looping,   0,        looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH", "Looping (Europe)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, loopingu,  looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (US, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, loopingua, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (US, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, loopingub, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (US, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
 GAME( 1982, skybump,   0,        looping, skybump, looping_state, init_looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

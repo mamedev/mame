@@ -70,6 +70,9 @@ TODO:
 #include "speaker.h"
 #include "tilemap.h"
 
+#include <algorithm>
+#include <iterator>
+
 #include "sprinter.lh"
 
 
@@ -578,7 +581,7 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		do_mem_wait(4);
 	}
 
-	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
+	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (BIT(m_pn, 5) << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
 	const u8 dcpp = m_dcp_location[dcp_offset];
 	u8 data = 0xff;
 	switch (dcpp)
@@ -700,7 +703,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	}
 	do_mem_wait(4);
 
-	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (0 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
+	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (BIT(m_pn, 5) << 11) | (m_dos << 10) | (0 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
 	const u8 dcpp = m_dcp_location[dcp_offset];
 	if ((dcpp >= 0xc0) && (dcpp < 0xf0))
 		m_ram_pages[dcpp - 0xc0] = data;
@@ -826,14 +829,15 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	case 0xc0: // 1FFD
 	case 0xc8:
 		m_sc = data;
-		if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_RESET
+		if (BIT(m_cnf, 6)) m_sc = 0; // CNF_SC_CLEAN
 		update_memory();
 		break;
 	case 0xc1: // 7FFD
 	case 0xc9:
 		m_pn = data;
-		if (BIT(m_cnf, 5)) m_pn &= 0xc0;  // CNF_PN[5..0]_RESET
-		if (BIT(~m_cnf, 7)) m_pn &= 0x1f; // CNF_PN[7..6]_RESET
+		if (BIT(~m_cnf, 7)) m_pn &= 0x3f; // CNF_PN[7..6]_CLEAN
+		if (BIT(~m_cnf, 7) && BIT(m_cnf, 5)) m_pn &= 0xdf; // CNF_PN[5]_CLEAN
+		if (BIT(m_cnf, 5)) m_pn &= 0xe0;  // CNF_PN[4..0]_CLEAN
 		update_memory();
 		break;
 	case 0xc2:
@@ -871,9 +875,10 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		if (BIT(data, 2))
 		{
 			m_cnf = data;
-			if (BIT(m_cnf, 5)) m_pn &= 0xc0;  // CNF_PN[5..0]_RESET
-			if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_RESET
-			if (BIT(~m_cnf, 7)) m_pn &= 0x1f; // CNF_PN[7..6]_RESET
+			if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_CLEAN
+			if (BIT(~m_cnf, 7)) m_pn &= 0x3f; // CNF_PN[7..6]_CLEAN
+			if (BIT(~m_cnf, 7) && BIT(m_cnf, 5)) m_pn &= 0xdf; // CNF_PN[5]_CLEAN
+			if (BIT(m_cnf, 5)) m_pn &= 0xe0;  // CNF_PN[4..0]_CLEAN
 		}
 
 		update_memory();
@@ -1428,6 +1433,21 @@ void sprinter_state::init_taps()
 		{
 			check_accel(false, offset, data);
 		}
+	});
+
+	m_maincpu->space(AS_IO).install_write_tap(0x0000, 0xffff, "cpu_io_w", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		// Internal z84 ports are not accessible through IO map, hence they need special case here
+		// Keep these in ascending order
+		constexpr u8 z84_int[] = {
+			0x10, 0x11, 0x12, 0x13,
+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			0xee, 0xef,
+			0xf0, 0xf1, 0xf4
+		};
+		const auto found = std::lower_bound(std::begin(z84_int), std::end(z84_int), offset);
+		if ((found != std::end(z84_int)) && (*found == offset))
+			dcp_w(offset, data);
 	});
 }
 

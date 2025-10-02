@@ -807,8 +807,8 @@ static int tzx_cas_do_work( int16_t **buffer )
 				pilot_length = get_u16le(&cur_block[9]);
 				uint16_t zero = get_u16le(&cur_block[11]);
 				uint16_t one = get_u16le(&cur_block[13]);
-				bit0 = (cur_block[15] >> 4) ?: 16;
-				bit1 = (cur_block[15] & 0x0f) ?: 16;
+				bit0 = (cur_block[15] >> 4) ? (cur_block[15] >> 4) : 16;
+				bit1 = (cur_block[15] & 0x0f) ? (cur_block[15] & 0x0f) : 16;
 				uint8_t leading_num = util::BIT(cur_block[16], 6, 2);
 				bool leading_bit = util::BIT(cur_block[16], 5);
 				uint8_t trailing_num =  util::BIT(cur_block[16], 3, 2);

@@ -299,7 +299,7 @@ u8 k051960_device::k051960_fetchromdata(offs_t offset)
 	int pri = 0;
 	bool shadow = false;
 
-	m_k051960_cb(&code, &color, &pri, &shadow);
+	m_k051960_cb(code, color, pri, shadow);
 
 	addr = (code << 7) | (off1 << 2) | offset;
 	addr &= m_sprite_rom.length() - 1;
@@ -471,7 +471,7 @@ void k051960_device::k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle 
 		int pri = 0;
 		bool shadow = !BIT(m_shadow_config, 2) && (BIT(m_shadow_config, 1) || BIT(color, 7));
 
-		m_k051960_cb(&code, &color, &pri, &shadow);
+		m_k051960_cb(code, color, pri, shadow);
 
 		if (max_priority != -1)
 			if (pri < min_priority || pri > max_priority)

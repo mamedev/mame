@@ -6,8 +6,8 @@ Rewrite of Sega 315-5313 MD VDP (tied to Teradrive)
 
 Notes:
 - Teradrive actually has 128 KiB compared to stock 64, this means that d_titov2 won't possibly work
-here;
-- Should eventually derive from 315-5124 (the SMS VDP);
+  here;
+- Should eventually emulate the 315-5124 (the SMS VDP) via Mode 4;
 
 **************************************************************************************************/
 
@@ -18,7 +18,7 @@ here;
 #define LOG_REGSDMA     (1U << 2)
 #define LOG_DMA         (1U << 3)
 
-#define VERBOSE (LOG_GENERAL | LOG_REGS)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -98,15 +98,17 @@ void ym7101_device::device_start()
 	save_pointer(NAME(m_sprite_cache), 80 * 4);
 
 	m_hres_mode = 0x81;
+	m_sprite_collision = false;
+	m_sprite_overflow = false;
 
 	save_item(STRUCT_MEMBER(m_command, latch));
 	save_item(STRUCT_MEMBER(m_command, address));
 	save_item(STRUCT_MEMBER(m_command, code));
-//	save_item(STRUCT_MEMBER(m_command, write_state));
+//  save_item(STRUCT_MEMBER(m_command, write_state));
 
 	save_item(STRUCT_MEMBER(m_dma, source_address));
 	save_item(STRUCT_MEMBER(m_dma, length));
-//	save_item(STRUCT_MEMBER(m_dma, mode));
+//  save_item(STRUCT_MEMBER(m_dma, mode));
 	save_item(STRUCT_MEMBER(m_dma, active));
 	save_item(STRUCT_MEMBER(m_dma, fill));
 
@@ -115,7 +117,10 @@ void ym7101_device::device_start()
 	save_item(NAME(m_de));
 	save_item(NAME(m_ie0));
 	save_item(NAME(m_m1));
+	save_item(NAME(m_m2));
 	save_item(NAME(m_m3));
+	save_item(NAME(m_m5));
+	save_item(NAME(m_sh));
 	save_item(NAME(m_hscroll_address));
 	save_item(NAME(m_hsz));
 	save_item(NAME(m_vsz));
@@ -139,7 +144,8 @@ void ym7101_device::device_start()
 	save_item(NAME(m_vcounter));
 	save_item(NAME(m_hvcounter_latch));
 	save_item(NAME(m_vram_mask));
-
+	save_item(NAME(m_sprite_collision));
+	save_item(NAME(m_sprite_overflow));
 }
 
 void ym7101_device::device_reset()
@@ -200,18 +206,57 @@ void ym7101_device::update_command_state()
 	m_command.code = ((m_command.latch & 0xc000) >> 14) | ((m_command.latch & 0xf0'0000) >> 18);
 }
 
+// https://gendev.spritesmind.net/forum/viewtopic.php?t=768
+u16 ym7101_device::get_hv_counter()
+{
+	const u8 h40_mode = BIT(m_hres_mode, 0);
+
+	int const hpos = screen().hpos();
+
+	const u16 vincrement_hpos = h40_mode ? (0xa4 << 1) : (0x84 << 1);
+	int const vpos = screen().vpos() + !!(hpos > vincrement_hpos);
+
+	u8 vcount = vpos > 234 ? vpos - 0xea + 0xe4 : vpos;
+	// TODO: a bit off compared to screen htotal (half clocks? 68k stalls on hsync?)
+	// (54 + 364 = 418 vs. 0x1aa of 427)
+	const u16 hphase1 = h40_mode ? (0xb6 << 1) : (0x93 << 1);
+	const u16 hphase2 = h40_mode ? (0xe4 << 1) : (0xe9 << 1);
+	u8 hcount = (hpos > hphase1 ? hpos - hphase1 + hphase2 : hpos) >> 1;
+
+	return (vcount << 8) | hcount;
+}
+
+bool ym7101_device::in_hblank()
+{
+	const u8 h40_mode = BIT(m_hres_mode, 0);
+
+	const u16 hblank_upper = h40_mode ? (0xb2 << 1) : (0x92 << 1);
+	const u16 hblank_lower = h40_mode ? (0x05 << 1) : (0x04 << 1);
+
+	return !!(screen().hpos() < hblank_lower) || (screen().hpos() > hblank_upper);
+}
+
 u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
 {
+	const u8 sprite_flags = (m_sprite_overflow << 6) | (m_sprite_collision << 5);
+
+	if (!machine().side_effects_disabled())
+	{
+		m_sprite_overflow = false;
+		m_sprite_collision = false;
+	}
+
 	// other bits returns open bus, tbd
 	// FIFO empty << 9
 	// FIFO full << 8
-	const bool in_hblank = !!(screen().hpos() < (0x05 << 1)) || (screen().hpos() > (0xb2 << 1));
-	return (m_vint_pending << 7)
-//      | sprite_overflow << 6
-//      | sprite_collision << 5
+	// HACK: return FIFO always empty for now
+	// quadchal, splatth2j
+	return (1 << 9)
+		| (m_vint_pending << 7)
+		| sprite_flags
 //      | odd << 4
 		| (screen().vblank() << 3)
-		| in_hblank << 2
+		| in_hblank() << 2
 		| (m_dma.active << 1);
 		// is_pal << 0
 }
@@ -235,7 +280,8 @@ void ym7101_device::control_port_w(offs_t offset, u16 data, u16 mem_mask)
 				)
 			)
 			{
-				LOGDMA("DMA %s code=%02x: src=%06x dst=%06x length=%04x autoinc=%02x\n"
+				LOGDMA("(%d %d) DMA %s code=%02x: src=%06x dst=%06x length=%04x autoinc=%02x\n"
+					, screen().hpos(), screen().vpos()
 					, m_dma.mode == MEMORY_TO_VRAM ? "Memory->VDP" : "VRAM Copy"
 					, m_command.code
 					, m_dma.source_address
@@ -255,7 +301,12 @@ void ym7101_device::control_port_w(offs_t offset, u16 data, u16 mem_mask)
 
 		if ((data & 0xc000) == 0x8000)
 		{
-			space(AS_VDP_IO).write_byte((data >> 8) & 0x3f, data & 0xff);
+			const u8 reg = (data >> 8) & 0x3f;
+
+			// disable upper access in Mode 4 (bassmpro Sega logo)
+			if (!m_m5 && reg > 10)
+				return;
+			space(AS_VDP_IO).write_byte(reg, data & 0xff);
 		}
 		else
 		{
@@ -318,7 +369,8 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (m_dma.active && m_dma.mode == VRAM_FILL && BIT(m_command.code, 0))
 	{
-		LOGDMA("DMA VRAM Fill code=%02x value=%04x: dst=%06x length=%04x autoinc=%02x\n"
+		LOGDMA("(%d %d) DMA VRAM Fill code=%02x value=%04x: dst=%06x length=%04x autoinc=%02x\n"
+			, screen().hpos(), screen().vpos()
 			, m_command.code
 			, m_dma.fill
 			, m_command.address
@@ -354,26 +406,6 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 
 	m_command.address += m_auto_increment;
 	m_command.address &= m_vram_mask;
-}
-
-// https://gendev.spritesmind.net/forum/viewtopic.php?t=768
-u16 ym7101_device::get_hv_counter()
-{
-	const u8 h40_mode = BIT(m_hres_mode, 0);
-
-	int const hpos = screen().hpos();
-
-	const u16 vincrement_hpos = h40_mode ? (0xa4 << 1) : (0x84 << 1);
-	int const vpos = screen().vpos() + !!(hpos > vincrement_hpos);
-
-	u8 vcount = vpos > 234 ? vpos - 0xea + 0xe4 : vpos;
-	// TODO: a bit off compared to screen htotal (half clocks? 68k stalls on hsync?)
-	// (54 + 364 = 418 vs. 0x1aa of 427)
-	const u16 hphase1 = h40_mode ? (0xb6 << 1) : (0x93 << 1);
-	const u16 hphase2 = h40_mode ? (0xe4 << 1) : (0xe9 << 1);
-	u8 hcount = (hpos > hphase1 ? hpos - hphase1 + hphase2 : hpos) >> 1;
-
-	return (vcount << 8) | hcount;
 }
 
 u16 ym7101_device::hv_counter_r(offs_t offset, u16 mem_mask)
@@ -433,7 +465,10 @@ void ym7101_device::cram_w(offs_t offset, u16 data, u16 mem_mask)
 
 	// normal
 	m_palette->set_pen_color(offset, level[r << 1], level[g << 1], level[b << 1]);
-	// TODO: shadow & highlight
+	// shadow
+	m_palette->set_pen_color(offset | 0x80, level[r], level[g], level[b]);
+	// hilight
+	m_palette->set_pen_color(offset | 0x40, level[7 + r], level[7 + g], level[7 + b]);
 }
 
 void ym7101_device::cram_map(address_map &map)
@@ -484,6 +519,8 @@ void ym7101_device::regs_map(address_map &map)
 		m_de = !!BIT(data, 6);
 		m_ie0 = !!BIT(data, 5);
 		m_m1 = !!BIT(data, 4);
+		m_m2 = !!BIT(data, 3);
+		m_m5 = !!BIT(data, 2);
 		//m_dma.active = !!(m_m1 && BIT(m_command.code, 5));
 
 		if (m_ie0 && m_vint_pending)
@@ -503,8 +540,8 @@ void ym7101_device::regs_map(address_map &map)
 			, m_de
 			, m_ie0
 			, m_m1
-			, BIT(data, 3)
-			, BIT(data, 2)
+			, m_m2
+			, m_m5
 		);
 	}));
 	map(2, 2).lw8(NAME([this] (u8 data) {
@@ -570,13 +607,14 @@ void ym7101_device::regs_map(address_map &map)
 			m_hres_mode = data & 0x81;
 			flush_screen_mode();
 		}
+		m_sh = !!(BIT(data, 3));
 		LOGREGS("\tRSx: %d (%s) VS: %d HS: %d EP: %d S/H: %d LSx: %d\n"
 			, BIT(data, 7)
 			, BIT(data, 7) ? "H40" : "H32"
 			, BIT(data, 6)
 			, BIT(data, 5)
 			, BIT(data, 4)
-			, BIT(data, 3)
+			, m_sh
 			, (data & 6) >> 1
 		);
 	}));
@@ -675,6 +713,7 @@ void ym7101_device::flush_screen_mode()
 
 	//this->set_unscaled_clock(target_clock);
 
+	// FIXME: really 427.5 for H40 mode
 	const int htotal = h40_mode ? 427 : 342;
 	const int vtotal = 262;
 
@@ -711,7 +750,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 	u16 offset = 0;
 	int y, x;
 	u16 height, width;
-	u8 sprite_mask_state = 0;
+	u8 sprite_mask_state = 0; // m_sprite_overflow;
 
 	do {
 		const u16 *cache = &m_sprite_cache[offset];
@@ -761,8 +800,8 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 				if ((m_sprite_line[x + xi] & 0xf) == 0)
 					m_sprite_line[x + xi] = (color) | (dot & 0xf) | (high_priority << 6);
-				// sprite collision
-				// else if (dot)
+				else if (dot)
+					m_sprite_collision = true;
 			}
 		}
 
@@ -776,7 +815,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 			//   Looks just a quick way to draw nothing that works by chance.
 			// - rambo3 references link = 80 during attract.
 			//if (link != 0x7f)
-			//	popmessage("ym7101: attempt to access link $%d, aborted", link);
+			//  popmessage("ym7101: attempt to access link $%d, aborted", link);
 			break;
 		}
 
@@ -794,7 +833,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 	} while(num_sprites > 0 && num_pixels > 0 && entry_sprites > 0 && link != 0);
 
-	// sprite overflow, here
+	// m_sprite_overflow = num_pixels <= 0 || num_sprites <= 0 || sprite_mask_state == 2;
 }
 
 void ym7101_device::prepare_tile_line(int scanline)
@@ -811,13 +850,21 @@ void ym7101_device::prepare_tile_line(int scanline)
 	//int y = scanline >> 3;
 	int yi = scanline & 7;
 
-	const u16 vram_mask = 0x7ff;
+	const u16 tile_mask = 0x7ff;
 	//const u16 page_mask[] = { 0x7ff, 0x1fff, 0x1fff, 0x1fff };
 
 	const u16 page_masks[] = { 32, 64, 1, 128 };
 
 	const u16 h_page = page_masks[m_hsz];
 	const u16 v_page = page_masks[m_vsz];
+
+	// AV Artisan games will set plane B base with 0x18000
+	const u32 plane_a_name_base = (m_plane_a_name_table & m_vram_mask) >> 1;
+	const u32 plane_b_name_base = (m_plane_b_name_table & m_vram_mask) >> 1;
+
+	// talespin ignores lowest bit for status bar (writes 0x1800, wants 0x1000)
+	const u32 window_name_mask = (h40_mode ? 0x1f000 : 0x1f800) & m_vram_mask;
+	const u32 window_name_base = (m_window_name_table & window_name_mask) >> 1;
 
 	const u16 window_h_page = h40_mode ? 64 : 32;
 	const u16 window_v_page = 32;
@@ -870,8 +917,8 @@ void ym7101_device::prepare_tile_line(int scanline)
 			const u32 tile_offset_a = (x & ((window_h_page * 1) - 1)) + ((vcolumn_a >> 3) * (window_h_page >> 0));
 			scrolly_a_frac = 0;
 			scrollx_a_frac = 0;
-			id_flags_a = m_vram[((m_window_name_table >> 1) + tile_offset_a) & m_vram_mask];
-			tile_a = id_flags_a & vram_mask;
+			id_flags_a = m_vram[(window_name_base + tile_offset_a) & m_vram_mask];
+			tile_a = id_flags_a & tile_mask;
 			flipx_a = BIT(id_flags_a, 11) ? 4 : 3;
 			flipy_a = BIT(id_flags_a, 12) ? 7 : 0;
 			color_a = ((id_flags_a >> 13) & 3) << 4;
@@ -886,8 +933,8 @@ void ym7101_device::prepare_tile_line(int scanline)
 			scrolly_a_frac = scrolly_a & 7;
 			scrollx_a_frac = scrollx_a & 7;
 
-			id_flags_a = m_vram[((m_plane_a_name_table >> 1) + tile_offset_a) & m_vram_mask];
-			tile_a = id_flags_a & vram_mask;
+			id_flags_a = m_vram[(plane_a_name_base + tile_offset_a) & m_vram_mask];
+			tile_a = id_flags_a & tile_mask;
 			flipx_a = BIT(id_flags_a, 11) ? 4 : 3;
 			flipy_a = BIT(id_flags_a, 12) ? 7 : 0;
 			color_a = ((id_flags_a >> 13) & 3) << 4;
@@ -900,8 +947,8 @@ void ym7101_device::prepare_tile_line(int scanline)
 		const u16 scrolly_b_frac = scrolly_b & 7;
 		const u16 vcolumn_b = (scrolly_b + scanline) & ((v_page * 8) - 1);
 		const u32 tile_offset_b = ((x - (scrollx_b >> 3)) & ((h_page * 1) - 1)) + ((vcolumn_b >> 3) * (h_page >> 0));
-		const u16 id_flags_b = m_vram[((m_plane_b_name_table >> 1) + tile_offset_b) & m_vram_mask];
-		const u16 tile_b = id_flags_b & vram_mask;
+		const u16 id_flags_b = m_vram[(plane_b_name_base + tile_offset_b) & m_vram_mask];
+		const u16 tile_b = id_flags_b & tile_mask;
 		const u8 flipx_b = BIT(id_flags_b, 11) ? 4 : 3;
 		const u8 flipy_b = BIT(id_flags_b, 12) ? 7 : 0;
 		const u8 color_b = ((id_flags_b >> 13) & 3) << 4;
@@ -956,27 +1003,90 @@ bool ym7101_device::render_line(int scanline)
 
 	for (int x = 0; x < line_width; x ++)
 	{
-		u8 pen = m_background_color;
-
-		for (int pri = 0; pri < 2; pri ++)
-		{
-			u8 dot = m_tile_b_line[x];
-			if ((dot & 0xf) && BIT(dot, 6) == pri)
-				pen = dot & 0x3f;
-
-			dot = m_tile_a_line[x];
-			if ((dot & 0xf) && BIT(dot, 6) == pri)
-				pen = dot & 0x3f;
-
-			if (m_sprite_line[x] & 0xf && BIT(m_sprite_line[x], 6) == pri)
-				pen = m_sprite_line[x] & 0x3f;
-		}
+		u8 dot_b = m_tile_b_line[x];
+		u8 dot_a = m_tile_a_line[x];
+		u8 dot_sprite = m_sprite_line[x];
+		u8 pen = (this->*mix_table[m_sh])(dot_a, dot_b, dot_sprite);
 
 		p[x] = m_palette->pen(pen);
 	}
 
 	return true;
 }
+
+const ym7101_device::mix_func ym7101_device::mix_table[2] =
+{
+	&ym7101_device::mix_normal,
+	&ym7101_device::mix_sh
+};
+
+u8 ym7101_device::mix_normal(u8 dot_a, u8 dot_b, u8 dot_sprite)
+{
+	u8 pen = m_background_color;
+	for (int pri = 0; pri < 2; pri ++)
+	{
+		if ((dot_b & 0xf) && BIT(dot_b, 6) == pri)
+			pen = dot_b & 0x3f;
+
+		if ((dot_a & 0xf) && BIT(dot_a, 6) == pri)
+			pen = dot_a & 0x3f;
+
+		if (dot_sprite & 0xf && BIT(dot_sprite, 6) == pri)
+			pen = dot_sprite & 0x3f;
+	}
+	return pen;
+}
+
+// https://rasterscroll.com/mdgraphics/graphical-effects/shadow-and-highlight/
+u8 ym7101_device::mix_sh(u8 dot_a, u8 dot_b, u8 dot_sprite)
+{
+	u8 pen = m_background_color;
+
+	for (int pri = 0; pri < 2; pri ++)
+	{
+		if ((dot_b & 0xf) && BIT(dot_b, 6) == pri)
+			pen = dot_b & 0x3f;
+
+		if ((dot_a & 0xf) && BIT(dot_a, 6) == pri)
+			pen = dot_a & 0x3f;
+
+		// apply shadow if both tiles are low priority
+		if (!pri && !BIT(dot_a, 6) && !BIT(dot_b, 6))
+			pen |= 0x80;
+
+		if (dot_sprite & 0xf && BIT(dot_sprite, 6) == pri)
+		{
+			const u8 sprite_entry = dot_sprite & 0x3f;
+			if (sprite_entry == 0x3f)
+			{
+				// make pen transparent and apply shadow mask
+				pen |= 0x80;
+			}
+			else if (sprite_entry == 0x3e)
+			{
+				// make pen transparent and apply highlight mask
+				// cancel shadow effect if was previously set
+				if (pen & 0x80)
+					pen &= 0x3f;
+				else
+					pen |= 0x40;
+			}
+			else
+			{
+				// apply shadow mask if sprite entry isn't in the E line
+				// and overlaps a low priority tile
+				if (!pri && (sprite_entry & 0xf) != 0xe)
+				{
+					pen = (dot_sprite & 0x3f) | (pen & 0x80);
+				}
+				else
+					pen = (dot_sprite & 0x3f);
+			}
+		}
+	}
+	return pen;
+}
+
 
 TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 {
@@ -1080,10 +1190,18 @@ TIMER_CALLBACK_MEMBER(ym7101_device::dma_callback)
 		m_dtack_cb(0);
 		m_dma.active = false;
 		m_dma_timer->adjust(attotime::never);
+		LOGDMA("(%d %d) DMA end\n", screen().hpos(), screen().vpos());
 	}
 	else
 	{
-		m_dma_timer->adjust(attotime::from_ticks(8, clock()));
+		// https://md.railgun.works/index.php?title=VDP#DMA_Bandwidth
+		// TODO: rough estimation, should also take FIFO in consideration
+		// - galahad explicitly stops 68k by running DMAs during active scan
+		// - sailormn will hang during intro by side effect of checking sound busy without bus
+		// - zoom stage intros are timed against DMA (currently a bit too fast)
+		const bool in_active_display = !screen().vblank() && !in_hblank();
+
+		m_dma_timer->adjust(attotime::from_ticks(4 << (in_active_display + (code_dest == AS_VDP_VRAM)), clock()));
 	}
 }
 
@@ -1092,5 +1210,3 @@ u32 ym7101_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
-
-

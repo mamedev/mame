@@ -2,14 +2,13 @@
 // copyright-holders: Xing Xing, David Haywood
 
 /*
-
-IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s) with XA sub-cpu
-These games use the IGS027A processor.
+IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s) with XA sub-CPU
 
 Triple Fever (V105US) (tripfevb) hangs after paying out tickets, with the MCU
 apparently attempting serial communication with something.
 
 TODO:
+* Krazy Keno touch pad is unemulated.
 * Does Crazy Bugs (V103JP) actually support a hopper?  It shows in the input
   test, but both the Payout and Ticket buttons seem to use the ticket dispenser.
 */
@@ -32,6 +31,8 @@ TODO:
 #include "speaker.h"
 
 #include "crzybugs.lh"
+#include "jking04.lh"
+#include "krzykeno.lh"
 #include "tripfev.lh"
 
 
@@ -50,13 +51,15 @@ public:
 		m_screen(*this, "screen"),
 		m_ticket(*this, "ticket"),
 		m_external_rom(*this, "user1"),
+		m_okibank(*this, "okibank%u", 1U),
 		m_io_test(*this, "TEST%u", 0U),
 		m_io_dsw(*this, "DSW%u", 1U),
 		m_out_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	void base(machine_config &config) ATTR_COLD;
-	void base_xor(machine_config &config) ATTR_COLD;
+	void haunthig(machine_config &config) ATTR_COLD;
+	void tripfev(machine_config &config) ATTR_COLD;
 
 	void init_crzybugs() ATTR_COLD;
 	void init_crzybugsj() ATTR_COLD;
@@ -81,13 +84,15 @@ private:
 	optional_device<ticket_dispenser_device> m_ticket;
 	required_region_ptr<u32> m_external_rom;
 
+	optional_memory_bank_array<2> m_okibank;
+
 	optional_ioport_array<3> m_io_test;
 	optional_ioport_array<3> m_io_dsw;
 
 	output_finder<8> m_out_lamps;
 
 	u32 m_xor_table[0x100];
-	u8 m_io_select[2];
+	u8 m_io_select;
 
 	bool m_irq_from_igs031;
 
@@ -96,13 +101,14 @@ private:
 	void pgm_create_dummy_internal_arm_region() ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 	void main_xor_map(address_map &map) ATTR_COLD;
+	void haunthig_map(address_map &map) ATTR_COLD;
+	void tripfev_map(address_map &map) ATTR_COLD;
+
+	void split_bank_oki_map(address_map &map) ATTR_COLD;
 
 	u32 external_rom_r(offs_t offset);
 
 	void xor_table_w(offs_t offset, u8 data);
-
-	u16 xa_r(offs_t offset, u16 mem_mask);
-	void xa_w(offs_t offset, u16 data, u16 mem_mask);
 
 	void output_w(u8 data);
 	void lamps_w(u8 data);
@@ -110,9 +116,10 @@ private:
 	void xa_irq(int state);
 
 	u32 gpio_r();
-	void oki_bank_w(offs_t offset, u8 data);
-	template <unsigned Select, unsigned First> u8 dsw_r();
-	template <unsigned Select> void io_select_w(u8 data);
+	void oki_bank_w(u8 data);
+	void oki_split_bank_w(u8 data);
+	u8 dsw_r();
+	void io_select_w(u8 data);
 };
 
 
@@ -124,6 +131,13 @@ void igs_m027xa_state::machine_reset()
 void igs_m027xa_state::machine_start()
 {
 	m_out_lamps.resolve();
+
+	if (m_okibank[1])
+	{
+		u8 *const samples = memregion("oki")->base();
+		m_okibank[0]->configure_entries(0, 16, samples, 0x20000);
+		m_okibank[1]->configure_entries(0, 16, samples, 0x20000);
+	}
 
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 
@@ -146,14 +160,13 @@ void igs_m027xa_state::video_start()
 
 void igs_m027xa_state::main_map(address_map &map)
 {
-	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
+	map(0x08000000, 0x081fffff).rom().region("user1", 0); // Game ROM
 
 	map(0x18000000, 0x18007fff).ram().mirror(0xf8000).share("nvram");
 
 	map(0x38000000, 0x38007fff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write));
 	map(0x38008000, 0x38008003).umask32(0x000000ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x38009000, 0x38009003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x3800c000, 0x3800c003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_bank_w));
 
 	map(0x50000000, 0x500003ff).umask32(0x000000ff).w(FUNC(igs_m027xa_state::xor_table_w));
 
@@ -165,7 +178,27 @@ void igs_m027xa_state::main_xor_map(address_map &map)
 {
 	main_map(map);
 
-	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027xa_state::external_rom_r)); // Game ROM
+	map(0x08000000, 0x081fffff).r(FUNC(igs_m027xa_state::external_rom_r)); // Game ROM
+}
+
+void igs_m027xa_state::haunthig_map(address_map &map)
+{
+	main_xor_map(map);
+
+	map(0x3800a000, 0x3800a003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_split_bank_w));
+}
+
+void igs_m027xa_state::tripfev_map(address_map &map)
+{
+	main_xor_map(map);
+
+	map(0x3800c000, 0x3800c003).umask32(0x000000ff).w(FUNC(igs_m027xa_state::oki_bank_w));
+}
+
+void igs_m027xa_state::split_bank_oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).bankr(m_okibank[0]);
+	map(0x20000, 0x3ffff).bankr(m_okibank[1]);
 }
 
 
@@ -253,16 +286,16 @@ INPUT_PORTS_START( crzybugs_us )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 	PORT_DIPSETTING(    0x04, DEF_STR(Yes) )
 	PORT_DIPNAME( 0x08, 0x08, "Odds Table" )               PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR(No) )
-	PORT_DIPSETTING(    0x08, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x08, DEF_STR(On) )
 	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )           PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )
-	PORT_DIPNAME( 0x60, 0x60, "Symbol" )                   PORT_DIPLOCATION("SW1:6,7")
-	PORT_DIPSETTING(    0x00, "Both" )
-	PORT_DIPSETTING(    0x20, "Both (duplicate)" )
-	PORT_DIPSETTING(    0x40, "Fruit" )
+	PORT_DIPNAME( 0x60, 0x60, "Symbols" )                  PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x60, "Bug" )
+	PORT_DIPSETTING(    0x40, "Fruit" )
+	PORT_DIPSETTING(    0x20, "Both" )
+	PORT_DIPSETTING(    0x00, "Both" )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Score Box" )                PORT_DIPLOCATION("SW2:1,2")
@@ -280,7 +313,7 @@ INPUT_PORTS_START( crzybugs_us )
 	PORT_DIPSETTING(    0x30, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x20, "Regular" )
 	PORT_DIPSETTING(    0x10, "Georgia" )
-	PORT_DIPSETTING(    0x00, "Georgia (duplicate)" )
+	PORT_DIPSETTING(    0x00, "Georgia" )
 	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )                PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
@@ -300,17 +333,68 @@ INPUT_PORTS_START( crzybugs_jp )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x01, DEF_STR(On) )
-	PORT_DIPNAME( 0x06, 0x06, "Symbol" )                   PORT_DIPLOCATION("SW1:2,3")
-	PORT_DIPSETTING(    0x00, "Both" )
-	PORT_DIPSETTING(    0x02, "Both (duplicate)" )
-	PORT_DIPSETTING(    0x04, "Fruit" )
+	PORT_DIPNAME( 0x06, 0x06, "Symbols" )                  PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x06, "Bug" )
+	PORT_DIPSETTING(    0x04, "Fruit" )
+	PORT_DIPSETTING(    0x02, "Both" )
+	PORT_DIPSETTING(    0x00, "Both" )
 	PORT_DIPNAME( 0x08, 0x08, "Hold Pair" )                PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, "Regular" )
 
 	PORT_MODIFY("DSW3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( jking04 )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("TEST0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play / Take Score")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+
+	PORT_MODIFY("TEST1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Extra")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Ticket")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
+
+	PORT_MODIFY("TEST2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Stop Reel 1 / Show Odds")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Odds Table" )               PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x04, 0x04, "Password" )                 PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x08, 0x00, "Auto Hold" )                PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x10, 0x00, "Auto Stop" )                PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x20, 0x00, "Show Title" )               PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Score Box" )                PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, DEF_STR(No) )
+	PORT_DIPSETTING(    0x80, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x40, "10X" )
+	PORT_DIPSETTING(    0x00, "10X" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "Play Score" )               PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x02, 0x00, "Hand Count" )               PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( tripfev )
@@ -340,15 +424,15 @@ INPUT_PORTS_START( tripfev )
 	PORT_DIPNAME( 0x04, 0x04, "Password" )                 PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
-	PORT_DIPNAME( 0x08, 0x08, "Odds Table" )               PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR(No) )
-	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x08, 0x00, "Odds Table" )               PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x30, 0x30, "Score Box" )                PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x00, "10X" )
-	PORT_DIPSETTING(    0x10, "10X (duplicate)" )
-	PORT_DIPSETTING(    0x20, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x30, DEF_STR(No) )
-	PORT_DIPNAME( 0x40, 0x40, "Play Score" )               PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x20, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x10, "10X" )
+	PORT_DIPSETTING(    0x00, "10X" )
+	PORT_DIPNAME( 0x40, 0x00, "Play Score" )               PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPNAME( 0x80, 0x80, "Auto Take" )                PORT_DIPLOCATION("SW1:8")
@@ -356,17 +440,99 @@ INPUT_PORTS_START( tripfev )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Hand Count" )               PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x00, "Hand Count" )               PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPNAME( 0x06, 0x06, "Hold Pair" )                PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x04, "Regular" )
 	PORT_DIPSETTING(    0x02, "Georgia" )
-	PORT_DIPSETTING(    0x00, "Georgia (duplicate)" )
+	PORT_DIPSETTING(    0x00, "Georgia" )
 	PORT_DIPNAME( 0x08, 0x08, "Auto Ticket" )              PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( haunthig101us )
+	PORT_INCLUDE(tripfev)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x10, 0x00, "Double Up Game" )           PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( haunthig107us )
+	PORT_INCLUDE(haunthig101us)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x20, 0x20, "Auto Play" )                PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( krzykeno )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("TEST0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_NAME("Call Attendant")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play / Raise")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Clear Error")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Pick / Hold / Stop Reel 1")
+
+	PORT_MODIFY("TEST1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Ticket")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
+
+	PORT_MODIFY("TEST2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_NAME("Help / Stop Reel 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )    PORT_NAME("Take Score / Exit")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_NAME("Quick Pick / Wipe Card / Stop Reel 2")
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Demo Mode" )                PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x04, 0x04, "Password" )                 PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x08, 0x00, "Odds Table" )               PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x30, 0x30, "Score Box" )                PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR(No) )
+	PORT_DIPSETTING(    0x20, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x10, "10X" )
+	PORT_DIPSETTING(    0x00, "10X" )
+	PORT_DIPNAME( 0x40, 0x00, "Play Score" )               PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x80, 0x00, "Hand Count" )               PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Auto Ticket" )              PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x02, 0x02, "Non Stop" )                 PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x04, 0x04, "Hold Pair" )                PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, "Regular" )
+	PORT_DIPSETTING(    0x00, "Georgia" )
+	PORT_DIPNAME( 0x18, 0x18, "Symbols" )                  PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "Both" )
+	PORT_DIPSETTING(    0x10, "Fruit" )
+	PORT_DIPSETTING(    0x08, "Bug" )
+	PORT_DIPSETTING(    0x00, "Bug" )
+	PORT_DIPNAME( 0x80, 0x80, "Touch Pad" )                PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 INPUT_PORTS_END
 
 
@@ -383,18 +549,19 @@ void igs_m027xa_state::output_w(u8 data)
 void igs_m027xa_state::lamps_w(u8 data)
 {
 	// active high outputs
-	// +------+----------------+----------------+
-	// | lamp | crzybugs       | tripfev        |
-	// +------+----------------+----------------+
-	// |  1   | start/stop all | start/stop all |
-	// |  2   | stop 2/small   | stop 3/small   |
-	// |  3   | bet            | stop 5/play    |
-	// |  4   | stop 3/take    | stop 4/take    |
-	// |  5   | stop 1/double  | stop 2/double  |
-	// |  6   | big            | stop 1/big     |
-	// |  7   |                |                |
-	// |  8   |                |                |
-	// +------+----------------+----------------+
+	// +------+----------------+----------------+----------------+-----------------------------+
+	// | lamp | crzybugs       | tripfev        | jking04        | krzykeno                    |
+	// |      |                | haunthig       |                |                             |
+	// +------+----------------+----------------+----------------+-----------------------------+
+	// |  1   | start/stop all | start/stop all | start/stop all | start/stop all/keep         |
+	// |  2   | stop 2/small   | stop 3/small   | stop 4         | help/stop 3                 |
+	// |  3   | bet            | stop 5/play    | bet/take       | play/raise                  |
+	// |  4   | stop 3/take    | stop 4/take    | stop 1         | take/exit                   |
+	// |  5   | stop 1/double  | stop 2/double  | stop 3         | quick pick/wipe card/stop 2 |
+	// |  6   | big            | stop 1/big     | stop 2         | pick/stop 1                 |
+	// |  7   |                |                |                |                             |
+	// |  8   |                |                |                |                             |
+	// +------+----------------+----------------+----------------+-----------------------------+
 	for (unsigned i = 0; 8 > i; ++i)
 		m_out_lamps[i] = BIT(data, i);
 }
@@ -408,26 +575,30 @@ u32 igs_m027xa_state::gpio_r()
 	return ret;
 }
 
-void igs_m027xa_state::oki_bank_w(offs_t offset, u8 data)
+void igs_m027xa_state::oki_bank_w(u8 data)
 {
-	m_oki->set_rom_bank(data & 7);
+	m_oki->set_rom_bank(data & 0x07);
 }
 
-template <unsigned Select, unsigned First>
+void igs_m027xa_state::oki_split_bank_w(u8 data)
+{
+	m_okibank[0]->set_entry(data & 0x0f); // speech
+	m_okibank[1]->set_entry((data >> 4) & 0x0f); // music
+}
+
 u8 igs_m027xa_state::dsw_r()
 {
 	u8 data = 0xff;
 
-	for (int i = First; i < m_io_dsw.size(); i++)
-		if (!BIT(m_io_select[Select], i - First))
+	for (int i = 0; i < m_io_dsw.size(); i++)
+		if (!BIT(m_io_select, i))
 			data &= m_io_dsw[i].read_safe(0xff);
 	return data;
 }
 
-template <unsigned Select>
 void igs_m027xa_state::io_select_w(u8 data)
 {
-	m_io_select[Select] = data;
+	m_io_select = data;
 }
 
 
@@ -476,7 +647,7 @@ void igs_m027xa_state::base(machine_config &config)
 	IGS027A(config, m_maincpu, 22'000'000); // Crazy Bugs has a 22MHz crystal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_map);
 	m_maincpu->in_port().set(FUNC(igs_m027xa_state::gpio_r));
-	m_maincpu->out_port().set(FUNC(igs_m027xa_state::io_select_w<1>));
+	m_maincpu->out_port().set(FUNC(igs_m027xa_state::io_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -503,7 +674,7 @@ void igs_m027xa_state::base(machine_config &config)
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits(true);
-	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027xa_state::dsw_r<1, 0>)));
+	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027xa_state::dsw_r)));
 	m_igs017_igs031->in_pb_callback().set_ioport("TEST0");
 	m_igs017_igs031->in_pc_callback().set_ioport("TEST1");
 
@@ -511,14 +682,23 @@ void igs_m027xa_state::base(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void igs_m027xa_state::base_xor(machine_config &config)
+void igs_m027xa_state::haunthig(machine_config &config)
 {
 	base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::main_xor_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::haunthig_map);
+
+	m_oki->set_addrmap(0, &igs_m027xa_state::split_bank_oki_map);
+}
+
+void igs_m027xa_state::tripfev(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027xa_state::tripfev_map);
 }
 
 
@@ -530,9 +710,9 @@ void igs_m027xa_state::base_xor(machine_config &config)
 ROM_START( haunthig )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "haunthig_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "haunthig_igs027a", 0x00000, 0x4000, CRC(ccde8c3d) SHA1(7ed1613b848a7c9f1fd3e88f062eee5117a9a020) )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_ver-109us.u34", 0x000000, 0x80000, CRC(300fed78) SHA1(afa4c8855cd780c57d4f92ea6131ed4e77063268) )
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 )
@@ -556,7 +736,7 @@ ROM_END
 ROM_START( haunthig107us ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, two banks of 8 DIP switches
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "h2_igs027a.u42", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "h2_igs027a.u42", 0x00000, 0x4000, CRC(ccde8c3d) SHA1(7ed1613b848a7c9f1fd3e88f062eee5117a9a020) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_v-107us.u34", 0x000000, 0x200000, CRC(dd01f631) SHA1(34106caf3c3086f611c67852c5296dba6a0fb38a) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
@@ -582,9 +762,9 @@ ROM_END
 ROM_START( haunthig101us ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, two banks of 8 DIP switches
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "h2_igs027a", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'H2'
+	ROM_LOAD( "h2_igs027a", 0x00000, 0x4000, CRC(ccde8c3d) SHA1(7ed1613b848a7c9f1fd3e88f062eee5117a9a020) ) // sticker marked 'H2'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_ver-101us.u34", 0x000000, 0x80000, CRC(4bf045d4) SHA1(78c848fd69961df8d9b75f92ad57c3534fbf08db) )
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 )
@@ -610,7 +790,7 @@ ROM_START( crzybugs ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "m7_igs27a.u37", 0x00000, 0x4000, CRC(1b20532c) SHA1(e08d0110a843915a8ba8627ae6d3947cccc22048) ) // sticker marked 'M7'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-204us.u23", 0x000000, 0x80000, CRC(d1232462) SHA1(685a292f39bf57a80d6ef31289cf9f673ba06dd4) ) // MX27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
@@ -632,7 +812,7 @@ ROM_START( crzybugs202us )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "m7_igs27a.u37", 0x00000, 0x4000, CRC(1b20532c) SHA1(e08d0110a843915a8ba8627ae6d3947cccc22048) ) // sticker marked 'M7' (not verified for this set)
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(210da1e6) SHA1(c726497bebd25d6a9053e331b4c26acc7e2db0b2) ) // MX27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
@@ -654,7 +834,7 @@ ROM_START( crzybugs200us )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "m7_igs27a.u37", 0x00000, 0x4000, CRC(1b20532c) SHA1(e08d0110a843915a8ba8627ae6d3947cccc22048) ) // sticker marked 'M7' (not verified for this set)
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(129e36e9) SHA1(53f20bc3792249de8ef276f84283baa9abd30acd) ) // MX27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
@@ -703,7 +883,7 @@ ROM_START( tripfev )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "igs027a.u42", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "v110.u23", 0x000000, 0x80000, CRC(68658bf9) SHA1(7d7f2c67acb55a8ef24b7cc54cb2e5b3f94c387a) ) // 27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
@@ -724,7 +904,7 @@ ROM_START( tripfev108us ) // IGS PCB-0575-02-HU PCB
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "w1_igs027a.u42", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "v108.u34", 0x000000, 0x80000, CRC(f0ad18ed) SHA1(95239e7b9925f12008051140afb74d47a5da4a3a) ) // 27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
@@ -746,7 +926,7 @@ ROM_START( tripfev107us ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "w1_igs027a.u37", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "triple_fever_u23_v107_us.u23", 0x000000, 0x80000, CRC(aa56d888) SHA1(0b8b2765079259b76ea803289841d867c33c8cb2) ) // 27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
@@ -768,7 +948,7 @@ ROM_START( tripfev105us ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "w1_igs027a.u37", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "u23 27c4096.bin", 0x000000, 0x80000, CRC(f870edda) SHA1(30d1c2d4c575749adbbf28b64eca1f35bcf7dfca) ) // 27C4096, unreadable label
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
@@ -790,7 +970,7 @@ ROM_START( wldfruit ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "w1.u37", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'W1?' (same label, but not the same as tripfev)
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "wild_fruit_v-208us.u23", 0x000000, 0x80000, CRC(d43398f1) SHA1(ecc4bd5cb6da16b35c63b843cf7beec1ab84ed9d) ) // M27C4002
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
@@ -810,9 +990,9 @@ ROM_END
 ROM_START( jking04 ) // IGS PCB-0447-03-GM - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, three banks of 8 DIP switches
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "j10_igs027a.u37", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "j10_igs027a.u37", 0x0000, 0x4000, CRC(ebbca800) SHA1(5a659999432c6972588609683fa2f440a895cec2) )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "j_k_2004_v101_us.u23", 0x000000, 0x80000, CRC(8ab70d64) SHA1(4ddda6d9eba3db7b3e5267d70349933d6bce2266) ) // 27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
@@ -832,7 +1012,7 @@ ROM_END
 ROM_START( krzykeno ) // IGS PCB-0575-03-HU PCB
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "v21_igs027a.u42", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "v21_igs027a.u42", 0x0000, 0x4000, CRC(f24271da) SHA1(e4530b563b2ca36cc7efbc699d438ca44824f58a) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "krazy_keno_v-105us.u34", 0x000000, 0x200000, CRC(98d8797e) SHA1(0de2500e85df5611baa275267d711f57bc5f60ee) )
@@ -879,9 +1059,9 @@ void igs_m027xa_state::pgm_create_dummy_internal_arm_region()
 
 void igs_m027xa_state::init_hauntedh()
 {
-	hauntedh_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
+	tripfev_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 }
 
 void igs_m027xa_state::init_crzybugs()
@@ -914,40 +1094,38 @@ void igs_m027xa_state::init_wldfruit()
 void igs_m027xa_state::init_jking04()
 {
 	jking04_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027xa_state::init_krzykeno()
 {
-	krzykeno_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
+	tswxp_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 }
 
 } // anonymous namespace
 
 // These use the MX10EXAQC (80c51XA from Philips)
 // the PCBs are closer to igs_fear.cpp in terms of layout
-GAME(  2008, haunthig,      0,        base,       base,        igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_NOT_WORKING ) // IGS FOR V109US 2008 10 14
-GAME(  2007, haunthig107us, haunthig, base,       base,        igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2007 07 03
-GAME(  2006, haunthig101us, haunthig, base,       base,        igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_NOT_WORKING ) // IGS FOR V101US 2006 08 23
+GAMEL( 2008, haunthig,      0,        haunthig,   haunthig107us, igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", 0, layout_tripfev ) // IGS FOR V109US 2008 10 14
+GAMEL( 2007, haunthig107us, haunthig, haunthig,   haunthig107us, igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V107US)", 0, layout_tripfev ) // IGS FOR V107US 2007 07 03
+GAMEL( 2006, haunthig101us, haunthig, haunthig,   haunthig101us, igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", 0, layout_tripfev ) // IGS FOR V101US 2006 08 23
 
-GAMEL( 2009, crzybugs,      0,        base_xor,   crzybugs_us, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
-GAMEL( 2006, crzybugs202us, crzybugs, base_xor,   crzybugs_us, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
-GAMEL( 2005, crzybugs200us, crzybugs, base_xor,   crzybugs_us, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", 0, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
+GAMEL( 2009, crzybugs,      0,        tripfev,    crzybugs_us,   igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
+GAMEL( 2006, crzybugs202us, crzybugs, tripfev,    crzybugs_us,   igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
+GAMEL( 2005, crzybugs200us, crzybugs, tripfev,    crzybugs_us,   igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V200US)", 0, layout_crzybugs ) // FOR V100US 2005 7 20 but also V200US string
 
-GAMEL( 2007, crzybugs103jp, crzybugs, base_xor,   crzybugs_jp, igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", 0, layout_crzybugs ) // IGS FOR V101JP 2007 06 08 (test mode calls this V102JP, ROM label was V103JP)
+GAMEL( 2007, crzybugs103jp, crzybugs, tripfev,    crzybugs_jp,   igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", 0, layout_crzybugs ) // IGS FOR V101JP 2007 06 08 (test mode calls this V102JP, ROM label was V103JP)
 
-GAMEL( 2006, tripfev,       0,        base_xor,   tripfev,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V110US)", 0, layout_tripfev )
-GAMEL( 2006, tripfev108us,  tripfev,  base_xor,   tripfev,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", 0, layout_tripfev )
-GAMEL( 2006, tripfev107us,  tripfev,  base_xor,   tripfev,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", 0, layout_tripfev ) // IGS FOR V107US 2006 09 07
-GAMEL( 2006, tripfev105us,  tripfev,  base_xor,   tripfev,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING, layout_tripfev )
+GAMEL( 2006, tripfev,       0,        tripfev,    tripfev,       igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V110US)", 0, layout_tripfev )
+GAMEL( 2006, tripfev108us,  tripfev,  tripfev,    tripfev,       igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", 0, layout_tripfev )
+GAMEL( 2006, tripfev107us,  tripfev,  tripfev,    tripfev,       igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", 0, layout_tripfev ) // IGS FOR V107US 2006 09 07
+GAMEL( 2006, tripfev105us,  tripfev,  tripfev,    tripfev,       igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING, layout_tripfev )
 
-GAME(  200?, wldfruit,      0,        base,       base,        igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
+GAME(  200?, wldfruit,      0,        base,       base,          igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
 
-GAME(  200?, jking04,       0,        base,       base,        igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", MACHINE_NOT_WORKING ) // no IGS027A dump
+GAMEL( 2003, jking04,       0,        tripfev,    jking04,       igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", 0, layout_jking04 )
 
-GAME(  200?, krzykeno,      0,        base,       base,        igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING ) // no IGS027A dump
+GAMEL( 2006, krzykeno,      0,        haunthig,   krzykeno,      igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING, layout_krzykeno ) // touch pad
