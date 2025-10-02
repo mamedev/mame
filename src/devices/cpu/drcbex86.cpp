@@ -1285,16 +1285,21 @@ void drcbe_x86::reset()
 		a.mov(eax, ptr(ecx, regoffsh));
 		a.mov(MABS(&m_state.f[regnum].s.h), eax);
 	}
-	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, fmod)));                  // movzx eax,state->fmod
-	a.and_(eax, 3);                                                                     // and    eax,3
-	a.mov(MABS(&m_state.fmod), al);                                                     // mov    [fmod],al
-	a.fldcw(word_ptr(uintptr_t(&fp_control[0]), eax, 1));                               // fldcw  fp_control[eax*2]
-	a.mov(eax, ptr(ecx, offsetof(drcuml_machine_state, exp)));                          // mov    eax,state->exp
-	a.mov(MABS(&m_state.exp), eax);                                                     // mov    [exp],eax
-	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, flags)));                 // movzx eax,state->flags
-	a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                                  // push   flags_unmap[eax*4]
-	a.popfd();                                                                          // popf
-	a.ret();                                                                            // ret
+	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, fmod)));
+	a.and_(eax, 3);
+	a.mov(MABS(&m_state.fmod), al);
+	a.fldcw(word_ptr(uintptr_t(&fp_control[0]), eax, 1));
+	a.mov(eax, ptr(ecx, offsetof(drcuml_machine_state, exp)));
+	a.mov(MABS(&m_state.exp), eax);
+
+	a.pushfd();
+	a.and_(dword_ptr(esp), ~0x8c5);
+	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, flags)));
+	a.and_(eax, FLAGS_ALL);
+	a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
+	a.or_(dword_ptr(esp), eax);
+	a.popfd();
+	a.ret();
 
 
 	// emit the generated code
@@ -3578,11 +3583,22 @@ void drcbe_x86::op_setflgs(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
 	a.pushfd();
-
-	emit_mov_r32_p32(a, eax, srcp);
-
-	a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
 	a.and_(dword_ptr(esp), ~0x8c5);
+
+	if (srcp.is_immediate())
+	{
+		uint32_t const flags = flags_unmap[srcp.immediate() & FLAGS_ALL];
+		if (!flags)
+			a.xor_(eax, eax);
+		else
+			a.mov(eax, flags);
+	}
+	else
+	{
+		emit_mov_r32_p32(a, eax, srcp);
+		a.and_(eax, FLAGS_ALL);
+		a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
+	}
 	a.or_(dword_ptr(esp), eax);
 
 	a.popfd();
@@ -6991,15 +7007,18 @@ void drcbe_x86::op_fcmp(Assembler &a, const instruction &inst)
 	a.fcomip(st1);
 	a.fstp(st0);
 
-	// clear Z and C if unordered
-	Label ordered = a.newLabel();
+	if (inst.flags() & (FLAG_Z | FLAG_C))
+	{
+		// clear Z and C if unordered
+		Label ordered = a.newLabel();
 
-	a.short_().jnp(ordered);
-	a.lahf();
-	a.and_(eax, 0x00003e00);
-	a.sahf();
+		a.short_().jnp(ordered);
+		a.lahf();
+		a.and_(eax, 0x00003e00);
+		a.sahf();
 
-	a.bind(ordered);
+		a.bind(ordered);
+	}
 }
 
 

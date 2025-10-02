@@ -628,7 +628,7 @@ private:
 
 	void store_carry(a64::Assembler &a, bool inverted = false);
 	void load_carry(a64::Assembler &a, bool inverted = false);
-	void set_flags(a64::Assembler &a);
+	void set_flags(a64::Assembler &a, const a64::Gp &reg);
 
 	void calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits);
 	void calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits);
@@ -1468,22 +1468,21 @@ void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted)
 	}
 }
 
-void drcbe_arm64::set_flags(a64::Assembler &a)
+void drcbe_arm64::set_flags(a64::Assembler &a, const a64::Gp &reg)
 {
 	// Set native condition codes after loading flags register
 	m_carry_state = carry_state::POISON;
 
 	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
 
-	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
-	a.ubfx(TEMP_REG3, FLAGS_REG, FLAG_BIT_V, 1); // overflow flag
-	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
+	a.and_(TEMP_REG2, reg.x(), 0b1100); // zero + sign
+	a.bfxil(TEMP_REG2, reg.x(), FLAG_BIT_V, 1); // overflow flag
 	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
 
 	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
 
 	a.mov(TEMP_REG2, FLAG_C | FLAG_U);
-	a.and_(FLAGS_REG, FLAGS_REG, TEMP_REG2);
+	a.and_(FLAGS_REG, reg.x(), TEMP_REG2);
 }
 
 inline void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits)
@@ -2425,8 +2424,10 @@ void drcbe_arm64::op_setflgs(a64::Assembler &a, const uml::instruction &inst)
 
 	be_parameter flagsp(*this, inst.param(0), PTYPE_MRI);
 
-	mov_reg_param(a, inst.size(), FLAGS_REG, flagsp);
-	set_flags(a);
+	const a64::Gp flags = flagsp.select_register(FLAGS_REG, inst.size());
+
+	mov_reg_param(a, inst.size(), flags, flagsp);
+	set_flags(a, flags);
 }
 
 void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
@@ -2527,13 +2528,18 @@ void drcbe_arm64::op_restore(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	a.ldrb(TEMP_REG1.w(), arm::Mem(membase, offsetof(drcuml_machine_state, fmod)));
+	a.and_(TEMP_REG1.w(), TEMP_REG1.w(), 3);
+	a.mrs(TEMP_REG2, a64::Predicate::SysReg::kFPCR);
 	emit_strb_mem(a, TEMP_REG1.w(), &m_state.fmod);
+	a.sub(TEMP_REG1.w(), TEMP_REG1.w(), 1);
+	a.bfi(TEMP_REG2, TEMP_REG1, 22, 2);
+	a.msr(a64::Predicate::SysReg::kFPCR, TEMP_REG2);
 
 	a.ldr(TEMP_REG1.w(), arm::Mem(membase, offsetof(drcuml_machine_state, exp)));
 	emit_str_mem(a, TEMP_REG1.w(), &m_state.exp);
 
 	a.ldrb(FLAGS_REG.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
-	set_flags(a);
+	set_flags(a, FLAGS_REG);
 }
 
 void drcbe_arm64::op_load(a64::Assembler &a, const uml::instruction &inst)
