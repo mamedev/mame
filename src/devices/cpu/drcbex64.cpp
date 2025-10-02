@@ -603,7 +603,6 @@ private:
 	void movsd_r128_p64(Assembler &a, Xmm const &reg, be_parameter const &param);
 	void movsd_p64_r128(Assembler &a, be_parameter const &param, Xmm const &reg);
 
-	void calculate_status_flags(Assembler &a, uint32_t instsize, Operand const &dst, u8 flags);
 	void calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp const &lo, Gp const &hi);
 	void calculate_status_flags_mul_low(Assembler &a, Gp const &lo);
 
@@ -1430,50 +1429,6 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 	}
 }
 
-void drcbe_x64::calculate_status_flags(Assembler &a, uint32_t instsize, Operand const &dst, u8 flags)
-{
-	// calculate status flags in a way that does not modify any other status flags
-	uint32_t flagmask = 0;
-
-	// can't get FLAG_V from lahf so implement it using seto if needed in the future
-	if (flags & FLAG_C) flagmask |= 0x0100;
-	if (flags & FLAG_Z) flagmask |= 0x4000;
-	if (flags & FLAG_S) flagmask |= 0x8000;
-	if (flags & FLAG_U) flagmask |= 0x0400;
-
-	if ((flags & (FLAG_Z | FLAG_S)) == flags)
-	{
-		Gp tempreg = r10;
-		Gp tempreg2 = r11;
-
-		a.mov(tempreg, rax);
-
-		if (dst.isMem())
-			a.mov(tempreg2, dst.as<Mem>());
-		else
-			a.mov(tempreg2, dst.as<Gpq>().r64());
-
-		a.lahf();
-		a.and_(rax, ~flagmask);
-		if (instsize == 4)
-			a.test(tempreg2.r32(), tempreg2.r32());
-		else
-			a.test(tempreg2, tempreg2);
-		a.mov(tempreg2, rax);
-
-		a.lahf();
-		a.and_(rax, flagmask);
-		a.or_(rax, tempreg2);
-		a.sahf();
-
-		a.mov(rax, tempreg);
-	}
-	else
-	{
-		fatalerror("drcbe_x64::calculate_status_flags: unknown flag combination requested: %02x\n", flags);
-	}
-}
-
 void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp const &lo, Gp const &hi)
 {
 	Gp tempreg = r11;
@@ -1552,29 +1507,27 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 		const uint32_t bitshift = param.immediate() & (opsize * 8 - 1);
 
 		if (bitshift)
-		{
 			a.emit(opcode, dst, imm(param.immediate()));
 
-			if (rotate && (update_flags & (FLAG_S | FLAG_Z)))
+		if (!bitshift && update_flags && !(update_flags & (FLAG_S | FLAG_Z)) && !carryin)
+		{
+			a.clc(); // throw away carry since it'll never be used
+		}
+		else if ((rotate && (update_flags & (FLAG_S | FLAG_Z))) || (!bitshift && update_flags))
+		{
+			if ((update_flags & FLAG_C) && ((rotate && bitshift) || ((update_flags & (FLAG_S | FLAG_Z)) && carryin)))
+				a.rcl(r10b, 1); // save carry
+
+			if (!rotate || (update_flags & (FLAG_S | FLAG_Z)))
 			{
-				if (update_flags & FLAG_C)
-					calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
-				else if (dst.isMem())
+				if (dst.isMem())
 					a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
 				else
 					a.test(dst.as<Gp>(), dst.as<Gp>());
 			}
-		}
-		else if (update_flags)
-		{
-			if (!carryin && !(update_flags & (FLAG_S | FLAG_Z)))
-				a.clc(); // throw away carry since it'll never be used
-			else if ((!carryin || !(update_flags & FLAG_C)) && dst.isMem())
-				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
-			else if (!carryin || !(update_flags & FLAG_C))
-				a.test(dst.as<Gp>(), dst.as<Gp>());
-			else if (update_flags & (FLAG_S | FLAG_Z))
-				calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
+
+			if ((update_flags & FLAG_C) && ((rotate && bitshift) || ((update_flags & (FLAG_S | FLAG_Z)) && carryin)))
+				a.rcr(r10b, 1); // restore carry
 		}
 	}
 	else if (update_flags || carryin)
@@ -1595,14 +1548,21 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 			a.short_().jnz(calc);
 
-			if (carryin)
-				a.shr(r10b, 1); // restore carry for rolc/rorc
-			else if (!(update_flags & ~FLAG_C))
-				a.clc(); // throw away carry since it'll never be used
-			else if (dst.isMem())
-				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
-			else
-				a.test(dst.as<Gp>(), dst.as<Gp>());
+			if (update_flags & (FLAG_S | FLAG_Z))
+			{
+				if (dst.isMem())
+					a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
+				else
+					a.test(dst.as<Gp>(), dst.as<Gp>());
+			}
+
+			if (update_flags & FLAG_C)
+			{
+				if (carryin)
+					a.rcr(r10b, 1); // restore carry for rolc/rorc
+				else if (!(update_flags & (FLAG_S | FLAG_Z)))
+					a.clc(); // throw away carry since it'll never be used
+			}
 
 			a.short_().jmp(end);
 
@@ -1614,20 +1574,22 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		a.emit(opcode, dst, cl);
 
-		if (carryin)
-			a.bind(end);
-
-		if ((rotate || !(update_flags & FLAG_C)) && (update_flags & (FLAG_S | FLAG_Z)))
+		// zero-bit shifts and rotate instructions don't update S and Z
+		if ((update_flags & (FLAG_S | FLAG_Z)) && (!(update_flags & FLAG_C) || rotate))
 		{
-			if (update_flags & FLAG_C)
-				calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
-			else if (dst.isMem())
+			if ((update_flags & FLAG_C) && rotate)
+				a.rcl(r10b, 1); // save carry
+
+			if (dst.isMem())
 				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
 			else
 				a.test(dst.as<Gp>(), dst.as<Gp>());
+
+			if ((update_flags & FLAG_C) && rotate)
+				a.rcr(r10b, 1); // restore carry
 		}
 
-		if ((update_flags & FLAG_C) && !carryin)
+		if ((update_flags & FLAG_C) || carryin)
 			a.bind(end);
 	}
 	else
@@ -2578,11 +2540,23 @@ void drcbe_x64::op_setflgs(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
 	a.pushfq();
-
-	mov_reg_param(a, rax, srcp);
-
-	a.mov(rax, ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));
 	a.and_(qword_ptr(rsp), ~0x8c5);
+
+	if (srcp.is_immediate())
+	{
+		uint64_t const flags = m_near.flagsunmap[srcp.immediate() & FLAGS_ALL];
+		if (!flags)
+			a.xor_(rax, rax);
+		else
+			a.mov(rax, flags);
+	}
+	else
+	{
+		mov_reg_param(a, rax, srcp);
+		a.and_(rax, FLAGS_ALL);
+
+		a.mov(rax, ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));
+	}
 	a.or_(qword_ptr(rsp), rax);
 
 	a.popfq();
@@ -2697,17 +2671,21 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	fmod.setSize(1);
 
 	// copy fmod and exp
-	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, fmod)));                  // movzx  eax,state->fmod
-	a.and_(eax, 3);                                                                     // and    eax,3
-	a.mov(MABS(&m_state.fmod), al);                                                     // mov    [fmod],al
-	a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));                // ldmxcsr fp_control[eax]
-	a.mov(eax, ptr(rcx, offsetof(drcuml_machine_state, exp)));                          // mov    eax,state->exp
-	a.mov(MABS(&m_state.exp), eax);                                                     // mov    [exp],eax
+	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, fmod)));
+	a.and_(eax, 3);
+	a.mov(MABS(&m_state.fmod), al);
+	a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));
+	a.mov(eax, ptr(rcx, offsetof(drcuml_machine_state, exp)));
+	a.mov(MABS(&m_state.exp), eax);
 
 	// copy flags
-	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, flags)));                 // movzx  eax,state->flags
-	a.push(qword_ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));             // push   flags_unmap[eax*8]
-	a.popfq();                                                                          // popf
+	a.pushfq();
+	a.and_(qword_ptr(rsp), ~0x8c5);
+	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, flags)));
+	a.and_(eax, FLAGS_ALL);
+	a.mov(rax, ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));
+	a.or_(qword_ptr(rsp), rax);
+	a.popfq();
 }
 
 
@@ -5620,15 +5598,18 @@ void drcbe_x64::op_fcmp(Assembler &a, const instruction &inst)
 			a.comisd(src1reg, Xmm(src2p.freg()));
 	}
 
-	// clear Z and C if unordered
-	Label ordered = a.newLabel();
+	if (inst.flags() & (FLAG_Z | FLAG_C))
+	{
+		// clear Z and C if unordered
+		Label ordered = a.newLabel();
 
-	a.short_().jnp(ordered);
-	a.lahf();
-	a.and_(eax, 0x00003e00);
-	a.sahf();
+		a.short_().jnp(ordered);
+		a.lahf();
+		a.and_(eax, 0x00003e00);
+		a.sahf();
 
-	a.bind(ordered);
+		a.bind(ordered);
+	}
 }
 
 

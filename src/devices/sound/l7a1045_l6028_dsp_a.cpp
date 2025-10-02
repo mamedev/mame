@@ -319,8 +319,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 				const uint16_t multiplier = (m_audiodat[m_audioregister][m_audiochannel].dat[1] ^ 0xffff) + 1;
 				const uint16_t base = m_audiodat[m_audioregister][m_audiochannel].dat[0];
 
-				double loop_start = (double)base * ((double)multiplier / 4096.0);
-				vptr->loop_start = (uint32_t)loop_start;
+				vptr->loop_start = (uint32_t(base) * multiplier) >> 12;
 			}
 			break;
 
