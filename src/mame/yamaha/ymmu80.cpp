@@ -132,6 +132,7 @@
 #include "mulcd.h"
 #include "sound/swp20.h"
 #include "sound/meg.h"
+#include "sound/deq.h"
 
 #include "debugger.h"
 #include "speaker.h"
@@ -170,6 +171,7 @@ public:
 		, m_swp20_0(*this, "swp20_0")
 		, m_swp20_1(*this, "swp20_1")
 		, m_meg(*this, "meg")
+		, m_deq(*this, "deq")
 		, m_lcd(*this, "lcd")
 		, m_ioport_p7(*this, "P7")
 		, m_ioport_p8(*this, "P8")
@@ -188,6 +190,7 @@ private:
 	required_device<swp20_device> m_swp20_0;
 	required_device<swp20_device> m_swp20_1;
 	required_device<meg_device> m_meg;
+	required_device<deq_device> m_deq;
 	required_device<mulcd_device> m_lcd;
 	required_ioport m_ioport_p7;
 	required_ioport m_ioport_p8;
@@ -265,9 +268,9 @@ u8 mu80_state::pb_r()
 	if((cur_pa & PA_LCD_ENABLE)) {
 		if(cur_pa & PA_LCD_RW) {
 			if(cur_pa & PA_LCD_RS)
-				return m_lcd->data_read();
+				return m_lcd->data_r();
 			else
-				return m_lcd->control_read();
+				return m_lcd->control_r();
 		} else {
 			if(!(cur_pa & 0x10)) {
 				u8 val = 0xff;
@@ -301,9 +304,9 @@ void mu80_state::pa_w(u8 data)
 	if((cur_pa & PA_LCD_ENABLE) && !(data & PA_LCD_ENABLE)) {
 		if(!(cur_pa & PA_LCD_RW)) {
 			if(cur_pa & PA_LCD_RS)
-				m_lcd->data_write(cur_pb);
+				m_lcd->data_w(cur_pb);
 			else
-				m_lcd->control_write(cur_pb);
+				m_lcd->control_w(cur_pb);
 		}
 	}
 
@@ -352,6 +355,9 @@ void mu80_state::mu80(machine_config &config)
 	m_swp20_1->add_route(1, "speaker", 1.0, 1);
 
 	MEG(config, m_meg);
+
+	DEQ(config, m_deq);
+	m_swp20_0->set_deq(m_deq);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
