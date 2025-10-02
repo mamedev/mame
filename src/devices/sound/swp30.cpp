@@ -88,11 +88,11 @@
 //
 //    Memory map in rough numerical order with block indications
 //
-//   cccccc 000000  AMW2/IIR         mmmm .aaa aaaa aaaa                      Filter 1 mode and main parameter
-//   cccccc 000001  AMW2/IIR         .xxx xxxx uuuu uuuu                      Bypass level
-//   cccccc 000010  AMW2/IIR         .... .ccc cccc cccc                      Filter 2 mode and main parameter
-//   cccccc 000011  AMW2/IIR         .... .... vvvv vvvv                      Post-filter level
-//   cccccc 000100  AMW2/IIR         bbbb b... .... ....                      Filters second parameter
+//   cccccc 000000  AMW2/Filters     mmmm .aaa aaaa aaaa                      Filter 1 mode and main parameter
+//   cccccc 000001  AMW2/Filters     .xxx xxxx uuuu uuuu                      Bypass/dry level
+//   cccccc 000010  AMW2/Filters     .... .ccc cccc cccc                      Filter 2 mode and main parameter
+//   cccccc 000011  AMW2/Filters     .... .... vvvv vvvv                      Post-filter level
+//   cccccc 000100  AMW2/Filters     bbbb b... .... ....                      Filters second parameter
 
 //   cccccc 000101  AWM2/LFO         .... .... .aaa aaaa                      LFO amplitude depth
 //   cccccc 000110  AWM2/Envelope    ssss ssss iiii iiii                      Attack speed and start volume
