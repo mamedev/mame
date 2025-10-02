@@ -17,6 +17,7 @@
 #include <oleauto.h>
 
 #include <setupapi.h>
+#include <cfgmgr32.h>   // for MAX_DEVICE_ID_LEN
 
 namespace osd {
 
@@ -89,15 +90,16 @@ public:
 
 		bool xinput_detect_failed = false;
 		std::vector<DWORD> xinput_deviceids;
-		if (!get_xinput_devices(xinput_deviceids))
-		{
+		
+		HRESULT result = get_xinput_devices(xinput_deviceids);
+		if (result != 0)
 			xinput_detect_failed = true;
 			xinput_deviceids.clear();
 			osd_printf_warning("XInput device detection failed. XInput won't be used. Error: 0x%X\n", uint32_t(result));
 		}
 
 		// Enumerate all the DirectInput joysticks and add them if they aren't XInput compatible
-		HRESULT result = m_dinput_helper->enum_attached_devices(
+		result = m_dinput_helper->enum_attached_devices(
 				DI8DEVCLASS_GAMECTRL,
 				[this, &xinput_deviceids] (LPCDIDEVICEINSTANCE instance)
 				{
@@ -208,12 +210,12 @@ private:
 	// Checking against a VID/PID of 0x028E/0x045E won't find 3rd party or future
 	// XInput devices.
 	//-----------------------------------------------------------------------------
-	BOOL get_xinput_devices(std::vector<DWORD> &xinput_deviceids)
+	HRESULT get_xinput_devices(std::vector<DWORD> &xinput_deviceids)
 	{
 		HDEVINFO devInfoSet = SetupDiGetClassDevsW(nullptr, nullptr, nullptr, DIGCF_ALLCLASSES | DIGCF_PRESENT);
 		if (devInfoSet == INVALID_HANDLE_VALUE) {
 			osd_printf_error("SetupDiGetClassDevs failed.\n");
-			return FALSE;
+			return HRESULT_FROM_WIN32(GetLastError());
 		}
 		SP_DEVINFO_DATA devInfoData = {sizeof(SP_DEVINFO_DATA), 0, 0};
 		DWORD devIndex = 0;
@@ -239,7 +241,7 @@ private:
 			}
 		}
 		SetupDiDestroyDeviceInfoList(devInfoSet);
-		return TRUE;
+		return HRESULT_FROM_WIN32(ERROR_SUCCESS);
 	}
 
 };
