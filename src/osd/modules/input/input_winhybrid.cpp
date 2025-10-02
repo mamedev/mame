@@ -17,7 +17,6 @@
 #include <oleauto.h>
 
 #include <setupapi.h>
-#pragma comment(lib, "setupapi.lib")
 
 namespace osd {
 
