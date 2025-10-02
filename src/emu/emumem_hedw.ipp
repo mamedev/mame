@@ -144,7 +144,7 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 		}
 	} else {
 		offs_t j = 0;
-		offs_t k = j+1;
+		offs_t k = j + 1;
 		handler_entry *the_handler;
 		do {
 			the_handler = m_a_dispatch[j];
