@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 /*************************************************************************
-
+ 
   This is a driver for a gambling board with a yet unknown name.
   Driver by Felipe Sanches
 
@@ -293,7 +293,7 @@ void marywu_state::unkwinw_io_map(address_map &map)
 	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
     map(0x9000, 0x9000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xb000, 0xb000).w(FUNC(marywu_state::unkwinw_adpcm_bank));
+	map(0xb000, 0xb000).w(FUNC(marywu_state::unkwinw_adpcm_bank)); // 8 adpcm bank rom.
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* hm6116lp-3: 2kbytes of Static RAM */
 
 }
