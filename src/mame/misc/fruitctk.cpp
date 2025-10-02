@@ -58,15 +58,15 @@ X2 M82C55A-2
 new8279
 
 Todo:
-
 Led Controller
 Layout.
 
 Still Looping F1 During reset
-if press to insert coin will cause bell ding and error 02 or error 30 
+if press to insert coin will to error 02 or error 30 
+
 debug:
-pc = 424 - boot
-pc = 231 
+pc = 424 - bypass error 02 error.
+
 */
 
 #include "emu.h"
@@ -314,7 +314,7 @@ void fruitctk_state::fruitctk(machine_config &config)
 
 }
 
-ROM_START( fruitctk ) // cpu type unknown
+ROM_START( fruitctk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w27c512.bin", 0x0000, 0x10000, CRC(2A1B63C1) SHA1(631a95c684db961283f45b4bfe67fa58d79b2191) )
 
@@ -331,3 +331,4 @@ ROM_START( fruitctk ) // cpu type unknown
 
 //   YEAR   NAME    PARENT   MACHINE      INPUT     STATE           INIT        ROT    COMPANY       FULLNAME                 FLAGS
 GAME( 2002?, fruitctk,   0,  fruitctk,     fruitctk, fruitctk_state, empty_init, ROT0,  "<unknown>", "Fruit Cocktail",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
