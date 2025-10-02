@@ -203,7 +203,7 @@ private:
 
 	//-----------------------------------------------------------------------------
 	// Enum each present PNP device in device information set using setupapi 
-	// and check each device ID to see if it contains
+	// and check each device ID  to see if it contains
 	// "IG_" (ex. "VID_045E&PID_028E&IG_00").  If it does, then it's an XInput device
 	// Unfortunately this information can not be found by just using DirectInput.
 	// Checking against a VID/PID of 0x028E/0x045E won't find 3rd party or future
@@ -227,7 +227,7 @@ private:
 			{
 				// Check if the device ID contains "IG_".  If it does, then it's an XInput device
 				// Unfortunately this information can not be found by just using DirectInput
-				// If it does, then get the VID/PID
+				// If it does, then get the VID/PID as DWORD numbers
 				DWORD dwVid = 0;
 				DWORD dwPid = 0;
 				if (wcsstr(strDeviceID, L"IG_") &&
