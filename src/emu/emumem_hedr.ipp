@@ -110,7 +110,7 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatc
 		for(u32 i = 0; i != m_dispatch_array.size(); i++) {
 			u32 map_start_index = map.size();
 			offs_t j = 0;
-			offs_t k = j+1;
+			offs_t k = j + 1;
 			handler_entry *handle = m_dispatch_array[i][j];
 			do {
 				while((handle == m_dispatch_array[i][k]) && (k < BITMASK)) {
