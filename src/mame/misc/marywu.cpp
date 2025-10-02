@@ -24,7 +24,6 @@
   st m27c512? - duplicated 32x2 with same rom programs.
   
   unkwinw
-  
   Product name: 小方玛丽板
   Product Code: square-mario-baord
   The board has a single marking J373.
@@ -402,5 +401,5 @@ ROM_END
 GAME( ????, marywu,  0,      marywu,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING ) // Error 02
 GAME( ????, mary1s,  0,      mary1s,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
 
-// clones with led board.
+// Different Hardware.
 GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Gambling Board",                          MACHINE_NOT_WORKING ) // Error 02. Need Correct layout.
