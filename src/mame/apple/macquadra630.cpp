@@ -37,6 +37,7 @@
 #include "emu.h"
 
 #include "cuda.h"
+#include "dfac2.h"
 #include "f108.h"
 #include "iosb.h"
 #include "macadb.h"
@@ -67,6 +68,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_f108(*this, "f108"),
 		m_primetimeii(*this, "primetimeii"),
+		m_dfac2(*this, "dfac2"),
 		m_video(*this, "valkyrie"),
 		m_macadb(*this, "macadb"),
 		m_cuda(*this, "cuda"),
@@ -86,6 +88,7 @@ private:
 	required_device<m68040_device> m_maincpu;
 	required_device<f108_device> m_f108;
 	required_device<primetimeii_device> m_primetimeii;
+	required_device<dfac2_device> m_dfac2;
 	required_device<valkyrie_device> m_video;
 	required_device<macadb_device> m_macadb;
 	required_device<cuda_device> m_cuda;
@@ -176,7 +179,9 @@ void quadra630_state::macqd630(machine_config &config)
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_primetimeii, FUNC(primetime_device::cb1_w));
 	m_cuda->via_data_callback().set(m_primetimeii, FUNC(primetime_device::cb2_w));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &sda_merger(INPUT_MERGER_ALL_HIGH(config, "sda"));
@@ -188,6 +193,11 @@ void quadra630_state::macqd630(machine_config &config)
 
 	m_video->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<1>));
 
+	APPLE_DFAC2(config, m_dfac2, 22257);
+	m_dfac2->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<2>));
+	m_cuda->iic_scl_callback().append(m_dfac2, FUNC(dfac2_device::scl_write));
+	m_cuda->iic_sda_callback().append(m_dfac2, FUNC(dfac2_device::sda_write));
+
 	m_primetimeii->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
 	m_primetimeii->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_primetimeii->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
@@ -195,6 +205,7 @@ void quadra630_state::macqd630(machine_config &config)
 
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 	nubus.out_irqe_callback().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x20>));
 	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 

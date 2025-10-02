@@ -673,7 +673,6 @@ d23f=input port 1 value
 #include "machine/gen_latch.h"
 #include "machine/upd4701.h"
 #include "sound/dac.h"
-#include "sound/samples.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 
@@ -825,10 +824,10 @@ class kageki_state : public insectx_state
 public:
 	kageki_state(const machine_config &mconfig, device_type type, const char *tag)
 		: insectx_state(mconfig, type, tag)
-		, m_samples(*this, "samples")
 		, m_dswa(*this, "DSWA")
 		, m_dswb(*this, "DSWB")
 		, m_csport_sel(0)
+		, m_scpu(*this, "samples")
 	{ }
 
 	void kageki(machine_config &config) ATTR_COLD;
@@ -847,20 +846,15 @@ private:
 	uint8_t csport_r();
 	void csport_w(uint8_t data);
 
-	SAMPLES_START_CB_MEMBER(init_samples);
-
 	void kageki_sub_map(address_map &map) ATTR_COLD;
-
-	required_device<samples_device> m_samples;
+	void scpu_map(address_map& map) ATTR_COLD;
+	void scpu_io_map(address_map& map) ATTR_COLD;
 
 	required_ioport m_dswa;
 	required_ioport m_dswb;
 
-	// sound-related
-	std::unique_ptr<int16_t[]>    m_sampledata[MAX_SAMPLES];
-	int      m_samplesize[MAX_SAMPLES]{};
-
 	int      m_csport_sel;
+	required_device<cpu_device> m_scpu;
 };
 
 
@@ -1422,38 +1416,6 @@ void kabukiz_state::sound_bank_w(uint8_t data)
 }
 
 
-SAMPLES_START_CB_MEMBER(kageki_state::init_samples)
-{
-	uint8_t *src = memregion("samples")->base() + 0x0090;
-	for (int i = 0; i < MAX_SAMPLES; i++)
-	{
-		int start = (src[(i * 2) + 1] * 256) + src[(i * 2)];
-		uint8_t *scan = &src[start];
-		int size = 0;
-
-		// check sample length
-		while (*scan++ != 0x00)
-			size++;
-
-		/* 2009-11 FP: should these be saved? */
-		m_sampledata[i] = std::make_unique<int16_t[]>(size);
-		m_samplesize[i] = size;
-
-		if (start < 0x100)
-			start = size = 0;
-
-		// signed 8-bit sample to unsigned 8-bit sample convert
-		int16_t *dest = m_sampledata[i].get();
-		scan = &src[start];
-		for (int n = 0; n < size; n++)
-		{
-			*dest++ = (int8_t)((*scan++) ^ 0x80) * 256;
-		}
-	//  logerror("samples num:%02X ofs:%04X lng:%04X\n", i, start, size);
-	}
-}
-
-
 uint8_t kageki_state::csport_r()
 {
 	int dsw, dsw1, dsw2;
@@ -1461,7 +1423,7 @@ uint8_t kageki_state::csport_r()
 	dsw1 = m_dswa->read();
 	dsw2 = m_dswb->read();
 
-	switch (m_csport_sel)
+	switch (m_csport_sel & 3)
 	{
 		case    0x00:           // DSW2 5,1 / DSW1 5,1
 			dsw = (((dsw2 & 0x10) >> 1) | ((dsw2 & 0x01) << 2) | ((dsw1 & 0x10) >> 3) | ((dsw1 & 0x01) >> 0));
@@ -1485,26 +1447,10 @@ uint8_t kageki_state::csport_r()
 
 void kageki_state::csport_w(uint8_t data)
 {
-	if (data > 0x3f)
-	{
-		// read dipsw port
-		m_csport_sel = (data & 0x03);
-	}
-	else
-	{
-		if (data < MAX_SAMPLES)
-		{
-			// play samples
-			m_samples->start_raw(0, m_sampledata[data].get(), m_samplesize[data], 7000);
-			LOG("VOICE:%02X PLAY", data);
-		}
-		else
-		{
-			// stop samples
-			m_samples->stop(0);
-			LOG("VOICE:%02X STOP", data);
-		}
-	}
+	m_csport_sel = data;
+
+	if (!BIT(data, 6))
+		m_scpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void insectx_state::prompal_main_map(address_map &map)
@@ -1588,6 +1534,18 @@ void kageki_state::kageki_sub_map(address_map &map)
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc001, 0xc001).portr("IN1");
 	map(0xc002, 0xc002).portr("IN2");
+}
+
+void kageki_state::scpu_map(address_map& map)
+{
+	map(0x0000, 0xffff).rom();
+}
+
+void kageki_state::scpu_io_map(address_map& map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x00, 0xff).lr8(NAME([this]() { return m_csport_sel; }));
 }
 
 void insectx_state::insectx_sub_map(address_map &map)
@@ -2415,6 +2373,10 @@ void kageki_state::kageki(machine_config &config)
 	/* basic machine hardware */
 	m_subcpu->set_addrmap(AS_PROGRAM, &kageki_state::kageki_sub_map);
 
+	Z80(config, m_scpu, XTAL(12'000'000) / 4);
+	m_scpu->set_addrmap(AS_PROGRAM, &kageki_state::scpu_map);
+	m_scpu->set_addrmap(AS_IO, &kageki_state::scpu_io_map);
+
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
 	ymsnd.port_a_read_callback().set(FUNC(kageki_state::csport_r));
@@ -2424,10 +2386,7 @@ void kageki_state::kageki(machine_config &config)
 	ymsnd.add_route(2, "speaker", 0.15);
 	ymsnd.add_route(3, "speaker", 0.35);
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(kageki_state::init_samples));
-	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // HA17408P R2R DAC, TODO: check levels
 }
 
 void tnzsb_state::tnzsb(machine_config &config)

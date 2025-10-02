@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller, R. Belmont
 
-#ifndef MAME_CPU_SH_SHDASM_H
-#define MAME_CPU_SH_SHDASM_H
+#ifndef MAME_CPU_SH_SH_DASM_H
+#define MAME_CPU_SH_SH_DASM_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ private:
 	bool m_is_sh34;
 };
 
-#endif
+#endif // MAME_CPU_SH_SH_DASM_H

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_QQL_KEMPSTON_DI_H
-#define MAME_BUS_QQL_KEMPSTON_DI_H
+#ifndef MAME_BUS_QL_KEMPSTON_DI_H
+#define MAME_BUS_QL_KEMPSTON_DI_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ protected:
 DECLARE_DEVICE_TYPE(KEMPSTON_DISK_INTERFACE, kempston_disk_interface_device)
 
 
-#endif // MAME_BUS_QQL_KEMPSTON_DI_H
+#endif // MAME_BUS_QL_KEMPSTON_DI_H

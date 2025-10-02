@@ -328,8 +328,8 @@ ROM_START( patapata )
 	ROM_LOAD( "rw-93085-2.u4",  0x080000+0x40000, 0x080000, CRC(3698fafa) SHA1(3de54a990478621271285254544f5382d6fd9ca9) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s131n.u119", 0x000, 0x200, CRC(33f63fc8) SHA1(24c4a1a7c06e546571c77c7dc7bd87c57aa088d7) )
-	ROM_LOAD( "n82s135n.u137", 0x000, 0x100, CRC(cb90eedc) SHA1(6577cb1999a90b9209b150cbedde11de9ac30018) )
+	ROM_LOAD( "n82s131n.u119", 0x000, 0x200, CRC(33f63fc8) SHA1(24c4a1a7c06e546571c77c7dc7bd87c57aa088d7) ) // hotizontal video timing (not used in emulation for now)
+	ROM_LOAD( "n82s135n.u137", 0x000, 0x100, CRC(cb90eedc) SHA1(6577cb1999a90b9209b150cbedde11de9ac30018) ) // vertical video timing (not used in emulation for now)
 ROM_END
 
 } // anonymous namespace

@@ -189,12 +189,12 @@ protected:
 	enum
 	{
 		MICR_RESET    = 0x01,   // reset
-		MICR_RJA      = 0x02,   // right justified address
+		MICR_RJA      = 0x02,   // right justified address (TODO)
 		MICR_CT_VIS   = 0x04,   // counter/timer vector includes status
 		MICR_PB_VIS   = 0x08,   // port B vector includes status
 		MICR_PA_VIS   = 0x10,   // port A vector includes status
 		MICR_NV       = 0x20,   // no vector
-		MICR_DLC      = 0x40,   // disable lower chain
+		MICR_DLC      = 0x40,   // disable lower chain (TODO)
 		MICR_MIE      = 0x80    // master interrupt enable
 	};
 
@@ -202,35 +202,35 @@ protected:
 	// master configuration control register
 	enum
 	{
-		MCCR_LC_MASK  = 0x03,   // counter/timer link controls
-		MCCR_PAE      = 0x04,   // port A enable
-		MCCR_PLC      = 0x08,   // port link control
+		MCCR_LC_MASK  = 0x03,   // counter/timer link controls (TODO)
+		MCCR_PAE      = 0x04,   // port A enable (TODO)
+		MCCR_PLC      = 0x08,   // port link control (TODO)
 		MCCR_PCE_CT3E = 0x10,   // port C and counter/timer 3 enable
 		MCCR_CT2E     = 0x20,   // counter/timer 2 enable
 		MCCR_CT1E     = 0x40,   // counter/timer 1 enable
-		MCCR_PBE      = 0x80    // port B enable
+		MCCR_PBE      = 0x80    // port B enable (TODO)
 	};
 
 
 	// port mode specification registers
 	enum
 	{
-		PMS_LPM       = 0x01,   // latch on pattern match
-		PMS_DTE       = 0x01,   // deskew timer enable
-		PMS_PMS_MASK  = 0x06,   // pattern mode specification
-		PMS_IMO       = 0x08,   // interrupt on match only
-		PMS_SB        = 0x10,   // single buffer
-		PMS_ITB       = 0x20,   // interrupt on two bytes
-		PMS_PTS_MASK  = 0xc0    // port type select
+		PMS_LPM       = 0x01,   // latch on pattern match (TODO)
+		PMS_DTE       = 0x01,   // deskew timer enable (TODO)
+		PMS_PMS_MASK  = 0x06,   // pattern mode specification (TODO)
+		PMS_IMO       = 0x08,   // interrupt on match only (TODO)
+		PMS_SB        = 0x10,   // single buffer (TODO)
+		PMS_ITB       = 0x20,   // interrupt on two bytes (TODO)
+		PMS_PTS_MASK  = 0xc0    // port type select (TODO)
 	};
 
 
 	// port handshake specification registers
 	enum
 	{
-		PHS_DTS_MASK  = 0x07,   // deskew time specification
-		PHS_RWS_MASK  = 0x38,   // request/wait specification
-		PHS_HTS_MASK  = 0xc0    // handshake type specification
+		PHS_DTS_MASK  = 0x07,   // deskew time specification (TODO)
+		PHS_RWS_MASK  = 0x38,   // request/wait specification (TODO)
+		PHS_HTS_MASK  = 0xc0    // handshake type specification (TODO)
 	};
 
 
@@ -238,8 +238,8 @@ protected:
 	enum
 	{
 		PCS_IOE       = 0x01,   // interrupt on error
-		PCS_PMF       = 0x02,   // pattern match flag (read only)
-		PCS_IRF       = 0x04,   // input register full (read only)
+		PCS_PMF       = 0x02,   // pattern match flag (read only) (TODO)
+		PCS_IRF       = 0x04,   // input register full (read only) (TODO)
 		PCS_ORE       = 0x08,   // output register empty (read only)
 		PCS_ERR       = 0x10,   // interrupt error (read only)
 		PCS_IP        = 0x20,   // interrupt pending
@@ -251,12 +251,12 @@ protected:
 	// counter/timer mode specification registers
 	enum
 	{
-		CTMS_DCS_MASK = 0x03,   // output duty cycle
+		CTMS_DCS_MASK = 0x03,   // output duty cycle (TODO)
 		CTMS_REB      = 0x04,   // retrigger enable bit
-		CTMS_EDE      = 0x08,   // external gate enable
-		CTMS_ETE      = 0x10,   // external trigger enable
-		CTMS_ECE      = 0x20,   // external count enable
-		CTMS_EOE      = 0x40,   // external output enable
+		CTMS_EDE      = 0x08,   // external gate enable (TODO)
+		CTMS_ETE      = 0x10,   // external trigger enable (TODO)
+		CTMS_ECE      = 0x20,   // external count enable (TODO)
+		CTMS_EOE      = 0x40,   // external output enable (TODO)
 		CTMS_CSC      = 0x80    // continuous/single cycle
 	};
 

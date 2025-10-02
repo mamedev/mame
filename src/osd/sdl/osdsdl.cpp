@@ -55,7 +55,6 @@ void defines_verbose()
 	osd_printf_verbose("\n");
 	osd_printf_verbose("Build defines 1:    ");
 	MACRO_VERBOSE(LSB_FIRST);
-	MACRO_VERBOSE(PTR64);
 	MACRO_VERBOSE(MAME_NOASM);
 	MACRO_VERBOSE(MAME_DEBUG);
 	MACRO_VERBOSE(BIGENDIAN);
@@ -508,7 +507,9 @@ void sdl_osd_interface::process_events()
 				}
 				else if (m_modifier_keys & MODIFIER_KEY_SHIFT)
 				{
-					if (event.key.keysym.sym == SDLK_6) // Ctrl-^ (RS)
+					if (event.key.keysym.sym == SDLK_2) // Ctrl-@ (NUL)
+						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x00);
+					else if (event.key.keysym.sym == SDLK_6) // Ctrl-^ (RS)
 						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1e);
 					else if (event.key.keysym.sym == SDLK_MINUS) // Ctrl-_ (US)
 						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1f);

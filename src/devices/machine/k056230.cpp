@@ -32,7 +32,7 @@ TODO:
 #define VERBOSE (0)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(K056230, k056230_device, "k056230", "K056230 LANC")
+DEFINE_DEVICE_TYPE(K056230, k056230_device, "k056230", "Konami 056230 LANC")
 DEFINE_DEVICE_TYPE(K056230_VIPER, k056230_viper_device, "k056230_viper", "Konami Viper LANC")
 
 k056230_device::k056230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)

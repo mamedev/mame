@@ -268,4 +268,4 @@ ROM_END
 
 } // Anonymous namespace
 
-COMP( 1987, pbo,      0,      0,      pbo,      pbo,      pbo_state, empty_init, "Philips",    "BO (Videosynthesizer Prototype)", MACHINE_IS_SKELETON )
+COMP( 1987, pbo,      0,      0,      pbo,      pbo,      pbo_state, empty_init, "Philips",    "BO (Videosynthesizer Prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

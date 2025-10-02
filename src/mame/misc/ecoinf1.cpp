@@ -367,12 +367,12 @@ ROM_END
 
 // all roms might really be for the same game, just in different cabinet styles
 // these ALL contain "Ver 3 BAR-X V1:84 TYPE T" strings
-GAME( 19??, ec_barxo,   0,        ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 1)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxoa,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 2)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxob,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 3)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxoc,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 4)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxod,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 5)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxoe,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 6)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_bar5,    ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar 5 (older PCB) (Electrocoin)",                MACHINE_IS_SKELETON_MECHANICAL) // or just another Bar X set?
-GAME( 19??, ec_casbxo,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 1)", MACHINE_IS_SKELETON_MECHANICAL) // this one actually has some code offset changes
-GAME( 19??, ec_casbxoa, ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxo,   0,        ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 1)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME( 19??, ec_barxoa,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 2)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME( 19??, ec_barxob,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 3)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME( 19??, ec_barxoc,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 4)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME( 19??, ec_barxod,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 5)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME( 19??, ec_barxoe,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 6)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME( 19??, ec_bar5,    ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar 5 (older PCB) (Electrocoin)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK) // or just another Bar X set?
+GAME( 19??, ec_casbxo,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK) // this one actually has some code offset changes
+GAME( 19??, ec_casbxoa, ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

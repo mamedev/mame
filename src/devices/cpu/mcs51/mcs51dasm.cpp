@@ -2,25 +2,12 @@
 // copyright-holders:Steve Ellenoff
 /*****************************************************************************
  *
- *   i8051dasm.c
- *   Portable MCS-51 Family Emulator
+ * Portable MCS-51 Family Disassembler
+ * Copyright Steve Ellenoff
  *
- *   Chips in the family:
- *   8051 Product Line (8031,8051,8751)
- *   8052 Product Line (8032,8052,8752)
- *   8054 Product Line (8054)
- *   8058 Product Line (8058)
- *
- *   Copyright Steve Ellenoff, all rights reserved.
- *
- *  This work is based on:
- *  #1) 'Intel(tm) MC51 Microcontroller Family Users Manual' and
- *  #2) 8051 simulator by Travis Marlatte
- *  #3) Portable UPI-41/8041/8741/8042/8742 emulator V0.1 by Juergen Buchmueller (MAME CORE)
- *
- *****************************************************************************
  * Symbol Memory Name Tables borrowed from:
  * D52 8052 Disassembler - Copyright Jeffery L. Post
+ *
  *****************************************************************************/
 
 #include "emu.h"
@@ -320,16 +307,16 @@ const mcs51_disassembler::mem_info mcs51_disassembler::i8xc751_names[] = {
 	{  0x98, "i2con"   },
 	{  0x99, "i2dat"   },
 	{  0xd8, "i2cfg"   },
-	{  0xf8, "i2sta"   },  /* read only */
+	{  0xf8, "i2sta"   }, // read only
 
-	{ 0x198, "xstp"    }, /* read: no function */
-	{ 0x199, "xstr"    }, /* read: MASTER */
-	{ 0x19a, "cstp"    }, /* read: STP */
-	{ 0x19b, "cstr"    }, /* read: STR */
-	{ 0x19c, "carl"    }, /* read: ARL */
-	{ 0x19d, "cdr"     }, /* read: DRDY */
-	{ 0x19e, "idle"    }, /* read: ATN */
-	{ 0x19f, "cxa"     }, /* read: RDAT */
+	{ 0x198, "xstp"    }, // read: no function
+	{ 0x199, "xstr"    }, // read: MASTER
+	{ 0x19a, "cstp"    }, // read: STP
+	{ 0x19b, "cstr"    }, // read: STR
+	{ 0x19c, "carl"    }, // read: ARL
+	{ 0x19d, "cdr"     }, // read: DRDY
+	{ 0x19e, "idle"    }, // read: ATN
+	{ 0x19f, "cxa"     }, // read: RDAT
 
 	{ 0x1ac, "ei2"     },
 

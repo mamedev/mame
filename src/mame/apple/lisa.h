@@ -13,18 +13,20 @@
 
 #include "cpu/m6502/m6504.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/6522via.h"
+#include "machine/6522via.h"
 #include "machine/74259.h"
-#include "machine/6522via.h"
-#include "machine/6522via.h"
-#include "machine/8530scc.h"
 #include "machine/applefdintf.h"
 #include "machine/iwm.h"
 #include "machine/nvram.h"
+#include "machine/z80scc.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 #include "formats/ap_dsk35.h"
+
 
 /* lisa MMU segment regs */
 struct real_mmu_entry
@@ -144,7 +146,7 @@ private:
 	required_device<via6522_device> m_via1;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-	required_device<scc8530_legacy_device> m_scc;
+	required_device<scc8530_device> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
 	required_device<ls259_device> m_latch;

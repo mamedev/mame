@@ -389,7 +389,7 @@ authors:hap
 
 		<group ref="sb_ui"><bounds x="-11.5" y="3" width="10" height="80" /></group>
 
-		<!-- chessboard coords -->
+		<!-- chessboard coords / labels -->
 		<element ref="text_8"><bounds x="1.25" y="9"  width="2" height="1.5" /></element>
 		<element ref="text_7"><bounds x="1.25" y="19" width="2" height="1.5" /></element>
 		<element ref="text_6"><bounds x="1.25" y="29" width="2" height="1.5" /></element>

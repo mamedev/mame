@@ -18,6 +18,7 @@
 #include "pc11.h"
 #include "qg640.h"
 #include "qtx.h"
+#include "tdl12.h"
 #include "uknc_kmd.h"
 
 
@@ -31,6 +32,7 @@ void qbus_cards(device_slot_interface &device)
 	device.option_add("mz", UKNC_KMD);
 	device.option_add("qg640", MATROX_QG640);
 	device.option_add("by", BK_KMD);
+	device.option_add("tdl12", TDL12);
 }
 
 
@@ -96,6 +98,8 @@ qbus_device::qbus_device(const machine_config &mconfig, const char *tag, device_
 	device_z80daisy_interface(mconfig, *this),
 	m_program_config("a18", ENDIANNESS_BIG, 16, 16, 0, address_map_constructor()),
 	m_space(*this, finder_base::DUMMY_TAG, -1),
+	m_out_bus_error_cb(*this),
+	m_out_bevnt_cb(*this),
 	m_out_birq4_cb(*this),
 	m_out_birq5_cb(*this),
 	m_out_birq6_cb(*this),
@@ -122,6 +126,7 @@ device_memory_interface::space_config_vector qbus_device::memory_space_config() 
 
 void qbus_device::device_start()
 {
+	m_view = nullptr;
 }
 
 
@@ -154,7 +159,10 @@ void qbus_device::add_card(device_qbus_card_interface &card)
 
 void qbus_device::install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask)
 {
-	m_space->install_readwrite_handler(start, end, rhandler, whandler, mask);
+	if (m_view)
+		m_view->install_readwrite_handler(start, end, rhandler, whandler, mask);
+	else
+		m_space->install_readwrite_handler(start, end, rhandler, whandler, mask);
 }
 
 

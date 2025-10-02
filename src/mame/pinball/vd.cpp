@@ -315,14 +315,13 @@ void vd_state::vd(machine_config &config)
 
 	/* Sound */
 	genpin_audio(config);
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ay8910_device &ay1(AY8910(config, "ay1", 2000000)); //?
-	ay1.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	ay1.port_a_read_callback().set_ioport("DSW2");
 	ay1.port_b_read_callback().set_ioport("DSW1");
 	ay8910_device &ay2(AY8910(config, "ay2", 2000000)); //?
-	ay2.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	ay2.port_b_read_callback().set_ioport("DSW3");
 
 	/* Video */
@@ -355,5 +354,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1986, break86,  0,    vd,  break86,  vd_state, init_0, ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986, papillon, 0,    vd,  papillon, vd_state, init_1, ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986, break86,  0,    vd,  break86,  vd_state, init_0, ROT0,  "Video Dens", "Break '86", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986, papillon, 0,    vd,  papillon, vd_state, init_1, ROT0,  "Video Dens", "Papillon",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -238,5 +238,5 @@ ROM_END
 
 COMP( 1999, ga6la7,  0,  0, ga6la7, 0, quakeat_state, empty_init, "Gigabyte", "GA-6LA7", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // errors out with ISA state 0x05 (keyboard), then wants flash ROM i/f to work properly
 
-GAME( 1998, quake,  0,      quake,  quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )
+GAME( 1998, quake,  0,      quake,  quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Actua Soccer Arcade

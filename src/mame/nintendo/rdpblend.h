@@ -13,8 +13,10 @@
 
 ******************************************************************************/
 
-#ifndef _VIDEO_RDPBLEND_H_
-#define _VIDEO_RDPBLEND_H_
+#ifndef MAME_NINTENDO_RDPBLEND_H
+#define MAME_NINTENDO_RDPBLEND_H
+
+#pragma once
 
 #include "n64_v.h"
 
@@ -69,4 +71,4 @@ class n64_blender_t
 		uint8_t               m_alpha_dither[256 * 8];
 };
 
-#endif // _VIDEO_RDPBLEND_H_
+#endif // MAME_NINTENDO_RDPBLEND_H

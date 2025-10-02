@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_PC_KB_MSNAT_H
-#define MAME_BUS_PC_KB_MSNAT_H
+#ifndef MAME_BUS_PC_KBD_MSNAT_H
+#define MAME_BUS_PC_KBD_MSNAT_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PC_KBD_MICROSOFT_NATURAL, pc_kbd_microsoft_natural_device)
 
-#endif // MAME_BUS_PC_KB_MSNAT_H
+#endif // MAME_BUS_PC_KBD_MSNAT_H

@@ -1016,8 +1016,7 @@ void macrossp_state::macrossp(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_888, 4096);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
@@ -1026,8 +1025,8 @@ void macrossp_state::macrossp(machine_config &config)
 	ensoniq.set_addrmap(1, &macrossp_state::es5506_bank1_map);
 	ensoniq.set_channels(1);
 	ensoniq.irq_cb().set(FUNC(macrossp_state::irqhandler));
-	ensoniq.add_route(0, "lspeaker", 0.1);
-	ensoniq.add_route(1, "rspeaker", 0.1);
+	ensoniq.add_route(0, "speaker", 0.1, 0);
+	ensoniq.add_route(1, "speaker", 0.1, 1);
 }
 
 void macrossp_state::quizmoon(machine_config &config)

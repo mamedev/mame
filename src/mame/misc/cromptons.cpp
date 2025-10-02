@@ -167,4 +167,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, ffruits,  0,   cromptons, cromptons, cromptons_state, empty_init, ROT0, "Cromptons Leisure Machines", "Frantic Fruits",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000, ffruits,  0,   cromptons, cromptons, cromptons_state, empty_init, ROT0, "Cromptons Leisure Machines", "Frantic Fruits",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

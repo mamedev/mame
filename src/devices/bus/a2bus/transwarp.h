@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_A2BUS_A2TRANSWARP_H
-#define MAME_BUS_A2BUS_A2TRANSWARP_H
+#ifndef MAME_BUS_A2BUS_TRANSWARP_H
+#define MAME_BUS_A2BUS_TRANSWARP_H
 
 #include "a2bus.h"
 

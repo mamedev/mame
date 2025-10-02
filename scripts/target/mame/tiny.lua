@@ -40,6 +40,7 @@ SOUNDS["DISCRETE"] = true
 SOUNDS["HC55516"] = true
 SOUNDS["OKIM6295"] = true
 SOUNDS["SAMPLES"] = true
+SOUNDS["SN76496"] = true
 SOUNDS["TMS5220"] = true
 SOUNDS["VOTRAX_SC01"] = true
 SOUNDS["YM2151"] = true
@@ -158,6 +159,8 @@ files{
 	MAME_DIR .. "src/mame/midway/williams.h",
 	MAME_DIR .. "src/mame/midway/williams_m.cpp",
 	MAME_DIR .. "src/mame/midway/williams_v.cpp",
+	MAME_DIR .. "src/mame/midway/williamsblitter.cpp",
+	MAME_DIR .. "src/mame/midway/williamsblitter.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco_v.cpp",
@@ -167,9 +170,9 @@ files{
 	MAME_DIR .. "src/mame/gaelco/gaelco_wrally_sprites.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco_ds5002fp.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco_ds5002fp.h",
-	MAME_DIR .. "src/mame/venture/looping.cpp",
-	MAME_DIR .. "src/mame/misc/supertnk.cpp",
 	MAME_DIR .. "src/mame/misc/goldnpkr.cpp",
+	MAME_DIR .. "src/mame/videogames/looping.cpp",
+	MAME_DIR .. "src/mame/videogames/supertnk.cpp",
 }
 end
 

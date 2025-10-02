@@ -156,7 +156,7 @@ void spg2xx_game_marc250_state::machine_start()
 	m_pulse_timer2->adjust(attotime::never);
 
 	// hack, makes x-racer3 and some others more stable, TODO: find out what is really wrong
-	m_maincpu->set_clock_scale(2.0000f);
+	m_maincpu->set_clock_scale(2.0);
 
 }
 
@@ -552,7 +552,7 @@ static INPUT_PORTS_START( lexifit )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )

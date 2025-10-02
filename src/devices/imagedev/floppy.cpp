@@ -124,6 +124,7 @@ DEFINE_DEVICE_TYPE(EPSON_SD_680L, epson_sd_680l, "epson_sd_680l", "EPSON SD-680L
 
 // Panasonic 3.5" drive
 DEFINE_DEVICE_TYPE(PANA_JU_363, pana_ju_363, "pana_ju_363", "Panasonic JU-363 Flexible Disk Drive")
+DEFINE_DEVICE_TYPE(PANA_JU_386, pana_ju_386, "pana_ju_386", "Panasonic JU-386 Flexible Disk Drive")
 
 // Sony 3.5" drives
 DEFINE_DEVICE_TYPE(SONY_OA_D31V, sony_oa_d31v, "sony_oa_d31v", "Sony OA-D31V Micro Floppydisk Drive")
@@ -247,33 +248,33 @@ floppy_image_device *floppy_connector::get_device()
 //  floppy_image_device - constructor
 //-------------------------------------------------
 
-floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_image_interface(mconfig, *this),
-		m_input_format(nullptr),
-		m_output_format(nullptr),
-		m_image(),
-		m_index_timer(nullptr),
-		m_tracks(0),
-		m_sides(0),
-		m_form_factor(0),
-		m_sectoring_type(floppy_image::SOFT),
-		m_motor_always_on(false),
-		m_dskchg_writable(false),
-		m_has_trk00_sensor(true),
-		m_dir(0), m_stp(0), m_wtg(0), m_mon(0), m_ss(0), m_ds(-1), m_idx(0), m_wpt(0), m_rdy(0), m_dskchg(0),
-		m_ready(false),
-		m_rpm(0),
-		m_angular_speed(0),
-		m_revolution_count(0),
-		m_cyl(0),
-		m_subcyl(0),
-		m_amplifier_freakout_time(attotime::from_usec(16)),
-		m_image_dirty(false),
-		m_track_dirty(false),
-		m_ready_counter(0),
-		m_make_sound(false),
-		m_sound_out(nullptr)
+floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	m_input_format(nullptr),
+	m_output_format(nullptr),
+	m_image(),
+	m_index_timer(nullptr),
+	m_tracks(0),
+	m_sides(0),
+	m_form_factor(0),
+	m_sectoring_type(floppy_image::SOFT),
+	m_motor_always_on(false),
+	m_dskchg_writable(false),
+	m_has_trk00_sensor(true),
+	m_dir(0), m_stp(0), m_wtg(0), m_mon(1), m_ss(0), m_ds(-1), m_idx(0), m_wpt(0), m_rdy(0), m_dskchg(0),
+	m_ready(false),
+	m_rpm(0),
+	m_angular_speed(0),
+	m_revolution_count(0),
+	m_cyl(0),
+	m_subcyl(0),
+	m_amplifier_freakout_time(attotime::from_usec(16)),
+	m_image_dirty(false),
+	m_track_dirty(false),
+	m_ready_counter(0),
+	m_make_sound(false),
+	m_sound_out(nullptr)
 {
 	m_extension_list[0] = '\0';
 }
@@ -527,7 +528,7 @@ void floppy_image_device::device_start()
 
 	m_cyl = 0;
 	m_subcyl = 0;
-	m_ss  = 0;
+	m_ss = 0;
 	m_actual_ss = 0;
 	m_ds = -1;
 	m_stp = 1;
@@ -538,7 +539,6 @@ void floppy_image_device::device_start()
 	m_ready = true;
 	m_ready_counter = 0;
 	m_phases = 0;
-
 
 	if (m_make_sound) m_sound_out = subdevice<floppy_sound_device>(FLOPSND_TAG);
 
@@ -610,7 +610,10 @@ std::pair<std::error_condition, const floppy_image_format_t *> floppy_image_devi
 		}
 	}
 
-	return{ std::error_condition(), best_format };
+	if(best_format)
+		return{ std::error_condition(), best_format };
+	else
+		return{ image_error::INVALIDIMAGE, nullptr };
 }
 
 void floppy_image_device::init_floppy_load(bool write_supported)
@@ -632,6 +635,8 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 	if (m_motor_always_on) {
 		// When disk is inserted, start motor
 		mon_w(0);
+		m_ready_counter = 2;
+
 	} else if(!m_mon)
 		m_ready_counter = 2;
 
@@ -650,9 +655,9 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 	const floppy_image_format_t *best_format = nullptr;
 	for (const floppy_image_format_t *format : m_fif_list) {
 		int score = format->identify(*io, m_form_factor, m_variants);
-		if(score && format->extension_matches(filename()))
+		if (score && format->extension_matches(filename()))
 			score |= floppy_image_format_t::FIFID_EXT;
-		if(score > best) {
+		if (score > best) {
 			best = score;
 			best_format = format;
 		}
@@ -666,6 +671,11 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 		m_image.reset();
 		return std::make_pair(image_error::INVALIDIMAGE, "Incompatible image file format or corrupted data");
 	}
+
+	char const *const wp = get_feature("write_protected");
+	if (wp && !std::strcmp(wp, "true"))
+		make_readonly();
+
 	m_output_format = is_readonly() ? nullptr : best_format;
 
 	m_image_dirty = false;
@@ -1590,18 +1600,17 @@ void floppy_sound_device::step(int zone)
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void floppy_sound_device::sound_stream_update(sound_stream &stream)
 {
 	// We are using only one stream, unlike the parent class
 	// Also, there is no need for interpolation, as we only expect
 	// one sample rate of 44100 for all samples
 
 	int16_t out;
-	auto &samplebuffer = outputs[0];
 	int m_idx = 0;
 	int sampleend = 0;
 
-	for (int sampindex = 0; sampindex < samplebuffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		out = 0;
 
@@ -1695,7 +1704,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 		}
 
 		// Write to the stream buffer
-		samplebuffer.put_int(sampindex, out, 32768);
+		stream.put_int(0, sampindex, out, 32768);
 	}
 }
 
@@ -2431,6 +2440,42 @@ void pana_ju_363::setup_characteristics()
 	add_variant(floppy_image::SSDD);
 	add_variant(floppy_image::DSDD);
 }
+
+
+//-------------------------------------------------
+//  3.5" Panasonic Flexible Disk Drive JU-386
+//
+//  track to track: 3 ms
+//  settling time: 15 ms
+//  motor start time: 300 ms
+//  transfer rate: 500 Kbits/s
+//  (can also be configured for 300 RPM @ 250 Kb/s with a jumper)
+//
+//-------------------------------------------------
+
+pana_ju_386::pana_ju_386(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, PANA_JU_386, tag, owner, clock)
+{
+}
+
+pana_ju_386::~pana_ju_386()
+{
+}
+
+void pana_ju_386::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_35;
+	m_tracks = 84;
+	m_sides = 2;
+	m_dskchg_writable = true;
+	set_rpm(360);
+
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSHD);
+}
+
 
 //-------------------------------------------------
 //  Sony OA-D31V

@@ -15,12 +15,12 @@
 #include "modules/font/font_module.h"
 #include "modules/input/input_module.h"
 #include "modules/midi/midi_module.h"
+#include "modules/netdev/netdev_module.h"
 #include "modules/monitor/monitor_module.h"
 #include "modules/netdev/netdev_module.h"
 #include "modules/render/render_module.h"
 #include "modules/sound/sound_module.h"
 
-#include "osdnet.h"
 #include "watchdog.h"
 
 #include "emu.h"
@@ -144,28 +144,11 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD SOUND OPTIONS" },
 	{ OSDOPTION_SOUND,                           OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "sound output method: " },
-	{ OSDOPTION_AUDIO_LATENCY "(0-5)",           "2",              core_options::option_type::INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
-
-#ifndef NO_USE_PORTAUDIO
-	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "PORTAUDIO OPTIONS" },
-	{ OSDOPTION_PA_API,                          OSDOPTVAL_NONE,   core_options::option_type::STRING,    "PortAudio API" },
-	{ OSDOPTION_PA_DEVICE,                       OSDOPTVAL_NONE,   core_options::option_type::STRING,    "PortAudio device" },
-	{ OSDOPTION_PA_LATENCY "(0-0.25)",           "0",              core_options::option_type::FLOAT,     "suggested latency in seconds, 0 for default" },
-#endif
+	{ OSDOPTION_AUDIO_LATENCY ";alat(0.0-50.0)", "0.0",            core_options::option_type::FLOAT,     "audio latency, 0 for default (increase to reduce glitches, decrease for responsiveness)" },
 
 #ifdef SDLMAME_MACOSX
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
 	{ OSDOPTION_AUDIO_OUTPUT,                    OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "audio output device" },
-	{ OSDOPTION_AUDIO_EFFECT "0",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 0" },
-	{ OSDOPTION_AUDIO_EFFECT "1",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 1" },
-	{ OSDOPTION_AUDIO_EFFECT "2",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 2" },
-	{ OSDOPTION_AUDIO_EFFECT "3",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 3" },
-	{ OSDOPTION_AUDIO_EFFECT "4",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 4" },
-	{ OSDOPTION_AUDIO_EFFECT "5",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 5" },
-	{ OSDOPTION_AUDIO_EFFECT "6",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 6" },
-	{ OSDOPTION_AUDIO_EFFECT "7",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 7" },
-	{ OSDOPTION_AUDIO_EFFECT "8",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 8" },
-	{ OSDOPTION_AUDIO_EFFECT "9",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 9" },
 #endif
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD MIDI OPTIONS" },
@@ -208,6 +191,7 @@ osd_common_t::osd_common_t(osd_options &options)
 	, m_sound(nullptr)
 	, m_debugger(nullptr)
 	, m_midi(nullptr)
+	, m_network(nullptr)
 	, m_keyboard_input(nullptr)
 	, m_mouse_input(nullptr)
 	, m_lightgun_input(nullptr)
@@ -259,7 +243,7 @@ void osd_common_t::register_options()
 #endif
 	REGISTER_MODULE(m_mod_man, RENDERER_NONE);
 
-	REGISTER_MODULE(m_mod_man, SOUND_DSOUND);
+	REGISTER_MODULE(m_mod_man, SOUND_WASAPI);
 	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
@@ -269,6 +253,9 @@ void osd_common_t::register_options()
 #endif
 #ifndef NO_USE_PULSEAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PULSEAUDIO);
+#endif
+#ifndef NO_USE_PIPEWIRE
+	REGISTER_MODULE(m_mod_man, SOUND_PIPEWIRE);
 #endif
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
@@ -505,38 +492,66 @@ void osd_common_t::debugger_update()
 }
 
 
-//-------------------------------------------------
-//  update_audio_stream - update the stereo audio
-//  stream
-//-------------------------------------------------
-
-void osd_common_t::update_audio_stream(const int16_t *buffer, int samples_this_frame)
+bool osd_common_t::sound_external_per_channel_volume()
 {
-	//
-	// This method is called whenever the system has new audio data to stream.
-	// It provides an array of stereo samples in L-R order which should be
-	// output at the configured sample_rate.
-	//
-	m_sound->update_audio_stream(m_machine->video().throttled(), buffer,samples_this_frame);
+	return m_sound->external_per_channel_volume();
 }
 
-
-//-------------------------------------------------
-//  set_mastervolume - set the system volume
-//-------------------------------------------------
-
-void osd_common_t::set_mastervolume(int attenuation)
+bool osd_common_t::sound_split_streams_per_source()
 {
-	//
-	// Attenuation is the attenuation in dB (a negative number).
-	// To convert from dB to a linear volume scale do the following:
-	//    volume = MAX_VOLUME;
-	//    while (attenuation++ < 0)
-	//       volume /= 1.122018454;      //  = (10 ^ (1/20)) = 1dB
-	//
-	if (m_sound != nullptr)
-		m_sound->set_mastervolume(attenuation);
+	return m_sound->split_streams_per_source();
 }
+
+uint32_t osd_common_t::sound_get_generation()
+{
+	return m_sound->get_generation();
+}
+
+osd::audio_info osd_common_t::sound_get_information()
+{
+	return m_sound->get_information();
+}
+
+uint32_t osd_common_t::sound_stream_sink_open(uint32_t node, std::string name, uint32_t rate)
+{
+	return m_sound->stream_sink_open(node, name, rate);
+}
+
+uint32_t osd_common_t::sound_stream_source_open(uint32_t node, std::string name, uint32_t rate)
+{
+	return m_sound->stream_source_open(node, name, rate);
+}
+
+void osd_common_t::sound_stream_set_volumes(uint32_t id, const std::vector<float> &db)
+{
+	m_sound->stream_set_volumes(id, db);
+}
+
+void osd_common_t::sound_stream_close(uint32_t id)
+{
+	m_sound->stream_close(id);
+}
+
+void osd_common_t::sound_stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame)
+{
+	m_sound->stream_sink_update(id, buffer, samples_this_frame);
+}
+
+void osd_common_t::sound_stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame)
+{
+	m_sound->stream_source_update(id, buffer, samples_this_frame);
+}
+
+void osd_common_t::sound_begin_update()
+{
+	m_sound->begin_update();
+}
+
+void osd_common_t::sound_end_update()
+{
+	m_sound->end_update();
+}
+
 
 
 //-------------------------------------------------
@@ -615,8 +630,8 @@ bool osd_common_t::execute_command(const char *command)
 {
 	if (strcmp(command, OSDCOMMAND_LIST_NETWORK_ADAPTERS) == 0)
 	{
-		osd_module &om = select_module_options<osd_module>(OSD_NETDEV_PROVIDER);
-		auto const &interfaces = get_netdev_list();
+		auto &om = select_module_options<netdev_module>(OSD_NETDEV_PROVIDER);
+		auto const interfaces = om.list_devices();
 		if (interfaces.empty())
 		{
 			printf("No supported network interfaces were found\n");
@@ -626,17 +641,17 @@ bool osd_common_t::execute_command(const char *command)
 			printf("Available network interfaces:\n");
 			for (auto &entry : interfaces)
 			{
-				printf("    %s\n", entry->description);
+				printf("    %.*s\n", int(entry.description.length()), entry.description.data());
 			}
 		}
-		om.exit();
+		dynamic_cast<osd_module &>(om).exit();
 
 		return true;
 	}
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
 	{
-		osd_module &om = select_module_options<osd_module>(OSD_MIDI_PROVIDER);
-		auto const ports = dynamic_cast<midi_module &>(om).list_midi_ports();
+		auto &om = select_module_options<midi_module>(OSD_MIDI_PROVIDER);
+		auto const ports = om.list_midi_ports();
 		if (ports.empty())
 		{
 			printf("No MIDI ports were found\n");
@@ -657,7 +672,7 @@ bool osd_common_t::execute_command(const char *command)
 					printf(port.default_output ? "%s (default)\n" : "%s\n", port.name.c_str());
 			}
 		}
-		om.exit();
+		dynamic_cast<osd_module &>(om).exit();
 
 		return true;
 	}
@@ -697,9 +712,9 @@ void osd_common_t::init_subsystems()
 
 	m_debugger = &select_module_options<debug_module>(OSD_DEBUG_PROVIDER);
 
-	select_module_options<netdev_module>(OSD_NETDEV_PROVIDER);
-
 	m_midi = &select_module_options<midi_module>(OSD_MIDI_PROVIDER);
+
+	m_network = &select_module_options<netdev_module>(OSD_NETDEV_PROVIDER);
 
 	m_output = &select_module_options<output_module>(OSD_OUTPUT_PROVIDER);
 	machine().output().set_global_notifier(output_notifier_callback, this);
@@ -788,3 +803,12 @@ std::vector<osd::midi_port_info> osd_common_t::list_midi_ports()
 	return m_midi->list_midi_ports();
 }
 
+std::unique_ptr<osd::network_device> osd_common_t::open_network_device(int id, osd::network_handler &handler)
+{
+	return m_network->open_device(id, handler);
+}
+
+std::vector<osd::network_device_info> osd_common_t::list_network_devices()
+{
+	return m_network->list_devices();
+}

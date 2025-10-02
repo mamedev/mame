@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_BUS_HLE_PS2_MOUSE_H
-#define MAME_BUS_HLE_PS2_MOUSE_H
+#ifndef MAME_BUS_PC_KBD_HLE_MOUSE_H
+#define MAME_BUS_PC_KBD_HLE_MOUSE_H
 
 #pragma once
 
@@ -95,4 +95,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HLE_PS2_MOUSE, hle_ps2_mouse_device)
 
-#endif // MAME_BUS_HLE_PS2_MOUSE_H
+#endif // MAME_BUS_PC_KBD_HLE_MOUSE_H

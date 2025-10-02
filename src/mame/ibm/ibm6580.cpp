@@ -1073,4 +1073,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY  FULLNAME                  FLAGS */
-COMP( 1980, ibm6580, 0,      0,      ibm6580, 0,     ibm6580_state, empty_init, "IBM",   "IBM 6580 Displaywriter", MACHINE_IS_SKELETON)
+COMP( 1980, ibm6580, 0,      0,      ibm6580, 0,     ibm6580_state, empty_init, "IBM",   "IBM 6580 Displaywriter", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

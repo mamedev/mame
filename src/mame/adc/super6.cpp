@@ -203,7 +203,7 @@ uint8_t super6_state::fdc_r()
 		if (!m_z80_wait)
 		{
 			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-			m_maincpu->defer_access();
+			m_maincpu->retry_access();
 		}
 
 		m_z80_wait = !m_z80_wait;

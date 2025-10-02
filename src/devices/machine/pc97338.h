@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_MACHINE_PC97336_H
-#define MAME_MACHINE_PC97336_H
+#ifndef MAME_MACHINE_PC97338_H
+#define MAME_MACHINE_PC97338_H
 
 #pragma once
 
@@ -121,4 +121,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PC97338, pc97338_device);
 
-#endif // MAME_MACHINE_PC97336_H
+#endif // MAME_MACHINE_PC97338_H

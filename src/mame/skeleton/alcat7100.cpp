@@ -121,4 +121,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1984, alcat7100, 0, 0, alcat7100, alcat7100, alcat7100_state, empty_init, "Alcatel", "Terminal 7100", MACHINE_IS_SKELETON)
+COMP(1984, alcat7100, 0, 0, alcat7100, alcat7100, alcat7100_state, empty_init, "Alcatel", "Terminal 7100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

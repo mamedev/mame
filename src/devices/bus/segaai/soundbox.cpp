@@ -142,12 +142,11 @@ void segaai_soundbox_device::device_add_mconfig(machine_config &config)
 	m_tmp8255->out_pb_callback().set(FUNC(segaai_soundbox_device::tmp8255_portb_w));
 	m_tmp8255->out_pc_callback().set(FUNC(segaai_soundbox_device::tmp8255_portc_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	YM2151(config, m_ym2151, DERIVED_CLOCK(1,1));   // ~3.58MHz
 	m_ym2151->irq_handler().set(FUNC(segaai_soundbox_device::ym2151_irq_w));
-	m_ym2151->add_route(0, "lspeaker", 1.00);
-	m_ym2151->add_route(1, "rspeaker", 1.00);
+	m_ym2151->add_route(0, "speaker", 1.00, 0);
+	m_ym2151->add_route(1, "speaker", 1.00, 1);
 }
 
 ROM_START(soundbox)

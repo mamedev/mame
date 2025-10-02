@@ -51,9 +51,6 @@
     00011000    0x74   88844777
 
 
-
-
-
     TO DO :
 
     - missing starfield
@@ -168,6 +165,13 @@ private:
 
 	void io_map(address_map &map) ATTR_COLD;
 };
+
+
+/*************************************
+ *
+ *  Video hardware
+ *
+ *************************************/
 
 void battlex_state::palette_w(offs_t offset, uint8_t data)
 {
@@ -479,7 +483,6 @@ void battlex_state::battlex(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &battlex_state::io_map);
 	m_maincpu->set_periodic_int(FUNC(battlex_state::interrupt), attotime::from_hz(400)); // controls game speed?
 
-
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -502,7 +505,6 @@ void dodgeman_state::dodgeman(machine_config &config)
 	battlex(config);
 
 	m_maincpu->set_addrmap(AS_IO, &dodgeman_state::io_map);
-
 
 	AY8910(config, "ay2", XTAL(10'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.40);   // divider not verified
 }

@@ -85,6 +85,7 @@ private:
 
 	emu_timer* m_watchdog_timer;
 	attotime m_watchdog_delay;
+
 protected:
 	u32 const m_size;
 	s32 m_offset_watchdog;
@@ -127,6 +128,12 @@ protected:
 	m48t58_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 };
 
+class ds1643_device : public m48t58_device
+{
+public:
+	ds1643_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
 class mk48t08_device : public timekeeper_device
 {
 public:
@@ -137,12 +144,6 @@ class mk48t12_device : public timekeeper_device
 {
 public:
 	mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-};
-
-class ds1643_device : public m48t58_device
-{
-public:
-	ds1643_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // device type definition

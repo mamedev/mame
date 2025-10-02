@@ -178,8 +178,20 @@ static INPUT_PORTS_START( mpoker2 )
 INPUT_PORTS_END
 
 
-// TODO
+static const gfx_layout gfx_8x8x16 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0, 2) },
+	{ STEP8(0, 8*2) },
+	{ STEP8(0, 8*8*2) },
+	8*8*16
+};
+
+// TODO: only preliminary
 static GFXDECODE_START( gfx_palsystems_sh2 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x16, 0, 16 )
 GFXDECODE_END
 
 
@@ -250,6 +262,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, mpoker2,  0,       palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 1)", MACHINE_IS_SKELETON )
-GAME( 199?, mpoker2a, mpoker2, palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 2)", MACHINE_IS_SKELETON )
-GAME( 199?, mpoker2b, mpoker2, palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 3)", MACHINE_IS_SKELETON )
+GAME( 199?, mpoker2,  0,       palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, mpoker2a, mpoker2, palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, mpoker2b, mpoker2, palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

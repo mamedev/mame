@@ -119,4 +119,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1986, d461, 0, 0, d461, d461, d400_state, empty_init, "Data General", "Dasher D461", MACHINE_IS_SKELETON )
+COMP( 1986, d461, 0, 0, d461, d461, d400_state, empty_init, "Data General", "Dasher D461", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

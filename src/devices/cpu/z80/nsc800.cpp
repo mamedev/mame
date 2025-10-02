@@ -47,30 +47,41 @@ void nsc800_device::device_reset()
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
-
-void nsc800_device::do_op()
+void nsc800_device::execute_run()
 {
-	#include "cpu/z80/ncs800.hxx"
+	#include "cpu/z80/nsc800.hxx"
 }
 
 void nsc800_device::execute_set_input(int inputnum, int state)
 {
+	bool update_irq_attention = false;
 	switch (inputnum)
 	{
 	case NSC800_RSTA:
+		update_irq_attention = true;
 		m_nsc800_irq_state[0] = state;
 		break;
 
 	case NSC800_RSTB:
+		update_irq_attention = true;
 		m_nsc800_irq_state[1] = state;
 		break;
 
 	case NSC800_RSTC:
+		update_irq_attention = true;
 		m_nsc800_irq_state[2] = state;
 		break;
 
 	default:
 		z80_device::execute_set_input(inputnum, state);
 		break;
+	}
+
+	if (update_irq_attention)
+	{
+		if (m_nsc800_irq_state[0] != CLEAR_LINE || m_nsc800_irq_state[1] != CLEAR_LINE || m_nsc800_irq_state[2] != CLEAR_LINE)
+			set_service_attention<SA_NSC800_IRQ_ON, 1>();
+		else
+			set_service_attention<SA_NSC800_IRQ_ON, 0>();
 	}
 }

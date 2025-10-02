@@ -180,4 +180,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT         COMPANY            FULLNAME     FLAGS
-COMP( 2010, ultim809, 0,      0,      ultim809, ultim809, ultim809_state, empty_init, "Matthew Sarnoff", "Ultim809", MACHINE_IS_INCOMPLETE | MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 2010, ultim809, 0,      0,      ultim809, ultim809, ultim809_state, empty_init, "Matthew Sarnoff", "Ultim809", MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

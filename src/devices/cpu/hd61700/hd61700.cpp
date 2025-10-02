@@ -296,6 +296,7 @@ bool hd61700_cpu_device::check_irqs()
 	{
 		if (BIT(REG_IB, i) && !BIT(m_irq_status, i))
 		{
+			standard_irq_callback(i, m_pc);
 			m_irq_status |= (1 << i);
 			push(REG_SS, (uint8_t)(m_pc >> 8));
 			push(REG_SS, (uint8_t)m_pc);
@@ -319,18 +320,18 @@ void hd61700_cpu_device::execute_run()
 {
 	do
 	{
-		m_ppc = m_curpc;
-
-		debugger_instruction_hook(m_curpc);
-
 		// verify that CPU is not in sleep
 		if (m_state & CPU_SLP)
 		{
+			debugger_wait_hook();
 			m_icount -= 6;
 		}
 		else
 		{
 			check_irqs();
+
+			m_ppc = m_curpc;
+			debugger_instruction_hook(m_curpc);
 
 			// instruction fetch
 			uint8_t op = read_op();

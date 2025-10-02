@@ -85,6 +85,7 @@ private:
 	attotime            m_period;       // the repeat frequency of the timer
 	attotime            m_start;        // time when the timer was started
 	attotime            m_expire;       // time when the timer will expire
+	u32                 m_index;        // needed to restore timers scheduled at the same time in correct order
 
 	friend class device_scheduler;
 	friend class fixed_allocator<emu_timer>;
@@ -143,7 +144,7 @@ private:
 	void apply_suspend_changes();
 
 	// timer helpers
-	emu_timer &timer_list_insert(emu_timer &timer);
+	template <bool CheckIndex = false> emu_timer &timer_list_insert(emu_timer &timer);
 	emu_timer &timer_list_remove(emu_timer &timer);
 	void execute_timers();
 

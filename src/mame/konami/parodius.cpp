@@ -57,7 +57,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<address_map_bank_device> m_bank0000;
 	required_device<k052109_device> m_k052109;
-	required_device<k05324x_device> m_k053245;
+	required_device<k053244_device> m_k053245;
 	required_device<k053251_device> m_k053251;
 
 	required_memory_bank m_mainbank;
@@ -66,7 +66,7 @@ private:
 	// video-related
 	uint8_t m_layer_colorbase[3]{};
 	uint8_t m_sprite_colorbase = 0;
-	int m_layerpri[3]{};
+	int32_t m_layerpri[3]{};
 
 	// misc
 	emu_timer *m_nmi_blocked = nullptr;
@@ -77,7 +77,7 @@ private:
 	void sound_arm_nmi_w(uint8_t data);
 	void z80_nmi_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	K05324X_CB_MEMBER(sprite_callback);
+	K053244_CB_MEMBER(sprite_callback);
 	K052109_CB_MEMBER(tile_callback);
 	void banking_callback(uint8_t data);
 
@@ -95,8 +95,8 @@ private:
 
 K052109_CB_MEMBER(parodius_state::tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 /***************************************************************************
@@ -105,19 +105,19 @@ K052109_CB_MEMBER(parodius_state::tile_callback)
 
 ***************************************************************************/
 
-K05324X_CB_MEMBER(parodius_state::sprite_callback)
+K053244_CB_MEMBER(parodius_state::sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x1f);
+	color = m_sprite_colorbase + (color & 0x1f);
 }
 
 
@@ -129,22 +129,27 @@ K05324X_CB_MEMBER(parodius_state::sprite_callback)
 
 uint32_t parodius_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// update color info and refresh tilemaps
+	static const int K053251_CI[3] = { k053251_device::CI2, k053251_device::CI4, k053251_device::CI3 };
 	int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
-	m_sprite_colorbase   = m_k053251->get_palette_index(k053251_device::CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI4);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI3);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
 
-	m_k052109->tilemap_update();
+	for (int i = 0; i < 3; i++)
+	{
+		int prev_colorbase = m_layer_colorbase[i];
+		m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
 
+		if (m_layer_colorbase[i] != prev_colorbase)
+			m_k052109->mark_tilemap_dirty(i);
+	}
+
+	// sort layers and draw
 	int layer[3];
-
-	layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
-	layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
-	layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI3);
+	for (int i = 0; i < 3; i++)
+	{
+		layer[i] = i;
+		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+	}
 
 	konami_sortlayers3(layer, m_layerpri);
 
@@ -218,13 +223,13 @@ void parodius_state::main_map(address_map &map)
 	map(0x2000, 0x5fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0x2000, 0x27ff).view(m_view_2000);
 	m_view_2000[0](0x2000, 0x27ff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
-	m_view_2000[1](0x2000, 0x27ff).rw(m_k053245, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
+	m_view_2000[1](0x2000, 0x27ff).rw(m_k053245, FUNC(k053244_device::k053245_r), FUNC(k053244_device::k053245_w));
 	map(0x3f8c, 0x3f8c).portr("P1");
 	map(0x3f8d, 0x3f8d).portr("P2");
 	map(0x3f8e, 0x3f8e).portr("DSW3");
 	map(0x3f8f, 0x3f8f).portr("DSW1");
 	map(0x3f90, 0x3f90).portr("DSW2");
-	map(0x3fa0, 0x3faf).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x3fa0, 0x3faf).rw(m_k053245, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w));
 	map(0x3fb0, 0x3fbf).w(m_k053251, FUNC(k053251_device::write));
 	map(0x3fc0, 0x3fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(parodius_state::_3fc0_w));
 	map(0x3fc4, 0x3fc4).w(FUNC(parodius_state::videobank_w));
@@ -351,11 +356,11 @@ void parodius_state::banking_callback(uint8_t data)
 void parodius_state::parodius(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 12000000); // 053248
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 053248
 	m_maincpu->set_addrmap(AS_PROGRAM, &parodius_state::main_map);
 	m_maincpu->line().set(FUNC(parodius_state::banking_callback));
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &parodius_state::sound_map); // NMIs are triggered by the 053260
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&parodius_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
@@ -364,36 +369,34 @@ void parodius_state::parodius(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	screen.set_screen_update(FUNC(parodius_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(parodius_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245, 24_MHz_XTAL);
 	m_k053245->set_palette("palette");
 	m_k053245->set_sprite_callback(FUNC(parodius_state::sprite_callback));
 
 	K053251(config, m_k053251, 0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
-	k053260_device &k053260(K053260(config, "k053260", 3579545));
-	k053260.add_route(0, "lspeaker", 0.70);
-	k053260.add_route(1, "rspeaker", 0.70);
+	k053260_device &k053260(K053260(config, "k053260", 3.579545_MHz_XTAL));
+	k053260.add_route(0, "speaker", 0.70, 0);
+	k053260.add_route(1, "speaker", 0.70, 1);
 	k053260.sh1_cb().set(FUNC(parodius_state::z80_nmi_w));
 }
 

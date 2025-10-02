@@ -682,8 +682,8 @@ GAMEL( 1974, rebound,   0, rebound,  rebound,   rebound_state,  empty_init, ROT0
 GAMEL( 1976, breakout,  0, breakout, breakout,  breakout_state, empty_init, ROT90, "Atari", "Breakout", MACHINE_SUPPORTS_SAVE, layout_breakout)
 
 // 100% TTL
-//GAMEL(1974, spike,      rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari/Kee", "Spike", MACHINE_IS_SKELETON)
-//GAMEL(1974, volleyball, rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari", "Volleyball", MACHINE_IS_SKELETON)
+//GAMEL(1974, spike,      rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari/Kee", "Spike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAMEL(1974, volleyball, rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari", "Volleyball", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 //GAME( 1973, coupedav,   pongd,    pongd,    pongd,    pong_state,     empty_init, ROT0,  "Atari France", "Coupe Davis", MACHINE_SUPPORTS_SAVE)
 //GAME( 1973, pongbarl,   pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Pong In-A-Barrel", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, cktpong,    pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong", MACHINE_SUPPORTS_SAVE)

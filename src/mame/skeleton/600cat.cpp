@@ -157,4 +157,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME                              FLAGS
-COMP( 199?, 600cat, 0,      0,      _600cat, _600cat, _600cat_state, empty_init, "Wavetek", "600 Cellular Activation Tester", MACHINE_IS_SKELETON )
+COMP( 199?, 600cat, 0,      0,      _600cat, _600cat, _600cat_state, empty_init, "Wavetek", "600 Cellular Activation Tester", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

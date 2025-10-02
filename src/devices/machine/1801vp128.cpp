@@ -811,3 +811,8 @@ void k1801vp128_device::set_ds(int fid)
 		execute_command(CMD_READ);
 	}
 }
+
+std::string k1801vp128_device::ttsn() const
+{
+	return machine().time().to_string();
+}

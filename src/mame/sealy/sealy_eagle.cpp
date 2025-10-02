@@ -174,4 +174,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2011, qczl, 0, qczl, qczl, sealy_eagle_state, empty_init, ROT0, "Sealy", "Qing Cheng Zhi Lian", MACHINE_IS_SKELETON )
+GAME( 2011, qczl, 0, qczl, qczl, sealy_eagle_state, empty_init, ROT0, "Sealy", "Qing Cheng Zhi Lian", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

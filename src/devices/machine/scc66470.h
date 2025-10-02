@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_SCC66470_H
-#define MAME_VIDEO_SCC66470_H
+#ifndef MAME_MACHINE_SCC66470_H
+#define MAME_MACHINE_SCC66470_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SCC66470, scc66470_device)
 
-#endif // MAME_VIDEO_SCC66470_H
+#endif // MAME_MACHINE_SCC66470_H

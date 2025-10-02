@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Samuel Neves, Peter Wilhelmsen, Morten Shearman Kirkegaard
-#ifndef MAME_SEGA_315_5838_371_0229_COMP_H
-#define MAME_SEGA_315_5838_371_0229_COMP_H
+#ifndef MAME_SEGA_315_5838_317_0229_COMP_H
+#define MAME_SEGA_315_5838_317_0229_COMP_H
 
 #pragma once
 
@@ -78,4 +78,4 @@ private:
 #endif
 };
 
-#endif // MAME_SEGA_315_5838_371_0229_COMP_H
+#endif // MAME_SEGA_315_5838_317_0229_COMP_H

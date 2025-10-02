@@ -297,7 +297,7 @@ static INPUT_PORTS_START( hitpoker )
 	PORT_DIPNAME( 0x40, 0x40, "Monitor" ) // a JP probably
 	PORT_DIPSETTING(    0x40, "15KHz" )
 	PORT_DIPSETTING(    0x00, "24KHz" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
@@ -357,7 +357,7 @@ static INPUT_PORTS_START( reelmtp )
 	PORT_INCLUDE( hitpoker )
 
 	PORT_MODIFY("VBLANK") // these 2 seem inverted wrt hitpoker
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_DIPNAME( 0x80, 0x80, "H-Blank" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

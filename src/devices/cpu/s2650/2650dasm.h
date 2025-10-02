@@ -25,13 +25,12 @@ public:
 	s2650_disassembler(config *conf);
 	virtual ~s2650_disassembler() = default;
 
-	virtual u32 opcode_alignment() const override;
-	virtual u32 interface_flags() const override;
-	virtual u32 page_address_bits() const override;
+	virtual u32 opcode_alignment() const override { return 1; }
+	virtual u32 interface_flags() const override  { return PAGED; }
+	virtual u32 page_address_bits() const override { return 13; }
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static const int rel[0x100];
 	static const char cc[4];
 
 	void add(std::string &buf, const std::string &str);

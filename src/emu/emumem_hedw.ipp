@@ -25,6 +25,7 @@ template<int HighBits, int Width, int AddrShift> handler_entry_write_dispatch<Hi
 	m_a_dispatch = m_dispatch_array[0].data();
 	m_u_ranges = m_ranges_array[0].data();
 	m_u_dispatch = m_dispatch_array[0].data();
+	m_global_range = init;
 
 	if (!handler)
 		handler = space->get_unmap_w<Width, AddrShift>();
@@ -35,7 +36,7 @@ template<int HighBits, int Width, int AddrShift> handler_entry_write_dispatch<Hi
 	}
 }
 
-template<int HighBits, int Width, int AddrShift> handler_entry_write_dispatch<HighBits, Width, AddrShift>::handler_entry_write_dispatch(address_space *space, memory_view &view) : handler_entry_write<Width, AddrShift>(space, handler_entry::F_VIEW), m_view(&view), m_a_dispatch(nullptr), m_a_ranges(nullptr), m_u_dispatch(nullptr), m_u_ranges(nullptr)
+template<int HighBits, int Width, int AddrShift> handler_entry_write_dispatch<HighBits, Width, AddrShift>::handler_entry_write_dispatch(address_space *space, memory_view &view, offs_t addrstart, offs_t addrend) : handler_entry_write<Width, AddrShift>(space, handler_entry::F_VIEW), m_view(&view), m_a_dispatch(nullptr), m_a_ranges(nullptr), m_u_dispatch(nullptr), m_u_ranges(nullptr)
 {
 	m_ranges_array.resize(1);
 	m_dispatch_array.resize(1);
@@ -43,11 +44,16 @@ template<int HighBits, int Width, int AddrShift> handler_entry_write_dispatch<Hi
 	m_a_dispatch = m_dispatch_array[0].data();
 	m_u_ranges = m_ranges_array[0].data();
 	m_u_dispatch = m_dispatch_array[0].data();
+	m_global_range.start = addrstart;
+	m_global_range.end = addrend;
 
 	auto handler = space->get_unmap_w<Width, AddrShift>();
 	handler->ref(COUNT);
-	for(unsigned int i=0; i != COUNT; i++)
+	for(unsigned int i=0; i != COUNT; i++) {
 		m_u_dispatch[i] = handler;
+		m_u_ranges[i].start = addrstart;
+		m_u_ranges[i].end = addrend;
+	}
 }
 
 template<int HighBits, int Width, int AddrShift> handler_entry_write_dispatch<HighBits, Width, AddrShift>::handler_entry_write_dispatch(handler_entry_write_dispatch<HighBits, Width, AddrShift> *src) : handler_entry_write<Width, AddrShift>(src->m_space, handler_entry::F_DISPATCH), m_view(nullptr)
@@ -58,9 +64,20 @@ template<int HighBits, int Width, int AddrShift> handler_entry_write_dispatch<Hi
 	m_a_dispatch = m_dispatch_array[0].data();
 	m_u_ranges = m_ranges_array[0].data();
 	m_u_dispatch = m_dispatch_array[0].data();
+	m_global_range = src->m_global_range;
 
+	std::map<handler_entry_write<Width, AddrShift> *, handler_entry_write<Width, AddrShift> *> dupmap;
 	for(unsigned int i=0; i != COUNT; i++) {
-		m_u_dispatch[i] = src->m_u_dispatch[i]->dup();
+		handler_entry_write<Width, AddrShift> *msrc = src->m_u_dispatch[i];
+		auto m = dupmap.find(msrc);
+		if(m != dupmap.end()) {
+			m->second->ref();
+			m_u_dispatch[i] = m->second;
+		} else {
+			handler_entry_write<Width, AddrShift> *dest = msrc->dup();
+			dupmap[src] = dest;
+			m_u_dispatch[i] = dest;
+		}
 		m_u_ranges[i] = src->m_u_ranges[i];
 	}
 }
@@ -91,10 +108,11 @@ template<int HighBits, int Width, int AddrShift> offs_t handler_entry_write_disp
 template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispatch<HighBits, Width, AddrShift>::dump_map(std::vector<memory_entry> &map) const
 {
 	if(m_view) {
+		offs_t base_cur = map.empty() ? m_view->m_addrstart & HIGHMASK : map.back().end + 1;
 		for(u32 i = 0; i != m_dispatch_array.size(); i++) {
 			u32 j = map.size();
-			offs_t cur = map.empty() ? m_view->m_addrstart & HIGHMASK : map.back().end + 1;
-			offs_t end = m_view->m_addrend + 1;
+			offs_t cur = base_cur;
+			offs_t end = m_global_range.end + 1;
 			do {
 				offs_t entry = (cur >> LowBits) & BITMASK;
 				if(m_dispatch_array[i][entry]->is_dispatch() || m_dispatch_array[i][entry]->is_view())
@@ -115,6 +133,7 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 	} else {
 		offs_t cur = map.empty() ? 0 : map.back().end + 1;
 		offs_t base = cur & UPMASK;
+		offs_t end = m_global_range.end + 1;
 		do {
 			offs_t entry = (cur >> LowBits) & BITMASK;
 			if(m_a_dispatch[entry]->is_dispatch() || m_a_dispatch[entry]->is_view())
@@ -122,7 +141,7 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 			else
 				map.emplace_back(memory_entry{ m_a_ranges[entry].start, m_a_ranges[entry].end, m_a_dispatch[entry] });
 			cur = map.back().end + 1;
-		} while(cur && !((cur ^ base) & UPMASK));
+		} while(cur != end && !((cur ^ base) & UPMASK));
 	}
 }
 
@@ -655,57 +674,29 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 		u32 dt = lowbits - LowBits;
 		u32 ne = 1 << dt;
 		u32 ee = end_entry - start_entry;
-		if(m_view) {
-			auto filter = [s = m_view->m_addrstart, e = m_view->m_addrend] (handler_entry::range r) { r.intersect(s, e); return r; };
-
-			for(offs_t entry = 0; entry <= ee; entry++) {
-				dispatch[entry]->ref(ne);
-				u32 e0 = (entry << dt) & BITMASK;
-				for(offs_t e = 0; e != ne; e++) {
-					offs_t e1 = e0 | e;
-					if(!(m_u_dispatch[e1]->flags() & handler_entry::F_UNMAP))
-						fatalerror("Collision on multiple init_handlers calls");
-					m_u_dispatch[e1]->unref();
-					m_u_dispatch[e1] = dispatch[entry];
-					m_u_ranges[e1] = filter(ranges[entry]);
-				}
-			}
-		} else {
-			for(offs_t entry = 0; entry <= ee; entry++) {
-				dispatch[entry]->ref(ne);
-				u32 e0 = (entry << dt) & BITMASK;
-				for(offs_t e = 0; e != ne; e++) {
-					offs_t e1 = e0 | e;
-					if(!(m_u_dispatch[e1]->flags() & handler_entry::F_UNMAP))
-						fatalerror("Collision on multiple init_handlers calls");
-					m_u_dispatch[e1]->unref();
-					m_u_dispatch[e1] = dispatch[entry];
-					m_u_ranges[e1] = ranges[entry];
-				}
+		auto filter = [s = m_global_range.start, e = m_global_range.end] (handler_entry::range r) { r.intersect(s, e); return r; };
+		for(offs_t entry = 0; entry <= ee; entry++) {
+			dispatch[entry]->ref(ne);
+			u32 e0 = (entry << dt) & BITMASK;
+			for(offs_t e = 0; e != ne; e++) {
+				offs_t e1 = e0 | e;
+				if(!(m_u_dispatch[e1]->flags() & handler_entry::F_UNMAP))
+					fatalerror("Collision on multiple init_handlers calls");
+				m_u_dispatch[e1]->unref();
+				m_u_dispatch[e1] = dispatch[entry];
+				m_u_ranges[e1] = filter(ranges[entry]);
 			}
 		}
 
 	} else {
-		if(m_view) {
-			auto filter = [s = m_view->m_addrstart, e = m_view->m_addrend] (handler_entry::range r) { r.intersect(s, e); return r; };
-
-			for(offs_t entry = start_entry & BITMASK; entry <= (end_entry & BITMASK); entry++) {
-				if(!(m_u_dispatch[entry]->flags() & handler_entry::F_UNMAP))
-					fatalerror("Collision on multiple init_handlers calls");
-				m_u_dispatch[entry]->unref();
-				m_u_dispatch[entry] = dispatch[entry];
-				m_u_ranges[entry] = filter(ranges[entry]);
-				dispatch[entry]->ref();
-			}
-		} else {
-			for(offs_t entry = start_entry & BITMASK; entry <= (end_entry & BITMASK); entry++) {
-				if(!(m_u_dispatch[entry]->flags() & handler_entry::F_UNMAP))
-					fatalerror("Collision on multiple init_handlers calls");
-				m_u_dispatch[entry]->unref();
-				m_u_dispatch[entry] = dispatch[entry];
-				m_u_ranges[entry] = ranges[entry];
-				dispatch[entry]->ref();
-			}
+		auto filter = [s = m_global_range.start, e = m_global_range.end] (handler_entry::range r) { r.intersect(s, e); return r; };
+		for(offs_t entry = start_entry & BITMASK; entry <= (end_entry & BITMASK); entry++) {
+			if(!(m_u_dispatch[entry]->flags() & handler_entry::F_UNMAP))
+				fatalerror("Collision on multiple init_handlers calls");
+			m_u_dispatch[entry]->unref();
+			m_u_dispatch[entry] = dispatch[entry];
+			m_u_ranges[entry] = filter(ranges[entry]);
+			dispatch[entry]->ref();
 		}
 	}
 }
@@ -735,9 +726,20 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 		m_u_ranges = m_ranges_array[i].data();
 		m_u_dispatch = m_dispatch_array[i].data();
 
+		std::map<handler_entry_write<Width, AddrShift> *, handler_entry_write<Width, AddrShift> *> dupmap;
+
 		for(u32 entry = 0; entry != COUNT; entry++)
 			if(m_dispatch_array[0][entry]) {
-				m_u_dispatch[entry] = m_dispatch_array[0][entry]->dup();
+				handler_entry_write<Width, AddrShift> *src = m_dispatch_array[0][entry];
+				auto m = dupmap.find(src);
+				if(m != dupmap.end()) {
+					m->second->ref();
+					m_u_dispatch[entry] = m->second;
+				} else {
+					handler_entry_write<Width, AddrShift> *dest = src->dup();
+					dupmap[src] = dest;
+					m_u_dispatch[entry] = dest;
+				}
 				m_u_ranges[entry] = m_ranges_array[0][entry];
 			}
 

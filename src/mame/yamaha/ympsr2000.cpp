@@ -27,25 +27,32 @@ public:
 	void psr2000(machine_config &config);
 
 private:
-	required_device<sh3be_device> m_maincpu;
+	required_device<sh7709_device> m_maincpu;
 	required_device<sed1330_device> m_lcdc;  // In reality a sed1335
 
 	void map(address_map &map) ATTR_COLD;
 	void lcdc_map(address_map &map) ATTR_COLD;
 
 	void machine_start() override ATTR_COLD;
+	void palette_init(palette_device &palette);
 };
 
 void psr2000_state::machine_start()
 {
 }
 
+void psr2000_state::palette_init(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t(0x36, 0x41, 0xcf));
+	palette.set_pen_color(1, rgb_t(0xdb, 0xe9, 0xff));
+}
+
 void psr2000_state::psr2000(machine_config &config)
 {
-	SH3BE(config, m_maincpu, 10_MHz_XTAL*4);
+	SH7709(config, m_maincpu, 10_MHz_XTAL*4, ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr2000_state::map);
 
-	auto &palette = PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+	auto &palette = PALETTE(config, "palette", FUNC(psr2000_state::palette_init), 2);
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
 	screen.set_refresh_hz(60);
@@ -58,16 +65,15 @@ void psr2000_state::psr2000(machine_config &config)
 	m_lcdc->set_screen("screen");
 	m_lcdc->set_addrmap(0, &psr2000_state::lcdc_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void psr2000_state::map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).rom().region("maincpu", 0).mirror(0xe0000000);
-	map(0x08000000, 0x087fffff).rom().region("style", 0).mirror(0xe0000000);
-	map(0x0c000000, 0x0c7fffff).ram().mirror(0xe0000000);
-	map(0x10000000, 0x100fffff).rom().region("data", 0).mirror(0xe0000000);
+	map(0x00000000, 0x007fffff).rom().region("maincpu", 0);
+	map(0x08000000, 0x087fffff).rom().region("style", 0);
+	map(0x0c000000, 0x0c7fffff).ram();
+	map(0x10000000, 0x100fffff).rom().region("data", 0);
 	map(0x14000000, 0x1400000f); // 8bitcs -> lcdccs, fdccs
 	map(0x14400000, 0x14400000).rw(m_lcdc, FUNC(sed1330_device::status_r), FUNC(sed1330_device::data_w));
 	map(0x14400002, 0x14400002).rw(m_lcdc, FUNC(sed1330_device::data_r), FUNC(sed1330_device::command_w));
@@ -103,4 +109,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 2001, psr2000, 0, 0, psr2000, psr2000, psr2000_state, empty_init, "Yamaha", "PSR-2000", MACHINE_IS_SKELETON )
+SYST( 2001, psr2000, 0, 0, psr2000, psr2000, psr2000_state, empty_init, "Yamaha", "PSR-2000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

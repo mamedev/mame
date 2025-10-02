@@ -122,4 +122,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1988, am1000, 0, 0, am1000, am1000, am1000_state, empty_init, "Alpha Micro", "AM-1000", MACHINE_IS_SKELETON)
+COMP(1988, am1000, 0, 0, am1000, am1000, am1000_state, empty_init, "Alpha Micro", "AM-1000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

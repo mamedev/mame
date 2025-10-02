@@ -36,6 +36,11 @@ public:
 
 	void io_map(address_map &map) ATTR_COLD;
 
+	// $46e8, $56e8, $66e8, $76e8 for ISA bus
+	void mode_setup_w(offs_t offset, uint8_t data);
+	// $102 ISA bus / $3c3 MCA bus
+	//void wakeup_w(offs_t offset, uint8_t data);
+
 	virtual uint8_t mem_r(offs_t offset);
 	virtual void mem_w(offs_t offset, uint8_t data);
 	virtual uint8_t mem_linear_r(offs_t offset);
@@ -43,6 +48,7 @@ public:
 
 	void set_offset(uint16_t val) { vga.crtc.offset = val; }
 	void set_vram_size(size_t vram_size) { vga.svga_intf.vram_size = vram_size; }
+	auto vsync_cb() { return m_vsync_cb.bind(); }
 	// FIXME: should be protected, but virge_pci.cpp violates this
 	inline uint16_t get_crtc_port() { return BIT(vga.miscellaneous_output, 0) ? 0x3d0 : 0x3b0; }
 
@@ -83,6 +89,7 @@ protected:
 	void recompute_params_clock(int divisor, int xtal);
 	virtual void recompute_params();
 	uint8_t vga_vblank();
+	virtual void enter_setup_mode();
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -229,6 +236,7 @@ protected:
 	/**/    uint8_t map13;
 	/**/    uint8_t irq_clear;
 	/**/    uint8_t irq_disable;
+			uint8_t irq_latch;
 			uint8_t no_wrap;
 		} crtc;
 
@@ -268,6 +276,7 @@ protected:
 			int state;
 			uint8_t color[0x300]; /* flat RGB triplets */
 			int dirty;
+			uint8_t loading[3];
 		} dac;
 
 		struct {
@@ -299,6 +308,8 @@ protected:
 	address_space_config m_atc_space_config;
 
 	bool m_ioas = false;
+
+	devcb_write_line m_vsync_cb;
 private:
 	uint32_t start_addr();
 };

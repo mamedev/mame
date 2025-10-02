@@ -116,7 +116,7 @@ DISPATCH01:
 		case 0x5B:                                      set_b();    %XDEC8;     return;
 		case 0x5C:                                      set_b();    %INC8;      return;
 		case 0x5D:                                      set_b();    %TST8;      return;
-		case 0x5E:                                      set_b();    %XCLR8;      return;
+		case 0x5E:                                      set_b();    %XCLR8;     return;
 		case 0x5F:                                      set_b();    %CLR8;      return;
 
 		case 0x60:  case 0x61:                          %INDEXED;   %NEG8;      return;
@@ -312,7 +312,7 @@ DISPATCH10:
 		case 0x2E:              set_cond(cond_gt());                %LBRANCH;   return;
 		case 0x2F:              set_cond(!cond_gt());               %LBRANCH;   return;
 
-		case 0x3E:                                                  %XSWI2;      return;
+		case 0x3E:                                                  %XSWI2;     return;
 		case 0x3F:                                                  %SWI2;      return;
 
 		case 0x83:              set_regop16(m_q.p.d);   set_imm();  %CMP16;     return;
@@ -364,7 +364,7 @@ DISPATCH11:
 		case 0x10:                                                  %DISPATCH11; return;
 		case 0x11:                                                  %DISPATCH11; return;
 
-		case 0x3E:                                                  %XFIRQ;      return;
+		case 0x3E:                                                  %XFIRQ;     return;
 		case 0x3F:                                                  %SWI3;      return;
 		case 0x83:              set_regop16(m_u);       set_imm();  %CMP16;     return;
 		case 0x8C:              set_regop16(m_s);       set_imm();  %CMP16;     return;

@@ -81,9 +81,12 @@ public:
 	int csr_out();
 	int csw_out();
 	int rtcen_out();
-	int romen_out();
-	int ramen_out();
-	int ramenx_out();
+
+	int romen_out();   // Boot EPROM access
+	int ramen_out();   // Stock SRAM access
+	int ramenx_out();  // 32K expanded SRAM access
+	int ramenu_out();  // Full 384K SRAM access
+
 	int snden_out();
 	int dben_out();
 	int gaready_out();
@@ -154,7 +157,7 @@ private:
 		MPEPROM,
 		MPSRAM,
 		MPSRAMX,
-		MPSRAMF,
+		MPSRAMU,
 		MBOX,
 
 		CARTPROT

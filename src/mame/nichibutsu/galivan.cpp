@@ -1197,11 +1197,17 @@ void galivan_state::common(machine_config &config)
 	    Sum:                  0.67015
 	    Multiply all 3 values by 1 / 0.67015 (i.e. 1.492203):
 	   Final values are: ym: 0.492203; dac1: 0.209505; dac2: 0.298291 */
-	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R15, R14, nothing(infinite resistance), wire(short), C9, C11
+
+	// R15, R14, nothing(infinite resistance), wire(short), C9, C11
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0));
 	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R11, R10, nothing(infinite resistance), wire(short), C7, C17
+
+	// R11, R10, nothing(infinite resistance), wire(short), C7, C17
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7));
 	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R12, nothing(infinite resistance), wire(short), C8, C18
+
+	// R13, R12, nothing(infinite resistance), wire(short), C8, C18
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7));
 	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	YM3526(config, "ymsnd", XTAL(8'000'000) / 2).add_route(ALL_OUTPUTS, m_ymfilter, 0.4922);
@@ -1625,7 +1631,7 @@ ROM_START( ninjemat )
 
 	ROM_REGION( 0x20000, "tiles", 0 )
 	ROM_LOAD( "4.a6",         0x00000, 0x8000, CRC(655f0a58) SHA1(8ffe73cec68d52c7b09651b546289613d6d4dde4) )
-	ROM_LOAD( "3.a4",         0x08000, 0x8000, CRC(934e1703) SHA1(451f8d01d9035d91c969cdc3fb582a00007da7df) )
+	ROM_LOAD( "3.a4",         0x08000, 0x8000, CRC(b4416f53) SHA1(c2253518318aac2710aac5e83f8df84945ada2ce) )
 	ROM_LOAD( "2.a3",         0x10000, 0x8000, CRC(955b5c45) SHA1(936bfe2599228dd0861bbcfe15152ac5e9b906d1) )
 	ROM_LOAD( "1.a1",         0x18000, 0x8000, CRC(bbd2e51c) SHA1(51bc266cf8161610204e5d98e56346b1d8d3c009) )
 
@@ -1637,10 +1643,10 @@ ROM_START( ninjemat )
 
 	ROM_REGION( 0x8000, "bgtiles", 0 )
 	ROM_LOAD( "5.c1",         0x00000, 0x4000, CRC(e8469d44) SHA1(a015e4f67597fca438ed4c714b9854615e5d59b7) )
-	ROM_LOAD( "6.c3",         0x04000, 0x4000, BAD_DUMP CRC(163a024e) SHA1(bb4c78f5e231e8e9c9556790d94972b963b1480e) ) // Bad ROM?
+	ROM_LOAD( "6.c3",         0x04000, 0x4000, CRC(163a024e) SHA1(bb4c78f5e231e8e9c9556790d94972b963b1480e) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "7114.a9",      0x00000, 0x0100, CRC(6eecaeaa) SHA1(5767fb8b07d652956474e2a6e56bc49b7c002814) ) // red
+	ROM_LOAD( "7114.a9",      0x00000, 0x0100, CRC(001a762e) SHA1(5d3783162bd23b09291ee380e2968d1c6ff0267e) ) // red
 	ROM_LOAD( "7114.a10",     0x00100, 0x0100, CRC(30556466) SHA1(caa1a941d3a2651504acc1ea3ae14de921e1975a) ) // green
 	ROM_LOAD( "7114.a11",     0x00200, 0x0100, CRC(1fe3d4fd) SHA1(6f1f432667ec1d7286149ccde6790b74499aa50a) ) // blue
 	ROM_LOAD( "7114.c2",      0x00300, 0x0100, CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8) ) // sprite lookup table
@@ -1902,5 +1908,5 @@ GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, ninjemak_state, empty_init, 
 GAME( 1986, ninjemat, ninjemak, galivan,  galivan,  ninjemak_state, empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Ninja Emaki (Tecfri license)",                        MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan)",                           MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan, alt)",                      MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, youmab_state,   empty_init , ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // player is invincible
+GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // player is invincible
 GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 2)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // ""

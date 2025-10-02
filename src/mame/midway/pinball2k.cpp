@@ -653,8 +653,7 @@ void pinball2k_state::mediagx(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 
@@ -762,6 +761,6 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1999, swe1pb,   0,     mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0, "Midway",  "Pinball 2000: Star Wars Episode 1", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1999, rfmpb,    0,     mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0, "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1999, rfmpbr2,  rfmpb, mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0, "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1999, swe1pb,   0,     mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0, "Midway",  "Pinball 2000: Star Wars Episode 1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1999, rfmpb,    0,     mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0, "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1999, rfmpbr2,  rfmpb, mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0, "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

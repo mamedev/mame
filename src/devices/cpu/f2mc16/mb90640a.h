@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_CPU_F2MC16_MB90640_H
-#define MAME_CPU_F2MC16_MB90640_H
+#ifndef MAME_CPU_F2MC16_MB90640A_H
+#define MAME_CPU_F2MC16_MB90640A_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ public:
 
 DECLARE_DEVICE_TYPE(MB90641A, mb90641a_device)
 
-#endif // MAME_CPU_F2MC16_MB90640_H
+#endif // MAME_CPU_F2MC16_MB90640A_H

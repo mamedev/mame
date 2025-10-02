@@ -1484,18 +1484,18 @@ ROM_END
 
 
 // CRT-300 mainboard + CRT-307 Rev - ROM board
-GAME( 1989, ma6710,    0, crt307,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13",     MACHINE_IS_SKELETON ) // build date is 04/25/96?
+GAME( 1989, ma6710,    0, crt307,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 04/25/96?
 
 // CRT-350 mainboard + CRT-307 Rev A ROM board
-GAME( 1991, ma6710a,   0, crt307_alt, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-21",     MACHINE_IS_SKELETON ) // build date is 01/12/99? - but shows 1991 on screen
-GAME( 1992, ma6711,    0, crt307_alt, ma6711,   merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6711-14-R0A", MACHINE_IS_SKELETON ) // build date is 10/06/92?
-GAME( 1992, ma9800,    0, crt307_alt, ma9800,   merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 9800-20-R0",  MACHINE_IS_SKELETON ) // build date is 10/06/92?
+GAME( 1991, ma6710a,   0, crt307_alt, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-21",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 01/12/99? - but shows 1991 on screen
+GAME( 1992, ma6711,    0, crt307_alt, ma6711,   merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6711-14-R0A", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 10/06/92?
+GAME( 1992, ma9800,    0, crt307_alt, ma9800,   merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 9800-20-R0",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 10/06/92?
 
 // CRT-350 mainboard + MEMORY EXPANSION BOARD CRT-352
-GAME( 199?, ma7551t,   0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-20-R3T", MACHINE_IS_SKELETON ) // build date is 04/12/00?
-GAME( 199?, ma7551p,   0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-21-R2P", MACHINE_IS_SKELETON ) // build date is 12/27/00?
-GAME( 199?, ma7556,    0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556-00-R2",  MACHINE_IS_SKELETON ) // build date is 10/20/98?
-GAME( 199?, ma7558r4,  0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R4",  MACHINE_IS_SKELETON ) // build date is 01/09/01?
-GAME( 199?, ma7558r0,  0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R0",  MACHINE_IS_SKELETON ) // build date is 02/25/02?
-GAME( 199?, ma8340,    0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 8340-01-R1",  MACHINE_IS_SKELETON ) // build date is 04/18/93?
-GAME( 199?, ma8350,    0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 8350-00-R1",  MACHINE_IS_SKELETON ) // build date is 07/28/94?
+GAME( 199?, ma7551t,   0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-20-R3T", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 04/12/00?
+GAME( 199?, ma7551p,   0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551-21-R2P", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 12/27/00?
+GAME( 199?, ma7556,    0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556-00-R2",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 10/20/98?
+GAME( 199?, ma7558r4,  0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R4",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 01/09/01?
+GAME( 199?, ma7558r0,  0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558-01-R0",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 02/25/02?
+GAME( 199?, ma8340,    0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 8340-01-R1",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 04/18/93?
+GAME( 199?, ma8350,    0, crt352,     merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 8350-00-R1",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // build date is 07/28/94?

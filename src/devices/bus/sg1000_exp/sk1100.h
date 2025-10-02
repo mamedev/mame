@@ -34,13 +34,13 @@ public:
 	// construction/destruction
 	sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-
 protected:
+	sega_sk1100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_sg1000_expansion_slot_interface overrides
 	virtual uint8_t peripheral_r(offs_t offset) override;
@@ -62,9 +62,20 @@ private:
 	uint8_t m_keylatch;
 };
 
+class sega_sk1100e_device : public sega_sk1100_device
+{
+public:
+	// construction/destruction
+	sega_sk1100e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA_SK1100, sega_sk1100_device)
+DECLARE_DEVICE_TYPE(SEGA_SK1100E, sega_sk1100e_device)
 
 
 #endif // MAME_BUS_SG1000_EXP_SK1100_H

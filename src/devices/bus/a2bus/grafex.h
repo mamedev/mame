@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_A2BUS_A2GRAFEX_H
-#define MAME_BUS_A2BUS_A2GRAFEX_H
+#ifndef MAME_BUS_A2BUS_GRAFEX_H
+#define MAME_BUS_A2BUS_GRAFEX_H
 
 #pragma once
 
@@ -18,4 +18,4 @@
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_GRAFEX, device_a2bus_card_interface)
 
-#endif  // MAME_BUS_A2BUS_GRAFEX_H
+#endif // MAME_BUS_A2BUS_GRAFEX_H

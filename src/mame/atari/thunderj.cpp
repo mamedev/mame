@@ -158,7 +158,6 @@ const atari_motion_objects_config thunderj_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x03ff,0,0,0 }}, // mask for the link
@@ -205,123 +204,136 @@ uint32_t thunderj_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			uint8_t const *const pri = &priority_bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &priority_bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
-					 *
-					 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
-					 *      PF/M=MPX0*!MPX1*!MPX2*!MPX3*!MPX4*!MPX5*!MPX6*!MPX7
-					 *          +PFX3*PFX8*PFX9*!MPR0
-					 *          +PFX3*PFX8*!MPR0*!MPR1
-					 *          +PFX3*PFX9*!MPR1
-					 *
-					 *      --- CS1 is 1 if the playfield should be displayed
-					 *      CS1=PF/M*!ALBG*!APIX0*!APIX1
-					 *         +!MPX0*!MPX1*!MPX2*!MPX3*!ALBG*!APIX0*!APIX1
-					 *
-					 *      --- CS0 is 1 if the MOs should be displayed
-					 *      CS0=!PF/M*MPX0*!ALBG*!APIX0*!APIX1
-					 *         +!PF/M*MPX1*!ALBG*!APIX0*!APIX1
-					 *         +!PF/M*MPX2*!ALBG*!APIX0*!APIX1
-					 *         +!PF/M*MPX3*!ALBG*!APIX0*!APIX1
-					 *
-					 *      --- CRA10 is the 0x200 bit of the color RAM index; set if pf is displayed
-					 *      CRA10:=CS1
-					 *
-					 *      --- CRA9 is the 0x100 bit of the color RAM index; set if mo is displayed
-					 *          or if the playfield selected is playfield #2
-					 *      CRA9:=PFXS*CS1
-					 *          +!CS1*CS0
-					 *
-					 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
-					 *      CRA8:=CS1*PFX7
-					 *          +!CS1*MPX7*CS0
-					 *          +!CS1*!CS0*ALC4
-					 *
-					 *      CRA7:=CS1*PFX6
-					 *          +!CS1*MPX6*CS0
-					 *
-					 *      CRA6:=CS1*PFX5
-					 *          +MPX5*!CS1*CS0
-					 *          +!CS1*!CS0*ALC3
-					 *
-					 *      CRA5:=CS1*PFX4
-					 *          +MPX4*!CS1*CS0
-					 *          +!CS1*ALC2*!CS0
-					 *
-					 *      CRA4:=CS1*PFX3
-					 *          +!CS1*MPX3*CS0
-					 *          +!CS1*!CS0*ALC1
-					 *
-					 *      CRA3:=CS1*PFX2
-					 *          +MPX2*!CS1*CS0
-					 *          +!CS1*!CS0*ALC0
-					 *
-					 *      CRA2:=CS1*PFX1
-					 *          +MPX1*!CS1*CS0
-					 *          +!CS1*!CS0*APIX1
-					 *
-					 *      CRA1:=CS1*PFX0
-					 *          +MPX0*!CS1*CS0
-					 *          +!CS1*!CS0*APIX0
-					 */
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority signals special rendering and doesn't draw anything
-					if (mopriority & 4)
-						continue;
-
-					// determine pf/m signal
-					int pfm = 0;
-					if ((mo[x] & 0xff) == 1)
-						pfm = 1;
-					else if (pf[x] & 8)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					uint8_t const *const pri = &priority_bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						int const pfpriority = (pri[x] & 0x80) ? ((pri[x] >> 2) & 3) : (pri[x] & 3);
-						if (((pfpriority == 3) && !(mopriority & 1)) ||
-							((pfpriority & 1) && (mopriority == 0)) ||
-							((pfpriority & 2) && !(mopriority & 2)))
-							pfm = 1;
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
+							 *
+							 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
+							 *      PF/M=MPX0*!MPX1*!MPX2*!MPX3*!MPX4*!MPX5*!MPX6*!MPX7
+							 *          +PFX3*PFX8*PFX9*!MPR0
+							 *          +PFX3*PFX8*!MPR0*!MPR1
+							 *          +PFX3*PFX9*!MPR1
+							 *
+							 *      --- CS1 is 1 if the playfield should be displayed
+							 *      CS1=PF/M*!ALBG*!APIX0*!APIX1
+							 *         +!MPX0*!MPX1*!MPX2*!MPX3*!ALBG*!APIX0*!APIX1
+							 *
+							 *      --- CS0 is 1 if the MOs should be displayed
+							 *      CS0=!PF/M*MPX0*!ALBG*!APIX0*!APIX1
+							 *         +!PF/M*MPX1*!ALBG*!APIX0*!APIX1
+							 *         +!PF/M*MPX2*!ALBG*!APIX0*!APIX1
+							 *         +!PF/M*MPX3*!ALBG*!APIX0*!APIX1
+							 *
+							 *      --- CRA10 is the 0x200 bit of the color RAM index; set if pf is displayed
+							 *      CRA10:=CS1
+							 *
+							 *      --- CRA9 is the 0x100 bit of the color RAM index; set if mo is displayed
+							 *          or if the playfield selected is playfield #2
+							 *      CRA9:=PFXS*CS1
+							 *          +!CS1*CS0
+							 *
+							 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
+							 *      CRA8:=CS1*PFX7
+							 *          +!CS1*MPX7*CS0
+							 *          +!CS1*!CS0*ALC4
+							 *
+							 *      CRA7:=CS1*PFX6
+							 *          +!CS1*MPX6*CS0
+							 *
+							 *      CRA6:=CS1*PFX5
+							 *          +MPX5*!CS1*CS0
+							 *          +!CS1*!CS0*ALC3
+							 *
+							 *      CRA5:=CS1*PFX4
+							 *          +MPX4*!CS1*CS0
+							 *          +!CS1*ALC2*!CS0
+							 *
+							 *      CRA4:=CS1*PFX3
+							 *          +!CS1*MPX3*CS0
+							 *          +!CS1*!CS0*ALC1
+							 *
+							 *      CRA3:=CS1*PFX2
+							 *          +MPX2*!CS1*CS0
+							 *          +!CS1*!CS0*ALC0
+							 *
+							 *      CRA2:=CS1*PFX1
+							 *          +MPX1*!CS1*CS0
+							 *          +!CS1*!CS0*APIX1
+							 *
+							 *      CRA1:=CS1*PFX0
+							 *          +MPX0*!CS1*CS0
+							 *          +!CS1*!CS0*APIX0
+							 */
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority signals special rendering and doesn't draw anything
+							if (mopriority & 4)
+								continue;
+
+							// determine pf/m signal
+							int pfm = 0;
+							if ((mo[x] & 0xff) == 1)
+								pfm = 1;
+							else if (pf[x] & 8)
+							{
+								int const pfpriority = (pri[x] & 0x80) ? ((pri[x] >> 2) & 3) : (pri[x] & 3);
+								if (((pfpriority == 3) && !(mopriority & 1)) ||
+									((pfpriority & 1) && (mopriority == 0)) ||
+									((pfpriority & 2) && !(mopriority & 2)))
+									pfm = 1;
+							}
+
+							// if pfm is low, we display the mo
+							if (!pfm)
+								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+
+							// don't erase yet -- we need to make another pass later
+						}
 					}
-
-					// if pfm is low, we display the mo
-					if (!pfm)
-						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
-
-					// don't erase yet -- we need to make another pass later
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_vad->alpha().draw(screen, bitmap, cliprect, 0, 0);
 
 	// now go back and process the upper bit of MO priority
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority might mean palette kludges
-					if (mopriority & 4)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						// if bit 2 is set, start setting high palette bits
-						if (mo[x] & 2)
-							m_vad->mob().apply_stain(bitmap, pf, mo, x, y);
+						if (mo[x] != 0xffff)
+						{
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority might mean palette kludges
+							if (mopriority & 4)
+							{
+								// if bit 2 is set, start setting high palette bits
+								if (mo[x] & 2)
+									m_vad->mob().apply_stain(bitmap, pf, mo, x, y);
+							}
+						}
 					}
 				}
-		}
+			});
+
 	return 0;
 }
 
@@ -366,7 +378,7 @@ void thunderj_state::latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		// 0 means hold CPU 2's reset low
-		if (data & 1)
+		if (BIT(data, 0))
 			m_extra->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		else
 			m_extra->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -460,7 +472,7 @@ static INPUT_PORTS_START( thunderj )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("260012")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa")   // Input buffer full (@260030)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")  // Output buffer full (@360030)
@@ -496,9 +508,9 @@ static const gfx_layout anlayout =
 
 
 static GFXDECODE_START( gfx_thunderj )
-	GFXDECODE_ENTRY( "sprites_tiles1", 0, gfx_8x8x4_planar,  512,  96 )
-	GFXDECODE_ENTRY( "sprites_tiles2", 0, gfx_8x8x4_planar,  256, 112 )
-	GFXDECODE_ENTRY( "chars",          0, anlayout,            0, 512 )
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_planar,  512,  96 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_planar,  256, 112 )
+	GFXDECODE_ENTRY( "chars",   0, anlayout,            0, 512 )
 GFXDECODE_END
 
 
@@ -533,7 +545,7 @@ void thunderj_state::thunderj(machine_config &config)
 	m_vad->scanline_int_cb().set(FUNC(thunderj_state::scanline_int_write_line));
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(thunderj_state::get_playfield_tile_info));
 	TILEMAP(config, "vad:playfield2", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(thunderj_state::get_playfield2_tile_info));
-	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(thunderj_state::get_alpha_tile_info));
+	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 30, 0).set_info_callback(FUNC(thunderj_state::get_alpha_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, thunderj_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -582,7 +594,7 @@ ROM_START( thunderj )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136076-2015.1b", 0x00000, 0x10000, CRC(d8feb7fb) SHA1(684ebf2f0c0df742c98e7f45f74de86a11c8d6e8) ) // Rev 2 program ROM
 
-	ROM_REGION( 0x100000, "sprites_tiles1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136076-1021.5s",   0x000000, 0x10000, CRC(d8432766) SHA1(04e7d820974c0890fde1257b4710cf7b520d7d48) ) // graphics, plane 0 */
 	ROM_LOAD( "136076-1025.5r",   0x010000, 0x10000, CRC(839feed5) SHA1(c683ef5b78f8fd63dd557a630544f1e21aebe665) )
 	ROM_LOAD( "136076-1029.3p",   0x020000, 0x10000, CRC(fa887662) SHA1(5d19022e8d40be86b85d0bcc28c97207ab9ec403) )
@@ -600,7 +612,7 @@ ROM_START( thunderj )
 	ROM_LOAD( "136076-1032.14p",  0x0e0000, 0x10000, CRC(f639161a) SHA1(cc2549f7fdd251fa44735a6cd5fdb8ffb97948be) )
 	ROM_LOAD( "136076-1036.16p",  0x0f0000, 0x10000, CRC(b342443d) SHA1(fa7865f8a90c0e761e1cc5e155931d0574f2d81c) )
 
-	ROM_REGION( 0x100000, "sprites_tiles2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "136076-1037.2s",   0x000000, 0x10000, CRC(07addba6) SHA1(4a3286ee570bf4263944854bf959c8ef114cc123) )
 	ROM_LOAD( "136076-1041.2r",   0x010000, 0x10000, CRC(1e9c29e4) SHA1(e4afa2c469bfa22504cba5dfd23704c5c2bb33c4) )
 	ROM_LOAD( "136076-1045.34s",  0x020000, 0x10000, CRC(e7235876) SHA1(0bb03baec1de3e520dc270a3ed44bec953e08c00) )
@@ -658,7 +670,7 @@ ROM_START( thunderja )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136076-2015.1b", 0x00000, 0x10000, CRC(d8feb7fb) SHA1(684ebf2f0c0df742c98e7f45f74de86a11c8d6e8) ) // Rev 2 program ROM
 
-	ROM_REGION( 0x100000, "sprites_tiles1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136076-1021.5s",   0x000000, 0x10000, CRC(d8432766) SHA1(04e7d820974c0890fde1257b4710cf7b520d7d48) ) // graphics, plane 0 */
 	ROM_LOAD( "136076-1025.5r",   0x010000, 0x10000, CRC(839feed5) SHA1(c683ef5b78f8fd63dd557a630544f1e21aebe665) )
 	ROM_LOAD( "136076-1029.3p",   0x020000, 0x10000, CRC(fa887662) SHA1(5d19022e8d40be86b85d0bcc28c97207ab9ec403) )
@@ -676,7 +688,7 @@ ROM_START( thunderja )
 	ROM_LOAD( "136076-1032.14p",  0x0e0000, 0x10000, CRC(f639161a) SHA1(cc2549f7fdd251fa44735a6cd5fdb8ffb97948be) )
 	ROM_LOAD( "136076-1036.16p",  0x0f0000, 0x10000, CRC(b342443d) SHA1(fa7865f8a90c0e761e1cc5e155931d0574f2d81c) )
 
-	ROM_REGION( 0x100000, "sprites_tiles2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "136076-1037.2s",   0x000000, 0x10000, CRC(07addba6) SHA1(4a3286ee570bf4263944854bf959c8ef114cc123) )
 	ROM_LOAD( "136076-1041.2r",   0x010000, 0x10000, CRC(1e9c29e4) SHA1(e4afa2c469bfa22504cba5dfd23704c5c2bb33c4) )
 	ROM_LOAD( "136076-1045.34s",  0x020000, 0x10000, CRC(e7235876) SHA1(0bb03baec1de3e520dc270a3ed44bec953e08c00) )

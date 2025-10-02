@@ -1458,7 +1458,10 @@ void tlcs90_device::execute_run()
 
 		// when in HALT state, the fetched opcode is not dispatched (aka a NOP) and the PC is not increased
 		if (m_halt)
+		{
+			debugger_wait_hook();
 			m_op = NOP;
+		}
 		else
 		{
 			m_prvpc.d = m_pc.d;

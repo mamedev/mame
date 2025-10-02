@@ -158,16 +158,6 @@ newoption {
 }
 
 newoption {
-	trigger = "distro",
-	description = "Choose distribution",
-	allowed = {
-		{ "generic",           "generic"            },
-		{ "debian-stable",     "debian-stable"      },
-		{ "ubuntu-intrepid",   "ubuntu-intrepid"    },
-	},
-}
-
-newoption {
 	trigger = "target",
 	description = "Building target",
 }
@@ -483,16 +473,6 @@ flags {
 	"Cpp17",
 }
 
-configuration { "vs20*" }
-	buildoptions {
-		"/bigobj",
-	}
-	buildoptions_cpp {
-		"/Zc:__cplusplus",
-	}
-	flags {
-		"ExtraWarnings",
-	}
 	if not _OPTIONS["NOWERROR"] then
 		flags{
 			"FatalWarnings",
@@ -570,20 +550,8 @@ configuration { "gmake or ninja" }
 
 dofile ("toolchain.lua")
 
-if _OPTIONS["targetos"]=="windows" then
-	configuration { "x64" }
-		defines {
-			"X64_WINDOWS_ABI",
-		}
-	configuration { }
-end
-
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
-
--- define PTR64 if we are a 64-bit target
-configuration { "x64 or android-*64"}
-	defines { "PTR64=1" }
 
 -- define MAME_DEBUG if we are a debugging build
 configuration { "Debug" }
@@ -702,24 +670,22 @@ else
 	}
 end
 
-if _OPTIONS["NOASM"]=="1" then
+if _OPTIONS["NOASM"] == "1" then
 	defines {
 		"MAME_NOASM"
 	}
 end
 
-if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
-	if _OPTIONS["BIGENDIAN"]~="1" then
-		configuration { "x64" }
-			defines {
-				"NATIVE_DRC=drcbe_x64",
-			}
-		configuration { "x32" }
-			defines {
-				"NATIVE_DRC=drcbe_x86",
-			}
-		configuration {  }
-	end
+if _OPTIONS["FORCE_DRC_C_BACKEND"] then
+	configuration { }
+		defines {
+			"NATIVE_DRC=drcbe_c",
+		}
+elseif (_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64") then
+	configuration { }
+		defines {
+			"ASMJIT_STATIC",
+		}
 end
 
 	defines {
@@ -1041,12 +1007,12 @@ end
 			end
 			buildoptions {
 				"-fdiagnostics-show-note-include-stack",
+				"-Wno-error=tautological-compare",
 				"-Wno-cast-align",
 				"-Wno-constant-logical-operand",
 				"-Wno-extern-c-compat",
 				"-Wno-ignored-qualifiers",
 				"-Wno-pragma-pack", -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
-				"-Wno-tautological-compare",
 				"-Wno-unknown-attributes",
 				"-Wno-unknown-warning-option",
 				"-Wno-unused-value",
@@ -1081,9 +1047,6 @@ end
 				"-Wno-error=stringop-truncation", -- ImGui again
 				"-Wno-stringop-overflow", -- generates false positives when assigning an int rvalue to a u8 variable without an explicit cast
 			}
-			buildoptions_cpp {
-				"-Wno-error=class-memaccess", -- many instances in ImGui and BGFX
-			}
 			if version >= 110000 then
 				buildoptions {
 					"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
@@ -1104,12 +1067,6 @@ end
 		end
 	end
 
-if (_OPTIONS["PLATFORM"]=="alpha") then
-	defines {
-		"PTR64=1",
-	}
-end
-
 if (_OPTIONS["PLATFORM"]=="arm") then
 	buildoptions {
 		"-Wno-cast-align",
@@ -1119,21 +1076,6 @@ end
 if (_OPTIONS["PLATFORM"]=="arm64") then
 	buildoptions {
 		"-Wno-cast-align",
-	}
-	defines {
-		"PTR64=1",
-	}
-end
-
-if (_OPTIONS["PLATFORM"]=="riscv64") then
-	defines {
-		"PTR64=1",
-	}
-end
-
-if (_OPTIONS["PLATFORM"]=="mips64") then
-	defines {
-		"PTR64=1",
 	}
 end
 
@@ -1160,32 +1102,43 @@ configuration { "asmjs" }
 	}
 	defines {
 		"ASIO_HAS_PTHREADS",
+		"SOUND_DISABLE_THREADING",
 	}
 	linkoptions {
 		"-Wl,--start-group",
-		"-O" .. _OPTIONS["OPTIMIZE"],
 		"-s USE_SDL=2",
 		"-s USE_SDL_TTF=2",
-		"--memory-init-file 0",
 		"-s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=\"['\\$$ERRNO_CODES']\"",
 		"-s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__ZN15running_machine30emscripten_get_running_machineEv', '__ZN15running_machine17emscripten_get_uiEv', '__ZN15running_machine20emscripten_get_soundEv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio', '_SDL_SendKeyboardKey', '__ZN15running_machine15emscripten_saveEPKc', '__ZN15running_machine15emscripten_loadEPKc', '__ZN15running_machine21emscripten_hard_resetEv', '__ZN15running_machine21emscripten_soft_resetEv', '__ZN15running_machine15emscripten_exitEv']\"",
 		"-s EXPORTED_RUNTIME_METHODS=\"['cwrap']\"",
 		"-s ERROR_ON_UNDEFINED_SYMBOLS=0",
-		"-s USE_WEBGL2=1",
-		"-s LEGACY_GL_EMULATION=1",
-		"-s GL_UNSAFE_OPTS=0",
+		"-s STACK_SIZE=5MB",
+		"-s MAX_WEBGL_VERSION=2",
 		"--pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js",
 		"--post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/essl@bgfx/shaders/essl",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/bgfx@artwork/bgfx",
+		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/lut-default.png@artwork/lut-default.png",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png",
 	}
+	if _OPTIONS["OPTIMIZE"]~=nil then
+		if _OPTIONS["OPTIMIZE"]=="3" then
+			-- emcc's link-time -O3 is very slow, max out at -O2 for now
+			-- we should still be getting the benefit of -O3 on the individual object files
+			linkoptions {
+				"-O2",
+			}
+		else
+			linkoptions {
+				"-O" .. _OPTIONS["OPTIMIZE"],
+			}
+		end
+	end
 	if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 		linkoptions {
 			"-g" .. _OPTIONS["SYMLEVEL"],
-			"-s DEMANGLE_SUPPORT=1",
 		}
 	end
 	if _OPTIONS["WEBASSEMBLY"] then
@@ -1201,11 +1154,12 @@ configuration { "asmjs" }
 		-- define a fixed memory size because allowing memory growth disables asm.js optimizations
 		linkoptions {
 			"-s ALLOW_MEMORY_GROWTH=0",
-			"-s TOTAL_MEMORY=268435456",
+			"-s INITIAL_MEMORY=256MB",
 		}
 	else
 		linkoptions {
 			"-s ALLOW_MEMORY_GROWTH=1",
+			"-s INITIAL_MEMORY=24MB"
 		}
 	end
 	archivesplit_size "20"
@@ -1225,12 +1179,6 @@ configuration { "linux-*" }
 		flags {
 			"LinkSupportCircularDependencies",
 		}
-		if _OPTIONS["distro"]=="debian-stable" then
-			defines
-			{
-				"NO_AFFINITY_NP",
-			}
-		end
 
 
 configuration { "freebsd or netbsd" }
@@ -1292,13 +1240,18 @@ configuration { "vs20*" }
 			"userenv",
 		}
 
+if _OPTIONS["vs"]==nil then
 		buildoptions {
-			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
+			"/bigobj",
+			"/permissive-",
+			"/utf-8",
+			"/Zc:enumTypes",
+			"/Zc:preprocessor",
+			"/Zc:templateScope",
 		}
 
 		buildoptions {
-			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
-			"/wd4005", -- warning C4005: The macro identifier is defined twice. The compiler uses the second macro definition
+			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
 			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
 			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
@@ -1310,6 +1263,7 @@ configuration { "vs20*" }
 			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
 			"/wd4250", -- warning C4250: 'xxx' : inherits 'xxx' via dominance
 			"/wd4267", -- warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
+			"/wd4305", -- warning C4305: 'conversion': truncation from 'type1' to 'type2'
 			"/wd4310", -- warning C4310: cast truncates constant value
 			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
 			"/wd4324", -- warning C4324: 'xxx' : structure was padded due to __declspec(align())
@@ -1320,14 +1274,26 @@ configuration { "vs20*" }
 			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
 			"/wd4459", -- warning C4459: declaration of 'xxx' hides global declaration
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
+			"/wd4646", -- warning C4646: function declared with 'noreturn' has non-void return type
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'name' used
 			"/wd4702", -- warning C4702: unreachable code
-			"/wd4706", -- warning C4706: assignment within conditional expression
-			"/wd4804", -- warning C4804: '>>': unsafe use of type 'bool' in operation
 			"/wd4805", -- warning C4805: 'x' : unsafe mix of type 'xxx' and type 'xxx' in operation
+			"/wd4806", -- warning C4806: 'operation': unsafe operation: no value of type 'type' promoted to type 'type' can equal the given constant
 			"/wd4996", -- warning C4996: 'function': was declared deprecated
 		}
 
-if _OPTIONS["vs"]=="intel-15" then
+		buildoptions_cpp {
+			"/Zc:__cplusplus",
+		}
+
+		flags {
+			"ExtraWarnings",
+		}
+elseif _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/bigobj",
+		}
+
 		buildoptions {
 			"/Qwd9",                -- remark #9: nested comment is not allowed
 			"/Qwd82",               -- remark #82: storage class is not first
@@ -1362,36 +1328,32 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd11074",            -- remark #11074: Inlining inhibited by limit max-size  / remark #11074: Inlining inhibited by limit max-total-size
 			"/Qwd11075",            -- remark #11075: To get full report use -Qopt-report:4 -Qopt-report-phase ipo
 		}
-end
 
-if _OPTIONS["vs"]=="clangcl" then
+		flags {
+			"ExtraWarnings",
+		}
+elseif _OPTIONS["vs"]=="clangcl" then
 		buildoptions {
-			"-Wno-enum-conversion",
 			"-Wno-ignored-qualifiers",
-			"-Wno-missing-braces",
-			"-Wno-missing-field-initializers",
 			"-Wno-new-returns-null",
-			"-Wno-nonportable-include-path",
-			"-Wno-pointer-bool-conversion",
-			"-Wno-pragma-pack",
-			"-Wno-switch",
-			"-Wno-tautological-constant-out-of-range-compare",
-			"-Wno-tautological-pointer-compare",
-			"-Wno-unknown-warning-option",
 			"-Wno-unused-const-variable",
-			"-Wno-unused-function",
 			"-Wno-unused-label",
-			"-Wno-unused-local-typedef",
 			"-Wno-unused-private-field",
-			"-Wno-unused-variable",
 			"-Wno-xor-used-as-pow",
-			"-Wno-microsoft-cast",
+			"-Wno-error=deprecated-declarations",
+			"-Wno-error=tautological-compare",
+		}
+	if _OPTIONS["DEPRECATED"]=="0" then
+		buildoptions {
+			"-Wno-deprecated-declarations"
+		}
+	end
+
+		flags {
+			-- don't set ExtraWarnings flag (/W4 == -Wall -Wextra); use default (/W3 == -Wall) instead
 		}
 end
 
-		linkoptions {
-			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
-		}
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include"
 		}

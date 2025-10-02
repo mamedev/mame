@@ -4,8 +4,8 @@
  * Konami 573 Master Calendar
  *
  */
-#ifndef MAME_KONAMI_K573_MCAL_H
-#define MAME_KONAMI_K573_MCAL_H
+#ifndef MAME_KONAMI_K573MCAL_H
+#define MAME_KONAMI_K573MCAL_H
 
 #pragma once
 
@@ -47,4 +47,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KONAMI_573_MASTER_CALENDAR, k573mcal_device)
 
-#endif // MAME_KONAMI_K573_MCAL_H
+#endif // MAME_KONAMI_K573MCAL_H

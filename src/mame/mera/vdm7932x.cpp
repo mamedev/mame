@@ -145,4 +145,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1992, vdm79322, 0, 0, vdm7932x, vdm7932x, vdm7932x_state, empty_init, "Mera-Elzab", "VDM 79322/CM 7233", MACHINE_IS_SKELETON)
+COMP(1992, vdm79322, 0, 0, vdm7932x, vdm7932x, vdm7932x_state, empty_init, "Mera-Elzab", "VDM 79322/CM 7233", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

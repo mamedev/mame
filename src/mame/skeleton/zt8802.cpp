@@ -103,4 +103,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, empty_init, "Ziatech", "ZT-8802 SBC", MACHINE_IS_SKELETON )
+COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, empty_init, "Ziatech", "ZT-8802 SBC", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

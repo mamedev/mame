@@ -85,4 +85,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1996, scrpndx, 0, scrpndx, scrpndx, meritsdx_state, empty_init, ROT0, "Merit", "Scorpion DX", MACHINE_IS_SKELETON_MECHANICAL) // OCT 15 1996 -- ASM 15:30
+GAME(1996, scrpndx, 0, scrpndx, scrpndx, meritsdx_state, empty_init, ROT0, "Merit", "Scorpion DX", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK) // OCT 15 1996 -- ASM 15:30

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_COP420_COP420DS_H
-#define MAME_CPU_COP420_COP420DS_H
+#ifndef MAME_CPU_COP400_COP420DS_H
+#define MAME_CPU_COP400_COP420DS_H
 
 #pragma once
 
@@ -23,4 +23,4 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 };
 
-#endif
+#endif // MAME_CPU_COP400_COP420DS_H

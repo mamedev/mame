@@ -162,15 +162,20 @@
 		end
 	end
 
-	local function removevalues(tbl, removes)
+ 	local function removevalues(tbl, removes)
+		for i = #tbl, 1, -1 do
+			for _, pattern in ipairs(removes) do
+				if pattern == tbl[i] then
+					table.remove(tbl, i)
+					break
+				end
+			end
+		end
+
 		for k, v in pairs(tbl) do
 			for _, pattern in ipairs(removes) do
 				if pattern == tbl[k] then
-					if type(k) == "number" then
-						table.remove(tbl, k)
-					else
-						tbl[k] = nil
-					end
+					tbl[k] = nil
 					break
 				end
 			end

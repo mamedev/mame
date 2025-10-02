@@ -33,11 +33,13 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -308,7 +310,7 @@ void dacholer_state::snd_ack_w(uint8_t data)
 
 int dacholer_state::snd_ack_r()
 {
-	return m_snd_ack;       //guess ...
+	return m_snd_ack; // guess ...
 }
 
 void dacholer_state::snd_irq_w(uint8_t data)

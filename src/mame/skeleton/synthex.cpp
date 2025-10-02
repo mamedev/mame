@@ -234,4 +234,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1981, synthex, 0, 0, synthex, synthex, synthex_state, empty_init, "Elka", "Synthex", MACHINE_IS_SKELETON)
+SYST(1981, synthex, 0, 0, synthex, synthex, synthex_state, empty_init, "Elka", "Synthex", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

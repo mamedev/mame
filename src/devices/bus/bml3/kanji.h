@@ -2,14 +2,14 @@
 // copyright-holders:Jonathan Edwards
 /*********************************************************************
 
-    bml3kanji.h
+    kanji.h
 
     Hitachi MP-9740 (?) kanji character ROM for the MB-689x
 
 *********************************************************************/
 
-#ifndef MAME_BUS_BML3_BML3KANJI_H
-#define MAME_BUS_BML3_BML3KANJI_H
+#ifndef MAME_BUS_BML3_KANJI_H
+#define MAME_BUS_BML3_KANJI_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BML3BUS_KANJI, bml3bus_kanji_device)
 
-#endif // MAME_BUS_BML3_BML3KANJI_H
+#endif // MAME_BUS_BML3_KANJI_H

@@ -127,4 +127,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1983, itt1700, 0, 0, itt1700, itt1700, itt1700_state, empty_init, "ITT Courier", "ITT 1700", MACHINE_IS_SKELETON)
+COMP(1983, itt1700, 0, 0, itt1700, itt1700, itt1700_state, empty_init, "ITT Courier", "ITT 1700", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

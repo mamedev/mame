@@ -23,7 +23,6 @@ DEFINE_DEVICE_TYPE(MM74C923, mm74c923_device, "mm74c923", "MM74C923 20-Key Encod
 
 
 
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -111,6 +110,13 @@ uint8_t mm74c922_device::read()
 
 void mm74c922_device::change_output_lines()
 {
+	// clock data latches
+	if (m_next_data != m_data)
+	{
+		m_data = m_next_data;
+	}
+
+	// clock data available
 	if (m_next_da != m_da)
 	{
 		m_da = m_next_da;
@@ -119,12 +125,6 @@ void mm74c922_device::change_output_lines()
 
 		// active high output
 		m_write_da(m_da ? 1 : 0);
-	}
-
-	// clock data latches
-	if (m_next_data != m_data)
-	{
-		m_data = m_next_data;
 	}
 }
 

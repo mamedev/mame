@@ -16,7 +16,7 @@ Public documentation:
 
 - US Patent 4933980
 
-Games using ADSR: gyruss
+Games using ADSR: gyruss (though easier to test with software on Spectrum/MSX)
 
 A list with more games using ADSR can be found here:
       http://mametesters.org/view.php?id=3043
@@ -593,7 +593,7 @@ be induced by cutoff currents from the 15 FETs.
 
 #define ENABLE_REGISTER_TEST        (0)     // Enable preprogrammed registers
 
-static constexpr stream_buffer::sample_t MAX_OUTPUT = 1.0;
+static constexpr sound_stream::sample_t MAX_OUTPUT = 1.0;
 
 
 /*************************************
@@ -758,7 +758,7 @@ static const ay8910_device::mosfet_param ay8910_mosfet_param =
  *
  *************************************/
 
-static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, stream_buffer::sample_t *tab)
+static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, sound_stream::sample_t *tab)
 {
 	double min = 10.0,  max = 0.0;
 
@@ -817,7 +817,7 @@ static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *p
 	// for (e = 0;e<16;e++) printf("%d %d\n",e << 10, tab[e << 10]);
 }
 
-static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, stream_buffer::sample_t *tab, int zero_is_off)
+static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, sound_stream::sample_t *tab, int zero_is_off)
 {
 	double rt;
 	double rw;
@@ -855,7 +855,7 @@ static inline void build_single_table(double rl, const ay8910_device::ay_ym_para
 
 }
 
-static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, stream_buffer::sample_t *tab)
+static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, sound_stream::sample_t *tab)
 {
 	for (int j = 0; j < par.m_count; j++)
 	{
@@ -873,7 +873,7 @@ static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param
 }
 
 
-stream_buffer::sample_t ay8910_device::mix_3D()
+sound_stream::sample_t ay8910_device::mix_3D()
 {
 	int indx = 0;
 
@@ -956,20 +956,18 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			m_envelope[0].set_period(m_regs[AY_EAFINE], m_regs[AY_EACOARSE]);
 			break;
 		case AY_ENABLE:
-			if ((m_last_enable == -1) ||
-				((m_last_enable & 0x40) != (m_regs[AY_ENABLE] & 0x40)))
+			if (u8 enable = m_regs[AY_ENABLE] & 0x40; enable != (m_last_enable & 0x40))
 			{
-				// write out 0xff if port set to input
+				// output is high-impedance if port is set to input
 				if (!m_port_a_write_cb.isunset())
-					m_port_a_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x40) ? m_regs[AY_PORTA] : 0xff);
+					m_port_a_write_cb(0, enable ? m_regs[AY_PORTA] : 0xff, enable ? 0xff : 0);
 			}
 
-			if ((m_last_enable == -1) ||
-				((m_last_enable & 0x80) != (m_regs[AY_ENABLE] & 0x80)))
+			if (u8 enable = m_regs[AY_ENABLE] & 0x80; enable != (m_last_enable & 0x80))
 			{
-				// write out 0xff if port set to input
+				// output is high-impedance if port is set to input
 				if (!m_port_b_write_cb.isunset())
-					m_port_b_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x80) ? m_regs[AY_PORTB] : 0xff);
+					m_port_b_write_cb(0, enable ? m_regs[AY_PORTB] : 0xff, enable ? 0xff : 0);
 			}
 			m_last_enable = m_regs[AY_ENABLE];
 			break;
@@ -998,7 +996,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			if (m_regs[AY_ENABLE] & 0x40)
 			{
 				if (!m_port_a_write_cb.isunset())
-					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
+					m_port_a_write_cb(m_regs[AY_PORTA]);
 				else
 					LOGMASKED(LOG_WARNINGS, "%s: warning: unmapped write %02x to %s Port A\n", machine().describe_context(), v, name());
 			}
@@ -1011,7 +1009,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			if (m_regs[AY_ENABLE] & 0x80)
 			{
 				if (!m_port_b_write_cb.isunset())
-					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
+					m_port_b_write_cb(m_regs[AY_PORTB]);
 				else
 					LOGMASKED(LOG_WARNINGS, "%s: warning: unmapped write %02x to %s Port B\n", machine().describe_context(), v, name());
 			}
@@ -1057,19 +1055,10 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ay8910_device::sound_stream_update(sound_stream &stream)
 {
 	tone_t *tone;
 	envelope_t *envelope;
-
-	int samples = outputs[0].samples();
-
-	// hack to prevent us from hanging when starting filtered outputs
-	if (!m_ready)
-	{
-		for (int chan = 0; chan < m_streams; chan++)
-			outputs[chan].fill(0);
-	}
 
 	// The 8910 has three outputs, each output is the mix of one of the three
 	// tone generators and of the (single) noise generator. The two are mixed
@@ -1079,7 +1068,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	// is 1, not 0, and can be modulated changing the volume.
 
 	// buffering loop
-	for (int sampindex = 0; sampindex < samples; sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 		{
@@ -1174,38 +1163,38 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 						{
 							env_volume >>= 1;
 							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
-								outputs[chan].put(sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
+								stream.put(chan, sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
 							else
-								outputs[chan].put(sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
+								stream.put(chan, sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
 						}
 						else
 						{
 							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
-								outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
+								stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
 							else
-								outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
+								stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
 						}
 					}
 					else
 					{
 						if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
-							outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
+							stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
 						else
-							outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
+							stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
 					}
 				}
 				else
 				{
 					if (is_expanded_mode())
-						outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
+						stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
 					else
-						outputs[chan].put(sampindex, m_vol_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
+						stream.put(chan, sampindex, m_vol_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
 				}
 			}
 		}
 		else
 		{
-			outputs[0].put(sampindex, mix_3D());
+			stream.put(0, sampindex, mix_3D());
 		}
 	}
 }
@@ -1300,7 +1289,7 @@ void ay8910_device::device_start()
 		m_streams = 1;
 	}
 
-	m_vol3d_table = make_unique_clear<stream_buffer::sample_t[]>(8*32*32*32);
+	m_vol3d_table = make_unique_clear<sound_stream::sample_t[]>(8*32*32*32);
 
 	build_mixer_table();
 
@@ -1328,7 +1317,7 @@ void ay8910_device::ay8910_reset_ym()
 	m_noise_value = 0;
 	m_count_noise = 0;
 	m_prescale_noise = 0;
-	m_last_enable = -1;  // force a write
+	m_last_enable = 0xc0; // force a write
 	for (int i = 0; i < AY_PORTA; i++)
 		ay8910_write_reg(i,0);
 	m_ready = 1;
@@ -1348,13 +1337,6 @@ void ay8910_device::ay8910_reset_ym()
 	//#define AY_EACOARSE    (12)
 	//#define AY_EASHAPE (13)
 #endif
-}
-
-void ay8910_device::set_volume(int channel,int volume)
-{
-	for (int ch = 0; ch < m_streams; ch++)
-		if (channel == ch || m_streams == 1 || channel == ALL_8910_CHANNELS)
-			set_output_gain(ch, volume / 100.0);
 }
 
 void ay8910_device::ay_set_clock(int clock)
@@ -1419,7 +1401,7 @@ u8 ay8910_device::ay8910_read_ym()
 	switch (r)
 	{
 	case AY_PORTA:
-		if ((m_regs[AY_ENABLE] & 0x40) != 0)
+		if (m_regs[AY_ENABLE] & 0x40)
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read from %s Port A set as output\n", machine().describe_context(), name());
 		/*
 		   even if the port is set as output, we still need to return the external
@@ -1432,15 +1414,15 @@ u8 ay8910_device::ay8910_read_ym()
 		   case were it makes a difference in comparison to a standard TTL output.
 		*/
 		if (!m_port_a_read_cb.isunset())
-			m_regs[AY_PORTA] = m_port_a_read_cb(0);
+			m_regs[AY_PORTA] = m_port_a_read_cb();
 		else
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read 8910 Port A\n", machine().describe_context());
 		break;
 	case AY_PORTB:
-		if ((m_regs[AY_ENABLE] & 0x80) != 0)
+		if (m_regs[AY_ENABLE] & 0x80)
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read from 8910 Port B set as output\n", machine().describe_context());
 		if (!m_port_b_read_cb.isunset())
-			m_regs[AY_PORTB] = m_port_b_read_cb(0);
+			m_regs[AY_PORTB] = m_port_b_read_cb();
 		else
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read 8910 Port B\n", machine().describe_context());
 		break;

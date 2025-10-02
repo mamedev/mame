@@ -14,9 +14,6 @@
 
 #include "mms77316_fdc.h"
 
-#include "imagedev/floppy.h"
-#include "machine/wd_fdc.h"
-
 #define LOG_REG   (1U << 1)    // Shows register setup
 #define LOG_LINES (1U << 2)    // Show control lines
 #define LOG_DRIVE (1U << 3)    // Show drive select
@@ -24,6 +21,7 @@
 #define LOG_ERR   (1U << 5)    // log errors
 #define LOG_BURST (1U << 6)    // burst mode
 #define LOG_DATA  (1U << 7)    // data read/writes
+#define LOG_SETUP (1U << 8)
 
 #define VERBOSE (0)
 
@@ -36,6 +34,7 @@
 #define LOGERR(...)        LOGMASKED(LOG_ERR, __VA_ARGS__)
 #define LOGBURST(...)      LOGMASKED(LOG_BURST, __VA_ARGS__)
 #define LOGDATA(...)       LOGMASKED(LOG_DATA, __VA_ARGS__)
+#define LOGSETUP(...)      LOGMASKED(LOG_SETUP, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -43,60 +42,13 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-namespace {
 
-class mms77316_fdc_device : public device_t, public device_h89bus_right_card_interface
-{
-public:
-	mms77316_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-	virtual void write(u8 select_lines, u8 offset, u8 data) override;
-	virtual u8 read(u8 select_lines, u8 offset) override;
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
-	void ctrl_w(u8 val);
-	void data_w(u8 val);
-	u8 data_r();
-
-	void set_irq(int state);
-	void set_drq(int state);
-
-	// Burst mode was required for a 2 MHz Z80 to handle 8" DD data rates.
-	// The typical irq/drq was too slow, this utilizes wait states to read the
-	// WD1797 data port once the drq line is high.
-	inline bool burst_mode_r() { return !m_drq_allowed; }
-
-private:
-	required_device<fd1797_device> m_fdc;
-	required_device_array<floppy_connector, 8> m_floppies;
-
-	bool m_irq_allowed;
-	bool m_drq_allowed;
-
-	bool m_irq;
-	bool m_drq;
-	u32 m_drq_count;
-
-	/// Bits set in cmd_ControlPort_c
-	static constexpr u8 ctrl_525DriveSel_c = 2;
-	static constexpr u8 ctrl_EnableIntReq_c = 3;
-	static constexpr u8 ctrl_EnableDrqInt_c = 5;
-	static constexpr u8 ctrl_SetMFMRecording_c = 6;
-
-	static constexpr XTAL MASTER_CLOCK = XTAL(8'000'000);
-	static constexpr XTAL FIVE_IN_CLOCK = MASTER_CLOCK / 8;
-	static constexpr XTAL EIGHT_IN_CLOCK = MASTER_CLOCK / 4;
-};
-
-mms77316_fdc_device::mms77316_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_MMS77316, tag, owner, 0),
-	device_h89bus_right_card_interface(mconfig, *this),
-	m_fdc(*this, "mms_fdc"),
-	m_floppies(*this, "mms_fdc:%u", 0U)
+mms77316_fdc_device::mms77316_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H89BUS_MMS77316, tag, owner, 0)
+	, device_h89bus_right_card_interface(mconfig, *this)
+	, m_fdc(*this, "mms_fdc")
+	, m_floppies(*this, "mms_fdc:%u", 0U)
+	, m_intr_cntrl(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -117,13 +69,13 @@ void mms77316_fdc_device::ctrl_w(u8 val)
 
 	if (m_irq_allowed)
 	{
-		set_slot_fdcirq(m_irq);
-		set_slot_fdcdrq(m_drq);
+		m_intr_cntrl->set_irq(m_irq);
+		m_intr_cntrl->set_drq(m_drq);
 	}
 	else
 	{
-		set_slot_fdcirq(CLEAR_LINE);
-		set_slot_fdcdrq(CLEAR_LINE);
+		m_intr_cntrl->set_irq(CLEAR_LINE);
+		m_intr_cntrl->set_drq(CLEAR_LINE);
 	}
 
 	LOGDRIVE("%s: floppydrive: %d, 5.25 in: %d\n", FUNCNAME, floppy_drive, five_in_drv);
@@ -162,37 +114,32 @@ void mms77316_fdc_device::data_w(u8 val)
 	m_fdc->data_w(val);
 }
 
-void mms77316_fdc_device::write(u8 select_lines, u8 reg, u8 val)
+void mms77316_fdc_device::write(offs_t reg, u8 val)
 {
-	if (!(select_lines & h89bus_device::H89_GPP))
-	{
-		return;
-	}
-
-	if (reg != 2) LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
 
 	switch (reg)
 	{
-	case 0:
-		ctrl_w(val);
-		break;
-	case 1:
-	case 2:
-	case 3:
-		LOGERR("%s: Unexpected port write reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
-		break;
-	case 4:
-		m_fdc->cmd_w(val);
-		break;
-	case 5:
-		m_fdc->track_w(val);
-		break;
-	case 6:
-		m_fdc->sector_w(val);
-		break;
-	case 7:
-		data_w(val);
-		break;
+		case 0:
+			ctrl_w(val);
+			break;
+		case 1:
+		case 2:
+		case 3:
+			LOGERR("%s: Unexpected port write reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+			break;
+		case 4:
+			m_fdc->cmd_w(val);
+			break;
+		case 5:
+			m_fdc->track_w(val);
+			break;
+		case 6:
+			m_fdc->sector_w(val);
+			break;
+		case 7:
+			data_w(val);
+			break;
 	}
 }
 
@@ -219,37 +166,32 @@ u8 mms77316_fdc_device::data_r()
 	return data;
 }
 
-u8 mms77316_fdc_device::read(u8 select_lines, u8 reg)
+u8 mms77316_fdc_device::read(offs_t reg)
 {
-	if (!(select_lines & h89bus_device::H89_GPP))
-	{
-		return 0;
-	}
-
 	// default return for the h89
 	u8 value = 0xff;
 
 	switch (reg)
 	{
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-		// read not supported on these addresses
-		LOGERR("%s: Unexpected port read reg: %d\n", FUNCNAME, reg);
-		break;
-	case 4:
-		value = m_fdc->status_r();
-		break;
-	case 5:
-		value = m_fdc->track_r();
-		break;
-	case 6:
-		value = m_fdc->sector_r();
-		break;
-	case 7:
-		value = data_r();
-		break;
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			// read not supported on these addresses
+			LOGERR("%s: Unexpected port read reg: %d\n", FUNCNAME, reg);
+			break;
+		case 4:
+			value = m_fdc->status_r();
+			break;
+		case 5:
+			value = m_fdc->track_r();
+			break;
+		case 6:
+			value = m_fdc->sector_r();
+			break;
+		case 7:
+			value = data_r();
+			break;
 	}
 
 	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, value);
@@ -259,6 +201,9 @@ u8 mms77316_fdc_device::read(u8 select_lines, u8 reg)
 
 void mms77316_fdc_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_drq_allowed));
 	save_item(NAME(m_irq));
@@ -268,13 +213,39 @@ void mms77316_fdc_device::device_start()
 
 void mms77316_fdc_device::device_reset()
 {
+	if (!m_installed)
+	{
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_GPP);
+
+		LOGSETUP("%s: num ranges: %d\n", FUNCNAME, addr_ranges.size());
+
+		// There should be two ranges, the one with is single address should be for the real
+		// GPP, the one with a range, is for this device.
+		for (h89bus::addr_range range : addr_ranges)
+		{
+			// find the range with more than one port address.
+			if (range.first != range.second)
+			{
+				LOGSETUP("%s: range found: 0x%02x-0x%02x\n", FUNCNAME, range.first, range.second);
+
+				h89bus().install_io_device(range.first, range.second,
+					read8sm_delegate(*this, FUNC(mms77316_fdc_device::read)),
+					write8sm_delegate(*this, FUNC(mms77316_fdc_device::write)));
+
+				break;
+			}
+		}
+
+		m_installed = true;
+	}
+
 	m_irq_allowed = false;
 	m_drq_allowed = false;
 	m_irq         = false;
 	m_drq_count   = 0;
 
-	set_slot_fdcirq(CLEAR_LINE);
-	set_slot_fdcdrq(CLEAR_LINE);
+	m_intr_cntrl->set_irq(CLEAR_LINE);
+	m_intr_cntrl->set_drq(CLEAR_LINE);
 	set_slot_wait(CLEAR_LINE);
 
 	for (int i = 0; i < 4; i++)
@@ -355,7 +326,7 @@ void mms77316_fdc_device::set_irq(int state)
 		m_drq_count = 0;
 	}
 
-	set_slot_fdcirq(m_irq_allowed ? m_irq : CLEAR_LINE);
+	m_intr_cntrl->set_irq(m_irq_allowed ? m_irq : CLEAR_LINE);
 }
 
 void mms77316_fdc_device::set_drq(int state)
@@ -373,14 +344,12 @@ void mms77316_fdc_device::set_drq(int state)
 			set_slot_wait(CLEAR_LINE);
 		}
 
-		set_slot_fdcdrq(m_drq_count == 0 ? m_drq : CLEAR_LINE);
+		m_intr_cntrl->set_drq(m_drq_count == 0 ? m_drq : CLEAR_LINE);
 	}
 	else
 	{
-		set_slot_fdcdrq(m_drq_allowed ? m_drq : CLEAR_LINE);
+		m_intr_cntrl->set_drq(m_drq_allowed ? m_drq : CLEAR_LINE);
 	}
 }
-
-}   // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MMS77316, device_h89bus_right_card_interface, mms77316_fdc_device, "mms77316_fdc", "Magnolia MicroSystems 77316 Soft-sectored Controller");

@@ -2,13 +2,11 @@
 // copyright-holders:Ernesto Corvi
 /*******************************************************************************
 
-    mb88dasm.h
     Core implementation for the portable Fujitsu MB88xx series MCU disassembler.
 
     Written by Ernesto Corvi
 
 *******************************************************************************/
-
 
 #ifndef MAME_CPU_MB88XX_MB88DASM_H
 #define MAME_CPU_MB88XX_MB88DASM_H

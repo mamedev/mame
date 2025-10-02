@@ -26,6 +26,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
+		m_ram(*this, "ram"),
 		m_paddle(*this, "PADDLE")
 	{ }
 
@@ -44,6 +45,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_ram;
 	required_ioport m_paddle;
 
 	tilemap_t *m_bg_tilemap = nullptr;

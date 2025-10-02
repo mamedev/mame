@@ -11,10 +11,10 @@
 #define MAME_CPU_M6502_GEW7_H
 
 #include "m6502mcu.h"
-#include "m65c02.h"
+#include "w65c02.h"
 #include "sound/gew7.h"
 
-class gew7_device : public m6502_mcu_device_base<m65c02_device>, public device_mixer_interface
+class gew7_device : public m6502_mcu_device_base<w65c02_device>, public device_mixer_interface
 {
 public:
 	gew7_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
@@ -32,7 +32,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void internal_update(u64 current_time) override;
-	using m6502_mcu_device_base<m65c02_device>::internal_update;
+	using m6502_mcu_device_base<w65c02_device>::internal_update;
 
 	u8 timer_stat_r();
 	void timer_stat_w(u8 data);

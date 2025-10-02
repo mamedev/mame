@@ -150,4 +150,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY    FULLNAME     FLAGS
-GAME(1992, caramball, 0,      caramball, caramball, caramball_state, empty_init, ROT0, "Inconel", "Caramball", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992, caramball, 0,      caramball, caramball, caramball_state, empty_init, ROT0, "Inconel", "Caramball", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

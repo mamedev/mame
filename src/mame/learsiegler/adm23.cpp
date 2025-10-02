@@ -88,4 +88,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1982, adm23, 0, 0, adm23, adm23, adm23_state, empty_init, "Lear Siegler", "ADM 23 Smart Terminal", MACHINE_IS_SKELETON)
+COMP(1982, adm23, 0, 0, adm23, adm23, adm23_state, empty_init, "Lear Siegler", "ADM 23 Smart Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

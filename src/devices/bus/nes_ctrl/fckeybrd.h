@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_NES_CTRL_FCKEYBOARD_H
-#define MAME_BUS_NES_CTRL_FCKEYBOARD_H
+#ifndef MAME_BUS_NES_CTRL_FCKEYBRD_H
+#define MAME_BUS_NES_CTRL_FCKEYBRD_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_FCKEYBOARD, nes_fckeybrd_device)
 
-#endif // MAME_BUS_NES_CTRL_FCKEYBOARD_H
+#endif // MAME_BUS_NES_CTRL_FCKEYBRD_H

@@ -51,75 +51,62 @@ public:
 		m_sprdma_base(0x8000)
 	{ }
 
-	void vandyke(machine_config &config);
-	void tdragon2(machine_config &config);
-	void tharrier(machine_config &config);
-	void raphero(machine_config &config);
-	void tdragon(machine_config &config);
-	void tdragonb(machine_config &config);
-	void tdragonb2(machine_config &config);
-	void tdragonb3(machine_config &config);
-	void gunnail(machine_config &config);
-	void gunnailb(machine_config &config);
-	void hachamf(machine_config &config);
-	void bjtwin(machine_config &config);
-	void cactus(machine_config &config);
-	void ssmissin(machine_config &config);
-	void bioship(machine_config &config);
-	void macross2(machine_config &config);
-	void blkheart(machine_config &config);
-	void manybloc(machine_config &config);
-	void acrobatm(machine_config &config);
-	void acrobatmbl(machine_config &config);
-	void strahl(machine_config &config);
-	void strahljbl(machine_config &config);
-	void tdragon3h(machine_config &config);
-	void macross(machine_config &config);
-	void mustang(machine_config &config);
-	void mustangb(machine_config &config);
-	void mustangb3(machine_config &config);
-	void twinactn(machine_config &config);
-	void vandykeb(machine_config &config);
-	void powerins(machine_config &config);
-	void powerinsj(machine_config &config);
-	void powerinspu(machine_config &config);
-	void powerinspj(machine_config &config);
-	void powerinsa(machine_config &config);
-	void powerinsb(machine_config &config);
-	void powerinsc(machine_config &config);
+	void vandyke(machine_config &config) ATTR_COLD;
+	void tdragon2(machine_config &config) ATTR_COLD;
+	void tharrier(machine_config &config) ATTR_COLD;
+	void raphero(machine_config &config) ATTR_COLD;
+	void tdragon(machine_config &config) ATTR_COLD;
+	void tdragonb(machine_config &config) ATTR_COLD;
+	void tdragonb2(machine_config &config) ATTR_COLD;
+	void tdragonb3(machine_config &config) ATTR_COLD;
+	void gunnail(machine_config &config) ATTR_COLD;
+	void gunnailb(machine_config &config) ATTR_COLD;
+	void hachamf(machine_config &config) ATTR_COLD;
+	void hachamfb2(machine_config &config) ATTR_COLD;
+	void bjtwin(machine_config &config) ATTR_COLD;
+	void cactus(machine_config &config) ATTR_COLD;
+	void ssmissin(machine_config &config) ATTR_COLD;
+	void bioship(machine_config &config) ATTR_COLD;
+	void macross2(machine_config &config) ATTR_COLD;
+	void blkheart(machine_config &config) ATTR_COLD;
+	void manybloc(machine_config &config) ATTR_COLD;
+	void acrobatm(machine_config &config) ATTR_COLD;
+	void acrobatmbl(machine_config &config) ATTR_COLD;
+	void strahl(machine_config &config) ATTR_COLD;
+	void strahljbl(machine_config &config) ATTR_COLD;
+	void tdragon3h(machine_config &config) ATTR_COLD;
+	void macross(machine_config &config) ATTR_COLD;
+	void macrossbl(machine_config &config) ATTR_COLD;
+	void mustang(machine_config &config) ATTR_COLD;
+	void mustangb(machine_config &config) ATTR_COLD;
+	void mustangb3(machine_config &config) ATTR_COLD;
+	void twinactn(machine_config &config) ATTR_COLD;
+	void vandykeb(machine_config &config) ATTR_COLD;
+	void powerins(machine_config &config) ATTR_COLD;
+	void powerinsj(machine_config &config) ATTR_COLD;
+	void powerinspu(machine_config &config) ATTR_COLD;
+	void powerinspj(machine_config &config) ATTR_COLD;
+	void powerinsa(machine_config &config) ATTR_COLD;
+	void powerinsb(machine_config &config) ATTR_COLD;
+	void powerinsc(machine_config &config) ATTR_COLD;
 
-	void init_nmk();
-	void init_tharrier();
-	void init_vandykeb();
-	void init_tdragonb();
-	void init_tdragonb2();
-	void init_ssmissin();
-	void init_twinactn();
-	void init_banked_audiocpu();
-	void init_gunnailb();
-	void init_bjtwin();
-	void init_powerinsa();
-	void init_acrobatmbl();
+	void init_nmk() ATTR_COLD;
+	void init_tharrier() ATTR_COLD;
+	void init_vandykeb() ATTR_COLD;
+	void init_tdragonb() ATTR_COLD;
+	void init_tdragonb2() ATTR_COLD;
+	void init_ssmissin() ATTR_COLD;
+	void init_twinactn() ATTR_COLD;
+	void init_banked_audiocpu() ATTR_COLD;
+	void init_gunnailb() ATTR_COLD;
+	void init_bjtwin() ATTR_COLD;
+	void init_powerinsa() ATTR_COLD;
+	void init_acrobatmbl() ATTR_COLD;
+	void init_macrossbl() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_hacky_scanline);
-	u32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void flipscreen_w(u8 data);
-	void vandyke_flipscreen_w(u8 data);
-	void tilebank_w(u8 data);
-
-	void macross2_sound_reset_w(u16 data);
-	void macross2_audiobank_w(u8 data);
-	void ssmissin_okibank_w(u8 data);
-	void powerinsa_okibank_w(u8 data);
-	template<unsigned Chip> void tharrier_okibank_w(u8 data);
-	u8 powerins_bootleg_fake_ym2203_r();
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -146,19 +133,18 @@ protected:
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;
 
-	int m_tilerambank = 0;
+	u32 m_tilerambank = 0;
 	int m_sprdma_base = 0;
-	int mask[4*2]{};
 	std::unique_ptr<u16[]> m_spriteram_old;
 	std::unique_ptr<u16[]> m_spriteram_old2;
-	int m_bgbank = 0;
-	int m_bioship_background_bank = 0;
+	u8 m_bgbank = 0;
+	u8 m_bioship_background_bank = 0;
 	tilemap_t *m_bg_tilemap[2]{};
 	tilemap_t *m_tx_tilemap = nullptr;
-	int m_mustang_bg_xscroll = 0;
+	s32 m_mustang_bg_xscroll = 0;
 	u8 m_scroll[2][4]{};
 	u16 m_vscroll[4]{};
-	int m_prot_count = 0;
+	u8 m_prot_count = 0;
 	u8 m_vtiming_val = 0;
 
 	void mainram_strange_w(offs_t offset, u16 data/*, u16 mem_mask = ~0*/);
@@ -168,6 +154,11 @@ protected:
 	u16 tharrier_mcu_r(offs_t offset, u16 mem_mask = ~0);
 	u16 vandykeb_r();
 	u16 tdragonb_prot_r();
+
+	void flipscreen_w(u8 data);
+	void vandyke_flipscreen_w(u8 data);
+
+	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Layer> void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void mustang_scroll_w(u16 data);
 	void raphero_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -176,15 +167,28 @@ protected:
 	void vandyke_scroll_w(offs_t offset, u16 data);
 	void vandykeb_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void manybloc_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tilebank_w(u8 data);
 	void bioship_bank_w(u8 data);
 	void nmk004_x0016_w(u16 data);
 	void nmk004_bioship_x0016_w(u16 data);
 
-	void set_interrupt_timing(machine_config &config);
-	void set_hacky_interrupt_timing(machine_config &config);
-	void set_screen_lowres(machine_config &config);
-	void set_screen_midres(machine_config &config);
-	void set_screen_hires(machine_config &config);
+	void macross2_sound_reset_w(u16 data);
+	void macross2_audiobank_w(u8 data);
+	void ssmissin_okibank_w(u8 data);
+	void powerinsa_okibank_w(u8 data);
+	template<unsigned Chip> void tharrier_okibank_w(u8 data);
+	u8 powerins_bootleg_fake_ym2203_r();
+
+	void set_interrupt_timing(machine_config &config) ATTR_COLD;
+	void set_hacky_interrupt_timing(machine_config &config) ATTR_COLD;
+	void set_screen_lowres(machine_config &config) ATTR_COLD;
+	void set_screen_midres(machine_config &config) ATTR_COLD;
+	void set_screen_hires(machine_config &config) ATTR_COLD;
+
+	void configure_nmk004(machine_config &config) ATTR_COLD;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_hacky_scanline);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
 	template<unsigned Layer, unsigned Gfx> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
@@ -204,6 +208,7 @@ protected:
 	void get_colour_6bit(u32 &colour, u32 &pri_mask);
 	void get_sprite_flip(u16 attr, int &flipx, int &flipy, int &code);
 	void get_flip_extcode_powerins(u16 attr, int &flipx, int &flipy, int &code);
+	u32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -231,10 +236,12 @@ protected:
 	void gunnailb_sound_map(address_map &map) ATTR_COLD;
 	void gunnailb_sound_io_map(address_map &map) ATTR_COLD;
 	void hachamf_map(address_map &map) ATTR_COLD;
+	void hachamfb2_map(address_map &map) ATTR_COLD;
 	void macross2_map(address_map &map) ATTR_COLD;
 	void macross2_sound_io_map(address_map &map) ATTR_COLD;
 	void macross2_sound_map(address_map &map) ATTR_COLD;
 	void macross_map(address_map &map) ATTR_COLD;
+	void macrossbl_map(address_map &map) ATTR_COLD;
 	void manybloc_map(address_map &map) ATTR_COLD;
 	void mustang_map(address_map &map) ATTR_COLD;
 	void mustangb_map(address_map &map) ATTR_COLD;
@@ -278,8 +285,8 @@ public:
 	{
 	}
 
-	void tdragon_prot(machine_config &config);
-	void hachamf_prot(machine_config &config);
+	void tdragon_prot(machine_config &config) ATTR_COLD;
+	void hachamf_prot(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -311,16 +318,16 @@ public:
 	{
 	}
 
-	void bjtwin_prot(machine_config &config);
-	void gunnail_prot(machine_config &config);
-	void macross_prot(machine_config &config);
+	void bjtwin_prot(machine_config &config) ATTR_COLD;
+	void gunnail_prot(machine_config &config) ATTR_COLD;
+	void macross_prot(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void device_post_load() override;
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void base_nmk214_215(machine_config &config);
+	void base_nmk214_215(machine_config &config) ATTR_COLD;
 
 	void decode_nmk214();
 
@@ -343,25 +350,25 @@ public:
 		m_afega_scroll(*this, "afega_scroll_%u", 0U)
 	{}
 
-	void firehawk(machine_config &config);
-	void grdnstrm(machine_config &config);
-	void grdnstrmk(machine_config &config);
-	void popspops(machine_config &config);
-	void redhawki(machine_config &config);
-	void redhawkb(machine_config &config);
-	void stagger1(machine_config &config);
-	void spec2k(machine_config &config);
+	void firehawk(machine_config &config) ATTR_COLD;
+	void grdnstrm(machine_config &config) ATTR_COLD;
+	void grdnstrmk(machine_config &config) ATTR_COLD;
+	void popspops(machine_config &config) ATTR_COLD;
+	void redhawki(machine_config &config) ATTR_COLD;
+	void redhawkb(machine_config &config) ATTR_COLD;
+	void stagger1(machine_config &config) ATTR_COLD;
+	void spec2k(machine_config &config) ATTR_COLD;
 
-	void init_bubl2000();
-	void init_grdnstrm();
-	void init_grdnstrmau();
-	void init_redfoxwp2a();
-	void init_grdnstrmg();
-	void init_redhawk();
-	void init_redhawkg();
-	void init_redhawki();
-	void init_redhawksa();
-	void init_spec2k();
+	void init_bubl2000() ATTR_COLD;
+	void init_grdnstrm() ATTR_COLD;
+	void init_grdnstrmau() ATTR_COLD;
+	void init_redfoxwp2a() ATTR_COLD;
+	void init_grdnstrmg() ATTR_COLD;
+	void init_redhawk() ATTR_COLD;
+	void init_redhawkg() ATTR_COLD;
+	void init_redhawki() ATTR_COLD;
+	void init_redhawksa() ATTR_COLD;
+	void init_spec2k() ATTR_COLD;
 
 private:
 	optional_shared_ptr_array<u16, 2> m_afega_scroll;
@@ -381,9 +388,9 @@ private:
 	void redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void afega_map(address_map &map) ATTR_COLD;
-	void afega_sound_cpu(address_map &map) ATTR_COLD;
+	void afega_sound_map(address_map &map) ATTR_COLD;
 	void firehawk_map(address_map &map) ATTR_COLD;
-	void firehawk_sound_cpu(address_map &map) ATTR_COLD;
+	void firehawk_sound_map(address_map &map) ATTR_COLD;
 };
 
 class nmk16_tomagic_state : public nmk16_state
@@ -393,9 +400,9 @@ public:
 		nmk16_state(mconfig, type, tag)
 	{}
 
-	void tomagic(machine_config &config);
+	void tomagic(machine_config &config) ATTR_COLD;
 
-	void init_tomagic();
+	void init_tomagic() ATTR_COLD;
 
 private:
 	void tomagic_map(address_map &map) ATTR_COLD;
@@ -412,7 +419,7 @@ public:
 		m_inputs(*this, { "DSW1", "DSW2", "BUTTONS", "P1", "P2" })
 	{}
 
-	void tharrierb(machine_config &config);
+	void tharrierb(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

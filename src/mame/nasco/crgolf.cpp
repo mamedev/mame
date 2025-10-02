@@ -247,7 +247,7 @@ void crgolf_state::palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(data, 6);
 		bit1 = BIT(data, 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		m_palette->set_pen_color(offs, r, g, b);
 	}

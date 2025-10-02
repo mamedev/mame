@@ -71,7 +71,7 @@ void cbm_serial_box_device::serial_box_mem(address_map &map)
 
 void cbm_serial_box_device::device_add_mconfig(machine_config &config)
 {
-	M65C02(config, m_maincpu, XTAL(4'000'000)/4);
+	W65C02(config, m_maincpu, XTAL(4'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm_serial_box_device::serial_box_mem);
 }
 

@@ -90,7 +90,7 @@ void circus_state::draw_sprite_collision(bitmap_ind16 &bitmap, const rectangle &
 
 void circus_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// The sync generator hardware is used to draw the border and diving boards
+	// The PROMs are used to draw the border and diving boards
 	draw_line(bitmap, cliprect, 0, 18, 255, 18, 0);
 	draw_line(bitmap, cliprect, 0, 249, 255, 249, 1);
 	draw_line(bitmap, cliprect, 0, 18, 0, 248, 0);

@@ -406,18 +406,18 @@ void atarisy1_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x081fff).mirror(0x6000).bankr(m_slapstic_bank); // slapstic maps here
-	map(0x2e0000, 0x2e0001).r(FUNC(atarisy1_state::atarisy1_int3state_r));
+	map(0x2e0000, 0x2e0001).r(FUNC(atarisy1_state::int3state_r));
 	map(0x400000, 0x401fff).ram();
-	map(0x800000, 0x800001).w(FUNC(atarisy1_state::atarisy1_xscroll_w)).share("xscroll");
-	map(0x820000, 0x820001).w(FUNC(atarisy1_state::atarisy1_yscroll_w)).share("yscroll");
-	map(0x840000, 0x840001).w(FUNC(atarisy1_state::atarisy1_priority_w));
+	map(0x800000, 0x800001).w(FUNC(atarisy1_state::xscroll_w)).share(m_xscroll);
+	map(0x820000, 0x820001).w(FUNC(atarisy1_state::yscroll_w)).share(m_yscroll);
+	map(0x840000, 0x840001).w(FUNC(atarisy1_state::priority_w));
 	map(0x860001, 0x860001).w(FUNC(atarisy1_state::bankselect_w));
 	map(0x880001, 0x880001).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x8a0001, 0x8a0001).w(FUNC(atarisy1_state::video_int_ack_w));
 	map(0x8c0001, 0x8c0001).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
 	map(0x900000, 0x9fffff).ram();
 	map(0xa00000, 0xa01fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
-	map(0xa02000, 0xa02fff).ram().w(FUNC(atarisy1_state::atarisy1_spriteram_w)).share("mob");
+	map(0xa02000, 0xa02fff).ram().w(FUNC(atarisy1_state::spriteram_w)).share("mob");
 	map(0xa03000, 0xa03fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xf00000, 0xf003ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
@@ -480,7 +480,7 @@ static INPUT_PORTS_START( marble )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
@@ -519,7 +519,7 @@ static INPUT_PORTS_START( peterpak )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Throw/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Jump")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
@@ -558,7 +558,7 @@ static INPUT_PORTS_START( indytemp )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Whip/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )  // freeze?
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
@@ -613,7 +613,7 @@ static INPUT_PORTS_START( roadrunn )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Hop/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
@@ -648,7 +648,7 @@ static INPUT_PORTS_START( roadblst )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Lasers")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
@@ -685,7 +685,7 @@ static const gfx_layout anlayout =
 
 
 static GFXDECODE_START( gfx_atarisy1 )
-	GFXDECODE_ENTRY( "alpha", 0x00000, anlayout,       0, 64 )
+	GFXDECODE_ENTRY( "alpha", 0x00000, anlayout, 0, 64 )
 GFXDECODE_END
 
 
@@ -718,8 +718,8 @@ void atarisy1_state::add_speech(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy1_state::sound_ext_map);
 
 	TMS5220C(config, m_tms, 14.318181_MHz_XTAL/2/11);
-	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.6);
-	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 0.6);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.6, 0);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.6, 1);
 
 	MOS6522(config, m_via, 14.318181_MHz_XTAL/8);
 	m_via->readpa_handler().set(m_tms, FUNC(tms5220_device::status_r));
@@ -768,13 +768,12 @@ void atarisy1_state::atarisy1(machine_config &config)
 	// note: these parameters are from published specs, not derived
 	// video timing comes from an 82S163 (H) and an 82S129 (V)
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(atarisy1_state::screen_update_atarisy1));
+	m_screen->set_screen_update(FUNC(atarisy1_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
@@ -785,12 +784,12 @@ void atarisy1_state::atarisy1(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14.318181_MHz_XTAL/4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ymsnd.add_route(0, "lspeaker", 0.48);
-	ymsnd.add_route(1, "rspeaker", 0.48);
+	ymsnd.add_route(0, "speaker", 0.48, 0);
+	ymsnd.add_route(1, "speaker", 0.48, 1);
 
 	pokey_device &pokey(POKEY(config, "pokey", 14.318181_MHz_XTAL/8));
-	pokey.add_route(ALL_OUTPUTS, "lspeaker", 0.24);
-	pokey.add_route(ALL_OUTPUTS, "rspeaker", 0.24);
+	pokey.add_route(ALL_OUTPUTS, "speaker", 0.24, 0);
+	pokey.add_route(ALL_OUTPUTS, "speaker", 0.24, 1);
 }
 
 void atarisy1_state::marble(machine_config &config)

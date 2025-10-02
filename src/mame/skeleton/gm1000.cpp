@@ -132,5 +132,5 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1994, bh1000, 0, 0, gm1000, gm1000, gm1000_state, empty_init, "Nihon Eniac Co., Ltd.", "Sound Saurus BH-1000", MACHINE_IS_SKELETON)
-SYST(1994, gm1000, 0, 0, gm1000, gm1000, gm1000_state, empty_init, "Suzuki (Hammond license)", "GM-1000 GM Sound Module", MACHINE_IS_SKELETON)
+SYST(1994, bh1000, 0, 0, gm1000, gm1000, gm1000_state, empty_init, "Nihon Eniac Co., Ltd.", "Sound Saurus BH-1000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1994, gm1000, 0, 0, gm1000, gm1000, gm1000_state, empty_init, "Suzuki (Hammond license)", "GM-1000 GM Sound Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

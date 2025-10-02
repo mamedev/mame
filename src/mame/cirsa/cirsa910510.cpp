@@ -72,7 +72,7 @@ Most of them use also the Cirsa-Unidesa 930902-3 for extra sound.
 #include "cpu/i86/i86.h"
 #include "machine/i2cmem.h"
 #include "machine/i8155.h"
-//#include "machine/i8256.h"
+#include "machine/i8256.h"
 #include "machine/pcf8583.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
@@ -130,9 +130,9 @@ void cirsa910510_state::cirsa910510(machine_config &config)
 
 	I8155(config, "sound_8155", 0); // on sound PCB
 
-	//I8256(config, "muart1", 18.432_MHz_XTAL / 3);
+	I8256(config, "muart1", 18.432_MHz_XTAL / 3);
 
-	//I8256(config, "muart2", 18.432_MHz_XTAL / 3);
+	I8256(config, "muart2", 18.432_MHz_XTAL / 3);
 
 	PCF8583(config, "rtc", 32.768_kHz_XTAL);
 
@@ -203,6 +203,6 @@ ROM_END
 } // Anonymous namespace
 
 // This has mechanical reels and small LED displays, some other titles have an auxiliary video PCB
-GAME( 199?, minimony,  0,        cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, minimonya, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 2, v1.5?)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, minimonyb, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 3, v1.4?)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, minimony,  0,        cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, minimonya, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 2, v1.5?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, minimonyb, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 3, v1.4?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

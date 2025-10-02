@@ -9,11 +9,12 @@ Mighty Guy   (c) 1986 Nichibutsu
 driver by Carlos A. Lozano <calb@gsyc.inf.uc3m.es>
 
 TODO:
-- Fix priority kludge
+- fix priority kludge
 - Inaccurate 1412M2 protection chip emulation in mightguy, used by the sound CPU.
   This is probably an extra CPU (program ROM is the ic2 one), presumably
-  with data / address line scrambling
-- Some sound problems remaining, not just 1412M2, but see also MT7949
+  with data / address line scrambling.
+- cop01 AY8910 filters, see MT7949 (I locally tried blindly copy-pasting the one
+  from magmax, but voice volume was too low)
 
 
 Mighty Guy board layout:
@@ -60,6 +61,7 @@ Mighty Guy board layout:
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
@@ -74,35 +76,26 @@ namespace {
 
 #define MIGHTGUY_HACK    0
 
-class cop01_state : public driver_device
+class cop01_base_state : public driver_device
 {
 public:
-	cop01_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cop01_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
-
-	void cop01(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	uint8_t sound_command_r();
-
-	void cop01_base(machine_config &config);
-
-	required_device<cpu_device> m_audiocpu;
-
-private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -113,37 +106,65 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 	uint8_t m_vreg[4]{};
 
-	// sound-related
-	uint8_t m_pulse = 0;
-	static constexpr int TIMER_RATE = 11475;  // unknown, hand-tuned to match audio reference
-
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	void irq_ack_w(uint8_t data);
-	uint8_t sound_irq_ack_w();
+	void palette(palette_device &palette) const;
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void background_w(offs_t offset, uint8_t data);
 	void foreground_w(offs_t offset, uint8_t data);
 	void vreg_w(offs_t offset, uint8_t data);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	void palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void audio_io_map(address_map &map) ATTR_COLD;
+	void irq_ack_w(uint8_t data);
+
 	void main_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
+
+	void cop01_base(machine_config &config);
 };
 
-class mightguy_state : public cop01_state
+class cop01_state : public cop01_base_state
+{
+public:
+	cop01_state(const machine_config &mconfig, device_type type, const char *tag) :
+		cop01_base_state(mconfig, type, tag),
+		m_ay(*this, "ay%u", 0U)
+	{ }
+
+	void cop01(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_device_array<ay8910_device, 3> m_ay;
+
+	uint8_t m_ls74_q = 0;
+	uint8_t m_ls74_clr = 0;
+
+	uint8_t sound_command_r();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer);
+
+	void ay8910_portb_0_w(uint8_t data);
+	void ay8910_porta_0_w(uint8_t data);
+
+	void audio_io_map(address_map &map) ATTR_COLD;
+};
+
+class mightguy_state : public cop01_base_state
 {
 public:
 	mightguy_state(const machine_config &mconfig, device_type type, const char *tag) :
-		cop01_state(mconfig, type, tag),
+		cop01_base_state(mconfig, type, tag),
 		m_prot(*this, "prot_chip"),
 		m_fake(*this, "FAKE")
 	{ }
@@ -155,15 +176,22 @@ public:
 	void init_mightguy();
 
 private:
-	void audio_io_map(address_map &map) ATTR_COLD;
-
 	required_device<nb1412m2_device> m_prot;
-
 	required_ioport m_fake;
+
+	uint8_t sound_command_r();
+
+	void audio_io_map(address_map &map) ATTR_COLD;
 };
 
 
-void cop01_state::palette(palette_device &palette) const
+/***************************************************************************
+
+  Palette
+
+***************************************************************************/
+
+void cop01_base_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -209,7 +237,7 @@ void cop01_state::palette(palette_device &palette) const
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
+TILE_GET_INFO_MEMBER(cop01_base_state::get_bg_tile_info)
 {
 	int const tile = m_bgvideoram[tile_index];
 	int const attr = m_bgvideoram[tile_index + 0x800];
@@ -232,7 +260,7 @@ TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
 	tileinfo.group = pri;
 }
 
-TILE_GET_INFO_MEMBER(cop01_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(cop01_base_state::get_fg_tile_info)
 {
 	int const tile = m_fgvideoram[tile_index];
 	tileinfo.set(0, tile, 0, 0);
@@ -246,10 +274,10 @@ TILE_GET_INFO_MEMBER(cop01_state::get_fg_tile_info)
 
 ***************************************************************************/
 
-void cop01_state::video_start()
+void cop01_base_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cop01_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cop01_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cop01_base_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cop01_base_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(15);
 
@@ -262,54 +290,11 @@ void cop01_state::video_start()
 
 /***************************************************************************
 
-  Memory handlers
-
-***************************************************************************/
-
-void cop01_state::background_w(offs_t offset, uint8_t data)
-{
-	m_bgvideoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
-}
-
-void cop01_state::foreground_w(offs_t offset, uint8_t data)
-{
-	m_fgvideoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-void cop01_state::vreg_w(offs_t offset, uint8_t data)
-{
-	/*  0x40: --xx---- sprite bank, coin counters, flip screen
-	 *        -----x-- flip screen
-	 *        ------xx coin counters
-	 *  0x41: xxxxxxxx xscroll
-	 *  0x42: ---xx--- ? matches the bg tile color most of the time, but not
-	 *                 during level transitions. Maybe sprite palette bank?
-	 *                 (the four banks in the PROM are identical)
-	 *        ------x- unused (xscroll overflow)
-	 *        -------x msb xscroll
-	 *  0x43: xxxxxxxx yscroll
-	 */
-	m_vreg[offset] = data;
-
-	if (offset == 0)
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 1);
-		machine().bookkeeping().coin_counter_w(1, data & 2);
-		flip_screen_set(data & 4);
-	}
-}
-
-
-
-/***************************************************************************
-
   Display refresh
 
 ***************************************************************************/
 
-void cop01_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cop01_base_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
@@ -347,7 +332,7 @@ void cop01_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
-uint32_t cop01_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cop01_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_vreg[1] + 256 * (m_vreg[2] & 1));
 	m_bg_tilemap->set_scrolly(0, m_vreg[3]);
@@ -356,8 +341,46 @@ uint32_t cop01_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
+
+
+
+/*************************************
+ *
+ *  Sound
+ *
+ *************************************/
+
+void cop01_state::ay8910_porta_0_w(uint8_t data)
+{
+}
+
+void cop01_state::ay8910_portb_0_w(uint8_t data)
+{
+	// bit 0 is input to CLR line of the LS74
+	m_ls74_clr = data & 1;
+	m_ls74_q &= m_ls74_clr;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(cop01_state::sound_timer)
+{
+	// assume timing is the same as magmax.cpp
+	m_ls74_q = m_ls74_clr;
+}
+
+uint8_t cop01_state::sound_command_r()
+{
+	return (m_soundlatch->read() << 1) | m_ls74_q;
+}
+
+uint8_t mightguy_state::sound_command_r()
+{
+	// does not have the sound timer
+	return m_soundlatch->read() << 1;
+}
+
 
 
 /*************************************
@@ -366,24 +389,40 @@ uint32_t cop01_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
  *
  *************************************/
 
-uint8_t cop01_state::sound_command_r()
+void cop01_base_state::background_w(offs_t offset, uint8_t data)
 {
-	int res = (m_soundlatch->read() & 0x7f) << 1;
-
-	// bit 0 seems to be a timer
-	if ((m_audiocpu->total_cycles() / TIMER_RATE) & 1)
-	{
-		if (m_pulse == 0)
-			res |= 1;
-
-		m_pulse = 1;
-	}
-	else
-		m_pulse = 0;
-
-	return res;
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
+void cop01_base_state::foreground_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void cop01_base_state::vreg_w(offs_t offset, uint8_t data)
+{
+	/*  0x40: --xx---- sprite bank, coin counters, flip screen
+	 *        -----x-- flip screen
+	 *        ------xx coin counters
+	 *  0x41: xxxxxxxx xscroll
+	 *  0x42: ---xx--- ? matches the bg tile color most of the time, but not
+	 *                 during level transitions. Maybe sprite palette bank?
+	 *                 (the four banks in the PROM are identical)
+	 *        ------x- unused (xscroll overflow)
+	 *        -------x msb xscroll
+	 *  0x43: xxxxxxxx yscroll
+	 */
+	m_vreg[offset] = data;
+
+	if (offset == 0)
+	{
+		machine().bookkeeping().coin_counter_w(0, data & 1);
+		machine().bookkeeping().coin_counter_w(1, data & 2);
+		flip_screen_set(data & 4);
+	}
+}
 
 template <int Mask>
 int mightguy_state::area_r()
@@ -391,16 +430,12 @@ int mightguy_state::area_r()
 	return (m_fake->read() & Mask) ? 1 : 0;
 }
 
-void cop01_state::irq_ack_w(uint8_t data)
+void cop01_base_state::irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-uint8_t cop01_state::sound_irq_ack_w()
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return 0;
-}
+
 
 /*************************************
  *
@@ -408,16 +443,16 @@ uint8_t cop01_state::sound_irq_ack_w()
  *
  *************************************/
 
-void cop01_state::main_map(address_map &map)
+void cop01_base_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram(); // c000-c7ff in cop01
-	map(0xd000, 0xdfff).ram().w(FUNC(cop01_state::background_w)).share(m_bgvideoram);
+	map(0xd000, 0xdfff).ram().w(FUNC(cop01_base_state::background_w)).share(m_bgvideoram);
 	map(0xe000, 0xe0ff).writeonly().share(m_spriteram);
-	map(0xf000, 0xf3ff).w(FUNC(cop01_state::foreground_w)).share(m_fgvideoram);
+	map(0xf000, 0xf3ff).w(FUNC(cop01_base_state::foreground_w)).share(m_fgvideoram);
 }
 
-void cop01_state::io_map(address_map &map)
+void cop01_base_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("P1");
@@ -425,24 +460,24 @@ void cop01_state::io_map(address_map &map)
 	map(0x02, 0x02).portr("SYSTEM");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x40, 0x43).w(FUNC(cop01_state::vreg_w));
+	map(0x40, 0x43).w(FUNC(cop01_base_state::vreg_w));
 	map(0x44, 0x44).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x45, 0x45).w(FUNC(cop01_state::irq_ack_w)); // ?
+	map(0x45, 0x45).w(FUNC(cop01_base_state::irq_ack_w)); // ?
 }
 
-void cop01_state::sound_map(address_map &map)
+void cop01_base_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8000).r(FUNC(cop01_state::sound_irq_ack_w));
+	map(0x8000, 0x8000).rw(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_r), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xc000, 0xc7ff).ram();
 }
 
 void cop01_state::audio_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
-	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x04, 0x05).w("ay3", FUNC(ay8910_device::address_data_w));
+	map(0x00, 0x01).w(m_ay[0], FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x03).w(m_ay[1], FUNC(ay8910_device::address_data_w));
+	map(0x04, 0x05).w(m_ay[2], FUNC(ay8910_device::address_data_w));
 	map(0x06, 0x06).r(FUNC(cop01_state::sound_command_r));
 }
 
@@ -680,15 +715,21 @@ GFXDECODE_END
  *
  *************************************/
 
-void cop01_state::machine_start()
+void cop01_base_state::machine_start()
 {
-	save_item(NAME(m_pulse));
 	save_item(NAME(m_vreg));
 }
 
-void cop01_state::machine_reset()
+void cop01_state::machine_start()
 {
-	m_pulse = 0;
+	cop01_base_state::machine_start();
+
+	save_item(NAME(m_ls74_q));
+	save_item(NAME(m_ls74_clr));
+}
+
+void cop01_base_state::machine_reset()
+{
 	m_vreg[0] = 0;
 	m_vreg[1] = 0;
 	m_vreg[2] = 0;
@@ -696,19 +737,18 @@ void cop01_state::machine_reset()
 }
 
 
-void cop01_state::cop01_base(machine_config &config)
+void cop01_base_state::cop01_base(machine_config &config)
 {
-	constexpr XTAL MAINCPU_CLOCK = XTAL(12'000'000);
-
 	// basic machine hardware
-	Z80(config, m_maincpu, MAINCPU_CLOCK / 2); // unknown clock / divider
-	m_maincpu->set_addrmap(AS_PROGRAM, &cop01_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &cop01_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cop01_state::irq0_line_assert));
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2); // unknown divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &cop01_base_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &cop01_base_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cop01_base_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, XTAL(3'000'000)); // unknown clock / divider, hand-tuned to match audio reference
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cop01_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &cop01_state::audio_io_map);
+	Z80(config, m_audiocpu, 20_MHz_XTAL / 8); // matches audio reference
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cop01_base_state::sound_map);
+
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -716,40 +756,47 @@ void cop01_state::cop01_base(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(cop01_state::screen_update));
+	screen.set_screen_update(FUNC(cop01_base_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cop01);
-	PALETTE(config, m_palette, FUNC(cop01_state::palette), 16+8*16+16*16, 256);
+	PALETTE(config, m_palette, FUNC(cop01_base_state::palette), 16+8*16+16*16, 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch->set_separate_acknowledge(true);
 }
 
 void cop01_state::cop01(machine_config &config)
 {
 	cop01_base(config);
 
-	AY8910(config, "ay1", 1250000).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider, hand-tuned to match audio reference
-	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); // "
-	AY8910(config, "ay3", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); // "
+	// sound hardware
+	m_audiocpu->set_addrmap(AS_IO, &cop01_state::audio_io_map);
+
+	AY8910(config, m_ay[0], 20_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_ay[0]->port_a_write_callback().set(FUNC(cop01_state::ay8910_porta_0_w));
+	m_ay[0]->port_b_write_callback().set(FUNC(cop01_state::ay8910_portb_0_w));
+
+	AY8910(config, m_ay[1], 20_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, m_ay[2], 20_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	TIMER(config, "sound_timer").configure_scanline(FUNC(cop01_state::sound_timer), "screen", 64, 128);
 }
 
 void mightguy_state::mightguy(machine_config &config)
 {
 	cop01_base(config);
 
-	constexpr XTAL AUDIOCPU_CLOCK = XTAL(8'000'000);
-
-	m_audiocpu->set_clock(AUDIOCPU_CLOCK / 2); // unknown divider
+	// sound hardware
 	m_audiocpu->set_addrmap(AS_IO, &mightguy_state::audio_io_map);
 
-	NB1412M2(config, m_prot, XTAL(8'000'000) / 2); // divided by 2 maybe
+	NB1412M2(config, m_prot, 8_MHz_XTAL / 2); // divided by 2 maybe
 	m_prot->dac_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
-	YM3526(config, "ymsnd", AUDIOCPU_CLOCK / 2).add_route(ALL_OUTPUTS, "mono", 1.0); // unknown divider
+	YM3526(config, "ymsnd", 8_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown DAC
 }

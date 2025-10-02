@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#ifndef MAME_BUS_COCO_COCO_DWSOCKH_H
-#define MAME_BUS_COCO_COCO_DWSOCKH_H
+#ifndef MAME_BUS_COCO_COCO_DWSOCK_H
+#define MAME_BUS_COCO_COCO_DWSOCK_H
 
 #include "osdfile.h"
 
@@ -69,4 +69,4 @@ DECLARE_DEVICE_TYPE(COCO_DWSOCK, beckerport_device)
 // device iterator
 typedef device_type_enumerator<beckerport_device> beckerport_device_enumerator;
 
-#endif // MAME_BUS_COCO_COCO_DWSOCKH_H
+#endif // MAME_BUS_COCO_COCO_DWSOCK_H

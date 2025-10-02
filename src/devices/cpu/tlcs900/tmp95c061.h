@@ -47,7 +47,8 @@ public:
 	template <size_t Bit> auto an_read() { return m_an_read[Bit].bind(); }
 
 protected:
-	virtual void device_config_complete() override;
+	virtual void device_config_complete() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -60,6 +61,9 @@ protected:
 	void tlcs900_change_tff( int which, int change );
 	int tlcs900_process_hdma( int channel );
 	void update_porta();
+
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	template <uint8_t> uint8_t port_r();

@@ -208,7 +208,6 @@ void lua_engine::initialize_input(sol::table &emu)
 	natkeyboard_type["paste"] = &natural_keyboard::paste;
 	natkeyboard_type["dump"] = static_cast<std::string (natural_keyboard::*)() const>(&natural_keyboard::dump);
 	natkeyboard_type["empty"] = sol::property(&natural_keyboard::empty);
-	natkeyboard_type["full"] = sol::property(&natural_keyboard::full);
 	natkeyboard_type["can_post"] = sol::property(&natural_keyboard::can_post);
 	natkeyboard_type["is_posting"] = sol::property(&natural_keyboard::is_posting);
 	natkeyboard_type["in_use"] = sol::property(&natural_keyboard::in_use, &natural_keyboard::set_in_use);
@@ -356,10 +355,8 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["is_analog"] = sol::property(&ioport_field::is_analog);
 	ioport_field_type["is_digital_joystick"] = sol::property(&ioport_field::is_digital_joystick);
 	ioport_field_type["enabled"] = sol::property(&ioport_field::enabled);
-	ioport_field_type["optional"] = sol::property(&ioport_field::optional);
 	ioport_field_type["cocktail"] = sol::property(&ioport_field::cocktail);
 	ioport_field_type["toggle"] = sol::property(&ioport_field::toggle);
-	ioport_field_type["rotated"] = sol::property(&ioport_field::rotated);
 	ioport_field_type["analog_reverse"] = sol::property(&ioport_field::analog_reverse);
 	ioport_field_type["analog_reset"] = sol::property(&ioport_field::analog_reset);
 	ioport_field_type["analog_wraps"] = sol::property(&ioport_field::analog_wraps);
@@ -469,7 +466,7 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto input_class_type = sol().registry().new_usertype<input_class>("input_class", sol::no_constructor);
 	input_class_type["name"] = sol::property(&input_class::name);
-	input_class_type["enabled"] = sol::property(&input_class::enabled);
+	input_class_type["enabled"] = sol::property(&input_class::enabled, &input_class::enable);
 	input_class_type["multi"] = sol::property(&input_class::multi);
 	input_class_type["devices"] = sol::property(
 			[this] (input_class &devclass)

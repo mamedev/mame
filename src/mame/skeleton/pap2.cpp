@@ -100,4 +100,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 200?, pap2, 0, 0, pap2, pap2, pap2_state, empty_init, "Linksys (Cisco)", "PAP2", MACHINE_IS_SKELETON )
+SYST( 200?, pap2, 0, 0, pap2, pap2, pap2_state, empty_init, "Linksys (Cisco)", "PAP2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

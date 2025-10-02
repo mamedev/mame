@@ -60,15 +60,21 @@ public:
 	auto read_cnf14_callback() { return m_cnf14_read_cb.bind(); }
 	auto read_cnf13_callback() { return m_cnf13_read_cb.bind(); }
 	auto read_cnf12_callback() { return m_cnf12_read_cb.bind(); }
+	auto cnf_write_ddr_callback() { return m_cnf_write_ddr_cb.bind(); }
 
 	// NOTE: these are internal shadows, for the input sense.
 	ioport_value egasw4_r();
 	ioport_value egasw3_r();
 	ioport_value egasw2_r();
 	ioport_value egasw1_r();
+
+	void set_vclk2(u32 freq) { m_vclk2 = freq; }
+	void set_vclk2(const XTAL &freq) { m_vclk2 = freq.value(); }
+
 protected:
 	wd90c00_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
@@ -77,6 +83,8 @@ protected:
 	virtual bool get_interlace_mode() override { return m_interlace_mode; }
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void enter_setup_mode() override;
 
 private:
 	virtual u8 crtc_data_r(offs_t offset) override;
@@ -104,6 +112,9 @@ private:
 	devcb_read_line m_cnf14_read_cb;
 	devcb_read_line m_cnf13_read_cb;
 	devcb_read_line m_cnf12_read_cb;
+	devcb_read8     m_cnf_write_ddr_cb;
+
+	u32 m_vclk2;
 };
 
 class wd90c11a_vga_device : public wd90c00_vga_device

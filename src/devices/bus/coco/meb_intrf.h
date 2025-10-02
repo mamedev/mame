@@ -2,14 +2,14 @@
 // copyright-holders:tim lindner
 /*********************************************************************
 
-    intrf.h
+    meb_intrf.h
 
     CRC / Disto Mini Expansion Bus management
 
 *********************************************************************/
 
-#ifndef MAME_BUS_COCO_DISTOMEB_H
-#define MAME_BUS_COCO_DISTOMEB_H
+#ifndef MAME_BUS_COCO_MEB_INTRF_H
+#define MAME_BUS_COCO_MEB_INTRF_H
 
 #pragma once
 
@@ -87,4 +87,4 @@ private:
 
 void disto_meb_add_basic_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_COCO_DISTOMEB_H
+#endif // MAME_BUS_COCO_MEB_INTRF_H

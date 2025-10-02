@@ -4471,19 +4471,22 @@ void sparc_base_device::run_loop()
 		    continue;
 		}*/
 
-		if (CHECK_DEBUG)
-			debugger_instruction_hook(PC);
-
 		if (MODE == MODE_RESET)
 		{
+			if (CHECK_DEBUG)
+				debugger_wait_hook();
 			reset_step();
 		}
 		else if (MODE == MODE_ERROR)
 		{
+			if (CHECK_DEBUG)
+				debugger_wait_hook();
 			error_step();
 		}
 		else if (MODE == MODE_EXECUTE)
 		{
+			if (CHECK_DEBUG)
+				debugger_instruction_hook(PC);
 			execute_step();
 		}
 
@@ -4507,7 +4510,7 @@ void sparc_base_device::run_loop()
 
 void sparc_base_device::execute_run()
 {
-	bool debug = machine().debug_flags & DEBUG_FLAG_ENABLED;
+	const bool debug = debugger_enabled();
 
 	if (m_bp_reset_in)
 	{

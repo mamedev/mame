@@ -200,5 +200,5 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1986, att630, 0, 0, att630, att630, att630_state, empty_init, "AT&T", "630 MTG", MACHINE_IS_SKELETON )
-COMP( 1990, att730x, 0, 0, att730x, att630, att630_state, empty_init, "AT&T", "730X", MACHINE_IS_SKELETON )
+COMP( 1986, att630, 0, 0, att630, att630, att630_state, empty_init, "AT&T", "630 MTG", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1990, att730x, 0, 0, att730x, att630, att630_state, empty_init, "AT&T", "730X", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

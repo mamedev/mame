@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_BUS_PCI_S3VISION_PCI_H
-#define MAME_BUS_PCI_S3VISION_PCI_H
+#ifndef MAME_BUS_PCI_VISION_H
+#define MAME_BUS_PCI_VISION_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ DECLARE_DEVICE_TYPE(VISION864_PCI, vision864_pci_device)
 DECLARE_DEVICE_TYPE(VISION964_PCI, vision964_pci_device)
 DECLARE_DEVICE_TYPE(VISION968_PCI, vision968_pci_device)
 
-#endif // MAME_BUS_PCI_S3VISION_PCI_H
+#endif // MAME_BUS_PCI_S3VISION_H

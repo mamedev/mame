@@ -126,6 +126,7 @@ const struct
 	{ INPUT_STRING_Coinage, "Coinage" },
 	{ INPUT_STRING_Coin_A, "Coin A" },
 	{ INPUT_STRING_Coin_B, "Coin B" },
+	{ INPUT_STRING_10C_1C, "10 Coins/1 Credit" },
 	{ INPUT_STRING_9C_1C, "9 Coins/1 Credit" },
 	{ INPUT_STRING_8C_1C, "8 Coins/1 Credit" },
 	{ INPUT_STRING_7C_1C, "7 Coins/1 Credit" },
@@ -134,8 +135,8 @@ const struct
 	{ INPUT_STRING_4C_1C, "4 Coins/1 Credit" },
 	{ INPUT_STRING_3C_1C, "3 Coins/1 Credit" },
 	{ INPUT_STRING_8C_3C, "8 Coins/3 Credits" },
-	{ INPUT_STRING_4C_2C, "4 Coins/2 Credits" },
 	{ INPUT_STRING_5C_2C, "5 Coins/2 Credits" },
+	{ INPUT_STRING_4C_2C, "4 Coins/2 Credits" },
 	{ INPUT_STRING_2C_1C, "2 Coins/1 Credit" },
 	{ INPUT_STRING_5C_3C, "5 Coins/3 Credits" },
 	{ INPUT_STRING_3C_2C, "3 Coins/2 Credits" },
@@ -162,6 +163,11 @@ const struct
 	{ INPUT_STRING_1C_7C, "1 Coin/7 Credits" },
 	{ INPUT_STRING_1C_8C, "1 Coin/8 Credits" },
 	{ INPUT_STRING_1C_9C, "1 Coin/9 Credits" },
+	{ INPUT_STRING_1C_10C, "1 Coin/10 Credits" },
+	{ INPUT_STRING_1C_20C, "1 Coin/20 Credits" },
+	{ INPUT_STRING_1C_25C, "1 Coin/25 Credits" },
+	{ INPUT_STRING_1C_50C, "1 Coin/50 Credits" },
+	{ INPUT_STRING_1C_100C, "1 Coin/100 Credits" },
 	{ INPUT_STRING_Free_Play, "Free Play" },
 	{ INPUT_STRING_Cabinet, "Cabinet" },
 	{ INPUT_STRING_Upright, "Upright" },
@@ -619,6 +625,8 @@ void digital_joystick::frame_update()
 			m_current4way &= ~(UP_BIT | DOWN_BIT);
 		}
 	}
+	else
+		m_current4way &= m_current;
 }
 
 
@@ -740,8 +748,8 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype].set_default();
 
-	for (int i = 0; i < std::size(m_chars); i++)
-		std::fill(std::begin(m_chars[i]), std::end(m_chars[i]), char32_t(0));
+	for (auto &chars : m_chars)
+		std::fill(std::begin(chars), std::end(chars), UCHAR_INVALID);
 
 	// for DIP switches and configs, look for a default value from the owner
 	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
@@ -909,11 +917,8 @@ std::vector<char32_t> ioport_field::keyboard_codes(int which) const
 	if (which >= std::size(m_chars))
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
 
-	std::vector<char32_t> result;
-	for (int i = 0; i < std::size(m_chars[which]) && m_chars[which][i] != 0; i++)
-		result.push_back(m_chars[which][i]);
-
-	return result;
+	auto &chars = m_chars[which];
+	return std::vector<char32_t>(std::begin(chars), std::find(std::begin(chars), std::end(chars), UCHAR_INVALID));
 }
 
 
@@ -1865,18 +1870,6 @@ time_t ioport_manager::initialize()
 	init_autoselect_devices({ IPT_DIAL,        IPT_DIAL_V },                       OPTION_DIAL_DEVICE,       "dial");
 	init_autoselect_devices({ IPT_TRACKBALL_X, IPT_TRACKBALL_Y },                  OPTION_TRACKBALL_DEVICE,  "trackball");
 	init_autoselect_devices({ IPT_MOUSE_X,     IPT_MOUSE_Y },                      OPTION_MOUSE_DEVICE,      "mouse");
-
-	// look for 4-way diagonal joysticks and change the default map if we find any
-	const char *joystick_map_default = machine().options().joystick_map();
-	if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
-		for (auto &port : m_portlist)
-			for (ioport_field const &field : port.second->fields())
-				if (field.live().joystick != nullptr && field.rotated())
-				{
-					input_class_joystick &devclass = downcast<input_class_joystick &>(machine().input().device_class(DEVICE_CLASS_JOYSTICK));
-					devclass.set_global_joystick_map(input_class_joystick::map_4way_diagonal);
-					break;
-				}
 
 	// register callbacks for when we load configurations
 	machine().configuration().config_register(
@@ -3289,7 +3282,8 @@ ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, std
 	m_errorbuf(errorbuf),
 	m_curport(nullptr),
 	m_curfield(nullptr),
-	m_cursetting(nullptr)
+	m_cursetting(nullptr),
+	m_curshift(0)
 {
 }
 
@@ -3394,6 +3388,7 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 
 	// reset the current setting
 	m_cursetting = nullptr;
+	m_curshift = 0;
 	return *this;
 }
 
@@ -3404,16 +3399,17 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 
 ioport_configurer& ioport_configurer::field_add_char(std::initializer_list<char32_t> charlist)
 {
-	for (int index = 0; index < std::size(m_curfield->m_chars); index++)
-		if (m_curfield->m_chars[index][0] == 0)
-		{
-			const size_t char_count = std::size(m_curfield->m_chars[index]);
-			assert(charlist.size() > 0 && charlist.size() <= char_count);
+	if (m_curshift < std::size(m_curfield->m_chars))
+	{
+		auto &chars = m_curfield->m_chars[m_curshift++];
+		assert(chars[0] == UCHAR_INVALID);
+		assert(charlist.size() <= std::size(chars));
 
-			for (size_t i = 0; i < char_count; i++)
-				m_curfield->m_chars[index][i] = i < charlist.size() ? *(charlist.begin() + i) : 0;
-			return *this;
-		}
+		std::copy(charlist.begin(), charlist.end(), std::begin(chars));
+		std::fill(std::begin(chars) + charlist.size(), std::end(chars), UCHAR_INVALID);
+
+		return *this;
+	}
 
 	std::ostringstream s;
 	bool is_first = true;

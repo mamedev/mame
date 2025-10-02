@@ -120,7 +120,6 @@ const atari_motion_objects_config shuuz_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x000,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -157,48 +156,53 @@ uint32_t shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
 			{
-				if (mo[x] != 0xffff)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
-					 *
-					 *      --- O13 is 1 if (PFS7-4 == 0xf)
-					 *      O13=PFS6*PFS7*(PFS5&PFS4)
-					 *
-					 *      --- PF/M is 1 if MOs have priority, or 0 if playfield has priority
-					 *      MO/PF=!PFS7*!(LBD7&LBD6)*!M1*!O13
-					 *         +!PFS7*!(LBD7&LBD6)*!M2*!O13
-					 *         +!PFS7*!(LBD7&LBD6)*!M3*!O13
-					 *         +PFS7*(LBD7&LBD6)*!M1*!O13
-					 *         +PFS7*(LBD7&LBD6)*!M2*!O13
-					 *         +PFS7*(LBD7&LBD6)*!M3*!O13
-					 *
-					 */
-
-					// This is based on observations, and not verified against schematics and GAL equations.
-					// TODO:
-					// * Locate schematics for (or trace out) video mixing section.
-					// * Obtain equations for video mixing GALs.
-					bool const o13 = (pf[x] & 0xf0) == 0xf0;
-					bool const mopf = ((pf[x] & 0x80) ? ((mo[x] & 0xc0) == 0xc0) : ((mo[x] & 0xc0) != 0xc0)) && !o13;
-
-					// if MO/PF is asserted, we draw the MO
-					if (mopf)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if (mo[x] & 0x0e)       // solid colors
-							pf[x] = mo[x];
-						else if (mo[x] & 0x01)  // shadows
-							pf[x] |= 0x200;
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
+							 *
+							 *      --- O13 is 1 if (PFS7-4 == 0xf)
+							 *      O13=PFS6*PFS7*(PFS5&PFS4)
+							 *
+							 *      --- PF/M is 1 if MOs have priority, or 0 if playfield has priority
+							 *      MO/PF=!PFS7*!(LBD7&LBD6)*!M1*!O13
+							 *         +!PFS7*!(LBD7&LBD6)*!M2*!O13
+							 *         +!PFS7*!(LBD7&LBD6)*!M3*!O13
+							 *         +PFS7*(LBD7&LBD6)*!M1*!O13
+							 *         +PFS7*(LBD7&LBD6)*!M2*!O13
+							 *         +PFS7*(LBD7&LBD6)*!M3*!O13
+							 *
+							 */
+
+							// This is based on observations, and not verified against schematics and GAL equations.
+							// TODO:
+							// * Locate schematics for (or trace out) video mixing section.
+							// * Obtain equations for video mixing GALs.
+							bool const o13 = (pf[x] & 0xf0) == 0xf0;
+							bool const mopf = ((pf[x] & 0x80) ? ((mo[x] & 0xc0) == 0xc0) : ((mo[x] & 0xc0) != 0xc0)) && !o13;
+
+							// if MO/PF is asserted, we draw the MO
+							if (mopf)
+							{
+								if (mo[x] & 0x0e)       // solid colors
+									pf[x] = mo[x];
+								else if (mo[x] & 0x01)  // shadows
+									pf[x] |= 0x200;
+							}
+						}
 					}
 				}
-			}
-		}
+			});
+
 	return 0;
 }
 
@@ -229,7 +233,7 @@ void shuuz_state::latch_w(uint16_t data) // TODO
 uint16_t shuuz_state::leta_r(offs_t offset)
 {
 	// trackball -- rotated 45 degrees?
-	int const which = offset & 1;
+	int const which = BIT(offset, 0);
 
 	// when reading the even ports, do a real analog port update
 	if (which == 0)
@@ -256,7 +260,7 @@ uint16_t shuuz_state::special_port0_r()
 {
 	int result = m_system->read();
 
-	if ((result & 0x0800) && get_hblank())
+	if (BIT(result, 11) && get_hblank())
 		result &= ~0x0800;
 
 	return result;
@@ -305,7 +309,7 @@ static INPUT_PORTS_START( shuuz )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x07fc, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
@@ -332,7 +336,7 @@ static INPUT_PORTS_START( shuuz2 )
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Step Debug SW") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Playfield Debug SW") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Debug SW") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Crosshair Debug SW") PORT_CODE(KEYCODE_C)
@@ -380,8 +384,8 @@ static const gfx_layout pfmolayout =
 
 
 static GFXDECODE_START( gfx_shuuz )
-	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 16 )      // sprites & playfield
-	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      // sprites & playfield
+	GFXDECODE_ENTRY( "tiles",   0, pfmolayout,  256, 16 )      // playfield
+	GFXDECODE_ENTRY( "sprites", 0, pfmolayout,    0, 16 )      // sprites
 GFXDECODE_END
 
 
@@ -408,7 +412,7 @@ void shuuz_state::shuuz(machine_config &config)
 
 	ATARI_VAD(config, m_vad, 0, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
-	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(shuuz_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 62, 64).set_info_callback(FUNC(shuuz_state::get_playfield_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, shuuz_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -438,13 +442,13 @@ ROM_START( shuuz )
 	ROM_LOAD16_BYTE( "136083-4010.23p",     0x00000, 0x20000, CRC(1c2459f8) SHA1(4b8daf196e3ba17cf958a3c1af4e4dacfb79b9e7) )
 	ROM_LOAD16_BYTE( "136083-4011.13p",     0x00001, 0x20000, CRC(6db53a85) SHA1(7f9b3ea78fa65221931bfdab1aa5f1913ffed753) )
 
-	ROM_REGION( 0x080000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x080000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136083-2030.43x", 0x000000, 0x20000, CRC(8ecf1ed8) SHA1(47143f1eaf43027c5301eb6009d8a56a98328894) )
 	ROM_LOAD( "136083-2032.20x", 0x020000, 0x20000, CRC(5af184e6) SHA1(630969466c606d1f51da81911fb365a4cac4685c) )
 	ROM_LOAD( "136083-2031.87x", 0x040000, 0x20000, CRC(72e9db63) SHA1(be13830b38c2603bbd6b875abdc1675788a60b24) )
 	ROM_LOAD( "136083-2033.65x", 0x060000, 0x20000, CRC(8f552498) SHA1(7fd323f3b30747a8645d7a9676fdf8f973b6632a) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "136083-1020.43u", 0x000000, 0x20000, CRC(d21ad039) SHA1(5389745eff6690c1890f98a9630869b1084fb2f3) )
 	ROM_LOAD( "136083-1022.20u", 0x020000, 0x20000, CRC(0c10bc90) SHA1(11272757ecad42a4fae49046bd1b01d5ff7f7d4f) )
 	ROM_LOAD( "136083-1024.43m", 0x040000, 0x20000, CRC(adb09347) SHA1(5294dfb3d4aa83525795ca03c2f328ab9a666baf) )
@@ -472,13 +476,13 @@ ROM_START( shuuz2 )
 	ROM_LOAD16_BYTE( "136083-23p.rom",     0x00000, 0x20000, CRC(98aec4e7) SHA1(8cbe6e7835ecf0ef74a2de723ef970a63d3bddd1) )
 	ROM_LOAD16_BYTE( "136083-13p.rom",     0x00001, 0x20000, CRC(dd9d5d5c) SHA1(0bde6be55532c232b1d27824c2ce61f33501cbb0) )
 
-	ROM_REGION( 0x080000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x080000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136083-2030.43x", 0x000000, 0x20000, CRC(8ecf1ed8) SHA1(47143f1eaf43027c5301eb6009d8a56a98328894) )
 	ROM_LOAD( "136083-2032.20x", 0x020000, 0x20000, CRC(5af184e6) SHA1(630969466c606d1f51da81911fb365a4cac4685c) )
 	ROM_LOAD( "136083-2031.87x", 0x040000, 0x20000, CRC(72e9db63) SHA1(be13830b38c2603bbd6b875abdc1675788a60b24) )
 	ROM_LOAD( "136083-2033.65x", 0x060000, 0x20000, CRC(8f552498) SHA1(7fd323f3b30747a8645d7a9676fdf8f973b6632a) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "136083-1020.43u", 0x000000, 0x20000, CRC(d21ad039) SHA1(5389745eff6690c1890f98a9630869b1084fb2f3) )
 	ROM_LOAD( "136083-1022.20u", 0x020000, 0x20000, CRC(0c10bc90) SHA1(11272757ecad42a4fae49046bd1b01d5ff7f7d4f) )
 	ROM_LOAD( "136083-1024.43m", 0x040000, 0x20000, CRC(adb09347) SHA1(5294dfb3d4aa83525795ca03c2f328ab9a666baf) )

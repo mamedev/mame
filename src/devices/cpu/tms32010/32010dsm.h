@@ -24,8 +24,8 @@
 	*                                                                          *
 	\**************************************************************************/
 
-#ifndef MAME_CPU_TMS32010_DIS32010_H
-#define MAME_CPU_TMS32010_DIS32010_H
+#ifndef MAME_CPU_TMS32010_32010DSM_H
+#define MAME_CPU_TMS32010_32010DSM_H
 
 #pragma once
 
@@ -56,4 +56,4 @@ private:
 	std::vector<TMS32010Opcode> Op;
 };
 
-#endif
+#endif // MAME_CPU_TMS32010_32010DSM_H

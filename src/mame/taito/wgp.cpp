@@ -3,8 +3,8 @@
 // thanks-to:Richard Bush
 /***************************************************************************
 
-World Grand Prix    (c) Taito Corporation 1989
-================
+WGP    (c) Taito Corporation 1989
+===
 
 David Graves
 
@@ -17,10 +17,10 @@ any are different from the ones listed below.
 
                 *****
 
-World Grand Prix runs on hardware which is pretty different from the
-system Taito commonly used for their pseudo-3d racing games of the
-time, the Z system. Different screen and sprite hardware is used.
-There's also a LAN hookup (for multiple machines).
+WGP runs on hardware which is pretty different from the system Taito
+commonly used for their pseudo-3d racing games of the time, the Z system.
+Different screen and sprite hardware is used. There's also a LAN hookup
+(for multiple machines).
 
 As well as a TC0100SCN tilemap generator (two 64x64 layers of 8x8
 tiles and a layer of 8x8 tiles with graphics data taken from RAM)
@@ -34,8 +34,7 @@ from 16x16 gfx chunks via a sprite mapping area in RAM.
 The piv and sprite layers are rotatable (but not individually, only
 together).
 
-World Grand Prix has twin 68K CPUs which communicate via $4000 bytes
-of shared ram.
+WGP has twin 68K CPUs which communicate via $4000 bytes of shared ram.
 
 There is a Z80 as well, which takes over sound duties. Commands are
 written to it by the one of the 68000s (the same as Taito F2 games).
@@ -71,8 +70,8 @@ Offer fake-dip selectable analogue steer
 
 Is piv/sprite layers rotation control at 0x600000 ?
 
-Verify y-zoom is correct on the stages that use it (including Wgp2
-default course). Row zoom may be hard to verify, but Wgp2 course
+Verify y-zoom is correct on the stages that use it (including WGP 2
+default course). Row zoom may be hard to verify, but WGP 2 course
 selection screen is probably a good test.
 
 Implement proper positioning/zoom/rotation for sprites.
@@ -84,7 +83,7 @@ and have [int?] timing glitches.)
 DIP coinage
 
 
-Wgp
+WGP
 ---
 
 Analogue brake pedal works but won't register in service mode.
@@ -96,8 +95,8 @@ $ac3e sub (called off int4) at $ac78 does three calcs to the six
     in service mode as brake.
 
 
-Wgp2
-----
+WGP 2
+-----
 
 Piv y zoom may be imperfect. Check the up/down hill part of the
 default course. The road looks a little odd.
@@ -112,7 +111,7 @@ testing that ram. We hack prog for CPUB to disable the writes.]
 
                 *****
 
-[Wgp stopped with LAN error. (Looks like CPUB tells CPUA what is wrong
+[WGP stopped with LAN error. (Looks like CPUB tells CPUA what is wrong
 with LAN in shared ram $142048. Examined at $e57c which prints out
 relevant lan error message). Ended up at $e57c from $b14e-xx code
 section. CPUA does PEA of $e57c which is the fallback if CPUB doesn't
@@ -462,18 +461,18 @@ u16 wgp_state::lan_status_r()
 {
 	logerror("CPU #2 PC %06x: warning - read lan status\n",m_subcpu->pc());
 
-	return  (0x4 << 8); /* CPUB expects this in code at $104d0 (Wgp) */
+	return  (0x4 << 8); /* CPUB expects this in code at $104d0 (WGP) */
 }
 
 void wgp_state::rotate_port_w(offs_t offset, u16 data)
 {
 	/* This port may be for piv/sprite layer rotation.
 
-	Wgp2 pokes a single set of values (see 2 routines from
-	$4e4a), so if this is rotation then Wgp2 *doesn't* use
+	WGP 2 pokes a single set of values (see 2 routines from
+	$4e4a), so if this is rotation then WGP 2 *doesn't* use
 	it.
 
-	Wgp pokes a wide variety of values here, which appear
+	WGP pokes a wide variety of values here, which appear
 	to move up and down as rotation control words might.
 	See $ae06-d8 which pokes piv ctrl words, then pokes
 	values to this port.
@@ -593,7 +592,7 @@ void wgp_state::main_map(address_map &map)
 	map(0x320000, 0x32000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x400000, 0x40bfff).ram().share("spritemap");   /* sprite tilemaps */
 	map(0x40c000, 0x40dfff).ram().share("spriteram");   /* sprite ram */
-	map(0x40fff0, 0x40fff1).nopw();    /* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
+	map(0x40fff0, 0x40fff1).nopw();    /* ?? (writes 0x8000 and 0 alternately - WGP 2 just 0) */
 	map(0x500000, 0x501fff).ram();                 /* unknown/unused */
 	map(0x502000, 0x517fff).ram().w(FUNC(wgp_state::pivram_word_w)).share("pivram"); /* piv tilemaps */
 	map(0x520000, 0x52001f).ram().w(FUNC(wgp_state::piv_ctrl_word_w)).share("piv_ctrlram");
@@ -810,9 +809,10 @@ GFXDECODE_END
 /***********************************************************
                       MACHINE DRIVERS
 
-Wgp has high interleaving to prevent "common ram error".
+WGP has high interleaving to prevent "common ram error".
 However sync to vblank is lacking, which is causing the
 graphics glitches.
+
 ***********************************************************/
 
 void wgp_state::device_post_load()
@@ -895,15 +895,14 @@ void wgp_state::wgp(machine_config &config)
 	m_tc0100scn->set_palette(m_palette);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // assumes Z80 sandwiched between 68Ks
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -1170,7 +1169,7 @@ ROM_START( wgp2 )
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* delta-t samples */
 	ROM_LOAD( "c32-12.7", 0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 
-//  WGP2 security board (has TC0190FMC)
+//  WGP 2 security board (has TC0190FMC)
 //  ROM_LOAD( "c73-06", 0x00000, 0x00???, NO_DUMP )
 ROM_END
 
@@ -1195,9 +1194,10 @@ void wgp_state::init_wgp2()
 
 /* Working Games with some graphics problems - e.g. missing rotation */
 
-GAME( 1989, wgp,        0,    wgp,    wgp,    wgp_state, init_wgp,  ROT0, "Taito Corporation Japan",   "World Grand Prix (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpu,     wgp,    wgp,    wgpu,   wgp_state, init_wgp,  ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpj,     wgp,    wgp,    wgpj,   wgp_state, init_wgp,  ROT0, "Taito Corporation",         "World Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, wgp2,     wgp,    wgp2,   wgp2,   wgp_state, init_wgp2, ROT0, "Taito Corporation",         "World Grand Prix 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgp,     0,   wgp,  wgp,    wgp_state, init_wgp,  ROT0, "Taito Corporation Japan",   "WGP: Real Race Feeling (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpu,    wgp, wgp,  wgpu,   wgp_state, init_wgp,  ROT0, "Taito America Corporation", "WGP: Real Race Feeling (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpj,    wgp, wgp,  wgpj,   wgp_state, init_wgp,  ROT0, "Taito Corporation",         "WGP: Real Race Feeling (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpjoy,  wgp, wgp,  wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "WGP: Real Race Feeling (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpjoya, wgp, wgp,  wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "WGP: Real Race Feeling (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1990, wgp2,    0,   wgp2, wgp2,   wgp_state, init_wgp2, ROT0, "Taito Corporation",         "WGP 2: Real Race Feeling (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

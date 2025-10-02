@@ -191,7 +191,7 @@ void i8086_cpu_device::execute_run()
 			m_prev_ip = m_ip;
 			m_seg_prefix = false;
 
-				/* Dispatch IRQ */
+			/* Dispatch IRQ */
 			if ( m_pending_irq && (m_no_interrupt == 0) )
 			{
 				if ( m_pending_irq & NMI_IRQ )
@@ -211,6 +211,7 @@ void i8086_cpu_device::execute_run()
 
 			if(m_halt)
 			{
+				debugger_wait_hook();
 				m_icount = 0;
 				return;
 			}
@@ -366,7 +367,6 @@ i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, 
 	, m_int_vector(0)
 	, m_pending_irq(0)
 	, m_nmi_state(0)
-	, m_irq_state(0)
 	, m_test_state(1)
 	, m_pc(0)
 	, m_lock(false)
@@ -488,7 +488,6 @@ void i8086_common_cpu_device::device_start()
 	save_item(NAME(m_int_vector));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_nmi_state));
-	save_item(NAME(m_irq_state));
 	save_item(NAME(m_AuxVal));
 	save_item(NAME(m_OverVal));
 	save_item(NAME(m_ZeroVal));
@@ -529,14 +528,6 @@ void i8086_common_cpu_device::device_reset()
 {
 	m_ZeroVal = 1;
 	m_ParityVal = 1;
-	m_regs.w[AX] = 0;
-	m_regs.w[CX] = 0;
-	m_regs.w[DX] = 0;
-	m_regs.w[BX] = 0;
-	m_regs.w[SP] = 0;
-	m_regs.w[BP] = 0;
-	m_regs.w[SI] = 0;
-	m_regs.w[DI] = 0;
 	m_sregs[ES] = 0;
 	m_sregs[CS] = 0xffff;
 	m_sregs[SS] = 0;
@@ -554,9 +545,7 @@ void i8086_common_cpu_device::device_reset()
 	m_NT = 1; // 8086 NT always 1
 	m_MF = 1; // 8086 MF always 1, 80286 always 0
 	m_int_vector = 0;
-	m_pending_irq = 0;
-	m_nmi_state = 0;
-	m_irq_state = 0;
+	m_pending_irq &= INT_IRQ;
 	m_no_interrupt = 0;
 	m_fire_trap = 0;
 	m_prefix_seg = 0;
@@ -576,7 +565,7 @@ void i8086_common_cpu_device::device_reset()
 
 void i8086_common_cpu_device::interrupt(int int_num, int trap)
 {
-	PUSH( CompressFlags() );
+	PUSH(CompressFlags());
 	m_TF = m_IF = 0;
 
 	if (int_num == -1)
@@ -598,15 +587,11 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 {
 	if (inptnum == INPUT_LINE_NMI)
 	{
-		if ( m_nmi_state == state )
-		{
-			return;
-		}
-		m_nmi_state = state;
-		if (state != CLEAR_LINE)
+		if (!m_nmi_state && state)
 		{
 			m_pending_irq |= NMI_IRQ;
 		}
+		m_nmi_state = state;
 	}
 	else if (inptnum == INPUT_LINE_TEST)
 	{
@@ -614,7 +599,6 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 	}
 	else
 	{
-		m_irq_state = state;
 		if (state == CLEAR_LINE)
 		{
 			m_pending_irq &= ~INT_IRQ;
@@ -2293,7 +2277,8 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						uresult = m_regs.w[AX];
 						uresult2 = uresult % tmp;
-						if ((uresult /= tmp) > 0xff)
+						uresult /= tmp;
+						if (uresult > 0xff)
 						{
 							interrupt(0);
 						}
@@ -2314,7 +2299,9 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						result = (int16_t)m_regs.w[AX];
 						result2 = result % (int16_t)((int8_t)tmp);
-						if ((result /= (int16_t)((int8_t)tmp)) > 0xff)
+						result /= (int16_t)((int8_t)tmp);
+						int32_t lower_bound = m_MF ? -0x7f : -0x80;
+						if (result > 0x7f || result < lower_bound)
 						{
 							interrupt(0);
 						}
@@ -2385,7 +2372,8 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						uresult = (((uint32_t)m_regs.w[DX]) << 16) | m_regs.w[AX];
 						uresult2 = uresult % tmp;
-						if ((uresult /= tmp) > 0xffff)
+						uresult /= tmp;
+						if (uresult > 0xffff)
 						{
 							interrupt(0);
 						}
@@ -2406,7 +2394,9 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						result = ((uint32_t)m_regs.w[DX] << 16) + m_regs.w[AX];
 						result2 = result % (int32_t)((int16_t)tmp);
-						if ((result /= (int32_t)((int16_t)tmp)) > 0xffff)
+						result /= (int32_t)((int16_t)tmp);
+						int32_t lower_bound = m_MF ? -0x7fff : -0x8000;
+						if (result > 0x7fff || result < lower_bound)
 						{
 							interrupt(0);
 						}

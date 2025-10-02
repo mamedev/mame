@@ -9,6 +9,7 @@ The u3 ROM contains the following message (it's David Kittinger's company):
 Copyright (c) 1985, Intelligent Heuristic Programming, Inc
 
 Hardware notes:
+- PCB label: 100045
 - R65C02P4 @ 5MHz (10MHz XTAL)
 - 2*2KB RAM(NEC D449C-3), 2*32KB ROM
 - 64+8 leds, magnet sensors chessboard
@@ -16,8 +17,10 @@ Hardware notes:
 
 I/O is again similar to supercon
 
-The first version was on a modified Super Constellation PCB. 4MHz CPU speed,
-and 4 TMM27128 with identical ROM contents as the newer version.
+The 1st version had a R65C02P3 @ 4MHz (8MHz XTAL). IRQ and beeper via the XTAL
+instead of 555 timer, but nearly the same frequency. The 4MHz version was also
+seen on a modified Super Constellation PCB, with 4 TMM27128 and identical ROM
+contents as the newer version.
 
 *******************************************************************************/
 
@@ -102,7 +105,7 @@ void cexpert_state::mux_w(u8 data)
 
 void cexpert_state::control_w(u8 data)
 {
-	// d0-d2: clock/printer?
+	// d0-d2: clock?
 
 	// d3: enable beeper
 	m_beeper->set_state(BIT(data, 3));
@@ -133,6 +136,7 @@ u8 cexpert_state::input2_r()
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read() << 6;
 
+	// d0-d2: printer
 	// other: ?
 	return ~data;
 }
@@ -146,8 +150,8 @@ u8 cexpert_state::input2_r()
 void cexpert_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x1000, 0x1000).nopw(); // accessory?
-	map(0x1100, 0x1100).nopw(); // "
+	map(0x1000, 0x1000).nopw(); // printer
+	map(0x1100, 0x1100).nopw(); // printer
 	map(0x1200, 0x1200).rw(FUNC(cexpert_state::input2_r), FUNC(cexpert_state::mux_w));
 	map(0x1300, 0x1300).rw(FUNC(cexpert_state::input1_r), FUNC(cexpert_state::control_w));
 	map(0x1800, 0xffff).rom();

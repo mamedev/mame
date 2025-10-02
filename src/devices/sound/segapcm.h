@@ -4,8 +4,8 @@
 /*    SEGA 8bit PCM                                      */
 /*********************************************************/
 
-#ifndef MAMESOUND_SEGAPCM_H
-#define MAMESOUND_SEGAPCM_H
+#ifndef MAME_SOUND_SEGAPCM_H
+#define MAME_SOUND_SEGAPCM_H
 
 #pragma once
 
@@ -41,7 +41,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_pre_change() override;
@@ -56,4 +56,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGAPCM, segapcm_device)
 
-#endif // MAMESOUND_SEGAPCM_H
+#endif // MAME_SOUND_SEGAPCM_H

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_CPU_EVO_EVO_H
-#define MAME_CPU_EVO_EVO_H
+#ifndef MAME_CPU_EVOLUTION_EVO_H
+#define MAME_CPU_EVOLUTION_EVO_H
 
 #pragma once
 
@@ -10,6 +10,8 @@
 class evo_cpu_device : public cpu_device
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
+
 	evo_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -36,4 +38,4 @@ private:
 
 DECLARE_DEVICE_TYPE(EVOLUTION_CPU, evo_cpu_device)
 
-#endif // MAME_CPU_EVO_EVO_H
+#endif // MAME_CPU_EVOLUTION_EVO_H

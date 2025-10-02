@@ -40,7 +40,7 @@ public:
 
 	u8 get_control_low();
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -358,10 +358,10 @@ u8 polysix_sound_block::get_control_low()
 }
 
 // #*#*#*#*#*#*#*#
-void polysix_sound_block::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void polysix_sound_block::sound_stream_update(sound_stream &stream)
 {
-	for(int sample=0; sample != outputs[0].samples(); sample++) {
-		//		u8 trigger = m_gates & ~m_current_gates;
+	for(int sample=0; sample != stream.samples(); sample++) {
+		//      u8 trigger = m_gates & ~m_current_gates;
 		float out = 0;
 
 		// Step the pwm phase (common to all channels)
@@ -374,7 +374,7 @@ void polysix_sound_block::sound_stream_update(sound_stream &stream, std::vector<
 
 		//  Compute the threshold
 		float pw_thr = pw_threshold[m_pw_pwm];
-		if(BIT(m_control_low, 3) || 1)
+		if(BIT(m_control_low, 3))
 			// PWM mode, the modulation multiplies the threshold part over 0.5 with the phase wrapped between 0.2 and 1
 			pw_thr = 0.5 + (pw_thr - 0.5) * (0.2 + pwm_phase * 0.8);
 
@@ -411,12 +411,12 @@ void polysix_sound_block::sound_stream_update(sound_stream &stream, std::vector<
 			else
 				// When gate is off, discharge a 0.047uF cap through a 230K resistor
 				m_organ_eg[channel] -= m_organ_eg[channel]*0.00192537196422815;   // 1-exp(-1/(230e3 * 0.047e-6 * 48000))
-			
+
 			out += wave * m_organ_eg[channel];
 		}
 
 		m_current_gates = m_gates;
-		outputs[0].put_clamp(sample, out/2);
+		stream.put(0, sample, out/2);
 	}
 }
 
@@ -442,7 +442,7 @@ public:
 	virtual void machine_start() override ATTR_COLD;
 	void polysix(machine_config &config);
 
- 	INPUT_CHANGED_MEMBER(tape_enable_w);
+	INPUT_CHANGED_MEMBER(tape_enable_w);
 
 private:
 	required_device<mcs48_cpu_device> m_progmcu;
@@ -573,7 +573,7 @@ void polysix_state::prog_p1_w(u8 data)
 		case 0xc: m_sound->set_mg_delay(m_prog_bus); break;
 		case 0xd: m_sound->set_mg_level(m_prog_bus); break;
 		}
-	}	
+	}
 }
 
 void polysix_state::prog_p2_w(u8 data)
@@ -625,7 +625,7 @@ int polysix_state::prog_t0_r()
 
 int polysix_state::prog_t1_r()
 {
-	//	logerror("prog t1 %f\n", m_tape->input());
+	//  logerror("prog t1 %f\n", m_tape->input());
 	return m_tape->input() >= 0;
 }
 
@@ -689,7 +689,7 @@ void polysix_state::key_p2_w(u8 data)
 	if(BIT(chg, 7))
 		logerror("cn12-16=%d\n", BIT(m_key_p2, 7));
 
-	//	logerror("key_p2_w row=%x l1=%d l2=%d inh=%d cn12=%d\n", BIT(data, 0, 3), BIT(data, 3), BIT(data, 4), BIT(data, 5), BIT(data, 7));
+	//  logerror("key_p2_w row=%x l1=%d l2=%d inh=%d cn12=%d\n", BIT(data, 0, 3), BIT(data, 3), BIT(data, 4), BIT(data, 5), BIT(data, 7));
 }
 
 int polysix_state::key_t0_r()
@@ -988,4 +988,4 @@ ROM_START(polysix)
 ROM_END
 
 
-SYST(1980, polysix, 0, 0, polysix, polysix, polysix_state, empty_init, "Korg", "Polysix Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1980, polysix, 0, 0, polysix, polysix, polysix_state, empty_init, "Korg", "Polysix Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -117,4 +117,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1988, madmoney2, 0, madmoney2, madmoney2, madmoney2_state, empty_init, ROT0, "Picmatic", "Mad Money 2", MACHINE_IS_SKELETON_MECHANICAL) // String "(C) PICMATIC S.A. 1988 BY B.MEITINER VER 0.0 09.09.88" on ROM
+GAME(1988, madmoney2, 0, madmoney2, madmoney2, madmoney2_state, empty_init, ROT0, "Picmatic", "Mad Money 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK) // String "(C) PICMATIC S.A. 1988 BY B.MEITINER VER 0.0 09.09.88" on ROM

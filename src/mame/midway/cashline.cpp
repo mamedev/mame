@@ -225,4 +225,4 @@ ROM_END
 
 
 //    YEAR   NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY        FULLNAME    FLAGS
-GAME( 1995?, cashline, 0,      cashline, cashline, cashline_state, empty_init, ROT0,     "Bally/Sente", "Cashline", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995?, cashline, 0,      cashline, cashline, cashline_state, empty_init, ROT0,     "Bally/Sente", "Cashline", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -478,7 +478,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
 
 	BT458(config, "ramdac", 83'020'800);
 
-	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(FUNC(mpcb828_device::scc_irq));
 	m_scc->out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
 
@@ -509,7 +509,7 @@ void mpcb849_device::device_add_mconfig(machine_config &config)
 
 	BT458(config, "ramdac", 0); // unconfirmed clock
 
-	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(FUNC(mpcb849_device::scc_irq));
 	m_scc->out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
 
@@ -561,7 +561,7 @@ void msmt094_device::device_add_mconfig(machine_config &config)
 	//TMS32030(config, m_dsp3, 40_MHz_XTAL);
 
 	// FIXME: actually Z0853006VSC
-	scc8530_device& scc(SCC8530N(config, "scc", 4.9152_MHz_XTAL));
+	scc8530_device& scc(SCC8530(config, "scc", 4.9152_MHz_XTAL));
 	scc.out_int_callback().set(FUNC(msmt094_device::scc_irq));
 	scc.out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
 

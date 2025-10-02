@@ -6,8 +6,8 @@
 
 **************************************************************************************************/
 
-#ifndef MAME_BUS_PC8801_31_H
-#define MAME_BUS_PC8801_31_H
+#ifndef MAME_BUS_PC8801_PC8801_31_H
+#define MAME_BUS_PC8801_PC8801_31_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PC8801_31, pc8801_31_device)
 
-#endif // MAME_BUS_PC8801_31_H
+#endif // MAME_BUS_PC8801_PC8801_31_H

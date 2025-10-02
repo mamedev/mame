@@ -374,7 +374,7 @@ static INPUT_PORTS_START( pkgnsh )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0xf000, 0xf000, "Balls Per Credit" )
 	PORT_DIPSETTING(      0x7000, "5 Balls" )
 	PORT_DIPSETTING(      0x6000, "6 Balls" )
@@ -458,7 +458,7 @@ static INPUT_PORTS_START( pkgnshdx )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x00f0, 0x00f0, "Balls Per Credit" )
 	PORT_DIPSETTING(      0x0070, "5 Balls" )
 	PORT_DIPSETTING(      0x0060, "6 Balls" )
@@ -768,16 +768,15 @@ void realbrk_state::realbrk(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(33'868'800) / 2));
-	ymz.add_route(0, "lspeaker", 0.50);
-	ymz.add_route(1, "rspeaker", 0.50);
+	ymz.add_route(0, "speaker", 0.50, 0);
+	ymz.add_route(1, "speaker", 0.50, 1);
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 }
 
 void realbrk_state::pkgnsh(machine_config &config)

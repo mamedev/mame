@@ -225,8 +225,8 @@ void quadra800_state::macqd800(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^iosb:lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^iosb:rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^iosb:speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^iosb:speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
@@ -247,6 +247,7 @@ void quadra800_state::macqd800(machine_config &config)
 
 	nubus_device &nubus(NUBUS(config, "nubus", 40_MHz_XTAL / 4));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 	nubus.out_irqc_callback().set(m_iosb, FUNC(iosb_device::via2_irq_w<0x08>));
 	nubus.out_irqd_callback().set(m_iosb, FUNC(iosb_device::via2_irq_w<0x10>));
 	nubus.out_irqe_callback().set(m_iosb, FUNC(iosb_device::via2_irq_w<0x20>));

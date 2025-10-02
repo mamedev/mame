@@ -450,14 +450,13 @@ void discoboy_state::discoboy(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x1000);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(10'000'000) / 4));   // 2.5 MHz?
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.6);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.6);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.6, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.6, 1);
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
@@ -465,8 +464,8 @@ void discoboy_state::discoboy(machine_config &config)
 	MSM5205(config, m_msm, XTAL(400'000));
 	m_msm->vck_legacy_callback().set(FUNC(discoboy_state::adpcm_int)); // interrupt function
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);      // 4KHz, 4 Bits
-	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 

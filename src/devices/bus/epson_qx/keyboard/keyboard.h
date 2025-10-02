@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_EPSON_QX_KEYBOARD_H
-#define MAME_BUS_EPSON_QX_KEYBOARD_H
+#ifndef MAME_BUS_EPSON_QX_KEYBOARD_KEYBOARD_H
+#define MAME_BUS_EPSON_QX_KEYBOARD_KEYBOARD_H
 
 #pragma once
 
@@ -111,4 +111,4 @@ DECLARE_DEVICE_TYPE_NS(EPSON_QX_KEYBOARD_PORT, bus::epson_qx::keyboard, keyboard
 DECLARE_DEVICE_TYPE_NS(QX10_KEYBOARD_HASCI, bus::epson_qx::keyboard, qx10_keyboard_hasci)
 DECLARE_DEVICE_TYPE_NS(QX10_KEYBOARD_ASCII, bus::epson_qx::keyboard, qx10_keyboard_ascii)
 
-#endif
+#endif // MAME_BUS_EPSON_QX_KEYBOARD_KEYBOARD_H

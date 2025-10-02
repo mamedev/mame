@@ -25,8 +25,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_EXP_H
-#define MAME_BUS_COLECO_EXP_H
+#ifndef MAME_BUS_COLECO_CARTRIDGE_EXP_H
+#define MAME_BUS_COLECO_CARTRIDGE_EXP_H
 
 #pragma once
 
@@ -93,6 +93,7 @@ class device_colecovision_cartridge_interface : public device_interface
 	friend class colecovision_cartridge_slot_device;
 
 public:
+	virtual void load_done() { };
 	virtual uint8_t read(offs_t offset, int _8000, int _a000, int _c000, int _e000) { return 0xff; }
 	virtual void write(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) { }
 
@@ -113,4 +114,4 @@ DECLARE_DEVICE_TYPE(COLECOVISION_CARTRIDGE_SLOT, colecovision_cartridge_slot_dev
 
 void colecovision_cartridges(device_slot_interface &device);
 
-#endif // MAME_BUS_COLECO_EXP_H
+#endif // MAME_BUS_COLECO_CARTRIDGE_EXP_H

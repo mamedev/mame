@@ -13,8 +13,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_ISA8_WDXT_GEN_H
-#define MAME_BUS_ISA8_WDXT_GEN_H
+#ifndef MAME_BUS_ISA_WDXT_GEN_H
+#define MAME_BUS_ISA_WDXT_GEN_H
 
 #pragma once
 
@@ -82,4 +82,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ISA8_WDXT_GEN, wdxt_gen_device)
 
-#endif // MAME_BUS_ISA8_WDXT_GEN_H
+#endif // MAME_BUS_ISA_WDXT_GEN_H

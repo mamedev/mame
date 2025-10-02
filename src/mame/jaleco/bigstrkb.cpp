@@ -396,17 +396,16 @@ void bigstrkb_state::bigstrkb(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 //  YM2151(config, "ymsnd", 4'000'000);
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 4'000'000, okim6295_device::PIN7_HIGH));
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", 4'000'000, okim6295_device::PIN7_HIGH));
-	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 }
 
 // Rom Loading

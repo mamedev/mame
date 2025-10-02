@@ -9,8 +9,8 @@
  *
  **************************************************************************/
 
-#ifndef MAME_MACHINE_PXA255
-#define MAME_MACHINE_PXA255
+#ifndef MAME_MACHINE_PXA255_H
+#define MAME_MACHINE_PXA255_H
 
 #pragma once
 
@@ -478,4 +478,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device)
 
-#endif // MAME_MACHINE_PXA255
+#endif // MAME_MACHINE_PXA255_H

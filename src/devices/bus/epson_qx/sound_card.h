@@ -6,8 +6,8 @@
  *
  *******************************************************************/
 
-#ifndef MAME_BUS_EPSON_QX_YM2149_H
-#define MAME_BUS_EPSON_QX_YM2149_H
+#ifndef MAME_BUS_EPSON_QX_SOUND_CARD_H
+#define MAME_BUS_EPSON_QX_SOUND_CARD_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 DECLARE_DEVICE_TYPE_NS(EPSON_QX_OPTION_YM2149, bus::epson_qx, ym2149_sound_card_device)
 
 
-#endif // MAME_BUS_EPSON_QX_YM2149_H
+#endif // MAME_BUS_EPSON_QX_SOUND_CARD_H

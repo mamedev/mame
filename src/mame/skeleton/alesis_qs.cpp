@@ -71,11 +71,10 @@ void qs_state::qs7(machine_config &config)
 	//TODO: add LCD display controller here
 
 	/* sound hardware */
-	//SPEAKER(config, "left").front_left();
-	//SPEAKER(config, "right").front_right();
+	//SPEAKER(config, "speaker", 2).front();
 	//alesis_qs_series_device &sound(ALESIS_QS_SERIES(config, "sound", SND_CLOCK));
-	//sound.add_route(0, "left", 1.0);
-	//sound.add_route(1, "right", 1.0);
+	//sound.add_route(0, "speaker", 1.0, 0);
+	//sound.add_route(1, "speaker", 1.0, 1);
 
 		/* Interfaces */
 		//PCMCIA
@@ -103,4 +102,4 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY   FULLNAME                       FLAGS
-COMP( 1996, alesqs7, 0,      0,      qs7,     qs7,   qs_state, empty_init, "Alesis", "Alesis QS7 musical keyboard", MACHINE_IS_SKELETON )
+COMP( 1996, alesqs7, 0,      0,      qs7,     qs7,   qs_state, empty_init, "Alesis", "Alesis QS7 musical keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

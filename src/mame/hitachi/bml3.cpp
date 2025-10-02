@@ -839,7 +839,7 @@ static const gfx_layout ig_charlayout =
 };
 
 static GFXDECODE_START( gfx_bml3mk5 )
-	GFXDECODE_ENTRY( nullptr, 0, ig_charlayout, 0, 1 )
+	GFXDECODE_RAM( nullptr, 0, ig_charlayout, 0, 1 )
 GFXDECODE_END
 
 

@@ -251,6 +251,7 @@ void drmicro_state::pcm_set_w(uint8_t data)
 	pcm_w(1);
 }
 
+
 /*************************************
  *
  *  Address maps
@@ -276,6 +277,7 @@ void drmicro_state::io_map(address_map &map)
 	map(0x04, 0x04).portr("DSW2").w(FUNC(drmicro_state::nmi_enable_w));
 	map(0x05, 0x05).noprw(); // unused? / watchdog?
 }
+
 
 /*************************************
  *
@@ -342,6 +344,7 @@ static INPUT_PORTS_START( drmicro )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_HIGH, "SW2:!7" ) // Service Mode shows as "X"
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:!8" ) // Service Mode shows as "X"
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -432,8 +435,6 @@ void drmicro_state::drmicro(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &drmicro_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(drmicro_state::interrupt));
 
-	config.set_maximum_quantum(attotime::from_hz(60));
-
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -449,15 +450,16 @@ void drmicro_state::drmicro(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76496(config, "sn1", MCLK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76496(config, "sn2", MCLK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76496(config, "sn3", MCLK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76496(config, "sn1", MCLK / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76496(config, "sn2", MCLK / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76496(config, "sn3", MCLK / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MSM5205(config, m_msm, 384_kHz_XTAL);
 	m_msm->vck_legacy_callback().set(FUNC(drmicro_state::pcm_w));   // IRQ handler
 	m_msm->set_prescaler_selector(msm5205_device::S64_4B);  // 6 KHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.75);
 }
+
 
 /*************************************
  *

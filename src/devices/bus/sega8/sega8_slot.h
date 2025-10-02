@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef MAME_BUS_SEGA8_SLOT_H
-#define MAME_BUS_SEGA8_SLOT_H
+#ifndef MAME_BUS_SEGA8_SEGA8_SLOT_H
+#define MAME_BUS_SEGA8_SEGA8_SLOT_H
 
 #pragma once
 
@@ -353,4 +353,4 @@ void sg1000mk3_cart(device_slot_interface &device);
 void sms_cart(device_slot_interface &device);
 void gg_cart(device_slot_interface &device);
 
-#endif // MAME_BUS_SEGA8_SLOT_H
+#endif // MAME_BUS_SEGA8_SEGA8_SLOT_H

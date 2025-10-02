@@ -64,22 +64,17 @@ void snkwave_device::device_start()
 //  for our sound stream
 //-------------------------------------------------
 
-void snkwave_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void snkwave_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
 	assert(m_counter < 0x1000);
 	assert(m_frequency < 0x1000);
 
 	/* if no sound, we're done */
 	if (m_frequency == 0xfff)
-	{
-		buffer.fill(0);
 		return;
-	}
 
 	/* generate sound into buffer while updating the counter */
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int loops;
 		int16_t out = 0;
@@ -104,7 +99,7 @@ void snkwave_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			}
 		}
 
-		buffer.put_int(sampindex, out, 32768);
+		stream.put_int(0, sampindex, out, 32768);
 	}
 }
 
@@ -119,14 +114,11 @@ void snkwave_device::snkwave_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
-	// all registers are 6-bit
-	data &= 0x3f;
-
-	if (offset == 0)
-		m_frequency = (m_frequency & 0x03f) | (data << 6);
-	else if (offset == 1)
-		m_frequency = (m_frequency & 0xfc0) | data;
-	else if (offset <= 5)
+	if (offset == 0) // F1, high 6 bits
+		m_frequency = (m_frequency & 0x03f) | ((data & 0xfc) << 4);
+	else if (offset == 1) // F2, low 6 bits
+		m_frequency = (m_frequency & 0xfc0) | (data & 0x3f);
+	else if (offset <= 5) // W3 thru W6, low 3 bits of each nybble
 		update_waveform(offset - 2, data);
 }
 
@@ -143,7 +135,7 @@ void snkwave_device::update_waveform(unsigned int offset, uint8_t data)
 {
 	assert(offset < WAVEFORM_LENGTH/4);
 
-	m_waveform[offset * 2]     = ((data & 0x38) >> 3) << (12-CLOCK_SHIFT);
+	m_waveform[offset * 2]     = ((data & 0x70) >> 4) << (12-CLOCK_SHIFT);
 	m_waveform[offset * 2 + 1] = ((data & 0x07) >> 0) << (12-CLOCK_SHIFT);
 	m_waveform[WAVEFORM_LENGTH-2 - offset * 2] = ~m_waveform[offset * 2 + 1];
 	m_waveform[WAVEFORM_LENGTH-1 - offset * 2] = ~m_waveform[offset * 2];

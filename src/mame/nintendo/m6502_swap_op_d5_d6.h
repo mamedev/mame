@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_M6502_SWAP_OP_D5_D6_H
-#define MAME_M6502_SWAP_OP_D5_D6_H
+#ifndef MAME_NINTENDO_M6502_SWAP_OP_D5_D6_H
+#define MAME_NINTENDO_M6502_SWAP_OP_D5_D6_H
 
 #pragma once
 
@@ -52,12 +52,17 @@ class rp2a03_core_swap_op_d5_d6 : public rp2a03_core_device {
 public:
 	rp2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void disable_encryption_on_reset() { m_encryption_enabled_on_reset = false; }
+
 	void set_encryption_state(bool state);
+	void set_which_crypt(int crypt) { m_cryptconfig = crypt; }
+
 protected:
 	class mi_decrypt : public mi_default {
 	public:
 
 		bool m_encryption_enabled;
+		int m_whichcrypt;
 
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
@@ -78,10 +83,14 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	bool m_encryption_enabled_on_reset;
+	int m_cryptconfig;
 };
 
 
 DECLARE_DEVICE_TYPE(M6502_SWAP_OP_D5_D6, m6502_swap_op_d5_d6)
 DECLARE_DEVICE_TYPE(RP2A03_CORE_SWAP_OP_D5_D6, rp2a03_core_swap_op_d5_d6)
 
-#endif // MAME_M6502_SWAP_OP_D5_D6_H
+#endif // MAME_NINTENDO_M6502_SWAP_OP_D5_D6_H

@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_ABCBUS_LUXOR10828_H
-#define MAME_BUS_ABCBUS_LUXOR10828_H
+#ifndef MAME_BUS_ABCBUS_LUX10828_H
+#define MAME_BUS_ABCBUS_LUX10828_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(LUXOR_55_10828, luxor_55_10828_device)
 
-#endif // MAME_BUS_ABCBUS_LUXOR10828_H
+#endif // MAME_BUS_ABCBUS_LUX10828_H

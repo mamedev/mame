@@ -54,4 +54,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1998, ampscarp, 0, 0, ampscarp, ampscarp, ampscarp_state, empty_init, "Motorola", "AMPS Car Phone", MACHINE_IS_SKELETON )
+COMP( 1998, ampscarp, 0, 0, ampscarp, ampscarp, ampscarp_state, empty_init, "Motorola", "AMPS Car Phone", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

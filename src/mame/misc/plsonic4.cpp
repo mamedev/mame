@@ -229,4 +229,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1991, plsonic4, 0, plsonic4, plsonic4, plsonic4_state, empty_init, ROT0, "SegaSA / Sonic", "Play Sonic 4", MACHINE_IS_SKELETON )
+GAME( 1991, plsonic4, 0, plsonic4, plsonic4, plsonic4_state, empty_init, ROT0, "SegaSA / Sonic", "Play Sonic 4", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

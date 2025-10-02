@@ -9,6 +9,15 @@ see eag68k.cpp for 68000-based EAG hardware
 NOTE: To start a new game in EAS/PC, press Game Control (aka Reset), activate
 the D6 square, and then press CL. See below for more info.
 
+TODO:
+- Chess Encyclopedia modules don't work properly on fpres. Prestige doesn't
+  have nvram, it has a load/play switch for swapping modules without having to
+  turn off the chesscomputer. This won't work on MAME, since it forces a hard
+  reset when inserting a new ROM cartridge.
+- Likewise, these modules don't work properly on feasx. It doesn't correctly
+  announce when a new module needs to be inserted. Probably unsupported and
+  therefore BTANB?
+
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.
   To resolve this, hold the Game Control button while booting to clear nvram.
@@ -31,7 +40,7 @@ Hardware notes:
 - TSI S14001A + speech ROM
 - I/O with 8255 PPI and bunch of TTL
 - 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
-- module slot and printer port
+- module slot and printer port (600 baud, 7 data bits, 1 stop bit, no parity)
 
 *: In West Germany, some distributors released it with overclocked CPUs,
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
@@ -75,6 +84,14 @@ separate from a (ledless) magnetic chessboard. The EAS conversion has unmodified
 ROMs, most commonly seen with the feasgla romset. In MAME, it's available as an
 alternate view (see video options). The EAG conversion is a cloneset of feag.
 
+PC/EAS/EAG are the only Fidelity chesscomputers that officially support the EOA-EOE
+Chess Encyclopedia modules. When it's time to swap modules to a different volume,
+the 7seg display will announce it like "GS 0C", where the last digit indicates
+which module to insert (in this case: Volume C). On EAS/EAG, the user is supposed
+to turn off the chesscomputer before inserting a new module (a hard reset on MAME
+is sufficient). On Prestige, modules need to be swapped on the fly. For the 1st
+version of Prestige, it only works on level A3 or higher.
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -82,7 +99,7 @@ alternate view (see video options). The EAG conversion is a cloneset of feag.
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/m6502/m65c02.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"
@@ -113,6 +130,7 @@ public:
 		fidel_clockdiv_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
+		m_rs232(*this, "rs232"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -142,6 +160,7 @@ protected:
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
+	required_device<rs232_port_device> m_rs232;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
@@ -266,7 +285,8 @@ void elite_state::ppi_porta_w(u8 data)
 	m_speech->data_w(data & 0x3f);
 	m_speech->start_w(BIT(data, 6));
 
-	// d7: printer? (black wire to LED pcb)
+	// d7: printer port data
+	m_rs232->write_txd(BIT(~data, 7));
 }
 
 void elite_state::ppi_portc_w(u8 data)
@@ -292,7 +312,7 @@ void elite_state::ppi_portc_w(u8 data)
 
 u8 elite_state::ppi_portb_r()
 {
-	// d0: printer? white wire from LED pcb
+	// d0: printer busy?
 	u8 data = 1;
 
 	// d1: S14001A busy pin
@@ -368,9 +388,7 @@ void elite_state::eag2100_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( eas )
-	PORT_INCLUDE( fidel_clockdiv_4 )
-
+static INPUT_PORTS_START( eas_base )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Control")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
@@ -385,6 +403,11 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( eas )
+	PORT_INCLUDE( eas_base )
+	PORT_INCLUDE( fidel_clockdiv_2 ) // default for 3MHz
 
 	PORT_START("CPU")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elite_state::change_cpu_freq), 0) // factory set
@@ -394,9 +417,10 @@ static INPUT_PORTS_START( eas )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ewc )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( eas_base )
+	PORT_INCLUDE( fidel_clockdiv_4 ) // default for >3MHz
 
-	PORT_MODIFY("CPU") // default to 3.57MHz
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elite_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
@@ -404,9 +428,10 @@ static INPUT_PORTS_START( ewc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( easc )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( eas_base )
+	PORT_INCLUDE( fidel_clockdiv_4 ) // default for >3MHz
 
-	PORT_MODIFY("CPU") // default to 4MHz
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elite_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
@@ -421,7 +446,7 @@ static INPUT_PORTS_START( pc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( easx )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( easc )
 
 	PORT_MODIFY("CPU") // 5MHz
 	PORT_BIT(0x03, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -461,6 +486,8 @@ void elite_state::pc(machine_config &config)
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(13700)); // active for 13.7us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -529,8 +556,8 @@ void elite_state::easx(machine_config &config)
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	config.device_remove("nvram");
-	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_0);
-	NVRAM(config, "nvram.ic6", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram.ic6", nvram_device::DEFAULT_ALL_1);
 }
 
 void elite_state::eag(machine_config &config)

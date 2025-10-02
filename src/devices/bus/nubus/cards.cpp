@@ -11,6 +11,8 @@
 
 #include "8lc.h"
 #include "bootbug.h"
+#include "enetlc.h"
+#include "enetnbtp.h"
 #include "laserview.h"
 #include "nubus_48gc.h"
 #include "nubus_asntmc3b.h"
@@ -22,10 +24,8 @@
 #include "nubus_spec8.h"
 #include "nubus_specpdq.h"
 #include "nubus_vikbw.h"
-#include "nubus_wsportrait.h"
 #include "pds30_30hr.h"
 #include "pds30_cb264.h"
-#include "pds30_mc30.h"
 #include "pds30_procolor816.h"
 #include "pds30_sigmalview.h"
 #include "quadralink.h"
@@ -45,34 +45,57 @@ void mac_nubus_cards(device_slot_interface &device)
 	device.option_add("radiustpd",  NUBUS_RADIUSTPD);   // Radius Two Page Display
 	device.option_add("asmc3nb",    NUBUS_ASNTMC3NB);   // Asante MC3NB Ethernet card
 	device.option_add("portrait",   NUBUS_WSPORTRAIT);  // Apple Macintosh II Portrait video card
+	device.option_add("workstation",NUBUS_WORKSTATION); // Apple Macintosh II Workstation video card
 	device.option_add("enetnb",     NUBUS_APPLEENET);   // Apple NuBus Ethernet
 	device.option_add("bootbug",    NUBUS_BOOTBUG);     // Brigent BootBug debugger card
 	device.option_add("quadralink", NUBUS_QUADRALINK);  // AE Quadralink serial card
 	device.option_add("laserview",  NUBUS_LASERVIEW);   // Sigma Designs LaserView monochrome video card
 	device.option_add("thunder4gx", NUBUS_THUNDERIVGX); // Radius Thunder IV GX video card
+	device.option_add("thunder4gx16", NUBUS_THUNDERIVGX); // Radius Thunder IV GX 1600 video card
+	device.option_add("pc8",        NUBUS_PROCOLOR8);   // Lapis ProColor Server 8 video card
+	device.option_add("enetnbtp",   NUBUS_ENETNBTP);    // Apple Ethernet NB Twisted Pair
 }
 
+void powermac_nubus_cards(device_slot_interface &device)
+{
+	device.option_add("mdc48", NUBUS_MDC48);            // Apple Macintosh Display Card 4•8
+	device.option_add("mdc824", NUBUS_MDC824);          // Apple Macintosh Display Card 8•24
+	device.option_add("cb264", NUBUS_CB264);            // RasterOps ColorBoard 264
+	device.option_add("asmc3nb", NUBUS_ASNTMC3NB);      // Asante MC3NB Ethernet card
+	device.option_add("enetnb", NUBUS_APPLEENET);       // Apple NuBus Ethernet
+	device.option_add("quadralink", NUBUS_QUADRALINK);  // AE Quadralink serial card
+	device.option_add("thunder4gx", NUBUS_THUNDERIVGX); // Radius Thunder IV GX video card
+	device.option_add("thunder4gx16", NUBUS_THUNDERIVGX); // Radius Thunder IV GX 1600 video card
+	device.option_add("enetnbtp", NUBUS_ENETNBTP);        // Apple Ethernet NB Twisted Pair
+}
 
 void mac_pds030_cards(device_slot_interface &device)
 {
 	device.option_add("cb264se30", PDS030_CB264SE30);   // RasterOps Colorboard 264/SE30
+	device.option_add("pc8", PDS030_PROCOLOR8);     // Lapis ProColor Server 8 PDS
 	device.option_add("pc816", PDS030_PROCOLOR816); // Lapis ProColor Server 8*16 PDS
 	device.option_add("lview", PDS030_LVIEW);       // Sigma Designs L-View
 	device.option_add("30hr",  PDS030_XCEED30HR);   // Micron/XCEED Technology Color 30HR
+	device.option_add("30hrint", PDS030_XCEED30HRINT);  // Micron/XCEED Technology Color 30HR (take over SE/30 internal monitor)
 	device.option_add("mc30",  PDS030_XCEEDMC30);   // Micron/XCEED Technology MacroColor 30
+	device.option_add("mc30int", PDS030_XCEEDMC30INT);  // Micron/XCEED Technology MacroColor 30 (take over SE/30 internal monitor)
 	device.option_add("ethermac30", PDS030_ETHERMAC30I);    // Farallon EtherMac 30i Ethernet card
 }
 
 void mac_pdslc_cards(device_slot_interface &device)
 {
 	device.option_add("macconilc", PDSLC_MACCONILC);    // Asante MacCON i LC Ethernet card
+	device.option_add("enetlc", PDSLC_ENETLC);          // Apple Ethernet LC
+	device.option_add("enetlctp", PDSLC_ENETLCTP);      // Apple Ethernet LC Twisted Pair
 }
 
-// cards for the LC PDS slot that only work in the original LC
+// cards for the LC PDS slot that work in the original LC
 void mac_pdslc_orig_cards(device_slot_interface &device)
 {
 	device.option_add("macconilc", PDSLC_MACCONILC);    // Asante MacCON i LC Ethernet card
 	device.option_add("ro8lc", PDSLC_COLORVUE8LC);      // RasterOps ColorVue 8LC
+	device.option_add("enetlc", PDSLC_ENETLC);          // Apple Ethernet LC
+	device.option_add("enetlctp", PDSLC_ENETLCTP);      // Apple Ethernet LC Twisted Pair
 }
 
 // IIsi can take either one SE/30 PDS or one NuBus card
@@ -90,13 +113,17 @@ void mac_iisi_cards(device_slot_interface &device)
 	device.option_add("radiustpd", NUBUS_RADIUSTPD);   // Radius Two Page Display
 	device.option_add("asmc3nb", NUBUS_ASNTMC3NB);     // Asante MC3NB Ethernet card
 	device.option_add("portrait", NUBUS_WSPORTRAIT);   // Apple Macintosh II Portrait video card
+	device.option_add("workstation", NUBUS_WORKSTATION); // Apple Macintosh II Workstation video card
 	device.option_add("enetnb", NUBUS_APPLEENET);      // Apple NuBus Ethernet
 	device.option_add("bootbug", NUBUS_BOOTBUG);       // Brigent BootBug debugger card
 	device.option_add("quadralink", NUBUS_QUADRALINK); // AE Quadralink serial card
 	device.option_add("laserview", NUBUS_LASERVIEW);   // Sigma Designs LaserView monochrome video card
 	device.option_add("thunder4gx", NUBUS_THUNDERIVGX); // Radius Thunder IV GX video card
+	device.option_add("thunder4gx16", NUBUS_THUNDERIVGX); // Radius Thunder IV GX 1600 video card
+	device.option_add("pc8", NUBUS_PROCOLOR8);          // Lapis ProColor Server 8 video card
+	device.option_add("enetnbtp", NUBUS_ENETNBTP);      // Apple Ethernet NB Twisted Pair
 
-	device.option_add("cb264se30", PDS030_CB264SE30);     // RasterOps Colorboard 264/SE30
+	device.option_add("cb264se30", PDS030_CB264SE30); // RasterOps Colorboard 264/SE30
 	device.option_add("pc816", PDS030_PROCOLOR816);   // Lapis ProColor Server 8*16 PDS
 	device.option_add("lview", PDS030_LVIEW);         // Sigma Designs L-View
 	device.option_add("30hr", PDS030_XCEED30HR);      // Micron/XCEED Technology Color 30HR

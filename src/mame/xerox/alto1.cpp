@@ -83,4 +83,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1973, alto1, 0, 0, alto1, alto1, alto1_state, empty_init, "Xerox", "Alto I", MACHINE_IS_SKELETON )
+COMP( 1973, alto1, 0, 0, alto1, alto1, alto1_state, empty_init, "Xerox", "Alto I", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

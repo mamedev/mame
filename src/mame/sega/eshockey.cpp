@@ -230,4 +230,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1993, eshockey, 0, eshockey, eshockey, eshockey_state, empty_init, ROT0, "Sega", "Exciting Speed Hockey (V19930325)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, eshockey, 0, eshockey, eshockey, eshockey_state, empty_init, ROT0, "Sega", "Exciting Speed Hockey (V19930325)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

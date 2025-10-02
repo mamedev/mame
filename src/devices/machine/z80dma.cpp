@@ -129,7 +129,7 @@ enum
 /****************************************************************************
  * device type definition
  ****************************************************************************/
-DEFINE_DEVICE_TYPE(Z80DMA, z80dma_device, "z80dma", "Z80 DMA Controller")
+DEFINE_DEVICE_TYPE(Z80DMA, z80dma_device, "z80dma", "Zilog Z80 DMA Controller")
 
 /****************************************************************************
  * z80dma_device - constructor
@@ -179,6 +179,8 @@ void z80dma_device::device_start()
 	save_item(NAME(m_rdy));
 	save_item(NAME(m_force_ready));
 	save_item(NAME(m_wait));
+	save_item(NAME(m_waits_extra));
+	save_item(NAME(m_busrq));
 	save_item(NAME(m_busrq_ack));
 	save_item(NAME(m_is_pulse));
 	save_item(NAME(m_latch));
@@ -197,9 +199,11 @@ void z80dma_device::device_reset()
 	m_rdy = 0;
 	m_force_ready = 0;
 	m_wait = 0;
+	m_waits_extra = 0;
 	m_num_follow = 0;
 	m_read_num_follow = m_read_cur_follow = 0;
 	m_reset_pointer = 0;
+	set_busrq(CLEAR_LINE);
 	m_busrq_ack = 0;
 	m_is_pulse = false;
 	memset(m_regs, 0, sizeof(m_regs));
@@ -303,8 +307,20 @@ void z80dma_device::disable()
 	m_timer->reset();
 	if (m_busrq_ack == 1)
 	{
-		m_out_busreq_cb(CLEAR_LINE);
+		set_busrq(CLEAR_LINE);
 	}
+}
+
+void z80dma_device::update_bao()
+{
+	m_out_bao_cb(!m_busrq && m_busrq_ack);
+}
+
+void z80dma_device::set_busrq(int state)
+{
+	m_busrq = state;
+	m_out_busreq_cb(m_busrq);
+	update_bao();
 }
 
 /****************************************************************************
@@ -476,7 +492,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 		case SEQ_REQUEST_BUS:
 			if (m_busrq_ack == 0)
 			{
-				m_out_busreq_cb(ASSERT_LINE);
+				set_busrq(ASSERT_LINE);
 			}
 			m_dma_seq = SEQ_WAITING_ACK;
 			break;
@@ -497,7 +513,8 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 				}
 
 				const attotime clock = clocks_to_attotime(1);
-				const attotime next = clock * (3 - ((PORTA_IS_SOURCE ? PORTA_TIMING : PORTB_TIMING) & 0x03));
+				const attotime next = clock * (3 - ((PORTA_IS_SOURCE ? PORTA_TIMING : PORTB_TIMING) & 0x03) + m_waits_extra);
+				m_waits_extra = 0;
 				m_timer->adjust(next, 0, clock);
 
 				m_dma_seq = SEQ_TRANS1_READ_SOURCE;
@@ -517,7 +534,8 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 		case SEQ_TRANS1_INC_DEC_DEST_ADDRESS:
 			{
 				const attotime clock = clocks_to_attotime(1);
-				const attotime next = clock * (3 - ((PORTB_IS_SOURCE ? PORTA_TIMING : PORTB_TIMING) & 0x03));
+				const attotime next = clock * (3 - ((PORTB_IS_SOURCE ? PORTA_TIMING : PORTB_TIMING) & 0x03) + m_waits_extra);
+				m_waits_extra = 0;
 				m_timer->adjust(next, 0, clock);
 
 				m_dma_seq = SEQ_TRANS1_WRITE_DEST;
@@ -542,7 +560,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 				switch (mode)
 				{
 					case 0b00: // Byte/Single/byte-at-a-time
-						m_out_busreq_cb(CLEAR_LINE);
+						set_busrq(CLEAR_LINE);
 						m_dma_seq = SEQ_WAIT_READY;
 						break;
 
@@ -553,7 +571,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 						}
 						else
 						{
-							m_out_busreq_cb(CLEAR_LINE);
+							set_busrq(CLEAR_LINE);
 							m_dma_seq = SEQ_WAIT_READY;
 						}
 						break;
@@ -615,13 +633,15 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 u8 z80dma_device::read()
 {
 	const u8 res = m_read_regs_follow[m_read_cur_follow];
-	m_read_cur_follow++;
+	if (!machine().side_effects_disabled())
+	{
+		m_read_cur_follow++;
 
-	if(m_read_cur_follow >= m_read_num_follow)
-		m_read_cur_follow = 0;
+		if(m_read_cur_follow >= m_read_num_follow)
+			m_read_cur_follow = 0;
 
-	LOG("Z80DMA Read %02x\n", res);
-
+		LOG("Z80DMA Read %02x\n", res);
+	}
 	return res;
 }
 
@@ -733,9 +753,7 @@ void z80dma_device::write(u8 data)
 					interrupt_check();
 					// Needs six reset commands to reset the DMA
 					{
-						u8 WRi;
-
-						for (WRi = 0; WRi < 7; WRi++)
+						for (u8 WRi = 0; WRi < 7; WRi++)
 							REG(WRi,m_reset_pointer) = 0;
 
 						m_reset_pointer++;
@@ -875,7 +893,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 void z80dma_device::rdy_w(int state)
 {
 	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback), this), state);
 }
 
 /****************************************************************************
@@ -884,4 +902,30 @@ void z80dma_device::rdy_w(int state)
 void z80dma_device::bai_w(int state)
 {
 	m_busrq_ack = state;
+	update_bao();
+}
+
+
+DEFINE_DEVICE_TYPE(UA858D, ua858d_device, "ua858d", "Mikroelektronik UA858D DMA Controller")
+
+ua858d_device::ua858d_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: z80dma_device(mconfig, UA858D, tag, owner, clock)
+{
+}
+
+void ua858d_device::write(u8 data)
+{
+	if ((m_num_follow == 0) && ((data & 0x83) == 0x80)) // WR3
+	{
+		LOG("UA858D WR3 %02x\n", data);
+		WR3 = data;
+		if (data & 0x08)
+			m_regs_follow[m_num_follow++] = GET_REGNUM(MASK_BYTE);
+		if (data & 0x10)
+			m_regs_follow[m_num_follow++] = GET_REGNUM(MATCH_BYTE);
+	}
+	else
+	{
+		z80dma_device::write(data);
+	}
 }

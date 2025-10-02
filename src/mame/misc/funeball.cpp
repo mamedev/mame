@@ -62,4 +62,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME      PARENT MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                FULLNAME      FLAGS
-GAME( 1997, funeball, 0,     funeball, funeball, funeball_state, empty_init, ROT0, "Fun Industries Inc.", "Fun-E-Ball", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1997, funeball, 0,     funeball, funeball, funeball_state, empty_init, ROT0, "Fun Industries Inc.", "Fun-E-Ball", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_MAGTAPE_H
-#define MAME_DEVICES_IMAGEDEV_MAGTAPE_H
+#ifndef MAME_IMAGEDEV_MAGTAPE_H
+#define MAME_IMAGEDEV_MAGTAPE_H
 
 #pragma once
 
@@ -53,4 +53,4 @@ protected:
 	virtual const char *image_brief_type_name() const noexcept override { return "utap"; }
 };
 
-#endif // MAME_DEVICES_IMAGEDEV_MAGTAPE_H
+#endif // MAME_IMAGEDEV_MAGTAPE_H

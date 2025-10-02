@@ -123,7 +123,7 @@ ioport_constructor isa8_finalchs_device::device_input_ports() const
 
 void isa8_finalchs_device::device_add_mconfig(machine_config &config)
 {
-	M65SC02(config, m_maincpu, 5_MHz_XTAL);
+	G65SC02(config, m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &isa8_finalchs_device::finalchs_mem);
 
 	GENERIC_LATCH_8(config, m_mainlatch);

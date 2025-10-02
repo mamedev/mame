@@ -262,7 +262,7 @@ void tx0_64kw_device::execute_run()
 
 		if ((! m_run) && (! m_rim))
 		{
-			debugger_instruction_hook(PC);
+			debugger_wait_hook();
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
 		}
 		else if (m_rim)
@@ -368,7 +368,7 @@ void tx0_8kw_device::execute_run()
 
 		if ((! m_run) && (! m_rim))
 		{
-			debugger_instruction_hook(PC);
+			debugger_wait_hook();
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
 		}
 		else if (m_rim)

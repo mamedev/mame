@@ -97,6 +97,7 @@ dvk_mx_device::dvk_mx_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, DVK_MX, tag, owner, clock)
 	, device_qbus_card_interface(mconfig, *this)
 	, m_connectors(*this, "%u", 0U)
+	, m_installed(false)
 {
 }
 
@@ -126,6 +127,7 @@ void dvk_mx_device::device_start()
 	}
 
 	// save state
+	save_item(NAME(m_installed));
 	save_item(NAME(m_mxcs));
 	save_item(NAME(m_rbuf));
 	save_item(NAME(m_wbuf));
@@ -133,11 +135,10 @@ void dvk_mx_device::device_start()
 
 	m_timer_2khz = timer_alloc(FUNC(dvk_mx_device::twokhz_tick), this);
 
-	m_bus->install_device(0177130, 0177133, read16sm_delegate(*this, FUNC(dvk_mx_device::read)),
-		write16sm_delegate(*this, FUNC(dvk_mx_device::write)));
-
 	m_mxcs = 0;
 	selected_drive = -1;
+
+	m_installed = false;
 }
 
 //-------------------------------------------------
@@ -146,6 +147,13 @@ void dvk_mx_device::device_start()
 
 void dvk_mx_device::device_reset()
 {
+	if (!m_installed)
+	{
+		m_bus->install_device(0177130, 0177133, read16sm_delegate(*this, FUNC(dvk_mx_device::read)),
+			write16sm_delegate(*this, FUNC(dvk_mx_device::write)));
+		m_installed = true;
+	}
+
 	m_rbuf = m_wbuf = 0;
 
 	m_mxcs &= ~MXCSR_ERR;

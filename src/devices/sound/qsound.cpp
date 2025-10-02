@@ -257,10 +257,10 @@ void qsound_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void qsound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void qsound_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(stream_buffer::sample_t(m_samples[0]) * (1.0 / 32768.0));
-	outputs[1].fill(stream_buffer::sample_t(m_samples[1]) * (1.0 / 32768.0));
+	stream.fill(0, sound_stream::sample_t(m_samples[0]) * (1.0 / 32768.0));
+	stream.fill(1, sound_stream::sample_t(m_samples[1]) * (1.0 / 32768.0));
 }
 
 

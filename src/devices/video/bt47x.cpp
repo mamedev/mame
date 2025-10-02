@@ -35,7 +35,7 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(BT471, bt471_device, "bt471", "Brooktree Bt471 256 Color RAMDAC")
-//DEFINE_DEVICE_TYPE(BT473, bt473_device, "bt473", "Brooktree Bt473 True-Color RAMDAC")
+DEFINE_DEVICE_TYPE(BT473, bt473_device, "bt473", "Brooktree Bt473 True-Color RAMDAC")
 //DEFINE_DEVICE_TYPE(BT474, bt474_device, "bt474", "Brooktree Bt474 256 Color RAMDAC")
 DEFINE_DEVICE_TYPE(BT475, bt475_device, "bt475", "Brooktree Bt475 256 Color RAMDAC")
 DEFINE_DEVICE_TYPE(BT476, bt476_device, "bt476", "Brooktree Bt476 256 Color RAMDAC")
@@ -151,6 +151,11 @@ bt475_device_base::bt475_device_base(machine_config const &mconfig, device_type 
 
 bt471_device::bt471_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: bt47x_device_base(mconfig, BT471, tag, owner, clock, 256, 16, 6)
+{
+}
+
+bt473_device::bt473_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: bt47x_device_base(mconfig, BT473, tag, owner, clock, 256, 16, 8)
 {
 }
 

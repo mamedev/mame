@@ -25,8 +25,8 @@ C2-00154C
 |          4H  5H           PROM7J        |
 |                           PAL    DSW1(8)|
 |              PROM5G                     |
-|                           76489         |
-|                           76489         |
+|                           76489AN       |
+|                           76489AN       |
 |               Z80                       |
 |                                PAL      |
 |15.468MHz PAL              6116     555  |
@@ -257,8 +257,8 @@ void mrjong_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("P2").w(FUNC(mrjong_state::flipscreen_w));
-	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489_device::write));
-	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489_device::write));
+	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489a_device::write));
+	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489a_device::write));
 	map(0x03, 0x03).r(FUNC(mrjong_state::io_0x03_r));     // Unknown
 }
 
@@ -379,8 +379,8 @@ void mrjong_state::mrjong(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489(config, "sn1", 15'468'000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn2", 15'468'000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "sn1", 15'468'000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "sn2", 15'468'000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

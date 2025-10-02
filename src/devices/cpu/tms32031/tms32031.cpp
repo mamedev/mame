@@ -817,6 +817,7 @@ void tms3203x_device::check_irqs()
 	if (!m_delayed)
 	{
 		uint16_t intmask = 1 << (whichtrap - 1);
+		standard_irq_callback(whichtrap - 1, m_pc);
 
 		// bit in IF is cleared when interrupt is taken
 		IREG(TMR_IF) &= ~intmask;
@@ -954,12 +955,13 @@ void tms3203x_device::execute_run()
 	// if we're idling, just eat the cycles
 	if (m_is_idling)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}
 
 	// non-debug case
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 	{
 		while (m_icount > 0)
 		{

@@ -322,10 +322,8 @@ void sdl_window_info::mouse_left(unsigned device)
 		return;
 
 	// leaving implicitly releases buttons, so check hold/drag if necessary
-	if (BIT(info->buttons, 0))
+	if (BIT(info->buttons, 0) && (0 < info->clickcnt))
 	{
-		assert(0 <= info->clickcnt);
-
 		auto const now(std::chrono::steady_clock::now());
 		auto const exp(std::chrono::milliseconds(250) + info->pressed);
 		int const dx(info->x - info->pressedx);

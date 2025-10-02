@@ -1,6 +1,6 @@
 # Chinese Traditional translations for MAME package
 # MAME 套件的正體中文翻譯
-# Copyright (C) 1997-2024 MAMEdev and contributors
+# Copyright (C) 1997-2025 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2023.
 #
@@ -930,11 +930,11 @@ msgstr "未完美模擬功能: "
 
 #: src/frontend/mame/ui/info.cpp:133
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr "尚未支援檯面型筐體模式的畫面翻轉。"
+msgstr "尚未支援檯面型筐體模式的畫面翻轉。\n"
 
 #: src/frontend/mame/ui/info.cpp:135
 msgid "This system requires external artwork files.\n"
-msgstr "此系統需要額外的裝飾圖檔"
+msgstr "此系統需要額外的裝飾圖檔。\n"
 
 #: src/frontend/mame/ui/info.cpp:137
 msgid ""
@@ -2028,7 +2028,7 @@ msgstr ""
 "找不到系統 ROM, 請檢查 %1$s.ini 檔案中指定的 ROM 路徑設定。\n"
 "\n"
 "如果是首次使用 %2$s, 請參閱 docs 目錄中的 %2$s.pdf 以取得設定 %2$s 的相關訊"
-"息\n"
+"息。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:329
 #, c-format

@@ -412,6 +412,9 @@ public:
 	/* return the number of warnings we generated */
 	int warnings() const { return m_warnings; }
 
+	/* return the number of present but bad ROMs */
+	int presentbad() const { return m_presentbad; }
+
 	std::string& software_load_warnings_message() { return m_softwarningstring; }
 
 	/* return the number of BAD_DUMP/NO_DUMP warnings we generated */
@@ -461,8 +464,9 @@ private:
 	int rom_fread(emu_file *file, u8 *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(emu_file *file, memory_region &region, const rom_entry *parent_region, const rom_entry *romp);
 	void fill_rom_data(memory_region &region, const rom_entry *romp);
-	void copy_rom_data(memory_region &region, const rom_entry *romp);
+	void copy_rom_data(device_t &device, memory_region &region, const rom_entry *romp);
 	void process_rom_entries(
+			device_t &device,
 			const std::vector<std::string> &searchpath,
 			u8 bios,
 			memory_region &region,
@@ -487,6 +491,7 @@ private:
 	running_machine &   m_machine;            // reference to our machine
 
 	int                 m_warnings;           // warning count during processing
+	int                 m_presentbad;         // ROM files that are present bad have the wrong content
 	int                 m_knownbad;           // BAD_DUMP/NO_DUMP count during processing
 	int                 m_errors;             // error count during processing
 

@@ -44,11 +44,10 @@ The options for adding a new autofire button or modifying an existing autofire
 button are the same.
 
 Select **Input** to set the emulated button that you want to simulate pressing
-repeatedly.  Currently, only player buttons are supported.  Typically you’ll set
-this to the primary fire button for shooting games.  This is most often *P1
-Button 1* or the equivalent for another player, but it might have a
-different name. On Konami’s Gradius games, *P1 Button 2* is the primary fire
-button.
+repeatedly.  Only digital inputs are supported.  Typically you’ll set this to
+the primary fire button for shooting games.  This is most often *P1 Button 1*
+or the equivalent for another player, but it might have a different name.  On
+Konami’s Gradius games, *P1 Button 2* is the primary fire button.
 
 Select **Hotkey** to set the control (or combination of controls) you’ll use to
 activate the autofire button.  This can be any combination that MAME supports
@@ -74,6 +73,13 @@ button.
 When modifying an existing autofire button, select **Done** or press the UI
 Cancel key to return to the list of autofire buttons.  Changes take effect
 immediately.
+
+When modifying an existing autofire button, select **Delete** to delete the
+autofire button.  The autofire button will be deleted immediately when you
+select **Delete** without requiring additional confirmation.  You can also
+delete an autofire button by highlighting it in the list of autofire buttons
+and pressing the UI Clear key (Del/Delete/Forward Delete on the keyboard by
+default).
 
 
 .. _plugins-autofire-notes:

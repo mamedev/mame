@@ -445,14 +445,8 @@ SYNC:
 	m_syncack_write_func(1);
 	while(!m_nmi_asserted && !m_firq_line && !m_irq_line)
 	{
-		// massaging the PC this way makes the debugger's behavior more
-		// intuitive
-		m_pc.w--;
-
 		@eat_remaining();
-
-		// unmassage...
-		m_pc.w++;
+		;
 	}
 	m_syncack_write_func(0);
 	@eat(1);
@@ -496,11 +490,7 @@ SEX:
 
 BRANCH:
 	@m_temp.b.l = read_opcode_arg();
-	if(!hd6309_native_mode())
-	{
-		@dummy_vma(1);
-		;
-	}
+	@dummy_vma(1);
 	if (branch_taken())
 	{
 		m_pc.w += (int8_t) m_temp.b.l;
@@ -510,11 +500,7 @@ BRANCH:
 LBRANCH:
 	@m_temp.b.h = read_opcode_arg();
 	@m_temp.b.l = read_opcode_arg();
-	if(!hd6309_native_mode())
-	{
-		@dummy_vma(1);
-		;
-	}
+	@dummy_vma(1);
 	if (branch_taken())
 	{
 		m_pc.w += m_temp.w;
@@ -595,14 +581,8 @@ CWAI:
 
 	while((m_ea.w = get_pending_interrupt()) == 0)
 	{
-		// massaging the PC this way makes the debugger's behavior more
-		// intuitive
-		m_pc.w -= 2;
-
 		@eat_remaining();
-
-		// unmassage...
-		m_pc.w += 2;
+		;
 	}
 
 	if (m_nmi_asserted)

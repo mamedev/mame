@@ -181,6 +181,7 @@ public:
 	bool transfer_test_interrupt(int vector);
 	void set_dreq(int state);
 	void start(int submodule);
+	void abort(int submodule) { dma_done(submodule); }
 
 protected:
 	required_device<h8_device> m_cpu;

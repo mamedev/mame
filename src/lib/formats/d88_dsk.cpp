@@ -554,9 +554,4 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool d88_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const d88_format FLOPPY_D88_FORMAT;

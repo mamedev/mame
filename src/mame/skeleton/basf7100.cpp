@@ -609,6 +609,8 @@ void basf7100_state::basf7100(machine_config &config)
 	m_fdccpu->set_addrmap(AS_IO, &basf7100_state::fdc_io_map);
 	m_fdccpu->set_irq_acknowledge_callback(FUNC(basf7100_state::fdccpu_irq_callback));
 
+	config.set_maximum_quantum(attotime::from_usec(600));
+
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

@@ -76,7 +76,13 @@
 			{ "xbox360",     "Xbox 360" },
 			{ "durango",     "Xbox One" },
 			{ "ARM",         "ARM" },
+			{ "ARM64",         "ARM64" },
 			{ "PowerPC",     "PowerPC" },
+			{ "nx32",        "Nintendo Switch, 32-bit only" },
+			{ "nx64",        "Nintendo Switch, 64-bit only" },
+			{ "gdk-desktop", "GDK Windows Desktop" },
+			{ "gdk-xboxone", "GDK Xbox One" },
+			{ "gdk-scarlett","GDK Xbox Scarlett" },
 		}
 	}
 

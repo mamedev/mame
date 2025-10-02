@@ -91,4 +91,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1998, bvm20f1e, 0, 0, bvm, bvm, bvm_state, empty_init, "Sony", "Trinitron Color Video Monitor BVM-20F1E", MACHINE_IS_SKELETON)
+SYST(1998, bvm20f1e, 0, 0, bvm, bvm, bvm_state, empty_init, "Sony", "Trinitron Color Video Monitor BVM-20F1E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

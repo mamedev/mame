@@ -301,6 +301,7 @@ u8 h83048_device::syscr_r()
 void h83048_device::syscr_w(u8 data)
 {
 	m_syscr = data;
+	m_intc->set_nmi_edge(BIT(data, 2));
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }

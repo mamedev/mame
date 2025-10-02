@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_STD_H
-#define MAME_BUS_COLECO_STD_H
+#ifndef MAME_BUS_COLECO_CARTRIDGE_STD_H
+#define MAME_BUS_COLECO_CARTRIDGE_STD_H
 
 #pragma once
 
@@ -40,5 +40,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(COLECOVISION_STANDARD, colecovision_standard_cartridge_device)
 
-
-#endif // MAME_BUS_COLECO_STD_H
+#endif // MAME_BUS_COLECO_CARTRIDGE_STD_H

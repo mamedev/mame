@@ -303,4 +303,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2014, rfsantafeg, 0, rfslotspcpent, rfslotspcpent, rfslotspcpent_state, empty_init, ROT0, "Recreativos Franco", "Santa Fe Golden", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2014, rfsantafeg, 0, rfslotspcpent, rfslotspcpent, rfslotspcpent_state, empty_init, ROT0, "Recreativos Franco", "Santa Fe Golden", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

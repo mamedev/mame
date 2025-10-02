@@ -41,7 +41,7 @@ ToDo:
 - Only one video plane is emulated, needs to be understood. Various gfx elements missing.
 - There's an undumped GAL 16V8-25L on the DMD board (position U8)
 - Strikes n Spares: sound, needs 2 DMD screens.
-- Brooks & Dunn: roms are missing. Program was not finished, game will never work.
+- Brooks & Dunn: ROMs are missing. Program was not finished, game will never work.
 
 *****************************************************************************************************/
 
@@ -50,7 +50,7 @@ ToDo:
 
 #include "gottlieb_a.h"
 
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "video/mc6845.h"
@@ -101,7 +101,6 @@ private:
 	void u5a_w(u8 data);
 	u8 dmd_r();
 	void dmd_w(u8 data);
-	void nmi_w(int state);
 	void crtc_vs(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void palette_init(palette_device &palette);
@@ -113,8 +112,8 @@ private:
 	u8 m_segment = 0U;
 	u8 m_u4b = 0U;
 
-	required_device<m65c02_device> m_maincpu;
-	required_device<m65c02_device> m_dmdcpu;
+	required_device<w65c02_device> m_maincpu;
+	required_device<w65c02_device> m_dmdcpu;
 	required_memory_bank    m_bank1;
 	required_device<mc6845_device> m_crtc;
 	required_shared_ptr<u8> m_vram;
@@ -286,12 +285,6 @@ INPUT_CHANGED_MEMBER( gts3a_state::test_inp )
 	m_u4->write_ca1(newval);
 }
 
-// This trampoline needed; WRITELINE("maincpu", m65c02_device, nmi_line) does not work
-void gts3a_state::nmi_w(int state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
-}
-
 void gts3a_state::lampret_w(u8 data)
 {
 	if (m_row < 12)
@@ -316,7 +309,7 @@ void gts3a_state::solenoid_w(offs_t offset, u8 data)
 void gts3a_state::segbank_w(u8 data)
 {
 	m_segment = data;
-	m_dmdcpu->set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
+	m_dmdcpu->set_input_line(W65C02_IRQ_LINE, ASSERT_LINE);
 }
 
 void gts3a_state::u4b_w(u8 data)
@@ -360,7 +353,7 @@ void gts3a_state::init_gts3a()
 
 u8 gts3a_state::dmd_r()
 {
-	m_dmdcpu->set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
+	m_dmdcpu->set_input_line(W65C02_IRQ_LINE, CLEAR_LINE);
 	return m_segment;
 }
 
@@ -430,12 +423,12 @@ void gts3a_state::machine_reset()
 
 void gts3a_state::p0(machine_config &config)
 {
-	M65C02(config, m_maincpu, XTAL(4'000'000) / 2);
+	W65C02(config, m_maincpu, XTAL(4'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gts3a_state::mem_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 6116LP + DS1210
 
-	M65C02(config, m_dmdcpu, XTAL(3'579'545) / 2);
+	W65C02(config, m_dmdcpu, XTAL(3'579'545) / 2);
 	m_dmdcpu->set_addrmap(AS_PROGRAM, &gts3a_state::dmd_map);
 
 	// Video
@@ -462,7 +455,7 @@ void gts3a_state::p0(machine_config &config)
 	m_u4->readpb_handler().set(FUNC(gts3a_state::u4b_r));
 	m_u4->writepb_handler().set(FUNC(gts3a_state::u4b_w));
 	//m_u4->ca2_handler().set(FUNC(gts3a_state::u4ca2_w));
-	m_u4->cb2_handler().set(FUNC(gts3a_state::nmi_w));
+	m_u4->cb2_handler().set_inputline("maincpu", W65C02_NMI_LINE).invert();
 
 	R65C22(config, m_u5, XTAL(4'000'000) / 2);
 	m_u5->irq_handler().set("irq", FUNC(input_merger_device::in_w<1>));
@@ -473,7 +466,7 @@ void gts3a_state::p0(machine_config &config)
 	//m_u5->cb1_Handler().set(FUNC(gts3a_state::u5cb1_w));
 	//m_u5->cb2_Handler().set(FUNC(gts3a_state::u5cb2_w));
 
-	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", W65C02_IRQ_LINE);
 
 	// Sound
 	genpin_audio(config);
@@ -607,6 +600,27 @@ ROM_START(cueballc)
 
 	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("dsprom0.bin", 0x00000, 0x40000, CRC(3756efeb) SHA1(2bf84a840ad134666c76d49b89c2de76c0420af8))
+	ROM_RELOAD(0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(9fd04109) SHA1(27864fe4e9c248dce6221c9e56861967d089b216))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(476bb11c) SHA1(ce546df59933cc230a6671dec493bbbe71146dee))
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(23708ad9) SHA1(156fcb19403f9845404af1a4ac4edfd3fcde601d))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
+ROM_END
+
+ROM_START(cueballv)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cue_ball_wizard_734_bx_gprom.u2", 0x0000, 0x10000, CRC(e14b378d) SHA1(d815d302a8d82d22d986214e55b24914a69a49d6))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("wizard_espanol_dsprom.u3", 0x00000, 0x40000, CRC(21e60313) SHA1(fb343dfe65ce5f23f616756959d998053b8c77f6))
 	ROM_RELOAD(0x40000, 0x40000)
 
 	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
@@ -1153,6 +1167,50 @@ ROM_START(smbpc)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
 ROM_END
 
+ROM_START(smbpv)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom_v.u2", 0x0000, 0x10000, CRC(a50f1b45) SHA1(5ac95e92b13d3205f0d94382f10e3a57fb5af357))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom2.bin", 0x00000, 0x40000, BAD_DUMP CRC(181e8234) SHA1(9b22681f61cae401269a88c3cfd783d683390877)) // Damaged on the Vifico PCB, taken from 'smbp'
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(6f1d0a3e) SHA1(c7f665d79b9073f28f90debde16cafa9ab57a47c))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(e9cef116) SHA1(5f710bc24e1a168f296a22417aebecbde3bfaa5c))
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(0acdfd49) SHA1(0baabd32b546842bc5c76a61b509b558677b50f9))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
+ROM_END
+
+/* Earlier than 'smbpv'. Lacks adjustments #57 and #58. It also defaults to 24 max. credits in German and Spanish setting.
+   Has Spanish instead of French texts, and shows "VIFICO" instead of "GAME OVER" in attract mode. */
+ROM_START(smbpva)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom_27c512.u2", 0x0000, 0x10000, CRC(d2db2f09) SHA1(6327812d352fecde3a4e63b36fea923c4586da74)) // Same as "smbp" but changing the string 'LES GAGNANTS DISENT "NON" A LA DROGUE' to 'SERVICIO TECNICO DE VIFICO 95/2238827'
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom2_27c20.u3", 0x00000, 0x40000, CRC(8bc709e3) SHA1(84b56255a05a48cd416ed5ef096dd6324b87652b))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1_27c256.k2", 0x8000, 0x8000, CRC(6f1d0a3e) SHA1(c7f665d79b9073f28f90debde16cafa9ab57a47c))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1_27c20.u4", 0x00000, 0x40000, CRC(e9cef116) SHA1(5f710bc24e1a168f296a22417aebecbde3bfaa5c))
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD("arom2_27c20.u5", 0x80000, 0x40000, CRC(0acdfd49) SHA1(0baabd32b546842bc5c76a61b509b558677b50f9))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1_27c256.k3", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Super Mario Brothers Mushroom World (N105)
 /-------------------------------------------------------------------*/
@@ -1367,45 +1425,48 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1992,  smbp,       0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  smbpa,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 2)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  smbpb,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 3)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  smbpc,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 4)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  smbmush,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers Mushroom World",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  cueball,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  cueballa,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (rev. 2)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  cueballb,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (rev. 3)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  cueballc,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (older display rev.)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  sfightii,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 1)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  sfightiia,  sfightii, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 2)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  sfightiib,  sfightii, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 3)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  teedoffp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (pinball, rev.3)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  teedoffp1,  teedoffp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (pinball, rev.1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  teedoffp0,  teedoffp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (pinball)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  gladiatp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Gladiators (pinball)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  wipeout,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Wipeout (rev.2, set 1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  wipeout2a,  wipeout,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Wipeout (rev.2, set 2)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rescu911,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Rescue 911 (rev.1)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcsoccer,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "World Challenge Soccer (rev.1, set 1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcsoccer1a, wcsoccer, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "World Challenge Soccer (rev.1, set 2)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.5)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp4,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.4)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp3,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.3)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp2,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.2)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp1,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp0,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  shaqattq,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.5)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  shaqattq2,  shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.2)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(2003,  mac_zois,   shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Aksioma",  "machinaZOIS Virtual Training Center",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  freddy,     0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.4)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  freddy3,    freddy,   p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.3)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  bighurt,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Frank Thomas' Big Hurt (rev.3)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  waterwld,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Waterworld (rev.3)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  waterwld2,  waterwld, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Waterworld (rev.2)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  snspares,   0,        p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.6)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  snspares2,  snspares, p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.2)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  snspares1,  snspares, p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  andretti,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Mario Andretti (rev.T4)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  andretti0,  andretti, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Mario Andretti",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996,  barbwire,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Barb Wire",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996,  brooks,     0,        p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Brooks & Dunn (rev.T1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbp,       0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 1)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbpa,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 2)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbpb,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 3)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbpc,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 4)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbpv,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb (Vifico license)", "Super Mario Brothers (pinball, Spanish, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // Missing the Spanish display ROM
+GAME(1992,  smbpva,     smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb (Vifico license)", "Super Mario Brothers (pinball, Spanish, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbmush,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers Mushroom World",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  cueball,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  cueballa,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (rev. 2)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  cueballb,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (rev. 3)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  cueballc,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (older display rev.)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  cueballv,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb (Vifico license)", "Cue Ball Wizard (Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  sfightii,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 1)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  sfightiia,  sfightii, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 2)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  sfightiib,  sfightii, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 3)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  teedoffp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (pinball, rev.3)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  teedoffp1,  teedoffp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (pinball, rev.1)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  teedoffp0,  teedoffp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (pinball)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  gladiatp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Gladiators (pinball)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  wipeout,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Wipeout (rev.2, set 1)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  wipeout2a,  wipeout,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Wipeout (rev.2, set 2)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rescu911,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Rescue 911 (rev.1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcsoccer,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "World Challenge Soccer (rev.1, set 1)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcsoccer1a, wcsoccer, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "World Challenge Soccer (rev.1, set 2)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.5)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp4,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.4)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp3,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.3)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp2,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.2)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp1,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.1)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp0,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  shaqattq,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.5)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  shaqattq2,  shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(2003,  mac_zois,   shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Aksioma",  "machinaZOIS Virtual Training Center",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  freddy,     0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.4)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  freddy3,    freddy,   p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.3)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bighurt,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Frank Thomas' Big Hurt (rev.3)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  waterwld,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Waterworld (rev.3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  waterwld2,  waterwld, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Waterworld (rev.2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  snspares,   0,        p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.6)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  snspares2,  snspares, p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.2)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  snspares1,  snspares, p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.1)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  andretti,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Mario Andretti (rev.T4)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  andretti0,  andretti, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Mario Andretti",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1996,  barbwire,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Barb Wire",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1996,  brooks,     0,        p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Brooks & Dunn (rev.T1)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

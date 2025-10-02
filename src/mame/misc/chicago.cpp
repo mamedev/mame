@@ -147,4 +147,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1976, dmodrbcc, 0, chicago, 0, chicago_state, empty_init, ROT0, "Chicago Coin", "Demolition Derby (Chicago Coin)", MACHINE_IS_SKELETON )
+GAME( 1976, dmodrbcc, 0, chicago, 0, chicago_state, empty_init, ROT0, "Chicago Coin", "Demolition Derby (Chicago Coin)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

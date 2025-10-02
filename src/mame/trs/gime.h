@@ -150,7 +150,7 @@ protected:
 	bool                        m_legacy_video;
 	uint32_t                    m_video_position;
 	uint8_t                     m_line_in_row;
-	scanline_record             m_scanlines[25+192+26];
+	scanline_record             m_scanlines[25+25+192+26+25];
 	bool                        m_displayed_rgb;
 
 	// palette state
@@ -239,6 +239,7 @@ protected:
 	// rendering sampled graphics
 	typedef uint32_t (gime_device::*emit_samples_proc)(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	uint32_t emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	template<int xscale>
 	uint32_t emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	template<int xscale>
 	uint32_t emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);

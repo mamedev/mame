@@ -79,8 +79,7 @@ void thinkpad8xx_state::thinkpad850(machine_config &config)
 
 	H8325(config, "mcu", XTAL(10'000'000)); // Actually an H8/338 (HD6473388: 48k-byte ROM; 2k-byte RAM), unknown clock
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SOFTWARE_LIST(config, "thinkpad8xx").set_original("thinkpad8xx");
 }
@@ -102,4 +101,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR, NAME,        PARENT, COMPAT, MACHINE,     INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,       FLAGS
-COMP( 1996, thinkpad850, 0,      0,      thinkpad850, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_IS_SKELETON )
+COMP( 1996, thinkpad850, 0,      0,      thinkpad850, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

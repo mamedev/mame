@@ -33,17 +33,17 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-constexpr stream_buffer::sample_t dac_gain_r2r = 1.0;
-constexpr stream_buffer::sample_t dac_gain_bw = 2.0;
+constexpr sound_stream::sample_t dac_gain_r2r = 1.0;
+constexpr sound_stream::sample_t dac_gain_bw = 2.0;
 
 
 // ======================> dac_mapper_callback
 
-using dac_mapper_callback = stream_buffer::sample_t (*)(u32 input, u8 bits);
+using dac_mapper_callback = sound_stream::sample_t (*)(u32 input, u8 bits);
 
-stream_buffer::sample_t dac_mapper_unsigned(u32 input, u8 bits);
-stream_buffer::sample_t dac_mapper_signed(u32 input, u8 bits);
-stream_buffer::sample_t dac_mapper_ones_complement(u32 input, u8 bits);
+sound_stream::sample_t dac_mapper_unsigned(u32 input, u8 bits);
+sound_stream::sample_t dac_mapper_signed(u32 input, u8 bits);
+sound_stream::sample_t dac_mapper_ones_complement(u32 input, u8 bits);
 
 
 // ======================> dac_bit_interface
@@ -82,13 +82,13 @@ class dac_device_base : public device_t, public device_sound_interface
 {
 protected:
 	// constructor
-	dac_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain);
+	dac_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 bits, dac_mapper_callback mapper, sound_stream::sample_t gain);
 
 	// device startup
 	virtual void device_start() override ATTR_COLD;
 
 	// stream generation
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// set the current value
 	void set_value(u32 value)
@@ -100,26 +100,26 @@ protected:
 public:
 	// configuration: default output range is -1..1 for all cases except
 	// for 1-bit DACs, which default to 0..1
-	dac_device_base &set_output_range(stream_buffer::sample_t range_min, stream_buffer::sample_t range_max)
+	dac_device_base &set_output_range(sound_stream::sample_t range_min, sound_stream::sample_t range_max)
 	{
 		m_range_min = range_min;
 		m_range_max = range_max;
 		return *this;
 	}
-	dac_device_base &set_output_range(stream_buffer::sample_t vref) { return set_output_range(-vref, vref); }
+	dac_device_base &set_output_range(sound_stream::sample_t vref) { return set_output_range(-vref, vref); }
 
 private:
 	// internal state
 	sound_stream *m_stream;
-	stream_buffer::sample_t m_curval;
-	std::vector<stream_buffer::sample_t> m_value_map;
+	sound_stream::sample_t m_curval;
+	std::vector<sound_stream::sample_t> m_value_map;
 
 	// configuration state
 	u8 const m_bits;
 	dac_mapper_callback const m_mapper;
-	stream_buffer::sample_t const m_gain;
-	stream_buffer::sample_t m_range_min;
-	stream_buffer::sample_t m_range_max;
+	sound_stream::sample_t const m_gain;
+	sound_stream::sample_t m_range_min;
+	sound_stream::sample_t m_range_max;
 };
 
 
@@ -128,7 +128,7 @@ private:
 class dac_bit_device_base : public dac_device_base, public dac_bit_interface
 {
 protected:
-	dac_bit_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
+	dac_bit_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, sound_stream::sample_t gain) :
 		dac_device_base(mconfig, type, tag, owner, clock, bits, mapper, gain)
 	{
 	}
@@ -144,7 +144,7 @@ public:
 class dac_byte_device_base : public dac_device_base, public dac_byte_interface
 {
 protected:
-	dac_byte_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
+	dac_byte_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, sound_stream::sample_t gain) :
 		dac_device_base(mconfig, type, tag, owner, clock, bits, mapper, gain)
 	{
 	}
@@ -160,7 +160,7 @@ public:
 class dac_word_device_base : public dac_device_base, public dac_word_interface
 {
 protected:
-	dac_word_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
+	dac_word_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, sound_stream::sample_t gain) :
 		dac_device_base(mconfig, type, tag, owner, clock, bits, mapper, gain)
 	{
 	}
@@ -213,6 +213,7 @@ DAC_GENERATOR(MC3410,    mc3410_device,    dac_word_device_base, dac_mapper_unsi
 DAC_GENERATOR(MP1210,    mp1210_device,    dac_word_device_base, dac_mapper_signed,   12, dac_gain_r2r, "MP1210 DAC",    "mp1210") // also addressable with separate 8-bit and 4-bit input latches
 DAC_GENERATOR(PCM54HP,   pcm54hp_device,   dac_word_device_base, dac_mapper_unsigned, 16, dac_gain_r2r, "PCM54HP DAC",   "pcm54hp")
 DAC_GENERATOR(UDA1341TS, uda1341ts_device, dac_word_device_base, dac_mapper_signed,   16, dac_gain_r2r, "UDA1341TS DAC", "uda1341ts") // I2C stereo audio codec
+DAC_GENERATOR(CS4334,    cs4334_device,    dac_word_device_base, dac_mapper_signed,   16, dac_gain_r2r, "CS4334 DAC",    "cs4334") // I2C stereo audio codec
 DAC_GENERATOR(ZN425E,    zn425e_device,    dac_byte_device_base, dac_mapper_unsigned,  8, dac_gain_r2r, "ZN425E DAC",    "zn425e")
 DAC_GENERATOR(ZN426E,    zn426e_device,    dac_byte_device_base, dac_mapper_unsigned,  8, dac_gain_r2r, "ZN426E-8 DAC",  "zn426e")
 DAC_GENERATOR(ZN428E,    zn428e_device,    dac_byte_device_base, dac_mapper_unsigned,  8, dac_gain_r2r, "ZN428E-8 DAC",  "zn428e")

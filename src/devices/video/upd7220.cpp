@@ -346,7 +346,12 @@ inline void upd7220_device::dequeue(uint8_t *data, int *flag)
 
 inline void upd7220_device::update_vsync_timer(int state)
 {
-	int next_y = state ? (m_vs + m_vbp) : 0;
+	const int vert_mult = (m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON ? 2 : 1;
+
+	// page 6-68, route vsync so that top is start of back porch, end is at sync time
+	// (at bottom of MAME vpos() mechanism)
+	// - pc9801:lemmings and pc9801:spindiz2 cares
+	int next_y = state ? 0 : (m_vbp + m_al + m_vfp) * vert_mult;
 
 	attotime duration = screen().time_until_pos(next_y, 0);
 
@@ -360,10 +365,11 @@ inline void upd7220_device::update_vsync_timer(int state)
 
 inline void upd7220_device::update_hsync_timer(int state)
 {
+	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : 8;
 	int y = screen().vpos();
 
-	int next_x = state ? m_hs : 0;
-	int next_y = state ? y : ((y + 1) % m_al);
+	int next_x = state ? m_hs * horiz_mult : 0;
+	int next_y = state ? y : ((y + 1) % (m_vs + m_vbp + m_al + m_vfp - 1));
 
 	attotime duration = screen().time_until_pos(next_y, next_x);
 
@@ -430,6 +436,7 @@ inline void upd7220_device::recompute_parameters()
 	if (m_m)
 	{
 		screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+		screen().reset_origin();
 
 		update_hsync_timer(0);
 		update_vsync_timer(0);
@@ -1419,14 +1426,12 @@ void upd7220_device::process_fifo()
 			LOGCMD3("WDAT PATTERN=%04x\n", m_pattern);
 			if (m_figs.m_figure_type)
 				break;
-			LOGCMD3("- CR=%02x (%02x %02x) (%c) EAD=%06x - FIGS DC=%04x\n"
-				, m_cr
-				, m_pr[2]
-				, m_pr[1]
-				, m_pr[1] ? m_pr[1]:' '
-				, m_ead
-				, m_figs.m_dc
-			);
+			LOGCMD3("- CR=%02x (%02x %02x) (%c) EAD=%06x - FIGS DC=%04x\n",
+					m_cr,
+					m_pr[2], m_pr[1],
+					m_pr[1] ? m_pr[1] : ' ',
+					m_ead,
+					m_figs.m_dc);
 			fifo_set_direction(FIFO_WRITE);
 
 			wdat((m_cr & 0x18) >> 3,m_cr & 3);
@@ -1888,7 +1893,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 					int yval = (y*zoom)+z + (bsy + m_vbp);
 					// pc9801:duel sets up bitmap layer with height 384 vs. 400 of text layer
 					// so we scissor here, interlace wants it bumped x2 (microbx2)
-					if(yval <= cliprect.bottom() && (yval - m_vbp) < m_al << interlace)
+					if(yval >= cliprect.top() && yval <= cliprect.bottom() && (yval - m_vbp) < m_al << interlace)
 						draw_graphics_line(bitmap, addr, yval, wd, pitch_shift);
 				}
 			}

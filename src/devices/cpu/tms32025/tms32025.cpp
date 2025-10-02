@@ -2000,11 +2000,11 @@ void tms3202x_device::execute_run()
 	if (m_idle && m_IFR && m_icount > 0)
 		m_icount -= process_IRQs();
 
-	while (m_idle && m_icount > 0)
-		process_timer(m_icount);
-
-	if (m_icount <= 0) debugger_instruction_hook(m_PC);
-
+	if (m_idle) {
+		debugger_wait_hook();
+		while (m_idle && m_icount > 0)
+			process_timer(m_icount);
+	}
 
 	while (m_icount > 0)
 	{

@@ -287,4 +287,4 @@ ROM_START( ibm5550 )
 	ROM_LOAD("chargen.rom", 0x00000, 0x20000, NO_DUMP )
 ROM_END
 
-COMP( 1983, ibm5550, 0, 0, ibm5550, ibm5550, ibm5550_state, empty_init, "International Business Machines", "Multistation 5550", MACHINE_IS_SKELETON )
+COMP( 1983, ibm5550, 0, 0, ibm5550, ibm5550, ibm5550_state, empty_init, "International Business Machines", "Multistation 5550", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

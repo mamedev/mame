@@ -95,4 +95,4 @@ ROM_END
 
 
 //   YEAR  NAME   PARENT/COMPAT MACHINE  INPUT    CLASS             INIT COMPANY  FULLNAME                                    FLAGS
-SYST(19??, vo5850pm,    0, 0,   umatic, umatic, umatic_state, empty_init, "Sony", "U-Matic Videocassette Recorder VO-5850PM",  MACHINE_IS_SKELETON)
+SYST(19??, vo5850pm,    0, 0,   umatic, umatic, umatic_state, empty_init, "Sony", "U-Matic Videocassette Recorder VO-5850PM",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

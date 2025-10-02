@@ -16,156 +16,165 @@ xavix_math_device::xavix_math_device(const machine_config &mconfig, const char *
 
 void xavix_math_device::device_start()
 {
-	save_item(NAME(m_barrel_params));
-	save_item(NAME(m_multparams));
+	save_item(NAME(m_mpr));
+	save_item(NAME(m_mpd));
+	save_item(NAME(m_mad));
+	save_item(NAME(m_sgn_mpd));
+	save_item(NAME(m_sgn_mpr));
 	save_item(NAME(m_multresults));
 }
 
 void xavix_math_device::device_reset()
 {
-	m_barrel_params[0] = 0x00;
-	m_barrel_params[1] = 0x00;
-
-	std::fill(std::begin(m_multparams), std::end(m_multparams), 0x00);
+	m_mpr = 0;
+	m_mpd = 0;
+	m_mad = 0;
+	m_sgn_mpd = 0;
+	m_sgn_mpr = 0;
 	std::fill(std::begin(m_multresults), std::end(m_multresults), 0x00);
 }
-
 
 // epo_guru uses this for ground movement in 3d stages (and other places)
 uint8_t xavix_math_device::barrel_r(offs_t offset)
 {
+	uint8_t ret = 0;
 	if (offset == 0)
 	{
-		// or upper bits of result?
-		LOG("%s: reading shift trigger?!\n", machine().describe_context());
-		return 0x00;
+		ret = (m_sgn_mpd ? 0x80 : 0x00) | (m_mpr & 0x40) | (m_mpr & 0x07);
 	}
 	else
 	{
-		uint8_t retdata = m_barrel_params[1];
-		LOG("%s: reading shift results/data %02x\n", machine().describe_context(), retdata);
-		return retdata;
+		ret = (m_mpr & 0x40) ?
+			m_multresults[1] ^ m_multresults[0] : (m_mpr & 0x08) ?
+			m_multresults[1] : m_multresults[0];
 	}
+
+	LOG("%s: reading shift results/data %d %02x\n", machine().describe_context(), offset, ret);
+	return ret;
 }
 
 // epo_guru 3d stages still flicker a lot with this, but it seems unrelated to the calculations here, possibly a raster timing issue
-// the pickup animations however don't seem to play, which indicates this could still be wrong.
 void xavix_math_device::barrel_w(offs_t offset, uint8_t data)
 {
-	LOG("%s: barrel_w %02x\n", machine().describe_context(), data);
+	LOG("%s: barrel_w %d %02x\n", machine().describe_context(), offset, data);
 
-	m_barrel_params[offset] = data;
-
-	// offset 0 = trigger
 	if (offset == 0)
 	{
-		int shift_data = m_barrel_params[1];
-		int shift_amount = data & 0x0f;
-		int shift_param = (data & 0xf0) >> 4;
-
-		if (shift_param == 0x00) // just a shift? (definitely right for 'hammer throw'
-		{
-			// used in epo_guru for 'hammer throw', 'pre-title screen', 'mini game select', '3d chase game (floor scroll, pickups, misc)', 'toilet roll mini game (when you make an error)'
-
-			if (shift_amount & 0x08)
-			{
-				m_barrel_params[1] = (shift_data >> (shift_amount & 0x7));
-			}
-			else
-			{
-				m_barrel_params[1] = (shift_data << (shift_amount & 0x7));
-			}
-		}
-		else if (shift_param == 0x8) // rotate? (should it rotate through a carry bit of some kind?)
-		{
-			// used in epo_guru for '3d chase game' (unsure of actual purpose in it)
-			switch (shift_amount)
-			{
-			case 0x0: m_barrel_params[1] = shift_data; break;
-			case 0x1: m_barrel_params[1] = (shift_data << 1) | ((shift_data >> 7) & 0x01); break;
-			case 0x2: m_barrel_params[1] = (shift_data << 2) | ((shift_data >> 6) & 0x03); break;
-			case 0x3: m_barrel_params[1] = (shift_data << 3) | ((shift_data >> 5) & 0x07); break;
-			case 0x4: m_barrel_params[1] = (shift_data << 4) | ((shift_data >> 4) & 0x0f); break;
-			case 0x5: m_barrel_params[1] = (shift_data << 5) | ((shift_data >> 3) & 0x1f); break;
-			case 0x6: m_barrel_params[1] = (shift_data << 6) | ((shift_data >> 2) & 0x2f); break;
-			case 0x7: m_barrel_params[1] = (shift_data << 7) | ((shift_data >> 1) & 0x3f); break;
-			case 0x8: m_barrel_params[1] = shift_data; break;
-			case 0x9: m_barrel_params[1] = (shift_data >> 1) | ((shift_data & 0x01) << 7); break;
-			case 0xa: m_barrel_params[1] = (shift_data >> 2) | ((shift_data & 0x03) << 6); break;
-			case 0xb: m_barrel_params[1] = (shift_data >> 3) | ((shift_data & 0x07) << 5); break;
-			case 0xc: m_barrel_params[1] = (shift_data >> 4) | ((shift_data & 0x0f) << 4); break;
-			case 0xd: m_barrel_params[1] = (shift_data >> 5) | ((shift_data & 0x1f) << 3); break;
-			case 0xe: m_barrel_params[1] = (shift_data >> 6) | ((shift_data & 0x2f) << 2); break;
-			case 0xf: m_barrel_params[1] = (shift_data >> 7) | ((shift_data & 0x3f) << 1); break;
-			}
-		}
+		m_mad = 0;
+		m_sgn_mpd = data & 0x80;
+		m_sgn_mpr = 0;
+		m_mpr = data;
+		do_math(true);
+	}
+	else
+	{
+		m_mpd = data;
 	}
 }
 
-
-
 uint8_t xavix_math_device::mult_r(offs_t offset)
 {
-	return m_multresults[offset];
+	uint8_t ret = m_multresults[offset];
+	LOG("%s: mult_r %d %02x (read result)\n", machine().describe_context(), offset, ret);
+	return ret;
 }
 
 void xavix_math_device::mult_w(offs_t offset, uint8_t data)
 {
+	LOG("%s: mult_w %d %02x (write result)\n", machine().describe_context(), offset, data);
 	// rad_madf writes here to set the base value which the multiplication result gets added to
 	m_multresults[offset] = data;
 }
 
 uint8_t xavix_math_device::mult_param_r(offs_t offset)
 {
-	return m_multparams[offset];
+	uint8_t ret = 0;
+
+	if (offset == 0)
+	{
+		ret = m_mad | (m_sgn_mpd ? 0x02 : 0x00) | m_sgn_mpr;
+	}
+	else if (offset == 1)
+	{
+		ret = m_mpd;
+	}
+	else
+	{
+		ret = m_mpr;
+	}
+
+	LOG("%s: mult_param_r %d %02x (read parameters)\n", machine().describe_context(), offset, ret);
+	return ret;
+}
+
+void xavix_math_device::do_math(bool mul_shf)
+{
+	uint16_t result = 0;
+	uint8_t mpd = m_mpd;
+	uint8_t mulinp;
+
+	if (!mul_shf)
+	{
+		mulinp = m_mpr;
+	}
+	else
+	{
+		mulinp = 1 << (m_mpr & 0x7);
+	}
+
+	if (m_sgn_mpd && (mpd & 0x80) && m_sgn_mpr && (mulinp & 0x80))
+	{
+		result = mpd * mulinp - (mpd << 8) - (mulinp << 8);
+	}
+	else if (m_sgn_mpd && (mpd & 0x80))
+	{
+		result = mpd * mulinp - (mulinp << 8);
+	}
+	else if (m_sgn_mpr && (mulinp & 0x80))
+	{
+		result = mpd * mulinp - (mpd << 8);
+	}
+	else
+	{
+		result = mpd * mulinp;
+	}
+
+	if (m_mad)
+	{
+		uint16_t oldresult = (m_multresults[1] << 8) | m_multresults[0];
+		result = oldresult + result;
+	}
+
+	m_multresults[1] = (result >> 8) & 0xff;
+	m_multresults[0] = result & 0xff;
 }
 
 void xavix_math_device::mult_param_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	COMBINE_DATA(&m_multparams[offset]);
 	// there are NOPs after one of the writes, so presumably the operation is write triggerd and not intstant
 	// see test code at 0184a4 in monster truck
 
 	// offset0 is control
 
-	// mm-- --Ss
-	// mm = mode, S = sign for param1, s = sign for param2
-	// modes 00 = multiply (regular?) 11 = add to previous 01 / 10 unknown (maybe subtract?)
+	// m?-- --Ss
+	// m = mode, S = sign for param1, s = sign for param2
+	LOG("%s: mult_param_w %d %02x (write param1 and trigger)\n", machine().describe_context(), offset, data);
 
-	if (offset == 2)
+	if (offset == 0)
 	{
-		// assume 0 is upper bits, might be 'mode' instead, check
+		m_mad = data & 0x80;
+		// sometimes 0x40 is set along with 0x80, sometimes only 0x80, why? is it important?
 
-
-		int signmode = (m_multparams[0] & 0x3f);
-
-		uint16_t result = 0;
-
-		// rad_madf uses this mode (add to previous result)
-		if ((m_multparams[0] & 0xc0) == 0xc0)
-		{
-			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
-			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
-
-			result = param1 * param2;
-
-			uint16_t oldresult = (m_multresults[1] << 8) | m_multresults[0];
-			result = oldresult + result;
-		}
-		else if ((m_multparams[0] & 0xc0) == 0x00)
-		{
-			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
-			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
-
-			result = param1 * param2;
-		}
-		else
-		{
-			popmessage("unknown multiplier mode %02x", m_multparams[0] & 0xc0);
-		}
-
-		m_multresults[1] = (result >> 8) & 0xff;
-		m_multresults[0] = result & 0xff;
+		m_sgn_mpd = data & 0x02;
+		m_sgn_mpr = data & 0x01;
+	}
+	else if (offset == 1)
+	{
+		m_mpd = data;
+	}
+	else if (offset == 2)
+	{
+		m_mpr = data;
+		do_math(false);
 	}
 }
-

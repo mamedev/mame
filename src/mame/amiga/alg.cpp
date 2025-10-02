@@ -51,7 +51,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/ldp1450.h"
 #include "machine/nvram.h"
-#include "machine/amigafdc.h"
 #include "speaker.h"
 
 
@@ -86,6 +85,8 @@ public:
 	void alg_r1(machine_config &config);
 
 protected:
+	virtual void video_start() override ATTR_COLD;
+
 	// amiga_state overrides
 	virtual void potgo_w(uint16_t data) override;
 
@@ -100,8 +101,6 @@ private:
 	uint16_t m_input_select;
 
 	int get_lightgun_pos(int player, int *x, int *y);
-
-	DECLARE_VIDEO_START(alg);
 
 	void a500_mem(address_map &map) ATTR_COLD;
 	void main_map_picmatic(address_map &map) ATTR_COLD;
@@ -141,7 +140,7 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
  *
  *************************************/
 
-VIDEO_START_MEMBER(alg_state,alg)
+void alg_state::video_start()
 {
 	// Standard video start
 	VIDEO_START_CALL_MEMBER(amiga);
@@ -341,7 +340,7 @@ void alg_state::alg_r1(machine_config &config)
 	// Video hardware
 	ntsc_video(config);
 
-	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
+	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
 	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(false);
@@ -354,22 +353,19 @@ void alg_state::alg_r1(machine_config &config)
 	// FIXME: should be 4096
 	PALETTE(config, m_palette, FUNC(alg_state::amiga_palette), 4097);
 
-	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)
-
 	// Sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	PAULA_8364(config, m_paula, amiga_state::CLK_C1_NTSC);
-	m_paula->add_route(0, "lspeaker", 0.25);
-	m_paula->add_route(1, "rspeaker", 0.25);
-	m_paula->add_route(2, "rspeaker", 0.25);
-	m_paula->add_route(3, "lspeaker", 0.25);
+	m_paula->add_route(0, "speaker", 0.25, 0);
+	m_paula->add_route(1, "speaker", 0.25, 1);
+	m_paula->add_route(2, "speaker", 0.25, 1);
+	m_paula->add_route(3, "speaker", 0.25, 0);
 	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	// cia
 	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
@@ -380,7 +376,7 @@ void alg_state::alg_r1(machine_config &config)
 	MOS8520(config, m_cia_1, amiga_state::CLK_E_NTSC);
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
-	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
+	PAULA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
 	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));

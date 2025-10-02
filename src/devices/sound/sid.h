@@ -63,7 +63,7 @@ struct SID6581_t
 	int port_r(running_machine &machine, int offset);
 	void port_w(int offset, int data);
 
-	void fill_buffer(write_stream_view &buffer);
+	void fill_buffer(sound_stream &stream);
 
 private:
 	void syncEm();

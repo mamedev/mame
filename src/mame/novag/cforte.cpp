@@ -170,6 +170,7 @@ u8 cforte_state::input2_r()
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read() << 6;
 
+	// d0-d2: printer
 	// other: ?
 	return ~data;
 }
@@ -183,8 +184,8 @@ u8 cforte_state::input2_r()
 void cforte_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x1c00, 0x1c00).nopw(); // accessory?
-	map(0x1d00, 0x1d00).nopw(); // "
+	map(0x1c00, 0x1c00).nopw(); // printer
+	map(0x1d00, 0x1d00).nopw(); // printer
 	map(0x1e00, 0x1e00).rw(FUNC(cforte_state::input2_r), FUNC(cforte_state::mux_w));
 	map(0x1f00, 0x1f00).rw(FUNC(cforte_state::input1_r), FUNC(cforte_state::control_w));
 	map(0x2000, 0xffff).rom();

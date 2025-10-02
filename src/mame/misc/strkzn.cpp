@@ -87,4 +87,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, strkzn, 0, strkzn, strkzn, strkzn_state, empty_init, ROT0, "Purple Star", "Strike Zone (Purple Star)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1994, strkzn, 0, strkzn, strkzn, strkzn_state, empty_init, ROT0, "Purple Star", "Strike Zone (Purple Star)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

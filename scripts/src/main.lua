@@ -48,11 +48,24 @@ end
 	}
 
 	if _OPTIONS["SYMBOLS"] then
+		local llvm_obdjump = false
+		local objdump_ver = backtick('objdump --version')
+		if string.match(objdump_ver, 'LLVM version ') then
+			llvm_obdjump = true
+		end
+
 		configuration { "mingw*" }
-			postbuildcommands {
-				"$(SILENT) echo Dumping symbols.",
-				"$(SILENT) objdump --section=.text --line-numbers --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
-			}
+			if llvm_obdjump then
+				postbuildcommands {
+					"$(SILENT) echo Dumping symbols.",
+					"$(SILENT) " .. PYTHON .. " " .. MAME_DIR .. "scripts/build/llvm-objdump-filter.py $(TARGET) | c++filt >$(subst .exe,.sym,$(TARGET))"
+				}
+			else
+				postbuildcommands {
+					"$(SILENT) echo Dumping symbols.",
+					"$(SILENT) objdump --section=.text --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
+				}
+			end
 	end
 
 	configuration { "Release" }
@@ -151,7 +164,7 @@ end
 		ext_lib("jpeg"),
 		"7z",
 	}
-if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+if CPU_INCLUDE_DRC_NATIVE then
 	links {
 		"asmjit",
 	}
@@ -220,14 +233,6 @@ end
 		GEN_DIR  .. "resource",
 	}
 
-	configuration { "vs20*"}
-		-- See https://github.com/bkaradzic/GENie/issues/544
-		includedirs {
-			MAME_DIR .. "scripts/resources/windows/" .. _target,
-			GEN_DIR  .. "resource",
-		}
-	configuration { }
-
 
 if (STANDALONE==true) then
 	standalone();
@@ -269,12 +274,6 @@ if (STANDALONE~=true) then
 		resincludedirs {
 			MAME_DIR .. "scripts/resources/windows/mame",
 		}
-		configuration { "vs20*"}
-			-- See https://github.com/bkaradzic/GENie/issues/544
-			includedirs {
-				MAME_DIR .. "scripts/resources/windows/mame",
-			}
-		configuration { }
 	end
 
 	local mainfile = MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".cpp"

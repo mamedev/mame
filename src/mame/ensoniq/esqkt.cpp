@@ -273,13 +273,12 @@ void esqkt_state::kt(machine_config &config)
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ESQ_5505_5510_PUMP(config, m_pump, 16_MHz_XTAL / (16 * 32));
 	m_pump->set_esp(m_esp);
-	m_pump->add_route(0, "lspeaker", 1.0);
-	m_pump->add_route(1, "rspeaker", 1.0);
+	m_pump->add_route(0, "speaker", 1.0, 0);
+	m_pump->add_route(1, "speaker", 1.0, 1);
 
 	auto &es5506a(ES5506(config, "ensoniq1", 16_MHz_XTAL));
 	es5506a.sample_rate_changed().set(FUNC(esqkt_state::es5506_clock_changed)); // TODO : Sync with 2 chips?
@@ -305,14 +304,14 @@ void esqkt_state::kt(machine_config &config)
 	es5506b.set_region2("waverom3"); /* Bank 0 */
 	es5506b.set_region3("waverom4"); /* Bank 1 */
 	es5506b.set_channels(4);          /* channels */
-	es5506b.add_route(0, "lspeaker", 1.0);
-	es5506b.add_route(1, "rspeaker", 1.0);
-	es5506b.add_route(2, "lspeaker", 1.0);
-	es5506b.add_route(3, "rspeaker", 1.0);
-	es5506b.add_route(4, "lspeaker", 1.0);
-	es5506b.add_route(5, "rspeaker", 1.0);
-	es5506b.add_route(6, "lspeaker", 1.0);
-	es5506b.add_route(7, "rspeaker", 1.0);
+	es5506b.add_route(0, "speaker", 1.0, 0);
+	es5506b.add_route(1, "speaker", 1.0, 1);
+	es5506b.add_route(2, "speaker", 1.0, 0);
+	es5506b.add_route(3, "speaker", 1.0, 1);
+	es5506b.add_route(4, "speaker", 1.0, 0);
+	es5506b.add_route(5, "speaker", 1.0, 1);
+	es5506b.add_route(6, "speaker", 1.0, 0);
+	es5506b.add_route(7, "speaker", 1.0, 1);
 }
 
 void esqkt_state::ts(machine_config &config)
@@ -338,13 +337,12 @@ void esqkt_state::ts(machine_config &config)
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ESQ_5505_5510_PUMP(config, m_pump, 16_MHz_XTAL / (16 * 32));
 	m_pump->set_esp(m_esp);
-	m_pump->add_route(0, "lspeaker", 1.0);
-	m_pump->add_route(1, "rspeaker", 1.0);
+	m_pump->add_route(0, "speaker", 1.0, 0);
+	m_pump->add_route(1, "speaker", 1.0, 1);
 
 	auto &es5506a(ES5506(config, "ensoniq", 16_MHz_XTAL));
 	es5506a.sample_rate_changed().set(FUNC(esqkt_state::es5506_clock_changed));

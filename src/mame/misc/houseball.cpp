@@ -93,4 +93,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME       PARENT MACHINE    INPUT       CLASS            INIT        ROT   COMPANY   FULLNAME       FLAGS
-GAME(1989, houseball, 0,     houseball, houseball,  houseball_state, empty_init, ROT0, "Olakoa", "House Ball",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, houseball, 0,     houseball, houseball,  houseball_state, empty_init, ROT0, "Olakoa", "House Ball",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

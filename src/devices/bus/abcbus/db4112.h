@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_ABCBUS_DATABOARD_4112_H
-#define MAME_BUS_ABCBUS_DATABOARD_4112_H
+#ifndef MAME_BUS_ABCBUS_DB4112_H
+#define MAME_BUS_ABCBUS_DB4112_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DATABOARD_4112, abc_databoard_4112_device)
 
-#endif // MAME_BUS_ABCBUS_DATABOARD_4112_H
+#endif // MAME_BUS_ABCBUS_DB4112_H

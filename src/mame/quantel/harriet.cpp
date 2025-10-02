@@ -136,4 +136,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1990, harriet, 0, 0, harriet, harriet, harriet_state, empty_init, "Quantel", "Harriet", MACHINE_IS_SKELETON )
+COMP( 1990, harriet, 0, 0, harriet, harriet, harriet_state, empty_init, "Quantel", "Harriet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -103,7 +103,7 @@ void clxvme186_state::clxvme186(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &clxvme186_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &clxvme186_state::io_map);
 
-	SCC8530N(config, "scc", 3.6864_MHz_XTAL);
+	SCC8530(config, "scc", 3.6864_MHz_XTAL);
 
 	M3000(config, "rtc", 32.768_kHz_XTAL);
 
@@ -121,4 +121,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1983, clxvme186, 0, 0, clxvme186, clxvme186, clxvme186_state, empty_init, "Colex", "Colex VME-80186", MACHINE_IS_SKELETON)
+COMP(1983, clxvme186, 0, 0, clxvme186, clxvme186, clxvme186_state, empty_init, "Colex", "Colex VME-80186", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -287,6 +287,7 @@ void sh2_device::execute_run()
 
 	if (m_cpu_off)
 	{
+		debugger_wait_hook();
 		m_sh2_state->icount = 0;
 		return;
 	}
@@ -690,7 +691,7 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 
 	UML_LABEL(block, label++);              // label:
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 	{
 		for (auto & elem : m_fastram)
 		{

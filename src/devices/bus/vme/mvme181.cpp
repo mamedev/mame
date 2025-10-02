@@ -73,17 +73,13 @@ void vme_mvme181_card_device::device_start()
 	m_cpu->space(AS_PROGRAM).install_read_tap(0xff820000, 0xff82001f, "rtc",
 		[this](offs_t offset, u32 &data, u32 mem_mask)
 		{
-			if (!m_rtc->chip_enable())
+			if (ACCESSING_BITS_24_31)
 			{
-				if (BIT(offset, 2))
-					m_rtc->read_1();
+				if (m_rtc->ceo_r())
+					data = (data & 0x00ffffffU) | u32(m_rtc->read(offset >> 2)) << 24;
 				else
-					m_rtc->read_0();
+					m_rtc->read(offset >> 2);
 			}
-			else if (BIT(offset, 4))
-				data = u32(m_rtc->read_data()) << 24;
-			else
-				m_rtc->write_data(BIT(offset, 2));
 		});
 }
 
@@ -102,7 +98,7 @@ void vme_mvme181_card_device::device_add_mconfig(machine_config &config)
 	MC88200(config, m_mmu[0], 40_MHz_XTAL / 2, 0x7e).set_mbus(m_cpu, AS_PROGRAM);
 	MC88200(config, m_mmu[1], 40_MHz_XTAL / 2, 0x7f).set_mbus(m_cpu, AS_PROGRAM);
 
-	DS1315(config, m_rtc, 0); // DS1216
+	DS1216E(config, m_rtc);
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL); // SCC68692C1A44
 	m_duart->irq_cb().set(FUNC(vme_mvme181_card_device::irq_w<6>));

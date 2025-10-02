@@ -1187,14 +1187,14 @@ void xa_cpu::aluop_byte_rdoff8_rs(int alu_op, u8 rd, u8 offset8, u8 rs)
 	}
 }
 
-void xa_cpu::add_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { fatalerror("ADD.w [%s+#$%02x], %s", m_regnames16[rd], offset8, m_regnames16[rs]);}
-void xa_cpu::addc_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs){ fatalerror("ADDC.w [%s+#$%02x], %s", m_regnames16[rd], offset8, m_regnames16[rs]);}
-void xa_cpu::sub_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { fatalerror("SUB.w [%s+#$%02x], %s", m_regnames16[rd], offset8, m_regnames16[rs]);}
-void xa_cpu::subb_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs){ fatalerror("SUBB.w [%s+#$%02x], %s", m_regnames16[rd], offset8, m_regnames16[rs]);}
-void xa_cpu::cmp_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { fatalerror("CMP.w [%s+#$%02x], %s", m_regnames16[rd], offset8, m_regnames16[rs]);}
-void xa_cpu::and_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { fatalerror("AND.w [%s+#$%02x], %s", m_regnames16[rd], offset8, m_regnames16[rs]);}
-void xa_cpu::or_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs)  { fatalerror("OR.w [%s+#$%02x], %s", m_regnames16[rd], offset8, m_regnames16[rs]);}
-void xa_cpu::xor_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { fatalerror("XOR.w [%s+#$%02x], %s", m_regnames16[rd], offset8, m_regnames16[rs]);}
+void xa_cpu::add_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u16 val = rdat16(address); u16 rsval = gr16(rs); u16 result = do_add_16(val, rsval); wdat16(address, result); cy(6); }
+void xa_cpu::addc_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs){ u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u16 val = rdat16(address); u16 rsval = gr16(rs); u16 result = do_addc_16(val, rsval); wdat16(address, result); cy(6); }
+void xa_cpu::sub_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u16 val = rdat16(address); u16 rsval = gr16(rs); u16 result = do_sub_16(val, rsval); wdat16(address, result); cy(6); }
+void xa_cpu::subb_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs){ u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u16 val = rdat16(address); u16 rsval = gr16(rs); u16 result = do_subb_16(val, rsval); wdat16(address, result); cy(6); }
+void xa_cpu::cmp_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u16 val = rdat16(address); u16 rsval = gr16(rs); do_sub_16(val, rsval); cy(6); }
+void xa_cpu::and_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u16 val = rdat16(address); u16 rsval = gr16(rs); u16 result = do_and_16(val, rsval); wdat16(address, result); cy(6); }
+void xa_cpu::or_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs)  { u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u16 val = rdat16(address); u16 rsval = gr16(rs); u16 result = do_or_16(val, rsval); wdat16(address, result); cy(6); }
+void xa_cpu::xor_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; u16 val = rdat16(address); u16 rsval = gr16(rs); u16 result = do_xor_16(val, rsval); wdat16(address, result); cy(6); }
 void xa_cpu::mov_word_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { u16 val = gr16(rs); u16 fulloffset = util::sext(offset8, 8); u16 address = get_addr(rd) + fulloffset; do_nz_flags_16(val); wdat16(address, val); cy(5); }
 
 void xa_cpu::add_byte_rdoff8_rs(u8 rd, u8 offset8, u8 rs) { fatalerror("ADD.b [%s+#$%02x], %s", m_regnames16[rd], offset8, m_regnames8[rs]);}
@@ -1523,13 +1523,13 @@ void xa_cpu::bne_rel8(u8 rel8) { if (get_z_flag() == 0) { set_pc_in_current_page
 // BEQ rel8                    Branch if the zero flag is set                                          2 6t/3nt    1111 0011  rrrr rrrr
 void xa_cpu::beq_rel8(u8 rel8) { if (get_z_flag()) { set_pc_in_current_page(expand_rel8(rel8)); cy(6); } else { cy(3); } }
 // BNV rel8                    Branch if overflow flag is clear                                        2 6t/3nt    1111 0100  rrrr rrrr
-void xa_cpu::bnv_rel8(u8 rel8) { fatalerror("BNV %04x\n", expand_rel8(rel8)); }
+void xa_cpu::bnv_rel8(u8 rel8) { if (!get_v_flag()) { set_pc_in_current_page(expand_rel8(rel8)); cy(6); } else { cy(3); } }
 // BOV rel8                    Branch if overflow flag is set                                          2 6t/3nt    1111 0101  rrrr rrrr
-void xa_cpu::bov_rel8(u8 rel8) { fatalerror("BOV %04x\n", expand_rel8(rel8)); }
+void xa_cpu::bov_rel8(u8 rel8) { if (get_v_flag()) { set_pc_in_current_page(expand_rel8(rel8)); cy(6); } else { cy(3); } }
 // BPL rel8                    Branch if the negative flag is clear                                    2 6t/3nt    1111 0110  rrrr rrrr
 void xa_cpu::bpl_rel8(u8 rel8) { if (!get_n_flag()) { set_pc_in_current_page(expand_rel8(rel8)); cy(6); } else { cy(3); } }
 // BMI rel8                    Branch if the negative flag is set                                      2 6t/3nt    1111 0111  rrrr rrrr
-void xa_cpu::bmi_rel8(u8 rel8) { fatalerror("BMI %04x\n", expand_rel8(rel8)); }
+void xa_cpu::bmi_rel8(u8 rel8) { if (get_n_flag()) { set_pc_in_current_page(expand_rel8(rel8)); cy(6); } else { cy(3); } }
 // BG rel8                     Branch if greater than (unsigned)                                       2 6t/3nt    1111 1000  rrrr rrrr
 void xa_cpu::bg_rel8(u8 rel8) { fatalerror("BG %04x\n", expand_rel8(rel8)); }
 // BL rel8                     Branch if less than or equal to (unsigned)                              2 6t/3nt    1111 1001  rrrr rrrr

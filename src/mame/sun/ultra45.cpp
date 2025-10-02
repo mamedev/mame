@@ -80,4 +80,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR, NAME,    PARENT, COMPAT, MACHINE, INPUT,   CLASS,         INIT,       COMPANY,            FULLNAME,   FLAGS
-COMP( 1996, ultra45, 0,      0,      ultra45, ultra45, ultra45_state, empty_init, "Sun Microsystems", "Ultra 45", MACHINE_IS_SKELETON )
+COMP( 1996, ultra45, 0,      0,      ultra45, ultra45, ultra45_state, empty_init, "Sun Microsystems", "Ultra 45", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

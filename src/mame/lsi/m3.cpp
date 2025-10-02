@@ -31,31 +31,33 @@
 
     TODO:
     - Initial PC is currently hacked to f000
-    - Verify/fix floppy hookup (CPU needs to be overclocked?)
+    - Verify/fix floppy hookup
     - Printer interface
     - Buzzer
     - Map the rest of the keys, verify existing keys
     - Switch FDC to 1 MHz for 5.25" drives
 
     Notes:
-    - No offical software available, but a custom version of CP/M
     - Y to boot from floppy, ESC to enter monitor, any other key to
       boot from IDE
 
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "machine/i8255.h"
-#include "machine/i8251.h"
-#include "machine/wd_fdc.h"
-#include "video/mc6845.h"
 #include "imagedev/floppy.h"
-#include "bus/rs232/rs232.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80ctc.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 
 namespace {
@@ -68,8 +70,8 @@ namespace {
 class m3_state : public driver_device
 {
 public:
-	m3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ctc(*this, "ctc"),
 		m_ppi(*this, "ppi%u", 0U),
@@ -126,7 +128,9 @@ private:
 	void fdc_drq_w(int state);
 	uint8_t fdc_data_r(offs_t offset);
 	void fdc_data_w(offs_t offset, uint8_t data);
-	bool m_nmi_taken = 0;
+
+	bool m_nmi_enabled = false;
+	bool m_nmi_taken = false;
 };
 
 
@@ -451,8 +455,8 @@ void m3_state::fdc_intrq_w(int state)
 {
 	if (state)
 	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 		m_nmi_taken = false;
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	m_ctc->trg1(state);
@@ -461,22 +465,25 @@ void m3_state::fdc_intrq_w(int state)
 void m3_state::fdc_drq_w(int state)
 {
 	if (state)
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-
-	if (state && !m_nmi_taken)
 	{
-		m_nmi_taken = true;
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+
+		if (m_nmi_enabled)
+		{
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+			m_nmi_enabled = false;
+			m_nmi_taken = true;
+		}
 	}
 }
 
 uint8_t m3_state::fdc_data_r(offs_t offset)
 {
-	if ((m_fdc->drq_r() == 0) && m_nmi_taken)
+	if (m_nmi_taken && m_fdc->drq_r() == 0)
 	{
-		// cpu tries to read data without drq, halt it and reset pc
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_maincpu->set_state_int(Z80_PC, m_maincpu->state_int(Z80_PC) - 2);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->retry_access();
 
 		return 0;
 	}
@@ -486,13 +493,10 @@ uint8_t m3_state::fdc_data_r(offs_t offset)
 
 void m3_state::fdc_data_w(offs_t offset, uint8_t data)
 {
-	if ((m_fdc->drq_r() == 0) && m_nmi_taken)
+	if (m_nmi_taken && m_fdc->drq_r() == 0)
 	{
-		// cpu tries to write data without drq, halt it and reset pc
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_maincpu->set_state_int(Z80_PC, m_maincpu->state_int(Z80_PC) - 2);
-
-		return;
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->retry_access();
 	}
 
 	m_fdc->data_w(data);
@@ -505,7 +509,7 @@ void m3_state::ppi2_pa_w(uint8_t data)
 	// 7-------  not used?
 	// -6------  buzzer
 	// --5-----  not used?
-	// ---4----  unknown (motor?)
+	// ---4----  nmi enable
 	// ----3---  unknown
 	// -----2--  floppy side
 	// ------10  drive select
@@ -521,6 +525,8 @@ void m3_state::ppi2_pa_w(uint8_t data)
 
 	if (floppy)
 		floppy->ss_w(BIT(data, 2));
+
+	m_nmi_enabled = bool(BIT(~data, 4));
 }
 
 uint8_t m3_state::ppi2_pb_r()
@@ -534,6 +540,7 @@ void m3_state::machine_start()
 	save_item(NAME(m_kbd_col));
 	save_item(NAME(m_kbd_row));
 	save_item(NAME(m_kbd_data));
+	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_nmi_taken));
 }
 
@@ -541,13 +548,8 @@ void m3_state::machine_reset()
 {
 	m_maincpu->set_pc(0xf000);
 
+	m_nmi_enabled = false;
 	m_nmi_taken = false;
-
-	// floppy motor is always on
-	if (m_floppy[0])
-		m_floppy[0]->get_device()->mon_w(0);
-	if (m_floppy[1])
-		m_floppy[1]->get_device()->mon_w(0);
 }
 
 
@@ -561,8 +563,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static DEVICE_INPUT_DEFAULTS_START( rs232_defaults )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+static DEVICE_INPUT_DEFAULTS_START( rs232_printer_defaults )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
@@ -582,7 +583,6 @@ static void m3_floppies(device_slot_interface &device)
 void m3_state::m3(machine_config &config)
 {
 	Z80(config, m_maincpu, 4.9152_MHz_XTAL / 2);
-	m_maincpu->set_clock_scale(1.2f); // needs to be overclocked or its too slow for the floppy
 	m_maincpu->set_addrmap(AS_PROGRAM, &m3_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &m3_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
@@ -605,7 +605,7 @@ void m3_state::m3(machine_config &config)
 	usart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(rs232_defaults));
+	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(rs232_printer_defaults));
 	rs232.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set("usart", FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set("usart", FUNC(i8251_device::write_cts));
@@ -632,6 +632,8 @@ void m3_state::m3(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(m3_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", m3_floppies, "sa850", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", m3_floppies, "sa850", floppy_image_device::default_mfm_floppy_formats);
+
+	SOFTWARE_LIST(config, "floppy_list").set_original("m3");
 
 	// keyboard
 	I8035(config, m_kbdmcu, 6.144_MHz_XTAL);

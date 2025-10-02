@@ -409,7 +409,7 @@ static INPUT_PORTS_START( subs )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("lscreen")
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("lscreen", FUNC(screen_device::vblank))
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -501,10 +501,9 @@ void subs_state::subs(machine_config &config)
 
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	ls259_device &latch(LS259(config, "latch")); // C9
 	latch.q_out_cb<0>().set_output("led0").invert(); // START LAMP 1

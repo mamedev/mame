@@ -61,4 +61,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1990, xm200, 0, 0, xm200, xm200, xm200_state, empty_init, "Orla", "XM200 Orchestra Module", MACHINE_IS_SKELETON)
+SYST(1990, xm200, 0, 0, xm200, xm200, xm200_state, empty_init, "Orla", "XM200 Orchestra Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

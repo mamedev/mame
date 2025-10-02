@@ -147,7 +147,7 @@ ROM_END
 } // Anonymous namespace
 
 //   YEAR  NAME         PARENT    COMPAT       MACHINE   INPUT         CLASS       INIT  COMPANY  FULLNAME                                                        FLAGS
-GAME(1999, scrpiond,    0,        scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Jun 15, 1999)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, scrpionda,   scrpiond, scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Oct 01, 1997)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993, scrpiondb,   scrpiond, scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Dec 24, 1993)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992, pubtimed2ch, 0,        scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Pub Time Darts II Plus 2 with Solo Challenger (Mar 24, 1992)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1999, scrpiond,    0,        scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Jun 15, 1999)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, scrpionda,   scrpiond, scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Oct 01, 1997)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1993, scrpiondb,   scrpiond, scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Dec 24, 1993)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1992, pubtimed2ch, 0,        scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Pub Time Darts II Plus 2 with Solo Challenger (Mar 24, 1992)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

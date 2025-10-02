@@ -3,9 +3,9 @@
 /*
 
  Lucky Girl (newer 1991 version on different hardware?)
-  -- there is an early 'Lucky Girl' which appears to be running on Nichibutsu like hardware.
+  -- there is an early 'Lucky Girl' which runs on Nichibutsu like hardware.
 
- The program rom extracted from the Z180 also refers to this as Lucky 74..
+ The program ROM extracted from the Z180 also refers to this as Lucky 74..
 
  TODO:
  - sound (what's the sound chip?)
@@ -129,7 +129,6 @@ private:
 	memory_share_creator<uint8_t> m_palette_ram;
 	output_finder<12> m_lamps;
 
-	uint8_t m_nmi_enable;
 	tilemap_t *m_reel_tilemap[4];
 	uint16_t m_palette_index;
 
@@ -145,7 +144,6 @@ private:
 	uint8_t test_r();
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(irq);
 
 	void _7smash_io(address_map &map) ATTR_COLD;
 	void _7smash_map(address_map &map) ATTR_COLD;
@@ -158,8 +156,6 @@ private:
 void luckgrln_state::machine_start()
 {
 	m_lamps.resolve();
-
-	save_item(NAME(m_nmi_enable));
 }
 
 template<uint8_t Reel>
@@ -347,15 +343,8 @@ void luckgrln_state::_7smash_map(address_map &map)
 
 void luckgrln_state::output_w(uint8_t data)
 {
-	data &= 0xc7;
-
-	/* correct? */
-	if (data==0x84)
-		m_nmi_enable = 0;
-	else if (data==0x85)
-		m_nmi_enable = 1;
-	else
-		printf("output_w unk data %02x\n",data);
+	if (data & 0x01)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -636,9 +625,9 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x08, "1 Coin/25 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )
 	PORT_DIPNAME( 0x40, 0x40, "DSW3-40" )               PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -648,9 +637,9 @@ static INPUT_PORTS_START( luckgrln )
 
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x0f, 0x04, "Coin C" )                PORT_DIPLOCATION("DSW4:1,2,3,4")
-	PORT_DIPSETTING(    0x0f, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x0d, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
@@ -659,13 +648,13 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x04, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x03, "1 Coin/20 Credits" )
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )
-	PORT_DIPSETTING(    0x01, "1 Coin/50 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_100C ) )
 	PORT_DIPNAME( 0x70, 0x10, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DSW4:5,6,7")
-	PORT_DIPSETTING(    0x70, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x70, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 5C_1C ) )
@@ -758,19 +747,19 @@ static INPUT_PORTS_START( _7smash )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW3:3,4")
-	PORT_DIPSETTING(    0x0c, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0xf0, 0x00, "Coin C" )          PORT_DIPLOCATION("DSW3:5,6,7,8")
 	PORT_DIPSETTING(    0x00, "1 Coin/200 Credits" )
-	PORT_DIPSETTING(    0x10, "1 Coin/100 Credits" )
-	PORT_DIPSETTING(    0x20, "1 Coin/50 Credits" )
-	PORT_DIPSETTING(    0x30, "1 Coin/25 Credits" )
-	PORT_DIPSETTING(    0x40, "1 Coin/20 Credits" )
-	PORT_DIPSETTING(    0x50, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_10C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
@@ -778,9 +767,9 @@ static INPUT_PORTS_START( _7smash )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0xd0, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0xf0, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 10C_1C ) )
 
 	PORT_START("DSW4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED  )
@@ -845,18 +834,12 @@ static GFXDECODE_START( gfx_luckgrln )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(luckgrln_state::irq)
-{
-	if(m_nmi_enable)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
 void luckgrln_state::luckgrln(machine_config &config)
 {
-	HD647180X(config, m_maincpu, 16000000);
+	HD647180X(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::mainmap);
 	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::luckgrln_io);
-	m_maincpu->set_vblank_int("screen", FUNC(luckgrln_state::irq));
+	m_maincpu->set_vblank_int("screen", FUNC(luckgrln_state::nmi_line_assert));
 	m_maincpu->out_pa_callback().set(FUNC(luckgrln_state::output_w));
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 12_MHz_XTAL / 8)); /* HD6845SP; unknown clock, hand tuned to get ~60 fps */
@@ -903,19 +886,6 @@ void luckgrln_state::init_luckgrln()
 		rom[i] = x;
 	}
 
-	#if 0
-	{
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		FILE *fp = fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(rom, 0x20000, 1, fp);
-			fclose(fp);
-		}
-	}
-	#endif
-
 	// ??
 //  membank("bank1")->set_base(&rom[0x010000]);
 }
@@ -939,15 +909,50 @@ ROM_START( luckgrln )
 	ROM_LOAD( "falcon.6", 0x40000, 0x20000, CRC(bfb02c87) SHA1(1b5ca562ed76eb3f1b4a52d379a6af07e79b6ee5) )
 ROM_END
 
+ROM_START( luckstrn )
+	ROM_REGION( 0x4000, "maincpu", 0 ) // internal Z180 ROM
+	ROM_LOAD( "internal_rom", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "rom_data", 0 ) // external data / CPU ROM
+	ROM_LOAD( "12.t1", 0x00000, 0x20000, CRC(5e7e6a84) SHA1(7d8eb14c7b83b0555ba60065796de7950c612485) )
+
+	ROM_REGION( 0x60000, "reels", 0 )
+	ROM_LOAD( "1.c1", 0x00000, 0x20000, CRC(1fca2f4f) SHA1(e54595e387c3a742ebf777a2c2795c2d64ec166b) ) // 1ST AND 2ND HALF IDENTICAL, half unused, 5bpp
+	ROM_LOAD( "2.e1", 0x20000, 0x20000, CRC(311a1801) SHA1(ed822dc5b38408221dfbde767abd675c53a766f8) )
+	ROM_LOAD( "3.h1", 0x40000, 0x20000, CRC(ae557bbd) SHA1(4b4ddb5fbb36019c4bd0cfab6a229f3ad09ac95a) )
+
+	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_LOAD( "4.l1", 0x00000, 0x20000, CRC(00a1b66d) SHA1(107306689032d5a56fc9337e22a447bad4c371e4) ) // half unused, 5bpp
+	ROM_LOAD( "5.n1", 0x20000, 0x20000, CRC(df29763e) SHA1(5468cccae98aa7e5b141cdb1fc899f418c79f6e7) )
+	ROM_LOAD( "6.r1", 0x40000, 0x20000, CRC(16823fb7) SHA1(e62b5fbf7a105df128dd9dd6d45e59f0ffef5bb8) )
+ROM_END
+
+ROM_START( luckstrna )
+	ROM_REGION( 0x4000, "maincpu", 0 ) // internal Z180 ROM
+	ROM_LOAD( "internal_rom", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "rom_data", 0 ) // external data / CPU ROM
+	ROM_LOAD( "16.t1", 0x00000, 0x20000, CRC(1906dd3e) SHA1(35c7d5a6f2dc6291ab5e40ab56951ac7b384ff16) )
+
+	ROM_REGION( 0x60000, "reels", 0 )
+	ROM_LOAD( "1.c1", 0x00000, 0x20000, CRC(1fca2f4f) SHA1(e54595e387c3a742ebf777a2c2795c2d64ec166b) ) // 1ST AND 2ND HALF IDENTICAL, half unused, 5bpp
+	ROM_LOAD( "2.e1", 0x20000, 0x20000, CRC(311a1801) SHA1(ed822dc5b38408221dfbde767abd675c53a766f8) )
+	ROM_LOAD( "3.h1", 0x40000, 0x20000, CRC(ae557bbd) SHA1(4b4ddb5fbb36019c4bd0cfab6a229f3ad09ac95a) )
+
+	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_LOAD( "4.l1", 0x00000, 0x20000, CRC(00a1b66d) SHA1(107306689032d5a56fc9337e22a447bad4c371e4) ) // half unused, 5bpp
+	ROM_LOAD( "5.n1", 0x20000, 0x20000, CRC(df29763e) SHA1(5468cccae98aa7e5b141cdb1fc899f418c79f6e7) )
+	ROM_LOAD( "6.r1", 0x40000, 0x20000, CRC(16823fb7) SHA1(e62b5fbf7a105df128dd9dd6d45e59f0ffef5bb8) )
+ROM_END
+
 ROM_START( 7smash )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "eagle.8",      0x000000, 0x020000, CRC(b115c5d5) SHA1(3f80613886b7f8092ec914c9bfb416078aca82a3) )
-	ROM_LOAD( "7smash.bin",   0x000000, 0x004000, CRC(58396efa) SHA1(b957d28e321a5c4f9a90e0a7eaf8f01450662c0e) ) // internal Z180 rom
+	ROM_LOAD( "7smash.bin",   0x000000, 0x004000, CRC(58396efa) SHA1(b957d28e321a5c4f9a90e0a7eaf8f01450662c0e) ) // internal Z180 ROM
 
-	ROM_REGION( 0x20000, "rom_data", ROMREGION_ERASEFF ) // external data / cpu rom
+	ROM_REGION( 0x20000, "rom_data", ROMREGION_ERASEFF ) // external data / CPU ROM
 
-
-	ROM_REGION( 0x60000, "reels", ROMREGION_ERASE00 ) // reel gfxs
+	ROM_REGION( 0x60000, "reels", ROMREGION_ERASE00 ) // reel gfx
 	ROM_LOAD( "eagle.3",      0x40000, 0x020000, CRC(d75b3b2f) SHA1(1d90bc17f9e645966126fa19c42a7c4d54098776) )
 	ROM_LOAD( "eagle.2",      0x20000, 0x020000, CRC(211b5acb) SHA1(e35ae6c93a1daa9d3aa46970c5c3d39788f948bb) )
 	ROM_LOAD( "eagle.1",      0x00000, 0x020000, CRC(21317c37) SHA1(7706045b85f86f6e58cc67c2d7dee01d80df3422) )  // half unused, 5bpp
@@ -958,6 +963,22 @@ ROM_START( 7smash )
 	ROM_LOAD( "eagle.4",      0x00000, 0x20000, CRC(dcf92dca) SHA1(87c7d88dc35981ad636376b53264cee87ccdaa71) )  // half unused, 5bpp
 ROM_END
 
+ROM_START( 7smasha ) // this has the full program in the external ROM, even if the PCB has the custom CPU
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "eagle_9.u1", 0x000000, 0x020000, CRC(cfca7e22) SHA1(74b1c83aea6478a49a6b33950e389a4e2e19c16f) )
+
+	ROM_REGION( 0x20000, "rom_data", ROMREGION_ERASEFF ) // external data / CPU ROM
+
+	ROM_REGION( 0x60000, "reels", ROMREGION_ERASE00 ) // reel gfx
+	ROM_LOAD( "eagle_3.1f", 0x40000, 0x020000, CRC(d75b3b2f) SHA1(1d90bc17f9e645966126fa19c42a7c4d54098776) )
+	ROM_LOAD( "eagle_2.1e", 0x20000, 0x020000, CRC(211b5acb) SHA1(e35ae6c93a1daa9d3aa46970c5c3d39788f948bb) )
+	ROM_LOAD( "eagle_1.1c", 0x00000, 0x020000, CRC(21317c37) SHA1(7706045b85f86f6e58cc67c2d7dee01d80df3422) ) // half unused, 5bpp
+
+	ROM_REGION( 0x60000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "eagle_6.1r", 0x40000, 0x20000, CRC(2c4416d4) SHA1(25d04d4d08ab491a9684b8e6f21e57479711ee87) )
+	ROM_LOAD( "eagle_5.1n", 0x20000, 0x20000, CRC(cd8bc456) SHA1(cefe211492158f445ceaaa9015e1143ea9afddbb) )
+	ROM_LOAD( "eagle_4.1l", 0x00000, 0x20000, CRC(dcf92dca) SHA1(87c7d88dc35981ad636376b53264cee87ccdaa71) ) // half unused, 5bpp
+ROM_END
 
 } // anonymous namespace
 
@@ -966,6 +987,9 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT           ROT   COMPANY           FULL NAME                                 FLAGS                                     LAYOUT
-GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln )
-GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY           FULL NAME                                        FLAGS                                     LAYOUT
+GAMEL( 1991, luckgrln,  0,        luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180-based hardware)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln )
+GAMEL( 1991, luckstrn,  0,        luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Star (newer Z180-based hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln ) // missing internal ROM dump
+GAMEL( 1991, luckstrna, luckstrn, luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Star (newer Z180-based hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln ) // missing internal ROM dump
+GAMEL( 1993, 7smash,    0,        _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash (set 1)",                               MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )
+GAMEL( 1993, 7smasha,   7smash,   _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash (set 2)",                               MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )

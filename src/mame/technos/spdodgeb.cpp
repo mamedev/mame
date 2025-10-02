@@ -438,7 +438,7 @@ int spdodgeb_state::mcu_busy_r()
 
 static INPUT_PORTS_START( spdodgeb )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(spdodgeb_state::mcu_busy_r)) // mcu63701_busy flag
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -555,7 +555,7 @@ void spdodgeb_state::machine_reset()
 {
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
-	m_adpcm_idle[0] = m_adpcm_data[1] = 0;
+	m_adpcm_idle[0] = m_adpcm_idle[1] = 0;
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
 	m_mcu_status = 0;
 	memset(m_inputs, 0, sizeof(m_inputs));
@@ -590,28 +590,27 @@ void spdodgeb_state::spdodgeb(machine_config &config)
 	PALETTE(config, m_palette, FUNC(spdodgeb_state::palette), 1024);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(12'000'000) / 4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	MSM5205(config, m_msm[0], 384000);
 	m_msm[0]->vck_legacy_callback().set(FUNC(spdodgeb_state::adpcm_int<0>));  // interrupt function
 	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);  // 8kHz?
-	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_msm[0]->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_msm[0]->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	MSM5205(config, m_msm[1], 384000);
 	m_msm[1]->vck_legacy_callback().set(FUNC(spdodgeb_state::adpcm_int<1>));  // interrupt function
 	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);  // 8kHz?
-	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_msm[1]->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_msm[1]->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 

@@ -70,8 +70,8 @@ The Gambit hardware notes:
 - PCB label: 510-1115A01
 - rest is same as The Classic (model 6079)
 
-The Gambit either has a black/white button panel color theme, or black/red/white,
-which was more commonly seen on newer versions and Gambit Voice.
+The Gambit either has a black/white button panel color theme, or black/red/white.
+The latter was more commonly seen on newer versions and Gambit Voice.
 
 Designer 1500 hardware notes:
 - PCB label: 510.1131A01

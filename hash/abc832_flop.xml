@@ -406,4 +406,60 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="teletex800" supported="no">
+		<description>Teletex 800</description>
+		<year>1986</year>
+		<publisher>Luxor</publisher>
+		<sharedfeat name="requirement" value="pr:teletex800"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="TELETEXT 800 V1.33" />
+			<dataarea name="flop" size="655360">
+				<rom name="TELETEXT_800_v1.33_832.img" size="655360" crc="128279b3" sha1="167c1b8ad63c182019af4a023a1dedebd22e1baa"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Televerket Teletext 85 Flexskiva 9604" />
+			<dataarea name="flop" size="655360">
+				<rom name="Televerket Teletext 85 Flexskiva 9604.img" size="655360" crc="c448fae2" sha1="f51af696b8f80c1d3fda8af5a799b9d95ca3cf23"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="SYSTEMSKIVA ABC 80 (DP)" />
+			<dataarea name="flop" size="3212288">
+				<rom name="SYSTEMSKIVA_ABC_80_(DP).hfe" size="3212288" crc="230993be" sha1="4c0f689a0c2fdb636be99de0a9b18afe05407b81"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="860305 P00088-3 800-830" />
+			<dataarea name="flop" size="3137024">
+				<rom name="860305_P00088-3_800-830.hfe" size="3137024" crc="18f18757" sha1="e2545f7c025ee1b1c10f507e77e821d793b3dee1"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="ORD-reda Programskiva 860331" />
+			<dataarea name="flop" size="3162112">
+				<rom name="ORD-reda Programskiva.hfe" size="3162112" crc="de112362" sha1="b3369d95d58078f6ca57ac590b27985bb12e0cb6"/>
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="ORD-reda Textskiva 8 (Demo) 860331" />
+			<dataarea name="flop" size="3212288">
+				<rom name="ORD-reda Textskiva 8 (Demo).hfe" size="3212288" crc="b10bbdb6" sha1="575b5153b050c2100f6ecceea9184d56a9f5934e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="ORD-reda PRINTER/FLEX data 860331" />
+			<dataarea name="flop" size="3187200">
+				<rom name="ORD-reda PRINTER-FLEX data.hfe" size="3187200" crc="98fcd553" sha1="e608b6c9f630da552be2f3d07f27d534613de6af"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

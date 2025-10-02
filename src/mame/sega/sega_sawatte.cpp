@@ -251,4 +251,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1996?, sawatte, 0, 0, sawatte,  sawatte, sawatte_state, empty_init, "Sega", "Sawatte", MACHINE_IS_SKELETON )
+CONS( 1996?, sawatte, 0, 0, sawatte,  sawatte, sawatte_state, empty_init, "Sega", "Sawatte", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

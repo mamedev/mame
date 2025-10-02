@@ -168,7 +168,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1976, bombaway,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Bombs Away", MACHINE_IS_SKELETON )
-GAME( 1976, ckidzo,    0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Ckidzo", MACHINE_IS_SKELETON )
-GAME( 1976, cgunship,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Cobra Gunship", MACHINE_IS_SKELETON )
-GAME( 1976, mead4in1,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Meadows 4 in 1", MACHINE_IS_SKELETON )
+GAME( 1976, bombaway,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Bombs Away", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, ckidzo,    0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Ckidzo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, cgunship,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Cobra Gunship", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, mead4in1,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Meadows 4 in 1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

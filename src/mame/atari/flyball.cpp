@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Stefan Jokisch, Ivan Vangelista, Ryan Holtz
+// copyright-holders:Stefan Jokisch, Ryan Holtz
 /***************************************************************************
 
 Atari Flyball Driver

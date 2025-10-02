@@ -205,13 +205,6 @@ function vs10_flags.release_minimalRebuild_setToFalse()
 	test.string_contains(buffer,'<MinimalRebuild>false</MinimalRebuild>')
 end
 
-function vs10_flags.mfc_useOfMfc_setToStatic()
-    flags{"MFC"}
-
-    local buffer = get_buffer()
-    test.string_contains(buffer,'<UseOfMfc>Dynamic</UseOfMfc>')
-end
-
 --there is not an option for /Z7 OldStyle
 --/ZI is not compatible with /clr or x64_64
 --minimal Rebuild requires /Zi in x86_64

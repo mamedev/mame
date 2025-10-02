@@ -11,7 +11,6 @@
 #pragma once
 
 #include "machine/gen_latch.h"
-#include "machine/timer.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -51,9 +50,9 @@ private:
 	optional_memory_bank m_audiobank;
 
 	/* video-related */
-	tilemap_t     *m_tilemap[2]{};
-	tilemap_t     *m_tx_tilemap = nullptr;
-	uint16_t      m_vctrl[8]{};
+	tilemap_t   *m_tilemap[2]{};
+	tilemap_t   *m_tx_tilemap = nullptr;
+	uint16_t    m_vctrl[8]{};
 	int         m_sprite_flipy_mask = 0;
 	int         m_sprite_pri_mask = 0;
 	int         m_tilemap_priority = 0;
@@ -77,8 +76,8 @@ private:
 	DECLARE_VIDEO_START(madgear);
 	uint32_t screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(lastduel_timer_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(madgear_timer_cb);
+	void lastduel_interrupt(int state);
+	void madgear_interrupt(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void lastduel_map(address_map &map) ATTR_COLD;
 	void madgear_map(address_map &map) ATTR_COLD;

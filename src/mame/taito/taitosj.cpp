@@ -148,15 +148,15 @@ port B: bit 0 NMI enable
 
 Notes:
 ------
-- Alpine Sky uses the feature where write to d50e-d50f can be processed by a PAL and
+- Alpine Ski uses the feature where write to d50e-d50f can be processed by a PAL and
   answer read back from d40b.
 
 Kickstart Wheelie King :
-- additional ram @ $d800-$dfff (scroll ram  + ??)
+- additional ram @ $d800-$dfff (scroll ram + ??)
 - color bank @ $d000-$d001
 - taitosj_scroll @ $d002-$d007
 - strange controls :
-     - 'revolve type' - 3 pos switch (gears) +  button/pedal (accel)
+     - 'revolve type' - 3 pos switch (gears) + button/pedal (accel)
      - two buttons for gear change, auto acceleration
 
 TODO:
@@ -1739,10 +1739,10 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( gfx_taitosj )
-	GFXDECODE_ENTRY( nullptr, 0x9000, charlayout,   0, 8 )    // the game dynamically modifies this
-	GFXDECODE_ENTRY( nullptr, 0x9000, spritelayout, 0, 8 )    // the game dynamically modifies this
-	GFXDECODE_ENTRY( nullptr, 0xa800, charlayout,   0, 8 )    // the game dynamically modifies this
-	GFXDECODE_ENTRY( nullptr, 0xa800, spritelayout, 0, 8 )    // the game dynamically modifies this
+	GFXDECODE_RAM( nullptr, 0x9000, charlayout,   0, 8 )
+	GFXDECODE_RAM( nullptr, 0x9000, spritelayout, 0, 8 )
+	GFXDECODE_RAM( nullptr, 0xa800, charlayout,   0, 8 )
+	GFXDECODE_RAM( nullptr, 0xa800, spritelayout, 0, 8 )
 GFXDECODE_END
 
 static const discrete_dac_r1_ladder taitosj_dacvol_ladder =
@@ -1823,8 +1823,9 @@ void taitosj_state::nomcu(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // 30k r-2r network
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.15); // 30k r-2r network
 	DISCRETE(config, m_dacvol, taitosj_dacvol_discrete);
+	m_dacvol->set_clock(48000 * 32); // match dac.cpp samplerate
 	m_dacvol->add_route(0, "dac", 1.0, DAC_INPUT_RANGE_HI);
 	m_dacvol->add_route(0, "dac", -1.0, DAC_INPUT_RANGE_LO);
 }

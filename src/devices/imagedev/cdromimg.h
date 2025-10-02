@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_CHD_CD_H
-#define MAME_DEVICES_IMAGEDEV_CHD_CD_H
+#ifndef MAME_IMAGEDEV_CDROMIMG_H
+#define MAME_IMAGEDEV_CDROMIMG_H
 
 #pragma once
 
@@ -114,4 +114,4 @@ public:
 };
 
 
-#endif // MAME_DEVICES_IMAGEDEV_CHD_CD_H
+#endif // MAME_IMAGEDEV_CDROMIMG_H

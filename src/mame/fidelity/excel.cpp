@@ -177,8 +177,8 @@ CPU D6 to W: (model 6092, tied to VCC otherwise)
 
 #include "emu.h"
 
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/r65c02.h"
-#include "cpu/m6502/m65sc02.h"
 #include "machine/clock.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -460,7 +460,7 @@ INPUT_PORTS_END
 void excel_state::fexcel(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
+	G65SC102(config, m_maincpu, 12_MHz_XTAL); // G65SC102P-3, 12.0M ceramic resonator (divided by 4 internally)
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz

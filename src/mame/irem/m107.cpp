@@ -661,7 +661,7 @@ static INPUT_PORTS_START( m107_2player )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") //this is sprite flag on Irem M92, if this is active low then Dream Soccer '94 is unplayably slow
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) //this is sprite flag on Irem M92, if this is active low then Dream Soccer '94 is unplayably slow
 
 	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW3:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW3:2" )
@@ -810,7 +810,7 @@ static INPUT_PORTS_START( wpksoc )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") //this is sprite flag on Irem M92, if this is active low then Dream Soccer '94 is unplayably slow
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) //this is sprite flag on Irem M92, if this is active low then Dream Soccer '94 is unplayably slow
 	PORT_DIPNAME( 0x0100, 0x0000, "DSW3" )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0100, DEF_STR( On ) )
@@ -1227,8 +1227,7 @@ void m107_state::firebarr(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set_inputline(m_soundcpu, NEC_INPUT_LINE_INTP1);
@@ -1238,12 +1237,12 @@ void m107_state::firebarr(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181) / 4));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, NEC_INPUT_LINE_INTP0);
-	ymsnd.add_route(0, "lspeaker", 0.40);
-	ymsnd.add_route(1, "rspeaker", 0.40);
+	ymsnd.add_route(0, "speaker", 0.40, 0);
+	ymsnd.add_route(1, "speaker", 0.40, 1);
 
 	iremga20_device &ga20(IREMGA20(config, "irem", XTAL(14'318'181) / 4));
-	ga20.add_route(0, "lspeaker", 1.0);
-	ga20.add_route(1, "rspeaker", 1.0);
+	ga20.add_route(0, "speaker", 1.0, 0);
+	ga20.add_route(1, "speaker", 1.0, 1);
 }
 
 void m107_state::dsoccr94(machine_config &config)

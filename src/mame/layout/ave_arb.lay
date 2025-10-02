@@ -483,8 +483,8 @@ authors:hap
 		<element name="9.9" ref="led2"><bounds x="91" y="60.25" width="1.5" height="1.5" /></element>
 		<element name="9.8" ref="led2"><bounds x="91" y="63.25" width="1.5" height="1.5" /></element>
 
-		<element ref="nothing" inputtag="IN.1" inputmask="0x02" clickthrough="yes"><bounds x="95" y="13" width="2" height="2" /></element>
-		<element ref="bt" inputtag="IN.1" inputmask="0x01"><bounds x="95" y="13" width="2" height="2" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x02"><bounds x="95" y="13" width="2" height="2" /></element>
+		<element ref="bt" inputtag="IN.1" inputmask="0x01" clickthrough="yes"><bounds x="95" y="13" width="2" height="2" /></element>
 		<element ref="bt" inputtag="IN.1" inputmask="0x02"><bounds x="95" y="17" width="2" height="2" /></element>
 
 		<element ref="bt" inputtag="IN.0" inputmask="0x80"><bounds x="95" y="22.5" width="2" height="2" /></element>

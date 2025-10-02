@@ -155,4 +155,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME      FLAGS
-COMP( 2003, pegasos2, 0,      0,      pegasos2, pegasos2, pegasos2_state, empty_init, "Genesi", "PEGASOS II", MACHINE_IS_SKELETON )
+COMP( 2003, pegasos2, 0,      0,      pegasos2, pegasos2, pegasos2_state, empty_init, "Genesi", "PEGASOS II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

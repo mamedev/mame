@@ -40,6 +40,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
@@ -50,13 +51,12 @@
 #include "machine/upd765.h"
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
-#include "speaker.h"
 #include "video/upd7220.h"
-#include "emupal.h"
 
+#include "emupal.h"
+#include "speaker.h"
 #include "screen.h"
 #include "softlist_dev.h"
-#include "imagedev/snapquik.h"
 
 
 namespace {

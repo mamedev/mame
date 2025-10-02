@@ -156,7 +156,7 @@ void ef9345_device::device_start()
 	save_item(NAME(m_dor));
 	save_item(NAME(m_ror));
 	save_item(NAME(m_block));
-	save_item(NAME(m_blink));
+	save_item(NAME(m_blink_phase));
 	save_item(NAME(m_latchc0));
 	save_item(NAME(m_latchm));
 	save_item(NAME(m_latchi));
@@ -174,7 +174,7 @@ void ef9345_device::device_reset()
 	m_state = 0;
 	m_bf = 0;
 	m_block = 0;
-	m_blink = 0;
+	m_blink_phase = 0;
 	m_latchc0 = 0;
 	m_latchm = 0;
 	m_latchi = 0;
@@ -202,7 +202,10 @@ TIMER_CALLBACK_MEMBER(ef9345_device::clear_busy_flag)
 
 TIMER_CALLBACK_MEMBER(ef9345_device::blink_tick)
 {
-	m_blink = !m_blink;
+	// 11 -> 10 -> 01 -> 00 -> repeats...
+	// left bit = flashing characters toggle (0.5 Hz)
+	// right bit = flashing cursor toggle (1 Hz)
+	m_blink_phase = (m_blink_phase + 3) & 0x3;
 }
 
 
@@ -220,8 +223,8 @@ void ef9345_device::draw_char_40(uint8_t *c, uint16_t x, uint16_t y)
 	const int scan_xsize = std::min( screen().width() - (x * 8), 8);
 	const int scan_ysize = std::min( screen().height() - (y * 10), 10);
 
-	for(int i = 0; i < scan_ysize; i++)
-		for(int j = 0; j < scan_xsize; j++)
+	for (int i = 0; i < scan_ysize; i++)
+		for (int j = 0; j < scan_xsize; j++)
 			m_screen_out.pix(y * 10 + i, x * 8 + j) = palette[c[8 * i + j] & 0x07];
 }
 
@@ -232,8 +235,8 @@ void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 	const int scan_xsize = std::min( screen().width() - (x * 6), 6);
 	const int scan_ysize = std::min( screen().height() - (y * 10), 10);
 
-	for(int i = 0; i < scan_ysize; i++)
-		for(int j = 0; j < scan_xsize; j++)
+	for (int i = 0; i < scan_ysize; i++)
+		for (int j = 0; j < scan_xsize; j++)
 			m_screen_out.pix(y * 10 + i, x * 6 + j) = palette[c[6 * i + j] & 0x07];
 }
 
@@ -279,12 +282,13 @@ void ef9345_device::set_video_mode(void)
 void ef9345_device::init_accented_chars(void)
 {
 	uint16_t i, j;
-	for(j = 0; j < 0x10; j++)
-		for(i = 0; i < 0x200; i++)
+	for (j = 0; j < 0x10; j++)
+		for (i = 0; i < 0x200; i++)
 			m_acc_char[(j << 9) + i] = m_charset[0x0600 + i];
 
-	for(j = 0; j < 0x200; j += 0x40)
-		for(i = 0; i < 4; i++)
+	for (j = 0; j < 0x200; j += 0x40)
+	{
+		for (i = 0; i < 4; i++)
 		{
 			m_acc_char[0x0200 + j + i +  4] |= 0x1c; //tilde
 			m_acc_char[0x0400 + j + i +  4] |= 0x10; //acute
@@ -308,6 +312,7 @@ void ef9345_device::init_accented_chars(void)
 			m_acc_char[0x1e00 + j + i + 32] |= 0x08; //cedilla
 			m_acc_char[0x1e00 + j + i + 36] |= 0x04; //cedilla
 		}
+	}
 }
 
 // read a char in charset or in m_videoram
@@ -352,25 +357,30 @@ uint8_t ef9345_device::get_dial(uint8_t x, uint8_t attrib)
 void ef9345_device::zoom(uint8_t *pix, uint16_t n)
 {
 	uint8_t i, j;
-	if ((n & 0x0a) == 0)
-		for(i = 0; i < 80; i += 8) // 1, 4, 5
-			for(j = 7; j > 0; j--)
+	if ((n & 0x0a) == 0) // n = 1, 4, 5 (left side)
+	{
+		for (i = 0; i < 80; i += 8)
+			for (j = 7; j > 0; j--)
 				pix[i + j] = pix[i + j / 2];
-
-	if ((n & 0x05) == 0)
-		for(i = 0; i < 80; i += 8) // 2, 8, 10
-			for(j =0 ; j < 7; j++)
+	}
+	if ((n & 0x05) == 0) // n = 2, 8, 10 (right side)
+	{
+		for (i = 0; i < 80; i += 8)
+			for (j =0 ; j < 7; j++)
 				pix[i + j] = pix[i + 4 + j / 2];
-
-	if ((n & 0x0c) == 0)
-		for(i = 0; i < 8; i++) // 1, 2, 3
-			for(j = 9; j > 0; j--)
-				pix[i + 8 * j] = pix[i + 8 * (j / 2)];
-
-	if ((n & 0x03) == 0)
-		for(i = 0; i < 8; i++) // 4, 8, 12
-			for(j = 0; j < 9; j++)
-				pix[i + 8 * j] = pix[i + 40 + 8 * (j / 2)];
+	}
+	if ((n & 0x0c) == 0) // n = 1, 2, 3 (top side)
+	{
+		for (i = 0; i < 8; i++)
+			for (j = 9; j > 0; j--)
+				pix[i + 8 * j] = pix[i + 8 * ((j-1) / 2)];
+	}
+	if ((n & 0x03) == 0) // n = 4, 8, 12 (bottom side)
+	{
+		for (i = 0; i < 8; i++)
+			for (j = 0; j < 9; j++)
+				pix[i + 8 * j] = pix[i + 32 + 8 * ((j+1) / 2)];
+	}
 }
 
 
@@ -378,7 +388,23 @@ void ef9345_device::zoom(uint8_t *pix, uint16_t n)
 uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 {
 	uint16_t i = x, j;
-	j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
+
+	if (m_variant == EF9345_MODE::TYPE_EF9345)
+	{
+		// On the EF9345 the service row is always displayed at the top, and
+		// it can be fetched from either Y=0 or Y=1.
+		j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
+	}
+	else
+	{
+		// On the TS9347 the service row is displayed either at the top or at
+		// the bottom, and it is always fetched from Y=0.
+		if (m_tgs & 1)
+			j = (y == 24) ? 0 : ((m_ror & 0x1f) + y);
+		else
+			j = (y == 0) ? 0 : ((m_ror & 0x1f) + y - 1);
+	}
+
 	j = (j > 31) ? (j - 24) : j;
 
 	//right side of a double width character
@@ -392,69 +418,97 @@ uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 	return 0x40 * j + i;
 }
 
-// draw bichrome character (40 columns)
-void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, uint8_t insert, uint8_t flash, uint8_t conceal, uint8_t negative, uint8_t underline)
+// applies the insert, flash, conceal and negative attributes,
+// considering whether the cursor is on this character or not.
+std::tuple<uint8_t, uint8_t, bool> ef9345_device::makecolors(uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool cursor)
 {
-	uint16_t i;
-	uint8_t pix[80];
+	uint8_t tmp, c_compl_mask = 0;
+	bool underline = false;
 
-	if (m_variant == EF9345_MODE::TYPE_TS9347)
+	if (negative)
 	{
-		c0 = 0;
-	}
-
-	if (flash && m_pat & 0x40 && m_blink)
-		c1 = c0;                    //flash
-	if (conceal && m_pat & 0x08)
-		c1 = c0;                    //conceal
-	if (negative)                   //negative
-	{
-		i = c1;
+		tmp = c1;
 		c1 = c0;
-		c0 = i;
+		c0 = tmp;
 	}
 
-	if ((m_pat & 0x30) == 0x30)
-		insert = 0;                 //active area mark
-	if (insert == 0)
-		c1 += 8;                    //foreground color
-	if ((m_pat & 0x30) == 0x00)
-		insert = 1;                 //insert mode
-	if (insert == 0)
-		c0 += 8;                    //background color
-
-	//draw the cursor
-	i = (m_registers[6] & 0x1f);
-	if (i < 8)
-		i &= 1;
-
-	if (iblock == 0x40 * i + (m_registers[7] & 0x3f))   //cursor position
+	if (cursor)
 	{
-		switch(m_mat & 0x70)
+		switch (m_mat & 0x70)
 		{
 		case 0x40:                  //00 = fixed complemented
-			c0 = (23 - c0) & 15;
-			c1 = (23 - c1) & 15;
+			c_compl_mask = 0x7;
 			break;
 		case 0x50:                  //01 = fixed underlined
-			underline = 1;
+			underline = true;
 			break;
 		case 0x60:                  //10 = flash complemented
-			if (m_blink)
-			{
-				c0 = (23 - c0) & 15;
-				c1 = (23 - c1) & 15;
-			}
+			if (m_blink_phase & 0x1)
+				c_compl_mask = 0x7;
 			break;
 		case 0x70:                  //11 = flash underlined
-			if (m_blink)
-				underline = 1;
+			if (m_blink_phase & 0x1)
+				underline = true;
 			break;
 		}
 	}
 
+	switch (m_pat & 0x30)           //insert mode
+	{
+	case 0x00: // inlay
+		if (insert)
+			c0 = 0, c1 = (c1 ^ c_compl_mask) | 0x8;
+		else
+			c0 = c1 = 0;
+		break;
+	case 0x10: // boxing
+		if (insert)
+			c0 = (c0 ^ c_compl_mask) | 0x8, c1 = (c1 ^ c_compl_mask) | 0x8;
+		else
+			c0 = c1 = 0;
+		break;
+	case 0x20: // character mark
+		if (insert)
+			c0 = (c0 ^ c_compl_mask) | 0x8, c1 = (c1 ^ c_compl_mask) | 0x8;
+		else
+			c0 = c0 ^ c_compl_mask, c1 = c1 ^ c_compl_mask;
+		break;
+	case 0x30: // active area mark
+		c0 = (c0 ^ c_compl_mask) | 0x8, c1 = (c1 ^ c_compl_mask) | 0x8;
+		break;
+	}
+
+	// Note: flashing characters blink on the opposite phase if negative.
+	if ((flash && (m_pat & 0x40) && negative == !!(m_blink_phase & 0x2)) ||
+		(conceal && (m_pat & 0x08)))
+	{
+		c1 = c0; // make foreground same as background
+	}
+
+	return std::make_tuple(c0, c1, underline);
+}
+
+// draw bichrome character (40 columns)
+void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool underline)
+{
+	uint16_t i;
+	uint8_t pix[80];
+
+	// test if the cursor is on this character
+	i = (m_registers[6] & 0x1f);
+	if (i < 8)
+		i &= 1;
+	if (dial > 0 && (dial & 0x05) == 0) // dial = 2, 8, 10 (right side)
+		iblock++;
+	bool cursor = iblock == 0x40 * i + (m_registers[7] & 0x3f);
+
+	bool cursor_underline;
+	std::tie(c0, c1, cursor_underline) = makecolors(c0, c1, insert, flash, conceal, negative, cursor);
+	if ((type & 7) != 2 && (type & 7) != 3) // no underline cursor if semi-gr.
+		underline |= cursor_underline;
+
 	// generate the pixel table
-	for(i = 0; i < 40; i+=4)
+	for (i = 0; i < 40; i+=4)
 	{
 		uint8_t ch = read_char(type, address + i);
 
@@ -500,7 +554,7 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 	m_last_dial[x] = 0;
 
 	//initialize the color table
-	for(j = 1, n = 0, i = 0; i < 8; i++)
+	for (j = 1, n = 0, i = 0; i < 8; i++)
 	{
 		col[i] = 7;
 
@@ -523,7 +577,7 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 	if (lowresolution) ramindex += 5 * (b & 0x04);
 
 	//fill pixel table
-	for(i = 0, j = 0; i < 10; i++)
+	for (i = 0, j = 0; i < 10; i++)
 	{
 		uint8_t ch = read_char(0x0c, ramindex + 4 * (i >> lowresolution));
 		pix[j] = pix[j + 1] = col[(ch & 0x03) >> 0]; j += 2;
@@ -536,42 +590,35 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 }
 
 // draw bichrome character (80 columns)
-void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uint8_t cursor)
+void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, bool cursor)
 {
 	uint8_t c0, c1, pix[60];
 	uint16_t i, j, d;
 
+	bool insert = BIT(m_dor, (a & 1) ? 7 : 3);      //insert = DOR7/DOR3
 	c1 = (a & 1) ? (m_dor >> 4) & 7 : m_dor & 7;    //foreground color = DOR
 	c0 =  m_mat & 7;                                //background color = MAT
 
 	switch(c & 0x80)
 	{
 	case 0: //alphanumeric G0 set
+	{
 		//A0: D = color set
 		//A1: U = underline
 		//A2: F = flash
 		//A3: N = negative
 		//C0-6: character code
+		bool underline = (a & 2) >> 1;
+		bool flash = (a & 4) >> 2;
+		bool negative = (a & 8) >> 3;
 
-		if ((a & 4) && (m_pat & 0x40) && (m_blink))
-			c1 = c0;    //flash
-		if (a & 8)      //negative
-		{
-			i = c1;
-			c1 = c0;
-			c0 = i;
-		}
-
-		if ((cursor == 0x40) || ((cursor == 0x60) && m_blink))
-		{
-			i = c1;
-			c1 = c0;
-			c0 = i;
-		}
+		bool cursor_underline;
+		std::tie(c0, c1, cursor_underline) = makecolors(c0, c1, insert, flash, false, negative, cursor);
+		underline ^= cursor_underline;
 
 		d = ((c & 0x7f) >> 2) * 0x40 + (c & 0x03);  //char position
 
-		for(i=0, j=0; i < 10; i++)
+		for (i=0, j=0; i < 10; i++)
 		{
 			uint8_t ch = read_char(0, d + 4 * i);
 			for (uint8_t b=0; b<6; b++)
@@ -579,14 +626,19 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uin
 		}
 
 		//draw the underline
-		if ((a & 2) || (cursor == 0x50) || ((cursor == 0x70) && m_blink))
+		if (underline)
 			memset(&pix[54], c1, 6);
-
 		break;
+	}
 	default: //dedicated mosaic set
+	{
 		//A0: D = color set
 		//A1-3: 3 blocks de 6 pixels
 		//C0-6: 7 blocks de 6 pixels
+
+		bool cursor_underline;
+		std::tie(c0, c1, cursor_underline) = makecolors(c0, c1, insert, false, false, false, cursor);
+
 		pix[ 0] = (c & 0x01) ? c1 : c0;
 		pix[ 3] = (c & 0x02) ? c1 : c0;
 		pix[12] = (c & 0x04) ? c1 : c0;
@@ -598,16 +650,20 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uin
 		pix[48] = (a & 0x04) ? c1 : c0;
 		pix[51] = (a & 0x08) ? c1 : c0;
 
-		for(i = 0; i < 60; i += 12)
+		for (i = 0; i < 60; i += 12)
 		{
 			pix[i + 6] = pix[i];
 			pix[i + 9] = pix[i + 3];
 		}
 
-		for(i = 0; i < 60; i += 3)
+		for (i = 0; i < 60; i += 3)
 			pix[i + 2] = pix[i + 1] = pix[i];
 
+		//draw the underline
+		if (cursor_underline)
+			memset(&pix[54], c1, 6);
 		break;
+	}
 	}
 
 	draw_char_80(pix, x, y);
@@ -702,29 +758,30 @@ void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 void ef9345_device::makechar_12x80(uint16_t x, uint16_t y)
 {
 	uint16_t iblock = indexblock(x, y);
-	//draw the cursor
-	uint8_t cursor = 0;
-	uint8_t b = BIT(m_registers[7], 7);
+	bool cursor_odd = BIT(m_registers[7], 7);
 
+	//test if the cursor is on one of the two characters that we are rendering.
 	uint8_t i = (m_registers[6] & 0x1f);
 	if (i < 8)
 		i &= 1;
+	bool cursor = iblock == 0x40 * i + (m_registers[7] & 0x3f);
 
-	if (iblock == 0x40 * i + (m_registers[7] & 0x3f))   //cursor position
-		cursor = m_mat & 0x70;
-
-	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1, b ? 0 : cursor);
-	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1, b ? cursor : 0);
+	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1, cursor && !cursor_odd);
+	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1, cursor && cursor_odd);
 }
 
 void ef9345_device::draw_border(uint16_t line)
 {
 	if (m_char_mode == MODE12x80 || m_char_mode == MODE8x80)
-		for(int i = 0; i < 82; i++)
+	{
+		for (int i = 0; i < 82; i++)
 			draw_char_80(m_border, i, line);
+	}
 	else
-		for(int i = 0; i < 42; i++)
+	{
+		for (int i = 0; i < 42; i++)
 			draw_char_40(m_border, i, line);
+	}
 }
 
 void ef9345_device::makechar(uint16_t x, uint16_t y)
@@ -936,6 +993,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 		case 0x91:  //NOP: no operation
 		case 0x95:  //VRM: vertical sync mask reset
 		case 0x99:  //VSM: vertical sync mask set
+			set_busy_flag(1000);
 			break;
 		case 0xb0:  //INY: increment Y
 			set_busy_flag(2000);
@@ -961,7 +1019,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			uint8_t r2 = (cmd&0x04) ? 5 : 7;
 			int busy = 2000;
 
-			for(i = 0; i < 1280; i++)
+			for (i = 0; i < 1280; i++)
 			{
 				a1 = indexram(r1); a2 = indexram(r2);
 				m_videoram->write_byte(a2, m_videoram->read_byte(a1));
@@ -1017,7 +1075,9 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	if (scanline == 250)
 		m_state &= 0xfb;
 
-	set_busy_flag(104000);
+	// If we are interrupting a running command, delay its completion.
+	if (m_busy_timer->enabled())
+		m_busy_timer->adjust(m_busy_timer->remaining() + attotime::from_nsec(104000));
 
 	if (m_char_mode == MODE12x80 || m_char_mode == MODE8x80)
 	{
@@ -1035,35 +1095,46 @@ void ef9345_device::update_scanline(uint16_t scanline)
 		m_state |= 0x04;
 		draw_border(0);
 		if (m_pat & 1)
-			for(i = 0; i < 40; i++)
+		{
+			for (i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
+		}
 		else
-			for(i = 0; i < 42; i++)
+		{
+			for (i = 0; i < 42; i++)
 				draw_char_40(m_border, i, 1);
+		}
 	}
 	else if (scanline < 120)
 	{
 		if (m_pat & 2)
-			for(i = 0; i < 40; i++)
+		{
+			for (i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
+		}
 		else
+		{
 			draw_border(scanline / 10);
+		}
 	}
 	else if (scanline < 250)
 	{
 		if (m_variant == EF9345_MODE::TYPE_TS9347)
 		{
-			for(i = 0; i < 40; i++)
+			for (i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
 		}
 		else
 		{
 			if (m_pat & 4) // Lower bulk enable
-				for(i = 0; i < 40; i++)
+			{
+				for (i = 0; i < 40; i++)
 					makechar(i, (scanline / 10));
+			}
 			else
+			{
 				draw_border(scanline / 10);
-
+			}
 			if (scanline == 240)
 				draw_border(26);
 		}

@@ -13,6 +13,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Animatix</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Christian Belin &amp; Jacques Pages"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="87155">
@@ -25,6 +26,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Animatix (Alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Christian Belin &amp; Jacques Pages"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="87155">
@@ -37,6 +39,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Animatix (Alt 2)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Christian Belin &amp; Jacques Pages"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="87155">
@@ -85,6 +88,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Music 3 Voix</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="P.O. Richez"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juin 1987"/>
+		<info name="serial" value="L 546"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="43906">
@@ -97,6 +103,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Music 3 Voix (Alt)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="P.O. Richez"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juin 1987"/>
+		<info name="serial" value="L 546"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="43906">
@@ -109,6 +118,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Music 3 Voix (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="P.O. Richez"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juin 1987"/>
+		<info name="serial" value="L 546"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="43906">
@@ -150,7 +162,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="sjeuxmo6a" cloneof="sjeuxmo6">
+	<!-- $11F1 loader hack -->
+	<software name="sjeuxmo6a" cloneof="sjeuxmo6" supported="no">
 		<description>Super Jeux MO6 (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
@@ -225,6 +238,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Aquanaute</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Bruno Ouachee"/>
+		<info name="serial" value="AQ 1132"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="116580">
@@ -237,6 +252,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Aquanaute (Alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Bruno Ouachee"/>
+		<info name="serial" value="AQ 1132"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="116580">
@@ -249,6 +266,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Aquanaute (Alt 2)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Bruno Ouachee"/>
+		<info name="serial" value="AQ 1132"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="116580">
@@ -261,6 +280,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Bactron</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="144"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="21914824">
@@ -269,10 +289,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
+	<!-- $42 loader hack -->
 	<software name="bactrona" cloneof="bactron">
 		<description>Bactron (Alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="144"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="69780">
@@ -281,10 +303,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
+	<!-- $42 loader hack -->
 	<software name="bactronb" cloneof="bactron">
 		<description>Bactron (Alt 2)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="144"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="69780">
@@ -293,10 +317,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
+	<!-- $11F1 loader hack -->
 	<software name="bactronc" cloneof="bactron">
 		<description>Bactron (Alt 3)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="144"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="69780">
@@ -305,10 +331,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="bivouac">
+	<!-- $41 loader hack -->
+	<software name="bivouac" supported="no">
 		<description>Bivouac</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="159449">
@@ -317,10 +345,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="bivouaca" cloneof="bivouac">
+	<!-- $41 loader hack -->
+	<software name="bivouaca" cloneof="bivouac" supported="no">
 		<description>Bivouac (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="159449">
@@ -329,10 +359,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="bivouacb" cloneof="bivouac">
+	<!-- $11F1 loader hack -->
+	<software name="bivouacb" cloneof="bivouac" supported="no">
 		<description>Bivouac (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="166169">
@@ -341,7 +373,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="bivouacc" cloneof="bivouac">
+	<!-- files unreadable? -->
+	<software name="bivouacc" cloneof="bivouac" supported="no">
 		<description>Bivouac (WAV)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
@@ -389,10 +422,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="moranech">
+	<!-- $42 loader hack -->
+	<software name="moranech" supported="no">
 		<description>Bob Morane Chevalerie 1</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="121794">
@@ -401,10 +436,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="moranecha" cloneof="moranech">
+	<!-- $42 loader hack -->
+	<software name="moranecha" cloneof="moranech" supported="no">
 		<description>Bob Morane Chevalerie 1 (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="121794">
@@ -413,10 +450,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="moranechb" cloneof="moranech">
+	<!-- $11F1 loader hack -->
+	<software name="moranechb" cloneof="moranech" supported="no">
 		<description>Bob Morane Chevalerie 1 (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="123954">
@@ -425,10 +464,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="moraneju">
+	<!-- $41 loader hack -->
+	<software name="moraneju" supported="no">
 		<description>Bob Morane Jungle 1</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="118996">
@@ -437,10 +478,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="moranejua" cloneof="moraneju">
+	<!-- $41 loader hack -->
+	<software name="moranejua" cloneof="moraneju" supported="no">
 		<description>Bob Morane Jungle 1 (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="118996">
@@ -449,10 +492,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="moranejub" cloneof="moraneju">
+	<!-- $11F1 loader hack -->
+	<software name="moranejub" cloneof="moraneju" supported="no">
 		<description>Bob Morane Jungle 1 (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="121396">
@@ -461,10 +506,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="moranesf">
+	<!-- $41 loader hack -->
+	<software name="moranesf" supported="no">
 		<description>Bob Morane Science Fiction 1</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="105449">
@@ -473,10 +520,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="moranesfa" cloneof="moranesf">
+	<!-- $41 loader hack -->
+	<software name="moranesfa" cloneof="moranesf" supported="no">
 		<description>Bob Morane Science Fiction 1 (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="105449">
@@ -485,10 +534,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="moranesfb" cloneof="moranesf">
+	<!-- $11F1 loader hack -->
+	<software name="moranesfb" cloneof="moranesf" supported="no">
 		<description>Bob Morane Science Fiction 1 (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="106889">
@@ -501,6 +552,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Bobo</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="37305726">
@@ -509,10 +561,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="boboa" cloneof="bobo">
+	<!-- $41 loader hack -->
+	<software name="boboa" cloneof="bobo" supported="no">
 		<description>Bobo (Alt)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="140319">
@@ -521,10 +575,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="bobob" cloneof="bobo">
+	<!-- $41 loader hack -->
+	<software name="bobob" cloneof="bobo" supported="no">
 		<description>Bobo (Alt 2)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="140319">
@@ -533,10 +589,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="boboc" cloneof="bobo">
+	<!-- $11F1 loader hack -->
+	<software name="boboc" cloneof="bobo" supported="no">
 		<description>Bobo (Alt 3)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="141039">
@@ -545,11 +603,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $41 loader hack, works in dcmoto -->
 	<software name="capblood" supported="no">
 		<description>Captain Blood</description>
 		<year>1988</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="104698">
@@ -558,11 +617,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $41 loader hack, works in dcmoto -->
 	<software name="capblooda" cloneof="capblood" supported="no">
 		<description>Captain Blood (Alt)</description>
 		<year>1988</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="104698">
@@ -571,11 +631,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="capbloodb" cloneof="capblood" supported="no">
 		<description>Captain Blood (Alt 2)</description>
 		<year>1988</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="111658">
@@ -596,7 +657,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="chicagoa" cloneof="chicago" supported="no">
 		<description>Chicago 90 (Alt)</description>
 		<year>1989</year>
@@ -609,7 +670,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="chicagob" cloneof="chicago" supported="no">
 		<description>Chicago 90 (Alt 2)</description>
 		<year>1989</year>
@@ -622,7 +683,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="chicagoc" cloneof="chicago" supported="no">
 		<description>Chicago 90 (Alt 3)</description>
 		<year>1989</year>
@@ -636,8 +697,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="crepuscu">
-		<description>Le Crepuscule du Naja</description>
-		<year>198?</year>
+		<description>Les Aventures du Ka 1 - Le Crepuscule du Naja</description>
+		<year>1987</year>
 		<publisher>Chip</publisher>
 
 		<part name="cass1" interface="mo_cass">
@@ -648,8 +709,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="crepuscua" cloneof="crepuscu">
-		<description>Le Crepuscule du Naja (Alt)</description>
-		<year>198?</year>
+		<description>Les Aventures du Ka 1 - Le Crepuscule du Naja (Alt)</description>
+		<year>1987</year>
 		<publisher>Chip</publisher>
 
 		<part name="cass1" interface="mo_cass">
@@ -660,8 +721,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="crepuscub" cloneof="crepuscu">
-		<description>Le Crepuscule du Naja (Alt 2)</description>
-		<year>198?</year>
+		<description>Les Aventures du Ka 1 - Le Crepuscule du Naja (Alt 2)</description>
+		<year>1987</year>
 		<publisher>Chip</publisher>
 
 		<part name="cass1" interface="mo_cass">
@@ -779,7 +840,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="fbi">
+	<!-- $41 loader hack -->
+	<software name="fbi" supported="no">
 		<description>F.B.I.</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
@@ -791,7 +853,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="fbia" cloneof="fbi">
+	<!-- $41 loader hack -->
+	<software name="fbia" cloneof="fbi" supported="no">
 		<description>F.B.I. (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
@@ -803,7 +866,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="fbib" cloneof="fbi">
+	<!-- $41 loader hack -->
+	<software name="fbib" cloneof="fbi" supported="no">
 		<description>F.B.I. (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
@@ -815,7 +879,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="fbic" cloneof="fbi">
+	<!-- $11F1 loader hack -->
+	<software name="fbic" cloneof="fbi" supported="no">
 		<description>F.B.I. (Alt 3)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
@@ -827,7 +892,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="gp500cc" supported="no">
 		<description>Grand Prix 500cc</description>
 		<year>1986</year>
@@ -840,7 +905,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="gp500cca" cloneof="gp500cc" supported="no">
 		<description>Grand Prix 500cc (Alt)</description>
 		<year>1986</year>
@@ -853,7 +918,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="gp500ccb" cloneof="gp500cc" supported="no">
 		<description>Grand Prix 500cc (Alt 2)</description>
 		<year>1986</year>
@@ -914,10 +979,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="iznogoud">
+	<!-- $41 loader hack -->
+	<software name="iznogoud" supported="no">
 		<description>Iznogoud</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="116606">
@@ -926,10 +993,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="iznogouda" cloneof="iznogoud">
+	<!-- $41 loader hack -->
+	<software name="iznogouda" cloneof="iznogoud" supported="no">
 		<description>Iznogoud (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="116606">
@@ -938,10 +1007,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="iznogoudb" cloneof="iznogoud">
+	<!-- $11F1 loader hack -->
+	<software name="iznogoudb" cloneof="iznogoud" supported="no">
 		<description>Iznogoud (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="118526">
@@ -950,6 +1021,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
+	<!-- files unreadable? -->
 	<software name="karate">
 		<description>Karate</description>
 		<year>1987</year>
@@ -962,10 +1034,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="karatea" cloneof="karate">
+	<!-- $41 loader hack -->
+	<software name="karatea" cloneof="karate" supported="no">
 		<description>Karate (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="36636">
@@ -974,11 +1048,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="kya" supported="no">
 		<description>K.Y.A. - Keep Yourself Alive</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="L 548"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="52663">
@@ -987,11 +1062,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="kyaa" cloneof="kya" supported="no">
 		<description>K.Y.A. - Keep Yourself Alive (Alt)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="L 548"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="52663">
@@ -1000,11 +1076,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="kyab" cloneof="kya" supported="no">
 		<description>K.Y.A. - Keep Yourself Alive (Alt 2)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="L 548"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="52663">
@@ -1089,6 +1166,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Mach 3</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Décembre 1987"/>
+		<info name="serial" value="L 551"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="34621978">
@@ -1097,7 +1176,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="mach3a" cloneof="mach3">
+	<!-- $42 loader hack -->
+	<software name="mach3a" cloneof="mach3" supported="no">
 		<description>Mach 3 (Alt)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
@@ -1109,7 +1189,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="mach3b" cloneof="mach3">
+	<!-- $42 loader hack -->
+	<software name="mach3b" cloneof="mach3" supported="no">
 		<description>Mach 3 (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
@@ -1121,10 +1202,13 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="mach3c" cloneof="mach3">
+	<!-- $11F1 loader hack -->
+	<software name="mach3c" cloneof="mach3" supported="no">
 		<description>Mach 3 (Alt 3)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Décembre 1987"/>
+		<info name="serial" value="L 551"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="111607">
@@ -1134,7 +1218,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="malefatl">
-		<description>Le Malefice des Atlantes</description>
+		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1146,7 +1230,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="malefatla" cloneof="malefatl">
-		<description>Le Malefice des Atlantes (Alt)</description>
+		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes (Alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1158,7 +1242,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="malefatlb" cloneof="malefatl">
-		<description>Le Malefice des Atlantes (Alt 2)</description>
+		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1170,9 +1254,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="marchomb">
-		<description>Marche a l'Ombre</description>
+		<description>Marche à l'Ombre</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="19889448">
@@ -1181,10 +1266,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="marchomba" cloneof="marchomb">
-		<description>Marche a l'Ombre (Alt)</description>
+	<!-- $41 loader hack -->
+	<software name="marchomba" cloneof="marchomb" supported="no">
+		<description>Marche à l'Ombre (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="102288">
@@ -1193,10 +1280,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="marchombb" cloneof="marchomb">
-		<description>Marche a l'Ombre (Alt 2)</description>
+	<!-- $41 loader hack -->
+	<software name="marchombb" cloneof="marchomb" supported="no">
+		<description>Marche à l'Ombre (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="102288">
@@ -1205,10 +1294,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="marchombc" cloneof="marchomb">
-		<description>Marche a l'Ombre (Alt 3)</description>
+	<!-- $11F1 loader hack -->
+	<software name="marchombc" cloneof="marchomb" supported="no">
+		<description>Marche à l'Ombre (Alt 3)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="104448">
@@ -1218,7 +1309,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="menacarc">
-		<description>Menace sur l'Arctique</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1230,7 +1321,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="menacarca" cloneof="menacarc">
-		<description>Menace sur l'Arctique (Alt)</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (Alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1242,7 +1333,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="menacarcb" cloneof="menacarc">
-		<description>Menace sur l'Arctique (Alt 2)</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1254,9 +1345,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mgt">
-		<description>MGT</description>
+		<description>M.G.T.</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Octobre 1986"/>
+		<info name="serial" value="L 540"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="21508610">
@@ -1265,8 +1358,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="mgta" cloneof="mgt">
-		<description>MGT (Alt)</description>
+	<!-- $42 loader hack -->
+	<software name="mgta" cloneof="mgt" supported="no">
+		<description>M.G.T. (Alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -1277,8 +1371,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="mgtb" cloneof="mgt">
-		<description>MGT (Alt 2)</description>
+	<!-- $42 loader hack -->
+	<software name="mgtb" cloneof="mgt" supported="no">
+		<description>M.G.T. (Alt 2)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -1289,8 +1384,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="mgtc" cloneof="mgt">
-		<description>MGT (Alt 3)</description>
+	<!-- $11F1 loader hack -->
+	<software name="mgtc" cloneof="mgt" supported="no">
+		<description>M.G.T. (Alt 3)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -1303,7 +1399,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!-- incomplete dump
     <software name="mgtd" cloneof="mgt">
-        <description>MGT (Bad)</description>
+        <description>M.G.T. (Bad)</description>
         <year>1986</year>
         <publisher>Loriciels</publisher>
 
@@ -1319,6 +1415,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Mission</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1987"/>
+		<info name="serial" value="L 549"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="22527992">
@@ -1327,11 +1425,13 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="missiona" cloneof="mission" supported="no">
 		<description>Mission (Alt)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1987"/>
+		<info name="serial" value="L 549"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="73104">
@@ -1340,11 +1440,13 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="missionb" cloneof="mission" supported="no">
 		<description>Mission (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1987"/>
+		<info name="serial" value="L 549"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="73104">
@@ -1353,11 +1455,13 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="missionc" cloneof="mission" supported="no">
 		<description>Mission (Alt 3)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1987"/>
+		<info name="serial" value="L 549"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="73104">
@@ -1367,9 +1471,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="oxphar">
-		<description>Oxphar</description>
+		<description>Oxphar - La Pierre Bleue de Savanah</description>
 		<year>1987</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="author" value="Pascal Bacoux"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="32924">
@@ -1379,9 +1484,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="oxphara" cloneof="oxphar">
-		<description>Oxphar (Alt)</description>
+		<description>Oxphar - La Pierre Bleue de Savanah (Alt)</description>
 		<year>1987</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="author" value="Pascal Bacoux"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="32924">
@@ -1390,10 +1496,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="passvent">
+	<!-- $42 loader hack -->
+	<software name="passvent" supported="no">
 		<description>Les Passagers du Vent</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="307382">
@@ -1402,10 +1510,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="passventa" cloneof="passvent">
+	<!-- $42 loader hack -->
+	<software name="passventa" cloneof="passvent" supported="no">
 		<description>Les Passagers du Vent (Alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="307382">
@@ -1414,10 +1524,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="passventb" cloneof="passvent">
+	<!-- $11F1 loader hack -->
+	<software name="passventb" cloneof="passvent" supported="no">
 		<description>Les Passagers du Vent (Alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="307384">
@@ -1430,6 +1542,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Prohibition</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="19401872">
@@ -1438,10 +1551,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="prohibita" cloneof="prohibit">
+	<!-- $41 loader hack -->
+	<software name="prohibita" cloneof="prohibit" supported="no">
 		<description>Prohibition (Alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="100025">
@@ -1450,10 +1565,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="prohibitb" cloneof="prohibit">
+	<!-- $41 loader hack -->
+	<software name="prohibitb" cloneof="prohibit" supported="no">
 		<description>Prohibition (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="100025">
@@ -1462,10 +1579,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="prohibitc" cloneof="prohibit">
+	<!-- $11F1 loader hack -->
+	<software name="prohibitc" cloneof="prohibit" supported="no">
 		<description>Prohibition (Alt 3)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="102185">
@@ -1474,7 +1593,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="quad">
+	<!-- $42 loader hack -->
+	<software name="quad" supported="no">
 		<description>Quad</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
@@ -1486,7 +1606,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="quada" cloneof="quad" supported="no">
 		<description>Quad (Alt)</description>
 		<year>1987</year>
@@ -1499,7 +1619,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="quadb" cloneof="quad" supported="no">
 		<description>Quad (Alt 2)</description>
 		<year>1987</year>
@@ -1512,7 +1632,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="quadc" cloneof="quad" supported="no">
 		<description>Quad (Alt 3)</description>
 		<year>1987</year>
@@ -1530,7 +1650,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
     <software name="quadd" cloneof="quad" supported="no">
         <description>Quad (Bugged)</description>
         <year>1987</year>
-        <publisher>Microvds</publisher>
+        <publisher>Microïds</publisher>
 
         <part name="cass1" interface="mo_cass">
             <dataarea name="cass" size="88402">
@@ -1544,6 +1664,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Silent Service</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="SS 1109"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="48938">
@@ -1556,6 +1677,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Silent Service (Alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="SS 1109"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="48938">
@@ -1568,6 +1690,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Silent Service (Alt 2)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="SS 1109"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="48938">
@@ -1612,10 +1735,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="spacerac">
+	<!-- Device I/O Error -->
+	<software name="spacerac" supported="no">
 		<description>Space Racer</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1988"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="29188385">
@@ -1624,7 +1749,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="spaceraca" cloneof="spacerac">
+	<!-- $11F1 loader hack -->
+	<software name="spaceraca" cloneof="spacerac" supported="no">
 		<description>Space Racer (Alt)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
@@ -1636,7 +1762,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="spaceracb" cloneof="spacerac">
+	<!-- $42 loader hack -->
+	<software name="spaceracb" cloneof="spacerac" supported="no">
 		<description>Space Racer (Alt 2)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
@@ -1648,7 +1775,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="spaceracc" cloneof="spacerac">
+	<!-- $42 loader hack -->
+	<software name="spaceracc" cloneof="spacerac" supported="no">
 		<description>Space Racer (Alt 3)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
@@ -1672,7 +1800,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="superskia" cloneof="superski" supported="no">
 		<description>Super Ski (Alt)</description>
 		<year>1987</year>
@@ -1685,7 +1813,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="superskib" cloneof="superski" supported="no">
 		<description>Super Ski (Alt 2)</description>
 		<year>1987</year>
@@ -1698,7 +1826,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="superskic" cloneof="superski" supported="no">
 		<description>Super Ski (Alt 3)</description>
 		<year>1987</year>
@@ -1727,7 +1855,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 -->
 
 	<software name="traitbzz">
-		<description>Traitement Bzzz</description>
+		<description>Les Aventures du Ka 5 - Traitement Bzzz</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1739,7 +1867,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="traitbzza" cloneof="traitbzz">
-		<description>Traitement Bzzz (Alt)</description>
+		<description>Les Aventures du Ka 5 - Traitement Bzzz (Alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1751,7 +1879,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="traitbzzb" cloneof="traitbzz">
-		<description>Traitement Bzzz (Alt 2)</description>
+		<description>Les Aventures du Ka 5 - Traitement Bzzz (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1764,7 +1892,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<software name="turbocup">
 		<description>Turbo Cup</description>
-		<year>1988</year>
+		<year>1989</year>
 		<publisher>Loriciels</publisher>
 
 		<part name="cass2" interface="mo_cass">
@@ -1774,10 +1902,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="turbocupa" cloneof="turbocup" supported="no">
 		<description>Turbo Cup (Alt)</description>
-		<year>1988</year>
+		<year>1989</year>
 		<publisher>Loriciels</publisher>
 
 		<part name="cass1" interface="mo_cass">
@@ -1787,10 +1915,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<!-- protection, works in dcmoto -->
+	<!-- $42 loader hack, works in dcmoto -->
 	<software name="turbocupb" cloneof="turbocup" supported="no">
 		<description>Turbo Cup (Alt 2)</description>
-		<year>1988</year>
+		<year>1989</year>
 		<publisher>Loriciels</publisher>
 
 		<part name="cass1" interface="mo_cass">
@@ -1800,10 +1928,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="mortdino">
+	<!-- $41 loader hack -->
+	<software name="mortdino" supported="no">
 		<description>Vie et Mort des Dinosaures</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="91960">
@@ -1812,10 +1942,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="mortdinoa" cloneof="mortdino">
+	<!-- $41 loader hack -->
+	<software name="mortdinoa" cloneof="mortdino" supported="no">
 		<description>Vie et Mort des Dinosaures (Alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="91960">
@@ -1824,10 +1956,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="mortdinob" cloneof="mortdino">
+	<!-- $11F1 loader hack -->
+	<software name="mortdinob" cloneof="mortdino" supported="no">
 		<description>Vie et Mort des Dinosaures (Alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="95560">

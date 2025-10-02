@@ -91,4 +91,4 @@ ROM_END
     Drivers
 ***************************************************************************/
 
-SYST( 1980, tr808, 0, 0, tr808, tr808, tr808_state, empty_init, "Roland", "TR-808 Rhythm Composer", MACHINE_IS_SKELETON )
+SYST( 1980, tr808, 0, 0, tr808, tr808, tr808_state, empty_init, "Roland", "TR-808 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

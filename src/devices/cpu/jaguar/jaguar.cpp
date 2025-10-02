@@ -486,6 +486,7 @@ void jaguargpu_cpu_device::execute_run()
 	if (m_go == false)
 	{
 		//device->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}
@@ -521,6 +522,7 @@ void jaguardsp_cpu_device::execute_run()
 	if (m_go == false)
 	{
 		//device->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

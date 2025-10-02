@@ -635,7 +635,8 @@ void nb1413m3_device::vcrctrl_w(uint8_t data)
 	}
 }
 
-/* Nichibutsu Mahjong games share a common control panel */
+// Nichibutsu Mahjong games share a common control panel
+// The bit order is the opposite of Dynax/IGS
 INPUT_PORTS_START( nbmjcontrols )
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )

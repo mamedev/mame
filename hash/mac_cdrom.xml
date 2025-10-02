@@ -29,11 +29,13 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<!-- Chex Quest duplicated in ibm5170_cdrom.xml -->
 	<software name="chexquest">
 		<description>Chex Quest</description>
 		<year>1996</year>
 		<publisher>General Mills</publisher>
+		<!-- TODO: macpwr180c: QuickTime video hiccups -->
 		<info name="developer" value="Digital Café" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -41,24 +43,26 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="hexen">
 		<description>Hexen: Beyond Heretic</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
 		<info name="developer" value="Raven Software" />
+		<sharedfeat name="compatibility" value="MC68040,PPC601,PPC603,PPC604" />
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="hexen" sha1="5a77d58f1a7e648779d681ca9136539104e8b6ae" />
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Discs 1, 2, 3 are in the ibm5170_cdrom.xml as they are PC software. -->
 	<software name="idanthol">
 		<description>id Anthology</description>
 		<year>1996</year>
 		<publisher>id Software</publisher>
-		<notes><![CDATA[
-		Discs 1, 2, 3 are in the ibm5170_cdrom.xml software list as they are PC software.
-		]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
 		<part name="cdrom4" interface="cdrom">
@@ -67,6 +71,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac70a9">
 		<description>System Software 7.0a9 ("Big Bang" pre-release)</description>
 		<year>1991</year>
@@ -78,6 +83,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac71">
 		<description>System Software 7.1 (US English)</description>
 		<year>1992</year>
@@ -89,6 +95,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac712p_q630">
 		<description>Performa CD (System 7.1.2P for Quadra 630 and LC/Performa 580) (US English)</description>
 		<year>1994</year>
@@ -100,6 +107,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac75">
 		<description>System Software 7.5 (US English)</description>
 		<year>1994</year>
@@ -111,6 +119,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac753">
 		<description>System Software 7.5.3 (US English)</description>
 		<year>1996</year>
@@ -122,6 +131,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac76">
 		<description>Mac OS 7.6 (US English)</description>
 		<year>1997</year>
@@ -134,6 +144,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac76_de">
 		<description>Mac OS 7.6 (German)</description>
 		<year>1997</year>
@@ -146,6 +157,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac761">
 		<description>Mac OS 7.6.1 (US English)</description>
 		<year>1997</year>
@@ -158,6 +170,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac80_jp">
 		<description>Mac OS 8 (Japanese)</description>
 		<year>1997</year>
@@ -170,6 +183,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="mac81">
 		<description>Mac OS 8.1 (US English)</description>
 		<year>1998</year>
@@ -182,6 +196,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<!-- Mac OS 7.0.1-9.x -->
 	<software name="mfma_addsub">
 		<description>My First Math Adventure: Adding and Subtracting</description>
@@ -194,6 +209,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="pwrmaccd">
 		<description>Power Macintosh 6100/7100/8100 CD (System Software 7.1.2P) (US English)</description>
 		<year>1994</year>
@@ -206,6 +222,7 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="ultdoom">
 		<description>The Ultimate Doom</description>
 		<year>1995</year>

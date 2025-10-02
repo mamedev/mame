@@ -13,9 +13,9 @@ NOTES:
 #include "emu.h"
 #include "atm.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/hdd.h"
-#include "sound/ay8910.h"
 
 #define LOG_MEM   (1U << 1)
 #define LOG_VIDEO (1U << 2)
@@ -95,7 +95,7 @@ void atm_state::atm_port_ff_w(offs_t offset, u8 data)
 	{
 		// Must read current ULA value (which is doesn't work now) from the BUS.
 		// Good enough as non-border case is too complicated and possibly no software uses it.
-		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
+		u8 pen = 0x0f & get_border_color(m_screen->hpos(), m_screen->vpos());
 		m_palette_data[pen] = data;
 		m_palette->set_pen_color(pen,
 			(BIT(~data, 1) * 0xaa) | (BIT(~data, 6) * 0x55),
@@ -181,12 +181,12 @@ u8 atm_state::get_border_color(u16 hpos, u16 vpos)
 
 void atm_state::atm_update_video_mode()
 {
-	bool zx_scale = m_rg == 0b011;
+	bool zx_scale = m_rg & 1;
 	bool double_width = BIT(m_rg, 1) && !zx_scale;
-	u8 border_x = (40 - (32 * !zx_scale)) << double_width;
+	u8 border_x = (40 - (32 * !zx_scale)) << (double_width ? 1 : 0);
 	u8 border_y = (40 - (4 * !zx_scale));
 	rectangle scr = get_screen_area();
-	m_screen->configure(448 << double_width, m_screen->height(), {scr.left() - border_x, scr.right() + border_x, scr.top() - border_y, scr.bottom() + border_y}, m_screen->frame_period().as_attoseconds());
+	m_screen->configure(448 << (double_width ? 1 : 0), m_screen->height(), {scr.left() - border_x, scr.right() + border_x, scr.top() - border_y, scr.bottom() + border_y}, m_screen->frame_period().as_attoseconds());
 	LOGVIDEO("Video mode: %d\n", m_rg);
 
 	//spectrum_palette(m_palette);
@@ -381,8 +381,8 @@ void atm_state::atm_io(address_map &map)
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 
 	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
-	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
-	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay_slot", FUNC(ay_slot_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
 
 	// PORTS: Shadow
 	map(0x0000, 0xffff).view(m_io_view);
@@ -431,8 +431,6 @@ void atm_state::machine_start()
 
 	ram_pages_mask = (m_ram->size() - 1) / 0x4000;
 	m_bank_ram[0]->configure_entries(0, ram_pages_mask + 1, m_ram->pointer(), 0x4000);
-
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 }
 
 void atm_state::machine_reset()
@@ -440,12 +438,12 @@ void atm_state::machine_reset()
 	m_beta->enable();
 	m_beta_drive_selected = 0;
 
+	m_port_fe_data = -1;
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
 	m_port_77_data = 0;
 
 	m_br3 = 0;
-	m_palette_data = { 0xff };
 	atm_port_77_w(0x4000, 3); // m_port_77_data: CPM=0(on), PEN=0(off), PEN2=1(off); vmode: zx
 }
 
@@ -455,7 +453,6 @@ void atm_state::video_start()
 	m_screen_location = m_ram->pointer() + (5 << 14);
 	m_char_location = m_char_rom;
 	subdevice<gfxdecode_device>("gfxdecode")->gfx(0)->set_source(m_char_location);
-	m_contention_pattern = {};
 }
 
 /* F4 Character Displayer */
@@ -505,10 +502,12 @@ void atm_state::atm(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &atm_state::atm_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &atm_state::atm_switch);
 	m_maincpu->set_vblank_int("screen", FUNC(atm_state::atm_interrupt));
-	m_maincpu->nomreq_cb().set_nop();
+	m_maincpu->refresh_cb().remove();
+	m_maincpu->nomreq_cb().remove();
 
 	m_screen->set_raw(X1_128_SINCLAIR / 5, 448, 312, {get_screen_area().left() - 40, get_screen_area().right() + 40, get_screen_area().top() - 40, get_screen_area().bottom() + 40});
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	BETA_DISK(config, m_beta, 0);
 	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, nullptr, nullptr, false);
@@ -597,7 +596,7 @@ ROM_START( atmtb2plus )
 	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))
 ROM_END
 
-/*    YEAR  NAME        PARENT   COMPAT MACHINE     INPUT      CLASS          INIT        COMPANY     FULLNAME                  FLAGS */
-COMP( 1991, atm,        spec128, 0,     atm,        spec_plus, atm_state,     empty_init, "MicroART", "ATM-Turbo (ATM-CP)",     MACHINE_NOT_WORKING)
-COMP( 1992, atmtb2,     spec128, 0,     atmtb2,     spec_plus, atm_state,     empty_init, "MicroART", "ATM-Turbo 2",            MACHINE_SUPPORTS_SAVE)
-COMP( 1993, atmtb2plus, spec128, 0,     atmtb2plus, spec_plus, atm_state,     empty_init, "MicroART", "ATM-Turbo 2+",           MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME        PARENT   COMPAT MACHINE     INPUT        CLASS          INIT        COMPANY     FULLNAME                  FLAGS */
+COMP( 1991, atm,        spec128, 0,     atm,        spec_plus2a, atm_state,     empty_init, "MicroART", "ATM-Turbo (ATM-CP)",     MACHINE_NOT_WORKING)
+COMP( 1992, atmtb2,     spec128, 0,     atmtb2,     spec_plus2a, atm_state,     empty_init, "MicroART", "ATM-Turbo 2",            MACHINE_SUPPORTS_SAVE)
+COMP( 1993, atmtb2plus, spec128, 0,     atmtb2plus, spec_plus2a, atm_state,     empty_init, "MicroART", "ATM-Turbo 2+",           MACHINE_SUPPORTS_SAVE)

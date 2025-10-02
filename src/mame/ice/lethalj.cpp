@@ -901,7 +901,30 @@ ROM_START( eggventr7 )
 	ROM_LOAD( "eu18.u18", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 ROM_END
 
-// There is an undumped release 3 when GR5 & GR6 was updated to the .3 versions
+// It's not known when GR5 & GR6 were updated to the .3 version, but release 4 still had GR5.2 & GR6.2 ROMs
+
+ROM_START( eggventr4 ) // Comes from a PCB with an early serial number EV00151, program ROMSs are 27C040 with required data at 0x7ffe0 in each ROM
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )  // 34010 code
+	ROM_LOAD16_BYTE( "ev_vc8.4.vc8", 0x000000, 0x080000, CRC(3348aabb) SHA1(959c6a20e67e7fe0d4505f8af6433bf7207f3656) ) // Labeled as EV VC8.4
+	ROM_LOAD16_BYTE( "ev_vc9.4.vc9", 0x000001, 0x080000, CRC(c699178f) SHA1(192b770966db5e534eccb60b4632d392dbba3721) ) // Labeled as EV VC9.4
+
+	ROM_REGION16_LE( 0x600000, "gfx", 0 )  // graphics data
+	ROM_LOAD16_BYTE( "egr1.gr1",     0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
+	ROM_LOAD16_BYTE( "egr2.gr2",     0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
+	ROM_LOAD16_BYTE( "egr4.gr4",     0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
+	ROM_LOAD16_BYTE( "egr3.gr3",     0x200001, 0x100000, CRC(3f8dfc73) SHA1(83a168069f896ea7e67a97c6d591d09b19d5f486) )
+	ROM_LOAD16_BYTE( "ev_gr6.2.gr6", 0x400000, 0x100000, CRC(a4d9d126) SHA1(d5f2bc4bfa7c0462865907dbc39fc0479340e1c8) ) // Labeled as EV GR6.2 - verified correct for release 4
+	ROM_LOAD16_BYTE( "ev_gr5.2.gr5", 0x400001, 0x100000, CRC(b5162234) SHA1(3f05c7eb5b00805eb7fc1e3634dea29b1ce3af62) ) // Labeled as EV GR5.2 - verified correct for release 4
+
+	ROM_REGION( 0x80000, "oki1", 0 )   // sound data
+	ROM_LOAD( "eu20.u20", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
+
+	ROM_REGION( 0x80000, "oki2", 0 )   // sound data
+	ROM_LOAD( "eu21.u21", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
+
+	ROM_REGION( 0x80000, "oki3", 0 )   // sound data
+	ROM_LOAD( "eu18.u18", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
+ROM_END
 
 ROM_START( eggventr2 ) // Comes from a PCB with an early serial number EV00123, program roms are 27C040 with required data at 0x7ffe0 in each rom
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )  // 34010 code
@@ -1218,6 +1241,7 @@ GAME( 1996, franticfa, franticf, franticf, franticfa, lethalj_state, empty_init,
 GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 10)", 0 )
 GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 8)", 0 )
 GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggventr4, eggventr, gameroom, eggventr2, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 4)", 0 )
 GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 2)", 0 )
 GAME( 1997, eggventr1, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "Kyle Hodgetts / The Game Room", "Egg Venture (Release 1)", 0 )
 GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )

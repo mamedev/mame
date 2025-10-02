@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_P1_SOUND_H
-#define MAME_BUS_P1_SOUND_H
+#ifndef MAME_BUS_ISA_P1_SOUND_H
+#define MAME_BUS_ISA_P1_SOUND_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 DECLARE_DEVICE_TYPE(P1_SOUND, p1_sound_device)
 
 
-#endif // MAME_BUS_P1_SOUND_H
+#endif // MAME_BUS_ISA_P1_SOUND_H

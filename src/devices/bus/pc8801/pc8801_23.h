@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_PC8801_23_H
-#define MAME_BUS_PC8801_23_H
+#ifndef MAME_BUS_PC8801_PC8801_23_H
+#define MAME_BUS_PC8801_PC8801_23_H
 
 #pragma once
 
@@ -39,5 +39,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PC8801_23, pc8801_23_device)
 
-
-#endif // MAME_BUS_PC8801_23_H
+#endif // MAME_BUS_PC8801_PC8801_23_H

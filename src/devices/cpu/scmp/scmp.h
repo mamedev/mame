@@ -53,13 +53,14 @@ private:
 	PAIR    m_P1;
 	PAIR    m_P2;
 	PAIR    m_P3;
-	uint8_t   m_AC;
-	uint8_t   m_ER;
-	uint8_t   m_SR;
+	uint8_t m_AC;
+	uint8_t m_ER;
+	uint8_t m_SR;
 
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
-	int                 m_icount;
+
+	int                m_icount;
 
 	devcb_write8       m_flag_out_func;
 	devcb_write_line   m_sout_func;

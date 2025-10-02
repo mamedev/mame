@@ -13,6 +13,7 @@
 #define LOG_STATE           (1U << 2)
 #define LOG_LINESTATE       (1U << 3)
 #define VERBOSE             (0)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -81,8 +82,9 @@ enum
 DEFINE_DEVICE_TYPE(MACADB, macadb_device, "macadb", "Mac ADB HLE")
 
 static INPUT_PORTS_START( macadb )
-	PORT_START("MOUSE0") /* Mouse - button */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_START("MOUSE0") /* Mouse - buttons */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button 0") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON2)
 
 	PORT_START("MOUSE1") /* Mouse - X AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
@@ -238,6 +240,8 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 		m_keys(*this, "KEY%u", 0),
 		write_adb_data(*this),
 		write_adb_irq(*this),
+		write_adb_power(*this),
+		write_adb_akd(*this),
 		m_waiting_cmd(false),
 		m_datasize(0),
 		m_command(0),
@@ -313,6 +317,7 @@ static char const *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 bool macadb_device::adb_pollkbd(int update)
 {
 	int report, codes[2];
+	int akd = 0;
 	bool result;
 
 	codes[0] = codes[1] = 0xff; // key up
@@ -343,6 +348,10 @@ bool macadb_device::adb_pollkbd(int update)
 					if (!(keybuf & (1 << j)))
 					{
 						codes[report] |= 0x80;
+					}
+					else
+					{
+						akd = 1;
 					}
 
 					// update modifier state
@@ -426,10 +435,12 @@ bool macadb_device::adb_pollkbd(int update)
 	if (codes[0] == 0x5d)
 	{
 		codes[0] = codes[1] = 0x7f;
+		write_adb_power(ASSERT_LINE);
 	}
 	else if (codes[0] == 0xdd)
 	{
 		codes[0] = codes[1] = 0xff;
+		write_adb_power(CLEAR_LINE);
 	}
 
 	// figure out if there was a change
@@ -453,32 +464,31 @@ bool macadb_device::adb_pollkbd(int update)
 		}
 	}
 
+	write_adb_akd(akd);
+
 	return result;
+}
+
+void macadb_device::portable_update_keyboard()
+{
+	adb_pollkbd(0);
 }
 
 bool macadb_device::adb_pollmouse()
 {
-	s32 NewX, NewY, NewButton;
+	s32 const NewButton = m_mouse0->read() & 0x03;
+	s32 const NewX = m_mouse1->read();
+	s32 const NewY = m_mouse2->read();
 
-	NewButton = m_mouse0->read() & 0x01;
-	NewX = m_mouse1->read();
-	NewY = m_mouse2->read();
-
-	if ((NewX != m_lastmousex) || (NewY != m_lastmousey) || (NewButton != m_lastbutton))
-	{
-		return true;
-	}
-
-	return false;
+	return (NewX != m_lastmousex) || (NewY != m_lastmousey) || (NewButton != m_lastbutton);
 }
 
 void macadb_device::adb_accummouse(u8 *MouseX, u8 *MouseY )
 {
 	int MouseCountX = 0, MouseCountY = 0;
-	int NewX, NewY;
 
-	NewX = m_mouse1->read();
-	NewY = m_mouse2->read();
+	int const NewX = m_mouse1->read();
+	int const NewY = m_mouse2->read();
 
 //  printf("pollmouse: X %d Y %d\n", NewX, NewY);
 
@@ -512,7 +522,7 @@ void macadb_device::adb_accummouse(u8 *MouseX, u8 *MouseY )
 		m_lastmousey = NewY;
 	}
 
-	m_lastbutton = m_mouse0->read() & 0x01;
+	m_lastbutton = m_mouse0->read() & 0x03;
 
 	*MouseX = (u8)MouseCountX;
 	*MouseY = (u8)MouseCountY;
@@ -520,10 +530,8 @@ void macadb_device::adb_accummouse(u8 *MouseX, u8 *MouseY )
 
 void macadb_device::adb_talk()
 {
-	int addr, reg;
-
-	addr = (m_command>>4);
-	reg = (m_command & 3);
+	int const addr = m_command >> 4;
+	int const reg = m_command & 3;
 
 //  printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", m_command, (m_command>>2)&3, addr, reg, m_mouseaddr, m_keybaddr);
 
@@ -594,9 +602,8 @@ void macadb_device::adb_talk()
 								this->adb_accummouse(&mouseX, &mouseY);
 							}
 							//printf("X %x Y %x\n", mouseX, mouseY);
-							m_buffer[0] = (m_lastbutton & 0x01) ? 0x00 : 0x80;
-							m_buffer[0] |= mouseY & 0x7f;
-							m_buffer[1] = (mouseX & 0x7f) | 0x80;
+							m_buffer[0] = (BIT(~m_lastbutton, 0) << 7) | (mouseY & 0x7f);
+							m_buffer[1] = (BIT(~m_lastbutton, 1) << 7) | (mouseX & 0x7f);
 
 							if ((m_buffer[0] != m_last_mouse[0]) || (m_buffer[1] != m_last_mouse[1]))
 							{

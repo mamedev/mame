@@ -242,6 +242,22 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<!-- was originally in fm77av.xml, game is supported by base FM-7 anyway -->
+	<!-- https://fm-7.com/museum/products/rb7irg02/ -->
+	<!-- assume either mistake or actually one of the two is 3.5" version -->
+	<software name="dsenraku" cloneof="daisenr">
+		<description>Daisenryaku FM (alt)</description>
+		<year>1987</year>
+		<publisher>システムソフト (System Soft)</publisher>
+		<info name="release" value="198708xx"/>
+		<info name="alt_title" value="大戦略FM"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="dsenryaku.d77" size="348848" crc="35f02f75" sha1="f590c7f2d3d1b602274bef5e1992babf4acfebc3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkcrys">
 		<description>Dark Crystal</description>
 		<year>1984</year>

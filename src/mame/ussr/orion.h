@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_RADIO_ORION_H
-#define MAME_RADIO_ORION_H
+#ifndef MAME_USSR_ORION_H
+#define MAME_USSR_ORION_H
 
 #pragma once
 
@@ -78,7 +78,6 @@ protected:
 	void orionpro_memory_page_w(uint8_t data);
 	uint8_t orionpro_io_r(offs_t offset);
 	void orionpro_io_w(offs_t offset, uint8_t data);
-	DECLARE_MACHINE_START(orion128);
 	void orion128_palette(palette_device &palette) const;
 	uint32_t screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
@@ -167,4 +166,4 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_RADIO_ORION_H
+#endif // MAME_USSR_ORION_H

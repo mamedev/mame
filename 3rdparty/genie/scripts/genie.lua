@@ -78,7 +78,7 @@
 			linkoptions  { "-rdynamic" }
 
 		configuration "linux"
-			define       { "_FILE_OFFSET_BITS=64" }
+			defines      { "_FILE_OFFSET_BITS=64" }
 
 		configuration "macosx"
 			targetdir   "../bin/darwin"

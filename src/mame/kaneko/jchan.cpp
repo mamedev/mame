@@ -599,10 +599,7 @@ void jchan_state::jchan(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 64*8);
-	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	screen.set_raw(28.636363_MHz_XTAL / 4, 460, 0, 320, 261, 0, 240);
 	screen.set_screen_update(FUNC(jchan_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -621,12 +618,11 @@ void jchan_state::jchan(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16000000));
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 /* ROM loading */

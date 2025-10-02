@@ -235,4 +235,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1986, si5500, 0, 0, si5500, si5500, si5500_state, empty_init, "Scientific Instruments", "Model 5500 Temperature Controller", MACHINE_IS_SKELETON)
+COMP(1986, si5500, 0, 0, si5500, si5500, si5500_state, empty_init, "Scientific Instruments", "Model 5500 Temperature Controller", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

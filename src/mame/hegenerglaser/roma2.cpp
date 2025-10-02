@@ -72,21 +72,18 @@ private:
 	u8 input_r();
 };
 
-INPUT_CHANGED_MEMBER(roma2_state::reset_button)
-{
-	// RES buttons in serial tied to CPU RESET
-	if (m_reset->read() == 3)
-	{
-		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_display->reset();
-	}
-}
-
 
 
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+INPUT_CHANGED_MEMBER(roma2_state::reset_button)
+{
+	// RES buttons in serial tied to CPU RESET
+	if (m_reset->read() == 3)
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
 
 u8 roma2_state::input_r()
 {
@@ -181,8 +178,8 @@ void roma2_state::roma2(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(roma2_state::irq5_line_hold), irq_period);
 
 	HC259(config, m_outlatch);
-	// Q0-Q3: input mux; Q4: strobe; Q6-Q7: DAC
-	m_outlatch->q_out_cb<4>().set(m_display, FUNC(mephisto_display1_device::strobe_w));
+	// Q0-Q3: input mux; Q4: lcd common; Q6-Q7: DAC
+	m_outlatch->q_out_cb<4>().set(m_display, FUNC(mephisto_display1_device::common_w));
 	m_outlatch->parallel_out_cb().set(m_dac, FUNC(dac_2bit_ones_complement_device::write)).rshift(6).mask(3);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board);

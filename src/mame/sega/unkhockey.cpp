@@ -153,4 +153,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 199?, unkhockey, 0, unkhockey, unkhockey, unkhockey_state, empty_init, ROT0, "Sega", "unknown Sega air hockey game", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, unkhockey, 0, unkhockey, unkhockey, unkhockey_state, empty_init, ROT0, "Sega", "unknown Sega air hockey game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

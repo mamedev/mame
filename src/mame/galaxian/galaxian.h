@@ -151,56 +151,57 @@ public:
 	void theend_coin_counter_w(uint8_t data);
 	uint8_t explorer_sound_latch_r();
 	uint8_t frogger_sound_timer_r();
-	void init_galaxian();
-	void init_nolock();
-	void init_azurian();
-	void init_batman2();
-	void init_highroll();
-	void init_frogg();
-	void init_mooncrst();
-	void init_mooncrsu();
-	void init_mooncrgx();
-	void init_moonqsr();
-	void init_pacmanbl();
-	void init_devilfshg();
-	void init_jumpbug();
-	void init_jumpbugbc();
-	void init_checkman();
-	void init_checkmaj();
-	void init_dingo();
-	void init_dingoe();
-	void init_kong();
-	void init_fantastc();
-	void init_timefgtr();
-	void init_theend();
-	void init_scramble();
-	void init_explorer();
-	void init_mandinga();
-	void init_mandingaeg();
-	void init_atlantis();
-	void init_scobra();
-	void init_scobrae();
-	void init_losttomb();
-	void init_frogger();
-	void init_froggermc();
-	void init_froggers();
-	void init_quaak();
-	void init_turtles();
-	void init_ckongs();
-	void init_ckonggx();
-	void init_anteater();
-	void init_anteateruk();
-	void init_superbon();
-	void init_calipso();
-	void init_ghostmun();
-	void init_froggrs();
-	void init_warofbugg();
-	void init_jungsub();
-	void init_mimonkey();
-	void init_mimonkeyb();
-	void init_victoryc();
-	void init_bigkonggx();
-	void init_crazym();
+	void init_galaxian() ATTR_COLD;
+	void init_nolock() ATTR_COLD;
+	void init_azurian() ATTR_COLD;
+	void init_batman2() ATTR_COLD;
+	void init_ladybugg2() ATTR_COLD;
+	void init_highroll() ATTR_COLD;
+	void init_frogg() ATTR_COLD;
+	void init_mooncrst() ATTR_COLD;
+	void init_mooncrsu() ATTR_COLD;
+	void init_mooncrgx() ATTR_COLD;
+	void init_moonqsr() ATTR_COLD;
+	void init_pacmanbl() ATTR_COLD;
+	void init_devilfshg() ATTR_COLD;
+	void init_jumpbug() ATTR_COLD;
+	void init_jumpbugbc() ATTR_COLD;
+	void init_checkman() ATTR_COLD;
+	void init_checkmaj() ATTR_COLD;
+	void init_dingo() ATTR_COLD;
+	void init_dingoe() ATTR_COLD;
+	void init_kong() ATTR_COLD;
+	void init_fantastc() ATTR_COLD;
+	void init_timefgtr() ATTR_COLD;
+	void init_theend() ATTR_COLD;
+	void init_scramble() ATTR_COLD;
+	void init_explorer() ATTR_COLD;
+	void init_mandinga() ATTR_COLD;
+	void init_mandingaeg() ATTR_COLD;
+	void init_atlantis() ATTR_COLD;
+	void init_scobra() ATTR_COLD;
+	void init_scobrae() ATTR_COLD;
+	void init_losttomb() ATTR_COLD;
+	void init_frogger() ATTR_COLD;
+	void init_froggermc() ATTR_COLD;
+	void init_froggers() ATTR_COLD;
+	void init_quaak() ATTR_COLD;
+	void init_turtles() ATTR_COLD;
+	void init_ckongs() ATTR_COLD;
+	void init_ckonggx() ATTR_COLD;
+	void init_anteater() ATTR_COLD;
+	void init_anteateruk() ATTR_COLD;
+	void init_superbon() ATTR_COLD;
+	void init_calipso() ATTR_COLD;
+	void init_ghostmun() ATTR_COLD;
+	void init_froggrs() ATTR_COLD;
+	void init_warofbugg() ATTR_COLD;
+	void init_jungsub() ATTR_COLD;
+	void init_mimonkey() ATTR_COLD;
+	void init_mimonkeyb() ATTR_COLD;
+	void init_victoryc() ATTR_COLD;
+	void init_bigkonggx() ATTR_COLD;
+	void init_crazym() ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
@@ -211,8 +212,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
 	void state_save_register();
-	void sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spritebase);
-	void bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base);
+	void sprites_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spritebase);
+	void bullets_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base);
 	void stars_init();
 	void stars_update_origin();
 	void stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs, uint8_t starmask);
@@ -265,65 +266,66 @@ public:
 			draw_background_func draw_background,
 			extend_tile_info_func extend_tile_info,
 			extend_sprite_info_func extend_sprite_info);
-	void galaxian_base(machine_config &config);
-	void sidam_bootleg_base(machine_config &config);
-	void konami_base(machine_config &config);
-	void konami_sound_1x_ay8910(machine_config &config);
-	void konami_sound_2x_ay8910(machine_config &config);
-	void scramble_base(machine_config &config);
-	void timefgtr(machine_config &config);
-	void moonqsr(machine_config &config);
-	void frogger(machine_config &config);
-	void anteatergg(machine_config &config);
-	void ozon1(machine_config &config);
-	void theend(machine_config &config);
-	void turtles(machine_config &config);
-	void fantastc(machine_config &config);
-	void jumpbug(machine_config &config);
-	void jumpbugbrf(machine_config &config);
-	void checkmaj(machine_config &config);
-	void pacmanbl(machine_config &config);
-	void quaak(machine_config &config);
-	void galaxian(machine_config &config);
-	void highroll(machine_config &config);
-	void devilfshg(machine_config &config);
-	void froggers(machine_config &config);
-	void froggervd(machine_config &config);
-	void anteateruk(machine_config &config);
-	void anteaterg(machine_config &config);
-	void anteater(machine_config &config);
-	void turpins(machine_config &config);
-	void explorer(machine_config &config);
-	void scramble(machine_config &config);
-	void scobra(machine_config &config);
-	void froggermc(machine_config &config);
-	void froggeram(machine_config &config);
-	void spactrai(machine_config &config);
-	void takeoff(machine_config &config);
-	void mooncrst(machine_config &config);
-	void eagle(machine_config &config);
-	void ckongs(machine_config &config);
-	void frogf(machine_config &config);
-	void amigo2(machine_config &config);
-	void checkman(machine_config &config);
-	void jungsub(machine_config &config);
-	void victoryc(machine_config &config);
-	void frogg(machine_config &config);
-	void mandingarf(machine_config &config);
-	void mandinka(machine_config &config);
-	void thepitm(machine_config &config);
-	void kong(machine_config &config);
-	void bongo(machine_config &config);
-	void bongog(machine_config &config);
-	void scorpnmc(machine_config &config);
-	void ckongg(machine_config &config);
-	void ckongmc(machine_config &config);
-	void astroamb(machine_config &config);
-	void mimonkey(machine_config &config);
-	void mimonscr(machine_config &config);
-	void galartic(machine_config &config);
-	void bigkonggx(machine_config &config);
-	void scrammr(machine_config &config);
+	void galaxian_base(machine_config &config) ATTR_COLD;
+	void sidam_bootleg_base(machine_config &config) ATTR_COLD;
+	void konami_base(machine_config &config) ATTR_COLD;
+	void konami_sound_1x_ay8910(machine_config &config) ATTR_COLD;
+	void konami_sound_2x_ay8910(machine_config &config) ATTR_COLD;
+	void scramble_base(machine_config &config) ATTR_COLD;
+	void timefgtr(machine_config &config) ATTR_COLD;
+	void moonqsr(machine_config &config) ATTR_COLD;
+	void frogger(machine_config &config) ATTR_COLD;
+	void anteatergg(machine_config &config) ATTR_COLD;
+	void ozon1(machine_config &config) ATTR_COLD;
+	void theend(machine_config &config) ATTR_COLD;
+	void turtles(machine_config &config) ATTR_COLD;
+	void fantastc(machine_config &config) ATTR_COLD;
+	void jumpbug(machine_config &config) ATTR_COLD;
+	void jumpbugbrf(machine_config &config) ATTR_COLD;
+	void checkmaj(machine_config &config) ATTR_COLD;
+	void pacmanbl(machine_config &config) ATTR_COLD;
+	void quaak(machine_config &config) ATTR_COLD;
+	void galaxian(machine_config &config) ATTR_COLD;
+	void highroll(machine_config &config) ATTR_COLD;
+	void devilfshg(machine_config &config) ATTR_COLD;
+	void froggers(machine_config &config) ATTR_COLD;
+	void froggervd(machine_config &config) ATTR_COLD;
+	void anteateruk(machine_config &config) ATTR_COLD;
+	void anteaterg(machine_config &config) ATTR_COLD;
+	void anteater(machine_config &config) ATTR_COLD;
+	void turpins(machine_config &config) ATTR_COLD;
+	void explorer(machine_config &config) ATTR_COLD;
+	void scramble(machine_config &config) ATTR_COLD;
+	void scobra(machine_config &config) ATTR_COLD;
+	void froggermc(machine_config &config) ATTR_COLD;
+	void froggeram(machine_config &config) ATTR_COLD;
+	void spactrai(machine_config &config) ATTR_COLD;
+	void takeoff(machine_config &config) ATTR_COLD;
+	void mooncrst(machine_config &config) ATTR_COLD;
+	void eagle(machine_config &config) ATTR_COLD;
+	void ckongs(machine_config &config) ATTR_COLD;
+	void frogf(machine_config &config) ATTR_COLD;
+	void amigo2(machine_config &config) ATTR_COLD;
+	void checkman(machine_config &config) ATTR_COLD;
+	void jungsub(machine_config &config) ATTR_COLD;
+	void victoryc(machine_config &config) ATTR_COLD;
+	void frogg(machine_config &config) ATTR_COLD;
+	void mandingarf(machine_config &config) ATTR_COLD;
+	void mandinka(machine_config &config) ATTR_COLD;
+	void thepitm(machine_config &config) ATTR_COLD;
+	void kong(machine_config &config) ATTR_COLD;
+	void bongo(machine_config &config) ATTR_COLD;
+	void bongog(machine_config &config) ATTR_COLD;
+	void scorpnmc(machine_config &config) ATTR_COLD;
+	void ckongg(machine_config &config) ATTR_COLD;
+	void ckongmc(machine_config &config) ATTR_COLD;
+	void astroamb(machine_config &config) ATTR_COLD;
+	void mimonkey(machine_config &config) ATTR_COLD;
+	void mimonscr(machine_config &config) ATTR_COLD;
+	void galartic(machine_config &config) ATTR_COLD;
+	void bigkonggx(machine_config &config) ATTR_COLD;
+	void scrammr(machine_config &config) ATTR_COLD;
+	void turpinnv(machine_config &config) ATTR_COLD;
 
 	template <int Mask> ioport_value ckongg_coinage_r();
 	template <int Mask> int ckongs_coinage_r();
@@ -335,7 +337,6 @@ protected:
 	void set_num_spritegens(int num) { m_numspritegens = num; }
 	void set_x_scale(uint8_t scale) { m_x_scale = scale; }
 	void set_h0_start(uint8_t start) { m_h0_start = start; }
-	void set_left_sprite_clip(uint8_t clip) { m_leftspriteclip = clip; }
 
 	void amigo2_map(address_map &map) ATTR_COLD;
 	void anteaterg_map(address_map &map) ATTR_COLD;
@@ -392,6 +393,7 @@ protected:
 	void takeoff_sound_portmap(address_map &map) ATTR_COLD;
 	void theend_map(address_map &map) ATTR_COLD;
 	void thepitm_map(address_map &map) ATTR_COLD;
+	void turpinnv_map(address_map &map) ATTR_COLD;
 	void turpins_map(address_map &map) ATTR_COLD;
 	void turpins_sound_map(address_map &map) ATTR_COLD;
 	void turtles_map(address_map &map) ATTR_COLD;
@@ -400,10 +402,10 @@ protected:
 	virtual void machine_start() override
 	{
 		m_lamps.resolve();
-
 		m_irq_enabled = 0;
 	}
 	virtual void video_start() override ATTR_COLD;
+	virtual void sprites_clip(screen_device &screen, rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -456,7 +458,6 @@ protected:
 	uint8_t m_stars_blink_state = 0;
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5]{};
-	uint8_t m_leftspriteclip = 16;
 };
 
 
@@ -468,8 +469,8 @@ public:
 	{
 	}
 
-	void bagmanmc(machine_config &config);
-	void init_bagmanmc();
+	void bagmanmc(machine_config &config) ATTR_COLD;
+	void init_bagmanmc() ATTR_COLD;
 
 protected:
 	void bagmanmc_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
@@ -492,12 +493,12 @@ public:
 		, m_rombank(*this, "rombank")
 	{ }
 
-	void gmgalax(machine_config &config);
+	void gmgalax(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(game_changed);
 	template <int N> ioport_value port_r();
 
-	void init_gmgalax();
+	void init_gmgalax() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -522,11 +523,12 @@ public:
 	{
 	}
 
-	void pisces(machine_config &config);
-	void porter(machine_config &config);
-	void skybase(machine_config &config);
+	void ladybugg2(machine_config &config) ATTR_COLD;
+	void pisces(machine_config &config) ATTR_COLD;
+	void porter(machine_config &config) ATTR_COLD;
+	void skybase(machine_config &config) ATTR_COLD;
 
-	void init_pisces();
+	void init_pisces() ATTR_COLD;
 
 protected:
 	void pisces_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
@@ -536,6 +538,7 @@ private:
 	void pisces_map(address_map &map) ATTR_COLD;
 	void skybase_map(address_map &map) ATTR_COLD;
 	void porter_map(address_map &map) ATTR_COLD;
+	void ladybugg2_opcodes_map (address_map &map) ATTR_COLD;
 };
 
 
@@ -548,8 +551,8 @@ public:
 	{
 	}
 
-	void fourplay(machine_config &config);
-	void init_fourplay();
+	void fourplay(machine_config &config) ATTR_COLD;
+	void init_fourplay() ATTR_COLD;
 
 private:
 	void fourplay_rombank_w(offs_t offset, uint8_t data);
@@ -567,10 +570,10 @@ public:
 	{
 	}
 
-	void mshuttle(machine_config &config);
+	void mshuttle(machine_config &config) ATTR_COLD;
 
-	void init_mshuttle();
-	void init_mshuttlj();
+	void init_mshuttle() ATTR_COLD;
+	void init_mshuttlj() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -604,7 +607,7 @@ public:
 	int muxbit_r();
 	int noise_r();
 
-	void kingball(machine_config &config);
+	void kingball(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -636,8 +639,11 @@ public:
 	{
 	}
 
-	void namenayo(machine_config &config);
-	void init_namenayo();
+	void namenayo(machine_config &config) ATTR_COLD;
+	void init_namenayo() ATTR_COLD;
+
+protected:
+	virtual void sprites_clip(screen_device &screen, rectangle &cliprect) override { }
 
 private:
 	void namenayo_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -663,9 +669,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(tenspot_fake);
 
-	void tenspot(machine_config &config);
-
-	void init_tenspot();
+	void tenspot(machine_config &config) ATTR_COLD;
+	void init_tenspot() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -697,8 +702,8 @@ public:
 	{
 	}
 
-	void zigzag(machine_config &config);
-	void init_zigzag();
+	void zigzag(machine_config &config) ATTR_COLD;
+	void init_zigzag() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -722,8 +727,8 @@ public:
 	{
 	}
 
-	void videight(machine_config &config);
-	void init_videight();
+	void videight(machine_config &config) ATTR_COLD;
+	void init_videight() ATTR_COLD;
 
 private:
 	void videight_rombank_w(offs_t offset, uint8_t data);
@@ -745,10 +750,10 @@ public:
 	{
 	}
 
-	void guttangt(machine_config &config);
-	void guttangts3(machine_config &config);
-	void init_guttangt();
-	void init_guttangts3();
+	void guttangt(machine_config &config) ATTR_COLD;
+	void guttangts3(machine_config &config) ATTR_COLD;
+	void init_guttangt() ATTR_COLD;
+	void init_guttangts3() ATTR_COLD;
 
 private:
 	void guttangt_map(address_map &map) ATTR_COLD;
@@ -768,8 +773,8 @@ public:
 	{
 	}
 
-	void scorpion(machine_config &config);
-	void init_scorpion();
+	void scorpion(machine_config &config) ATTR_COLD;
+	void init_scorpion() ATTR_COLD;
 
 private:
 	uint8_t ay8910_r(offs_t offset);
@@ -797,9 +802,8 @@ public:
 	{
 	}
 
-	void sfx(machine_config &config);
-
-	void init_sfx();
+	void sfx(machine_config &config) ATTR_COLD;
+	void init_sfx() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -832,8 +836,7 @@ public:
 	}
 
 	void monsterz(machine_config& config);
-
-	void init_monsterz();
+	void init_monsterz() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -865,7 +868,7 @@ public:
 
 	ioport_value dial_r();
 
-	void moonwar(machine_config &config);
+	void moonwar(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -894,8 +897,8 @@ public:
 	{
 	}
 
-	void sbhoei(machine_config &config);
-	void init_sbhoei();
+	void sbhoei(machine_config &config) ATTR_COLD;
+	void init_sbhoei() ATTR_COLD;
 	void sbhoei_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void sbhoei_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 
@@ -930,8 +933,8 @@ public:
 	{
 	}
 
-	void bmxstunts(machine_config &config);
-	void init_bmxstunts();
+	void bmxstunts(machine_config &config) ATTR_COLD;
+	void init_bmxstunts() ATTR_COLD;
 	void bmxstunts_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 
 private:

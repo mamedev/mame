@@ -23,8 +23,8 @@ Hardware notes:
 
 #include "mmboard.h"
 
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
@@ -224,7 +224,7 @@ void montec_state::montec4le(machine_config &config)
 	montec4(config);
 
 	// basic machine hardware
-	M65C02(config.replace(), m_maincpu, 8_MHz_XTAL);
+	W65C02(config.replace(), m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &montec_state::montec_mem);
 
 	const attotime irq_period = attotime::from_hz(8_MHz_XTAL / 0x4000);

@@ -38,8 +38,7 @@ svi_expander_device::svi_expander_device(const machine_config &mconfig, const ch
 	m_ctrl1_handler(*this),
 	m_ctrl2_handler(*this),
 	m_excsr_handler(*this, 0xff),
-	m_excsw_handler(*this),
-	m_dummy(0)
+	m_excsw_handler(*this)
 {
 }
 
@@ -59,9 +58,6 @@ void svi_expander_device::device_start()
 {
 	// get inserted module
 	m_module = get_card_device();
-
-	// register for save states
-	save_item(NAME(m_dummy));
 }
 
 //-------------------------------------------------

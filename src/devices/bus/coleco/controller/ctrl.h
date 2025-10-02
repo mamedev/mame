@@ -9,8 +9,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_CTRL_H
-#define MAME_BUS_COLECO_CTRL_H
+#ifndef MAME_BUS_COLECO_CONTROLLER_CTRL_H
+#define MAME_BUS_COLECO_CONTROLLER_CTRL_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ DECLARE_DEVICE_TYPE(COLECOVISION_CONTROL_PORT, colecovision_control_port_device)
 void colecovision_control_port_devices(device_slot_interface &device);
 
 
-#endif // MAME_BUS_COLECO_CTRL_H
+#endif // MAME_BUS_COLECO_CONTROLLER_CTRL_H

@@ -133,4 +133,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1982, vp60, 0, 0, vp60, vp60, vp60_state, empty_init, "ADDS", "Viewpoint 60", MACHINE_IS_SKELETON )
+COMP( 1982, vp60, 0, 0, vp60, vp60, vp60_state, empty_init, "ADDS", "Viewpoint 60", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

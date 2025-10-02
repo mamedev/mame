@@ -392,7 +392,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 	</software>
 
 	<software name="3dsoccera" cloneof="3dsoccer">
-		<description>3D Soccer (Alt)</description>
+		<description>3D Soccer (alt)</description>
 		<!-- Possibly the German version altered for the Schmid TVG-2000 -->
 		<year>1983</year>
 		<publisher>UA Ltd.</publisher>
@@ -771,7 +771,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 
 	<software name="jumpbuga" cloneof="jumpbug">
 	<!-- Possibly the German version altered for the Schmid TVG-2000 -->
-		<description>Jump Bug (Alt)</description>
+		<description>Jump Bug (alt)</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<info name="alt_title" value="Happy Bug" />
@@ -850,7 +850,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 	</software>
 
 	<software name="nibblema" cloneof="nibblem">
-		<description>Nibblemen (Alt)</description>
+		<description>Nibblemen (alt)</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<info name="alt_title" value="Devilman the Dot Muncher, Super Gobbler" />
@@ -963,7 +963,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 	</software>
 
 	<software name="spacewar" cloneof="spaceatt">
-		<description>Space War (Prototype)</description>
+		<description>Space War (prototype)</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<part name="cart" interface="arcadia_cart">
@@ -975,7 +975,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 	</software>
 
 	<software name="spaceatta" cloneof="spaceatt">
-		<description>Space Attack (Alt)</description>
+		<description>Space Attack (alt)</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<part name="cart" interface="arcadia_cart">
@@ -1076,7 +1076,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 	</software>
 
 	<software name="superbuga" cloneof="superbug">
-		<description>Super Bug (Alt)</description>
+		<description>Super Bug (alt)</description>
 		<year>198?</year>
 		<publisher>UA Ltd.</publisher>
 		<part name="cart" interface="arcadia_cart">
@@ -1152,7 +1152,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 	</software>
 
 	<software name="vidlexeg" cloneof="vidlex">
-		<description>Video-Lexikon: English to German (Fixed)</description>
+		<description>Video-Lexikon: English to German (fixed)</description>
 		<!-- This ROM has concatinated and re-ordered the original 3 ROM dump into one file. -->
 		<year>198?</year>
 		<publisher>UA Ltd.</publisher>
@@ -1165,7 +1165,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 	</software>
 
 	<software name="vidlexge" cloneof="vidlex">
-		<description>Video-Lexikon: German to English (Fixed)</description>
+		<description>Video-Lexikon: German to English (fixed)</description>
 		<!-- This ROM has concatinated and re-ordered the original 3 ROM dump into one file. -->
 		<year>198?</year>
 		<publisher>UA Ltd.</publisher>

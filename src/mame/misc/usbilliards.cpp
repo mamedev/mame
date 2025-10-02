@@ -140,4 +140,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1975, sharkusb,    0,       usbilliards, 0, usbilliards_state, empty_init, ROT0, "US Billiards Inc.", "Shark (US Billiards)", MACHINE_IS_SKELETON )
+GAME( 1975, sharkusb,    0,       usbilliards, 0, usbilliards_state, empty_init, ROT0, "US Billiards Inc.", "Shark (US Billiards)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

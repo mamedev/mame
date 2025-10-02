@@ -219,16 +219,14 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	// update the PVIs
 	if (!y)
 	{
-		m_pvi[0]->render_first_line();
-		m_pvi[1]->render_first_line();
-		m_pvi[2]->render_first_line();
+		m_pvi[0]->start_new_frame();
+		m_pvi[1]->start_new_frame();
+		m_pvi[2]->start_new_frame();
 	}
-	else
-	{
-		m_pvi[0]->render_next_line();
-		m_pvi[1]->render_next_line();
-		m_pvi[2]->render_next_line();
-	}
+	m_pvi[0]->render_next_line();
+	m_pvi[1]->render_next_line();
+	m_pvi[2]->render_next_line();
+
 	uint16_t const *const pvi1_row = &m_pvi[0]->bitmap().pix(y);
 	uint16_t const *const pvi2_row = &m_pvi[1]->bitmap().pix(y);
 	uint16_t const *const pvi3_row = &m_pvi[2]->bitmap().pix(y);
@@ -319,7 +317,7 @@ void laserbat_state::laserbat_palette(palette_device &palette) const
 	    for red and green.  LSB for blue is always effectively 1.  The
 	    middle group is the MSB.  Yet another crazy thing they did.
 
-	    Each colour channel has an emitter follower buffer amlpifier
+	    Each colour channel has an emitter follower buffer amplifier
 	    biased with a 1k resistor to +5V and a 3k3 resistor to ground.
 	    Output is adjusted by connecting additional resistors across the
 	    leg to ground using an open collector buffer - 270R, 820R and

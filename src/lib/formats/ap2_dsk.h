@@ -21,12 +21,9 @@
 
 ***************************************************************************/
 
-#define APPLE2_NIBBLE_SIZE 416
-#define APPLE2_SMALL_NIBBLE_SIZE 374
-#define APPLE2_STD_TRACK_COUNT 35
-#define APPLE2_TRACK_COUNT 40
-#define APPLE2_SECTOR_COUNT 16
-#define APPLE2_SECTOR_SIZE 256
+constexpr int APPLE2_STD_TRACK_COUNT = 35;
+constexpr int APPLE2_TRACK_COUNT = 40;
+constexpr int APPLE2_SECTOR_SIZE = 256;
 
 /**************************************************************************/
 class a2_13sect_format : public floppy_image_format_t
@@ -40,7 +37,6 @@ public:
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
-	virtual bool supports_save() const noexcept override;
 
 private:
 	static uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
@@ -116,7 +112,6 @@ public:
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
-	virtual bool supports_save() const noexcept override;
 
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
@@ -135,7 +130,6 @@ public:
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
-	virtual bool supports_save() const noexcept override;
 
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
@@ -145,8 +139,8 @@ public:
 private:
 	static constexpr size_t nibbles_per_track = 0x1a00;
 	static constexpr size_t min_sync_bytes = 4;
-	static constexpr auto expected_size_35t = 35 * nibbles_per_track;
-	static constexpr auto expected_size_40t = 40 * nibbles_per_track;
+	static constexpr auto expected_size_35t = APPLE2_STD_TRACK_COUNT * nibbles_per_track;
+	static constexpr auto expected_size_40t = APPLE2_TRACK_COUNT * nibbles_per_track;
 
 	static std::vector<uint32_t> generate_levels_from_nibbles(const std::vector<uint8_t>& nibbles);
 };

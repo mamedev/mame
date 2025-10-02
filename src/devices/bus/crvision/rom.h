@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef MAME_BUS_CPC_CRVISION_ROM_H
-#define MAME_BUS_CPC_CRVISION_ROM_H
+#ifndef MAME_BUS_CRVISION_ROM_H
+#define MAME_BUS_CRVISION_ROM_H
 
 #pragma once
 
@@ -113,5 +113,4 @@ DECLARE_DEVICE_TYPE(CRVISION_ROM_12K, crvision_rom12k_device)
 DECLARE_DEVICE_TYPE(CRVISION_ROM_16K, crvision_rom16k_device)
 DECLARE_DEVICE_TYPE(CRVISION_ROM_18K, crvision_rom18k_device)
 
-
-#endif // MAME_BUS_CPC_CRVISION_ROM_H
+#endif // MAME_BUS_CRVISION_ROM_H

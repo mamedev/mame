@@ -109,7 +109,8 @@ template<int N>
 void mini_state::seg_w(u8 data)
 {
 	// R2x,R3x: LCD segment data
-	m_lcd_data = (m_lcd_data & ~(0xf << (N*4))) | (data << (N*4));
+	const u8 shift = N * 4;
+	m_lcd_data = (m_lcd_data & ~(0xf << shift)) | (data << shift);
 	update_lcd();
 }
 
@@ -196,6 +197,7 @@ void mini_state::smchess(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_refresh(attotime::from_hz(30));
+
 	config.set_default_layout(layout_saitek_minichess);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));

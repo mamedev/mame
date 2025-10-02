@@ -9,8 +9,7 @@
 #include "cpu/mips/mips1.h"
 #include "machine/eepromser.h"
 #include "sound/bsmt2000.h"
-#include "video/ramdac.h"
-#include "emupal.h"
+#include "video/bt48x.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -33,11 +32,9 @@ protected:
 		m_maincpu(*this, "maincpu"),
 		m_bsmt(*this, "bsmt"),
 		m_bsmt_region(*this, "bsmt"),
-		m_lspeaker(*this, "lspeaker"),
-		m_rspeaker(*this, "rspeaker"),
+		m_speaker(*this, "speaker"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
 		m_ramdac(*this, "ramdac"),
 		m_leds(*this, "leds%u", 0U),
 		m_gun_x_io(*this, "GUNX%u", 1U),
@@ -50,8 +47,6 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	void mem(address_map &map) ATTR_COLD;
-
-	void ramdac_map(address_map &map) ATTR_COLD;
 
 	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -71,12 +66,10 @@ protected:
 	required_device<r3041_device> m_maincpu;
 	required_device<bsmt2000_device> m_bsmt;
 	required_region_ptr<uint8_t> m_bsmt_region;
-	required_device<speaker_device> m_lspeaker;
-	required_device<speaker_device> m_rspeaker;
+	required_device<speaker_device> m_speaker;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<ramdac_device> m_ramdac;
+	required_device<bt481_device> m_ramdac;
 
 	enum
 	{

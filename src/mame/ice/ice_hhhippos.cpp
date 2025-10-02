@@ -91,4 +91,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1991, hhhippos, 0, hhhippos, hhhippos, ice_hhhippos_state, empty_init, ROT0, "ICE (Innovative Concepts in Entertainment)", "Hungry Hungry Hippos (redemption game)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991, hhhippos, 0, hhhippos, hhhippos, ice_hhhippos_state, empty_init, ROT0, "ICE (Innovative Concepts in Entertainment)", "Hungry Hungry Hippos (redemption game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

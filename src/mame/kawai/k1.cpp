@@ -112,8 +112,8 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, k1,  0,  0, k1,  k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1 Digital Multi-Dimensional Synthesizer",         MACHINE_IS_SKELETON)
-SYST(1988, k1m, k1, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1m Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)
-SYST(1988, k1r, k1, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1r Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)
+SYST(1988, k1,  0,  0, k1,  k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1 Digital Multi-Dimensional Synthesizer",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, k1m, k1, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1m Digital Multi-Dimensional Synthesizer Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, k1r, k1, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1r Digital Multi-Dimensional Synthesizer Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-SYST(1989, k1rii, 0, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1rII Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)
+SYST(1989, k1rii, 0, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1rII Digital Multi-Dimensional Synthesizer Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -69,6 +69,8 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 	, m_p0_out(*this)
 	, m_p1_out(*this)
 	, m_p2_out(*this)
+	, m_dma_read(*this, 0xffff)
+	, m_dma_write(*this)
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
 	, m_chip_type(chip_type)
@@ -107,21 +109,19 @@ void v25_common_device::prefetch()
 	m_prefetch_count--;
 }
 
-void v25_common_device::do_prefetch(int previous_ICount)
+void v25_common_device::do_prefetch()
 {
-	int diff = previous_ICount - (int) m_icount;
-
 	/* The implementation is not accurate, but comes close.
 	 * It does not respect that the V30 will fetch two bytes
 	 * at once directly, but instead uses only 2 cycles instead
 	 * of 4. There are however only very few sources publicly
 	 * available and they are vague.
 	 */
-	while (m_prefetch_count<0)
+	while (m_prefetch_count < 0)
 	{
 		m_prefetch_count++;
-		if (diff>m_prefetch_cycles)
-			diff -= m_prefetch_cycles;
+		if (m_cur_cycles > m_prefetch_cycles)
+			m_cur_cycles -= m_prefetch_cycles;
 		else
 			m_icount -= m_prefetch_cycles;
 	}
@@ -133,18 +133,17 @@ void v25_common_device::do_prefetch(int previous_ICount)
 		return;
 	}
 
-	while (diff>=m_prefetch_cycles && m_prefetch_count < m_prefetch_size)
+	while (m_cur_cycles >= m_prefetch_cycles && m_prefetch_count < m_prefetch_size)
 	{
-		diff -= m_prefetch_cycles;
+		m_cur_cycles -= m_prefetch_cycles;
 		m_prefetch_count++;
 	}
-
 }
 
 uint8_t v25_common_device::fetch()
 {
 	prefetch();
-	return m_dr8((Sreg(PS)<<4)+m_ip++);
+	return m_dr8((Sreg(PS)<<4) + m_ip++);
 }
 
 uint16_t v25_common_device::fetchword()
@@ -154,6 +153,7 @@ uint16_t v25_common_device::fetchword()
 	return r;
 }
 
+// TODO: make V25 a subclass instead
 #define nec_common_device v25_common_device
 
 #include "v25instr.h"
@@ -168,7 +168,7 @@ uint8_t v25_common_device::fetchop()
 	uint8_t ret;
 
 	prefetch();
-	ret = m_dr8((Sreg(PS)<<4)+m_ip++);
+	ret = m_dr8((Sreg(PS)<<4) + m_ip++);
 
 	if (m_MF == 0)
 		if (m_v25v35_decryptiontable)
@@ -186,6 +186,7 @@ void v25_common_device::device_reset()
 {
 	m_ip = 0;
 	m_prev_ip = 0;
+	m_rep_ip = 0;
 	m_IBRK = 1;
 	m_F0 = 0;
 	m_F1 = 0;
@@ -214,8 +215,8 @@ void v25_common_device::device_reset()
 	m_mode_state = m_MF = (m_v25v35_decryptiontable) ? 0 : 1;
 	m_intm = 0;
 	m_halted = 0;
+	m_rep_params = 0;
 
-	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
 	m_TMC0 = m_TMC1 = 0;
 
 	for (int i = 0; i < 2; i++)
@@ -225,6 +226,10 @@ void v25_common_device::device_reset()
 		m_brg[i] = 0;
 		m_sce[i] = 0;
 	}
+
+	m_dmam[0] = m_dmam[1] = 0;
+	m_dma_channel = -1;
+	m_last_dma_channel = 0;
 
 	m_RAMEN = 1;
 	m_TB = 20;
@@ -255,6 +260,7 @@ void v25_common_device::nec_interrupt(unsigned int_num, int /*INTSOURCES*/ sourc
 {
 	uint32_t dest_seg, dest_off;
 
+	m_rep_params = 0;
 	i_pushf();
 	m_TF = m_IF = 0;
 	m_MF = m_mode_state;
@@ -483,6 +489,111 @@ void v25_common_device::external_int()
 	}
 }
 
+void v25_common_device::dma_process()
+{
+	uint16_t sar = m_internal_ram[m_dma_channel * 4];
+	uint16_t dar = m_internal_ram[m_dma_channel * 4 + 1];
+	uint16_t sarh_darh = m_internal_ram[m_dma_channel * 4 + 2];
+	uint8_t dmamode = BIT(m_dmam[m_dma_channel], 5, 3);
+	bool w = BIT(m_dmam[m_dma_channel], 4);
+
+	uint32_t saddr = ((uint32_t(sarh_darh) & 0xff00) << 4) + sar;
+	uint32_t daddr = ((uint32_t(sarh_darh) & 0x00ff) << 12) + dar;
+
+	switch (dmamode & 3)
+	{
+	case 0:
+		// Memory to memory transfer
+		if (w)
+		{
+			uint16_t data = v25_read_word(saddr);
+			v25_write_word(daddr, data);
+		}
+		else
+		{
+			uint8_t data = v25_read_byte(saddr);
+			v25_write_byte(daddr, data);
+		}
+		CLK((w && m_program->addr_width() == 8) ? 8 : 4);
+		break;
+
+	case 1:
+		// I/O to memory transfer
+		if (w && m_program->addr_width() == 16)
+		{
+			uint16_t data = m_dma_read[m_dma_channel](daddr);
+			v25_write_word(daddr, data);
+		}
+		else
+		{
+			uint8_t data = m_dma_read[m_dma_channel](daddr);
+			v25_write_byte(daddr, data);
+			if (w)
+			{
+				logerror("Warning: V25 16-bit I/O to memory transfer\n");
+				data = m_dma_read[m_dma_channel](daddr + 1);
+				v25_write_byte(daddr + 1, data);
+				CLK(2);
+			}
+		}
+		CLK(2);
+		break;
+
+	case 2:
+		// Memory to I/O transfer
+		if (w && m_program->addr_width() == 16)
+		{
+			uint16_t data = v25_read_word(saddr);
+			m_dma_write[m_dma_channel](saddr, data);
+		}
+		else
+		{
+			uint8_t data = v25_read_byte(saddr);
+			m_dma_write[m_dma_channel](saddr, data);
+			if (w)
+			{
+				logerror("Warning: V25 16-bit memory to I/O transfer\n");
+				data = v25_read_byte(saddr + 1);
+				m_dma_write[m_dma_channel](saddr + 1, data);
+				CLK(2);
+			}
+		}
+		CLK(2);
+		break;
+
+	default:
+		logerror("Reserved DMA transfer mode\n");
+		CLK(1);
+		break;
+	}
+
+	// Update source and destination based on address control
+	uint8_t dmac = m_dmac[m_dma_channel];
+	if (BIT(dmac, 0, 2) == 1)
+		m_internal_ram[m_dma_channel * 4] = sar + (w ? 2 : 1);
+	else if (BIT(dmac, 0, 2) == 2)
+		m_internal_ram[m_dma_channel * 4] = sar - (w ? 2 : 1);
+	if (BIT(dmac, 4, 2) == 1)
+		m_internal_ram[m_dma_channel * 4 + 1] = dar + (w ? 2 : 1);
+	else if (BIT(dmac, 4, 2) == 2)
+		m_internal_ram[m_dma_channel * 4 + 1] = dar - (w ? 2 : 1);
+
+	// Update TC
+	uint16_t tc = --m_internal_ram[m_dma_channel * 4 + 3];
+	if (tc == 0)
+	{
+		m_dmam[m_dma_channel] &= 0xf0; // disable channel
+		m_pending_irq |= m_dma_channel ? INTD1 : INTD0; // request interrupt
+	}
+
+	if (dmamode == 0 || dmamode > 4 || tc == 0)
+	{
+		// Single step/single transfer modes (or end of burst)
+		m_last_dma_channel = m_dma_channel;
+		m_dma_channel = -1;
+	}
+}
+
 /****************************************************************************/
 /*                             OPCODES                                      */
 /****************************************************************************/
@@ -562,6 +673,7 @@ void v25_common_device::device_start()
 	}
 
 	m_no_interrupt = 0;
+	m_cur_cycles = 0;
 	m_prefetch_count = 0;
 	m_prefetch_reset = 0;
 	m_prefix_base = 0;
@@ -569,6 +681,9 @@ void v25_common_device::device_start()
 	m_EA = 0;
 	m_EO = 0;
 	m_E16 = 0;
+
+	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
+	m_dmac[0] = m_dmac[1] = 0;
 
 	for (i = 0; i < 4; i++)
 		m_timers[i] = timer_alloc(FUNC(v25_common_device::v25_timer_callback), this);
@@ -583,6 +698,7 @@ void v25_common_device::device_start()
 
 	save_item(NAME(m_ip));
 	save_item(NAME(m_prev_ip));
+	save_item(NAME(m_rep_ip));
 	save_item(NAME(m_IBRK));
 	save_item(NAME(m_F0));
 	save_item(NAME(m_F1));
@@ -620,6 +736,7 @@ void v25_common_device::device_start()
 	save_item(NAME(m_no_interrupt));
 	save_item(NAME(m_intm));
 	save_item(NAME(m_halted));
+	save_item(NAME(m_rep_params));
 	save_item(NAME(m_TM0));
 	save_item(NAME(m_MD0));
 	save_item(NAME(m_TM1));
@@ -630,6 +747,10 @@ void v25_common_device::device_start()
 	save_item(NAME(m_scc));
 	save_item(NAME(m_brg));
 	save_item(NAME(m_sce));
+	save_item(NAME(m_dmac));
+	save_item(NAME(m_dmam));
+	save_item(NAME(m_dma_channel));
+	save_item(NAME(m_last_dma_channel));
 	save_item(NAME(m_RAMEN));
 	save_item(NAME(m_TB));
 	save_item(NAME(m_PCK));
@@ -752,8 +873,6 @@ void v25_common_device::state_export(const device_state_entry &entry)
 
 void v25_common_device::execute_run()
 {
-	int prev_ICount;
-
 	int pending = m_pending_irq & m_unmasked_irq;
 
 	if (m_halted && pending)
@@ -784,13 +903,20 @@ void v25_common_device::execute_run()
 
 	if (m_halted)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
-		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
 		return;
 	}
 
-	while(m_icount>0) {
-		/* Dispatch IRQ */
+	while(m_icount>0)
+	{
+		if (m_dma_channel != -1)
+		{
+			dma_process();
+			continue;
+		}
+
+		// Dispatch IRQ
 		m_prev_ip = m_ip;
 		if (m_no_interrupt==0 && (m_pending_irq & m_unmasked_irq))
 		{
@@ -800,13 +926,25 @@ void v25_common_device::execute_run()
 				external_int();
 		}
 
-		/* No interrupt allowed between last instruction and this one */
+		// No interrupt allowed between last instruction and this one
 		if (m_no_interrupt)
 			m_no_interrupt--;
 
 		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
-		prev_ICount = m_icount;
-		(this->*s_nec_instruction[fetchop()])();
-		do_prefetch(prev_ICount);
+		m_cur_cycles = 0;
+
+		if (m_rep_params)
+			cont_rep();
+		else
+			(this->*s_nec_instruction[fetchop()])();
+		do_prefetch();
+
+		if ((m_dmam[0] & 0x0c) == 0x0c || (m_dmam[1] & 0x0c) == 0x0c)
+		{
+			if ((m_dmam[1 - m_last_dma_channel] & 0x0c) == 0x0c)
+				m_dma_channel = 1 - m_last_dma_channel;
+			else
+				m_dma_channel = m_last_dma_channel;
+		}
 	}
 }

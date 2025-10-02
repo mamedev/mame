@@ -24,20 +24,135 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "tube_6502.h"
+
+#include "cpu/m6502/g65sc02.h"
+#include "cpu/m6502/r65c02.h"
+#include "machine/ram.h"
+#include "machine/tube.h"
+
 #include "softlist_dev.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(BBC_TUBE_6502,    bbc_tube_6502_device,    "bbc_tube_6502",    "Acorn 6502 2nd Processor")
-DEFINE_DEVICE_TYPE(BBC_TUBE_6502P,   bbc_tube_6502p_device,   "bbc_tube_6502p",   "Acorn 6502 2nd Processor (pre-production)")
-DEFINE_DEVICE_TYPE(BBC_TUBE_6502E,   bbc_tube_6502e_device,   "bbc_tube_6502e",   "Acorn Extended 6502 2nd Processor")
-DEFINE_DEVICE_TYPE(BBC_TUBE_65C102,  bbc_tube_65c102_device,  "bbc_tube_65c102",  "Acorn 65C102 Co-Processor")
+// ======================> bbc_tube_6502_device
+
+class bbc_tube_6502_device : public device_t, public device_bbc_tube_interface
+{
+public:
+	bbc_tube_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_tube_6502_device(mconfig, BBC_TUBE_6502, tag, owner, clock)
+	{
+	}
+
+protected:
+	bbc_tube_6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
+		, device_bbc_tube_interface(mconfig, *this)
+		, m_maincpu(*this, "maincpu")
+		, m_view(*this, "view")
+		, m_ula(*this, "ula")
+		, m_ram(*this, "ram")
+		, m_rom(*this, "rom")
+	{
+	}
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	void tube_6502_mem(address_map &map) ATTR_COLD;
+
+	virtual uint8_t host_r(offs_t offset) override;
+	virtual void host_w(offs_t offset, uint8_t data) override;
+
+	virtual uint8_t tube_r(offs_t offset);
+	virtual void tube_w(offs_t offset, uint8_t data);
+
+	required_device<m6502_device> m_maincpu;
+	memory_view m_view;
+	required_device<tube_device> m_ula;
+	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+
+	void prst_w(int state);
+};
+
+
+// ======================> bbc_tube_6502p_device
+
+class bbc_tube_6502p_device : public bbc_tube_6502_device
+{
+public:
+	bbc_tube_6502p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_tube_6502_device(mconfig, BBC_TUBE_6502P, tag, owner, clock)
+	{
+	}
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+private:
+	void tube_6502p_mem(address_map &map) ATTR_COLD;
+};
+
+
+// ======================> bbc_tube_6502e_device
+
+class bbc_tube_6502e_device : public bbc_tube_6502_device
+{
+public:
+	bbc_tube_6502e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_tube_6502_device(mconfig, BBC_TUBE_6502E, tag, owner, clock)
+		, m_opcode_ind_y(false)
+		, m_page(0)
+		, m_cycles(0)
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+private:
+	void tube_6502e_mem(address_map &map) ATTR_COLD;
+
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+
+	bool m_opcode_ind_y;
+	uint8_t m_page;
+	uint64_t m_cycles;
+};
+
+
+// ======================> bbc_tube_65c102_device
+
+class bbc_tube_65c102_device : public bbc_tube_6502_device
+{
+public:
+	bbc_tube_65c102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_tube_6502_device(mconfig, BBC_TUBE_65C102, tag, owner, clock)
+	{
+	}
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
 
 
 //-------------------------------------------------
@@ -79,7 +194,7 @@ void bbc_tube_6502e_device::tube_6502e_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  ROM( tube_6502 )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START( tube_6502 )
@@ -124,55 +239,6 @@ ROM_START( tube_65c102 )
 ROM_END
 
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void bbc_tube_6502_device::device_add_mconfig(machine_config &config)
-{
-	M65SC02(config, m_maincpu, 12_MHz_XTAL / 4); // G65SC02
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_6502_device::tube_6502_mem);
-
-	TUBE(config, m_ula);
-	m_ula->pnmi_handler().set_inputline(m_maincpu, M65C02_NMI_LINE);
-	m_ula->pirq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
-	m_ula->prst_handler().set(FUNC(bbc_tube_6502_device::prst_w));
-
-	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
-
-	SOFTWARE_LIST(config, "flop_ls_6502").set_original("bbc_flop_6502");
-}
-
-void bbc_tube_6502p_device::device_add_mconfig(machine_config &config)
-{
-	bbc_tube_6502_device::device_add_mconfig(config);
-
-	M6502(config.replace(), m_maincpu, 12_MHz_XTAL / 4); // SY6502C
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_6502p_device::tube_6502p_mem);
-}
-
-void bbc_tube_6502e_device::device_add_mconfig(machine_config &config)
-{
-	bbc_tube_6502_device::device_add_mconfig(config);
-
-	M65SC02(config.replace(), m_maincpu, 12_MHz_XTAL / 4); // G65SC02
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_6502e_device::tube_6502e_mem);
-
-	m_ram->set_default_size("256K").set_default_value(0);
-}
-
-void bbc_tube_65c102_device::device_add_mconfig(machine_config &config)
-{
-	bbc_tube_6502_device::device_add_mconfig(config);
-
-	R65C02(config.replace(), m_maincpu, 16_MHz_XTAL / 4); // R65C102
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_65c102_device::tube_6502_mem);
-}
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
 const tiny_rom_entry *bbc_tube_6502_device::device_rom_region() const
 {
 	return ROM_NAME( tube_6502 );
@@ -193,47 +259,52 @@ const tiny_rom_entry *bbc_tube_65c102_device::device_rom_region() const
 	return ROM_NAME( tube_65c102 );
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
 
 //-------------------------------------------------
-//  bbc_tube_6502_device - constructor
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-bbc_tube_6502_device::bbc_tube_6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_bbc_tube_interface(mconfig, *this)
-	, m_maincpu(*this, "maincpu")
-	, m_view(*this, "view")
-	, m_ula(*this, "ula")
-	, m_ram(*this, "ram")
-	, m_rom(*this, "rom")
+void bbc_tube_6502_device::device_add_mconfig(machine_config &config)
 {
+	G65SC02(config, m_maincpu, 12_MHz_XTAL / 4); // G65SC02
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_6502_device::tube_6502_mem);
+
+	TUBE(config, m_ula);
+	m_ula->pnmi_handler().set_inputline(m_maincpu, G65SC02_NMI_LINE);
+	m_ula->pirq_handler().set_inputline(m_maincpu, G65SC02_IRQ_LINE);
+	m_ula->prst_handler().set(FUNC(bbc_tube_6502_device::prst_w));
+
+	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
+
+	SOFTWARE_LIST(config, "flop_ls_6502").set_original("bbc_flop_6502");
 }
 
-bbc_tube_6502_device::bbc_tube_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_tube_6502_device(mconfig, BBC_TUBE_6502, tag, owner, clock)
+void bbc_tube_6502p_device::device_add_mconfig(machine_config &config)
 {
+	bbc_tube_6502_device::device_add_mconfig(config);
+
+	M6502(config.replace(), m_maincpu, 12_MHz_XTAL / 4); // SY6502C
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_6502p_device::tube_6502p_mem);
 }
 
-bbc_tube_6502p_device::bbc_tube_6502p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_tube_6502_device(mconfig, BBC_TUBE_6502P, tag, owner, clock)
+void bbc_tube_6502e_device::device_add_mconfig(machine_config &config)
 {
+	bbc_tube_6502_device::device_add_mconfig(config);
+
+	G65SC02(config.replace(), m_maincpu, 12_MHz_XTAL / 4); // G65SC02
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_6502e_device::tube_6502e_mem);
+
+	m_ram->set_default_size("256K").set_default_value(0);
 }
 
-bbc_tube_6502e_device::bbc_tube_6502e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_tube_6502_device(mconfig, BBC_TUBE_6502E, tag, owner, clock)
-	, m_opcode_ind_y(false)
-	, m_page(0)
-	, m_cycles(0)
+void bbc_tube_65c102_device::device_add_mconfig(machine_config &config)
 {
+	bbc_tube_6502_device::device_add_mconfig(config);
+
+	R65C102(config.replace(), m_maincpu, 16_MHz_XTAL); // R65C102
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_65c102_device::tube_6502_mem);
 }
 
-bbc_tube_65c102_device::bbc_tube_65c102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_tube_6502_device(mconfig, BBC_TUBE_65C102, tag, owner, clock)
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -342,3 +413,11 @@ void bbc_tube_6502e_device::ram_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[offset] = data;
 	}
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_6502,   device_bbc_tube_interface, bbc_tube_6502_device,   "bbc_tube_6502",   "Acorn 6502 2nd Processor")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_6502P,  device_bbc_tube_interface, bbc_tube_6502p_device,  "bbc_tube_6502p",  "Acorn 6502 2nd Processor (pre-production)")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_6502E,  device_bbc_tube_interface, bbc_tube_6502e_device,  "bbc_tube_6502e",  "Acorn Extended 6502 2nd Processor")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_65C102, device_bbc_tube_interface, bbc_tube_65c102_device, "bbc_tube_65c102", "Acorn 65C102 Co-Processor")

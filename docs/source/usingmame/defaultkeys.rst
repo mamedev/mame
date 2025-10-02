@@ -35,22 +35,22 @@ and saving/loading save states.
 
     If you are running with -debug, this key sends a ‘break’ in emulation.
 
-    When a slider control is visible, you can use the following keys to control
-    it:
+    When a slider control is visible, the keyboard controls are the same as
+    in the Slider Controls menu:
 
     * **Up** - select previous parameter to modify.
     * **Down** - select next parameter to modify.
     * **Left** - decrease the value of the selected parameter.
     * **Right** - increase the value of the selected parameter.
-    * **Enter** - reset parameter value to its default.
+    * **Delete** - reset parameter value to its default.
+    * **Alt+Left** - decrease the value by the largest amount.
     * **Control+Left** - decrease the value by 10x.
     * **Shift+Left** - decrease the value by 0.1x.
-    * **Alt+Left** - decrease the value by the smallest amount.
+    * **Shift+Alt+Left** - decrease the value by the smallest amount.
+    * **Alt+Right** - increase the value by the largest amount.
     * **Control+Right** - increase the value by 10x.
     * **Shift+Right** - increase the value by 0.1x.
-    * **Alt+Right** - increase the value by the smallest amount.
-    * **End** - temporarily hide the On Screen Display.
-    * **Home** - bring the On Screen Display back after hiding it.
+    * **Shift+Alt+Right** - increase the value by the smallest amount.
 **Up Arrow**
     Highlight previous UI menu option.
 **Down Arrow**
@@ -88,14 +88,16 @@ and saving/loading save states.
     Use the Enter key to switch between the three modes (palette, graphics, and
     tilemaps).
 
-    Press F4 again to turn off the display.
+    Press F4 again to turn off the viewer.
     The key controls in each mode vary slightly:
 
     Palette/colortable mode:
 
     * **[** **]** - switch between palette devices.
     * **Up**/**Down** - scroll up/down one line at a time.
-    * **Page Up**/**Page Down** - scroll up/down one page at a time.
+    * **Shift+Up**/**Down** - scroll right/left one cell at a time.
+    * **Page Up**/**Page Down** - scroll up/down one page at a time (hold
+      Control or Alt to scroll 10 or 100 pages).
     * **Home**/**End** - move to top/bottom of list.
     * **-**/**+** - increase/decrease the number of colors per row.
     * **0** - restore the default number of colors per row.
@@ -105,12 +107,15 @@ and saving/loading save states.
 
     * **[** **]** - switch between different graphics sets.
     * **Up**/**Down** - scroll up/down one line at a time.
-    * **Page Up**/**Page Down** - scroll up/down one page at a time.
+    * **Shift+Up**/**Down** - scroll right/left one cell at a time.
+    * **Page Up**/**Page Down** - scroll up/down one page at a time (hold
+      Control or Alt to scroll 10 or 100 pages).
     * **Home**/**End** - move to top/bottom of list.
-    * **Left**/**Right** - change color displayed.
+    * **Left**/**Right** - change color displayed (hold Control or Alt for
+      wider control).
     * **R** - rotate tiles 90 degrees clockwise.
-    * **-**/**+** - increase/decrease the number of tiles per row (hold Shift to
-      restrict to integer scale factors).
+    * **-**/**+** - increase/decrease the number of tiles per row (hold Shift
+      to restrict to integer scale factors).
     * **0** - restore the default number of tiles per row (hold Shift to
       restrict to integer scale factors).
     * **Enter** - switch to tilemap viewer.
@@ -538,7 +543,7 @@ This list shows the standard keyboard configuration.
     Player 1 Hanafuda No
 **O**
     Player 1 Taiwanese Mahjong O
-**Semicolon**
+**P**
     Player 1 Taiwanese Mahjong P
 **Q**
     Player 1 Taiwanese Mahjong Q
@@ -582,6 +587,7 @@ buttons.
     navigate the internal operator service menus)
 **0** *(not numeric keypad)*
     Service 2
+
     Book-Keeping (for machines that have this functionality)
 **-** *(not numeric keypad)*
     Service 3
@@ -595,25 +601,25 @@ buttons.
     Deal
 **L**
     Stand
-**4** *(not numeric keypad)*
-    Take Score
-
-    For games that allow gambling winnings in a double-or-nothing bonus game,
-    this takes the winnings from the main game.
-**3** *(not numeric keypad)*
+**D**
     Double Up
 
     For games that allow gambling winnings in a double-or-nothing bonus game,
     this gambles the winnings from the main game in the bonus game.
-**D**
+**F**
     Half Gamble
 
     Used by games that allow gambling half or all of the winnings from the main
-    game in the bonus game.
+    game in the bonus game, this stakes half the winnings from the main game.
+**G**
+    Take Score
+
+    For games that allow gambling winnings in a double-or-nothing bonus game,
+    this stakes the winnings from the main game.
 **A**
-    High
+    High/big
 **S**
-    Low
+    Low/small
 **O**
     Door
 

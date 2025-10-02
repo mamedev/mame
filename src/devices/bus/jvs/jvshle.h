@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_BUS_JVS_JVSDEV_H
-#define MAME_BUS_JVS_JVSDEV_H
+#ifndef MAME_BUS_JVS_JVSHLE_H
+#define MAME_BUS_JVS_JVSHLE_H
 
 #pragma once
 
@@ -172,4 +172,4 @@ private:
 	uint8_t m_analog_output_channels;
 };
 
-#endif // MAME_BUS_JVS_JVSDEV_H
+#endif // MAME_BUS_JVS_JVSHLE_H

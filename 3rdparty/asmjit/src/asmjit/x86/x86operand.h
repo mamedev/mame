@@ -871,6 +871,9 @@ public:
   //! distinguish between 8-bit, 16-bit, 32-bit, and 64-bit increments.
   ASMJIT_INLINE_NODEBUG constexpr uint32_t size() const noexcept { return _signature.getField<Signature::kSizeMask>(); }
 
+  //! Sets the memory operand size (in bytes).
+  ASMJIT_INLINE_NODEBUG void setSize(uint32_t size) noexcept { _signature.setField<Signature::kSizeMask>(size); }
+
   //! \}
 
   //! \name Address Type

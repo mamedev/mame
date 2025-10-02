@@ -31,7 +31,7 @@ Notes:
 
 #include "igs023_video.h"
 #include "igs027a.h"
-#include "mahjong.h"
+#include "igsmahjong.h"
 #include "pgmcrypt.h"
 
 #include "machine/i8255.h"

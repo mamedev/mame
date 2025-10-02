@@ -318,8 +318,8 @@ void ikki_state::sub_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0xc000, 0xc7ff).ram().share(m_spriteram);
 	map(0xc800, 0xcfff).ram().share("shared_ram");
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76489a_device::write));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76489a_device::write));
 }
 
 
@@ -488,8 +488,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::irq)
 }
 
 
-
-
 void ikki_state::ikki(machine_config &config)
 {
 	constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;
@@ -527,9 +525,8 @@ void ikki_state::ikki(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76496(config, "sn1", CPU_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.75);
-
-	SN76496(config, "sn2", CPU_CLOCK / 2).add_route(ALL_OUTPUTS, "mono", 0.75);
+	SN76489A(config, "sn1", CPU_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.75);
+	SN76489A(config, "sn2", CPU_CLOCK / 2).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 

@@ -203,8 +203,7 @@ void vegaeo_state::vega(machine_config &config)
 	m_palette->set_membits(16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
@@ -216,8 +215,8 @@ void vegaeo_state::vega(machine_config &config)
 	m_qs1000->p1_out().set(FUNC(vegaeo_state::qs1000_p1_w));
 	m_qs1000->p2_out().set(FUNC(vegaeo_state::qs1000_p2_w));
 	m_qs1000->p3_out().set(FUNC(vegaeo_state::qs1000_p3_w));
-	m_qs1000->add_route(0, "lspeaker", 1.0);
-	m_qs1000->add_route(1, "rspeaker", 1.0);
+	m_qs1000->add_route(0, "speaker", 1.0, 0);
+	m_qs1000->add_route(1, "speaker", 1.0, 1);
 }
 
 /*

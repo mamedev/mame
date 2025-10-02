@@ -278,7 +278,6 @@ const atari_motion_objects_config gauntlet_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0,0,0,0x03ff }}, // mask for the link
@@ -386,28 +385,36 @@ uint32_t gauntlet_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified via schematics:
-
-					    MO pen 1 clears PF color bit 0x80
-					*/
-					if ((mo[x] & 0x0f) == 1)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						// Vindicators Part II has extra logic here for the bases
-						if (!m_vindctr2_screen_refresh || (mo[x] & 0xf0) != 0)
-							pf[x] ^= 0x80;
+						if (mo[x] != 0xffff)
+						{
+							/* verified via schematics:
+
+							    MO pen 1 clears PF color bit 0x80
+							*/
+							if ((mo[x] & 0x0f) == 1)
+							{
+								// Vindicators Part II has extra logic here for the bases
+								if (!m_vindctr2_screen_refresh || (mo[x] & 0xf0) != 0)
+									pf[x] ^= 0x80;
+							}
+							else
+							{
+								pf[x] = mo[x];
+							}
+						}
 					}
-					else
-						pf[x] = mo[x];
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -482,7 +489,7 @@ uint8_t gauntlet_state::switch_6502_r()
 	if (m_soundlatch->pending_r()) temp ^= 0x80;
 	if (m_mainlatch->pending_r()) temp ^= 0x40;
 	if (!m_tms5220->readyq_r()) temp ^= 0x20;
-	if (!(m_803008->read() & 0x0008)) temp ^= 0x10;
+	if (BIT(~m_803008->read(), 3)) temp ^= 0x10;
 
 	return temp;
 }
@@ -557,10 +564,10 @@ void gauntlet_state::main_map(address_map &map)
 	map(0x902000, 0x903fff).mirror(0x2c8000).ram().share("mob");
 	map(0x904000, 0x904fff).mirror(0x2c8000).ram();
 	map(0x905000, 0x905f7f).mirror(0x2c8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
-	map(0x905f6e, 0x905f6f).mirror(0x2c8000).ram().w(FUNC(gauntlet_state::yscroll_w)).share("yscroll");
+	map(0x905f6e, 0x905f6f).mirror(0x2c8000).ram().w(FUNC(gauntlet_state::yscroll_w)).share(m_yscroll);
 	map(0x905f80, 0x905fff).mirror(0x2c8000).ram().share("mob:slip");
 	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x930000, 0x930001).mirror(0x2cfffe).w(FUNC(gauntlet_state::xscroll_w)).share("xscroll");
+	map(0x930000, 0x930001).mirror(0x2cfffe).w(FUNC(gauntlet_state::xscroll_w)).share(m_xscroll);
 }
 
 
@@ -642,7 +649,7 @@ static INPUT_PORTS_START( gauntlet )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", FUNC(generic_latch_8_device::pending_r)) // SNDBUF
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")  // 1020 (sound)
@@ -690,7 +697,7 @@ static INPUT_PORTS_START( vindctr2 )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", FUNC(generic_latch_8_device::pending_r)) // SNDBUF
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")  // 1020 (sound)
@@ -722,8 +729,8 @@ static const gfx_layout anlayout =
 
 
 static GFXDECODE_START( gfx_gauntlet )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_planar,  256, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, anlayout,            0, 64 )
+	GFXDECODE_ENTRY( "spr_tiles", 0, gfx_8x8x4_planar,  256, 32 )
+	GFXDECODE_ENTRY( "chars",     0, anlayout,            0, 64 )
 GFXDECODE_END
 
 
@@ -762,7 +769,7 @@ void gauntlet_state::base(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::IRGB_4444, 1024);
 
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(gauntlet_state::get_playfield_tile_info));
-	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(gauntlet_state::get_alpha_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(gauntlet_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, gauntlet_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
@@ -777,27 +784,26 @@ void gauntlet_state::base(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
-	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
+	m_soundlatch->data_pending_callback().append([this] (int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 	m_mainlatch->data_pending_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
 	YM2151(config, m_ym2151, 14.318181_MHz_XTAL / 4);
-	m_ym2151->add_route(1, "lspeaker", 0.48);
-	m_ym2151->add_route(0, "rspeaker", 0.48);
+	m_ym2151->add_route(1, "speaker", 0.48, 0);
+	m_ym2151->add_route(0, "speaker", 0.48, 1);
 
 	POKEY(config, m_pokey, 14.318181_MHz_XTAL / 8);
-	m_pokey->add_route(ALL_OUTPUTS, "lspeaker", 0.32);
-	m_pokey->add_route(ALL_OUTPUTS, "rspeaker", 0.32);
+	m_pokey->add_route(ALL_OUTPUTS, "speaker", 0.32, 0);
+	m_pokey->add_route(ALL_OUTPUTS, "speaker", 0.32, 1);
 
 	TMS5220C(config, m_tms5220, 14.318181_MHz_XTAL / 2 / 11); // potentially 14.318181_MHz_XTAL / 2 / 9 as well
-	m_tms5220->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_tms5220->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_tms5220->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_tms5220->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 
 	LS259(config, m_soundctl); // 16T/U
 	m_soundctl->q_out_cb<0>().set(m_ym2151, FUNC(ym2151_device::reset_w)); // music reset, low reset
@@ -868,10 +874,10 @@ ROM_START( gauntlets )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -905,10 +911,10 @@ ROM_START( gauntlet )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -942,10 +948,10 @@ ROM_START( gauntletj )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -979,10 +985,10 @@ ROM_START( gauntletj12 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1016,10 +1022,10 @@ ROM_START( gauntletg )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1053,10 +1059,10 @@ ROM_START( gauntletr9 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1090,10 +1096,10 @@ ROM_START( gauntletgr8 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1127,10 +1133,10 @@ ROM_START( gauntletr7 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1164,10 +1170,10 @@ ROM_START( gauntletgr6 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1201,10 +1207,10 @@ ROM_START( gauntletr5 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1238,10 +1244,10 @@ ROM_START( gauntletr4 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1275,10 +1281,10 @@ ROM_START( gauntletgr3 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1312,10 +1318,10 @@ ROM_START( gauntletr2 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1349,10 +1355,10 @@ ROM_START( gauntletr1 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1386,10 +1392,10 @@ ROM_START( gauntlet2p )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1423,10 +1429,10 @@ ROM_START( gauntlet2pj )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1460,10 +1466,10 @@ ROM_START( gauntlet2pg )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1497,10 +1503,10 @@ ROM_START( gauntlet2pr3 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1534,10 +1540,10 @@ ROM_START( gauntlet2pj2 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1571,10 +1577,10 @@ ROM_START( gauntlet2pg1 )
 	ROM_LOAD( "136037-120.16r",  0x004000, 0x004000, CRC(6ee7f3cc) SHA1(b86676340b06f07c164690862c1f6f75f30c080b) )
 	ROM_LOAD( "136037-119.16s",  0x008000, 0x008000, CRC(fa19861f) SHA1(7568b4ab526bd5849f7ef70dfa6d1ef1f30c0abc) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136037-104.6p",   0x000000, 0x004000, CRC(6c276a1d) SHA1(ec383a8fdcb28efb86b7f6ba4a3306fea5a09d72) ) // 27128, second half 0x00
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136037-111.1a",   0x000000, 0x008000, CRC(91700f33) SHA1(fac1ce700c4cd46b643307998df781d637f193aa) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136037-113.1l",   0x010000, 0x008000, CRC(d497d0a8) SHA1(bb715bcec7f783dd04151e2e3b221a72133bf17d) )
@@ -1612,10 +1618,10 @@ ROM_START( gaunt2 )
 	ROM_LOAD( "136043-1120.16r", 0x004000, 0x004000, CRC(5c731006) SHA1(045ad571db34ef870b1bf003e77eea403204f55b) )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
-	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x60000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136043-1123.1c",  0x010000, 0x004000, CRC(e4c98f01) SHA1(a24bece3196d13c38e4acdbf62783860253ba67d) )
@@ -1661,10 +1667,10 @@ ROM_START( gaunt2g )
 	ROM_LOAD( "136043-1120.16r", 0x004000, 0x004000, CRC(5c731006) SHA1(045ad571db34ef870b1bf003e77eea403204f55b) )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
-	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x60000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136043-1123.1c",  0x010000, 0x004000, CRC(e4c98f01) SHA1(a24bece3196d13c38e4acdbf62783860253ba67d) )
@@ -1710,10 +1716,10 @@ ROM_START( gaunt22p )
 	ROM_LOAD( "136043-1120.16r", 0x004000, 0x004000, CRC(5c731006) SHA1(045ad571db34ef870b1bf003e77eea403204f55b) )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
-	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x60000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136043-1123.1c",  0x010000, 0x004000, CRC(e4c98f01) SHA1(a24bece3196d13c38e4acdbf62783860253ba67d) )
@@ -1759,10 +1765,10 @@ ROM_START( gaunt22p1 )
 	ROM_LOAD( "136043-1120.16r", 0x004000, 0x004000, CRC(5c731006) SHA1(045ad571db34ef870b1bf003e77eea403204f55b) )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
-	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x60000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136043-1123.1c",  0x010000, 0x004000, CRC(e4c98f01) SHA1(a24bece3196d13c38e4acdbf62783860253ba67d) )
@@ -1808,10 +1814,10 @@ ROM_START( gaunt22pg )
 	ROM_LOAD( "136043-1120.16r", 0x004000, 0x004000, CRC(5c731006) SHA1(045ad571db34ef870b1bf003e77eea403204f55b) )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
-	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x60000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
 	ROM_LOAD( "136037-112.1b",   0x008000, 0x008000, CRC(869330be) SHA1(5dfaaf54ee2b3c0eaf35e8c17558313db9791616) )
 	ROM_LOAD( "136043-1123.1c",  0x010000, 0x004000, CRC(e4c98f01) SHA1(a24bece3196d13c38e4acdbf62783860253ba67d) )
@@ -1865,10 +1871,10 @@ ROM_START( vindctr2 )
 	ROM_LOAD( "136059-1160.16s", 0x004000, 0x004000, CRC(eef0a003) SHA1(4b1c0810e8c60e364051ed867fed0dc3a0b3a872) )
 	ROM_LOAD( "136059-1161.16r", 0x008000, 0x008000, CRC(68c74337) SHA1(13a9333e0b58ce771774632ecdfa8ca9c9664e57) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1198.6p",  0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
-	ROM_REGION( 0xc0000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0xc0000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1162.1a",  0x000000, 0x008000, CRC(dd3833ad) SHA1(e78a44b5f2033b618b5879a8a39bfdf428b5e4c7) )
 	ROM_LOAD( "136059-1166.1b",  0x008000, 0x008000, CRC(e2db50a0) SHA1(953e621f7312340dcbda9e4a727ebeba69ba7d4e) )
 	ROM_LOAD( "136059-1170.1c",  0x010000, 0x008000, CRC(f050ab43) SHA1(72fbba20b6c8a1838842084c07157cdc2fd923c1) )
@@ -1933,10 +1939,10 @@ ROM_START( vindctr2r2 )
 	ROM_LOAD( "136059-1160.16s", 0x004000, 0x004000, CRC(eef0a003) SHA1(4b1c0810e8c60e364051ed867fed0dc3a0b3a872) )
 	ROM_LOAD( "136059-1161.16r", 0x008000, 0x008000, CRC(68c74337) SHA1(13a9333e0b58ce771774632ecdfa8ca9c9664e57) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1198.6p",  0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
-	ROM_REGION( 0xc0000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0xc0000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1162.1a",  0x000000, 0x008000, CRC(dd3833ad) SHA1(e78a44b5f2033b618b5879a8a39bfdf428b5e4c7) )
 	ROM_LOAD( "136059-1166.1b",  0x008000, 0x008000, CRC(e2db50a0) SHA1(953e621f7312340dcbda9e4a727ebeba69ba7d4e) )
 	ROM_LOAD( "136059-1170.1c",  0x010000, 0x008000, CRC(f050ab43) SHA1(72fbba20b6c8a1838842084c07157cdc2fd923c1) )
@@ -2001,10 +2007,10 @@ ROM_START( vindctr2r1 )
 	ROM_LOAD( "136059-1160.16s", 0x004000, 0x004000, CRC(eef0a003) SHA1(4b1c0810e8c60e364051ed867fed0dc3a0b3a872) )
 	ROM_LOAD( "136059-1161.16r", 0x008000, 0x008000, CRC(68c74337) SHA1(13a9333e0b58ce771774632ecdfa8ca9c9664e57) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "chars", 0 )
 	ROM_LOAD( "136059-1198.6p",  0x000000, 0x004000, CRC(f99b631a) SHA1(7a2430b6810c77b0f717d6e9d71823eadbcf6013) )
 
-	ROM_REGION( 0xc0000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0xc0000, "spr_tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136059-1162.1a",  0x000000, 0x008000, CRC(dd3833ad) SHA1(e78a44b5f2033b618b5879a8a39bfdf428b5e4c7) )
 	ROM_LOAD( "136059-1166.1b",  0x008000, 0x008000, CRC(e2db50a0) SHA1(953e621f7312340dcbda9e4a727ebeba69ba7d4e) )
 	ROM_LOAD( "136059-1170.1c",  0x010000, 0x008000, CRC(f050ab43) SHA1(72fbba20b6c8a1838842084c07157cdc2fd923c1) )
@@ -2063,7 +2069,7 @@ void gauntlet_state::init_gauntlet()
 
 void gauntlet_state::init_vindctr2()
 {
-	uint8_t *gfx2_base = memregion("gfx2")->base();
+	uint8_t *gfx2_base = memregion("spr_tiles")->base();
 	std::vector<uint8_t> data(0x8000);
 
 	common_init();
@@ -2075,7 +2081,7 @@ void gauntlet_state::init_vindctr2()
 	memcpy(&data[0], &gfx2_base[0x88000], 0x8000);
 	for (int i = 0; i < 0x8000; i++)
 	{
-		int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
+		int const srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
 		gfx2_base[0x88000 + i] = data[srcoffs];
 	}
 }

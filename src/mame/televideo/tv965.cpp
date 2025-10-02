@@ -118,4 +118,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1989, tv965, 0, 0, tv965, tv965, tv965_state, empty_init, "TeleVideo Systems", "TeleVideo 965", MACHINE_IS_SKELETON )
+COMP( 1989, tv965, 0, 0, tv965, tv965, tv965_state, empty_init, "TeleVideo Systems", "TeleVideo 965", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

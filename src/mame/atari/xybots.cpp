@@ -131,7 +131,6 @@ const atari_motion_objects_config xybots_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x300,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x3f }},         // mask for the link (dummy)
@@ -169,51 +168,57 @@ uint32_t xybots_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified via schematics:
-
-					    PRIEN = ~(~MOPIX3 & ~MOPIX2 & ~MOPIX1) = (MOPIX3-0 > 1)
-
-					    if (PRIEN)
-					        PF/MO = (~MOPRI3-0 > PFCOL3-0)
-					    else
-					        PF/MO = (~MOPRI3-0 >= PFCOL3-0)
-
-					    if (PF/MO | ~(PRIEN & MOCOL3))
-					        GPC(P3-0) = PFPIX3-0
-					    else
-					        GPC(P3-0) = ~MOCOL3-0
-					*/
-					int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) ^ 15;
-					int const pfcolor = (pf[x] >> 4) & 0x0f;
-					int const prien = ((mo[x] & 0x0f) > 1);
-
-					if (prien)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if (mopriority <= pfcolor)
+						if (mo[x] != 0xffff)
 						{
-							/* this first case doesn't make sense from the schematics, but it has
-							   the correct effect */
-							if (mo[x] & 0x80)
-								pf[x] = (mo[x] ^ 0x2f0) & atari_motion_objects_device::DATA_MASK;
+							/* verified via schematics:
+
+							    PRIEN = ~(~MOPIX3 & ~MOPIX2 & ~MOPIX1) = (MOPIX3-0 > 1)
+
+							    if (PRIEN)
+							        PF/MO = (~MOPRI3-0 > PFCOL3-0)
+							    else
+							        PF/MO = (~MOPRI3-0 >= PFCOL3-0)
+
+							    if (PF/MO | ~(PRIEN & MOCOL3))
+							        GPC(P3-0) = PFPIX3-0
+							    else
+							        GPC(P3-0) = ~MOCOL3-0
+							*/
+							int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) ^ 15;
+							int const pfcolor = (pf[x] >> 4) & 0x0f;
+							int const prien = ((mo[x] & 0x0f) > 1);
+
+							if (prien)
+							{
+								if (mopriority <= pfcolor)
+								{
+									/* this first case doesn't make sense from the schematics, but it has
+									   the correct effect */
+									if (mo[x] & 0x80)
+										pf[x] = (mo[x] ^ 0x2f0) & atari_motion_objects_device::DATA_MASK;
+									else
+										pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+								}
+							}
 							else
-								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							{
+								if (mopriority < pfcolor)
+									pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							}
 						}
 					}
-					else
-					{
-						if (mopriority < pfcolor)
-							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
-					}
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -243,7 +248,9 @@ void xybots_state::video_int_ack_w(uint16_t data)
 uint16_t xybots_state::special_port1_r()
 {
 	int result = m_ffe200->read();
-	result ^= m_h256 ^= 0x0400;
+	result ^= m_h256 ^ 0x0400;
+	if (!machine().side_effects_disabled())
+		m_h256 ^= 0x0400;
 	return result;
 }
 
@@ -310,7 +317,7 @@ static INPUT_PORTS_START( xybots )
 	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // /AUDBUSY
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) // 256H
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // VBLANK
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // VBLANK
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -382,15 +389,14 @@ void xybots_state::xybots(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_1, ASSERT_LINE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ATARI_JSA_I(config, m_jsa, 0);
 	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("FFE200").bit(8);
-	m_jsa->add_route(0, "rspeaker", 1.0);
-	m_jsa->add_route(1, "lspeaker", 1.0);
+	m_jsa->add_route(0, "speaker", 1.0, 1);
+	m_jsa->add_route(1, "speaker", 1.0, 0);
 	config.device_remove("jsa:pokey");
 	config.device_remove("jsa:tms");
 }

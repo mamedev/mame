@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_F2MC16_F2MC16_TIMER_H
-#define MAME_CPU_F2MC16_F2MC16_TIMER_H
+#ifndef MAME_CPU_F2MC16_F2MC16_RELOAD_H
+#define MAME_CPU_F2MC16_F2MC16_RELOAD_H
 
 #pragma once
 
@@ -72,4 +72,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(F2MC16_RELOAD_TIMER, f2mc16_reload_timer_device)
 
-#endif
+#endif // MAME_CPU_F2MC16_F2MC16_RELOAD_H

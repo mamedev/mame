@@ -252,9 +252,9 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1997?, slvrball806,    0,           silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_IS_SKELETON)
-GAME(1997?, slvrball720,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_IS_SKELETON)
-GAME(1997?, slvrball632,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_IS_SKELETON)
+GAME(1997?, slvrball806,    0,           silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1997?, slvrball720,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1997?, slvrball632,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-GAME(199?,  slvrballbu409,  slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_IS_SKELETON)
-GAME(199?,  slvrballbu409b, slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_IS_SKELETON) // Probably the same as set 1
+GAME(199?,  slvrballbu409,  slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(199?,  slvrballbu409b, slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Probably the same as set 1

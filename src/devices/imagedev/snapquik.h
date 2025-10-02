@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
-#define MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
+#ifndef MAME_IMAGEDEV_SNAPQUIK_H
+#define MAME_IMAGEDEV_SNAPQUIK_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ DECLARE_DEVICE_TYPE(QUICKLOAD, quickload_image_device)
 #define QUICKLOAD_LOAD_MEMBER(_name)                std::pair<std::error_condition, std::string> _name(snapshot_image_device &image)
 #define DECLARE_QUICKLOAD_LOAD_MEMBER(_name)        QUICKLOAD_LOAD_MEMBER(_name)
 
-#endif // MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
+#endif // MAME_IMAGEDEV_SNAPQUIK_H

@@ -559,7 +559,10 @@ static int load_files(int i, int *found, const char *path)
 				else
 				{
 					if (zip->decompress(file.buf.get(), file.size))
+					{
+						printf("%s: Decompression failed\n", file.name.c_str());
 						file.free();
+					}
 				}
 
 				file.listed = 0;

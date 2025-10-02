@@ -61,6 +61,6 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1996, gkidabc,   0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius KID ABC Fan (Germany)",   MACHINE_IS_SKELETON)
-COMP(1995, miprimlec, 0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Mis Primeras Lecciones (Spain)", MACHINE_IS_SKELETON)
-COMP(1995, gjrprofi,  0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius Junior Profi (Germany)",  MACHINE_IS_SKELETON)
+COMP(1996, gkidabc,   0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius KID ABC Fan (Germany)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1995, miprimlec, 0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Mis Primeras Lecciones (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1995, gjrprofi,  0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius Junior Profi (Germany)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

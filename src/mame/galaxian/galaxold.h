@@ -70,7 +70,7 @@ public:
 	output_finder<2> m_leds;
 
 	int m_irq_line = 0;
-	uint8_t m__4in1_bank = 0U;
+	uint8_t m_4in1_bank = 0U;
 	tilemap_t *m_bg_tilemap = nullptr;
 	int m_spriteram2_present = 0;
 	uint8_t m_gfxbank[5]{};
@@ -155,6 +155,7 @@ public:
 	void init_ladybugg();
 	void init_4in1();
 	void init_superbikg();
+	void init_dkongjrv();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
@@ -256,6 +257,7 @@ public:
 	void racknrol(machine_config &config);
 	void hunchbkg(machine_config &config);
 	void videotron(machine_config &config);
+	void dkongjrv(machine_config &config);
 	void hexpoola(machine_config &config);
 	void dkongjrm(machine_config &config);
 	void tazzmang(machine_config &config);
@@ -276,6 +278,10 @@ public:
 	void bullsdrtg_data_map(address_map &map) ATTR_COLD;
 	void dkongjrm_map(address_map &map) ATTR_COLD;
 	void dkongjrmc_map(address_map &map) ATTR_COLD;
+	void dkongjrv_audio_map(address_map &map) ATTR_COLD;
+	void dkongjrv_audio_io_map(address_map &map) ATTR_COLD;
+	void dkongjrv_io_map(address_map &map) ATTR_COLD;
+	void dkongjrv_map(address_map &map) ATTR_COLD;
 	void drivfrcg_program(address_map &map) ATTR_COLD;
 	void drivfrcg_io(address_map &map) ATTR_COLD;
 	void galaxold_map(address_map &map) ATTR_COLD;

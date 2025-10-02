@@ -182,4 +182,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1986, telex274, 0, 0, telex274, telex274, telex274_state, empty_init, "Telex Computer Products", "Telex 274-61C Sixteen Station Control Unit", MACHINE_IS_SKELETON)
+COMP(1986, telex274, 0, 0, telex274, telex274, telex274_state, empty_init, "Telex Computer Products", "Telex 274-61C Sixteen Station Control Unit", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

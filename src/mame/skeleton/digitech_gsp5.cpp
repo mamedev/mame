@@ -65,4 +65,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1989, gsp5, 0, 0, gsp5, gsp5, gsp5_state, empty_init, "DigiTech", "GSP 5 Guitar Effects Processor/Preamp", MACHINE_IS_SKELETON)
+SYST(1989, gsp5, 0, 0, gsp5, gsp5, gsp5_state, empty_init, "DigiTech", "GSP 5 Guitar Effects Processor/Preamp", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

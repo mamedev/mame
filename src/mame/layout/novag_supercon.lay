@@ -569,6 +569,8 @@ authors:hap
 	<group name="overlay">
 		<bounds left="-19" right="116" top="-0.5" bottom="88.5" />
 
+		<group ref="default"><bounds left="-19" right="116" top="-0.5" bottom="88.5" /></group>
+
 		<!-- block buttons -->
 		<element ref="hlb" clickthrough="no"><bounds x="88" y="16" width="6" height="4" /></element>
 		<element ref="hlb" clickthrough="no"><bounds x="88" y="26" width="6" height="4" /></element>
@@ -579,8 +581,6 @@ authors:hap
 		<element ref="hlb" clickthrough="no"><bounds x="97" y="46" width="6" height="4" /></element>
 		<element ref="hlb" clickthrough="no"><bounds x="97" y="56" width="6" height="4" /></element>
 		<element ref="hlb" clickthrough="no"><bounds x="97" y="66" width="6" height="4" /></element>
-
-		<group ref="default"><bounds left="-19" right="116" top="-0.5" bottom="88.5" /></group>
 
 		<!-- erase -->
 		<element ref="blackb"><bounds x="86" y="0" width="1" height="88" /></element>

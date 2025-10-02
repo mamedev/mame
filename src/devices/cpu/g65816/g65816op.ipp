@@ -1940,7 +1940,9 @@ TABLE_FUNCTION(int, execute, (int clocks))
 	// do a check here also in case we're in STOP_WAI mode - this'll clear it when the IRQ happens
 	g65816i_check_maskable_interrupt();
 
-	if (!CPU_STOPPED)
+	if (CPU_STOPPED)
+		debugger_wait_hook();
+	else
 	{
 		CLOCKS = clocks;
 		do

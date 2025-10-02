@@ -167,6 +167,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1985, dw8000,   0,      0, dw8000,   dw8000, korgdw8k_state, empty_init, "Korg",               "DW-8000 Programmable Digital Waveform Synthesizer", MACHINE_IS_SKELETON)
-SYST(1985, dw8000ex, dw8000, 0, dw8000ex, dw8000, korgdw8k_state, empty_init, "Korg / Musitronics", "DW-8000-EX Programmable Digital Waveform Synthesizer", MACHINE_IS_SKELETON)
-SYST(1985, ex8000,   dw8000, 0, dw8000,   dw8000, korgdw8k_state, empty_init, "Korg",               "EX-8000 Programmable Polyphonic Synthe Module", MACHINE_IS_SKELETON)
+SYST(1985, dw8000,   0,      0, dw8000,   dw8000, korgdw8k_state, empty_init, "Korg",               "DW-8000 Programmable Digital Waveform Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1985, dw8000ex, dw8000, 0, dw8000ex, dw8000, korgdw8k_state, empty_init, "Korg / Musitronics", "DW-8000-EX Programmable Digital Waveform Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1985, ex8000,   dw8000, 0, dw8000,   dw8000, korgdw8k_state, empty_init, "Korg",               "EX-8000 Programmable Polyphonic Synthe Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

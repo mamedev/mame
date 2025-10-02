@@ -68,4 +68,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1999, rp200, 0, 0, rp200, rp200, gem_rp_state, empty_init, "Generalmusic", "GEM RealPiano RP200", MACHINE_IS_SKELETON)
+SYST(1999, rp200, 0, 0, rp200, rp200, gem_rp_state, empty_init, "Generalmusic", "GEM RealPiano RP200", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

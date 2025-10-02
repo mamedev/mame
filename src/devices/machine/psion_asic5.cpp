@@ -110,7 +110,7 @@ void psion_asic5_device::device_reset()
 	m_int_mask       = 0x00;
 	m_int_status     = 0x02; // UART transmitter empty
 	m_control        = 0x00;
-	m_bdr            = 0xffff;
+	m_bdr            = -1;
 
 	receive_register_reset();
 	transmit_register_reset();

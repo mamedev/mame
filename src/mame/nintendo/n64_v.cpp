@@ -174,11 +174,11 @@ uint32_t n64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	if (m_rcp_periphs->is_interlace_mode())
 	{
 		m_rcp_periphs->video_update(m_interlace_bitmap[m_rcp_periphs->get_current_field()]);
-		for (int y=cliprect.min_y; y <= cliprect.max_y; y ++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			const u8 line_field = y & 1;
 			const u16 y_field_line = y >> 1;
-			for (int x = cliprect.min_x; x<=cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				bitmap.pix(y, x) = m_interlace_bitmap[line_field].pix(y_field_line, x);
 			}
@@ -3490,11 +3490,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 	const uint32_t zb = object.m_misc_state.m_zb_address >> 1;
 	const uint32_t zhb = object.m_misc_state.m_zb_address;
 
-#ifdef PTR64
-	assert(extent.userdata != (const void *)0xcccccccccccccccc);
-#else
-	assert(extent.userdata != (const void *)0xcccccccc);
-#endif
+	assert(uintptr_t(extent.userdata) != uintptr_t(uint64_t(0xcccccccc'cccccccc)));
 	rdp_span_aux* userdata = (rdp_span_aux*)extent.userdata;
 
 	m_tex_pipe.calculate_clamp_diffs(tilenum, userdata, object);
@@ -3813,11 +3809,7 @@ void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const r
 	int32_t news = 0;
 	int32_t newt = 0;
 
-#ifdef PTR64
-	assert(extent.userdata != (const void *)0xcccccccccccccccc);
-#else
-	assert(extent.userdata != (const void *)0xcccccccc);
-#endif
+	assert(uintptr_t(extent.userdata) != uintptr_t(uint64_t(0xcccccccc'cccccccc)));
 	rdp_span_aux* userdata = (rdp_span_aux*)extent.userdata;
 
 	m_tex_pipe.calculate_clamp_diffs(tile1, userdata, object);

@@ -62,4 +62,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 198?, casiorom, 0, 0, casiorom,  casiorom, casiorom_state, empty_init, "Casio", "Casio ROM Pack Software List holder", MACHINE_IS_SKELETON )
+CONS( 198?, casiorom, 0, 0, casiorom,  casiorom, casiorom_state, empty_init, "Casio", "Casio ROM Pack Software List holder", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

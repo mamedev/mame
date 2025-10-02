@@ -91,5 +91,5 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1998, qmsirius, 0, 0, qmsirius, qmsirius, qmsirius_state, empty_init, "Quasimidi Musikelektronik GmbH", "Quasimidi Sirius",  MACHINE_IS_SKELETON)
-SYST(1996, qmrave,   0, 0, qmsirius, qmsirius, qmsirius_state, empty_init, "Quasimidi Musikelektronik GmbH", "Rave-O-Lution 309", MACHINE_IS_SKELETON)
+SYST(1998, qmsirius, 0, 0, qmsirius, qmsirius, qmsirius_state, empty_init, "Quasimidi Musikelektronik GmbH", "Quasimidi Sirius",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1996, qmrave,   0, 0, qmsirius, qmsirius, qmsirius_state, empty_init, "Quasimidi Musikelektronik GmbH", "Rave-O-Lution 309", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

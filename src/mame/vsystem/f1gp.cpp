@@ -11,11 +11,6 @@
     - f1gp2's hardware is very similar to Lethal Crash Race, main difference
       being an extra 68000.
 
-    TODO:
-    - Hook up link for Multi Player game mode. Currently they boot with
-      link set to multiple, but the ID changes every boot (and will black
-      out if a multiplayer game is started).
-
     f1gp:
     - gfxctrl register not understood - handling of fg/sprite priority to fix
       "continue" screen is just a kludge.
@@ -33,6 +28,8 @@
 #include "vsystem_gga.h"
 #include "vsystem_spr.h"
 #include "vsystem_spr2.h"
+
+#include "bus/rs232/rs232.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -84,6 +81,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_acia(*this, "acia"),
+		m_rs232_out(*this, "com_out"),
+		m_rs232_in(*this, "com_in"),
 		m_rozgfxram(*this, "rozgfxram"),
 		m_spr_old(*this, "vsystem_spr_old%u", 1U)
 	{ }
@@ -120,6 +119,8 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch; // not f1gpbl
 	required_device<acia6850_device> m_acia;
+	required_device<rs232_port_device> m_rs232_out;
+	required_device<rs232_port_device> m_rs232_in;
 
 	void sh_bankswitch_w(uint8_t data);
 	uint8_t soundlatch_pending_r();
@@ -220,7 +221,6 @@ TILE_GET_INFO_MEMBER(f1gp2_state::get_roz_tile_info)
   Start the video hardware emulation.
 
 ***************************************************************************/
-
 
 void f1gp_state::video_start()
 {
@@ -360,6 +360,7 @@ uint32_t f1gp2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 	return 0;
 }
+
 
 /***************************************************************************
 
@@ -742,6 +743,14 @@ static INPUT_PORTS_START( f1gp2 )
 	PORT_DIPUNUSED( 0x001e, 0x001e )
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( linkplay )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_78125 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_78125 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 
 
 static GFXDECODE_START( gfx_f1gp )
@@ -826,9 +835,18 @@ void f1gp_state::f1gp(machine_config &config)
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
-	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
+	m_acia->txd_handler().set("com_out", FUNC(rs232_port_device::write_txd));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 1'000'000)); // guessed
+	// dual DE-9 ports
+	// COM-IN (inner) and COM-OUT (outer) according to manual
+	rs232_port_device &rs232out(RS232_PORT(config, "com_out", default_rs232_devices, nullptr));
+	rs232out.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	rs232_port_device &rs232in(RS232_PORT(config, "com_in", default_rs232_devices, nullptr));
+	rs232in.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232in.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 16)); // 78125 baud
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
@@ -858,8 +876,7 @@ void f1gp_state::f1gp(machine_config &config)
 	m_k053936->set_offsets(-58, -2);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(FUNC(f1gp_state::soundlatch_pending_w));
@@ -867,10 +884,10 @@ void f1gp_state::f1gp(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 void f1gp_state::f1gpbl(machine_config &config)
@@ -889,11 +906,21 @@ void f1gp_state::f1gpbl(machine_config &config)
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
-	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
+	m_acia->txd_handler().set("com_out", FUNC(rs232_port_device::write_txd));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 1'000'000)); // guessed
+	// dual DE-9 ports
+	// COM-IN (inner) and COM-OUT (outer) according to manual
+	rs232_port_device &rs232out(RS232_PORT(config, "com_out", default_rs232_devices, nullptr));
+	rs232out.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	rs232_port_device &rs232in(RS232_PORT(config, "com_in", default_rs232_devices, nullptr));
+	rs232in.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232in.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 16)); // 78125 baud
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
+
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1163,9 +1190,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, f1gp,   0,    f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // censored banners, US McO'River release?
-GAME( 1991, f1gpa,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 3)",            MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // supposed to be the earliest version dumped and only work with steering wheel
-GAME( 1991, f1gpbl, f1gp, f1gpbl, f1gp,  f1gp_state,  empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,   0,    f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored banners, US McO'River release?
+GAME( 1991, f1gpa,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 3)",            MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // supposed to be the earliest version dumped and only work with steering wheel
+GAME( 1991, f1gpbl, f1gp, f1gpbl, f1gp,  f1gp_state,  empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2,  0,    f1gp2,  f1gp2, f1gp2_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, f1gp2,  0,    f1gp2,  f1gp2, f1gp2_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

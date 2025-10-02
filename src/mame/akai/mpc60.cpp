@@ -195,4 +195,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1987, mpc60, 0, 0, mpc60, mpc60, mpc60_state, empty_init, "Akai Electric", "MPC60 MIDI Production Center", MACHINE_IS_SKELETON)
+SYST(1987, mpc60, 0, 0, mpc60, mpc60, mpc60_state, empty_init, "Akai Electric", "MPC60 MIDI Production Center", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

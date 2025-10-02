@@ -177,7 +177,7 @@ Measurements -
 
 TIMER_DEVICE_CALLBACK_MEMBER(badlands_state::sound_scanline)
 {
-	int scanline = param;
+	int const scanline = param;
 	//address_space &space = m_audiocpu->space(AS_PROGRAM);
 
 	// 32V
@@ -198,7 +198,7 @@ void badlands_state::machine_reset()
 
 	//scanline_timer_reset(*m_screen, 32);
 
-	membank("soundbank")->set_entry(0);
+	m_soundbank->set_entry(0);
 }
 
 
@@ -212,7 +212,7 @@ void badlands_state::machine_reset()
 INTERRUPT_GEN_MEMBER(badlands_state::vblank_int)
 {
 	// TODO: remove this hack
-	int pedal_state = ioport("PEDALS")->read();
+	int const pedal_state = m_io_pedals->read();
 
 	/* update the pedals once per frame */
 	for (int i = 0; i < 2; i++)
@@ -284,8 +284,8 @@ uint8_t badlands_state::audio_io_r()
 	    0x02 = coin 2
 	    0x01 = coin 1
 	*/
-	uint8_t result = ioport("AUDIO")->read();
-	if (!(ioport("FE4000")->read() & 0x0080)) result ^= 0x90;
+	uint8_t result = m_io_audio->read();
+	if (BIT(m_io_fe4000->read(), 7)) result ^= 0x90;
 	result ^= 0x10;
 
 	return result;
@@ -306,7 +306,7 @@ void badlands_state::audio_io_w(uint8_t data)
 	*/
 
 	// update the bank
-	membank("soundbank")->set_entry((data >> 6) & 3);
+	m_soundbank->set_entry((data >> 6) & 3);
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
 	m_ymsnd->reset_w(BIT(data, 0));
@@ -374,7 +374,7 @@ void badlands_state::audio_map(address_map &map)
 	map(0x2806, 0x2806).mirror(0x5f9).rw(FUNC(badlands_state::audio_irqack_r), FUNC(badlands_state::audio_irqack_w));
 	map(0x2a02, 0x2a02).mirror(0x5f9).w(m_mainlatch, FUNC(generic_latch_8_device::write));
 	map(0x2a04, 0x2a04).mirror(0x5f9).w(FUNC(badlands_state::audio_io_w));
-	map(0x3000, 0x3fff).bankr("soundbank");
+	map(0x3000, 0x3fff).bankr(m_soundbank);
 	map(0x4000, 0xffff).rom();
 }
 
@@ -408,8 +408,8 @@ static const gfx_layout badlands_molayout =
 };
 
 static GFXDECODE_START( gfx_badlands )
-	GFXDECODE_ENTRY( "gfx1", 0, pflayout,           0, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, badlands_molayout,  128, 8 )
+	GFXDECODE_ENTRY( "tiles",   0, pflayout,           0, 8 )
+	GFXDECODE_ENTRY( "sprites", 0, badlands_molayout,  128, 8 )
 GFXDECODE_END
 
 
@@ -485,7 +485,7 @@ ROM_START( badlands )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136074-1018.9c", 0x00000, 0x10000, CRC(a05fd146) SHA1(d97abbcf7897ca720cc18ff3a323f41cd3b23c34) )
 
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x60000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136074-1012.4n",  0x000000, 0x10000, CRC(5d124c6c) SHA1(afebaaf90b3751f5e873fc4c45f1d5385ef86a6e) )  /* playfield */
 	ROM_LOAD( "136074-1013.2n",  0x010000, 0x10000, CRC(b1ec90d6) SHA1(8d4c7db8e1bf9c050f5869eb38fa573867fdc12b) )
 	ROM_LOAD( "136074-1014.4s",  0x020000, 0x10000, CRC(248a6845) SHA1(086ef0840b889e790ce3fcd09f98589aae932456) )
@@ -493,7 +493,7 @@ ROM_START( badlands )
 	ROM_LOAD( "136074-1016.4u",  0x040000, 0x10000, CRC(878f7c66) SHA1(31159bea5d6aac8100fca8f3860220b97d63e72e) )
 	ROM_LOAD( "136074-1017.2u",  0x050000, 0x10000, CRC(ad0071a3) SHA1(472b197e5d320b3424d8a8d8c051b1023a07ae08) )
 
-	ROM_REGION( 0x30000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x30000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "136074-1010.14r", 0x000000, 0x10000, CRC(c15f629e) SHA1(944e3479dce6e420cf9a3f4c1438c5ca66e5cb97) )  /* mo */
 	ROM_LOAD( "136074-1011.10r", 0x010000, 0x10000, CRC(fb0b6717) SHA1(694ab0f04d673682831a24027757d4b3c40a4e0e) )
 	ROM_LOAD( "136074-1019.14t", 0x020000, 0x10000, CRC(0e26bff6) SHA1(ee018dd37a27c7e7c16a57ea0d32aeb9cdf26bb4) )
@@ -518,7 +518,7 @@ ROM_END
 void badlands_state::init_badlands()
 {
 	/* initialize the audio system */
-	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x01000);
+	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x01000);
 }
 
 

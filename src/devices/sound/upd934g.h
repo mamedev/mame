@@ -27,30 +27,31 @@ public:
 	// construction/destruction
 	upd934g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void write(offs_t offset, uint8_t data);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	sound_stream *m_stream;
 
-	uint16_t m_addr[16];
+	u16 m_addr[16];
+	u8 m_valid[16];
 
 	struct
 	{
-		uint16_t pos;
-		int playing;
-		int effect;
+		u16 pos;
+		s8 playing;
+		u8 effect;
 	}
 	m_channel[4];
 
-	int m_sample;
-	bool m_ready;
+	u8 m_sample;
+	u8 m_ready;
 };
 
 // device type definition

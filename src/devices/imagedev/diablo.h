@@ -4,8 +4,8 @@
  *   DIABLO drive image to hard disk interface
  **********************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_DIABLO_H
-#define MAME_DEVICES_IMAGEDEV_DIABLO_H
+#ifndef MAME_IMAGEDEV_DIABLO_H
+#define MAME_IMAGEDEV_DIABLO_H
 
 #pragma once
 
@@ -78,4 +78,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(DIABLO, diablo_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_DIABLO_H
+#endif // MAME_IMAGEDEV_DIABLO_H

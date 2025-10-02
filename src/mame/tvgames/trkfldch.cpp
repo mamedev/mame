@@ -25,7 +25,7 @@ DDR & TF PCBs look identical, all the parts are in the same place, the traces ar
 Some of m_unkregs must retain value (or return certain things) or RAM containing vectors gets blanked and game crashes.
 The G65816 code on these is VERY ugly and difficult to follow, many redundant statements, excessive mode switching, accessing things via pointers to pointers etc.
 
-One of the vectors points to 0x6000, there is nothing mapped there, could it be a small internal ROM or some debug trap for development?
+One of the vectors points to 0x6000, there is nothing mapped there, could it be a small internal ROM (sound related?) or some debug trap for development?
 
 
 ---
@@ -36,6 +36,20 @@ Mountain Bike Rally uses scrolling / split (helps confirm the same row skip logi
 Turn and Whack (cards) game runs far too quickly (might show us where timer config is)
 The Power Game game also appears to run far too quickly
 Territory Pursuit uses y-flipped sprites
+
+The code to play/request a sample from ROM is at 0D:FB7B
+It is called after pushing 3 words onto the stack containing the sample address
+
+eg.
+05:85B6: pea $0000
+05:85B9: pea $0005
+05:85BC: pea $f8bc
+05:85BF: jsl $0dfb7b    --- play sample
+
+Samples appear to be terminated with 0x8000
+
+The game also has some terrible PSG-like music, is this coming from a secondary MCU as there is an additional glob on
+each of the units using the tech, and the audio quality varies significantly.
 
 */
 
@@ -1608,6 +1622,12 @@ ROM_START( trkfldch )
 	ROM_LOAD( "trackandfield.bin", 0x000000, 0x400000,  CRC(f4f1959d) SHA1(344dbfe8df1897adf77da6e5ca0435c4d47d6842) )
 ROM_END
 
+ROM_START( trkfldchj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "trackandfieldjap.u2", 0x000000, 0x400000, CRC(2badbbae) SHA1(8102a6166bda3de2b13a984c391ad05e15fbf7ce) )
+ROM_END
+
+
 ROM_START( my1stddr )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "myfirstddr.bin", 0x000000, 0x400000, CRC(2ef57bfc) SHA1(9feea5adb9de8fe17e915f3a037e8ddd70e58ae7) )
@@ -1627,6 +1647,12 @@ ROM_START( lexitvsprt )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "29l3211.u2a", 0x000000, 0x400000, CRC(65e5223c) SHA1(13eae6e34100fb9761335e87a3cf728bb31e860f) )
 ROM_END
+
+ROM_START( senspid )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD( "spidermanmat.bin", 0x00000, 0x400000, CRC(11f5181c) SHA1(7f0d5d34f924b6a7182102451a2ac1cc41e575b0) )
+ROM_END
+
 
 /*
 Included with Orange model
@@ -1717,10 +1743,19 @@ The following were also available (via the Download service?)
 
 
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// 走れ!とべ!投げろ! ハイパースポーツチャレンジ
+CONS( 2007, trkfldchj, trkfldch,   0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Hashire! Tobe! Nagero! Hyper Sports Challenge (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
 CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",                                     "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
+
 CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd",                         "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
 CONS( 200?, shtscore,  0,          0,  trkfldch, shtscore,trkfldch_state,      empty_init,    "Halsall / time4toys.com / Electronic Games", "Shoot n' Score", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
 CONS( 200?, lexitvsprt,0,          0,  trkfldch, lexi,    trkfldch_lexi_state, empty_init,    "Lexibook",                                   "TV Sports Plug & Play 5-in-1 (JG7000)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+// don't have a picture of the box, title screen doesn't give a more complete title, I/O seems closer lexitvsprt
+CONS( 2007, senspid,   0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Senario",                                    "The Amazing Spider-Man (Senario, floor mat)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // additional online content could be downloaded onto these if they were connected to a PC via USB
 CONS( 2008, teleshi,   0,          0,  trkfldch, konsb,   trkfldch_state,      empty_init,    "Konami",                                     "Teleshibai (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // テレしばい - this one is orange

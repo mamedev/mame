@@ -248,4 +248,4 @@ ROM_END
 
 
 //    year, name,     parent,  compat, machine,           input,             class,                   init,       company,  fullname,             flags
-CONS( 2005, pixtermu, 0,       0,      pixter_multimedia, pixter_multimedia, pixter_multimedia_state, empty_init, "Mattel", "Pixter Multi-Media", MACHINE_IS_SKELETON )
+CONS( 2005, pixtermu, 0,       0,      pixter_multimedia, pixter_multimedia, pixter_multimedia_state, empty_init, "Mattel", "Pixter Multi-Media", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

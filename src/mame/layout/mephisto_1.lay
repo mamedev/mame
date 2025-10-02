@@ -9,6 +9,12 @@ authors:hap
 
 <!-- schach labels -->
 
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="gray1"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+	<element name="gray2"><rect><color red="0.11" green="0.105" blue="0.10" /></rect></element>
+	<element name="gray2d"><disk><color red="0.11" green="0.105" blue="0.10" /></disk></element>
+	<element name="gray3"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
+
 	<element name="text_schach"><text string="SCHACH"><color red="0.3" green="0.3" blue="0.31" /></text></element>
 	<element name="text_matt"><text string="MATT"><color red="0.3" green="0.3" blue="0.31" /></text></element>
 	<element name="text_patt"><text string="PATT"><color red="0.3" green="0.3" blue="0.31" /></text></element>
@@ -217,12 +223,6 @@ authors:hap
 
 
 <!-- brikett -->
-
-	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="gray1"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
-	<element name="gray2"><rect><color red="0.11" green="0.105" blue="0.10" /></rect></element>
-	<element name="gray2d"><disk><color red="0.11" green="0.105" blue="0.10" /></disk></element>
-	<element name="gray3"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
 
 	<group name="brikett">
 		<bounds x="16.5" y="6" width="58.5" height="32" />

@@ -34,20 +34,31 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	struct l7a1045_voice
 	{
 		constexpr l7a1045_voice() { }
 
+		uint32_t loop_start = 0;
 		uint32_t start = 0;
 		uint32_t end = 0;
-		bool mode = false;
+		uint32_t step = 0;
 		uint32_t pos = 0;
 		uint32_t frac = 0;
 		uint16_t l_volume = 0;
 		uint16_t r_volume = 0;
+		uint16_t env_volume = 0;
+		uint16_t env_target = 0;
+		uint16_t env_step = 0;
+		uint32_t env_pos = 0;
+		uint16_t flt_freq = 0;
+		uint16_t flt_target = 0;
+		uint16_t flt_step = 0;
+		uint32_t flt_pos = 0;
+		uint8_t flt_resonance = 0;
+		int32_t b = 0, l = 0; // filter state
 	};
 
 	sound_stream *m_stream;
@@ -57,6 +68,7 @@ private:
 
 	uint8_t m_audiochannel;
 	uint8_t m_audioregister;
+	double m_sample_rate;
 
 	struct l7a1045_48bit_data {
 		uint16_t dat[3];

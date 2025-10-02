@@ -150,14 +150,26 @@ REF. 970429
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
-#include "emupal.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 #include "speedup.lh"
 
 
-#define LOG             0
+#define LOG_EEPROM          (1U << 1)
+#define LOG_SOUND           (1U << 2)
+#define LOG_TMS             (1U << 3)
+#define LOG_ADSP            (1U << 4)
+
+#define VERBOSE 0
+
+#include "logmacro.h"
+
+#define LOGEEPROM(...)      LOGMASKED(LOG_EEPROM, __VA_ARGS__)
+#define LOGSOUND(...)       LOGMASKED(LOG_SOUND, __VA_ARGS__)
+#define LOGTMS(...)         LOGMASKED(LOG_TMS, __VA_ARGS__)
+#define LOGADSP(...)        LOGMASKED(LOG_ADSP, __VA_ARGS__)
 
 
 void gaelco3d_state::ser_irq(int state)
@@ -177,10 +189,11 @@ void gaelco3d_state::ser_irq(int state)
 
 void gaelco3d_state::machine_start()
 {
+	m_adsp_bank->configure_entries(0, 256, memregion("adsprom")->base(), 0x4000);
+
 	// Save state support
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_analog_ports));
-	save_item(NAME(m_framenum));
 	save_item(NAME(m_adsp_ireg));
 	save_item(NAME(m_adsp_ireg_base));
 	save_item(NAME(m_adsp_incs));
@@ -188,23 +201,20 @@ void gaelco3d_state::machine_start()
 	save_item(NAME(m_fp_clock));
 	save_item(NAME(m_fp_state));
 	save_item(NAME(m_fp_analog_ports));
-	save_item(NAME(m_fp_lenght));
+	save_item(NAME(m_fp_length));
 }
 
 
 MACHINE_RESET_MEMBER(gaelco3d_state,common)
 {
-	m_framenum = 0;
-
 	// Boot the ADSP chip
-	uint16_t *src = (uint16_t *)memregion("user1")->base();
+	uint16_t const *const src = (uint16_t *)memregion("adsprom")->base();
 	for (int i = 0; i < (src[3] & 0xff) * 8; i++)
 	{
-		uint32_t opcode = ((src[i*4+0] & 0xff) << 16) | ((src[i*4+1] & 0xff) << 8) | (src[i*4+2] & 0xff);
+		uint32_t const opcode = ((src[i * 4 + 0] & 0xff) << 16) | ((src[i * 4 + 1] & 0xff) << 8) | (src[i * 4 + 2] & 0xff);
 		m_adsp_ram_base[i] = opcode;
 	}
 
-	m_adsp_bank->configure_entries(0, 256, memregion("user1")->base(), 0x4000);
 	m_adsp_bank->set_entry(0);
 
 	// Keep the TMS32031 halted until the code is ready to go
@@ -214,14 +224,14 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 
 void gaelco3d_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER( common );
+	MACHINE_RESET_CALL_MEMBER(common);
 	m_soundlatch->acknowledge_w();
 }
 
 
 MACHINE_RESET_MEMBER(gaelco3d_state,gaelco3d2)
 {
-	MACHINE_RESET_CALL_MEMBER( common );
+	MACHINE_RESET_CALL_MEMBER(common);
 	m_fp_clock = 27;
 	m_fp_state = 0;
 }
@@ -268,8 +278,8 @@ uint16_t gaelco3d_state::eeprom_data_r(offs_t offset, uint16_t mem_mask)
 
 	if (m_eeprom->do_read())
 		result ^= 0x0004;
-	if (LOG)
-		logerror("eeprom_data_r(%02X)\n", result);
+	if (!machine().side_effects_disabled())
+		LOGEEPROM("eeprom_data_r(%02X)\n", result);
 	return result;
 }
 
@@ -283,8 +293,8 @@ uint16_t gaelco3d_state::eeprom_data_r(offs_t offset, uint16_t mem_mask)
 
 uint16_t gaelco3d_state::sound_status_r(offs_t offset, uint16_t mem_mask)
 {
-	if (LOG)
-		logerror("%s:sound_status_r(%02X) = %02X\n", machine().describe_context(), offset, m_sound_status);
+	if (!machine().side_effects_disabled())
+		LOGSOUND("%s:sound_status_r(%02X) = %02X\n", machine().describe_context(), offset, m_sound_status);
 	if (ACCESSING_BITS_0_7)
 		return m_sound_status;
 	return 0xffff;
@@ -293,8 +303,7 @@ uint16_t gaelco3d_state::sound_status_r(offs_t offset, uint16_t mem_mask)
 
 void gaelco3d_state::sound_status_w(uint16_t data)
 {
-	if (LOG)
-		logerror("sound_status_w(%02X)\n", m_sound_status);
+	LOGSOUND("sound_status_w(%02X)\n", m_sound_status);
 	m_sound_status = data;
 }
 
@@ -309,7 +318,7 @@ void gaelco3d_state::sound_status_w(uint16_t data)
 template <int N>
 int gaelco3d_state::analog_bit_r()
 {
-	return (m_analog_ports[N] >> 7) & 0x01;
+	return BIT(m_analog_ports[N], 7);
 }
 
 
@@ -341,7 +350,7 @@ void gaelco3d_state::analog_port_latch_w(int state)
 template <int N>
 int gaelco3d_state::fp_analog_bit_r()
 {
-	return (m_fp_analog_ports[N] >> m_fp_clock) & 1;
+	return BIT(m_fp_analog_ports[N], m_fp_clock);
 }
 
 void gaelco3d_state::fp_analog_clock_w(int state)
@@ -355,15 +364,15 @@ void gaelco3d_state::fp_analog_clock_w(int state)
 			m_fp_clock = 0;
 			for (int i = 0; i < 2; i++)
 			{
-				u32 ay = m_analog[i * 2].read_safe(0);
-				u32 ax = m_analog[i * 2 + 1].read_safe(0);
+				u32 const ay = m_analog[i * 2].read_safe(0);
+				u32 const ax = m_analog[i * 2 + 1].read_safe(0);
 				m_fp_analog_ports[i] = (ax << 18) | ((ax ^ 0xff) << 10) | (ay << 2) | 1;
-				s32 aay = ay - 0x80;
-				s32 aax = ax - 0x80;
-				u32 len = aay * aay + aax * aax;
-				if (len <= m_fp_lenght[i])
+				s32 const aay = ay - 0x80;
+				s32 const aax = ax - 0x80;
+				u32 const len = aay * aay + aax * aax;
+				if (len <= m_fp_length[i])
 					m_fp_analog_ports[i] |= 2;
-				m_fp_lenght[i] = len;
+				m_fp_length[i] = len;
 			}
 		}
 	}
@@ -378,7 +387,8 @@ void gaelco3d_state::fp_analog_clock_w(int state)
 
 uint32_t gaelco3d_state::tms_m68k_ram_r(offs_t offset)
 {
-//  logerror("%s:tms_m68k_ram_r(%04X) = %08X\n", machine().describe_context(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
+	//if (!machine().side_effects_disabled())
+		//LOGTMS("%s:tms_m68k_ram_r(%04X) = %08X\n", machine().describe_context(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
 	if (m_m68k_ram_base16)
 		return (int32_t)(int16_t)m_m68k_ram_base16[offset];
 	else if (offset & 1)
@@ -401,8 +411,7 @@ void gaelco3d_state::tms_m68k_ram_w(offs_t offset, uint32_t data)
 
 void gaelco3d_state::tms_iack_w(offs_t offset, uint8_t data)
 {
-	if (LOG)
-		logerror("iack_w(%d) - %06X\n", data, offset);
+	LOGTMS("iack_w(%d) - %06X\n", data, offset);
 	m_tms->set_input_line(0, CLEAR_LINE);
 }
 
@@ -418,8 +427,7 @@ void gaelco3d_state::tms_reset_w(int state)
 {
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done.
 	   It does not ever appear to be touched after that */
-	if (LOG)
-		logerror("%06X:tms_reset_w = %d\n", m_maincpu->pc(), state);
+	LOGTMS("%06X:tms_reset_w = %d\n", m_maincpu->pc(), state);
 	m_tms->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -428,16 +436,14 @@ void gaelco3d_state::tms_irq_w(int state)
 {
 	/* This is written twice, 0,1, in quick succession.
 	   Done after uploading, and after modifying the comm area */
-	if (LOG)
-		logerror("%06X:tms_irq_w = %d\n", m_maincpu->pc(), state);
+	LOGTMS("%06X:tms_irq_w = %d\n", m_maincpu->pc(), state);
 	m_tms->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 void gaelco3d_state::tms_control3_w(int state)
 {
-	if (LOG)
-		logerror("%06X:tms_control3_w = %d\n", m_maincpu->pc(), state);
+	LOGTMS("%06X:tms_control3_w = %d\n", m_maincpu->pc(), state);
 }
 
 /*************************************
@@ -479,15 +485,14 @@ ADSP control 3FFF W = 0C08  (SYSCONTROL_REG)
 
 void gaelco3d_state::adsp_control_w(offs_t offset, uint16_t data)
 {
-	if (LOG)
-		logerror("ADSP control %04X W = %04X\n", 0x3fe0 + offset, data);
+	LOGADSP("ADSP control %04X W = %04X\n", 0x3fe0 + offset, data);
 
 	m_adsp_control_regs[offset] = data;
 	switch (offset)
 	{
 		case SYSCONTROL_REG:
 			// See if SPORT1 got disabled
-			if ((data & 0x0800) == 0)
+			if (BIT(~data, 11))
 			{
 				for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
 					m_dmadac[i]->enable(0);
@@ -498,7 +503,7 @@ void gaelco3d_state::adsp_control_w(offs_t offset, uint16_t data)
 
 		case S1_AUTOBUF_REG:
 			// Autobuffer off: nuke the timer, and disable the DAC
-			if ((data & 0x0002) == 0)
+			if (BIT(~data, 1))
 			{
 				for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
 					m_dmadac[i]->enable(0);
@@ -509,9 +514,9 @@ void gaelco3d_state::adsp_control_w(offs_t offset, uint16_t data)
 
 		case S1_CONTROL_REG:
 			if (((data >> 4) & 3) == 2)
-				logerror("Oh no!, the data is compressed with u-law encoding\n");
+				LOGADSP("Oh no!, the data is compressed with u-law encoding\n");
 			if (((data >> 4) & 3) == 3)
-				logerror("Oh no!, the data is compressed with A-law encoding\n");
+				LOGADSP("Oh no!, the data is compressed with A-law encoding\n");
 			break;
 	}
 }
@@ -519,8 +524,7 @@ void gaelco3d_state::adsp_control_w(offs_t offset, uint16_t data)
 
 void gaelco3d_state::adsp_rombank_w(offs_t offset, uint16_t data)
 {
-	if (LOG)
-		logerror("adsp_rombank_w(%d) = %04X\n", offset, data);
+	LOGADSP("adsp_rombank_w(%d) = %04X\n", offset, data);
 	m_adsp_bank->set_entry((offset & 1) * 0x80 + (data & 0x7f));
 }
 
@@ -538,7 +542,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 	int reg = m_adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
 
 	// Copy the current data into the buffer
-// logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", m_adsp_ireg, reg, m_adsp_incs, m_adsp_size);
+// LOGADSP("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", m_adsp_ireg, reg, m_adsp_incs, m_adsp_size);
 	if (m_adsp_incs)
 	{
 		for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
@@ -569,24 +573,20 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 		return;
 
 	// Check if SPORT1 is enabled
-	if (m_adsp_control_regs[SYSCONTROL_REG] & 0x0800) // bit 11
+	if (BIT(m_adsp_control_regs[SYSCONTROL_REG], 11)) // bit 11
 	{
 		// We only support autobuffer here (which is what this thing uses), bail if not enabled
-		if (m_adsp_control_regs[S1_AUTOBUF_REG] & 0x0002) // bit 1
+		if (BIT(m_adsp_control_regs[S1_AUTOBUF_REG], 1)) // bit 1
 		{
 			// Get the autobuffer registers
-			int     mreg, lreg;
-			uint16_t  source;
-			attotime sample_period;
-
 			m_adsp_ireg = (m_adsp_control_regs[S1_AUTOBUF_REG] >> 9) & 7;
-			mreg = (m_adsp_control_regs[S1_AUTOBUF_REG] >> 7) & 3;
+			int mreg = (m_adsp_control_regs[S1_AUTOBUF_REG] >> 7) & 3;
 			mreg |= m_adsp_ireg & 0x04; // msb comes from ireg
-			lreg = m_adsp_ireg;
+			int const lreg = m_adsp_ireg;
 
 			/* Now get the register contents in a more legible format.
 			   We depend on register indexes to be continuous (which is the case in our core) */
-			source = m_adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
+			uint16_t source = m_adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
 			m_adsp_incs = m_adsp->state_int(ADSP2100_M0 + mreg);
 			m_adsp_size = m_adsp->state_int(ADSP2100_L0 + lreg);
 
@@ -602,7 +602,7 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 			// Calculate how long until we generate an interrupt
 
 			// Period per each bit sent
-			sample_period = attotime::from_hz(m_adsp->clock()) * (2 * (m_adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			attotime sample_period = attotime::from_hz(m_adsp->clock()) * (2 * (m_adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			// Now put it down to samples, so we know what the channel frequency has to be
 			sample_period *= 16 * SOUND_CHANNELS;
@@ -621,7 +621,7 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 			return;
 		}
 		else
-			logerror( "ADSP SPORT1: trying to transmit and autobuffer not enabled!\n" );
+			LOGADSP( "ADSP SPORT1: trying to transmit and autobuffer not enabled!\n" );
 	}
 
 	// If we get there, something went wrong. Disable playing
@@ -640,23 +640,16 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
  *
  *************************************/
 
-
-void gaelco3d_state::radikalb_lamp_w(int state)
-{
-	// Arbitrary data written
-	logerror("%06X:unknown_127_w = %d\n", m_maincpu->pc(), state);
-}
-
 void gaelco3d_state::unknown_137_w(int state)
 {
 	// Only written $00 or $ff
-	logerror("%06X:unknown_137_w = %d\n", m_maincpu->pc(), state);
+	LOGADSP("%06X:unknown_137_w = %d\n", m_maincpu->pc(), state);
 }
 
 void gaelco3d_state::unknown_13a_w(int state)
 {
 	// Only written $0000 or $0001
-	logerror("%06X:unknown_13a_w = %04X\n", m_maincpu->pc(), state);
+	LOGADSP("%06X:unknown_13a_w = %04X\n", m_maincpu->pc(), state);
 }
 
 
@@ -671,7 +664,7 @@ void gaelco3d_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::gaelco3d_paletteram_w)).share("paletteram16");
+	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::paletteram_w)).share(m_paletteram16);
 	map(0x51000c, 0x51000d).portr("IN0");
 	map(0x51001c, 0x51001d).portr("IN1");
 	map(0x51002c, 0x51002d).portr("IN2");
@@ -685,14 +678,14 @@ void gaelco3d_state::main_map(address_map &map)
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
 	map(0x510106, 0x510107).mirror(0x000070).nopr(); // clr.b instructions do dummy reads
 	map(0x510107, 0x510107).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
-	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base16");
+	map(0xfe0000, 0xfeffff).ram().share(m_m68k_ram_base16);
 }
 
 
 void gaelco3d_state::main020_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::gaelco3d_paletteram_020_w)).share("paletteram32");
+	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::paletteram_020_w)).share(m_paletteram32);
 	map(0x51000c, 0x51000f).portr("IN0");
 	map(0x51001c, 0x51001f).portr("IN1");
 	map(0x51002c, 0x51002f).portr("IN2");
@@ -704,31 +697,31 @@ void gaelco3d_state::main020_map(address_map &map)
 	map(0x510103, 0x510103).select(0x000038).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 3, data); }));
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
 	map(0x510107, 0x510107).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
-	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base32");
+	map(0xfe0000, 0xfeffff).ram().share(m_m68k_ram_base32);
 }
 
 void gaelco3d_state::tms_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rw(FUNC(gaelco3d_state::tms_m68k_ram_r), FUNC(gaelco3d_state::tms_m68k_ram_w));
-	map(0x400000, 0x7fffff).rom().region("user2", 0);
-	map(0xc00000, 0xc00007).w(FUNC(gaelco3d_state::gaelco3d_render_w));
+	map(0x400000, 0x7fffff).rom().region("tmsrom", 0);
+	map(0xc00000, 0xc00007).w(FUNC(gaelco3d_state::render_w));
 }
 
 
 void gaelco3d_state::adsp_program_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().share("adsp_ram_base");   // 1k words internal RAM
+	map(0x0000, 0x03ff).ram().share(m_adsp_ram_base);   // 1k words internal RAM
 	map(0x37ff, 0x37ff).nopr();                         // speedup hammers this for no apparent reason
 }
 
 void gaelco3d_state::adsp_data_map(address_map &map)
 {
 	map(0x0000, 0x0001).w(FUNC(gaelco3d_state::adsp_rombank_w));
-	map(0x0000, 0x1fff).bankr("adspbank");
+	map(0x0000, 0x1fff).bankr(m_adsp_bank);
 	map(0x2000, 0x2000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).umask16(0x00ff);
 	map(0x2000, 0x2000).w(FUNC(gaelco3d_state::sound_status_w));
-	map(0x3800, 0x39ff).ram().share("adsp_fastram");    // 512 words internal RAM
-	map(0x3fe0, 0x3fff).w(FUNC(gaelco3d_state::adsp_control_w)).share("adsp_regs");
+	map(0x3800, 0x39ff).ram().share(m_adsp_fastram_base);    // 512 words internal RAM
+	map(0x3fe0, 0x3fff).w(FUNC(gaelco3d_state::adsp_control_w)).share(m_adsp_control_regs);
 }
 
 
@@ -931,7 +924,7 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	TIMER(config, "adsp_timer").configure_generic(FUNC(gaelco3d_state::adsp_autobuffer_irq));
+	TIMER(config, m_adsp_autobuffer_timer).configure_generic(FUNC(gaelco3d_state::adsp_autobuffer_irq));
 
 	GAELCO_SERIAL(config, m_serial, 0);
 	m_serial->irq_handler().set(FUNC(gaelco3d_state::ser_irq));
@@ -948,7 +941,7 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 
 	LS259(config, m_outlatch); // IC2 on top board near edge connector
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco3d_state::tms_control3_w));
-	m_outlatch->q_out_cb<2>().set(FUNC(gaelco3d_state::radikalb_lamp_w));
+	m_outlatch->q_out_cb<2>().set_output("Start_lamp"); // START LAMP
 	m_outlatch->q_out_cb<3>().set(FUNC(gaelco3d_state::unknown_137_w));
 	m_outlatch->q_out_cb<4>().set(m_serial, FUNC(gaelco_serial_device::irq_enable));
 	m_outlatch->q_out_cb<5>().set(FUNC(gaelco3d_state::analog_port_clock_w));
@@ -1037,28 +1030,135 @@ ROM_START( speedup ) // Version 2.20 - REF. 960717 ROM board
 	ROM_LOAD16_BYTE( "sup_2.2_10.ic10", 0x000000, 0x80000, CRC(ee781e64) SHA1(d90fa9319982fa389c2032e13d59850971078006) ) // 2.2 is handwritten between SUP and 10
 	ROM_LOAD16_BYTE( "sup_2.2_15.ic15", 0x000001, 0x80000, CRC(1b8ff9d2) SHA1(4939b45844de962d2b93be058b44c09e366cf8db) ) // 2.2 is handwritten between SUP and 15
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "sup_ic25.ic25", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) ) // designation silkscreend on mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "sup_ic32.ic32", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) ) // designation silkscreend on mask ROM
 	ROM_LOAD32_WORD( "sup_ic33.ic33", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) ) // designation silkscreend on mask ROM
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_REGION( 0x1000000, "texture", 0 )
 	ROM_LOAD( "sup_ic12.ic12", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) ) // designation silkscreend on mask ROM
 	ROM_LOAD( "sup_ic14.ic14", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) ) // designation silkscreend on mask ROM
 	ROM_LOAD( "sup_ic11.ic11", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) ) // designation silkscreend on mask ROM
 	ROM_LOAD( "sup_ic13.ic13", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) ) // designation silkscreend on mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
 	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
 	// These 2 are copies of the previous 2 at different IC locations
 //  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
 //  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
 
-	ROM_REGION( 0x2000, "coin", 0 ) // Credit distribution PCB
-	ROM_LOAD( "2x1c_pic16c54.u1", 0x0000, 0x2000, NO_DUMP )
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+ROM_END
+
+ROM_START( speedup21 ) // Version 2.10
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "sup_e_v2.10_5-3_ic10_2345_27c040.bin", 0x000000, 0x80000, CRC(d6fabf94) SHA1(b900fe3816c9c1c9b7669a9b58cf15db858fee78) )
+	ROM_LOAD16_BYTE( "sup_o_v2.10_5-3_ic15_5e35_27c040.bin", 0x000001, 0x80000, CRC(ee2c215e) SHA1(047a833333bfa277a2aaaa302d2a38a36b494e64) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "sup_ic25.ic25", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) ) // designation silkscreend on mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "sup_ic32.ic32", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) ) // designation silkscreend on mask ROM
+	ROM_LOAD32_WORD( "sup_ic33.ic33", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "sup_ic12.ic12", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic14.ic14", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic11.ic11", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic13.ic13", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+	// These 2 are copies of the previous 2 at different IC locations
+//  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+//  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+ROM_END
+
+ROM_START( speedup20 ) // Version 2.00 (18/Feb)
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "sup_e_v2.00_18-2_ic10_c5a4_27c040.bin", 0x000000, 0x80000, CRC(cbab8d60) SHA1(c2dfad8da835d274bc5c9449c9aa401ad1702d0a) )
+	ROM_LOAD16_BYTE( "sup_o_v2.00_18-2_ic15_9c28_27c040.bin", 0x000001, 0x80000, CRC(4be05b03) SHA1(c8788a3e521ff3bd6e40a97ba9c225b13ec56b33) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "sup_ic25.ic25", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) ) // designation silkscreend on mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "sup_ic32.ic32", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) ) // designation silkscreend on mask ROM
+	ROM_LOAD32_WORD( "sup_ic33.ic33", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "sup_ic12.ic12", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic14.ic14", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic11.ic11", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic13.ic13", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+	// These 2 are copies of the previous 2 at different IC locations
+//  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+//  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+ROM_END
+
+ROM_START( speedup20a ) // Version 2.00 (17/Feb)
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "sup_e-10_v2.00_17-2_d5bb_27c040.bin", 0x000000, 0x80000, CRC(1c9796d8) SHA1(251a911bcd6459aeb2af78bf37c983738ca04898) )
+	ROM_LOAD16_BYTE( "sup_o-15_v2.00_17-2_a8d5_27c040.bin", 0x000001, 0x80000, CRC(3ebe3ce0) SHA1(6437e0564b4d8a572bb771b2c4dcdb2e9c9ae762) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "sup_ic25.ic25", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) ) // designation silkscreend on mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "sup_ic32.ic32", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) ) // designation silkscreend on mask ROM
+	ROM_LOAD32_WORD( "sup_ic33.ic33", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "sup_ic12.ic12", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic14.ic14", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic11.ic11", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic13.ic13", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+	// These 2 are copies of the previous 2 at different IC locations
+//  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+//  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
 ROM_END
 
 ROM_START( speedup12 ) // Version 1.20 - REF. 960717 ROM board
@@ -1066,28 +1166,33 @@ ROM_START( speedup12 ) // Version 1.20 - REF. 960717 ROM board
 	ROM_LOAD16_BYTE( "sup_10.ic10", 0x000000, 0x80000, CRC(07e70bae) SHA1(17013d859ec075e12518b094040a056d850b3271) )
 	ROM_LOAD16_BYTE( "sup_15.ic15", 0x000001, 0x80000, CRC(7947c28d) SHA1(46efb56d0f7fe2e92d0d04dcd2f130aef3be436d) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "sup_ic25.ic25", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) ) // designation silkscreend on mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "sup_ic32.ic32", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) ) // designation silkscreend on mask ROM
 	ROM_LOAD32_WORD( "sup_ic33.ic33", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) ) // designation silkscreend on mask ROM
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_REGION( 0x1000000, "texture", 0 )
 	ROM_LOAD( "sup_ic12.ic12", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) ) // designation silkscreend on mask ROM
 	ROM_LOAD( "sup_ic14.ic14", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) ) // designation silkscreend on mask ROM
 	ROM_LOAD( "sup_ic11.ic11", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) ) // designation silkscreend on mask ROM
 	ROM_LOAD( "sup_ic13.ic13", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) ) // designation silkscreend on mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
 	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
 	// These 2 are copies of the previous 2 at different IC locations
 //  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
 //  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
 
-	ROM_REGION( 0x2000, "coin", 0 ) // Credit distribution PCB
-	ROM_LOAD( "2x1c_pic16c54.u1", 0x0000, 0x2000, NO_DUMP )
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
 ROM_END
 
 ROM_START( speedup10 ) // Version 1.00 - REF. 960717 ROM board
@@ -1095,28 +1200,33 @@ ROM_START( speedup10 ) // Version 1.00 - REF. 960717 ROM board
 	ROM_LOAD16_BYTE( "ic10_1.00.ic10", 0x000000, 0x80000, CRC(24ed8f48) SHA1(59d59e2a0b2fb7aed5320167960129819adedd9a) ) // handwritten labels IC10 1.00
 	ROM_LOAD16_BYTE( "ic15_1.00.ic15", 0x000001, 0x80000, CRC(b3fda7f1) SHA1(e77ef3cb46be0767476f65dcc8d4fc12550be4a3) ) // handwritten labels IC15 1.00
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "sup_ic25.ic25", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) ) // designation silkscreend on mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "sup_ic32.ic32", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) ) // designation silkscreend on mask ROM
 	ROM_LOAD32_WORD( "sup_ic33.ic33", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) ) // designation silkscreend on mask ROM
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_REGION( 0x1000000, "texture", 0 )
 	ROM_LOAD( "sup_ic12.ic12", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) ) // designation silkscreend on mask ROM
 	ROM_LOAD( "sup_ic14.ic14", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) ) // designation silkscreend on mask ROM
 	ROM_LOAD( "sup_ic11.ic11", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) ) // designation silkscreend on mask ROM
 	ROM_LOAD( "sup_ic13.ic13", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) ) // designation silkscreend on mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
 	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
 	// These 2 are copies of the previous 2 at different IC locations
 //  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
 //  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
 
-	ROM_REGION( 0x2000, "coin", 0 ) // Credit distribution PCB
-	ROM_LOAD( "2x1c_pic16c54.u1", 0x0000, 0x2000, NO_DUMP )
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
 ROM_END
 
 
@@ -1127,20 +1237,20 @@ ROM_START( surfplnt ) // Version 4.1 - REF. 971223 ROM board
 	ROM_LOAD16_BYTE( "pls_8.ic8",   0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "pls_13.ic13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_REGION( 0x1000000, "texture", 0 )
 	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
 	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
 	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
@@ -1150,6 +1260,11 @@ ROM_START( surfplnt ) // Version 4.1 - REF. 971223 ROM board
 //  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
 //  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
 //  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
 ROM_END
 
 ROM_START( surfplnt40 ) // Version 4.0 - REF. 970514 ROM board
@@ -1159,20 +1274,20 @@ ROM_START( surfplnt40 ) // Version 4.0 - REF. 970514 ROM board
 	ROM_LOAD16_BYTE( "pls_8.ic8",   0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "pls_13.ic13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_REGION( 0x1000000, "texture", 0 )
 	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
 	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
 	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
@@ -1182,6 +1297,48 @@ ROM_START( surfplnt40 ) // Version 4.0 - REF. 970514 ROM board
 //  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
 //  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
 //  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
+ROM_END
+
+ROM_START( surfplnt31 ) // Version 3.1
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "3.1_0l_6bcc_ic5_skate_27c040.bin",  0x000000, 0x80000, CRC(e33186ce) SHA1(915f32f3219ec32151086f97da7759967d0d883d) )
+	ROM_LOAD16_BYTE( "3.1_1l_d75a_ic11_skate_27c040.bin", 0x000001, 0x80000, CRC(b832dd0e) SHA1(d2468cee640682c484daed324e8c91ac4497946d) )
+	ROM_LOAD16_BYTE( "3.1_0h_ab01_ic8_skate_27c040.bin",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
+	ROM_LOAD16_BYTE( "3.1_1h_2b87_ic13_skate_27c040.bin", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+	ROM_LOAD( "pls_22.ic22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "pls_19.ic27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) ) // labeled PLS 19 in IC27 on the PCB
+//  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
+//  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
+//  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
 ROM_END
 
 ROM_START( surfplnt30 ) // Version 3.0 - REF. 970514 ROM board
@@ -1191,20 +1348,20 @@ ROM_START( surfplnt30 ) // Version 3.0 - REF. 970514 ROM board
 	ROM_LOAD16_BYTE( "pls_8.ic8",   0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "pls_13.ic13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_REGION( 0x1000000, "texture", 0 )
 	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
 	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
 	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
@@ -1214,6 +1371,11 @@ ROM_START( surfplnt30 ) // Version 3.0 - REF. 970514 ROM board
 //  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
 //  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
 //  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
 ROM_END
 
 ROM_START( surfplnt20 ) // Version 2.0 - REF. 970514 ROM board
@@ -1223,20 +1385,20 @@ ROM_START( surfplnt20 ) // Version 2.0 - REF. 970514 ROM board
 	ROM_LOAD16_BYTE( "pls_8.ic8",   0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "pls_13.ic13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_REGION( 0x1000000, "texture", 0 )
 	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
 	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
 	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
@@ -1246,6 +1408,85 @@ ROM_START( surfplnt20 ) // Version 2.0 - REF. 970514 ROM board
 //  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
 //  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
 //  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
+ROM_END
+
+ROM_START( surfplnt12 ) // Version 1.2
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "snow_1.2_ic12_25-6_0l_8f33_27c040.bin", 0x000000, 0x80000, CRC(e64072d3) SHA1(3d1295021ac235941051d560ccc0d6481a95ed92) )
+	ROM_LOAD16_BYTE( "snow_1.2_ic11_25-6_1l_b99v_27c040.bin", 0x000001, 0x80000, CRC(fd50c3c3) SHA1(09e39b8b04f9d4471b5c37ed5a93f9b8f6dde219) )
+	ROM_LOAD16_BYTE( "snow_1.2_ic20_25-6_0h_ab01_27c040.bin", 0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
+	ROM_LOAD16_BYTE( "snow_1.2_ic10_25-6_1h_2b87_27c040.bin", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+	ROM_LOAD( "pls_22.ic22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "pls_19.ic27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) ) // labeled PLS 19 in IC27 on the PCB
+//  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
+//  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
+//  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
+ROM_END
+
+ROM_START( surfplnt10 ) // Version 1.0
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "1.0_snow_10-09_5_f375_0l_27c040.ic5",   0x000000, 0x80000, CRC(7db0a114) SHA1(65723a08acc56d3eec6f9a96d3f06e32dd5e95b6) )
+	ROM_LOAD16_BYTE( "1.0_snow_10-09_11_c6fd_1l_27c040.ic11", 0x000001, 0x80000, CRC(87bdb700) SHA1(e4c6d4808073500cb870e3866e2377701572b234) )
+	ROM_LOAD16_BYTE( "1.0_snow_10-09_8_ab01_0h_27c040.ic8",   0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
+	ROM_LOAD16_BYTE( "1.0_snow_10-09_13_2b87_1h_27c040.ic13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+	ROM_LOAD( "pls_22.ic22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "pls_19.ic27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) ) // labeled PLS 19 in IC27 on the PCB
+//  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
+//  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
+//  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
 ROM_END
 
 
@@ -1256,14 +1497,14 @@ ROM_START( radikalb ) // Version 2.02 - REF. 980311 ROM board
 	ROM_LOAD32_BYTE( "rab_14.ic14", 0x000002, 0x80000, CRC(4a0ac8cb) SHA1(4883e5eddb833dcd39376be435aa8e8e2ec47ab5) )
 	ROM_LOAD32_BYTE( "rab_19.ic19", 0x000003, 0x80000, CRC(c2d4fcb2) SHA1(8e389d1479ba084e5363aef9c797c65ca7f355d2) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "rab_ic23.ic23", 0x0000000, 0x400000, CRC(dcf52520) SHA1(ab54421c182436660d2a56a334c1aa335424644a) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "rab_ic48.ic48", 0x000000, 0x400000, CRC(9c56a06a) SHA1(54f12d8b55fa14446c47e31684c92074c4157fe1) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD32_WORD( "rab_ic45.ic45", 0x000002, 0x400000, CRC(7e698584) SHA1(a9423835a126396902c499e9f7df3b68c2ab28a8) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_REGION( 0x2000000, "texture", 0 )
 	ROM_LOAD( "rab_ic8.ic8",   0x0000000, 0x400000, CRC(4fbd4737) SHA1(594438d3edbe00682290986cc631615d7bef67f3) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "rab_ic10.ic10", 0x0800000, 0x400000, CRC(870b0ce4) SHA1(75910dca87d2eb3a6b4a28f6e9c63a6b6700de84) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "rab_ic15.ic15", 0x1000000, 0x400000, CRC(edb9d409) SHA1(1f8df507e990eee197f2779b45bd8f143d1bd439) ) // designation silkscreend on SMT mask ROM
@@ -1274,7 +1515,7 @@ ROM_START( radikalb ) // Version 2.02 - REF. 980311 ROM board
 	ROM_LOAD( "rab_ic16.ic16", 0x1400000, 0x400000, CRC(9d595e46) SHA1(b985332974e1fb0b9d20d521da0d7deceea93a8a) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "rab_ic18.ic18", 0x1c00000, 0x400000, CRC(3084bc49) SHA1(9da43482293eeb08ceae67455b2fcd97b6ef5109) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "rab_24.ic24", 0x0000000, 0x020000, CRC(2984bc1d) SHA1(1f62bdaa86feeff96640e325f8241b9c5f383a44) )
 	ROM_LOAD( "rab_25.ic25", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) )
 	ROM_LOAD( "rab_26.ic26", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) )
@@ -1284,6 +1525,11 @@ ROM_START( radikalb ) // Version 2.02 - REF. 980311 ROM board
 //  ROM_LOAD( "rab_25.ic33", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) ) // labeled RAB 25 in IC33 on the PCB
 //  ROM_LOAD( "rab_26.ic34", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) ) // labeled RAB 26 in IC34 on the PCB
 //  ROM_LOAD( "rab_27.ic35", 0x0060000, 0x020000, CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) ) // labeled RAB 27 in IC35 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
 ROM_END
 
 ROM_START( radikalba ) // Version 2.02, Atari license - REF. 980311 ROM board
@@ -1293,14 +1539,14 @@ ROM_START( radikalba ) // Version 2.02, Atari license - REF. 980311 ROM board
 	ROM_LOAD32_BYTE( "rab_14.ic14", 0x000002, 0x80000, CRC(4a0ac8cb) SHA1(4883e5eddb833dcd39376be435aa8e8e2ec47ab5) )
 	ROM_LOAD32_BYTE( "rab_19.ic19", 0x000003, 0x80000, CRC(2631bd61) SHA1(57331ad49e7284b82073f696049de109b7683b03) ) // sldh
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "rab_ic23.ic23", 0x0000000, 0x400000, CRC(dcf52520) SHA1(ab54421c182436660d2a56a334c1aa335424644a) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "rab_ic48.ic48", 0x000000, 0x400000, CRC(9c56a06a) SHA1(54f12d8b55fa14446c47e31684c92074c4157fe1) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD32_WORD( "rab_ic45.ic45", 0x000002, 0x400000, CRC(7e698584) SHA1(a9423835a126396902c499e9f7df3b68c2ab28a8) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_REGION( 0x2000000, "texture", 0 )
 	ROM_LOAD( "rab_ic8.ic8",   0x0000000, 0x400000, CRC(4fbd4737) SHA1(594438d3edbe00682290986cc631615d7bef67f3) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "rab_ic10.ic10", 0x0800000, 0x400000, CRC(870b0ce4) SHA1(75910dca87d2eb3a6b4a28f6e9c63a6b6700de84) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "rab_ic15.ic15", 0x1000000, 0x400000, CRC(edb9d409) SHA1(1f8df507e990eee197f2779b45bd8f143d1bd439) ) // designation silkscreend on SMT mask ROM
@@ -1311,7 +1557,7 @@ ROM_START( radikalba ) // Version 2.02, Atari license - REF. 980311 ROM board
 	ROM_LOAD( "rab_ic16.ic16", 0x1400000, 0x400000, CRC(9d595e46) SHA1(b985332974e1fb0b9d20d521da0d7deceea93a8a) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "rab_ic18.ic18", 0x1c00000, 0x400000, CRC(3084bc49) SHA1(9da43482293eeb08ceae67455b2fcd97b6ef5109) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "rab_24.ic24", 0x0000000, 0x020000, CRC(2984bc1d) SHA1(1f62bdaa86feeff96640e325f8241b9c5f383a44) )
 	ROM_LOAD( "rab_25.ic25", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) )
 	ROM_LOAD( "rab_26.ic26", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) )
@@ -1321,7 +1567,52 @@ ROM_START( radikalba ) // Version 2.02, Atari license - REF. 980311 ROM board
 //  ROM_LOAD( "rab_25.ic33", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) ) // labeled RAB 25 in IC33 on the PCB
 //  ROM_LOAD( "rab_26.ic34", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) ) // labeled RAB 26 in IC34 on the PCB
 //  ROM_LOAD( "rab_27.ic35", 0x0060000, 0x020000, CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) ) // labeled RAB 27 in IC35 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
 ROM_END
+
+/* All ROMs but the two program ROMs were on custom DIP42 PCBs with solderded flash chips:
+   - FLA32X8 dip modules are equivalent to 27c322 eproms but in “8 bit mode” (such EPROM doesnt exist), the module has A0 in place of D15. These modules use two 29F016 flash chips.
+   - FLASH32M/1 dip modules are equivalent to 27c322 (full 16 bit output), pin 11 chip enable is active HIGH (instead of active LOW). These modules use two 29F016 flash chips. */
+ROM_START( radikalbp ) // Development PCB, silkscreened "3D-3G-AER/2"
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68020 code
+	ROM_LOAD16_BYTE( "29f016.u22", 0x000000, 0x200000, CRC(534ce101) SHA1(4763ecd7e075b69b0742912050633b5d87b26413) )
+	ROM_LOAD16_BYTE( "29f016.u30", 0x000001, 0x200000, CRC(48b26455) SHA1(743d7f32642891d608e345021cabbdf3dd025870) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "so_flash32m-1.u87", 0x0000000, 0x400000, CRC(89af0f3e) SHA1(9e63b19696fd309bf55d990b0b1e1f3a4aa3cb36) )
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "h_flash32m.u89", 0x000000, 0x400000, CRC(9c56a06a) SHA1(54f12d8b55fa14446c47e31684c92074c4157fe1) )
+	ROM_LOAD32_WORD( "flash32m.u88",   0x000002, 0x400000, CRC(e011cf9c) SHA1(f3563a1fc6be0596e1aa08255343e9ad8074d2c4) )
+
+	ROM_REGION( 0x2000000, "texture", 0 )
+	ROM_LOAD( "b_fla32x8_8_bit.u18", 0x0000000, 0x400000, CRC(4fbd4737) SHA1(594438d3edbe00682290986cc631615d7bef67f3) )
+	ROM_LOAD( "d_fla32x8_8_bit.u28", 0x0800000, 0x400000, CRC(2eaa42e7) SHA1(0fd6bf9a464392a201fe55327a86573ee7e82890) )
+	ROM_LOAD( "a_fla32x8_8_bit.u41", 0x1000000, 0x400000, CRC(edb9d409) SHA1(1f8df507e990eee197f2779b45bd8f143d1bd439) )
+	ROM_LOAD( "c_fla32x8_8_bit.u43", 0x1800000, 0x400000, CRC(72fe2ad9) SHA1(b65b099eb245f75dde9758690ada3acf35cce8f1) )
+	ROM_LOAD( "f_fla32x8_8_bit.u27", 0x0400000, 0x400000, CRC(5b88077f) SHA1(d38db0df40f078273c6ac6d001a6c83460915beb) )
+	ROM_LOAD( "h_fla32x8_8_bit.u29", 0x0c00000, 0x400000, CRC(4fbbd8df) SHA1(08f9b43dd4de967a26434c7295ea3b21dfea0405) )
+	ROM_LOAD( "e_fla32x8_8_bit.u42", 0x1400000, 0x400000, CRC(dd16837e) SHA1(7d37b5a571895a4ae39e2bbb804acae645de68c1) )
+	ROM_LOAD( "g_fla32x8_8_bit.u44", 0x1c00000, 0x400000, CRC(7d868c37) SHA1(fdc7e836208f904a53417d61daf765bc9804dfea) )
+
+	// There were neither texmask ROMs on this PCB nor sockets for them
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "rab_24.ic24", 0x0000000, 0x020000, BAD_DUMP CRC(2984bc1d) SHA1(1f62bdaa86feeff96640e325f8241b9c5f383a44) ) // Not present on the development PCB ??
+	ROM_LOAD( "rab_25.ic25", 0x0020000, 0x020000, BAD_DUMP CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) ) // Not present on the development PCB ??
+	ROM_LOAD( "rab_26.ic26", 0x0040000, 0x020000, BAD_DUMP CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) ) // Not present on the development PCB ??
+	ROM_LOAD( "rab_27.ic27", 0x0060000, 0x020000, BAD_DUMP CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) ) // Not present on the development PCB ??
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "deco-i_pal16l8.ic21", 0x000, 0x117, BAD_DUMP CRC(81484e3b) SHA1(c63f35dba20c7fd7226e03cf18d2860740b0dd0c) ) // Bruteforced
+	ROM_LOAD( "m.1_pal16l8.ic91",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "p_pal16l8d.u21",      0x000, 0x117, BAD_DUMP CRC(f957b735) SHA1(7015400a94f1a07762f1b285a9038bec72c1aa3b) ) // Bruteforced
+	ROM_LOAD( "so_pal16l8d.u82",     0x000, 0x117, BAD_DUMP CRC(f706c313) SHA1(90c615d817267d809515050bf8ca1ac816a8a57f) ) // Bruteforced
+ROM_END
+
 
 /*
 Football Power has a small PCB inside the ball controller, very similar to the one found on
@@ -1343,27 +1634,117 @@ Gaelco Football, with two accelerometers and a PIC.
   |                |
   |________________|
 */
-ROM_START( footbpow ) // Version 1.2 - REF. 000208 ROM board
+ROM_START( footbpow ) // Version 4.6
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
+	ROM_LOAD32_BYTE( "p_ic7_2431_3c9c_28-2_27c040.ic7",        0x000000, 0x80000, CRC(0f4baf2e) SHA1(d4bacc5d1d1dd901075ef125c2e9014f93710e04) )
+	ROM_LOAD32_BYTE( "p_ic12_1623_f0fb_28-2_27c040.ic12",      0x000001, 0x80000, CRC(a256a726) SHA1(421e1ec1da1f7cc8631a70256fb0b0ee282a6fc3) )
+	ROM_LOAD32_BYTE( "p_ic13_0815_4ab5_28-2_27c040.ic13",      0x000002, 0x80000, CRC(d5865820) SHA1(a9c7ec43b3487a12ade325544efe800988dacbec) )
+	ROM_LOAD32_BYTE( "p_ic19_0007_54c5_28-2_wait_27c040.ic19", 0x000003, 0x80000, CRC(48de8155) SHA1(da39621a1f65b48ad7e5dc9f15a00a7a24700143) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "fop_ic23.ic23", 0x0000000, 0x400000, CRC(3c02f7c6) SHA1(2325f2a1b260ac60929c82640ced481ad67bb2e0) )
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "fop_ic48.ic48", 0x000000, 0x800000, CRC(efddf5c1) SHA1(1014b0193d17de05ebcc733fc5d26089b932385b) )
+	ROM_LOAD32_WORD( "fop_ic42.ic42", 0x000002, 0x800000, CRC(8772e536) SHA1(530dfb4e27466bd97582c4fd50af01f14716ed2b) )
+
+	ROM_REGION( 0x2000000, "texture", 0 )
+	ROM_LOAD( "fop_ic8.ic8",   0x0000000, 0x400000, CRC(eaff30ec) SHA1(63f5d33b98194a206c558f9e02c432e7e05aa0e6) )
+	ROM_LOAD( "fop_ic10.ic10", 0x0800000, 0x400000, CRC(536c822b) SHA1(235e96af470785f6cca010782560a4071f285901) )
+	ROM_LOAD( "fop_ic15.ic15", 0x1000000, 0x400000, CRC(c8903051) SHA1(b5927a0bbba017d42b98e7850df966cfa9eeb64a) )
+	ROM_LOAD( "fop_ic17.ic17", 0x1800000, 0x400000, CRC(559a38ae) SHA1(e36d596ad90d0f3657d677e3afa984be30c1fa3b) )
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "fop_24.ic24", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+	ROM_LOAD( "fop_25.ic25", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+	ROM_LOAD( "fop_26.ic26", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+	ROM_LOAD( "fop_27.ic27", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "fop_24.ic34", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+//  ROM_LOAD( "fop_25.ic35", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+//  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+//  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+	       Oscillator =  High Speed
+	       Watchdog Timer = Enabled
+	       Power-Up Timer = Disabled
+	       Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+ROM_END
+
+ROM_START( footbpow14 ) // Version 1.4
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
+	ROM_LOAD32_BYTE( "fut_ic7_1117_12-6-01_27c040.ic7",   0x000000, 0x80000, CRC(d6f473eb) SHA1(6db6cc78c4854cf50bfebe5b5ba747115e6e1513) )
+	ROM_LOAD32_BYTE( "fut_ic12_4ad2_12-6-01_27c040.ic12", 0x000001, 0x80000, CRC(24b6c9a0) SHA1(8301524542d8f49b1443e2866bc30578860b541c) )
+	ROM_LOAD32_BYTE( "fut_ic13_e30f_12-6-01_27c040.ic13", 0x000002, 0x80000, CRC(948c7e41) SHA1(469b9cf195e601f1bd75dfaa09ce882894608123) )
+	ROM_LOAD32_BYTE( "fut_ic19_75ab_12-6-01_27c040.ic19", 0x000003, 0x80000, CRC(985551a1) SHA1(5f6ee92883bbcb352cbcd619c45e4debe4f825d9) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "fop_ic23.ic23", 0x0000000, 0x400000, CRC(3c02f7c6) SHA1(2325f2a1b260ac60929c82640ced481ad67bb2e0) )
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "fop_ic48.ic48", 0x000000, 0x800000, CRC(efddf5c1) SHA1(1014b0193d17de05ebcc733fc5d26089b932385b) )
+	ROM_LOAD32_WORD( "fop_ic42.ic42", 0x000002, 0x800000, CRC(8772e536) SHA1(530dfb4e27466bd97582c4fd50af01f14716ed2b) )
+
+	ROM_REGION( 0x2000000, "texture", 0 )
+	ROM_LOAD( "fop_ic8.ic8",   0x0000000, 0x400000, CRC(eaff30ec) SHA1(63f5d33b98194a206c558f9e02c432e7e05aa0e6) )
+	ROM_LOAD( "fop_ic10.ic10", 0x0800000, 0x400000, CRC(536c822b) SHA1(235e96af470785f6cca010782560a4071f285901) )
+	ROM_LOAD( "fop_ic15.ic15", 0x1000000, 0x400000, CRC(c8903051) SHA1(b5927a0bbba017d42b98e7850df966cfa9eeb64a) )
+	ROM_LOAD( "fop_ic17.ic17", 0x1800000, 0x400000, CRC(559a38ae) SHA1(e36d596ad90d0f3657d677e3afa984be30c1fa3b) )
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "fop_24.ic24", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+	ROM_LOAD( "fop_25.ic25", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+	ROM_LOAD( "fop_26.ic26", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+	ROM_LOAD( "fop_27.ic27", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "fop_24.ic34", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+//  ROM_LOAD( "fop_25.ic35", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+//  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+//  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+	       Oscillator =  High Speed
+	       Watchdog Timer = Enabled
+	       Power-Up Timer = Disabled
+	       Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+ROM_END
+
+ROM_START( footbpow12 ) // Version 1.2 - REF. 000208 ROM board
 	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
 	ROM_LOAD32_BYTE( "fop_7.ic7",   0x000000, 0x80000, CRC(a2d7ec69) SHA1(27e4f3d27882152244c0f9d5a984e0f1bd7b7d3f) )
 	ROM_LOAD32_BYTE( "fop_12.ic12", 0x000001, 0x80000, CRC(443caf77) SHA1(2b0c6dccee28fb3caa0b2493f59ddbd29897aed9) )
 	ROM_LOAD32_BYTE( "fop_13.ic13", 0x000002, 0x80000, CRC(57723eda) SHA1(09972b09444b6704dcc966033bfab61ea57d0cd0) )
 	ROM_LOAD32_BYTE( "fop_19.ic19", 0x000003, 0x80000, CRC(aa59cd2d) SHA1(7cc6edfd0896e4d2c881b16d5ad07361bdeff11d) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "fop_ic23.ic23", 0x0000000, 0x400000, CRC(3c02f7c6) SHA1(2325f2a1b260ac60929c82640ced481ad67bb2e0) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "fop_ic48.ic48", 0x000000, 0x800000, CRC(efddf5c1) SHA1(1014b0193d17de05ebcc733fc5d26089b932385b) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD32_WORD( "fop_ic42.ic42", 0x000002, 0x800000, CRC(8772e536) SHA1(530dfb4e27466bd97582c4fd50af01f14716ed2b) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_REGION( 0x2000000, "texture", 0 )
 	ROM_LOAD( "fop_ic8.ic8",   0x0000000, 0x400000, CRC(eaff30ec) SHA1(63f5d33b98194a206c558f9e02c432e7e05aa0e6) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "fop_ic10.ic10", 0x0800000, 0x400000, CRC(536c822b) SHA1(235e96af470785f6cca010782560a4071f285901) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "fop_ic15.ic15", 0x1000000, 0x400000, CRC(c8903051) SHA1(b5927a0bbba017d42b98e7850df966cfa9eeb64a) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "fop_ic17.ic17", 0x1800000, 0x400000, CRC(559a38ae) SHA1(e36d596ad90d0f3657d677e3afa984be30c1fa3b) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "fop_24.ic24", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
 	ROM_LOAD( "fop_25.ic25", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
 	ROM_LOAD( "fop_26.ic26", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
@@ -1374,8 +1755,18 @@ ROM_START( footbpow ) // Version 1.2 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF)
-	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+	       Oscillator =  High Speed
+	       Watchdog Timer = Enabled
+	       Power-Up Timer = Disabled
+	       Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
 ROM_END
 
 ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
@@ -1385,20 +1776,20 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 	ROM_LOAD32_BYTE( "fop_13..ic13", 0x000002, 0x80000, CRC(c58afb45) SHA1(0b0f95b31532bcdf599d160d1a9fd46fe9d24b55) ) // labeled FOP 13.
 	ROM_LOAD32_BYTE( "fop_19..ic19", 0x000003, 0x80000, CRC(c6380cf1) SHA1(845d9db0e8f4a762f5e527da45f6751e5583cb71) ) // labeled FOP 19.
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "fop_ic23.ic23", 0x0000000, 0x400000, CRC(3c02f7c6) SHA1(2325f2a1b260ac60929c82640ced481ad67bb2e0) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
 	ROM_LOAD32_WORD( "fop_ic48.ic48", 0x000000, 0x800000, CRC(efddf5c1) SHA1(1014b0193d17de05ebcc733fc5d26089b932385b) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD32_WORD( "fop_ic42.ic42", 0x000002, 0x800000, CRC(8772e536) SHA1(530dfb4e27466bd97582c4fd50af01f14716ed2b) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_REGION( 0x2000000, "texture", 0 )
 	ROM_LOAD( "fop_ic8.ic8",   0x0000000, 0x400000, CRC(eaff30ec) SHA1(63f5d33b98194a206c558f9e02c432e7e05aa0e6) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "fop_ic10.ic10", 0x0800000, 0x400000, CRC(536c822b) SHA1(235e96af470785f6cca010782560a4071f285901) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "fop_ic15.ic15", 0x1000000, 0x400000, CRC(c8903051) SHA1(b5927a0bbba017d42b98e7850df966cfa9eeb64a) ) // designation silkscreend on SMT mask ROM
 	ROM_LOAD( "fop_ic17.ic17", 0x1800000, 0x400000, CRC(559a38ae) SHA1(e36d596ad90d0f3657d677e3afa984be30c1fa3b) ) // designation silkscreend on SMT mask ROM
 
-	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_REGION( 0x0080000, "texmask", 0 )
 	ROM_LOAD( "fop_24.ic24", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
 	ROM_LOAD( "fop_25.ic25", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
 	ROM_LOAD( "fop_26.ic26", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
@@ -1409,8 +1800,18 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF)
-	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+	       Oscillator =  High Speed
+	       Watchdog Timer = Enabled
+	       Power-Up Timer = Disabled
+	       Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
 ROM_END
 
 
@@ -1420,17 +1821,26 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1996, speedup,   0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
-GAMEL( 1996, speedup12, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
-GAMEL( 1996, speedup10, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20, checksum 2037)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 11/Mar
+GAMEL( 1996, speedup21,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.10, checksum 9536)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 05/Mar
+GAMEL( 1996, speedup20,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum E145)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 18/Feb
+GAMEL( 1996, speedup20a, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum 491B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 17/Feb
+GAMEL( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20, checksum 6851)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 10/Oct
+GAMEL( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00, checksum 31A9)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
 
-GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt30, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt20, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 2.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt,    0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt40,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt31,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt30,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 12/Nov
+GAME( 1997, surfplnt20,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 2.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 12/Sep
+GAME( 1997, surfplnt12,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 1.2)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 25/Jun. Older than 1.0??
+GAME( 1997, surfplnt10,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 1.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 10/Sep
 
-GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalb,    0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalba,   radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalbp,   radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (prototype)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
 
-GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1999, footbpow11, footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow,    0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 4.6)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow14,  footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow12,  footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow11,  footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )

@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __INTV_VOICE_H
-#define __INTV_VOICE_H
+#ifndef MAME_BUS_INTV_VOICE_H
+#define MAME_BUS_INTV_VOICE_H
 
-#include "slot.h"
+#pragma once
+
 #include "rom.h"
+#include "slot.h"
+
 #include "sound/sp0256.h"
 
 
@@ -62,4 +65,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(INTV_ROM_VOICE, intv_voice_device)
 
-#endif // MAME_BUS_INTV_SLOT_H
+#endif // MAME_BUS_INTV_VOICE_H

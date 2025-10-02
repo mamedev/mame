@@ -18,10 +18,7 @@
     Sound Quality (currently crackles)
     Verify timer enable / disable behavior
     Line Modes, High Colour Line Mode
-    Tile rowscroll modes
     0x8000 bit in palette is 'cut through' mode, which isn't the same as transpen, some kind of palette manipulation
-    **DONE** It seems Pal1 and Pal2 should actually be separate render buffers for each palette, on which layers / sprites can be enabled, that are mixed later and can be output independently to LCD and TV?
-        (how does this work with high colour line mode?)
     CCIR effects (only apply to 'palette 2'?)
     LCD Control registers
     Internal to External DMA (glitchy)
@@ -30,12 +27,12 @@
     Verify raster timing (might be off by a line)
     Hardware glitches (scroll layers + sprites get offset under specific conditions, sprites sometimes missing in 2 rightmost column, bk sometimes missing in rightmost column during scroll)
     Sleep functionality on sound cpu (broken on hardware?)
-    Interrupt controller / proper interrupt support (currently a bit hacky, only main timer and sub-timer a supported)
+    Improve Interrupt controller
     Proper IO support (enables / disables) UART, I2C etc.
     'Capture' mode
     Gain (zoom) for Tilemaps
     Refactor into a device
-    Verify that internal ROMs are blank (it isn't used for any set we have)
+    Verify that internal ROMs where possible (not always used)
 
     + more
 
@@ -66,6 +63,7 @@
 #include "vt1682_alu.h"
 #include "vt1682_timer.h"
 #include "machine/bankdev.h"
+#include "machine/i2cmem.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "emupal.h"
@@ -75,10 +73,11 @@
 #define LOG_VRAM_WRITES      (1U << 1)
 #define LOG_SRAM_WRITES      (1U << 2)
 #define LOG_OTHER            (1U << 3)
+#define LOG_DMA              (1U << 4)
 
-#define LOG_ALL           (LOG_VRAM_WRITES | LOG_SRAM_WRITES | LOG_OTHER)
+#define LOG_ALL           (LOG_DMA | LOG_VRAM_WRITES | LOG_SRAM_WRITES | LOG_OTHER)
 
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_OTHER)
 #include "logmacro.h"
 
 
@@ -115,6 +114,7 @@ public:
 		m_bank(*this, "cartbank"),
 		m_screen(*this, "screen"),
 		m_soundcpu(*this, "soundcpu"),
+		m_seeprom(*this, "seeprom"),
 		m_soundcpu_timer_a_dev(*this, "snd_timera_dev"),
 		m_soundcpu_timer_b_dev(*this, "snd_timerb_dev"),
 		m_system_timer_dev(*this, "sys_timer_dev"),
@@ -122,6 +122,7 @@ public:
 		m_soundcpu_alu(*this, "soundalu"),
 		m_spriteram(*this, "spriteram"),
 		m_vram(*this, "vram"),
+		m_mainram(*this, "mainram"),
 		m_sound_share(*this, "sound_share"),
 		m_gfxdecode(*this, "gfxdecode2"),
 		m_palette(*this, "palette"),
@@ -130,6 +131,7 @@ public:
 
 	[[maybe_unused]] void vt_vt1682(machine_config& config);
 	void regular_init();
+	void ignore_bk_paldepth_init();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -144,11 +146,13 @@ protected:
 
 	void vt_vt1682_map(address_map &map) ATTR_COLD;
 	void vt_vt1682_sound_map(address_map &map) ATTR_COLD;
+	void rom_map(address_map &map) ATTR_COLD;
 
 	required_device<address_map_bank_device> m_fullrom;
 	required_memory_bank m_bank;
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_soundcpu;
+	optional_device<i2cmem_device> m_seeprom;
 
 	void soundcpu_timera_irq(int state);
 	void soundcpu_timerb_irq(int state);
@@ -163,6 +167,11 @@ protected:
 	void vt_vt1682_palbase(machine_config& config);
 	void vt_vt1682_common(machine_config& config);
 
+	virtual void clear_sound_reset_line();
+
+	// hacks
+	bool m_allow_bk_paldepth_mode = true;
+
 private:
 	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
 	required_device<vrt_vt1682_alu_device> m_soundcpu_alu;
@@ -170,6 +179,7 @@ private:
 
 	required_device<address_map_bank_device> m_spriteram;
 	required_device<address_map_bank_device> m_vram;
+	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_sound_share;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -177,7 +187,6 @@ private:
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	void rom_map(address_map &map) ATTR_COLD;
 
 	void spriteram_map(address_map &map) ATTR_COLD;
 	void vram_map(address_map &map) ATTR_COLD;
@@ -240,6 +249,18 @@ private:
 	uint8_t m_202e;
 	uint8_t m_2030;
 
+	uint8_t m_scu_to_main_irq_active;
+	uint8_t m_timera_to_main_irq_active;
+	uint16_t m_current_main_vector;
+	uint16_t m_new_main_vector;
+
+	uint8_t m_timera_to_sound_irq_active;
+	uint8_t m_timerb_to_sound_irq_active;
+	uint16_t m_current_sound_vector;
+	uint16_t m_new_sound_vector;
+
+	void update_main_interrupts();
+	void update_sound_interrupts();
 
 	uint8_t vt1682_2000_r();
 	void vt1682_2000_w(uint8_t data);
@@ -356,8 +377,6 @@ private:
 	uint8_t vt1682_2030_r();
 	void vt1682_2030_w(uint8_t data);
 
-	uint8_t io_ef_r() { return 0x00; }
-
 	/* Video Helpers */
 
 	uint16_t get_spriteram_addr()
@@ -462,6 +481,8 @@ private:
 
 	void vt1682_2105_comr6_tvmodes_w(uint8_t data);
 
+	void vt1682_212e_scuirq_clear_w(u8 data);
+
 	void vt1682_211c_regs_ext2421_w(uint8_t data);
 
 	uint8_t vt1682_2122_dma_dt_addr_7_0_r();
@@ -497,7 +518,7 @@ private:
 	uint8_t soundcpu_irq_vector_hack_r(offs_t offset);
 	uint8_t maincpu_irq_vector_hack_r(offs_t offset);
 	void vt1682_sound_reset_hack_w(offs_t offset, uint8_t data);
-	bool m_scpu_is_in_reset;
+	uint8_t m_scpu_is_in_reset;
 
 	/* System Helpers */
 
@@ -575,6 +596,11 @@ private:
 	uint8_t vt1682_soundcpu_211b_dacright_15_8_r();
 	void vt1682_soundcpu_211b_dacright_15_8_w(uint8_t data);
 
+	// TODO: hook these up properly, used by gm235upc
+	uint8_t vt1682_soundcpu_2410_ioa_data_r() { return machine().rand() & 0x8a; }
+	void vt1682_soundcpu_2410_ioa_data_w(uint8_t data) { }
+	uint8_t vt1682_soundcpu_2410_iob_data_r() { return machine().rand(); }
+
 	/* Support */
 
 	void vt1682_timer_enable_trampoline_w(uint8_t data)
@@ -598,6 +624,7 @@ private:
 
 	uint8_t rom_4000_to_7fff_r(offs_t offset);
 	uint8_t rom_8000_to_ffff_r(offs_t offset);
+	void rom_8000_to_ffff_w(offs_t offset, uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(line_render_start);
@@ -611,7 +638,6 @@ private:
 	int get_address_for_tilepos(int x, int y, int tilesize, uint16_t* pagebases);
 
 	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
-	[[maybe_unused]] void draw_tile(int segment, int tile, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
 	void draw_layer(int which, int opaque, const rectangle& cliprect);
 	void draw_sprites(const rectangle& cliprect);
 };
@@ -652,9 +678,10 @@ protected:
 private:
 
 	uint8_t m_previous_port_b;
-	int m_input_sense;
 	int m_input_pos;
 	int m_current_bank;
+
+	attotime m_transition_time;
 
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
@@ -671,6 +698,7 @@ public:
 	{ }
 
 	void vt1682_dance(machine_config& config);
+	void gm235upc(machine_config& config);
 
 protected:
 	uint8_t uio_porta_r();
@@ -678,6 +706,8 @@ protected:
 
 private:
 	required_ioport m_io_p1;
+
+	void rom_ram_map(address_map& map);
 };
 
 class vt1682_lxts3_state : public vt_vt1682_state
@@ -689,6 +719,7 @@ public:
 	{ }
 
 	void vt1682_lxts3(machine_config& config);
+	void vt1682_24c02(machine_config& config);
 	void vt1682_unk1682(machine_config& config);
 
 	void unk1682_init();
@@ -698,8 +729,32 @@ public:
 protected:
 	uint8_t uio_porta_r();
 
+	uint8_t iof_i2c_r() { return m_seeprom->read_sda() ? 0xc : 0x8; }
+	void iof_i2c_w(uint8_t data) { m_seeprom->write_sda(BIT(data, 2)); m_seeprom->write_scl(BIT(data, 3)); }
+
 private:
 	required_ioport m_io_p1;
+};
+
+class vt1682_anpncpc_state : public vt1682_lxts3_state
+{
+public:
+	vt1682_anpncpc_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt1682_lxts3_state(mconfig, type, tag)
+	{ }
+
+	void anpncpc(machine_config& config);
+
+protected:
+	virtual void clear_sound_reset_line() override
+	{
+		vt_vt1682_state::clear_sound_reset_line();
+		m_soundcpu->set_state_int(M6502_S, 0x1f0+3);
+	}
+
+private:
+	uint8_t iof_i2c_r() { return m_seeprom->read_sda() ? 0x6 : 0x2; }
+	void iof_i2c_w(uint8_t data) { m_seeprom->write_scl(BIT(data, 1)); m_seeprom->write_sda(BIT(data, 2)); }
 };
 
 class vt1682_mx10_state : public vt_vt1682_state
@@ -715,6 +770,7 @@ public:
 	void mx10_init();
 
 protected:
+	uint8_t uioa_r() { logerror("%s uioa_r dir %02x\n", machine().describe_context(), m_uio->inteact_212a_uio_a_direction_r()); return 0xff; } // cmpmx11 needs something here to boot (probably just a power off button in here)
 	uint8_t uiob_r() { logerror("%s uiob_r dir %02x\n", machine().describe_context(), m_uio->inteact_214a_uio_b_direction_r()); return m_io_uiob->read(); }
 	void uiob_w(u8 data)
 	{
@@ -732,6 +788,20 @@ protected:
 				m_bank->set_entry(0);
 			}
 		}
+	}
+
+	virtual void clear_sound_reset_line() override
+	{
+		// The code uploaded by the Classic Max Pocket units doesn't initialize the SP on reset
+		// leading to the stack destroying critical code / data and moving down RAM every time
+		// the system resets the sound CPU when selecting new games or exiting to menu.
+		//
+		// While it could be there's a small internal ROM stub doing that before jumping to the
+		// vectors (VT168 has this capability for both CPUs) it's equally likely that the 6502
+		// core in the chip just initializes the SP to this value on every reset.
+		vt_vt1682_state::clear_sound_reset_line();
+		m_soundcpu->set_state_int(M6502_S, 0x1e4+0x3); // set stack pointer somewhere sensible, there is a block of 0xff bytes in this area, which could be the correct location
+		m_soundcpu->set_state_int(M6502_P, 0x06); // disable interrupts
 	}
 
 private:
@@ -858,6 +928,16 @@ void vt_vt1682_state::machine_start()
 
 	/* System */
 
+	save_item(NAME(m_scu_to_main_irq_active));
+	save_item(NAME(m_timera_to_main_irq_active));
+	save_item(NAME(m_current_main_vector));
+	save_item(NAME(m_new_main_vector));
+
+	save_item(NAME(m_timera_to_sound_irq_active));
+	save_item(NAME(m_timerb_to_sound_irq_active));
+	save_item(NAME(m_current_sound_vector));
+	save_item(NAME(m_new_sound_vector));
+
 	save_item(NAME(m_prgbank1_r0));
 	save_item(NAME(m_prgbank1_r1));
 	save_item(NAME(m_210c_prgbank1_r2));
@@ -891,6 +971,8 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_soundcpu_2119_dacleft_15_8));
 	save_item(NAME(m_soundcpu_211a_dacright_7_0));
 	save_item(NAME(m_soundcpu_211b_dacright_15_8));
+
+	save_item(NAME(m_scpu_is_in_reset));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -959,6 +1041,16 @@ void vt_vt1682_state::machine_reset()
 	m_2030 = 0;
 
 	/* System */
+	m_scu_to_main_irq_active = 0;
+	m_timera_to_main_irq_active = 0;
+	m_current_main_vector = 0xfffe;
+	m_new_main_vector = 0xfffe;
+
+	m_timera_to_sound_irq_active = 0;
+	m_timerb_to_sound_irq_active = 0;
+	m_current_sound_vector = 0x0ff8;
+	m_new_sound_vector = 0x0ff8;
+
 	m_prgbank1_r0 = 0;
 	m_prgbank1_r1 = 0;
 	m_210c_prgbank1_r2 = 0;
@@ -1001,7 +1093,10 @@ void vt_vt1682_state::machine_reset()
 	m_bank->set_entry(0);
 
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_scpu_is_in_reset = true;
+	m_scpu_is_in_reset = 1;
+
+	update_main_interrupts();
+	update_sound_interrupts();
 }
 
 /*
@@ -1248,6 +1343,13 @@ uint8_t vt_vt1682_state::rom_8000_to_ffff_r(offs_t offset)
 	return m_fullrom->read8(address);
 }
 
+void vt_vt1682_state::rom_8000_to_ffff_w(offs_t offset, uint8_t data)
+{
+	const uint32_t address = translate_address_8000_to_ffff(offset + 0x8000);
+	m_fullrom->write8(address, data);
+}
+
+
 /************************************************************************************************************************************
  VT1682 PPU Registers
 ************************************************************************************************************************************/
@@ -1274,7 +1376,7 @@ uint8_t vt_vt1682_state::vt1682_2000_r()
 
 void vt_vt1682_state::vt1682_2000_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2000_w writing: %02x (Capture:%1x Slave:%1x NMI_Enable:%1x)\n", machine().describe_context(), data, (data & 0x10)>>4, (data & 0x08)>>3, (data & 0x01)>>0 );
+	LOGMASKED(LOG_OTHER, "%s: vt1682_2000_w writing: %02x (Capture:%1x Slave:%1x NMI_Enable:%1x)\n", machine().describe_context(), data, (data & 0x10) >> 4, (data & 0x08) >> 3, (data & 0x01) >> 0);
 	m_2000 = data;
 }
 
@@ -1489,9 +1591,27 @@ uint8_t vt_vt1682_state::vt1682_2007_vram_data_r()
 void vt_vt1682_state::vt1682_2007_vram_data_w(uint8_t data)
 {
 	uint16_t vram_address = get_vram_addr();
+
 	m_vram->write8(vram_address, data);
-	LOGMASKED(LOG_VRAM_WRITES, "%s: vt1682_2007_vram_data_w writing: %02x to VideoRam Address %04x\n", machine().describe_context(), data, vram_address);
-	vram_address++; // auto inc
+
+	if (m_2000 & 0x4)
+	{
+		// this mode is completely undocumented, but needed for many games in the cmpmx10 / cmpmx11 sets
+		if (vram_address & 0x01)
+		{
+			vram_address += 0x40;
+			vram_address &= ~0x01;
+		}
+		else
+		{
+			vram_address++;
+		}
+	}
+	else
+	{
+		vram_address++;
+	}
+
 	set_vram_addr(vram_address); // update registers
 }
 
@@ -2167,8 +2287,10 @@ void vt_vt1682_state::vt1682_2020_bk_linescroll_w(uint8_t data)
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2020_bk_linescroll_w writing: %02x\n", machine().describe_context(), data);
 	m_2020_bk_linescroll = data;
 
-	if (data)
-		popmessage("linescroll %02x!\n", data);
+	// cmpmx10 / cmpmx11 set a scroll bank, but don't appear to enable linescroll
+	// could this be a workaround for the scroll offset issue the hardware has?
+	//if (data & 0x30)
+	//  popmessage("linescroll unused %01x | BK2enable %d BK1enable %d PRAM addr %04x!\n", (data & 0xc0) >> 6, (data & 0x20)>> 5, (data & 0x10) >> 4, (data & 0xf) << 8);
 }
 
 /*
@@ -2686,22 +2808,28 @@ uint8_t vt_vt1682_state::vt1682_2106_enable_regs_r()
 	return ret;
 }
 
+void vt_vt1682_state::clear_sound_reset_line()
+{
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_scpu_is_in_reset = 0;
+}
+
 void vt_vt1682_state::vt1682_2106_enable_regs_w(uint8_t data)
 {
 	// COMR6 is used for banking
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context().c_str(), data,
-		(data & 0x20) >> 5, (data & 0x10) >> 4, (data & 0x08) >> 3, (data & 0x04) >> 2, (data & 0x02) >> 1, (data & 0x01));
+	LOGMASKED(LOG_OTHER, "%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context(), data,
+		BIT(data, 5), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
 	m_2106_enable_reg = data;
 
-	if (data & 0x20)
+	if (BIT(data, 5))
 	{
-		m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_scpu_is_in_reset = false;
+		if (m_scpu_is_in_reset)
+			clear_sound_reset_line();
 	}
 	else
 	{
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		m_scpu_is_in_reset = true;
+		m_scpu_is_in_reset = 1;
 	}
 }
 
@@ -3272,30 +3400,6 @@ void vt_vt1682_state::vt1682_211c_regs_ext2421_w(uint8_t data)
 */
 
 /*
-    Address 0x211e WRITE (MAIN CPU)
-
-    0x80 - ADCEN
-    0x40 - ADCS1
-    0x20 - ADCS0
-    0x10 - (unused)
-    0x08 - IOFOEN3
-    0x04 - IOFOEN2
-    0x02 - IOFOEN1
-    0x01 - IOFOEN0
-
-    Address 0x211e READ (MAIN CPU)
-
-    0x80 - ADC DATA:7
-    0x40 - ADC DATA:6
-    0x20 - ADC DATA:5
-    0x10 - ADC DATA:4
-    0x08 - ADC DATA:3
-    0x04 - ADC DATA:2
-    0x02 - ADC DATA:1
-    0x01 - ADC DATA:0
-*/
-
-/*
     Address 0x211f r/w (MAIN CPU)
 
     0x80 - VGCEN
@@ -3361,13 +3465,13 @@ void vt_vt1682_state::vt1682_211c_regs_ext2421_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_r()
 {
 	uint8_t ret = m_2122_dma_dt_addr_7_0;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2122_dma_dt_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2122_dma_dt_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2122_dma_dt_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2122_dma_dt_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_2122_dma_dt_addr_7_0 = data;
 }
 
@@ -3388,13 +3492,13 @@ void vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_r()
 {
 	uint8_t ret = m_2123_dma_dt_addr_15_8;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2123_dma_dt_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2123_dma_dt_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2123_dma_dt_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2123_dma_dt_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
 	m_2123_dma_dt_addr_15_8 = data;
 }
 
@@ -3415,13 +3519,13 @@ void vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_r()
 {
 	uint8_t ret = m_2124_dma_sr_addr_7_0;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2124_dma_sr_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2124_dma_sr_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2124_dma_sr_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2124_dma_sr_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_2124_dma_sr_addr_7_0 = data;
 }
 
@@ -3442,13 +3546,13 @@ void vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_r()
 {
 	uint8_t ret = m_2125_dma_sr_addr_15_8;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2125_dma_sr_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2125_dma_sr_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2125_dma_sr_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2125_dma_sr_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
 	m_2125_dma_sr_addr_15_8 = data;
 }
 
@@ -3470,13 +3574,13 @@ void vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r()
 {
 	uint8_t ret = m_2126_dma_sr_bank_addr_22_15;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2126_dma_sr_bank_addr_22_15_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2126_dma_sr_bank_addr_22_15_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2126_dma_sr_bank_addr_22_15_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2126_dma_sr_bank_addr_22_15_w writing: %02x\n", machine().describe_context(), data);
 	m_2126_dma_sr_bank_addr_22_15 = data;
 }
 
@@ -3511,7 +3615,7 @@ uint8_t vt_vt1682_state::vt1682_2127_dma_status_r()
 	int dma_status = 0; // 1 would be 'busy'
 	ret |= dma_status;
 
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2127_dma_status_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2127_dma_status_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -3526,9 +3630,14 @@ void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 	uint16_t dstaddr = get_dma_dt_addr();
 
 	if (is_video)
-		LOGMASKED(LOG_OTHER, "Doing DMA, External to Internal (VRAM/SRAM) src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
+	{
+		if (get_dma_dt_addr() == 0x2004)
+			LOGMASKED(LOG_DMA, "Doing DMA, External to Internal (VRAM/SRAM) src: %08x dest: %04x length: %03x - spriteram addr %04x\n", srcaddr | srcbank << 15, dstaddr, count, get_spriteram_addr());
+		else
+			LOGMASKED(LOG_DMA, "Doing DMA, External to Internal (VRAM/SRAM) src: %08x dest: %04x length: %03x - vram addr %04x\n", srcaddr | srcbank << 15, dstaddr, count, get_vram_addr());
+	}
 	else
-		LOGMASKED(LOG_OTHER, "Doing DMA, External to Internal src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
+		LOGMASKED(LOG_DMA, "Doing DMA, External to Internal src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
 
 	for (int i = 0; i < count; i++)
 	{
@@ -3559,9 +3668,14 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 	uint16_t dstaddr = get_dma_dt_addr();
 
 	if (is_video)
-		LOGMASKED(LOG_OTHER, "Doing DMA, Internal to Internal (VRAM/SRAM) src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
+	{
+		if (get_dma_dt_addr() == 0x2004)
+			LOGMASKED(LOG_DMA, "Doing DMA, Internal to Internal (VRAM/SRAM) src: %04x dest: %04x length: %03x - spriteram addr %04x\n", srcaddr, dstaddr, count, get_spriteram_addr());
+		else
+			LOGMASKED(LOG_DMA, "Doing DMA, Internal to Internal (VRAM/SRAM) src: %04x dest: %04x length: %03x - vram addr %04x\n", srcaddr, dstaddr, count, get_vram_addr());
+	}
 	else
-		LOGMASKED(LOG_OTHER, "Doing DMA, Internal to Internal src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
+		LOGMASKED(LOG_DMA, "Doing DMA, Internal to Internal src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
 
 	for (int i = 0; i < count; i++)
 	{
@@ -3587,7 +3701,7 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 
 void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2127_dma_size_trigger_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2127_dma_size_trigger_w writing: %02x\n", machine().describe_context(), data);
 
 	// hw waits until VBLANK before actually doing the DMA! (TODO)
 
@@ -3597,7 +3711,7 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 		{
 			// Source External
 			// Dest External
-			LOGMASKED(LOG_OTHER, "Invalid DMA, both Source and Dest are 'External'\n");
+			LOGMASKED(LOG_DMA, "Invalid DMA, both Source and Dest are 'External'\n");
 			return;
 		}
 		else
@@ -3610,7 +3724,7 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 
 			if ((srcaddr & 1) || ((dstaddr & 1) && (!get_dma_dt_is_video())) )
 			{
-				LOGMASKED(LOG_OTHER, "Invalid DMA, low bit of address set\n");
+				LOGMASKED(LOG_DMA, "Invalid DMA, low bit of address set\n");
 				return;
 			}
 
@@ -3634,11 +3748,11 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 
 			if ((srcaddr & 1) || (dstaddr & 1))
 			{
-				LOGMASKED(LOG_OTHER, "Invalid DMA, low bit of address set\n");
+				LOGMASKED(LOG_DMA, "Invalid DMA, low bit of address set\n");
 				return;
 			}
 
-			LOGMASKED(LOG_OTHER, "Unhandled DMA, Dest is 'External'\n");
+			LOGMASKED(LOG_DMA, "Unhandled DMA, Dest is 'External'\n");
 			return;
 		}
 		else
@@ -3651,7 +3765,7 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 
 			if ((srcaddr & 1) || ((dstaddr & 1) && (!get_dma_dt_is_video())) )
 			{
-				LOGMASKED(LOG_OTHER, "Invalid DMA, low bit of address set\n");
+				LOGMASKED(LOG_DMA, "Invalid DMA, low bit of address set\n");
 				return;
 			}
 
@@ -3677,13 +3791,13 @@ void vt_vt1682_state::vt1682_2127_dma_size_trigger_w(uint8_t data)
 uint8_t vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r()
 {
 	uint8_t ret = m_2128_dma_sr_bank_addr_24_23;
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2128_dma_sr_bank_addr_24_23_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2128_dma_sr_bank_addr_24_23_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 void vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w(uint8_t data)
 {
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2128_dma_sr_bank_addr_24_23_w writing: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_DMA, "%s: vt1682_2128_dma_sr_bank_addr_24_23_w writing: %02x\n", machine().describe_context(), data);
 	m_2128_dma_sr_bank_addr_24_23 = data & 0x03;
 }
 
@@ -3946,32 +4060,6 @@ void vt_vt1682_state::vt1682_212c_prng_seed_w(uint8_t data)
     0x01 - UIOB ATTRIBUTE
 */
 
-/*
-    Address 0x214c r/w (MAIN CPU)
-
-    0x80 - (unused)
-    0x40 - (unused)
-    0x20 - Keychange Enable
-    0x10 - Keychange Enable
-    0x08 - IOFEN
-    0x04 - (unused)
-    0x02 - (unused)
-    0x01 - IOEOEN
-*/
-
-/*
-    Address 0x214d r/w (MAIN CPU)
-
-    0x80 - IOF:3
-    0x40 - IOF:2
-    0x20 - IOF:1
-    0x10 - IOF:0
-    0x08 - IOE:3
-    0x04 - IOE:2
-    0x02 - IOE:1
-    0x01 - IOE:0
-*/
-
 
 /************************************************************************************************************************************
  VT1682 Sound CPU Registers
@@ -4143,9 +4231,11 @@ void vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w(uint8_t data)
 
 	if (data & 0x10)
 	{
-		// not seen used
-	//	logerror("Main CPU IRQ Request from Sound CPU\n");
+		m_scu_to_main_irq_active = 1;
+		update_main_interrupts();
+	//  logerror("Main CPU IRQ Request from Sound CPU\n");
 	}
+
 
 	if (data & 0x08)
 	{
@@ -4415,15 +4505,6 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 		}
 	}
 }
-void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect)
-{
-	int tilesize_high = is16pix_high ? 16 : 8;
-
-	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
-	{
-		draw_tile_pixline(segment, tile, yy, x, y+yy, palselect, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, cliprect);
-	}
-}
 
 void vt_vt1682_state::setup_video_pages(int which, int tilesize, int vs, int hs, int y8, int x8, uint16_t* pagebases)
 {
@@ -4434,7 +4515,6 @@ void vt_vt1682_state::setup_video_pages(int which, int tilesize, int vs, int hs,
 	pagebases[1] = 0xffff;
 	pagebases[2] = 0xffff;
 	pagebases[3] = 0xffff;
-
 
 	if (!tilesize) // 8x8 mode
 	{
@@ -4453,7 +4533,7 @@ void vt_vt1682_state::setup_video_pages(int which, int tilesize, int vs, int hs,
 				pagebases[0] = 0x800; /* 0x800-0xfff */ // technically invalid?
 				break;
 			case 0x3:
-				pagebases[0] = 0x800; /* 0x800-0xfff */ // technically invalid?
+				pagebases[0] = 0x800; /* 0x800-0xfff */ // technically invalid (but set by a number of games in cmpmx10 / cmpmx11 eg. Go Go Go)
 				break;
 			}
 
@@ -4846,32 +4926,16 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 	int bk_line = (m_main_control_bk[which] & 0x02) >> 1;
 	int bk_tilebpp = (m_main_control_bk[which] & 0x0c) >> 2;
 	int bk_depth = (m_main_control_bk[which] & 0x30) >> 4;
-	int bk_paldepth_mode = (m_main_control_bk[which] & 0x40) >> 5; // called bkpal in places, bk_pal_select in others (in conflict with palselect below)
+	int bk_paldepth_mode = (m_main_control_bk[which] & 0x40) >> 6; // called bkpal in places, bk_pal_select in others (in conflict with palselect below) needs to be ignored for cmpmx10
 	int bk_enable = (m_main_control_bk[which] & 0x80) >> 7;
 
 	if (bk_enable)
 	{
-		int xscroll = m_xscroll_7_0_bk[which];
 		int yscroll = m_yscroll_7_0_bk[which];
-		int xscrollmsb = (m_scroll_control_bk[which] & 0x01);
 		int yscrollmsb = (m_scroll_control_bk[which] & 0x02) >> 1;
 		int page_layout_h = (m_scroll_control_bk[which] & 0x04) >> 2;
 		int page_layout_v = (m_scroll_control_bk[which] & 0x08) >> 3;
 		int high_color = (m_scroll_control_bk[which] & 0x10) >> 4;
-
-		/* must be some condition for this, as Maze Pac does not want this offset (confirmed no offset on hardware) but some others do (see Snake title for example)
-		   documentation says it's a hw bug, for bk2 (+2 pixels), but conditions aren't understood, and bk1 clearly needs offset too
-		   sprites and tilemaps on the select menu need to align too, without left edge scrolling glitches
-		   judging this from videos is tricky, because there's another bug that causes the right-most column of pixels to not render for certain scroll values
-		   and the right-most 2 columns of sprites to not render
-
-		   does this come down to pal1/pal2 output mixing rather than specific layers?
-		*/
-		//if (which == 0)
-		//  xscroll += 1;
-
-		//if (which == 1)
-		//  xscroll += 1;
 
 		int segment = m_segment_7_0_bk[which];
 		segment |= m_segment_11_8_bk[which] << 8;
@@ -4883,21 +4947,52 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 
 		uint16_t bases[4];
 
-		setup_video_pages(which, bk_tilesize, page_layout_v, page_layout_h, yscrollmsb, xscrollmsb, bases);
-
-		//LOGMASKED(LOG_OTHER, "layer %d bases %04x %04x %04x %04x (scrolls x:%02x y:%02x)\n", which, bases[0], bases[1], bases[2], bases[3], xscroll, yscroll);
-
 		if (!bk_line)
 		{
 			int palselect;
 			if (which == 0) palselect = m_200f_bk_pal_sel & 0x03;
 			else palselect = (m_200f_bk_pal_sel & 0x0c) >> 2;
 
-			// Character Mode
-			LOGMASKED(LOG_OTHER, "DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x PalDepthMode:%1x PalSelect:%1 PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_paldepth_mode, palselect, page_layout_v, page_layout_h, xscroll, yscroll);
-
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
+				int xscroll = m_xscroll_7_0_bk[which];
+				int xscrollmsb = (m_scroll_control_bk[which] & 0x01);
+
+				int rowscroll_pram_address = (m_2020_bk_linescroll & 0xf) * 0x100;
+
+				bool rowscroll_enabled = false;
+				if ((which == 0) && (m_2020_bk_linescroll & 0x10))
+					rowscroll_enabled = true;
+				if ((which == 1) && (m_2020_bk_linescroll & 0x20))
+					rowscroll_enabled = true;
+
+				if (rowscroll_enabled)
+				{
+					// yes, the rowscroll table is in main ram, not vram ?!
+					xscroll += (s8)m_mainram[rowscroll_pram_address + y];
+					// also need to modify xscrollmsb?
+				}
+
+				/* must be some condition for this, as Maze Pac does not want this offset (confirmed no offset on hardware) but some others do (see Snake title for example)
+				   documentation says it's a hw bug, for bk2 (+2 pixels), but conditions aren't understood, and bk1 clearly needs offset too
+				   sprites and tilemaps on the select menu need to align too, without left edge scrolling glitches
+				   judging this from videos is tricky, because there's another bug that causes the right-most column of pixels to not render for certain scroll values
+				   and the right-most 2 columns of sprites to not render
+
+				   does this come down to pal1/pal2 output mixing rather than specific layers?
+
+				   maybe some odd interaction with rowscroll even if it's disabled?
+				   (as rowscroll is weird using mainram, and the mx10/11 sets set a bank even without enabling it, maybe as a workaround)
+				*/
+
+				//if (which == 0)
+				//  xscroll += 1;
+
+				//if (which == 1)
+				//  xscroll += 1;
+
+				setup_video_pages(which, bk_tilesize, page_layout_v, page_layout_h, yscrollmsb, xscrollmsb, bases);
+
 				int ytile, ytileline;
 
 				int ywithscroll = y - yscroll;
@@ -4948,9 +5043,22 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 
 					uint8_t realpal, realdepth;
 
-					if (bk_paldepth_mode)
+					// Dingle Hunt and Ocean Fantasy in cmpmx10 turn this on
+					// but priority data and palette data are stored as normal
+					// resulting in broken palettes and priority if we use it
+					//
+					// Alien Attack in njp60in1 / pgs268 / unk1682 also sets
+					// this and expects it to be ignored
+					//
+					// The broken priorities in Table Tennis for exsprt48 / itvg48
+					// are unrelated (bit isn't set) but as they work in
+					// xing48 could be just a bug in those versions
+					//
+					// does it really work on hardware? we disable it entirely
+					// in those sets for now
+					if (bk_paldepth_mode && m_allow_bk_paldepth_mode)
 					{
-						// this mode isn't tested, not seen it used
+						// haven't seen this used properly
 						//if (bk_paldepth_mode)
 						//  popmessage("bk_paldepth_mode set\n");
 						realdepth = pal & 0x03;
@@ -5133,6 +5241,12 @@ void vt_vt1682_state::rom_map(address_map &map)
 	map(0x0000000, 0x1ffffff).bankr("cartbank");
 }
 
+void vt1682_dance_state::rom_ram_map(address_map &map)
+{
+	rom_map(map);
+	map(0x1000000, 0x101ffff).ram();
+}
+
 // 11-bits (0x800 bytes) for sprites
 void vt_vt1682_state::spriteram_map(address_map &map)
 {
@@ -5180,14 +5294,28 @@ void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 	map(0x2136, 0x2136).w(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_5_div_w));
 	map(0x2137, 0x2137).w(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
 
+	// is this IO port the same logic as the UIO?
+	map(0x2140, 0x2140).rw(FUNC(vt_vt1682_state::vt1682_soundcpu_2410_ioa_data_r), FUNC(vt_vt1682_state::vt1682_soundcpu_2410_ioa_data_w));
+	map(0x2144, 0x2144).r(FUNC(vt_vt1682_state::vt1682_soundcpu_2410_iob_data_r));
+
+
 	map(0xf000, 0xffff).ram().share("sound_share"); // doesn't actually map here, the CPU fetches vectors from 0x0ff0 - 0x0fff!
 
 	map(0xfffe, 0xffff).r(FUNC(vt_vt1682_state::soundcpu_irq_vector_hack_r)); // probably need custom IRQ support in the core instead...
 }
 
+void vt_vt1682_state::vt1682_212e_scuirq_clear_w(u8 data)
+{
+	// this is listed as unused in older documentation, with 211c reads being for scuirq clear
+	// however later documentation lists this address as a correction and the software we are
+	// aware of uses it
+	m_scu_to_main_irq_active = 0;
+	update_main_interrupts();
+}
+
 void vt_vt1682_state::vt_vt1682_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram();
+	map(0x0000, 0x0fff).ram().share("mainram");
 	map(0x1000, 0x1fff).ram().share("sound_share");
 	map(0x1ff4, 0x1fff).w(FUNC(vt_vt1682_state::vt1682_sound_reset_hack_w));
 
@@ -5278,7 +5406,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	// 211b UART
 	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
 	// 211d misc enable regs
-	// 211e ADC
+	map(0x211e, 0x211e).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_211e_adc_data_r), FUNC(vrt_vt1682_io_device::vt1682_211e_adconfig_w));
 	// 211f voice gain
 	// 2120 sleep period
 	// 2121 misc interrupt masks / clears
@@ -5295,7 +5423,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x212b, 0x212b).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_r), FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_w));
 	map(0x212c, 0x212c).rw(FUNC(vt_vt1682_state::vt1682_212c_prng_r), FUNC(vt_vt1682_state::vt1682_212c_prng_seed_w));
 	// 212d PLL
-	// 212e unused
+	map(0x212e, 0x212e).w(FUNC(vt_vt1682_state::vt1682_212e_scuirq_clear_w));
 	// 212f unused
 	map(0x2130, 0x2130).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
 	map(0x2131, 0x2131).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
@@ -5310,11 +5438,12 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x214a, 0x214a).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_r), FUNC(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_w));
 	map(0x214b, 0x214b).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_r), FUNC(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_w));
 
-	map(0x214d, 0x214d).r(FUNC(vt_vt1682_state::io_ef_r));
+	map(0x214c, 0x214c).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_214c_ioefconfig_r),FUNC(vrt_vt1682_io_device::vt1682_214c_ioefconfig_w));
+	map(0x214d, 0x214d).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_214d_io_ef_r),FUNC(vrt_vt1682_io_device::vt1682_214d_io_ef_w));
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
-	map(0x8000, 0xffff).r(FUNC(vt_vt1682_state::rom_8000_to_ffff_r));
+	map(0x8000, 0xffff).rw(FUNC(vt_vt1682_state::rom_8000_to_ffff_r), FUNC(vt_vt1682_state::rom_8000_to_ffff_w));
 
 	map(0xfffe, 0xffff).r(FUNC(vt_vt1682_state::maincpu_irq_vector_hack_r)); // probably need custom IRQ support in the core instead...
 }
@@ -5347,15 +5476,34 @@ Ext IRQ         0x0ffe - 0x0fff
 
 uint8_t vt_vt1682_state::soundcpu_irq_vector_hack_r(offs_t offset)
 {
-	// redirect to Timer IRQ!
-	return m_sound_share[0x0ff8 + offset];
+	auto vector = m_current_sound_vector;
+	if (offset == 0)
+	{
+		vector = m_new_sound_vector;
+		if (!machine().side_effects_disabled())
+			m_current_sound_vector = vector;
+	}
+
+	// redirect to required IRQ!
+	return m_sound_share[vector + offset];
 }
+
+
 
 uint8_t vt_vt1682_state::maincpu_irq_vector_hack_r(offs_t offset)
 {
-	// redirect to Timer IRQ!
-	return rom_8000_to_ffff_r((0xfff8 - 0x8000)+offset);
+	auto vector = m_current_main_vector;
+	if (offset == 0)
+	{
+		vector = m_new_main_vector;
+		if (!machine().side_effects_disabled())
+			m_current_main_vector = vector;
+	}
+
+	// redirect to required IRQ!
+	return rom_8000_to_ffff_r((vector - 0x8000) + offset);
 }
+
 
 // intg5410 writes a new program without resetting the CPU when selecting from the 'arcade' game main menu, this is problematic
 // it does appear to rewrite the vectors first, so maybe there is some hardware side-effect of this putting the CPU in reset state??
@@ -5365,24 +5513,50 @@ void vt_vt1682_state::vt1682_sound_reset_hack_w(offs_t offset, uint8_t data)
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
+void vt_vt1682_state::update_sound_interrupts()
+{
+	if (m_timera_to_sound_irq_active || m_timerb_to_sound_irq_active)
+	{
+		if (m_timera_to_sound_irq_active)
+		{
+			m_new_sound_vector = 0x0ff8;
+		}
+		else if (m_timerb_to_sound_irq_active)
+		{
+			m_new_sound_vector = 0x0ff6;
+		}
+
+		m_soundcpu->set_input_line(0, ASSERT_LINE);
+	}
+	else
+	{
+		m_new_sound_vector = 0x0ffe;
+		m_soundcpu->set_input_line(0, CLEAR_LINE);
+	}
+}
+
+
 void vt_vt1682_state::soundcpu_timera_irq(int state)
 {
 	if (state && !m_scpu_is_in_reset)
-		m_soundcpu->set_input_line(0, ASSERT_LINE);
+		m_timera_to_sound_irq_active = 1;
 	else
-		m_soundcpu->set_input_line(0, CLEAR_LINE);
+		m_timera_to_sound_irq_active = 0;
+
+	update_sound_interrupts();
 }
 
 void vt_vt1682_state::soundcpu_timerb_irq(int state)
 {
-// need to set proper vector (need IRQ priority manager function?)
-/*
-    if (state)
-        m_soundcpu->set_input_line(0, ASSERT_LINE);
-    else
-        m_soundcpu->set_input_line(0, CLEAR_LINE);
-*/
+	if (state && !m_scpu_is_in_reset)
+		m_timerb_to_sound_irq_active = 1;
+	else
+		m_timerb_to_sound_irq_active = 0;
+
+	update_sound_interrupts();
 }
+
+
 
 void vt_vt1682_state::maincpu_timer_irq(int state)
 {
@@ -5400,9 +5574,33 @@ void vt_vt1682_state::maincpu_timer_irq(int state)
 	*/
 
 	if (state)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_timera_to_main_irq_active = 1;
 	else
+		m_timera_to_main_irq_active = 0;
+
+	update_main_interrupts();
+}
+
+void vt_vt1682_state::update_main_interrupts()
+{
+	if (m_timera_to_main_irq_active || m_scu_to_main_irq_active)
+	{
+		if (m_timera_to_main_irq_active)
+		{
+			m_new_main_vector = 0xfff8;
+		}
+		else if (m_scu_to_main_irq_active)
+		{
+			m_new_main_vector = 0xfff6;
+		}
+
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+	else
+	{
+		m_new_main_vector = 0xfffe;
 		m_maincpu->set_input_line(0, CLEAR_LINE);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::line_render_start)
@@ -5570,11 +5768,10 @@ void vt_vt1682_state::vt_vt1682_common(machine_config& config)
 	VT_VT1682_IO(config, m_io, 0);
 	VT_VT1682_UIO(config, m_uio, 0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DAC_12BIT_R2R(config, m_leftdac, 0).add_route(0, "lspeaker", 0.5); // unknown 12-bit DAC
-	DAC_12BIT_R2R(config, m_rightdac, 0).add_route(0, "rspeaker", 0.5); // unknown 12-bit DAC
+	DAC_12BIT_R2R(config, m_leftdac, 0).add_route(0, "speaker", 0.5, 0); // unknown 12-bit DAC
+	DAC_12BIT_R2R(config, m_rightdac, 0).add_route(0, "speaker", 0.5, 1); // unknown 12-bit DAC
 }
 
 
@@ -5589,16 +5786,15 @@ void intec_interact_state::machine_start()
 	vt_vt1682_state::machine_start();
 
 	save_item(NAME(m_previous_port_b));
-	save_item(NAME(m_input_sense));
 	save_item(NAME(m_input_pos));
 	save_item(NAME(m_current_bank));
+	save_item(NAME(m_transition_time));
 }
 
 void intec_interact_state::machine_reset()
 {
 	vt_vt1682_state::machine_reset();
-	m_previous_port_b = 0x0;
-	m_input_sense = 0;
+	m_previous_port_b = 0xf;
 	m_input_pos = 0;
 	m_current_bank = 0;
 	if (m_bank)
@@ -5716,6 +5912,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gm235upc )
 	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lxts3 )
@@ -5729,6 +5933,19 @@ static INPUT_PORTS_START( lxts3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( icb )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( njp60in1 )
 	PORT_START("IN0")
@@ -5785,16 +6002,18 @@ static INPUT_PORTS_START( mx10 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // this is probably some kind of power switch
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Menu")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( anpncpc )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 // this controller code is just designed to feed the games with data they're happy with, it probably has no grounds in reality
 // as I don't know how they really work.  presumably wireless with timeouts, sending signals for brief periods that need to be
@@ -5819,15 +6038,16 @@ uint8_t intec_interact_state::porta_r()
 	case 0x4: ret = m_io_p4->read(); break;
 	}
 
-	//LOGMASKED(LOG_OTHER, "%s: porta_r returning: %1x (INPUTS) (with input position %d)\n", machine().describe_context(), ret, m_input_pos);
+	LOGMASKED(LOG_OTHER, "%s: porta_r returning: %1x (INPUTS) (with input position %d)\n", machine().describe_context(), ret, m_input_pos);
 	return ret;
 }
 
 uint8_t intec_interact_state::portc_r()
 {
 	uint8_t ret = 0x0;
-	ret |= m_input_sense ^1;
-	//LOGMASKED(LOG_OTHER, "%s: portc_r returning: %1x (CONTROLLER INPUT SENSE)\n", machine().describe_context(), ret);
+	if (machine().time() >= m_transition_time + attotime::from_usec(100))
+		ret |= 1;
+	LOGMASKED(LOG_OTHER, "%s: portc_r returning: %1x (CONTROLLER INPUT SENSE) @ %s\n", machine().describe_context(), ret, machine().time().to_string());
 	return ret;
 }
 
@@ -5835,59 +6055,35 @@ void intec_interact_state::portb_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: portb_w writing: %1x\n", machine().describe_context(), data & 0xf);
 
-	if ((m_previous_port_b & 0x1) && (!(data & 0x1)))
+	if ((m_previous_port_b & 0x1) != (data & 0x1))
 	{
-		// 0x1 high -> low
-		LOGMASKED(LOG_OTHER, "high to low\n");
-
-		if (m_input_sense == 1)
+		if (data & 0x1)
 		{
-			m_input_pos++;
+			// 0x1 low -> high
+			LOGMASKED(LOG_OTHER, "low to high @ %s\n", machine().time().to_string());
 		}
 		else
 		{
-			m_input_sense = 1;
+			// 0x1 high -> low
+			LOGMASKED(LOG_OTHER, "high to low @ %s\n", machine().time().to_string());
 		}
-		LOGMASKED(LOG_OTHER, "input pos is %d\n", m_input_pos);
 
-	}
-	else if ((m_previous_port_b & 0x1) && (data & 0x1))
-	{
-		// 0x1 high -> high
-		LOGMASKED(LOG_OTHER, "high to high\n");
-		m_input_pos = 0;
-	}
-	else if ((!(m_previous_port_b & 0x1)) && (!(data & 0x1)))
-	{
-		// 0x1 low -> low
-		LOGMASKED(LOG_OTHER, "low to low\n");
-
-		if (m_input_sense == 1)
-		{
-			m_input_pos = 0;
-		}
-	}
-	else if ((!(m_previous_port_b & 0x1)) && (data & 0x1))
-	{
-		// 0x1 low -> high
-		LOGMASKED(LOG_OTHER, "low to high\n");
-
-		if (m_input_sense == 1)
+		attotime now = machine().time();
+		if (now < m_transition_time + attotime::from_usec(100))
 		{
 			m_input_pos++;
+			m_transition_time = now;
 		}
-
-		if (m_input_pos == 5)
+		else if (!(data & 0x1))
 		{
-			m_input_sense = 0;
+			m_input_pos = 0;
+			m_transition_time = now;
 		}
-
 		LOGMASKED(LOG_OTHER, "input pos is %d\n", m_input_pos);
-
 	}
 
 	m_previous_port_b = data;
-};
+}
 
 void vt1682_exsport_state::clock_joy2()
 {
@@ -5928,7 +6124,6 @@ void intec_interact_state::intech_interact(machine_config& config)
 	m_io->porta_in().set(FUNC(intec_interact_state::porta_r));
 	m_io->porta_out().set(FUNC(intec_interact_state::porta_w));
 
-	m_io->portb_in().set(FUNC(intec_interact_state::portb_r));
 	m_io->portb_out().set(FUNC(intec_interact_state::portb_w));
 
 	m_io->portc_in().set(FUNC(intec_interact_state::portc_r));
@@ -5940,8 +6135,7 @@ void intec_interact_state::intech_interact(machine_config& config)
 	m_leftdac->reset_routes();
 	m_rightdac->reset_routes();
 
-	config.device_remove(":lspeaker");
-	config.device_remove(":rspeaker");
+	config.device_remove(":speaker");
 
 	SPEAKER(config, "mono").front_center();
 	m_leftdac->add_route(0, "mono", 0.5);
@@ -6003,8 +6197,7 @@ void vt1682_dance_state::vt1682_dance(machine_config& config)
 	m_leftdac->reset_routes();
 	m_rightdac->reset_routes();
 
-	config.device_remove(":lspeaker");
-	config.device_remove(":rspeaker");
+	config.device_remove(":speaker");
 
 	SPEAKER(config, "mono").front_center();
 	m_leftdac->add_route(0, "mono", 0.5);
@@ -6013,6 +6206,14 @@ void vt1682_dance_state::vt1682_dance(machine_config& config)
 	m_uio->porta_in().set(FUNC(vt1682_dance_state::uio_porta_r));
 	m_uio->porta_out().set(FUNC(vt1682_dance_state::uio_porta_w));
 }
+
+void vt1682_dance_state::gm235upc(machine_config& config)
+{
+	vt1682_dance(config);
+	m_fullrom->set_map(&vt1682_dance_state::rom_ram_map);
+}
+
+
 
 void vt1682_lxts3_state::vt1682_lxts3(machine_config& config)
 {
@@ -6025,14 +6226,35 @@ void vt1682_lxts3_state::vt1682_lxts3(machine_config& config)
 	m_leftdac->reset_routes();
 	m_rightdac->reset_routes();
 
-	config.device_remove(":lspeaker");
-	config.device_remove(":rspeaker");
+	config.device_remove(":speaker");
 
 	SPEAKER(config, "mono").front_center();
 	m_leftdac->add_route(0, "mono", 0.5);
 	m_rightdac->add_route(0, "mono", 0.5);
 
 	m_uio->porta_in().set(FUNC(vt1682_lxts3_state::uio_porta_r));
+}
+
+void vt1682_lxts3_state::vt1682_24c02(machine_config& config)
+{
+	vt1682_lxts3(config);
+
+	m_io->portf_in().set(FUNC(vt1682_lxts3_state::iof_i2c_r));
+	m_io->portf_out().set(FUNC(vt1682_lxts3_state::iof_i2c_w));
+
+	I2C_24C02(config, m_seeprom);
+}
+
+void vt1682_anpncpc_state::anpncpc(machine_config& config)
+{
+	vt1682_lxts3(config);
+
+	m_io->portf_in().set(FUNC(vt1682_anpncpc_state::iof_i2c_r));
+	m_io->portf_out().set(FUNC(vt1682_anpncpc_state::iof_i2c_w));
+
+	// has a GPBA02A-HL011 I/O extender on the keyboard PCB
+
+	I2C_24C64(config, m_seeprom);
 }
 
 void vt1682_mx10_state::mx10(machine_config& config)
@@ -6043,14 +6265,14 @@ void vt1682_mx10_state::mx10(machine_config& config)
 	M6502(config.replace(), m_maincpu, MAIN_CPU_CLOCK_NTSC); // no opcode bitswap
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_mx10_state::vt_vt1682_map);
 
+	m_uio->porta_in().set(FUNC(vt1682_mx10_state::uioa_r));
 	m_uio->portb_in().set(FUNC(vt1682_mx10_state::uiob_r));
 	m_uio->portb_out().set(FUNC(vt1682_mx10_state::uiob_w));
 
 	m_leftdac->reset_routes();
 	m_rightdac->reset_routes();
 
-	config.device_remove(":lspeaker");
-	config.device_remove(":rspeaker");
+	config.device_remove(":speaker");
 
 	SPEAKER(config, "mono").front_center();
 	m_leftdac->add_route(0, "mono", 0.5);
@@ -6068,8 +6290,7 @@ void vt1682_lxts3_state::vt1682_unk1682(machine_config& config)
 	m_leftdac->reset_routes();
 	m_rightdac->reset_routes();
 
-	config.device_remove(":lspeaker");
-	config.device_remove(":rspeaker");
+	config.device_remove(":speaker");
 
 	SPEAKER(config, "mono").front_center();
 	m_leftdac->add_route(0, "mono", 0.5);
@@ -6097,6 +6318,13 @@ void vt_vt1682_state::regular_init()
 	m_bank->configure_entry(0, memregion("mainrom")->base() + 0x0000000);
 }
 
+void vt_vt1682_state::ignore_bk_paldepth_init()
+{
+	regular_init();
+	m_allow_bk_paldepth_mode = false;
+}
+
+
 void vt1682_mx10_state::mx10_init()
 {
 	m_bank->configure_entry(0, memregion("mainrom")->base() + 0x0000000);
@@ -6120,12 +6348,7 @@ void vt1682_mx10_state::mx10_init()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 
-	// for some reason, after changing banks, the sound CPU
-	// doesn't seem to end up in a good state, and trashes
-	// its own memory
-	//
-	// this is an ugly hack to prevent that for now, at the expense of any kind of correct sound
-	m_soundcpu->set_clock_scale(0.01f);
+	m_allow_bk_paldepth_mode = false;
 }
 
 
@@ -6141,7 +6364,7 @@ void intec_interact_state::banked_init()
 
 void vt1682_lxts3_state::unk1682_init()
 {
-	regular_init();
+	ignore_bk_paldepth_init();
 
 	uint8_t* ROM = memregion("mainrom")->base();
 	// this jumps to a function on startup that has a bunch of jumps / accesses to the 3xxx region, which is internal ROM
@@ -6153,7 +6376,7 @@ void vt1682_lxts3_state::unk1682_init()
 
 void vt1682_lxts3_state::njp60in1_init()
 {
-	regular_init();
+	ignore_bk_paldepth_init();
 
 	uint8_t* ROM = memregion("mainrom")->base();
 	// first jsr in the code is for some port based security(?) check, might be SEEPROM
@@ -6164,7 +6387,7 @@ void vt1682_lxts3_state::njp60in1_init()
 
 void vt1682_lxts3_state::pgs268_init()
 {
-	regular_init();
+	ignore_bk_paldepth_init();
 
 	uint8_t* ROM = memregion("mainrom")->base();
 	// patch out the first JSR again
@@ -6288,10 +6511,47 @@ ROM_START( lxts3 )
 ROM_END
 
 
+ROM_START( icb_ts )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "toystory.bin", 0x00000, 0x400000, CRC(396f8aff) SHA1(b149470306cd77558666b7ab90fa3fe4e95b6c60) )
+ROM_END
+
+ROM_START( icb_car )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "kh26lv320.u2", 0x00000, 0x400000, CRC(88132171) SHA1(55a9ac8c1f49dfc116565ac11149cbd4eef90938) )
+ROM_END
+
+ROM_START( icb_dp )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "princesscoloringbook.bin", 0x00000, 0x400000, CRC(253a0245) SHA1(1b902f179eed469cf749aaa9169fede290ce1031) )
+ROM_END
+
 ROM_START( gm235upc )
 	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "39vf3201.u3", 0x00000, 0x400000, CRC(182f8a2c) SHA1(7be56e1063cc8dbb78c419f5adc05b8cd65c8e2f))
 	// also has RAM
+ROM_END
+
+ROM_START( anpncpc )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "s29gl064a10tfir3.u12", 0x00000, 0x800000, CRC(7a801dd5) SHA1(1c956939ed62069564e1d008cbfe405e0a067092) )
+
+	ROM_REGION( 0x2000, "seeprom", ROMREGION_ERASE00 ) // probably just settings / profiles, remove later if so
+	ROM_LOAD( "l24c64.u5", 0x00000, 0x2000, CRC(968f8234) SHA1(6fb961a06892e4a577f78b3687c428b8e1c4c7d3) )
+ROM_END
+
+ROM_START( cmpmx10 )
+	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
+	// despite V1682 being able to access 32Mbytes natively, this is split into 2 4Mbyte banks with external banking
+	// the 2nd bank contains an (unused) menu for a 6-in-1
+	ROM_LOAD( "classicmaxpocket_vertical.u3", 0x000000, 0x400000, CRC(9d3614f9) SHA1(e5de00b23eb1a2d39c524f5b5aed3b1cda44efce) )
+	ROM_CONTINUE(0x2000000,0x400000)
+ROM_END
+
+ROM_START( cmpmx11 )
+	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
+	// this set doesn't use external banking, and expects the 8Mbytes to map straight
 ROM_END
 
 } // anonymous namespace
@@ -6369,41 +6629,33 @@ CONS( 200?, dance555,  0,  0,  vt1682_exsportp,   dance555, vt1682_exsport_state
 
 // manual explicitly states it has NTSC output only (unit can be connected to a TV) and both Ranning Horse + Explosion (Bomberman) are the NTSC versions
 // has 21.477 Mhz XTAL
-CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
+CONS( 200?, njp60in1,  0,  0,   vt1682_24c02, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // fewer than 268 games, there are repeats
-CONS( 200?, pgs268,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, pgs268_init, "<unknown>", "Portable Game Station 268-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
+CONS( 200?, pgs268,  0,  0,   vt1682_24c02, njp60in1, vt1682_lxts3_state, pgs268_init, "<unknown>", "Portable Game Station 268-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // this appears to be related to the NJ Pocket, claims 101-in-1 but has some duplicates.
 // Like the 'Wow Wireless gaming' it incorrectly mixes the PAL version of 'Ranning Horse' with the NTSC version of 'Bomberman', it has no TV output.
 // has 26.6017 Mhz (6xPAL) XTAL
-CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk1682_init, "<unknown>", "unknown VT1682-based 101-in-1 handheld (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // linescroll issues
+CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk1682_init, "<unknown>", "unknown VT1682-based 101-in-1 handheld (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
-CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // linescroll issues
+CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, icb_ts,   0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_init,  "Techno Source", "Interactive Coloring Book: Disney / Pixar Toy Story", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, icb_car,  0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_init,  "Techno Source", "Interactive Coloring Book: Disney / Pixar Cars", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, icb_dp,   0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_init,  "Techno Source", "Interactive Coloring Book: Disney Princess", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // there are products on SunPlus type hardware with nearly identical shells 'Mi DiGi World' / 'Mi Digi Diary'
 // needs IO ports on sound CPU side, needs write access to space for RAM (inputs are 'mini-keyboard' style)
-CONS( 200?, gm235upc,  0,  0,  vt1682_dance, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, gm235upc,  0,  0,  gm235upc, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-ROM_START( cmpmx11 )
-	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
-	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x400000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
-	ROM_CONTINUE(0x2000000,0x400000)
-ROM_END
+// "Anpanman Color PC" (アンパンマンカラーパソコン)
+CONS( 2009, anpncpc,   0,  0,  anpncpc, anpncpc, vt1682_anpncpc_state, regular_init,  "Bandai", "Anpanman Color PC (Japan)", MACHINE_NOT_WORKING )
 
-ROM_START( cmpmx10 )
-	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
-	// despite V1682 being able to access 32Mbytes natively, this is split into 2 4Mbyte banks with external banking
-	// the 2nd bank contains an (unused) menu for a 6-in-1
-	ROM_LOAD( "classicmaxpocket_vertical.u3", 0x000000, 0x400000, CRC(9d3614f9) SHA1(e5de00b23eb1a2d39c524f5b5aed3b1cda44efce) )
-	ROM_CONTINUE(0x2000000,0x400000)
-ROM_END
-
-
-// might be VT-09 or VT-162, uses a ROM glob on a sub-board, data lines seem scrambled at least?
-CONS( 2009, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Premier Portfolio International",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (horizontal, France)", MACHINE_NOT_WORKING )
+// as with others the cmpmx10 and cmpmx11 have minor offset issues in some games, you can see it easily in Jewel Master
+// 2007 is the copyright date shown on all the games, but the unit could have been released later
+CONS( 2007, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Jungle Soft (Premier Portfolio International license)",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (horizontal, France)", MACHINE_IMPERFECT_GRAPHICS )
 // this unit has a vertical screen, and the games are designed for that aspect
 // only Jungle Soft is shown on box for manufacturer details, 30-in-1 versions also exist
 // see https://bootleggames.fandom.com/wiki/Classic_Max_Pocket for other units with these games
-// how do you specify ROT270 with CONS? using GAME macro for now
-GAME( 2009, cmpmx10,     0,        mx10, mx10, vt1682_mx10_state, mx10_init, ROT270, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", MACHINE_NOT_WORKING )
+CONS( 2007, cmpmx10,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", ROT270 | MACHINE_IMPERFECT_GRAPHICS )

@@ -24,8 +24,11 @@ TODO:
 - some minor color issues (see video)
 
 - testing dips in service mode, they don't match what MAME's UI shows
- (i.e. dip 5 in the UI causes dip 8 to change in service mode display).
+  (i.e. dip 5 in the UI causes dip 8 to change in service mode display).
   A dip listing is available online.
+
+- get rid of (&machine().system() == &GAME_NAME(monymony)) and check and see if the
+  protection handler should also apply to monymony2 that was added later
 
 
 Notes:
@@ -44,14 +47,83 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "zaccaria.h"
+#include "zaccaria_a.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
+#include "video/resnet.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+GAME_EXTERN(monymony);
+
+
+namespace {
+
+class zaccaria_state : public driver_device
+{
+public:
+	zaccaria_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_audiopcb(*this, "audiopcb")
+		, m_videoram(*this, "videoram")
+		, m_attributesram(*this, "attributesram")
+		, m_spriteram(*this, "spriteram%u", 1U)
+		, m_dsw_port(*this, "DSW.%u", 0)
+		, m_coins(*this, "COINS")
+	{ }
+
+	void zaccaria(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	uint8_t dsw_r();
+	uint8_t prot1_r(offs_t offset);
+	uint8_t prot2_r(offs_t offset);
+	void coin_w(int state);
+	void nmi_mask_w(int state);
+	void videoram_w(offs_t offset, uint8_t data);
+	void attributes_w(offs_t offset, uint8_t data);
+	uint8_t read_attr(offs_t offset, int which);
+	void update_colscroll();
+	void flip_screen_x_w(int state);
+	void dsw_sel_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vblank_irq(int state);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, int color, int section);
+
+	void main_map(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device>                 m_maincpu;
+	required_device<gfxdecode_device>           m_gfxdecode;
+	required_device<palette_device>             m_palette;
+	required_device<zac1b11142_audio_device>    m_audiopcb;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_attributesram;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
+
+	required_ioport_array<3> m_dsw_port;
+	required_ioport m_coins;
+
+	uint8_t m_dsw_sel = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_nmi_mask = 0;
+};
 
 
 void zaccaria_state::machine_start()
@@ -64,6 +136,254 @@ void zaccaria_state::machine_reset()
 {
 	m_dsw_sel = 0;
 }
+
+
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+
+Here's the hookup from the proms (82s131) to the r-g-b-outputs
+
+     Prom 9F        74LS374
+    -----------   ____________
+       12         |  3   2   |---680 ohm----| blue out
+       11         |  4   5   |---1k ohm-----| (+ 470 ohm pulldown)
+       10         |  7   6   |---820 ohm-------|
+        9         |  8   9   |---1k ohm--------| green out
+     Prom 9G      |          |                 | (+ 390 ohm pulldown)
+       12         |  13  12  |---1.2k ohm------|
+       11         |  14  15  |---820 ohm----------|
+       10         |  17  16  |---1k ohm-----------| red out
+        9         |  18  19  |---1.2k ohm---------| (+ 390 ohm pulldown)
+                  |__________|
+
+
+***************************************************************************/
+
+void zaccaria_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances_rg[] = { 1200, 1000, 820 };
+	static constexpr int resistances_b[]  = { 1000, 820 };
+
+	double weights_rg[3], weights_b[2];
+	compute_resistor_weights(0, 0xff, -1.0,
+			3, resistances_rg, weights_rg, 390, 0,
+			2, resistances_b,  weights_b,  470, 0,
+			0, nullptr, nullptr, 0, 0);
+
+	for (int i = 0; i < 0x200; i++)
+	{
+		/*
+		  TODO: I'm not sure, but I think that pen 0 must always be black, otherwise
+		  there's some junk brown background in Jack Rabbit.
+		  From the schematics it seems that the background color can be changed, but
+		  I'm not sure where it would be taken from; I think the high bits of
+		  attributesram, but they are always 0 in these games so they would turn out
+		  black anyway.
+		 */
+		if (!(i & 0x038))
+			palette.set_indirect_color(i, rgb_t::black());
+		else
+		{
+			int bit0, bit1, bit2;
+
+			// red component
+			bit0 = BIT(color_prom[i + 0x000], 3);
+			bit1 = BIT(color_prom[i + 0x000], 2);
+			bit2 = BIT(color_prom[i + 0x000], 1);
+			int const r = combine_weights(weights_rg, bit0, bit1, bit2);
+
+			// green component
+			bit0 = BIT(color_prom[i + 0x000], 0);
+			bit1 = BIT(color_prom[i + 0x200], 3);
+			bit2 = BIT(color_prom[i + 0x200], 2);
+			int const g = combine_weights(weights_rg, bit0, bit1, bit2);
+
+			// blue component
+			bit0 = BIT(color_prom[i + 0x200], 1);
+			bit1 = BIT(color_prom[i + 0x200], 0);
+			int const b = combine_weights(weights_b, bit0, bit1);
+
+			palette.set_indirect_color(i, rgb_t(r, g, b));
+		}
+	}
+
+	/* There are 512 unique colors, which seem to be organized in 8 blocks */
+	/* of 64. In each block, colors are not in the usual sequential order */
+	/* but in interleaved order, like Phoenix. Additionally, colors for */
+	/* background and sprites are interleaved. */
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 4; j++)
+			for (int k = 0; k < 8; k++)
+				// swap j and k to make the colors sequential
+				palette.set_pen_indirect(0 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2 * j);
+
+	for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 4; j++)
+			for (int k = 0; k < 8; k++)
+				// swap j and k to make the colors sequential
+				palette.set_pen_indirect(256 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2 * j + 1);
+}
+
+
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
+{
+	uint8_t attr = m_videoram[tile_index | 0x400];
+	uint16_t code = m_videoram[tile_index] | ((attr & 0x03) << 8);
+	attr = (attr & 0x0c) >> 2 | (read_attr(tile_index, 1) & 0x07) << 2;
+
+	tileinfo.set(0, code, attr, 0);
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void zaccaria_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zaccaria_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap->set_scroll_cols(32);
+}
+
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+/* sprite format:
+
+  76543210
+0 xxxxxxxx x
+1 x....... flipy
+  .x...... flipx
+  ..xxxxxx code low
+2 xx...... code high
+  ..xxx... ?
+  .....xxx color
+3 xxxxxxxx y
+
+offsets 1 and 2 are swapped if accessed from spriteram2
+
+*/
+void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, int color, int section)
+{
+	int o1 = 1 + section;
+	int o2 = 2 - section;
+
+	for (int offs = 0; offs < 0x20; offs += 4)
+	{
+		int sx = spriteram[offs + 3] + 1;
+		int sy = 242 - spriteram[offs];
+		int flipx = spriteram[offs + o1] & 0x40;
+		int flipy = spriteram[offs + o1] & 0x80;
+
+		if (sx == 1) continue;
+
+		if (flip_screen_x())
+		{
+			sx = 240 - sx;
+			flipx = !flipx;
+		}
+		if (flip_screen_y())
+		{
+			sy = 240 - sy;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				(spriteram[offs + o1] & 0x3f) + (spriteram[offs + o2] & 0xc0),
+				((spriteram[offs + o2] & 0x07) << 2) | color,
+				flipx, flipy, sx, sy, 0);
+	}
+}
+
+uint32_t zaccaria_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect);
+
+	// 3 layers of sprites, each with their own palette and priorities
+	// Not perfect yet, does spriteram(1) layer have a priority bit somewhere?
+	draw_sprites(bitmap, cliprect, m_spriteram[1], 2, 1);
+	draw_sprites(bitmap, cliprect, m_spriteram[0], 1, 0);
+	draw_sprites(bitmap, cliprect, m_spriteram[1] + 0x20, 0, 1);
+
+	return 0;
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void zaccaria_state::vblank_irq(int state)
+{
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+void zaccaria_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+void zaccaria_state::attributes_w(offs_t offset, uint8_t data)
+{
+	uint8_t prev = m_attributesram[offset];
+	m_attributesram[offset] = data;
+
+	if (prev != data)
+	{
+		if (offset & 1)
+		{
+			uint8_t mask = flip_screen_x() ? 0x1f : 0;
+			for (int i = offset / 2; i < 0x400; i += 0x20)
+				m_bg_tilemap->mark_tile_dirty(i ^ mask);
+		}
+		else
+			update_colscroll();
+	}
+}
+
+uint8_t zaccaria_state::read_attr(offs_t offset, int which)
+{
+	if (flip_screen_x()) offset ^= 0x1f;
+	return m_attributesram[(offset << 1 & 0x3f) | (which & 1)];
+}
+
+void zaccaria_state::update_colscroll()
+{
+	for (int i = 0; i < 0x20; i++)
+		m_bg_tilemap->set_scrolly(i, read_attr(i, 0));
+}
+
+void zaccaria_state::flip_screen_x_w(int state)
+{
+	flip_screen_x_set(state);
+	update_colscroll();
+}
+
 
 void zaccaria_state::dsw_sel_w(uint8_t data)
 {
@@ -92,8 +412,6 @@ uint8_t zaccaria_state::dsw_r()
 	return m_dsw_port[m_dsw_sel]->read();
 }
 
-
-GAME_EXTERN(monymony);
 
 uint8_t zaccaria_state::prot1_r(offs_t offset)
 {
@@ -165,6 +483,13 @@ void zaccaria_state::main_map(address_map &map)
 	map(0x8000, 0xdfff).rom();
 }
 
+
+
+/***************************************************************************
+
+  Input ports
+
+***************************************************************************/
 
 static INPUT_PORTS_START( monymony )
 	PORT_START("DSW.0")
@@ -308,6 +633,13 @@ static INPUT_PORTS_START( jackrabt )
 INPUT_PORTS_END
 
 
+
+/***************************************************************************
+
+  GFX layouts
+
+***************************************************************************/
+
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -327,12 +659,12 @@ static GFXDECODE_START( gfx_zaccaria )
 GFXDECODE_END
 
 
-void zaccaria_state::vblank_irq(int state)
-{
-	if (state && m_nmi_mask)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
 
+/***************************************************************************
+
+  Machine config
+
+***************************************************************************/
 
 void zaccaria_state::zaccaria(machine_config &config)
 {
@@ -376,39 +708,39 @@ void zaccaria_state::zaccaria(machine_config &config)
 
 /***************************************************************************
 
-  Game driver(s)
+  ROM definitions
 
 ***************************************************************************/
 
 ROM_START( monymony )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cpu1.1a",           0x0000, 0x1000, CRC(13c227ca) SHA1(be305d112917904dd130b08f6b5186e3fbcb858a) )
+	ROM_LOAD( "cpu1.1a",      0x0000, 0x1000, CRC(13c227ca) SHA1(be305d112917904dd130b08f6b5186e3fbcb858a) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
-	ROM_LOAD( "cpu2.1b",           0x1000, 0x1000, CRC(87372545) SHA1(04618d007a93b3f6706f56b10bdf39727d7d748d) )
+	ROM_LOAD( "cpu2.1b",      0x1000, 0x1000, CRC(87372545) SHA1(04618d007a93b3f6706f56b10bdf39727d7d748d) )
 	ROM_CONTINUE(             0x9000, 0x1000 )
-	ROM_LOAD( "cpu3.1c",           0x2000, 0x1000, CRC(6aea9c01) SHA1(36a57f4dfae52d674dcf55d2b93dbacf734866b1) )
+	ROM_LOAD( "cpu3.1c",      0x2000, 0x1000, CRC(6aea9c01) SHA1(36a57f4dfae52d674dcf55d2b93dbacf734866b1) )
 	ROM_CONTINUE(             0xa000, 0x1000 )
-	ROM_LOAD( "cpu4.1d",           0x3000, 0x1000, CRC(5fdec451) SHA1(0f955c907e0a61a725a951018fdf5cc321139863) )
+	ROM_LOAD( "cpu4.1d",      0x3000, 0x1000, CRC(5fdec451) SHA1(0f955c907e0a61a725a951018fdf5cc321139863) )
 	ROM_CONTINUE(             0xb000, 0x1000 )
-	ROM_LOAD( "cpu5.2a",           0x4000, 0x1000, CRC(af830e3c) SHA1(bed57c341ae3500f147efe31bcf01f81466ec1c0) )
+	ROM_LOAD( "cpu5.2a",      0x4000, 0x1000, CRC(af830e3c) SHA1(bed57c341ae3500f147efe31bcf01f81466ec1c0) )
 	ROM_CONTINUE(             0xc000, 0x1000 )
-	ROM_LOAD( "cpu6.2c",           0x5000, 0x1000, CRC(31da62b1) SHA1(486f07087244f8537510afacb64ddd59eb512a4d) )
+	ROM_LOAD( "cpu6.2c",      0x5000, 0x1000, CRC(31da62b1) SHA1(486f07087244f8537510afacb64ddd59eb512a4d) )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
 	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) // 64k for first 6802
-	ROM_LOAD( "snd13.2g",          0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
-	ROM_LOAD( "snd9.1i",           0xc000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
+	ROM_LOAD( "snd13.2g",     0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
+	ROM_LOAD( "snd9.1i",      0xc000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
 
 	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) // 64k for second 6802
-	ROM_LOAD( "snd8.1h",           0x2000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
+	ROM_LOAD( "snd8.1h",      0x2000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
 	ROM_CONTINUE(             0x6000, 0x1000 )
-	ROM_LOAD( "snd7.1g",           0x3000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
+	ROM_LOAD( "snd7.1g",      0x3000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
 	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "bg1.2d",           0x0000, 0x2000, CRC(82ab4d1a) SHA1(5aaf42a508df236f2e7c844d377132d73053907b) )
-	ROM_LOAD( "bg2.1f",           0x2000, 0x2000, CRC(40d4e4d1) SHA1(79cbade30f1c9269e70ddb9c4332cfe1e8dc50a9) )
-	ROM_LOAD( "bg3.1e",           0x4000, 0x2000, CRC(36980455) SHA1(4140b0cd4137c8f209124b12d9c0eb3b04f91991) )
+	ROM_LOAD( "bg1.2d",       0x0000, 0x2000, CRC(82ab4d1a) SHA1(5aaf42a508df236f2e7c844d377132d73053907b) )
+	ROM_LOAD( "bg2.1f",       0x2000, 0x2000, CRC(40d4e4d1) SHA1(79cbade30f1c9269e70ddb9c4332cfe1e8dc50a9) )
+	ROM_LOAD( "bg3.1e",       0x4000, 0x2000, CRC(36980455) SHA1(4140b0cd4137c8f209124b12d9c0eb3b04f91991) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "9g",  0x0000, 0x0200, CRC(fc9a0f21) SHA1(2a93d684645ee1b70315386127223151582ab370) )
@@ -417,33 +749,33 @@ ROM_END
 
 ROM_START( monymony2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cpu1.1a",           0x0000, 0x1000, CRC(907225b2) SHA1(88955d21deee8364e391413c8e59361ca5f7e534) )
+	ROM_LOAD( "cpu1.1a",      0x0000, 0x1000, CRC(907225b2) SHA1(88955d21deee8364e391413c8e59361ca5f7e534) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
-	ROM_LOAD( "cpu2.1b",           0x1000, 0x1000, CRC(87372545) SHA1(04618d007a93b3f6706f56b10bdf39727d7d748d) )
+	ROM_LOAD( "cpu2.1b",      0x1000, 0x1000, CRC(87372545) SHA1(04618d007a93b3f6706f56b10bdf39727d7d748d) )
 	ROM_CONTINUE(             0x9000, 0x1000 )
-	ROM_LOAD( "cpu3.1c",           0x2000, 0x1000, CRC(3c874c16) SHA1(5607475638c3c313a8150aaa0e3b653226c2442a) )
+	ROM_LOAD( "cpu3.1c",      0x2000, 0x1000, CRC(3c874c16) SHA1(5607475638c3c313a8150aaa0e3b653226c2442a) )
 	ROM_CONTINUE(             0xa000, 0x1000 )
-	ROM_LOAD( "cpu4.1d",           0x3000, 0x1000, CRC(5fdec451) SHA1(0f955c907e0a61a725a951018fdf5cc321139863) )
+	ROM_LOAD( "cpu4.1d",      0x3000, 0x1000, CRC(5fdec451) SHA1(0f955c907e0a61a725a951018fdf5cc321139863) )
 	ROM_CONTINUE(             0xb000, 0x1000 )
-	ROM_LOAD( "cpu5.2a",           0x4000, 0x1000, CRC(af830e3c) SHA1(bed57c341ae3500f147efe31bcf01f81466ec1c0) )
+	ROM_LOAD( "cpu5.2a",      0x4000, 0x1000, CRC(af830e3c) SHA1(bed57c341ae3500f147efe31bcf01f81466ec1c0) )
 	ROM_CONTINUE(             0xc000, 0x1000 )
-	ROM_LOAD( "cpu6.2c",           0x5000, 0x1000, CRC(31da62b1) SHA1(486f07087244f8537510afacb64ddd59eb512a4d) )
+	ROM_LOAD( "cpu6.2c",      0x5000, 0x1000, CRC(31da62b1) SHA1(486f07087244f8537510afacb64ddd59eb512a4d) )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
 	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) // 64k for first 6802
-	ROM_LOAD( "snd13.2g",          0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
-	ROM_LOAD( "snd9.1i",           0xc000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
+	ROM_LOAD( "snd13.2g",     0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
+	ROM_LOAD( "snd9.1i",      0xc000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
 
 	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) // 64k for second 6802
-	ROM_LOAD( "snd8.1h",           0x2000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
+	ROM_LOAD( "snd8.1h",      0x2000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
 	ROM_CONTINUE(             0x6000, 0x1000 )
-	ROM_LOAD( "snd7.1g",           0x3000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
+	ROM_LOAD( "snd7.1g",      0x3000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
 	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "bg1.2d",           0x0000, 0x2000, CRC(82ab4d1a) SHA1(5aaf42a508df236f2e7c844d377132d73053907b) )
-	ROM_LOAD( "bg2.1f",           0x2000, 0x2000, CRC(40d4e4d1) SHA1(79cbade30f1c9269e70ddb9c4332cfe1e8dc50a9) )
-	ROM_LOAD( "bg3.1e",           0x4000, 0x2000, CRC(36980455) SHA1(4140b0cd4137c8f209124b12d9c0eb3b04f91991) )
+	ROM_LOAD( "bg1.2d",       0x0000, 0x2000, CRC(82ab4d1a) SHA1(5aaf42a508df236f2e7c844d377132d73053907b) )
+	ROM_LOAD( "bg2.1f",       0x2000, 0x2000, CRC(40d4e4d1) SHA1(79cbade30f1c9269e70ddb9c4332cfe1e8dc50a9) )
+	ROM_LOAD( "bg3.1e",       0x4000, 0x2000, CRC(36980455) SHA1(4140b0cd4137c8f209124b12d9c0eb3b04f91991) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "9g",  0x0000, 0x0200, CRC(fc9a0f21) SHA1(2a93d684645ee1b70315386127223151582ab370) )
@@ -465,16 +797,16 @@ ROM_START( jackrabt )
 	ROM_LOAD( "cpu-01.5h",    0xc000, 0x1000, CRC(785e1a01) SHA1(a748d300be9455cad4f912e01c2279bb8465edfe) )
 	ROM_LOAD( "cpu-01.6h",    0xd000, 0x1000, CRC(dd5979cf) SHA1(e9afe7002b2258a1c3132bdd951c6e20d473fb6a) )
 /* This set was also found with bigger program ROMs (but for the first which matches)
-    ROM_LOAD( "cpu-01-2.1b",   0x1000, 0x1000, CRC(1af79299) SHA1(8e68606a31aa7a7940ff90a7059f56ca7db0ac7c) )
-    ROM_CONTINUE(              0x9000, 0x1000)
-    ROM_LOAD( "cpu-01-3.1c",   0x2000, 0x1000, CRC(a02d5bc7) SHA1(1cb0ad29e7895b80053212bdf9aab9efe334326a) )
-    ROM_CONTINUE(              0xa000, 0x1000)
-    ROM_LOAD( "cpu-01-4.1d",   0x3000, 0x1000) CRC(8e7fbbb3) SHA1(3d57ddf6a47d5f28e4fd24002e948287803a2438) )
-    ROM_CONTINUE(              0xb000, 0x1000)
-    ROM_LOAD( "cpu-01-5.2a",   0x4000, 0x1000, CRC(2f3aa2a4) SHA1(4256894f178980abf187bb5424f9d738fcae2623) )
-    ROM_CONTINUE(              0xc000, 0x1000)
-    ROM_LOAD( "cpu-01-6.2c",   0x5000, 0x1000, CRC(c38228c0) SHA1(1ccc720b0d64b16c268a2bcfb8990f3c71b65913) )
-    ROM_CONTINUE(              0xd000, 0x1000)
+    ROM_LOAD( "cpu-01-2.1b",  0x1000, 0x1000, CRC(1af79299) SHA1(8e68606a31aa7a7940ff90a7059f56ca7db0ac7c) )
+    ROM_CONTINUE(             0x9000, 0x1000)
+    ROM_LOAD( "cpu-01-3.1c",  0x2000, 0x1000, CRC(a02d5bc7) SHA1(1cb0ad29e7895b80053212bdf9aab9efe334326a) )
+    ROM_CONTINUE(             0xa000, 0x1000)
+    ROM_LOAD( "cpu-01-4.1d",  0x3000, 0x1000) CRC(8e7fbbb3) SHA1(3d57ddf6a47d5f28e4fd24002e948287803a2438) )
+    ROM_CONTINUE(             0xb000, 0x1000)
+    ROM_LOAD( "cpu-01-5.2a",  0x4000, 0x1000, CRC(2f3aa2a4) SHA1(4256894f178980abf187bb5424f9d738fcae2623) )
+    ROM_CONTINUE(             0xc000, 0x1000)
+    ROM_LOAD( "cpu-01-6.2c",  0x5000, 0x1000, CRC(c38228c0) SHA1(1ccc720b0d64b16c268a2bcfb8990f3c71b65913) )
+    ROM_CONTINUE(             0xd000, 0x1000)
 */
 
 	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) // 64k for first 6802
@@ -577,7 +909,15 @@ ROM_START( jackrabts )
 	ROM_LOAD( "jr-ic9f",      0x0200, 0x0200, CRC(085914d1) SHA1(3d6f9318f5a9f08ce89e4184e3efb9881f671fa7) )
 ROM_END
 
+} // anonymous namespace
 
+
+
+/***************************************************************************
+
+  Game drivers
+
+***************************************************************************/
 
 GAME( 1983, monymony,  0,        zaccaria, monymony, zaccaria_state, empty_init, ROT90, "Zaccaria", "Money Money (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, monymony2, monymony, zaccaria, monymony, zaccaria_state, empty_init, ROT90, "Zaccaria", "Money Money (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

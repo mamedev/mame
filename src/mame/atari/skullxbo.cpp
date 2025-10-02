@@ -64,8 +64,6 @@ public:
 
 	void skullxbo(machine_config &config);
 
-	void init_skullxbo();
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
@@ -149,7 +147,6 @@ const atari_motion_objects_config skullxbo_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x000,              // base palette entry
-	0x200,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -328,61 +325,67 @@ uint32_t skullxbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
 
-					    --- O17 is an intermediate value
-					    O17=PFPIX3*PFPAL2S*PFPAL3S
+							    --- O17 is an intermediate value
+							    O17=PFPIX3*PFPAL2S*PFPAL3S
 
-					    --- CRAM.A10 controls the high bit of the palette select; used for shadows
-					    CRAM.A10=BA11*CRAMD
-					        +!CRAMD*!LBPRI0*!LBPRI1*!O17*(LBPIX==1)*(ANPIX==0)
-					        +!CRAMD*LBPRI0*!LBPRI1*(LBPIX==1)*(ANPIX==0)*!PFPAL3S
-					        +!CRAMD*LBPRI1*(LBPIX==1)*(ANPIX==0)*!PFPAL2S*!PFPAL3S
-					        +!CRAMD*!PFPIX3*(LBPIX==1)*(ANPIX==0)
+							    --- CRAM.A10 controls the high bit of the palette select; used for shadows
+							    CRAM.A10=BA11*CRAMD
+							        +!CRAMD*!LBPRI0*!LBPRI1*!O17*(LBPIX==1)*(ANPIX==0)
+							        +!CRAMD*LBPRI0*!LBPRI1*(LBPIX==1)*(ANPIX==0)*!PFPAL3S
+							        +!CRAMD*LBPRI1*(LBPIX==1)*(ANPIX==0)*!PFPAL2S*!PFPAL3S
+							        +!CRAMD*!PFPIX3*(LBPIX==1)*(ANPIX==0)
 
-					    --- SA and SB are the mux select lines:
-					    ---     0 = motion objects
-					    ---     1 = playfield
-					    ---     2 = alpha
-					    ---     3 = color RAM access from CPU
-					    !SA=!CRAMD*(ANPIX!=0)
-					        +!CRAMD*!LBPRI0*!LBPRI1*!O17*(LBPIX!=1)*(LBPIX!=0)
-					        +!CRAMD*LBPRI0*!LBPRI1*(LBPIX!=1)*(LBPIX!=0)*!PFPAL3S
-					        +!CRAMD*LBPRI1*(LBPIX!=1)*(LBPIX!=0)*!PFPAL2S*!PFPAL3S
-					        +!CRAMD*!PFPIX3*(LBPIX!=1)*(LBPIX!=0)
+							    --- SA and SB are the mux select lines:
+							    ---     0 = motion objects
+							    ---     1 = playfield
+							    ---     2 = alpha
+							    ---     3 = color RAM access from CPU
+							    !SA=!CRAMD*(ANPIX!=0)
+							        +!CRAMD*!LBPRI0*!LBPRI1*!O17*(LBPIX!=1)*(LBPIX!=0)
+							        +!CRAMD*LBPRI0*!LBPRI1*(LBPIX!=1)*(LBPIX!=0)*!PFPAL3S
+							        +!CRAMD*LBPRI1*(LBPIX!=1)*(LBPIX!=0)*!PFPAL2S*!PFPAL3S
+							        +!CRAMD*!PFPIX3*(LBPIX!=1)*(LBPIX!=0)
 
-					    !SB=!CRAMD*(ANPIX==0)
-					        +!CRAMD*LBMISC*(LBPIX!=0)
+							    !SB=!CRAMD*(ANPIX==0)
+							        +!CRAMD*LBMISC*(LBPIX!=0)
 
-					*/
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-					int const mopix = mo[x] & 0x1f;
-					int const pfcolor = (pf[x] >> 4) & 0x0f;
-					int const pfpix = pf[x] & 0x0f;
-					int const o17 = ((pf[x] & 0xc8) == 0xc8);
+							*/
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+							int const mopix = mo[x] & 0x1f;
+							int const pfcolor = (pf[x] >> 4) & 0x0f;
+							int const pfpix = pf[x] & 0x0f;
+							int const o17 = ((pf[x] & 0xc8) == 0xc8);
 
-					// implement the equations
-					if ((mopriority == 0 && !o17 && mopix >= 2) ||
-						(mopriority == 1 && mopix >= 2 && !(pfcolor & 0x08)) ||
-						((mopriority & 2) && mopix >= 2 && !(pfcolor & 0x0c)) ||
-						(!(pfpix & 8) && mopix >= 2))
-						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							// implement the equations
+							if ((mopriority == 0 && !o17 && mopix >= 2) ||
+								(mopriority == 1 && mopix >= 2 && !(pfcolor & 0x08)) ||
+								((mopriority & 2) && mopix >= 2 && !(pfcolor & 0x0c)) ||
+								(!(pfpix & 8) && mopix >= 2))
+								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 
-					if ((mopriority == 0 && !o17 && mopix == 1) ||
-						(mopriority == 1 && mopix == 1 && !(pfcolor & 0x08)) ||
-						((mopriority & 2) && mopix == 1 && !(pfcolor & 0x0c)) ||
-						(!(pfpix & 8) && mopix == 1))
-						pf[x] |= 0x400;
+							if ((mopriority == 0 && !o17 && mopix == 1) ||
+								(mopriority == 1 && mopix == 1 && !(pfcolor & 0x08)) ||
+								((mopriority & 2) && mopix == 1 && !(pfcolor & 0x0c)) ||
+								(!(pfpix & 8) && mopix == 1))
+								pf[x] |= 0x400;
+						}
+					}
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -522,8 +525,8 @@ static INPUT_PORTS_START( skullxbo )
 
 	PORT_START("FF5802")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank))
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")  // /AUDBUSY
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -546,12 +549,12 @@ INPUT_PORTS_END
 
 static const gfx_layout pflayout =
 {
-	16,8,
+	8,8,
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 1, 2, 3 },
-	{ RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+4, 0,0, 4,4,
-		RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+12,RGN_FRAC(1,2)+12, 8,8, 12,12 },
+	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0, 4,
+		RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+12, 8, 12 },
 	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
 	16*8
 };
@@ -559,11 +562,11 @@ static const gfx_layout pflayout =
 
 static const gfx_layout anlayout =
 {
-	16,8,
+	8,8,
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 1 },
-	{ 0,0, 2,2, 4,4, 6,6, 8,8, 10,10, 12,12, 14,14 },
+	{ 0, 2, 4, 6, 8, 10, 12, 14 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	8*16
 };
@@ -583,8 +586,8 @@ static const gfx_layout molayout =
 
 static GFXDECODE_START( gfx_skullxbo )
 	GFXDECODE_ENTRY( "sprites",   0, molayout, 0x000, 32 )
-	GFXDECODE_ENTRY( "playfield", 0, pflayout, 0x200, 16 )
-	GFXDECODE_ENTRY( "chars",     0, anlayout, 0x300, 16 )
+	GFXDECODE_SCALE( "playfield", 0, pflayout, 0x200, 16, 2, 1 )
+	GFXDECODE_SCALE( "chars",     0, anlayout, 0x300, 16, 2, 1 )
 GFXDECODE_END
 
 
@@ -612,7 +615,7 @@ void skullxbo_state::skullxbo(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 16, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(skullxbo_state::get_playfield_tile_info));
-	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 16, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(skullxbo_state::get_alpha_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 16, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(skullxbo_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, skullxbo_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
@@ -657,7 +660,7 @@ ROM_START( skullxbo )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136072-1149.1b",  0x00000, 0x10000, CRC(8d730e7a) SHA1(b89fb9cadcf813ea5cba55f1efcdcdd2517944c7) )
 
-	ROM_REGION( 0x190000, "sprites", 0 )
+	ROM_REGION( 0x190000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "136072-1102.13r",  0x000000, 0x010000, CRC(90becdfa) SHA1(aa5aaeda70e137518a9e58906daed66fa563b27e) )
 	ROM_LOAD( "136072-1104.28r",  0x010000, 0x010000, CRC(33609071) SHA1(6d9671a9edbdd28c1e360017253dab5dd858dbe7) )
 	ROM_LOAD( "136072-1106.41r",  0x020000, 0x010000, CRC(71962e9f) SHA1(4e6017ede5ce2fec7f6e25eadfc4070f3296ff2f) )
@@ -720,7 +723,7 @@ ROM_START( skullxbo4 )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136072-1149.1b",  0x00000, 0x10000, CRC(8d730e7a) SHA1(b89fb9cadcf813ea5cba55f1efcdcdd2517944c7) )
 
-	ROM_REGION( 0x190000, "sprites", 0 )
+	ROM_REGION( 0x190000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "136072-1102.13r",  0x000000, 0x010000, CRC(90becdfa) SHA1(aa5aaeda70e137518a9e58906daed66fa563b27e) )
 	ROM_LOAD( "136072-1104.28r",  0x010000, 0x010000, CRC(33609071) SHA1(6d9671a9edbdd28c1e360017253dab5dd858dbe7) )
 	ROM_LOAD( "136072-1106.41r",  0x020000, 0x010000, CRC(71962e9f) SHA1(4e6017ede5ce2fec7f6e25eadfc4070f3296ff2f) )
@@ -783,7 +786,7 @@ ROM_START( skullxbo3 )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136072-1149.1b",  0x00000, 0x10000, CRC(8d730e7a) SHA1(b89fb9cadcf813ea5cba55f1efcdcdd2517944c7) )
 
-	ROM_REGION( 0x190000, "sprites", 0 )
+	ROM_REGION( 0x190000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "136072-1102.13r",  0x000000, 0x010000, CRC(90becdfa) SHA1(aa5aaeda70e137518a9e58906daed66fa563b27e) )
 	ROM_LOAD( "136072-1104.28r",  0x010000, 0x010000, CRC(33609071) SHA1(6d9671a9edbdd28c1e360017253dab5dd858dbe7) )
 	ROM_LOAD( "136072-1106.41r",  0x020000, 0x010000, CRC(71962e9f) SHA1(4e6017ede5ce2fec7f6e25eadfc4070f3296ff2f) )
@@ -846,7 +849,7 @@ ROM_START( skullxbo2 )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136072-1149.1b",  0x00000, 0x10000, CRC(8d730e7a) SHA1(b89fb9cadcf813ea5cba55f1efcdcdd2517944c7) )
 
-	ROM_REGION( 0x190000, "sprites", 0 )
+	ROM_REGION( 0x190000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "136072-1102.13r",  0x000000, 0x010000, CRC(90becdfa) SHA1(aa5aaeda70e137518a9e58906daed66fa563b27e) )
 	ROM_LOAD( "136072-1104.28r",  0x010000, 0x010000, CRC(33609071) SHA1(6d9671a9edbdd28c1e360017253dab5dd858dbe7) )
 	ROM_LOAD( "136072-1106.41r",  0x020000, 0x010000, CRC(71962e9f) SHA1(4e6017ede5ce2fec7f6e25eadfc4070f3296ff2f) )
@@ -909,7 +912,7 @@ ROM_START( skullxbo1 )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136072-1149.1b",  0x00000, 0x10000, CRC(8d730e7a) SHA1(b89fb9cadcf813ea5cba55f1efcdcdd2517944c7) )
 
-	ROM_REGION( 0x190000, "sprites", 0 )
+	ROM_REGION( 0x190000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "136072-1102.13r",  0x000000, 0x010000, CRC(90becdfa) SHA1(aa5aaeda70e137518a9e58906daed66fa563b27e) )
 	ROM_LOAD( "136072-1104.28r",  0x010000, 0x010000, CRC(33609071) SHA1(6d9671a9edbdd28c1e360017253dab5dd858dbe7) )
 	ROM_LOAD( "136072-1106.41r",  0x020000, 0x010000, CRC(71962e9f) SHA1(4e6017ede5ce2fec7f6e25eadfc4070f3296ff2f) )
@@ -958,18 +961,6 @@ ROM_START( skullxbo1 )
 ROM_END
 
 
-
-/*************************************
- *
- *  ROM decoding
- *
- *************************************/
-
-void skullxbo_state::init_skullxbo()
-{
-	memset(memregion("sprites")->base() + 0x170000, 0, 0x20000);
-}
-
 } // anonymous namespace
 
 
@@ -979,8 +970,8 @@ void skullxbo_state::init_skullxbo()
  *
  *************************************/
 
-GAME( 1989, skullxbo,  0,        skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, skullxbo4, skullxbo, skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, skullxbo3, skullxbo, skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, skullxbo2, skullxbo, skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, skullxbo1, skullxbo, skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skullxbo,  0,        skullxbo, skullxbo, skullxbo_state, empty_init, ROT0, "Atari Games", "Skull & Crossbones (rev 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skullxbo4, skullxbo, skullxbo, skullxbo, skullxbo_state, empty_init, ROT0, "Atari Games", "Skull & Crossbones (rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skullxbo3, skullxbo, skullxbo, skullxbo, skullxbo_state, empty_init, ROT0, "Atari Games", "Skull & Crossbones (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skullxbo2, skullxbo, skullxbo, skullxbo, skullxbo_state, empty_init, ROT0, "Atari Games", "Skull & Crossbones (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skullxbo1, skullxbo, skullxbo, skullxbo, skullxbo_state, empty_init, ROT0, "Atari Games", "Skull & Crossbones (rev 1)", MACHINE_SUPPORTS_SAVE )

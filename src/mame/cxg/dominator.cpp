@@ -307,7 +307,12 @@ void dominator_state::commander(machine_config &config)
 
 ROM_START( sdtor )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("22p_2.05", 0x8000, 0x8000, CRC(9707119c) SHA1(d7cde835a37bd5d9ff349a871c890ea4cd9b2c26) )
+	ROM_LOAD("22p_2.05", 0x8000, 0x8000, CRC(9707119c) SHA1(d7cde835a37bd5d9ff349a871c890ea4cd9b2c26) ) // M27C256B
+ROM_END
+
+ROM_START( sdtora )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("1988_newcrest_239_2.04", 0x8000, 0x8000, CRC(f9548d92) SHA1(77340b32a33fc2a49c97d60774f395548b99294c) ) // TMS27C256-20JL
 ROM_END
 
 
@@ -323,7 +328,7 @@ ROM_END
 
 ROM_START( sgalaxyb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("230_1.03", 0x8000, 0x8000, CRC(30d81c4e) SHA1(ab3a9b58db26d87d3e66600b77c9435313b632f2) )
+	ROM_LOAD("1988_newcrest_230_1.03", 0x8000, 0x8000, CRC(30d81c4e) SHA1(ab3a9b58db26d87d3e66600b77c9435313b632f2) )
 ROM_END
 
 
@@ -342,6 +347,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1989, sdtor,    0,       0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, sdtora,   sdtor,   0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.04)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1988, sgalaxy,  0,       0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.03)", MACHINE_SUPPORTS_SAVE )
 SYST( 1988, sgalaxya, sgalaxy, 0,      galaxy,    galaxy,    dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Galaxy (v2.00)", MACHINE_SUPPORTS_SAVE )

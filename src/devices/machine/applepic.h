@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_DEVICES_MACHINE_APPLEPIC_H
-#define MAME_DEVICES_MACHINE_APPLEPIC_H
+#ifndef MAME_MACHINE_APPLEPIC_H
+#define MAME_MACHINE_APPLEPIC_H
 
 #pragma once
 
@@ -107,4 +107,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(APPLEPIC, applepic_device)
 
-#endif // MAME_DEVICES_MACHINE_APPLEPIC_H
+#endif // MAME_MACHINE_APPLEPIC_H

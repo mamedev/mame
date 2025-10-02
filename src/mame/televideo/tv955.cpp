@@ -9,7 +9,7 @@ Skeleton driver for "third generation" TeleVideo terminals (905, 955, 9220).
 #include "emu.h"
 #include "tv955kb.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/input_merger.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
@@ -146,7 +146,7 @@ INPUT_PORTS_END
 
 void tv955_state::tv955(machine_config &config)
 {
-	M65C02(config, m_maincpu, 19.3396_MHz_XTAL / 9);
+	W65C02(config, m_maincpu, 19.3396_MHz_XTAL / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tv955_state::mem_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);

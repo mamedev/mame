@@ -11,8 +11,8 @@
 
 Notes:
 
-- mjcamerb and mmcamera is the medal version of mjcamera, however the
-   two don't run on the same hardware. mjcamera is in nbmj8688.cpp.
+- mjcameram is the medal version of mjcamera.  mjcamerao is a version of the
+   game on different hardware in nbmj8688.cpp.
 
 - In mjfocus(Medal Type), sometimes CPU's hands are forced out from the screen.
   This is correct behaviour.
@@ -214,6 +214,26 @@ void nbmj8891_state::init_pairsten()
 		prot[i] = bitswap<8>(prot[i + 0x20000],5,6,0,4,3,7,1,2);
 	}
 }
+
+void nbmj8891_state::init_avmjyk()
+{
+	uint8_t *prot = memregion("protection")->base();
+	uint8_t *ram = memregion("maincpu")->base() + 0xf800;
+
+	/* need to clear RAM otherwise it doesn't boot... */
+	for (int i = 0; i < 0x800; i++) ram[i] = 0x00;
+
+	/* this is one possible way to rearrange the protection ROM data to get the
+	   expected 0x7362 checksum. It's probably completely wrong! But since the
+	   game doesn't do anything else with that ROM, this is more than enough. I
+	   could just fill this are with fake data, the only thing that matters is
+	   the checksum. */
+	for (int i = 0; i < 0x20000; i++)
+	{
+		prot[i] = bitswap<8>(prot[i + 0x20000],2,7,1,6,5,3,0,4);
+	}
+}
+
 
 void nbmj8891_state::gionbana_map(address_map &map)
 {
@@ -621,7 +641,7 @@ static INPUT_PORTS_START( hanamomo )
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mjcamerb )
+static INPUT_PORTS_START( mjcamera )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
@@ -687,7 +707,7 @@ static INPUT_PORTS_START( mjcamerb )
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mmcamera )
+static INPUT_PORTS_START( mjcameram )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -831,7 +851,7 @@ static INPUT_PORTS_START( gionbana )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1028,7 +1048,7 @@ static INPUT_PORTS_START( abunai )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1851,7 +1871,7 @@ static INPUT_PORTS_START( mmaiko )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )             PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2112,7 +2132,7 @@ static INPUT_PORTS_START( taiwanmb )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x30, 0x30, "Credit Max" )
 	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, "3000" )
@@ -2254,7 +2274,7 @@ void nbmj8891_state::abunai(machine_config &config)
 }
 
 /* NBMJDRV2 */
-void nbmj8891_state::mjcamerb(machine_config &config)
+void nbmj8891_state::mjcamera(machine_config &config)
 {
 	gionbana(config);
 
@@ -2270,7 +2290,7 @@ void nbmj8891_state::mjcamerb(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 }
 
-void nbmj8891_state::mmcamera(machine_config &config)
+void nbmj8891_state::mjcameram(machine_config &config)
 {
 	gionbana(config);
 
@@ -3119,6 +3139,53 @@ ROM_START( pairsten )
 	ROM_LOAD( "mask.f2", 0x00000, 0x40000, CRC(77ba1eaf) SHA1(bde55b4d2938f44fd07ff7d5b5a845f2ea64b4fc) )   // same as housemnq/5i.bin gfx data
 ROM_END
 
+ROM_START( avmjts ) // GH1701 PCB + VCR tape controller PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c.3h",    0x00000, 0x10000, CRC(c3265f26) SHA1(4361fc8e6fb9ff84b2a59441bc1784fd5d084b90) )
+
+	ROM_REGION( 0x20000, "voice", 0 )
+	ROM_LOAD( "b.2k",    0x00000, 0x10000, CRC(a57e449e) SHA1(11cfbcf28813253ad3c51867539195c86e7c51b4) )
+	// 2j not populated
+
+	ROM_REGION( 0xf0000, "gfx1", 0 )
+	ROM_LOAD( "d.8c",    0x00000, 0x10000, CRC(9e109649) SHA1(b0e47c1ca3ccd954813d355afe1ae6664e811e0a) )
+	ROM_LOAD( "e.8d",    0x10000, 0x10000, CRC(3b2b8d35) SHA1(8d5f20c1ebe1dc1773398046740b8f73049fb503) )
+	ROM_LOAD( "f.8e",    0x20000, 0x10000, CRC(0db818c3) SHA1(2e00a32d33c9713c8aa91ea66a1a181a511a71e3) )
+	ROM_LOAD( "g.8f",    0x30000, 0x10000, CRC(4e00c976) SHA1(72fa67bab145280e5a175b9e2b66795bbfbc41fa) )
+	ROM_LOAD( "h.8h",    0x40000, 0x10000, CRC(a2f63dd6) SHA1(7469a68917a0553489fe70abdb81f761384fa6e3) )
+	// 8k socketed but no ROM, everything else not populated
+
+	ROM_REGION( 0x40000, "protection", 0 )
+	ROM_LOAD( "mask.2f", 0x00000, 0x40000, CRC(2199e3e9) SHA1(965af4a29db4ff909dbeeebab1b828eb4f23f57e) )
+
+	DISK_REGION( "vhs" ) /* Video Home System tape */
+	DISK_IMAGE_READONLY( "avmjts", 0, NO_DUMP )
+ROM_END
+
+ROM_START( avmjyk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "13.3h",    0x00000, 0x10000, CRC(b8557fd1) SHA1(09f229f6f116149276769ec21091140b1acf04df) )
+
+	ROM_REGION( 0x20000, "voice", 0 )
+	ROM_LOAD( "12.2k",    0x00000, 0x10000, CRC(a57e449e) SHA1(11cfbcf28813253ad3c51867539195c86e7c51b4) )
+	// 2j not populated
+
+	ROM_REGION( 0xf0000, "gfx1", 0 )
+	ROM_LOAD( "14.8c",    0x00000, 0x10000, CRC(8d76f6fc) SHA1(d3fdd9ce16dda6ec5b476aa510e55cba9e10800c) )
+	ROM_LOAD( "15.8d",    0x10000, 0x10000, CRC(a0b7a063) SHA1(830ba4f025b5c5ea6360d0b06e254cdee7263550) )
+	ROM_LOAD( "16.8e",    0x20000, 0x10000, CRC(5796f351) SHA1(b1d3f0858d287eafa853a85df9f98d0a0e4ca7ff) )
+	ROM_LOAD( "17.8f",    0x30000, 0x10000, CRC(6980ec9e) SHA1(b42d1103cf157f250c5ed8e20b976045216762b4) )
+	ROM_LOAD( "18.8h",    0x40000, 0x10000, CRC(9f60fe0d) SHA1(d368b3dd91e79cb2274e01819aa72e42cb3ddda5) )
+	ROM_LOAD( "19.8k",    0x50000, 0x10000, CRC(509cc684) SHA1(5ec0327ddb5cc3e532effbfa1cd3f8550e532922) )
+	// everything else not populated
+
+	ROM_REGION( 0x40000, "protection", 0 )
+	ROM_LOAD( "mask.2f", 0x00000, 0x40000, CRC(2199e3e9) SHA1(965af4a29db4ff909dbeeebab1b828eb4f23f57e) )
+
+	DISK_REGION( "vhs" ) /* Video Home System tape */
+	DISK_IMAGE_READONLY( "avmjts", 0, NO_DUMP )
+ROM_END
+
 ROM_START( bananadr )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4h",   0x00000, 0x10000, CRC(a6344e0d) SHA1(ee8df28fb2f579d3eb10d8aa454c6289de4a9239) )
@@ -3339,7 +3406,7 @@ ROM_START( hanaojia )
 	ROM_LOAD( "hnoj_11.bin", 0x100000, 0x20000, CRC(bfe38671) SHA1(6c81864caab61ea60dfe446b390221bdcfb0895e) )
 ROM_END
 
-ROM_START( mjcamerb )
+ROM_START( mjcamera )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "2.3h",        0x00000, 0x10000, CRC(3a0f110b) SHA1(8923136ed25ed91c90f93c3f75f5532ff8f9d420) )
 
@@ -3369,7 +3436,7 @@ ROM_START( mjcamerb )
 	ROM_LOAD( "mcam_m1.bin", 0x00000, 0x40000, CRC(f85c5b07) SHA1(0fc55e9b60ccc630a0d77862eb5e64a3ba366947) )   // same as housemnq/3i.bin gfx data
 ROM_END
 
-ROM_START( mmcamera )
+ROM_START( mjcameram )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "2.3ha",  0x00000, 0x10000, CRC(b6eed2cf) SHA1(87171ba9ba247e54244867f720738f9b88a1213e) )
 
@@ -3537,8 +3604,8 @@ GAME( 1989, abunai,    0,        abunai,   abunai,   nbmj8891_state, empty_init,
 GAME( 1989, mjfocus,   0,        mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890313)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjfocusm,  mjfocus,  mjfocusm, mjfocusm, nbmj8891_state, init_mjfocusm, ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890510, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, peepshow,  mjfocus,  mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "AC", "Nozokimeguri Mahjong Peep Show (Japan 890404)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjcamerb,  0,        mjcamerb, mjcamerb, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (set 2) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (Japan 890509, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjcamera,  0,        mjcamera, mjcamera, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (Japan 881109, newer hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjcameram, mjcamera, mjcameram,mjcameram,nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (Japan 890509, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, scandal,   0,        scandal,  scandal,  nbmj8891_state, init_scandal,  ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890213)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, scandalm,  scandal,  scandalm, scandalm, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890217, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mgmen89,   0,        mgmen89,  mgmen89,  nbmj8891_state, init_mgmen89,  ROT0,   "Nichibutsu", "Mahjong G-MEN'89 (Japan 890425)", MACHINE_SUPPORTS_SAVE )
@@ -3550,6 +3617,8 @@ GAME( 1990, mladyhtr,  0,        mladyhtr, mladyhtr, nbmj8891_state, empty_init,
 GAME( 1990, chinmoku,  0,        chinmoku, chinmoku, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong Chinmoku no Hentai (Japan 900511)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, maiko,     0,        maiko,    maiko,    nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana (Japan 900802)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana (Japan 900911, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, avmjts,    0,        mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "Nichibutsu", "AV-Mahjong Two Shot (Japan Ver 1.00 1990/05/21)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, avmjyk,    0,        mjfocus,  mjfocus,  nbmj8891_state, init_avmjyk,   ROT0,   "Nichibutsu", "AV-Mahjong Yanchana Koneko (Japan Ver 1.01 1990/08/23)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hnxmasev,  0,        hnxmasev, maiko,    nbmj8891_state, empty_init,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Christmas Eve (Japan 901204)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hnageman,  0,        hnageman, maiko,    nbmj8891_state, empty_init,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Ageman (Japan 900716)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, club90s,   0,        club90s,  club90s,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", MACHINE_SUPPORTS_SAVE )

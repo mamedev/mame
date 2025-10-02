@@ -206,13 +206,14 @@ void clipper_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(m_pc);
-
 		if (m_wait)
 		{
+			debugger_wait_hook();
 			m_icount = 0;
 			continue;
 		}
+
+		debugger_instruction_hook(m_pc);
 
 		// fetch and decode an instruction
 		if (decode_instruction())

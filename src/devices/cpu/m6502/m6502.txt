@@ -86,11 +86,11 @@ several other CMOS variants
 additional commands
 
 atari lynx bastian schicks bll
-integrated m65sc02 cpu core
-no bbr bbs instructions, else m65c02 compatible
+integrated g65sc02 cpu core
+no bbr bbs instructions, else w65c02 compatible
 
 watara supervision
-integrated m65c02 cpu core (or m65sc02 or m65ce02?)
+integrated w65c02 cpu core (or g65sc02 or m65ce02?)
 
 
 gte65816 (nintendo snes)

@@ -94497,6 +94497,7 @@ void m68000_device::stop_i16u_if() // 4e72 ffff
 	m_au = m_au - 2;
 	m_icount -= 2;
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
+	debugger_wait_hook();
 	return;
 }
 

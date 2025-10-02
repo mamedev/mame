@@ -157,4 +157,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1992, mtd1256, 0, 0, mtd1256, mtd1256, mtd1256_state, empty_init, "Geonica", "Meteodata 1256", MACHINE_IS_SKELETON)
+SYST(1992, mtd1256, 0, 0, mtd1256, mtd1256, mtd1256_state, empty_init, "Geonica", "Meteodata 1256", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

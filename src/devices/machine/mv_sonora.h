@@ -6,8 +6,8 @@
     Supports 5 different modelines at up to 16bpp
 
 *********************************************************************/
-#ifndef MAME_MACHINE_MAC_VIDEO_SONORA_H
-#define MAME_MACHINE_MAC_VIDEO_SONORA_H
+#ifndef MAME_MACHINE_MV_SONORA_H
+#define MAME_MACHINE_MV_SONORA_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MAC_VIDEO_SONORA, mac_video_sonora_device)
 
-#endif  /* MAME_MACHINE_MAC_VIDEO_SONORA_H */
+#endif // MAME_MACHINE_MV_SONORA_H

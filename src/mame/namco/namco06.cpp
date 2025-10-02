@@ -229,7 +229,7 @@ void namco_06xx_device::set_nmi(int state)
 {
 	if (!m_nmicpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
-		m_nmicpu->set_input_line(INPUT_LINE_NMI, state);
+		m_nmicpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_ALTOS_ALTOS2_KEYBOARD_H
-#define MAME_ALTOS_ALTOS2_KEYBOARD_H
+#ifndef MAME_ALTOS_ALTOS2_KBD_H
+#define MAME_ALTOS_ALTOS2_KBD_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ private:
 // device type declarations
 DECLARE_DEVICE_TYPE(ALTOS2_KEYBOARD, altos2_keyboard_device)
 
-#endif // MAME_ALTOS_ALTOS2_KEYBOARD_H
+#endif // MAME_ALTOS_ALTOS2_KBD_H

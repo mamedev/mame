@@ -8,8 +8,6 @@
 
     Copyright Nicola Salmoria, Andreas Naive, and Charles MacDonald.
 
-    All rights reserved.
-
 ***************************************************************************/
 
 #ifndef MAME_SEGA_FD1094_H

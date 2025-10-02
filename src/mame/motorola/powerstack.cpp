@@ -44,4 +44,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1996, powerstk, 0, 0, powerstack, powerstack, powerstack_state, empty_init, "Motorola", "Powerstack II", MACHINE_IS_SKELETON )
+COMP( 1996, powerstk, 0, 0, powerstack, powerstack, powerstack_state, empty_init, "Motorola", "Powerstack II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

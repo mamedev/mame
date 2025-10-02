@@ -88,4 +88,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 2000, phusion, 0, 0, phusion, phusion, phusion_state, empty_init, "VTech", "Phusion", MACHINE_IS_SKELETON )
+SYST( 2000, phusion, 0, 0, phusion, phusion, phusion_state, empty_init, "VTech", "Phusion", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
