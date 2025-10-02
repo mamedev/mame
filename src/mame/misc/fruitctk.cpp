@@ -325,10 +325,6 @@ ROM_START( fruitctk )
     ROM_END
 
 
-
 } // anonymous namespace
-
-
-//   YEAR   NAME    PARENT   MACHINE      INPUT     STATE           INIT        ROT    COMPANY       FULLNAME                 FLAGS
-GAME( 2002?, fruitctk,   0,  fruitctk,     fruitctk, fruitctk_state, empty_init, ROT0,  "<unknown>", "Fruit Cocktail",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
+//    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
+GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
