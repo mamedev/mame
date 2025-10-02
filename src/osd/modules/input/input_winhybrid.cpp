@@ -218,7 +218,7 @@ private:
 			osd_printf_error("SetupDiGetClassDevs failed.\n");
 			return HRESULT_FROM_WIN32(GetLastError());
 		}
-		SP_DEVINFO_DATA devInfoData = {sizeof(SP_DEVINFO_DATA), 0, 0};
+		SP_DEVINFO_DATA devInfoData = {sizeof(SP_DEVINFO_DATA)};
 		DWORD devIndex = 0;
 		while (SetupDiEnumDeviceInfo(devInfoSet, devIndex, &devInfoData)) 
 		{
