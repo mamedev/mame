@@ -139,12 +139,6 @@ These are the formats supported by Floptool for conversion to other formats.
 
 	File extensions: dsk, do, po
 
-**A2_RWTS18**
-
-	Apple II RWTS18-type image
-
-	File extensions: rti
-
 **A2_EDD**
 
 	Apple II EDD image
