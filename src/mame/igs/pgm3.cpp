@@ -154,7 +154,7 @@ void pgm3_state::machine_reset()
 void pgm3_state::pgm3(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM9(config, m_maincpu, 800000000); // wrong, ARM1176JZ based SoC
+	ARM1176JZF_S(config, m_maincpu, 800000000); // SOC38 / IGS038 - ARM1176JZ based SoC
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm3_state::pgm3_map);
 
 	/* video hardware */
