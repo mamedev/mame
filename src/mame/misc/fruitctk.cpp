@@ -250,8 +250,8 @@ map(0x9002, 0x9003).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::a
 map(0xb000, 0xb001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 map(0xb004, 0xb004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 map(0xb008, 0xb00a).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
-map(0xb00b, 0xb00b).nopw(); // ?? Write = 80
-map(0xb00c, 0xb00c).nopw(); // Led
+// map(0xb00b, 0xb00b).nopw(); // ?? Write = 80
+// map(0xb00c, 0xb00c).nopw(); // Led
 map(0xb00d, 0xb00f).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
 }
 
@@ -315,5 +315,6 @@ ROM_START( fruitctk )
 } // anonymous namespace
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 
 
