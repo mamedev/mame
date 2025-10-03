@@ -4,6 +4,10 @@
 
     Skeleton driver for Elaut Megacrane
 
+	This is the control board for a crane game.
+	It plays music during gameplay and voice effects when inserting a coin or
+	when the game is over.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -100,6 +104,7 @@ void megacrane_state::megacrane(machine_config &config)
 	MC68HC11E1(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megacrane_state::mem_map);
 	m_maincpu->in_pa_callback().set_ioport("IN1");
+	m_maincpu->in_pd_callback().set_ioport("IN2");
 	m_maincpu->in_pe_callback().set_ioport("SW1");
 
 	GENERIC_SPI_FLASH(config, m_spi, 0);
