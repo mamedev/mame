@@ -33,8 +33,6 @@ counters in-out must be NC (0, LOW)
 coin acceptor NC 0 LOW
 hopper sensor NC 0 LOW 
 
-
-
 Hardware info: (Wip)
 
 Board:
@@ -61,7 +59,6 @@ Todo:
 Led Controller
 Layout.
 
-Still Looping F1 During reset
 if press to insert coin will to error 02 or error 30 
 
 debug:
@@ -171,10 +168,9 @@ static INPUT_PORTS_START( fruitctk )
     PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // will cause error 02 During reset
-
-    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("P1.6") 
-    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("P1.7")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // is from hopper? will cause error 02 During reset nvram
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
 
 
 
@@ -206,17 +202,8 @@ INPUT_PORTS_END
 void fruitctk_state::p1_w(uint8_t data)
 {
 
-	m_hopper->motor_w(BIT(data, 3)); // ?? from guessed
-	machine().bookkeeping().coin_counter_w(7, data & 0x80);  
-	machine().bookkeeping().coin_counter_w(6, data & 0x40); 
-	machine().bookkeeping().coin_counter_w(5, data & 0x20);
-	machine().bookkeeping().coin_counter_w(4, data & 0x10); 
-	machine().bookkeeping().coin_counter_w(3, data & 0x08);  
-	machine().bookkeeping().coin_counter_w(2, data & 0x04);  // unused?
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);  // unused?
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // unused? 
-
-  logerror("P1.0 Write to %02x\n", data);
+	m_hopper->motor_w(BIT(data, 3)); // ?? from guessed. Wrong
+    logerror("P1.0 Write to %02x\n", data);
 
 	
 }
@@ -244,7 +231,7 @@ uint8_t fruitctk_state::keyboard_r()
 
 void fruitctk_state::display_7seg_data_w(uint8_t data)
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver) // Code was from marywu
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // Code was from marywu to decode 7 segment display.
 
 	m_digits[2 * m_selected_7seg_module + 0] = patterns[data & 0x0f];
 	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
@@ -264,7 +251,7 @@ map(0xb000, 0xb001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::wri
 map(0xb004, 0xb004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 map(0xb008, 0xb00a).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 map(0xb00b, 0xb00b).nopw(); // ??
-map(0xb00c, 0xb00c).nopw(); // Led Board
+map(0xb00c, 0xb00c).nopw(); // Led
 map(0xb00d, 0xb00f).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
 }
 
@@ -328,3 +315,4 @@ ROM_START( fruitctk )
 } // anonymous namespace
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
