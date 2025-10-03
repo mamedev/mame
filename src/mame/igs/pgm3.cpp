@@ -44,7 +44,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-#include "aes256cbc/AES_256_CBC.h"
+#include "util/aes256cbc.h"
 
 namespace {
 
