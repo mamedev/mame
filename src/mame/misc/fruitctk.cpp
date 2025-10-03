@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:flama12333
 /*************************************************************************
-Driver For fruit cocktail - Roulette gambling board
+Driver For fruit cocktail - Roulette gambling board MC51 Based
 
 Notes: (Wip)
 K0+K1 = RESET
@@ -78,8 +78,8 @@ pc = 424 - bypass error 02 error.
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "speaker.h"
-#include "marywu.lh"
 
+#include "marywu.lh"
 
 namespace {
 
@@ -90,7 +90,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
-		, m_inputs(*this, { "Inputs1", "Inputs2", "Inputs3", "Inputs4" })
+		, m_inputs(*this, { "INPUTS1", "INPUTS2", "INPUTS3", "INPUTS4" })
 		, m_hopper(*this, "hopper")
 		, m_oki(*this, "oki")
 
@@ -107,9 +107,7 @@ private:
 	void multiplex_7seg_w(uint8_t data);
 	void io_map(address_map &map);
 	void program_map(address_map &map);
-
-
-	uint8_t keyboard_r();
+    uint8_t keyboard_r();
 	uint8_t m_selected_7seg_module = 0;
     output_finder<32> m_digits;
 	output_finder<30> m_leds;
@@ -119,10 +117,9 @@ private:
 
 };
 
-
 static INPUT_PORTS_START( fruitctk )
 
-	PORT_START("Inputs1")
+	PORT_START("INPUTS1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_Q) PORT_NAME("Bet 8")  
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 7")  
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 6")  
@@ -133,7 +130,7 @@ static INPUT_PORTS_START( fruitctk )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_I) PORT_NAME("Bet 1")
 
 
-	PORT_START("Inputs2")
+	PORT_START("INPUTS2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_GAMBLE_DEAL ) PORT_CODE(KEYCODE_O) PORT_NAME("Start")     
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_LOW  ) PORT_CODE(KEYCODE_P) // D-UP Low?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_HIGH ) PORT_CODE(KEYCODE_A) // D-UP High?
@@ -143,7 +140,7 @@ static INPUT_PORTS_START( fruitctk )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_G) // Payout?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CODE(KEYCODE_H)// Coin. will cause error 30
 
-	PORT_START("Inputs3")
+	PORT_START("INPUTS3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_J)  
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_K)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_L)
@@ -153,7 +150,7 @@ static INPUT_PORTS_START( fruitctk )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_B)
 
-	PORT_START("Inputs4")
+	PORT_START("INPUTS4")
     PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED  )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED  )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED  ) 
@@ -173,9 +170,7 @@ static INPUT_PORTS_START( fruitctk )
     PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
     PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
 
-
-
-PORT_START("DSW1")
+    PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
@@ -185,16 +180,13 @@ PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 
-
-PORT_START("DSW2")
+    PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
+
 INPUT_PORTS_END
-
-
-
 
 void fruitctk_state::p1_w(uint8_t data)
 {
@@ -204,8 +196,6 @@ void fruitctk_state::p1_w(uint8_t data)
 
 	
 }
-
-
 
 void fruitctk_state::multiplex_7seg_w(uint8_t data)
 {
@@ -241,15 +231,15 @@ void fruitctk_state::program_map(address_map &map)
 
 void fruitctk_state::io_map(address_map &map)
 {
-map(0x8000, 0x87ff).ram().share("nvram");
-map(0xc000, 0xc001).w("opll", FUNC(ym2413_device::write));
-map(0x9002, 0x9003).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-map(0xb000, 0xb001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-map(0xb004, 0xb004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-map(0xb008, 0xb00a).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
-// map(0xb00b, 0xb00b).nopw(); // ?? Write = 80
-// map(0xb00c, 0xb00c).nopw(); // Led
-map(0xb00d, 0xb00f).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
+    map(0x8000, 0x87ff).ram().share("nvram");
+    map(0xc000, 0xc001).w("opll", FUNC(ym2413_device::write));
+    map(0x9002, 0x9003).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+    map(0xb000, 0xb001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+    map(0xb004, 0xb004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+    map(0xb008, 0xb00a).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
+    map(0xb00b, 0xb00b).unmapw(); // ?? Write = 80
+    map(0xb00c, 0xb00c).unmapw(); // Led
+    map(0xb00d, 0xb00f).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
 }
 
 void fruitctk_state::machine_start()
@@ -312,5 +302,3 @@ ROM_END
 
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
-
