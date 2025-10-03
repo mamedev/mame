@@ -93,7 +93,6 @@ public:
 		, m_inputs(*this, { "INPUTS1", "INPUTS2", "INPUTS3", "INPUTS4" })
 		, m_hopper(*this, "hopper")
 		, m_oki(*this, "oki")
-
 	{ }
 
 	void fruitctk(machine_config &config);
