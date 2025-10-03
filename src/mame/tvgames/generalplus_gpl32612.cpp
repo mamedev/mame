@@ -525,7 +525,10 @@ CONS( 2019, sumikpc,            0,        0,      gpl32612, gpl32612, generalplu
 CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",          "Disney & Disney/Pixar Characters Dekita! ga Ippai Dream Toy Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32610
-CONS( 201?, rotom2,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "<unknown>",          "Rotom Tablet (different) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, rotom2,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Rotom Tablet (different) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32611
-CONS( 201?, neopad,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Neo Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// 小学館の図鑑 NEO Pad - 生きもの編 (this is the standard green version)
+CONS( 201?, neopad,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Shogakukan no Zukan NEO Pad - Ikimono-hen (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// a blue version exists with the subtitle Norimono + Kuraberu-hen (乗りもの＋くらべる編).
+// another green version with 'DX' on the end of the title also exists
