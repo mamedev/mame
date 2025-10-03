@@ -76,6 +76,8 @@ private:
 
 void pgm3_state::decryptaes(const uint8_t *key, const uint8_t *iv, int source, int dest, int length)
 {
+	using namespace aes256cbc;
+
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
 	AES_CTX ctx;
 	uint8_t inbuffer[16];
