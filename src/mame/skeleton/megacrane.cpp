@@ -10,6 +10,7 @@
 #include "speaker.h"
 
 #include "cpu/mc68hc11/mc68hc11.h"
+#include "machine/generic_spi_flash.h"
 #include "sound/ay8910.h"
 
 namespace {
@@ -20,6 +21,8 @@ public:
 	megacrane_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_spi(*this, "nvram")
+		, m_ymz(*this, "ymz")
 	{
 	}
 
@@ -29,6 +32,8 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<mc68hc11_cpu_device> m_maincpu;
+	required_device<generic_spi_flash_device> m_spi;
+	required_device<ymz284_device> m_ymz;
 };
 
 
@@ -36,8 +41,8 @@ void megacrane_state::mem_map(address_map &map)
 {
 	map(0x8000, 0xffff).rom().region("program", 0x8000);
 
-	map(0x8000, 0x8000).w("ymz", FUNC(ay8910_device::address_w));
-	map(0x8001, 0x8001).w("ymz", FUNC(ay8910_device::data_w));
+	map(0x8000, 0x8000).w(m_ymz, FUNC(ymz284_device::address_w));
+	map(0x8001, 0x8001).w(m_ymz, FUNC(ymz284_device::data_w));
 }
 
 
@@ -97,6 +102,8 @@ void megacrane_state::megacrane(machine_config &config)
 	m_maincpu->in_pa_callback().set_ioport("IN1");
 	m_maincpu->in_pe_callback().set_ioport("SW1");
 
+	GENERIC_SPI_FLASH(config, m_spi, 0);
+
 	SPEAKER(config, "mono").front_center();
 
 	YMZ284(config, "ymz", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -107,7 +114,9 @@ ROM_START(megacrane)
     ROM_REGION(0x10000, "program", 0)
 	ROM_LOAD("elaut_2001_eu_mg_i_02.39.07.u5", 0x0000, 0x10000, CRC(feb5cfa1) SHA1(3c091543c0419ea15a5d66d2b9602668e7c35b10))
 	ROM_REGION(0x2000, "voice", 0)
-	ROM_LOAD("elaut_2001_sound_megacrane.u5", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("elaut_2001_sound_megacrane.u5", 0x0000, 0x2000, NO_DUMP) //ISD1420P
+	ROM_REGION(0x200, "nvram", 0)
+	ROM_LOAD("fm25040.u4", 0x0000, 0x200, CRC(b77297fe) SHA1(c404f7a254395412d8ee3a7090a2d67848923409))
 ROM_END
 
 } // anonymous namespace
