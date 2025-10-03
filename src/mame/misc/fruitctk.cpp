@@ -79,7 +79,7 @@ pc = 424 - bypass error 02 error.
 #include "sound/ymopl.h"
 #include "speaker.h"
 
-#include "marywu.lh"
+// #include "marywu.lh"
 
 namespace {
 
@@ -270,7 +270,7 @@ void fruitctk_state::fruitctk(machine_config &config)
 	I8255A(config, "ppi2");
 	
 	/* Video */
-    config.set_default_layout(layout_marywu);
+//  config.set_default_layout(layout_marywu);
 	
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -299,3 +299,4 @@ ROM_END
 
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
