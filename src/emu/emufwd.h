@@ -61,6 +61,7 @@ class configuration_manager;
 class crosshair_manager;
 
 // declared in debug/debugcmd.h
+class described_symbol_table;
 class debugger_commands;
 
 // declared in debug/debugcon.h
