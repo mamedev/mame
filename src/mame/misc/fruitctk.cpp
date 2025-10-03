@@ -308,13 +308,9 @@ ROM_START( fruitctk )
 
     ROM_REGION( 0x40000, "oki", 0 )
     ROM_LOAD( "w27c02.bin", 0x00000, 0x40000, CRC(A8217121) SHA1(a35004f00632b552b587dfa12c1698abada5e300) ) //  Voices Rom
-
     ROM_END
 
 
 } // anonymous namespace
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
-
-
