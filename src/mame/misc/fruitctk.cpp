@@ -260,18 +260,15 @@ void fruitctk_state::machine_start()
 
 void fruitctk_state::fruitctk(machine_config &config)
 {
-	/* Video */
-    config.set_default_layout(layout_marywu);
-	
+
 	/* basic machine hardware */
 	i8051_device &maincpu(I8051(config, "maincpu", XTAL(12'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &fruitctk_state::program_map);
 	maincpu.set_addrmap(AS_IO, &fruitctk_state::io_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
 	maincpu.port_out_cb<1>().set(FUNC(fruitctk_state::p1_w));
-
+   
 	HOPPER(config, m_hopper, attotime::from_msec(10));
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Keyboard & display interface */
@@ -281,10 +278,13 @@ void fruitctk_state::fruitctk(machine_config &config)
 	kbdc.out_disp_callback().set(FUNC(fruitctk_state::display_7seg_data_w));
   
     I8255A(config, "ppi1");
-  	I8255A(config, "ppi2");
+  
+	I8255A(config, "ppi2");
 	
-
-    /* sound hardware */
+	/* Video */
+    config.set_default_layout(layout_marywu);
+	
+	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(12'000'000) / 6)); // divisor not verified
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -302,10 +302,9 @@ ROM_START( fruitctk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w27c512.bin", 0x0000, 0x10000, CRC(2A1B63C1) SHA1(631a95c684db961283f45b4bfe67fa58d79b2191) )
 
-
     ROM_REGION( 0x40000, "oki", 0 )
-    ROM_LOAD( "w27c02.bin", 0x00000, 0x40000, CRC(A8217121) SHA1(a35004f00632b552b587dfa12c1698abada5e300) ) //  Voices Rom
-    ROM_END
+    ROM_LOAD( "w27c02.bin", 0x00000, 0x40000, CRC(A8217121) SHA1(a35004f00632b552b587dfa12c1698abada5e300) ) // only contains music
+ROM_END
 
 
 } // anonymous namespace
@@ -313,4 +312,5 @@ ROM_START( fruitctk )
 
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 
