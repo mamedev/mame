@@ -56,6 +56,7 @@ X2 M82C55A-2
 new8279
 
 Todo:
+Dip switch
 Led Controller
 Layout.
 
@@ -312,3 +313,4 @@ ROM_START( fruitctk )
 
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
