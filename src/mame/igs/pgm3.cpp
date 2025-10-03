@@ -69,12 +69,12 @@ private:
 	void screen_vblank_pgm3(int state);
 	required_device<cpu_device> m_maincpu;
 	void pgm3_map(address_map &map) ATTR_COLD;
-	void decryptaes(const uint8_t *key, const uint8_t *iv, int length);
+	void decryptaes(const uint8_t *key, const uint8_t *iv, int source, int dest, int length);
 
 	required_shared_ptr<u32> m_mainram;
 };
 
-void pgm3_state::decryptaes(const uint8_t* key, const uint8_t* iv, int length)
+void pgm3_state::decryptaes(const uint8_t *key, const uint8_t *iv, int source, int dest, int length)
 {
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
 	AES_CTX ctx;
@@ -87,16 +87,17 @@ void pgm3_state::decryptaes(const uint8_t* key, const uint8_t* iv, int length)
 	{
 		for (int j = 0; j < 16; j++)
 		{
-			inbuffer[j] = mem.read_byte(0x10000000 + i + j);
+			inbuffer[j] = mem.read_byte(source + i + j);
 		}
 
 		AES_Decrypt(&ctx, inbuffer, outbufer);
 
 		for (int j = 0; j < 16; j++)
 		{
-			mem.write_byte(i + j, outbufer[j]);
+			mem.write_byte(dest + i + j, outbufer[j]);
 		}
 	}
+
 	AES_CTX_Free(&ctx);
 }
 
@@ -133,24 +134,18 @@ void pgm3_state::machine_reset()
 {
 	// perform a bootstrap to bypass the level 0 internal_mask as it might not be properly dumped
 	uint8_t* bootrom = memregion("internal_mask")->base();
-
 	uint8_t rom_aes_key[32];
 	uint8_t rom_aes_iv[16];
 
 	for (int i = 0; i < 32; i++)
-	{
-		uint8_t keybyte = bootrom[0x42b8 + i];
-		rom_aes_key[i] = keybyte;
-	}
+		rom_aes_key[i] = bootrom[0x42b8 + i];
 
 	for (int i = 0; i < 16; i++)
-	{
 		rom_aes_iv[i] = bootrom[0x44a8 + i];
-	}
 
 	// the first 0x20000 bytes are encrypted with this key, it then uses other keys to decrypt the rest
 	// the decryption is done in hardware, not software
-    decryptaes(rom_aes_key, rom_aes_iv, 0x20000);
+    decryptaes(rom_aes_key, rom_aes_iv, 0x10000000, 0x00000000, 0x20000);
 
 	// if we want to boot from somewhere else, change this
 	//m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x04000000);
