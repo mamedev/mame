@@ -30891,6 +30891,9 @@ freewaya
 @source:misc/fresh.cpp
 fresh
 
+@source:misc/fruitctk.cpp
+fruitctk
+
 @source:misc/funeball.cpp
 funeball
 
