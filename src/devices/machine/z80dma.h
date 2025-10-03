@@ -106,8 +106,8 @@ protected:
 	virtual int is_ready();
 	void interrupt_check();
 	void trigger_interrupt(int level);
-	void do_read();
-	virtual void do_write();
+	virtual void do_read();
+	void do_write();
 	void do_transfer_write();
 	void do_search();
 
