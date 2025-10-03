@@ -469,8 +469,8 @@ private:
 
 		void *              stacksave;              // saved stack pointer
 
-		uint8_t             flagsmap[0x1000];       // flags map
-		uint64_t            flagsunmap[0x20];       // flags unmapper
+		uint8_t             flagsmap[0x100];        // flags map
+		uint32_t            flagsunmap[0x20];       // flags unmapper
 	};
 
 	// resolved memory handler functions
@@ -1047,17 +1047,17 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		if (entry & 0x004) flags |= FLAG_U;
 		if (entry & 0x040) flags |= FLAG_Z;
 		if (entry & 0x080) flags |= FLAG_S;
-		if (entry & 0x800) flags |= FLAG_V;
+		// can't get FLAG_V from lahf
 		m_near.flagsmap[entry] = flags;
 	}
 	for (int entry = 0; entry < std::size(m_near.flagsunmap); entry++)
 	{
-		uint64_t flags = 0;
-		if (entry & FLAG_C) flags |= 0x001;
-		if (entry & FLAG_U) flags |= 0x004;
-		if (entry & FLAG_Z) flags |= 0x040;
-		if (entry & FLAG_S) flags |= 0x080;
-		if (entry & FLAG_V) flags |= 0x800;
+		uint32_t flags = 0;
+		if (entry & FLAG_C) flags |= 0x001 << 8;
+		if (entry & FLAG_U) flags |= 0x004 << 8;
+		if (entry & FLAG_Z) flags |= 0x040 << 8;
+		if (entry & FLAG_S) flags |= 0x080 << 8;
+		// can't set V -> O with sahf
 		m_near.flagsunmap[entry] = flags;
 	}
 
@@ -2527,27 +2527,31 @@ void drcbe_x64::op_setflgs(Assembler &a, const instruction &inst)
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
-	a.pushfq();
-	a.and_(qword_ptr(rsp), ~0x8c5);
-
 	if (srcp.is_immediate())
 	{
-		uint64_t const flags = m_near.flagsunmap[srcp.immediate() & FLAGS_ALL];
+		uint32_t const flags = m_near.flagsunmap[srcp.immediate() & FLAGS_ALL];
 		if (!flags)
-			a.xor_(rax, rax);
+			a.xor_(eax, eax);
 		else
-			a.mov(rax, flags);
+			a.mov(eax, flags);
+
+		if (srcp.immediate() & FLAG_V)
+			a.mov(ecx, 1);
+		else
+			a.xor_(ecx, ecx);
 	}
 	else
 	{
-		mov_reg_param(a, rax, srcp);
-		a.and_(rax, FLAGS_ALL);
+		mov_reg_param(a, eax, srcp);
+		a.mov(ecx, FLAG_V);
+		a.and_(ecx, eax);
+		a.and_(eax, FLAGS_ALL);
 
-		a.mov(rax, ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));
+		a.mov(eax, ptr(rbp, rax, 2, offset_from_rbp(&m_near.flagsunmap[0])));
 	}
-	a.or_(qword_ptr(rsp), rax);
 
-	a.popfq();
+	a.add(cl, 0x7f);
+	a.sahf();
 }
 
 
@@ -2566,20 +2570,25 @@ void drcbe_x64::op_save(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state to the destination
-	mov_r64_imm(a, rcx, (uintptr_t)dstp.memory());                                      // mov    rcx,dstp
+	mov_r64_imm(a, rcx, (uintptr_t)dstp.memory());
 
 	// copy flags
-	a.pushfq();                                                                         // pushf
-	a.pop(rax);                                                                         // pop    rax
-	a.and_(eax, 0x8c5);                                                                 // and    eax,0x8c5
-	a.mov(al, ptr(rbp, rax, 0, offset_from_rbp(&m_near.flagsmap[0])));                  // mov    al,[flags_map]
-	a.mov(ptr(rcx, offsetof(drcuml_machine_state, flags)), al);                         // mov    state->flags,al
+	a.lahf();
+	a.seto(dl);
+	a.shr(eax, 8);
+	a.movzx(edx, dl);
+	a.and_(eax, 0x0c5);
+	a.movzx(eax, byte_ptr(rbp, rax, 0, offset_from_rbp(&m_near.flagsmap[0])));
+	a.lea(rax, ptr(rax, rdx, 1));
+	a.mov(ptr(rcx, offsetof(drcuml_machine_state, flags)), al);
 
 	// copy fmod and exp
-	a.mov(al, MABS(&m_state.fmod));                                                     // mov    al,[fmod]
-	a.mov(ptr(rcx, offsetof(drcuml_machine_state, fmod)), al);                          // mov    state->fmod,al
-	a.mov(eax, MABS(&m_state.exp));                                                     // mov    eax,[exp]
-	a.mov(ptr(rcx, offsetof(drcuml_machine_state, exp)), eax);                          // mov    state->exp,eax
+	Mem fmod = MABS(&m_state.fmod);
+	fmod.setSize(1);
+	a.movzx(eax, fmod);
+	a.mov(ptr(rcx, offsetof(drcuml_machine_state, fmod)), al);
+	a.mov(eax, MABS(&m_state.exp));
+	a.mov(ptr(rcx, offsetof(drcuml_machine_state, exp)), eax);
 
 	// copy integer registers
 	int regoffs = offsetof(drcuml_machine_state, r);
@@ -2627,7 +2636,7 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state from the destination
-	mov_r64_imm(a, rcx, (uintptr_t)srcp.memory());                                      // mov    rcx,dstp
+	mov_r64_imm(a, rcx, (uintptr_t)srcp.memory());
 
 	// copy integer registers
 	int regoffs = offsetof(drcuml_machine_state, r);
@@ -2667,13 +2676,13 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	a.mov(MABS(&m_state.exp), eax);
 
 	// copy flags
-	a.pushfq();
-	a.and_(qword_ptr(rsp), ~0x8c5);
 	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, flags)));
+	a.mov(ecx, FLAG_V); // don't need pointer to src any more
+	a.and_(ecx, eax);
 	a.and_(eax, FLAGS_ALL);
-	a.mov(rax, ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));
-	a.or_(qword_ptr(rsp), rax);
-	a.popfq();
+	a.mov(eax, ptr(rbp, rax, 2, offset_from_rbp(&m_near.flagsunmap[0])));
+	a.add(cl, 0x7f);
+	a.sahf();
 }
 
 
