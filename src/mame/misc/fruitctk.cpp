@@ -278,7 +278,7 @@ void fruitctk_state::fruitctk(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Keyboard & display interface */
-    i8279_device &kbdc(I8279(config, "i8279", XTAL(12'000'000) / 6));
+    i8279_device &kbdc(I8279(config, "i8279", XTAL(12'000'000) / 6)); // divisor not verified
 	kbdc.out_sl_callback().set(FUNC(fruitctk_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(fruitctk_state::keyboard_r));          // keyboard Return Lines
 	kbdc.out_disp_callback().set(FUNC(fruitctk_state::display_7seg_data_w));
@@ -289,7 +289,7 @@ void fruitctk_state::fruitctk(machine_config &config)
 
     /* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(12'000'000) / 6));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(12'000'000) / 6)); // divisor not verified
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
 	ay1.port_a_read_callback().set_ioport("DSW1");
 	ay1.port_b_read_callback().set_ioport("DSW2");
@@ -314,3 +314,4 @@ ROM_START( fruitctk )
 } // anonymous namespace
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
