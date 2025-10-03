@@ -46,9 +46,7 @@
 
 #include "aes256cbc/AES_256_CBC.h"
 
-//namespace {
-
-
+namespace {
 
 class pgm3_state : public driver_device
 {
@@ -231,7 +229,7 @@ void pgm3_state::init_kov3hd()
 {
 }
 
-//} // anonymous namespace
+} // anonymous namespace
 
 
 // all dumped sets might be China region, unless region info comes from elsewhere
