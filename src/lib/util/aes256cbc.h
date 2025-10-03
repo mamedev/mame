@@ -10,8 +10,6 @@
 #ifndef MAME_LIB_UTIL_AES256CBC_H
 #define MAME_LIB_UTIL_AES256CBC_H
 
-// not ideal to duplicate these here, but if we want to avoid modifying AES_256_CBC.h seems neccessary?
-
 #define AES_BLOCK_SIZE 16
 
 typedef struct {
