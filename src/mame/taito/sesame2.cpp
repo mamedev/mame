@@ -1,12 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:stonedDiscord
 /***************************************************************************
 
-    
 Sesame 2
 
 K11J
-
 
 Main CPU: Renesas HD6412394TE20 H8S/2394 (ROMless microcontroller @ 20MHz)
    Sound: OKI MSM9810B 8-channel ADPCM audio
@@ -27,15 +25,15 @@ Main CPU: Renesas HD6412394TE20 H8S/2394 (ROMless microcontroller @ 20MHz)
 
 namespace {
 
-class sesame_state : public driver_device
+class sesame2_state : public driver_device
 {
 public:
-	sesame_state(const machine_config &mconfig, device_type type, const char *tag) :
+	sesame2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void sesame(machine_config &config);
+	void sesame2(machine_config &config);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -57,45 +55,45 @@ private:
 
 
 
-uint8_t sesame_state::port3_r()
+uint8_t sesame2_state::port3_r()
 {
 	return 0;
 }
 
-void sesame_state::port3_w(uint8_t data)
+void sesame2_state::port3_w(uint8_t data)
 {
 
 }
 
-uint8_t sesame_state::port5_r()
-{
-	return 0;
-}
-
-void sesame_state::port5_w(uint8_t data)
-{
-}
-
-uint8_t sesame_state::port6_r()
+uint8_t sesame2_state::port5_r()
 {
 	return 0;
 }
 
-void sesame_state::port6_w(uint8_t data)
+void sesame2_state::port5_w(uint8_t data)
 {
 }
 
-uint8_t sesame_state::porta_r()
+uint8_t sesame2_state::port6_r()
+{
+	return 0;
+}
+
+void sesame2_state::port6_w(uint8_t data)
+{
+}
+
+uint8_t sesame2_state::porta_r()
 {
 	return 0xf0;
 }
 
-uint8_t sesame_state::portg_r()
+uint8_t sesame2_state::portg_r()
 {
 	return 0;
 }
 
-void sesame_state::prg_map(address_map &map)
+void sesame2_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("program", 0);
 	map(0x200000, 0x21ffff).ram();
@@ -104,7 +102,7 @@ void sesame_state::prg_map(address_map &map)
 	map(0x400002, 0x400002).r("oki", FUNC(okim9810_device::read));
 }
 
-static INPUT_PORTS_START( sesame )
+static INPUT_PORTS_START( sesame2 )
 	PORT_START("SYSTEM")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) // coin 1
@@ -136,24 +134,24 @@ static INPUT_PORTS_START( sesame )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void sesame_state::sesame(machine_config &config)
+void sesame2_state::sesame2(machine_config &config)
 {
 	H8S2394(config, m_maincpu, XTAL(20'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &sesame_state::prg_map);
-	m_maincpu->set_vblank_int("screen", FUNC(sesame_state::irq1_line_hold));
-	m_maincpu->set_periodic_int(FUNC(sesame_state::irq0_line_hold), attotime::from_hz(60));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sesame2_state::prg_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sesame2_state::irq1_line_hold));
+	m_maincpu->set_periodic_int(FUNC(sesame2_state::irq0_line_hold), attotime::from_hz(60));
 	m_maincpu->read_port1().set_ioport("P1");
 	m_maincpu->read_port2().set_ioport("SYSTEM");
 	m_maincpu->write_port2().set_nop();
-	m_maincpu->read_port3().set(FUNC(sesame_state::port3_r));
-	m_maincpu->write_port3().set(FUNC(sesame_state::port3_w));
+	m_maincpu->read_port3().set(FUNC(sesame2_state::port3_r));
+	m_maincpu->write_port3().set(FUNC(sesame2_state::port3_w));
 	m_maincpu->read_port4().set_ioport("P4");
-	m_maincpu->read_port5().set(FUNC(sesame_state::port5_r));
-	m_maincpu->write_port5().set(FUNC(sesame_state::port5_w));
-	m_maincpu->read_port6().set(FUNC(sesame_state::port6_r));
-	m_maincpu->write_port6().set(FUNC(sesame_state::port6_w));
-	m_maincpu->read_porta().set(FUNC(sesame_state::porta_r));
-	m_maincpu->read_portg().set(FUNC(sesame_state::portg_r));
+	m_maincpu->read_port5().set(FUNC(sesame2_state::port5_r));
+	m_maincpu->write_port5().set(FUNC(sesame2_state::port5_w));
+	m_maincpu->read_port6().set(FUNC(sesame2_state::port6_r));
+	m_maincpu->write_port6().set(FUNC(sesame2_state::port6_w));
+	m_maincpu->read_porta().set(FUNC(sesame2_state::porta_r));
+	m_maincpu->read_portg().set(FUNC(sesame2_state::portg_r));
 	m_maincpu->write_portg().set_nop();
 
 	SPEAKER(config, "speaker", 2).front();
@@ -176,4 +174,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, sesame, 0, sesame, sesame, sesame_state, empty_init, ROT270, "Taito", "Sesame 2", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 200?, sesame2, 0, sesame2, sesame2, sesame2_state, empty_init, ROT270, "Taito", "Sesame 2", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
