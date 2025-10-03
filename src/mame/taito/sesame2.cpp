@@ -4,7 +4,8 @@
 
 Sesame 2 crane game board
 
-K11J
+セサミ2 ゴ カソボード
+K11J0969A
 
 Probably related to dinoking.cpp as it's the same CPU and similiar ROM sticker codes
 
@@ -67,17 +68,17 @@ void sesame2_state::prg_map(address_map &map)
 }
 
 static INPUT_PORTS_START( sesame2 )
-	PORT_START("DSW2")
+	PORT_START("DSW2") //74HC165A
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "DSW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "DSW2:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
 
-	PORT_START("DSW3")
+	PORT_START("DSW3") //74HC165A
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
@@ -117,6 +118,14 @@ void sesame2_state::sesame2(machine_config &config)
 	m_maincpu->read_portf().set(FUNC(sesame2_state::portf_r));
 	m_maincpu->write_portf().set(FUNC(sesame2_state::portf_w));
 
+	//connector N
+	//port6
+	//port5
+	//porta
+	//port1
+	//porth
+	//port2
+
 	SPEAKER(config, "speaker", 2).front();
 
 	okim9810_device &oki(OKIM9810(config, "oki", XTAL(4'096'000)));
@@ -129,9 +138,11 @@ ROM_START( sesame2 )
 	ROM_REGION16_BE(0x080000, "program", 0)
 	ROM_LOAD( "f25-05.ic56",   0x000000, 0x080000, CRC(2205de06) SHA1(a67c2c2d626d805ff7e2d26a6c7d3e217ec0b3de) )
 
-	ROM_REGION(0x1000000, "oki", 0)
+	ROM_REGION(0x200000, "oki", 0)
 	ROM_LOAD( "f26-04.ic58",  0x000000, 0x200000, CRC(4d013fc5) SHA1(4ae6dfe57db341a2bc52068149966ca2842d20e4) )
 
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "at93c46.ic67", 0x00, 0x80, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
