@@ -2387,143 +2387,131 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 	be_parameter maskp(*this, inst.param(1), PTYPE_I);
 
 	// pick a target register for the general case
-	Gp dstreg = dstp.select_register(eax);
+	Gp dstreg = dstp.select_register(edx);
 
-	a.lahf();
-	a.mov(r10, rax);
-
-	// compute mask for flags
-	// can't get FLAG_V from lahf
 	uint32_t flagmask = 0;
-	if (maskp.immediate() & FLAG_C) flagmask |= 0x001;
-	if (maskp.immediate() & FLAG_Z) flagmask |= 0x040;
-	if (maskp.immediate() & FLAG_S) flagmask |= 0x080;
-	if (maskp.immediate() & FLAG_U) flagmask |= 0x004;
 
 	switch (maskp.immediate())
 	{
 		// single flags only
 		case FLAG_C:
-			a.setc(al);                                                                 // setc   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
+			a.setc(al);
+			a.movzx(dstreg, al);
 			break;
 
 		case FLAG_V:
-			a.seto(al);                                                                 // seto   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 1);                                                           // shl    dstreg,1
+			a.seto(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(rax, rax));
 			break;
 
 		case FLAG_Z:
-			a.setz(al);                                                                 // setz   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 2);                                                           // shl    dstreg,2
+			a.setz(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(0, rax, 2));
 			break;
 
 		case FLAG_S:
-			a.sets(al);                                                                 // sets   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 3);                                                           // shl    dstreg,3
+			a.sets(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(0, rax, 3));
 			break;
 
 		case FLAG_U:
-			a.setp(al);                                                                 // setp   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 4);                                                           // shl    dstreg,4
+			a.setp(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(rax, rax));
+			a.lea(dstreg, ptr(0, dstreg, 3));
 			break;
 
 		// carry plus another flag
 		case FLAG_C | FLAG_V:
-			a.setc(al);                                                                 // setc   al
-			a.seto(cl);                                                                 // seto   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 1));                                            // lea    dstreg,[eax+ecx*2]
+			a.setc(al);
+			a.seto(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 1));
 			break;
 
 		case FLAG_C | FLAG_Z:
-			a.setc(al);                                                                 // setc   al
-			a.setz(cl);                                                                 // setz   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 2));                                            // lea    dstreg,[eax+ecx*4]
+			a.setc(al);
+			a.setz(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 2));
 			break;
 
 		case FLAG_C | FLAG_S:
-			a.setc(al);                                                                 // setc   al
-			a.sets(cl);                                                                 // sets   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 3));                                            // lea    dstreg,[eax+ecx*8]
+			a.setc(al);
+			a.sets(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 3));
 			break;
 
 		// overflow plus another flag
 		case FLAG_V | FLAG_Z:
-			a.seto(al);                                                                 // seto   al
-			a.setz(cl);                                                                 // setz   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 1));                                            // lea    dstreg,[eax+ecx*2]
-			a.shl(dstreg, 1);                                                           // shl    dstreg,1
+			a.seto(al);
+			a.setz(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 1));
+			a.lea(dstreg, ptr(dstreg, dstreg));
 			break;
 
 		case FLAG_V | FLAG_S:
-			a.seto(al);                                                                 // seto   al
-			a.sets(cl);                                                                 // sets   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 2));                                            // lea    dstreg,[eax+ecx*4]
-			a.shl(dstreg, 1);                                                           // shl    dstreg,1
+			a.seto(al);
+			a.sets(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 2));
+			a.lea(dstreg, ptr(dstreg, dstreg));
 			break;
 
 		// zero plus another flag
 		case FLAG_Z | FLAG_S:
-			a.setz(al);                                                                 // setz   al
-			a.sets(cl);                                                                 // sets   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 1));                                            // lea    dstreg,[eax+ecx*2]
-			a.shl(dstreg, 2);                                                           // shl    dstreg,2
+			a.setz(al);
+			a.sets(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 1));
+			a.lea(dstreg, ptr(0, dstreg, 2));
 			break;
 
 		// default cases
 		default:
+			// compute mask for flags
+			if (maskp.immediate() & FLAG_C) flagmask |= 0x001;
+			if (maskp.immediate() & FLAG_Z) flagmask |= 0x040;
+			if (maskp.immediate() & FLAG_S) flagmask |= 0x080;
+			if (maskp.immediate() & FLAG_U) flagmask |= 0x004;
+
+			// can't get FLAG_V from lahf
+			a.lahf();
+			a.seto(cl);
+
+			a.mov(edx, eax);
+			a.shr(edx, 8);
+			a.and_(edx, flagmask);
+			a.movzx(dstreg, byte_ptr(rbp, rdx, 0, offset_from_rbp(&m_near.flagsmap[0])));
+
 			if (maskp.immediate() & FLAG_V)
 			{
-				a.seto(al);
-				a.movzx(ecx, al);
-				a.shl(ecx, 1);
+				a.movzx(ecx, cl);
+				a.lea(r11, ptr(rcx, rcx));
+				a.or_(dstreg, r11d);
 			}
 
-			a.mov(r11, r10);
-			a.shr(r11, 8);
-			a.and_(r11, flagmask);
-			a.movzx(dstreg, byte_ptr(rbp, r11, 0, offset_from_rbp(&m_near.flagsmap[0]))); // movzx  dstreg,[flags_map]
-
-			if (maskp.immediate() & FLAG_V)
-				a.or_(dstreg, ecx);
+			// Restore flags
+			a.add(cl, 0x7f);
+			a.sahf();
 			break;
 	}
 
-	// 32-bit form
 	if (inst.size() == 4)
-		mov_param_reg(a, dstp, dstreg);                                                 // mov   dstp,dstreg
-
-	// 64-bit form
+		mov_param_reg(a, dstp, dstreg); // 32-bit form
 	else if (inst.size() == 8)
-		mov_param_reg(a, dstp, dstreg.r64());                                           // mov   dstp,dstreg
-
-	if (maskp.immediate() & FLAG_V)
-	{
-		// Restore overflow flag
-		a.mov(eax, dstreg);
-		a.shr(eax, 1);
-		a.and_(eax, 1);
-		a.add(al, 0x7f);
-	}
-
-	a.mov(rax, r10);
-	a.sahf();
+		mov_param_reg(a, dstp, dstreg.r64()); // 64-bit form
 }
 
 
