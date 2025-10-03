@@ -71,36 +71,35 @@ private:
 	void screen_vblank_pgm3(int state);
 	required_device<cpu_device> m_maincpu;
 	void pgm3_map(address_map &map) ATTR_COLD;
-	void decryptaes(const uint8_t *key, int keylen, const uint8_t *iv, uint8_t *input);
+	void decryptaes(const uint8_t *key, const uint8_t *iv, int length);
 
 	required_shared_ptr<u32> m_mainram;
 };
 
-void pgm3_state::decryptaes(const uint8_t *key, int keylen, const uint8_t *iv, uint8_t *input)
+void pgm3_state::decryptaes(const uint8_t* key, const uint8_t* iv, int length)
 {
-#define LENGTH 0x20000
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
 	AES_CTX ctx;
-	uint8_t out[LENGTH];
-
-
-	if (input != out)
-	{
-		memcpy(out, input, LENGTH);
-	}
+	uint8_t inbuffer[16];
+	uint8_t outbufer[16];
 
 	AES_DecryptInit(&ctx, key, iv);
 
-	for (int i = 0; i < LENGTH; i+=16)
+	for (int i = 0; i < length; i += 16)
 	{
-		AES_Decrypt(&ctx, input+i, out+i);
+		for (int j = 0; j < 16; j++)
+		{
+			inbuffer[j] = mem.read_byte(0x10000000 + i + j);
+		}
+
+		AES_Decrypt(&ctx, inbuffer, outbufer);
+
+		for (int j = 0; j < 16; j++)
+		{
+			mem.write_byte(i + j, outbufer[j]);
+		}
 	}
 	AES_CTX_Free(&ctx);
-
-	for (int i = 0; i < LENGTH / 4; i++)
-	{
-		uint32_t val = (out[(i * 4) + 0] << 0) | (out[(i * 4) + 1] << 8) | (out[(i * 4) + 2] << 16) | (out[(i * 4) + 3] << 24);
-		m_mainram[i] = val;
-	}
 }
 
 void pgm3_state::pgm3_map(address_map &map)
@@ -134,6 +133,7 @@ void pgm3_state::machine_start()
 
 void pgm3_state::machine_reset()
 {
+	// perform a bootstrap to bypass the level 0 internal_mask as it might not be properly dumped
 	uint8_t* bootrom = memregion("internal_mask")->base();
 
 	uint8_t rom_aes_key[32];
@@ -142,7 +142,6 @@ void pgm3_state::machine_reset()
 	for (int i = 0; i < 32; i++)
 	{
 		uint8_t keybyte = bootrom[0x42b8 + i];
-		printf("%02x, ", keybyte);
 		rom_aes_key[i] = keybyte;
 	}
 
@@ -151,7 +150,9 @@ void pgm3_state::machine_reset()
 		rom_aes_iv[i] = bootrom[0x44a8 + i];
 	}
 
-    decryptaes(rom_aes_key, 32, rom_aes_iv, memregion("internal_flash")->base());
+	// the first 0x20000 bytes are encrypted with this key, it then uses other keys to decrypt the rest
+	// the decryption is done in hardware, not software
+    decryptaes(rom_aes_key, rom_aes_iv, 0x20000);
 
 	// if we want to boot from somewhere else, change this
 	//m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x04000000);
