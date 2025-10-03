@@ -10,6 +10,17 @@
 #ifndef MAME_LIB_UTIL_AES256CBC_H
 #define MAME_LIB_UTIL_AES256CBC_H
 
-#include <aes256cbc/AES_256_CBC.h>
+// not ideal to duplicate these here, but if we want to avoid modifying AES_256_CBC.h seems neccessary?
+
+#define AES_BLOCK_SIZE 16
+
+typedef struct {
+	unsigned int roundkey[60];
+	unsigned int iv[4];
+} AES_CTX;
+
+void AES_DecryptInit(AES_CTX *ctx, const unsigned char *key, const unsigned char *iv);
+void AES_Decrypt(AES_CTX* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
+void AES_CTX_Free(AES_CTX *ctx);
 
 #endif // MAME_LIB_UTIL_AES256CBC_H
