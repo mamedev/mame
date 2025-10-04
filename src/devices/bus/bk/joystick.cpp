@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BK_JOYSTICK, bk_joystick_device, "bk_joystick", "Joystick Interface EG2013")
+DEFINE_DEVICE_TYPE(BK_JOYSTICK, bk_joystick_device, "bk_joystick", "BK Joystick Interface")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
