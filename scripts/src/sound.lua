@@ -182,7 +182,6 @@ if (SOUNDS["AC97"]~=null) then
 end
 
 
-
 ---------------------------------------------------
 -- CEM 3394 analog synthesizer chip
 --@src/devices/sound/cem3394.h,SOUNDS["CEM3394"] = true
@@ -1187,6 +1186,18 @@ if (SOUNDS["VA_VCA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/va_vca.cpp",
 		MAME_DIR .. "src/devices/sound/va_vca.h",
+	}
+end
+
+--------------------------------------------------
+-- Virtual analog voltage-controlled filters (VCFs)
+--@src/devices/sound/va_vcf.h,SOUNDS["VA_VCF"] = true
+--------------------------------------------------
+
+if (SOUNDS["VA_VCF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vcf.cpp",
+		MAME_DIR .. "src/devices/sound/va_vcf.h",
 	}
 end
 
