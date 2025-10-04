@@ -261,7 +261,7 @@
 //
 // Backwards sample reading negates the sample position value before
 // fetching.  Note that backwards reading disable looping.
-// 
+//
 // Samples are read with sample pos 0 corresponding to the bottom
 // sample at the 25-bits address. It is important to note that four
 // consecutive sample values are required for the interpolation block,
@@ -273,7 +273,7 @@
 // A pitch skip bigger than the loop size ends up with results
 // somewhere between weird and utterly insane.  Don't do that.
 //
-//  
+//
 //   Sample interpolation
 //
 // Samples go through an interpolator which uses two past samples and
@@ -424,7 +424,7 @@ void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_
 	switch(spos & 1) {
 	case 0: {
 		// 32103210 32103210 32103210
-	    // bbbbaaaa ddddcccc ........
+		// bbbbaaaa ddddcccc ........
 		u32 l0 = wave.read_dword(adr);
 		u32 l1 = wave.read_dword(adr);
 		val0 = l0;
@@ -435,7 +435,7 @@ void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_
 	}
 	case 1: {
 		// 32103210 32103210 32103210
-	    // aaaa.... ccccbbbb ....dddd
+		// aaaa.... ccccbbbb ....dddd
 		u32 l0 = wave.read_dword(adr);
 		u32 l1 = wave.read_dword(adr+1);
 		u32 l2 = wave.read_dword(adr+2);
@@ -654,7 +654,7 @@ void swp30_device::streaming_block::read_8c(memory_access<25, 2, -2, ENDIANNESS_
 		}
 		m_dpcm_pos = spos;
 	}
-		
+
 	val0 = m_dpcm_s0;
 	val1 = m_dpcm_s1;
 	val2 = m_dpcm_s2;
@@ -725,7 +725,7 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 			}
 		}
 	}
-	return std::make_pair(result, false);				
+	return std::make_pair(result, false);
 }
 
 void swp30_device::streaming_block::update_loop_size()
@@ -835,7 +835,7 @@ std::string swp30_device::streaming_block::describe() const
 			desc += util::string_format(" loop-tune +%02x", (m_loop >> 24) & 0x3f);
 	}
 	if(m_pitch & 0x2000) {
-		u32 p = 0x4000 - (m_pitch & 0x3fff);		
+		u32 p = 0x4000 - (m_pitch & 0x3fff);
 		desc += util::string_format(" pitch -%x.%03x", p >> 10, p & 0x3ff);
 	} else if(m_pitch & 0x3fff)
 		desc += util::string_format(" pitch +%x.%03x", (m_pitch >> 10) & 7, m_pitch & 0x3ff);
@@ -861,7 +861,7 @@ std::string swp30_device::streaming_block::describe() const
 // bits and the second 5.  A first paramter of 0 disables the
 // associated filter.
 //
-// 
+//
 //
 //   Volumes
 //
@@ -916,7 +916,7 @@ std::string swp30_device::streaming_block::describe() const
 //    b2 = dt - 1
 //
 //    y0 = x0 * a0 + y1 * (2 - dt - a0) + y2 * (dt - 1)
-//	     = (x0 - y1) * a0 + (y2 - y1) * dt + 2*y1 - y2
+//       = (x0 - y1) * a0 + (y2 - y1) * dt + 2*y1 - y2
 //
 // 4: Chamberlin configuration band pass filter with fixed q=1
 //
@@ -1060,7 +1060,7 @@ s32 swp30_device::filter_block::step(s16 input)
 			m_filter_1_b = m_filter_1_b + ((s64(m_filter_1_p1) * m_filter_1_h) >> 16);
 			m_filter_1_n = m_filter_1_h + m_filter_1_l;
 			m_filter_1_l = m_filter_1_l + ((s64(m_filter_1_p1) * m_filter_1_b) >> 16);
-			
+
 			switch(m_filter_1_a >> 14) {
 			case 0x0: y0 = m_filter_1_l; break;
 			case 0x1: y0 = m_filter_1_b; break;
@@ -1078,7 +1078,7 @@ s32 swp30_device::filter_block::step(s16 input)
 			case 0xe: y0 = ((input - 2*m_filter_1_x1 + m_filter_1_x2) << 6) + m_filter_1_y0 + ((s64(m_filter_1_p1) * ((m_filter_1_x1 << 6) - m_filter_1_y0)) >> 16); break;
 			case 0xf: y0 = ((input - 2*m_filter_1_x1 + m_filter_1_x2) << 6) + 2*m_filter_1_y0 - m_filter_1_y1 + ((s64(m_filter_1_p1) * ((m_filter_1_x1 << 6) - m_filter_1_y0)) >> 16) + ((s64(m_filter_p2) * (m_filter_1_y1 - m_filter_1_y0)) >> 7); break;
 			}
-			
+
 			m_filter_1_x2 = m_filter_1_x1;
 			m_filter_1_x1 = input;
 			m_filter_1_y1 = m_filter_1_y0;
@@ -1091,7 +1091,7 @@ s32 swp30_device::filter_block::step(s16 input)
 				m_filter_2_b = m_filter_2_b + ((s64(m_filter_2_p1) * m_filter_2_h) >> 16);
 				m_filter_2_n = m_filter_2_h + m_filter_2_l;
 				m_filter_2_l = m_filter_2_l + ((s64(m_filter_2_p1) * m_filter_2_b) >> 16);
-			
+
 				switch(m_filter_2_a >> 14) {
 				case 0x0: y0 = m_filter_2_l; break;
 				case 0x1: y0 = m_filter_2_b; break;
@@ -1110,7 +1110,7 @@ s32 swp30_device::filter_block::step(s16 input)
 				case 0xe: y0 = (y0 - 2*m_filter_2_x1 + m_filter_2_x2) + m_filter_2_y0 + ((s64(m_filter_2_p1) * ((m_filter_2_x1 << 6) - m_filter_2_y0)) >> 16); break;
 				case 0xf: y0 = (y0 - 2*m_filter_2_x1 + m_filter_2_x2) + 2*m_filter_2_y0 - m_filter_2_y1 + ((s64(m_filter_2_p1) * ((m_filter_2_x1 << 6) - m_filter_2_y0)) >> 16) + ((s64(m_filter_p2) * (m_filter_2_y1 - m_filter_2_y0)) >> 7); break;
 				}
-			
+
 				m_filter_2_x2 = m_filter_2_x1;
 				m_filter_2_x1 = y0_1;
 				m_filter_2_y1 = m_filter_2_y0;
@@ -1296,7 +1296,7 @@ template<u32 filter> void swp30_device::iir1_block::b1_w(u16 data)
 
 // Envelope block
 //
-// 
+//
 //   cccccc 000110   ssss ssss iiii iiii                      Attack speed and start volume
 //   cccccc 000111   ssss ssss tttt tttt                      Decay 1 speed and target
 //   cccccc 001000   ssss ssss tttt tttt                      Decay 2 speed and target
@@ -1398,34 +1398,34 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 	// Phase is incorrect, and very weird
 
 	if(level >= 0x78)
-        return 0x7f;
+		return 0x7f;
 
-    u32 k0 = level >> 3;
-    u32 k1 = level & 7;
+	u32 k0 = level >> 3;
+	u32 k1 = level & 7;
 
-    if(level >= 0x48) {
-        k0 -= 9;
+	if(level >= 0x48) {
+		k0 -= 9;
 		u32 a = (4 << k0) - 1;
-        u32 b = (2 << k0) - 1;
-        static const u8 mx[8] = { 0x00, 0x20, 0x44, 0xa2, 0x55, 0x75, 0xee, 0xfe };
-        return ((mx[k1] >> (sample_counter & 7)) & 1) ? a : b;
+		u32 b = (2 << k0) - 1;
+		static const u8 mx[8] = { 0x00, 0x20, 0x44, 0xa2, 0x55, 0x75, 0xee, 0xfe };
+		return ((mx[k1] >> (sample_counter & 7)) & 1) ? a : b;
 	}
 
-    if(level >= 0x40) {
-        if(sample_counter & 1)
+	if(level >= 0x40) {
+		if(sample_counter & 1)
 			return 1;
 		u32 s1 = (sample_counter & 0xe) >> 1;
 		static const u8 mx[8] = { 0x00, 0x01, 0x22, 0xa8, 0x55, 0xab, 0x77, 0xfd };
-        return (mx[k1] >> s1) & 1;
+		return (mx[k1] >> s1) & 1;
 	}
 
-    k0 = 8 - k0;
+	k0 = 8 - k0;
 
 	if(sample_counter & util::make_bitmask<u32>(k0))
 		return 0;
 
 	static const u16 mx[8] = { 0x5555, 0x5557, 0x5757, 0x5777, 0x7777, 0x777f, 0x7f7f, 0x7fff };
-    return (mx[k1] >> ((sample_counter >> k0) & 0xf)) & 1;
+	return (mx[k1] >> ((sample_counter >> k0) & 0xf)) & 1;
 }
 
 u16 swp30_device::envelope_block::step(u32 sample_counter)
@@ -1461,13 +1461,13 @@ u16 swp30_device::envelope_block::step(u32 sample_counter)
 		if(level == limit) {
 			if(m_envelope_mode == DECAY1)
 				m_envelope_mode = DECAY2;
-			
+
 			else if(m_release_glo & 0xff00)
 				m_envelope_mode = RELEASE;
 		}
 		break;
 	}
-		
+
 	case RELEASE: {
 		s32 level = m_envelope_level + level_step((m_release_glo >> 8) ^ 0x80, sample_counter);
 		if(level > 0x3fff)
@@ -1476,10 +1476,6 @@ u16 swp30_device::envelope_block::step(u32 sample_counter)
 		break;
 	}
 	}
-	static FILE *fd = nullptr;
-	if(!fd)
-		fd = fopen("/people/galibert/mame/mu100/env-mu100.txt", "w");
-	fprintf(fd, "%d\n", result);
 	return result;
 }
 
@@ -1608,7 +1604,7 @@ void swp30_device::lfo_block::step(running_machine &machine)
 	case 1: m_state = m_counter & 0x20000 ? (~m_counter >> 5) & 0xffe : (m_counter >> 5) & 0xffe; break;
 	case 2: m_state = m_counter & 0x20000 ? 0xfff : 0; break;
 	case 3: if((pc ^ m_counter) & 0x3fe00) m_state = machine.rand() & 0xfff; break;
-	}	
+	}
 }
 
 u16 swp30_device::lfo_block::get_amplitude() const
@@ -1623,7 +1619,7 @@ s16 swp30_device::lfo_block::get_pitch() const
 		return v >> 8;
 	else
 		return v >> 11;
-		
+
 }
 
 void swp30_device::lfo_block::type_step_pitch_w(u16 data)
@@ -1664,7 +1660,7 @@ s32 swp30_device::volume_apply(s32 level, s32 sample)
 		return 0;
 
 	s32 e = level >> 10;
-	s32 m = level & 0x3ff; 
+	s32 m = level & 0x3ff;
 	s64 mul = (0x4000000 - (m << 15)) >> e;
 	return (sample * mul) >> 26;
 }
@@ -1682,7 +1678,7 @@ void swp30_device::awm2_step(std::array<s32, 0x40> &samples_per_chan)
 		auto [sample1, trigger_release] = m_streaming[chan].step(m_wave_cache, lfo.get_pitch());
 		if(trigger_release)
 			m_envelope[chan].trigger_release();
-		
+
 		s32 sample2 = m_filter[chan].step(sample1);
 		s32 sample3 = m_iir1[chan].step(sample2);
 		s32 sample4 = volume_apply(m_envelope[chan].step(m_meg->m_sample_counter) + lfo.get_amplitude(), sample3);
@@ -2092,7 +2088,7 @@ template<int sel> void swp30_device::meg_state::prg_w(u16 data)
 	m_program[m_program_address] = (m_program[m_program_address] & mask) | (u64(data) << shift);
 
 	if(sel == 3) {
-		m_program_address ++; 
+		m_program_address ++;
 		if(m_program_address == 0x180)
 			m_program_address = 0;
 	}
@@ -2203,7 +2199,7 @@ template<int sel> void swp30_device::wave_val_w(u16 data)
 	else
 		m_wave_val = (m_wave_val & 0xffff0000) |  data;
 	if(!sel) {
-		//		logerror("wave_val_w %08x\n", m_wave_val);
+		//      logerror("wave_val_w %08x\n", m_wave_val);
 		if(m_wave_access == 0x5000) {
 			m_wave_cache.write_dword(m_wave_adr, m_wave_val);
 			m_wave_adr ++;
@@ -2218,28 +2214,28 @@ template<int sel> void swp30_device::wave_val_w(u16 data)
 
 u16 swp30_device::meg_state::revram_encode(u32 v)
 {
-    v &= 0x7ffffff;
-    u32 s = 0;
-    if(v & 0x4000000) {
-        v ^= 0x7ffffff;
-        s = 1;
+	v &= 0x7ffffff;
+	u32 s = 0;
+	if(v & 0x4000000) {
+		v ^= 0x7ffffff;
+		s = 1;
 	}
-    u32 e = 15;
+	u32 e = 15;
 	while(e && !(v & (0x400 << e)))
-        e --;
-    u32 m = e ? (v >> (e-1)) & 0x7ff : v;
-    return (e << 12) | (s << 11) | m;
+		e --;
+	u32 m = e ? (v >> (e-1)) & 0x7ff : v;
+	return (e << 12) | (s << 11) | m;
 }
 
 u32 swp30_device::meg_state::revram_decode(u16 v)
 {
-    u32 e = (v >> 12) & 15;
-    u32 s = (v >> 11) & 1;
-    u32 m = v & 0x7ff;
-    u32 vb = e ? (m | 0x800) << (e-1) : m;
-    if(s)
-        vb ^= e ? (0xffffffff << (e-1)) & 0xffffffff : 0xffffffe0;
-    return vb;
+	u32 e = (v >> 12) & 15;
+	u32 s = (v >> 11) & 1;
+	u32 m = v & 0x7ff;
+	u32 vb = e ? (m | 0x800) << (e-1) : m;
+	if(s)
+		vb ^= e ? (0xffffffff << (e-1)) & 0xffffffff : 0xffffffe0;
+	return vb;
 }
 
 
@@ -2735,7 +2731,7 @@ void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
 			input = m_meg->m_m[0x20 | (mix & 0xf)];
 		else
 			input = m_meli[mix & 0xf];
-				
+
 		if(input == 0)
 			continue;
 
@@ -2830,7 +2826,7 @@ void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
 
 //   - 63 mmio registers (bank 'm') numbered 01-3f with 00 wired to 0,
 //     which are usable as normal registers but also are used for
-//     communication 
+//     communication
 
 //   - 8 t(emporary) registers
 
@@ -3103,7 +3099,7 @@ template<int sel> u16 swp30_device::meg_const_r(offs_t offset)
 
 template<int sel> void swp30_device::meg_const_w(offs_t offset, u16 data)
 {
-	//	logerror("meg const[%03x] = %04x / %f\n", (offset >> 6)*6 + sel, data, s16(data) / 32768.0);
+	//  logerror("meg const[%03x] = %04x / %f\n", (offset >> 6)*6 + sel, data, s16(data) / 32768.0);
 	m_meg->const_w((offset >> 6)*6 + sel, data);
 }
 
@@ -3114,7 +3110,7 @@ template<int sel> u16 swp30_device::meg_offset_r(offs_t offset)
 
 template<int sel> void swp30_device::meg_offset_w(offs_t offset, u16 data)
 {
-	//	logerror("meg offset[%02x/%03x] = %x / %d\n", (offset >> 6)*2 + sel, 3*((offset >> 6)*2 + sel), data, data);
+	//  logerror("meg offset[%02x/%03x] = %x / %d\n", (offset >> 6)*2 + sel, 3*((offset >> 6)*2 + sel), data, data);
 	m_meg->offset_w((offset >> 6)*2 + sel, data);
 }
 
@@ -3318,7 +3314,7 @@ offs_t swp30_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	if(BIT(opcode, 0x3e))
 		append(r, util::string_format("idx = p"));
 
-    if(BIT(opcode, 0x3b)) {
+	if(BIT(opcode, 0x3b)) {
 		if(BIT(opcode, 0x3c))
 			append(r, util::string_format("t%x = p", t));
 		else
@@ -3460,7 +3456,7 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 					UML_DMOV(block, I2, 0);
 			}
 		}
-		
+
 		switch(mmode) {
 		case 1:
 			UML_DSHL(block, I0, I1, 8+15);
@@ -3573,7 +3569,7 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			UML_DMOVc(block, COND_G, I0, I1);
 			break;
 		}
-		
+
 		UML_DMOV(block, mem(&m_p), I0);
 	}
 
@@ -3650,7 +3646,7 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			UML_DSAR(block, I0, I0, (15-8));
 			UML_SAR(block, mem(&m_mw_value[index3]), I0, 8);
 			break;
-		case 7: 
+		case 7:
 			UML_MOV(block, mem(&m_mw_value[index3]), mem(&m_m[sm]));
 			break;
 		}
@@ -3848,7 +3844,7 @@ void swp30_device::meg_state::step()
 			v = get_lfo(m_pc >> 4);
 			break;
 		case 4: v = m_ram_read; break;
-		case 5:	v = m_swp->machine().rand() & 0xffffff; if(v & 0x00800000) v |= 0xff000000; break;
+		case 5: v = m_swp->machine().rand() & 0xffffff; if(v & 0x00800000) v |= 0xff000000; break;
 		case 6: {
 			s64 p = m_p;
 			if(!BIT(opcode, 0x0a))
@@ -3927,8 +3923,8 @@ void swp30_device::meg_state::step()
 		}
 		break;
 	}
-	}			
-		
+	}
+
 	m_delay_3 ++;
 	if(m_delay_3 == 3)
 		m_delay_3 = 0;
