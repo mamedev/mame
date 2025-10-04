@@ -11837,7 +11837,8 @@ license:CC0-1.0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="fbasic" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
@@ -11863,7 +11864,8 @@ license:CC0-1.0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="fbasic" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-N-128-02" />
@@ -11889,7 +11891,8 @@ license:CC0-1.0
 		<info name="serial" value="HVC-VT"/>
 		<info name="release" value="19850221"/>
 		<info name="alt_title" value="ファミリーベーシックV3"/>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="fbasic" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="VT-N-256-41" />
@@ -44345,7 +44348,8 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V1.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="fbasic" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="mirroring" value="vertical" />
@@ -44366,7 +44370,8 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V0.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="fbasic" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb" value="HVC-FAMILYBASIC" />
@@ -46849,7 +46854,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="fbasic" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
