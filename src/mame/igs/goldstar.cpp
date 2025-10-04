@@ -1936,8 +1936,32 @@ void wingco_state::magodds_palette(palette_device &palette) const
 
 void goldstar_state::bonusch_palette(palette_device &palette) const
 {
-	// There are 2 GFX banks.
-	// We're constructing a double-sized palette with one half for each bank.
+/*
+  Bonus Chance W-8 video RESNET
+  -----------------------------
+
+                                220                                          220                                          220
+  24s10(3E)-12 -+- 74174-02 ---NNNNN---+       24s10(3F)-12 -+- 74174-02 ---NNNNN---+       24s10(3H)-12 -+- 74174-02 ---NNNNN---+
+  24s10(4E)-12 _|                      |       24s10(4F)-12 _|                      |       24s10(4H)-12 _|                      |
+                                470    |                                     470    |                                     470    |
+  24s10(3E)-11 -+- 74174-10 ---NNNNN---+       24s10(3F)-11 -+- 74174-10 ---NNNNN---+       24s10(3H)-11 -+- 74174-10 ---NNNNN---+
+  24s10(4E)-11 _|                      |       24s10(4F)-11 _|                      |       24s10(4H)-11 _|                      |
+                                 1K    |                                      1K    |                                      1K    |
+  24s10(3E)-10 -+- 74174-12 ---NNNNN---+       24s10(3F)-10 -+- 74174-12 ---NNNNN---+       24s10(3H)-10 -+- 74174-12 ---NNNNN---+
+  24s10(4E)-10 _|                      |       24s10(4F)-10 _|                      |       24s10(4H)-10 _|                      |
+                                 2K    |                                      2K    |                                      2K    |
+  24s10(3E)-09 -+- 74174-15 ---NNNNN---+---.   24s10(3F)-09 -+- 74174-15 ---NNNNN---+---.   24s10(3H)-09 -+- 74174-15 ---NNNNN---+---.
+  24s10(4E)-09 _|                      |   |   24s10(4F)-09 _|                      |   |   24s10(4H)-09 _|                      |   |
+                                       Z   |                                        Z   |                                        Z   |
+                                    1K Z   |  .-----.                            1K Z   |  .-------.                          1K Z   |  .------.
+                                       Z   '--| RED |                               Z   '--| GREEN |                             Z   '--| BLUE |
+                                       |      '-----'                               |      '-------'                             |      '------'
+                                      GND                                          GND                                          GND
+
+  There are 2 main graphics banks.
+  We're constructing a double-sized palette with one half for each bank.
+
+*/
 	uint8_t const *const color_prom = memregion("proms")->base();
 	static constexpr int resistances_rgb[4] = { 2000, 1000, 470, 220 };
 
