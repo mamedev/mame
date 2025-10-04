@@ -1190,6 +1190,18 @@ if (SOUNDS["VA_VCA"]~=null) then
 	}
 end
 
+--------------------------------------------------
+-- Virtual analog voltage-controlled filters (VCFs)
+--@src/devices/sound/va_vcf.h,SOUNDS["VA_VCF"] = true
+--------------------------------------------------
+
+if (SOUNDS["VA_VCF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vcf.cpp",
+		MAME_DIR .. "src/devices/sound/va_vcf.h",
+	}
+end
+
 ---------------------------------------------------
 -- VLM5030 speech synthesizer
 --@src/devices/sound/vlm5030.h,SOUNDS["VLM5030"] = true
