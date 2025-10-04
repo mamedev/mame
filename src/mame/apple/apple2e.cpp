@@ -2097,10 +2097,10 @@ u8 apple2e_state::c000_r(offs_t offset)
 			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x7e:  // read IOUDIS
+		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
 			return (m_ioudis ? 0x00 : 0x80) | uFloatingBus7;
 
-		case 0x7f:  // read DHIRES
+		case 0x79: case 0x7b: case 0x7d: case 0x7f:  // read DHIRES
 			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:
@@ -2537,12 +2537,12 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 		case 0x6f:
 			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x7e:  // read IOUDIS
+		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
 			m_vbl = false;
 			lower_irq(IRQ_VBL);
-			return (m_ioudis ? 0x80 : 0x00) | uFloatingBus7;
+			return (m_ioudis ? 0x00 : 0x80) | uFloatingBus7;
 
-		case 0x7f:  // read DHIRES
+		case 0x79: case 0x7b: case 0x7d: case 0x7f:  // read DHIRES
 			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:

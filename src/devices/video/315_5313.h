@@ -78,12 +78,12 @@ public:
 		if (machine().side_effects_disabled())
 			return;
 
-		if (m_irq6_pending)
+		if (m_irq6_pending && BIT(m_regs[0x01], 5))
 		{
 			m_irq6_pending = 0;
 			m_lv6irqline_callback(false);
 		}
-		else if (m_irq4_pending)
+		else if (m_irq4_pending && BIT(m_regs[0x00], 4))
 		{
 			m_irq4_pending = 0;
 			m_lv4irqline_callback(false);

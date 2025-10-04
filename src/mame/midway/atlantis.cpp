@@ -905,6 +905,9 @@ ROM_START( mwskins )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) ) // EPR 1.00 Feb 14 2000 12:20:22
 
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "342_skins_game.u44", 0x0000, 0x2000, CRC(a99734bd) SHA1(eb0db94d1023d33b84caeef68a7d276d90cd3c4f) )
+
 	DISK_REGION(PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "mwskins", 0, SHA1(5cb293a6fdb2478293f48ddfc93cdd018acb2bb5) )
 ROM_END
@@ -912,6 +915,9 @@ ROM_END
 ROM_START( mwskinsa )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "342_skins_game.u44", 0x0000, 0x2000, CRC(a99734bd) SHA1(eb0db94d1023d33b84caeef68a7d276d90cd3c4f) )
 
 	DISK_REGION(PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "mwskinsa", 0, SHA1(72497917b31156eb11a46bbcc6f22a254dcec044) )
@@ -921,6 +927,9 @@ ROM_START( mwskinso )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "342_skins_game.u44", 0x0000, 0x2000, CRC(a99734bd) SHA1(eb0db94d1023d33b84caeef68a7d276d90cd3c4f) )
+
 	DISK_REGION(PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "mwskins104", 0, SHA1(6917f66718999c144c854795c5856bf5659b85fa) )
 ROM_END
@@ -929,12 +938,15 @@ ROM_START( mwskinst )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "boot101.bin", 0x000000, 0x080000, CRC(8b02035f) SHA1(e7c6c2711052230c117a9342f38c185e311f2950) ) // EPR 1.01 Apr 13 2000 11:18:32
 
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "342_skins_game.u44", 0x0000, 0x2000, CRC(a99734bd) SHA1(eb0db94d1023d33b84caeef68a7d276d90cd3c4f) )
+
 	DISK_REGION(PCI_ID_IDE":ide:0:hdd" )
 	DISK_IMAGE( "mwskinst", 0, SHA1(1edcf05bd9d5c9d1422e84bd713d1d120940e365) )
 	// another dump with data SHA1 cba09f0240dd797b554ae28b74416472d2327e5b is available, both have latest version 1.15 in the changelog at 0x934687
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*************************************

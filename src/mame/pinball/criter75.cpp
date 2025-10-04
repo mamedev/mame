@@ -4,7 +4,7 @@
 
   Skeleton driver for Petaco Criterium 75 pinball.
 
-  There's an older (1975) versión of this pinball, from Recel, but it's fully 
+  There's an older (1975) versión of this pinball, from Recel, but it's fully
   electromechanical (no PROMs).
 
   More info about the machine: https://www.recreativas.org/criterium-75-4ss-2938-petaco

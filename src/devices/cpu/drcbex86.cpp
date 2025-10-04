@@ -1285,16 +1285,21 @@ void drcbe_x86::reset()
 		a.mov(eax, ptr(ecx, regoffsh));
 		a.mov(MABS(&m_state.f[regnum].s.h), eax);
 	}
-	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, fmod)));                  // movzx eax,state->fmod
-	a.and_(eax, 3);                                                                     // and    eax,3
-	a.mov(MABS(&m_state.fmod), al);                                                     // mov    [fmod],al
-	a.fldcw(word_ptr(uintptr_t(&fp_control[0]), eax, 1));                               // fldcw  fp_control[eax*2]
-	a.mov(eax, ptr(ecx, offsetof(drcuml_machine_state, exp)));                          // mov    eax,state->exp
-	a.mov(MABS(&m_state.exp), eax);                                                     // mov    [exp],eax
-	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, flags)));                 // movzx eax,state->flags
-	a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                                  // push   flags_unmap[eax*4]
-	a.popfd();                                                                          // popf
-	a.ret();                                                                            // ret
+	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, fmod)));
+	a.and_(eax, 3);
+	a.mov(MABS(&m_state.fmod), al);
+	a.fldcw(word_ptr(uintptr_t(&fp_control[0]), eax, 1));
+	a.mov(eax, ptr(ecx, offsetof(drcuml_machine_state, exp)));
+	a.mov(MABS(&m_state.exp), eax);
+
+	a.pushfd();
+	a.and_(dword_ptr(esp), ~0x8c5);
+	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, flags)));
+	a.and_(eax, FLAGS_ALL);
+	a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
+	a.or_(dword_ptr(esp), eax);
+	a.popfd();
+	a.ret();
 
 
 	// emit the generated code
@@ -2432,13 +2437,13 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 			a.mov(ecx, reglo);
 			a.shld(reglo, reghi, count);
-			if (saveflags && count != 0) a.pushfd();
+			if (saveflags && count) a.pushfd();
 			a.shld(reghi, ecx, count);
 		}
 
 		if (saveflags)
 		{
-			if (count == 0)
+			if (!count)
 			{
 				a.test(reglo, reglo);
 				a.pushfd();
@@ -2453,10 +2458,9 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	}
 	else
 	{
-		Label skipall = a.newLabel();
-		Label end = a.newLabel();
-		Label skip1 = a.newLabel();
-		Label shift_loop = a.newLabel();
+		Label const skipall = a.newLabel();
+		Label const end = a.newLabel();
+		Label const skip1 = a.newLabel();
 
 		emit_mov_r32_p32(a, ecx, param);
 
@@ -2467,21 +2471,23 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.cmp(ecx, 32);
 		a.short_().jl(skip1);
 
-		a.bind(shift_loop);
-		if (inst.flags() != 0)
+		if (inst.flags())
 		{
+			Label const shift_loop = a.newLabel();
+
+			a.bind(shift_loop);
 			a.sub(ecx, 31);
 			a.mov(tempreg, reglo);
 			a.shld(reglo, reghi, 31);
 			a.shld(reghi, tempreg, 31);
+			a.cmp(ecx, 32);
+			a.short_().jge(shift_loop);
 		}
 		else
 		{
 			a.xchg(reghi, reglo);
 			a.sub(ecx, 32);
 		}
-		a.cmp(ecx, 32);
-		a.short_().jge(shift_loop);
 
 		a.bind(skip1);
 		reset_last_upper_lower_reg();
@@ -3577,11 +3583,22 @@ void drcbe_x86::op_setflgs(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
 	a.pushfd();
-
-	emit_mov_r32_p32(a, eax, srcp);
-
-	a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
 	a.and_(dword_ptr(esp), ~0x8c5);
+
+	if (srcp.is_immediate())
+	{
+		uint32_t const flags = flags_unmap[srcp.immediate() & FLAGS_ALL];
+		if (!flags)
+			a.xor_(eax, eax);
+		else
+			a.mov(eax, flags);
+	}
+	else
+	{
+		emit_mov_r32_p32(a, eax, srcp);
+		a.and_(eax, FLAGS_ALL);
+		a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
+	}
 	a.or_(dword_ptr(esp), eax);
 
 	a.popfd();
@@ -4652,7 +4669,7 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 	{
 		// 32-bit form
 		emit_mov_r32_p32(a, eax, srcp);                                                 // mov   eax,srcp
-		shift_op_param(a, Inst::kIdRol, inst.size(), eax, shiftp,                                    // rol   eax,shiftp
+		shift_op_param(a, Inst::kIdRol, inst.size(), eax, shiftp,                       // rol   eax,shiftp
 			[inst](Assembler &a, Operand const &dst, be_parameter const &src)
 			{
 				// optimize zero case
@@ -4703,7 +4720,7 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 		}
 		else
 		{
-			a.mov(ptr(esp, -8), ebx);                                                   // mov   [esp-8],ebx
+			a.mov(ptr(esp, 0), ebx);                                                    // mov   [esp],ebx
 			emit_mov_r64_p64(a, ebx, ecx, maskp);                                       // mov   ecx:ebx,maskp
 			a.and_(eax, ebx);                                                           // and   eax,ebx
 			a.and_(edx, ecx);                                                           // and   edx,ecx
@@ -4712,12 +4729,12 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 			if (dstp.is_int_register())
 			{
 				if (dstp.ireg() == Gp::kIdBx)
-					a.and_(ptr(esp, -8), ebx);                                          // and   dstp.lo,ebx
+					a.and_(ptr(esp, 0), ebx);                                           // and   dstp.lo,ebx
 				else
 					a.and_(Gpd(dstp.ireg()), ebx);                                      // and   dstp.lo,ebx
 				a.and_(MABS(m_reghi[dstp.ireg()]), ecx);                                // and   dstp.hi,ecx
 				if (dstp.ireg() == Gp::kIdBx)
-					a.or_(ptr(esp, -8), eax);                                           // or    dstp.lo,eax
+					a.or_(ptr(esp, 0), eax);                                            // or    dstp.lo,eax
 				else
 					a.or_(Gpd(dstp.ireg()), eax);                                       // or    dstp.lo,eax
 				a.or_(MABS(m_reghi[dstp.ireg()]), edx);                                 // or    dstp.hi,edx
@@ -4730,7 +4747,7 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 				a.or_(MABS(dstp.memory(4)), edx);                                       // or    dstp.hi,edx
 			}
 
-			a.mov(ebx, ptr(esp, -8));                                                   // mov   ebx,[esp-8]
+			a.mov(ebx, ptr(esp, 0));                                                    // mov   ebx,[esp]
 
 			if (inst.flags())
 			{
@@ -6985,11 +7002,23 @@ void drcbe_x86::op_fcmp(Assembler &a, const instruction &inst)
 	be_parameter src2p(*this, inst.param(1), PTYPE_MF);
 
 	// general case
-	emit_fld_p(a, inst.size(), src2p);                                                  // fld   src2p
-	emit_fld_p(a, inst.size(), src1p);                                                  // fld   src1p
-	a.fcompp();                                                                         // fcompp
-	a.fnstsw(ax);                                                                       // fnstsw ax
-	a.sahf();                                                                           // sahf
+	emit_fld_p(a, inst.size(), src2p);
+	emit_fld_p(a, inst.size(), src1p);
+	a.fcomip(st1);
+	a.fstp(st0);
+
+	if (inst.flags() & (FLAG_Z | FLAG_C))
+	{
+		// clear Z and C if unordered
+		Label ordered = a.newLabel();
+
+		a.short_().jnp(ordered);
+		a.lahf();
+		a.and_(eax, 0x00003e00);
+		a.sahf();
+
+		a.bind(ordered);
+	}
 }
 
 

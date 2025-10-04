@@ -360,26 +360,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="alcwndrl">
-		<description>Alice in Wonderland (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2015-05-04"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="alice in wonderland (4am crack) side a.dsk" size="143360" crc="46d03565" sha1="bf3ea2cdf0c5fb63aff9686605c2cae84774c62f" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="alice in wonderland (4am crack) side b.dsk" size="143360" crc="f03e007e" sha1="fd960bf392beaa9f081ff36a9f621cd1ce5e3c92" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="animkngd">
 		<description>Animal Kingdom (cleanly cracked)</description>
 		<year>1985</year>
@@ -1251,26 +1231,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="alcwndrlr2">
-		<description>Alice in Wonderland rev. 2 (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="alice in wonderland rev. 2 (4am crack) side a.dsk" size="143360" crc="e9a946e8" sha1="1d23a33c504df204af50d32093010c41f15d8cdc" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="alice in wonderland rev. 2 (4am crack) side b.dsk" size="143360" crc="f249da10" sha1="9ec87f245a6ad0a0414f0b5b1a9c66da94719db0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="trhuntft">
 		<description>A Treasure Hunt of Facts (version 84-02) (cleanly cracked)</description>
 		<year>1984</year>
@@ -2028,39 +1988,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bellhop">
-		<description>Bellhop (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2017-10-04"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bellhop (4am crack).dsk" size="143360" crc="b5a5c914" sha1="fac8017d1810673c8cda26f2e342d30695dba29f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="belwrt">
-		<description>Below the Root (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-11-13"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="below the root (4am crack) side a.dsk" size="143360" crc="b546f694" sha1="e4a03625fd40389af5f787c39f574c1eed569547" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="below the root (4am crack) side b.dsk" size="143360" crc="3298fdc6" sha1="f6b2a638a96afb4c99e182ff6ee477763bb440fa" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="biblebb">
 		<description>Bible Baseball (cleanly cracked)</description>
 		<year>1983</year>
@@ -2315,19 +2242,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="championship baseball (4am crack) side b.dsk" size="143360" crc="b4767c81" sha1="4ad26e03f0227ec4eada7ad0709222baf79427bb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chmpgolf">
-		<description>Championship Golf (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2018-06-12"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="championship golf (4am crack).dsk" size="143360" crc="632254c5" sha1="c4613b775f652be87706f89362ebf61bcdd43239" />
 			</dataarea>
 		</part>
 	</software>
@@ -3179,19 +3093,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="creative play (imperfect 4am crack) side b.dsk" size="143360" crc="58283e22" sha1="1db7172d6549dc8a4f39133ba1c05941acc69a2d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmstopr">
-		<description>Crime Stopper (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2018-08-08"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="crime stopper (4am crack).dsk" size="143360" crc="045b7082" sha1="d0a76363471a6d4f721f8e6506c6b32af2f74e25" />
 			</dataarea>
 		</part>
 	</software>
@@ -4937,19 +4838,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="gin rummy (4am crack).dsk" size="143360" crc="9286c88c" sha1="49140b844e7683a9f0df3eafd4a7fb8cfaa06c76" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gohayden">
-		<description>Go (Hayden) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Co.</publisher>
-		<info name="release" value="2016-07-27"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="go (4am crack).dsk" size="143360" crc="014b2a73" sha1="70a43566885d69bfe902a21103341a431da731a6" />
 			</dataarea>
 		</part>
 	</software>
@@ -9266,19 +9154,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="raf - the battle of britain (4am crack).dsk" size="143360" crc="b2caaab8" sha1="43dd4d5a1085ec0c18c7c3b690b85499d0b1bb50" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="alibi">
-		<description>Alibi (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2019-06-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="alibi (4am crack).dsk" size="143360" crc="0b3db1e0" sha1="8d6a7c582944ee1d54c5c4d875ed4d2e41299ec1" />
 			</dataarea>
 		</part>
 	</software>
@@ -13769,41 +13644,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="swsfamrb">
-		<description>Swiss Family Robinson (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2017-08-12"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="swiss family robinson (4am crack).dsk" size="143360" crc="1cd108f6" sha1="f072c4dcb9bcc05289927adc55da5cd79170185b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swsfamrbb" cloneof="swsfamrb">
-		<description>Swiss Family Robinson (imperfect clean crack)</description>
-		<year>1984</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2017-08-12"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="swiss family robinson (imperfect 4am crack).dsk" size="143360" crc="75f5b079" sha1="652ec117b904ffbe4a5e7f2b53d58273caf67b59" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mpverbs1">
 		<description>Verbs I (cleanly cracked)</description>
 		<year>1982</year>
@@ -14795,67 +14635,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizoz">
-		<description>The Wizard of Oz (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-03-13"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A - Boot"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (4am crack) disk a - boot.dsk" size="143360" crc="a111593a" sha1="8214a6616fc571ed4e1130e0b37724bc83f5aa35" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (4am crack) disk b.dsk" size="143360" crc="f7f64f0b" sha1="94be36f818a7c76ecba6a485e1b40e2f0c7a2aff" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (4am crack) disk c.dsk" size="143360" crc="4e23048d" sha1="db11585b49ffd145c8b06b33b804cd64fb9efe05" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizozb" cloneof="wizoz">
-		<description>The Wizard of Oz (imperfect clean crack)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-03-13"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A - Boot"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (imperfect 4am crack) disk a - boot.dsk" size="143360" crc="f11dcc1b" sha1="49190cb5c69a41f4aaa1d135c303ce69c783cfee" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (imperfect 4am crack) disk b.dsk" size="143360" crc="f7f64f0b" sha1="94be36f818a7c76ecba6a485e1b40e2f0c7a2aff" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (imperfect 4am crack) disk c.dsk" size="143360" crc="4e23048d" sha1="db11585b49ffd145c8b06b33b804cd64fb9efe05" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="zork1r88">
 		<description>Zork I (Release 88 / 840726 / interpreter B) (cleanly cracked)</description>
 		<year>1984</year>
@@ -15197,79 +14976,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the typewriter (4am crack).dsk" size="143360" crc="8ef13d0d" sha1="f5e592d873097db008a5cb5f84e18955242ec193" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trsrisld">
-		<description>Treasure Island (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-10-03"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (4am crack) side a.dsk" size="143360" crc="ae6fd6fd" sha1="8ea61af42b958161c3b50148683e1d8c27573d16" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (4am crack) side b.dsk" size="143360" crc="c3ca1416" sha1="000ffa7d1a40ce5d892a94690a5a398c15bceafc" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (4am crack) side c.dsk" size="143360" crc="0f671042" sha1="3297a11b79c7185a77e8eabd1e93e3d2dabe0a45" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Side D"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (4am crack) side d.dsk" size="143360" crc="ba3b4b42" sha1="5ce7ab049c18615ee5165620aa23185523c5a1e2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trsrisldb" cloneof="trsrisld">
-		<description>Treasure Island (imperfect clean crack)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-10-03"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (imperfect 4am crack) side a.dsk" size="143360" crc="fe6343dc" sha1="29c771367983e74bc72825a0dc805b831585f486" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (imperfect 4am crack) side b.dsk" size="143360" crc="c3ca1416" sha1="000ffa7d1a40ce5d892a94690a5a398c15bceafc" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (imperfect 4am crack) side c.dsk" size="143360" crc="0f671042" sha1="3297a11b79c7185a77e8eabd1e93e3d2dabe0a45" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Side D"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (imperfect 4am crack) side d.dsk" size="143360" crc="ba3b4b42" sha1="5ce7ab049c18615ee5165620aa23185523c5a1e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -21102,27 +20808,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="inca">
-		<description>Inca (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2021-09-17"/>
-		<!-- "Inca" is a 1985 adventure game developed by Joe Emerson and Ken Smith, and distributed by Hayden Software. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="inca (4am crack) side a.dsk" size="143360" crc="622c8e05" sha1="52f15fff82587642fecc73342139260cb12f025e"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="inca (4am crack) side b.dsk" size="143360" crc="32d9ef26" sha1="827d2c6c8e93731d1f8b52e5ae3d1ac8fa4754f7"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hlygrail">
 		<description>The Holy Grail (cleanly cracked)</description>
 		<year>1985</year>
@@ -23847,7 +23532,7 @@ license:CC0-1.0
 	<software name="apstriplon">
 		<description>Adventures in Problem Solving: A Trip to London (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -23863,7 +23548,7 @@ license:CC0-1.0
 	<software name="apsalicenl">
 		<description>Adventures in Problem Solving: Alice's Adventure in Numberland (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -23879,7 +23564,7 @@ license:CC0-1.0
 	<software name="apsmarat">
 		<description>Adventures in Problem Solving: Marathon (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -23895,7 +23580,7 @@ license:CC0-1.0
 	<software name="apstreasfi">
 		<description>Adventures in Problem Solving: The Treasure of Forest Isle (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -24540,13 +24225,81 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="alibi">
+		<description>Alibi (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Ian Trackman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-06-02 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alibi (4am crack).dsk" size="143360" crc="0b3db1e0" sha1="8d6a7c582944ee1d54c5c4d875ed4d2e41299ec1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcwndrlr1" cloneof="alcwndrl">
+		<description>Alice in Wonderland (revision 1) (Windham Classics) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="original_publisher" value="Spinnaker Software" />
+		<info name="programmer" value="Dale DeSharone, Laurence Yep, William Groetzinger, and Vince Mills" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<!-- Revision 1 crack of this game was an earlier version. That one was protected with the E7 bitstream, invented in 1983 and productized in 1984. Revision 2 has a newer protection scheme that wasn't invented until 1985. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2015-05-04 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland (4am crack) side a.dsk" size="143360" crc="46d03565" sha1="bf3ea2cdf0c5fb63aff9686605c2cae84774c62f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland (4am crack) side b.dsk" size="143360" crc="f03e007e" sha1="fd960bf392beaa9f081ff36a9f621cd1ce5e3c92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcwndrl">
+		<description>Alice in Wonderland (revision 2) (Windham Classics) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="original_publisher" value="Spinnaker Software" />
+		<info name="programmer" value="Dale DeSharone, Laurence Yep, William Groetzinger, and Vince Mills" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- Revision 1 crack of this game was an earlier version. That one was protected with the E7 bitstream, invented in 1983 and productized in 1984. Revision 2 has a newer protection scheme that wasn't invented until 1985. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2018-09-28 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland rev. 2 (4am crack) side a.dsk" size="143360" crc="e9a946e8" sha1="1d23a33c504df204af50d32093010c41f15d8cdc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland rev. 2 (4am crack) side b.dsk" size="143360" crc="f249da10" sha1="9ec87f245a6ad0a0414f0b5b1a9c66da94719db0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alcfacflr1" cloneof="alcfacfl">
 		<description>Aliencounter and Face Flash (revision 1) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Milliken Publishing</publisher>
 		<info name="programmer" value="William H. Kraus" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<info name="version" value="revision 2" />
+		<info name="version" value="revision 1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-08-02 -->
 		<!-- educational program -->
@@ -26642,6 +26395,46 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bellhop">
+		<description>Bellhop (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value=" Garry Kitchen and John van Ryzin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-04 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bellhop (4am crack).dsk" size="143360" crc="b5a5c914" sha1="fac8017d1810673c8cda26f2e342d30695dba29f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="belwrt">
+		<description>Below the Root (4am crack)</description>
+		<year>1984</year>
+		<publisher>Windham Classics</publisher>
+		<info name="programmer" value="Dale DeSharone and William Groetzinger" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2018-11-13 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="below the root (4am crack) side a.dsk" size="143360" crc="b546f694" sha1="e4a03625fd40389af5f787c39f574c1eed569547" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="below the root (4am crack) side b.dsk" size="143360" crc="3298fdc6" sha1="f6b2a638a96afb4c99e182ff6ee477763bb440fa" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="berraids">
 		<description>Berserker Raids (4am crack)</description>
 		<year>1983</year>
@@ -28250,6 +28043,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="challenge math (4am crack).dsk" size="143360" crc="13ca32af" sha1="77fd54dfe5bc0b3775c43d38540a3f3366d25c24" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chmpgolf">
+		<description>Championship Golf (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Blair Hadfield" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-06-12 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="championship golf (4am crack).dsk" size="143360" crc="632254c5" sha1="c4613b775f652be87706f89362ebf61bcdd43239" />
 			</dataarea>
 		</part>
 	</software>
@@ -30118,11 +29927,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cntparr0">
+	<software name="cntparad">
 		<description>Counting Parade (revision 0) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Spinnaker Software</publisher>
-		<info name="developer" value="Spinnaker Software" />
+		<info name="developer" value="Stepping Stone Software" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 0" />
 		<!-- There is one other known version of this game; it contains differences in several files. -->
@@ -30380,13 +30189,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="crmstopr">
+		<description>Crime Stopper (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="Dan Kitchen and Barry Marx" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-08-08 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="crime stopper (4am crack).dsk" size="143360" crc="045b7082" sha1="d0a76363471a6d4f721f8e6506c6b32af2f74e25" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crmwave">
 		<description>Crime Wave (4am crack)</description>
 		<year>1983</year>
 		<publisher>Penguin Software</publisher>
 		<info name="programmer" value="Scott Schram" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-02-15 -->
 		<!-- arcade game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -35105,6 +34931,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gohayden">
+		<description>Go (Hayden Book Company) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Stan Erwin" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-07-27 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="go (4am crack).dsk" size="143360" crc="014b2a73" sha1="70a43566885d69bfe902a21103341a431da731a6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="go2headclmb" cloneof="go2headcl">
 		<description>Go To The Head Of The Class (4am crack)</description>
 		<year>1984</year>
@@ -36601,6 +36443,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="inferential anne ii (4am crack).dsk" size="143360" crc="aaccfba4" sha1="47e7fe20de827e9292a8d2a5fe1912db93da2633" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inca">
+		<description>Inca (4am crack)</description>
+		<year>1985</year>
+		<publisher>Hayden Software</publisher>
+		<info name="programmer" value="Joe Emerson and Ken Smith" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-09-17 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="inca (4am crack) side a.dsk" size="143360" crc="622c8e05" sha1="52f15fff82587642fecc73342139260cb12f025e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Story"/>
+			<dataarea name="flop" size="143360">
+				<rom name="inca (4am crack) side b.dsk" size="143360" crc="32d9ef26" sha1="827d2c6c8e93731d1f8b52e5ae3d1ac8fa4754f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39177,10 +39042,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="mspells81" cloneof="mspells21">
-		<description>Magic Spells (1981) (Apple) (4am crack)</description>
+		<description>Magic Spells (version 1981) (Apple) (4am crack)</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
 		<info name="developer" value="Advanced Learning Technology"/>
+		<info name="original_publisher" value="Advanced Learning Technology" />
 		<info name="programmer" value="Leslie Grimm and Corrine Grimm" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<info name="version" value="1981" />
@@ -39195,10 +39061,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="mspells11" cloneof="mspells21">
-		<description>Magic Spells (version 1.1) (4am and san inc crack)</description>
+		<description>Magic Spells (version 1.1) (The Learning Company) (4am and san inc crack)</description>
 		<year>1981</year>
 		<publisher>The Learning Company</publisher>
-		<info name="original_publisher" value="Apple Computer" />
+		<info name="original_publisher" value="Advanced Learning Technology" />
 		<info name="programmer" value="Leslie Grimm and Corrine Grimm" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1.1" />
@@ -39213,10 +39079,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="mspells21">
-		<description>Magic Spells (version 2.1) (4am crack)</description>
+		<description>Magic Spells (version 2.1) (The Learning Company) (4am crack)</description>
 		<year>1985</year>
 		<publisher>The Learning Company</publisher>
-		<info name="original_publisher" value="Apple Computer" />
+		<info name="original_publisher" value="Advanced Learning Technology" />
 		<info name="programmer" value="K. Elliott, G. Genoar, S. Gordon, L. Grimm, and K. Klose" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<info name="version" value="2.1" />
@@ -45286,7 +45152,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Penguin Software</publisher>
 		<info name="programmer" value="Eagle Berns and Michael Kosaka" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-08-08 -->
 		<!-- arcade game -->
@@ -46044,6 +45910,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-12-28 -->
 		<!-- educational program -->
+		<!-- This may be side B of Sum Ducks. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="prime ducks (4am crack).dsk" size="143360" crc="7eec8773" sha1="35e17dacfb9d87b68a290aa503464baebc01b285" />
@@ -51342,7 +51209,7 @@ license:CC0-1.0
 	<software name="sshonbear">
 		<description>Start Solving: Honeybear (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -51358,7 +51225,7 @@ license:CC0-1.0
 	<software name="sssamstst">
 		<description>Start Solving: Sam's Sticker Store (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -51374,7 +51241,7 @@ license:CC0-1.0
 	<software name="sstinatvs">
 		<description>Start Solving: Tina's TV Show (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -52730,6 +52597,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2C,A2GS" />
 		<!-- Dump released: 2015-10-16 -->
 		<!-- educational program -->
+		<!-- This was also shipped with side B, Prime Ducks. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="sum ducks (4am crack).dsk" size="143360" crc="0838572d" sha1="bc04d30512bac66d6e1fdf80eaef7ae00ecc4ffd" />
@@ -53019,6 +52887,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="survival math (4am crack).dsk" size="143360" crc="0965ef15" sha1="e66d1ab9f5b0f244f5cbdb0f0d03c3c850e29aff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swfrobin">
+		<description>Swiss Family Robinson (4am crack)</description>
+		<year>1984</year>
+		<publisher>Windham Classics</publisher>
+		<info name="developer" value="Tom Snyder Productions" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-12. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="swiss family robinson (4am crack).dsk" size="143360" crc="1cd108f6" sha1="f072c4dcb9bcc05289927adc55da5cd79170185b" />
 			</dataarea>
 		</part>
 	</software>
@@ -54966,7 +54850,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="developer" value="Tom Snyder Productions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="version 1" />
 		<!-- This undated version was released with a different copy protection than later versions -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -54984,7 +54868,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="developer" value="Tom Snyder Productions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="version 2" />
 		<!-- Updated protection and re-released.  There are no other known changes between the two versions. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -56433,6 +56317,35 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wizardoz">
+		<description>The Wizard of Oz (4am crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="programmer" value="Ruth Wick, Ralph Hebb, Dan Mydlack, Mitch Stein, Howard Boles, and Seth Godin" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-03-13. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of oz (4am crack) disk a - boot.dsk" size="143360" crc="a111593a" sha1="8214a6616fc571ed4e1130e0b37724bc83f5aa35" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of oz (4am crack) disk b.dsk" size="143360" crc="f7f64f0b" sha1="94be36f818a7c76ecba6a485e1b40e2f0c7a2aff" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of oz (4am crack) disk c.dsk" size="143360" crc="4e23048d" sha1="db11585b49ffd145c8b06b33b804cd64fb9efe05" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wgbbg">
 		<description>The World's Greatest Baseball Game (4am crack)</description>
 		<year>1986</year>
@@ -56587,8 +56500,8 @@ license:CC0-1.0
 	<software name="thkmathunps">
 		<description>Thinkers: Mathematics Unlimited Problem Solving (4am crack)</description>
 		<year>1986</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
-		<info name="developer" value="Holt, Rinehart &amp; Winston" />
+		<publisher>Holt, Rinehart and Winston</publisher>
+		<info name="developer" value="Holt, Rinehart and Winston" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-12-31 -->
@@ -57107,7 +57020,8 @@ license:CC0-1.0
 		<description>Trains (4am crack)</description>
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="developer" value="Spinnaker Software" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-03-08 -->
 		<!-- educational game -->
@@ -57167,7 +57081,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="transyl82" cloneof="transyl">
-		<description>Transylvania (version 1982) (4am crack)</description>
+		<description>Transylvania (version 1982) (Penguin Software) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Penguin Software</publisher>
 		<info name="programmer" value="Antonio Antiochia" />
@@ -57184,7 +57098,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="transyl84" cloneof="transyl">
-		<description>Transylvania (version 1984) (4am crack)</description>
+		<description>Transylvania (version 1984) (Penguin Software) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Penguin Software</publisher>
 		<info name="programmer" value="Antonio Antiochia, Steven Meuse, and Marsha Meuse" />
@@ -57202,7 +57116,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="transyl">
-		<description>Transylvania (version 1985) (4am crack)</description>
+		<description>Transylvania (version 1985) (Polarware) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Polarware</publisher>
 		<info name="original_publisher" value="Penguin Software" />
@@ -57274,6 +57188,42 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="travels with za-zoom- the world rev. 2 (4am crack).dsk" size="143360" crc="da36cc5c" sha1="a1390091e342263a9b2f07863a3a139ddda40d5e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trisland">
+		<description>Treasure Island (4am crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="developer" value="Byron Preiss Video Productions" />
+		<info name="programmer" value="Michael P. Meyer, John Pierard, Ann Weil, Andre Garneau, and Lee Jacknow" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-10-03. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (4am crack) side a.dsk" size="143360" crc="ae6fd6fd" sha1="8ea61af42b958161c3b50148683e1d8c27573d16" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (4am crack) side b.dsk" size="143360" crc="c3ca1416" sha1="000ffa7d1a40ce5d892a94690a5a398c15bceafc" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (4am crack) side c.dsk" size="143360" crc="0f671042" sha1="3297a11b79c7185a77e8eabd1e93e3d2dabe0a45" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (4am crack) side d.dsk" size="143360" crc="ba3b4b42" sha1="5ce7ab049c18615ee5165620aa23185523c5a1e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -58692,7 +58642,7 @@ license:CC0-1.0
 	<software name="voygmimi">
 		<description>Voyage of the Mimi (4am crack)</description>
 		<year>1985</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="programmer" value="Cynthia Char, Bill Tally, Dennis Sullivan, Michael Martin, and Roberta Schwartz" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -59033,7 +58983,7 @@ license:CC0-1.0
 	<software name="wtpacerept">
 		<description>What's the Problem: Ace Reporter (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -59049,7 +58999,7 @@ license:CC0-1.0
 	<software name="wtpchesche">
 		<description>What's the Problem: Chester and the Cheese (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -59065,7 +59015,7 @@ license:CC0-1.0
 	<software name="wtpwhworld">
 		<description>What's the Problem: Where in the World? (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />

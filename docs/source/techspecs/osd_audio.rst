@@ -10,10 +10,10 @@ host system audio.  A part of it is the OSD support, where a
 host-specific module ensures the interface between Mame and the host.
 This is the documentation for that module.
 
-Note: this is currenty output-only, but input should follow.
+Note: this is currently output-only, but input should follow.
 
 
-Capabitilies
+Capabilities
 ------------
 
 The OSD interface is designed to allow three levels of support,
@@ -175,7 +175,7 @@ every frame would be a bad idea.
     virtual uint32_t get_generation() override;
 
 That method returns the current generation number.  It's called at a
-minimum once per update, which usually means per frame.  It whould be
+minimum once per update, which usually means per frame.  It should be
 reasonably lightweight when nothing special happens.
 
 .. code-block: C++

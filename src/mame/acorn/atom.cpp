@@ -219,8 +219,8 @@ public:
 	void atombbc(machine_config &config);
 
 protected:
-	void machine_start() override ATTR_COLD;
-	void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	memory_view m_mode;
@@ -242,7 +242,7 @@ public:
 	void atomes(machine_config &config);
 
 protected:
-	void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_ioport m_cfg_mode;
@@ -271,7 +271,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( clock_boost );
 
 protected:
-	void machine_start() override ATTR_COLD;
+	 virtual void machine_start() override ATTR_COLD;
 
 private:
 	memory_share_creator<uint8_t> m_ram;
@@ -1103,11 +1103,8 @@ void prophet_state::machine_reset()
 {
 	atom_state::machine_reset();
 
-	if (m_cfg_mode->read())
-	{
-		/* Autoboot into ROM */
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
+	/* Autoboot into ROM */
+	m_maincpu->set_input_line(M6502_IRQ_LINE, m_cfg_mode->read() ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

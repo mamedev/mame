@@ -10,13 +10,6 @@
   according to Xing Xing
   "The main cpu of PGM3 whiched coded as 'SOC38' is an ARM1176@800M designed by SOCLE(http://www.socle-tech.com/). Not much infomation is available on this asic"
 
-  there is likely a 512KBytes encrypted bootloader(u-boot?) inside the cpu which load the kernel&initrd from the external SD card.
-
-  however, according to
-  http://www.arcadebelgium.net/t4958-knights-of-valour-3-hd-sangoku-senki-3-hd
-  the CPU is an Intel Atom D525 CPU with 2GB of RAM (but based on hardware images this is incorrect, they clearly show the CPU Xing Xing states is used)
-
-
   the card images seem to have encrypted data up to the C2000000 mark, then
   some text string about a non-bootable disk followed by mostly blank data
 
@@ -51,6 +44,7 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include "util/aes256cbc.h"
 
 namespace {
 
@@ -59,14 +53,15 @@ class pgm3_state : public driver_device
 public:
 	pgm3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_mainram(*this, "mainram")
+	{ }
 
 	void pgm3(machine_config &config);
 
 	void init_kov3hd();
 
 private:
-
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
@@ -74,11 +69,47 @@ private:
 	void screen_vblank_pgm3(int state);
 	required_device<cpu_device> m_maincpu;
 	void pgm3_map(address_map &map) ATTR_COLD;
+	void decryptaes(const uint8_t *key, const uint8_t *iv, int source, int dest, int length);
+
+	required_shared_ptr<u32> m_mainram;
 };
+
+void pgm3_state::decryptaes(const uint8_t *key, const uint8_t *iv, int source, int dest, int length)
+{
+	using namespace aes256cbc;
+
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	AES_CTX ctx;
+	uint8_t inbuffer[16];
+	uint8_t outbufer[16];
+
+	AES_DecryptInit(&ctx, key, iv);
+
+	for (int i = 0; i < length; i += 16)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			inbuffer[j] = mem.read_byte(source + i + j);
+		}
+
+		AES_Decrypt(&ctx, inbuffer, outbufer);
+
+		for (int j = 0; j < 16; j++)
+		{
+			mem.write_byte(dest + i + j, outbufer[j]);
+		}
+	}
+
+	AES_CTX_Free(&ctx);
+}
 
 void pgm3_state::pgm3_map(address_map &map)
 {
-	map(0x00000000, 0x00003fff).rom();
+	map(0x00000000, 0x0007ffff).ram().share("mainram");
+	//map(0x00000000, 0x00007fff).rom().region("internal_mask", 0); // for full boot process the internal mask area would initially appear at 0
+
+	map(0x10000000, 0x1007ffff).rom().region("internal_flash", 0);
+	map(0x28000000, 0x2801ffff).ram();
 }
 
 static INPUT_PORTS_START( pgm3 )
@@ -103,14 +134,30 @@ void pgm3_state::machine_start()
 
 void pgm3_state::machine_reset()
 {
+	// perform a bootstrap to bypass the level 0 internal_mask as it might not be properly dumped
+	uint8_t* bootrom = memregion("internal_mask")->base();
+	uint8_t rom_aes_key[32];
+	uint8_t rom_aes_iv[16];
+
+	for (int i = 0; i < 32; i++)
+		rom_aes_key[i] = bootrom[0x42b8 + i];
+
+	for (int i = 0; i < 16; i++)
+		rom_aes_iv[i] = bootrom[0x44a8 + i];
+
+	// the first 0x20000 bytes are encrypted with this key, it then uses other keys to decrypt the rest
+	// the decryption is done in hardware, not software
+    decryptaes(rom_aes_key, rom_aes_iv, 0x10000000, 0x00000000, 0x20000);
+
+	// if we want to boot from somewhere else, change this
+	//m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x04000000);
 }
 
 void pgm3_state::pgm3(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM9(config, m_maincpu, 800000000); // wrong, see notes at top of driver
+	ARM1176JZF_S(config, m_maincpu, 800000000); // SOC38 / IGS038 - ARM1176JZ based SoC
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm3_state::pgm3_map);
-	m_maincpu->set_disable();
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -125,9 +172,21 @@ void pgm3_state::pgm3(machine_config &config)
 	PALETTE(config, "palette").set_entries(0x1000);
 }
 
+#define KOV3HD_SOC_ROMS \
+	/* The mask part of the SOC38, this gets hidden by the system after use */ \
+	/* Same ROM is likely used by other games as it contains a number of unused keys, with the key to use being selected by a HW register */ \
+	/* kov3hd uses the AES keys at 0x42b8 and 0x44a8 in this ROM */ \
+	/* the only purpose of this bootloader is to decrypt the flash part of the internal ROM below, copying it into RAM */ \
+	/* (ROM was reconstructed from several decap attempts, hence BAD_DUMP as there could be errors, furthermore it was dumped from a chip */ \
+	/*  marked 'production sample' so could be different from final) */ \
+	ROM_REGION32_LE( 0x8000, "internal_mask", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "internal_boot.bin", 0x0000, 0x8000, BAD_DUMP CRC(f6877f92) SHA1(4431d73cc7e5bbb11cd53449284fff1435a6ea32) ) \
+	/* internal flash is for KOV3HD, and gets decrypted using hardware AES decryption and a key from internal_mask */ \
+	ROM_REGION32_LE( 0x80000, "internal_flash", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "internal_flash.bin", 0x0000, 0x80000, CRC(5925187d) SHA1(3acc29891142d47a7bf3c73016a06bc436977b40) )
+
 ROM_START( kov3hd )
-	ROM_REGION( 0x04000, "maincpu", ROMREGION_ERASE00 )
-	// does it boot from the card, or is there an internal rom?
+	KOV3HD_SOC_ROMS
 
 	DISK_REGION( "card" )
 	DISK_IMAGE( "kov3hd_m105", 0, SHA1(81af30aa6e1a34b2a8fab8c5c23a313a7164767c) )
@@ -135,32 +194,28 @@ ROM_START( kov3hd )
 ROM_END
 
 ROM_START( kov3hd104 )
-	ROM_REGION( 0x04000, "maincpu", ROMREGION_ERASE00 )
-	// does it boot from the card, or is there an internal rom?
+	KOV3HD_SOC_ROMS
 
 	DISK_REGION( "card" )
 	DISK_IMAGE( "kov3hd_m104", 0, SHA1(899b3b81825e6f23ae8f39aa67ad5b019f387cf9) )
 ROM_END
 
 ROM_START( kov3hd103 )
-	ROM_REGION( 0x04000, "maincpu", ROMREGION_ERASE00 )
-	// does it boot from the card, or is there an internal rom?
+	KOV3HD_SOC_ROMS
 
 	DISK_REGION( "card" )
 	DISK_IMAGE( "kov3hd_m103", 0, SHA1(0d4fd981f477cd5ed62609b875f4ddec939a2bb0) )
 ROM_END
 
 ROM_START( kov3hd102 )
-	ROM_REGION( 0x04000, "maincpu", ROMREGION_ERASE00 )
-	// does it boot from the card, or is there an internal rom?
+	KOV3HD_SOC_ROMS
 
 	DISK_REGION( "card" )
 	DISK_IMAGE( "kov3hd_m102", 0, SHA1(a5a872f9add5527b94019ec77ff1cd0f167f040f) )
 ROM_END
 
 ROM_START( kov3hd101 )
-	ROM_REGION( 0x04000, "maincpu", ROMREGION_ERASE00 )
-	// does it boot from the card, or is there an internal rom?
+	KOV3HD_SOC_ROMS
 
 	DISK_REGION( "card" )
 	DISK_IMAGE( "kov3hd_m101", 0, SHA1(086d6f1b8b2c01a8670fd6480da44b9c507f6e08) )

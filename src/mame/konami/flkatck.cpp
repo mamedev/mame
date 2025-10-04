@@ -227,7 +227,7 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// draw the graphics
 	m_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, clip[0], 0, m_k007121->flipscreen() ? 16 : 40, 0, screen.priority(), (uint32_t)-1);
+	m_k007121->sprites_draw(bitmap, clip[0], screen.priority(), (uint32_t)-1);
 	m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 
 	return 0;
@@ -403,6 +403,7 @@ void flkatck_state::flkatck(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).set_endianness(ENDIANNESS_LITTLE);
 
 	K007121(config, m_k007121, 0, gfx_flkatck, "palette", "screen");
+	m_k007121->set_sprite_offsets(40, 16);
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_flipscreen_cb().set(FUNC(flkatck_state::flipscreen_w));
 

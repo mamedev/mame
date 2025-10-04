@@ -1013,7 +1013,7 @@ void upd7810_device::MOV_ANM_A()
 /* 4d c9: 0100 1101 1100 1001 */
 void upd7810_device::MOV_SMH_A()
 {
-	SMH = A;
+	write_smh(A);
 }
 
 /* 4d ca: 0100 1101 1100 1010 */
@@ -4093,7 +4093,10 @@ void upd7810_device::MVI_ANM_xx()
 /* 64 81: 0110 0100 1000 0001 xxxx xxxx */
 void upd7810_device::MVI_SMH_xx()
 {
-	RDOPARG( SMH );
+	uint8_t imm;
+
+	RDOPARG( imm );
+	write_smh(imm);
 }
 
 /* 64 83: 0110 0100 1000 0011 xxxx xxxx */
@@ -4125,7 +4128,7 @@ void upd7810_device::ANI_SMH_xx()
 	uint8_t imm;
 
 	RDOPARG( imm );
-	SMH &= imm;
+	write_smh(SMH & imm);
 	SET_Z(SMH);
 }
 
@@ -4169,7 +4172,7 @@ void upd7810_device::XRI_SMH_xx()
 	uint8_t imm;
 
 	RDOPARG( imm );
-	SMH ^= imm;
+	write_smh(SMH ^ imm);
 	SET_Z(SMH);
 }
 
@@ -4213,7 +4216,7 @@ void upd7810_device::ORI_SMH_xx()
 	uint8_t imm;
 
 	RDOPARG( imm );
-	SMH |= imm;
+	write_smh(SMH | imm);
 	SET_Z(SMH);
 }
 
@@ -4263,7 +4266,7 @@ void upd7810_device::ADINC_SMH_xx()
 	tmp = SMH + imm;
 
 	ZHC_ADD( tmp, SMH, 0 );
-	SMH = tmp;
+	write_smh(tmp);
 	SKIP_NC;
 }
 
@@ -4371,7 +4374,7 @@ void upd7810_device::SUINB_SMH_xx()
 	RDOPARG( imm );
 	tmp = SMH - imm;
 	ZHC_SUB( tmp, SMH, 0 );
-	SMH = tmp;
+	write_smh(tmp);
 	SKIP_NC;
 }
 
@@ -4469,7 +4472,7 @@ void upd7810_device::ADI_SMH_xx()
 	tmp = SMH + imm;
 
 	ZHC_ADD( tmp, SMH, 0 );
-	SMH = tmp;
+	write_smh(tmp);
 }
 
 /* 64 c3: 0110 0100 1100 0011 xxxx xxxx */
@@ -4562,7 +4565,7 @@ void upd7810_device::ACI_SMH_xx()
 	tmp = SMH + imm + (PSW & CY);
 
 	ZHC_ADD( tmp, SMH, (PSW & CY) );
-	SMH = tmp;
+	write_smh(tmp);
 }
 
 /* 64 d3: 0110 0100 1101 0011 xxxx xxxx */
@@ -4653,7 +4656,7 @@ void upd7810_device::SUI_SMH_xx()
 	RDOPARG( imm );
 	tmp = SMH - imm;
 	ZHC_SUB( tmp, SMH, 0 );
-	SMH = tmp;
+	write_smh(tmp);
 }
 
 /* 64 e3: 0110 0100 1110 0011 xxxx xxxx */
@@ -4746,7 +4749,7 @@ void upd7810_device::SBI_SMH_xx()
 	RDOPARG( imm );
 	tmp = SMH - imm - (PSW & CY);
 	ZHC_SUB( tmp, SMH, (PSW & CY) );
-	SMH = tmp;
+	write_smh(tmp);
 }
 
 /* 64 f3: 0110 0100 1111 0011 xxxx xxxx */
@@ -8746,7 +8749,7 @@ void upd7810_device::SETB()
 			MKL |= (1 << bit);
 			break;
 		case 0x19:  /* SMH */
-			SMH |= (1 << bit);
+			write_smh(SMH | (1 << bit));
 			break;
 		case 0x1b:  /* EOM */
 			EOM |= (1 << bit);
@@ -8796,7 +8799,7 @@ void upd7810_device::CLR()
 			MKL &= ~(1 << bit);
 			break;
 		case 0x19:  /* SMH */
-			SMH &= ~(1 << bit);
+			write_smh(SMH & ~(1 << bit));
 			break;
 		case 0x1b:  /* EOM */
 			EOM &= ~(1 << bit);

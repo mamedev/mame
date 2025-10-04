@@ -71,7 +71,6 @@ public:
 		, m_1mhzbus(*this, "1mhzbus")
 		, m_userport(*this, "userport")
 		, m_internal(*this, "internal")
-		, m_exp(*this, "exp")
 		, m_fdc(*this, "fdc")
 		, m_rom(*this, "romslot%u", 0U)
 		, m_cart(*this, "cartslot%u", 1U)
@@ -85,8 +84,6 @@ public:
 
 	uint8_t mos_r(offs_t offset);
 	void mos_w(offs_t offset, uint8_t data);
-
-	int get_analogue_input(int channel_number);
 
 	void init_bbc();
 	void init_ltmp();
@@ -119,7 +116,6 @@ protected:
 	optional_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	optional_device<bbc_userport_slot_device> m_userport;
 	optional_device<bbc_internal_slot_device> m_internal;
-	optional_device<bbc_exp_slot_device> m_exp;
 	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device_array<bbc_romslot_device, 16> m_rom;
 	optional_device_array<bbc_cartslot_device, 2> m_cart;

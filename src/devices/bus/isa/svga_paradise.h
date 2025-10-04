@@ -139,7 +139,6 @@ protected:
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	void io_isa_map(address_map &map) ATTR_COLD;
 
-private:
 	required_device<wd90c11a_vga_device> m_vga;
 };
 

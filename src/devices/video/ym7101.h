@@ -42,12 +42,14 @@ public:
 		if (machine().side_effects_disabled())
 			return;
 
-		if (m_vint_pending)
+		// chukrck2 & d_titov2 cares about not ack-ing an irq that isn't enabled.
+		// fatalrew/killshow & sesame otherwise need this
+		if (m_vint_pending && m_ie0)
 		{
 			m_vint_pending = 0;
 			m_vint_callback(0);
 		}
-		else if (m_hint_pending)
+		else if (m_hint_pending && m_ie1)
 		{
 			m_hint_pending = 0;
 			m_hint_callback(0);
@@ -143,14 +145,21 @@ private:
 	void control_port_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 hv_counter_r(offs_t offset, u16 mem_mask);
 
+	u16 get_hv_counter();
+	bool in_hblank();
+
 	void vram_w(offs_t offset, u16 data, u16 mem_mask);
 	void cram_w(offs_t offset, u16 data, u16 mem_mask);
 
-	bool m_ie1;
+	bool m_ie1; // HINT enable
 	bool m_vr; // 128 KiB VRAM mode (undocumented)
-	bool m_de;
-	bool m_ie0;
+	bool m_de; // display enable
+	bool m_ie0; // VINT enable
 	bool m_m1; // DMA enable
+	bool m_m2; // Vertical resolution V28/V30, latter won't sync in NTSC
+	bool m_m3; // latch H/V counter
+	bool m_m5; // Mode 5 if on, else Mode 4 (SMS)
+	bool m_sh; // Shadow/Highlight mode, aliases: S/TE, S/TEN
 	u32 m_hscroll_address;
 	u8 m_hsz, m_vsz;
 	u8 m_auto_increment;
@@ -171,11 +180,19 @@ private:
 	u8 m_hres_mode;
 	int m_vint_pending, m_hint_pending;
 	int m_vcounter; // irq4 counter
+	u16 m_hvcounter_latch;
+	u32 m_vram_mask;
+	bool m_sprite_collision, m_sprite_overflow;
 
 	bitmap_rgb32 m_bitmap;
 	bool render_line(int scanline);
 	void prepare_sprite_line(int scanline);
 	void prepare_tile_line(int scanline);
+
+	typedef u8 (ym7101_device::*mix_func)(u8 dot_a, u8 dot_b, u8 sprite_dot);
+	static const mix_func mix_table[2];
+	u8 mix_normal(u8 dot_a, u8 dot_b, u8 sprite_dot);
+	u8 mix_sh(u8 dot_a, u8 dot_b, u8 sprite_dot);
 
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 

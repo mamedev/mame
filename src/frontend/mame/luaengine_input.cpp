@@ -355,10 +355,8 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["is_analog"] = sol::property(&ioport_field::is_analog);
 	ioport_field_type["is_digital_joystick"] = sol::property(&ioport_field::is_digital_joystick);
 	ioport_field_type["enabled"] = sol::property(&ioport_field::enabled);
-	ioport_field_type["optional"] = sol::property(&ioport_field::optional);
 	ioport_field_type["cocktail"] = sol::property(&ioport_field::cocktail);
 	ioport_field_type["toggle"] = sol::property(&ioport_field::toggle);
-	ioport_field_type["rotated"] = sol::property(&ioport_field::rotated);
 	ioport_field_type["analog_reverse"] = sol::property(&ioport_field::analog_reverse);
 	ioport_field_type["analog_reset"] = sol::property(&ioport_field::analog_reset);
 	ioport_field_type["analog_wraps"] = sol::property(&ioport_field::analog_wraps);

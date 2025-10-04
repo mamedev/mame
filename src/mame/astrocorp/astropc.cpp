@@ -33,7 +33,7 @@ Flying Age           NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=34
 Halloween Party     YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=35
 Olympian Games      YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=36
 The Circus           NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=37
-Treasure Hunting     NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=38
+Treasure Hunting    YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=38
 World War II         NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=39
 Ra's Scepter        YES
 Hawaii              YES
@@ -322,6 +322,22 @@ ROM_START( hwparty )
 	ROM_LOAD( "halloween_us.23.a.img", 0x0000, 0x7a80000, CRC(65d3877f) SHA1(076035bd55189a186368ae42463ab7471be1583c) )
 ROM_END
 
+ // Pallas GX1 REV:B - AMD Geode CS5530A-UCE, SMC FDC37C932APM. Sub board with ROMs, ASTRO M and ASTRO V102PX-013 customs
+ROM_START( treasurh )
+	// GAME NAME    : TREASURE HUNTING
+	// GAME TYPE    : MULTI-LINER
+	// DEVELOPER    : ASTRO CORP
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */
+	ROM_LOAD( "phoenixbios_e586 bios.u16", 0x0000, 0x040000, CRC(885e3cde) SHA1(ff90cda4383a119c7f54545c11fa432505e66c1b) )
+
+	ROM_REGION(0x20000, "rom", 0) // on subboard
+	ROM_LOAD16_BYTE( "thus-47.1", 0x00000, 0x010000, CRC(49951369) SHA1(b9362b3046f2e3f974ec1c40fb2dabd42406f359) )
+	ROM_LOAD16_BYTE( "thus-47.2", 0x00001, 0x010000, CRC(6700e29b) SHA1(97f8e1738e9257f831f11d9fb609f4fcabc0318e) )
+
+	ROM_REGION(0x8000000, "drive", 0)
+	ROM_LOAD( "halloween_us.23.a.img", 0x0000000, 0x3d20000, CRC(6ebf4568) SHA1(f0db56d8f7ba9969570a108159ec4621a57a392c) )
+ROM_END
+
 
 // The following games use an Artemis II sub board and may need to be moved to a separate driver
 // The Artemis II sub board has 2x M68K ROMs and 2x LY621024SL RAMs on the upper side,
@@ -383,6 +399,8 @@ GAME( 2004,  hawaii,   0,       astropc, astropc, astropc_state, init_astropc, R
 GAME( 2005,  oligam,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Olympian Games (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 2005,  rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Ra's Scepter (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 2005,  treasurh, 0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Treasure Hunting (US.09.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Artemis II games

@@ -67,7 +67,7 @@ license:CC0-1.0
 			<bounds x="90" y="10" width="10" height="10" />
 		</element>
 
-<!-- control unit-->
+		<!-- control unit-->
 		<element name="led0" ref="led_red">
 			<bounds left="40" right="45" top="30" bottom="35" />
 		</element>
@@ -75,18 +75,18 @@ license:CC0-1.0
 			<bounds left="50" right="55" top="30" bottom="35" />
 		</element>
 
-<!-- debug-->
-    <repeat count="12">
-    <param name="s" start="0" increment="1" />
-    <param name="x" start="0" increment="2" />
-        <repeat count="8">
-        <param name="z" start="0" increment="1" />
-        <param name="y" start="30" increment="2" />
-            <element name="lamp~z~~s~" ref="green_led">
-			    <bounds x="~x~" y="~y~" width="1" height="1" />
-		    </element>
-        </repeat>
-    </repeat>
+		<!-- debug-->
+		<repeat count="12">
+			<param name="s" start="0" increment="1" />
+			<param name="x" start="0" increment="2" />
+			<repeat count="8">
+			<param name="z" start="0" increment="1" />
+			<param name="y" start="30" increment="2" />
+				<element name="lamp~z~~s~" ref="green_led">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+				</element>
+			</repeat>
+		</repeat>
 
 
 	</view>

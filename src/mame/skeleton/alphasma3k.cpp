@@ -67,8 +67,8 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<hd44780_device> m_lcdc0;
-	required_device<hd44780_device> m_lcdc1;
+	required_device<ks0066_device> m_lcdc0;
+	required_device<ks0066_device> m_lcdc1;
 	required_device<ram_device> m_ram;
 	required_region_ptr<u16> m_ipl;
 

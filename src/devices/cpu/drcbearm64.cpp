@@ -4,38 +4,71 @@
 
 Register use:
 
-r0      first function parameter/return value
-r1      second function parameter
-r2      third function parameter
-r3      fourth function parameter
-r4
-r5
-r6
-r7
-r8
-r9      temporary for intermediate values
-r10     temporary for intermediate values
-r11     temporary for intermediate values
-r12     scratch register used by helper functions
-r13     scratch register used by helper functions
-r14     scratch register used for address calculation
-r15     temporary used in opcode functions
-r16
-r17
-r18
-r19     UML register I0
-r20     UML register I1
-r21     UML register I2
-r22     UML register I3
-r23     UML register I4
-r24     UML register I5
-r35     UML register I6
-r26     UML register I7
-r27     near cache pointer
-r28     emulated flags
-r29     base generated code frame pointer
+r0      parameter/result    first function parameter/return value
+r1      parameter/result    second function parameter
+r2      parameter/result    third function parameter
+r3      parameter/result    fourth function parameter
+r4      parameter/result
+r5      parameter/result
+r6      parameter/result
+r7      parameter/result
+r8      result pointer
+r9                          temporary for intermediate values
+r10                         temporary for intermediate values
+r11                         temporary for intermediate values
+r12                         scratch register used by helper functions
+r13                         scratch register used by helper functions
+r14                         scratch register used for address calculation
+r15                         temporary used in opcode functions
+r16     intra-call scratch
+r17     intra-call scratch
+r18     platform register
+r19     callee-saved        UML register I0
+r20     callee-saved        UML register I1
+r21     callee-saved        UML register I2
+r22     callee-saved        UML register I3
+r23     callee-saved        UML register I4
+r24     callee-saved        UML register I5
+r35     callee-saved        UML register I6
+r26     callee-saved        UML register I7
+r27     callee-saved        near cache pointer
+r28     callee-saved        emulated flags
+r29     frame pointer       base generated code frame pointer
 r30     link register
 sp      stack pointer
+
+v0      parameter/result
+v1      parameter/result
+v2      parameter/result
+v3      parameter/result
+v4      parameter/result
+v5      parameter/result
+v6      parameter/result
+v7      parameter/result
+v8                          UML register F0
+v9                          UML register F1
+v10                         UML register F2
+v11                         UML register F3
+v12                         UML register F4
+v13                         UML register F5
+v14                         UML register F6
+v15                         UML register F7
+v16                         temporary for intermediate values
+v17                         temporary for intermediate values
+v18                         temporary for intermediate values
+v19
+v20
+v21
+v22
+v23
+v24
+v25
+v26
+v27
+v28
+v29
+v30
+v31
 
 
 Stack layout in top-level generated code frame:
@@ -69,6 +102,11 @@ You can calculate the generated code subroutine call depth as
 (FP - SP) / 0x10.  You can see the return addresses for the generated code
 subroutine calls at SP + 0x08, SP + 0x18, SP + 0x28, etc. until reaching
 the location FP points to.
+
+TODO:
+* Some operations do not clear the upper bits of integer registers when
+  they should (e.g. 32-bit MOV with the same register as source and
+  destination).
 
 ***************************************************************************/
 
@@ -183,13 +221,6 @@ const a64::CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 	a64::CondCode::kLT,    // COND_L,           requires SV
 	a64::CondCode::kGE,    // COND_GE,          requires SV
 };
-
-// UML flag bit numbers
-constexpr unsigned FLAG_BIT_C = 0;
-constexpr unsigned FLAG_BIT_V = 1;
-constexpr unsigned FLAG_BIT_Z = 2;
-constexpr unsigned FLAG_BIT_S = 3;
-constexpr unsigned FLAG_BIT_U = 4;
 
 // masks for immediate values that can be generated with movz instructions
 constexpr uint64_t LSL0_MASK = 0x00000000'0000ffff;
@@ -366,26 +397,15 @@ void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 	a.mov(reg, val);
 }
 
-void store_unordered(a64::Assembler &a)
-{
-	a.cset(SCRATCH_REG1, a64::CondCode::kPL);
-	a.cset(SCRATCH_REG2, a64::CondCode::kNE);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kCS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kVS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.bfi(FLAGS_REG, SCRATCH_REG2, FLAG_BIT_U, 1);
-}
-
 inline void get_unordered(a64::Assembler &a, const a64::Gp &reg)
 {
-	a.ubfx(reg.x(), FLAGS_REG, FLAG_BIT_U, 1);
+	a.ubfx(reg.x(), FLAGS_REG, uml::FLAG_BIT_U, 1);
 }
 
-inline void store_carry_reg(a64::Assembler &a, const a64::Gp &reg)
+inline void store_carry_reg(a64::Assembler &a, const a64::Gp &reg, unsigned bit = 0)
 {
-	a.bfi(FLAGS_REG, reg.x(), FLAG_BIT_C, 1);
+	// this depends on carry being the least significant bit of the flags
+	a.bfxil(FLAGS_REG, reg.x(), bit, 1);
 }
 
 inline void get_carry(a64::Assembler &a, const a64::Gp &reg, bool inverted = false)
@@ -478,7 +498,7 @@ private:
 
 	struct near_state
 	{
-		uint32_t emulated_flags;
+		uint64_t saved_fpcr;
 	};
 
 	struct memory_accessors
@@ -596,11 +616,13 @@ private:
 	arm::Mem emit_loadstore_address_setup(a64::Assembler &a, const a64::Gp &basereg, const be_parameter &indp, const uml::parameter &scalesizep) const;
 
 	void emit_memaccess_setup(a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
+	void emit_narrow_memaccess_setup(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
+	void emit_narrow_memread(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const;
 	void emit_narrow_memwrite(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const;
 
 	void store_carry(a64::Assembler &a, bool inverted = false);
 	void load_carry(a64::Assembler &a, bool inverted = false);
-	void set_flags(a64::Assembler &a);
+	void set_flags(a64::Assembler &a, const a64::Gp &reg);
 
 	void calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits);
 	void calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits);
@@ -981,10 +1003,10 @@ void drcbe_arm64::emit_skip(a64::Assembler &a, uml::condition_t cond, Label &ski
 	switch (cond)
 	{
 		case uml::COND_U:
-			a.tbz(FLAGS_REG, FLAG_BIT_U, skip);
+			a.tbz(FLAGS_REG, uml::FLAG_BIT_U, skip);
 			break;
 		case uml::COND_NU:
-			a.tbnz(FLAGS_REG, FLAG_BIT_U, skip);
+			a.tbnz(FLAGS_REG, uml::FLAG_BIT_U, skip);
 			break;
 		case uml::COND_C:
 		case uml::COND_NC:
@@ -997,7 +1019,7 @@ void drcbe_arm64::emit_skip(a64::Assembler &a, uml::condition_t cond, Label &ski
 					a.b(ARM_NOT_CONDITION(cond), skip);
 					break;
 				default:
-					a.emit((cond == uml::COND_C) ? a64::Inst::kIdTbz : a64::Inst::kIdTbnz, FLAGS_REG, FLAG_BIT_C, skip);
+					a.emit((cond == uml::COND_C) ? a64::Inst::kIdTbz : a64::Inst::kIdTbnz, FLAGS_REG, uml::FLAG_BIT_C, skip);
 			}
 			break;
 		case uml::COND_A:
@@ -1017,7 +1039,7 @@ inline arm::Mem drcbe_arm64::emit_loadstore_address_setup(a64::Assembler &a, con
 	if (scale == 0)
 	{
 		// if there's no shift, sign extension can be part of the addressing mode
-		const a64::Gp offsreg = TEMP_REG3.w();
+		const a64::Gp offsreg = indp.select_register(TEMP_REG3, 4);
 		mov_reg_param(a, 4, offsreg, indp);
 		return arm::Mem(basereg, offsreg, a64::sxtw(0));
 	}
@@ -1081,14 +1103,12 @@ void drcbe_arm64::emit_memaccess_setup(a64::Assembler &a, const be_parameter &ad
 	// x8, x7 and potentially x6 clobbered
 }
 
-void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
+void drcbe_arm64::emit_narrow_memaccess_setup(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const
 {
-	// expects data in REG_PARAM3 and mask in REG_PARAM4
-
 	address_space &space = *m_space[spacesizep.space()];
 	auto const addrreg = (accessors.no_mask || accessors.mask_simple) ? REG_PARAM2 : a64::x5;
 	mov_reg_param(a, 4, addrreg, addrp);
-	get_imm_relative(a, a64::x8, uintptr_t(accessors.specific.write.dispatch));
+	get_imm_relative(a, a64::x8, uintptr_t(side.dispatch));
 
 	// get the shift count for the data and offset in w7
 	int const shift = space.addr_shift() - 3;
@@ -1153,8 +1173,55 @@ void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &ad
 	}
 
 	// apply this pointer displacement if necessary
-	if (accessors.specific.write.displacement)
-		a.add(REG_PARAM1, REG_PARAM1, accessors.specific.write.displacement); // assume less than 4K
+	if (side.displacement)
+		a.add(REG_PARAM1, REG_PARAM1, side.displacement); // assume less than 4K
+
+	// load vtable pointer early if we'll need it
+	if (side.is_virtual)
+		a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+
+	// adjusted dispatch table entry pointer in REG_PARAM1
+	// masked address in REG_PARAM2
+	// shift count in w7
+	// vtable pointer in x8 if virtual
+	// x6 and potentially x8 and x5 clobbered
+}
+
+void drcbe_arm64::emit_narrow_memread(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
+{
+	// expects mask in REG_PARAM3
+
+	emit_narrow_memaccess_setup(a, addrp, spacesizep, accessors, accessors.specific.read);
+
+	// shift the mask
+	a.lsl(REG_PARAM3, REG_PARAM3, a64::x7);
+
+	// stash the shift count - flags are clobbered anyway, so use the emulated flags register
+	a.mov(FLAGS_REG.w(), a64::w7);
+
+	// call the read function
+	if (accessors.specific.read.is_virtual)
+	{
+		a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.read.function)); // assume no more than 4096 vtable entries
+		a.blr(a64::x8);
+	}
+	else
+	{
+		call_arm_addr(a, (const void *)accessors.specific.read.function);
+	}
+
+	// shift the result
+	if (accessors.specific.native_bytes <= 4)
+		a.lsr(REG_PARAM1.w(), REG_PARAM1.w(), FLAGS_REG.w());
+	else
+		a.lsr(REG_PARAM1, REG_PARAM1, FLAGS_REG);
+}
+
+void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
+{
+	// expects data in REG_PARAM3 and mask in REG_PARAM4
+
+	emit_narrow_memaccess_setup(a, addrp, spacesizep, accessors, accessors.specific.write);
 
 	// shift the data and mask
 	a.lsl(REG_PARAM3, REG_PARAM3, a64::x7);
@@ -1163,7 +1230,6 @@ void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &ad
 	// call the write function
 	if (accessors.specific.write.is_virtual)
 	{
-		a.ldr(a64::x8, a64::Mem(REG_PARAM1));
 		a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.write.function)); // assume no more than 4096 vtable entries
 		a.blr(a64::x8);
 	}
@@ -1224,7 +1290,7 @@ void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_pa
 		}
 		else
 		{
-			const a64::Gp scratch = select_register(SCRATCH_REG2, movsize);
+			const a64::Gp scratch = select_register(SCRATCH_REG1, movsize);
 
 			get_imm_relative(a, scratch, (regsize == 4) ? uint32_t(src) : src);
 			emit_str_mem(a, scratch, dst.memory());
@@ -1238,8 +1304,6 @@ void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_pa
 
 void drcbe_arm64::mov_param_param(a64::Assembler &a, uint32_t regsize, const be_parameter &dst, const be_parameter &src) const
 {
-	// FIXME: this won't clear upper bits of the output for a 4-byte move when the source is a register or immediate
-	// need to fix affected cases (mov, sext), currently confounded by issues in the simplifier
 	assert(!dst.is_immediate());
 
 	if (src.is_memory())
@@ -1256,7 +1320,15 @@ void drcbe_arm64::mov_param_param(a64::Assembler &a, uint32_t regsize, const be_
 	}
 	else if (src.is_int_register())
 	{
-		mov_param_reg(a, regsize, dst, src.get_register_int(regsize));
+		if ((regsize == 4) && dst.is_cold_register())
+		{
+			mov_reg_param(a, regsize, SCRATCH_REG1, src);
+			mov_param_reg(a, regsize, dst, SCRATCH_REG1);
+		}
+		else
+		{
+			mov_param_reg(a, regsize, dst, src.get_register_int(regsize));
+		}
 	}
 	else if (src.is_immediate())
 	{
@@ -1390,22 +1462,21 @@ void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted)
 	}
 }
 
-void drcbe_arm64::set_flags(a64::Assembler &a)
+void drcbe_arm64::set_flags(a64::Assembler &a, const a64::Gp &reg)
 {
 	// Set native condition codes after loading flags register
 	m_carry_state = carry_state::POISON;
 
 	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
 
-	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
-	a.ubfx(TEMP_REG3, FLAGS_REG, FLAG_BIT_V, 1); // overflow flag
-	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
+	a.and_(TEMP_REG2, reg.x(), 0b1100); // zero + sign
+	a.bfxil(TEMP_REG2, reg.x(), uml::FLAG_BIT_V, 1); // overflow flag
 	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
 
 	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
 
 	a.mov(TEMP_REG2, FLAG_C | FLAG_U);
-	a.and_(FLAGS_REG, FLAGS_REG, TEMP_REG2);
+	a.and_(FLAGS_REG, reg.x(), TEMP_REG2);
 }
 
 inline void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits)
@@ -1428,18 +1499,11 @@ inline void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const
 {
 	m_carry_state = carry_state::POISON;
 
+	// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
 	if (shift == 0)
-	{
 		store_carry_reg(a, a64::xzr);
-	}
 	else
-	{
-		const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
-
-		// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
-		a.lsr(scratch, reg, maxBits + 1 - shift);
-		store_carry_reg(a, scratch);
-	}
+		store_carry_reg(a, reg, maxBits + 1 - shift);
 }
 
 inline void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift)
@@ -1463,22 +1527,11 @@ inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, cons
 {
 	m_carry_state = carry_state::POISON;
 
+	// carry = (PARAM1 >> (shift - 1)) & 1
 	if (shift == 0)
-	{
 		store_carry_reg(a, a64::xzr);
-	}
-	else if (shift == 1)
-	{
-		store_carry_reg(a, reg);
-	}
 	else
-	{
-		const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
-
-		// carry = (PARAM1 >> (shift - 1)) & 1
-		a.lsr(scratch, reg, shift - 1);
-		store_carry_reg(a, scratch);
-	}
+		store_carry_reg(a, reg, shift - 1);
 }
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
@@ -1494,8 +1547,6 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_baseptr(cache.near() + 0x100)
 	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
-	m_near.emulated_flags = 0;
-
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
@@ -1594,7 +1645,10 @@ void drcbe_arm64::reset()
 	a.emitProlog(frame);
 
 	get_imm_absolute(a, BASE_REG, uintptr_t(m_baseptr));
-	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
+
+	a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kFPCR);
+	a.mov(FLAGS_REG, 0);
+	emit_str_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
 
 	a.emitArgsAssignment(frame, args);
 
@@ -1603,6 +1657,9 @@ void drcbe_arm64::reset()
 	// generate exit point
 	m_exit = dst + a.offset();
 	a.bind(a.newNamedLabel("exit_point"));
+
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
 
 	a.mov(a64::sp, a64::x29);
 
@@ -2034,7 +2091,7 @@ void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
 			if (tbnzrange)
 			{
 				const a64::Inst::Id opcode = (inst.condition() == uml::COND_U) ? a64::Inst::kIdTbnz : a64::Inst::kIdTbz;
-				a.emit(opcode, FLAGS_REG, FLAG_BIT_U, jmptarget);
+				a.emit(opcode, FLAGS_REG, uml::FLAG_BIT_U, jmptarget);
 			}
 			else
 			{
@@ -2057,7 +2114,7 @@ void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
 					if (tbnzrange)
 					{
 						const a64::Inst::Id opcode = (inst.condition() == uml::COND_C) ? a64::Inst::kIdTbnz : a64::Inst::kIdTbz;
-						a.emit(opcode, FLAGS_REG, FLAG_BIT_C, jmptarget);
+						a.emit(opcode, FLAGS_REG, uml::FLAG_BIT_C, jmptarget);
 					}
 					else
 					{
@@ -2167,13 +2224,9 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 	Label skip;
 	emit_skip(a, inst.condition(), skip);
 
-	emit_str_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
-
 	get_imm_relative(a, REG_PARAM1, (uintptr_t)paramp.memory());
 	get_imm_relative(a, TEMP_REG1, (uintptr_t)funcp.cfunc());
 	a.blr(TEMP_REG1);
-
-	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
@@ -2208,7 +2261,7 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_flags(inst);
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
-	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
+	const a64::Gp scratch = select_register(TEMP_REG1, inst.size());
 
 	if (srcp.is_immediate())
 	{
@@ -2216,13 +2269,17 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
-		const a64::Gp src = srcp.select_register(FUNC_SCRATCH_REG, inst.size());
+		const a64::Gp src = srcp.select_register(scratch, inst.size());
 
 		mov_reg_param(a, inst.size(), src, srcp);
 		a.and_(scratch, src, 3);
 	}
 
+	a.mrs(TEMP_REG2, a64::Predicate::SysReg::kFPCR);
 	emit_strb_mem(a, scratch.w(), &m_state.fmod);
+	a.sub(scratch.w(), scratch.w(), 1);
+	a.bfi(TEMP_REG2, scratch.x(), 22, 2);
+	a.msr(a64::Predicate::SysReg::kFPCR, TEMP_REG2);
 }
 
 void drcbe_arm64::op_getfmod(a64::Assembler &a, const uml::instruction &inst)
@@ -2276,13 +2333,13 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 		if (first)
 		{
 			a.cset(dst, a64::CondCode::kVS);
-			a.lsl(dst, dst, FLAG_BIT_V);
+			a.lsl(dst, dst, uml::FLAG_BIT_V);
 			first = false;
 		}
 		else
 		{
 			a.cset(SCRATCH_REG1, a64::CondCode::kVS);
-			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_V);
+			a.orr(dst, dst, SCRATCH_REG1, uml::FLAG_BIT_V);
 		}
 	}
 
@@ -2291,13 +2348,13 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 		if (first)
 		{
 			a.cset(dst, a64::CondCode::kEQ);
-			a.lsl(dst, dst, FLAG_BIT_Z);
+			a.lsl(dst, dst, uml::FLAG_BIT_Z);
 			first = false;
 		}
 		else
 		{
 			a.cset(SCRATCH_REG1, a64::CondCode::kEQ);
-			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_Z);
+			a.orr(dst, dst, SCRATCH_REG1, uml::FLAG_BIT_Z);
 		}
 	}
 
@@ -2306,13 +2363,13 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 		if (first)
 		{
 			a.cset(dst, a64::CondCode::kMI);
-			a.lsl(dst, dst, FLAG_BIT_S);
+			a.lsl(dst, dst, uml::FLAG_BIT_S);
 			first = false;
 		}
 		else
 		{
 			a.cset(SCRATCH_REG1, a64::CondCode::kMI);
-			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_S);
+			a.orr(dst, dst, SCRATCH_REG1, uml::FLAG_BIT_S);
 		}
 	}
 
@@ -2343,8 +2400,10 @@ void drcbe_arm64::op_setflgs(a64::Assembler &a, const uml::instruction &inst)
 
 	be_parameter flagsp(*this, inst.param(0), PTYPE_MRI);
 
-	mov_reg_param(a, inst.size(), FLAGS_REG, flagsp);
-	set_flags(a);
+	const a64::Gp flags = flagsp.select_register(FLAGS_REG, inst.size());
+
+	mov_reg_param(a, inst.size(), flags, flagsp);
+	set_flags(a, flags);
 }
 
 void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
@@ -2366,7 +2425,7 @@ void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
 	a.and_(TEMP_REG2, TEMP_REG1, 0b1100); // zero + sign
 	a.orr(TEMP_REG2, TEMP_REG2, FLAGS_REG); // carry + unordered flags
 
-	a.bfi(TEMP_REG2, TEMP_REG1, FLAG_BIT_V, 1); // overflow flag
+	a.bfi(TEMP_REG2, TEMP_REG1, uml::FLAG_BIT_V, 1); // overflow flag
 
 	a.strb(TEMP_REG2.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
 
@@ -2445,13 +2504,18 @@ void drcbe_arm64::op_restore(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	a.ldrb(TEMP_REG1.w(), arm::Mem(membase, offsetof(drcuml_machine_state, fmod)));
+	a.and_(TEMP_REG1.w(), TEMP_REG1.w(), 3);
+	a.mrs(TEMP_REG2, a64::Predicate::SysReg::kFPCR);
 	emit_strb_mem(a, TEMP_REG1.w(), &m_state.fmod);
+	a.sub(TEMP_REG1.w(), TEMP_REG1.w(), 1);
+	a.bfi(TEMP_REG2, TEMP_REG1, 22, 2);
+	a.msr(a64::Predicate::SysReg::kFPCR, TEMP_REG2);
 
 	a.ldr(TEMP_REG1.w(), arm::Mem(membase, offsetof(drcuml_machine_state, exp)));
 	emit_str_mem(a, TEMP_REG1.w(), &m_state.exp);
 
 	a.ldrb(FLAGS_REG.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
-	set_flags(a);
+	set_flags(a, FLAGS_REG);
 }
 
 void drcbe_arm64::op_load(a64::Assembler &a, const uml::instruction &inst)
@@ -2633,6 +2697,11 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 		else
 			call_arm_addr(a, (const void *)accessors.specific.read.function);
 	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		a.mov(REG_PARAM3, make_bitmask<uint64_t>(8 << spacesizep.size()));
+		emit_narrow_memread(a, addrp, spacesizep, accessors);
+	}
 	else
 	{
 		mov_reg_param(a, 4, REG_PARAM2, addrp);
@@ -2659,7 +2728,26 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 		}
 	}
 
-	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
+	const a64::Gp dstreg = dstp.select_register(REG_PARAM1, inst.size());
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		a.and_(dstreg, select_register(REG_PARAM1, inst.size()), 0x000000ff);
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else if (spacesizep.size() == SIZE_WORD)
+	{
+		a.and_(dstreg, select_register(REG_PARAM1, inst.size()), 0x0000ffff);
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else if ((spacesizep.size() == SIZE_DWORD) && (inst.size() == 8))
+	{
+		a.mov(dstreg.w(), REG_PARAM1.w());
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else
+	{
+		mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
+	}
 }
 
 void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
@@ -2694,6 +2782,11 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 			call_arm_addr(a, (const void *)accessors.specific.read.function);
 		}
 	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
+		emit_narrow_memread(a, addrp, spacesizep, accessors);
+	}
 	else
 	{
 		mov_reg_param(a, 4, REG_PARAM2, addrp);
@@ -2721,7 +2814,26 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 		}
 	}
 
-	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
+	const a64::Gp dstreg = dstp.select_register(REG_PARAM1, inst.size());
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		a.and_(dstreg, select_register(REG_PARAM1, inst.size()), 0x000000ff);
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else if (spacesizep.size() == SIZE_WORD)
+	{
+		a.and_(dstreg, select_register(REG_PARAM1, inst.size()), 0x0000ffff);
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else if ((spacesizep.size() == SIZE_DWORD) && (inst.size() == 8))
+	{
+		a.mov(dstreg.w(), REG_PARAM1.w());
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else
+	{
+		mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
+	}
 }
 
 void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
@@ -2888,15 +3000,7 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 		mov_reg_param(a, inst.size(), src, srcp);
 
 		// move carry bit to lsb
-		if (shift != 0)
-		{
-			a.lsr(scratch, src, shift);
-			store_carry_reg(a, scratch);
-		}
-		else
-		{
-			store_carry_reg(a, src);
-		}
+		store_carry_reg(a, src, shift);
 	}
 	else
 	{
@@ -3129,7 +3233,9 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter maskp(*this, inst.param(3), PTYPE_MRI);
 
 	const a64::Gp output = dstp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src = srcp.select_register(output, inst.size());
 	const uint64_t instbits = inst.size() * 8;
+	const uint64_t instmask = util::make_bitmask<uint64_t>(instbits);
 
 	bool optimized = false;
 	if (maskp.is_immediate() && shiftp.is_immediate() && !maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
@@ -3137,32 +3243,34 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		// A mask of all 1s will be handled efficiently in the unoptimized path, so only optimize for the other cases if possible
 		const auto pop = population_count_64(maskp.immediate());
 		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
-		const auto invlamask = ~(maskp.immediate() << lz) & util::make_bitmask<uint64_t>(instbits);
+		const auto invlamask = ~(maskp.immediate() << lz) & instmask;
 		const bool is_right_aligned = (maskp.immediate() & (maskp.immediate() + 1)) == 0;
 		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
 		const auto s = shiftp.immediate() & (instbits - 1);
 
 		if (is_right_aligned || is_contiguous)
 		{
-			mov_reg_param(a, inst.size(), output, srcp);
+			mov_reg_param(a, inst.size(), src, srcp);
 			optimized = true;
 		}
 
 		if (is_right_aligned)
 		{
 			// Optimize a contiguous right-aligned mask
-			const auto s2 = (instbits - s) & (instbits - 1);
+			const auto s2 = -int(s) & (instbits - 1);
 
 			if (s >= pop)
 			{
-				a.ubfx(output, output, s2, pop);
+				a.ubfx(output, src, s2, pop);
+			}
+			else if (s2 > 0)
+			{
+				a.ror(output, src, s2);
+				a.bfc(output, pop, instbits - pop);
 			}
 			else
 			{
-				if (s2 > 0)
-					a.ror(output, output, s2);
-
-				a.bfc(output, pop, instbits - pop);
+				a.and_(output, src, ~maskp.immediate() & instmask);
 			}
 		}
 		else if (is_contiguous)
@@ -3171,9 +3279,14 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 			auto const rot = -int(s + pop + lz) & (instbits - 1);
 
 			if (rot > 0)
-				a.ror(output, output, rot);
-
-			a.ubfiz(output, output, instbits - pop - lz, pop);
+			{
+				a.ror(output, src, rot);
+				a.ubfiz(output, output, instbits - pop - lz, pop);
+			}
+			else
+			{
+				a.ubfiz(output, src, instbits - pop - lz, pop);
+			}
 		}
 	}
 
@@ -3195,18 +3308,24 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		if (!maskp.is_immediate() || !is_valid_immediate_mask(maskp.immediate(), inst.size()))
 			mov_reg_param(a, inst.size(), mask, maskp);
 
-		mov_reg_param(a, inst.size(), output, srcp);
-
 		if (shiftp.is_immediate())
 		{
 			const auto s = -int64_t(shiftp.immediate()) & (instbits - 1);
 			if (s != 0)
-				a.ror(output, output, s);
+			{
+				mov_reg_param(a, inst.size(), src, srcp);
+				a.ror(output, src, s);
+			}
+			else
+			{
+				mov_reg_param(a, inst.size(), output, srcp);
+			}
 		}
 		else
 		{
+			mov_reg_param(a, inst.size(), src, srcp);
 			a.and_(rshift, rshift, (inst.size() * 8) - 1);
-			a.ror(output, output, rshift);
+			a.ror(output, src, rshift);
 		}
 
 		const a64::Inst::Id maskop = inst.flags() ? a64::Inst::kIdAnds : a64::Inst::kIdAnd;
@@ -3262,11 +3381,11 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 			if (is_right_aligned)
 			{
 				// Optimize a contiguous right-aligned mask
-				rot = (instbits - s) & (instbits - 1);
+				rot = -int32_t(s) & (instbits - 1);
 			}
-			else if (is_contiguous)
+			else
 			{
-				// Optimize a contiguous mask
+				// Optimize a contiguous mask - rotate the field to make it right-aligned, then insert it
 				rot = -int32_t(s + pop + lz) & (instbits - 1);
 				lsb = instbits - pop - lz;
 			}
@@ -3281,19 +3400,25 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 					result = rotr_64(srcp.immediate(), rot);
 
 				a.mov(scratch, result);
-			}
-			else if (rot > 0)
-			{
-				mov_reg_param(a, inst.size(), src, srcp);
-
-				a.ror(scratch, src, rot);
+				a.bfi(dst, scratch, lsb, pop);
 			}
 			else
 			{
-				mov_reg_param(a, inst.size(), scratch, srcp);
-			}
+				mov_reg_param(a, inst.size(), src, srcp);
 
-			a.bfi(dst, scratch, lsb, pop);
+				if (is_right_aligned && ((rot + pop) <= instbits))
+				{
+					// can insert a right-aligned field directly when it doesn't wrap around
+					a.bfxil(dst, src, rot, pop);
+				}
+				else
+				{
+					if (rot > 0)
+						a.ror(scratch, src, rot);
+
+					a.bfi(dst, (rot > 0) ? scratch : src, lsb, pop);
+				}
+			}
 
 			optimized = true;
 		}
@@ -3421,7 +3546,7 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 	{
 		m_carry_state = carry_state::CANONICAL;
 
-		a.sbfx(TEMP_REG1, FLAGS_REG, FLAG_BIT_C, 1);
+		a.sbfx(TEMP_REG1, FLAGS_REG, uml::FLAG_BIT_C, 1);
 		a.cmn(TEMP_REG1, 1);
 	}
 
@@ -3524,8 +3649,15 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 
 		mov_reg_param(a, inst.size(), src1, src1p);
-		mov_reg_param(a, inst.size(), src2, src2p);
-		a.emit(opcode, output, src1, src2);
+		if (src1p == src2p)
+		{
+			a.emit(opcode, output, src1, src1);
+		}
+		else
+		{
+			mov_reg_param(a, inst.size(), src2, src2p);
+			a.emit(opcode, output, src1, src2);
+		}
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 
@@ -3556,43 +3688,42 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 	{
 		m_carry_state = carry_state::LOGICAL;
 
-		a.ubfx(TEMP_REG1, FLAGS_REG, FLAG_BIT_C, 1);
+		a.ubfx(TEMP_REG1, FLAGS_REG, uml::FLAG_BIT_C, 1);
 		a.cmp(a64::xzr, TEMP_REG1);
 	}
 
 	const a64::Gp zero = select_register(a64::xzr, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src2p.is_immediate_value(0))
+	if (src1p == src2p)
 	{
-		if (src1p.is_immediate_value(0))
+		if (CarryIn || (inst.flags() && dstp.is_int_register()))
 		{
-			if (CarryIn)
-			{
-				a.emit(opcode, output, zero, zero);
-				mov_param_reg(a, inst.size(), dstp, output);
-			}
-			else
-			{
-				mov_param_reg(a, inst.size(), dstp, zero);
-				a.emit(opcode, zero, zero, zero);
-			}
+			a.emit(opcode, output, zero, zero);
+			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else
 		{
-			const a64::Gp src = src1p.select_register(output, inst.size());
+			mov_param_reg(a, inst.size(), dstp, zero);
+			if (inst.flags())
+				a.emit(opcode, zero, zero, zero);
+		}
+	}
+	else if (src2p.is_immediate_value(0))
+	{
+		const a64::Gp src = src1p.select_register(output, inst.size());
 
-			mov_reg_param(a, inst.size(), src, src1p);
-			if (CarryIn)
-			{
-				a.emit(opcode, output, src, zero);
-				mov_param_reg(a, inst.size(), dstp, output);
-			}
-			else
-			{
-				mov_param_reg(a, inst.size(), dstp, src);
+		mov_reg_param(a, inst.size(), src, src1p);
+		if (CarryIn || (inst.flags() && dstp.is_int_register()))
+		{
+			a.emit(opcode, output, src, zero);
+			mov_param_reg(a, inst.size(), dstp, output);
+		}
+		else
+		{
+			mov_param_reg(a, inst.size(), dstp, src);
+			if (inst.flags())
 				a.emit(opcode, zero, src, zero);
-			}
 		}
 	}
 	else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
@@ -4450,7 +4581,7 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	size_t const maxBits = inst.size() * 8 - 1;
+	size_t const maxBits = (inst.size() * 8) - 1;
 
 	bool can_use_dst_reg = dstp.is_int_register();
 	if (can_use_dst_reg && src1p.is_int_register())
@@ -4460,40 +4591,95 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp param1 = src1p.select_register(TEMP_REG3, inst.size());
 	const a64::Gp output = can_use_dst_reg ? dstp.select_register(TEMP_REG1, inst.size()) : select_register(TEMP_REG1, inst.size());
-	const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
 
-	mov_reg_param(a, inst.size(), param1, src1p);
+	bool zs_flags_done = false;
 
 	// shift > 1: src = (PARAM1 << shift) | (carry << (shift - 1)) | (PARAM1 >> (33 - shift))
 	// shift = 1: src = (PARAM1 << shift) | carry
 
 	if (src2p.is_immediate())
 	{
-		const auto shift = src2p.immediate() % (inst.size() * 8);
+		const auto si = src2p.immediate() & maxBits;
 
-		if (shift != 0)
+		if (!si)
 		{
-			a.ubfx(carry, param1, (inst.size() * 8) - shift, 1);
-			if (shift > 1)
-				a.ubfx(output, param1, (inst.size() * 8) - shift + 1, shift - 1);
-			a.bfi(output.x(), FLAGS_REG, shift - 1, 1);
-			a.bfi(output, param1, shift, (inst.size() * 8) - shift);
-			a.bfi(FLAGS_REG, carry.x(), 0, 1);
+			mov_reg_param(a, inst.size(), output, src1p);
+		}
+		else if (src1p.is_immediate_value(0))
+		{
+			// this depends on carry being the least significant bit of the flags
+			a.ubfiz(output, select_register(FLAGS_REG, inst.size()), si - 1, 1);
 
 			if (inst.flags() & FLAG_C)
-				calculate_carry_shift_left_imm(a, param1, shift, maxBits);
+				store_carry_reg(a, a64::xzr);
+
+			m_carry_state = carry_state::POISON;
+		}
+		else if ((si == 1) && (m_carry_state == carry_state::CANONICAL))
+		{
+			mov_reg_param(a, inst.size(), param1, src1p);
+
+			if (inst.flags())
+			{
+				a.adcs(output, param1, param1);
+
+				if (inst.flags() & FLAG_C)
+					store_carry(a);
+				else
+					m_carry_state = carry_state::POISON;
+			}
+			else
+			{
+				a.adc(output, param1, param1);
+			}
+
+			zs_flags_done = true;
 		}
 		else
 		{
-			a.mov(output, param1);
+			mov_reg_param(a, inst.size(), param1, src1p);
+
+			// this depends on carry being the least significant bit of the flags
+			if (si > 1)
+				a.lsr(output, param1, (inst.size() * 8) + 1 - si);
+			a.bfi(output, select_register(FLAGS_REG, inst.size()), si - 1, 1);
+			a.bfi(output, param1, si, (inst.size() * 8) - si);
+
+			if (inst.flags() & FLAG_C)
+				calculate_carry_shift_left_imm(a, param1, si, maxBits);
+		}
+	}
+	else if (src1p.is_immediate_value(0))
+	{
+		const a64::Gp scratch = select_register(TEMP_REG2, inst.size());
+		const a64::Gp shift = src2p.select_register(scratch, inst.size());
+		const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+		mov_reg_param(a, inst.size(), shift, src2p);
+
+		a.ands(scratch, shift, maxBits);
+		get_carry(a, output);
+		a.sub(scratch, scratch, 1);
+		a.lsl(output, output, scratch);
+		a.csel(output, zero, output, a64::CondCode::kZero);
+
+		if (inst.flags() & FLAG_C)
+		{
+			// this depends on carry being the least significant bit of the flags
+			a.csel(scratch.x(), FLAGS_REG, a64::xzr, a64::CondCode::kZero);
+			store_carry_reg(a, scratch);
+
+			m_carry_state = carry_state::POISON;
 		}
 	}
 	else
 	{
 		const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
+		const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
 		const a64::Gp scratch2 = select_register(FUNC_SCRATCH_REG, inst.size());
 
+		mov_reg_param(a, inst.size(), param1, src1p);
 		mov_reg_param(a, inst.size(), shift, src2p);
 
 		a.and_(scratch2, shift, maxBits);
@@ -4527,7 +4713,7 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 		a.bind(skip3);
 	}
 
-	if (inst.flags() & (FLAG_Z | FLAG_S))
+	if (!zs_flags_done && (inst.flags() & (FLAG_Z | FLAG_S)))
 		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
@@ -4545,7 +4731,7 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	size_t const maxBits = inst.size() * 8 - 1;
+	size_t const maxBits = (inst.size() * 8) - 1;
 
 	bool can_use_dst_reg = dstp.is_int_register();
 	if (can_use_dst_reg && src1p.is_int_register())
@@ -4555,9 +4741,6 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp param1 = src1p.select_register(TEMP_REG3, inst.size());
 	const a64::Gp output = can_use_dst_reg ? dstp.select_register(TEMP_REG1, inst.size()) : select_register(TEMP_REG1, inst.size());
-	const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
-
-	mov_reg_param(a, inst.size(), param1, src1p);
 
 	// if (shift > 1)
 	//  src = (PARAM1 >> shift) | (((flags & FLAG_C) << 31) >> (shift - 1)) | (PARAM1 << (33 - shift));
@@ -4566,31 +4749,65 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 
 	if (src2p.is_immediate())
 	{
-		const auto shift = src2p.immediate() % (inst.size() * 8);
+		const auto si = src2p.immediate() & maxBits;
 
-		if (shift != 0)
+		if (!si)
 		{
-			a.ubfx(carry, param1, shift - 1, 1);
-			a.ubfx(output, param1, shift, (inst.size() * 8) - shift);
-			a.bfi(output.x(), FLAGS_REG, (inst.size() * 8) - shift, 1);
-			if (shift > 1)
-				a.bfi(output, param1, (inst.size() * 8) - shift + 1, shift - 1);
-			a.bfi(FLAGS_REG, carry.x(), 0, 1);
+			mov_reg_param(a, inst.size(), output, src1p);
+		}
+		else if (src1p.is_immediate_value(0))
+		{
+			// this depends on carry being the least significant bit of the flags
+			a.ubfiz(output, select_register(FLAGS_REG, inst.size()), (inst.size() * 8) - si, 1);
 
 			if (inst.flags() & FLAG_C)
-				calculate_carry_shift_right_imm(a, param1, shift);
+				store_carry_reg(a, a64::xzr);
+
+			m_carry_state = carry_state::POISON;
 		}
 		else
 		{
-			a.mov(output, param1);
+			mov_reg_param(a, inst.size(), param1, src1p);
+
+			// this depends on carry being the least significant bit of the flags
+			a.lsr(output, param1, si);
+			a.bfi(output, select_register(FLAGS_REG, inst.size()), (inst.size() * 8) - si, 1);
+			if (si > 1)
+				a.bfi(output, param1, (inst.size() * 8) + 1 - si, si - 1);
+
+			if (inst.flags() & FLAG_C)
+				calculate_carry_shift_right_imm(a, param1, si);
+		}
+	}
+	else if (src1p.is_immediate_value(0))
+	{
+		const a64::Gp scratch = select_register(TEMP_REG2, inst.size());
+		const a64::Gp shift = src2p.select_register(scratch, inst.size());
+		const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+		mov_reg_param(a, inst.size(), shift, src2p);
+
+		a.ands(scratch, shift, maxBits);
+		get_carry(a, output);
+		a.ror(output, output, scratch);
+		a.csel(output, zero, output, a64::CondCode::kZero);
+
+		if (inst.flags() & FLAG_C)
+		{
+			a.csel(scratch.x(), FLAGS_REG, a64::xzr, a64::CondCode::kZero);
+			store_carry_reg(a, scratch, uml::FLAG_BIT_C);
+
+			m_carry_state = carry_state::POISON;
 		}
 	}
 	else
 	{
 		const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
+		const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
 		const a64::Gp scratch2 = select_register(FUNC_SCRATCH_REG, inst.size());
 
+		mov_reg_param(a, inst.size(), param1, src1p);
 		mov_reg_param(a, inst.size(), shift, src2p);
 
 		a.and_(scratch2, shift, maxBits);
@@ -4886,9 +5103,9 @@ void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
 				Label done = a.newLabel();
 
 				// this depends on each case being two instructions
-				emit_ldrb_mem(a, TEMP_REG1, &m_state.fmod);
+				emit_ldrb_mem(a, TEMP_REG1.w(), &m_state.fmod);
 				a.adr(TEMP_REG2, base);
-				a.add(TEMP_REG2, TEMP_REG1, arm::lsl(3));
+				a.add(TEMP_REG2, TEMP_REG2, TEMP_REG1, arm::lsl(3));
 				a.br(TEMP_REG2);
 
 				a.bind(base);
@@ -5000,7 +5217,10 @@ void drcbe_arm64::op_fcmp(a64::Assembler &a, const uml::instruction &inst)
 	else
 		m_carry_state = carry_state::POISON;
 	if (inst.flags() & FLAG_U)
-		store_unordered(a);
+	{
+		a.cset(SCRATCH_REG1, a64::CondCode::kVS);
+		a.bfi(FLAGS_REG, SCRATCH_REG1, uml::FLAG_BIT_U, 1);
+	}
 }
 
 template <a64::Inst::Id Opcode> void drcbe_arm64::op_float_alu(a64::Assembler &a, const uml::instruction &inst)

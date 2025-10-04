@@ -159,20 +159,18 @@ static void zx81_fill_file_name(const char* name)
 
 static int zx81_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
-	unsigned int number_of_0_data = 0;
-	unsigned int number_of_1_data = 0;
-	unsigned int number_of_0_name = 0;
-	unsigned int number_of_1_name = 0;
+	real_data_length = bytes[ZX81_DATA_LENGTH_OFFSET] + bytes[ZX81_DATA_LENGTH_OFFSET + 1] * 256 - ZX81_START_LOAD_ADDRESS;
 
-	real_data_length = bytes[ZX81_DATA_LENGTH_OFFSET] + bytes[ZX81_DATA_LENGTH_OFFSET+1]*256 - ZX81_START_LOAD_ADDRESS;
+	if (real_data_length > length)
+		return -1;
 
-	number_of_1_data = zx81_cassette_calculate_number_of_1(bytes, real_data_length);
-	number_of_0_data = length*8-number_of_1_data;
+	unsigned int number_of_1_data = zx81_cassette_calculate_number_of_1(bytes, real_data_length);
+	unsigned int number_of_0_data = length * 8 - number_of_1_data;
 
-	number_of_1_name = zx81_cassette_calculate_number_of_1(zx_file_name, zx_file_name_length);
-	number_of_0_name = zx_file_name_length*8-number_of_1_name;
+	unsigned int number_of_1_name = zx81_cassette_calculate_number_of_1(zx_file_name, zx_file_name_length);
+	unsigned int number_of_0_name = zx_file_name_length * 8 - number_of_1_name;
 
-	return (number_of_0_data+number_of_0_name)*ZX81_LOW_BIT_LENGTH + (number_of_1_data+number_of_1_name)*ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
+	return (number_of_0_data + number_of_0_name) * ZX81_LOW_BIT_LENGTH + (number_of_1_data + number_of_1_name) * ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
 }
 
 static int zx81_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, int data_available)
@@ -247,15 +245,14 @@ CASSETTE_FORMATLIST_END
 
 static int zx80_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
-	unsigned int number_of_0_data = 0;
-	unsigned int number_of_1_data = 0;
+	real_data_length = bytes[ZX80_DATA_LENGTH_OFFSET] + bytes[ZX80_DATA_LENGTH_OFFSET + 1] * 256 - ZX80_START_LOAD_ADDRESS - 1;
+	if (real_data_length > length)
+		return -1;
 
-	real_data_length = bytes[ZX80_DATA_LENGTH_OFFSET] + bytes[ZX80_DATA_LENGTH_OFFSET+1]*256 - ZX80_START_LOAD_ADDRESS - 1;
+	unsigned int number_of_1_data = zx81_cassette_calculate_number_of_1(bytes, real_data_length);
+	unsigned int number_of_0_data = length * 8 - number_of_1_data;
 
-	number_of_1_data = zx81_cassette_calculate_number_of_1(bytes, real_data_length);
-	number_of_0_data = length*8-number_of_1_data;
-
-	return number_of_0_data*ZX81_LOW_BIT_LENGTH + number_of_1_data*ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
+	return number_of_0_data * ZX81_LOW_BIT_LENGTH + number_of_1_data * ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
 }
 
 static int zx80_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, int data_available)
