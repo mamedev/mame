@@ -19,7 +19,10 @@ local function initialize_button(settings)
 			key_cfg = settings.key,
 			on_frames = settings.on_frames,
 			off_frames = settings.off_frames,
-			counter = 0
+			counter = 0,
+			enabled = true,
+			toggle_key = settings.toggle_key and manager.machine.input:seq_from_tokens(settings.toggle_key),
+			toggle_key_cfg = settings.toggle_key
 		}
 		local port = ioport.ports[settings.port]
 		if port then
@@ -42,7 +45,8 @@ local function serialize_settings(button_list)
 			type = manager.machine.ioport:input_type_to_token(button.type),
 			key = button.key_cfg,
 			on_frames = button.on_frames,
-			off_frames = button.off_frames
+			off_frames = button.off_frames,
+			toggle_key = button.toggle_key_cfg
 		}
 		table.insert(settings, setting)
 	end
