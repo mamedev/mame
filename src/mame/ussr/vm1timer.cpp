@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "vm1timer.h"
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 

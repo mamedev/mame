@@ -42,6 +42,7 @@ void bk_state::reset_w(int state)
 		m_kbd->reset();
 		m_timer->init_w();
 		m_qbus->init_w();
+		m_up->init_w();
 	}
 }
 
@@ -53,12 +54,12 @@ uint16_t bk_state::vid_scroll_r()
 // SEL1 register (0010 and 0010.01)
 //
 // 15-8 R   high byte of cpu start address
-// 7    R   bitbanger cts in
+// 7    R   bitbanger cts in (always 1 without mod)
 // 7    W   cassette motor control, 1: off 0: on
 // 6    R   keyboard any key down, 1: no 0: yes
 // 6    W   cassette data and speaker out
 // 5    R   cassette data in
-// 5    W   cassette data and bitbanger rts out
+// 5    W   cassette data and bitbanger rts out (with mod)
 // 4    R   bitbanger rx
 // 4    W   bitbanger tx
 // 2    R   updated
@@ -68,7 +69,7 @@ uint16_t bk_state::vid_scroll_r()
 uint16_t bk_state::sel1_r()
 {
 	double level = m_cassette->input();
-	uint16_t data = 0100000 | m_sel1 | ((level > 0) ? SEL1_RX_CAS : 0);
+	uint16_t data = 0100000 | SEL1_RDY_SER | m_sel1 | ((level > 0) ? SEL1_RX_CAS : 0);
 	if (!machine().side_effects_disabled())
 		m_sel1 &= ~SEL1_UPDATED;
 
@@ -85,7 +86,7 @@ uint16_t bk_state::trap_r()
 uint16_t bk_state::bk11_sel1_r()
 {
 	double level = m_cassette->input();
-	uint16_t data = 0140200 | m_sel1 | ((level > 0) ? SEL1_RX_CAS : 0);
+	uint16_t data = 0140000 | SEL1_RDY_SER | m_sel1 | ((level > 0) ? SEL1_RX_CAS : 0);
 	if (!machine().side_effects_disabled())
 		m_sel1 &= ~SEL1_UPDATED;
 
