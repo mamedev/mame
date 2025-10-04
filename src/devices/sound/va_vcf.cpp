@@ -206,7 +206,6 @@ void va_lpf4_device::recalc_filter()
 	m_b[2] = 6 * (r1           - 2 * gzc2          + gzc4);
 	m_b[3] = 4 * (r1 - 2 * gzc          + 2 * gzc3 - gzc4);
 	m_b[4] =      r1 - 4 * gzc + 6 * gzc2 - 4 * gzc3 + gzc4;
-
 }
 
 
