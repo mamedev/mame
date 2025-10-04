@@ -152,22 +152,33 @@ void generalplus_gp327902_game_state::init_spi()
 	}
 	else
 	{
-		// sanxpet has the main block here, which is likely copied to RAM by previous parts of the bootloader above
+		// smksagas has the main block here, which is likely copied to RAM by previous parts of the bootloader above
 		m_copybase = 0x16000;
 		m_copydest = 0x0;
 		m_copylength = 0x200000;
 	}
 }
 
-ROM_START( sanxpet )
+ROM_START( smksagas )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l64.u1", 0x0000, 0x800000, CRC(f28b9fd3) SHA1(8ed4668f271cbe01065bc0836e49ce70faf10834) )
 ROM_END
 
-ROM_START( sanxpeta )
+ROM_START( smksagasa ) // code is the same, some data area differs, could be different factory defaults, or user data, remove later if redundant
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u1", 0x0000, 0x800000, CRC(5dee73ea) SHA1(ff0302a479f0a1a0a6dc605e18f6389f6244922f) )
+ROM_END
+
+ROM_START( smkmikke ) // DX version
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l6403f.u1", 0x0000, 0x800000, CRC(cb5dc7b6) SHA1(425c4d01b56784278b77824a354d9efa46e1a74e) )
 ROM_END
+
+ROM_START( smkmikkea ) // different code revision (non-DX)
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u1", 0x0000, 0x800000, CRC(af900ab7) SHA1(c2cb0d37acf94edd150e6ef4f987f66b2306b97e) )
+ROM_END
+
 
 ROM_START( tomyegg )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
@@ -189,14 +200,16 @@ ROM_END
 // see evolution_handheld.cpp
 
 // 2019 version is house shaped device - すみっコぐらし すみっコさがし
-CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, smksagas,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan, set 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a standard unit
+CONS( 2019, smksagasa,        smksagas, 0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan, set 2)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a 'Deluxe' unit
 // or Sumikko Gurashi - Sumikko Sagashi DX (すみっコぐらし すみっコさがしDX "Sumikko Gurashi the movie" alt version)
 
 // 2020 version - Sumikko Gurashi - Sumikko Catch, see generalplus_gpl16250_spi_direct.cpp
 
 // 2021 version is a square device with a tiny 'mole' figure on top - すみっコぐらし すみっコみっけDX
 // or Sumikko Gurashi - Sumikko Mikke (すみっコぐらし すみっコみっけ)
-CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke DX (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, smkmikke,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke DX (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a 'Deluxe' unit
+CONS( 2021, smkmikkea,       smkmikke, 0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a standard unit
 
 // other devices on the same Soc
 

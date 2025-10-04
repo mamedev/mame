@@ -499,6 +499,13 @@ ROM_START( fapocket )
 	ROM_LOAD( "s29gl512n.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
 ROM_END
 
+ROM_START( wol260 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "js28f256m29ewh.u1", 0x00000, 0x2000000, CRC(ccb08b50) SHA1(089335c001085cfae94db6ea39e31388674581ed) )
+ROM_END
+
+
+
 void nes_vt42xx_state::init_rfcp168()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
@@ -597,3 +604,6 @@ CONS( 200?, mc_8x6ss, 0,        0, nes_vt42xx_1mb, nes_vt42xx, nes_vt42xx_state,
 
 // Uses DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2017, fapocket,  0,  0,  nes_vt42xx_fa,     nes_vt42xx_fa, nes_vt42xx_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
+
+// has a 32Mbyte ROM, needs extra banking (Commando for example is in the 2nd half)
+CONS( 201?, wol260,    0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Wolsen", "260 in 1 Handheld Game (Wolsen)", MACHINE_NOT_WORKING )
