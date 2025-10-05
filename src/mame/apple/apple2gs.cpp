@@ -489,6 +489,7 @@ private:
 	void update_speed();
 	int get_vpos();
 	void process_clock();
+	void clear_vgcint(u8 data);
 
 	// ZipGS stuff
 	bool m_accel_unlocked = false;
@@ -1500,6 +1501,24 @@ void apple2gs_state::process_clock()
 	}
 }
 
+void apple2gs_state::clear_vgcint(u8 data)
+{
+	if (!(data & VGCINT_SECOND))
+	{
+		m_vgcint &= ~VGCINT_SECOND;
+		lower_irq(IRQS_SECOND);
+	}
+	if (!(data & VGCINT_SCANLINE))
+	{
+		m_vgcint &= ~VGCINT_SCANLINE;
+		lower_irq(IRQS_SCAN);
+	}
+	if (!(m_vgcint & (VGCINT_SECOND | VGCINT_SCANLINE)))
+	{
+		m_vgcint &= ~VGCINT_ANYVGCINT;
+	}
+}
+
 u8 apple2gs_state::c000_r(offs_t offset)
 {
 	u8 ret;
@@ -1600,9 +1619,15 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_slotromsel;
 
 		case 0x2e:  // VERTCNT
+			// reading VERTCNT clears SCB status
+			clear_vgcint(~VGCINT_SCANLINE);
+
 			return get_vpos() >> 1;
 
 		case 0x2f:  // HORIZCNT
+			// reading HORIZCNT clears SCB status
+			clear_vgcint(~VGCINT_SCANLINE);
+
 			ret = m_screen->hpos() / 11;
 			if (ret > 0)
 			{
@@ -1959,20 +1984,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x32:  // VGCINTCLEAR
 			//printf("%02x to VGCINTCLEAR\n", data);
-			if (!(data & VGCINT_SECOND))
-			{
-				m_vgcint &= ~VGCINT_SECOND;
-				lower_irq(IRQS_SECOND);
-			}
-			if (!(data & VGCINT_SCANLINE))
-			{
-				m_vgcint &= ~VGCINT_SCANLINE;
-				lower_irq(IRQS_SCAN);
-			}
-			if (!(m_vgcint & (VGCINT_SECOND | VGCINT_SCANLINE)))
-			{
-				m_vgcint &= ~VGCINT_ANYVGCINT;
-			}
+			clear_vgcint(data);
 			break;
 
 		case 0x33:  // CLOCKDATA
