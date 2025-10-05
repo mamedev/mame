@@ -266,7 +266,7 @@ uint32_t dbz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::scanline)
 {
-	int scanline = param;
+	const int scanline = param;
 
 	if (scanline == 256) // vblank-out irq
 		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
