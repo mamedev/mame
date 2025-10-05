@@ -133,8 +133,7 @@ void i960_cpu_device::send_iac(uint32_t adr)
 		break;
 	case 0x41:  // test for pending interrupts
 		logerror("I960: %x: IAC %08x %08x %08x %08x (test for pending interrupts)\n", m_PIP, iac[0], iac[1], iac[2], iac[3]);
-		// check_irqs() seems to take care of this though it may not be entirely accurate
-		check_irqs();
+		check_pending_irqs();
 		break;
 	case 0x80:  // store SAT & PRCB in memory
 		m_program.write_dword(iac[1], m_SAT);
@@ -509,67 +508,67 @@ void i960_cpu_device::take_interrupt(int vector, int lvl)
 	m_PC |= 0x2002; // set supervisor mode & interrupt flag
 }
 
-void i960_cpu_device::check_irqs()
+void i960_cpu_device::check_immediate_irqs()
 {
-	int int_tab =  m_program.read_dword(m_PRCB+20);    // interrupt table
-	int cpu_pri = (m_PC>>16)&0x1f;
-	int pending_pri;
-	int lvl, irq, take = -1;
-	int vword;
-	static const uint32_t lvlmask[4] = { 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000 };
-
-	pending_pri = m_program.read_dword(int_tab);       // read pending priorities
+	int cpu_pri = (m_PC >> 16) & 0x1f;
 
 	if ((m_immediate_irq) && ((cpu_pri < m_immediate_pri) || (m_immediate_pri == 31)))
 	{
 		take_interrupt(m_immediate_vector, m_immediate_pri);
 		m_immediate_irq = 0;
 	}
-	else
-	{
-		for(lvl = 31; lvl >= 0; lvl--) {
-			if((pending_pri & (1 << lvl)) && ((cpu_pri < lvl) || (lvl == 31))) {
-				int word, wordl, wordh;
+}
 
-				// figure out which word contains this level's priorities
-				word = ((lvl / 4) * 4) + 4; // (lvl/4) = word address, *4 for byte address, +4 to skip pending priorities
-				wordl = (lvl % 4) * 8;
-				wordh = (wordl + 8) - 1;
+void i960_cpu_device::check_pending_irqs()
+{
+	int int_tab = m_program.read_dword(m_PRCB + 20);    // interrupt table
+	int cpu_pri = (m_PC >> 16) & 0x1f;
+	int pending_pri = m_program.read_dword(int_tab);    // read pending priorities
+	int take = -1;
+	static const uint32_t lvlmask[4] = { 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000 };
 
-				vword = m_program.read_dword(int_tab + word);
+	for (int lvl = 31; lvl >= 0; lvl--) {
+		if ((pending_pri & (1 << lvl)) && ((cpu_pri < lvl) || (lvl == 31))) {
+			int word, wordl, wordh;
 
-				// take the first vector we find for this level
-				for (irq = wordh; irq >= wordl; irq--) {
-					if(vword & (1 << irq)) {
-						// clear pending bit
-						vword &= ~(1 << irq);
-						m_program.write_dword(int_tab + word, vword);
-						take = irq;
-						break;
-					}
+			// figure out which word contains this level's priorities
+			word = ((lvl / 4) * 4) + 4; // (lvl/4) = word address, *4 for byte address, +4 to skip pending priorities
+			wordl = (lvl % 4) * 8;
+			wordh = (wordl + 8) - 1;
+
+			int vword = m_program.read_dword(int_tab + word);
+
+			// take the first vector we find for this level
+			for (int irq = wordh; irq >= wordl; irq--) {
+				if (vword & (1 << irq)) {
+					// clear pending bit
+					vword &= ~(1 << irq);
+					m_program.write_dword(int_tab + word, vword);
+					take = irq;
+					break;
 				}
+			}
 
-				// if no vectors were found at our level, it's an error
-				if(take == -1) {
-					logerror("i960: ERROR! no vector found for pending level %d\n", lvl);
+			// if no vectors were found at our level, it's an error
+			if (take == -1) {
+				logerror("i960: ERROR! no vector found for pending level %d\n", lvl);
 
-					// try to recover...
-					pending_pri &= ~(1 << lvl);
-					m_program.write_dword(int_tab, pending_pri);
-					return;
-				}
-
-				// if no vectors are waiting for this level, clear the level bit
-				if(!(vword & lvlmask[lvl % 4])) {
-					pending_pri &= ~(1 << lvl);
-					m_program.write_dword(int_tab, pending_pri);
-				}
-
-				take += ((lvl/4) * 32);
-
-				take_interrupt(take, lvl);
+				// try to recover...
+				pending_pri &= ~(1 << lvl);
+				m_program.write_dword(int_tab, pending_pri);
 				return;
 			}
+
+			// if no vectors are waiting for this level, clear the level bit
+			if (!(vword & lvlmask[lvl % 4])) {
+				pending_pri &= ~(1 << lvl);
+				m_program.write_dword(int_tab, pending_pri);
+			}
+
+			take += ((lvl / 4) * 32);
+
+			take_interrupt(take, lvl);
+			return;
 		}
 	}
 }
@@ -664,7 +663,7 @@ void i960_cpu_device::do_ret()
 		m_PC = x;
 
 		// check for another IRQ now that we're back
-		check_irqs();
+		check_pending_irqs();
 		break;
 
 	default:
@@ -711,8 +710,8 @@ void i960_cpu_device::execute_burst_stall_op(uint32_t opcode)
 
 	// clear stall burst mode
 	m_stall_state.burst_mode = false;
-	// now that we are done we might as well check if there's a pending irq too
-	check_irqs();
+	// now that we are done we might as well check if there's an irq too
+	check_immediate_irqs();
 }
 
 void i960_cpu_device::execute_op(uint32_t opcode)
@@ -1515,6 +1514,8 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				t2 = get_2_ri(opcode);
 				m_PC = (m_PC & ~t2) | (m_r[(opcode>>19) & 0x1f] & t2);
 				set_ri(opcode, t1);
+				if ((t1 >> 16 & 0x1f) > (m_PC >> 16 & 0x1f))
+					check_pending_irqs();
 				break;
 
 			default:
@@ -2206,7 +2207,7 @@ void i960_cpu_device::execute_run()
 
 	// delay checking irqs if we are in burst stall mode
 	if(m_stall_state.burst_mode == false)
-		check_irqs();
+		check_immediate_irqs();
 
 	while(m_icount > 0) {
 		m_PIP = m_IP;

@@ -176,7 +176,8 @@ private:
 	void execute_op(uint32_t opcode);
 	void execute_burst_stall_op(uint32_t opcode);
 	void take_interrupt(int vector, int lvl);
-	void check_irqs();
+	void check_immediate_irqs();
+	void check_pending_irqs();
 	void do_call(uint32_t adr, int type, uint32_t stack);
 	void do_ret_0();
 	void do_ret();
