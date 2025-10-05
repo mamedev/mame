@@ -49,22 +49,6 @@ enum
 	INT_MATCH_END_OF_BLOCK
 };
 
-enum
-{
-	SEQ_WAIT_READY = 0,
-	SEQ_REQUEST_BUS,
-	SEQ_WAITING_ACK,
-	SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS,
-	SEQ_TRANS1_READ_SOURCE,
-	SEQ_TRANS1_INC_DEC_DEST_ADDRESS,
-	SEQ_TRANS1_WRITE_DEST,
-	SEQ_TRANS1_BYTE_MATCH,
-	SEQ_TRANS1_INC_BYTE_COUNTER,
-	SEQ_TRANS1_SET_FLAGS,
-	SEQ_FINISH
-};
-
-
 /****************************************************************************
  * MACROS
  ****************************************************************************/
