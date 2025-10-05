@@ -259,7 +259,7 @@ uint32_t dbz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], flag, pri);
 	}
 
-	m_k053246->k053247_sprites_draw( bitmap, cliprect);
+	m_k053246->k053247_sprites_draw(bitmap, cliprect);
 	return 0;
 }
 
