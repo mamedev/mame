@@ -17,8 +17,8 @@
 
 #include "emu.h"
 
-#include "k052109.h"
 #include "k051960.h"
+#include "k052109.h"
 #include "konamipt.h"
 #include "konami_helper.h"
 
@@ -99,9 +99,10 @@ private:
 	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
+
 	void main_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -306,8 +307,8 @@ void gradius3_state::sound_irq_w(uint16_t data)
 void gradius3_state::sound_bank_w(uint8_t data)
 {
 	/* banks # for the 007232 (chip 1) */
-	const int bank_A = ((data >> 0) & 0x03);
-	const int bank_B = ((data >> 2) & 0x03);
+	const int bank_A = (data >> 0) & 0x03;
+	const int bank_B = (data >> 2) & 0x03;
 	m_k007232->set_bank(bank_A, bank_B);
 }
 
