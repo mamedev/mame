@@ -24,6 +24,7 @@ nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, dev
 	, m_oki0_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_oki1_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_page_mask(0xff)
+	, m_current_bank{0}
 	, m_size{0}
 {
 }
@@ -53,6 +54,9 @@ void nmk112_device::device_start()
 						m_tablebank[c][i]->configure_entry(b,
 							m_rom[c] + (((i << 8) + (b << 16)) % m_size[c]));
 				}
+				m_samplebank[c][i]->set_entry(0);
+				if (paged)
+					m_tablebank[c][i]->set_entry(0);
 			}
 			// install banks
 			address_space *space = (c == 0) ? m_oki0_space : m_oki1_space;
