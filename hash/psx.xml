@@ -37499,6 +37499,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat (Japan)</description>
 		<year>1995</year>
 		<publisher>Namco Hometek</publisher>
+		<info name="alt_title" value="エースコンバット"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="release" value="19950630"/>
@@ -37520,6 +37521,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat 2 (Japan)</description>
 		<year>1997</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="エースコンバット２"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="serial" value="SLPS-00830"/>
@@ -37541,6 +37543,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat 2 (Japan, rev. 1) (PlayStation the Best)</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="エースコンバット２"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="serial" value="SLPS-91146"/>
@@ -37566,6 +37569,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat 3: Electrosphere (Japan)</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="エースコンバット３　エレクトロスフィア"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="serial" value="SLPS-02020 / SLPS-02021 / SLPS-91214 / SLPS-91215"/>
@@ -37596,6 +37600,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat 3: Electrosphere (Japan, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="エースコンバット３　エレクトロスフィア"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="serial" value="SCPS-45397 / SCPS-45398"/>
@@ -37715,6 +37720,7 @@ The game only boot on PAL
 		<description>Action Bass (Japan)</description>
 		<year>1999</year>
 		<publisher>Syscom Entertainment</publisher>
+		<info name="alt_title" value="アクション・バス"/>
 		<info name="developer" value="Vingt-et-un"/>
 		<info name="language" value="English"/>
 		<info name="serial" value="SLPS-02482"/>
@@ -37736,6 +37742,7 @@ The game only boot on PAL
 		<description>AirRace Championship (Japan)</description>
 		<year>1999</year>
 		<publisher>Xing Entertainment</publisher>
+		<info name="alt_title" value="エアレース・チャンピオンシップ"/>
 		<info name="developer" value="Xing Entertainment"/>
 		<info name="language" value="English"/>
 		<info name="serial" value="SLPS-01879"/>
@@ -42118,6 +42125,7 @@ Battle screen status bar flickers
 		<description>Darkseed (Japan)</description>
 		<year>1995</year>
 		<publisher>GaGa Communications</publisher>
+		<info name="alt_title" value="ダークシード"/>
 		<info name="developer" value="Cyberdreams"/>
 		<info name="language" value="Japanese" />
 		<info name="release" value="19951027"/>
@@ -58004,6 +58012,7 @@ Battle screen status bar flickers
 		<description>Transport Tycoon 3D: SL Kara Hajimeyou!! (Japan)</description>
 		<year>1998</year>
 		<publisher>Ocean</publisher>
+		<info name="alt_title" value="トランスポートタイクーン３Ｄ　ＳＬからはじめよう！！"/>
 		<info name="developer" value="MicroProse" />
 		<info name="developer" value="Digital Amusement" />
 		<info name="language" value="Japanese"/>
