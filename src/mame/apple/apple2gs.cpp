@@ -1038,7 +1038,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		}
 	}
 
-	if (scanline == (192+BORDER_TOP))
+	if (scanline == BORDER_TOP)
+	{
+		m_vbl = false;
+	}
+	else if (scanline == (192+BORDER_TOP))
 	{
 		m_vbl = true;
 
@@ -1571,7 +1575,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return (uKeyboardC010 & 0x7f) | (m_video->get_80store() ? 0x80 : 0x00);
 
 		case 0x19:  // read VBL (not VBLBAR, see Apple IIGS Technical Note #40)
-			return (uKeyboardC010 & 0x7f) | (m_screen->vblank() ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_vbl ? 0x80 : 0x00);
 
 		case 0x1a:  // read TEXT
 			return (uKeyboardC010 & 0x7f) | (m_video->get_graphics() ? 0x00 : 0x80);
