@@ -5506,6 +5506,8 @@ void nmk16_state::macross2(machine_config &config)
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+	nmk112.set_oki0_space_tag("oki1");
+	nmk112.set_oki1_space_tag("oki2");
 }
 
 void nmk16_state::tdragon2(machine_config &config)
@@ -5550,6 +5552,8 @@ void nmk16_state::tdragon2(machine_config &config)
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+	nmk112.set_oki0_space_tag("oki1");
+	nmk112.set_oki1_space_tag("oki2");
 }
 
 void nmk16_state::tdragon3h(machine_config &config)
@@ -5611,6 +5615,8 @@ void nmk16_state::raphero(machine_config &config)
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+	nmk112.set_oki0_space_tag("oki1");
+	nmk112.set_oki1_space_tag("oki2");
 }
 
 void nmk16_state::bjtwin(machine_config &config)
@@ -5641,6 +5647,8 @@ void nmk16_state::bjtwin(machine_config &config)
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+	nmk112.set_oki0_space_tag("oki1");
+	nmk112.set_oki1_space_tag("oki2");
 }
 
 void nmk16_state::cactus(machine_config &config)
@@ -5783,6 +5791,8 @@ void nmk16_state::powerins(machine_config &config)
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+	nmk112.set_oki0_space_tag("oki1");
+	nmk112.set_oki1_space_tag("oki2");
 }
 
 void nmk16_state::powerinsa(machine_config &config)
@@ -5864,6 +5874,8 @@ void nmk16_state::powerinsb(machine_config &config)
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+	nmk112.set_oki0_space_tag("oki1");
+	nmk112.set_oki1_space_tag("oki2");
 
 	// Sound code talks to one YM2203, but it's not fitted on the board
 }
@@ -8268,11 +8280,11 @@ ROM_START( macross2 ) // Title screen shows Kanji characters & Macross II
 	ROM_LOAD16_WORD_SWAP( "bp932an.a07", 0x000000, 0x200000, CRC(aa1b21b9) SHA1(133822e3d8628aa4eb3e62fbd054956799423b98) ) // Sprites
 	ROM_LOAD16_WORD_SWAP( "bp932an.a08", 0x200000, 0x200000, CRC(67eb2901) SHA1(25e0f9fda1a8c0c2b59616dd153cb6dcb459d2d9) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a06", 0x040000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a06", 0x000000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a05", 0x040000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a05", 0x000000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "mcrs2bpr.9",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8298,11 +8310,11 @@ ROM_START( macross2k ) // Title screen only shows Macross II, no Kanji.  Suspect
 	ROM_LOAD16_WORD_SWAP( "bp932an.a07", 0x000000, 0x200000, CRC(aa1b21b9) SHA1(133822e3d8628aa4eb3e62fbd054956799423b98) ) // Sprites
 	ROM_LOAD16_WORD_SWAP( "bp932an.a08", 0x200000, 0x200000, CRC(67eb2901) SHA1(25e0f9fda1a8c0c2b59616dd153cb6dcb459d2d9) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a06", 0x040000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a06", 0x000000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a05", 0x040000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a05", 0x000000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "mcrs2bpr.9",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8328,11 +8340,11 @@ ROM_START( macross2g )
 	ROM_LOAD16_WORD_SWAP( "bp932an.a07", 0x000000, 0x200000, CRC(aa1b21b9) SHA1(133822e3d8628aa4eb3e62fbd054956799423b98) ) // Sprites
 	ROM_LOAD16_WORD_SWAP( "bp932an.a08", 0x200000, 0x200000, CRC(67eb2901) SHA1(25e0f9fda1a8c0c2b59616dd153cb6dcb459d2d9) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a06", 0x040000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a06", 0x000000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a05", 0x040000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a05", 0x000000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "mcrs2bpr.9",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8358,11 +8370,11 @@ ROM_START( tdragon2 )
 	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  // Sprites
 	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930916.4", 0x000000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930915.3", 0x000000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8391,11 +8403,11 @@ ROM_START( tdragon3h )
 	ROM_LOAD16_BYTE( "conny.1", 0x000001, 0x100000, CRC(37b32460) SHA1(7b689a7e23a9428c6d36f0791a64e7a9a41e7cfa) )
 	ROM_LOAD16_WORD_SWAP( "conny.5", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", ROMREGION_ERASEFF )   // only 1 oki on this PCB
+	ROM_REGION( 0x200000, "oki1", ROMREGION_ERASEFF )   // only 1 oki on this PCB
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "conny.6", 0x040000, 0x100000, CRC(564f87ed) SHA1(010dd001fda28d9c15ca09a0d12cac438a46cd54) )  // all banked
-	ROM_LOAD( "conny.7", 0x140000, 0x100000, CRC(2e767f6f) SHA1(34e3f747716eb7a585340791c2cfbfde57681d69) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "conny.6", 0x000000, 0x100000, CRC(564f87ed) SHA1(010dd001fda28d9c15ca09a0d12cac438a46cd54) )  // all banked
+	ROM_LOAD( "conny.7", 0x100000, 0x100000, CRC(2e767f6f) SHA1(34e3f747716eb7a585340791c2cfbfde57681d69) )
 
 	ROM_REGION( 0x0100, "htiming", 0 ) // not dumped for this set
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, BAD_DUMP CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8421,11 +8433,11 @@ ROM_START( tdragon2a )
 	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  // Sprites
 	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930916.4", 0x000000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930915.3", 0x000000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8451,11 +8463,11 @@ ROM_START( bigbang )
 	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  // Sprites
 	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930916.4", 0x000000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930915.3", 0x000000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8481,11 +8493,11 @@ ROM_START( bigbanga )
 	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  // Sprites
 	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930916.4", 0x000000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930915.3", 0x000000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8574,13 +8586,13 @@ ROM_START( arcadian )
 	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  // 16x16 tiles
 	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  // 16x16 tiles
 
-	ROM_REGION( 0x440000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
-	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
+	ROM_REGION( 0x400000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.6", 0x000000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_LOAD( "rhp94099.7", 0x200000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
 
-	ROM_REGION( 0x440000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
-	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_REGION( 0x400000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.5", 0x000000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
+	ROM_LOAD( "rhp94099.6", 0x200000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "prom1.u19", 0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) )  // 82S129
@@ -8610,13 +8622,13 @@ ROM_START( raphero )
 	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  // 16x16 tiles
 	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  // 16x16 tiles
 
-	ROM_REGION( 0x440000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
-	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
+	ROM_REGION( 0x400000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.6", 0x000000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_LOAD( "rhp94099.7", 0x200000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
 
-	ROM_REGION( 0x440000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
-	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_REGION( 0x400000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.5", 0x000000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
+	ROM_LOAD( "rhp94099.6", 0x200000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "prom1.u19", 0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) )  // 82S129
@@ -8646,13 +8658,13 @@ ROM_START( rapheroa )
 	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  // 16x16 tiles
 	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  // 16x16 tiles
 
-	ROM_REGION( 0x440000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
-	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
+	ROM_REGION( 0x400000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.6", 0x000000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_LOAD( "rhp94099.7", 0x200000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
 
-	ROM_REGION( 0x440000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
-	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_REGION( 0x400000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.5", 0x000000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
+	ROM_LOAD( "rhp94099.6", 0x200000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "prom1.u19", 0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) )  // 82S129
@@ -8682,11 +8694,11 @@ ROM_START( sabotenb )
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "ic100.sb5",  0x000000, 0x200000, CRC(b20f166e) SHA1(074d770fd6d233040a80a92f4467d81f961c650b) )  // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic30.sb6",    0x040000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic30.sb6",    0x000000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic27.sb7",    0x000000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8714,11 +8726,11 @@ ROM_START( sabotenba )
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "ic100.sb5",  0x000000, 0x200000, CRC(b20f166e) SHA1(074d770fd6d233040a80a92f4467d81f961c650b) )  // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic30.sb6",    0x040000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic30.sb6",    0x000000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic27.sb7",    0x000000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8743,11 +8755,11 @@ ROM_START( cactus )
 	ROM_LOAD16_BYTE( "s-03.bin",    0x000001, 0x100000, CRC(bc1781b8) SHA1(5000f2111c5981428a772a9dcae2c7c8f1f6958b) )
 	ROM_LOAD16_BYTE( "s-04.bin",    0x000000, 0x100000, CRC(f823885e) SHA1(558b2bed207ccff8f1425cbb9dadc1ec0b70a65b) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "s-01.bin",    0x040000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "s-01.bin",    0x000000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "s-02.bin",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "s-02.bin",    0x000000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
 ROM_END
 
 ROM_START( bjtwin )
@@ -8768,11 +8780,11 @@ ROM_START( bjtwin )
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "93087-5.bin", 0x000000, 0x100000, CRC(bb06245d) SHA1(c91e2284d95370b8ef2eb1b9d6305fdd6cde23a0) ) // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 ) // OKIM6295 samples
-	ROM_LOAD( "93087-6.bin",    0x040000, 0x100000, CRC(372d46dd) SHA1(18f44e777241af50787730652fa018c51b65ea15) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 ) // OKIM6295 samples
+	ROM_LOAD( "93087-6.bin",    0x000000, 0x100000, CRC(372d46dd) SHA1(18f44e777241af50787730652fa018c51b65ea15) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 ) // OKIM6295 samples
-	ROM_LOAD( "93087-7.bin",    0x040000, 0x100000, CRC(8da67808) SHA1(f042574c097f5a8c2684fcc23f2c817c168254ef) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 ) // OKIM6295 samples
+	ROM_LOAD( "93087-7.bin",    0x000000, 0x100000, CRC(8da67808) SHA1(f042574c097f5a8c2684fcc23f2c817c168254ef) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8799,11 +8811,11 @@ ROM_START( bjtwina )
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "93087-5.bin", 0x000000, 0x100000, CRC(bb06245d) SHA1(c91e2284d95370b8ef2eb1b9d6305fdd6cde23a0) ) // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 ) // OKIM6295 samples
-	ROM_LOAD( "93087-6.bin",    0x040000, 0x100000, CRC(372d46dd) SHA1(18f44e777241af50787730652fa018c51b65ea15) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 ) // OKIM6295 samples
+	ROM_LOAD( "93087-6.bin",    0x000000, 0x100000, CRC(372d46dd) SHA1(18f44e777241af50787730652fa018c51b65ea15) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 ) // OKIM6295 samples
-	ROM_LOAD( "93087-7.bin",    0x040000, 0x100000, CRC(8da67808) SHA1(f042574c097f5a8c2684fcc23f2c817c168254ef) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 ) // OKIM6295 samples
+	ROM_LOAD( "93087-7.bin",    0x000000, 0x100000, CRC(8da67808) SHA1(f042574c097f5a8c2684fcc23f2c817c168254ef) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8830,13 +8842,13 @@ ROM_START( bjtwinp )
 	ROM_LOAD16_BYTE( "u4.ic100", 0x000000, 0x080000, CRC(6501b1fb) SHA1(1c0832c3bb33aac1e5cd8845d77bc09222548ef8) )
 	ROM_LOAD16_BYTE( "u5.ic100", 0x000001, 0x080000, CRC(8394e2ba) SHA1(bb921ccf1f5221611449ed3537d60395d8a1c1e9) )
 
-	ROM_REGION( 0x140000, "oki1", 0 ) // OKIM6295 samples
-	ROM_LOAD( "bottom.ic30",    0x040000, 0x80000, CRC(b5ef197f) SHA1(89d675f921dead585c2fef44105a7aea2f1f399c) ) // all banked
-	ROM_LOAD( "top.ic30",       0x0c0000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
+	ROM_REGION( 0x100000, "oki1", 0 ) // OKIM6295 samples
+	ROM_LOAD( "bottom.ic30",    0x000000, 0x80000, CRC(b5ef197f) SHA1(89d675f921dead585c2fef44105a7aea2f1f399c) ) // all banked
+	ROM_LOAD( "top.ic30",       0x080000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
 
-	ROM_REGION( 0x140000, "oki2", 0 ) // OKIM6295 samples
-	ROM_LOAD( "top.ic27",       0x040000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) // all banked
-	ROM_LOAD( "bottom.ic27",    0x0c0000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
+	ROM_REGION( 0x100000, "oki2", 0 ) // OKIM6295 samples
+	ROM_LOAD( "top.ic27",       0x000000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) // all banked
+	ROM_LOAD( "bottom.ic27",    0x080000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8867,13 +8879,13 @@ ROM_START( bjtwinpa )
 	ROM_LOAD16_BYTE( "ic100_1.bin", 0x000000, 0x080000, CRC(2ea7e460) SHA1(b8dc13994ae2433fc7c38412c9ea6f10f945bca5) )
 	ROM_LOAD16_BYTE( "ic100_2.bin", 0x000001, 0x080000, CRC(ec85e1b7) SHA1(2f9a60ad2beb22d1b41dab7db3634b8e36cfce3e) )
 
-	ROM_REGION( 0x140000, "oki1", 0 ) // OKIM6295 samples
-	ROM_LOAD( "bottom.ic30",    0x040000, 0x80000, CRC(b5ef197f) SHA1(89d675f921dead585c2fef44105a7aea2f1f399c) ) // all banked
-	ROM_LOAD( "top.ic30",       0x0c0000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
+	ROM_REGION( 0x100000, "oki1", 0 ) // OKIM6295 samples
+	ROM_LOAD( "bottom.ic30",    0x000000, 0x80000, CRC(b5ef197f) SHA1(89d675f921dead585c2fef44105a7aea2f1f399c) ) // all banked
+	ROM_LOAD( "top.ic30",       0x080000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
 
-	ROM_REGION( 0x140000, "oki2", 0 ) // OKIM6295 samples
-	ROM_LOAD( "top.ic27",       0x040000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) // all banked
-	ROM_LOAD( "bottom.ic27",    0x0c0000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
+	ROM_REGION( 0x100000, "oki2", 0 ) // OKIM6295 samples
+	ROM_LOAD( "top.ic27",       0x000000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) // all banked
+	ROM_LOAD( "bottom.ic27",    0x080000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8900,11 +8912,11 @@ ROM_START( nouryoku )
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "ic100.5",    0x000000, 0x200000, CRC(24d3e24e) SHA1(71e38637953ec98bf308824aaef5628803aead21) )  // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic30.6",     0x040000, 0x100000, CRC(feea34f4) SHA1(bee467e74dbad497c6f5f6b38b7e52001e767012) )  // all banked
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic30.6",     0x000000, 0x100000, CRC(feea34f4) SHA1(bee467e74dbad497c6f5f6b38b7e52001e767012) )  // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic27.7",     0x040000, 0x100000, CRC(8a69fded) SHA1(ee73f1789bcc672232606a4b3b28087fea1c5c69) )  // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic27.7",     0x000000, 0x100000, CRC(8a69fded) SHA1(ee73f1789bcc672232606a4b3b28087fea1c5c69) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, BAD_DUMP CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129 - taken from bjtwin
@@ -8933,14 +8945,13 @@ ROM_START( nouryokup )
 	ROM_LOAD16_BYTE( "obj1even.u9.ic100", 0x100000, 0x080000, CRC(e01567e8) SHA1(69775752b61ce103d91e127f1fbf7c94b960b835) )
 	ROM_LOAD16_BYTE( "obj1odd.u8.ic100",  0x100001, 0x080000, CRC(4a383085) SHA1(45351eb67c90936e500b527e9f93c1f70b67bd9a) )
 
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD("soundpcm0.bottom.ic30", 0x000000, 0x080000, CRC(34ded136) SHA1(00fe1d6327483bb9e73802beca3ce6d808a20ceb) )
+	ROM_LOAD("soundpcm1.top.ic30",    0x080000, 0x080000, CRC(a8d2abf7) SHA1(5619437e3e1f70f78cb2aeb2d619511be11e02e1) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD("soundpcm0.bottom.ic30", 0x040000, 0x080000, CRC(34ded136) SHA1(00fe1d6327483bb9e73802beca3ce6d808a20ceb) )
-	ROM_LOAD("soundpcm1.top.ic30",    0x0c0000, 0x080000, CRC(a8d2abf7) SHA1(5619437e3e1f70f78cb2aeb2d619511be11e02e1) )
-
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD("soundpcm2.top.ic27",    0x040000, 0x080000, CRC(29d0a15d) SHA1(a235eec225dd5006dd1f4e21d78fd647335f45dc) )
-	ROM_LOAD("soundpcm3.bottom.ic27", 0x0c0000, 0x080000, CRC(c764e749) SHA1(8399d3b6807bd263eee607c5625618d19688b394) )
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD("soundpcm2.top.ic27",    0x000000, 0x080000, CRC(29d0a15d) SHA1(a235eec225dd5006dd1f4e21d78fd647335f45dc) )
+	ROM_LOAD("soundpcm3.bottom.ic27", 0x080000, 0x080000, CRC(c764e749) SHA1(8399d3b6807bd263eee607c5625618d19688b394) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, BAD_DUMP CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129 - taken from bjtwin
@@ -9031,13 +9042,13 @@ ROM_START( powerins )
 	ROM_LOAD16_WORD_SWAP( "93095-18.u122", 0x600000, 0x100000, CRC(b135e3f2) SHA1(339fb4007ca0f379b7554a1c4f711f494a371fb2) )
 	ROM_LOAD16_WORD_SWAP( "93095-19.u123", 0x700000, 0x100000, CRC(67695537) SHA1(4c78ce3e36f27d2a6a9e50e8bf896335d4d0958a) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "93095-10.u48", 0x040000, 0x100000, CRC(329ac6c5) SHA1(e809b94e2623141f5a48995cfa97fe1ead7ab40b) )
-	ROM_LOAD( "93095-11.u49", 0x140000, 0x100000, CRC(75d6097c) SHA1(3c89a7c9b12087e2d969b822419d3e5f98f5cb1d) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "93095-10.u48", 0x000000, 0x100000, CRC(329ac6c5) SHA1(e809b94e2623141f5a48995cfa97fe1ead7ab40b) )
+	ROM_LOAD( "93095-11.u49", 0x100000, 0x100000, CRC(75d6097c) SHA1(3c89a7c9b12087e2d969b822419d3e5f98f5cb1d) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "93095-8.u46",  0x040000, 0x100000, CRC(f019bedb) SHA1(4b6e10f85671c75b666e547887d403d6e607cec8) )
-	ROM_LOAD( "93095-9.u47",  0x140000, 0x100000, CRC(adc83765) SHA1(9e760443f9de21c1bb7e33eaa1541023fcdc60ab) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "93095-8.u46",  0x000000, 0x100000, CRC(f019bedb) SHA1(4b6e10f85671c75b666e547887d403d6e607cec8) )
+	ROM_LOAD( "93095-9.u47",  0x100000, 0x100000, CRC(adc83765) SHA1(9e760443f9de21c1bb7e33eaa1541023fcdc60ab) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "20.u54",       0x0000,   0x0100, CRC(38bd0e2f) SHA1(20d311869642cd96bb831fdf4a458e0d872f03eb) ) // 82S129
@@ -9075,13 +9086,13 @@ ROM_START( powerinsj )
 	ROM_LOAD16_WORD_SWAP( "93095-18.u122", 0x600000, 0x100000, CRC(b135e3f2) SHA1(339fb4007ca0f379b7554a1c4f711f494a371fb2) )
 	ROM_LOAD16_WORD_SWAP( "93095-19.u123", 0x700000, 0x100000, CRC(67695537) SHA1(4c78ce3e36f27d2a6a9e50e8bf896335d4d0958a) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "93095-10.u48", 0x040000, 0x100000, CRC(329ac6c5) SHA1(e809b94e2623141f5a48995cfa97fe1ead7ab40b) )
-	ROM_LOAD( "93095-11.u49", 0x140000, 0x100000, CRC(75d6097c) SHA1(3c89a7c9b12087e2d969b822419d3e5f98f5cb1d) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "93095-10.u48", 0x000000, 0x100000, CRC(329ac6c5) SHA1(e809b94e2623141f5a48995cfa97fe1ead7ab40b) )
+	ROM_LOAD( "93095-11.u49", 0x100000, 0x100000, CRC(75d6097c) SHA1(3c89a7c9b12087e2d969b822419d3e5f98f5cb1d) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "93095-8.u46",  0x040000, 0x100000, CRC(f019bedb) SHA1(4b6e10f85671c75b666e547887d403d6e607cec8) )
-	ROM_LOAD( "93095-9.u47",  0x140000, 0x100000, CRC(adc83765) SHA1(9e760443f9de21c1bb7e33eaa1541023fcdc60ab) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "93095-8.u46",  0x000000, 0x100000, CRC(f019bedb) SHA1(4b6e10f85671c75b666e547887d403d6e607cec8) )
+	ROM_LOAD( "93095-9.u47",  0x100000, 0x100000, CRC(adc83765) SHA1(9e760443f9de21c1bb7e33eaa1541023fcdc60ab) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "20.u54",       0x0000,   0x0100, CRC(38bd0e2f) SHA1(20d311869642cd96bb831fdf4a458e0d872f03eb) ) // 82S129
@@ -9129,17 +9140,17 @@ ROM_START( powerinspu )
 	ROM_LOAD16_BYTE( "fo7.mo7.27c040", 0x700001, 0x80000, CRC(9ab1998c) SHA1(fadaa4a46cefe0093ee1ebeddbae63143fa7bb5a) )
 	ROM_LOAD16_BYTE( "fe7.me7.27c040", 0x700000, 0x80000, CRC(1ab0c88a) SHA1(8bc72732f5911e0d4e0cf12fd2fb12d67e03299e) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "ao0.ad00.27c040", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) ) // located on OS93089 SUB daughterboard
-	ROM_LOAD( "ao1.ad01.27c040", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
-	ROM_LOAD( "ao2.ad02.27c040", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
-	ROM_LOAD( "ao3.ad03.27c040", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "ao0.ad00.27c040", 0x000000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) ) // located on OS93089 SUB daughterboard
+	ROM_LOAD( "ao1.ad01.27c040", 0x080000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
+	ROM_LOAD( "ao2.ad02.27c040", 0x100000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
+	ROM_LOAD( "ao3.ad03.27c040", 0x180000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "ad10.ad10.27c040", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) ) // located on OS93089 SUB daughterboard
-	ROM_LOAD( "ad11.ad11.27c040", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
-	ROM_LOAD( "ad12.ad12.27c040", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
-	ROM_LOAD( "ad13.ad13.27c040", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "ad10.ad10.27c040", 0x000000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) ) // located on OS93089 SUB daughterboard
+	ROM_LOAD( "ad11.ad11.27c040", 0x080000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
+	ROM_LOAD( "ad12.ad12.27c040", 0x100000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
+	ROM_LOAD( "ad13.ad13.27c040", 0x180000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "20.u54",       0x0000,   0x0100, CRC(38bd0e2f) SHA1(20d311869642cd96bb831fdf4a458e0d872f03eb) ) // 82S129
@@ -9187,17 +9198,17 @@ ROM_START( powerinspj )
 	ROM_LOAD16_BYTE( "fo7.mo7.27c040", 0x700001, 0x80000, CRC(9ab1998c) SHA1(fadaa4a46cefe0093ee1ebeddbae63143fa7bb5a) )
 	ROM_LOAD16_BYTE( "fe7.me7.27c040", 0x700000, 0x80000, CRC(1ab0c88a) SHA1(8bc72732f5911e0d4e0cf12fd2fb12d67e03299e) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "ao0.ad00.27c040", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) ) // located on OS93089 SUB daughterboard
-	ROM_LOAD( "ao1.ad01.27c040", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
-	ROM_LOAD( "ao2.ad02.27c040", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
-	ROM_LOAD( "ao3.ad03.27c040", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "ao0.ad00.27c040", 0x000000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) ) // located on OS93089 SUB daughterboard
+	ROM_LOAD( "ao1.ad01.27c040", 0x080000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
+	ROM_LOAD( "ao2.ad02.27c040", 0x100000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
+	ROM_LOAD( "ao3.ad03.27c040", 0x180000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "ad10.ad10.27c040", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) ) // located on OS93089 SUB daughterboard
-	ROM_LOAD( "ad11.ad11.27c040", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
-	ROM_LOAD( "ad12.ad12.27c040", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
-	ROM_LOAD( "ad13.ad13.27c040", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "ad10.ad10.27c040", 0x000000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) ) // located on OS93089 SUB daughterboard
+	ROM_LOAD( "ad11.ad11.27c040", 0x080000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
+	ROM_LOAD( "ad12.ad12.27c040", 0x100000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
+	ROM_LOAD( "ad13.ad13.27c040", 0x180000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "20.u54",       0x0000,   0x0100, CRC(38bd0e2f) SHA1(20d311869642cd96bb831fdf4a458e0d872f03eb) ) // 82S129
@@ -9257,7 +9268,7 @@ ROM_START( powerinsa )
 	ROM_LOAD16_WORD_SWAP( "rom8",  0x400000, 0x200000, CRC(b02fdd6d) SHA1(1e2c52b4e9999f0b564fcf13ff41b097ad7d0c39) )
 	ROM_LOAD16_WORD_SWAP( "rom7",  0x600000, 0x200000, CRC(92ab9996) SHA1(915ec8f383cc3652c3816a9b56ee54e22e104a5c) )
 
-	ROM_REGION( 0x080000, "oki1", 0 )   // 8 bit ADPCM (banked)
+	ROM_REGION( 0x080000, "oki1", 0 )   // 4 bit ADPCM (banked)
 	ROM_LOAD( "rom5", 0x000000, 0x080000, CRC(88579c8f) SHA1(13083934ab294c9b08d3e36f55c00a6a2e5a0507) )
 ROM_END
 
@@ -9348,17 +9359,17 @@ ROM_START( powerinsb )
 	ROM_LOAD16_BYTE( "12p.bin", 0x700001, 0x80000, CRC(9ab1998c) SHA1(fadaa4a46cefe0093ee1ebeddbae63143fa7bb5a) )
 	ROM_LOAD16_BYTE( "11q.bin", 0x700000, 0x80000, CRC(1ab0c88a) SHA1(8bc72732f5911e0d4e0cf12fd2fb12d67e03299e) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "4a.bin", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
-	ROM_LOAD( "4b.bin", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
-	ROM_LOAD( "4c.bin", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
-	ROM_LOAD( "4d.bin", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "4a.bin", 0x000000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
+	ROM_LOAD( "4b.bin", 0x080000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
+	ROM_LOAD( "4c.bin", 0x100000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
+	ROM_LOAD( "4d.bin", 0x180000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "5a.bin", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
-	ROM_LOAD( "5b.bin", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
-	ROM_LOAD( "5c.bin", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
-	ROM_LOAD( "5d.bin", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "5a.bin", 0x000000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
+	ROM_LOAD( "5b.bin", 0x080000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
+	ROM_LOAD( "5c.bin", 0x100000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
+	ROM_LOAD( "5d.bin", 0x180000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
 
 	ROM_REGION( 0x0220, "proms", 0 ) // unknown
 	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(67d5ec4b) SHA1(87d32948a0c88277dcdd0eaa035bde40fc7db5fe) )
@@ -9400,17 +9411,17 @@ ROM_START( powerinsc )
 	ROM_LOAD16_BYTE( "23.040.u96", 0x700000, 0x80000,  CRC(625c5b7b) SHA1(ddac164cd92459bdce5905b31eccded9b1c06086) )
 	ROM_LOAD16_BYTE( "12.040.u92", 0x700001, 0x80000,  CRC(08c4e478) SHA1(172dd9532a9240014afb4817b61a3e8122be8f0c) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "9.040.u32", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
-	ROM_LOAD( "8.040.u30", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
-	ROM_LOAD( "7.040.u33", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
-	ROM_LOAD( "6.040.u31", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "9.040.u32", 0x000000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
+	ROM_LOAD( "8.040.u30", 0x080000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
+	ROM_LOAD( "7.040.u33", 0x100000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
+	ROM_LOAD( "6.040.u31", 0x180000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "5.040.u36", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
-	ROM_LOAD( "4.040.u34", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
-	ROM_LOAD( "3.040.u37", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
-	ROM_LOAD( "2.040.u35", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "5.040.u36", 0x000000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
+	ROM_LOAD( "4.040.u34", 0x080000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
+	ROM_LOAD( "3.040.u37", 0x100000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
+	ROM_LOAD( "2.040.u35", 0x180000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
 ROM_END
 
 ROM_START( manybloc )
