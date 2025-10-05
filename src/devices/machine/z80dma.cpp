@@ -26,12 +26,14 @@
 
 #define LOG_DMA     (1U << 1)
 #define LOG_INT     (1U << 2)
+#define LOG_LINE    (1U << 3)
 
-//#define VERBOSE (LOG_GENERAL | LOG_DMA | LOG_INT)
+//#define VERBOSE (LOG_GENERAL | LOG_DMA | LOG_INT | LOG_LINE)
 #include "logmacro.h"
 
 #define LOGDMA(...) LOGMASKED(LOG_DMA, __VA_ARGS__)
 #define LOGINT(...) LOGMASKED(LOG_INT, __VA_ARGS__)
+#define LOGLINE(...) LOGMASKED(LOG_LINE, __VA_ARGS__)
 
 
 /****************************************************************************
@@ -597,7 +599,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 
 			if(TRANSFER_MODE == TM_TRANSFER)     m_status |= 0x10;   // no match found
 
-			LOG("Z80DMA End of Block\n");
+			LOGDMA("Z80DMA End of Block\n");
 
 			if (INT_ON_END_OF_BLOCK)
 			{
@@ -606,7 +608,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 
 			if (AUTO_RESTART)
 			{
-				LOG("Z80DMA Auto Restart\n");
+				LOGDMA("Z80DMA Auto Restart\n");
 
 				m_addressA = PORTA_ADDRESS;
 				m_addressB = PORTB_ADDRESS;
@@ -632,7 +634,8 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
  ****************************************************************************/
 u8 z80dma_device::read()
 {
-	const u8 res = m_read_regs_follow[m_read_cur_follow];
+	// HACK: always return the live status
+	const u8 res = (m_read_cur_follow == 0) && (READ_MASK & 1) ? m_status : m_read_regs_follow[m_read_cur_follow];
 	if (!machine().side_effects_disabled())
 	{
 		m_read_cur_follow++;
@@ -892,7 +895,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
  ****************************************************************************/
 void z80dma_device::rdy_w(int state)
 {
-	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
+	LOGLINE("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback), this), state);
 }
 
