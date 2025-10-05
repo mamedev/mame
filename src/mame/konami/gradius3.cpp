@@ -11,14 +11,14 @@
     on cpu B and the needed parts are copied to RAM at run time.
 
     There's also something wrong in the way tile banks are implemented in
-    k052109.cpp. They don't seem to be used by this game.
+    konami/k052109.cpp. They don't seem to be used by this game.
 
 ***************************************************************************/
 
 #include "emu.h"
 
-#include "k052109.h"
 #include "k051960.h"
+#include "k052109.h"
 #include "konamipt.h"
 #include "konami_helper.h"
 
@@ -32,6 +32,14 @@
 
 #include "emupal.h"
 #include "speaker.h"
+
+
+#define LOG_GFX (1 << 1)
+#define LOG_IRQ (1 << 2)
+#define LOG_UNKNOWN (1 << 3)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 namespace {
@@ -91,9 +99,10 @@ private:
 	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
+
 	void main_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -139,12 +148,9 @@ K051960_CB_MEMBER(gradius3_state::sprite_callback)
 		}
 	};
 
-	int pri = ((color & 0x60) >> 5);
+	const int pri = ((color & 0x60) >> 5);
 
-	if (m_priority == 0)
-		priority = primask[0][pri];
-	else
-		priority = primask[1][pri];
+	priority = primask[m_priority][pri];
 
 	code |= (color & 0x01) << 13;
 	color = sprite_colorbase + ((color & 0x1e) >> 1);
@@ -207,7 +213,7 @@ uint16_t gradius3_state::gfxrom_r(offs_t offset)
 
 void gradius3_state::gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int oldword = m_gfxram[offset];
+	const uint16_t oldword = m_gfxram[offset];
 
 	COMBINE_DATA(&m_gfxram[offset]);
 
@@ -230,7 +236,7 @@ void gradius3_state::k052109_halfword_w(offs_t offset, uint16_t data, uint16_t m
 	if (!ACCESSING_BITS_0_7)
 	{
 		m_k052109->write(offset, (data >> 8) & 0xff);
-		// logerror("%s half %04x = %04x\n",machine().describe_context(),offset,data);
+		LOGMASKED(LOG_GFX, "%s: half %04x = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
 	}
 }
 
@@ -241,20 +247,20 @@ void gradius3_state::cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		data >>= 8;
 
 		/* bits 0-1 are coin counters */
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 		/* bit 2 selects layer priority */
-		m_priority = data & 0x04;
+		m_priority = BIT(data, 2);
 
 		/* bit 3 enables cpu B */
-		m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 5 enables irq */
-		m_irqAen = data & 0x20;
+		m_irqAen = BIT(data, 5);
 
 		/* other bits unknown */
-		//logerror("%s: write %04x to c0000\n",machine().describe_context(),data);
+		LOGMASKED(LOG_UNKNOWN, "%s: write %02x & %02x to cpuA_ctrl_w\n", machine().describe_context(), data, mem_mask >> 8);
 	}
 }
 
@@ -275,22 +281,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::sub_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240 && m_irqBmask & 1) // vblank-out irq
+	if (scanline == 240 && BIT(m_irqBmask, 0)) // vblank-out irq
 		m_subcpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 16 && m_irqBmask & 2) // sprite end DMA irq
+	if (scanline == 16 && BIT(m_irqBmask, 1)) // sprite end DMA irq
 		m_subcpu->set_input_line(2, HOLD_LINE);
 }
 
 void gradius3_state::cpuB_irqtrigger_w(uint16_t data)
 {
-	if (m_irqBmask & 4)
+	if (BIT(m_irqBmask, 2))
 	{
-		logerror("%04x trigger cpu B irq 4 %02x\n",m_maincpu->pc(),data);
+		LOGMASKED(LOG_IRQ, "%s: trigger cpu B irq 4 %04x\n", machine().describe_context(), data);
 		m_subcpu->set_input_line(4, HOLD_LINE);
 	}
 	else
-		logerror("%04x MISSED cpu B irq 4 %02x\n",m_maincpu->pc(),data);
+		LOGMASKED(LOG_IRQ, "%s: MISSED cpu B irq 4 %04x\n", machine().describe_context(), data);
 }
 
 void gradius3_state::sound_irq_w(uint16_t data)
@@ -300,11 +306,9 @@ void gradius3_state::sound_irq_w(uint16_t data)
 
 void gradius3_state::sound_bank_w(uint8_t data)
 {
-	int bank_A, bank_B;
-
 	/* banks # for the 007232 (chip 1) */
-	bank_A = ((data >> 0) & 0x03);
-	bank_B = ((data >> 2) & 0x03);
+	const int bank_A = (data >> 0) & 0x03;
+	const int bank_B = (data >> 2) & 0x03;
 	m_k007232->set_bank(bank_A, bank_B);
 }
 
@@ -331,7 +335,7 @@ void gradius3_state::main_map(address_map &map)
 	map(0x0e0000, 0x0e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0e8000, 0x0e8000).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0f0000, 0x0f0001).w(FUNC(gradius3_state::sound_irq_w));
-	map(0x100000, 0x103fff).ram().share("share1");
+	map(0x100000, 0x103fff).ram().share("sharedram");
 	map(0x14c000, 0x153fff).rw(FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
 	map(0x180000, 0x19ffff).ram().w(FUNC(gradius3_state::gfxram_w)).share("k052109");
 }
@@ -342,7 +346,7 @@ void gradius3_state::sub_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x140000, 0x140001).w(FUNC(gradius3_state::cpuB_irqenable_w));
-	map(0x200000, 0x203fff).ram().share("share1");
+	map(0x200000, 0x203fff).ram().share("sharedram");
 	map(0x24c000, 0x253fff).rw(FUNC(gradius3_state::k052109_halfword_r), FUNC(gradius3_state::k052109_halfword_w));
 	map(0x280000, 0x29ffff).ram().w(FUNC(gradius3_state::gfxram_w)).share("k052109");
 	map(0x2c0000, 0x2c000f).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w)).umask16(0x00ff);
@@ -493,20 +497,17 @@ void gradius3_state::gradius3(machine_config &config)
 	m_k051960->set_plane_order(K051960_PLANEORDER_GRADIUS3);
 
 	/* sound hardware */
-	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
-	ymsnd.add_route(0, "speaker", 1.0, 0);
-	ymsnd.add_route(1, "speaker", 1.0, 1);
+	ymsnd.add_route(0, "speaker", 1.0); // only left channel is connected
+	ymsnd.add_route(1, "speaker", 0.0);
 
 	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(gradius3_state::volume_callback));
-	m_k007232->add_route(0, "speaker", 0.20, 0);
-	m_k007232->add_route(0, "speaker", 0.20, 1);
-	m_k007232->add_route(1, "speaker", 0.20, 0);
-	m_k007232->add_route(1, "speaker", 0.20, 1);
+	m_k007232->add_route(ALL_OUTPUTS, "speaker", 0.20);
 }
 
 
