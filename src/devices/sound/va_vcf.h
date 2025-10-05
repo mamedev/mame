@@ -116,10 +116,10 @@ protected:
 private:
 	// Configuration, not needed in save state.
 	float m_r_eq;  // R_EQ in the datasheet.
-	float m_cv2freq;  // Cached computation for frequency. See the constructor.
+	float m_cv2freq;  // Cached computation for frequency calculations.
 	bool m_res_enabled;
 	float m_r_rc;  // R_RC in the datasheet.
-	float m_res_a;  // Cached computation for resonance. See configure_resonance().
+	float m_res_a;  // Cached computation for resonance calculations.
 };
 
 #endif  // MAME_SOUND_VA_VCF_H

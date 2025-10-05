@@ -202,9 +202,9 @@ void va_lpf4_device::recalc_filter()
 	m_a[4] = r1;
 
 	m_b[0] =      r1 + 4 * gzc + 6 * gzc2 + 4 * gzc3 + gzc4;
-	m_b[1] = 4 * (r1 + 2 * gzc          - 2 * gzc3 - gzc4);
-	m_b[2] = 6 * (r1           - 2 * gzc2          + gzc4);
-	m_b[3] = 4 * (r1 - 2 * gzc          + 2 * gzc3 - gzc4);
+	m_b[1] = 4 * (r1 + 2 * gzc            - 2 * gzc3 - gzc4);
+	m_b[2] = 6 * (r1           - 2 * gzc2            + gzc4);
+	m_b[3] = 4 * (r1 - 2 * gzc            + 2 * gzc3 - gzc4);
 	m_b[4] =      r1 - 4 * gzc + 6 * gzc2 - 4 * gzc3 + gzc4;
 }
 
@@ -256,7 +256,7 @@ float cem3320_lpf4_device::cv_to_freq(float freq_cv) const
 	// - R_F ~ External feedback resistor. Usually 100K.
 	// - C_P ~ External capacitor.
 	constexpr float VT = 0.0252F;  // Thermal voltage at 20C.
-	// m_cv2freq is set to AI0 / (2 * PI * R_EQ * C_P) in recalc_cv2freq().
+	// m_cv2freq caches: AI0 / (2 * PI * R_EQ * C_P).
 	return m_cv2freq * expf(-freq_cv / VT);
 }
 
