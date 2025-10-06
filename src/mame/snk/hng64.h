@@ -161,7 +161,7 @@ public:
 		m_mainram(*this, "mainram"),
 		m_cart(*this, "gameprg"),
 		m_sysregs(*this, "sysregs"),
-		m_rombase(*this, "user1"),
+		m_rombase(*this, "bios"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteregs(*this, "spriteregs"),
 		m_videoram(*this, "videoram"),

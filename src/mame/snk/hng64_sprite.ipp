@@ -101,12 +101,12 @@ do \
 		if (curx & 1) \
 		{ \
 			if (!(ypos & 1)) \
-				srcpix = 0; \
+				srcpix = trans_pen; \
 		} \
 		else \
 		{ \
 			if ((ypos & 1)) \
-				srcpix = 0; \
+				srcpix = trans_pen; \
 		} \
 	} \
 } \
@@ -189,8 +189,8 @@ inline void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, 
 	// fetch the source data
 	const u8 *srcdata = gfx->get_data(code);
 
-	s32 destendx = xpos + dstwidth - 1;
-	u32 leftovers = (destendx + 1 - xpos);
+	const s32 destendx = xpos + dstwidth - 1;
+	const u32 leftovers = (destendx + 1 - xpos);
 
 	drawline(dest, destz, cliprect,
 		gfx, code, color, flipy, xpos,
@@ -221,7 +221,7 @@ inline void hng64_state::get_tile_details(bool chain, u16 spritenum, u8 xtile, u
 		tileno = (m_spriteram[(spritenum * 8) + 4] & 0x0007ffff);
 		pal = (m_spriteram[(spritenum * 8) + 3] & 0x00ff0000) >> 16;
 
-		if (m_spriteregs[0] & 0x00800000) //bpp switch
+		if (BIT(m_spriteregs[0], 23)) //bpp switch
 		{
 			gfxregion = 4;
 		}
@@ -238,7 +238,7 @@ inline void hng64_state::get_tile_details(bool chain, u16 spritenum, u8 xtile, u
 	{
 		tileno = (m_spriteram[((spritenum + offset) * 8) + 4] & 0x0007ffff);
 		pal = (m_spriteram[((spritenum + offset) * 8) + 3] & 0x00ff0000) >> 16;
-		if (m_spriteregs[0] & 0x00800000) //bpp switch
+		if (BIT(m_spriteregs[0], 23)) //bpp switch
 		{
 			gfxregion = 4;
 		}
@@ -263,7 +263,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 	// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
 	// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
 	// Could also be draw order related, check if it inverts the z value?
-	const bool zsort = !(m_spriteregs[0] & 0x01000000);
+	const bool zsort = BIT(~m_spriteregs[0], 24);
 
 	if (zsort)
 		m_sprite_zbuffer.fill(0x0000, cliprect);
@@ -313,7 +313,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		const u32 zoomx = (m_spriteram[(currentsprite * 8) + 1] & 0x0000ffff) >> 0;
 
 		/* Calculate the zoom */
-		int zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
+		const u8 zoom_shift = BIT(m_spriteregs[0], 27) ? 4 : 8;
 
 		/* Sprites after 'Fair and Square' have a zoom of 0 in sams64 for one frame, they shouldn't be seen? */
 		if (!zoomx || !zoomy)
@@ -334,19 +334,8 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			continue;
 		}
 
-		s32 dx, dy;
-
-		if (zoom_factor == 0x100)
-		{
-			dx = zoomx << 8;
-			dy = zoomy << 8;
-		}
-		else
-		{
-			dx = zoomx << 4;
-			dy = zoomy << 4;
-		}
-
+		const s32 dx = zoomx << zoom_shift;
+		const s32 dy = zoomy << zoom_shift;
 
 		u32 full_srcpix_y = 0;
 		u32 full_dstheight = 0;

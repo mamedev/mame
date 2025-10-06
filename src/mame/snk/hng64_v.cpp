@@ -3,6 +3,20 @@
 #include "emu.h"
 #include "hng64.h"
 
+#define LOG_3D           (1 << 1)
+#define LOG_FRAMEBUFFER  (1 << 2)
+#define LOG_DISPLAY_LIST (1 << 3)
+#define LOG_TEXTURE      (1 << 4)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOG3D(...)           LOGMASKED(LOG_3D, __VA_ARGS__)
+#define LOGFRAMEBUFFER(...)  LOGMASKED(LOG_FRAMEBUFFER, __VA_ARGS__)
+#define LOGDISPLAYLIST(...)  LOGMASKED(LOG_DISPLAY_LIST, __VA_ARGS__)
+#define LOGTEXTURE(...)      LOGMASKED(LOG_TEXTURE, __VA_ARGS__)
+
 /*
     final mix can clearly only process 2 possibilities for any screen pixel; a 'top' and 'bottom' pixel option
     one of those can be blended.
