@@ -101,18 +101,18 @@ class hng64_state;
 class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7>
 {
 public:
-	hng64_poly_renderer(hng64_state& state);
+	hng64_poly_renderer(hng64_state &state);
 
 	void drawShaded(polygon *p);
-	void render_texture_scanline(s32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
-	void render_flat_scanline(s32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	void render_texture_scanline(s32 scanline, const extent_t &extent, const hng64_poly_data &renderData, int threadid);
+	void render_flat_scanline(s32 scanline, const extent_t &extent, const hng64_poly_data &renderData, int threadid);
 
-	hng64_state& state() { return m_state; }
-	float* depthBuffer3d() { return m_depthBuffer3d.get(); }
-	u16* colorBuffer3d() { return m_colorBuffer3d.get(); }
+	hng64_state &state() { return m_state; }
+	float *depthBuffer3d() { return m_depthBuffer3d.get(); }
+	u16 *colorBuffer3d() { return m_colorBuffer3d.get(); }
 
 private:
-	hng64_state& m_state;
+	hng64_state &m_state;
 
 	// (Temporarily class members - someday they will live in the memory map)
 	std::unique_ptr<float[]> m_depthBuffer3d;
@@ -183,18 +183,18 @@ public:
 	{
 	}
 
-	void hng64(machine_config &config);
-	void hng64_default(machine_config &config);
-	void hng64_drive(machine_config &config);
-	void hng64_shoot(machine_config &config);
-	void hng64_fight(machine_config &config);
+	void hng64(machine_config &config) ATTR_COLD;
+	void hng64_default(machine_config &config) ATTR_COLD;
+	void hng64_drive(machine_config &config) ATTR_COLD;
+	void hng64_shoot(machine_config &config) ATTR_COLD;
+	void hng64_fight(machine_config &config) ATTR_COLD;
 
-	void init_roadedge();
-	void init_hng64_drive();
-	void init_hng64();
-	void init_hng64_shoot();
-	void init_ss64();
-	void init_hng64_fght();
+	void init_roadedge() ATTR_COLD;
+	void init_hng64_drive() ATTR_COLD;
+	void init_hng64() ATTR_COLD;
+	void init_hng64_shoot() ATTR_COLD;
+	void init_ss64() ATTR_COLD;
+	void init_hng64_fght() ATTR_COLD;
 
 	u8 *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
@@ -214,15 +214,15 @@ private:
 	static constexpr int HNG64_MASTER_CLOCK = 50'000'000;
 
 	/* TODO: NOT measured! */
-	static constexpr int PIXEL_CLOCK = (HNG64_MASTER_CLOCK*2)/4; // x 2 is due to the interlaced screen ...
+	static constexpr int PIXEL_CLOCK = (HNG64_MASTER_CLOCK * 2) / 4; // x 2 is due to the interlaced screen ...
 
-	static constexpr int HTOTAL = 0x200+0x100;
+	static constexpr int HTOTAL = 0x200 + 0x100;
 	static constexpr int HBEND = 0;
 	static constexpr int HBSTART = 0x200;
 
-	static constexpr int VTOTAL = 264*2;
+	static constexpr int VTOTAL = 264 * 2;
 	static constexpr int VBEND = 0;
-	static constexpr int VBSTART = 224*2;
+	static constexpr int VBSTART = 224 * 2;
 
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
@@ -465,34 +465,44 @@ private:
 
 	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, int line);
 
-	void tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		int wraparound, u8 drawformat, u8 alpha, u8 mosaic, u8 tm, int splitside);
+	void tilemap_draw_roz_core_line(
+			screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+			int wraparound, u8 drawformat, u8 alpha, u8 mosaic, u8 tm, int splitside);
 
 	TIMER_CALLBACK_MEMBER(_3dfifo_processed);
 	void clear3d();
 	bool command3d(const u16* packet);
 
-	void mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, u16 priority, int y);
+	void mixsprites_test(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 priority, int y);
 
-	void get_tile_details(bool chain, u16 spritenum, u8 xtile, u8 ytile, u8 xsize, u8 ysize, bool xflip, bool yflip, u32& tileno, u16& pal, u8 &gfxregion);
+	void get_tile_details(bool chain, u16 spritenum, u8 xtile, u8 ytile, u8 xsize, u8 ysize, bool xflip, bool yflip, u32 &tileno, u16 &pal, u8 &gfxregion);
 	void draw_sprites_buffer(screen_device &screen, const rectangle &cliprect);
-	void draw_sprite_line(screen_device& screen, const rectangle& cliprect, s32 curyy, s16 cury, s16 xpos, int chainx, s32 dx, s32 dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, u16 zval, bool zsort, bool blend, u16 group, bool checkerboard, u8 mosaic);
+	void draw_sprite_line(
+			screen_device &screen, const rectangle &cliprect,
+			s32 curyy, s16 cury, s16 xpos, int chainx, s32 dx, s32 dy, int ytileblock, int chaini, int currentsprite, int chainy,
+			int xflip, int yflip, u16 zval, bool zsort, bool blend, u16 group, bool checkerboard, u8 mosaic);
 
-	void drawline(bitmap_ind16& dest, bitmap_ind16& destz, const rectangle& cliprect,
-		gfx_element* gfx, u32 code, u32 color, int flipy, s32 xpos,
-		s32 dx, s32 dy, u32 trans_pen, u32 zval, bool zrev, bool blend, bool checkerboard, u8 mosaic, u8 &mosaic_count_x, s32 ypos, const u8* srcdata, s32 srcx, u32 leftovers, int line, u16 &srcpix);
+	void drawline(
+			bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
+			gfx_element *gfx, u32 code, u32 color,
+			int flipy, s32 xpos, s32 dx, s32 dy,
+			u32 trans_pen, u32 zval, bool zrev, bool blend, bool checkerboard, u8 mosaic, u8 &mosaic_count_x,
+			s32 ypos, const u8 *srcdata, s32 srcx, u32 leftovers, int line, u16 &srcpix);
 
-	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
-		gfx_element *gfx, u32 code, u32 color, int flipx, int flipy, s32 xpos, s32 ypos,
-		s32 dx, s32 dy, u32 dstwidth, u32 trans_pen, u32 zval, bool zrev, bool blend, u16 group, bool checkerboard, u8 mosaic, u8 &mosaic_count_x, int line, u16 &srcpix);
+	void zoom_transpen(
+			bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
+			gfx_element *gfx, u32 code, u32 color,
+			int flipx, int flipy, s32 xpos, s32 ypos, s32 dx, s32 dy, u32 dstwidth,
+			u32 trans_pen, u32 zval, bool zrev, bool blend, u16 group, bool checkerboard, u8 mosaic, u8 &mosaic_count_x,
+			int line, u16 &srcpix);
 
-	void setCameraTransformation(const u16* packet);
-	void setLighting(const u16* packet);
-	void set3dFlags(const u16* packet);
-	void setCameraProjectionMatrix(const u16* packet);
-	void recoverStandardVerts(polygon& currentPoly, int m, const u16* chunkOffset_verts, int& counter, const u16 *packet);
-	void recoverPolygonBlock(const u16* packet, int& numPolys);
-	void printPacket(const u16* packet, int hex);
+	void setCameraTransformation(const u16 *packet);
+	void setLighting(const u16 *packet);
+	void set3dFlags(const u16 *packet);
+	void setCameraProjectionMatrix(const u16 *packet);
+	void recoverStandardVerts(polygon &currentPoly, int m, const u16 *chunkOffset_verts, int &counter, const u16 *packet);
+	void recoverPolygonBlock(const u16 *packet, int &numPolys);
+	void printPacket(const u16 *packet, int hex);
 	float uToF(u16 input);
 	void matmul4(float *product, const float *a, const float *b);
 	void vecmatmul4(float *product, const float *a, const float *b);
@@ -525,8 +535,9 @@ private:
 	void main_sound_comms_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 sound_comms_r(offs_t offset);
 	void sound_comms_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void hng64_audio(machine_config &config);
-	void hng64_network(machine_config &config);
+
+	void hng64_audio(machine_config &config) ATTR_COLD;
+	void hng64_network(machine_config &config) ATTR_COLD;
 	void comm_io_map(address_map &map) ATTR_COLD;
 	void comm_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
