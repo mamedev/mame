@@ -5,20 +5,6 @@
 /// Hyper NeoGeo 64 - 3D bits ///
 /////////////////////////////////
 
-#define LOG_3D           (1 << 1)
-#define LOG_FRAMEBUFFER  (1 << 2)
-#define LOG_DISPLAY_LIST (1 << 3)
-#define LOG_TEXTURE      (1 << 4)
-
-#define VERBOSE (0)
-
-#include "logmacro.h"
-
-#define LOG3D(...)           LOGMASKED(LOG_3D, __VA_ARGS__)
-#define LOGFRAMEBUFFER(...)  LOGMASKED(LOG_FRAMEBUFFER, __VA_ARGS__)
-#define LOGDISPLAYLIST(...)  LOGMASKED(LOG_DISPLAY_LIST, __VA_ARGS__)
-#define LOGTEXTURE(...)      LOGMASKED(LOG_TEXTURE, __VA_ARGS__)
-
 // Polygon rasterizer interface
 hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 	: poly_manager<float, hng64_poly_data, 7>(state.machine())
@@ -502,11 +488,10 @@ void hng64_state::recoverPolygonBlock(const u16* packet, int& numPolys)
 	//////////////////////////////////////////////*/
 
 	// 3d ROM Offset
-	const u16 *threeDRoms = m_vertsrom;
-	const u32 threeDOffset = (((u32)packet[2]) << 16) | ((u32)packet[3]);
-	const u16 *const threeDPointer = &threeDRoms[threeDOffset * 3];
+	const u32 threeDOffset = (u32(packet[2]) << 16) | u32(packet[3]);
+	const u16 *const threeDPointer = &m_vertsrom[threeDOffset * 3];
 
-	if (threeDOffset >= m_vertsrom_size)
+	if (threeDOffset >= m_vertsrom.length())
 	{
 		// bbust2 quite often spams this invalid pointer
 		if ((packet[2] == 0x2347) && (packet[3] == 0x5056))
@@ -568,7 +553,7 @@ void hng64_state::recoverPolygonBlock(const u16* packet, int& numPolys)
 	// For all 4 polygon chunks
 	for (int k = 0; k < 4; k++)
 	{
-		const u16 *chunkOffset = &threeDRoms[address[k] * 3];
+		const u16 *chunkOffset = &m_vertsrom[address[k] * 3];
 		for (int l = 0; l < size[k]; l++)
 		{
 			////////////////////////////////////////////
@@ -1012,8 +997,8 @@ bool hng64_state::command3d(const u16* packet)
 		// 'world' in roadedge/xrally (track, trackside objects etc.)
 		// Split the packet and call recoverPolygonBlock on each half.
 		u16 miniPacket[16];
-		memset(miniPacket, 0, sizeof(u16)*16);
-		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i];
+		std::fill(std::begin(miniPacket), std::end(miniPacket), 0);
+		std::copy_n(&packet[0], 7, std::begin(miniPacket));
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
@@ -1023,8 +1008,8 @@ bool hng64_state::command3d(const u16* packet)
 		{
 			if (packet[8] == 0x0102)
 			{
-				memset(miniPacket, 0, sizeof(u16) * 16);
-				for (int i = 0; i < 7; i++) miniPacket[i] = packet[i + 8];
+				std::fill(std::begin(miniPacket), std::end(miniPacket), 0);
+				std::copy_n(&packet[8], 7, std::begin(miniPacket));
 				miniPacket[7] = 0x7fff;
 				miniPacket[11] = 0x7fff;
 				miniPacket[15] = 0x7fff;
