@@ -47183,8 +47183,7 @@ license:CC0-1.0
 		<description>President Elect (4am and san inc crack)</description>
 		<year>1981</year>
 		<publisher>Strategic Simulations Inc. (SSI)</publisher>
-		<info name="programmer" value="Nelson G. Hernandez" />
-		<info name="programmer" value="Sr." />
+		<info name="programmer" value="Nelson G. Hernandez, Sr." />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-10-21 -->
@@ -47200,8 +47199,7 @@ license:CC0-1.0
 		<description>President Elect 1988 Edition (version 2.0) (4am crack)</description>
 		<year>1987</year>
 		<publisher>Strategic Simulations Inc. (SSI)</publisher>
-		<info name="programmer" value="Nelson G. Hernandez" />
-		<info name="programmer" value="Sr." />
+		<info name="programmer" value="Nelson G. Hernandez, Sr." />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<info name="version" value="2.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
