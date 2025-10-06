@@ -11,13 +11,14 @@
 
 #pragma once
 
+#include "qbus.h"
+
 #include "cpu/t11/t11.h"
-#include "formats/bk0010_dsk.h"
 #include "machine/1801vp128.h"
 #include "machine/pdp11.h"
 #include "machine/z80daisy.h"
 
-#include "qbus.h"
+#include "formats/bk0010_dsk.h"
 
 
 /***************************************************************************
@@ -40,18 +41,18 @@ public:
 	virtual void init_w() override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override {};
 
-	void kmd_mem(address_map &map);
+	void kmd_mem(address_map &map) ATTR_COLD;
 
 	required_device<k1801vm1_device> m_maincpu;
 	required_device<k1801vp128_device> m_fdc;
@@ -84,4 +85,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DVK_KMD, dvk_kmd_device)
 
-#endif
+#endif // MAME_BUS_QBUS_DVK_KMD_H
