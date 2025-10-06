@@ -39281,8 +39281,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>McCarthy-McCormack</publisher>
 		<info name="programmer" value="Jane McCarthy" />
-		<info name="programmer" value="Kay McCormark" />
-		<info name="programmer" value="PhD." />
+		<info name="programmer" value="Kay McCormark, Ph.D." />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 0" />
 		<!-- This revision is earlier due to an updated phone number in revision 1. -->
@@ -39308,8 +39307,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>McCarthy-McCormack</publisher>
 		<info name="programmer" value="Jane McCarthy" />
-		<info name="programmer" value="Kay McCormark" />
-		<info name="programmer" value="PhD." />
+		<info name="programmer" value="Kay McCormark, Ph.D." />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
 		<!-- This revision has an updated phone number. -->
