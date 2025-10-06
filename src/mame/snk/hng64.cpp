@@ -1811,7 +1811,7 @@ static GFXDECODE_START( gfx_hng64 )
 
 GFXDECODE_END
 
-static void hng64_reorder( u8* gfxregion, size_t gfxregionsize)
+static void hng64_reorder(u8* gfxregion, size_t gfxregionsize)
 {
 	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
 	// reorder them
