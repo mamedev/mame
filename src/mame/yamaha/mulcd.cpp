@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(MULCD,   mulcd_device,   "mulcd",   "Yamaha MU/VL70/FS1R comm
 
 ROM_START( mulcd )
 	ROM_REGION( 525261, "screen", 0)
-	ROM_LOAD( "mulcd.svg", 0, 525021, CRC(fb3c68ed) SHA1(e18bd29d25b8e5d025ec107adc37021e1f5e85e1))
+	ROM_LOAD( "mulcd.svg", 0, 525261, CRC(fb3c68ed) SHA1(e18bd29d25b8e5d025ec107adc37021e1f5e85e1))
 
 	ROM_REGION( 0x1000, "cgrom", 0)
 	ROM_LOAD( "hd44780u_b04.bin", 0x0000, 0x1000, CRC(126ed6da) SHA1(2ff0899bfee7795ba52a3d56c96edf31d9e6a3f9))
