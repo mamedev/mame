@@ -29,12 +29,17 @@
         r = sample rate in 4.12 fixed point relative to 44100 Hz (0x1000 = 44100 Hz)
 
     2  ----------------   mmmmmmmmmmmmmmmm   bbbbbbbbbbbbbbbb
-		b = loop length.  Loop start = sample end - loop length.
-		m = 2's complement negative of the loop length multiplier, in the same
-			4.12 fixed point format as the sample rate.
-			A multiplier of 0x1000 means b is exactly the loop length, whereas
-			a multiplier of 0x0800 means b is double the loop length so you must
-			divide it by 2 to get the actual loop length.
+        b = loop length.  Loop start = sample end - loop length.
+        m = 2's complement negative of the loop length multiplier, in the same
+            4.12 fixed point format as the sample rate.
+            A multiplier of 0x1000 means b is exactly the loop length, whereas
+            a multiplier of 0x0800 means b is double the loop length so you must
+            divide it by 2 to get the actual loop length.
+
+        If bit 15 of m is NOT set, then the base is the offset from the start of the sample
+        to the loop start, and the end of the sample is the loop start plus the multiplier.
+        This is currently speculation based on HNG64 behavior.  Once the MPC3000 runs it should
+        be possible to better understand this.
 
     3  ----------------   vvvvvvvvvvvvvvvv   ----------------
         v = volume envelope starting value (16 bit, maaaaybe signed?)
@@ -52,14 +57,15 @@
         R = filter resonance (4 bits, 0 = 1.0, 0xf = 0.0)
         r = filter cutoff frequency envelope rate in 8.8 fixed point
 
-    7  ----------------   eeeeeeeeeeeedddd   llllllllrrrrrrrr left/right volume
+    7  ----------------   aaaaaaaaeeeedddd   llllllllrrrrrrrr left/right volume
         e = delay effect parameters, unknown encoding
         d = routing destination?  MPC3000 has 8 discrete outputs plus a stereo master pair.
             The 8 discrete outputs are 4 stereo pairs, and the master pair appears to be
             a mix of the other 4 pairs.
+            HNG64 uses f for normal output, 2 for rear speakers, and 6 for subwoofer.
         l = left volume (8 bit, 0-255)
         r = right volume (8 bit, 0-255)
-        (Is this correct or is the volume 16 bits and d is a panpot?)
+        a = volume when non-default speaker is selected for HNG64 (8 bit, 0-255)
 
     8  ----------------   ----------------   ---------------- (read only?)
 
@@ -316,11 +322,10 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 		// loop start, encoded weirdly
 		case 0x02:
 			{
-				const uint16_t multiplier = (m_audiodat[m_audioregister][m_audiochannel].dat[1] ^ 0xffff) + 1;
-				const uint16_t base = m_audiodat[m_audioregister][m_audiochannel].dat[0];
+				const uint32_t multiplier = (m_audiodat[m_audioregister][m_audiochannel].dat[1] ^ 0xffff) + 1;
+				const uint32_t base = m_audiodat[m_audioregister][m_audiochannel].dat[0];
 
-				double loop_start = (double)base * ((double)multiplier / 4096.0);
-				vptr->loop_start = (uint32_t)loop_start;
+				vptr->loop_start = (base * multiplier) >> 12;
 			}
 			break;
 
@@ -403,6 +408,13 @@ void l7a1045_sound_device::sound_status_w(uint16_t data)
 		vptr->frac = 0;
 		vptr->pos = 0;
 		m_key |= 1 << m_audiochannel;
+
+		// alternate interpretation of loop parameters (works well for the crowd in xrally but not yet TRUSTED)
+		if ((!BIT(m_audiodat[2][m_audiochannel].dat[1], 15)) && (vptr->end != 0xfffff0))
+		{
+			vptr->loop_start = uint32_t(m_audiodat[2][m_audiochannel].dat[0]);
+			vptr->end = vptr->start + uint32_t(m_audiodat[2][m_audiochannel].dat[1]) + vptr->loop_start;
+		}
 	}
 	else    // key off
 	{

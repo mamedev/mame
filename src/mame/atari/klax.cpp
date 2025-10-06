@@ -501,7 +501,7 @@ void klax_bootleg_state::audio_ctrl_w(u8 data)
  *
  *************************************/
 
-ROM_START( klax )
+ROM_START( klax ) // internal ROM test date: 13FEB1990 11:10:09
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "136075-6006.3n", 0x00000, 0x10000, CRC(e8991709) SHA1(90d69b0712e68e842a8b946539f1f43ef165e8de) )
 	ROM_LOAD16_BYTE( "136075-6005.1n", 0x00001, 0x10000, CRC(72b8c510) SHA1(f79d3a2de4deaabbcec632e8be9a1d5f6c0c3740) )
@@ -531,7 +531,7 @@ ROM_START( klax )
 ROM_END
 
 
-ROM_START( klax5 )
+ROM_START( klax5 ) // internal ROM test date: 20JAN1990 14:47:06
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "13607-5006.3n", 0x00000, 0x10000, CRC(05c98fc0) SHA1(84880d3d65c46c96c739063b3f61b1663989c56e) )
 	ROM_LOAD16_BYTE( "13607-5005.1n", 0x00001, 0x10000, CRC(d461e1ee) SHA1(73e8615a742555f74c1086c0b745afc7e94a478f) )
@@ -560,7 +560,7 @@ ROM_START( klax5 )
 	ROM_LOAD( "136075-1004.6w.bin",  0x0000, 0x0117, CRC(6cd3270d) SHA1(84854b5beee539a80fc94f6e4637aa1c2543a1cb) )
 ROM_END
 
-ROM_START( klax5bl ) // derived from 'klax5' set
+ROM_START( klax5bl ) // derived from 'klax5' set, internal ROM test date: 20JAN1990 14:47:06
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "6.bin", 0x00000, 0x10000, CRC(3cfd2748) SHA1(165c446bab9df6517746451d056330386cb5212c) )
 	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x10000, CRC(910e5bf9) SHA1(2b5af427e7cbad8d4ed2a202900f227295e1dea9) )
@@ -582,7 +582,7 @@ ROM_START( klax5bl ) // derived from 'klax5' set
 	ROM_LOAD16_BYTE( "8.bin", 0x00001, 0x10000, CRC(36764bbc) SHA1(5762996a327b5f7f93f42dad7eccb6297b3e4c0b) )
 ROM_END
 
-ROM_START( klax5bl2 ) // derived from 'klax5' set, closer than klax5bl
+ROM_START( klax5bl2 ) // derived from 'klax5' set, closer than klax5bl, internal ROM test date: 20JAN1990 14:47:06
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "3.ic31", 0x00000, 0x10000, CRC(e43699f3) SHA1(2a78959ad065e1c0f69cc2ba4146a50102ccfd7e) )
 	ROM_LOAD16_BYTE( "1.ic13", 0x00001, 0x10000, CRC(dc67f13a) SHA1(6021f48b53f9000983bcd786b8366ba8638174de) )
@@ -610,7 +610,7 @@ ROM_START( klax5bl2 ) // derived from 'klax5' set, closer than klax5bl
 	ROM_LOAD( "gal16v8.ic29",   0x600, 0x117, NO_DUMP )
 ROM_END
 
-ROM_START( klax5bl3 ) // almost identical to klax5bl2, only the first audiocpu ROM differs
+ROM_START( klax5bl3 ) // almost identical to klax5bl2, only the first audiocpu ROM differs, internal ROM test date: 20JAN1990 14:47:06
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "3.ic31", 0x00000, 0x10000, CRC(e43699f3) SHA1(2a78959ad065e1c0f69cc2ba4146a50102ccfd7e) )
 	ROM_LOAD16_BYTE( "1.ic13", 0x00001, 0x10000, CRC(dc67f13a) SHA1(6021f48b53f9000983bcd786b8366ba8638174de) )
@@ -641,7 +641,7 @@ ROM_START( klax5bl3 ) // almost identical to klax5bl2, only the first audiocpu R
 	ROM_LOAD( "gal16v8.ic29",   0x600, 0x117, NO_DUMP )
 ROM_END
 
-ROM_START( klax4 )
+ROM_START( klax4 ) // internal ROM test date: 20JAN1990 14:47:06
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "136075-5006.3n", 0x00000, 0x10000, CRC(65eb9a31) SHA1(3f47d58fe9eb154ab14ac282919f92679b5c7922) )
 	ROM_LOAD16_BYTE( "136075-5005.1n", 0x00001, 0x10000, CRC(7be27349) SHA1(79eef2b7f4a0fb6991d81f6543d5ae00de9f2452) )
@@ -670,7 +670,7 @@ ROM_START( klax4 )
 	ROM_LOAD( "136075-1004.6w.bin",  0x0000, 0x0117, CRC(6cd3270d) SHA1(84854b5beee539a80fc94f6e4637aa1c2543a1cb) )
 ROM_END
 
-ROM_START( klaxj4 )
+ROM_START( klaxj4 ) // internal ROM test date: 13FEB1990 11:10:09
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "136075-4406.3n", 0x00000, 0x10000, CRC(fc4045ec) SHA1(58441ffeb58c1dc9ef18f3c6381eec52923ffe03) )
 	ROM_LOAD16_BYTE( "136075-4405.1n", 0x00001, 0x10000, CRC(f017461a) SHA1(a0acd66a48c2a964c3e8f2bdacd94908bfc84843) )
@@ -699,7 +699,7 @@ ROM_START( klaxj4 )
 	ROM_LOAD( "136075-1004.6w.bin",  0x0000, 0x0117, CRC(6cd3270d) SHA1(84854b5beee539a80fc94f6e4637aa1c2543a1cb) )
 ROM_END
 
-ROM_START( klaxj3 )
+ROM_START( klaxj3 ) // internal ROM test date: 20JAN1990 14:47:06
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "136075-3406.3n", 0x00000, 0x10000, CRC(ab2aa50b) SHA1(0ebffc8b4724eb8c4423e0b1f62b0fff7cc30aab) )
 	ROM_LOAD16_BYTE( "136075-3405.1n", 0x00001, 0x10000, CRC(9dc9a590) SHA1(4c77b1ad9c083325f33520f2b6aa598dde247ad8) )
@@ -729,7 +729,7 @@ ROM_START( klaxj3 )
 ROM_END
 
 
-ROM_START( klaxd2 )
+ROM_START( klaxd2 ) // internal ROM test date: 13FEB1990 11:10:09
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "136075-2206.3n", 0x00000, 0x10000, CRC(9d1a713b) SHA1(6e60a43934bd8959c5c07dd12e087c63ea791bb9) )
 	ROM_LOAD16_BYTE( "136075-1205.1n", 0x00001, 0x10000, CRC(45065a5a) SHA1(77339ca04e54a04489ce9d6e11816475e57d1311) )
@@ -767,13 +767,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, klax,     0,    klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klax5,    klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klax4,    klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klaxj4,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Japan, version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klaxj3,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Japan, version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klaxd2,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Germany, version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, klax,     0,    klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, klax5,    klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, klax4,    klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, klaxj4,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Japan, version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, klaxj3,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Japan, version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, klaxd2,   klax, klax,    klax, klax_state,         empty_init, ROT0, "Atari Games",        "Klax (Germany, version 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, klax5bl,  klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klax5bl2, klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klax5bl3, klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg (Playmark)", "Klax (version 5, bootleg set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* encrypted Z80 opcodes */
+GAME( 1990, klax5bl,  klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, klax5bl2, klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, klax5bl3, klax, klax5bl, klax, klax_bootleg_state, empty_init, ROT0, "bootleg (Playmark)", "Klax (version 5, bootleg set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* encrypted Z80 opcodes */

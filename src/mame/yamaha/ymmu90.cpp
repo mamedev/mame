@@ -153,9 +153,9 @@ u8 mu90_state::pb_r()
 	if(m_lcd && (cur_pa & 0x20)) {
 		if(cur_pa & 0x40) {
 			if(cur_pa & 0x02)
-				res &= m_lcd->data_read();
+				res &= m_lcd->data_r();
 			else
-				res &= m_lcd->control_read();
+				res &= m_lcd->control_r();
 		}
 	}
 
@@ -181,9 +181,9 @@ void mu90_state::pa_w(u8 data)
 	if(m_lcd && (cur_pa & 0x20) && !(data & 0x20)) {
 		if(!(cur_pa & 0x40)) {
 			if(cur_pa & 0x02)
-				m_lcd->data_write(cur_pb);
+				m_lcd->data_w(cur_pb);
 			else
-				m_lcd->control_write(cur_pb);
+				m_lcd->control_w(cur_pb);
 		}
 	}
 

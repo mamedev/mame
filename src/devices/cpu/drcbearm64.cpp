@@ -222,13 +222,6 @@ const a64::CondCode condition_map[uml::COND_MAX - uml::COND_Z] =
 	a64::CondCode::kGE,    // COND_GE,          requires SV
 };
 
-// UML flag bit numbers
-constexpr unsigned FLAG_BIT_C = 0;
-constexpr unsigned FLAG_BIT_V = 1;
-constexpr unsigned FLAG_BIT_Z = 2;
-constexpr unsigned FLAG_BIT_S = 3;
-constexpr unsigned FLAG_BIT_U = 4;
-
 // masks for immediate values that can be generated with movz instructions
 constexpr uint64_t LSL0_MASK = 0x00000000'0000ffff;
 constexpr uint64_t LSL16_MASK = 0x00000000'ffff0000;
@@ -406,12 +399,13 @@ void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 
 inline void get_unordered(a64::Assembler &a, const a64::Gp &reg)
 {
-	a.ubfx(reg.x(), FLAGS_REG, FLAG_BIT_U, 1);
+	a.ubfx(reg.x(), FLAGS_REG, uml::FLAG_BIT_U, 1);
 }
 
-inline void store_carry_reg(a64::Assembler &a, const a64::Gp &reg)
+inline void store_carry_reg(a64::Assembler &a, const a64::Gp &reg, unsigned bit = 0)
 {
-	a.bfi(FLAGS_REG, reg.x(), FLAG_BIT_C, 1);
+	// this depends on carry being the least significant bit of the flags
+	a.bfxil(FLAGS_REG, reg.x(), bit, 1);
 }
 
 inline void get_carry(a64::Assembler &a, const a64::Gp &reg, bool inverted = false)
@@ -628,7 +622,7 @@ private:
 
 	void store_carry(a64::Assembler &a, bool inverted = false);
 	void load_carry(a64::Assembler &a, bool inverted = false);
-	void set_flags(a64::Assembler &a);
+	void set_flags(a64::Assembler &a, const a64::Gp &reg);
 
 	void calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits);
 	void calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits);
@@ -1009,10 +1003,10 @@ void drcbe_arm64::emit_skip(a64::Assembler &a, uml::condition_t cond, Label &ski
 	switch (cond)
 	{
 		case uml::COND_U:
-			a.tbz(FLAGS_REG, FLAG_BIT_U, skip);
+			a.tbz(FLAGS_REG, uml::FLAG_BIT_U, skip);
 			break;
 		case uml::COND_NU:
-			a.tbnz(FLAGS_REG, FLAG_BIT_U, skip);
+			a.tbnz(FLAGS_REG, uml::FLAG_BIT_U, skip);
 			break;
 		case uml::COND_C:
 		case uml::COND_NC:
@@ -1025,7 +1019,7 @@ void drcbe_arm64::emit_skip(a64::Assembler &a, uml::condition_t cond, Label &ski
 					a.b(ARM_NOT_CONDITION(cond), skip);
 					break;
 				default:
-					a.emit((cond == uml::COND_C) ? a64::Inst::kIdTbz : a64::Inst::kIdTbnz, FLAGS_REG, FLAG_BIT_C, skip);
+					a.emit((cond == uml::COND_C) ? a64::Inst::kIdTbz : a64::Inst::kIdTbnz, FLAGS_REG, uml::FLAG_BIT_C, skip);
 			}
 			break;
 		case uml::COND_A:
@@ -1468,22 +1462,21 @@ void drcbe_arm64::load_carry(a64::Assembler &a, bool inverted)
 	}
 }
 
-void drcbe_arm64::set_flags(a64::Assembler &a)
+void drcbe_arm64::set_flags(a64::Assembler &a, const a64::Gp &reg)
 {
 	// Set native condition codes after loading flags register
 	m_carry_state = carry_state::POISON;
 
 	a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
 
-	a.and_(TEMP_REG2, FLAGS_REG, 0b1100); // zero + sign
-	a.ubfx(TEMP_REG3, FLAGS_REG, FLAG_BIT_V, 1); // overflow flag
-	a.orr(TEMP_REG2, TEMP_REG2, TEMP_REG3);
+	a.and_(TEMP_REG2, reg.x(), 0b1100); // zero + sign
+	a.bfxil(TEMP_REG2, reg.x(), uml::FLAG_BIT_V, 1); // overflow flag
 	a.bfi(TEMP_REG1, TEMP_REG2, 28, 4);
 
 	a.msr(a64::Predicate::SysReg::kNZCV, TEMP_REG1);
 
 	a.mov(TEMP_REG2, FLAG_C | FLAG_U);
-	a.and_(FLAGS_REG, FLAGS_REG, TEMP_REG2);
+	a.and_(FLAGS_REG, reg.x(), TEMP_REG2);
 }
 
 inline void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits)
@@ -1506,18 +1499,11 @@ inline void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const
 {
 	m_carry_state = carry_state::POISON;
 
+	// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
 	if (shift == 0)
-	{
 		store_carry_reg(a, a64::xzr);
-	}
 	else
-	{
-		const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
-
-		// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
-		a.lsr(scratch, reg, maxBits + 1 - shift);
-		store_carry_reg(a, scratch);
-	}
+		store_carry_reg(a, reg, maxBits + 1 - shift);
 }
 
 inline void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift)
@@ -1541,22 +1527,11 @@ inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, cons
 {
 	m_carry_state = carry_state::POISON;
 
+	// carry = (PARAM1 >> (shift - 1)) & 1
 	if (shift == 0)
-	{
 		store_carry_reg(a, a64::xzr);
-	}
-	else if (shift == 1)
-	{
-		store_carry_reg(a, reg);
-	}
 	else
-	{
-		const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
-
-		// carry = (PARAM1 >> (shift - 1)) & 1
-		a.lsr(scratch, reg, shift - 1);
-		store_carry_reg(a, scratch);
-	}
+		store_carry_reg(a, reg, shift - 1);
 }
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
@@ -2116,7 +2091,7 @@ void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
 			if (tbnzrange)
 			{
 				const a64::Inst::Id opcode = (inst.condition() == uml::COND_U) ? a64::Inst::kIdTbnz : a64::Inst::kIdTbz;
-				a.emit(opcode, FLAGS_REG, FLAG_BIT_U, jmptarget);
+				a.emit(opcode, FLAGS_REG, uml::FLAG_BIT_U, jmptarget);
 			}
 			else
 			{
@@ -2139,7 +2114,7 @@ void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
 					if (tbnzrange)
 					{
 						const a64::Inst::Id opcode = (inst.condition() == uml::COND_C) ? a64::Inst::kIdTbnz : a64::Inst::kIdTbz;
-						a.emit(opcode, FLAGS_REG, FLAG_BIT_C, jmptarget);
+						a.emit(opcode, FLAGS_REG, uml::FLAG_BIT_C, jmptarget);
 					}
 					else
 					{
@@ -2358,13 +2333,13 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 		if (first)
 		{
 			a.cset(dst, a64::CondCode::kVS);
-			a.lsl(dst, dst, FLAG_BIT_V);
+			a.lsl(dst, dst, uml::FLAG_BIT_V);
 			first = false;
 		}
 		else
 		{
 			a.cset(SCRATCH_REG1, a64::CondCode::kVS);
-			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_V);
+			a.orr(dst, dst, SCRATCH_REG1, uml::FLAG_BIT_V);
 		}
 	}
 
@@ -2373,13 +2348,13 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 		if (first)
 		{
 			a.cset(dst, a64::CondCode::kEQ);
-			a.lsl(dst, dst, FLAG_BIT_Z);
+			a.lsl(dst, dst, uml::FLAG_BIT_Z);
 			first = false;
 		}
 		else
 		{
 			a.cset(SCRATCH_REG1, a64::CondCode::kEQ);
-			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_Z);
+			a.orr(dst, dst, SCRATCH_REG1, uml::FLAG_BIT_Z);
 		}
 	}
 
@@ -2388,13 +2363,13 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 		if (first)
 		{
 			a.cset(dst, a64::CondCode::kMI);
-			a.lsl(dst, dst, FLAG_BIT_S);
+			a.lsl(dst, dst, uml::FLAG_BIT_S);
 			first = false;
 		}
 		else
 		{
 			a.cset(SCRATCH_REG1, a64::CondCode::kMI);
-			a.orr(dst, dst, SCRATCH_REG1, FLAG_BIT_S);
+			a.orr(dst, dst, SCRATCH_REG1, uml::FLAG_BIT_S);
 		}
 	}
 
@@ -2425,8 +2400,10 @@ void drcbe_arm64::op_setflgs(a64::Assembler &a, const uml::instruction &inst)
 
 	be_parameter flagsp(*this, inst.param(0), PTYPE_MRI);
 
-	mov_reg_param(a, inst.size(), FLAGS_REG, flagsp);
-	set_flags(a);
+	const a64::Gp flags = flagsp.select_register(FLAGS_REG, inst.size());
+
+	mov_reg_param(a, inst.size(), flags, flagsp);
+	set_flags(a, flags);
 }
 
 void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
@@ -2448,7 +2425,7 @@ void drcbe_arm64::op_save(a64::Assembler &a, const uml::instruction &inst)
 	a.and_(TEMP_REG2, TEMP_REG1, 0b1100); // zero + sign
 	a.orr(TEMP_REG2, TEMP_REG2, FLAGS_REG); // carry + unordered flags
 
-	a.bfi(TEMP_REG2, TEMP_REG1, FLAG_BIT_V, 1); // overflow flag
+	a.bfi(TEMP_REG2, TEMP_REG1, uml::FLAG_BIT_V, 1); // overflow flag
 
 	a.strb(TEMP_REG2.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
 
@@ -2527,13 +2504,18 @@ void drcbe_arm64::op_restore(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	a.ldrb(TEMP_REG1.w(), arm::Mem(membase, offsetof(drcuml_machine_state, fmod)));
+	a.and_(TEMP_REG1.w(), TEMP_REG1.w(), 3);
+	a.mrs(TEMP_REG2, a64::Predicate::SysReg::kFPCR);
 	emit_strb_mem(a, TEMP_REG1.w(), &m_state.fmod);
+	a.sub(TEMP_REG1.w(), TEMP_REG1.w(), 1);
+	a.bfi(TEMP_REG2, TEMP_REG1, 22, 2);
+	a.msr(a64::Predicate::SysReg::kFPCR, TEMP_REG2);
 
 	a.ldr(TEMP_REG1.w(), arm::Mem(membase, offsetof(drcuml_machine_state, exp)));
 	emit_str_mem(a, TEMP_REG1.w(), &m_state.exp);
 
 	a.ldrb(FLAGS_REG.w(), arm::Mem(membase, offsetof(drcuml_machine_state, flags)));
-	set_flags(a);
+	set_flags(a, FLAGS_REG);
 }
 
 void drcbe_arm64::op_load(a64::Assembler &a, const uml::instruction &inst)
@@ -3018,10 +3000,7 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 		mov_reg_param(a, inst.size(), src, srcp);
 
 		// move carry bit to lsb
-		if (shift != 0)
-			a.bfxil(FLAGS_REG, src.x(), shift, 1); // this depends on carry being the least significant bit of the flags
-		else
-			store_carry_reg(a, src);
+		store_carry_reg(a, src, shift);
 	}
 	else
 	{
@@ -3567,7 +3546,7 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 	{
 		m_carry_state = carry_state::CANONICAL;
 
-		a.sbfx(TEMP_REG1, FLAGS_REG, FLAG_BIT_C, 1);
+		a.sbfx(TEMP_REG1, FLAGS_REG, uml::FLAG_BIT_C, 1);
 		a.cmn(TEMP_REG1, 1);
 	}
 
@@ -3709,7 +3688,7 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 	{
 		m_carry_state = carry_state::LOGICAL;
 
-		a.ubfx(TEMP_REG1, FLAGS_REG, FLAG_BIT_C, 1);
+		a.ubfx(TEMP_REG1, FLAGS_REG, uml::FLAG_BIT_C, 1);
 		a.cmp(a64::xzr, TEMP_REG1);
 	}
 
@@ -4815,9 +4794,8 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 
 		if (inst.flags() & FLAG_C)
 		{
-			// this depends on carry being the least significant bit of the flags
 			a.csel(scratch.x(), FLAGS_REG, a64::xzr, a64::CondCode::kZero);
-			store_carry_reg(a, scratch);
+			store_carry_reg(a, scratch, uml::FLAG_BIT_C);
 
 			m_carry_state = carry_state::POISON;
 		}
@@ -5241,7 +5219,7 @@ void drcbe_arm64::op_fcmp(a64::Assembler &a, const uml::instruction &inst)
 	if (inst.flags() & FLAG_U)
 	{
 		a.cset(SCRATCH_REG1, a64::CondCode::kVS);
-		a.bfi(FLAGS_REG, SCRATCH_REG1, FLAG_BIT_U, 1);
+		a.bfi(FLAGS_REG, SCRATCH_REG1, uml::FLAG_BIT_U, 1);
 	}
 }
 

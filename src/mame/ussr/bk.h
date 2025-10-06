@@ -19,6 +19,7 @@
 #include "machine/pdp11.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+#include "vm1timer.h"
 
 #include "emupal.h"
 
@@ -32,6 +33,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_cassette(*this, "cassette")
 		, m_dac(*this, "dac")
+		, m_timer(*this, "timer")
 		, m_kbd(*this, "keyboard")
 		, m_qbus(*this, "qbus")
 		, m_ram(*this, "ram%u", 0U)
@@ -88,6 +90,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cassette;
 	required_device<dac_bit_interface> m_dac;
+	required_device<k1801vm1_timer_device> m_timer;
 	required_device<k1801vp014_device> m_kbd;
 	required_device<qbus_device> m_qbus;
 	optional_shared_ptr_array<uint16_t, 8> m_ram;

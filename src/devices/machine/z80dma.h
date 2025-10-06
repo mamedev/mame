@@ -106,10 +106,11 @@ protected:
 	virtual int is_ready();
 	void interrupt_check();
 	void trigger_interrupt(int level);
-	void do_read();
-	virtual void do_write();
+	virtual void do_read();
+	void do_write();
 	void do_transfer_write();
 	void do_search();
+	void setup_next_read(int rr);
 
 	u16 &REG(unsigned m, unsigned s) noexcept { return m_regs[REGNUM(m, s)]; }
 
@@ -123,7 +124,6 @@ protected:
 	u8  m_num_follow;
 	u8  m_cur_follow;
 	u8  m_regs_follow[5];
-	u8  m_read_num_follow;
 
 private:
 	// device_z80daisy_interface implementation
@@ -148,7 +148,6 @@ private:
 
 	u16  m_regs[(6 << 3) + 1 + 1];
 	u8   m_read_cur_follow;
-	u8   m_read_regs_follow[7];
 	u8   m_status;
 	int  m_dma_seq;
 

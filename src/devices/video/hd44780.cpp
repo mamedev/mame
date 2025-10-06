@@ -197,15 +197,15 @@ ROM_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  hd44780_device - constructor
+//  hd44780_base_device - constructor
 //-------------------------------------------------
 
 hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd44780_device(mconfig, HD44780, tag, owner, clock)
+	: hd44780_base_device(mconfig, HD44780, tag, owner, clock)
 {
 }
 
-hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+hd44780_base_device::hd44780_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_pixel_update_cb(*this)
 	, m_busy_factor(1.0)
@@ -220,17 +220,17 @@ hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, 
 }
 
 hd44780u_device::hd44780u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hd44780_device(mconfig, HD44780U, tag, owner, clock)
+	hd44780_base_device(mconfig, HD44780U, tag, owner, clock)
 {
 }
 
 sed1278_device::sed1278_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hd44780_device(mconfig, SED1278, tag, owner, clock)
+	hd44780_base_device(mconfig, SED1278, tag, owner, clock)
 {
 }
 
 ks0066_device::ks0066_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hd44780_device(mconfig, KS0066, tag, owner, clock)
+	hd44780_base_device(mconfig, KS0066, tag, owner, clock)
 {
 }
 
@@ -263,14 +263,14 @@ const tiny_rom_entry *ks0066_device::device_rom_region() const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void hd44780_device::device_start()
+void hd44780_base_device::device_start()
 {
 	m_cgrom = m_cgrom_region.found() ? m_cgrom_region : memregion("cgrom")->base();
 
 	m_pixel_update_cb.resolve();
 
-	m_busy_timer = timer_alloc(FUNC(hd44780_device::clear_busy_flag), this);
-	m_blink_timer = timer_alloc(FUNC(hd44780_device::blink_tick), this);
+	m_busy_timer = timer_alloc(FUNC(hd44780_base_device::clear_busy_flag), this);
+	m_blink_timer = timer_alloc(FUNC(hd44780_base_device::blink_tick), this);
 
 	// state saving
 	save_item(NAME(m_busy_factor));
@@ -304,7 +304,7 @@ void hd44780_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void hd44780_device::device_reset()
+void hd44780_base_device::device_reset()
 {
 	memset(m_ddram, 0x20, sizeof(m_ddram)); // filled with SPACE char
 	memset(m_cgram, 0, sizeof(m_cgram));
@@ -335,7 +335,7 @@ void hd44780_device::device_reset()
 //  device_clock_changed
 //-------------------------------------------------
 
-void hd44780_device::device_clock_changed()
+void hd44780_base_device::device_clock_changed()
 {
 	// (re)adjust blink timer
 	attotime period = attotime::from_ticks(102400, clock()); // blink happens every 102400 cycles
@@ -348,7 +348,7 @@ void hd44780_device::device_clock_changed()
 //  device validity check
 //-------------------------------------------------
 
-void hd44780_device::device_validity_check(validity_checker &valid) const
+void hd44780_base_device::device_validity_check(validity_checker &valid) const
 {
 	if (clock() == 0)
 		osd_printf_error("LCDC clock cannot be zero!\n");
@@ -358,12 +358,12 @@ void hd44780_device::device_validity_check(validity_checker &valid) const
 //  timer events
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(hd44780_device::clear_busy_flag)
+TIMER_CALLBACK_MEMBER(hd44780_base_device::clear_busy_flag)
 {
 	m_busy_flag = false;
 }
 
-TIMER_CALLBACK_MEMBER(hd44780_device::blink_tick)
+TIMER_CALLBACK_MEMBER(hd44780_base_device::blink_tick)
 {
 	m_blink = !m_blink;
 }
@@ -373,13 +373,13 @@ TIMER_CALLBACK_MEMBER(hd44780_device::blink_tick)
 //  HELPERS
 //**************************************************************************
 
-void hd44780_device::set_busy_flag(uint16_t cycles)
+void hd44780_base_device::set_busy_flag(uint16_t cycles)
 {
 	m_busy_flag = true;
 	m_busy_timer->adjust(attotime::from_ticks(cycles, clock() / m_busy_factor));
 }
 
-void hd44780_device::correct_ac()
+void hd44780_base_device::correct_ac()
 {
 	if (m_active_ram == DDRAM)
 	{
@@ -396,7 +396,7 @@ void hd44780_device::correct_ac()
 		m_ac &= 0x3f;
 }
 
-void hd44780_device::update_ac(int direction)
+void hd44780_base_device::update_ac(int direction)
 {
 	if (m_active_ram == DDRAM && m_num_line == 2 && direction == -1 && m_ac == 0x40)
 		m_ac = 0x27;
@@ -406,7 +406,7 @@ void hd44780_device::update_ac(int direction)
 	correct_ac();
 }
 
-void hd44780_device::shift_display(int direction)
+void hd44780_base_device::shift_display(int direction)
 {
 	m_disp_shift += direction;
 
@@ -416,7 +416,7 @@ void hd44780_device::shift_display(int direction)
 		m_disp_shift = 0x4f;
 }
 
-void hd44780_device::update_nibble(int rs, int rw)
+void hd44780_base_device::update_nibble(int rs, int rw)
 {
 	if (m_rs_state != rs || m_rw_state != rw)
 	{
@@ -428,7 +428,7 @@ void hd44780_device::update_nibble(int rs, int rw)
 	m_nibble = !m_nibble;
 }
 
-inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state)
+inline void hd44780_base_device::pixel_update(bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state)
 {
 	if (!m_pixel_update_cb.isnull())
 	{
@@ -469,7 +469,7 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, u8 line, u8 pos, 
 //  device interface
 //**************************************************************************
 
-const u8 *hd44780_device::render()
+const u8 *hd44780_base_device::render()
 {
 	memset(m_render_buf, 0, sizeof(m_render_buf));
 
@@ -517,7 +517,7 @@ const u8 *hd44780_device::render()
 	return m_render_buf;
 }
 
-uint32_t hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hd44780_base_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	const u8 *img = render();
@@ -538,7 +538,7 @@ uint32_t hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-u8 hd44780_device::read(offs_t offset)
+u8 hd44780_base_device::read(offs_t offset)
 {
 	if (m_data_len == 4 && !machine().side_effects_disabled())
 		update_nibble(offset & 0x01, 1);
@@ -552,7 +552,7 @@ u8 hd44780_device::read(offs_t offset)
 	return 0;
 }
 
-void hd44780_device::write(offs_t offset, u8 data)
+void hd44780_base_device::write(offs_t offset, u8 data)
 {
 	if (m_data_len == 4 && !machine().side_effects_disabled())
 		update_nibble(offset & 0x01, 0);
@@ -564,7 +564,7 @@ void hd44780_device::write(offs_t offset, u8 data)
 	}
 }
 
-u8 hd44780_device::db_r()
+u8 hd44780_base_device::db_r()
 {
 	if (m_enabled && m_rw_input == 1)
 	{
@@ -578,22 +578,22 @@ u8 hd44780_device::db_r()
 	return 0xff;
 }
 
-void hd44780_device::db_w(u8 data)
+void hd44780_base_device::db_w(u8 data)
 {
 	m_db_input = data;
 }
 
-void hd44780_device::rs_w(int state)
+void hd44780_base_device::rs_w(int state)
 {
 	m_rs_input = state;
 }
 
-void hd44780_device::rw_w(int state)
+void hd44780_base_device::rw_w(int state)
 {
 	m_rw_input = state;
 }
 
-void hd44780_device::e_w(int state)
+void hd44780_base_device::e_w(int state)
 {
 	if (m_data_len == 4 && state && !m_enabled && !machine().side_effects_disabled())
 		update_nibble(m_rs_input, m_rw_input);
@@ -610,7 +610,7 @@ void hd44780_device::e_w(int state)
 	m_enabled = state;
 }
 
-void hd44780_device::control_write(u8 data)
+void hd44780_base_device::control_write(u8 data)
 {
 	if (m_data_len == 4)
 	{
@@ -732,7 +732,7 @@ void hd44780_device::control_write(u8 data)
 	m_first_cmd = false;
 }
 
-u8 hd44780_device::control_read()
+u8 hd44780_base_device::control_read()
 {
 	if (m_data_len == 4)
 	{
@@ -747,7 +747,7 @@ u8 hd44780_device::control_read()
 	}
 }
 
-void hd44780_device::data_write(u8 data)
+void hd44780_base_device::data_write(u8 data)
 {
 	if (false && m_busy_flag)
 	{
@@ -785,7 +785,7 @@ void hd44780_device::data_write(u8 data)
 		shift_display(m_direction);
 }
 
-u8 hd44780_device::data_read()
+u8 hd44780_base_device::data_read()
 {
 	u8 data = (m_active_ram == DDRAM) ? m_ddram[m_ac] : m_cgram[m_ac];
 

@@ -40,6 +40,7 @@ void bk_state::reset_w(int state)
 	if (state == ASSERT_LINE)
 	{
 		m_kbd->reset();
+		m_timer->init_w();
 		m_qbus->init_w();
 	}
 }

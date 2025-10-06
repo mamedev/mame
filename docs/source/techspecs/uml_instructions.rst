@@ -80,6 +80,29 @@ Conditions
 | ``ge``      | greater than or equal (signed) | ``COND_GE`` | ``S == V``         |
 +-------------+--------------------------------+-------------+--------------------+
 
+.. _umlinst-flagmask:
+
+Flag masks
+~~~~~~~~~~
+
++-------+-------------+-----------+----------------+
+| Value | Disassembly | Mnemonic  | Usage          |
++=======+=============+===========+================+
+| 0x01  | ``C``       | carry     | ``FLAG_C``     |
++-------+-------------+-----------+----------------+
+| 0x02  | ``V``       | overflow  | ``FLAG_V``     |
++-------+-------------+-----------+----------------+
+| 0x04  | ``Z``       | zero      | ``FLAG_Z``     |
++-------+-------------+-----------+----------------+
+| 0x08  | ``S``       | sign      | ``FLAG_S``     |
++-------+-------------+-----------+----------------+
+| 0x10  | ``U``       | unordered | ``FLAG_U``     |
++-------+-------------+-----------+----------------+
+| 0x00  |             |           | ``FLAGS_NONE`` |
++-------+-------------+-----------+----------------+
+| 0x1f  | ``USZVC``   |           | ``FLAGS_ALL``  |
++-------+-------------+-----------+----------------+
+
 .. _umlinst-roundmode:
 
 Floating point rounding modes
@@ -811,6 +834,109 @@ Simplification rules
 * Immediate values for the ``bit`` operand are truncated to five or six
   bits for 32-bit or 64-bit operands, respectively.
 
+.. _umlinst-setflgs:
+
+SETFLGS
+~~~~~~~
+
+Set the flags arbitrarily.
+
++-----------------+-------------------------------+
+| Disassembly     | Usage                         |
++=================+===============================+
+| .. code-block:: | .. code-block::               |
+|                 |                               |
+|     setflgs src |     UML_SETFLGS(block, src);  |
++-----------------+-------------------------------+
+
+The five least significant bits of the value of ``src`` are copied to
+the flags.  Bits are copied to the **carry (C)**, **overflow (V)**,
+**zero (Z)**, **sign (S)** and **unordered (U)** flags, starting from
+the least significant bit position.
+
+Operands
+^^^^^^^^
+
+src (32-bit – memory, integer register, immediate, map variable)
+    The value to copy to the flags.  Only the least significant five
+    bits of this operand are used.
+
+Flags
+^^^^^
+
+carry (C)
+    Set to the value of bit 0 of the ``src`` operand, counting from the
+    least significant bit starting from zero.
+overflow (V)
+    Set to the value of bit 1 of the ``src`` operand, counting from the
+    least significant bit starting from zero.
+zero (Z)
+    Set to the value of bit 2 of the ``src`` operand, counting from the
+    least significant bit starting from zero.
+sign (S)
+    Set to the value of bit 3 of the ``src`` operand, counting from the
+    least significant bit starting from zero.
+unordered (U)
+    Set to the value of bit 4 of the ``src`` operand, counting from the
+    least significant bit starting from zero.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-getflgs:
+
+GETFLGS
+~~~~~~~
+
+Copy flags.
+
++----------------------+------------------------------------+
+| Disassembly          | Usage                              |
++======================+====================================+
+| .. code-block::      | .. code-block:: C++                |
+|                      |                                    |
+|     getflgs dst,mask |     UML_GETFLGS(block, dst, mask); |
++----------------------+------------------------------------+
+
+The flags corresponding to bit positions that are set in ``mask`` are
+copied to the corresponding bit positions in ``dst``.  Bit positions
+corresponding in ``dst`` that do not correspond to flags or that
+correspond to bit positions that are clear in ``mask`` are cleared.
+
+Back-ends may be able to generate more efficient code if fewer bit
+positions are set in ``mask``.
+
+Operands
+^^^^^^^^
+
+src (32-bit – memory, integer register)
+    The destination where the flags corresponding to bit positions that
+    are set in the ``mask`` operand will be copied.
+mask (flag mask – immediate, map variable)
+    The mask to specify which flags to copy.  Only the least significant
+    five bits of this operand are used.
+
+Flags
+^^^^^
+
+carry (C)
+    Unchanged.
+overflow (V)
+    Unchanged.
+zero (Z)
+    Unchanged.
+sign (S)
+    Unchanged.
+unordered (U)
+    Unchanged.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
 .. _umlinst-setfmod:
 
 SETFMOD
@@ -863,7 +989,8 @@ GETFMOD
 ~~~~~~~
 
 Get the current default floating point rounding mode set by the most
-recent :ref:`SETFMOD <umlinst-setfmod>` instruction.
+recent :ref:`SETFMOD <umlinst-setfmod>` or :ref:`RESTORE
+<umlinst-restore>` instruction.
 
 +-----------------+------------------------------+
 | Disassembly     | Usage                        |
@@ -875,8 +1002,8 @@ recent :ref:`SETFMOD <umlinst-setfmod>` instruction.
 
 Note that the result of this instruction may not correspond to the
 actual effective default rounding mode between entering the generated
-code and executing the first :ref:`SETFMOD <umlinst-setfmod>`
-instruction.
+code and executing the first :ref:`SETFMOD <umlinst-setfmod>` or
+:ref:`RESTORE <umlinst-restore>` instruction.
 
 Operands
 ^^^^^^^^
@@ -887,6 +1014,105 @@ dst (32-bit – memory, integer register)
     (``ROUND_ROUND``) for round to nearest, 2 (``ROUND_CEIL``) for round
     toward positive infinity, or 3 (``ROUND_FLOOR``) for round toward
     negative infinity.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Undefined.
+sign (S)
+    Undefined.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-restore:
+
+RESTORE
+~~~~~~~
+
+Set the contents of the UML integer and floating point registers, the
+contents of the ``EXP`` register, the flags and the default floating
+point rounding mode from a ``drcuml_machine_state`` structure.
+
++-----------------+------------------------------+
+| Disassembly     | Usage                        |
++=================+==============================+
+| .. code-block:: | .. code-block:: C++          |
+|                 |                              |
+|     restore src |     UML_RESTORE(block, src); |
++-----------------+------------------------------+
+
+Restores program-visible UML state from a structure in memory.  The
+subroutine call stack and current instruction pointer are not changed.
+Execution continues with the following UML instruction.
+
+src (``drcuml_machine_state`` structure – memory)
+    The source that will be used to set program-visible UML machine
+    state.  This may be any host memory location accessible by the
+    application.  It is not restricted to the recompiler cache.
+
+Flags
+^^^^^
+
+carry (C)
+    Set from the ``src`` operand.
+overflow (V)
+    Set from the ``src`` operand.
+zero (Z)
+    Set from the ``src`` operand.
+sign (S)
+    Set from the ``src`` operand.
+unordered (U)
+    Set from the ``src`` operand.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-save:
+
+SAVE
+~~~~
+
+Copy the contents of the UML integer and floating point registers, the
+contents of the ``EXP`` register, the flags and the default floating
+point rounding mode to a ``drcuml_machine_state`` structure.
+
++-----------------+---------------------------+
+| Disassembly     | Usage                     |
++=================+===========================+
+| .. code-block:: | .. code-block:: C++       |
+|                 |                           |
+|     save    dst |     UML_SAVE(block, dst); |
++-----------------+---------------------------+
+
+Saves program-visible UML state to a structure in memory that can
+subsequently be restored using the :ref:`RESTORE <umlinst-restore>`
+instruction.  The subroutine call stack and current instruction pointer
+are not saved.
+
+Note that the saved floating point rounding mode may not correspond to
+the actual effective default rounding mode between entering the
+generated code and executing the first :ref:`SETFMOD <umlinst-setfmod>`
+or :ref:`RESTORE <umlinst-restore>` instruction.
+
+Operands
+^^^^^^^^
+
+dst (``drcuml_machine_state`` structure – memory)
+    The destination where program-visible UML machine state will be
+    saved.  This may be any host memory location accessible by the
+    application.  It is not restricted to the recompiler cache.
 
 Flags
 ^^^^^
@@ -1113,6 +1339,10 @@ destination.  Host system rules for integer alignment must be followed.
 |     dload   dst,base,index,size_scale |     UML_DLOAD(block, dst, base, index, size, scale); |
 +---------------------------------------+------------------------------------------------------+
 
+This instruction can be used to read a value from any host memory
+location accessible by the application.  It is not restricted to the
+recompiler cache.
+
 Operands
 ^^^^^^^^
 
@@ -1169,6 +1399,10 @@ destination.  Host system rules for integer alignment must be followed.
 |     dloads  dst,base,index,size_scale |     UML_DLOADS(block, dst, base, index, size, scale); |
 +---------------------------------------+-------------------------------------------------------+
 
+This instruction can be used to read a value from any host memory
+location accessible by the application.  It is not restricted to the
+recompiler cache.
+
 Operands
 ^^^^^^^^
 
@@ -1223,6 +1457,10 @@ displacement.  Host system rules for integer alignment must be followed.
 |     store   base,index,src,size_scale |     UML_STORE(block, base, index, src, size, scale);  |
 |     dstore  base,index,src,size_scale |     UML_DSTORE(block, base, index, src, size, scale); |
 +---------------------------------------+-------------------------------------------------------+
+
+This instruction can be used to write a value to any host memory
+location accessible by the application.  It is not restricted to the
+recompiler cache.
 
 Operands
 ^^^^^^^^
@@ -3342,6 +3580,130 @@ Simplification rules
   to the instruction size.
 * Immediate values for the ``count`` operand are truncated to five or
   six bits for 32-bit or 64-bit operands, respectively.
+
+.. _umlinst-rolins:
+
+ROLINS
+~~~~~~
+
+Rotate an integer value and combine with the destination value using a
+mask.  The value is rotated to the left (toward the most significant bit
+position).  Bits shifted out of the most significant bit position are
+shifted into the least significant bit position.  The rotated value is
+then combined with the destination value: for bit positions that are set
+in the mask, the corresponding bit position values are copied from the
+rotated value to the destination; for bit positions that are clear in
+the mask, the corresponding bit position values in the destination are
+preserved.
+
++--------------------------------+------------------------------------------------+
+| Disassembly                    | Usage                                          |
++================================+================================================+
+| .. code-block::                | .. code-block:: C++                            |
+|                                |                                                |
+|     rolins  dst,src,count,mask |     UML_ROLINS(block, dst, src, count, mask);  |
+|     drolins dst,src,count,mask |     UML_DROLINS(block, dst, src, count, mask); |
++--------------------------------+------------------------------------------------+
+
+Rotates the value of ``src`` left by ``count`` bit positions and then
+copies bit values to ``dst`` where the corresponding bit positions are
+set in ``mask``.
+
+Back-ends may be able to optimise some forms of this instruction, for
+example when the ``count`` and ``mask`` operands are both immediate
+values.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination that will be combined with the rotated value.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to be rotated and masked.
+count (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The number of bit positions to rotate by.  Only the least
+    significant five bits or six bits of this operand are used,
+    depending on the instruction size.
+mask (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The mask to control which bit positions are copied from the rotated
+    value and which bit positions are preserved in the destination.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`ROL <umlinst-rol>`, :ref:`AND <umlinst-and>`,
+  :ref:`OR <umlinst-or>` or :ref:`MOV <umlinst-mov>` if the ``mask``
+  operand is an immediate value with all bits set or the immediate value
+  zero.
+* Immediate values for the ``src`` and ``mask`` operands are truncated
+  to the instruction size.
+* Immediate values for the ``count`` operand are truncated to five or
+  six bits for 32-bit or 64-bit operands, respectively.
+
+.. _umlinst-bswap:
+
+BSWAP
+~~~~~
+
+Reverse the order of bytes within an integer value.
+
++---------------------+----------------------------------+
+| Disassembly         | Usage                            |
++=====================+==================================+
+| .. code-block::     | .. code-block:: C++              |
+|                     |                                  |
+|     bswap   dst,src |     UML_BSWAP(block, dst, src);  |
+|     dbswap  dst,src |     UML_DBSWAP(block, dst, src); |
++---------------------+----------------------------------+
+
+This instruction can be used to convert between big Endian and little
+Endian byte order.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the result will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to have its byte order reversed.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src`` operand is an immediate value.
 
 
 .. _umlinst-fparith:
