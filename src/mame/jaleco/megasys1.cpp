@@ -101,6 +101,8 @@ RAM             RW      0e0000-0effff*        <               <
                                 Issues / To Do
                                 --------------
 
+- Hook up microcontroller for peekaboo (connected differently to other games).
+
 - Making the M6295 status register return 0 fixes the music tempo in
   avspirit, 64street, astyanax etc. but makes most of the effects in
   hachoo disappear! Define SOUND_HACK to 0 to turn this hack off
