@@ -3287,7 +3287,7 @@ void apple2gs_state::a2gs_es5503_map(address_map &map)
     ADB microcontroller + KEYGLU emulation
 
     Huge thanks to Neil Parker's writeup on the ADB microcontroller!
-    http://www.llx.com/~nparker/a2/adb.html
+    http://llx.com/Neil/a2/adb.html
 ***************************************************************************/
 
 u8 apple2gs_state::adbmicro_p0_in()
