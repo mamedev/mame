@@ -36412,7 +36412,7 @@ license:CC0-1.0
 		<description>The Ancient Art of War (version 1989)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="David" />
+		<info name="programmer" value="David Murray" />
 		<info name="programmer" value="Barry Murray" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<info name="version" value="1989" />
@@ -36438,7 +36438,7 @@ license:CC0-1.0
 		<description>The Ancient Art of War at Sea</description>
 		<year>1988</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="David" />
+		<info name="programmer" value="David Murray" />
 		<info name="programmer" value="Barry Murray" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
