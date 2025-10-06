@@ -1316,6 +1316,9 @@ void apple2gs_state::do_io(int offset)
 			}
 			break;
 
+		case 0x2a:  // 16-bit access to NEWVIDEO
+			break;
+
 		case 0x30:
 			m_speaker_state ^= 1;
 			if (m_speaker_state)
@@ -1333,6 +1336,9 @@ void apple2gs_state::do_io(int offset)
 				m_acceltimer->adjust(attotime::from_msec(5));
 				accel_normal_speed();
 			}
+			break;
+
+		case 0x37:  // DMAREG, 16-bit access to CYAREG
 			break;
 
 		case 0x47:  // CLRVBLINT
@@ -1419,7 +1425,7 @@ void apple2gs_state::do_io(int offset)
 			m_video->dhires_w(1);
 			break;
 
-		case 0x68:  // STATE
+		case 0x69:  // 16-bit access to STATEREG
 			break;
 
 		case 0x70:  // PTRIG triggers paddles on read or write
