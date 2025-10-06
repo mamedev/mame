@@ -1453,21 +1453,21 @@ void hng64_state::video_start()
 	m_old_tileflags[2] = -1;
 	m_old_tileflags[3] = -1;
 
-	m_tilemap[0].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<0, 0>, "get_tile_info_0_8x8"),       TILEMAP_SCAN_ROWS,  8,  8, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[0].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<0, 1>, "get_tile_info_0_16x16"),     TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[0].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<0, 1>, "get_tile_info_0_16x16_alt"), TILEMAP_SCAN_ROWS, 16, 16, 256,  64); // 128x128x4 = 0x10000
+	m_tilemap[0].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<0, 0>))), TILEMAP_SCAN_ROWS,  8,  8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[0].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<0, 1>))), TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[0].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<0, 1>))), TILEMAP_SCAN_ROWS, 16, 16, 256,  64); // 128x128x4 = 0x10000
 
-	m_tilemap[1].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<1, 0>, "get_tile_info_1_8x8"),       TILEMAP_SCAN_ROWS,  8,  8, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[1].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<1, 1>, "get_tile_info_1_16x16"),     TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[1].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<1, 1>, "get_tile_info_1_16x16_alt"), TILEMAP_SCAN_ROWS, 16, 16, 256,  64); // 128x128x4 = 0x10000
+	m_tilemap[1].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<1, 0>))), TILEMAP_SCAN_ROWS,  8,  8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[1].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<1, 1>))), TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[1].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<1, 1>))), TILEMAP_SCAN_ROWS, 16, 16, 256,  64); // 128x128x4 = 0x10000
 
-	m_tilemap[2].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<2, 0>, "get_tile_info_2_8x8"),       TILEMAP_SCAN_ROWS,  8,  8, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[2].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<2, 1>, "get_tile_info_2_16x16"),     TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[2].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<2, 1>, "get_tile_info_2_16x16_alt"), TILEMAP_SCAN_ROWS, 16, 16, 256,  64); // 128x128x4 = 0x10000
+	m_tilemap[2].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<2, 0>))), TILEMAP_SCAN_ROWS,  8,  8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[2].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<2, 1>))), TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[2].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<2, 1>))), TILEMAP_SCAN_ROWS, 16, 16, 256,  64); // 128x128x4 = 0x10000
 
-	m_tilemap[3].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<3, 0>, "get_tile_info_3_8x8"),       TILEMAP_SCAN_ROWS,  8,  8, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[3].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<3, 1>, "get_tile_info_3_16x16"),     TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[3].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, &hng64_state::get_tile_info<3, 1>, "get_tile_info_3_16x16_alt"), TILEMAP_SCAN_ROWS, 16, 16, 256,  64); // 128x128x4 = 0x10000
+	m_tilemap[3].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<3, 0>))), TILEMAP_SCAN_ROWS,  8,  8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[3].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<3, 1>))), TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[3].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&hng64_state::get_tile_info<3, 1>))), TILEMAP_SCAN_ROWS, 16, 16, 256,  64); // 128x128x4 = 0x10000
 
 	for (auto &elem : m_tilemap)
 	{
@@ -1484,7 +1484,7 @@ void hng64_state::video_start()
 	m_polys.resize(HNG64_MAX_POLYGONS);
 
 	m_texturerom = memregion("textures0")->base();
-	m_vertsrom = (u16*)memregion("verts")->base();
+	m_vertsrom = (u16 *)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
 
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
