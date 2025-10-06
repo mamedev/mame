@@ -1236,13 +1236,13 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="504" y="430" width="22" height="14" />
 		</element>
 
-		<!-- enderecamento switch -->
-		<element name="ENDERECAMENTO (Fixo/Sequencial)" ref="rotary_switch" inputtag="BUTTONS" inputmask="0x400">
+		<!-- Endereçamento: Fixo/Sequencial -->
+		<element ref="rotary_switch" inputtag="BUTTONS" inputmask="0x400">
 			<bounds x="856" y="650" width="37" height="37" />
 		</element>
 
-		<!-- memoria switch -->
-		<element name="MEMORIA (Liberada/Protegida)" ref="rotary_switch" inputtag="BUTTONS" inputmask="0x800">
+		<!-- Memória: Liberada/Protegida -->
+		<element ref="rotary_switch" inputtag="BUTTONS" inputmask="0x800">
 			<bounds x="1088" y="650" width="37" height="37" />
 		</element>
 
