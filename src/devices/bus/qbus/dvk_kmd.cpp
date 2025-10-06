@@ -42,10 +42,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "dvk_kmd.h"
 
-#define LOG_DBG     (1U <<  2)
+#define LOG_DBG     (1U <<  1)
 
 //#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -59,7 +58,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DVK_KMD, dvk_kmd_device, "dvk_kmd", "DVK KMD floppy")
+DEFINE_DEVICE_TYPE(DVK_KMD, dvk_kmd_device, "dvk_kmd", "DVK KMD floppy controller")
 
 ROM_START(dvk_kmd)
 	ROM_REGION(0x2000, "maincpu", 0)
@@ -102,13 +101,13 @@ static void kmd_floppies(device_slot_interface &device)
 
 void dvk_kmd_device::kmd_mem(address_map &map)
 {
-	// FIXME add trap
+	// FIXME: add trap
 	map(0000000, 0017777).rom().region("maincpu", 0);
 	map(0020000, 0023777).ram();
 	map(0040000, 0077777).rw(FUNC(dvk_kmd_device::dma_read), FUNC(dvk_kmd_device::dma_write));
 	map(0177100, 0177103).rw(FUNC(dvk_kmd_device::local_read), FUNC(dvk_kmd_device::local_write));
 	map(0177130, 0177133).rw(m_fdc, FUNC(k1801vp128_device::read), FUNC(k1801vp128_device::write));
-	map(0177716, 0177717).lr16(NAME([](offs_t offset) { return 010000 | 1; })).nopw();
+	map(0177716, 0177717).lr16(NAME([] (offs_t offset) { return 010000 | 1; })).nopw();
 	map(0177760, 0177761).noprw(); // RAM chip base address register
 }
 
@@ -123,16 +122,18 @@ void dvk_kmd_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dvk_kmd_device::kmd_mem);
 
 	K1801VP128(config, m_fdc, XTAL(4'000'000));
-	m_fdc->ds_in_callback().set([] (uint16_t data) {
-		switch (data & 15)
-		{
-			case 1: return 0;
-			case 2: return 1;
-			case 4: return 2;
-			case 8: return 3;
-			default: return -1;
-		}
-	});
+	m_fdc->ds_in_callback().set(
+			[] (uint16_t data)
+			{
+				switch (data & 15)
+				{
+					case 1: return 0;
+					case 2: return 1;
+					case 4: return 2;
+					case 8: return 3;
+					default: return -1;
+				}
+			});
 	FLOPPY_CONNECTOR(config, "fdc:0", kmd_floppies, "525qd", dvk_kmd_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", kmd_floppies, "525qd", dvk_kmd_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:2", kmd_floppies, "525qd", dvk_kmd_device::floppy_formats);
@@ -163,8 +164,9 @@ void dvk_kmd_device::device_reset()
 {
 	if (!m_installed)
 	{
-		m_bus->install_device(0172140, 0172143, read16sm_delegate(*this, FUNC(dvk_kmd_device::read)),
-			write16sm_delegate(*this, FUNC(dvk_kmd_device::write)));
+		m_bus->install_device(0172140, 0172143,
+				read16sm_delegate(*this, FUNC(dvk_kmd_device::read)),
+				write16sm_delegate(*this, FUNC(dvk_kmd_device::write)));
 		m_installed = true;
 	}
 	m_cr = m_dr = m_go = 0;
