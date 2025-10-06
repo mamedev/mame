@@ -848,6 +848,7 @@ private:
 
 	uint8_t m_vblank_irq_enable = 0U;
 	uint8_t m_vidreg = 0U;
+	uint8_t m_reelbank = 0U;
 
 	void coincount_w(uint8_t data);
 	void unkcm_0x02_w(uint8_t data);
@@ -970,10 +971,12 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(unkch_state::get_bonusch_bg_tile_info)
 {
+//  extra tilemap to show credits and bet
+
 	int const code = m_bg_vidram[tile_index];
 	int const attr = m_bg_atrram[tile_index];
 
-	tileinfo.set(2,
+	tileinfo.set(3,
 			code + 0x100,
 			(attr & 0xf0) >> 4,
 			0);
@@ -1133,7 +1136,12 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel_tile_info)
 	int const code = m_reel_ram[Which][tile_index];
 	int const attr = m_reel_attrram[Which][tile_index];
 
-	tileinfo.set(1,
+	if ((code | (attr & 0x0f) << 8) < 0x100)
+		m_reelbank = 1;
+	else
+		m_reelbank = 2;
+
+	tileinfo.set(m_reelbank,
 			code | (attr & 0x0f) << 8,
 			(attr & 0xf0) >> 4,
 			0);
@@ -1260,6 +1268,10 @@ VIDEO_START_MEMBER(unkch_state, bonusch)
 
 	// is there an enable reg for this game?
 	m_enable_reg = 0x1b;
+
+	// 1 for regular reels; 2 for d-up reel numbers.
+//	m_reelbank = 2;
+
 }
 
 VIDEO_START_MEMBER(cmaster_state, pkrmast)
@@ -12996,9 +13008,10 @@ static GFXDECODE_START( gfx_megaline )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bonusch )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout,        0, 16 )  // for fg
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout,     256,  8 )  // for reels
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 256+128,  8 )  // for reels extended gfx 
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout,           0, 16 )  // for fg
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout,        256,  8 )  // for reels
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 256+128+16,  8 )  // for reels extended gfx (d-up reel numbers)
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout,    256+128,  8 )  // for reels extended gfx (credit + bet tilemap)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_sangho )
@@ -28615,8 +28628,8 @@ GAMEL( 1986, skillch,    0,        megaline, megaline, wingco_state,   init_skch
 GAMEL( 1986, skillcha,   skillch,  megaline, skillcha, wingco_state,   init_skcha,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2, 53-98 main)",                    0,          layout_skillch )
 
 // --- Wing W-8 hardware ---
-GAME(  1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    init_bonch,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                MACHINE_IMPERFECT_COLORS )  // M80C51F MCU, need proper colors in d-up2 reel numbers
-GAME(  1990, bonuscha,   bonusch,  bonusch,  bonusch,  unkch_state,    init_boncha,    ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 2)",                                MACHINE_IMPERFECT_COLORS )  // M80C51F MCU, need proper colors in d-up2 reel numbers
+GAME(  1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    init_bonch,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                0 )  // M80C51F MCU
+GAME(  1990, bonuscha,   bonusch,  bonusch,  bonusch,  unkch_state,    init_boncha,    ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 2)",                                0 )  // M80C51F MCU
 
 
 // --- Magical Odds hardware ---
