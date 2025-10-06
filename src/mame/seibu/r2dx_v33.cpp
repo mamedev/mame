@@ -65,12 +65,13 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "emu.h"
 #include "raiden2.h"
 
+#include "r2crypt.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
-#include "r2crypt.h"
 
 #include "speaker.h"
 
@@ -96,9 +97,9 @@ public:
 	{
 	}
 
-	void nzerotea(machine_config &config);
+	void nzerotea(machine_config &config) ATTR_COLD;
 
-	void init_nzerotea();
+	void init_nzerotea() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -149,9 +150,9 @@ public:
 	{
 	}
 
-	void zerotm2k(machine_config &config);
+	void zerotm2k(machine_config &config) ATTR_COLD;
 
-	void init_zerotm2k();
+	void init_zerotm2k() ATTR_COLD;
 
 protected:
 	void zerotm2k_eeprom_w(u16 data);
@@ -174,9 +175,9 @@ public:
 	{
 	}
 
-	void rdx_v33(machine_config &config);
+	void rdx_v33(machine_config &config) ATTR_COLD;
 
-	void init_rdx_v33();
+	void init_rdx_v33() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
