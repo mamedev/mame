@@ -330,7 +330,7 @@ void raiden2_state::sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask)
 		if (BIT(~m_sprcpt_flags1, 31))
 		{
 			// Upload finished
-#if (VERBOSE & LOG_SPRCRPT)
+			if (VERBOSE & LOG_SPRCRPT)
 			{
 				logerror("%s: \n", machine().describe_context());
 				logerror("sprcpt_val 1: %08x\n", m_sprcpt_val[0]);
@@ -350,7 +350,6 @@ void raiden2_state::sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask)
 						logerror("\n");
 				}
 			}
-#endif
 		}
 	}
 }
