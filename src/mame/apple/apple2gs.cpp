@@ -439,7 +439,6 @@ private:
 	bool m_altzp = false;
 	bool m_ramrd = false, m_ramwrt = false;
 	bool m_lcram = false, m_lcram2 = false, m_lcprewrite = false, m_lcwriteenable = false;
-	bool m_ioudis = false;
 	bool m_rombank = false;
 
 	u8 m_shadow = 0, m_speed = 0, m_textcol = 0;
@@ -758,7 +757,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_altzp));
 	save_item(NAME(m_ramrd));
 	save_item(NAME(m_ramwrt));
-	save_item(NAME(m_ioudis));
 	save_item(NAME(m_vbl));
 	save_item(NAME(m_irqmask));
 	save_item(NAME(m_lcram));
@@ -830,7 +828,6 @@ void apple2gs_state::machine_reset()
 	m_altzp = false;
 	m_ramrd = false;
 	m_ramwrt = false;
-	m_ioudis = true;
 	m_video->set_newvideo(0x01); // verified on ROM03 hardware
 	m_clock_frame = 0;
 	m_slot_irq = false;
@@ -1299,20 +1296,6 @@ void apple2gs_state::do_io(int offset)
 {
 	if(machine().side_effects_disabled()) return;
 
-	if (m_ioudis)
-	{
-		switch (offset)
-		{
-			case 0x5e:  // SETDHIRES
-				m_video->dhires_w(0);
-				return;
-
-			case 0x5f:  // CLRDHIRES
-				m_video->dhires_w(1);
-				return;
-		}
-	}
-
 	switch (offset)
 	{
 		case 0x20:
@@ -1424,22 +1407,22 @@ void apple2gs_state::do_io(int offset)
 			m_gameio->an2_w(1);
 			break;
 
-		case 0x5e: // AN3 off
+		case 0x5e: // AN3 off, DHIRESON
 			m_an3 = false;
 			m_gameio->an3_w(0);
+			m_video->dhires_w(0);
 			break;
 
-		case 0x5f: // AN3 on
+		case 0x5f: // AN3 on, DHIRESOFF
 			m_an3 = true;
 			m_gameio->an3_w(1);
+			m_video->dhires_w(1);
 			break;
 
 		case 0x68:  // STATE
 			break;
 
-		// trigger joypad read
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
-		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
+		case 0x70:  // PTRIG triggers paddles on read or write
 			// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
 			if ((m_accel_present) && !BIT(m_accel_gsxsettings, 6))
 			{
@@ -1747,40 +1730,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 					(m_rombank ? 0x02 : 0x00) |
 					(m_intcxrom ? 0x01 : 0x00);
 
-		case 0x70:  // PTRIG - triggers paddles on read or write
-			if (!machine().side_effects_disabled())
-			{
-				// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
-				if ((m_accel_present) && !BIT(m_accel_gsxsettings, 6))
-				{
-					m_accel_temp_slowdown = true;
-					m_acceltimer->adjust(attotime::from_msec(5));
-					accel_normal_speed();
-				}
-
-				// 558 monostable one-shot timers; a running timer cannot be restarted
-				if (machine().time().as_double() >= m_joystick_x1_time)
-				{
-					m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
-				}
-				if (machine().time().as_double() >= m_joystick_y1_time)
-				{
-					m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
-				}
-				if (machine().time().as_double() >= m_joystick_x2_time)
-				{
-					m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
-				}
-				if (machine().time().as_double() >= m_joystick_y2_time)
-				{
-					m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
-				}
-
-			}
-
-			return m_rom[offset + 0x3c000];
-
-		// The ROM IRQ vectors point here
+		// The ROM IRQ vectors point here (0x70 returns floating bus)
 		case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			return m_rom[offset + 0x3c000];
@@ -2188,31 +2138,6 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				m_lc00.select(0);
 				m_lc01.select(0);
 			}
-			break;
-
-		case 0x70:
-		case 0x71:
-		case 0x72:
-		case 0x73:
-		case 0x74:
-		case 0x75:
-		case 0x76:
-		case 0x77:
-		case 0x78:
-		case 0x79:
-		case 0x7a:
-		case 0x7b:
-		case 0x7c:
-		case 0x7d:
-			do_io(offset); // make sure it also side-effect resets the paddles as documented
-			break;
-
-		case 0x7e: // SETIOUDIS
-			m_ioudis = true;
-			break;
-
-		case 0x7f: // CLRIOUDIS
-			m_ioudis = false;
 			break;
 
 		default:
