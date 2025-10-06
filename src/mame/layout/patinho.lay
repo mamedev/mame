@@ -1005,42 +1005,48 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		</element>
 
 		<!-- define buttons -->
-		<element name="NORMAL" ref="button" inputtag="BUTTONS" inputmask="0x001">
+		<!-- NORMAL -->
+		<element name="MODE_BUTTON0" ref="button" inputtag="BUTTONS" inputmask="0x001">
 			<bounds x="93" y="994" width="42" height="42" />
 		</element>
 		<element ref="str_NORMAL">
 			<bounds x="90" y="963" width="60" height="18" />
 		</element>
 
-		<element name="CICLOUNICO" ref="button" inputtag="BUTTONS" inputmask="0x002">
+		<!-- CICLOUNICO -->
+		<element name="MODE_BUTTON1" ref="button" inputtag="BUTTONS" inputmask="0x002">
 			<bounds x="200" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_CICLOUNICO">
 			<bounds x="185" y="963" width="72" height="18" />
 		</element>
 
-		<element name="INSTRUCAOUNICA" ref="button" inputtag="BUTTONS" inputmask="0x004">
+		<!-- INSTRUCAOUNICA -->
+		<element name="MODE_BUTTON2" ref="button" inputtag="BUTTONS" inputmask="0x004">
 			<bounds x="310" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_INSTRUCAOUNICA">
 			<bounds x="294" y="961" width="68" height="22" />
 		</element>
 
-		<element name="ENDERECAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x008">
+		<!-- ENDERECAMENTO -->
+		<element name="MODE_BUTTON3" ref="button" inputtag="BUTTONS" inputmask="0x008">
 			<bounds x="413" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_ENDERECAMENTO">
 			<bounds x="397" y="963" width="70" height="18" />
 		</element>
 
-		<element name="ARMAZENAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x010">
+		<!-- ARMAZENAMENTO -->
+		<element name="MODE_BUTTON4" ref="button" inputtag="BUTTONS" inputmask="0x010">
 			<bounds x="520" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_ARMAZENAMENTO">
 			<bounds x="501" y="963" width="72" height="18" />
 		</element>
 
-		<element name="EXPOSICAO" ref="button" inputtag="BUTTONS" inputmask="0x020">
+		<!-- EXPOSICAO -->
+		<element name="MODE_BUTTON5" ref="button" inputtag="BUTTONS" inputmask="0x020">
 			<bounds x="626" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_EXPOSICAO">

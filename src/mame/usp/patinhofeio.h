@@ -14,6 +14,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_decwriter(*this, "decwriter")
 		, m_tty(*this, "teletype")
+		, m_mode_button(*this, "MODE_BUTTON%u", 0U)
 	{ }
 
 	void init_patinho_feio();
@@ -42,6 +43,7 @@ protected:
 	required_device<teleprinter_device> m_tty;
 
 private:
+	output_finder<6> m_mode_button;
 	uint8_t* paper_tape_data = nullptr;
 	uint32_t paper_tape_length = 0;
 	uint32_t paper_tape_address = 0;

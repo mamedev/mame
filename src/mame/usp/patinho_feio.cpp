@@ -29,17 +29,9 @@ void patinho_feio_state::init_patinho_feio()
 
 void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode){
 	char lamp_id[11];
-	static char const *const button_names[] = {
-		"NORMAL",
-		"CICLOUNICO",
-		"INSTRUCAOUNICA",
-		"ENDERECAMENTO",
-		"ARMAZENAMENTO",
-		"EXPOSICAO"
-	};
 
 	for (int i=0; i<6; i++){
-		m_out->set_value(button_names[i], (mode == i) ? 1 : 0);
+		m_mode_button[i] = (mode == i) ? 1 : 0;
 	}
 
 	for (int i=0; i<8; i++){
@@ -188,6 +180,8 @@ DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state::tape_load )
 void patinho_feio_state::machine_start(){
 	m_teletype_timer = timer_alloc(FUNC(patinho_feio_state::teletype_callback), this);
 	m_decwriter_timer = timer_alloc(FUNC(patinho_feio_state::decwriter_callback), this);
+
+	m_mode_button.resolve();
 
 	// Copy some programs directly into RAM.
 	// This is a hack for setting up the computer
