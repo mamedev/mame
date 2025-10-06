@@ -1063,10 +1063,9 @@ void g65816_device::state_string_export(const device_state_entry &entry, std::st
 			str = string_format("%c%c%c%c%c%c%c%c",
 				m_flag_n & NFLAG_SET ? 'N':'.',
 				m_flag_v & VFLAG_SET ? 'V':'.',
-				m_flag_m & MFLAG_SET ? 'M':'.',
-				m_flag_x & XFLAG_SET ? 'X':'.',
+				m_flag_m & MFLAG_SET ? (m_flag_e ? ' ':'M'):'.',
+				m_flag_x & XFLAG_SET ? (m_flag_e ? 'B':'X'):'.',
 				m_flag_d & DFLAG_SET ? 'D':'.',
-
 				m_flag_i & IFLAG_SET ? 'I':'.',
 				m_flag_z == 0        ? 'Z':'.',
 				m_flag_c & CFLAG_SET ? 'C':'.');
