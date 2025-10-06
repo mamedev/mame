@@ -143,6 +143,7 @@ class hng64_state : public driver_device
 public:
 	hng64_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_texturerom(*this, "textures0"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_palette_fade0(*this, "palette0"),
@@ -179,7 +180,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_in(*this, "IN%u", 0U),
 		m_samsho64_3d_hack(0),
-		m_roadedge_3d_hack(0)
+		m_roadedge_3d_hack(0),
+		m_vertsrom(*this, "verts")
 	{
 	}
 
@@ -196,7 +198,7 @@ public:
 	void init_ss64() ATTR_COLD;
 	void init_hng64_fght() ATTR_COLD;
 
-	u8 *m_texturerom = nullptr;
+	required_region_ptr<u8> m_texturerom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_palette_fade0;
@@ -342,8 +344,7 @@ private:
 
 	emu_timer *m_3dfifo_timer = nullptr;
 
-	u16* m_vertsrom = nullptr;
-	u32 m_vertsrom_size = 0;
+	required_region_ptr<u16> m_vertsrom;
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
 
 	u16 main_latch[2]{};
@@ -466,7 +467,7 @@ private:
 	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, int line);
 
 	void tilemap_draw_roz_core_line(
-			screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+			screen_device &screen, bitmap_rgb32 &destbitmap, const rectangle &cliprect, tilemap_t *tmap,
 			int wraparound, u8 drawformat, u8 alpha, u8 mosaic, u8 tm, int splitside);
 
 	TIMER_CALLBACK_MEMBER(_3dfifo_processed);

@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "hng64.h"
 
+#include <algorithm>
+
 #define LOG_3D           (1 << 1)
 #define LOG_FRAMEBUFFER  (1 << 2)
 #define LOG_DISPLAY_LIST (1 << 3)
@@ -124,14 +126,15 @@ void hng64_state::videoram_w(offs_t offset, u32 data, u32 mem_mask)
 #define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL) \
 do { \
 	if (drawformat == 1) \
-		*(u32 *)dest = clut[INPUT_VAL]; \
+		*dest = clut[INPUT_VAL]; \
 	else if (drawformat == 2) \
-		*(u32 *)dest = add_blend_r32(*(u32 *)dest, clut[INPUT_VAL]); \
+		*dest = add_blend_r32(*dest, clut[INPUT_VAL]); \
 	else if (drawformat == 3) \
-		*(u32 *)dest = alpha_blend_r32(*(u32 *)dest, clut[INPUT_VAL], alpha); \
+		*dest = alpha_blend_r32(*dest, clut[INPUT_VAL], alpha); \
 } while (0)
 
-void hng64_state::tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+void hng64_state::tilemap_draw_roz_core_line(
+		screen_device &screen, bitmap_rgb32 &destbitmap, const rectangle &cliprect, tilemap_t *tmap,
 		int wraparound, u8 drawformat, u8 alpha, u8 mosaic, u8 tm, int splitside)
 {
 	int source_line_to_use = cliprect.min_y;
@@ -328,7 +331,7 @@ void hng64_state::tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32
 
 	// we have the scroll values for the current line, draw
 
-	pen_t* clut;
+	const pen_t *clut;
 
 	// allow one of the 2 pairs of fade values to be used (complete guess! but fatfurwa turns this bit on whenever it wants to do a fade effect and off when it's done)
 	if (BIT(get_tileregs(tm), 7))
@@ -338,20 +341,19 @@ void hng64_state::tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32
 		//  as we're already using this to decide which layer we're on for blending, it's probably not got a double use)
 		if (BIT(get_tileregs(tm), 5))
 		{
-			clut = (pen_t*)&m_palette_fade0->pen(0);
+			clut = &m_palette_fade0->pen(0);
 		}
 		else
 		{
-			clut = (pen_t*)&m_palette_fade1->pen(0);
+			clut = &m_palette_fade1->pen(0);
 		}
 	}
 	else
 	{
-		clut = (pen_t*)&m_palette->pen(0);
+		clut = &m_palette->pen(0);
 	}
 
 	bitmap_ind8 &priority_bitmap = screen.priority();
-	bitmap_rgb32 &destbitmap = dest;
 	const bitmap_ind16 &srcbitmap = tmap->pixmap();
 	const bitmap_ind8 &flagsmap = tmap->flagsmap();
 	const int xmask = srcbitmap.width()-1;
@@ -371,9 +373,9 @@ void hng64_state::tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32
 	int sy = cliprect.min_y;
 	int ex = cliprect.max_x;
 
-	/* optimized loop for the not rotated case */
 	if (incxy == 0 && incyx == 0 && !wraparound)
 	{
+		/* optimized loop for the not rotated case */
 		/* skip without drawing until we are within the bitmap */
 		while (startx >= widthshifted && sx <= ex)
 		{
@@ -434,9 +436,9 @@ void hng64_state::tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32
 			}
 		}
 	}
-	/* wraparound case */
 	else if (wraparound)
 	{
+		/* wraparound case */
 		/* initialize X counters */
 		int x = sx;
 		u32 cx = startx;
@@ -696,8 +698,8 @@ void hng64_state::mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, c
 
 	if (true)
 	{
-		const u16* spritesrc = &m_sprite_bitmap.pix(y, cliprect.min_x);
-		u32* spritedst = &bitmap.pix(y, cliprect.min_x);
+		const u16 *spritesrc = &m_sprite_bitmap.pix(y, cliprect.min_x);
+		u32 *spritedst = &bitmap.pix(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -722,7 +724,7 @@ void hng64_state::mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, c
 					if (srcpix & 0x8000)
 					{
 						if (spriteblendtype)
-							*spritedst = alpha_blend_r32(*(u32*)spritedst, spriteclut[srcpix & 0x0fff], 0x80);
+							*spritedst = alpha_blend_r32(*spritedst, spriteclut[srcpix & 0x0fff], 0x80);
 						else
 							*spritedst = add_blend_r32(*spritedst, spriteclut[srcpix & 0x0fff]);
 					}
@@ -894,8 +896,8 @@ u32 hng64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 			{
 				const int realy = (((y-visarea.min_y) * yinc) >> 16);
 
-				const u16* src = &m_poly_renderer->colorBuffer3d()[((realy) & 0x1ff) * 512];
-				u32* dst = &bitmap.pix(y, cliprect.min_x);
+				const u16 *src = &m_poly_renderer->colorBuffer3d()[((realy) & 0x1ff) * 512];
+				u32 *dst = &bitmap.pix(y, cliprect.min_x);
 
 				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				{
@@ -907,7 +909,7 @@ u32 hng64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 						// our m_palette_3d has 16 copies of the palette at different brightness levels, so we can pass directly
 						if (srcpix & 0x0800)
 						{
-							*dst = alpha_blend_r32(*(u32*)dst, clut_3d[(srcpix & 0xf7ff) | palbase], 0x80);
+							*dst = alpha_blend_r32(*dst, clut_3d[(srcpix & 0xf7ff) | palbase], 0x80);
 						}
 						else
 						{
@@ -1497,13 +1499,8 @@ void hng64_state::video_start()
 	m_dl = std::make_unique<u16[]>(0x100);
 	m_polys.resize(HNG64_MAX_POLYGONS);
 
-	m_texturerom = memregion("textures0")->base();
-	m_vertsrom = (u16 *)memregion("verts")->base();
-	m_vertsrom_size = memregion("verts")->bytes();
-
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 	m_screen->register_screen_bitmap(m_sprite_zbuffer);
-
 }
 
 
