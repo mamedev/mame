@@ -158,7 +158,6 @@ static INPUT_PORTS_START( fruitctk )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("K0") // K3
 	
 	PORT_START("P1")
-
     PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -299,5 +298,6 @@ ROM_END
 
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 
 
