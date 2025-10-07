@@ -182,7 +182,7 @@ inline uint32_t mb86235_device::decode_ea(uint8_t mode, uint8_t rx, uint8_t ry, 
 inline uint32_t mb86235_device::read_abus(uint32_t addr)
 {
 	if ((addr & 0x3fff) >= 0x400)
-		return m_external.read_dword(addr & 0x3fff);
+		return m_external.read_dword((addr & 0x3fff) + (m_core->eb & 0xffc000));
 	else
 		return m_dataa.read_dword(addr & 0x3ff);
 }
@@ -195,7 +195,7 @@ inline uint32_t mb86235_device::read_bbus(uint32_t addr)
 inline void mb86235_device::write_abus(uint32_t addr, uint32_t data)
 {
 	if ((addr & 0x3fff) >= 0x400)
-		m_external.write_dword(addr & 0x3fff, data);
+		m_external.write_dword((addr & 0x3fff) + (m_core->eb & 0xffc000), data);
 	else
 		m_dataa.write_dword(addr & 0x3ff, data);
 }
