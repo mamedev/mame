@@ -264,11 +264,11 @@ void fruitctk_state::fruitctk(machine_config &config)
 	kbdc.out_sl_callback().set(FUNC(fruitctk_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(fruitctk_state::keyboard_r));          // keyboard Return Lines
 	kbdc.out_disp_callback().set(FUNC(fruitctk_state::display_7seg_data_w));
-  
+   
+	/* Programmable Peripheral Interface */ 
     I8255A(config, "ppi1");
-  
-	I8255A(config, "ppi2");
-	
+    I8255A(config, "ppi2");
+	 
 	/* Video */
 //  config.set_default_layout(layout_marywu);
 	
@@ -299,4 +299,5 @@ ROM_END
 
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 
