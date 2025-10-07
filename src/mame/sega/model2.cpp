@@ -29,7 +29,6 @@
               bypass it by entering then exiting service mode;
     - sgt24h: has input analog issues, steering doesn't center when neutral,
       gas and brake pedals pulses instead of being fixed;
-    - stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
 
     Notes:
@@ -758,12 +757,11 @@ void model2c_state::copro_function_port_w(offs_t offset, u32 data)
 
 void model2c_state::copro_tgpx4_map(address_map &map)
 {
-	map(0x00000000, 0x00007fff).ram().share("copro_tgpx4_program");
+	map(0x00000000, 0x00000fff).ram().share("copro_tgpx4_program");
 }
 
 void model2c_state::copro_tgpx4_data_map(address_map &map)
 {
-//  map(0x00000000, 0x000003ff) internal RAM
 	map(0x00400000, 0x00407fff).ram().share("bufferram").mirror(0x003f8000);
 	map(0x00800000, 0x009fffff).rom().region("copro_data",0); // ROM data
 }
