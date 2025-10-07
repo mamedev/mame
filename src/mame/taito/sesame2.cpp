@@ -2,7 +2,7 @@
 // copyright-holders:stonedDiscord
 /***************************************************************************
 
-Sesame 2 crane game board
+Capriccio Sesame 2 crane game board
 
 セサミ2 ゴ カソボード
 K11J0969A
@@ -12,9 +12,9 @@ Probably related to dinoking.cpp as it's the same CPU and similiar ROM sticker c
 Main CPU: Renesas HD6412394TE20 H8S/2394 (ROMless microcontroller @ 20MHz)
    Sound: OKI MSM9810B 8-channel ADPCM audio
 
-     OSC: 
-  EEPROM: 
-     RAM: Cypress CY7C1021B 64K x 16 Static RAM (44-pin TSOP) x 3 (silkscreened WORK, FRAM0 & FRAM1)
+     OSC: 20MHz
+  EEPROM: Atmel 93C46
+     RAM: None on board
 
 ***************************************************************************/
 
