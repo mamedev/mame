@@ -27,15 +27,11 @@
   Product name: 小方玛丽板
   Product Code: square-mario-baord
   The board has a single marking J373.
-  
-  At back pcb
-  MUSICBAR VER 201.
- 
   string: COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
-  Notes: the ay bgm are unused during attract and gameplay and only playable after press k1 then press start  3 times.
- 
-  3V6 BAT - backup battery to keep nvram
+
   Mainboard
+  18 x 16.5cm.
+  3V6 BAT - backup battery to keep nvram
   U1 AT89C51 - internal rom.
   U2 HM6118LP-3
   U8 EPM7032SLC44-10N 
@@ -44,8 +40,11 @@
   U11 MX 29F1615PC-10
   U12 w27c512 - eeprom
   Y1 10.7386
+  at back
+  MUSICBAR VER 201.
   
-  Led Board.
+  Led Board
+  29 x 20.5cm.
   the LED board says GHY1-PCB and BYP-020 
   U5 Two JFC 95101   
   unpopulated ld32 - led and ds14 ds15 2x  7 segment display 2 digit.
@@ -396,7 +395,8 @@ ROM_START( unkwinw )
 ROM_END
 
 } // anonymous namespace
-//
+
+
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE           INIT         ROT   COMPANY               FULLNAME                                                   FLAGS
 GAME( ????, marywu,  0,      marywu,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING ) // Error 02
 GAME( ????, mary1s,  0,      mary1s,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
