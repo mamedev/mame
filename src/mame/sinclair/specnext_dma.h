@@ -20,7 +20,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void do_write() override;
+	virtual void do_read() override;
 
 private:
 	bool m_dma_mode; // 0 = zxn dma, 1 = z80 dma

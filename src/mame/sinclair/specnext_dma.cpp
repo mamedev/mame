@@ -60,54 +60,22 @@ void specnext_dma_device::write(u8 data)
 	else
 	{
 		int nreg = m_regs_follow[m_cur_follow];
-		z80dma_device::write(data);
 		if(nreg == REGNUM(2, 1))
 		{
 			if (data & 0x20)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(ZXN_PRESCALER);
 		}
+		z80dma_device::write(data);
 	}
 }
 
-void specnext_dma_device::do_write()
+void specnext_dma_device::do_read()
 {
-	if (m_dma_mode)
-	{
-		z80dma_device::do_write();
-		return;
-	}
-	// else (zxnDMA)
-
-	if (m_byte_counter)
-		m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
-
-	switch (TRANSFER_MODE)
-	{
-	case TM_TRANSFER:
-		do_transfer_write();
-		break;
-
-	case TM_SEARCH:
-		do_search();
-		break;
-
-	case TM_SEARCH_TRANSFER:
-		do_transfer_write();
-		do_search();
-		break;
-
-	default:
-		logerror("z80dma_do_operation: invalid mode %d!\n", TRANSFER_MODE);
-		break;
-	}
-
-	m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
-
-	m_byte_counter++;
-	if ((m_byte_counter + 1) == m_count)
+	z80dma_device::do_read();
+	// zxnDMA?
+	if (m_dma_mode == 0 && (m_byte_counter + 1) == m_count)
 		m_byte_counter++;
 }
-
 
 void specnext_dma_device::device_start()
 {

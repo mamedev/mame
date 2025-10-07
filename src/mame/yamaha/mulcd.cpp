@@ -4,6 +4,8 @@
 // HD44780B04/LCD image combo used in the yamaha mus, vl70m, fs1r and
 // probably others
 //
+// LCD layout and font validated against a real mu50
+//
 // Yamaha module name: DM113Z-5BL3
 
 #include "emu.h"
@@ -14,11 +16,11 @@
 DEFINE_DEVICE_TYPE(MULCD,   mulcd_device,   "mulcd",   "Yamaha MU/VL70/FS1R common LCD")
 
 ROM_START( mulcd )
-	ROM_REGION( 525021, "screen", 0)
-	ROM_LOAD( "mulcd.svg", 0, 525021, CRC(81eba091) SHA1(d998f4b508555ddd56b187a868311cd34f28e077))
+	ROM_REGION( 525261, "screen", 0)
+	ROM_LOAD( "mulcd.svg", 0, 525261, CRC(fb3c68ed) SHA1(e18bd29d25b8e5d025ec107adc37021e1f5e85e1))
 
 	ROM_REGION( 0x1000, "cgrom", 0)
-	ROM_LOAD( "hd44780u_b04.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
+	ROM_LOAD( "hd44780u_b04.bin", 0x0000, 0x1000, CRC(126ed6da) SHA1(2ff0899bfee7795ba52a3d56c96edf31d9e6a3f9))
 ROM_END
 
 const tiny_rom_entry *mulcd_device::device_rom_region() const

@@ -469,8 +469,8 @@ private:
 
 		void *              stacksave;              // saved stack pointer
 
-		uint8_t             flagsmap[0x1000];       // flags map
-		uint64_t            flagsunmap[0x20];       // flags unmapper
+		uint8_t             flagsmap[0x100];        // flags map
+		uint32_t            flagsunmap[0x20];       // flags unmapper
 	};
 
 	// resolved memory handler functions
@@ -1047,17 +1047,17 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		if (entry & 0x004) flags |= FLAG_U;
 		if (entry & 0x040) flags |= FLAG_Z;
 		if (entry & 0x080) flags |= FLAG_S;
-		if (entry & 0x800) flags |= FLAG_V;
+		// can't get FLAG_V from lahf
 		m_near.flagsmap[entry] = flags;
 	}
 	for (int entry = 0; entry < std::size(m_near.flagsunmap); entry++)
 	{
-		uint64_t flags = 0;
-		if (entry & FLAG_C) flags |= 0x001;
-		if (entry & FLAG_U) flags |= 0x004;
-		if (entry & FLAG_Z) flags |= 0x040;
-		if (entry & FLAG_S) flags |= 0x080;
-		if (entry & FLAG_V) flags |= 0x800;
+		uint32_t flags = 0;
+		if (entry & FLAG_C) flags |= 0x001 << 8;
+		if (entry & FLAG_U) flags |= 0x004 << 8;
+		if (entry & FLAG_Z) flags |= 0x040 << 8;
+		if (entry & FLAG_S) flags |= 0x080 << 8;
+		// can't set V -> O with sahf
 		m_near.flagsunmap[entry] = flags;
 	}
 
@@ -2387,143 +2387,131 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 	be_parameter maskp(*this, inst.param(1), PTYPE_I);
 
 	// pick a target register for the general case
-	Gp dstreg = dstp.select_register(eax);
+	Gp dstreg = dstp.select_register(edx);
 
-	a.lahf();
-	a.mov(r10, rax);
-
-	// compute mask for flags
-	// can't get FLAG_V from lahf
 	uint32_t flagmask = 0;
-	if (maskp.immediate() & FLAG_C) flagmask |= 0x001;
-	if (maskp.immediate() & FLAG_Z) flagmask |= 0x040;
-	if (maskp.immediate() & FLAG_S) flagmask |= 0x080;
-	if (maskp.immediate() & FLAG_U) flagmask |= 0x004;
 
 	switch (maskp.immediate())
 	{
 		// single flags only
 		case FLAG_C:
-			a.setc(al);                                                                 // setc   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
+			a.setc(al);
+			a.movzx(dstreg, al);
 			break;
 
 		case FLAG_V:
-			a.seto(al);                                                                 // seto   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 1);                                                           // shl    dstreg,1
+			a.seto(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(rax, rax));
 			break;
 
 		case FLAG_Z:
-			a.setz(al);                                                                 // setz   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 2);                                                           // shl    dstreg,2
+			a.setz(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(0, rax, 2));
 			break;
 
 		case FLAG_S:
-			a.sets(al);                                                                 // sets   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 3);                                                           // shl    dstreg,3
+			a.sets(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(0, rax, 3));
 			break;
 
 		case FLAG_U:
-			a.setp(al);                                                                 // setp   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 4);                                                           // shl    dstreg,4
+			a.setp(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(rax, rax));
+			a.lea(dstreg, ptr(0, dstreg, 3));
 			break;
 
 		// carry plus another flag
 		case FLAG_C | FLAG_V:
-			a.setc(al);                                                                 // setc   al
-			a.seto(cl);                                                                 // seto   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 1));                                            // lea    dstreg,[eax+ecx*2]
+			a.setc(al);
+			a.seto(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 1));
 			break;
 
 		case FLAG_C | FLAG_Z:
-			a.setc(al);                                                                 // setc   al
-			a.setz(cl);                                                                 // setz   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 2));                                            // lea    dstreg,[eax+ecx*4]
+			a.setc(al);
+			a.setz(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 2));
 			break;
 
 		case FLAG_C | FLAG_S:
-			a.setc(al);                                                                 // setc   al
-			a.sets(cl);                                                                 // sets   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 3));                                            // lea    dstreg,[eax+ecx*8]
+			a.setc(al);
+			a.sets(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 3));
 			break;
 
 		// overflow plus another flag
 		case FLAG_V | FLAG_Z:
-			a.seto(al);                                                                 // seto   al
-			a.setz(cl);                                                                 // setz   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 1));                                            // lea    dstreg,[eax+ecx*2]
-			a.shl(dstreg, 1);                                                           // shl    dstreg,1
+			a.seto(al);
+			a.setz(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 1));
+			a.lea(dstreg, ptr(dstreg, dstreg));
 			break;
 
 		case FLAG_V | FLAG_S:
-			a.seto(al);                                                                 // seto   al
-			a.sets(cl);                                                                 // sets   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 2));                                            // lea    dstreg,[eax+ecx*4]
-			a.shl(dstreg, 1);                                                           // shl    dstreg,1
+			a.seto(al);
+			a.sets(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 2));
+			a.lea(dstreg, ptr(dstreg, dstreg));
 			break;
 
 		// zero plus another flag
 		case FLAG_Z | FLAG_S:
-			a.setz(al);                                                                 // setz   al
-			a.sets(cl);                                                                 // sets   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 1));                                            // lea    dstreg,[eax+ecx*2]
-			a.shl(dstreg, 2);                                                           // shl    dstreg,2
+			a.setz(al);
+			a.sets(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, 1));
+			a.lea(dstreg, ptr(0, dstreg, 2));
 			break;
 
 		// default cases
 		default:
+			// compute mask for flags
+			if (maskp.immediate() & FLAG_C) flagmask |= 0x001;
+			if (maskp.immediate() & FLAG_Z) flagmask |= 0x040;
+			if (maskp.immediate() & FLAG_S) flagmask |= 0x080;
+			if (maskp.immediate() & FLAG_U) flagmask |= 0x004;
+
+			// can't get FLAG_V from lahf
+			a.lahf();
+			a.seto(cl);
+
+			a.mov(edx, eax);
+			a.shr(edx, 8);
+			a.and_(edx, flagmask);
+			a.movzx(dstreg, byte_ptr(rbp, rdx, 0, offset_from_rbp(&m_near.flagsmap[0])));
+
 			if (maskp.immediate() & FLAG_V)
 			{
-				a.seto(al);
-				a.movzx(ecx, al);
-				a.shl(ecx, 1);
+				a.movzx(ecx, cl);
+				a.lea(r11, ptr(rcx, rcx));
+				a.or_(dstreg, r11d);
 			}
 
-			a.mov(r11, r10);
-			a.shr(r11, 8);
-			a.and_(r11, flagmask);
-			a.movzx(dstreg, byte_ptr(rbp, r11, 0, offset_from_rbp(&m_near.flagsmap[0]))); // movzx  dstreg,[flags_map]
-
-			if (maskp.immediate() & FLAG_V)
-				a.or_(dstreg, ecx);
+			// Restore flags
+			a.add(cl, 0x7f);
+			a.sahf();
 			break;
 	}
 
-	// 32-bit form
 	if (inst.size() == 4)
-		mov_param_reg(a, dstp, dstreg);                                                 // mov   dstp,dstreg
-
-	// 64-bit form
+		mov_param_reg(a, dstp, dstreg); // 32-bit form
 	else if (inst.size() == 8)
-		mov_param_reg(a, dstp, dstreg.r64());                                           // mov   dstp,dstreg
-
-	if (maskp.immediate() & FLAG_V)
-	{
-		// Restore overflow flag
-		a.mov(eax, dstreg);
-		a.shr(eax, 1);
-		a.and_(eax, 1);
-		a.add(al, 0x7f);
-	}
-
-	a.mov(rax, r10);
-	a.sahf();
+		mov_param_reg(a, dstp, dstreg.r64()); // 64-bit form
 }
 
 
@@ -2539,27 +2527,31 @@ void drcbe_x64::op_setflgs(Assembler &a, const instruction &inst)
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
-	a.pushfq();
-	a.and_(qword_ptr(rsp), ~0x8c5);
-
 	if (srcp.is_immediate())
 	{
-		uint64_t const flags = m_near.flagsunmap[srcp.immediate() & FLAGS_ALL];
+		uint32_t const flags = m_near.flagsunmap[srcp.immediate() & FLAGS_ALL];
 		if (!flags)
-			a.xor_(rax, rax);
+			a.xor_(eax, eax);
 		else
-			a.mov(rax, flags);
+			a.mov(eax, flags);
+
+		if (srcp.immediate() & FLAG_V)
+			a.mov(ecx, 1);
+		else
+			a.xor_(ecx, ecx);
 	}
 	else
 	{
-		mov_reg_param(a, rax, srcp);
-		a.and_(rax, FLAGS_ALL);
+		mov_reg_param(a, eax, srcp);
+		a.mov(ecx, FLAG_V);
+		a.and_(ecx, eax);
+		a.and_(eax, FLAGS_ALL);
 
-		a.mov(rax, ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));
+		a.mov(eax, ptr(rbp, rax, 2, offset_from_rbp(&m_near.flagsunmap[0])));
 	}
-	a.or_(qword_ptr(rsp), rax);
 
-	a.popfq();
+	a.add(cl, 0x7f);
+	a.sahf();
 }
 
 
@@ -2578,20 +2570,25 @@ void drcbe_x64::op_save(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state to the destination
-	mov_r64_imm(a, rcx, (uintptr_t)dstp.memory());                                      // mov    rcx,dstp
+	mov_r64_imm(a, rcx, (uintptr_t)dstp.memory());
 
 	// copy flags
-	a.pushfq();                                                                         // pushf
-	a.pop(rax);                                                                         // pop    rax
-	a.and_(eax, 0x8c5);                                                                 // and    eax,0x8c5
-	a.mov(al, ptr(rbp, rax, 0, offset_from_rbp(&m_near.flagsmap[0])));                  // mov    al,[flags_map]
-	a.mov(ptr(rcx, offsetof(drcuml_machine_state, flags)), al);                         // mov    state->flags,al
+	a.lahf();
+	a.seto(dl);
+	a.shr(eax, 8);
+	a.movzx(edx, dl);
+	a.and_(eax, 0x0c5);
+	a.movzx(eax, byte_ptr(rbp, rax, 0, offset_from_rbp(&m_near.flagsmap[0])));
+	a.lea(rax, ptr(rax, rdx, 1));
+	a.mov(ptr(rcx, offsetof(drcuml_machine_state, flags)), al);
 
 	// copy fmod and exp
-	a.mov(al, MABS(&m_state.fmod));                                                     // mov    al,[fmod]
-	a.mov(ptr(rcx, offsetof(drcuml_machine_state, fmod)), al);                          // mov    state->fmod,al
-	a.mov(eax, MABS(&m_state.exp));                                                     // mov    eax,[exp]
-	a.mov(ptr(rcx, offsetof(drcuml_machine_state, exp)), eax);                          // mov    state->exp,eax
+	Mem fmod = MABS(&m_state.fmod);
+	fmod.setSize(1);
+	a.movzx(eax, fmod);
+	a.mov(ptr(rcx, offsetof(drcuml_machine_state, fmod)), al);
+	a.mov(eax, MABS(&m_state.exp));
+	a.mov(ptr(rcx, offsetof(drcuml_machine_state, exp)), eax);
 
 	// copy integer registers
 	int regoffs = offsetof(drcuml_machine_state, r);
@@ -2639,7 +2636,7 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state from the destination
-	mov_r64_imm(a, rcx, (uintptr_t)srcp.memory());                                      // mov    rcx,dstp
+	mov_r64_imm(a, rcx, (uintptr_t)srcp.memory());
 
 	// copy integer registers
 	int regoffs = offsetof(drcuml_machine_state, r);
@@ -2679,13 +2676,13 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	a.mov(MABS(&m_state.exp), eax);
 
 	// copy flags
-	a.pushfq();
-	a.and_(qword_ptr(rsp), ~0x8c5);
 	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, flags)));
+	a.mov(ecx, FLAG_V); // don't need pointer to src any more
+	a.and_(ecx, eax);
 	a.and_(eax, FLAGS_ALL);
-	a.mov(rax, ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));
-	a.or_(qword_ptr(rsp), rax);
-	a.popfq();
+	a.mov(eax, ptr(rbp, rax, 2, offset_from_rbp(&m_near.flagsunmap[0])));
+	a.add(cl, 0x7f);
+	a.sahf();
 }
 
 

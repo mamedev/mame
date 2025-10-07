@@ -80,6 +80,29 @@ Conditions
 | ``ge``      | greater than or equal (signed) | ``COND_GE`` | ``S == V``         |
 +-------------+--------------------------------+-------------+--------------------+
 
+.. _umlinst-flagmask:
+
+Flag masks
+~~~~~~~~~~
+
++-------+-------------+-----------+----------------+
+| Value | Disassembly | Mnemonic  | Usage          |
++=======+=============+===========+================+
+| 0x01  | ``C``       | carry     | ``FLAG_C``     |
++-------+-------------+-----------+----------------+
+| 0x02  | ``V``       | overflow  | ``FLAG_V``     |
++-------+-------------+-----------+----------------+
+| 0x04  | ``Z``       | zero      | ``FLAG_Z``     |
++-------+-------------+-----------+----------------+
+| 0x08  | ``S``       | sign      | ``FLAG_S``     |
++-------+-------------+-----------+----------------+
+| 0x10  | ``U``       | unordered | ``FLAG_U``     |
++-------+-------------+-----------+----------------+
+| 0x00  |             |           | ``FLAGS_NONE`` |
++-------+-------------+-----------+----------------+
+| 0x1f  | ``USZVC``   |           | ``FLAGS_ALL``  |
++-------+-------------+-----------+----------------+
+
 .. _umlinst-roundmode:
 
 Floating point rounding modes
@@ -856,6 +879,58 @@ sign (S)
 unordered (U)
     Set to the value of bit 4 of the ``src`` operand, counting from the
     least significant bit starting from zero.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-getflgs:
+
+GETFLGS
+~~~~~~~
+
+Copy flags.
+
++----------------------+------------------------------------+
+| Disassembly          | Usage                              |
++======================+====================================+
+| .. code-block::      | .. code-block:: C++                |
+|                      |                                    |
+|     getflgs dst,mask |     UML_GETFLGS(block, dst, mask); |
++----------------------+------------------------------------+
+
+The flags corresponding to bit positions that are set in ``mask`` are
+copied to the corresponding bit positions in ``dst``.  Bit positions
+corresponding in ``dst`` that do not correspond to flags or that
+correspond to bit positions that are clear in ``mask`` are cleared.
+
+Back-ends may be able to generate more efficient code if fewer bit
+positions are set in ``mask``.
+
+Operands
+^^^^^^^^
+
+src (32-bit – memory, integer register)
+    The destination where the flags corresponding to bit positions that
+    are set in the ``mask`` operand will be copied.
+mask (flag mask – immediate, map variable)
+    The mask to specify which flags to copy.  Only the least significant
+    five bits of this operand are used.
+
+Flags
+^^^^^
+
+carry (C)
+    Unchanged.
+overflow (V)
+    Unchanged.
+zero (Z)
+    Unchanged.
+sign (S)
+    Unchanged.
+unordered (U)
+    Unchanged.
 
 Simplification rules
 ^^^^^^^^^^^^^^^^^^^^
@@ -3580,6 +3655,55 @@ Simplification rules
   to the instruction size.
 * Immediate values for the ``count`` operand are truncated to five or
   six bits for 32-bit or 64-bit operands, respectively.
+
+.. _umlinst-bswap:
+
+BSWAP
+~~~~~
+
+Reverse the order of bytes within an integer value.
+
++---------------------+----------------------------------+
+| Disassembly         | Usage                            |
++=====================+==================================+
+| .. code-block::     | .. code-block:: C++              |
+|                     |                                  |
+|     bswap   dst,src |     UML_BSWAP(block, dst, src);  |
+|     dbswap  dst,src |     UML_DBSWAP(block, dst, src); |
++---------------------+----------------------------------+
+
+This instruction can be used to convert between big Endian and little
+Endian byte order.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the result will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to have its byte order reversed.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src`` operand is an immediate value.
 
 
 .. _umlinst-fparith:
