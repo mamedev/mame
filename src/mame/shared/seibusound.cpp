@@ -75,19 +75,21 @@
 DEFINE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device, "seibu_sound", "Seibu Sound System")
 
 seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SEIBU_SOUND, tag, owner, clock),
-		m_int_cb(*this),
-		m_coin_io_cb(*this, 0),
-		m_ym_read_cb(*this, 0),
-		m_ym_write_cb(*this),
-		m_sound_rom(*this, finder_base::DUMMY_TAG),
-		m_rom_bank(*this, finder_base::DUMMY_TAG),
-		m_main2sub_pending(false),
-		m_sub2main_pending(false),
-		m_rst10_irq(false),
-		m_rst18_irq(false),
-		m_rst10_service(false),
-		m_rst18_service(false)
+	: device_t(mconfig, SEIBU_SOUND, tag, owner, clock)
+	, m_int_cb(*this)
+	, m_coin_io_cb(*this, 0)
+	, m_ym_read_cb(*this, 0)
+	, m_ym_write_cb(*this)
+	, m_sound_rom(*this, finder_base::DUMMY_TAG)
+	, m_rom_bank(*this, finder_base::DUMMY_TAG)
+	, m_main2sub{0}
+	, m_sub2main{0}
+	, m_main2sub_pending(false)
+	, m_sub2main_pending(false)
+	, m_rst10_irq(false)
+	, m_rst18_irq(false)
+	, m_rst10_service(false)
+	, m_rst18_service(false)
 {
 }
 
@@ -105,7 +107,8 @@ void seibu_sound_device::device_start()
 
 			/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
 			m_rom_bank->set_entry(0);
-		} else
+		}
+		else
 			m_rom_bank->set_base(&m_sound_rom[0x8000]);
 	}
 
@@ -347,53 +350,6 @@ void seibu_sound_common::seibu_sound_map(address_map &map)
 }
 
 /***************************************************************************/
-
-DEFINE_DEVICE_TYPE(SEI80BU, sei80bu_device, "sei80bu", "SEI80BU Encrypted Z80 Interface")
-
-sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SEI80BU, tag, owner, clock),
-		device_rom_interface(mconfig, *this)
-{
-}
-
-u8 sei80bu_device::data_r(offs_t offset)
-{
-	u16 const a = offset;
-	u8 src = read_byte(offset);
-
-	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
-	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
-	if ( BIT(a,11) & ~BIT(a,8) &  BIT(a,1)) src ^= 0x04;
-	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
-	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
-
-	if (BIT(a,13) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,3,2,0,1);
-	if (BIT(a, 8) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,2,3,1,0);
-
-	return src;
-}
-
-u8 sei80bu_device::opcode_r(offs_t offset)
-{
-	u16 const a = offset;
-	u8 src = read_byte(offset);
-
-	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
-	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
-	if (~BIT(a,13) & BIT(a,12))             src ^= 0x20;
-	if (~BIT(a,6)  &  BIT(a,1))             src ^= 0x10;
-	if (~BIT(a,12) &  BIT(a,2))             src ^= 0x08;
-	if ( BIT(a,11) & ~BIT(a,8) &  BIT(a,1)) src ^= 0x04;
-	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
-	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
-
-	if (BIT(a,13) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,3,2,0,1);
-	if (BIT(a, 8) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,2,3,1,0);
-	if (BIT(a,12) &  BIT(a,9)) src = bitswap<8>(src,7,6,4,5,3,2,1,0);
-	if (BIT(a,11) & ~BIT(a,6)) src = bitswap<8>(src,6,7,5,4,3,2,1,0);
-
-	return src;
-}
 
 /***************************************************************************
     Seibu ADPCM device

@@ -19,7 +19,7 @@
     Legionnaire               "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC."
     Raiden 2                  "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC." (YM2151 substituted for YM3812, plus extra MSM6205)
     Raiden DX                 "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC." (YM2151 substituted for YM3812, plus extra MSM6205)
-    Cup Soccer                "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC."
+    Seibu Cup Soccer          "START UP PROGRAM V1.02 (C)1986 SEIBU KAIHATSU INC."
     SD Gundam Psycho Salamander "Copyright by King Bee Sol 1991"
     * = encrypted
 
@@ -31,8 +31,6 @@
 
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
-
-#include "dirom.h"
 
 
 class seibu_sound_common {
@@ -117,24 +115,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device)
-
-
-// SEI80BU (Z80 program decryption)
-
-class sei80bu_device : public device_t, public device_rom_interface<16>
-{
-public:
-	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	u8 data_r(offs_t offset);
-	u8 opcode_r(offs_t offset);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override { }
-};
-
-DECLARE_DEVICE_TYPE(SEI80BU, sei80bu_device)
 
 // Seibu ADPCM device
 
