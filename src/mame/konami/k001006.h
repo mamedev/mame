@@ -34,15 +34,15 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<uint16_t[]>      m_pal_ram;
+	std::unique_ptr<uint16_t[]>     m_pal_ram;
 	std::unique_ptr<uint16_t[]>     m_unknown_ram;
 	uint32_t       m_addr;
-	int          m_device_sel;
+	uint32_t       m_device_sel;
 
 	std::unique_ptr<uint8_t[]>     m_texrom;
 
 	required_region_ptr<uint8_t> m_gfxrom;
-	bool m_enable_bilinear = false;
+	bool m_enable_bilinear;
 };
 
 

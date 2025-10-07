@@ -703,6 +703,7 @@ void pingpong_state::pingpong(machine_config &config)
 	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz (probably)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::pingpong_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pingpong_state::pingpong_interrupt), "screen", 0, 1);
+
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware

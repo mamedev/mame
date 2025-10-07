@@ -82,11 +82,12 @@ with the following code:
 #include "emu.h"
 #include "fromance.h"
 
+#include "mahjong.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/msm5205.h"
 #include "sound/ymopl.h"
-#include "vsystem_gga.h"
+
 #include "speaker.h"
 
 
@@ -188,20 +189,15 @@ void fromance_state::fromance_portselect_w(uint8_t data)
 
 uint8_t fromance_state::fromance_keymatrix_r()
 {
-	int ret = 0xff;
+	int ret = 0x3f;
 
-	if (m_portselect & 0x01)
-		ret &= ioport("KEY1")->read();
-	if (m_portselect & 0x02)
-		ret &= ioport("KEY2")->read();
-	if (m_portselect & 0x04)
-		ret &= ioport("KEY3")->read();
-	if (m_portselect & 0x08)
-		ret &= ioport("KEY4")->read();
-	if (m_portselect & 0x10)
-		ret &= ioport("KEY5")->read();
+	for (unsigned i = 0; m_key_matrix.size() > i; ++i)
+	{
+		if (BIT(m_portselect, i))
+			ret &= m_key_matrix[i]->read();
+	}
 
-	return ret;
+	return 0xc0 | ret;
 }
 
 
@@ -333,59 +329,6 @@ void fromance_state::fromance_sub_io_map(address_map &map)
  *
  *************************************/
 
-static INPUT_PORTS_START( mahjong_panel )
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( nekkyoku )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -459,7 +402,7 @@ static INPUT_PORTS_START( nekkyoku )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -536,7 +479,7 @@ static INPUT_PORTS_START( idolmj )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -611,7 +554,7 @@ static INPUT_PORTS_START( fromance )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -686,7 +629,7 @@ static INPUT_PORTS_START( nmsengen )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -758,7 +701,7 @@ static INPUT_PORTS_START( daiyogen )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -783,53 +726,53 @@ static INPUT_PORTS_START( mjnatsu )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-		PORT_START("DSW2")
-		PORT_DIPNAME( 0x07, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!1,!2,!3")
-		PORT_DIPSETTING(    0x00, "1" )
-		PORT_DIPSETTING(    0x04, "2" )
-		PORT_DIPSETTING(    0x02, "3" )
-		PORT_DIPSETTING(    0x06, "4" )
-		PORT_DIPSETTING(    0x01, "5" )
-		PORT_DIPSETTING(    0x05, "6" )
-		PORT_DIPSETTING(    0x03, "7" )
-		PORT_DIPSETTING(    0x07, "8" )
-		PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!4,!5")
-		PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-		PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-		PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-		PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
-		PORT_DIPNAME( 0x20, 0x00, "Ignore FURITEN" )        PORT_DIPLOCATION("SW1:!6")
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-		PORT_DIPNAME( 0x40, 0x00, "PINFU with TSUMO" )      PORT_DIPLOCATION("SW1:!7")
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-		PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:!8")
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR(Difficulty) )       PORT_DIPLOCATION("SW1:!1,!2,!3")  // 難易度
+	PORT_DIPSETTING(    0x00, "1 (easy)" )                                                  // 易
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x06, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x05, "6" )
+	PORT_DIPSETTING(    0x03, "7" )
+	PORT_DIPSETTING(    0x07, "8 (hard)" )                                                  // 難
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR(Coinage) )          PORT_DIPLOCATION("SW1:!4,!5")     // コイン
+	PORT_DIPSETTING(    0x18, DEF_STR(3C_1C) )                                              // ３コイン１クレジット
+	PORT_DIPSETTING(    0x08, DEF_STR(2C_1C) )                                              // ２コイン１クレジット
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_1C) )                                              // １コイン１クレジット
+	PORT_DIPSETTING(    0x10, DEF_STR(1C_2C) )                                              // １コイン２クレジット
+	PORT_DIPNAME( 0x20, 0x00, "Allow Kuitan" )            PORT_DIPLOCATION("SW1:!6")        // 食い断
+	PORT_DIPSETTING(    0x20, DEF_STR(No) )                                                 // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                // 有
+	PORT_DIPNAME( 0x40, 0x00, "Allow Pinfu with Tsumo" )  PORT_DIPLOCATION("SW1:!7")        // 平和・ツモ複合
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )                                                 // 無
+	PORT_DIPSETTING(    0x40, DEF_STR(Yes) )                                                // 有
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Flip_Screen) )      PORT_DIPLOCATION("SW1:!8")        // 画面反転
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                // 正
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                                 // 逆
 
-		PORT_START("DSW1")
-		PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:!1")
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-		PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-		PORT_DIPNAME( 0x06, 0x00, "Player Initial Score" )  PORT_DIPLOCATION("SW2:!2,!3")
-		PORT_DIPSETTING(    0x00, "1,000" )
-		PORT_DIPSETTING(    0x04, "2,000" )
-		PORT_DIPSETTING(    0x02, "3,000" )
-		PORT_DIPSETTING(    0x06, "5,000" )
-		PORT_DIPNAME( 0x08, 0x00, "Start GOLD" )        PORT_DIPLOCATION("SW2:!4")
-		PORT_DIPSETTING(    0x00, "1,000" )
-		PORT_DIPSETTING(    0x08, "6,000" )
-	PORT_DIPNAME( 0x10, 0x00, "Item Shop Voice" )       PORT_DIPLOCATION("SW2:!5")
-		PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-		PORT_DIPNAME( 0x20, 0x00, "Stop Button (N)" )       PORT_DIPLOCATION("SW2:!6")
-		PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-		PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Allow_Continue) )   PORT_DIPLOCATION("SW2:!1")        // コンティニュー
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                 // 有
+	PORT_DIPNAME( 0x06, 0x00, "Player Initial Score" )    PORT_DIPLOCATION("SW2:!2,!3")     // プレイヤー持ち点
+	PORT_DIPSETTING(    0x00, "1,000" )
+	PORT_DIPSETTING(    0x04, "2,000" )
+	PORT_DIPSETTING(    0x02, "3,000" )
+	PORT_DIPSETTING(    0x06, "5,000" )
+	PORT_DIPNAME( 0x08, 0x00, "Starting Gold" )           PORT_DIPLOCATION("SW2:!4")        // スタート時ＧＯＬＤ
+	PORT_DIPSETTING(    0x00, "1,000" )
+	PORT_DIPSETTING(    0x08, "6,000" )
+	PORT_DIPNAME( 0x10, 0x00, "Item Shop Voice" )         PORT_DIPLOCATION("SW2:!5")        // アイテム売り音声
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                 // 有
+	PORT_DIPNAME( 0x20, 0x00, "Stop Button (N)" )         PORT_DIPLOCATION("SW2:!6")        // ストップボタン（Ｎ）
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                 // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )                                          // 固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )                                          // 固定
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 

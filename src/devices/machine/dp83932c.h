@@ -42,9 +42,6 @@ protected:
 	void update_interrupts();
 	bool address_filter(u8 *buf);
 
-	// diagnostic helper
-	void dump_bytes(u8 *buf, int length);
-
 	enum registers : unsigned
 	{
 		CR    = 0x00, // command

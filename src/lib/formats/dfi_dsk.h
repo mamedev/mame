@@ -18,7 +18,6 @@ public:
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
-	virtual bool supports_save() const noexcept override;
 };
 
 extern const dfi_format FLOPPY_DFI_FORMAT;

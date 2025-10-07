@@ -4530,6 +4530,56 @@ ROM_START( bsharku )
 	ROM_LOAD( "c34-28.ic95", 0xa00, 0x144, CRC(bf7c2a41) SHA1(59fe561e9ff509c72e8ae8f22a75b6911d150de0) ) // PAL20L8
 ROM_END
 
+ROM_START( bsharkuo )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE( "c34_13.98", 0x00000, 0x20000, CRC(bc55fc14) SHA1(e598023482c2df856a98ca05d9680917e62e7f3f) )
+	ROM_LOAD16_BYTE( "c34_11.75", 0x00001, 0x20000, CRC(decb522c) SHA1(e9fff03fac2d093821e88cf12ee558375b33b046) )
+	ROM_LOAD16_BYTE( "c34_12.97", 0x40000, 0x20000, CRC(30394013) SHA1(bd028eaecc93a7181f57d05824b50847ad733afd) )
+	ROM_LOAD16_BYTE( "c34_10.74", 0x40001, 0x20000, CRC(3a852420) SHA1(e905d97348e774284c4cec269f40a2ad1061c74e) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 512K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "c34_16.128", 0x00000, 0x20000, CRC(6869fa99) SHA1(16221f25c865a81ca4f6a987b6de02a3ccf3208c) )
+	ROM_LOAD16_BYTE( "c34_14.112", 0x00001, 0x20000, CRC(c09c0f91) SHA1(32c78924617328abb11c094f89a90a92e72ed5e6) )
+	ROM_LOAD16_BYTE( "c34_17.129", 0x40000, 0x20000, CRC(4798358f) SHA1(de943d7ac1db1de5696845496d00654840233502) )
+	ROM_LOAD16_BYTE( "c34_15.113", 0x40001, 0x20000, CRC(451d9053) SHA1(9af1942516591297ba184fa6f9edc02a6c8a7030) )
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c34_05.3", 0x00000, 0x80000, CRC(596b83da) SHA1(826cf1e48a017a0cbfcc4a4f507dfb285594178b) )  /* SCR 8x8 */
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "c34_04.17", 0x000000, 0x080000, CRC(2446b0da) SHA1(bce5c73533e2bb7dfa7f18fad510f818cf1a542a) )    /* OBJ 16x8 */
+	ROM_LOAD64_WORD_SWAP( "c34_03.16", 0x000002, 0x080000, CRC(a18eab78) SHA1(155f0efbfe73e18355804477d4b8954bb47bf1ef) )
+	ROM_LOAD64_WORD_SWAP( "c34_02.15", 0x000004, 0x080000, CRC(8488ba10) SHA1(60f8f0dc9d4bc6bc452527250221c9915e9dfe6e) )
+	ROM_LOAD64_WORD_SWAP( "c34_01.14", 0x000006, 0x080000, CRC(3ebe8c63) SHA1(fa7403bf895c041cb64234209c944683ae372e57) )
+
+	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
+	ROM_LOAD16_WORD( "c34_07.42", 0x00000, 0x80000, CRC(edb07808) SHA1(f32b4b93e9125536376d96fbca76c2b2f5f78656) ) /* ROD, road lines */
+
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
+	ROM_LOAD16_WORD( "c34_06.12", 0x00000, 0x80000, CRC(d200b6eb) SHA1(6bfe3a7dde8d4e983521877d2bb176f5d126b763) )  /* STY spritemap */
+
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
+	ROM_LOAD( "c34_08.127", 0x00000, 0x80000, CRC(89a30450) SHA1(96b96ca5a3e20cdceb9ac5ddf377fb21a9a529fb) )
+
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
+	ROM_LOAD( "c34_09.126", 0x00000, 0x80000, CRC(39d12b50) SHA1(5c5d1369597604376943e4825f6c09cc28d66047) )
+
+	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
+	ROM_LOAD( "c34_18.22", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
+	ROM_LOAD( "c34_19.72", 0x00000, 0x00100, CRC(2ee9c404) SHA1(3a2ddaaaf7abe9f47f7e062b002fd3a61c80f60b) ) // road/sprite priority and palette select
+	ROM_LOAD( "c34_20.89", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
+	ROM_LOAD( "c34_21.7",  0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) )
+	ROM_LOAD( "c34_22.8",  0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) )
+
+	ROM_REGION( 0xc00, "pld", ROMREGION_ERASE00 )
+	ROM_LOAD( "c34-23.ic27", 0x000, 0x104, CRC(82942887) SHA1(6405a43f459c8fbdc3aec0d91ecf8eb2652f597d) ) // PAL16L8
+	ROM_LOAD( "c34-24.ic65", 0x200, 0x104, CRC(be080005) SHA1(1a721b300b0d4cb12b55429849154143aec4fa3a) ) // PAL16L8
+	ROM_LOAD( "c34-25.ic66", 0x400, 0x144, CRC(d0ee97ee) SHA1(3d88e44d9bb5824a9a513c020b254a0ff82cf871) ) // PAL20L8
+	ROM_LOAD( "c34-26.ic67", 0x600, 0x144, CRC(022ee90f) SHA1(a9f7d25a8fd74ae2305bf2286f8807fa4c51d018) ) // PAL20L8
+	ROM_LOAD( "c34-27.ic94", 0x800, 0x144, CRC(a503352a) SHA1(5cc92eab18685dadf912d0f52457bc091b6446cd) ) // PAL20L8
+	ROM_LOAD( "c34-28.ic95", 0xa00, 0x144, CRC(bf7c2a41) SHA1(59fe561e9ff509c72e8ae8f22a75b6911d150de0) ) // PAL20L8
+ROM_END
+
 ROM_START( bsharkj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c34_71.98", 0x00000, 0x20000, CRC(df1fa629) SHA1(6cb207e577fac85da654f3dc56e2f9f25c38a76d) )
@@ -5627,6 +5677,7 @@ GAMEL(1988, enforceja,  enforce,  enforce,   enforceja, contcirc_state,         
 
 GAME( 1989, bshark,     0,        bshark,    bshark,    taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bsharku,    bshark,   bshark,    bsharku,   taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharkuo,   bshark,   bshark,    bsharku,   taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bsharkj,    bshark,   bshark,    bsharkj,   taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bsharkjjs,  bshark,   bsharkjjs, bsharkjjs, taitoz_state,           empty_init,  ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan, Joystick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

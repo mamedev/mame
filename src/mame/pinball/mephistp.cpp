@@ -44,7 +44,7 @@ public:
 	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart(*this, "m_uart")
+		, m_uart(*this, "muart")
 		, m_aysnd(*this, "aysnd")
 		, m_soundbank(*this, "soundbank")
 		//, m_io_keyboard(*this, "X%d", 0U)
@@ -134,7 +134,7 @@ void mephisto_state::mephisto_map(address_map &map)
 {
 	map(0x00000, 0x07fff).rom().region("maincpu", 0).mirror(0x8000);
 	map(0x10000, 0x107ff).ram().share("nvram");
-	map(0x12000, 0x1201f).rw("m_uart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x12000, 0x1201f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x13000, 0x130ff).rw("ic20", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x13800, 0x13807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x14000, 0x140ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
@@ -148,7 +148,7 @@ void mephisto_state::sport2k_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
 	map(0x20000, 0x21fff).ram().share("nvram");
-	map(0x2a000, 0x2a01f).rw("m_uart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x2a000, 0x2a01f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x2b000, 0x2b0ff).rw("ic20", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x2b800, 0x2b807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x2c000, 0x2c0ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
@@ -212,20 +212,20 @@ void mephisto_state::mephisto(machine_config &config)
 	/* basic machine hardware */
 	I8088(config, m_maincpu, XTAL(18'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mephisto_map);
-	//m_maincpu->set_irq_acknowledge_callback("m_uart", FUNC(i8256_device::inta_callback));
+	//m_maincpu->set_irq_acknowledge_callback(m_uart, FUNC(i8256_device::inta_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	//config.set_default_layout(layout_mephistp);
 
-	i8256_device &m_uart(I8256(config, "m_uart", XTAL(18'000'000)/3));
-	m_uart.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	//m_uart.txd_handler().set_inputline("audiocpu", MCS51_RX_LINE);
+	I8256(config, m_uart, XTAL(18'000'000)/3);
+	m_uart->int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//m_uart->txd_handler().set_inputline("audiocpu", MCS51_RX_LINE);
 
 	I8155(config, "ic20", XTAL(18'000'000)/6);
 	//i8155_device &i8155_1(I8155(config, "ic20", XTAL(18'000'000)/6));
-	//i8155_1.out_to_callback().set("m_uart", FUNC(i8256_device::write_txc));
+	//i8155_1.out_to_callback().set(m_uart, FUNC(i8256_device::write_txc));
 
 	I8155(config, "ic9", XTAL(18'000'000)/6);
 	//i8155_device &i8155_2(I8155(config, "ic9", XTAL(18'000'000)/6));
@@ -336,7 +336,7 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1987,  mephistpn,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (newer?)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME(1987,  mephistpn,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (newer?)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -148,9 +148,4 @@ bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const st
 	return true;
 }
 
-bool apridisk_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const apridisk_format FLOPPY_APRIDISK_FORMAT;

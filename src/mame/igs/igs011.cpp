@@ -3437,8 +3437,10 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( lhb2 )
+	// defaults based on manual for lhb2cpgs
+
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x02, "Payout Rate" )           PORT_DIPLOCATION("SW1:1,2,3") // 機率調整
+	PORT_DIPNAME( 0x07, 0x04, "Payout Rate" )           PORT_DIPLOCATION("SW1:1,2,3") // 機率調整
 	PORT_DIPSETTING(    0x07, "50%" )
 	PORT_DIPSETTING(    0x06, "54%" )
 	PORT_DIPSETTING(    0x05, "58%" )
@@ -3533,6 +3535,30 @@ static INPUT_PORTS_START( lhb2 )
 
 	PORT_MODIFY("KEY4")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( lhb2cpgs )
+	// The manual provides two sets of recommended settings for DIP SW.1:
+	//       文台建議值                            武台建議值
+	// SW 1   ON  ON OFF  ON  ON OFF OFF OFF        ON OFF  ON OFF OFF OFF OFF OFF
+
+	//       建議調法
+	// SW 2  OFF OFF OFF OFF OFF OFF OFF OFF
+	// SW 3  OFF OFF OFF OFF OFF OFF OFF OFF
+
+	PORT_INCLUDE( lhb2 )
+
+	PORT_MODIFY("DSW3")
+	// listed in manual but not shown in test mode - what does this actually do?
+	PORT_DIPNAME( 0x70, 0x70, "Lottery Ticket Ratio" )  PORT_DIPLOCATION("SW3:5,6,7") // 彩票比例
+	PORT_DIPSETTING(    0x70, "1:1" )
+	PORT_DIPSETTING(    0x60, "1:2" )
+	PORT_DIPSETTING(    0x50, "1:5" )
+	PORT_DIPSETTING(    0x40, "1:6" )
+	PORT_DIPSETTING(    0x30, "1:7" )
+	PORT_DIPSETTING(    0x20, "1:8" )
+	PORT_DIPSETTING(    0x10, "1:9" )
+	PORT_DIPSETTING(    0x00, "1:10" )
 INPUT_PORTS_END
 
 
@@ -4963,7 +4989,7 @@ ROM_START( lhb2 )
 	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )  // 2 banks
 ROM_END
 
-ROM_START( lhb2cpgs )
+ROM_START( lhb2cpgs ) // 龍虎榜II 搓牌高手 (Lóng Hǔ Bǎng II Cuō Pái Gāoshǒu)
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "v127c.u29", 0x00000, 0x80000, CRC(d6025580) SHA1(1aa4e248380d1e70ef18d81073b5ab578d848f89) )
 
@@ -5245,7 +5271,7 @@ GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_oki_stat
 GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_oki_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_oki_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_oki_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2cpgs,      lhb2,     lhb2cpgs,        lhb2,      igs011_oki_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
+GAME( 1996, lhb2cpgs,      lhb2,     lhb2cpgs,        lhb2cpgs,  igs011_oki_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_oki_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, lhb3,          lhb2,     lhb3,            lhb2,      igs011_oki_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_oki_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )

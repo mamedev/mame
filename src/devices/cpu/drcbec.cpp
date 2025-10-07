@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drcbec.c
+    drcbec.cpp
 
     Interpreted C core back-end for the universal machine language.
 
@@ -15,6 +15,7 @@
 
 #include "debug/debugcpu.h"
 
+#include <cfenv>
 #include <cmath>
 
 
@@ -28,6 +29,14 @@ using namespace uml;
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
+
+const int rounding_map[4] =
+{
+	FE_TOWARDZERO,  // ROUND_TRUNC
+	FE_TONEAREST,   // ROUND_ROUND
+	FE_UPWARD,      // ROUND_CEIL
+	FE_DOWNWARD     // ROUND_FLOOR
+};
 
 // define a bit to match each possible condition, starting at bit 12
 constexpr uint32_t ZBIT  = 0x1000 << (COND_Z & 15);
@@ -728,6 +737,9 @@ void drcbe_c::get_info(drcbe_info &info) const noexcept
 
 int drcbe_c::execute(code_handle &entry)
 {
+	// save environment
+	int const feround = std::fegetround();
+
 	// get the entry point
 	const drcbec_instruction *inst = (const drcbec_instruction *)entry.codeptr();
 	assert_in_cache(m_cache, inst);
@@ -786,6 +798,7 @@ int drcbe_c::execute(code_handle &entry)
 				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_EXIT, 4, 0):
+				std::fesetround(feround);
 				return PARAM0;
 
 			case MAKE_OPCODE_SHORT(OP_JMP, 4, 1):       // JMP     imm[,c]
@@ -856,7 +869,8 @@ int drcbe_c::execute(code_handle &entry)
 			// ----------------------- Internal Register Operations -----------------------
 
 			case MAKE_OPCODE_SHORT(OP_SETFMOD, 4, 0):   // SETFMOD src
-				m_state.fmod = PARAM0;
+				m_state.fmod = PARAM0 & 0x03;
+				std::fesetround(rounding_map[PARAM0 & 0x03]);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_GETFMOD, 4, 0):   // GETFMOD dst
@@ -884,7 +898,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RESTORE, 4, 0):   // RESTORE dst
 			case MAKE_OPCODE_SHORT(OP_RESTORE, 4, 1):   // RESTORE dst
 				m_state = *inst[0].state;
-				flags = inst[0].state->flags;
+				flags = m_state.flags &= FLAGS_ALL;
+				std::fesetround(rounding_map[m_state.fmod &= 0x03]);
 				break;
 
 
@@ -1455,9 +1470,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RORC, 4, 0):      // RORC    dst,src,count[,f]
 				shift = PARAM2 & 31;
 				if (shift > 1)
-					PARAM0 = (PARAM1 >> shift) | (((flags & FLAG_C) << 31) >> (shift - 1)) | (PARAM1 << (33 - shift));
+					PARAM0 = (PARAM1 >> shift) | (uint32_t(flags & FLAG_C) << (32 - shift)) | (PARAM1 << (33 - shift));
 				else if (shift == 1)
-					PARAM0 = (PARAM1 >> shift) | ((flags & FLAG_C) << 31);
+					PARAM0 = (PARAM1 >> shift) | (uint32_t(flags & FLAG_C) << 31);
 				else
 					PARAM0 = PARAM1;
 				break;
@@ -1465,9 +1480,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RORC, 4, 1):
 				shift = PARAM2 & 31;
 				if (shift > 1)
-					temp32 = (PARAM1 >> shift) | (((flags & FLAG_C) << 31) >> (shift - 1)) | (PARAM1 << (33 - shift));
+					temp32 = (PARAM1 >> shift) | (uint32_t(flags & FLAG_C) << (32 - shift)) | (PARAM1 << (33 - shift));
 				else if (shift == 1)
-					temp32 = (PARAM1 >> shift) | ((flags & FLAG_C) << 31);
+					temp32 = (PARAM1 >> shift) | (uint32_t(flags & FLAG_C) << 31);
 				else
 					temp32 = PARAM1;
 				flags = FLAGS32_NZ(temp32) | (((shift != 0) ? (PARAM1 >> (shift - 1)) : flags) & FLAG_C);
@@ -2084,9 +2099,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RORC, 8, 0):      // DRORC   dst,src,count[,f]
 				shift = DPARAM2 & 63;
 				if (shift > 1)
-					DPARAM0 = (DPARAM1 >> shift) | ((((uint64_t)flags & FLAG_C) << 63) >> (shift - 1)) | (DPARAM1 << (65 - shift));
+					DPARAM0 = (DPARAM1 >> shift) | (uint64_t(flags & FLAG_C) << (64 - shift)) | (DPARAM1 << (65 - shift));
 				else if (shift == 1)
-					DPARAM0 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
+					DPARAM0 = (DPARAM1 >> shift) | (uint64_t(flags & FLAG_C) << 63);
 				else
 					DPARAM0 = DPARAM1;
 				break;
@@ -2094,9 +2109,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RORC, 8, 1):
 				shift = DPARAM2 & 63;
 				if (shift > 1)
-					temp64 = (DPARAM1 >> shift) | ((((uint64_t)flags & FLAG_C) << 63) >> (shift - 1)) | (DPARAM1 << (65 - shift));
+					temp64 = (DPARAM1 >> shift) | (uint64_t(flags & FLAG_C) << (64 - shift)) | (DPARAM1 << (65 - shift));
 				else if (shift == 1)
-					temp64 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
+					temp64 = (DPARAM1 >> shift) | (uint64_t(flags & FLAG_C) << 63);
 				else
 					temp64 = DPARAM1;
 				flags = FLAGS64_NZ(temp64) | (((shift != 0) ? (DPARAM1 >> (shift - 1)) : flags) & FLAG_C);

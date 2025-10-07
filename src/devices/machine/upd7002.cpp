@@ -10,8 +10,6 @@
 #include "upd7002.h"
 
 
-/* Device Interface */
-
 DEFINE_DEVICE_TYPE(UPD7002, upd7002_device, "upd7002", "uPD7002 ADC")
 
 upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -21,7 +19,7 @@ upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, d
 	, m_data0(0)
 	, m_digitalvalue(0)
 	, m_conversion_counter(0)
-	, m_get_analogue_cb(*this)
+	, m_get_analogue_cb(*this, 0)
 	, m_eoc_cb(*this)
 {
 }
@@ -33,8 +31,6 @@ upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, d
 void upd7002_device::device_start()
 {
 	m_conversion_timer = timer_alloc(FUNC(upd7002_device::conversion_complete), this);
-	m_get_analogue_cb.resolve();
-	m_eoc_cb.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_status));
@@ -61,7 +57,6 @@ void upd7002_device::device_reset()
 /*****************************************************************************
  Implementation
 *****************************************************************************/
-
 
 int upd7002_device::eoc_r()
 {
@@ -109,8 +104,6 @@ uint8_t upd7002_device::read(offs_t offset)
 
 void upd7002_device::write(offs_t offset, uint8_t data)
 {
-	/* logerror("write to uPD7002 $%02X = $%02X\n",offset,data); */
-
 	switch (offset & 0x03)
 	{
 	case 0:
@@ -121,21 +114,21 @@ void upd7002_device::write(offs_t offset, uint8_t data)
 		    D3 defines whether an 8 (0) or 12 (1) bit resolution conversion should occur
 		    D4 to D7 not used.
 
-		    an 8  bit conversion typically takes 4ms
-		    an 12 bit conversion typically takes 10ms
+		    an 8 bit conversion typically takes 4ms
+		    a 12 bit conversion typically takes 10ms
 
 		    writing to this register will initiate a conversion.
 		*/
 
 		/* set D6=0 busy ,D7=1 conversion not complete */
-		m_status=(data & 0x0f) | 0x80;
+		m_status = (data & 0x0f) | 0x80;
 
 		// call the EOC function with EOC from status
 		// eoc_r(0) this has just been set to 1
 		m_eoc_cb(1);
 
 		/* the uPD7002 works by sampling the analogue value at the start of the conversion
-		   so it is read hear and stored until the end of the A to D conversion */
+		   so it is read here and stored until the end of the A to D conversion */
 
 		// this function should return a 16 bit value.
 		m_digitalvalue = m_get_analogue_cb(m_status & 0x03);

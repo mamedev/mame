@@ -3247,8 +3247,7 @@ ROM_START(terabrst)
 	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "715uel_m48t58y.35d", 0x000000, 0x002000, CRC(57322db4) SHA1(59cb8cd6ab446bf8781e3dddf902a4ff2484068e) )
 
-	ROM_REGION( 0x0000224, "security_eeprom", 0 )
-	ROM_LOAD( "security_eeprom", 0x000000, 0x000224, NO_DUMP ) // Unused?
+	// security EEPROM not populated for this game
 ROM_END
 
 ROM_START(terabrstj)
@@ -3277,8 +3276,7 @@ ROM_START(terabrstj)
 	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_jel", 0x000000, 0x002000, BAD_DUMP CRC(bcf8610f) SHA1(b52e4ca707cf36f16fb3ba29a8a8f5dc4a42be7b) ) // hand built
 
-	ROM_REGION( 0x0000224, "security_eeprom", 0 )
-	ROM_LOAD( "security_eeprom", 0x000000, 0x000224, NO_DUMP ) // Unused?
+	// security EEPROM not populated for this game
 ROM_END
 
 ROM_START(terabrsta)
@@ -3307,8 +3305,7 @@ ROM_START(terabrsta)
 	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_hel", 0x000000, 0x002000, BAD_DUMP CRC(1bf1278d) SHA1(40d437eb7428a42c0d8eb47cbcebc95ff8dc1767) ) // hand built
 
-	ROM_REGION( 0x0000224, "security_eeprom", 0 )
-	ROM_LOAD( "security_eeprom", 0x000000, 0x000224, NO_DUMP ) // Unused?
+	// security EEPROM not populated for this game
 ROM_END
 
 ROM_START(terabrstua)
@@ -3337,8 +3334,7 @@ ROM_START(terabrstua)
 	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_uaa", 0x000000, 0x002000, BAD_DUMP CRC(60509b6a) SHA1(5938587770bdf5569c8b4c7413967869bddfcf84) ) // hand built
 
-	ROM_REGION( 0x0000224, "security_eeprom", 0 )
-	ROM_LOAD( "security_eeprom", 0x000000, 0x000224, NO_DUMP ) // Unused?
+	// security EEPROM not populated for this game
 ROM_END
 
 ROM_START(terabrstja)
@@ -3367,8 +3363,7 @@ ROM_START(terabrstja)
 	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_jaa", 0x000000, 0x002000, BAD_DUMP CRC(ac54bdf9) SHA1(0139d29db112f9581a94091c2fac008e5c9f855d) ) // hand built
 
-	ROM_REGION( 0x0000224, "security_eeprom", 0 )
-	ROM_LOAD( "security_eeprom", 0x000000, 0x000224, NO_DUMP ) // Unused?
+	// security EEPROM not populated for this game
 ROM_END
 
 ROM_START(terabrstaa)
@@ -3397,8 +3392,7 @@ ROM_START(terabrstaa)
 	ROM_REGION(0x2000, "m48t58", 0)
 	ROM_LOAD( "m48t58y-70pc1_haa", 0x000000, 0x002000, BAD_DUMP CRC(960b864e) SHA1(9f6d7b81689777b98c0e1b6ac41135604da48429) ) // hand built
 
-	ROM_REGION( 0x0000224, "security_eeprom", 0 )
-	ROM_LOAD( "security_eeprom", 0x000000, 0x000224, NO_DUMP ) // Unused?
+	// security EEPROM not populated for this game
 ROM_END
 
 ROM_START(thrilldgeu) // GE713UF sticker, does not have the chip at 2G since it uses the rev A network board

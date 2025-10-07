@@ -269,6 +269,12 @@ void model2_state::machine_reset()
 	m_copro_fifo_out->clear();
 	m_geo_write_start_address = 0;
 	m_geo_read_start_address = 0;
+
+	const int irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
+	for (auto irq : irq_type)
+	{
+		m_maincpu->set_input_line(irq, CLEAR_LINE);
+	}
 }
 
 void model2_state::reset_model2_scsp()
@@ -513,9 +519,9 @@ u32 model2_tgp_state::copro_inv_r(offs_t offset)
 	u32 result = m_copro_tgp_tables[index | 0x8000];
 	u8 bexp = (m_copro_inv_base >> 23) & 0xff;
 	u8 exp = (result >> 23) + (0x7f - bexp);
-	result = (result & 0x807fffff) | (exp << 23);
-	if(m_copro_inv_base & 0x80000000)
-		result ^= 0x80000000;
+	result = (result & 0x007fffff) | (exp << 23);
+	if (m_copro_inv_base & 0x80000000 && offset)
+		result |= 0x80000000;
 	return result;
 }
 
@@ -601,9 +607,6 @@ void model2_tgp_state::copro_fifo_w(u32 data)
 	}
 	else
 		m_copro_fifo_in->push(u32(data));
-
-	// 1 wait state for i960; prevents Manx TT course select rotation bug
-	m_maincpu->spin_until_time(attotime::from_nsec(40));
 }
 
 

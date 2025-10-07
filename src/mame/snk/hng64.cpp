@@ -681,6 +681,7 @@ LVS-DG2
 #define LOG_SNDCOM_UNKNWN   (1U << 2)
 #define LOG_DMA             (1U << 3)
 #define LOG_VREGS           (1U << 4)
+#define LOG_SYSREGS         (1U << 5)
 
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -696,18 +697,18 @@ LVS-DG2
 
 */
 
-void hng64_state::hng_comm_map(address_map &map)
+void hng64_state::comm_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom().region("comm", 0);
 	map(0x20000, 0x3ffff).bankr(m_com_bank);
 	map(0x40000, 0x47fff).mirror(0xb8000).ram();
 }
 
-void hng64_state::hng_comm_io_map(address_map &map)
+void hng64_state::comm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	/* Reserved for the KL5C80 internal hardware */
-//  map(0x00, 0x07).rw(FUNC(hng64_state::hng64_comm_mmu_r), FUNC(hng64_state::hng64_comm_mmu_w));
+//  map(0x00, 0x07).rw(FUNC(hng64_state::comm_mmu_r), FUNC(hng64_state::comm_mmu_w));
 //  map(0x08, 0x1f).noprw();              /* Reserved */
 //  map(0x20, 0x25).rw(hng64_state::));   /* Timer/Counter B */           /* hng64 writes here */
 //  map(0x27, 0x27).noprw();              /* Reserved */
@@ -721,8 +722,8 @@ void hng64_state::hng_comm_io_map(address_map &map)
 
 	/* General IO */
 //  map(0x40, 0x47).rw("ulanc", FUNC(com20020_device::read), FUNC(com20020_device::write));
-	map(0x50, 0x57).rw(FUNC(hng64_state::hng64_com_share_r), FUNC(hng64_state::hng64_com_share_w));
-	map(0x72, 0x72).w(FUNC(hng64_state::hng64_com_bank_w));
+	map(0x50, 0x57).rw(FUNC(hng64_state::com_share_r), FUNC(hng64_state::com_share_w));
+	map(0x72, 0x72).w(FUNC(hng64_state::com_bank_w));
 //  map(0x73, 0x73).w(hng64_state::));            /* dunno yet */
 }
 
@@ -736,59 +737,60 @@ void hng64_state::reset_net()
 void hng64_state::hng64_network(machine_config &config)
 {
 	KL5C80A12(config, m_comm, HNG64_MASTER_CLOCK / 4);        /* KL5C80A12CFP - binary compatible with Z80. */
-	m_comm->set_addrmap(AS_PROGRAM, &hng64_state::hng_comm_map);
-	m_comm->set_addrmap(AS_IO, &hng64_state::hng_comm_io_map);
+	m_comm->set_addrmap(AS_PROGRAM, &hng64_state::comm_map);
+	m_comm->set_addrmap(AS_IO, &hng64_state::comm_io_map);
 }
 
 
-uint32_t hng64_state::hng64_com_r(offs_t offset, uint32_t mem_mask)
+u32 hng64_state::com_r(offs_t offset, u32 mem_mask)
 {
-	LOGMASKED(LOG_COMRW, "com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_COMRW, "com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
 	return m_idt7133_dpram[offset];
 }
 
-void hng64_state::hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::com_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_COMRW, "com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_idt7133_dpram[offset]);
 }
 
 /* TODO: fully understand this */
-void hng64_state::hng64_com_share_mips_w(offs_t offset, uint8_t data)
+void hng64_state::com_share_mips_w(offs_t offset, u8 data)
 {
 	m_com_shared[offset ^ 3] = data;
 }
 
-uint8_t hng64_state::hng64_com_share_mips_r(offs_t offset)
+u8 hng64_state::com_share_mips_r(offs_t offset)
 {
 	return m_com_shared[offset];
 }
 
-void hng64_state::hng64_com_share_w(offs_t offset, uint8_t data)
+void hng64_state::com_share_w(offs_t offset, u8 data)
 {
 	m_com_shared[offset] = data;
 }
 
-uint8_t hng64_state::hng64_com_share_r(offs_t offset)
+u8 hng64_state::com_share_r(offs_t offset)
 {
-	if(offset == 4)
+	if (offset == 4)
 		return m_com_shared[offset] | 1; // some busy flag?
 
 	return m_com_shared[offset];
 }
 
-void hng64_state::hng64_com_bank_w(uint8_t data)
+void hng64_state::com_bank_w(u8 data)
 {
 	m_com_bank->set_entry(data & 0x03);
 }
 
 
-uint32_t hng64_state::hng64_rtc_r(offs_t offset, uint32_t mem_mask)
+u32 hng64_state::rtc_r(offs_t offset, u32 mem_mask)
 {
 	if (offset & 1)
 	{
 		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
-		int rtc_addr = offset >> 1;
+		const int rtc_addr = offset >> 1;
 
 		// bit 4 disables "system log reader" (the device is 4-bit? so this bit is not from the device?)
 		if ((rtc_addr & 0xf) == 0xd)
@@ -799,7 +801,8 @@ uint32_t hng64_state::hng64_rtc_r(offs_t offset, uint32_t mem_mask)
 	else
 	{
 		// shouldn't happen unless something else is mapped here too
-		LOG("%s: unhandled hng64_rtc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+		if (!machine().side_effects_disabled())
+			LOG("%s: unhandled rtc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
 		return 0xffffffff;
 	}
 }
@@ -812,28 +815,26 @@ void hng64_state::do_dma(address_space &space)
 	LOGMASKED(LOG_DMA, "Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
 	while (m_dma_len >= 0)
 	{
-		uint32_t dat;
-
-		dat = space.read_dword(m_dma_start);
-		space.write_dword(m_dma_dst, dat);
+		space.write_dword(m_dma_dst, space.read_dword(m_dma_start));
 		m_dma_start += 4;
 		m_dma_dst += 4;
 		m_dma_len--;
 	}
 }
 
-uint32_t hng64_state::hng64_dmac_r(offs_t offset, uint32_t mem_mask)
+u32 hng64_state::dmac_r(offs_t offset, u32 mem_mask)
 {
 	// DMAC seems to be mapped as 4 bytes in every 8
 	if ((offset * 4) == 0x54)
 		return 0x00000000; //dma status, 0x800
 
-	LOG("%s: unhandled hng64_dmac_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+	if (!machine().side_effects_disabled())
+		LOG("%s: unhandled dmac_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
 
 	return 0xffffffff;
 }
 
-void hng64_state::hng64_dmac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::dmac_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
 {
 	// DMAC seems to be mapped as 4 bytes in every 8
 	switch (offset * 4)
@@ -852,12 +853,12 @@ void hng64_state::hng64_dmac_w(address_space &space, offs_t offset, uint32_t dat
 	case 0x4c: // (0x0101 - trigger) (0x0000 - after DMA)
 	case 0x5c: // (0x0008 - trigger?) after 0x4c
 	default:
-		LOG("%s: unhandled hng64_dmac_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+		LOG("%s: unhandled dmac_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 		break;
 	}
 }
 
-void hng64_state::hng64_rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::rtc_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (offset & 1)
 	{
@@ -867,33 +868,35 @@ void hng64_state::hng64_rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	else
 	{
 		// shouldn't happen unless something else is mapped here too
-		LOG("%s: unhandled hng64_rtc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+		LOG("%s: unhandled rtc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 	}
 }
 
-void hng64_state::hng64_mips_to_iomcu_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::mips_to_iomcu_irq_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
 	LOG("%s: HNG64 writing to SYSTEM Registers %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), data, mem_mask);
 	if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
 }
 
-uint32_t hng64_state::hng64_irqc_r(offs_t offset, uint32_t mem_mask)
+u32 hng64_state::irqc_r(offs_t offset, u32 mem_mask)
 {
 	if ((offset * 4) == 0x04)
 	{
-		LOG("%s: irq level READ %04x\n", machine().describe_context(), m_irq_level);
+		if (!machine().side_effects_disabled())
+			LOG("%s: irq level READ %04x\n", machine().describe_context(), m_irq_level);
 		return m_irq_level;
 	}
 	else
 	{
-		LOG("%s: unhandled hng64_irqc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+		if (!machine().side_effects_disabled())
+			LOG("%s: unhandled irqc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
 	}
 
 	return 0xffffffff;
 }
 
-void hng64_state::hng64_irqc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::irqc_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -905,7 +908,7 @@ void hng64_state::hng64_irqc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		break;
 
 	default:
-		LOG("%s: unhandled hng64_irqc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		LOG("%s: unhandled irqc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
 		break;
 	}
 }
@@ -940,41 +943,41 @@ void hng64_state::hng64_irqc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
   ----
 */
 
-uint32_t hng64_state::hng64_sysregs_r(offs_t offset, uint32_t mem_mask)
+u32 hng64_state::sysregs_r(offs_t offset, u32 mem_mask)
 {
-	//LOG("%s: hng64_sysregs_r (%04x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+	//LOG("%s: sysregs_r (%04x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
 
-	switch(offset*4)
+	switch (offset * 4)
 	{
 		case 0x001c: return 0x00000000; // 0x00000040 must not be set or games won't boot
 		//case 0x106c:
 		//case 0x107c:
 		case 0x1084:
-			LOG("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
+			if (!machine().side_effects_disabled())
+				LOG("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
 			return 0x00000002; //MCU->MIPS latch port
 	}
 
 	return m_sysregs[offset];
 }
 
-void hng64_state::raster_irq_pos_w(uint32_t data)
+void hng64_state::raster_irq_pos_w(u32 data)
 {
 	m_raster_irq_pos[m_irq_pos_half] = data;
 
 	m_irq_pos_half ^= 1;
 }
 
-void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::sysregs_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	COMBINE_DATA (&m_sysregs[offset]);
+	COMBINE_DATA(&m_sysregs[offset]);
 
-#if 0
-	if(((offset*4) & 0xff00) == 0x1100)
-		logerror("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
-#endif
-	int scanline = m_screen->vpos();
+	if (((offset * 4) & 0xff00) == 0x1100)
+		LOGMASKED(LOG_SYSREGS, "%s: HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", machine().describe_context(), offset*4, m_sysregs[offset], m_maincpu->pc());
 
-	switch(offset*4)
+	const int scanline = m_screen->vpos();
+
+	switch (offset * 4)
 	{
 		/*
 		case 0x0014:
@@ -1005,7 +1008,7 @@ void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		    break;
 		*/
 		default:
-			logerror("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) on scanline %d\n", machine().describe_context(), offset * 4, data, mem_mask, scanline);
+			LOGMASKED(LOG_SYSREGS, "%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) on scanline %d\n", machine().describe_context(), offset * 4, data, mem_mask, scanline);
 	}
 }
 
@@ -1014,9 +1017,10 @@ void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 * MIPS side Dual Port RAM hookup for MCU
 **************************************/
 
-uint8_t hng64_state::hng64_dualport_r(offs_t offset)
+u8 hng64_state::dualport_r(offs_t offset)
 {
-	LOG("%s: dualport R %04x\n", machine().describe_context(), offset);
+	if (!machine().side_effects_disabled())
+		LOG("%s: dualport R %04x\n", machine().describe_context(), offset);
 
 	// hack, this should just be put in ram at 0x600 by the MCU.
 	if (!(m_mcu_en == 0x0c))
@@ -1054,10 +1058,10 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
     need to work out what triggers the interrupt, as a write to 0 wouldn't as the Dual Port RAM interrupts
     are on addresses 0x7fe and 0x7ff (we're using an address near the system regs, based on code analysis
-    it seems correct, see hng64_mips_to_iomcu_irq_w )
+    it seems correct, see mips_to_iomcu_irq_w )
 */
 
-void hng64_state::hng64_dualport_w(offs_t offset, uint8_t data)
+void hng64_state::dualport_w(offs_t offset, u8 data)
 {
 	m_dt71321_dpram->right_w(offset, data);
 	LOG("%s: dualport WRITE %04x %02x\n", machine().describe_context(), offset, data);
@@ -1068,14 +1072,12 @@ void hng64_state::hng64_dualport_w(offs_t offset, uint8_t data)
 /* The following is guesswork, needs confirmation with a test on the real board. */
 // every sprite is 0x20 bytes
 //
-void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::sprite_clear_even_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
-	uint32_t spr_offs;
-
-	spr_offs = (offset) * 0x40;
+	const u32 spr_offs = (offset) * 0x40;
 	// for one sprite
-	if(ACCESSING_BITS_16_31)
+	if (ACCESSING_BITS_16_31)
 	{
 		mspace.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x08+0x00+spr_offs, 0x00000000);
@@ -1083,7 +1085,7 @@ void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32
 		mspace.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
 	}
 	// for another sprite
-	if(ACCESSING_BITS_8_15)
+	if (ACCESSING_BITS_8_15)
 	{
 		mspace.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x08+0x20+spr_offs, 0x00000000);
@@ -1092,14 +1094,12 @@ void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32
 	}
 }
 
-void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::sprite_clear_odd_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
-	uint32_t spr_offs;
-
-	spr_offs = (offset) * 0x40;
+	const u32 spr_offs = (offset) * 0x40;
 	// for one sprite
-	if(ACCESSING_BITS_16_31)
+	if (ACCESSING_BITS_16_31)
 	{
 		mspace.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
 	//  mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (2nd slash)
@@ -1107,7 +1107,7 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 		mspace.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
 	}
 	// for another sprite
-	if(ACCESSING_BITS_0_15)
+	if (ACCESSING_BITS_0_15)
 	{
 		mspace.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
 	//  mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (1st slash)
@@ -1116,16 +1116,16 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 	}
 }
 
-void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::vregs_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	LOGMASKED(LOG_VREGS, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+	LOGMASKED(LOG_VREGS, "vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
 
-	uint32_t newval = m_videoregs[offset];
+	u32 newval = m_videoregs[offset];
 	COMBINE_DATA(&newval);
 
 	if (newval != m_videoregs[offset])
 	{
-		int vpos = m_screen->vpos();
+		const int vpos = m_screen->vpos();
 
 		if (vpos > 0)
 			m_screen->update_partial(vpos - 1);
@@ -1134,24 +1134,29 @@ void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-uint16_t hng64_state::main_sound_comms_r(offs_t offset)
+u16 hng64_state::main_sound_comms_r(offs_t offset)
 {
-	switch(offset *2)
+	switch (offset * 2)
 	{
+		case 0x00:
+			return main_latch[0];
+		case 0x02:
+			return main_latch[1];
 		case 0x04:
 			return sound_latch[0];
 		case 0x06:
 			return sound_latch[1];
 		default:
-			LOGMASKED(LOG_SNDCOM_UNKNWN, "%08x R\n",offset*2);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_SNDCOM_UNKNWN, "%08x R\n",offset*2);
 			break;
 	}
 	return 0;
 }
 
-void hng64_state::main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void hng64_state::main_sound_comms_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	switch(offset * 2)
+	switch (offset * 2)
 	{
 		case 0x00:
 			COMBINE_DATA(&main_latch[0]);
@@ -1160,9 +1165,12 @@ void hng64_state::main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_
 			COMBINE_DATA(&main_latch[1]);
 			break;
 		case 0x08:
-			m_audiocpu->set_input_line(5, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
-			if(data & 0xfe)
-				LOGMASKED(LOG_SNDCOM_UNKNWN, "IRQ send %02x?\n",data);
+			if (data & 1)
+			{
+				m_audiocpu->set_input_line(5, ASSERT_LINE);
+				// let the V53 catch up
+				m_maincpu->spin_until_time(attotime::from_usec(5));
+			}
 			break;
 		default:
 			LOGMASKED(LOG_SNDCOM_UNKNWN, "%02x %04x\n",offset*2,data);
@@ -1171,43 +1179,43 @@ void hng64_state::main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_
 }
 
 
-void hng64_state::hng_map(address_map &map)
+void hng64_state::main_map(address_map &map)
 {
 	// main RAM / ROM
-	map(0x00000000, 0x00ffffff).ram().share("mainram");
+	map(0x00000000, 0x00ffffff).ram().share(m_mainram);
 	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0);
 
 	// Misc Peripherals
-	map(0x1f700000, 0x1f7010ff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs"); // various things
+	map(0x1f700000, 0x1f7010ff).rw(FUNC(hng64_state::sysregs_r), FUNC(hng64_state::sysregs_w)).share(m_sysregs); // various things
 
-	map(0x1f701100, 0x1f70111f).rw(FUNC(hng64_state::hng64_irqc_r), FUNC(hng64_state::hng64_irqc_w));
-	map(0x1f701200, 0x1f70127f).rw(FUNC(hng64_state::hng64_dmac_r), FUNC(hng64_state::hng64_dmac_w));
+	map(0x1f701100, 0x1f70111f).rw(FUNC(hng64_state::irqc_r), FUNC(hng64_state::irqc_w));
+	map(0x1f701200, 0x1f70127f).rw(FUNC(hng64_state::dmac_r), FUNC(hng64_state::dmac_w));
 	// 1f702004 used (rarely writes 01 or a random looking value as part of init sequences)
-	map(0x1f702100, 0x1f70217f).rw(FUNC(hng64_state::hng64_rtc_r), FUNC(hng64_state::hng64_rtc_w));
-	map(0x1f7021c4, 0x1f7021c7).w(FUNC(hng64_state::hng64_mips_to_iomcu_irq_w));
+	map(0x1f702100, 0x1f70217f).rw(FUNC(hng64_state::rtc_r), FUNC(hng64_state::rtc_w));
+	map(0x1f7021c4, 0x1f7021c7).w(FUNC(hng64_state::mips_to_iomcu_irq_w));
 
 	// SRAM.  Coin data, Player Statistics, etc.
 	map(0x1f800000, 0x1f803fff).ram().share("nvram");
 
 	// Dualport RAM (shared with IO MCU)
-	map(0x1f808000, 0x1f8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
+	map(0x1f808000, 0x1f8087ff).rw(FUNC(hng64_state::dualport_r), FUNC(hng64_state::dualport_w)).umask32(0xffffffff);
 
 	// BIOS ROM
-	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0);
+	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("bios", 0);
 
 	// Sprites
-	map(0x20000000, 0x2000bfff).ram().share("spriteram");
-	map(0x2000d800, 0x2000e3ff).w(FUNC(hng64_state::hng64_sprite_clear_even_w));
-	map(0x2000e400, 0x2000efff).w(FUNC(hng64_state::hng64_sprite_clear_odd_w));
-	map(0x20010000, 0x20010013).ram().share("spriteregs");
+	map(0x20000000, 0x2000bfff).ram().share(m_spriteram);
+	map(0x2000d800, 0x2000e3ff).w(FUNC(hng64_state::sprite_clear_even_w));
+	map(0x2000e400, 0x2000efff).w(FUNC(hng64_state::sprite_clear_odd_w));
+	map(0x20010000, 0x20010013).ram().share(m_spriteregs);
 
 	// Backgrounds
-	map(0x20100000, 0x2017ffff).ram().w(FUNC(hng64_state::hng64_videoram_w)).share("videoram");    // Tilemap
-	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
+	map(0x20100000, 0x2017ffff).ram().w(FUNC(hng64_state::videoram_w)).share(m_videoram);    // Tilemap
+	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::vregs_w)).share(m_videoregs);
 
 	// Mixing
-	map(0x20200000, 0x20203fff).ram().w(FUNC(hng64_state::pal_w)).share("paletteram");
-	map(0x20208000, 0x2020805f).w(FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
+	map(0x20200000, 0x20203fff).ram().w(FUNC(hng64_state::pal_w)).share(m_paletteram);
+	map(0x20208000, 0x2020805f).w(FUNC(hng64_state::tcram_w)).share(m_tcram);   // Transition Control
 	map(0x20208000, 0x2020805f).r(FUNC(hng64_state::tcram_r));
 
 	// 3D display list control
@@ -1218,27 +1226,27 @@ void hng64_state::hng_map(address_map &map)
 	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::dl_vreg_r));
 
 	// 3D framebuffer
-	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::hng64_fbcontrol_r), FUNC(hng64_state::hng64_fbcontrol_w)).umask32(0xffffffff);
-	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbscale_w)).share("fbscale");
-	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w)).share("fbscroll");
-	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).share("fbunk");
+	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::fbcontrol_r), FUNC(hng64_state::fbcontrol_w)).umask32(0xffffffff);
+	map(0x30000004, 0x30000007).w(FUNC(hng64_state::fbscale_w)).share(m_fbscale);
+	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::fbscroll_w)).share(m_fbscroll);
+	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::fbunkbyte_w)).share(m_fbunk);
 	// as the below registers are used at render time, not mixing time, it's possible the above scroll/scale registers are too
-	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::hng64_texture_wrapsize_table_r), FUNC(hng64_state::hng64_texture_wrapsize_table_w)).umask32(0xffffffff);
+	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::texture_wrapsize_table_r), FUNC(hng64_state::texture_wrapsize_table_w)).umask32(0xffffffff);
 
-	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_fbram1_r), FUNC(hng64_state::hng64_fbram1_w)).share("fbram1");  // 3D Display Buffer A
-	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_fbram2_r), FUNC(hng64_state::hng64_fbram2_w)).share("fbram2");  // 3D Display Buffer B
+	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::fbram1_r), FUNC(hng64_state::fbram1_w)).share(m_fbram1);  // 3D Display Buffer A
+	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::fbram2_r), FUNC(hng64_state::fbram2_w)).share(m_fbram2);  // 3D Display Buffer B
 
 	// Sound
-	map(0x60000000, 0x601fffff).rw(FUNC(hng64_state::hng64_soundram2_r), FUNC(hng64_state::hng64_soundram2_w)); // actually seems unmapped, see note in audio/hng64.c
-	map(0x60200000, 0x603fffff).rw(FUNC(hng64_state::hng64_soundram_r), FUNC(hng64_state::hng64_soundram_w));   // program + data for V53A gets uploaded here
+	map(0x60000000, 0x601fffff).rw(FUNC(hng64_state::soundram2_r), FUNC(hng64_state::soundram2_w)); // actually seems unmapped, see note in audio/hng64.c
+	map(0x60200000, 0x603fffff).rw(FUNC(hng64_state::soundram_r), FUNC(hng64_state::soundram_w));   // program + data for V53A gets uploaded here
 
 	// These are sound ports of some sort
 	map(0x68000000, 0x6800000f).rw(FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
-	map(0x6f000000, 0x6f000003).w(FUNC(hng64_state::hng64_soundcpu_enable_w));
+	map(0x6f000000, 0x6f000003).w(FUNC(hng64_state::soundcpu_enable_w));
 
 	// Dualport RAM (shared with Communications CPU)
-	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
-	map(0xc0001000, 0xc0001007).ram().share("comhack");//.rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
+	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::com_r), FUNC(hng64_state::com_w)).share("com_ram");
+	map(0xc0001000, 0xc0001007).ram().share(m_comhack);//.rw(FUNC(hng64_state::com_share_mips_r), FUNC(hng64_state::com_share_mips_w));
 }
 
 
@@ -1741,20 +1749,20 @@ static const gfx_layout hng64_16x16x8_spritelayout =
 	32*64
 };
 
-static const uint32_t texlayout_xoffset[1024] = { STEP1024(0,8) };
-static const uint32_t texlayout_yoffset[1024] = { STEP1024(0,8192) };
+static const u32 texlayout_xoffset[1024] = { STEP1024(0,8) };
+static const u32 texlayout_yoffset[1024] = { STEP1024(0,8192) };
 
-template <uint32_t... Values>
-static auto const &texlayout_xoffset_4(std::integer_sequence<uint32_t, Values...>)
+template <u32... Values>
+static auto const &texlayout_xoffset_4(std::integer_sequence<u32, Values...>)
 {
-	static constexpr uint32_t const s_values[sizeof...(Values)] = { ((Values * 4) ^ 4)... };
+	static constexpr u32 const s_values[sizeof...(Values)] = { ((Values * 4) ^ 4)... };
 	return s_values;
 }
 
-template <uint32_t... Values>
-static auto const &texlayout_yoffset_4(std::integer_sequence<uint32_t, Values...>)
+template <u32... Values>
+static auto const &texlayout_yoffset_4(std::integer_sequence<u32, Values...>)
 {
-	static constexpr uint32_t const s_values[sizeof...(Values)] = { (Values * 4096)... };
+	static constexpr u32 const s_values[sizeof...(Values)] = { (Values * 4096)... };
 	return s_values;
 }
 
@@ -1781,8 +1789,8 @@ static const gfx_layout hng64_1024x1024x4_texlayout =
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
 	1024*2048*4,
-	texlayout_xoffset_4(std::make_integer_sequence<uint32_t, 1024>()),
-	texlayout_yoffset_4(std::make_integer_sequence<uint32_t, 2048>())
+	texlayout_xoffset_4(std::make_integer_sequence<u32, 1024>()),
+	texlayout_yoffset_4(std::make_integer_sequence<u32, 2048>())
 };
 
 
@@ -1803,13 +1811,13 @@ static GFXDECODE_START( gfx_hng64 )
 
 GFXDECODE_END
 
-static void hng64_reorder( uint8_t* gfxregion, size_t gfxregionsize)
+static void hng64_reorder(u8* gfxregion, size_t gfxregionsize)
 {
 	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
 	// reorder them
-	uint8_t tilesize = 4*8; // 4 bytes per line, 8 lines
+	const u8 tilesize = 4*8; // 4 bytes per line, 8 lines
 
-	std::vector<uint8_t> buffer(gfxregionsize);
+	std::vector<u8> buffer(gfxregionsize);
 
 	for (int i = 0; i < gfxregionsize/2; i += tilesize)
 	{
@@ -1820,14 +1828,14 @@ static void hng64_reorder( uint8_t* gfxregion, size_t gfxregionsize)
 	memcpy(gfxregion, &buffer[0], gfxregionsize);
 }
 
-void hng64_state::init_hng64_reorder_gfx()
+void hng64_state::init_reorder_gfx()
 {
 	hng64_reorder(memregion("scrtile")->base(), memregion("scrtile")->bytes());
 }
 
 void hng64_state::init_hng64()
 {
-	init_hng64_reorder_gfx();
+	init_reorder_gfx();
 }
 
 void hng64_state::init_hng64_fght()
@@ -1839,7 +1847,7 @@ void hng64_state::init_hng64_fght()
 void hng64_state::init_ss64()
 {
 	init_hng64_fght();
-	m_samsho64_3d_hack = 1;
+	m_samsho64_3d_hack = true;
 }
 
 void hng64_state::init_hng64_drive()
@@ -1851,7 +1859,7 @@ void hng64_state::init_hng64_drive()
 void hng64_state::init_roadedge()
 {
 	init_hng64_drive();
-	m_roadedge_3d_hack = 1;
+	m_roadedge_3d_hack = true;
 }
 
 void hng64_state::init_hng64_shoot()
@@ -1860,7 +1868,7 @@ void hng64_state::init_hng64_shoot()
 	init_hng64();
 }
 
-void hng64_state::set_irq(uint32_t irq_vector)
+void hng64_state::set_irq(u32 irq_vector)
 {
 	/*
 	    TODO:
@@ -2100,11 +2108,11 @@ void hng64_state::set_irq(uint32_t irq_vector)
 
 	m_irq_pending |= irq_vector;
 
-	if(m_irq_pending)
+	if (m_irq_pending)
 	{
-		for(int i = 0; i < 31; i++)
+		for (int i = 0; i < 31; i++)
 		{
-			if(m_irq_pending & 1 << i)
+			if (m_irq_pending & 1 << i)
 			{
 				m_irq_level = i;
 				break;
@@ -2119,7 +2127,7 @@ void hng64_state::set_irq(uint32_t irq_vector)
 
 TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 {
-	int scanline = param;
+	const int scanline = param;
 
 	if (!(scanline & 1)) // in reality there are half as many scanlines, as we're running in interlace mode
 	{
@@ -2149,11 +2157,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 void hng64_state::machine_start()
 {
 	/* 1 meg of virtual address space for the com cpu */
-	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
-	m_com_op_base = std::make_unique<uint8_t[]>(0x10000);
+	m_com_virtual_mem = std::make_unique<u8[]>(0x100000);
+	m_com_op_base = std::make_unique<u8[]>(0x10000);
 
-	m_soundram = std::make_unique<uint16_t[]>(0x200000 / 2);
-	m_soundram2 = std::make_unique<uint16_t[]>(0x200000 / 2);
+	m_soundram = std::make_unique<u16[]>(0x200000 / 2);
+	m_soundram2 = std::make_unique<u16[]>(0x200000 / 2);
 
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
@@ -2177,12 +2185,13 @@ void hng64_state::machine_start()
 
 	m_irq_pending = 0;
 
-	m_3dfifo_timer = timer_alloc(FUNC(hng64_state::hng64_3dfifo_processed), this);
+	m_3dfifo_timer = timer_alloc(FUNC(hng64_state::_3dfifo_processed), this);
 	m_comhack_timer = timer_alloc(FUNC(hng64_state::comhack_callback), this);
 
 	m_com_bank->configure_entries(0, 4, memregion("comm")->base(), 0x20000);
 	m_com_bank->set_entry(0);
 
+	init_sound();
 	init_io();
 
 	save_pointer(NAME(m_com_virtual_mem), 0x100000);
@@ -2233,7 +2242,7 @@ TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
 	LOG("comhack_callback %04x\n\n", m_comhack[0]);
 
 	// different network IDs give different default colours for the cars in roadedge
-	uint8_t network_id = 0x01;
+	u8 network_id = 0x01;
 
 	// this fixes the stuck scroller text in the xrally intro (largest pink text) but prevents the inputs from working.
 	// It's probably trying to sync the scroller with another unit? however the original machines can run as singles
@@ -2278,7 +2287,7 @@ void hng64_state::machine_reset()
 
 ***********************************************/
 
-void hng64_state::ioport1_w(uint8_t data)
+void hng64_state::ioport1_w(u8 data)
 {
 	//LOG("%s: ioport1_w %02x\n", machine().describe_context(), data);
 
@@ -2299,20 +2308,20 @@ void hng64_state::ioport1_w(uint8_t data)
 }
 
 // it does write 0xff here before each set of reading, but before setting a new output address?
-void hng64_state::ioport3_w(uint8_t data)
+void hng64_state::ioport3_w(u8 data)
 {
 
 	if (m_port1 & 0x08) // 0x08 in port1 enables write? otherwise it writes 0xff to port 7 all the time, when port 7 is also lamps
 	{
-		int addr = (m_port1 & 0xe0) >> 5;
+		const int addr = (m_port1 & 0xe0) >> 5;
 		m_lamps->lamps_w(addr, data);
 	}
 }
 
 
-uint8_t hng64_state::ioport3_r()
+u8 hng64_state::ioport3_r()
 {
-	int addr = (m_port1&0xe0)>>5;
+	const int addr = (m_port1 & 0xe0) >> 5;
 
 	//LOG("%s: ioport3_r (from address %02x) (other bits of m_port1 %02x)\n", machine().describe_context(), addr, m_port1 & 0x1f);
 	return m_in[addr]->read();
@@ -2320,7 +2329,7 @@ uint8_t hng64_state::ioport3_r()
 
 DEFINE_DEVICE_TYPE(HNG64_LAMPS, hng64_lamps_device, "hng64_lamps", "HNG64 Lamps")
 
-hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, HNG64_LAMPS, tag, owner, clock)
 	, m_lamps_out_cb(*this)
 {
@@ -2330,7 +2339,7 @@ void hng64_lamps_device::device_start()
 {
 }
 
-void hng64_state::hng64_drive_lamps7_w(uint8_t data)
+void hng64_state::drive_lamps7_w(u8 data)
 {
 	/*
 	   0x80 - BGM Select #2 (Active High)
@@ -2344,7 +2353,7 @@ void hng64_state::hng64_drive_lamps7_w(uint8_t data)
 	*/
 }
 
-void hng64_state::hng64_drive_lamps6_w(uint8_t data)
+void hng64_state::drive_lamps6_w(u8 data)
 {
 	/*
 	   0x80 - BGM Select #4 (Active High)
@@ -2356,15 +2365,15 @@ void hng64_state::hng64_drive_lamps6_w(uint8_t data)
 	   0x02
 	   0x01 - Coin Counter #1
 	*/
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-void hng64_state::hng64_drive_lamps5_w(uint8_t data)
+void hng64_state::drive_lamps5_w(u8 data)
 {
 	// force feedback steering position
 }
 
-void hng64_state::hng64_shoot_lamps7_w(uint8_t data)
+void hng64_state::shoot_lamps7_w(u8 data)
 {
 	/*
 	   0x80
@@ -2388,7 +2397,7 @@ void hng64_state::hng64_shoot_lamps7_w(uint8_t data)
     0x00004000 gun #3
 */
 
-void hng64_state::hng64_shoot_lamps6_w(uint8_t data)
+void hng64_state::shoot_lamps6_w(u8 data)
 {
 	// Start Lamp #1 / #2 don't get written to the output port, is this a TLCS870 bug or are they not connected to the 'lamp' outputs, they do get written to the DP ram, see above notes
 	/*
@@ -2403,7 +2412,7 @@ void hng64_state::hng64_shoot_lamps6_w(uint8_t data)
 	*/
 }
 
-void hng64_state::hng64_fight_lamps6_w(uint8_t data)
+void hng64_state::fight_lamps6_w(u8 data)
 {
 	/*
 	   0x80
@@ -2415,8 +2424,8 @@ void hng64_state::hng64_fight_lamps6_w(uint8_t data)
 	   0x02 - Coin Counter #2
 	   0x01 - Coin Counter #1
 	*/
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 
@@ -2426,7 +2435,7 @@ void hng64_state::hng64_fight_lamps6_w(uint8_t data)
 
 ***********************************************/
 
-void hng64_state::ioport7_w(uint8_t data)
+void hng64_state::ioport7_w(u8 data)
 {
 	/* Port bits
 
@@ -2470,18 +2479,19 @@ void hng64_state::ioport7_w(uint8_t data)
 	m_port7 = data;
 }
 
-uint8_t hng64_state::ioport0_r()
+u8 hng64_state::ioport0_r()
 {
-	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
-	uint8_t ret = m_dt71321_dpram->left_r(addr);
+	const u16 addr = (m_ex_ramaddr | (m_ex_ramaddr_upper << 9)) & 0x7ff;
+	const u8 ret = m_dt71321_dpram->left_r(addr);
 
-	LOG("%s: ioport0_r %02x (from address %04x)\n", machine().describe_context(), ret, addr);
+	if (!machine().side_effects_disabled())
+		LOG("%s: ioport0_r %02x (from address %04x)\n", machine().describe_context(), ret, addr);
 	return ret;
 }
 
-void hng64_state::ioport0_w(uint8_t data)
+void hng64_state::ioport0_w(u8 data)
 {
-	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
+	const u16 addr = (m_ex_ramaddr | (m_ex_ramaddr_upper << 9)) & 0x7ff;
 	m_dt71321_dpram->left_w(addr, data);
 
 	LOG("%s: ioport0_w %02x (to address %04x)\n", machine().describe_context(), data, addr);
@@ -2497,7 +2507,7 @@ void hng64_state::ioport0_w(uint8_t data)
 /* This port is dual purpose, with the upper pins being used as a serial input / output / clock etc. and the output latch (written data) being configured appropriately however the lower 2 bits also seem to be used
    maybe these lower 2 bits were intended for serial comms LEDs, although none are documented in the PCB layouts.
 */
-void hng64_state::ioport4_w(uint8_t data)
+void hng64_state::ioport4_w(u8 data)
 {
 	LOG("%s: ioport4_w %02x\n", machine().describe_context(), data);
 }
@@ -2526,14 +2536,14 @@ void hng64_state::sio0_w(int state)
 TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqon_callback)
 {
 	LOG("timer_hack_on\n");
-	m_iomcu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE );
+	m_iomcu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	m_tempio_irqoff_timer->adjust(m_maincpu->cycles_to_attotime(1000));
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqoff_callback)
 {
 	LOG("timer_hack_off\n");
-	m_iomcu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE );
+	m_iomcu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 
@@ -2554,7 +2564,7 @@ void hng64_state::hng64(machine_config &config)
 	VR4300BE(config, m_maincpu, HNG64_MASTER_CLOCK);     // actually R4300
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hng64_state::hng_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hng64_state::main_map);
 
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(hng64_state::hng64_irq), "screen", 0, 1);
 
@@ -2566,8 +2576,8 @@ void hng64_state::hng64(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(hng64_state::screen_update_hng64));
-	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank_hng64));
+	m_screen->set_screen_update(FUNC(hng64_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x1000);
 	PALETTE(config, m_palette_fade0).set_format(palette_device::xRGB_888, 0x1000);
@@ -2616,14 +2626,14 @@ void hng64_state::hng64_default(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps_out_cb<0>().set(FUNC(hng64_state::hng64_default_lamps_w<0>));
-	lamps.lamps_out_cb<1>().set(FUNC(hng64_state::hng64_default_lamps_w<1>));
-	lamps.lamps_out_cb<2>().set(FUNC(hng64_state::hng64_default_lamps_w<2>));
-	lamps.lamps_out_cb<3>().set(FUNC(hng64_state::hng64_default_lamps_w<3>));
-	lamps.lamps_out_cb<4>().set(FUNC(hng64_state::hng64_default_lamps_w<4>));
-	lamps.lamps_out_cb<5>().set(FUNC(hng64_state::hng64_default_lamps_w<5>));
-	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::hng64_default_lamps_w<6>));
-	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::hng64_default_lamps_w<7>));
+	lamps.lamps_out_cb<0>().set(FUNC(hng64_state::default_lamps_w<0>));
+	lamps.lamps_out_cb<1>().set(FUNC(hng64_state::default_lamps_w<1>));
+	lamps.lamps_out_cb<2>().set(FUNC(hng64_state::default_lamps_w<2>));
+	lamps.lamps_out_cb<3>().set(FUNC(hng64_state::default_lamps_w<3>));
+	lamps.lamps_out_cb<4>().set(FUNC(hng64_state::default_lamps_w<4>));
+	lamps.lamps_out_cb<5>().set(FUNC(hng64_state::default_lamps_w<5>));
+	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::default_lamps_w<6>));
+	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::default_lamps_w<7>));
 }
 
 void hng64_state::hng64_drive(machine_config &config)
@@ -2631,9 +2641,9 @@ void hng64_state::hng64_drive(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps_out_cb<5>().set(FUNC(hng64_state::hng64_drive_lamps5_w)); // force feedback steering
-	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::hng64_drive_lamps6_w)); // lamps + coin counter
-	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::hng64_drive_lamps7_w)); // lamps
+	lamps.lamps_out_cb<5>().set(FUNC(hng64_state::drive_lamps5_w)); // force feedback steering
+	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::drive_lamps6_w)); // lamps + coin counter
+	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::drive_lamps7_w)); // lamps
 }
 
 void hng64_state::hng64_shoot(machine_config &config)
@@ -2641,8 +2651,8 @@ void hng64_state::hng64_shoot(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some missing?!)
-	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::hng64_shoot_lamps7_w)); // gun lamps
+	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::shoot_lamps6_w)); // start lamps (some missing?!)
+	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::shoot_lamps7_w)); // gun lamps
 }
 
 void hng64_state::hng64_fight(machine_config &config)
@@ -2650,7 +2660,7 @@ void hng64_state::hng64_fight(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::hng64_fight_lamps6_w)); // coin counters
+	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::fight_lamps6_w)); // coin counters
 }
 
 
@@ -2668,7 +2678,7 @@ void hng64_state::hng64_fight(machine_config &config)
 
 #define HNG64_BIOS \
 	/* R4300 BIOS code (main CPU) */ \
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) \
+	ROM_REGION32_BE( 0x0100000, "bios", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "japan", "Japan" ) \
 	ROM_LOAD_HNG64_BIOS( 0, "brom1.bin",         0x00000, 0x080000, CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) ) \
 	ROM_SYSTEM_BIOS( 1, "us", "USA" ) \
@@ -2705,7 +2715,7 @@ ROM_START( hng64 )
 	ROM_REGION( 0x1000000, "textures1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "textures2", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "textures3", ROMREGION_ERASEFF )
-	ROM_REGION16_BE( 0x0c00000, "verts", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x0c00000, "verts", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "l7a1045", ROMREGION_ERASEFF ) /* Sound Samples */
 ROM_END
 
@@ -2760,7 +2770,7 @@ ROM_START( roadedge )
 	ROM_LOAD( "001tx04a.16",0x0c00000, 0x400000, CRC(288a5bd5) SHA1(24e05db681894eb31cdc049cf42c1f9d7347bd0c) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x0c00000, "verts", 0 )
+	ROM_REGION16_LE( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "001vt01a.17", 0x0000000, 0x400000, CRC(1a748e1b) SHA1(376d40baa3b94890d4740045d053faf208fe43db), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "001vt02a.18", 0x0000002, 0x400000, CRC(449f94d0) SHA1(2228690532d82d2661285aeb4260689b027597cb), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "001vt03a.19", 0x0000004, 0x400000, CRC(50ac8639) SHA1(dd2d3689466990a7c479bb8f11bd930ea45e47b5), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -2831,7 +2841,7 @@ ROM_START( sams64 )
 	ROM_LOAD( "002-tx04a.16", 0x0c00000, 0x400000, CRC(f7dac24f) SHA1(1215354f28cbeb9fc38f6a7acae450ad5f34bb6a) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x1800000, "verts", 0 )
+	ROM_REGION16_LE( 0x1800000, "verts", 0 )
 	ROMX_LOAD( "002-vt01a.17", 0x0000000, 0x400000, CRC(403fd7fd) SHA1(9bdadbeb4cd13c4c4e89a1c233af9eaaa46f8fdf), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "002-vt02a.18", 0x0000002, 0x400000, CRC(e1885905) SHA1(6b16083c50e887aebe2baf95bf56697c239970f2), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "002-vt03a.19", 0x0000004, 0x400000, CRC(2074a6a6) SHA1(9a5e8259d1e19d2b43878c24ca06afba5ee5e316), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -2896,7 +2906,7 @@ ROM_START( xrally )
 	ROM_LOAD( "003-tx04a.16", 0x0c00000, 0x400000, CRC(16d7805b) SHA1(4cc7b2375832c2f9f20fe882e604a2a52bf07f6f) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x0c00000, "verts", 0 )
+	ROM_REGION16_LE( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "003-vt01a.17", 0x0000000, 0x400000, CRC(3e5e275d) SHA1(74f5ec88c258bc224e271f7abeb02d6485e27d8c), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "003-vt02a.18", 0x0000002, 0x400000, CRC(da7b956e) SHA1(c57cbb8c51145ae224faba5b6a1a7e61cb2bee64), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "003-vt03a.19", 0x0000004, 0x400000, CRC(4fe72cb7) SHA1(9f8e662f0656f201924834d1ee78498d4223745e), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -2964,7 +2974,7 @@ ROM_START( bbust2 )
 	ROM_LOAD( "004-tx04a.16", 0x0c00000, 0x400000, CRC(b5f0ef01) SHA1(646bfb17b9e81aecf8db33d3a021f7769b262eda) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x0c00000, "verts", 0 )
+	ROM_REGION16_LE( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "004-vt01a.17", 0x0000000, 0x400000, CRC(25ebbf9b) SHA1(b7c3fb9ee9cf75824d908e7a94970282f1845d5d), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "004-vt02a.18", 0x0000002, 0x400000, CRC(279fc216) SHA1(eb90cc347745491c1d1b1fb611fd6e227310731c), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "004-vt03a.19", 0x0000004, 0x400000, CRC(e0cf6a42) SHA1(dd09b3d05739cf030c820cd7dbaea2e7262764ab), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -3040,7 +3050,7 @@ ROM_START( sams64_2 )
 	ROM_LOAD( "005tx04a.16",0x0c00000, 0x400000, CRC(6be50882) SHA1(1f99717cfa69076b258a0c52d66be007fd820374) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x1800000, "verts", 0 )
+	ROM_REGION16_LE( 0x1800000, "verts", 0 )
 	ROMX_LOAD( "005vt01a.17", 0x0000000, 0x400000, CRC(48a61479) SHA1(ef982b1ecc6dfca2ad989391afcc1b3d1e7fe652), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "005vt02a.18", 0x0000002, 0x400000, CRC(ba9100c8) SHA1(f7704fb8e5310ea7d0e6ae6b8935717ec9119b6d), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "005vt03a.19", 0x0000004, 0x400000, CRC(f54a28de) SHA1(c445cf7fee71a516065cf37e05b898208f48b17e), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -3116,7 +3126,7 @@ ROM_START( fatfurwa )
 	ROM_LOAD( "006tx04a.16",0x0c00000, 0x400000, CRC(82d61652) SHA1(28303ae9e2545a4cb0b5843f9e73407754f41e9e) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x0c00000, "verts", 0 )
+	ROM_REGION16_LE( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "006vt01a.17", 0x0000000, 0x400000, CRC(5c20ed4c) SHA1(df679f518292d70b9f23d2bddabf975d56b96910), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "006vt02a.18", 0x0000002, 0x400000, CRC(150eb717) SHA1(9acb067346eb386256047c0f1d24dc8fcc2118ca), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "006vt03a.19", 0x0000004, 0x400000, CRC(021cfcaf) SHA1(fb8b5f50d3490b31f0a4c3e6d3ae1b98bae41c97), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -3198,7 +3208,7 @@ ROM_START( buriki )
 	ROM_LOAD( "007tx04a.16",0x0c00000, 0x400000, CRC(02aa3f46) SHA1(1fca89c70586f8ebcdf669ecac121afa5cdf623f) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION( 0x0c00000, "verts", 0 )
+	ROM_REGION16_LE( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "007vt01a.17", 0x0000000, 0x400000, CRC(f78a0376) SHA1(fde4ddd4bf326ae5f1ed10311c237b13b62e060c), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "007vt02a.18", 0x0000002, 0x400000, CRC(f365f608) SHA1(035fd9b829b7720c4aee6fdf204c080e6157994f), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "007vt03a.19", 0x0000004, 0x400000, CRC(ba05654d) SHA1(b7fe532732c0af7860c8eded3c5abd304d74e08e), ROM_GROUPWORD | ROM_SKIP(4) )

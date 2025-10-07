@@ -5,15 +5,15 @@
  Driver by XingXing
 
  These games use the IGS027A processor.  This is an ARM7 with internal
- ROM (also used on later PGM games). The IGS027A is usually covered by
- a holographic sticker with an alphanumerical code. It has been
- confirmed that it doesn't correspond to a specific internal ROM (i.e.
- two B6-stickered IGS027As have been found to contain different internal
- ROM, while 3 differently stickered IGS027As have been found to contain
- the same internal ROM).
+ ROM (also used on later PGM games).  The IGS027A is usually covered by
+ a holographic sticker with an alphanumeric code.  It has been confirmed
+ that it doesn't correspond to a specific internal ROM (i.e. two
+ B6-stickered IGS027As have been found to contain different internal
+ ROM, while three differently stickered IGS027As have been found to
+ contain the same internal ROM).
 
- In some cases the first part of the internal ROM is execute only, and
- cannot be read out with a trojan. No games in this driver make use of
+ In some cases the first part of the internal ROM is execute-only, and
+ cannot be read out with a trojan.  No games in this driver make use of
  this feature.
 
  There are several more games on this and similar platforms.
@@ -115,6 +115,7 @@
 #include "ccly.lh"
 #include "jking02.lh"
 #include "oceanpar.lh"
+#include "royal5p.lh"
 #include "tripslot.lh"
 
 
@@ -163,6 +164,7 @@ public:
 	void zhongguo(machine_config &config) ATTR_COLD;
 	void mgzz(machine_config &config) ATTR_COLD;
 	void oceanpar(machine_config &config) ATTR_COLD;
+	void royal5p(machine_config &config) ATTR_COLD;
 	void tripslot(machine_config &config) ATTR_COLD;
 	void ccly(machine_config &config) ATTR_COLD;
 	void cjsxp(machine_config &config) ATTR_COLD;
@@ -247,6 +249,8 @@ private:
 	void jking02_output_w(u8 data);
 	void tshs101_output_w(u8 data);
 	void oceanpar_output_w(u8 data);
+	void royal5p_misc_w(u8 data);
+	void royal5p_counters_w(u8 data);
 	void tripslot_misc_w(u8 data);
 	void tripslot_okibank_low_w(u8 data);
 	void ccly_okibank_w(u8 data);
@@ -264,6 +268,7 @@ private:
 	template <bool Xor> void m027_1ppi_map(address_map &map) ATTR_COLD;
 	template <bool Xor> void m027_2ppis_map(address_map &map) ATTR_COLD;
 	void cjddz_map(address_map &map) ATTR_COLD;
+	void royal5p_map(address_map &map) ATTR_COLD;
 	void tripslot_map(address_map &map) ATTR_COLD;
 	void ccly_map(address_map &map) ATTR_COLD;
 	void tshs101_map(address_map &map) ATTR_COLD;
@@ -350,6 +355,13 @@ void igs_m027_state::cjddz_map(address_map &map)
 	m027_1ppi_map<true>(map);
 
 	map(0x3800'b000, 0x3800'b003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::oki_128k_bank_w));
+}
+
+void igs_m027_state::royal5p_map(address_map &map)
+{
+	m027_1ppi_map<true>(map);
+
+	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::royal5p_misc_w));
 }
 
 void igs_m027_state::tripslot_map(address_map &map)
@@ -737,7 +749,7 @@ INPUT_PORTS_START( jking02 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x1f, 0x1f, "ID Number")                 PORT_DIPLOCATION("SW1:1,2,3,4,5")
+	PORT_DIPNAME( 0x1f, 0x1f, "ID Number" )                PORT_DIPLOCATION("SW1:1,2,3,4,5")
 	SATELLITE_NO_SETTINGS
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
@@ -1693,6 +1705,109 @@ INPUT_PORTS_START( fruitpar206us )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( royal5p )
+	PORT_START("PORTB")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )                  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PLAYER")
+	PORT_BIT( 0x00001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00004, IP_ACTIVE_LOW, IPT_START1 )               PORT_NAME("Start / Stop All Reels")
+	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )           PORT_NAME("Stop Reel 2 / Big / Show Odds")
+	PORT_BIT( 0x00010, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )           PORT_NAME("Stop Reel 4 / Double Up")
+	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )           PORT_NAME("Stop Reel 3 / Small")
+	PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )           PORT_NAME("Stop Reel 1 / Take Score") // also advances to next page of odds table
+	PORT_BIT( 0x00080, IP_ACTIVE_LOW, IPT_SLOT_STOP5 )           PORT_NAME("Stop Reel 5 / Bet")
+	PORT_BIT( 0xfff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("CLEARMEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Symbols" )                     PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Fruit" )
+	PORT_DIPSETTING(    0x00, "Christmas" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR(Demo_Sounds) )          PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x04, 0x00, "Odds Table" )                  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x08, 0x08, "System Limit" )                PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x08, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )              PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )                 PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPNAME( 0x40, 0x40, "Non Stop" )                    PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(No) )                   // reels automatically stop after a delay
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                  // reels must be stopped manually
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Maximum Bet" )                 PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x02, "50" )
+	PORT_DIPSETTING(    0x01, "100" )
+	PORT_DIPSETTING(    0x00, "300" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                 PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x04, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x30, 0x30, "Key-In Rate" )                 PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x10, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Key-Out Rate" )                PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "10" )
+	PORT_DIPSETTING(    0x40, "75" )
+	PORT_DIPSETTING(    0x00, "100" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR(Coinage) )              PORT_DIPLOCATION("SW3:1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x06, DEF_STR(1C_4C) )
+	PORT_DIPSETTING(    0x05, DEF_STR(1C_5C) )
+	PORT_DIPSETTING(    0x04, DEF_STR(1C_10C) )
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_25C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_50C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_100C) )
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_100C) )
+	PORT_DIPNAME( 0x38, 0x38, "Payout Rate" )                 PORT_DIPLOCATION("SW3:4,5,6")
+	PORT_DIPSETTING(    0x00, "35%" )
+	PORT_DIPSETTING(    0x08, "40%" )
+	PORT_DIPSETTING(    0x10, "45%" )
+	PORT_DIPSETTING(    0x18, "50%" )
+	PORT_DIPSETTING(    0x20, "55%" )
+	PORT_DIPSETTING(    0x28, "60%" )
+	PORT_DIPSETTING(    0x30, "70%" )
+	PORT_DIPSETTING(    0x38, "80%" )
+	PORT_DIPNAME( 0x40, 0x40, "Double Up Game Payout Rate" )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x00, "80%" )
+	PORT_DIPSETTING(    0x40, "90%" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Language) )             PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(English) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Spanish) )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( tripslot )
 	PORT_START("PORTB")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )                 PORT_CONDITION("DSW1", 0x02, EQUALS, 0x02)
@@ -2011,8 +2126,8 @@ INPUT_PORTS_START( cjsxp )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( chessc2 )
-	// preliminary - game seems to lack an input test and settings are locked out with password
+INPUT_PORTS_START( gonefsh )
+	// preliminary - games seems to lack an input test and settings are locked out with password
 
 	PORT_START("PORTB")
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2028,12 +2143,12 @@ INPUT_PORTS_START( chessc2 )
 	PORT_START("PLAYER")
 	PORT_BIT( 0x00001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00004, IP_ACTIVE_LOW, IPT_START1 )     // called "Cast" in Gone Fishing
 	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )
 	PORT_BIT( 0x00010, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
 	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
 	PORT_BIT( 0x00040, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
-	PORT_BIT( 0x00080, IP_ACTIVE_LOW, IPT_GAMBLE_BET )        PORT_NAME("Play")
+	PORT_BIT( 0x00080, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) // called "Bait" in Gone Fishing or "Play" In Chess Challenge II
 	PORT_BIT( 0xfff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("CLEARMEM")
@@ -2204,28 +2319,28 @@ template <unsigned Start>
 void igs_m027_state::lamps_w(u8 data)
 {
 	// active high outputs
-	// +------+-------------------------------+-------------------------------+---------------+--------+
-	// | lamp | jking02                       | tripslot                      | oceanpar      | ccly   |
-	// |      +---------------+---------------+---------------+---------------+               +--------+
-	// |      | 36+10         | 28-Pin        | 36+10         | 28-Pin        |               | Fruit  |
-	// +------+---------------+---------------+---------------+---------------+---------------+--------|
-	// |  1   | stop 4/start  |               | start         |               | start         | start  |
-	// |  2   | stop 3/small  |               | stop 3/small  |               | stop 2/small  | small  |
-	// |  3   | bet           |               | stop 5/bet    |               | bet           | bet    |
-	// |  4   | stop 1/take   |               | stop 4/take   |               | stop 3/take   | take   |
-	// |  5   | stop 2/double |               | stop 2/double |               | stop 1/double | double |
-	// |  6   | stop all/big  |               | stop 1/big    |               | stop all/big  | big    |
-	// |  7   |               |               |               |               |               |        |
-	// |  8   |               |               |               |               |               |        |
-	// |  9   |               | bet           |               | stop 5/bet    |               |        |
-	// | 10   |               | start         |               | start         |               |        |
-	// | 11   |               |               |               |               |               |        |
-	// | 12   |               | stop 1/take   |               | stop 1/big    |               |        |
-	// | 13   |               | stop 2/big    |               | stop 2/double |               |        |
-	// | 14   |               | stop 4/double |               | stop 4/take   |               |        |
-	// | 15   |               | stop 3/small  |               | stop 3/small  |               |        |
-	// | 16   |               |               |               |               |               |        |
-	// +------+---------------+---------------+---------------+---------------+---------------+--------+
+	// +------+-------------------------------+-------------------------------+---------------+----------------+--------+
+	// | lamp | jking02                       | tripslot                      | oceanpar      | royal5p        | ccly   |
+	// |      +---------------+---------------+---------------+---------------+               |                +--------+
+	// |      | 36+10         | 28-Pin        | 36+10         | 28-Pin        |               |                | Fruit  |
+	// +------+---------------+---------------+---------------+---------------+---------------+----------------+--------+
+	// |  1   | stop 4/start  |               | start         |               | start         | start/stop all | start  |
+	// |  2   | stop 3/small  |               | stop 3/small  |               | stop 2/small  | stop 3/small   | small  |
+	// |  3   | bet           |               | stop 5/bet    |               | bet           | stop 5/bet     | bet    |
+	// |  4   | stop 1/take   |               | stop 4/take   |               | stop 3/take   | stop 1/take    | take   |
+	// |  5   | stop 2/double |               | stop 2/double |               | stop 1/double | stop 4/double  | double |
+	// |  6   | stop all/big  |               | stop 1/big    |               | stop all/big  | stop 2/big     | big    |
+	// |  7   |               |               |               |               |               |                |        |
+	// |  8   |               |               |               |               |               |                |        |
+	// |  9   |               | bet           |               | stop 5/bet    |               |                |        |
+	// | 10   |               | start         |               | start         |               |                |        |
+	// | 11   |               |               |               |               |               |                |        |
+	// | 12   |               | stop 1/take   |               | stop 1/big    |               |                |        |
+	// | 13   |               | stop 2/big    |               | stop 2/double |               |                |        |
+	// | 14   |               | stop 4/double |               | stop 4/take   |               |                |        |
+	// | 15   |               | stop 3/small  |               | stop 3/small  |               |                |        |
+	// | 16   |               |               |               |               |               |                |        |
+	// +------+---------------+---------------+---------------+---------------+---------------+----------------+--------+
 	for (unsigned i = 0; 8 > i; ++i)
 		m_out_lamps[Start + i] = BIT(data, i);
 }
@@ -2273,6 +2388,19 @@ void igs_m027_state::oceanpar_output_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2)); // one pulse per COINC accepted
 	machine().bookkeeping().coin_counter_w(3, BIT(data, 6)); // one pulse per KEYOUT
 	m_hopper->motor_w(BIT(data, 7));
+}
+
+void igs_m027_state::royal5p_misc_w(u8 data)
+{
+	m_hopper->motor_w(BIT(data, 3));
+}
+
+void igs_m027_state::royal5p_counters_w(u8 data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // one pulse per COINA accepted
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // one pulse per KEYIN accepted
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 3)); // one pulse per coin out
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 4)); // one pulse per KEYOUT
 }
 
 void igs_m027_state::tripslot_misc_w(u8 data)
@@ -2373,7 +2501,7 @@ void igs_m027_state::m027_noppi(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 template <bool Xor>
@@ -2588,6 +2716,20 @@ void igs_m027_state::oceanpar(machine_config &config)
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
+}
+
+void igs_m027_state::royal5p(machine_config &config)
+{
+	m027_1ppi<true>(config);
+
+	m_maincpu->set_addrmap(0, &igs_m027_state::royal5p_map);
+	m_maincpu->in_port().set_ioport("PLAYER");
+	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).rshift(3);
+
+	m_ppi[0]->out_pb_callback().set(FUNC(igs_m027_state::royal5p_counters_w));
+	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs_m027_state::tripslot(machine_config &config)
@@ -2876,7 +3018,7 @@ ROM_END
 ROM_START( gonefsh ) // IGS PCB-0331-02-FG
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "027a.u32", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "027a.u32", 0x0000, 0x4000, CRC(e0096297) SHA1(ce4cf1186d19470fb51314a9c007587ad31102a4) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "gonefishin_v-602us.u23", 0x00000, 0x80000, CRC(f47b673c) SHA1(c3d412209427df9fde76a76c78cfe8267dbceb78) )
@@ -2884,9 +3026,10 @@ ROM_START( gonefsh ) // IGS PCB-0331-02-FG
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "gonefishin_text.u12", 0x000000, 0x080000, CRC(a0ece4b7) SHA1(473369bc3aed6d1971bf67e7632e00972bda208c) )
 
-	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "gonefishin_cg1_u13.u13", 0x000000, 0x200000, CRC(9e6cea86) SHA1(7b5d13eba5fd90a611293959bddd82a058a8d2c7) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
-	ROM_LOAD( "gonefishin_cg2_u11.u11", 0x200000, 0x080000, CRC(3baeb7e6) SHA1(e8a80c590d504182402294f5455453ad1fc8827b) )
+	// empty. ROM above is a 27C160 (smaller than the other games on same PCB)
+	ROM_LOAD( "gonefishin_cg2_u11.u11", 0x400000, 0x080000, CRC(3baeb7e6) SHA1(e8a80c590d504182402294f5455453ad1fc8827b) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "gonefishin_sp.u28", 0x00000, 0x80000, CRC(e8db1fd1) SHA1(09ef823a2edb3be4bd773f4aec41594359957354) )
@@ -3040,7 +3183,7 @@ ROM_END
 ROM_START( royal5p ) // PCB-0367-08-FG-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "v21_027a.u32", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "v21_027a.u32", 0x0000, 0x4000, CRC(90d44b53) SHA1(c9b57ff1eaa613b6a1caff8fb15d8ddef3e6d04b) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "r5+_v-101us.u23", 0x00000, 0x80000, CRC(99e83ba0) SHA1(f069b23261399e29827d14f1cb03f8bb12e3f50d) ) // 27C4002
@@ -4478,9 +4621,9 @@ void igs_m027_state::init_jhg3d()
 
 void igs_m027_state::init_gonefsh()
 {
-	gonefsh_decrypt(machine());
+	qiji6_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+	m_igs017_igs031->tarzan_decrypt_sprites(0x200000, 0x200000);
 }
 
 } // anonymous namespace
@@ -4516,6 +4659,7 @@ GAMEL( 1999, oceanpar,      0,        oceanpar,     oceanpar105us, igs_m027_stat
 GAMEL( 1999, oceanpar101us, oceanpar, oceanpar,     oceanpar101us, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", 0, layout_oceanpar ) // 1999 copyright in ROM
 GAMEL( 1999, fruitpar,      0,        oceanpar,     oceanpar105us, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214US)", 0, layout_oceanpar )
 GAMEL( 1999, fruitpar206us, fruitpar, oceanpar,     fruitpar206us, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
+GAME(  2002, gonefsh,       0,        oceanpar,     gonefsh,       igs_m027_state, init_gonefsh,  ROT0, "IGS", "Gone Fishing (V602US)", MACHINE_NOT_WORKING ) // input, outputs, Oki bank
 GAME(  2004, cjddz,         0,        cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V219CN)", 0 ) // 2004 date in internal ROM
 GAME(  2004, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V217CN)", 0 ) // 2004 date in internal ROM
 GAME(  2004, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 ) // 2004 date in internal ROM
@@ -4524,6 +4668,7 @@ GAME(  2004, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_stat
 GAME(  2005, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, cjtljp,        0,        xypdk,        lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji Jiaqiang Ban (V206CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, xypdk,         0,        xypdk,        lhzb4,         igs_m027_state, init_xypdk,    ROT0, "IGS", "Xingyun Pao De Kuai (V106CN)", 0 )
+GAMEL( 2005, royal5p,       0,        royal5p,      royal5p,       igs_m027_state, init_royal5p,  ROT0, "IGS", "Royal 5+ / X'mas 5 (V101US)", 0, layout_royal5p )
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 GAMEL( 2005, ccly,          crzybugs, ccly,         ccly,          igs_m027_state, init_ccly,     ROT0, "IGS", "Chong Chong Leyuan (V100CN)", MACHINE_NOT_WORKING, layout_ccly )
 GAME(  2001, cjsxp,         0,        cjsxp,        cjsxp,         igs_m027_state, init_klxyj,    ROT0, "IGS", "Huangpai Zuqiu Plus / Chaoji Shuangxing Plus (V103CN)", MACHINE_NOT_WORKING )
@@ -4533,8 +4678,8 @@ GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_stat
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
-GAME(  2002, chessc2,       0,        chessc2,      chessc2,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME(  200?, gonefsh2,      0,        chessc2,      chessc2,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME(  2002, chessc2,       0,        chessc2,      gonefsh,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME(  200?, gonefsh2,      0,        chessc2,      gonefsh,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 // these can select between two different games via DIP switch (currently unemulated feature)
 GAME(  2007, cjddzs,        0,        cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V302CN)", MACHINE_NOT_WORKING )
@@ -4550,6 +4695,4 @@ GAME(  200?, luckycrs,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
-GAME(  2005, royal5p,       0,        m027_1ppi<false>, base,     igs_m027_state, init_royal5p,  ROT0, "IGS", "Royal 5+ (V101US)", MACHINE_NOT_WORKING )
 GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, init_jhg3d,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
-GAME(  2002, gonefsh,       0,        m027_1ppi<false>, base,     igs_m027_state, init_gonefsh,  ROT0, "IGS", "Gone Fishing (V602US)", MACHINE_NOT_WORKING )

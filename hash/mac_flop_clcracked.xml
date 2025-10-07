@@ -5,23 +5,6 @@ license:CC0-1.0
 -->
 <softwarelist name="mac_flop_clcracked" description="Apple Macintosh 400K/800K cleanly cracked disks">
 
-	<software name="dlxmuscset10">
-		<description>Deluxe Music Construction Set (version 1.0) (san inc crack)</description>
-		<year>1985</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Geoff Brown and John MacMillan" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
-		<!--Dump released: 2022-12-21-->
-		<!--music program-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="419284">
-				<rom name="deluxe music construction set v1.0 (san inc crack).dc42" size="419284" crc="5de68d4f" sha1="b5dc7cb805e44b45a201266199334aaafa2f886a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bortime">
 		<description>Borrowed Time (san inc crack)</description>
 		<year>1985</year>
@@ -273,23 +256,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="419284">
 				<rom name="the mind prober v1.0 (san inc crack).dc42" size="419284" crc="e3a65c23" sha1="862e931f3229fe58e109c646b13e60d5352eea9d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="harstkm">
-		<description>Harrier Strike Mission (san inc crack)</description>
-		<year>1985</year>
-		<publisher>Miles Computing</publisher>
-		<info name="programmer" value="Tim Hays" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
-		<!--Dump released: 2022-12-30-->
-		<!--action game-->
-		<!--The original would only run on Mac 512K and Mac 512Ke, due to programming bugs unrelated to the copy protection. This crack includes patches that allow the game to run on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic.-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="419284">
-				<rom name="harrier strike mission (san inc crack).dc42" size="419284" crc="6175efea" sha1="049b886a061e1daae3c690727ede160c3a85a9c7" />
 			</dataarea>
 		</part>
 	</software>
@@ -1028,7 +994,7 @@ license:CC0-1.0
 	<software name="macgolf20">
 		<description>MacGolf (version 2.0) (4am crack)</description>
 		<year>1985</year>
-		<publisher>Practical Computer Applications</publisher>
+		<publisher>Practical Computer Applications (PCAI)</publisher>
 		<info name="programmer" value="Robert Papp" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
 		<info name="version" value="2.0" />
@@ -1062,7 +1028,7 @@ license:CC0-1.0
 	<software name="macbup26">
 		<description>MacBackup (version 2.6) (4am crack)</description>
 		<year>1985</year>
-		<publisher>Practical Computer Applications</publisher>
+		<publisher>Practical Computer Applications (PCAI)</publisher>
 		<info name="developer" value="Practical Computer Applications" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
 		<info name="version" value="2.6" />
@@ -1330,23 +1296,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pfsfra00">
-		<description>pfs: file &amp; pfs: report (version A.00) (4am crack)</description>
-		<year>1984</year>
-		<publisher>Software Publishing Corporation</publisher>
-		<info name="developer" value="Software Publishing Corporation" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<info name="version" value="A.00" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
-		<!--Dump released: 2023-01-21-->
-		<!--productivity program-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="419284">
-				<rom name="pfs file and report a.00 (4am crack).dc42" size="419284" crc="cebb0a55" sha1="f53db7cfbedeb17885af217c22cec096e30ac0aa" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="lodrun10">
 		<description>Lode Runner (version 1.0) (4am crack)</description>
 		<year>1984</year>
@@ -1445,54 +1394,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="838484">
 				<rom name="professional composer v2.3mfx (san inc crack).dc42" size="838484" crc="fdcbd77d" sha1="b193754aaa693411728b43346fe8de96ce0f7ba1" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uninvit21d1">
-		<description>Uninvited (version 2.1D1) (san inc crack)</description>
-		<year>1986</year>
-		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Craig Erickson, Jay Zipnick, Billy Wolfe, Terry Schulenburg, Mark Waterman, Darin Adler, David Marsh, Todd Squires, Tod Zipnick, Steve Hays, and Waldemar Horwat" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<info name="version" value="2.1D1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
-		<!--Dump released: 2023-01-24-->
-		<!--adventure game-->
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="419284">
-				<rom name="uninvited v2.1d1 (san inc crack) disk 1.dc42" size="419284" crc="4e9f68e9" sha1="e8393e8649584f3d076972d34b4736d6a2cb67cd" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="419284">
-				<rom name="uninvited v2.1d1 (san inc crack) disk 2.dc42" size="419284" crc="27b3b930" sha1="6f81015f09e9bd51696d6e37bc387bbf24f493f2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uninvit10">
-		<description>Uninvited (version 1.0) (san inc crack)</description>
-		<year>1986</year>
-		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Craig Erickson, Jay Zipnick, Billy Wolfe, Terry Schulenburg, Mark Waterman, Darin Adler, David Marsh, Todd Squires, Tod Zipnick, Steve Hays, and Waldemar Horwat" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
-		<!--Dump released: 2023-03-12-->
-		<!--adventure game-->
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="419284">
-				<rom name="uninvited v1.0 (san inc crack) disk 1.dc42" size="419284" crc="296c706a" sha1="84752a414cba6f007a50d9ff9f97eae010041bd3" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="419284">
-				<rom name="uninvited v1.0 (san inc crack) disk 2.dc42" size="419284" crc="0a9e5e56" sha1="ffcf19295d11a3a50bd2e0f7b8a02d559c6ddb61" />
 			</dataarea>
 		</part>
 	</software>
@@ -2031,23 +1932,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="macracqb">
-		<description>MacRacquetball (version 2.0) (4am crack)</description>
-		<year>1987</year>
-		<publisher>Practical Computing Applications</publisher>
-		<info name="programmer" value="Robert Pappas" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<info name="version" value="2.0" />
-		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc" />
-		<!-- Dump released: 2023-08-05 -->
-		<!-- sports game -->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="838484">
-				<rom name="macracquetball v2.0 (4am crack).dc42" size="838484" crc="46dbdba4" sha1="9e9c9d56f16f761feba63b901aa5366a4b29d4f6" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gridwars">
 		<description>Grid Wars (version 1.0) (san inc crack)</description>
 		<year>1985</year>
@@ -2160,6 +2044,549 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="419284">
 				<rom name="fullpaint v1.0 (san inc crack).dc42" size="419284" crc="fcae3ea1" sha1="8a17a59f6702b3fae66992622a4fd084d350e553" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cwmagic">
+		<description>Crossword Magic (version 4.0) (san inc crack)</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Larry Sherman" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="4.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-21 -->
+		<!-- puzzle game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="crossword magic v4.0 (san inc crack).dc42" size="419284" crc="9524fc3f" sha1="7d827e383f328988c2b21cc55ed7af84fcfb1777" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlxmuscset10" cloneof="dlxmuscset">
+		<description>Deluxe Music Construction Set (version 1.0) (san inc crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Geoff Brown" />
+		<info name="programmer" value="John MacMillan" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2022-12-21 -->
+		<!-- music program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="deluxe music construction set v1.0 (san inc crack).dc42" size="419284" crc="5de68d4f" sha1="b5dc7cb805e44b45a201266199334aaafa2f886a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlxmuscset">
+		<description>Deluxe Music Construction Set (version 2.0) (san inc crack)</description>
+		<year>1986</year>
+		<publisher> Electronic Arts</publisher>
+		<info name="programmer" value="Geoff Brown" />
+		<info name="programmer" value="John MacMillan" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-16 -->
+		<!-- music program -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program" />
+			<dataarea name="flop" size="419284">
+				<rom name="deluxe music construction set v2.0 (san inc crack) disk 1.dc42" size="419284" crc="b9b26b1e" sha1="1162cb18c45ecc120a710451e3b6606b5bad05f0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Instruments" />
+			<dataarea name="flop" size="419284">
+				<rom name="deluxe music construction set v2.0 (san inc crack) disk 2.dc42" size="419284" crc="091b6cc6" sha1="f15bc9304afc6a17b54ec81108a45e5b039b0a9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feathspc">
+		<description>Feathers &amp; Space (version 1.1) (san inc crack)</description>
+		<year>1985</year>
+		<publisher>PBI Software</publisher>
+		<info name="programmer" value="Peter Merrill" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="feathers and space v1.1 (san inc crack).dc42" size="419284" crc="29beaf22" sha1="c3d9c5b2eaa4140cd9dd82ff801aff0c3b53f561" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fokkertps">
+		<description>Fokker Triplane Flight Simulator (version 1985-10-31) (san inc crack)</description>
+		<year>1985</year>
+		<publisher>Bullseye Software</publisher>
+		<info name="programmer" value="Donald A. Hill, Jr." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.  Help pages require 1MB RAM." />
+		<info name="version" value="1985-10-31" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-09-19 -->
+		<!-- simulation game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="fokker triplane flight simulator 1985-10-31 (san inc crack).dc42" size="419284" crc="e96dfd20" sha1="dd368f45e751add2b608d7869308b9b5a87d5c56" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harstkm850807" cloneof="harstkm">
+		<description>Harrier Strike Mission (version 1985-08-07) (san inc crack)</description>
+		<year>1985</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1985-08-07" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!--The original would only run on Mac 512K and Mac 512Ke, due to programming bugs unrelated to the copy protection. This crack includes patches that allow the game to run on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic.-->
+		<!--Dump released: 2022-12-30-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="harrier strike mission (san inc crack).dc42" size="419284" crc="6175efea" sha1="049b886a061e1daae3c690727ede160c3a85a9c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harstkm">
+		<description>Harrier Strike Mission (version 1985-09-05) (san inc crack)</description>
+		<year>1985</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 128K and Mac 512K only. It does not run on later models." />
+		<info name="version" value="1985-09-05" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="harrier strike mission 1985-09-05 (san inc crack).dc42" size="419284" crc="e064d66a" sha1="0f72f4d72bc812476018bbe44df1ba2e4d7d8219" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ijlastcru">
+		<description>Indiana Jones and the Last Crusade (version 1.7) (san inc crack)</description>
+		<year>1990</year>
+		<publisher>LucasFilm Games</publisher>
+		<info name="programmer" value="Noah Falstein" />
+		<info name="programmer" value="David Fox" />
+		<info name="programmer" value="Ron Gilbert" />
+		<info name="programmer" value="Mike Eber" />
+		<info name="programmer" value="Steve Purcell" />
+		<info name="programmer" value="Martin Cameron" />
+		<info name="programmer" value="Aric Wilmunder" />
+		<info name="usage" value="Runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic and Mac II.  Supports monochrome or 16 colors." />
+		<info name="version" value="1.7" />
+		<sharedfeat name="compatibility" value="MC68000,MC68020" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k,mac512ke" />
+		<!-- Dump released: 2025-09-24 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="838484">
+				<rom name="indiana jones and the last crusade v1.7 (san inc crack) disk 1.dc42" size="838484" crc="6e484f09" sha1="926267ca59e0ec844e68d01ad06cecb3c48ab47b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="838484">
+				<rom name="indiana jones and the last crusade v1.7 (san inc crack) disk 2.dc42" size="838484" crc="20cbc8e5" sha1="48ffdff9649d80215682866993db587c61f00c51" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="838484">
+				<rom name="indiana jones and the last crusade v1.7 (san inc crack) disk 3.dc42" size="838484" crc="ab91f5dd" sha1="51b84a063f41e16075f5315146264af7790950dd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldfngr">
+		<description>James Bond 007 in: Goldfinger (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Angelsoft" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-16 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="goldfinger (san inc crack).dc42" size="419284" crc="c7327217" sha1="c5e4c4d57ee038c5ef42b1cd6c3cdaaae805341e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jazz">
+		<description>Jazz (version 1A) (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Lotus Development</publisher>
+		<info name="developer" value="Lotus Development" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1A" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-09-21 -->
+		<!-- productivity program -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Startup" />
+			<dataarea name="flop" size="419284">
+				<rom name="jazz v1a (san inc crack) disk 1.dc42" size="419284" crc="2044ffe3" sha1="93027e5218f57e44af37180fa4e903186e6f56b8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program" />
+			<dataarea name="flop" size="419284">
+				<rom name="jazz v1a (san inc crack) disk 2.dc42" size="419284" crc="4fa2f1c2" sha1="4219569e7414bf9c4977642da1a67cb5d4ae32c1" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Primer" />
+			<dataarea name="flop" size="419284">
+				<rom name="jazz v1a (san inc crack) disk 3.dc42" size="419284" crc="a58dcc3b" sha1="31fb98d95a4424f3a56898ba7466be0203599f64" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kidtalk">
+		<description>KidTalk (version 1.0) (san inc crack)</description>
+		<year>1985</year>
+		<publisher>First Byte</publisher>
+		<info name="developer" value="First Byte" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="kidtalk v1.0 (san inc crack).dc42" size="419284" crc="a34f6bb0" sha1="41ad070c4d2d16748fc829db74293bca6e71a09e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macattk">
+		<description>Mac Attack (revision 1-GC 1985-01-07) (san inc crack)</description>
+		<year>1985</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1-GC 1985-01-07" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="mac attack 1985-01-07 (san inc crack).dc42" size="419284" crc="a6965552" sha1="4a11e5fa0b0a36c8805b32f3d768e1966a80deec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macmatch">
+		<description>MacMatch (4am crack)</description>
+		<year>1984</year>
+		<publisher>Axion</publisher>
+		<info name="programmer" value="Eagle I. Berns" />
+		<info name="programmer" value="Michael Kosaka" />
+		<info name="programmer" value="Phillip Goldman" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-16 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="macmatch (4am crack).dc42" size="419284" crc="49b930af" sha1="ed0e7ca73eac9554ea411942445990d27b1591a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macracqb10" cloneof="macracqb">
+		<description>MacRacquetball: The Exciting Racquetball Simulator (version 1.0) (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Practical Computer Applications (PCAI)</publisher>
+		<info name="programmer" value="Robert Pappas" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
+		<!-- Dump released: 2025-09-19 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="838484">
+				<rom name="macraquetball v1.0 (san inc crack).dc42" size="838484" crc="8d3fe08c" sha1="030f100339bac5a9cf17f64393c52151d9f30e06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macracqb">
+		<description>MacRacquetball: The Exciting Racquetball Simulator (version 2.0) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Practical Computer Applications (PCAI)</publisher>
+		<info name="programmer" value="Robert Pappas" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k,mac512ke" />
+		<!-- Dump released: 2023-08-05 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="838484">
+				<rom name="macracquetball v2.0 (4am crack).dc42" size="838484" crc="46dbdba4" sha1="9e9c9d56f16f761feba63b901aa5366a4b29d4f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathtalk">
+		<description>MathTalk (version 1.0) (san inc crack)</description>
+		<year>1986</year>
+		<publisher>First Byte</publisher>
+		<info name="developer" value="First Byte" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="mathtalk v1.0 (san inc crack).dc42" size="419284" crc="6fcf4377" sha1="c513a2e2ae18f86fd0813808527b6181bb95f929" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pagemaker">
+		<description>PageMaker (version 1.2) (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Aldus Corporation</publisher>
+		<info name="programmer" value="Jeremy Jaech" />
+		<info name="programmer" value="Mike Templeman" />
+		<info name="programmer" value="Dave Walter" />
+		<info name="programmer" value="Mark Sundstrom" />
+		<info name="programmer" value="John Nelson" />
+		<info name="release" value="19860324" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-09-21 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="419284">
+				<rom name="pagemaker v1.2 (san inc crack) disk 1.dc42" size="419284" crc="df723af8" sha1="86b646f3b9b037fb7d2a3484140eeeba9497d81f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="419284">
+				<rom name="pagemaker v1.2 (san inc crack) disk 2.dc42" size="419284" crc="0a910410" sha1="0ade0892b3dca6d2163529e8210f3360a47bd0e7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon3">
+		<description>Sargon III (san inc crack)</description>
+		<year>1984</year>
+		<publisher>Hayden Software</publisher>
+		<info name="programmer" value="Dan Spracken" />
+		<info name="programmer" value="Kathe Spracken" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-17 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="sargon iii (san inc crack).dc42" size="419284" crc="832a4e81" sha1="766d01fa63d3694854bca87352a6e17ca06b2711" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bkdrgen">
+		<description>The Brock Keystroke Database and Report Generator (4am crack)</description>
+		<year>1984</year>
+		<publisher>Brock Software</publisher>
+		<info name="programmer" value="Ron Barr" />
+		<info name="programmer" value="Phil Beckman" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- productivity program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="the brock keystroke database and report generator (4am crack).dc42" size="419284" crc="80287222" sha1="bde36a7b9001127368247c11a61fd3027a8f0de3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvited10" cloneof="uninvited">
+		<description>Uninvited (version 1.0 1986-07-08) (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="ICOM Simulations" />
+		<info name="programmer" value="Craig Erickson" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Billy Wolfe" />
+		<info name="programmer" value="Terry Schulenburg" />
+		<info name="programmer" value="Mark Waterman" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Tod Zipnick" />
+		<info name="programmer" value="Steve Hays" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0 1986-07-08" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!--Dump released: 2023-03-12-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="419284">
+				<rom name="uninvited v1.0 (san inc crack) disk 1.dc42" size="419284" crc="296c706a" sha1="84752a414cba6f007a50d9ff9f97eae010041bd3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="419284">
+				<rom name="uninvited v1.0 (san inc crack) disk 2.dc42" size="419284" crc="0a9e5e56" sha1="ffcf19295d11a3a50bd2e0f7b8a02d559c6ddb61" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvited860806" cloneof="uninvited">
+		<description>Uninvited (version 1986-08-06) (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="ICOM Simulations" />
+		<info name="programmer" value="Craig Erickson" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Billy Wolfe" />
+		<info name="programmer" value="Terry Schulenburg" />
+		<info name="programmer" value="Mark Waterman" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Tod Zipnick" />
+		<info name="programmer" value="Steve Hays" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1986-08-06" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="419284">
+				<rom name="uninvited 1986-08-06 (san inc crack) disk 1.dc42" size="419284" crc="1b96480c" sha1="308023dbaee0eab68be2d0fcc8a856eab7f4e128" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="419284">
+				<rom name="uninvited 1986-08-06 (san inc crack) disk 2.dc42" size="419284" crc="f74f7103" sha1="1ecc243783d303017a7696bf28484cf9992a06a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvited">
+		<description>Uninvited (version 2.1D1 1986-12-05) (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="ICOM Simulations" />
+		<info name="programmer" value="Craig Erickson" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Billy Wolfe" />
+		<info name="programmer" value="Terry Schulenburg" />
+		<info name="programmer" value="Mark Waterman" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Tod Zipnick" />
+		<info name="programmer" value="Steve Hays" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="2.1D1 1986-12-05" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!--Dump released: 2023-01-24-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="419284">
+				<rom name="uninvited v2.1d1 (san inc crack) disk 1.dc42" size="419284" crc="4e9f68e9" sha1="e8393e8649584f3d076972d34b4736d6a2cb67cd" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="419284">
+				<rom name="uninvited v2.1d1 (san inc crack) disk 2.dc42" size="419284" crc="27b3b930" sha1="6f81015f09e9bd51696d6e37bc387bbf24f493f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsfile">
+		<description>pfs: file (version A.01) (san inc crack)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="developer" value="Software Publishing Corporation" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="A.01" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- productivity program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="pfs file va.01 (san inc crack).dc42" size="419284" crc="23607b65" sha1="bf08a334c15ca6de43d2b5a2aa36e844865c42d0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsreport">
+		<description>pfs: report (version A.00) (san inc crack)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="developer" value="Software Publishing Corporation" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="A.00" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- productivity program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="pfs report va.00 (san inc crack).dc42" size="419284" crc="029dde74" sha1="a21e65e22978a3a1f4a6f764fbb3efc80072604f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsfilerep">
+		<description>pfs: file &amp; pfs: report (version A.00) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="developer" value="Software Publishing Corporation" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="A.00" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!--Dump released: 2023-01-21-->
+		<!--productivity program-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="pfs file and report a.00 (4am crack).dc42" size="419284" crc="cebb0a55" sha1="f53db7cfbedeb17885af217c22cec096e30ac0aa" />
 			</dataarea>
 		</part>
 	</software>

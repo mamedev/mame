@@ -303,10 +303,7 @@ void combatsc_base_state::videoview1_w(offs_t offset, uint8_t data)
 
 void combatsc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
-	k007121_device *k007121 = circuit ? m_k007121[1] : m_k007121[0];
-	int base_color = (circuit * 4) * 16 + (k007121->ctrl_r(6) & 0x10) * 2;
-
-	k007121->sprites_draw(bitmap, cliprect, base_color, 0, 0, priority_bitmap, pri_mask);
+	m_k007121[circuit]->sprites_draw(bitmap, cliprect, priority_bitmap, pri_mask);
 }
 
 

@@ -1830,7 +1830,6 @@ TABLE_FUNCTION(void, set_line, (int line, int state))
 				{
 					CPU_STOPPED &= ~STOP_LEVEL_WAI;
 				}
-				return;
 			}
 			return;
 		case G65816_LINE_NMI:
@@ -1855,8 +1854,6 @@ TABLE_FUNCTION(void, set_line, (int line, int state))
 		case G65816_LINE_RDY:
 			return;
 	}
-
-	LINE_IRQ=1; // FIXME: this can't be right!
 }
 
 

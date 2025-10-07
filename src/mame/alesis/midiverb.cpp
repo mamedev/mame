@@ -4,6 +4,10 @@
 /*
 The MIDIverb is a digital delay & reverb unit.
 
+The MIDIFEX is a digital effects unit, primarily implementing echoes. The
+MIDIFEX is just a MIDIverb with a different DSP ROM, and different labeling on
+the case. The rest of the hardware and the MCU firmware are the same.
+
 The computer portion of the device is very simple. The firmware runs on a
 80C31 microcontroller. It reads the 4 buttons, drives the two 7-segment
 displays, and listens to MIDI for program changes. It also controls which
@@ -56,6 +60,7 @@ Audio inputs are emulated using MAME's audio input capabilities.
 #include "video/pwm.h"
 #include "speaker.h"
 
+#include "alesis_midifex.lh"
 #include "alesis_midiverb.lh"
 
 #define LOG_PROGRAM_CHANGE (1U << 1)
@@ -259,7 +264,7 @@ u16 midiverb_dsp_device::analog_to_digital(float sample) const
 	const float transformed = std::clamp(sample, -DAC_MAX_V, DAC_MAX_V) / DAC_MAX_V;
 
 	// Quantize to 12 bits, keeping in mind that the range is -1 - 1 (reason
-	// for "/ 2"). Then convert to 13 bits ("* 2"). Bit 0 is always set ("+ 1).
+	// for "/ 2"). Then convert to 13 bits ("* 2"). Bit 0 is always set ("+ 1").
 	const s16 quantized = floorf(transformed * ((1 << 12) / 2 - 1)) * 2 + 1;
 	assert(quantized > -4096 && quantized < 4096);
 
@@ -299,6 +304,7 @@ public:
 	}
 
 	void midiverb(machine_config &config) ATTR_COLD;
+	void midifex(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(mix_changed);
 
@@ -556,6 +562,12 @@ void midiverb_state::midiverb(machine_config &config)
 	configure_audio(config);
 }
 
+void midiverb_state::midifex(machine_config &config)
+{
+	midiverb(config);
+	config.set_default_layout(layout_alesis_midifex);
+}
+
 DECLARE_INPUT_CHANGED_MEMBER(midiverb_state::mix_changed)
 {
 	update_mix();
@@ -584,6 +596,15 @@ ROM_START(midiverb)
 	// "MVOBJ 2-6-86" label.
 ROM_END
 
+ROM_START(midifex)
+	ROM_REGION(0x2000, MAINCPU_TAG, 0)  // U54. 2764 ROM.
+	ROM_LOAD("mvop_4-7-86.u54", 0x000000, 0x002000, CRC(14d6596d) SHA1(c6dc579d8086556b2dd4909c8deb3c7006293816))
+
+	ROM_REGION(0x4000, "dsp_microcode", 0)  // U51, 27128, 16K ROM.
+	ROM_LOAD("midifex_7-17-86.u51", 0x000000, 0x004000, CRC(098cc1b4) SHA1(5144ded869c3abda05a1392c31a7bdeeb166b106))
+ROM_END
+
 }  // anonymous namespace
 
 SYST(1986, midiverb, 0, 0, midiverb, midiverb, midiverb_state, empty_init, "Alesis", "MIDIverb", MACHINE_SUPPORTS_SAVE)
+SYST(1986, midifex, 0, 0, midifex, midiverb, midiverb_state, empty_init, "Alesis", "MIDIFEX", MACHINE_SUPPORTS_SAVE)

@@ -277,7 +277,7 @@ license:CC0-1.0
 
 	<element name="split_layer_text1"><text string="Split/"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="split_layer_text2"><text string="Layer"><color red="0.83" green="0.86" blue="0.83" /></text></element>
-	
+
 
 	<element name="p63_text"><text string="+63"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="0_text"><text string="0"><color red="0.83" green="0.86" blue="0.83" /></text></element>

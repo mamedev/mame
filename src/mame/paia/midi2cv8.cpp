@@ -60,14 +60,16 @@ reset (F3).
 #include "cpu/mcs51/mcs51.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
+#include "machine/rescap.h"
 #include "video/pwm.h"
 
 #include "paia_midi2cv8.lh"
 
-#define LOG_DAC (1U << 1)
-#define LOG_CVS (1U << 2)
+#define LOG_DAC         (1U << 1)
+#define LOG_CVS         (1U << 2)
+#define LOG_CALIBRATION (1U << 3)
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL | LOG_CALIBRATION)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -79,28 +81,24 @@ constexpr const char MAINCPU_TAG[] = "80c31";
 class midi2cv8_state : public driver_device
 {
 public:
-	midi2cv8_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, MAINCPU_TAG)
-		, m_midi_pwm_led(*this, "midi_pwm_led")
-		, m_cv_display_integer(*this, "cv_%d_integer", 1U)
-		, m_cv_display_fractional(*this, "cv_%d_fractional", 1U)
-		, m_cv(8, -1)
-	{
-	}
+	midi2cv8_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD;
 
 	void midi2cv8(machine_config &config) ATTR_COLD;
 
+	DECLARE_INPUT_CHANGED_MEMBER(dac_trimmer_changed);
+
 protected:
-	static constexpr const float DAC_V_MAX = 10;
+	static inline constexpr double VCC = 5.0;
 
 	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
-	u8 get_dac_value() const;
 	void update_active_cv();
-	virtual bool compute_cv(float *cv) const;
+	virtual bool compute_cv(double *cv) const;
 	virtual int is_volts_per_hz_r() const;
+	virtual double r28() const;
 
+	double get_dac_i_out() const { return m_dac_i_fs * m_dac_value / 255.0; }
 	mcs51_cpu_device &get_maincpu() { return *m_maincpu; }
 
 private:
@@ -109,51 +107,70 @@ private:
 
 	void dac_w(u8 data);
 	void output_mux_select_w(u8 data);
+	void update_dac_reference();
 
 	void program_map(address_map &map) ATTR_COLD;
 	void external_memory_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_midi_pwm_led;
+	required_ioport m_dac_trimmer;
 	output_finder<8> m_cv_display_integer;
 	output_finder<8> m_cv_display_fractional;
 
 	bool m_inhibit_output_mux = false;
 	u8 m_selected_output_mux = 0;
 	u8 m_dac_value = 0;
+	double m_dac_i_fs = 0;
 	u8 m_midi_rxd_bit = 1; // Initial value needs to be 1, for serial "idle".
-	std::vector<float> m_cv;
+	std::array<double, 8> m_cv;
 };
 
 // MIDI2CV8 with the V/Hz daughterboard.
 class midi2cv8_vhz_state : public midi2cv8_state
 {
 public:
-	midi2cv8_vhz_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
-		: midi2cv8_state(mconfig, type, tag)
-	{
-	}
+	midi2cv8_vhz_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD;
 
 	void midi2cv8_vhz(machine_config &config) ATTR_COLD;
 
+	DECLARE_INPUT_CHANGED_MEMBER(octave_trimmer_changed);
+
 protected:
 	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
-	bool compute_cv(float *cv) const override;
+	bool compute_cv(double *cv) const override;
 	int is_volts_per_hz_r() const override;
+	double r28() const override;
 
 private:
 	void octave_mux_select_w(u8 data);
+	void update_octave_calibration();
 
+	required_ioport_array<4> m_octave_trimmers;
+	std::array<double, 5> m_octave_scalers = {1, 1, 1, 1, 1};
 	u8 m_selected_octave_mux = 0;
 };
 
 // The implementations of midi2cv8_state and midi2cv8_vhz_state below are
 // interleaved, to better demonstrate the difference in behavior between them.
 
-u8 midi2cv8_state::get_dac_value() const
+midi2cv8_state::midi2cv8_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag)
+	, m_maincpu(*this, MAINCPU_TAG)
+	, m_midi_pwm_led(*this, "midi_pwm_led")
+	, m_dac_trimmer(*this, "dac_trimmer")
+	, m_cv_display_integer(*this, "cv_%d_integer", 1U)
+	, m_cv_display_fractional(*this, "cv_%d_fractional", 1U)
 {
-	return m_dac_value;
+	std::fill(m_cv.begin(), m_cv.end(), -1);
+}
+
+midi2cv8_vhz_state::midi2cv8_vhz_state(const machine_config &mconfig, device_type type, const char *tag)
+	: midi2cv8_state(mconfig, type, tag)
+	, m_octave_trimmers(*this, "octave_%u_trimmer", 1U)
+{
 }
 
 void midi2cv8_state::update_active_cv()
@@ -165,7 +182,7 @@ void midi2cv8_state::update_active_cv()
 	if (m_inhibit_output_mux)
 		return;
 
-	float cv = 0;
+	double cv = 0;
 	if (!compute_cv(&cv))
 		return;
 
@@ -183,24 +200,32 @@ void midi2cv8_state::update_active_cv()
 			machine().time().as_double());
 }
 
-bool midi2cv8_state::compute_cv(float *cv) const
+bool midi2cv8_state::compute_cv(double *cv) const
 {
-	*cv = DAC_V_MAX * get_dac_value() / 255.0F;
+	// IC10:B (LM324 op-amp) and R28 convert the DAC output current to a voltage.
+	*cv = get_dac_i_out() * r28();
 	return true;
 }
 
-bool midi2cv8_vhz_state::compute_cv(float *cv) const
+bool midi2cv8_vhz_state::compute_cv(double *cv) const
 {
-	// -1 means the MUX input is not connected.
-	static constexpr const float DIVIDE_BY[8] = {-1, 1, 2, 4, 8, 16, -1, -1};
-	static constexpr const float V_HALF = DAC_V_MAX / 2;
-
+	// -1 means that MUX input is not connected.
+	constexpr int SCALER_INDEX[8] = {-1, 4, 3, 2, 1, 0, -1, -1};
 	assert(m_selected_octave_mux >= 0 && m_selected_octave_mux < 8);
-	const float divisor = DIVIDE_BY[m_selected_octave_mux];
-	if (divisor <= 0)
+	const int scaler_index = SCALER_INDEX[m_selected_octave_mux];
+	if (scaler_index < 0)
 		return false;
 
-	*cv = (V_HALF + V_HALF * get_dac_value() / 255.0F) / divisor;
+	// IC10:A (LM324 op-amp), R39 and R40 invert VCC to produce -5V, which is
+	// then summed with the DAC output via R32. IC10:B converts the current sum
+	// to a voltage, while inverting it. This results in a nominal voltage range
+	// of 5V-10V. That voltage is then optionally scaled down by the voltage
+	// divider network selected by the octave MUX.
+	constexpr double R39 = RES_K(33);
+	constexpr double R40 = RES_K(33);
+	constexpr double R32 = RES_R(2700);
+	constexpr double I_OFFSET = (R40 / R39) * VCC / R32;
+	*cv = (I_OFFSET + get_dac_i_out()) * r28() * m_octave_scalers[scaler_index];
 	return true;
 }
 
@@ -209,6 +234,16 @@ int midi2cv8_state::is_volts_per_hz_r() const
 	// P1.7 pulled up by R54, but connected to GND when the V/Hz option is not
 	// installed. This results in P1.7 reading as 0.
 	return 0;
+}
+
+double midi2cv8_state::r28() const
+{
+	return RES_R(5600);
+}
+
+double midi2cv8_vhz_state::r28() const
+{
+	return RES_R(2700);
 }
 
 int midi2cv8_vhz_state::is_volts_per_hz_r() const
@@ -241,22 +276,6 @@ void midi2cv8_state::dac_w(u8 data)
 	LOGMASKED(LOG_DAC, "DAC value: %02x\n", m_dac_value);
 }
 
-void midi2cv8_vhz_state::octave_mux_select_w(u8 data)
-{
-	// Octave MUX (IC4) is a 4051. X0, X6 and X7 are not connected.
-	// MUX INH is tied low, so it is always enabled.
-	// P1.5 -> OCT A.
-	// P1.6 -> OCT B.
-	// P1.7 -> OCT C.
-	// All signals above are inverted and level-shifted by Q1-Q3.
-
-	const u8 selection = (~data & 0xe0) >> 5;  // Bits 5-7.
-	if (m_selected_octave_mux == selection)
-		return;
-	m_selected_octave_mux = selection;
-	update_active_cv();
-}
-
 void midi2cv8_state::output_mux_select_w(u8 data)
 {
 	// MUX (IC13) is a 4051.
@@ -274,6 +293,91 @@ void midi2cv8_state::output_mux_select_w(u8 data)
 	m_inhibit_output_mux = inhibit;
 	m_selected_output_mux = selection;
 	update_active_cv();
+}
+
+void midi2cv8_state::update_dac_reference()
+{
+	constexpr double R29_POT_MAX = RES_R(1000);
+	constexpr double R31 = RES_R(2200);
+
+	const double r29 = R29_POT_MAX * (100 - m_dac_trimmer->read()) / 100.0;
+	const double i_ref = VCC / (r29 + R31);
+
+	// Compute max ("full scale") output current using the formula in the DAC08
+	// datasheet.
+	m_dac_i_fs = i_ref * 255.0 / 256.0;
+	update_active_cv();
+
+	LOGMASKED(LOG_CALIBRATION, "DAC iFS updated: %f\n", m_dac_i_fs);
+}
+
+void midi2cv8_vhz_state::octave_mux_select_w(u8 data)
+{
+	// Octave MUX (IC4) is a 4051. X0, X6 and X7 are not connected.
+	// MUX INH is tied low, so it is always enabled.
+	// P1.5 -> OCT A.
+	// P1.6 -> OCT B.
+	// P1.7 -> OCT C.
+	// All signals above are inverted and level-shifted by Q1-Q3.
+
+	const u8 selection = (~data & 0xe0) >> 5;  // Bits 5-7.
+	if (m_selected_octave_mux == selection)
+		return;
+	m_selected_octave_mux = selection;
+	update_active_cv();
+}
+
+// Returns the voltage proportion at different points on the resistive divider
+// ladder. This ladder is used for scaling down the CV to lower octaves.
+constexpr std::array<double, 8> octave_resistor_ladder_v()
+{
+	constexpr double RESISTOR_LADDER[9] =
+	{
+		RES_R(47),  // R47
+		RES_2_PARALLEL(RES_R(22), RES_K(1)),  // R26, R20 pot
+		RES_R(22),  // R21
+		RES_2_PARALLEL(RES_R(56), RES_K(1)),  // R18, R14 pot
+		RES_R(47),  // R17
+		RES_2_PARALLEL(RES_R(120), RES_K(1)),  // R13, R11 pot
+		RES_R(100),  // R12
+		RES_2_PARALLEL(RES_R(270), RES_K(1)),  // R10, R8 pot
+		RES_R(390),  // R9
+	};
+
+	// Compute cumulative resistance in both directions.
+	std::array<double, 8> r_lower{};
+	std::array<double, 8> r_upper{};
+	r_lower[0] = RESISTOR_LADDER[0];
+	r_upper[7] = RESISTOR_LADDER[8];
+	for (int i = 1; i < 8; ++i)
+	{
+		r_lower[i] = r_lower[i - 1] + RESISTOR_LADDER[i];
+		r_upper[7 - i] = r_upper[8 - i] + RESISTOR_LADDER[8 - i];
+	}
+
+	std::array<double, 8> ladder_v{};
+	for (int i = 0; i < 8; ++i)
+		ladder_v[i] = RES_VOLTAGE_DIVIDER(r_upper[i], r_lower[i]);
+	return ladder_v;
+}
+
+void midi2cv8_vhz_state::update_octave_calibration()
+{
+	constexpr std::array<double, 8> ladder_v = octave_resistor_ladder_v();
+	for (int octave = 0; octave < 4; ++octave)
+	{
+		const double v_low = ladder_v[2 * octave];
+		const double v_high = ladder_v[2 * octave + 1];
+		const double trimmer = m_octave_trimmers[octave]->read() / 100.0;
+		m_octave_scalers[octave] = v_low + trimmer * (v_high - v_low);
+	}
+	m_octave_scalers[4] = 1.0;
+	update_active_cv();
+
+	LOGMASKED(LOG_CALIBRATION, "Octave calibration updated: ");
+	for (int i = 0; i < m_octave_scalers.size(); ++i)
+		LOGMASKED(LOG_CALIBRATION, "%d: %f  ", i, m_octave_scalers[i]);
+	LOGMASKED(LOG_CALIBRATION, "\n");
 }
 
 void midi2cv8_state::program_map(address_map &map)
@@ -296,6 +400,7 @@ void midi2cv8_state::machine_start()
 	save_item(NAME(m_inhibit_output_mux));
 	save_item(NAME(m_selected_output_mux));
 	save_item(NAME(m_dac_value));
+	save_item(NAME(m_dac_i_fs));
 	save_item(NAME(m_midi_rxd_bit));
 	save_item(NAME(m_cv));
 }
@@ -303,7 +408,19 @@ void midi2cv8_state::machine_start()
 void midi2cv8_vhz_state::machine_start()
 {
 	midi2cv8_state::machine_start();
+	save_item(NAME(m_octave_scalers));
 	save_item(NAME(m_selected_octave_mux));
+}
+
+void midi2cv8_state::machine_reset()
+{
+	update_dac_reference();
+}
+
+void midi2cv8_vhz_state::machine_reset()
+{
+	midi2cv8_state::machine_reset();
+	update_octave_calibration();
 }
 
 void midi2cv8_state::midi2cv8(machine_config &config)
@@ -342,6 +459,16 @@ void midi2cv8_vhz_state::midi2cv8_vhz(machine_config &config)
 	get_maincpu().port_out_cb<1>().set(FUNC(midi2cv8_vhz_state::octave_mux_select_w));
 }
 
+DECLARE_INPUT_CHANGED_MEMBER(midi2cv8_state::dac_trimmer_changed)
+{
+	update_dac_reference();
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(midi2cv8_vhz_state::octave_trimmer_changed)
+{
+	update_octave_calibration();
+}
+
 INPUT_PORTS_START(midi2cv8)
 	PORT_START("dsw")
 	PORT_DIPNAME(0x0f, 0x00, "MIDI Channel") PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -373,6 +500,25 @@ INPUT_PORTS_START(midi2cv8)
 	PORT_DIPNAME(0x80, 0x00, "Not Connected") PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(   0x00, DEF_STR(On))
 	PORT_DIPSETTING(   0x80, DEF_STR(Off))
+
+	PORT_START("dac_trimmer")
+	PORT_ADJUSTER(50, "DAC tune") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midi2cv8_state::dac_trimmer_changed), 0)
+INPUT_PORTS_END
+
+INPUT_PORTS_START(midi2cv8_vhz)
+	PORT_INCLUDE(midi2cv8)
+
+	// All octave trimmers are 1K potentiometers.
+	// Default values are for a correct tuning relative to octave 5, with a
+	// small error due to adjuster resolution.
+	PORT_START("octave_1_trimmer")
+	PORT_ADJUSTER(72, "Octave 1 trimmer (R20)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midi2cv8_vhz_state::octave_trimmer_changed), 0)
+	PORT_START("octave_2_trimmer")
+	PORT_ADJUSTER(65, "Octave 2 trimmer (R14)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midi2cv8_vhz_state::octave_trimmer_changed), 0)
+	PORT_START("octave_3_trimmer")
+	PORT_ADJUSTER(56, "Octave 3 trimmer (R11)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midi2cv8_vhz_state::octave_trimmer_changed), 0)
+	PORT_START("octave_4_trimmer")
+	PORT_ADJUSTER(48, "Octave 4 trimmer (R8)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midi2cv8_vhz_state::octave_trimmer_changed), 0)
 INPUT_PORTS_END
 
 #define ROMS_MIDI2CV8 \
@@ -392,4 +538,4 @@ ROM_END
 } // anonymous namespace
 
 SYST(1997, midi2cv8, 0, 0, midi2cv8, midi2cv8, midi2cv8_state, empty_init, "PAiA Electronics", "midi2cv8", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
-SYST(1997, midi2cv8_vhz, 0, 0, midi2cv8_vhz, midi2cv8, midi2cv8_vhz_state, empty_init, "PAiA Electronics", "midi2cv8 V/Hz", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+SYST(1997, midi2cv8_vhz, 0, 0, midi2cv8_vhz, midi2cv8_vhz, midi2cv8_vhz_state, empty_init, "PAiA Electronics", "midi2cv8 V/Hz", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
