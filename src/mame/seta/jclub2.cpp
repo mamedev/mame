@@ -17,8 +17,8 @@
 
   ST-0013: unknown function. Doesn't seem to be used anywhere else?
   ST-0016: Z80 with integrated video + sound capabilities. Video functionality is probably not used here.
-  ST-0017: unknown function (maybe I/O or RLE). Also used in srmp6 (see srmp6.cpp).
-  ST-0020: zooming sprites + blitter + tilemaps chip. Also used by gdfs in ssv.cpp (see st0020.cpp)
+  ST-0017: unknown function (maybe I/O or RLE). Also used in srmp6 (see seta/srmp6.cpp).
+  ST-0020: zooming sprites + blitter + tilemaps chip. Also used by gdfs in seta/ssv.cpp (see seta/st0020.cpp)
   ST-0032: similar to ST-0020 but the ram / list formats aren't the same. Maybe it handles sound as
            there doesn't seem to be any other dedicated sound chip. Doesn't seem to be used anywhere else?
 
@@ -94,26 +94,37 @@
   - Extend palette to 0x20000 entries (palette_device::allocate_palette() prevents more than 0x10000)
   - Correct clocks
   - darkhors: fix the disalignment between sprites and tilemap (gap in the fence) during play. Other screens are fine
+  - Sprites are 1 frame delayed compared to tilemap? needs to verification from real hardware.
 
 ************************************************************************************************************/
 
 #include "emu.h"
+
+#include "st0016.h"
+#include "st0020.h"
+
 #include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
-#include "st0016.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "sound/setapcm.h"
 #include "sound/okim6295.h"
-#include "st0020.h"
+#include "sound/setapcm.h"
+
 #include "emupal.h"
 #include "speaker.h"
 #include "tilemap.h"
 
 #include "jclub2o.lh"
 #include "jclub2.lh"
+
+#define LOG_UNKNOWN (1 << 1)
+#define LOG_SOUND   (1 << 2)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
 
 namespace {
 
@@ -125,14 +136,27 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_hopper1(*this, "hopper1"), m_hopper2(*this, "hopper2"),
+		m_hopper(*this, "hopper%u", 1U),
 		m_palette(*this, "palette"),
-		m_key1(*this, "KEY1.%u", 0), m_key2(*this, "KEY2.%u", 0),
-		m_input_sel1(0), m_input_sel2(0),
+		m_key{{*this, "KEY1.%u", 0}, {*this, "KEY2.%u", 0}},
+		m_input_sel{0},
 		m_out1(0), m_out2(0), m_out3(0)
 	{ }
 
-	uint8_t read_key(required_ioport_array<8> & key, uint8_t mask);
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device_array<ticket_dispenser_device, 2> m_hopper;
+	required_device<palette_device> m_palette;
+	required_ioport_array<8> m_key[2];
+
+	uint8_t m_input_sel[2];
+
+	uint32_t m_out1, m_out2, m_out3;
+
+	uint8_t read_key(uint8_t which);
 
 	uint8_t console_r();
 	void console_w(uint8_t data);
@@ -141,17 +165,6 @@ public:
 	void eeprom_93c46_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_irq);
-
-protected:
-	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<ticket_dispenser_device> m_hopper1, m_hopper2;
-	required_device<palette_device> m_palette;
-	required_ioport_array<8> m_key1, m_key2;
-
-	uint8_t m_input_sel1, m_input_sel2;
-
-	uint32_t m_out1, m_out2, m_out3;
 
 	void debug_out();
 };
@@ -163,22 +176,25 @@ class jclub2_state : public common_state
 public:
 	jclub2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		common_state(mconfig, type, tag),
-		m_st0020(*this, "st0020")
+		m_st0020(*this, "st0020"),
+		m_pl_low(*this, "P%uLOW", 1U)
 	{ }
+
+	void jclub2(machine_config &config) ATTR_COLD;
+
+protected:
+	required_device<st0020_device> m_st0020;
+	required_ioport_array<2> m_pl_low;
 
 	void input_sel1_out3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void input_sel2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t p1_r();
-	uint32_t p2_r();
+	template <unsigned Which> uint32_t pl_r();
 	void out1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void out2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void jclub2(machine_config &config);
 	void jclub2_map(address_map &map) ATTR_COLD;
-protected:
-	required_device<st0020_device> m_st0020;
 };
 
 // Older jclub2 hardware (with ST-0016)
@@ -188,39 +204,38 @@ public:
 	jclub2o_state(const machine_config &mconfig, device_type type, const char *tag) :
 		jclub2_state(mconfig, type, tag),
 		m_soundcpu(*this, "soundcpu"),
-		m_soundbank(*this, "soundbank")
+		m_soundbank(*this, "soundbank"),
+		m_soundlatch{0},
+		m_soundlatch_status(0)
 	{ }
 
+	void jclub2o(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
 	required_device<st0016_cpu_device> m_soundcpu;
 	required_memory_bank m_soundbank;
+
+	uint8_t m_soundlatch[2];
+	uint8_t m_soundlatch_status;
 
 	void eeprom_s29290_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// ST-0016 <-> 68EC020
-	uint8_t cmd1_r();
-	uint8_t cmd2_r();
-	void cmd1_w(uint8_t data);
-	void cmd2_w(uint8_t data);
-	uint8_t cmd_stat_r();
+	template <unsigned Which> uint8_t soundlatch_r();
+	template <unsigned Which> void soundlatch_w(uint8_t data);
+	uint8_t soundlatch_status_r();
 	void st0016_rom_bank_w(uint8_t data); // temp?
 
 	// 68EC020 <-> ST-0016
-	uint32_t cmd1_word_r();
-	uint32_t cmd2_word_r();
-	void cmd1_word_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void cmd2_word_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t cmd_stat_word_r();
+	template <unsigned Which> uint32_t soundlatch_word_r();
+	template <unsigned Which> void soundlatch_word_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	void init_jclub2o();
-
-	void jclub2o(machine_config &config);
 	void jclub2o_map(address_map &map) ATTR_COLD;
-	void st0016_io(address_map &map) ATTR_COLD;
-	void st0016_mem(address_map &map) ATTR_COLD;
-private:
-	uint8_t m_cmd1;
-	uint8_t m_cmd2;
-	uint8_t m_cmd_stat;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -230,49 +245,42 @@ class darkhors_state : public common_state
 public:
 	darkhors_state(const machine_config &mconfig, device_type type, const char *tag) :
 		common_state(mconfig, type, tag),
-		m_tmapram(*this,     "tmapram"),
-		m_tmapscroll(*this,  "tmapscroll"),
-		m_tmapram2(*this,    "tmapram2"),
-		m_tmapscroll2(*this, "tmapscroll2"),
-		m_spriteram(*this,   "spriteram"),
-		m_gfxdecode(*this,   "gfxdecode")
+		m_tmapram(*this, "tmapram%u", 1U),
+		m_tmapscroll(*this, "tmapscroll%u", 1U),
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
-	void init_darkhors();
+	void init_darkhors() ATTR_COLD;
 
-	void darkhors(machine_config &config);
-	void darkhorsa(machine_config &config);
+	void darkhors(machine_config &config) ATTR_COLD;
+	void darkhorsa(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	required_shared_ptr_array<uint32_t, 2> m_tmapram;
+	required_shared_ptr_array<uint32_t, 2> m_tmapscroll;
+	required_shared_ptr<uint32_t> m_spriteram;
+
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	tilemap_t *m_tmap[2]{};
+
 	void input_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t input_r();
 	void out1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	void tmapram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void tmapram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <unsigned Which> void tmapram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	template <unsigned Which> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void darkhors_map(address_map &map) ATTR_COLD;
 	void darkhorsa_map(address_map &map) ATTR_COLD;
-
-	required_shared_ptr<uint32_t> m_tmapram;
-	required_shared_ptr<uint32_t> m_tmapscroll;
-	required_shared_ptr<uint32_t> m_tmapram2;
-	required_shared_ptr<uint32_t> m_tmapscroll2;
-	required_shared_ptr<uint32_t> m_spriteram;
-
-	required_device<gfxdecode_device> m_gfxdecode;
-
-	tilemap_t *m_tmap = nullptr;
-	tilemap_t *m_tmap2 = nullptr;
 };
 
 
@@ -298,25 +306,20 @@ uint8_t common_state::console_status_r()
 	return 0x3;
 }
 
-uint8_t common_state::read_key(required_ioport_array<8> & key, uint8_t mask)
+uint8_t common_state::read_key(uint8_t which)
 {
-	switch(mask)
+	uint8_t ret = 0xff;
+	for (int i = 0; i < 8; i++)
 	{
-		case 0x01:  return key[0]->read();
-		case 0x02:  return key[1]->read();
-		case 0x04:  return key[2]->read();
-		case 0x08:  return key[3]->read();
-		case 0x10:  return key[4]->read();
-		case 0x20:  return key[5]->read();
-		case 0x40:  return key[6]->read();
-		case 0x80:  return key[7]->read();
+		if (BIT(m_input_sel[which], i))
+			ret &= m_key[which][i]->read();
 	}
-	return 0xff;
+	return ret;
 }
 
 void common_state::debug_out()
 {
-//  popmessage("OUT: %04X | %04X | %02X--", m_out1 >> 16, m_out2 >> 16, m_out3 >> 24);
+	//popmessage("OUT: %04X | %04X | %02X--", m_out1 >> 16, m_out2 >> 16, m_out3 >> 24);
 }
 
 /***************************************************************************
@@ -342,61 +345,52 @@ uint32_t jclub2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
+template <unsigned Which>
+TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info)
 {
-	uint16_t tile     =   m_tmapram[tile_index] >> 16;
-	uint16_t color    =   m_tmapram[tile_index] & 0xffff;
-	tileinfo.set(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
+	const uint16_t tile = m_tmapram[Which][tile_index] >> 16;
+	const uint16_t color = m_tmapram[Which][tile_index] & 0xffff;
+	tileinfo.set(0, tile/2, BIT(color, 9) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
-TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_1)
-{
-	uint16_t tile     =   m_tmapram2[tile_index] >> 16;
-	uint16_t color    =   m_tmapram2[tile_index] & 0xffff;
-	tileinfo.set(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
-}
-
+template <unsigned Which>
 void darkhors_state::tmapram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_tmapram[offset]);
-	m_tmap->mark_tile_dirty(offset);
-}
-void darkhors_state::tmapram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_tmapram2[offset]);
-	m_tmap2->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tmapram[Which][offset]);
+	m_tmap[Which]->mark_tile_dirty(offset);
 }
 
 void darkhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *s       =   m_spriteram;
-	uint32_t *end     =   m_spriteram + 0x02000/4;
+	const uint32_t *s = m_spriteram;
+	const uint32_t *end = m_spriteram + 0x02000/4;
 
 	for ( ; s < end; s += 8/4 )
 	{
-		int sx      =   (s[ 0 ] >> 16);
-		int sy      =   (s[ 0 ] & 0xffff);
-		int attr    =   (s[ 1 ] >> 16);
-		int code    =   (s[ 1 ] & 0xffff);
+		int sx         = s[0] >> 16;
+		int sy         = s[0] & 0xffff;
+		const int attr = s[1] >> 16;
+		const int code = s[1] & 0xffff;
 
 		// List end
-		if (sx & 0x8000)
+		if (BIT(sx, 15))
 			break;
 
-		int flipx   =   0;
-		int flipy   =   0;
-		int color   =   (attr & 0x0200) ? (attr & 0x1ff) : (attr & 0x1ff) * 4;
+		const bool flipx = false;
+		const bool flipy = false;
+		const int color  = BIT(attr, 9) ? (attr & 0x1ff) : (attr & 0x1ff) * 4;
 
 		// Sign extend the position
-		sx  =   (sx & 0x1ff) - (sx & 0x200);
-		sy  =   (sy & 0x1ff) - (sy & 0x200);
+		sx =  util::sext(sx, 10);
+		sy =  util::sext(sy, 10);
 
-		sy  =   -sy;
-		sy  +=  0xf8;
+		sy =  -sy;
+		sy += 0xf8;
 
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-			code/2, color,
-			flipx,  flipy,  sx, sy, 0);
+				code/2, color,
+				flipx, flipy,
+				sx, sy, 0);
 	}
 }
 
@@ -404,10 +398,10 @@ void darkhors_state::video_start()
 {
 	common_state::video_start();
 
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
-	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info_1)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
-	m_tmap->set_transparent_pen(0);
-	m_tmap2->set_transparent_pen(0);
+	m_tmap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
+	m_tmap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
+	m_tmap[0]->set_transparent_pen(0);
+	m_tmap[1]->set_transparent_pen(0);
 
 	m_gfxdecode->gfx(0)->set_granularity(64); // 256 colour sprites with palette selectable on 64 colour boundaries
 }
@@ -429,25 +423,25 @@ uint32_t darkhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_tmap->set_scrollx(0, (m_tmapscroll[0] >> 16) - 5);
-	m_tmap->set_scrolly(0, (m_tmapscroll[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 1)    m_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tmap[0]->set_scrollx(0, (m_tmapscroll[0][0] >> 16) - 5);
+	m_tmap[0]->set_scrolly(0, (m_tmapscroll[0][0] & 0xffff) - 0xff);
+	if (layers_ctrl & 1)    m_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
-	m_tmap2->set_scrollx(0, (m_tmapscroll2[0] >> 16) - 5);
-	m_tmap2->set_scrolly(0, (m_tmapscroll2[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 2)    m_tmap2->draw(screen, bitmap, cliprect, 0, 0);
+	m_tmap[1]->set_scrollx(0, (m_tmapscroll[1][0] >> 16) - 5);
+	m_tmap[1]->set_scrolly(0, (m_tmapscroll[1][0] & 0xffff) - 0xff);
+	if (layers_ctrl & 2)    m_tmap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (layers_ctrl & 4)    draw_sprites(bitmap,cliprect);
 
 #ifdef MAME_DEBUG
 #if 0
 	popmessage("%04X-%04X %04X-%04X %04X-%04X %04X-%04X %04X-%04X %04X-%04X",
-		m_tmapscroll[0] >> 16, m_tmapscroll[0] & 0xffff,
-		m_tmapscroll[1] >> 16, m_tmapscroll[1] & 0xffff,
-		m_tmapscroll[2] >> 16, m_tmapscroll[2] & 0xffff,
-		m_tmapscroll[3] >> 16, m_tmapscroll[3] & 0xffff,
-		m_tmapscroll[4] >> 16, m_tmapscroll[4] & 0xffff,
-		m_tmapscroll[5] >> 16, m_tmapscroll[5] & 0xffff
+		m_tmapscroll[0][0] >> 16, m_tmapscroll[0][0] & 0xffff,
+		m_tmapscroll[0][1] >> 16, m_tmapscroll[0][1] & 0xffff,
+		m_tmapscroll[0][2] >> 16, m_tmapscroll[0][2] & 0xffff,
+		m_tmapscroll[0][3] >> 16, m_tmapscroll[0][3] & 0xffff,
+		m_tmapscroll[0][4] >> 16, m_tmapscroll[0][4] & 0xffff,
+		m_tmapscroll[0][5] >> 16, m_tmapscroll[0][5] & 0xffff
 	);
 #endif
 #endif
@@ -468,7 +462,7 @@ void jclub2_state::input_sel2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	// sometimes 0x80000000 bit is set
 	// (it is cleared before reading from 4d0000.b / 4d0004.b / 4d0008.b / 4d000c.b)
 	if (ACCESSING_BITS_16_23)
-		m_input_sel2 = data >> 16;
+		m_input_sel[1] = data >> 16;
 }
 
 void jclub2_state::input_sel1_out3_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -476,7 +470,7 @@ void jclub2_state::input_sel1_out3_w(offs_t offset, uint32_t data, uint32_t mem_
 	COMBINE_DATA(&m_out3);
 
 	if (ACCESSING_BITS_16_23)
-		m_input_sel1 = data >> 16;
+		m_input_sel[0] = data >> 16;
 	if (ACCESSING_BITS_24_31)
 	{
 		// 0x0800 P2 divider coil
@@ -485,16 +479,11 @@ void jclub2_state::input_sel1_out3_w(offs_t offset, uint32_t data, uint32_t mem_
 	}
 }
 
-uint32_t jclub2_state::p1_r()
+template <unsigned Which>
+uint32_t jclub2_state::pl_r()
 {
-	uint32_t ret = ioport("P1LOW")->read() & 0x00ffffff;
-	return ret | (read_key(m_key1, m_input_sel1) << 24);
-}
-
-uint32_t jclub2_state::p2_r()
-{
-	uint32_t ret = ioport("P2LOW")->read() & 0x00ffffff;
-	return ret | (read_key(m_key2, m_input_sel2) << 24);
+	uint32_t ret = m_pl_low[Which]->read() & 0x00ffffff;
+	return ret | (read_key(Which) << 24);
 }
 
 void jclub2_state::out1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -515,9 +504,9 @@ void jclub2_state::out1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// 0x0002 counter meter 5
 		// 0x0001 counter meter 2
 
-		m_hopper2->motor_w(                         data  & 0x10000000);
-		machine().bookkeeping().coin_lockout_w(1, (~data) & 0x01000000);
-		machine().bookkeeping().coin_lockout_w(0, (~data) & 0x00800000);
+		m_hopper[1]->motor_w(                     BIT( data, 28));
+		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 24));
+		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 23));
 
 		debug_out();
 	}
@@ -530,7 +519,7 @@ void jclub2_state::out2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		// 0x8000 P1 hopper rotate
 
-		m_hopper1->motor_w(data & 0x80000000);
+		m_hopper[0]->motor_w(BIT(data, 31));
 
 		debug_out();
 	}
@@ -541,55 +530,45 @@ void jclub2_state::out2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void jclub2o_state::eeprom_s29290_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data & ~0xff000000)
-		logerror("%s: Unknown EEPROM bit written %08X\n", machine().describe_context(), data);
+		LOGMASKED(LOG_UNKNOWN, "%s: Unknown EEPROM bit written %08X & %08x\n", machine().describe_context(), data, mem_mask);
 
 	if (ACCESSING_BITS_24_31)
 	{
 		// latch the bit
-		m_eeprom->di_write((data & 0x01000000) >> 24);
+		m_eeprom->di_write(BIT(data, 24));
 
 		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x08000000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->cs_write(BIT(data, 27) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x04000000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write(BIT(data, 26) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 // 68EC020 <-> ST-0016
 
-uint32_t jclub2o_state::cmd1_word_r()
+template <unsigned Which>
+uint32_t jclub2o_state::soundlatch_word_r()
 {
-	m_cmd_stat &= ~0x02;
-	return m_cmd1 << 24;
-}
-uint32_t jclub2o_state::cmd2_word_r()
-{
-	m_cmd_stat &= ~0x08;
-	return m_cmd2 << 24;
+	if (!machine().side_effects_disabled())
+		m_soundlatch_status &= ~(0x02 << (Which << 1));
+	return m_soundlatch[Which] << 24;
 }
 
-uint32_t jclub2o_state::cmd_stat_word_r()
+
+uint8_t jclub2o_state::soundlatch_status_r()
 {
-	return m_cmd_stat << 24;
+	return m_soundlatch_status;
 }
 
-void jclub2o_state::cmd1_word_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+template <unsigned Which>
+void jclub2o_state::soundlatch_word_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		m_cmd_stat |= 0x01;
-		m_cmd1 = data >> 24;
-		logerror("%s: cmd1_w %02x\n", machine().describe_context(), m_cmd1);
-	}
-}
-void jclub2o_state::cmd2_word_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		m_cmd_stat |= 0x04;
-		m_cmd2 = data >> 24;
-		logerror("%s: cmd2_w %02x\n", machine().describe_context(), m_cmd2);
+		m_soundlatch_status |= 0x01 << (Which << 1);
+		m_soundlatch[Which] = data >> 24;
+		LOGMASKED(LOG_SOUND, "%s: soundlatch_word_w<%02x> %02x\n", machine().describe_context(), Which, m_soundlatch[Which]);
 	}
 }
 
@@ -606,19 +585,19 @@ void jclub2o_state::jclub2o_map(address_map &map)
 //  map(0x4a0030, 0x4a0033).w(FUNC(jclub2o_map::));
 
 	// ST-0016
-	map(0x4b0000, 0x4b0003).rw(FUNC(jclub2o_state::cmd1_word_r), FUNC(jclub2o_state::cmd1_word_w));
-	map(0x4b0004, 0x4b0007).rw(FUNC(jclub2o_state::cmd2_word_r), FUNC(jclub2o_state::cmd2_word_w));
-	map(0x4b0008, 0x4b000b).r(FUNC(jclub2o_state::cmd_stat_word_r));
+	map(0x4b0000, 0x4b0003).rw(FUNC(jclub2o_state::soundlatch_word_r<0>), FUNC(jclub2o_state::soundlatch_word_w<0>));
+	map(0x4b0004, 0x4b0007).rw(FUNC(jclub2o_state::soundlatch_word_r<1>), FUNC(jclub2o_state::soundlatch_word_w<1>));
+	map(0x4b0008, 0x4b0008).r(FUNC(jclub2o_state::soundlatch_status_r));
 
 	map(0x4d0000, 0x4d0003).nopr().nopw(); // reads seem unused? this write would go to two 7-segs (but the code is never called)
 	map(0x4d0004, 0x4d0007).nopr();
 	map(0x4d0008, 0x4d000b).nopr();
 	map(0x4d000c, 0x4d000f).nopr();
 
-	map(0x4e0000, 0x4e0003).r(FUNC(jclub2o_state::p2_r)).w(FUNC(jclub2o_state::input_sel2_w));
+	map(0x4e0000, 0x4e0003).r(FUNC(jclub2o_state::pl_r<1>)).w(FUNC(jclub2o_state::input_sel2_w));
 
 	map(0x580000, 0x580003).portr("EEPROM");
-	map(0x580004, 0x580007).r(FUNC(jclub2o_state::p1_r));
+	map(0x580004, 0x580007).r(FUNC(jclub2o_state::pl_r<0>));
 	map(0x580008, 0x58000b).portr("COIN");
 	map(0x58000c, 0x58000f).w(FUNC(jclub2o_state::input_sel1_out3_w));
 	map(0x580010, 0x580013).w(FUNC(jclub2o_state::out1_w));
@@ -642,57 +621,45 @@ void jclub2o_state::jclub2o_map(address_map &map)
 
 // ST-0016 map
 
-// common rombank? should go in machine/st0016 with larger address space exposed?
+// common rombank? should go in seta/st0016.cpp with larger address space exposed?
 void jclub2o_state::st0016_rom_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x1f);
 }
 
-uint8_t jclub2o_state::cmd1_r()
+template <unsigned Which>
+uint8_t jclub2o_state::soundlatch_r()
 {
-	m_cmd_stat &= ~0x01;
-	return m_cmd1;
-}
-uint8_t jclub2o_state::cmd2_r()
-{
-	m_cmd_stat &= ~0x04;
-	return m_cmd2;
-}
-uint8_t jclub2o_state::cmd_stat_r()
-{
-	return m_cmd_stat;
+	if (!machine().side_effects_disabled())
+		m_soundlatch_status &= ~(0x01 << (Which << 1));
+	return m_soundlatch[Which];
 }
 
-void jclub2o_state::cmd1_w(uint8_t data)
+template <unsigned Which>
+void jclub2o_state::soundlatch_w(uint8_t data)
 {
-	m_cmd1 = data;
-	m_cmd_stat |= 0x02;
-	logerror("%s: cmd1_w %02x\n", machine().describe_context(), m_cmd1);
-}
-void jclub2o_state::cmd2_w(uint8_t data)
-{
-	m_cmd2 = data;
-	m_cmd_stat |= 0x08;
-	logerror("%s: cmd2_w %02x\n", machine().describe_context(), m_cmd2);
+	m_soundlatch[Which] = data;
+	m_soundlatch_status |= 0x02 << (Which << 1);
+	LOGMASKED(LOG_SOUND, "%s: soundlatch_w<%02x> %02x\n", machine().describe_context(), Which, m_soundlatch[Which]);
 }
 
-void jclub2o_state::st0016_mem(address_map &map)
+void jclub2o_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("soundbank");
+	map(0x8000, 0xbfff).bankr(m_soundbank);
 	map(0xe800, 0xe8ff).ram();
 	//map(0xe900, 0xe9ff) // sound - internal
 	//map(0xec00, 0xec1f).rw(FUNC(jclub2o_state::st0016_character_ram_r), FUNC(jclub2o_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram();
 }
 
-void jclub2o_state::st0016_io(address_map &map)
+void jclub2o_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	//map(0x00, 0xbf).rw(FUNC(jclub2o_state::st0016_vregs_r), FUNC(jclub2o_state::st0016_vregs_w));
-	map(0xc0, 0xc0).rw(FUNC(jclub2o_state::cmd1_r), FUNC(jclub2o_state::cmd1_w));
-	map(0xc1, 0xc1).rw(FUNC(jclub2o_state::cmd2_r), FUNC(jclub2o_state::cmd2_w));
-	map(0xc2, 0xc2).r(FUNC(jclub2o_state::cmd_stat_r));
+	map(0xc0, 0xc0).rw(FUNC(jclub2o_state::soundlatch_r<0>), FUNC(jclub2o_state::soundlatch_w<0>));
+	map(0xc1, 0xc1).rw(FUNC(jclub2o_state::soundlatch_r<1>), FUNC(jclub2o_state::soundlatch_w<1>));
+	map(0xc2, 0xc2).r(FUNC(jclub2o_state::soundlatch_status_r));
 	map(0xe1, 0xe1).w(FUNC(jclub2o_state::st0016_rom_bank_w));
 	map(0xe7, 0xe7).nopw(); // watchdog?
 	//map(0xf0, 0xf0).r(FUNC(jclub2o_state::st0016_dma_r));
@@ -704,18 +671,18 @@ void jclub2o_state::st0016_io(address_map &map)
 void common_state::eeprom_93c46_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data & ~0xff000000)
-		logerror("%s: Unknown EEPROM bit written %08X\n", machine().describe_context(), data);
+		LOGMASKED(LOG_UNKNOWN, "%s: Unknown EEPROM bit written %08X & %08X\n", machine().describe_context(), data, mem_mask);
 
 	if (ACCESSING_BITS_24_31)
 	{
 		// latch the bit
-		m_eeprom->di_write((data & 0x04000000) >> 26);
+		m_eeprom->di_write(BIT(data, 26));
 
 		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x01000000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->cs_write(BIT(data, 24) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write(BIT(data, 25) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -733,10 +700,10 @@ void jclub2_state::jclub2_map(address_map &map)
 	map(0x4d0008, 0x4d000b).nopr();
 	map(0x4d000c, 0x4d000f).nopr();
 
-	map(0x4e0000, 0x4e0003).r(FUNC(jclub2_state::p2_r)).w(FUNC(jclub2_state::input_sel2_w));
+	map(0x4e0000, 0x4e0003).r(FUNC(jclub2_state::pl_r<1>)).w(FUNC(jclub2_state::input_sel2_w));
 
 	map(0x580000, 0x580003).portr("EEPROM");
-	map(0x580004, 0x580007).r(FUNC(jclub2_state::p1_r));
+	map(0x580004, 0x580007).r(FUNC(jclub2_state::pl_r<0>));
 	map(0x580008, 0x58000b).portr("COIN");
 	map(0x58000c, 0x58000f).w(FUNC(jclub2_state::input_sel1_out3_w));
 	map(0x580010, 0x580013).w(FUNC(jclub2_state::out1_w));
@@ -766,15 +733,15 @@ void jclub2_state::jclub2_map(address_map &map)
 void darkhors_state::input_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
-		m_input_sel1 = data >> 16;
+		m_input_sel[0] = data >> 16;
 	if (ACCESSING_BITS_24_31)
-		m_input_sel2 = data >> 24;
+		m_input_sel[1] = data >> 24;
 }
 
 uint32_t darkhors_state::input_r()
 {
-	return  (read_key(m_key1, m_input_sel1) << 16) |
-			(read_key(m_key2, m_input_sel2) << 24) ;
+	return  (read_key(0) << 16) |
+			(read_key(1) << 24);
 }
 
 void darkhors_state::out1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -802,8 +769,8 @@ void darkhors_state::out1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// 0x0002 counter meter 2
 		// 0x0001 counter meter 1
 
-		machine().bookkeeping().coin_lockout_w(1, (~data) & 0x80000000);
-		machine().bookkeeping().coin_lockout_w(0, (~data) & 0x10000000);
+		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 31));
+		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 28));
 
 		debug_out();
 	}
@@ -832,22 +799,22 @@ void darkhors_state::darkhors_map(address_map &map)
 	map(0x580421, 0x580421).r(FUNC(darkhors_state::console_status_r));
 
 	map(0x800000, 0x86bfff).ram();
-	map(0x86c000, 0x86ffff).ram().w(FUNC(darkhors_state::tmapram_w)).share("tmapram");
-	map(0x870000, 0x873fff).ram().w(FUNC(darkhors_state::tmapram2_w)).share("tmapram2");
+	map(0x86c000, 0x86ffff).ram().w(FUNC(darkhors_state::tmapram_w<0>)).share(m_tmapram[0]);
+	map(0x870000, 0x873fff).ram().w(FUNC(darkhors_state::tmapram_w<1>)).share(m_tmapram[1]);
 	map(0x874000, 0x87dfff).ram();
-	map(0x87e000, 0x87ffff).ram().share("spriteram");
+	map(0x87e000, 0x87ffff).ram().share(m_spriteram);
 	map(0x880000, 0x89ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x8a0000, 0x8bffff).ram();   // this should still be palette ram!
-	map(0x8c0120, 0x8c012f).writeonly().share("tmapscroll");
-	map(0x8c0130, 0x8c013f).writeonly().share("tmapscroll2");
+	map(0x8c0120, 0x8c012f).writeonly().share(m_tmapscroll[0]);
+	map(0x8c0130, 0x8c013f).writeonly().share(m_tmapscroll[1]);
 }
 
 void darkhors_state::darkhorsa_map(address_map &map)
 {
 	darkhors_map(map);
 
-	map(0x8c0020, 0x8c002f).writeonly().share("tmapscroll");
-	map(0x8c0030, 0x8c003f).writeonly().share("tmapscroll2");
+	map(0x8c0020, 0x8c002f).writeonly().share(m_tmapscroll[0]);
+	map(0x8c0030, 0x8c003f).writeonly().share(m_tmapscroll[1]);
 	map(0x8c0120, 0x8c012f).unmaprw();
 	map(0x8c0130, 0x8c013f).unmaprw();
 }
@@ -1129,7 +1096,7 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_darkhors )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 ) // color codes should be doubled
+	GFXDECODE_ENTRY( "gfx", 0, layout_16x16x8, 0, 0x10000/64 ) // color codes should be doubled
 GFXDECODE_END
 
 /***************************************************************************
@@ -1137,6 +1104,25 @@ GFXDECODE_END
                                 Machine Drivers
 
 ***************************************************************************/
+
+void common_state::machine_start()
+{
+	save_item(NAME(m_input_sel));
+
+	save_item(NAME(m_out1));
+	save_item(NAME(m_out2));
+	save_item(NAME(m_out3));
+}
+
+void jclub2o_state::machine_start()
+{
+	common_state::machine_start();
+
+	m_soundbank->configure_entries(0, 32, memregion("soundcpu")->base(), 0x4000);
+
+	save_item(NAME(m_soundlatch));
+	save_item(NAME(m_soundlatch_status));
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(common_state::scanline_irq)
 {
@@ -1157,19 +1143,19 @@ void jclub2o_state::jclub2o(machine_config &config)
 {
 	M68EC020(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jclub2o_state::jclub2o_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(jclub2o_state::scanline_irq), "screen", 0, 1);
 
 	ST0016_CPU(config, m_soundcpu, 8000000);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &jclub2o_state::st0016_mem);
-	m_soundcpu->set_addrmap(AS_IO, &jclub2o_state::st0016_io);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &jclub2o_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &jclub2o_state::sound_io_map);
 	m_soundcpu->set_vblank_int("screen", FUNC(jclub2o_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_S29290_16BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper[0], attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper[1], attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1177,7 +1163,7 @@ void jclub2o_state::jclub2o(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(0x190, 0x100+16);
 	screen.set_visarea(0, 0x190-1, 0x10, 0x100-1);
-	screen.set_screen_update(FUNC(jclub2_state::screen_update));
+	screen.set_screen_update(FUNC(jclub2o_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
@@ -1202,14 +1188,14 @@ void jclub2_state::jclub2(machine_config &config)
 {
 	M68EC020(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jclub2_state::jclub2_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(jclub2_state::scanline_irq), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper[0], attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper[1], attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1223,8 +1209,7 @@ void jclub2_state::jclub2(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
-	ST0020_SPRITES(config, m_st0020, 0);
-	m_st0020->set_is_st0032(1);
+	ST0032_SPRITES(config, m_st0020, 0);
 	m_st0020->set_is_jclub2(1); // offsets
 	m_st0020->set_palette(m_palette);
 
@@ -1245,14 +1230,14 @@ void darkhors_state::darkhors(machine_config &config)
 {
 	M68EC020(config, m_maincpu, 12000000); // 36MHz/3 ??
 	m_maincpu->set_addrmap(AS_PROGRAM, &darkhors_state::darkhors_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(darkhors_state::scanline_irq), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200));
-	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper[0], attotime::from_msec(200));
+	TICKET_DISPENSER(config, m_hopper[1], attotime::from_msec(200));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1522,7 +1507,7 @@ ROM_START( darkhors )
 	ROM_LOAD32_WORD_SWAP( "prg2", 0x00000, 0x80000, CRC(f2ec5818) SHA1(326937a331496880f517f41b0b8ab54e55fd7af7) ) // 27 JUN. 1997
 	ROM_LOAD32_WORD_SWAP( "prg1", 0x00002, 0x80000, CRC(b80f8f59) SHA1(abc26dd8b36da0d510978364febe385f69fb317f) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gfx1", 0x000000, 0x80000, CRC(e9fe9967) SHA1(a79d75c09f0eac6372de8d6e98c5eecf38ef750c) )
 	ROM_LOAD( "gfx2", 0x080000, 0x80000, CRC(0853c5c5) SHA1(2b49ffe607278817f1f8219a79f5906be53ee6f4) )
 	ROM_LOAD( "gfx3", 0x100000, 0x80000, CRC(6e89278f) SHA1(044c15e00ea95fd3f108fa916000a1000789c8e8) )
@@ -1546,7 +1531,7 @@ ROM_START( jclub2bl )
 	ROM_LOAD32_WORD_SWAP( "154.4002", 0x00000, 0x80000, CRC(b892c254) SHA1(c1c31d878f41e4751048c07055d426803cd3332d) ) // 27 JUN. 1997
 	ROM_LOAD32_WORD_SWAP( "155.4002", 0x00002, 0x80000, CRC(3d9061c0) SHA1(efd2c8d742d3ac097f0228c2b71453b3261a6d83) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) // not dumped yet, should be closer to the original (no Dark Horse GFX)
+	ROM_REGION( 0x400000, "gfx", 0 ) // not dumped yet, should be closer to the original (no Dark Horse GFX)
 	ROM_LOAD( "gfx1", 0x000000, 0x80000, BAD_DUMP CRC(e9fe9967) SHA1(a79d75c09f0eac6372de8d6e98c5eecf38ef750c) )
 	ROM_LOAD( "gfx2", 0x080000, 0x80000, BAD_DUMP CRC(0853c5c5) SHA1(2b49ffe607278817f1f8219a79f5906be53ee6f4) )
 	ROM_LOAD( "gfx3", 0x100000, 0x80000, BAD_DUMP CRC(6e89278f) SHA1(044c15e00ea95fd3f108fa916000a1000789c8e8) )
@@ -1571,11 +1556,6 @@ ROM_END
 
 ***************************************************************************/
 
-void jclub2o_state::init_jclub2o()
-{
-	m_soundbank->configure_entries(0, 32, memregion("soundcpu")->base(), 0x4000);
-}
-
 void darkhors_state::init_darkhors()
 {
 	// the dumped eeprom bytes are in a different order to how MAME expects them to be!?
@@ -1598,11 +1578,11 @@ void darkhors_state::init_darkhors()
 
 
 // Older hardware (ST-0020 + ST-0016)
-GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  empty_init,    ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  empty_init,    ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  empty_init,    ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  empty_init,    ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  empty_init,    ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 // Newer hardware (ST-0032)
 GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
