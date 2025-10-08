@@ -783,7 +783,9 @@ license:CC0-1.0
 		<description>Dunjonquest: Datestones of Ryn</description>
 		<year>1979</year>
 		<publisher>Automated Simulations</publisher>
-		<info name="programmer" value="Jeffrey A. Johnson, Jon Freeman, and Jim Connelley" />
+		<info name="programmer" value="Jeffrey A. Johnson" />
+		<info name="programmer" value="Jon Freeman" />
+		<info name="programmer" value="Jim Connelley" />
 		<info name="usage" value="]Load 32K" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- role-playing game -->

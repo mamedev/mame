@@ -188,7 +188,8 @@ Title screen logo is misplaced if intro isn't skipped, uses [V810] CMPF, CVTS, A
 Mario also shots in fault, which definitely indicates bad maths
 [VIP] palette ramps are particularly bad, cfr. ROZ layer
 ]]></notes>
-		<info name="developer" value="Nintendo R&amp;D1, Tose Software"/>
+		<info name="developer" value="Nintendo R&amp;D1"/>
+		<info name="developer" value="Tose Software"/>
 		<info name="serial" value="VUE-VMTJ-JPN, VUE-VMTJ-USA"/>
 		<info name="release" value="19950721 (JPN), 19950814 (USA)"/>
 		<info name="alt_title" value="マリオズテニス"/>
