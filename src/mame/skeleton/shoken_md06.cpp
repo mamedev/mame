@@ -50,6 +50,7 @@ private:
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -62,6 +63,13 @@ void shoken_md06_state::program_map(address_map &map)
 }
 
 void shoken_md06_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).nopw();
+	map(0x80, 0x80).noprw();
+}
+
+void shoken_md06_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x40).nopw();
@@ -155,6 +163,7 @@ void shoken_md06_state::petitlot(machine_config &config)
 void shoken_md06_state::polarstar(machine_config &config)
 {
 	petitlot(config);
+	m_maincpu->set_addrmap(AS_IO, &shoken_md06_state::sound_io_map);
 
 	okim9810_device &oki(OKIM9810(config, "oki", 16_MHz_XTAL / 12));
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0); //divider guessed
