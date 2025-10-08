@@ -351,15 +351,14 @@ field.default_centerdelta (read-only)
     default values after associated digital increment/decrement inputs are
     released, or ``nil`` for digital fields and wrapping analog fields.
 field.analog_reverse (read-only)
-    A Boolean indicating whether the field corresponds to an analog control that
-    increases in the opposite direction to the convention (e.g. larger values
-    when a pedal is released or a joystick is moved to the left), or ``nil`` for
-    digital fields.
+    A Boolean indicating whether the value increases in the opposite direction
+    to the convention for analog fields (e.g. larger values when a pedal is
+    released or a joystick is moved to the left), or ``nil`` for digital fields.
 field.default_analog_reverse (read-only)
-    A Boolean indicating whether the field corresponds to an analog control that
-    increases in the opposite direction to the convention by default (e.g.
-    larger values when a pedal is released or a joystick is moved to the left),
-    or ``nil`` for digital fields.
+    A Boolean indicating whether the value increases in the opposite direction
+    to the convention by default for analog fields (e.g. larger values when a
+    pedal is released or a joystick is moved to the left), or ``nil`` for
+    digital fields.
 field.way (read-only)
     The number of directions allowed by the restrictor plate/gate for a digital
     joystick, or zero (0) for other inputs.

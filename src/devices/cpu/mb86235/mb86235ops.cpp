@@ -41,8 +41,8 @@
 #define F1  0x20000000
 #define F2  0x40000000
 
-#define FSET(f) m_core->st |= (f)
-#define FCLR(f) m_core->st &= ~(f)
+#define FSET(f) do { m_core->st |= (f); } while (false)
+#define FCLR(f) do { m_core->st &= ~(f); } while (false)
 
 void mb86235_device::handle_single_step_execution()
 {

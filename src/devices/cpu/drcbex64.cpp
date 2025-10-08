@@ -2408,13 +2408,13 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 		case FLAG_Z:
 			a.setz(al);
 			a.movzx(eax, al);
-			a.lea(dstreg, ptr(0, rax, 2));
+			a.lea(dstreg, ptr(0, rax, FLAG_BIT_Z));
 			break;
 
 		case FLAG_S:
 			a.sets(al);
 			a.movzx(eax, al);
-			a.lea(dstreg, ptr(0, rax, 3));
+			a.lea(dstreg, ptr(0, rax, FLAG_BIT_S));
 			break;
 
 		case FLAG_U:
@@ -2430,7 +2430,7 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 			a.seto(cl);
 			a.movzx(eax, al);
 			a.movzx(ecx, cl);
-			a.lea(dstreg, ptr(eax, ecx, 1));
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_V - FLAG_BIT_C));
 			break;
 
 		case FLAG_C | FLAG_Z:
@@ -2438,7 +2438,7 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 			a.setz(cl);
 			a.movzx(eax, al);
 			a.movzx(ecx, cl);
-			a.lea(dstreg, ptr(eax, ecx, 2));
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_Z - FLAG_BIT_C));
 			break;
 
 		case FLAG_C | FLAG_S:
@@ -2446,6 +2446,15 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 			a.sets(cl);
 			a.movzx(eax, al);
 			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_S - FLAG_BIT_C));
+			break;
+
+		case FLAG_C | FLAG_U:
+			a.setp(cl);
+			a.setc(al);
+			a.movzx(ecx, cl);
+			a.movzx(eax, al);
+			a.lea(ecx, ptr(ecx, ecx));
 			a.lea(dstreg, ptr(eax, ecx, 3));
 			break;
 
@@ -2455,7 +2464,7 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 			a.setz(cl);
 			a.movzx(eax, al);
 			a.movzx(ecx, cl);
-			a.lea(dstreg, ptr(eax, ecx, 1));
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_Z - FLAG_BIT_V));
 			a.lea(dstreg, ptr(dstreg, dstreg));
 			break;
 
@@ -2464,7 +2473,16 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 			a.sets(cl);
 			a.movzx(eax, al);
 			a.movzx(ecx, cl);
-			a.lea(dstreg, ptr(eax, ecx, 2));
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_S - FLAG_BIT_V));
+			a.lea(dstreg, ptr(dstreg, dstreg));
+			break;
+
+		case FLAG_V | FLAG_U:
+			a.seto(al);
+			a.setp(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_U - FLAG_BIT_V));
 			a.lea(dstreg, ptr(dstreg, dstreg));
 			break;
 
@@ -2474,8 +2492,27 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 			a.sets(cl);
 			a.movzx(eax, al);
 			a.movzx(ecx, cl);
-			a.lea(dstreg, ptr(eax, ecx, 1));
-			a.lea(dstreg, ptr(0, dstreg, 2));
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_S - FLAG_BIT_Z));
+			a.lea(dstreg, ptr(0, dstreg, FLAG_BIT_Z));
+			break;
+
+		case FLAG_Z | FLAG_U:
+			a.setz(al);
+			a.setp(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_U - FLAG_BIT_Z));
+			a.lea(dstreg, ptr(0, dstreg, FLAG_BIT_Z));
+			break;
+
+		// sign plus another flag
+		case FLAG_S | FLAG_U:
+			a.sets(al);
+			a.setp(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_U - FLAG_BIT_S));
+			a.lea(dstreg, ptr(0, dstreg, FLAG_BIT_S));
 			break;
 
 		// default cases

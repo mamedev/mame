@@ -18,6 +18,39 @@
 #include <cstdlib>
 #include <cstring>
 
+
+class a2_sect_format::byte_reader
+{
+public:
+	byte_reader(const byte_reader &) = default;
+	byte_reader& operator=(const byte_reader &) = default;
+
+	byte_reader(const std::vector<bool> &b) : buf(&b) { }
+
+	uint8_t operator()()
+	{
+		uint8_t v = 0;
+		const int w1 = wrap;
+		while((wrap != w1+2) && !(v & 0x80)) {
+			v = (v << 1) | ((*buf)[pos] ? 1 : 0);
+			pos++;
+			if(pos == buf->size()) {
+				pos = 0;
+				wrap++;
+			}
+		}
+		return v;
+	}
+
+	bool wrapped() const { return wrap != 0; }
+
+private:
+	const std::vector<bool> *buf;
+	int pos = 0;
+	int wrap = 0;
+};
+
+
 a2_sect_format::a2_sect_format(int nsect) : m_nsect(nsect)
 {
 	assert(nsect <= APPLE2_MAX_SECTOR_COUNT);
@@ -72,7 +105,7 @@ bool a2_sect_format::save(util::random_read_write &io, const std::vector<uint32_
 		if(VERBOSE_SAVE) {
 			fprintf(stderr,"done.\n");
 		}
-		byte_reader br{&buf};
+		byte_reader br(buf);
 		int hb = 0;
 		int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
 		for(;;) {
@@ -105,7 +138,7 @@ bool a2_sect_format::save(util::random_read_write &io, const std::vector<uint32_
 				if(VERBOSE_SAVE) {
 					uint32_t post = get_u24be(&h[8]);
 					printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n",
-							vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
+							vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xffff00)==0xdeaa00?"OK":"BAD");
 				}
 				// sanity check
 				if (tr == track && se < m_nsect) {
@@ -114,7 +147,7 @@ bool a2_sect_format::save(util::random_read_write &io, const std::vector<uint32_
 					gridcell |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
 
 					if (gridcell & (LENIENT_ADDR_CHECK ? ADDRFOUND : ADDRGOOD)) {
-						byte_reader orig_br = br;
+						byte_reader orig_br(br);
 
 						hb = 0;
 						for(int i=0; i<20 && hb != 4; i++) {
@@ -145,7 +178,7 @@ bool a2_sect_format::save(util::random_read_write &io, const std::vector<uint32_
 								dpost <<= 8;
 								dpost |= br();
 							}
-							bool dpost_good = (dpost & 0xFFFF00) == 0xDEAA00;
+							bool dpost_good = (dpost & 0xffff00) == 0xdeaa00;
 
 							uint8_t *dest = sectdata + APPLE2_SECTOR_SIZE * logical_sector_index(se);
 
@@ -189,7 +222,7 @@ bool a2_sect_format::save(util::random_read_write &io, const std::vector<uint32_
 				}
 				hb = 0;
 			}
-			if(br.wrap)
+			if(br.wrapped())
 				break;
 		}
 		for(int i = 0; i < m_nsect; i++) {
@@ -313,10 +346,12 @@ bool a2_13sect_format::load(util::random_read &io, uint32_t form_factor, const s
 			raw_w(track_data, 24, 0xd5aaad);
 
 			uint8_t pval = 0x00;
-			auto write_data_byte = [&track_data, &pval](uint8_t nval) {
-				raw_w(track_data, 8, translate5[nval ^ pval]);
-				pval = nval;
-			};
+			auto write_data_byte =
+					[&track_data, &pval] (uint8_t nval)
+					{
+						raw_w(track_data, 8, translate5[nval ^ pval]);
+						pval = nval;
+					};
 
 			const uint8_t *sdata = sector_data + APPLE2_SECTOR_SIZE * sector;
 
@@ -377,9 +412,8 @@ int a2_13sect_format::logical_sector_index(int physical) const {
 }
 
 void a2_13sect_format::decode_sector_data(
-	byte_reader &br, uint8_t (&decoded_buf)[APPLE2_SECTOR_SIZE],
-	uint8_t &dchk_expected, uint8_t &dchk_actual
-) const
+		byte_reader &br, uint8_t (&decoded_buf)[APPLE2_SECTOR_SIZE],
+		uint8_t &dchk_expected, uint8_t &dchk_actual) const
 {
 	uint8_t low_bits[154];
 
@@ -414,14 +448,14 @@ const a2_13sect_format FLOPPY_A213S_FORMAT;
 
 static const uint8_t dos_skewing[] =
 {
-	0x00, 0x07, 0x0E, 0x06, 0x0D, 0x05, 0x0C, 0x04,
-	0x0B, 0x03, 0x0A, 0x02, 0x09, 0x01, 0x08, 0x0F
+	0x00, 0x07, 0x0e, 0x06, 0x0d, 0x05, 0x0c, 0x04,
+	0x0b, 0x03, 0x0a, 0x02, 0x09, 0x01, 0x08, 0x0f
 };
 
 static const uint8_t prodos_skewing[] =
 {
-	0x00, 0x08, 0x01, 0x09, 0x02, 0x0A, 0x03, 0x0B,
-	0x04, 0x0C, 0x05, 0x0D, 0x06, 0x0E, 0x07, 0x0F
+	0x00, 0x08, 0x01, 0x09, 0x02, 0x0a, 0x03, 0x0b,
+	0x04, 0x0c, 0x05, 0x0d, 0x06, 0x0e, 0x07, 0x0f
 };
 
 
@@ -474,12 +508,9 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 		return 0;
 
 	// check standard size plus some oddball sizes in our softlist
-	if (
-		size != APPLE2_TRACK_COUNT * SECTOR_COUNT * APPLE2_SECTOR_SIZE
+	if (size != APPLE2_TRACK_COUNT * SECTOR_COUNT * APPLE2_SECTOR_SIZE
 		&& size != APPLE2_STD_TRACK_COUNT * SECTOR_COUNT * APPLE2_SECTOR_SIZE
-		&& size != 143403 && size != 143363 && size != 143358 && size != 143195
-	)
-	{
+		&& size != 143403 && size != 143363 && size != 143358 && size != 143195) {
 		return 0;
 	}
 
@@ -497,55 +528,43 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 		return 0;
 
 	bool prodos_order = false;
-	// check ProDOS boot block
-	if (!memcmp("PRODOS", &sector_data[0x103], 6))
-	{
+	if (!memcmp("PRODOS", &sector_data[0x103], 6)) {
+		// ProDOS boot block
 		prodos_order = true;
-	}   // check for alternate version ProDOS boot block
-	if (!memcmp("PRODOS", &sector_data[0x121], 6))
-	{
+	} else if (!memcmp("PRODOS", &sector_data[0x121], 6)) {
+		// alternate version ProDOS boot block
 		prodos_order = true;
-	}   // check for ProDOS order SOS disk
-	else if (!memcmp(sos_block1, &sector_data[0x100], 4))
-	{
+	} else if (!memcmp(sos_block1, &sector_data[0x100], 4)) {
+		// ProDOS order SOS disk
 		prodos_order = true;
-	}   // check for Apple III A2 emulator disk in ProDOS order
-	else if (!memcmp(a3a2emul_block1, &sector_data[0x100], 6))
-	{
+	} else if (!memcmp(a3a2emul_block1, &sector_data[0x100], 6)) {
+		// Apple III A2 emulator disk in ProDOS order
 		prodos_order = true;
-	}   // check for PCPI Applicard software in ProDOS order
-	else if (!memcmp("COPYRIGHT (C) 1979, DIGITAL RESEARCH", &sector_data[0x118], 36))
-	{
+	} else if (!memcmp("COPYRIGHT (C) 1979, DIGITAL RESEARCH", &sector_data[0x118], 36)) {
+		// PCPI Applicard software in ProDOS order
 		prodos_order = true;
-	}   // check Apple II Pascal
-	else if (!memcmp("SYSTEM.APPLE", &sector_data[0xd7], 12))
-	{
+	} else if (!memcmp("SYSTEM.APPLE", &sector_data[0xd7], 12)) {
+		// Apple II Pascal
 		// Pascal discs can still be DOS order.
 		// Check for the second half of the boot code at 0x100
 		// (which means ProDOS order)
-		if (!memcmp(pascal_block1, &sector_data[0x100], 4))
-		{
+		if (!memcmp(pascal_block1, &sector_data[0x100], 4)) {
 			prodos_order = true;
 		}
-	}   // check for DOS 3.3 disks in ProDOS order
-	else if (!memcmp(dos33_block1, &sector_data[0x100], 4))
-	{
+	} else if (!memcmp(dos33_block1, &sector_data[0x100], 4)) {
+		// DOS 3.3 disks in ProDOS order
 		prodos_order = true;
-	}   // check for a later version of the Pascal boot block
-	else if (!memcmp(pascal2_block1, &sector_data[0x100], 4))
-	{
+	} else if (!memcmp(pascal2_block1, &sector_data[0x100], 4)) {
+		// a later version of the Pascal boot block
 		prodos_order = true;
-	}   // check for CP/M disks in ProDOS order
-	else if (!memcmp(cpm22_block1, &sector_data[0x100], 8))
-	{
+	} else if (!memcmp(cpm22_block1, &sector_data[0x100], 8)) {
+		// CP/M disks in ProDOS order
 		prodos_order = true;
-	}   // check for subnodule disk
-	else if (!memcmp(subnod_block1, &sector_data[0x100], 8))
-	{
+	} else if (!memcmp(subnod_block1, &sector_data[0x100], 8)) {
+		// subnodule disk
 		prodos_order = true;
-	}   // check for ProDOS 2.5's new boot block
-	else if (!memcmp("PRODOS", &sector_data[0x3a], 6))
-	{
+	} else if (!memcmp("PRODOS", &sector_data[0x3a], 6)) {
+		// ProDOS 2.5's new boot block
 		prodos_order = true;
 	}
 
@@ -561,7 +580,7 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
 	int tracks = (size == (APPLE2_TRACK_COUNT * SECTOR_COUNT * APPLE2_SECTOR_SIZE))
-		? APPLE2_TRACK_COUNT : APPLE2_STD_TRACK_COUNT;
+			? APPLE2_TRACK_COUNT : APPLE2_STD_TRACK_COUNT;
 
 	int fpos = 0;
 	for(int track=0; track < tracks; track++) {
@@ -580,12 +599,9 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 		for(int i=0; i<SECTOR_COUNT; i++) {
 			int sector;
 
-			if (m_prodos_order)
-			{
+			if (m_prodos_order) {
 				sector = prodos_skewing[i];
-			}
-			else
-			{
+			} else {
 				sector = dos_skewing[i];
 			}
 
@@ -637,21 +653,6 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 	return true;
 }
 
-uint8_t a2_16sect_format::byte_reader::operator()()
-{
-		uint8_t v = 0;
-		int w1 = wrap;
-		while(wrap != w1+2 && !(v & 0x80)) {
-				v = (v << 1) | (*buf)[pos];
-				pos++;
-				if(pos == buf->size()) {
-						pos = 0;
-						wrap++;
-				}
-		}
-		return v;
-}
-
 bool a2_16sect_format::check_dosver(int dosver) const
 {
 	if (dosver != 0) {
@@ -663,20 +664,16 @@ bool a2_16sect_format::check_dosver(int dosver) const
 }
 
 int a2_16sect_format::logical_sector_index(int physical) const {
-	if (m_prodos_order)
-	{
+	if (m_prodos_order) {
 		return prodos_skewing[physical];
-	}
-	else
-	{
+	} else {
 		return dos_skewing[physical];
 	}
 }
 
 void a2_16sect_format::decode_sector_data(
-	byte_reader &br, uint8_t (&decoded_buf)[APPLE2_SECTOR_SIZE],
-	uint8_t &dchk_expected, uint8_t &dchk_actual
-) const
+		byte_reader &br, uint8_t (&decoded_buf)[APPLE2_SECTOR_SIZE],
+		uint8_t &dchk_expected, uint8_t &dchk_actual) const
 {
 	uint8_t low_bits[0x56];
 
@@ -853,21 +850,20 @@ int a2_nib_format::identify(util::random_read &io, uint32_t form_factor, const s
 }
 
 
-template<class It>
-static
-size_t count_leading_FFs(const It first, const It last)
+template <typename It>
+static size_t count_leading_FFs(const It first, const It last)
 {
 	auto curr = first;
 	for (; curr != last; ++curr) {
-		if (*curr != 0xFF) {
+		if (*curr != 0xff) {
 			break;
 		}
 	}
 	return curr - first;
 }
 
-static
-size_t count_trailing_padding(const std::vector<uint8_t>& nibbles) {
+static size_t count_trailing_padding(const std::vector<uint8_t>& nibbles)
+{
 	const auto b = nibbles.rbegin();
 	const auto e = nibbles.rend();
 	auto i = b;
@@ -884,34 +880,33 @@ size_t count_trailing_padding(const std::vector<uint8_t>& nibbles) {
 std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vector<uint8_t>& nibbles)
 {
 	std::vector<uint32_t> levels;
-	const auto append_FFs = [&] (size_t count) {
-		while (count-- > 0) {
-			raw_w(levels, 8, 0xFF);
-		}
-	};
-	const auto append_syncs = [&] (size_t count) {
-		while (count-- > 0) {
-			raw_w(levels, 10, 0x00FF << 2);
-		}
-	};
-	const auto append_byte = [&] (uint8_t byte) {
-		raw_w(levels, 8, byte);
-	};
+	const auto append_FFs =
+			[&levels] (size_t count)
+			{
+				while (count-- > 0) {
+					raw_w(levels, 8, 0xff);
+				}
+			};
+	const auto append_syncs =
+			[&levels] (size_t count)
+			{
+				while (count-- > 0) {
+					raw_w(levels, 10, 0x00ff << 2);
+				}
+			};
+	const auto append_byte = [&levels] (uint8_t byte) { raw_w(levels, 8, byte); };
 
 
-	const auto leading_FF_count =
-		count_leading_FFs(nibbles.begin(), nibbles.end());
+	const auto leading_FF_count = count_leading_FFs(nibbles.begin(), nibbles.end());
 
-	if (leading_FF_count >= nibbles.size()) { // all are 0xFF !?!?
+	if (leading_FF_count >= nibbles.size()) { // all are 0xff !?!?
 		assert(leading_FF_count >= min_sync_bytes);
 		append_syncs(leading_FF_count);
 		return levels;
 	}
 
 	const auto trailing_padding_size = count_trailing_padding(nibbles);
-	const auto trailing_FF_count =
-		count_leading_FFs(nibbles.rbegin() + trailing_padding_size,
-						  nibbles.rend());
+	const auto trailing_FF_count = count_leading_FFs(nibbles.rbegin() + trailing_padding_size, nibbles.rend());
 	const auto wrapped_FF_count = leading_FF_count + trailing_FF_count;
 	const bool wrapped_FF_are_syncs = wrapped_FF_count >= min_sync_bytes;
 
@@ -923,18 +918,20 @@ std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vec
 
 	{
 		size_t FF_count = 0;
-		const auto flush_FFs = [&] {
-			if (FF_count == 0) {
-				return;
-			}
+		const auto flush_FFs =
+				[&append_syncs, &append_FFs, &FF_count]
+				{
+					if (FF_count == 0) {
+						return;
+					}
 
-			if (FF_count >= a2_nib_format::min_sync_bytes) {
-				append_syncs(FF_count);
-			} else {
-				append_FFs(FF_count);
-			}
-			FF_count = 0;
-		};
+					if (FF_count >= a2_nib_format::min_sync_bytes) {
+						append_syncs(FF_count);
+					} else {
+						append_FFs(FF_count);
+					}
+					FF_count = 0;
+				};
 
 		const auto end = nibbles.end() - trailing_padding_size - trailing_FF_count;
 		for (auto i = nibbles.begin() + leading_FF_count; i != end; ++i) {
@@ -943,7 +940,7 @@ std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vec
 				continue;
 			}
 
-			if (nibble == 0xFF) {
+			if (nibble == 0xff) {
 				++FF_count;
 				continue;
 			}
