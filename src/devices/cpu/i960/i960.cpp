@@ -1738,7 +1738,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 
 			case 0xb: // roundrl
 				m_icount -= 70;
-				t1f = get_1_rif(opcode);
+				t1f = get_1_rifl(opcode);
 				set_rifl(opcode, round_to_int(t1f));
 				break;
 
