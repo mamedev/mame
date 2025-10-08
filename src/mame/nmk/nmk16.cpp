@@ -5921,7 +5921,7 @@ void nmk16_state::manybloc(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,manybloc)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
