@@ -115,7 +115,7 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 			}
 
 			++x %= info[0];
-			if (x == 0)
+			if (x == 0 && info[4] != 1)
 				scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * info[4]);
 			else
 				scr += info[3];
@@ -182,7 +182,7 @@ void specnext_layer2_device::draw_16(screen_device &screen, bitmap_rgb32 &bitmap
 			}
 
 			++x %= info[0];
-			if (x == 0)
+			if (x == 0  && info[4] != 1)
 				scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * info[4]);
 			else
 				scr += info[3];
