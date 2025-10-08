@@ -99,16 +99,19 @@
 ************************************************************************************************************/
 
 #include "emu.h"
+
+#include "st0016.h"
+#include "st0020.h"
+
 #include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
-#include "st0016.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "sound/setapcm.h"
 #include "sound/okim6295.h"
-#include "st0020.h"
+#include "sound/setapcm.h"
+
 #include "emupal.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -177,7 +180,7 @@ public:
 		m_pl_low(*this, "P%uLOW", 1U)
 	{ }
 
-	void jclub2(machine_config &config);
+	void jclub2(machine_config &config) ATTR_COLD;
 
 protected:
 	required_device<st0020_device> m_st0020;
@@ -206,7 +209,7 @@ public:
 		m_soundlatch_status(0)
 	{ }
 
-	void jclub2o(machine_config &config);
+	void jclub2o(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -248,10 +251,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
-	void init_darkhors();
+	void init_darkhors() ATTR_COLD;
 
-	void darkhors(machine_config &config);
-	void darkhorsa(machine_config &config);
+	void darkhors(machine_config &config) ATTR_COLD;
+	void darkhorsa(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -316,7 +319,7 @@ uint8_t common_state::read_key(uint8_t which)
 
 void common_state::debug_out()
 {
-//  popmessage("OUT: %04X | %04X | %02X--", m_out1 >> 16, m_out2 >> 16, m_out3 >> 24);
+	//popmessage("OUT: %04X | %04X | %02X--", m_out1 >> 16, m_out2 >> 16, m_out3 >> 24);
 }
 
 /***************************************************************************
@@ -385,9 +388,9 @@ void darkhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		sy += 0xf8;
 
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-			code/2, color,
-			flipx, flipy,
-			sx, sy, 0);
+				code/2, color,
+				flipx, flipy,
+				sx, sy, 0);
 	}
 }
 
@@ -738,7 +741,7 @@ void darkhors_state::input_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask
 uint32_t darkhors_state::input_r()
 {
 	return  (read_key(0) << 16) |
-			(read_key(1) << 24) ;
+			(read_key(1) << 24);
 }
 
 void darkhors_state::out1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
