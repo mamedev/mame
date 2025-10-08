@@ -115,7 +115,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream)
 	int outpos = 0;
 	int num_samples = stream.samples();
 
-	while (num_samples-- > 0)
+	while (num_samples-- != 0)
 	{
 		int64_t total_l = 0;
 		int64_t total_r = 0;
