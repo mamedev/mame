@@ -28,22 +28,19 @@ public:
 	void sprram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
+	// sprites
+	struct sprite_list_t
+	{
+		int num = 0;
+		int sprite = 0;
+		int xoffs = 0;
+		int yoffs = 0;
+	};
+
 	st0020_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-
-	// per-game hack
-	int m_is_jclub2;
-
-	// RAM
-	std::unique_ptr<uint16_t[]> m_gfxram;
-	std::unique_ptr<uint16_t[]> m_spriteram;
-	std::unique_ptr<uint16_t[]> m_regs;
-	optional_region_ptr<uint8_t> m_rom_ptr;
-
-	tilemap_t *m_tmap[4]{};
-	uint32_t m_gfxram_bank = 0;
 
 	void gfxram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -60,22 +57,6 @@ protected:
 	virtual uint32_t get_tile_color(int i, uint32_t color);
 	void tmap_st0020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	// sprites
-	struct sprite_list_t
-	{
-		sprite_list_t()
-			: num(0)
-			, sprite(0)
-			, xoffs(0)
-			, yoffs(0)
-		{}
-
-		int num = 0;
-		int sprite = 0;
-		int xoffs = 0;
-		int yoffs = 0;
-	};
-
 	virtual uint32_t get_sprite_color(uint32_t color);
 	virtual void draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void draw_single_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, sprite_list_t &list);
@@ -83,6 +64,18 @@ protected:
 	// CRTC
 	virtual int get_crtc_top();
 	virtual int get_crtc_bottom();
+
+	// per-game hack
+	int m_is_jclub2;
+
+	// RAM
+	std::unique_ptr<uint16_t[]> m_gfxram;
+	std::unique_ptr<uint16_t[]> m_spriteram;
+	std::unique_ptr<uint16_t[]> m_regs;
+	optional_region_ptr<uint8_t> m_rom_ptr;
+
+	tilemap_t *m_tmap[4];
+	uint32_t m_gfxram_bank;
 };
 
 class st0032_device : public st0020_device
