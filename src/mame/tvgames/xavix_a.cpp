@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device, "xavix_sound", "XaviX Sound")
 
-xavix_sound_device::xavix_sound_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XAVIX_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
