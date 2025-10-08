@@ -34,6 +34,7 @@ st0020_device::st0020_device(const machine_config &mconfig, device_type type, co
 	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
 	m_rom_ptr(*this, DEVICE_SELF),
+	m_tmap{ nullptr, nullptr, nullptr, nullptr },
 	m_gfxram_bank(0)
 {
 	m_is_jclub2 = 0;
@@ -91,7 +92,7 @@ void st0020_device::device_start()
 	for (int i = 0; i < 4; ++i)
 	{
 		m_tmap[i]->set_transparent_pen(0);
-//      m_tmap[i]->set_scrolldy(-0x301, 0);
+		//m_tmap[i]->set_scrolldy(-0x301, 0);
 	}
 
 	// Save state
@@ -695,11 +696,11 @@ void st0020_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
-		if (machine().input().code_pressed(KEYCODE_E))  mask |= 4;
-		if (machine().input().code_pressed(KEYCODE_R))  mask |= 8;
-		if (machine().input().code_pressed(KEYCODE_A))  mask |= 16;
+		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 0x01;
+		if (machine().input().code_pressed(KEYCODE_W))  mask |= 0x02;
+		if (machine().input().code_pressed(KEYCODE_E))  mask |= 0x04;
+		if (machine().input().code_pressed(KEYCODE_R))  mask |= 0x08;
+		if (machine().input().code_pressed(KEYCODE_A))  mask |= 0x10;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
@@ -717,16 +718,22 @@ void st0020_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// tilemaps
 	for (int pri = 0x3f; pri >= 0; --pri)
+	{
 		for (int i = 0; i < 4; ++i)
-			if ((layers_ctrl & (1 << i))
+		{
+			if (BIT(layers_ctrl, i)
 					&& (tmap_priority(i) == pri)
 					&& tmap_is_enabled(i))
 				m_tmap[i]->draw(screen, bitmap, cliprect, 0, 0);
+		}
+	}
 
 	// sprites
-	if (layers_ctrl & 16)
+	if (layers_ctrl & 0x10)
+	{
 		for (int pri = 0; pri <= 0xf; ++pri)
 			draw_zooming_sprites(bitmap, cliprect, pri);
+	}
 
 #ifdef MAME_DEBUG
 #if 0
