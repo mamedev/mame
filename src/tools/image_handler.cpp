@@ -290,13 +290,13 @@ bool image_handler::floppy_create(const floppy_create_info &format, fs::meta_dat
 		fs::fsblk_vec_t blockdev(img);
 		auto fs = format.m_manager->mount(blockdev);
 		if(!fs || fs->format(meta))
-			return false;
+			return true;
 
 		auto io = util::ram_read(img.data(), img.size(), 0xff);
 		return !format.m_type->load(*io, floppy_image::FF_UNKNOWN, variants, m_floppy_image);
 	} else {
 		fs::unformatted_image::format(format.m_key, &m_floppy_image);
-		return true;
+		return false;
 	}
 }
 
