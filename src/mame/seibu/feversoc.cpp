@@ -155,7 +155,9 @@ uint32_t feversoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		const u32 colour = (m_spriteram[offs + 0] & 0x003f0000) >> 16;
 		const u8 w = ((m_spriteram[offs + 0] & 0x07000000) >> 24) + 1;
 		const u8 h = ((m_spriteram[offs + 0] & 0x70000000) >> 28) + 1;
-		// TODO: flip sprite?
+		// TODO: flip sprites, unused?
+		// flip horizontal in bit 27
+		// flip vertical in bit 31
 
 		if (sx >= 0x180)
 			sx -= 0x200;
