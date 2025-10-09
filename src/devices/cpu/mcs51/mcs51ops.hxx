@@ -930,7 +930,7 @@ OPHANDLER( xchd_a_ir )
 	ir_data = IRAM_IR(R_REG(r));            //Grab data pointed to by R0 or R1
 	acc = ACC;                              //Grab ACC value
 	SET_ACC((acc & 0xf0) | (ir_data & 0x0f)); //Set ACC to lower nibble of data pointed to by R0 or R1
-	IRAM_W(R_REG(r), (ir_data & 0xf0) | (acc & 0x0f)); //Set data pointed to by R0 or R1 to lower nibble of ACC
+	IRAM_IW(R_REG(r), (ir_data & 0xf0) | (acc & 0x0f)); //Set data pointed to by R0 or R1 to lower nibble of ACC
 }
 
 //XRL data addr, A                          /* 1: 0110 0010 */
