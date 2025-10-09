@@ -11646,7 +11646,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 	</software>
 
 	<software name="aqlian">
-		<description>Ā Q Liánhuán Pào (Taiwan)</description>
+		<description>Ā Q Liánhuán Pào (Taiwan, unprotected)</description>
 		<year>1995</year>
 		<publisher>C&amp;E</publisher>
 		<info name="alt_title" value="阿Q連環泡"/>
@@ -15024,10 +15024,10 @@ No [VDP] sprites
 	</software>
 
 	<software name="cjfuweng">
-		<description>Chāojí Dà Fùwēng (Taiwan)</description>
+		<description>Chāojí Dà Fùwēng (Taiwan, unprotected)</description>
 		<!-- 1994 or 1995 -->
 		<year>1994?</year>
-		<publisher>Gametec</publisher>
+		<publisher>Gamtec</publisher>
 		<notes><![CDATA[
 https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 ]]></notes>
@@ -18796,11 +18796,12 @@ https://segaretro.org/Feng_Kuang_Tao_Hua_Yuan
 
 	<software name="fengshen">
 		<!-- Blanked header -->
-		<description>Fēngshén Yīngjié Chuán (Taiwan)</description>
+		<description>Fēngshén Yīngjié Chuán (Taiwan, unprotected)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
 		<notes><![CDATA[
 https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
+Patches protection checks, original uses Squirrel King cart scheme
 ]]></notes>
 		<info name="alt_title" value="封神英傑傳"/>
 		<part name="cart" interface="megadriv_cart">
@@ -19922,6 +19923,23 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
+	<software name="gunfight" supported="partial">
+		<description>Gunfight 3 in 1 (Taiwan)</description>
+		<year>1998?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Unsupported [Justifier] or [Menacer] peripheral (joypad works)
+]]></notes>
+		<!-- <info name="developer" value="Gamtec?" /> -->
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_lion3"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom name="gunfight_3_in_1_unl.bin" size="0x080000" crc="8fa43256" sha1="4083d0fc6aa6796a4b12a830dc77a6a380358346"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="gynougj" cloneof="gynoug">
 		<description>Gynoug (Japan)</description>
 		<year>1991</year>
@@ -20012,9 +20030,12 @@ Unemulated [Sega Mega Modem] features
 	</software>
 
 	<software name="heitao2">
-		<description>Hei Tao 2 - Super Big 2 (Taiwan)</description>
+		<description>Hei Tao 2 - Super Big 2 (Taiwan, unprotected)</description>
 		<year>199?</year>
 		<publisher>King Tec</publisher>
+		<notes><![CDATA[
+Patches protection checks, original uses Super Bubble Bobble MD cart scheme
+]]></notes>
 		<info name="serial" value="GM-95301"/>
 		<info name="alt_title" value="黑桃2 大老二 ~ Hei Tao 2 - Da Lao Er (Box)"/>
 		<part name="cart" interface="megadriv_cart">
@@ -20803,10 +20824,28 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="jiujim">
-		<description>Jiu Ji Ma Jiang II - Ye Yan Bian (China)</description>
+	<software name="jujimj2">
+		<description>Ju Ji Ma Jiang II - Ye Yan Bian (China, protected)</description>
+		<year>199?</year>
+		<publisher>Sun Green</publisher>
+		<info name="serial" value="GM-95001"/>
+		<info name="alt_title" value="究極麻將II"/>
+		<part name="cart" interface="megadriv_cart">
+			<!-- assumed, cares about $40'0006 returning 0xf0 -->
+			<feature name="slot" value="rom_smouse"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="pretty girl mahjongg (Ch).bin" size="1048576" crc="69f24500" sha1="0b4f63b8de2dcc4359a26c3ff21f910f206b6110"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jiujim" cloneof="jujimj2">
+		<description>Jiu Ji Ma Jiang II - Ye Yan Bian (China, unprotected)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Reads at $40'0006, returning expected value of #$-1000 crashes game
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="jiu ji ma jiang ii - ye yan bian (chi) (unl).bin" size="1048576" crc="e9829b22" sha1="c112602c58f9867377bb6a1204d1d7e49a50aa10"/>
@@ -28885,7 +28924,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 
 <!-- undumped original '96 release by Kin Tec known to exist -->
 	<software name="shuihu" cloneof="watermar">
-		<description>Shuǐhǔ - Fēngyún Chuán (Taiwan)</description>
+		<description>Shuǐhǔ - Fēngyún Chuán (Taiwan, unprotected)</description>
 		<year>1999</year>
 		<publisher>Never Ending Soft Team</publisher>
 		<notes><![CDATA[
@@ -28901,9 +28940,12 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 	</software>
 
 	<software name="shuihuzh">
-		<description>Shuǐhǔ Zhuàn (China)</description>
+		<description>Shuǐhǔ Zhuàn (China, unprotected)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<notes><![CDATA[
+Patches protection checks, original uses Squirrel King cart scheme
+]]></notes>
 		<info name="alt_title" value="水滸傳"/>
 		<info name="language" value="Chinese" />
 		<part name="cart" interface="megadriv_cart">
@@ -36078,9 +36120,12 @@ https://segaretro.org/Ya_Se_Chuan_Shuo
 	</software>
 
 	<software name="yangji" cloneof="yangfam">
-		<description>Yīmén Yīngliè - Yángjiā Jiāng (China)</description>
+		<description>Yīmén Yīngliè - Yángjiā Jiāng (China, unprotected)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Patches protection check, original is a rom_smb
+]]></notes>
 		<info name="alt_title" value="一門英烈 楊家將"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -36779,6 +36824,23 @@ Crashes during attract or in character select, copy protection
 		</part>
 	</software>
 
+	<software name="13mahjnv">
+		<description>Shísān Zhāng Májiàng - Zhong Guo Měi Nv Pian (Taiwan)</description>
+		<year>1993</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<!-- Gamtec? -->
+		<notes><![CDATA[
+https://segaretro.org/Shi_San_Zhang_Ma_Jiang:_Zhong_Guo_Mei_Nv_Pian
+]]></notes>
+		<info name="alt_title" value="十三張麻將 中國美女篇" />
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_soulb" />
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom name="shi san zhang ma jiang_ zhong guo mei nv pian (unl).bin" size="0x100000" crc="9b691779" sha1="68313fb5be300375e7908bf1e3bf2d4c40fbd82c" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokestad">
 		<description>Pokemon Stadium</description>
 		<year>2000?</year>
@@ -37155,19 +37217,6 @@ https://segaretro.org/Smash_Controller
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="bomboy (unl).bin" size="524288" crc="065d2019" sha1="206fff31bccbb9a973de95c9ae780acb462548dd"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jujimj2">
-		<description>Ju Ji Ma Jiang II</description>
-		<year>199?</year>
-		<publisher>Sun Green</publisher>
-		<info name="serial" value="GM-95001"/>
-		<info name="alt_title" value="究極麻將II"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="pretty girl mahjongg (Ch).bin" size="1048576" crc="69f24500" sha1="0b4f63b8de2dcc4359a26c3ff21f910f206b6110"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37606,9 +37655,13 @@ Unsupported lightgun or mouse?
 	</software>
 
 	<software name="dbfb">
-		<description>Dragon Ball Final Bout (China?)</description>
+		<description>Dragon Ball Final Bout (Taiwan, unprotected)</description>
 		<year>1998</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>DVS Electronic</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Dragon_Ball:_Final_Bout
+Patches protection check, original is a rom_smb
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="dragon ball final bout (unl).bin" size="2097152" crc="63847005" sha1="6014cbf37fbabc51df581f7a93a1f8df09a66665"/>
