@@ -114,6 +114,9 @@ void megadrive_unl_kof99_device::time_io_map(address_map &map)
  * topf               Top Fighter 2000 MK VIII
  * https://segaretro.org/Top_Fighter_2000_MK_VIII
  *
+ * gunfight Gunfight 3 in 1
+ * https://segaretro.org/Gunfight_3_in_1
+ *
  * Obfuscated bankswitch mechanism + a bitswap based protection device.
  *
  * TODO:

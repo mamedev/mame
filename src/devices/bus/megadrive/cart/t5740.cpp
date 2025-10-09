@@ -6,6 +6,9 @@ WaterMelon T-5740
 
 https://segaretro.org/Pier_Solar_and_the_Great_Architects
 
+TODO:
+- several unknowns in TIME io range;
+
 **************************************************************************************************/
 
 #include "emu.h"
@@ -74,8 +77,11 @@ void megadrive_hb_psolar_device::cart_map(address_map &map)
 
 void megadrive_hb_psolar_device::time_io_map(address_map &map)
 {
-	map(0x01, 0x01).lw8(NAME([this] (offs_t offset, u8 data) {
-		//printf("Mode %02x\n", data);
+	map(0x01, 0x01).lw8(NAME([] (offs_t offset, u8 data) {
+		//logerror("Mode %02x\n", data);
+		// x--- enable SPI bus?
+		// --x- enable bankswitch addresses?
+		// ---x always on
 	}));
 	map(0x03, 0x03).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[5]->set_entry(data & 0xf); }));
 	map(0x05, 0x05).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[6]->set_entry(data & 0xf); }));

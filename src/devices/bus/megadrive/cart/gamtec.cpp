@@ -176,6 +176,9 @@ void megadrive_unl_777casino_device::cart_map(address_map &map)
  *
  * Game also implements self-modifying code at PC=28026 .. PC=28066, presumably against copiers
  *
+ * Shi San Zhang Ma Jiang: Zhong Guo Mei Nv Pian
+ * (assumed, only $40'0004 checked on title to gameplay transition)
+ *
  */
 
 DEFINE_DEVICE_TYPE(MEGADRIVE_UNL_SOULBLADE, megadrive_unl_soulblade_device, "megadrive_unl_soulblade", "Megadrive Soul Blade cart")

@@ -7,6 +7,7 @@
 #include "action_replay.h"
 #include "avartisan.h"
 #include "eeprom.h"
+#include "everdrive.h"
 #include "gamtec.h"
 #include "jcart.h"
 #include "mcpirate.h"
@@ -32,6 +33,7 @@ char const *const MD_SSF2               = "rom_ssf2";
 char const *const HB_SSF                = "rom_titan"; // TODO: rename
 char const *const HB_SSF_SRAM           = "ssf_sram";
 char const *const HB_SSF_EX             = "ssf_ex";
+char const *const HB_EVERDRIVE          = "everdrive";
 char const *const MD_SRAM               = "rom_sram";
 char const *const MD_SONIC3             = "rom_fram"; // TODO: change string
 char const *const MD_TPLAY96            = "rom_tplay96";
@@ -203,6 +205,9 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::HB_SSF,         MEGADRIVE_HB_SSF);
 	device.option_add_internal(slotoptions::HB_SSF_SRAM,    MEGADRIVE_HB_SSF_SRAM);
 	device.option_add_internal(slotoptions::HB_SSF_EX,      MEGADRIVE_HB_SSF_EX);
+
+	// Everdrive based carts
+	device.option_add(slotoptions::HB_EVERDRIVE, MEGADRIVE_HB_EVERDRIVE);
 
 	// WaterMelon
 	device.option_add_internal(slotoptions::HB_PSOLAR,      MEGADRIVE_HB_PSOLAR);

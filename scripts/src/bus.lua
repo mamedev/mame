@@ -3890,6 +3890,8 @@ if (BUSES["MEGADRIVE_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/cart/avartisan.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/eeprom.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/eeprom.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/everdrive.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/everdrive.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/gamtec.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/gamtec.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/jcart.cpp",
