@@ -547,7 +547,8 @@ private:
 	void op_subc(Assembler &a, const uml::instruction &inst);
 	void op_cmp(Assembler &a, const uml::instruction &inst);
 	template <Inst::Id Opcode> void op_mul(Assembler &a, const uml::instruction &inst);
-	template <Inst::Id Opcode> void op_mullw(Assembler &a, const uml::instruction &inst);
+	void op_mululw(Assembler &a, const uml::instruction &inst);
+	void op_mulslw(Assembler &a, const uml::instruction &inst);
 	void op_divu(Assembler &a, const uml::instruction &inst);
 	void op_divs(Assembler &a, const uml::instruction &inst);
 	void op_and(Assembler &a, const uml::instruction &inst);
@@ -604,7 +605,6 @@ private:
 	void movsd_p64_r128(Assembler &a, be_parameter const &param, Xmm const &reg);
 
 	void calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp const &lo, Gp const &hi);
-	void calculate_status_flags_mul_low(Assembler &a, Gp const &lo);
 
 	size_t emit(CodeHolder &ch);
 
@@ -689,9 +689,9 @@ inline void drcbe_x64::generate_one(Assembler &a, const uml::instruction &inst)
 	case uml::OP_SUBB:    op_subc(a, inst);                 break; // SUBB    dst,src1,src2[,f]
 	case uml::OP_CMP:     op_cmp(a, inst);                  break; // CMP     src1,src2[,f]
 	case uml::OP_MULU:    op_mul<Inst::kIdMul>(a, inst);    break; // MULU    dst,edst,src1,src2[,f]
-	case uml::OP_MULULW:  op_mullw<Inst::kIdMul>(a, inst);  break; // MULULW  dst,src1,src2[,f]
+	case uml::OP_MULULW:  op_mululw(a, inst);               break; // MULULW  dst,src1,src2[,f]
 	case uml::OP_MULS:    op_mul<Inst::kIdImul>(a, inst);   break; // MULS    dst,edst,src1,src2[,f]
-	case uml::OP_MULSLW:  op_mullw<Inst::kIdImul>(a, inst); break; // MULSLW  dst,src1,src2[,f]
+	case uml::OP_MULSLW:  op_mulslw(a, inst);               break; // MULSLW  dst,src1,src2[,f]
 	case uml::OP_DIVU:    op_divu(a, inst);                 break; // DIVU    dst,edst,src1,src2[,f]
 	case uml::OP_DIVS:    op_divs(a, inst);                 break; // DIVS    dst,edst,src1,src2[,f]
 	case uml::OP_AND:     op_and(a, inst);                  break; // AND     dst,src1,src2[,f]
@@ -865,7 +865,7 @@ inline void drcbe_x64::normalize_commutative(const be_parameter &dst, be_paramet
 		using std::swap;
 		swap(inner, outer);
 	}
-	else
+	else if (dst != inner)
 	{
 		normalize_commutative(inner, outer);
 	}
@@ -1391,8 +1391,8 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 			if (is64 && !short_immediate(param.immediate()))
 			{
 				// use scratch register for 64-bit immediate
-				a.mov(r11, param.immediate());
-				a.emit(opcode, dst, r11);
+				a.mov(r10, param.immediate());
+				a.emit(opcode, dst, r10);
 			}
 			else
 			{
@@ -1479,19 +1479,6 @@ void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp c
 	a.add(al, 0x7f);
 
 	a.mov(rax, tempreg);
-	a.sahf();
-}
-
-inline void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, Gp const &lo)
-{
-	// calculate zero, sign flags based on the lower half of the result but keep the overflow from the multiplication
-	a.seto(dl);
-
-	a.test(lo, lo);
-
-	// restore overflow flag
-	a.lahf();
-	a.add(dl, 0x7f);
 	a.sahf();
 }
 
@@ -2535,8 +2522,8 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 			if (maskp.immediate() & FLAG_V)
 			{
 				a.movzx(ecx, cl);
-				a.lea(r11, ptr(rcx, rcx));
-				a.or_(dstreg, r11d);
+				a.lea(r10, ptr(rcx, rcx));
+				a.or_(dstreg, r10d);
 			}
 
 			// Restore flags
@@ -4407,7 +4394,12 @@ void drcbe_x64::op_mul(Assembler &a, const instruction &inst)
 	be_parameter edstp(*this, inst.param(1), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(2), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
-	normalize_commutative(src1p, src2p);
+	if (src1p.is_memory() && !src2p.is_memory())
+	{
+		// always put memory in second parameter - there's no immediate form
+		using std::swap;
+		swap(src1p, src2p);
+	}
 	const bool compute_hi = (dstp != edstp);
 
 	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
@@ -4419,14 +4411,11 @@ void drcbe_x64::op_mul(Assembler &a, const instruction &inst)
 	{
 		a.emit(Opcode, MABS(src2p.memory(), inst.size()));
 	}
-	else if (src2p.is_int_register())
+	else
 	{
-		a.emit(Opcode, Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src2p.ireg()));
-	}
-	else if (src2p.is_immediate())
-	{
-		a.mov(edstreg, src2p.immediate());
-		a.emit(Opcode, edstreg);
+		const Gp srcreg = src2p.select_register(edstreg);
+		mov_reg_param(a, srcreg, src2p);
+		a.emit(Opcode, srcreg);
 	}
 	mov_param_reg(a, dstp, dstreg);
 	if (compute_hi)
@@ -4438,12 +4427,74 @@ void drcbe_x64::op_mul(Assembler &a, const instruction &inst)
 
 
 //-------------------------------------------------
-//  op_mullw - process a MULULW or MULSLW
-//  (32x32=32) opcode
+//  op_mululw - process a MULULW (32x32=32) opcode
 //-------------------------------------------------
 
-template <Inst::Id Opcode>
-void drcbe_x64::op_mullw(Assembler &a, const instruction &inst)
+void drcbe_x64::op_mululw(Assembler &a, const instruction &inst)
+{
+	// if overflow flag isn't required, this is equivalent mulslw which uses the more flexible imul
+	if (!(inst.flags() & FLAG_V))
+	{
+		op_mulslw(a, inst);
+		return;
+	}
+
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_flags(inst, FLAG_V | FLAG_Z | FLAG_S);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
+	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
+	if (src1p.is_memory() && !src2p.is_memory())
+	{
+		// always put memory in second parameter - there's no immediate form
+		using std::swap;
+		swap(src1p, src2p);
+	}
+
+	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
+	const Gp hireg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
+
+	// general case
+	mov_reg_param(a, dstreg, src1p);
+	if (src2p.is_memory())
+	{
+		a.mul(MABS(src2p.memory(), inst.size()));
+	}
+	else
+	{
+		const Gp srcreg = src2p.select_register(hireg);
+		mov_reg_param(a, srcreg, src2p);
+		a.mul(srcreg);
+	}
+	mov_param_reg(a, dstp, dstreg);
+
+	if (inst.flags() & (FLAG_Z | FLAG_S))
+	{
+		if (inst.flags() & FLAG_V)
+			a.seto(hireg.r8()); // keep the overflow flag from the multiplication
+
+		a.test(dstreg, dstreg);
+
+		if (inst.flags() & FLAG_V)
+		{
+			// restore overflow flag
+			a.lahf();
+			a.add(hireg.r8(), 0x7f);
+			a.sahf();
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  op_mulslw - process a MULSLW (32x32=32) opcode
+//-------------------------------------------------
+
+void drcbe_x64::op_mulslw(Assembler &a, const instruction &inst)
 {
 	// validate instruction
 	assert(inst.size() == 4 || inst.size() == 8);
@@ -4454,34 +4505,72 @@ void drcbe_x64::op_mullw(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
-	normalize_commutative(src1p, src2p);
+	if (src2p.is_immediate() && ((inst.size() == 4) || (s32(u32(src2p.immediate())) == s64(src2p.immediate()))))
+	{
+		// can use 3-operand form
+	}
+	else if (src1p.is_immediate() && ((inst.size() == 4) || (s32(u32(src1p.immediate())) == s64(src1p.immediate()))))
+	{
+		// swap operands so 3-operand form can be used
+		using std::swap;
+		swap(src1p, src2p);
+	}
+	else if (src1p.is_memory() && !src2p.is_memory())
+	{
+		// always put memory in second parameter if 3-operand form can't be used
+		using std::swap;
+		swap(src1p, src2p);
+	}
 
-	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
+	const Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
 	const Gp hireg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
 
-	// general case
-	mov_reg_param(a, dstreg, src1p);
-	if (src2p.is_memory())
+	if (src2p.is_immediate() && ((inst.size() == 4) || (s32(u32(src2p.immediate())) == s64(src2p.immediate()))))
 	{
-		a.emit(Opcode, MABS(src2p.memory(), inst.size()));
+		// use 3-operand form to multiply by immediate
+		const int64_t imm = (inst.size() == 4) ? s32(u32(src2p.immediate())) : src2p.immediate();
+		if (src1p.is_memory())
+		{
+			a.imul(dstreg, MABS(src1p.memory(), inst.size()), imm);
+		}
+		else
+		{
+			const Gp srcreg = src1p.select_register(hireg);
+			mov_reg_param(a, srcreg, src1p);
+			a.imul(dstreg, srcreg, imm);
+		}
 	}
-	else if (src2p.is_int_register())
+	else
 	{
-		a.emit(Opcode, Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src2p.ireg()));
-	}
-	else if (src2p.is_immediate())
-	{
-		a.mov(hireg, src2p.immediate());
-		a.emit(Opcode, hireg);
+		// use 2-operand form
+		mov_reg_param(a, dstreg, src1p);
+		if (src2p.is_memory())
+		{
+			a.imul(dstreg, MABS(src2p.memory(), inst.size()));
+		}
+		else
+		{
+			const Gp srcreg = src2p.select_register(hireg);
+			mov_reg_param(a, srcreg, src2p);
+			a.imul(dstreg, srcreg);
+		}
 	}
 	mov_param_reg(a, dstp, dstreg);
 
 	if (inst.flags() & (FLAG_Z | FLAG_S))
 	{
 		if (inst.flags() & FLAG_V)
-			calculate_status_flags_mul_low(a, dstreg);
-		else
-			a.test(dstreg, dstreg);
+			a.seto(hireg.r8()); // keep the overflow flag from the multiplication
+
+		a.test(dstreg, dstreg);
+
+		if (inst.flags() & FLAG_V)
+		{
+			// restore overflow flag
+			a.lahf();
+			a.add(hireg.r8(), 0x7f);
+			a.sahf();
+		}
 	}
 }
 
