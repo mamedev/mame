@@ -207,6 +207,7 @@ Reference of music tempo:
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
+#include "machine/input_merger.h"
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
@@ -4579,7 +4580,7 @@ void nmk16_state::tharrier(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4633,7 +4634,7 @@ void nmk16_state::mustang(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4675,7 +4676,7 @@ void nmk16_state::mustangb(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4713,7 +4714,7 @@ void nmk16_state::mustangb3(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
@@ -4749,7 +4750,7 @@ void nmk16_state::bioship(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bioship);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bioship)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, bioship)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4787,7 +4788,7 @@ void nmk16_state::vandyke(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4827,7 +4828,7 @@ void nmk16_state::vandykeb(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4850,8 +4851,8 @@ void nmk16_state::acrobatm(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4894,7 +4895,7 @@ void nmk16_state::acrobatmbl(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
@@ -4951,7 +4952,7 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4992,7 +4993,7 @@ void nmk16_state::tdragonb2(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5016,7 +5017,7 @@ void nmk16_state::tdragon(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5162,7 +5163,7 @@ void nmk16_state::ssmissin(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5188,8 +5189,8 @@ void nmk16_state::strahl(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_strahl));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_strahl);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, strahl)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5228,8 +5229,8 @@ void nmk16_state::strahljbl(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_strahl));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_strahl);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, strahl)
 
 	SPEAKER(config, "mono").front_center();
 
@@ -5263,7 +5264,7 @@ void nmk16_state::hachamf(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5340,7 +5341,7 @@ void nmk16_state::macross(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5378,7 +5379,7 @@ void nmk16_state::blkheart(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5415,7 +5416,7 @@ void nmk16_state::gunnail(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, gunnail)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5482,7 +5483,7 @@ void nmk16_state::macross2(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross2)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5526,7 +5527,7 @@ void nmk16_state::tdragon2(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross2)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5587,7 +5588,7 @@ void nmk16_state::raphero(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, gunnail)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5627,7 +5628,7 @@ void nmk16_state::bjtwin(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bjtwin);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, bjtwin)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5763,7 +5764,7 @@ void nmk16_state::powerins(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,powerins)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, powerins)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5808,7 +5809,7 @@ void nmk16_state::powerinsa(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,powerins)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, powerins)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5848,7 +5849,7 @@ void nmk16_state::powerinsb(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,powerins)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, powerins)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5921,7 +5922,7 @@ void nmk16_state::manybloc(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -6464,6 +6465,8 @@ void afega_state::stagger1(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(4'000'000)); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &afega_state::afega_sound_map);
 
+	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline(m_audiocpu, 0);
+
 	// video hardware
 	set_screen_lowres(config);
 	m_spritegen->set_colpri_callback(FUNC(afega_state::get_colour_4bit));
@@ -6472,16 +6475,16 @@ void afega_state::stagger1(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(afega_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch->data_pending_callback().set("audioirq", FUNC(input_merger_any_high_device::in_w<0>));
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(4'000'000))); // verified on PCB
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.irq_handler().set("audioirq", FUNC(input_merger_any_high_device::in_w<1>));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	OKIM6295(config, m_oki[0], XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH); // verified on PCB
@@ -6492,7 +6495,6 @@ void afega_state::redhawki(machine_config &config)
 {
 	stagger1(config);
 
-	// basic machine hardware
 	// video hardware
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_redhawki));
 }
@@ -6501,7 +6503,6 @@ void afega_state::redhawkb(machine_config &config)
 {
 	stagger1(config);
 
-	// basic machine hardware
 	// video hardware
 	m_gfxdecode->set_info(gfx_redhawkb);
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_redhawkb));
@@ -6511,11 +6512,9 @@ void afega_state::grdnstrm(machine_config &config)
 {
 	stagger1(config);
 
-	// basic machine hardware
-
 	// video hardware
 	m_gfxdecode->set_info(gfx_grdnstrm);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,grdnstrm)
+	MCFG_VIDEO_START_OVERRIDE(afega_state, grdnstrm)
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_firehawk));
 }
 
@@ -6526,7 +6525,7 @@ void afega_state::grdnstrmk(machine_config &config) // Side by side with PCB, th
 	// video hardware
 	m_screen->set_refresh_hz(57); // Side by side with PCB, MAME is too fast at 56
 	m_gfxdecode->set_info(gfx_grdnstrm);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,grdnstrm)
+	MCFG_VIDEO_START_OVERRIDE(afega_state, grdnstrm)
 }
 
 void afega_state::popspops(machine_config &config)
@@ -6555,7 +6554,7 @@ void afega_state::firehawk(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grdnstrm);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,grdnstrm)
+	MCFG_VIDEO_START_OVERRIDE(afega_state, grdnstrm)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -6594,7 +6593,7 @@ void nmk16_state::twinactn(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
