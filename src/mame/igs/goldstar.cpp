@@ -2846,25 +2846,6 @@ void unkch_state::bonch_0x40_w(uint8_t data)  // player 2 ??? wdog ??? video_reg
 }
 
 
-uint8_t wingco_state::sm7831_read(offs_t offset)
-{
-	uint8_t ret = 0;
-	switch(offset)
-	{
-		case 0: ret = sm7831_status; logerror("SM7831: Read Status - Offset:%02x - status:%02x\n", offset, ret); break;
-		case 1: ret = 0;  logerror("SM7831: Not Implemented - Offset:%02x\n", offset); break;
-		case 2: ret = sm7831_shift_dig;  logerror("SM7831: Read Shift Dig.- Offset:%02x\n", offset); break;
-		case 3: if(sm7831_data_cmd == 0x02)
-					ret = sm7831_X_reg[m_dap_idx];
-				if(sm7831_data_cmd == 0x03)
-					ret = sm7831_Y_reg[m_dap_idx];
-				logerror("SM7831: Read Data - m_dap_idx:%02x - data:%02x\n", m_dap_idx, ret);
-				m_dap_idx = m_dap_idx + 1;
-				break;
-	}
-	return ret;
-}
-
 void wingco_state::fever_outp_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
@@ -2920,6 +2901,25 @@ void wingco_state::fever_outp_w(offs_t offset, uint8_t data)
     SM7831 Arithmetic Processor Device Emulation
 
 ****************************************************/
+
+uint8_t wingco_state::sm7831_read(offs_t offset)
+{
+	uint8_t ret = 0;
+	switch(offset)
+	{
+		case 0: ret = sm7831_status; logerror("SM7831: Read Status - Offset:%02x - status:%02x\n", offset, ret); break;
+		case 1: ret = 0;  logerror("SM7831: Not Implemented - Offset:%02x\n", offset); break;
+		case 2: ret = sm7831_shift_dig;  logerror("SM7831: Read Shift Dig.- Offset:%02x\n", offset); break;
+		case 3: if(sm7831_data_cmd == 0x02)
+					ret = sm7831_X_reg[m_dap_idx];
+				if(sm7831_data_cmd == 0x03)
+					ret = sm7831_Y_reg[m_dap_idx];
+				logerror("SM7831: Read Data - m_dap_idx:%02x - data:%02x\n", m_dap_idx, ret);
+				m_dap_idx = m_dap_idx + 1;
+				break;
+	}
+	return ret;
+}
 
 void wingco_state::sm7831_write(offs_t offset, uint8_t data)
 {
