@@ -139,8 +139,8 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	float dvoz = extent.param[2].dpdx;
 	int     x;
 
-	tex_x_mask  = (tex_mirr_x ? (tex_width * 2) : tex_width) - 1;
-	tex_y_mask  = (tex_mirr_y ? (tex_height * 2) : tex_height) - 1;
+	tex_x_mask = tex_width - 1;
+	tex_y_mask = tex_height - 1;
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;
 
@@ -148,7 +148,7 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	colortable_g += ((colorbase >>  5) & 0x1f) << 8;
 	colortable_b += ((colorbase >> 10) & 0x1f) << 8;
 
-	for(x = extent.startx; x < extent.stopx; x++, uoz += duoz, voz += dvoz, ooz += dooz)
+	for (x = extent.startx; x < extent.stopx; x++, uoz += duoz, voz += dvoz, ooz += dooz)
 	{
 		float z = recip_approx(ooz) * 256.0f;
 		int32_t u = uoz * z;
@@ -159,51 +159,71 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 		u32  alp, alp1, alp2, alp3, alp4;
 #endif
 		u8 luma;
-		int u2;
-		int v2;
-		int du = 1;
-		int dv = 1;
+		int u2, u2n;
+		int v2, v2n;
 
 #if defined(MODEL2_CHECKER)
-		if ( ((x^scanline) & 1) == 0 )
+		if (((x ^ scanline) & 1) == 0)
 			continue;
 #endif
-		u2 = (u >> 8) & tex_x_mask;
-		v2 = (v >> 8) & tex_y_mask;
+		u2 = u >> 8;
+		v2 = v >> 8;
 
-		if (tex_mirr_x && u2 >= tex_width)
+		if (tex_mirr_x && ((u2 & tex_width) != 0)) // Only flip if even number of tilings
 		{
-			u2 = (tex_width * 2 - 1) - u2;
-			du = tex_width-1;
+			u2 = (u2 ^ tex_x_mask) & tex_x_mask;
+			u2n = std::max(0, u2 - 1); // Ensure sample is inside texture
 		}
-
-		if (tex_mirr_y && v2 >= tex_height)
+		else
 		{
-			v2 = (tex_height * 2 - 1) - v2;
-			dv = tex_height-1;
+			u2 &= tex_x_mask;
+			u2n = std::min(u2 + 1, (int) tex_x_mask); // Ensure sample is inside texture
+		}
+		if (tex_mirr_y && ((v2 & tex_height) != 0)) // Only flip if even number of tilings
+		{
+			v2 = (v2 ^ tex_y_mask) & tex_y_mask;
+			v2n = std::max(0, v2 - 1); // Ensure sample is inside texture
+		}
+		else 
+		{
+			v2 &= tex_y_mask;
+			v2n = std::min(v2 + 1, (int) tex_y_mask);  // Ensure sample is inside texture
 		}
 
 		frac1 = u & 0xFF;
 		frac2 = 0x100 - frac1;
 		frac3 = v & 0xFF;
 		frac4 = 0x100 - frac3;
-		tex1 = get_texel(tex_x, tex_y, u2, v2, sheet );
-		tex2 = get_texel(tex_x, tex_y, (u2 + du) % tex_width, v2, sheet);
-		tex3 = get_texel(tex_x, tex_y, u2, ( v2 + dv ) % tex_height, sheet);
-		tex4 = get_texel(tex_x, tex_y, (u2 + du) % tex_width, (v2 + dv) % tex_height, sheet);
+		tex1 = get_texel(tex_x, tex_y, u2, v2, sheet);
+		tex2 = get_texel(tex_x, tex_y, u2n, v2, sheet);
+		tex3 = get_texel(tex_x, tex_y, u2, v2n, sheet);
+		tex4 = get_texel(tex_x, tex_y, u2n, v2n, sheet);
 #if defined(MODEL2_TRANSLUCENT)
 		alp1 = (tex1 + 1) >> 4;
 		alp2 = (tex2 + 1) >> 4;
 		alp3 = (tex3 + 1) >> 4;
 		alp4 = (tex4 + 1) >> 4;
 		alp = alp1 * frac2 * frac4 + alp2 * frac1 * frac4 + alp3 * frac2 * frac3 + alp4 * frac1 * frac3;
-		if ( alp > 0x8000 )
+		if ( alp >= 0x8000 )
 			continue;
+		// Anti Alpha Highlighted Edges
+		tex1 &= alp1 - 1;
+		tex2 &= alp2 - 1;
+		tex3 &= alp3 - 1;
+		tex4 &= alp4 - 1;
+		u32 maxValidTex = std::max(std::max(std::max(tex1, tex2), tex3), tex4);
+		if (alp1)
+			tex1 = maxValidTex;
+		if (alp2)
+			tex2 = maxValidTex;
+		if (alp3)
+			tex3 = maxValidTex;
+		if (alp4)
+			tex4 = maxValidTex;
 #endif
-
 		t = tex1 * frac2 * frac4 + tex2 * frac1 * frac4 + tex3 * frac2 * frac3 + tex4 * frac1 * frac3;
 
-		// The bilinear filtered has 16 bits of precision, and the table needs t to be shifted by 3 on the left
+		// Bilinear combination has 16 bits of precision, and the table needs t to be shifted by 3 on the left
 		luma = (u32)lumaram[lumabase + (t >> 13)] * object.luma / 256;
 
 		// Virtua Striker sets up a luma of 0x40 for national flags on bleachers, fix here.
