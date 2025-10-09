@@ -637,7 +637,6 @@ public:
 	void wcat3(machine_config &config) ATTR_COLD;
 
 	void init_cb2() ATTR_COLD;
-	void init_feverch() ATTR_COLD;
 	void init_flam7_tw() ATTR_COLD;
 	void init_flaming7() ATTR_COLD;
 	void init_lucky8a() ATTR_COLD;
@@ -680,6 +679,21 @@ private:
 	void ay8910_outputa_w(uint8_t data);
 	void ay8910_outputb_w(uint8_t data);
 	void fever_outp_w(offs_t offset, uint8_t data);
+
+
+	// SM7831 Arithmetic Processor device emulation
+	uint8_t sm7831_mode = 0;
+	uint8_t sm7831_status = 0;
+	uint8_t sm7831_shift_dig = 0;
+	uint8_t sm7831_data_cmd = 0;
+	uint8_t m_dap_idx = 0;
+	uint8_t sm7831_X_reg[0x08] = {};
+	uint8_t sm7831_Y_reg[0x08] = {};
+	uint8_t sm7831_Z_reg[0x08] = {};
+	uint8_t sm7831_tmp_reg[0x08] = {};
+	uint8_t sm7831_read(offs_t offset);
+	void sm7831_write(offs_t offset, uint8_t data);
+
 
 	// handlers for lucky bar MCU ports
 	uint8_t mcu_portb_r();
@@ -910,6 +924,9 @@ void wingco_state::machine_start()
 
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_vidreg));
+	save_item(NAME(sm7831_X_reg));
+	save_item(NAME(sm7831_Y_reg));
+
 }
 
 void unkch_state::machine_start()
@@ -2828,6 +2845,26 @@ void unkch_state::bonch_0x40_w(uint8_t data)  // player 2 ??? wdog ??? video_reg
 	m_ticket_dispenser->motor_w(BIT(data, 5));
 }
 
+
+uint8_t wingco_state::sm7831_read(offs_t offset)
+{
+	uint8_t ret = 0;
+	switch(offset)
+	{
+		case 0: ret = sm7831_status; logerror("SM7831: Read Status - Offset:%02x - status:%02x\n", offset, ret); break;
+		case 1: ret = 0;  logerror("SM7831: Not Implemented - Offset:%02x\n", offset); break;
+		case 2: ret = sm7831_shift_dig;  logerror("SM7831: Read Shift Dig.- Offset:%02x\n", offset); break;
+		case 3: if(sm7831_data_cmd == 0x02)
+					ret = sm7831_X_reg[m_dap_idx];
+				if(sm7831_data_cmd == 0x03)
+					ret = sm7831_Y_reg[m_dap_idx];
+				logerror("SM7831: Read Data - m_dap_idx:%02x - data:%02x\n", m_dap_idx, ret);
+				m_dap_idx = m_dap_idx + 1;
+				break;
+	}
+	return ret;
+}
+
 void wingco_state::fever_outp_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
@@ -2876,6 +2913,197 @@ void wingco_state::fever_outp_w(offs_t offset, uint8_t data)
 			break;
 		}
 	}
+}
+
+
+/****************************************************
+    SM7831 Arithmetic Processor Device Emulation
+
+****************************************************/
+
+void wingco_state::sm7831_write(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		case 0: sm7831_mode = data; logerror("SM7831: Set mode - Offset:%02x - Data:%02x\n", offset, data); break;
+		case 1: {
+				if(data < 0x40)
+					switch(data & 0x3f)
+					{
+						case 0x00:  // Clear X register
+									for(int i = 0; i < 8; i++)
+										sm7831_X_reg[i] = 0;
+									logerror("SM7831: Clear X register - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x20:  // Clear Y register
+									for(int i = 0; i < 8 ; i++)
+										sm7831_Y_reg[i] = 0;
+									logerror("SM7831: Clear X register - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x01:	// Move Register X to Y
+									for(int i = 0; i < 8 ; i++)
+										sm7831_Y_reg[i] = sm7831_X_reg[i];
+									logerror("SM7831: Move Register X to Y - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x21:  // Move Register Y to X
+									for(int i = 0; i < 8 ; i++)
+										sm7831_X_reg[i] = sm7831_Y_reg[i];
+									logerror("SM7831: Move Register Y to X - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x02:  // Exchange Register X with Y
+									for(int i = 0; i < 8 ; i++)
+									{
+										sm7831_tmp_reg[i] = sm7831_X_reg[i];
+										sm7831_X_reg[i]   = sm7831_Y_reg[i];
+										sm7831_Y_reg[i]   = sm7831_tmp_reg[i];
+									}
+									logerror("SM7831: Exchange Register X with Y - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x22:  // Exchange Register X with Z
+									for(int i = 0; i < 8 ; i++)
+									{
+										sm7831_tmp_reg[i] = sm7831_X_reg[i];
+										sm7831_X_reg[i]   = sm7831_Z_reg[i];
+										sm7831_Z_reg[i]   = sm7831_tmp_reg[i];
+									}
+									logerror("SM7831: Exchange Register X with Z - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x03: logerror("SM7831: Zero sense Register X - Offset:%02x - Data:%02x\n", offset, data); break;								// Zero sense Register X  - Set Zero Flag if ...
+						case 0x23: logerror("SM7831: Zero sense Register Y - Offset:%02x - Data:%02x\n", offset, data); break;								// Zero sense Register y  - Set Zero Flag if ...
+						case 0x04: logerror("SM7831: Register X normalization - Offset:%02x - Data:%02x\n", offset, data); break;							// Register X normalization
+						case 0x24: logerror("SM7831: Register Y normalization - Offset:%02x - Data:%02x\n", offset, data); break;							// Register Y normalization
+
+						// Arithmetic Commands
+
+						case 0x08:  								// Add X + Y -> X
+								 {
+									uint8_t carry = 0;
+
+									for (int i = 0; i < 8; i++)
+									{
+										// Extract nibbles from X[i] and Y[i]
+										uint8_t x_low  = sm7831_X_reg[i] & 0x0f;
+										uint8_t x_high = (sm7831_X_reg[i] >> 4) & 0x0f;
+										uint8_t y_low  = sm7831_Y_reg[i] & 0x0f;
+										uint8_t y_high = (sm7831_Y_reg[i] >> 4) & 0x0f;
+
+										// Add low nibble + carry
+										uint8_t sum_low = x_low + y_low + carry;
+										carry = 0;
+
+										if (sum_low > 9)
+										{
+											sum_low += 6;
+											carry = sum_low > 0x0f ? 1 : 0;
+											sum_low &= 0x0f;
+										}
+
+										// Add high nibble + carry
+										uint8_t sum_high = x_high + y_high + carry;
+										carry = 0;
+
+										if (sum_high > 9)
+										{
+											sum_high += 6;
+											carry = sum_high > 0x0f ? 1 : 0;
+											sum_high &= 0x0f;
+										}
+
+										// Save result into X[i]
+										sm7831_X_reg[i] = (sum_high << 4) | sum_low;
+									}
+
+									if(carry == 1)
+										sm7831_status =  0x02;
+									else
+										sm7831_status =  0x00;
+									logerror("SM7831: Add X + Y -> X - Offset:%02x - Data:%02x\n", offset, data);
+								}
+								break;
+
+						case 0x09:	// Sub X - Y -> X
+								 {
+									uint8_t borrow = 0;
+
+									for (int i = 0; i < 8; i++)
+									{
+										// Extract low and high nibbles from current byte of X and Y
+										uint8_t x_low  = sm7831_X_reg[i] & 0x0f;
+										uint8_t x_high = (sm7831_X_reg[i] >> 4) & 0x0f;
+										uint8_t y_low  = sm7831_Y_reg[i] & 0x0f;
+										uint8_t y_high = (sm7831_Y_reg[i] >> 4) & 0x0f;
+
+										// Subtract low-order digit (within byte)
+										int16_t diff_low = x_low - y_low - borrow;
+										borrow = 0;
+										if (diff_low < 0)
+										{
+											diff_low += 10;
+											borrow = 1;
+										}
+
+										// Subtract high-order digit (within same byte)
+										int16_t diff_high = x_high - y_high - borrow;
+										borrow = 0;
+										if (diff_high < 0)
+										{
+											diff_high += 10;
+											borrow = 1;
+										}
+
+										sm7831_X_reg[i] = ((uint8_t)diff_high << 4) | (uint8_t)diff_low;
+									}
+									if(borrow == 1)
+										sm7831_status =  0x06;
+									else
+										sm7831_status =  0x00;
+									logerror("SM7831: Sub X - Y -> X - Offset:%02x - Data:%02x - borrow:%02x\n", offset, data, borrow);
+								}
+								break;
+						case 0x0a: logerror("SM7831: Mul X * Y -> X - Offset:%02x - Data:%02x\n", offset, data); break;										// Mul X * Y -> X
+						case 0x0c: logerror("SM7831: Div X / Y -> X - Offset:%02x - Data:%02x\n", offset, data); break;										// Div X / Y -> X
+						case 0x0e: logerror("SM7831: SQRTodd  X sqrt -> X - Offset:%02x - Data:%02x\n", offset, data); break;								// SQRTodd  X sqrt -> X
+						case 0x1e: logerror("SM7831: SQRTeven X sqrt -> X - Offset:%02x - Data:%02x\n", offset, data); break;								// SQRTeven X sqrt -> X
+						default: logerror("SM7831: Default - Offset:%02x - Data:%02x\n", offset, data); break;
+					}
+				else
+					switch((data & 0xc0) >> 4)
+					{
+						case 0x04:
+						case 0x05: logerror("SM7831: SL Register X - Offset:%02x - Data:%02x\n", offset, data); break;											// SR Register X
+						case 0x06:
+						case 0x07: logerror("SM7831: SL Register Y - Offset:%02x - Data:%02x\n", offset, data); break;											// SL Register Y
+						case 0x08:
+						case 0x09: logerror("SM7831: SR Register X - Offset:%02x - Data:%02x\n", offset, data); break;											// SR Register X
+						case 0x0a:
+						case 0x0b: logerror("SM7831: SR Register Y - Offset:%02x - Data:%02x\n", offset, data); break;											// SR Register Y
+
+						default: logerror("SM7831: Default - Offset:%02x - Data:%02x\n", offset, data); break;
+					}
+				}
+				break;
+
+		case 2: sm7831_data_cmd = data >> 5;
+				m_dap_idx = 0;
+				logerror("SM7831: Set DAP <-> MEM Mode - Data_Index:%02x - Data_cmd:%02x\n", m_dap_idx, data >> 5);
+				break;
+
+		case 3:
+				if(sm7831_data_cmd == 0x04)  // Mem to DAP reg X
+				{
+					sm7831_X_reg[m_dap_idx] = data;
+					logerror("SM7831: Write Data - m_dap_idx:%02x (X) - Data:%02x\n", m_dap_idx, sm7831_X_reg[m_dap_idx]);
+				}
+				if(sm7831_data_cmd == 0x05)  // Mem to DAP reg Y
+				{
+					sm7831_Y_reg[m_dap_idx] = data;
+					logerror("SM7831: Write Data - m_dap_idx:%02x (Y) - Data:%02x\n", m_dap_idx, sm7831_Y_reg[m_dap_idx]);
+				}
+				m_dap_idx = m_dap_idx + 1;
+				break;
+		default: break;
+	}
+
 }
 
 
@@ -4271,7 +4499,7 @@ void wingco_state::feverch_map(address_map &map)
 	map(0xe400, 0xe5ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xe600, 0xe7ff).ram();
 
-	map(0xe800, 0xe83f).mirror(0x80).ram().w(FUNC(wingco_state::reel_scroll_w<0>)).share(m_reel_scroll[0]);  // different offsets for normal or dup reels 
+	map(0xe800, 0xe83f).mirror(0x80).ram().w(FUNC(wingco_state::reel_scroll_w<0>)).share(m_reel_scroll[0]);  // different offsets for normal or dup reels
 	map(0xea00, 0xea3f).ram().w(FUNC(wingco_state::reel_scroll_w<1>)).share(m_reel_scroll[1]);
 	map(0xec00, 0xec3f).ram().w(FUNC(wingco_state::reel_scroll_w<2>)).share(m_reel_scroll[2]);
 
@@ -4284,7 +4512,9 @@ void wingco_state::feverch_portmap(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x18, 0x1c).noprw(); // unknown protection device - under test
+	map(0x18, 0x1b).rw(FUNC(wingco_state::sm7831_read), FUNC(wingco_state::sm7831_write));
+	map(0x1c, 0x1c).noprw(); // unknown
+
 	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
 	map(0x28, 0x28).w("sn2", FUNC(sn76489_device::write));
 	map(0x30, 0x30).w("sn3", FUNC(sn76489_device::write));
@@ -28521,30 +28751,6 @@ void unkch_state::init_boncha()
 	rom[0x5d04] = 0x77;
 }
 
-void wingco_state::init_feverch()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-//	dipsw read protection skip
-	rom[0x06cf] = 0x0a;
-	rom[0x073c] = 0x11;
-	rom[0x07d2] = 0x12;
-	rom[0x0810] = 0x10;
-	
-//  battery check
-	rom[0x3382] = 0x18;
-	rom[0x3383] = 0x00;
-
-//	temp hack - divide by 0 endless loop
-	rom[0x4160] = 0x00;
-	rom[0x4161] = 0x00;
-
-//	signature break (protection)
-//	rom[0x3387] = 0xd0;
-	rom[0x3350] = 0xc9;  // 02c1 call 0x3350 - signature break (protection)
-}
-
-
 } // anonymous namespace
 
 
@@ -28767,9 +28973,9 @@ GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam
 
 
 // --- Wing W-6 hardware ---
-GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   init_feverch,   ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         MACHINE_NOT_WORKING,   layout_lucky8 )  // unimplemented arithmetic chip
-GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         MACHINE_NOT_WORKING,   layout_lucky8 )  // unimplemented arithmetic chip
-GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,                     layout_lucky8 )
+GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
+GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
+GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
 
 // --- Wing W-7 hardware ---
 GAMEL( 1991, megaline,   0,        megaline, megaline, wingco_state,   init_mgln,      ROT0, "Fun World",         "Mega Lines (Wing W-7 System)",                             0,          layout_megaline )
