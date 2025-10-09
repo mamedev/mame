@@ -7,8 +7,9 @@ Everdrive-MD (first gen)
 TODO:
 - avoid phantom cart loading (does nothing, we load BIOS from here);
 - ST_M29W640FT incomplete (shouldn't work with ROM patching);
-- SD card doesn't work (returns "SEL ERROR 120" once it starts to read from SD card filesystem,
-with full speed mode selected)
+- SPI comms dislikes receiving a SS signal when full speed is selected (goes 0 -> 1 -> 0,
+  throwing a "SEL ERROR 120" if we don't guard against it)
+- Add remaining cfg_w flags;
 
 **************************************************************************************************/
 
@@ -157,13 +158,14 @@ void megadrive_hb_everdrive_device::cfg_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		// assume negated by using #SS nomenclature
-		m_sdcard->spi_ss_w(BIT(~data, 0));
 		m_spi_full_speed = BIT(data, 1);
+		// assume negated by using #SS nomenclature
+		// HACK: don't change SS line if full speed is selected
+		if (!m_spi_full_speed)
+			m_sdcard->spi_ss_w(BIT(~data, 0));
+		// used on dir listing onward
 		m_spi_16 = BIT(data, 2);
 		//printf("SS %d full_speed %d\n", BIT(data, 0), m_spi_full_speed);
-		if (m_spi_16)
-			popmessage("SPI16 enabled");
 
 		// guess
 		m_spi_clock->adjust(attotime::never);
@@ -203,7 +205,7 @@ TIMER_CALLBACK_MEMBER(megadrive_hb_everdrive_device::spi_clock_cb)
 		}
 		else
 		{
-			m_sdcard->spi_mosi_w(BIT(m_out_latch, 7));
+			m_sdcard->spi_mosi_w(BIT(m_out_latch, m_spi_16 ? 15 : 7));
 			m_sdcard->spi_clock_w(0);
 
 			m_out_latch <<= 1;
