@@ -1343,6 +1343,12 @@ ROM_START( racechl8 )
 	ROM_LOAD( "ppu 401 0517.u5", 0x00000, 0x80000, CRC(51c6d44b) SHA1(6a48ea1185cf0d2d0bcf9a1b2a8cc881e318d978) )
 ROM_END
 
+ROM_START( danzkara )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "bs-danz-r2.bin", 0x00000, 0x100000, CRC(806be92b) SHA1(07bad2f383dc578fa8fc83b0c1886001bf1d72b9) )
+ROM_END
+
+
 void nes_clone_state::init_nes_clone()
 {
 }
@@ -1395,3 +1401,6 @@ CONS( 200?, digezlg, 0, 0, nes_clone_dnce2000, digezlg, nes_clone_dnce2000_state
 
 // 2005-04-03 date on PCB
 CONS( 2005, racechl8, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision / Taikee", "Racing Challenge - 8 Games In 1", 0 )
+
+// might not fit here (but doesn't seem to be VT02/VT03 at least)
+CONS( 200?, danzkara,  0,  0,  nes_clone_dnce2000,    nes_clone, nes_clone_dnce2000_state, init_nes_clone, "<unknown>", "DanZ Kara (BS-888)", MACHINE_NOT_WORKING )
