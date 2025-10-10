@@ -36,38 +36,119 @@ public:
 	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto read_regs_callback() { return m_readregs_cb.bind(); }
+	auto write_regs_callback() { return m_writeregs_cb.bind(); }   // <-- for vm1 LA/RA mirroring
 	auto read_samples_callback() { return m_readsamples_cb.bind(); }
 
+	// control API
 	void enable_voice(int voice, bool update_only);
 	void disable_voice(int voice);
 	bool is_voice_enabled(int voice);
+
+	// rate handling
+	void set_tempo(int index, uint8_t value);
+	void set_cyclerate(uint8_t value);
+
+	// register handlers (from the CPU map)
+	uint8_t sound_volume_r();
+	void sound_volume_w(uint8_t data);
+	uint8_t sound_mixer_r();
+	void sound_mixer_w(uint8_t data);
+	uint8_t dac_control_r();
+	void dac_control_w(uint8_t data);
+
+	// helpers
+	void set_dac_gain(uint8_t amp_data);
+	void set_output_mode(bool mono);
+	void set_mastervol(uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// sound stream update overrides
+	// sound stream update
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	sound_stream *m_stream = nullptr;
+	// stream
+	sound_stream* m_stream = nullptr;
 
+	// global timing
+	uint8_t m_tp_dev[4] = { 0, 0, 0, 0 };
+	uint8_t m_cyclerate_dev = 1;
+
+	// callbacks
+	devcb_read8  m_readregs_cb;
+	devcb_write8 m_writeregs_cb;     // used to mirror vm1 phase to LA/RA
+	devcb_read8  m_readsamples_cb;
+
+	// voice state
 	struct xavix_voice {
-		bool enabled[2]{};
-		uint32_t position[2]{};
-		uint32_t startposition[2]{};
-		uint8_t bank = 0; // no samples appear to cross a bank boundary, so likely wraps
-		int type = 0;
-		int rate = 0;
-		int vol = 0;
+		uint8_t   enabled = 0;
+		uint32_t  position = 0;
+		uint32_t  loopposition = 0;
+		uint32_t  loopendposition = 0;
+		uint32_t  startposition = 0;
+
+		uint32_t  envpositionleft = 0;
+		uint32_t  envpositionright = 0;
+		uint8_t   envbank = 0;
+		uint8_t   envmode = 0;
+
+		uint8_t   bank = 0;
+		uint32_t  rate = 0;
+		uint8_t   type = 0;
+		uint8_t   vol = 0;
+
+		uint16_t  env_rom_base_left = 0;
+		uint16_t  env_rom_base_right = 0;
+
+		uint8_t   env_vol_left = 0xff;
+		uint8_t   env_vol_right = 0xff;
+
+		uint32_t  env_period_samples = 0;
+		uint32_t  env_countdown = 0;
+		uint8_t   env_active_left = 1;
+		uint8_t   env_active_right = 1;
+
+		// misc (vm1/vm2 helpers, tickers)
+		uint8_t   env_phase = 0;
+
+		uint8_t la_byte = 0;  // shadow of LA (low address byte)
+		uint8_t ra_byte = 0;  // shadow of RA (low address byte)
 	};
 
-	devcb_read8 m_readregs_cb;
+	// mixer state
+	struct xavix_mixer
+	{
+		uint8_t monoural = 0;
+		uint8_t capacity = 0;
+		uint8_t amp = 2;
 
-	devcb_read8 m_readsamples_cb;
+		uint8_t dac = 0;
+		uint8_t gap = 0;
+		uint8_t lead = 0;
+		uint8_t lag = 0;
 
+		uint8_t mastervol = 0xff;
+		int32_t gain = 2;
+	};
+
+	xavix_mixer m_mix;
 	xavix_voice m_voice[16];
+
+	uint32_t m_pitch_countdown[16];
+
+	// helpers
+	uint32_t tempo_to_period_samples(uint8_t tp) const;
+	uint8_t decay(uint8_t x);
+	void step_envelope(int voice);
+	uint8_t fetch_env_byte(int voice, int channel, uint32_t idx);
+	uint8_t fetch_env_byte_direct(int voice, int channel, uint16_t addr);
+	void step_pitch(int voice);
+	void step_side1(int channel, int voice, const uint8_t la, const uint8_t ra);
+	void step_side_env_vm1(int channel, xavix_voice v, int voice);
+	void step_side_env_vm2(int channel, xavix_voice v, int voice);
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)
@@ -385,36 +466,39 @@ protected:
 	uint8_t dispctrl_6ff8_r();
 	void dispctrl_6ff8_w(uint8_t data);
 
-	uint8_t sound_startstop_r(offs_t offset);
-	void sound_startstop_w(offs_t offset, uint8_t data);
-	uint8_t sound_updateenv_r(offs_t offset);
-	void sound_updateenv_w(offs_t offset, uint8_t data);
+	uint8_t sound_voice_startstop_r(offs_t offset);
+	void sound_voice_startstop_w(offs_t offset, uint8_t data);
+	uint8_t sound_voice_updateenv_r(offs_t offset);
+	void sound_voice_updateenv_w(offs_t offset, uint8_t data);
 
-	uint8_t sound_sta16_r(offs_t offset);
-	uint8_t sound_75f5_r();
+	uint8_t sound_voice_status_r(offs_t offset);
+
 	uint8_t sound_volume_r();
 	void sound_volume_w(uint8_t data);
 
+	uint8_t sound_regbase_r();
 	void sound_regbase_w(uint8_t data);
 
-	uint8_t sound_75f8_r();
-	void sound_75f8_w(uint8_t data);
+	uint8_t sound_cyclerate_r();
+	void sound_cyclerate_w(uint8_t data);
 
-	uint8_t sound_75f9_r();
-	void sound_75f9_w(uint8_t data);
+	uint8_t sound_mixer_r();
+	void sound_mixer_w(uint8_t data);
 
-	uint8_t sound_timer0_r();
-	void sound_timer0_w(uint8_t data);
-	uint8_t sound_timer1_r();
-	void sound_timer1_w(uint8_t data);
-	uint8_t sound_timer2_r();
-	void sound_timer2_w(uint8_t data);
-	uint8_t sound_timer3_r();
-	void sound_timer3_w(uint8_t data);
+	uint8_t sound_tp0_r();
+	void sound_tp0_w(uint8_t data);
+	uint8_t sound_tp1_r();
+	void sound_tp1_w(uint8_t data);
+	uint8_t sound_tp2_r();
+	void sound_tp2_w(uint8_t data);
+	uint8_t sound_tp3_r();
+	void sound_tp3_w(uint8_t data);
 
-	uint8_t sound_irqstatus_r();
-	void sound_irqstatus_w(uint8_t data);
-	void sound_75ff_w(uint8_t data);
+	uint8_t sound_irq_status_r();
+	void sound_irq_status_w(uint8_t data);
+	void sound_dac_control_w(uint8_t data);
+	uint8_t sound_dac_control_r();
+
 	uint8_t m_sound_irqstatus = 0;
 	uint8_t m_soundreg16_0[2]{};
 	uint8_t m_soundreg16_1[2]{};
@@ -534,11 +618,10 @@ protected:
 	uint8_t m_6ff0 = 0;
 	uint8_t m_video_ctrl = 0;
 
-	uint8_t m_mastervol = 0;
-	uint8_t m_unk_snd75f8 = 0;
-	uint8_t m_unk_snd75f9 = 0;
+	uint8_t m_cyclerate = 0;
+	uint8_t m_mixer = 0;
 	uint8_t m_unk_snd75ff = 0;
-	uint8_t m_sndtimer[4]{};
+	uint8_t m_tp[4]{};
 
 	uint8_t m_timer_baseval = 0;
 
@@ -614,6 +697,7 @@ protected:
 	int get_current_address_byte();
 
 	uint8_t sound_regram_read_cb(offs_t offset);
+	void    sound_regram_write_cb(offs_t offset, uint8_t data);
 
 	uint8_t m_extbusctrl[3]{};
 
