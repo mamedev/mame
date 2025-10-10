@@ -381,7 +381,7 @@ public:
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
-	virtual bool logging() const noexcept override { return m_log != nullptr; }
+	virtual bool logging() const noexcept override { return bool(m_log); }
 
 private:
 	// a be_parameter is similar to a uml::parameter but maps to native registers/memory
@@ -612,7 +612,7 @@ private:
 	// internal state
 	drc_hash_table          m_hash;                 // hash table state
 	drc_map_variables       m_map;                  // code map
-	x86log_context *        m_log;                  // logging
+	x86log_context::ptr     m_log;                  // logging
 	FILE *                  m_log_asmjit;
 
 	uint32_t *              m_absmask32;            // absolute value mask (32-bit)
@@ -1004,7 +1004,6 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	: drcbe_interface(drcuml, cache, device)
 	, m_hash(cache, modes, addrbits, ignorebits)
 	, m_map(cache, 0xaaaaaaaa5555)
-	, m_log(nullptr)
 	, m_log_asmjit(nullptr)
 	, m_absmask32((uint32_t *)cache.alloc_near(16*2 + 15))
 	, m_absmask64(nullptr)
@@ -1087,7 +1086,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	if (device.machine().options().drc_log_native())
 	{
 		std::string filename = std::string("drcbex64_").append(device.shortname()).append(".asm");
-		m_log = x86log_create_context(filename.c_str());
+		m_log = x86log_context::create(filename);
 		m_log_asmjit = fopen(std::string("drcbex64_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
 	}
 }
@@ -1100,8 +1099,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 drcbe_x64::~drcbe_x64()
 {
 	// free the log context
-	if (m_log != nullptr)
-		x86log_free_context(m_log);
+	m_log.reset();
 
 	if (m_log_asmjit)
 		fclose(m_log_asmjit);
@@ -1154,8 +1152,8 @@ size_t drcbe_x64::emit(CodeHolder &ch)
 void drcbe_x64::reset()
 {
 	// output a note to the log
-	if (m_log != nullptr)
-		x86log_printf(m_log, "%s", "\n\n===========\nCACHE RESET\n===========\n\n");
+	if (m_log)
+		m_log->printf("%s", "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	// generate a little bit of glue code to set up the environment
 	x86code *dst = (x86code *)m_cache.top();
@@ -1223,10 +1221,10 @@ void drcbe_x64::reset()
 
 	if (m_log)
 	{
-		x86log_disasm_code_range(m_log, "entry_point", dst, m_exit);
-		x86log_disasm_code_range(m_log, "exit_point", m_exit, m_nocode);
-		x86log_disasm_code_range(m_log, "nocode_point", m_nocode, m_endofblock);
-		x86log_disasm_code_range(m_log, "end_of_block", m_endofblock, dst + bytes);
+		m_log->disasm_code_range("entry_point", dst, m_exit);
+		m_log->disasm_code_range("exit_point", m_exit, m_nocode);
+		m_log->disasm_code_range("nocode_point", m_nocode, m_endofblock);
+		m_log->disasm_code_range("end_of_block", m_endofblock, dst + bytes);
 	}
 
 	// reset our hash tables
@@ -1314,7 +1312,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 		{
 			dasm = inst.disasm(&m_drcuml);
 
-			x86log_add_comment(m_log, dst + a.offset(), "%s", dasm.c_str());
+			m_log->add_comment(dst + a.offset(), "%s", dasm.c_str());
 			a.setInlineComment(dasm.c_str());
 		}
 
@@ -1334,7 +1332,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	// catch falling off the end of a block
 	if (m_log)
 	{
-		x86log_add_comment(m_log, dst + a.offset(), "%s", "end of block");
+		m_log->add_comment(dst + a.offset(), "%s", "end of block");
 		a.setInlineComment("end of block");
 	}
 	a.jmp(imm(m_endofblock));
@@ -1346,7 +1344,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 
 	// log it
 	if (m_log)
-		x86log_disasm_code_range(m_log, (blockname.empty()) ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
+		m_log->disasm_code_range(blockname.empty() ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
 
 	// tell all of our utility objects that the block is finished
 	m_hash.block_end(block);
