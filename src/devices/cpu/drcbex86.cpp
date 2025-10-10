@@ -3578,7 +3578,6 @@ void drcbe_x86::op_setflgs(Assembler &a, const instruction &inst)
 {
 	assert(inst.size() == 4);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 

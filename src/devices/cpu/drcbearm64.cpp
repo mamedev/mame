@@ -2396,7 +2396,6 @@ void drcbe_arm64::op_getflgs(a64::Assembler &a, const uml::instruction &inst)
 void drcbe_arm64::op_setflgs(a64::Assembler &a, const uml::instruction &inst)
 {
 	assert(inst.size() == 4);
-	assert_no_condition(inst);
 
 	be_parameter flagsp(*this, inst.param(0), PTYPE_MRI);
 
@@ -3254,7 +3253,11 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 			optimized = true;
 		}
 
-		if (is_right_aligned)
+		if (maskp.is_immediate_value(0))
+		{
+			a.mov(output, select_register(a64::xzr, inst.size()));
+		}
+		else if (is_right_aligned)
 		{
 			// Optimize a contiguous right-aligned mask
 			const auto s2 = -int(s) & (instbits - 1);
@@ -3372,7 +3375,13 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
 		const auto s = shiftp.immediate() & (instbits - 1);
 
-		if (is_right_aligned || is_contiguous)
+		if (maskp.is_immediate_value(0))
+		{
+			mov_reg_param(a, inst.size(), dst, dstp);
+
+			optimized = true;
+		}
+		else if (is_right_aligned || is_contiguous)
 		{
 			mov_reg_param(a, inst.size(), dst, dstp);
 
@@ -3836,12 +3845,14 @@ void drcbe_arm64::op_mulu(a64::Assembler &a, const uml::instruction &inst)
 		if (inst.size() == 8)
 		{
 			a.mul(lo, src1, src2);
-			a.umulh(hi, src1, src2);
+			if (compute_hi || inst.flags())
+				a.umulh(hi, src1, src2);
 		}
 		else
 		{
 			a.umull(lo, src1, src2);
-			a.lsr(hi, lo, 32);
+			if (compute_hi || inst.flags())
+				a.lsr(hi, lo, 32);
 		}
 	}
 
@@ -3851,23 +3862,31 @@ void drcbe_arm64::op_mulu(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.flags())
 	{
-		a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
+		if (inst.flags() & uml::FLAG_Z)
+		{
+			a.cmp(lo, 0);
+			a.ccmp(hi, 0, 0, a64::CondCode::kEQ);
+		}
 
-		a.tst(lo, lo);
-		a.cset(TEMP_REG1, a64::CondCode::kEQ);
-		a.tst(hi, hi);
-		a.cset(TEMP_REG3, a64::CondCode::kEQ);
-		a.and_(TEMP_REG1, TEMP_REG1, TEMP_REG3);
-		a.bfi(SCRATCH_REG1, TEMP_REG1, 30, 1); // zero flag
+		if (inst.flags() & (uml::FLAG_V | uml::FLAG_S))
+		{
+			a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
 
-		a.tst(hi, hi); // overflow check
-		a.cset(TEMP_REG3, a64::CondCode::kNE);
-		a.bfi(SCRATCH_REG1, TEMP_REG3, 28, 1); // overflow flag
+			if (inst.flags() & uml::FLAG_V)
+			{
+				a.tst(hi, hi); // overflow check
+				a.cset(TEMP_REG3, a64::CondCode::kNE);
+				a.bfi(SCRATCH_REG1, TEMP_REG3, 28, 1); // overflow flag
+			}
 
-		a.lsr(TEMP_REG3, hi, inst.size() * 8 - 1); // take top bit of result as sign flag
-		a.bfi(SCRATCH_REG1, TEMP_REG3, 31, 1); // sign flag
+			if (inst.flags() & uml::FLAG_S)
+			{
+				a.lsr(TEMP_REG3, hi, inst.size() * 8 - 1); // take top bit of result as sign flag
+				a.bfi(SCRATCH_REG1, TEMP_REG3, 31, 1); // sign flag
+			}
 
-		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+			a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+		}
 
 		m_carry_state = carry_state::POISON;
 	}
@@ -3963,12 +3982,14 @@ void drcbe_arm64::op_muls(a64::Assembler &a, const uml::instruction &inst)
 		if (inst.size() == 8)
 		{
 			a.mul(lo, src1, src2);
-			a.smulh(hi, src1, src2);
+			if (compute_hi || inst.flags())
+				a.smulh(hi, src1, src2);
 		}
 		else
 		{
 			a.smull(lo, src1, src2);
-			a.lsr(hi, lo, 32);
+			if (compute_hi || inst.flags())
+				a.lsr(hi, lo, 32);
 		}
 	}
 
@@ -3978,33 +3999,41 @@ void drcbe_arm64::op_muls(a64::Assembler &a, const uml::instruction &inst)
 
 	if (inst.flags())
 	{
-		a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
-
-		a.tst(lo, lo);
-		a.cset(TEMP_REG1, a64::CondCode::kEQ);
-		a.tst(hi, hi);
-		a.cset(SCRATCH_REG2, a64::CondCode::kEQ);
-		a.and_(TEMP_REG1, TEMP_REG1, SCRATCH_REG2);
-		a.bfi(SCRATCH_REG1, TEMP_REG1, 30, 1); // zero flag
-
-		if (inst.size() == 4)
+		if (inst.flags() & uml::FLAG_Z)
 		{
-			a.sxtw(TEMP_REG1, lo.w());
-			a.cmp(TEMP_REG1, lo);
-		}
-		else
-		{
-			a.asr(TEMP_REG1, lo, 63);
-			a.cmp(TEMP_REG1, hi);
+			a.cmp(lo, 0);
+			a.ccmp(hi, 0, 0, a64::CondCode::kEQ);
 		}
 
-		a.cset(TEMP_REG1, a64::CondCode::kNE);
-		a.bfi(SCRATCH_REG1, TEMP_REG1, 28, 1); // overflow flag
+		if (inst.flags() & (uml::FLAG_V | uml::FLAG_S))
+		{
+			a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
 
-		a.lsr(TEMP_REG1, hi, inst.size() * 8 - 1); // take top bit of result as sign flag
-		a.bfi(SCRATCH_REG1, TEMP_REG1, 31, 1); // sign flag
+			if (inst.flags() & uml::FLAG_V)
+			{
+				if (inst.size() == 4)
+				{
+					a.sxtw(TEMP_REG1, lo.w());
+					a.cmp(TEMP_REG1, lo);
+				}
+				else
+				{
+					a.asr(TEMP_REG1, lo, 63);
+					a.cmp(TEMP_REG1, hi);
+				}
 
-		a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+				a.cset(TEMP_REG1, a64::CondCode::kNE);
+				a.bfi(SCRATCH_REG1, TEMP_REG1, 28, 1); // overflow flag
+			}
+
+			if (inst.flags() & uml::FLAG_S)
+			{
+				a.lsr(TEMP_REG1, hi, inst.size() * 8 - 1); // take top bit of result as sign flag
+				a.bfi(SCRATCH_REG1, TEMP_REG1, 31, 1); // sign flag
+			}
+
+			a.msr(a64::Predicate::SysReg::kNZCV, SCRATCH_REG1);
+		}
 
 		m_carry_state = carry_state::POISON;
 	}
