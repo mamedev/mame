@@ -44,7 +44,10 @@
   MUSICBAR VER 201.
   
   Led Board
+  3 x 2 leds
+  6 x 24 leds for roulette
   29 x 20.5cm.
+
   the LED board says GHY1-PCB and BYP-020 
   U5 Two JFC 95101   
   unpopulated ld32 - led and ds14 ds15 2x  7 segment display 2 digit.
