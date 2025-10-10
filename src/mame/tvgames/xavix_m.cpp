@@ -548,8 +548,8 @@ void xavix_popira2_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
 	if (m_cartslot->has_cart())
 	{
-		m_cartslot->write_sda((data & 0x08) >> 3);
-		m_cartslot->write_scl((data & 0x10) >> 4);
+		m_cartslot->write_sda(BIT(direction, 3) ? BIT(data, 3) : 1);
+		m_cartslot->write_scl(BIT(direction, 4) ? BIT(data, 4) : 0);
 	}
 }
 
@@ -565,8 +565,8 @@ void xavix_evio_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
 	if (m_cartslot->has_cart())
 	{
-		m_cartslot->write_sda((data & 0x10) >> 4);
-		m_cartslot->write_scl((data & 0x20) >> 5);
+		m_cartslot->write_sda(BIT(direction, 4) ? BIT(data, 4) : 1);
+		m_cartslot->write_scl(BIT(direction, 5) ? BIT(data, 5) : 0);
 	}
 }
 
