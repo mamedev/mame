@@ -1887,9 +1887,11 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		}
 		break;
 	case 0x12:
+		m_screen->update_now();
 		nr_12_layer2_active_bank_w(nr_wr_dat);
 		break;
 	case 0x13:
+		m_screen->update_now();
 		nr_13_layer2_shadow_bank_w(nr_wr_dat);
 		break;
 	case 0x14:
