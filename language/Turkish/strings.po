@@ -2494,6 +2494,8 @@ msgid ""
 "Auditing media for system %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"%2$u/%3$u sistemi için medya denetleniyor...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:128
 #, c-format
@@ -2503,21 +2505,25 @@ msgid ""
 "Press %1$s to cancel\n"
 "Press %2$s to continue"
 msgstr ""
+"Denetim iptal edilsin mi?\n"
+"\n"
+"İptal etmek için %1$s tuşuna basın\n"
+"Devam etmek için %2$s tuşuna basın"
 
 #: src/frontend/mame/ui/auditmenu.cpp:148
 #, c-format
 msgid "Audit media for %1$u systems marked unavailable"
-msgstr ""
+msgstr "%1$u sistem için denetim ortamı kullanılamaz olarak işaretlendi"
 
 #: src/frontend/mame/ui/auditmenu.cpp:149
 #, c-format
 msgid "Audit media for all %1$u systems"
-msgstr ""
+msgstr "Tüm %1$u sistemleri için medya denetle"
 
 #: src/frontend/mame/ui/auditmenu.cpp:165
 #, c-format
 msgid "Press %1$s to cancel\n"
-msgstr ""
+msgstr "İptal etmek için %1$s tuşuna basın\n"
 
 #: src/frontend/mame/ui/custui.cpp:54
 msgid "Show All"
@@ -2662,22 +2668,22 @@ msgstr "Grafik görüntüleyici arkaplanı"
 #: src/frontend/mame/ui/custui.cpp:638
 msgctxt "color-option"
 msgid "Mouse over color"
-msgstr ""
+msgstr "Fare üzerindeykenki renk"
 
 #: src/frontend/mame/ui/custui.cpp:639
 msgctxt "color-option"
 msgid "Mouse over background color"
-msgstr ""
+msgstr "Fare üzerindeykenki arkaplan rengi"
 
 #: src/frontend/mame/ui/custui.cpp:640
 msgctxt "color-option"
 msgid "Mouse down color"
-msgstr ""
+msgstr "Fare üzerinde değilkenki renk"
 
 #: src/frontend/mame/ui/custui.cpp:641
 msgctxt "color-option"
 msgid "Mouse down background color"
-msgstr ""
+msgstr "Fare üzerinde değilkenki arkaplan rengi"
 
 #: src/frontend/mame/ui/custui.cpp:645
 msgid "Restore default colors"
@@ -2710,7 +2716,7 @@ msgstr "Seçili"
 #: src/frontend/mame/ui/custui.cpp:684
 msgctxt "color-sample"
 msgid "Mouse Over"
-msgstr ""
+msgstr "Fare Üzerindeyken"
 
 #: src/frontend/mame/ui/custui.cpp:685
 msgctxt "color-sample"
@@ -2946,7 +2952,7 @@ msgstr "Teyp Kontrolü"
 #: src/frontend/mame/ui/mainmenu.cpp:145
 msgctxt "menu-main"
 msgid "Pseudo Terminals"
-msgstr ""
+msgstr "Pseudo Terminaller"
 
 #: src/frontend/mame/ui/mainmenu.cpp:148
 msgctxt "menu-main"
@@ -3390,27 +3396,27 @@ msgstr "Yazıcı\tKusurlu\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Manyetik Bant\tUygulanmamış\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Mag. Tape\tImperfect\n"
-msgstr ""
+msgstr "Manyetik Bant\tKusurlu\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Punch Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Delikli Bant\tUygulanmamış\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Punch Tape\tImperfect\n"
-msgstr ""
+msgstr "Delikli Bant\tKusurlu\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3040
 msgid "Mag. Drum\tUnimplemented\n"
-msgstr ""
+msgstr "Manyetik Drum\tUygulanmamış\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3042
 msgid "Mag. Drum\tImperfect\n"
-msgstr ""
+msgstr "Manyetik Drum\tKusurlu\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3045
 msgid "(EP)ROM\tUnimplemented\n"
@@ -3658,32 +3664,32 @@ msgstr "  Kullanıcı Girişleri    [%1$d giriş]\n"
 #: src/frontend/mame/ui/devopt.cpp:304
 #, c-format
 msgid "  Mahjong inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Mahjong girişleri [%1$d giriş]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:306
 #, c-format
 msgid "  Hanafuda inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Hanafuda girişleri    [%1$d girişler]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:308
 #, c-format
 msgid "  Gambling inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Kumar girişleri    [%1$d girişler]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:310
 #, c-format
 msgid "  Analog inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Analog girişler    [%1$d girişler]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:312
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Ayarlayıcı girişleri [%1$d girişler]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:314
 #, c-format
 msgid "  Keypad inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Tuş takımı girişleri [%1$d girişler]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:316
 #, c-format
@@ -4315,12 +4321,12 @@ msgstr ""
 #: src/emu/inpttype.ipp:103
 msgctxt "input-name"
 msgid "Key In"
-msgstr ""
+msgstr "Anahtar İçeride"
 
 #: src/emu/inpttype.ipp:104
 msgctxt "input-name"
 msgid "Key Out"
-msgstr ""
+msgstr "Anahtar Dışarıda"
 
 #: src/emu/inpttype.ipp:105 src/emu/inpttype.ipp:606
 msgctxt "input-name"
@@ -4330,7 +4336,7 @@ msgstr "Servis"
 #: src/emu/inpttype.ipp:106
 msgctxt "input-name"
 msgid "Book-Keeping"
-msgstr ""
+msgstr "Muhasebe"
 
 #: src/emu/inpttype.ipp:107
 msgctxt "input-name"
@@ -4340,12 +4346,12 @@ msgstr "Kapı"
 #: src/emu/inpttype.ipp:108
 msgctxt "input-name"
 msgid "Payout"
-msgstr ""
+msgstr "Ödeme"
 
 #: src/emu/inpttype.ipp:109
 msgctxt "input-name"
 msgid "Bet"
-msgstr ""
+msgstr "Bahis"
 
 #: src/emu/inpttype.ipp:110
 msgctxt "input-name"
@@ -4355,22 +4361,22 @@ msgstr "Dağıt"
 #: src/emu/inpttype.ipp:111
 msgctxt "input-name"
 msgid "Stand"
-msgstr ""
+msgstr "Tut"
 
 #: src/emu/inpttype.ipp:112
 msgctxt "input-name"
 msgid "Take Score"
-msgstr ""
+msgstr "Puan Al"
 
 #: src/emu/inpttype.ipp:113
 msgctxt "input-name"
 msgid "Double Up"
-msgstr ""
+msgstr "İkiye Katla"
 
 #: src/emu/inpttype.ipp:114
 msgctxt "input-name"
 msgid "Half Gamble"
-msgstr ""
+msgstr "Yarım Bahis"
 
 #: src/emu/inpttype.ipp:115
 msgctxt "input-name"
@@ -4385,27 +4391,27 @@ msgstr "Düşük"
 #: src/emu/inpttype.ipp:121
 msgctxt "input-name"
 msgid "Hold 1"
-msgstr ""
+msgstr "1 Tut"
 
 #: src/emu/inpttype.ipp:122
 msgctxt "input-name"
 msgid "Hold 2"
-msgstr ""
+msgstr "2 Tut"
 
 #: src/emu/inpttype.ipp:123
 msgctxt "input-name"
 msgid "Hold 3"
-msgstr ""
+msgstr "3 Tut"
 
 #: src/emu/inpttype.ipp:124
 msgctxt "input-name"
 msgid "Hold 4"
-msgstr ""
+msgstr "4 Tut"
 
 #: src/emu/inpttype.ipp:125
 msgctxt "input-name"
 msgid "Hold 5"
-msgstr ""
+msgstr "5 Tut"
 
 #: src/emu/inpttype.ipp:126
 msgctxt "input-name"
@@ -4415,27 +4421,27 @@ msgstr "Vazgeç"
 #: src/emu/inpttype.ipp:131
 msgctxt "input-name"
 msgid "Stop Reel 1"
-msgstr ""
+msgstr "1. Makarayı Durdur"
 
 #: src/emu/inpttype.ipp:132
 msgctxt "input-name"
 msgid "Stop Reel 2"
-msgstr ""
+msgstr "2. Makarayı Durdur"
 
 #: src/emu/inpttype.ipp:133
 msgctxt "input-name"
 msgid "Stop Reel 3"
-msgstr ""
+msgstr "3. Makarayı Durdur"
 
 #: src/emu/inpttype.ipp:134
 msgctxt "input-name"
 msgid "Stop Reel 4"
-msgstr ""
+msgstr "4. Makarayı Durdur"
 
 #: src/emu/inpttype.ipp:135
 msgctxt "input-name"
 msgid "Stop All Reels"
-msgstr ""
+msgstr "Tüm Makaraları Durdur"
 
 #: src/emu/inpttype.ipp:559
 msgctxt "input-name"
@@ -4545,22 +4551,22 @@ msgstr "Banknot 1"
 #: src/emu/inpttype.ipp:588
 msgctxt "input-name"
 msgid "Service 1"
-msgstr ""
+msgstr "Servis 1"
 
 #: src/emu/inpttype.ipp:589
 msgctxt "input-name"
 msgid "Service 2"
-msgstr ""
+msgstr "Servis 2"
 
 #: src/emu/inpttype.ipp:590
 msgctxt "input-name"
 msgid "Service 3"
-msgstr ""
+msgstr "Servis 3"
 
 #: src/emu/inpttype.ipp:591
 msgctxt "input-name"
 msgid "Service 4"
-msgstr ""
+msgstr "Servis 4"
 
 #: src/emu/inpttype.ipp:596
 msgctxt "input-name"
@@ -4600,7 +4606,7 @@ msgstr ""
 #: src/emu/inpttype.ipp:608
 msgctxt "input-name"
 msgid "Door Interlock"
-msgstr ""
+msgstr "Kapı Kilidi"
 
 #: src/emu/inpttype.ipp:609
 msgctxt "input-name"
@@ -4747,202 +4753,202 @@ msgstr ""
 #: src/emu/inpttype.ipp:686
 msgctxt "input-name"
 msgid "Positional"
-msgstr ""
+msgstr "Pozisyonel"
 
 #: src/emu/inpttype.ipp:687
 msgctxt "input-name"
 msgid "Positional 2"
-msgstr ""
+msgstr "Pozisyonel 2"
 
 #: src/emu/inpttype.ipp:688
 msgctxt "input-name"
 msgid "Positional 3"
-msgstr ""
+msgstr "Pozisyonel 3"
 
 #: src/emu/inpttype.ipp:689
 msgctxt "input-name"
 msgid "Positional 4"
-msgstr ""
+msgstr "Pozisyonel 4"
 
 #: src/emu/inpttype.ipp:690
 msgctxt "input-name"
 msgid "Positional 5"
-msgstr ""
+msgstr "Pozisyonel 5"
 
 #: src/emu/inpttype.ipp:691
 msgctxt "input-name"
 msgid "Positional 6"
-msgstr ""
+msgstr "Pozisyonel 6"
 
 #: src/emu/inpttype.ipp:692
 msgctxt "input-name"
 msgid "Positional 7"
-msgstr ""
+msgstr "Pozisyonel 7"
 
 #: src/emu/inpttype.ipp:693
 msgctxt "input-name"
 msgid "Positional 8"
-msgstr ""
+msgstr "Pozisyonel 8"
 
 #: src/emu/inpttype.ipp:694
 msgctxt "input-name"
 msgid "Positional 9"
-msgstr ""
+msgstr "Pozisyonel 9"
 
 #: src/emu/inpttype.ipp:695
 msgctxt "input-name"
 msgid "Positional 10"
-msgstr ""
+msgstr "Pozisyonel 10"
 
 #: src/emu/inpttype.ipp:700
 msgctxt "input-name"
 msgid "Positional V"
-msgstr ""
+msgstr "Pozisyonel V"
 
 #: src/emu/inpttype.ipp:701
 msgctxt "input-name"
 msgid "Positional V 2"
-msgstr ""
+msgstr "Pozisyonel V 2"
 
 #: src/emu/inpttype.ipp:702
 msgctxt "input-name"
 msgid "Positional V 3"
-msgstr ""
+msgstr "Pozisyonel V 3"
 
 #: src/emu/inpttype.ipp:703
 msgctxt "input-name"
 msgid "Positional V 4"
-msgstr ""
+msgstr "Pozisyonel V 4"
 
 #: src/emu/inpttype.ipp:704
 msgctxt "input-name"
 msgid "Positional V 5"
-msgstr ""
+msgstr "Pozisyonel V 5"
 
 #: src/emu/inpttype.ipp:705
 msgctxt "input-name"
 msgid "Positional V 6"
-msgstr ""
+msgstr "Pozisyonel V 6"
 
 #: src/emu/inpttype.ipp:706
 msgctxt "input-name"
 msgid "Positional V 7"
-msgstr ""
+msgstr "Pozisyonel V 7"
 
 #: src/emu/inpttype.ipp:707
 msgctxt "input-name"
 msgid "Positional V 8"
-msgstr ""
+msgstr "Pozisyonel V 8"
 
 #: src/emu/inpttype.ipp:708
 msgctxt "input-name"
 msgid "Positional V 9"
-msgstr ""
+msgstr "Pozisyonel V 9"
 
 #: src/emu/inpttype.ipp:709
 msgctxt "input-name"
 msgid "Positional V 10"
-msgstr ""
+msgstr "Pozisyonel V 10"
 
 #: src/emu/inpttype.ipp:714
 msgctxt "input-name"
 msgid "Dial"
-msgstr ""
+msgstr "Kadran"
 
 #: src/emu/inpttype.ipp:715
 msgctxt "input-name"
 msgid "Dial 2"
-msgstr ""
+msgstr "Kadran 2"
 
 #: src/emu/inpttype.ipp:716
 msgctxt "input-name"
 msgid "Dial 3"
-msgstr ""
+msgstr "Kadran 3"
 
 #: src/emu/inpttype.ipp:717
 msgctxt "input-name"
 msgid "Dial 4"
-msgstr ""
+msgstr "Kadran 4"
 
 #: src/emu/inpttype.ipp:718
 msgctxt "input-name"
 msgid "Dial 5"
-msgstr ""
+msgstr "Kadran 5"
 
 #: src/emu/inpttype.ipp:719
 msgctxt "input-name"
 msgid "Dial 6"
-msgstr ""
+msgstr "Kadran 6"
 
 #: src/emu/inpttype.ipp:720
 msgctxt "input-name"
 msgid "Dial 7"
-msgstr ""
+msgstr "Kadran 7"
 
 #: src/emu/inpttype.ipp:721
 msgctxt "input-name"
 msgid "Dial 8"
-msgstr ""
+msgstr "Kadran 8"
 
 #: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "Dial 9"
-msgstr ""
+msgstr "Kadran 9"
 
 #: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "Dial 10"
-msgstr ""
+msgstr "Kadran 10"
 
 #: src/emu/inpttype.ipp:728
 msgctxt "input-name"
 msgid "Dial V"
-msgstr ""
+msgstr "Kadran V"
 
 #: src/emu/inpttype.ipp:729
 msgctxt "input-name"
 msgid "Dial V 2"
-msgstr ""
+msgstr "Kadran V 2"
 
 #: src/emu/inpttype.ipp:730
 msgctxt "input-name"
 msgid "Dial V 3"
-msgstr ""
+msgstr "Kadran V 3"
 
 #: src/emu/inpttype.ipp:731
 msgctxt "input-name"
 msgid "Dial V 4"
-msgstr ""
+msgstr "Kadran V 4"
 
 #: src/emu/inpttype.ipp:732
 msgctxt "input-name"
 msgid "Dial V 5"
-msgstr ""
+msgstr "Kadran V 5"
 
 #: src/emu/inpttype.ipp:733
 msgctxt "input-name"
 msgid "Dial V 6"
-msgstr ""
+msgstr "Kadran V 6"
 
 #: src/emu/inpttype.ipp:734
 msgctxt "input-name"
 msgid "Dial V 7"
-msgstr ""
+msgstr "Kadran V 7"
 
 #: src/emu/inpttype.ipp:735
 msgctxt "input-name"
 msgid "Dial V 8"
-msgstr ""
+msgstr "Kadran V 8"
 
 #: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "Dial V 9"
-msgstr ""
+msgstr "Kadran V 9"
 
 #: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "Dial V 10"
-msgstr ""
+msgstr "Kadran V 10"
 
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
@@ -5397,7 +5403,7 @@ msgstr "Fare Y 10"
 #: src/emu/inpttype.ipp:868
 msgctxt "input-name"
 msgid "Keypad"
-msgstr ""
+msgstr "Tuş Takımı"
 
 #: src/emu/inpttype.ipp:869
 msgctxt "input-name"
@@ -5497,7 +5503,7 @@ msgstr "UI Kontrollerini Aç/Kapa"
 #: src/emu/inpttype.ipp:892
 msgctxt "input-name"
 msgid "Break in Debugger"
-msgstr ""
+msgstr "Hata Ayıklayıcıda Kesinti"
 
 #: src/emu/inpttype.ipp:893
 msgctxt "input-name"
@@ -5512,7 +5518,7 @@ msgstr "Duraklat - Tek Adım"
 #: src/emu/inpttype.ipp:895
 msgctxt "input-name"
 msgid "Rewind - Single Step"
-msgstr ""
+msgstr "Geri Sarma - Tek Adım"
 
 #: src/emu/inpttype.ipp:896
 msgctxt "input-name"
@@ -5537,7 +5543,7 @@ msgstr "Ymuşak Sıfırlama"
 #: src/emu/inpttype.ipp:900
 msgctxt "input-name"
 msgid "Show Decoded Graphics"
-msgstr ""
+msgstr "Kodlanmış Grafikleri Göster"
 
 #: src/emu/inpttype.ipp:901
 msgctxt "input-name"
@@ -5612,12 +5618,12 @@ msgstr "UI Döndür"
 #: src/emu/inpttype.ipp:915
 msgctxt "input-name"
 msgid "Show Profiler"
-msgstr ""
+msgstr "Profilciyi göster"
 
 #: src/emu/inpttype.ipp:916
 msgctxt "input-name"
 msgid "UI Release Pointer"
-msgstr ""
+msgstr "UI İşaretçiyi serbest bırak"
 
 #: src/emu/inpttype.ipp:917
 msgctxt "input-name"
@@ -5627,12 +5633,12 @@ msgstr "UI Yazı Yapıştır"
 #: src/emu/inpttype.ipp:918
 msgctxt "input-name"
 msgid "UI (First) Tape Start"
-msgstr ""
+msgstr "UI (İlk) Bantı Başlat"
 
 #: src/emu/inpttype.ipp:919
 msgctxt "input-name"
 msgid "UI (First) Tape Stop"
-msgstr ""
+msgstr "UI (İlk) Bantı Durdur"
 
 #: src/emu/inpttype.ipp:920
 msgctxt "input-name"
@@ -5672,37 +5678,37 @@ msgstr "Tam ekranı aç"
 #: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr ""
+msgstr "İşlenmiş Anlık Görüntüyü Al"
 
 #: src/osd/modules/input/input_windows.cpp:128 src/osd/sdl/osdsdl.cpp:388
 msgctxt "input-name"
 msgid "Record Rendered Video"
-msgstr ""
+msgstr "İşlenmiş Videoyu Kaydet"
 
 #: src/osd/modules/input/input_windows.cpp:144
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
-msgstr ""
+msgstr "Son İşlemeyi Aç/Kapat"
 
 #: src/osd/sdl/osdsdl.cpp:365
 msgctxt "input-name"
 msgid "Toggle Filter"
-msgstr ""
+msgstr "Filtreyi Aç/Kapat"
 
 #: src/osd/sdl/osdsdl.cpp:371
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "Ön Ölçeklemeyi Azalt"
 
 #: src/osd/sdl/osdsdl.cpp:382
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "Ön Ölçeklemeyi Yükselt"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "When updated"
-msgstr ""
+msgstr "Ne zaman güncellendi"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
@@ -5776,17 +5782,19 @@ msgstr "Tip ismi boş"
 #: plugins/cheatfind/init.lua:468
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "Hile %s'ye yazıldı ve cheat.simple'a eklendi"
 
 #: plugins/cheatfind/init.lua:478
 msgid "Cheat added to cheat.simple"
-msgstr ""
+msgstr "Hile cheat.simple'a eklendi"
 
 #: plugins/cheatfind/init.lua:483
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
+"Dosya yazılamıyor\n"
+"Cheetpath klasörünün mevcut olduğundan emin olun"
 
 #: plugins/cheatfind/init.lua:497
 msgid "CPU or RAM"
@@ -5794,7 +5802,7 @@ msgstr "CPU veya RAM"
 
 #: plugins/cheatfind/init.lua:501
 msgid "Changes to this only take effect when \"Start new search\" is selected"
-msgstr ""
+msgstr "Buradaki değişiklikler yalnızca \"Yeni arama başlat\" seçildiğinde geçerli olur"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Automatic"
@@ -5810,99 +5818,99 @@ msgstr "Duraklatma modu"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Manually toggle pause when needed"
-msgstr ""
+msgstr "Gerektiğinde duraklatmayı manuel olarak açıp kapatın"
 
 #: plugins/cheatfind/init.lua:522
 msgid "Automatically toggle pause with on-screen menus"
-msgstr ""
+msgstr "Ekran menülerinde duraklatmayı otomatik olarak açıp kapatın"
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr ""
+msgstr "Tüm yuvalar temizlendi ve mevcut durum Yuva 1'e kaydedildi"
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
-msgstr ""
+msgstr "Yeni arama başlat"
 
 #: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr ""
+msgstr "Bellek durumu %d Yuvasına kaydedildi"
 
 #: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr ""
+msgstr "Mevcut bellek durumunu %d Yuvasına kaydet"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "toplam %d eşleşme bulundu"
 
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr ""
+msgstr "Karşılaştırma Yap: Yuva %d %s Yuva %d"
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr ""
+msgstr "Karşılaştırma Yap: Yuva %d %s Yuva %d %s %d"
 
 #: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr ""
+msgstr "Karşılaştırma Yap: Yuva %d BITWISE%s Yuva %d"
 
 #: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr ""
+msgstr "Karşılaştırma Yap: Yuva %d %s %d"
 
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
-msgstr ""
+msgstr "Yuva %d"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
-msgstr ""
+msgstr "Sol sağdan daha az"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left greater than right"
-msgstr ""
+msgstr "Sol sağdan daha çok"
 
 #: plugins/cheatfind/init.lua:682
 msgid "Left equal to right"
-msgstr ""
+msgstr "Sol sağa eşit"
 
 #: plugins/cheatfind/init.lua:684
 msgid "Left not equal to right"
-msgstr ""
+msgstr "Sol sağa eşit değil"
 
 #: plugins/cheatfind/init.lua:686
 msgid "Left equal to right with bitmask"
-msgstr ""
+msgstr "Sol sağa bitmask ile eşit"
 
 #: plugins/cheatfind/init.lua:688
 msgid "Left not equal to right with bitmask"
-msgstr ""
+msgstr "Sol sağa bitmask ile eşit değil"
 
 #: plugins/cheatfind/init.lua:690
 msgid "Left less than value"
-msgstr ""
+msgstr "Sol değerden daha az"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Left greater than value"
-msgstr ""
+msgstr "Sol değerden daha çok"
 
 #: plugins/cheatfind/init.lua:694
 msgid "Left equal to value"
-msgstr ""
+msgstr "Sol değere eşit"
 
 #: plugins/cheatfind/init.lua:696
 msgid "Left not equal to value"
-msgstr ""
+msgstr "Sol değere eşit değil"
 
 #: plugins/cheatfind/init.lua:718
 msgid "Value"
@@ -5937,12 +5945,16 @@ msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"Slot 1 değerini dürtmek istiyorsanız bunu kullanın (örneğin, "
+"bir şeyle başladınız ama kaybettiniz)"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"Son Yuva değerini dürtmek istiyorsanız bunu kullanın (örneğin, bir eşyanız "
+"olmadan başladınız ama sonunda aldınız)"
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
@@ -6124,49 +6136,49 @@ msgstr "Vazgeç"
 #: plugins/autofire/autofire_menu.lua:325
 msgctxt "plugin-autofire"
 msgid "Select an input for autofire"
-msgstr ""
+msgstr "Oto ateş için bir giriş seçin"
 
 #: plugins/timecode/init.lua:155
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro started at %s"
-msgstr ""
+msgstr "ZAMAN KODU: Giriş %s'de başladı"
 
 #: plugins/timecode/init.lua:160
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro duration %s"
-msgstr ""
+msgstr "ZAMAN KODU: Giriş süresi %s"
 
 #: plugins/timecode/init.lua:165
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay started at %s"
-msgstr ""
+msgstr "ZAMAN KODU: Oyun %s'de başladı"
 
 #: plugins/timecode/init.lua:170
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay duration %s"
-msgstr ""
+msgstr "ZAMAN KODU: Oyun süresi %s"
 
 #: plugins/timecode/init.lua:176
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d started at %s"
-msgstr ""
+msgstr "ZAMAN KODU: Ekstra %d, %s'de başladı"
 
 #: plugins/timecode/init.lua:182
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d duration %s"
-msgstr ""
+msgstr "ZAMAN KODU: Ekstra %d süresi %s"
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d [paused] "
-msgstr ""
+msgstr " %s%s%02d:%02d [duraklatıldı] "
 
 #: plugins/timecode/init.lua:207
 #, lua-format
@@ -6298,7 +6310,7 @@ msgstr "Süre (çerçeveler)"
 #: plugins/inputmacro/inputmacro_menu.lua:400
 msgctxt "plugin-inputmacro"
 msgid "n/a"
-msgstr ""
+msgstr "yok"
 
 #: plugins/inputmacro/inputmacro_menu.lua:404
 #, lua-format
@@ -6535,7 +6547,7 @@ msgstr "Vazgeç"
 #: plugins/commonui/init.lua:199
 msgctxt "plugin-commonui"
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "Geçersiz kombinasyon girildi"
 
 #: plugins/commonui/init.lua:205
 #, lua-format
@@ -6544,6 +6556,8 @@ msgid ""
 "Enter combination or press %s to cancel\n"
 "%s"
 msgstr ""
+"Kombinasyonu girin veya iptal etmek için %s tuşuna basın\n"
+"%s"
 
 #~ msgid "Infos"
 #~ msgstr "Bilgiler"
