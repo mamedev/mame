@@ -463,7 +463,9 @@ CONS( 2013, kidizmp,         0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom (Germany, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters Rotom Tablet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ポケモン図鑑 スマホロトム
+CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pokemon Zukan - Sumaho Rotom (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32610 - 「それいけ！アンパンマン」スポーツ育脳マット
 CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: Sports Ikunou Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
@@ -518,14 +520,16 @@ CONS( 2021, chiikpc,            0,        0,      gpl32612, gpl32612, generalplu
 CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Manabi no Sai-Kyo-Oh ni Nare! Sai-Kyo-Oh Zukan PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32600A
-CONS( 2019, sumikpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Sumikko PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a unit with purple top
+// マウスできせかえ! すみっコぐらしパソコンプラス
+CONS( 2019, sumikpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi PC Plus (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a unit with purple top
 
 
 // ディズニー&ディズニー／ピクサーキャラクターズ できた!がいっぱい ドリームトイパッド
 CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",          "Disney & Disney/Pixar Characters Dekita! ga Ippai Dream Toy Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32610
-CONS( 201?, rotom2,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Rotom Tablet (different) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// カメラでリンク! ポケモン図鑑 スマホロトム
+CONS( 201?, rotom2,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Camera de Link! Pokemon Zukan - Sumaho Rotom (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32611
 // 小学館の図鑑 NEO Pad - 生きもの編 (this is the standard green version)
