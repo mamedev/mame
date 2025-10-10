@@ -478,6 +478,7 @@ public:
 	void init_cmtetriskr() ATTR_COLD;
 	void init_cmv4() ATTR_COLD;
 	void init_crazybonb() ATTR_COLD;
+	void init_cutya() ATTR_COLD;
 	void init_eldoraddoa() ATTR_COLD;
 	void init_fb2010() ATTR_COLD;
 	void init_hamhouse() ATTR_COLD;
@@ -24934,6 +24935,68 @@ ROM_START( feverchtw )
 	ROM_LOAD( "82s123.10d", 0x100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
 ROM_END
 
+// W-6 for W-4 hardware...
+ROM_START( feverchw4 )
+/*
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8.b14", 0x00000, 0x8000, CRC(3bdc197c) SHA1(6552d9343442e7bbbd713f299219b63e423a79b4) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "cf18.7h",  0x00000, 0x5400, CRC(c63924fe) SHA1(7471d05c8688ba1fa6c0c3444de8883595c21776) )
+	ROM_IGNORE(                    0x2c00 )
+	ROM_LOAD( "cf19.8h",  0x08000, 0x5400, CRC(f0229490) SHA1(665d335cc030a0cbec0c11c685a6f1e2f9706989) )
+	ROM_IGNORE(                    0x2c00 )
+	ROM_LOAD( "cf20.10h", 0x10000, 0x5400, CRC(1d831a06) SHA1(42d235b8dd894d38579886940a3e13adb843e00d) )
+	ROM_IGNORE(                    0x2c00 )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "cf1.1h", 0x0000, 0x2000, CRC(5f022073) SHA1(2e154837834cc9db452279b4933900234b568565) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                 0x2000 )
+	ROM_LOAD( "cf2.2h", 0x2000, 0x2000, CRC(e8f927b9) SHA1(29dec2f21a1bea250a4a2d75fab8d03a1fc70bcd) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                 0x2000 )
+	ROM_LOAD( "cf3.4h", 0x4000, 0x2000, CRC(79b06e00) SHA1(18f73527714914edb57e22909c95f2c764223900) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                 0x2000 )
+	ROM_LOAD( "cf4.5h", 0x6000, 0x2000, CRC(7f73744e) SHA1(7c07095f7ec4302a4839a279c755979ec10e0715) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "82s129.12f", 0x000, 0x100, BAD_DUMP CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
+	ROM_LOAD_NIB_HIGH( "82s129.11f", 0x000, 0x100, BAD_DUMP CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
+	ROM_LOAD(          "82s123.13f", 0x080, 0x020, BAD_DUMP CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD(          "82s123.13f", 0x0000, 0x0020, BAD_DUMP CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8.b14", 0x00000, 0x10000, CRC(6b7d70be) SHA1(d6520f2da2b74eae02b6ee3375fe982c358dc927) )
+
+	// only the program ROM was provided, with no indication of the other ROMs / PROMs. Using bog-standard lucky8 ones for now
+	ROM_REGION( 0x18000, "gfx1", 0 ) // may be wrong, see missing GFX on title screen
+	ROM_LOAD( "5.h7",   0x00000, 0x8000, BAD_DUMP CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6.h8",   0x08000, 0x8000, BAD_DUMP CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7.h10",  0x10000, 0x8000, BAD_DUMP CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",   0x0000, 0x2000, BAD_DUMP CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.h3",   0x2000, 0x2000, BAD_DUMP CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.h4",   0x4000, 0x2000, BAD_DUMP CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.h6",   0x6000, 0x2000, BAD_DUMP CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.g13", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "82s129.g14", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+ROM_END
+
 /*
   Win Cherry (ver 0.16 - 19990219)
 
@@ -28761,6 +28824,15 @@ void goldstar_state::init_moonlghtb()
 
 }
 
+void cmaster_state::init_cutya()
+{
+	init_cmv4();
+
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x02e6] = 0x83;  // jp 0301 -> jp 8301  start
+	rom[0x8f51] = 0x84;  // jp 4423 -> jp 8423  loop attract ok
+}
+
 
 } // anonymous namespace
 
@@ -28849,7 +28921,7 @@ GAMEL( 1991, cmasterl,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, skillmst,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v5.0)",                 0,                 layout_cmasterb )
 GAMEL( 1991, skillmsta,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v3.0)",                 0,                 layout_cmasterb )
 GAMEL( 1991, cutyline,   0,        cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cuty Line (LC-88, ver.1.01)",                 0,                 layout_cmasterb )
-GAMEL( 1991, cutylinea,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.8.05C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
+GAMEL( 1991, cutylinea,  cutyline, cm,       cmasterb, cmaster_state,  init_cutya,     ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.8.05C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, cutylineb,  cutyline, cutylineb,cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7C.14)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, cutylinec,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7.07C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, lonestar,   cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 1)",                    0,                 layout_cmasterb )
@@ -28987,6 +29059,7 @@ GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam
 GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
 GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
 GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
+GAME(  1986, feverchw4,  feverch,  lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 // --- Wing W-7 hardware ---
 GAMEL( 1991, megaline,   0,        megaline, megaline, wingco_state,   init_mgln,      ROT0, "Fun World",         "Mega Lines (Wing W-7 System)",                             0,          layout_megaline )
