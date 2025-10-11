@@ -68,14 +68,15 @@
 
 #include "emu.h"
 #include "seibuspi.h"
+//#include "seibuspi_m.h"
 
-#include "cpu/i386/i386.h"
 //#include "bus/rs232/rs232.h"
+#include "cpu/i386/i386.h"
 #include "machine/i8251.h"
 //#include "machine/microtch.h"
 //#include "machine/rtc4543.h"
-//#include "seibuspi_m.h"
 #include "sound/ymz280b.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -93,7 +94,7 @@ public:
 
 	void seibucats(machine_config &config) ATTR_COLD;
 
-	void init_seibucats();
+	void init_seibucats() ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -102,9 +103,9 @@ protected:
 
 private:
 	// screen updates
-//  u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-//  IRQ_CALLBACK_MEMBER(irq_callback);
-//  INTERRUPT_GEN_MEMBER(interrupt);
+	//u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	//IRQ_CALLBACK_MEMBER(irq_callback);
+	//INTERRUPT_GEN_MEMBER(interrupt);
 
 	u16 input_mux_r();
 	void input_select_w(u16 data);
@@ -115,12 +116,14 @@ private:
 
 	u16 m_input_select = 0;
 
-//  optional_ioport_array<5> m_key;
-//  optional_ioport m_special;
+	//optional_ioport_array<5> m_key;
+	//optional_ioport m_special;
 };
 
 void seibucats_state::video_start()
 {
+	seibuspi_base_state::video_start();
+
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;
 	m_layer_enable = 0;
@@ -135,8 +138,6 @@ void seibucats_state::video_start()
 	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
 
 	memset(m_alpha_table, 0, 0x2000); // TODO : no alpha blending?
-
-	register_video_state();
 }
 
 // identical to EJ Sakura
@@ -319,7 +320,7 @@ void seibucats_state::seibucats(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_screen_update(FUNC(seibucats_state::screen_update));
+	//screen.set_screen_update(FUNC(seibucats_state::screen_update));
 	screen.set_screen_update(FUNC(seibucats_state::screen_update_sys386f));
 	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
 
@@ -344,7 +345,7 @@ void seibucats_state::seibucats(machine_config &config)
 
 #define SEIBUCATS_OBJ_LOAD \
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00) \
-/*  obj4.u0234 empty slot */ \
+	/* obj4.u0234 empty slot */ \
 	ROM_LOAD16_WORD_SWAP("obj03.u0232", 0x100000, 0x100000, BAD_DUMP CRC(15c230cf) SHA1(7e12871d6e34e28cd4b5b23af6b0cbdff9432500)  ) \
 	ROM_LOAD16_WORD_SWAP("obj02.u0233", 0x200000, 0x100000, BAD_DUMP CRC(dffd0114) SHA1(b74254061b6da5a2ce310ea89684db430b43583e)  ) \
 	ROM_LOAD16_WORD_SWAP("obj01.u0231", 0x300000, 0x100000, BAD_DUMP CRC(ee5ae0fd) SHA1(0baff6ca4e8bceac4e09732da267f57578dcc280)  )
