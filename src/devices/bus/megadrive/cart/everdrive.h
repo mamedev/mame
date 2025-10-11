@@ -17,7 +17,7 @@ class megadrive_hb_everdrive_device : public device_t,
 public:
 	megadrive_hb_everdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static constexpr feature_type unemulated_features() { return feature::MEDIA; }
+	static constexpr feature_type imperfect_features() { return feature::MEDIA; }
 
 	virtual void cart_map(address_map &map) override ATTR_COLD;
 	virtual void time_io_map(address_map &map) override ATTR_COLD;

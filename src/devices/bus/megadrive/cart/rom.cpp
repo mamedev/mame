@@ -50,7 +50,7 @@ void megadrive_rom_device::cart_map(address_map &map)
 /*
  * Super Street Fighter II
  *
- * Sega 315-5709 or 315-5779
+ * Sega 315-5709 or 315-5779 mapper
  *
  */
 

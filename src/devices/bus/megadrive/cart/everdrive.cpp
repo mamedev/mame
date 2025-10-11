@@ -5,11 +5,16 @@
 Everdrive-MD (first gen)
 
 TODO:
-- avoid phantom cart loading (does nothing, we load BIOS from here);
-- ST_M29W640FT incomplete (shouldn't work with ROM patching);
-- SPI comms dislikes receiving a SS signal when full speed is selected (goes 0 -> 1 -> 0,
-  throwing a "SEL ERROR 120" if we don't guard against it)
+- avoid phantom cart slot loading (does nothing, we load BIOS from here);
+- ST_M29W640FT core is incomplete (spurious unhandled writes);
+- SPI comms dislikes receiving a SS signal when full speed is selected
+\- goes 0 -> 1 -> 0, throwing a "SEL ERROR 120" if we don't guard against it;
 - Add remaining cfg_w flags;
+- Currently bases on HW spec 1.1 firmware v3, anything below that not yet supported;
+- Overlay for ROM patching (Game Genie based);
+- Reserved OS loading (A+B+C at power on, +UP for earlier carts) does nothing;
+- Understand and implement module options;
+- JTAG interface;
 
 **************************************************************************************************/
 
@@ -39,12 +44,14 @@ void megadrive_hb_everdrive_device::device_add_mconfig(machine_config &config)
 	m_sdcard->spi_miso_callback().set([this](int state) { m_in_bit = state; });
 }
 
+// 0x00000 bootloader
+// 0x10000 OS
+// 0x20000 reserve OS copy
+// 0x30000 settings
+// 0x40000-0xfffff module ROM area
+// NOTE: bootloader stores boot flags (?) at $d0000
 ROM_START( everdrive_md )
 	ROM_REGION16_BE(0x800000, "flash", ROMREGION_ERASE00)
-	// 0x00000 bootloader
-	// 0x10000 OS
-	// 0x20000 reserve OS copy
-	// 0x30000 settings
 	ROM_LOAD16_WORD_SWAP("v35.bin", 0x00000, 0x20000, CRC(161b4d2e) SHA1(fe71de7dd1f2117409b158ccd45c68b1d6781a9c) )
 
 //	ROM_LOAD16_WORD_SWAP("game.bin", 0x400000, 0x3e0000, CRC(1) SHA1(1) )
@@ -104,12 +111,12 @@ void megadrive_hb_everdrive_device::cart_map(address_map &map)
 		})
 	);
 
-	// vblank redirection (for cheating?)
+	// vblank redirection (for cheating), in OS mode (so at copy time)
 //	m_vbl_catch[0](0x00'0078, 0x00'0079).lr16(NAME([] () { return 0xff; }));
 //	m_vbl_catch[0](0x00'007a, 0x00'007b).lr16(NAME([this] () { return m_vblv; }));
 }
 
-// TODO: /TIME inaccessible when in game_mode
+// TODO: OS range /TIME inaccessible when in game_mode
 void megadrive_hb_everdrive_device::time_io_map(address_map &map)
 {
 	map(0x00, 0x01).rw(FUNC(megadrive_hb_everdrive_device::spi_data_r), FUNC(megadrive_hb_everdrive_device::spi_data_w));
@@ -122,6 +129,8 @@ void megadrive_hb_everdrive_device::time_io_map(address_map &map)
 		if (ACCESSING_BITS_0_7)
 			m_rom_map_port = BIT(data, 0) ? (0x40'0000 >> 1) : 0;
 	}));
+
+	// TODO: assume cloning 315-5709 for RAM_MODE_1 and SSF2_MODE
 }
 
 u16 megadrive_hb_everdrive_device::spi_data_r(offs_t offset, u16 mem_mask)
@@ -139,7 +148,9 @@ void megadrive_hb_everdrive_device::spi_data_w(offs_t offset, u16 data, u16 mem_
 	m_spi_clock_cycles = m_spi_16 ? 16 : 8;
 	m_spi_clock_state = false;
 
-	const int ticks = (m_spi_full_speed ? 16 : 128);
+	// Timings reported are per single byte, estimated.
+	// This will score a "time 1/10 sec: 96" / "speed kb/s: 105" in krikzz's benchmark
+	const int ticks = (m_spi_full_speed ? 16 : 128) >> 3;
 	m_spi_clock->adjust(attotime::from_ticks(ticks, this->clock()), 0, attotime::from_ticks(ticks, this->clock()));
 }
 
