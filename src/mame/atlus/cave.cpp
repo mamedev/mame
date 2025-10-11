@@ -938,6 +938,25 @@ void ppsatan_state::ppsatan_map(address_map &map)
 
 
 /***************************************************************************
+
+
+                            Memory Maps - Oki sound
+
+
+***************************************************************************/
+
+void cave_state::nmk112_oki0_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki0_map));
+}
+
+void cave_state::nmk112_oki1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki1_map));
+}
+
+
+/***************************************************************************
                                 Power Instinct 2
 ***************************************************************************/
 
@@ -2299,18 +2318,18 @@ void cave_state::donpachi(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], 4.220_MHz_XTAL/4, okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.60);
-
-	OKIM6295(config, m_oki[1], 4.220_MHz_XTAL/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki1");
-	nmk112.set_oki1_space_tag("oki2");
 	nmk112.set_page_mask(1 << 0);    // chip #0 (music) is not paged
+
+	OKIM6295(config, m_oki[0], 4.220_MHz_XTAL/4, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.60);
+	m_oki[0]->set_addrmap(0, &cave_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], 4.220_MHz_XTAL/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[1]->set_addrmap(0, &cave_state::nmk112_oki1_map);
 }
 
 
@@ -2757,17 +2776,17 @@ void cave_z80_state::pwrinst2(machine_config &config)
 	ym2203.add_route(2, "mono", 0.40);
 	ym2203.add_route(3, "mono", 0.80);
 
-	OKIM6295(config, m_oki[0], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
-
-	OKIM6295(config, m_oki[1], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki1");
-	nmk112.set_oki1_space_tag("oki2");
+
+	OKIM6295(config, m_oki[0], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
+	m_oki[0]->set_addrmap(0, &cave_z80_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_oki[1]->set_addrmap(0, &cave_z80_state::nmk112_oki1_map);
 }
 
 

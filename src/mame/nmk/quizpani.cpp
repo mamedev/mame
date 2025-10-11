@@ -107,6 +107,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map) ATTR_COLD;
+	void nmk112_oki0_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -219,6 +220,11 @@ void quizpani_state::program_map(address_map &map)
 	map(0x11c000, 0x11ffff).ram().w(FUNC(quizpani_state::txt_videoram_w)).share(m_txt_videoram);
 	map(0x180000, 0x18ffff).ram();
 	map(0x200000, 0x33ffff).rom();
+}
+
+void quizpani_state::nmk112_oki0_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki0_map));
 }
 
 
@@ -434,11 +440,12 @@ void quizpani_state::quizpani(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 16'000'000 / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki");
-	nmk112.set_oki0_space_tag("oki");
+
+	okim6295_device &oki(OKIM6295(config, "oki", 16'000'000 / 4, okim6295_device::PIN7_LOW));
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.set_addrmap(0, &quizpani_state::nmk112_oki0_map);
 }
 
 ROM_START( quizpani )

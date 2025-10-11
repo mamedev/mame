@@ -184,6 +184,9 @@ private:
 	void drail_mem_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 	void sweethrt_mem_map(address_map &map) ATTR_COLD;
+
+	void nmk112_oki0_map(address_map &map) ATTR_COLD;
+	void nmk112_oki1_map(address_map &map) ATTR_COLD;
 };
 
 class omatsuri_state : public nmkmedal_state
@@ -262,6 +265,17 @@ void omatsuri_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom().region("maincpu", 0);
 	map(0xd000, 0xefff).ram();
+}
+
+
+void hpierrot_state::nmk112_oki0_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki0_map));
+}
+
+void hpierrot_state::nmk112_oki1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki1_map));
 }
 
 
@@ -347,10 +361,12 @@ void hpierrot_state::drail(machine_config &config)
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki");
-	nmk112.set_oki0_space_tag("oki");
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+
+	okim6295_device &oki(OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)); // divider and pin not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.set_addrmap(0, &hpierrot_state::nmk112_oki0_map);
 }
 
 void hpierrot_state::sweethrt(machine_config &config)
@@ -361,13 +377,15 @@ void hpierrot_state::sweethrt(machine_config &config)
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // actually thought to be included in the NMK-113 custom
 	nmk112.set_rom0_tag("oki");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki");
-	nmk112.set_oki1_space_tag("oki2");
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+	okim6295_device &oki1(OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)); // divider and pin not verified
+	oki1.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki1.set_addrmap(0, &hpierrot_state::nmk112_oki0_map);
 
-	OKIM6295(config, "oki2", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+	okim6295_device &oki2(OKIM6295(config, "oki2", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)); // divider and pin not verified
+	oki2.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki2.set_addrmap(0, &hpierrot_state::nmk112_oki1_map);
 }
 
 void omatsuri_state::omatsuri(machine_config &config)

@@ -55,6 +55,9 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map) ATTR_COLD;
+	void nmk112_oki0_map(address_map &map) ATTR_COLD;
+	void nmk112_oki1_map(address_map &map) ATTR_COLD;
+
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -204,6 +207,17 @@ void patapata_state::main_map(address_map &map)
 	map(0x180000, 0x18ffff).ram(); // mainram?
 }
 
+void patapata_state::nmk112_oki0_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki0_map));
+}
+
+void patapata_state::nmk112_oki1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki1_map));
+}
+
+
 static INPUT_PORTS_START( patapata )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -296,15 +310,17 @@ void patapata_state::patapata(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki1", 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // not verified
-
-	OKIM6295(config, "oki2", 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // not verified
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // or 212? difficult to read (maybe 212 is 2* 112?)
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki1");
-	nmk112.set_oki1_space_tag("oki2");
+
+	okim6295_device &oki1(OKIM6295(config, "oki1", 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW)); // not verified
+	oki1.add_route(ALL_OUTPUTS, "mono", 0.40);
+	oki1.set_addrmap(0, &patapata_state::nmk112_oki0_map);
+
+	okim6295_device &oki2(OKIM6295(config, "oki2", 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW)); // not verified
+	oki2.add_route(ALL_OUTPUTS, "mono", 0.40);
+	oki2.set_addrmap(0, &patapata_state::nmk112_oki1_map);
 }
 
 ROM_START( patapata )

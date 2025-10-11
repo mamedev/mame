@@ -941,18 +941,6 @@ void nmk16_state::ssmissin_sound_map(address_map &map)
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void nmk16_state::oki1_map(address_map &map)
-{
-	map(0x00000, 0x1ffff).rom().region("oki1", 0);
-	map(0x20000, 0x3ffff).bankr(m_okibank[0]);
-}
-
-void nmk16_state::oki2_map(address_map &map)
-{
-	map(0x00000, 0x1ffff).rom().region("oki2", 0);
-	map(0x20000, 0x3ffff).bankr(m_okibank[1]);
-}
-
 void nmk16_state::strahl_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
@@ -1244,6 +1232,29 @@ void nmk16_state::powerins_bootleg_audio_io_map(address_map &map)
 	map(0x90, 0x97).w("nmk112", FUNC(nmk112_device::okibank_w));
 }
 
+
+void nmk16_state::oki1_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom().region("oki1", 0);
+	map(0x20000, 0x3ffff).bankr(m_okibank[0]);
+}
+
+void nmk16_state::oki2_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom().region("oki2", 0);
+	map(0x20000, 0x3ffff).bankr(m_okibank[1]);
+}
+
+void nmk16_state::nmk112_oki0_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki0_map));
+}
+
+void nmk16_state::nmk112_oki1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki1_map));
+}
+
 void nmk16_state::powerinsa_oki_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom().region("oki1", 0);
@@ -1255,6 +1266,7 @@ void nmk16_state::tdragonb2_oki_map(address_map &map)
 	map(0x00000, 0x1ffff).rom().region("oki", 0);
 	map(0x20000, 0x3ffff).bankr(m_okibank[0]);
 }
+
 
 static INPUT_PORTS_START( vandyke )
 	PORT_START("IN0")
@@ -5497,17 +5509,17 @@ void nmk16_state::macross2(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki1");
-	nmk112.set_oki1_space_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::tdragon2(machine_config &config)
@@ -5543,17 +5555,17 @@ void nmk16_state::tdragon2(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki1");
-	nmk112.set_oki1_space_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::tdragon3h(machine_config &config)
@@ -5606,17 +5618,17 @@ void nmk16_state::raphero(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki1");
-	nmk112.set_oki1_space_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::bjtwin(machine_config &config)
@@ -5638,17 +5650,17 @@ void nmk16_state::bjtwin(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki1");
-	nmk112.set_oki1_space_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::cactus(machine_config &config)
@@ -5782,17 +5794,17 @@ void nmk16_state::powerins(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW); // verified on PCB
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.15);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW); // verified on PCB
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki1");
-	nmk112.set_oki1_space_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW); // verified on PCB
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW); // verified on PCB
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::powerinsa(machine_config &config)
@@ -5865,17 +5877,17 @@ void nmk16_state::powerinsb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.15);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-	nmk112.set_oki0_space_tag("oki1");
-	nmk112.set_oki1_space_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 
 	// Sound code talks to one YM2203, but it's not fitted on the board
 }
