@@ -37,7 +37,7 @@ YM2151:
 
 #include "emu.h"
 
-#include "seibusound.h" // for seibu_sound_decrypt on the MAIN cpu (not sound)
+#include "sei80bu.h"
 #include "t5182.h"
 
 #include "cpu/z80/z80.h"
@@ -199,7 +199,7 @@ uint32_t mustache_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void mustache_state::memmap(address_map &map)
 {
 	map(0x0000, 0x7fff).r("sei80bu", FUNC(sei80bu_device::data_r));
-	map(0x8000, 0xbfff).rom();
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
 	map(0xc000, 0xcfff).ram().w(FUNC(mustache_state::videoram_w)).share(m_videoram);
 	map(0xd000, 0xd000).w("t5182", FUNC(t5182_device::sound_irq_w));
 	map(0xd001, 0xd001).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
@@ -325,7 +325,7 @@ void mustache_state::mustache(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mustache_state::memmap);
 	m_maincpu->set_addrmap(AS_OPCODES, &mustache_state::decrypted_opcodes_map);
 
-	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("maincpu");
+	SEI80BU(config, "sei80bu", 12_MHz_XTAL / 2).set_device_rom_tag("maincpu");
 
 	t5182_device &t5182(T5182(config, "t5182", 14.318181_MHz_XTAL / 4));
 	t5182.ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));

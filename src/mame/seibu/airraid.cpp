@@ -144,6 +144,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 #include "emu.h"
 #include "airraid_dev.h"
+#include "sei80bu.h"
 
 #include "seibusound.h"
 
@@ -454,7 +455,7 @@ void airraid_state::airraid(machine_config &config)
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
-	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
+	SEI80BU(config, "sei80bu", XTAL(14'318'181) / 4).set_device_rom_tag("audiocpu");
 }
 
 void airraid_state::airraide(machine_config &config)
