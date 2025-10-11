@@ -347,6 +347,7 @@ void hpierrot_state::drail(machine_config &config)
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki");
+	nmk112.set_oki0_space_tag("oki");
 
 	SPEAKER(config, "mono").front_center();
 	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
@@ -360,6 +361,8 @@ void hpierrot_state::sweethrt(machine_config &config)
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // actually thought to be included in the NMK-113 custom
 	nmk112.set_rom0_tag("oki");
 	nmk112.set_rom1_tag("oki2");
+	nmk112.set_oki0_space_tag("oki");
+	nmk112.set_oki1_space_tag("oki2");
 
 	SPEAKER(config, "mono").front_center();
 	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
@@ -384,8 +387,8 @@ ROM_START( drail ) // handwritten labels
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_dream rail v08c 2c0c v987275.u1", 0x00000, 0x10000, CRC(c14fae88) SHA1(f0478b563ac851372bc0b93772d89ab70ad61877) ) // 通ドリームレール V08C 2C0C V957220, 1xxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0xc0000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
-	ROM_LOAD( "2_dream rail pcm.u11", 0x40000, 0x80000, CRC(efdc1eea) SHA1(c39fed6f97b71556b468e0872a8240fe7b6495e6) ) // ドリームレールPCM
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "2_dream rail pcm.u11", 0x00000, 0x80000, CRC(efdc1eea) SHA1(c39fed6f97b71556b468e0872a8240fe7b6495e6) ) // ドリームレールPCM
 	// empty socket 3.u10
 ROM_END
 
@@ -394,8 +397,8 @@ ROM_START( sluster2 ) // same PCB as drail
 	ROM_LOAD( "slusterii_v987275.u1", 0x00000, 0x10000, CRC(5139ac8f) SHA1(90739006e8f76cda460ef59b9a9cca40800bb44f) ) // SラスターII V987275, 11xxxxxxxxxxxxxx = 0xFF
 
 
-	ROM_REGION( 0xc0000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
-	ROM_LOAD( "sluster2_2.u11", 0x40000, 0x80000, CRC(d8aa034c) SHA1(0082eec841c7278698a4a1ef4be3b2bb605d3582) ) // Sラスター2 ADPCM 2
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sluster2_2.u11", 0x00000, 0x80000, CRC(d8aa034c) SHA1(0082eec841c7278698a4a1ef4be3b2bb605d3582) ) // Sラスター2 ADPCM 2
 	// empty socket 3.u10
 ROM_END
 
@@ -427,13 +430,13 @@ ROM_START( sweethrt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sweethart-typeb-v96b290.u55", 0x00000, 0x10000, CRC(d5ccce6d) SHA1(ef4c1a19df0bcf7961dc8df0ebc7a1654f4a86ca) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x140000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
-	ROM_LOAD( "sweethart-typeb-sound-2.u37", 0x40000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
-	ROM_LOAD( "sweethart-typeb-sound-3.u38", 0xc0000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "sweethart-typeb-sound-2.u37", 0x00000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
+	ROM_LOAD( "sweethart-typeb-sound-3.u38", 0x80000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x140000, "oki2", 0) // identical to the above
-	ROM_LOAD( "sweethart-typeb-sound-4.u18", 0x40000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
-	ROM_LOAD( "sweethart-typeb-sound-5.u19", 0xc0000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x100000, "oki2", 0)
+	ROM_LOAD( "sweethart-typeb-sound-4.u18", 0x00000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
+	ROM_LOAD( "sweethart-typeb-sound-5.u19", 0x80000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 ROM_START( omatsuri ) // seems to hit some unimplemented CPU regs

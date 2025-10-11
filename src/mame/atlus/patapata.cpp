@@ -303,6 +303,8 @@ void patapata_state::patapata(machine_config &config)
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // or 212? difficult to read (maybe 212 is 2* 112?)
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+	nmk112.set_oki0_space_tag("oki1");
+	nmk112.set_oki1_space_tag("oki2");
 }
 
 ROM_START( patapata )
@@ -319,13 +321,13 @@ ROM_START( patapata )
 	ROM_LOAD16_BYTE( "rw-93085-19.u19", 0x100001, 0x040000, CRC(dfd7bdcf) SHA1(02e46da9a8c938daa180a57f4aca04b2fd655ee0) )
 	ROM_LOAD16_BYTE( "rw-93085-20.u20", 0x100000, 0x040000, CRC(dd821f74) SHA1(a63e9979db30d130449f689cc6ba8b4c7d25085a) )
 
-	ROM_REGION( 0x100000+0x40000, "oki1", 0 ) /* OKIM6295 samples */
-	ROM_LOAD( "rw-93085-5.u22", 0x000000+0x40000, 0x080000, CRC(0c0d2835) SHA1(dc14ebea5f4e0d3f2f8e7bc05e16b8d0f92ce588) )
-	ROM_LOAD( "rw-93085-6.u23", 0x080000+0x40000, 0x080000, CRC(882c25d0) SHA1(9cbf21bd5940240440025b4481d96e3db45a676c) )
+	ROM_REGION( 0x100000, "oki1", 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "rw-93085-5.u22", 0x000000, 0x080000, CRC(0c0d2835) SHA1(dc14ebea5f4e0d3f2f8e7bc05e16b8d0f92ce588) )
+	ROM_LOAD( "rw-93085-6.u23", 0x080000, 0x080000, CRC(882c25d0) SHA1(9cbf21bd5940240440025b4481d96e3db45a676c) )
 
-	ROM_REGION( 0x100000+0x40000, "oki2", 0 ) /* OKIM6295 samples */
-	ROM_LOAD( "rw-93085-1.u3",  0x000000+0x40000, 0x080000, CRC(d9776d50) SHA1(06e4d2184f687af8380fcb49ce48ce8ec8091050) )
-	ROM_LOAD( "rw-93085-2.u4",  0x080000+0x40000, 0x080000, CRC(3698fafa) SHA1(3de54a990478621271285254544f5382d6fd9ca9) )
+	ROM_REGION( 0x100000, "oki2", 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "rw-93085-1.u3",  0x000000, 0x080000, CRC(d9776d50) SHA1(06e4d2184f687af8380fcb49ce48ce8ec8091050) )
+	ROM_LOAD( "rw-93085-2.u4",  0x080000, 0x080000, CRC(3698fafa) SHA1(3de54a990478621271285254544f5382d6fd9ca9) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s131n.u119", 0x000, 0x200, CRC(33f63fc8) SHA1(24c4a1a7c06e546571c77c7dc7bd87c57aa088d7) ) // hotizontal video timing (not used in emulation for now)
