@@ -385,7 +385,7 @@ esq2x40_vfx_device::esq2x40_vfx_device(const machine_config &mconfig, const char
 }
 
 void esq2x40_vfx_device::set_char(uint8_t row, uint8_t column, uint8_t c, uint8_t attr) {
-	m_chars[row][column] = (' ' <= c && c < 128) ? c - ' ' : 0;
+	m_chars[row][column] = (' ' <= c && c < 128) ? c : 0;
 	m_attrs[row][column] = attr;
 	m_dirty[row][column] = true;
 
@@ -408,7 +408,9 @@ void esq2x40_vfx_device::update_display()
 		{
 			if (m_dirty[row][col])
 			{
-				uint32_t char_segments = font_vfx[m_chars[row][col]];
+				uint8_t c = m_chars[row][col];
+
+				uint32_t char_segments = font_vfx[(' ' <= c && c < 128) ? (c - ' ') : 0];
 				auto attr = m_attrs[row][col];
 				uint32_t segments;
 
