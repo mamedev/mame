@@ -1583,17 +1583,15 @@ void xavix_state::xavix(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
-	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
-
 	XAVIX_ADC(config, m_adc, 0);
-	m_adc->read_0_callback().set(FUNC(xavix_state::adc0_r));
-	m_adc->read_1_callback().set(FUNC(xavix_state::adc1_r));
-	m_adc->read_2_callback().set(FUNC(xavix_state::adc2_r));
-	m_adc->read_3_callback().set(FUNC(xavix_state::adc3_r));
-	m_adc->read_4_callback().set(FUNC(xavix_state::adc4_r));
-	m_adc->read_5_callback().set(FUNC(xavix_state::adc5_r));
-	m_adc->read_6_callback().set(FUNC(xavix_state::adc6_r));
-	m_adc->read_7_callback().set(FUNC(xavix_state::adc7_r));
+	m_adc->read_0_callback().set_ioport("AN0");
+	m_adc->read_1_callback().set_ioport("AN1");
+	m_adc->read_2_callback().set_ioport("AN2");
+	m_adc->read_3_callback().set_ioport("AN3");
+	m_adc->read_4_callback().set_ioport("AN4");
+	m_adc->read_5_callback().set_ioport("AN5");
+	m_adc->read_6_callback().set_ioport("AN6");
+	m_adc->read_7_callback().set_ioport("AN7");
 
 	XAVIX_ANPORT(config, m_anport, 0);
 	m_anport->read_0_callback().set(FUNC(xavix_state::anport0_r));
