@@ -32,16 +32,16 @@ public:
 		m_global_spritexoff(0)
 	{ }
 
-	void maniacsq_d5002fp(machine_config &config);
-	void play2000(machine_config &config);
-	void srollnd(machine_config &config);
-	void alighunt(machine_config &config);
-	void alighunt_d5002fp(machine_config &config);
-	void maniacsq(machine_config &config);
-	void saltcrdi(machine_config &config);
+	void maniacsq_d5002fp(machine_config &config) ATTR_COLD;
+	void play2000(machine_config &config) ATTR_COLD;
+	void srollnd(machine_config &config) ATTR_COLD;
+	void alighunt(machine_config &config) ATTR_COLD;
+	void alighunt_d5002fp(machine_config &config) ATTR_COLD;
+	void maniacsq(machine_config &config) ATTR_COLD;
+	void saltcrdi(machine_config &config) ATTR_COLD;
 
-	void init_alighunt();
-	void init_play2000();
+	void init_alighunt() ATTR_COLD;
+	void init_play2000() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -60,7 +60,7 @@ protected:
 
 	void ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2);
 
-	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	template <unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -102,10 +102,10 @@ public:
 		gaelco2_state(mconfig, type, tag)
 	{ }
 
-	void touchgo(machine_config &config);
-	void touchgo_d5002fp(machine_config &config);
+	void touchgo(machine_config &config) ATTR_COLD;
+	void touchgo_d5002fp(machine_config &config) ATTR_COLD;
 
-	void init_touchgo();
+	void init_touchgo() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -131,10 +131,10 @@ public:
 		m_snowboar_protection(*this, "snowboar_prot")
 	{ }
 
-	void maniacsqs(machine_config &config);
-	void snowboar(machine_config &config);
+	void maniacsqs(machine_config &config) ATTR_COLD;
+	void snowboar(machine_config &config) ATTR_COLD;
 
-	void init_snowboara();
+	void init_snowboara() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -160,7 +160,7 @@ public:
 		, m_light_y(*this, "LIGHT%u_Y", 0U)
 	{}
 
-	void bang(machine_config &config);
+	void bang(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -170,6 +170,7 @@ private:
 	template <unsigned Which> u16 gun_y();
 	void bang_clr_gun_int_w(u16 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(bang_irq);
+
 	void bang_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<2> m_light_x;
@@ -187,15 +188,16 @@ public:
 		, m_analog(*this, "ANALOG%u", 0U)
 	{}
 
-	void wrally2(machine_config &config);
+	void wrally2(machine_config &config) ATTR_COLD;
 
-	void init_wrally2();
+	void init_wrally2() ATTR_COLD;
 
 	template <int N> int wrally2_analog_bit_r();
 
 private:
 	void wrally2_adc_clk(int state);
 	void wrally2_adc_cs(int state);
+
 	void wrally2_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<2> m_analog;
