@@ -2,44 +2,45 @@
 // copyright-holders:Angelo Salese,Carl
 /**************************************************************************************************
 
-    Epson PC98[01] class machine
+Epson PC98[01] class machine
 
-    TODO (PC-286VS):
-    - Verify A20 gate usage, seems to reuse the same hookup as later Epson variants;
+TODO (pc286VS):
+- Verify A20 gate usage, seems to reuse the same hookup as later Epson variants;
+- Not extensively tested beyond not having a working SASI/SCSI option (using IDE as fallback);
 
-    TODO (PC-386M):
-    - Incomplete shadow IPL banking, we currently never bankswitch to the other ROM bank
-      (which barely contains program code);
-    - "ERR:VR" at POST (GFX VRAM)
-      Sub-routine that throws this is at PC=0xfd9bc. Notice that you can actually skip this
-      with eip=0x1bf in debugger and make the system to actually checkout memory installed.
-      (Shorthand: "bp fd9bc,eip=0x1bf")
-    - POST throws non-fatal "ERR:PA" (page fault, "Protected Address"?) after checking memory
-      installed. Non-fatal as in POST will checkout bootable devices afterward.
+TODO (pc386M):
+- Incomplete shadow IPL banking, we currently never bankswitch to the other ROM bank
+  (which barely contains program code);
+- "ERR:VR" at POST (GFX VRAM)
+  Sub-routine that throws this is at PC=0xfd9bc. Notice that you can actually skip this
+  with eip=0x1bf in debugger and make the system to actually checkout memory installed.
+  (Shorthand: "bp fd9bc,eip=0x1bf")
+- POST throws non-fatal "ERR:PA" (page fault, "Protected Address"?) after checking memory
+  installed. Non-fatal as in POST will checkout bootable devices afterward.
 
-    TODO: (PC-486SE/PC-486MU):
-    - Verify ROM bankswitch;
-      On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode
-      is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads
-      the same bank.
-    - Remove IDE regression hack at I/O $74e;
-    - Regressed with a ERR:RA (conventional memory!?) when moving driver to
-      stand-alone file;
-    - Eventually errors with a ERR:VR (GFX VRAM);
+TODO: (pc486se/pc486mu):
+- Verify ROM bankswitch;
+  On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode
+  is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads
+  the same bank.
+- Remove IDE regression hack at I/O $74e;
+- Regressed with a ERR:RA (conventional memory!?) when moving driver to
+  stand-alone file;
+- Eventually errors with a ERR:VR (GFX VRAM);
 
-    Notes:
-    - A detailed list of Epson PC98s can be seen from here:
-      http://www.pc-9800.net/db_epson/index.htm
+Notes:
+- A detailed list of Epson PC98s can be seen from here:
+  http://www.pc-9800.net/db_epson/index.htm
 
-    - Being these knockoffs means that there isn't 100% compatibility with all SWs.
-      Additionally NEC introduced the so called "EPSON Protect" / "EPSON check" (エプソンチェック)
-      starting with MS-DOS 3.3 onward, which checks the presence of NEC / Microsoft copyright
-      string at E800:0DD8 and refuses to boot if not satisfied.
-      cfr. https://github.com/joncampbell123/dosbox-x/issues/682
-      Epson offcially provided PC "Software Installation Program" (SIP) floppy disks
-      (the "epinstal*" in SW list?) that counteracts with the protection check.
-      There's alternatively a freeware user released "Dispell!" program tool that can be used for
-      the same purpose, which also works for 32-bit DOS/V machines.
+- Being these knockoffs means that there isn't 100% compatibility with all SWs.
+  Additionally NEC introduced the so called "EPSON Protect" / "EPSON check" (エプソンチェック)
+  starting with MS-DOS 3.3 onward, which checks the presence of NEC / Microsoft copyright
+  string at E800:0DD8 and refuses to boot if not satisfied.
+  cfr. https://github.com/joncampbell123/dosbox-x/issues/682
+  Epson offcially provided PC "Software Installation Program" (SIP) floppy disks
+  (the "epinstal*" in SW list?) that counteracts with the protection check.
+  There's alternatively a freeware user released "Dispell!" program tool that can be used for
+  the same purpose, which also works for 32-bit DOS/V machines.
 
 **************************************************************************************************/
 
@@ -305,7 +306,7 @@ static INPUT_PORTS_START( pc386m )
 
 	PORT_START("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_CONFNAME( 0x04, 0x04, "Load IDE BIOS" )
+	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
@@ -557,20 +558,20 @@ ROM_END
 // Epson PC98 desktop line
 
 // PC-286 (i286, first model released in Oct 1987)
-COMP( 1989, pc286vs,     0,       0, pc286vs,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286VS", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1989, pc286vs,     0,       0, pc286vs,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286VS", MACHINE_NOT_WORKING )
 
 // PC-286U (same as above except running on V30)
-COMP( 1987, pc286u,     0,        0, pc286u,     pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286U", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Revised BIOS 1988
+COMP( 1987, pc286u,     0,        0, pc286u,     pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286U", MACHINE_NOT_WORKING ) // Revised BIOS 1988
 
 // PC-286C "PC Club" (same as PC-286?)
 // ...
 
 // PC-386 (i386)
-COMP( 1990, pc386m,     0,        0, pc386m,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-386M",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1990, pc386m,     0,        0, pc386m,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-386M",  MACHINE_NOT_WORKING )
 
 // PC-486 (i486SX/DX)
-COMP( 1994, pc486mu,    0,        0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486MU", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486SE", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc486mu,    0,        0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486MU", MACHINE_NOT_WORKING )
+COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486SE", MACHINE_NOT_WORKING )
 // PRO-486 (first actual version with i486dx? Supports High-reso)
 // PC-486P/Win (same as a PC-486P but with Windows 3.0a + MS-DOS 3.3 HDD pre-installed?)
 

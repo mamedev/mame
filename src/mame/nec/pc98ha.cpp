@@ -2,28 +2,31 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    PC98LT/HA class machine "Handy98" aka 1st Gen LCD PC98
+PC98LT/HA class machine "Handy98" aka 1st Gen LCD PC98
 
-    TODO:
-    - pc98lt: remove timer hack:
-        - definitely incorrect given the erratic cursor blinking in N88BASIC;
-    - identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
-    - merge from base pc98 class (WIP);
-    - when idle for some time buzzer farts until a key is pressed (?);
-    - add NVRAM saving:
-    - pinpoint NVRAM init switch source:
-        - first port C read (pc98lt: i/o 0x35, PC=0xf841f) tests for bit 7,
-          which initializes battery backup if on, but port C is in output mode there.
-          Somehow obf irq is on at boot if battery failed?
-    - power handling;
-    - pc98ha specifics:
-        - RTC is upd4991a (partially done), it's parallel instead of serial and incompatible with
-          everything else ugh;
-        - EMS fails at boot, it's never ever really checked;
-        - MSDOS cannot detect EMS properly, is there a flag somewhere?
-        - JEIDA memory card interface (68pin cfr. "Super Daisenryaku HA",
-          most likely same as NeoGeo JEIDA 3.0 memory cards);
-        - optional docking station (for floppy device only or can mount other stuff too?);
+TODO:
+- compose common points from base pc98 class, decouple;
+- identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
+- when idle for some time buzzer farts until a key is pressed (?);
+- add NVRAM saving:
+- pinpoint NVRAM init switch source:
+\- first port C read (pc98lt: i/o 0x35, PC=0xf841f) tests for bit 7,
+   which initializes battery backup if on, but port C is in output mode there.
+   Somehow obf irq is on at boot if battery failed?
+- power handling;
+
+TODO (pc98lt):
+- remove timer hack:
+\- definitely incorrect given the erratic cursor blinking in N88BASIC;
+
+TODO (pc98ha):
+- RTC is upd4991a (partially done), it's parallel instead of serial and incompatible with
+  everything else ugh;
+- EMS fails at boot, it's never ever really checked;
+- MSDOS cannot detect EMS properly, is there a flag somewhere?
+- JEIDA memory card interface (68pin cfr. "Super Daisenryaku HA",
+  most likely same as NeoGeo JEIDA 3.0 memory cards);
+- optional docking station (for floppy device only or can mount other stuff too?);
 
 **************************************************************************************************/
 

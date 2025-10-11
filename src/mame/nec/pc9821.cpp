@@ -6,21 +6,29 @@ NEC PC-9821
 
 follow-up to PC-9801 for the consumer market
 
-TODO (PC-9821):
+References:
+- https://www.satotomi.com/sl9821/sl9821_tec5.html for PEGC MMIO
+
+TODO (pc9821):
 - non-fatal "cache error" at POST for all machines listed here;
 - undumped IDE ROM, kludged to work;
 - further state machine breakdowns;
 
-TODO (PC-9821Ap2):
-- Lack of key repeat makes it unable to enter SETUP mode normally.
-  bp 0xf8a32,1,{esi|=40;g} to simulate holding HELP key at power-on/reset;
+TODO (pc9821ap2):
+- To enter SETUP mode, unmap F3 or move MAME soft reset out of F3 then hold HELP key.
+\- alternative: bp 0xf8a32,1,{esi|=40;g} to simulate holding HELP key at power-on/reset;
+- Unimplemented 15MB memory hole mark for Windows NT
+\- cfr. io_wab.txt, interfaces with VGA core thru local bus via address-data ports at $fa2-3
 
-TODO (PC-9821As):
+TODO (pc9821as):
 - unimplemented SDIP specific access;
 - "SYSTEM SHUTDOWN" while accessing above;
-- Update: it never goes into above after I changed default m_dma_access_ctrl to 0xfe?
+- Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
 
-TODO (PC-9821Cx3):
+TODO (pc9821ce2):
+- Incomplete dump, getitf98 style dump known to exist;
+
+TODO (pc9821cx3):
 - "MICON ERROR" at POST, we currently return a ready state in remote control register
   to bypass it, is it expected behaviour?
 - Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os
@@ -36,13 +44,13 @@ TODO (PC-9821Cx3):
   at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
   Where this is mapped is currently unknown;
 
-TODO (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333):
+TODO (pc9821xa16/pc9821ra20/pc9821ra266/pc9821ra333):
 - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
   involved bankswitch with Pentium based machines);
 
-TODO: (PC-9821Nr15/PC-9821Nr166)
+TODO: (pc9821Nr15/pc9821Nr166)
 - Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
-- Skipping that will eventually die with a "MEMORY ERROR" (never reads extended memory);
+- Skipping that will eventually error out with a "MEMORY ERROR" (never reads extended memory);
 
 **************************************************************************************************/
 
@@ -749,7 +757,7 @@ static INPUT_PORTS_START( pc9821 )
 
 	PORT_START("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_CONFNAME( 0x04, 0x04, "Load IDE BIOS" )
+	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
@@ -1463,11 +1471,11 @@ ROM_END
 // To mark this we intentionally add square brackets here as optional omission notation.
 
 // 98MULTi (i386, desktop)
-COMP( 1992, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state,        init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state,        init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING )
 
 // 98MATE [A] (i486, desktop, has 98 MATE local bus "ML", with optional RL-like high-reso)
-COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING )
+COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     0 )
 
 // SC-9821A (rebranded MATE A machines with minor differences such as SW power control)
 // ...
@@ -1476,8 +1484,8 @@ COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_
 // ...
 
 // 98MULTi CanBe (i486/Pentium, desktop & tower, Multimedia PC with optional TV Tuner & remote control function, Fax, Modem, MPEG-2, FX-98IF for PC-FX compatibility etc. etc.)
-COMP( 1994, pc9821ce2,   0,           0, pc9821ce2,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1995, pc9821cx3,   pc9821ce2,   0, pc9821cx3,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821ce2,   0,           0, pc9821ce2,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
+COMP( 1995, pc9821cx3,   pc9821ce2,   0, pc9821cx3,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
 
 // 98MULTi CanBe Jam (Pentium Pro equipped, laptop, Multimedia PC as above + JEIDA 4.2/PCMCIA 2.1)
 // ...
@@ -1487,17 +1495,17 @@ COMP( 1995, pc9821cx3,   pc9821ce2,   0, pc9821cx3,    pc9821,   pc9821_canbe_st
 // ...
 
 // 98MATE X (i486sx/Pentium/Pentium Pro, has PCI, comes with various SVGA cards)
-COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1996, pc9821xa16,  pc9821xs,    0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING )
+COMP( 1996, pc9821xa16,  pc9821xs,    0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING )
 
 // 98MATE VALUESTAR (Pentium, comes with Windows 95 and several programs pre-installed)
 //COMP( 1998, pc9821v13,   0,           0, pc9821v13,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 //COMP( 1998, pc9821v20,   pc9821v13,   0, pc9821v20,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V20 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE R (Pentium Pro, otherwise same as 98MATE X?)
-COMP( 1996, pc9821ra20,  0,            0, pc9821ra20,  pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, pc9821ra266, pc9821ra20,   0, pc9821ra266, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821ra20,  0,            0, pc9821ra20,  pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING )
+COMP( 1997, pc9821ra266, pc9821ra20,   0, pc9821ra266, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING )
+COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING )
 
 // 98MATE SERVER, pc9821rs* (Server variant of 98MATE R. Inherits concepts from SV-H98 98SERVER)
 // ...
@@ -1507,9 +1515,9 @@ COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_s
 //COMP( 1994, pc9821ne,    0,            0, pc9821ne,    pc9821,   pc9821_note_state,       init_pc9801_kanji,   "NEC",   "PC-9821Ne (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98NOTE Lavie
-COMP( 1996, pc9821nr15,  0,            0, pc9821nr15,  pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, pc9821nr166, pc9821nr15,   0, pc9821nr166, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, pc9821nw150, pc9821nr15,   0, pc9821nw150, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nw150 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821nr15,  0,            0, pc9821nr15,  pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING )
+COMP( 1997, pc9821nr166, pc9821nr15,   0, pc9821nr166, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING )
+COMP( 1997, pc9821nw150, pc9821nr15,   0, pc9821nw150, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nw150 (98NOTE Lavie)",   MACHINE_NOT_WORKING )
 
 // 98NOTE Light
 // ...
