@@ -629,7 +629,7 @@ ROM_START( mjzb ) // IGS PCB-0433-04-GK - Has IGS027A, MX10EXAQC, 2x Actel A54SX
 	// 3 of the GFX ROMs are underdumped
 	ROM_REGION( 0x2000000, "gfx1", ROMREGION_ERASE00 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp).
 	// u7 is probably correct, leaving as bad dump due to having to hand fix the address lines
-	ROM_LOAD32_WORD( "mjzb_cg_u7.u7",   0x0000000, 0x800000, BAD_DUMP CRC(43cd7ace) SHA1(571256a70e285bf2ad9e485fb2c07037b541d882) )
+	ROM_LOAD32_WORD( "mjzb_cg_u7.u7",   0x0000000, 0x800000, BAD_DUMP CRC(9a09b5d9) SHA1(63e90da4cbe0ccb6823fcbd9433c0022f6edb771) )
 
 	// for u6 we only have the 6th 0x100000 block and the ROM chip is broken
 	ROM_LOAD32_WORD( "mjzb_cg_u6.u6",   0x0a00002, 0x100000, BAD_DUMP CRC(b2aeb4a1) SHA1(c5c73d340164a9e1a60a3519633550596e0ca00f) )
