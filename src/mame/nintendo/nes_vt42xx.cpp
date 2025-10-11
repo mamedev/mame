@@ -313,7 +313,7 @@ void nes_vt42xx_state::nes_vt42xx(machine_config &config)
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt42xx_state::upper_412d_r));
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt42xx_state::upper_412c_w));
 
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
+	m_soc->set_default_palette_mode(PAL_MODE_VT0x);
 	m_soc->force_bad_dma();
 }
 
@@ -596,6 +596,7 @@ CONS( 2019, gbox2019, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, emp
 
 CONS( 200?, gprnrs1,  0,  0,  nes_vt42xx_8mb,  nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, gprnrs16, 0,  0,  nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, wol260,   gprnrs16, 0, nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "Wolsen", "260 in 1 Handheld Game (Wolsen)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, mc_9x6ss, 0,        0, nes_vt42xx_4mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_9x6sa, mc_9x6ss, 0, nes_vt42xx_2mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
@@ -604,5 +605,3 @@ CONS( 200?, mc_8x6ss, 0,        0, nes_vt42xx_1mb, nes_vt42xx, nes_vt42xx_state,
 
 // Uses DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2017, fapocket,  0,  0,  nes_vt42xx_fa,     nes_vt42xx_fa, nes_vt42xx_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
-
-CONS( 201?, wol260,    0,  0,  nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "Wolsen", "260 in 1 Handheld Game (Wolsen)", MACHINE_NOT_WORKING )
