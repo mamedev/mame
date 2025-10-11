@@ -436,7 +436,7 @@ void nes_state::nes(machine_config &config)
 	NES_CONTROL_PORT(config, m_special, nes_control_special_devices, nullptr).set_screen_tag(m_screen);
 
 	NES_CART_SLOT(config, m_cartslot, NTSC_APU_CLOCK, nes_cart, nullptr).set_must_be_loaded(true);
-	SOFTWARE_LIST(config, "cart_list").set_original("nes");
+	SOFTWARE_LIST(config, "cart_list").set_original("nes").set_filter("!exp");
 	SOFTWARE_LIST(config, "ade_list").set_original("nes_ade");         // Camerica/Codemasters Aladdin Deck Enhancer mini-carts
 	SOFTWARE_LIST(config, "ntb_list").set_original("nes_ntbrom");      // Sunsoft Nantettate! Baseball mini-carts
 	SOFTWARE_LIST(config, "kstudio_list").set_original("nes_kstudio"); // Bandai Karaoke Studio expansion carts
@@ -473,6 +473,7 @@ void nes_state::famicom(machine_config &config)
 	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad").set_screen_tag(m_screen);
 	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr).set_screen_tag(m_screen);
 
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("nes");
 	SOFTWARE_LIST(config, "flop_list").set_original("famicom_flop");
 	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
 }
