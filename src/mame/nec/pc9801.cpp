@@ -7,7 +7,7 @@ PC-9801 (c) 1981 NEC
 References:
 - https://www.pc-9800.net/index.htm
 - https://www.webtech.co.jp/company/doc/undocumented_mem/index.html
-
+- https://web.archive.org/web/20190331142002/http://www.geocities.jp/retro_zzz/machines/nec/9801/mdl98cpu.html
 
 TODO:
 - C-Bus SCSI support, remove IDE ROM loads where doesn't belong by default;
@@ -41,7 +41,7 @@ TODO (pc9801us / pc9801fs):
 - pc9801fs at least: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS,
  incompatible with 512 bps or IDE itself?
 
-TODO (pc9801bx2)
+TODO (pc9801bx2):
 - "SYSTEM SHUTDOWN" at POST, SDIP related, soft reset to bypass;
 - Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
 - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
@@ -2908,8 +2908,8 @@ void pc9801vm_state::init_pc9801vm_kanji()
 // specifically happening for PC9801RS. This will be hopefully put into stone with driver splits at some point in future.
 
 // "vanilla" class (i86, E/F/M)
-COMP( 1982, pc9801,     0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
-COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
+COMP( 1982, pc9801,     0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801",   MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING ) // genuine dump
 
 // N5200 (started as a vanilla PC-98 business line derivative,
 //        eventually diverged into its own thing and incorporated various Hyper 98 features.
@@ -2929,16 +2929,16 @@ COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9
 // ...
 
 // VM class (V30)
-COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
+COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING ) // genuine dump
 // UV class (V30)
-COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
+COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING ) // genuine dump
 
 // UX class (i286)
-COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING )
 
 // VX class (first model using an EGC)
 // original VX0/VX2/VX4 released in Nov 1986, minor updates with OS pre-installed etc. in 1987
-COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING )
 
 // XA/XL class (1120 x 750 true color, nicknamed "High-reso")
 // ...
@@ -2955,20 +2955,20 @@ COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_p
 // ...
 
 // RS class (i386SX)
-COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING )
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING )
 // DX class (i286)
-COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801DX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801DX",                     MACHINE_NOT_WORKING )
 // DA class (i386SX + SDIP and EMS)
 // ...
 // UF/UR/US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
-COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING )
 // FS class (i386SX + ?)
-COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING )
 // FA class (i486SX)
 // ...
 // BX class (official nickname "98 FELLOW", last releases prior to 9821 line)
-COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING )
 
 // PC-98GS (Multimedia PC, exclusive video mode "Extended Screen Graphics", -73 sound board (a superset of later -86), superimposition)
 // ...
