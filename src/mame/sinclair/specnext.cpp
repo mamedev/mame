@@ -959,33 +959,45 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
 
-		if (m_nr_68_blend_mode != 0b11)
-		//if (m_nr_68_blend_mode == 0b00)
+		const bool is_textmode = BIT(m_nr_6b_tm_control, 3);
+		if (m_nr_68_blend_mode == 0b00) // Use ULA as blend layer
 		{
-			if (m_nr_68_ula_en && BIT(~m_nr_6b_tm_control, 3))
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), is_textmode ? 1 : 0xff);
+			if (m_nr_68_ula_en && !is_textmode)
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 8);
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), is_textmode ? 1 : 2);
 		}
-		/* TODO No tests for modes below yet
-		else if (m_nr_68_blend_mode == 0b10)
+		else if (m_nr_68_blend_mode == 0b10) // Use result of ULA + Tilemap
 		{
-		}
-		else if (m_nr_68_blend_mode == 0b11)
-		{
-		}
-		*/
-		else
-		{
-			if (m_nr_68_ula_en && BIT(~m_nr_6b_tm_control, 3))
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
+			if (m_nr_68_ula_en && !is_textmode)
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
+		}
+		else if (m_nr_68_blend_mode == 0b11) // Use Tilemap as blend layer
+		{
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
+			if (m_nr_68_ula_en && !is_textmode)
+			{
+				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
+			}
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
+		}
+		else // No blending (disable blend)
+		{
 			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
+			if (m_nr_68_ula_en && !is_textmode)
+			{
+				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
+			}
 			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
 		}
 		// mixes only to 1
@@ -1875,9 +1887,11 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		}
 		break;
 	case 0x12:
+		m_screen->update_now();
 		nr_12_layer2_active_bank_w(nr_wr_dat);
 		break;
 	case 0x13:
+		m_screen->update_now();
 		nr_13_layer2_shadow_bank_w(nr_wr_dat);
 		break;
 	case 0x14:

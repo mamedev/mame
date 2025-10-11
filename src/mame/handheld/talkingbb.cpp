@@ -22,9 +22,6 @@ Players enter a 3-digit code to select the team.
 
 TODO:
 - add cartridge slots
-- Buttons are unresponsive at initial game setup, you need to hold the yes/no button
-  until it responds. The keypad reading routine is at $1A5D, it gets skipped for several
-  seconds at a time. Once in-game, everything is fine though. BTANB or different cause?
 
 ********************************************************************************
 

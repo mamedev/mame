@@ -213,7 +213,10 @@ TIMER_CALLBACK_MEMBER(ef9345_device::blink_tick)
 void ef9345_device::set_busy_flag(int period)
 {
 	m_bf = 1;
-	m_busy_timer->adjust(attotime::from_nsec(period));
+	if (period < 0)
+		m_busy_timer->reset();
+	else
+		m_busy_timer->adjust(attotime::from_nsec(period));
 }
 
 // draw a char in 40 char line mode
@@ -846,6 +849,21 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			m_videoram->write_byte(a + 0x0800, m_registers[2]);
 			if (cmd&1) inc_x(7);
 			break;
+		case 0x05:  //CLF: Clear page 24 bits
+		case 0x07:  //CLG: Clear page 16 bits
+			set_busy_flag(-1);
+			for (int i = 0; i < 32 * 40; i++)
+			{
+				a = indexram(7);
+				m_videoram->write_byte(a, m_registers[1]);
+				m_videoram->write_byte(a + 0x0800, m_registers[2]);
+				if (cmd == 0x05)
+					m_videoram->write_byte(a + 0x1000, m_registers[3]);
+				inc_x(7);
+				if ((m_registers[7] & 0x3f) == 0)
+					inc_y(6);
+			}
+			break;
 		case 0x08:  //KRF: ram->R1,R2,R3
 		case 0x09:  //KRF: ram->R1,R2,R3 + increment
 			set_busy_flag(7500);
@@ -1019,7 +1037,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			uint8_t r2 = (cmd&0x04) ? 5 : 7;
 			int busy = 2000;
 
-			for (i = 0; i < 1280; i++)
+			for (i = 0; i < 32 * 40; i++)
 			{
 				a1 = indexram(r1); a2 = indexram(r2);
 				m_videoram->write_byte(a2, m_videoram->read_byte(a1));
@@ -1046,8 +1064,6 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			set_busy_flag(busy);
 		}
 		break;
-		case 0x05:  //CLF: Clear page 24 bits
-		case 0x07:  //CLG: Clear page 16 bits
 		case 0x40:  //KRC: R1 -> ram
 		case 0x41:  //KRC: R1 -> ram + inc
 		case 0x48:  //KRC: 80 characters - 8 bits

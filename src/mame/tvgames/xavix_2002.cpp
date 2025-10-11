@@ -419,12 +419,8 @@ void superxavix_i2c_jmat_state::write_extended_io1(offs_t offset, uint8_t data, 
 {
 	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
 
-	if (mem_mask & 0x08)
-		m_i2cmem->write_sda((data & 0x08) >> 3);
-
-	if (mem_mask & 0x10)
-		m_i2cmem->write_scl((data & 0x10) >> 4);
-
+	m_i2cmem->write_sda(BIT(mem_mask, 3) ? BIT(data, 3) : 1);
+	m_i2cmem->write_scl(BIT(mem_mask, 4) ? BIT(data, 4) : 0);
 }
 
 void superxavix_i2c_jmat_state::write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask)

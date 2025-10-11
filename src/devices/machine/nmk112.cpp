@@ -12,20 +12,17 @@
 #include "emu.h"
 #include "nmk112.h"
 
-#define TABLESIZE   0x100
-#define BANKSIZE    0x10000
-
 
 
 DEFINE_DEVICE_TYPE(NMK112, nmk112_device, "nmk112", "NMK112")
 
 nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NMK112, tag, owner, clock)
+	, m_samplebank{ { *this, "samplebank_0_%u", 0U }, { *this, "samplebank_1_%u", 0U } }
+	, m_tablebank{ { *this, "tablebank_0_%u", 0U }, { *this, "tablebank_1_%u", 0U } }
+	, m_rom(*this, { finder_base::DUMMY_TAG, finder_base::DUMMY_TAG })
 	, m_page_mask(0xff)
-	, m_rom0(*this, finder_base::DUMMY_TAG)
-	, m_rom1(*this, finder_base::DUMMY_TAG)
-	, m_size0(0)
-	, m_size1(0)
+	, m_size{ 0, 0 }
 {
 }
 
@@ -35,13 +32,32 @@ nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, dev
 
 void nmk112_device::device_start()
 {
-	save_item(NAME(m_current_bank));
+	for (int c = 0; c < 2; c++)
+	{
+		if (m_rom[c])
+		{
+			m_size[c] = m_rom[c].bytes();
 
-	if (m_rom0)
-		m_size0 = m_rom0.bytes() - 0x40000;
+			// bank slot configurations
+			for (int i = 0; i < 4; i++)
+			{
+				for (int b = 0; b < 256; b++)
+				{
+					if (m_samplebank[c][i])
+						m_samplebank[c][i]->configure_entry(b, &m_rom[c][(b << 16) % m_size[c]]);
 
-	if (m_rom1)
-		m_size1 = m_rom1.bytes() - 0x40000;
+					if (m_tablebank[c][i])
+						m_tablebank[c][i]->configure_entry(b, &m_rom[c][((i << 8) + (b << 16)) % m_size[c]]);
+				}
+
+				if (m_samplebank[c][i])
+					m_samplebank[c][i]->set_entry(0);
+
+				if (m_tablebank[c][i])
+					m_tablebank[c][i]->set_entry(0);
+			}
+		}
+	}
 }
 
 //-------------------------------------------------
@@ -50,41 +66,10 @@ void nmk112_device::device_start()
 
 void nmk112_device::device_reset()
 {
-	for (int i = 0; i < 8; i++)
-	{
-		m_current_bank[i] = 0;
-		do_bankswitch(i, m_current_bank[i]);
-	}
+	for (offs_t i = 0; i < 8; i++)
+		okibank_w(i, 0);
 }
 
-void nmk112_device::do_bankswitch( int offset, int data )
-{
-	int chip = (offset & 4) >> 2;
-	int banknum = offset & 3;
-	int paged = (m_page_mask & (1 << chip));
-
-	uint8_t *rom = chip ? m_rom1 : m_rom0;
-	int size = chip ? m_size1 : m_size0;
-
-	m_current_bank[offset] = data;
-
-	if (size == 0) return;
-
-	int bankaddr = (data * BANKSIZE) % size;
-
-	/* copy the samples */
-	if ((paged) && (banknum == 0))
-		memcpy(rom + 0x400, rom + 0x40000 + bankaddr + 0x400, BANKSIZE - 0x400);
-	else
-		memcpy(rom + banknum * BANKSIZE, rom + 0x40000 + bankaddr, BANKSIZE);
-
-	/* also copy the sample address table, if it is paged on this chip */
-	if (paged)
-	{
-		rom += banknum * TABLESIZE;
-		memcpy(rom, rom + 0x40000 + bankaddr, TABLESIZE);
-	}
-}
 
 /*****************************************************************************
     DEVICE HANDLERS
@@ -92,12 +77,47 @@ void nmk112_device::do_bankswitch( int offset, int data )
 
 void nmk112_device::okibank_w(offs_t offset, u8 data)
 {
-	if (m_current_bank[offset] != data)
-		do_bankswitch(offset, data);
+	const int chip = BIT(offset, 2);
+	const int banknum = offset & 3;
+
+	if (m_size[chip])
+	{
+		if (m_samplebank[chip][banknum])
+			m_samplebank[chip][banknum]->set_entry(data);
+
+		if (m_tablebank[chip][banknum])
+			m_tablebank[chip][banknum]->set_entry(data);
+	}
 }
 
-void nmk112_device::device_post_load()
+
+/*****************************************************************************
+    ADDRESS MAPS
+*****************************************************************************/
+
+void nmk112_device::oki0_map(address_map &map)
 {
-	for (int i = 0; i < 8; i++)
-		do_bankswitch(i, m_current_bank[i]);
+	oki_map(0, map);
+}
+
+void nmk112_device::oki1_map(address_map &map)
+{
+	oki_map(1, map);
+}
+
+void nmk112_device::oki_map(unsigned which, address_map &map)
+{
+	map(0x00000, 0x0ffff).bankr(m_samplebank[which][0]);
+	map(0x10000, 0x1ffff).bankr(m_samplebank[which][1]);
+	map(0x20000, 0x2ffff).bankr(m_samplebank[which][2]);
+	map(0x30000, 0x3ffff).bankr(m_samplebank[which][3]);
+
+	// these get installed over the top of the first bank if present
+	if (is_paged(which))
+	{
+		map(0x00000, 0x000ff).bankr(m_tablebank[which][0]);
+		map(0x00100, 0x001ff).bankr(m_tablebank[which][1]);
+		map(0x00200, 0x002ff).bankr(m_tablebank[which][2]);
+		map(0x00300, 0x003ff).bankr(m_tablebank[which][3]);
+	}
 }

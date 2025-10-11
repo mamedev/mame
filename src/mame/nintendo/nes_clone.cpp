@@ -148,6 +148,7 @@ public:
 	{ }
 
 	void nes_clone_vtvsocr(machine_config& config);
+	void nes_clone_danzkara_pal(machine_config& config);
 
 private:
 	void nes_clone_vtvsocr_map(address_map &map) ATTR_COLD;
@@ -393,6 +394,22 @@ static INPUT_PORTS_START( digezlg )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( danzkara )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY // NOT A JOYSTICK!!
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY
 
 	PORT_START("IO1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1214,6 +1231,12 @@ void nes_clone_vtvsocr_state::nes_clone_vtvsocr(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvsocr_state::nes_clone_vtvsocr_map);
 }
 
+void nes_clone_vtvsocr_state::nes_clone_danzkara_pal(machine_config& config)
+{
+	nes_clone_pal(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvsocr_state::nes_clone_vtvsocr_map);
+}
+
 void nes_clone_vtvsocr_state::nes_clone_vtvsocr_map(address_map& map)
 {
 	nes_clone_basemap(map);
@@ -1322,6 +1345,13 @@ ROM_START( vtvsocr )
 	ROM_LOAD16_WORD_SWAP( "virtualtvsoccer.bin", 0x00000, 0x40000, CRC(2cfe42aa) SHA1(c2cafdbd5cc6491c94efd3f1be4b70c9de737b46) )
 ROM_END
 
+// Unit obtained in the UK; PCB has 26.601712 MHz XTAL (6x PAL subcarrier)
+ROM_START( danzkara )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	// 8-bit ROM, but byteswapped for encryption?
+	ROM_LOAD16_WORD_SWAP( "bs-danz-r2.bin", 0x00000, 0x100000, CRC(806be92b) SHA1(07bad2f383dc578fa8fc83b0c1886001bf1d72b9) )
+ROM_END
+
 ROM_START( dancexpt )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "dancingexpert27c010.bin", 0x0000, 0x20000, CRC(658ba2ea) SHA1(c08f6a2735b3c7383cba3a5fa3af905d5af6926f) )
@@ -1389,6 +1419,8 @@ CONS( 200?, dancexpt, 0, 0, nes_clone_dancexpt, dancexpt, nes_clone_dancexpt_sta
 
 CONS( 200?, vtvsocr,     0,  0,  nes_clone_vtvsocr, nes_clone, nes_clone_vtvsocr_state, init_nes_clone, "<unknown>", "Virtual TV Soccer", MACHINE_NOT_WORKING )
 
+// manufacturer not named on box
+CONS( 200?, danzkara,  0,  0,  nes_clone_danzkara_pal, danzkara, nes_clone_vtvsocr_state, init_nes_clone, "Game Star", "DanZ Kara (BS-888)", MACHINE_NOT_WORKING )
 
 // in early 2000s LG TVs
 CONS( 200?, digezlg, 0, 0, nes_clone_dnce2000, digezlg, nes_clone_dnce2000_state, init_nes_clone, "LG", "Digital ez LG", MACHINE_NOT_WORKING )

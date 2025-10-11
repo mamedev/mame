@@ -6,12 +6,193 @@ copyright-holders:m1macrophage
 
 <mamelayout version="2">
 
-	<element name="blue_box">
-		<rect><color red="0" green="0.64" blue="0.99"/></rect>
-	</element>
 	<element name="black_box">
-		<rect><color red="0.27" green="0.28" blue="0.29"/></rect>
+		<image><data><![CDATA[
+			<rect fill="#45474a" x="0" y="0" width="517" height="190" rx="3" ry="3"/>
+		]]></data></image>
 	</element>
+
+	<element name="left_panel">
+		<image><data><![CDATA[
+			<svg width="108" height="190">
+				<rect fill="#00a3fc" stroke="#45474a" stroke-width="2" x="1" y="1" width="106" height="188" rx="3" ry="3"/>
+				<rect fill="#45474a" x="0" y="48" width="108" height="2"/>
+				<rect fill="#45474a" x="0" y="96" width="108" height="2"/>
+
+				<!-- Tickmarks around the volume knob. -->
+				<g stroke="#ffffff" stroke-width="0.5" transform="translate(26, 72)>
+					<line x1="0" y1="0" x2="20" y2="0"/>
+					<line transform="rotate(60)" x1="0" y1="0" x2="20" y2="0"/>
+					<line transform="rotate(120)" x1="0" y1="0" x2="20" y2="0"/>
+					<line transform="rotate(180)" x1="0" y1="0" x2="20" y2="0"/>
+					<line transform="rotate(240)" x1="0" y1="0" x2="20" y2="0"/>
+					<line transform="rotate(300)" x1="0" y1="0" x2="20" y2="0"/>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="wheel_panel">
+		<image><data><![CDATA[
+			<svg width="94" height="160">
+				<rect fill="#00a3fc" stroke="#45474a" stroke-width="2" x="1" y="1" width="92" height="158" rx="3" ry="3"/>
+
+				<!-- Pitch wheel arrows. -->
+				<g transform="translate(13, 82)">
+					<polygon fill="#d1e0e0" points="0,0 2,5 -2,5"/>
+					<line stroke="#d1e0e0" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
+				</g>
+				<g transform="translate(13, 132) rotate(180)">
+					<polygon fill="#d1e0e0" points="0,0 2,5 -2,5"/>
+					<line stroke="#d1e0e0" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
+				</g>
+
+				<!-- Mod wheel arrow. -->
+				<g transform="translate(55, 82)">W
+					<polygon fill="#d1e0e0" points="0,0 2,5 -2,5"/>
+					<line stroke="#d1e0e0" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="trigger_memory_box">
+		<image><data><![CDATA[
+			<rect fill="#00a3fc" x="0" y="0" width="52" height="141" rx="3" ry="3"/>
+			<rect fill="#45474a" x="0" y="71" width="52" height="2"/>
+		]]></data></image>
+	</element>
+
+	<element name="osc_box">
+		<image><data><![CDATA[
+			<rect fill="#00a3fc" x="0" y="0" width="168" height="141" rx="3" ry="3"/>
+			<rect fill="#45474a" x="0" y="59" width="168" height="2"/>
+			<rect fill="#00a3fc" x="63" y="51" width="35" height="18"/>
+		]]></data></image>
+	</element>
+
+	<element name="mod_box">
+		<image><data><![CDATA[
+			<rect fill="#00a3fc" x="0" y="0" width="52" height="141" rx="3" ry="3"/>
+			<!-- Downward-pointing arrow. -->
+			<polygon transform="translate(27, 66)" fill="#45474a" points="-2,0 2,0 2,3 5,3 0,11 -5,3 -2,3"/>
+		]]></data></image>
+	</element>
+
+	<element name="mixer_box">
+		<image><data><![CDATA[
+			<rect fill="#00a3fc" x="0" y="0" width="52" height="141" rx="3" ry="3"/>
+		]]></data></image>
+	</element>
+
+	<element name="modifiers_box">
+		<image><data><![CDATA[
+			<rect fill="#00a3fc" x="0" y="0" width="139" height="141" rx="3" ry="3"/>
+			<rect fill="#45474a" x="0" y="68" width="139" height="2"/>
+			<rect fill="#45474a" x="0" y="103" width="139" height="2"/>
+			<!-- Upward-pointing arrow. -->
+			<polygon transform="translate(117, 55)" fill="#45474a" points="0,0 7,7 4,7 4,14 -4,14 -4,7, -7,7"/>
+		]]></data></image>
+	</element>
+
+	<element name="wave_triangle">
+		<image><data><![CDATA[
+			<svg width="16" height="18">
+				<polyline stroke="#000000" stroke-width="0.5" fill="none" points="4,12 8,5 12,12"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="wave_square">
+		<image><data><![CDATA[
+			<svg width="16" height="18">
+				<polyline stroke="#000000" stroke-width="0.5" fill="none" points="4,12 4,5 8,5 8,12 12,12, 12,5"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="wave_saw">
+		<image><data><![CDATA[
+			<svg width="16" height="18">
+				<polyline stroke="#000000" stroke-width="0.5" fill="none" points="4,12 4,5 12,12"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="wave_pulse">
+		<image><data><![CDATA[
+			<svg width="26" height="18">
+				<polyline stroke="#000000" stroke-width="0.5" fill="none" points="4,12 4,5 8,5 8,12 22,12, 22,5"/>
+				<polyline stroke="#000000" stroke-width="0.5" fill="none" points="11,7 19,7"/>
+				<polygon transform="translate(9, 7)" fill="#000000" points="0,0 2,-2 2,2"/>
+				<polygon transform="translate(21, 7) rotate(180)" fill="#000000" points="0,0 2,-2 2,2"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="eg_attack">
+		<image><data><![CDATA[
+			<svg width="26" height="18">
+				<line stroke="#000000" stroke-width="1.5" x1="4" y1="11" x2="7" y2="4"/>
+				<line stroke="#000000" stroke-width="0.5" x1="7" y1="4" x2="11" y2="7"/>
+				<line stroke="#000000" stroke-width="0.5" x1="11" y1="7" x2="19" y2="7"/>
+				<line stroke="#000000" stroke-width="0.5" x1="19" y1="7" x2="22" y2="11"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="eg_decay">
+		<image><data><![CDATA[
+			<svg width="26" height="18">
+				<line stroke="#000000" stroke-width="0.5" x1="4" y1="11" x2="7" y2="4"/>
+				<line stroke="#000000" stroke-width="1.5" x1="7" y1="4" x2="11" y2="7"/>
+				<line stroke="#000000" stroke-width="0.5" x1="11" y1="7" x2="19" y2="7"/>
+				<line stroke="#000000" stroke-width="0.5" x1="19" y1="7" x2="22" y2="11"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="eg_sustain">
+		<image><data><![CDATA[
+			<svg width="26" height="18">
+				<line stroke="#000000" stroke-width="0.5" x1="4" y1="11" x2="7" y2="4"/>
+				<line stroke="#000000" stroke-width="0.5" x1="7" y1="4" x2="11" y2="7"/>
+				<line stroke="#000000" stroke-width="1.5" x1="11" y1="7" x2="19" y2="7"/>
+				<line stroke="#000000" stroke-width="0.5" x1="19" y1="7" x2="22" y2="11"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="eg_release">
+		<image><data><![CDATA[
+			<svg width="26" height="18">
+				<line stroke="#000000" stroke-width="0.5" x1="4" y1="11" x2="7" y2="4"/>
+				<line stroke="#000000" stroke-width="0.5" x1="7" y1="4" x2="11" y2="7"/>
+				<line stroke="#000000" stroke-width="0.5" x1="11" y1="7" x2="19" y2="7"/>
+				<line stroke="#000000" stroke-width="1.5" x1="19" y1="7" x2="22" y2="11"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="level1_arrow">
+		<image><data><![CDATA[
+			<svg width="17" height="5">
+				<polygon fill="#ebfafa" points="0,2 5,0 5,4"/>
+				<line stroke="#ebfafa" stroke-width="1" x1="5" y1="2" x2="16" y2="2"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="level2_arrow">
+		<image><data><![CDATA[
+			<svg width="52" height="6">
+				<polygon fill="#ebfafa" points="0,2 5,0 5,4"/>
+				<line stroke="#ebfafa" stroke-width="1" x1="5" y1="2" x2="51" y2="2"/>
+				<line stroke="#ebfafa" stroke-width="1" x1="51" y1="2" x2="51" y2="5"/>
+			</svg>
+		]]></data></image>
+	</element>
+
 	<element name="white_box">
 		<rect><color red="0.92" green="0.98" blue="0.98"/></rect>
 	</element>
@@ -40,9 +221,18 @@ copyright-holders:m1macrophage
 
 	<element name="octave_button">
 		<rect>
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0"/>
+			<color red="0" green="0" blue="0"/>
+		</rect>
+		<rect>
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9"/>
+			<color red="0.04" green="0.31" blue="0.44"/>
+		</rect>
+		<disk>
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8"/>
 			<color state="0" red="0.27" green="0.53" blue="0.67"/>
 			<color state="1" red="0.04" green="0.31" blue="0.44"/>
-		</rect>
+		</disk>
 	</element>
 
 	<element name="volume_knob">
@@ -78,7 +268,7 @@ copyright-holders:m1macrophage
 		</disk>
 	</element>
 
-	<element name="blue_button">
+	<element name="cyan_button">
 		<rect>
 			<color state="0" red="0.47" green="0.94" blue="0.99"/>
 			<color state="1" red="0.24" green="0.47" blue="0.49"/>
@@ -141,6 +331,11 @@ copyright-holders:m1macrophage
 
 	<element name="black_key">
 		<rect>
+			<bounds x="0" y="0" width="18" height="120"/>
+			<color red="0" green="0" blue="0"/>
+		</rect>
+		<rect>
+			<bounds x="2" y="0" width="14" height="118"/>
 			<color state="0" red="0.17" green="0.16" blue="0.18"/>
 			<color state="1" red="0.52" green="0.52" blue="0.54"/>
 		</rect>
@@ -148,98 +343,66 @@ copyright-holders:m1macrophage
 
 	<element name="white_key">
 		<rect>
+			<bounds x="0" y="0" width="28" height="185"/>
+			<color red="0" green="0" blue="0"/>
+		</rect>
+		<rect>
+			<bounds x="1" y="0" width="26" height="185"/>
 			<color state="0" red="0.92" green="0.92" blue="0.88"/>
 			<color state="1" red="0.71" green="0.71" blue="0.69"/>
 		</rect>
 	</element>
 
-	<group name="left_white_key">
-		<bounds width="28" height="185"/>
-		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="~key_mask~">
-			<bounds x="1" y="0" width="18" height="120"/>
-		</element>
-		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="~key_mask~">
-			<bounds x="1" y="120" width="26" height="65"/>
-		</element>
-	</group>
-
-	<group name="middle_white_key">
-		<bounds width="28" height="185"/>
-		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="~key_mask~">
-			<bounds x="9" y="0" width="10" height="120"/>
-		</element>
-		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="~key_mask~">
-			<bounds x="1" y="120" width="26" height="65"/>
-		</element>
-	</group>
-
-	<group name="right_white_key">
-		<bounds width="28" height="185"/>
-		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="~key_mask~">
-			<bounds x="9" y="0" width="18" height="120"/>
-		</element>
-		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="~key_mask~">
-			<bounds x="1" y="120" width="26" height="65"/>
-		</element>
-	</group>
-
 	<group name="keyboard_octave">
 		<bounds width="196" height="185"/>
 		<!-- C -->
-		<param name="key_mask" value="0x001"/>
-		<group ref="left_white_key">
+		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x001">
 			<bounds x="0" y="0" width="28" height="185"/>
-		</group>
-		<!-- C# -->
-		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x002">
-			<bounds x="20" y="0" width="16" height="118"/>
 		</element>
 		<!-- D -->
-		<param name="key_mask" value="0x004"/>
-		<group ref="middle_white_key">
+		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x004">
 			<bounds x="28" y="0" width="28" height="185"/>
-		</group>
-		<!-- D# -->
-		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x008">
-			<bounds x="48" y="0" width="16" height="118"/>
 		</element>
 		<!-- E -->
-		<param name="key_mask" value="0x010"/>
-		<group ref="right_white_key">
+		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x010">
 			<bounds x="56" y="0" width="28" height="185"/>
-		</group>
+		</element>
 		<!-- F -->
-		<param name="key_mask" value="0x020"/>
-		<group ref="left_white_key">
+		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x020">
 			<bounds x="84" y="0" width="28" height="185"/>
-		</group>
-		<!-- F# -->
-		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x040">
-			<bounds x="104" y="0" width="16" height="118"/>
 		</element>
 		<!-- G -->
-		<param name="key_mask" value="0x080"/>
-		<group ref="middle_white_key">
+		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x080">
 			<bounds x="112" y="0" width="28" height="185"/>
-		</group>
-		<!-- G# -->
-		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x100">
-			<bounds x="132" y="0" width="16" height="118"/>
 		</element>
 		<!-- A -->
-		<param name="key_mask" value="0x200"/>
-		<group ref="middle_white_key">
+		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x200">
 			<bounds x="140" y="0" width="28" height="185"/>
-		</group>
-		<!-- A# -->
-		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x400">
-			<bounds x="160" y="0" width="16" height="118"/>
 		</element>
 		<!-- B -->
-		<param name="key_mask" value="0x800"/>
-		<group ref="right_white_key">
+		<element ref="white_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x800">
 			<bounds x="168" y="0" width="28" height="185"/>
-		</group>
+		</element>
+		<!-- C# -->
+		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x002">
+			<bounds x="16" y="0" width="18" height="120"/>
+		</element>
+		<!-- D# -->
+		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x008">
+			<bounds x="50" y="0" width="18" height="120"/>
+		</element>
+		<!-- F# -->
+		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x040">
+			<bounds x="100" y="0" width="18" height="120"/>
+		</element>
+		<!-- G# -->
+		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x100">
+			<bounds x="131" y="0" width="18" height="120"/>
+		</element>
+		<!-- A# -->
+		<element ref="black_key" inputtag="keyboard_oct_~kb_oct~" inputmask="0x400">
+			<bounds x="162" y="0" width="18" height="120"/>
+		</element>
 	</group>
 
 	<element name="text_program">
@@ -293,17 +456,14 @@ copyright-holders:m1macrophage
 	<element name="text_rate">
 		<text string="RATE"><color red="0" green="0" blue="0"/></text>
 	</element>
-	<element name="text_square">
-		<text string="SQR"><color red="0" green="0" blue="0"/></text>
-	</element>
 	<element name="text_shape">
-		<text string="SHAPE"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="SHAPE"><color red="0.47" green="0.94" blue="0.99"/></text>
 	</element>
 	<element name="text_to_osc">
-		<text string="TO OSC"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="TO OSC"><color red="0.47" green="0.94" blue="0.99"/></text>
 	</element>
 	<element name="text_to_filter">
-		<text string="TO FILTER"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="TO FILTER"><color red="0.47" green="0.94" blue="0.99"/></text>
 	</element>
 	<element name="text_mod">
 		<text string="MOD"><color red="0.92" green="0.98" blue="0.98"/></text>
@@ -316,7 +476,7 @@ copyright-holders:m1macrophage
 		<text string="OSC 2"><color red="0.92" green="0.98" blue="0.98"/></text>
 	</element>
 	<element name="text_footage">
-		<text string="FOOTAGE"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="FOOTAGE"><color red="0.47" green="0.94" blue="0.99"/></text>
 	</element>
 	<element name="text_32f">
 		<text string="32'"><color red="0" green="0" blue="0"/></text>
@@ -328,22 +488,13 @@ copyright-holders:m1macrophage
 		<text string="8'"><color red="0" green="0" blue="0"/></text>
 	</element>
 	<element name="text_waveshape">
-		<text string="WAVESHAPE"><color red="0.92" green="0.98" blue="0.98"/></text>
-	</element>
-	<element name="text_saw">
-		<text string="SAW"><color red="0" green="0" blue="0"/></text>
-	</element>
-	<element name="text_triangle">
-		<text string="TRI"><color red="0" green="0" blue="0"/></text>
-	</element>
-	<element name="text_pulse">
-		<text string="PULSE"><color red="0" green="0" blue="0"/></text>
+		<text string="WAVESHAPE"><color red="0.47" green="0.94" blue="0.99"/></text>
 	</element>
 	<element name="text_sync">
-		<text string="SYNC"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="SYNC"><color red="0.47" green="0.94" blue="0.99"/></text>
 	</element>
 	<element name="text_2to1">
-		<text string="2 -> 1"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="2 -> 1"><color red="0.47" green="0.94" blue="0.99"/></text>
 	</element>
 	<element name="text_interval">
 		<text string="INTERVAL"><color red="0" green="0" blue="0"/></text>
@@ -388,11 +539,11 @@ copyright-holders:m1macrophage
 			<color red="0.92" green="0.98" blue="0.98"/>
 		</text>
 	</element>
-	<element name="text_kb_white">
-		<text string="KB"><color red="0.92" green="0.98" blue="0.98"/></text>
+	<element name="text_kb_cyan">
+		<text string="KB"><color red="0.47" green="0.94" blue="0.99"/></text>
 	</element>
 	<element name="text_track">
-		<text string="TRACK"><color red="0.92" green="0.98" blue="0.98"/></text>
+		<text string="TRACK"><color red="0.47" green="0.94" blue="0.99"/></text>
 	</element>
 	<element name="text_half">
 		<text string="1/2"><color red="0" green="0" blue="0"/></text>
@@ -546,10 +697,12 @@ copyright-holders:m1macrophage
 			<bounds x="796" y="235" width="12" height="193"/>
 		</element>
 
-		<!-- Program -->
-		<element ref="blue_box">
-			<bounds x="43" y="34" width="104" height="47"/>
+		<!-- Program, Volume and Incremental Control section. -->
+		<element ref="left_panel">
+			<bounds x="41" y="32" width="108" height="190"/>
 		</element>
+
+		<!-- Program -->
 		<element ref="text_program">
 			<bounds x="71" y="38" width="51" height="8"/>
 		</element>
@@ -570,9 +723,6 @@ copyright-holders:m1macrophage
 		</element>
 
 		<!-- Volume -->
-		<element ref="blue_box">
-			<bounds x="43" y="82" width="104" height="47"/>
-		</element>
 		<element ref="volume_knob">
 			<bounds x="52" y="89" width="30" height="30"/>
 		</element>
@@ -581,9 +731,6 @@ copyright-holders:m1macrophage
 		</element>
 
 		<!-- Incremental Control -->
-		<element ref="blue_box">
-			<bounds x="43" y="130" width="104" height="87"/>
-		</element>
 		<element ref="text_incremental">
 			<bounds x="44" y="137" width="67" height="7"/>
 		</element>
@@ -609,10 +756,12 @@ copyright-holders:m1macrophage
 			<bounds x="80" y="190" width="30" height="7"/>
 		</element>
 
-		<!-- Trigger -->
-		<element ref="blue_box">
-			<bounds x="241" y="37" width="52" height="69"/>
+		<!-- Trigger & Memory section. -->
+		<element ref="trigger_memory_box">
+			<bounds x="241" y="37" width="52" height="141"/>
 		</element>
+
+		<!-- Trigger -->
 		<element ref="yellow_button" inputtag="button_group_a_4" inputmask="0x08">
 			<bounds x="255" y="50" width="26" height="18"/>
 		</element>
@@ -622,26 +771,23 @@ copyright-holders:m1macrophage
 		<element ref="text_glide">
 			<bounds x="259" y="59" width="16" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_a_5" inputmask="0x04">
+		<element ref="cyan_button" inputtag="button_group_a_5" inputmask="0x04">
 			<bounds x="251" y="77" width="16" height="18"/>
 		</element>
 		<element ref="text_single">
 			<bounds x="253" y="83" width="12" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_a_5" inputmask="0x02">
+		<element ref="cyan_button" inputtag="button_group_a_5" inputmask="0x02">
 			<bounds x="269" y="77" width="16" height="18"/>
 		</element>
 		<element ref="text_multi">
 			<bounds x="270" y="83" width="13" height="6"/>
 		</element>
 		<element ref="text_trigger">
-			<bounds x="247" y="97" width="41" height="8"/>
+			<bounds x="244" y="97" width="46" height="8"/>
 		</element>
 
 		<!-- Memory -->
-		<element ref="blue_box">
-			<bounds x="241" y="108" width="52" height="69"/>
-		</element>
 		<element ref="orange_button" inputtag="button_group_a_4" inputmask="0x04">
 			<bounds x="258" y="113" width="20" height="21"/>
 		</element>
@@ -655,11 +801,11 @@ copyright-holders:m1macrophage
 			<bounds x="259" y="150" width="17" height="6"/>
 		</element>
 		<element ref="text_memory">
-			<bounds x="246" y="169" width="43" height="8"/>
+			<bounds x="244" y="169" width="46" height="8"/>
 		</element>
 
 		<!-- Mod -->
-		<element ref="blue_box">
+		<element ref="mod_box">
 			<bounds x="305" y="37" width="52" height="141"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_2" inputmask="0x04">
@@ -668,23 +814,20 @@ copyright-holders:m1macrophage
 		<element ref="text_rate">
 			<bounds x="325" y="56" width="12" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_a_4" inputmask="0x10">
+		<element ref="cyan_button" inputtag="button_group_a_4" inputmask="0x10">
 			<bounds x="315" y="77" width="16" height="18"/>
 		</element>
-		<element ref="text_triangle">
-			<bounds x="317" y="83" width="12" height="6"/>
+		<element ref="wave_triangle">
+			<bounds x="315" y="77" width="16" height="18"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_a_5" inputmask="0x10">
+		<element ref="cyan_button" inputtag="button_group_a_5" inputmask="0x10">
 			<bounds x="332" y="77" width="16" height="18"/>
 		</element>
-		<element ref="text_square">
-			<bounds x="334" y="83" width="12" height="6"/>
+		<element ref="wave_square">
+			<bounds x="332" y="77" width="16" height="18"/>
 		</element>
 		<element ref="text_shape">
-			<bounds x="323" y="96" width="15" height="6"/>
-		</element>
-		<element ref="black_box">
-			<bounds x="329" y="104" width="6" height="8"/>
+			<bounds x="310" y="96" width="42" height="6"/>
 		</element>
 		<element ref="off_button" inputtag="button_group_a_4" inputmask="0x02">
 			<bounds x="315" y="115" width="16" height="18"/>
@@ -693,7 +836,7 @@ copyright-holders:m1macrophage
 			<bounds x="332" y="115" width="16" height="18"/>
 		</element>
 		<element ref="text_to_osc">
-			<bounds x="322" y="134" width="16" height="6"/>
+			<bounds x="310" y="134" width="42" height="6"/>
 		</element>
 		<element ref="off_button" inputtag="button_group_a_3" inputmask="0x02">
 			<bounds x="315" y="144" width="16" height="18"/>
@@ -702,32 +845,34 @@ copyright-holders:m1macrophage
 			<bounds x="332" y="144" width="16" height="18"/>
 		</element>
 		<element ref="text_to_filter">
-			<bounds x="319" y="163" width="25" height="6"/>
+			<bounds x="310" y="163" width="42" height="6"/>
 		</element>
 		<element ref="text_mod">
-			<bounds x="320" y="169" width="23" height="8"/>
+			<bounds x="310" y="169" width="42" height="8"/>
+		</element>
+
+		<!-- Oscillator Bank section. -->
+		<element ref="osc_box">
+			<bounds x="368" y="37" width="168" height="141"/>
 		</element>
 
 		<!-- Osc 1 -->
-		<element ref="blue_box">
-			<bounds x="368" y="37" width="168" height="59"/>
-		</element>
 		<element ref="text_osc_1_white">
 			<bounds x="374" y="40" width="23" height="7"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_4" inputmask="0x08">
+		<element ref="cyan_button" inputtag="button_group_b_4" inputmask="0x08">
 			<bounds x="378" y="50" width="16" height="18"/>
 		</element>
 		<element ref="text_32f">
 			<bounds x="382" y="56" width="8" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_4" inputmask="0x10">
+		<element ref="cyan_button" inputtag="button_group_b_4" inputmask="0x10">
 			<bounds x="401" y="50" width="16" height="18"/>
 		</element>
 		<element ref="text_16f">
 			<bounds x="406" y="56" width="7" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_5" inputmask="0x08">>
+		<element ref="cyan_button" inputtag="button_group_b_5" inputmask="0x08">>
 			<bounds x="425" y="50" width="16" height="18"/>
 		</element>
 		<element ref="text_8f">
@@ -736,37 +881,31 @@ copyright-holders:m1macrophage
 		<element ref="text_footage">
 			<bounds x="398" y="69" width="22" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_5" inputmask="0x20">
+		<element ref="cyan_button" inputtag="button_group_b_5" inputmask="0x20">
 			<bounds x="456" y="50" width="16" height="18"/>
 		</element>
-		<element ref="text_saw">
-			<bounds x="458" y="56" width="12" height="6"/>
+		<element ref="wave_saw">
+			<bounds x="456" y="50" width="16" height="18"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_5" inputmask="0x10">
+		<element ref="cyan_button" inputtag="button_group_b_5" inputmask="0x10">
 			<bounds x="481" y="50" width="16" height="18"/>
 		</element>
-		<element ref="text_triangle">
-			<bounds x="483" y="56" width="12" height="6"/>
+		<element ref="wave_triangle">
+			<bounds x="481" y="50" width="16" height="18"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_3" inputmask="0x08">
 			<bounds x="503" y="50" width="26" height="18"/>
 		</element>
-		<element ref="text_pulse">
-			<bounds x="505" y="56" width="22" height="6"/>
+		<element ref="wave_pulse">
+			<bounds x="503" y="50" width="26" height="18"/>
 		</element>
 		<element ref="text_waveshape">
 			<bounds x="474" y="69" width="30" height="6"/>
 		</element>
 
 		<!-- Sync-->
-		<element ref="blue_box">  <!-- need to draw osc 2 box before sync -->
-			<bounds x="368" y="98" width="168" height="80"/>
-		</element>
 		<element ref="text_sync">
 			<bounds x="442" y="81" width="14" height="6"/>
-		</element>
-		<element ref="blue_box">
-			<bounds x="431" y="88" width="35" height="18"/>
 		</element>
 		<element ref="off_button" inputtag="button_group_b_5" inputmask="0x04">
 			<bounds x="432" y="88" width="16" height="18"/>
@@ -782,19 +921,19 @@ copyright-holders:m1macrophage
 		<element ref="text_osc_2_white">
 			<bounds x="374" y="100" width="23" height="7"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_a_3" inputmask="0x08">
+		<element ref="cyan_button" inputtag="button_group_a_3" inputmask="0x08">
 			<bounds x="378" y="115" width="16" height="18"/>
 		</element>
 		<element ref="text_32f">
 			<bounds x="382" y="121" width="8" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_4" inputmask="0x02">
+		<element ref="cyan_button" inputtag="button_group_b_4" inputmask="0x02">
 			<bounds x="401" y="115" width="16" height="18"/>
 		</element>
 		<element ref="text_16f">
 			<bounds x="406" y="121" width="7" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_5" inputmask="0x01">
+		<element ref="cyan_button" inputtag="button_group_b_5" inputmask="0x01">
 			<bounds x="425" y="115" width="16" height="18"/>
 		</element>
 		<element ref="text_8f">
@@ -803,23 +942,23 @@ copyright-holders:m1macrophage
 		<element ref="text_footage">
 			<bounds x="398" y="134" width="22" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_3" inputmask="0x04">
+		<element ref="cyan_button" inputtag="button_group_b_3" inputmask="0x04">
 			<bounds x="456" y="115" width="16" height="18"/>
 		</element>
-		<element ref="text_saw">
-			<bounds x="458" y="121" width="12" height="6"/>
+		<element ref="wave_saw">
+			<bounds x="456" y="115" width="16" height="18"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_4" inputmask="0x01">
+		<element ref="cyan_button" inputtag="button_group_b_4" inputmask="0x01">
 			<bounds x="481" y="115" width="16" height="18"/>
 		</element>
-		<element ref="text_triangle">
-			<bounds x="483" y="121" width="12" height="6"/>
+		<element ref="wave_triangle">
+			<bounds x="481" y="115" width="16" height="18"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_1" inputmask="0x04">
 			<bounds x="503" y="115" width="26" height="18"/>
 		</element>
-		<element ref="text_pulse">
-			<bounds x="505" y="121" width="22" height="6"/>
+		<element ref="wave_pulse">
+			<bounds x="503" y="115" width="26" height="18"/>
 		</element>
 		<element ref="text_waveshape">
 			<bounds x="474" y="134" width="30" height="6"/>
@@ -835,7 +974,7 @@ copyright-holders:m1macrophage
 		</element>
 
 		<!-- Mixer -->
-		<element ref="blue_box">
+		<element ref="mixer_box">
 			<bounds x="547" y="37" width="52" height="141"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_4" inputmask="0x20">
@@ -857,17 +996,19 @@ copyright-holders:m1macrophage
 			<bounds x="566" y="141" width="15" height="6"/>
 		</element>
 		<element ref="text_mixer">
-			<bounds x="557" y="169" width="33" height="8"/>
+			<bounds x="550" y="169" width="46" height="8"/>
+		</element>
+
+		<!-- Modifiers section -->
+		<element ref="modifiers_box">
+			<bounds x="611" y="37" width="139" height="141"/>
 		</element>
 
 		<!-- VCF -->
-		<element ref="blue_box">
-			<bounds x="611" y="37" width="139" height="68"/>
-		</element>
 		<element ref="text_vcf">
 			<bounds x="621" y="40" width="120" height="7"/>
 		</element>
-		<element ref="text_kb_white">
+		<element ref="text_kb_cyan">
 			<bounds x="639" y="48" width="7" height="5"/>
 		</element>
 		<element ref="text_track">
@@ -876,13 +1017,13 @@ copyright-holders:m1macrophage
 		<element ref="off_button" inputtag="button_group_b_1" inputmask="0x08">
 			<bounds x="621" y="48" width="16" height="18"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_3" inputmask="0x10">
+		<element ref="cyan_button" inputtag="button_group_b_3" inputmask="0x10">
 			<bounds x="621" y="67" width="16" height="18"/>
 		</element>
 		<element ref="text_half">
 			<bounds x="625" y="73" width="7" height="6"/>
 		</element>
-		<element ref="blue_button" inputtag="button_group_b_3" inputmask="0x20">
+		<element ref="cyan_button" inputtag="button_group_b_3" inputmask="0x20">
 			<bounds x="621" y="86" width="16" height="18"/>
 		</element>
 		<element ref="text_full">
@@ -909,72 +1050,87 @@ copyright-holders:m1macrophage
 		<element ref="text_amount">
 			<bounds x="719" y="76" width="19" height="6"/>
 		</element>
-		<element ref="black_box">
-			<bounds x="725" y="93" width="6" height="13"/>
-		</element>
 
 		<!-- Filter Contour -->
-		<element ref="blue_box">
-			<bounds x="611" y="107" width="139" height="33"/>
-		</element>
 		<element ref="text_filter_contour">
 			<bounds x="647" y="107" width="68" height="7"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_1" inputmask="0x01">
 			<bounds x="621" y="115" width="26" height="18"/>
 		</element>
+		<element ref="eg_attack">
+			<bounds x="621" y="115" width="26" height="18"/>
+		</element>
 		<element ref="text_attack">
-			<bounds x="630" y="120" width="8" height="8"/>
+			<bounds x="631" y="126" width="6" height="6"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_0" inputmask="0x04">
 			<bounds x="652" y="115" width="26" height="18"/>
 		</element>
+		<element ref="eg_decay">
+			<bounds x="652" y="115" width="26" height="18"/>
+		</element>
 		<element ref="text_decay">
-			<bounds x="661" y="120" width="8" height="8"/>
+			<bounds x="662" y="126" width="6" height="6"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_0" inputmask="0x20">
 			<bounds x="684" y="115" width="26" height="18"/>
 		</element>
+		<element ref="eg_sustain">
+			<bounds x="684" y="115" width="26" height="18"/>
+		</element>
 		<element ref="text_sustain">
-			<bounds x="693" y="120" width="8" height="8"/>
+			<bounds x="694" y="126" width="6" height="6"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_0" inputmask="0x10">
 			<bounds x="716" y="115" width="26" height="18"/>
 		</element>
+		<element ref="eg_release">
+			<bounds x="716" y="115" width="26" height="18"/>
+		</element>
 		<element ref="text_release">
-			<bounds x="725" y="120" width="8" height="8"/>
+			<bounds x="726" y="126" width="6" height="6"/>
 		</element>
 
 		<!-- Loudness Contour -->
-		<element ref="blue_box">
-			<bounds x="611" y="142" width="139" height="36"/>
-		</element>
 		<element ref="text_loudness_contour">
 			<bounds x="637" y="142" width="87" height="7"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_2" inputmask="0x02">
 			<bounds x="621" y="150" width="26" height="18"/>
 		</element>
+		<element ref="eg_attack">
+			<bounds x="621" y="150" width="26" height="18"/>
+		</element>
 		<element ref="text_attack">
-			<bounds x="630" y="155" width="8" height="8"/>
+			<bounds x="631" y="161" width="6" height="6"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_2" inputmask="0x01">
 			<bounds x="652" y="150" width="26" height="18"/>
 		</element>
+		<element ref="eg_decay">
+			<bounds x="652" y="150" width="26" height="18"/>
+		</element>
 		<element ref="text_decay">
-			<bounds x="661" y="155" width="8" height="8"/>
+			<bounds x="662" y="161" width="6" height="6"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_2" inputmask="0x20">
 			<bounds x="684" y="150" width="26" height="18"/>
 		</element>
+		<element ref="eg_sustain">
+			<bounds x="684" y="150" width="26" height="18"/>
+		</element>
 		<element ref="text_sustain">
-			<bounds x="693" y="155" width="8" height="8"/>
+			<bounds x="694" y="161" width="6" height="6"/>
 		</element>
 		<element ref="yellow_button" inputtag="button_group_b_2" inputmask="0x10">
 			<bounds x="716" y="150" width="26" height="18"/>
 		</element>
+		<element ref="eg_release">
+			<bounds x="716" y="150" width="26" height="18"/>
+		</element>
 		<element ref="text_release">
-			<bounds x="725" y="155" width="8" height="8"/>
+			<bounds x="726" y="161" width="6" height="6"/>
 		</element>
 		<element ref="text_modifiers">
 			<bounds x="654" y="169" width="54" height="8"/>
@@ -1041,8 +1197,8 @@ copyright-holders:m1macrophage
 			<bounds x="650" y="187" width="20" height="21"/>
 		</element>
 
-		<element ref="white_box">
-			<bounds x="676" y="196" width="11" height="1"/>
+		<element ref="level1_arrow">
+			<bounds x="673" y="194" width="17" height="5"/>
 		</element>
 		<element ref="orange_button" inputtag="button_group_b_0" inputmask="0x02">
 			<bounds x="690" y="187" width="20" height="21"/>
@@ -1053,11 +1209,8 @@ copyright-holders:m1macrophage
 		<element ref="text_1">
 			<bounds x="697" y="198" width="6" height="6"/>
 		</element>
-		<element ref="white_box">
-			<bounds x="676" y="182" width="49" height="1"/>
-		</element>
-		<element ref="white_box">
-			<bounds x="725" y="182" width="1" height="3"/>
+		<element ref="level2_arrow">
+			<bounds x="673" y="181" width="52" height="6"/>
 		</element>
 		<element ref="orange_button" inputtag="button_group_b_0" inputmask="0x01">
 			<bounds x="715" y="187" width="20" height="21"/>
@@ -1119,8 +1272,8 @@ copyright-holders:m1macrophage
 		</element>
 
 		<!-- Wheel section -->
-		<element ref="blue_box">
-			<bounds x="51" y="254" width="90" height="155"/>
+		<element ref="wheel_panel">
+			<bounds x="50" y="252" width="94" height="160"/>
 		</element>
 		<element ref="text_octave">
 			<bounds x="92" y="262" width="21" height="7"/>
@@ -1132,7 +1285,7 @@ copyright-holders:m1macrophage
 			<bounds x="75" y="272" width="22" height="22"/>
 		</element>
 		<element ref="text_0">
-			<bounds x="80" y="278" width="9" height="11"/>
+			<bounds x="81" y="278" width="10" height="10"/>
 		</element>
 		<element ref="led" name="octave_led_1">
 			<bounds x="114" y="257" width="8" height="8"/>
@@ -1141,7 +1294,7 @@ copyright-holders:m1macrophage
 			<bounds x="107" y="272" width="22" height="22"/>
 		</element>
 		<element ref="text_plus_1">
-			<bounds x="111" y="277" width="11" height="11"/>
+			<bounds x="113" y="278" width="10" height="10"/>
 		</element>
 		<element ref="text_mod_rate">
 			<bounds x="90" y="303" width="26" height="7"/>
@@ -1165,7 +1318,7 @@ copyright-holders:m1macrophage
 		<!-- Keyboard -->
 		<repeat count="3">
 			<param name="kb_oct" start="1" increment="1"/>
-			<param name="kb_x" start="176" increment="196"/>
+			<param name="kb_x" start="177" increment="196"/>
 			<group ref="keyboard_octave">
 				<bounds x="~kb_x~" y ="236" width="196" height="185"/>
 			</group>

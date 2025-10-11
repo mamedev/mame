@@ -217,19 +217,19 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7400, 0x757f).ram();
 
 	// Sound Control
-	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_startstop_r), FUNC(xavix_state::sound_startstop_w)); // r/w tested read/written 8 times in a row
-	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_updateenv_r), FUNC(xavix_state::sound_updateenv_w));
-	map(0x75f4, 0x75f5).r(FUNC(xavix_state::sound_sta16_r)); // related to 75f0 / 75f1 (read after writing there - rad_mtrk)
-	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_volume_r), FUNC(xavix_state::sound_volume_w)); // r/w tested
-	map(0x75f7, 0x75f7).w(FUNC(xavix_state::sound_regbase_w));
-	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::sound_75f8_r), FUNC(xavix_state::sound_75f8_w)); // r/w tested
-	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::sound_75f9_r), FUNC(xavix_state::sound_75f9_w));
-	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::sound_timer0_r), FUNC(xavix_state::sound_timer0_w)); // r/w tested
-	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_timer1_r), FUNC(xavix_state::sound_timer1_w)); // r/w tested
-	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_timer2_r), FUNC(xavix_state::sound_timer2_w)); // r/w tested
-	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_timer3_r), FUNC(xavix_state::sound_timer3_w)); // r/w tested
-	map(0x75fe, 0x75fe).rw(FUNC(xavix_state::sound_irqstatus_r), FUNC(xavix_state::sound_irqstatus_w));
-	map(0x75ff, 0x75ff).w(FUNC(xavix_state::sound_75ff_w));
+	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_voice_startstop_r), FUNC(xavix_state::sound_voice_startstop_w));
+	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_voice_updateenv_r), FUNC(xavix_state::sound_voice_updateenv_w));
+	map(0x75f4, 0x75f5).r(FUNC(xavix_state::sound_voice_status_r));
+	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_volume_r), FUNC(xavix_state::sound_volume_w));
+	map(0x75f7, 0x75f7).rw(FUNC(xavix_state::sound_regbase_r), FUNC(xavix_state::sound_regbase_w));
+	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::sound_cyclerate_r), FUNC(xavix_state::sound_cyclerate_w));
+	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::sound_mixer_r), FUNC(xavix_state::sound_mixer_w));
+	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::sound_tp0_r), FUNC(xavix_state::sound_tp0_w));
+	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_tp1_r), FUNC(xavix_state::sound_tp1_w));
+	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_tp2_r), FUNC(xavix_state::sound_tp2_w));
+	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_tp3_r), FUNC(xavix_state::sound_tp3_w));
+	map(0x75fe, 0x75fe).rw(FUNC(xavix_state::sound_irq_status_r), FUNC(xavix_state::sound_irq_status_w));
+	map(0x75ff, 0x75ff).rw(FUNC(xavix_state::sound_dac_control_r), FUNC(xavix_state::sound_dac_control_w));
 
 	// Slot Registers
 	map(0x7810, 0x7810).w(FUNC(xavix_state::slotreg_7810_w)); // startup
@@ -1583,17 +1583,15 @@ void xavix_state::xavix(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
-	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
-
 	XAVIX_ADC(config, m_adc, 0);
-	m_adc->read_0_callback().set(FUNC(xavix_state::adc0_r));
-	m_adc->read_1_callback().set(FUNC(xavix_state::adc1_r));
-	m_adc->read_2_callback().set(FUNC(xavix_state::adc2_r));
-	m_adc->read_3_callback().set(FUNC(xavix_state::adc3_r));
-	m_adc->read_4_callback().set(FUNC(xavix_state::adc4_r));
-	m_adc->read_5_callback().set(FUNC(xavix_state::adc5_r));
-	m_adc->read_6_callback().set(FUNC(xavix_state::adc6_r));
-	m_adc->read_7_callback().set(FUNC(xavix_state::adc7_r));
+	m_adc->read_0_callback().set_ioport("AN0");
+	m_adc->read_1_callback().set_ioport("AN1");
+	m_adc->read_2_callback().set_ioport("AN2");
+	m_adc->read_3_callback().set_ioport("AN3");
+	m_adc->read_4_callback().set_ioport("AN4");
+	m_adc->read_5_callback().set_ioport("AN5");
+	m_adc->read_6_callback().set_ioport("AN6");
+	m_adc->read_7_callback().set_ioport("AN7");
 
 	XAVIX_ANPORT(config, m_anport, 0);
 	m_anport->read_0_callback().set(FUNC(xavix_state::anport0_r));
@@ -1624,6 +1622,7 @@ void xavix_state::xavix(machine_config &config)
 	XAVIX_SOUND(config, m_sound, MAIN_CLOCK);
 	m_sound->read_regs_callback().set(FUNC(xavix_state::sound_regram_read_cb));
 	m_sound->read_samples_callback().set(FUNC(xavix_state::sample_read));
+	m_sound->write_regs_callback().set(FUNC(xavix_state::sound_regram_write_cb));
 	//m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_sound->add_route(0, "speaker", 1.0, 0);
 	m_sound->add_route(1, "speaker", 1.0, 1);
