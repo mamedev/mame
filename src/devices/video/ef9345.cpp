@@ -669,7 +669,7 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, boo
 	}
 	}
 
-	draw_char_80(pix, x, y);
+	draw_char_80(pix, x + 1, y + 1);
 }
 
 // generate 16 bits 40 columns char
@@ -769,8 +769,8 @@ void ef9345_device::makechar_12x80(uint16_t x, uint16_t y)
 		i &= 1;
 	bool cursor = iblock == 0x40 * i + (m_registers[7] & 0x3f);
 
-	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1, cursor && !cursor_odd);
-	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1, cursor && cursor_odd);
+	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x, y, cursor && !cursor_odd);
+	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 1, y, cursor && cursor_odd);
 }
 
 void ef9345_device::draw_border(uint16_t line)
@@ -1089,12 +1089,17 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	uint16_t i;
 
 	if (scanline == 250)
+	{
+		// We are past the end of the screen, clear the VSYNC flag.
 		m_state &= 0xfb;
+	}
 
 	// If we are interrupting a running command, delay its completion.
 	if (m_busy_timer->enabled())
 		m_busy_timer->adjust(m_busy_timer->remaining() + attotime::from_nsec(104000));
 
+	// Draw the margin at the left and right sides of the row we are about to update.
+	// Note: the row we are about to update is (scanline / 10) + 1.
 	if (m_char_mode == MODE12x80 || m_char_mode == MODE8x80)
 	{
 		draw_char_80(m_border, 0, (scanline / 10) + 1);
@@ -1108,8 +1113,13 @@ void ef9345_device::update_scanline(uint16_t scanline)
 
 	if (scanline == 0)
 	{
+		// Set the VSYNC flag.
 		m_state |= 0x04;
+
+		// Before starting with the first row of text, also draw a blank row as top margin.
 		draw_border(0);
+
+		// Update the first row of text.
 		if (m_pat & 1)
 		{
 			for (i = 0; i < 40; i++)
@@ -1123,6 +1133,7 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	}
 	else if (scanline < 120)
 	{
+		// Update the current row.
 		if (m_pat & 2)
 		{
 			for (i = 0; i < 40; i++)
@@ -1135,6 +1146,7 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	}
 	else if (scanline < 250)
 	{
+		// Update the current row.
 		if (m_variant == EF9345_MODE::TYPE_TS9347)
 		{
 			for (i = 0; i < 40; i++)
@@ -1151,6 +1163,9 @@ void ef9345_device::update_scanline(uint16_t scanline)
 			{
 				draw_border(scanline / 10);
 			}
+
+			// If we have just updated the last row of text, draw an extra blank row for the bottom
+			// margin.
 			if (scanline == 240)
 				draw_border(26);
 		}
