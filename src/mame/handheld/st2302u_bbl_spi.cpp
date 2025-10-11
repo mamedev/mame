@@ -445,6 +445,13 @@ ROM_START(toumapet)
 	ROM_LOAD("p25d32sh.bin", 0x000000, 0x400000, CRC(25498f00) SHA1(c5c410e29f540d7f1fd4bbb333467f8a3eaccc15) )
 ROM_END
 
+ROM_START(qpet)
+	INTERNAL_ROM_TYPE2 // not checked if it uses this ROM type
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("t25s16.bin", 0x000000, 0x200000, CRC(78a9c285) SHA1(73b0ebe1c88af79fae3357ab3cb4920d685a14f4) )
+ROM_END
+
 
 } // anonymous namespace
 
@@ -484,3 +491,4 @@ CONS( 201?, dphh8633,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl3
 // also has the 0xE4 XOR, also doesn't currently boot, could be yet another internal ROM
 CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
 
+CONS( 2020, qpet,          0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "M&D", "Q Pet (2nd version)", MACHINE_NOT_WORKING )

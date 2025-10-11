@@ -1322,6 +1322,12 @@ ROM_START( vtvsocr )
 	ROM_LOAD16_WORD_SWAP( "virtualtvsoccer.bin", 0x00000, 0x40000, CRC(2cfe42aa) SHA1(c2cafdbd5cc6491c94efd3f1be4b70c9de737b46) )
 ROM_END
 
+ROM_START( danzkara )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	// 8-bit ROM, but byteswapped for encryption?
+	ROM_LOAD16_WORD_SWAP( "bs-danz-r2.bin", 0x00000, 0x100000, CRC(806be92b) SHA1(07bad2f383dc578fa8fc83b0c1886001bf1d72b9) )
+ROM_END
+
 ROM_START( dancexpt )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "dancingexpert27c010.bin", 0x0000, 0x20000, CRC(658ba2ea) SHA1(c08f6a2735b3c7383cba3a5fa3af905d5af6926f) )
@@ -1389,6 +1395,7 @@ CONS( 200?, dancexpt, 0, 0, nes_clone_dancexpt, dancexpt, nes_clone_dancexpt_sta
 
 CONS( 200?, vtvsocr,     0,  0,  nes_clone_vtvsocr, nes_clone, nes_clone_vtvsocr_state, init_nes_clone, "<unknown>", "Virtual TV Soccer", MACHINE_NOT_WORKING )
 
+CONS( 200?, danzkara,  0,  0,  nes_clone_vtvsocr,    nes_clone, nes_clone_vtvsocr_state, init_nes_clone, "<unknown>", "DanZ Kara (BS-888)", MACHINE_NOT_WORKING )
 
 // in early 2000s LG TVs
 CONS( 200?, digezlg, 0, 0, nes_clone_dnce2000, digezlg, nes_clone_dnce2000_state, init_nes_clone, "LG", "Digital ez LG", MACHINE_NOT_WORKING )
