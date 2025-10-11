@@ -3,6 +3,7 @@
 license:CC0-1.0
 copyright-holders:m1macrophage
 -->
+
 <mamelayout version="2">
 
 	<element name="black_box">
@@ -37,7 +38,7 @@ copyright-holders:m1macrophage
 				<rect fill="#00a3fc" stroke="#45474a" stroke-width="2" x="1" y="1" width="92" height="158" rx="3" ry="3"/>
 
 				<!-- Pitch wheel arrows. -->
-				<g id="arrow" transform="translate(13, 82)">
+				<g transform="translate(13, 82)">
 					<polygon fill="#d1e0e0" points="0,0 2,5 -2,5"/>
 					<line stroke="#d1e0e0" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
 				</g>
