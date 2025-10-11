@@ -699,8 +699,22 @@ TILE_GET_INFO_MEMBER(seibuspi_tilemap_state::get_fore_tile_info)
 }
 
 
+void seibuspi_base_state::video_start()
+{
+	m_gfxdecode->gfx(0)->set_granularity(1 << m_sprite_bpp);
+
+	save_item(NAME(m_video_dma_length));
+	save_item(NAME(m_video_dma_address));
+	save_item(NAME(m_layer_enable));
+
+	save_pointer(NAME(m_palette_ram), m_palette_ram_size/4);
+	save_pointer(NAME(m_sprite_ram), m_sprite_ram_size/4);
+}
+
 void seibuspi_tilemap_state::video_start()
 {
+	seibuspi_base_state::video_start();
+
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;
 	m_layer_enable = 0;
@@ -769,51 +783,6 @@ void seibuspi_tilemap_state::video_start()
 	memset(m_alpha_table + 0x1600 + 0x170, 1, 0x10);
 	memset(m_alpha_table + 0x1600 + 0x1f0, 1, 0x10);
 
-	register_tilemap_state();
-}
-
-VIDEO_START_MEMBER(seibuspi_state,ejanhs)
-{
-	seibuspi_state::video_start();
-
-	memset(m_alpha_table, 0, 0x2000); // no alpha blending
-}
-
-void sys386f_state::video_start()
-{
-	m_video_dma_length = 0;
-	m_video_dma_address = 0;
-	m_layer_enable = 0;
-
-	m_palette_ram_size = 0x4000;
-	m_sprite_ram_size = 0x2000;
-	m_sprite_bpp = 8;
-
-	m_palette_ram = make_unique_clear<u32[]>(m_palette_ram_size/4);
-	m_sprite_ram = make_unique_clear<u32[]>(m_sprite_ram_size/4);
-
-	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
-
-	memset(m_alpha_table, 0, 0x2000); // no alpha blending
-
-	register_video_state();
-}
-
-void seibuspi_base_state::register_video_state()
-{
-	m_gfxdecode->gfx(0)->set_granularity(1 << m_sprite_bpp);
-	save_item(NAME(m_video_dma_length));
-	save_item(NAME(m_video_dma_address));
-	save_item(NAME(m_layer_enable));
-
-	save_pointer(NAME(m_palette_ram), m_palette_ram_size/4);
-	save_pointer(NAME(m_sprite_ram), m_sprite_ram_size/4);
-}
-
-void seibuspi_tilemap_state::register_tilemap_state()
-{
-	register_video_state();
-
 	save_item(NAME(m_layer_bank));
 	save_item(NAME(m_rf2_layer_bank));
 	save_item(NAME(m_rowscroll_enable));
@@ -828,4 +797,31 @@ void seibuspi_tilemap_state::register_tilemap_state()
 	save_item(NAME(m_fore_layer_d14));
 
 	save_pointer(NAME(m_tilemap_ram), m_tilemap_ram_size/4);
+}
+
+VIDEO_START_MEMBER(seibuspi_state,ejanhs)
+{
+	seibuspi_state::video_start();
+
+	memset(m_alpha_table, 0, 0x2000); // no alpha blending
+}
+
+void sys386f_state::video_start()
+{
+	seibuspi_base_state::video_start();
+
+	m_video_dma_length = 0;
+	m_video_dma_address = 0;
+	m_layer_enable = 0;
+
+	m_palette_ram_size = 0x4000;
+	m_sprite_ram_size = 0x2000;
+	m_sprite_bpp = 8;
+
+	m_palette_ram = make_unique_clear<u32[]>(m_palette_ram_size/4);
+	m_sprite_ram = make_unique_clear<u32[]>(m_sprite_ram_size/4);
+
+	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
+
+	memset(m_alpha_table, 0, 0x2000); // no alpha blending
 }
