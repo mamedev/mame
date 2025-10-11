@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="mz800_rom" description="MZ-800 ROM cards">
+
+	<software name="rcunk" supported="no">
+		<description>Unknown ROM card</description>
+		<year>1991</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="mz800_rom">
+			<dataarea name="rom" size="0x10000">
+				<rom name="rom_00.bin" size="0x10000" crc="0e4e7053" sha1="6fafaf01b3c17053bddf9e4bb4412261b86d122b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rcsharp" supported="no">
+		<description>ROM Card (Sharpsoft, v1.1)</description>
+		<year>????</year>
+		<publisher>Sharpsoft</publisher>
+		<part name="rom" interface="mz800_rom">
+			<dataarea name="rom" size="0x10000">
+				<rom name="rom_01.bin" size="0x10000" crc="f1742311" sha1="947bc45d4b9d93d1cfac675ee44480920bfcd245"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rcfaix" supported="no">
+		<description>ROM Karta Číslo 004 (Faixsoft)</description>
+		<year>????</year>
+		<publisher>Faixsoft</publisher>
+		<part name="rom" interface="mz800_rom">
+			<dataarea name="rom" size="0x10000">
+				<rom name="rom_02.bin" size="0x10000" crc="4ada4dfa" sha1="19d86665974ea4fdc600263b3aa45089bedb9427"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspepack" supported="no">
+		<description>ROM-Pack (MSPEsoft, v1.04)</description>
+		<year>????</year>
+		<publisher>MSPEsoft</publisher>
+		<part name="rom" interface="mz800_rom">
+			<dataarea name="rom" size="0x10000">
+				<rom name="rom_03.bin" size="0x10000" crc="9415b1ea" sha1="7fb3003781ba2430db460b7e4b319e78f70211f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
