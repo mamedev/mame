@@ -444,6 +444,11 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 					m_curattr |= AT_UNDERLINE;
 					break;
 
+				case 0xd5:  // move curser one step left
+					if (m_cursx > 0)
+						m_cursx -= 1;
+					break;
+
 				case 0xd6:  // clear screen
 					m_vfd->clear();
 					m_external_panel->clear_display();
@@ -470,7 +475,7 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 					break;
 
 				default:
-					// LOG("Unknown control code %02x\n", data);
+					LOG("Unknown control code %02x\n", data);
 					break;
 			}
 		}
@@ -478,8 +483,8 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 		{
 			if ((data >= 0x20) && (data <= 0x5f))
 			{
-				m_vfd->set_char(m_cursy, m_cursx, data - ' ', m_curattr);
-				m_external_panel->set_char(m_cursy, m_cursx, data - ' ', m_curattr);
+				m_vfd->set_char(m_cursy, m_cursx, data, m_curattr);
+				m_external_panel->set_char(m_cursy, m_cursx, data, m_curattr);
 
 				m_cursx++;
 
