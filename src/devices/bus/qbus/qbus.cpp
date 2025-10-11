@@ -11,6 +11,8 @@
 #include "qbus.h"
 
 // Peripheral boards
+
+// storage
 #include "bk_kmd.h"
 #include "dsd4432.h"
 #include "dvk_kgd.h"
@@ -22,13 +24,19 @@
 #include "tdl12.h"
 #include "uknc_kmd.h"
 
+// serial ports
+#include "bk_irps.h"
+#include "dvk_ktlk.h"
+
 
 void qbus_cards(device_slot_interface &device)
 {
 	device.option_add("pc11", DEC_PC11); /* Paper tape reader and punch */
 	device.option_add("qts1", TTI_QTS1);
 	device.option_add("dsd4432", DSD4432);
+	device.option_add("irps", BK_IRPS);
 	device.option_add("kgd", DVK_KGD);
+	device.option_add("ktlk", DVK_KTLK);
 	device.option_add("mx", DVK_MX);
 	device.option_add("my", DVK_KMD);
 	device.option_add("mz", UKNC_KMD);
