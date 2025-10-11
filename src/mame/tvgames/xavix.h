@@ -9,7 +9,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/bankdev.h"
 #include "machine/i2cmem.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -161,7 +160,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
-		m_an_in(*this, "AN%u", 0U),
 		m_mouse0x(*this, "MOUSE0X"),
 		m_mouse0y(*this, "MOUSE0Y"),
 		m_mouse1x(*this, "MOUSE1X"),
@@ -170,7 +168,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
-		m_lowbus(*this, "lowbus"),
 		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
@@ -301,7 +298,6 @@ protected:
 
 	required_ioport m_in0;
 	required_ioport m_in1;
-	required_ioport_array<8> m_an_in;
 	optional_ioport m_mouse0x;
 	optional_ioport m_mouse0y;
 	optional_ioport m_mouse1x;
@@ -310,7 +306,6 @@ protected:
 	required_device<xavix_device> m_maincpu;
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
-	required_device<address_map_bank_device> m_lowbus;
 	address_space* m_cpuspace = nullptr;
 
 	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
@@ -354,7 +349,7 @@ protected:
 		}
 		else
 		{
-			return m_lowbus->read8(offset & 0x7fff);
+			return m_maincpu->space(5).read_byte(offset & 0x7fff);
 		}
 	}
 
@@ -581,15 +576,6 @@ protected:
 		return 0xff;
 	}
 
-
-	uint8_t adc0_r() { return m_an_in[0]->read(); }
-	uint8_t adc1_r() { return m_an_in[1]->read(); }
-	uint8_t adc2_r() { return m_an_in[2]->read(); }
-	uint8_t adc3_r() { return m_an_in[3]->read(); }
-	uint8_t adc4_r() { return m_an_in[4]->read(); }
-	uint8_t adc5_r() { return m_an_in[5]->read(); }
-	uint8_t adc6_r() { return m_an_in[6]->read(); }
-	uint8_t adc7_r() { return m_an_in[7]->read(); }
 
 	uint8_t anport0_r() { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; }
 	uint8_t anport1_r() { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; }
@@ -1123,7 +1109,7 @@ protected:
 		}
 		else
 		{
-			return m_lowbus->read8(offset & 0x7fff);
+			return m_maincpu->space(5).read_byte(offset & 0x7fff);
 		}
 	}
 

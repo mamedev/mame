@@ -11837,7 +11837,8 @@ license:CC0-1.0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="exp" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
@@ -11863,7 +11864,8 @@ license:CC0-1.0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="exp" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-N-128-02" />
@@ -11889,7 +11891,8 @@ license:CC0-1.0
 		<info name="serial" value="HVC-VT"/>
 		<info name="release" value="19850221"/>
 		<info name="alt_title" value="ファミリーベーシックV3"/>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="exp" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="VT-N-256-41" />
@@ -12156,6 +12159,7 @@ license:CC0-1.0
 		<info name="serial" value="FT-01"/>
 		<info name="release" value="19861112"/>
 		<info name="alt_title" value="ファミリートレーナー① アスレチックワールド"/>
+		<sharedfeat name="compatibility" value="exp" />
 		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
@@ -12177,6 +12181,7 @@ license:CC0-1.0
 		<info name="serial" value="FT-01"/>
 		<info name="release" value="19861112"/>
 		<info name="alt_title" value="ファミリートレーナー① アスレチックワールド"/>
+		<sharedfeat name="compatibility" value="exp" />
 		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
@@ -12198,6 +12203,7 @@ license:CC0-1.0
 		<info name="serial" value="FT-02"/>
 		<info name="release" value="19861223"/>
 		<info name="alt_title" value="ファミリートレーナー② ランニングスタジアム"/>
+		<sharedfeat name="compatibility" value="exp" />
 		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
@@ -12219,6 +12225,7 @@ license:CC0-1.0
 		<info name="serial" value="FT-03"/>
 		<info name="release" value="19870226"/>
 		<info name="alt_title" value="ファミリートレーナー③ エアロビスタジオ"/>
+		<sharedfeat name="compatibility" value="exp" />
 		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bandai_pt554" />
@@ -12244,6 +12251,7 @@ license:CC0-1.0
 		<info name="serial" value="FT-04"/>
 		<info name="release" value="19870528"/>
 		<info name="alt_title" value="ファミリートレーナー④ ジョギングレース"/>
+		<sharedfeat name="compatibility" value="exp" />
 		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
@@ -12265,6 +12273,7 @@ license:CC0-1.0
 		<info name="serial" value="FT-05"/>
 		<info name="release" value="19870731"/>
 		<info name="alt_title" value="ファミリートレーナー⑤ 迷路大作戦"/>
+		<sharedfeat name="compatibility" value="exp" />
 		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x161" />
@@ -12286,6 +12295,7 @@ license:CC0-1.0
 		<info name="serial" value="FT-07"/>
 		<info name="release" value="19871127"/>
 		<info name="alt_title" value="ファミリートレーナー⑦ ファミトレ大運動会"/>
+		<sharedfeat name="compatibility" value="exp" />
 		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
@@ -12307,6 +12317,7 @@ license:CC0-1.0
 		<info name="serial" value="FT-08"/>
 		<info name="release" value="19871201"/>
 		<info name="alt_title" value="ファミリートレーナー⑧ 突撃!風雲たけし城"/>
+		<sharedfeat name="compatibility" value="exp" />
 		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
@@ -12328,6 +12339,7 @@ license:CC0-1.0
 		<info name="serial" value="FT-09"/>
 		<info name="release" value="19881220"/>
 		<info name="alt_title" value="ファミリートレーナー⑨ 風雲たけし城二"/>
+		<sharedfeat name="compatibility" value="exp" />
 		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gxrom" />
@@ -44345,7 +44357,8 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V1.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="exp" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="mirroring" value="vertical" />
@@ -44366,7 +44379,8 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V0.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="exp" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb" value="HVC-FAMILYBASIC" />
@@ -46849,7 +46863,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
-		<sharedfeat name="exp_default" value="fc_keyboard"/>
+		<sharedfeat name="compatibility" value="exp" />
+		<sharedfeat name="exp_default" value="fc_keyboard" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
@@ -46889,6 +46904,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>Family Trainer 10 - Rairai Kyonshiizu - Baby Kyonshii no Amida Daibouken (Japan, prototype)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
+		<sharedfeat name="compatibility" value="exp" />
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
@@ -46910,6 +46927,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="FT-10"/>
 		<info name="release" value="19890131"/>
 		<info name="alt_title" value="来来キョンシーズ ベビーキョンシーのあみだ大冒険"/>
+		<sharedfeat name="compatibility" value="exp" />
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
@@ -46924,6 +46943,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+
 	<software name="train6mp" cloneof="streetcp">
 		<description>Family Trainer 6 - Manhattan Police (Japan)</description>
 		<year>1987</year>
@@ -46931,6 +46951,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="FT-06"/>
 		<info name="release" value="19870801"/>
 		<info name="alt_title" value="ファミリートレーナー⑥ マンハッタンポリス"/>
+		<sharedfeat name="compatibility" value="exp" />
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />

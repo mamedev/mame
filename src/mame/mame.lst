@@ -17725,6 +17725,7 @@ funkyfig
 funkyfiga
 hanakanz
 hginga
+hgingaa
 hgokbang
 hgokou
 hgokoua
@@ -43555,6 +43556,9 @@ fc100
 
 @source:skeleton/fk1.cpp
 fk1
+
+@source:skeleton/flashgun.cpp
+flashgun
 
 @source:skeleton/flashvga2.cpp
 ruletamag

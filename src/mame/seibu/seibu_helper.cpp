@@ -9,7 +9,7 @@
 
 // add two numbers generating carry from one bit to the next only if
 // the corresponding bit in carry_mask is 1
-u32 partial_carry_sum(u32 add1, u32 add2, u32 carry_mask, int bits)
+u32 seibu_partial_carry_sum(u32 add1, u32 add2, u32 carry_mask, int bits)
 {
 	int res = 0;
 	int carry = 0;
@@ -33,12 +33,12 @@ u32 partial_carry_sum(u32 add1, u32 add2, u32 carry_mask, int bits)
 	return res;
 }
 
-u32 partial_carry_sum32(u32 add1, u32 add2, u32 carry_mask)
+u32 seibu_partial_carry_sum32(u32 add1, u32 add2, u32 carry_mask)
 {
-	return partial_carry_sum(add1, add2, carry_mask, 32);
+	return seibu_partial_carry_sum(add1, add2, carry_mask, 32);
 }
 
-u32 partial_carry_sum24(u32 add1, u32 add2, u32 carry_mask)
+u32 seibu_partial_carry_sum24(u32 add1, u32 add2, u32 carry_mask)
 {
-	return partial_carry_sum(add1, add2, carry_mask, 24);
+	return seibu_partial_carry_sum(add1, add2, carry_mask, 24);
 }

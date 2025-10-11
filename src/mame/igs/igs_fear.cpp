@@ -626,22 +626,18 @@ ROM_START( mjzb ) // IGS PCB-0433-04-GK - Has IGS027A, MX10EXAQC, 2x Actel A54SX
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
 	ROM_LOAD( "a9.u38", 0x000000, 0x10000, CRC(7dae4900) SHA1(bbf7ba7c9e95ff2ffeb1dc0fc7ccedd4da274d01) ) // same as icescape
 
-	// The GFX ROMs are underdumped
+	// 3 of the GFX ROMs are underdumped
 	ROM_REGION( 0x2000000, "gfx1", ROMREGION_ERASE00 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp).
+	// u7 is probably correct, leaving as bad dump due to having to hand fix the address lines
+	ROM_LOAD32_WORD( "mjzb_cg_u7.u7",   0x0000000, 0x800000, BAD_DUMP CRC(9a09b5d9) SHA1(63e90da4cbe0ccb6823fcbd9433c0022f6edb771) )
 
-	// first 0x100000 block is missing
-	ROM_LOAD32_WORD( "mjzb_cg_u7_part2.u7", 0x0200000, 0x100000, BAD_DUMP CRC(2573cd2a) SHA1(1b50bad9d4663c961f13414d91e46bc9741ac6de) )
-	// blocks 3-5 are missing
-	ROM_LOAD32_WORD( "mjzb_cg_u7_part6.u7", 0x0a00000, 0x100000, BAD_DUMP CRC(87e81846) SHA1(76a977cc48dd10cb215d597f69192a37d7b1e04f) )
-	// blocks 7-8 are missing
-
-	// for u6 we only have the 6th 0x100000 block
+	// for u6 we only have the 6th 0x100000 block and the ROM chip is broken
 	ROM_LOAD32_WORD( "mjzb_cg_u6.u6",   0x0a00002, 0x100000, BAD_DUMP CRC(b2aeb4a1) SHA1(c5c73d340164a9e1a60a3519633550596e0ca00f) )
 
-	// for u14 we only have the 6th 0x100000 block
+	// for u14 we only have the 6th 0x100000 block and the ROM chip is broken
 	ROM_LOAD32_WORD( "mjzb_cg_u14.u14", 0x1a00000, 0x100000, BAD_DUMP CRC(f96d6c81) SHA1(b9db6ed0ed9f311090506ef1286bf5d3c71fea78) )
 
-	// for u13 we only have the 6th 0x100000 block
+	// for u13 we only have the 6th 0x100000 block and the ROM chip is broken
 	ROM_LOAD32_WORD( "mjzb_cg_u13.u13", 0x1a00002, 0x100000, BAD_DUMP CRC(d427b001) SHA1(417a891564accd5d70c6827ba5bd481587c72954) )
 
 	// u17 and u18 not populated
