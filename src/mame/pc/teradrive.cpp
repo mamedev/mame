@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
-// thanks-to: Mask of Destiny, Nemesis, Sik
+// thanks-to: Mask of Destiny, Nemesis, Sik, ICEknight
 /**************************************************************************************************
 
 Sega Teradrive
@@ -20,6 +20,7 @@ References (generic MD):
 - https://segaretro.org/Sega_Mega_Drive/VDP_general_usage
 - https://segaretro.org/Sega_Mega_Drive/Technical_specifications
 - https://gendev.spritesmind.net/forum/viewtopic.php?p=37011#p37011
+- https://github.com/jsgroth/jgenesis/wiki/Tricky%E2%80%90to%E2%80%90Emulate-Games#genesis
 
 NOTES (PC side):
 - F1 at POST will bring a setup menu;
@@ -33,6 +34,7 @@ NOTES (MD side):
 - has discrete YM3438 in place of YM2612
 - Mega CD expansion port working with DIY extension cable, 32x needs at least a passive cart adapter
 - focus 3 in debugger is the current default for MD side
+- bp ff0122,1,{fill 0xff8100,4,"SEGA";g} to bypass TMSS loading for games without a valid header
 - MAME inability of handling differing refresh rates causes visible tearing in MD screen
   (cfr. koteteik intro). A partial workaround is to use Video mode = composite, so that
   VGA will downclock to ~60 Hz instead.
@@ -42,10 +44,19 @@ TODO:
 - Quadtel EMM driver fails recognizing WD76C10 chipset with drv4;
 - Cannot HDD format with floppy insthdd.bat, cannot boot from HDD (needs floppy first).
   Attached disk is a WDL-330PS with no geometry info available;
-- MD side cart slot, expansion bay and VDP rewrites (WIP);
 - TMSS unlock and respective x86<->MD bus grants are sketchy;
 - SEGA TERADRIVE テラドライブ ユーザーズマニュアル known to exist (not scanned yet)
 - "TIMER FAIL" when exiting from F1 setup menu (keyboard? reset from chipset?);
+- dual boot not yet handled;
+
+TODO (MD side):
+- some games (orunnersj, timekillu, rhythmld and late SGDK games) fails on Z80 bus request stuff;
+- dashdes: is a flickerfest during gameplay;
+- sonic2/combatca: no interlace support in 2-players mode;
+- dheadj: scrolling issues in stage 4-1 (blocks overflowing with );
+- shangon/skitchin: one line off during gameplay;
+- caesar: no sound;
+- gynougj: stray tile on top-left of title screen;
 
 **************************************************************************************************/
 
