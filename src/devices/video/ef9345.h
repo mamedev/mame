@@ -61,7 +61,6 @@ protected:
 
 	// inline helpers
 	inline uint16_t indexram(uint8_t r);
-	inline uint16_t indexrom(uint8_t r);
 	inline void inc_x(uint8_t r);
 	inline void inc_y(uint8_t r);
 
