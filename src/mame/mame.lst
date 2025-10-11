@@ -43557,6 +43557,9 @@ fc100
 @source:skeleton/fk1.cpp
 fk1
 
+@source:skeleton/flashgun.cpp
+flashgun
+
 @source:skeleton/flashvga2.cpp
 ruletamag
 
