@@ -577,8 +577,8 @@ ROM_START( minitel2 )
 	ROM_SYSTEM_BIOS(2, "ft_bv9", "Minitel 2 ROM Bv9")
 	ROMX_LOAD( "bv9.1402",           0x0000, 0x8000, CRC(ace5d65e) SHA1(c8d589f8af6bd7d339964fdece937a76db972115), ROM_BIOS(2) )
 
-	ROM_REGION( 0x4000, "ts9347", 0 )
-	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
+	ROM_REGION( 0x2000, "ts9347", 0 )
+	ROM_LOAD( "ts9347.bin", 0x0000, 0x2000, CRC(acff72e7) SHA1(54c8b6f5b6407f13a933a40b5b7742ca06cdc1a3) )
 ROM_END
 
 } // anonymous namespace
