@@ -53,6 +53,8 @@ protected:
 	u8 m_alpha_table[0x2000]{};
 	u32 m_sprite_bpp = 0;
 
+	virtual void video_start() override ATTR_COLD;
+
 	void palette_dma_start_w(u32 data);
 	void sprite_dma_start_w(u16 data);
 	void video_dma_length_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -67,8 +69,6 @@ protected:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	INTERRUPT_GEN_MEMBER(interrupt);
-
-	void register_video_state() ATTR_COLD;
 
 	void rise_map(address_map &map) ATTR_COLD;
 };
@@ -150,8 +150,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_midl_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	u32 screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void register_tilemap_state() ATTR_COLD;
 
 	void rdft2_text_decrypt(u8 *rom) ATTR_COLD;
 	void rdft2_bg_decrypt(u8 *rom, int size) ATTR_COLD;
