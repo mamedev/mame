@@ -5,9 +5,13 @@
     Seibu SPI hardware
 
 ******************************************************************************/
+#ifndef MAME_SEIBU_SEIBUSPI_H
+#define MAME_SEIBU_SEIBUSPI_H
 
-#include "machine/eepromser.h"
+#pragma once
+
 #include "machine/7200fifo.h"
+#include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 
 #include "sound/okim6295.h"
@@ -29,8 +33,6 @@ protected:
 		, m_key(*this, "KEY%u", 0)
 		, m_special(*this, "SPECIAL")
 	{ }
-
-	virtual void machine_start() override ATTR_COLD {}
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u32> m_mainram;
@@ -66,7 +68,7 @@ protected:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	void register_video_state();
+	void register_video_state() ATTR_COLD;
 
 	void rise_map(address_map &map) ATTR_COLD;
 };
@@ -81,7 +83,7 @@ public:
 
 	void sys386f(machine_config &config) ATTR_COLD;
 
-	void init_sys386f();
+	void init_sys386f() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -104,12 +106,10 @@ public:
 		: seibuspi_base_state(mconfig, type, tag)
 	{ }
 
-	void init_rdft22kc();
-	void init_rfjet2kc();
+	void init_rdft22kc() ATTR_COLD;
+	void init_rfjet2kc() ATTR_COLD;
 
 protected:
-	virtual void video_start() override ATTR_COLD;
-
 	tilemap_t *m_text_layer = nullptr;
 	tilemap_t *m_back_layer = nullptr;
 	tilemap_t *m_midl_layer = nullptr;
@@ -128,6 +128,8 @@ protected:
 	std::unique_ptr<u32[]> m_tilemap_ram;
 	u32 m_tilemap_ram_size = 0;
 	u32 m_bg_fore_layer_position = 0;
+
+	virtual void video_start() override ATTR_COLD;
 
 	void tile_decrypt_key_w(u16 data);
 	void layer_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -149,15 +151,15 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	u32 screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void register_tilemap_state();
+	void register_tilemap_state() ATTR_COLD;
 
-	void rdft2_text_decrypt(u8 *rom);
-	void rdft2_bg_decrypt(u8 *rom, int size);
+	void rdft2_text_decrypt(u8 *rom) ATTR_COLD;
+	void rdft2_bg_decrypt(u8 *rom, int size) ATTR_COLD;
 
-	void rfjet_text_decrypt(u8 *rom);
-	void rfjet_bg_decrypt(u8 *rom, int size);
+	void rfjet_text_decrypt(u8 *rom) ATTR_COLD;
+	void rfjet_bg_decrypt(u8 *rom, int size) ATTR_COLD;
 
-	void base_video(machine_config &config);
+	void base_video(machine_config &config) ATTR_COLD;
 
 	void base_map(address_map &map) ATTR_COLD;
 };
@@ -197,15 +199,12 @@ public:
 	void sxx2f(machine_config &config) ATTR_COLD;
 	void sxx2g(machine_config &config) ATTR_COLD;
 
-	void init_rdft();
-	void init_rdft2();
-	void init_rfjet();
-	void init_sei252();
+	void init_rdft() ATTR_COLD;
+	void init_rdft2() ATTR_COLD;
+	void init_rfjet() ATTR_COLD;
+	void init_sei252() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 	required_device<cpu_device> m_audiocpu;
 	optional_device_array<fifo7200_device, 2> m_soundfifo;
 
@@ -222,14 +221,17 @@ protected:
 	u8 z80_soundfifo_status_r();
 	void z80_bank_w(u8 data);
 
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	u32 rdft_speedup_r();
 
 	void ymf_irqhandler(int state);
 
-	void init_spi_common();
+	void init_spi_common() ATTR_COLD;
 
-	void text_decrypt(u8 *rom);
-	void bg_decrypt(u8 *rom, int size);
+	void text_decrypt(u8 *rom) ATTR_COLD;
+	void bg_decrypt(u8 *rom, int size) ATTR_COLD;
 
 	void sei252_map(address_map &map) ATTR_COLD;
 	void sxx2e_map(address_map &map) ATTR_COLD;
@@ -251,12 +253,12 @@ public:
 	void rdft2(machine_config &config) ATTR_COLD;
 	void spi(machine_config &config) ATTR_COLD;
 
-	void init_batlball();
-	void init_ejanhs();
-	void init_senkyu();
-	void init_senkyua();
-	void init_viprp1();
-	void init_viprp1o();
+	void init_batlball() ATTR_COLD;
+	void init_ejanhs() ATTR_COLD;
+	void init_senkyu() ATTR_COLD;
+	void init_senkyua() ATTR_COLD;
+	void init_viprp1() ATTR_COLD;
+	void init_viprp1o() ATTR_COLD;
 
 	template <int N> ioport_value ejanhs_encode();
 
@@ -288,3 +290,5 @@ private:
 	void spi_soundmap(address_map &map) ATTR_COLD;
 	void spi_ymf271_map(address_map &map) ATTR_COLD;
 };
+
+#endif // MAME_SEIBU_SEIBUSPI_H
