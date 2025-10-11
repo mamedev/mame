@@ -1708,6 +1708,8 @@ IRQ_CALLBACK_MEMBER(seibuspi_base_state::irq_callback)
 
 void seibuspi_z80_state::machine_reset()
 {
+	seibuspi_tilemap_state::machine_reset();
+
 	m_z80_bank->set_entry(0);
 	m_z80_lastbank = 0;
 	m_sb_coin_latch = 0;
@@ -1760,13 +1762,13 @@ void seibuspi_state::machine_start()
 
 void seibuspi_state::machine_reset()
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
 	seibuspi_z80_state::machine_reset();
+
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_z80_prg_transfer_pos = 0;
 
-	// fix the magic ID byte so users can't "brick" the machine
+	// Hack: fix the magic ID byte so users can't "brick" the machine
 	if (m_soundflash1_region)
 	{
 		m_soundflash[0]->write_raw(0, m_soundflash1_region[0]);
