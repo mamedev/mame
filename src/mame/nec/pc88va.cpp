@@ -34,7 +34,7 @@ TODO:
 - Every PC Engine OS boot tries to write TVRAM ASCII data on every boot to
   $exxxx ROM region, banking bug?
 - all N88 BASIC entries tries to do stuff with EMM, more banking?
-- Share SASI i/f (PC-9801-07?) as C-Bus option;
+- Share SASI i/f (PC-9801-07?) as C-Bus option, fix implementation;
 
 (old notes, to be reordered)
 - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
@@ -641,7 +641,6 @@ uint8_t pc88va_state::sasi_status_r()
  */
 void pc88va_state::sasi_ctrl_w(uint8_t data)
 {
-
 	m_sasibus->write_sel(BIT(data, 5));
 
 	if(m_sasi_ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
