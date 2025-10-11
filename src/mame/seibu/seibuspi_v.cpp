@@ -43,7 +43,7 @@ static u32 decrypt_tile(u32 val, int tileno, u32 key1, u32 key2, u32 key3)
 {
 	val = bitswap<24>(val, 18,19,9,5, 10,17,16,20, 21,22,6,11, 15,14,4,23, 0,1,7,8, 13,12,3,2);
 
-	return partial_carry_sum24(val, tileno + key1, key2) ^ key3;
+	return seibu_partial_carry_sum24(val, tileno + key1, key2) ^ key3;
 }
 
 static void decrypt_text(u8 *rom, u32 key1, u32 key2, u32 key3)
