@@ -605,5 +605,4 @@ CONS( 200?, mc_8x6ss, 0,        0, nes_vt42xx_1mb, nes_vt42xx, nes_vt42xx_state,
 // Uses DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2017, fapocket,  0,  0,  nes_vt42xx_fa,     nes_vt42xx_fa, nes_vt42xx_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
 
-// has a 32Mbyte ROM, needs extra banking (Commando for example is in the 2nd half)
-CONS( 201?, wol260,    0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Wolsen", "260 in 1 Handheld Game (Wolsen)", MACHINE_NOT_WORKING )
+CONS( 201?, wol260,    0,  0,  nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "Wolsen", "260 in 1 Handheld Game (Wolsen)", MACHINE_NOT_WORKING )
