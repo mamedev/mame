@@ -474,6 +474,8 @@ ROM_START( plpittashi ) // all ROM labels handwritten
 ROM_END
 
 // POW98200 main PCB + POW98202 ROM PCB with small label "9806 マノ" (9806 mano)
+// ザ・ラブジェネレーション
+// video reference: https://www.youtube.com/watch?v=sEYzAluGN_s
 ROM_START( pllovegene )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lovegene_1.1", 0x00000, 0x10000, CRC(d14701f2) SHA1(6d80db4b5fb04a1c9989adaa03db800768216730) ) // actual label "ラブ ジェネ 1"
@@ -496,4 +498,4 @@ GAME( 1998, plpittashi, 0,        omatsuri, trocana, omatsuri_state, empty_init,
 GAME( 1998, sluster2,   0,        drail,    trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Super Luster II",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, H10072,·V040P, V98727 strings
 GAME( 1999, omatsuri,   0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
 GAME( 1999, pldoraemon, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Doraemon (Power Link)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99204°, DORAMON (sic), STEPPING_PCB200_CAP75 strings
-GAME( 1999, pllovegene, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Generation (Power Link)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // LOVE GE NMK LTD MK LTD CHAN16± V98616
+GAME( 1999, pllovegene, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "The Love Generation (Power Link)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // LOVE GE NMK LTD MK LTD CHAN16± V98616
