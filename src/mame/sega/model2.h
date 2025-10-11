@@ -621,15 +621,15 @@ struct m2_poly_extra_data
 	model2_state *  state;
 	u32      lumabase;
 	u32      colorbase;
-	u32 *    texsheet;
-	u32      texwidth;
-	u32      texheight;
-	u32      texx, texy;
+	u32 *    texsheet[6];
+	u32      texwidth[6];
+	u32      texheight[6];
+	u32      texx[6];
+	u32		 texy[6];
 	u8       texmirrorx;
 	u8       texmirrory;
 	u8       luma;
 };
-
 
 static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 {
