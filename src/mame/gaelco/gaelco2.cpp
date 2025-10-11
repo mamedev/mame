@@ -1677,6 +1677,7 @@ void gaelco2_state::alighunt(machine_config &config)
 void gaelco2_state::alighunt_d5002fp(machine_config &config)
 {
 	alighunt(config);
+
 	GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2).set_addrmap(0, &gaelco2_state::mcu_hostmem_map); // 12 MHz
 	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 }
@@ -1919,15 +1920,15 @@ ROM_END
 void gaelco2_dual_state::touchgo_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                                         // ROM
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_dual_state::vram_w)).share("spriteram");                                       // Video RAM
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_dual_state::vram_w)).share("spriteram");                                  // Video RAM
 	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));    // Sound Registers
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_dual_state::palette_w)).share(m_paletteram);                                   // Palette
-	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_dual_state::vregs_w)).share(m_vregs);                                          // Video Registers
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_dual_state::palette_w)).share(m_paletteram);                              // Palette
+	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_dual_state::vregs_w)).share(m_vregs);                                     // Video Registers
 	map(0x300000, 0x300001).portr("IN0");                                                                                  // DSW #1 + Input 1P
 	map(0x300002, 0x300003).portr("IN1");                                                                                  // DSW #2 + Input 2P
 	map(0x300004, 0x300005).portr("IN2");                                                                                  // COINSW + Input 3P
 	map(0x300006, 0x300007).portr("IN3");                                                                                  // SERVICESW + Input 4P
-	map(0x500000, 0x500001).select(0x0038).w(FUNC(gaelco2_dual_state::wrally2_latch_w));                                        // Coin counters
+	map(0x500000, 0x500001).select(0x0038).w(FUNC(gaelco2_dual_state::wrally2_latch_w));                                   // Coin counters
 	map(0xfe0000, 0xfe7fff).ram();                                                                                         // Work RAM
 	map(0xfe8000, 0xfeffff).ram().share(m_shareram);                                                                       // Work RAM (shared with D5002FP)
 }
@@ -2473,18 +2474,18 @@ ROM_END
 
 void snowboar_state::snowboar_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                                                                // ROM
-	map(0x200000, 0x20ffff).ram().w(FUNC(snowboar_state::vram_w)).share("spriteram");                                                              // Video RAM
-	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));                           // Sound Registers
-	map(0x210000, 0x211fff).ram().w(FUNC(snowboar_state::palette_w)).share(m_paletteram);                                                          // Palette
-	map(0x212000, 0x213fff).ram();                                                                                                                // Extra RAM
-	map(0x218004, 0x218009).ram().w(FUNC(snowboar_state::vregs_w)).share(m_vregs);                                                                 // Video Registers
+	map(0x000000, 0x0fffff).rom();                                                                                                                     // ROM
+	map(0x200000, 0x20ffff).ram().w(FUNC(snowboar_state::vram_w)).share("spriteram");                                                                  // Video RAM
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_cg1v_device::gaelcosnd_r), FUNC(gaelco_cg1v_device::gaelcosnd_w));                                // Sound Registers
+	map(0x210000, 0x211fff).ram().w(FUNC(snowboar_state::palette_w)).share(m_paletteram);                                                              // Palette
+	map(0x212000, 0x213fff).ram();                                                                                                                     // Extra RAM
+	map(0x218004, 0x218009).ram().w(FUNC(snowboar_state::vregs_w)).share(m_vregs);                                                                     // Video Registers
 	map(0x300000, 0x300001).portr("P1");
-	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                                                         // Coin Counters & serial EEPROM
+	map(0x300000, 0x30000f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);                                                              // Coin Counters & serial EEPROM
 	map(0x300010, 0x300011).portr("P2");
 	map(0x300020, 0x300021).portr("COIN");
-	map(0x310000, 0x31ffff).rw(FUNC(snowboar_state::snowboar_protection_r), FUNC(snowboar_state::snowboar_protection_w)).share(m_snowboar_protection);    // Protection
-	map(0xfe0000, 0xfeffff).ram();                                                                                                                // Work RAM
+	map(0x310000, 0x31ffff).rw(FUNC(snowboar_state::snowboar_protection_r), FUNC(snowboar_state::snowboar_protection_w)).share(m_snowboar_protection); // Protection
+	map(0xfe0000, 0xfeffff).ram();                                                                                                                     // Work RAM
 }
 
 
