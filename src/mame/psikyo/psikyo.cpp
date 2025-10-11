@@ -1282,6 +1282,29 @@ ROM_START( samuraia )
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
+// PCB was found in Korea. Banpresto copyright removed (still shows the Psikyo splash screen)
+ROM_START( samuraiak )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_LOAD32_WORD_SWAP( "u127.bin", 0x000000, 0x080000, CRC(ed4a3626) SHA1(b48f86be816850289d237bc43aca549fda4ae534) )
+	ROM_LOAD32_WORD_SWAP( "u126.bin", 0x000002, 0x080000, CRC(21803147) SHA1(fcdc14e6c39fca70f9fa7258068eb053713d1f94) )
+
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_LOAD( "3-u58.bin", 0x00000, 0x20000, CRC(310f5c76) SHA1(dbfd1c5a7a514bccd89fc4f7191744cf76bb745d) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_WORD_SWAP( "u14.bin",  0x000000, 0x200000, CRC(00a546cb) SHA1(30a8679b49928d5fcbe58b5eecc2ebd08173adf8) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
+	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
+	ROM_LOAD16_WORD_SWAP( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* Samples */
+	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
+
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 ROM_START( sngkace )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u127.bin", 0x000000, 0x040000, CRC(6c45b2f8) SHA1(08473297e174f3a6d67043f3b16f4e6b9c68b826) ) // 1&0
@@ -2051,6 +2074,7 @@ void psikyo_state::init_tengaibl()
 ***************************************************************************/
 
 GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Samurai Aces (World)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1993, samuraiak, samuraia, sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Samurai Aces (Korea?)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 1)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 2)",                 MACHINE_SUPPORTS_SAVE )
 
