@@ -183,6 +183,8 @@ private:
 	u16 m_hvcounter_latch;
 	u32 m_vram_mask;
 	bool m_sprite_collision, m_sprite_overflow;
+	u16 m_hpage, m_vpage;
+	void calculate_plane_sizes();
 
 	bitmap_rgb32 m_bitmap;
 	bool render_line(int scanline);

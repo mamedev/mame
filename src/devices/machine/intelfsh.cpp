@@ -109,6 +109,7 @@ DEFINE_DEVICE_TYPE(MACRONIX_29F1610MC_16BIT, macronix_29f1610mc_16bit_device, "m
 DEFINE_DEVICE_TYPE(MACRONIX_29L001MC,        macronix_29l001mc_device,        "macronix_29l001mc",        "Macronix 29L001MC Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29LV160TMC,      macronix_29lv160tmc_device,      "macronix_29lv160tmc",      "Macronix 29LV160TMC Flash")
 DEFINE_DEVICE_TYPE(ST_M29W640GB,             st_m29w640gb_device,             "st_m29w640gb",             "ST M29W640GB Flash")
+DEFINE_DEVICE_TYPE(ST_M29W640FT,             st_m29w640ft_device,             "st_m29w640ft",             "ST M29W640FT Flash")
 DEFINE_DEVICE_TYPE(TMS_29F040,               tms_29f040_device,               "tms_29f040",               "Texas Instruments 29F040 Flash")
 
 DEFINE_DEVICE_TYPE(PANASONIC_MN63F805MNP,    panasonic_mn63f805mnp_device,    "panasonic_mn63f805mnp",    "Panasonic MN63F805MNP Flash")
@@ -263,6 +264,9 @@ macronix_29lv160tmc_device::macronix_29lv160tmc_device(const machine_config &mco
 
 st_m29w640gb_device::st_m29w640gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, ST_M29W640GB, tag, owner, clock, 0x800000, MFG_ST, 0x227e) { m_bot_boot_sector = true; m_device_id2 = 0x2210; m_device_id3 = 0x2200; }
+
+st_m29w640ft_device::st_m29w640ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, ST_M29W640FT, tag, owner, clock, 0x800000, MFG_ST, 0x22ed) { m_bot_boot_sector = true; m_device_id2 = 0x2210; m_device_id3 = 0x2200; }
 
 panasonic_mn63f805mnp_device::panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, PANASONIC_MN63F805MNP, tag, owner, clock, 0x10000, MFG_PANASONIC, 0x1b) { m_sector_is_4k = true; }
@@ -603,7 +607,8 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_flash_mode = FM_NORMAL;
 			break;
 		case 0x90:
-			if ( m_fast_mode && m_maker_id == MFG_FUJITSU ) // reset from fast mode (when fast mode is enabled)
+			// TODO: W640GB also needs this path
+			if ( m_fast_mode && (m_maker_id == MFG_FUJITSU || (m_maker_id == MFG_ST && (m_device_id == 0x22ed || m_device_id == 0x227e))) ) // reset from fast mode (when fast mode is enabled)
 				m_flash_mode = FM_FAST_RESET;
 			else // read ID
 				m_flash_mode = FM_READID;
@@ -626,8 +631,16 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		case 0x20:  // block erase
 			if (m_maker_id == MFG_SST && m_device_id == 0x61)
 				logerror("Unknown flash mode byte %x\n", data & 0xff);
+			else if (m_maker_id == MFG_ST && (m_device_id == 0x22ed || m_device_id == 0x227e))
+			{
+				// unlock bypass
+				m_flash_mode = FM_NORMAL;
+				m_fast_mode = true;
+			}
 			else
+			{
 				m_flash_mode = FM_CLEARPART1;
+			}
 			break;
 		case 0x60:  // set master lock
 			m_flash_mode = FM_SETMASTER;
@@ -636,8 +649,10 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_flash_mode = FM_READSTATUS;
 			break;
 		case 0xa0: // fast program (fast mode must be enabled)
-			if ( m_fast_mode && m_maker_id == MFG_FUJITSU )
+			if ( m_fast_mode && (m_maker_id == MFG_FUJITSU || (m_maker_id == MFG_ST && (m_device_id == 0x22ed || m_device_id == 0x227e))) )
+			{
 				m_flash_mode = FM_BYTEPROGRAM;
+			}
 			else
 				logerror( "%s: Unknown flash mode byte %x\n", machine().describe_context(), data & 0xff );
 			break;
@@ -958,7 +973,9 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 					m_data[address] &= data;
 			}
 			else
+			{
 				m_data[address] = data;
+			}
 			break;
 		case 16: // senbbs test mode requires this, note, flash type is guessed there based on manufacturer + device ident as markings were erased
 			m_data[address*2] = data >> 8;
