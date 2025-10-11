@@ -4,8 +4,8 @@
 /***************************************************************************************************
     Skeleton driver for ITISA Flash Gun
 
-    The game projects "clay pigeons" (really just White light spots) on a fixed Surface with a
-    painted landscape, moving them with a combination of lenses and motors, and then the payer
+    The game projects "clay pigeons" (really just white light spots) on a fixed Surface with a
+    painted landscape, moving them with a combination of lenses and motors, and then the player
     shoots at them with a lightgun (there are two rifles, it's a two players game).
 
     More info: https://www.recreativas.org/flash-gun-2404-itisa-electronics
