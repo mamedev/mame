@@ -213,7 +213,7 @@ void gaelco2_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 ***************************************************************************/
 
 static constexpr u8 RGB_CHG = 0x08;
-static constexpr u8 ADJUST_COLOR(s16 c) { u8(u16(std::clamp<s16>(c, 0, 255))); }
+static constexpr u8 ADJUST_COLOR(s16 c) { return std::clamp<s16>(c, 0, 255); }
 
 // table used for color adjustment
 static const s8 pen_color_adjust[16] = {
