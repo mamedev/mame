@@ -227,10 +227,10 @@ void splash_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		if (BIT(attr2, 7)) sx += 256;
 
 		gfx->transpen(bitmap, cliprect,
-			number,
-			0x10 + (attr2 & 0x0f),
-			BIT(attr, 6), BIT(attr, 7),
-			sx - 8, sy, 0);
+				number,
+				0x10 + (attr2 & 0x0f),
+				BIT(attr, 6), BIT(attr, 7),
+				sx - 8, sy, 0);
 	}
 }
 
@@ -249,10 +249,10 @@ void funystrp_state::funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 		if (BIT(attr2, 7)) sx += 256;
 
 		gfx->transpen(bitmap,cliprect,
-			number,
-			(attr2 & 0x7f),
-			BIT(attr, 6), BIT(attr, 7),
-			sx - 8, sy, 0);
+				number,
+				(attr2 & 0x7f),
+				BIT(attr, 6), BIT(attr, 7),
+				sx - 8, sy, 0);
 	}
 }
 
