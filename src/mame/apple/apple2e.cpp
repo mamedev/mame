@@ -1786,11 +1786,11 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			switch (offset)
 			{
 				case 0x5e:  // SETDHIRES
-					m_video->dhires_w(0);
+					m_video->an3_w(0);
 					break;
 
 				case 0x5f:  // CLRDHIRES
-					m_video->dhires_w(1);
+					m_video->an3_w(1);
 					break;
 			}
 		}
