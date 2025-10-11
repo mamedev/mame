@@ -1741,60 +1741,69 @@ void apple2e_state::do_io(int offset, bool is_iic)
 	if ((offset & 0x58) == 0x58)
 	{
 		// IIc-specific switches
-		if (((m_isiic || m_isace500) && (!m_accel_unlocked)) && (!m_ioudis))
+		if ((m_isiic || m_isace500) && (!m_ioudis))
 		{
 			switch (offset)
 			{
 				case 0x58:  // DisXY
-					m_xy = false; break;
+					m_xy = false;
+					break;
 
 				case 0x59:  // EnbXY
-					m_xy = true; break;
+					m_xy = true;
+					break;
 
 				case 0x5a:  // DisVBL
 					lower_irq(IRQ_VBL);
-					m_vblmask = false; break;
+					m_vblmask = false;
+					break;
 
 				case 0x5b:  // EnVBL
-					m_vblmask = true; break;
+					m_vblmask = true;
+					break;
 
 				case 0x5c:  // RisX0Edge
-					m_x0edge = false; break;
+					m_x0edge = false;
+					break;
 
 				case 0x5d:  // FalX0Edge
-					m_x0edge = true; break;
+					m_x0edge = true;
+					break;
 
 				case 0x5e:  // RisY0Edge
-					if (!m_ioudis)
-					{
-						m_y0edge = false;
-					}
+					m_y0edge = false;
 					break;
 
 				case 0x5f:  // FalY0Edge
-					if (!m_ioudis)
-					{
-						m_y0edge = true;
-					}
+					m_y0edge = true;
 					break;
 			}
-		}
 
-		// IIe does not have IOUDIS (ref: on-h/w tests by TomCh)
-		if ((m_ioudis) || (!m_isiic && !m_isace500))
+			return;
+		}
+		else // IIe does not have IOUDIS (ref: on-h/w tests by TomCh)
 		{
 			switch (offset)
 			{
 				case 0x5e:  // SETDHIRES
-					m_video->dhires_w(0);
+					m_video->an3_w(0);
 					break;
 
 				case 0x5f:  // CLRDHIRES
-					m_video->dhires_w(1);
+					m_video->an3_w(1);
 					break;
 			}
 		}
-// ComputerEyes seems to indicate that the annuciators get tickled regardless of the IOUDIS state.
+
+		/*
+		Fall through to annunciators, which is correct for the IIe.
+
+		The IIc Technical Reference says: "if the IOUDis switch is on, both
+		reading from and writing to addresses C058 through C05D are reserved".
+		The IIc does not have an internal gameio port, and the annunciators
+		are not available on the external DB-9 connector, so even if state
+		changes, it can't go anywhere, and can't be read back.
+		*/
 	}
 
 	if ((offset & 0xf0) == 0x30) // speaker, $C030 is really 30-3f
@@ -2097,11 +2106,8 @@ u8 apple2e_state::c000_r(offs_t offset)
 			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
-			return (m_ioudis ? 0x00 : 0x80) | uFloatingBus7;
-
-		case 0x79: case 0x7b: case 0x7d: case 0x7f:  // read DHIRES
-			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
+		// Apple IIe Technical Reference (1985/1987) lists RDIOUDIS and RDDHIRES,
+		// but this this is incorrect: they only exist on the IIc.
 
 		default:
 			do_io(offset, false);
@@ -2394,7 +2400,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
-		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d:
+		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			if (m_isace2200)
 			{
 				if (offset == 0x78)
@@ -2414,13 +2420,9 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 				m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
 			}
 			do_io(offset, false);    // make sure it also side-effect resets the paddles as documented
+
+			assert(m_ioudis && "CLRIOUDIS does not exist on IIe");
 			break;
-
-		case 0x7e:  // SETIOUDIS
-			m_ioudis = true; break;
-
-		case 0x7f:  // CLRIOUDIS
-			m_ioudis = false; break;
 
 		default:
 			do_io(offset, false);
@@ -2540,7 +2542,7 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
 			m_vbl = false;
 			lower_irq(IRQ_VBL);
-			return (m_ioudis ? 0x00 : 0x80) | uFloatingBus7;
+			return (m_ioudis ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x79: case 0x7b: case 0x7d: case 0x7f:  // read DHIRES
 			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;

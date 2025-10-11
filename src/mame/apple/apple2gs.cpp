@@ -1416,13 +1416,13 @@ void apple2gs_state::do_io(int offset)
 		case 0x5e: // AN3 off, DHIRESON
 			m_an3 = false;
 			m_gameio->an3_w(0);
-			m_video->dhires_w(0);
+			m_video->an3_w(0);
 			break;
 
 		case 0x5f: // AN3 on, DHIRESOFF
 			m_an3 = true;
 			m_gameio->an3_w(1);
-			m_video->dhires_w(1);
+			m_video->an3_w(1);
 			break;
 
 		case 0x69:  // 16-bit access to STATEREG
