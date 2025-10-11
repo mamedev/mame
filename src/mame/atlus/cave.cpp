@@ -938,6 +938,25 @@ void ppsatan_state::ppsatan_map(address_map &map)
 
 
 /***************************************************************************
+
+
+                            Memory Maps - Oki sound
+
+
+***************************************************************************/
+
+void cave_state::nmk112_oki0_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki0_map));
+}
+
+void cave_state::nmk112_oki1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki1_map));
+}
+
+
+/***************************************************************************
                                 Power Instinct 2
 ***************************************************************************/
 
@@ -2299,16 +2318,18 @@ void cave_state::donpachi(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], 4.220_MHz_XTAL/4, okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.60);
-
-	OKIM6295(config, m_oki[1], 4.220_MHz_XTAL/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 	nmk112.set_page_mask(1 << 0);    // chip #0 (music) is not paged
+
+	OKIM6295(config, m_oki[0], 4.220_MHz_XTAL/4, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.60);
+	m_oki[0]->set_addrmap(0, &cave_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], 4.220_MHz_XTAL/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[1]->set_addrmap(0, &cave_state::nmk112_oki1_map);
 }
 
 
@@ -2755,15 +2776,17 @@ void cave_z80_state::pwrinst2(machine_config &config)
 	ym2203.add_route(2, "mono", 0.40);
 	ym2203.add_route(3, "mono", 0.80);
 
-	OKIM6295(config, m_oki[0], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
-
-	OKIM6295(config, m_oki[1], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+
+	OKIM6295(config, m_oki[0], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
+	m_oki[0]->set_addrmap(0, &cave_z80_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_oki[1]->set_addrmap(0, &cave_z80_state::nmk112_oki1_map);
 }
 
 
@@ -3438,14 +3461,12 @@ ROM_START( donpachi )
 	ROM_REGION( 0x040000, "layer2", 0 ) /* Text / Character Layer */
 	ROM_LOAD( "text.u58", 0x000000, 0x040000, CRC(5dba06e7) SHA1(f9dab7f6c732a683fddb4cae090a875b3962332b) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u33", 0x040000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x200000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "atdp.u33", 0x000000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
-	ROM_REGION( 0x340000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
-	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x300000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "atdp.u32", 0x000000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
+	ROM_LOAD( "atdp.u33", 0x100000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-donpachi.u10", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) ) /* ATMEL 93C46 */
@@ -3471,14 +3492,12 @@ ROM_START( donpachij )
 	ROM_REGION( 0x040000, "layer2", 0 ) /* Text / Character Layer */
 	ROM_LOAD( "u58.bin", 0x000000, 0x040000, CRC(285379ff) SHA1(b9552edcec29ddf4b552800b145c398b94117ab0) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u33", 0x040000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x200000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "atdp.u33", 0x000000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
-	ROM_REGION( 0x340000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
-	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x300000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "atdp.u32", 0x000000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
+	ROM_LOAD( "atdp.u33", 0x100000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-donpachi.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
@@ -3504,14 +3523,12 @@ ROM_START( donpachikr )
 	ROM_REGION( 0x040000, "layer2", 0 ) /* Text / Character Layer */
 	ROM_LOAD( "text.u58", 0x000000, 0x040000, CRC(5dba06e7) SHA1(f9dab7f6c732a683fddb4cae090a875b3962332b) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u33", 0x040000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x200000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "atdp.u33", 0x000000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
-	ROM_REGION( 0x340000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
-	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x300000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "atdp.u32", 0x000000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
+	ROM_LOAD( "atdp.u33", 0x100000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-donpachi.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
@@ -3537,14 +3554,12 @@ ROM_START( donpachihk )
 	ROM_REGION( 0x040000, "layer2", 0 ) /* Text / Character Layer */
 	ROM_LOAD( "u58.bin", 0x000000, 0x040000, CRC(285379ff) SHA1(b9552edcec29ddf4b552800b145c398b94117ab0) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u33", 0x040000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x200000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "atdp.u33", 0x000000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
-	ROM_REGION( 0x340000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
-	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x300000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "atdp.u32", 0x000000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
+	ROM_LOAD( "atdp.u33", 0x100000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-donpachi.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
@@ -3578,14 +3593,12 @@ ROM_START( donpachijs )
 	ROM_REGION( 0x040000, "layer2", 0 ) /* Text / Character Layer */
 	ROM_LOAD( "u58.bin", 0x000000, 0x040000, CRC(285379ff) SHA1(b9552edcec29ddf4b552800b145c398b94117ab0) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u33", 0x040000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x200000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "atdp.u33", 0x000000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
-	ROM_REGION( 0x340000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "atdp.u32", 0x040000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
-	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
+	ROM_REGION( 0x300000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "atdp.u32", 0x000000, 0x100000, CRC(0d89fcca) SHA1(e16ed15fa5e72537822f7b37e83ccfed0fa87338) )
+	ROM_LOAD( "atdp.u33", 0x100000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-donpachi.u10", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) ) /* ATMEL 93C46 */
@@ -4591,15 +4604,13 @@ ROM_START( pwrinst2 )   /* 94.04.08 */
 	ROM_REGION( 0x080000, "layer3", 0 )
 	ROM_LOAD( "g02.82a", 0x000000, 0x080000, CRC(4b3567d6) SHA1(d3e14783b312d2bea9722a8e3c22bcec81e26166) )
 
-	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u53", 0x040000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
-	ROM_LOAD( "g02.u54", 0x240000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
+	ROM_REGION( 0x400000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "g02.u53", 0x000000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
+	ROM_LOAD( "g02.u54", 0x200000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
 
-	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
-	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+	ROM_REGION( 0x400000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "g02.u55", 0x000000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
+	ROM_LOAD( "g02.u56", 0x200000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
 
 	ROM_REGION( 0x03ff, "pal", 0 )
 	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
@@ -4641,15 +4652,13 @@ ROM_START( pwrinst2a )  /* also 94.04.08 like pwrinst2, but different program ro
 	ROM_REGION( 0x080000, "layer3", 0 )
 	ROM_LOAD( "g02.82a", 0x000000, 0x080000, CRC(4b3567d6) SHA1(d3e14783b312d2bea9722a8e3c22bcec81e26166) )
 
-	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u53", 0x040000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
-	ROM_LOAD( "g02.u54", 0x240000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
+	ROM_REGION( 0x400000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "g02.u53", 0x000000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
+	ROM_LOAD( "g02.u54", 0x200000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
 
-	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
-	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+	ROM_REGION( 0x400000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "g02.u55", 0x000000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
+	ROM_LOAD( "g02.u56", 0x200000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
 
 	ROM_REGION( 0x03ff, "pal", 0 )
 	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
@@ -4691,15 +4700,13 @@ ROM_START( pwrinst2j )
 	ROM_REGION( 0x080000, "layer3", 0 )
 	ROM_LOAD( "g02j.82a", 0x000000, 0x080000, CRC(3be86fe1) SHA1(313bfe5fb8dc5fee4462db259738e079759f9390) )
 
-	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u53", 0x040000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
-	ROM_LOAD( "g02.u54", 0x240000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
+	ROM_REGION( 0x400000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "g02.u53", 0x000000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
+	ROM_LOAD( "g02.u54", 0x200000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
 
-	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
-	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+	ROM_REGION( 0x400000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "g02.u55", 0x000000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
+	ROM_LOAD( "g02.u56", 0x200000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
 
 	ROM_REGION( 0x03ff, "pal", 0 )
 	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
@@ -4796,15 +4803,13 @@ ROM_START( plegends )
 	ROM_REGION( 0x080000, "layer3", 0 )
 	ROM_LOAD( "text.u82", 0x000000, 0x080000, CRC(f57333ea) SHA1(409d8005ffcf91943e4a743b2434ce425f5bdc36) ) /* US version's rom labeled "d20" */
 
-	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u53", 0x040000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
-	ROM_LOAD( "g02.u54", 0x240000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
+	ROM_REGION( 0x400000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "g02.u53", 0x000000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
+	ROM_LOAD( "g02.u54", 0x200000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
 
-	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
-	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+	ROM_REGION( 0x400000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "g02.u55", 0x000000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
+	ROM_LOAD( "g02.u56", 0x200000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
 
 	ROM_REGION( 0x03ff, "pal", 0 )
 	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
@@ -4848,15 +4853,13 @@ ROM_START( plegendsj )
 	ROM_REGION( 0x080000, "layer3", 0 )
 	ROM_LOAD( "text.u82", 0x000000, 0x080000, CRC(f57333ea) SHA1(409d8005ffcf91943e4a743b2434ce425f5bdc36) ) /* US version's rom labeled "d20" */
 
-	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u53", 0x040000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
-	ROM_LOAD( "g02.u54", 0x240000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
+	ROM_REGION( 0x400000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "g02.u53", 0x000000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
+	ROM_LOAD( "g02.u54", 0x200000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
 
-	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
-	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+	ROM_REGION( 0x400000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "g02.u55", 0x000000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
+	ROM_LOAD( "g02.u56", 0x200000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
 
 	ROM_REGION( 0x03ff, "pal", 0 )
 	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
