@@ -822,6 +822,7 @@ public:
 	norautp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_nvram(*this, "nvram"),
 		m_ppi8255(*this, "ppi8255_%u", 0),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -829,7 +830,6 @@ public:
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
-		m_nvram(*this, "nvramx"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -910,6 +910,7 @@ private:
 
 	std::unique_ptr<uint16_t[]> m_np_vram;
 	required_device<cpu_device> m_maincpu;
+	required_device<nvram_device> m_nvram;
 	required_device_array<i8255_device, 3> m_ppi8255;
 	required_device<discrete_sound_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -917,7 +918,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-	optional_device<nvram_device> m_nvram;
 	output_finder<12> m_lamps;
 
 	std::unique_ptr<uint8_t[]> m_nvram8;
@@ -937,8 +937,7 @@ void norautp_state::machine_start()
 {
 	m_lamps.resolve();
 	m_nvram8 = std::make_unique<uint8_t[]>(TP_NVRAM_SIZE);
-	if(m_nvram != NULL)
-		m_nvram->set_base(m_nvram8.get(),TP_NVRAM_SIZE);
+	m_nvram->set_base(m_nvram8.get(),TP_NVRAM_SIZE);
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_nvunlock));
 }
@@ -2775,51 +2774,19 @@ void norautp_state::kimbldhl(machine_config &config)
 
 void norautp_state::tpoker2(machine_config &config)
 {
+	noraut_base(config);
+
 	// basic machine hardware
-	I8080(config, m_maincpu, DPHL_CPU_CLOCK);
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::tpoker2_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
-
-	NVRAM(config, "nvramx", nvram_device::DEFAULT_ALL_0);
-
-	I8255(config, m_ppi8255[0], 0);
-	// (60-63) Mode 0 - Port A set as input
-	m_ppi8255[0]->in_pa_callback().set_ioport("DSW1");
-	m_ppi8255[0]->out_pb_callback().set(FUNC(norautp_state::mainlamps_w));
-	m_ppi8255[0]->out_pc_callback().set(FUNC(norautp_state::counterlamps_w));
-
-	I8255(config, m_ppi8255[1], 0);
-	// (a0-a3) Mode 0 - Ports A & B set as input
-	m_ppi8255[1]->in_pa_callback().set_ioport("IN0");
-	m_ppi8255[1]->in_pb_callback().set_ioport("IN1");
-	m_ppi8255[1]->out_pc_callback().set(FUNC(norautp_state::soundlamps_w));
-
-	I8255(config, m_ppi8255[2], 0);
-	m_ppi8255[2]->out_pb_callback().set(FUNC(norautp_state::ppi2_b_w));
-	m_ppi8255[2]->in_pc_callback().set_ioport("IN2");
-	m_ppi8255[2]->out_pc_callback().set(FUNC(norautp_state::ppi2_obf_w)).bit(7);
-
-	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*16, 32*16);
-	m_screen->set_visarea(2*16, 31*16-1, (0*16) + 8, 16*16-1);
 	m_screen->set_screen_update(FUNC(norautp_state::screen_update_dphl));
-	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_norautp);
-	PALETTE(config, "palette", FUNC(norautp_state::bp_based_palette), 512);
-
-	HOPPER(config, m_hopper, attotime::from_msec(150));
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 512);
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, norautp_discrete);
 	m_discrete->set_intf(dphl_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-
 }
 
 void norautp_state::drhl(machine_config &config)
@@ -5785,7 +5752,7 @@ ROM_START(tpoker2 )
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
 
-	ROM_REGION( 0x0800,  "nvramx", 0 )  // nvram
+	ROM_REGION( 0x0800,  "nvram", 0 )  // nvram
 	ROM_LOAD( "mk48z02.u44", 0x0000, 0x0800, CRC(fcb12763) SHA1(66a672c15db7f514d190f84fba023b2733d1f194) )
 
 	ROM_REGION( 0x0200,  "proms", 0 )
@@ -5955,7 +5922,7 @@ ROM_START( tpoker2b )
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "1993_micro_mfg_turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
 
-	ROM_REGION( 0x0800,  "nvramx", 0 )  // DS1220AD-150 ; Dallas 2K x 8 CMOS nonvolatile SRAM
+	ROM_REGION( 0x0800,  "nvram", 0 )  // DS1220AD-150 ; Dallas 2K x 8 CMOS nonvolatile SRAM
 	ROM_LOAD( "tpoker2a_nvram.bin", 0x0000, 0x0800, CRC(615f3888) SHA1(b7d5aeb1c52748061f8913571bc5ac3e839c3595) )
 
 	ROM_REGION( 0x0200,  "proms", 0 )
