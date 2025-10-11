@@ -87,7 +87,20 @@ void system_board_y2_state::system_board_y2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 }
 
+#define SYSTEM_Y2_FPGA_BITSTREAM \
+	ROM_REGION( 0x200000, "fgpa_spi", 0) /* located on motherboard, contains a bitstream for the Xilinx Spartan 3A XC3S700A FPGA */ \
+	ROM_LOAD( "system_y2_m25p40.u801", 0x00000, 0x80000, CRC(2b19f490) SHA1(b6a0482926d02fb5bb9a2c05ffdba6a2347fe658) )
+
+ROM_START( systemy2 )
+	SYSTEM_Y2_FPGA_BITSTREAM
+	ROM_REGION( 0x8000000, "boot", ROMREGION_ERASE00 )
+	ROM_REGION( 0x42000000, "nand_u101", ROMREGION_ERASE00 )
+	ROM_REGION( 0x42000000, "nand_u102", ROMREGION_ERASE00 ) 
+ROM_END
+
 ROM_START( kof2002um ) // The King of Fighters 复仇之路/Fùchóu zhī lù/Road to Revenge
+	SYSTEM_Y2_FPGA_BITSTREAM
+
 	ROM_REGION( 0x8000000, "boot", 0 ) // sound program only? or boot too?
 	ROM_LOAD( "s29gl01gp11fcr2.u103", 0x0000000, 0x8000000, CRC(722cbad1) SHA1(0292be12255ee4bd586166a3f5cd108c5453295b) )
 
@@ -98,6 +111,8 @@ ROM_START( kof2002um ) // The King of Fighters 复仇之路/Fùchóu zhī lù/Ro
 ROM_END
 
 ROM_START( kof2002umj )
+	SYSTEM_Y2_FPGA_BITSTREAM
+
 	ROM_REGION( 0x8000000, "boot", 0 ) // sound program only? or boot too?
 	ROM_LOAD( "s29gl01gp11fcr2.u103", 0x0000000, 0x8000000, CRC(916c9d68) SHA1(65c09f75b6a71b0d79a827c6829d1c05d8699a32) )
 
@@ -108,6 +123,8 @@ ROM_START( kof2002umj )
 ROM_END
 
 ROM_START( higurashi ) //ひぐらしの哭く頃に 雀 / Higurashi no Naku Koro ni Jong - AM-Y2 ROM_V0 PCB (also has a XILINX XC2C64A etched 0012)
+	SYSTEM_Y2_FPGA_BITSTREAM
+
 	ROM_REGION( 0x10000000, "boot", 0 )
 	ROM_LOAD( "s29gl01gp11tfcr2.u103", 0x0000000, 0x8000000, CRC(1a20bb8b) SHA1(49beb0c9d3549355b55192ba4a24e3f06b750038) )
 	ROM_LOAD( "s29gl01gp11tfcr2.u104", 0x8000000, 0x8000000, CRC(ea7a4ba4) SHA1(bd801eb4b21ee1bade906a4faa172cb7eb0fd5ac) )
@@ -121,11 +138,13 @@ ROM_END
 } // anonymous namespace
 
 
+GAME( 2009, systemy2,   0,         system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SI Electronics",             "System Board Y2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
+
 /* The title screen shows "The King of Fighters - Road to Revenge" (Chinese / English) while the speech on the title screen announcer says "The King of Fighters 2002 Unlimited Match"
    There is a PS2 version with the Unlimited Match title screen, but unless it's used for a different region the arcade doesn't show that title, only announces it. */
-GAME( 2009, kof2002um,  0,         system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SNK Playmore / New Channel", "The King of Fighters - Fuchou Zhi Lu/Road to Revenge / The King of Fighters 2002 Unlimited Match (China)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // also Export?
+GAME( 2009, kof2002um,  systemy2,  system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SNK Playmore / New Channel", "The King of Fighters - Fuchou Zhi Lu/Road to Revenge / The King of Fighters 2002 Unlimited Match (China)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // also Export?
 GAME( 2009, kof2002umj, kof2002um, system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SNK Playmore",               "The King of Fighters 2002 Unlimited Match (Japan)",                                                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2009, higurashi,  0,         system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "AQ Interactive",             "Higurashi no Naku Koro ni Jong (Japan)",                                                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, higurashi,  systemy2,  system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "AQ Interactive",             "Higurashi no Naku Koro ni Jong (Japan)",                                                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 //エヌアイン完全世界/En-Eins Perfektewelt
 //上海 臥龍天昇/Shanghai Ga ryū tenshō
