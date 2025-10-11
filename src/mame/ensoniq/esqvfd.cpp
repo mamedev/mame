@@ -408,12 +408,26 @@ void esq2x40_vfx_device::update_display()
 		{
 			if (m_dirty[row][col])
 			{
-				uint32_t segdata = font_vfx[m_chars[row][col]];
+				uint32_t char_segments = font_vfx[m_chars[row][col]];
 				auto attr = m_attrs[row][col];
-				auto underline = (attr & AT_UNDERLINE) && (!(attr & AT_BLINK) || m_blink_on);
+				uint32_t segments;
 
-				// digits:
-				m_vfds->set((row * m_cols) + col, segdata | (underline ? 0x8000 : 0));
+				if ((attr & AT_BLINK) && !m_blink_on)  // something is blinked off
+				{
+					if (attr & AT_UNDERLINE) // blink the underline off
+						segments = char_segments;
+					else // there is no underline, blink the entire character
+						segments = 0;
+				}
+				else
+				{
+					if (attr & AT_UNDERLINE) 
+						segments = char_segments | 0x8000;
+					else
+						segments = char_segments;
+				}
+
+				m_vfds->set((row * m_cols) + col, segments);
 
 				m_dirty[row][col] = 0;
 			}
