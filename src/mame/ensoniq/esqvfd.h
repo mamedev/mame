@@ -31,7 +31,10 @@ protected:
 	public:
 		output_helper_impl(device_t &device) : output_manager::output_finder<void, N>(device, "vfd%u", 0U) { }
 		virtual void resolve() override { output_manager::output_finder<void, N>::resolve(); }
-		virtual int32_t set(unsigned n, int32_t value) override { return this->operator[](n) = value; }
+		virtual int32_t set(unsigned n, int32_t value) override {
+
+			return this->operator[](n) = value;
+		}
 	};
 
 	typedef std::tuple<output_helper::ptr, int, int> dimensions_param;
@@ -64,7 +67,9 @@ public:
 
 	virtual void write_char(uint8_t data) override;
 
-protected:
+	template <int R, int C> static dimensions_param make_dimensions(device_t &device) { return dimensions_param(std::make_unique<output_helper_impl<2 * R * C> >(device), R, C); }
+
+	protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
