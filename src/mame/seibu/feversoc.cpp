@@ -16,7 +16,7 @@ TODO:
 - Layout including lamps
 - Hopper only works in "COIN HOPPER" mode
 - Do button 5 or remaining DIPs actually do anything outside service mode?
-- Make device of RISE11 sprite hardware that also used in seibu/seibuspi.cpp
+- Make device of RISE11 sprite hardware also used in seibu/seibuspi.cpp
   and seibu/seibucats.cpp
 
 ============================================================================
@@ -74,13 +74,16 @@ U089 MAX232 Dual EIA Driver/Receiver
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh/sh7604.h"
+
 #include "seibuspi_m.h"
-#include "sound/okim6295.h"
+
+#include "cpu/sh/sh7604.h"
 #include "machine/eepromser.h"
-#include "machine/rtc4543.h"
 #include "machine/nvram.h"
+#include "machine/rtc4543.h"
 #include "machine/ticket.h"
+#include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -108,7 +111,8 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void init_feversoc();
+	void init_feversoc() ATTR_COLD;
+
 	void feversoc(machine_config &config) ATTR_COLD;
 
 protected:
