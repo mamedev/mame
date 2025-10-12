@@ -228,7 +228,7 @@ copyright-holders:m1macrophage
 		<element ref="text-slow">
 			<bounds x="138" y="94" width="40" height="15"/>
 		</element>
-		<element ref="knob-value" inputraw="yes" inputtag="~knob_id~" inputmask="0x7f">
+		<element ref="knob-value" inputraw="yes" inputtag="~knob_id~" inputmask="0xffff">
 			<bounds x="68" y="52" width="40" height="16"/>
 		</element>
 		<element ref="transparent-rect" clickthrough="no" id="~knob_id~">
@@ -428,18 +428,29 @@ copyright-holders:m1macrophage
 
 		-----------------------------------------------------------------------
 		-- Slider and knob library starts.
-		-- This is a *trimmed down* version of the reference implementation in
-		-- linn_linndrum.lay.
+		-- Can be copied as-is to other layouts.
 		-----------------------------------------------------------------------
 		local widgets = {}   -- Stores slider and knob information.
 		local pointers = {}  -- Tracks pointer state.
 
-		-- A sweep between 0 and 100 requires moving the pointer by
-		-- `scale * clickarea.height` pixes.
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
 		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
 			table.insert(widgets, {
 				clickarea = get_layout_item(view, clickarea_id),
 				field     = get_port_field(port_name),
+				is_knob   = true,
 				scale     = scale })
 		end
 
@@ -479,9 +490,18 @@ copyright-holders:m1macrophage
 			-- If a button was just pressed, find the affected widget, if any.
 			if dn & 1 ~= 0 then
 				for i = 1, #widgets do
-					if widgets[i].clickarea.bounds:includes(x, y) then
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
 						pointers[id] = {
 							selected_widget = i,
+							relative = relative,
 							start_y = y,
 							start_value = widgets[i].field.user_value }
 						break
@@ -495,17 +515,38 @@ copyright-holders:m1macrophage
 			end
 
 			-- A widget is selected. Update its state based on the pointer's Y
-			-- position. It is assumed the attached IO field is an
-			-- IPT_ADJUSTER with a range of 0-100 (the default).
+			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
 
 			local pointer = pointers[id]
 			local widget = widgets[pointer.selected_widget]
-			local step_y = 100.0 / (widget.scale * widget.clickarea.bounds.height)
-			local new_value = pointer.start_value + (pointer.start_y - y) * step_y
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
 
 			new_value = math.floor(new_value + 0.5)
-			if new_value < 0 then new_value = 0 end
-			if new_value > 100 then new_value = 100 end
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
 			widget.field.user_value = new_value
 		end
 
