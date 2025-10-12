@@ -194,7 +194,7 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
-	void base(machine_config &config);
+	void base(machine_config &config) ATTR_COLD;
 	template <uint8_t Which> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
@@ -221,17 +221,17 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
-	void magic10(machine_config &config);
-	void magic10a(machine_config &config);
-	void sgsafari(machine_config &config);
-	void soccer10(machine_config &config);
+	void magic10(machine_config &config) ATTR_COLD;
+	void magic10a(machine_config &config) ATTR_COLD;
+	void sgsafari(machine_config &config) ATTR_COLD;
+	void soccer10(machine_config &config) ATTR_COLD;
 
-	void init_magic10();
-	void init_sgsafari();
-	void init_soccer10();
+	void init_magic10() ATTR_COLD;
+	void init_sgsafari() ATTR_COLD;
+	void init_soccer10() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
 
 	required_device<ticket_dispenser_device> m_ticket;
 	required_device<ticket_dispenser_device> m_hopper;
@@ -252,14 +252,15 @@ public:
 		magic10_base_state(mconfig, type, tag)
 	{ }
 
-	void magic102(machine_config &config);
+	void magic102(machine_config &config) ATTR_COLD;
 
-	void init_altaten();
-	void init_magic102();
-	void init_suprpool();
+	void init_altaten() ATTR_COLD;
+	void init_magic102() ATTR_COLD;
+	void init_spccomp() ATTR_COLD;
+	void init_suprpool() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { save_item(NAME(m_ret)); }
+	virtual void machine_start() override ATTR_COLD { save_item(NAME(m_ret)); }
 
 private:
 	uint16_t r();
@@ -275,9 +276,9 @@ public:
 		magic10_state(mconfig, type, tag)
 	{ }
 
-	void hotslot(machine_config &config);
+	void hotslot(machine_config &config) ATTR_COLD;
 
-	void init_hotslot();
+	void init_hotslot() ATTR_COLD;
 
 private:
 	uint16_t copro_r();
@@ -295,9 +296,9 @@ public:
 		m_ticket(*this, "ticket")
 	{ }
 
-	void spetrix(machine_config &config);
+	void spetrix(machine_config &config) ATTR_COLD;
 
-	void init_spetrix();
+	void init_spetrix() ATTR_COLD;
 
 protected:
 	required_device<ticket_dispenser_device> m_ticket;
@@ -1911,6 +1912,32 @@ ROM_START( altaten )
 	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
 ROM_END
 
+// same PCB as altaten
+ROM_START( spccomp )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "s_comp_1.8a_3.u2", 0x00000, 0x20000, CRC(db51ad58) SHA1(06711e9dc1031168362fef96371b646e2a8c9e4c) ) // 1xxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD16_BYTE( "s_comp_1.8a_2.u3", 0x00001, 0x20000, CRC(1825bac5) SHA1(6628b9b3809256b7b7bf799a595e4b00c6314410) ) // 1xxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x10000, "mcu", 0 ) // h8/330 HD6473308cp10 with internal ROM
+	ROM_LOAD( "mcu", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "tiles", 0 )
+	ROM_LOAD( "s_comp_1.7a_7.u35", 0x00000, 0x20000, CRC(4bcc28be) SHA1(c0de42e7f60cbab79ffdd45c7bbced90d4e187a3) )
+	ROM_LOAD( "s_comp_1.7a_6.u36", 0x20000, 0x20000, CRC(461b5267) SHA1(403c48ac74fcb225f14abf5f9478a3bd375844b0) )
+	ROM_LOAD( "s_comp_1.7a_5.u37", 0x40000, 0x20000, CRC(65944c43) SHA1(337041cb099cf4c8e71989bb6d613df899d98a8c) )
+	ROM_LOAD( "s_comp_1.7a_4.u38", 0x60000, 0x20000, CRC(d8c42026) SHA1(ea10f4a0ff37134b5d26e540221607c16b60a7d0) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) // ADPCM samples
+	ROM_LOAD( "s_computer_1.u32", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) // same as various other sets
+
+	ROM_REGION( 0x800, "nvram", 0 ) // pre-initialized for convenience
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(bd4fd5cb) SHA1(52bc40ae4617c7b136660620d3639cfbe423e5f3) )
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
+ROM_END
+
 
 /****************************
 *       Driver Init         *
@@ -1978,6 +2005,18 @@ void magic102_state::init_altaten()
 	rom[0x7669] = 0x4e;
 }
 
+void magic102_state::init_spccomp()
+{
+	m_layer2_offset[0] = 8;
+	m_layer2_offset[1] = 16;
+
+	// patching the boot protection...
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x7684] = 0x71;
+	rom[0x7685] = 0x4e;
+}
+
 } // anonymous namespace
 
 
@@ -2001,4 +2040,5 @@ GAMEL( 1996, sgsafari,  0,        sgsafari, sgsafari, magic10_state,  init_sgsaf
 GAMEL( 1995, musicsrt,  0,        magic10a, musicsrt, magic10_state,  init_magic10,  ROT0, "ABM Games",                        "Music Sort (ver. 2.02)",        MACHINE_SUPPORTS_SAVE,                        layout_musicsrt )
 GAME(  1998, lunaprk,   0,        magic102, magic102, magic102_state, init_suprpool, ROT0, "ABM Games",                        "Luna Park (ver. 1.2)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME(  1999, altaten,   0,        magic102, magic102, magic102_state, init_altaten,  ROT0, "<unknown>",                        "Alta Tensione (ver. 2.01a)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, spccomp,   0,        magic102, magic102, magic102_state, init_spccomp,  ROT0, "<unknown>",                        "Space Computer (ver. 1.8a)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME(  199?, spetrix,   0,        spetrix,  spetrix,  spetrix_state,  init_spetrix,  ROT0, "<unknown>",                        "Super Petrix (ver. 1P)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
