@@ -7,9 +7,35 @@
     Skeleton driver for the Volkswagen Digijet series of automotive ECUs
 
     The Digijet Engine Control Unit (ECU) was used in Volkswagen vehicles
-    from the early 1980s.
+    from the 1980s.
 
-    Currently, the only dump is from a 1985 Volkswagen Vanagon (USA CA).
+    CPU: MAF 80A39HL
+	ROM: ST M2764AF6
+	ADC0809CCN
+	LM2901
+	SN74LS373N
+	SN74LS00N
+	XTAL 7.372 MHz
+
+	_________________________
+	|          7   A 0       |
+	|          4   D 8       |
+	C          3   C 0    7  |
+	O          7     9    4  |
+	N  L2      3          0  |
+	N  M0    M2764AF6  X  0  |
+	|  91          80A39HL   |
+	|________________________|
+
+	Connector
+	3  GND
+	6  GND
+	7  GND
+	9  GND
+	10 GND
+	16 GND
+	17 GND
+	18 GND
 
 **************************************************************************/
 
@@ -65,8 +91,14 @@ ROM_START( digijet )
 	ROM_LOAD( "vanagon_85_usa_ca.bin", 0x000, 0x800, CRC(2ed7c4c5) SHA1(ae48d8892b44fe76b48bcefd293c15cd47af3fba) ) // Volkswagen Vanagon, 1985, USA, California
 ROM_END
 
+ROM_START( digijet2 )
+	ROM_REGION( 0x2000, I8049_TAG, 0 )
+	ROM_LOAD( "fabb05_03_03.bin", 0x0000, 0x2000, CRC(8c96bcdf) SHA1(73b26914cd15ca3a5e0d7427de9ce4b4e311fb00) ) // Volkswagen 1990, Germany
+ROM_END
+
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY       FULLNAME   FLAGS
-CONS( 1985, digijet, 0,      0,      digijet, digijet, digijet_state, empty_init, "Volkswagen", "Digijet", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT     COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY       FULLNAME          FLAGS
+CONS( 1985, digijet,   digijet90, 0,      digijet, digijet, digijet_state, empty_init, "Volkswagen", "Digijet",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+CONS( 1990, digijet90, 0,         0,      digijet, digijet, digijet_state, empty_init, "Volkswagen", "Digijet (1990)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
