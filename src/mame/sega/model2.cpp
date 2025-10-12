@@ -926,7 +926,7 @@ void model2_state::irq_enable_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_intena);
 
 	const u32 line = 1 << 10;
-	if (m_sound_irq_pending && m_intena & line)
+	if ((m_uart->status_r() & 0x03) && (m_intena & line))
 	{
 		m_intreq |= line;
 		irq_update();
@@ -2416,10 +2416,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 
 void model2_state::sound_ready_w(int state)
 {
-	m_sound_irq_pending = state;
-
+	// sound interrupt is asserted if either RxRDY or TxRDY is active
 	const u32 line = 1 << 10;
-	if (m_sound_irq_pending && m_intena & line)
+	if ((m_uart->status_r() & 0x03) && (m_intena & line))
 	{
 		m_intreq |= line;
 		irq_update();
@@ -2559,8 +2558,8 @@ void model2o_state::model2o(machine_config &config)
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
 	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
-	m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
-	m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
+	m_uart->rxrdy_handler().set(FUNC(model2o_state::sound_ready_w));
+	m_uart->txrdy_handler().set(FUNC(model2o_state::sound_ready_w));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));

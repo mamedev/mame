@@ -103,8 +103,6 @@ public:
 	void init_srallyc();
 	void init_powsledm();
 
-	void sound_ready_w(int state);
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -153,7 +151,6 @@ protected:
 	std::unique_ptr<raster_state> m_raster;
 	std::unique_ptr<geo_state> m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
-	bool m_sound_irq_pending = false;
 	u8 m_gearsel = 0;
 	u8 m_lightgun_mux = 0;
 
@@ -225,6 +222,7 @@ protected:
 	void reset_model2_scsp();
 	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  void screen_vblank_model2(int state);
+	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
 
