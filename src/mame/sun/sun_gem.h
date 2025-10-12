@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_SUN_GEM_H
-#define MAME_SUN_GEM_H
+#ifndef MAME_SUN_SUN_GEM_H
+#define MAME_SUN_SUN_GEM_H
 
 #pragma once
 
@@ -20,4 +20,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SUN_GEM, sun_gem_device)
 
-#endif // MAME_SUN_GEM_H
+#endif // MAME_SUN_SUN_GEM_H
