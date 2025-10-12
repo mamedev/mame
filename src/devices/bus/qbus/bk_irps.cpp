@@ -37,14 +37,14 @@ public:
 	bk_irps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_z80daisy_interface overrides
-	virtual int z80daisy_irq_state() override { return m_sart->z80daisy_irq_state(); };
-	virtual int z80daisy_irq_ack() override { return m_sart->z80daisy_irq_ack(); };
-	virtual void z80daisy_irq_reti() override { };
+	virtual int z80daisy_irq_state() override { return m_sart->z80daisy_irq_state(); }
+	virtual int z80daisy_irq_ack() override { return m_sart->z80daisy_irq_ack(); }
+	virtual void z80daisy_irq_reti() override { }
 
 	required_device<k1801vp065_device> m_sart;
 	required_device<rs232_port_device> m_rs232;
@@ -91,9 +91,8 @@ void bk_irps_device::device_add_mconfig(machine_config &config)
 void bk_irps_device::device_start()
 {
 	m_bus->install_device(0176560, 0176567,
-		emu::rw_delegate(m_sart, FUNC(k1801vp065_device::read)),
-		emu::rw_delegate(m_sart, FUNC(k1801vp065_device::write))
-	);
+			emu::rw_delegate(m_sart, FUNC(k1801vp065_device::read)),
+			emu::rw_delegate(m_sart, FUNC(k1801vp065_device::write)));
 }
 
 } // anonymous namespace
