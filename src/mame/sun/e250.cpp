@@ -41,7 +41,7 @@ Main components found on its main PCB:
 
 #include "softlist_dev.h"
 
-#include "sun_fcnc_270_4373_07.h"
+#include "sun_gem.h"
 //#include "bus/pci/permedia2.h"
 
 
@@ -80,7 +80,7 @@ void e250_state::e250(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 
 	// PCI Cards
-	SUN_FCNC_270_4373_07(config, "sun_fcnc_270_4373_07"); // Sun Microsystems 270-4373-07 Gigabit Fiber Channel Network Card
+	SUN_GEM(config, "sun_fcnc_270_4373_07"); // Sun Microsystems 270-4373-07 Gigabit Fiber Channel Network Card
 	//PERMEDIA2(config, "permedia2"); // Raptor GFX PCI Video Card
 }
 
