@@ -11,15 +11,12 @@
 
     TODO:
     - Mip Mapping still needs to be properly sorted in the renderer;
-    - sound comms still needs some work (sometimes m68k doesn't get some commands or play them with a delay);
     - outputs and artwork (for gearbox indicators);
     - clean-ups;
 
     TODO (per-game issues)
     - doa, doaa: corrupted sound, eventually becomes silent;
     - dynamcopc: corrupts palette for 2d;
-    - fvipers: enables timers, but then irq register is empty, hence it crashes with an
-      "interrupt halt" at POST (regression, worked around);
     - hpyagu98: stops with 'Error #1' message during boot.
       Also writes to the 0x600000-0x62ffff range in main CPU program map;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
@@ -29,7 +26,6 @@
               bypass it by entering then exiting service mode;
     - sgt24h: has input analog issues, steering doesn't center when neutral,
       gas and brake pedals pulses instead of being fixed;
-    - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...
@@ -128,18 +124,17 @@ void model2_state::timers_w(offs_t offset, u32 data, u32 mem_mask)
 template <int TNum>
 TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 {
-	int bit = TNum + 2;
-
 	if(m_timerrun[TNum] == 0)
 		return;
 
 	m_timers[TNum]->reset();
 
-	m_intreq |= (1<<bit);
-	if(m_intena & 1<<bit)
-		m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
-	//printf("%08x %08x (%08x)\n",m_intreq,m_intena,1<<bit);
-	model2_check_irq_state();
+	const u32 line = 1 << (TNum + 2);
+	if (m_intena & line)
+	{
+		m_intreq |= line;
+		irq_update();
+	}
 
 	m_timervals[TNum] = 0xfffff;
 	m_timerrun[TNum] = 0;
@@ -269,11 +264,7 @@ void model2_state::machine_reset()
 	m_geo_write_start_address = 0;
 	m_geo_read_start_address = 0;
 
-	const int irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
-	for (auto irq : irq_type)
-	{
-		m_maincpu->set_input_line(irq, CLEAR_LINE);
-	}
+	irq_update();
 }
 
 void model2_state::reset_model2_scsp()
@@ -927,42 +918,27 @@ u32 model2_state::irq_enable_r()
 void model2_state::irq_ack_w(u32 data)
 {
 	m_intreq &= data;
-
-	model2_check_irqack_state(data ^ 0xffffffff);
+	irq_update();
 }
 
 void model2_state::irq_enable_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_intena);
-	model2_check_irq_state();
-}
 
-void model2_state::model2_check_irq_state()
-{
-	return;
-
-	/* TODO: vf2 and fvipers hangs with an irq halt on POST, disabled for now */
-	const int irq_type[12]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
-
-	for(int i=0;i<12;i++)
+	const u32 line = 1 << 10;
+	if (m_sound_irq_pending && m_intena & line)
 	{
-		if (m_intena & (1<<i) && m_intreq & (1<<i))
-		{
-			m_maincpu->set_input_line(irq_type[i], ASSERT_LINE);
-			return;
-		}
+		m_intreq |= line;
+		irq_update();
 	}
 }
 
-void model2_state::model2_check_irqack_state(u32 data)
+void model2_state::irq_update()
 {
-	const int irq_type[12]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
-
-	for(int i=0;i<12;i++)
-	{
-		if(data & 1<<i)
-			m_maincpu->set_input_line(irq_type[i], CLEAR_LINE);
-	}
+	m_maincpu->set_input_line(I960_IRQ0, m_intreq & 0b0000'0000'0001 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(I960_IRQ1, m_intreq & 0b0000'0000'0010 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(I960_IRQ2, m_intreq & 0b0011'1111'1100 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(I960_IRQ3, m_intreq & 0b1100'0000'0000 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 u8 model2_state::model2_serial_r(offs_t offset)
@@ -2427,67 +2403,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 
 	if(scanline == 384)
 	{
-		m_intreq |= (1<<0);
-		if(m_intena & 1<<0)
-			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
-		model2_check_irq_state();
+		const u32 line = 1 << 0;
+		if (m_intena & line)
+		{
+			m_intreq |= line;
+			irq_update();
+		}
 		if (m_m2comm != nullptr)
 			m_m2comm->check_vint_irq();
 	}
-	else if(scanline == 0)
-	{
-		/* From sound to main CPU (TODO: what enables this?) */
-		m_intreq |= (1<<10);
-		if(m_intena & 1<<10)
-			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
-		model2_check_irq_state();
-	}
 }
 
-#ifdef UNUSED_FUNCTION
 void model2_state::sound_ready_w(int state)
 {
-	if(state)
-	{
-		m_intreq |= (1<<10);
-		if(m_intena & 1<<10)
-			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
-		model2_check_irq_state();
-	}
-}
-#endif
+	m_sound_irq_pending = state;
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2c_state::model2c_interrupt)
-{
-	int scanline = param;
-
-	if(scanline == 384)
+	const u32 line = 1 << 10;
+	if (m_sound_irq_pending && m_intena & line)
 	{
-		m_intreq |= (1<<0);
-		if(m_intena & 1<<0)
-			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
-		model2_check_irq_state();
-		if (m_m2comm != nullptr)
-			m_m2comm->check_vint_irq();
+		m_intreq |= line;
+		irq_update();
 	}
-	else if(scanline == 0)
-	{
-		m_intreq |= (1<<10);
-		if(m_intena & 1<<10)
-			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
-		model2_check_irq_state();
-	}
-	#if 0
-	else if(scanline == 0)
-	{
-		// TODO: irq source? Scroll allocation in dynamcopc?
-		// it's actually a timer 0 irq, doesn't seem necessary
-		m_intreq |= (1<<2);
-		if(m_intena & 1<<2)
-			m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
-		model2_check_irq_state();
-	}
-	#endif
 }
 
 /* Model 2 sound board emulation */
@@ -2578,8 +2514,8 @@ void model2_state::model2_scsp(machine_config &config)
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
-//  m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
-//  m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
+	m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
+	m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
@@ -2623,6 +2559,8 @@ void model2o_state::model2o(machine_config &config)
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
 	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
+	m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
+	m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
@@ -3033,7 +2971,7 @@ void model2c_state::model2c(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2c_state::model2c_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86235(config, m_copro_tgpx4, 20_MHz_XTAL);
 	m_copro_tgpx4->set_addrmap(AS_PROGRAM, &model2c_state::copro_tgpx4_map);
