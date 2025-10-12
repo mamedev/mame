@@ -230,33 +230,45 @@ DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
     ADDRESS MAPS
 ***************************************************************************/
 
-void mcs51_cpu_device::program_internal(address_map &map)
+void mcs51_cpu_device::program_map(address_map &map)
 {
 	if (m_rom_size > 0)
 		map(0, m_rom_size - 1).rom().region(DEVICE_SELF, 0);
 }
 
-void mcs51_cpu_device::io_internal(address_map &map)
+void mcs51_cpu_device::sfr_map(address_map &map)
 {
-	map(0x0000, m_ram_mask).ram().share("scratchpad");
-	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
+	map(0x80, 0xff).ram().rw(FUNC(mcs51_cpu_device::sfr_read), FUNC(mcs51_cpu_device::sfr_write));
+}
+
+void mcs51_cpu_device::intd_map(address_map &map)
+{
+	map(0x00, m_ram_mask).ram().share(m_internal_ram);
+	map(0x80, 0xff).unmaprw();
+	sfr_map(map);
+}
+
+void mcs51_cpu_device::inti_map(address_map &map)
+{
+	map(0x00, m_ram_mask).ram().share(m_internal_ram);
 }
 
 
 
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor io_map, int program_width, int io_width, uint8_t features)
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mcs51_cpu_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 18 : 16, 0)
-	, m_intd_config("internal_direct", ENDIANNESS_LITTLE, 8, 9, 0, io_map)
+	, m_intd_config("internal_direct", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mcs51_cpu_device::intd_map), this))
+	, m_inti_config("internal_indirect", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mcs51_cpu_device::inti_map), this))
 	, m_pc(0)
 	, m_features(features)
 	, m_inst_cycles(0)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
 	, m_ram_mask((io_width == 8) ? 0xff : 0x7f)
 	, m_num_interrupts(5)
-	, m_sfr_ram(*this, "sfr_ram")
-	, m_scratchpad(*this, "scratchpad")
+	, m_sfr_ram(*this, "sfr_ram", 0x80, ENDIANNESS_LITTLE)
+	, m_internal_ram(*this, "internal_ram")
 	, m_port_in_cb(*this, 0xff)
 	, m_port_out_cb(*this)
 	, m_rtemp(0)
@@ -269,13 +281,6 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	for (auto & elem : m_forced_inputs)
 		elem = 0;
 }
-
-
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features)
-	: mcs51_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(mcs51_cpu_device::program_internal), this), address_map_constructor(FUNC(mcs51_cpu_device::io_internal), this), program_width, io_width, features)
-{
-}
-
 
 i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I8031, tag, owner, clock, 0, 7)
@@ -443,7 +448,8 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config),
-		std::make_pair(AS_INTD,    &m_intd_config)
+		std::make_pair(AS_INTD,    &m_intd_config),
+		std::make_pair(AS_INTI,    &m_inti_config)
 	};
 }
 
@@ -457,24 +463,19 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 #define ROP_ARG(pc)     m_program.read_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
-#define CODEMEM_R(a)    (uint8_t)m_program.read_byte(a)
+#define CODEMEM_R(a)    m_program.read_byte(a)
 
 /* Read/Write a byte from/to External Data Memory (Usually RAM or other I/O) */
-#define DATAMEM_R(a)    (uint8_t)m_data.read_byte(a)
+#define DATAMEM_R(a)    m_data.read_byte(a)
 #define DATAMEM_W(a,v)  m_data.write_byte(a, v)
 
-/* Read/Write a byte from/to the Internal RAM */
+/* Read/Write a byte from/to the Internal RAM, direct or indirect */
 
-#define IRAM_R(a)       iram_read(a)
-#define IRAM_W(a, d)    iram_write(a, d)
+#define IRAM_R(a)       m_intd.read_byte(a)
+#define IRAM_W(a, d)    m_intd.write_byte(a, d)
 
-/* Read/Write a byte from/to the Internal RAM indirectly */
-/* (called from indirect addressing)                     */
-uint8_t mcs51_cpu_device::iram_iread(offs_t a) { return (a <= m_ram_mask) ? m_intd.read_byte(a) : 0xff; }
-void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m_intd.write_byte(a, d); }
-
-#define IRAM_IR(a)      iram_iread(a)
-#define IRAM_IW(a, d)   iram_iwrite(a, d)
+#define IRAM_IR(a)      m_inti.read_byte(a)
+#define IRAM_IW(a, d)   m_inti.write_byte(a, d)
 
 /* Form an Address to Read/Write to External RAM indirectly */
 /* (called from indirect addressing)                        */
@@ -496,8 +497,8 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 /* SFR Registers - These are accessed directly for speed on read */
 /* Read accessors                                                */
 
-#define SFR_A(a)        m_sfr_ram[(a)]
-#define SET_SFR_A(a,v)  do { SFR_A(a) = (v); } while (0)
+#define SFR_A(a)        m_sfr_ram[(a) & 0x7f]
+#define SET_SFR_A(a,v)  do { SFR_A((a) & 0x7f) = (v); } while (0)
 
 #define ACC         SFR_A(ADDR_ACC)
 #define PSW         SFR_A(ADDR_PSW)
@@ -523,7 +524,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 #define B           SFR_A(ADDR_B)
 #define SBUF        SFR_A(ADDR_SBUF)
 
-#define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
+#define R_REG(r)    m_internal_ram[(r) | (PSW & 0x18)]
 #define DPTR        ((DPH<<8) | DPL)
 
 /* 8052 Only registers */
@@ -582,7 +583,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 #define SET_SBUF(v) SET_SFR_A(ADDR_SBUF, v)
 
 /* No actions triggered on write */
-#define SET_REG(r, v)   do { m_scratchpad[(r) | (PSW & 0x18)] = (v); } while (0)
+#define SET_REG(r, v)   do { m_internal_ram[(r) | (PSW & 0x18)] = (v); } while (0)
 
 #define SET_DPTR(n)     do { DPH = ((n) >> 8) & 0xff; DPL = (n) & 0xff; } while (0)
 
@@ -869,21 +870,6 @@ offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 			return (offset & mem_mask) | (P2 << 8);
 	}
 	return offset;
-}
-
-/* Internal ram read/write */
-
-uint8_t mcs51_cpu_device::iram_read(size_t offset)
-{
-	return ((offset < 0x80) ? m_intd.read_byte(offset) : sfr_read(offset));
-}
-
-void mcs51_cpu_device::iram_write(size_t offset, uint8_t data)
-{
-	if (offset < 0x80)
-		m_intd.write_byte(offset, data);
-	else
-		sfr_write(offset, data);
 }
 
 /*Push the current PC to the stack*/
@@ -2168,12 +2154,9 @@ void mcs51_cpu_device::execute_run()
  * MCS51/8051 Section
  ****************************************************************************/
 
-void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
+void mcs51_cpu_device::sfr_write(offs_t offset, uint8_t data)
 {
-	/* update register */
-	assert(offset >= 0x80 && offset <= 0xff);
-
-	switch (offset)
+	switch (offset + 0x80)
 	{
 		case ADDR_P0:   m_port_out_cb[0](data);             break;
 		case ADDR_P1:   m_port_out_cb[1](data);             break;
@@ -2220,14 +2203,12 @@ void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
 			/* no write in this case according to manual */
 			return;
 	}
-	m_intd.write_byte((size_t)offset | 0x100, data);
+	m_sfr_ram[offset] = data;
 }
 
-uint8_t mcs51_cpu_device::sfr_read(size_t offset)
+uint8_t mcs51_cpu_device::sfr_read(offs_t offset)
 {
-	assert(offset >= 0x80 && offset <= 0xff);
-
-	switch (offset)
+	switch (offset + 0x80)
 	{
 		/* Read/Write/Modify operations read the port latch ! */
 		/* Move to memory map */
@@ -2255,7 +2236,7 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 		case ADDR_SBUF:
 		case ADDR_IE:
 		case ADDR_IP:
-			return m_intd.read_byte((size_t) offset | 0x100);
+			return m_sfr_ram[offset];
 		/* Illegal or non-implemented sfr */
 		default:
 			LOG("attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", (uint32_t)offset,PC);
@@ -2270,6 +2251,7 @@ void mcs51_cpu_device::device_start()
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
 	space(AS_INTD).specific(m_intd);
+	space(AS_INTI).specific(m_inti);
 
 	/* Save states */
 	save_item(NAME(m_ppc));
@@ -2459,7 +2441,7 @@ void mcs51_cpu_device::device_reset()
  * 8052 Section
  ****************************************************************************/
 
-void i8052_device::sfr_write(size_t offset, uint8_t data)
+void i8052_device::sfr_write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -2469,7 +2451,7 @@ void i8052_device::sfr_write(size_t offset, uint8_t data)
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			m_intd.write_byte((size_t) offset | 0x100, data);
+			m_sfr_ram[offset] = data;
 			break;
 
 		default:
@@ -2477,9 +2459,9 @@ void i8052_device::sfr_write(size_t offset, uint8_t data)
 	}
 }
 
-uint8_t i8052_device::sfr_read(size_t offset)
+uint8_t i8052_device::sfr_read(offs_t offset)
 {
-	switch (offset)
+	switch (offset + 0x80)
 	{
 		/* 8052 family specific */
 		case ADDR_T2CON:
@@ -2487,7 +2469,7 @@ uint8_t i8052_device::sfr_read(size_t offset)
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			return m_intd.read_byte((size_t) offset | 0x100);
+			return m_sfr_ram[offset];
 		default:
 			return mcs51_cpu_device::sfr_read(offset);
 	}
@@ -2498,9 +2480,9 @@ uint8_t i8052_device::sfr_read(size_t offset)
  * 80C52 Section
  ****************************************************************************/
 
-void i80c52_device::sfr_write(size_t offset, uint8_t data)
+void i80c52_device::sfr_write(offs_t offset, uint8_t data)
 {
-	switch (offset)
+	switch (offset + 0x80)
 	{
 		/* 80c52 family specific */
 		case ADDR_IP:
@@ -2517,18 +2499,18 @@ void i80c52_device::sfr_write(size_t offset, uint8_t data)
 			i8052_device::sfr_write(offset, data);
 			return;
 	}
-	m_intd.write_byte((size_t) offset | 0x100, data);
+	m_sfr_ram[offset] = data;
 }
 
-uint8_t i80c52_device::sfr_read(size_t offset)
+uint8_t i80c52_device::sfr_read(offs_t offset)
 {
-	switch (offset)
+	switch (offset + 0x80)
 	{
 		/* 80c52 family specific */
 		case ADDR_IPH:
 		case ADDR_SADDR:
 		case ADDR_SADEN:
-			return m_intd.read_byte((size_t) offset | 0x100);
+			return m_sfr_ram[offset];
 		default:
 			return i8052_device::sfr_read(offset);
 	}
@@ -2542,7 +2524,7 @@ uint8_t i80c52_device::sfr_read(size_t offset)
 #define DS5_LOGW(a, d)  LOG("write to  " # a " register at 0x%04x, data=%x\n", PC, d)
 #define DS5_LOGR(a, d)  LOG("read from " # a " register at 0x%04x\n", PC)
 
-uint8_t mcs51_cpu_device::ds5002fp_protected(size_t offset, uint8_t data, uint8_t ta_mask, uint8_t mask)
+uint8_t mcs51_cpu_device::ds5002fp_protected(offs_t offset, uint8_t data, uint8_t ta_mask, uint8_t mask)
 {
 	uint8_t is_timed_access;
 
@@ -2555,9 +2537,9 @@ uint8_t mcs51_cpu_device::ds5002fp_protected(size_t offset, uint8_t data, uint8_
 	return (m_sfr_ram[offset] & (~mask)) | (data & mask);
 }
 
-void ds5002fp_device::sfr_write(size_t offset, uint8_t data)
+void ds5002fp_device::sfr_write(offs_t offset, uint8_t data)
 {
-	switch (offset)
+	switch (offset + 0x80)
 	{
 		case ADDR_TA:
 			m_ds5002fp.previous_ta = TA;
@@ -2581,7 +2563,7 @@ void ds5002fp_device::sfr_write(size_t offset, uint8_t data)
 			mcs51_cpu_device::sfr_write(offset, data);
 			return;
 	}
-	m_intd.write_byte((size_t) offset | 0x100, data);
+	m_sfr_ram[offset] = data;
 }
 
 
@@ -2604,9 +2586,9 @@ bool ds5002fp_device::is_rnr_ready()
 		return false;
 }
 
-uint8_t ds5002fp_device::sfr_read(size_t offset)
+uint8_t ds5002fp_device::sfr_read(offs_t offset)
 {
-	switch (offset)
+	switch (offset + 0x80)
 	{
 		case ADDR_CRCR:     DS5_LOGR(CRCR, data);       break;
 		case ADDR_CRCL:     DS5_LOGR(CRCL, data);       break;
@@ -2624,17 +2606,17 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 		default:
 			return mcs51_cpu_device::sfr_read(offset);
 	}
-	return m_intd.read_byte((size_t) offset | 0x100);
+	return m_sfr_ram[offset];
 }
 
 /*
-Documentation states that having the battery connected "maintains the internal scratchpad RAM" and "certain SFRs"
+Documentation states that having the battery connected "maintains the internal internal_ram RAM" and "certain SFRs"
 (although it isn't clear exactly which SFRs except for those explicitly mentioned)
 */
 
 void ds5002fp_device::nvram_default()
 {
-	memset(m_scratchpad, 0, 0x80);
+	memset(m_internal_ram, 0, 0x80);
 	memset(m_sfr_ram, 0, 0x80);
 
 	int expected_bytes = 0x80 + 0x80;
@@ -2651,7 +2633,7 @@ void ds5002fp_device::nvram_default()
 	{
 		uint8_t *region = m_region->base();
 
-		memcpy(m_scratchpad, region, 0x80); region += 0x80;
+		memcpy(m_internal_ram, region, 0x80); region += 0x80;
 		memcpy(m_sfr_ram, region, 0x80); region += 0x80;
 		/* does anything else need storing? any registers that aren't in sfr ram?
 		   It isn't clear if the various initial MCON registers etc. are just stored in sfr ram
@@ -2663,7 +2645,7 @@ bool ds5002fp_device::nvram_read(util::read_stream &file)
 {
 	std::error_condition err;
 	size_t actual;
-	std::tie(err, actual) = read(file, m_scratchpad, 0x80);
+	std::tie(err, actual) = read(file, m_internal_ram, 0x80);
 	if (err || (actual != 0x80))
 		return false;
 	std::tie(err, actual) = read(file, m_sfr_ram, 0x80);
@@ -2676,7 +2658,7 @@ bool ds5002fp_device::nvram_write(util::write_stream &file)
 {
 	std::error_condition err;
 	size_t actual;
-	std::tie(err, actual) = write(file, m_scratchpad, 0x80);
+	std::tie(err, actual) = write(file, m_internal_ram, 0x80);
 	if (err || (actual != 0x80))
 		return false;
 	std::tie(err, actual) = write(file, m_sfr_ram, 0x80);
