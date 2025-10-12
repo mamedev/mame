@@ -221,7 +221,7 @@ copyright-holders:m1macrophage
 	<group name="knob">
 		<element ref="knob_outer" id="knob_~knob_input~"><bounds x="0" y="0" width="68" height="68"/></element>
 		<element ref="knob_inner"><bounds x="9" y="9" width="50" height="50"/></element>
-		<element ref="knob_value" inputtag="~knob_input~" inputmask="0x7f" inputraw="yes">
+		<element ref="knob_value" inputtag="~knob_input~" inputmask="0xffff" inputraw="yes">
 			<bounds x="17" y="22" width="34" height="24"/>
 		</element>
 		<element ref="transparent" clickthrough="no"><bounds x="17" y="22" width="34" height="24"/></element>
@@ -236,7 +236,7 @@ copyright-holders:m1macrophage
 		</element>
 		<element ref="slider_well"><bounds x="8" y="0" width="16" height="~slider_height~"/></element>
 		<element ref="slider_knob" id="slider_knob_~slider_input~">>
-			<animate inputtag="~slider_input~" inputmask="0x7f"/>
+			<animate inputtag="~slider_input~" inputmask="0xffff"/>
 			<bounds state="100" x="10" y="0" width="12" height="28"/>
 			<bounds state="0" x="10" y="~slider_knob_max_y~" width="12" height="28"/>
 		</element>
@@ -628,8 +628,8 @@ copyright-holders:m1macrophage
 				is_knob     = false })
 		end
 
-		-- A sweep between 0 and 100 requires moving the pointer by
-		-- `scale * clickarea.height` pixes.
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
 		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
 			table.insert(widgets, {
 				clickarea = get_layout_item(view, clickarea_id),
@@ -699,15 +699,18 @@ copyright-holders:m1macrophage
 			end
 
 			-- A widget is selected. Update its state based on the pointer's Y
-			-- position. It is assumed the attached IO field is an
-			-- IPT_ADJUSTER with a range of 0-100 (the default).
+			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
 
 			local pointer = pointers[id]
 			local widget = widgets[pointer.selected_widget]
 
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
 			local new_value
 			if widget.is_knob then
-				local step_y = 100.0 / (widget.scale * widget.clickarea.bounds.height)
+				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
 				new_value = pointer.start_value + (pointer.start_y - y) * step_y
 			else
 				local knob_half_height = widget.slider_knob.bounds.height / 2
@@ -717,17 +720,17 @@ copyright-holders:m1macrophage
 				if pointer.relative then
 					-- User clicked on the knob. The new value will depend on how
 					--  much the knob was dragged.
-					new_value = pointer.start_value - 100 * (y - pointer.start_y) / (max_y - min_y)
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
 				else
 					-- User clicked elsewhere on the slider. The new value will depend on
 					-- the absolute position of the click.
-					new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
 				end
 			end
 
 			new_value = math.floor(new_value + 0.5)
-			if new_value < 0 then new_value = 0 end
-			if new_value > 100 then new_value = 100 end
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
 			widget.field.user_value = new_value
 		end
 
