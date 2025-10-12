@@ -1028,7 +1028,8 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 	// Ni-cd (?) battery with 1.5 ~ 2.3 hours of duration
 }
 
-/* took from "raw" memory dump */
+// TODO: this shouldn't be necessary for any 9821
+// They all have one form or another of internal IDE BIOS instead.
 #define LOAD_IDE_ROM \
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) ) \
 	ROM_LOAD( "d8000.rom", 0x0000, 0x2000, BAD_DUMP CRC(5dda57cc) SHA1(d0dead41c5b763008a4d777aedddce651eb6dcbb) ) \
@@ -1230,7 +1231,9 @@ ROM_START( pc9821cx3 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
 	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x40000, 0x00000, 0x02000 )
 ROM_END
 
 /*

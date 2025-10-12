@@ -32,14 +32,14 @@ TODO (pc9801/pc9801f):
 - it currently hooks up half size kanji ROMs, causing missing text in many games;
 
 TODO (pc9801rs):
-- Remove IDE hack to not make 512 to 256 sector byte translations, assume unsupported and really
-  requiring a SCSI option instead.
+- Remove IDE hack to not make 512 to 256 sector byte translations
+\- probably need a working C-Bus IDE in place;
 
 TODO (pc9801us / pc9801fs):
 - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
 - RAM check detects more RAM than what's really installed (and saves previous detection in MEMSW);
-- pc9801fs at least: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS,
- incompatible with 512 bps or IDE itself?
+- pc9801fs: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS
+\- wants specifically (the internal) SCSI?
 
 TODO (pc9801bx2):
 - "SYSTEM SHUTDOWN" at POST, SDIP related, soft reset to bypass;
@@ -158,7 +158,8 @@ u8 pc9801vm_state::ide_ctrl_hack_r()
 	if (!machine().side_effects_disabled())
 	{
 		// HACK: RS IDE driver will try to do 512 to 256 byte sector translations
-		// MEMSW has no setting for this, is it concealed?
+		// Never initializes buffer at $457, and MEMSW has no setting for this.
+
 		// SDIP based machines don't need this (they will default to 512 bps, shadowed from
 		// gaiji $ac403 bit 6).
 		address_space &ram = m_maincpu->space(AS_PROGRAM);
@@ -2625,6 +2626,8 @@ ROM_END
 
 /*
 US - i386SX @ 16 MHz
+
+Built-in 2.5 IDE interface
 */
 
 ROM_START( pc9801us )
@@ -2647,8 +2650,9 @@ ROM_START( pc9801us )
 	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
 
 	LOAD_KANJI_ROMS
-	// SASI HDDs
-//  LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 /*
@@ -2676,6 +2680,9 @@ ROM_START( pc9801fs )
 
 	LOAD_KANJI_ROMS
 //  LOAD_IDE_ROM
+
+//	ROM_REGION( 0x4000, "scsi", ROMREGION_ERASEVAL(0xcb) )
+//	ROM_COPY( "biosrom", 0x16000, 0x00000, 0x02000 )
 ROM_END
 
 /*
@@ -2711,11 +2718,16 @@ ROM_START( pc9801rs )
 
 	/* following is an emulator memory dump, should be checked and eventually nuked if nothing worth is there */
 	ROM_REGION( 0x100000, "memory", 0 )
+	// refs for an "EPSON SCANNER"
 	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
-	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
+	// 1-filled
+	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )
+	// sound BIOS at $cc000
 	ROM_LOAD( "c8000.rom", 0xc8000, 0x8000, CRC(f2a262b0) SHA1(fe97d2068d18bbb7425d9774e2e56982df2aa1fb) )
-	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
-	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )  // contains n-88 basic (86) v2.0
+	// 1-filled
+	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )
+	// n-88 basic (86) v2.0
+	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
 	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
 	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
 
@@ -2767,7 +2779,9 @@ ROM_START( pc9801bx2 )
 	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
 
 	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 void pc9801_state::init_pc9801_kanji()
@@ -2956,7 +2970,7 @@ COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_p
 
 // RS class (i386SX)
 COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING )
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING )
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     0 )
 // DX class (i286)
 COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801DX",                     MACHINE_NOT_WORKING )
 // DA class (i386SX + SDIP and EMS)
