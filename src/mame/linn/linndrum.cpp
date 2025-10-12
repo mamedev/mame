@@ -333,7 +333,7 @@ void linndrum_vcf_eg_device::sound_stream_update(sound_stream &stream)
 void linndrum_vcf_eg_device::device_add_mconfig(machine_config &config)
 {
 	TIMER(config, m_trigger_timer).configure_generic(FUNC(linndrum_vcf_eg_device::trigger_timer_elapsed));
-	VA_RC_EG(config, m_rc).set_c(CAP_U(0.1));  // mux: C70, tom: no designation.
+	VA_RC_EG(config, m_rc).set_c(EG_C);
 	m_rc->add_route(0, *this, 1.0);
 }
 
