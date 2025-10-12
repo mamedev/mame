@@ -250,11 +250,11 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 			// Trilinear combination
 			int frac = (int)((mml - level) * 256.0f);
 			frac = std::min(std::max(frac, 0), 256);
-			t = (256 - frac) * t + frac * t2;
+			t = ((256 - frac) * t + frac * t2) >> 8;
 		}
 
-		// Trilinear combination has 16 bits of precision, and the table needs t to be shifted by 3 on the left
-		luma = (u32)lumaram[lumabase + (t >> (16-3))] * object.luma / 256;
+		// Trilinear combination has 8 bits of precision, and the table needs t to be shifted by 3 on the left
+		luma = (u32)lumaram[lumabase + (t >> (8 - 3))] * object.luma / 256;
 
 		// Virtua Striker sets up a luma of 0x40 for national flags on bleachers, fix here.
 		luma = std::min((int)luma,0x3f);
