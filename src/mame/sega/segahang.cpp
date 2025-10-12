@@ -464,7 +464,7 @@ void segahang_state::sound_portmap_2203x2(address_map &map)
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
-void segahang_state::mcu_io_map(address_map &map)
+void segahang_state::mcu_data_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(segahang_state::i8751_r), FUNC(segahang_state::i8751_w));
 }
@@ -935,7 +935,7 @@ void segahang_state::sharrier(machine_config &config)
 	m_maincpu->remove_vblank_int();
 
 	I8751(config, m_mcu, 8000000);
-	m_mcu->set_addrmap(AS_IO, &segahang_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &segahang_state::mcu_data_map);
 	m_mcu->port_out_cb<1>().set(FUNC(segahang_state::i8751_p1_w));
 
 	m_screen->screen_vblank().set_inputline("mcu", INPUT_LINE_IRQ0);

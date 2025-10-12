@@ -46,12 +46,17 @@ public:
 	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
 
 	void program_internal(address_map &map) ATTR_COLD;
-	void data_internal(address_map &map) ATTR_COLD;
+	void io_internal(address_map &map) ATTR_COLD;
 
 protected:
+	enum {
+		AS_INTD = 4,
+		AS_INTI = 5,
+	};
+
 	// construction/destruction
-	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
-	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features = 0);
+	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features = 0);
+	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor io_map, int program_width, int io_width, uint8_t features = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -76,7 +81,7 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	address_space_config m_io_config;
+	address_space_config m_intd_config;
 
 	// Internal stuff
 	uint16_t m_ppc;              // previous pc
@@ -132,8 +137,8 @@ protected:
 
 	// Memory spaces
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
-	memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
-	memory_access<18, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+	memory_access<18, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_intd;
 
 	devcb_read8::array<4> m_port_in_cb;
 	devcb_write8::array<4> m_port_out_cb;
@@ -374,7 +379,7 @@ public:
 	i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+	i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features = 0);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -415,7 +420,7 @@ public:
 	i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+	i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features = 0);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
@@ -435,7 +440,7 @@ public:
 	i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+	i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features = 0);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -465,7 +470,7 @@ public:
 	i87c51fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+	i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features = 0);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
@@ -548,7 +553,7 @@ public:
 	p80c562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	p80c562_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+	p80c562_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features = 0);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };

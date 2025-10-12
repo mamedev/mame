@@ -462,11 +462,11 @@ void segas16a_state::mcu_control_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  mcu_io_w - handle I/O space writes, which map
+//  mcu_data_w - handle I/O space writes, which map
 //  to the 68000's address space
 //-------------------------------------------------
 
-void segas16a_state::mcu_io_w(offs_t offset, uint8_t data)
+void segas16a_state::mcu_data_w(offs_t offset, uint8_t data)
 {
 	//
 	//  1.00 0... = work RAM (accessed @ $4000+x) or I/O (accessed @ $8000+x)
@@ -519,11 +519,11 @@ void segas16a_state::mcu_io_w(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  mcu_io_r - handle I/O space reads, which map
+//  mcu_data_r - handle I/O space reads, which map
 //  to the 68000's address space
 //-------------------------------------------------
 
-uint8_t segas16a_state::mcu_io_r(address_space &space, offs_t offset)
+uint8_t segas16a_state::mcu_data_r(address_space &space, offs_t offset)
 {
 	switch ((m_mcu_control >> 3) & 7)
 	{
@@ -1014,9 +1014,9 @@ void segas16a_state::sound_no7751_portmap(address_map &map)
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
-void segas16a_state::mcu_io_map(address_map &map)
+void segas16a_state::mcu_data_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(segas16a_state::mcu_io_r), FUNC(segas16a_state::mcu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(segas16a_state::mcu_data_r), FUNC(segas16a_state::mcu_data_w));
 }
 
 
@@ -2065,7 +2065,7 @@ void segas16a_state::system16a_i8751(machine_config &config)
 	m_maincpu->remove_vblank_int();
 
 	I8751(config, m_mcu, 8000000);
-	m_mcu->set_addrmap(AS_IO, &segas16a_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &segas16a_state::mcu_data_map);
 	m_mcu->port_out_cb<1>().set(FUNC(segas16a_state::mcu_control_w));
 
 	m_screen->screen_vblank().set(FUNC(segas16a_state::i8751_main_cpu_vblank_w));

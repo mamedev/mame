@@ -227,7 +227,7 @@ private:
 	void m72_protected_portmap(address_map &map) ATTR_COLD;
 	void m72_airduel_portmap(address_map &map) ATTR_COLD;
 	void i80c31_mem_map(address_map &map) ATTR_COLD;
-	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
 	void sound_protected_portmap(address_map &map) ATTR_COLD;
 	void xmultiplm72_map(address_map &map) ATTR_COLD;
 };

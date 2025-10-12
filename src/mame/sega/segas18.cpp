@@ -679,7 +679,7 @@ void segas18_state::pcm_map(address_map &map)
  *
  *************************************/
 
-void segas18_state::mcu_io_map(address_map &map)
+void segas18_state::mcu_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff); // port 2 not used for high order address byte
@@ -1512,7 +1512,7 @@ void segas18_state::system18_i8751(machine_config &config)
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
 	I8751(config, m_mcu, 8000000);
-	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &segas18_state::mcu_data_map);
 	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
 }
 
@@ -1526,7 +1526,7 @@ void segas18_state::system18_fd1094_i8751(machine_config &config)
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
 	I8751(config, m_mcu, 8000000);
-	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &segas18_state::mcu_data_map);
 	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
 }
 

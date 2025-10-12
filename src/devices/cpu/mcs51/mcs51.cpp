@@ -55,8 +55,8 @@
  *
  * Notes:
  *
- * The term cycles is used here to really refer to clock oscilations, because 1 machine cycle
- * actually takes 12 oscilations.
+ * The term cycles is used here to really refer to clock oscillations, because 1 machine cycle
+ * actually takes 12 oscillations.
  *
  * Read/Write/Modify Instruction -
  *   Data is read from the Port Latch (not the Port Pin!), possibly modified, and
@@ -236,7 +236,7 @@ void mcs51_cpu_device::program_internal(address_map &map)
 		map(0, m_rom_size - 1).rom().region(DEVICE_SELF, 0);
 }
 
-void mcs51_cpu_device::data_internal(address_map &map)
+void mcs51_cpu_device::io_internal(address_map &map)
 {
 	map(0x0000, m_ram_mask).ram().share("scratchpad");
 	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
@@ -244,16 +244,16 @@ void mcs51_cpu_device::data_internal(address_map &map)
 
 
 
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features)
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor io_map, int program_width, int io_width, uint8_t features)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0, data_map)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 18 : 16, 0)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 18 : 16, 0)
+	, m_intd_config("internal_direct", ENDIANNESS_LITTLE, 8, 9, 0, io_map)
 	, m_pc(0)
 	, m_features(features)
 	, m_inst_cycles(0)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
-	, m_ram_mask((data_width == 8) ? 0xff : 0x7f)
+	, m_ram_mask((io_width == 8) ? 0xff : 0x7f)
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
@@ -271,8 +271,8 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 }
 
 
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
-	: mcs51_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(mcs51_cpu_device::program_internal), this), address_map_constructor(FUNC(mcs51_cpu_device::data_internal), this), program_width, data_width, features)
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features)
+	: mcs51_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(mcs51_cpu_device::program_internal), this), address_map_constructor(FUNC(mcs51_cpu_device::io_internal), this), program_width, io_width, features)
 {
 }
 
@@ -297,8 +297,8 @@ am8753_device::am8753_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
-	: mcs51_cpu_device(mconfig, type, tag, owner, clock, program_width, data_width, features | FEATURE_I8052)
+i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features)
+	: mcs51_cpu_device(mconfig, type, tag, owner, clock, program_width, io_width, features | FEATURE_I8052)
 {
 	m_num_interrupts = 6;
 }
@@ -323,8 +323,8 @@ i80c31_device::i80c31_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
-	: mcs51_cpu_device(mconfig, type, tag, owner, clock, program_width, data_width, features | FEATURE_CMOS)
+i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features)
+	: mcs51_cpu_device(mconfig, type, tag, owner, clock, program_width, io_width, features | FEATURE_CMOS)
 {
 }
 
@@ -339,8 +339,8 @@ i87c51_device::i87c51_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
-	: i8052_device(mconfig, type, tag, owner, clock, program_width, data_width, features | FEATURE_I80C52 | FEATURE_CMOS)
+i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features)
+	: i8052_device(mconfig, type, tag, owner, clock, program_width, io_width, features | FEATURE_I80C52 | FEATURE_CMOS)
 {
 }
 
@@ -360,8 +360,8 @@ i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-i87c51fa_device::i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
-	: i80c52_device(mconfig, type, tag, owner, clock, program_width, data_width, features)
+i87c51fa_device::i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features)
+	: i80c52_device(mconfig, type, tag, owner, clock, program_width, io_width, features)
 {
 }
 
@@ -410,8 +410,8 @@ i8744_device::i8744_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-p80c562_device::p80c562_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
-	: i80c51_device(mconfig, type, tag, owner, clock, program_width, data_width, features)
+p80c562_device::p80c562_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int io_width, uint8_t features)
+	: i80c51_device(mconfig, type, tag, owner, clock, program_width, io_width, features)
 {
 }
 
@@ -443,7 +443,7 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config),
-		std::make_pair(AS_IO,      &m_io_config)
+		std::make_pair(AS_INTD,    &m_intd_config)
 	};
 }
 
@@ -460,8 +460,8 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 #define CODEMEM_R(a)    (uint8_t)m_program.read_byte(a)
 
 /* Read/Write a byte from/to External Data Memory (Usually RAM or other I/O) */
-#define DATAMEM_R(a)    (uint8_t)m_io.read_byte(a)
-#define DATAMEM_W(a,v)  m_io.write_byte(a, v)
+#define DATAMEM_R(a)    (uint8_t)m_data.read_byte(a)
+#define DATAMEM_W(a,v)  m_data.write_byte(a, v)
 
 /* Read/Write a byte from/to the Internal RAM */
 
@@ -470,8 +470,8 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-uint8_t mcs51_cpu_device::iram_iread(offs_t a) { return (a <= m_ram_mask) ? m_data.read_byte(a) : 0xff; }
-void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m_data.write_byte(a, d); }
+uint8_t mcs51_cpu_device::iram_iread(offs_t a) { return (a <= m_ram_mask) ? m_intd.read_byte(a) : 0xff; }
+void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m_intd.write_byte(a, d); }
 
 #define IRAM_IR(a)      iram_iread(a)
 #define IRAM_IW(a, d)   iram_iwrite(a, d)
@@ -875,13 +875,13 @@ offs_t mcs51_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 
 uint8_t mcs51_cpu_device::iram_read(size_t offset)
 {
-	return ((offset < 0x80) ? m_data.read_byte(offset) : sfr_read(offset));
+	return ((offset < 0x80) ? m_intd.read_byte(offset) : sfr_read(offset));
 }
 
 void mcs51_cpu_device::iram_write(size_t offset, uint8_t data)
 {
 	if (offset < 0x80)
-		m_data.write_byte(offset, data);
+		m_intd.write_byte(offset, data);
 	else
 		sfr_write(offset, data);
 }
@@ -1817,7 +1817,7 @@ void mcs51_cpu_device::execute_op(uint8_t op)
     OPCODE CYCLES
 ***************************************************************************/
 
-/* # of oscilations each opcode requires*/
+/* # of oscillations each opcode requires*/
 const uint8_t mcs51_cpu_device::mcs51_cycles[256] =
 {
 	1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -2220,7 +2220,7 @@ void mcs51_cpu_device::sfr_write(size_t offset, uint8_t data)
 			/* no write in this case according to manual */
 			return;
 	}
-	m_data.write_byte((size_t)offset | 0x100, data);
+	m_intd.write_byte((size_t)offset | 0x100, data);
 }
 
 uint8_t mcs51_cpu_device::sfr_read(size_t offset)
@@ -2255,7 +2255,7 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 		case ADDR_SBUF:
 		case ADDR_IE:
 		case ADDR_IP:
-			return m_data.read_byte((size_t) offset | 0x100);
+			return m_intd.read_byte((size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
 			LOG("attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", (uint32_t)offset,PC);
@@ -2269,7 +2269,7 @@ void mcs51_cpu_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
-	space(AS_IO).specific(m_io);
+	space(AS_INTD).specific(m_intd);
 
 	/* Save states */
 	save_item(NAME(m_ppc));
@@ -2469,7 +2469,7 @@ void i8052_device::sfr_write(size_t offset, uint8_t data)
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			m_data.write_byte((size_t) offset | 0x100, data);
+			m_intd.write_byte((size_t) offset | 0x100, data);
 			break;
 
 		default:
@@ -2487,7 +2487,7 @@ uint8_t i8052_device::sfr_read(size_t offset)
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			return m_data.read_byte((size_t) offset | 0x100);
+			return m_intd.read_byte((size_t) offset | 0x100);
 		default:
 			return mcs51_cpu_device::sfr_read(offset);
 	}
@@ -2517,7 +2517,7 @@ void i80c52_device::sfr_write(size_t offset, uint8_t data)
 			i8052_device::sfr_write(offset, data);
 			return;
 	}
-	m_data.write_byte((size_t) offset | 0x100, data);
+	m_intd.write_byte((size_t) offset | 0x100, data);
 }
 
 uint8_t i80c52_device::sfr_read(size_t offset)
@@ -2528,7 +2528,7 @@ uint8_t i80c52_device::sfr_read(size_t offset)
 		case ADDR_IPH:
 		case ADDR_SADDR:
 		case ADDR_SADEN:
-			return m_data.read_byte((size_t) offset | 0x100);
+			return m_intd.read_byte((size_t) offset | 0x100);
 		default:
 			return i8052_device::sfr_read(offset);
 	}
@@ -2581,7 +2581,7 @@ void ds5002fp_device::sfr_write(size_t offset, uint8_t data)
 			mcs51_cpu_device::sfr_write(offset, data);
 			return;
 	}
-	m_data.write_byte((size_t) offset | 0x100, data);
+	m_intd.write_byte((size_t) offset | 0x100, data);
 }
 
 
@@ -2624,7 +2624,7 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 		default:
 			return mcs51_cpu_device::sfr_read(offset);
 	}
-	return m_data.read_byte((size_t) offset | 0x100);
+	return m_intd.read_byte((size_t) offset | 0x100);
 }
 
 /*

@@ -286,7 +286,7 @@ void design6_state::design6(machine_config &config)
 {
 	I8051(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &design6_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &design6_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &design6_state::io_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(design6_state::port1_w));
 
 	ADDRESS_MAP_BANK(config, m_iobank, 0);

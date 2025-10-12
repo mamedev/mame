@@ -638,7 +638,7 @@ void fatman_state::fatman(machine_config &config)
 {
 	I8031(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fatman_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &fatman_state::external_memory_map);
+	m_maincpu->set_addrmap(AS_DATA, &fatman_state::external_memory_map);
 
 	// The `set_constant()`s on inputs 1 and 3 ensure that those inputs, when
 	// read, will return whatever was written to them (the input is

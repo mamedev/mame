@@ -717,8 +717,8 @@ private:
 
 	void z80_io_w(offs_t offset, uint8_t data);
 	uint8_t z80_io_r(offs_t offset);
-	void tmcu_io_w(offs_t offset, uint8_t data);
-	uint8_t tmcu_io_r(offs_t offset);
+	void tmcu_data_w(offs_t offset, uint8_t data);
+	uint8_t tmcu_data_r(offs_t offset);
 	void tmcu_p1_out(uint8_t data);
 	uint8_t m_z80_io_c0;
 	uint8_t tetin3_r();
@@ -757,7 +757,7 @@ private:
 	void superdrg_opcodes_map(address_map &map) ATTR_COLD;
 	void wcat3_map(address_map &map) ATTR_COLD;
 	void tmcu_program_map(address_map &map) ATTR_COLD;
-	void tmcu_io_map(address_map &map) ATTR_COLD;
+	void tmcu_data_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -2769,13 +2769,13 @@ void wingco_state::z80_io_w(offs_t offset, uint8_t data)
 	logerror("Z80_io_w(): offset:%02x - data: %02x\n", offset, data);  // investigate functionality port 0xc0
 }
 
-void wingco_state::tmcu_io_w(offs_t offset, uint8_t data)
+void wingco_state::tmcu_data_w(offs_t offset, uint8_t data)
 {
 	if ((offset != 0x122) & (offset != 0x123))
-	logerror("tmcu_io Write: Offs:%04x - Data:%02x\n", offset, data);
+	logerror("tmcu_data Write: Offs:%04x - Data:%02x\n", offset, data);
 }
 
-uint8_t wingco_state::tmcu_io_r(offs_t offset)
+uint8_t wingco_state::tmcu_data_r(offs_t offset)
 {
 	return 0x00;
 }
@@ -4481,9 +4481,9 @@ void wingco_state::tmcu_program_map(address_map &map)
 	map(0x0000, 0x1fff).rom().region("tmcu",0);
 }
 
-void wingco_state::tmcu_io_map(address_map &map)
+void wingco_state::tmcu_data_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(FUNC(wingco_state::tmcu_io_r), FUNC(wingco_state::tmcu_io_w));
+	map(0x0000, 0x01ff).rw(FUNC(wingco_state::tmcu_data_r), FUNC(wingco_state::tmcu_data_w));
 }
 
 
@@ -14759,7 +14759,7 @@ void wingco_state::lucky8tet(machine_config &config)
 
 	I80C51(config, m_tmcu, 24'500'000);  // Internal Clock
 	m_tmcu->set_addrmap(AS_PROGRAM, &wingco_state::tmcu_program_map);
-	m_tmcu->set_addrmap(AS_IO, &wingco_state::tmcu_io_map);
+	m_tmcu->set_addrmap(AS_DATA, &wingco_state::tmcu_data_map);
 
 	m_tmcu->port_out_cb<1>().set(FUNC(wingco_state::tmcu_p1_out));
 

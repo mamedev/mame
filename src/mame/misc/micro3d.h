@@ -196,7 +196,7 @@ private:
 	void drmath_data(address_map &map) ATTR_COLD;
 	void drmath_prg(address_map &map) ATTR_COLD;
 	void hostmem(address_map &map) ATTR_COLD;
-	void soundmem_io(address_map &map) ATTR_COLD;
+	void soundmem_data(address_map &map) ATTR_COLD;
 	void soundmem_prg(address_map &map) ATTR_COLD;
 	void vgbmem(address_map &map) ATTR_COLD;
 };
