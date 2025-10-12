@@ -34,21 +34,21 @@ public:
 	// construction/destruction
 	dvk_ktlk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint16_t read(offs_t offset);
-	void write(offs_t offset, uint16_t data);
-
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
-	virtual void z80daisy_irq_reti() override {};
+	virtual void z80daisy_irq_reti() override { }
 
 private:
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data);
+
 	required_device_array<k1801vp065_device, 6> m_sart;
 	required_device_array<rs232_port_device, 6> m_rs232;
 
@@ -124,8 +124,9 @@ void dvk_ktlk_device::device_reset()
 {
 	if (!m_installed)
 	{
-		m_bus->install_device(0176560, 0176637, read16sm_delegate(*this, FUNC(dvk_ktlk_device::read)),
-			write16sm_delegate(*this, FUNC(dvk_ktlk_device::write)));
+		m_bus->install_device(0176560, 0176637,
+				read16sm_delegate(*this, FUNC(dvk_ktlk_device::read)),
+				write16sm_delegate(*this, FUNC(dvk_ktlk_device::write)));
 		m_installed = true;
 	}
 }
@@ -182,4 +183,4 @@ int dvk_ktlk_device::z80daisy_irq_ack()
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(DVK_KTLK, device_qbus_card_interface, dvk_ktlk_device, "ktlk", "DVK KTLK 6-port serial");
+DEFINE_DEVICE_TYPE_PRIVATE(DVK_KTLK, device_qbus_card_interface, dvk_ktlk_device, "dvk_ktlk", "DVK KTLK 6-port serial");
