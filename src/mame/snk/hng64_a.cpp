@@ -183,28 +183,6 @@ void hng64_state::sound_map(address_map &map)
 	}
 }
 
-void hng64_state::sound_port_0008_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	LOGSOUND("sound_port_0008_w %04x %04x\n", data, mem_mask);
-	// seems to one or more of the DMARQ on the V53, writes here when it expects DMA channel 3 to transfer ~0x20 bytes just after startup
-
-	/* TODO: huh? */
-	m_audiocpu->dreq_w<3>(data & 0x1);
-	m_dsp->l7a1045_sound_w(8 / 2,data,mem_mask);
-//  m_audiocpu->hack_w(1);
-}
-
-
-u16 hng64_state::sound_port_0008_r(offs_t offset, u16 mem_mask)
-{
-	// read in irq5
-	if (!machine().side_effects_disabled())
-		LOGSOUND("%s: sound_port_0008_r mask (%04x)\n", machine().describe_context(), mem_mask);
-	return 0;
-}
-
-
-
 // but why not just use the V33/V53 XA mode??
 void hng64_state::sound_bank_w(offs_t offset, u16 data)
 {
@@ -215,17 +193,6 @@ void hng64_state::sound_bank_w(offs_t offset, u16 data)
 	// the 2 early games don't do this.. maybe all banks actuallly default to that region tho?
 	// the sound code on those games seems buggier anyway.
 	m_audio_bank[offset & 0xf]->set_entry(data & 0x1f);
-}
-
-
-void hng64_state::sound_port_000a_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	LOGSOUND("%s: hng64_port sound_port_000a_w %04x mask (%04x)\n", machine().describe_context(), data, mem_mask);
-}
-
-void hng64_state::sound_port_000c_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	LOGSOUND("%s: hng64_port sound_port_000c_w %04x mask (%04x)\n", machine().describe_context(), data, mem_mask);
 }
 
 
@@ -272,11 +239,7 @@ u16 hng64_state::sound_comms_r(offs_t offset)
 
 void hng64_state::sound_io_map(address_map &map)
 {
-	map(0x0000, 0x0007).rw(m_dsp, FUNC(l7a1045_sound_device::l7a1045_sound_r), FUNC(l7a1045_sound_device::l7a1045_sound_w));
-
-	map(0x0008, 0x0009).rw(FUNC(hng64_state::sound_port_0008_r), FUNC(hng64_state::sound_port_0008_w));
-	map(0x000a, 0x000b).w(FUNC(hng64_state::sound_port_000a_w));
-	map(0x000c, 0x000d).w(FUNC(hng64_state::sound_port_000c_w));
+	map(0x0000, 0x000f).m(m_dsp, FUNC(l7a1045_sound_device::map));
 
 	map(0x0080, 0x0081).w(FUNC(hng64_state::sound_port_0080_w));
 
@@ -322,7 +285,7 @@ void hng64_state::tcu_tm2_cb(int state)
 
 
 
-void hng64_state::hng64_audio(machine_config &config)
+void hng64_state::hng64_audio_base(machine_config &config)
 {
 	V53A(config, m_audiocpu, 32_MHz_XTAL); // reference footage indicates the timer must be the full 32 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &hng64_state::sound_map);
@@ -335,9 +298,36 @@ void hng64_state::hng64_audio(machine_config &config)
 	m_audiocpu->tout_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
 	m_audiocpu->tout_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
 
-	SPEAKER(config, "speaker", 2).front();
-
 	L7A1045(config, m_dsp, 33.8688_MHz_XTAL);
+	m_dsp->drq_handler_cb().set(m_audiocpu, FUNC(v53a_device::dreq_w<3>));
+}
+
+void hng64_state::hng64_audio(machine_config &config)
+{
+	hng64_audio_base(config);
+
+	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "rear", 1).rear_center();
+	SPEAKER(config, "subwoofer", 1).lfe();
+
 	m_dsp->add_route(0, "speaker", 1.0, 0);
 	m_dsp->add_route(1, "speaker", 1.0, 1);
+	m_dsp->add_route(3, "rear", 1.0, 0);
+	m_dsp->add_route(5, "subwoofer", 1.0, 0);
+}
+
+void hng64_state::hng64_audio_bbust2(machine_config &config)
+{
+	hng64_audio_base(config);
+
+	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "gun_1", 1).front_center();
+	SPEAKER(config, "gun_2", 1).front_center();
+	SPEAKER(config, "gun_3", 1).front_center();
+
+	m_dsp->add_route(0, "speaker", 1.0, 0);
+	m_dsp->add_route(1, "speaker", 1.0, 1);
+	m_dsp->add_route(3, "gun_1", 1.0, 0);
+	m_dsp->add_route(4, "gun_2", 1.0, 0);
+	m_dsp->add_route(5, "gun_3", 1.0, 0);
 }

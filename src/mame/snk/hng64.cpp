@@ -2584,7 +2584,6 @@ void hng64_state::hng64(machine_config &config)
 	PALETTE(config, m_palette_fade1).set_format(palette_device::xRGB_888, 0x1000);
 	PALETTE(config, m_palette_3d).set_format(palette_device::xRGB_888, 0x1000 * 0x10);
 
-	hng64_audio(config);
 	hng64_network(config);
 
 	tmp87ph40an_device &iomcu(TMP87PH40AN(config, m_iomcu, 8_MHz_XTAL));
@@ -2624,6 +2623,7 @@ void hng64_state::hng64(machine_config &config)
 void hng64_state::hng64_default(machine_config &config)
 {
 	hng64(config);
+	hng64_audio(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps_out_cb<0>().set(FUNC(hng64_state::default_lamps_w<0>));
@@ -2639,6 +2639,7 @@ void hng64_state::hng64_default(machine_config &config)
 void hng64_state::hng64_drive(machine_config &config)
 {
 	hng64(config);
+	hng64_audio(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps_out_cb<5>().set(FUNC(hng64_state::drive_lamps5_w)); // force feedback steering
@@ -2649,6 +2650,7 @@ void hng64_state::hng64_drive(machine_config &config)
 void hng64_state::hng64_shoot(machine_config &config)
 {
 	hng64(config);
+	hng64_audio_bbust2(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::shoot_lamps6_w)); // start lamps (some missing?!)
@@ -2658,6 +2660,7 @@ void hng64_state::hng64_shoot(machine_config &config)
 void hng64_state::hng64_fight(machine_config &config)
 {
 	hng64(config);
+	hng64_audio(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::fight_lamps6_w)); // coin counters

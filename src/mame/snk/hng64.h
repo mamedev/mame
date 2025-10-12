@@ -523,12 +523,6 @@ private:
 	void tcu_tm1_cb(int state);
 	void tcu_tm2_cb(int state);
 
-	u16 sound_port_0008_r(offs_t offset, u16 mem_mask = ~0);
-	void sound_port_0008_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	void sound_port_000a_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void sound_port_000c_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
 	void sound_port_0080_w(u16 data);
 
 	void sound_bank_w(offs_t offset, u16 data);
@@ -537,7 +531,9 @@ private:
 	u16 sound_comms_r(offs_t offset);
 	void sound_comms_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
+	void hng64_audio_base(machine_config &config) ATTR_COLD;
 	void hng64_audio(machine_config &config) ATTR_COLD;
+	void hng64_audio_bbust2(machine_config &config) ATTR_COLD;
 	void hng64_network(machine_config &config) ATTR_COLD;
 	void comm_io_map(address_map &map) ATTR_COLD;
 	void comm_map(address_map &map) ATTR_COLD;

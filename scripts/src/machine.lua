@@ -3570,6 +3570,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/te7774.h,MACHINES["TE7774"] = true
+---------------------------------------------------
+
+if (MACHINES["TE7774"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/te7774.cpp",
+		MAME_DIR .. "src/devices/machine/te7774.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/thmfc1.h,MACHINES["THMFC1"] = true
 ---------------------------------------------------
 
