@@ -626,13 +626,13 @@ ROM_START( mjzb ) // IGS PCB-0433-04-GK - Has IGS027A, MX10EXAQC, 2x Actel A54SX
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
 	ROM_LOAD( "a9.u38", 0x000000, 0x10000, CRC(7dae4900) SHA1(bbf7ba7c9e95ff2ffeb1dc0fc7ccedd4da274d01) ) // same as icescape
 
-	// 2 of the GFX ROMs are underdumped
+	// 1 of the GFX ROMs is underdumped
 	ROM_REGION( 0x2000000, "gfx1", ROMREGION_ERASE00 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp).
 	// u7 is probably correct, leaving as bad dump due to having to hand fix the address lines
 	ROM_LOAD32_WORD( "mjzb_cg_u7.u7",   0x0000000, 0x800000, BAD_DUMP CRC(9a09b5d9) SHA1(63e90da4cbe0ccb6823fcbd9433c0022f6edb771) )
 
-	// for u6 we only have the 6th 0x100000 block and the ROM chip is broken
-	ROM_LOAD32_WORD( "mjzb_cg_u6.u6",   0x0a00002, 0x100000, BAD_DUMP CRC(b2aeb4a1) SHA1(c5c73d340164a9e1a60a3519633550596e0ca00f) )
+	// u6 is probably correct, leaving as bad dump due to having to hand fix the address lines and due to the bad state of the ROM chip
+	ROM_LOAD32_WORD( "mjzb_cg_u6.u6",   0x0000002, 0x800000, BAD_DUMP CRC(6f78c584) SHA1(453f48b7142cf5703a0b145be5c83189351e47ad) )
 
 	// for u14 we only have the 6th 0x100000 block and the ROM chip is broken
 	ROM_LOAD32_WORD( "mjzb_cg_u14.u14", 0x1a00000, 0x100000, BAD_DUMP CRC(f96d6c81) SHA1(b9db6ed0ed9f311090506ef1286bf5d3c71fea78) )
@@ -668,6 +668,7 @@ void igs_fear_state::init_mjzb()
 }
 
 } // anonymous namespace
+
 
 GAME( 2005, superkds, 0, igs_fear_xor, superkds, igs_fear_state, init_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", MACHINE_NODEVICE_LAN )
 GAME( 2006, fearless, 0, igs_fear_xor, fear,     igs_fear_state, init_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
