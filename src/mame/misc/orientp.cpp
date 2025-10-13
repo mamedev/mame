@@ -289,14 +289,14 @@ void orientp_state::orientp(machine_config &config)
     // basic machine hardware
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &orientp_state::program_map);
-	maincpu.set_addrmap(AS_IO, &orientp_state::data_map);
+	maincpu.set_addrmap(AS_DATA, &orientp_state::data_map);
    
     NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	
 	// at89s51 mcu
     i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
     mcu.set_addrmap(AS_PROGRAM, &orientp_state::mcu_map);
-	mcu.set_addrmap(AS_IO, &orientp_state::mcu_data_map);
+	mcu.set_addrmap(AS_DATA, &orientp_state::mcu_data_map);
 	mcu.port_in_cb<0>().set(FUNC(orientp_state::mcu_r));
 
 	// 82C55 for leds
