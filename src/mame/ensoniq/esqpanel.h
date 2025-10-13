@@ -7,12 +7,12 @@
 
 #include "esqvfd.h"
 #include "esqlcd.h"
-#include "extpanel.h"
 
 #include "diserial.h"
 
-#include <vector>
+#include <iostream>
 #include <set>
+#include <vector>
 
 
 //**************************************************************************
@@ -52,15 +52,6 @@ protected:
 
 	virtual void send_to_display(uint8_t data) = 0;
 
-	virtual TIMER_CALLBACK_MEMBER(check_external_panel_server);
-
-	virtual void send_display_contents() { }
-	virtual void send_analog_values() { }
-	virtual void send_button_states() { }
-	virtual void send_light_states() { }
-
-	optional_device<esq_external_panel_device> m_external_panel;
-
 	std::set<int> m_pressed_buttons;
 	std::vector<uint8_t> m_light_states;
 
@@ -87,8 +78,6 @@ private:
 	uint8_t m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write = 0;
 	bool m_tx_busy = false;
-
-	emu_timer *m_external_panel_timer = nullptr;
 };
 
 class esqpanel1x22_device : public esqpanel_device {
@@ -126,19 +115,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_reset_after_children() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void send_to_display(uint8_t data) override { }
 	virtual void rcv_complete() override;    // Rx completed receiving byte
-
-	virtual void send_display_contents() override;
-	virtual void send_analog_values() override;
-	virtual void send_button_states() override;
-	virtual void send_light_states() override;
-
-	virtual void set_button(uint8_t button, bool pressed) override;
-	virtual void set_analog_value(offs_t offset, uint16_t value) override;
 
 	required_device<esq2x40_vfx_device> m_vfd;
 
