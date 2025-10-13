@@ -88,7 +88,7 @@ public:
 	specnext_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_io_shadow_view(*this, "io_shadow_view")
+		, m_io_expbus_view(*this, "io_expbus_view")
 		, m_bank_boot_rom(*this, "bootrom")
 		, m_bank_ram(*this, "bank_ram%u", 0U)
 		, m_view0(*this, "mem_view0")
@@ -252,6 +252,8 @@ private:
 	void nr_70_layer2_palette_offset_w(u8 data) { m_nr_70_layer2_palette_offset = data; m_layer2->palette_offset_w(m_nr_70_layer2_palette_offset); }
 	void nr_71_layer2_scrollx_msb_w(bool data) { m_nr_71_layer2_scrollx_msb = data; m_layer2->scroll_x_w((m_nr_71_layer2_scrollx_msb << 8) | m_nr_16_layer2_scrollx); }
 
+	void nr_80_expbus_w(u8 data) { m_nr_80_expbus = data; m_io_expbus_view.select(BIT(m_nr_80_expbus, 7)); }
+
 	bool nr_8c_altrom_en() const { return BIT(m_nr_8c_altrom, 7); }
 	bool nr_8c_altrom_rw() const { return BIT(m_nr_8c_altrom, 6); }
 	bool nr_8c_altrom_lock_rom1() const { return BIT(m_nr_8c_altrom, 5); }
@@ -314,7 +316,7 @@ private:
 	void port_e7_reg_w(u8 data);
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_next_regs;
-	memory_view m_io_shadow_view;
+	memory_view m_io_expbus_view;
 	memory_bank_creator m_bank_boot_rom;
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
@@ -2190,7 +2192,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_7f_user_register_0 = nr_wr_dat;
 		break;
 	case 0x80:
-		m_nr_80_expbus = nr_wr_dat;
+		nr_80_expbus_w(nr_wr_dat);
 		break;
 	case 0x81:
 		m_nr_81_expbus_ula_override = BIT(nr_wr_dat, 6);
@@ -2929,9 +2931,9 @@ void specnext_state::map_io(address_map &map)
 			m_dac[3]->data_w(data);
 	}));
 
-	map(0x0000, 0xffff).view(m_io_shadow_view);
-	subdevice<zxbus_device>("zxbus")->set_io_space(m_io_shadow_view[0], m_io_shadow_view[1]);
-	m_io_shadow_view.select(0);
+	map(0x0000, 0xffff).view(m_io_expbus_view);
+	m_io_expbus_view[0]; // exp bus disabled
+	subdevice<zxbus_device>("zxbus")->set_io_space(m_io_expbus_view[1], m_io_expbus_view[1]);
 }
 
 void specnext_state::map_regs(address_map &map)
@@ -3357,7 +3359,7 @@ void specnext_state::machine_reset()
 	//nmi_divmmc  = 0;
 	//nmi_expbus  = 0;
 	//nmi_state  = S_NMI_IDLE;
-	m_nr_80_expbus = (m_nr_80_expbus << 4) | (m_nr_80_expbus & 0x0f);
+	nr_80_expbus_w((m_nr_80_expbus << 4) | (m_nr_80_expbus & 0x0f));
 	m_nr_8c_altrom = (m_nr_8c_altrom << 4) | (m_nr_8c_altrom & 0x0f);
 	//port_253b_rd_qq  = 0b00;
 	//sram_req_d  = 0;
