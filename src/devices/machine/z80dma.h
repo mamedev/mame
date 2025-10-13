@@ -129,10 +129,10 @@ protected:
 
 	virtual TIMER_CALLBACK_MEMBER(clock_w);
 
-	emu_timer *m_timer;
-
 	u16 &REG(unsigned m, unsigned s) noexcept { return m_regs[REGNUM(m, s)]; }
 	static constexpr unsigned REGNUM(unsigned m, unsigned s) { return (m << 3) + s; }
+
+	emu_timer *m_timer;
 
 	u16 m_addressA;
 	u16 m_addressB;

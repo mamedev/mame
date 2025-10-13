@@ -64,12 +64,13 @@ void specnext_dma_device::write(u8 data)
 	}
 	else
 	{
-		int nreg = m_regs_follow[m_cur_follow];
-		if(nreg == REGNUM(2, 1))
+		const u8 nreg = m_regs_follow[m_cur_follow];
+		if (nreg == REGNUM(2, 1))
 		{
 			if (data & 0x20)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(ZXN_PRESCALER);
-		} else if(nreg == REGNUM(2, 2))
+		}
+		else if (nreg == REGNUM(2, 2))
 		{
 			m_r2_portB_preescaler_s = data;
 		}
