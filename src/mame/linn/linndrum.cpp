@@ -108,9 +108,9 @@ Example:
 #define LOG_MIX              (1U << 7)
 #define LOG_PITCH            (1U << 8)
 #define LOG_HAT_EG           (1U << 9)
-#define LOG_CV_OFFSET        (1U << 10)
+#define LOG_CALIBRATION      (1U << 10)
 
-#define VERBOSE (LOG_GENERAL | LOG_CV_OFFSET)
+#define VERBOSE (LOG_CALIBRATION)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -314,7 +314,7 @@ void linndrum_vcf_eg_device::update_freq_cv_offset()
 	const float vx = (R * R1 * VMINUS + R * R2 * VPLUS) / (R * R1 + R * R2 + R1 * R2);
 	m_i_offset = vx / R;
 
-	LOGMASKED(LOG_CV_OFFSET, "%s: CV Offset current: %f. CV range: %f - %f\n",
+	LOGMASKED(LOG_CALIBRATION, "%s: CV Offset current: %f. CV range: %f - %f\n",
 	          tag(), m_i_offset, get_freq_cv(0), get_freq_cv(EG_V_TARGET));
 }
 
@@ -670,7 +670,7 @@ void linndrum_audio_device::tom_w(u8 data, bool is_strobe)
 		case 4: m_tom_selected_pitch = TV_LOW_TOMS; break;
 		case 5: m_tom_selected_pitch = TV_MID_TOMS; break;
 		case 6: m_tom_selected_pitch = TV_HI_TOMS; break;
-		default: LOG("Firmware bug: invalid pitch variation for tom/conga.\n");
+		default: logerror("Firmware bug: invalid pitch variation for tom/conga.\n");
 	}
 	update_tom_pitch();
 
@@ -1237,7 +1237,7 @@ void linndrum_audio_device::update_tom_pitch()
 
 	if (m_tom_selected_pitch < 0)
 	{
-		LOG("Firmware or driver bug: floating input to pitch CV op-amp.\n");
+		logerror("Firmware or driver bug: floating input to pitch CV op-amp.\n");
 		return;
 	}
 
@@ -1518,7 +1518,7 @@ u8 linndrum_state::get_voice_data(u8 data) const
 	}
 	else
 	{
-		LOG("Firmware bug: floating voice data bus when strobing a voice.\n");
+		logerror("Firmware bug: floating voice data bus when strobing a voice.\n");
 		return 0x0f;  // Floating TTL inputs. Will likely resolve to 1s.
 	}
 }
