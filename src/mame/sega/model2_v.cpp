@@ -816,10 +816,10 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 		u32 posx = 32 * ( (tri->texheader[2] >> 0) & 0x3f );
 		u32 posy = 32 * ( (tri->texheader[2] >> 6) & 0x1f );
 
-		// 6 MIPS LEVELS
-		// EACH MIP LEVEL HAS HALF WIDTH AND HALF HEIGHT
-		// LOCATED RECURSIVELY IN THE BOTTOM RIGHT CORNER OF 2048x1024
-		// EACH LEVEL HAS FLIPPED RAM BANKS
+		// 6 mips levels
+		// each mip level has half width and half height of the level above
+		// mips are located recursively in the bottom right corner of 2048x1024
+		// each level has flipped ram banks compared to the level above
 		for (u32 mip = 0; mip < 6; mip++)
 		{
 			extra.texsheet[mip] = sheet;
