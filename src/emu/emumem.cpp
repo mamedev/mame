@@ -53,6 +53,19 @@ void handler_entry::dump_map(std::vector<memory_entry> &map) const
 	fatalerror("dump_map called on non-dispatching class\n");
 }
 
+bool handler_entry::is_handler_in_map(std::vector<memory_entry> &map, offs_t begin, offs_t end, handler_entry *handler) const
+{
+	auto it = std::find_if(map.begin(), map.end(), [handler,begin,end](const memory_entry& e) {
+		return (e.entry == handler) && (e.start == begin) && (e.end == end);
+	} );
+
+	if(it == map.end()) {
+		return false;
+	}
+
+	return true;
+}
+
 void handler_entry::select_a(int slot)
 {
 	fatalerror("select_a called on non-view\n");
