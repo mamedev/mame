@@ -19464,6 +19464,12 @@ chesskng
 @source:handheld/dbridgec.cpp
 dbridgec
 
+@source:handheld/evolution_handheld.cpp
+buttdtct
+evolhh
+pokexyqz
+smkatsum
+
 @source:handheld/gameking.cpp
 gamekin3
 gameking
@@ -43541,11 +43547,6 @@ eurit30
 eurocom2
 microtrol
 waveterm
-
-@source:skeleton/evolution_handheld.cpp
-buttdtct
-evolhh
-smkatsum
 
 @source:skeleton/extrema_m27sv.cpp
 multgmxl
