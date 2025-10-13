@@ -326,8 +326,8 @@ void mpc3000_state::mpc3000(machine_config &config)
 	TE7774(config, m_sio, V53_PCLKOUT);
 	m_sio->txd_handler<0>().set(m_mdout, FUNC(midi_port_device::write_txd));
 	m_sio->rxrdy_handler<0>().set("intp5", FUNC(input_merger_device::in_w<0>));
-	m_sio->rxrdy_handler<1>().set("intp5", FUNC(input_merger_device::in_w<0>));
-	m_sio->rxrdy_handler<2>().set("intp5", FUNC(input_merger_device::in_w<0>));
+	m_sio->rxrdy_handler<1>().set("intp5", FUNC(input_merger_device::in_w<1>));
+	m_sio->rxrdy_handler<2>().set("intp5", FUNC(input_merger_device::in_w<2>));
 	m_sio->rxrdy_handler<3>().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 	m_sio->txrdy_handler<0>().set("intp4", FUNC(input_merger_device::in_w<0>));
 	m_sio->txrdy_handler<1>().set("intp4", FUNC(input_merger_device::in_w<1>));
