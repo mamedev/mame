@@ -121,9 +121,9 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void io_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
-	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
 	void mcu_map(address_map &map) ATTR_COLD;
 
     uint8_t mcu_r();
@@ -250,7 +250,7 @@ void orientp_state::program_map(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void orientp_state::io_map(address_map &map)
+void orientp_state::data_map(address_map &map)
 {
     map(0xd800, 0xf7ff).ram().share("nvram"); // might be wrong
     map(0xf800, 0xf803).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -266,7 +266,7 @@ void orientp_state::mcu_map(address_map &map)
 	map(0x0000, 0xfff).rom();
 }
 
-void orientp_state::mcu_io_map(address_map &map)
+void orientp_state::mcu_data_map(address_map &map)
 {
   
 	
@@ -289,14 +289,14 @@ void orientp_state::orientp(machine_config &config)
     // basic machine hardware
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &orientp_state::program_map);
-	maincpu.set_addrmap(AS_IO, &orientp_state::io_map);
+	maincpu.set_addrmap(AS_IO, &orientp_state::data_map);
    
     NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	
 	// at89s51 mcu
     i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
     mcu.set_addrmap(AS_PROGRAM, &orientp_state::mcu_map);
-	mcu.set_addrmap(AS_IO, &orientp_state::mcu_io_map);
+	mcu.set_addrmap(AS_IO, &orientp_state::mcu_data_map);
 	mcu.port_in_cb<0>().set(FUNC(orientp_state::mcu_r));
 
 	// 82C55 for leds
