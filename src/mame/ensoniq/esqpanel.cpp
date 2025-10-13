@@ -95,6 +95,9 @@ void esqpanel_device::device_reset_after_children()
 
 	attotime sample_time(0, ATTOSECONDS_PER_MILLISECOND);
 	attotime initial_delay(0, ATTOSECONDS_PER_MILLISECOND);
+
+	m_blink_timer->adjust(initial_delay, 0, sample_time);
+	m_blink_timer->enable(true);
 }
 
 
