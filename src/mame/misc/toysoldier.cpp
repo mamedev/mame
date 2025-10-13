@@ -56,7 +56,7 @@ protected:
 private:
 	void ay_port_a_w(uint8_t data);
 	void ay_port_b_w(uint8_t data);
-	void io_map(address_map &map);
+	void data_map(address_map &map);
 	void program_map(address_map &map);
 
 };
@@ -121,7 +121,7 @@ void toysoldier_state::program_map(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void toysoldier_state::io_map(address_map &map)
+void toysoldier_state::data_map(address_map &map)
 {
 	map(0x8000, 0x8001).w("opll", FUNC(ym2413_device::write));
 	map(0x9000, 0x9001).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
@@ -144,7 +144,7 @@ void toysoldier_state::toysoldier(machine_config &config)
 	/* basic machine hardware */
 	i8052_device &maincpu(I80C32(config, "maincpu", XTAL(12'000'000))); // Actually cpu is a Winbond W78C32c-40
 	maincpu.set_addrmap(AS_PROGRAM, &toysoldier_state::program_map);
-	maincpu.set_addrmap(AS_IO, &toysoldier_state::io_map);
+	maincpu.set_addrmap(AS_IO, &toysoldier_state::data_map);
 	
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
