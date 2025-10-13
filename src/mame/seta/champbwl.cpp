@@ -441,7 +441,7 @@ static INPUT_PORTS_START( champbwl )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( doraemon )
+static INPUT_PORTS_START( doraemon_base )
 	PORT_START("DSW1")  // f006
 	PORT_DIPNAME( 0x01, 0x00, "1 Bet" )														PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "1" )
@@ -470,6 +470,30 @@ static INPUT_PORTS_START( doraemon )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
 
+	PORT_START("IN0")   // f000
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_MEMORY_RESET )  PORT_NAME( "Data Clear" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1    )      PORT_NAME( "¥100" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN2    )      PORT_NAME( "¥10" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN3    )      PORT_NAME( "Medal" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 )      PORT_NAME( "Freeze" )  PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+
+	PORT_START("IN1")   // f002
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON3  )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM   )      PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // sensor
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW  )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( doraemon )
+	PORT_INCLUDE(doraemon_base)
+
 	PORT_START("DSW2")  // f007
 	PORT_DIPNAME( 0x07, 0x01, "Rank" )														PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, "1" )
@@ -480,7 +504,7 @@ static INPUT_PORTS_START( doraemon )
 	PORT_DIPSETTING(    0x02, "6" )
 	PORT_DIPSETTING(    0x04, "7" )
 	PORT_DIPSETTING(    0x00, "8" )
-	PORT_DIPNAME( 0x08, 0x08, "Win Wave" )													PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Payout rate variation" )										PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "Small" )
 	PORT_DIPSETTING(    0x00, "Big" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )											PORT_DIPLOCATION("SW2:5")
@@ -495,36 +519,18 @@ static INPUT_PORTS_START( doraemon )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )											PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
-
-	PORT_START("IN0")   // f000
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE2 )  PORT_NAME( "Data Clear" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN4    )  PORT_NAME( "¥100" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3    )  PORT_NAME( "¥10" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN2    )  PORT_NAME( "Medal" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE3 )  PORT_NAME( "Freeze" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-
-	PORT_START("IN1")   // f002
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON3  )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM   )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // sensor
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( doraemonp )
-	PORT_START("DSW1")  // f006
-	PORT_DIPNAME( 0x0f, 0x09, "Gift Out" )
-	PORT_DIPSETTING(    0x0f,   "2 %" )
-	PORT_DIPSETTING(    0x0e,   "5 %" )
-	PORT_DIPSETTING(    0x0d,   "7 %" )
+	PORT_INCLUDE(doraemon_base)
+
+	PORT_MODIFY("DSW1")  // f006
+	PORT_DIPNAME( 0x0f, 0x09, "Gift Out" )													PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x0f,  "2.5 %" )
+	PORT_DIPSETTING(    0x0e,  "5 %" )
+	PORT_DIPSETTING(    0x0d,  "7.5 %" )
 	PORT_DIPSETTING(    0x0c,  "10 %" )
-	PORT_DIPSETTING(    0x0b,  "12 %" )
+	PORT_DIPSETTING(    0x0b,  "12.5 %" )
 	PORT_DIPSETTING(    0x0a,  "15 %" )
 	PORT_DIPSETTING(    0x09,  "20 %" )
 	PORT_DIPSETTING(    0x08,  "25 %" )
@@ -536,38 +542,17 @@ static INPUT_PORTS_START( doraemonp )
 	PORT_DIPSETTING(    0x02, "100 %" )
 	PORT_DIPSETTING(    0x01, "100 %" )
 	PORT_DIPSETTING(    0x00, "100 %" )
-	PORT_DIPNAME( 0x10, 0x10, "Games For 100 Yen" )
+	PORT_DIPNAME( 0x10, 0x10, "Games For 100 Yen" )											PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )										PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN0")   // f000
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE2 )  PORT_NAME( "Data Clear" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1    )
+	PORT_MODIFY("IN0")   // f000
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1    )      PORT_NAME( "Coin" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE3 )  PORT_NAME( "Freeze" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-
-	PORT_START("IN1")   // f002
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3  )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // sensor
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 
@@ -880,5 +865,5 @@ GAME( 1989,  champbwl,  0,        champbwl,  champbwl,  champbwl_state, empty_in
 GAME( 1989,  champbwla, champbwl, champbwl,  champbwl,  champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling (location test)",   MACHINE_SUPPORTS_SAVE )
 
 // TODO: parent set freezes when winning during gameplay, probably due to bad hopper mapping. Needs further checks:
-GAME( 1993?, doraemon,  0,        doraemon,  doraemon,  doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon Surotto",                       MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
+GAME( 1993?, doraemon,  0,        doraemon,  doraemon,  doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon Slot",                          MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
 GAME( 1993?, doraemonp, doraemon, doraemonp, doraemonp, doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
