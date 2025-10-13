@@ -2399,6 +2399,7 @@ void specnext_state::nr_07_cpu_speed_w(u8 data)
 {
 	m_nr_07_cpu_speed = data & 3;
 	m_maincpu->set_clock_scale(1 << m_nr_07_cpu_speed);
+	m_ctc->set_clock_scale(1 << m_nr_07_cpu_speed);
 	m_dma->set_clock_scale(1 << m_nr_07_cpu_speed);
 }
 
