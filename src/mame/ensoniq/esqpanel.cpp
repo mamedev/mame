@@ -423,6 +423,7 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 			m_cursy = ((data & 0x7f) >= 40) ? 1 : 0;
 			m_cursx = (data & 0x7f) % 40;
 			m_curattr = m_vfd->get_attr(m_cursy, m_cursx);
+			LOG("%02x: -> (%d, %d)\n", data, m_cursy, m_cursx);
 		}
 		else if (data >= 0xd0)
 		{
@@ -444,12 +445,22 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 					m_curattr |= AT_UNDERLINE;
 					break;
 
-				case 0xd5:  // move curser one step left
+				case 0xd4:  // move curser one step right
+					LOG("d4: %d", m_cursx);
+					if (m_cursx < 39)
+						m_cursx += 1;
+					LOG(" -> %d\n", m_cursx);
+					break;
+
+					case 0xd5:  // move curser one step left
+					LOG("d5: %d", m_cursx);
 					if (m_cursx > 0)
 						m_cursx -= 1;
+					LOG(" -> %d\n", m_cursx);
 					break;
 
 				case 0xd6:  // clear screen
+					LOG("d6: clear screen\n");
 					m_vfd->clear();
 					m_external_panel->clear_display();
 					m_cursx = m_cursy = 0;
@@ -457,17 +468,21 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 					break;
 
 				case 0xf5:  // save cursor position
+					LOG("f5: save pos (%d, %d)\n", m_cursy, m_cursx);
 					m_savedx = m_cursx;
 					m_savedy = m_cursy;
 					break;
 
 				case 0xf6:  // restore cursor position
+					LOG("f6: restore pos (%d, %d)\n", m_cursy, m_cursx);
 					m_cursx = m_savedx;
 					m_cursy = m_savedy;
+					LOG("f6: restore pos (%d, %d)\n", m_cursy, m_cursx);
 					m_curattr = m_vfd->get_attr(m_cursy, m_cursx);
 					break;
 
 				case 0xfd: // also clear screen?
+					LOG("fd: clear screen\n");
 					m_vfd->clear();
 					m_external_panel->clear_display();
 					m_cursx = m_cursy = 0;
@@ -475,7 +490,8 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 					break;
 
 				default:
-					LOG("Unknown control code %02x\n", data);
+					char c = m_vfd->get_char(m_cursy, m_cursx);
+					LOG("Unknown control code %02x (@ %d, %d, %02x '%c')\n", data, m_cursy, m_cursy, c, c);
 					break;
 			}
 		}
@@ -483,6 +499,7 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 		{
 			if ((data >= 0x20) && (data <= 0x5f))
 			{
+				LOG("%c\n", data);
 				m_vfd->set_char(m_cursy, m_cursx, data, m_curattr);
 				m_external_panel->set_char(m_cursy, m_cursx, data, m_curattr);
 
@@ -492,6 +509,18 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 				{
 					m_cursx = 39;
 				}
+			}
+			else if (data == 0x7f)
+			{
+				// DEL character -> move one step right? used on ENV TIMES page, RELEASE value
+				if (m_cursx < 39)
+					m_cursx++;
+				LOG("7f: DEL, skipping -> (%d, %d)\n", m_cursy, m_cursx);
+			}
+			else
+			{
+				char c = m_vfd->get_char(m_cursy, m_cursx);
+				LOG("Unknown character code %02x (@ %d, %d, %02x '%c')\n", data, m_cursy, m_cursy, c, c);
 			}
 		}
 	}
