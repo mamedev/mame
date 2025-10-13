@@ -144,7 +144,7 @@ void toysoldier_state::toysoldier(machine_config &config)
 	/* basic machine hardware */
 	i8052_device &maincpu(I80C32(config, "maincpu", XTAL(12'000'000))); // Actually cpu is a Winbond W78C32c-40
 	maincpu.set_addrmap(AS_PROGRAM, &toysoldier_state::program_map);
-	maincpu.set_addrmap(AS_IO, &toysoldier_state::data_map);
+	maincpu.set_addrmap(AS_DATA, &toysoldier_state::data_map);
 	
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
