@@ -65,16 +65,6 @@ inline uint16_t ef9345_device::indexram(uint8_t r)
 	return ((x&0x3f) | ((x & 0x40) << 6) | ((x & 0x80) << 4) | ((y & 0x1f) << 6) | ((y & 0x20) << 8));
 }
 
-// calculate the internal ROM offset
-inline uint16_t ef9345_device::indexrom(uint8_t r)
-{
-	uint8_t x = m_registers[r];
-	uint8_t y = m_registers[r - 1];
-	if (y < 8)
-		y &= 1;
-	return((x&0x3f)|((x&0x40)<<6)|((x&0x80)<<4)|((y&0x1f)<<6));
-}
-
 // increment x
 inline void ef9345_device::inc_x(uint8_t r)
 {
@@ -602,10 +592,11 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, boo
 	c1 = (a & 1) ? (m_dor >> 4) & 7 : m_dor & 7;    //foreground color = DOR
 	c0 =  m_mat & 7;                                //background color = MAT
 
-	switch(c & 0x80)
+	if (m_variant == EF9345_MODE::TYPE_TS9347 || (c & 0x80) == 0) //alphanumeric G0 set
 	{
-	case 0: //alphanumeric G0 set
-	{
+		// On the TS9347, G11 comes right after G0 starting from char 128.
+		uint8_t index = (c & 0x80) ? 3 : 0;
+
 		//A0: D = color set
 		//A1: U = underline
 		//A2: F = flash
@@ -623,7 +614,7 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, boo
 
 		for (i=0, j=0; i < 10; i++)
 		{
-			uint8_t ch = read_char(0, d + 4 * i);
+			uint8_t ch = read_char(index, d + 4 * i);
 			for (uint8_t b=0; b<6; b++)
 				pix[j++] = (ch & (1<<b)) ? c1 : c0;
 		}
@@ -631,9 +622,8 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, boo
 		//draw the underline
 		if (underline)
 			memset(&pix[54], c1, 6);
-		break;
 	}
-	default: //dedicated mosaic set
+	else //dedicated mosaic set (EF9345 only)
 	{
 		//A0: D = color set
 		//A1-3: 3 blocks de 6 pixels
@@ -665,8 +655,6 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, boo
 		//draw the underline
 		if (cursor_underline)
 			memset(&pix[54], c1, 6);
-		break;
-	}
 	}
 
 	draw_char_80(pix, x + 1, y + 1);
@@ -744,6 +732,8 @@ void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 	//type and address of the char
 	address = ((c & 0x7f) >> 2) * 0x40 + (c & 0x03);
 	type = (b & 0xf0) >> 4;
+	if (m_variant == EF9345_MODE::TYPE_TS9347 && !(type & 0x8))
+		type &= 0x3; // drop the i2 bit, which is not part of the type
 
 	//char attributes
 	c0 = a & 0x07;                  //background
@@ -998,7 +988,16 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			set_busy_flag(3500);
 			switch(cmd&7)
 			{
-				case 0:     m_registers[1] = m_charset[indexrom(7) & 0x1fff]; break;
+				case 0:
+				{
+					uint8_t type = ((m_registers[6]&0x20)>>3) | ((m_registers[7]&0x40)>>5) | ((m_registers[7]&0x80)>>7);
+					if (m_variant == EF9345_MODE::TYPE_TS9347)
+						type &= 0x3; // 4-7 are aliases of 0-3 on the TS9347
+
+					uint16_t addr = ((m_registers[6]&0x1f)<<6) | (m_registers[7]&0x3f);
+					m_registers[1] = read_char(type, addr); // read slice from ROM
+					break;
+				}
 				case 1:     m_registers[1] = m_tgs; break;
 				case 2:     m_registers[1] = m_mat; break;
 				case 3:     m_registers[1] = m_pat; break;
