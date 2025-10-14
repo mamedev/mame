@@ -2153,8 +2153,8 @@ void pc9801_state::pc9801_common(machine_config &config)
 	UPD765A(config, m_fdc_2hd, 8'000'000, true, true);
 	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));
 	m_fdc_2hd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
-	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
-	FLOPPY_CONNECTOR(config, "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("pc98");
 
@@ -2174,14 +2174,14 @@ void pc9801_state::pc9801_common(machine_config &config)
 
 void pc9801_state::config_floppy_525hd(machine_config &config)
 {
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
 }
 
 void pc9801_state::config_floppy_35hd(machine_config &config)
 {
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:0", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:1", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:0", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:1", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
 }
 
 void pc9801_state::pc9801(machine_config &config)
@@ -2203,8 +2203,8 @@ void pc9801_state::pc9801(machine_config &config)
 	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
 	m_fdc_2dd->intrq_wr_callback().set(FUNC(pc9801_state::fdc_2dd_irq));
 	m_fdc_2dd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w)).invert();
-	FLOPPY_CONNECTOR(config, "upd765_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
 
 	pc9801_sasi(config);
 	UPD1990A(config, m_rtc);
