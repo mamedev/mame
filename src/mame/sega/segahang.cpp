@@ -11,6 +11,7 @@
 
     To do for each game:
         * verify analog input min/max
+          (Hang On ride-on: gas 0 to A5, brake 0 to D2)
         * verify protection
 
 ***************************************************************************/
@@ -1052,6 +1053,12 @@ ROM_START( hangon )
 	ROM_LOAD( "315-5118.bin", 0x000, 0x08f, CRC(51d448a2) SHA1(0a1018cc1d4c6dc87625d59539d257e01c9dc872) )
 	ROM_LOAD( "315-5119.bin", 0x100, 0x08f, CRC(a37f00e1) SHA1(129b10f6cb48e1a1fefd69009380516cf2c677b5) )
 	ROM_LOAD( "315-5120.bin", 0x200, 0x08f, CRC(ba5f92ec) SHA1(74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b) )
+
+	ROM_REGION( 0xeb, "soundboard_plds", 0 )
+	ROM_LOAD( "315-5103.6e", 0x00, 0xeb, CRC(85284c32) SHA1(45bcc6745b3540777eed02374064d2f853b4fe1f) ) // PLS153
+
+	ROM_REGION( 0xeb, "romoard_plds", 0 )
+	ROM_LOAD( "315-5121.2a", 0x00, 0xeb, CRC(5dd89643) SHA1(b94bbed9fca269d198788e0a5e995ce7cbc453d7) ) // PLS153
 ROM_END
 
 //*************************************************************************************************************************
@@ -1112,6 +1119,12 @@ ROM_START( hangon1 )
 	ROM_LOAD( "315-5118.bin", 0x000, 0x08f, CRC(51d448a2) SHA1(0a1018cc1d4c6dc87625d59539d257e01c9dc872) )
 	ROM_LOAD( "315-5119.bin", 0x100, 0x08f, CRC(a37f00e1) SHA1(129b10f6cb48e1a1fefd69009380516cf2c677b5) )
 	ROM_LOAD( "315-5120.bin", 0x200, 0x08f, CRC(ba5f92ec) SHA1(74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b) )
+
+	ROM_REGION( 0xeb, "soundboard_plds", 0 )
+	ROM_LOAD( "315-5103.6e", 0x00, 0xeb, CRC(85284c32) SHA1(45bcc6745b3540777eed02374064d2f853b4fe1f) ) // PLS153
+
+	ROM_REGION( 0xeb, "romoard_plds", 0 )
+	ROM_LOAD( "315-5121.2a", 0x00, 0xeb, CRC(5dd89643) SHA1(b94bbed9fca269d198788e0a5e995ce7cbc453d7) ) // PLS153
 ROM_END
 
 //*************************************************************************************************************************
@@ -1177,6 +1190,12 @@ ROM_START( hangon2 )
 	ROM_LOAD( "315-5118.bin", 0x000, 0x08f, CRC(51d448a2) SHA1(0a1018cc1d4c6dc87625d59539d257e01c9dc872) )
 	ROM_LOAD( "315-5119.bin", 0x100, 0x08f, CRC(a37f00e1) SHA1(129b10f6cb48e1a1fefd69009380516cf2c677b5) )
 	ROM_LOAD( "315-5120.bin", 0x200, 0x08f, CRC(ba5f92ec) SHA1(74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b) )
+
+	ROM_REGION( 0xeb, "soundboard_plds", 0 )
+	ROM_LOAD( "315-5103.6e", 0x00, 0xeb, CRC(85284c32) SHA1(45bcc6745b3540777eed02374064d2f853b4fe1f) ) // PLS153
+
+	ROM_REGION( 0xeb, "romoard_plds", 0 )
+	ROM_LOAD( "315-5121.2a", 0x00, 0xeb, CRC(5dd89643) SHA1(b94bbed9fca269d198788e0a5e995ce7cbc453d7) ) // PLS153
 ROM_END
 
 //*************************************************************************************************************************
