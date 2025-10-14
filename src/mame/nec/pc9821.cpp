@@ -8,6 +8,7 @@ follow-up to PC-9801 for the consumer market
 
 References:
 - https://www.satotomi.com/sl9821/sl9821_tec5.html for PEGC MMIO
+- Mate-R_bible.pdf for late machine HW pics and info
 
 TODO (pc9821):
 - non-fatal "cache error" at POST for all machines listed here;
@@ -1509,6 +1510,10 @@ COMP( 1996, pc9821xa16,  pc9821xs,    0, pc9821xa16,   pc9821,   pc9821_mate_x_s
 COMP( 1996, pc9821ra20,  0,            0, pc9821ra20,  pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING )
 COMP( 1997, pc9821ra266, pc9821ra20,   0, pc9821ra266, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING )
 COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING )
+
+// pc9821rvII26: Pentium II 266 MHz / ReliantComputer Champion 1.0 (i440bx clone?) / MGA-2064W
+// Beefiest known desktop PC-98, can be DIY to mount AGP cards thru PCI bridge
+// cfr. http://pc.ni-land.com/bunshitsu/mate-r/rv26upg04.htm
 
 // 98MATE SERVER, pc9821rs* (Server variant of 98MATE R. Inherits concepts from SV-H98 98SERVER)
 // ...

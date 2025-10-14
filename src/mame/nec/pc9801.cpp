@@ -14,13 +14,14 @@ TODO:
 \- load actual IDE BIOSes from IPL romsets where applicable (pc9801bx onward, all pc9821)
 - Port over pc88va SASI version in common C-Bus option;
 - Remove kludge for POR bit in a20_ctrl_w fn;
+\- Causes "SYSTEM SHUTDOWN"s on OS installs/reboots (soft reset the machine manually);
 - hookup PC80S31K device for 2d type floppies, fix loading bug (missing specific BIOS?)
 - CMT support (-03/-13/-36 i/f or cbus only, supported by i86/V30 fully compatible machines
   only);
 - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
 - Incomplete FDC inner semantics with the dual ports;
-- floppy sounds never silences when drive is idle (disabled for the time being);
-- epdiag: throws ID invalid when run with auto-detect 2HD/2DD mode (DIP-SW 3-1 -> 0);
+\- floppy sounds never silences when drive is idle (disabled for the time being);
+\- epdiag: throws ID invalid when run with auto-detect 2HD/2DD mode (DIP-SW 3-1 -> 0);
 - Export mouse support to an actual PC9871 device;
 - GP-IB emulation, μPD7210;
 - Per-system dip-switches/configurations;
@@ -33,7 +34,7 @@ TODO (pc9801/pc9801f):
 
 TODO (pc9801rs):
 - Remove IDE hack to not make 512 to 256 sector byte translations
-\- probably need a working C-Bus IDE in place;
+\- probably need a working C-Bus IDE in place, or a SCSI option;
 
 TODO (pc9801us / pc9801fs):
 - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
@@ -1924,6 +1925,8 @@ void pc98_base_state::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_DCP_FORMAT);
 	fr.add(FLOPPY_DIP_FORMAT);
 	fr.add(FLOPPY_NFD_FORMAT);
+	// *nix/FreeBSD may distribute with this
+	fr.add(FLOPPY_IMG_FORMAT);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )

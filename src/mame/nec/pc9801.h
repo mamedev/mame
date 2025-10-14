@@ -62,12 +62,12 @@
 #include "bus/ata/atadev.h"
 #include "bus/ata/ataintf.h"
 
-#include "debugger.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
+#include "formats/img_dsk.h"
 #include "formats/pc98_dsk.h"
 #include "formats/pc98fdi_dsk.h"
 #include "formats/fdd_dsk.h"
