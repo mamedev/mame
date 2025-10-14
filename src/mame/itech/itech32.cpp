@@ -1797,8 +1797,8 @@ void itech32_state::base_devices(machine_config &config)
 	m_ensoniq->set_region2("ensoniq.2");
 	m_ensoniq->set_region3("ensoniq.3");
 	m_ensoniq->set_channels(1);               // channels
-	m_ensoniq->add_route(0, "speaker", 0.1, 1); // swapped stereo
-	m_ensoniq->add_route(1, "speaker", 0.1, 0);
+	m_ensoniq->add_route(0, "speaker", 1.6, 1); // swapped stereo
+	m_ensoniq->add_route(1, "speaker", 1.6, 0);
 }
 
 void itech32_state::via(machine_config &config)
@@ -1872,8 +1872,8 @@ void drivedge_state::drivedge(machine_config &config)
 	SPEAKER(config, "back", 2).rear();
 
 	m_ensoniq->set_channels(2);
-	m_ensoniq->add_route(2, "back", 0.1, 1);  // swapped stereo
-	m_ensoniq->add_route(3, "back", 0.1, 0);
+	m_ensoniq->add_route(2, "back", 1.6, 1);  // swapped stereo
+	m_ensoniq->add_route(3, "back", 1.6, 0);
 }
 
 void shoottv_state::shoottv(machine_config &config)
