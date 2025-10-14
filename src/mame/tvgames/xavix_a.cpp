@@ -137,7 +137,6 @@ void xavix_sound_device::device_start()
 
 void xavix_sound_device::device_reset()
 {
-
 	// hardware default on init
 	m_cyclerate_div = 0x0f;
 
@@ -193,7 +192,6 @@ void xavix_sound_device::device_reset()
 
 void xavix_sound_device::sound_stream_update(sound_stream &stream)
 {
-
 	int out_pos = 0;
 	int num_samples = stream.samples();
 
@@ -403,6 +401,13 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 	if (update_only)
 		return;
 
+	// udance enables what seems like an invalid voice when it should be silent, not clear what the hardware would do in this case
+	if (!update_only && !(new_type & 1) && wave_addr == wave_loop_addr)
+	{
+		m_voice[voice].enabled = 0;
+		return;
+	}
+
 	// Full (re)start
 	m_voice[voice].enabled = 1;
 	m_voice[voice].bank = wave_addr_bank;
@@ -511,6 +516,7 @@ uint8_t xavix_sound_device::sound_volume_r()
 
 void xavix_sound_device::sound_volume_w(uint8_t data)
 {
+	m_stream->update();
 	set_mastervol(data);
 	LOGMASKED(LOG_CFG, "[cfg] mixer mastervol=%u\n", unsigned(data));
 }
@@ -524,6 +530,7 @@ uint8_t xavix_sound_device::sound_mixer_r()
 
 void xavix_sound_device::sound_mixer_w(uint8_t data)
 {
+	m_stream->update();
 	m_mix.monaural = BIT(data, 7);
 	m_mix.capacity = BIT(data, 4, 2);
 	m_mix.amp      = BIT(data, 0, 3);
@@ -545,6 +552,7 @@ uint8_t xavix_sound_device::dac_control_r()
 
 void xavix_sound_device::dac_control_w(uint8_t data)
 {
+	m_stream->update();
 	m_mix.dac  = BIT(data, 7);
 	m_mix.gap  = BIT(data, 5, 2);
 	m_mix.lead = BIT(data, 2, 3);
@@ -696,7 +704,6 @@ uint8_t xavix_sound_device::fetch_env_byte_direct(int voice, int channel, uint16
 
 void xavix_sound_device::step_envelope(int voice)
 {
-
 	xavix_voice& v = m_voice[voice];
 
 	bool& logged_start = v.log_env_started;
