@@ -60,7 +60,6 @@ namespace
 	//     - gap!=0 issues a second write strobe (at 3−lag+gap), duplicating the held sample within the frame.
 	//	   - no titles found that change these from the defaults, so unable to test.
 	//   These alter *when* a channel is latched (and can duplicate it), but not the state-machine rate itself.
-	static constexpr uint32_t SEQUENCER_RATE_HZ = 21'477'272 / ((0x0f + 1u) * 8u); // Hardware Rate (167'791)
 	
 	static constexpr uint8_t MIXER_ORDER_MULTIPLEX[16] = { 0x0, 0xa, 0x7, 0xd, 0xc, 0x6, 0xb, 0x1, 0x4, 0xe, 0x3, 0x9, 0x8, 0x2, 0xf, 0x5 };
 	static constexpr uint8_t MIXER_ORDER_BROADCAST[16] = { 0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf };
@@ -79,9 +78,10 @@ xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char
 
 void xavix_sound_device::device_start()
 {
+	m_sequencer_rate_hz = clock() / ((0x0f + 1u) * 8u); // Hardware Rate (167'791)
 	m_owner_state = dynamic_cast<xavix_state*>(owner());
-	m_stream = stream_alloc(0, 2, SEQUENCER_RATE_HZ);
-	LOGMASKED(LOG_CFG, "[cfg] start render_rate=%uHz\n", SEQUENCER_RATE_HZ);
+	m_stream = stream_alloc(0, 2, m_sequencer_rate_hz);
+	LOGMASKED(LOG_CFG, "[cfg] start render_rate=%uHz\n", m_sequencer_rate_hz);
 
 	// dividers
 	save_item(NAME(m_tempo_div));
@@ -599,13 +599,13 @@ attotime xavix_sound_device::tempo_period(uint8_t tempo) const
 {
     const uint32_t samples = tempo_to_period_ticks(tempo);
     if (!samples) return attotime::never;
-    return attotime::from_ticks(samples, SEQUENCER_RATE_HZ); // engine ticks
+    return attotime::from_ticks(samples, m_sequencer_rate_hz); // engine ticks
 }
 
 double xavix_sound_device::tempo_tick_hz(uint8_t tempo) const
 {
     const uint32_t samples = tempo_to_period_ticks(tempo);
-    return samples ? (double(SEQUENCER_RATE_HZ) / double(samples)) : 0.0;
+    return samples ? (double(m_sequencer_rate_hz) / double(samples)) : 0.0;
 }
 
 uint32_t xavix_sound_device::phase_step_per_tick(uint32_t rate) const

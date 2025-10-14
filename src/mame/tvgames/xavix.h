@@ -87,6 +87,7 @@ private:
 	// global timing
 	uint8_t m_tempo_div[4] = { 0, 0, 0, 0 };
 	uint8_t m_cyclerate_div = 1;
+	uint32_t m_sequencer_rate_hz;
 
 	// callbacks
 	devcb_read8  m_readregs_cb;
