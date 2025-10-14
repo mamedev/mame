@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cpu/m6805/m68hc05e1.h"
+#include "machine/macseconds.h"
 
 #define USE_BUS_ADB (0)
 
@@ -23,7 +24,7 @@
 /// on-board RAM and ROM plus several GPIO pins.  Egret handles
 /// simple power management, the Apple Desktop Bus, I2C, real-time
 /// clock, and parameter RAM.
-class egret_device :  public device_t, public device_nvram_interface
+class egret_device :  public device_t, public device_nvram_interface, public macseconds_interface
 {
 public:
 	// construction/destruction

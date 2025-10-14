@@ -13,6 +13,8 @@
   registers look a lot like an evolved version of the blitter in the Spectrum PDQ,
   and the CRTC is similar to the SuperMac CRTC in nubus/supermac.cpp.
 
+  DAC is an Analog Devices ADV7152.
+
   Usage:
   - Hold down "T" when the Radius screen appears after the beep, and keep it
     held down until you see the video mode you want.  Many more options are
@@ -42,6 +44,7 @@
 #define LOG_RAMDAC (1U << 4)
 
 #define VERBOSE (0)
+
 #include "logmacro.h"
 
 namespace {
@@ -73,6 +76,8 @@ protected:
 
 	u32 registers_r(offs_t offset, u32 mem_mask);
 	void registers_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 crtc_r(offs_t offset, u32 mem_mask);
+	void crtc_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 ramdac_r(offs_t offset, u32 mem_mask);
 	void ramdac_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 accel_r(offs_t offset, u32 mem_mask);
@@ -82,6 +87,8 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
+
+	void card_map(address_map &map);
 
 	std::unique_ptr<u32[]> m_vram;
 	u32 m_mode, m_irq_control;
@@ -174,11 +181,22 @@ nubus_thunder4gx_device::nubus_thunder4gx_device(const machine_config &mconfig, 
 {
 	std::fill(std::begin(m_crtc), std::end(m_crtc), 0);
 	std::fill(std::begin(m_blitter_medium_pattern), std::end(m_blitter_medium_pattern), 0);
-	std::fill(std::begin(m_blitter_large_pattern), std::end(m_blitter_large_pattern), 0);}
+	std::fill(std::begin(m_blitter_large_pattern), std::end(m_blitter_large_pattern), 0);
+}
+
+void nubus_thunder4gx_device::card_map(address_map &map)
+{
+	map(0xc0'0000, 0xc0'000f).w(FUNC(nubus_thunder4gx_device::clockgen_w));
+	map(0xc4'0000, 0xc7'ffff).rw(FUNC(nubus_thunder4gx_device::registers_r), FUNC(nubus_thunder4gx_device::registers_w));
+	map(0xc8'0000, 0xc8'ffff).rw(FUNC(nubus_thunder4gx_device::crtc_r), FUNC(nubus_thunder4gx_device::crtc_w));
+	map(0xcc'0000, 0xcc'1fff).rw(FUNC(nubus_thunder4gx_device::accel_r), FUNC(nubus_thunder4gx_device::accel_w));
+	map(0xd0'0000, 0xd0'00ff).rw(FUNC(nubus_thunder4gx_device::ramdac_r), FUNC(nubus_thunder4gx_device::ramdac_w));
+}
 
 void nubus_thunder4gx_device::device_start()
 {
 	const u32 slotspace = get_slotspace();
+	const u32 superspace = get_super_slotspace();
 
 	install_declaration_rom("declrom");
 
@@ -197,12 +215,10 @@ void nubus_thunder4gx_device::device_start()
 	save_item(NAME(m_display_enable));
 	save_pointer(NAME(m_vram), VRAM_SIZE);
 
-	install_bank(slotspace, slotspace+VRAM_SIZE-1, &m_vram[0]);
+	nubus().install_map(*this, &nubus_thunder4gx_device::card_map);
 
-	nubus().install_writeonly_device(slotspace+0xc00000, slotspace+0xc0000f, emu::rw_delegate(*this, FUNC(nubus_thunder4gx_device::clockgen_w)));
-	nubus().install_device(slotspace+0xc40000, slotspace+0xc8ffff, emu::rw_delegate(*this, FUNC(nubus_thunder4gx_device::registers_r)), emu::rw_delegate(*this, FUNC(nubus_thunder4gx_device::registers_w)));
-	nubus().install_device(slotspace+0xcc0000, slotspace+0xcc1fff, emu::rw_delegate(*this, FUNC(nubus_thunder4gx_device::accel_r)), emu::rw_delegate(*this, FUNC(nubus_thunder4gx_device::accel_w)));
-	nubus().install_device(slotspace+0xd00000, slotspace+0xd000ff, emu::rw_delegate(*this, FUNC(nubus_thunder4gx_device::ramdac_r)), emu::rw_delegate(*this, FUNC(nubus_thunder4gx_device::ramdac_w)));
+	install_bank(slotspace, slotspace+VRAM_SIZE-1, &m_vram[0]);
+	install_bank(superspace, superspace + VRAM_SIZE - 1, &m_vram[0]);
 }
 
 void nubus_thunder4gx_device::device_reset()
@@ -331,50 +347,11 @@ u32 nubus_thunder4gx_device::registers_r(offs_t offset, u32 mem_mask)
 			// 0a0028 = RadiusColor Twin
 			return 0x0a0028;
 
-		case 0x10000:   // mode
-			return m_mode;
-
-		case 0x10002:   // monitor sense
-		{
-			u8 mon = m_monitor_config->read();
-			u8 monitor_id = ((m_monitor_id >> 2) ^ 7) & 0x7;
-			u8 res;
-			if (mon & 0x40)
-			{
-				res = 7;
-
-				if (mon & 0x80)
-				{
-					res = 6;
-				}
-
-				if (monitor_id == 0x4)
-				{
-					res &= 4 | (BIT(mon, 5) << 1) | BIT(mon, 4);
-				}
-				if (monitor_id == 0x2)
-				{
-					res &= (BIT(mon, 3) << 2) | 2 | BIT(mon, 2);
-				}
-				if (monitor_id == 0x1)
-				{
-					res &= (BIT(mon, 1) << 2) | (BIT(mon, 0) << 1) | 1;
-				}
-			}
-			else
-			{
-				res = mon;
-			}
-
-			LOGMASKED(LOG_MONSENSE, "Sense result = %x\n", res);
-			return (res << 2) | 0x3;
-		}
-
 		default:
 			LOGMASKED(LOG_GENERAL, "Read @ C4xxxx %08x mask %08x\n", offset, mem_mask);
 			break;
-		}
-			return 0;
+	}
+	return 0;
 }
 
 void nubus_thunder4gx_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
@@ -416,6 +393,105 @@ void nubus_thunder4gx_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 		default:
 				LOGMASKED(LOG_GENERAL, "%s Write @ C4xxxx: %x to reg %x (mask %x)\n", machine().describe_context(), data & mem_mask, offset, mem_mask);
 				break;
+	}
+}
+
+u32 nubus_thunder4gx_device::crtc_r(offs_t offset, u32 mem_mask)
+{
+	switch (offset)
+	{
+	case 0x00: // mode
+		return m_mode;
+
+	case 0x02: // monitor sense
+	{
+		u8 mon = m_monitor_config->read();
+		u8 monitor_id = ((m_monitor_id >> 2) ^ 7) & 0x7;
+		u8 res;
+		if (mon & 0x40)
+		{
+			res = 7;
+
+			if (mon & 0x80)
+			{
+				res = 6;
+			}
+
+			if (monitor_id == 0x4)
+			{
+				res &= 4 | (BIT(mon, 5) << 1) | BIT(mon, 4);
+			}
+			if (monitor_id == 0x2)
+			{
+				res &= (BIT(mon, 3) << 2) | 2 | BIT(mon, 2);
+			}
+			if (monitor_id == 0x1)
+			{
+				res &= (BIT(mon, 1) << 2) | (BIT(mon, 0) << 1) | 1;
+			}
+		}
+		else
+		{
+			res = mon;
+		}
+
+		LOGMASKED(LOG_MONSENSE, "Sense result = %x\n", res);
+		return (res << 2) | 0x3;
+	}
+
+	case 0x05:
+	case 0x06:
+	case 0x07:
+	case 0x08:
+	case 0x09:
+	case 0x0a:
+	case 0x0b:
+	case 0x0c:
+	case 0x0d:
+	case 0x0e:
+	case 0x0f:
+		return m_crtc[offset - 5];
+
+	default:
+		LOGMASKED(LOG_GENERAL, "Read @ C8xxxx %08x mask %08x\n", offset, mem_mask);
+		break;
+	}
+	return 0;
+}
+
+void nubus_thunder4gx_device::crtc_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	data &= mem_mask;
+	switch (offset)
+	{
+	case 0x00:
+		m_mode = data & 0xf;
+		LOGMASKED(LOG_GENERAL, "%x to mode\n", data);
+		break;
+
+	case 0x02:
+		LOGMASKED(LOG_MONSENSE, "%x to monitor drive\n", data);
+		m_monitor_id = data;
+		break;
+
+	case 0x05:
+	case 0x06:
+	case 0x07:
+	case 0x08:
+	case 0x09:
+	case 0x0a:
+	case 0x0b:
+	case 0x0c:
+	case 0x0d:
+	case 0x0e:
+	case 0x0f:
+		m_crtc[offset - 5] = data & mem_mask;
+		LOGMASKED(LOG_GENERAL, "%04x to CRTC @ %x (%x)\n", data & mem_mask, offset, offset - 0x10005);
+		break;
+
+	default:
+		LOGMASKED(LOG_GENERAL, "%s Write @ C8xxxx: %x to reg %x (mask %x)\n", machine().describe_context(), data & mem_mask, offset, mem_mask);
+		break;
 	}
 }
 
@@ -802,6 +878,28 @@ void nubus_thunder4gx_device::clockgen_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
+class nubus_thunder4gx16_device : public nubus_thunder4gx_device
+{
+public:
+	nubus_thunder4gx16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	nubus_thunder4gx_device(mconfig, NUBUS_THUNDERIVGX16, tag, owner, clock)
+	{
+	}
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+ROM_START( thundergx1600 )
+	ROM_REGION(0x10000, "declrom", 0)
+	ROM_LOAD( "radius thunder iv gx1600 0010-415-0003.bin", 0x000000, 0x010000, CRC(b0c036c1) SHA1(ea008fa93f56807f48d9535f70efebdf3def2609) )
+ROM_END
+
+const tiny_rom_entry *nubus_thunder4gx16_device::device_rom_region() const
+{
+	return ROM_NAME( thundergx1600 );
+}
+
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_THUNDERIVGX, device_nubus_card_interface, nubus_thunder4gx_device, "nb_thungx", "Radius Thunder IV GX video card")
+DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_THUNDERIVGX16, device_nubus_card_interface, nubus_thunder4gx16_device, "nb_thungx16", "Radius Thunder IV GX 1600 video card")

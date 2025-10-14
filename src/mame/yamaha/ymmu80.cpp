@@ -265,9 +265,9 @@ u8 mu80_state::pb_r()
 	if((cur_pa & PA_LCD_ENABLE)) {
 		if(cur_pa & PA_LCD_RW) {
 			if(cur_pa & PA_LCD_RS)
-				return m_lcd->data_read();
+				return m_lcd->data_r();
 			else
-				return m_lcd->control_read();
+				return m_lcd->control_r();
 		} else {
 			if(!(cur_pa & 0x10)) {
 				u8 val = 0xff;
@@ -301,9 +301,9 @@ void mu80_state::pa_w(u8 data)
 	if((cur_pa & PA_LCD_ENABLE) && !(data & PA_LCD_ENABLE)) {
 		if(!(cur_pa & PA_LCD_RW)) {
 			if(cur_pa & PA_LCD_RS)
-				m_lcd->data_write(cur_pb);
+				m_lcd->data_w(cur_pb);
 			else
-				m_lcd->control_write(cur_pb);
+				m_lcd->control_w(cur_pb);
 		}
 	}
 
@@ -339,18 +339,17 @@ void mu80_state::mu80(machine_config &config)
 
 	MULCD(config, m_lcd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SWP20(config, m_swp20_0);
 	m_swp20_0->set_device_rom_tag("swp20");
-	m_swp20_0->add_route(0, "lspeaker", 1.0);
-	m_swp20_0->add_route(1, "rspeaker", 1.0);
+	m_swp20_0->add_route(0, "speaker", 1.0, 0);
+	m_swp20_0->add_route(1, "speaker", 1.0, 1);
 
 	SWP20(config, m_swp20_1);
 	m_swp20_1->set_device_rom_tag("swp20");
-	m_swp20_1->add_route(0, "lspeaker", 1.0);
-	m_swp20_1->add_route(1, "rspeaker", 1.0);
+	m_swp20_1->add_route(0, "speaker", 1.0, 0);
+	m_swp20_1->add_route(1, "speaker", 1.0, 1);
 
 	MEG(config, m_meg);
 

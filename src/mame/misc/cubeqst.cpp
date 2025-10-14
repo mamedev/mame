@@ -556,19 +556,18 @@ void cubeqst_state::cubeqst(machine_config &config)
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(cubeqst_state::vblank_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	for (int i = 0; i < 8; i++)
 	{
 		// AD7521JN.2D (59) + CD4051BE.3D (24) + 1500pF.C6-C13 (34) + TL074CN.3B/3C (53) + 10K.RN3/4 (30)
-		AD7521(config, m_ldacs[i]).add_route(0, "lspeaker", 0.125);
+		AD7521(config, m_ldacs[i]).add_route(0, "speaker", 0.125, 0);
 
 		// AD7521JN.2D (59) + CD4051BE.1D (24) + 1500pF.C15-C22 (34) + TL074CN.1B/1C (53) + 10K.RN1/2 (30)
-		AD7521(config, m_rdacs[i]).add_route(0, "rspeaker", 0.125);
+		AD7521(config, m_rdacs[i]).add_route(0, "speaker", 0.125, 1);
 	}
 }
 

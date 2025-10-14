@@ -367,7 +367,7 @@ bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, 
 //  osd_stat
 //============================================================
 
-std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
+osd::directory::entry::ptr osd_stat(const std::string &path)
 {
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 	struct stat st;
@@ -380,18 +380,22 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	osd::directory::entry *result;
-	try { result = reinterpret_cast<osd::directory::entry *>(::operator new(sizeof(*result) + path.length() + 1)); }
-	catch (...) { return nullptr; }
+	auto const result = reinterpret_cast<osd::directory::entry *>(
+			::operator new(
+				sizeof(osd::directory::entry) + path.length() + 1,
+				std::align_val_t(alignof(osd::directory::entry)),
+				std::nothrow));
+	if (!result) return nullptr;
 	new (result) osd::directory::entry;
 
-	std::strcpy(reinterpret_cast<char *>(result) + sizeof(*result), path.c_str());
-	result->name = reinterpret_cast<char *>(result) + sizeof(*result);
+	auto const resultname = reinterpret_cast<char *>(result) + sizeof(*result);
+	std::strcpy(resultname, path.c_str());
+	result->name = resultname;
 	result->type = S_ISDIR(st.st_mode) ? osd::directory::entry::entry_type::DIR : osd::directory::entry::entry_type::FILE;
 	result->size = std::uint64_t(std::make_unsigned_t<decltype(st.st_size)>(st.st_size));
 	result->last_modified = std::chrono::system_clock::from_time_t(st.st_mtime);
 
-	return std::unique_ptr<osd::directory::entry>(result);
+	return osd::directory::entry::ptr(result);
 }
 
 

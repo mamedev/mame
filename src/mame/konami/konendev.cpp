@@ -403,13 +403,12 @@ void konendev_state::konendev(machine_config &config)
 	EEPROM_93C56_16BIT(config, "eeprom");
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16'934'400)); // Clock unknown
 	ymz.set_addrmap(0, &konendev_state::ymz280b_map);
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 

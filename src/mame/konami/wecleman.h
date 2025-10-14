@@ -67,24 +67,24 @@ protected:
 
 	required_region_ptr<uint8_t> m_sprite_region;
 
-	int m_spr_color_offs = 0;
-	int m_prot_state = 0;
-	int m_selected_ip = 0;
-	int m_irqctrl = 0;
-	int m_bgpage[4]{};
-	int m_fgpage[4]{};
-	const int *m_gfx_bank = nullptr;
+	int32_t m_spr_color_offs = 0;
+	int32_t m_prot_state = 0;
+	int32_t m_selected_ip = 0;
+	int32_t m_irqctrl = 0;
+	int32_t m_bgpage[4]{};
+	int32_t m_fgpage[4]{};
+	const int32_t *m_gfx_bank = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_txt_tilemap = nullptr;
-	int m_gameid = 0;
-	int m_spr_offsx = 0;
-	int m_spr_offsy = 0;
-	int m_spr_count = 0;
-	int m_cloud_blend = 0;
-	int m_cloud_ds = 0;
-	int m_cloud_visible = 0;
-	int m_sound_hw_type = 0;
+	int32_t m_gameid = 0;
+	int32_t m_spr_offsx = 0;
+	int32_t m_spr_offsy = 0;
+	int32_t m_spr_count = 0;
+	int32_t m_cloud_blend = 0;
+	int32_t m_cloud_ds = 0;
+	int32_t m_cloud_visible = 0;
+	int32_t m_sound_hw_type = 0;
 	bool m_hotchase_sound_hs = 0;
 	pen_t m_black_pen{};
 

@@ -182,12 +182,9 @@ void ymz770_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void ymz770_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ymz770_device::sound_stream_update(sound_stream &stream)
 {
-	auto &outL = outputs[0];
-	auto &outR = outputs[1];
-
-	for (int i = 0; i < outL.samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		sequencer();
 
@@ -280,8 +277,8 @@ retry:
 		}
 		if (m_mute)
 			mixr = mixl = 0;
-		outL.put_int(i, mixl, 32768);
-		outR.put_int(i, mixr, 32768);
+		stream.put_int(0, i, mixl, 32768);
+		stream.put_int(1, i, mixr, 32768);
 	}
 }
 

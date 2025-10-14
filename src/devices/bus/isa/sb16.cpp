@@ -380,7 +380,7 @@ ROM_START( sb16 )
 	ROM_LOAD("ct1741_v413_xor.bin", 0x00, 0x40, CRC(5243d15a) SHA1(c7637c92828843f47e6e2f956af639b07aee4571))
 ROM_END
 
-void sb16_lle_device::sb16_io(address_map &map)
+void sb16_lle_device::sb16_data(address_map &map)
 {
 	map(0x0000, 0x0000).mirror(0xff00).rw(FUNC(sb16_lle_device::dsp_data_r), FUNC(sb16_lle_device::dsp_data_w));
 //  map(0x0001, 0x0001) // MIDI related?
@@ -428,33 +428,32 @@ const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 void sb16_lle_device::device_add_mconfig(machine_config &config)
 {
 	I80C52(config, m_cpu, XTAL(24'000'000));
-	m_cpu->set_addrmap(AS_IO, &sb16_lle_device::sb16_io);
+	m_cpu->set_addrmap(AS_DATA, &sb16_lle_device::sb16_data);
 	m_cpu->port_in_cb<1>().set(FUNC(sb16_lle_device::p1_r));
 	m_cpu->port_out_cb<1>().set(FUNC(sb16_lle_device::p1_w));
 	m_cpu->port_in_cb<2>().set(FUNC(sb16_lle_device::p2_r));
 	m_cpu->port_out_cb<2>().set(FUNC(sb16_lle_device::p2_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	CT1745(config, m_mixer);
 	m_mixer->set_fm_tag("ymf262");
 	m_mixer->set_ldac_tag(m_ldac);
 	m_mixer->set_rdac_tag(m_rdac);
-	m_mixer->add_route(0, "lspeaker", 1.0);
-	m_mixer->add_route(1, "rspeaker", 1.0);
+	m_mixer->add_route(0, "speaker", 1.0, 0);
+	m_mixer->add_route(1, "speaker", 1.0, 1);
 	m_mixer->irq_status_cb().set([this] () {
 		return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
 	});
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, 0); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, 1); // unknown DAC
 
 	ymf262_device &ymf262(YMF262(config, "ymf262", XTAL(14'318'181)));
-	ymf262.add_route(0, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
-	ymf262.add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
-	ymf262.add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
-	ymf262.add_route(3, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	ymf262.add_route(0, m_mixer, 1.00, 0);
+	ymf262.add_route(1, m_mixer, 1.00, 1);
+	ymf262.add_route(2, m_mixer, 1.00, 0);
+	ymf262.add_route(3, m_mixer, 1.00, 1);
 
 	PC_JOY(config, m_joy);
 }

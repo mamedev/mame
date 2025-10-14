@@ -50,10 +50,10 @@ void pc8801_23_device::device_add_mconfig(machine_config &config)
 //  m_opna->port_a_read_callback().set(FUNC(pc8801_23_device::opn_porta_r));
 //  m_opna->port_b_read_callback().set_ioport("OPN_PB");
 	// TODO: per-channel mixing is unconfirmed
-	m_opna->add_route(0, "^^lspeaker", 0.25);
-	m_opna->add_route(0, "^^rspeaker", 0.25);
-	m_opna->add_route(1, "^^lspeaker", 0.75);
-	m_opna->add_route(2, "^^rspeaker", 0.75);
+	m_opna->add_route(0, "^^speaker", 0.75, 0);
+	m_opna->add_route(0, "^^speaker", 0.75, 1);
+	m_opna->add_route(1, "^^speaker", 0.75, 0);
+	m_opna->add_route(2, "^^speaker", 0.75, 1);
 }
 
 void pc8801_23_device::device_start()

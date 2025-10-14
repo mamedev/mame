@@ -865,12 +865,11 @@ void mos6560_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void mos6560_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void mos6560_device::sound_stream_update(sound_stream &stream)
 {
 	int i, v;
-	auto &buffer = outputs[0];
 
-	for (i = 0; i < buffer.samples(); i++)
+	for (i = 0; i < stream.samples(); i++)
 	{
 		v = 0;
 		if (TONE1_ON /*||(m_tone1pos != 0) */ )
@@ -883,7 +882,7 @@ void mos6560_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			if (m_tone1pos >= m_tone1samples)
 			{
 				m_tone1pos = 0;
-				m_tone1samples = buffer.sample_rate() / TONE1_FREQUENCY;
+				m_tone1samples = stream.sample_rate() / TONE1_FREQUENCY;
 				if (m_tone1samples == 0)
 					m_tone1samples = 1;
 			}
@@ -899,7 +898,7 @@ void mos6560_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			if (m_tone2pos >= m_tone2samples)
 			{
 				m_tone2pos = 0;
-				m_tone2samples = buffer.sample_rate() / TONE2_FREQUENCY;
+				m_tone2samples = stream.sample_rate() / TONE2_FREQUENCY;
 				if (m_tone2samples == 0)
 					m_tone2samples = 1;
 			}
@@ -915,7 +914,7 @@ void mos6560_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			if (m_tone3pos >= m_tone3samples)
 			{
 				m_tone3pos = 0;
-				m_tone3samples = buffer.sample_rate() / TONE3_FREQUENCY;
+				m_tone3samples = stream.sample_rate() / TONE3_FREQUENCY;
 				if (m_tone3samples == 0)
 					m_tone3samples = 1;
 			}
@@ -935,6 +934,6 @@ void mos6560_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			v = 8191;
 		else if (v < -8191)
 			v = -8191;
-		buffer.put_int(i, v, 8192);
+		stream.put_int(0, i, v, 8192);
 	}
 }

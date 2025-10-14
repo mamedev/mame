@@ -1734,7 +1734,6 @@ void galaga_state::galagab(machine_config &config)
 	galaga(config);
 
 	/* basic machine hardware */
-
 	config.device_remove("06xx");
 	config.device_remove("54xx");
 	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
@@ -1962,7 +1961,6 @@ void digdug_state::dzigzag(machine_config &config)
 	digdug(config);
 
 	/* basic machine hardware */
-
 	z80_device &sub3(Z80(config, "sub3", MASTER_CLOCK/6));   /* 3.072 MHz */
 	sub3.set_addrmap(AS_PROGRAM, &digdug_state::dzigzag_mem4);
 }

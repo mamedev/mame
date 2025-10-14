@@ -3,7 +3,7 @@
 /****************************************************************************************************************
 
   Skeleton driver for "El Circulo", from Inder.
-  It's a gambling roulette built with lights (mix of leds and small light bulbs) and an crystal artwork overlay.
+  It's a gambling roulette built with lights (mix of LEDs and small light bulbs) and an crystal artwork overlay.
 
      ______________    ______    __________________________________    ____________    ________________
     | | | | | | | |___| | | |___|               _         _       |___| | | | | | |___| | | | | | | | |
@@ -55,6 +55,8 @@ LD15 (_)                                                                        
 
 #include "speaker.h"
 
+#include "elcirculo.lh"
+
 namespace {
 
 class elcirculo_state : public driver_device
@@ -64,15 +66,28 @@ public:
 	elcirculo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_leds(*this, "ld%u%u", 0U, 0U)
+		, m_lamps(*this, "il%u", 0U)
 	{
 	}
 
-	void elcirculo(machine_config &config);
+	void elcirculo(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	output_finder<4, 8> m_leds;
+	output_finder<8> m_lamps;
+
+	uint8_t m_led_row = 0;
+	uint8_t m_led_data = 0;
 
 	INTERRUPT_GEN_MEMBER(irq_gen);
+
+	void led_w(offs_t offset, uint8_t data);
+	void strobe_w(offs_t offset, uint8_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 };
@@ -82,6 +97,32 @@ INTERRUPT_GEN_MEMBER(elcirculo_state::irq_gen)
 	m_maincpu->set_input_line(M6504_IRQ_LINE, HOLD_LINE);
 }
 
+void elcirculo_state::led_w(offs_t offset, uint8_t data)
+{
+	if (offset == 0)
+	{
+		m_led_data = data;
+	}
+	else if (offset == 1)
+	{
+		m_led_row = ~data & 0x0f;
+	}
+}
+
+void elcirculo_state::strobe_w(offs_t offset, uint8_t data)
+{
+	for (uint8_t row = 0; std::size(m_leds) > row; ++row)
+	{
+		if (BIT(m_led_row, row))
+		{
+			for (int bit = 0; bit < 8; bit++)
+			{
+				m_leds[row][bit] = !BIT(m_led_data, bit);
+			}
+		}
+	}
+}
+
 void elcirculo_state::program_map(address_map &map)
 {
 	map.global_mask(0x1fff);
@@ -89,8 +130,8 @@ void elcirculo_state::program_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x0200).portr("IN0");
 	map(0x0201, 0x0201).portr("DSW1");
-	// map(0x0400, 0x0401).w();
-	// map(0x0600, 0x0601).w();
+	map(0x0400, 0x0401).w(FUNC(elcirculo_state::led_w));
+	map(0x0600, 0x0601).w(FUNC(elcirculo_state::strobe_w));
 	map(0x1000, 0x17ff).mirror(0x800).rom().region("maincpu", 0);
 }
 
@@ -116,6 +157,15 @@ INPUT_PORTS_START(elcirculo)
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 INPUT_PORTS_END
 
+void elcirculo_state::machine_start()
+{
+	save_item(NAME(m_led_row));
+	save_item(NAME(m_led_data));
+
+	m_leds.resolve();
+	m_lamps.resolve();
+}
+
 void elcirculo_state::elcirculo(machine_config &config)
 {
 	M6504(config, m_maincpu, 1'000'000); // R6504P, internal clock
@@ -132,4 +182,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1980, elcirculo, 0, elcirculo, elcirculo, elcirculo_state, empty_init, ROT0, "Inder", "El Circulo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAMEL(1980, elcirculo, 0, elcirculo, elcirculo, elcirculo_state, empty_init, ROT0, "Inder", "El Circulo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_elcirculo)

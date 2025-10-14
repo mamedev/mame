@@ -549,9 +549,9 @@ s32 swx00_sound_device::fpapply(s32 value, s32 sample)
 	return (s64(sample) - ((s64(sample) * ((value >> 9) & 0x7fff)) >> 16)) >> (value >> 24);
 }
 
-void swx00_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void swx00_sound_device::sound_stream_update(sound_stream &stream)
 {
-	for(int i=0; i != outputs[0].samples(); i++) {
+	for(int i=0; i != stream.samples(); i++) {
 		s32 dry_l = 0, dry_r = 0;
 		s32 rev   = 0;
 		s32 cho_l = 0, cho_r = 0;
@@ -715,7 +715,7 @@ void swx00_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 		(void)var_l;
 		(void)var_r;
 
-		outputs[0].put_int(i, dry_l, 32768);
-		outputs[1].put_int(i, dry_r, 32768);
+		stream.put_int(0, i, dry_l, 32768);
+		stream.put_int(1, i, dry_r, 32768);
 	}
 }

@@ -133,12 +133,12 @@ ioport_constructor lcpds_cv8lc_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-lcpds_cv8lc_device::lcpds_cv8lc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+lcpds_cv8lc_device::lcpds_cv8lc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	lcpds_cv8lc_device(mconfig, PDSLC_COLORVUE8LC, tag, owner, clock)
 {
 }
 
-lcpds_cv8lc_device::lcpds_cv8lc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+lcpds_cv8lc_device::lcpds_cv8lc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_tms34061(*this, "tms34061"),
@@ -194,9 +194,9 @@ void lcpds_cv8lc_device::device_reset()
 	m_display_enable = 0;
 }
 
-uint32_t lcpds_cv8lc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 lcpds_cv8lc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]);
+	auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]);
 	const pen_t *pens = m_palette->pens();
 
 	m_tms34061->get_display_state();

@@ -65,9 +65,6 @@ license:CC0-1.0
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="1886" y="414" width="32" height="64" />
-		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="1886" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -77,6 +74,9 @@ license:CC0-1.0
 				<bounds x="1886" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="1886" y="414" width="32" height="64" />
+		</element>
 	</view>
 
 	<view name="Triple-Screen (Gapless) + Shifter-R Off-Screen" showpointers="no">
@@ -90,9 +90,6 @@ license:CC0-1.0
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="1928" y="414" width="32" height="64" />
-		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="1928" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -102,6 +99,9 @@ license:CC0-1.0
 				<bounds x="1928" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="1928" y="414" width="32" height="64" />
+		</element>
 	</view>
 
 	<view name="Triple-Screen (Gapless) + Shifter-L Overlay" showpointers="no">
@@ -115,9 +115,6 @@ license:CC0-1.0
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="2" y="414" width="32" height="64" />
-		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -127,6 +124,9 @@ license:CC0-1.0
 				<bounds x="2" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="2" y="414" width="32" height="64" />
+		</element>
 	</view>
 
 	<view name="Triple-Screen (Gapless) + Shifter-L Off-Screen" showpointers="no">
@@ -140,9 +140,6 @@ license:CC0-1.0
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="-40" y="414" width="32" height="64" />
-		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="-40" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -152,6 +149,9 @@ license:CC0-1.0
 				<bounds x="-40" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="-40" y="414" width="32" height="64" />
+		</element>
 	</view>
 
 	<view name="Single-Screen + Shifter-R Overlay" showpointers="no">
@@ -159,9 +159,6 @@ license:CC0-1.0
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="606" y="414" width="32" height="64" />
-		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="606" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -171,6 +168,9 @@ license:CC0-1.0
 				<bounds x="606" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="606" y="414" width="32" height="64" />
+		</element>
 	</view>
 
 	<view name="Single-Screen + Shifter-R Off-Screen" showpointers="no">
@@ -178,9 +178,6 @@ license:CC0-1.0
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="648" y="414" width="32" height="64" />
-		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="648" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -190,6 +187,9 @@ license:CC0-1.0
 				<bounds x="648" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="648" y="414" width="32" height="64" />
+		</element>
 	</view>
 
 	<view name="Single-Screen + Shifter-L Overlay" showpointers="no">
@@ -197,9 +197,6 @@ license:CC0-1.0
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="2" y="414" width="32" height="64" />
-		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -209,6 +206,9 @@ license:CC0-1.0
 				<bounds x="2" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="2" y="414" width="32" height="64" />
+		</element>
 	</view>
 
 	<view name="Single-Screen + Shifter-L Off-Screen" showpointers="no">
@@ -216,9 +216,6 @@ license:CC0-1.0
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="-40" y="414" width="32" height="64" />
-		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="-40" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -228,6 +225,9 @@ license:CC0-1.0
 				<bounds x="-40" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="-40" y="414" width="32" height="64" />
+		</element>
 	</view>
 
 </mamelayout>

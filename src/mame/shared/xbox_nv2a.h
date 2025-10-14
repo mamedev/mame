@@ -874,7 +874,7 @@ public:
 		offs_t destination_address = 0;
 		int op = 0;
 		int width = 0;
-		int heigth = 0;
+		int height = 0;
 		uint32_t sourcex = 0;
 		uint32_t sourcey = 0;
 		uint32_t destinationx = 0;

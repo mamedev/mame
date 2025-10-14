@@ -116,7 +116,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1288   TMS1100   1981, Tiger Finger Bowl
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
- @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
+ @MP1312   TMS1100   1981, Gakken FX-Micom R-165
+ @MP1312A  TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1342   TMS1100   1985, Tiger Micro-Bot
  @MP1343   TMS1100   1984, Tandy (Micronta) VoxClock 3
  *MP1359   TMS1100   1985, Play-Jour Capsela CRC2000
@@ -200,6 +201,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6358   TMS1475   1982, Bandai U-Boat
  *MP6361   TMS1475   1983, <unknown> Defender Strikes
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
+ *MP7303   TMS1400   1980, Entex Football 3 (6018)
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
@@ -208,6 +210,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400   1982, Parker Brothers Master Merlin
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
+ *MP7574   TMS1600   1981, Busch Microtronic 2090 (actually, label is TMS1600NLL7574, no MP label)
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
   MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> entex/sag.cpp
  *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part
@@ -5622,7 +5625,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Entex (Electronic) Basketball 2
+  Entex Basketball 2
   * TMS1100 6010 MP1218 (die label: 1100B, MP1218)
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -7091,6 +7094,9 @@ ROM_END
   - USA: Science Fair Microcomputer Trainer, published by Tandy. Of note is
     the complete redesign of the case, adding more adjustable wiring
 
+  ROM Revision A was used in Science Fair Microcomputer Trainer, and probably
+  also in newer batches of FX-Micom R-165. It improves RNG and key debouncing.
+
 *******************************************************************************/
 
 class fxmcr165_state : public hh_tms1k_state
@@ -7216,7 +7222,17 @@ void fxmcr165_state::fxmcr165(machine_config &config)
 
 ROM_START( fxmcr165 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1312", 0x0000, 0x0800, CRC(6efc8bcc) SHA1(ced8a02b472a3178073691d3dccc0f19f57428fd) )
+	ROM_LOAD( "mp1312a", 0x0000, 0x0800, CRC(6efc8bcc) SHA1(ced8a02b472a3178073691d3dccc0f19f57428fd) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_fxmcr165_output.pla", 0, 365, CRC(ce656866) SHA1(40e1614f5afcc7572fda596e1be453d54e95af0c) )
+ROM_END
+
+ROM_START( fxmcr165a )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1312", 0x0000, 0x0800, CRC(a76e1644) SHA1(981b6723ac899a2cf325041c4a96cb4304ee1c1d) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
@@ -11249,7 +11265,7 @@ u8 lostreas_state::read_k()
 // inputs
 
 /* physical button layout and labels are like this:
-  (note: Canadian version differs slightly to accomodoate dual-language)
+  (note: Canadian version differs slightly to accommodate dual-language)
 
     [N-S(gold)]    [1] [2] [3]    [AIR]
     [E-W(gold)]    [4] [5] [6]    [UP]
@@ -17466,7 +17482,7 @@ SYST( 1979, esbattle,   0,         0,      esbattle,  esbattle,  esbattle_state,
 SYST( 1980, blastit,    0,         0,      blastit,   blastit,   blastit_state,   empty_init, "Entex", "Blast It", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, einvader,   0,         0,      einvader,  einvader,  einvader_state,  empty_init, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, efootb4 ,   0,         0,      efootb4,   efootb4,   efootb4_state,   empty_init, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
-SYST( 1980, ebaskb2 ,   0,         0,      ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ebaskb2 ,   0,         0,      ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, raisedvl,   0,         0,      raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, ebknight,   0,         0,      ebknight,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Black Knight Pinball (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1980, mmarvin,    0,         0,      mmarvin,   mmarvin,   mmarvin_state,   empty_init, "Entex", "Musical Marvin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
@@ -17479,7 +17495,8 @@ SYST( 1980, gjackpot,   0,         0,      gjackpot,  gjackpot,  gjackpot_state,
 SYST( 1980, ginv,       0,         0,      ginv,      ginv,      ginv_state,      empty_init, "Gakken", "Invader (Gakken, cyan version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, ginv1000,   0,         0,      ginv1000,  ginv1000,  ginv1000_state,  empty_init, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, ginv2000,   0,         0,      ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, fxmcr165,   0,         0,      fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, fxmcr165,   0,         0,      fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165 (rev. A)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, fxmcr165a,  fxmcr165,  0,      fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165 (older)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1979, elecdet,    0,         0,      elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 SYST( 1981, skywriter,  0,         0,      skywriter, skywriter, skywriter_state, empty_init, "Ideal Toy Corporation", "Sky-Writer: The Electronic Message Sender", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )

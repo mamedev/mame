@@ -89,37 +89,29 @@ public:
 	zorba_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_config_port(*this, "CNF")
-		, m_rom(*this, "maincpu")
-		, m_ram(*this, "mainram")
-		, m_bank1(*this, "bank1")
 		, m_p_chargen(*this, "chargen")
 		, m_maincpu(*this, "maincpu")
 		, m_dma(*this, "dma")
-		, m_uart0(*this, "uart0")
-		, m_uart1(*this, "uart1")
-		, m_uart2(*this, "uart2")
-		, m_pia0(*this, "pia0")
-		, m_pia1(*this, "pia1")
+		, m_uart(*this, "uart%u", 0U)
+		, m_pia(*this, "pia%u", 0U)
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
 		, m_beep(*this, "beeper")
-		, m_fdc (*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_ieee(*this, IEEE488_TAG)
+		, m_rom_view(*this, "rom_view")
 	{
 	}
 
 	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
 	void zorba(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void zorba_io(address_map &map) ATTR_COLD;
-	void zorba_mem(address_map &map) ATTR_COLD;
-
+private:
 	// Memory banking control
 	uint8_t ram_r();
 	void ram_w(uint8_t data);
@@ -152,47 +144,46 @@ private:
 	void printer_fault_w(int state);
 	void printer_select_w(int state);
 
-	required_ioport                     m_config_port;
+	void zorba_io(address_map &map) ATTR_COLD;
+	void zorba_mem(address_map &map) ATTR_COLD;
 
-	required_region_ptr<u8>             m_rom;
-	required_shared_ptr<u8>             m_ram;
-	required_memory_bank                m_bank1;
-	required_region_ptr<uint8_t>        m_p_chargen;
+	required_ioport                            m_config_port;
 
-	required_device<z80_device>         m_maincpu;
-	required_device<z80dma_device>      m_dma;
-	required_device<i8251_device>       m_uart0;
-	required_device<i8251_device>       m_uart1;
-	required_device<i8251_device>       m_uart2;
-	required_device<pia6821_device>     m_pia0;
-	required_device<pia6821_device>     m_pia1;
+	required_region_ptr<uint8_t>               m_p_chargen;
 
-	required_device<palette_device>     m_palette;
-	required_device<i8275_device>       m_crtc;
+	required_device<z80_device>                m_maincpu;
+	required_device<z80dma_device>             m_dma;
+	required_device_array<i8251_device, 3>     m_uart;
+	required_device_array<pia6821_device, 2>   m_pia;
 
-	required_device<beep_device>        m_beep;
+	required_device<palette_device>            m_palette;
+	required_device<i8275_device>              m_crtc;
 
-	required_device<fd1793_device>      m_fdc;
-	required_device<floppy_connector>   m_floppy0;
-	required_device<floppy_connector>   m_floppy1;
+	required_device<beep_device>               m_beep;
 
-	required_device<ieee488_device>     m_ieee;
+	required_device<fd1793_device>             m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+
+	required_device<ieee488_device>            m_ieee;
+
+	memory_view                                m_rom_view;
 
 	uint8_t m_intmask = 0U;
 	uint8_t m_tx_rx_rdy = 0U;
 	uint8_t m_irq = 0U;
 
 	bool    m_printer_prowriter = false;
-	int     m_printer_fault = 0;
-	int     m_printer_select = 0;
+	int32_t m_printer_fault = 0;
+	int32_t m_printer_select = 0;
 
 	uint8_t m_term_data = 0U;
 };
 
 void zorba_state::zorba_mem(address_map &map)
 {
-	map(0x0000, 0xffff).ram().share("mainram");
-	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x0000, 0xffff).ram();
+	map(0x0000, 0x3fff).view(m_rom_view);
+	m_rom_view[0](0x0000, 0x3fff).rom().region("maincpu", 0);
 }
 
 
@@ -203,14 +194,14 @@ void zorba_state::zorba_io(address_map &map)
 	map(0x04, 0x04).rw(FUNC(zorba_state::rom_r), FUNC(zorba_state::rom_w));
 	map(0x05, 0x05).rw(FUNC(zorba_state::ram_r), FUNC(zorba_state::ram_w));
 	map(0x10, 0x11).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
-	map(0x20, 0x21).rw(m_uart0, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x22, 0x23).rw(m_uart1, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x24, 0x25).rw(m_uart2, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x20, 0x21).rw(m_uart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x22, 0x23).rw(m_uart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x24, 0x25).rw(m_uart[2], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x26, 0x26).w(FUNC(zorba_state::intmask_w));
 	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x40, 0x43).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x50, 0x53).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x60, 0x63).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x50, 0x53).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x60, 0x63).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
 namespace {
@@ -284,41 +275,41 @@ void zorba_state::zorba(machine_config &config)
 	m_dma->in_iorq_callback().set(FUNC(zorba_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(zorba_state::io_write_byte));
 
-	I8251(config, m_uart0, 24_MHz_XTAL / 12); // U32 COM port J2
-	m_uart0->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd)); // TODO: this line has a LED attached
-	m_uart0->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
-	m_uart0->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	m_uart0->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<1>));
-	m_uart0->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<0>));
+	I8251(config, m_uart[0], 24_MHz_XTAL / 12); // U32 COM port J2
+	m_uart[0]->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd)); // TODO: this line has a LED attached
+	m_uart[0]->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart[0]->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_uart[0]->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<1>));
+	m_uart[0]->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<0>));
 
-	I8251(config, m_uart1, 24_MHz_XTAL / 12); // U31 printer port J3
-	m_uart1->txd_handler().set("serprn", FUNC(rs232_port_device::write_txd));
-	m_uart1->rts_handler().set("serprn", FUNC(rs232_port_device::write_rts));
-	m_uart1->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<3>));
-	m_uart1->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<2>));
+	I8251(config, m_uart[1], 24_MHz_XTAL / 12); // U31 printer port J3
+	m_uart[1]->txd_handler().set("serprn", FUNC(rs232_port_device::write_txd));
+	m_uart[1]->rts_handler().set("serprn", FUNC(rs232_port_device::write_rts));
+	m_uart[1]->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<3>));
+	m_uart[1]->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<2>));
 
-	I8251(config, m_uart2, 24_MHz_XTAL / 12); // U30 serial keyboard J6
-	m_uart2->txd_handler().set("keyboard", FUNC(zorba_keyboard_device::txd_w));
-	m_uart2->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<5>));
-	m_uart2->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<4>));
+	I8251(config, m_uart[2], 24_MHz_XTAL / 12); // U30 serial keyboard J6
+	m_uart[2]->txd_handler().set("keyboard", FUNC(zorba_keyboard_device::txd_w));
+	m_uart[2]->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<5>));
+	m_uart[2]->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<4>));
 
 	// port A - disk select etc, beeper
 	// port B - parallel interface
-	PIA6821(config, m_pia0);
-	m_pia0->writepa_handler().set(FUNC(zorba_state::pia0_porta_w));
-	m_pia0->writepb_handler().set("parprndata", FUNC(output_latch_device::write));
-	m_pia0->cb2_handler().set("parprn", FUNC(centronics_device::write_strobe));
+	PIA6821(config, m_pia[0]);
+	m_pia[0]->writepa_handler().set(FUNC(zorba_state::pia0_porta_w));
+	m_pia[0]->writepb_handler().set("parprndata", FUNC(output_latch_device::write));
+	m_pia[0]->cb2_handler().set("parprn", FUNC(centronics_device::write_strobe));
 
 	// IEEE488 interface
-	PIA6821(config, m_pia1);
-	m_pia1->readpa_handler().set(m_ieee, FUNC(ieee488_device::dio_r)); // TODO: gated with PB1
-	m_pia1->writepa_handler().set(m_ieee, FUNC(ieee488_device::host_dio_w)); // TODO: gated with PB1
-	m_pia1->readpb_handler().set(FUNC(zorba_state::pia1_portb_r));
-	m_pia1->writepb_handler().set(FUNC(zorba_state::pia1_portb_w));
-	m_pia1->ca2_handler().set(m_ieee, FUNC(ieee488_device::host_ifc_w));
-	m_pia1->cb2_handler().set(m_ieee, FUNC(ieee488_device::host_ren_w));
-	m_pia1->irqa_handler().set("irq1", FUNC(input_merger_device::in_w<0>));
-	m_pia1->irqb_handler().set("irq1", FUNC(input_merger_device::in_w<1>));
+	PIA6821(config, m_pia[1]);
+	m_pia[1]->readpa_handler().set(m_ieee, FUNC(ieee488_device::dio_r)); // TODO: gated with PB1
+	m_pia[1]->writepa_handler().set(m_ieee, FUNC(ieee488_device::host_dio_w)); // TODO: gated with PB1
+	m_pia[1]->readpb_handler().set(FUNC(zorba_state::pia1_portb_r));
+	m_pia[1]->writepb_handler().set(FUNC(zorba_state::pia1_portb_w));
+	m_pia[1]->ca2_handler().set(m_ieee, FUNC(ieee488_device::host_ifc_w));
+	m_pia[1]->cb2_handler().set(m_ieee, FUNC(ieee488_device::host_ren_w));
+	m_pia[1]->irqa_handler().set("irq1", FUNC(input_merger_device::in_w<0>));
+	m_pia[1]->irqb_handler().set("irq1", FUNC(input_merger_device::in_w<1>));
 
 	// PIT
 	pit8254_device &pit(PIT8254(config, "pit", 0));
@@ -326,10 +317,10 @@ void zorba_state::zorba(machine_config &config)
 	pit.set_clk<1>(24_MHz_XTAL / 3);
 	pit.set_clk<2>(24_MHz_XTAL / 3);
 	pit.out_handler<0>().set(FUNC(zorba_state::br1_w));
-	pit.out_handler<1>().set(m_uart1, FUNC(i8251_device::write_txc));
-	pit.out_handler<1>().append(m_uart1, FUNC(i8251_device::write_rxc));
-	pit.out_handler<2>().set(m_uart2, FUNC(i8251_device::write_txc));
-	pit.out_handler<2>().append(m_uart2, FUNC(i8251_device::write_rxc));
+	pit.out_handler<1>().set(m_uart[1], FUNC(i8251_device::write_txc));
+	pit.out_handler<1>().append(m_uart[1], FUNC(i8251_device::write_rxc));
+	pit.out_handler<2>().set(m_uart[2], FUNC(i8251_device::write_txc));
+	pit.out_handler<2>().append(m_uart[2], FUNC(i8251_device::write_rxc));
 
 	// CRTC
 	I8275(config, m_crtc, 14.318'181_MHz_XTAL / 8); // TODO: character clock divider is 9 during HRTC
@@ -344,24 +335,24 @@ void zorba_state::zorba(machine_config &config)
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<1>));
-	FLOPPY_CONNECTOR(config, m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], zorba_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], zorba_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// J1 IEEE-488
 	IEEE488(config, m_ieee);
-	m_ieee->srq_callback().set(m_pia1, FUNC(pia6821_device::ca2_w)); // TODO: gated with PB1 from PIA
+	m_ieee->srq_callback().set(m_pia[1], FUNC(pia6821_device::ca2_w)); // TODO: gated with PB1 from PIA
 
 	// J2 EIA RS232/internal modem
 	// TODO: this has additional lines compared to a regular RS232 port (TxC in, RxC in, RxC out, speaker in, power)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart0, FUNC(i8251_device::write_rxd)); // TODO: this line has a LED attached
-	rs232.cts_handler().set(m_uart0, FUNC(i8251_device::write_cts)); // TODO: this line has a LED attached
-	rs232.dsr_handler().set(m_uart0, FUNC(i8251_device::write_dsr));
+	rs232.rxd_handler().set(m_uart[0], FUNC(i8251_device::write_rxd)); // TODO: this line has a LED attached
+	rs232.cts_handler().set(m_uart[0], FUNC(i8251_device::write_cts)); // TODO: this line has a LED attached
+	rs232.dsr_handler().set(m_uart[0], FUNC(i8251_device::write_dsr));
 
 	// J3 Parallel printer
 	centronics_device &parprn(CENTRONICS(config, "parprn", centronics_devices, "printer"));
-	parprn.busy_handler().set(m_uart1, FUNC(i8251_device::write_cts));
-	parprn.busy_handler().append(m_uart1, FUNC(i8251_device::write_dsr)); // TODO: shared with serial CTS
+	parprn.busy_handler().set(m_uart[1], FUNC(i8251_device::write_cts));
+	parprn.busy_handler().append(m_uart[1], FUNC(i8251_device::write_dsr)); // TODO: shared with serial CTS
 	parprn.fault_handler().set(FUNC(zorba_state::printer_fault_w));
 	parprn.select_handler().set(FUNC(zorba_state::printer_select_w));
 
@@ -370,10 +361,10 @@ void zorba_state::zorba(machine_config &config)
 
 	// J3 Serial printer
 	rs232_port_device &serprn(RS232_PORT(config, "serprn", default_rs232_devices, nullptr));
-	serprn.rxd_handler().set(m_uart1, FUNC(i8251_device::write_rxd)); // TODO: this line has a LED attached
+	serprn.rxd_handler().set(m_uart[1], FUNC(i8251_device::write_rxd)); // TODO: this line has a LED attached
 
 	// J6 TTL-level serial keyboard
-	ZORBA_KEYBOARD(config, "keyboard").rxd_cb().set(m_uart2, FUNC(i8251_device::write_rxd));
+	ZORBA_KEYBOARD(config, "keyboard").rxd_cb().set(m_uart[2], FUNC(i8251_device::write_rxd));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("zorba");
 }
@@ -398,22 +389,20 @@ void zorba_state::machine_start()
 	m_printer_prowriter = false;
 	m_printer_fault = 0;
 	m_printer_select = 0;
-	m_bank1->configure_entry(0, m_ram);
-	m_bank1->configure_entry(1, m_rom);
 }
 
 void zorba_state::machine_reset()
 {
-	m_uart2->write_cts(0); // always asserted
+	m_uart[2]->write_cts(0); // always asserted
 
 	m_intmask = 0x00;
 	m_tx_rx_rdy = 0x00;
 	m_irq = 0x00;
 
 	m_printer_prowriter = BIT(m_config_port->read(), 0);
-	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
+	m_pia[0]->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 
-	m_bank1->set_entry(1);
+	m_rom_view.select(0);
 
 	m_maincpu->reset();
 }
@@ -426,25 +415,25 @@ void zorba_state::machine_reset()
 uint8_t zorba_state::ram_r()
 {
 	if (!machine().side_effects_disabled())
-		m_bank1->set_entry(0);
+		m_rom_view.disable();
 	return 0;
 }
 
 void zorba_state::ram_w(uint8_t data)
 {
-	m_bank1->set_entry(0);
+	m_rom_view.disable();
 }
 
 uint8_t zorba_state::rom_r()
 {
 	if (!machine().side_effects_disabled())
-		m_bank1->set_entry(1);
+		m_rom_view.select(0);
 	return 0;
 }
 
 void zorba_state::rom_w(uint8_t data)
 {
-	m_bank1->set_entry(1);
+	m_rom_view.select(0);
 }
 
 
@@ -529,8 +518,8 @@ void zorba_state::br1_w(int state)
 {
 	// TODO: these can be jumpered to inputs from J2 so a modem can generate Baud rates
 	// TODO: receive clock is exposed on J2 for external devices without Baud rate generators
-	m_uart0->write_txc(state);
-	m_uart0->write_rxc(state);
+	m_uart[0]->write_txc(state);
+	m_uart[0]->write_rxc(state);
 }
 
 
@@ -544,16 +533,16 @@ void zorba_state::pia0_porta_w(uint8_t data)
 	m_fdc->dden_w(BIT(data, 6));
 
 	floppy_image_device *floppy = nullptr;
-	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (!BIT(data, 0)) floppy = m_floppy[0]->get_device();
+	if (!BIT(data, 1)) floppy = m_floppy[1]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
 	if (floppy)
 		floppy->ss_w(!BIT(data, 5));
 
-	m_floppy0->get_device()->mon_w(BIT(data, 4));
-	m_floppy1->get_device()->mon_w(BIT(data, 4));
+	m_floppy[0]->get_device()->mon_w(BIT(data, 4));
+	m_floppy[1]->get_device()->mon_w(BIT(data, 4));
 }
 
 uint8_t zorba_state::pia1_portb_r()
@@ -567,7 +556,7 @@ uint8_t zorba_state::pia1_portb_r()
 	// 6  NDAC  gated with PB1 (active high)
 	// 7  NRFD  gated with PB1 (active high)
 
-	const uint8_t outputs(m_pia0->b_output());
+	const uint8_t outputs(m_pia[0]->b_output());
 	return
 			(m_ieee->eoi_r() << 3) |
 			(m_ieee->dav_r() << 5) |
@@ -617,7 +606,7 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 	if (BIT(attrcode, LTEN))
 		gfx = 0xff;
 
-	bool hlgt = BIT(attrcode, HLGT);
+	bool const hlgt = BIT(attrcode, HLGT);
 	for (int i = 0; i < 8; i++)
 		bitmap.pix(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];
 }
@@ -632,7 +621,7 @@ void zorba_state::printer_fault_w(int state)
 	// connects to CB1 for Centronics
 	m_printer_fault = state;
 	if (!m_printer_prowriter)
-		m_pia0->cb1_w(state);
+		m_pia[0]->cb1_w(state);
 }
 
 void zorba_state::printer_select_w(int state)
@@ -640,13 +629,13 @@ void zorba_state::printer_select_w(int state)
 	// connects to CB1 for Prowriter
 	m_printer_select = state;
 	if (m_printer_prowriter)
-		m_pia0->cb1_w(state);
+		m_pia[0]->cb1_w(state);
 }
 
 INPUT_CHANGED_MEMBER( zorba_state::printer_type )
 {
 	m_printer_prowriter = newval;
-	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
+	m_pia[0]->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 }
 
 

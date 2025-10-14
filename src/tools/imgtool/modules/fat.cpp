@@ -436,7 +436,7 @@ static imgtoolerr_t fat_partition_open(imgtool::partition &partition, uint64_t f
 	if (info->sectors_per_cluster == 0)
 		return IMGTOOLERR_CORRUPTIMAGE;
 
-	info->total_sectors = total_sectors_l + (uint64_t(total_sectors_h) << 16);
+	info->total_sectors = total_sectors_l != 0 ? total_sectors_l : total_sectors_h;
 	available_sectors = info->total_sectors - info->reserved_sectors
 		- (info->sectors_per_fat * info->fat_count)
 		- (info->root_entries * FAT_DIRENT_SIZE + FAT_SECLEN - 1) / FAT_SECLEN;

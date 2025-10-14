@@ -655,7 +655,8 @@ void tipi_card_device::device_stop()
 {
 	// MZ: Without this I'm getting segfaults/list corruption
 	// when leaving the emulation
-	m_wsclient->stop();
+	if (m_wsclient != nullptr)
+		m_wsclient->stop();
 	LOG("Stopping TIPI\n");
 }
 
@@ -695,11 +696,13 @@ void tipi_card_device::device_add_mconfig(machine_config &config)
 
 ROM_START( tipi )
 	ROM_REGION(0x8000, TI99_DSRROM, 0)
-	ROM_DEFAULT_BIOS("2023")
+	ROM_DEFAULT_BIOS("2025")
 	ROM_SYSTEM_BIOS(0, "2021", "TIPI DSR (2021)" )
 	ROMX_LOAD("tipidsr.u2", 0x0000, 0x8000, CRC(a54e65af) SHA1(f930e4b079a5b6b24dc20f262e9c599d2051b6be), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "2023", "TIPI DSR (2023)" )
 	ROMX_LOAD("tipidsr_2023.u2", 0x0000, 0x8000, CRC(666f0b63) SHA1(70950e647d5a5102695580064b0bf8d2703586d3), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "2025", "TIPI DSR (2025)" )
+	ROMX_LOAD("tipidsr_2025.u2", 0x0000, 0x8000, CRC(3b9cb922) SHA1(99986d6ef89ab3eeba08eb6593193e99292458fb), ROM_BIOS(2))
 ROM_END
 
 

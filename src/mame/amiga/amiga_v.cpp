@@ -81,9 +81,24 @@ void amiga_state::amiga_palette(palette_device &palette) const
  *
  *************************************/
 
+void amiga_state::video_start_common()
+{
+	/* reset the genlock color */
+	m_genlock_color = 0xffff;
+
+	m_sprite_ctl_written = 0;
+
+	m_screen->register_screen_bitmap(m_flickerfixer);
+	m_screen->register_screen_bitmap(m_scanline_bitmap);
+}
+
 VIDEO_START_MEMBER( amiga_state, amiga )
 {
+	video_start_common();
+
 	/* generate tables that produce the correct playfield color for dual playfield mode */
+	m_separate_bitplanes[0].resize(64);
+	m_separate_bitplanes[1].resize(64);
 	for (int j = 0; j < 64; j++)
 	{
 		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4);
@@ -92,16 +107,8 @@ VIDEO_START_MEMBER( amiga_state, amiga )
 		m_separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 8);
 		m_separate_bitplanes[1][j] = pf2pix ? (pf2pix + 8) : pf1pix;
 	}
-	// TODO: verify usage of values in the 64-255 range
+	// TODO: verify usage of values in the 64-255 range on real HW
 	// (should black out pf1 if j & 0x40, pf2 if j & 0x80)
-
-	/* reset the genlock color */
-	m_genlock_color = 0xffff;
-
-	m_sprite_ctl_written = 0;
-
-	m_screen->register_screen_bitmap(m_flickerfixer);
-	m_screen->register_screen_bitmap(m_scanline_bitmap);
 }
 
 
@@ -493,7 +500,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
 		// reset copper and ham color
-		m_copper->vblank_sync();
+		m_copper->vblank_sync(true);
 		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
@@ -525,6 +532,10 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	raw_scanline = scanline;
 
 	scanline /= 2;
+
+	// notify copper that we are not in vblank anymore
+	if (scanline == get_screen_vblank_line())
+		m_copper->vblank_sync(false);
 
 	m_last_scanline = scanline;
 
@@ -904,17 +915,24 @@ uint32_t amiga_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
+bool amiga_state::get_screen_standard()
+{
+	// we support dynamic switching between PAL and NTSC, determine mode from register
+	if (m_agnus_id >= AGNUS_HR_PAL)
+		return CUSTOM_REG(REG_BEAMCON0) & 0x20;
+
+	// old agnus, agnus id determines PAL or NTSC
+	return !(m_agnus_id & 0x10);
+}
+
+int amiga_state::get_screen_vblank_line()
+{
+	return get_screen_standard() ? amiga_state::VBLANK_PAL : amiga_state::VBLANK_NTSC;
+}
+
 void amiga_state::update_screenmode()
 {
-	bool pal;
-
-	// first let's see if we're PAL or NTSC
-	if (m_agnus_id >= AGNUS_HR_PAL)
-		// we support dynamic switching between PAL and NTSC, determine mode from register
-		pal = CUSTOM_REG(REG_BEAMCON0) & 0x20;
-	else
-		// old agnus, agnus id determines PAL or NTSC
-		pal = !(m_agnus_id & 0x10);
+	bool pal = get_screen_standard();
 
 	// basic height & vblank length
 	int height = pal ? SCREEN_HEIGHT_PAL : SCREEN_HEIGHT_NTSC;

@@ -10,13 +10,6 @@
 #include "tecmo.h"
 
 
-/*
-   video_type is used to distinguish Rygar, Silkworm and Gemini Wing.
-   This is needed because there is a difference in the tile and sprite indexing.
-*/
-
-
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -148,18 +141,18 @@ void tecmo_state::fgscroll_w(offs_t offset, uint8_t data)
 {
 	m_fgscroll[offset] = data;
 
+	m_screen->update_partial(m_screen->vpos());
 	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] + 256 * m_fgscroll[1]);
 	m_fg_tilemap->set_scrolly(0, m_fgscroll[2]);
-	m_screen->update_partial(m_screen->vpos());
 }
 
 void tecmo_state::bgscroll_w(offs_t offset, uint8_t data)
 {
 	m_bgscroll[offset] = data;
 
+	m_screen->update_partial(m_screen->vpos());
 	m_bg_tilemap->set_scrollx(0, m_bgscroll[0] + 256 * m_bgscroll[1]);
 	m_bg_tilemap->set_scrolly(0, m_bgscroll[2]);
-	m_screen->update_partial(m_screen->vpos());
 }
 
 void tecmo_state::flipscreen_w(uint8_t data)
@@ -174,7 +167,6 @@ void tecmo_state::flipscreen_w(uint8_t data)
   Display refresh
 
 ***************************************************************************/
-
 
 uint32_t tecmo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

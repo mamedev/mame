@@ -1059,12 +1059,11 @@ void gb_state::gameboy(machine_config &config)
 	DMG_PPU(config, m_ppu, m_maincpu);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMG_APU(config, m_apu, MASTER_CLOCK);
-	m_apu->add_route(0, "lspeaker", 0.50);
-	m_apu->add_route(1, "rspeaker", 0.50);
+	m_apu->add_route(0, "speaker", 0.50, 0);
+	m_apu->add_route(1, "speaker", 0.50, 1);
 
 	// cartslot
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
@@ -1098,12 +1097,11 @@ void sgb_state::supergb(machine_config &config)
 	SGB_PPU(config, m_ppu, m_maincpu);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMG_APU(config, m_apu, 4'295'454);
-	m_apu->add_route(0, "lspeaker", 0.50);
-	m_apu->add_route(1, "rspeaker", 0.50);
+	m_apu->add_route(0, "speaker", 0.50, 0);
+	m_apu->add_route(1, "speaker", 0.50, 1);
 
 	// cartslot
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
@@ -1161,12 +1159,11 @@ void gbc_state::gbcolor(machine_config &config)
 	CGB_PPU(config, m_ppu, m_maincpu);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	CGB04_APU(config, m_apu, GBC_CLOCK / 2);
-	m_apu->add_route(0, "lspeaker", 0.50);
-	m_apu->add_route(1, "rspeaker", 0.50);
+	m_apu->add_route(0, "speaker", 0.50, 0);
+	m_apu->add_route(1, "speaker", 0.50, 1);
 
 	// cartslot
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
@@ -1199,11 +1196,10 @@ void megaduck_state::megaduck(machine_config &config)
 	DMG_PPU(config, m_ppu, m_maincpu);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	DMG_APU(config, m_apu, XTAL(4'194'304));
-	m_apu->add_route(0, "lspeaker", 0.50);
-	m_apu->add_route(1, "rspeaker", 0.50);
+	m_apu->add_route(0, "speaker", 0.50, 0);
+	m_apu->add_route(1, "speaker", 0.50, 1);
 
 	// cartslot
 	MEGADUCK_CART_SLOT(config, m_cartslot, megaduck_cartridges, nullptr);

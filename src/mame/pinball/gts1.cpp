@@ -1078,7 +1078,7 @@ GAME(19??,  sys1test, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gott
 GAME(1977,  cleoptra, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1978,  sinbad,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1978,  sinbadn,  sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker (Gottlieb)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // NE555 beeper
 GAME(1978,  dragon,   gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

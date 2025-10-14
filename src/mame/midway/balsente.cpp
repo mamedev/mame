@@ -935,6 +935,18 @@ static INPUT_PORTS_START( minigolf2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( minigolfct )
+	PORT_INCLUDE( minigolf2 )
+
+	/* Player 2 Trackball */
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_PLAYER(2)
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( toggle )
 	PORT_INCLUDE( sentetst )
 
@@ -1326,7 +1338,7 @@ static INPUT_PORTS_START( shrike )
 	PORT_DIPSETTING(    0x03, "2:30" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "G1:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "G1:4" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x20, "G1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "G1:7" )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -2226,8 +2238,6 @@ ROM_END
 
 /*
 
-Currently undumped:
-
 Mini Golf Cocktail (10/18/85)
 
 Cartridge Type:
@@ -2242,6 +2252,29 @@ Label:
 NOTE: Cartridge contains an unlabeled PAL at U1C
 
 */
+
+ROM_START( minigolfct ) /* Cart: 006-8025-01-0B REV B */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs. All 27128s */
+	ROM_LOAD( "mini_golf_ct_ab01_10-18-85.u8a",  0x00000, 0x4000, CRC(348f827f) SHA1(a013ef3068e14e0738bcfa4de26c0c2df4c0a7f6) )
+	ROM_LOAD( "mini_golf_ur_ab23_10-8-85.u7a",   0x04000, 0x4000, CRC(19a6ff47) SHA1(70b6da3b4186e5b9463f2ea0fefefad21ec80637) ) // had CT hand-written on top
+	ROM_LOAD( "mini_golf_ur_ab45_10-8-85.u6a",   0x08000, 0x4000, CRC(925d76eb) SHA1(29d2d7b26d2e81817c4d135935dab70a5aa2d146) ) // had CT hand-written on top
+	ROM_LOAD( "mini_golf_ur_ab67_10-8-85.u5a",   0x0c000, 0x4000, CRC(6a311c9a) SHA1(b0409e5f4bd3bf898b8701561aac6dbbc28417bd) ) // had CT hand-written on top
+	/* U4A is unpopulated */
+	ROM_LOAD( "mini_golf_ct_cd23_10-18-85.u3a",  0x14000, 0x4000, CRC(7a285105) SHA1(5924c81fbf6474575f5ae36a88dc4fcf0ff703b3) )
+	/* U2A is unpopulated */
+	ROM_LOAD( "mini_golf_ct_cd6ef_10-18-85.u1a", 0x1c000, 0x4000, CRC(a6352f3d) SHA1(986c841ae1b2dd85f1ce1c296887d7e39772f111) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )        /* up to 64k of sprites */
+	ROM_LOAD( "mini_golf_ur_gr01_10-8-85.u6b", 0x00000, 0x4000, CRC(8e24d594) SHA1(d35329fb78f90ec478418917aa1ef06d0967e6f8) ) // had CT hand-written on top
+	ROM_LOAD( "mini_golf_ur_gr23_10-8-85.u5b", 0x04000, 0x4000, CRC(3bf355ef) SHA1(691df25b35b00e21ad09d17a21fe98a353aa3dda) ) // had CT hand-written on top
+	ROM_LOAD( "mini_golf_ur_gr45_10-8-85.u4b", 0x08000, 0x4000, CRC(8eb14921) SHA1(fda8b8f8e801360310f7cb1aa4c6aea1fa0a4b25) ) // had CT hand-written on top
+	/* U3B is unpopulated */
+
+	ROM_REGION( 0x00100, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal10l8.u1c", 0x0000, 0x002c, CRC(5cc09374) SHA1(07798579aeb1e2514034acea6555c0f81c48a41c) ) /* PAL10L8CN */
+
+	MOTHERBOARD_PALS
+ROM_END
 
 /*
 
@@ -2966,64 +2999,65 @@ void balsente_state::init_shrike()    { expand_roms(EXPAND_ALL);  config_shooter
  *************************************/
 
 /* Board: Unknown */
-GAME( 1984, sentetst,  0,        balsente, sentetst, balsente_state, init_sentetst, ROT0, "Bally/Sente",  "Sente Diagnostic Cartridge", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sentetst,   0,        balsente, sentetst,   balsente_state, init_sentetst,  ROT0, "Bally/Sente",  "Sente Diagnostic Cartridge", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8003-01-0D Rev D */
-GAME( 1984, cshift,    0,        balsente, cshift,   balsente_state, init_cshift,   ROT0, "Bally/Sente",  "Chicken Shift (11/23/84)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hattrick,  0,        balsente, hattrick, balsente_state, init_hattrick, ROT0, "Bally/Sente",  "Hat Trick (11/12/84)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gghost,    0,        balsente, gghost,   balsente_state, init_gghost,   ROT0, "Bally/Sente",  "Goalie Ghost", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, otwalls,   0,        balsente, otwalls,  balsente_state, init_otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente) (10/16/84)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, snakepit,  0,        balsente, sentetst, balsente_state, init_snakepit, ROT0, "Bally/Sente",  "Snake Pit", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, snakepita, snakepit, balsente, sentetst, balsente_state, init_snakepit, ROT0, "Sente Technologies Inc.", "Snake Pit (9/14/84)", MACHINE_SUPPORTS_SAVE ) // 1984, even though titlescreen says 1983
-GAME( 1984, triviag1,  0,        balsente, triviag1, balsente_state, init_triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (2/12/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviag1a, triviag1, balsente, triviag1, balsente_state, init_triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (12/14/84)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, cshift,     0,        balsente, cshift,     balsente_state, init_cshift,    ROT0, "Bally/Sente",  "Chicken Shift (11/23/84)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hattrick,   0,        balsente, hattrick,   balsente_state, init_hattrick,  ROT0, "Bally/Sente",  "Hat Trick (11/12/84)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gghost,     0,        balsente, gghost,     balsente_state, init_gghost,    ROT0, "Bally/Sente",  "Goalie Ghost", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, otwalls,    0,        balsente, otwalls,    balsente_state, init_otwalls,   ROT0, "Bally/Sente",  "Off the Wall (Sente) (10/16/84)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, snakepit,   0,        balsente, sentetst,   balsente_state, init_snakepit,  ROT0, "Bally/Sente",  "Snake Pit", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, snakepita,  snakepit, balsente, sentetst,   balsente_state, init_snakepit,  ROT0, "Sente Technologies Inc.", "Snake Pit (9/14/84)", MACHINE_SUPPORTS_SAVE ) // 1984, even though titlescreen says 1983
+GAME( 1984, triviag1,   0,        balsente, triviag1,   balsente_state, init_triviag1,  ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (2/12/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviag1a,  triviag1, balsente, triviag1,   balsente_state, init_triviag1,  ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (12/14/84)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown (From a picture on eBay Snacks'n Jaxson does not match any documented types here.) */
-GAME( 1984, snakjack,  0,        balsente, snakjack, balsente_state, init_snakjack,  ROT0, "Bally/Sente",  "Snacks'n Jaxson", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, snakjack,   0,        balsente, snakjack,   balsente_state, init_snakjack,  ROT0, "Bally/Sente",  "Snacks'n Jaxson", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8025-01-0B Rev B */
-GAMEL(1984, stocker,   0,        balsente, stocker,  balsente_state, init_stocker,   ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
-GAME( 1984, triviabb,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviag2,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition) (3/22/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition) (3/29/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gimeabrk,  0,        balsente, gimeabrk, balsente_state, init_gimeabrk,  ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, minigolf,  0,        balsente, minigolf, balsente_state, init_minigolf,  ROT0, "Bally/Sente",  "Mini Golf (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, minigolfa, minigolf, balsente, minigolf, balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, minigolfb, minigolf, balsente, minigolf2,balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, stompina,  stompin,  balsente, stompina, balsente_state, init_shrike,    ROT0, "Bally/Sente",  "Stompin' (prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teamht,    0,        teamht,   teamht,   balsente_state, init_hattrick,  ROT0, "Bally/Sente",  "Team Hat Trick (11/16/84)", MACHINE_SUPPORTS_SAVE ) // ROM chips dated 11/16/84
-GAME( 1987, grudge,    0,        grudge,   grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, prototype)", MACHINE_SUPPORTS_SAVE ) // only the PCB was found
-GAME( 1987, grudgei,   grudge,   grudge,   grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // PCB came from a dedicated cabinet complete with artwork
-GAME( 1987, grudgep,   grudge,   grudge,   grudgep,  balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
+GAMEL(1984, stocker,    0,        balsente, stocker,    balsente_state, init_stocker,   ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
+GAME( 1984, triviabb,   0,        balsente, triviag1,   balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviag2,   0,        balsente, triviag1,   balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition) (3/22/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviayp,   0,        balsente, triviag1,   balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition) (3/29/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviasp,   0,        balsente, triviag1,   balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gimeabrk,   0,        balsente, gimeabrk,   balsente_state, init_gimeabrk,  ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolf,   0,        balsente, minigolf,   balsente_state, init_minigolf,  ROT0, "Bally/Sente",  "Mini Golf (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolfa,  minigolf, balsente, minigolf,   balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolfb,  minigolf, balsente, minigolf2,  balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolfct, minigolf, balsente, minigolfct, balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (cocktail, 10/18/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, stompina,   stompin,  balsente, stompina,   balsente_state, init_shrike,    ROT0, "Bally/Sente",  "Stompin' (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teamht,     0,        teamht,   teamht,     balsente_state, init_hattrick,  ROT0, "Bally/Sente",  "Team Hat Trick (11/16/84)", MACHINE_SUPPORTS_SAVE ) // ROM chips dated 11/16/84
+GAME( 1987, grudge,     0,        grudge,   grudge,     balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, prototype)", MACHINE_SUPPORTS_SAVE ) // only the PCB was found
+GAME( 1987, grudgei,    grudge,   grudge,   grudge,     balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // PCB came from a dedicated cabinet complete with artwork
+GAME( 1987, grudgep,    grudge,   grudge,   grudgep,    balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown  */
-GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes,  ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen III, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // Genus Edition?
-GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle,    ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, triviaes,   0,        balsente, triviaes,   balsente_state, init_triviaes,  ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen III, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // Genus Edition?
+GAME( 1985, toggle,     0,        balsente, toggle,     balsente_state, init_toggle,    ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 007-8001-01-0C Rev C1 */
-GAME( 1987, triviaes2, triviaes, balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen II, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // "Jovenes Carrozas" Edition?
+GAME( 1987, triviaes2,  triviaes, balsente, triviaes,   balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen II, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // "Jovenes Carrozas" Edition?
 
 /* Board: 006-8027-01-0B Rev B */
-GAME( 1986, nstocker,  0,        st1002,   nstocker, balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nstockera, nstocker, st1002,   nstocker, balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sfootbal,  0,        st1002,   sfootbal, balsente_state, init_sfootbal,  ROT0, "Bally/Sente",  "Street Football (11/12/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker,    0,        spiker,   spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spikera,   spiker,   spiker,   spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spikerb,   spiker,   spiker,   spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (earliest?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stompin,   0,        st1002,   stompin,  balsente_state, init_stompin,   ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nstocker,   0,        st1002,   nstocker,   balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nstockera,  nstocker, st1002,   nstocker,   balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sfootbal,   0,        st1002,   sfootbal,   balsente_state, init_sfootbal,  ROT0, "Bally/Sente",  "Street Football (11/12/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker,     0,        spiker,   spiker,     balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spikera,    spiker,   spiker,   spiker,     balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spikerb,    spiker,   spiker,   spiker,     balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (earliest?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stompin,    0,        st1002,   stompin,    balsente_state, init_stompin,   ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8030-01-0A Rev A */
-GAME( 1986, nametune,  0,        st1002,   nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (Bally, 3/31/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nametunea, nametune, st1002,   nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (Bally, 3/23/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametune,   0,        st1002,   nametune,   balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (Bally, 3/31/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametunea,  nametune, st1002,   nametune,   balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (Bally, 3/23/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: A084-91889-A000 (Not a cartridge, but dedicated board) */
-GAME( 1987, rescraid,  0,        rescraid, rescraid, balsente_state, init_rescraid,  ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rescraid,   0,        rescraid, rescraid,   balsente_state, init_rescraid,  ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown */
-GAME( 1986, shrike,    0,        shrike,   shrike,   balsente_state, init_shrike,    ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rescraida, rescraid, rescraid, rescraid, balsente_state, init_rescraid,  ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shrike,     0,        shrike,   shrike,     balsente_state, init_shrike,    ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rescraida,  rescraid, rescraid, rescraid,   balsente_state, init_rescraid,  ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
 
 /* Trivial Pursuit running on Maibesa hardware (with Bally/Sente license) */
-GAME( 1988, triviaes4, 0,        triviamb, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)", "Trivial Pursuit (Volumen IV, Spanish, Maibesa hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games
-GAME( 19??, triviaes5, 0,        triviamb, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)", "Trivial Pursuit (Volumen V, Spanish, Maibesa hardware)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games
+GAME( 1988, triviaes4,  0,        triviamb, triviaes,   balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)", "Trivial Pursuit (Volumen IV, Spanish, Maibesa hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games
+GAME( 19??, triviaes5,  0,        triviamb, triviaes,   balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)", "Trivial Pursuit (Volumen V, Spanish, Maibesa hardware)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games

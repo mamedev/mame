@@ -7,7 +7,8 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/tlcs900/tmp95c061.h" // TODO: tmp94c241.h
+#include "bus/technics/kn5000/hdae5000.h"
+#include "cpu/tlcs900/tmp94c241.h"
 #include "imagedev/floppy.h"
 #include "machine/gen_latch.h"
 #include "machine/upd765.h"
@@ -95,6 +96,8 @@ public:
 		, m_maincpu_latch(*this, "maincpu_latch")
 		, m_subcpu_latch(*this, "subcpu_latch")
 		, m_fdc(*this, "fdc")
+		, m_com_select(*this, "COM_SELECT")
+		, m_extension(*this, "extension")
 		, m_CPL_SEG(*this, "CPL_SEG%u", 0U)
 		, m_CPR_SEG(*this, "CPR_SEG%u", 0U)
 		, m_checking_device_led_cn11(*this, "checking_device_led_cn11")
@@ -109,11 +112,14 @@ public:
 	void kn5000(machine_config &config);
 
 private:
-	required_device<tmp95c061_device> m_maincpu;
-	required_device<tmp95c061_device> m_subcpu;
+	required_device<tmp94c241_device> m_maincpu;
+	required_device<tmp94c241_device> m_subcpu;
 	required_device<generic_latch_8_device> m_maincpu_latch;
 	required_device<generic_latch_8_device> m_subcpu_latch;
 	required_device<upd72067_device> m_fdc;
+	required_ioport m_com_select;
+	required_device<kn5000_extension_connector> m_extension;
+
 	required_ioport_array<11> m_CPL_SEG; // buttons on "Control Panel Left" PCB
 	required_ioport_array<11> m_CPR_SEG; // buttons on "Control Panel Right" PCB
 	output_finder<> m_checking_device_led_cn11;
@@ -148,7 +154,6 @@ void kn5000_state::maincpu_mem(address_map &map)
 	map(0x1703b0, 0x1703df).m("vga", FUNC(mn89304_vga_device::io_map)); // LCD controller @ IC206
 	map(0x1a0000, 0x1bffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
 	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
-	map(0x200000, 0x2fffff).noprw(); // Extension board goes here.
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
 	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
 	//map(0x800000, 0x82ffff).rom().region("subprogram", 0); // not sure yet in which chip this is stored, but I suspect it should be IC19
@@ -161,17 +166,14 @@ void kn5000_state::subcpu_mem(address_map &map)
 	// There seems to also be devices at 110000, 130000 and 1e0000
 
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC28, IC29
+	//map(0x110000, 0x11????).rw(FUNC(kn5000_state::tone_generator_r), FUNC(kn5000_state::tone_generator_w)); // @ IC303
 	map(0x120000, 0x12ffff).r(m_subcpu_latch, FUNC(generic_latch_8_device::read)); // @ IC22
 	map(0x120000, 0x12ffff).w(m_maincpu_latch, FUNC(generic_latch_8_device::write)); // @ IC23
-	//map(0x??????, 0x??????).rw(FUNC(kn5000_state::tone_generator_r), FUNC(kn5000_state::tone_generator_w)); // @ IC303
-	//map(0x??????, 0x??????).rw(FUNC(kn5000_state::dsp1_r), FUNC(kn5000_state::dsp1_w)); // @ IC311
-
-	// This is not necessarily correct.
-	// Just silencing oslog messages for the subcpu while we don't have a proper ROM dump.
-	map(0xfe0000, 0xffffff).rom().region("mask", 0); // 1Mbit MASK ROM @ IC30
+	//map(0x130000, 0x13????).rw(FUNC(kn5000_state::dsp1_r), FUNC(kn5000_state::dsp1_w)); // @ IC311
+	map(0xfe0000, 0xffffff).rom().region("subcpu", 0); // 1Mbit MASK ROM @ IC30
 
 	//Note:
-	// DSP2 @ IC302 uses a serial bus
+	// DSP2 @ IC302 uses a serial #0 pins but I think it is bitbanging those pins.
 }
 
 static void kn5000_floppies(device_slot_interface &device)
@@ -196,6 +198,37 @@ static INPUT_PORTS_START(kn5000)
 	PORT_DIPSETTING(   0xd0, "PC1")
 	PORT_DIPSETTING(   0xb0, "PC2")
 	PORT_DIPSETTING(   0x70, "Mac")
+
+	PORT_START("AREA")
+	PORT_DIPNAME(0x06, 0x06, "Area Selection")
+	PORT_DIPSETTING(   0x02, "Thailand, Indonesia, Iran, U.A.E., Panama, Argentina, Peru, Brazil")
+	PORT_DIPSETTING(   0x04, "USA, Mexico")
+	PORT_DIPSETTING(   0x06, "Other")
+
+/*
+    Actual full list of regions (but it is unclear if there's any
+    other hardware difference among them):
+
+    PORT_DIPSETTING(   0x04, "(M): U.S.A.")
+    PORT_DIPSETTING(   0x06, "(MC): Canada")
+    PORT_DIPSETTING(   0x04, "(XM): Mexico")
+    PORT_DIPSETTING(   0x06, "(EN): Norway, Sweden, Denmark, Finland")
+    PORT_DIPSETTING(   0x06, "(EH): Holland, Belgium")
+    PORT_DIPSETTING(   0x06, "(EF): France, Italy")
+    PORT_DIPSETTING(   0x06, "(EZ): Germany")
+    PORT_DIPSETTING(   0x06, "(EW): Switzerland")
+    PORT_DIPSETTING(   0x06, "(EA): Austria")
+    PORT_DIPSETTING(   0x06, "(EP): Spain, Portugal, Greece, South Africa")
+    PORT_DIPSETTING(   0x06, "(EK): United Kingdom")
+    PORT_DIPSETTING(   0x06, "(XL): New Zealand")
+    PORT_DIPSETTING(   0x06, "(XR): Australia")
+    PORT_DIPSETTING(   0x06, "(XS): Malaysia")
+    PORT_DIPSETTING(   0x06, "(MD): Saudi Arabia, Hong Kong, Kuwait")
+    PORT_DIPSETTING(   0x06, "(XT): Taiwan")
+    PORT_DIPSETTING(   0x02, "(X): Thailand, Indonesia, Iran, U.A.E., Panama, Argentina, Peru, Brazil")
+    PORT_DIPSETTING(   0x06, "(XP): Philippines")
+    PORT_DIPSETTING(   0x06, "(XW): Singapore")
+*/
 
 	PORT_START("CPR_SEG0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -589,6 +622,8 @@ void kn5000_state::machine_start()
 	save_item(NAME(m_mstat));
 	save_item(NAME(m_sstat));
 
+	m_extension->program_map(m_maincpu->space(AS_PROGRAM));
+
 	m_checking_device_led_cn11.resolve();
 	m_checking_device_led_cn12.resolve();
 	m_CPL_LED.resolve();
@@ -604,7 +639,7 @@ void kn5000_state::machine_reset()
 void kn5000_state::kn5000(machine_config &config)
 {
 	// Note: The CPU has an internal clock doubler
-	TMP95C061(config, m_maincpu, 2 * 8_MHz_XTAL); // actual cpu is TMP94C241F @ IC5
+	TMP94C241(config, m_maincpu, 2 * 8_MHz_XTAL); // TMP94C241F @ IC5
 	// Address bus is set to 32 bits by the pins AM1=+5v and AM0=GND
 	m_maincpu->set_addrmap(AS_PROGRAM, &kn5000_state::maincpu_mem);
 	// Interrupt 4: FDCINT
@@ -619,7 +654,7 @@ void kn5000_state::kn5000(machine_config &config)
 
 	// MAINCPU PORT 7:
 	//   bit 5 (~BUSRQ pin): RY/~BY pin of maincpu ROMs
-	m_maincpu->port7_read().set([] { return (1 << 5); }); // checked at EF3735 (v10 ROM)
+	m_maincpu->port7_read().set_constant(1 << 5); // checked at EF3735 (v10 ROM)
 
 
 	// MAINCPU PORT 8:
@@ -630,20 +665,22 @@ void kn5000_state::kn5000(machine_config &config)
 	// MAINCPU PORT A:
 	//   bit 0 (output) = sub_cpu ~RESET / SRST
 	m_maincpu->porta_write().set([this] (u8 data) {
-		m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 	});
 
 	// MAINCPU PORT C:
 	//   bit 0 (input) = "check terminal" switch
 	//   bit 1 (output) = "check terminal" LED
-	// TODO: m_maincpu->portc_read().set([this] { return ioport("CN11")->read(); });
-	// TODO: m_maincpu->portc_write().set([this] (u8 data) { m_checking_device_led_cn11 = (BIT(data, 1) == 0); });
+	m_maincpu->portc_read().set_ioport("CN11");
+	m_maincpu->portc_write().set([this] (u8 data) {
+		m_checking_device_led_cn11 = (BIT(data, 1) == 0);
+	});
 
 
 	// MAINCPU PORT D:
 	//   bit 0 (output) = FDCRST
 	//   bit 6 (input) = FD.I/O
-	// TODO: m_maincpu->portd_write().set([this] (u8 data) { m_fdc->reset_w(BIT(data, 0)); });
+	m_maincpu->portd_write().set(m_fdc, FUNC(upd72067_device::reset_w)).bit(0);
 	// TODO: bit 6!
 
 
@@ -651,7 +688,7 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 0 (input) = +5v
 	//   bit 2 (input) = HDDRDY
 	//   bit 4 (?) = MICSNS
-	// TODO: m_maincpu->porte_read().set([] { return 1; }); //checked at EF05A6 (v10 ROM)
+	m_maincpu->porte_read().set_constant(1); //checked at EF05A6 (v10 ROM)
 	// FIXME: Bit 0 should only be 1 if the
 	// optional hard-drive extension board is disabled;
 
@@ -670,10 +707,7 @@ void kn5000_state::kn5000(machine_config &config)
 
 
 	// MAINCPU PORT H:
-	//   bit 1 = TC1 Terminal count - microDMA
-	// TODO: m_maincpu->porth_read().set([] { return 2; }); // area/region detection: checked at EF083E (v10 ROM)
-	// FIXME: These are resistors on the pcb, but could be declared
-	// in the driver as a 2 bit DIP-Switch for area/region selection.
+	m_maincpu->porth_read().set_ioport("AREA"); // checked at EF083E (v10 ROM)
 
 
 	// MAINCPU PORT Z:
@@ -685,12 +719,12 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 5 = (input) COM.PC1
 	//   bit 6 = (input) COM.MAC
 	//   bit 7 = (input) COM.MIDI
-	// TODO: m_maincpu->portz_read().set([this] {
-	// TODO:    return ioport("COM_SELECT")->read() | (m_sstat << 2);
-	// TODO: });
-	// TODO: m_maincpu->portz_write().set([this] (u8 data) {
-	// TODO:    m_mstat = data & 3;
-	// TODO: });
+	m_maincpu->portz_read().set([this] {
+		return m_com_select->read() | (m_sstat << 2);
+	});
+	m_maincpu->portz_write().set([this] (u8 data) {
+		m_mstat = data & 3;
+	});
 
 
 	// RX0/TX0 = MRXD/MTXD
@@ -701,15 +735,18 @@ void kn5000_state::kn5000(machine_config &config)
 	// AN1 = AFT
 
 	// Note: The CPU has an internal clock doubler
-	TMP95C061(config, m_subcpu, 2*10_MHz_XTAL); // actual cpu is TMP94C241F @ IC27
+	TMP94C241(config, m_subcpu, 2*10_MHz_XTAL); // TMP94C241F @ IC27
 	// Address bus is set to 8 bits by the pins AM1=GND and AM0=GND
 	m_subcpu->set_addrmap(AS_PROGRAM, &kn5000_state::subcpu_mem);
 
 	// SUBCPU PORT C:
 	//   bit 0 (input) = "check terminal" switch
 	//   bit 1 (output) = "check terminal" LED
-	// TODO: m_subcpu->portc_read().set([this] { return ioport("CN12")->read(); });
-	// TODO: m_subcpu->portc_write().set([this] (u8 data) { m_checking_device_led_cn12 = (BIT(data, 1) == 0); });
+	m_subcpu->portc_read().set_ioport("CN12");
+	m_subcpu->portc_write().set([this] (u8 data) {
+		m_checking_device_led_cn12 = (BIT(data, 1) == 0);
+	});
+
 
 	// SUBCPU PORT D:
 	//   bit 0 = (output) SSTAT0
@@ -717,12 +754,12 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 2 = (input) MSTAT0
 	//   bit 3 (not used)
 	//   bit 4 = (input) MSTAT1
-	// TODO: m_subcpu->portd_read().set([this] {
-	// TODO:    return (BIT(m_mstat, 0) << 2) | (BIT(m_mstat, 1) << 4);
-	// TODO: });
-	// TODO: m_subcpu->portd_write().set([this] (u8 data) {
-	// TODO:    m_sstat = data & 3;
-	// TODO: });
+	m_subcpu->portd_read().set([this] {
+		return (BIT(m_mstat, 0) << 2) | (BIT(m_mstat, 1) << 4);
+	});
+	m_subcpu->portd_write().set([this] (u8 data) {
+		m_sstat = data & 3;
+	});
 
 
 	GENERIC_LATCH_8(config, m_maincpu_latch); // @ IC23
@@ -743,6 +780,10 @@ void kn5000_state::kn5000(machine_config &config)
 	// Interrupt 7: FDC.I/O
 
 	FLOPPY_CONNECTOR(config, "fdc:0", kn5000_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	/* Extension port */
+	KN5000_EXTENSION(config, m_extension, kn5000_extension_intf, nullptr);
+	m_extension->irq_callback().set_inputline(m_maincpu, TLCS900_INT9);
 
 	/* video hardware */
 	// LCD Controller MN89304 @ IC206 24_MHz_XTAL
@@ -803,15 +844,8 @@ ROM_START(kn5000)
 	ROMX_LOAD("kn5000_subprogram_v140.rom", 0x000000, 0x030000, CRC(d9a537aa) SHA1(b7f471522ab3125e5eb42c7368d57a56084ce32a), ROM_BIOS(5)) // v5
 	ROMX_LOAD("kn5000_subprogram_v139.rom", 0x000000, 0x030000, NO_DUMP, ROM_BIOS(6)) // v4
 
-	ROM_REGION16_LE(0x20000, "mask", 0) // subcpu boot rom
-	ROM_LOAD("kn5000_mask_rom.ic30", 0x00000, 0x20000, NO_DUMP)
-	// hack to keep the CPU from touching SFRs arbitrarily while we do not have a proper ROM dump:
-	ROM_FILL(0x000000, 1, 0x68) // 68 fe = infinite loop
-	ROM_FILL(0x000001, 1, 0xfe)
-	ROM_FILL(0x01ff00, 1, 0x00) // RESET vector = 0x00fe0000
-	ROM_FILL(0x01ff01, 1, 0x00)
-	ROM_FILL(0x01ff02, 1, 0xfe)
-	ROM_FILL(0x01ff03, 1, 0x00)
+	ROM_REGION16_LE(0x20000, "subcpu", 0)
+	ROM_LOAD("kn5000_subcpu_boot.ic30", 0x00000, 0x20000, BAD_DUMP CRC(a45ceb77) SHA1(d29429a9a1ef7a718fa88c1aa38d0f7238ba5d94)) // Ranges fe0800-ff7800 and ff9800-fff000 not dumped yet. Assumed here as being filled with 0xFF.
 
 	ROM_REGION16_LE(0x200000, "table_data", 0)
 	ROM_LOAD32_WORD("kn5000_table_data_rom_even.ic3", 0x000000, 0x100000, CRC(b6f0becd) SHA1(1fd2604236b8d12ea7281fad64d72746eb00c525))

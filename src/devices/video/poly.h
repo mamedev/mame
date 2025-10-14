@@ -279,6 +279,7 @@ public:
 		{
 			BaseType start;                     // parameter value at start
 			BaseType dpdx;                      // dp/dx relative to start
+			BaseType dpdy;                      // dp/dy relative to start
 		};
 		int16_t startx, stopx;                  // starting (inclusive)/ending (exclusive) endpoints
 		std::array<param_t, MaxParams> param;   // array of parameter start/delays
@@ -786,6 +787,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(recta
 				{
 					extent.param[paramnum].start = v1->p[paramnum] + fullstartx * param_dpdx[paramnum] + fully * param_dpdy[paramnum];
 					extent.param[paramnum].dpdx = param_dpdx[paramnum];
+					extent.param[paramnum].dpdy = param_dpdy[paramnum];
 				}
 			}
 		}
@@ -950,6 +952,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 			{
 				extent.param[paramnum].start = param_start[paramnum] + fullstartx * param_dpdx[paramnum] + fully * param_dpdy[paramnum];
 				extent.param[paramnum].dpdx = param_dpdx[paramnum];
+				extent.param[paramnum].dpdy = param_dpdy[paramnum];
 			}
 		}
 	}
@@ -1066,6 +1069,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_extents(re
 			{
 				extent.param[paramnum].start = srcextent.param[paramnum].start;
 				extent.param[paramnum].dpdx = srcextent.param[paramnum].dpdx;
+				extent.param[paramnum].dpdy = srcextent.param[paramnum].dpdy;
 			}
 			extent.userdata = srcextent.userdata;
 
@@ -1248,6 +1252,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 
 					extent.param[paramnum].start = lparam;// - (BaseType(istartx) + 0.5f) * dpdx;
 					extent.param[paramnum].dpdx = dpdx;
+					extent.param[paramnum].dpdy = ledge->dpdy[paramnum];
 				}
 			}
 

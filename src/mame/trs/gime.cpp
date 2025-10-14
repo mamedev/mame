@@ -9,19 +9,18 @@
 
     Mid frame raster effects (source John Kowalski)
 
-        Here are the things that get changed mid-frame:
+    Here are the things that get changed mid-frame:
+    - Palette registers ($FFB0-$FFBF)
+    - Horizontal resolution (switches between 256 and 320 pixels, $FF99)
+    - Horizontal scroll position (bits 0-6 $FF9F)
+    - Horizontal virtual screen (bit 7 $FF9F)
+    - Pixel height (bits 0-2 $FF98)
+    - Border color ($FF9A)
 
-            - Palette registers ($FFB0-$FFBF)
-            - Horizontal resolution (switches between 256 and 320 pixels, $FF99)
-            - Horizontal scroll position (bits 0-6 $FF9F)
-            - Horizontal virtual screen (bit 7 $FF9F)
-            - Pixel height (bits 0-2 $FF98)
-            - Border color ($FF9A)
-
-        On the positive side, you don't have to worry about registers
-        $FF9D/$FF9E being changed mid-frame.  Even if they are changed
-        mid-frame, they have no effect on the displayed image.  The video
-        address only gets latched at the top of the frame.
+    On the positive side, you don't have to worry about registers
+    $FF9D/$FF9E being changed mid-frame.  Even if they are changed
+    mid-frame, they have no effect on the displayed image.  The video
+    address only gets latched at the top of the frame.
 
 
     TIMING
@@ -86,9 +85,9 @@
 
 #include "emu.h"
 #include "gime.h"
+
 #include "bus/coco/cococart.h"
 #include "machine/ram.h"
-
 
 
 
@@ -128,7 +127,6 @@
 #define LOGTBITS(...) LOGMASKED(LOG_TBITS, __VA_ARGS__)
 #define LOGMBITS(...) LOGMASKED(LOG_MBITS, __VA_ARGS__)
 #define LOGRBITS(...) LOGMASKED(LOG_RBITS, __VA_ARGS__)
-
 
 
 
@@ -291,9 +289,9 @@ inline gime_device::pixel_t gime_device::get_composite_color(int color)
 
 inline gime_device::pixel_t gime_device::get_rgb_color(int color)
 {
-	return  (((color >> 4) & 2) | ((color >> 2) & 1)) * 0x550000
-		|   (((color >> 3) & 2) | ((color >> 1) & 1)) * 0x005500
-		|   (((color >> 2) & 2) | ((color >> 0) & 1)) * 0x000055;
+	return  (((color >> 4) & 2) | ((color >> 2) & 1)) * 0x550000 |
+			(((color >> 3) & 2) | ((color >> 1) & 1)) * 0x005500 |
+			(((color >> 2) & 2) | ((color >> 0) & 1)) * 0x000055;
 }
 
 
@@ -657,15 +655,15 @@ uint8_t gime_device::read(offs_t offset)
 	switch(offset & 0xF0)
 	{
 		case 0x00:
-			data = read_gime_register(offset);          // $FF90 - $FF9F
+			data = read_gime_register(offset);    // $FF90 - $FF9F
 			break;
 
 		case 0x10:
-			data = read_mmu_register(offset);           // $FFA0 - $FFAF
+			data = read_mmu_register(offset);     // $FFA0 - $FFAF
 			break;
 
 		case 0x20:
-			data = read_palette_register(offset);       // $FFB0 - $FFBF
+			data = read_palette_register(offset); // $FFB0 - $FFBF
 			break;
 
 		default:
@@ -740,8 +738,7 @@ inline uint8_t gime_device::read_palette_register(offs_t offset)
 	//  POKE&HFFB1,0:PRINTPEEK(&HFFB1)      returns 64
 	//
 	// This is because of the floating bus
-	return m_palette_rotated[m_palette_rotated_position][offset & 0x0F]
-		| (read_floating_bus() & 0xC0);
+	return m_palette_rotated[m_palette_rotated_position][offset & 0x0F] | (read_floating_bus() & 0xC0);
 }
 
 
@@ -1220,8 +1217,8 @@ inline offs_t gime_device::get_video_base()
 		ff9e_mask = 0xFF;
 	}
 
-	result += ((offs_t) (m_gime_registers[0x0E] & ff9e_mask)    * 0x00008)
-			| ((offs_t) (m_gime_registers[0x0D] & ff9d_mask)    * 0x00800);
+	result += ((offs_t) (m_gime_registers[0x0E] & ff9e_mask) * 0x00008) |
+			((offs_t) (m_gime_registers[0x0D] & ff9d_mask) * 0x00800);
 	return result;
 }
 
@@ -1317,7 +1314,7 @@ void gime_device::record_border_scanline(uint16_t physical_scanline)
 {
 	m_line_in_row = 0;
 	update_border(physical_scanline);
-	update_value(&m_scanlines[physical_scanline].m_line_in_row, (uint8_t) ~0);
+	update_value(&m_scanlines[physical_scanline].m_line_in_row, uint8_t(~0));
 }
 
 
@@ -1860,7 +1857,7 @@ bool gime_device::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		pixel_t *RESTRICT pixels = bitmap_addr(bitmap, y, 0);
 
 		/* render the scanline */
-		if (m_scanlines[y].m_line_in_row == (uint8_t) ~0)
+		if (m_scanlines[y].m_line_in_row == uint8_t(~0))
 		{
 			/* this is a border scanline */
 			render_scanline<0, &gime_device::emit_dummy_samples>(scanline, pixels, min_x, max_x, &resolver);

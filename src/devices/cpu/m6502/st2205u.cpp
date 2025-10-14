@@ -101,25 +101,19 @@ st2302u_device::st2302u_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void st2205u_base_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void st2205u_base_device::sound_stream_update(sound_stream &stream)
 {
-	// reset the output stream
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-	outputs[2].fill(0);
-	outputs[3].fill(0);
-
-	int samples = outputs[0].samples();
+	int samples = stream.samples();
 	int outpos = 0;
 	while (samples-- != 0)
 	{
 		for (int channel = 0; channel < 4; channel++)
 		{
 			s16 adpcm_contribution = m_adpcm_level[channel];
-			outputs[channel].add_int(outpos, adpcm_contribution * 0x10, 32768);
+			stream.add_int(channel, outpos, adpcm_contribution * 0x10, 32768);
 
 			auto psg_contribution = std::sin((double)m_psg_freqcntr[channel]/4096.0f);
-			outputs[channel].add_int(outpos, psg_contribution * m_psg_amplitude[channel]*0x80,32768);
+			stream.add_int(channel, outpos, psg_contribution * m_psg_amplitude[channel]*0x80,32768);
 		}
 
 		outpos++;
@@ -1135,6 +1129,18 @@ void st2302u_device::unk18_w(u8 data)
 	logerror("%s: Writing %02X to unknown register $18\n", machine().describe_context(), data);
 }
 
+u8 st2302u_device::unk3a_r()
+{
+	// toumapet expects bit 0 to become 1 at some point after writing #$0B to this address
+	return 0x01;
+}
+
+void st2302u_device::unk3a_w(u8 data)
+{
+	// $3A is PMCR on ST2205U, but maybe not here (or with different bits)
+	logerror("%s: Writing %02X to unknown register $3A\n", machine().describe_context(), data);
+}
+
 void st2302u_device::unk6d_w(u8 data)
 {
 	// $6D is PCMH on ST2205U, but probably not here
@@ -1342,6 +1348,7 @@ void st2302u_device::int_map(address_map &map)
 	map(0x0016, 0x0016).rw(FUNC(st2302u_device::mull_r), FUNC(st2302u_device::mull_w));
 	map(0x0017, 0x0017).rw(FUNC(st2302u_device::mulh_r), FUNC(st2302u_device::mulh_w));
 	map(0x0018, 0x0018).w(FUNC(st2302u_device::unk18_w));
+	map(0x003a, 0x003a).rw(FUNC(st2302u_device::unk3a_r), FUNC(st2302u_device::unk3a_w));
 	map(0x0040, 0x0047).rw(FUNC(st2302u_device::psg_r), FUNC(st2302u_device::psg_w));
 	map(0x0048, 0x004b).rw(FUNC(st2302u_device::vol_r), FUNC(st2302u_device::vol_w));
 	map(0x004c, 0x004d).rw(FUNC(st2302u_device::volm_r), FUNC(st2302u_device::volm_w));

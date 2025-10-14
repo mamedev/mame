@@ -18,99 +18,140 @@ class IndStr:
 
     def line(self):
         return self.str
-    
+
     def get_indent(self):
         return self.indent
-    
+
     def is_comment(self):
         return self.str.startswith("#") and not self.str.startswith("#if") and not self.str.startswith("#endif")
-    
+
     def is_blank(self):
         return not self.str
-    
+
     def has_indent(self):
-        return self.indent != ''
+        return self.indent != '' or self.str[0] == "{" or self.str[0] == "}"
+
+    def strip_indent(self, n):
+        if self.indent != '':
+            self.indent = self.indent[n:]
 
     def replace(self, new):
         self.str = new
-    
+
     def replace(self, old, new):
         return IndStr(self.str.replace(old, new), self.indent)
-    
+
     def with_str(self, new_str):
         return IndStr(new_str, self.indent)
-    
+
     def split(self):
         return self.str.split()
-    
+
     def print(self, str, f):
         print("\t\t%s%s" % (self.indent, str), file=f)
 
 
 
 class Opcode:
-    def __init__(self, code):
+    def __init__(self, prefix, code):
+        self.prefix = prefix
         self.code = code
         self.source = []
 
     def add_source_lines(self, lines):
         self.source.extend(lines)
 
-    def save_dasm(self, f):
-        code = self.code
-        has_steps = len(self.source) > 1
+    def with_steps(self):
+        for i in range(0, len(self.source)):
+            tokens = self.source[i].line().split()
+            if (tokens[0] == '+') or (len(tokens) > 2 and tokens[1] == "!!"):
+                return True
+        return False
+
+    def save_dasm(self, step_switch: bool, f):
+        has_steps = self.with_steps()
         if has_steps:
-            print("\t\tswitch (u8(m_ref))", file=f)
-            print("\t\t{", file=f)
-            print("\t\tcase 0x00:", file=f)
+            if step_switch:
+                print("\t\tswitch (u8(m_ref))", file=f)
+                print("\t\t{", file=f)
+                print("\t\tcase 0x00:", file=f)
+            else:
+                print("\t\t//case 0x00:", file=f)
         step = 0
         for i in range(0, len(self.source)):
             il = self.source[i]
+            if not has_steps or not step_switch:
+                il.strip_indent(1)
             line = il.line()
             tokens = line.split()
+            last_line = i + 1 == len(self.source)
+
             if tokens[0] == '+':
                 il.print("m_icount -= %s;" % (" ".join(tokens[1:])), f)
                 step += 1
-                to_step = "0x%s" % (hex(256 + step)[3:])
                 il.print("if (m_icount <= 0) {", f)
-                il.print("	m_ref = (m_ref & 0xffff00) | %s;" % (to_step), f)
-                il.print("	return;", f)
-                il.print("}", f)
-                il.print("[[fallthrough]];", f)
-                print("\t\tcase %s:" % (to_step), file=f)
+                if not last_line:
+                    to_step = hex(256 + step)[3:]
+                    il.print("	m_ref = 0x%s%s%s;" % (self.prefix, self.code, to_step), f)
+                    il.print("	return;", f)
+                    il.print("}", f)
+                    if step_switch:
+                        il.print("[[fallthrough]];", f)
+                        print("\t\tcase 0x%s:" % (to_step), file=f)
+                    else:
+                        print("\t\t//case 0x%s:" % (to_step), file=f)
+                else:
+                    il.print("	m_ref = 0xffff00;", f)
+                    il.print("	return;", f)
+                    il.print("}", f)
             elif (len(tokens) > 2 and tokens[1] == "!!"):
-                il.print("[[fallthrough]];", f)
                 step += 1;
-                print("\t\tcase 0x%s:" % (hex(256 + step)[3:]), file=f)
+                if step_switch:
+                    il.print("[[fallthrough]];", f)
+                    print("\t\tcase 0x%s:" % (hex(256 + step)[3:]), file=f)
+                else:
+                    print("\t\t//case 0x%s:" % (hex(256 + step)[3:]), file=f)
                 il.print("%s" % " ".join(tokens[2:]), f)
                 il.print("m_icount -= %s;" % (tokens[0]), f)
                 il.print("if (m_icount <= 0) {", f)
                 il.print("	if (access_to_be_redone()) {", f)
                 il.print("		m_icount += %s;" % (tokens[0]), f)
-                il.print("		m_ref = (m_ref & 0xffff00) | 0x%s;" % (hex(256 + step)[3:]), f)
-                il.print("	} else", f)
-                step += 1
-                to_step = "0x%s" % (hex(256 + step)[3:])
-                il.print("		m_ref = (m_ref & 0xffff00) | %s;" % (to_step), f)
-                il.print("	return;", f)
-                il.print("}", f)
-                il.print("[[fallthrough]];", f)
-                print("\t\tcase %s:" % (to_step), file=f)
+                il.print("		m_ref = 0x%s%s%s;" % (self.prefix, self.code, hex(256 + step)[3:]), f)
+                il.print("	} else {", f)
+                if not last_line:
+                    step += 1
+                    to_step = hex(256 + step)[3:]
+                    il.print("		m_ref = 0x%s%s%s;" % (self.prefix, self.code, to_step), f)
+                    il.print("	}", f)
+                    il.print("	return;", f)
+                    il.print("}", f)
+                    if step_switch:
+                        il.print("[[fallthrough]];", f)
+                        print("\t\tcase 0x%s:" % (to_step), file=f)
+                    else:
+                        print("\t\t//case 0x%s:" % (to_step), file=f)
+                else:
+                    il.print("		m_ref = 0xffff00;", f)
+                    il.print("	}", f)
+                    il.print("	return;", f)
+                    il.print("}", f)
             else:
                 il.print("%s" % line, f)
-        if has_steps:
-            print("\t\t\tbreak;\n", file=f)
+        if has_steps and step_switch:
             print("\t\t}", file=f)
 
 class Macro:
-    def __init__(self, name, arg_name = None):
+    def __init__(self, name, arg_names = None):
         self.name = name
         self.source = []
-        self.arg_name = arg_name
+        self.arg_names = arg_names
 
-    def apply(self, arg):
-        if self.arg_name is not None:
-            return [ r.replace(self.arg_name, arg) for r in self.source ]
+    def apply(self, args):
+        if self.arg_names is not None:
+            src = self.source
+            for i, arg in enumerate(args.split(",")):
+                src = [ r.replace(self.arg_names[i], arg) for r in src ]
+            return src
         else:
             return self.source
 
@@ -120,7 +161,7 @@ class Macro:
 class OpcodeList:
     def __init__(self, gen, fname):
         self.gen = gen
-        self.opcode_info = []
+        self.opcode_info = {} # prefix -> [Opcode]
         self.macros = {}
 
         try:
@@ -146,16 +187,16 @@ class OpcodeList:
                 # New opcode
                 tokens = line.split()
                 if tokens[0] == "macro":
-                    arg_name = None
+                    arg_names = None
                     if len(tokens) > 2:
-                        arg_name = tokens[2]
+                        arg_names = tokens[2:]
                     nnames = tokens[1].split(":")
                     if len(nnames) == 2:
-                        inf = Macro(nnames[1], arg_name)
+                        inf = Macro(nnames[1], arg_names)
                         if nnames[0] == self.gen:
                             self.macros[nnames[1]] = inf
                     else:
-                        inf = Macro(nnames[0], arg_name)
+                        inf = Macro(nnames[0], arg_names)
                         if None == self.gen:
                             if nnames[0] in self.macros:
                                 sys.stderr.write("Replacing macro: %s\n" % nnames[0])
@@ -165,33 +206,32 @@ class OpcodeList:
                                 self.macros[nnames[0]] = inf
                 else:
                     ntokens = tokens[0].split(":")
-                    if len(ntokens) == 2:
-                        inf = Opcode(ntokens[1])
-                        if ntokens[0] == self.gen:
-                            # Replace in list when already present, otherwise append
-                            found = False
-                            found_index = 0
-                            for i in range(len(self.opcode_info)):
-                                if self.opcode_info[i].code == inf.code:
-                                    found = True
-                                    found_index = i
-                            if found:
-                                self.opcode_info[found_index] = inf
-                            else:
-                                self.opcode_info.append(inf)
-                    else:
-                        inf = Opcode(ntokens[0])
-                        if None == self.gen:
-                            self.opcode_info.append(inf)
-                        else:
-                            # Only place in list when not already present
-                            found = False
-                            for i in range(len(self.opcode_info)):
-                                if self.opcode_info[i].code == inf.code:
-                                    found = True
-                            if not found:
-                                self.opcode_info.append(inf)
+                    gen = None if len(ntokens) == 1 else ntokens[0]
+                    prefix = ntokens[0][:2] if len(ntokens) == 1 else ntokens[1][:2]
+                    opcode = ntokens[0][2:] if len(ntokens) == 1 else ntokens[1][2:]
+                    if self.opcode_info.get(prefix) is None:
+                        self.opcode_info[prefix] = []
+                    opcodes = self.opcode_info[prefix]
 
+                    if None == gen:
+                        inf = Opcode(prefix, opcode)
+                        opcodes.append(inf)
+                    elif gen == self.gen:
+                        # Replace for ext generator
+                        found = False
+                        found_index = 0
+                        for i in range(len(opcodes)):
+                            if opcodes[i].code == opcode:
+                                found = True
+                                found_index = i
+                        if found:
+                            inf = Opcode(prefix, opcode)
+                            opcodes[found_index] = inf
+                        else:
+                            sys.stderr.write("[%s] Cannot find opcode: %s%s\n" % (gen, prefix, opcode))
+                            sys.exit(1)
+                    else:
+                        inf = Opcode(prefix, '/dev/null')
 
     def pre_process(self, iline):
         out = []
@@ -203,14 +243,14 @@ class OpcodeList:
             line_toc = line_toc[2:]
             line = " ".join(line_toc)
         for i in range(times):
-            if line_toc[0] == 'call':
-                name = line_toc[1]
-                arg = None
-                if len(line_toc) > 2:
-                    arg = line_toc[2]
+            if line_toc[0].startswith('@'):
+                name = line_toc[0][1:]
+                args = None
+                if len(line_toc) > 1:
+                    args = " ".join(line_toc[1:])
                 if name in self.macros:
                     macro = self.macros[name]
-                    ([out.extend(self.pre_process(il)) for il in macro.apply(arg)])
+                    ([out.extend(self.pre_process(il)) for il in macro.apply(args)])
                 else:
                     sys.stderr.write("Macro not found %s\n" % name)
                     out.append(iline.with_str("... %s" % name))
@@ -218,37 +258,73 @@ class OpcodeList:
                 out.append(iline.with_str(line))
         return out
 
-    def save_exec(self, f):
-        prefix = None
-        print("switch (u8(m_ref >> 16)) // prefix", file=f)
-        print("{", file=f)
-        for opc in self.opcode_info:
-            if (opc.code[:2]) != prefix:
-                if prefix is not None:
-                    print("\n\t}", file=f)
-                    print("\t\tbreak;", file=f)
-                    print("", file=f)
-                    print("}", file=f)
-                    print("break; // prefix: 0x%s" % (prefix), file=f)
-                    print("", file=f)
-                prefix = opc.code[:2]
-                print("case 0x%s:" % (opc.code[:2]), file=f)
+    def switch_prefix(self, prefixes, reenter: bool, f):
+        prefix_switch = len(prefixes) > 1
+
+        if prefix_switch:
+            print("switch (u8(m_ref >> 16)) // prefix", file=f)
+            print("{", file=f)
+
+        for prefix in sorted(prefixes):
+            is_rop = prefix == 'ff'
+            opc_switch = not is_rop
+            if prefix_switch:
+                print("case 0x%s:" % (prefix), file=f)
                 print("{", file=f)
+            if opc_switch:
                 print("\tswitch (u8(m_ref >> 8)) // opcode", file=f)
                 print("\t{", file=f)
-            print("\tcase 0x%s:" % (opc.code[2:]), file=f)
-            #print("\t{", file=f)
-            opc.save_dasm(f)
-            #print("\t}", file=f)
-            print("\t\tbreak;", file=f)
-            print("", file=f)
-        print("\t} // switch opcode", file=f)
+            for opc in self.opcode_info[prefix]:
+                # reenter loop only process steps > 0
+                if not reenter or opc.with_steps():
+                    if opc_switch:
+                        print("\tcase 0x%s:" % (opc.code), file=f)
+                    opc.save_dasm(step_switch=reenter, f=f)
+                    print("\t\tcontinue;", file=f)
+                    print("", file=f)
+            if opc_switch:
+                print("\t}", file=f)
+
+            if prefix_switch:
+                print("} break; // prefix: %s" % (prefix), file=f)
+                print("", file=f)
+        if prefix_switch:
+            print("} // switch prefix", file=f)
+
+    def save_exec(self, f):
+        print("if (m_wait_state)", file=f)
+        print("{", file=f)
+        print("\tm_icount = 0; // stalled", file=f)
+        print("\treturn;", file=f)
         print("}", file=f)
-        print("break; // prefix: 0x%s" % (prefix), file=f)
         print("", file=f)
-        print("} // switch prefix", file=f)
+        print("const bool nomemrq_en = !m_nomreq_cb.isunset();", file=f)
+        print("[[maybe_unused]] const bool refresh_en = !m_refresh_cb.isunset();", file=f)
         print("", file=f)
-        print("m_ref = 0xffff00;", file=f)
+        print("bool interrupted = true;", file=f)
+        print("while (u8(m_ref) != 0x00) {", file=f)
+        print("// slow re-enter", file=f)
+        print("\t// workaround to simulate main loop behavior where continue statement relays on having it set after", file=f)
+        print("\tif (!interrupted) {", file=f)
+        print("\t\tm_ref = 0xffff00;", file=f)
+        print("\t\tcontinue;", file=f)
+        print("\t}", file=f)
+        print("\tinterrupted = false;", file=f)
+        print("", file=f)
+        self.switch_prefix(self.opcode_info.keys(), reenter=True, f=f)
+        print("", file=f)
+        print('assert((void("switch statement above must cover all possible cases!"), false));', file=f)
+        print("} // end: slow", file=f)
+        print("if (m_ref != 0xffff00) goto process;", file=f)
+        print("", file=f)
+        print("while (true) { // fast process", file=f)
+        print("\t\t// rop: unwrapped ff prefix", file=f)
+        self.switch_prefix(['ff'], reenter=False, f=f)
+        print("", file=f)
+        print("process:", file=f)
+        self.switch_prefix(self.opcode_info.keys() - ['ff'], reenter=False, f=f)
+        print("} // end: fast", file=f)
+        print('assert((void("unreachable!"), false));', file=f)
 
 def main(argv):
     if len(argv) != 3 and len(argv) != 4:

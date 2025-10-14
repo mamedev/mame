@@ -108,8 +108,9 @@ cd32: unsupported [Akiko] close tray after CD32 BIOS plays back music, will othe
 		<!-- Packaging Design: Epic Marketing -->
 		<publisher>APC &amp; TCP</publisher>
 		<notes><![CDATA[
-Intro and main menu use [Denise] BPLCON3 SPRESx
-Optional [Denise] SHRES mode in gameplay
+Intro and main menu use [Lisa] BPLCON3 SPRESx
+Optional [Lisa] SHRES mode in gameplay
+Very easy to ball stuck in table 2 (verify, https://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=124163#Post124163)
 Editor and HD Install untested
 ]]></notes>
 		<!-- TODO: verify assign BrainDamage: "Brain Damage:" before install as Erratum note -->
@@ -118,6 +119,24 @@ Editor and HD Install untested
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pinball_brain_damage_(europe)" sha1="883518fb03b69ec1460b22cbb57a52845b9324cd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wendetta" supported="no">
+		<!-- "A1200/A4000 CD32" on cover art -->
+		<!-- http://redump.org/disc/106519/ -->
+		<description>Wendetta 2175 (Europe)</description>
+		<year>1996</year>
+		<publisher>Skills</publisher>
+		<notes><![CDATA[
+[Lisa] Uses SPRESx for intro credits text
+[Lisa] heavy graphic corruptions in ship select and gameplay
+]]></notes>
+		<info name="developer" value="Vortex Design" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="wendetta_2175_(europe)" sha1="c7a4e4c9cc2acbe6b561bf2230c22529d6592e8c"/>
 			</diskarea>
 		</part>
 	</software>

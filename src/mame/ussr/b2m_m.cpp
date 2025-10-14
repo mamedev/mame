@@ -122,7 +122,7 @@ uint8_t b2m_state::ppi1_portb_r()
 void b2m_state::fdc_drq(int state)
 {
 	/* Clears HALT state of CPU when data is ready to read */
-	if (state)
+	if (state && m_drq_interlock)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
@@ -147,10 +147,14 @@ void b2m_state::ppi2_portc_w(uint8_t data)
 	    When bit 5 is set CPU is in HALT state and stay there until
 	    DRQ is triggered from floppy side
 	*/
+	m_drq_interlock = BIT(data, 5);
+}
 
-	if ((data & 0xf0)==0x20) {
+uint8_t b2m_state::fdc_status_hack_r()
+{
+	if (!machine().side_effects_disabled() && m_drq_interlock && !m_fdc->drq_r())
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	}
+	return m_fdc->status_r();
 }
 
 uint8_t b2m_state::romdisk_porta_r()
@@ -232,6 +236,8 @@ void b2m_state::machine_reset()
 {
 	m_vblank_state = 0;
 	set_bank(7);
+
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 uint32_t b2m_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

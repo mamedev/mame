@@ -115,6 +115,8 @@ public:
 
 	uint8_t read_pa() const;
 	uint8_t read_pb() const;
+	void shift_out();
+	void shift_in();
 
 protected:
 	// construction/destruction
@@ -130,14 +132,18 @@ protected:
 	TIMER_CALLBACK_MEMBER(t2_tick);
 	TIMER_CALLBACK_MEMBER(ca2_tick);
 
+	void set_int(int data);
+	void clear_int(int data);
+
+	int m_in_cb1;
+	int m_in_cb2;
+
+	uint8_t m_acr;
+
 private:
 	uint16_t get_counter1_value();
 	void counter2_decrement();
 
-	void set_int(int data);
-	void clear_int(int data);
-	void shift_out();
-	void shift_in();
 	void set_pa_line(int line, int state);
 	void set_pb_line(int line, int state);
 
@@ -169,8 +175,6 @@ private:
 	uint8_t m_latch_a;
 
 	uint8_t m_in_b;
-	int m_in_cb1;
-	int m_in_cb2;
 	uint8_t m_out_b;
 	int m_out_cb1;
 	int m_out_cb2;
@@ -188,7 +192,6 @@ private:
 
 	uint8_t m_sr;
 	uint8_t m_pcr;
-	uint8_t m_acr;
 	uint8_t m_ier;
 	uint8_t m_ifr;
 

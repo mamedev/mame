@@ -66,7 +66,7 @@ DEFINE_DEVICE_TYPE(NMC9306, nmc9306_device, "nmc9306", "NMC9306 EEPROM")
 //  nmc9306_device - constructor
 //-------------------------------------------------
 
-inline uint16_t nmc9306_device::read(offs_t offset)
+inline u16 nmc9306_device::read(offs_t offset)
 {
 	return m_register[offset];
 }
@@ -110,6 +110,7 @@ inline void nmc9306_device::erase(offs_t offset)
 nmc9306_device::nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NMC9306, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
+	m_region(*this, DEVICE_SELF),
 	m_bits(0),
 	m_state(STATE_IDLE),
 	m_command(0),
@@ -130,8 +131,6 @@ nmc9306_device::nmc9306_device(const machine_config &mconfig, const char *tag, d
 
 void nmc9306_device::device_start()
 {
-	memset(m_register, 0, sizeof(m_register));
-
 	// state saving
 	save_item(NAME(m_bits));
 	save_item(NAME(m_state));
@@ -153,8 +152,18 @@ void nmc9306_device::device_start()
 
 void nmc9306_device::nvram_default()
 {
-	for (auto & elem : m_register)
-		elem = 0xffff;
+	if (m_region.found())
+	{
+		if (m_region->bytes() != sizeof(m_register))
+			fatalerror("%s incorrect region size", tag());
+
+		std::memcpy(m_register, m_region->base(), sizeof(m_register));
+	}
+	else
+	{
+		for (auto & elem : m_register)
+			elem = 0xffff;
+	}
 }
 
 

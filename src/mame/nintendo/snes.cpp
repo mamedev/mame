@@ -1200,7 +1200,10 @@ void snes_console_state::machine_start()
 			case SNES_CX4:      // this still uses the old simulation instead of emulating the CPU
 			case SNES_ST010:    // this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
 			case SNES_ST011:    // this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
-			case SNES_ST018:    // still unemulated
+				break;
+			case SNES_ST018:
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x003800, 0x0038ff, 0, 0xbf0000, 0, read8sm_delegate(*m_cartslot, FUNC(base_sns_cart_slot_device::chip_read)));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x003800, 0x0038ff, 0, 0xbf0000, 0, write8sm_delegate(*m_cartslot, FUNC(base_sns_cart_slot_device::chip_write)));
 				break;
 			case SNES_Z80GB:      // skeleton support
 				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8m_delegate(*this, FUNC(snes_console_state::snessgb_lo_r)), write8m_delegate(*this, FUNC(snes_console_state::snessgb_lo_w)));
@@ -1362,13 +1365,12 @@ void snes_console_state::snes(machine_config &config)
 	m_ctrl2->set_gunlatch_callback(FUNC(snes_console_state::gun_latch_cb));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	S_DSP(config, m_s_dsp, XTAL(24'576'000) / 12);
+	S_DSP(config, m_s_dsp, XTAL(24'576'000));
 	m_s_dsp->set_addrmap(0, &snes_console_state::spc_map);
-	m_s_dsp->add_route(0, "lspeaker", 1.00);
-	m_s_dsp->add_route(1, "rspeaker", 1.00);
+	m_s_dsp->add_route(0, "speaker", 1.00, 0);
+	m_s_dsp->add_route(1, "speaker", 1.00, 1);
 
 	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
 	m_cartslot->set_must_be_loaded(true);

@@ -25,7 +25,6 @@ permissions:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         compiler: [gcc, clang]
@@ -41,6 +40,7 @@ jobs:
             cxx: clang++
             subtarget: mame
             executable: mame
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
       with:

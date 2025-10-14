@@ -138,7 +138,7 @@ void f1dream_state::f1dream_map(address_map &map)
 	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(FUNC(f1dream_state::to_mcu_w));
 }
 
-void f1dream_state::f1dream_mcu_io(address_map &map)
+void f1dream_state::f1dream_mcu_data(address_map &map)
 {
 	map(0x7f0, 0x7ff).rw(FUNC(f1dream_state::mcu_shared_r), FUNC(f1dream_state::mcu_shared_w));
 }
@@ -637,7 +637,7 @@ void tigeroad_state::tigeroad(machine_config &config)
 
 	// Timings may be different, driver originally had 60.08Hz vblank.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(24'000'000)/4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -676,7 +676,7 @@ void f1dream_state::f1dream(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &f1dream_state::f1dream_map);
 
 	I8751(config, m_mcu, XTAL(10'000'000)); // 8MHz rated chip, 24.0000MHz/3???
-	m_mcu->set_addrmap(AS_IO, &f1dream_state::f1dream_mcu_io);
+	m_mcu->set_addrmap(AS_DATA, &f1dream_state::f1dream_mcu_data);
 	m_mcu->port_out_cb<1>().set("soundlatch", FUNC(generic_latch_8_device::write));
 	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::out3_w));
 }
@@ -716,7 +716,7 @@ void tigeroad_state::f1dream_comad(machine_config &config) // COMAD-01 PCB with 
 	BUFFERED_SPRITERAM16(config, "spriteram");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(24'000'000)/4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);

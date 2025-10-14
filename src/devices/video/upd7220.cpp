@@ -1426,14 +1426,12 @@ void upd7220_device::process_fifo()
 			LOGCMD3("WDAT PATTERN=%04x\n", m_pattern);
 			if (m_figs.m_figure_type)
 				break;
-			LOGCMD3("- CR=%02x (%02x %02x) (%c) EAD=%06x - FIGS DC=%04x\n"
-				, m_cr
-				, m_pr[2]
-				, m_pr[1]
-				, m_pr[1] ? m_pr[1]:' '
-				, m_ead
-				, m_figs.m_dc
-			);
+			LOGCMD3("- CR=%02x (%02x %02x) (%c) EAD=%06x - FIGS DC=%04x\n",
+					m_cr,
+					m_pr[2], m_pr[1],
+					m_pr[1] ? m_pr[1] : ' ',
+					m_ead,
+					m_figs.m_dc);
 			fifo_set_direction(FIFO_WRITE);
 
 			wdat((m_cr & 0x18) >> 3,m_cr & 3);

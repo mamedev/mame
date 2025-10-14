@@ -55,6 +55,8 @@ private:
 
 	void nand_create_stripped_region();
 
+	void dma_complete_hacks(int state);
+
 	std::vector<uint8_t> m_strippedrom{};
 	int m_strippedsize = 0;
 	int m_size = 0;

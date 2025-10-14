@@ -16,6 +16,8 @@ TODO:
 - Layout including lamps
 - Hopper only works in "COIN HOPPER" mode
 - Do button 5 or remaining DIPs actually do anything outside service mode?
+- Make device of RISE11 sprite hardware also used in seibu/seibuspi.cpp
+  and seibu/seibucats.cpp
 
 ============================================================================
 
@@ -72,13 +74,16 @@ U089 MAX232 Dual EIA Driver/Receiver
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh/sh7604.h"
+
 #include "seibuspi_m.h"
-#include "sound/okim6295.h"
+
+#include "cpu/sh/sh7604.h"
 #include "machine/eepromser.h"
-#include "machine/rtc4543.h"
 #include "machine/nvram.h"
+#include "machine/rtc4543.h"
 #include "machine/ticket.h"
+#include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -106,18 +111,22 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void init_feversoc();
-	void feversoc(machine_config &config);
+	void init_feversoc() ATTR_COLD;
+
+	void feversoc(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint16_t in_r(offs_t offset);
 	void output_w(uint16_t data);
 	void output2_w(uint16_t data);
-	void feversoc_map(address_map &map) ATTR_COLD;
-	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void feversoc_irq(int state);
-	void feversoc_irq_ack(uint16_t data);
-	virtual void machine_start() override ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
+	void irq_ack_w(uint16_t data);
+
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_mainram1;
 	required_shared_ptr<uint32_t> m_mainram2;
@@ -136,38 +145,45 @@ private:
 };
 
 
-#define MASTER_CLOCK XTAL(28'636'363)
-
-
-uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t feversoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *spriteram32 = m_spriteram;
-	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
-
 	bitmap.fill(m_palette->pen(0), cliprect); //black pen
 
-	for(offs=(0x2000/4)-2;offs>-1;offs-=2)
+	for (int offs = (0x2000 / 4) - 2; offs >= 0; offs -= 2)
 	{
-		spr_offs = (spriteram32[offs+0] & 0x3fff);
-		if(spr_offs == 0)
+		u32 spr_offs = (m_spriteram[offs + 0] & 0x3fff);
+		if (spr_offs == 0)
 			continue;
-		sy = (spriteram32[offs+1] & 0x01ff);
-		sx = (spriteram32[offs+1] & 0x01ff0000)>>16;
-		colour = (spriteram32[offs+0] & 0x003f0000)>>16;
-		w = ((spriteram32[offs+0] & 0x07000000)>>24)+1;
-		h = ((spriteram32[offs+0] & 0x70000000)>>28)+1;
+		int sy = m_spriteram[offs + 1] & 0x01ff;
+		int sx = (m_spriteram[offs + 1] & 0x01ff0000) >> 16;
+		const u32 colour = (m_spriteram[offs + 0] & 0x003f0000) >> 16;
+		const u8 w = ((m_spriteram[offs + 0] & 0x07000000) >> 24) + 1;
+		const u8 h = ((m_spriteram[offs + 0] & 0x70000000) >> 28) + 1;
+		// TODO: flip sprites, unused?
+		// flip horizontal in bit 27
+		// flip vertical in bit 31
 
-		if( sy & 0x100)
-			sy-=0x200;
+		if (sx >= 0x180)
+			sx -= 0x200;
 
-		for(dx=0;dx<w;dx++)
-			for(dy=0;dy<h;dy++)
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
+		if (sy >= 0x180)
+			sy -= 0x200;
+
+		for (int dx = 0; dx < w; dx++)
+		{
+			for (int dy = 0; dy < h; dy++)
+			{
+				m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
+						spr_offs++, colour,
+						0, 0,
+						(sx + dx * 16), (sy + dy * 16),
+						0x3f);
+			}
+		}
 	}
 
 	return 0;
 }
-
 
 
 uint16_t feversoc_state::in_r(offs_t offset)
@@ -177,22 +193,22 @@ uint16_t feversoc_state::in_r(offs_t offset)
 
 void feversoc_state::output_w(uint16_t data)
 {
-	machine().bookkeeping().coin_lockout_w(0, ~data & 0x40);
-	machine().bookkeeping().coin_lockout_w(1, ~data & 0x40);
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	// data & 2 coin out counter
-	machine().bookkeeping().coin_counter_w(1, data & 4);
-	m_hopper->motor_w((data & 0x08) >> 3); // coin hopper or prize hopper
-	m_oki->set_rom_bank((data & 0x20) >> 5);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 6));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 6));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	// BIT(data, 1) coin out counter
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
+	m_hopper->motor_w(BIT(data, 3)); // coin hopper or prize hopper
+	m_oki->set_rom_bank(BIT(data, 5));
 
-	m_eeprom->di_write((data & 0x8000) ? 1 : 0);
-	m_eeprom->clk_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->cs_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 15));
+	m_eeprom->clk_write(BIT(data, 14) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write(BIT(data, 13) ? ASSERT_LINE : CLEAR_LINE);
 
-	m_rtc->data_w((data & 0x0800) ? 1 : 0);
-	m_rtc->wr_w((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
-	m_rtc->clk_w((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
-	m_rtc->ce_w((data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->data_w(BIT(data, 11));
+	m_rtc->wr_w(BIT(data, 10) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->clk_w(BIT(data, 9) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->ce_w(BIT(data, 8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void feversoc_state::output2_w(uint16_t data)
@@ -200,21 +216,21 @@ void feversoc_state::output2_w(uint16_t data)
 	for (int n = 0; n < 7; n++)
 		m_lamps[n] = BIT(data, n); // LAMP1-LAMP7
 
-	machine().bookkeeping().coin_counter_w(2, data & 0x2000); // key in
-	//data & 0x4000 key out
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 13)); // key in
+	//BIT(data, 14) key out
 }
 
 
-void feversoc_state::feversoc_map(address_map &map)
+void feversoc_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x0003ffff).rom();
-	map(0x02000000, 0x0202ffff).ram().share("workram1"); //work ram
-	map(0x02030000, 0x02033fff).ram().share("nvram");
-	map(0x02034000, 0x0203dfff).ram().share("workram2"); //work ram
-	map(0x0203e000, 0x0203ffff).ram().share("spriteram");
+	map(0x02000000, 0x0202ffff).ram().share(m_mainram1); //work ram
+	map(0x02030000, 0x02033fff).ram().share(m_nvram);
+	map(0x02034000, 0x0203dfff).ram().share(m_mainram2); //work ram
+	map(0x0203e000, 0x0203ffff).ram().share(m_spriteram);
 	map(0x06000000, 0x06000001).w(FUNC(feversoc_state::output_w));
 	map(0x06000002, 0x06000003).w(FUNC(feversoc_state::output2_w));
-	map(0x06000006, 0x06000007).w(FUNC(feversoc_state::feversoc_irq_ack));
+	map(0x06000006, 0x06000007).w(FUNC(feversoc_state::irq_ack_w));
 	map(0x06000008, 0x0600000b).r(FUNC(feversoc_state::in_r));
 	map(0x0600000d, 0x0600000d).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//map(0x06010000, 0x0601007f).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
@@ -222,24 +238,20 @@ void feversoc_state::feversoc_map(address_map &map)
 	map(0x06018000, 0x06019fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 }
 
-static const gfx_layout spi_spritelayout =
+static const gfx_layout spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,3),
 	6,
 	{ RGN_FRAC(0,3)+0,RGN_FRAC(0,3)+8,RGN_FRAC(1,3)+0,RGN_FRAC(1,3)+8,RGN_FRAC(2,3)+0,RGN_FRAC(2,3)+8 },
-	{
-		7,6,5,4,3,2,1,0,23,22,21,20,19,18,17,16
-	},
-	{
-		0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32
-	},
+	{ STEP8(7,-1), STEP8(16+7,-1) },
+	{ STEP16(0,32) },
 	16*32
 };
 
 
 static GFXDECODE_START( gfx_feversoc )
-	GFXDECODE_ENTRY( "gfx1", 0, spi_spritelayout,   0, 0x40 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   0, 0x40 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( feversoc )
@@ -278,13 +290,13 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void feversoc_state::feversoc_irq(int state)
+void feversoc_state::screen_vblank(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(8, ASSERT_LINE);
 }
 
-void feversoc_state::feversoc_irq_ack(uint16_t data)
+void feversoc_state::irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(8, CLEAR_LINE);
 }
@@ -296,9 +308,11 @@ void feversoc_state::machine_start()
 
 void feversoc_state::feversoc(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = XTAL(28'636'363);
+
 	/* basic machine hardware */
 	SH7604(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &feversoc_state::feversoc_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &feversoc_state::main_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -306,18 +320,18 @@ void feversoc_state::feversoc(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1); //dynamic resolution?
-	screen.set_screen_update(FUNC(feversoc_state::screen_update_feversoc));
+	screen.set_screen_update(FUNC(feversoc_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(feversoc_state::feversoc_irq));
+	screen.screen_vblank().set(FUNC(feversoc_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_feversoc);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, MASTER_CLOCK/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.6); //pin 7 & frequency not verified (clock should be 28,6363 / n)
+	OKIM6295(config, m_oki, MASTER_CLOCK / 16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.6); //pin 7 & frequency not verified (clock should be 28,6363 / n)
 
-	EEPROM_93C56_16BIT(config, "eeprom");
+	EEPROM_93C56_16BIT(config, m_eeprom);
 
 	JRC6355E(config, m_rtc, XTAL(32'768));
 
@@ -339,7 +353,7 @@ ROM_START( feversoc )
 	ROM_LOAD16_BYTE( "prog0.u0139",   0x00001, 0x20000, CRC(fa699503) SHA1(96a834d4f7d5b764aa51db745afc2cd9a7c9783d) )
 	ROM_LOAD16_BYTE( "prog1.u0140",   0x00000, 0x20000, CRC(fd4d7943) SHA1(d7d782f878656bc79d70589f9df2cbcfff0adb5e) )
 
-	ROM_REGION( 0x600000, "gfx1", 0)    /* text */
+	ROM_REGION( 0x600000, "sprites", 0)    /* text */
 	ROM_LOAD("obj1.u011", 0x000000, 0x200000, CRC(d8c8dde7) SHA1(3ef815fb1e21a0bd907ee835bc7a32d80f6a9d28) )
 	ROM_LOAD("obj2.u012", 0x200000, 0x200000, CRC(8e93bfda) SHA1(3b4740cefb164efc320fb69f58e8800d2646fea6) )
 	ROM_LOAD("obj3.u013", 0x400000, 0x200000, CRC(8c8c6e8b) SHA1(bed4990d6eebb7aefa200ad2bed9b7e71e6bd064) )
@@ -352,7 +366,7 @@ void feversoc_state::init_feversoc()
 {
 	uint32_t *rom = (uint32_t *)memregion("maincpu")->base();
 
-	seibuspi_rise11_sprite_decrypt_feversoc(memregion("gfx1")->base(), 0x200000);
+	seibuspi_rise11_sprite_decrypt_feversoc(memregion("sprites")->base(), 0x200000);
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0003ffff, 1, rom);

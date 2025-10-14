@@ -42,7 +42,12 @@ plus reload after save needs to be counterchecked for all games unless explicitl
 		<notes><![CDATA[
 Stage 1 player shadow sports an additive blending bug when the moon is the backdrop (known to not happen on real HW)
 ]]></notes>
-		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
 				<rom name="blue angelo - angels from the shrine (europe) (en,fr,de,es,it,pt).smc" size="17302528" crc="54ff5945" sha1="369f96bb41378ab4108d0dc8866148b328cbd75e"/>

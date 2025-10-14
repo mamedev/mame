@@ -28,7 +28,7 @@ jobs:
     - name: Build HTML
       run: make -C docs html
     - name: Build PDF
-      run: make -C docs latexpdf
+      run: make -C docs PAPER=a4 latexpdf
     - uses: actions/upload-artifact@main
       with:
         name: mame-docs-${{ github.sha }}

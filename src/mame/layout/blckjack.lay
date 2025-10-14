@@ -1,76 +1,118 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+copyright-holders: Roberto Fresca, Grull Osgo.
+
+  Black Jack (Interflip)
+  control panel
+
 -->
 <mamelayout version="2">
-	<element name="L0" defstate="1">
-		<rect>
-			<color red="0.70" green="0.70" blue="0.0" />
-		</rect>
-		<text string="HIT" state="1">
+
+	<!-- define elements -->
+
+	<element name="L0" defstate="0">
+		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.17" green="0.076" blue="0.0" /></rect>
+		<text string="HIT">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L1" defstate="1">
-		<rect>
-			<color red="0.70" green="0.00" blue="0.0" />
-		</rect>
-		<text string="STAND" state="1">
+	<element name="L1" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.25" green="0.0" blue="0.0" /></rect>
+		<text string="STAND">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L2" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue=".0" />
-		</rect>
-		<text string="DOUBLE" state="1">
+	<element name="L2" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.25" green="0.0" blue="0.0" /></rect>
+		<text string="DOUBLE">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
-	<element name="L7" defstate="1">
-		<rect>
-			<color red="0.70" green="0.70" blue="0.0" />
-		</rect>
-		<text string="DEAL" state="1">
+
+	<element name="L7" defstate="0">
+		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.17" green="0.076" blue="0.0" /></rect>
+		<text string="DEAL">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
+
+	<element name="buttonedge_y" defstate="0">
+		<rect state="1"><color red="0.7" green="0.35" blue="0.0" /></rect>
+		<rect state="0"><color red="0.12" green="0.04" blue="0.0" /></rect>
+	</element>
+
+	<element name="buttonedge_r" defstate="0">
+		<rect state="1"><color red="0.7" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.15" green="0.0" blue="0.0" /></rect>
+	</element>
+
+
 	<element name="BX" defstate="1">
-		<rect>
-			<color red="0.00" green="0.00" blue="0.0" />
-		</rect>
+		<rect><color red="0.00" green="0.00" blue="0.0" /></rect>
 	</element>
+
 	<element name="Dig1" defstate="1">
-		<led7seg>
-			<color red=".75" green="0.0" blue="0.0" />
-		</led7seg>
+		<led7seg><color red="0.5" green="0.5" blue="0.5" /></led7seg>
 	</element>
+
+
+	<!-- define cpanel layout -->
 
 	<view name="Button Lamps">
+
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<element name="lamp1" ref="L0">
-			<bounds x="0.5694" y="3.12" width="0.5" height="0.30" />
+
+	<!-- define button-lamps -->
+
+		<element name="lamp1" ref="buttonedge_y" inputtag="IN0" inputmask="0x10">
+			<bounds x="0.57" y="3.12" width="0.50" height="0.30" />
 		</element>
-		<element name="lamp2" ref="L1">
-			<bounds x="1.508" y="3.12" width="0.35" height="0.30" />
+		<element name="lamp1" ref="L0" inputtag="IN0" inputmask="0x10">
+			<bounds x="0.59" y="3.14" width="0.46" height="0.26" />
 		</element>
-		<element name="lamp3" ref="L2">
-			<bounds x="2.3" y="3.12" width="0.35" height="0.30" />
+
+		<element name="lamp2" ref="buttonedge_r" inputtag="IN0" inputmask="0x20">
+			<bounds x="1.51" y="3.12" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp0" ref="L7">
-			<bounds x="3.093" y="3.12" width="0.5" height="0.30" />
+		<element name="lamp2" ref="L1" inputtag="IN0" inputmask="0x20">
+			<bounds x="1.53" y="3.14" width="0.31" height="0.26" />
 		</element>
+
+		<element name="lamp3" ref="buttonedge_r" inputtag="IN0" inputmask="0x40">
+			<bounds x="2.30" y="3.12" width="0.35" height="0.30" />
+		</element>
+		<element name="lamp3" ref="L2" inputtag="IN0" inputmask="0x40">
+			<bounds x="2.32" y="3.14" width="0.31" height="0.26" />
+		</element>
+
+		<element name="lamp0" ref="buttonedge_y" inputtag="IN0" inputmask="0x08">
+			<bounds x="3.10" y="3.12" width="0.50" height="0.30" />
+		</element>
+		<element name="lamp0" ref="L7" inputtag="IN0" inputmask="0x08">
+			<bounds x="3.12" y="3.14" width="0.46" height="0.26" />
+		</element>
+
+
 		<element name="" ref="BX">
 			<bounds x="3.99" y="3.00" width="0.01" height="0.45" />
 		</element>
+
+
+	<!-- define mech counters -->
+
 		<element name="digit0" ref="Dig1">
 			<bounds x="3.92" y="3.12" width="0.05" height="0.06" />
 		</element>
@@ -136,5 +178,6 @@ license:CC0-1.0
 		<element name="digit20" ref="Dig1">
 			<bounds x="3.62" y="3.28" width="0.05" height="0.06" />
 		</element>
+
 	</view>
 </mamelayout>

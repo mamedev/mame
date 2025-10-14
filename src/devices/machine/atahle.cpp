@@ -3,11 +3,27 @@
 #include "emu.h"
 #include "atahle.h"
 
-#define VERBOSE                     0
-#define PRINTF_IDE_COMMANDS         0
+#define LOG_COMMAND (1U << 1)
+#define LOG_READ (1U << 2)
+#define LOG_READDATA (1U << 3)
+#define LOG_READSTATUS (1U << 4)
+#define LOG_READCOMPLETED (1U << 5)
+#define LOG_WRITE (1U << 6)
+#define LOG_WRITEDATA (1U << 7)
+#define LOG_WRITECOMPLETED (1U << 8)
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) osd_printf_debug x; } while (0)
+//#define VERBOSE (LOG_GENERAL | LOG_COMMAND | LOG_READ | /* LOG_READDATA | LOG_READSTATUS | */ LOG_READCOMPLETED | LOG_WRITE | /* LOG_WRITEDATA | */ LOG_WRITECOMPLETED)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGCOMMAND(...)        LOGMASKED(LOG_COMMAND, __VA_ARGS__)
+#define LOGREAD(...)           LOGMASKED(LOG_READ, __VA_ARGS__)
+#define LOGREADDATA(...)       LOGMASKED(LOG_READDATA, __VA_ARGS__)
+#define LOGREADSTATUS(...)     LOGMASKED(LOG_READSTATUS, __VA_ARGS__)
+#define LOGREADCOMPLETED(...)  LOGMASKED(LOG_READCOMPLETED, __VA_ARGS__)
+#define LOGWRITE(...)          LOGMASKED(LOG_WRITE, __VA_ARGS__)
+#define LOGWRITEDATA(...)      LOGMASKED(LOG_WRITEDATA, __VA_ARGS__)
+#define LOGWRITECOMPLETED(...) LOGMASKED(LOG_WRITECOMPLETED, __VA_ARGS__)
 
 enum
 {
@@ -110,7 +126,6 @@ void ata_hle_device_base::device_start()
 
 void ata_hle_device_base::device_reset()
 {
-	/* reset the drive state */
 	set_dasp(CLEAR_LINE);
 	set_dmarq(CLEAR_LINE);
 	set_irq(CLEAR_LINE);
@@ -121,9 +136,7 @@ void ata_hle_device_base::device_reset()
 	m_resetting = true;
 
 	if (m_csel == 0)
-	{
 		start_busy(DETECT_DEVICE1_TIME, PARAM_DETECT_DEVICE1);
-	}
 	else
 	{
 		set_dasp(ASSERT_LINE);
@@ -138,9 +151,7 @@ void ata_hle_device_base::soft_reset()
 	m_status = 0;
 
 	if (is_ready())
-	{
 		m_status |= IDE_STATUS_DRDY;
-	}
 
 	start_busy(DIAGNOSTIC_TIME, PARAM_DIAGNOSTIC);
 }
@@ -198,7 +209,7 @@ void ata_hle_device_base::process_command()
 		break;
 
 	default:
-		LOGPRINT(("IDE unknown command (%02X)\n", m_command));
+		LOG("%s device %d process_command() unknown command (0x%02x)\n", machine().describe_context(), m_csel, m_command);
 		m_status |= IDE_STATUS_ERR;
 		m_error = IDE_ERROR_ABRT;
 		set_irq(ASSERT_LINE);
@@ -221,7 +232,7 @@ void ata_hle_device_base::finished_command()
 	case IDE_COMMAND_SET_FEATURES:
 		if (!set_features())
 		{
-			LOGPRINT(("IDE Set features failed (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high));
+			LOGCOMMAND("IDE Set features failed (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high);
 
 			m_status |= IDE_STATUS_ERR;
 			m_error = IDE_ERROR_ABRT;
@@ -234,7 +245,7 @@ void ata_hle_device_base::finished_command()
 		break;
 
 	default:
-		logerror( "finished_command() unhandled command %02x\n", m_command );
+		LOG("device %d finished_command() unhandled command 0x%02x\n", m_csel, m_command);
 		break;
 	}
 }
@@ -319,10 +330,10 @@ bool ata_hle_device_base::set_features()
 		m_revert_to_defaults = true;
 		return true;
 
-	// not actually handled, but reply as if we did
 	case IDE_SET_FEATURES_ENABLE_ECC:
 	case IDE_SET_FEATURES_ENABLE_RETRIES:
 	case IDE_SET_FEATURES_ENABLE_READ_LOOK_AHEAD:
+		// not actually handled, but reply as if we did
 		return true;
 	}
 
@@ -331,7 +342,7 @@ bool ata_hle_device_base::set_features()
 
 int ata_hle_device_base::bit_to_mode(uint16_t word)
 {
-	switch (word>>8)
+	switch (word >> 8)
 	{
 	case 0x01:
 		return 0;
@@ -347,26 +358,23 @@ int ata_hle_device_base::bit_to_mode(uint16_t word)
 		return 5;
 	case 0x40:
 		return 6;
-	case 0x080:
+	case 0x80:
 		return 7;
 	}
 
 	return -1;
 }
 
-// Return the currently selected single word dma mode, -1 if none selected
 int ata_hle_device_base::single_word_dma_mode()
 {
 	return bit_to_mode(m_identify_buffer[62]);
 }
 
-// Return the currently selected multi word dma mode, -1 if none selected
 int ata_hle_device_base::multi_word_dma_mode()
 {
 	return bit_to_mode(m_identify_buffer[63]);
 }
 
-// Return the currently selected ultra dma mode, -1 if none selected
 int ata_hle_device_base::ultra_dma_mode()
 {
 	return bit_to_mode(m_identify_buffer[88]);
@@ -374,15 +382,13 @@ int ata_hle_device_base::ultra_dma_mode()
 
 uint16_t ata_hle_device_base::read_data()
 {
-	/* fetch the correct amount of data */
 	uint16_t result = m_buffer[m_buffer_offset++];
 	if (!m_8bit_data_transfers)
 		result |= m_buffer[m_buffer_offset++] << 8;
 
-	/* if we're at the end of the buffer, handle it */
 	if (m_buffer_offset >= m_buffer_size)
 	{
-		LOG(("%s:IDE completed PIO read\n", machine().describe_context()));
+		LOGREADCOMPLETED("%s device %d read_data() completed\n", machine().describe_context(), m_csel);
 		read_buffer_empty();
 	}
 
@@ -391,15 +397,13 @@ uint16_t ata_hle_device_base::read_data()
 
 void ata_hle_device_base::write_data(uint16_t data)
 {
-	/* store the correct amount of data */
 	m_buffer[m_buffer_offset++] = data;
 	if (!m_8bit_data_transfers)
 		m_buffer[m_buffer_offset++] = data >> 8;
 
-	/* if we're at the end of the buffer, handle it */
 	if (m_buffer_offset >= m_buffer_size)
 	{
-		LOG(("%s:IDE completed PIO write\n", machine().describe_context()));
+		LOGWRITECOMPLETED("%s device %d write_data() completed\n", machine().describe_context(), m_csel);
 		write_buffer_full();
 	}
 }
@@ -429,12 +433,10 @@ void ata_hle_device_base::read_buffer_empty()
 	m_buffer_offset = 0;
 
 	m_status &= ~IDE_STATUS_DRQ;
-
-	// Doesn't matter if we're in dma or not, when the buffer is empty
-	// there's no more request to be had
 	set_dmarq(CLEAR_LINE);
 
-	if (ultra_dma_mode() >= 0) {
+	if (ultra_dma_mode() >= 0)
+	{
 		m_buffer_empty_timer->enable(true);
 		m_buffer_empty_timer->adjust(attotime::zero);
 	}
@@ -447,9 +449,6 @@ void ata_hle_device_base::write_buffer_full()
 	m_buffer_offset = 0;
 
 	m_status &= ~IDE_STATUS_DRQ;
-
-	// Doesn't matter if we're in dma or not, when the buffer is full
-	// there's no more request to be had
 	set_dmarq(CLEAR_LINE);
 
 	process_buffer();
@@ -499,240 +498,205 @@ void ata_hle_device_base::set_pdiag_in(int state)
 
 uint16_t ata_hle_device_base::dma_r()
 {
-	uint16_t result = 0xffff;
-
 	if (device_selected())
 	{
 		if (!m_dmack)
-		{
-			logerror( "%s: %s dev %d read_dma ignored (!DMACK)\n", machine().describe_context(), tag(), dev() );
-		}
+			LOG("%s device %d dma_r 0x%04x (ignored DMACK)\n", machine().describe_context(), m_csel, 0xffff);
 		else if (m_dmarq && single_word_dma_mode() >= 0)
-		{
-			logerror( "%s: %s dev %d read_dma ignored (DMARQ)\n", machine().describe_context(), tag(), dev() );
-		}
+			LOG("%s device %d dma_r 0x%04x (ignored DMARQ)\n", machine().describe_context(), m_csel, 0xffff);
 		else if (!m_dmarq && multi_word_dma_mode() >= 0)
-		{
-			logerror( "%s: %s dev %d read_dma ignored (!DMARQ)\n", machine().describe_context(), tag(), dev() );
-		}
+			LOG("%s device %d dma_r 0x%04x (ignored !DMARQ)\n", machine().describe_context(), m_csel, 0xffff);
 		else if (!m_dmarq && ultra_dma_mode() >= 0)
-		{
-			logerror("%s: %s dev %d read_dma ignored (!DMARQ)\n", machine().describe_context(), tag(), dev());
-		}
+			LOG("%s device %d dma_r 0x%04x (ignored !DMARQ)\n", machine().describe_context(), m_csel, 0xffff);
 		else if (m_status & IDE_STATUS_BSY)
-		{
-			logerror( "%s: %s dev %d read_dma ignored (BSY)\n", machine().describe_context(), tag(), dev() );
-		}
+			LOG("%s device %d dma_r 0x%04x (ignored BSY)\n", machine().describe_context(), m_csel, 0xffff);
 		else if (!(m_status & IDE_STATUS_DRQ))
-		{
-			logerror( "%s: %s dev %d read_dma ignored (!DRQ)\n", machine().describe_context(), tag(), dev() );
-		}
+			LOG("%s device %d dma_r 0x%04x (ignored !DRQ)\n", machine().describe_context(), m_csel, 0xffff);
 		else
 		{
-			result = read_data();
+			uint16_t data = read_data();
 
 			if ((m_status & IDE_STATUS_DRQ) && single_word_dma_mode() >= 0)
 				set_dmarq(ASSERT_LINE);
+
+			LOGREADDATA("%s device %d dma_r 0x%04x\n", machine().describe_context(), m_csel, data);
+			return data;
 		}
 	}
 
-	return result;
+	return 0xffff;
 }
 
 uint16_t ata_hle_device_base::command_r(offs_t offset)
 {
-	uint16_t result = 0xffff;
+	if (!(m_status & IDE_STATUS_DRDY) && is_ready())
+		m_status |= IDE_STATUS_DRDY;
 
 	if (device_selected() || m_single_device)
 	{
 		if (m_dmack)
 		{
 			if (!machine().side_effects_disabled())
-				logerror( "%s: %s dev %d read_cs0 %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
+				LOG("%s device %d cs0_r (0x%x) 0x%04x (ignored DMACK)\n", machine().describe_context(), dev(), offset, 0xffff);
 		}
-		else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_STATUS_R)
+		else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_DATA_RW)
 		{
-			// ATA5 spec says status reads should also go through here, but this breaks Primal Rage 2.
-			// Real hardware might work due to read ahead in the vt83c461.
-			if (device_selected())
-			{
-				switch (offset)
-				{
-					case IDE_CS0_DATA_RW:
-						if (!machine().side_effects_disabled())
-							logerror( "%s: %s dev %d read_cs0 %04x ignored (BSY)\n", machine().describe_context(), tag(), dev(), offset );
-						break;
+			uint8_t status = device_selected() ? calculate_status() : 0;
 
-					default:
-						result = calculate_status();
-						break;
-				}
-			}
-			else
-			{
-				result = 0;
-			}
+			if (!machine().side_effects_disabled())
+				LOGREADSTATUS("%s device %d cs0_r (0x%x) 0x%04x (status BSY)\n", machine().describe_context(), dev(), offset, status);
+
+			return status;
 		}
 		else
 		{
 			switch (offset)
 			{
-				/* read data if there's data to be read */
-				case IDE_CS0_DATA_RW:
-					if (device_selected())
-					{
-						if (!(m_status & IDE_STATUS_DRQ))
-						{
-							if (!machine().side_effects_disabled())
-								logerror( "%s: %s dev %d read_cs0 ignored (!DRQ)\n", machine().describe_context(), tag(), dev() );
-						}
-						else
-						{
-							if (!machine().side_effects_disabled())
-								result = read_data();
-							else
-								result = 0;
-						}
-					}
-					else
-					{
-						result = 0;
-					}
-					break;
-
-				/* return the current error */
-				case IDE_CS0_ERROR_R:
-					result = m_error;
-					break;
-
-				/* return the current sector count */
-				case IDE_CS0_SECTOR_COUNT_RW:
-					result = m_sector_count;
-					break;
-
-				/* return the current sector */
-				case IDE_CS0_SECTOR_NUMBER_RW:
-					result = m_sector_number;
-					break;
-
-				/* return the current cylinder LSB */
-				case IDE_CS0_CYLINDER_LOW_RW:
-					result = m_cylinder_low;
-					break;
-
-				/* return the current cylinder MSB */
-				case IDE_CS0_CYLINDER_HIGH_RW:
-					result = m_cylinder_high;
-					break;
-
-				/* return the current head */
-				case IDE_CS0_DEVICE_HEAD_RW:
-					result = m_device_head;
-					break;
-
-				/* return the current status and clear any pending interrupts */
-				case IDE_CS0_STATUS_R:
-					if (device_selected())
-					{
-						result = calculate_status();
-
-						if (!(m_status & IDE_STATUS_DRDY) && is_ready())
-							m_status |= IDE_STATUS_DRDY;
-
-						set_irq(CLEAR_LINE);
-					}
-					else
-					{
-						result = 0;
-					}
-					break;
-
-				/* log anything else */
-				default:
+			case IDE_CS0_DATA_RW:
+				if (!device_selected())
+				{
 					if (!machine().side_effects_disabled())
-						logerror("%s:unknown IDE cs0 read at %03X\n", machine().describe_context(), offset);
-					break;
+						LOG("%s device %d cs0_r data 0x%04x (ignored !selected)\n", machine().describe_context(), dev(), 0xffff);
+				}
+				else if (m_status & IDE_STATUS_BSY)
+				{
+					if (!machine().side_effects_disabled())
+						LOG("%s device %d cs0_r data 0x%04x (ignored BSY)\n", machine().describe_context(), dev(), 0xffff);
+				}
+				else if (!(m_status & IDE_STATUS_DRQ))
+				{
+					if (!machine().side_effects_disabled())
+						LOG("%s device %d cs0_r data 0x%04x (ignored !DRQ)\n", machine().describe_context(), dev(), 0xffff);
+				}
+				else
+				{
+					uint16_t data = device_selected() ? read_data() : 0xffff;
+					LOGREADDATA("%s device %d cs0_r data 0x%04x\n", machine().describe_context(), m_csel, data);
+					return data;
+				}
+				break;
+
+			case IDE_CS0_ERROR_R:
+				if (!machine().side_effects_disabled())
+					LOGREAD("%s device %d cs0_r error register 0x%02x\n", machine().describe_context(), dev(), m_error);
+
+				return m_error;
+
+			case IDE_CS0_SECTOR_COUNT_RW:
+				if (!machine().side_effects_disabled())
+					LOGREAD("%s device %d cs0_r sector count 0x%02x\n", machine().describe_context(), dev(), m_sector_count);
+
+				return m_sector_count;
+
+			case IDE_CS0_SECTOR_NUMBER_RW:
+				if (!machine().side_effects_disabled())
+					LOGREAD("%s device %d cs0_r sector number 0x%02x\n", machine().describe_context(), dev(), m_sector_number);
+
+				return m_sector_number;
+
+			case IDE_CS0_CYLINDER_LOW_RW:
+				if (!machine().side_effects_disabled())
+					LOGREAD("%s device %d cs0_r cylinder low 0x%02x\n", machine().describe_context(), dev(), m_cylinder_low);
+
+				return m_cylinder_low;
+
+			case IDE_CS0_CYLINDER_HIGH_RW:
+				if (!machine().side_effects_disabled())
+					LOGREAD("%s device %d cs0_r cylinder high 0x%02x\n", machine().describe_context(), dev(), m_cylinder_high);
+
+				return m_cylinder_high;
+
+			case IDE_CS0_DEVICE_HEAD_RW:
+				if (!machine().side_effects_disabled())
+					LOGREAD("%s device %d cs0_r device/head 0x%02x\n", machine().describe_context(), dev(), m_device_head);
+
+				return m_device_head;
+
+			case IDE_CS0_STATUS_R:
+			{
+				uint8_t status = device_selected() ? calculate_status() : 0;
+
+				if (device_selected())
+					set_irq(CLEAR_LINE);
+
+				if (!machine().side_effects_disabled())
+					LOGREADSTATUS("%s device %d cs0_r status 0x%04x\n", machine().describe_context(), dev(), status);
+
+				return status;
+			}
+
+			default:
+				if (!machine().side_effects_disabled())
+					LOG("%s device %d cs0_r unknown (0x%x) 0x%04x\n", machine().describe_context(), dev(), offset, 0xffff);
 			}
 		}
 	}
 
-	/* logit */
-//  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
-	if (!machine().side_effects_disabled())
-		LOG(("%s:IDE cs0 read %X at %X (err: %X)\n", machine().describe_context(), result, offset, m_error));
-
-	/* return the result */
-	return result;
+	return 0xffff;
 }
-
 
 uint16_t ata_hle_device_base::control_r(offs_t offset)
 {
-	/* logit */
-//  if (offset != IDE_CS1_ALTERNATE_STATUS_R)
-	if (!machine().side_effects_disabled())
-		LOG(("%s:IDE cs1 read at %X\n", machine().describe_context(), offset));
-
-	uint16_t result = 0xffff;
+	if (!(m_status & IDE_STATUS_DRDY) && is_ready())
+		m_status |= IDE_STATUS_DRDY;
 
 	if (device_selected() || m_single_device)
 	{
 		if (m_dmack)
 		{
 			if (!machine().side_effects_disabled())
-				logerror( "%s: %s dev %d read_cs1 %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset );
+				LOG("%s device %d cs1_r (0x%x) 0x%0x (ignored DMACK)\n", machine().describe_context(), dev(), offset, 0xffff);
+
+			return 0xffff;
 		}
 		else
 		{
 			switch (offset)
 			{
-				case IDE_CS1_ALTERNATE_STATUS_R:
-					if (device_selected())
-					{
-						result = calculate_status();
-					}
-					else
-					{
-						result = 0;
-					}
-					break;
+			case IDE_CS1_ALTERNATE_STATUS_R:
+			{
+				uint8_t status = device_selected() ? calculate_status() : 0;
 
-				case IDE_CS1_ACTIVE_STATUS:
-					/*
+				if (!machine().side_effects_disabled())
+					LOGREADSTATUS("%s device %d cs1_r status 0x%04x\n", machine().describe_context(), dev(), status);
+				return status;
+			}
 
-					    bit     description
+			case IDE_CS1_ACTIVE_STATUS:
+			{
+				uint8_t active_status = device_selected() ? 1 : 0;
 
-					    0       master active
-					    1       slave active
-					    2       complement of active disk head bit 0
-					    3       complement of active disk head bit 1
-					    4       complement of active disk head bit 2
-					    5       complement of active disk head bit 3
-					    6       write in progress
-					    7       floppy present (unused)
+				/*
 
-					*/
-					if (device_selected())
-					{
-						result = 0x01;
-					}
-					else
-					{
-						result = 0;
-					}
-					break;
+				    bit     description
 
-				/* log anything else */
-				default:
-					if (!machine().side_effects_disabled())
-						logerror("%s:unknown IDE cs1 read at %03X\n", machine().describe_context(), offset);
-					break;
+				    0       master active
+				    1       slave active
+				    2       complement of active disk head bit 0
+				    3       complement of active disk head bit 1
+				    4       complement of active disk head bit 2
+				    5       complement of active disk head bit 3
+				    6       write in progress
+				    7       floppy present (unused)
+
+				*/
+
+				if (!machine().side_effects_disabled())
+					LOGREAD("%s device %d cs1_r active status 0x%04x\n", machine().describe_context(), dev(), active_status);
+
+				return active_status;
+			}
+
+			default:
+				if (!machine().side_effects_disabled())
+					LOG("%s device %d cs1_r unknown (0x%x) 0x%04x\n", machine().describe_context(), dev(), offset, 0xffff);
+
+				return 0xffff;
 			}
 		}
 	}
 
-	/* return the result */
-	return result;
+	return 0xffff;
 }
 
 void ata_hle_device_base::dma_w(uint16_t data)
@@ -740,29 +704,17 @@ void ata_hle_device_base::dma_w(uint16_t data)
 	if (device_selected())
 	{
 		if (!m_dmack)
-		{
-			logerror( "%s: %s dev %d write_dma %04x ignored (!DMACK)\n", machine().describe_context(), tag(), dev(), data );
-		}
+			LOG("%s device %d dma_w 0x%04x (ignored !DMACK)\n", machine().describe_context(), m_csel, data);
 		else if (m_dmarq && single_word_dma_mode() >= 0)
-		{
-			logerror( "%s: %s dev %d write_dma %04x ignored (DMARQ)\n", machine().describe_context(), tag(), dev(), data );
-		}
+			LOG("%s device %d dma_w 0x%04x (ignored DMARQ)\n", machine().describe_context(), m_csel, data);
 		else if (!m_dmarq && multi_word_dma_mode() >= 0)
-		{
-			logerror( "%s: %s dev %d write_dma %04x ignored (!DMARQ)\n", machine().describe_context(), tag(), dev(), data );
-		}
+			LOG("%s device %d dma_w 0x%04x (ignored !DMARQ)\n", machine().describe_context(), m_csel, data);
 		else if (!m_dmarq && ultra_dma_mode() >= 0)
-		{
-			logerror("%s: %s dev %d write_dma %04x ignored (!DMARQ)\n", machine().describe_context(), tag(), dev(), data);
-		}
+			LOG("%s device %d dma_w 0x%04x (ignored !DMARQ)\n", machine().describe_context(), m_csel, data);
 		else if (m_status & IDE_STATUS_BSY)
-		{
-			logerror( "%s: %s dev %d write_dma %04x ignored (BSY)\n", machine().describe_context(), tag(), dev(), data );
-		}
+			LOG("%s device %d dma_w 0x%04x (ignored BSY)\n", machine().describe_context(), m_csel, data);
 		else if (!(m_status & IDE_STATUS_DRQ))
-		{
-			logerror( "%s: %s dev %d write_dma %04x ignored (!DRQ)\n", machine().describe_context(), tag(), dev(), data );
-		}
+			LOG("%s device %d dma_w 0x%04x (ignored !DRQ)\n", machine().describe_context(), m_csel, data);
 		else
 		{
 			write_data(data);
@@ -775,164 +727,143 @@ void ata_hle_device_base::dma_w(uint16_t data)
 
 void ata_hle_device_base::command_w(offs_t offset, uint16_t data)
 {
-	/* logit */
-	if (offset != IDE_CS0_DATA_RW)
-		LOG(("%s:IDE cs0 write to %X = %04X\n", machine().describe_context(), offset, data));
+	if ((m_status & IDE_STATUS_DRQ) && offset != IDE_CS0_DATA_RW && (offset != IDE_CS0_DEVICE_HEAD_RW || data != m_device_head))
+	{
+		LOG("%s device %d cs0_w (0x%x) aborted after %d bytes (%02x)\n", machine().describe_context(), m_csel, offset, m_buffer_offset, m_command);
+		stop_busy();
+		m_status &= ~IDE_STATUS_DRQ;
+		set_dmarq(CLEAR_LINE);
+		m_status |= IDE_STATUS_ERR;
+		m_error = IDE_ERROR_ABRT;
+	}
 
-	if (m_dmack)
-	{
-		logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data );
-	}
-	else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_COMMAND_W)
-	{
-		logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
-	}
-	else if ((m_status & IDE_STATUS_DRQ) && offset != IDE_CS0_DATA_RW && offset != IDE_CS0_COMMAND_W)
-	{
-		logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
-	}
+	if (m_status & IDE_STATUS_BSY)
+		LOG("%s device %d cs0_w (0x%x) 0x%04x (ignored BSY)\n", machine().describe_context(), m_csel, offset, data);
+	else if (m_dmack)
+		LOG("%s device %d cs0_w (0x%x) 0x%04x (ignored DMACK)\n", machine().describe_context(), m_csel, offset, data);
 	else
 	{
-		uint8_t old;
-
 		switch (offset)
 		{
-			/* write data */
-			case IDE_CS0_DATA_RW:
-				if (device_selected())
+		case IDE_CS0_DATA_RW:
+			if (device_selected() || m_single_device)
+			{
+				if (!device_selected())
+					LOG("%s device %d cs0_w data 0x%04x (ignored !selected)\n", machine().describe_context(), m_csel, data);
+				else if (!(m_status & IDE_STATUS_DRQ))
+					LOG("%s device %d cs0_w data 0x%04x (ignored !DRQ)\n", machine().describe_context(), m_csel, data);
+				else
 				{
-					if (!(m_status & IDE_STATUS_DRQ))
-					{
-						logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (!DRQ)\n", machine().describe_context(), tag(), dev(), offset, data );
-					}
-					else
-					{
-						write_data(data);
-					}
+					LOGWRITEDATA("%s device %d cs0_w data 0x%04x\n", machine().describe_context(), m_csel, data);
+					write_data(data);
 				}
-				break;
+			}
+			break;
 
-			case IDE_CS0_FEATURE_W:
-				m_feature = data;
-				break;
+		case IDE_CS0_FEATURE_W:
+			LOGWRITE("%s device %d cs0_w feature 0x%02x\n", machine().describe_context(), m_csel, data);
+			m_feature = data;
+			break;
 
-			/* sector count */
-			case IDE_CS0_SECTOR_COUNT_RW:
-				m_sector_count = (data & 0xff) ? (data & 0xff) : 0x100;
-				break;
+		case IDE_CS0_SECTOR_COUNT_RW:
+			LOGWRITE("%s device %d cs0_w sector count 0x%02x\n", machine().describe_context(), m_csel, data);
+			m_sector_count = (data & 0xff) ? (data & 0xff) : 0x100;
+			break;
 
-			/* current sector */
-			case IDE_CS0_SECTOR_NUMBER_RW:
-				m_sector_number = data;
-				break;
+		case IDE_CS0_SECTOR_NUMBER_RW:
+			LOGWRITE("%s device %d cs0_w sector number 0x%02x\n", machine().describe_context(), m_csel, data);
+			m_sector_number = data;
+			break;
 
-			/* current cylinder LSB */
-			case IDE_CS0_CYLINDER_LOW_RW:
-				m_cylinder_low = data;
-				break;
+		case IDE_CS0_CYLINDER_LOW_RW:
+			LOGWRITE("%s device %d cs0_w cylinder low 0x%02x\n", machine().describe_context(), m_csel, data);
+			m_cylinder_low = data;
+			break;
 
-			/* current cylinder MSB */
-			case IDE_CS0_CYLINDER_HIGH_RW:
-				m_cylinder_high = data;
-				break;
+		case IDE_CS0_CYLINDER_HIGH_RW:
+			LOGWRITE("%s device %d cs0_w cylinder high 0x%02x\n", machine().describe_context(), m_csel, data);
+			m_cylinder_high = data;
+			break;
 
-			/* current head */
-			case IDE_CS0_DEVICE_HEAD_RW:
-				old = m_device_head;
-				m_device_head = data;
+		case IDE_CS0_DEVICE_HEAD_RW:
+		{
+			LOGWRITE("%s device %d cs0_w device/head 0x%02x\n", machine().describe_context(), m_csel, data);
 
-				if ((m_device_head ^ old) & IDE_DEVICE_HEAD_DRV)
-					update_irq();
-				break;
+			bool drv_changed = ((m_device_head ^ data) & IDE_DEVICE_HEAD_DRV) != 0;
+			m_device_head = data;
 
-			/* command */
-			case IDE_CS0_COMMAND_W:
-				// Packet devices can accept DEVICE RESET when BSY or DRQ is set.
-				if (m_status & IDE_STATUS_BSY)
-				{
-					logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (BSY) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
-				}
-				else if (m_status & IDE_STATUS_DRQ)
-				{
-					logerror( "%s: %s dev %d write_cs0 %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), tag(), dev(), offset, data, m_command );
-				}
-				else if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
-				{
-					m_command = data;
-					m_error = IDE_ERROR_NONE;
+			if (drv_changed)
+				update_irq();
+			break;
+		}
 
-					/* implicitly clear interrupts & dmarq here */
-					set_irq(CLEAR_LINE);
-					set_dmarq(CLEAR_LINE);
+		case IDE_CS0_COMMAND_W:
+			if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
+			{
+				LOGWRITE("%s device %d cs0_w command 0x%02x\n", machine().describe_context(), m_csel, data);
 
-					m_buffer_offset = 0;
+				m_command = data;
+				m_buffer_offset = 0;
+				m_status &= ~IDE_STATUS_ERR;
+				m_error = IDE_ERROR_NONE;
 
-					set_dasp(CLEAR_LINE);
-					m_status &= ~IDE_STATUS_DRQ;
-					m_status &= ~IDE_STATUS_ERR;
+				set_irq(CLEAR_LINE);
+				set_dasp(CLEAR_LINE);
 
-					process_command();
-				}
-				break;
+				process_command();
+			}
+			break;
 
-			default:
-				logerror("%s:unknown IDE cs0 write at %03X = %04x\n", machine().describe_context(), offset, data);
-				break;
+		default:
+			LOG("%s device %d cs0_w unknown (0x%x) 0x%02x\n", machine().describe_context(), m_csel, offset, data);
+			break;
 		}
 	}
 }
 
 void ata_hle_device_base::control_w(offs_t offset, uint16_t data)
 {
-	/* logit */
-	LOG(("%s:IDE cs1 write to %X = %08X\n", machine().describe_context(), offset, data));
-
 	if (m_dmack)
-	{
-		logerror( "%s: %s dev %d write_cs1 %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data);
-	}
+		LOG("%s device %d cs1_w (0x%x) 0x%04x (ignored DMACK)\n", machine().describe_context(), m_csel, offset, data);
 	else
 	{
-		uint8_t old;
-
 		switch (offset)
 		{
-			/* adapter control */
-			case IDE_CS1_DEVICE_CONTROL_W:
-				old = m_device_control;
-				m_device_control = data;
+		case IDE_CS1_DEVICE_CONTROL_W:
+		{
+			LOGWRITE("%s device %d cs1_w device control 0x%02x\n", machine().describe_context(), m_csel, data);
 
-				if ((m_device_control ^ old) & IDE_DEVICE_CONTROL_NIEN)
-					update_irq();
+			uint8_t old = m_device_control;
+			m_device_control = data;
 
-				if ((m_device_control ^ old) & IDE_DEVICE_CONTROL_SRST)
+			if ((m_device_control ^ old) & IDE_DEVICE_CONTROL_NIEN)
+				update_irq();
+
+			if ((m_device_control ^ old) & IDE_DEVICE_CONTROL_SRST)
+			{
+				if (m_device_control & IDE_DEVICE_CONTROL_SRST)
 				{
-					if (m_device_control & IDE_DEVICE_CONTROL_SRST)
+					if (m_resetting)
+						LOG("%s device %d cs1_w (0x%x) %04x (ignored RESET)\n", machine().describe_context(), m_csel, offset, data);
+					else
 					{
-						if (m_resetting)
-						{
-							logerror( "%s: %s dev %d write_cs1 %04x %04x ignored (RESET)\n", machine().describe_context(), tag(), dev(), offset, data );
-						}
-						else
-						{
-							set_dasp(CLEAR_LINE);
-							set_dmarq(CLEAR_LINE);
-							set_irq(CLEAR_LINE);
-							set_pdiag(CLEAR_LINE);
+						set_dasp(CLEAR_LINE);
+						set_dmarq(CLEAR_LINE);
+						set_irq(CLEAR_LINE);
+						set_pdiag(CLEAR_LINE);
 
-							start_busy(attotime::never, PARAM_RESET);
-						}
-					}
-					else if (m_busy_timer->param() == PARAM_RESET)
-					{
-						soft_reset();
+						start_busy(attotime::never, PARAM_RESET);
 					}
 				}
-				break;
+				else if (m_busy_timer->param() == PARAM_RESET)
+					soft_reset();
+			}
+			break;
+		}
 
-			default:
-				logerror("%s:unknown IDE cs1 write at %03X = %04x\n", machine().describe_context(), offset, data);
-				break;
+		default:
+			LOG("%s device %d cs1_w unknown (0x%x) 0x%02x\n", machine().describe_context(), m_csel, offset, data);
+			break;
 		}
 	}
 }

@@ -154,14 +154,13 @@ void a2bus_ayboard_device::single_via_devices(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(a2bus_ayboard_device::via1_out_b));
 	m_via1->irq_handler().set(FUNC(a2bus_ayboard_device::via1_irq_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	AY8913(config, m_ay1, 1022727);
-	m_ay1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_ay1->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 
 	AY8913(config, m_ay2, 1022727);
-	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_ay2->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 }
 
 void a2bus_ayboard_device::device_add_mconfig(machine_config &config)
@@ -184,8 +183,8 @@ void a2bus_mockingboard_device::device_add_mconfig(machine_config &config)
 
 	VOTRAX_SC01A(config, m_sc01, 1022727);
 	m_sc01->ar_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_sc01->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_sc01->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_sc01->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_sc01->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void a2bus_phasor_device::device_add_mconfig(machine_config &config)
@@ -195,16 +194,15 @@ void a2bus_phasor_device::device_add_mconfig(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(a2bus_phasor_device::via1_out_b));
 	m_via2->writepb_handler().set(FUNC(a2bus_phasor_device::via2_out_b));
 
-	SPEAKER(config, "lspeaker2").front_left();
-	SPEAKER(config, "rspeaker2").front_right();
+	SPEAKER(config, "speaker2", 2).front();
 
-	m_ay2->reset_routes().add_route(ALL_OUTPUTS, "lspeaker2", 0.5);
+	m_ay2->reset_routes().add_route(ALL_OUTPUTS, "speaker2", 0.5, 0);
 
 	AY8913(config, m_ay3, 1022727);
-	m_ay3->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_ay3->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 
 	AY8913(config, m_ay4, 1022727);
-	m_ay4->add_route(ALL_OUTPUTS, "rspeaker2", 0.5);
+	m_ay4->add_route(ALL_OUTPUTS, "speaker2", 0.5, 1);
 }
 
 void a2bus_echoplus_device::device_add_mconfig(machine_config &config)

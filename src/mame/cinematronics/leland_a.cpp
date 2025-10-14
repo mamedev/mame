@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Paul Leaman
 /***************************************************************************
 
-    Cinemat/Leland driver
+    Cinematronics / Leland Cinemat System driver
 
     Leland sound hardware
     driver by Aaron Giles and Paul Leaman

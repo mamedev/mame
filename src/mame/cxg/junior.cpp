@@ -235,7 +235,7 @@ ROM_START( sjunior )
 	ROM_LOAD("1988_newcrest_614140ha27", 0x0000, 0x2000, CRC(9eb77d94) SHA1(84306ee39986847f9ae82a1117dc6fb8bd309bab) )
 
 	ROM_REGION( 57412, "screen", 0 )
-	ROM_LOAD("cpchess.svg", 0, 57412, CRC(7859b1ac) SHA1(518c5cd08fa8562628345e8e28048c01c9e4edd6) )
+	ROM_LOAD("pchess.svg", 0, 57412, CRC(7859b1ac) SHA1(518c5cd08fa8562628345e8e28048c01c9e4edd6) )
 ROM_END
 
 } // anonymous namespace

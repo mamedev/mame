@@ -51,7 +51,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// internal state
@@ -97,11 +97,9 @@ void istrebiteli_sound_device::device_start()
 	save_item(NAME(m_prev_data));
 }
 
-void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void istrebiteli_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int smpl = 0;
 		if (m_rom_out_en)
@@ -112,7 +110,7 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::ve
 			smpl &= machine().rand() & 1;
 		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
 
-		buffer.put_int(sampindex, smpl, 32768);
+		stream.put_int(0, sampindex, smpl, 32768);
 		m_rom_cnt = (m_rom_cnt + m_rom_incr) & 0x1ff;
 	}
 }

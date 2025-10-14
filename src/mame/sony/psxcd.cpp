@@ -85,7 +85,7 @@ psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, devic
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_spu(*this, finder_base::DUMMY_TAG)
 {
-	set_interface("psx_cdrom");
+	set_interface("cdrom");
 }
 
 

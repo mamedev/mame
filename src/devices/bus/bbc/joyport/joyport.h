@@ -72,7 +72,7 @@ public:
 	void write_cb2(int state);
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 
 	device_bbc_joyport_interface *m_device;
@@ -96,7 +96,7 @@ public:
 protected:
 	device_bbc_joyport_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_joyport_slot_device *m_slot;
+	bbc_joyport_slot_device *const m_slot;
 };
 
 

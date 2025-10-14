@@ -106,20 +106,20 @@ authors:hap
 		<element ref="text_skill"><bounds x="9" y="9.6" width="2" height="0.29" /></element>
 		<element ref="text_game"><bounds x="9" y="10.0" width="2" height="0.29" /></element>
 
+		<element ref="switch_music" inputtag="FAKE" inputmask="0x02" inputraw="yes"><bounds x="10.25" y="8.8" width="1" height="0.29" /></element>
+		<element ref="switch_speed" inputtag="CPU" inputmask="0x01" inputraw="yes"><bounds x="10.25" y="9.2" width="1" height="0.29" /></element>
+		<element ref="switch_skill" inputtag="IN.3" inputmask="0x08" inputraw="yes"><bounds x="10.25" y="9.6" width="1" height="0.29" /></element>
+		<element ref="switch_game" inputtag="IN.3" inputmask="0x07" inputraw="yes"><bounds x="10.25" y="10.0" width="1" height="0.29" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="10.2" y="8.7" width="1.1" height="1.8" /></element>
+
 		<element ref="text_ry"><bounds x="9.825" y="8.77" width="0.35" height="0.35" /></element>
 		<element ref="text_ry"><bounds x="9.825" y="9.17" width="0.35" height="0.35" /></element>
 		<element ref="text_ro"><bounds x="9.825" y="9.57" width="0.35" height="0.35" /></element>
 		<element ref="text_ro"><bounds x="9.825" y="9.97" width="0.35" height="0.35" /></element>
 		<element ref="nothing" inputtag="FAKE" inputmask="0x02" inputraw="yes"><bounds x="9.805" y="8.75" width="0.39" height="0.39" /></element>
-		<element ref="nothing" inputtag="IN.4" inputmask="0x01" inputraw="yes"><bounds x="9.805" y="9.15" width="0.39" height="0.39" /></element>
+		<element ref="nothing" inputtag="CPU" inputmask="0x01" inputraw="yes"><bounds x="9.805" y="9.15" width="0.39" height="0.39" /></element>
 		<element ref="nothing" inputtag="IN.3" inputmask="0x08" inputraw="yes"><bounds x="9.805" y="9.55" width="0.39" height="0.39" /></element>
 		<element ref="nothing" inputtag="IN.3" inputmask="0x07" inputraw="yes"><bounds x="9.805" y="9.95" width="0.39" height="0.39" /></element>
-
-		<element ref="nothing" clickthrough="no"><bounds x="10.2" y="8.7" width="1.1" height="1.8" /></element>
-		<element ref="switch_music" inputtag="FAKE" inputmask="0x02" inputraw="yes"><bounds x="10.25" y="8.8" width="1" height="0.29" /></element>
-		<element ref="switch_speed" inputtag="IN.4" inputmask="0x01" inputraw="yes"><bounds x="10.25" y="9.2" width="1" height="0.29" /></element>
-		<element ref="switch_skill" inputtag="IN.3" inputmask="0x08" inputraw="yes"><bounds x="10.25" y="9.6" width="1" height="0.29" /></element>
-		<element ref="switch_game" inputtag="IN.3" inputmask="0x07" inputraw="yes"><bounds x="10.25" y="10.0" width="1" height="0.29" /></element>
 
 		<element ref="button" inputtag="FAKE" inputmask="0x01"><bounds x="8.0" y="11" width="0.5" height="0.5" /></element>
 		<element ref="button" inputtag="IN.2" inputmask="0x01"><bounds x="9.75" y="11.9" width="0.5" height="0.5" /></element>

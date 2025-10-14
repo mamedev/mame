@@ -656,12 +656,12 @@ static INPUT_PORTS_START( shadfrce )
 	SHADFRCE_PLAYER_INPUT( 2, IPT_START2 )
 
 	PORT_START("EXTRA") // Fake IN2 (players 1 & 2 extra inputs
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -704,19 +704,19 @@ static INPUT_PORTS_START( shadfrce )
 
 	PORT_START("DSW2")  // not mapped directly
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )        PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )                  // "Advanced" in manual
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )                  // "Advanced" in manual
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )               // "Expert" in manual
 	PORT_DIPNAME( 0x0c, 0x0c, "Stage Clear Energy Regain" )  PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x04, "50%" )
-	PORT_DIPSETTING(    0x0c, "25%" )
-	PORT_DIPSETTING(    0x08, "10%" )
+	PORT_DIPSETTING(    0x0c, "100%" )
+	PORT_DIPSETTING(    0x08, "50%" )
+	PORT_DIPSETTING(    0x04, "25%" )
 	PORT_DIPSETTING(    0x00, "0%" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x10, 0x10, "Player's lives" )             PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPNAME( 0x20, 0x20, "Vs. Stage" )                  PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW2:7")
@@ -727,6 +727,31 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	// PCB has 3rd DIP switch "SW3" listed in manual as 1:OFF & 2:OFF & 3:OFF (ALL "NOT USED"), 4:ON & 5:ON (ALL "DON'T TOUCH"), 6:OFF, 7:OFF, 8:OFF (ALL "NOT USED")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( shadfrceu )
+	PORT_INCLUDE(shadfrce)
+
+	PORT_MODIFY("EXTRA") // Fake IN2 (players 1 & 2 extra inputs)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("DSW2") 
+	PORT_DIPNAME( 0x0c, 0x08, "Stage Clear Energy Regain" )  PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x08, "100%" )
+	PORT_DIPSETTING(    0x04, "50%" )
+	PORT_DIPSETTING(    0x00, "25%" )
+	PORT_DIPSETTING(    0x0c, "0%" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )            PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 // Graphic Decoding
@@ -795,20 +820,19 @@ void shadfrce_state::shadfrce(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spvideoram);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));      // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.50);
-	ymsnd.add_route(1, "rspeaker", 0.50);
+	ymsnd.add_route(0, "speaker", 0.50, 0);
+	ymsnd.add_route(1, "speaker", 0.50, 1);
 
 	OKIM6295(config, m_oki, XTAL(13'495'200) / 8, okim6295_device::PIN7_HIGH); // verified on PCB
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 // Rom Defs.
@@ -904,6 +928,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (World, Version 3)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force - Henshin Ninja (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrce,   0,        shadfrce, shadfrce,  shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (World, Version 3)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrceu, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce,  shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force - Henshin Ninja (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

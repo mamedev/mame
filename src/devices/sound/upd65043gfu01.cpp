@@ -205,9 +205,9 @@ void upd65043gfu01_device::update_noise()
 }
 
 //**************************************************************************
-void upd65043gfu01_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void upd65043gfu01_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		s16 sample = 0;
 
@@ -244,6 +244,6 @@ void upd65043gfu01_device::sound_stream_update(sound_stream &stream, std::vector
 		if (!BIT(m_control, 4))
 			sample += m_pcm_buffer[m_pcm_buffer_read & 0x1ff];
 
-		outputs[0].put_int_clamp(i, sample, 1 << 10);
+		stream.put_int_clamp(0, i, sample, 1 << 10);
 	}
 }

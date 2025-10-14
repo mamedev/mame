@@ -225,17 +225,17 @@ GFXDECODE_END
 void carpolo_state::carpolo(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, XTAL(11'289'000)/12); // 940.75 kHz
+	M6502(config, m_maincpu, 11.289_MHz_XTAL / 12); // 940.75 kHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &carpolo_state::main_map);
 
-	pia6821_device &pia0(PIA6821(config, "pia0"));
+	pia6821_device &pia0(PIA6821(config, "pia0", 11.289_MHz_XTAL / 12));
 	pia0.readpb_handler().set(FUNC(carpolo_state::pia_0_port_b_r));
 	pia0.writepa_handler().set(FUNC(carpolo_state::pia_0_port_a_w));
 	pia0.writepb_handler().set(FUNC(carpolo_state::pia_0_port_b_w));
 	pia0.ca2_handler().set(FUNC(carpolo_state::coin1_interrupt_clear_w));
 	pia0.cb2_handler().set(FUNC(carpolo_state::coin2_interrupt_clear_w));
 
-	pia6821_device &pia1(PIA6821(config, "pia1"));
+	pia6821_device &pia1(PIA6821(config, "pia1", 11.289_MHz_XTAL / 12));
 	pia1.readpa_handler().set(FUNC(carpolo_state::pia_1_port_a_r));
 	pia1.readpb_handler().set(FUNC(carpolo_state::pia_1_port_b_r));
 	pia1.ca2_handler().set(FUNC(carpolo_state::coin3_interrupt_clear_w));
@@ -271,10 +271,7 @@ void carpolo_state::carpolo(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 239, 0, 255);
+	screen.set_raw(11.289_MHz_XTAL / 2, 336, 0, 240, 280, 0, 256);
 	screen.set_screen_update(FUNC(carpolo_state::screen_update));
 	screen.screen_vblank().set(FUNC(carpolo_state::screen_vblank));
 	screen.set_palette(m_palette);

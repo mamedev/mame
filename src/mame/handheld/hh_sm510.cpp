@@ -27,14 +27,14 @@ TODO:
   per segment, adding pwm_display_device right now has no added value
 - add nstarfox sound effect chip emulation
 - naltair IPT_DIAL should be 1-way, it's not supposed to rotate left
-- add svg screen for nsmb3, nsmw
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
   verification is wanted for: bassmate, gnw_bfightn, gnw_bjack, gnw_bsweep,
   gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
-  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda
+  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trtreisl,
+  trspacadv, vesarif, uchitari
 
 ================================================================================
 
@@ -139,7 +139,7 @@ Fire(FR-27), Octopus, Chef, Egg/Mickey Mouse, Donkey Kong Jr.(CJ-93),
 Spitball Sparky.
 
 The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
-КБ1013ВК1-2 for SM5A and КБ1013ВК4-2 for SM510.
+КБ1013ВК1-2 for SM5A, КБ1013ВК4-2 for SM510 and КБ1013ВК7-2 for SM511.
 
 *******************************************************************************/
 
@@ -155,6 +155,9 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 #include "hh_sm510_single.lh"
 #include "hh_sm510_dualv.lh"
 #include "hh_sm510_dualh.lh"
+#include "hh_sm510_tripleh.lh"
+
+#include "elbaskb.lh"
 
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
 #include "hh_sm500_test.lh" // "
@@ -216,7 +219,7 @@ void hh_sm510_state::machine_reset()
 // lcd panel - on lcd handhelds, usually not a generic x/y screen device
 // deflicker here, especially needed for SM500/SM5A with the active shift register
 
-TIMER_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
+void hh_sm510_state::update_display()
 {
 	u8 z_mask = (1 << m_display_z_len) - 1;
 	u8 zx_len = 1 << (m_display_x_len + m_display_z_len);
@@ -379,14 +382,6 @@ void hh_sm510_state::mcfg_cpu_sm5a(machine_config &config)
 	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
 }
 
-void hh_sm510_state::mcfg_cpu_kb1013vk12(machine_config &config)
-{
-	KB1013VK12(config, m_maincpu);
-	mcfg_cpu_common(config);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-}
-
 void hh_sm510_state::mcfg_cpu_sm510(machine_config &config)
 {
 	SM510(config, m_maincpu);
@@ -422,6 +417,9 @@ void hh_sm510_state::mcfg_cpu_sm530(machine_config &config)
 
 void hh_sm510_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
 {
+	if (width == 0 || height == 0)
+		return;
+
 	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(width, height);
@@ -445,14 +443,6 @@ void hh_sm510_state::mcfg_sound_r1(machine_config &config)
 void hh_sm510_state::sm5a_common(machine_config &config, u16 width, u16 height)
 {
 	mcfg_cpu_sm5a(config);
-	mcfg_sound_r1(config);
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	mcfg_svg_screen(config, width, height);
-}
-
-void hh_sm510_state::kb1013vk12_common(machine_config &config, u16 width, u16 height)
-{
-	mcfg_cpu_kb1013vk12(config);
 	mcfg_sound_r1(config);
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
 	mcfg_svg_screen(config, width, height);
@@ -492,6 +482,17 @@ void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 left
 	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
 
 	config.set_default_layout(layout_hh_sm510_dualh);
+}
+
+void hh_sm510_state::sm511_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight)
+{
+	mcfg_cpu_sm511(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
+	mcfg_svg_screen(config, middlewidth, middleheight, "screen_middle");
+	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
+
+	config.set_default_layout(layout_hh_sm510_tripleh);
 }
 
 void hh_sm510_state::dualv_common(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
@@ -593,7 +594,7 @@ static INPUT_PORTS_START( gnw_ball )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
@@ -668,7 +669,7 @@ static INPUT_PORTS_START( gnw_flagman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -727,7 +728,7 @@ static INPUT_PORTS_START( gnw_vermin )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_CONFNAME( 0x08, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x08, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
@@ -794,7 +795,7 @@ static INPUT_PORTS_START( gnw_fires )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
@@ -871,7 +872,7 @@ static INPUT_PORTS_START( gnw_judge )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Computer's Operation Time (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Increase Computer's Operation Time (Cheat)" ) // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -951,7 +952,7 @@ static INPUT_PORTS_START( gnw_manholeg )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -1010,7 +1011,7 @@ static INPUT_PORTS_START( gnw_helmet )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1089,7 +1090,7 @@ public:
 
 static INPUT_PORTS_START( gnw_lion )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Increase Speed (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x01, 0x00, "Increase Speed (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1112,7 +1113,7 @@ static INPUT_PORTS_START( gnw_lion )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -1167,7 +1168,7 @@ static INPUT_PORTS_START( gnw_pchute )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1239,7 +1240,7 @@ public:
 
 static INPUT_PORTS_START( gnw_octopus )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1274,7 +1275,7 @@ void gnw_octopus_state::gnw_octopus(machine_config &config)
 
 void gnw_octopus_state::taynyoke(machine_config &config)
 {
-	kb1013vk12_common(config, 1647, 1080); // R mask option confirmed
+	sm5a_common(config, 1647, 1080); // КБ1013ВК1-2, R mask option confirmed
 }
 
 // roms
@@ -1324,7 +1325,7 @@ public:
 
 static INPUT_PORTS_START( gnw_popeye )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1417,7 +1418,7 @@ static INPUT_PORTS_START( gnw_chef )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1431,7 +1432,7 @@ void gnw_chef_state::gnw_chef(machine_config &config)
 
 void gnw_chef_state::vespovar(machine_config & config)
 {
-	kb1013vk12_common(config, 1679, 1080); // R mask option confirmed
+	sm5a_common(config, 1679, 1080); // КБ1013ВК1-2, R mask option confirmed
 }
 
 // roms
@@ -1503,7 +1504,7 @@ static INPUT_PORTS_START( gnw_mmouse )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1574,7 +1575,7 @@ public:
 
 static INPUT_PORTS_START( gnw_fire )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1609,7 +1610,7 @@ void gnw_fire_state::gnw_fire(machine_config &config)
 
 void gnw_fire_state::kosmicmt(machine_config & config)
 {
-	kb1013vk12_common(config, 1673, 1080); // R mask option confirmed
+	sm5a_common(config, 1673, 1080); // КБ1013ВК1-2, R mask option confirmed
 }
 
 // roms
@@ -1676,12 +1677,12 @@ static INPUT_PORTS_START( gnw_tbridge )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1745,12 +1746,12 @@ static INPUT_PORTS_START( gnw_fireatk )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1814,12 +1815,12 @@ static INPUT_PORTS_START( gnw_stennis )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1883,12 +1884,12 @@ static INPUT_PORTS_START( gnw_opanic )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1959,7 +1960,7 @@ static INPUT_PORTS_START( gnw_dkong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2026,7 +2027,7 @@ static INPUT_PORTS_START( gnw_mickdon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2102,12 +2103,12 @@ static INPUT_PORTS_START( gnw_ghouse )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2178,7 +2179,7 @@ static INPUT_PORTS_START( gnw_dkong2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2245,12 +2246,12 @@ static INPUT_PORTS_START( gnw_mario )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2323,12 +2324,12 @@ static INPUT_PORTS_START( gnw_rshower )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2395,12 +2396,12 @@ static INPUT_PORTS_START( gnw_lboat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2467,12 +2468,12 @@ static INPUT_PORTS_START( gnw_pinball )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB -- this one multiplies scoring factor
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB -- this one multiplies scoring factor
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2610,12 +2611,12 @@ static INPUT_PORTS_START( gnw_squish )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2682,12 +2683,12 @@ static INPUT_PORTS_START( gnw_bsweep )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Controller keys skips level when activated
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)" ) // " -- Controller keys skips level when activated
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2756,12 +2757,12 @@ static INPUT_PORTS_START( gnw_sbuster )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2835,12 +2836,12 @@ static INPUT_PORTS_START( gnw_gcliff )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Left or right skips level when activated
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)" ) // " -- Left or right skips level when activated
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2914,12 +2915,12 @@ static INPUT_PORTS_START( gnw_zelda )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // " -- Invincibility when playing on bottom screen only
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // " -- Invincibility when playing on bottom screen only
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2995,12 +2996,12 @@ static INPUT_PORTS_START( gnw_mariocmt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3081,12 +3082,12 @@ static INPUT_PORTS_START( gnw_snoopyp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3160,12 +3161,12 @@ static INPUT_PORTS_START( gnw_popeyep )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives and Stronger Punch (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives and Stronger Punch (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3207,6 +3208,11 @@ ROM_END
 
   The tabletop version was also licensed to Coleco.
 
+  Also cloned by Elektronika(USSR) as Винни-Пух (Vinni-Pukh, i.e. Winnie the
+  Pooh) (model ИМ-12), with different LCD graphics.
+  * КБ1515ХМ3-2 9009 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511 (same ROM contents as CJ-93)
+
 *******************************************************************************/
 
 class gnw_dkjrp_state : public hh_sm510_state
@@ -3217,6 +3223,7 @@ public:
 	{ }
 
 	void gnw_dkjrp(machine_config &config);
+	void vinnpukh(machine_config &config);
 };
 
 // inputs
@@ -3242,12 +3249,12 @@ static INPUT_PORTS_START( gnw_dkjrp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3259,6 +3266,11 @@ void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
 	sm511_common(config, 1920, 1049);
 }
 
+void gnw_dkjrp_state::vinnpukh(machine_config &config)
+{
+	sm511_common(config, 1890, 1080); // 1638 x 936
+}
+
 // roms
 
 ROM_START( gnw_dkjrp )
@@ -3266,10 +3278,21 @@ ROM_START( gnw_dkjrp )
 	ROM_LOAD( "cj-93.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) ) // decap needed for verification
+	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(38946be7) SHA1(affdb8514d32dc9dbf2ccc1c4a0394e68ebc61cb) ) // decap needed for verification
 
 	ROM_REGION( 340751, "screen", 0)
 	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
+ROM_END
+
+ROM_START( vinnpukh )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "vinnpukh.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "vinnpukh.melody", 0x000, 0x100, BAD_DUMP CRC(38946be7) SHA1(affdb8514d32dc9dbf2ccc1c4a0394e68ebc61cb) ) // decap needed for verification
+
+	ROM_REGION( 193376, "screen", 0)
+	ROM_LOAD( "vinnpukh.svg", 0, 193376, CRC(69c4e5c5) SHA1(313f164706c3d24e2fc1363ff9730a21e5b1ca6c) )
 ROM_END
 
 
@@ -3314,12 +3337,12 @@ static INPUT_PORTS_START( gnw_mbaway )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3396,12 +3419,12 @@ static INPUT_PORTS_START( gnw_mmousep )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3490,12 +3513,12 @@ static INPUT_PORTS_START( gnw_dkjr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3560,12 +3583,12 @@ static INPUT_PORTS_START( gnw_mariocm )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3633,12 +3656,12 @@ static INPUT_PORTS_START( gnw_manhole )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3702,7 +3725,7 @@ static INPUT_PORTS_START( gnw_tfish )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3779,7 +3802,7 @@ static INPUT_PORTS_START( gnw_smb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3876,7 +3899,7 @@ static INPUT_PORTS_START( gnw_climber )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3975,7 +3998,7 @@ static INPUT_PORTS_START( gnw_bfight )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4058,7 +4081,7 @@ static INPUT_PORTS_START( gnw_mariotj )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4125,12 +4148,12 @@ static INPUT_PORTS_START( gnw_ssparky )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4194,12 +4217,12 @@ static INPUT_PORTS_START( gnw_cgrab )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Do not release crabs (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Do not release crabs (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4290,12 +4313,12 @@ static INPUT_PORTS_START( gnw_boxing )
 	PORT_INCLUDE( microvs_shared )
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4349,7 +4372,7 @@ static INPUT_PORTS_START( gnw_dkong3 )
 	PORT_INCLUDE( microvs_shared )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4403,12 +4426,12 @@ static INPUT_PORTS_START( gnw_dkhockey )
 	PORT_INCLUDE( microvs_shared )
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Any Goal Scores 10 Points (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Any Goal Scores 10 Points (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P2 Goals Scores No Points (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "P2 Goals Scores No Points (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4486,7 +4509,7 @@ static INPUT_PORTS_START( bassmate )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Skip Compute Animation (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Skip Compute Animation (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4524,7 +4547,7 @@ ROM_END
   * KB1013VK1-2 MCU
   * lcd screen with custom segments, 1-bit sound
 
-  In 1984, Электроника (Elektronika, USSR) released an unlicensed clone of
+  In 1983, Электроника (Elektronika, USSR) released an unlicensed clone of
   Nintendo G&W Egg: Ну, погоди! (Nu, pogodi!). This was followed by several other
   titles that were the same under the hood, only differing in graphics. They also
   made a slightly modified version, adding a new game mode (by pressing A+B)
@@ -4554,7 +4577,7 @@ ROM_END
   ИМ-32    Кот-рыболов         Kot-rybolov          -                   -
   ИМ-33    Квака-задавака      Kvaka-zadavaka       Frogling            -
   ИМ-49    Ночные воришки      Nochnye vorishki     Night Burglars      -
-  ИМ-50    Космический полёт   Kosmicheskiy polyot  Space Flight        Same Model ID as Весёлая арифметика (Amusing Arithmetic) which isn't emulated yet
+  ИМ-50    Космический полёт   Kosmicheskiy polyot  Space Flight        Same Model ID as Весёлая арифметика (Amusing Arithmetic)
   ИМ-51    Морская атака       Morskaya ataka       -                   -
   ИМ-53    Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
   -        Цирк                Circus (Tsirk)       -                   Unknown Model ID
@@ -4608,67 +4631,67 @@ INPUT_PORTS_END
 
 void nupogodi_state::nupogodi(machine_config &config)
 {
-	kb1013vk12_common(config, 1715, 1080); // R mask option ?
+	sm5a_common(config, 1715, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::ehockey(machine_config &config)
 {
-	kb1013vk12_common(config, 1782, 1080); // R mask option ?
+	sm5a_common(config, 1782, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::rkosmosa(machine_config &config)
 {
-	kb1013vk12_common(config, 1646, 1080); // R mask option ?
+	sm5a_common(config, 1646, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::okhota(machine_config &config)
 {
-	kb1013vk12_common(config, 1632, 1080); // R mask option ?
+	sm5a_common(config, 1632, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::biathlon(machine_config &config)
 {
-	kb1013vk12_common(config, 1633, 1080); // R mask option ?
+	sm5a_common(config, 1633, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::vfutbol(machine_config &config)
 {
-	kb1013vk12_common(config, 1655, 1080); // R mask option ?
+	sm5a_common(config, 1655, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::krybolov(machine_config &config)
 {
-	kb1013vk12_common(config, 1638, 1080); // R mask option ?
+	sm5a_common(config, 1638, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::kvakazad(machine_config &config)
 {
-	kb1013vk12_common(config, 1660, 1080); // R mask option ?
+	sm5a_common(config, 1660, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::nochnyev(machine_config &config)
 {
-	kb1013vk12_common(config, 1641, 1080); // R mask option ?
+	sm5a_common(config, 1641, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::kosmicpt(machine_config &config)
 {
-	kb1013vk12_common(config, 1658, 1080); // R mask option ?
+	sm5a_common(config, 1658, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::morataka(machine_config &config)
 {
-	kb1013vk12_common(config, 1648, 1080); // R mask option ?
+	sm5a_common(config, 1648, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::atakaast(machine_config &config)
 {
-	kb1013vk12_common(config, 1620, 1080); // R mask option ?
+	sm5a_common(config, 1620, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 void nupogodi_state::ecircus(machine_config &config)
 {
-	kb1013vk12_common(config, 1657, 1080); // R mask option ?
+	sm5a_common(config, 1657, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 // roms
@@ -4836,7 +4859,7 @@ INPUT_PORTS_END
 
 void auslalom_state::auslalom(machine_config &config)
 {
-	kb1013vk12_common(config, 1732, 1080); // R mask option ?
+	sm5a_common(config, 1732, 1080); // КБ1013ВК1-2, R mask option ?
 }
 
 // roms
@@ -4847,6 +4870,287 @@ ROM_START( auslalom )
 
 	ROM_REGION( 117520, "screen", 0)
 	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Баскетбол (Basketbol) (model ИМ-55)
+  * PCB label: ЕНСК.758726.002/3
+  * KB1013VK1-2 MCU
+  * 26 LEDs + 4 7seg LEDs, 1-bit sound
+
+  It's a LED game with an LCD driver MCU, that's unconventional.
+
+*******************************************************************************/
+
+class elbaskb_state : public hh_sm510_state
+{
+public:
+	elbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag),
+		m_digits(*this, "digit%u", 0U)
+	{ }
+
+	void elbaskb(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void update_display() override;
+
+private:
+	output_finder<4> m_digits;
+};
+
+void elbaskb_state::machine_start()
+{
+	hh_sm510_state::machine_start();
+	m_digits.resolve();
+}
+
+// handlers
+
+void elbaskb_state::update_display()
+{
+	hh_sm510_state::update_display();
+
+	// convert to digit segments
+	for (int i = 0; i < 4; i++)
+	{
+		u8 data = 0;
+		for (int seg = 0; seg < 7; seg++)
+		{
+			int x = ((i << 1) | (seg >> 2 ^ 1)) & 3;
+			int y = seg & 3;
+			int z = i >> 1 ^ 1;
+
+			data = data >> 1 | (m_out_x[x][y][z] ? 0x40 : 0);
+		}
+
+		m_digits[i] = data;
+	}
+}
+
+// inputs
+
+static INPUT_PORTS_START( elbaskb )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_COCKTAIL // Отбор
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Отбор
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x06, 0x02, DEF_STR( Difficulty ) ) PORT_CHANGED_CB(input_changed)
+	PORT_CONFSETTING(    0x02, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+INPUT_PORTS_END
+
+// config
+
+void elbaskb_state::elbaskb(machine_config &config)
+{
+	sm5a_common(config, 0, 0); // КБ1013ВК1-2, R mask option ?
+	config.set_default_layout(layout_elbaskb);
+}
+
+// roms
+
+ROM_START( elbaskb )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-55.bin", 0x0000, 0x0740, CRC(006f82d0) SHA1(aca582dcb387345cd09a08e42a954c43430772fc) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Весёлая арифметика (model ИМ-50) or Amusing Arithmetic (export
+  version, model MG-50)
+  * КБ1515ХМ3-2 9202 006 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511
+  * lcd screen with custom segments, 1-bit sound
+  * ROM signature: ALEXANDER GAGANOV, USSR, MOSCOW, 1990
+
+*******************************************************************************/
+
+class vesarif_state : public hh_sm510_state
+{
+public:
+	vesarif_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void vesarif(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( vesarif )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Start")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void vesarif_state::vesarif(machine_config &config)
+{
+	sm511_common(config, 1672, 1080); // 1326 x 856
+}
+
+// roms
+
+ROM_START( vesarif )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "vesarif.program", 0x0000, 0x1000, CRC(ae9053ef) SHA1(40dcda3616c9f430e04e20aef22e7db6b2b94f37) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "vesarif.melody", 0x000, 0x100, BAD_DUMP CRC(28fb8872) SHA1(18db11d27d8af2fddf8bba8080e05e2fa50b8215) ) // decap needed for verification
+
+	ROM_REGION( 81240, "screen", 0)
+	ROM_LOAD( "vesarif.svg", 0, 81240, CRC(27121109) SHA1(63d53e5718b1a014a5cfd7dffa5cb17469fa3182) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Учитель арифметики(?) (Uchitel' arifmetiki(?), model ???)
+  * КБ1515ХМ3-2 9108 001 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511
+  * lcd screen with custom segments, 1-bit sound
+  * ROM signature: ALEXANDER GAGANOV USSR, MOSCOW
+
+  There is no evidence of a real unit yet. Only two hardware parts are
+  available at the moment: PCB with chip, and LCD (in fact, there must have been
+  two PCBs; the other one was for the keypad, battery compartment and speaker).
+  Both parts were found in ruins of the factory in Vinnytsia (Ukraine) formerly
+  producing LCD games.
+
+  As the device did not come into mass production, it's considered to be
+  just a prototype. The game title is not fully determined. There is a reference
+  to a game called "Учитель арифметики" in the Микропроцессорные средства и
+  системы magazine (year 1990, number 4, page 38), and this reference was
+  taken as the most probable name for this game.
+
+*******************************************************************************/
+
+class uchitari_state : public hh_sm510_state
+{
+public:
+	uchitari_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void uchitari(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( uchitari )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("Evaluate Entry")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_CHANGED_CB(input_changed) PORT_NAME("Start Exam")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CHANGED_CB(input_changed) PORT_NAME("Evaluate Division Entries")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_CHANGED_CB(input_changed) PORT_NAME("Mode")
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x30, NOTEQUALS, 0x00) // Alarm / Exam Level
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // "0"/Minute
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_CB(input_changed) PORT_NAME("Clear entry / Correction")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x0c, NOTEQUALS, 0x00) // "1"/Hour
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // S7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("FAKE") // some of the buttons are presumed to be physically separate but electronically the same
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHANGED_CB(input_changed) PORT_NAME("Minute")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CHANGED_CB(input_changed) PORT_NAME("Hour")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_CHANGED_CB(input_changed) PORT_NAME("Exam Level")
+INPUT_PORTS_END
+
+// config
+
+void uchitari_state::uchitari(machine_config &config)
+{
+	sm511_common(config, 1520, 1080); // 1341 x 953
+}
+
+// roms
+
+ROM_START( uchitari )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "uchitari.program", 0x0000, 0x1000, CRC(1d2d7abb) SHA1(10d90f63813cddc5c986ed3942c64ee6d67f545e) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "uchitari.melody", 0x000, 0x100, BAD_DUMP CRC(28041942) SHA1(a36e246b215499b7392c28fddf1aad499016a480) ) // decap needed for verification
+
+	ROM_REGION( 98294, "screen", 0)
+	ROM_LOAD( "uchitari.svg", 0, 98294, CRC(f84b9d59) SHA1(a05713d571824d11f037b7592c0d280e418dc8b3) )
 ROM_END
 
 
@@ -5470,12 +5774,16 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Bill Elliott's NASCAR Racing (model 13010)
-  * PCB label: BH010
-  * Sharp SM511 under epoxy (die label KMS73B, 783)
+  Konami Bill Elliott's NASCAR Racing (model 13010), Chequered Flag
+  * PCB label:
+    BH010 (Bill Elliott's NASCAR Racing)
+    BH016 (Chequered Flag)
+  * Sharp SM511 under epoxy
+    die label KMS73B, 783 (Bill Elliott's NASCAR Racing)
   * lcd screen with custom segments, 1-bit sound
 
-  Chequered Flag is presumed to have the same MCU ROM.
+  Chequered Flag is presumed to have the same MCU ROM as Bill Elliott's NASCAR
+  Racing. The MCU was not decapped, so it's not 100% certain.
 
 *******************************************************************************/
 
@@ -5487,6 +5795,7 @@ public:
 	{ }
 
 	void knascar(machine_config &config);
+	void kchqflag(machine_config &config);
 };
 
 // inputs
@@ -5515,6 +5824,11 @@ void knascar_state::knascar(machine_config &config)
 	sm511_common(config, 1491, 1080);
 }
 
+void knascar_state::kchqflag(machine_config &config)
+{
+	sm511_common(config, 1482, 1080);
+}
+
 // roms
 
 ROM_START( knascar )
@@ -5522,12 +5836,22 @@ ROM_START( knascar )
 	ROM_LOAD( "783.program", 0x0000, 0x1000, CRC(0a08536a) SHA1(199203fad96e0d2b173b876b9746064b0c30dc7b) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f))
+	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f) )
 
 	ROM_REGION( 474061, "screen", 0)
 	ROM_LOAD( "knascar.svg", 0, 474061, CRC(d30f639a) SHA1(6fd061eda61f925a9f85cf5fb4b7024f15e1e1fe) )
 ROM_END
 
+ROM_START( kchqflag )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "783.program", 0x0000, 0x1000, CRC(0a08536a) SHA1(199203fad96e0d2b173b876b9746064b0c30dc7b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f) )
+
+	ROM_REGION( 439251, "screen", 0)
+	ROM_LOAD( "kchqflag.svg", 0, 439251, CRC(8d477ab1) SHA1(eb0fe02a4f285081f0fd422df17bca48498112de) )
+ROM_END
 
 
 
@@ -6315,13 +6639,13 @@ INPUT_PORTS_END
 
 void gamewatch_state::nsmb3(machine_config &config)
 {
-	sm530_common(config, 1000, 1000);
+	sm530_common(config, 1203, 1080);
 	config.set_default_layout(layout_hh_sm500_test);
 }
 
 void gamewatch_state::nsmw(machine_config &config)
 {
-	sm530_common(config, 1000, 1000);
+	sm530_common(config, 1190, 1080);
 	config.set_default_layout(layout_hh_sm500_test);
 }
 
@@ -6334,8 +6658,8 @@ ROM_START( nsmb3 )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "633.melody", 0x000, 0x100, CRC(98340c46) SHA1(94b5865fc669b7f6487845647866c06f4f581f63) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "nsmb3.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 373935, "screen", 0)
+	ROM_LOAD( "nsmb3.svg", 0, 373935, CRC(d3dd4ef9) SHA1(2e95bdf55b8ba050efbd8fd27442a1872d93685f) )
 ROM_END
 
 ROM_START( nsmw )
@@ -6345,8 +6669,8 @@ ROM_START( nsmw )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "636.melody", 0x000, 0x100, CRC(5df99e13) SHA1(98d5f78b5bcf59a232ccb5c61210568948c4501b) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "nsmw.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 401273, "screen", 0)
+	ROM_LOAD( "nsmw.svg", 0, 401273, CRC(72cb618d) SHA1(cecf9bb7ad21896c9a68ca606359f2b6f9c08d5d) )
 ROM_END
 
 
@@ -11300,6 +11624,11 @@ static INPUT_PORTS_START( trshutvoy )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("FAKE") // Up/Sound are electronically the same button
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
@@ -11377,7 +11706,7 @@ static INPUT_PORTS_START( trsrescue )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -11457,12 +11786,12 @@ static INPUT_PORTS_START( trsgkeep )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -11523,7 +11852,7 @@ public:
 
 static INPUT_PORTS_START( trspacmis )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -11585,6 +11914,198 @@ ROM_END
 
 /*******************************************************************************
 
+  Tronica: Space Adventure (model SA-12)
+  * PCB labels: SA-12 111182 32-523-1
+  * Sharp SM511 label 1112 237C TRONICA (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class trspacadv_state : public hh_sm510_state
+{
+public:
+	trspacadv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trspacadv(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trspacadv )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("3")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("7")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("=")
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_CHANGED_CB(input_changed) PORT_NAME("ALM")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_CHANGED_CB(input_changed) PORT_NAME("%")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CHANGED_CB(input_changed) PORT_NAME("C")
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Left/Sound
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire") // F
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // S7
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.7") // S8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_CHANGED_CB(input_changed) PORT_NAME("Mode")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("FAKE") // Left/Sound are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+INPUT_PORTS_END
+
+// config
+
+void trspacadv_state::trspacadv(machine_config &config)
+{
+	sm511_common(config, 1532, 1080);
+}
+
+// roms
+
+ROM_START( trspacadv )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "1112_237c.program", 0x0000, 0x1000, CRC(7c863fbc) SHA1(1c65f9f8166162c2cd203967ae3d0d49cc14baf7) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "1112_237c.melody", 0x000, 0x100, BAD_DUMP CRC(685a3305) SHA1(31b948dbd0fbae3517db505bc58904092c2b077f) ) // decap needed for verification
+
+	ROM_REGION( 117824, "screen", 0)
+	ROM_LOAD( "trspacadv.svg", 0, 117824, CRC(5b7c7f28) SHA1(3851eb2221660a33c521bbd3b01d7a76a558d07c) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tronica Treasure Island (model TI-31)
+  * PCB labels: TI-31 160383 32-537-1
+  * Sharp SM511 label 1113 239B TRONICA (no decap)
+  * horizontal triple lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class trtreisl_state : public hh_sm510_state
+{
+public:
+	trtreisl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trtreisl(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trtreisl )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Button/Hour
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Min")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x00, "Score Booster (Cheat)" ) // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("FAKE") // SJP and Hour are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Start/Jump/Pick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Hour")
+INPUT_PORTS_END
+
+// config
+
+void trtreisl_state::trtreisl(machine_config &config)
+{
+	sm511_tripleh(config, 525, 675, 870, 675, 525, 675); // 1555 x 547
+}
+
+// roms
+
+ROM_START( trtreisl )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "1113_239b.program", 0x0000, 0x1000, CRC(fec16266) SHA1(f2725a077cff9dbed9cd324ff802d10dcbdb4451) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "1113_239b.melody", 0x000, 0x100, BAD_DUMP CRC(2de3f974) SHA1(17e7a3947a457580efefa544c3132e93e20cbc71) ) // decap needed for verification
+
+	ROM_REGION( 59803, "screen_left", 0)
+	ROM_LOAD( "trtreisl_left.svg", 0, 59803, CRC(92f5f11e) SHA1(fdf8edf7742d2e0d2893e2226872c897e966f64e) )
+
+	ROM_REGION( 94316, "screen_middle", 0)
+	ROM_LOAD( "trtreisl_middle.svg", 0, 94316, CRC(adcf5308) SHA1(0c7932e4ba7a3daba24f0ff385c21035b86f4e23) )
+
+	ROM_REGION( 46905, "screen_right", 0)
+	ROM_LOAD( "trtreisl_right.svg", 0, 46905, CRC(26e6b4bd) SHA1(7469f2d5291f20621dc3f2b7f260cf4b4681f95b) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Tronica: Diver's Adventure (model DA-37), Clever Chicken (model CC-38V)
   * PCB labels: DA-37 260383 32-541-1 (DA-37)
                 CC38V 210483 32-545-1 (CC-38V)
@@ -11624,7 +12145,7 @@ static INPUT_PORTS_START( trdivadv )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -11854,10 +12375,10 @@ SYST( 1984, gnw_dkhockey, 0,           0,      gnw_dkhockey, gnw_dkhockey, gnw_d
 // Nintendo G&W hardware licensed to other companies (not part of G&W series)
 SYST( 1984, bassmate,     0,           0,      bassmate,     bassmate,     bassmate_state,     empty_init, "Telko / Nintendo", "Bassmate Computer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-// Elektronika (mostly G&W clones)
+// Elektronika (G&W clones)
 SYST( 1988, taynyoke,     gnw_octopus, 0,      taynyoke,     gnw_octopus,  gnw_octopus_state,  empty_init, "bootleg (Elektronika)", "Tayny okeana", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, vespovar,     gnw_chef,    0,      vespovar,     gnw_chef,     gnw_chef_state,     empty_init, "bootleg (Elektronika)", "Vesyolyy povar", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1984, nupogodi,     gnw_mmouse,  0,      nupogodi,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, nupogodi,     gnw_mmouse,  0,      nupogodi,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1988, ehockey,      gnw_mmouse,  0,      ehockey,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, rkosmosa,     gnw_mmouse,  0,      rkosmosa,     rkosmosa,     nupogodi_state,     empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, okhota,       gnw_mmouse,  0,      okhota,       gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -11872,7 +12393,13 @@ SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   nupog
 SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      nupogodi_state,     empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 199?, vinnpukh,     gnw_dkjrp,   0,      vinnpukh,     gnw_dkjrp,    gnw_dkjrp_state,    empty_init, "bootleg (Elektronika)", "Vinni-Pukh", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+// Elektronika (original)
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 199?, elbaskb,      0,           0,      elbaskb,      elbaskb,      elbaskb_state,      empty_init, "Elektronika", "Basketbol (Elektronika)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, vesarif,      0,           0,      vesarif,      vesarif,      vesarif_state,      empty_init, "Elektronika", "Vesolaya arifmetika", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, uchitari,     0,           0,      uchitari,     uchitari,     uchitari_state,     empty_init, "Elektronika", "Uchitel' arifmetiki (prototype?)", MACHINE_SUPPORTS_SAVE )
 
 // Konami
 SYST( 1989, kdribble,     0,           0,      kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -11885,6 +12412,7 @@ SYST( 1990, kbilly,       0,           0,      kbilly,       kbilly,       kbill
 SYST( 1990, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "The Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, knascar,      0,           0,      knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kchqflag,     knascar,     0,      kchqflag,     knascar,      knascar_state,      empty_init, "Konami", "Chequered Flag (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kblades,      0,           0,      kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, ktmnt2,       0,           0,      ktmnt2,       ktmnt2,       ktmnt2_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles II: Splinter Speaks (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 SYST( 1990, knfl,         0,           0,      knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -11896,8 +12424,8 @@ SYST( 1991, kbucky,       0,           0,      kbucky,       kbucky,       kbuck
 SYST( 1991, kgarfld,      0,           0,      kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nelsonic Game Watch series
-SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, nstarfox,     0,           0,      nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 
 // Tiger 7-xxx/78-xxx models
@@ -11970,6 +12498,8 @@ SYST( 1983, trthuball,    trsrescue,   0,      trthuball,    trsrescue,    trsre
 SYST( 1983, trsgkeep,     0,           0,      trsgkeep,     trsgkeep,     trsgkeep_state,     empty_init, "Tronica", "Super Goal Keeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspacmis,    0,           0,      trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspider,     trspacmis,   0,      trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, trspacadv,    0,           0,      trspacadv,    trspacadv,    trspacadv_state,    empty_init, "Tronica", "Space Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trtreisl,     0,           0,      trtreisl,     trtreisl,     trtreisl_state,     empty_init, "Tronica", "Treasure Island (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1983, trdivadv,     0,           0,      trdivadv,     trdivadv,     trdivadv_state,     empty_init, "Tronica", "Diver's Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1983, trclchick,    trdivadv,    0,      trclchick,    trclchick,    trdivadv_state,     empty_init, "Tronica", "Clever Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

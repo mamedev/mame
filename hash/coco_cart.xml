@@ -388,7 +388,8 @@ Bearing off before all checkers are in last quadrant puts game in a non working 
 		<description>Color LOGO</description>
 		<year>1983</year>
 		<publisher>Tandy</publisher>
-		<info name="developer" value="Larry Kheriaty &amp; George Gerhold" />
+		<info name="developer" value="Larry Kheriaty" />
+		<info name="developer" value="George Gerhold" />
 		<info name="serial" value="26-2722" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
@@ -403,7 +404,8 @@ Bearing off before all checkers are in last quadrant puts game in a non working 
 		<year>1983</year>
 		<publisher>Tandy</publisher>
 		<!-- MicroPi and Socatra -->
-		<info name="developer" value="Larry Kheriaty &amp; George Gerhold" />
+		<info name="developer" value="Larry Kheriaty" />
+		<info name="developer" value="George Gerhold" />
 		<info name="serial" value="26-8722" />
 		<info name="language" value="French" />
 		<part name="cart" interface="coco_cart">
@@ -1294,7 +1296,8 @@ Laggy keyboard presses (verify)
 		<description>Super LOGO</description>
 		<year>1984</year>
 		<publisher>Tandy</publisher>
-		<info name="developer" value="Larry Kheriaty &amp; George Gerhold" />
+		<info name="developer" value="Larry Kheriaty" />
+		<info name="developer" value="George Gerhold" />
 		<info name="serial" value="26-2717" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">

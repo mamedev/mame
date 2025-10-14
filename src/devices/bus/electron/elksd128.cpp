@@ -10,43 +10,51 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "elksd128.h"
 
+#include "bus/vcs_ctrl/ctrl.h"
 #include "machine/spi_sdcard.h"
 
 
 namespace {
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-class electron_elksd128_device:
-	public device_t,
-	public device_electron_expansion_interface
+class electron_elksd128_device
+	: public device_t
+	, public device_electron_expansion_interface
 {
 public:
-	// construction/destruction
-	electron_elksd128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_elksd128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, ELECTRON_ELKSD128, tag, owner, clock)
+		, device_electron_expansion_interface(mconfig, *this)
+		, m_flash(*this, "flash")
+		, m_sdcard(*this, "sdcard")
+		, m_joy(*this, "joy")
+		, m_romsel(0)
+		, m_adc_channel(0)
+		, m_swr_lock(0)
+		, m_spi_clock_state(false)
+		, m_spi_clock_sysclk(false)
+		, m_spi_clock_cycles(0)
+	{
+	}
 
 protected:
-	// device_t implementation
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	// device_electron_expansion_interface implementation
 	virtual uint8_t expbus_r(offs_t offset) override;
 	virtual void expbus_w(offs_t offset, uint8_t data) override;
 
 private:
 	required_memory_region m_flash;
 	required_device<spi_sdcard_device> m_sdcard;
-	required_ioport m_joy;
+	required_device<vcs_control_port_device> m_joy;
 
 	uint8_t m_romsel;
 	uint8_t m_adc_channel;
@@ -66,34 +74,20 @@ private:
 };
 
 
-static INPUT_PORTS_START( elksd128 )
-	PORT_START("JOY")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Fire")
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
-INPUT_PORTS_END
-
 //-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-ioport_constructor electron_elksd128_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( elksd128 );
-}
-
-
-//-------------------------------------------------
-//  ROM( elksd128 )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START( elksd128 )
 	ROM_REGION(0x80000, "flash", 0)
 	ROM_LOAD("esd12815.rom", 0x0000, 0x80000, CRC(3ecf23ce) SHA1(d552149fec6a1deec2b75c740092bd311d67046f))
 ROM_END
+
+const tiny_rom_entry *electron_elksd128_device::device_rom_region() const
+{
+	return ROM_NAME( elksd128 );
+}
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -104,39 +98,10 @@ void electron_elksd128_device::device_add_mconfig(machine_config &config)
 	SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_in_bit = state; });
+
+	VCS_CONTROL_PORT(config, m_joy, vcs_control_port_devices, "joy");
 }
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *electron_elksd128_device::device_rom_region() const
-{
-	return ROM_NAME( elksd128 );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  electron_elksd128_device - constructor
-//-------------------------------------------------
-
-electron_elksd128_device::electron_elksd128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_ELKSD128, tag, owner, clock)
-	, device_electron_expansion_interface(mconfig, *this)
-	, m_flash(*this, "flash")
-	, m_sdcard(*this, "sdcard")
-	, m_joy(*this, "JOY")
-	, m_romsel(0)
-	, m_adc_channel(0)
-	, m_swr_lock(0)
-	, m_spi_clock_state(false)
-	, m_spi_clock_sysclk(false)
-	, m_spi_clock_cycles(0)
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -209,17 +174,17 @@ uint8_t electron_elksd128_device::expbus_r(offs_t offset)
 				switch (m_adc_channel)
 				{
 				case 0x04:
-					if (!BIT(m_joy->read(), 3))
+					if (!BIT(m_joy->read_joy(), 3))
 						data = 0x00;
-					else if (!BIT(m_joy->read(), 2))
+					else if (!BIT(m_joy->read_joy(), 2))
 						data = 0xff;
 					else
 						data = 0x80;
 					break;
 				case 0x05:
-					if (!BIT(m_joy->read(), 1))
+					if (!BIT(m_joy->read_joy(), 1))
 						data = 0x00;
-					else if (!BIT(m_joy->read(), 0))
+					else if (!BIT(m_joy->read_joy(), 0))
 						data = 0xff;
 					else
 						data = 0x80;
@@ -232,7 +197,7 @@ uint8_t electron_elksd128_device::expbus_r(offs_t offset)
 				break;
 
 			case 0xfc72: // Plus 1 joystick and ADC status
-				data = 0xaf | (m_joy->read() & 0x10);
+				data = 0xaf | (BIT(m_joy->read_joy(), 5) << 4);
 				break;
 
 			case 0xfc80: // SPI controller data port
@@ -248,11 +213,11 @@ uint8_t electron_elksd128_device::expbus_r(offs_t offset)
 				break;
 
 			case 0xfcc0: // First Byte interface
-				data = m_joy->read() | 0xe0;
+				data = bitswap<8>(m_joy->read_joy(), 7, 6, 4, 5, 3, 2, 1, 0);
 				break;
 
 			case 0xfcd0: // Slogger interface
-				data = m_joy->read() | 0xe0;
+				data = bitswap<8>(m_joy->read_joy(), 7, 6, 4, 5, 3, 2, 1, 0);
 				break;
 			}
 			break;
@@ -364,9 +329,5 @@ TIMER_CALLBACK_MEMBER(electron_elksd128_device::spi_clock)
 
 } // anonymous namespace
 
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(ELECTRON_ELKSD128, device_electron_expansion_interface, electron_elksd128_device, "electron_elksd128", "ElkSD128 Electron SD Interface")

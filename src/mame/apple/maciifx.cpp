@@ -449,11 +449,10 @@ void maciifx_state::maciifx(machine_config &config)
 	m_scsidma->set_maincpu_tag("maincpu");
 	m_scsidma->write_irq().set(FUNC(maciifx_state::oss_interrupt<9>));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
-	m_asc->add_route(0, "lspeaker", 1.0);
-	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->add_route(0, "speaker", 1.0, 0);
+	m_asc->add_route(1, "speaker", 1.0, 1);
 	m_asc->irqf_callback().set(FUNC(maciifx_state::oss_interrupt<8>));
 
 	R65NC22(config, m_via1, C7M / 10);
@@ -472,8 +471,8 @@ void maciifx_state::maciifx(machine_config &config)
 	sccpic.hint_callback().set(FUNC(maciifx_state::oss_interrupt<7>));
 
 	m_scc->out_int_callback().set("sccpic", FUNC(applepic_device::pint_w));
-	m_scc->out_wreqa_callback().set("sccpic", FUNC(applepic_device::reqa_w));
-	m_scc->out_wreqb_callback().set("sccpic", FUNC(applepic_device::reqb_w));
+	m_scc->out_wreqa_callback().set("sccpic", FUNC(applepic_device::reqa_w)).invert();
+	m_scc->out_wreqb_callback().set("sccpic", FUNC(applepic_device::reqb_w)).invert();
 
 	applepic_device &swimpic(APPLEPIC(config, "swimpic", C15M));
 	swimpic.prd_callback().set(m_fdc, FUNC(applefdintf_device::read));

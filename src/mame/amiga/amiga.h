@@ -416,8 +416,8 @@ public:
 	uint16_t m_genlock_color = 0;
 
 	/* separate 6 in-order bitplanes into 2 x 3-bit bitplanes in two nibbles */
-	// FIXME: we instantiate 256 entries so that it pleases AGA
-	uint8_t m_separate_bitplanes[2][256];
+	// AGA adds extra complexity with PF2OFx, so we need to instantiate at init time
+	std::vector<uint8_t> m_separate_bitplanes[2];
 
 	/* aga */
 	int m_aga_diwhigh_written = 0;
@@ -428,12 +428,17 @@ public:
 	uint16_t m_aga_sprdatb[8][4]{};
 	int m_aga_sprite_fetched_words = 0;
 	int m_aga_sprite_dma_used_words[8]{};
+	uint16_t m_aga_clxcon2;
 
+	void video_start_common();
 	DECLARE_VIDEO_START( amiga );
 	DECLARE_VIDEO_START( amiga_aga );
 	void amiga_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	bool get_screen_standard();
+	int get_screen_vblank_line();
 	void update_screenmode();
 
 	TIMER_CALLBACK_MEMBER( scanline_callback );
@@ -628,6 +633,9 @@ protected:
 	void bplcon0_w(u16 data);
 	void aga_bplcon0_w(u16 data);
 
+	// TODO: move to Lisa
+	void clxcon2_w(u16 data);
+
 private:
 	// blitter helpers
 	uint32_t blit_ascending();
@@ -652,7 +660,8 @@ private:
 	void render_scanline(bitmap_rgb32 &bitmap, int scanline);
 
 	// AGA video helpers
-	void aga_palette_write(int color_reg, uint16_t data);
+	u16 aga_palette_read(offs_t color_reg);
+	void aga_palette_write(offs_t color_reg, uint16_t data);
 	void aga_fetch_sprite_data(int scanline, int sprite);
 	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
 	void aga_update_sprite_dma(int scanline, int num);

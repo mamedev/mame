@@ -9,17 +9,57 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "dvk_kgd.h"
 
 #include "emupal.h"
+#include "screen.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(DVK_KGD, dvk_kgd_device, "kgd", "DVK KGD framebuffer")
+static constexpr int KGDCR_WR = 0140000;
+static constexpr int KGDDR_WR = 0000377;
+static constexpr int KGDAR_WR = 0037777;
+static constexpr int KGDCT_WR = 0037777;
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+// ======================> dvk_kgd_device
+
+class dvk_kgd_device : public device_t,
+					public device_qbus_card_interface
+{
+public:
+	// construction/destruction
+	dvk_kgd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	bool m_installed;
+
+	required_device<screen_device> m_screen;
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	std::unique_ptr<uint8_t[]> m_videoram_base;
+	uint8_t *m_videoram;
+
+	uint16_t m_cr;
+	uint16_t m_dr;
+	uint16_t m_ar;
+	uint16_t m_ct;
+};
 
 
 //**************************************************************************
@@ -33,6 +73,7 @@ DEFINE_DEVICE_TYPE(DVK_KGD, dvk_kgd_device, "kgd", "DVK KGD framebuffer")
 dvk_kgd_device::dvk_kgd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DVK_KGD, tag, owner, clock)
 	, device_qbus_card_interface(mconfig, *this)
+	, m_installed(false)
 	, m_screen(*this, "screen")
 {
 }
@@ -80,10 +121,8 @@ void dvk_kgd_device::device_add_mconfig(machine_config &config)
 
 void dvk_kgd_device::device_start()
 {
-	m_bus->install_device(0176640, 0176647, read16sm_delegate(*this, FUNC(dvk_kgd_device::read)),
-		write16sm_delegate(*this, FUNC(dvk_kgd_device::write)));
-
 	// save state
+	save_item(NAME(m_installed));
 	save_item(NAME(m_cr));
 	save_item(NAME(m_dr));
 	save_item(NAME(m_ar));
@@ -91,6 +130,8 @@ void dvk_kgd_device::device_start()
 
 	m_videoram_base = std::make_unique<uint8_t[]>(16384);
 	m_videoram = m_videoram_base.get();
+
+	m_installed = false;
 }
 
 
@@ -100,6 +141,12 @@ void dvk_kgd_device::device_start()
 
 void dvk_kgd_device::device_reset()
 {
+	if (!m_installed)
+	{
+		m_bus->install_device(0176640, 0176647, read16sm_delegate(*this, FUNC(dvk_kgd_device::read)),
+			write16sm_delegate(*this, FUNC(dvk_kgd_device::write)));
+		m_installed = true;
+	}
 	m_cr = m_dr = m_ar = m_ct = 0;
 }
 
@@ -161,3 +208,12 @@ void dvk_kgd_device::write(offs_t offset, uint16_t data)
 		break;
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(DVK_KGD, device_qbus_card_interface, dvk_kgd_device, "dvk_kgd", "DVK KGD framebuffer")

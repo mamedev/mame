@@ -1789,8 +1789,7 @@ void itech32_state::base_devices(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(itech32_state::generate_int1));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ES5506(config, m_ensoniq, SOUND_CLOCK);
 	m_ensoniq->set_region0("ensoniq.0");
@@ -1798,8 +1797,8 @@ void itech32_state::base_devices(machine_config &config)
 	m_ensoniq->set_region2("ensoniq.2");
 	m_ensoniq->set_region3("ensoniq.3");
 	m_ensoniq->set_channels(1);               // channels
-	m_ensoniq->add_route(0, "rspeaker", 0.1); // swapped stereo
-	m_ensoniq->add_route(1, "lspeaker", 0.1);
+	m_ensoniq->add_route(0, "speaker", 0.1, 1); // swapped stereo
+	m_ensoniq->add_route(1, "speaker", 0.1, 0);
 }
 
 void itech32_state::via(machine_config &config)
@@ -1868,12 +1867,13 @@ void drivedge_state::drivedge(machine_config &config)
 
 	m_screen->screen_vblank().set_nop(); // interrupt not used?
 
-	SPEAKER(config, "left_back").front_left();   // Sound PCB has hook-ups & AMPs for 5 channels
-	SPEAKER(config, "right_back").front_right(); // As per Sound Tests Menu: Left Front, Right Front, Left Rear, Right Rear, Under Seat
+	// Sound PCB has hook-ups & AMPs for 5 channels
+	// As per Sound Tests Menu: Left Front, Right Front, Left Rear, Right Rear, Under Seat
+	SPEAKER(config, "back", 2).rear();
 
 	m_ensoniq->set_channels(2);
-	m_ensoniq->add_route(2, "right_back", 0.1);  // swapped stereo
-	m_ensoniq->add_route(3, "left_back", 0.1);
+	m_ensoniq->add_route(2, "back", 0.1, 1);  // swapped stereo
+	m_ensoniq->add_route(3, "back", 0.1, 0);
 }
 
 void shoottv_state::shoottv(machine_config &config)

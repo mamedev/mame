@@ -2078,10 +2078,9 @@ void segas1x_bootleg_state::z80_ym2151(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_io_map);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
+	YM2151(config, "ymsnd", 4000000).add_route(0, "speaker", 0.32, 0).add_route(1, "speaker", 0.32, 1);
 }
 
 void segas1x_bootleg_state::sound_cause_nmi(int state)
@@ -2097,15 +2096,14 @@ void segas1x_bootleg_state::z80_ym2151_upd7759(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_7759_io_map);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
+	YM2151(config, "ymsnd", 4000000).add_route(0, "speaker", 0.32, 0).add_route(1, "speaker", 0.32, 1);
 
 	UPD7759(config, m_upd7759);
 	m_upd7759->drq().set(FUNC(segas1x_bootleg_state::sound_cause_nmi));
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.48);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.48);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.48, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.48, 1);
 }
 
 void segas1x_bootleg_state::datsu_ym2151_msm5205(machine_config &config)
@@ -2119,16 +2117,15 @@ void segas1x_bootleg_state::datsu_ym2151_msm5205(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tturfbl_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::tturfbl_sound_io_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
+	YM2151(config, "ymsnd", 4000000).add_route(0, "speaker", 0.32, 0).add_route(1, "speaker", 0.32, 1);
 
 	MSM5205(config, m_msm, 220000);
 	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::tturfbl_msm5205_callback));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
-	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 void segas1x_bootleg_state::datsu_2x_ym2203_msm5205(machine_config &config)
@@ -2458,22 +2455,21 @@ void segas1x_bootleg_state::system18(machine_config &config)
 	m_sprites->set_local_originx(64);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym3438_device &ym3438_0(YM3438(config, "3438.0", 8000000));
-	ym3438_0.add_route(0, "lspeaker", 0.40);
-	ym3438_0.add_route(1, "rspeaker", 0.40);
+	ym3438_0.add_route(0, "speaker", 0.40, 0);
+	ym3438_0.add_route(1, "speaker", 0.40, 1);
 
 	ym3438_device &ym3438_1(YM3438(config, "3438.1", 8000000));
-	ym3438_1.add_route(0, "lspeaker", 0.40);
-	ym3438_1.add_route(1, "rspeaker", 0.40);
+	ym3438_1.add_route(0, "speaker", 0.40, 0);
+	ym3438_1.add_route(1, "speaker", 0.40, 1);
 
 	rf5c68_device &rf5c68(RF5C68(config, "5c68", 8000000));
-	rf5c68.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	rf5c68.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	rf5c68.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	rf5c68.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	rf5c68.set_addrmap(0, &segas1x_bootleg_state::pcm_map);
 }
 
@@ -2530,8 +2526,8 @@ void segas1x_bootleg_state::shdancbl(machine_config &config)
 	MSM5205(config, m_msm, 200000);
 	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::shdancbl_msm5205_callback));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
-	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 void segas1x_bootleg_state::shdancbla(machine_config &config)
@@ -2549,8 +2545,8 @@ void segas1x_bootleg_state::shdancbla(machine_config &config)
 	MSM5205(config, m_msm, 200000);
 	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::shdancbl_msm5205_callback));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
-	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 
@@ -2827,11 +2823,11 @@ ROM_START( wb3bble )  /*  Appears to be a pre-system 16 bootleg with encryption 
 	ROM_LOAD16_BYTE( "epr12093.b4", 0x60001, 0x010000, CRC(4891e7bb) SHA1(1be04fcabe9bfa8cf746263a5bcca67902a021a0) ) // 12- ic71
 	ROM_LOAD16_BYTE( "epr12097.b8", 0x60000, 0x010000, CRC(e645902c) SHA1(497cfcf6c25cc2e042e16dbcb1963d2223def15a) ) // 16- ic103
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "a-1 ic68", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU code */
-	ROM_LOAD( "d8749h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "d8749h.mcu", 0x000, 0x800, CRC(4d4fa98d) SHA1(3c1500e7d008232a0eac8394a8d077e159aa43d1) )
 ROM_END
 
 /******************************
@@ -3689,7 +3685,10 @@ ROM_START( ddcrewbl )
 	ROM_LOAD16_BYTE( "13.bin", 0x200000, 0x20000, CRC(0033fe50) SHA1(3f29db7ddcfb5b6d6dfdd500d6541ac6018974ca) )
 	ROM_LOAD16_BYTE( "17.bin", 0x200001, 0x20000, CRC(bbb43241) SHA1(7a2955c59c39e9e214f15a842d3bc94d7a1095f3) )
 	ROM_LOAD16_BYTE( "14.bin", 0x240000, 0x20000, CRC(8780712e) SHA1(05ab2f7b108e0ae139237665da14f33132fb555e) )
-	ROM_LOAD16_BYTE( "18.bin", 0x240001, 0x20000, CRC(94b69d68) SHA1(e49ac664f4a5576737db9b9a7eee34b8c5fcd333))
+	ROM_LOAD16_BYTE( "18.bin", 0x240001, 0x20000, CRC(94b69d68) SHA1(e49ac664f4a5576737db9b9a7eee34b8c5fcd333) )
+
+	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "pic16c57", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, "tiles", 0 ) // same as original
 	ROM_LOAD( "fac-03.bin", 0x00000, 0x40000, CRC(2228cd88) SHA1(5774bb6a401c3da05c5f3c9d3996b20bb3713cb2) )
@@ -3709,13 +3708,49 @@ ROM_START( ddcrewbl )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "fac-12.bin", 0x00000, 0x80000, CRC(2e7dade2) SHA1(4133138990ed10f56e299399f034f86ffd9cbd47) )
 
-	ROM_REGION( 0x100000, "proms", 0 )
+	ROM_REGION( 0x120, "proms", 0 )
 	ROM_LOAD( "82s123.bin", 0x000, 0x020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
-	ROM_LOAD( "82s129.bin", 0x000, 0x100, CRC(00b5c4c4) SHA1(acab51ad861b25edf310b9b903a7fc486daaee4b) )
+	ROM_LOAD( "82s129.bin", 0x020, 0x100, CRC(00b5c4c4) SHA1(acab51ad861b25edf310b9b903a7fc486daaee4b) )
 
-	ROM_REGION( 0x100000, "gals", 0 )
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8-1.bin", 0x000, 0x117, CRC(64892ee8) SHA1(c7ea077aead5934d95d61f82bdf705dc0cb0e8e4) )
-	ROM_LOAD( "gal16v8-2.bin", 0x000, 0x117, CRC(22133a8f) SHA1(0b5bc074cfe88c0631df63e0c0a733c660d73af0) )
+	ROM_LOAD( "gal16v8-2.bin", 0x200, 0x117, CRC(22133a8f) SHA1(0b5bc074cfe88c0631df63e0c0a733c660d73af0) )
+ROM_END
+
+ROM_START( cltchitrbl ) // same PCB as ddcrewbl
+	ROM_REGION( 0x400000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "5.prg", 0x000000, 0x40000, CRC(78c7a606) SHA1(788604eadd29810071411dad8537aab2d68caeb7) )
+	ROM_LOAD16_BYTE( "7.prg", 0x000001, 0x40000, CRC(dd7062a2) SHA1(6ddd686ece17840d69c7bdc1305f2ff25f88fc3d) )
+	ROM_LOAD16_BYTE( "6.prg", 0x200000, 0x10000, CRC(d62845fc) SHA1(92bd3b2a6f9e78c1a1e93e6f8ea887ab2fd440c3) ) // x1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "8.prg", 0x200001, 0x10000, CRC(bd0d1c7d) SHA1(6a3d2740e0547ad634dc5cac5e00b5ad877d0b55) ) // x1xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "pic16c57", 0x0000, 0x1000, NO_DUMP )
+
+
+	ROM_REGION( 0xc0000, "tiles", 0 ) // same as original, but for very minor differences in 1.gfx1
+	ROM_LOAD( "3.gfx1", 0x000000, 0x40000, CRC(0451f5f3) SHA1(5069edddf29a8190a73dc467b91ffcb80348aff6) )
+	ROM_LOAD( "2.gfx1", 0x040000, 0x40000, CRC(d7bd63fe) SHA1(ea5cf70db1303dd4564215fde824305637b97d05) )
+	ROM_LOAD( "1.gfx1", 0x080000, 0x40000, CRC(3b961344) SHA1(9eda23942cf809a520b555cf5ef4bead5850d66e) )
+
+	ROM_REGION16_BE( 0x800000, "sprites", 0 ) // same as original
+	ROM_LOAD16_BYTE( "9.gfx2",  0x000001, 0x80000, CRC(c707f416) SHA1(e6a9d89849f7f1c303a3ca29a629f81397945a2d) )
+	ROM_LOAD16_BYTE( "12.gfx2", 0x000000, 0x80000, CRC(f05c68c6) SHA1(b6a0535b6c734a0c89fdb6506c32ffe6ab3aa8cd) )
+	ROM_LOAD16_BYTE( "10.gfx2", 0x200001, 0x80000, CRC(a4c341e0) SHA1(15a0b5a42b56465a7b7df98968cc2ed177ce6f59) )
+	ROM_LOAD16_BYTE( "13.gfx2", 0x200000, 0x80000, CRC(0106fea6) SHA1(e16e2a469ecbbc704021dee6264db30aa0898368) )
+	ROM_LOAD16_BYTE( "11.gfx2", 0x400001, 0x80000, CRC(f33b13af) SHA1(d3eb64dcf12d532454bf3cd6c86528c0f11ee316) )
+	ROM_LOAD16_BYTE( "14.gfx2", 0x400000, 0x80000, CRC(09ba8835) SHA1(72e83dd1793a7f4b2b881e71f262493e3d4992b3) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "4.oki", 0x00000, 0x80000, CRC(f8108a95) SHA1(404824169d1a226bcb2c5837cfd3036568f6cd38) )
+
+	ROM_REGION( 0x120, "proms", 0 )
+	ROM_LOAD( "82s123.bin", 0x000, 0x020, NO_DUMP )
+	ROM_LOAD( "82s129.bin", 0x020, 0x100, NO_DUMP )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8-1.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8-2.bin", 0x200, 0x117, NO_DUMP )
 ROM_END
 
 // bootleg PCB stickered 'Impeuropex Corp.' (an Italian manufacturer) and 'garanzia 6 mesi dal 30.OTT.1991' (6 months guarantee from 30 Oct. 1991)
@@ -3747,7 +3782,7 @@ ROM_START( bloxeedbl )
 	ROM_LOAD( "23.ic4", 0x40000, 0x20000, CRC(2b2c3d8b) SHA1(543f622e7139c22bc491583cbb276acfc827b5d0) ) // ds40986 (27c010)
 	ROM_LOAD( "24.ic5", 0x60000, 0x20000, CRC(107b141b) SHA1(e3fe19b4c7ba8ff60638df17dc4ae50f42a6b024) ) // ds40986 (27c010)
 
-	ROM_REGION( 0x100000, "proms", 0 )
+	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "82s129.ic32", 0x000, 0x0100, CRC(b921d13f) SHA1(d9d8a1571d974fd512e66097d5d83dd69035cbcb) )
 
 	ROM_REGION( 0x800, "plds", 0 )
@@ -3789,7 +3824,7 @@ ROM_START( timescanbl )
 	ROM_LOAD( "b_82s129.i22", 0x000, 0x100, CRC(88962e80) SHA1(ebf3d57d53fcba727cf20e4bb26f12934f7d1bc7) )
 	ROM_LOAD( "b_82s123.ic4", 0x100, 0x020, CRC(98d14190) SHA1(94f49830c98dbb54e10caa31100e382978813531) )
 
-	ROM_REGION( 0x400, "gals", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "shinobi_gal16v8.ic3", 0x000, 0x117, CRC(4d988385) SHA1(9be8db60bdd452b4013bab42c4b5592b387c927b) )
 	ROM_LOAD( "cs_galv8v.ic13",      0x200, 0x117, NO_DUMP )
 ROM_END
@@ -3987,6 +4022,18 @@ void segas1x_bootleg_state::init_ddcrewbl()
 	init_common();
 }
 
+void segas1x_bootleg_state::init_bloxeedbl()
+{
+	init_common();
+	init_sys18bl_oki();
+
+	// HACK: patch out undumped MCU handshake for now
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x508 / 2] = 0x6100;
+	rom[0x50a / 2] = 0x020a;
+}
+
 
 void segas1x_bootleg_state::altbeastbl_gfx_w(offs_t offset, uint16_t data)
 {
@@ -4110,10 +4157,10 @@ GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,    goldnaxe, segas1x_bootleg_sta
 GAME( 1989, tturfbl,     tturf,     tturfbl,       tturf,    segas1x_bootleg_state,  init_tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, dduxbl,      ddux,      dduxbl,        ddux,     segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
 GAME( 1988, altbeastbl,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, altbeastbl2, altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg",         "Altered Beast (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // broken sprites
+GAME( 1988, altbeastbl2, altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg", "Altered Beast (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // broken sprites
 GAME( 1988, mutantwarr,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Datsu bootleg of Altered Beast)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, eswatbl,     eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, eswatbl2,    eswat,     eswatbl2,      eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, eswatbl,     eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "Cyber Police ESWAT (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, eswatbl2,    eswat,     eswatbl2,      eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "Cyber Police ESWAT (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1988, tetrisbl,    tetris,    tetrisbl,      tetris,   segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
 GAME( 1987, timescanbl,  timescan,  tetrisbl,      tetris,   segas1x_bootleg_state,  empty_init,      ROT0,   "bootleg", "Time Scanner (bootleg)", MACHINE_NOT_WORKING ) // encrypted
 
@@ -4125,5 +4172,6 @@ GAME( 1991, iqpipe,      0,         beautyb,       tetris,   segas1x_bootleg_sta
 GAME( 1990, mwalkbl,     mwalk,     mwalkbl,       mwalkbl,  segas1x_bootleg_state,  init_sys18bl_oki,ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbl,    shdancer,  shdancbl,      shdancbl, segas1x_bootleg_state,  init_shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbla,   shdancer,  shdancbla,     shdancbl, segas1x_bootleg_state,  init_shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,      ddcrewbl, segas1x_bootleg_state,  init_ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1990, bloxeedbl,   bloxeed,   bloxeedbl,     tetris,   segas1x_bootleg_state,  init_sys18bl_oki, ROT0,  "bootleg (Impeuropex)", "Bloxeed (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // P8749H MCU isn't dumped, used for protection?
+GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,      ddcrewbl, segas1x_bootleg_state,  init_ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1990, cltchitrbl,  cltchitr,  ddcrewbl,      ddcrewbl, segas1x_bootleg_state,  init_ddcrewbl,   ROT0,   "bootleg", "Clutch Hitter (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+GAME( 1990, bloxeedbl,   bloxeed,   bloxeedbl,     tetris,   segas1x_bootleg_state,  init_bloxeedbl,  ROT0,   "bootleg (Impeuropex)", "Bloxeed (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // P8749H MCU isn't dumped, used for protection

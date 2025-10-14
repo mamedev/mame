@@ -241,6 +241,8 @@ private:
 	uint8_t m_mcu_port6 = 0;
 	uint32_t m_sprbank = 0;
 
+	static constexpr int m_irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
+
 	uint32_t unk1_r();
 	uint8_t network_r(offs_t offset);
 	uint32_t sysreg_r();
@@ -352,6 +354,11 @@ void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// 0: RAM at 00000000, ROM at 10000000
 		// 1: ROM at 00000000, RAM at 10000000
 		m_mainbank.select(data & 1);
+	}
+	else if (offset >= 0x10 && offset <= 0x13)	// clear i960 IRQ line
+	{
+		// data value doesn't seem to matter
+		m_maincpu->set_input_line(m_irq_type[offset & 3], CLEAR_LINE);
 	}
 }
 
@@ -650,12 +657,15 @@ void namcofl_state::machine_reset()
 
 	std::fill_n(&m_workram[0], m_workram.bytes() / 4, 0);
 	m_mainbank.select(1);
+
+	for (auto irq : m_irq_type)
+		m_maincpu->set_input_line(irq, CLEAR_LINE);
 }
 
 
 void namcofl_state::namcofl(machine_config &config)
 {
-	I960(config, m_maincpu, 80_MHz_XTAL / 4); // i80960KA-20 == 20 MHz part
+	I80960KA(config, m_maincpu, 80_MHz_XTAL / 4); // i80960KA-20 == 20 MHz part
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::main_map);
 
 	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL / 3);
@@ -707,13 +717,12 @@ void namcofl_state::namcofl(machine_config &config)
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->enable_shadows();
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	c352_device &c352(C352(config, "c352", 48.384_MHz_XTAL / 2, 288));
-	c352.add_route(0, "lspeaker", 1.00);
-	c352.add_route(1, "rspeaker", 1.00);
-	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
-	//c352.add_route(3, "rspeaker", 1.00);
+	c352.add_route(0, "speaker", 1.00, 0);
+	c352.add_route(1, "speaker", 1.00, 1);
+	//c352.add_route(2, "speaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "speaker", 1.00);
 }
 
 ROM_START( speedrcr )

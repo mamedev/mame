@@ -37,7 +37,6 @@
 #pragma once
 
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -71,7 +70,7 @@ public:
 	void irq_w(int state) { m_irq_handler(state); }
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 
 	device_bbc_modem_interface *m_card;
@@ -92,7 +91,7 @@ public:
 protected:
 	device_bbc_modem_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_modem_slot_device *m_slot;
+	bbc_modem_slot_device *const m_slot;
 };
 
 

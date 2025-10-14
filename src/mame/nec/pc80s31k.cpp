@@ -511,7 +511,7 @@ void pc88va2_fd_if_device::device_add_mconfig(machine_config &config)
 {
 	pc80s31k_device::device_add_mconfig(config);
 	m_fdc->intrq_wr_callback().append([this](int state) { if(m_fdc_mode & 1) { m_write_irq(state); } });
-	m_fdc->drq_wr_callback().set([this](int state) { printf("%d %d\n", m_fdc_mode, state); if(m_fdc_mode & 1) { m_write_drq(state); } });
+	m_fdc->drq_wr_callback().set([this](int state) { if(m_fdc_mode & 1) { m_write_drq(state); } });
 
 //  m_fdc->set_ready_line_connected(false);
 }
@@ -684,10 +684,10 @@ void pc88va2_fd_if_device::host_motor_control_w(u8 data)
  */
 void pc88va2_fd_if_device::host_fdc_control_w(u8 data)
 {
-	const bool fdcrst = bool(BIT(data, 7));
-	const bool ttrg = bool(BIT(data, 0));
-	const bool cur_xtmask = bool(BIT(data, 2));
-	const bool cur_dmae = bool(BIT(data, 4));
+	const bool fdcrst = !!(BIT(data, 7));
+	const bool ttrg = !!(BIT(data, 0));
+	const bool cur_xtmask = !!(BIT(data, 2));
+	const bool cur_dmae = !!(BIT(data, 4));
 	LOG("$1b6 FDC control port 2 (%02x) %d FDCRST| %d%d FDCFRY| %d DMAE| %d XTMASK| %d TTRG\n"
 		, data
 		, fdcrst
@@ -698,48 +698,18 @@ void pc88va2_fd_if_device::host_fdc_control_w(u8 data)
 		, ttrg
 	);
 
-	if( ttrg )
+	if( ttrg && !BIT(m_fdc_ctrl_2, 0) )
 		m_fdc_timer->adjust(attotime::from_msec(100));
-
-//  if (cur_dmae && !m_dmae)
-	{
-//      m_fdc->set_ready_line_connected(0);
-//      m_fdc->ready_w(0);
-	}
-
-	m_dmae = cur_dmae;
-
-	// TODO: confirm condition
-	// shanghai and famista (at very least) sends a motor off if left idle for a while,
-	// then any attempt to load/save will fail because there's no explicit motor on
-	// written back to $1b4.
-	// Note that this still isn't enough to avoid floppy errors, but makes failures
-	// to be eventually recoverable for now.
-	if (!m_xtmask && cur_xtmask && ttrg)
-	{
-		floppy_image_device *floppy0, *floppy1;
-		floppy0 = m_floppy[0]->get_device();
-		floppy1 = m_floppy[1]->get_device();
-
-		// TODO: check me out
-		if (floppy0)
-			if (m_floppy[0]->get_device()->mon_r() == 1)
-				m_motor_start_timer[0]->adjust(attotime::from_msec(505));
-
-		if (floppy1)
-			if (m_floppy[1]->get_device()->mon_r() == 1)
-				m_motor_start_timer[1]->adjust(attotime::from_msec(505));
-	}
+	else if (!ttrg && BIT(m_fdc_ctrl_2, 0) )
+		m_fdc_timer->adjust(attotime::never);
 
 	m_xtmask = cur_xtmask;
-
-	//if (!BIT(m_fdc_ctrl_2, 4) && BIT(data, 4))
-	//  m_maincpu->dreq_w<2>(1);
-	//m_dmac->dreq2_w(1);
 
 	// TODO: 0 -> 1 transition?
 	if( fdcrst )
 		m_fdc->reset();
+
+	m_dmae = cur_dmae;
 
 	m_fdc_ctrl_2 = data;
 

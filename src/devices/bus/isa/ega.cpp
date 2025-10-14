@@ -1036,7 +1036,6 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t d[4];
 	uint8_t alu[4];
-	uint8_t target_mask = m_graphics_controller.data[8];
 
 	alu[0] =alu[1] = alu[2] = alu[3] = 0;
 
@@ -1079,7 +1078,6 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		alu[1] = m_read_latch[1];
 		alu[2] = m_read_latch[2];
 		alu[3] = m_read_latch[3];
-		target_mask = 0xff;
 		break;
 
 	case 2:     // Write mode 2
@@ -1112,25 +1110,25 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		{
 			// Plane 0
 			// Bit selection
-			m_plane[0][offset] = ( m_plane[0][offset] & ~ target_mask ) | ( alu[0] & target_mask );
+			m_plane[0][offset] = alu[0];
 		}
 		if ( m_sequencer.data[2] & 0x02 )
 		{
 			// Plane 1
 			// Bit selection
-			m_plane[1][offset] = ( m_plane[1][offset] & ~ target_mask ) | ( alu[1] & target_mask );
+			m_plane[1][offset] = alu[1];
 		}
 		if ( m_sequencer.data[2] & 0x04 )
 		{
 			// Plane 2
 			// Bit selection
-			m_plane[2][offset] = ( m_plane[2][offset] & ~ target_mask ) | ( alu[2] & target_mask );
+			m_plane[2][offset] = alu[2];
 		}
 		if ( m_sequencer.data[2] & 0x08 )
 		{
 			// Plane 3
 			// Bit selection
-			m_plane[3][offset] = ( m_plane[3][offset] & ~ target_mask ) | ( alu[3] & target_mask );
+			m_plane[3][offset] = alu[3];
 		}
 	}
 	else
@@ -1145,13 +1143,13 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 			{
 				// Plane 1
 				// Bit selection
-				m_plane[1][offset] = ( m_plane[1][offset] & ~ target_mask ) | ( alu[1] & target_mask );
+				m_plane[1][offset] = alu[1];
 			}
 			if ( ( m_sequencer.data[2] & 0x08 ) && ! ( m_sequencer.data[4] & 0x01 ) )
 			{
 				// Plane 3
 				// Bit selection
-				m_plane[3][offset] = ( m_plane[3][offset] & ~ target_mask ) | ( alu[3] & target_mask );
+				m_plane[3][offset] = alu[3];
 			}
 		}
 		else
@@ -1162,13 +1160,13 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 			{
 				// Plane 0
 				// Bit selection
-				m_plane[0][offset] = ( m_plane[0][offset] & ~ target_mask ) | ( alu[0] & target_mask );
+				m_plane[0][offset] = alu[0];
 			}
 			if ( ( m_sequencer.data[2] & 0x04 ) && ! ( m_sequencer.data[4] & 0x01 ) )
 			{
 				// Plane 2
 				// Bit selection
-				m_plane[2][offset] = ( m_plane[2][offset] & ~ target_mask ) | ( alu[2] & target_mask );
+				m_plane[2][offset] = alu[2];
 			}
 		}
 	}

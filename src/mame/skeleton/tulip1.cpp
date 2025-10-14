@@ -17,7 +17,7 @@
     - WD2793PL-02 FDC
 
     TODO:
-    - No MUART emulation which handles interrupts, timers, serial and
+    - MUART emulation which handles interrupts, timers, serial and
       parallel interfaces.
 
     Notes:
@@ -30,6 +30,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "machine/i8256.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 #include "bus/rs232/rs232.h"

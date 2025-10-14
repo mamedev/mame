@@ -5,7 +5,6 @@
     Driver by Ville Linde
 
 
-
     Hardware overview:
 
     GN676 CPU Board:
@@ -257,22 +256,22 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dsp(*this, {"dsp", "dsp2"}), // TODO: hardcoded tags in machine/konpc.cpp
+		m_dsp(*this, "dsp%u", 1U),
 		m_k056800(*this, "k056800"),
 		m_k001604(*this, "k001604_%u", 1U),
 		m_konppc(*this, "konppc"),
 		m_adc12138(*this, "adc12138"),
 		m_voodoo(*this, "voodoo%u", 0U),
+		m_palette(*this, "palette%u", 1U),
+		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
+		m_jvs_host(*this, "jvs_host"),
+		m_gn676_lan(*this, "gn676_lan"),
+		m_cgboard_bank(*this, "cgboard_%u_bank", 0U),
 		m_in(*this, "IN%u", 0U),
 		m_dsw(*this, "DSW"),
 		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram"),
-		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
-		m_cg_view(*this, "cg_view"),
-		m_jvs_host(*this, "jvs_host"),
-		m_gn676_lan(*this, "gn676_lan")
+		m_cg_view(*this, "cg_view")
 	{ }
 
 	void nwktr(machine_config &config);
@@ -287,8 +286,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	// TODO: Needs verification on real hardware
-	static const int m_sound_timer_usec = 2400;
 	static constexpr int JVS_BUFFER_SIZE = 1024;
 
 	required_shared_ptr<uint32_t> m_work_ram;
@@ -300,50 +297,41 @@ private:
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
 	required_device_array<generic_voodoo_device, 2> m_voodoo;
+	required_device_array<palette_device, 2> m_palette;
+	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
+	required_device<konppc_jvs_host_device> m_jvs_host;
+	required_device<konami_gn676_lan_device> m_gn676_lan;
+	required_memory_bank_array<2> m_cgboard_bank;
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
 	required_ioport_array<5> m_analog;
 	output_finder<2> m_pcb_digit;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	memory_view m_cg_view;
-	required_device<konppc_jvs_host_device> m_jvs_host;
-	required_device<konami_gn676_lan_device> m_gn676_lan;
 
-	emu_timer *m_sound_irq_timer;
-	bool m_exrgb;
+	bool m_sound_irq_enabled = false;
+	bool m_exrgb = false;
 
-	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
 	void soundtimer_en_w(uint16_t data);
-	void soundtimer_count_w(uint16_t data);
+	void soundtimer_ack_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
 	void jamma_jvs_w(uint8_t data);
 
-	TIMER_CALLBACK_MEMBER(sound_irq);
+	INTERRUPT_GEN_MEMBER(sound_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void ppc_map(address_map &map) ATTR_COLD;
-	void sharc0_map(address_map &map) ATTR_COLD;
-	void sharc1_map(address_map &map) ATTR_COLD;
+	template <unsigned Board> void sharc_map(address_map &map) ATTR_COLD;
 	void sound_memmap(address_map &map) ATTR_COLD;
 };
 
-void nwktr_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	data = m_generic_paletteram_32[offset];
-	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-}
-
 uint32_t nwktr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->pen(0), cliprect);
+	bitmap.fill(m_palette[0]->pen(0), cliprect);
 
-	int board = m_exrgb ? 1 : 0;
+	int const board = m_exrgb ? 1 : 0;
 
 	m_voodoo[board]->update(bitmap, cliprect);
 	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);   // K001604 on slave board doesn't seem to output anything. Bug or intended?
@@ -403,15 +391,10 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 		{
 			m_gn676_lan->reset_fpga_state(BIT(data, 6));
 
-			int cs = BIT(data, 3);
-			int conv = BIT(data, 2);
-			int di = BIT(data, 1);
-			int sclk = BIT(data, 0);
-
-			m_adc12138->cs_w(cs);
-			m_adc12138->conv_w(conv);
-			m_adc12138->di_w(di);
-			m_adc12138->sclk_w(sclk);
+			m_adc12138->cs_w(BIT(data, 3));
+			m_adc12138->conv_w(BIT(data, 2));
+			m_adc12138->di_w(BIT(data, 1));
+			m_adc12138->sclk_w(BIT(data, 0));
 			break;
 		}
 
@@ -423,9 +406,9 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x10 = EXID0
 			    0x01 = EXRGB
 			*/
-			if (data & 0x80) // CG Board 1 IRQ Ack
+			if (BIT(data, 7)) // CG Board 1 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-			if (data & 0x40) // CG Board 0 IRQ Ack
+			if (BIT(data, 6)) // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			m_konppc->set_cgboard_id((data >> 4) & 0x3);
@@ -433,7 +416,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
 			// This could mean broadcast to both CG boards?
 
-			m_exrgb = data & 0x1;       // Select which CG Board outputs signal
+			m_exrgb = BIT(data, 0);       // Select which CG Board outputs signal
 
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
@@ -446,31 +429,19 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 
 /*****************************************************************************/
 
-TIMER_CALLBACK_MEMBER(nwktr_state::sound_irq)
+INTERRUPT_GEN_MEMBER(nwktr_state::sound_irq)
 {
-	m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	if (m_sound_irq_enabled)
+		m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
-
 
 void nwktr_state::soundtimer_en_w(uint16_t data)
 {
-	if (data & 1)
-	{
-		// Reset and disable timer
-		m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
-		m_sound_irq_timer->enable(false);
-	}
-	else
-	{
-		// Enable timer
-		m_sound_irq_timer->enable(true);
-	}
+	m_sound_irq_enabled = !BIT(data, 0);
 }
 
-void nwktr_state::soundtimer_count_w(uint16_t data)
+void nwktr_state::soundtimer_ack_w(uint16_t data)
 {
-	// Reset the count
-	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
 	m_audiocpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
@@ -485,10 +456,7 @@ void nwktr_state::machine_start()
 	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_work_ram);
 
-	m_sound_irq_timer = timer_alloc(FUNC(nwktr_state::sound_irq), this);
-
-	m_exrgb = false;
-
+	save_item(NAME(m_sound_irq_enabled));
 	save_item(NAME(m_exrgb));
 }
 
@@ -497,10 +465,11 @@ void nwktr_state::ppc_map(address_map &map)
 	map(0x00000000, 0x003fffff).ram().share(m_work_ram);
 	map(0x74000000, 0x7407ffff).view(m_cg_view);
 	m_cg_view[0](0x74000000, 0x740000ff).rw(m_k001604[0], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
-	m_cg_view[1](0x74000000, 0x740000ff).rw(m_k001604[1], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
-	map(0x74010000, 0x7401ffff).ram().w(FUNC(nwktr_state::paletteram32_w)).share("paletteram");
+	m_cg_view[0](0x74010000, 0x7401ffff).ram().w(m_palette[0], FUNC(palette_device::write32)).share("palette1");
 	m_cg_view[0](0x74020000, 0x7403ffff).rw(m_k001604[0], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	m_cg_view[0](0x74040000, 0x7407ffff).rw(m_k001604[0], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
+	m_cg_view[1](0x74000000, 0x740000ff).rw(m_k001604[1], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
+	m_cg_view[1](0x74010000, 0x7401ffff).ram().w(m_palette[1], FUNC(palette_device::write32)).share("palette2");
 	m_cg_view[1](0x74020000, 0x7403ffff).rw(m_k001604[1], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	m_cg_view[1](0x74040000, 0x7407ffff).rw(m_k001604[1], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
@@ -525,31 +494,21 @@ void nwktr_state::sound_memmap(address_map &map)
 	map(0x200000, 0x200fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w)); // Ricoh RF5C400
 	map(0x300000, 0x30001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
 	map(0x500000, 0x500001).w(FUNC(nwktr_state::soundtimer_en_w)).nopr();
-	map(0x600000, 0x600001).w(FUNC(nwktr_state::soundtimer_count_w)).nopr();
+	map(0x600000, 0x600001).w(FUNC(nwktr_state::soundtimer_ack_w)).nopr();
 }
 
 /*****************************************************************************/
 
-void nwktr_state::sharc0_map(address_map &map)
+template <unsigned Board>
+void nwktr_state::sharc_map(address_map &map)
 {
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<Board>), FUNC(konppc_device::cgboard_shared_sharc_w<Board>));
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[Board]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[Board][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
-	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
-	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
-}
-
-void nwktr_state::sharc1_map(address_map &map)
-{
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
-	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r), FUNC(konppc_device::nwk_voodoo_1_w));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
-	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
-	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
+	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_r<Board>), FUNC(konppc_device::nwk_voodoo_w<Board>));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<Board>), FUNC(konppc_device::cgboard_comm_sharc_w<Board>));
+	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<Board>), FUNC(konppc_device::cgboard_k033906_w<Board>));
+	map(0x3600000, 0x37fffff).bankr(m_cgboard_bank[Board]);
 }
 
 /*****************************************************************************/
@@ -662,24 +621,27 @@ void nwktr_state::machine_reset()
 {
 	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	m_sound_irq_enabled = false;
 }
 
 void nwktr_state::nwktr(machine_config &config)
 {
 	// basic machine hardware
-	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2); // PowerPC 403GA 32MHz
+	PPC403GA(config, m_maincpu, 64_MHz_XTAL / 2); // PowerPC 403GA 32MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nwktr_state::ppc_map);
 
-	M68000(config, m_audiocpu, XTAL(64'000'000)/4); // 16MHz
+	M68000(config, m_audiocpu, 64_MHz_XTAL / 4); // 16MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nwktr_state::sound_memmap);
+	m_audiocpu->set_periodic_int(FUNC(nwktr_state::sound_irq), attotime::from_hz(16.9344_MHz_XTAL / 384 / 128)); // 344.5Hz (44100 / 128)
 
-	ADSP21062(config, m_dsp[0], XTAL(36'000'000));
+	ADSP21062(config, m_dsp[0], 36_MHz_XTAL);
 	m_dsp[0]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp[0]->set_addrmap(AS_DATA, &nwktr_state::sharc0_map);
+	m_dsp[0]->set_addrmap(AS_DATA, &nwktr_state::sharc_map<0>);
 
-	ADSP21062(config, m_dsp[1], XTAL(36'000'000));
+	ADSP21062(config, m_dsp[1], 36_MHz_XTAL);
 	m_dsp[1]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp[1]->set_addrmap(AS_DATA, &nwktr_state::sharc1_map);
+	m_dsp[1]->set_addrmap(AS_DATA, &nwktr_state::sharc_map<1>);
 
 	config.set_maximum_quantum(attotime::from_hz(9000));
 
@@ -692,7 +654,7 @@ void nwktr_state::nwktr(machine_config &config)
 	K033906(config, "k033906_2", 0, m_voodoo[1]);
 
 	// video hardware
-	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
+	VOODOO_1(config, m_voodoo[0], 50_MHz_XTAL);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
 	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -701,7 +663,7 @@ void nwktr_state::nwktr(machine_config &config)
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
+	VOODOO_1(config, m_voodoo[1], 50_MHz_XTAL);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
 	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -712,30 +674,38 @@ void nwktr_state::nwktr(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// default 24KHz parameter in both 001604 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
-	screen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
+	screen.set_raw(64_MHz_XTAL / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
 	screen.set_screen_update(FUNC(nwktr_state::screen_update));
 
-	PALETTE(config, m_palette).set_entries(65536);
+	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
+	PALETTE(config, m_palette[1]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
 
 	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_palette(m_palette);
+	m_k001604[0]->set_palette(m_palette[0]);
 
 	K001604(config, m_k001604[1], 0);
-	m_k001604[1]->set_palette(m_palette);
+	m_k001604[1]->set_palette(m_palette[1]);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	K056800(config, m_k056800, XTAL(16'934'400));
+	K056800(config, m_k056800, 16.9344_MHz_XTAL);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
-	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(16'934'400)));  // as per Guru readme above
-	rfsnd.add_route(0, "lspeaker", 1.0);
-	rfsnd.add_route(1, "rspeaker", 1.0);
+	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", 16.9344_MHz_XTAL)); // as per Guru readme above
+	rfsnd.add_route(0, "speaker", 1.0, 0);
+	rfsnd.add_route(1, "speaker", 1.0, 1);
 
 	KONPPC(config, m_konppc, 0);
+	m_konppc->set_dsp_tag(0, m_dsp[0]);
+	m_konppc->set_dsp_tag(1, m_dsp[1]);
+	m_konppc->set_k033906_tag(0, "k033906_1");
+	m_konppc->set_k033906_tag(1, "k033906_2");
+	m_konppc->set_voodoo_tag(0, m_voodoo[0]);
+	m_konppc->set_voodoo_tag(1, m_voodoo[1]);
+	m_konppc->set_texture_bank_tag(0, m_cgboard_bank[0]);
+	m_konppc->set_texture_bank_tag(1, m_cgboard_bank[1]);
 	m_konppc->set_num_boards(2);
-	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
+	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
 
 	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
 
@@ -754,7 +724,7 @@ void nwktr_state::nwktr_lan_b(machine_config &config)
 
 void nwktr_state::jamma_jvs_w(uint8_t data)
 {
-	bool accepted = m_jvs_host->write(data);
+	bool const accepted = m_jvs_host->write(data);
 	if (accepted)
 		m_jvs_host->read();
 }
@@ -769,15 +739,15 @@ void nwktr_state::init_nwktr()
 void nwktr_state::init_racingj()
 {
 	init_nwktr();
-	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
-	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("slave_cgboard")->base()); // for some reason, additional CG roms are located on the slave CG board...
+	m_cgboard_bank[0]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
+	m_cgboard_bank[1]->configure_entries(0, 2, memregion("cgboard_1")->base(), 0x800000); // for some reason, additional CG roms are located on the slave CG board...
 }
 
 void nwktr_state::init_thrilld()
 {
 	init_nwktr();
-	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
-	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("master_cgboard")->base()); // ...while this is not the case for thrilld
+	m_cgboard_bank[0]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0);
+	m_cgboard_bank[1]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0); // ...while this is not the case for thrilld
 }
 
 /*****************************************************************************/
@@ -790,11 +760,11 @@ ROM_START(racingj)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -817,11 +787,11 @@ ROM_START(racingje)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -844,11 +814,11 @@ ROM_START(racingjj)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -871,11 +841,11 @@ ROM_START(racingja)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -898,11 +868,11 @@ ROM_START(racingjm)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -925,11 +895,11 @@ ROM_START(racingjme)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -952,11 +922,11 @@ ROM_START(racingjmj)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -979,11 +949,11 @@ ROM_START(racingjma)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -1006,11 +976,11 @@ ROM_START(racingjn)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -1033,11 +1003,11 @@ ROM_START(racingjne)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -1060,11 +1030,11 @@ ROM_START(racingjnj)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -1087,11 +1057,11 @@ ROM_START(racingjna)
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -1115,11 +1085,11 @@ ROM_START(racingj2)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1143,11 +1113,11 @@ ROM_START(racingj2e)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1171,11 +1141,11 @@ ROM_START(racingj2j)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1199,11 +1169,11 @@ ROM_START(racingj2a)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1227,11 +1197,11 @@ ROM_START(racingj2m)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1255,11 +1225,11 @@ ROM_START(racingj2me)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1283,11 +1253,11 @@ ROM_START(racingj2mj)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1311,11 +1281,11 @@ ROM_START(racingj2ma)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1339,11 +1309,11 @@ ROM_START(racingj2n)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1367,11 +1337,11 @@ ROM_START(racingj2ne)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1395,11 +1365,11 @@ ROM_START(racingj2nj)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1423,11 +1393,11 @@ ROM_START(racingj2na)
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_1", ROMREGION_ERASE00) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1450,7 +1420,7 @@ ROM_START(thrilld)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1476,7 +1446,7 @@ ROM_START(thrilldj)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1502,7 +1472,7 @@ ROM_START(thrilldja)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1528,7 +1498,7 @@ ROM_START(thrillde)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1554,7 +1524,7 @@ ROM_START(thrillda)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1580,7 +1550,7 @@ ROM_START(thrilldab)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1606,7 +1576,7 @@ ROM_START(thrilldb)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1632,7 +1602,7 @@ ROM_START(thrilldbj)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1658,7 +1628,7 @@ ROM_START(thrilldbja)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1684,7 +1654,7 @@ ROM_START(thrilldbe)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1710,7 +1680,7 @@ ROM_START(thrilldba)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1736,7 +1706,7 @@ ROM_START(thrilldbab)
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x1000000, "cgboard_0", ROMREGION_ERASE00) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1754,12 +1724,10 @@ ROM_START(thrilldbab)
 	ROM_LOAD( "gm676aa_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(c011dcea) SHA1(39cbbe518bfc256cdb72bdaece03c539f705c807) ) // hand built
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*****************************************************************************/
-
-#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // GNxxx -> 5+R gear shift (8-way joystick), clutch pedal, hand brake lever
 // GYxxx -> Same as GN but intended for the 'super deluxe' cab (Cobra system). GY676 RTC is interchangable between Cobra and NWK-TR Racing Jam
@@ -1767,45 +1735,45 @@ ROM_END
 // GQxxx -> up/down gear shift, no clutch, no hand brake lever
 // Change the first two bytes in the NVRAM and fix the checksum at 0x0e-0x0f (calculated as the negated sum of 0x00-0x0e as 16-bit big endian values)
 // to generate new NVRAMs.
-GAME( 1998, racingj,    0,        nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676UAC)",               GAME_FLAGS )
-GAME( 1998, racingje,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676EAC)",               GAME_FLAGS )
-GAME( 1998, racingjj,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676JAC)",               GAME_FLAGS )
-GAME( 1998, racingja,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676AAC)",               GAME_FLAGS )
-GAME( 1998, racingjm,   racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676UAC)",               GAME_FLAGS )
-GAME( 1998, racingjme,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676EAC)",               GAME_FLAGS )
-GAME( 1998, racingjmj,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676JAC)",               GAME_FLAGS )
-GAME( 1998, racingjma,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676AAC)",               GAME_FLAGS )
-GAME( 1998, racingjn,   racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676UAC)",               GAME_FLAGS )
-GAME( 1998, racingjne,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676EAC)",               GAME_FLAGS )
-GAME( 1998, racingjnj,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676JAC)",               GAME_FLAGS )
-GAME( 1998, racingjna,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676AAC)",               GAME_FLAGS )
+GAME( 1998, racingj,    0,        nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676UAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingje,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676EAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjj,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676JAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingja,   racingj,  nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676AAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjm,   racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676UAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjme,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676EAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjmj,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676JAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjma,  racingj,  nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GM676AAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjn,   racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676UAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjne,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676EAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjnj,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676JAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingjna,  racingj,  nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GN676AAC)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1998, racingj2,   0,        nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888UAA)",   GAME_FLAGS )
-GAME( 1998, racingj2e,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888EAA)",   GAME_FLAGS )
-GAME( 1998, racingj2j,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888JAA)",   GAME_FLAGS )
-GAME( 1998, racingj2a,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888AAA)",   GAME_FLAGS )
-GAME( 1998, racingj2m,  racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888UAA)",   GAME_FLAGS )
-GAME( 1998, racingj2me, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888EAA)",   GAME_FLAGS )
-GAME( 1998, racingj2mj, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888JAA)",   GAME_FLAGS )
-GAME( 1998, racingj2ma, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888AAA)",   GAME_FLAGS )
-GAME( 1998, racingj2n,  racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888UAA)",   GAME_FLAGS )
-GAME( 1998, racingj2ne, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888EAA)",   GAME_FLAGS )
-GAME( 1998, racingj2nj, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888JAA)",   GAME_FLAGS )
-GAME( 1998, racingj2na, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888AAA)",   GAME_FLAGS )
+GAME( 1998, racingj2,   0,        nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888UAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2e,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888EAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2j,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888JAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2a,  racingj2, nwktr, nwktr_gq, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888AAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2m,  racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888UAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2me, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888EAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2mj, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888JAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2ma, racingj2, nwktr, nwktr_gm, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GM888AAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2n,  racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888UAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2ne, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888EAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2nj, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888JAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj2na, racingj2, nwktr, nwktr_gn, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GN888AAA)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // JAx, ABx --> 5+R gear shift (8-way joystick), clutch pedal, hand brake lever
 // JCx, ACx, UDx --> up/down gear shift, no clutch, hand brake lever
 // EDx --> prompts you to select if you have a hand brake lever installed, a clutch pedal installed,
 // gear shifter type (up/down, 4 pos, or 5+R), and gear shifter's display position.
-GAME( 1998, thrilld,    0,       nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDE)",             GAME_FLAGS )
-GAME( 1998, thrilldj,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCE)",             GAME_FLAGS )
-GAME( 1998, thrilldja,  thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAE)",             GAME_FLAGS )
-GAME( 1998, thrillde,   thrilld, nwktr_lan_b, thrillde, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDE)",             GAME_FLAGS )
-GAME( 1998, thrillda,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACE)",             GAME_FLAGS )
-GAME( 1998, thrilldab,  thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABE)",             GAME_FLAGS )
-GAME( 1998, thrilldb,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDB)",             GAME_FLAGS )
-GAME( 1998, thrilldbj,  thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCB)",             GAME_FLAGS )
-GAME( 1998, thrilldbja, thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAB)",             GAME_FLAGS )
-GAME( 1998, thrilldbe,  thrilld, nwktr_lan_b, thrillde, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDB)",             GAME_FLAGS )
-GAME( 1998, thrilldba,  thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACB)",             GAME_FLAGS )
-GAME( 1998, thrilldbab, thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABB)",             GAME_FLAGS )
+GAME( 1998, thrilld,    0,       nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldj,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldja,  thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrillde,   thrilld, nwktr_lan_b, thrillde, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrillda,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldab,  thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABE)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldb,   thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (UDB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldbj,  thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JCB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldbja, thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldbe,  thrilld, nwktr_lan_b, thrillde, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EDB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldba,  thrilld, nwktr_lan_b, nwktr_gm, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ACB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldbab, thrilld, nwktr_lan_b, nwktr_gn, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (ABB)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

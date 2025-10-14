@@ -136,7 +136,7 @@ private:
 	required_shared_ptr<u16> m_base;
 
 	void main_mem(address_map &map) ATTR_COLD;
-	void keytronic_pc3270_io(address_map &map) ATTR_COLD;
+	void keytronic_pc3270_data(address_map &map) ATTR_COLD;
 	void keytronic_pc3270_program(address_map &map) ATTR_COLD;
 	void sub_io(address_map &map) ATTR_COLD;
 	void sub_mem(address_map &map) ATTR_COLD;
@@ -466,7 +466,7 @@ void applix_state::keytronic_pc3270_program(address_map &map)
 	map(0x0000, 0x0fff).rom().region("kbdcpu", 0);
 }
 
-void applix_state::keytronic_pc3270_io(address_map &map)
+void applix_state::keytronic_pc3270_data(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(applix_state::internal_data_read), FUNC(applix_state::internal_data_write));
 }
@@ -852,7 +852,7 @@ void applix_state::applix(machine_config &config)
 
 	i8051_device &kbdcpu(I8051(config, "kbdcpu", 11060250));
 	kbdcpu.set_addrmap(AS_PROGRAM, &applix_state::keytronic_pc3270_program);
-	kbdcpu.set_addrmap(AS_IO, &applix_state::keytronic_pc3270_io);
+	kbdcpu.set_addrmap(AS_DATA, &applix_state::keytronic_pc3270_data);
 	kbdcpu.port_in_cb<1>().set(FUNC(applix_state::p1_read));
 	kbdcpu.port_out_cb<1>().set(FUNC(applix_state::p1_write));
 	kbdcpu.port_in_cb<2>().set(FUNC(applix_state::p2_read));
@@ -870,10 +870,9 @@ void applix_state::applix(machine_config &config)
 	PALETTE(config, m_palette, FUNC(applix_state::applix_palette), 16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC0800(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
-	DAC0800(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
+	SPEAKER(config, "speaker", 2).front();
+	DAC0800(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // 74ls374.u20 + dac0800.u21 + 4052.u23
+	DAC0800(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // 74ls374.u20 + dac0800.u21 + 4052.u23
 
 	/* Devices */
 	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
@@ -902,7 +901,7 @@ void applix_state::applix(machine_config &config)
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cass->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.10, 0);
 
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2); //connected to Z80H clock pin
 	FLOPPY_CONNECTOR(config, m_floppy[0], applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);

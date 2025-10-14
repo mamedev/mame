@@ -432,8 +432,7 @@ void fcrash_state::fcrash(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 24000000/6); /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_sound_map);
@@ -449,6 +448,7 @@ void fcrash_state::fcrash(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -484,11 +484,10 @@ void fcrash_state::fcrash(machine_config &config)
 
 void fcrash_state::ffightblb(machine_config &config)
 {
-		/* basic machine hardware */
+	/* basic machine hardware */
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 24000000/6); /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::ffightblb_sound_map);
@@ -504,6 +503,7 @@ void fcrash_state::ffightblb(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -522,9 +522,9 @@ void fcrash_state::ffightblb(machine_config &config)
 void fcrash_state::cawingbl(machine_config &config)
 {
 	fcrash(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq6_line_hold)); /* needed to write to scroll values */
-
 	MCFG_MACHINE_START_OVERRIDE(fcrash_state, cawingbl)
 }
 
@@ -533,8 +533,7 @@ void fcrash_state::kodb(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::kodb_sound_map);
@@ -549,6 +548,7 @@ void fcrash_state::kodb(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -574,8 +574,7 @@ void fcrash_state::mtwinsb(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::mtwinsb_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
@@ -590,6 +589,7 @@ void fcrash_state::mtwinsb(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -615,8 +615,7 @@ void fcrash_state::sf2m1(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::sf2m1_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
@@ -628,6 +627,7 @@ void fcrash_state::sf2m1(machine_config &config)
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -649,8 +649,7 @@ void fcrash_state::sgyxz(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
@@ -666,6 +665,7 @@ void fcrash_state::sgyxz(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
@@ -705,8 +705,7 @@ void fcrash_state::varthb(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::varthb_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
@@ -721,6 +720,7 @@ void fcrash_state::varthb(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_cps1));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -1079,8 +1079,6 @@ void fcrash_state::init_cawingbl()
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x882000, 0x882001, "IN1");
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x882006, 0x882007, write16s_delegate(*this, FUNC(fcrash_state::cawingbl_soundlatch_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x882008, 0x88200f, read16sm_delegate(*this, FUNC(fcrash_state::cps1_dsw_r)));
-
-	init_cps1();
 }
 
 void fcrash_state::init_kodb()
@@ -1095,15 +1093,12 @@ void fcrash_state::init_kodb()
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x900000, 0x903fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x904000, 0x907fff, m_bootleg_sprite_ram.get()); /* both of these need to be mapped */
-
-	init_cps1();
 }
 
 void fcrash_state::init_mtwinsb()
 {
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
-	init_cps1();
 }
 
 void fcrash_state::init_sf2m1()
@@ -1119,7 +1114,6 @@ void fcrash_state::init_wofr1bl()
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x990000, 0x990001, write16smo_delegate(*this, FUNC(fcrash_state::wofr1bl_spr_base_w)));
-	init_cps1();
 }
 
 
@@ -2341,10 +2335,10 @@ ROM_END
 GAME( 1990, cawingbl,   cawing,  cawingbl,  cawingbl,  fcrash_state,   init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
 GAME( 1990, cawingb2,   cawing,  cawingbl,  cawingbl,  fcrash_state,   init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
 
-GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,   init_cps1,      ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,   init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,   init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
-GAME( 1990, ffightblb,  ffight,  ffightblb, fcrash,    fcrash_state,   init_cps1,      ROT0,    "bootleg (Soon Hwa)",  "Final Fight (bootleg with single OKI)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // priority glitches
+GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,   empty_init,     ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,   empty_init,     ROT0,    "bootleg",  "Final Fight (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,   empty_init,     ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
+GAME( 1990, ffightblb,  ffight,  ffightblb, fcrash,    fcrash_state,   empty_init,     ROT0,    "bootleg (Soon Hwa)",  "Final Fight (bootleg with single OKI)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // priority glitches
 
 GAME( 1991, kodb,       kod,     kodb,      kodb,      fcrash_state,   init_kodb,      ROT0,    "bootleg (Playmark)",  "The King of Dragons (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
 
@@ -2353,8 +2347,8 @@ GAME( 1993, mtwinsb,    mtwins,  mtwinsb,   mtwins,    fcrash_state,   init_mtwi
 GAME( 1992, sf2m1,      sf2ce,   sf2m1,     sf2,       fcrash_state,   init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M1, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 GAME( 1992, sf2m9,      sf2ce,   sf2m1,     sf2,       fcrash_state,   init_sf2m1,     ROT0,    "bootleg",  "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 
-GAME( 1999, sgyxz,      wof,     sgyxz,     sgyxz,     cps1bl_no_brgt, init_cps1,      ROT0,    "bootleg (All-In Electronic)",  "Warriors of Fate ('sgyxz' bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
-GAME( 1992, wofabl,     wof,     wofabl,    wofabl,    cps1bl_no_brgt, init_cps1,      ROT0,    "bootleg",  "Sangokushi II (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
+GAME( 1999, sgyxz,      wof,     sgyxz,     sgyxz,     cps1bl_no_brgt, empty_init,     ROT0,    "bootleg (All-In Electronic)",  "Warriors of Fate ('sgyxz' bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
+GAME( 1992, wofabl,     wof,     wofabl,    wofabl,    cps1bl_no_brgt, empty_init,     ROT0,    "bootleg",  "Sangokushi II (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
 GAME( 1992, wofr1bl,    wof,     wofr1bl,   wof,       cps1bl_no_brgt, init_wofr1bl,   ROT0,    "bootleg",  "Warriors of Fate (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921002 ETC
 
 GAME( 1992, varthb,     varth,   varthb,    varth,     fcrash_state,   init_mtwinsb,   ROT270,  "bootleg",  "Varth: Operation Thunderstorm (bootleg, set 1)",  MACHINE_SUPPORTS_SAVE )

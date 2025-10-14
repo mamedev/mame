@@ -11,8 +11,8 @@
 #pragma once
 
 
-#define MAHJONG_PAYOUT_RATE(shift, loc) \
-		PORT_DIPNAME( 0x0f << shift, 0x07 << shift, "Payout Rate" ) PORT_DIPLOCATION(loc) \
+#define MAHJONG_PAYOUT_RATE_DFLT(shift, dflt, loc) \
+		PORT_DIPNAME( 0x0f << shift, dflt << shift, "Payout Rate" ) PORT_DIPLOCATION(loc) \
 		PORT_DIPSETTING(             0x00 << shift, "50%" ) \
 		PORT_DIPSETTING(             0x01 << shift, "53%" ) \
 		PORT_DIPSETTING(             0x02 << shift, "56%" ) \
@@ -30,6 +30,8 @@
 		PORT_DIPSETTING(             0x0e << shift, "93%" ) \
 		PORT_DIPSETTING(             0x0f << shift, "96%" )
 
+#define MAHJONG_PAYOUT_RATE(shift, loc) MAHJONG_PAYOUT_RATE_DFLT(shift, 0x07, loc)
+
 #define MAHJONG_ODDS_RATE(shift, loc) \
 		PORT_DIPNAME( 0x03 << shift, 0x00 << shift, "Odds Rate" ) PORT_DIPLOCATION(loc) \
 		PORT_DIPSETTING(             0x03 << shift, "1 2 4 8 12 16 24 32" ) \
@@ -42,7 +44,7 @@
 		PORT_DIPSETTING(             0x03 << shift, DEF_STR(1C_1C) )                         /* １コイン　　１プレイ */ \
 		PORT_DIPSETTING(             0x02 << shift, DEF_STR(1C_2C) )                         /* １コイン　　２プレイ */ \
 		PORT_DIPSETTING(             0x01 << shift, DEF_STR(1C_5C) )                         /* １コイン　　５プレイ */ \
-		PORT_DIPSETTING(             0x00 << shift, "1 Coin/10 Credits" )                    /* １コイン　１０プレイ */
+		PORT_DIPSETTING(             0x00 << shift, DEF_STR(1C_10C) )                        /* １コイン　１０プレイ */
 
 #define MAHJONG_NOTE_CREDITS(shift, loc, ct, cs) \
 		PORT_DIPNAME( 0x01 << shift, 0x00 << shift, "Credits Per Note" ) PORT_DIPLOCATION(loc)                 /* ＮＯＴＥ　ＲＡＴＥ */ \
