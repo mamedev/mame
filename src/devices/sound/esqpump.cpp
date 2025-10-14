@@ -4,6 +4,9 @@
 
   esqpump.cpp - Ensoniq 5505/5506 to 5510 interface.
 
+	Modeled specifically after the routing of and for use with
+	the VFX family of keyboards.
+
   By Christian Brunschen
 
 ***************************************************************************/
@@ -26,7 +29,12 @@ esq_5505_5510_pump_device::esq_5505_5510_pump_device(const machine_config &mconf
 
 void esq_5505_5510_pump_device::device_start()
 {
-	m_stream = stream_alloc(8, 2, clock(), STREAM_SYNCHRONOUS);
+	// The VFX only has a single pait of stereo outputs, 'Main'; these will be channels 0 and 1,
+	// and will be routed to the 'speaker' output device.
+	// VFX-SD and later have a separate 'Aux' stereo output that bypasses ESP effect processing;
+	// these will be channels 2 and 3 and can be routed to a separate 'aux' output device.
+	// On the VFX, those will simply remain silent.
+	m_stream = stream_alloc(8, 4, clock(), STREAM_SYNCHRONOUS);
 
 #if PUMP_DETECT_SILENCE
 	silent_for = 500;
@@ -58,11 +66,11 @@ void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream)
 #define SAMPLE_SHIFT 4
 	constexpr sound_stream::sample_t input_scale = 32768.0 / (1 << SAMPLE_SHIFT);
 
-	// anything for the 'aux' output?
-	sound_stream::sample_t l = stream.get(0, 0) * (1.0 / (1 << SAMPLE_SHIFT));
-	sound_stream::sample_t r = stream.get(1, 0) * (1.0 / (1 << SAMPLE_SHIFT));
+	// Push the 'Aux' output samples directly into the output stream
+	stream.put(2, 0, stream.get(0, 0) * (1.0 / (1 << SAMPLE_SHIFT)));
+	stream.put(3, 0, stream.get(1, 0) * (1.0 / (1 << SAMPLE_SHIFT)));
 
-	// push the samples into the ESP
+	// Push the 'FX1', 'FX2' and 'DRY' samples into the ESP
 	m_esp->ser_w(0, s32(stream.get(2, 0) * input_scale));
 	m_esp->ser_w(1, s32(stream.get(3, 0) * input_scale));
 	m_esp->ser_w(2, s32(stream.get(4, 0) * input_scale));
@@ -83,11 +91,9 @@ void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream)
 	}
 #endif
 
-	// read the processed result from the ESP and add to the saved AUX data
-	sound_stream::sample_t ll = sound_stream::sample_t(m_esp->ser_r(6)) * (1.0 / 32768.0);
-	sound_stream::sample_t rr = sound_stream::sample_t(m_esp->ser_r(7)) * (1.0 / 32768.0);
-	l += ll;
-	r += rr;
+	// Read the processed result from the ESP.
+	sound_stream::sample_t l = sound_stream::sample_t(m_esp->ser_r(6)) * (1.0 / 32768.0);
+	sound_stream::sample_t r = sound_stream::sample_t(m_esp->ser_r(7)) * (1.0 / 32768.0);
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
 	// if we're processing the fake program through the ESP, the result should just be that of adding the inputs
@@ -102,7 +108,7 @@ void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream)
 	ei = (ei + 1) % 0x4000;
 #endif
 
-	// write the combined data to the output
+	// Write the Processed samples to the output
 	stream.put(0, 0, l);
 	stream.put(1, 0, r);
 

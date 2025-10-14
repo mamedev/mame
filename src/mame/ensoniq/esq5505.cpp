@@ -854,6 +854,10 @@ void esq5505_state::vfxsd(machine_config &config)
 	// but with an updated memory map that includes FDC and sequence RAM
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
 
+	SPEAKER(config, "aux", 2).front();
+	m_pump->add_route(2, "aux", 1.0, 0);
+	m_pump->add_route(3, "aux", 1.0, 1);
+
 	// On the VFX-SD, the floppy connector always has exactly one 3.5inch DD floppy drive.
 	WD1772(config, m_fdc, 8000000);
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
@@ -897,6 +901,10 @@ void esq5505_state::vfx32(machine_config &config)
 	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "speaker", 1.0, 0);
 	m_pump->add_route(1, "speaker", 1.0, 1);
+
+	SPEAKER(config, "aux", 2).front();
+	m_pump->add_route(2, "aux", 1.0, 0);
+	m_pump->add_route(3, "aux", 1.0, 1);
 
 	ES5505(config, m_otis, 30.47618_MHz_XTAL / 2);
 	m_otis->sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));
