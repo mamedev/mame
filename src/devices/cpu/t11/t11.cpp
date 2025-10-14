@@ -36,9 +36,23 @@
 
 
 DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "DEC T11")
+DEFINE_DEVICE_TYPE(LSI11,    lsi11_device,    "lsi11",    "DEC LSI-11")
 DEFINE_DEVICE_TYPE(K1801VM1, k1801vm1_device, "k1801vm1", "K1801VM1")
 DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 
+
+/*
+ * Not implemented:
+ *
+ * instruction timing, microcode-related insns, HALT state and ODT,
+ * traps: double bus error and bus error on vector fetch.
+ */
+lsi11_device::lsi11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: t11_device(mconfig, LSI11, tag, owner, clock)
+	, z80_daisy_chain_interface(mconfig, *this)
+{
+	c_insn_set = IS_LEIS | IS_MXPS; // EISFIS is an option
+}
 
 /*
  * Not implemented:
@@ -222,6 +236,83 @@ static const struct irq_table_entry irq_table[] =
 	{ 7<<5, 0144 },
 	{ 7<<5, 0140 }
 };
+
+// priorities from LSI-11 Processor Handbook, p. 4-70
+void lsi11_device::t11_check_irqs()
+{
+	int8_t              mcir = MCIR_NONE;
+	uint16_t            vsel = 0;
+
+	if (m_mcir != MCIR_NONE)
+	{
+		mcir = m_mcir;
+		vsel = m_vsel;
+	}
+	// 1. bus error
+	else if (m_bus_error)
+	{
+		m_bus_error = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_TIMEOUT;
+	}
+	// 3. illegal insn
+	else if (mcir == MCIR_ILL)
+	{
+		take_interrupt(vsel);
+	}
+	// 4. trace trap
+	else if (m_trace_trap)
+	{
+		if (GET_T)
+		{
+			mcir = MCIR_IRQ;
+			vsel = T11_BPT;
+		}
+		else
+			m_trace_trap = false;
+	}
+	else if (GET_T)
+	{
+		m_trace_trap = true;
+	}
+	// 5. halt line (B HALT L bus signal) -- FIXME not implemented
+	// 6. power fail (B POK H bus signal)
+	else if (m_power_fail)
+	{
+		m_power_fail = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_PWRFAIL;
+	}
+	// 7. event line (B EVNT L bus signal)
+	else if (m_cp[2] && !GET_I)
+	{
+		m_cp[2] = false;
+		mcir = MCIR_IRQ;
+		vsel = VM1_EVNT;
+	}
+	// 8. device interrupt (B IRQ4 L bus signal)
+	else if (m_vec_active && !GET_I)
+	{
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		int vec = (intf != nullptr) ? intf->z80daisy_irq_ack() : m_in_iack_func(0);
+		if (vec == -1 || vec == 0)
+		{
+			m_vec_active = 0;
+			return;
+		}
+		else
+		{
+			mcir = MCIR_IRQ;
+			vsel = vec;
+		}
+	}
+
+	if (mcir == MCIR_IRQ)
+		take_interrupt(vsel);
+
+	m_mcir = MCIR_NONE;
+}
+
 
 // PSW7 masks external interrupts (except IRQ1) -- IRQ2, IRQ3, VIRQ
 // PSW11 also masks IRQ1.  PSW10 also masks ACLO.

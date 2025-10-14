@@ -11959,7 +11959,23 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( hginga )
+ROM_START( hginga ) // shows version 1.00 like below, but program ROM label has extra -1.
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
+	ROM_LOAD( "8101-1.2b", 0x00000, 0x40000, CRC(923c70c5) SHA1(9a042f1813f78276f90d4dcc94a206a2b216aed4) )
+	ROM_RELOAD(            0x10000, 0x40000 )
+
+	ROM_REGION( 0x180000, "blitter", ROMREGION_ERASEFF )
+	ROM_LOAD( "8102.9a",  0x000000, 0x80000, CRC(0074af23) SHA1(39cd978bcc34b27fc896094cf2dd3b7d4596ab00) )
+	ROM_LOAD( "8103.10a", 0x080000, 0x80000, CRC(a3a4ecb5) SHA1(08264cf131fd4c02d8b5925564cf8daa56e0bbc2) )
+	ROM_LOAD( "8104.11a", 0x100000, 0x20000, CRC(24513af9) SHA1(ee1f440b64c1f8c1efc6f0c60e25cab257407865) )
+	ROM_RELOAD(           0x120000, 0x20000 )
+	ROM_RELOAD(           0x140000, 0x20000 )
+	ROM_RELOAD(           0x160000, 0x20000 )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )  // Samples - none
+ROM_END
+
+ROM_START( hgingaa )
 	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "8101.2b", 0x00000, 0x40000, CRC(77a64b71) SHA1(3426998746c834435ff10a8d1c6502ea64a5f2e2) )
 	ROM_RELOAD(          0x10000, 0x40000 )
@@ -13108,7 +13124,8 @@ GAME( 1993, animaljrj,   animaljr, mmpanic,   animaljr,   mmpanic_state,  empty_
 GAME( 1994, mjmyster,    0,        mjmyster,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World (Japan, set 1)",                    MACHINE_NO_COCKTAIL  )
 GAME( 1994, mjmywrld,    mjmyster, mjmywrld,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World (Japan, set 2)",                    MACHINE_NO_COCKTAIL  )
 
-GAME( 1994, hginga,      0,        hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan)",                                    MACHINE_NO_COCKTAIL  )
+GAME( 1994, hginga,      0,        hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan, ver 1.00, rev 1)",                   MACHINE_NO_COCKTAIL  )
+GAME( 1994, hgingaa,     hginga,   hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan, ver 1.00)",                          MACHINE_NO_COCKTAIL  )
 
 GAME( 1994, mjmyuniv,    0,        mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                   MACHINE_NO_COCKTAIL  )
 GAME( 1995, mjmyunivh,   mjmyuniv, mjmyuniv,  mjmyunivh,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Maa Zoek Lung Hing Fu Dai (Hong Kong, D106T)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped

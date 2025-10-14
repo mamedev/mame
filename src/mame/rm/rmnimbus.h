@@ -255,7 +255,7 @@ private:
 	bool m_voice_enabled = false;
 
 	void nimbus_io(address_map &map) ATTR_COLD;
-	void nimbus_iocpu_io(address_map &map) ATTR_COLD;
+	void nimbus_iocpu_data(address_map &map) ATTR_COLD;
 	void nimbus_iocpu_mem(address_map &map) ATTR_COLD;
 	void nimbus_mem(address_map &map) ATTR_COLD;
 

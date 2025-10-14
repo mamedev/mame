@@ -32,7 +32,7 @@ public:
 
 	void write_rxd(int state);
 
-	void wangpc_keyboard_io(address_map &map) ATTR_COLD;
+	void wangpc_keyboard_data(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides

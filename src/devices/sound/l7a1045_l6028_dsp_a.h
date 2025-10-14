@@ -1,5 +1,5 @@
-// license:LGPL-2.1+
-// copyright-holders:David Haywood, Angelo Salese, ElSemi
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, O. Galibert
 #ifndef MAME_SOUND_L7A1045_L6028_DSP_A_H
 #define MAME_SOUND_L7A1045_L6028_DSP_A_H
 
@@ -17,16 +17,14 @@ class l7a1045_sound_device : public device_t,
 public:
 	l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-//  void set_base(int8_t* base) { m_base = base; }
+	void map(address_map &map);
 
-	void l7a1045_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t l7a1045_sound_r(offs_t offset, uint16_t mem_mask = ~0);
+	auto drq_handler_cb() { return m_drq_handler.bind(); }
 
 	uint8_t dma_r_cb(offs_t offset);
 	void dma_w_cb(offs_t offset, uint8_t data);
-	uint16_t dma_r16_cb() { m_voice[0].pos++; return 0; }
-	void dma_w16_cb(uint16_t data) { m_voice[0].pos++; }
-	void dma_hreq_cb(int state);
+	uint16_t dma_r16_cb();
+	void dma_w16_cb(uint16_t data);
 
 protected:
 	// device-level overrides
@@ -37,6 +35,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
+	static const int NUM_VOICES = 32;
+	static const int REGS_PER_VOICE = 16;
+
 	struct l7a1045_voice
 	{
 		constexpr l7a1045_voice() { }
@@ -59,27 +60,30 @@ private:
 		uint32_t flt_pos = 0;
 		uint8_t flt_resonance = 0;
 		int32_t b = 0, l = 0; // filter state
+		uint8_t send_dest = 0;
+		uint8_t send_level = 0;
 	};
 
-	sound_stream *m_stream;
-	l7a1045_voice m_voice[32];
-	uint32_t    m_key;
+	devcb_write_line m_drq_handler;
+	sound_stream    *m_stream;
+	l7a1045_voice   m_voice[NUM_VOICES];
+	uint32_t        m_key;
 	required_region_ptr<uint8_t> m_rom;
 
-	uint8_t m_audiochannel;
-	uint8_t m_audioregister;
-	double m_sample_rate;
+	uint8_t m_cur_channel;
+	uint8_t m_cur_register;
+	double  m_sample_rate;
 
-	struct l7a1045_48bit_data {
-		uint16_t dat[3];
-	};
+	uint64_t m_regs[REGS_PER_VOICE][NUM_VOICES];
 
-	l7a1045_48bit_data m_audiodat[0x10][0x20];
+	void voice_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t voiceregs_r(offs_t offset);
+	void voiceregs_w(offs_t offset, uint16_t data);
+	uint16_t control_r();
+	void control_w(uint16_t data);
+	void atomic_w(uint16_t data);
 
-	void sound_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void sound_data_w(offs_t offset, uint16_t data);
-	uint16_t sound_data_r(offs_t offset);
-	void sound_status_w(uint16_t data);
+	void recalc_loop_start(l7a1045_voice *vptr);
 };
 
 DECLARE_DEVICE_TYPE(L7A1045, l7a1045_sound_device)

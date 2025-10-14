@@ -41,17 +41,16 @@
 #include "speaker.h"
 
 
-#define LOG_IO    (1U << 1)
-#define LOG_MEM   (1U << 2)
-#define LOG_WARN  (1U << 3)
+#define LOG_IO     (1U << 1)
+#define LOG_MEM    (1U << 2)
+#define LOG_COPPER (1U << 3)
 
-//#define VERBOSE ( LOG_GENERAL | LOG_IO | /*LOG_MEM |*/ LOG_WARN )
+//#define VERBOSE ( LOG_GENERAL | LOG_IO | /*LOG_MEM |*/ LOG_COPPER )
 #include "logmacro.h"
 
-#define LOGIO(...)    LOGMASKED(LOG_IO,    __VA_ARGS__)
-#define LOGMEM(...)   LOGMASKED(LOG_MEM,   __VA_ARGS__)
-#define LOGWARN(...)  LOGMASKED(LOG_WARN,  __VA_ARGS__)
-
+#define LOGIO(...)     LOGMASKED(LOG_IO,     __VA_ARGS__)
+#define LOGMEM(...)    LOGMASKED(LOG_MEM,    __VA_ARGS__)
+#define LOGCOPPER(...) LOGMASKED(LOG_COPPER, __VA_ARGS__)
 
 namespace {
 
@@ -911,7 +910,7 @@ void specnext_state::update_video_mode()
 
 	m_eff_nr_03_machine_timing = m_nr_03_machine_timing;
 	m_eff_nr_05_5060 = m_nr_05_5060;
-	LOG("%s: %s %dHz", machine_name, is_hdmi ? "HDMI" : "VGA", m_nr_05_5060 ? 60 : 50);
+	LOG("%s: %s %dHz\n", machine_name, is_hdmi ? "HDMI" : "VGA", m_nr_05_5060 ? 60 : 50);
 }
 
 u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -960,33 +959,45 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
 
-		if (m_nr_68_blend_mode != 0b11)
-		//if (m_nr_68_blend_mode == 0b00)
+		const bool is_textmode = BIT(m_nr_6b_tm_control, 3);
+		if (m_nr_68_blend_mode == 0b00) // Use ULA as blend layer
 		{
-			if (m_nr_68_ula_en && BIT(~m_nr_6b_tm_control, 3))
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), is_textmode ? 1 : 0xff);
+			if (m_nr_68_ula_en && !is_textmode)
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 8);
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), is_textmode ? 1 : 2);
 		}
-		/* TODO No tests for modes below yet
-		else if (m_nr_68_blend_mode == 0b10)
+		else if (m_nr_68_blend_mode == 0b10) // Use result of ULA + Tilemap
 		{
-		}
-		else if (m_nr_68_blend_mode == 0b11)
-		{
-		}
-		*/
-		else
-		{
-			if (m_nr_68_ula_en && BIT(~m_nr_6b_tm_control, 3))
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
+			if (m_nr_68_ula_en && !is_textmode)
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
+		}
+		else if (m_nr_68_blend_mode == 0b11) // Use Tilemap as blend layer
+		{
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
+			if (m_nr_68_ula_en && !is_textmode)
+			{
+				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
+			}
+			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
+		}
+		else // No blending (disable blend)
+		{
 			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
+			if (m_nr_68_ula_en && !is_textmode)
+			{
+				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
+			}
 			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
 		}
 		// mixes only to 1
@@ -1211,24 +1222,34 @@ attotime specnext_state::copper_until_pos_r(u16 pos)
 	const u16 vcount = BIT(pos, 0, 9);
 	const u16 hcount = BIT(pos, 9, 6) << 3;
 	if (vcount > m_video_timings.max_vc || hcount > m_video_timings.max_hc)
+	{
+		LOGCOPPER("[%s] HALT\n", m_copper->tag());
 		return attotime::never;
+	}
 	else
 	{
 		if (BIT(pos, 15))  // MOVE
 		{
 			u16 vtarget = cvc_to_vpos(vcount);
-			u16 htarget = ((hcount/* + 12*/) + m_video_timings.min_hactive + m_screen->width()) % m_screen->width();
+			u16 htarget = ((hcount/* + 12*/) + m_video_timings.min_hactive + m_video_timings.max_hc) %  m_video_timings.max_hc;
 			if (htarget < (m_video_timings.min_hactive))
 				vtarget = (vtarget + 1) % m_screen->height();
 			htarget <<= 1;
-			if (vtarget != m_screen->vpos() || htarget > m_screen->hpos())
+			const u16 vpos = m_screen->vpos();
+			const u16 hpos = m_screen->hpos();
+			LOGCOPPER("[%s] [%02x, %03x] WAIT(%02x+%02x, %03x)\n", m_copper->tag(), vpos, hpos >> 1, m_nr_64_copper_offset, vcount, hcount);
+			if (vtarget != vpos || htarget > hpos)
 				return m_screen->time_until_pos(vtarget, htarget);
 			else
+			{
+				LOGCOPPER("[%s] !WAIT\n", m_copper->tag());
 				return attotime::zero;
+			}
 		}
 		else // FRAME or RESET
 		{
 			assert(!vcount && !hcount);
+			LOGCOPPER("[%s] FRAME (0, 0)\n", m_copper->tag());
 			return m_screen->time_until_pos(cvc_to_vpos(0), m_video_timings.min_hactive << 1);
 		}
 	}
@@ -1715,7 +1736,7 @@ u8 specnext_state::reg_r(offs_t nr_register)
 	default:
 		port_253b_dat = 0x00;
 		if (!machine().side_effects_disabled())
-			LOGWARN("rR: %X -> %x\n", nr_register, port_253b_dat);
+			LOG("rR: %X -> %x\n", nr_register, port_253b_dat);
 	}
 
 	return port_253b_dat;
@@ -1866,9 +1887,11 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		}
 		break;
 	case 0x12:
+		m_screen->update_now();
 		nr_12_layer2_active_bank_w(nr_wr_dat);
 		break;
 	case 0x13:
+		m_screen->update_now();
 		nr_13_layer2_shadow_bank_w(nr_wr_dat);
 		break;
 	case 0x14:
@@ -2330,7 +2353,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		LOG("Debug: #%02X\n", nr_wr_dat); // LED
 		break;
 	default:
-		LOGWARN("wR: %X <- %x\n", nr_wr_reg, nr_wr_dat);
+		LOG("wR: %X <- %x\n", nr_wr_reg, nr_wr_dat);
 		break;
 	}
 
@@ -2376,6 +2399,7 @@ void specnext_state::nr_07_cpu_speed_w(u8 data)
 {
 	m_nr_07_cpu_speed = data & 3;
 	m_maincpu->set_clock_scale(1 << m_nr_07_cpu_speed);
+	m_ctc->set_clock_scale(1 << m_nr_07_cpu_speed);
 	m_dma->set_clock_scale(1 << m_nr_07_cpu_speed);
 }
 

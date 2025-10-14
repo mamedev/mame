@@ -138,7 +138,7 @@ void f1dream_state::f1dream_map(address_map &map)
 	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(FUNC(f1dream_state::to_mcu_w));
 }
 
-void f1dream_state::f1dream_mcu_io(address_map &map)
+void f1dream_state::f1dream_mcu_data(address_map &map)
 {
 	map(0x7f0, 0x7ff).rw(FUNC(f1dream_state::mcu_shared_r), FUNC(f1dream_state::mcu_shared_w));
 }
@@ -676,7 +676,7 @@ void f1dream_state::f1dream(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &f1dream_state::f1dream_map);
 
 	I8751(config, m_mcu, XTAL(10'000'000)); // 8MHz rated chip, 24.0000MHz/3???
-	m_mcu->set_addrmap(AS_IO, &f1dream_state::f1dream_mcu_io);
+	m_mcu->set_addrmap(AS_DATA, &f1dream_state::f1dream_mcu_data);
 	m_mcu->port_out_cb<1>().set("soundlatch", FUNC(generic_latch_8_device::write));
 	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::out3_w));
 }

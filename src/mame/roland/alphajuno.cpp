@@ -116,7 +116,7 @@ void alphajuno_state::ajuno1(machine_config &config)
 {
 	I8032(config, m_maincpu, 12_MHz_XTAL); // P8032AH
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphajuno_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::ajuno1_ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &alphajuno_state::ajuno1_ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
 
@@ -151,7 +151,7 @@ void alphajuno_state::ajuno1(machine_config &config)
 void alphajuno_state::ajuno2(machine_config &config)
 {
 	ajuno1(config);
-	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::ajuno2_ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &alphajuno_state::ajuno2_ext_map);
 
 	mb63h149_device &keyscan(MB63H149(config, "keyscan", 12_MHz_XTAL));
 	keyscan.int_callback().set_inputline(m_maincpu, MCS51_INT0_LINE);
@@ -161,7 +161,7 @@ void alphajuno_state::mks50(machine_config &config)
 {
 	I80C31(config, m_maincpu, 12_MHz_XTAL); // MSM80C31P
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphajuno_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::mks50_ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &alphajuno_state::mks50_ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-20 + battery
 

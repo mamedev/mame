@@ -789,11 +789,9 @@ void z80_device::execute_set_input(int inputnum, int state)
 	switch (inputnum)
 	{
 	case Z80_INPUT_LINE_BUSRQ:
-		m_busrq_state = state;
-		if (state != CLEAR_LINE)
+		if (m_busrq_state == CLEAR_LINE && state != CLEAR_LINE)
 			set_service_attention<SA_BUSRQ, 1>();
-		else
-			set_service_attention<SA_BUSRQ, 0>();
+		m_busrq_state = state;
 		break;
 
 	case INPUT_LINE_NMI:

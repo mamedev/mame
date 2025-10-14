@@ -439,7 +439,6 @@ private:
 	bool m_altzp = false;
 	bool m_ramrd = false, m_ramwrt = false;
 	bool m_lcram = false, m_lcram2 = false, m_lcprewrite = false, m_lcwriteenable = false;
-	bool m_ioudis = false;
 	bool m_rombank = false;
 
 	u8 m_shadow = 0, m_speed = 0, m_textcol = 0;
@@ -489,6 +488,7 @@ private:
 	void update_speed();
 	int get_vpos();
 	void process_clock();
+	void clear_vgcint(u8 data);
 
 	// ZipGS stuff
 	bool m_accel_unlocked = false;
@@ -757,7 +757,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_altzp));
 	save_item(NAME(m_ramrd));
 	save_item(NAME(m_ramwrt));
-	save_item(NAME(m_ioudis));
 	save_item(NAME(m_vbl));
 	save_item(NAME(m_irqmask));
 	save_item(NAME(m_lcram));
@@ -829,7 +828,6 @@ void apple2gs_state::machine_reset()
 	m_altzp = false;
 	m_ramrd = false;
 	m_ramwrt = false;
-	m_ioudis = true;
 	m_video->set_newvideo(0x01); // verified on ROM03 hardware
 	m_clock_frame = 0;
 	m_slot_irq = false;
@@ -922,10 +920,11 @@ void apple2gs_state::raise_irq(int irq)
 	{
 		m_irqmask |= (1 << irq);
 
-		//printf("raise IRQ %d (mask %x)\n", irq, m_irqmask);
-
-		if (m_irqmask)
+		if (!(m_intflag & INTFLAG_IRQASSERTED))
 		{
+			//printf("raise IRQ %d (mask %x)\n", irq, m_irqmask);
+			// TODO: Zip AppleTalk slowdown
+
 			m_intflag |= INTFLAG_IRQASSERTED;
 			m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
 		}
@@ -945,10 +944,6 @@ void apple2gs_state::lower_irq(int irq)
 		{
 			m_intflag &= ~INTFLAG_IRQASSERTED;
 			m_maincpu->set_input_line(G65816_LINE_IRQ, CLEAR_LINE);
-		}
-		else
-		{
-			m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
 		}
 	}
 }
@@ -1011,7 +1006,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	int scanline = m_screen->vpos();
 	m_screen->update_partial(scanline);
 
-	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
+	// check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area
 	if ((m_video->get_newvideo() & 0x80) && (scanline >= BORDER_TOP) && (scanline < (200+BORDER_TOP)))
 	{
 		u8 scb;
@@ -1028,10 +1023,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 
 		if (scb & 0x40)
 		{
-			// scanline int flag is set even when the actual interrupt is disabled
+			// VGC and MegaII status flags are set even when the interrupt is disabled
 			m_vgcint |= VGCINT_SCANLINE;
 
-			// see if the interrupt is also enabled and trigger it if so
+			// trigger the interrupt if enabled
 			if (m_vgcint & VGCINT_SCANLINEEN)
 			{
 				m_vgcint |= VGCINT_ANYVGCINT;
@@ -1040,14 +1035,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		}
 	}
 
-	if (scanline == (192+BORDER_TOP))
+	if (scanline == BORDER_TOP)
+	{
+		m_vbl = false;
+	}
+	else if (scanline == (192+BORDER_TOP))
 	{
 		m_vbl = true;
 
 		// VBL interrupt
-		if ((m_inten & 0x08) && !(m_intflag & INTFLAG_VBL))
+		m_intflag |= INTFLAG_VBL;
+		if (m_inten & 0x08)
 		{
-			m_intflag |= INTFLAG_VBL;
 			raise_irq(IRQS_VBL);
 		}
 
@@ -1058,9 +1057,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		// quarter second?
 		if ((m_clock_frame % 15) == 0)
 		{
-			if ((m_inten & 0x10) && !(m_intflag & INTFLAG_QUARTER))
+			m_intflag |= INTFLAG_QUARTER;
+			if (m_inten & 0x10)
 			{
-				m_intflag |= INTFLAG_QUARTER;
 				raise_irq(IRQS_QTRSEC);
 			}
 		}
@@ -1082,9 +1081,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			//printf("one sec, vgcint = %02x\n", m_vgcint);
 			m_clock_frame = 0;
 
-			if ((m_vgcint & VGCINT_SECONDENABLE) && !(m_vgcint & VGCINT_SECOND))
+			m_vgcint |= VGCINT_SECOND;
+			if (m_vgcint & VGCINT_SECONDENABLE)
 			{
-				m_vgcint |= (VGCINT_SECOND|VGCINT_ANYVGCINT);
+				m_vgcint |= VGCINT_ANYVGCINT;
 				raise_irq(IRQS_SECOND);
 			}
 		}
@@ -1296,20 +1296,6 @@ void apple2gs_state::do_io(int offset)
 {
 	if(machine().side_effects_disabled()) return;
 
-	if (m_ioudis)
-	{
-		switch (offset)
-		{
-			case 0x5e:  // SETDHIRES
-				m_video->dhires_w(0);
-				return;
-
-			case 0x5f:  // CLRDHIRES
-				m_video->dhires_w(1);
-				return;
-		}
-	}
-
 	switch (offset)
 	{
 		case 0x20:
@@ -1330,6 +1316,9 @@ void apple2gs_state::do_io(int offset)
 			}
 			break;
 
+		case 0x2a:  // 16-bit access to NEWVIDEO
+			break;
+
 		case 0x30:
 			m_speaker_state ^= 1;
 			if (m_speaker_state)
@@ -1347,6 +1336,15 @@ void apple2gs_state::do_io(int offset)
 				m_acceltimer->adjust(attotime::from_msec(5));
 				accel_normal_speed();
 			}
+			break;
+
+		case 0x37:  // DMAREG, 16-bit access to CYAREG
+			break;
+
+		case 0x47:  // CLRVBLINT
+			m_intflag &= ~(INTFLAG_VBL | INTFLAG_QUARTER);
+			lower_irq(IRQS_VBL);
+			lower_irq(IRQS_QTRSEC);
 			break;
 
 		case 0x50:  // graphics mode
@@ -1415,22 +1413,22 @@ void apple2gs_state::do_io(int offset)
 			m_gameio->an2_w(1);
 			break;
 
-		case 0x5e: // AN3 off
+		case 0x5e: // AN3 off, DHIRESON
 			m_an3 = false;
 			m_gameio->an3_w(0);
+			m_video->an3_w(0);
 			break;
 
-		case 0x5f: // AN3 on
+		case 0x5f: // AN3 on, DHIRESOFF
 			m_an3 = true;
 			m_gameio->an3_w(1);
+			m_video->an3_w(1);
 			break;
 
-		case 0x68:  // STATE
+		case 0x69:  // 16-bit access to STATEREG
 			break;
 
-		// trigger joypad read
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
-		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
+		case 0x70:  // PTRIG triggers paddles on read or write
 			// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
 			if ((m_accel_present) && !BIT(m_accel_gsxsettings, 6))
 			{
@@ -1496,6 +1494,24 @@ void apple2gs_state::process_clock()
 	}
 }
 
+void apple2gs_state::clear_vgcint(u8 data)
+{
+	if (!(data & VGCINT_SECOND))
+	{
+		m_vgcint &= ~VGCINT_SECOND;
+		lower_irq(IRQS_SECOND);
+	}
+	if (!(data & VGCINT_SCANLINE))
+	{
+		m_vgcint &= ~VGCINT_SCANLINE;
+		lower_irq(IRQS_SCAN);
+	}
+	if (!(m_vgcint & (VGCINT_SECOND | VGCINT_SCANLINE)))
+	{
+		m_vgcint &= ~VGCINT_ANYVGCINT;
+	}
+}
+
 u8 apple2gs_state::c000_r(offs_t offset)
 {
 	u8 ret;
@@ -1548,7 +1564,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return (uKeyboardC010 & 0x7f) | (m_video->get_80store() ? 0x80 : 0x00);
 
 		case 0x19:  // read VBL (not VBLBAR, see Apple IIGS Technical Note #40)
-			return (uKeyboardC010 & 0x7f) | (m_screen->vblank() ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_vbl ? 0x80 : 0x00);
 
 		case 0x1a:  // read TEXT
 			return (uKeyboardC010 & 0x7f) | (m_video->get_graphics() ? 0x00 : 0x80);
@@ -1596,9 +1612,15 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_slotromsel;
 
 		case 0x2e:  // VERTCNT
+			// reading VERTCNT clears SCB status
+			clear_vgcint(~VGCINT_SCANLINE);
+
 			return get_vpos() >> 1;
 
 		case 0x2f:  // HORIZCNT
+			// reading HORIZCNT clears SCB status
+			clear_vgcint(~VGCINT_SCANLINE);
+
 			ret = m_screen->hpos() / 11;
 			if (ret > 0)
 			{
@@ -1615,7 +1637,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_diskreg;
 
 		case 0x32: // VGCINTCLEAR
-			return 0;
+			return read_floatingbus();
 
 		case 0x33: // CLOCKDATA
 			return m_clkdata;
@@ -1674,12 +1696,6 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x46:  // INTFLAG
 			return (m_an3 ? INTFLAG_AN3 : 0x00) | m_intflag;
 
-		case 0x47:  // CLRVBLINT
-			m_intflag &= ~(INTFLAG_VBL|INTFLAG_QUARTER);
-			lower_irq(IRQS_VBL);
-			lower_irq(IRQS_QTRSEC);
-			return read_floatingbus();
-
 		case 0x60: // button 3 on IIgs
 			return (m_gameio->sw3_r() ? 0x80 : 0x00) | uFloatingBus7;
 
@@ -1720,40 +1736,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 					(m_rombank ? 0x02 : 0x00) |
 					(m_intcxrom ? 0x01 : 0x00);
 
-		case 0x70:  // PTRIG - triggers paddles on read or write
-			if (!machine().side_effects_disabled())
-			{
-				// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
-				if ((m_accel_present) && !BIT(m_accel_gsxsettings, 6))
-				{
-					m_accel_temp_slowdown = true;
-					m_acceltimer->adjust(attotime::from_msec(5));
-					accel_normal_speed();
-				}
-
-				// 558 monostable one-shot timers; a running timer cannot be restarted
-				if (machine().time().as_double() >= m_joystick_x1_time)
-				{
-					m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
-				}
-				if (machine().time().as_double() >= m_joystick_y1_time)
-				{
-					m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
-				}
-				if (machine().time().as_double() >= m_joystick_x2_time)
-				{
-					m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
-				}
-				if (machine().time().as_double() >= m_joystick_y2_time)
-				{
-					m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
-				}
-
-			}
-
-			return m_rom[offset + 0x3c000];
-
-		// The ROM IRQ vectors point here
+		// The ROM IRQ vectors point here (0x70 returns floating bus)
 		case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			return m_rom[offset + 0x3c000];
@@ -1907,18 +1890,10 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x23:  // VGCINT
-			if ((m_vgcint & VGCINT_SECOND) && !(data & VGCINT_SECONDENABLE))
-			{
-				lower_irq(IRQS_SECOND);
-				m_vgcint &= ~(VGCINT_SECOND);
-			}
-			if ((m_vgcint & VGCINT_SCANLINE) && !(data & VGCINT_SCANLINEEN))
-			{
-				lower_irq(IRQS_SCAN);
-				m_vgcint &= ~(VGCINT_SCANLINE);
-			}
-
-			if (!(m_vgcint & (VGCINT_SECOND|VGCINT_SCANLINE)))
+			// clearing enable bits may clear VGCINT_ANYVGCINT
+			// but it does not clear VGCINT status bits or lower IRQs
+			if (!((m_vgcint &   (VGCINT_SECOND | VGCINT_SCANLINE))
+				& (data & (VGCINT_SECONDENABLE | VGCINT_SCANLINEEN))))
 			{
 				m_vgcint &= ~(VGCINT_ANYVGCINT);
 			}
@@ -1969,24 +1944,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x32:  // VGCINTCLEAR
 			//printf("%02x to VGCINTCLEAR\n", data);
-			// one second
-			if (m_vgcint & VGCINT_SECOND)
-			{
-				lower_irq(IRQS_SECOND);
-				m_vgcint &= ~(VGCINT_SECOND|VGCINT_ANYVGCINT);
-			}
-
-			// scanline
-			if (m_vgcint & VGCINT_SCANLINE)
-			{
-				lower_irq(IRQS_SCAN);
-				m_vgcint &= ~(VGCINT_SCANLINE|VGCINT_ANYVGCINT);
-			}
-
-			if (m_irqmask & ((1<<IRQS_SECOND) | (1<<IRQS_SCAN)))
-			{
-				m_vgcint |= VGCINT_ANYVGCINT;
-			}
+			clear_vgcint(data);
 			break;
 
 		case 0x33:  // CLOCKDATA
@@ -2086,23 +2044,17 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x41:  // INTEN
 			m_inten = data & 0x1f;
+			// clearing enable bits may clear INTFLAG_IRQASSERTED
+			// but it does not clear INTFLAG status bits
 			if (!(data & 0x10))
 			{
-				m_intflag &= ~INTFLAG_QUARTER;
 				lower_irq(IRQS_QTRSEC);
 			}
 			if (!(data & 0x08))
 			{
-				m_intflag &= ~INTFLAG_VBL;
 				lower_irq(IRQS_VBL);
 			}
 			//printf("%02x to INTEN, now %02x\n", data, m_vgcint);
-			break;
-
-		case 0x47:  // CLRVBLINT
-			m_intflag &= ~(INTFLAG_VBL|INTFLAG_QUARTER);
-			lower_irq(IRQS_VBL);
-			lower_irq(IRQS_QTRSEC);
 			break;
 
 		case 0x59: // Zip GS-specific settings
@@ -2192,31 +2144,6 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				m_lc00.select(0);
 				m_lc01.select(0);
 			}
-			break;
-
-		case 0x70:
-		case 0x71:
-		case 0x72:
-		case 0x73:
-		case 0x74:
-		case 0x75:
-		case 0x76:
-		case 0x77:
-		case 0x78:
-		case 0x79:
-		case 0x7a:
-		case 0x7b:
-		case 0x7c:
-		case 0x7d:
-			do_io(offset); // make sure it also side-effect resets the paddles as documented
-			break;
-
-		case 0x7e: // SETIOUDIS
-			m_ioudis = true;
-			break;
-
-		case 0x7f: // CLRIOUDIS
-			m_ioudis = false;
 			break;
 
 		default:
@@ -3360,7 +3287,7 @@ void apple2gs_state::a2gs_es5503_map(address_map &map)
     ADB microcontroller + KEYGLU emulation
 
     Huge thanks to Neil Parker's writeup on the ADB microcontroller!
-    http://www.llx.com/~nparker/a2/adb.html
+    http://llx.com/Neil/a2/adb.html
 ***************************************************************************/
 
 u8 apple2gs_state::adbmicro_p0_in()
@@ -3441,6 +3368,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		m_altzp = false;
 		m_video->page2_w(false);
 		m_video->res_w(0);
+		m_irqmask = 0;
 
 		lcrom_update();
 		auxbank_update();

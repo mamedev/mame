@@ -143,7 +143,7 @@ void qs1000_device::qs1000_prg_map(address_map &map)
 }
 
 
-void qs1000_device::qs1000_io_map(address_map &map)
+void qs1000_device::qs1000_data_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
 	map(0x0200, 0x0211).w(FUNC(qs1000_device::wave_w));
@@ -199,7 +199,7 @@ void qs1000_device::device_add_mconfig(machine_config &config)
 {
 	I8052(config, m_cpu, DERIVED_CLOCK(1, 1));
 	m_cpu->set_addrmap(AS_PROGRAM, &qs1000_device::qs1000_prg_map);
-	m_cpu->set_addrmap(AS_IO, &qs1000_device::qs1000_io_map);
+	m_cpu->set_addrmap(AS_DATA, &qs1000_device::qs1000_data_map);
 	m_cpu->port_in_cb<1>().set(FUNC(qs1000_device::p1_r));
 	m_cpu->port_out_cb<1>().set(FUNC(qs1000_device::p1_w));
 	m_cpu->port_in_cb<2>().set(FUNC(qs1000_device::p2_r));

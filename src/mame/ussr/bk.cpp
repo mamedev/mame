@@ -44,7 +44,8 @@ void bk_state::bk0010_mem(address_map &map)
 	map(0177660, 0177663).r(m_kbd, FUNC(k1801vp014_device::read));
 	map(0177660, 0177661).w(m_kbd, FUNC(k1801vp014_device::write));
 	map(0177664, 0177665).rw(FUNC(bk_state::vid_scroll_r), FUNC(bk_state::vid_scroll_w));
-	map(0177706, 0177715).noprw();
+	map(0177706, 0177713).rw(m_timer, FUNC(k1801vm1_timer_device::read), FUNC(k1801vm1_timer_device::write));
+	map(0177714, 0177715).rw(m_up, FUNC(bk_parallel_slot_device::read), FUNC(bk_parallel_slot_device::write));
 	map(0177716, 0177717).rw(FUNC(bk_state::sel1_r), FUNC(bk_state::sel1_w));
 }
 
@@ -93,7 +94,8 @@ void bk_state::bk0011_mem(address_map &map)
 		m_stop_disabled = BIT(data, 15);
 	}));
 	map(0177664, 0177665).rw(FUNC(bk_state::vid_scroll_r), FUNC(bk_state::vid_scroll_w));
-	map(0177706, 0177715).noprw();
+	map(0177706, 0177713).rw(m_timer, FUNC(k1801vm1_timer_device::read), FUNC(k1801vm1_timer_device::write));
+	map(0177714, 0177715).rw(m_up, FUNC(bk_parallel_slot_device::read), FUNC(bk_parallel_slot_device::write));
 	map(0177716, 0177717).rw(FUNC(bk_state::bk11_sel1_r), FUNC(bk_state::bk11_sel1_w));
 }
 
@@ -136,6 +138,7 @@ void bk_state::bk0010(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain);
 	m_maincpu->out_reset().set(FUNC(bk_state::reset_w));
 
+	K1801VM1_TIMER(config, m_timer, 3000000);
 
 	K1801VP014(config, m_kbd, 0);
 	m_kbd->virq_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
@@ -154,6 +157,10 @@ void bk_state::bk0010(machine_config &config)
 	m_qbus->birq4().set_inputline(m_maincpu, t11_device::VEC_LINE);
 	QBUS_SLOT(config, "qbus" ":1", qbus_cards, nullptr);
 	QBUS_SLOT(config, "qbus" ":2", qbus_cards, nullptr); // some cards have passthrough
+
+	BK_PARALLEL_SLOT(config, m_up, 0, bk_parallel_devices, nullptr);
+	m_up->irq2_handler().set_inputline(m_maincpu, t11_device::CP2_LINE);
+	m_up->irq3_handler().set_inputline(m_maincpu, t11_device::CP3_LINE);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -195,6 +202,8 @@ void bk_state::bk0011(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bk_state::bk0011_mem);
 	m_maincpu->set_daisy_config(daisy_chain);
 	m_maincpu->out_reset().set(FUNC(bk_state::reset_w));
+
+	K1801VM1_TIMER(config.replace(), m_timer, 4000000);
 
 	m_kbd->halt_wr_callback().set([this] (int state) {
 		if (!m_stop_disabled) m_maincpu->set_input_line(t11_device::HLT_LINE, state);

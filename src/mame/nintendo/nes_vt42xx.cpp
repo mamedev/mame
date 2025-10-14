@@ -313,7 +313,7 @@ void nes_vt42xx_state::nes_vt42xx(machine_config &config)
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt42xx_state::upper_412d_r));
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt42xx_state::upper_412c_w));
 
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
+	m_soc->set_default_palette_mode(PAL_MODE_VT0x);
 	m_soc->force_bad_dma();
 }
 
@@ -499,6 +499,13 @@ ROM_START( fapocket )
 	ROM_LOAD( "s29gl512n.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
 ROM_END
 
+ROM_START( wol260 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "js28f256m29ewh.u1", 0x00000, 0x2000000, CRC(ccb08b50) SHA1(089335c001085cfae94db6ea39e31388674581ed) )
+ROM_END
+
+
+
 void nes_vt42xx_state::init_rfcp168()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
@@ -589,6 +596,7 @@ CONS( 2019, gbox2019, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, emp
 
 CONS( 200?, gprnrs1,  0,  0,  nes_vt42xx_8mb,  nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, gprnrs16, 0,  0,  nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, wol260,   gprnrs16, 0, nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "Wolsen", "260 in 1 Handheld Game (Wolsen)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, mc_9x6ss, 0,        0, nes_vt42xx_4mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_9x6sa, mc_9x6ss, 0, nes_vt42xx_2mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )

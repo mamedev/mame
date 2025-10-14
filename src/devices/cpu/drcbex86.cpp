@@ -419,7 +419,7 @@ public:
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
-	virtual bool logging() const noexcept override { return m_log != nullptr; }
+	virtual bool logging() const noexcept override { return bool(m_log); }
 
 private:
 	// HACK: leftover from x86emit
@@ -636,7 +636,7 @@ private:
 	// internal state
 	drc_hash_table          m_hash;                 // hash table state
 	drc_map_variables       m_map;                  // code map
-	x86log_context *        m_log;                  // logging
+	x86log_context::ptr     m_log;                  // logging
 	FILE *                  m_log_asmjit;
 	bool                    m_logged_common;        // logged common code already?
 	bool const              m_sse3;                 // do we have SSE3 support?
@@ -1016,7 +1016,6 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	drcbe_interface(drcuml, cache, device)
 	, m_hash(cache, modes, addrbits, ignorebits)
 	, m_map(cache, 0)
-	, m_log(nullptr)
 	, m_log_asmjit(nullptr)
 	, m_logged_common(false)
 	, m_sse3(CpuInfo::host().features().x86().hasSSE3())
@@ -1085,7 +1084,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	if (device.machine().options().drc_log_native())
 	{
 		std::string filename = std::string("drcbex86_").append(device.shortname()).append(".asm");
-		m_log = x86log_create_context(filename.c_str());
+		m_log = x86log_context::create(filename);
 		m_log_asmjit = fopen(std::string("drcbex86_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
 	}
 }
@@ -1098,8 +1097,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 drcbe_x86::~drcbe_x86()
 {
 	// free the log context
-	if (m_log != nullptr)
-		x86log_free_context(m_log);
+	m_log.reset();
 
 	if (m_log_asmjit)
 		fclose(m_log_asmjit);
@@ -1152,8 +1150,8 @@ size_t drcbe_x86::emit(CodeHolder &ch)
 void drcbe_x86::reset()
 {
 	// output a note to the log
-	if (m_log != nullptr)
-		x86log_printf(m_log, "%s", "\n\n===========\nCACHE RESET\n===========\n\n");
+	if (m_log)
+		m_log->printf("%s", "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	// generate a little bit of glue code to set up the environment
 	x86code *dst = (x86code *)m_cache.top();
@@ -1285,29 +1283,34 @@ void drcbe_x86::reset()
 		a.mov(eax, ptr(ecx, regoffsh));
 		a.mov(MABS(&m_state.f[regnum].s.h), eax);
 	}
-	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, fmod)));                  // movzx eax,state->fmod
-	a.and_(eax, 3);                                                                     // and    eax,3
-	a.mov(MABS(&m_state.fmod), al);                                                     // mov    [fmod],al
-	a.fldcw(word_ptr(uintptr_t(&fp_control[0]), eax, 1));                               // fldcw  fp_control[eax*2]
-	a.mov(eax, ptr(ecx, offsetof(drcuml_machine_state, exp)));                          // mov    eax,state->exp
-	a.mov(MABS(&m_state.exp), eax);                                                     // mov    [exp],eax
-	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, flags)));                 // movzx eax,state->flags
-	a.push(dword_ptr(uintptr_t(flags_unmap), eax, 2));                                  // push   flags_unmap[eax*4]
-	a.popfd();                                                                          // popf
-	a.ret();                                                                            // ret
+	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, fmod)));
+	a.and_(eax, 3);
+	a.mov(MABS(&m_state.fmod), al);
+	a.fldcw(word_ptr(uintptr_t(&fp_control[0]), eax, 1));
+	a.mov(eax, ptr(ecx, offsetof(drcuml_machine_state, exp)));
+	a.mov(MABS(&m_state.exp), eax);
+
+	a.pushfd();
+	a.and_(dword_ptr(esp), ~0x8c5);
+	a.movzx(eax, byte_ptr(ecx, offsetof(drcuml_machine_state, flags)));
+	a.and_(eax, FLAGS_ALL);
+	a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
+	a.or_(dword_ptr(esp), eax);
+	a.popfd();
+	a.ret();
 
 
 	// emit the generated code
 	size_t bytes = emit(ch);
 
-	if (m_log != nullptr && !m_logged_common)
+	if (m_log && !m_logged_common)
 	{
-		x86log_disasm_code_range(m_log, "entry_point", dst, m_exit);
-		x86log_disasm_code_range(m_log, "exit_point", m_exit, m_nocode);
-		x86log_disasm_code_range(m_log, "nocode_point", m_nocode, m_endofblock);
-		x86log_disasm_code_range(m_log, "end_of_block", m_endofblock, m_save);
-		x86log_disasm_code_range(m_log, "save", m_save, m_restore);
-		x86log_disasm_code_range(m_log, "restore", m_restore, dst + bytes);
+		m_log->disasm_code_range("entry_point", dst, m_exit);
+		m_log->disasm_code_range("exit_point", m_exit, m_nocode);
+		m_log->disasm_code_range("nocode_point", m_nocode, m_endofblock);
+		m_log->disasm_code_range("end_of_block", m_endofblock, m_save);
+		m_log->disasm_code_range("save", m_save, m_restore);
+		m_log->disasm_code_range("restore", m_restore, dst + bytes);
 
 		m_logged_common = true;
 	}
@@ -1395,7 +1398,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 		if (m_log)
 		{
 			dasm = inst.disasm(&m_drcuml);
-			x86log_add_comment(m_log, dst + a.offset(), "%s", dasm.c_str());
+			m_log->add_comment(dst + a.offset(), "%s", dasm.c_str());
 			a.setInlineComment(dasm.c_str());
 		}
 
@@ -1415,7 +1418,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 	// catch falling off the end of a block
 	if (m_log)
 	{
-		x86log_add_comment(m_log, dst + a.offset(), "%s", "end of block");
+		m_log->add_comment(dst + a.offset(), "%s", "end of block");
 		a.setInlineComment("end of block");
 	}
 	a.jmp(imm(m_endofblock));
@@ -1427,7 +1430,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 
 	// log it
 	if (m_log)
-		x86log_disasm_code_range(m_log, (blockname.empty()) ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
+		m_log->disasm_code_range(blockname.empty() ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
 
 	// tell all of our utility objects that the block is finished
 	m_hash.block_end(block);
@@ -3573,16 +3576,26 @@ void drcbe_x86::op_setflgs(Assembler &a, const instruction &inst)
 {
 	assert(inst.size() == 4);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
 	a.pushfd();
-
-	emit_mov_r32_p32(a, eax, srcp);
-
-	a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
 	a.and_(dword_ptr(esp), ~0x8c5);
+
+	if (srcp.is_immediate())
+	{
+		uint32_t const flags = flags_unmap[srcp.immediate() & FLAGS_ALL];
+		if (!flags)
+			a.xor_(eax, eax);
+		else
+			a.mov(eax, flags);
+	}
+	else
+	{
+		emit_mov_r32_p32(a, eax, srcp);
+		a.and_(eax, FLAGS_ALL);
+		a.mov(eax, ptr(uintptr_t(flags_unmap), eax, 2));
+	}
 	a.or_(dword_ptr(esp), eax);
 
 	a.popfd();
@@ -6991,15 +7004,18 @@ void drcbe_x86::op_fcmp(Assembler &a, const instruction &inst)
 	a.fcomip(st1);
 	a.fstp(st0);
 
-	// clear Z and C if unordered
-	Label ordered = a.newLabel();
+	if (inst.flags() & (FLAG_Z | FLAG_C))
+	{
+		// clear Z and C if unordered
+		Label ordered = a.newLabel();
 
-	a.short_().jnp(ordered);
-	a.lahf();
-	a.and_(eax, 0x00003e00);
-	a.sahf();
+		a.short_().jnp(ordered);
+		a.lahf();
+		a.and_(eax, 0x00003e00);
+		a.sahf();
 
-	a.bind(ordered);
+		a.bind(ordered);
+	}
 }
 
 

@@ -381,7 +381,7 @@ public:
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
-	virtual bool logging() const noexcept override { return m_log != nullptr; }
+	virtual bool logging() const noexcept override { return bool(m_log); }
 
 private:
 	// a be_parameter is similar to a uml::parameter but maps to native registers/memory
@@ -469,8 +469,8 @@ private:
 
 		void *              stacksave;              // saved stack pointer
 
-		uint8_t             flagsmap[0x1000];       // flags map
-		uint64_t            flagsunmap[0x20];       // flags unmapper
+		uint8_t             flagsmap[0x100];        // flags map
+		uint16_t            flagsunmap[0x20];       // flags unmapper
 	};
 
 	// resolved memory handler functions
@@ -547,7 +547,8 @@ private:
 	void op_subc(Assembler &a, const uml::instruction &inst);
 	void op_cmp(Assembler &a, const uml::instruction &inst);
 	template <Inst::Id Opcode> void op_mul(Assembler &a, const uml::instruction &inst);
-	template <Inst::Id Opcode> void op_mullw(Assembler &a, const uml::instruction &inst);
+	void op_mululw(Assembler &a, const uml::instruction &inst);
+	void op_mulslw(Assembler &a, const uml::instruction &inst);
 	void op_divu(Assembler &a, const uml::instruction &inst);
 	void op_divs(Assembler &a, const uml::instruction &inst);
 	void op_and(Assembler &a, const uml::instruction &inst);
@@ -603,16 +604,15 @@ private:
 	void movsd_r128_p64(Assembler &a, Xmm const &reg, be_parameter const &param);
 	void movsd_p64_r128(Assembler &a, be_parameter const &param, Xmm const &reg);
 
-	void calculate_status_flags(Assembler &a, uint32_t instsize, Operand const &dst, u8 flags);
-	void calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp const &lo, Gp const &hi);
-	void calculate_status_flags_mul_low(Assembler &a, Gp const &lo);
+	void calculate_status_flags_mul(Assembler &a, const uml::instruction &inst, Gp const &lo, Gp const &hi);
+	void calculate_status_flags_mullw(Assembler &a, const uml::instruction &inst, Gp const &lo, Gp const &hi);
 
 	size_t emit(CodeHolder &ch);
 
 	// internal state
 	drc_hash_table          m_hash;                 // hash table state
 	drc_map_variables       m_map;                  // code map
-	x86log_context *        m_log;                  // logging
+	x86log_context::ptr     m_log;                  // logging
 	FILE *                  m_log_asmjit;
 
 	uint32_t *              m_absmask32;            // absolute value mask (32-bit)
@@ -690,9 +690,9 @@ inline void drcbe_x64::generate_one(Assembler &a, const uml::instruction &inst)
 	case uml::OP_SUBB:    op_subc(a, inst);                 break; // SUBB    dst,src1,src2[,f]
 	case uml::OP_CMP:     op_cmp(a, inst);                  break; // CMP     src1,src2[,f]
 	case uml::OP_MULU:    op_mul<Inst::kIdMul>(a, inst);    break; // MULU    dst,edst,src1,src2[,f]
-	case uml::OP_MULULW:  op_mullw<Inst::kIdMul>(a, inst);  break; // MULULW  dst,src1,src2[,f]
+	case uml::OP_MULULW:  op_mululw(a, inst);               break; // MULULW  dst,src1,src2[,f]
 	case uml::OP_MULS:    op_mul<Inst::kIdImul>(a, inst);   break; // MULS    dst,edst,src1,src2[,f]
-	case uml::OP_MULSLW:  op_mullw<Inst::kIdImul>(a, inst); break; // MULSLW  dst,src1,src2[,f]
+	case uml::OP_MULSLW:  op_mulslw(a, inst);               break; // MULSLW  dst,src1,src2[,f]
 	case uml::OP_DIVU:    op_divu(a, inst);                 break; // DIVU    dst,edst,src1,src2[,f]
 	case uml::OP_DIVS:    op_divs(a, inst);                 break; // DIVS    dst,edst,src1,src2[,f]
 	case uml::OP_AND:     op_and(a, inst);                  break; // AND     dst,src1,src2[,f]
@@ -866,7 +866,7 @@ inline void drcbe_x64::normalize_commutative(const be_parameter &dst, be_paramet
 		using std::swap;
 		swap(inner, outer);
 	}
-	else
+	else if (dst != inner)
 	{
 		normalize_commutative(inner, outer);
 	}
@@ -1004,7 +1004,6 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	: drcbe_interface(drcuml, cache, device)
 	, m_hash(cache, modes, addrbits, ignorebits)
 	, m_map(cache, 0xaaaaaaaa5555)
-	, m_log(nullptr)
 	, m_log_asmjit(nullptr)
 	, m_absmask32((uint32_t *)cache.alloc_near(16*2 + 15))
 	, m_absmask64(nullptr)
@@ -1048,17 +1047,17 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		if (entry & 0x004) flags |= FLAG_U;
 		if (entry & 0x040) flags |= FLAG_Z;
 		if (entry & 0x080) flags |= FLAG_S;
-		if (entry & 0x800) flags |= FLAG_V;
+		// can't get FLAG_V from lahf
 		m_near.flagsmap[entry] = flags;
 	}
 	for (int entry = 0; entry < std::size(m_near.flagsunmap); entry++)
 	{
-		uint64_t flags = 0;
-		if (entry & FLAG_C) flags |= 0x001;
-		if (entry & FLAG_U) flags |= 0x004;
-		if (entry & FLAG_Z) flags |= 0x040;
-		if (entry & FLAG_S) flags |= 0x080;
-		if (entry & FLAG_V) flags |= 0x800;
+		uint16_t flags = 0;
+		if (entry & FLAG_C) flags |= 0x001 << 8;
+		if (entry & FLAG_U) flags |= 0x004 << 8;
+		if (entry & FLAG_Z) flags |= 0x040 << 8;
+		if (entry & FLAG_S) flags |= 0x080 << 8;
+		// can't set V -> O with sahf
 		m_near.flagsunmap[entry] = flags;
 	}
 
@@ -1087,7 +1086,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	if (device.machine().options().drc_log_native())
 	{
 		std::string filename = std::string("drcbex64_").append(device.shortname()).append(".asm");
-		m_log = x86log_create_context(filename.c_str());
+		m_log = x86log_context::create(filename);
 		m_log_asmjit = fopen(std::string("drcbex64_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
 	}
 }
@@ -1100,8 +1099,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 drcbe_x64::~drcbe_x64()
 {
 	// free the log context
-	if (m_log != nullptr)
-		x86log_free_context(m_log);
+	m_log.reset();
 
 	if (m_log_asmjit)
 		fclose(m_log_asmjit);
@@ -1154,8 +1152,8 @@ size_t drcbe_x64::emit(CodeHolder &ch)
 void drcbe_x64::reset()
 {
 	// output a note to the log
-	if (m_log != nullptr)
-		x86log_printf(m_log, "%s", "\n\n===========\nCACHE RESET\n===========\n\n");
+	if (m_log)
+		m_log->printf("%s", "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	// generate a little bit of glue code to set up the environment
 	x86code *dst = (x86code *)m_cache.top();
@@ -1223,10 +1221,10 @@ void drcbe_x64::reset()
 
 	if (m_log)
 	{
-		x86log_disasm_code_range(m_log, "entry_point", dst, m_exit);
-		x86log_disasm_code_range(m_log, "exit_point", m_exit, m_nocode);
-		x86log_disasm_code_range(m_log, "nocode_point", m_nocode, m_endofblock);
-		x86log_disasm_code_range(m_log, "end_of_block", m_endofblock, dst + bytes);
+		m_log->disasm_code_range("entry_point", dst, m_exit);
+		m_log->disasm_code_range("exit_point", m_exit, m_nocode);
+		m_log->disasm_code_range("nocode_point", m_nocode, m_endofblock);
+		m_log->disasm_code_range("end_of_block", m_endofblock, dst + bytes);
 	}
 
 	// reset our hash tables
@@ -1314,7 +1312,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 		{
 			dasm = inst.disasm(&m_drcuml);
 
-			x86log_add_comment(m_log, dst + a.offset(), "%s", dasm.c_str());
+			m_log->add_comment(dst + a.offset(), "%s", dasm.c_str());
 			a.setInlineComment(dasm.c_str());
 		}
 
@@ -1334,7 +1332,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 	// catch falling off the end of a block
 	if (m_log)
 	{
-		x86log_add_comment(m_log, dst + a.offset(), "%s", "end of block");
+		m_log->add_comment(dst + a.offset(), "%s", "end of block");
 		a.setInlineComment("end of block");
 	}
 	a.jmp(imm(m_endofblock));
@@ -1346,7 +1344,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, uint3
 
 	// log it
 	if (m_log)
-		x86log_disasm_code_range(m_log, (blockname.empty()) ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
+		m_log->disasm_code_range(blockname.empty() ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
 
 	// tell all of our utility objects that the block is finished
 	m_hash.block_end(block);
@@ -1392,8 +1390,8 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 			if (is64 && !short_immediate(param.immediate()))
 			{
 				// use scratch register for 64-bit immediate
-				a.mov(r11, param.immediate());
-				a.emit(opcode, dst, r11);
+				a.mov(r10, param.immediate());
+				a.emit(opcode, dst, r10);
 			}
 			else
 			{
@@ -1430,114 +1428,72 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 	}
 }
 
-void drcbe_x64::calculate_status_flags(Assembler &a, uint32_t instsize, Operand const &dst, u8 flags)
+void drcbe_x64::calculate_status_flags_mul(Assembler &a, const uml::instruction &inst, Gp const &lo, Gp const &hi)
 {
-	// calculate status flags in a way that does not modify any other status flags
-	uint32_t flagmask = 0;
-
-	// can't get FLAG_V from lahf so implement it using seto if needed in the future
-	if (flags & FLAG_C) flagmask |= 0x0100;
-	if (flags & FLAG_Z) flagmask |= 0x4000;
-	if (flags & FLAG_S) flagmask |= 0x8000;
-	if (flags & FLAG_U) flagmask |= 0x0400;
-
-	if ((flags & (FLAG_Z | FLAG_S)) == flags)
+	if (!(inst.flags() & (FLAG_Z | FLAG_S)))
 	{
-		Gp tempreg = r10;
-		Gp tempreg2 = r11;
+		// overflow flag is calculated by multiply instruction
+	}
+	else if ((inst.flags() & (FLAG_Z | FLAG_S)) != (FLAG_Z | FLAG_S))
+	{
+		if (inst.flags() & FLAG_V)
+			a.seto(r10b); // keep the overflow flag from the multiplication
 
-		a.mov(tempreg, rax);
-
-		if (dst.isMem())
-			a.mov(tempreg2, dst.as<Mem>());
+		if (inst.flags() & FLAG_Z)
+			a.or_(lo, hi);
 		else
-			a.mov(tempreg2, dst.as<Gpq>().r64());
+			a.test(hi, hi);
 
-		a.lahf();
-		a.and_(rax, ~flagmask);
-		if (instsize == 4)
-			a.test(tempreg2.r32(), tempreg2.r32());
-		else
-			a.test(tempreg2, tempreg2);
-		a.mov(tempreg2, rax);
-
-		a.lahf();
-		a.and_(rax, flagmask);
-		a.or_(rax, tempreg2);
-		a.sahf();
-
-		a.mov(rax, tempreg);
+		if (inst.flags() & FLAG_V)
+		{
+			// restore overflow flag
+			a.lahf();
+			a.add(r10b, 0x7f);
+			a.sahf();
+		}
 	}
 	else
 	{
-		fatalerror("drcbe_x64::calculate_status_flags: unknown flag combination requested: %02x\n", flags);
+		const Gp tempreg = (inst.size() == 4) ? Gp(r10d) : Gp(r10);
+
+		a.mov(tempreg, lo);
+
+		if (inst.flags() & FLAG_V)
+			a.seto(al); // overflow flag in al[0]
+
+		a.test(hi, hi);
+		a.lahf(); // sign and upper half zero in ah[7:6]
+
+		a.test(tempreg, tempreg);
+		a.setz(cl); // lower half zero in cl[0]
+		a.or_(cl, 0x02); // keep sign
+		a.shl(cl, 6); // shift into position
+		a.and_(ah, cl); // combine zero flags
+
+		if (inst.flags() & FLAG_V)
+			a.add(al, 0x7f); // restore overflow flag
+
+		a.sahf();
 	}
 }
 
-void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp const &lo, Gp const &hi)
+void drcbe_x64::calculate_status_flags_mullw(Assembler &a, const uml::instruction &inst, Gp const &lo, Gp const &hi)
 {
-	Gp tempreg = r11;
-	Gp tempreg2 = r10;
+	if (inst.flags() & (FLAG_Z | FLAG_S))
+	{
+		if (inst.flags() & FLAG_V)
+			a.seto(hi.r8()); // keep the overflow flag from the multiplication
 
-	if (lo.id() == rax.id() || hi.id() == rax.id())
-		a.mov(tempreg2, rax);
-
-	a.seto(al);
-	a.movzx(rax, al); // clear out the rest of rax for lahf
-	a.mov(tempreg, rax);
-
-	a.lahf();
-	a.shl(tempreg, 16);
-	a.or_(tempreg, rax);
-
-	if (hi.id() == rax.id())
-		a.mov(rax, tempreg2);
-
-	if (instsize == 4)
-		a.test(hi.r32(), hi.r32());
-	else
-		a.test(hi, hi);
-
-	a.lahf();  // will have the sign flag + upper half zero
-	a.mov(hi, rax);
-
-	if (lo.id() == rax.id())
-		a.mov(rax, tempreg2);
-
-	if (instsize == 4)
-		a.test(lo.r32(), lo.r32());
-	else
 		a.test(lo, lo);
 
-	a.lahf();  // lower half zero
-	a.and_(rax, hi); // if top and bottom are zero then this will leave the zero flag
-	a.and_(rax, 0x4000); // zero
-	a.and_(hi, 0x8000); // sign
-	a.or_(rax, hi); // combine sign flag from top and zero flags for both
-
-	a.and_(tempreg, ~(0x4000 | 0x8000));
-	a.or_(tempreg, rax);
-
-	// restore overflow flag
-	a.mov(rax, tempreg);
-	a.shr(rax, 16);
-	a.add(al, 0x7f);
-
-	a.mov(rax, tempreg);
-	a.sahf();
-}
-
-inline void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, Gp const &lo)
-{
-	// calculate zero, sign flags based on the lower half of the result but keep the overflow from the multiplication
-	a.seto(dl);
-
-	a.test(lo, lo);
-
-	// restore overflow flag
-	a.lahf();
-	a.add(dl, 0x7f);
-	a.sahf();
+		if (inst.flags() & FLAG_V)
+		{
+			// restore overflow flag
+			a.lahf();
+			a.add(hi.r8(), 0x7f);
+			a.sahf();
+		}
+	}
 }
 
 void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsize, Operand const &dst, be_parameter const &param, u8 update_flags)
@@ -1552,29 +1508,27 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 		const uint32_t bitshift = param.immediate() & (opsize * 8 - 1);
 
 		if (bitshift)
-		{
 			a.emit(opcode, dst, imm(param.immediate()));
 
-			if (rotate && (update_flags & (FLAG_S | FLAG_Z)))
+		if (!bitshift && update_flags && !(update_flags & (FLAG_S | FLAG_Z)) && !carryin)
+		{
+			a.clc(); // throw away carry since it'll never be used
+		}
+		else if ((rotate && (update_flags & (FLAG_S | FLAG_Z))) || (!bitshift && update_flags))
+		{
+			if ((update_flags & FLAG_C) && ((rotate && bitshift) || ((update_flags & (FLAG_S | FLAG_Z)) && carryin)))
+				a.rcl(r10b, 1); // save carry
+
+			if (!rotate || (update_flags & (FLAG_S | FLAG_Z)))
 			{
-				if (update_flags & FLAG_C)
-					calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
-				else if (dst.isMem())
+				if (dst.isMem())
 					a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
 				else
 					a.test(dst.as<Gp>(), dst.as<Gp>());
 			}
-		}
-		else if (update_flags)
-		{
-			if (!carryin && !(update_flags & (FLAG_S | FLAG_Z)))
-				a.clc(); // throw away carry since it'll never be used
-			else if ((!carryin || !(update_flags & FLAG_C)) && dst.isMem())
-				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
-			else if (!carryin || !(update_flags & FLAG_C))
-				a.test(dst.as<Gp>(), dst.as<Gp>());
-			else if (update_flags & (FLAG_S | FLAG_Z))
-				calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
+
+			if ((update_flags & FLAG_C) && ((rotate && bitshift) || ((update_flags & (FLAG_S | FLAG_Z)) && carryin)))
+				a.rcr(r10b, 1); // restore carry
 		}
 	}
 	else if (update_flags || carryin)
@@ -1595,14 +1549,21 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 			a.short_().jnz(calc);
 
-			if (carryin)
-				a.shr(r10b, 1); // restore carry for rolc/rorc
-			else if (!(update_flags & ~FLAG_C))
-				a.clc(); // throw away carry since it'll never be used
-			else if (dst.isMem())
-				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
-			else
-				a.test(dst.as<Gp>(), dst.as<Gp>());
+			if (update_flags & (FLAG_S | FLAG_Z))
+			{
+				if (dst.isMem())
+					a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
+				else
+					a.test(dst.as<Gp>(), dst.as<Gp>());
+			}
+
+			if (update_flags & FLAG_C)
+			{
+				if (carryin)
+					a.rcr(r10b, 1); // restore carry for rolc/rorc
+				else if (!(update_flags & (FLAG_S | FLAG_Z)))
+					a.clc(); // throw away carry since it'll never be used
+			}
 
 			a.short_().jmp(end);
 
@@ -1614,20 +1575,22 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		a.emit(opcode, dst, cl);
 
-		if (carryin)
-			a.bind(end);
-
-		if ((rotate || !(update_flags & FLAG_C)) && (update_flags & (FLAG_S | FLAG_Z)))
+		// zero-bit shifts and rotate instructions don't update S and Z
+		if ((update_flags & (FLAG_S | FLAG_Z)) && (!(update_flags & FLAG_C) || rotate))
 		{
-			if (update_flags & FLAG_C)
-				calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z);
-			else if (dst.isMem())
+			if ((update_flags & FLAG_C) && rotate)
+				a.rcl(r10b, 1); // save carry
+
+			if (dst.isMem())
 				a.test(dst.as<Mem>(), util::make_bitmask<uint64_t>(opsize * 8));
 			else
 				a.test(dst.as<Gp>(), dst.as<Gp>());
+
+			if ((update_flags & FLAG_C) && rotate)
+				a.rcr(r10b, 1); // restore carry
 		}
 
-		if ((update_flags & FLAG_C) && !carryin)
+		if ((update_flags & FLAG_C) || carryin)
 			a.bind(end);
 	}
 	else
@@ -2425,143 +2388,168 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 	be_parameter maskp(*this, inst.param(1), PTYPE_I);
 
 	// pick a target register for the general case
-	Gp dstreg = dstp.select_register(eax);
+	Gp dstreg = dstp.select_register(edx);
 
-	a.lahf();
-	a.mov(r10, rax);
-
-	// compute mask for flags
-	// can't get FLAG_V from lahf
 	uint32_t flagmask = 0;
-	if (maskp.immediate() & FLAG_C) flagmask |= 0x001;
-	if (maskp.immediate() & FLAG_Z) flagmask |= 0x040;
-	if (maskp.immediate() & FLAG_S) flagmask |= 0x080;
-	if (maskp.immediate() & FLAG_U) flagmask |= 0x004;
 
 	switch (maskp.immediate())
 	{
 		// single flags only
 		case FLAG_C:
-			a.setc(al);                                                                 // setc   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
+			a.setc(al);
+			a.movzx(dstreg, al);
 			break;
 
 		case FLAG_V:
-			a.seto(al);                                                                 // seto   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 1);                                                           // shl    dstreg,1
+			a.seto(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(rax, rax));
 			break;
 
 		case FLAG_Z:
-			a.setz(al);                                                                 // setz   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 2);                                                           // shl    dstreg,2
+			a.setz(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(0, rax, FLAG_BIT_Z));
 			break;
 
 		case FLAG_S:
-			a.sets(al);                                                                 // sets   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 3);                                                           // shl    dstreg,3
+			a.sets(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(0, rax, FLAG_BIT_S));
 			break;
 
 		case FLAG_U:
-			a.setp(al);                                                                 // setp   al
-			a.movzx(dstreg, al);                                                        // movzx  dstreg,al
-			a.shl(dstreg, 4);                                                           // shl    dstreg,4
+			a.setp(al);
+			a.movzx(eax, al);
+			a.lea(dstreg, ptr(rax, rax));
+			a.lea(dstreg, ptr(0, dstreg, 3));
 			break;
 
 		// carry plus another flag
 		case FLAG_C | FLAG_V:
-			a.setc(al);                                                                 // setc   al
-			a.seto(cl);                                                                 // seto   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 1));                                            // lea    dstreg,[eax+ecx*2]
+			a.setc(al);
+			a.seto(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_V - FLAG_BIT_C));
 			break;
 
 		case FLAG_C | FLAG_Z:
-			a.setc(al);                                                                 // setc   al
-			a.setz(cl);                                                                 // setz   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 2));                                            // lea    dstreg,[eax+ecx*4]
+			a.setc(al);
+			a.setz(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_Z - FLAG_BIT_C));
 			break;
 
 		case FLAG_C | FLAG_S:
-			a.setc(al);                                                                 // setc   al
-			a.sets(cl);                                                                 // sets   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 3));                                            // lea    dstreg,[eax+ecx*8]
+			a.setc(al);
+			a.sets(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_S - FLAG_BIT_C));
+			break;
+
+		case FLAG_C | FLAG_U:
+			a.setp(cl);
+			a.setc(al);
+			a.movzx(ecx, cl);
+			a.movzx(eax, al);
+			a.lea(ecx, ptr(ecx, ecx));
+			a.lea(dstreg, ptr(eax, ecx, 3));
 			break;
 
 		// overflow plus another flag
 		case FLAG_V | FLAG_Z:
-			a.seto(al);                                                                 // seto   al
-			a.setz(cl);                                                                 // setz   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 1));                                            // lea    dstreg,[eax+ecx*2]
-			a.shl(dstreg, 1);                                                           // shl    dstreg,1
+			a.seto(al);
+			a.setz(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_Z - FLAG_BIT_V));
+			a.lea(dstreg, ptr(dstreg, dstreg));
 			break;
 
 		case FLAG_V | FLAG_S:
-			a.seto(al);                                                                 // seto   al
-			a.sets(cl);                                                                 // sets   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 2));                                            // lea    dstreg,[eax+ecx*4]
-			a.shl(dstreg, 1);                                                           // shl    dstreg,1
+			a.seto(al);
+			a.sets(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_S - FLAG_BIT_V));
+			a.lea(dstreg, ptr(dstreg, dstreg));
+			break;
+
+		case FLAG_V | FLAG_U:
+			a.seto(al);
+			a.setp(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_U - FLAG_BIT_V));
+			a.lea(dstreg, ptr(dstreg, dstreg));
 			break;
 
 		// zero plus another flag
 		case FLAG_Z | FLAG_S:
-			a.setz(al);                                                                 // setz   al
-			a.sets(cl);                                                                 // sets   cl
-			a.movzx(eax, al);                                                           // movzx  eax,al
-			a.movzx(ecx, cl);                                                           // movzx  ecx,cl
-			a.lea(dstreg, ptr(eax, ecx, 1));                                            // lea    dstreg,[eax+ecx*2]
-			a.shl(dstreg, 2);                                                           // shl    dstreg,2
+			a.setz(al);
+			a.sets(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_S - FLAG_BIT_Z));
+			a.lea(dstreg, ptr(0, dstreg, FLAG_BIT_Z));
+			break;
+
+		case FLAG_Z | FLAG_U:
+			a.setz(al);
+			a.setp(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_U - FLAG_BIT_Z));
+			a.lea(dstreg, ptr(0, dstreg, FLAG_BIT_Z));
+			break;
+
+		// sign plus another flag
+		case FLAG_S | FLAG_U:
+			a.sets(al);
+			a.setp(cl);
+			a.movzx(eax, al);
+			a.movzx(ecx, cl);
+			a.lea(dstreg, ptr(eax, ecx, FLAG_BIT_U - FLAG_BIT_S));
+			a.lea(dstreg, ptr(0, dstreg, FLAG_BIT_S));
 			break;
 
 		// default cases
 		default:
+			// compute mask for flags
+			if (maskp.immediate() & FLAG_C) flagmask |= 0x001;
+			if (maskp.immediate() & FLAG_Z) flagmask |= 0x040;
+			if (maskp.immediate() & FLAG_S) flagmask |= 0x080;
+			if (maskp.immediate() & FLAG_U) flagmask |= 0x004;
+
+			// can't get FLAG_V from lahf
+			a.lahf();
+			a.seto(cl);
+
+			a.mov(edx, eax);
+			a.shr(edx, 8);
+			a.and_(edx, flagmask);
+			a.movzx(dstreg, byte_ptr(rbp, rdx, 0, offset_from_rbp(&m_near.flagsmap[0])));
+
 			if (maskp.immediate() & FLAG_V)
 			{
-				a.seto(al);
-				a.movzx(ecx, al);
-				a.shl(ecx, 1);
+				a.movzx(ecx, cl);
+				a.lea(r10, ptr(rcx, rcx));
+				a.or_(dstreg, r10d);
 			}
 
-			a.mov(r11, r10);
-			a.shr(r11, 8);
-			a.and_(r11, flagmask);
-			a.movzx(dstreg, byte_ptr(rbp, r11, 0, offset_from_rbp(&m_near.flagsmap[0]))); // movzx  dstreg,[flags_map]
-
-			if (maskp.immediate() & FLAG_V)
-				a.or_(dstreg, ecx);
+			// Restore flags
+			a.add(cl, 0x7f);
+			a.sahf();
 			break;
 	}
 
-	// 32-bit form
 	if (inst.size() == 4)
-		mov_param_reg(a, dstp, dstreg);                                                 // mov   dstp,dstreg
-
-	// 64-bit form
+		mov_param_reg(a, dstp, dstreg); // 32-bit form
 	else if (inst.size() == 8)
-		mov_param_reg(a, dstp, dstreg.r64());                                           // mov   dstp,dstreg
-
-	if (maskp.immediate() & FLAG_V)
-	{
-		// Restore overflow flag
-		a.mov(eax, dstreg);
-		a.shr(eax, 1);
-		a.and_(eax, 1);
-		a.add(al, 0x7f);
-	}
-
-	a.mov(rax, r10);
-	a.sahf();
+		mov_param_reg(a, dstp, dstreg.r64()); // 64-bit form
 }
 
 
@@ -2573,19 +2561,34 @@ void drcbe_x64::op_setflgs(Assembler &a, const instruction &inst)
 {
 	assert(inst.size() == 4);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
-	a.pushfq();
+	if (srcp.is_immediate())
+	{
+		uint32_t const flags = m_near.flagsunmap[srcp.immediate() & FLAGS_ALL];
+		if (!flags)
+			a.xor_(eax, eax);
+		else
+			a.mov(eax, flags);
 
-	mov_reg_param(a, rax, srcp);
+		if (srcp.immediate() & FLAG_V)
+			a.mov(ecx, 1);
+		else
+			a.xor_(ecx, ecx);
+	}
+	else
+	{
+		mov_reg_param(a, eax, srcp);
+		a.mov(ecx, FLAG_V);
+		a.and_(ecx, eax);
+		a.and_(eax, FLAGS_ALL);
 
-	a.mov(rax, ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));
-	a.and_(qword_ptr(rsp), ~0x8c5);
-	a.or_(qword_ptr(rsp), rax);
+		a.movzx(eax, word_ptr(rbp, rax, 1, offset_from_rbp(&m_near.flagsunmap[0])));
+	}
 
-	a.popfq();
+	a.add(cl, 0x7f);
+	a.sahf();
 }
 
 
@@ -2604,20 +2607,25 @@ void drcbe_x64::op_save(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state to the destination
-	mov_r64_imm(a, rcx, (uintptr_t)dstp.memory());                                      // mov    rcx,dstp
+	mov_r64_imm(a, rcx, (uintptr_t)dstp.memory());
 
 	// copy flags
-	a.pushfq();                                                                         // pushf
-	a.pop(rax);                                                                         // pop    rax
-	a.and_(eax, 0x8c5);                                                                 // and    eax,0x8c5
-	a.mov(al, ptr(rbp, rax, 0, offset_from_rbp(&m_near.flagsmap[0])));                  // mov    al,[flags_map]
-	a.mov(ptr(rcx, offsetof(drcuml_machine_state, flags)), al);                         // mov    state->flags,al
+	a.lahf();
+	a.seto(dl);
+	a.shr(eax, 8);
+	a.movzx(edx, dl);
+	a.and_(eax, 0x0c5);
+	a.movzx(eax, byte_ptr(rbp, rax, 0, offset_from_rbp(&m_near.flagsmap[0])));
+	a.lea(rax, ptr(rax, rdx, 1));
+	a.mov(ptr(rcx, offsetof(drcuml_machine_state, flags)), al);
 
 	// copy fmod and exp
-	a.mov(al, MABS(&m_state.fmod));                                                     // mov    al,[fmod]
-	a.mov(ptr(rcx, offsetof(drcuml_machine_state, fmod)), al);                          // mov    state->fmod,al
-	a.mov(eax, MABS(&m_state.exp));                                                     // mov    eax,[exp]
-	a.mov(ptr(rcx, offsetof(drcuml_machine_state, exp)), eax);                          // mov    state->exp,eax
+	Mem fmod = MABS(&m_state.fmod);
+	fmod.setSize(1);
+	a.movzx(eax, fmod);
+	a.mov(ptr(rcx, offsetof(drcuml_machine_state, fmod)), al);
+	a.mov(eax, MABS(&m_state.exp));
+	a.mov(ptr(rcx, offsetof(drcuml_machine_state, exp)), eax);
 
 	// copy integer registers
 	int regoffs = offsetof(drcuml_machine_state, r);
@@ -2665,7 +2673,7 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_M);
 
 	// copy live state from the destination
-	mov_r64_imm(a, rcx, (uintptr_t)srcp.memory());                                      // mov    rcx,dstp
+	mov_r64_imm(a, rcx, (uintptr_t)srcp.memory());
 
 	// copy integer registers
 	int regoffs = offsetof(drcuml_machine_state, r);
@@ -2697,17 +2705,21 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	fmod.setSize(1);
 
 	// copy fmod and exp
-	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, fmod)));                  // movzx  eax,state->fmod
-	a.and_(eax, 3);                                                                     // and    eax,3
-	a.mov(MABS(&m_state.fmod), al);                                                     // mov    [fmod],al
-	a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));                // ldmxcsr fp_control[eax]
-	a.mov(eax, ptr(rcx, offsetof(drcuml_machine_state, exp)));                          // mov    eax,state->exp
-	a.mov(MABS(&m_state.exp), eax);                                                     // mov    [exp],eax
+	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, fmod)));
+	a.and_(eax, 3);
+	a.mov(MABS(&m_state.fmod), al);
+	a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));
+	a.mov(eax, ptr(rcx, offsetof(drcuml_machine_state, exp)));
+	a.mov(MABS(&m_state.exp), eax);
 
 	// copy flags
-	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, flags)));                 // movzx  eax,state->flags
-	a.push(qword_ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));             // push   flags_unmap[eax*8]
-	a.popfq();                                                                          // popf
+	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, flags)));
+	a.mov(ecx, FLAG_V); // don't need pointer to src any more
+	a.and_(ecx, eax);
+	a.and_(eax, FLAGS_ALL);
+	a.mov(eax, ptr(rbp, rax, 2, offset_from_rbp(&m_near.flagsunmap[0])));
+	a.add(cl, 0x7f);
+	a.sahf();
 }
 
 
@@ -4395,7 +4407,12 @@ void drcbe_x64::op_mul(Assembler &a, const instruction &inst)
 	be_parameter edstp(*this, inst.param(1), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(2), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
-	normalize_commutative(src1p, src2p);
+	if (src1p.is_memory() && !src2p.is_memory())
+	{
+		// always put memory in second parameter - there's no immediate form
+		using std::swap;
+		swap(src1p, src2p);
+	}
 	const bool compute_hi = (dstp != edstp);
 
 	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
@@ -4407,31 +4424,79 @@ void drcbe_x64::op_mul(Assembler &a, const instruction &inst)
 	{
 		a.emit(Opcode, MABS(src2p.memory(), inst.size()));
 	}
-	else if (src2p.is_int_register())
+	else
 	{
-		a.emit(Opcode, Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src2p.ireg()));
-	}
-	else if (src2p.is_immediate())
-	{
-		a.mov(edstreg, src2p.immediate());
-		a.emit(Opcode, edstreg);
+		const Gp srcreg = src2p.select_register(edstreg);
+		mov_reg_param(a, srcreg, src2p);
+		a.emit(Opcode, srcreg);
 	}
 	mov_param_reg(a, dstp, dstreg);
 	if (compute_hi)
 		mov_param_reg(a, edstp, edstreg);
 
-	if (inst.flags() & (FLAG_Z | FLAG_S))
-		calculate_status_flags_mul(a, inst.size(), rax, rdx);
+	calculate_status_flags_mul(a, inst, dstreg, edstreg);
 }
 
 
 //-------------------------------------------------
-//  op_mullw - process a MULULW or MULSLW
-//  (32x32=32) opcode
+//  op_mululw - process a MULULW (32x32=32) opcode
 //-------------------------------------------------
 
-template <Inst::Id Opcode>
-void drcbe_x64::op_mullw(Assembler &a, const instruction &inst)
+void drcbe_x64::op_mululw(Assembler &a, const instruction &inst)
+{
+	// if overflow flag isn't required, this is equivalent mulslw which uses the more flexible imul
+	if (!(inst.flags() & FLAG_V))
+	{
+		op_mulslw(a, inst);
+		return;
+	}
+
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_flags(inst, FLAG_V | FLAG_Z | FLAG_S);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
+	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
+	if (src1p.is_memory() && !src2p.is_memory())
+	{
+		// always put memory in second parameter - there's no immediate form
+		using std::swap;
+		swap(src1p, src2p);
+	}
+
+	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
+	const Gp hireg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
+
+	// general case
+	mov_reg_param(a, dstreg, src1p);
+	if (src1p == src2p)
+	{
+		a.mul(dstreg);
+	}
+	else if (src2p.is_memory())
+	{
+		a.mul(MABS(src2p.memory(), inst.size()));
+	}
+	else
+	{
+		const Gp srcreg = src2p.select_register(hireg);
+		mov_reg_param(a, srcreg, src2p);
+		a.mul(srcreg);
+	}
+	mov_param_reg(a, dstp, dstreg);
+
+	calculate_status_flags_mullw(a, inst, dstreg, hireg);
+}
+
+
+//-------------------------------------------------
+//  op_mulslw - process a MULSLW (32x32=32) opcode
+//-------------------------------------------------
+
+void drcbe_x64::op_mulslw(Assembler &a, const instruction &inst)
 {
 	// validate instruction
 	assert(inst.size() == 4 || inst.size() == 8);
@@ -4442,35 +4507,65 @@ void drcbe_x64::op_mullw(Assembler &a, const instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
-	normalize_commutative(src1p, src2p);
+	bool use3op = false;
+	if (src2p.is_immediate() && ((inst.size() == 4) || (s32(u32(src2p.immediate())) == s64(src2p.immediate()))))
+	{
+		use3op = true;
+	}
+	else if (src1p.is_immediate() && ((inst.size() == 4) || (s32(u32(src1p.immediate())) == s64(src1p.immediate()))))
+	{
+		// put immediate second so 3-operand form can be used
+		using std::swap;
+		swap(src1p, src2p);
+		use3op = true;
+	}
+	else if ((src1p.is_memory() && !src2p.is_memory()) || (dstp == src2p))
+	{
+		// always put memory in second parameter if 3-operand form can't be used
+		using std::swap;
+		swap(src1p, src2p);
+	}
 
-	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
+	const Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
 	const Gp hireg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
 
-	// general case
-	mov_reg_param(a, dstreg, src1p);
-	if (src2p.is_memory())
+	if (use3op)
 	{
-		a.emit(Opcode, MABS(src2p.memory(), inst.size()));
+		// use 3-operand form to multiply by immediate
+		const int64_t imm = (inst.size() == 4) ? s32(u32(src2p.immediate())) : src2p.immediate();
+		if (src1p.is_memory())
+		{
+			a.imul(dstreg, MABS(src1p.memory(), inst.size()), imm);
+		}
+		else
+		{
+			const Gp srcreg = src1p.select_register(hireg);
+			mov_reg_param(a, srcreg, src1p);
+			a.imul(dstreg, srcreg, imm);
+		}
 	}
-	else if (src2p.is_int_register())
+	else
 	{
-		a.emit(Opcode, Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, src2p.ireg()));
-	}
-	else if (src2p.is_immediate())
-	{
-		a.mov(hireg, src2p.immediate());
-		a.emit(Opcode, hireg);
+		// use 2-operand form
+		mov_reg_param(a, dstreg, src1p);
+		if (src1p == src2p)
+		{
+			a.imul(dstreg, dstreg);
+		}
+		else if (src2p.is_memory())
+		{
+			a.imul(dstreg, MABS(src2p.memory(), inst.size()));
+		}
+		else
+		{
+			const Gp srcreg = src2p.select_register(hireg);
+			mov_reg_param(a, srcreg, src2p);
+			a.imul(dstreg, srcreg);
+		}
 	}
 	mov_param_reg(a, dstp, dstreg);
 
-	if (inst.flags() & (FLAG_Z | FLAG_S))
-	{
-		if (inst.flags() & FLAG_V)
-			calculate_status_flags_mul_low(a, dstreg);
-		else
-			a.test(dstreg, dstreg);
-	}
+	calculate_status_flags_mullw(a, inst, dstreg, hireg);
 }
 
 
@@ -5620,15 +5715,18 @@ void drcbe_x64::op_fcmp(Assembler &a, const instruction &inst)
 			a.comisd(src1reg, Xmm(src2p.freg()));
 	}
 
-	// clear Z and C if unordered
-	Label ordered = a.newLabel();
+	if (inst.flags() & (FLAG_Z | FLAG_C))
+	{
+		// clear Z and C if unordered
+		Label ordered = a.newLabel();
 
-	a.short_().jnp(ordered);
-	a.lahf();
-	a.and_(eax, 0x00003e00);
-	a.sahf();
+		a.short_().jnp(ordered);
+		a.lahf();
+		a.and_(eax, 0x00003e00);
+		a.sahf();
 
-	a.bind(ordered);
+		a.bind(ordered);
+	}
 }
 
 
@@ -6012,7 +6110,6 @@ void drcbe_x64::op_fcopyi(Assembler &a, const instruction &inst)
 			a.movd(dstreg, Gpd(srcp.ireg()));
 			movss_p32_r128(a, dstp, dstreg);
 		}
-
 	}
 	else if (inst.size() == 8)
 	{

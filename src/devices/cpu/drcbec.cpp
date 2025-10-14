@@ -898,7 +898,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RESTORE, 4, 0):   // RESTORE dst
 			case MAKE_OPCODE_SHORT(OP_RESTORE, 4, 1):   // RESTORE dst
 				m_state = *inst[0].state;
-				flags = inst[0].state->flags;
+				flags = m_state.flags &= FLAGS_ALL;
+				std::fesetround(rounding_map[m_state.fmod &= 0x03]);
 				break;
 
 

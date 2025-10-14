@@ -1187,7 +1187,7 @@ if CPUS["MCS51"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.h",
-		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.hxx",
+		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.cpp",
 	}
 end
 

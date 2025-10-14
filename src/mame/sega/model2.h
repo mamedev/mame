@@ -151,9 +151,6 @@ protected:
 	std::unique_ptr<raster_state> m_raster;
 	std::unique_ptr<geo_state> m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
-//  u32 m_soundack;
-	void model2_check_irq_state();
-	void model2_check_irqack_state(u32 data);
 	u8 m_gearsel = 0;
 	u8 m_lightgun_mux = 0;
 
@@ -193,6 +190,7 @@ protected:
 	void irq_ack_w(u32 data);
 	u32 irq_enable_r();
 	void irq_enable_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void irq_update();
 	u8 model2_serial_r(offs_t offset);
 	void model2_serial_w(offs_t offset, u8 data);
 	void horizontal_sync_w(u16 data);
@@ -224,7 +222,7 @@ protected:
 	void reset_model2_scsp();
 	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  void screen_vblank_model2(int state);
-//  void sound_ready_w(int state);
+	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
 
@@ -599,8 +597,6 @@ protected:
 	u32 copro_fifo_r();
 	void copro_fifo_w(u32 data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
-
 	void model2c_crx_mem(address_map &map) ATTR_COLD;
 	void model2c_5881_mem(address_map &map) ATTR_COLD;
 	void copro_tgpx4_map(address_map &map) ATTR_COLD;
@@ -621,15 +617,15 @@ struct m2_poly_extra_data
 	model2_state *  state;
 	u32      lumabase;
 	u32      colorbase;
-	u32 *    texsheet;
-	u32      texwidth;
-	u32      texheight;
-	u32      texx, texy;
+	u32 *    texsheet[6];
+	u32      texwidth[6];
+	u32      texheight[6];
+	u32      texx[6];
+	u32		 texy[6];
 	u8       texmirrorx;
 	u8       texmirrory;
 	u8       luma;
 };
-
 
 static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 {

@@ -317,9 +317,9 @@ u8 mu100_state::p1_r()
 		if((m_cur_p2 & P2_LCD_ENABLE)) {
 			if(m_cur_p2 & P2_LCD_RW) {
 				if(m_cur_p2 & P2_LCD_RS)
-					return m_lcd->data_read();
+					return m_lcd->data_r();
 				else
-					return m_lcd->control_read();
+					return m_lcd->control_r();
 			} else
 				return 0x00;
 		}
@@ -343,9 +343,9 @@ void mu100_state::p2_w(u8 data)
 		if((m_cur_p2 & P2_LCD_ENABLE) && !(data & P2_LCD_ENABLE)) {
 			if(!(m_cur_p2 & P2_LCD_RW)) {
 				if(m_cur_p2 & P2_LCD_RS)
-					m_lcd->data_write(m_cur_p1);
+					m_lcd->data_w(m_cur_p1);
 				else
-					m_lcd->control_write(m_cur_p1);
+					m_lcd->control_w(m_cur_p1);
 			}
 		}
 		m_lcd->set_contrast((data >> 3) & 7);

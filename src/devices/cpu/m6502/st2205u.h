@@ -293,6 +293,8 @@ private:
 	};
 
 	void unk18_w(u8 data);
+	u8 unk3a_r();
+	void unk3a_w(u8 data);
 	void unk6d_w(u8 data);
 	void unk6e_w(u8 data);
 	u8 unk7b_r();

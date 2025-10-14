@@ -448,6 +448,17 @@ ROM_START( retror30 )
 	ROM_LOAD( "s29gl032n90tfi03.u2", 0x00000, 0x400000, CRC(dfb89ef7) SHA1(401539b73521e018e3af70b8019e6b59ba67fcad) )
 ROM_END
 
+ROM_START( k10_5l )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "js28f128m29ewh.u4", 0x00000, 0x1000000, CRC(69dba082) SHA1(bd6829b0339795876dd5b4eb5de8bbd124c64f77) )
+	ROM_IGNORE(0x100)
+ROM_END
+
+ROM_START( k10_2l )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.u4", 0x00000, 0x1000000, CRC(3ca75ab7) SHA1(a4e4f939c26b4a2f361261fa8b5303c6eeee9c41) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -498,3 +509,12 @@ CONS( 2020, lxpcpp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 // Power Console - Generic EN/FR model
 // Power Console - Generic EN/ES model
 // Power Console - Generic EN/DE model
+
+// unclear SoC types maybe even different
+// Rush'n Attack has the raster split in the wrong place on the 5 language version (mountains in first stage) when using real hardware
+// said game also requires either extra RAM on the PCB (none visible) or a SoC that natively supports that
+// 
+// not set as clones as each other because the games lists are different
+CONS( 201?, k10_5l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (5 languages)", MACHINE_NOT_WORKING )
+CONS( 201?, k10_2l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (2 languages)", MACHINE_NOT_WORKING )
+

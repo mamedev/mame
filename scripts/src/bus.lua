@@ -902,6 +902,31 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bk/parallel.h,BUSES["BK_PARALLEL"] = true
+---------------------------------------------------
+
+if (BUSES["BK_PARALLEL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bk/parallel.cpp",
+		MAME_DIR .. "src/devices/bus/bk/parallel.h",
+		MAME_DIR .. "src/devices/bus/bk/carts.cpp",
+		MAME_DIR .. "src/devices/bus/bk/carts.h",
+		MAME_DIR .. "src/devices/bus/bk/ay.cpp",
+		MAME_DIR .. "src/devices/bus/bk/ay.h",
+		MAME_DIR .. "src/devices/bus/bk/covox.cpp",
+		MAME_DIR .. "src/devices/bus/bk/covox.h",
+		MAME_DIR .. "src/devices/bus/bk/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/bk/joystick.h",
+		MAME_DIR .. "src/devices/bus/bk/loopback.cpp",
+		MAME_DIR .. "src/devices/bus/bk/loopback.h",
+		MAME_DIR .. "src/devices/bus/bk/printer.cpp",
+		MAME_DIR .. "src/devices/bus/bk/printer.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bw2/exp.h,BUSES["BW2"] = true
 ---------------------------------------------------
 
@@ -4917,12 +4942,18 @@ end
 
 if (BUSES["QBUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/qbus/bk_irps.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/bk_irps.h",
 		MAME_DIR .. "src/devices/bus/qbus/bk_kmd.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/bk_kmd.h",
 		MAME_DIR .. "src/devices/bus/qbus/dsd4432.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/dsd4432.h",
 		MAME_DIR .. "src/devices/bus/qbus/dvk_kgd.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/dvk_kgd.h",
+		MAME_DIR .. "src/devices/bus/qbus/dvk_kmd.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/dvk_kmd.h",
+		MAME_DIR .. "src/devices/bus/qbus/dvk_ktlk.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/dvk_ktlk.h",
 		MAME_DIR .. "src/devices/bus/qbus/dvk_mx.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/dvk_mx.h",
 		MAME_DIR .. "src/devices/bus/qbus/pc11.cpp",

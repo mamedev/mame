@@ -81,7 +81,7 @@ TODO:
     Medalusion 2:
  *   - Doko Demo Issho Toro's Fishing (c) 2006
  *   - Pingu's Ice Block (c) 2005
- !   - Geki Makaimura (c) 2005
+ *   - Geki Makaimura (c) 2005
  *!  - Won! Tertainment Happy Channel (c) 2008 note: main board is different, uses Yamaha YMZ770C
                                                      instead of YMZ770B
     Not medal machines:
@@ -91,8 +91,7 @@ TODO:
 
  *  - dumped
  *! - CF card dumped, boot roms missing
- !  - Boot ROMs dumped, CF card missing
-
+ 
 **************************************************************************************************/
 
 
@@ -651,7 +650,6 @@ ROM_START( dokodemo )
 	DISK_IMAGE( "dokodemo", 0, SHA1(0c786b6857a29b26971578abe1c8439fe43d94b5) )
 ROM_END
 
-// only boot loader ROMs dumped, actual game CF card is missing
 ROM_START( gekimaka )
 	ROM_REGION32_LE( 0x1000000, "maincpu", 0 ) // BIOS code
 	ROM_LOAD32_WORD( "stm_04.ic30", 0x000000, 0x400000, CRC(74687757) SHA1(96b6e3725bcf16e92c6966f9b9ce93cfdd7ba641) )
@@ -666,7 +664,7 @@ ROM_START( gekimaka )
 	ROM_LOAD( "ic26", 0x000000, 0x008000, CRC(da921265) SHA1(c4a2d79d834c0333218c7a4853a8e4167036955a) )
 
 	DISK_REGION( "ata:0:cfcard" )
-	DISK_IMAGE( "gekimaka", 0, NO_DUMP )
+	DISK_IMAGE( "gekimaka", 0, SHA1(d1041ebc364b32b251c421d5a7006e9754c2ed0c) )
 ROM_END
 
 ROM_START( pingu )

@@ -204,6 +204,7 @@ public:
 	void init_royal5p() ATTR_COLD;
 	void init_jhg3d() ATTR_COLD;
 	void init_gonefsh() ATTR_COLD;
+	void init_mgfx() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -3537,7 +3538,7 @@ ROM_END
 ROM_START( mgzz100cn ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery)
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "f1_027a.bin", 0x00000, 0x4000, CRC(4b270edb) SHA1(3b4821f7cb785056809c121e6508348df123bfa1) )
+	ROM_LOAD( "f1_027a.u23", 0x00000, 0x4000, CRC(4b270edb) SHA1(3b4821f7cb785056809c121e6508348df123bfa1) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-100cn.u10", 0x000000, 0x80000, CRC(278964f7) SHA1(75e48e3124d038f16f93fe3c1f63dd1568f0c018) )
@@ -3550,6 +3551,26 @@ ROM_START( mgzz100cn ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sp.u14", 0x00000, 0x80000, CRC(f037952e) SHA1(0fa83e164937c9e8245861da7fd11f225525918d) )
+ROM_END
+
+
+// 满贯福星 (Mǎnguàn Fúxīng)
+ROM_START( mgfx ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery, 22 MHz XTAL)
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "w6_027a.u23", 0x00000, 0x4000, CRC(7a8a2ea6) SHA1(88f580dc267986cf979de4ef1981758417f106e9) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-104t.u10", 0x000000, 0x80000, CRC(e6e304f7) SHA1(e99cecbbd938affb521b28583af5f8171d397ec2) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", ROMREGION_ERASE00 )
+	ROM_LOAD( "igs_t3402.u9", 0x000000, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", ROMREGION_ERASE00 )
+	ROM_LOAD( "igs_a3401.u17", 0x000000, 0x400000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "igs_s3403.u14", 0x00000, 0x80000, NO_DUMP )
 ROM_END
 
 
@@ -4626,6 +4647,12 @@ void igs_m027_state::init_gonefsh()
 	m_igs017_igs031->tarzan_decrypt_sprites(0x200000, 0x200000);
 }
 
+void igs_m027_state::init_mgfx()
+{
+	mgfx_decrypt(machine());
+	// m_igs017_igs031->set_text_reverse_bits(false);
+}
+
 } // anonymous namespace
 
 
@@ -4679,7 +4706,7 @@ GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_stat
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,       0,        chessc2,      gonefsh,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME(  200?, gonefsh2,      0,        chessc2,      gonefsh,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME(  2002, gonefsh2,      0,        chessc2,      gonefsh,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 // these can select between two different games via DIP switch (currently unemulated feature)
 GAME(  2007, cjddzs,        0,        cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V302CN)", MACHINE_NOT_WORKING )
@@ -4696,3 +4723,4 @@ GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
 GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, init_jhg3d,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
+GAME(  200?, mgfx,          0,        mgzz,             mgzz101cn,igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", MACHINE_NOT_WORKING )

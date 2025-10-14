@@ -263,6 +263,7 @@
 #include "sound/sn76496.h"
 #include "sound/ymopl.h"
 #include "video/ramdac.h"
+#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -273,6 +274,7 @@
 
 #include "animalhs.lh"
 #include "bingowng.lh"
+#include "bonusch.lh"
 #include "cherryb3.lh"
 #include "chrygld.lh"
 #include "cmaster.lh"
@@ -330,7 +332,6 @@ public:
 	{ }
 
 
-	void feverch(machine_config &config) ATTR_COLD;
 	void goldfrui(machine_config &config) ATTR_COLD;
 	void goldstar(machine_config &config) ATTR_COLD;
 	void goldstbl(machine_config &config) ATTR_COLD;
@@ -348,6 +349,7 @@ public:
 	void init_ladylinrc() ATTR_COLD;
 	void init_ladylinrd() ATTR_COLD;
 	void init_ladylinre() ATTR_COLD;
+	void init_moonlghtb() ATTR_COLD;
 	void init_super9() ATTR_COLD;
 	void init_wcherry() ATTR_COLD;
 
@@ -398,7 +400,9 @@ protected:
 	void bg_vidram_w(offs_t offset, uint8_t data);
 	void bg_atrram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void reel_ram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void reel_scroll_w(offs_t offset, uint8_t data);
 	void goldstar_fa00_w(uint8_t data);
+	void bonusch_palette(palette_device &palette) const ATTR_COLD;
 	void cm_palette(palette_device &palette) const ATTR_COLD;
 	void lucky8_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -417,8 +421,6 @@ private:
 	void protection_w(uint8_t data);
 	uint8_t protection_r();
 
-	void feverch_map(address_map &map) ATTR_COLD;
-	void feverch_portmap(address_map &map) ATTR_COLD;
 	void kkotnoli_map(address_map &map) ATTR_COLD;
 	void ladylinr_map(address_map &map) ATTR_COLD;
 	void super9_map(address_map &map) ATTR_COLD;
@@ -476,6 +478,7 @@ public:
 	void init_cmtetriskr() ATTR_COLD;
 	void init_cmv4() ATTR_COLD;
 	void init_crazybonb() ATTR_COLD;
+	void init_cutya() ATTR_COLD;
 	void init_eldoraddoa() ATTR_COLD;
 	void init_fb2010() ATTR_COLD;
 	void init_hamhouse() ATTR_COLD;
@@ -615,6 +618,7 @@ public:
 	void animalw(machine_config &config) ATTR_COLD;
 	void bingowng(machine_config &config) ATTR_COLD;
 	void bingownga(machine_config &config) ATTR_COLD;
+	void feverch(machine_config &config) ATTR_COLD;
 	void flam7_tw(machine_config &config) ATTR_COLD;
 	void flam7_w4(machine_config &config) ATTR_COLD;
 	void flaming7(machine_config &config) ATTR_COLD;
@@ -676,6 +680,22 @@ private:
 	void megaline_outputd_w(uint8_t data);
 	void ay8910_outputa_w(uint8_t data);
 	void ay8910_outputb_w(uint8_t data);
+	void fever_outp_w(offs_t offset, uint8_t data);
+
+
+	// SM7831 Arithmetic Processor device emulation
+	uint8_t sm7831_mode = 0;
+	uint8_t sm7831_status = 0;
+	uint8_t sm7831_shift_dig = 0;
+	uint8_t sm7831_data_cmd = 0;
+	uint8_t m_dap_idx = 0;
+	uint8_t sm7831_X_reg[0x08] = {};
+	uint8_t sm7831_Y_reg[0x08] = {};
+	uint8_t sm7831_Z_reg[0x08] = {};
+	uint8_t sm7831_tmp_reg[0x08] = {};
+	uint8_t sm7831_read(offs_t offset);
+	void sm7831_write(offs_t offset, uint8_t data);
+
 
 	// handlers for lucky bar MCU ports
 	uint8_t mcu_portb_r();
@@ -688,6 +708,7 @@ private:
 	void magodds_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_lucky8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_feverch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_megaline(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -696,8 +717,8 @@ private:
 
 	void z80_io_w(offs_t offset, uint8_t data);
 	uint8_t z80_io_r(offs_t offset);
-	void tmcu_io_w(offs_t offset, uint8_t data);
-	uint8_t tmcu_io_r(offs_t offset);
+	void tmcu_data_w(offs_t offset, uint8_t data);
+	uint8_t tmcu_data_r(offs_t offset);
 	void tmcu_p1_out(uint8_t data);
 	uint8_t m_z80_io_c0;
 	uint8_t tetin3_r();
@@ -720,6 +741,8 @@ private:
 
 	void animalw_map(address_map &map) ATTR_COLD;
 	void bingowng_map(address_map &map) ATTR_COLD;
+	void feverch_map(address_map &map) ATTR_COLD;
+	void feverch_portmap(address_map &map) ATTR_COLD;
 	void flaming7_map(address_map &map) ATTR_COLD;
 	void lucky8_map(address_map &map) ATTR_COLD;
 	void lucky8p_map(address_map &map) ATTR_COLD;
@@ -734,7 +757,7 @@ private:
 	void superdrg_opcodes_map(address_map &map) ATTR_COLD;
 	void wcat3_map(address_map &map) ATTR_COLD;
 	void tmcu_program_map(address_map &map) ATTR_COLD;
-	void tmcu_io_map(address_map &map) ATTR_COLD;
+	void tmcu_data_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -831,10 +854,13 @@ public:
 	void init_unkch1() ATTR_COLD;
 	void init_unkch3() ATTR_COLD;
 	void init_unkch4() ATTR_COLD;
+	void init_bonch() ATTR_COLD;
+	void init_boncha() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+	DECLARE_VIDEO_START(bonusch);
 
 private:
 	required_shared_ptr_array<uint8_t, 3> m_reel_attrram;
@@ -843,13 +869,19 @@ private:
 
 	uint8_t m_vblank_irq_enable = 0U;
 	uint8_t m_vidreg = 0U;
+	uint8_t m_reelbank = 0U;
 
 	void coincount_w(uint8_t data);
 	void unkcm_0x02_w(uint8_t data);
 	void unkcm_0x03_w(uint8_t data);
+	void bonch_0x10_w(uint8_t data);
+	void bonch_0x20_w(uint8_t data);
+	void bonch_0x30_w(uint8_t data);
+	void bonch_0x40_w(uint8_t data);
 
 	template <uint8_t Which> void reel_attrram_w(offs_t offset, uint8_t data);
 
+	uint32_t screen_update_bonusch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_unkch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void vblank_irq(int state);
@@ -859,7 +891,9 @@ private:
 	void unkch_map(address_map &map) ATTR_COLD;
 	void unkch_portmap(address_map &map) ATTR_COLD;
 
+	TILE_GET_INFO_MEMBER(get_bonusch_bg_tile_info);
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bch_reel_tile_info);
 };
 
 class cd3poker_state : public cmaster_state
@@ -892,6 +926,9 @@ void wingco_state::machine_start()
 
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_vidreg));
+	save_item(NAME(sm7831_X_reg));
+	save_item(NAME(sm7831_Y_reg));
+
 }
 
 void unkch_state::machine_start()
@@ -940,6 +977,15 @@ void goldstar_state::bg_atrram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
+// W-8 reels scroll need even-odd bytes mirrored
+template <uint8_t Which>
+void goldstar_state::reel_scroll_w(offs_t offset, uint8_t data)
+{
+	m_reel_scroll[Which][offset] = data;
+	m_reel_scroll[Which][offset + 1] = data;
+
+}
+
 
 /****************************************************
                     Tile Get Info
@@ -954,6 +1000,19 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 	tileinfo.set(0,
 			code | (attr & 0xf0) << 4,
 			attr & 0x0f,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(unkch_state::get_bonusch_bg_tile_info)
+{
+//  extra tilemap to show credits and bet
+
+	int const code = m_bg_vidram[tile_index];
+	int const attr = m_bg_atrram[tile_index];
+
+	tileinfo.set(3,
+			code + 0x100,
+			(attr & 0xf0) >> 4,
 			0);
 }
 
@@ -1117,6 +1176,23 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel_tile_info)
 			0);
 }
 
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(unkch_state::get_bch_reel_tile_info)
+{
+	int const code = m_reel_ram[Which][tile_index];
+	int const attr = m_reel_attrram[Which][tile_index];
+
+	if ((code | (attr & 0x0f) << 8) < 0x100)
+		m_reelbank = 1;
+	else
+		m_reelbank = 2;
+
+	tileinfo.set(m_reelbank,
+			code | (attr & 0x0f) << 8,
+			(attr & 0xf0) >> 4,
+			0);
+}
+
 
 /****************************************************
                      Video Start
@@ -1217,6 +1293,31 @@ void unkch_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_enable_reg = 0x0b;
+}
+
+VIDEO_START_MEMBER(unkch_state, bonusch)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_bonusch_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_bg_tilemap->set_scroll_cols(32);
+
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_bch_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_bch_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_bch_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+
+	// is there an enable reg for this game?
+	m_enable_reg = 0x1b;
+
+	// 1 for regular reels; 2 for d-up reel numbers.
+//	m_reelbank = 2;
+
 }
 
 VIDEO_START_MEMBER(cmaster_state, pkrmast)
@@ -1602,6 +1703,81 @@ uint32_t wingco_state::screen_update_megaline(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
+uint32_t wingco_state::screen_update_feverch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	if (m_enable_reg & 0x02)  // only 1st reel for d-up
+	{
+		for (int i = 0; i < 64; i++)
+		{
+			// only one reels tilemap
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+		}
+		const rectangle visible1(0, (7+48)*8-1, 15*8, (12+8)*8-1);  // adjust the rolling numbers
+
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+	}
+	else
+	{
+		for (int i = 0; i < 64; i++)
+		{
+			// all three reels tilemaps
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+		}
+
+		const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
+		const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
+		const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
+
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+	}
+
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+uint32_t unkch_state::screen_update_bonusch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	if (!(m_enable_reg & 0x01))
+		return 0;
+
+	if (m_enable_reg & 0x08)
+	{
+		for (int i = 0; i < 64; i++)
+		{
+			m_bg_tilemap->set_scrolly(i, m_bg_scroll [i]);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+			// all three reels tilemaps
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+		}
+
+		const rectangle visible1(9*8, (15+48)*8-1,  6*8,  (6+6)*8-1);
+		const rectangle visible2(9*8, (15+48)*8-1, 13*8, (13+6)*8-1);
+		const rectangle visible3(9*8, (15+48)*8-1, 20*8, (20+6)*8-1);
+
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+	}
+
+	if (m_enable_reg & 0x02)
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
 uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
@@ -1851,6 +2027,99 @@ void wingco_state::magodds_palette(palette_device &palette) const
 		uint8_t const r = pal4bit(proms[0x200 + i]);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+void goldstar_state::bonusch_palette(palette_device &palette) const
+{
+/*
+  Bonus Chance W-8 video RESNET
+  -----------------------------
+
+                                220                                          220                                          220
+  24s10(3E)-12 -+- 74174-02 ---NNNNN---+       24s10(3F)-12 -+- 74174-02 ---NNNNN---+       24s10(3H)-12 -+- 74174-02 ---NNNNN---+
+  24s10(4E)-12 _|                      |       24s10(4F)-12 _|                      |       24s10(4H)-12 _|                      |
+                                470    |                                     470    |                                     470    |
+  24s10(3E)-11 -+- 74174-10 ---NNNNN---+       24s10(3F)-11 -+- 74174-10 ---NNNNN---+       24s10(3H)-11 -+- 74174-10 ---NNNNN---+
+  24s10(4E)-11 _|                      |       24s10(4F)-11 _|                      |       24s10(4H)-11 _|                      |
+                                 1K    |                                      1K    |                                      1K    |
+  24s10(3E)-10 -+- 74174-12 ---NNNNN---+       24s10(3F)-10 -+- 74174-12 ---NNNNN---+       24s10(3H)-10 -+- 74174-12 ---NNNNN---+
+  24s10(4E)-10 _|                      |       24s10(4F)-10 _|                      |       24s10(4H)-10 _|                      |
+                                 2K    |                                      2K    |                                      2K    |
+  24s10(3E)-09 -+- 74174-15 ---NNNNN---+---.   24s10(3F)-09 -+- 74174-15 ---NNNNN---+---.   24s10(3H)-09 -+- 74174-15 ---NNNNN---+---.
+  24s10(4E)-09 _|                      |   |   24s10(4F)-09 _|                      |   |   24s10(4H)-09 _|                      |   |
+                                       Z   |                                        Z   |                                        Z   |
+                                    1K Z   |  .-----.                            1K Z   |  .-------.                          1K Z   |  .------.
+                                       Z   '--| RED |                               Z   '--| GREEN |                             Z   '--| BLUE |
+                                       |      '-----'                               |      '-------'                             |      '------'
+                                      GND                                          GND                                          GND
+
+  There are 2 main graphics banks.
+  We're constructing a double-sized palette with one half for each bank.
+
+*/
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances_rgb[4] = { 2000, 1000, 470, 220 };
+
+	double weights_r[4], weights_g[4], weights_b[4];
+	compute_resistor_weights(0, 255,    -1.0,
+			4,  resistances_rgb,    weights_r,  1000,   0,
+			4,  resistances_rgb,    weights_g,  1000,   0,
+			4,  resistances_rgb,    weights_b,  1000,   0);
+
+	for (int i = 0; i < 256; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+
+		// Red component (GFX bank 0, PROM 3E)
+		bit0 = BIT(color_prom[0x000 + i], 0);
+		bit1 = BIT(color_prom[0x000 + i], 1);
+		bit2 = BIT(color_prom[0x000 + i], 2);
+		bit3 = BIT(color_prom[0x000 + i], 3);
+		int const r1 = combine_weights(weights_r, bit0, bit1, bit2, bit3);
+
+		// Red component (GFX bank 1, PROM 4E)
+		bit0 = BIT(color_prom[0x100 + i], 0);
+		bit1 = BIT(color_prom[0x100 + i], 1);
+		bit2 = BIT(color_prom[0x100 + i], 2);
+		bit3 = BIT(color_prom[0x100 + i], 3);
+		int const r2 = combine_weights(weights_r, bit0, bit1, bit2, bit3);
+
+		// Green component (GFX bank 0, PROM 3F)
+		bit0 = BIT(color_prom[0x200 + i], 0);
+		bit1 = BIT(color_prom[0x200 + i], 1);
+		bit2 = BIT(color_prom[0x200 + i], 2);
+		bit3 = BIT(color_prom[0x200 + i], 3);
+		int const g1 = combine_weights(weights_g, bit0, bit1, bit2, bit3);
+
+		// Green component (GFX bank 1, PROM 4F)
+		bit0 = BIT(color_prom[0x300 + i], 0);
+		bit1 = BIT(color_prom[0x300 + i], 1);
+		bit2 = BIT(color_prom[0x300 + i], 2);
+		bit3 = BIT(color_prom[0x300 + i], 3);
+		int const g2 = combine_weights(weights_g, bit0, bit1, bit2, bit3);
+
+		// Blue component (GFX bank 0, PROM 3H)
+		bit0 = BIT(color_prom[0x400 + i], 0);
+		bit1 = BIT(color_prom[0x400 + i], 1);
+		bit2 = BIT(color_prom[0x400 + i], 2);
+		bit3 = BIT(color_prom[0x400 + i], 3);
+		int const b1 = combine_weights(weights_b, bit0, bit1, bit2, bit3);
+
+		// Blue component (GFX bank 1, PROM 4H)
+		bit0 = BIT(color_prom[0x500 + i], 0);
+		bit1 = BIT(color_prom[0x500 + i], 1);
+		bit2 = BIT(color_prom[0x500 + i], 2);
+		bit3 = BIT(color_prom[0x500 + i], 3);
+		int const b2 = combine_weights(weights_b, bit0, bit1, bit2, bit3);
+
+
+		// PROMs circuitry, 1st GFX bank
+		palette.set_pen_color(i, rgb_t(r1, g1, b1));
+
+		// PROMs circuitry, 2nd GFX bank
+		palette.set_pen_color(i + 256, rgb_t(r2, g2, b2));
 	}
 }
 
@@ -2500,13 +2769,13 @@ void wingco_state::z80_io_w(offs_t offset, uint8_t data)
 	logerror("Z80_io_w(): offset:%02x - data: %02x\n", offset, data);  // investigate functionality port 0xc0
 }
 
-void wingco_state::tmcu_io_w(offs_t offset, uint8_t data)
+void wingco_state::tmcu_data_w(offs_t offset, uint8_t data)
 {
 	if ((offset != 0x122) & (offset != 0x123))
-	logerror("tmcu_io Write: Offs:%04x - Data:%02x\n", offset, data);
+	logerror("tmcu_data Write: Offs:%04x - Data:%02x\n", offset, data);
 }
 
-uint8_t wingco_state::tmcu_io_r(offs_t offset)
+uint8_t wingco_state::tmcu_data_r(offs_t offset)
 {
 	return 0x00;
 }
@@ -2532,6 +2801,313 @@ uint8_t cd3poker_state::armaly_prot_r()
 	else
 		return index == 0x0f ? 0xa5 : 0x5a;
 }
+
+void unkch_state::bonch_0x10_w(uint8_t data)  // prot. system
+{
+//	popmessage("bonch_0x10_w %02x", data);
+	logerror("bonch_0x10_w %02x\n", data);
+}
+
+void unkch_state::bonch_0x20_w(uint8_t data) // meters
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  //  Coin A
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);  //  Key In
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);  //  Coin B
+	machine().bookkeeping().coin_counter_w(3, data & 0x08);  //  Coin C
+	machine().bookkeeping().coin_counter_w(4, data & 0x10);  //  Coin D
+	machine().bookkeeping().coin_counter_w(5, data & 0x40);  //  Key Out
+
+//	popmessage("bonch_0x20_w %02x", data);
+//	logerror("bonch_0x20_w %02x\n", data);
+}
+
+void unkch_state::bonch_0x30_w(uint8_t data)  // lamps
+{
+	m_lamps[0] = BIT(data, 0);  // Start
+	m_lamps[1] = BIT(data, 1);  // Stop 2
+	m_lamps[2] = BIT(data, 2);  // High/Low
+	m_lamps[3] = BIT(data, 3);  // Stop 3
+	m_lamps[4] = BIT(data, 4);  // Bet
+	m_lamps[5] = BIT(data, 5);  // Stop 1
+	m_lamps[6] = BIT(data, 6);  // D-Up/Take
+	m_lamps[7] = BIT(data, 7);  // Stop All
+
+//	popmessage("bonch_0x30_w %02x", data);
+//	logerror("bonch_0x30_w %02x\n", data);
+}
+
+void unkch_state::bonch_0x40_w(uint8_t data)  // player 2 ??? wdog ??? video_reg ???
+{
+//	popmessage("bonch_0x40_w %02x", data);
+//	if((data & 0x6f) != 0)  // skip bits 4 and 7 (bit 7 wd or vid_reg enable/disable global) - (bit 4 fixed 1) - (values 90-10-90-10-etc...)
+		logerror("bonch_0x40_w %02x\n", data);
+
+// bit 5 - Hopper Motor
+// The hopper's operation cannot be verified because the protection system disables this payment method.
+	m_ticket_dispenser->motor_w(BIT(data, 5));
+}
+
+
+void wingco_state::fever_outp_w(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		case 0: // 0x38
+		{
+			m_ticket_dispenser->motor_w(BIT(data, 7));
+			m_enable_reg = data;
+			//popmessage("port 38: data%02x", data);
+			break;
+		}
+		case 1:  // 0x39
+		{
+			machine().bookkeeping().coin_counter_w(4, data & 0x01);  //  ?????
+			machine().bookkeeping().coin_counter_w(3, data & 0x04);  //  Hopper
+			machine().bookkeeping().coin_counter_w(2, data & 0x08);  //  Coin C
+			machine().bookkeeping().coin_counter_w(1, data & 0x10);  //  Coin B
+			machine().bookkeeping().coin_counter_w(0, data & 0x20);  //  Coin A / Exchange
+			//popmessage("port 39: data%02x", data);
+			break;
+		}
+		case 2:  // 0x3a lamps1
+		{
+			m_lamps[0] = BIT(data, 0);  //
+			m_lamps[1] = BIT(data, 1);  //
+			m_lamps[2] = BIT(data, 2);  //
+			m_lamps[3] = BIT(data, 3);  //
+			m_lamps[4] = BIT(data, 4);  //
+			m_lamps[5] = BIT(data, 5);  //
+			m_lamps[6] = BIT(data, 6);  //
+			m_lamps[7] = BIT(data, 7);  //
+			//popmessage("port 3a:Lamps??? data%02x", data);
+			break;
+		}
+		case 3: // 0x3b lamps2
+		{
+			m_lamps[8+0] = BIT(data, 0);  //
+			m_lamps[8+1] = BIT(data, 1);  //
+			m_lamps[8+2] = BIT(data, 2);  //
+			m_lamps[8+3] = BIT(data, 3);  //
+			m_lamps[8+4] = BIT(data, 4);  //
+			m_lamps[8+5] = BIT(data, 5);  //
+			m_lamps[8+6] = BIT(data, 6);  // D-Up/Take
+			m_lamps[8+7] = BIT(data, 7);  //
+			//popmessage("port 3b: data%02x", data);
+			break;
+		}
+	}
+}
+
+
+/****************************************************
+    SM7831 Arithmetic Processor Device Emulation
+
+****************************************************/
+
+uint8_t wingco_state::sm7831_read(offs_t offset)
+{
+	uint8_t ret = 0;
+	switch(offset)
+	{
+		case 0: ret = sm7831_status; logerror("SM7831: Read Status - Offset:%02x - status:%02x\n", offset, ret); break;
+		case 1: ret = 0;  logerror("SM7831: Not Implemented - Offset:%02x\n", offset); break;
+		case 2: ret = sm7831_shift_dig;  logerror("SM7831: Read Shift Dig.- Offset:%02x\n", offset); break;
+		case 3: if(sm7831_data_cmd == 0x02)
+					ret = sm7831_X_reg[m_dap_idx];
+				if(sm7831_data_cmd == 0x03)
+					ret = sm7831_Y_reg[m_dap_idx];
+				logerror("SM7831: Read Data - m_dap_idx:%02x - data:%02x\n", m_dap_idx, ret);
+				m_dap_idx = m_dap_idx + 1;
+				break;
+	}
+	return ret;
+}
+
+void wingco_state::sm7831_write(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		case 0: sm7831_mode = data; logerror("SM7831: Set mode - Offset:%02x - Data:%02x\n", offset, data); break;
+		case 1: {
+				if(data < 0x40)
+					switch(data & 0x3f)
+					{
+						case 0x00:  // Clear X register
+									for(int i = 0; i < 8; i++)
+										sm7831_X_reg[i] = 0;
+									logerror("SM7831: Clear X register - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x20:  // Clear Y register
+									for(int i = 0; i < 8 ; i++)
+										sm7831_Y_reg[i] = 0;
+									logerror("SM7831: Clear X register - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x01:	// Move Register X to Y
+									for(int i = 0; i < 8 ; i++)
+										sm7831_Y_reg[i] = sm7831_X_reg[i];
+									logerror("SM7831: Move Register X to Y - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x21:  // Move Register Y to X
+									for(int i = 0; i < 8 ; i++)
+										sm7831_X_reg[i] = sm7831_Y_reg[i];
+									logerror("SM7831: Move Register Y to X - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x02:  // Exchange Register X with Y
+									for(int i = 0; i < 8 ; i++)
+									{
+										sm7831_tmp_reg[i] = sm7831_X_reg[i];
+										sm7831_X_reg[i]   = sm7831_Y_reg[i];
+										sm7831_Y_reg[i]   = sm7831_tmp_reg[i];
+									}
+									logerror("SM7831: Exchange Register X with Y - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x22:  // Exchange Register X with Z
+									for(int i = 0; i < 8 ; i++)
+									{
+										sm7831_tmp_reg[i] = sm7831_X_reg[i];
+										sm7831_X_reg[i]   = sm7831_Z_reg[i];
+										sm7831_Z_reg[i]   = sm7831_tmp_reg[i];
+									}
+									logerror("SM7831: Exchange Register X with Z - Offset:%02x - Data:%02x\n", offset, data);
+									break;
+						case 0x03: logerror("SM7831: Zero sense Register X - Offset:%02x - Data:%02x\n", offset, data); break;								// Zero sense Register X  - Set Zero Flag if ...
+						case 0x23: logerror("SM7831: Zero sense Register Y - Offset:%02x - Data:%02x\n", offset, data); break;								// Zero sense Register y  - Set Zero Flag if ...
+						case 0x04: logerror("SM7831: Register X normalization - Offset:%02x - Data:%02x\n", offset, data); break;							// Register X normalization
+						case 0x24: logerror("SM7831: Register Y normalization - Offset:%02x - Data:%02x\n", offset, data); break;							// Register Y normalization
+
+						// Arithmetic Commands
+
+						case 0x08:  								// Add X + Y -> X
+								 {
+									uint8_t carry = 0;
+
+									for (int i = 0; i < 8; i++)
+									{
+										// Extract nibbles from X[i] and Y[i]
+										uint8_t x_low  = sm7831_X_reg[i] & 0x0f;
+										uint8_t x_high = (sm7831_X_reg[i] >> 4) & 0x0f;
+										uint8_t y_low  = sm7831_Y_reg[i] & 0x0f;
+										uint8_t y_high = (sm7831_Y_reg[i] >> 4) & 0x0f;
+
+										// Add low nibble + carry
+										uint8_t sum_low = x_low + y_low + carry;
+										carry = 0;
+
+										if (sum_low > 9)
+										{
+											sum_low += 6;
+											carry = sum_low > 0x0f ? 1 : 0;
+											sum_low &= 0x0f;
+										}
+
+										// Add high nibble + carry
+										uint8_t sum_high = x_high + y_high + carry;
+										carry = 0;
+
+										if (sum_high > 9)
+										{
+											sum_high += 6;
+											carry = sum_high > 0x0f ? 1 : 0;
+											sum_high &= 0x0f;
+										}
+
+										// Save result into X[i]
+										sm7831_X_reg[i] = (sum_high << 4) | sum_low;
+									}
+
+									if(carry == 1)
+										sm7831_status =  0x02;
+									else
+										sm7831_status =  0x00;
+									logerror("SM7831: Add X + Y -> X - Offset:%02x - Data:%02x\n", offset, data);
+								}
+								break;
+
+						case 0x09:	// Sub X - Y -> X
+								 {
+									uint8_t borrow = 0;
+
+									for (int i = 0; i < 8; i++)
+									{
+										// Extract low and high nibbles from current byte of X and Y
+										uint8_t x_low  = sm7831_X_reg[i] & 0x0f;
+										uint8_t x_high = (sm7831_X_reg[i] >> 4) & 0x0f;
+										uint8_t y_low  = sm7831_Y_reg[i] & 0x0f;
+										uint8_t y_high = (sm7831_Y_reg[i] >> 4) & 0x0f;
+
+										// Subtract low-order digit (within byte)
+										int16_t diff_low = x_low - y_low - borrow;
+										borrow = 0;
+										if (diff_low < 0)
+										{
+											diff_low += 10;
+											borrow = 1;
+										}
+
+										// Subtract high-order digit (within same byte)
+										int16_t diff_high = x_high - y_high - borrow;
+										borrow = 0;
+										if (diff_high < 0)
+										{
+											diff_high += 10;
+											borrow = 1;
+										}
+
+										sm7831_X_reg[i] = ((uint8_t)diff_high << 4) | (uint8_t)diff_low;
+									}
+									if(borrow == 1)
+										sm7831_status =  0x06;
+									else
+										sm7831_status =  0x00;
+									logerror("SM7831: Sub X - Y -> X - Offset:%02x - Data:%02x - borrow:%02x\n", offset, data, borrow);
+								}
+								break;
+						case 0x0a: logerror("SM7831: Mul X * Y -> X - Offset:%02x - Data:%02x\n", offset, data); break;										// Mul X * Y -> X
+						case 0x0c: logerror("SM7831: Div X / Y -> X - Offset:%02x - Data:%02x\n", offset, data); break;										// Div X / Y -> X
+						case 0x0e: logerror("SM7831: SQRTodd  X sqrt -> X - Offset:%02x - Data:%02x\n", offset, data); break;								// SQRTodd  X sqrt -> X
+						case 0x1e: logerror("SM7831: SQRTeven X sqrt -> X - Offset:%02x - Data:%02x\n", offset, data); break;								// SQRTeven X sqrt -> X
+						default: logerror("SM7831: Default - Offset:%02x - Data:%02x\n", offset, data); break;
+					}
+				else
+					switch((data & 0xc0) >> 4)
+					{
+						case 0x04:
+						case 0x05: logerror("SM7831: SL Register X - Offset:%02x - Data:%02x\n", offset, data); break;											// SR Register X
+						case 0x06:
+						case 0x07: logerror("SM7831: SL Register Y - Offset:%02x - Data:%02x\n", offset, data); break;											// SL Register Y
+						case 0x08:
+						case 0x09: logerror("SM7831: SR Register X - Offset:%02x - Data:%02x\n", offset, data); break;											// SR Register X
+						case 0x0a:
+						case 0x0b: logerror("SM7831: SR Register Y - Offset:%02x - Data:%02x\n", offset, data); break;											// SR Register Y
+
+						default: logerror("SM7831: Default - Offset:%02x - Data:%02x\n", offset, data); break;
+					}
+				}
+				break;
+
+		case 2: sm7831_data_cmd = data >> 5;
+				m_dap_idx = 0;
+				logerror("SM7831: Set DAP <-> MEM Mode - Data_Index:%02x - Data_cmd:%02x\n", m_dap_idx, data >> 5);
+				break;
+
+		case 3:
+				if(sm7831_data_cmd == 0x04)  // Mem to DAP reg X
+				{
+					sm7831_X_reg[m_dap_idx] = data;
+					logerror("SM7831: Write Data - m_dap_idx:%02x (X) - Data:%02x\n", m_dap_idx, sm7831_X_reg[m_dap_idx]);
+				}
+				if(sm7831_data_cmd == 0x05)  // Mem to DAP reg Y
+				{
+					sm7831_Y_reg[m_dap_idx] = data;
+					logerror("SM7831: Write Data - m_dap_idx:%02x (Y) - Data:%02x\n", m_dap_idx, sm7831_Y_reg[m_dap_idx]);
+				}
+				m_dap_idx = m_dap_idx + 1;
+				break;
+		default: break;
+	}
+
+}
+
 
 /****************************************************
                Memory Map Information
@@ -3827,28 +4403,33 @@ void wingco_state::megaline_portmap(address_map &map)  // TODO: verify everythin
 
 void unkch_state::bonusch_map(address_map &map)
 {
-// Reels stuff and RAM are there just as placeholder, and obviously in wrong offset
+	map(0x0000, 0xbfff).rom();
 
-	map(0x0000, 0xbfff).rom();  // ok
+	map(0xc000, 0xc1ff).ram().w(FUNC(unkch_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xc200, 0xc3ff).ram().w(FUNC(unkch_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xc400, 0xc5ff).ram().w(FUNC(unkch_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xc600, 0xc7ff).ram().w(FUNC(unkch_state::bg_vidram_w)).share(m_bg_vidram);
 
-	map(0xd800, 0xdfff).ram();  //.share("nvram");
+	map(0xc800, 0xc9ff).ram().w(FUNC(unkch_state::reel_attrram_w<0>)).share(m_reel_attrram[0]);
+	map(0xca00, 0xcbff).ram().w(FUNC(unkch_state::reel_attrram_w<1>)).share(m_reel_attrram[1]);
+	map(0xcc00, 0xcdff).ram().w(FUNC(unkch_state::reel_attrram_w<2>)).share(m_reel_attrram[2]);
+	map(0xce00, 0xcfff).ram().w(FUNC(unkch_state::bg_atrram_w)).share(m_bg_atrram);
+
+	map(0xd000, 0xd03f).ram().share(m_reel_scroll[0]);
+	map(0xd040, 0xd1ff).ram();
+	map(0xd200, 0xd23f).ram().share(m_reel_scroll[1]);
+	map(0xd240, 0xd3ff).ram();
+	map(0xd400, 0xd43f).ram().share(m_reel_scroll[2]);
+	map(0xd440, 0xd5ff).ram();
+	map(0xd600, 0xd63f).ram().share(m_bg_scroll);
+	map(0xd640, 0xd7ff).ram();
+
+	map(0xd800, 0xdfff).ram().share("nvram");
 
 	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::fg_vidram_w)).share(m_fg_vidram);
 	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::fg_atrram_w)).share(m_fg_atrram);
 
-// just placeholders
-
-	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::reel_ram_w<0>)).share(m_reel_ram[0]);
-	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::reel_ram_w<1>)).share(m_reel_ram[1]);
-	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::reel_ram_w<2>)).share(m_reel_ram[2]);
-
-	map(0xf640, 0xf67f).ram().share(m_reel_scroll[0]);
-	map(0xf680, 0xf6bf).ram().share(m_reel_scroll[1]);
-	map(0xf700, 0xf73f).ram().share(m_reel_scroll[2]);
-
-	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel_attrram_w<0>)).share(m_reel_attrram[0]);
-	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel_attrram_w<1>)).share(m_reel_attrram[1]);
-	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel_attrram_w<2>)).share(m_reel_attrram[2]);
+	map(0xf000, 0xffff).ram();
 }
 
 /* Bonus Chance W-8
@@ -3868,18 +4449,26 @@ void unkch_state::bonusch_map(address_map &map)
   60h = R
 
 */
+
 void unkch_state::bonusch_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).portr("IN0");
-	map(0x20, 0x20).portr("IN1");
-	map(0x50, 0x50).w("sn1", FUNC(sn76489_device::write));  // SN76489 #1
-	map(0x51, 0x51).w("sn2", FUNC(sn76489_device::write));  // SN76489 #2
-	map(0x52, 0x52).w("sn3", FUNC(sn76489_device::write));  // SN76489 #3
-	map(0x53, 0x53).w("sn4", FUNC(sn76489_device::write));  // SN76489 #4
-	map(0x60, 0x60).portr("IN3");
+	map(0x00, 0x0f).ram();                                               // portection related (regs ????)
+	map(0x10, 0x10).nopr().w(FUNC(unkch_state::bonch_0x10_w));           // protection related output
+	map(0x20, 0x20).portr("IN4").w(FUNC(unkch_state::bonch_0x20_w));     // bookeeping counters output
+	map(0x30, 0x30).portr("IN0").w(FUNC(unkch_state::bonch_0x30_w));     // player1 input - player lamps output
+	map(0x40, 0x40).portr("IN1").w(FUNC(unkch_state::bonch_0x40_w));     // player2 input - unknown output
+	map(0x50, 0x50).portr("IN2").w("sn1", FUNC(sn76489_device::write));  // SN76489 #1    - coins input
+	map(0x51, 0x51).w("sn2", FUNC(sn76489_device::write));               // SN76489 #2
+	map(0x52, 0x52).w("sn3", FUNC(sn76489_device::write));               // SN76489 #3
+	map(0x53, 0x53).w("sn4", FUNC(sn76489_device::write));               // SN76489 #4
+	map(0x60, 0x60).portr("IN3");                                        // service input
+	map(0x70, 0x70).portr("DSW1");
+	map(0x71, 0x71).portr("DSW2");
+	map(0x72, 0x72).portr("DSW3");
+	map(0x73, 0x73).portr("DSW4");
+	map(0x74, 0x74).portr("DSW5");
 }
-
 
 void wingco_state::lucky8tet_ioport(address_map &map)
 {
@@ -3892,44 +4481,46 @@ void wingco_state::tmcu_program_map(address_map &map)
 	map(0x0000, 0x1fff).rom().region("tmcu",0);
 }
 
-void wingco_state::tmcu_io_map(address_map &map)
+void wingco_state::tmcu_data_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(FUNC(wingco_state::tmcu_io_r), FUNC(wingco_state::tmcu_io_w));
+	map(0x0000, 0x01ff).rw(FUNC(wingco_state::tmcu_data_r), FUNC(wingco_state::tmcu_data_w));
 }
 
 
-void goldstar_state::feverch_map(address_map &map)
+void wingco_state::feverch_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 
-	map(0xc000, 0xc7ff).ram();
+	map(0xc000, 0xc7ff).ram().share("nvram");
 	map(0xc800, 0xcfff).ram();
-	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
-	map(0xd800, 0xdfff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0xd000, 0xd7ff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xd800, 0xdfff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
-	map(0xe200, 0xe3ff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
-	map(0xe400, 0xe5ff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xe000, 0xe1ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xe200, 0xe3ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xe400, 0xe5ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xe600, 0xe7ff).ram();
 
-	map(0xe800, 0xe83f).ram().share(m_reel_scroll[0]);
-	map(0xea00, 0xea3f).ram().share(m_reel_scroll[1]);
-	map(0xec00, 0xec3f).ram().share(m_reel_scroll[2]);
+	map(0xe800, 0xe83f).mirror(0x80).ram().w(FUNC(wingco_state::reel_scroll_w<0>)).share(m_reel_scroll[0]);  // different offsets for normal or dup reels
+	map(0xea00, 0xea3f).ram().w(FUNC(wingco_state::reel_scroll_w<1>)).share(m_reel_scroll[1]);
+	map(0xec00, 0xec3f).ram().w(FUNC(wingco_state::reel_scroll_w<2>)).share(m_reel_scroll[2]);
 
 	map(0xf000, 0xffff).ram();
 }
 
-
-void goldstar_state::feverch_portmap(address_map &map)
+void wingco_state::feverch_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x18, 0x1b).rw(FUNC(wingco_state::sm7831_read), FUNC(wingco_state::sm7831_write));
+	map(0x1c, 0x1c).noprw(); // unknown
+
 	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
 	map(0x28, 0x28).w("sn2", FUNC(sn76489_device::write));
 	map(0x30, 0x30).w("sn3", FUNC(sn76489_device::write));
-	//map(0x38, 0x3b)
+	map(0x38, 0x3b).w(FUNC(wingco_state::fever_outp_w));
 }
 
 
@@ -7588,45 +8179,176 @@ static INPUT_PORTS_START( wcat3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_H) PORT_NAME("P2 - White / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 - Start")
 
+	// ---------------- DSW1 ----------------
 	PORT_MODIFY("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "Game Style" )           PORT_DIPLOCATION("DSW1:1") // no confirmed
+	PORT_DIPSETTING(    0x00, "Upright Type" )          // on
+	PORT_DIPSETTING(    0x01, "Table Type" )            // off
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Coin SW" )       PORT_DIPLOCATION("DSW1:2") // no confirmed
+	PORT_DIPSETTING(    0x02, "Active Low" )            // off
+	PORT_DIPSETTING(    0x00, "Active High" )           // on
+	PORT_DIPNAME( 0x04, 0x04, "Payout Method" )        PORT_DIPLOCATION("DSW1:3") // ok
+	PORT_DIPSETTING(    0x00, "Automatic" )             // on
+	PORT_DIPSETTING(    0x04, "Pay Out Switch" )        // off
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Game (7)" )   PORT_DIPLOCATION("DSW1:4") // no confirmed
+	PORT_DIPSETTING(    0x00, "Even" )                  // on
+	PORT_DIPSETTING(    0x08, "Lose" )                  // off
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW1:5" )  // default = OFF (bit=1)
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game" )       PORT_DIPLOCATION("DSW1:6") // ok
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )          // on
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )           // off
+	PORT_DIPNAME( 0xc0, 0xc0, "Special Odds Limit" )   PORT_DIPLOCATION("DSW1:7,8") // no confirmed
+	PORT_DIPSETTING(    0x80, "x300" )
+	PORT_DIPSETTING(    0x40, "x500" )
+	PORT_DIPSETTING(    0x00, "x1000" )
+	PORT_DIPSETTING(    0xc0, "None" )
 
+	// ---------------- DSW2 ----------------
 	PORT_MODIFY("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
+	PORT_DIPNAME( 0x07, 0x05, "Main Game Payout Rate" )  PORT_DIPLOCATION("DSW2:1,2,3") // ok
+	PORT_DIPSETTING(    0x07, "55%" )  // off,off,off
+	PORT_DIPSETTING(    0x06, "60%" )  // on,off,off
+	PORT_DIPSETTING(    0x05, "65%" )  // off,on,off
+	PORT_DIPSETTING(    0x04, "70%" )  // on,on,off
+	PORT_DIPSETTING(    0x03, "75%" )  // off,off,on
+	PORT_DIPSETTING(    0x02, "80%" )  // on,off,on
+	PORT_DIPSETTING(    0x01, "85%" )  // off,on,on
+	PORT_DIPSETTING(    0x00, "90%" )  // on,on,on
+	PORT_DIPNAME( 0x18, 0x18, "Payout Limit" )           PORT_DIPLOCATION("DSW2:4,5") // no confirmed
+	PORT_DIPSETTING(    0x18, "300" )    // off,off
+	PORT_DIPSETTING(    0x10, "500" )    // on,off
+	PORT_DIPSETTING(    0x08, "1000" )   // off,on
+	PORT_DIPSETTING(    0x00, "None" )   // on,on
+	PORT_DIPNAME( 0x20, 0x00, "Sound for Wins >100x" )   PORT_DIPLOCATION("DSW2:6") // no confirmed
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )   // off
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )    // on
+	PORT_DIPNAME( 0x40, 0x40, "Key-Out Step" )           PORT_DIPLOCATION("DSW2:7") // ok
+	PORT_DIPSETTING(    0x40, "By 1" )   // OFF
+	PORT_DIPSETTING(    0x00, "By 100" ) // ON
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )       PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )   // OFF = Disable
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )    // ON  = Enable
 
+	// ---------------- DSW3 ----------------
 	PORT_MODIFY("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW3:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW3:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW3:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW3:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW3:8")
+	PORT_DIPNAME( 0x0f, 0x0f, "Coin D Rate & Hopper step" ) PORT_DIPLOCATION("DSW3:1,2,3,4")  // ok, also use it for pay out step (hopper)
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )      // on,on,on,on
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )       // on,on,on,off
+	PORT_DIPSETTING(    0x02, DEF_STR( 5C_2C ) )       // on,on,off,on
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )       // on,on,off,off
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )       // on,off,on,on
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )       // on,off,on,off
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )       // on,off,off,on
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )       // on,off,off,off
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )       // off,on,on,on
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_3C ) )       // off,on,on,off
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )       // off,on,off,on
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_10C ) )      // off,on,off,off
+	PORT_DIPSETTING(    0x0c, "1 Coin / 20 Credits" )  // off,off,on,on
+	PORT_DIPSETTING(    0x0d, "1 Coin / 25 Credits" )  // off,off,on,off
+	PORT_DIPSETTING(    0x0e, "1 Coin / 50 Credits" )  // off,off,off,on
+	PORT_DIPSETTING(    0x0f, "1 Coin / 80 Credits" )  // off,off,off,off
+	PORT_DIPNAME( 0x70, 0x70, "Coin C Rate" )               PORT_DIPLOCATION("DSW3:5,6,7")  // ok
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )      // on,on,on
+	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )       // off,on,on
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )       // on,off,on
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )       // off,off,on
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )       // on,on,off
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_2C ) )       // off,on,off
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )       // on,off,off
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_10C ) )      // off,off,off
+	PORT_DIPNAME( 0x80, 0x80, "Coin A Sharing" )            PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(    0x00, "Interchangeable" )
+	PORT_DIPSETTING(    0x80, "Not Interchangeable" )
 
+	// ---------------- DSW4 ----------------
 	PORT_MODIFY("DSW4")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW4:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW4:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW4:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW4:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW4:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW4:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW4:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW4:8")
+	PORT_DIPNAME( 0x07, 0x07, "Key In" )               PORT_DIPLOCATION("DSW4:1,2,3") // ok
+	PORT_DIPSETTING(    0x00, "5" )    // on,on,on
+	PORT_DIPSETTING(    0x01, "10" )   // off,on,on
+	PORT_DIPSETTING(    0x02, "20" )   // on,off,on
+	PORT_DIPSETTING(    0x03, "25" )   // off,off,on
+	PORT_DIPSETTING(    0x04, "40" )   // on,on,off
+	PORT_DIPSETTING(    0x05, "50" )   // off,on,off
+	PORT_DIPSETTING(    0x06, "100" )  // on,off,off
+	PORT_DIPSETTING(    0x07, "500" )  // off,off,off
+	PORT_DIPNAME( 0x38, 0x38, "Coin A Rate" )          PORT_DIPLOCATION("DSW4:4,5,6")  // ok
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )       // on,on,on
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )       // off,on,on
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )       // on,off,on
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )       // off,off,on
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_6C ) )       // on,on,off
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_10C ) )      // off,on,off
+	PORT_DIPSETTING(    0x30, "1 Coin / 20 Credits" )  // on,off,off
+	PORT_DIPSETTING(    0x38, "1 Coin / 50 Credits" )  // off,off,off
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )     PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )     PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+/*
+    The following info is from japanese manual
+
+	//---------------- DSW5 is present in the daughterboard ----------------
+	PORT_MODIFY("DSW5")
+	PORT_DIPNAME( 0x03, 0x02, "Coin Limit" )                PORT_DIPLOCATION("DSW5:1,2")
+	PORT_DIPSETTING(    0x03, "1,000" )     // off,off
+	PORT_DIPSETTING(    0x02, "5,000" )     // on,off
+	PORT_DIPSETTING(    0x01, "10,000" )    // off,on
+	PORT_DIPSETTING(    0x00, "20,000" )    // on,on
+	PORT_DIPNAME( 0x1c, 0x14, "Credit Limit" )              PORT_DIPLOCATION("DSW5:3,4,5")
+	PORT_DIPSETTING(    0x1c, "5,000" )     // off,off,off
+	PORT_DIPSETTING(    0x18, "10,000" )    // on,off,off
+	PORT_DIPSETTING(    0x14, "20,000" )    // off,on,off
+	PORT_DIPSETTING(    0x10, "30,000" )    // on,on,off
+	PORT_DIPSETTING(    0x0c, "40,000" )    // off,off,on
+	PORT_DIPSETTING(    0x08, "50,000" )    // on,off,on
+	PORT_DIPSETTING(    0x04, "100,000" )   // off,on,on
+	PORT_DIPSETTING(    0x00, "None" )      // on,on,on
+	PORT_DIPNAME( 0x20, 0x00, "Reel Speed" )                PORT_DIPLOCATION("DSW5:6")
+	PORT_DIPSETTING(    0x20, "Normal" )    // off
+	PORT_DIPSETTING(    0x00, "High" )      // on
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )                   PORT_DIPLOCATION("DSW5:7,8")
+	PORT_DIPSETTING(    0xc0, "8 Bet" )   // off,off
+	PORT_DIPSETTING(    0x80, "16 Bet" )  // on,off
+	PORT_DIPSETTING(    0x40, "32 Bet" )  // off,on
+	PORT_DIPSETTING(    0x00, "64 Bet" )  // on,on
+
+	//---------------- DSW6 is present in the daughterboard ----------------
+	PORT_MODIFY("DSW6")
+	PORT_DIPNAME( 0x03, 0x03, "Bell Fever Line Count" )       PORT_DIPLOCATION("DSW6:1,2")
+	PORT_DIPSETTING(    0x03, "3" )   // off,off
+	PORT_DIPSETTING(    0x02, "5" )   // on,off
+	PORT_DIPSETTING(    0x01, "7" )   // off,on
+	PORT_DIPSETTING(    0x00, "9" )   // on,on
+	PORT_DIPNAME( 0x04, 0x04, "Cat Bonus Count" )             PORT_DIPLOCATION("DSW6:3")
+	PORT_DIPSETTING(    0x04, "7" )   // off
+	PORT_DIPSETTING(    0x00, "9" )   // on
+	PORT_DIPNAME( 0x10, 0x10, "Cat Bonus Multiplier" )        PORT_DIPLOCATION("DSW6:5")
+	PORT_DIPSETTING(    0x00, "x2" )  // on
+	PORT_DIPSETTING(    0x10, "x3" )  // off
+	PORT_DIPNAME( 0x60, 0x60, "Bar Bonus Count (1/2/3 BAR)" ) PORT_DIPLOCATION("DSW6:6,7")
+	PORT_DIPSETTING(    0x60, "3 / 6 / 8" )     // off,off
+	PORT_DIPSETTING(    0x40, "4 / 8 / 12" )    // on,off
+	PORT_DIPSETTING(    0x20, "5 / 10 / 14" )   // off,on
+	PORT_DIPSETTING(    0x00, "6 / 12 / 16" )   // on,on
+
+	//------------- Rotary Switch is present in the daughterboard -------------
+	PORT_MODIFY("Rotary SW")
+	PORT_DIPNAME( 0x0f, 0x05, "Wave Level" )  PORT_DIPLOCATION("SW7:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "0 (None)" )   // all off -> 0
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x09, "9 (Large)" )
+*/
 INPUT_PORTS_END
 
 // TODO: everything
@@ -10766,187 +11488,165 @@ static INPUT_PORTS_START( skillcha )
 INPUT_PORTS_END
 
 
-
 static INPUT_PORTS_START( bonusch )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+	PORT_START("IN0")  // PLAYER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )       PORT_CODE(KEYCODE_N)  PORT_NAME("Start / Stop")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_CODE(KEYCODE_V)  PORT_NAME("Low / Info")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_CODE(KEYCODE_Z)  PORT_NAME("Bet / Stop All")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  PORT_CODE(KEYCODE_X)  PORT_NAME("Take")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_CODE(KEYCODE_C)  PORT_NAME("D-Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_CODE(KEYCODE_B)  PORT_NAME("High")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
+	PORT_START("IN1") // player 2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Service Coin")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+	PORT_START("IN2")  // coins
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) //PORT_CODE(KEYCODE_G) PORT_NAME("COINS:IN2-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //PORT_CODE(KEYCODE_H) PORT_NAME("COINS:IN2-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) //PORT_CODE(KEYCODE_J) PORT_NAME("COINS:IN2-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) //PORT_CODE(KEYCODE_K) PORT_NAME("COINS:IN2-8")
 
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+	PORT_START("IN3")  // service
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tickets", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )  // Hopper presence detection
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Stats")
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, "Double-Up Type" )
+	PORT_DIPSETTING(    0x03, "1" )  // Hi-Lo Card Style
+	PORT_DIPSETTING(    0x02, "2" )  //	Hi-Lo With Reel Bonus
+	PORT_DIPSETTING(    0x01, "3" )  // Hi-Lo With Poker Combo
+	PORT_DIPSETTING(    0x00, "None" )
+	PORT_DIPNAME( 0x04, 0x04, "Hopper SW" )
+	PORT_DIPSETTING(    0x04, "Low Active" )
+	PORT_DIPSETTING(    0x00, "High Active" )
+	PORT_DIPNAME( 0x08, 0x08, "Hopper" )
+	PORT_DIPSETTING(    0x08, "Switched Payout" )
+	PORT_DIPSETTING(    0x00, "Automatic Payout" )
+	PORT_DIPNAME( 0x30, 0x30, "Min. Bet" )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Unknown ) ) // Max Bet: default 0 ("40") - settled by protection device
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Unknown ) ) // WIn Rate: default 0 "95%") - settled by protection device
+	PORT_DIPNAME( 0x10, 0x10, "Limit Display" )
+	PORT_DIPSETTING(    0x10, "On" )
+	PORT_DIPSETTING(    0x00, "Off" )
+	PORT_DIPNAME( 0xe0, 0xe0, "Game Limits" )
+	PORT_DIPSETTING(    0xe0, "None" )
+	PORT_DIPSETTING(    0xc0, "5000" )
+	PORT_DIPSETTING(    0xa0, "10000" )
+	PORT_DIPSETTING(    0x80, "15000" )
+	PORT_DIPSETTING(    0x60, "20000" )
+	PORT_DIPSETTING(    0x40, "30000" )
+	PORT_DIPSETTING(    0x20, "40000" )
+	PORT_DIPSETTING(    0x00, "50000" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, "Key In Settings" )
+	PORT_DIPSETTING(    0x07, "5 Credits" )
+	PORT_DIPSETTING(    0x06, "10 Credits" )
+	PORT_DIPSETTING(    0x05, "20 Credits" )
+	PORT_DIPSETTING(    0x04, "25 Credits" )
+	PORT_DIPSETTING(    0x03, "40 Credits" )
+	PORT_DIPSETTING(    0x02, "50 Credits" )
+	PORT_DIPSETTING(    0x01, "80 Credits" )
+	PORT_DIPSETTING(    0x00, "100 Credits" )
+	PORT_DIPNAME( 0x38, 0x38,"Coin A Settings" )
+	PORT_DIPSETTING(    0x38, "1 Credits" )
+	PORT_DIPSETTING(    0x30, "2 Credits" )
+	PORT_DIPSETTING(    0x28, "4 Credits" )
+	PORT_DIPSETTING(    0x20, "5 Credits" )
+	PORT_DIPSETTING(    0x18, "8 Credits" )
+	PORT_DIPSETTING(    0x10, "10 Credits" )
+	PORT_DIPSETTING(    0x08, "25 Credits" )
+	PORT_DIPSETTING(    0x00, "50 Credits" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Hopper Capacity" )
+	PORT_DIPSETTING(    0xc0, "300" )
+	PORT_DIPSETTING(    0x80, "500" )
+	PORT_DIPSETTING(    0x40, "1000" )
+	PORT_DIPSETTING(    0x00, "None" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "DSW4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f, 0x0f, "Coin C Settings" )
+	PORT_DIPSETTING(    0x0f, "1" )
+	PORT_DIPSETTING(    0x0d, "2" )
+	PORT_DIPSETTING(    0x09, "3" )
+	PORT_DIPSETTING(    0x07, "2" )
+	PORT_DIPSETTING(    0x06, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x03, "20" )
+	PORT_DIPSETTING(    0x02, "25" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x70, 0x70, "Coin B Settings" )
+	PORT_DIPSETTING(    0x70, DEF_STR( 10C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin / 200 Credit" )	// add this to the core -> 1 Coin 200 Credits
+	PORT_DIPNAME( 0x80, 0x80, "Reel" )
+	PORT_DIPSETTING(    0x80, "Auto Stop" )
+	PORT_DIPSETTING(    0x00, "Manual Stop" )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, "DSW5" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, "Maximun Jackpot" )
+	PORT_DIPSETTING(    0x03, "500" )
+	PORT_DIPSETTING(    0x02, "2000" )
+	PORT_DIPSETTING(    0x01, "2500" )
+	PORT_DIPSETTING(    0x00, "3000" )
+	PORT_DIPNAME( 0x04, 0x04, "Jackpot Display" )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x08, "Jackpot" )
+	PORT_DIPSETTING(    0x08, "Game Stop" )
+	PORT_DIPSETTING(    0x00, "Continue" )
+	PORT_DIPNAME( 0x10, 0x10, "Min. Bet for Jackpot" )
+	PORT_DIPSETTING(    0x10, "8" )
+	PORT_DIPSETTING(    0x00, "16" )
+	PORT_DIPNAME( 0x20, 0x20, "Double-Up Limit" )
+	PORT_DIPSETTING(    0x20, "None" )
+	PORT_DIPSETTING(    0x00, "6 Times" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Double-Up Difficulty" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Very_Difficult ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( feverch )
@@ -10980,51 +11680,50 @@ static INPUT_PORTS_START( feverch )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME("Coin D")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
+	PORT_START("IN3") // coin
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_E) PORT_NAME("IN3-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_R) PORT_NAME("IN3-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_T) PORT_NAME("IN3-4")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN3-8")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(2) PORT_NAME("Coin C")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2) PORT_NAME("Coin B")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2) PORT_NAME("Coin A - Exchange Out")
 
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+	PORT_START("IN4") // service
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )          PORT_NAME("Service Coin")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // 1 coin - 100 credits
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Hopper presence detection
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Stats")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Game Style" )           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x00, "Upright Type" )
+	PORT_DIPSETTING(    0x01, "Table Type" )
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Coin SW" )       PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, "Active Low" )
+	PORT_DIPSETTING(    0x00, "Active High" )
+	PORT_DIPNAME( 0x04, 0x04, "Payout Method" )        PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x00, "Automatic" )
+	PORT_DIPSETTING(    0x04, "Pay Out Switch" )
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Game (7)" )   PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x00, "Even" )
+	PORT_DIPSETTING(    0x08, "Lose" )
+	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )           PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game" )       PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Hopper Pay Limit" )     PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x80, "x300" )
+	PORT_DIPSETTING(    0x40, "x500" )
+	PORT_DIPSETTING(    0x00, "x1000" )
+	PORT_DIPSETTING(    0xc0, "None" )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Pay Rate" ) PORT_DIPLOCATION("DSW2:1,2,3,4")
@@ -11044,21 +11743,20 @@ static INPUT_PORTS_START( feverch )
 	PORT_DIPSETTING(    0x02, "92%" )
 	PORT_DIPSETTING(    0x01, "95%" )
 	PORT_DIPSETTING(    0x00, "97%" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Maximum Bet" )        PORT_DIPLOCATION("DSW2:5,6")
+	PORT_DIPSETTING(    0x30, "8" )
+	PORT_DIPSETTING(    0x20, "16" )
+	PORT_DIPSETTING(    0x10, "32" )
+	PORT_DIPSETTING(    0x00, "64" )
+	PORT_DIPNAME( 0x40, 0x40, "Big/Small Flip Flop" )   PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Out by Coin A" )  PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, "Not Exchanged" )
+	PORT_DIPSETTING(    0x00, "Exchange" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x07, 0x07, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Rate" )           PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(    0x00, "5 Credits" )
 	PORT_DIPSETTING(    0x01, "10 Credits" )
 	PORT_DIPSETTING(    0x02, "20 Credits" )
@@ -11067,22 +11765,21 @@ static INPUT_PORTS_START( feverch )
 	PORT_DIPSETTING(    0x05, "50 Credits" )
 	PORT_DIPSETTING(    0x06, "60 Credits" )
 	PORT_DIPSETTING(    0x07, "100 Credits" )
-	PORT_DIPNAME( 0x38, 0x38, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:4,5,6")
+	PORT_DIPNAME( 0x38, 0x28, "Coin A Rate" )           PORT_DIPLOCATION("DSW3:4,5,6")
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_50C ) ) // why?? hacked?
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_10C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Jackpot Limit" )         PORT_DIPLOCATION("DSW3:7,8")
+	PORT_DIPSETTING(    0xc0, "Unlimited" )
+	PORT_DIPSETTING(    0x80, "30000" )
+	PORT_DIPSETTING(    0x40, "40000" )
+	PORT_DIPSETTING(    0x00, "50000" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x0f, 0x0f, "Coin D Rate" ) PORT_DIPLOCATION("DSW4:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, "Coin C Rate" )            PORT_DIPLOCATION("DSW4:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 5C_2C ) )
@@ -11095,16 +11792,21 @@ static INPUT_PORTS_START( feverch )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_10C ) )
-	PORT_DIPNAME( 0x70, 0x70, "Coin C Rate" ) PORT_DIPLOCATION("DSW4:5,6,7")
-	PORT_DIPSETTING(    0x70, DEF_STR( 1C_50C ) ) // why?? hacked?
+	PORT_DIPSETTING(    0x0c, DEF_STR( 10C_1C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 10C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 10C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 10C_1C ) )
+	PORT_DIPNAME( 0x70, 0x70, "Coin B Rate" )            PORT_DIPLOCATION("DSW4:5,6,7")
+	PORT_DIPSETTING(    0x70, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x80, 0x80, "4th Coin" ) PORT_DIPLOCATION("DSW4:8")
-	PORT_DIPSETTING(    0x80, "As Coin A" )
+	PORT_DIPSETTING(    0x70, "1 Coin / 50 Credits" )
+	PORT_DIPNAME( 0x80, 0x80, "Credit Limit Game Over" ) PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x80, "Game Over" )
 	PORT_DIPSETTING(    0x00, "As Hopper Line" )
 
 INPUT_PORTS_END
@@ -12658,6 +13360,13 @@ static GFXDECODE_START( gfx_megaline )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128,  8 )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_bonusch )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout,           0, 16 )  // for fg
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout,        256,  8 )  // for reels
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 256+128+16,  8 )  // for reels extended gfx (d-up reel numbers)
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout,    256+128,  8 )  // for reels extended gfx (credit + bet tilemap)
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_sangho )
 	GFXDECODE_ENTRY( "gfx1", 0, sangho_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sangho_tilelayout, 128,  8 )
@@ -13971,16 +14680,19 @@ void unkch_state::bonusch(machine_config &config)
 
 	I80C51(config, "mcu", 12_MHz_XTAL).set_disable();
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(unkch_state::screen_update_goldstar));
+	screen.set_screen_update(FUNC(unkch_state::screen_update_bonusch));
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
-	PALETTE(config, m_palette, FUNC(unkch_state::lucky8_palette), 256);
+	MCFG_VIDEO_START_OVERRIDE(unkch_state, bonusch)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bonusch);
+	PALETTE(config, m_palette, FUNC(unkch_state::bonusch_palette), 512);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -13989,13 +14701,18 @@ void unkch_state::bonusch(machine_config &config)
 	SN76489(config, "sn2", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 	SN76489(config, "sn3", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 	SN76489(config, "sn4", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	// payout hardware
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
-void goldstar_state::feverch(machine_config &config)
+void wingco_state::feverch(machine_config &config)
 {
 	Z80(config, m_maincpu, 12'000'000 / 2); // clock not verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::feverch_map);
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::feverch_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::feverch_map);
+	m_maincpu->set_addrmap(AS_IO, &wingco_state::feverch_portmap);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -14016,17 +14733,20 @@ void goldstar_state::feverch(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.set_screen_update(FUNC(wingco_state::screen_update_feverch));
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
-	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	PALETTE(config, m_palette, FUNC(wingco_state::cm_palette), 256);
 
 	SPEAKER(config, "mono").front_center();
 
 	SN76489A(config, "sn1", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80);  // actually SN76489AN, clock not verified
 	SN76489A(config, "sn2", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80);  // actually SN76489AN, clock not verified
 	SN76489A(config, "sn3", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80);  // actually SN76489AN, clock not verified
+
+	// payout hardware
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
 
@@ -14039,7 +14759,7 @@ void wingco_state::lucky8tet(machine_config &config)
 
 	I80C51(config, m_tmcu, 24'500'000);  // Internal Clock
 	m_tmcu->set_addrmap(AS_PROGRAM, &wingco_state::tmcu_program_map);
-	m_tmcu->set_addrmap(AS_IO, &wingco_state::tmcu_io_map);
+	m_tmcu->set_addrmap(AS_DATA, &wingco_state::tmcu_data_map);
 
 	m_tmcu->port_out_cb<1>().set(FUNC(wingco_state::tmcu_p1_out));
 
@@ -24034,22 +24754,40 @@ ROM_START( bonusch )
 	ROM_LOAD( "0.5p", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "1.1c",  0x00000, 0x10000, CRC(33ce67c0) SHA1(8f3d7e78a4616bebafed2779b7f793d41576c9c8) )
-	ROM_LOAD( "2.1e",  0x10000, 0x10000, CRC(fc394767) SHA1(645bf0e60a7061771aa73bb4d10603eaaad17f20) )
+	ROM_LOAD( "2.1e",  0x08000, 0x08000, CRC(fc394767) SHA1(645bf0e60a7061771aa73bb4d10603eaaad17f20) )
+	ROM_CONTINUE(      0x00000, 0x08000 )
+	ROM_LOAD( "1.1c",  0x18000, 0x08000, CRC(33ce67c0) SHA1(8f3d7e78a4616bebafed2779b7f793d41576c9c8) )
+	ROM_CONTINUE(      0x10000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "3.1m",  0x00000, 0x10000, CRC(2acac012) SHA1(59d879214c4e473fa6fedb4a08dcd9b3c6a881a3) )
-	ROM_LOAD( "4.1p",  0x10000, 0x10000, CRC(530bdec2) SHA1(2ce0993386fe6b165363a053b54fc66d8bf385d7) )
+//	ROM_LOAD( "4.1p",   0x08000, 0x08000, CRC(530bdec2) SHA1(2ce0993386fe6b165363a053b54fc66d8bf385d7) )
+//	ROM_CONTINUE(       0x00000, 0x08000 )
+//	ROM_LOAD( "3.1m",   0x18000, 0x08000, CRC(2acac012) SHA1(59d879214c4e473fa6fedb4a08dcd9b3c6a881a3) )
+//	ROM_CONTINUE(       0x10000, 0x08000 )
 
-	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "4.1p",   0x08000, 0x04000, CRC(530bdec2) SHA1(2ce0993386fe6b165363a053b54fc66d8bf385d7) )
+	ROM_CONTINUE(       0x0e000, 0x02000 )  // 3rd and 4th querters swapped
+	ROM_CONTINUE(       0x0c000, 0x02000 )  // 3rd and 4th querters swapped
+
+	ROM_CONTINUE(       0x00000, 0x04000 )
+	ROM_CONTINUE(       0x06000, 0x02000 )  // 3rd and 4th querters swapped
+	ROM_CONTINUE(       0x04000, 0x02000 )  // 3rd and 4th querters swapped
+
+	ROM_LOAD( "3.1m",   0x18000, 0x04000, CRC(2acac012) SHA1(59d879214c4e473fa6fedb4a08dcd9b3c6a881a3) )
+	ROM_CONTINUE(       0x1e000, 0x02000 )  // 3rd and 4th querters swapped
+	ROM_CONTINUE(       0x1c000, 0x02000 )  // 3rd and 4th querters swapped
+
+	ROM_CONTINUE(       0x10000, 0x04000 )
+	ROM_CONTINUE(       0x16000, 0x02000 )  // 3rd and 4th querters swapped
+	ROM_CONTINUE(       0x14000, 0x02000 )  // 3rd and 4th querters swapped
+
+	ROM_REGION( 0x600, "proms", 0 )
 	ROM_LOAD( "tbp24s10.3e", 0x0000, 0x0100, CRC(f8d160c5) SHA1(a3cb9c4337f4f030d62e74ccc882052959b1fa4f) )
-	ROM_LOAD( "tbp24s10.3f", 0x0100, 0x0100, CRC(bbc03eb2) SHA1(c0e44df0ec8268344f59965e3b9d62a4dca2ebb2) )
-	ROM_LOAD( "tbp24s10.3h", 0x0200, 0x0100, CRC(77b2585d) SHA1(898302f9a0bd8e354794087461f8f1103bb63783) )
-
-	ROM_REGION( 0x300, "proms2", 0 )
-	ROM_LOAD( "tbp24s10.4e", 0x0000, 0x0100, CRC(06fa2649) SHA1(b2f17d37826317ccad19d535cd5afeedb143778b) )
-	ROM_LOAD( "tbp24s10.4f", 0x0100, 0x0100, CRC(38000593) SHA1(e0113590cb2dc338d61ae2e7e92b1046c5c2d19f) )
-	ROM_LOAD( "tbp24s10.4h", 0x0200, 0x0100, CRC(cbf0062d) SHA1(f49dfca34d2eb86b5ff16872fab23d3e3a10be9a) )
+	ROM_LOAD( "tbp24s10.4e", 0x0100, 0x0100, CRC(06fa2649) SHA1(b2f17d37826317ccad19d535cd5afeedb143778b) )
+	ROM_LOAD( "tbp24s10.3f", 0x0200, 0x0100, CRC(bbc03eb2) SHA1(c0e44df0ec8268344f59965e3b9d62a4dca2ebb2) )
+	ROM_LOAD( "tbp24s10.4f", 0x0300, 0x0100, CRC(38000593) SHA1(e0113590cb2dc338d61ae2e7e92b1046c5c2d19f) )
+	ROM_LOAD( "tbp24s10.3h", 0x0400, 0x0100, CRC(77b2585d) SHA1(898302f9a0bd8e354794087461f8f1103bb63783) )
+	ROM_LOAD( "tbp24s10.4h", 0x0500, 0x0100, CRC(cbf0062d) SHA1(f49dfca34d2eb86b5ff16872fab23d3e3a10be9a) )
 ROM_END
 
 ROM_START( bonuscha )
@@ -24060,22 +24798,40 @@ ROM_START( bonuscha )
 	ROM_LOAD( "0.5p", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "1.1c",  0x00000, 0x10000, CRC(33ce67c0) SHA1(8f3d7e78a4616bebafed2779b7f793d41576c9c8) )
-	ROM_LOAD( "2.1e",  0x10000, 0x10000, CRC(fc394767) SHA1(645bf0e60a7061771aa73bb4d10603eaaad17f20) )
+	ROM_LOAD( "2.1e",  0x08000, 0x08000, CRC(fc394767) SHA1(645bf0e60a7061771aa73bb4d10603eaaad17f20) )
+	ROM_CONTINUE(      0x00000, 0x08000 )
+	ROM_LOAD( "1.1c",  0x18000, 0x08000, CRC(33ce67c0) SHA1(8f3d7e78a4616bebafed2779b7f793d41576c9c8) )
+	ROM_CONTINUE(      0x10000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "3.1m",  0x00000, 0x10000, CRC(2acac012) SHA1(59d879214c4e473fa6fedb4a08dcd9b3c6a881a3) )
-	ROM_LOAD( "4.1p",  0x10000, 0x10000, CRC(530bdec2) SHA1(2ce0993386fe6b165363a053b54fc66d8bf385d7) )
+//	ROM_LOAD( "4.1p",   0x08000, 0x08000, CRC(530bdec2) SHA1(2ce0993386fe6b165363a053b54fc66d8bf385d7) )
+//	ROM_CONTINUE(       0x00000, 0x08000 )
+//	ROM_LOAD( "3.1m",   0x18000, 0x08000, CRC(2acac012) SHA1(59d879214c4e473fa6fedb4a08dcd9b3c6a881a3) )
+//	ROM_CONTINUE(       0x10000, 0x08000 )
 
-	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "4.1p",   0x08000, 0x04000, CRC(530bdec2) SHA1(2ce0993386fe6b165363a053b54fc66d8bf385d7) )
+	ROM_CONTINUE(       0x0e000, 0x02000 )  // 3rd and 4th querters swapped
+	ROM_CONTINUE(       0x0c000, 0x02000 )  // 3rd and 4th querters swapped
+
+	ROM_CONTINUE(       0x00000, 0x04000 )
+	ROM_CONTINUE(       0x06000, 0x02000 )  // 3rd and 4th querters swapped
+	ROM_CONTINUE(       0x04000, 0x02000 )  // 3rd and 4th querters swapped
+
+	ROM_LOAD( "3.1m",   0x18000, 0x04000, CRC(2acac012) SHA1(59d879214c4e473fa6fedb4a08dcd9b3c6a881a3) )
+	ROM_CONTINUE(       0x1e000, 0x02000 )  // 3rd and 4th querters swapped
+	ROM_CONTINUE(       0x1c000, 0x02000 )  // 3rd and 4th querters swapped
+
+	ROM_CONTINUE(       0x10000, 0x04000 )
+	ROM_CONTINUE(       0x16000, 0x02000 )  // 3rd and 4th querters swapped
+	ROM_CONTINUE(       0x14000, 0x02000 )  // 3rd and 4th querters swapped
+
+	ROM_REGION( 0x600, "proms", 0 )
 	ROM_LOAD( "tbp24s10.3e", 0x0000, 0x0100, CRC(f8d160c5) SHA1(a3cb9c4337f4f030d62e74ccc882052959b1fa4f) )
-	ROM_LOAD( "tbp24s10.3f", 0x0100, 0x0100, CRC(bbc03eb2) SHA1(c0e44df0ec8268344f59965e3b9d62a4dca2ebb2) )
-	ROM_LOAD( "tbp24s10.3h", 0x0200, 0x0100, CRC(77b2585d) SHA1(898302f9a0bd8e354794087461f8f1103bb63783) )
-
-	ROM_REGION( 0x300, "proms2", 0 )
-	ROM_LOAD( "tbp24s10.4e", 0x0000, 0x0100, CRC(06fa2649) SHA1(b2f17d37826317ccad19d535cd5afeedb143778b) )
-	ROM_LOAD( "tbp24s10.4f", 0x0100, 0x0100, CRC(38000593) SHA1(e0113590cb2dc338d61ae2e7e92b1046c5c2d19f) )
-	ROM_LOAD( "tbp24s10.4h", 0x0200, 0x0100, CRC(cbf0062d) SHA1(f49dfca34d2eb86b5ff16872fab23d3e3a10be9a) )
+	ROM_LOAD( "tbp24s10.4e", 0x0100, 0x0100, CRC(06fa2649) SHA1(b2f17d37826317ccad19d535cd5afeedb143778b) )
+	ROM_LOAD( "tbp24s10.3f", 0x0200, 0x0100, CRC(bbc03eb2) SHA1(c0e44df0ec8268344f59965e3b9d62a4dca2ebb2) )
+	ROM_LOAD( "tbp24s10.4f", 0x0300, 0x0100, CRC(38000593) SHA1(e0113590cb2dc338d61ae2e7e92b1046c5c2d19f) )
+	ROM_LOAD( "tbp24s10.3h", 0x0400, 0x0100, CRC(77b2585d) SHA1(898302f9a0bd8e354794087461f8f1103bb63783) )
+	ROM_LOAD( "tbp24s10.4h", 0x0500, 0x0100, CRC(cbf0062d) SHA1(f49dfca34d2eb86b5ff16872fab23d3e3a10be9a) )
 ROM_END
 
 /*
@@ -24097,8 +24853,8 @@ ROM_START( feverch )
 	ROM_LOAD( "w9.c11", 0x00000, 0x8000, CRC(4dda18ef) SHA1(9a98a2f6996903b58d53e10b7b68c6ed1c34967a) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "cf18.7h", 0x00000, 0x08000, CRC(c63924fe) SHA1(7471d05c8688ba1fa6c0c3444de8883595c21776) )
-	ROM_LOAD( "cf19.8h", 0x08000, 0x08000, CRC(f0229490) SHA1(665d335cc030a0cbec0c11c685a6f1e2f9706989) )
+	ROM_LOAD( "cf18.7h",  0x00000, 0x08000, CRC(c63924fe) SHA1(7471d05c8688ba1fa6c0c3444de8883595c21776) )
+	ROM_LOAD( "cf19.8h",  0x08000, 0x08000, CRC(f0229490) SHA1(665d335cc030a0cbec0c11c685a6f1e2f9706989) )
 	ROM_LOAD( "cf20.10h", 0x10000, 0x08000, CRC(1d831a06) SHA1(42d235b8dd894d38579886940a3e13adb843e00d) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
@@ -24111,14 +24867,14 @@ ROM_START( feverch )
 	ROM_LOAD( "cf4.5h", 0x6000, 0x2000, CRC(7f73744e) SHA1(7c07095f7ec4302a4839a279c755979ec10e0715) )  // 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(       0x6000, 0x2000 )
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD_NIB_LOW(  "82s129.11f", 0x000, 0x100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
-	ROM_LOAD_NIB_HIGH( "82s129.12f", 0x000, 0x100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
-	ROM_LOAD(          "82s123.13f", 0x080, 0x020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "82s129.12f", 0x0000, 0x0100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
+	ROM_LOAD_NIB_HIGH( "82s129.11f", 0x0000, 0x0100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
+	ROM_LOAD(          "82s123.13f", 0x0080, 0x0020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
 
-	ROM_REGION( 0x120, "unkproms", 0 )
-	ROM_LOAD( "82s129.4e",  0x000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )  // same as megaline
-	ROM_LOAD( "82s123.10d", 0x100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
+	ROM_REGION( 0x0120, "unkproms", 0 )
+	ROM_LOAD( "82s129.4e",  0x0000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )  // same as megaline
+	ROM_LOAD( "82s123.10d", 0x0100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
 ROM_END
 
 ROM_START( fevercha )
@@ -24140,14 +24896,14 @@ ROM_START( fevercha )
 	ROM_LOAD( "5h", 0x6000, 0x2000, CRC(7f73744e) SHA1(7c07095f7ec4302a4839a279c755979ec10e0715) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(   0x6000, 0x2000 )
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD_NIB_LOW(  "82s129.11f", 0x000, 0x100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
-	ROM_LOAD_NIB_HIGH( "82s129.12f", 0x000, 0x100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
-	ROM_LOAD(          "82s123.13f", 0x080, 0x020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "82s129.12f", 0x0000, 0x0100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
+	ROM_LOAD_NIB_HIGH( "82s129.11f", 0x0000, 0x0100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
+	ROM_LOAD(          "82s123.13f", 0x0080, 0x0020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
 
-	ROM_REGION( 0x120, "unkproms", 0 )
-	ROM_LOAD( "82s129.4e",  0x000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )  // same as megaline
-	ROM_LOAD( "82s123.10d", 0x100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
+	ROM_REGION( 0x0120, "unkproms", 0 )
+	ROM_LOAD( "82s129.4e",  0x0000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )  // same as megaline
+	ROM_LOAD( "82s123.10d", 0x0100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
 ROM_END
 
 ROM_START( feverchtw )
@@ -24177,6 +24933,36 @@ ROM_START( feverchtw )
 	ROM_REGION( 0x120, "unkproms", 0 )
 	ROM_LOAD( "82s129.4e",  0x000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) ) // same as megaline
 	ROM_LOAD( "82s123.10d", 0x100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
+ROM_END
+
+// W-6 for W-4 hardware...
+ROM_START( feverchw4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8.b14",  0x00000, 0x8000, CRC(3bdc197c) SHA1(6552d9343442e7bbbd713f299219b63e423a79b4) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.h7",   0x00000, 0x8000, CRC(3f52c063) SHA1(a53042b1285ed1cd853aa54b5c58deccf7eb2693) )
+	ROM_LOAD( "6.h8",   0x08000, 0x8000, CRC(9dace485) SHA1(8b7f0ce84334252285db60c8d9e16d2b17d67cb6) )
+	ROM_LOAD( "7.h10",  0x10000, 0x8000, CRC(77a6ee8f) SHA1(46d437089729db004a54e35c79c3c95ef169695b) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",   0x0000, 0x2000, CRC(c2f72d5f) SHA1(3e4f37a60931a417929255e782d8f7f219d8ebd0) )
+	ROM_LOAD( "2.h3",   0x2000, 0x2000, CRC(b4a0f2ad) SHA1(f68d5134156b646c5eeadbab6bdc21507018eafa) )
+	ROM_LOAD( "3.h4",   0x4000, 0x2000, CRC(464997a3) SHA1(e56bc0f52dbb3689c38d357e24914e7688254534) )
+	ROM_LOAD( "4.h6",   0x6000, 0x2000, CRC(bc3a09c4) SHA1(952dcd4aace87fd7249fc2391c8b4832fa17b083) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.g13", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "82s129.g14", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -27940,6 +28726,82 @@ void wingco_state::init_mgln()
 	rom[0x4637] = 0xc9;
 }
 
+void unkch_state::init_bonch()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x5a60] = 0x77;
+	rom[0x5a67] = 0x77;
+
+	rom[0x5a8c] = 0x77;
+	rom[0x5a93] = 0x77;
+
+	//release hopper pay protection
+	rom[0x5ab2] = 0x4f;
+	rom[0x5ab3] = 0xd8;
+	rom[0x5ab6] = 0x77;
+	rom[0x5aca] = 0x77;
+
+	// backup data control skip
+	rom[0x5e82] = 0xd8; // 1
+	rom[0x5e98] = 0xd8; // 2
+
+	rom[0x5d66] = 0xc9;
+	rom[0x73be] = 0xc9;
+}
+
+void unkch_state::init_boncha()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x5a47] = 0x77;
+	rom[0x5a4e] = 0x77;
+	rom[0x5a73] = 0x77;
+	rom[0x5a7a] = 0x77;
+	rom[0x5a9d] = 0x77;
+	rom[0x5ab1] = 0x77;
+	rom[0x5e66] = 0x01;
+	rom[0x5e72] = 0x00;
+	rom[0x5e88] = 0x00;
+	rom[0x5ba0] = 0x77;
+	rom[0x5bb0] = 0x77;
+	rom[0x5bd5] = 0x77;
+	rom[0x5be1] = 0x77;
+	rom[0x5c07] = 0x77;
+	rom[0x5c0e] = 0x77;
+	rom[0x5c33] = 0x77;
+	rom[0x5c41] = 0x77;
+	rom[0x5c65] = 0x77;
+	rom[0x5c6c] = 0x77;
+	rom[0x5c97] = 0x77;
+	rom[0x5ca0] = 0x77;
+	rom[0x5cc3] = 0x77;
+	rom[0x5c97] = 0x77;
+	rom[0x5cc3] = 0x77;
+	rom[0x5cd2] = 0x77;
+	rom[0x5cf5] = 0x77;
+	rom[0x5d04] = 0x77;
+}
+
+void goldstar_state::init_moonlghtb()
+{
+	// masking the reels
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0xc780] = 0x00;   // black
+
+}
+
+void cmaster_state::init_cutya()
+{
+	init_cmv4();
+
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x02e6] = 0x83;  // jp 0301 -> jp 8301  start
+	rom[0x8f51] = 0x84;  // jp 4423 -> jp 8423  loop attract ok
+}
+
+
 } // anonymous namespace
 
 
@@ -27955,8 +28817,8 @@ GAMEL( 199?, goldstar,   0,        goldstar, goldstar, goldstar_state, init_gold
 GAMEL( 199?, goldstbl,   goldstar, goldstbl, goldstar, goldstar_state, empty_init,     ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
 GAME(  199?, moonlght,   goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.0629, low program)",            0 )
 GAME(  199?, moonlghta,  goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.0629, high program)",           0 )
-GAME(  199?, moonlghtb,  goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.02L0A, low program)",           MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
-GAME(  199?, moonlghtc,  goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.02L0A, high program, alt gfx)", MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
+GAME(  199?, moonlghtb,  goldstar, moonlght, goldstar, goldstar_state, init_moonlghtb, ROT0, "bootleg",           "Moon Light (v.02L0A, low program)",           0 )
+GAME(  199?, moonlghtc,  goldstar, moonlght, goldstar, goldstar_state, init_moonlghtb, ROT0, "bootleg",           "Moon Light (v.02L0A, high program, alt gfx)", 0 )
 GAME(  199?, gregular,   goldstar, moonlght, gregular, goldstar_state, empty_init,     ROT0, "bootleg (Playmark)","Golden Regular (version 388/2000)",           0 )                         // hacked to only hand pay
 GAMEL( 199?, chrygld,    0,        chrygld,  chrygld,  cb3_state,      init_chrygld,   ROT0, "bootleg",           "Cherry Gold I (set 1)",                       0,                 layout_chrygld )
 GAMEL( 199?, chry10,     0,        chrygld,  chry10,   cb3_state,      init_chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
@@ -28027,7 +28889,7 @@ GAMEL( 1991, cmasterl,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, skillmst,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v5.0)",                 0,                 layout_cmasterb )
 GAMEL( 1991, skillmsta,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v3.0)",                 0,                 layout_cmasterb )
 GAMEL( 1991, cutyline,   0,        cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cuty Line (LC-88, ver.1.01)",                 0,                 layout_cmasterb )
-GAMEL( 1991, cutylinea,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.8.05C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
+GAMEL( 1991, cutylinea,  cutyline, cm,       cmasterb, cmaster_state,  init_cutya,     ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.8.05C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, cutylineb,  cutyline, cutylineb,cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7C.14)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, cutylinec,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7.07C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, lonestar,   cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 1)",                    0,                 layout_cmasterb )
@@ -28162,9 +29024,10 @@ GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam
 
 
 // --- Wing W-6 hardware ---
-GAME(  1986, feverch,    0,        feverch,  feverch,  goldstar_state, empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )  // unimplemented arithmetic chip, reels scrolling, I/O
-GAME(  1986, fevercha,   feverch,  feverch,  feverch,  goldstar_state, empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )  // unimplemented arithmetic chip, reels scrolling, I/O
-GAME(  1986, feverchtw,  feverch,  feverch,  feverch,  goldstar_state, empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )  // reels scrolling, I/O
+GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
+GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
+GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
+GAME(  1986, feverchw4,  feverch,  lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 // --- Wing W-7 hardware ---
 GAMEL( 1991, megaline,   0,        megaline, megaline, wingco_state,   init_mgln,      ROT0, "Fun World",         "Mega Lines (Wing W-7 System)",                             0,          layout_megaline )
@@ -28172,8 +29035,8 @@ GAMEL( 1986, skillch,    0,        megaline, megaline, wingco_state,   init_skch
 GAMEL( 1986, skillcha,   skillch,  megaline, skillcha, wingco_state,   init_skcha,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2, 53-98 main)",                    0,          layout_skillch )
 
 // --- Wing W-8 hardware ---
-GAME(  1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                MACHINE_NOT_WORKING )  // M80C51F MCU
-GAME(  1990, bonuscha,   bonusch,  bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 2)",                                MACHINE_NOT_WORKING )  // M80C51F MCU
+GAMEL( 1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    init_bonch,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                0,          layout_bonusch )  // M80C51F MCU
+GAMEL( 1990, bonuscha,   bonusch,  bonusch,  bonusch,  unkch_state,    init_boncha,    ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 2)",                                0,          layout_bonusch )  // M80C51F MCU
 
 
 // --- Magical Odds hardware ---

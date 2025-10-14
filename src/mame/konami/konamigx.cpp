@@ -3080,7 +3080,7 @@ ROM_START( soccerssu )
 	ROM_LOAD( "soccerssu.nv", 0x0000, 0x080, CRC(812f6878) SHA1(fc4975211720a7eb413bceda8109231cb1c00834) )
 ROM_END
 
-/* Soccer Superstars (94.12.19 - Japan ver JAC) Writes JAB to EEPROM and reports as JAC */
+/* Soccer Superstars (94.12.09 - Japan ver JAC) Writes JAB to EEPROM and reports as JAC */
 ROM_START( soccerssj )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3223,7 +3223,7 @@ ROM_END
 
 /* Vs. Net Soccer TODO: Hook up ROM tests. */
 
-/* Vs. Net Soccer (ver EAD) */
+/* Vs. Net Soccer (ver EAD) 1996.11.27 */
 ROM_START( vsnetscr )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3261,7 +3261,7 @@ ROM_START( vsnetscr )
 	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
-/* Vs. Net Soccer (ver EAB) */
+/* Vs. Net Soccer (ver EAB)  1996.11.27 */
 ROM_START( vsnetscreb )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3299,7 +3299,7 @@ ROM_START( vsnetscreb )
 	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
-/* Vs. Net Soccer (ver UAB) */
+/* Vs. Net Soccer (ver UAB) 1996.11.27 */
 ROM_START( vsnetscru )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3463,7 +3463,7 @@ Notes:
            PAL5: PALCE16V8 stamped 000143
 */
 
-/* Vs. Net Soccer (ver JAB) */
+/* Vs. Net Soccer (ver JAB) 1996.11.25 */
 ROM_START( vsnetscrj )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3501,7 +3501,7 @@ ROM_START( vsnetscrj )
 	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
-/* Vs. Net Soccer (ver AAA) */
+/* Vs. Net Soccer (ver AAA) 1996.11.27 */
 ROM_START( vsnetscra )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )

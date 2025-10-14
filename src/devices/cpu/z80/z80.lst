@@ -1048,17 +1048,18 @@ ffff
 		if (m_busrq_state) { // SA_BUSRQ
 			if (!m_busack_state) {
 				m_busack_state = 1;
-				set_service_attention<SA_BUSACK, 1>();
 				m_busack_cb(1);
 			}
 			if (m_icount > 0)
 				m_icount = 0;
 			m_ref = 0xffff00;
 			return;
-		} else if (m_busack_state) { // SA_BUSACK
-			m_busack_state = 0;
-			set_service_attention<SA_BUSACK, 0>();
-			m_busack_cb(0);
+		} else {
+			set_service_attention<SA_BUSRQ, 0>();
+			if (m_busack_state) {
+				m_busack_state = 0;
+				m_busack_cb(0);
+			}
 		}
 		@check_interrupts
 		set_service_attention<SA_AFTER_EI, 0>();
