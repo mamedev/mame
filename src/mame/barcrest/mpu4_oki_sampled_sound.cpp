@@ -127,7 +127,6 @@ void mpu4_oki_sampled_sound::pia_gb_portb_w(uint8_t data)
 			LOG("Volume Set to %2x\n", data);
 			float percent = (32-m_global_volume)/32.0;
 			m_msm6376->set_output_gain(0, percent);
-			m_msm6376->set_output_gain(1, percent);
 		}
 	}
 	m_msm6376->ch2_w(data & 0x02);
@@ -188,8 +187,7 @@ void mpu4_oki_sampled_sound::device_add_mconfig(machine_config &config)
 	m_pia_ic4ss->cb2_handler().set(FUNC(mpu4_oki_sampled_sound::pia_gb_cb2_w));
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(0, *this, 1.0);
-	m_msm6376->add_route(1, *this, 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, *this, 1.0);
 }
 
 

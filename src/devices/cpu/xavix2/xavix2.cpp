@@ -191,7 +191,7 @@ void xavix2_device::execute_run()
 			if(!m_ei_count)
 				m_pc = check_interrupt(m_pc);
 		}
-		if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if(debugger_enabled())
 			debugger_instruction_hook(m_pc);
 
 		u32 opcode = m_program_cache.read_byte(m_pc) << 24;

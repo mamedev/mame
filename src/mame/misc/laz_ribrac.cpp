@@ -301,19 +301,18 @@ void ribrac_state::ribrac(machine_config &config)
 {
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ribrac_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &ribrac_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &ribrac_state::ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 6264 + MAX694 + battery
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki[0], 2.097152_MHz_XTAL, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	OKIM6295(config, m_oki[1], 2.097152_MHz_XTAL, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 

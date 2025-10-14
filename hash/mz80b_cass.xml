@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+TODO:
+- pinpoint differences between the various SB BASIC flavours
+
+-->
+
+<softwarelist name="mz80b_cass" description="Sharp MZ-80B cassettes">
+
+<!-- !Operating Systems -->
+
+	<software name="sb5510" supported="no">
+		<description>BASIC SB-5510</description>
+		<year>1981</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="usage" value="IPL" />
+
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="18923">
+				<rom name="sb5510.mzf" size="18923" crc="f9f7edb2" sha1="4436a3b73a8a6a54fe4d04f4d0d0e2adece479cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp5025" supported="no">
+		<description>BASIC SP-5025</description>
+		<year>1981?</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, hangs during loading with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="usage" value="IPL" />
+
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="12416">
+				<rom name="basic sp-5025.mzf" size="12416" crc="919c6689" sha1="36eed75a966b2dd9de0be45d89b6364dfceda40a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: cloneof is assumed -->
+	<software name="sb6510" cloneof="sb6511" supported="no">
+		<description>Disk BASIC SB-6510</description>
+		<year>1981</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="usage" value="IPL" />
+
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="32384">
+				<rom name="disk basic6510ipl.mzf" size="32384" crc="4486c1e3" sha1="da13e7aacde47febed054b42110dc8b960b3fdf4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb6511" supported="no">
+		<description>Disk BASIC SB-6511</description>
+		<year>1981</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+Starts with an Error 50
+]]></notes>
+		<info name="usage" value="IPL" />
+
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="32384">
+				<rom name="disk basic6511ipl.mzf" size="32384" crc="1678da41" sha1="0f0aa380fa7117ac5c9f8f31f59f9bc3877a7b9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb6610" supported="no">
+		<!-- "Double precision" at BASIC header -->
+		<description>Disk BASIC SB-6610</description>
+		<year>1981</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="usage" value="IPL" />
+
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="32384">
+				<rom name="disk basic6610ipl.mzf" size="32384" crc="d2f8ebf7" sha1="f59965c965d9d81b5a5e2099c0ba5e7fbd77de83"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- !Games -->
+
+	<software name="vosque" supported="no">
+		<description>Vosque</description>
+		<year>19??</year>
+		<!-- TODO: from title, check spelling on tape cover -->
+		<publisher>d.B Soft</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="usage" value="IPL" />
+
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="25472">
+				<rom name="vosque mz80b.mzt" size="25472" crc="1dc3b210" sha1="3c87d52292e356686eca927cd26614a3ffe6739e"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

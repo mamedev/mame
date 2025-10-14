@@ -8,6 +8,7 @@ authors:hap
 <!-- define elements -->
 
 	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="nothing" defstate="0"><rect><color alpha="0" /></rect></element>
 
 	<element name="lane">
 		<rect><bounds x="0" y="0" width="1" height="1" /><color red="0.8" green="0.8" blue="0.8" /></rect>
@@ -61,9 +62,10 @@ authors:hap
 		<!-- bezel -->
 		<element ref="lane"><bounds x="18.69" y="9.7" width="2.62" height="24" /></element>
 
-		<element ref="white" clickthrough="no"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
+		<element ref="white"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
 		<collection name="Gear Position">
 			<element ref="gear" inputtag="IN.0" inputmask="0x0c" inputraw="yes"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
+			<element ref="nothing" clickthrough="no"><bounds x="16" y="9.7" width="8" height="0.8" /></element> <!-- block clickable input -->
 		</collection>
 
 		<!-- led matrix -->

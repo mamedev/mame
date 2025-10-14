@@ -7,18 +7,15 @@
 
     It has a number of constructor-helpers for automatically generating
     a biquad filter equivalent to the filter response of a few standard
-    analog second order filter topographies.
+    analog first and second order filter topographies.
 
     This biquad filter implementation is based on one written by Frank
     Palazzolo, K. Wilkins, Couriersud, and Derrick Renaud, with some changes:
     * It uses the Q factor directly in the filter definitions, rather than the damping factor (1/2Q)
     * It implements every common type of digital biquad filter which I could find documentation for.
     * The filter is Direct-form II instead of Direct-form I, which results in shorter compiled code.
+    *  (There are advantages to Direct-form I if the code used fixed-point math, but it does not.)
     * Optional direct control of the 5 normalized biquad parameters for a custom/raw parameter filter.
-
-    Possibly useful features which aren't implemented because nothing uses them yet:
-    * More Sallen-Key filter variations (band-pass, high-pass)
-
 */
 #include "emu.h"
 #include "flt_biquad.h"
@@ -78,7 +75,7 @@ filter_biquad_device::filter_biquad_device(const machine_config &mconfig, const 
 }
 
 // set up the filter with the specified parameters and return a pointer to the new device
-filter_biquad_device& filter_biquad_device::setup(biquad_type type, double fc, double q, double gain)
+filter_biquad_device &filter_biquad_device::setup(biquad_type type, double fc, double q, double gain)
 {
 	m_type = type;
 	m_fc = fc;
@@ -86,7 +83,7 @@ filter_biquad_device& filter_biquad_device::setup(biquad_type type, double fc, d
 	m_gain = gain;
 	return *this;
 }
-filter_biquad_device& filter_biquad_device::setup(filter_biquad_device::biquad_params p)
+filter_biquad_device &filter_biquad_device::setup(filter_biquad_device::biquad_params p)
 {
 	m_type = p.type;
 	m_fc = p.fc;
@@ -94,7 +91,7 @@ filter_biquad_device& filter_biquad_device::setup(filter_biquad_device::biquad_p
 	m_gain = p.gain;
 	return *this;
 }
-filter_biquad_device& filter_biquad_device::setup_raw(double a1, double a2, double b0, double b1, double b2)
+filter_biquad_device &filter_biquad_device::setup_raw(double a1, double a2, double b0, double b1, double b2)
 {
 	m_type = biquad_type::RAWPARAMS;
 	m_a1 = a1;
@@ -116,7 +113,7 @@ void filter_biquad_device::modify(biquad_type type, double fc, double q, double 
 	m_gain = gain;
 	recalc();
 }
-void filter_biquad_device::modify(filter_biquad_device::biquad_params p)
+void filter_biquad_device::modify(biquad_params p)
 {
 	m_stream->update();
 	m_type = p.type;
@@ -149,60 +146,106 @@ void filter_biquad_device::modify_raw(double a1, double a2, double b0, double b1
 
 
 // Sallen-Key filters
+// (sometimes referred to as KRC or VCVS filter structures)
+
+/*
+ * The calculation of the cutoff parameter for the Sallen-Key low-pass and
+ * high-pass is identical, the only differences being the biquad filter
+ * type used, and the calculation of the q factor.
+ */
+filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lphp_calc(biquad_type type, double r1, double r2, double r3, double r4, double c1, double c2)
+{
+	biquad_params r;
+	if ((r1 == 0) || (r2 == 0) || (r3 == 0) || (r4 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::opamp_sk_lphp_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, r3: %f, r4: %f, c1: %f, c2: %f", r1, r2, r3, r4, c1, c2); /* Filter can not be setup.  Undefined results. */
+	}
+	r.type = type;
+	r.gain = 1.0 + (r4 / r3); // == (r3 + r4) / r3
+	r.fc = 1.0 / (2 * M_PI * sqrt(r1 * r2 * c1 * c2));
+	if (type == biquad_type::LOWPASS)
+		r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c2) + (r2 * c2) + ((r1 * c1) * (1.0 - r.gain)));
+	else if (type == biquad_type::HIGHPASS)
+		r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c2) + (r1 * c1) + ((r2 * c2) * (1.0 - r.gain)));
+	else
+		r.q = M_SQRT2/2.0; // we shouldn't get here but fail gracefully if we do.
+	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_sk_lphp_calc(%f, %f, %f, %f, %f, %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, r3, r4, c1*1000000, c2*1000000, r.fc, r.q, r.gain);
+	return r;
+}
 
 /* Setup a biquad filter structure based on a single op-amp Sallen-Key low-pass filter circuit.
  * This is sometimes, incorrectly, called a "Butterworth" filter structure.
  *
- *                   .----------------------------.
- *                   |                            |
- *                  ---  c1                       |
- *                  ---                           |
- *                   |                            |
- *            r1     |   r2                |\     |
- *   In >----ZZZZ----+--ZZZZ---+--------+  | \    |
- *                             |        '--|+ \   |
- *                            ---  c2      |   >--+------> out
- *                            ---       .--|- /   |
- *                             |        |  | /    |
- *                            gnd       |  |/     |
- *                                      |         |
- *                                      |   r4    |
- *                                      +--ZZZZ---'
- *                                      |
- *                                      Z
- *                                      Z r3
- *                                      Z
- *                                      |
- *                                     gnd
+ *                ,--------------------------.
+ *                |                          |
+ *               --- c1                      |
+ *               ---                         |
+ *                |                   |\     |
+ *           r1   |   r2              | \    |
+ *   In >---ZZZZ--+--ZZZZ--+----------|+ \   |
+ *                         |          |   >--+---> out
+ *                        --- c2   ,--|- /   |
+ *                        ---      |  | /    |
+ *                         |       |  |/     |
+ *                         |       |         |
+ *                        gnd      |   r4    |
+ *                                 +--ZZZZ---'
+ *                                 |
+ *                                 Z r3
+ *                                 Z
+ *                                 Z
+ *                                 |
+ *                                gnd
  */
-filter_biquad_device& filter_biquad_device::opamp_sk_lowpass_setup(double r1, double r2, double r3, double r4, double c1, double c2)
+filter_biquad_device &filter_biquad_device::opamp_sk_lowpass_setup(double r1, double r2, double r3, double r4, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_sk_lowpass_calc(r1, r2, r3, r4, c1, c2);
+	biquad_params p = opamp_sk_lphp_calc(biquad_type::LOWPASS, r1, r2, r3, r4, c1, c2);
 	return setup(p);
 }
 
 void filter_biquad_device::opamp_sk_lowpass_modify(double r1, double r2, double r3, double r4, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_sk_lowpass_calc(r1, r2, r3, r4, c1, c2);
+	biquad_params p = opamp_sk_lphp_calc(biquad_type::LOWPASS, r1, r2, r3, r4, c1, c2);
 	modify(p);
 }
 
-filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lowpass_calc(double r1, double r2, double r3, double r4, double c1, double c2)
+
+/* Setup a biquad filter structure based on a single op-amp Sallen-Key high-pass filter circuit.
+ *
+ *                ,--------------------------.
+ *                |                          |
+ *                Z r1                       |
+ *                Z                          |
+ *                Z                   |\     |
+ *           c1   |   c2              | \    |
+ *   In >----||---+---||---+----------|+ \   |
+ *                         |          |   >--+---> out
+ *                         Z r2    ,--|- /   |
+ *                         Z       |  | /    |
+ *                         Z       |  |/     |
+ *                         |       |         |
+ *                        gnd      |   r4    |
+ *                                 +--ZZZZ---'
+ *                                 |
+ *                                 Z r3
+ *                                 Z
+ *                                 Z
+ *                                 |
+ *                                gnd
+ */
+filter_biquad_device &filter_biquad_device::opamp_sk_highpass_setup(double r1, double r2, double r3, double r4, double c1, double c2)
 {
-	filter_biquad_device::biquad_params r;
-	if ((r1 == 0) || (r2 == 0) || (r3 == 0) || (r4 == 0) || (c1 == 0) || (c2 == 0))
-	{
-		fatalerror("filter_biquad_device::opamp_sk_lowpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, r3: %f, r4: %f, c1: %f, c2: %f", r1, r2, r3, r4, c1, c2); /* Filter can not be setup.  Undefined results. */
-	}
-	r.type = biquad_type::LOWPASS;
-	r.gain = 1.0 + (r4 / r3); // == (r3 + r4) / r3
-	r.fc = 1.0 / (2 * M_PI * sqrt(r1 * r2 * c1 * c2));
-	r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c2) + (r2 * c2) + ((r2 * c1) * (1.0 - r.gain)));
-	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_sk_lowpass_calc(%f, %f, %f, %f, %f, %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, r3, r4, c1*1000000, c2*1000000, r.fc, r.q, r.gain);
-	return r;
+	biquad_params p = opamp_sk_lphp_calc(biquad_type::HIGHPASS, r1, r2, r3, r4, c1, c2);
+	return setup(p);
 }
 
-// TODO when needed: Sallen-Key high-pass filter
+void filter_biquad_device::opamp_sk_highpass_modify(double r1, double r2, double r3, double r4, double c1, double c2)
+{
+	biquad_params p = opamp_sk_lphp_calc(biquad_type::HIGHPASS, r1, r2, r3, r4, c1, c2);
+	modify(p);
+}
+
+// TODO when needed: Sallen-Key band-pass (there are several versions of this in the 1955 Sallen-Key paper)
 
 
 // Multiple-Feedback filters
@@ -210,41 +253,56 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lowpass_calc(
 /* Setup a biquad filter structure based on a single op-amp Multiple-Feedback low-pass filter circuit.
  * This is sometimes called a "Rauch" filter circuit.
  * NOTE: There is a well known 'proper' 1st order version of this circuit where
- *  r2 is a dead short, and c1 omitted. As an exception to the usual rule about
- *  missing components, set both c1 and r2 to 0 in this case.
- * NOTE: There is a variant of this filter with the c1 capacitor left off, and
- *  r2 present. if so, set c1 to 0 and r2 to its expected value.
- * TODO: make this compatible with the RES_M(999.99) and RES_R(0.001) rules!
+ *  r2 is a dead short, and c1 omitted: set r2 to 0 or RES_R(0.001) and c1 to 0
+ *  in this case.
+ * NOTE: There is a variant of this filter where r2 is present but c1 is
+ *  omitted: set r2 to its expected value, and c1 to 0.
  *
- *                             .--------+---------.
- *                             |        |         |
- *                             Z       --- c2     |
- *                             Z r3    ---        |
- *                             Z        |         |
- *            r1               |   r2   |  |\     |
- *   In >----ZZZZ----+---------+--ZZZZ--+  | \    |
- *                   |                  '--|- \   |
- *                  ---  c1                |   >--+------> out
- *                  ---                 .--|+ /
- *                   |                  |  | /
- *                  gnd        vRef >---'  |/
+ * Typical variant: (set c1 to 0 if missing)
+ *                        ,--------+---------.
+ *                        |        |         |
+ *                        Z r3    --- c2     |
+ *                        Z       ---        |
+ *                        Z        |         |
+ *           r1           |   r2   |  |\     |
+ *   In >---ZZZZ--+-------+--ZZZZ--+  | \    |
+ *                |                `--|- \   |
+ *               --- c1               |   >--+---> out
+ *               ---               ,--|+ /
+ *                |                |  | /
+ *                |       vRef >---'  |/
+ *               gnd
+ *
+ * First order variant: (set c1 and r2 to 0)
+ *                ,-------+---------.
+ *                |       |         |
+ *                Z r3   --- c2     |
+ *                Z      ---        |
+ *                Z       |         |
+ *           r1   |       |  |\     |
+ *   In >---ZZZZ--+-------+  | \    |
+ *                        `--|- \   |
+ *                           |   >--+---> out
+ *                        ,--|+ /
+ *                        |  | /
+ *                vRef >--'  |/
  *
  */
-filter_biquad_device& filter_biquad_device::opamp_mfb_lowpass_setup(double r1, double r2, double r3, double c1, double c2)
+filter_biquad_device &filter_biquad_device::opamp_mfb_lowpass_setup(double r1, double r2, double r3, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_mfb_lowpass_calc(r1, r2, r3, c1, c2);
+	biquad_params p = opamp_mfb_lowpass_calc(r1, r2, r3, c1, c2);
 	return setup(p);
 }
 
 void filter_biquad_device::opamp_mfb_lowpass_modify(double r1, double r2, double r3, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_mfb_lowpass_calc(r1, r2, r3, c1, c2);
+	biquad_params p = opamp_mfb_lowpass_calc(r1, r2, r3, c1, c2);
 	modify(p);
 }
 
 filter_biquad_device::biquad_params filter_biquad_device::opamp_mfb_lowpass_calc(double r1, double r2, double r3, double c1, double c2)
 {
-	filter_biquad_device::biquad_params r;
+	biquad_params r;
 	if ((r1 == 0) || ((r2 == 0) && (c1 != 0)) || (r3 == 0) || (c2 == 0))
 	{
 		fatalerror("filter_biquad_device::opamp_mfb_lowpass_calc() - only c1 can be 0 (and if c1 is 0, r2 can also be 0); parameters were: r1: %f, r2: %f, r3: %f, c1: %f, c2: %f", r1, r2, r3, c1, c2); /* Filter can not be setup.  Undefined results. */
@@ -269,26 +327,24 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_mfb_lowpass_calc
 /* Setup a biquad filter structure based on a single op-amp Multiple-Feedback band-pass filter circuit.
  * This is sometimes called a "modified Deliyannis" or "Deliyannis-friend" filter circuit,
  *  or an "Infinite Gain Multiple-Feedback [band-pass] Filter" aka "IGMF".
- * TODO: There is a documented modification to this filter which adds a resistor ladder between
- *  ground and the op-amp output, with the 'rung' of the ladder connecting to the + input of
- *  the op-amp, and this allows more control of the filter.
  * NOTE2: If r2 is not present, then set it to RES_M(999.99), the code will effectively be an Infinite Gain MFB Bandpass.
  *
- *                             .--------+---------.
- *                             |        |         |
- *                            --- c1    Z         |
- *                            ---       Z r3      |
- *                             |        Z         |
- *            r1               |  c2    |  |\     |
- *   In >----ZZZZ----+---------+--||----+  | \    |
- *                   Z                  '--|- \   |
- *                   Z r2                  |   >--+------> out
- *                   Z                  .--|+ /
- *                   |                  |  | /
- *                  gnd        vRef >---'  |/
+ *                        ,--------+---------.
+ *                        |        |         |
+ *                       --- c1    Z r3      |
+ *                       ---       Z         |
+ *                        |        Z         |
+ *           r1           |   c2   |  |\     |
+ *   In >---ZZZZ--+-------+---||---+  | \    |
+ *                |                `--|- \   |
+ *                Z r2                |   >--+---> out
+ *                Z                ,--|+ /
+ *                Z                |  | /
+ *                |       vRef >---'  |/
+ *               gnd
  *
  */
-filter_biquad_device& filter_biquad_device::opamp_mfb_bandpass_setup(double r1, double r2, double r3, double c1, double c2)
+filter_biquad_device &filter_biquad_device::opamp_mfb_bandpass_setup(double r1, double r2, double r3, double c1, double c2)
 {
 	if ((r1 == 0) || (r2 == 0) || (r3 == 0) || (c1 == 0) || (c2 == 0))
 	{
@@ -305,21 +361,21 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_bandpass_setup(double r1, 
 
 /* Setup a biquad filter structure based on a single op-amp Multiple-Feedback high-pass filter circuit.
  *
- *                             .--------+---------.
- *                             |        |         |
- *                            --- c3    Z         |
- *                            ---       Z r2      |
- *                             |        Z         |
- *            c1               |   c2   |  |\     |
- *   In >-----||-----+---------+---||---+  | \    |
- *                   Z                  '--|- \   |
- *                   Z r1                  |   >--+------> out
- *                   Z                  .--|+ /
- *                   |                  |  | /
- *                  gnd        vRef >---'  |/
+ *                        ,--------+---------.
+ *                        |        |         |
+ *                       --- c3    Z         |
+ *                       ---       Z r2      |
+ *                        |        Z         |
+ *          c1            |   c2   |  |\     |
+ *   In >---||----+-------+---||---+  | \    |
+ *                Z                `--|- \   |
+ *                Z r1                |   >--+---> out
+ *                Z                ,--|+ /
+ *                |                |  | /
+ *               gnd      vRef >---'  |/
  *
  */
-filter_biquad_device& filter_biquad_device::opamp_mfb_highpass_setup(double r1, double r2, double c1, double c2, double c3)
+filter_biquad_device &filter_biquad_device::opamp_mfb_highpass_setup(double r1, double r2, double c1, double c2, double c3)
 {
 	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0) || (c3 == 0))
 	{
@@ -333,40 +389,43 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_highpass_setup(double r1, 
 	return setup(biquad_type::HIGHPASS, fc, q, gain);
 }
 
+
+// Other filters:
+
 // Differentiator Filter
 
 /* Setup a biquad filter structure based on a single op-amp Differentiator band-pass filter circuit.
  * This circuit is sometimes called an "Inverting Band Pass Filter Circuit"
  *
- *                           .--------+---------.
- *                           |        |         |
- *                          --- c2    Z         |
- *                          ---       Z r2      |
- *                           |        Z         |
- *            r1      c1     |        |  |\     |
- *   In >----ZZZZ-----||-----+--------+  | \    |
- *                                    '--|- \   |
- *                                       |   >--+------> out
- *                                    .--|+ /
- *                                    |  | /
- *                           vRef >---'  |/
+ *                        ,--------+---------.
+ *                        |        |         |
+ *                       --- c2    Z r2      |
+ *                       ---       Z         |
+ *                        |        Z         |
+ *           r1      c1   |        |  |\     |
+ *   In >---ZZZZ-----||---+--------+  | \    |
+ *                                 `--|- \   |
+ *                                    |   >--+---> out
+ *                                 ,--|+ /
+ *                                 |  | /
+ *                        vRef >---'  |/
  *
  */
-filter_biquad_device& filter_biquad_device::opamp_diff_bandpass_setup(double r1, double r2, double c1, double c2)
+filter_biquad_device &filter_biquad_device::opamp_diff_bandpass_setup(double r1, double r2, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
+	biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
 	return setup(p);
 }
 
 void filter_biquad_device::opamp_diff_bandpass_modify(double r1, double r2, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
+	biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
 	modify(p);
 }
 
 filter_biquad_device::biquad_params filter_biquad_device::opamp_diff_bandpass_calc(double r1, double r2, double c1, double c2)
 {
-	filter_biquad_device::biquad_params r;
+	biquad_params r;
 	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0))
 	{
 		fatalerror("filter_biquad_device::opamp_diff_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2); /* Filter can not be setup.  Undefined results. */
@@ -380,6 +439,101 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_diff_bandpass_ca
 	r.type = biquad_type::BANDPASS;
 	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_diff_bandpass_calc(%f, %f, %f, %f) yields:\n\ttype = %d, fc = %f (f1 = %f, f2 = %f), Q = %f, gain = %f\n", r1, r2, c1*1000000, c2*1000000, static_cast<int>(r.type), r.fc, f1, f2, r.q, r.gain);
 	return r;
+}
+
+
+/* RC-based band-pass filters:
+ *
+ * RR variation: the two resistors are connected to each other:
+ *
+ *   Vin -- C1 -- R1 -+-----+- Vout
+ *                    |     |
+ *                    R2    C2
+ *                    |     |
+ *                   GND  (V)GND
+ *
+ *
+ * CC variation: The two capacitors are connected to each other:
+ *
+ *   Vin -- R1 -+- C2 -+- Vout
+ *              |      |
+ *              C1     R2
+ *              |      |
+ *             GND   (V)GND
+ *
+ * (V)GND could be a virtual ground.
+ *
+ * BPF transfer function: H(s) = (A * s) / (s ^ 2 + B * s + C)
+ * In the RR configuration, we have:
+ *   A = 1 / (R1 * C2)
+ *   B = (R1 * C1 + R2 * C2 + R2 * C1) / (R1 * R2 * C1 * C2)
+ *   C = 1 / (R1 * R2 * C1 * C2)
+ * In the CC configuration, we have:
+ *   A = 1 / (R1 * C1)
+ *   B = (R1 * C1 + R2 * C2 + R1 * C2) / (R1 * R2 * C1 * C2)
+ *   C = 1 / (R1 * R2 * C1 * C2)
+ * From the standard transfer function for BPFs, we have:
+ *   A = gain * (w / Q)
+ *   B = w / Q
+ *   C = w ^ 2
+ * The calculations of Fc, Q and gain in the *_calc functions below are derived
+ * from the equations above, with some algebra.
+ */
+
+filter_biquad_device &filter_biquad_device::rc_rr_bandpass_setup(double r1, double r2, double c1, double c2)
+{
+	return setup(rc_rr_bandpass_calc(r1, r2, c1, c2));
+}
+
+void filter_biquad_device::rc_rr_bandpass_modify(double r1, double r2, double c1, double c2)
+{
+	modify(rc_rr_bandpass_calc(r1, r2, c1, c2));
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::rc_rr_bandpass_calc(double r1, double r2, double c1, double c2)
+{
+	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::rc_rr_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2);
+	}
+	const double x = sqrt(r1 * r2 * c1 * c2);
+	const double y = r1 * c1 + r2 * c2 + r2 * c1;
+	const double z = r2 * c1;
+	biquad_params p;
+	p.type = biquad_type::BANDPASS;
+	p.fc = 1.0 / (2.0 * M_PI * x);
+	p.q = x / y;
+	p.gain = z / y;
+	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_rr_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
+	return p;
+}
+
+filter_biquad_device &filter_biquad_device::rc_cc_bandpass_setup(double r1, double r2, double c1, double c2)
+{
+	return setup(rc_cc_bandpass_calc(r1, r2, c1, c2));
+}
+
+void filter_biquad_device::rc_cc_bandpass_modify(double r1, double r2, double c1, double c2)
+{
+	modify(rc_cc_bandpass_calc(r1, r2, c1, c2));
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::rc_cc_bandpass_calc(double r1, double r2, double c1, double c2)
+{
+	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::rc_cc_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2);
+	}
+	const double x = sqrt(r1 * r2 * c1 * c2);
+	const double y = r1 * c1 + r2 * c2 + r1 * c2;
+	const double z = r2 * c2;
+	biquad_params p;
+	p.type = biquad_type::BANDPASS;
+	p.fc = 1.0 / (2.0 * M_PI * x);
+	p.q = x / y;
+	p.gain = z / y;
+	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_cc_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
+	return p;
 }
 
 
@@ -415,22 +569,19 @@ void filter_biquad_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void filter_biquad_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void filter_biquad_device::sound_stream_update(sound_stream &stream)
 {
-	auto &src = inputs[0];
-	auto &dst = outputs[0];
-
-	if (m_last_sample_rate != m_stream->sample_rate())
+	if (m_last_sample_rate != stream.sample_rate())
 	{
 		recalc();
-		m_last_sample_rate = m_stream->sample_rate();
+		m_last_sample_rate = stream.sample_rate();
 	}
 
-	for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
-		m_input = src.get(sampindex);
+		m_input = stream.get(0, sampindex);
 		step();
-		dst.put(sampindex, m_output);
+		stream.put(0, sampindex, m_output);
 	}
 }
 
@@ -468,6 +619,7 @@ void filter_biquad_device::recalc()
 				break;
 			// For highpass and friends, block the entire signal.
 			case biquad_type::HIGHPASS1P:
+			case biquad_type::HIGHPASS1P1Z:
 			case biquad_type::HIGHPASS:
 			case biquad_type::BANDPASS:
 			case biquad_type::PEAK:
@@ -503,6 +655,13 @@ void filter_biquad_device::recalc()
 				m_b0 = 1.0 + m_a1;
 				m_a1 = -m_a1;
 				m_b1 = m_b2 = m_a2 = 0.0;
+				break;
+			case biquad_type::HIGHPASS1P1Z:
+				normal = 1.0 / (K + 1.0);
+				m_b0 = normal;
+				m_b1 = -normal;
+				m_a1 = (K - 1.0) * normal;
+				m_b2 = m_a2 = 0.0;
 				break;
 			case biquad_type::LOWPASS:
 				m_b0 = Ksquared * normal;

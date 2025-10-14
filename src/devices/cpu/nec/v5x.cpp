@@ -320,7 +320,7 @@ void v50_base_device::OPCN_w(u8 data)
 	m_OPCN = data & 0x0f;
 
 	m_tout1_callback((data & 0x03) == 0x03 ? m_tout1 : 1);
-	m_icu->ir1_w(BIT(data, 2) ? 0 : m_intp1);
+	m_icu->ir1_w(BIT(data, 2) ? m_sint : m_intp1);
 	m_icu->ir2_w(BIT(data, 3) ? m_tout1 : m_intp2);
 }
 
@@ -331,6 +331,13 @@ void v50_base_device::tout1_w(int state)
 		m_tout1_callback(state);
 	if (BIT(m_OPCN, 3))
 		m_icu->ir2_w(state);
+}
+
+void v50_base_device::sint_w(int state)
+{
+	m_sint = state;
+	if (BIT(m_OPCN, 2))
+		m_icu->ir1_w(state);
 }
 
 void v50_base_device::device_reset()
@@ -348,8 +355,11 @@ void v50_base_device::device_start()
 
 	set_irq_acknowledge_callback(*m_icu, FUNC(v5x_icu_device::inta_cb));
 
+	m_scu->write_cts(0);
+
 	save_item(NAME(m_OPCN));
 	save_item(NAME(m_tout1));
+	save_item(NAME(m_sint));
 	save_item(NAME(m_intp1));
 	save_item(NAME(m_intp2));
 }
@@ -502,6 +512,8 @@ void v50_base_device::device_add_mconfig(machine_config &config)
 	m_tcu->out_handler<1>().set(m_scu, FUNC(v5x_scu_device::write_rxc));
 	m_tcu->out_handler<1>().append(m_scu, FUNC(v5x_scu_device::write_txc));
 	m_tcu->out_handler<1>().append(FUNC(v50_base_device::tout1_w));
+
+	m_scu->sint_handler().set(FUNC(v50_base_device::sint_w));
 }
 
 device_memory_interface::space_config_vector v50_base_device::memory_space_config() const

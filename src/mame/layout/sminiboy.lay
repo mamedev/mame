@@ -154,7 +154,7 @@ Super Mini-Boy control panel
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		
+
 		<element ref="cpanel">
 			<bounds left="0" right="4" top="3" bottom="3.80" />
 		</element>
@@ -218,7 +218,7 @@ Super Mini-Boy control panel
 		</element>
 
 	<!-- second line: Big - Small - Double Up/Hit - Take/Stand - Cancel - Deal - Bet/Split -->
-		
+
 		<element name="lamp1" ref="buttonedge_r" inputtag="INPUT6" inputmask="0x02">
 			<bounds x="3.445" y="3.48" width="0.44" height="0.24" />
 		</element>
@@ -267,6 +267,6 @@ Super Mini-Boy control panel
 		<element name="lamp3" ref="big">
 			<bounds x="0.135" y="3.5" width="0.40" height="0.20" />
 		</element>
-		
+
 	</view>
 </mamelayout>

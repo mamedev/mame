@@ -624,7 +624,8 @@ Copy protection check kicks in after selecting an input device on title screen
 		<year>1986</year>
 		<publisher>Data East</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Capcom / Quicksilver" />
+		<info name="developer" value="Capcom" />
+		<info name="developer" value="Quicksilver" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1617569">
@@ -3415,7 +3416,8 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		<description>DeluxePaint II-PC (French)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="developer" value="Dan Silva, Brent Iverson" />
+		<info name="developer" value="Dan Silva" />
+		<info name="developer" value="Brent Iverson" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="E01551FL(1)" />
 			<feature name="part_id" value="Logiciel français" />
@@ -6039,6 +6041,85 @@ Stalls or throws either "Bad command or file name", "disk read error" or "divide
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="368640">
 				<rom name="FD13-D2.IMG" size="368640" crc="f1c6c004" sha1="89b6b937d24182abc7a729d5740c36abbec90b7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos14_720">
+		<description>FreeDOS 1.4 (Floppy-Only Edition, 3.5" 720k)</description>
+		<year>2025</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.4" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installer" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86BOOT.img" size="737280" crc="0d52c73c" sha1="8a8e8d43ad11817661ae9cbbff6a0fa372ea76fa" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK01.img" size="737280" crc="3f879626" sha1="1a9eed17c9f9f708fddecb31c764786a80c9ebce" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK02.img" size="737280" crc="5cb6a495" sha1="cf401c8280598e388d6a988c51fd6c17cd6b9ab4" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK03.img" size="737280" crc="6252dc59" sha1="8b0e4acc9efcecae78e922c35fb0f8dc6830baee" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK04.img" size="737280" crc="1197a133" sha1="4bf43573e3fe73d58071d680bbbb00fc32237f15" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK05.img" size="737280" crc="fcdcfe15" sha1="5ff2e3ec4d68802bc59c8f95713a24775d86f745" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK06.img" size="737280" crc="c3246fa2" sha1="2ef78ec8c42b64aaf55273b76cbf3610db0c2885" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK07.img" size="737280" crc="62545372" sha1="e8be09b41a2f07e183fc5284a3a5b3b76d0c04f5" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK08.img" size="737280" crc="42845f50" sha1="e6ef0bb133dfa86fffe48d1c75162f1f17c8642e" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK09.img" size="737280" crc="b48f740c" sha1="4d995317845a88e5e310a632acaa07cdecd83358" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 10" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK10.img" size="737280" crc="7747ce58" sha1="41620723781d8379cb60125cc643d4690667f636" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 11" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK11.img" size="737280" crc="09e61f03" sha1="05b019c750f8fa0b0f59dd42760300576edc1b5e" />
 			</dataarea>
 		</part>
 	</software>
@@ -10388,19 +10469,19 @@ Hangs after few seconds of gameplay
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="CM Gideon" />
 			<dataarea name="flop" size="737280">
-				<rom name="gideon.img" size="737280" crc="c858c60e" sha1="dd482fd7efc60615c2836a4fef23c520454370db"/>
+				<rom name="gideon.img" size="737280" crc="6b903e6b" sha1="3753d34a52ff765393bcc4dd0d8e68dbb9dbb662"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="CM The King" />
 			<dataarea name="flop" size="737280">
-				<rom name="theking.img" size="737280" crc="23bb50c0" sha1="9f5cb7c610fdf8404df5af59b101ed2a3a644ff2"/>
+				<rom name="theking.img" size="737280" crc="4412d875" sha1="245298ee049ba5a112f4e3f39d4e237d7fc99e6d"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Other" />
 			<dataarea name="flop" size="737280">
-				<rom name="other.img" size="737280" crc="660256ab" sha1="df629b5f0479082d25262e24af1fda7f025cf1f0"/>
+				<rom name="other.img" size="737280" crc="6bf45a36" sha1="cca48a34a22cf62b60ac545110262bd39a0e7e6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11447,7 +11528,8 @@ Very broken gfxs in [CGA] mode
 		<description>The Dream Team: 3 on 3 Challenge</description>
 		<year>1991</year>
 		<publisher>Data East</publisher>
-		<info name="developer" value="Park Place Productions, Season Ticket Productions" />
+		<info name="developer" value="Park Place Productions" />
+		<info name="developer" value="Season Ticket Productions" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Camera 1 Disk" />
@@ -11586,7 +11668,9 @@ Very broken gfxs in [CGA] mode
 		<description>Emmanuelle: A Game of Eroticism</description>
 		<year>1989</year>
 		<publisher>Tomahawk</publisher>
-		<info name="developer" value="Coktel Vision, Inférence, MDO" />
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="Inférence" />
+		<info name="developer" value="MDO" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Emmanuelle [Tomahawk] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="97a14df2" sha1="a4628163e0003e66e38eb58204d5f22b49c52fb5"/>
@@ -13236,7 +13320,8 @@ Hangs when launching soccer.com
 		<description>Kult (cracked)</description>
 		<year>1989</year>
 		<publisher>Infogrames Multimedia SA</publisher>
-		<info name="developer" value="Exxos/ERE Informatique" />
+		<info name="developer" value="Exxos" />
+		<info name="developer" value="ERE Informatique" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Kult (1989) (cracked).img" size="368640" crc="fddcaf43" sha1="e0789a5656461e6abd21c293c490b3d52cc89c9e"/>
@@ -16382,7 +16467,9 @@ When starting the game, the error "Packed file is corrupt" is shown.
 		<year>1991</year>
 		<publisher>Maxis Software</publisher>
 		<info name="developer" value="Maxis Software" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -17109,7 +17196,8 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<publisher>Rainbird Software</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Argonaut Software" />
-		<info name="language" value="English/German" />
+		<info name="language" value="English" />
+		<info name="language" value="German" />
 		<info name="ported_by" value="Realtime Games Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">

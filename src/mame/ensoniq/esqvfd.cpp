@@ -151,11 +151,11 @@ void esqvfd_device::update_display()
 			{
 				uint32_t segdata = conv_segments(font[m_chars[row][col]]);
 
-				// force bottom bar on all underlined chars
-				if (m_attrs[row][col] & AT_UNDERLINE)
-					segdata |= 0x0008;
-
+				// digits:
 				m_vfds->set((row * m_cols) + col, segdata);
+
+				// underlines:
+				m_vfds->set((row * m_cols) + col + (m_rows * m_cols), (m_attrs[row][col] & AT_UNDERLINE) ? 1 : 0);
 
 				m_dirty[row][col] = 0;
 			}
@@ -170,17 +170,22 @@ void esq2x40_device::device_add_mconfig(machine_config &config)
 	config.set_default_layout(layout_esq2by40);
 }
 
-void esq2x40_device::write_char(int data)
+void esq2x40_device::write_char(uint8_t data)
 {
 	// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
 	if (m_lastchar == 0xfa)
 	{
-		if ((m_cursx + data) > m_rows)
-			data = m_rows - m_cursx;
-		for (int i = 0; i < data; i++)
+		for (uint8_t j = 0; j < m_rows; j++)
 		{
-			m_attrs[m_cursy][m_cursx + i] |= AT_UNDERLINE;
-			m_dirty[m_cursy][m_cursx + i] = 1;
+			for (uint8_t i = 0; i < m_cols; i++)
+			{
+				if (m_cursy == j && i >= m_cursx && i < m_cursx + data)
+					m_attrs[j][i] |= AT_UNDERLINE;
+				else
+					m_attrs[j][i] &= ~AT_UNDERLINE;
+
+				m_dirty[j][i] = 1;
+			}
 		}
 
 		m_lastchar = 0;
@@ -305,7 +310,7 @@ void esq1x22_device::device_add_mconfig(machine_config &config)
 }
 
 
-void esq1x22_device::write_char(int data)
+void esq1x22_device::write_char(uint8_t data)
 {
 	if (data >= 0x60)
 	{
@@ -352,7 +357,7 @@ void esq2x40_sq1_device::device_add_mconfig(machine_config &config)
 	config.set_default_layout(layout_esq2by40);  // we use the normal 2x40 layout
 }
 
-void esq2x40_sq1_device::write_char(int data)
+void esq2x40_sq1_device::write_char(uint8_t data)
 {
 	if (data == 0x09)   // musical note
 	{

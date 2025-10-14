@@ -41,8 +41,10 @@ Notes:
 
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -83,13 +85,14 @@ private:
 	required_device<screen_device> m_screen;
 
 	// video-related
-	tilemap_t   *m_tilemap[3] = {nullptr, nullptr, nullptr};
+	tilemap_t *m_tilemap[3];
 
-	int       m_oki_bank = 0;
-	uint16_t  m_gfx_control = 0;
+	uint8_t m_oki_bank = 0;
+	uint16_t m_gfx_control = 0;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
 
 	template <unsigned Which> TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -104,10 +107,7 @@ private:
 template <unsigned Which>
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile_info)
 {
-	tileinfo.set(Which,
-			m_videoram_buffer[Which][tile_index],
-			0,
-			0);
+	tileinfo.set(Which, m_videoram_buffer[Which][tile_index], 0, 0);
 }
 
 void _3x3puzzle_state::gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -158,6 +158,7 @@ void _3x3puzzle_state::video_start()
 		m_videoram_buffer[i] = make_unique_clear<uint16_t[]>(videoram_size);
 		save_pointer(NAME(m_videoram_buffer[i]), videoram_size, i);
 	}
+
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_3x3puzzle_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_3x3puzzle_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_3x3puzzle_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -171,8 +172,13 @@ uint32_t _3x3puzzle_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 
+	return 0;
+}
+
+void _3x3puzzle_state::screen_vblank(int state)
+{
 	// guess based on register use and Casanova intro
-	if (BIT(m_gfx_control, 5))
+	if (state && BIT(m_gfx_control, 5))
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -184,8 +190,6 @@ uint32_t _3x3puzzle_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			}
 		}
 	}
-
-	return 0;
 }
 
 void _3x3puzzle_state::_3x3puzzle_map(address_map &map)
@@ -319,7 +323,6 @@ static INPUT_PORTS_START( casanova )
 	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )
-
 INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_3x3puzzle )
@@ -336,17 +339,14 @@ void _3x3puzzle_state::machine_start()
 
 void _3x3puzzle_state::machine_reset()
 {
-	m_oki_bank = 0;
-	m_gfx_control = 0;
+	gfx_ctrl_w(0, 0);
 }
 
 
 void _3x3puzzle_state::_3x3puzzle(machine_config &config)
 {
-	constexpr XTAL MAIN_CLOCK = XTAL(10'000'000);
-
 	// basic machine hardware
-	M68000(config, m_maincpu, MAIN_CLOCK);
+	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_3x3puzzle_state::_3x3puzzle_map);
 	m_maincpu->set_vblank_int("screen", FUNC(_3x3puzzle_state::irq4_line_hold));
 
@@ -355,6 +355,7 @@ void _3x3puzzle_state::_3x3puzzle(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(_3x3puzzle_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(_3x3puzzle_state::screen_vblank));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
 
@@ -364,7 +365,7 @@ void _3x3puzzle_state::_3x3puzzle(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki, 4_MHz_XTAL/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -439,8 +440,8 @@ ROM_START( casanova )
 
 	ROM_REGION( 0x400000, "tiles1", 0 )
 	ROM_LOAD32_BYTE( "casanova.u23", 0x000000, 0x80000, CRC(4bd4e5b1) SHA1(13759d086ef2dba26129022bade12be11b81258e) )
-	ROM_LOAD32_BYTE( "casanova.u25", 0x000001, 0x80000, CRC(5461811b) SHA1(03301c836ba378e527867de25ee15abd3a0434ac))
-	ROM_LOAD32_BYTE( "casanova.u27", 0x000002, 0x80000, CRC(dd178379) SHA1(990109db9d0ce693cf7371109cb0d4745b8dde59))
+	ROM_LOAD32_BYTE( "casanova.u25", 0x000001, 0x80000, CRC(5461811b) SHA1(03301c836ba378e527867de25ee15abd3a0434ac) )
+	ROM_LOAD32_BYTE( "casanova.u27", 0x000002, 0x80000, CRC(dd178379) SHA1(990109db9d0ce693cf7371109cb0d4745b8dde59) )
 	ROM_LOAD32_BYTE( "casanova.u29", 0x000003, 0x80000, CRC(36469f9e) SHA1(d4603bf99aef953e2eb49c1862d66961246e88c2) )
 	ROM_LOAD32_BYTE( "casanova.u81", 0x200000, 0x80000, CRC(9eafd37d) SHA1(bc9e7a035849f23da48c9d923188c61188d93c43) )
 	ROM_LOAD32_BYTE( "casanova.u83", 0x200001, 0x80000, CRC(9d4ce407) SHA1(949c7f329bd348beff4f14ac7b506c8aef212ad8) )

@@ -348,7 +348,7 @@ void pc_kbd_keytronic_pc3270_device::keytronic_pc3270_program(address_map &map)
 	map(0x0000, 0x0fff).rom().region("kb_keytr", 0);
 }
 
-void pc_kbd_keytronic_pc3270_device::keytronic_pc3270_io(address_map &map)
+void pc_kbd_keytronic_pc3270_device::keytronic_pc3270_data(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(pc_kbd_keytronic_pc3270_device::internal_data_read), FUNC(pc_kbd_keytronic_pc3270_device::internal_data_write));
 }
@@ -424,7 +424,7 @@ void pc_kbd_keytronic_pc3270_device::device_add_mconfig(machine_config &config)
 {
 	I8051(config, m_cpu, 11060250);
 	m_cpu->set_addrmap(AS_PROGRAM, &pc_kbd_keytronic_pc3270_device::keytronic_pc3270_program);
-	m_cpu->set_addrmap(AS_IO, &pc_kbd_keytronic_pc3270_device::keytronic_pc3270_io);
+	m_cpu->set_addrmap(AS_DATA, &pc_kbd_keytronic_pc3270_device::keytronic_pc3270_data);
 	m_cpu->port_in_cb<1>().set(FUNC(pc_kbd_keytronic_pc3270_device::p1_read));
 	m_cpu->port_out_cb<1>().set(FUNC(pc_kbd_keytronic_pc3270_device::p1_write));
 	m_cpu->port_in_cb<2>().set(FUNC(pc_kbd_keytronic_pc3270_device::p2_read));

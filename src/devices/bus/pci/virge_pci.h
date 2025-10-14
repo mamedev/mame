@@ -66,6 +66,27 @@ private:
 	u32 get_vga_linear_address();
 };
 
+class virgevx_pci_device : public virge_pci_device
+{
+public:
+	template <typename T>
+	virgevx_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+		: virgevx_pci_device(mconfig, tag, owner, clock)
+	{
+		set_screen_tag(std::forward<T>(screen_tag));
+	}
+	virgevx_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+//  required_device<s3virge_vga_device> m_vga;
+//  required_memory_region m_bios;
+//  optional_device<screen_device> m_screen;
+};
+
 class virgedx_pci_device : public virge_pci_device
 {
 public:
@@ -88,6 +109,7 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(VIRGE_PCI, virge_pci_device)
+DECLARE_DEVICE_TYPE(VIRGEVX_PCI, virgevx_pci_device)
 DECLARE_DEVICE_TYPE(VIRGEDX_PCI, virgedx_pci_device)
 
 #endif

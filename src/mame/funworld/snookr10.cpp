@@ -68,7 +68,7 @@
   8 bits for color codes (256 x 16 colors). It means the hardware was designed for more
   elaborated graphics than these games...
 
-  Color PROMs from current games are 512 bytes lenght, but they only use the first 256 bytes.
+  Color PROMs from current games are 512 bytes length, but they only use the first 256 bytes.
 
   The sound is composed by 4-bit ADPCM samples. All the supported games have the same sound ROM.
   All the sounds/samples were ripped from the Gottlieb pinball 'Cue Ball Wizard'(1992).
@@ -585,7 +585,7 @@
   - Added the oki6295 emulation to all games.
   - Hooked output ports.
   - Documented and calculated all bits related to lamps.
-  - Adjusted palette lenght to 256 colors.
+  - Adjusted palette length to 256 colors.
   - Totally decrypted the apple10 color matrix. Now colors are perfect.
   - Created a new machine driver for apple10 due to encryption.
   - Reverse engineering the code to complete the DIP switches.
@@ -884,7 +884,7 @@ static INPUT_PORTS_START( apple10 )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x10, 0x10, "Super Game Settings" )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, "Play to Payout" )
 	PORT_DIPSETTING(    0x00, "Direct Payout" )

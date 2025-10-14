@@ -722,7 +722,7 @@ void taitoair_state::airsys(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000) / 2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.30);
+	ymsnd.add_route(0, "mono", 0.90);
 	ymsnd.add_route(1, "mono", 0.60);
 	ymsnd.add_route(2, "mono", 0.60);
 

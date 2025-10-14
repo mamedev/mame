@@ -175,8 +175,8 @@ void paranoia_state::paranoia(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &paranoia_state::pce_io);
 	m_maincpu->port_in_cb().set(FUNC(paranoia_state::pce_joystick_r));
 	m_maincpu->port_out_cb().set(FUNC(paranoia_state::pce_joystick_w));
-	m_maincpu->add_route(0, "lspeaker", 1.00);
-	m_maincpu->add_route(1, "rspeaker", 1.00);
+	m_maincpu->add_route(0, "speaker", 1.00, 0);
+	m_maincpu->add_route(1, "speaker", 1.00, 1);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -210,8 +210,7 @@ void paranoia_state::paranoia(machine_config &config)
 	huc6270.set_vram_size(0x10000);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 ROM_START(paranoia)

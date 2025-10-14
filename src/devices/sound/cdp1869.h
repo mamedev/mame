@@ -215,7 +215,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_sound_interface callbacks
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	TIMER_CALLBACK_MEMBER(prd_update);
 
@@ -266,7 +266,7 @@ private:
 	uint16_t m_hma;                   // home memory address
 
 	// sound state
-	stream_buffer::sample_t m_signal; // current signal
+	sound_stream::sample_t m_signal; // current signal
 	int m_incr;                     // initial wave state
 	int m_toneoff;                  // tone off
 	int m_wnoff;                    // white noise off

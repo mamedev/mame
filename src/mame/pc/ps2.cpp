@@ -50,6 +50,8 @@ void ps2_state::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
 	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+	// TODO: verify thru Windows 3.1
+//  SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void ps2_state::ps2_16_map(address_map &map)
@@ -140,7 +142,7 @@ void ps2_state::ps2386(machine_config &config)
 	at_softlists(config);
 
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true); // FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);

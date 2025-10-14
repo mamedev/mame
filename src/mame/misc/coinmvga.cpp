@@ -686,13 +686,12 @@ void coinmvga_state::coinmvga(machine_config &config)
 	ramdac2.set_addrmap(0, &coinmvga_state::ramdac2_map);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", SND_CLOCK));
 	ymz.irq_handler().set_inputline("maincpu", 2);
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 

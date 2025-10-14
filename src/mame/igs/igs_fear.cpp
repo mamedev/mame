@@ -3,10 +3,11 @@
 
 // default bookkeeping passwords
 // fearless 1234
+// icescape all Start
 // superkds (unknown)
 
 // Other games on this hardware:
-// Fist Talks (uses mostly the same graphics as Fearless Pinnochio, but
+// Fist Talks (uses mostly the same graphics as Fearless Pinocchio, but
 //             is a Rock, Paper, Scissors game, not a fighter, and has
 //             only 4 graphic ROMs which are likely all different to FP)
 
@@ -54,9 +55,10 @@ public:
 	void igs_fear(machine_config &config) ATTR_COLD;
 	void igs_fear_xor(machine_config &config) ATTR_COLD;
 
-	void init_igs_fear() ATTR_COLD;
-	void init_igs_icescape() ATTR_COLD;
-	void init_igs_superkds() ATTR_COLD;
+	void init_fear() ATTR_COLD;
+	void init_icescape() ATTR_COLD;
+	void init_mjzb() ATTR_COLD;
+	void init_superkds() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -102,6 +104,7 @@ private:
 
 	u8 m_gpio_o;
 
+	int m_gfxrommask;
 	int m_trackball_cnt;
 	int m_trackball_axis[2], m_trackball_axis_pre[2], m_trackball_axis_diff[2];
 };
@@ -109,6 +112,7 @@ private:
 
 void igs_fear_state::video_start()
 {
+	m_gfxrommask = memregion("gfx1")->bytes() - 1;
 }
 
 void igs_fear_state::machine_start()
@@ -129,10 +133,11 @@ void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 	if ((romoffset != 0) && (romoffset != 0xffffffff))
 	{
 		//LOGMASKED(LOG_DEBUG, "x=%d, y=%d, w=%d pix, h=%d pix, c=0x%02x, romoffset=0x%08x\n", xpos, ypos, width, height, palette, romoffset << 2);
-		const u8 *gfxrom = &m_gfxrom[romoffset << 2];
 		const int x_base = flipx ? (xpos + width - 1) : xpos;
 		const int x_inc = flipx ? (-1) : 1;
 		palette = (palette & 0x3f) << 7;
+
+		int offset = 0;
 
 		for (int y = 0; y < height; y++)
 		{
@@ -140,7 +145,8 @@ void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int x_index = x_base;
 			for (int x = 0; x < width; x++)
 			{
-				u8 pix = *gfxrom++;
+				u8 pix = m_gfxrom[((romoffset << 2) + offset) & m_gfxrommask];
+				offset++;
 				if (pix)
 				{
 					if (cliprect.contains(x_index, ypos + y))
@@ -166,6 +172,10 @@ u32 igs_fear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		const int flipx   = (m_videoram[(i * 4) + 2] & 0x00000100) == 0;
 		const int rom_msb = (m_videoram[(i * 4) + 2] & 0xffff0000) >> 16;
 		const int rom_lsb = (m_videoram[(i * 4) + 3] & 0x0000ffff) >> 0;
+
+		// what is the maximum?
+		height &= 0x3ff;
+		width &= 0x3ff;
 
 		const int romoffset = rom_msb + (rom_lsb << 16);
 
@@ -347,37 +357,37 @@ INPUT_PORTS_END
 // has a touchscreen (optional?)
 static INPUT_PORTS_START( icescape )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Take Score")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop Reel 2 / Low") // Left bear on double up
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / High") // Right bear on double up
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SLOT_STOP4 ) PORT_NAME("Stop Reel 4 / Select Lines")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect observed
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start / Stop All Reels")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SLOT_STOP5 ) PORT_NAME("Stop Reel 5 / Double Up")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet All") // or something similar
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Show Odds
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) // ? gives Alarm message if pressed
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) // ? gives Call attendant message
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // brings up password screen
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) // ? gives Refill message
+	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect observed
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect observed
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect observed
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Touchscreen Test" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME(          0x01, 0x01, "Touchscreen Test" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(             0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(             0x00, DEF_STR(On) )
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW1:4")
@@ -524,7 +534,7 @@ void igs_fear_state::igs_fear(machine_config &config)
 
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
-	/* sound hardware */
+	// sound hardware
 	IGS_XA_ICS_SOUND(config, m_xa, 50'000'000/3);
 	m_xa->irq().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 }
@@ -547,7 +557,7 @@ ROM_START( fearless )
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked O7, not read protected
 	ROM_LOAD( "o7.u33", 0x000000, 0x10000, CRC(7dae4900) SHA1(bbf7ba7c9e95ff2ffeb1dc0fc7ccedd4da274d01) )
 
-	ROM_REGION( 0x3000000, "gfx1", 0 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
+	ROM_REGION( 0x4000000, "gfx1", ROMREGION_ERASEFF ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp)
 	ROM_LOAD32_WORD( "fearlessp_u7_cg-0l.u7",   0x0000000, 0x800000, CRC(ca254db4) SHA1(f5670c2ff0720c84c9aff3cea95b118b6044e469) )
 	ROM_LOAD32_WORD( "fearlessp_u6_cg-0h.u6",   0x0000002, 0x800000, CRC(02d8bbbf) SHA1(7cf36c909a5d76096a725ffe0a697bcbafbcf985) )
 	ROM_LOAD32_WORD( "fearlessp_u14_cg-1l.u14", 0x1000000, 0x800000, CRC(7fe312d2) SHA1(c0add22d9fc4c0e32a03922cb709b947bfff429d) )
@@ -604,23 +614,55 @@ ROM_START( icescape ) // IGS PCB-0433-16-GK (same PCB as Fearless Pinocchio) - H
 	ROM_LOAD( "icescape_fa_sp_u26.u26", 0x200000, 0x200000, CRC(35085613) SHA1(bdc6ecf5ee6fd095a56e33e8ce893fe05bcb426c) ) // M27C160
 ROM_END
 
-void igs_fear_state::init_igs_fear()
+// 麻将争霸 (Májiàng Zhēngbà)
+ROM_START( mjzb ) // IGS PCB-0433-04-GK - Has IGS027A, MX10EXAQC, 2x Actel A54SX32A, ICS2115, 2x 8-DIP banks
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "igs027_a7.u50", 0x00000, 0x4000, CRC(0b9e8477) SHA1(27944845616f2e3ba085aa871dd95f99953d7316) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "mjzbv-103cn.u37", 0x000000, 0x80000, CRC(269e88b5) SHA1(57ceaf258caccd4297571d08b8bb8de7918357c7) )
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_LOAD( "a9.u38", 0x000000, 0x10000, CRC(7dae4900) SHA1(bbf7ba7c9e95ff2ffeb1dc0fc7ccedd4da274d01) ) // same as icescape
+
+	// dumps are probably correct, leaving as bad dump due to having to hand fix the address lines and the bad state of the ROM chips
+	ROM_REGION( 0x2000000, "gfx1", ROMREGION_ERASE00 ) // FIXED BITS (0xxxxxxx) (graphics are 7bpp).
+	ROM_LOAD32_WORD( "mjzb_cg_u7.u7",   0x0000000, 0x800000, BAD_DUMP CRC(9a09b5d9) SHA1(63e90da4cbe0ccb6823fcbd9433c0022f6edb771) )
+	ROM_LOAD32_WORD( "mjzb_cg_u6.u6",   0x0000002, 0x800000, BAD_DUMP CRC(6f78c584) SHA1(453f48b7142cf5703a0b145be5c83189351e47ad) )
+	ROM_LOAD32_WORD( "mjzb_cg_u14.u14", 0x1000000, 0x800000, BAD_DUMP CRC(87d9f66e) SHA1(3d1d90418c5118892843d9cc22373b3d87d030ec) )
+	ROM_LOAD32_WORD( "mjzb_cg_u13.u13", 0x1000002, 0x800000, BAD_DUMP CRC(bcd686b2) SHA1(8599cf80bde88b438aef67f2379b29291777ccd8) )
+	// u17 and u18 not populated
+
+	ROM_REGION( 0x400000, "xa:ics", 0 )
+	ROM_LOAD( "mjzb_sp_u25.u25", 0x000000, 0x200000, CRC(28ff3b6e) SHA1(0576b6611154256d6b92c081c2d0bed73b8d746b) )
+	ROM_LOAD( "mjzb_sp_u26.u26", 0x200000, 0x200000, CRC(d87108f5) SHA1(ae79cc9d68f63470cd0d60fd9a9cef0204f1f239) )
+ROM_END
+
+void igs_fear_state::init_fear()
 {
 	fearless_decrypt(machine());
 }
 
-void igs_fear_state::init_igs_superkds()
+void igs_fear_state::init_superkds()
 {
 	superkds_decrypt(machine());
 }
 
-void igs_fear_state::init_igs_icescape()
+void igs_fear_state::init_icescape()
 {
 	icescape_decrypt(machine());
 }
 
+void igs_fear_state::init_mjzb()
+{
+	mjzb_decrypt(machine());
+}
+
 } // anonymous namespace
 
-GAME( 2005, superkds, 0, igs_fear_xor, superkds, igs_fear_state, init_igs_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", MACHINE_NODEVICE_LAN )
-GAME( 2006, fearless, 0, igs_fear_xor, fear,     igs_fear_state, init_igs_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
-GAME( 2006, icescape, 0, igs_fear_xor, icescape, igs_fear_state, init_igs_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_NOT_WORKING ) // IGS FOR V104FA 2006-11-02, internal ROM "TUE AUG 30 10:47:23 2005 ICESCAPE_V100FA"
+
+GAME( 2005, superkds, 0, igs_fear_xor, superkds, igs_fear_state, init_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", MACHINE_NODEVICE_LAN )
+GAME( 2006, fearless, 0, igs_fear_xor, fear,     igs_fear_state, init_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
+GAME( 2006, icescape, 0, igs_fear_xor, icescape, igs_fear_state, init_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_NOT_WORKING ) // IGS FOR V104FA 2006-11-02, internal ROM "TUE AUG 30 10:47:23 2005 ICESCAPE_V100FA"
+GAME( 2003, mjzb,     0, igs_fear_xor, icescape, igs_fear_state, init_mjzb,     ROT0, "IGS",                                   "Majiang Zhengba (V103CN)",                     MACHINE_NOT_WORKING )

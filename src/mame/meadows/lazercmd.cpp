@@ -265,11 +265,11 @@ public:
 		m_dsw(*this, "DSW")
 	{ }
 
-	void bbonk(machine_config &config);
-	void medlanes(machine_config &config);
-	void lazercmd(machine_config &config);
+	void bbonk(machine_config &config) ATTR_COLD;
+	void medlanes(machine_config &config) ATTR_COLD;
+	void lazercmd(machine_config &config) ATTR_COLD;
 
-	void init_lazercmd();
+	void init_lazercmd() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -309,7 +309,7 @@ private:
 	void medlanes_hardware_w(offs_t offset, uint8_t data);
 	void bbonk_hardware_w(offs_t offset, uint8_t data);
 	uint8_t hardware_r(offs_t offset);
-	void palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(bbonk_timer);
@@ -739,7 +739,7 @@ static GFXDECODE_START( gfx_lazercmd )
 	GFXDECODE_ENTRY( "chars", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
-void lazercmd_state::palette(palette_device &palette) const
+void lazercmd_state::palette_init(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0xb0, 0xb0, 0xb0)); // white
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // black
@@ -792,7 +792,7 @@ void lazercmd_state::medlanes(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
-	PALETTE(config, m_palette, FUNC(lazercmd_state::palette), 5);
+	PALETTE(config, m_palette, FUNC(lazercmd_state::palette_init), 5);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -844,21 +844,22 @@ ROM_START( lazercmd )
 	ROM_LOAD( "lc.b8", 0x0a00, 0x0200, CRC(6d708edd) SHA1(85a45a292eb7bca288b06a118658bf754f828a92) )
 ROM_END
 
+// also seen on a FRONT 024-0045 F PCB with double sized ROMs (apart from 2c and 3c which where same size)
 ROM_START( medlanes )
 	ROM_REGION( 0x1800, "maincpu", ROMREGION_INVERT ) // 32K cpu, 4K for ROM/RAM
-	ROM_LOAD_NIB_HIGH( "medlanes.2a", 0x0000, 0x0400, CRC(9c77566a) SHA1(60e1820012b47da8b86d54f00b6f60d2d0123745) )
-	ROM_LOAD_NIB_LOW(  "medlanes.3a", 0x0000, 0x0400, CRC(22bc56a6) SHA1(7444170c19274d9d889df61796e6f61af2361f3e) )
-	ROM_LOAD_NIB_HIGH( "medlanes.2b", 0x0400, 0x0400, CRC(7841b1a9) SHA1(80621d30995dad42ae44c62494922ca8b75415cf) )
-	ROM_LOAD_NIB_LOW(  "medlanes.3b", 0x0400, 0x0400, CRC(6616dbef) SHA1(9506177315883b7d87a9bfada712ddeea12fd446) )
-	ROM_LOAD_NIB_HIGH( "medlanes.2c", 0x0800, 0x0400, CRC(a359b5b8) SHA1(dbc3c286951c50e3465132fc0d6054f06026425d) )
-	ROM_LOAD_NIB_LOW(  "medlanes.3c", 0x0800, 0x0400, CRC(b3db0f3d) SHA1(57c28a54f7a1f17df3a24b61dd0cf37f9f6bc7d8) )
-	ROM_LOAD_NIB_HIGH( "medlanes.1a", 0x1000, 0x0400, CRC(0d57c596) SHA1(f3ce4802fc777c57f75fe691c93b7062903bdf06) )
-	ROM_LOAD_NIB_LOW(  "medlanes.4a", 0x1000, 0x0400, CRC(30d495e9) SHA1(4f2414bf60ef91093bedf5e9ae16833e9e135aa7) )
-	ROM_LOAD_NIB_HIGH( "medlanes.1b", 0x1400, 0x0400, CRC(1d451630) SHA1(bf9de3096e98685355c906ab7e1dc2628dce79d6) )
-	ROM_LOAD_NIB_LOW(  "medlanes.4b", 0x1400, 0x0400, CRC(a4abb5db) SHA1(a20da872b0f7d6b16b9551233af4269db9d1b55f) )
+	ROM_LOAD_NIB_HIGH( "medlanes.2a", 0x0000, 0x0400, CRC(9c77566a) SHA1(60e1820012b47da8b86d54f00b6f60d2d0123745) ) // first half of e5 on the PCB with bigger ROMs
+	ROM_LOAD_NIB_LOW(  "medlanes.3a", 0x0000, 0x0400, CRC(22bc56a6) SHA1(7444170c19274d9d889df61796e6f61af2361f3e) ) // first half of f5 on the PCB with bigger ROMs
+	ROM_LOAD_NIB_HIGH( "medlanes.2b", 0x0400, 0x0400, CRC(7841b1a9) SHA1(80621d30995dad42ae44c62494922ca8b75415cf) ) // first half of e6 on the PCB with bigger ROMs
+	ROM_LOAD_NIB_LOW(  "medlanes.3b", 0x0400, 0x0400, CRC(6616dbef) SHA1(9506177315883b7d87a9bfada712ddeea12fd446) ) // first half of f6 on the PCB with bigger ROMs
+	ROM_LOAD_NIB_HIGH( "medlanes.2c", 0x0800, 0x0400, CRC(a359b5b8) SHA1(dbc3c286951c50e3465132fc0d6054f06026425d) ) // e7 on the PCB with bigger ROMs
+	ROM_LOAD_NIB_LOW(  "medlanes.3c", 0x0800, 0x0400, CRC(b3db0f3d) SHA1(57c28a54f7a1f17df3a24b61dd0cf37f9f6bc7d8) ) // f7 on the PCB with bigger ROMs
+	ROM_LOAD_NIB_HIGH( "medlanes.1a", 0x1000, 0x0400, CRC(0d57c596) SHA1(f3ce4802fc777c57f75fe691c93b7062903bdf06) ) // second half of e5 on the PCB with bigger ROMs
+	ROM_LOAD_NIB_LOW(  "medlanes.4a", 0x1000, 0x0400, CRC(30d495e9) SHA1(4f2414bf60ef91093bedf5e9ae16833e9e135aa7) ) // second half of f5 on the PCB with bigger ROMs
+	ROM_LOAD_NIB_HIGH( "medlanes.1b", 0x1400, 0x0400, CRC(1d451630) SHA1(bf9de3096e98685355c906ab7e1dc2628dce79d6) ) // second half of e6 on the PCB with bigger ROMs
+	ROM_LOAD_NIB_LOW(  "medlanes.4b", 0x1400, 0x0400, CRC(a4abb5db) SHA1(a20da872b0f7d6b16b9551233af4269db9d1b55f) ) // second half of f6 on the PCB with bigger ROMs
 
 	ROM_REGION( 0x0c00, "chars", 0 )
-	ROM_LOAD( "medlanes.8b", 0x0a00, 0x0200, CRC(44e5de8f) SHA1(fc797fa137f0c11a15caf9c0013aac668fd69a3c) )
+	ROM_LOAD( "medlanes.8b", 0x0a00, 0x0200, CRC(44e5de8f) SHA1(fc797fa137f0c11a15caf9c0013aac668fd69a3c) ) // still b8 on the PCB with bigger ROMs
 ROM_END
 
 

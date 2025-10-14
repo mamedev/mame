@@ -1906,8 +1906,8 @@ void captaven_state::captaven(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000)/4/3));  // pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb)
 	audiocpu.set_addrmap(AS_PROGRAM, &captaven_state::h6280_sound_map);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline(m_maincpu, ARM_IRQ_LINE);
 
@@ -1960,22 +1960,21 @@ void captaven_state::captaven(machine_config &config)
 	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, 0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2151(config, m_ym2151, XTAL(32'220'000)/9); // verified on pcb
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "lspeaker", 0.42);
-	m_ym2151->add_route(1, "rspeaker", 0.42);
+	m_ym2151->add_route(0, "speaker", 0.42, 0);
+	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
 	OKIM6295(config, m_oki[0], XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH);  // verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH); // verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 }
 
 // DE-0380-2
@@ -1987,8 +1986,8 @@ void fghthist_state::fghthist(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
 	audiocpu.set_addrmap(AS_PROGRAM, &fghthist_state::h6280_sound_custom_latch_map);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -2036,8 +2035,7 @@ void fghthist_state::fghthist(machine_config &config)
 	m_ioprot->set_use_magic_read_address_xor(true);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
@@ -2045,16 +2043,16 @@ void fghthist_state::fghthist(machine_config &config)
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "lspeaker", 0.42);
-	m_ym2151->add_route(1, "rspeaker", 0.42);
+	m_ym2151->add_route(0, "speaker", 0.42, 0);
+	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 }
 
 // DE-0395-1
@@ -2084,8 +2082,8 @@ void fghthist_state::fghthistu(machine_config &config)
 
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->reset_routes();
-	m_ym2151->add_route(0, "lspeaker", 0.40);
-	m_ym2151->add_route(1, "rspeaker", 0.40);
+	m_ym2151->add_route(0, "speaker", 0.40, 0);
+	m_ym2151->add_route(1, "speaker", 0.40, 1);
 }
 
 // DE-0359-2 + Bottom board DE-0360-4
@@ -2097,8 +2095,8 @@ void dragngun_state::dragngun(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
 	audiocpu.set_addrmap(AS_PROGRAM, &dragngun_state::h6280_sound_map);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
 
@@ -2160,22 +2158,21 @@ void dragngun_state::dragngun(machine_config &config)
 	m_ioprot->set_interface_scramble_reverse();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "lspeaker", 0.42);
-	m_ym2151->add_route(1, "rspeaker", 0.42);
+	m_ym2151->add_route(0, "speaker", 0.42, 0);
+	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 
 	SPEAKER(config, "gun_speaker").front_center();
 
@@ -2236,6 +2233,8 @@ void dragngun_state::lockload(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "sound_irq_merger").output_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
+	config.set_maximum_quantum(attotime::from_hz(6000));  // to improve main<->audio comms
+
 	DECO_IRQ(config, m_deco_irq, 0);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->lightgun1_callback().set_ioport("LIGHT0_Y");
@@ -2243,8 +2242,6 @@ void dragngun_state::lockload(machine_config &config)
 	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
-
-	config.set_maximum_quantum(attotime::from_hz(6000));  // to improve main<->audio comms
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -2294,22 +2291,21 @@ void dragngun_state::lockload(machine_config &config)
 	m_ioprot->set_interface_scramble_reverse();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
-	m_ym2151->add_route(0, "lspeaker", 0.42);
-	m_ym2151->add_route(1, "rspeaker", 0.42);
+	m_ym2151->add_route(0, "speaker", 0.42, 0);
+	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 
 	LC7535(config, m_vol_main);
 	m_vol_main->select().set_constant(1);
@@ -2322,6 +2318,8 @@ void tattass_state::tattass(machine_config &config)
 	ARM(config, m_maincpu, 28000000/4); // unconfirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &tattass_state::tattass_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
+
+	config.set_maximum_quantum(attotime::from_hz(6000));  // to improve main<->audio comms
 
 	EEPROM_93C76_8BIT(config, m_eeprom);
 
@@ -2371,12 +2369,11 @@ void tattass_state::tattass(machine_config &config)
 	m_ioprot->set_interface_scramble_interleave();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DECOBSMT(config, m_decobsmt, 0);
-	m_decobsmt->add_route(0, "lspeaker", 1.0);
-	m_decobsmt->add_route(1, "rspeaker", 1.0);
+	m_decobsmt->add_route(0, "speaker", 1.0, 0);
+	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 }
 
 void nslasher_state::nslasher(machine_config &config)
@@ -2442,22 +2439,21 @@ void nslasher_state::nslasher(machine_config &config)
 	m_ioprot->set_interface_scramble_interleave();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "lspeaker", 0.40);
-	m_ym2151->add_route(1, "rspeaker", 0.40);
+	m_ym2151->add_route(0, "speaker", 0.40, 0);
+	m_ym2151->add_route(1, "speaker", 0.40, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.10, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 }
 
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
@@ -2468,8 +2464,8 @@ void nslasher_state::nslasheru(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
 	audiocpu.set_addrmap(AS_PROGRAM, &nslasher_state::h6280_sound_map);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	config.device_remove("sound_irq_merger");
 
@@ -3622,6 +3618,79 @@ ROM_START( tattass )
 	ROM_LOAD32_WORD( "pp45.cpu", 0x000002, 0x80000, CRC(d3f30de0) SHA1(5a0aa0f96d29299b3b337b4b51bc84e447eb74d0) )
 
 	ROM_REGION(0x10000, "decobsmt:soundcpu", 0 ) // Sound CPU
+	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(a7228077) SHA1(4d01575e51958a4d4686968008f5ed0a46380d70) )
+
+	ROM_REGION( 0x200000, "tiles1", 0 )
+	ROM_LOAD16_BYTE( "abak_b01.s02",  0x000000, 0x80000,  CRC(bc805680) SHA1(ccdbca23fc843ef82a3524020999542f43b3c618) )
+	ROM_LOAD16_BYTE( "abak_b01.s13",  0x000001, 0x80000,  CRC(350effcd) SHA1(0452d95be9fc28bd00d846a2cc5828899d69601e) )
+	ROM_LOAD16_BYTE( "abak_b23.s02",  0x100000, 0x80000,  CRC(91abdc21) SHA1(ba08e59bc0417e863d35ea295cf58cfe8faf57b5) )
+	ROM_LOAD16_BYTE( "abak_b23.s13",  0x100001, 0x80000,  CRC(80eb50fe) SHA1(abfe1a5417ceff9d6d52372d11993bf9b1db9432) )
+
+	ROM_REGION( 0x200000, "tiles2", 0 )
+	ROM_LOAD16_BYTE( "bbak_b01.s02",  0x000000, 0x80000,  CRC(611be9a6) SHA1(86263c8beb562e0607a65aa30fbbe030a044cd75) )
+	ROM_LOAD16_BYTE( "bbak_b01.s13",  0x000001, 0x80000,  CRC(097e0604) SHA1(6ae241b37b6bb15fc66679cf66f500b8f8a19f44) )
+	ROM_LOAD16_BYTE( "bbak_b23.s02",  0x100000, 0x80000,  CRC(3836531a) SHA1(57bead820ac396ee0ed8fb2ac5c15929896d75bf) )
+	ROM_LOAD16_BYTE( "bbak_b23.s13",  0x100001, 0x80000,  CRC(1210485a) SHA1(9edc4c96f389e231066ef164a7b2851cd7ade038) )
+
+	ROM_REGION( 0xa00000, "sprites1", 0 )
+	ROM_LOAD40_BYTE( "ob1_c0.b0",  0x000004, 0x80000,  CRC(053fecca) SHA1(319efc71042238d9012d2c3dddab9d11205decc6) )
+	ROM_LOAD40_BYTE( "ob1_c1.b0",  0x000003, 0x80000,  CRC(e183e6bc) SHA1(d9cce277861967f403a882879e1baefa84696bdc) )
+	ROM_LOAD40_BYTE( "ob1_c2.b0",  0x000002, 0x80000,  CRC(1314f828) SHA1(6a91543d4e70af30de287ba775c69ffb1cde719d) )
+	ROM_LOAD40_BYTE( "ob1_c3.b0",  0x000001, 0x80000,  CRC(c63866df) SHA1(a897835d8a33002f1bd54f27d1a6393c4e1864b9) )
+	ROM_LOAD40_BYTE( "ob1_c4.b0",  0x000000, 0x80000,  CRC(f71cdd1b) SHA1(6fbccdbe460c8ddfeed972ebe766a6f8a2d4c466) )
+
+	ROM_LOAD40_BYTE( "ob1_c0.b1",  0x280004, 0x80000,  CRC(385434b0) SHA1(ea764bd9844e13f5b10207022135dbe07bf0258a) )
+	ROM_LOAD40_BYTE( "ob1_c1.b1",  0x280003, 0x80000,  CRC(0a3ec489) SHA1(1a2e1252d6acda43019ded5a31ae60bef40e4bd9) )
+	ROM_LOAD40_BYTE( "ob1_c2.b1",  0x280002, 0x80000,  CRC(52f06081) SHA1(c630f45b110b9423dfb0bf92359fdb28b75c8cf1) )
+	ROM_LOAD40_BYTE( "ob1_c3.b1",  0x280001, 0x80000,  CRC(a8a5cfbe) SHA1(7afc8f7c7f3826a276e4840e4fc8b8bb645dd3bd) )
+	ROM_LOAD40_BYTE( "ob1_c4.b1",  0x280000, 0x80000,  CRC(09d0acd6) SHA1(1b162f5b76852e49ae6a24db2031d66ca59d87e9) )
+
+	ROM_LOAD40_BYTE( "ob1_c0.b2",  0x500004, 0x80000,  CRC(946e9f59) SHA1(46a0d35641b381fe553caa00451c30f1950b5dfd) )
+	ROM_LOAD40_BYTE( "ob1_c1.b2",  0x500003, 0x80000,  CRC(9f66ad54) SHA1(6e6ac6edee2f2dda46e7cd85db8d79c8335c73cd) )
+	ROM_LOAD40_BYTE( "ob1_c2.b2",  0x500002, 0x80000,  CRC(a8df60eb) SHA1(c971e66eec6accccaf2bdd87dde7adde79322da9) )
+	ROM_LOAD40_BYTE( "ob1_c3.b2",  0x500001, 0x80000,  CRC(a1a753be) SHA1(1666a32bb69db36dba029a835592d00a21ad8c5e) )
+	ROM_LOAD40_BYTE( "ob1_c4.b2",  0x500000, 0x80000,  CRC(b65b3c4b) SHA1(f636a682b506e3ce5ca07ba8fd3166158d1ab667) )
+
+	ROM_LOAD40_BYTE( "ob1_c0.b3",  0x780004, 0x80000,  CRC(cbbbc696) SHA1(6f2383655461ac35f3178e0f7c0146cff89c8295) )
+	ROM_LOAD40_BYTE( "ob1_c1.b3",  0x780003, 0x80000,  CRC(f7b1bdee) SHA1(1d505d8d4ede55246de0b5fbc6ca20f836699b60) )
+	ROM_LOAD40_BYTE( "ob1_c2.b3",  0x780002, 0x80000,  CRC(97815619) SHA1(b1b694310064971aa5438671d0f9992b7e4bf277) )
+	ROM_LOAD40_BYTE( "ob1_c3.b3",  0x780001, 0x80000,  CRC(fc3ccb7a) SHA1(4436fcbd830912589bd6c838eb63b7d41a2bb56e) )
+	ROM_LOAD40_BYTE( "ob1_c4.b3",  0x780000, 0x80000,  CRC(dfdfd0ff) SHA1(79dc686351d41d635359936efe97c7ade305dc84) )
+
+	ROM_REGION( 0x800000, "sprites2", 0 )
+	ROM_LOAD16_BYTE( "ob2_c0.b0",  0x000000, 0x80000,  CRC(9080ebe4) SHA1(1cfabe045532e16f203fe054449149451a280f56) )
+	ROM_LOAD16_BYTE( "ob2_c1.b0",  0x000001, 0x80000,  CRC(c0464970) SHA1(2bd87c9a7ed0742a8f1ee0c0de225e18a0351168) )
+	ROM_LOAD16_BYTE( "ob2_c2.b0",  0x400000, 0x80000,  CRC(35a2e621) SHA1(ff7687e30c379cbcee4f80c0c737cef891509881) )
+	ROM_LOAD16_BYTE( "ob2_c3.b0",  0x400001, 0x80000,  CRC(99c7cc2d) SHA1(c761e5b7f1e2afdafef36390f7141ebcb5e8f254) )
+	ROM_LOAD16_BYTE( "ob2_c0.b1",  0x100000, 0x80000,  CRC(2c2c15c9) SHA1(fdc48fab6dad97d16d4e77479fa77bb320eb3767) )
+	ROM_LOAD16_BYTE( "ob2_c1.b1",  0x100001, 0x80000,  CRC(d2c49a14) SHA1(49d92233d6d5f77fbbf9d31607c568efef6d94f0) )
+	ROM_LOAD16_BYTE( "ob2_c2.b1",  0x500000, 0x80000,  CRC(fbe957e8) SHA1(4f0bb0e434771316bcd8796878ffd3e5cafebb2b) )
+	ROM_LOAD16_BYTE( "ob2_c3.b1",  0x500001, 0x80000,  CRC(d7238829) SHA1(6fef08a518be69251852d3204413b4b8b6615be2) )
+	ROM_LOAD16_BYTE( "ob2_c0.b2",  0x200000, 0x80000,  CRC(aefa1b01) SHA1(bbd4b432b36d64f80065c56559ea9675acf3151e) )
+	ROM_LOAD16_BYTE( "ob2_c1.b2",  0x200001, 0x80000,  CRC(4af620ca) SHA1(f3753235b2e72f011c9b94f26a425b9a79577201) )
+	ROM_LOAD16_BYTE( "ob2_c2.b2",  0x600000, 0x80000,  CRC(8e58be07) SHA1(d8a8662e800da0892d70c628de0ca27ff983006c) )
+	ROM_LOAD16_BYTE( "ob2_c3.b2",  0x600001, 0x80000,  CRC(1b5188c5) SHA1(4792a36b889a2c2dfab9ec78d848d3d8bf10d20f) )
+	ROM_LOAD16_BYTE( "ob2_c0.b3",  0x300000, 0x80000,  CRC(a2a5dafd) SHA1(2baadcfe9ae8fa30ae4226caa10fe3d58f8af3e0) )
+	ROM_LOAD16_BYTE( "ob2_c1.b3",  0x300001, 0x80000,  CRC(6f0afd05) SHA1(6a4bf3466a77d14b3bc18377537f86108774badd) )
+	ROM_LOAD16_BYTE( "ob2_c2.b3",  0x700000, 0x80000,  CRC(90fe5f4f) SHA1(2149e9eae152556c632ebd4d0b2de49e40916a77) )
+	ROM_LOAD16_BYTE( "ob2_c3.b3",  0x700001, 0x80000,  CRC(e3517e6e) SHA1(68ac60570423d8f0d7cff3db1901c9c050d0be91) )
+
+	ROM_REGION(0x1000000, "decobsmt:bsmt", 0 )
+	ROM_LOAD( "u17.snd",  0x000000, 0x80000,  CRC(49303539) SHA1(3c4b6bbdcb039e355b66f72ed5ffe0bbd363f179) )
+	ROM_LOAD( "u21.snd",  0x080000, 0x80000,  CRC(0ad8bc18) SHA1(b06654e682080b3baeb7872d3c4eb3a04b22d79b) )
+	ROM_LOAD( "u36.snd",  0x100000, 0x80000,  CRC(f558947b) SHA1(57c0dc2e23beb388c1cf10a175be7dabf07da458) )
+	ROM_LOAD( "u37.snd",  0x180000, 0x80000,  CRC(7a3190bc) SHA1(e78b77268e5aa2879e7dcb5e8ff9e5dbed228cb1) )
+
+	ROM_REGION( 0x400, "eeprom", 0 )
+	ROM_LOAD( "eeprom-tattass.bin", 0x0000, 0x0400, CRC(7140f40c) SHA1(4fb7897933046b6adaf00b4626d5fd23d0e8a666) )
+ROM_END
+
+ROM_START( tattasso )
+	ROM_REGION(0x100000, "maincpu", 0 ) // ARM 32 bit code
+	ROM_LOAD32_WORD( "pp44.cpu", 0x000000, 0x80000, CRC(c3ca5b49) SHA1(c6420b0c20df1ae166b279504880ade65b1d8048) )
+	ROM_LOAD32_WORD( "pp45.cpu", 0x000002, 0x80000, CRC(d3f30de0) SHA1(5a0aa0f96d29299b3b337b4b51bc84e447eb74d0) )
+
+	ROM_REGION(0x10000, "decobsmt:soundcpu", 0 ) // Sound CPU
 	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(6947be8a) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
 
 	ROM_REGION( 0x200000, "tiles1", 0 )
@@ -3695,7 +3764,7 @@ ROM_START( tattassa )
 	ROM_LOAD32_WORD( "rev232a.001", 0x000002, 0x80000, CRC(550245d4) SHA1(c1b2b31768da9becebd907a8622d05aa68ecaa29) )
 
 	ROM_REGION(0x10000, "decobsmt:soundcpu", 0 ) // Sound CPU
-	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(6947be8a) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
+	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(a7228077) SHA1(4d01575e51958a4d4686968008f5ed0a46380d70) )
 
 	ROM_REGION( 0x200000, "tiles1", 0 )
 	ROM_LOAD16_BYTE( "abak_b01.s02",  0x000000, 0x80000,  CRC(bc805680) SHA1(ccdbca23fc843ef82a3524020999542f43b3c618) )
@@ -3753,10 +3822,10 @@ ROM_START( tattassa )
 	ROM_LOAD16_BYTE( "ob2_c3.b3",  0x700001, 0x80000,  CRC(e3517e6e) SHA1(68ac60570423d8f0d7cff3db1901c9c050d0be91) )
 
 	ROM_REGION(0x1000000, "decobsmt:bsmt", 0 )
-	ROM_LOAD( "u17.snd",  0x000000, 0x80000,  CRC(b945c18d) SHA1(6556bbb4a7057df3680132f24687fa944006c784) )
-	ROM_LOAD( "u21.snd",  0x080000, 0x80000,  CRC(10b2110c) SHA1(83e5938ed22da2874022e1dc8df76c72d95c448d) )
-	ROM_LOAD( "u36.snd",  0x100000, 0x80000,  CRC(3b73abe2) SHA1(195096e2302e84123b23b4ccd982fb3ab9afe42c) )
-	ROM_LOAD( "u37.snd",  0x180000, 0x80000,  CRC(986066b5) SHA1(9dd1a14de81733617cf51293674a8e26fc5cec68) )
+	ROM_LOAD( "u17.snd",  0x000000, 0x80000,  CRC(49303539) SHA1(3c4b6bbdcb039e355b66f72ed5ffe0bbd363f179) )
+	ROM_LOAD( "u21.snd",  0x080000, 0x80000,  CRC(0ad8bc18) SHA1(b06654e682080b3baeb7872d3c4eb3a04b22d79b) )
+	ROM_LOAD( "u36.snd",  0x100000, 0x80000,  CRC(f558947b) SHA1(57c0dc2e23beb388c1cf10a175be7dabf07da458) )
+	ROM_LOAD( "u37.snd",  0x180000, 0x80000,  CRC(7a3190bc) SHA1(e78b77268e5aa2879e7dcb5e8ff9e5dbed228cb1) )
 
 	ROM_REGION( 0x400, "eeprom", 0 )
 	ROM_LOAD( "eeprom-tattass.bin", 0x0000, 0x0400, CRC(7140f40c) SHA1(4fb7897933046b6adaf00b4626d5fd23d0e8a666) )
@@ -3963,6 +4032,7 @@ GAME( 1994, nslashers,  nslasher, nslasher,  nslasher, nslasher_state, init_nsla
 GAME( 1994, nslasheru,  nslasher, nslasheru, nslasher, nslasher_state, init_nslasher,  ROT0, "Data East Corporation", "Night Slashers (US Rev 1.2, DE-0395-1 PCB)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, tattass,    0,        tattass,   tattass,  tattass_state,  init_tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype, Mar 14 1995)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, tattasso,   tattass,  tattass,   tattass,  tattass_state,  init_tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype, Mar 14 1995, older sound)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, tattassa,   tattass,  tattass,   tattass,  tattass_state,  init_tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (Asia prototype, Mar 14 1995)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Dragon Gun / Locked 'n Loaded have very different sprite hardware

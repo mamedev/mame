@@ -37,6 +37,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include "formats/pk8020_dsk.h"
+
 
 #define LOG_BANK    (1U << 1)
 
@@ -107,6 +109,8 @@ private:
 	DECLARE_MACHINE_START(rt1715w);
 	DECLARE_MACHINE_RESET(rt1715w);
 
+	static void floppy_formats(format_registration &fr);
+
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<z80sio_device> m_sio0;
@@ -145,8 +149,8 @@ void rt1715_state::rt1715w_floppy_motor(uint8_t data)
 {
 	LOG("%s: rt1715w_floppy_motor %02x\n", machine().describe_context(), data);
 
-	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(data & 0x80 ? 1 : 0);
-	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(data & 0x08 ? 1 : 0);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(BIT(data, 7));
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(BIT(data, 3));
 }
 
 void rt1715_state::rt1715w_krfd_w(uint8_t data)
@@ -607,7 +611,7 @@ static INPUT_PORTS_START( k7658 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 
 	PORT_START("row_60")
 	// D07 A17 E07 B17 B07 C07 D17 C17
@@ -683,7 +687,7 @@ static INPUT_PORTS_START( k7658 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t') // FIXME
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("linker Rand")
 INPUT_PORTS_END
 
@@ -713,9 +717,16 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 
 static const z80_daisy_config rt1715w_daisy_chain[] =
 {
+	{ "ctc2" },
 	{ "sio0" },
 	{ nullptr }
 };
+
+void rt1715_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PK8020_FORMAT);
+}
 
 static void rt1715w_floppies(device_slot_interface &device)
 {
@@ -741,7 +752,7 @@ void rt1715_state::rt1715(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update("i8275", FUNC(i8275_device::screen_update));
-	m_screen->set_raw(13.824_MHz_XTAL, 864, 0, 624, 320, 0, 300); // ?
+	m_screen->set_raw(13.824_MHz_XTAL, 864, 0, 640, 320, 0, 288);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_rt1715);
 	PALETTE(config, "palette", FUNC(rt1715_state::rt1715_palette), 3);
@@ -758,6 +769,7 @@ void rt1715_state::rt1715(machine_config &config)
 	m_sio0->out_dtrb_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_sio0->out_rtsb_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
+	// 1715W: A5, IEO output NC
 	Z80CTC(config, m_ctc0, 15.9744_MHz_XTAL / 4);
 	m_ctc0->zc_callback<0>().set(m_sio0, FUNC(z80sio_device::txca_w));
 	m_ctc0->zc_callback<2>().set(m_sio0, FUNC(z80sio_device::rxtxcb_w));
@@ -798,11 +810,11 @@ void rt1715_state::rt1715w(machine_config &config)
 
 	m_crtc->drq_wr_callback().set(FUNC(rt1715_state::crtc_drq_w));
 
-	// operates in polled mode
+	// FIXME interrupt output NC, but vector 0x14 set to ISR 0xf6bc, find source
 	I8272A(config, m_fdc, 8'000'000 / 4, false);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w)).invert();
-	FLOPPY_CONNECTOR(config, "i8272:0", rt1715w_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "i8272:1", rt1715w_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:0", rt1715w_floppies, "525qd", rt1715_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:1", rt1715w_floppies, "525qd", rt1715_state::floppy_formats);
 
 	Z80DMA(config, m_dma, 15.9744_MHz_XTAL / 4);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
@@ -812,7 +824,11 @@ void rt1715_state::rt1715w(machine_config &config)
 	m_dma->in_iorq_callback().set(FUNC(rt1715_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(rt1715_state::io_write_byte));
 
+	// A4
 	Z80CTC(config, m_ctc2, 15.9744_MHz_XTAL / 4);
+	m_ctc2->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc2->zc_callback<1>().set(m_ctc2, FUNC(z80ctc_device::trg2));
+	// trg3 connected to /RQ signal
 
 	m_ram->set_default_size("256K");
 	RAM(config, m_videoram).set_default_size("4K").set_default_value(0x00);

@@ -2,8 +2,6 @@
 // copyright-holders:Dan Boris, Fabio Priuli, Mike Saarna, Robert Tuccitto
 /***************************************************************************
 
-  a7800.c
-
   Driver file to handle emulation of the Atari 7800.
 
   Dan Boris
@@ -102,8 +100,8 @@
 
 #include "bus/a7800/a78_carts.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/timer.h"
 #include "machine/mos6530.h"
+#include "machine/timer.h"
 #include "sound/tiaintf.h"
 
 #include "emupal.h"
@@ -133,12 +131,12 @@ public:
 	}
 
 protected:
-	void a7800_common(machine_config &config, uint32_t clock);
+	void a7800_common(machine_config &config, uint32_t clock) ATTR_COLD;
 
 	uint8_t bios_or_cart_r(offs_t offset);
 	uint8_t tia_r(offs_t offset);
 	void tia_w(offs_t offset, uint8_t data);
-	virtual void a7800_palette(palette_device &palette) const;
+	virtual void a7800_palette(palette_device &palette) const ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(maria_startdma);
 	uint8_t riot_joystick_r();
@@ -177,19 +175,19 @@ class a7800_ntsc_state : public a7800_state
 {
 public:
 	using a7800_state::a7800_state;
-	void init_a7800_ntsc();
-	void a7800_ntsc(machine_config &config);
+	void init_a7800_ntsc() ATTR_COLD;
+	void a7800_ntsc(machine_config &config) ATTR_COLD;
 };
 
 class a7800_pal_state : public a7800_state
 {
 public:
 	using a7800_state::a7800_state;
-	void init_a7800_pal();
-	void a7800_pal(machine_config &config);
+	void init_a7800_pal() ATTR_COLD;
+	void a7800_pal(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void a7800_palette(palette_device &palette) const override;
+	virtual void a7800_palette(palette_device &palette) const override ATTR_COLD;
 };
 
 
@@ -1412,6 +1410,8 @@ void a7800_ntsc_state::a7800_ntsc(machine_config &config)
 
 	// basic machine hardware
 	m_screen->set_raw(14'318'180/2, 454, 0, 320, 263, 27, 27 + 192 + 32);
+
+	m_cart->set_must_be_loaded(true);
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("a7800").set_filter("NTSC");

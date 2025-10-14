@@ -1,5 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders: Aaron Giles, Dirk Best
+// copyright-holders: Aaron Giles, Dirk Best, Angelo Salese
 /******************************************************************************
 
     MOS Technology/Commodore 8364 "Paula"
@@ -9,21 +9,18 @@
     DMA driven audio, the floppy controller, a serial receiver/transmitter,
     analog inputs and contains the interrupt controller.
 
-    References:
-    - https://www.amigarealm.com/computing/knowledge/hardref/ch5.htm
+References:
+- https://www.amigarealm.com/computing/knowledge/hardref/ch5.htm
 
-    TODO:
-    - Inherit FDC, serial and irq controller to here;
-    - Move Agnus "location" logic out of here;
-    - low-pass filter control thru Amiga Power LED where available, technically
-      outside of Paula;
-    - Verify ADKCON modulation;
-    - Verify manual mode:
-      \- AGA roadkill during gameplay, which also has very long period setups,
-         extremely aliased;
-    - When a DMA stop occurs, is the correlated channel playback stopped
-      at the end of the current cycle or as soon as possible like current
-      implementation?
+TODO:
+- Inherit FDC, serial and irq controller to here;
+- Move Agnus "location" logic out of here, add AUDxDR / AUDxDSR pin logic;
+- low-pass filter control thru Amiga Power LED where available, technically
+  outside of Paula;
+- Verify ADKCON modulation;
+- Verify manual mode;
+- amigaaga_flop:roadkill gameplay sets up incredibly high period (-> low pitch)
+  samples (engine thrust, bumping into walls);
 
 ******************************************************************************/
 
@@ -76,6 +73,18 @@ void paula_device::device_start()
 
 	// create the stream
 	m_stream = stream_alloc(0, 4, clock() / CLOCK_DIVIDER);
+
+	save_pointer(STRUCT_MEMBER(m_channel, loc), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, len), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, per), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, vol), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, curticks), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, manualmode), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, curlocation), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, curlength), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, dma_enabled), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, atper), 4);
+	save_pointer(STRUCT_MEMBER(m_channel, atvol), 4);
 }
 
 void paula_device::device_reset()
@@ -182,6 +191,13 @@ void paula_device::dmacon_set(u16 data)
 		if (!chan->dma_enabled && ((data >> channum) & 1))
 			dma_reload(chan, true);
 
+		// https://eab.abime.net/showthread.php?t=109529
+		// if channel DMA gets disabled while in progress then make sure to issue an irq at the
+		// end of current sample
+		// - gunbee, 6sense, amigames:fayoh*.lha will otherwise hang with stuck note.
+		if (chan->dma_enabled && !((data >> channum) & 1) && chan->curlength)
+			chan->manualmode = true;
+
 		chan->dma_enabled = bool(BIT(data, channum));
 	}
 }
@@ -257,7 +273,7 @@ std::string paula_device::print_audio_state()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void paula_device::sound_stream_update(sound_stream &stream)
 {
 	int channum, sampoffs = 0;
 
@@ -268,14 +284,10 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		m_channel[1].dma_enabled =
 		m_channel[2].dma_enabled =
 		m_channel[3].dma_enabled = false;
-
-		// clear the sample data to 0
-		for (channum = 0; channum < 4; channum++)
-			outputs[channum].fill(0);
 		return;
 	}
 
-	int samples = outputs[0].samples() * CLOCK_DIVIDER;
+	int samples = stream.samples() * CLOCK_DIVIDER;
 
 	if (LIVE_AUDIO_VIEW)
 		popmessage(print_audio_state());
@@ -335,7 +347,7 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 			// fill the buffer with the sample
 			for (i = 0; i < ticks; i += CLOCK_DIVIDER)
-				outputs[channum].put_int_clamp((sampoffs + i) / CLOCK_DIVIDER, sample, 32768);
+				stream.put_int_clamp(channum, (sampoffs + i) / CLOCK_DIVIDER, sample, 32768);
 
 			// account for the ticks; if we hit 0, advance
 			chan->curticks -= ticks;

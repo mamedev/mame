@@ -154,6 +154,8 @@ static INPUT_PORTS_START( duelmast )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 
 	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_duelmast_state::unknown_random_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_duelmast_state::unknown_random_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
@@ -182,8 +184,8 @@ static INPUT_PORTS_START( ttv_lotr )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_lotr_state::camera_r))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_lotr_state::camera_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_lotr_state::unknown_random_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_lotr_state::unknown_random_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
@@ -191,8 +193,8 @@ static INPUT_PORTS_START( epo_hamc )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::camera_r))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::camera_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::unknown_random_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::unknown_random_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ttv_mx )
@@ -289,7 +291,21 @@ void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 	I2C_24C02(config, "i2cmem", 0);
 }
 
+void xavix_duelmast_state::xavix_extbus_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rw(FUNC(xavix_duelmast_state::cart_r), FUNC(xavix_duelmast_state::cart_w));
+	map(0x408000, 0x40ffff).ram(); // seems to expect RAM here (at least when cart is enabled)
+}
 
+void xavix_duelmast_state::duelmast(machine_config &config)
+{
+	xavix2000(config);
+
+	I2C_24C04(config, "i2cmem", 0);
+
+	EKARA_CART_SLOT(config, m_cartslot, 0, ekara_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list_duelmast").set_original("duelmast_cart");
+}
 
 
 ROM_START( epo_sdb )
@@ -370,8 +386,11 @@ ROM_START( ban_onep )
 ROM_END
 
 ROM_START( duelmast )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("duelmasters.u4", 0x000000, 0x200000, CRC(2f11fcd7) SHA1(d8849c74833e77b8b309e845523f2cdc7ac68054) )
+	ROM_RELOAD(0x200000,0x200000)
+	ROM_RELOAD(0x400000,0x200000)
+	ROM_RELOAD(0x600000,0x200000)
 ROM_END
 
 ROM_START( tom_dpgm )
@@ -384,11 +403,6 @@ ROM_START( epo_es2j ) // ES2J MAIN-01  2005 date on PCB, 2006 ingame
 	ROM_LOAD("es2j.u3", 0x000000, 0x400000, CRC(840aecb1) SHA1(ad52449ffc13af5f4c67b2c3cf438e7ecd80b9fb) )
 ROM_END
 
-void xavix_i2c_lotr_state::init_epo_mini()
-{
-	init_xavix();
-	m_disable_timer_irq_hack = true;
-}
 
 
 // doesn't use extra opcodes?
@@ -401,14 +415,14 @@ CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04_2mb, epo_bowl,    xavix_i2c_stat
 
 // スーパーショット！ エキサイトゴルフ
 // needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)  (2002 date on PCB, 2003 ingame)
-CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_no_timer, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // とっとこハム太郎 ハムハム大サーカス！
 CONS( 2002, epo_hamc,  0,      0, xavix2000_4mb,       epo_hamc,   xavix_epo_hamc_state, init_xavix,    "Epoch / SSD Company LTD",       "Tottoko Hamtaro - Ham Ham Dai Circus! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。パーティ！リズムでぴょん！
 // needs timer irq hack to boot
-CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_no_timer, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // カードスキャン!　エキサイトステージ サッカー日本代表チーム
 CONS( 2006, epo_es2j,   0,     0,  xavix2000_4mb,      xavix,      xavix_state,          init_xavix,    "Epoch / SSD Company LTD",        "Card Scan! Excite Stage Soccer Nippon Daihyou Team (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -416,9 +430,7 @@ CONS( 2006, epo_es2j,   0,     0,  xavix2000_4mb,      xavix,      xavix_state, 
 
 // takes a long time to boot to a card scanner error
 // This is a product in the Duel Masters line called Duel Station; the boot up screen calls it Duel Station, title logo is Duel Masters
-// It also has a cartridge slot in addition to the card scanner and at least 1 ROM cartridge was produced "デュエルマスターズ　デュエルステーション専用カートリッジ　Ver.1"
-// デュエルステーション
-CONS( 2003, duelmast, 0, 0, xavix2000_i2c_24c04_2mb, duelmast,    xavix_duelmast_state,    init_xavix, "Takara / SSD Company LTD",      "Duel Masters: Duel Station (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, duelmast, 0, 0, duelmast, duelmast,    xavix_duelmast_state,    init_xavix, "Takara / SSD Company LTD",      "Duel Masters: Duel Station (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // スーパーダッシュボール
 CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,    epo_sdb,     xavix_2000_nv_sdb_state, init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
@@ -444,7 +456,7 @@ CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_sta
 
 // Let’s！TV プレイ　闘印奥義　 陰陽大戦記～目指せ最強闘神士～
 // stalls unless timers are disabled like epo_mini / epo_golf, 2004 date on PCB, 2005 ingame
-CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_epo_mini, "Bandai / SSD Company LTD",         "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_no_timer, "Bandai / SSD Company LTD",         "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ディズニープリンセス　キラキラ魔法のレッスン
 CONS( 2004, tom_dpgm, 0, 0, xavix2000_i2c_24c08_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tomy / SSD Company LTD",         "Disney Princess Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

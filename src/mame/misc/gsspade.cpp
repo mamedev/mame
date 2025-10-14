@@ -70,7 +70,7 @@ void gsspade_state::gsspade(machine_config &config)
 {
 	I8051(config, m_soundcpu, 10.738635_MHz_XTAL); // Intel/Fujitsu P8051AH
 	m_soundcpu->set_addrmap(AS_PROGRAM, &gsspade_state::prog_map);
-	m_soundcpu->set_addrmap(AS_IO, &gsspade_state::ext_map);
+	m_soundcpu->set_addrmap(AS_DATA, &gsspade_state::ext_map);
 	m_soundcpu->port_in_cb<1>().set_ioport("P1");
 
 	I8279(config, "kdc", 1'789'772); // ?

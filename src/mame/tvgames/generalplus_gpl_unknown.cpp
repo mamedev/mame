@@ -52,6 +52,8 @@ public:
 
 	void generalplus_gpl_unknown(machine_config &config);
 
+	void init_siddr();
+
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -579,6 +581,16 @@ void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &conf
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 }
 
+void generalplus_gpl_unknown_state::init_siddr()
+{
+	uint8_t* spirom8 = (uint8_t*)memregion("spi")->base();
+	for (int i = 0x3000; i < 0x400000; i++)
+	{
+		spirom8[i] = bitswap<8>(spirom8[i] ^ 0x68,
+			3, 5, 0, 7,    1, 4, 2, 6);
+	}
+}
+
 
 ROM_START( mapacman ) // this is the single game (no games hidden behind solder pads) release
 	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
@@ -620,6 +632,15 @@ ROM_START( taturtf )
 	ROM_LOAD16_WORD_SWAP( "tinyarcadeturtlefighter_25q32bst16_684016.bin", 0x000000, 0x400000, CRC(8e046f2d) SHA1(e48492cf953f22a47fa2b88a8f96a1e459b8c487) )
 ROM_END
 
+ROM_START( siddr )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "ddr-toy.bin", 0x0000, 0x400000, CRC(873cbcc8) SHA1(bdd3d12adb1284991a3f8aaa8e451e3a55931267) )
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -635,4 +656,6 @@ CONS( 2017, parcade,       0,       0,      generalplus_gpl_unknown,   generalpl
 
 CONS( 2019, taturtf,       0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Teenage Mutant Ninja Turtles - Turtle Fighter (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
+// Probably not identical hardware, but still not direct mapped SPI.  External ROM after 0x3000 is encrypted (maybe decrypted in software) seems to have jumps to internal ROM
+CONS( 2021, siddr,         0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

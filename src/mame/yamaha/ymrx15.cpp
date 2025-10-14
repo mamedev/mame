@@ -79,12 +79,11 @@ void rx15_state::rx15(machine_config &config)
 	lcdc.set_lcd_size(2, 8);
 	lcdc.set_pixel_update_cb(FUNC(rx15_state::pixel_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2154(config, m_ryp4, 2.7_MHz_XTAL);
-	m_ryp4->add_route(0, "lspeaker", 0.50);
-	m_ryp4->add_route(1, "rspeaker", 0.50);
+	m_ryp4->add_route(0, "speaker", 0.50, 0);
+	m_ryp4->add_route(1, "speaker", 0.50, 1);
 }
 
 ROM_START(rx15)

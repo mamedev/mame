@@ -22,7 +22,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	struct channel {
@@ -42,6 +42,7 @@ private:
 	// internal state
 	sound_stream *m_stream;
 	u8 m_select;
+	u8 m_enabled;
 	u8 m_balance;
 	u8 m_lfo_frequency;
 	u8 m_lfo_control;

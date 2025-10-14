@@ -567,6 +567,8 @@ void elwro800_state::elwro800(machine_config &config)
 	screen.set_palette("palette");
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
+	SPECTRUM_ULA_UNCONTENDED(config, m_ula); // dummy for required
+
 	PALETTE(config, "palette", FUNC(elwro800_state::spectrum_palette), 16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_elwro800);
 

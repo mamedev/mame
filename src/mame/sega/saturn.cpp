@@ -425,12 +425,13 @@ test1f diagnostic hacks:
 #include "emu.h"
 #include "saturn.h"
 
+#include "saturn_cdb.h"
+#include "stvcd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "machine/nvram.h"
 #include "machine/smpc.h"
-#include "machine/stvcd.h"
-#include "saturn_cdb.h"
 
 #include "bus/saturn/bram.h"
 #include "bus/saturn/dram.h"
@@ -863,15 +864,14 @@ void sat_console_state::saturn(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(sat_console_state,stv_vdp2)
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SCSP(config, m_scsp, 8467200*8/3); // 8.4672 MHz EXTCLK * 8 / 3 = 22.5792 MHz
 	m_scsp->set_addrmap(0, &sat_console_state::scsp_mem);
 	m_scsp->irq_cb().set(FUNC(saturn_state::scsp_irq));
 	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
-	m_scsp->add_route(0, "lspeaker", 1.0);
-	m_scsp->add_route(1, "rspeaker", 1.0);
+	m_scsp->add_route(0, "speaker", 1.0, 0);
+	m_scsp->add_route(1, "speaker", 1.0, 1);
 
 	stvcd_device &stvcd(STVCD(config, "stvcd", 0));
 	stvcd.add_route(0, "scsp", 1.0, 0);
@@ -899,6 +899,7 @@ void sat_console_state::saturnus(machine_config &config)
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-U");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
@@ -912,6 +913,7 @@ void sat_console_state::saturneu(machine_config &config)
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("PAL");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
@@ -925,6 +927,7 @@ void sat_console_state::saturnjp(machine_config &config)
 	SATURN_CDB(config, "saturn_cdb", 16000000);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-J");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");

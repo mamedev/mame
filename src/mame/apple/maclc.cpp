@@ -25,6 +25,7 @@
 
 #include "cuda.h"
 #include "dfac.h"
+#include "dfac2.h"
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
@@ -66,6 +67,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_v8(*this, "v8"),
 		m_dfac(*this, "dfac"),
+		m_dfac2(*this, "dfac2"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_scsibus1(*this, "scsi"),
@@ -95,6 +97,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<v8_device> m_v8;
 	optional_device<dfac_device> m_dfac;
+	optional_device<dfac2_device> m_dfac2;
 	optional_device<applefdintf_device> m_fdc;
 	optional_device_array<floppy_connector, 2> m_floppy;
 	required_device<nscsi_bus_device> m_scsibus1;
@@ -346,8 +349,8 @@ void maclc_state::maclc_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
@@ -386,20 +389,19 @@ void maclc_state::maclc_base(machine_config &config)
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	APPLE_DFAC(config, m_dfac, 22257);
-	m_dfac->add_route(0, "lspeaker", 1.0);
-	m_dfac->add_route(1, "rspeaker", 1.0);
+	m_dfac->add_route(0, "speaker", 1.0, 0);
+	m_dfac->add_route(1, "speaker", 1.0, 1);
 
 	V8(config, m_v8, C15M);
 	m_v8->set_maincpu_tag("maincpu");
 	m_v8->set_rom_tag("bootrom");
 	m_v8->hdsel_callback().set(FUNC(maclc_state::hdsel_w));
 	m_v8->hmmu_enable_callback().set(FUNC(maclc_state::set_hmmu));
-	m_v8->add_route(0, m_dfac, 1.0);
-	m_v8->add_route(1, m_dfac, 1.0);
+	m_v8->add_route(0, m_dfac, 1.0, 0);
+	m_v8->add_route(1, m_dfac, 1.0, 1);
 
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -494,10 +496,14 @@ void maclc_state::maccclas(machine_config &config)
 	m_v8->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_v8->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_v8->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
-	m_v8->add_route(0, "lspeaker", 1.0);
-	m_v8->add_route(1, "rspeaker", 1.0);
+	m_v8->add_route(0, "speaker", 1.0, 0);
+	m_v8->add_route(1, "speaker", 1.0, 1);
 
 	config.device_remove("dfac");
+	APPLE_DFAC2(config, m_dfac2, 22257);
+	m_dfac2->sda_callback().set(m_cuda, FUNC(cuda_device::set_iic_sda));
+	m_cuda->iic_scl_callback().set(m_dfac2, FUNC(dfac2_device::scl_write));
+	m_cuda->iic_sda_callback().set(m_dfac2, FUNC(dfac2_device::sda_write));
 
 	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
@@ -539,8 +545,8 @@ void maclc_state::mactv(machine_config &config)
 	m_v8->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_v8->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_v8->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
-	m_v8->add_route(0, "lspeaker", 1.0);
-	m_v8->add_route(1, "rspeaker", 1.0);
+	m_v8->add_route(0, "speaker", 1.0, 0);
+	m_v8->add_route(1, "speaker", 1.0, 1);
 
 	config.device_remove("dfac");
 
@@ -570,8 +576,8 @@ void maclc_state::macclas2(machine_config &config)
 	m_v8->pb4_callback().set(m_egret, FUNC(egret_device::set_via_full));
 	m_v8->pb5_callback().set(m_egret, FUNC(egret_device::set_sys_session));
 	m_v8->cb2_callback().set(m_egret, FUNC(egret_device::set_via_data));
-	m_v8->add_route(0, m_dfac, 1.0);
-	m_v8->add_route(1, m_dfac, 1.0);
+	m_v8->add_route(0, m_dfac, 1.0, 0);
+	m_v8->add_route(1, m_dfac, 1.0, 1);
 
 	// Classic II doesn't have an LC PDS slot (and its ROM has the Slot Manager disabled)
 	config.device_remove("pds");

@@ -1664,15 +1664,11 @@ void pc8801_state::pc8801(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("pc8801_cass");
 
-	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 
 	// TODO: clock, receiver handler, DCD?
 	I8251(config, m_usart, 0);
 	m_usart->txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
-
-	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
-	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
@@ -1706,18 +1702,16 @@ void pc8801_state::pc8801(machine_config &config)
 
 	// Note: original models up to OPNA variants really have an internal mono speaker,
 	// but user eventually can have a stereo mixing audio card mounted so for simplicity we MCM here.
-	SPEAKER(config, m_lspeaker).front_left();
-	SPEAKER(config, m_rspeaker).front_right();
+	SPEAKER(config, m_speaker, 2).front();
 
 	// TODO: DAC_1BIT
 	// 2400 Hz according to schematics, unaffected by clock speed setting (confirmed on real HW)
 	BEEP(config, m_beeper, MASTER_CLOCK / 16 / 13 / 8);
 
-	for (auto &speaker : { m_lspeaker, m_rspeaker })
-	{
-		m_cassette->add_route(ALL_OUTPUTS, speaker, 0.025);
-		m_beeper->add_route(ALL_OUTPUTS, speaker, 0.10);
-	}
+	m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.025, 0);
+	m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.025, 1);
+	m_beeper->add_route(ALL_OUTPUTS, m_speaker, 0.10, 0);
+	m_beeper->add_route(ALL_OUTPUTS, m_speaker, 0.10, 1);
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "joystick");
 
@@ -1726,6 +1720,11 @@ void pc8801_state::pc8801(machine_config &config)
 	m_exp->int3_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
 	m_exp->int4_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
 	m_exp->int5_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
+
+	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
+	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
+	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc8801");
 }
 
 void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
@@ -1738,14 +1737,15 @@ void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
 	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
 
-	for (auto &speaker : { m_lspeaker, m_rspeaker })
-	{
-		// TODO: per-channel mixing is unconfirmed
-		m_opn->add_route(0, speaker, 0.125);
-		m_opn->add_route(1, speaker, 0.125);
-		m_opn->add_route(2, speaker, 0.125);
-		m_opn->add_route(3, speaker, 0.125);
-	}
+	// TODO: per-channel mixing is unconfirmed
+	m_opn->add_route(0, m_speaker, 0.125, 0);
+	m_opn->add_route(1, m_speaker, 0.125, 0);
+	m_opn->add_route(2, m_speaker, 0.125, 0);
+	m_opn->add_route(3, m_speaker, 0.125, 0);
+	m_opn->add_route(0, m_speaker, 0.125, 1);
+	m_opn->add_route(1, m_speaker, 0.125, 1);
+	m_opn->add_route(2, m_speaker, 0.125, 1);
+	m_opn->add_route(3, m_speaker, 0.125, 1);
 }
 
 void pc8801mk2sr_state::pc8801mk2mr(machine_config &config)
@@ -1768,10 +1768,10 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->port_b_write_callback().set(FUNC(pc8801fh_state::opn_portb_w));
 
 	// TODO: per-channel mixing is unconfirmed
-	m_opna->add_route(0, m_lspeaker, 0.25);
-	m_opna->add_route(0, m_rspeaker, 0.25);
-	m_opna->add_route(1, m_lspeaker, 0.75);
-	m_opna->add_route(2, m_rspeaker, 0.75);
+	m_opna->add_route(0, m_speaker, 0.75, 0);
+	m_opna->add_route(0, m_speaker, 0.75, 1);
+	m_opna->add_route(1, m_speaker, 0.75, 0);
+	m_opna->add_route(2, m_speaker, 0.75, 1);
 
 	// TODO: add possible configuration override for baudrate here
 	// ...

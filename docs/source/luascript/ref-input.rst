@@ -269,6 +269,20 @@ field:set_value(value)
 field:clear_value()
     Clear programmatically overridden value and restore the field’s regular
     behaviour.
+field:set_sensitivity(sensitivity)
+    Set the sensitivity or gain for analog fields.  Raises an error for digital
+    fields.
+field:set_keydelta(sensitivity)
+    Set the sensitivity to corresponding digital increment/decrement inputs for
+    analog fields.  Raises an error for digital fields.
+field:set_centerdelta(sensitivity)
+    Set the speed at which non-wrapping analog fields return to their default
+    values after associated digital increment/decrement inputs are released.
+    Raises an error for digital fields and wrapping analog fields.
+field:set_analog_reverse(reverse)
+    Set whether an analog field’s value increases in the opposite direction to
+    the convention (e.g. larger values when a pedal is released or a joystick is
+    moved to the left).  Raises an error for digital fields.
 field:set_input_seq(seqtype, seq)
     Set the :ref:`input sequence <luascript-ref-inputseq>` for the specified
     sequence type.  This is used to configure per-machine input settings.  The
@@ -319,6 +333,32 @@ field.maxvalue (read-only)
     The maximum allowed value for analog fields, or ``nil`` for digital fields.
 field.sensitivity (read-only)
     The sensitivity or gain for analog fields, or ``nil`` for digital fields.
+field.default_sensitivity (read-only)
+    The default sensitivity or gain for analog fields, or ``nil`` for digital
+    fields.
+field.keydelta (read-only)
+    The sensitivity to corresponding digital increment/decrement inputs for
+    analog fields, or ``nil`` for digital fields.
+field.default_keydelta (read-only)
+    The default sensitivity to corresponding digital increment/decrement inputs
+    for analog fields, or ``nil`` for digital fields.
+field.centerdelta (read-only)
+    The speed at which non-wrapping analog fields return to their default values
+    after associated digital increment/decrement inputs are released, or ``nil``
+    for digital fields and wrapping analog fields.
+field.default_centerdelta (read-only)
+    The default speed at which non-wrapping analog fields return to their
+    default values after associated digital increment/decrement inputs are
+    released, or ``nil`` for digital fields and wrapping analog fields.
+field.analog_reverse (read-only)
+    A Boolean indicating whether the value increases in the opposite direction
+    to the convention for analog fields (e.g. larger values when a pedal is
+    released or a joystick is moved to the left), or ``nil`` for digital fields.
+field.default_analog_reverse (read-only)
+    A Boolean indicating whether the value increases in the opposite direction
+    to the convention by default for analog fields (e.g. larger values when a
+    pedal is released or a joystick is moved to the left), or ``nil`` for
+    digital fields.
 field.way (read-only)
     The number of directions allowed by the restrictor plate/gate for a digital
     joystick, or zero (0) for other inputs.
@@ -333,22 +373,12 @@ field.is_digital_joystick (read-only)
     switch.
 field.enabled (read-only)
     A Boolean indicating whether the field is enabled.
-field.optional (read-only)
-    A Boolean indicating whether the field is optional and not required to use
-    the emulated system.
 field.cocktail (read-only)
     A Boolean indicating whether the field is only used when the system is
     configured for a cocktail table cabinet.
 field.toggle (read-only)
     A Boolean indicating whether the field corresponds to a hardware toggle
     switch or push-on, push-off button.
-field.rotated (read-only)
-    A Boolean indicating whether the field corresponds to a control that is
-    rotated relative its standard orientation.
-field.analog_reverse (read-only)
-    A Boolean indicating whether the field corresponds to an analog control that
-    increases in the opposite direction to the convention (e.g. larger values
-    when a pedal is released or a joystick is moved to the left).
 field.analog_reset (read-only)
     A Boolean indicating whether the field corresponds to an incremental
     position input (e.g. a dial or trackball axis) that should be reset to zero

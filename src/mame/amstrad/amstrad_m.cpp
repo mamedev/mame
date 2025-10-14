@@ -2734,7 +2734,7 @@ uint8_t amstrad_state::amstrad_psg_porta_read()
 IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 {
 	// DMA interrupts can be automatically cleared if bit 0 of &6805 is set to 0
-	if( m_asic.enabled && m_plus_irq_cause != 0x06 && m_asic.dma_clear & 0x01)
+	if (m_asic.enabled && m_plus_irq_cause != 0x06 && m_asic.dma_clear & 0x01)
 	{
 		logerror("IRQ: Not cleared, IRQ was called by DMA [%i]\n",m_plus_irq_cause);
 		m_asic.ram[0x2c0f] &= ~0x80;  // not a raster interrupt, so this bit is reset
@@ -2742,9 +2742,9 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 	}
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_gate_array.hsync_counter &= 0x1F;
-	if ( m_asic.enabled )
+	if (m_asic.enabled)
 	{
-		if(m_plus_irq_cause == 6)  // bit 7 is set "if last interrupt acknowledge cycle was caused by a raster interrupt"
+		if (m_plus_irq_cause == 6)  // bit 7 is set "if last interrupt acknowledge cycle was caused by a raster interrupt"
 			m_asic.ram[0x2c0f] |= 0x80;
 		else
 		{
@@ -2753,33 +2753,33 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 		}
 		return (m_asic.ram[0x2805] & 0xf8) | m_plus_irq_cause;
 	}
-	if(m_system_type != SYSTEM_GX4000)
+	if (m_system_type != SYSTEM_GX4000)
+	{
+		// update AMX mouse inputs (normally done every 1/300th of a second)
+		if (m_io_ctrltype.read_safe(0) == 2)
 		{
-			// update AMX mouse inputs (normally done every 1/300th of a second)
-			if (m_io_ctrltype.read_safe(0) == 2)
-			{
-				static uint8_t prev_x,prev_y;
-				uint8_t data_x, data_y;
+			static uint8_t prev_x,prev_y;
+			uint8_t data_x, data_y;
 
-				m_amx_mouse_data = 0x0f;
-				data_x = m_io_mouse[0].read_safe(0);
-				data_y = m_io_mouse[1].read_safe(0);
+			m_amx_mouse_data = 0x0f;
+			data_x = m_io_mouse[0].read_safe(0);
+			data_y = m_io_mouse[1].read_safe(0);
 
-				if(data_x > prev_x)
-					m_amx_mouse_data &= ~0x08;
-				if(data_x < prev_x)
-					m_amx_mouse_data &= ~0x04;
-				if(data_y > prev_y)
-					m_amx_mouse_data &= ~0x02;
-				if(data_y < prev_y)
-					m_amx_mouse_data &= ~0x01;
-				m_amx_mouse_data |= (m_io_mouse[2].read_safe(0) << 4);
-				prev_x = data_x;
-				prev_y = data_y;
+			if(data_x > prev_x)
+				m_amx_mouse_data &= ~0x08;
+			if(data_x < prev_x)
+				m_amx_mouse_data &= ~0x04;
+			if(data_y > prev_y)
+				m_amx_mouse_data &= ~0x02;
+			if(data_y < prev_y)
+				m_amx_mouse_data &= ~0x01;
+			m_amx_mouse_data |= (m_io_mouse[2].read_safe(0) << 4);
+			prev_x = data_x;
+			prev_y = data_y;
 
-				m_amx_mouse_data |= (m_io_kbrow[9].read_safe(0) & 0x80);  // DEL key
-			}
+			m_amx_mouse_data |= (m_io_kbrow[9].read_safe(0) & 0x80);  // DEL key
 		}
+	}
 	return 0xFF;
 }
 

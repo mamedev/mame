@@ -93,15 +93,98 @@ even be configurable.
 */
 
 #include "emu.h"
-#include "simpl156.h"
 
-#include "decocrpt.h"
 #include "deco156_m.h"
+#include "deco16ic.h"
+#include "decocrpt.h"
+#include "decospr.h"
+
 #include "cpu/arm/arm.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include <algorithm>
+
+
+namespace {
+
+class simpl156_state : public driver_device
+{
+public:
+	simpl156_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_deco_tilegen(*this, "tilegen"),
+		m_eeprom(*this, "eeprom"),
+		m_okimusic(*this, "okimusic"),
+		m_sprgen(*this, "spritegen"),
+		m_palette(*this, "palette"),
+		m_rowscroll(*this, "rowscroll_%u", 1U, 0x1000U, ENDIANNESS_LITTLE),
+		m_mainram(*this, "mainram", 0x4000U, ENDIANNESS_LITTLE),
+		m_systemram(*this, "systemram"),
+		m_spriteram(*this, "spriteram", 0x1000U, ENDIANNESS_LITTLE)
+	{ }
+
+	void joemacr(machine_config &config) ATTR_COLD;
+	void magdrop(machine_config &config) ATTR_COLD;
+	void chainrec(machine_config &config) ATTR_COLD;
+	void mitchell156(machine_config &config) ATTR_COLD;
+	void magdropp(machine_config &config) ATTR_COLD;
+
+	void init_simpl156() ATTR_COLD;
+	void init_joemacr() ATTR_COLD;
+	void init_charlien() ATTR_COLD;
+	void init_prtytime() ATTR_COLD;
+	void init_osman() ATTR_COLD;
+	void init_chainrec() ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+
+	void eeprom_w(u32 data);
+	u32 spriteram_r(offs_t offset);
+	void spriteram_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 mainram_r(offs_t offset);
+	void mainram_w(offs_t offset, u32 data, u32 mem_mask);
+	template<unsigned Layer> u32 rowscroll_r(offs_t offset);
+	template<unsigned Layer> void rowscroll_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 joemacr_speedup_r();
+	u32 chainrec_speedup_r();
+	u32 prtytime_speedup_r();
+	u32 charlien_speedup_r();
+	u32 osman_speedup_r();
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vblank_interrupt(int state);
+
+	void base_map(address_map &map) ATTR_COLD;
+	void chainrec_map(address_map &map) ATTR_COLD;
+	void joemacr_map(address_map &map) ATTR_COLD;
+	void magdrop_map(address_map &map) ATTR_COLD;
+	void magdropp_map(address_map &map) ATTR_COLD;
+	void mitchell156_map(address_map &map) ATTR_COLD;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<okim6295_device> m_okimusic;
+	required_device<decospr_device> m_sprgen;
+	required_device<palette_device> m_palette;
+
+	/* memory pointers */
+	memory_share_array_creator<u16, 2> m_rowscroll;
+	memory_share_creator<u16> m_mainram;
+	required_shared_ptr<u32> m_systemram;
+	memory_share_creator<u16> m_spriteram;
+};
 
 
 static INPUT_PORTS_START( simpl156 )
@@ -115,21 +198,21 @@ static INPUT_PORTS_START( simpl156 )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )                  PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )                  PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )                  PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )                  PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )                  PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )                  PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -138,16 +221,15 @@ static INPUT_PORTS_START( magdrop )
 	PORT_INCLUDE(simpl156)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_OPTIONAL // not used in gameplay
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_OPTIONAL // not used in gameplay
+	// button 3 is not used in gameplay
 INPUT_PORTS_END
 
 
@@ -364,6 +446,30 @@ DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
 		case 0xc000: return 0xf0 | 0xcc; /*  or 0xf0|0xcc|0xaa ? */
 	}
 
+	return 0;
+}
+
+
+void simpl156_state::video_start()
+{
+	std::fill_n(&m_spriteram[0], m_spriteram.length(), 0xffff);
+}
+
+u32 simpl156_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0);
+
+	m_deco_tilegen->pf_update(m_rowscroll[0], m_rowscroll[1]);
+
+	bitmap.fill(256, cliprect);
+
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+
+	// sprites are flipped relative to tilemaps
+	m_sprgen->set_flip_screen(true);
+
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x1400/4); // 0x1400/4 seems right for charlien (doesn't initialize any more RAM, so will draw a garbage 0 with more)
 	return 0;
 }
 
@@ -1110,8 +1216,9 @@ void simpl156_state::init_osman()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, 0, 0x2000, 0, emu::rw_delegate(*this, FUNC(simpl156_state::osman_speedup_r)));
 	init_simpl156();
-
 }
+
+} // anonymous namespace
 
 /* Data East games running on the DE-0409-1 or DE-0491-1 PCB */
 GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, init_joemacr,  ROT0,  "Data East Corporation", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */

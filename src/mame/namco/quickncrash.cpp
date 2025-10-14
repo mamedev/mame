@@ -20,6 +20,8 @@ Namco H-5 CPU PCB (8830970101 - 8830960101)
 - D24OP8I XTAL
 - Epson SED1351F0A
 - 2x TC55257DFL-70L
+
+Cool Gunman is thought to run on similar hardware, it probably belongs here
 */
 
 #include "emu.h"
@@ -152,15 +154,18 @@ void qncrash_state::qncrash(machine_config &config)
 	EEPROM_93C66_16BIT(config, "eeprom");
 
 	// video hardware
-	// TODO: 2 LED screens (one for shots left / level infos, one for time left)
+	// TODO:
+	// - a 96x16 dot matrix LED display
+	// - a 5 digit 7 segment display for time
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "gun_speaker").front_center();
+	SPEAKER(config, "target_speaker").front_center();
 
 	okim9810_device &oki(OKIM9810(config, "oki", 4'096'000)); // no evident XTAL on PCB
-	oki.add_route(0, "lspeaker", 1.00);
-	oki.add_route(1, "rspeaker", 1.00);
+	// TODO: May need to be swapped. The announcer should come from gun_speaker
+	oki.add_route(0, "gun_speaker", 1.00);
+	oki.add_route(1, "target_speaker", 1.00);
 }
 
 
@@ -189,7 +194,7 @@ ROM_START( qncrasha )
 	ROM_LOAD( "qc3_mpr0.ic3", 0x00000, 0x10000, CRC(42c54dec) SHA1(0f6ca4bec7ae4f60b1943dad756933d02cd660c4) )
 
 	ROM_REGION( 0x20000, "dotcpu", 0 )
-	ROM_LOAD( "qc1_dot0.ic7", 0x00000, 0x20000, CRC(45dda645) SHA1(27efcef0e3a09390eec0d7859465a13caf52f9df) )
+	ROM_LOAD( "qc3_dot0.bin", 0x00000, 0x20000, CRC(97d8c117) SHA1(61a8b52c61abae8cbeccf6dd23e3ee0b4c2e443d) )
 
 	ROM_REGION( 0x800000, "oki", 0 )
 	ROM_LOAD( "qc1_snd0.ic12", 0x000000, 0x400000, CRC(d72713d2) SHA1(556a0be2bb08fc9b4a2476b0ce8a23aa66858809) )
@@ -207,5 +212,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1999, qncrash,  0,       qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (set 1, V2.200)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // version listed at 0xa97a in program ROM
-GAME( 1999, qncrasha, qncrash, qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (set 2)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1999, qncrash,  0,       qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (Japan, V2.200)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // version listed at 0xa97a in program ROM
+GAME( 1999, qncrasha, qncrash, qncrash, qncrash, qncrash_state, empty_init, ROT0, "Namco", "Quick & Crash (US)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

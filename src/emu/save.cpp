@@ -67,6 +67,7 @@ enum
 save_manager::save_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_reg_allowed(true)
+	, m_supported(false)
 {
 	m_rewind = std::make_unique<rewinder>(*this);
 }
@@ -99,6 +100,16 @@ void save_manager::allow_registration(bool allowed)
 
 		if (dupes_found)
 			fatalerror("%d duplicate save state entries found.\n", dupes_found);
+
+		m_supported = true;
+		for (device_t &device : device_enumerator(machine().root_device()))
+		{
+			if (device.type().emulation_flags() & device_t::flags::SAVE_UNSUPPORTED)
+			{
+				m_supported = false;
+				break;
+			}
+		}
 
 		dump_registry();
 
@@ -505,7 +516,7 @@ u32 save_manager::signature() const
 		temp[0] = little_endianize_int32(entry->m_typesize);
 		temp[1] = little_endianize_int32(entry->m_typecount);
 		temp[2] = little_endianize_int32(entry->m_blockcount);
-		temp[3] = little_endianize_int32(entry->m_stride);
+		temp[3] = 0;
 		crc.append(&temp[0], sizeof(temp));
 	}
 	return crc.finish();
@@ -934,7 +945,7 @@ void rewinder::report_error(save_error error, rewind_operation operation)
 	// success
 	case STATERR_NONE:
 		{
-			const u64 supported = m_save.machine().system().flags & MACHINE_SUPPORTS_SAVE;
+			const u64 supported = m_save.supported();
 			const char *const warning = supported || !m_first_time_warning ? "" :
 				"Rewind warning: Save states are not officially supported for this machine.\n";
 			const char *const opnamed = (operation == rewind_operation::LOAD) ? "loaded" : "captured";

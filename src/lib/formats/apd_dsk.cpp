@@ -208,9 +208,4 @@ bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool apd_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const apd_format FLOPPY_APD_FORMAT;

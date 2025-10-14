@@ -638,7 +638,7 @@ void dsp16_device_base::program_map(address_map &map)
 
 template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_some_rom()
 {
-	assert(bool(machine().debug_flags & DEBUG_FLAG_ENABLED) == Debugger);
+	assert(debugger_enabled() == Debugger);
 	for (bool mode_change = false; !mode_change && m_core->icount_remaining(); m_core->decrement_icount())
 	{
 		assert((cache::LOAD == m_cache_mode) == Caching);
@@ -1127,7 +1127,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 
 template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 {
-	assert(bool(machine().debug_flags & DEBUG_FLAG_ENABLED) == Debugger);
+	assert(debugger_enabled() == Debugger);
 	for (bool mode_change = false; !mode_change && m_core->icount_remaining(); m_core->decrement_icount())
 	{
 		u16 const op(m_cache[m_cache_ptr]);

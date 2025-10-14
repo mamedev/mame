@@ -154,7 +154,6 @@ void segas1x_bootleg_state::sys16_paletteram_w(offs_t offset, uint16_t data, uin
 void segas1x_bootleg_state::update_page(  )
 {
 	int all_dirty = 0;
-	int i, offset;
 
 	if (m_old_tile_bank[1] != m_tile_bank[1])
 	{
@@ -180,26 +179,23 @@ void segas1x_bootleg_state::update_page(  )
 			m_foreground[1]->mark_all_dirty();
 		}
 	}
-	else {
-		for (i = 0; i < 4; i++)
+	else
+	{
+		for (int i = 0; i < 4; i++)
 		{
 			int page0 = 64 * 32 * i;
 			if (m_old_bg_page[0][i] != m_bg_page[0][i])
 			{
 				m_old_bg_page[0][i] = m_bg_page[0][i];
-				for (offset = page0; offset < page0 + 64 * 32; offset++)
-				{
+				for (int offset = page0; offset < page0 + 64 * 32; offset++)
 					m_background[0]->mark_tile_dirty(offset);
-				}
 			}
 
 			if (m_old_fg_page[0][i] != m_fg_page[0][i])
 			{
 				m_old_fg_page[0][i] = m_fg_page[0][i];
-				for (offset = page0; offset < page0 + 64 * 32; offset++)
-				{
+				for (int offset = page0; offset < page0 + 64 * 32; offset++)
 					m_foreground[0]->mark_tile_dirty(offset);
-				}
 			}
 
 			if (m_system18)
@@ -207,19 +203,15 @@ void segas1x_bootleg_state::update_page(  )
 				if (m_old_bg_page[1][i] != m_bg_page[1][i])
 				{
 					m_old_bg_page[1][i] = m_bg_page[1][i];
-					for (offset = page0; offset < page0 + 64 * 32; offset++)
-					{
+					for (int offset = page0; offset < page0 + 64 * 32; offset++)
 						m_background[1]->mark_tile_dirty(offset);
-					}
 				}
 
 				if (m_old_fg_page[1][i] != m_fg_page[1][i])
 				{
 					m_old_fg_page[1][i] = m_fg_page[1][i];
-					for (offset = page0; offset < page0 + 64 * 32; offset++)
-					{
+					for (int offset = page0; offset < page0 + 64 * 32; offset++)
 						m_foreground[1]->mark_tile_dirty(offset);
-					}
 				}
 			}
 		}
@@ -228,7 +220,7 @@ void segas1x_bootleg_state::update_page(  )
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 {
-	const uint16_t *source = &m_tileram[m_bg_page[0][tile_index >> 11] << 11];
+	uint16_t const *const source = &m_tileram[m_bg_page[0][tile_index >> 11] << 11];
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
@@ -240,7 +232,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 {
-	const uint16_t *source = &m_tileram[m_fg_page[0][tile_index >> 11] << 11];
+	uint16_t const *const source = &m_tileram[m_fg_page[0][tile_index >> 11] << 11];
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (((data & m_tilebank_switch) ? m_tile_bank[1] : m_tile_bank[0]) << 12);
 
@@ -252,7 +244,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 {
-	const uint16_t *source = &m_tileram[m_bg_page[1][tile_index >> 11] << 11];
+	uint16_t const *const source = &m_tileram[m_bg_page[1][tile_index >> 11] << 11];
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
@@ -264,7 +256,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
 {
-	const uint16_t *source = &m_tileram[m_fg_page[1][tile_index >> 11] << 11];
+	uint16_t const *const source = &m_tileram[m_fg_page[1][tile_index >> 11] << 11];
 	int data = source[tile_index & 0x7ff];
 	int tile_number = (data & 0xfff) | (m_tile_bank[(data & 0x1000) >> 12] << 12);
 
@@ -276,7 +268,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
 
 void segas1x_bootleg_state::sys16_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t oldword = m_tileram[offset];
+	uint16_t const oldword = m_tileram[offset];
 
 	COMBINE_DATA(&m_tileram[offset]);
 
@@ -314,7 +306,7 @@ void segas1x_bootleg_state::sys16_tileram_w(offs_t offset, uint16_t data, uint16
 
 TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 {
-	const uint16_t *source = m_textram;
+	uint16_t const *const source = m_textram;
 	int tile_number = source[tile_index];
 	int pri = tile_number >> 8;
 
@@ -353,15 +345,13 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 	compute_resistor_weights(0, 255, -1.0,
 			6, resistances_normal, m_weights[0][0], 0, 0,
 			6, resistances_normal, m_weights[0][1], 0, 0,
-			6, resistances_normal, m_weights[0][2], 0, 0
-			);
+			6, resistances_normal, m_weights[0][2], 0, 0);
 
 	/* Shadow/Highlight colors */
 	compute_resistor_weights(0, 255, -1.0,
 			6, resistances_sh, m_weights[1][0], 0, 0,
 			6, resistances_sh, m_weights[1][1], 0, 0,
-			6, resistances_sh, m_weights[1][2], 0, 0
-			);
+			6, resistances_sh, m_weights[1][2], 0, 0);
 
 	if (!m_bg1_trans)
 		m_background[0] = &machine().tilemap().create(
@@ -646,34 +636,37 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
-		{
-			uint16_t *dest = &bitmap.pix(y);
-			uint16_t *src = &sprites.pix(y);
-//          uint8_t *pri = &screen.priority().pix(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &sprites] (rectangle const &rect)
 			{
-				// only process written pixels
-				uint16_t pix = src[x];
-				if (pix != 0xffff)
+				for (int y = rect.min_y; y <= rect.max_y; y++)
 				{
-					// compare sprite priority against tilemap priority
-//                  int priority = (pix >> 12) & 3;
-					if (1)
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					//uint8_t const *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
 					{
-						// if the color is set to maximum, shadow pixels underneath us
-						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += m_palette_entries;
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							//int const priority = (pix >> 12) & 3;
+							if (1)
+							{
+								// if the color is set to maximum, shadow pixels underneath us
+								if ((pix & 0x03f0) == 0x03f0)
+									dest[x] += m_palette_entries;
 
-						// otherwise, just add in sprite palette base
-						else
-							dest[x] = 0x400 | (pix & 0x3ff);
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x400 | (pix & 0x3ff);
+							}
+						}
 					}
 				}
-			}
-		}
-
+			});
 
 	return 0;
 }
@@ -716,33 +709,37 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_devic
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
-		{
-			uint16_t *dest = &bitmap.pix(y);
-			uint16_t *src = &sprites.pix(y);
-//          uint8_t *pri = &screen.priority().pix(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &sprites] (rectangle const &rect)
 			{
-				// only process written pixels
-				uint16_t pix = src[x];
-				if (pix != 0xffff)
+				for (int y = rect.min_y; y <= rect.max_y; y++)
 				{
-					// compare sprite priority against tilemap priority
-//                  int priority = (pix >> 12) & 3;
-					if (1)
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					//uint8_t const *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
 					{
-						// if the color is set to maximum, shadow pixels underneath us
-						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += m_palette_entries;
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							//int const priority = (pix >> 12) & 3;
+							if (1)
+							{
+								// if the color is set to maximum, shadow pixels underneath us
+								if ((pix & 0x03f0) == 0x03f0)
+									dest[x] += m_palette_entries;
 
-						// otherwise, just add in sprite palette base
-						else
-							dest[x] = 0x400 | (pix & 0x3ff);
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x400 | (pix & 0x3ff);
+							}
+						}
 					}
 				}
-			}
-		}
+			});
 
 
 	return 0;
@@ -795,36 +792,40 @@ uint32_t segas1x_bootleg_state::screen_update_system16(screen_device &screen, bi
 
 
 	// mix in sprites
-	if (!m_sprites.found())
+	if (!m_sprites)
 		return 0;
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
-		{
-			uint16_t *dest = &bitmap.pix(y);
-			uint16_t *src = &sprites.pix(y);
-//          uint8_t *pri = &screen.priority().pix(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &sprites] (rectangle const &rect)
 			{
-				// only process written pixels
-				uint16_t pix = src[x];
-				if (pix != 0xffff)
+				for (int y = rect.min_y; y <= rect.max_y; y++)
 				{
-					// compare sprite priority against tilemap priority
-//                  int priority = (pix >> 12) & 3;
-					if (1)
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					//uint8_t const *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
 					{
-						// if the color is set to maximum, shadow pixels underneath us
-						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += m_palette_entries;
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							//int const priority = (pix >> 12) & 3;
+							if (1)
+							{
+								// if the color is set to maximum, shadow pixels underneath us
+								if ((pix & 0x03f0) == 0x03f0)
+									dest[x] += m_palette_entries;
 
-						// otherwise, just add in sprite palette base
-						else
-							dest[x] = 0x400 | (pix & 0x3ff);
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x400 | (pix & 0x3ff);
+							}
+						}
 					}
 				}
-			}
-		}
+			});
 
 	return 0;
 }
@@ -861,33 +862,37 @@ uint32_t segas1x_bootleg_state::screen_update_system18old(screen_device &screen,
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
-		{
-			uint16_t *dest = &bitmap.pix(y);
-			uint16_t *src = &sprites.pix(y);
-//          uint8_t *pri = &screen.priority().pix(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &sprites] (rectangle const &rect)
 			{
-				// only process written pixels
-				uint16_t pix = src[x];
-				if (pix != 0xffff)
+				for (int y = rect.min_y; y <= rect.max_y; y++)
 				{
-					// compare sprite priority against tilemap priority
-//                  int priority = (pix >> 12) & 3;
-					if (1)
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					//uint8_t const *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
 					{
-						// if the color is set to maximum, shadow pixels underneath us
-						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += m_palette_entries;
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							//int const priority = (pix >> 12) & 3;
+							if (1)
+							{
+								// if the color is set to maximum, shadow pixels underneath us
+								if ((pix & 0x03f0) == 0x03f0)
+									dest[x] += m_palette_entries;
 
-						// otherwise, just add in sprite palette base
-						else
-							dest[x] = 0x400 | (pix & 0x3ff);
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x400 | (pix & 0x3ff);
+							}
+						}
 					}
 				}
-			}
-		}
+			});
 
 	return 0;
 }

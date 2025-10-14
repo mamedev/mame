@@ -560,16 +560,15 @@ void skimaxx_state::skimaxx(machine_config &config)
 	PALETTE(config, "palette", palette_device::RGB_555);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	OKIM6295(config, "oki1", XTAL(4'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "lspeaker", 1.0);     // ?
+	OKIM6295(config, "oki1", XTAL(4'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);     // ?
 
-	OKIM6295(config, "oki2", XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "lspeaker", 1.0);  // ?
+	OKIM6295(config, "oki2", XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);  // ?
 
-	OKIM6295(config, "oki3", XTAL(4'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "rspeaker", 1.0);     // ?
+	OKIM6295(config, "oki3", XTAL(4'000'000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);     // ?
 
-	OKIM6295(config, "oki4", XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "rspeaker", 1.0);  // ?
+	OKIM6295(config, "oki4", XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);  // ?
 }
 
 

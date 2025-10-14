@@ -16,15 +16,12 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
-#include "bus/heathzenith/h89/intr_cntrl.h"
+#include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
 
 class mms77316_fdc_device : public device_t, public device_h89bus_right_card_interface
 {
 public:
 	mms77316_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-	virtual void write(u8 select_lines, u8 offset, u8 data) override;
-	virtual u8 read(u8 select_lines, u8 offset) override;
 
 	template <typename T> void set_intr_cntrl(T &&tag) { m_intr_cntrl.set_tag(std::forward<T>(tag)); }
 
@@ -32,6 +29,9 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
 
 	void ctrl_w(u8 val);
 	void data_w(u8 val);
@@ -49,6 +49,8 @@ private:
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 8> m_floppies;
 	required_device<heath_intr_socket> m_intr_cntrl;
+
+	bool m_installed;
 
 	bool m_irq_allowed;
 	bool m_drq_allowed;

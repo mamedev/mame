@@ -25,9 +25,11 @@ TODO:
 
 Notes:
 - NV1 looks very different, not worth to subclass here;
+- According to starfrost013 this is really a Weitek core ...
 
 References:
 - https://envytools.readthedocs.io/en/latest/hw/display/nv3/index.html
+- https://86box.net/2025/02/25/riva128-part-1.html
 
 **************************************************************************************************/
 

@@ -120,7 +120,7 @@ private:
 	void pca002_map(address_map &map) ATTR_COLD;
 	void pca003_map(address_map &map) ATTR_COLD;
 	void pca008_map(address_map &map) ATTR_COLD;
-	void pca020_io_map(address_map &map) ATTR_COLD;
+	void pca020_data_map(address_map &map) ATTR_COLD;
 	void pca020_mem_map(address_map &map) ATTR_COLD;
 	void machine_start() override ATTR_COLD;
 	void machine_reset() override ATTR_COLD;
@@ -242,7 +242,7 @@ void alvg_state::pca020_mem_map(address_map &map)
 	map(0x8000, 0xffff).bankr("dmd");
 }
 
-void alvg_state::pca020_io_map(address_map &map)
+void alvg_state::pca020_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram().share("vram");
@@ -559,13 +559,12 @@ void alvg_state::pca008(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &alvg_state::pca008_map);
 	m_via1->writepa_handler().set(FUNC(alvg_state::via1_pa_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	BSMT2000(config, m_bsmt, XTAL(24'000'000));
 	m_bsmt->set_ready_callback(FUNC(alvg_state::bsmt_ready_w));
-	m_bsmt->add_route(0, "lspeaker", 1.2);
-	m_bsmt->add_route(1, "rspeaker", 1.2);
+	m_bsmt->add_route(0, "speaker", 1.2, 0);
+	m_bsmt->add_route(1, "speaker", 1.2, 1);
 
 	CLOCK(config, "fclock", 2'000'000 / 4096).signal_handler().set_inputline(m_audiocpu, 1);
 }
@@ -575,7 +574,7 @@ void alvg_state::pca020(machine_config &config)
 	/* basic machine hardware */
 	I8031(config, m_dmdcpu, XTAL(12'000'000));
 	m_dmdcpu->set_addrmap(AS_PROGRAM, &alvg_state::pca020_mem_map);
-	m_dmdcpu->set_addrmap(AS_IO, &alvg_state::pca020_io_map);
+	m_dmdcpu->set_addrmap(AS_DATA, &alvg_state::pca020_data_map);
 	m_dmdcpu->port_out_cb<1>().set(FUNC(alvg_state::dmd_port1_w));
 	m_dmdcpu->port_in_cb<1>().set(FUNC(alvg_state::dmd_port1_r));
 	m_dmdcpu->port_out_cb<3>().set(FUNC(alvg_state::dmd_port3_w));

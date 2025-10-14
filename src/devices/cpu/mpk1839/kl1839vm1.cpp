@@ -2,10 +2,12 @@
 // copyright-holders:Andrei I. Holub
 
 #include "emu.h"
-
 #include "kl1839vm1.h"
 #include "kl1839vm1dasm.h"
+
 #include "cpu/vax/vaxdasm.h"
+
+#include <algorithm>
 #include <regex>
 
 
@@ -132,7 +134,7 @@ u32 kl1839vm1_device::shr(u32 val, bool va, u8 fo, bool a_c, bool l_r)
 void kl1839vm1_device::kop(u8 kop, u8 fd, u32 x, u32 y, u8 rz, u8 ps, bool va = false, u8 fo = 0)
 {
 	u64 res = 0;
-	switch(fd)
+	switch (fd)
 	{
 		case 0b11:
 			x = s8(x);
@@ -148,7 +150,7 @@ void kl1839vm1_device::kop(u8 kop, u8 fd, u32 x, u32 y, u8 rz, u8 ps, bool va = 
 	}
 
 	RSP &= ~(VF | CF);
-	switch(kop)
+	switch (kop)
 	{
 		case 0b0000: res = y; break;
 		//   0b0001:
@@ -191,7 +193,7 @@ void kl1839vm1_device::kop(u8 kop, u8 fd, u32 x, u32 y, u8 rz, u8 ps, bool va = 
 		default: break;
 	}
 
-	switch(fd)
+	switch (fd)
 	{
 		case 0b11:
 			res &= 0x000000ff;
@@ -207,7 +209,8 @@ void kl1839vm1_device::kop(u8 kop, u8 fd, u32 x, u32 y, u8 rz, u8 ps, bool va = 
 			break;
 	}
 	R(rz) |= res;
-	if (rz == 0x1f) mreg_w();
+	if (rz == 0x1f)
+		mreg_w();
 }
 
 bool kl1839vm1_device::mreg_r()
@@ -288,7 +291,7 @@ void kl1839vm1_device::ma(u32 op)
 
 	u32 kob_data = kop1 ? R(x) : K(am);
 
-	if (!m_pcm_queue.empty())
+	if (m_pcm_queue_size > 0)
 	{
 		if (py)
 			am = vax_pcm_pull();
@@ -342,7 +345,7 @@ void kl1839vm1_device::mb(u32 op)
 
 	u32 kob_data = kop2 ? R(x) : R(y);
 
-	if (!m_pcm_queue.empty())
+	if (m_pcm_queue_size > 0)
 	{
 		if (py)
 			y = vax_pcm_pull();
@@ -380,7 +383,7 @@ void kl1839vm1_device::mc(u32 op)
 	const bool py = BIT(op, 2);
 	const bool px = BIT(op, 1);
 
-	if (!m_pcm_queue.empty())
+	if (m_pcm_queue_size > 0)
 	{
 		if (py)
 			y = vax_pcm_pull();
@@ -658,7 +661,7 @@ void kl1839vm1_device::decode_op(u32 op)
 
 void kl1839vm1_device::vax_decode_pc()
 {
-	if (!m_pcm_queue.empty())
+	if (m_pcm_queue_size > 0)
 	{
 		LOGVAX("Unused decoded data\n");
 	}
@@ -668,7 +671,6 @@ void kl1839vm1_device::vax_decode_pc()
 	m_op_size = 1;
 	AMC = op << 4;
 
-	m_pcm_queue.clear();
 	const vax_disassembler::mode* args = vax_disassembler::get_operands(op);
 	u8 arg_n = 0;
 	do
@@ -683,7 +685,7 @@ void kl1839vm1_device::vax_decode_pc()
 
 			// byte
 			case vax_disassembler::mode::bb:
-				m_pcm_queue.push_back(s8(m_ram.read_byte(PC + m_op_size)));
+				m_pcm_queue[arg_n] = s8(m_ram.read_byte(PC + m_op_size));
 				m_mem_reg[arg_n] = 0x8f;
 				m_op_size += 1;
 				break;
@@ -697,19 +699,19 @@ void kl1839vm1_device::vax_decode_pc()
 				u8 p = m_ram.read_byte(PC + m_op_size);
 				if (p == 0x8f) // M
 				{
-					m_pcm_queue.push_back(m_ram.read_byte(PC + m_op_size + 1));
+					m_pcm_queue[arg_n] = m_ram.read_byte(PC + m_op_size + 1);
 					m_mem_reg[arg_n] = p;
 					m_op_size += 2;
 				}
 				else if ((p & 0xf0) == 0x80) // M = R(n)+
 				{
-					m_pcm_queue.push_back(p & 0x0f);
+					m_pcm_queue[arg_n] = p & 0x0f;
 					m_mem_reg[arg_n] = p;
 					m_op_size += 1;
 				}
 				else if ((p & 0xf0) == 0x50) // R
 				{
-					m_pcm_queue.push_back(p & 0x0f);
+					m_pcm_queue[arg_n] = p & 0x0f;
 					m_mem_reg[arg_n] = p;
 					m_op_size += 1;
 				}
@@ -723,7 +725,7 @@ void kl1839vm1_device::vax_decode_pc()
 
 			// word
 			case vax_disassembler::mode::bw:
-				m_pcm_queue.push_back(s16(m_ram.read_word(PC + m_op_size)));
+				m_pcm_queue[arg_n] = s16(m_ram.read_word(PC + m_op_size));
 				m_mem_reg[arg_n] = 0x8f;
 				m_op_size += 2;
 				break;
@@ -739,19 +741,19 @@ void kl1839vm1_device::vax_decode_pc()
 				u8 p = m_ram.read_byte(PC + m_op_size);
 				if (p == 0x8f) // M
 				{
-					m_pcm_queue.push_back(m_ram.read_dword(PC + m_op_size + 1));
+					m_pcm_queue[arg_n] = m_ram.read_dword(PC + m_op_size + 1);
 					m_mem_reg[arg_n] = p;
 					m_op_size += 5;
 				}
 				else if ((p & 0xf0) == 0x80) // M = R(n)+
 				{
-					m_pcm_queue.push_back(p & 0x0f);
+					m_pcm_queue[arg_n] = p & 0x0f;
 					m_mem_reg[arg_n] = p;
 					m_op_size += 1;
 				}
 				else if ((p & 0xf0) == 0x50) // R
 				{
-					m_pcm_queue.push_back(p & 0x0f);
+					m_pcm_queue[arg_n] = p & 0x0f;
 					m_mem_reg[arg_n] = p;
 					m_op_size += 1;
 				}
@@ -765,7 +767,6 @@ void kl1839vm1_device::vax_decode_pc()
 
 			default:
 				LOGVAX("(%x): unknown operand mode %02d in OP=%02x (n=%d)\n", PC, u8(mode), op, arg_n + 1);
-				m_pcm_queue.clear();
 				m_op_size = 0;
 				break;
 		}
@@ -773,10 +774,12 @@ void kl1839vm1_device::vax_decode_pc()
 		++arg_n;
 	} while ((arg_n < 6) && (args[arg_n] != vax_disassembler::mode::none));
 
+	m_pcm_queue_size = 0;
 	if (m_op_size > 0) // above completed without failure
 	{
+		m_pcm_queue_size = (arg_n == 1 && m_mem_reg[0] == u8(~0)) ? 0 : arg_n; // none args case
 		u8 args_type = 0;
-		if (!m_pcm_queue.empty())
+		if (m_pcm_queue_size > 0)
 		{
 			for (u8 i = 0; i < arg_n; ++i)
 			{
@@ -874,22 +877,25 @@ void kl1839vm1_device::vax_decode_pc()
 	}
 
 	if (!m_op_size)
+	{
 		LOGVAX("(%x): undecoded OP=%02x .. EXIT\n", PC, op);
+	}
 	else
+	{
 		PC += m_op_size; // move to a next op
-		;//LOGVAX("(%x): Decoded: OP=%02x args:%d \n", PC, op, m_pcm_queue.size());
+		/*LOGVAX("(%x): Decoded: OP=%02x args:%d \n", PC, op, m_pcm_queue.size())*/;
+	}
 }
 
 u32 kl1839vm1_device::vax_pcm_pull(bool is_bo)
 {
-	if (m_pcm_queue.empty())
+	if (m_pcm_queue_size == 0)
 	{
 		LOGVAX("Pooling empty decoder queue\n");
 	}
 	else
 	{
-		PCM = m_pcm_queue.front();
-		m_pcm_queue.pop_front();
+		PCM = m_pcm_queue[0];
 
 		bool is_mem = (m_mem_reg[0] & 0xf0) == 0x80;
 		if (is_bo && !is_mem)
@@ -902,7 +908,10 @@ u32 kl1839vm1_device::vax_pcm_pull(bool is_bo)
 			PCM = R(PCM);
 			R(r) = PCM + 1;
 		}
+
+		std::copy(std::begin(m_pcm_queue) + 1, std::end(m_pcm_queue), std::begin(m_pcm_queue));
 		std::copy(std::begin(m_mem_reg) + 1, std::end(m_mem_reg), std::begin(m_mem_reg));
+		m_pcm_queue_size--;
 	}
 
 	return PCM;
@@ -925,8 +934,13 @@ void kl1839vm1_device::device_start()
 	save_item(NAME(m_amc));
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_fp));
-	save_pointer(NAME(m_reg), 0x20);
+	save_item(NAME(m_jzdra_waiting));
 	save_pointer(NAME(m_consts), 0x10);
+	save_pointer(NAME(m_reg), 0x20);
+	save_item(NAME(m_op_size));
+	save_item(NAME(m_pcm_queue_size));
+	save_pointer(NAME(m_pcm_queue), 6);
+	save_pointer(NAME(m_mem_reg), 6);
 
 	// Register debugger state
 	state_add(KL1839_AMC, "AMC",  AMC).formatstr("%08X");
@@ -1040,7 +1054,7 @@ void kl1839vm1_device::device_reset()
 	m_vma_tmp.d = 0;
 	RV = 0;
 	SCH = 0;
-	m_pcm_queue.clear();
+	m_pcm_queue_size = 0;
 	m_op_size = 0;
 }
 

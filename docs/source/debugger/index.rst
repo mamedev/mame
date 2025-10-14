@@ -158,6 +158,10 @@ Examples:
     Address 9660 in the default address space of the device with the
     absolute tag ``:ram``, or the ``ram`` space of the root machine
     device.
+``1883:vram.m``
+    Address 1883 in the memory region with the absolute tag ``:vram``.
+``1923:sprites.s``
+    Address 1923 in the memory share with the absolute tag ``:sprites``.
 
 The examples here include a lot of corner cases, but in general the
 debugger should take the most likely meaning for a device or address
@@ -327,6 +331,7 @@ The size may optionally be preceded by an access type specification:
 * ``o`` specifies direct read/write pointer access defaulting to space 3
   (opcodes)
 * ``m`` specifies a memory region
+* ``s`` specifies a memory share
 
 Finally, this may be preceded by a tag and/or address space name
 followed by a dot (``.``).

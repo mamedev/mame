@@ -150,7 +150,7 @@ protected:
 	bool                        m_legacy_video;
 	uint32_t                    m_video_position;
 	uint8_t                     m_line_in_row;
-	scanline_record             m_scanlines[25+192+26];
+	scanline_record             m_scanlines[25+25+192+26+25];
 	bool                        m_displayed_rgb;
 
 	// palette state

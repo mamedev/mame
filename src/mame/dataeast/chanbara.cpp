@@ -83,9 +83,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void init_chanbara();
+	void init_chanbara() ATTR_COLD;
 
-	void chanbara(machine_config &config);
+	void chanbara(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -175,7 +175,7 @@ void chanbara_state::video_start()
 	m_bg_tilemap[1]->set_transparent_pen(0);
 }
 
-void chanbara_state::draw_sprites(screen_device &screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+void chanbara_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0x80 - 4; offs >= 0x00; offs -= 4)
 	{

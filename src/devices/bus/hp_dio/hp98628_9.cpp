@@ -46,8 +46,7 @@
 #include "machine/z80sio.h"
 
 // Debugging
-#undef VERBOSE
-#define VERBOSE 0
+//#define VERBOSE 1
 #include "logmacro.h"
 
 namespace {
@@ -154,7 +153,7 @@ protected:
 	bool m_rt_in;
 	uint8_t m_modem_ctrl;
 	uint8_t m_modem_status;
-	uint8_t m_low_ram[ LOW_RAM_SIZE ];
+	uint8_t m_low_ram[LOW_RAM_SIZE];
 };
 
 base_98628_9_device::base_98628_9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -385,14 +384,16 @@ void base_98628_9_device::cpu_io_mem_map(address_map &map)
 
 void base_98628_9_device::install_68k_map(offs_t base_addr)
 {
-	dio().install_memory(0x0000 + base_addr,
-						 0x0007 + base_addr,
-						 read16sm_delegate(*this, [this](offs_t addr) { return reg_r(addr); }, ""),
-						 write16sm_delegate(*this, [this](offs_t addr, uint16_t data) { reg_w(addr, uint8_t(data)); }, ""));
-	dio().install_memory(0x4000 + base_addr,
-						 0x7fff + base_addr,
-						 read16sm_delegate(*this, FUNC(base_98628_9_device::low_ram_r_68k)),
-						 write16sm_delegate(*this, FUNC(base_98628_9_device::low_ram_w_68k)));
+	dio().install_memory(
+			0x0000 + base_addr,
+			0x0007 + base_addr,
+			read16sm_delegate(*this, NAME([this] (offs_t addr) { return reg_r(addr); })),
+			write16sm_delegate(*this, NAME([this] (offs_t addr, uint16_t data) { reg_w(addr, uint8_t(data)); })));
+	dio().install_memory(
+			0x4000 + base_addr,
+			0x7fff + base_addr,
+			read16sm_delegate(*this, FUNC(base_98628_9_device::low_ram_r_68k)),
+			write16sm_delegate(*this, FUNC(base_98628_9_device::low_ram_w_68k)));
 }
 
 uint8_t base_98628_9_device::reg_r(offs_t addr)
@@ -503,7 +504,7 @@ uint8_t base_98628_9_device::low_ram_r_z80(offs_t addr)
 		m_sio->ctsb_w(m_ctsb);
 		LOG("CTSB 0\n");
 	}
-	return m_low_ram[ addr & (LOW_RAM_SIZE - 1) ];
+	return m_low_ram[addr & (LOW_RAM_SIZE - 1)];
 }
 
 uint16_t base_98628_9_device::low_ram_r_68k(offs_t addr)
@@ -514,7 +515,7 @@ uint16_t base_98628_9_device::low_ram_r_68k(offs_t addr)
 		update_irq();
 		LOG("IRQ 0\n");
 	}
-	return m_low_ram[ addr & (LOW_RAM_SIZE - 1) ];
+	return m_low_ram[addr & (LOW_RAM_SIZE - 1)];
 }
 
 void base_98628_9_device::low_ram_w_z80(offs_t addr, uint8_t data)
@@ -525,7 +526,7 @@ void base_98628_9_device::low_ram_w_z80(offs_t addr, uint8_t data)
 		LOG("IRQ 1\n");
 		update_irq();
 	}
-	m_low_ram[ addr & (LOW_RAM_SIZE - 1) ] = data;
+	m_low_ram[addr & (LOW_RAM_SIZE - 1)] = data;
 }
 
 void base_98628_9_device::low_ram_w_68k(offs_t addr, uint16_t data)
@@ -536,7 +537,7 @@ void base_98628_9_device::low_ram_w_68k(offs_t addr, uint16_t data)
 		LOG("CTSB 1\n");
 		m_sio->ctsb_w(m_ctsb);
 	}
-	m_low_ram[ addr & (LOW_RAM_SIZE - 1) ] = uint8_t(data);
+	m_low_ram[addr & (LOW_RAM_SIZE - 1)] = uint8_t(data);
 }
 
 uint8_t base_98628_9_device::sio_r(offs_t addr)
@@ -873,7 +874,7 @@ protected:
 	bool m_tx;
 	bool m_last_tt;
 	uint8_t m_sr;
-	uint8_t m_high_ram[ HIGH_RAM_SIZE ];
+	uint8_t m_high_ram[HIGH_RAM_SIZE];
 };
 
 void dio16_98629_device::device_start()
@@ -995,20 +996,21 @@ void dio16_98629_device::cpu_program_mem_map(address_map &map)
 void dio16_98629_device::install_68k_map(offs_t base_addr)
 {
 	base_98628_9_device::install_68k_map(base_addr);
-	dio().install_memory(0x8000 + base_addr,
-						 0xbfff + base_addr,
-						 read16sm_delegate(*this, [this](offs_t addr) { return high_ram_r_z80(addr); }, ""),
-						 write16sm_delegate(*this, [this](offs_t addr, uint16_t data) { high_ram_w_z80(addr, uint8_t(data)); }, ""));
+	dio().install_memory(
+			0x8000 + base_addr,
+			0xbfff + base_addr,
+			read16sm_delegate(*this, NAME([this] (offs_t addr) { return high_ram_r_z80(addr); })),
+			write16sm_delegate(*this, NAME([this] (offs_t addr, uint16_t data) { high_ram_w_z80(addr, uint8_t(data)); })));
 }
 
 uint8_t dio16_98629_device::high_ram_r_z80(offs_t addr)
 {
-	return m_high_ram[ addr & (HIGH_RAM_SIZE - 1) ];
+	return m_high_ram[addr & (HIGH_RAM_SIZE - 1)];
 }
 
 void dio16_98629_device::high_ram_w_z80(offs_t addr, uint8_t data)
 {
-	m_high_ram[ addr & (HIGH_RAM_SIZE - 1) ] = data;
+	m_high_ram[addr & (HIGH_RAM_SIZE - 1)] = data;
 }
 
 void dio16_98629_device::tx_out(int state)

@@ -243,15 +243,14 @@ TIMER_CALLBACK_MEMBER(cdp1864_device::dma_tick)
 //  our sound stream
 //-------------------------------------------------
 
-void cdp1864_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void cdp1864_device::sound_stream_update(sound_stream &stream)
 {
-	stream_buffer::sample_t signal = m_signal;
-	auto &buffer = outputs[0];
+	sound_stream::sample_t signal = m_signal;
 
 	if (m_aoe)
 	{
 		double frequency = unscaled_clock() / 8 / 4 / (m_latch + 1) / 2;
-		int rate = buffer.sample_rate() / 2;
+		int rate = stream.sample_rate() / 2;
 
 		/* get progress through wave */
 		int incr = m_incr;
@@ -265,9 +264,9 @@ void cdp1864_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			signal = 1.0;
 		}
 
-		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 		{
-			buffer.put(sampindex, signal);
+			stream.put(0, sampindex, signal);
 			incr -= frequency;
 			while( incr < 0 )
 			{
@@ -280,8 +279,6 @@ void cdp1864_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		m_incr = incr;
 		m_signal = signal;
 	}
-	else
-		buffer.fill(0);
 }
 
 

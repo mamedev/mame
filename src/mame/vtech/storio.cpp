@@ -108,8 +108,7 @@ void vtech_storio_state::vtech_storio_base(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(vtech_storio_state::screen_update_storio));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vtech_storio_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);

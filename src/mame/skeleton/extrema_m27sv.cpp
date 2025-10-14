@@ -52,6 +52,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -69,6 +70,15 @@ void extrema_m27sv_state::video_start()
 void extrema_m27sv_state::program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram();
+	map(0xfe00, 0xffff).ram();
+}
+
+void extrema_m27sv_state::io_map(address_map &map)
+{
+	//map.unmap_value_high();
+	map.global_mask(0xff);
 }
 
 
@@ -116,7 +126,8 @@ void extrema_m27sv_state::extrema_m27sv(machine_config &config)
 {
 	Z80(config, m_maincpu, 36_MHz_XTAL / 8 ); // divider not verified. Or maybe uses one of the 11.0592 XTALs?
 	m_maincpu->set_addrmap(AS_PROGRAM, &extrema_m27sv_state::program_map);
-	// m_maincpu->set_vblank_int("screen", FUNC(extrema_m27sv_state::irq0_line_hold));
+	m_maincpu->set_addrmap(AS_IO, &extrema_m27sv_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(extrema_m27sv_state::irq0_line_hold));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
 	screen.set_refresh_hz(60);

@@ -271,13 +271,12 @@ void snesb51_state::base(machine_config &config)
 	m_ppu->set_screen("screen");
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	S_DSP(config, m_s_dsp, XTAL(24'576'000) / 12);
+	S_DSP(config, m_s_dsp, XTAL(24'576'000));
 	m_s_dsp->set_addrmap(0, &snesb51_state::spc_map);
-	m_s_dsp->add_route(0, "lspeaker", 1.00);
-	m_s_dsp->add_route(1, "rspeaker", 1.00);
+	m_s_dsp->add_route(0, "speaker", 1.00, 0);
+	m_s_dsp->add_route(1, "speaker", 1.00, 1);
 }
 
 void snesb51_state::mk3snes(machine_config &config)
@@ -285,7 +284,7 @@ void snesb51_state::mk3snes(machine_config &config)
 	base(config);
 
 	I8751(config, m_mcu, 12_MHz_XTAL);
-	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
+	m_mcu->set_addrmap(AS_DATA, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
 	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
 	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));
@@ -298,7 +297,7 @@ void snesb51_state::snes4sl(machine_config &config)
 	// exact type unknown
 	I8031(config, m_mcu, 12_MHz_XTAL);
 	m_mcu->set_addrmap(AS_PROGRAM, &snesb51_state::mem_map);
-	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
+	m_mcu->set_addrmap(AS_DATA, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
 	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
 	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));
@@ -314,7 +313,7 @@ void snesb51_state::snes4sln(machine_config &config)
 
 	I8051(config, m_mcu, 12_MHz_XTAL); // SAB 8051A-P
 	m_mcu->set_addrmap(AS_PROGRAM, &snesb51_state::mem_map);
-	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
+	m_mcu->set_addrmap(AS_DATA, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
 	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
 	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));

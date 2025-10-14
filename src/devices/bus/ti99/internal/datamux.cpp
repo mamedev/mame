@@ -205,6 +205,9 @@ void datamux_device::setaddress_all(uint16_t addr)
 	// Cartridge ROM
 	bool iscartrom = ((addr & 0xe000)==0x6000);
 
+	// Speech (1001 0wxx xxxx xxx0)
+	bool sbe = ((addr & 0xf801)==0x9000) && validaccess;
+
 	// Always deliver to GROM so that the select line may be cleared
 	line_state gsq = isgrom? ASSERT_LINE : CLEAR_LINE;
 	if (isgrom) m_grom_idle = false;
@@ -228,6 +231,7 @@ void datamux_device::setaddress_all(uint16_t addr)
 	// I/O port gets all accesses
 	m_memen_state = ASSERT_LINE;
 	m_ioport->memen_in(m_memen_state);
+	m_ioport->sbe(sbe);
 	m_ioport->setaddress_dbin(addr, m_dbin);
 }
 

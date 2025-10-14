@@ -111,8 +111,6 @@ TODO:
 #include "sound/tms36xx.h"
 #include "speaker.h"
 
-#define CLOCK_XTAL 12000000
-
 uint8_t naughtyb_state::in0_port_r()
 {
 	int in0 = ioport("IN0")->read();
@@ -143,6 +141,7 @@ uint8_t naughtyb_state::dsw0_port_r()
    If the values all match then it will jump to 0x0011 instead of 0x0009 (refresh instead of reset)
    Paul Priest: tourniquet@mameworld.net */
 
+// Protection devices are Oki MSM5500RS (IC99A) and Mitsubishi M54824P (IC99B).
 
 uint8_t naughtyb_state::popflame_protection_r()/* Not used by bootleg/hack */
 {
@@ -410,14 +409,11 @@ GFXDECODE_END
 void naughtyb_state::naughtyb_base(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, CLOCK_XTAL / 4); /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 12 MHz clock, divided by 4. CPU is a Z80A
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(36*8, 28*8);
-	m_screen->set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 288, 256, 0, 224);
 	m_screen->set_screen_update(FUNC(naughtyb_state::screen_update));
 	m_screen->set_palette(m_palette);
 

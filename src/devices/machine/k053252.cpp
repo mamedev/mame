@@ -65,7 +65,7 @@ TODO:
 #include "multibyte.h"
 
 
-DEFINE_DEVICE_TYPE(K053252, k053252_device, "k053252", "K053252 Timing/Interrupt Controller")
+DEFINE_DEVICE_TYPE(K053252, k053252_device, "k053252", "Konami 053252 Timing/Interrupt Controller")
 
 k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K053252, tag, owner, clock)

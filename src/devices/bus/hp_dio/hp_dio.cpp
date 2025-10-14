@@ -295,7 +295,7 @@ void device_dio16_card_interface::set_bus(dio16_device &bus)
 
 device_dio16_card_interface::device_dio16_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "hpdio"),
-	m_dio_dev(nullptr), m_next(nullptr)
+	m_dio_dev(nullptr)
 {
 }
 

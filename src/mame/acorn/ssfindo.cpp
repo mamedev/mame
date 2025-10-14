@@ -630,15 +630,14 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));
 	m_iomd->iolines_write().set(FUNC(ssfindo_state::iolines_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	qs1000_device &qs1000(QS1000(config, "qs1000", 24_MHz_XTAL));
 	qs1000.set_external_rom(true);
 	// qs1000.p1_out().set(FUNC()); // TODO: writes something here
 	qs1000.p3_in().set([this]() { return u8(0xfeU | m_txd); });
-	qs1000.add_route(0, "lspeaker", 0.25);
-	qs1000.add_route(1, "rspeaker", 0.25);
+	qs1000.add_route(0, "speaker", 0.25, 0);
+	qs1000.add_route(1, "speaker", 0.25, 1);
 }
 
 void ssfindo_state::ppcar(machine_config &config)

@@ -16,6 +16,11 @@
 
     Thanks to Franklin Bowen for bug fixes, ideas
 
+    TODO:
+    - KONAMI EXG/TFR isn't disassembled accurately:
+      0x3E/0x3F + param bit 7 clear = EXG
+      0x3E/0x3F + param bit 7 set = TFR
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -27,7 +32,7 @@ const char *const m6x09_base_disassembler::m6x09_regs[5] = { "X", "Y", "U", "S",
 const char *const m6x09_base_disassembler::m6x09_btwregs[5] = { "CC", "A", "B", "inv" };
 
 const char *const m6x09_base_disassembler::hd6309_tfmregs[16] = {
-	"D",   "X",   "Y",   "U",   "S", "inv", "inv", "inv",
+	"D",   "X",   "Y",   "U",   "S",   "inv", "inv", "inv",
 	"inv", "inv", "inv", "inv", "inv", "inv", "inv", "inv"
 };
 
@@ -50,7 +55,7 @@ m6x09_base_disassembler::m6x09_base_disassembler(const opcodeinfo *opcodes, size
 	: m_level(level), m_page(0)
 {
 	// create filtered opcode table
-	for (int i=0; i<opcode_count; i++)
+	for (int i = 0; i < opcode_count; i++)
 	{
 		if (opcodes[i].level() & level)
 		{
@@ -198,19 +203,19 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x80)
 			util::stream_format(stream, "PC");
 		if (pb & 0x40)
-			util::stream_format(stream, "%s%s", (pb&0x80)?",":"", (op->mode() == PSHS)?"U":"S");
+			util::stream_format(stream, "%s%s", (pb & 0x80) ? "," : "", (op->mode() == PSHS) ? "U" : "S");
 		if (pb & 0x20)
-			util::stream_format(stream, "%sY",  (pb&0xc0)?",":"");
+			util::stream_format(stream, "%sY",  (pb & 0xc0) ? "," : "");
 		if (pb & 0x10)
-			util::stream_format(stream, "%sX",  (pb&0xe0)?",":"");
+			util::stream_format(stream, "%sX",  (pb & 0xe0) ? "," : "");
 		if (pb & 0x08)
-			util::stream_format(stream, "%sDP", (pb&0xf0)?",":"");
+			util::stream_format(stream, "%sDP", (pb & 0xf0) ? "," : "");
 		if (pb & 0x04)
-			util::stream_format(stream, "%s%s", (pb&0xf8)?",":"", (pb & 0x02) ? "D" : "B");
+			util::stream_format(stream, "%s%s", (pb & 0xf8) ? "," : "", (pb & 0x02) ? "D" : "B");
 		else if (pb & 0x02)
-			util::stream_format(stream, "%sA",  (pb&0xfc)?",":"");
+			util::stream_format(stream, "%sA",  (pb & 0xfc) ? "," : "");
 		if (pb & 0x01)
-			util::stream_format(stream, "%sCC", (pb&0xfe)?",":"");
+			util::stream_format(stream, "%sCC", (pb & 0xfe) ? "," : "");
 		break;
 
 	case PULS:
@@ -219,33 +224,33 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x01)
 			util::stream_format(stream, "CC");
 		if (pb & 0x02)
-			util::stream_format(stream, "%s%s", (pb&0x01)?",":"", (pb & 0x04) ? "D" : "A");
+			util::stream_format(stream, "%s%s", (pb & 0x01) ? "," : "", (pb & 0x04) ? "D" : "A");
 		else if (pb & 0x04)
-			util::stream_format(stream, "%sB",  (pb&0x03)?",":"");
+			util::stream_format(stream, "%sB",  (pb & 0x03) ? "," : "");
 		if (pb & 0x08)
-			util::stream_format(stream, "%sDP", (pb&0x07)?",":"");
+			util::stream_format(stream, "%sDP", (pb & 0x07) ? "," : "");
 		if (pb & 0x10)
-			util::stream_format(stream, "%sX",  (pb&0x0f)?",":"");
+			util::stream_format(stream, "%sX",  (pb & 0x0f) ? "," : "");
 		if (pb & 0x20)
-			util::stream_format(stream, "%sY",  (pb&0x1f)?",":"");
+			util::stream_format(stream, "%sY",  (pb & 0x1f) ? "," : "");
 		if (pb & 0x40)
-			util::stream_format(stream, "%s%s", (pb&0x3f)?",":"", (op->mode() == PULS)?"U":"S");
+			util::stream_format(stream, "%s%s", (pb & 0x3f) ? "," : "", (op->mode() == PULS) ? "U" : "S");
 		if (pb & 0x80)
 		{
-			util::stream_format(stream, "%sPC", (pb&0x7f)?",":"");
+			util::stream_format(stream, "%sPC", (pb & 0x7f) ? "," : "");
 			flags |= STEP_OUT;
 		}
 		break;
 
 	case DIR:
 		ea = params.r8(ppc);
-		util::stream_format(stream, "$%02X", ea);
+		util::stream_format(stream, "<$%02X", ea);
 		break;
 
 	case DIR_IM:
 		assert_hd6309_exclusive();
 		util::stream_format(stream, "#$%02X;", params.r8(ppc));
-		util::stream_format(stream, "$%02X", params.r8(ppc + 1));
+		util::stream_format(stream, "<$%02X", params.r8(ppc + 1));
 		break;
 
 	case REL:
@@ -269,7 +274,7 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		else if (op->operand_length() == 2)
 		{
 			ea = params.r16(ppc);
-			if( !(ea & 0xff00) )
+			if (!(ea & 0xff00))
 			{
 				stream << '>'; // need the '>' to force an assembler to use EXT addressing
 			}
@@ -1145,16 +1150,16 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x2E, 1, "EORA",  IND,    M6x09_GENERAL },
 	{ 0x2F, 1, "EORB",  IND,    M6x09_GENERAL },
 
-	{ 0x30, 1, "ORA",      IMM, M6x09_GENERAL },
-	{ 0x31, 1, "ORB",      IMM, M6x09_GENERAL },
-	{ 0x32, 1, "ORA",      IND, M6x09_GENERAL },
-	{ 0x33, 1, "ORB",      IND, M6x09_GENERAL },
-	{ 0x34, 1, "CMPA",     IMM, M6x09_GENERAL },
-	{ 0x35, 1, "CMPB",     IMM, M6x09_GENERAL },
-	{ 0x36, 1, "CMPA",     IND, M6x09_GENERAL },
-	{ 0x37, 1, "CMPB",     IND, M6x09_GENERAL },
-	{ 0x38, 1, "SETLINES", IMM, M6x09_GENERAL },
-	{ 0x39, 1, "SETLINES", IND, M6x09_GENERAL },
+	{ 0x30, 1, "ORA",   IMM,    M6x09_GENERAL },
+	{ 0x31, 1, "ORB",   IMM,    M6x09_GENERAL },
+	{ 0x32, 1, "ORA",   IND,    M6x09_GENERAL },
+	{ 0x33, 1, "ORB",   IND,    M6x09_GENERAL },
+	{ 0x34, 1, "CMPA",  IMM,    M6x09_GENERAL },
+	{ 0x35, 1, "CMPB",  IMM,    M6x09_GENERAL },
+	{ 0x36, 1, "CMPA",  IND,    M6x09_GENERAL },
+	{ 0x37, 1, "CMPB",  IND,    M6x09_GENERAL },
+	{ 0x38, 1, "SETLN", IMM,    M6x09_GENERAL },
+	{ 0x39, 1, "SETLN", IND,    M6x09_GENERAL },
 	{ 0x3A, 1, "STA",   IND,    M6x09_GENERAL },
 	{ 0x3B, 1, "STB",   IND,    M6x09_GENERAL },
 	{ 0x3C, 1, "ANDCC", IMM,    M6x09_GENERAL },
@@ -1242,7 +1247,7 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x8C, 0, "DECA",  INH,    M6x09_GENERAL },
 	{ 0x8D, 0, "DECB",  INH,    M6x09_GENERAL },
 	{ 0x8E, 1, "DEC",   IND,    M6x09_GENERAL },
-	{ 0x8F, 0, "RTS",   INH ,   M6x09_GENERAL, STEP_OUT },
+	{ 0x8F, 0, "RTS",   INH,    M6x09_GENERAL, STEP_OUT },
 
 	{ 0x90, 0, "TSTA",  INH,    M6x09_GENERAL },
 	{ 0x91, 0, "TSTB",  INH,    M6x09_GENERAL },
@@ -1259,59 +1264,59 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x9C, 0, "ASLA",  INH,    M6x09_GENERAL },
 	{ 0x9D, 0, "ASLB",  INH,    M6x09_GENERAL },
 	{ 0x9E, 1, "ASL",   IND,    M6x09_GENERAL },
-	{ 0x9F, 0, "RTI",   INH ,   M6x09_GENERAL, STEP_OUT },
+	{ 0x9F, 0, "RTI",   INH,    M6x09_GENERAL, STEP_OUT },
 
-	{ 0xA0, 0, "ROLA",     INH,  M6x09_GENERAL },
-	{ 0xA1, 0, "ROLB",     INH,  M6x09_GENERAL },
-	{ 0xA2, 1, "ROL",      IND,  M6x09_GENERAL },
-	{ 0xA3, 1, "LSRW",     IND,  M6x09_GENERAL },
-	{ 0xA4, 1, "RORW",     IND,  M6x09_GENERAL },
-	{ 0xA5, 1, "ASRW",     IND,  M6x09_GENERAL },
-	{ 0xA6, 1, "ASLW",     IND,  M6x09_GENERAL },
-	{ 0xA7, 1, "ROLW",     IND,  M6x09_GENERAL },
-	{ 0xA8, 1, "JMP",      IND,  M6x09_GENERAL },
-	{ 0xA9, 1, "JSR",      IND,  M6x09_GENERAL, STEP_OVER },
-	{ 0xAA, 1, "BSR",      REL,  M6x09_GENERAL, STEP_OVER },
-	{ 0xAB, 2, "LBSR",     LREL, M6x09_GENERAL, STEP_OVER },
-	{ 0xAC, 1, "DECB,JNZ", REL,  M6x09_GENERAL },
-	{ 0xAD, 1, "DECX,JNZ", REL,  M6x09_GENERAL },
-	{ 0xAE, 0, "NOP",      INH,  M6x09_GENERAL },
+	{ 0xA0, 0, "ROLA",  INH,    M6x09_GENERAL },
+	{ 0xA1, 0, "ROLB",  INH,    M6x09_GENERAL },
+	{ 0xA2, 1, "ROL",   IND,    M6x09_GENERAL },
+	{ 0xA3, 1, "LSRW",  IND,    M6x09_GENERAL },
+	{ 0xA4, 1, "RORW",  IND,    M6x09_GENERAL },
+	{ 0xA5, 1, "ASRW",  IND,    M6x09_GENERAL },
+	{ 0xA6, 1, "ASLW",  IND,    M6x09_GENERAL },
+	{ 0xA7, 1, "ROLW",  IND,    M6x09_GENERAL },
+	{ 0xA8, 1, "JMP",   IND,    M6x09_GENERAL },
+	{ 0xA9, 1, "JSR",   IND,    M6x09_GENERAL, STEP_OVER },
+	{ 0xAA, 1, "BSR",   REL,    M6x09_GENERAL, STEP_OVER },
+	{ 0xAB, 2, "LBSR",  LREL,   M6x09_GENERAL, STEP_OVER },
+	{ 0xAC, 1, "DBJNZ", REL,    M6x09_GENERAL },
+	{ 0xAD, 1, "DXJNZ", REL,    M6x09_GENERAL },
+	{ 0xAE, 0, "NOP",   INH,    M6x09_GENERAL },
 
 	{ 0xB0, 0, "ABX",   INH,    M6x09_GENERAL },
 	{ 0xB1, 0, "DAA",   INH,    M6x09_GENERAL },
 	{ 0xB2, 0, "SEX",   INH,    M6x09_GENERAL },
 	{ 0xB3, 0, "MUL",   INH,    M6x09_GENERAL },
-	{ 0xB4, 0, "LMUL",   INH,   M6x09_GENERAL },
-	{ 0xB5, 0, "DIV X,B",   INH,    M6x09_GENERAL },
-	{ 0xB6, 0, "BMOVE Y,X,U", INH, M6x09_GENERAL },
-	{ 0xB7, 0, "MOVE Y,X,U", INH,  M6x09_GENERAL },
-	{ 0xB8, 1, "LSRD",   IMM,   M6x09_GENERAL },
-	{ 0xB9, 1, "LSRD",   IND,   M6x09_GENERAL },
-	{ 0xBA, 1, "RORD",   IMM,   M6x09_GENERAL },
-	{ 0xBB, 1, "RORD",   IND,   M6x09_GENERAL },
-	{ 0xBC, 1, "ASRD",   IMM,   M6x09_GENERAL },
-	{ 0xBD, 1, "ASRD",   IND,   M6x09_GENERAL },
-	{ 0xBE, 1, "ASLD",   IMM,   M6x09_GENERAL },
-	{ 0xBF, 1, "ASLD",   IND,   M6x09_GENERAL },
+	{ 0xB4, 0, "LMUL",  INH,    M6x09_GENERAL },
+	{ 0xB5, 0, "DIV    X,B",   INH, M6x09_GENERAL },
+	{ 0xB6, 0, "BMOVE  Y,X,U", INH, M6x09_GENERAL },
+	{ 0xB7, 0, "MOVE   Y,X,U", INH, M6x09_GENERAL },
+	{ 0xB8, 1, "LSRDI", IMM,    M6x09_GENERAL },
+	{ 0xB9, 1, "LSRWA", IND,    M6x09_GENERAL },
+	{ 0xBA, 1, "RORDI", IMM,    M6x09_GENERAL },
+	{ 0xBB, 1, "RORWA", IND,    M6x09_GENERAL },
+	{ 0xBC, 1, "ASRDI", IMM,    M6x09_GENERAL },
+	{ 0xBD, 1, "ASRWA", IND,    M6x09_GENERAL },
+	{ 0xBE, 1, "ASLDI", IMM,    M6x09_GENERAL },
+	{ 0xBF, 1, "ASLWA", IND,    M6x09_GENERAL },
 
-	{ 0xC0, 1, "ROLD",   IMM,   M6x09_GENERAL },
-	{ 0xC1, 1, "ROLD",   IND,   M6x09_GENERAL },
-	{ 0xC2, 0, "CLRD",   INH,   M6x09_GENERAL },
-	{ 0xC3, 1, "CLRW",   IND,   M6x09_GENERAL },
-	{ 0xC4, 0, "NEGD",   INH,   M6x09_GENERAL },
-	{ 0xC5, 1, "NEGW",   IND,   M6x09_GENERAL },
-	{ 0xC6, 0, "INCD",   INH,   M6x09_GENERAL },
-	{ 0xC7, 1, "INCW",   IND,   M6x09_GENERAL },
-	{ 0xC8, 0, "DECD",   INH,   M6x09_GENERAL },
-	{ 0xC9, 1, "DECW",   IND,   M6x09_GENERAL },
-	{ 0xCA, 0, "TSTD",   INH,   M6x09_GENERAL },
-	{ 0xCB, 1, "TSTW",   IND,   M6x09_GENERAL },
-	{ 0xCC, 0, "ABSA",   INH,   M6x09_GENERAL },
-	{ 0xCD, 0, "ABSB",   INH,   M6x09_GENERAL },
-	{ 0xCE, 0, "ABSD",   INH,   M6x09_GENERAL },
-	{ 0xCF, 0, "BSET A,X,U", INH,   M6x09_GENERAL },
+	{ 0xC0, 1, "ROLDI", IMM,    M6x09_GENERAL },
+	{ 0xC1, 1, "ROLWA", IND,    M6x09_GENERAL },
+	{ 0xC2, 0, "CLRD",  INH,    M6x09_GENERAL },
+	{ 0xC3, 1, "CLRW",  IND,    M6x09_GENERAL },
+	{ 0xC4, 0, "NEGD",  INH,    M6x09_GENERAL },
+	{ 0xC5, 1, "NEGW",  IND,    M6x09_GENERAL },
+	{ 0xC6, 0, "INCD",  INH,    M6x09_GENERAL },
+	{ 0xC7, 1, "INCW",  IND,    M6x09_GENERAL },
+	{ 0xC8, 0, "DECD",  INH,    M6x09_GENERAL },
+	{ 0xC9, 1, "DECW",  IND,    M6x09_GENERAL },
+	{ 0xCA, 0, "TSTD",  INH,    M6x09_GENERAL },
+	{ 0xCB, 1, "TSTW",  IND,    M6x09_GENERAL },
+	{ 0xCC, 0, "ABSA",  INH,    M6x09_GENERAL },
+	{ 0xCD, 0, "ABSB",  INH,    M6x09_GENERAL },
+	{ 0xCE, 0, "ABSD",  INH,    M6x09_GENERAL },
+	{ 0xCF, 0, "BSET   A,X,U", INH, M6x09_GENERAL },
 
-	{ 0xD0, 0, "BSET D,X,U", INH,   M6x09_GENERAL }
+	{ 0xD0, 0, "BSETW  D,X,U", INH, M6x09_GENERAL }
 };
 
 
@@ -1331,12 +1336,12 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 	{
 		"?", /* 0 - extended mode */
 		"?", /* 1 */
-		"x", /* 2 */
-		"y", /* 3 */
+		"X", /* 2 */
+		"Y", /* 3 */
 		"?", /* 4 - direct page */
-		"u", /* 5 */
-		"s", /* 6 */
-		"pc" /* 7 - pc */
+		"U", /* 5 */
+		"S", /* 6 */
+		"PC" /* 7 - pc */
 	};
 
 	int idx = (mode >> 4) & 7;
@@ -1352,19 +1357,19 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 			switch (type & 7)
 			{
 			case 0x00: /* register a */
-				util::stream_format(stream, "[a,%s]", index_reg[idx]);
+				util::stream_format(stream, "[A,%s]", index_reg[idx]);
 				break;
 
 			case 0x01: /* register b */
-				util::stream_format(stream, "[b,%s]", index_reg[idx]);
+				util::stream_format(stream, "[B,%s]", index_reg[idx]);
 				break;
 
 			case 0x04: /* direct - mode */
-				util::stream_format(stream, "[$%02x]", params.r8(p++));
+				util::stream_format(stream, "[<$%02X]", params.r8(p++));
 				break;
 
 			case 0x07: /* register d */
-				util::stream_format(stream, "[d,%s]", index_reg[idx]);
+				util::stream_format(stream, "[D,%s]", index_reg[idx]);
 				break;
 
 			default:
@@ -1377,23 +1382,23 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 			switch (type & 7)
 			{
 			case 0x00: /* register a */
-				util::stream_format(stream, "a,%s", index_reg[idx]);
+				util::stream_format(stream, "A,%s", index_reg[idx]);
 				break;
 
 			case 0x01: /* register b */
-				util::stream_format(stream, "b,%s", index_reg[idx]);
+				util::stream_format(stream, "B,%s", index_reg[idx]);
 				break;
 
 			case 0x04: /* direct - mode */
-				util::stream_format(stream, "$%02x", params.r8(p++));
+				util::stream_format(stream, "<$%02X", params.r8(p++));
 				break;
 
 			case 0x07: /* register d */
-				util::stream_format(stream, "d,%s", index_reg[idx]);
+				util::stream_format(stream, "D,%s", index_reg[idx]);
 				break;
 
 			default:
-				util::stream_format(stream, "????,%s", index_reg[idx]);
+				util::stream_format(stream, "?,%s", index_reg[idx]);
 				break;
 			}
 		}
@@ -1425,9 +1430,9 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 				val = params.r8(p++);
 
 				if (val & 0x80)
-					util::stream_format(stream, "[#$-%02x,%s]", 0x100 - val, index_reg[idx]);
+					util::stream_format(stream, "[#$-%02X,%s]", 0x100 - val, index_reg[idx]);
 				else
-					util::stream_format(stream, "[#$%02x,%s]", val, index_reg[idx]);
+					util::stream_format(stream, "[#$%02X,%s]", val, index_reg[idx]);
 				break;
 
 			case 5: // post word offset
@@ -1435,9 +1440,9 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 				p += 2;
 
 				if (val & 0x8000)
-					util::stream_format(stream, "[#$-%04x,%s]", 0x10000 - val, index_reg[idx]);
+					util::stream_format(stream, "[#$-%04X,%s]", 0x10000 - val, index_reg[idx]);
 				else
-					util::stream_format(stream, "[#$%04x,%s]", val, index_reg[idx]);
+					util::stream_format(stream, "[#$%04X,%s]", val, index_reg[idx]);
 				break;
 
 			case 6: // simple
@@ -1448,7 +1453,7 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 				val = params.r16(p);
 				p += 2;
 
-				util::stream_format(stream, "[$%04x]", val);
+				util::stream_format(stream, "[$%04X]", val);
 				break;
 			}
 		}
@@ -1476,9 +1481,9 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 				val = params.r8(p++);
 
 				if (val & 0x80)
-					util::stream_format(stream, "#$-%02x,%s", 0x100 - val, index_reg[idx]);
+					util::stream_format(stream, "#$-%02X,%s", 0x100 - val, index_reg[idx]);
 				else
-					util::stream_format(stream, "#$%02x,%s", val, index_reg[idx]);
+					util::stream_format(stream, "#$%02X,%s", val, index_reg[idx]);
 				break;
 
 			case 5: // post word offset
@@ -1486,9 +1491,9 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 				p += 2;
 
 				if (val & 0x8000)
-					util::stream_format(stream, "#$-%04x,%s", 0x10000 - val, index_reg[idx]);
+					util::stream_format(stream, "#$-%04X,%s", 0x10000 - val, index_reg[idx]);
 				else
-					util::stream_format(stream, "#$%04x,%s", val, index_reg[idx]);
+					util::stream_format(stream, "#$%04X,%s", val, index_reg[idx]);
 				break;
 
 			case 6: // simple
@@ -1499,7 +1504,7 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 				val = params.r16(p);
 				p += 2;
 
-				util::stream_format(stream, "$%04x", val);
+				util::stream_format(stream, "$%04X", val);
 				break;
 			}
 		}
@@ -1513,11 +1518,12 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 
 void konami_disassembler::register_register(std::ostream &stream, uint8_t pb)
 {
-	static const char konami_teregs[8] =
+	const char *const konami_teregs[8] =
 	{
-		'A', 'B', 'X', 'Y', 'S', 'U', '?', '?'
+		// B: D when reading, B when writing
+		"A", "B", "X", "Y", "DP", "U", "S", "PC"
 	};
-	util::stream_format(stream, "%c,%c",
+	util::stream_format(stream, "%s,%s",
 		konami_teregs[(pb >> 0) & 0x7],
 		konami_teregs[(pb >> 4) & 0x7]);
 }

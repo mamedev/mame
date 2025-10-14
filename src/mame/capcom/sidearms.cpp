@@ -1364,10 +1364,10 @@ void sidearms_state::init_whizz()
 
 // date string is at 0xaa2 in 'rom 03' it does not appear to be displayed
 
-GAME( 1986, sidearms,   0,        sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (World, 861129)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidearmsu,  sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861202)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidearmsur1,sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidearmsj,  sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (Japan, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearms,   0,        sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom",                   "Hyper Dyne Side Arms (World, 861129)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearmsu,  sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom (Romstar license)", "Hyper Dyne Side Arms (US, 861202)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearmsur1,sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom (Romstar license)", "Hyper Dyne Side Arms (US, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearmsj,  sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom",                   "Hyper Dyne Side Arms (Japan, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, turtship,   0,        turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko (Sharp Image license)",   "Turtle Ship (North America)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, turtshipj,  turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", MACHINE_SUPPORTS_SAVE )

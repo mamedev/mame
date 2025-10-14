@@ -62,7 +62,7 @@ public:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_RAINBOW2, bus::amiga::zorro, rainbow2_device)
-DECLARE_DEVICE_TYPE_NS(ZORRO_FRAMEMASTER, bus::amiga::zorro, framemaster_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_RAINBOW2, bus::amiga::zorro, rainbow2_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_FRAMEMASTER, bus::amiga::zorro, framemaster_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_RAINBOW2_H

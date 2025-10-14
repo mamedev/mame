@@ -37,10 +37,9 @@
 TILE_GET_INFO_MEMBER(m90_state::get_tile_info)
 {
 	uint16_t *vram = (uint16_t*)tilemap.user_data();
-	int tile,color;
 
-	tile=vram[tile_index<<1];
-	color=vram[(tile_index<<1)|1];
+	int tile=vram[tile_index<<1];
+	int color=vram[(tile_index<<1)|1];
 	tileinfo.set(0,
 			tile,
 			color&0xf,
@@ -117,6 +116,7 @@ void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const r
 		for (i = 0;i < y_multi;i++)
 
 			if (m_video_control_data[7] & 0x01)
+			{
 				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
@@ -124,7 +124,9 @@ void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const r
 					x,y+i*16,
 					screen.priority(),
 					(colour & 0x08) ? 0x00 : 0x02,0);
+			}
 			else if (m_video_control_data[7] & 0x02)
+			{
 				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
@@ -132,7 +134,9 @@ void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const r
 					x,y+i*16,
 					screen.priority(),
 					((colour & 0x0c)==0x0c) ? 0x00 : 0x02,0);
+			}
 			else
+			{
 				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
@@ -140,6 +144,7 @@ void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const r
 					x,y+i*16,
 					screen.priority(),
 					0x02,0);
+			}
 	}
 }
 
@@ -253,10 +258,10 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 	int const clip_miny = std::min(cliprect.min_y, 511);
 	int const clip_maxy = std::min(cliprect.max_y, 511);
 
-// m_pf_layer[0][0]->enable(pf_enable[0]);
-// m_pf_layer[1][0]->enable(pf_enable[1]);
-// m_pf_layer[0][1]->enable(pf_enable[0]);
-// m_pf_layer[1][1]->enable(pf_enable[1]);
+	// m_pf_layer[0][0]->enable(pf_enable[0]);
+	// m_pf_layer[1][0]->enable(pf_enable[1]);
+	// m_pf_layer[0][1]->enable(pf_enable[0]);
+	// m_pf_layer[1][1]->enable(pf_enable[1]);
 
 	constexpr int rowscroll_offs[2] = { 0xf000 >> 1, 0xf400 >> 1 };
 	constexpr int rowscroll_bias[2] = { 2, -2 };
@@ -401,32 +406,38 @@ uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* Setup scrolling */
-	if (m_video_control_data[6]&0x20) {
+	if (m_video_control_data[6]&0x20)
+	{
 		m_pf_layer[0][0]->set_scroll_rows(512);
 		m_pf_layer[0][1]->set_scroll_rows(512);
-		for (i=std::min(cliprect.min_y,511); i<=std::min(cliprect.max_y,511); i++) {
+		for (int i=std::min(cliprect.min_y,511); i<=std::min(cliprect.max_y,511); i++)
+		{
 			m_pf_layer[0][0]->set_scrollx(i, m_video_data[0xf400/2+i]-12);
 			m_pf_layer[0][1]->set_scrollx(i, m_video_data[0xf400/2+i]-12+256);
 		}
-	} else {
+	}
+	else
+	{
 		m_pf_layer[0][0]->set_scroll_rows(1);
 		m_pf_layer[0][1]->set_scroll_rows(1);
 		m_pf_layer[0][0]->set_scrollx(0, m_video_data[0xf004/2]-12);
 		m_pf_layer[0][1]->set_scrollx(0, m_video_data[0xf004/2]-12);
 	}
 
-	if (m_video_control_data[6] & 0x02) {
+	if (m_video_control_data[6] & 0x02)
+	{
 		m_pf_layer[1][1]->mark_all_dirty();
 		m_pf_layer[1][1]->set_scrollx(0, m_video_data[0xf000/2]-16 );
 		m_pf_layer[1][1]->set_scrolly(0, m_video_data[0xf008/2]+388);
 		m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 0,0);
 		m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 1,1);
-	} else {
+	}
+	else
+	{
 		m_pf_layer[1][0]->mark_all_dirty();
 		m_pf_layer[1][0]->set_scrollx(0, m_video_data[0xf000/2]-16 );
 		m_pf_layer[1][0]->set_scrolly(0, m_video_data[0xf008/2]-120);
@@ -434,12 +445,15 @@ uint32_t m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &
 		m_pf_layer[1][0]->draw(screen, bitmap, cliprect, 1,1);
 	}
 
-	if (m_video_control_data[6] & 0x04) {
+	if (m_video_control_data[6] & 0x04)
+	{
 		m_pf_layer[0][1]->mark_all_dirty();
 		m_pf_layer[0][1]->set_scrolly(0, m_video_data[0xf00c/2]+392);
 		m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 0,0);
 		m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 1,1);
-	} else {
+	}
+	else
+	{
 		m_pf_layer[0][0]->mark_all_dirty();
 		m_pf_layer[0][0]->set_scrolly(0, m_video_data[0xf00c/2]-116);
 		m_pf_layer[0][0]->draw(screen, bitmap, cliprect, 0,0);
@@ -456,14 +470,17 @@ uint32_t m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	if (!(m_video_data[0xf008/2] & 0x4000)) {
+	if (!(m_video_data[0xf008/2] & 0x4000))
+	{
 		m_pf_layer[0][1]->mark_all_dirty();
 		m_pf_layer[0][1]->set_scroll_rows(1);
 		m_pf_layer[0][1]->set_scrollx(0, m_video_data[0xf004/2]+64);
 		m_pf_layer[0][1]->set_scrolly(0, m_video_data[0xf006/2]+512);
 		m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 0,0);
 		m_pf_layer[0][1]->draw(screen, bitmap, cliprect, 1,1);
-	} else {
+	}
+	else
+	{
 		m_pf_layer[0][0]->mark_all_dirty();
 		m_pf_layer[0][0]->set_scroll_rows(1);
 		m_pf_layer[0][0]->set_scrollx(0, m_video_data[0xf004/2]+64);
@@ -472,14 +489,17 @@ uint32_t m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &
 		m_pf_layer[0][0]->draw(screen, bitmap, cliprect, 1,1);
 	}
 
-	if (!(m_video_data[0xf008/2] & 0x8000)) {
+	if (!(m_video_data[0xf008/2] & 0x8000))
+	{
 		m_pf_layer[1][1]->mark_all_dirty();
 		m_pf_layer[1][1]->set_scroll_rows(1);
 		m_pf_layer[1][1]->set_scrollx(0, m_video_data[0xf000/2]+68);
 		m_pf_layer[1][1]->set_scrolly(0, m_video_data[0xf002/2]+512);
 		m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 0,0);
 		m_pf_layer[1][1]->draw(screen, bitmap, cliprect, 1,1);
-	} else {
+	}
+	else
+	{
 		m_pf_layer[1][0]->mark_all_dirty();
 		m_pf_layer[1][0]->set_scroll_rows(1);
 		m_pf_layer[1][0]->set_scrollx(0, m_video_data[0xf000/2]+68);

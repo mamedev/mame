@@ -9,16 +9,17 @@
 
 
 Usage:
+
     When you're 100% sure there is a given crystal or resonator on a
     PCB, use XTAL(frequency) to document so.  That xtal object then
     collates multiplies or divides done to the base frequency to
     compute the final one.
 
-    If you recieve a XTAL object and want to turn it to a final
+    If you receive a XTAL object and want to turn it to a final
     frequency, use value() to get an integer or dvalue() to get a
     double.
 
-    If you recieve a XTAL object and want to check if the initial
+    If you receive a XTAL object and want to check if the initial
     crystal value is sane, use check(context message).  It will
     fatalerror if the value is not in the authorized value list.  It
     has a (small) cost, so don't do it in a hot path.
@@ -35,7 +36,6 @@ Usage:
 
 ***************************************************************************/
 
-
 #ifndef MAME_EMU_XTAL_H
 #define MAME_EMU_XTAL_H
 
@@ -43,9 +43,9 @@ Usage:
 
 #pragma once
 
-class XTAL {
+class XTAL
+{
 public:
-
 	constexpr explicit XTAL(double base_clock) : m_base_clock(base_clock), m_current_clock(base_clock) {}
 
 	constexpr double dvalue() const noexcept { return m_current_clock; }

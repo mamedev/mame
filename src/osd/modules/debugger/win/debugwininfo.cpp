@@ -47,7 +47,9 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 	m_wnd = win_create_window_ex_utf8(
 			DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
 			0, 0, 100, 100,
-			dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window(),
+			debugger.get_group_windows()
+				? dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window()
+				: nullptr,
 			create_standard_menubar(),
 			GetModuleHandleUni(),
 			this);
@@ -78,6 +80,13 @@ void debugwin_info::destroy()
 		m_views[curview].reset();
 	DestroyWindow(m_wnd);
 }
+
+
+bool debugwin_info::owns_window(HWND win) const
+{
+	return (win == m_wnd) || IsChild(m_wnd, win);
+}
+
 
 bool debugwin_info::set_default_focus()
 {
@@ -352,6 +361,10 @@ void debugwin_info::restore_configuration_from_node(util::xml::data_node const &
 }
 
 
+// Set the bounds for the corresponding debug_viewinfo.  This implementation
+// is only intended for use with win_infos that appear solely as an
+// independent free-floating window.  win_infos that can appear as a frame
+// within the main consolewin_info should override this.
 void debugwin_info::recompute_children()
 {
 	if (m_views[0] != nullptr)

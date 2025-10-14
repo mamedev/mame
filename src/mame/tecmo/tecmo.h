@@ -34,12 +34,13 @@ public:
 		m_dsw(*this, {"DSWA", "DSWB"})
 	{ }
 
-	void geminib(machine_config &config);
-	void backfirt(machine_config &config);
-	void silkworm(machine_config &config);
-	void gemini(machine_config &config);
 	void rygar(machine_config &config);
+	void gemini(machine_config &config);
+	void geminib(machine_config &config);
+	void silkworm(machine_config &config);
+	void silkwormj(machine_config &config);
 	void silkwormp(machine_config &config);
+	void backfirt(machine_config &config);
 
 	void init_silkworm();
 	void init_rygar();
@@ -47,7 +48,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -74,13 +74,15 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void gemini_map(address_map &map) ATTR_COLD;
 	void rygar_map(address_map &map) ATTR_COLD;
-	void rygar_sound_map(address_map &map) ATTR_COLD;
+	void gemini_map(address_map &map) ATTR_COLD;
 	void silkworm_map(address_map &map) ATTR_COLD;
-	void tecmo_sound_map(address_map &map) ATTR_COLD;
+
+	void rygar_sound_map(address_map &map) ATTR_COLD;
+	void geminib_sound_map(address_map &map) ATTR_COLD;
+	void gemini_sound_map(address_map &map) ATTR_COLD;
+	void silkwormj_sound_map(address_map &map) ATTR_COLD;
 	void silkwormp_sound_map(address_map &map) ATTR_COLD;
-	void backfirt_sound_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -100,7 +102,6 @@ private:
 	required_shared_ptr<uint8_t> m_bgscroll;
 
 	optional_region_ptr<uint8_t> m_adpcm_rom;
-
 	required_memory_bank m_mainbank;
 
 	// I/O ports
@@ -113,9 +114,10 @@ private:
 	int m_video_type = 0;
 
 	// ADPCM related
-	int32_t m_adpcm_pos = 0;
-	int32_t m_adpcm_end = 0;
-	int32_t m_adpcm_data = 0;
+	uint8_t m_adpcm_end = 0;
+	uint16_t m_adpcm_pos = 0;
+	bool m_adpcm_toggle = false;
+	bool m_adpcm_enabled = false;
 };
 
 #endif // MAME_TECMO_TECMO_H

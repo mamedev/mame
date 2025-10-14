@@ -163,12 +163,6 @@ Notes:
 
 Notes:
 -----
-
-- Sprites cover the top and bottom non-scrolling portions of the fg. This
-  includes the cookie cut light in round 19, which makes text disappear from
-  those areas. This looks odd, but it's the correct behaviour verified on the
-  real hardware.
-
 - There is an Easter egg in the service mode:
   1) Go into the service mode
   2) Press left or right to change the sound effect until it's $18
@@ -187,6 +181,16 @@ Notes:
   YURI.
   NEGIE
   S#TOU (# is the small ghost sprite)
+
+
+BTANB:
+-----
+- Sprites cover the top and bottom non-scrolling portions of the fg. This
+  includes the cookie cut light in round 19, which makes text disappear from
+  those areas. This looks odd, but it's the correct behaviour verified on the
+  real hardware.
+
+- Jump sound effect is silent for a while after car horn sound effect.
 
 ***************************************************************************/
 
