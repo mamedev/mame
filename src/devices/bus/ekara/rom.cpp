@@ -11,7 +11,7 @@
 DEFINE_DEVICE_TYPE(EKARA_ROM_PLAIN,         ekara_rom_plain_device,       "ekara_rom_plain",        "EKARA Cartridge")
 DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_BASE,      ekara_rom_i2c_base_device,    "ekara_rom_i2c_base",     "EKARA Cartridge with I2C")
 DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24C08_EPITCH,     ekara_rom_i2c_24c08_epitch_device,   "ekara_rom_i2c_24c08",    "EKARA Cartridge with I2C 24C08 (e-pitch)")
-DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC04,    ekara_rom_i2c_24lc04_device,  "ekara_rom_i2c_24lc04",   "EKARA Cartridge with I2C 24LC04")
+DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC04,    ekara_rom_i2c_24lc04_device,  "ekara_rom_i2c_24lc04",   "EKARA Cartridge with I2C 24LC04 (Jumping Popira)")
 DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC02,    ekara_rom_i2c_24lc02_device,  "ekara_rom_i2c_24lc02",   "EKARA Cartridge with I2C 24LC02")
 DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC02_GC0010,    ekara_rom_i2c_24lc02_gc0010_device,  "ekara_rom_i2c_24lc02_gc0010",   "EKARA Cartridge with I2C 24LC02 (GC0010 direct access)")
 DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC08_EVIO,    ekara_rom_i2c_24lc08_evio_device,  "ekara_rom_i2c_24lc08_evio",   "EKARA Cartridge with I2C 24LC08 (evio direct access)")
@@ -34,6 +34,7 @@ ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconf
 	m_i2cmem(*this, "i2cmem")
 {
 	m_buscontrol[0] = m_buscontrol[1] = m_buscontrol[2] = 0x00;
+	m_bus_write_control_mask = 0x08;
 }
 
 ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -49,6 +50,7 @@ ekara_rom_i2c_24c08_epitch_device::ekara_rom_i2c_24c08_epitch_device(const machi
 ekara_rom_i2c_24lc04_device::ekara_rom_i2c_24lc04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_24LC04, tag, owner, clock)
 {
+	m_bus_write_control_mask = 0x04;
 }
 
 ekara_rom_i2c_24lc02_device::ekara_rom_i2c_24lc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -106,7 +108,7 @@ bool ekara_rom_i2c_base_device::is_read_access_not_rom(void)
 
 bool ekara_rom_i2c_base_device::is_write_access_not_rom(void)
 {
-	return (m_buscontrol[0] & 0x08) ? true : false;
+	return (m_buscontrol[0] & m_bus_write_control_mask) ? true : false;
 }
 
 void ekara_rom_i2c_base_device::write_bus_control(offs_t offset, uint8_t data)
