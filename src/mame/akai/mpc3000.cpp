@@ -143,8 +143,10 @@ private:
 	void mpc3000_io_map(address_map &map) ATTR_COLD;
 	void mpc3000_sub_map(address_map &map) ATTR_COLD;
 
-	uint16_t dma_memr_cb(offs_t offset);
-	void dma_memw_cb(offs_t offset, uint16_t data);
+	uint8_t dma_memr_cb(offs_t offset);
+	void dma_memw_cb(offs_t offset, uint8_t data);
+	uint16_t dma_mem16r_cb(offs_t offset);
+	void dma_mem16w_cb(offs_t offset, uint16_t data);
 	void mpc3000_palette(palette_device &palette) const;
 
 	uint8_t subcpu_pa_r();
@@ -188,14 +190,24 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x00f8, 0x00ff).rw("adcexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
-uint16_t mpc3000_state::dma_memr_cb(offs_t offset)
+uint16_t mpc3000_state::dma_mem16r_cb(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_word(offset << 1);
 }
 
-void mpc3000_state::dma_memw_cb(offs_t offset, uint16_t data)
+void mpc3000_state::dma_mem16w_cb(offs_t offset, uint16_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_word(offset << 1, data);
+}
+
+uint8_t mpc3000_state::dma_memr_cb(offs_t offset)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+void mpc3000_state::dma_memw_cb(offs_t offset, uint8_t data)
+{
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
 void mpc3000_state::mpc3000_sub_map(address_map &map)
@@ -243,12 +255,13 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_map);
 	m_maincpu->set_addrmap(AS_IO, &mpc3000_state::mpc3000_io_map);
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v53a_device::hack_w));
-	m_maincpu->in_mem16r_cb().set(FUNC(mpc3000_state::dma_memr_cb));
-	m_maincpu->out_mem16w_cb().set(FUNC(mpc3000_state::dma_memw_cb));
+	m_maincpu->in_memr_cb().set(FUNC(mpc3000_state::dma_memr_cb));
+	m_maincpu->out_memw_cb().set(FUNC(mpc3000_state::dma_memw_cb));
+	m_maincpu->in_mem16r_cb().set(FUNC(mpc3000_state::dma_mem16r_cb));
+	m_maincpu->out_mem16w_cb().set(FUNC(mpc3000_state::dma_mem16w_cb));
 	m_maincpu->out_eop_cb().set("tc", FUNC(input_merger_device::in_w<0>));
 	m_maincpu->in_ior_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
 	m_maincpu->out_iow_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
-	m_maincpu->out_dack_cb<1>().set("tc", FUNC(input_merger_device::in_w<1>));
 	m_maincpu->in_ior_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_r));
 	m_maincpu->out_iow_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_w));
 	m_maincpu->in_io16r_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_r16_cb));
