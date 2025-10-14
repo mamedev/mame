@@ -26,8 +26,9 @@ TODO (pc9821as):
 - "SYSTEM SHUTDOWN" while accessing above;
 - Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
 
-TODO (pc9821ce2):
-- Incomplete dump, getitf98 style dump known to exist;
+TODO (pc9821ce):
+- Acts funny with SDIP, decides to override with an unusable format (all settings 1-filled);
+- Needs SCSI to boot stuff, or 2.5" option IDE for 98NOTE;
 
 TODO (pc9821cx3):
 - "MICON ERROR" at POST, we currently return a ready state in remote control register
@@ -621,6 +622,54 @@ void pc9821_mate_a_state::pc9821as_io(address_map &map)
  * CanBe overrides
  */
 
+void pc9821_canbe_state::itf_43d_bank_w(offs_t offset, uint8_t data)
+{
+	// assume overlay disabled on writes to $43d
+	m_bios_view.disable();
+	pc9801vm_state::itf_43d_bank_w(offset, data);
+}
+
+void pc9821_canbe_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
+{
+	if ((data & 0xf8) == 0xe0)
+	{
+		logerror("C-Bus overlay set %02x\n", data);
+		m_bios_view.select(data & 0x7);
+		return;
+	}
+
+	// Exit setup mode disarms overlay with a 0xe8 write
+	// (or writes are >> 1 and undocumented mem is wrong?)
+	if ((data & 0xf8) == 0xe8)
+	{
+		logerror("C-Bus overlay disable (%02x)\n", data);
+		m_bios_view.disable();
+		return;
+	}
+
+	pc9801vm_state::cbus_43f_bank_w(offset, data);
+}
+
+
+void pc9821_canbe_state::pc9821ce_map(address_map &map)
+{
+	pc9821_map(map);
+	map(0x000f8000, 0x000fffff).view(m_bios_view);
+	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x18000);
+}
+
+void pc9821_canbe_state::pc9821ce_io(address_map &map)
+{
+	pc9821_io(map);
+	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) {
+		if (data == 0xa0 || data == 0xe0)
+			m_sdip->bank_w(BIT(data, 6));
+		else
+			a20_ctrl_w(3, data);
+	}));
+}
+
+
 /*
  * CanBe Remote control
  * I/O $f4a: remote index (write only?)
@@ -699,6 +748,7 @@ void pc9821_canbe_state::pc9821cx3_map(address_map &map)
 	map(0x000c0000, 0x000dffff).ram();
 }
 
+// TODO: SDIP port
 void pc9821_canbe_state::pc9821cx3_io(address_map &map)
 {
 	pc9821_io(map);
@@ -862,21 +912,25 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 }
 
-void pc9821_canbe_state::pc9821ce2(machine_config &config)
+void pc9821_canbe_state::pc9821ce(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(25'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486sx
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821ce_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821ce_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
-
-	m_cbus[0]->set_default_option("pc9801_118");
+	config_floppy_35hd(config);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 }
+
+//void pc9821_canbe_state::pc9821ce2(machine_config &config)
+//{
+//	pc9821ce(config);
+//	m_cbus[0]->set_default_option("pc9801_118");
+//}
 
 void pc9821_canbe_state::pc9821cx3(machine_config &config)
 {
@@ -1163,21 +1217,52 @@ cfr. https://github.com/angelosa/mame_scratch/blob/main/src/redwood1.cpp
 //  ROM_LOAD( "font_ne.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
 
 /*
-98MULTi Ce2 - 80486SX 25
+98MULTi Ce - 80486SX 25
+
+3.5 x2
+1.6MB ~ 14.6MB model S1
+5.6MB ~ 14.6MB model S2
+pc9801-86
+
 */
 
-ROM_START( pc9821ce2 )
+ROM_START( pc9821ce )
+	ROM_REGION16_LE( 0x80000, "biosrom", ROMREGION_ERASEFF )
+	// second half blank
+	ROM_LOAD( "nyf5200_d27c4000d-15.bin", 0x000000, 0x080000, CRC(4c2fa623) SHA1(3acc1da7e32711a7579575b1520b44f6b2c3c2f8) )
+
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// baddump: missing setup menu bank
-	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, BAD_DUMP CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
-	ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
+	// 0x00000 KBCRT X47 891105
+	// 0x0c000 sound BIOS
+	// 0x10000 sound BIOS copy
+	// 0x16000 <to be identified>
+	// 0x1a000 setup menu
+	ROM_COPY( "biosrom", 0x38000, 0x28000, 0x08000 )
+	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x08000 )
+	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
 	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
+	// Uses SCSI not IDE
+//	LOAD_IDE_ROM
 ROM_END
+
+
+/*
+98MULTi Ce2 - 80486SX 25
+
+Retired: missing setup menu bank
+getitf98 dump known to exist, in case anyone bothers to assemble a franken def ...
+*/
+
+//ROM_START( pc9821ce2 )
+//	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+//	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, BAD_DUMP CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
+//	ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
+
 
 /*
 PC-9821CX3
@@ -1488,8 +1573,9 @@ COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_
 // ...
 
 // 98MULTi CanBe (i486/Pentium, desktop & tower, Multimedia PC with optional TV Tuner & remote control function, Fax, Modem, MPEG-2, FX-98IF for PC-FX compatibility etc. etc.)
-COMP( 1994, pc9821ce2,   0,           0, pc9821ce2,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
-COMP( 1995, pc9821cx3,   pc9821ce2,   0, pc9821cx3,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
+COMP( 1993, pc9821ce,   0,         0, pc9821ce,     pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce (98MULTi CanBe)",    MACHINE_NOT_WORKING )
+//COMP( 1994, pc9821ce2,  pc9821ce,  0, pc9821ce2,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
+COMP( 1995, pc9821cx3,  0,         0, pc9821cx3,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
 
 // 98MULTi CanBe Jam (Pentium Pro equipped, laptop, Multimedia PC as above + JEIDA 4.2/PCMCIA 2.1)
 // ...
