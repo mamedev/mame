@@ -1179,6 +1179,15 @@ ROM_START( ngen )
 ROM_END
 
 // not sure just how similar these systems are to the 80186 model, but are here at the moment to document the dumps
+ROM_START( ngen386 )
+	ROM_REGION32_LE( 0x4000, "bios", 0)
+	ROM_LOAD16_BYTE( "72-00992.6f",  0x000000, 0x002000, CRC(0a6ca028) SHA1(3077447314418e2278523b34e457a42970e2a0dc) )
+	ROM_LOAD16_BYTE( "72-00179.6d",  0x000001, 0x002000, CRC(2ab8b08a) SHA1(23df741904a4fe016f957cf6134601287c1b5f31) )
+
+	ROM_REGION16_LE( 0x2000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x2000, "fontram", ROMREGION_ERASE00 )
+ROM_END
+
 ROM_START( ngenb38 )
 	ROM_REGION32_LE( 0x2000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-168_fpc_386_cpu.bin",  0x000000, 0x001000, CRC(250a3b68) SHA1(49c070514bac264fa4892f284f7d2c852ae6605d) )
@@ -1204,5 +1213,6 @@ ROM_END
 
 
 COMP( 1983, ngen,    0,    0, ngen,    ngen, ngen_state,    empty_init, "Convergent Technologies",  "NGEN CP-001", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 199?, ngen386, ngen, 0, _386i,   ngen, ngen386_state, empty_init, "Convergent Technologies",  "NGEN 386",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 1991, ngenb38, ngen, 0, ngen386, ngen, ngen386_state, empty_init, "Financial Products Corp.", "B28/38",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 1990, 386i,    ngen, 0, _386i,   ngen, ngen386_state, empty_init, "Convergent Technologies",  "386i",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
