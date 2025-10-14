@@ -5924,6 +5924,8 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/opti82c861.h",
 		MAME_DIR .. "src/devices/bus/pci/pdc20262.cpp",
 		MAME_DIR .. "src/devices/bus/pci/pdc20262.h",
+		MAME_DIR .. "src/devices/bus/pci/permedia2.cpp",
+		MAME_DIR .. "src/devices/bus/pci/permedia2.h",
 		MAME_DIR .. "src/devices/bus/pci/promotion.cpp",
 		MAME_DIR .. "src/devices/bus/pci/promotion.h",
 		MAME_DIR .. "src/devices/bus/pci/riva128.cpp",
