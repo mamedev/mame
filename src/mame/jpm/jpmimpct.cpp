@@ -106,6 +106,10 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 #include "jpmimpct.lh"
 #include "cluedo.lh"
+#include "scrabble.lh"
+#include "hngmnjpm.lh"
+#include "coronatn.lh"
+#include "tqst.lh"
 
 
 DEFINE_DEVICE_TYPE(JPM_TOUCHSCREEN, jpmtouch_device, "jpmtouch", "JPM Touchscreen")
@@ -439,7 +443,20 @@ void jpmimpct_state::lamps_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void jpmimpct_state::digits_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_digits[m_lamp_strobe & 0xf] = data;
+	// This bit mapping is based on Scrabble which appears to be only game in this driver that uses 16-segment displays
+	// The actual Scrabble machine has 16 segment displays, however, the top 2 and bottom 2 LEDs are always driven in unisson like 14-segment display
+	// - Bit 3 is used for each of the bottom two segments
+	// - Bits 7 and 15 are used for the top two segments.  Each letter has either both set or both clear
+	int digit_index = (m_lamp_strobe / 2) & 0x7;
+	int data_shift = !(m_lamp_strobe & 1) * 8;
+	uint16_t masked_data = (data & mem_mask) << data_shift;
+	uint16_t temp_mask = 0, temp_digit = 0;
+
+	temp_mask =
+                bitswap<16>(0xff << data_shift, 10, 9, 1, 2, 0, 8, 14, 6, 5, 4, 3, 3, 12, 13, 7, 15);
+	temp_digit =
+                bitswap<16>(masked_data, 10, 9, 1, 2, 0, 8, 14, 6, 5, 4, 3, 3, 12, 13, 7, 15);
+	m_digits[digit_index] = (m_digits[digit_index] & ~temp_mask & 0xFFFF) | temp_digit;
 }
 
 void jpmimpct_state::lampstrobe_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1847,17 +1864,17 @@ GAMEL( 1995, cluedo2,   cluedo,   impact_video_touch, cluedo,   jpmimpct_video_s
 GAME( 1996, trivialp,  0,        impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialpd, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialpo, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabble,  0,        impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabbled, scrabble, impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAMEL( 1997, scrabble,  0,        impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE, layout_scrabble )
+GAMEL( 1997, scrabbled, scrabble, impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE, layout_scrabble )
 
 // Non Touchscreen
-GAME( 1998, hngmnjpm,  0,        impact_video, hngmnjpm, jpmimpct_video_state, empty_init, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hngmnjpmd, hngmnjpm, impact_video, hngmnjpm, jpmimpct_video_state, empty_init, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, hngmnjpm,  0,        impact_video, hngmnjpm, jpmimpct_video_state, empty_init, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE, layout_hngmnjpm )
+GAMEL( 1998, hngmnjpmd, hngmnjpm, impact_video, hngmnjpm, jpmimpct_video_state, empty_init, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE, layout_hngmnjpm )
+GAMEL( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE, layout_coronatn )
+GAMEL( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE, layout_coronatn )
 // This acts a bit like a touchscreen game, is there an unmapped Dipswitch to enable touch support, or a different software revision?
-GAME( 1996, tqst,      0,        impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_SUPPORTS_SAVE)
-GAME( 1996, tqstp,     tqst,     impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest (Protocol)"  , MACHINE_SUPPORTS_SAVE)
+GAMEL( 1996, tqst,      0,        impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_SUPPORTS_SAVE, layout_tqst )
+GAMEL( 1996, tqstp,     tqst,     impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest (Protocol)"  , MACHINE_SUPPORTS_SAVE, layout_tqst )
 
 // sets below are incomplete, missing video ROMs etc.
 GAME( 199?, snlad,     0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete

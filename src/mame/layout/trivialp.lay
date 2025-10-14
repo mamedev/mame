@@ -1,0 +1,1417 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+license: CC0-1.0
+-->
+<mamelayout version="2">
+	<!-- undefined lamp - used for lamps with undefined locations and purposes -->
+	<element name="undefined_lamp">
+		<disk state="1"><color red="1.0" green="1.0" blue="0.2" /></disk>
+		<disk state="0"><color red="0.1" green="0.1" blue="0.0" /></disk>
+	</element>
+	<!-- debug lamp - used for lamps with debug information -->
+	<repeat count="256">
+		<param name="n" start="0" increment="1"/>
+		<element name="debug_lamp_label_~n~">
+				<rect state="0">
+					<color red="0.00" green="0.20" blue="0.00"/>
+				</rect>
+				<rect state="1">
+					<color red="0.00" green="1.00" blue="0.00"/>
+				</rect>
+			<text string="~n~">
+				<color red="0.0" green="0.0" blue="0.0"/>
+				<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+			</text>
+		</element>
+	</repeat>
+
+	<element name="pass_button">
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.30" green="0.30" blue="0.00" /></rect>
+	</element>
+	<element name="pass_button_label">
+		<text string="Pass" state="1">
+			<color red="1.00" green="1.00" blue="1.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+		<text string="Pass" state="0">
+			<color red="0.00" green="0.00" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+	</element>
+
+		<!-- Skill Stop -->
+	<element name="skill_stop">
+		<text string="Skill Stop" state="1">
+			<color red="1.00" green="1.00" blue="1.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+		<text string="Skill Stop" state="0">
+			<color red="0.00" green="0.00" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+	</element>
+
+		<!-- Passes -->
+	<element name="1_pass">
+		<text string="One Pass" state="1">
+			<color red="0.80" green="0.80" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+		<text string="One Pass" state="0">
+			<color red="0.10" green="0.10" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+	</element>
+	<element name="2_passes">
+		<text string="2 Passes" state="1">
+			<color red="0.80" green="0.80" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+		<text string="2 Passes" state="0">
+			<color red="0.10" green="0.10" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+	</element>
+	<element name="3_passes">
+		<text string="3 Passes" state="1">
+			<color red="0.80" green="0.80" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+		<text string="3 Passes" state="0">
+			<color red="0.10" green="0.10" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+	</element>
+
+		<!-- All Prizes Doubled -->
+	<element name="all_text">
+		<text string="ALL" state="1">
+			<color red="1.00" green="0.00" blue="0.17" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="ALL" state="0">
+			<color red="0.05" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="prizes_text">
+		<text string="PRIZES" state="1">
+			<color red="1.00" green="0.00" blue="0.17" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="PRIZES" state="0">
+			<color red="0.05" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="doubled_text">
+		<text string="DOUBLED" state="1">
+			<color red="1.00" green="0.00" blue="0.17" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="DOUBLED" state="0">
+			<color red="0.05" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+		<!-- Prizes -->
+	<element name="prize_wedge_0deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#725142" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#1c140f" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="1pound_award">
+		<disk state="1">
+			<color red="1.00" green="1.00" blue="1.00" />
+			<bounds x="0.00" y="0.50" width="0.33" height="0.33" />
+		</disk>
+		<disk state="0">
+			<color red="0.30" green="0.30" blue="0.30" />
+			<bounds x="0.00" y="0.50" width="0.33" height="0.33" />
+		</disk>
+		<text string="£1" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.33" y="0.00" width="0.67" height="1.00" />
+		</text>
+		<text string="£1" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.33" y="0.00" width="0.67" height="1.00" />
+		</text>
+	</element>
+	<element name="2pound_award">
+		<disk state="1">
+			<color red="1.00" green="1.00" blue="1.00" />
+			<bounds x="0.00" y="0.50" width="0.25" height="0.33" />
+		</disk>
+		<disk state="0">
+			<color red="0.30" green="0.30" blue="0.30" />
+			<bounds x="0.00" y="0.50" width="0.25" height="0.33" />
+		</disk>
+		<disk state="1">
+			<color red="1.00" green="1.00" blue="1.00" />
+			<bounds x="0.25" y="0.50" width="0.25" height="0.33" />
+		</disk>
+		<disk state="0">
+			<color red="0.30" green="0.30" blue="0.30" />
+			<bounds x="0.25" y="0.50" width="0.25" height="0.33" />
+		</disk>
+		<text string="£2" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.50" height="1.00" />
+		</text>
+		<text string="£2" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.50" height="1.00" />
+		</text>
+	</element>
+	<element name="3pound_award">
+		<text string="£3" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£3" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="4pound_award">
+		<text string="£4" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£4" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="5pound_award">
+		<text string="£5" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£5" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="10pound_award">
+		<text string="£10" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£10" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+
+	<element name="pays_20pounds_when_completed">
+		<text string="PAYS £20" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.60" />
+		</text>
+		<text string="PAYS £20" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.60" />
+		</text>
+		<text string="WHEN COMPLETED" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.65" width="0.90" height="0.40" />
+		</text>
+		<text string="WHEN COMPLETED" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.65" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="20pound">
+		<text string="£20" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.00" y="0.00" width="1.00" height="1.00" />
+		</text>
+		<text string="£20" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.00" y="0.00" width="1.00" height="1.00" />
+		</text>
+	</element>
+	<element name="maximum_prize">
+		<text string="MAXIMUM PRIZE" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.00" y="0.00" width="1.00" height="1.00" />
+		</text>
+		<text string="MAXIMUM PRIZE" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.00" y="0.00" width="1.00" height="1.00" />
+		</text>
+	</element>
+
+		<!-- Music wedges -->
+	<element name="music_wedge_0deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#725142" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#1c140f" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="music_wedge_60deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#725142" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#1c140f" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="music_wedge_120deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#725142" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#1c140f" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="music_wedge_180deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#725142" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#1c140f" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="music_wedge_240deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#725142" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#1c140f" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="music_wedge_300deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#725142" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#1c140f" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+
+		<!-- Geography wedges -->
+	<element name="geography_wedge_0deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="007aa5" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#001e28" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="geography_wedge_60deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="007aa5" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#001e28" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="geography_wedge_120deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="007aa5" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#001e28" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="geography_wedge_180deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="007aa5" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#001e28" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="geography_wedge_240deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="007aa5" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#001e28" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="geography_wedge_300deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="007aa5" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#001e28" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+
+		<!-- Sports and Leisure wedges -->
+	<element name="sports_and_leisure_wedge_0deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#ce6b00" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#331900" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="sports_and_leisure_wedge_60deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#ce6b00" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#331900" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="sports_and_leisure_wedge_120deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#ce6b00" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#331900" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="sports_and_leisure_wedge_180deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#ce6b00" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#331900" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="sports_and_leisure_wedge_240deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#ce6b00" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#331900" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="sports_and_leisure_wedge_300deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#ce6b00" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#331900" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+
+		<!-- General Knowledge wedges -->
+	<element name="general_knowledge_wedge_0deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#bcb500" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#2d2b00" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="general_knowledge_wedge_60deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#bcb500" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#2d2b00" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="general_knowledge_wedge_120deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#bcb500" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#2d2b00" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="general_knowledge_wedge_180deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#bcb500" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#2d2b00" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="general_knowledge_wedge_240deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#bcb500" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#2d2b00" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="general_knowledge_wedge_300deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#bcb500" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#2d2b00" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+
+		<!-- Entertainment wedges -->
+	<element name="entertainment_wedge_0deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#a53863" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#280c16" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="entertainment_wedge_60deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#a53863" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#280c16" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="entertainment_wedge_120deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#a53863" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#280c16" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="entertainment_wedge_180deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#a53863" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#280c16" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="entertainment_wedge_240deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#a53863" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#280c16" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="entertainment_wedge_300deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#a53863" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#280c16" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+
+		<!-- Science and Nature wedges -->
+	<element name="science_and_nature_wedge_0deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#006328" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 -0.866 A 1 1 0 0 1 0.5 -0.866 Z" fill="#00160a" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="science_and_nature_wedge_60deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#006328" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 -0.866 A 1 1 0 0 1 1 0 Z" fill="#00160a" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="science_and_nature_wedge_120deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#006328" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 1 0 A 1 1 0 0 1 0.5 0.866 Z" fill="#00160a" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="science_and_nature_wedge_180deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#006328" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L 0.5 0.866 A 1 1 0 0 1 -0.5 0.866 Z" fill="#00160a" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="science_and_nature_wedge_240deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#006328" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -0.5 0.866 A 1 1 0 0 1 -1 0 Z" fill="#00160a" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+	<element name="science_and_nature_wedge_300deg">
+		<image state="1">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#006328" />
+				</svg>]]>
+			</data>
+		</image>
+		<image state="0">
+			<data>
+				<![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-1 -1 2 2">
+					<path d="M 0 0 L -1 0 A 1 1 0 0 1 -0.5 -0.866 Z" fill="#00160a" />
+				</svg>]]>
+			</data>
+		</image>
+	</element>
+
+
+		<!-- category headquarters -->
+	<element name="music_headquarters">
+		<rect state="1"><color red="0.45" green="0.32" blue="0.26" /></rect>
+		<rect state="0"><color red="0.11" green="0.08" blue="0.06" /></rect>
+		<text string="Music">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.35" width="0.90" height="0.40"/>
+		</text>
+	</element>
+	<element name="geography_headquarters">
+		<rect state="1"><color red="0.00" green="0.48" blue="0.65" /></rect>
+		<rect state="0"><color red="0.00" green="0.12" blue="0.16" /></rect>
+		<text string="Geography">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.35" width="0.90" height="0.40"/>
+		</text>
+	</element>
+	<element name="sports_and_leisure_headquarters">
+		<rect state="1"><color red="0.81" green="0.42" blue="0.00" /></rect>
+		<rect state="0"><color red="0.20" green="0.10" blue="0.00" /></rect>
+		<text string="Sports &amp;">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.40"/>
+		</text>
+		<text string="Leisure">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.55" width="0.90" height="0.40"/>
+		</text>
+	</element>
+	<element name="general_knowledge_headquarters">
+		<rect state="1"><color red="0.74" green="0.71" blue="0.00" /></rect>
+		<rect state="0"><color red="0.18" green="0.17" blue="0.00" /></rect>
+		<text string="General">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.40"/>
+		</text>
+		<text string="Knowledge">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.55" width="0.90" height="0.40"/>
+		</text>
+	</element>
+	<element name="entertainment_headquarters">
+		<rect state="1"><color red="0.65" green="0.22" blue="0.39" /></rect>
+		<rect state="0"><color red="0.16" green="0.05" blue="0.09" /></rect>
+		<text string="Entertainment">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.35" width="0.90" height="0.40"/>
+		</text>
+	</element>
+	<element name="science_and_nature_headquarters">
+		<rect state="1"><color red="0.00" green="0.39" blue="0.16" /></rect>
+		<rect state="0"><color red="0.00" green="0.09" blue="0.04" /></rect>
+		<text string="Science &amp;">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.40"/>
+		</text>
+		<text string="Nature">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.55" width="0.90" height="0.40"/>
+		</text>
+	</element>
+
+		<!-- regular squares -->
+	<element name="music_square">
+		<rect state="1"><color red="0.45" green="0.32" blue="0.26" /></rect>
+		<rect state="0"><color red="0.11" green="0.08" blue="0.06" /></rect>
+		<text string="M">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="geography_square">
+		<rect state="1"><color red="0.00" green="0.48" blue="0.65" /></rect>
+		<rect state="0"><color red="0.00" green="0.12" blue="0.16" /></rect>
+		<text string="G">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="sports_and_leisure_square">
+		<rect state="1"><color red="0.81" green="0.42" blue="0.00" /></rect>
+		<rect state="0"><color red="0.20" green="0.10" blue="0.00" /></rect>
+		<text string="SL">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="general_knowledge_square">
+		<rect state="1"><color red="0.74" green="0.71" blue="0.00" /></rect>
+		<rect state="0"><color red="0.18" green="0.17" blue="0.00" /></rect>
+		<text string="GK">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="entertainment_square">
+		<rect state="1"><color red="0.65" green="0.22" blue="0.39" /></rect>
+		<rect state="0"><color red="0.16" green="0.05" blue="0.09" /></rect>
+		<text string="E">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="science_and_nature_square">
+		<rect state="1"><color red="0.00" green="0.39" blue="0.16" /></rect>
+		<rect state="0"><color red="0.00" green="0.09" blue="0.04" /></rect>
+		<text string="SN">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="disk_square">
+		<rect state="1"><color red="0.58" green="0.16" blue="0.74" /></rect>
+		<rect state="0"><color red="0.14" green="0.04" blue="0.18" /></rect>
+		<text string="?">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="skill_game_square">
+		<rect state="1"><color red="0.48" green="0.48" blue="0.52" /></rect>
+		<rect state="0"><color red="0.12" green="0.12" blue="0.13" /></rect>
+		<text string="Skill">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
+		</text>
+		<text string="Game">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.55" width="0.90" height="0.45"/>
+		</text>
+	</element>
+
+	<element name="trivial_pursuit_marquee">
+		<text string="Trivial Pursuit">
+			<color red="0.90" green="0.55" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="trivial_pursuit_marquee_background">
+		<rect state="1"><color red="0.00" green="0.20" blue="0.70" /></rect>
+		<rect state="0"><color red="0.00" green="0.10" blue="0.35" /></rect>
+	</element>
+
+	<view name="Control Panel">
+		<screen index="0">
+			<bounds x="1100" y="100" width="800" height="600" />
+		</screen>
+
+				<!-- Wedges -->
+		<element name="lamp117" ref="science_and_nature_wedge_300deg" state="0">
+			<bounds x="800" y="50" width="160" height="160" />
+		</element>
+		<element name="lamp116" ref="entertainment_wedge_240deg" state="0">
+			<bounds x="800" y="50" width="160" height="160" />
+		</element>
+		<element name="lamp115" ref="general_knowledge_wedge_180deg" state="0">
+			<bounds x="800" y="50" width="160" height="160" />
+		</element>
+		<element name="lamp114" ref="sports_and_leisure_wedge_120deg" state="0">
+			<bounds x="800" y="50" width="160" height="160" />
+		</element>
+		<element name="lamp113" ref="geography_wedge_60deg" state="0">
+			<bounds x="800" y="50" width="160" height="160" />
+		</element>
+		<element name="lamp112" ref="music_wedge_0deg" state="0">
+			<bounds x="800" y="50" width="160" height="160" />
+		</element>
+
+		<element name="lamp123" ref="pays_20pounds_when_completed" state="0">
+			<bounds x="800" y="240" width="160" height="100"/>
+		</element>
+		<element name="lamp124" ref="20pound" state="0">
+			<bounds x="2050" y="0" width="200" height="150"/>
+		</element>
+		<element name="lamp118" ref="maximum_prize" state="0">
+			<bounds x="2050" y="130" width="200" height="50"/>
+		</element>
+
+			   <!-- 119, 120, 121, 122 - suspect that these are the marquee lights  -->
+		<element name="lamp119" ref="trivial_pursuit_marquee_background" state="0">
+			<bounds x="1300" y="-100" width="100" height="100"/>
+		</element>
+		<element name="lamp120" ref="trivial_pursuit_marquee_background" state="0">
+			<bounds x="1400" y="-100" width="100" height="100"/>
+		</element>
+		<element name="lamp121" ref="trivial_pursuit_marquee_background" state="0">
+			<bounds x="1500" y="-100" width="100" height="100"/>
+		</element>
+		<element name="lamp122" ref="trivial_pursuit_marquee_background" state="0">
+			<bounds x="1600" y="-100" width="100" height="100"/>
+		</element>
+		<element name="lamp122" ref="trivial_pursuit_marquee" state="0">
+			<bounds x="1300" y="-100" width="400" height="100"/>
+		</element>
+
+				<!-- Board -->
+		<element name="lamp168" ref="science_and_nature_headquarters" state="0">
+			<bounds x="1000" y="0" width="100" height="100" />
+		</element>
+
+		<element name="lamp169" ref="sports_and_leisure_square" state="0">
+			<bounds x="1000" y="100" width="60" height="100" />
+		</element>
+		<element name="lamp176" ref="skill_game_square" state="0">
+			<bounds x="1000" y="200" width="60" height="100" />
+		</element>
+		<element name="lamp177" ref="general_knowledge_square" state="0">
+			<bounds x="1000" y="300" width="60" height="100" />
+		</element>
+		<element name="lamp178" ref="music_square" state="0">
+			<bounds x="1000" y="400" width="60" height="100" />
+		</element>
+		<element name="lamp179" ref="disk_square" state="0">
+			<bounds x="1000" y="500" width="60" height="100" />
+		</element>
+		<element name="lamp180" ref="geography_square" state="0">
+			<bounds x="1000" y="600" width="60" height="100" />
+		</element>
+
+		<element name="lamp181" ref="entertainment_headquarters" state="0">
+			<bounds x="1000" y="700" width="100" height="100" />
+		</element>
+
+		<element name="lamp182" ref="geography_square" state="0">
+			<bounds x="1100" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp183" ref="skill_game_square" state="0">
+			<bounds x="1160" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp184" ref="sports_and_leisure_square" state="0">
+			<bounds x="1220" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp185" ref="science_and_nature_square" state="0">
+			<bounds x="1280" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp186" ref="disk_square" state="0">
+			<bounds x="1340" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp187" ref="music_square" state="0">
+			<bounds x="1400" y="700" width="60" height="100" />
+		</element>
+
+		<element name="lamp128" ref="general_knowledge_headquarters" state="0">
+			<bounds x="1460" y="700" width="100" height="100" />
+		</element>
+
+		<element name="lamp129" ref="music_square" state="0">
+			<bounds x="1560" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp130" ref="skill_game_square" state="0">
+			<bounds x="1620" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp131" ref="geography_square" state="0">
+			<bounds x="1680" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp132" ref="entertainment_square" state="0">
+			<bounds x="1740" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp133" ref="disk_square" state="0">
+			<bounds x="1800" y="700" width="60" height="100" />
+		</element>
+		<element name="lamp134" ref="science_and_nature_square" state="0">
+			<bounds x="1860" y="700" width="60" height="100" />
+		</element>
+
+		<element name="lamp135" ref="sports_and_leisure_headquarters" state="0">
+			<bounds x="1920" y="700" width="100" height="100" />
+		</element>
+
+		<element name="lamp136" ref="science_and_nature_square" state="0">
+			<bounds x="1960" y="600" width="60" height="100" />
+		</element>
+		<element name="lamp137" ref="skill_game_square" state="0">
+			<bounds x="1960" y="500" width="60" height="100" />
+		</element>
+		<element name="lamp144" ref="music_square" state="0">
+			<bounds x="1960" y="400" width="60" height="100" />
+		</element>
+		<element name="lamp145" ref="general_knowledge_square" state="0">
+			<bounds x="1960" y="300" width="60" height="100" />
+		</element>
+		<element name="lamp146" ref="disk_square" state="0">
+			<bounds x="1960" y="200" width="60" height="100" />
+		</element>
+		<element name="lamp147" ref="entertainment_square" state="0">
+			<bounds x="1960" y="100" width="60" height="100" />
+		</element>
+
+		<element name="lamp148" ref="geography_headquarters" state="0">
+			<bounds x="1920" y="0" width="100" height="100" />
+		</element>
+
+		<element name="lamp149" ref="entertainment_square" state="0">
+			<bounds x="1860" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp150" ref="skill_game_square" state="0">
+			<bounds x="1800" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp151" ref="science_and_nature_square" state="0">
+			<bounds x="1740" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp152" ref="sports_and_leisure_square" state="0">
+			<bounds x="1680" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp153" ref="disk_square" state="0">
+			<bounds x="1620" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp160" ref="general_knowledge_square" state="0">
+			<bounds x="1560" y="0" width="60" height="100" />
+		</element>
+
+		<element name="lamp161" ref="music_headquarters" state="0">
+			<bounds x="1460" y="0" width="100" height="100" />
+		</element>
+
+		<element name="lamp162" ref="general_knowledge_square" state="0">
+			<bounds x="1400" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp163" ref="skill_game_square" state="0">
+			<bounds x="1340" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp164" ref="entertainment_square" state="0">
+			<bounds x="1280" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp165" ref="geography_square" state="0">
+			<bounds x="1220" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp166" ref="disk_square" state="0">
+			<bounds x="1160" y="0" width="60" height="100" />
+		</element>
+		<element name="lamp167" ref="sports_and_leisure_square" state="0">
+			<bounds x="1100" y="0" width="60" height="100" />
+		</element>
+
+				<!-- Small Wedges -->
+		<element name="lamp85" ref="science_and_nature_wedge_300deg" state="0">
+			<bounds x="860" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp84" ref="science_and_nature_wedge_240deg" state="0">
+			<bounds x="860" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp83" ref="science_and_nature_wedge_180deg" state="0">
+			<bounds x="860" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp82" ref="science_and_nature_wedge_120deg" state="0">
+			<bounds x="860" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp81" ref="science_and_nature_wedge_60deg" state="0">
+			<bounds x="860" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp80" ref="science_and_nature_wedge_0deg" state="0">
+			<bounds x="860" y="700" width="100" height="100" />
+		</element>
+
+		<element name="lamp91" ref="entertainment_wedge_300deg" state="0">
+			<bounds x="860" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp90" ref="entertainment_wedge_240deg" state="0">
+			<bounds x="860" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp89" ref="entertainment_wedge_180deg" state="0">
+			<bounds x="860" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp88" ref="entertainment_wedge_120deg" state="0">
+			<bounds x="860" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp87" ref="entertainment_wedge_60deg" state="0">
+			<bounds x="860" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp86" ref="entertainment_wedge_0deg" state="0">
+			<bounds x="860" y="840" width="100" height="100" />
+		</element>
+
+		<element name="lamp75" ref="general_knowledge_wedge_300deg" state="0">
+			<bounds x="1000" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp74" ref="general_knowledge_wedge_240deg" state="0">
+			<bounds x="1000" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp73" ref="general_knowledge_wedge_180deg" state="0">
+			<bounds x="1000" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp72" ref="general_knowledge_wedge_120deg" state="0">
+			<bounds x="1000" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp71" ref="general_knowledge_wedge_60deg" state="0">
+			<bounds x="1000" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp70" ref="general_knowledge_wedge_0deg" state="0">
+			<bounds x="1000" y="840" width="100" height="100" />
+		</element>
+
+		<element name="lamp69" ref="sports_and_leisure_wedge_300deg" state="0">
+			<bounds x="1920" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp68" ref="sports_and_leisure_wedge_240deg" state="0">
+			<bounds x="1920" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp67" ref="sports_and_leisure_wedge_180deg" state="0">
+			<bounds x="1920" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp66" ref="sports_and_leisure_wedge_120deg" state="0">
+			<bounds x="1920" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp65" ref="sports_and_leisure_wedge_60deg" state="0">
+			<bounds x="1920" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp64" ref="sports_and_leisure_wedge_0deg" state="0">
+			<bounds x="1920" y="840" width="100" height="100" />
+		</element>
+
+		<element name="lamp59" ref="geography_wedge_300deg" state="0">
+			<bounds x="2060" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp58" ref="geography_wedge_240deg" state="0">
+			<bounds x="2060" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp57" ref="geography_wedge_180deg" state="0">
+			<bounds x="2060" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp56" ref="geography_wedge_120deg" state="0">
+			<bounds x="2060" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp55" ref="geography_wedge_60deg" state="0">
+			<bounds x="2060" y="840" width="100" height="100" />
+		</element>
+		<element name="lamp54" ref="geography_wedge_0deg" state="0">
+			<bounds x="2060" y="840" width="100" height="100" />
+		</element>
+
+		<element name="lamp53" ref="music_wedge_300deg" state="0">
+			<bounds x="2060" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp52" ref="music_wedge_240deg" state="0">
+			<bounds x="2060" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp51" ref="music_wedge_180deg" state="0">
+			<bounds x="2060" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp50" ref="music_wedge_120deg" state="0">
+			<bounds x="2060" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp49" ref="music_wedge_60deg" state="0">
+			<bounds x="2060" y="700" width="100" height="100" />
+		</element>
+		<element name="lamp48" ref="music_wedge_0deg" state="0">
+			<bounds x="2060" y="700" width="100" height="100" />
+		</element>
+
+				<!--
+				       All Prizes Doubled
+
+				       There appears to be 3 lamps for this
+				       Assume 1 per word
+				  -->
+		<element name="lamp107" ref="all_text" state="0">
+			<bounds x="2100" y="350" width="100" height="50" />
+		</element>
+		<element name="lamp106" ref="prizes_text" state="0">
+			<bounds x="2100" y="400" width="100" height="50" />
+		</element>
+		<element name="lamp105" ref="doubled_text" state="0">
+			<bounds x="2100" y="450" width="100" height="50" />
+		</element>
+
+		<element name="lamp76" ref="1_pass" state="0">
+			<bounds x="2100" y="550" width="100" height="50" />
+		</element>
+		<element name="lamp77" ref="2_passes" state="0">
+			<bounds x="2100" y="600" width="100" height="50" />
+		</element>
+		<element name="lamp78" ref="3_passes" state="0">
+			<bounds x="2100" y="650" width="100" height="50" />
+		</element>
+
+
+				<!-- Pass button -->
+		<element name="lamp60" ref="pass_button_label" state="0">
+			<bounds x="2100" y="700" width="100" height="50" />
+		</element>
+		<element name="lamp61" ref="pass_button" state="0">
+			<bounds x="2100" y="750" width="100" height="100" />
+		</element>
+
+				<!-- Pass button - disabled input since it creates a second cursor which in turn makes the touch screen difficult to control
+		<element name="lamp61" ref="pass_button" state="0" inputtag="J10_0" inputmask="0x01">
+			<bounds x="2100" y="750" width="100" height="100" />
+		</element>
+				     Pass button -->
+
+		<element name="lamp62" ref="skill_stop" state="0">
+			<bounds x="2100" y="850" width="100" height="50" />
+		</element>
+
+		<element name="lamp104" ref="1pound_award" state="0">
+			<bounds x="950" y="1000" width="150" height="100" />
+		</element>
+
+		<element name="lamp103" ref="2pound_award" state="0">
+			<bounds x="1100" y="1000" width="200" height="100" />
+		</element>
+
+		<element name="lamp102" ref="3pound_award" state="0">
+			<bounds x="1250" y="1000" width="100" height="100" />
+		</element>
+
+		<element name="lamp101" ref="4pound_award" state="0">
+			<bounds x="1350" y="1000" width="100" height="100" />
+		</element>
+		<element name="lamp100" ref="4pound_award" state="0">
+			<bounds x="1450" y="1000" width="100" height="100" />
+		</element>
+
+		<element name="lamp99" ref="5pound_award" state="0">
+			<bounds x="1550" y="1000" width="100" height="100" />
+		</element>
+		<element name="lamp98" ref="5pound_award" state="0">
+			<bounds x="1650" y="1000" width="100" height="100" />
+		</element>
+
+		<element name="lamp97" ref="10pound_award" state="0">
+			<bounds x="1750" y="1000" width="150" height="100" />
+		</element>
+		<element name="lamp96" ref="10pound_award" state="0">
+			<bounds x="1850" y="1000" width="150" height="100" />
+		</element>
+
+
+		<!-- Lamps with undefined physical locations and/or purpose
+		            60: on during the demo
+		            61: appears to be the pass light
+		            62: ???
+
+		            119, 120, 121, 122: on during the demo
+
+		            118, 123, 124: blink during the demo while explaining the 6 wedges awarding a jackpot prize.  Otherwise, off
+
+		    lamp14/lamp15: These are the first set of lamps that light up when the machine boots
+		            lamp14 stays on until lamps lamp224, lamp225, and lamp226 turn on.
+		            lamp15 stays on.  They turn off when collecting money from the bank.
+		            neither lamp is part of the lamp test
+
+		    lamp224/lamp225/lamp226: these are the second set of lamps that light up when the machine boots
+		            all three are part of the lamp test
+
+
+		            lamp96 to lamp104: light up when the user adds coins
+		              lamp104: starts blinking when user gets a COLLECT or CONTINUE prompt (e.g. after getting 1 pound for getting all mini pegs
+		              lamp103: starts blinking when user gets a COLLECT or CONTINUE prompt (e.g. after getting 2 pounds for getting all mini pegs
+
+		  -->
+
+		<element name="lamp14" ref="undefined_lamp" state="0">
+			<bounds x="818" y="678" width="7" height="7" />
+		</element>
+		<element name="lamp15" ref="undefined_lamp" state="0">
+			<bounds x="826" y="678" width="7" height="7" />
+		</element>
+		<element name="lamp224" ref="undefined_lamp" state="0">
+			<bounds x="814" y="686" width="7" height="7" />
+		</element>
+		<element name="lamp225" ref="undefined_lamp" state="0">
+			<bounds x="822" y="686" width="7" height="7" />
+		</element>
+		<element name="lamp226" ref="undefined_lamp" state="0">
+			<bounds x="830" y="686" width="7" height="7" />
+		</element>
+	</view>
+</mamelayout>
