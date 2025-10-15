@@ -136,6 +136,9 @@ private:
 	int m_savedx = 0, m_savedy = 0;
 	uint8_t m_curattr = 0;
 
+	void cursor_left();
+	void cursor_right();
+
 	emu_timer *m_blink_timer = nullptr;
 	uint8_t m_blink_phase;
 

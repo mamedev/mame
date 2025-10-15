@@ -317,6 +317,30 @@ void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 		config.set_default_layout(layout_sd1);
 }
 
+inline void esqpanel2x40_vfx_device::cursor_left()
+{
+	m_cursx--;
+	if (m_cursx < 0)
+	{
+		m_cursx += 40;
+		m_cursy--;
+		if (m_cursy < 0)
+			m_cursy += 2;
+	}
+}
+
+inline void esqpanel2x40_vfx_device::cursor_right()
+{
+	m_cursx++;
+	if (m_cursx >= 40)
+	{
+		m_cursx -= 40;
+		m_cursy++;
+		if (m_cursy >= 2)
+			m_cursy -= 2;
+	}
+}
+
 void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 {
 	receive_register_extract();
@@ -406,17 +430,15 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 					break;
 
 				case 0xd4:  // move curser one step right
-					LOG("d4: %d", m_cursx);
-					if (m_cursx < 39)
-						m_cursx += 1;
-					LOG(" -> %d\n", m_cursx);
+					LOG("d4: (%d, %d)", m_cursy, m_cursx);
+					cursor_right();
+					LOG(" -> (%d, %d)\n", m_cursy, m_cursx);
 					break;
 
-					case 0xd5:  // move curser one step left
-					LOG("d5: %d", m_cursx);
-					if (m_cursx > 0)
-						m_cursx -= 1;
-					LOG(" -> %d\n", m_cursx);
+				case 0xd5:  // move curser one step left
+					LOG("d5: (%d, %d)", m_cursy, m_cursx);
+					cursor_left();
+					LOG(" -> (%d, %d)\n", m_cursy, m_cursx);
 					break;
 
 				case 0xd6:  // clear screen
@@ -459,20 +481,11 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 			{
 				LOG("%c\n", data);
 				m_vfd->set_char(m_cursy, m_cursx, data, m_curattr);
-
-				m_cursx++;
-
-				if (m_cursx >= 39)
-				{
-					m_cursx = 39;
-				}
+				cursor_right();
 			}
 			else if (data == 0x7f)
 			{
-				// DEL character -> move one step right? used on ENV TIMES page, RELEASE value
-				if (m_cursx < 39)
-					m_cursx++;
-				LOG("7f: DEL, skipping -> (%d, %d)\n", m_cursy, m_cursx);
+				LOG("7f: Unknown function\n");
 			}
 			else
 			{
