@@ -191,6 +191,7 @@ namespace {
 #define GENERIC (0)
 #define EPS     (1)
 #define SQ1     (2)
+#define VFX     (3)
 
 #define KEYBOARD_HACK (1)   // turn on to play the SQ-1, SD-1, and SD-1 32-voice: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
 
@@ -208,11 +209,12 @@ static void ATTR_PRINTF(1,2) print_to_stderr(const char *format, ...)
 }
 #endif
 
-class esq5505_state : public driver_device
+class esq5505_state : public driver_device, public device_nvram_interface
 {
 public:
 	esq5505_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, device_nvram_interface(mconfig, *this, false)
 		, m_maincpu(*this, "maincpu")
 		, m_duart(*this, "duart")
 		, m_otis(*this, "otis")
@@ -226,6 +228,7 @@ public:
 		, m_mdout(*this, "mdout")
 		, m_rom(*this, "osrom")
 		, m_ram(*this, "osram")
+		, m_seqram(*this, "seqram")
 	{ }
 
 	void sq1(machine_config &config);
@@ -239,11 +242,18 @@ public:
 	void init_common();
 	void init_sq1();
 	void init_denib();
+	void init_vfx();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	// device_nvram_interface overrides
+	void nvram_default() override;
+	bool nvram_read(util::read_stream &file) override;
+	bool nvram_write(util::write_stream &file) override;
+	bool nvram_can_write() const override;
 
 private:
 	required_device<m68000_device> m_maincpu;
@@ -259,6 +269,7 @@ private:
 	required_device<midi_port_device> m_mdout;
 	required_region_ptr<uint16_t> m_rom;
 	required_shared_ptr<uint16_t> m_ram;
+	optional_shared_ptr<uint16_t> m_seqram;
 
 	uint16_t lower_r(offs_t offset);
 	void lower_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -452,6 +463,49 @@ void esq5505_state::otis_irq(int irq)
 	}
 }
 
+void esq5505_state::nvram_default()
+{
+	std::fill(m_ram.begin(), m_ram.end(), 0);
+	if (m_seqram)
+		std::fill(m_ram.begin(), m_ram.end(), 0);
+}
+
+bool esq5505_state::nvram_read(util::read_stream &file)
+{
+	size_t actual;
+	file.read_some(m_ram.begin(), m_ram.bytes(), actual);
+	if (actual != m_ram.bytes())
+		return false;
+	if (m_seqram.found())
+	{
+		file.read_some(m_seqram.begin(), m_seqram.bytes(), actual);
+		if (actual != m_seqram.bytes())
+			return false;
+	}
+	return true;
+}
+
+bool esq5505_state::nvram_write(util::write_stream &file)
+{
+	size_t actual;
+	file.write_some(m_ram.begin(), m_ram.bytes(), actual);
+	if (actual != m_ram.bytes())
+		return false;
+	if (m_seqram.found())
+	{
+		file.write_some(m_seqram.begin(), m_seqram.bytes(), actual);
+		if (actual != m_seqram.bytes())
+			return false;
+	}
+	return true;
+}
+
+bool esq5505_state::nvram_can_write() const
+{
+	return m_system_type == VFX;
+}
+
+
 void esq5505_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
@@ -599,7 +653,7 @@ void esq5505_state::vfxsd_map(address_map &map)
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
 	map(0x2c0000, 0x2c0007).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0x2e0000, 0x2fffff).rw(m_cartslot, FUNC(ensoniq_vfx_cartslot::read), FUNC(ensoniq_vfx_cartslot::write)).umask16(0x00ff);
-	map(0x330000, 0x3bffff).ram(); // sequencer memory?
+	map(0x330000, 0x37ffff).ram().share("seqram");
 	map(0xc00000, 0xc3ffff).rom().region("osrom", 0);
 	map(0xff0000, 0xffffff).ram().share("osram");
 }
@@ -691,7 +745,7 @@ void esq5505_state::duart_output(uint8_t data)
 		}
 		else
 		{
-			floppy->ss_w(((data & 8) >> 3) ^ 1); // bit 3, inverted -> floppy 
+			floppy->ss_w(((data & 8) >> 3) ^ 1); // bit 3, inverted -> floppy
 			m_floppy_is_active = (data & 16) != 0; // bit 4 is used to activate the floppy:
 			if (m_floppy_is_active)
 			{
@@ -1243,16 +1297,23 @@ void esq5505_state::init_denib()
 	}
 }
 
+void esq5505_state::init_vfx()
+{
+	init_denib();
+	m_system_type = VFX;
+	nvram_enable_backup(true);
+}
+
 } // Anonymous namespace
 
 
 CONS( 1988, eps,    0,   0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1989, vfxsd,  0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_vfx,    "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1989, vfxsd,  0,   0, vfxsd, vfx, esq5505_state, init_vfx,    "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1990, eps16p, eps, 0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_vfx,    "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1990, sq1,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1990, sqrack, sq1, 0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1991, sq2,    0,   0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sd132,  sd1, 0, vfx32, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1991, sd132,  sd1, 0, vfx32, vfx, esq5505_state, init_vfx,    "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1992, ks32,   sq2, 0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "KS-32",           MACHINE_NOT_WORKING)                       // 2x16 LCD
