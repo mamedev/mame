@@ -415,6 +415,13 @@ ROM_START( sumikpcp )
 	ROM_LOAD( "tc58nvg0s3hta00.nfrom1", 0x0000, 0x8800000, BAD_DUMP CRC(3187a2cc) SHA1(166719b0cd45d7d6b5523ed528b64afac2fb58b7) )
 ROM_END
 
+ROM_START( sumipc21 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00.nfrom201", 0x0000, 0x8800000, CRC(be124e78) SHA1(088d94a9cb5d028c73643b35f613dccbece1a6ca) )
+ROM_END
 
 ROM_START( dinopc )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -565,6 +572,10 @@ CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplu
 CONS( 2019, sumikpcp,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi PC Plus (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a unit with purple top, white base
 // there are code changes between these 2 sets, but there also look to be some bits that might be incorrectly flipped on one or both of them
 CONS( 2019, sumikpc,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a unit with blue top, white base
+
+// uses a glob
+CONS( 2021, sumipc21,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi Premium Plus (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white top, blue base
+
 
 // uses GPL32600A
 CONS( 2020, dinopc,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Dinosaur PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
