@@ -29,23 +29,28 @@
 
 	Connector
 	1  RPM
-	2  Coolant temperture
+	2  Coolant temperture (ADC IN2)
 	3  GND
-	4  Throttle switch
+	4  Throttle switch (T0)
 	5  Lambda sensor
-	6  GND
+	6  GND Air sensor
 	7  GND
 	9  GND
 	10 GND
-	12 Injectors
-	13 Ignition
-	14 Air in temperature
-	15 Air amount
+	11 Injector (P1.5)
+	12 Injector (P1.5)
+	13 Ignition Power
+	14 Air in temperature (ADC IN3)
+	15 Air amount (ADC IN0)
 	16 GND
 	17 GND
 	18 GND
 	19 Air sensor power
-	20 Fuel pump
+	20 Fuel pump (P1.4)
+	21 Fuel pump (P1.4)
+	22 GND
+	23 Injector (P1.5)
+	24 Injector (P1.5)
 	22 GND
 
 **************************************************************************/
@@ -77,12 +82,17 @@ public:
 	void digijet90(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<mcs48_cpu_device> m_maincpu;
 
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
 	void io_map(address_map &map) ATTR_COLD;
 	void io_map90(address_map &map) ATTR_COLD;
+
+	uint8_t p1_r();
+	void p1_w(uint8_t data);
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
 };
 
 void digijet_state::io_map(address_map &map)
@@ -98,6 +108,26 @@ void digijet_state::io_map90(address_map &map)
 	map(0x38,0x38).nopr();;
 }
 
+uint8_t digijet_state::p1_r()
+{
+	return 0xff;
+};
+
+void digijet_state::p1_w(uint8_t data)
+{
+	popmessage("p1 %02x", data);
+};
+
+uint8_t digijet_state::p2_r()
+{
+	return 0xff;
+};
+
+void digijet_state::p2_w(uint8_t data)
+{
+	popmessage("p2 %02x", data);
+};
+
 static INPUT_PORTS_START( digijet )
 INPUT_PORTS_END
 
@@ -106,6 +136,10 @@ void digijet_state::digijet(machine_config &config)
 	/* basic machine hardware */
 	I8049(config, m_maincpu, XTAL(11'000'000));
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
+	m_maincpu->p1_in_cb().set(FUNC(digijet_state::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
 }
 
 void digijet_state::digijet90(machine_config &config)
@@ -113,6 +147,10 @@ void digijet_state::digijet90(machine_config &config)
 	/* basic machine hardware */
 	I8049(config, m_maincpu, XTAL(7'372'800));
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map90);
+	m_maincpu->p1_in_cb().set(FUNC(digijet_state::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
 }
 
 ROM_START( digijet )
