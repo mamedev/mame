@@ -1094,6 +1094,10 @@ ROM_START( d12power )
 	ROM_LOAD( "25q128.u2", 0x00000, 0x1000000, CRC(02650ad4) SHA1(ca346409e11732d97b892c356fc5da61dc16ab01) )
 ROM_END
 
+ROM_START( d9_500 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "w25q128jv.u3", 0x00000, 0x1000000, CRC(66b137ce) SHA1(699ffaaf086bdb2001b0c4323b1e098f2dd3f885) )
+ROM_END
 
 ROM_START( dgun2572 )
 	ROM_REGION( 0x2000000, "mainrom", 0 ) // extra pins on subboard not marked
@@ -1369,6 +1373,9 @@ CONS( 201?, tiger108,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, 
 CONS( 201?, gon100,    0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "Game On 100-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 201?, d12power,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "SZDiiER", "Power - Charging and playing games (D12) (416-in-1)", MACHINE_IMPERFECT_GRAPHICS )
+
+// Super Chinese backgrounds don't show properly at least, sold as 'D9' but PCB has D-10D-V1.1 21-8-30 on it
+CONS( 2021, d9_500,    0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "D9 500 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // GB-50 console supports loading games from SD card (not emulated), main ROM is QSPI flash
 // Games loaded from SD card are loaded into the QSPI flash at 0x800000 - dump is from a clean factory console
