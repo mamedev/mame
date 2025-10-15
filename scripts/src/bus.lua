@@ -5453,6 +5453,8 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/mif201.h",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
+		MAME_DIR .. "src/devices/bus/cbus/options.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/options.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.cpp",
@@ -5465,6 +5467,8 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
 		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.h",
+		MAME_DIR .. "src/devices/bus/cbus/sound.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/sound.h",
 	}
 end
 

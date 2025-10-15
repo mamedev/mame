@@ -89,9 +89,9 @@ Has [PC9801-86] DAC FIFO issues
 		<notes><![CDATA[
 Slackware-based distro
 https://git.sr.ht/~nkali/plamo98-goodies/tree/main/item/plamo3x/install.md
-pc9821ap2: installer starts in 16 EGC color mode instead of 256
+pc9821ap2: installer randomly corrupt logs at startup when entering 256 color mode (clear output fixes it)
 Cannot install GRUB once install completed, need workaround (verify)
-Booting with load rootdsk from (fd1) fails (verify)
+Booting with load rootdsk from (fd1) fails (verify, GRUB has issues specifically with these disks)
 ]]></notes>
 		<info name="usage" value="cfr. detailed URL in XML notes node" />
 		<part name="flop1" interface="floppy_3_5">

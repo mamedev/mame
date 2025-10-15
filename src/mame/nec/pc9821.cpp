@@ -27,8 +27,8 @@ TODO (pc9821as):
 - Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
 
 TODO (pc9821ce):
-- Acts funny with SDIP, decides to override with an unusable format (all settings 1-filled);
 - Needs SCSI to boot stuff, or 2.5" option IDE for 98NOTE;
+- Can't boot any floppy;
 
 TODO (pc9821cx3):
 - "MICON ERROR" at POST, we currently return a ready state in remote control register
@@ -920,6 +920,9 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821ce_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821ce_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	m_cbus[0]->set_default_option("sound_pc9821ce");
+	m_cbus[0]->set_fixed(true);
 
 	config_floppy_35hd(config);
 

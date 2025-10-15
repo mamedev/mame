@@ -58,6 +58,8 @@ TODO (pc9801ux):
 #include "emu.h"
 #include "pc9801.h"
 
+#include "bus/cbus/amd98.h"
+#include "bus/cbus/options.h"
 #include "machine/input_merger.h"
 
 void pc98_base_state::rtc_w(uint8_t data)
@@ -1697,28 +1699,6 @@ static void pc9801_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-static void pc9801_cbus_devices(device_slot_interface &device)
-{
-	// official HW
-//  PC-9801-14
-	device.option_add("pc9801_26",  PC9801_26);
-	device.option_add("pc9801_55u", PC9801_55U);
-	device.option_add("pc9801_55l", PC9801_55L);
-	device.option_add("pc9801_86",  PC9801_86);
-	device.option_add("pc9801_118", PC9801_118);
-	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
-//  Spark Board
-	device.option_add("amd98",      AMD98);
-	device.option_add("mpu_pc98",   MPU_PC98);
-	device.option_add("sb16",       SB16_CT2720);
-
-	// doujinshi HW
-// MAD Factory / Doujin Hard (同人ハード)
-// MAD Factory Chibi-Oto: an ADPCM override for -86
-// MAD Factory Otomi-chan: "TORIE9211 MAD FACTORY" printed on proto PCB, just overrides for ADPCM for -86?
-	device.option_add("otomichan_kai", OTOMICHAN_KAI);
-}
-
 //  Jast Sound, could be installed independently
 
 void pc9801_state::fdc_2dd_irq(int state)
@@ -2009,7 +1989,7 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
-	PC9801CBUS_SLOT(config, m_cbus[0], pc9801_cbus_devices, "pc9801_26");
+	PC9801CBUS_SLOT(config, m_cbus[0], pc98_cbus_devices, "pc9801_26");
 	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
@@ -2020,7 +2000,7 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	m_cbus[0]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
 	m_cbus[0]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
 
-	PC9801CBUS_SLOT(config, m_cbus[1], pc9801_cbus_devices, nullptr);
+	PC9801CBUS_SLOT(config, m_cbus[1], pc98_cbus_devices, nullptr);
 	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
