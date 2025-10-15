@@ -19812,10 +19812,13 @@ ROM_START( nd8lines )
 	ROM_LOAD( "dw8-055-1.u34",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
 
 	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "met47s01.u66", 0x0000, 0x0100, CRC(78b6701e) SHA1(27b3d47b0a3637d3a92bf535b34d301e5a3aff8c) )
+	ROM_IGNORE(                       0x0100 )
+
+	ROM_REGION( 0x300, "unkproms", 0 )
 	ROM_LOAD( "he82s129.u33", 0x0000, 0x0100, CRC(3d2f1893) SHA1(927916856b25dfd6ded04c26714313bc49f7e220) )
-	// unidentified chip, read as 82s147 for now, bad dump until it's known if it's the correct equivalent
-	ROM_LOAD( "met47s01.u66", 0x0100, 0x0200, BAD_DUMP CRC(78b6701e) SHA1(27b3d47b0a3637d3a92bf535b34d301e5a3aff8c) )
 ROM_END
+
 
 /*
   Hamburger House (햄버거 하우스, Cherry Master Clone).
@@ -27789,6 +27792,19 @@ void wingco_state::init_nd8lines()
 
 	for (int i = 0x4000; i < 0x8000; i++)
 		rom[i] = bitswap<8>(rom[i] ^ 0x6c, 6, 0, 4, 3, 1, 2, 5, 7);
+
+	// split the prom nibbles creating 4bit data for foreground palette.
+	uint8_t *proms = memregion("proms")->base();
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t nibble1 = proms[i] >> 4;
+		uint8_t nibble2 = proms[i] & 0x0f;
+		proms[i] = nibble1;
+		proms[i + 0x100] = nibble2;
+	}
+
+	m_palette->update();
 }
 
 
