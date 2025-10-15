@@ -312,6 +312,16 @@ ROM_START( smatomo )
 	ROM_LOAD( "mx25l3206e.ic3", 0x0000, 0x400000, CRC(fb4d1684) SHA1(98cecd7ead52118028cb3a1de71cb3528cd81be5) )
 ROM_END
 
+ROM_START( bandslap )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u3", 0x0000, 0x800000, CRC(659f1b0f) SHA1(f3b287589cbcde5201249ea390ec7c51bd23de4c) )
+ROM_END
+
+ROM_START( bandplap )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u3", 0x0000, 0x800000, CRC(f85c388d) SHA1(59e30b51e2d6598881eb64edc027e0e27756631f) )
+ROM_END
+
 ROM_START( tamameet )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25q64.u3", 0x0000, 0x800000, CRC(f15507f8) SHA1(356cb1bd68169eb747898325eacfd7590dbe9f9c) )
@@ -477,6 +487,13 @@ CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_g
 
 // unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
 CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
+CONS( 2014, bandplap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney Princess 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
+CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
 
 // company is called 深圳市飞讯互动科技有限公司
 // very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
