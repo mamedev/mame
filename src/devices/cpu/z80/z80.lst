@@ -184,7 +184,7 @@ macro   retn
 	m_iff1 = m_iff2;
 
 macro   z80n:retn
-	m_out_retn_seen_cb(0);
+	m_out_retn_seen_cb(1);
 	@pop
 	if (m_stackless) {
 		m_pc.b.l = m_in_nextreg_cb(0xc2);

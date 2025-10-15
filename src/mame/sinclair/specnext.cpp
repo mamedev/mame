@@ -26,6 +26,7 @@
 #include "specnext_ctc.h"
 #include "specnext_divmmc.h"
 #include "specnext_dma.h"
+#include "specnext_im2.h"
 #include "specnext_multiface.h"
 #include "specnext_layer2.h"
 #include "specnext_lores.h"
@@ -99,9 +100,10 @@ public:
 		, m_view5(*this, "mem_view5")
 		, m_view6(*this, "mem_view6")
 		, m_view7(*this, "mem_view7")
+		, m_im2(*this, "im2")
 		, m_copper(*this, "copper")
 		, m_ctc(*this, "ctc")
-		, m_dma(*this, "ndma")
+		, m_dma(*this, "dma")
 		, m_i2c(*this, "i2c")
 		, m_sdcard(*this, "sdcard")
 		, m_ay(*this, "ay%u", 0U)
@@ -135,7 +137,7 @@ protected:
 
 	u8 do_m1(offs_t offset);
 	void do_mf_nmi();
-	void leave_nmi(int status);
+	void leave_nmi(int state);
 	void map_fetch(address_map &map) ATTR_COLD;
 	void map_mem(address_map &map) ATTR_COLD;
 	void map_io(address_map &map) ATTR_COLD;
@@ -176,12 +178,11 @@ private:
 	static const u8 G_VIDEO_INC = 0b11;
 	static const u16 UTM_FALLBACK_PEN = 0x800;
 
-	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
 	INTERRUPT_GEN_MEMBER(specnext_interrupt);
 	TIMER_CALLBACK_MEMBER(line_irq_on);
+	void ctc_irq_on(int state);
 	INTERRUPT_GEN_MEMBER(line_interrupt);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 	TIMER_CALLBACK_MEMBER(spi_clock);
 	void line_irq_adjust();
 
@@ -262,7 +263,7 @@ private:
 	bool nr_8f_mapping_mode_pentagon_1024() const { return m_nr_8f_mapping_mode == 0b11; }
 	bool nr_8f_mapping_mode_pentagon_1024_en() const { return nr_8f_mapping_mode_pentagon_1024() && BIT(~m_port_eff7_data, 2); }
 
-	void nr_c0_im2_vector_w(u8 data) { m_nr_c0_im2_vector = data; m_ctc->write(0, m_nr_c0_im2_vector << 5); }
+	void nr_c0_im2_vector_w(u8 data) { m_nr_c0_im2_vector = data; m_ctc->write(0, m_nr_c0_im2_vector << 5); m_im2->vector_w(m_nr_c0_im2_vector << 5); }
 
 	u32 internal_port_enable() const;
 	bool port_ff_io_en() const { return BIT(internal_port_enable(), 0); }
@@ -318,6 +319,7 @@ private:
 	memory_bank_creator m_bank_boot_rom;
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
+	required_device<specnext_im2_device> m_im2;
 	required_device<specnext_copper_device> m_copper;
 	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
@@ -568,8 +570,6 @@ private:
 	u8 m_spi_miso_dat;
 	bool m_i2c_scl_data;
 	bool m_i2c_sda_data;
-
-	u16 m_irq_mask;
 };
 
 void specnext_state::bank_update(u8 bank, u8 count)
@@ -2343,6 +2343,10 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_ce_dma_int_en_2_654 = BIT(nr_wr_dat, 4, 3);
 		m_nr_ce_dma_int_en_2_210 = BIT(nr_wr_dat, 0, 3);
 		break;
+	case 0xcf:
+		if (nr_wr_dat)
+			LOG("wR: CF <- %x, but 0 expected\n", nr_wr_dat);
+		break;
 	case 0xd8:
 		m_nr_d8_io_trap_fdc_en = BIT(nr_wr_dat, 0);
 		break;
@@ -2401,6 +2405,7 @@ void specnext_state::nr_07_cpu_speed_w(u8 data)
 	m_maincpu->set_clock_scale(1 << m_nr_07_cpu_speed);
 	m_ctc->set_clock_scale(1 << m_nr_07_cpu_speed);
 	m_dma->set_clock_scale(1 << m_nr_07_cpu_speed);
+	m_im2->set_clock_scale(1 << m_nr_07_cpu_speed);
 }
 
 void specnext_state::nr_14_global_transparent_rgb_w(u8 data)
@@ -2421,30 +2426,26 @@ void specnext_state::nr_1a_ula_clip_y2_w(u8 data)
 
 static const z80_daisy_config z80_daisy_chain[] =
 {
-	{ "ndma" },
+	{ "im2" },
 	{ "ctc" },
+	//{ "dma" },
 	{ nullptr }
 };
 
-TIMER_CALLBACK_MEMBER(specnext_state::irq_off)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	m_irq_mask = 0;
-}
-
 TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	m_irq_mask |= 1 << 11;
-	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+	m_im2->int_w((m_nr_02_bus_reset || !m_nr_c0_int_mode_pulse_0_im2_1) ? 0xff : (11 << 1));
 }
 
 TIMER_CALLBACK_MEMBER(specnext_state::line_irq_on)
 {
 	m_screen->update_now();
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	m_irq_mask |= 1 << 0;
-	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+	m_im2->int_w((m_nr_02_bus_reset || !m_nr_c0_int_mode_pulse_0_im2_1) ? 0xff : (1 << 1));
+}
+
+void specnext_state::ctc_irq_on(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
@@ -2474,27 +2475,6 @@ void specnext_state::line_irq_adjust()
 		m_irq_line_timer->reset();
 }
 
-IRQ_CALLBACK_MEMBER(specnext_state::irq_callback)
-{
-	if (!m_nr_02_bus_reset)
-	{
-		return 0xff;
-	}
-	else
-	{
-		u8 vector = 11;
-		if (m_irq_mask)
-		{
-			vector = 0;
-			u16 i = 1;
-			for (; ~m_irq_mask & i; ++vector, i <<= 1);
-			m_irq_mask &= ~i;
-
-		}
-		return (m_nr_c0_im2_vector << 5) | (vector << 2);
-	}
-}
-
 INPUT_CHANGED_MEMBER(specnext_state::on_mf_nmi)
 {
 	m_nr_02_generate_mf_nmi = newval & 1;
@@ -2520,7 +2500,7 @@ void specnext_state::do_mf_nmi()
 	}
 }
 
-void specnext_state::leave_nmi(int status)
+void specnext_state::leave_nmi(int state)
 {
 	m_mf->cpu_retn_seen_w(1);
 	m_mf->clock_w();
@@ -3210,7 +3190,6 @@ void specnext_state::machine_start()
 	save_item(NAME(m_spi_miso_dat));
 	save_item(NAME(m_i2c_scl_data));
 	save_item(NAME(m_i2c_sda_data));
-	save_item(NAME(m_irq_mask));
 }
 
 void specnext_state::reset_hard()
@@ -3581,7 +3560,6 @@ void specnext_state::machine_reset()
 	mmu_x2_w(6, 0x00);
 
 	m_ay_select = 0;
-	m_irq_mask = 0;
 }
 
 static const gfx_layout bootrom_charlayout =
@@ -3637,18 +3615,20 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_memory_map(&specnext_state::map_mem);
 	m_maincpu->set_io_map(&specnext_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(specnext_state::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
 	m_maincpu->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
 	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
 
+	SPECNEXT_IM2(config, m_im2, 28_MHz_XTAL / 8);
+	m_im2->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);
-	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->intr_callback().set(FUNC(specnext_state::ctc_irq_on));
 
 	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
-	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(specnext_state::dma_mreq_r));
 	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
 	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
