@@ -713,8 +713,6 @@ void seibuspi_base_state::video_start()
 
 void seibuspi_tilemap_state::video_start()
 {
-	seibuspi_base_state::video_start();
-
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;
 	m_layer_enable = 0;
@@ -797,6 +795,8 @@ void seibuspi_tilemap_state::video_start()
 	save_item(NAME(m_fore_layer_d14));
 
 	save_pointer(NAME(m_tilemap_ram), m_tilemap_ram_size/4);
+
+	seibuspi_base_state::video_start();
 }
 
 VIDEO_START_MEMBER(seibuspi_state,ejanhs)
@@ -808,8 +808,6 @@ VIDEO_START_MEMBER(seibuspi_state,ejanhs)
 
 void sys386f_state::video_start()
 {
-	seibuspi_base_state::video_start();
-
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;
 	m_layer_enable = 0;
@@ -824,4 +822,6 @@ void sys386f_state::video_start()
 	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
 
 	memset(m_alpha_table, 0, 0x2000); // no alpha blending
+
+	seibuspi_base_state::video_start();
 }

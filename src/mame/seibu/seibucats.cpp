@@ -122,8 +122,6 @@ private:
 
 void seibucats_state::video_start()
 {
-	seibuspi_base_state::video_start();
-
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;
 	m_layer_enable = 0;
@@ -138,6 +136,8 @@ void seibucats_state::video_start()
 	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
 
 	memset(m_alpha_table, 0, 0x2000); // TODO : no alpha blending?
+
+	seibuspi_base_state::video_start();
 }
 
 // identical to EJ Sakura
