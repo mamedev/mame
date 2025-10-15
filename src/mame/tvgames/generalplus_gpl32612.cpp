@@ -423,6 +423,18 @@ ROM_START( sumipc21 )
 	ROM_LOAD( "tc58nvg0s3hta00.nfrom201", 0x0000, 0x8800000, CRC(be124e78) SHA1(088d94a9cb5d028c73643b35f613dccbece1a6ca) )
 ROM_END
 
+ROM_START( segdis16 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x10800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx30lf2g18ac.nfrom", 0x0000, 0x10800000, CRC(87905c80) SHA1(79081934082e163163c06dc11362d8cf4e858bcf) )
+
+	DISK_REGION( "sdcard" ) // 8GB SD Card (might just be user data)
+	DISK_IMAGE( "segdis16", 0, SHA1(63cf1290c8ed78355b96b4e23885d11d7e2bd25d) )
+ROM_END
+
+
 ROM_START( dinopc )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
@@ -575,6 +587,10 @@ CONS( 2019, sumikpc,             0,        0,      gpl32612, gpl32612, generalpl
 
 // uses a glob
 CONS( 2021, sumipc21,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi Premium Plus (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white top, blue base
+
+// uses GPL32611
+CONS( 2016, segdis16,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney PC 2016 (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white top, blue base
+
 
 
 // uses GPL32600A
