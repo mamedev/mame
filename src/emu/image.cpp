@@ -54,7 +54,7 @@ image_manager::image_manager(running_machine &machine)
 		if (!startup_image.empty())
 		{
 			// we do have a startup image specified - load it
-			std::pair<std::error_condition, std::string> result(image_error::UNSPECIFIED, std::string());
+			std::pair<std::error_condition, std::string> result(image_error::NOSOFTWARE, std::string());
 
 			// try as a softlist
 			if (software_name_parse(startup_image))
@@ -64,17 +64,17 @@ image_manager::image_manager(running_machine &machine)
 			}
 
 			// failing that, try as an image
-			if (result.first)
+			if (result.first == image_error::NOSOFTWARE)
 			{
 				osd_printf_verbose("%s: attempting to load media image %s\n", image.device().tag(), startup_image);
 				result = image.load(startup_image);
-			}
 
-			// failing that, try creating it (if appropriate)
-			if (result.first && image.support_command_line_image_creation())
-			{
-				osd_printf_verbose("%s: attempting to create media image %s\n", image.device().tag(), startup_image);
-				result = image.create(startup_image);
+				// failing that, try creating it (if appropriate)
+				if (result.first && image.support_command_line_image_creation())
+				{
+					osd_printf_verbose("%s: attempting to create media image %s\n", image.device().tag(), startup_image);
+					result = image.create(startup_image);
+				}
 			}
 
 			// did the image load fail?
