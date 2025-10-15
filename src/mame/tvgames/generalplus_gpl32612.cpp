@@ -589,9 +589,8 @@ CONS( 2019, sumikpc,             0,        0,      gpl32612, gpl32612, generalpl
 CONS( 2021, sumipc21,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi Premium Plus (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white top, blue base
 
 // uses GPL32611
-CONS( 2016, segdis16,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney PC 2016 (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white top, blue base
-
-
+// ディズニーキャラクターズ マジカルパッド ～ガールズレッスン～
+CONS( 2016, segdis16,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney Characters Magical Pad -Girls Lesson- (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32600A
 CONS( 2020, dinopc,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Dinosaur PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
