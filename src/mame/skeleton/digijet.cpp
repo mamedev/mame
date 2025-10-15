@@ -35,6 +35,7 @@
 	5  Lambda sensor
 	6  GND Air sensor
 	7  GND
+	8  not populated (P1.3)
 	9  GND
 	10 GND
 	11 Injector (P1.5)
@@ -75,6 +76,7 @@ public:
 	digijet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, I8049_TAG)
+		, m_io_adc(*this, "ADC%u", 0U)
 	{
 	}
 
@@ -83,16 +85,19 @@ public:
 
 private:
 	required_device<mcs48_cpu_device> m_maincpu;
+	required_ioport_array<4> m_io_adc;
 
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
 	void io_map(address_map &map) ATTR_COLD;
 	void io_map90(address_map &map) ATTR_COLD;
 
-	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
 	void p2_w(uint8_t data);
+	uint8_t read_adc();
+
+	uint8_t m_adc_channel = 0;
 };
 
 void digijet_state::io_map(address_map &map)
@@ -104,31 +109,52 @@ void digijet_state::io_map(address_map &map)
 
 void digijet_state::io_map90(address_map &map)
 {
-	map(0x37,0x37).noprw();;
-	map(0x38,0x38).nopr();;
+	map(0x30, 0x3f).r(FUNC(digijet_state::read_adc));
 }
 
-uint8_t digijet_state::p1_r()
+uint8_t digijet_state::read_adc()
 {
-	return 0xff;
+	return m_io_adc[m_adc_channel]->read();
 };
 
 void digijet_state::p1_w(uint8_t data)
 {
-	popmessage("p1 %02x", data);
+	//bool m_int = BIT(data,0);
+	//bool unkn = BIT(data,3); 
+	bool fuel = BIT(data,4);
+	bool inject = BIT(data,5);
+	//bool watchdog = BIT(data,6);
+	popmessage("fuel %01x inj %01x",fuel,inject);
 };
 
 uint8_t digijet_state::p2_r()
 {
+	// bits 5 and 6 are the lambda sensor
+	// 3, 4 and 7 are floating
 	return 0xff;
 };
 
 void digijet_state::p2_w(uint8_t data)
 {
-	popmessage("p2 %02x", data);
+	m_adc_channel = data & 0x07;
 };
 
 static INPUT_PORTS_START( digijet )
+PORT_START("ADC0")
+PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_NAME("Air amount")
+
+PORT_START("ADC1")
+PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_NAME("Ignition")
+
+PORT_START("ADC2")
+PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_NAME("Coolant temperature")
+
+PORT_START("ADC3")
+PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_NAME("Air temperature")
+
+PORT_START("THROTTLE")
+PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
 INPUT_PORTS_END
 
 void digijet_state::digijet(machine_config &config)
@@ -136,10 +162,10 @@ void digijet_state::digijet(machine_config &config)
 	/* basic machine hardware */
 	I8049(config, m_maincpu, XTAL(11'000'000));
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
-	m_maincpu->p1_in_cb().set(FUNC(digijet_state::p1_r));
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
+	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
 }
 
 void digijet_state::digijet90(machine_config &config)
@@ -147,10 +173,10 @@ void digijet_state::digijet90(machine_config &config)
 	/* basic machine hardware */
 	I8049(config, m_maincpu, XTAL(7'372'800));
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map90);
-	m_maincpu->p1_in_cb().set(FUNC(digijet_state::p1_r));
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
+	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
 }
 
 ROM_START( digijet )
