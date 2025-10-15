@@ -28797,8 +28797,36 @@ void cmaster_state::init_cutya()
 	init_cmv4();
 
 	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x02e6] = 0x83;  // jp 0301 -> jp 8301  start
-	rom[0x8f51] = 0x84;  // jp 4423 -> jp 8423  loop attract ok
+
+	rom[0x02e6] = 0x83;  // jp 0301h -> jp 8301h  start
+	rom[0x2a6e] = 0x83;	 // ld hl, 0301h -> 8301h start
+	rom[0x8f51] = 0x84;  // jp 4423h -> jp 8423h  loop attract
+	rom[0x0821] = 0x93;  // 81fh jp 53CBh -> jp 93cbh
+	rom[0x0927] = 0x5a;	 // 0926h  call 0722h -> call 465ah - keep original program flow (as cutyline)	
+	rom[0x0928] = 0x46;
+	rom[0x9415] = 0xcd;  // 9415h  jp 8646h -> call 4d09h - keep original program flow (as cutyline)
+	rom[0x9416] = 0x09;
+	rom[0x9417] = 0x4d;
+	rom[0x8e3f] = 0x94;  // jp 541bh -> 941bh
+
+	// bet & start loop
+	rom[0x0480] = 0x13; // call 4358h -> call 1358h
+	rom[0x0486] = 0x13; // call 536dh -> call 136dh
+	rom[0x0489] = 0x14; // call 44a5h -> call 14a5h
+	rom[0x0bc5] = 0x14; // call 4475h -> call 1475h
+	rom[0x860f] = 0x94; // jp   5424h -> call 9424h
+
+	//start reels
+	rom[0x8645] = 0x94; // jp 542eh -> jp 942eh
+	rom[0x07f2] = 0x52; // jp 5462h -> jp 9452h (weird change in lower address)
+	rom[0x07f3] = 0x94;
+	rom[0x8860] = 0x94; // jp 548dh -> jp 948dh
+	rom[0x056e] = 0x94; // jp 5497h -> jp 9497h
+	rom[0x057d] = 0x93; // jp 53f0h -> jp 93f0h
+	rom[0x05b5] = 0x94; // jp 548ah -> jp 948ah
+	rom[0x0619] = 0x93; // jp 53d2h -> jp 93d2h
+	rom[0x82d8] = 0x93; // jp 53fch -> jp 93fch
+	rom[0x9493] = 0xa5;	// jp nz 0560h -> a560h 
 }
 
 
@@ -28889,9 +28917,9 @@ GAMEL( 1991, cmasterl,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, skillmst,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v5.0)",                 0,                 layout_cmasterb )
 GAMEL( 1991, skillmsta,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v3.0)",                 0,                 layout_cmasterb )
 GAMEL( 1991, cutyline,   0,        cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cuty Line (LC-88, ver.1.01)",                 0,                 layout_cmasterb )
-GAMEL( 1991, cutylinea,  cutyline, cm,       cmasterb, cmaster_state,  init_cutya,     ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.8.05C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
-GAMEL( 1991, cutylineb,  cutyline, cutylineb,cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7C.14)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
-GAMEL( 1991, cutylinec,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7.07C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
+GAMEL( 1991, cutylinea,  cutyline, cm,       cmasterb, cmaster_state,  init_cutya,     ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.8.05C)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
+GAMEL( 1991, cutylineb,  cutyline, cutylineb,cmasterb, cmaster_state,  init_cutya,     ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7C.14)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
+GAMEL( 1991, cutylinec,  cutyline, cm,       cmasterb, cmaster_state,  init_cutya,     ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7.07C)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, lonestar,   cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 1)",                    0,                 layout_cmasterb )
 GAMEL( 1991, lonestara,  cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 2)",                    0,                 layout_cmasterb )
 GAMEL( 1991, skdelux2k,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 2K (FBV2 ver.T)",        0,                 layout_cmasterb )
