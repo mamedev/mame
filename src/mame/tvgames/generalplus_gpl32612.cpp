@@ -297,6 +297,11 @@ ROM_START( dmnslayg )
 	ROM_LOAD( "tc58nvg0s3hta00_with_spare.u3", 0x0000, 0x8800000, CRC(a9402fdb) SHA1(0809a8da176f65efc2926131ba0259278d3c644d) )
 ROM_END
 
+ROM_START( pokepeac )
+	ROM_REGION(  0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00.u2", 0x0000, 0x8800000, CRC(bdd128b8) SHA1(412eeb83649ea499e4e6ce3c447f0c177d8bc0ce) )
+ROM_END
+
 ROM_START( anpanm19 )
 	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
@@ -483,6 +488,11 @@ CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_g
 // ROM has 'GPNandTag2' header rather than the usual
 // 鬼滅の刃 全集中パッド（グリーン)
 CONS( 2021, dmnslayg,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Bandai",        "Demon Slayer: Kimetsu no Yaiba Zenshuuchuu Pad (green ver.) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// unknown (uses a glob) GPNandTag2 header
+CONS( 201?, pokepeac,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pokemon Peaceful Place My Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+
 
 /* PCB is marked as M2-SPG48-GPG35-V30 2009-08-11
 
