@@ -19994,6 +19994,9 @@ vegaplus
 @source:handheld/wildfire.cpp
 wildfire
 
+@source:handheld/yuleyuan.cpp
+yuleyuan
+
 @source:hds/hds200.cpp
 hds200
 
