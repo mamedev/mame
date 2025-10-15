@@ -66,7 +66,6 @@ public:
 	double tempo_frequency(uint8_t tempo) const;
 	double tempo_tick_hz(uint8_t tempo) const;
 	uint32_t  phase_step_per_tick(uint32_t rate) const;
-	uint8_t   current_page() const;
 	uint32_t envelope_period_ticks(uint8_t tp) const;
 
 
@@ -81,8 +80,6 @@ protected:
 private:
 	// stream
 	sound_stream* m_stream = nullptr;
-	//uint32_t m_output_rate = 167791;
-	xavix_state* m_owner_state = nullptr;
 
 	// global timing
 	uint8_t m_tempo_div[4] = { 0, 0, 0, 0 };
@@ -127,7 +124,6 @@ private:
 		bool      log_env_stopped = false;
 		bool      log_env_paused = false;
 
-		uint8_t ram_page = 0;
 		uint16_t noise_state = 0;
 	};
 
@@ -229,7 +225,6 @@ public:
 	void init_xavix();
 	void init_no_timer() { init_xavix(); m_disable_timer_irq_hack = true; }
 
-	uint8_t sound_wave_ram_read(uint8_t page, uint16_t offset) const;
 	uint8_t sound_current_page() const;
 
 	void ioevent_trg01(int state);

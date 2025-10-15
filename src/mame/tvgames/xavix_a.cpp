@@ -79,7 +79,6 @@ xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char
 void xavix_sound_device::device_start()
 {
 	m_sequencer_rate_hz = clock() / ((0x0f + 1u) * 8u); // Hardware Rate (167'791)
-	m_owner_state = dynamic_cast<xavix_state*>(owner());
 	m_stream = stream_alloc(0, 2, m_sequencer_rate_hz);
 	LOGMASKED(LOG_CFG, "[cfg] start render_rate=%uHz\n", m_sequencer_rate_hz);
 
@@ -98,7 +97,6 @@ void xavix_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_voice, type));
 	save_item(STRUCT_MEMBER(m_voice, vol));
 
-	save_item(STRUCT_MEMBER(m_voice, ram_page));
 	save_item(STRUCT_MEMBER(m_voice, noise_state));
 
 	// envelope parameters
@@ -170,7 +168,6 @@ void xavix_sound_device::device_reset()
 		m_voice[v].env_countdown = m_voice[v].env_period_samples;
 		m_voice[v].env_active_left = 1;
 		m_voice[v].env_active_right = 1;
-		m_voice[v].ram_page = current_page();
 		m_voice[v].noise_state = 0;
 
 	}
@@ -243,8 +240,9 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream)
 
 				if (m_voice[v].type == 0)
 				{
-					m_voice[v].ram_page = current_page();
-					raw = m_owner_state ? m_owner_state->sound_wave_ram_read(m_voice[v].ram_page, uint16_t(phase & 0xffff)) : 0x80;
+					// TODO: is anything using this voice type?
+					// should it read from map(0x7400, 0x757f).ram() which is tested by gungunrv?
+					raw = 0x80;
 				}
 				else
 				{
@@ -381,7 +379,6 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 	m_voice[voice].env_bank = env_addr_bank;
 	m_voice[voice].env_rom_base_left = env_addr_left;
 	m_voice[voice].env_rom_base_right = env_addr_right;
-	m_voice[voice].ram_page = current_page();
 	m_voice[voice].type = new_type;
 	m_voice[voice].rate = new_rate;
 
@@ -613,11 +610,6 @@ uint32_t xavix_sound_device::phase_step_per_tick(uint32_t rate) const
     if (!rate) return 0;
     uint64_t step = rate; // sequencer rate equals timing base
     return uint32_t(step ? step : 1);
-}
-
-uint8_t xavix_sound_device::current_page() const
-{
-	return m_owner_state ? m_owner_state->sound_current_page() : 0;
 }
 
 void xavix_sound_device::set_tempo(int index, uint8_t value)
@@ -924,12 +916,6 @@ void xavix_sound_device::step_pitch(int voice)
 	if (v.rate != old)
 		LOGMASKED(LOG_PITCH, "[pitch] v=%2d %u->%u target=%u\n",
 			voice, old, v.rate, target);
-}
-
-uint8_t xavix_state::sound_wave_ram_read(uint8_t page, uint16_t offset) const
-{
-	const uint32_t base = (((uint32_t(page & 0x3f) << 8) + uint32_t(offset)) & 0x7fff);
-	return m_mainram[base];
 }
 
 uint8_t xavix_state::sound_current_page() const
