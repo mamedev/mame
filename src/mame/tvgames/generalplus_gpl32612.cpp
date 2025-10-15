@@ -408,7 +408,13 @@ ROM_START( sumikpc )
 	ROM_LOAD( "tc58nvg0s3hta00.nfrom1", 0x0000, 0x8800000, CRC(3187a2cc) SHA1(166719b0cd45d7d6b5523ed528b64afac2fb58b7) )
 ROM_END
 
+ROM_START( dinopc )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
 
+	ROM_REGION( 0x11000000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nbg1s3hta00.nfrom1", 0x0000, 0x11000000, CRC(c7ec0903) SHA1(c33a723a7967043a6560a002a33cdb33d0c1f207) )
+ROM_END
 
 
 
@@ -549,6 +555,9 @@ CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplu
 // uses GPL32600A
 // マウスできせかえ! すみっコぐらしパソコンプラス
 CONS( 2019, sumikpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi PC Plus (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a unit with purple top
+
+// uses GPL32600A
+CONS( 2020, dinopc,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Dinosaur PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
 // ディズニー&ディズニー／ピクサーキャラクターズ できた!がいっぱい ドリームトイパッド
