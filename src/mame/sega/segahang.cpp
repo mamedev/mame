@@ -1057,7 +1057,7 @@ ROM_START( hangon )
 	ROM_REGION( 0xeb, "soundboard_plds", 0 )
 	ROM_LOAD( "315-5103.6e", 0x00, 0xeb, CRC(85284c32) SHA1(45bcc6745b3540777eed02374064d2f853b4fe1f) ) // PLS153
 
-	ROM_REGION( 0xeb, "romoard_plds", 0 )
+	ROM_REGION( 0xeb, "romboard_plds", 0 )
 	ROM_LOAD( "315-5121.2a", 0x00, 0xeb, CRC(5dd89643) SHA1(b94bbed9fca269d198788e0a5e995ce7cbc453d7) ) // PLS153
 ROM_END
 
@@ -1123,7 +1123,7 @@ ROM_START( hangon1 )
 	ROM_REGION( 0xeb, "soundboard_plds", 0 )
 	ROM_LOAD( "315-5103.6e", 0x00, 0xeb, CRC(85284c32) SHA1(45bcc6745b3540777eed02374064d2f853b4fe1f) ) // PLS153
 
-	ROM_REGION( 0xeb, "romoard_plds", 0 )
+	ROM_REGION( 0xeb, "romboard_plds", 0 )
 	ROM_LOAD( "315-5121.2a", 0x00, 0xeb, CRC(5dd89643) SHA1(b94bbed9fca269d198788e0a5e995ce7cbc453d7) ) // PLS153
 ROM_END
 
@@ -1194,7 +1194,7 @@ ROM_START( hangon2 )
 	ROM_REGION( 0xeb, "soundboard_plds", 0 )
 	ROM_LOAD( "315-5103.6e", 0x00, 0xeb, CRC(85284c32) SHA1(45bcc6745b3540777eed02374064d2f853b4fe1f) ) // PLS153
 
-	ROM_REGION( 0xeb, "romoard_plds", 0 )
+	ROM_REGION( 0xeb, "romboard_plds", 0 )
 	ROM_LOAD( "315-5121.2a", 0x00, 0xeb, CRC(5dd89643) SHA1(b94bbed9fca269d198788e0a5e995ce7cbc453d7) ) // PLS153
 ROM_END
 
