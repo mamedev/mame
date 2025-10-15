@@ -70,7 +70,7 @@ image_manager::image_manager(running_machine &machine)
 				result = image.load(startup_image);
 
 				// failing that, try creating it (if appropriate)
-				if (result.first && image.support_command_line_image_creation())
+				if (result.first == std::errc::no_such_file_or_directory && image.support_command_line_image_creation())
 				{
 					osd_printf_verbose("%s: attempting to create media image %s\n", image.device().tag(), startup_image);
 					result = image.create(startup_image);
@@ -84,6 +84,7 @@ image_manager::image_manager(running_machine &machine)
 				image.unload();
 
 				// make sure it is removed from the ini file too
+				const std::string failed_startup_image = startup_image;
 				machine.options().image_option(image.instance_name()).specify("");
 				if (machine.options().write_config())
 					write_config(machine.options(), nullptr, &machine.system());
@@ -95,7 +96,7 @@ image_manager::image_manager(running_machine &machine)
 							: "Device %1$s load (-%2$s %3$s) failed: %7$s (%5$s:%6$d)",
 						image.device().name(),
 						image.instance_name(),
-						startup_image,
+						failed_startup_image,
 						result.second,
 						result.first.category().name(),
 						result.first.value(),
