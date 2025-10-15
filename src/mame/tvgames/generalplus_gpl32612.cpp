@@ -403,18 +403,17 @@ ROM_START( sumikpc )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
 
-	ROM_REGION( 0x8800000, "nand", ROMREGION_ERASE00 )
-	ROM_LOAD( "tc58nvg0s3hta00.nfrom1", 0x0000, 0x8800000, CRC(87aac4dd) SHA1(81991e5904adf0dacb489f2477507e7797146bc8) )
+	ROM_REGION( 0x8800000, "nand", ROMREGION_ERASE00 ) // clearly has some flipped bits compared to sumikpcp, but also seems to be different revision
+	ROM_LOAD( "tc58nvg0s3hta00.nfrom1", 0x0000, 0x8800000, BAD_DUMP CRC(87aac4dd) SHA1(81991e5904adf0dacb489f2477507e7797146bc8) )
 ROM_END
 
 ROM_START( sumikpcp )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
 
-	ROM_REGION( 0x8800000, "nand", ROMREGION_ERASE00 )
-	ROM_LOAD( "tc58nvg0s3hta00.nfrom1", 0x0000, 0x8800000, CRC(3187a2cc) SHA1(166719b0cd45d7d6b5523ed528b64afac2fb58b7) )
+	ROM_REGION( 0x8800000, "nand", ROMREGION_ERASE00 ) // clearly has some flipped bits compared to sumikpc, but also seems to be different revision
+	ROM_LOAD( "tc58nvg0s3hta00.nfrom1", 0x0000, 0x8800000, BAD_DUMP CRC(3187a2cc) SHA1(166719b0cd45d7d6b5523ed528b64afac2fb58b7) )
 ROM_END
-
 
 
 ROM_START( dinopc )
