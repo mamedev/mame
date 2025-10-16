@@ -172,6 +172,7 @@
 #include "esqvfd.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "machine/mc68681.h"
+#include "machine/nvram.h"
 #include "machine/wd_fdc.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
@@ -209,12 +210,11 @@ static void ATTR_PRINTF(1,2) print_to_stderr(const char *format, ...)
 }
 #endif
 
-class esq5505_state : public driver_device, public device_nvram_interface
+class esq5505_state : public driver_device
 {
 public:
 	esq5505_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, device_nvram_interface(mconfig, *this, false)
 		, m_maincpu(*this, "maincpu")
 		, m_duart(*this, "duart")
 		, m_otis(*this, "otis")
@@ -228,32 +228,28 @@ public:
 		, m_mdout(*this, "mdout")
 		, m_rom(*this, "osrom")
 		, m_ram(*this, "osram")
-		, m_seqram(*this, "seqram")
+		, m_osram_nvram(*this, "osram")
+		, m_seqram_nvram(*this, "seqram")
 	{ }
 
-	void sq1(machine_config &config);
+	void common(machine_config &config);
 	void vfx(machine_config &config);
+	void sq1(machine_config &config);
 	void vfxsd(machine_config &config);
+	void sd132(machine_config &config);
 	void eps(machine_config &config);
-	void vfx32(machine_config &config);
+	void common32(machine_config &config);
 	void ks32(machine_config &config);
 
 	void init_eps();
 	void init_common();
 	void init_sq1();
 	void init_denib();
-	void init_vfx();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-	// device_nvram_interface overrides
-	void nvram_default() override;
-	bool nvram_read(util::read_stream &file) override;
-	bool nvram_write(util::write_stream &file) override;
-	bool nvram_can_write() const override;
 
 private:
 	required_device<m68000_device> m_maincpu;
@@ -269,7 +265,8 @@ private:
 	required_device<midi_port_device> m_mdout;
 	required_region_ptr<uint16_t> m_rom;
 	required_shared_ptr<uint16_t> m_ram;
-	optional_shared_ptr<uint16_t> m_seqram;
+	optional_device<nvram_device> m_osram_nvram;
+	optional_device<nvram_device> m_seqram_nvram;
 
 	uint16_t lower_r(offs_t offset);
 	void lower_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -462,49 +459,6 @@ void esq5505_state::otis_irq(int irq)
 		// LOG("otis_irq -- %d\n", irq);
 	}
 }
-
-void esq5505_state::nvram_default()
-{
-	std::fill(m_ram.begin(), m_ram.end(), 0);
-	if (m_seqram)
-		std::fill(m_ram.begin(), m_ram.end(), 0);
-}
-
-bool esq5505_state::nvram_read(util::read_stream &file)
-{
-	size_t actual;
-	file.read_some(m_ram.begin(), m_ram.bytes(), actual);
-	if (actual != m_ram.bytes())
-		return false;
-	if (m_seqram.found())
-	{
-		file.read_some(m_seqram.begin(), m_seqram.bytes(), actual);
-		if (actual != m_seqram.bytes())
-			return false;
-	}
-	return true;
-}
-
-bool esq5505_state::nvram_write(util::write_stream &file)
-{
-	size_t actual;
-	file.write_some(m_ram.begin(), m_ram.bytes(), actual);
-	if (actual != m_ram.bytes())
-		return false;
-	if (m_seqram.found())
-	{
-		file.write_some(m_seqram.begin(), m_seqram.bytes(), actual);
-		if (actual != m_seqram.bytes())
-			return false;
-	}
-	return true;
-}
-
-bool esq5505_state::nvram_can_write() const
-{
-	return m_system_type == VFX;
-}
-
 
 void esq5505_state::cpu_space_map(address_map &map)
 {
@@ -822,7 +776,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 }
 #endif
 
-void esq5505_state::vfx(machine_config &config)
+void esq5505_state::common(machine_config &config)
 {
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfx_map);
@@ -877,9 +831,15 @@ void esq5505_state::vfx(machine_config &config)
 	m_otis->add_route(7, "pump", 1.0, 7);
 }
 
+void esq5505_state::vfx(machine_config &config)
+{
+	common(config);
+	NVRAM(config, m_osram_nvram, nvram_device::DEFAULT_NONE);
+}
+
 void esq5505_state::eps(machine_config &config)
 {
-	vfx(config);
+	common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::eps_cpu_space_map);
 
@@ -907,6 +867,8 @@ void esq5505_state::vfxsd(machine_config &config)
 	vfx(config);
 	// but with an updated memory map that includes FDC and sequence RAM
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
+	// and nvram for the sequencer RAM as well
+	NVRAM(config, m_seqram_nvram, nvram_device::DEFAULT_NONE);
 
 	SPEAKER(config, "aux", 2).front();
 	m_pump->add_route(2, "aux", 1.0, 0);
@@ -918,7 +880,7 @@ void esq5505_state::vfxsd(machine_config &config)
 }
 
 // 32-voice machines with the VFX-SD type config
-void esq5505_state::vfx32(machine_config &config)
+void esq5505_state::common32(machine_config &config)
 {
 	M68000(config, m_maincpu, 30.47618_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
@@ -980,9 +942,20 @@ void esq5505_state::vfx32(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
 }
 
+// Like the VFX-SD config, but with some clock speeds faster.
+void esq5505_state::sd132(machine_config &config)
+{
+	auto clock = 30.47618_MHz_XTAL / 2;
+
+	vfxsd(config);
+	m_maincpu->set_clock(clock);
+	m_otis->set_clock(clock);
+	m_pump->set_clock(clock);
+}
+
 void esq5505_state::sq1(machine_config &config)
 {
-	vfx(config);
+	common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::sq1_map);
 
 	ESQPANEL2X16_SQ1(config.replace(), m_panel);
@@ -992,7 +965,7 @@ void esq5505_state::sq1(machine_config &config)
 
 void esq5505_state::ks32(machine_config &config)
 {
-	vfx32(config);
+	common32(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::sq1_map);
 
 	ESQPANEL2X16_SQ1(config.replace(), m_panel);
@@ -1297,23 +1270,16 @@ void esq5505_state::init_denib()
 	}
 }
 
-void esq5505_state::init_vfx()
-{
-	init_denib();
-	m_system_type = VFX;
-	nvram_enable_backup(true);
-}
-
 } // Anonymous namespace
 
 
 CONS( 1988, eps,    0,   0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_vfx,    "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1989, vfxsd,  0,   0, vfxsd, vfx, esq5505_state, init_vfx,    "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1989, vfxsd,  0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1990, eps16p, eps, 0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_vfx,    "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1990, sq1,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1990, sqrack, sq1, 0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1991, sq2,    0,   0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sd132,  sd1, 0, vfx32, vfx, esq5505_state, init_vfx,    "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1991, sd132,  sd1, 0, sd132, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1992, ks32,   sq2, 0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "KS-32",           MACHINE_NOT_WORKING)                       // 2x16 LCD
