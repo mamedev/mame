@@ -65,6 +65,7 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
+#include "vw.lh"
 
 namespace {
 
@@ -90,26 +91,25 @@ private:
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
 	void io_map(address_map &map) ATTR_COLD;
-	void io_map90(address_map &map) ATTR_COLD;
 
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
 	void p2_w(uint8_t data);
 	uint8_t read_adc();
+	void start_adc(uint8_t data);
 
 	uint8_t m_adc_channel = 0;
 };
 
 void digijet_state::io_map(address_map &map)
 {
-	map(0x32,0x32).noprw();;
-	map(0x33,0x33).nopr();;
-	map(0x3f,0x3f).noprw();;
+	map(0x30, 0x3f).r(FUNC(digijet_state::read_adc));
+	map(0x30, 0x3f).w(FUNC(digijet_state::start_adc));
 }
 
-void digijet_state::io_map90(address_map &map)
+void digijet_state::start_adc(address_map &map)
 {
-	map(0x30, 0x3f).r(FUNC(digijet_state::read_adc));
+	;
 }
 
 uint8_t digijet_state::read_adc()
@@ -119,12 +119,12 @@ uint8_t digijet_state::read_adc()
 
 void digijet_state::p1_w(uint8_t data)
 {
-	//bool m_int = BIT(data,0);
-	//bool unkn = BIT(data,3); 
+	bool irq = BIT(data,0);
+	bool unkn = BIT(data,3); 
 	bool fuel = BIT(data,4);
 	bool inject = BIT(data,5);
-	//bool watchdog = BIT(data,6);
-	popmessage("fuel %01x inj %01x",fuel,inject);
+	bool watchdog = BIT(data,6);
+	popmessage("irq %01x unk %01x fuel %01x inj %01x wd %01x",irq,unkn,fuel,inject,watchdog);
 };
 
 uint8_t digijet_state::p2_r()
@@ -172,7 +172,7 @@ void digijet_state::digijet90(machine_config &config)
 {
 	/* basic machine hardware */
 	I8049(config, m_maincpu, XTAL(7'372'800));
-	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map90);
+	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
@@ -193,5 +193,5 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT     COMPAT  MACHINE    INPUT    CLASS          INIT        COMPANY       FULLNAME          FLAGS
-CONS( 1985, digijet,   digijet90, 0,      digijet,   digijet, digijet_state, empty_init, "Volkswagen", "Digijet",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-CONS( 1990, digijet90, 0,         0,      digijet90, digijet, digijet_state, empty_init, "Volkswagen", "Digijet (1990)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+GAMEL( 1985, digijet,   digijet90, 0,      digijet,   digijet, digijet_state, empty_init, "Volkswagen", "Digijet",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW, layout_vw )
+GAMEL( 1990, digijet90, 0,         0,      digijet90, digijet, digijet_state, empty_init, "Volkswagen", "Digijet (1990)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW, layout_vw )
