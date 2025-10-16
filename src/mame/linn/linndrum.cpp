@@ -402,7 +402,7 @@ private:
 	required_device<linndrum_vcf_eg_device> m_bass_eg;
 	required_device<timer_device> m_hat_trigger_timer;  // U37B (LM556).
 	required_device<va_rc_eg_device> m_hat_eg;
-	required_device<va_vca_device> m_hat_vca;  // CEM3360 (U91B).
+	required_device<cem3360_vca_device> m_hat_vca;  // U91B.
 	bool m_hat_open = false;
 	bool m_hat_triggered = false;
 	std::array<bool, NUM_MUX_VOICES> m_mux_counting = { false, false, false, false, false, false, false, false };
@@ -764,9 +764,9 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, m_hat_trigger_timer).configure_generic(FUNC(linndrum_audio_device::hat_trigger_timer_tick));  // LM556 (U37B).
 	VA_RC_EG(config, m_hat_eg).set_c(HAT_C22);
-	VA_VCA(config, m_hat_vca).configure_cem3360_linear_cv();
-	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0, 0);
-	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER, 1);
+	CEM3360_VCA(config, m_hat_vca);
+	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0, cem3360_vca_device::INPUT_AUDIO);
+	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER, cem3360_vca_device::INPUT_GAIN);
 
 	// *** Snare / sidestick section.
 
