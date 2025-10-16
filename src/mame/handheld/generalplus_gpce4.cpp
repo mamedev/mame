@@ -2,8 +2,10 @@
 // copyright-holders:David Haywood
 
 // seems to be a GPCExxx series SunPlus CPU
-// GPCE4064A seems very likely for the Super Impulse titles
-// but GPCE200A is a close match
+// GPCE4064 series seems very likely for the Super Impulse titles
+// 
+// GPCE4P064B is an OTP part with support for 30Kbyte OTP ROM (+2Kbyte 'test' area) which matches mapacman
+// it also lacks Port C, which appears to be unused here
 
 /*
    NOTES:
@@ -470,7 +472,7 @@ uint16_t generalplus_gpl_unknown_state::reg3095_r(offs_t offset)
 void generalplus_gpl_unknown_state::map(address_map &map)
 {
 	map(0x000000, 0x000fff).ram(); // RAM
-	//map(0x001000, 0x0017ff).ram(); // acts like open bus?
+	//map(0x001000, 0x0017ff).ram(); // Cache area, can be configured as RAM instead
 
 	// 3000 - IOA_Data
 	map(0x003001, 0x003001).rw(FUNC(generalplus_gpl_unknown_state::reg3001_r), FUNC(generalplus_gpl_unknown_state::reg3001_w)); // IOA_Buffer
@@ -632,7 +634,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer3 )
 
 void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &config)
 {
-	UNSP_20(config, m_maincpu, 96000000); // internal ROM uses unsp2.0 opcodes, unknown clock
+	UNSP_20(config, m_maincpu, 96000000); // internal ROM uses unsp2.0 opcodes, should be 48MHz but glitches (due to timer hookups?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl_unknown_state::map);
 	m_maincpu->set_vectorbase(0x4010); // there is also a set of vectors for what looks to be a burn-in test at 4000, maybe external pin selects?
 
