@@ -567,7 +567,7 @@ CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplu
 // 学習おうえんAI★ミラクルロボ
 CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushuu Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-// uses GPE13101A
+// uses GPEL3101A
 // たまごっち みーつ  (there appear to be many units in this series, ROM data could differ, this was from a light blue 'hearts and rainbows' themed unit with no subtitles)
 CONS( 2018, tamameet,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tamagotchi Meets (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
