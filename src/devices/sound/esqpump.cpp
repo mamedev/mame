@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "esqpump.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(ESQ_5505_5510_PUMP, esq_5505_5510_pump_device, "esq_5505_5510_pump", "Ensoniq 5505/5506 to 5510 interface")
 
 esq_5505_5510_pump_device::esq_5505_5510_pump_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -65,18 +67,34 @@ void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream)
 {
 #define SAMPLE_SHIFT 4
 	constexpr sound_stream::sample_t input_scale = 32768.0 / (1 << SAMPLE_SHIFT);
+	constexpr sound_stream::sample_t output_scale = 1.0 / 32768.0;
+
+	// At the time of writing, the es5505 code does not correctly clamp samples that it generates.
+	// This means that in particular those samples that are being fed into the ESP can cause
+	// audio glitches.
+	// So until the es5505 code is updated, we manually clamp the incoming samples that we read
+	// from the es5505.
+
+	// Samples after sample shifting will be in the standard signed 16-bit integer range -32768 .. +32767;
+	// for floating-pint sample_t these are divided by 32768 to bring them into range [-1.0 .. +1.0).
+
+	constexpr s32 esp_min = -32768;
+	constexpr s32 esp_max = 32767;
+
+	constexpr double stream_min = -32768.0 / 32768.0;
+	constexpr double stream_max = 32767.0 / 32768.0;
 
 	// Push the 'Aux' output samples directly into the output stream
-	stream.put(2, 0, stream.get(0, 0) * (1.0 / (1 << SAMPLE_SHIFT)));
-	stream.put(3, 0, stream.get(1, 0) * (1.0 / (1 << SAMPLE_SHIFT)));
+	stream.put(2, 0, std::clamp(stream.get(0, 0) * (1.0 / (1 << SAMPLE_SHIFT)), stream_min, stream_max));
+	stream.put(3, 0, std::clamp(stream.get(1, 0) * (1.0 / (1 << SAMPLE_SHIFT)), stream_min, stream_max));
 
 	// Push the 'FX1', 'FX2' and 'DRY' samples into the ESP
-	m_esp->ser_w(0, s32(stream.get(2, 0) * input_scale));
-	m_esp->ser_w(1, s32(stream.get(3, 0) * input_scale));
-	m_esp->ser_w(2, s32(stream.get(4, 0) * input_scale));
-	m_esp->ser_w(3, s32(stream.get(5, 0) * input_scale));
-	m_esp->ser_w(4, s32(stream.get(6, 0) * input_scale));
-	m_esp->ser_w(5, s32(stream.get(7, 0) * input_scale));
+	m_esp->ser_w(0, std::clamp(s32(stream.get(2, 0) * input_scale), esp_min, esp_max));
+	m_esp->ser_w(1, std::clamp(s32(stream.get(3, 0) * input_scale), esp_min, esp_max));
+	m_esp->ser_w(2, std::clamp(s32(stream.get(4, 0) * input_scale), esp_min, esp_max));
+	m_esp->ser_w(3, std::clamp(s32(stream.get(5, 0) * input_scale), esp_min, esp_max));
+	m_esp->ser_w(5, std::clamp(s32(stream.get(7, 0) * input_scale), esp_min, esp_max));
+	m_esp->ser_w(4, std::clamp(s32(stream.get(6, 0) * input_scale), esp_min, esp_max));
 
 #if PUMP_FAKE_ESP_PROCESSING
 	m_esp->ser_w(6, m_esp->ser_r(0) + m_esp->ser_r(2) + m_esp->ser_r(4));
@@ -92,8 +110,8 @@ void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream)
 #endif
 
 	// Read the processed result from the ESP.
-	sound_stream::sample_t l = sound_stream::sample_t(m_esp->ser_r(6)) * (1.0 / 32768.0);
-	sound_stream::sample_t r = sound_stream::sample_t(m_esp->ser_r(7)) * (1.0 / 32768.0);
+	sound_stream::sample_t l = sound_stream::sample_t(m_esp->ser_r(6)) * output_scale;
+	sound_stream::sample_t r = sound_stream::sample_t(m_esp->ser_r(7)) * output_scale;
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
 	// if we're processing the fake program through the ESP, the result should just be that of adding the inputs
