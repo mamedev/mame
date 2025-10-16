@@ -807,6 +807,21 @@ MACHINE_RESET_MEMBER(pc9821_state,pc9821)
 	m_pegc_mmio_view.disable();
 }
 
+MACHINE_RESET_MEMBER(pc9821_mate_a_state,pc9821ap2)
+{
+	MACHINE_RESET_CALL_MEMBER(pc9821);
+
+	m_bios_view.disable();
+}
+
+MACHINE_RESET_MEMBER(pc9821_canbe_state,pc9821_canbe)
+{
+	MACHINE_RESET_CALL_MEMBER(pc9821);
+
+	m_bios_view.disable();
+}
+
+
 // TODO: setter for DMAC clock should follow up whatever is the CPU clock
 
 void pc9821_state::pc9821(machine_config &config)
@@ -860,6 +875,7 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 	m_ppi_sys->in_pa_callback().set(m_ppi_sys, FUNC(i8255_device::pa_r));
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 }
 
 void pc9821_mate_a_state::pc9821ap2(machine_config &config)
@@ -874,6 +890,7 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 }
 
 void pc9821_canbe_state::pc9821ce(machine_config &config)
@@ -891,6 +908,7 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 	config_floppy_35hd(config);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
+	MCFG_MACHINE_RESET_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 }
 
 //void pc9821_canbe_state::pc9821ce2(machine_config &config)
@@ -915,6 +933,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	m_cbus[0]->set_fixed(true);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
+	MCFG_MACHINE_RESET_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 
 	// VLSI Supercore594 (Wildcat) PCI 2.0
 	// GD5440

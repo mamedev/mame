@@ -93,6 +93,7 @@ protected:
 
 private:
 	DECLARE_MACHINE_START(pc9821ap2);
+	DECLARE_MACHINE_RESET(pc9821ap2);
 
 	// Starting from Af
 	memory_view m_bios_view;
@@ -135,6 +136,8 @@ private:
 	memory_view m_bios_view;
 
 	DECLARE_MACHINE_START(pc9821_canbe);
+	DECLARE_MACHINE_RESET(pc9821_canbe);
+
 };
 
 // class pc9821_cereb_state : public pc9821_canbe_state
