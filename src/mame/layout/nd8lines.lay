@@ -151,10 +151,10 @@ copyright-holders: Roberto Fresca
 
 	<element name="stop_b" defstate="0">
 		<rect state="1">
-			<color red="0.22" green="0.0" blue="0.0" />
+			<color red="0.75" green="0.0" blue="0.0" />
 		</rect>
 		<rect state="0">
-			<color red="0.31" green="0.0" blue="0.0" />
+			<color red="0.3" green="0.0" blue="0.0" />
 		</rect>
 	</element>
 
