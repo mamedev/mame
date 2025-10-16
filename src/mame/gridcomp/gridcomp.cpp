@@ -444,7 +444,7 @@ void gridcomp_state::grid1131(machine_config &config)
 {
 	grid1121(config);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update_113x));
-	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 240); // XXX
+	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 256);
 }
 
 void gridcomp_state::grid1139(machine_config &config)
