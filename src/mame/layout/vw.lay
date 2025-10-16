@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+debugging display for Digijet ECU
+-->
+
+<mamelayout version="2">
+
+	<element name="led"> <disk state="0"> <color red="1.0" green="1.0" blue="0.1" /> </disk> </element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="10" bottom="10" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<view name="Main">
+		<element ref="background"> <bounds left="0" right="10" top="0" bottom="10" /> </element>
+
+		<element name="led_fuel" ref="led"> <bounds left="1" right=" 2" top="1" bottom="2" /> </element>
+		<element name="led_inject" ref="led"> <bounds left="3" right="4" top="1" bottom="2" /> </element>
+        <element name="led_unkn" ref="led"> <bounds left="5" right="6" top="1" bottom="2" /> </element>
+		<element name="led_wd" ref="led"> <bounds left="7" right="8" top="1" bottom="2" /> </element>
+	</view>
+
+</mamelayout>
