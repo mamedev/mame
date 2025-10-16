@@ -36,7 +36,8 @@ void pc98_cbus_devices(device_slot_interface &device)
 // MAD Factory Otomi-chan: "TORIE9211 MAD FACTORY" printed on proto PCB, just overrides for ADPCM for -86?
 	device.option_add("otomichan_kai", OTOMICHAN_KAI);
 
-	// internal sound
-	device.option_add_internal("sound_pc9821ce", SOUND_PC9821CE);
+	// internal sound options
+	device.option_add_internal("sound_pc9821ce",  SOUND_PC9821CE);
+	device.option_add_internal("sound_pc9821cx3", SOUND_PC9821CX3);
 }
 

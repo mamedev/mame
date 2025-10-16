@@ -134,15 +134,6 @@ protected:
 private:
 	memory_view m_bios_view;
 
-	// TODO: move to own device
-	void remote_addr_w(offs_t offset, u8 data);
-	u8 remote_data_r(offs_t offset);
-	void remote_data_w(offs_t offset, u8 data);
-
-	struct {
-		u8 index = 0;
-	}m_remote;
-
 	DECLARE_MACHINE_START(pc9821_canbe);
 };
 

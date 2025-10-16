@@ -31,8 +31,8 @@ TODO (pc9821ce):
 - Can't boot any floppy;
 
 TODO (pc9821cx3):
-- "MICON ERROR" at POST, we currently return a ready state in remote control register
-  to bypass it, is it expected behaviour?
+- Incomplete bank mapping, keeps looping over the same routine when hopping to PnP BIOS after
+  soft reset thru 0x0000:04fa program flow;
 - Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os
   $b00-$b03, kanji RAM $a9 and $f0 (mostly bit 5, built-in 27 inches HDD check?) then keeps
   looping;
@@ -58,6 +58,8 @@ TODO: (pc9821Nr15/pc9821Nr166)
 
 #include "emu.h"
 #include "pc9821.h"
+
+#include "machine/pci.h"
 
 // TODO: remove me, cfr. pc9801.cpp; verify that 9801 clocks are correct for 9821 series as well
 #define BASE_CLOCK      XTAL(31'948'800)    // verified for PC-9801RS/FA
@@ -669,91 +671,53 @@ void pc9821_canbe_state::pc9821ce_io(address_map &map)
 	}));
 }
 
-
-/*
- * CanBe Remote control
- * I/O $f4a: remote index (write only?)
- * I/O $f4b: remote data r/w
- * [0x00] <unknown>
- * [0x01] Windows Sound System related
- * ---- xxxx irq select
- * ---- 1000 INT8
- * ---- 0011 INT0
- * ---- 0010 INT41
- * ---- 0000 INT5
- * [0x02] <unknown>
- * [0x03] Remote control reset
- * ---- -x-- (1) Mic through (loopback?)
- * ---- ---x (1) Remote control reset
- * [0x04] Mute control
- * ---- ---x (Global?) sound mute
- * [0x10] Remote control data status
- * ---- --x- (1) device ready (0) busy
- * ---- ---x (1) received data available
- * [0x11] Remote control code
- * <returns the button pressed in 2 bytes form, 2nd byte is the XOR-ed version of 1st>
- * [0x12] <unknown>
- * [0x13] Power control
- * <succession of bytes to power on/off>
- * [0x14] remote irq control
- * ---- -x-- irq enable
- * ---- --xx irq select
- * ---- --11 INT41
- * ---- --10 INT1
- * ---- --01 INT2
- * ---- --00 INT0
- * [0x30] VOL1,2 YMF288 Left sound output
- * [0x31] VOL1,2 YMF288 Right sound output
- * [0x32] VOL3,4 Line Left input
- * [0x33] VOL3,4 Line Right input
- * [0x34] <unknown>
- * [0x35] <unknown>
- */
-// TODO: export remote control to an actual device, and pinpoint actual name
-void pc9821_canbe_state::remote_addr_w(offs_t offset, u8 data)
-{
-	m_remote.index = data;
-}
-
-u8 pc9821_canbe_state::remote_data_r(offs_t offset)
-{
-	uint8_t res;
-
-	res = 0;
-
-	logerror("%s: remote control reg read %02x\n", machine().describe_context(), m_remote.index);
-
-	switch(m_remote.index)
-	{
-		case 0x10:
-			res |= 2; // POST will throw "MICOM ERROR" otherwise
-			break;
-	}
-	return res;
-}
-
-void pc9821_canbe_state::remote_data_w(offs_t offset, u8 data)
-{
-	switch(m_remote.index)
-	{
-		default:
-			logerror("%s: remote control reg write %02x %02x\n", machine().describe_context(), m_remote.index, data);
-	}
-}
-
 void pc9821_canbe_state::pc9821cx3_map(address_map &map)
 {
 	pc9821_map(map);
 	// TODO: overwritten by C-bus mapping, but definitely tested as RAM on POST
-	map(0x000c0000, 0x000dffff).ram();
+	// map(0x000c0000, 0x000dffff).ram();
+	map(0x000f8000, 0x000fffff).view(m_bios_view);
+	// TODO: remaining settings
+	// bp 0xfd25a,1,{eax |= 0x91;g}
+	m_bios_view[4](0x000f8000, 0x000fffff).rom().region("biosrom", 0x38000);
+//	m_bios_view[5](0x000f8000, 0x000fffff).rom().region("biosrom", 0x30000);
+	// setup mode (assumed)
+//	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x40000);
+
+	// NEC PC-9800 series logo (same place as view 4?)
+	m_bios_view[8](0x000f8000, 0x000fffff).rom().region("biosrom", 0x38000);
+	// Computer GFXs
+	m_bios_view[14](0x000f8000, 0x000fffff).rom().region("biosrom", 0x20000);
 }
 
-// TODO: SDIP port
 void pc9821_canbe_state::pc9821cx3_io(address_map &map)
 {
 	pc9821_io(map);
-	map(0x0f4a, 0x0f4a).w(FUNC(pc9821_canbe_state::remote_addr_w));
-	map(0x0f4b, 0x0f4b).rw(FUNC(pc9821_canbe_state::remote_data_r), FUNC(pc9821_canbe_state::remote_data_w));
+	// TODO: MBCFG index/data devices (as C-Bus option)
+//	map(0x0411, 0x0411) index
+//	map(0x0413, 0x0413) data
+//	map(0x0b00, 0x0b00) index
+//	map(0x0b02, 0x0b02) data
+	map(0x043d, 0x043d).w(FUNC(pc9821_canbe_state::itf_43d_bank_w));
+	// TODO: uses its own banking scheme to accomodate extra GFX ROM size
+	map(0x043f, 0x043f).lw8(NAME([this] (offs_t offset, u8 data) {
+		if ((data & 0xf8) == 0xe0)
+		{
+			logerror("C-Bus overlay set %02x\n", data);
+			m_bios_view.select(data & 0x7);
+			return;
+		}
+
+		if ((data & 0xf8) == 0xe8)
+		{
+			logerror("C-Bus overlay set %02x\n", data);
+			m_bios_view.select((data & 0x7) | 8);
+			return;
+		}
+
+		pc9801vm_state::cbus_43f_bank_w(offset, data);
+	}));
+
 }
 
 static INPUT_PORTS_START( pc9821 )
@@ -939,7 +903,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(100'000'000); // Pentium Pro, 512 kB second cache option RAM
-	PENTIUM(config.replace(), m_maincpu, xtal);
+	PENTIUM_PRO(config.replace(), m_maincpu, xtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821cx3_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821cx3_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -947,7 +911,8 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
-	m_cbus[0]->set_default_option("pc9801_118");
+	m_cbus[0]->set_default_option("sound_pc9821cx3");
+	m_cbus[0]->set_fixed(true);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 
@@ -961,6 +926,8 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	// C-Bus x 3
 	// PC-9821CB-B04, on dedicated bus (Fax/Modem 14'400 bps) and IrDA board (115'200 bps)
 	// Optional PC-9821C3-B02 MIDI board, on dedicated bus
+	PCI_ROOT(config, "pci", 0);
+
 }
 
 void pc9821_mate_x_state::pc9821xs(machine_config &config)
@@ -1268,7 +1235,7 @@ getitf98 dump known to exist, in case anyone bothers to assemble a franken def .
 
 
 /*
-PC-9821CX3
+PC-9821Cx3
 
 Pentium @ 100 MHz
 16MB, max 128 MB
@@ -1288,11 +1255,12 @@ ROM_START( pc9821cx3 )
 	// 0 - 0x56xx: CanBe mascot GFX animations
 	// 0x1fda8 (?) - 0x2458f: monitor GFXs
 	// 0x24590 - 0x36xxx: more CanBe mascot GFX animations
+	// 0x38000: PnP bootblock?
 	// 0x3c000: NEC & CanBe logo GFXs
 	// 0x40000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
 	// 0x42000: setup menu
-	ROM_COPY( "biosrom", 0x78000, 0x10000, 0x08000 ) // ITF
-	ROM_COPY( "biosrom", 0x70000, 0x18000, 0x08000 ) // BIOS, probably wrong (reset vector at 0x67ff0)
+	ROM_COPY( "biosrom", 0x78000, 0x10000, 0x08000 ) // ITF?
+	ROM_COPY( "biosrom", 0x70000, 0x18000, 0x08000 ) // BIOS?
 	ROM_COPY( "biosrom", 0x68000, 0x20000, 0x08000 )
 	ROM_COPY( "biosrom", 0x60000, 0x28000, 0x08000 )
 
@@ -1319,10 +1287,23 @@ ROM_START( pc9821cx3 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
-	LOAD_KANJI_ROMS
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_CONTINUE(                      0x20000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_CONTINUE(                      0x20001, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_CONTINUE(                      0x60000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	ROM_CONTINUE(                      0x60001, 0x4000  )
+
+	// NOTE: needs 0-fill erase for initialization
+	// cfr. $afe00 and $ad400 range
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
-	ROM_COPY( "biosrom", 0x40000, 0x00000, 0x02000 )
+	ROM_COPY( "biosrom", 0x58000, 0x00000, 0x02000 )
 ROM_END
 
 /*

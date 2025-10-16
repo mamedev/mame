@@ -7,6 +7,7 @@
 #pragma once
 
 #include "pc9801_86.h"
+#include "pc9801_118.h"
 #include "pc9801_cbus.h"
 
 #include "machine/eepromser.h"
@@ -39,7 +40,35 @@ private:
 	u8 m_index;
 };
 
-DECLARE_DEVICE_TYPE(SOUND_PC9821CE, sound_pc9821ce_device)
+class sound_pc9821cx3_device : public pc9801_118_device
+						     , public device_memory_interface
+{
+public:
+	// construction/destruction
+	sound_pc9821cx3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual space_config_vector memory_space_config() const override;
+
+private:
+	address_space_config m_space_io_config;
+
+	void pnp_io_map(address_map &map);
+
+	u8 control_r(offs_t offset);
+	void control_w(offs_t offset, u8 data);
+
+	u8 m_index;
+};
+
+
+DECLARE_DEVICE_TYPE(SOUND_PC9821CE,  sound_pc9821ce_device)
+DECLARE_DEVICE_TYPE(SOUND_PC9821CX3, sound_pc9821cx3_device)
 
 
 #endif // MAME_BUS_CBUS_SOUND_H

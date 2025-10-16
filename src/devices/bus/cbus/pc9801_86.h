@@ -29,12 +29,13 @@ class pc9801_86_device : public device_t
 public:
 	// construction/destruction
 	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr feature_type unemulated_features() { return feature::MICROPHONE; }
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 protected:
+	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	void io_map(address_map &map) ATTR_COLD;
 	u8 pcm_control_r();
 	void pcm_control_w(u8 data);

@@ -35,6 +35,8 @@ public:
 	void ext_w(offs_t offset, uint8_t data);
 
 protected:
+	pc9801_118_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
@@ -44,9 +46,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-private:
 	required_device<pc9801_slot_device> m_bus;
-	required_device<ym2608_device>  m_opn3;
+	required_device<ym2608_device> m_opn3;
+private:
 
 //  u16 m_io_base, m_joy_sel;
 
