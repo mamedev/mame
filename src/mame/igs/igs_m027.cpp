@@ -3563,14 +3563,14 @@ ROM_START( mgfx ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery, 22 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-104t.u10", 0x000000, 0x80000, CRC(e6e304f7) SHA1(e99cecbbd938affb521b28583af5f8171d397ec2) )
 
-	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", ROMREGION_ERASE00 )
-	ROM_LOAD( "igs_t3402.u9", 0x000000, 0x80000, NO_DUMP )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t3402.u9", 0x000000, 0x80000, CRC(19b37f83) SHA1(d49bd0c1357bfe76182976c0142c2dded415ac7a) )
 
-	ROM_REGION( 0x400000, "igs017_igs031:sprites", ROMREGION_ERASE00 )
-	ROM_LOAD( "igs_a3401.u17", 0x000000, 0x400000, NO_DUMP )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a3401.u17", 0x000000, 0x400000, CRC(c031f069) SHA1(bb2a6a65e31d730bff8d3e1b8efeafe1a93a73b4) )
 
-	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 )
-	ROM_LOAD( "igs_s3403.u14", 0x00000, 0x80000, NO_DUMP )
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s3403.u14", 0x00000, 0x80000, CRC(f101f38d) SHA1(f8c6dd0bfe9a27423781039f28d102661cf26f4b) )
 ROM_END
 
 
@@ -4650,7 +4650,7 @@ void igs_m027_state::init_gonefsh()
 void igs_m027_state::init_mgfx()
 {
 	mgfx_decrypt(machine());
-	// m_igs017_igs031->set_text_reverse_bits(false);
+	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 } // anonymous namespace
@@ -4702,6 +4702,7 @@ GAME(  2001, cjsxp,         0,        cjsxp,        cjsxp,         igs_m027_stat
 GAME(  2000, tshs,          0,        zhongguo,     tshs,          igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V201CN)", 0 )
 GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // unemulated sound chips
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
+GAME(  200?, mgfx,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // inputs, outputs, Oki banking
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
@@ -4723,4 +4724,3 @@ GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
 GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, init_jhg3d,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
-GAME(  200?, mgfx,          0,        mgzz,             mgzz101cn,igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", MACHINE_NOT_WORKING )
