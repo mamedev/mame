@@ -147,11 +147,6 @@ void gng_state::video_start()
 	m_fg_tilemap->set_transparent_pen(3);
 	m_bg_tilemap->set_transmask(0, 0xff, 0x00); // split type 0 is totally transparent in front half
 	m_bg_tilemap->set_transmask(1, 0x41, 0xbe); // split type 1 has pens 0 and 6 transparent in front half
-
-	m_bg_tilemap->set_scrolldx(128, 128);
-	m_bg_tilemap->set_scrolldy(  6,   6);
-	m_fg_tilemap->set_scrolldx(128, 128);
-	m_fg_tilemap->set_scrolldy(  6,   6);
 }
 
 
@@ -219,7 +214,7 @@ void gng_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				buffered_spriteram[offs] + ((attributes << 2) & 0x300),
 				(attributes >> 4) & 3,
 				flipx, flipy,
-				sx + 128, sy + 6, 15);
+				sx, sy, 15);
 	}
 }
 
@@ -593,7 +588,7 @@ void gng_state::gng(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(12'000'000) / 2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(gng_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);

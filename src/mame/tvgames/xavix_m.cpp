@@ -497,29 +497,16 @@ void xavix_state::write_io1(uint8_t data, uint8_t direction)
 
 void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 {
-	if (direction & 0x08)
-	{
-		m_i2cmem->write_sda((data & 0x08) >> 3);
-	}
-
-	if (direction & 0x10)
-	{
-		m_i2cmem->write_scl((data & 0x10) >> 4);
-	}
+	m_i2cmem->write_sda(BIT(direction, 3) ? BIT(data, 3) : 1);
+	m_i2cmem->write_scl(BIT(direction, 4) ? BIT(data, 4) : 0);
 }
 
 // ltv_tam
 void xavix_i2c_ltv_tam_state::write_io1(uint8_t data, uint8_t direction)
 {
-	if (direction & 0x08)
-	{
-		m_i2cmem->write_sda((data & 0x08) >> 3);
-	}
+	m_i2cmem->write_sda(BIT(direction, 3) ? BIT(data, 3) : 1);
+	m_i2cmem->write_scl(BIT(direction, 2) ? BIT(data, 2) : 0);
 
-	if (direction & 0x04)
-	{
-		m_i2cmem->write_scl((data & 0x04) >> 2);
-	}
 }
 
 void xavix_i2c_mj_state::write_io1(uint8_t data, uint8_t direction)
@@ -531,15 +518,8 @@ void xavix_i2c_mj_state::write_io1(uint8_t data, uint8_t direction)
 // for taikodp
 void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
-	if (direction & 0x08)
-	{
-		m_i2cmem->write_sda((data & 0x08) >> 3);
-	}
-
-	if (direction & 0x10)
-	{
-		m_i2cmem->write_scl((data & 0x10) >> 4);
-	}
+	m_i2cmem->write_sda(BIT(direction, 3) ? BIT(data, 3) : 1);
+	m_i2cmem->write_scl(BIT(direction, 4) ? BIT(data, 4) : 0);
 }
 
 void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)
@@ -568,8 +548,8 @@ void xavix_popira2_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
 	if (m_cartslot->has_cart())
 	{
-		m_cartslot->write_sda((data & 0x08) >> 3);
-		m_cartslot->write_scl((data & 0x10) >> 4);
+		m_cartslot->write_sda(BIT(direction, 3) ? BIT(data, 3) : 1);
+		m_cartslot->write_scl(BIT(direction, 4) ? BIT(data, 4) : 0);
 	}
 }
 
@@ -585,8 +565,8 @@ void xavix_evio_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
 	if (m_cartslot->has_cart())
 	{
-		m_cartslot->write_sda((data & 0x10) >> 4);
-		m_cartslot->write_scl((data & 0x20) >> 5);
+		m_cartslot->write_sda(BIT(direction, 4) ? BIT(data, 4) : 1);
+		m_cartslot->write_scl(BIT(direction, 5) ? BIT(data, 5) : 0);
 	}
 }
 
@@ -892,11 +872,10 @@ void xavix_state::machine_start()
 	save_item(NAME(m_arena_control));
 	save_item(NAME(m_6ff0));
 	save_item(NAME(m_video_ctrl));
-	save_item(NAME(m_mastervol));
-	save_item(NAME(m_unk_snd75f8));
-	save_item(NAME(m_unk_snd75f9));
+	save_item(NAME(m_cyclerate));
+	save_item(NAME(m_mixer));
 	save_item(NAME(m_unk_snd75ff));
-	save_item(NAME(m_sndtimer));
+	save_item(NAME(m_tp));
 	save_item(NAME(m_timer_baseval));
 	save_item(NAME(m_spritereg));
 }
@@ -942,14 +921,13 @@ void xavix_state::machine_reset()
 
 	m_spritereg = 0;
 
-	m_mastervol = 0x00;
-	m_unk_snd75f8 = 0x00;
-	m_unk_snd75f9 = 0x00;
+	m_cyclerate = 0x00;
+	m_mixer = 0x00;
 	m_unk_snd75ff = 0x00;
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_sndtimer[i] = 0x00;
+		m_tp[i] = 0x00;
 	}
 
 	std::fill(std::begin(m_spritefragment_dmaparam1), std::end(m_spritefragment_dmaparam1), 0x00);

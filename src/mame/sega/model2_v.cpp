@@ -807,13 +807,40 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 
 	if (renderer & 2)
 	{
-		extra.texwidth = 32 << ((tri->texheader[0] >> 0) & 0x7);
-		extra.texheight = 32 << ((tri->texheader[0] >> 3) & 0x7);
-		extra.texx = 32 * ((tri->texheader[2] >> 0) & 0x3f);
-		extra.texy = 32 * ((tri->texheader[2] >> 6) & 0x1f);
 		extra.texmirrorx = (tri->texheader[0] >> 8) & 1;
 		extra.texmirrory = (tri->texheader[0] >> 9) & 1;
-		extra.texsheet = (tri->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
+
+		u32* sheet = (tri->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
+		u32 width = 32 << ((tri->texheader[0] >> 0) & 0x7);
+		u32 height = 32 << ((tri->texheader[0] >> 3) & 0x7);
+		u32 posx = 32 * ( (tri->texheader[2] >> 0) & 0x3f );
+		u32 posy = 32 * ( (tri->texheader[2] >> 6) & 0x1f );
+
+		// 6 mips levels
+		// each mip level has half width and half height of the level above
+		// mips are located recursively in the bottom right corner of 2048x1024
+		// each level has flipped ram banks compared to the level above
+		for (u32 mip = 0; mip < 6; mip++)
+		{
+			extra.texsheet[mip] = sheet;
+			extra.texwidth[mip] = width;
+			extra.texheight[mip] = height;
+			extra.texx[mip] = posx;
+			extra.texy[mip] = posy;
+
+			width /= 2;
+			height /= 2;
+			posx = 2048 - (2048 - posx) / 2;
+			posy = 1024 - (1024 - posy) / 2;
+			if (sheet == m_state.m_textureram0)
+			{
+				sheet = m_state.m_textureram1;
+			}
+			else
+			{
+				sheet = m_state.m_textureram0;
+			}
+		}
 
 		tri->v[0].pz = 1.0f / (tri->v[0].pz + std::numeric_limits<float>::min());
 		tri->v[0].pu = tri->v[0].pu * tri->v[0].pz * (1.0f / 8.0f);
@@ -2667,8 +2694,7 @@ u32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitm
 // TODO: fix forward declaration mess and move this function there instead
 void model2_state::tri_list_dump(FILE *dst)
 {
-	u32  i;
-
+	u32 i;
 	for( i = 0; i < m_raster->tri_list_index; i++ )
 	{
 		fprintf( dst, "index: %d\n", i );

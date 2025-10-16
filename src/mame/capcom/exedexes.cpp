@@ -36,6 +36,7 @@ public:
 	exedexes_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
@@ -44,7 +45,8 @@ public:
 		m_nbg_yscroll(*this, "nbg_yscroll"),
 		m_nbg_xscroll(*this, "nbg_xscroll"),
 		m_bg_scroll(*this, "bg_scroll"),
-		m_tilerom(*this, "tilerom")
+		m_tilerom(*this, "tilerom"),
+		m_irqprom(*this, "irqprom")
 	{ }
 
 	void exedexes(machine_config &config);
@@ -57,6 +59,7 @@ protected:
 private:
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -68,15 +71,16 @@ private:
 	required_shared_ptr<u8> m_nbg_xscroll;
 	required_shared_ptr<u8> m_bg_scroll;
 	required_region_ptr<u8> m_tilerom;
+	required_region_ptr<u8> m_irqprom;
 
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_tx_tilemap = nullptr;
-	uint8_t m_chon = 0;
-	uint8_t m_objon = 0;
-	uint8_t m_sc1on = 0;
-	uint8_t m_sc2on = 0;
+	u8 m_chon = 0;
+	u8 m_objon = 0;
+	u8 m_sc1on = 0;
+	u8 m_sc2on = 0;
 
 	void videoram_w(offs_t offset, u8 data);
 	void colorram_w(offs_t offset, u8 data);
@@ -307,13 +311,18 @@ u32 exedexes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::scanline)
 {
+	// interrupts at scanline specified in PROM
 	const int scanline = param;
+	const u8 irq = m_irqprom[scanline & 0xff];
 
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   // Z80 - RST 10h - vblank
+	// RST 08h at scanline 109
+	// RST 10h at scanline 240 (vblank)
+	if (irq & 8)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
 
-	if (scanline == 0) // unknown irq event
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   // Z80 - RST 08h
+	// 4 audio interrupts per frame
+	if (irq & 4)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -495,20 +504,17 @@ void exedexes_state::exedexes(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3 MHz, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &exedexes_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(exedexes_state::scanline), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 12_MHz_XTAL / 4)); // 3 MHz, verified on PCB
-	audiocpu.set_addrmap(AS_PROGRAM, &exedexes_state::sound_map);
-	audiocpu.set_periodic_int(FUNC(exedexes_state::irq0_line_hold), attotime::from_hz(4*60));
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // 3 MHz, verified on PCB
+	m_audiocpu->set_addrmap(AS_PROGRAM, &exedexes_state::sound_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(exedexes_state::scanline), "screen", 0, 1);
 
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.60); // verified on PCB
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 262, 16, 240); // measured 59.6Hz
 	screen.set_screen_update(FUNC(exedexes_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -556,7 +562,10 @@ ROM_START( exedexes )
 	ROM_LOAD( "c01_ee07.bin", 0x0000, 0x4000, CRC(3625a68d) SHA1(83010ca356385b713bafe03a502c566f6a9a8365) ) // Front Tile Map
 	ROM_LOAD( "h04_ee09.bin", 0x4000, 0x2000, CRC(6057c907) SHA1(886790641b84b8cd659d2eb5fd1adbabdd7dad3d) ) // Back Tile map
 
-	ROM_REGION( 0x0b20, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "06l_e-06.bin", 0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) ) // interrupt timing
+
+	ROM_REGION( 0x0a20, "proms", 0 )
 	ROM_LOAD( "02d_e-02.bin", 0x0000, 0x0100, CRC(8d0d5935) SHA1(a0ab827ff3b641965ef851893c399e3988fde55e) ) // red component
 	ROM_LOAD( "03d_e-03.bin", 0x0100, 0x0100, CRC(d3c17efc) SHA1(af88340287bd732c91bc5c75970f9de0431b4304) ) // green component
 	ROM_LOAD( "04d_e-04.bin", 0x0200, 0x0100, CRC(58ba964c) SHA1(1f98f8e484a0462f1a9fadef9e57612a32652599) ) // blue component
@@ -565,10 +574,9 @@ ROM_START( exedexes )
 	ROM_LOAD( "c04_e-07.bin", 0x0500, 0x0100, CRC(850064e0) SHA1(3884485e91bd82539d0d33f46b7abac60f4c3b1c) ) // 16x16 tile lookup table
 	ROM_LOAD( "l09_e-11.bin", 0x0600, 0x0100, CRC(2bb68710) SHA1(cfb375316245cb8751e765f163e6acf071dda9ca) ) // sprite lookup table
 	ROM_LOAD( "l10_e-12.bin", 0x0700, 0x0100, CRC(173184ef) SHA1(f91ecbdc67af1eed6757f660cac8a0e6866c1822) ) // sprite palette bank
-	ROM_LOAD( "06l_e-06.bin", 0x0800, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) ) // interrupt timing (not used)
-	ROM_LOAD( "k06_e-08.bin", 0x0900, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // video timing (not used)
-	ROM_LOAD( "l03_e-09.bin", 0x0a00, 0x0100, CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) ) // unknown (all 0)
-	ROM_LOAD( "03e_e-01.bin", 0x0b00, 0x0020, CRC(1acee376) SHA1(367094d924f8e0ec36d8310fada4d8143358f697) ) // unknown (priority?)
+	ROM_LOAD( "k06_e-08.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // video timing (not used)
+	ROM_LOAD( "l03_e-09.bin", 0x0900, 0x0100, CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) ) // unknown (all 0)
+	ROM_LOAD( "03e_e-01.bin", 0x0a00, 0x0020, CRC(1acee376) SHA1(367094d924f8e0ec36d8310fada4d8143358f697) ) // unknown (priority?)
 ROM_END
 
 ROM_START( savgbees )
@@ -598,6 +606,9 @@ ROM_START( savgbees )
 	ROM_LOAD( "c01_ee07.bin", 0x0000, 0x4000, CRC(3625a68d) SHA1(83010ca356385b713bafe03a502c566f6a9a8365) ) // Front Tile Map
 	ROM_LOAD( "h04_ee09.bin", 0x4000, 0x2000, CRC(6057c907) SHA1(886790641b84b8cd659d2eb5fd1adbabdd7dad3d) ) // Back Tile map
 
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "06l_e-06.bin", 0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) ) // interrupt timing
+
 	ROM_REGION( 0x0b20, "proms", 0 )
 	ROM_LOAD( "02d_e-02.bin", 0x0000, 0x0100, CRC(8d0d5935) SHA1(a0ab827ff3b641965ef851893c399e3988fde55e) ) // red component
 	ROM_LOAD( "03d_e-03.bin", 0x0100, 0x0100, CRC(d3c17efc) SHA1(af88340287bd732c91bc5c75970f9de0431b4304) ) // green component
@@ -607,10 +618,9 @@ ROM_START( savgbees )
 	ROM_LOAD( "c04_e-07.bin", 0x0500, 0x0100, CRC(850064e0) SHA1(3884485e91bd82539d0d33f46b7abac60f4c3b1c) ) // 16x16 tile lookup table
 	ROM_LOAD( "l09_e-11.bin", 0x0600, 0x0100, CRC(2bb68710) SHA1(cfb375316245cb8751e765f163e6acf071dda9ca) ) // sprite lookup table
 	ROM_LOAD( "l10_e-12.bin", 0x0700, 0x0100, CRC(173184ef) SHA1(f91ecbdc67af1eed6757f660cac8a0e6866c1822) ) // sprite palette bank
-	ROM_LOAD( "06l_e-06.bin", 0x0800, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) ) // interrupt timing (not used)
-	ROM_LOAD( "k06_e-08.bin", 0x0900, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // video timing (not used)
-	ROM_LOAD( "l03_e-09.bin", 0x0a00, 0x0100, CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) ) // unknown (all 0)
-	ROM_LOAD( "03e_e-01.bin", 0x0b00, 0x0020, CRC(1acee376) SHA1(367094d924f8e0ec36d8310fada4d8143358f697) ) // unknown (priority?)
+	ROM_LOAD( "k06_e-08.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // video timing (not used)
+	ROM_LOAD( "l03_e-09.bin", 0x0900, 0x0100, CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) ) // unknown (all 0)
+	ROM_LOAD( "03e_e-01.bin", 0x0a00, 0x0020, CRC(1acee376) SHA1(367094d924f8e0ec36d8310fada4d8143358f697) ) // unknown (priority?)
 ROM_END
 
 } // anonymous namespace

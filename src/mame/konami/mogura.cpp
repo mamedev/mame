@@ -63,6 +63,7 @@ S1/S2/S13/S14 - 0-ohm jumpers. S14 open, S1 1-3, S2 1-2, S13 1-2
             X - Resistors (some used for R2R Audio DAC)
         HSync - 15.6256kHz
         VSync - 59.1881Hz
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -109,8 +110,10 @@ private:
 	tilemap_t *m_tilemap = nullptr;
 
 	void tileram_w(offs_t offset, uint8_t data);
+	void control_w(uint8_t data);
 	void dac_w(uint8_t data);
 	void gfxram_w(offs_t offset, uint8_t data);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -150,38 +153,30 @@ void mogura_state::palette(palette_device &palette) const
 }
 
 
+TILEMAP_MAPPER_MEMBER(mogura_state::tilemap_scan)
+{
+	// strange tilemap layout probably means hcount is 256-511 and then 128-255
+	col ^= (col >> 1 & 0x10) ^ 0x20;
+	return row << 6 | col;
+}
+
 TILE_GET_INFO_MEMBER(mogura_state::get_tile_info)
 {
 	int code = m_tileram[tile_index];
 	int attr = m_tileram[tile_index + 0x800];
 
-	tileinfo.set(0,
-			code,
-			(attr >> 1) & 7,
-			0);
+	tileinfo.set(0, code, (attr >> 1) & 7, 0);
 }
 
 
 void mogura_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mogura_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mogura_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(mogura_state::tilemap_scan)), 8, 8, 64, 32);
 }
 
 uint32_t mogura_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const rectangle &visarea = screen.visible_area();
-
-	// tilemap layout is a bit strange ...
-	rectangle clip = visarea;
-	clip.max_x = 256 - 1;
-	m_tilemap->set_scrollx(0, 256);
-	m_tilemap->draw(screen, bitmap, clip, 0, 0);
-
-	clip.min_x = 256;
-	clip.max_x = 512 - 1;
-	m_tilemap->set_scrollx(0, -128);
-	m_tilemap->draw(screen, bitmap, clip, 0, 0);
-
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -191,8 +186,19 @@ void mogura_state::tileram_w(offs_t offset, uint8_t data)
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
+void mogura_state::control_w(uint8_t data)
+{
+	// bits 0 & 1: coin counters
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 0));
+
+	// bit 2: sound related?
+	// bit 3: always toggles?
+}
+
 void mogura_state::dac_w(uint8_t data)
 {
+	// 4 bit DAC x 2. MSB = left, LSB = right
 	m_ldac->write(data >> 4);
 	m_rdac->write(data & 15);
 }
@@ -200,8 +206,7 @@ void mogura_state::dac_w(uint8_t data)
 
 void mogura_state::gfxram_w(offs_t offset, uint8_t data)
 {
-	m_gfxram[offset] = data ;
-
+	m_gfxram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset / 16);
 }
 
@@ -217,14 +222,14 @@ void mogura_state::prg_map(address_map &map)
 void mogura_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).nopw();    // ??
+	map(0x00, 0x00).w(FUNC(mogura_state::control_w));
 	map(0x08, 0x08).portr("SYSTEM");
 	map(0x0c, 0x0c).portr("P1");
 	map(0x0d, 0x0d).portr("P2");
 	map(0x0e, 0x0e).portr("P3");
 	map(0x0f, 0x0f).portr("P4");
 	map(0x10, 0x10).portr("SERVICE");
-	map(0x14, 0x14).w(FUNC(mogura_state::dac_w)); // 4 bit DAC x 2. MSB = left, LSB = right
+	map(0x14, 0x14).w(FUNC(mogura_state::dac_w));
 }
 
 static INPUT_PORTS_START( mogura )
@@ -276,17 +281,14 @@ GFXDECODE_END
 void mogura_state::mogura(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 24_MHz_XTAL / 8 ); // 3 MHz
+	Z80(config, m_maincpu, 24_MHz_XTAL / 8); // 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &mogura_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &mogura_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mogura_state::irq0_line_hold));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.1881); // ?
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 512);
-	screen.set_visarea(0, 320-1, 0, 256-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // measured 59.1881
 	screen.set_screen_update(FUNC(mogura_state::screen_update));
 	screen.set_palette("palette");
 

@@ -92,7 +92,7 @@ protected:
 	// video-related
 	uint8_t m_layer_colorbase[3]{};
 	uint8_t m_sprite_colorbase = 0;
-	int m_layerpri[3]{};
+	int32_t m_layerpri[3]{};
 	bool m_tilemap_select;
 
 	// devices
@@ -173,9 +173,9 @@ K052109_CB_MEMBER(xmen_state::tile_callback)
 {
 	// (color & 0x02) is flip y handled internally by the 052109
 	if (layer == 0)
-		*color = m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+		color = m_layer_colorbase[layer] + ((color & 0xf0) >> 4);
 	else
-		*color = m_layer_colorbase[layer] + ((*color & 0x7c) >> 2);
+		color = m_layer_colorbase[layer] + ((color & 0x7c) >> 2);
 }
 
 /***************************************************************************
@@ -186,18 +186,18 @@ K052109_CB_MEMBER(xmen_state::tile_callback)
 
 K053246_CB_MEMBER(xmen_state::sprite_callback)
 {
-	int const pri = (*color & 0x00e0) >> 4;   // ???????
+	int const pri = (color & 0x00e0) >> 4;   // ???????
 
 	if (pri <= m_layerpri[2])
-		*priority_mask = 0;
+		priority_mask = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority_mask = 0xf0;
+		priority_mask = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+		priority_mask = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		priority_mask = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x001f);
+	color = m_sprite_colorbase + (color & 0x001f);
 }
 
 
@@ -239,8 +239,6 @@ uint32_t xmen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			m_k052109->mark_tilemap_dirty(i);
 	}
 
-	m_k052109->tilemap_update();
-
 	// sort layers and draw
 	int layer[3];
 	for (int i = 0; i < 3; i++)
@@ -252,14 +250,12 @@ uint32_t xmen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	konami_sortlayers3(layer, m_layerpri);
 
 	screen.priority().fill(0, cliprect);
-	// note the '+1' in the background color!!!
-	bitmap.fill(16 * bg_colorbase + 1, cliprect);
+	bitmap.fill(16 * bg_colorbase + 1, cliprect); // note the '+1' in the background color!
+
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
-	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-	pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 	m_k053246->k053247_sprites_draw(bitmap, cliprect);
 	return 0;
 }
@@ -318,7 +314,7 @@ void xmen6p_state::screen_vblank(int state)
 				m_k052109->mark_tilemap_dirty(i);
 		}
 
-		m_k052109->tilemap_update();
+		m_k052109->update_scroll();
 
 		// sort layers and draw
 		int layer[3];
@@ -331,14 +327,12 @@ void xmen6p_state::screen_vblank(int state)
 		konami_sortlayers3(layer, m_layerpri);
 
 		m_screen->priority().fill(0, cliprect);
-		// note the '+1' in the background color!!!
-		renderbitmap.fill(16 * bg_colorbase + 1, cliprect);
+		renderbitmap.fill(16 * bg_colorbase + 1, cliprect); // note the '+1' in the background color!
+
 		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[0], 0, 1);
 		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[1], 0, 2);
 		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[2], 0, 4);
 
-		/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-		pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 		m_k053246->k053247_sprites_draw(renderbitmap, cliprect);
 	}
 }

@@ -385,7 +385,7 @@ void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rect
 		shadow = color = m_ram[offs + 6];
 		primask = 0;
 
-		m_k053247_cb(&code, &color, &primask);
+		m_k053247_cb(code, color, primask);
 
 		k053247_draw_single_sprite_gxcore(bitmap, cliprect,
 				nullptr, nullptr,
@@ -595,7 +595,7 @@ void k053247_device::zdrawgfxzoom32GP(
 *****************************************************************************/
 
 
-DEFINE_DEVICE_TYPE(K055673, k055673_device, "k055673", "K055673 Sprite Generator")
+DEFINE_DEVICE_TYPE(K055673, k055673_device, "k055673", "Konami 055673 Sprite Generator")
 
 k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: k053247_device(mconfig, K055673, tag, owner, clock)
@@ -751,7 +751,7 @@ void k055673_device::device_start()
 //-------------------------------------------------
 
 
-DEFINE_DEVICE_TYPE(K053247, k053247_device, "k053247", "K053246/K053247 Sprite Generator")
+DEFINE_DEVICE_TYPE(K053247, k053247_device, "k053247", "Konami 053246/053247 Sprite Generator")
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: k053247_device(mconfig, K053247, tag, owner, clock)
@@ -871,7 +871,7 @@ void k053247_device::device_reset()
         0x00-0xff = zcode to ignore
 */
 
-void k053247_device::k053247_set_z_rejection(int zcode)
+void k053247_device::k053247_set_z_rejection(s32 zcode)
 {
 	m_z_rejection = zcode;
 }

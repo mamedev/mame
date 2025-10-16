@@ -291,7 +291,10 @@ static int flopcreate(int argc, char *argv[])
 	image_handler ih;
 	ih.set_on_disk_path(argv[4]);
 
-	ih.floppy_create(*create_fs, meta);
+	if(ih.floppy_create(*create_fs, meta)) {
+		fprintf(stderr, "Error: Floppy creation failed for format '%s'\n", create_fs->m_manager->name());
+		return 1;
+	}
 	return ih.floppy_save(*dest_format);
 }
 

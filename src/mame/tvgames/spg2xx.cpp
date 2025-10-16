@@ -331,6 +331,11 @@ void spg2xx_game_lexiart_state::mem_map_lexiart(address_map &map)
 	map(0x3f0000, 0x3f7fff).ram(); // 2 * 32Kb RAMs on PCB
 }
 
+void spg2xx_game_pdcj_state::mem_map_upperbank(address_map &map)
+{
+	map(0x000000, 0x1fffff).bankr("cartbank");
+	map(0x200000, 0x3fffff).bankr("upperbank");
+}
 
 
 static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuring out of inputs
@@ -558,10 +563,10 @@ static INPUT_PORTS_START( carled99 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("Steer Right")
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) // directional buttons, not a real joystick!
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Menu Select")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu Back")
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Accelerate")
@@ -1191,6 +1196,50 @@ static INPUT_PORTS_START( pballpup )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mpntball )
+	PORT_START("GUNY") // not verified
+	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 256.0f / 240.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("GUNX") // not verified
+	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.06f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Reload") // beeps if you hold on startup
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pause")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hide")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mpntbalt )
+	PORT_START("GUNY") // not verified
+	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 256.0f / 240.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("GUNX") // not verified
+	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.06f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hide")
+	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( swclone )
 	PORT_START("GUNY")
 	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1299,6 +1348,26 @@ static INPUT_PORTS_START( tmntbftc )
 	PORT_START("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( spidm2 )
+	PORT_START("P1") // the motion controls seem to map to simple button presses
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Hand Punch")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Web")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right Hand Punch")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Swing")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Jump")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Kick")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Pause")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( rocksock )
 	PORT_START("P1")
@@ -1623,6 +1692,27 @@ static INPUT_PORTS_START( ddr33v )
 	PORT_MODIFY("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pdcj )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pause")
+	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1977,12 +2067,19 @@ uint16_t spg2xx_game_pballpup_state::porta_r()
 void spg2xx_game_pballpup_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: spg2xx_game_pballpup_state::porta_w (%04x)\n", machine().describe_context(), data);
-	m_eeprom->di_write(BIT(data, 2));
-	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+
+	porta_nobank_w(offset, data, mem_mask);
 
 	// this can actually change bank from running code, because the code part in each bank is almost identical, just the data changes
 	switch_bank((data & 0x1000) ? 1 : 0);
+}
+
+void spg2xx_game_pballpup_state::porta_nobank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: spg2xx_game_pballpup_state::porta_nobank_w (%04x)\n", machine().describe_context(), data);
+	m_eeprom->di_write(BIT(data, 2));
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2005,6 +2102,27 @@ void spg2xx_game_pballpup_state::pballpup(machine_config &config)
 	m_maincpu->gunx_in().set(FUNC(spg2xx_game_pballpup_state::base_gunx_r));
 
 	EEPROM_93C66_16BIT(config, m_eeprom); // type?
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(spg2xx_game_pballpup_state::gun_irq)
+{
+	m_maincpu->extint_w(0, 1);
+}
+
+
+void spg2xx_game_pballpup_state::mpntball(machine_config &config)
+{
+	pballpup(config);
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_pballpup_state::porta_nobank_w));
+
+	// the gun can track (even without the screen flash) so this must be tied to movement, or periodic
+	TIMER(config, "guntimer").configure_periodic(FUNC(spg2xx_game_pballpup_state::gun_irq), attotime::from_hz(1000));
+}
+
+void spg2xx_game_pballpup_state::mpntbalt(machine_config &config)
+{
+	mpntball(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_pballpup_state::mem_map_2m);
 }
 
 uint16_t spg2xx_game_swclone_state::porta_r()
@@ -2069,8 +2187,6 @@ void spg2xx_game_dreamlss_state::porta_w(offs_t offset, uint16_t data, uint16_t 
 	switch_bank((data & 0x1000) ? 1 : 0);
 }
 
-
-// TODO: how does the SEEPROM hook up? (will need hack removing in init_dreamlss )
 uint16_t spg2xx_game_dreamlss_state::portb_r()
 {
 	uint16_t ret = m_portb_data & 0xfffe;
@@ -2566,6 +2682,41 @@ void spg2xx_game_smartcycle_state::smartcycle(machine_config &config)
 	SOFTWARE_LIST(config, "smartcycle_cart").set_original("smartcycle_cart");
 }
 
+void spg2xx_game_pdcj_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if ((data & mem_mask) & 0x0800)
+		m_upperbank->set_entry(2);
+	else
+		m_upperbank->set_entry(1);
+
+	m_maincpu->invalidate_cache();
+}
+
+void spg2xx_game_pdcj_state::machine_start()
+{
+	m_upperbank->configure_entries(0, memregion("maincpu")->bytes() / 0x400000, memregion("maincpu")->base(), 0x400000);
+	m_upperbank->set_entry(1);
+	spg2xx_game_state::machine_start();
+}
+
+void spg2xx_game_pdcj_state::machine_reset()
+{
+	m_upperbank->set_entry(1);
+	spg2xx_game_state::machine_reset();
+}
+
+void spg2xx_game_pdcj_state::pdcj(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_pdcj_state::mem_map_upperbank);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+}
+
 
 void spg2xx_game_ddr33v_state::init_ddr33v()
 {
@@ -2813,6 +2964,11 @@ ROM_START( lexiart )
 	ROM_LOAD16_WORD_SWAP( "lexibookartstudio.u3", 0x000000, 0x800000, CRC(fc417abb) SHA1(c0a18a2cf11c47086722f0ec88410614fed7c6f7) )
 ROM_END
 
+ROM_START( lexibds )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "barbiedrawingstudio.u3", 0x000000, 0x400000, CRC(16b5b52e) SHA1(e3719523d92d1302883f0b0c2d4b3fabedc34319) ) // no chip markings, dumped as 29LV320
+ROM_END
+
 ROM_START( tiktokmm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "webcamthingy.bin", 0x000000, 0x800000, CRC(54c0d4a9) SHA1(709ee607ca447baa6f7e686268df1998372fe617) )
@@ -2895,6 +3051,22 @@ ROM_START( whacmole )
 	ROM_LOAD16_WORD_SWAP( "whacamole.u1a", 0x000000, 0x400000, CRC(5841ba80) SHA1(b3ec922e1899a1f2e34069a50e36721e925afb9f) )
 ROM_END
 
+ROM_START( mpntbalt )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "paintball.u1", 0x000000, 0x400000, CRC(888e140e) SHA1(2406cfe7d9e40f112b6f161aba4886472524157e) )
+
+	//ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // dumped, but just contains user profiles / settings
+	//ROM_LOAD16_WORD_SWAP( "93c66.u2", 0x000, 0x200, CRC(3b5cf033) SHA1(5ac730141d2f44da6a18ab1ccb540543bace7553) )
+ROM_END
+
+ROM_START( mpntball )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "missionpaintball.u1", 0x000000, 0x800000, CRC(3962731a) SHA1(f33e69c681fb69204cf04174f725ebae30da6a43) )
+
+	//ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // dumped, but just contains user profiles / settings
+	//ROM_LOAD16_WORD_SWAP( "93c66.u4", 0x000, 0x200, CRC(cb6b9c9f) SHA1(78f485ee9a1f724428d08e4e2e152e95485777bb) )
+ROM_END
+
 ROM_START( backybbs )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "backyardbs.bin", 0x000000, 0x400000, CRC(9c378f27) SHA1(ca0c212482d0743db10046f550fee511a13e1ddb) )
@@ -2941,6 +3113,22 @@ ROM_END
 ROM_START( smartcyc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	/* no system ROM, all game data is on cartridges */
+ROM_END
+
+ROM_START( spidm2 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "spiderman2.bin", 0x000000, 0x400000, CRC(7ed425d8) SHA1(25b2078cdc83f5b54425a863336424c56ff20121) )
+ROM_END
+
+ROM_START( dinothun )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dinothunder.bin", 0x000000, 0x400000, CRC(03e82604) SHA1(c39d72aa8a0750ee38ab01b317e77a46e1d6004e) )
+ROM_END
+
+ROM_START( pdcj )
+	ROM_REGION( 0xc00000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "chip1.u2", 0x000000, 0x800000, CRC(ba4f2279) SHA1(cd6bc20f21e096251ca43b539c46cb51c790769c) )
+	ROM_LOAD16_WORD_SWAP( "chip2.u3", 0x800000, 0x400000, CRC(4fb335ac) SHA1(d6499816acb3da5c4f6a582bd3104c707422eb34) )
 ROM_END
 
 void spg2xx_game_state::init_crc()
@@ -3096,6 +3284,10 @@ CONS( 2005, tmntmutm,   0,        0, tmntmutm,  tmntmutm,  spg2xx_game_tmntmutm_
 
 CONS( 2006, pballpup,   0,        0, pballpup,  pballpup,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Powered Up",                                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2005, mpntbalt,   0,        0, mpntbalt,  mpntbalt,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Trainer",                                            MACHINE_IMPERFECT_SOUND )
+
+CONS( 2004, mpntball,   0,        0, mpntball,  mpntball,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball",                                                    MACHINE_IMPERFECT_SOUND )
+
 CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_state, empty_init,    "Hasbro / Tiger Electronics",                             "Dream Life Superstar (Version 0.3, Mar 16 2007)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Needs a hack to not show garbage sprite on startup
@@ -3118,6 +3310,8 @@ CONS( 200?, wfart,      0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_
 CONS( 200?, wfcentro,   wfart,    0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
 
 CONS( 200?, lexiart,    0,        0, lexiart,   lexiart,   spg2xx_game_lexiart_state,  empty_init,    "Lexibook",                                               "Lexibook Junior My 1st Drawing Studio",                                 MACHINE_NOT_WORKING )
+
+CONS( 200?, lexibds,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "Lexibook",                                               "Lexibook Junior Barbie Drawing Board / Barbie Drawing Studio",          MACHINE_NOT_WORKING )
 
 // set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
 CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                               MACHINE_NOT_WORKING )
@@ -3170,3 +3364,10 @@ CONS( 2007, lpetshop,   0,        0, lpetshop,  lpetshop,  spg2xx_game_lpetshop_
 CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,               empty_init, "Mattel",                                              "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, smartcyc,   0,        0, smartcycle, smartcyc, spg2xx_game_smartcycle_state,    empty_init, "Fisher Price",                                        "Smart Cycle", MACHINE_NOT_WORKING )
+
+CONS( 2004, spidm2,     0,        0, spg2xx,     spidm2,   spg2xx_game_state,               empty_init, "N-Vision",                                            "Spider-Man 2 Web Action", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2004, dinothun,   0,        0, spg2xx,    spg2xx,    spg2xx_game_state,               empty_init, "N-Vision / Toy Quest",                                "Power Rangers Dino Thunder: Thunder Action", MACHINE_NOT_WORKING )
+
+// this Japan version uses different banking to spg2xx_pdc.cpp so is in here instead
+CONS( 2006, pdcj,       0,        0, pdcj,      pdcj,      spg2xx_game_pdcj_state,          empty_init, "Conny / Takara",                                      "PDC - Pocket Dream Console (Japan)", MACHINE_IMPERFECT_SOUND )

@@ -100,7 +100,6 @@ private:
 	uint8_t m_sign[4]{};
 
 	template <uint8_t Which> void flipscreen_w(int state);
-	template <uint8_t Which> void dirtytiles();
 	void bankselect_w(uint8_t data);
 
 	void coin_counter_w(uint8_t data);
@@ -118,6 +117,7 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
+	template <uint8_t Which> void sprite_callback(int &code, int &color, int colbank);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;

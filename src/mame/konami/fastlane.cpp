@@ -72,7 +72,6 @@ private:
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	template <uint8_t Which> void vram_w(offs_t offset, uint8_t data);
 	void flipscreen_w(int state) { machine().tilemap().set_flip_all(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0); }
-	void dirtytiles() { machine().tilemap().mark_all_dirty(); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -140,12 +139,14 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info)
 
 void fastlane_state::video_start()
 {
-	m_k007121->set_spriteram(m_spriteram);
-
 	m_tilemap[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tilemap[1]->set_transparent_pen(0);
+
+	m_k007121->register_tilemap(m_tilemap[0]);
+	m_k007121->register_tilemap(m_tilemap[1]);
+	m_k007121->set_spriteram(m_spriteram);
 }
 
 
@@ -197,7 +198,7 @@ uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw the graphics
 	m_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, clip[0], 0, m_k007121->flipscreen() ? 16 : 40, 0, screen.priority(), (uint32_t)-1);
+	m_k007121->sprites_draw(bitmap, clip[0], screen.priority(), (uint32_t)-1);
 	m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 
 	return 0;
@@ -357,10 +358,10 @@ void fastlane_state::fastlane(machine_config &config)
 	PALETTE(config, m_palette, FUNC(fastlane_state::palette)).set_format(palette_device::xBGR_555, 1024*16, 0x400);
 
 	K007121(config, m_k007121, 0, gfx_fastlane, m_palette, m_screen);
+	m_k007121->set_sprite_offsets(40, 16);
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k007121->set_flipscreen_cb().set(FUNC(fastlane_state::flipscreen_w));
-	m_k007121->set_dirtytiles_cb(FUNC(fastlane_state::dirtytiles));
 
 	K051733(config, "k051733", 24_MHz_XTAL / 2);
 

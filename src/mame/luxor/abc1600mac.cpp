@@ -614,12 +614,18 @@ void abc1600_mac_device::dma_mreq_w(int index, int dmamap, offs_t offset, uint8_
 
 uint8_t abc1600_mac_device::dma_iorq_r(int dmamap, offs_t offset)
 {
+	uint8_t data = 0xff;
 	bool rw;
-	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
+	offs_t virtual_offset = 0x1fe000 | (get_dma_address(dmamap, offset, rw) & 0x1fff);
 
 	LOGMASKED(LOG_DMA, "%s DIORQ R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 
-	return space().read_byte(virtual_offset);
+	if ((offset & 0x1800) == 0x1000)
+	{
+		data = space().read_byte(virtual_offset);
+	}
+
+	return data;
 }
 
 
@@ -630,11 +636,14 @@ uint8_t abc1600_mac_device::dma_iorq_r(int dmamap, offs_t offset)
 void abc1600_mac_device::dma_iorq_w(int dmamap, offs_t offset, uint8_t data)
 {
 	bool rw;
-	offs_t virtual_offset = 0x1fe000 | get_dma_address(dmamap, offset, rw);
+	offs_t virtual_offset = 0x1fe000 | (get_dma_address(dmamap, offset, rw) & 0x1fff);
 
 	LOGMASKED(LOG_DMA, "%s DIORQ W %04x:%06x=%02x\n", machine().describe_context(), offset, virtual_offset, data);
 
-	space().write_byte(virtual_offset, data);
+	if ((offset & 0x1800) == 0x1000)
+	{
+		space().write_byte(virtual_offset, data);
+	}
 }
 
 

@@ -262,7 +262,7 @@ void wy60_state::wy60(machine_config &config)
 	i8031_device &maincpu(I8031(config, "maincpu", 11_MHz_XTAL)); // AMD P8051AH-40196
 	// FIXME: correct device type once 8051 core implements EA pin control
 	maincpu.set_addrmap(AS_PROGRAM, &wy60_state::prog_map);
-	maincpu.set_addrmap(AS_IO, &wy60_state::ext_map);
+	maincpu.set_addrmap(AS_DATA, &wy60_state::ext_map);
 	maincpu.port_out_cb<1>().set(FUNC(wy60_state::p1_w));
 	maincpu.port_in_cb<1>().set(FUNC(wy60_state::p1_r));
 	maincpu.port_out_cb<3>().set(m_aux, FUNC(rs232_port_device::write_txd)).bit(1);

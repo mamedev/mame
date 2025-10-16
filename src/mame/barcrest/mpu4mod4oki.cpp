@@ -175,7 +175,6 @@ namespace {
 class mpu4mod4oki_machines_state : public mpu4_state
 {
 public:
-
 	mpu4mod4oki_machines_state(const machine_config& mconfig, device_type type, const char* tag) :
 		mpu4_state(mconfig, type, tag)
 	{

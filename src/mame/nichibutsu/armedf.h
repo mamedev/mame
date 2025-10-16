@@ -191,7 +191,7 @@ private:
 	void mcu_spritelist_w(offs_t offset, u8 data);
 
 	void bigfghtr_map(address_map &map) ATTR_COLD;
-	void bigfghtr_mcu_io_map(address_map &map) ATTR_COLD;
+	void bigfghtr_mcu_data_map(address_map &map) ATTR_COLD;
 	void bigfghtr_mcu_map(address_map &map) ATTR_COLD;
 };
 

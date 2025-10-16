@@ -114,8 +114,8 @@ private:
 	std::unique_ptr<uint16_t[]> m_ttl_vram;
 	std::unique_ptr<uint16_t[]> m_pal_ram;
 	uint8_t     m_current_display_bank = 0;
-	int         m_ttl_gfx_index = 0;
-	int         m_sprite_colorbase = 0;
+	int32_t     m_ttl_gfx_index = 0;
+	uint16_t    m_sprite_colorbase = 0;
 
 	uint8_t     *m_roz_rom = nullptr;
 	uint8_t     m_roz_rombase = 0;
@@ -139,17 +139,17 @@ private:
 	void psac2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t k53936_rom_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
-	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
+	TILE_GET_INFO_MEMBER(get_936_tile_info);
 	void k054539_nmi_gen(int state);
 	uint16_t palette_r(offs_t offset);
 	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	K055673_CB_MEMBER(sprite_callback);
 
-	uint32_t screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint32_t screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bitmap_ind16 m_rng_dual_demultiplex_left_temp;
 	bitmap_ind16 m_rng_dual_demultiplex_right_temp;
 	void sprite_dma_trigger(void);
@@ -181,7 +181,7 @@ uint16_t rungun_state::sysregs_r(offs_t offset, uint16_t mem_mask)
 			    bit9 : screen output select
 			*/
 			{
-				uint8_t field_bit = m_screen->frame_number() & 1;
+				uint8_t field_bit = ~m_screen->frame_number() & 1;
 				if (m_single_screen_mode)
 					field_bit = 1;
 				return (m_system->read() & 0xfdff) | (field_bit << 9);
@@ -328,7 +328,7 @@ TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 
 K055673_CB_MEMBER(rungun_state::sprite_callback)
 {
-	*color = m_sprite_colorbase | (*color & 0x001f);
+	color = m_sprite_colorbase | (color & 0x001f);
 }
 
 uint16_t rungun_state::ttl_ram_r(offs_t offset)
@@ -354,7 +354,7 @@ void rungun_state::psac2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_m
 	m_936_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
+TILE_GET_INFO_MEMBER(rungun_state::get_936_tile_info)
 {
 	uint32_t base_addr = (uintptr_t)tilemap.user_data();
 	int tileno, colour, flipx;
@@ -403,7 +403,7 @@ void rungun_state::video_start()
 		m_ttl_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x2000));
 		m_ttl_tilemap[screen_num]->set_transparent_pen(0);
 
-		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::get_rng_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::get_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 		m_936_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x80000));
 		m_936_tilemap[screen_num]->set_transparent_pen(0);
 
@@ -414,10 +414,11 @@ void rungun_state::video_start()
 	m_screen->register_screen_bitmap(m_rng_dual_demultiplex_right_temp);
 }
 
-uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rungun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
+
 	m_current_display_bank = m_screen->frame_number() & 1;
 	if (m_single_screen_mode)
 		m_current_display_bank = 0;
@@ -439,28 +440,29 @@ uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bi
 
 
 // the 60hz signal gets split between 2 screens
-uint32_t rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rungun_state::screen_update_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int m_current_display_bank = m_screen->frame_number() & 1;
+	int current_display_bank = m_screen->frame_number() & 1;
 
-	if (!m_current_display_bank)
-		screen_update_rng(screen, m_rng_dual_demultiplex_left_temp, cliprect);
+	if (!current_display_bank)
+		screen_update(screen, m_rng_dual_demultiplex_left_temp, cliprect);
 	else
-		screen_update_rng(screen, m_rng_dual_demultiplex_right_temp, cliprect);
+		screen_update(screen, m_rng_dual_demultiplex_right_temp, cliprect);
 
-	copybitmap( bitmap, m_rng_dual_demultiplex_left_temp, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_rng_dual_demultiplex_left_temp, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
 // this depends upon the first screen being updated, and the bitmap being copied to the temp bitmap
-uint32_t rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rungun_state::screen_update_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	copybitmap( bitmap, m_rng_dual_demultiplex_right_temp, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_rng_dual_demultiplex_right_temp, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
 void rungun_state::sprite_dma_trigger(void)
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	uint32_t src_address;
 
 	if (m_single_screen_mode)
@@ -639,11 +641,11 @@ void rungun_state::machine_reset()
 void rungun_state::rng(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rungun_state::rungun_map);
 	m_maincpu->set_vblank_int("screen", FUNC(rungun_state::rng_interrupt));
 
-	Z80(config, m_soundcpu, 8000000);
+	Z80(config, m_soundcpu, 32_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &rungun_state::rungun_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // higher if sound stutters
@@ -654,12 +656,8 @@ void rungun_state::rng(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz(59.185606);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(88, 88+416-1, 24, 24+224-1);
-	m_screen->set_screen_update(FUNC(rungun_state::screen_update_rng));
+	m_screen->set_raw(32_MHz_XTAL / 4, 512, 88, 88+416, 264, 24, 24+224);
+	m_screen->set_screen_update(FUNC(rungun_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 
@@ -676,7 +674,7 @@ void rungun_state::rng(machine_config &config)
 	m_k055673->set_palette(m_palette);
 	m_k055673->set_screen(m_screen);
 
-	K053252(config, m_k053252, 16000000/2);
+	K053252(config, m_k053252, 32_MHz_XTAL / 4);
 	m_k053252->set_offsets(9*8, 24);
 	m_k053252->set_screen("screen");
 
@@ -699,8 +697,8 @@ void rungun_state::rng(machine_config &config)
 	// BGM, volumes handtuned to make SFXs audible (still not 100% right tho)
 	K054539(config, m_k054539[1], 18.432_MHz_XTAL);
 	m_k054539[1]->set_device_rom_tag("k054539");
-	m_k054539[1]->add_route(0, "speaker", 0.6, 0);
-	m_k054539[1]->add_route(1, "speaker", 0.6, 1);
+	m_k054539[1]->add_route(0, "speaker", 0.6, 1);
+	m_k054539[1]->add_route(1, "speaker", 0.6, 0);
 }
 
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.
@@ -710,15 +708,11 @@ void rungun_state::rng_dual(machine_config &config)
 {
 	rng(config);
 
-	m_screen->set_screen_update(FUNC(rungun_state::screen_update_rng_dual_left));
+	m_screen->set_screen_update(FUNC(rungun_state::screen_update_dual_left));
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
-	screen2.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen2.set_refresh_hz(59.185606);
-	screen2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen2.set_size(64*8, 32*8);
-	screen2.set_visarea(88, 88+416-1, 24, 24+224-1);
-	screen2.set_screen_update(FUNC(rungun_state::screen_update_rng_dual_right));
+	screen2.set_raw(32_MHz_XTAL / 4, 512, 88, 88+416, 264, 24, 24+224);
+	screen2.set_screen_update(FUNC(rungun_state::screen_update_dual_right));
 	screen2.set_palette(m_palette2);
 
 	m_k053252->set_slave_screen("screen2");

@@ -12,12 +12,83 @@
 #include "emu.h"
 #include "tube_arm7.h"
 
+#include "cpu/arm7/arm7.h"
+#include "machine/ram.h"
+#include "machine/tube.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_TUBE_ARM7, bbc_tube_arm7_device, "bbc_tube_arm7", "Sprow ARM7TDMI Co-Processor")
+namespace {
+
+// ======================> bbc_tube_arm7_device
+
+class bbc_tube_arm7_device : public device_t, public device_bbc_tube_interface
+{
+public:
+	bbc_tube_arm7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_TUBE_ARM7, tag, owner, clock)
+		, device_bbc_tube_interface(mconfig, *this)
+		, m_maincpu(*this, "maincpu")
+		, m_flash(*this, "flash")
+		, m_ula(*this, "ula")
+		, m_ram(*this, "ram")
+		, m_bank0_view(*this, "bank0")
+		, m_tube10(0)
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual uint8_t host_r(offs_t offset) override;
+	virtual void host_w(offs_t offset, uint8_t data) override;
+
+private:
+	enum
+	{
+		INTERRUPT = 0, // 7800_0000
+		EXT_MEMORY,    // 7810_0000
+		DRAM_CONTROL,  // 7818_0000
+		CACHE_MEMORY,  // 7820_0000
+		EXP_INTERRUPT, // 7BF0_0000
+		CHIP_CONFIG,   // B700_0000
+		PORT_CONTROL,  // B7A0_1000
+		SYSTEM,        // B800_0000
+		SYSTEM_TIMER,  // B800_1000
+		NUM_REGS
+	};
+
+	required_device<cpu_device> m_maincpu;
+	required_memory_region m_flash;
+	required_device<tube_device> m_ula;
+	required_device<ram_device> m_ram;
+	memory_view m_bank0_view;
+
+	void arm7_map(address_map &map) ATTR_COLD;
+
+	void prst_w(int state);
+
+	uint32_t oki_reg_r(offs_t offset);
+	void oki_reg_w(offs_t offset, uint32_t data);
+
+	// registers
+	uint32_t m_registers[NUM_REGS][32];
+	uint8_t m_tube10;
+
+	void update_bank0();
+	void update_interrupts();
+
+	void efiq_w(int state);
+	void exint3_w(int state);
+
+	int m_efiq_state;
+	int m_exint3_state;
+};
 
 
 //-------------------------------------------------
@@ -39,7 +110,7 @@ void bbc_tube_arm7_device::arm7_map(address_map &map)
 
 
 //-------------------------------------------------
-//  ROM( tube_arm7 )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START( tube_arm7 )
@@ -49,6 +120,11 @@ ROM_START( tube_arm7 )
 	ROM_SYSTEM_BIOS(1, "040", "ARM Tube OS 0.40")
 	ROMX_LOAD("atos040.rom", 0x00000, 0x80000, CRC(b34b5011) SHA1(babfb5bdb8265cf3ac7feff254146cb2d2773da1), ROM_BIOS(1))
 ROM_END
+
+const tiny_rom_entry *bbc_tube_arm7_device::device_rom_region() const
+{
+	return ROM_NAME( tube_arm7 );
+}
 
 
 //-------------------------------------------------
@@ -68,36 +144,6 @@ void bbc_tube_arm7_device::device_add_mconfig(machine_config &config)
 	RAM(config, m_ram).set_default_size("32M").set_extra_options("16M,64M");
 }
 
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *bbc_tube_arm7_device::device_rom_region() const
-{
-	return ROM_NAME( tube_arm7 );
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_tube_arm7_device - constructor
-//-------------------------------------------------
-
-bbc_tube_arm7_device::bbc_tube_arm7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_TUBE_ARM7, tag, owner, clock)
-	, device_bbc_tube_interface(mconfig, *this)
-	, m_maincpu(*this, "maincpu")
-	, m_flash(*this, "flash")
-	, m_ula(*this, "ula")
-	, m_ram(*this, "ram")
-	, m_bank0_view(*this, "bank0")
-	, m_tube10(0)
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -301,3 +347,8 @@ void bbc_tube_arm7_device::oki_reg_w(offs_t offset, uint32_t data)
 		break;
 	}
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_ARM7, device_bbc_tube_interface, bbc_tube_arm7_device, "bbc_tube_arm7", "Sprow ARM7TDMI Co-Processor")

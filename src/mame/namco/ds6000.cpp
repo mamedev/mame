@@ -188,7 +188,7 @@ ROM_START( ds6000 )
 	ROM_REGION( 0x4000, "mcu", ROMREGION_ERASE00 )
 	ROM_LOAD( "ds22sp1.6f", 0x0000, 0x4000, NO_DUMP ) // M37702E2AFP, internal ROM not dumped yet
 
-	ROM_REGION( 0x40000, "unsorted", 0 ) // data ROM for second M68020?
+	ROM_REGION( 0x40000, "sound_data", 0 )
 	ROM_LOAD( "pa28f200bx.8j", 0x00000, 0x40000, CRC(d2280eca) SHA1(87f91d054e2ed0ddae8a26a7656fb67a2f38ec95) )
 
 	ROM_REGION( 0x100000, "iocpu", 0 )

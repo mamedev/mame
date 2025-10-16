@@ -146,7 +146,7 @@ to go through the chip (8 bits at a time, even on 68000-based systems).
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K052109, k052109_device, "k052109", "K052109 Tilemap Generator")
+DEFINE_DEVICE_TYPE(K052109, k052109_device, "k052109", "Konami 052109 Tilemap Generator")
 
 const gfx_layout k052109_device::charlayout =
 {
@@ -179,7 +179,7 @@ GFXDECODE_MEMBER( k052109_device::gfxinfo_ram )
 GFXDECODE_END
 
 
-k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, K052109, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	device_video_interface(mconfig, *this, false),
@@ -247,7 +247,7 @@ void k052109_device::device_start()
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
-	m_ram = make_unique_clear<uint8_t[]>(0x6000);
+	m_ram = make_unique_clear<u8[]>(0x6000);
 	memset(m_charrombank, 0, sizeof(m_charrombank));
 	memset(m_charrombank_2, 0, sizeof(m_charrombank_2));
 
@@ -315,6 +315,9 @@ void k052109_device::vblank_callback(screen_device &screen, bool state)
 {
 	if (state && BIT(m_irq_control, 2))
 		m_irq_handler(ASSERT_LINE);
+
+	if (!state)
+		update_scroll();
 }
 
 TIMER_CALLBACK_MEMBER(k052109_device::firq_scanline)
@@ -342,21 +345,34 @@ u8 k052109_device::read(offs_t offset)
 		if ((offset & 0x1fff) >= 0x1800)
 		{
 			if (offset >= 0x180c && offset < 0x1834)
-			{   /* A y scroll */    }
+			{
+				// A y scroll
+			}
 			else if (offset >= 0x1a00 && offset < 0x1c00)
-			{   /* A x scroll */    }
+			{
+				// A x scroll
+			}
 			else if (offset == 0x1d00)
-			{   /* read for bitwise operations before writing */    }
+			{
+				// read for bitwise operations before writing
+			}
 			else if (offset >= 0x380c && offset < 0x3834)
-			{   /* B y scroll */    }
+			{
+				// B y scroll
+			}
 			else if (offset >= 0x3a00 && offset < 0x3c00)
-			{   /* B x scroll */    }
-			//else logerror("%s: read from unknown 052109 address %04x\n",machine().describe_context(),offset);
+			{
+				// B x scroll
+			}
+			else
+			{
+				//logerror("%s: read from unknown 052109 address %04x\n",machine().describe_context(),offset);
+			}
 		}
 
 		return m_ram[offset];
 	}
-	else    /* Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff */
+	else // Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff
 	{
 		assert(m_char_rom.found());
 
@@ -364,7 +380,7 @@ u8 k052109_device::read(offs_t offset)
 		int color = m_romsubbank;
 		int flags = 0;
 		int priority = 0;
-		int bank = m_charrombank[(color & 0x0c) >> 2] >> 2;   /* discard low bits (TMNT) */
+		int bank = m_charrombank[(color & 0x0c) >> 2] >> 2; // discard low bits (TMNT)
 		int addr;
 
 		bank |= (m_charrombank_2[(color & 0x0c) >> 2] >> 2); // Surprise Attack uses this 2nd bank in the rom test
@@ -372,7 +388,7 @@ u8 k052109_device::read(offs_t offset)
 		if (m_has_extra_video_ram)
 			code |= color << 8; /* kludge for X-Men */
 		else
-			m_k052109_cb(0, bank, &code, &color, &flags, &priority);
+			m_k052109_cb(0, bank, code, color, flags, priority);
 
 		addr = (code << 5) + (offset & 0x1f);
 		addr &= m_char_rom.length() - 1;
@@ -385,22 +401,26 @@ u8 k052109_device::read(offs_t offset)
 
 void k052109_device::write(offs_t offset, u8 data)
 {
-	if ((offset & 0x1fff) < 0x1800) /* tilemap RAM */
+	if ((offset & 0x1fff) < 0x1800) // tilemap RAM
 	{
 		if (offset >= 0x4000)
-			m_has_extra_video_ram = 1;  /* kludge for X-Men */
+			m_has_extra_video_ram = 1; // kludge for X-Men
 
 		m_ram[offset] = data;
 		m_tilemap[(offset & 0x1800) >> 11]->mark_tile_dirty(offset & 0x7ff);
 	}
-	else    /* control registers */
+	else // control registers
 	{
 		m_ram[offset] = data;
 
 		if (offset >= 0x180c && offset < 0x1834)
-		{   /* A y scroll */    }
+		{
+			// A y scroll
+		}
 		else if (offset >= 0x1a00 && offset < 0x1c00)
-		{   /* A x scroll */    }
+		{
+			// A x scroll
+		}
 		else if (offset == 0x1c00)
 		{
 			m_addrmap = data;
@@ -493,9 +513,13 @@ void k052109_device::write(offs_t offset, u8 data)
 			}
 		}
 		else if (offset >= 0x380c && offset < 0x3834)
-		{   /* B y scroll */    }
+		{
+			// B y scroll
+		}
 		else if (offset >= 0x3a00 && offset < 0x3c00)
-		{   /* B x scroll */    }
+		{
+			// B x scroll
+		}
 		else if (offset == 0x3d80) // Surprise Attack uses offset 0x3d80 in rom test
 		{
 			// mirroring this write, breaks Surprise Attack in game tilemaps
@@ -508,12 +532,15 @@ void k052109_device::write(offs_t offset, u8 data)
 			m_charrombank_2[2] = data & 0x0f;
 			m_charrombank_2[3] = (data >> 4) & 0x0f;
 		}
-		//else logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
+		else
+		{
+			//logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
+		}
 	}
 }
 
 
-void k052109_device::tilemap_update()
+void k052109_device::update_scroll()
 {
 
 #if 0
@@ -537,15 +564,15 @@ void k052109_device::tilemap_update()
 
 	for (int tmap = 0; tmap < 2; tmap++)
 	{
-		uint8_t scrollctrl = m_scrollctrl >> (tmap * 3) & 7;
+		u8 scrollctrl = m_scrollctrl >> (tmap * 3) & 7;
 
 		static int rows_table[4] = { 1, 1, 32, 256 };
 		int rows = rows_table[scrollctrl & 3];
 		int cols = BIT(scrollctrl, 2) ? 64 : 1;
 
 		const int tmap_mask = tmap ? 0x2000 : 0;
-		uint8_t *scrollram_y = &m_ram[0x1800 | tmap_mask];
-		uint8_t *scrollram_x = &m_ram[0x1a00 | tmap_mask];
+		u8 *scrollram_y = &m_ram[0x1800 | tmap_mask];
+		u8 *scrollram_x = &m_ram[0x1a00 | tmap_mask];
 
 		const int t = tmap + 1;
 
@@ -618,12 +645,12 @@ void k052109_device::tilemap_update()
 	}
 }
 
-void k052109_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+void k052109_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, u32 flags, u8 priority, u8 priority_mask)
 {
 	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority, priority_mask);
 }
 
-void k052109_device::mark_tilemap_dirty(uint8_t tmap_num)
+void k052109_device::mark_tilemap_dirty(u8 tmap_num)
 {
 	assert(tmap_num <= 2);
 	m_tilemap[tmap_num]->mark_all_dirty();
@@ -654,7 +681,7 @@ void k052109_device::tileflip_reset()
   color RAM    ------xx  depends on external connections (usually banking, flip)
 */
 
-void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2)
+void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int layer, u8 *cram, u8 *vram1, u8 *vram2)
 {
 	int flipy = 0;
 	int code = vram1[tile_index] + 256 * vram2[tile_index];
@@ -671,7 +698,7 @@ void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int laye
 
 	flipy = color & 0x02;
 
-	m_k052109_cb(layer, bank, &code, &color, &flags, &priority);
+	m_k052109_cb(layer, bank, code, color, flags, priority);
 
 	/* if the callback set flip X but it is not enabled, turn it off */
 	if (!BIT(m_tileflip_enable, 1))

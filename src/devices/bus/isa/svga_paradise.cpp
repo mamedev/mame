@@ -93,17 +93,18 @@ void isa16_pvga1a_device::device_add_mconfig(machine_config &config)
 
 void isa16_pvga1a_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(pvga1a_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(pvga1a_vga_device::io_map));
 }
 
 void isa16_pvga1a_device::device_start()
 {
 	set_isa_device();
+}
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_pvga1a_device::io_isa_map);
+void isa16_pvga1a_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
 }
 
 void isa16_pvga1a_device::remap(int space_id, offs_t start, offs_t end)
@@ -114,7 +115,7 @@ void isa16_pvga1a_device::remap(int space_id, offs_t start, offs_t end)
 		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
 	}
 	else if (space_id == AS_IO)
-		m_isa->install_device(0x03b0, 0x03df, *this, &isa16_pvga1a_device::io_isa_map);
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_pvga1a_device::io_isa_map);
 }
 
 /******************
@@ -184,18 +185,31 @@ void isa16_pvga1a_jk_device::device_add_mconfig(machine_config &config)
 
 void isa16_pvga1a_jk_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(pvga1a_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(pvga1a_vga_device::io_map));
 }
 
 void isa16_pvga1a_jk_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_pvga1a_jk_device::io_isa_map);
 }
+
+void isa16_pvga1a_jk_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_pvga1a_jk_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_w)));
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+	}
+	else if (space_id == AS_IO)
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_pvga1a_jk_device::io_isa_map);
+}
+
 
 /******************
  *
@@ -236,18 +250,31 @@ void isa8_wd90c90_jk_device::device_add_mconfig(machine_config &config)
 
 void isa8_wd90c90_jk_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(pvga1a_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(pvga1a_vga_device::io_map));
 }
 
 void isa8_wd90c90_jk_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa8_wd90c90_jk_device::io_isa_map);
 }
+
+void isa8_wd90c90_jk_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa8_wd90c90_jk_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(pvga1a_vga_device::mem_w)));
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+	}
+	else if (space_id == AS_IO)
+		m_isa->install_device(0x0000, 0xffff, *this, &isa8_wd90c90_jk_device::io_isa_map);
+}
+
 
 /******************
  *
@@ -294,18 +321,31 @@ void isa16_wd90c00_jk_device::device_add_mconfig(machine_config &config)
 
 void isa16_wd90c00_jk_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(wd90c00_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(wd90c00_vga_device::io_map));
 }
 
 void isa16_wd90c00_jk_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c00_jk_device::io_isa_map);
 }
+
+void isa16_wd90c00_jk_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_wd90c00_jk_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c00_vga_device::mem_w)));
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+	}
+	else if (space_id == AS_IO)
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_wd90c00_jk_device::io_isa_map);
+}
+
 
 /******************
  *
@@ -313,12 +353,18 @@ void isa16_wd90c00_jk_device::device_start()
  *
  *****************/
 
-isa16_wd90c11_lr_device::isa16_wd90c11_lr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA16_WD90C11_LR, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this),
-	m_vga(*this, "vga")
+isa16_wd90c11_lr_device::isa16_wd90c11_lr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa16_wd90c11_lr_device(mconfig, ISA16_WD90C11_LR, tag, owner, clock)
 {
 }
+
+isa16_wd90c11_lr_device::isa16_wd90c11_lr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_vga(*this, "vga")
+{
+}
+
 
 ROM_START( wd90c11_lr )
 	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)
@@ -342,22 +388,39 @@ void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
 	m_vga->set_screen("screen");
 	// 512KB (+ option for 1MB? Verify with interlace)
 	m_vga->set_vram_size(0x100000);
+	// required by megapc and teradrive for color
+	m_vga->read_cnf15_callback().set_constant(1);
+	m_vga->cnf_write_ddr_callback().set_constant(0x7f);
 }
 
 void isa16_wd90c11_lr_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(wd90c11a_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(wd90c11a_vga_device::io_map));
+	map(0x46e8, 0x46e8).w(m_vga, FUNC(wd90c11a_vga_device::mode_setup_w));
 }
 
 void isa16_wd90c11_lr_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c11a_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c11a_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c11_lr_device::io_isa_map);
 }
+
+void isa16_wd90c11_lr_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_wd90c11_lr_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c11a_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c11a_vga_device::mem_w)));
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+	}
+	else if (space_id == AS_IO)
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_wd90c11_lr_device::io_isa_map);
+}
+
 
 /******************
  *
@@ -405,18 +468,31 @@ void isa16_wd90c30_lr_device::device_add_mconfig(machine_config &config)
 
 void isa16_wd90c30_lr_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(wd90c30_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(wd90c30_vga_device::io_map));
 }
 
 void isa16_wd90c30_lr_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c30_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c30_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c30_lr_device::io_isa_map);
 }
+
+void isa16_wd90c30_lr_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_wd90c30_lr_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c30_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c30_vga_device::mem_w)));
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+	}
+	else if (space_id == AS_IO)
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_wd90c30_lr_device::io_isa_map);
+}
+
 
 /******************
  *
@@ -457,18 +533,19 @@ void isa16_wd90c31_lr_device::device_add_mconfig(machine_config &config)
 
 void isa16_wd90c31_lr_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(wd90c31_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(wd90c31_vga_device::io_map));
+	map(0x23c0, 0x23c7).m(m_vga, FUNC(wd90c31_vga_device::ext_io_map));
 }
 
 void isa16_wd90c31_lr_device::device_start()
 {
 	set_isa_device();
+}
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c31_lr_device::io_isa_map);
-	m_isa->install_device(0x23c0, 0x23c7, *m_vga, &wd90c31_vga_device::ext_io_map);
+void isa16_wd90c31_lr_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
 }
 
 void isa16_wd90c31_lr_device::remap(int space_id, offs_t start, offs_t end)
@@ -481,8 +558,7 @@ void isa16_wd90c31_lr_device::remap(int space_id, offs_t start, offs_t end)
 	}
 	else if (space_id == AS_IO)
 	{
-		m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c31_lr_device::io_isa_map);
-		m_isa->install_device(0x23c0, 0x23c7, *m_vga, &wd90c31_vga_device::ext_io_map);
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_wd90c31_lr_device::io_isa_map);
 	}
 }
 
@@ -528,19 +604,35 @@ void isa16_wd90c31a_lr_device::device_add_mconfig(machine_config &config)
 
 void isa16_wd90c31a_lr_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(wd90c31_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(wd90c31_vga_device::io_map));
+	map(0x23c0, 0x23c7).m(m_vga, FUNC(wd90c31_vga_device::ext_io_map));
 }
 
 void isa16_wd90c31a_lr_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c31a_lr_device::io_isa_map);
-	m_isa->install_device(0x23c0, 0x23c7, *m_vga, &wd90c31_vga_device::ext_io_map);
 }
+
+void isa16_wd90c31a_lr_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_wd90c31a_lr_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_w)));
+	}
+	else if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_wd90c31a_lr_device::io_isa_map);
+	}
+}
+
 
 /******************
  *
@@ -580,19 +672,35 @@ void isa16_wd90c31a_zs_device::device_add_mconfig(machine_config &config)
 
 void isa16_wd90c31a_zs_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(wd90c31_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(wd90c31_vga_device::io_map));
+	map(0x23c0, 0x23c7).m(m_vga, FUNC(wd90c31_vga_device::ext_io_map));
 }
 
 void isa16_wd90c31a_zs_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c31a_zs_device::io_isa_map);
-	m_isa->install_device(0x23c0, 0x23c7, *m_vga, &wd90c31_vga_device::ext_io_map);
 }
+
+void isa16_wd90c31a_zs_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_wd90c31a_zs_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c31_vga_device::mem_w)));
+	}
+	else if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_wd90c31a_zs_device::io_isa_map);
+	}
+}
+
 
 /******************
  *
@@ -633,17 +741,35 @@ void isa16_wd90c33_zz_device::device_add_mconfig(machine_config &config)
 
 void isa16_wd90c33_zz_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(wd90c33_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(wd90c33_vga_device::io_map));
+	map(0x23c0, 0x23c7).m(m_vga, FUNC(wd90c33_vga_device::ext_io_map));
+	map(0x23d0, 0x23d3).m(m_vga, FUNC(wd90c33_vga_device::localbus_if_map));
+	// NOTE: ct486 BIOS setup will drop in MDA without explicit setup mode
+	map(0x46e8, 0x46e8).w(m_vga, FUNC(wd90c33_vga_device::mode_setup_w));
 }
 
 void isa16_wd90c33_zz_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c33_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c33_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c33_zz_device::io_isa_map);
-	m_isa->install_device(0x23c0, 0x23cf, *m_vga, &wd90c33_vga_device::ext_io_map);
-	m_isa->install_device(0x23d0, 0x23d3, *m_vga, &wd90c33_vga_device::localbus_if_map);
 }
+
+void isa16_wd90c33_zz_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_wd90c33_zz_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
+
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c33_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c33_vga_device::mem_w)));
+	}
+	else if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_wd90c33_zz_device::io_isa_map);
+	}
+}
+

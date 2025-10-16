@@ -374,6 +374,6 @@ Current TO-DO:
 
 - Integrate the I/O subsystems in the 4510
 
-- Possibly integrate the sound subsytem in the rp2a03
+- Possibly integrate the sound subsystem in the rp2a03
 
 - Add decent hookups for the Apple 3 madness

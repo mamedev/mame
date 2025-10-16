@@ -397,14 +397,14 @@ void filetto_state::filetto(machine_config &config)
 
 ROM_START( filetto )
 	ROM_REGION( 0x10000, "bios", 0 )
-	ROM_LOAD("u49.bin", 0xc000, 0x2000, CRC(1be6948a) SHA1(9c433f63d347c211ee4663f133e8417221bc4bf0))
-	ROM_RELOAD(         0x8000, 0x2000 )
-	ROM_RELOAD(         0x4000, 0x2000 )
-	ROM_RELOAD(         0x0000, 0x2000 )
-	ROM_LOAD("u55.bin", 0xe000, 0x2000, CRC(1e455ed7) SHA1(786d18ce0ab1af45fc538a2300853e497488f0d4) )
-	ROM_RELOAD(         0xa000, 0x2000 )
-	ROM_RELOAD(         0x6000, 0x2000 )
-	ROM_RELOAD(         0x2000, 0x2000 )
+	ROM_LOAD( "u49.bin", 0xc000, 0x2000, CRC(1be6948a) SHA1(9c433f63d347c211ee4663f133e8417221bc4bf0) )
+	ROM_RELOAD(          0x8000, 0x2000 )
+	ROM_RELOAD(          0x4000, 0x2000 )
+	ROM_RELOAD(          0x0000, 0x2000 )
+	ROM_LOAD( "u55.bin", 0xe000, 0x2000, CRC(1e455ed7) SHA1(786d18ce0ab1af45fc538a2300853e497488f0d4) )
+	ROM_RELOAD(          0xa000, 0x2000 )
+	ROM_RELOAD(          0x6000, 0x2000 )
+	ROM_RELOAD(          0x2000, 0x2000 )
 
 	ROM_REGION( 0x40000, "game_prg", 0 ) // program data
 	ROM_LOAD( "m0.u1", 0x00000, 0x10000, CRC(2408289d) SHA1(eafc144a557a79b58bcb48545cb9c9778e61fcd3) )
@@ -413,8 +413,13 @@ ROM_START( filetto )
 	ROM_LOAD( "m3.u4", 0x30000, 0x10000, CRC(0c1e8a67) SHA1(f1b9280c65fcfcb5ec481cae48eb6f52d6cdbc9d) )
 
 	ROM_REGION( 0x40000, "samples", 0 ) // UM5100 sample roms
-	ROM_LOAD("v1.u15",  0x00000, 0x20000, CRC(613ddd07) SHA1(ebda3d559315879819cb7034b5696f8e7861fe42) )
-	ROM_LOAD("v2.u14",  0x20000, 0x20000, CRC(427e012e) SHA1(50514a6307e63078fe7444a96e39d834684db7df) )
+	ROM_LOAD( "v1.u15", 0x00000, 0x20000, CRC(613ddd07) SHA1(ebda3d559315879819cb7034b5696f8e7861fe42) )
+	ROM_LOAD( "v2.u14", 0x20000, 0x20000, CRC(427e012e) SHA1(50514a6307e63078fe7444a96e39d834684db7df) )
+
+	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal14l4cn.u15",   0x000, 0x03c, CRC(fb0e96d0) SHA1(428ba6fe7cb7c7f7e6833667c69a0810f9db29d8) ) // on main board
+	ROM_LOAD( "pal16l8acn.u10",  0x100, 0x117, CRC(5d9a1ec4) SHA1(b126c6cb5fc9a21c46a00c9a284241bfec6e8807) ) // on sound board, extracted so file is for GAL16V8
+	ROM_LOAD( "ampal16r8apc.u7", 0x300, 0x117, NO_DUMP ) // on sound board, registered
 ROM_END
 
 

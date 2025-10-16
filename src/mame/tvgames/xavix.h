@@ -9,7 +9,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/bankdev.h"
 #include "machine/i2cmem.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -29,6 +28,8 @@
 // some games (eg Radica Opus) run off a 3.579545MHz XTAL ( same as the above /6 ) so presumably there is a divider / multiplier circuit on some PCBs?
 // TODO: what's the PAL clock?
 
+class xavix_state;
+
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -36,38 +37,122 @@ public:
 	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto read_regs_callback() { return m_readregs_cb.bind(); }
+	auto write_regs_callback() { return m_writeregs_cb.bind(); }   // <-- for vm1 LA/RA mirroring
 	auto read_samples_callback() { return m_readsamples_cb.bind(); }
 
+	// control API
 	void enable_voice(int voice, bool update_only);
 	void disable_voice(int voice);
 	bool is_voice_enabled(int voice);
+	uint32_t sample_ram_read(uint32_t page, uint16_t offset) const;
+
+	// rate handling
+	void set_tempo(int index, uint8_t value);
+	void set_cyclerate(uint8_t value);
+
+	// register handlers (from the CPU map)
+	uint8_t sound_volume_r();
+	void sound_volume_w(uint8_t data);
+	uint8_t sound_mixer_r();
+	void sound_mixer_w(uint8_t data);
+	uint8_t dac_control_r();
+	void dac_control_w(uint8_t data);
+
+	// helpers
+	void set_dac_gain(uint8_t amp_data);
+	void set_output_mode(bool mono);
+	void set_mastervol(uint8_t data);
+	attotime tempo_period(uint8_t tempo) const;
+	double tempo_frequency(uint8_t tempo) const;
+	double tempo_tick_hz(uint8_t tempo) const;
+	uint32_t  phase_step_per_tick(uint32_t rate) const;
+	uint32_t envelope_period_ticks(uint8_t tp) const;
+
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// sound stream update overrides
+	// sound stream update
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	sound_stream *m_stream = nullptr;
+	// stream
+	sound_stream* m_stream = nullptr;
 
+	// global timing
+	uint8_t m_tempo_div[4] = { 0, 0, 0, 0 };
+	uint8_t m_cyclerate_div = 1;
+	uint32_t m_sequencer_rate_hz;
+
+	// callbacks
+	devcb_read8  m_readregs_cb;
+	devcb_write8 m_writeregs_cb;     // used to mirror vm1 phase to LA/RA
+	devcb_read8  m_readsamples_cb;
+
+	// voice state
 	struct xavix_voice {
-		bool enabled[2]{};
-		uint32_t position[2]{};
-		uint32_t startposition[2]{};
-		uint8_t bank = 0; // no samples appear to cross a bank boundary, so likely wraps
-		int type = 0;
-		int rate = 0;
-		int vol = 0;
+		uint8_t   enabled = 0;
+		uint32_t  position = 0;
+		uint32_t  loop_position = 0;
+		uint32_t  start_position = 0;
+
+		uint32_t  env_pos_left = 0;
+		uint32_t  env_pos_right = 0;
+		uint8_t   env_bank = 0;
+		uint8_t   env_mode = 0;
+
+		uint8_t   bank = 0;
+		uint32_t  rate = 0;
+		uint8_t   type = 0;
+		uint8_t   vol = 0;
+
+		uint16_t  env_rom_base_left = 0;
+		uint16_t  env_rom_base_right = 0;
+
+		uint8_t   env_vol_left = 0xff;
+		uint8_t   env_vol_right = 0xff;
+
+		uint32_t  env_period_samples = 0;
+		uint32_t  env_countdown = 0;
+		uint8_t   env_active_left = 1;
+		uint8_t   env_active_right = 1;
+
+		// misc (vm1/vm2 helpers, tickers)
+		bool      log_env_started = false;
+		bool      log_env_stopped = false;
+		bool      log_env_paused = false;
+
+		uint16_t noise_state = 0;
 	};
 
-	devcb_read8 m_readregs_cb;
+	// mixer state
+	struct xavix_mixer
+	{
+		uint8_t monaural = 0;
+		uint8_t capacity = 0;
+		uint8_t amp = 2;
 
-	devcb_read8 m_readsamples_cb;
+		uint8_t dac = 0;
+		uint8_t gap = 0;
+		uint8_t lead = 0;
+		uint8_t lag = 0;
 
+		uint8_t mastervol = 0xff;
+		int32_t gain = 2;
+	};
+
+	xavix_mixer m_mix;
 	xavix_voice m_voice[16];
+
+	// helpers
+	uint32_t tempo_to_period_ticks(uint8_t tp) const;
+	uint8_t decay(uint8_t x);
+	void step_pitch(int voice);
+	void step_envelope(int voice);
+	uint8_t fetch_env_byte(int voice, int channel, uint32_t idx);
+	uint8_t fetch_env_byte_direct(int voice, int channel, uint16_t addr);
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)
@@ -80,7 +165,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
-		m_an_in(*this, "AN%u", 0U),
 		m_mouse0x(*this, "MOUSE0X"),
 		m_mouse0y(*this, "MOUSE0Y"),
 		m_mouse1x(*this, "MOUSE1X"),
@@ -89,7 +173,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
-		m_lowbus(*this, "lowbus"),
 		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
@@ -141,6 +224,8 @@ public:
 
 	void init_xavix();
 	void init_no_timer() { init_xavix(); m_disable_timer_irq_hack = true; }
+
+	uint8_t sound_current_page() const;
 
 	void ioevent_trg01(int state);
 	void ioevent_trg02(int state);
@@ -220,7 +305,6 @@ protected:
 
 	required_ioport m_in0;
 	required_ioport m_in1;
-	required_ioport_array<8> m_an_in;
 	optional_ioport m_mouse0x;
 	optional_ioport m_mouse0y;
 	optional_ioport m_mouse1x;
@@ -229,7 +313,6 @@ protected:
 	required_device<xavix_device> m_maincpu;
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
-	required_device<address_map_bank_device> m_lowbus;
 	address_space* m_cpuspace = nullptr;
 
 	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
@@ -273,7 +356,7 @@ protected:
 		}
 		else
 		{
-			return m_lowbus->read8(offset & 0x7fff);
+			return m_maincpu->space(5).read_byte(offset & 0x7fff);
 		}
 	}
 
@@ -385,36 +468,39 @@ protected:
 	uint8_t dispctrl_6ff8_r();
 	void dispctrl_6ff8_w(uint8_t data);
 
-	uint8_t sound_startstop_r(offs_t offset);
-	void sound_startstop_w(offs_t offset, uint8_t data);
-	uint8_t sound_updateenv_r(offs_t offset);
-	void sound_updateenv_w(offs_t offset, uint8_t data);
+	uint8_t sound_voice_startstop_r(offs_t offset);
+	void sound_voice_startstop_w(offs_t offset, uint8_t data);
+	uint8_t sound_voice_updateenv_r(offs_t offset);
+	void sound_voice_updateenv_w(offs_t offset, uint8_t data);
 
-	uint8_t sound_sta16_r(offs_t offset);
-	uint8_t sound_75f5_r();
+	uint8_t sound_voice_status_r(offs_t offset);
+
 	uint8_t sound_volume_r();
 	void sound_volume_w(uint8_t data);
 
+	uint8_t sound_regbase_r();
 	void sound_regbase_w(uint8_t data);
 
-	uint8_t sound_75f8_r();
-	void sound_75f8_w(uint8_t data);
+	uint8_t sound_cyclerate_r();
+	void sound_cyclerate_w(uint8_t data);
 
-	uint8_t sound_75f9_r();
-	void sound_75f9_w(uint8_t data);
+	uint8_t sound_mixer_r();
+	void sound_mixer_w(uint8_t data);
 
-	uint8_t sound_timer0_r();
-	void sound_timer0_w(uint8_t data);
-	uint8_t sound_timer1_r();
-	void sound_timer1_w(uint8_t data);
-	uint8_t sound_timer2_r();
-	void sound_timer2_w(uint8_t data);
-	uint8_t sound_timer3_r();
-	void sound_timer3_w(uint8_t data);
+	uint8_t sound_tp0_r();
+	void sound_tp0_w(uint8_t data);
+	uint8_t sound_tp1_r();
+	void sound_tp1_w(uint8_t data);
+	uint8_t sound_tp2_r();
+	void sound_tp2_w(uint8_t data);
+	uint8_t sound_tp3_r();
+	void sound_tp3_w(uint8_t data);
 
-	uint8_t sound_irqstatus_r();
-	void sound_irqstatus_w(uint8_t data);
-	void sound_75ff_w(uint8_t data);
+	uint8_t sound_irq_status_r();
+	void sound_irq_status_w(uint8_t data);
+	void sound_dac_control_w(uint8_t data);
+	uint8_t sound_dac_control_r();
+
 	uint8_t m_sound_irqstatus = 0;
 	uint8_t m_soundreg16_0[2]{};
 	uint8_t m_soundreg16_1[2]{};
@@ -498,21 +584,15 @@ protected:
 	}
 
 
-	uint8_t adc0_r() { return m_an_in[0]->read(); }
-	uint8_t adc1_r() { return m_an_in[1]->read(); }
-	uint8_t adc2_r() { return m_an_in[2]->read(); }
-	uint8_t adc3_r() { return m_an_in[3]->read(); }
-	uint8_t adc4_r() { return m_an_in[4]->read(); }
-	uint8_t adc5_r() { return m_an_in[5]->read(); }
-	uint8_t adc6_r() { return m_an_in[6]->read(); }
-	uint8_t adc7_r() { return m_an_in[7]->read(); }
-
 	uint8_t anport0_r() { logerror("%s: unhandled anport0_r\n", machine().describe_context()); return 0xff; }
 	uint8_t anport1_r() { logerror("%s: unhandled anport1_r\n", machine().describe_context()); return 0xff; }
 	uint8_t anport2_r() { logerror("%s: unhandled anport2_r\n", machine().describe_context()); return 0xff; }
 	uint8_t anport3_r() { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; }
 
 	void update_irqs();
+	void refresh_sound_irq_state();
+	void reprogram_sound_timer(int index);
+	
 	uint8_t m_irqsource = 0;
 
 	uint8_t m_vectorenable = 0;
@@ -534,11 +614,10 @@ protected:
 	uint8_t m_6ff0 = 0;
 	uint8_t m_video_ctrl = 0;
 
-	uint8_t m_mastervol = 0;
-	uint8_t m_unk_snd75f8 = 0;
-	uint8_t m_unk_snd75f9 = 0;
+	uint8_t m_cyclerate = 0;
+	uint8_t m_mixer = 0;
 	uint8_t m_unk_snd75ff = 0;
-	uint8_t m_sndtimer[4]{};
+	uint8_t m_tp[4]{};
 
 	uint8_t m_timer_baseval = 0;
 
@@ -614,6 +693,7 @@ protected:
 	int get_current_address_byte();
 
 	uint8_t sound_regram_read_cb(offs_t offset);
+	void    sound_regram_write_cb(offs_t offset, uint8_t data);
 
 	uint8_t m_extbusctrl[3]{};
 
@@ -679,6 +759,14 @@ protected:
 
 	bool m_allow_superxavix_extra_rom_sprites; // config does not need saving
 
+	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
+	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
+	uint8_t superxavix_read_extended_io2(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io2 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[2]->read(); }
+
+	void superxavix_write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io0 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+	void superxavix_write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io1 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+	void superxavix_write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io2 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+
 private:
 	void ext_segment_regs_w(offs_t offset, uint8_t data);
 	void superxavix_plt_flush_w(uint8_t data);
@@ -724,14 +812,6 @@ private:
 	void extended_extbus_reg0_w(uint8_t data);
 	void extended_extbus_reg1_w(uint8_t data);
 	void extended_extbus_reg2_w(uint8_t data);
-
-	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
-	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
-	uint8_t superxavix_read_extended_io2(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io2 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[2]->read(); }
-
-	void superxavix_write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io0 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
-	void superxavix_write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io1 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
-	void superxavix_write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io2 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
 
 	void draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -862,16 +942,7 @@ protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
 };
 
-class xavix_duelmast_state : public xavix_i2c_state
-{
-public:
-	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
 
-protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
-};
 
 class xavix_i2c_tomshoot_state : public xavix_i2c_state
 {
@@ -1048,7 +1119,7 @@ protected:
 		}
 		else
 		{
-			return m_lowbus->read8(offset & 0x7fff);
+			return m_maincpu->space(5).read_byte(offset & 0x7fff);
 		}
 	}
 
@@ -1159,6 +1230,23 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_duelmast_state : public xavix_i2c_cart_state
+{
+public:
+	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_cart_state(mconfig, type, tag)
+	{
+		m_cartlimit = 0x800000;
+	}
+
+	void duelmast(machine_config &config);
+
+protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+
+	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 };
 
 class xavix_popira2_cart_state : public xavix_cart_state

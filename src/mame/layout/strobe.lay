@@ -130,15 +130,10 @@ authors:hap
 		<element ref="text_4" blend="multiply"><bounds xc="128" yc="100" width="12" height="12" /><orientation rotate="270" /></element>
 
 		<!-- middle switches/button -->
-		<element ref="nothing" inputtag="IN.4" inputmask="0x05" inputraw="yes"><bounds xc="93.5" yc="97" width="3.5" height="3.5" /></element>
-		<element ref="nothing" inputtag="IN.5" inputmask="0x07" inputraw="yes"><bounds xc="100" yc="97" width="3.5" height="3.5" /></element>
-		<element ref="nothing" inputtag="IN.6" inputmask="0x06" inputraw="yes"><bounds xc="106.5" yc="97" width="3.5" height="3.5" /></element>
-
-		<element ref="nothing" clickthrough="no"><bounds xc="100" y="85" width="25" height="18" /></element>
-
 		<element ref="redd"><bounds xc="100" yc="100" width="20" height="20" /></element>
 		<element ref="text_set" blend="multiply"><bounds xc="100" yc="106" width="20" height="5" /></element>
 		<element ref="hld" inputtag="IN.8" inputmask="0x08"><bounds xc="100" yc="100" width="20" height="20" /><color alpha="0.18" /></element>
+		<element ref="nothing" clickthrough="no"><bounds xc="100" y="85" width="25" height="18" /></element>
 
 		<element ref="orange"><bounds xc="100" y="85" width="25" height="18" /></element>
 

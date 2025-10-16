@@ -5,7 +5,7 @@ license:CC0-1.0
 
   Usage instructions: if the game/program does not autoboot, type DIR to list the disk content
   and look for CMD or COM files.
-  To run CMD files (which are TF-FOS programs, type RUN "XXX", with XXX being the name of the
+  To run CMD files (which are TF-DOS programs, type RUN "XXX", with XXX being the name of the
   CMD file (e.g. RUN "SPACE MOUSE").
   To run COM files (which are CP/M programs) simply type the name of the COM file.
 -->
@@ -180,7 +180,7 @@ STAR FIRE: works
 	<software name="basprog" supported="no">
 		<description>Sharp BASIC Programs 1</description>
 		<year>200?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Toshio Fukui</publisher>
 		<notes><![CDATA[
 Requires Disk BASIC
 ]]></notes>

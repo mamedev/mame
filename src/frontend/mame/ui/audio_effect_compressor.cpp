@@ -75,19 +75,29 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case RELEASE:
-			m_effect->set_release(max(0, m_effect->release() - ((alt_pressed && !shift_pressed) ? 10000 : ctrl_pressed ? 1000 : (shift_pressed && alt_pressed) ? 1 : shift_pressed ? 10 : 100)));
+			if(alt_pressed && !shift_pressed)
+				m_effect->set_release(0);
+			else if(m_effect->release() < 0)
+				m_effect->set_release(3000);
+			else
+				m_effect->set_release(max(0, m_effect->release() - (ctrl_pressed ? 1000 : (shift_pressed && alt_pressed) ? 1 : shift_pressed ? 10 : 100)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			ev->item->set_subtext(format_ms(m_effect->release()));
-			ev->item->set_flags(flag_lim(m_effect->release(), 0, 3000, m_effect->isset_release()));
+			ev->item->set_subtext(format_release(m_effect->release()));
+			ev->item->set_flags(flag_lim_special(m_effect->release(), 0, m_effect->isset_release()));
 			return true;
 
 		case RATIO:
-			m_effect->set_ratio(max(1, m_effect->ratio() - (alt_pressed ? 10000 : ctrl_pressed ? 5 : shift_pressed ? 0.1 : 1)));
+			if(alt_pressed)
+				m_effect->set_ratio(1);
+			else if(m_effect->ratio() <= 0)
+				m_effect->set_ratio(20);
+			else
+				m_effect->set_ratio(max(1, m_effect->ratio() - (ctrl_pressed ? 5 : shift_pressed ? 0.1 : 1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			ev->item->set_subtext(format_ratio(m_effect->ratio()));
-			ev->item->set_flags(flag_lim(m_effect->ratio(), 1, 20, m_effect->isset_ratio()));
+			ev->item->set_flags(flag_lim_special(m_effect->ratio(), 1, m_effect->isset_ratio()));
 			return true;
 
 		case INPUT_GAIN:
@@ -115,7 +125,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case THRESHOLD:
-			m_effect->set_threshold(max(-60, m_effect->threshold() - (alt_pressed ? 10000 : ctrl_pressed ? 20 : shift_pressed ? 1 : 5)));
+			m_effect->set_threshold(max(-60, m_effect->threshold() - (alt_pressed ? 10000 : ctrl_pressed ? 12 : shift_pressed ? 1 : 3)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			ev->item->set_subtext(format_db(m_effect->threshold()));
@@ -184,19 +194,25 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case RELEASE:
-			m_effect->set_release(min(3000, m_effect->release() + ((alt_pressed && !shift_pressed) ? 10000 : ctrl_pressed ? 1000 : (shift_pressed && alt_pressed) ? 1 : shift_pressed ? 10 : 100)));
+			if((alt_pressed && !shift_pressed) || m_effect->release() == 3000)
+				m_effect->set_release(-1);
+			else if(m_effect->release() >= 0)
+				m_effect->set_release(min(3000, m_effect->release() + (ctrl_pressed ? 1000 : (shift_pressed && alt_pressed) ? 1 : shift_pressed ? 10 : 100)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			ev->item->set_subtext(format_ms(m_effect->release()));
-			ev->item->set_flags(flag_lim(m_effect->release(), 0, 3000, m_effect->isset_release()));
+			ev->item->set_subtext(format_release(m_effect->release()));
+			ev->item->set_flags(flag_lim_special(m_effect->release(), 0, m_effect->isset_release()));
 			return true;
 
 		case RATIO:
-			m_effect->set_ratio(min(20, m_effect->ratio() + (alt_pressed ? 10000 : ctrl_pressed ? 5 : shift_pressed ? 0.1 : 1)));
+			if(alt_pressed || m_effect->ratio() == 20)
+				m_effect->set_ratio(-1);
+			else if(m_effect->ratio() > 0)
+				m_effect->set_ratio(min(20, m_effect->ratio() + (ctrl_pressed ? 5 : shift_pressed ? 0.1 : 1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			ev->item->set_subtext(format_ratio(m_effect->ratio()));
-			ev->item->set_flags(flag_lim(m_effect->ratio(), 1, 20, m_effect->isset_ratio()));
+			ev->item->set_flags(flag_lim_special(m_effect->ratio(), 1, m_effect->isset_ratio()));
 			return true;
 
 		case INPUT_GAIN:
@@ -224,7 +240,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case THRESHOLD:
-			m_effect->set_threshold(min(6, m_effect->threshold() + (alt_pressed ? 10000 : ctrl_pressed ? 20 : shift_pressed ? 1 : 5)));
+			m_effect->set_threshold(min(6, m_effect->threshold() + (alt_pressed ? 10000 : ctrl_pressed ? 12 : shift_pressed ? 1 : 3)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			ev->item->set_subtext(format_db(m_effect->threshold()));
@@ -404,7 +420,18 @@ std::string menu_audio_effect_compressor::format_ms(float val)
 
 std::string menu_audio_effect_compressor::format_ratio(float val)
 {
-	return util::string_format(_("menu-aeffect-compressor", "%1$g:1"), val);
+	if(val > 0)
+		return util::string_format(_("menu-aeffect-compressor", "%1$g:1"), val);
+	else
+		return _("menu-aeffect-compressor", "Infinity:1");
+}
+
+std::string menu_audio_effect_compressor::format_release(float val)
+{
+	if(val < 0)
+		return _("menu-aeffect-compressor", "Infinite");
+	else
+		return format_ms(val);
 }
 
 u32 menu_audio_effect_compressor::flag_mode() const
@@ -431,17 +458,29 @@ u32 menu_audio_effect_compressor::flag_lim(float value, float min, float max, bo
 	return flag;
 }
 
+u32 menu_audio_effect_compressor::flag_lim_special(float value, float min, bool isset)
+{
+	u32 flag = 0;
+	if(!isset)
+		flag |= FLAG_INVERT;
+	if(value != min)
+		flag |= FLAG_LEFT_ARROW;
+	if(value >= min)
+		flag |= FLAG_RIGHT_ARROW;
+	return flag;
+}
+
 void menu_audio_effect_compressor::populate()
 {
 	item_append(_("menu-aeffect-compressor", "Mode"), m_effect->mode() ? _("menu-aeffect-compressor", "Active") : _("menu-aeffect-compressor", "Bypass"), flag_mode(), (void *)MODE);
 	item_append(_("menu-aeffect-compressor", "Threshold"), format_db(m_effect->threshold()), flag_lim(m_effect->threshold(), -60, 6, m_effect->isset_threshold()), (void *)THRESHOLD);
-	item_append(_("menu-aeffect-compressor", "Ratio"), format_ratio(m_effect->ratio()), flag_lim(m_effect->ratio(), 1, 20, m_effect->isset_ratio()), (void *)RATIO);
+	item_append(_("menu-aeffect-compressor", "Ratio"), format_ratio(m_effect->ratio()), flag_lim_special(m_effect->ratio(), 1, m_effect->isset_ratio()), (void *)RATIO);
 	item_append(_("menu-aeffect-compressor", "Attack"), format_ms(m_effect->attack()), flag_lim(m_effect->attack(), 0, 300, m_effect->isset_attack()), (void *)ATTACK);
-	item_append(_("menu-aeffect-compressor", "Release"), format_ms(m_effect->release()), flag_lim(m_effect->release(), 0, 3000, m_effect->isset_release()), (void *)RELEASE);
+	item_append(_("menu-aeffect-compressor", "Release"), format_release(m_effect->release()), flag_lim_special(m_effect->release(), 0, m_effect->isset_release()), (void *)RELEASE);
 	item_append(_("menu-aeffect-compressor", "Input gain"), format_db(m_effect->input_gain()), flag_lim(m_effect->input_gain(), -12, 24, m_effect->isset_input_gain()), (void *)INPUT_GAIN);
 	item_append(_("menu-aeffect-compressor", "Output gain"), format_db(m_effect->output_gain()), flag_lim(m_effect->output_gain(), -12, 24, m_effect->isset_output_gain()), (void *)OUTPUT_GAIN);
 
-	item_append(menu_item_type::SEPARATOR);
+	item_append(_("menu-aeffect-compressor", "Advanced"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("menu-aeffect-compressor", "Convexity"), format_2dec(m_effect->convexity()), flag_lim(m_effect->convexity(), -2, 2, m_effect->isset_convexity()), (void *)CONVEXITY);
 	item_append(_("menu-aeffect-compressor", "Channel link"), format_2dec(m_effect->channel_link()), flag_lim(m_effect->channel_link(), 0, 1, m_effect->isset_channel_link()), (void *)CHANNEL_LINK);
 	item_append(_("menu-aeffect-compressor", "Feedback"), format_2dec(m_effect->feedback()), flag_lim(m_effect->feedback(), 0, 1, m_effect->isset_feedback()), (void *)FEEDBACK);

@@ -199,7 +199,7 @@ protected:
 	DECLARE_MACHINE_START(pc9801_common);
 	DECLARE_MACHINE_RESET(pc9801_common);
 
-	void config_video(machine_config &config);
+	virtual void config_video(machine_config &config);
 	void config_keyboard(machine_config &config);
 	void pc9801_mouse(machine_config &config);
 	void pc9801_cbus(machine_config &config);
@@ -389,6 +389,7 @@ public:
 	{
 	}
 
+	virtual void config_video(machine_config &config) override;
 	void pc9801vm(machine_config &config);
 	void pc9801uv(machine_config &config);
 

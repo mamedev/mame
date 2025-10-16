@@ -44,7 +44,7 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const override;
 
 	std::error_condition smartmedia_format_1();
-	std::error_condition smartmedia_format_2();
+	std::error_condition smartmedia_format_2(bool read_header, uint8_t id1 = 0, uint8_t id2 = 0);
 	int detect_geometry(uint8_t id1, uint8_t id2);
 
 	uint8_t m_mp_opcode;                  // multi-plane operation code

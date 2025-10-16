@@ -879,7 +879,7 @@ void decmate2_state::pc278(machine_config &config)
 	m_maincpu->strtup_callback().set_constant(0);
 
 	I8051(config, m_rxcpu, 16_MHz_XTAL / 2);
-	m_rxcpu->set_addrmap(AS_IO, &decmate2_state::rx_map);
+	m_rxcpu->set_addrmap(AS_DATA, &decmate2_state::rx_map);
 	m_rxcpu->port_in_cb<1>().set(FUNC(decmate2_state::rx_intr_r));
 	m_rxcpu->port_out_cb<1>().set(FUNC(decmate2_state::rx_sel_w));
 	m_rxcpu->port_in_cb<2>().set(FUNC(decmate2_state::rx_rdy_r));

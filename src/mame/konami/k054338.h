@@ -23,12 +23,11 @@
 #define K338_CTL_CLIPSL     0x20
 
 
-class k054338_device : public device_t,
-						public device_video_interface
+class k054338_device : public device_t, public device_video_interface
 {
 public:
-	template <typename T> k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag)
-		: k054338_device(mconfig, tag, owner, clock)
+	template <typename T> k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag) :
+		k054338_device(mconfig, tag, owner, clock)
 	{
 		m_k055555.set_tag(std::forward<T>(mixer_tag));
 	}
@@ -55,7 +54,7 @@ protected:
 
 private:
 	// internal state
-	uint16_t      m_regs[32];
+	uint16_t    m_regs[32];
 	int         m_shd_rgb[9];
 	int         m_alpha_inv;
 

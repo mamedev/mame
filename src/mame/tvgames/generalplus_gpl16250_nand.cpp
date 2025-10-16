@@ -26,8 +26,6 @@
     map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
 */
 
-
-
 #include "emu.h"
 #include "generalplus_gpl16250.h"
 #include "generalplus_gpl16250_nand.h"
@@ -70,6 +68,36 @@ uint8_t generalplus_gpac800_game_state::read_nand(offs_t offset)
 
 	return 0x00;
 }
+void generalplus_gpac800_game_state::dma_complete_hacks(int state)
+{
+	// HACKS to get into service mode for debugging (needed for testing as many of these require input sequences on the not yet emulated custom controls)
+
+	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
+
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+	//if (mem.read_word(0x4368c) == 0x4846)
+	//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+
+	//if (mem.read_word(0x34410) == 0x4846)
+	//  mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+
+	// what is it waiting for when we need these? (needed on some service mode screens)
+	//if (mem.read_word(0x3f368) == 0x4840)
+	//  mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
+
+	//if (mem.read_word(0x4d8d4) == 0x4840)
+	//  mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
+
+	//if (mem.read_word(0x3510f) == 0x4845)
+	//  mem.write_word(0x3510f, 0x4840);    // camp rock force service mode
+
+	if (mem.read_word(0x4abe7) == 0x4840)
+		mem.write_word(0x4abe7, 0x4841);    // camp rock IRQ? wait hack
+
+	//if (mem.read_word(0x37244) == 0x4845)
+	//  mem.write_word(0x37244, 0x4840);    // hannah montana guitar force service mode
+}
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
@@ -85,6 +113,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+	m_maincpu->dma_complete_callback().set(FUNC(generalplus_gpac800_game_state::dma_complete_hacks));
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
 

@@ -435,7 +435,7 @@ void s3virge_vga_device::s3_define_video_mode()
 		svga.rgb24_en = 0;
 		svga.rgb32_en = 0;
 		// TODO: virgevx has upgraded RAMDAC
-		// (overhauls color modes for accomodating 1600x1200 resolutions)
+		// (overhauls color modes for accommodating 1600x1200 resolutions)
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
 			case 0x01: svga.rgb8_en = 1; break;

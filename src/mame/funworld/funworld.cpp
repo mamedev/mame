@@ -5148,7 +5148,7 @@ ROM_START( pool10b ) // 1st set nominated for parent
 	ROM_LOAD( "n82s147an_p10.u25",   0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8h_p10b.u5",  0x0000, 0x0117, NO_DUMP ) // PLD is read protected
+	ROM_LOAD( "palce16v8h_p10b.u5",  0x0000, 0x0117, CRC(41d7d732) SHA1(65cdd5405c3fa24304598defdbfe1c971510c1bd) ) // bruteforced, file can be written to GAL16V8
 	ROM_LOAD( "palce20v8h_p10b.u22", 0x0200, 0x0157, NO_DUMP ) // PLD is read protected
 	ROM_LOAD( "palce20v8h_p10b.u23", 0x0400, 0x0157, NO_DUMP ) // PLD is read protected
 ROM_END

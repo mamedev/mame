@@ -239,11 +239,11 @@ private:
 template <int Layer>
 TILE_GET_INFO_MEMBER(wrally_state::get_tile_info)
 {
-	int const data = m_videoram[(Layer * 0x2000 / 2) + (tile_index << 1)];
-	int const data2 = m_videoram[(Layer * 0x2000 / 2) + (tile_index << 1) + 1];
+	int const data = m_videoram[(Layer << 12) + (tile_index << 1)];
+	int const data2 = m_videoram[(Layer << 12) + (tile_index << 1) + 1];
 	int const code = data & 0x3fff;
 
-	tileinfo.category = (data2 >> 5) & 0x01;
+	tileinfo.category = BIT(data2, 5);
 
 	tileinfo.set(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
 }
@@ -274,12 +274,15 @@ uint32_t wrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_sprites->draw_sprites(cliprect, m_spriteram, flip_screen());
 
 	// set scroll registers
-	if (!flip_screen()) {
+	if (!flip_screen())
+	{
 		m_tilemap[0]->set_scrolly(0, m_vregs[0]);
 		m_tilemap[0]->set_scrollx(0, m_vregs[1] + 4);
 		m_tilemap[1]->set_scrolly(0, m_vregs[2]);
 		m_tilemap[1]->set_scrollx(0, m_vregs[3]);
-	} else {
+	}
+	else
+	{
 		m_tilemap[0]->set_scrolly(0, 248 - m_vregs[0]);
 		m_tilemap[0]->set_scrollx(0, 1024 - m_vregs[1] - 4);
 		m_tilemap[1]->set_scrolly(0, 248 - m_vregs[2]);
@@ -288,15 +291,15 @@ uint32_t wrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// draw tilemaps + sprites
 	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER0,0);
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER1,0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER1, 0);
 
 	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0, 0);
 
 	m_sprites->mix_sprites(bitmap, cliprect, 0);
 
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1, 0);
 
 	m_sprites->mix_sprites(bitmap, cliprect, 1);
 
@@ -358,7 +361,7 @@ void wrally_state::coin_lockout_w(int state)
 template <int N>
 int wrally_state::analog_bit_r()
 {
-	return (m_analog_ports[N] >> 7) & 0x01;
+	return BIT(m_analog_ports[N], 7);
 }
 
 void wrally_state::adc_clk(int state)
@@ -512,7 +515,7 @@ static const gfx_layout wrally_tilelayout16 =
 };
 
 static GFXDECODE_START( gfx_wrally )
-	GFXDECODE_ENTRY( "gfx", 0x000000, wrally_tilelayout16, 0, 64*8 )
+	GFXDECODE_ENTRY( "gfx", 0, wrally_tilelayout16, 0, 64*8 )
 GFXDECODE_END
 
 
@@ -544,7 +547,7 @@ void wrally_state::wrally(machine_config &config)
 
 	GAELCO_WRALLY_SPRITES(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag("gfxdecode");
-	m_sprites->set_screen_tag("screen");
+	m_sprites->set_screen("screen");
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(wrally_state::coin_lockout_w<0>));
@@ -585,7 +588,7 @@ ROM_START( wrally )
 	ROM_LOAD16_BYTE( "worldr19.i09", 0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
 	ROM_LOAD16_BYTE( "worldr18.i07", 0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples
 	ROM_LOAD( "worldr14.c01",   0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "worldr15.c03",   0x080000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
@@ -618,7 +621,7 @@ ROM_START( wrallya )
 	ROM_LOAD16_BYTE( "rally i9.i9",   0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
 	ROM_LOAD16_BYTE( "rally i7.i7",   0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples
 	ROM_LOAD( "rally c1.c1",   0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "rally c3.c3",   0x080000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
@@ -650,7 +653,7 @@ ROM_START( wrallyb )
 	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) ) // Same data, different layout
 	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples
 	ROM_LOAD( "sound c-1.c1", 0x000000, 0x100000, CRC(2d69c9b8) SHA1(328cb3c928dc6921c0c3f0277f59bca6c747c504) ) // Same data in a single ROM
 
 	ROM_REGION( 0x0514, "plds", 0 ) // PALs and GALs
@@ -681,7 +684,7 @@ ROM_START( wrallyc )
 	ROM_LOAD16_BYTE( "worldr19.i09", 0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
 	ROM_LOAD16_BYTE( "worldr18.i07", 0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples
 	ROM_LOAD( "worldr14.c01",   0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "worldr15.c03",   0x080000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
@@ -714,7 +717,7 @@ ROM_START( wrallyd )
 	ROM_LOAD16_BYTE( "worldr19.i09", 0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
 	ROM_LOAD16_BYTE( "worldr18.i07", 0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples
 	ROM_LOAD( "worldr14.c01",   0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "worldr15.c03",   0x080000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
@@ -747,7 +750,7 @@ ROM_START( wrallye )
 	ROM_LOAD16_BYTE( "worldr19.i09", 0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
 	ROM_LOAD16_BYTE( "worldr18.i07", 0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples
 	ROM_LOAD( "worldr14.c01",   0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "worldr15.c03",   0x080000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
@@ -780,7 +783,7 @@ ROM_START( wrallyac )
 	ROM_LOAD16_BYTE( "worldr19.i09", 0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
 	ROM_LOAD16_BYTE( "worldr18.i07", 0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples
 	ROM_LOAD( "worldr14.c01",   0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "worldr15.c03",   0x080000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
@@ -811,7 +814,7 @@ ROM_START( wrallyat ) // Board marked 930217, Atari license
 	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) ) // Same data, different layout
 	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples
 	ROM_LOAD( "sound c-1.c1", 0x000000, 0x100000, CRC(2d69c9b8) SHA1(328cb3c928dc6921c0c3f0277f59bca6c747c504) ) // Same data in a single ROM
 
 	ROM_REGION( 0x0514, "plds", 0 ) // PALs and GALs
@@ -840,7 +843,7 @@ ROM_START( wrallyata ) // Board marked REF. 930217, Atari license
 	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) ) // Same data, different layout
 	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
 
-	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples
 	ROM_LOAD( "sound c-1.c1", 0x000000, 0x100000, CRC(2d69c9b8) SHA1(328cb3c928dc6921c0c3f0277f59bca6c747c504) ) // Same data in a single ROM
 
 	ROM_REGION( 0x0514, "plds", 0 ) // PALs and GALs

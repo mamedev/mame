@@ -65,4 +65,9 @@ const adam_format::format adam_format::formats[] = {
 	{}
 };
 
+int adam_format::get_image_offset(const format &f, int head, int track) const
+{
+	return (track + (head ? f.track_count : 0)) * compute_track_size(f);
+}
+
 const adam_format FLOPPY_ADAM_FORMAT;

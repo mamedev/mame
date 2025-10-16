@@ -1552,8 +1552,8 @@ ROM_START( scherrym ) // DYNA D9304 PCB; DYNA SCM V5.2 in bookkeeping screen
 	ROM_LOAD( "d3001", 0x00000, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
-	ROM_LOAD( "82s135.2d", 0x000, 0x100, CRC(e87ed5c9) SHA1(ecdfa9586f9daffdb366154b02febcdb535a1427) )
-	ROM_LOAD( "82s135.3d", 0x100, 0x100, CRC(16af0d6d) SHA1(a2004091aec05ee85ae8b82766e7c3013ca87bc4) )
+	ROM_LOAD( "82s135.3d", 0x000, 0x100, CRC(16af0d6d) SHA1(a2004091aec05ee85ae8b82766e7c3013ca87bc4) )
+	ROM_LOAD( "82s135.2d", 0x100, 0x100, CRC(e87ed5c9) SHA1(ecdfa9586f9daffdb366154b02febcdb535a1427) )
 ROM_END
 
 ROM_START( scherrym12 ) // DYNA D9304 PCB; DYNA SCM V1.2 in bookkeeping screen
@@ -1567,8 +1567,8 @@ ROM_START( scherrym12 ) // DYNA D9304 PCB; DYNA SCM V1.2 in bookkeeping screen
 	ROM_LOAD( "d3001", 0x00000, 0x20000, NO_DUMP )
 
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
-	ROM_LOAD( "82s135.2d", 0x000, 0x100, CRC(e87ed5c9) SHA1(ecdfa9586f9daffdb366154b02febcdb535a1427) )
-	ROM_LOAD( "82s135.3d", 0x100, 0x100, CRC(16af0d6d) SHA1(a2004091aec05ee85ae8b82766e7c3013ca87bc4) )
+	ROM_LOAD( "82s135.3d", 0x000, 0x100, CRC(16af0d6d) SHA1(a2004091aec05ee85ae8b82766e7c3013ca87bc4) )
+	ROM_LOAD( "82s135.2d", 0x100, 0x100, CRC(e87ed5c9) SHA1(ecdfa9586f9daffdb366154b02febcdb535a1427) )
 ROM_END
 
 ROM_START( scherrymp ) // DYNA D9702 PCB; DYNA PLUS V1.6 in bookkeeping screen
@@ -1746,9 +1746,9 @@ ROM_START( crzybell ) // DYNA D9401 PCB; DYNA CRBL1 V1.2D in bookkeeping screen
 	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD( "cbl1d.2g", 0x00000, 0x80000, CRC(83c6a91f) SHA1(3f802777e4a5581f7efe86309992f0e7a79851ee) )
 
-	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 ) // not dumped yet
-	ROM_LOAD( "82s135.j5", 0x000, 0x100, BAD_DUMP CRC(2d2237fb) SHA1(9b71801bd465d2a823f648f4d3c1823b5ba3340e) )
-	ROM_LOAD( "82s135.k5", 0x100, 0x100, BAD_DUMP CRC(9940ef22) SHA1(42b0c6410d8db34e0316e95b7b7007abc3098341) )
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "82s135.j5", 0x000, 0x100, CRC(a70ba127) SHA1(08ed172038b2f3f237093d46f48d612c6132cfb3) )
+	ROM_LOAD( "82s135.k5", 0x100, 0x100, CRC(6e653f22) SHA1(d9a72c292d07976897f44a9b776907a9a5400f40) )
 ROM_END
 
 ROM_START( nmondop ) // DYNA D9702 PCB; DYNA NMP V0.6I in bookkeeping screen
@@ -1758,9 +1758,22 @@ ROM_START( nmondop ) // DYNA D9702 PCB; DYNA NMP V0.6I in bookkeeping screen
 	ROM_REGION( 0x080000, "gfx", 0 )
 	ROM_LOAD( "nmp1i.12a", 0x000000, 0x80000, CRC(291ca4d1) SHA1(404439c0e73098e253160af1d36f7ceb7f98f49d) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // not dumped yet
-	ROM_LOAD( "82s147.9b",  0x000, 0x200, BAD_DUMP CRC(6c90f6a2) SHA1(f3f592954000d189ded0ed8c6c4444ace0b616a4) )
-	ROM_LOAD( "82s147.11b", 0x200, 0x200, BAD_DUMP CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "9b",  0x000, 0x100, CRC(d31a9e0a) SHA1(7a72df263cd75d7b83ec74e8d272447f609e6ef6) )
+	ROM_LOAD( "11b", 0x100, 0x100, CRC(cf66ea05) SHA1(5cab7cf203b2b5987c4ae27a3baa61f3bb088872) )
+ROM_END
+
+ROM_START( pdouble8 ) // DYNA D9304 PCB; DYNA SCM V5.3FA 1993 in bookkeeping screen, but Premium Double Eight 1996 on title screen
+	ROM_REGION16_LE( 0x40000, "boot_prg", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "scm_53f.11b", 0x20000, 0x10000, CRC(e078c8d1) SHA1(f7fc42a495987900e1b6864e3b9a6f0dc05a3661) )
+	ROM_RELOAD(                     0x30000, 0x10000)
+
+	ROM_REGION( 0x40000, "gfx", 0 )
+	ROM_LOAD( "db_1d.7c", 0x00000, 0x40000, CRC(c302a66b) SHA1(c376b9d66d0111df1647a33d488cde2097478b44) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "82s135.3d", 0x000, 0x100, CRC(be321344) SHA1(a4f092faa4751b28bb28f7ba278022406133f411) )
+	ROM_LOAD( "82s135.2d", 0x100, 0x100, CRC(43b5fe34) SHA1(81fd9767443f04a96b2eb879a20168cd5de83004) )
 ROM_END
 
 
@@ -1784,20 +1797,21 @@ void cb2001_state::init_smaller_proms()
 } // anonymous namespace
 
 
-//    YEAR  NAME          PARENT     MACHINE    INPUT      CLASS         INIT                ROT   COMPANY  FULLNAME                            FLAGS
-GAME( 2000, cb2001,       0,         cb2001,    cb2001,    cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus 2001 (V1.1I)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, ndongmul2,    0,         ndongmul2, ndongmul2, cb2001_state, empty_init,         ROT0, "Dyna",  "New DongmulDongmul 2 (V1.2N)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // goes into the weeds at various point, due to either missing MCU dump or incomplete decryption. Bad reels GFX.
-GAME( 1992, dynastye ,    0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Dynasty (1992, V5.1G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, scherrym ,    0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Super Cherry Master (V5.2)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, scherrym12 ,  scherrym,  scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Super Cherry Master (V1.2)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scherrymp,    0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Super Cherry Master Plus (V1.6)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scherrymp10u, scherrymp, scherrymp, scherrymp, cb2001_state, empty_init,         ROT0, "Dyna",  "Super Cherry Master Plus (V1.0U)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cb4,          0,         cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus IV (V5.0)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cb4a,         cb4,       cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus IV (V1.2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, cb5,          0,         cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Cherry Bonus V Five (V1.4)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, cb5_13,       cb5,       cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Cherry Bonus V Five (V1.3)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, cb5_11,       cb5,       cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Cherry Bonus V Five (V1.1)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, mystjb,       0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Mystery J & B (V1.3G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, tripjack,     0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Triple Jack (V1.6G)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, crzybell,     0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Crazy Bell (V1.2D)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, nmondop,      0,         cb2001,    cb2001,    cb2001_state, empty_init,         ROT0, "Dyna",  "New Mondo Plus (V0.6I)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME          PARENT     MACHINE    INPUT      CLASS         INIT                ROT   COMPANY                  FULLNAME                            FLAGS
+GAME( 2000, cb2001,       0,         cb2001,    cb2001,    cb2001_state, empty_init,         ROT0, "Dyna",                  "Cherry Bonus 2001 (V1.1I)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ndongmul2,    0,         ndongmul2, ndongmul2, cb2001_state, empty_init,         ROT0, "Dyna",                  "New DongmulDongmul 2 (V1.2N)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // goes into the weeds at various point, due to either missing MCU dump or incomplete decryption. Bad reels GFX.
+GAME( 1992, dynastye ,    0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Dynasty (1992, V5.1G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, scherrym ,    0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Super Cherry Master (V5.2)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, scherrym12 ,  scherrym,  scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Super Cherry Master (V1.2)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scherrymp,    0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Super Cherry Master Plus (V1.6)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scherrymp10u, scherrymp, scherrymp, scherrymp, cb2001_state, empty_init,         ROT0, "Dyna",                  "Super Cherry Master Plus (V1.0U)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cb4,          0,         cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",                  "Cherry Bonus IV (V5.0)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cb4a,         cb4,       cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",                  "Cherry Bonus IV (V1.2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, cb5,          0,         cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Cherry Bonus V Five (V1.4)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, cb5_13,       cb5,       cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Cherry Bonus V Five (V1.3)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, cb5_11,       cb5,       cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Cherry Bonus V Five (V1.1)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, mystjb,       0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Mystery J & B (V1.3G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tripjack,     0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Triple Jack (V1.6G)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, crzybell,     0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Crazy Bell (V1.2D)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nmondop,      0,         cb2001,    cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "New Mondo Plus (V0.6I)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pdouble8 ,    0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna & MK Electronics", "Premium Double Eight (V5.3FA)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

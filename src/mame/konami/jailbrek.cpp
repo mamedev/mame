@@ -89,6 +89,7 @@ Notes:
 
 #include "konami1.h"
 #include "konamipt.h"
+#include "k005849.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
@@ -111,10 +112,9 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_scroll_x(*this, "scroll_x"),
-		m_scroll_dir(*this, "scroll_dir"),
 		m_maincpu(*this, "maincpu"),
 		m_vlm(*this, "vlm"),
+		m_k005849(*this, "k005849"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
@@ -122,8 +122,6 @@ public:
 	void jailbrek(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -131,12 +129,11 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_scroll_x;
-	required_shared_ptr<uint8_t> m_scroll_dir;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<vlm5030_device> m_vlm;
+	required_device<k005849_device> m_k005849;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -144,10 +141,6 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	// misc
-	uint8_t m_irq_enable = 0U;
-	uint8_t m_nmi_enable = 0U;
-
-	void ctrl_w(uint8_t data);
 	void coin_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
@@ -156,8 +149,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vblank_irq(int state);
-	INTERRUPT_GEN_MEMBER(interrupt_nmi);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void prg_map(address_map &map) ATTR_COLD;
@@ -249,16 +240,15 @@ void jailbrek_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// added support for vertical scrolling (credits).  23/1/2002  -BR
 	// bit 2 appears to be horizontal/vertical scroll control
-	if (m_scroll_dir[0] & 0x04)
+	if (m_k005849->ctrl_r(2) & 0x04)
 	{
 		m_bg_tilemap->set_scroll_cols(32);
 		m_bg_tilemap->set_scroll_rows(1);
 		m_bg_tilemap->set_scrollx(0, 0);
 
 		for (int i = 0; i < 32; i++)
-			m_bg_tilemap->set_scrolly(i, ((m_scroll_x[i + 32] << 8) + m_scroll_x[i]));
+			m_bg_tilemap->set_scrolly(i, m_k005849->scroll_r(i) | ((m_k005849->scroll_r(i | 0x20) & 1) << 8));
 	}
 	else
 	{
@@ -267,7 +257,7 @@ uint32_t jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_bg_tilemap->set_scrolly(0, 0);
 
 		for (int i = 0; i < 32; i++)
-			m_bg_tilemap->set_scrollx(i, ((m_scroll_x[i + 32] << 8) + m_scroll_x[i]));
+			m_bg_tilemap->set_scrollx(i, m_k005849->scroll_r(i) | ((m_k005849->scroll_r(i | 0x20) & 1) << 8));
 	}
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -276,31 +266,11 @@ uint32_t jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void jailbrek_state::ctrl_w(uint8_t data)
-{
-	m_nmi_enable = data & 0x01;
-	m_irq_enable = data & 0x02;
-	flip_screen_set(data & 0x08);
-}
-
 void jailbrek_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
-
-void jailbrek_state::vblank_irq(int state)
-{
-	if (state && m_irq_enable)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt_nmi)
-{
-	if (m_nmi_enable)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
 
 uint8_t jailbrek_state::speech_r()
 {
@@ -321,12 +291,8 @@ void jailbrek_state::prg_map(address_map &map)
 	map(0x1000, 0x10bf).ram().share(m_spriteram);
 	map(0x10c0, 0x14ff).ram(); // ???
 	map(0x1500, 0x1fff).ram(); // work RAM
-	map(0x2000, 0x203f).ram().share(m_scroll_x);
-	map(0x2040, 0x2040).nopw(); // ???
-	map(0x2041, 0x2041).nopw(); // ???
-	map(0x2042, 0x2042).ram().share(m_scroll_dir); // bit 2 = scroll direction
-	map(0x2043, 0x2043).nopw(); // ???
-	map(0x2044, 0x2044).w(FUNC(jailbrek_state::ctrl_w)); // irq, nmi enable, screen flip
+	map(0x2000, 0x203f).rw(m_k005849, FUNC(k005849_device::scroll_r), FUNC(k005849_device::scroll_w));
+	map(0x2040, 0x2047).w(m_k005849, FUNC(k005849_device::ctrl_w));
 	map(0x3000, 0x3000).w(FUNC(jailbrek_state::coin_w));
 	map(0x3100, 0x3100).portr("DSW2").w("snsnd", FUNC(sn76489a_device::write));
 	map(0x3200, 0x3200).portr("DSW3").nopw(); // mirror of the previous?
@@ -403,46 +369,34 @@ static GFXDECODE_START( gfx_jailbrek )
 GFXDECODE_END
 
 
-void jailbrek_state::machine_start()
-{
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_nmi_enable));
-}
-
-void jailbrek_state::machine_reset()
-{
-	m_irq_enable = 0;
-	m_nmi_enable = 0;
-}
-
 void jailbrek_state::jailbrek(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = XTAL(18'432'000);
-	static constexpr XTAL VOICE_CLOCK = XTAL(3'579'545);
-
 	// basic machine hardware
-	KONAMI1(config, m_maincpu, MASTER_CLOCK / 12); // the bootleg uses a standard M6809 with separate decryption logic
+	KONAMI1(config, m_maincpu, 18.432_MHz_XTAL / 12); // the bootleg uses a standard M6809 with separate decryption logic
 	m_maincpu->set_addrmap(AS_PROGRAM, &jailbrek_state::prg_map);
-	m_maincpu->set_periodic_int(FUNC(jailbrek_state::interrupt_nmi), attotime::from_hz(500)); // ?
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
+	K005849(config, m_k005849, 0);
+	m_k005849->set_irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_k005849->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_k005849->set_flipscreen_cb().set(FUNC(jailbrek_state::flip_screen_set));
+
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jailbrek);
 	PALETTE(config, m_palette, FUNC(jailbrek_state::palette), 512, 32);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK / 3, 396, 8, 248, 256, 16, 240);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(jailbrek_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(jailbrek_state::vblank_irq));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, "snsnd", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "snsnd", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	VLM5030(config, m_vlm, VOICE_CLOCK);
+	VLM5030(config, m_vlm, 3.579545_MHz_XTAL);
 	m_vlm->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_vlm->set_addrmap(0, &jailbrek_state::vlm_map);
 }
@@ -454,14 +408,14 @@ void jailbrek_state::jailbrek(machine_config &config)
 
 ***************************************************************************/
 
-	/*
-	   Check if the ROM used for the speech is not a 2764, but a 27128.  If a
-	   27128 is used then the data is stored in the upper half of the EPROM.
-	   (The schematics and board refer to a 2764, but all the boards I have seen
-	   use a 27128.  According to the schematics pin 26 is tied high so if a 2764
-	   is used then the pin is ignored, but if a 27128 is used then pin 26
-	   represents address line A13.)
-	*/
+/*
+   Check if the ROM used for the speech is not a 2764, but a 27128.  If a
+   27128 is used then the data is stored in the upper half of the EPROM.
+   (The schematics and board refer to a 2764, but all the boards I have seen
+   use a 27128.  According to the schematics pin 26 is tied high so if a 2764
+   is used then the pin is ignored, but if a 27128 is used then pin 26
+   represents address line A13.)
+*/
 
 ROM_START( jailbrek )
 	ROM_REGION( 0x10000, "maincpu", 0 )

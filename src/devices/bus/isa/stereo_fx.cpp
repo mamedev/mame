@@ -93,7 +93,7 @@ ROM_START( stereo_fx )
 	ROM_LOAD("ati_stereo_fx.bin", 0x0000, 0x8000, CRC(1bebffa6) SHA1(e66c2619a6c05199554b5702d67877ae3799d415))
 ROM_END
 
-void stereo_fx_device::stereo_fx_io(address_map &map)
+void stereo_fx_device::stereo_fx_data(address_map &map)
 {
 	map(0xFF00, 0xFF00).w(FUNC(stereo_fx_device::port00_w));
 	map(0xFF10, 0xFF10).w("rdac", FUNC(dac_byte_interface::data_w));
@@ -118,7 +118,7 @@ void stereo_fx_device::device_add_mconfig(machine_config &config)
 {
 	I80C31(config, m_cpu, XTAL(30'000'000));
 	m_cpu->set_addrmap(AS_PROGRAM, &stereo_fx_device::stereo_fx_rom);
-	m_cpu->set_addrmap(AS_IO, &stereo_fx_device::stereo_fx_io);
+	m_cpu->set_addrmap(AS_DATA, &stereo_fx_device::stereo_fx_data);
 	m_cpu->port_in_cb<1>().set(FUNC(stereo_fx_device::p1_r));
 	m_cpu->port_out_cb<1>().set("ldac", FUNC(dac_byte_interface::data_w));
 	m_cpu->port_in_cb<3>().set(FUNC(stereo_fx_device::p3_r));

@@ -1190,6 +1190,18 @@ if (SOUNDS["VA_VCA"]~=null) then
 	}
 end
 
+--------------------------------------------------
+-- Virtual analog voltage-controlled filters (VCFs)
+--@src/devices/sound/va_vcf.h,SOUNDS["VA_VCF"] = true
+--------------------------------------------------
+
+if (SOUNDS["VA_VCF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vcf.cpp",
+		MAME_DIR .. "src/devices/sound/va_vcf.h",
+	}
+end
+
 ---------------------------------------------------
 -- VLM5030 speech synthesizer
 --@src/devices/sound/vlm5030.h,SOUNDS["VLM5030"] = true
@@ -1807,5 +1819,17 @@ if (SOUNDS["ADC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/adc.cpp",
 		MAME_DIR .. "src/devices/sound/adc.h",
+	}
+end
+
+---------------------------------------------------
+-- Casio FZ-series PCM
+--@src/devices/sound/fz_pcm.h,SOUNDS["FZ_PCM"] = true
+---------------------------------------------------
+
+if (SOUNDS["FZ_PCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/fz_pcm.cpp",
+		MAME_DIR .. "src/devices/sound/fz_pcm.h",
 	}
 end

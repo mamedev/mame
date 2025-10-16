@@ -222,21 +222,19 @@ void nec_common_device::prefetch()
 	m_prefetch_count--;
 }
 
-void nec_common_device::do_prefetch(int previous_ICount)
+void nec_common_device::do_prefetch()
 {
-	int diff = previous_ICount - (int) m_icount;
-
 	/* The implementation is not accurate, but comes close.
 	 * It does not respect that the V30 will fetch two bytes
 	 * at once directly, but instead uses only 2 cycles instead
 	 * of 4. There are however only very few sources publicly
 	 * available and they are vague.
 	 */
-	while (m_prefetch_count<0)
+	while (m_prefetch_count < 0)
 	{
 		m_prefetch_count++;
-		if (diff>m_prefetch_cycles)
-			diff -= m_prefetch_cycles;
+		if (m_cur_cycles > m_prefetch_cycles)
+			m_cur_cycles -= m_prefetch_cycles;
 		else
 			m_icount -= m_prefetch_cycles;
 	}
@@ -248,18 +246,17 @@ void nec_common_device::do_prefetch(int previous_ICount)
 		return;
 	}
 
-	while (diff>=m_prefetch_cycles && m_prefetch_count < m_prefetch_size)
+	while (m_cur_cycles >= m_prefetch_cycles && m_prefetch_count < m_prefetch_size)
 	{
-		diff -= m_prefetch_cycles;
+		m_cur_cycles -= m_prefetch_cycles;
 		m_prefetch_count++;
 	}
-
 }
 
 uint8_t nec_common_device::fetch()
 {
 	prefetch();
-	return m_dr8((Sreg(PS)<<4)+m_ip++);
+	return m_dr8((Sreg(PS)<<4) + m_ip++);
 }
 
 uint16_t nec_common_device::fetchword()
@@ -279,7 +276,7 @@ static uint8_t parity_table[256];
 uint8_t nec_common_device::fetchop()
 {
 	prefetch();
-	return m_dr8((Sreg(PS)<<4)+m_ip++);
+	return m_dr8((Sreg(PS)<<4) + m_ip++);
 }
 
 
@@ -292,6 +289,7 @@ void nec_common_device::device_reset()
 
 	m_ip = 0;
 	m_prev_ip = 0;
+	m_rep_ip = 0;
 	m_TF = 0;
 	m_IF = 0;
 	m_DF = 0;
@@ -308,6 +306,7 @@ void nec_common_device::device_reset()
 	m_irq_state = 0;
 	m_poll_state = 1;
 	m_halted = 0;
+	m_rep_params = 0;
 
 	if (m_chip_type == V33_TYPE)
 		m_xa = false;
@@ -325,6 +324,7 @@ void nec_common_device::nec_interrupt(unsigned int_num, int/*INTSOURCES*/ source
 {
 	uint32_t dest_seg, dest_off;
 
+	m_rep_params = 0;
 	i_pushf();
 	m_TF = m_IF = 0;
 	m_MF = 1;
@@ -462,6 +462,7 @@ void nec_common_device::device_start()
 	}
 
 	m_no_interrupt = 0;
+	m_cur_cycles = 0;
 	m_prefetch_count = 0;
 	m_prefetch_reset = 0;
 	m_prefix_base = 0;
@@ -472,6 +473,7 @@ void nec_common_device::device_start()
 	m_debugger_temp = 0;
 	m_ip = 0;
 	m_prev_ip = 0;
+	m_rep_ip = 0;
 
 	memset(m_regs.w, 0x00, sizeof(m_regs.w));
 	memset(m_sregs, 0x00, sizeof(m_sregs));
@@ -481,6 +483,7 @@ void nec_common_device::device_start()
 
 	save_item(NAME(m_ip));
 	save_item(NAME(m_prev_ip));
+	save_item(NAME(m_rep_ip));
 	save_item(NAME(m_TF));
 	save_item(NAME(m_IF));
 	save_item(NAME(m_DF));
@@ -497,6 +500,7 @@ void nec_common_device::device_start()
 	save_item(NAME(m_poll_state));
 	save_item(NAME(m_no_interrupt));
 	save_item(NAME(m_halted));
+	save_item(NAME(m_rep_params));
 	save_item(NAME(m_prefetch_count));
 	save_item(NAME(m_prefetch_reset));
 
@@ -627,8 +631,6 @@ void nec_common_device::state_export(const device_state_entry &entry)
 
 void nec_common_device::execute_run()
 {
-	int prev_ICount;
-
 	if (m_halted)
 	{
 		debugger_wait_hook();
@@ -636,10 +638,11 @@ void nec_common_device::execute_run()
 		return;
 	}
 
-	while(m_icount>0) {
+	while(m_icount>0)
+	{
 		m_prev_ip = m_ip;
 
-		/* Dispatch IRQ */
+		// Dispatch IRQ
 		if (m_pending_irq && m_no_interrupt==0)
 		{
 			if (m_pending_irq & NMI_IRQ)
@@ -648,16 +651,22 @@ void nec_common_device::execute_run()
 				external_int();
 		}
 
-		/* No interrupt allowed between last instruction and this one */
+		// No interrupt allowed between last instruction and this one
 		if (m_no_interrupt)
 			m_no_interrupt--;
 
 		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
-		prev_ICount = m_icount;
-		if (m_MF)
-			(this->*s_nec_instruction[fetchop()])();
+		m_cur_cycles = 0;
+
+		if (m_rep_params)
+			cont_rep();
 		else
-			(this->*s_nec80_instruction[fetchop()])();
-		do_prefetch(prev_ICount);
+		{
+			if (m_MF)
+				(this->*s_nec_instruction[fetchop()])();
+			else
+				(this->*s_nec80_instruction[fetchop()])();
+		}
+		do_prefetch();
 	}
 }
