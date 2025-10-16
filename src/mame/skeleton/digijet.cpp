@@ -69,14 +69,12 @@
 
 namespace {
 
-#define I8049_TAG   "i8049"
-
 class digijet_state : public driver_device
 {
 public:
 	digijet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, I8049_TAG)
+		, m_maincpu(*this, "maincpu")
 		, m_io_adc(*this, "ADC%u", 0U)
 	{
 	}
@@ -88,9 +86,10 @@ private:
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_ioport_array<4> m_io_adc;
 
-	virtual void machine_start() override { }
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override { }
 	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
@@ -98,8 +97,14 @@ private:
 	uint8_t read_adc();
 	void start_adc(uint8_t data);
 
-	uint8_t m_adc_channel = 0;
+	uint8_t m_adc_channel = 0x07;
+
 };
+
+void digijet_state::machine_start()
+{
+	save_item(NAME(m_adc_channel));
+}
 
 void digijet_state::io_map(address_map &map)
 {
@@ -107,15 +112,15 @@ void digijet_state::io_map(address_map &map)
 	map(0x30, 0x3f).w(FUNC(digijet_state::start_adc));
 }
 
-void digijet_state::start_adc(address_map &map)
-{
-	;
-}
-
 uint8_t digijet_state::read_adc()
 {
 	return m_io_adc[m_adc_channel]->read();
 };
+
+void digijet_state::start_adc(uint8_t data)
+{
+	;
+}
 
 void digijet_state::p1_w(uint8_t data)
 {
@@ -123,8 +128,8 @@ void digijet_state::p1_w(uint8_t data)
 	bool unkn = BIT(data,3); 
 	bool fuel = BIT(data,4);
 	bool inject = BIT(data,5);
-	bool watchdog = BIT(data,6);
-	popmessage("irq %01x unk %01x fuel %01x inj %01x wd %01x",irq,unkn,fuel,inject,watchdog);
+	//bool watchdog = BIT(data,6);
+	popmessage("irq %01x unk %01x fuel %01x inj %01x",irq,unkn,fuel,inject);
 };
 
 uint8_t digijet_state::p2_r()
@@ -137,6 +142,7 @@ uint8_t digijet_state::p2_r()
 void digijet_state::p2_w(uint8_t data)
 {
 	m_adc_channel = data & 0x07;
+	popmessage("p2 %04x",data);
 };
 
 static INPUT_PORTS_START( digijet )
@@ -161,7 +167,9 @@ void digijet_state::digijet(machine_config &config)
 {
 	/* basic machine hardware */
 	I8049(config, m_maincpu, XTAL(11'000'000));
+
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
+	
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
@@ -172,7 +180,9 @@ void digijet_state::digijet90(machine_config &config)
 {
 	/* basic machine hardware */
 	I8049(config, m_maincpu, XTAL(7'372'800));
+
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
+	
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
@@ -180,12 +190,12 @@ void digijet_state::digijet90(machine_config &config)
 }
 
 ROM_START( digijet )
-	ROM_REGION( 0x800, I8049_TAG, 0 )
+	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "vanagon_85_usa_ca.bin", 0x000, 0x800, CRC(2ed7c4c5) SHA1(ae48d8892b44fe76b48bcefd293c15cd47af3fba) ) // Volkswagen Vanagon, 1985, USA, California
 ROM_END
 
 ROM_START( digijet90 )
-	ROM_REGION( 0x2000, I8049_TAG, 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "fabb05_03_03.bin", 0x0000, 0x2000, CRC(8c96bcdf) SHA1(73b26914cd15ca3a5e0d7427de9ce4b4e311fb00) ) // Volkswagen 1990, Germany
 ROM_END
 
@@ -193,5 +203,5 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT     COMPAT  MACHINE    INPUT    CLASS          INIT        COMPANY       FULLNAME          FLAGS
-GAMEL( 1985, digijet,   digijet90, 0,      digijet,   digijet, digijet_state, empty_init, "Volkswagen", "Digijet",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW, layout_vw )
-GAMEL( 1990, digijet90, 0,         0,      digijet90, digijet, digijet_state, empty_init, "Volkswagen", "Digijet (1990)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW, layout_vw )
+CONS( 1985, digijet,   digijet90, 0,      digijet,   digijet, digijet_state, empty_init, "Volkswagen", "Digijet",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+CONS( 1990, digijet90, 0,         0,      digijet90, digijet, digijet_state, empty_init, "Volkswagen", "Digijet (1990)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
