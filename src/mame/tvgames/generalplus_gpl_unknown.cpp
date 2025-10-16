@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood
 
 // seems to be a GPCExxx series SunPlus CPU
-// GPCE200A seems very likely for the Super Impulse titles
-// but GPCE4064A is a close match
+// GPCE4064A seems very likely for the Super Impulse titles
+// but GPCE200A is a close match
 
 /*
    NOTES:

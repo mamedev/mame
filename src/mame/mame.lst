@@ -19477,6 +19477,9 @@ gameking
 @source:handheld/gmaster.cpp
 gmaster
 
+@source:handheld/generalplus_gpel31xx.cpp
+tamameet
+
 @source:handheld/hh_cop400.cpp
 bshipg
 comparca
@@ -47103,7 +47106,6 @@ smatomo
 sumikpc
 sumikpcp
 sumipc21
-tamameet
 tmydistb
 zippity
 zippityuk

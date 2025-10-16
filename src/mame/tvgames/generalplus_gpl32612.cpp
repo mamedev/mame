@@ -322,11 +322,6 @@ ROM_START( bandplap )
 	ROM_LOAD( "gpr25l64.u3", 0x0000, 0x800000, CRC(f85c388d) SHA1(59e30b51e2d6598881eb64edc027e0e27756631f) )
 ROM_END
 
-ROM_START( tamameet )
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "25q64.u3", 0x0000, 0x800000, CRC(f15507f8) SHA1(356cb1bd68169eb747898325eacfd7590dbe9f9c) )
-ROM_END
-
 ROM_START( chiikpc )
 	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l12833f.u6", 0x0000, 0x1000000, CRC(bde74209) SHA1(8a91554ae653f4ed54fd354049c32b545e4d359d) )
@@ -566,10 +561,6 @@ CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplu
 // uses a GP326813
 // 学習おうえんAI★ミラクルロボ
 CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushuu Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
-// uses GPEL3101A
-// たまごっち みーつ  (there appear to be many units in this series, ROM data could differ, this was from a light blue 'hearts and rainbows' themed unit with no subtitles)
-CONS( 2018, tamameet,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tamagotchi Meets (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses a glob CPU
 // ちいかわラーニングパソコン
