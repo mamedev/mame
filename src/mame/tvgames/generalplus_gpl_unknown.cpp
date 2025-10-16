@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// seems to be a GPCE4 series SunPlus CPU, GPCE4064A is a close match
+
 /*
    NOTES:
 
