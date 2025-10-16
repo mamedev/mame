@@ -43,7 +43,7 @@
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/ds5002fp.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"

@@ -52,7 +52,7 @@ until a restart or reset (F3).
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "machine/rescap.h"

@@ -18,7 +18,7 @@
 #include "emu.h"
 #include "cherry_mx1500.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 
 
 // device type definition

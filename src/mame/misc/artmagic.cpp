@@ -28,7 +28,7 @@
 #include "artmagic.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/tms34010/tms34010.h"
 #include "machine/eeprompar.h"
 #include "machine/mc68681.h"

@@ -29,7 +29,7 @@
 //       .  0  OK  DOWN-ARROW
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "video/nt7534.h"
 #include "emupal.h"
 #include "screen.h"

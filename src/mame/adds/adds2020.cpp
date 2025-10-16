@@ -17,7 +17,7 @@
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/scn_pci.h"

@@ -9,7 +9,7 @@ No significant progress can be made until the 8051 has its internal ROM dumped.
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 //#include "machine/er2055.h"
 #include "video/i8275.h"
 #include "screen.h"

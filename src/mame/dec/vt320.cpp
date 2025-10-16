@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/ram.h"
 #include "emupal.h"
 #include "screen.h"

@@ -26,7 +26,7 @@ ToDo:
 #include "emu.h"
 #include "genpin.h"
 #include "cpu/i86/i86.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/i8155.h"
 #include "machine/i8256.h"
 #include "machine/nvram.h"

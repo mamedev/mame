@@ -91,17 +91,6 @@ protected:
 	};
 
 	enum {
-		T2CON_TF2   = 7,  //Indicated Timer 2 Overflow Int Triggered
-		T2CON_EXF2  = 6,  //Indicates Timer 2 External Flag
-		T2CON_RCLK  = 5,  //Receive Clock
-		T2CON_TCLK  = 4,  //Transmit Clock
-		T2CON_EXEN2 = 3,  //Timer 2 External Interrupt Enable
-		T2CON_TR2   = 2,  //Indicates Timer 2 is running
-		T2CON_CT2   = 1,  //Sets Timer 2 Counter/Timer Mode
-		T2CON_CP    = 0,  //Sets Timer 2 Capture/Reload Mode
-	};
-
-	enum {
 		SCON_SM0 = 7,  //Sets Serial Port Mode
 		SCON_SM1 = 6,  //Sets Serial Port Mode
 		SCON_SM2 = 5,  //Sets Serial Port Mode (Multiprocesser mode)
@@ -137,26 +126,8 @@ protected:
 		PCON_EWT   = 2,
 	};
 
-	enum {
-		MCON_PA  = 4,
-		MCON_RG1 = 3,
-		MCON_PES = 2,
-		MCON_PM  = 1,
-		MCON_SL  = 0,
-	};
-
-	enum {
-		RPCTL_RNR   = 7,  // Bit 6 ??
-		RPCTL_EXBS  = 5,
-		RPCTL_AE    = 4,
-		RPCTL_IBI   = 3,
-		RPCTL_DMA   = 2,
-		RPCTL_RPCON = 1,
-		RPCTL_RG0   = 0,
-	};
-
 	// construction/destruction
-	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width, u8 features = 0);
+	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -187,7 +158,7 @@ protected:
 	// Internal stuff
 	u16 m_ppc;              // previous pc
 	u16 m_pc;               // current pc
-	u16 m_features;         // features of this cpu
+	bool m_has_pd;          // can powerdown
 	u8  m_rwm;              // Signals that the current instruction is a read/write/modify instruction
 
 	int      m_inst_cycles;      // cycles for the current instruction
@@ -226,13 +197,10 @@ protected:
 	} m_uart;                    // internal uart
 
 	// Internal Ram
-	u16 m_dptr, m_rcap2, m_t2, m_crc;
-	u8 m_acc, m_psw, m_b, m_sp, m_pcon, m_tcon, m_tmod, m_scon, m_sbuf, m_ie, m_ip;
+	u16 m_dptr;
+	u8 m_acc, m_psw, m_b, m_sp, m_pcon, m_tcon, m_tmod, m_scon, m_sbuf, m_ie, m_ip, m_iph;
 	u8 m_p0, m_p1, m_p2, m_p3;
 	u8 m_tl0, m_tl1, m_th0, m_th1;
-	u8 m_t2con;
-	u8 m_iph, m_saddr, m_saden;
-	u8 m_crcr, m_mcon, m_ta, m_rnr, m_rpctl, m_rps;
 
 	required_shared_ptr<u8> m_internal_ram; // 128 RAM (8031/51) + 128 RAM in second bank (8032/52)
 
@@ -309,9 +277,6 @@ protected:
 	void set_ie0(bool state) { set_bit<TCON_IE0>(m_tcon, state); }
 	void set_it0(bool state) { set_bit<TCON_IT0>(m_tcon, state); }
 
-	void set_tf2 (bool state) { set_bit<T2CON_TF2 >(m_t2con, state); }
-	void set_exf2(bool state) { set_bit<T2CON_EXF2>(m_t2con, state); }
-
 	void set_rb8(bool state) { set_bit<SCON_RB8>(m_scon, state); }
 	void set_ti (bool state) { set_bit<SCON_TI >(m_scon, state); }
 	void set_ri (bool state) { set_bit<SCON_RI >(m_scon, state); }
@@ -332,19 +297,6 @@ protected:
 	devcb_read8::array<4> m_port_in_cb;
 	devcb_write8::array<4> m_port_out_cb;
 
-	// DS5002FP
-	struct {
-		u8  previous_ta;   // Previous Timed Access value
-		u8  ta_window;     // Limed Access window
-		u8  range;         // Memory Range
-
-		// Bootstrap Configuration
-		u8  mcon;          // bootstrap loader MCON register
-		u8  rpctl;         // bootstrap loader RPCTL register
-		u8  crc;           // bootstrap loader CRC register
-		s32  rnr_delay;    // delay before new random number available
-	} m_ds5002fp;
-
 	// for the debugger
 	u8 m_rtemp;
 
@@ -353,6 +305,12 @@ protected:
 
 	void clear_current_irq();
 	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask);
+	virtual void handle_8bit_uart_clock(int source);
+	virtual void irqs_complete_and_mask(u8 &ints, u8 int_mask);
+	virtual void handle_ta_window();
+	virtual bool manage_idle_on_interrupt(u8 ints);
+	virtual void handle_irq(int irqline, int state, u32 new_state, u32 tr_state);
+
 	u8 iram_r(offs_t offset);
 	void iram_w(offs_t offset, u8 data);
 	void push_pc();
@@ -364,8 +322,8 @@ protected:
 	void transmit_receive(int source);
 	void update_timer_t0(int cycles);
 	void update_timer_t1(int cycles);
-	void update_timer_t2(int cycles);
-	void update_irq_prio(u8 ipl, u8 iph);
+	virtual void update_timer_t2(int cycles);
+	void update_irq_prio();
 	void execute_op(u8 op);
 	void check_irqs();
 	void burn_cycles(int cycles);
@@ -489,9 +447,6 @@ protected:
 // variants with no internal rom and 128 byte internal memory
 DECLARE_DEVICE_TYPE(I8031, i8031_device)
 
-// variants with no internal rom and 256 byte internal memory
-DECLARE_DEVICE_TYPE(I8032, i8032_device)
-
 // variants 4k internal rom and 128 byte internal memory
 DECLARE_DEVICE_TYPE(I8051, i8051_device)
 DECLARE_DEVICE_TYPE(I8751, i8751_device)
@@ -499,34 +454,8 @@ DECLARE_DEVICE_TYPE(I8751, i8751_device)
 // variants 8k internal rom and 128 byte internal memory (no 8052 features)
 DECLARE_DEVICE_TYPE(AM8753, am8753_device)
 
-// variants 8k internal rom and 256 byte internal memory and more registers
-DECLARE_DEVICE_TYPE(I8052, i8052_device)
-DECLARE_DEVICE_TYPE(I8752, i8752_device)
-
-// cmos variants
-DECLARE_DEVICE_TYPE(I80C31, i80c31_device)
-DECLARE_DEVICE_TYPE(I80C51, i80c51_device)
-DECLARE_DEVICE_TYPE(I87C51, i87c51_device)
-DECLARE_DEVICE_TYPE(I80C32, i80c32_device)
-DECLARE_DEVICE_TYPE(I80C52, i80c52_device)
-DECLARE_DEVICE_TYPE(I87C52, i87c52_device)
-DECLARE_DEVICE_TYPE(I87C51FA, i87c51fa_device)
-DECLARE_DEVICE_TYPE(I80C51GB, i80c51gb_device)
-DECLARE_DEVICE_TYPE(AT89C52, at89c52_device)
-DECLARE_DEVICE_TYPE(AT89S52, at89s52_device)
-DECLARE_DEVICE_TYPE(DS80C320, ds80c320_device)
-DECLARE_DEVICE_TYPE(SAB80C535, sab80c535_device)
-DECLARE_DEVICE_TYPE(P80C552, p80c552_device)
-DECLARE_DEVICE_TYPE(P87C552, p87c552_device)
-DECLARE_DEVICE_TYPE(P80C562, p80c562_device)
-
-// 4k internal perom and 128 internal ram and 2 analog comparators
-DECLARE_DEVICE_TYPE(AT89C4051, at89c4051_device)
-
 DECLARE_DEVICE_TYPE(I8344, i8344_device)
 DECLARE_DEVICE_TYPE(I8744, i8744_device)
-
-DECLARE_DEVICE_TYPE(DS5002FP, ds5002fp_device)
 
 
 class i8031_device : public mcs51_cpu_device
@@ -557,173 +486,6 @@ public:
 	am8753_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-
-class i8052_device : public mcs51_cpu_device
-{
-public:
-	// construction/destruction
-	i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width, u8 features = 0);
-
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	virtual void sfr_map(address_map &map) override ATTR_COLD;
-
-	u8   t2con_r();
-	void t2con_w(u8 data);
-	u8   rcap2_r(offs_t offset);
-	void rcap2_w(offs_t offset, u8 data);
-	u8   t2_r   (offs_t offset);
-	void t2_w   (offs_t offset, u8 data);
-};
-
-class i8032_device : public i8052_device
-{
-public:
-	// construction/destruction
-	i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class i8752_device : public i8052_device
-{
-public:
-	// construction/destruction
-	i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class i80c31_device : public i8052_device
-{
-public:
-	// construction/destruction
-	i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-
-class i80c51_device : public mcs51_cpu_device
-{
-public:
-	// construction/destruction
-	i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width, u8 features = 0);
-
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-class i87c51_device : public i80c51_device
-{
-public:
-	// construction/destruction
-	i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-
-class i80c52_device : public i8052_device
-{
-public:
-	// construction/destruction
-	i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width, u8 features = 0);
-
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	virtual void sfr_map(address_map &map) override ATTR_COLD;
-
-	u8   ip_c52_r();
-	void ip_c52_w(u8 data);
-	u8   iph_r ();
-	void iph_w (u8 data);
-	u8   saddr_r ();
-	void saddr_w (u8 data);
-	u8   saden_r ();
-	void saden_w (u8 data);
-};
-
-class i80c32_device : public i80c52_device
-{
-public:
-	// construction/destruction
-	i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class i87c52_device : public i80c52_device
-{
-public:
-	// construction/destruction
-	i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class i87c51fa_device : public i80c52_device
-{
-public:
-	// construction/destruction
-	i87c51fa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width, u8 features = 0);
-
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-class i80c51gb_device : public i87c51fa_device
-{
-public:
-	// construction/destruction
-	i80c51gb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-class at89c52_device : public i80c52_device
-{
-public:
-	// construction/destruction
-	at89c52_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class at89s52_device : public i80c52_device
-{
-public:
-	// construction/destruction
-	at89s52_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class at89c4051_device : public i80c51_device
-{
-public:
-	// construction/destruction
-	at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class ds80c320_device : public i80c52_device
-{
-public:
-	// construction/destruction
-	ds80c320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-class sab80c535_device : public i80c51_device
-{
-public:
-	// construction/destruction
-	sab80c535_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
 class i8344_device : public mcs51_cpu_device
 {
 public:
@@ -744,109 +506,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
-class p80c562_device : public i80c51_device
-{
-public:
-	// construction/destruction
-	p80c562_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-protected:
-	p80c562_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width, u8 features = 0);
-
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-class p80c552_device : public p80c562_device
-{
-public:
-	// construction/destruction
-	p80c552_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-class p87c552_device : public p80c562_device
-{
-public:
-	// construction/destruction
-	p87c552_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-/*
- * The DS5002FP has 2 16 bits data address buses (the byte-wide bus and the expanded bus). The exact memory position accessed depends on the
- * partition mode, the memory range and the expanded bus select. The partition mode and the expanded bus select can be changed at any time.
- *
- * In order to simplify memory mapping to the data address bus, the following address map is assumed for partitioned mode:
-
- * 0x00000-0x0ffff -> data memory on the expanded bus
- * 0x10000-0x1ffff -> data memory on the byte-wide bus
-
- * For non-partitioned mode the following memory map is assumed:
-
- * 0x0000-0xffff -> data memory (the bus used to access it does not matter)
- *
- * Internal ram 128k and security features
- */
-
-// these allow the default state of RAM to be set from a region
-#define DS5002FP_SET_MON( _mcon) \
-	ROM_FILL( 0xc6, 1, _mcon)
-
-#define DS5002FP_SET_RPCTL( _rpctl) \
-	ROM_FILL( 0xd8, 1, _rpctl)
-
-#define DS5002FP_SET_CRCR( _crcr) \
-	ROM_FILL( 0xc1, 1, _crcr)
-
-
-class ds5002fp_device : public mcs51_cpu_device, public device_nvram_interface
-{
-public:
-	// construction/destruction
-	ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	void set_mcon(u8 mcon) { m_ds5002fp.mcon = mcon; }
-	void set_rpctl(u8 rpctl) { m_ds5002fp.rpctl = rpctl; }
-	void set_crc(u8 crc) { m_ds5002fp.crc = crc; }
-
-	// device_nvram_interface overrides
-	virtual void nvram_default() override;
-	virtual bool nvram_read( util::read_stream &file ) override;
-	virtual bool nvram_write( util::write_stream &file ) override;
-
-protected:
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	virtual void sfr_map(address_map &map) override ATTR_COLD;
-
-	u8 pcon_ds_r();
-	void pcon_ds_w(u8 data);
-	void ip_ds_w(u8 data);
-	u8 crcr_r();
-	void crcr_w(u8 data);
-	u8 crc_r(offs_t offset);
-	void crc_w(offs_t offset, u8 data);
-	u8 mcon_r();
-	void mcon_w(u8 data);
-	u8 ta_r();
-	void ta_w(u8 data);
-	u8 rnr_r();
-	void rnr_w(u8 data);
-	u8 rpctl_r();
-	void rpctl_w(u8 data);
-	u8 rps_r();
-	void rps_w(u8 data);
-
-	u8 handle_rnr();
-	void ds_protected(u8 &val, u8 data, u8 ta_mask, u8 mask);
-
-private:
-	optional_memory_region m_region;
-};
 
 
 #endif // MAME_CPU_MCS51_MCS51_H

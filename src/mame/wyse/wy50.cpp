@@ -30,7 +30,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/er1400.h"
 #include "machine/scn_pci.h"
 #include "wy50kb.h"

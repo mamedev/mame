@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "machine/6850acia.h"
 #include "video/hd44780.h"
 #include "emupal.h"

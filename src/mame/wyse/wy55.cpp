@@ -12,7 +12,7 @@
 ***********************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 //#include "machine/ins8250.h"
 #include "machine/nvram.h"
 #include "machine/scn_pci.h"

@@ -250,7 +250,7 @@
 #include "emu.h"
 
 #include "cpu/m6805/m68705.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/z80/z80.h"
 #include "machine/ds2401.h"
 #include "machine/i8255.h"

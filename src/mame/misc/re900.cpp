@@ -73,7 +73,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/tms9928a.h"

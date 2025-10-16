@@ -8,7 +8,8 @@
 
 #include "emu.h"
 //#include "bus/midi/midi.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
+#include "cpu/mcs51/i80c51.h"
 #include "mb62h195.h"
 #include "mb63h149.h"
 #include "machine/nvram.h"

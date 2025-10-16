@@ -292,7 +292,7 @@
 #include "emu.h"
 
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/ds1215.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
