@@ -289,6 +289,7 @@
 #include "lucky8.lh"
 #include "lucky8p1.lh"
 #include "megaline.lh"
+#include "nd8lines.lh"
 #include "nfb96.lh"
 #include "nfb96tx.lh"
 #include "pokonl97.lh"
@@ -612,7 +613,8 @@ public:
 		m_fl7w4_id(*this, "fl7w4_id"),
 		m_mcu(*this, "mcu"),
 		m_tmcu(*this, "tmcu"),
-		m_nvram(*this, "nvram")
+		m_nvram(*this, "nvram"),
+		m_draw8sn(*this, "draw8sn")
 	{ }
 
 	void animalw(machine_config &config) ATTR_COLD;
@@ -681,7 +683,7 @@ private:
 	void ay8910_outputa_w(uint8_t data);
 	void ay8910_outputb_w(uint8_t data);
 	void fever_outp_w(offs_t offset, uint8_t data);
-
+	void draw8_sn_w(uint8_t data);
 
 	// SM7831 Arithmetic Processor device emulation
 	uint8_t sm7831_mode = 0;
@@ -732,6 +734,7 @@ private:
 	optional_device<m68705p_device> m_mcu;
 	optional_device<i80c51_device> m_tmcu;
 	optional_shared_ptr<uint8_t> m_nvram;
+	optional_device<sn76489a_device> m_draw8sn;
 
 	uint8_t m_nmi_enable = 0U;
 	uint8_t m_vidreg = 0U;
@@ -2313,6 +2316,17 @@ void wingco_state::mcu_portb_w(uint8_t data)
 void wingco_state::mcu_portc_w(uint8_t data)
 {
 	logerror("MCU port C write: %02x\n", data);
+}
+
+void wingco_state::draw8_sn_w(uint8_t data)
+{
+//  SN76489A commands have a inversed bit order.
+//	Maybe this design was meant for protection.
+
+	data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	m_draw8sn->write(data);
+
+	logerror("sn write: %02x\n", data);
 }
 
 
@@ -4078,7 +4092,7 @@ void wingco_state::nd8lines_map(address_map &map)
 	map(0xb840, 0xb840).portr("DSW3");
 	map(0xb850, 0xb850).w(FUNC(wingco_state::p1_lamps_w));
 	map(0xb860, 0xb860).w(FUNC(wingco_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489a_device::write)); // seems to write with swapped nibbles if compared to lucky8
+	map(0xb870, 0xb870).w(FUNC(wingco_state::draw8_sn_w));  // function to transform on the fly the sn76489a device commands
 	map(0xf800, 0xffff).ram();
 }
 
@@ -8569,14 +8583,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( nd8lines )  // TODO: need to be done once palette is figured out and effects can be verified
 	PORT_START("IN0")  // b800
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Odds table")  // Only works with coins inserted
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )       PORT_CODE(KEYCODE_N)  PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_CODE(KEYCODE_V)  PORT_NAME("Small / Info")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_CODE(KEYCODE_Z)  PORT_NAME("Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  PORT_CODE(KEYCODE_X)  PORT_NAME("Take")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_CODE(KEYCODE_C)  PORT_NAME("D-Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_CODE(KEYCODE_B)  PORT_NAME("Big")
 
 	PORT_START("IN1")  // b801
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -8593,20 +8607,20 @@ static INPUT_PORTS_START( nd8lines )  // TODO: need to be done once palette is f
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_L) PORT_NAME("Stop 3 / Move")  // stop 3 / move
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_K) PORT_NAME("Stop 2 / Hold")  // stop 2 / hold
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_J) PORT_NAME("Stop 1")         // stop 1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")  // b810
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Key Out / Attendant")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings / Test Mode") PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_IMPULSE(2)  // should be coins, PORT_IMPULSE needed or the game laments 'coin jam'
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_IMPULSE(2)  // should be coins, PORT_IMPULSE needed or the game laments 'coin jam'
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings / Test Mode") // PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Stats")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_IMPULSE(2)  // should be coins,  PORT_IMPULSE needed or the game laments 'coin jam'
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
@@ -14094,12 +14108,14 @@ void wingco_state::nd8lines(machine_config &config)
 	m_ppi[1]->in_pb_callback().set_ioport("DSW2");
 	m_ppi[1]->in_pc_callback().set_ioport("DSW4");
 
-	PALETTE(config.replace(), "palette", FUNC(wingco_state::cm_palette), 256);  // wrong
-
-	SN76489A(config.replace(), "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
-
 	config.device_remove("ppi8255_2");
+
+	// sound hardware
+	config.device_remove("snsnd");
 	config.device_remove("aysnd");
+
+	SN76489A(config, "draw8sn", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+
 }
 
 void wingco_state::lucky8f(machine_config &config)
@@ -19814,6 +19830,9 @@ ROM_START( nd8lines )
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "met47s01.u66", 0x0000, 0x0100, CRC(78b6701e) SHA1(27b3d47b0a3637d3a92bf535b34d301e5a3aff8c) )
 	ROM_IGNORE(                       0x0100 )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "82s123.u67",   0x0000, 0x0020, CRC(cbd7e5d4) SHA1(c7d96ee7f6fb0129630fdd4b079c4ed1eabda7c5) )
 
 	ROM_REGION( 0x300, "unkproms", 0 )
 	ROM_LOAD( "he82s129.u33", 0x0000, 0x0100, CRC(3d2f1893) SHA1(927916856b25dfd6ded04c26714313bc49f7e220) )
@@ -27793,6 +27812,7 @@ void wingco_state::init_nd8lines()
 	for (int i = 0x4000; i < 0x8000; i++)
 		rom[i] = bitswap<8>(rom[i] ^ 0x6c, 6, 0, 4, 3, 1, 2, 5, 7);
 
+
 	// split the prom nibbles creating 4bit data for foreground palette.
 	uint8_t *proms = memregion("proms")->base();
 
@@ -29141,7 +29161,7 @@ GAMEL( 198?, ns8linewa,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_ini
 GAMEL( 1985, ns8linewb,  ns8lines, lucky8t,  ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus, Yamate, 1985)", 0,        layout_lucky8p1 ) // only 1 control set...
 GAMEL( 1988, ns8linewc,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 1)", 0, layout_lucky8p1 ) // only 1 control set...
 GAMEL( 1988, ns8linewd,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 2)", 0, layout_lucky8p1 ) // only 1 control set...
-GAMEL( 1991, nd8lines,   lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND, layout_lucky8 ) // PROM decode wrong, SN emits terrible sound, inputs not done yet
+GAMEL( 1991, nd8lines,   lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           0,                     layout_nd8lines )  // SN commands inverted bitorder.
 GAMEL( 1989, f16s8l,     lucky8,   lucky8t,  lucky8,   wingco_state,   empty_init,     ROT0, "Leisure Ent",       "F-16 Super 8 Lines",                                       0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, super972,   ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 0,                     layout_lucky8p1 )  // only 1 control set...
 GAME(  198?, luckybar,   0,        luckybar, ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with MC68705 MCU)",                         0 )  // MC68705 MCU
