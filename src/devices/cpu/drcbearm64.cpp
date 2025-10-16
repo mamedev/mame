@@ -2080,7 +2080,7 @@ void drcbe_arm64::op_jmp(a64::Assembler &a, const uml::instruction &inst)
 	}
 
 	const bool bound = a.code()->is_label_bound(jmptarget);
-	const uint64_t targetoffs = a.code()->base_address() + a.code()->label_offset(jmptarget);
+	const uint64_t targetoffs = bound ? (a.code()->base_address() + a.code()->label_offset(jmptarget)) : 0;
 	const uint64_t codeoffs = a.code()->base_address() + a.offset();
 	const bool tbnzrange = bound && is_valid_immediate_signed(int64_t(targetoffs) - codeoffs, 14 + 2);
 
