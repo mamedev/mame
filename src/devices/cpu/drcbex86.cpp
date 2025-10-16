@@ -98,6 +98,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <type_traits>
 
 
 namespace drc {
@@ -399,7 +400,7 @@ class ThrowableErrorHandler : public ErrorHandler
 public:
 	virtual void handle_error(Error err, const char *message, BaseEmitter *origin) override
 	{
-		throw emu_fatalerror("asmjit error %u: %s", uint32_t(err), message);
+		throw emu_fatalerror("asmjit error %u: %s", std::underlying_type_t<Error>(err), message);
 	}
 };
 
@@ -1113,15 +1114,15 @@ size_t drcbe_x86::emit(CodeHolder &ch)
 	{
 		err = ch.flatten();
 		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::flatten() error %u", uint32_t(err));
+			throw emu_fatalerror("asmjit::CodeHolder::flatten() error %u", std::underlying_type_t<Error>(err));
 
 		err = ch.resolve_cross_section_fixups();
 		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::resolve_cross_section_fixups() error %u", uint32_t(err));
+			throw emu_fatalerror("asmjit::CodeHolder::resolve_cross_section_fixups() error %u", std::underlying_type_t<Error>(err));
 
 		err = ch.relocate_to_base(ch.base_address());
 		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::relocate_to_base() error %u", uint32_t(err));
+			throw emu_fatalerror("asmjit::CodeHolder::relocate_to_base() error %u", std::underlying_type_t<Error>(err));
 	}
 
 	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
@@ -1134,7 +1135,7 @@ size_t drcbe_x86::emit(CodeHolder &ch)
 
 	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
 	if (err != kErrorOk)
-		throw emu_fatalerror("asmjit::CodeHolder::copy_flattened_data() error %u", uint32_t(err));
+		throw emu_fatalerror("asmjit::CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
 
 	// update the drc cache and end codegen
 	*cachetop += alignment + code_size;

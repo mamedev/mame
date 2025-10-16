@@ -211,6 +211,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <type_traits>
 #include <vector>
 
 
@@ -345,7 +346,7 @@ class ThrowableErrorHandler : public ErrorHandler
 public:
 	virtual void handle_error(Error err, const char *message, BaseEmitter *origin) override
 	{
-		throw emu_fatalerror("asmjit error %u: %s", uint32_t(err), message);
+		throw emu_fatalerror("asmjit error %u: %s", std::underlying_type_t<Error>(err), message);
 	}
 };
 
@@ -1115,15 +1116,15 @@ size_t drcbe_x64::emit(CodeHolder &ch)
 	{
 		err = ch.flatten();
 		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::flatten() error %u", uint32_t(err));
+			throw emu_fatalerror("asmjit::CodeHolder::flatten() error %u", std::underlying_type_t<Error>(err));
 
 		err = ch.resolve_cross_section_fixups();
 		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::resolve_cross_section_fixups() error %u", uint32_t(err));
+			throw emu_fatalerror("asmjit::CodeHolder::resolve_cross_section_fixups() error %u", std::underlying_type_t<Error>(err));
 
 		err = ch.relocate_to_base(ch.base_address());
 		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::relocate_to_base() error %u", uint32_t(err));
+			throw emu_fatalerror("asmjit::CodeHolder::relocate_to_base() error %u", std::underlying_type_t<Error>(err));
 	}
 
 	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
@@ -1136,7 +1137,7 @@ size_t drcbe_x64::emit(CodeHolder &ch)
 
 	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
 	if (err != kErrorOk)
-		throw emu_fatalerror("asmjit::CodeHolder::copy_flattened_data() error %u", uint32_t(err));
+		throw emu_fatalerror("asmjit::CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
 
 	// update the drc cache and end codegen
 	*cachetop += alignment + code_size;
@@ -1404,7 +1405,7 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 		if (dst.is_mem())
 		{
 			// use temporary register for memory,memory
-			Gp const tmp = param.select_register(is64 ? Gp(rax) : Gp(eax));
+			Gp const tmp = param.select_register(is64 ? rax : eax);
 
 			a.mov(tmp, MABS(param.memory()));
 			a.emit(opcode, dst, tmp);
@@ -1454,7 +1455,7 @@ void drcbe_x64::calculate_status_flags_mul(Assembler &a, const uml::instruction 
 	}
 	else
 	{
-		const Gp tempreg = (inst.size() == 4) ? Gp(r10d) : Gp(r10);
+		const Gp tempreg = (inst.size() == 4) ? r10d : r10;
 
 		a.mov(tempreg, lo);
 
@@ -2752,7 +2753,7 @@ void drcbe_x64::op_load(Assembler &a, const instruction &inst)
 	const Gp basereg = get_base_register_and_offset(a, basep.memory(), rdx, baseoffs);
 
 	// pick a target register for the general case
-	const Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
+	const Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax);
 
 	if (indp.is_immediate())
 	{
@@ -2812,7 +2813,7 @@ void drcbe_x64::op_loads(Assembler &a, const instruction &inst)
 	const Gp basereg = get_base_register_and_offset(a, basep.memory(), rdx, baseoffs);
 
 	// pick a target register for the general case
-	const Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
+	const Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax);
 
 	if (indp.is_immediate())
 	{
@@ -3586,7 +3587,7 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 	}
 
 	// load non-immediate bit numbers into a register
-	Gp const bitreg = (inst.size() == 8) ? Gp(rcx) : Gp(ecx);
+	Gp const bitreg = (inst.size() == 8) ? rcx : ecx;
 	if (!bitp.is_immediate())
 	{
 		mov_reg_param(a, bitreg, bitp);
@@ -3696,7 +3697,7 @@ void drcbe_x64::op_mov(Assembler &a, const instruction &inst)
 			}
 			else
 			{
-				Gp const src = (inst.size() == 4) ? Gp(eax) : Gp(rax);
+				Gp const src = (inst.size() == 4) ? eax : rax;
 				mov_reg_param(a, src, srcp, true);
 				a.cmov(X86_CONDITION(inst.condition()), dst, src);
 			}
@@ -3823,7 +3824,7 @@ void drcbe_x64::op_roland(Assembler &a, const instruction &inst)
 	const unsigned bits = inst.size() * 8;
 
 	// pick a target register
-	Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), maskp);
+	Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, maskp);
 
 	if (shiftp.is_immediate() && maskp.is_immediate())
 	{
@@ -3898,9 +3899,9 @@ void drcbe_x64::op_rolins(Assembler &a, const instruction &inst)
 	be_parameter maskp(*this, inst.param(3), PTYPE_MRI);
 
 	// pick registers
-	Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(ecx) : Gp(rcx), shiftp, maskp);
-	Gp srcreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
-	Gp maskreg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
+	Gp dstreg = dstp.select_register((inst.size() == 4) ? ecx : rcx, shiftp, maskp);
+	Gp srcreg = (inst.size() == 4) ? eax : rax;
+	Gp maskreg = (inst.size() == 4) ? edx : rdx;
 
 	const unsigned bits = inst.size() * 8;
 	const uint64_t sizemask = util::make_bitmask<uint64_t>(bits);
@@ -4191,7 +4192,7 @@ void drcbe_x64::op_add(Assembler &a, const instruction &inst)
 		// general case
 
 		// pick a target register for the general case
-		Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), src2p);
+		Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
 
 		mov_reg_param(a, dstreg, src1p);                                                // mov   dstreg,src1p
 		alu_op_param(a, Inst::kIdAdd, dstreg, src2p,                                    // add   dstreg,src2p
@@ -4265,7 +4266,7 @@ void drcbe_x64::op_sub(Assembler &a, const instruction &inst)
 		}
 		else
 		{
-			Gp const dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
+			Gp const dstreg = dstp.select_register((inst.size() == 4) ? eax : rax);
 
 			mov_reg_param(a, dstreg, src2p);
 			a.neg(dstreg);
@@ -4295,7 +4296,7 @@ void drcbe_x64::op_sub(Assembler &a, const instruction &inst)
 		// general case
 
 		// pick a target register for the general case
-		Gp const dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), src2p);
+		Gp const dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
 
 		mov_reg_param(a, dstreg, src1p);
 		alu_op_param(a, Inst::kIdSub, dstreg, src2p,
@@ -4361,10 +4362,8 @@ void drcbe_x64::op_cmp(Assembler &a, const instruction &inst)
 
 	if (src1p == src2p)
 	{
-		// doesn't matter what we compare if it's always equal
-		const Gp srcreg = (inst.size() == 4) ? Gp(eax) : Gp(rax); // TODO: consider false dependencies
-
-		a.cmp(srcreg, srcreg);
+		// this will set flags the same way as comparing equal values (Z set, C/V/S clear)
+		a.xor_(eax, eax);
 	}
 	else if (src1p.is_memory())
 	{
@@ -4376,7 +4375,7 @@ void drcbe_x64::op_cmp(Assembler &a, const instruction &inst)
 		// general case
 
 		// pick a target register for the general case
-		const Gp src1reg = src1p.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
+		const Gp src1reg = src1p.select_register((inst.size() == 4) ? eax : rax);
 
 		if (src1p.is_immediate())
 		{
@@ -4415,8 +4414,8 @@ void drcbe_x64::op_mul(Assembler &a, const instruction &inst)
 	}
 	const bool compute_hi = (dstp != edstp);
 
-	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
-	const Gp edstreg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
+	const Gp dstreg = (inst.size() == 4) ? eax : rax;
+	const Gp edstreg = (inst.size() == 4) ? edx : rdx;
 
 	// general case
 	mov_reg_param(a, dstreg, src1p);
@@ -4467,8 +4466,8 @@ void drcbe_x64::op_mululw(Assembler &a, const instruction &inst)
 		swap(src1p, src2p);
 	}
 
-	const Gp dstreg = (inst.size() == 4) ? Gp(eax) : Gp(rax);
-	const Gp hireg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
+	const Gp dstreg = (inst.size() == 4) ? eax : rax;
+	const Gp hireg = (inst.size() == 4) ? edx : rdx;
 
 	// general case
 	mov_reg_param(a, dstreg, src1p);
@@ -4526,8 +4525,8 @@ void drcbe_x64::op_mulslw(Assembler &a, const instruction &inst)
 		swap(src1p, src2p);
 	}
 
-	const Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
-	const Gp hireg = (inst.size() == 4) ? Gp(edx) : Gp(rdx);
+	const Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax);
+	const Gp hireg = (inst.size() == 4) ? edx : rdx;
 
 	if (use3op)
 	{
@@ -4814,7 +4813,7 @@ void drcbe_x64::op_test(Assembler &a, const instruction &inst)
 		// general case
 
 		// pick a target register for the general case
-		const Gp src1reg = src1p.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
+		const Gp src1reg = src1p.select_register((inst.size() == 4) ? eax : rax);
 
 		mov_reg_param(a, src1reg, src1p);
 		alu_op_param(a, Inst::kIdTest, src1reg, src2p,
@@ -4943,7 +4942,7 @@ void drcbe_x64::op_xor(Assembler &a, const instruction &inst)
 	else
 	{
 		// general case
-		Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax), src2p);
+		Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax, src2p);
 
 		mov_reg_param(a, dstreg, src1p);
 		alu_op_param(a, Inst::kIdXor, dstreg, src2p,
@@ -5122,7 +5121,7 @@ void drcbe_x64::op_shift(Assembler &a, const uml::instruction &inst)
 			mov_reg_param(a, ecx, src2p, carryin); // do this first as shift and dst may be the same register
 
 		// pick a target register
-		const Gp dstreg = dstp.select_register((inst.size() == 4) ? Gp(eax) : Gp(rax));
+		const Gp dstreg = dstp.select_register((inst.size() == 4) ? eax : rax);
 		mov_reg_param(a, dstreg, src1p, carryin);
 
 		shift_op_param(a, Opcode, inst.size(), dstreg, src2p, inst.flags());
