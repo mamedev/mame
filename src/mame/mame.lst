@@ -19477,6 +19477,14 @@ gameking
 @source:handheld/gmaster.cpp
 gmaster
 
+@source:handheld/generalplus_gpcexxxx.cpp
+mapacman
+parcade
+siddr
+tagalaga
+taspinv
+taturtf
+
 @source:handheld/generalplus_gpel31xx.cpp
 tamameet
 
@@ -47109,14 +47117,6 @@ sumipc21
 tmydistb
 zippity
 zippityuk
-
-@source:tvgames/generalplus_gpl_unknown.cpp
-mapacman
-parcade
-siddr
-tagalaga
-taspinv
-taturtf
 
 @source:tvgames/generalplus_gpm453x_nand.cpp
 leapland

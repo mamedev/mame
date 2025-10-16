@@ -505,9 +505,11 @@ CONS( 2013, kidizmp,         0,        0,      gpl32612, gpl32612, generalplus_g
 // seems to be older tech, just glob + ROM, assuming it's a GP32 series based on above and due to having ARM code
 CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom (Germany, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// uses GPL32610
 CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // ポケモン図鑑 スマホロトム
+// uses a glob
 CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pokemon Zukan - Sumaho Rotom (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32610 - 「それいけ！アンパンマン」スポーツ育脳マット
@@ -524,6 +526,7 @@ CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_g
 
 
 // company is called 深圳市飞讯互动科技有限公司
+// surface details erased on SoC for both of these
 // very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
 CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "Interactive Game Console (Model B608, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // also very generic packaging, similar SD card content to above, including NES games, but with some extra music/videos for the dance part
@@ -549,7 +552,7 @@ MD481P
 (could be a rebranded GPL32 series, ROM has GPNand header)
 
 there is also a
-GPY0201A
+GPY0201A "Power management ASIC"
 
 */
 
