@@ -23,15 +23,18 @@
 class seibuspi_base_state : public driver_device
 {
 protected:
-	seibuspi_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	seibuspi_base_state(const machine_config &mconfig, device_type type, const char *tag, size_t paletteram_size, size_t spriteram_size, u32 sprite_bpp)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mainram(*this, "mainram")
 		, m_eeprom(*this, "eeprom")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_palette_ram(*this, "palette_ram", paletteram_size, ENDIANNESS_LITTLE)
+		, m_sprite_ram(*this, "sprite_ram", spriteram_size, ENDIANNESS_LITTLE)
 		, m_key(*this, "KEY%u", 0)
 		, m_special(*this, "SPECIAL")
+		, m_sprite_bpp(sprite_bpp)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -40,18 +43,18 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	memory_share_creator<u32> m_palette_ram;
+	memory_share_creator<u32> m_sprite_ram;
+
 	optional_ioport_array<5> m_key;
 	optional_ioport m_special;
+
+	const u32 m_sprite_bpp;
 
 	u32 m_video_dma_length = 0;
 	u32 m_video_dma_address = 0;
 	u16 m_layer_enable = 0;
-	std::unique_ptr<u32[]> m_palette_ram;
-	std::unique_ptr<u32[]> m_sprite_ram;
-	u32 m_palette_ram_size = 0;
-	u32 m_sprite_ram_size = 0;
 	u8 m_alpha_table[0x2000]{};
-	u32 m_sprite_bpp = 0;
 
 	virtual void video_start() override ATTR_COLD;
 
@@ -78,7 +81,7 @@ class sys386f_state : public seibuspi_base_state
 {
 public:
 	sys386f_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seibuspi_base_state(mconfig, type, tag)
+		: seibuspi_base_state(mconfig, type, tag, 0x4000, 0x2000, 8)
 	{ }
 
 	void sys386f(machine_config &config) ATTR_COLD;
@@ -103,13 +106,16 @@ class seibuspi_tilemap_state : public seibuspi_base_state
 {
 public:
 	seibuspi_tilemap_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seibuspi_base_state(mconfig, type, tag)
+		: seibuspi_base_state(mconfig, type, tag, 0x3000, 0x1000, 6)
+		, m_tilemap_ram(*this, "tilemap_ram", 0x4000, ENDIANNESS_LITTLE)
 	{ }
 
 	void init_rdft22kc() ATTR_COLD;
 	void init_rfjet2kc() ATTR_COLD;
 
 protected:
+	memory_share_creator<u32> m_tilemap_ram;
+
 	tilemap_t *m_text_layer = nullptr;
 	tilemap_t *m_back_layer = nullptr;
 	tilemap_t *m_midl_layer = nullptr;
@@ -125,8 +131,6 @@ protected:
 	u32 m_back_layer_d14 = 0;
 	u32 m_midl_layer_d14 = 0;
 	u32 m_fore_layer_d14 = 0;
-	std::unique_ptr<u32[]> m_tilemap_ram;
-	u32 m_tilemap_ram_size = 0;
 	u32 m_bg_fore_layer_position = 0;
 
 	virtual void video_start() override ATTR_COLD;
