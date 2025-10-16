@@ -172,6 +172,7 @@
 #include "esqvfd.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "machine/mc68681.h"
+#include "machine/nvram.h"
 #include "machine/wd_fdc.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
@@ -191,6 +192,7 @@ namespace {
 #define GENERIC (0)
 #define EPS     (1)
 #define SQ1     (2)
+#define VFX     (3)
 
 #define KEYBOARD_HACK (1)   // turn on to play the SQ-1, SD-1, and SD-1 32-voice: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
 
@@ -226,13 +228,17 @@ public:
 		, m_mdout(*this, "mdout")
 		, m_rom(*this, "osrom")
 		, m_ram(*this, "osram")
+		, m_osram_nvram(*this, "osram")
+		, m_seqram_nvram(*this, "seqram")
 	{ }
 
-	void sq1(machine_config &config);
+	void common(machine_config &config);
 	void vfx(machine_config &config);
+	void sq1(machine_config &config);
 	void vfxsd(machine_config &config);
+	void sd132(machine_config &config);
 	void eps(machine_config &config);
-	void vfx32(machine_config &config);
+	void common32(machine_config &config);
 	void ks32(machine_config &config);
 
 	void init_eps();
@@ -259,6 +265,8 @@ private:
 	required_device<midi_port_device> m_mdout;
 	required_region_ptr<uint16_t> m_rom;
 	required_shared_ptr<uint16_t> m_ram;
+	optional_device<nvram_device> m_osram_nvram;
+	optional_device<nvram_device> m_seqram_nvram;
 
 	uint16_t lower_r(offs_t offset);
 	void lower_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -599,7 +607,7 @@ void esq5505_state::vfxsd_map(address_map &map)
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
 	map(0x2c0000, 0x2c0007).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0x2e0000, 0x2fffff).rw(m_cartslot, FUNC(ensoniq_vfx_cartslot::read), FUNC(ensoniq_vfx_cartslot::write)).umask16(0x00ff);
-	map(0x330000, 0x3bffff).ram(); // sequencer memory?
+	map(0x330000, 0x37ffff).ram().share("seqram");
 	map(0xc00000, 0xc3ffff).rom().region("osrom", 0);
 	map(0xff0000, 0xffffff).ram().share("osram");
 }
@@ -691,7 +699,7 @@ void esq5505_state::duart_output(uint8_t data)
 		}
 		else
 		{
-			floppy->ss_w(((data & 8) >> 3) ^ 1); // bit 3, inverted -> floppy 
+			floppy->ss_w(((data & 8) >> 3) ^ 1); // bit 3, inverted -> floppy
 			m_floppy_is_active = (data & 16) != 0; // bit 4 is used to activate the floppy:
 			if (m_floppy_is_active)
 			{
@@ -768,7 +776,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 }
 #endif
 
-void esq5505_state::vfx(machine_config &config)
+void esq5505_state::common(machine_config &config)
 {
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfx_map);
@@ -823,9 +831,15 @@ void esq5505_state::vfx(machine_config &config)
 	m_otis->add_route(7, "pump", 1.0, 7);
 }
 
+void esq5505_state::vfx(machine_config &config)
+{
+	common(config);
+	NVRAM(config, m_osram_nvram, nvram_device::DEFAULT_NONE);
+}
+
 void esq5505_state::eps(machine_config &config)
 {
-	vfx(config);
+	common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::eps_cpu_space_map);
 
@@ -853,6 +867,8 @@ void esq5505_state::vfxsd(machine_config &config)
 	vfx(config);
 	// but with an updated memory map that includes FDC and sequence RAM
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
+	// and nvram for the sequencer RAM as well
+	NVRAM(config, m_seqram_nvram, nvram_device::DEFAULT_NONE);
 
 	SPEAKER(config, "aux", 2).front();
 	m_pump->add_route(2, "aux", 1.0, 0);
@@ -864,7 +880,7 @@ void esq5505_state::vfxsd(machine_config &config)
 }
 
 // 32-voice machines with the VFX-SD type config
-void esq5505_state::vfx32(machine_config &config)
+void esq5505_state::common32(machine_config &config)
 {
 	M68000(config, m_maincpu, 30.47618_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
@@ -926,9 +942,20 @@ void esq5505_state::vfx32(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
 }
 
+// Like the VFX-SD config, but with some clock speeds faster.
+void esq5505_state::sd132(machine_config &config)
+{
+	auto clock = 30.47618_MHz_XTAL / 2;
+
+	vfxsd(config);
+	m_maincpu->set_clock(clock);
+	m_otis->set_clock(clock);
+	m_pump->set_clock(clock);
+}
+
 void esq5505_state::sq1(machine_config &config)
 {
-	vfx(config);
+	common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::sq1_map);
 
 	ESQPANEL2X16_SQ1(config.replace(), m_panel);
@@ -938,7 +965,7 @@ void esq5505_state::sq1(machine_config &config)
 
 void esq5505_state::ks32(machine_config &config)
 {
-	vfx32(config);
+	common32(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::sq1_map);
 
 	ESQPANEL2X16_SQ1(config.replace(), m_panel);
@@ -1254,5 +1281,5 @@ CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "
 CONS( 1990, sq1,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1990, sqrack, sq1, 0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1991, sq2,    0,   0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sd132,  sd1, 0, vfx32, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1991, sd132,  sd1, 0, sd132, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1992, ks32,   sq2, 0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "KS-32",           MACHINE_NOT_WORKING)                       // 2x16 LCD
