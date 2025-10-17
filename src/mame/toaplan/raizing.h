@@ -7,6 +7,7 @@
 
 #include "gp9001.h"
 #include "toaplan_coincounter.h"
+#include "toaplan_txtilemap.h"
 #include "toaplipt.h"
 
 #include "cpu/m68000/m68000.h"
@@ -21,7 +22,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 
 class raizing_base_state : public driver_device
@@ -29,9 +29,6 @@ class raizing_base_state : public driver_device
 public:
 	raizing_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_tx_videoram(*this, "tx_videoram")
-		, m_tx_lineselect(*this, "tx_lineselect")
-		, m_tx_linescroll(*this, "tx_linescroll")
 		, m_tx_gfxram(*this, "tx_gfxram")
 		, m_audiobank(*this, "audiobank")
 		, m_raizing_okibank{
@@ -42,7 +39,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_vdp(*this, "gp9001")
 		, m_oki(*this, "oki%u", 1U)
-		, m_gfxdecode(*this, "gfxdecode")
+		, m_tx_tilemap(*this, "tx_tilemap")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch%u", 1U)
@@ -53,8 +50,6 @@ public:
 protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	// used by everything
-	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 	// used by bgaregga + batrider etc.
 	void bgaregga_common_video_start();
 	void raizing_z80_bankswitch_w(u8 data);
@@ -84,26 +79,19 @@ protected:
 	u32 screen_update_base(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
-	void tx_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-
 	void coin_w(u8 data);
 	void reset_audiocpu(int state);
 
-	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
-	required_shared_ptr<u16> m_tx_videoram;
-	optional_shared_ptr<u16> m_tx_lineselect;
-	optional_shared_ptr<u16> m_tx_linescroll;
 	optional_shared_ptr<u16> m_tx_gfxram;
 	optional_memory_bank m_audiobank; // batrider and bgaregga
 	optional_memory_bank_array<8> m_raizing_okibank[2];
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<z80_device> m_audiocpu;
 	required_device<gp9001vdp_device> m_vdp;
 	optional_device_array<okim6295_device, 2> m_oki;
-	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<toaplan_txtilemap_device> m_tx_tilemap;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device_array<generic_latch_8_device, 4> m_soundlatch; // tekipaki, batrider, bgaregga, batsugun
