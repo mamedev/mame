@@ -40,4 +40,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(SPECNEXT_IM2, specnext_im2_device)
+
 #endif // MAME_SINCLAIR_SPECNEXT_IM2_H
