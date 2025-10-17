@@ -82,6 +82,117 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	map(0x000000, 0x0027ff).rw(FUNC(generalplus_gpl951xx_device::ramread_r), FUNC(generalplus_gpl951xx_device::ramwrite_w));
 	// TODO: RAM is only 0x2800 on this, like earlier SPG2xx models? unmap the extra from the base_internal_map?
 
+	// 7000 - Tx3_X_Position
+	// 7001 - Tx3_Y_Position
+	// 7002 - Tx3_X_Offset
+	// 7003 - Tx3_Y_Offset
+	// 7004 - Tx3_Attribute
+	// 7005 - Tx3_Control
+	// 7006 - Tx3_N_PTR
+	// 7007 - Tx3_A_PTR
+
+	// 7010 - Tx1_X_Position
+	// 7011 - Tx1_Y_Position
+	// 7012 - Tx1_Attribute
+	// 7013 - Tx1_Control
+	// 7014 - Tx1_N_PTR
+	// 7015 - Tx1_A_PTR
+	// 7016 - Tx2_X_Position
+	// 7017 - Tx2_Y_Position 
+	// 7018 - Tx2_Attribute
+	// 7019 - Tx2_Contro
+	// 701a - Tx2_N_PTR
+	// 701b - Tx2_A_PTR
+	// 701c - VComValue
+	// 701d - VComOffset
+	// 701e - VComStep
+
+	// 7020 - Segment_Tx1
+	// 7021 - Segment_Tx2
+	// 7022 - Segment_sp
+	// 7023 - Segment_Tx3
+	//
+	// 702a - Blending
+	// 702b - Segment_Tx1H
+	// 702c - Segment_Tx2H
+	// 702d - Segment_spH
+	// 702e - Segment_Tx3H
+	//
+	// 7030 - Fade_Control
+	// 
+	// 703a - Palette_Control
+	// 
+	// 7042 - SControl
+	//
+	// 7050 - TFT_Ctrl
+	// 7051 - TFT_V_Width
+	// 7052 - TFT_VSync_Setup
+	// 7053 - TFT_V_Start
+	// 7054 - TFT_V_End
+	// 7055 - TFT_H_Width
+	// 7056 - TFT_HSync_Setup
+	// 7057 - TFT_H_Start
+	// 7058 - TFT_H_End
+	// 7059 - TFT_RGB_Ctrl
+	// 705a - TFT_Status
+	// 705b - TFT_MemMode_WCmd
+	// 705c - TFT_MemMode_RCmd
+	//
+	// 705e - STN_PIC_SEG
+	// 705f - STN_Ctrl1
+	// 
+	// 7062 - TFT_INT_EN
+	// 7063 - TFT_INT_CLR
+	// 7064 - US_Ctrl
+	// 7065 - US_Hscaling
+	// 7066 - US_Vscaling
+	// 7067 - US_Width
+	// 7068 - US_Height
+	// 7069 - US_Hoffset 
+	// 706a - US_Voffset
+	//
+	// 706c - TFT_V_Show_Start
+	// 706d - TFT_V_Show_End
+	// 706e - TFT_H_Show_Start
+	// 706f - TFT_H_Show_End 
+	// 
+	// 7070 - SPDMA_Source
+	// 7071 - SPDMA_Target
+	// 7072 - SPDMA_Number
+	// 7073 - HB_Ctrl
+	// 7074 - HB_GO
+	// 
+	// 707d - BLD_Color 
+	//
+	// 707e - PPU_RAM_BANK
+	// 707f - PPU_Enable 
+	//
+	// 7080 - STN_SEG
+	// 7081 - STN_COM
+	// 7082 - STN_PIC_COM
+	// 7083 - STN_CPWait
+	// 7084 - STN_Ctrl2
+	// 7085 - STN_GTG_SEG
+	// 7086 - STN_GTG_COM 
+	// 
+	// 70b4 - Tx1_N_PTRH
+	// 70b5 - Tx1_A_PTRH
+	// 70b6 - Tx2_N_PTRH
+	// 70b7 - Tx2_A_PTRH
+	// 70b8 - Tx3_N_PTRH
+	// 70b9 - Tx3_A_PTRH
+	//
+	// 70db - Free_Height
+	// 70dc - Free_Width
+	//
+	// 70e0 - Random0 (15-bit)
+	// 70e1 - Random1 (15-bit)
+	// 
+	// 7100 to 71ff - Tx_Hvoffset
+	// 7200 to 72ff - HCMValue
+	// 7300 to 73ff - Palette (banked)
+	// 7400 to 74ff - Sprite Ram (banked)
+	//
 	// 7800 - BodyID
 	// 7801 - unused
 	// 7802 - PwrKey_State
@@ -365,8 +476,97 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7a40 - USBD_Config
 	// 7a41 - USBD_Function
 	// 7a42 - USBD_PMR
+	// 7a43 - USBD_EP0Data
+	// 7a44 - USBD_BIData
+	// 7a45 - USBD_BOData
+	// 7a46 - USBD_INTINData
+	// 7a47 - USBD_EPEvent
+	// 7a48 - USBD_GLOINT
+	// 7a49 - USBD_INTEN
+	// 7a4a - USBD_INT
+	// 7a4b - USBD_SCI NTEN
+	// 7a4c - USBD_SCINT
+	// 7a4d - USBD_EPAutoSet
+	// 7a4e - USBD_EPSetStall
+	// 7a4f - USBD_EPBufClear
+	// 7a50 - USBD_EPEvntClear
+	// 7a51 - USBD_EP0WrtCount
+	// 7a52 - USBD_BOWrtCount
+	// 7a53 - USBD_EP0BufPointer
+	// 7a54 - USBD_BIBufPointer
+	// 7a55 - USBD_BOBufPointer
+	// 7a56 - USBD_EP0RTR
+	// 7a57 - USBD_EP0RR
+	// 7a58 - USBD_ EP0VR
+	// 7a59 - USBD_ EP0IR
+	// 7a5a - USBD_ EP0LR
+	// 
+	// 7a60 - USBD_DMAWrtCountL
+	// 7a61 - USBD_DMAWrtCountH
+	// 7a62 - USBD_DMAAckL
+	// 7a63 - USBD_DMAAckH
+	// 7a64 - USBD_EPStall
+	//
+	// 7a67 - USBD_Device
+	// 7a68 - USBD_NullPkt
+	// 7a69 - USBD_DMAINT
+	//
+	// 7a6c - USBD_INTF
 
-	map(0x007af0, 0x007af0).rw(FUNC(generalplus_gpl951xx_device::spi_direct_7af0_r), FUNC(generalplus_gpl951xx_device::spi_direct_7af0_w));
+	// 7a80 - DMA_Ctrl0
+	// 7a81 - DMA_SRC_AddrL0
+	// 7a82 - DMA_TAR_AddrL0
+	// 7a83 - DMA_TCountL0
+	// 7a84 - DMA_SRC_AddrH0
+	// 7a85 - DMA_TAR_AddrH0
+	// 7a86 - DMA_TCountH0
+	// 7a87 - DMA_MISC0
+	// 7a88 - DMA_Ctrl1
+	// 7a89 - DMA_SRC_AddrL1
+	// 7a8a - DMA_TAR_AddrL1
+	// 7a8b - DMA_TCountL1
+	// 7a8c - DMA_SRC_AddrH1
+	// 7a8d - DMA_TAR_AddrH1
+	// 7a8e - DMA_TCountH1
+	// 7a8f - DMA_MISC1
+	//
+	// 7ab0 - DMA_SPRISize0
+	// 7ab1 - DMA_SPRISize1
+	//
+	// 7abd - DMA_LineLength
+	// 7abe - DMA_SS
+	// 7abf - DMA_INT
+	//
+	// 7ac0 - CTS_Ctrl1
+	// 7ac1 - CTS_CH
+	// 7ac2 - CTS_DIV
+	// 7ac3 - CTS_CYCLE
+	// 7ac4 - CTS_Ctrl2
+	// 7ac5 - CTS_Status
+	// 7ac6 - CTS_Ctrl3
+	// 
+	// 7ac8 - CTS_FIFOLevel
+	// 7ac9 - CTS_CNT
+
+	map(0x007af0, 0x007af0).rw(FUNC(generalplus_gpl951xx_device::spi_direct_7af0_r), FUNC(generalplus_gpl951xx_device::spi_direct_7af0_w)); // Byte_Swap
+	// 7af1 - Nibble_Swap
+	// 7af2 - TwoBit_Swap
+	// 7af3 - Bit_Reverse
+
+	// 7b20 - KS_Ctrl1
+	// 7b21 - KS_Ctrl2
+	//
+	// 7b28 - KS_Data0
+	// 7b29 - KS_Data1
+	// 7b2a - KS_Data2
+	// 7b2b - KS_Data3
+	// 7b2c - KS_Data4
+	// 7b2d - KS_Data5
+	// 7b2e - KS_Data6
+	// 7b2f - KS_Data7
+	// 7b30 - KS_Data8
+	// 7b31 - KS_Data9
+	// 7b32 - KS_Data10
 
 	map(0x007b40, 0x007b40).r(FUNC(generalplus_gpl951xx_device::spi_direct_7b40_r)).nopw();; // SPIFC_Ctrl1
 	map(0x007b41, 0x007b41).nopw(); // SPIFC_CMD
@@ -379,7 +579,11 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	map(0x007b48, 0x007b48).nopw(); // SPIFC_RX_BC
 	map(0x007b49, 0x007b49).ram(); // SPIFC_TIMING
 
-	// 7b4b - SPIFC_Ctrl2 
+	// 7b4b - SPIFC_Ctrl2
+
+	// 7b80 to 7b9f - Audio
+	// 7c00 to 7cff - Audio
+	// 7e00 to 7eff - Audio
 
 	map(0x009000, 0x3fffff).rom().region("spidirect", 0);
 }
