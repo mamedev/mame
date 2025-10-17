@@ -174,6 +174,7 @@
 // 7818 - PLLWiatCLK
 // 7819 - Cache_Ctrl
 // 781a - Cache_HitRate
+// 
 // 781f - IO_SR_SMT
 
 // 7820 - MCS0_Ctrl 
@@ -193,6 +194,9 @@
 // 782e - NOR_WHold
 // 782f - SDRAM_EN
 
+// 7830 - CHECKSUM0_LB
+// 7831 - CHECKSUM1_LB
+
 // 7835 - MCS0_Page
 // 7836 - MCS1_Page
 // 7837 - MCS2_Page
@@ -203,15 +207,65 @@
 // 783c - SDRAM_Timing
 // 783d - SDRAM_CBRCYC
 // 783e - SDRAM_MISC
-
+// 783f - SDR_STATUS
+// 
 // 7840 - Mem_Ctrl
 // 7841 - Addr_Ctrl
 
-// 7874 - SDRAM_Drv
-// 7875 - SDRAM_Dly
+// 784e - ECC_ERR0_HB (?)
+// 784f - ECC_ERR1_HB (?) 
 
-// 787e - MCS_Drv
-// 787f - MCS_Dly
+// 7850 - NF_Ctrl
+// 7851 - NF_CMD
+// 7852 - NF_AddrL
+// 7853 - NF_AddrH
+// 7854 - NF_Data
+// 7855 - NF_INT_Ctrl
+
+// 7857 - ECC_Ctrl
+// 7858 - ECC_LPRL_LB
+// 7859 - ECC_LPRH_LB
+// 785a - ECC_CPR_LB
+// 785b - ECC_LPR_CKL_LB
+// 785c - ECC_LPR_CKH_LB
+// 785d - ECC_CPCKR_LB 
+// 785e - ECC_ERR0_LB
+// 785f - ECC_ERR1_LB 
+
+// 7860 - IOA_Data
+// 7861 - IOA_Buffer
+// 7862 - IOA_Dir
+// 7863 - IOA_Attrib
+// 7854 - IOA_Drv
+//
+// 7868 - IOB_Data
+// 7869 - IOB_Buffer
+// 786a - IOB_Dir
+// 786b - IOB_Attrib
+// 786c - IOB_Latch
+// 786d - IOB_Drv
+//
+// 7870 - IOC_Data
+// 7871 - IOC_Buffer
+// 7872 - IOC_Dir
+// 7873 - IOC_Attrib 
+// 7874 - SDRAM_Drv
+// 7875 - IOC_Drv
+// 7876 - SDRAM_Dly
+// 7877 - IOC_Latch
+// 7878 - IOD_Data 
+// 7879 - IOD_Buffer
+// 787a - IOD_Dir 
+// 787b - IOD_Attrib 
+// 787c - IOD_Drv
+// 787d - IOD_Dly 
+// 787e - CS_Drv / MCS_Drv
+// 787f - CS_Dly / MCS_Dly
+// 7880 - IOE_Data
+// 7881 - IOE_Buffer 
+// 7882 - IOE_Dir
+// 7883 - IOE_Attrib
+// 7884 - IOE_Drv
 
 // 7888 - MEM_Drv
 // 7889 - MEM_Dly0
@@ -221,6 +275,139 @@
 // 788d - MEM_Dly4
 // 788e - MEM_Dly5
 // 788f - MEM_Dly6
+
+// 78a0 - INT_Status1
+// 78a1 - INT_Status2
+// 78a3 - INT_Status3
+
+// 78a4 - INT_Priority1
+// 78a5 - INT_Priority2
+// 78a6 - INT_Priority2
+
+// 78a8 - MINT_Ctrl
+
+// 78b0 - TimeBaseA_Ctrl
+// 78b1 - TimeBaseB_Ctr
+// 78b2 - TimeBaseC_Ctrl
+
+// 78b8 - TimeBase_Reset
+
+// 78c0 - TimerA_Ctrl
+// 78c1 - TimerA_CCCtrl
+// 78c2 - TimerA_Preload
+// 78c3 - TimerA_CCReg
+// 78c4 - TimerA_UpCount
+
+// 78c8 - TimerB_Ctrl
+// 78c9 - TimerB_CCCtrl
+// 78ca - TimerB_Preload
+// 78cb - TimerB_CCReg
+// 78cc - TimerB_UpCount
+
+// 78d0 - TimerC_Ctrl
+// 78d1 - TimerC_CCCtrl
+// 78d2 - TimerC_Preload
+// 78d3 - TimerC_CCReg
+// 78d4 - TimerC_UpCount
+
+// 78d8 - TimerD_Ctrl 
+// 78da - TimerD_Preload
+// 78dc - TimerD_UpCount
+
+// 78e0 - TimerE_Ctrl
+// 78e2 - TimerE_Preload
+// 78e4 - TimerE_UpCount
+// 78e8 - TimerF_Ctrl
+// 78ea - TimerF_Preload
+// 78ec - TimerF_UpCount 
+
+// 78f0 - CHA_Ctrl
+// 78f1 - CHA_Data
+// 78f2 - CHA_FIFO
+// 
+// 78f8 - CHB_Ctrl
+// 78f9 - CHB_Data
+// 78fa - CHB_FIFO
+// 78fb - DAC_PGA
+
+// 78ff - IISEN
+
+// 7900 - UART_Data 
+// 7901 - UART_RXStatus 
+// 7902 - UART_Ctrl 
+// 7903 - UART_BaudRate
+// 7904 - UART_Status
+// 7905 - UART_FIFO
+// 7906 - UART_TXDLY 
+// 7907 - IrDA_BaudRate 
+// 7908 - IrDA_Ctrl 
+// 7909 - IrDA_LowPower
+
+// 7920 - Second
+// 7921 - Minute
+// 7922 - Hour 
+
+// 7924 - Alarm_Second 
+// 7925 - Alarm_Minute
+// 7926 - Alarm_Hour 
+
+// 7934 - RTC_Ctrl
+// 7935 - RTC_INT_Status
+// 7936 - RTC_INT_Ctrl 
+// 7937 - RTC_Busy
+
+// 7940 - SPI_Ctrl 
+// 7941 - SPI_TXStatus
+// 7942 - SPI_TXData
+// 7943 - SPI_RXStatus 
+// 7944 - SPI_RXData
+// 7945 - SPI_Misc
+
+// 7960 - ADC_Setup 
+// 7961 - MADC_Ctrl 
+// 7962 - MADC_Data
+// 7963 - ASADC_Ctrl 
+// 7964 - ASDAC_Data 
+
+// 7966 - USELINEIN 
+// 7967 - SH_WAIT
+
+// 79d0 - SD1_DataTX
+// 79d1 - SD1_DataRX
+// 79d2 - SD1_CMD
+// 79d3 - SD1_ArgL 
+// 79d4 - SD1_ArgH
+// 79d5 - SD1_RespL
+// 79d6 - SD1_RespH
+// 79d7 - SD1_Status
+// 79d8 - SD1_Ctrl 
+// 79d9 - SD1_BLKLEN
+// 79da - SD1_INT
+
+// 79e0 - SD2_DataTX
+// 79e1 - SD2_DataRX
+// 79e2 - SD2_CMD
+// 79e3 - SD2_ArgL 
+// 79e4 - SD2_ArgH
+// 79e5 - SD2_RespL
+// 79e6 - SD2_RespH
+// 79e7 - SD2_Status
+// 79e8 - SD2_Ctrl 
+// 79e9 - SD2_BLKLEN
+// 79ea - SD2_INT
+
+// 79f0 - CMA_R_Y_In
+// 79f1 - CMA_G_U_In
+// 79f2 - CMA_B_V_In 
+// 79f3 - CMA_Ctrl 
+// 79f4 - CMA_R_Y_Out 
+// 79f5 - CMA_G_U_Out
+// 79f6 - CMA_B_V_Out
+
+// 7af0 - Byte_Swap 
+// 7af1 - Nibble_Swap
+// 7af2 - TwoBit_Swap
+// 7af3 - Bit_Reverse
 
 
 DEFINE_DEVICE_TYPE(GPAC800,   generalplus_gpac800_device,  "gpac800",    "GeneralPlus GPL1625x System-on-a-Chip (with NAND handling)")
