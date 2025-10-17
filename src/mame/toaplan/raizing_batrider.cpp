@@ -239,7 +239,7 @@ void batrider_state::batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 	if (oldword != data)
 	{
 		COMBINE_DATA(&m_tx_gfxram[offset]);
-		m_gfxdecode->gfx(0)->mark_dirty(offset/16);
+		m_tx_tilemap->gfx(0)->mark_dirty(offset/16);
 	}
 }
 
@@ -292,9 +292,7 @@ void batrider_state::video_start()
 	m_vdp->disable_sprite_buffer(); // disable buffering on this game
 
 	// Create the Text tilemap for this game
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
-
-	create_tx_tilemap(0x1d4, 0x16b);
+	m_tx_tilemap->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
 
 	// Has special banking
 	save_item(NAME(m_gfxrom_bank));
@@ -620,10 +618,10 @@ INPUT_PORTS_END
 
 void batrider_state::batrider_dma_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(FUNC(batrider_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x0000, 0x1fff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::videoram_r), FUNC(toaplan_txtilemap_device::videoram_w));
 	map(0x2000, 0x2fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x3000, 0x31ff).ram().share(m_tx_lineselect);
-	map(0x3200, 0x33ff).ram().w(FUNC(batrider_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x3000, 0x31ff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::lineselect_r), FUNC(toaplan_txtilemap_device::lineselect_w));
+	map(0x3200, 0x33ff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::linescroll_r), FUNC(toaplan_txtilemap_device::linescroll_w));
 	map(0x3400, 0x7fff).ram();
 	map(0x8000, 0xffff).ram().w(FUNC(batrider_state::batrider_tx_gfxram_w)).share(m_tx_gfxram);
 }
@@ -802,13 +800,15 @@ void batrider_state::batrider(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(batrider_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_batrider);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp, 27_MHz_XTAL);
 	m_vdp->set_palette(m_palette);
 	m_vdp->set_tile_callback(FUNC(batrider_state::batrider_bank_cb));
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2);
+
+	TOAPLAN_TXTILEMAP(config, m_tx_tilemap, 27_MHz_XTAL, m_palette, gfx_batrider);
+	m_tx_tilemap->set_offset(0x1d4, 0, 0x16b, 0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -866,13 +866,15 @@ void bbakraid_state::bbakraid(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(bbakraid_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_batrider);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp, 27_MHz_XTAL);
 	m_vdp->set_palette(m_palette);
 	m_vdp->set_tile_callback(FUNC(bbakraid_state::batrider_bank_cb));
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_1);
+
+	TOAPLAN_TXTILEMAP(config, m_tx_tilemap, 27_MHz_XTAL, m_palette, gfx_batrider);
+	m_tx_tilemap->set_offset(0x1d4, 0, 0x16b, 0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -912,12 +914,14 @@ void nprobowl_state::nprobowl(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(nprobowl_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_batrider);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp, 27_MHz_XTAL);
 	m_vdp->set_palette(m_palette);
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2);
+
+	TOAPLAN_TXTILEMAP(config, m_tx_tilemap, 27_MHz_XTAL, m_palette, gfx_batrider);
+	m_tx_tilemap->set_offset(0x1d4, 0, 0x16b, 0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
