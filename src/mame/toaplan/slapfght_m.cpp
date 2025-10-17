@@ -41,15 +41,16 @@ uint8_t slapfght_state::getstar_mcusim_status_r()
 {
 	static const uint8_t states[3]={ 0xc7, 0x55, 0x00 };
 
+	const uint8_t ret = states[m_getstar_status_state];
 	if (!machine().side_effects_disabled())
 	{
-		m_getstar_status = states[m_getstar_status_state];
+		m_getstar_status = ret;
 
 		m_getstar_status_state++;
 		if (m_getstar_status_state > 2) m_getstar_status_state = 0;
 	}
 
-	return m_getstar_status;
+	return ret;
 }
 
 uint8_t slapfght_state::getstar_mcusim_r()
