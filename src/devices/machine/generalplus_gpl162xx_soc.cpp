@@ -22,7 +22,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "generalplus_gpl16250_soc.h"
+#include "generalplus_gpl162xx_soc.h"
 
 
 #define LOG_GCM394_SPI            (1U << 5)
@@ -1283,6 +1283,26 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7400 to 77ff - Standard sprite list (when PPU_RAM_BANK is 0)
 // 7400 to 74ff - Sprite0_Attribute list (when PPU_RAM_BANK is 1 and PPU_Enable bit 9 '3D' mode is disabled)
 // 7400 to 77ff - 3D sprite attribute list (when PPU_RAM_BANK is 1 and PPU_Enable bit 9 '3D' mode is enabled)
+//
+// 7800 - P_BodyID
+// 7803 - P_SYS_CTRL
+// 7804 - P_CLK_Ctrl0
+// 7805 - P_CLK_Ctrl1
+// 7806 - P_Reset_Flag
+// 7807 - P_Clock_Ctrl
+// 7808 - P_LVR_Ctrl
+// 780a - P_Watchdog_Ctrl
+// 780b - P_Watchdog_Clear
+// 780c - P_WAIT
+// 780d - P_HALT
+// 780e - P_SLEEP
+// 780f - P_Power_State
+
+// 7817 - P_PLLN
+// 7818 - P_PLLWiatCLK
+// 7819 - P_Cache_Ctrl
+// 781a - P_Cache_HitRate
+// 781f - P_IO_SR_SMT
 
 void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 {

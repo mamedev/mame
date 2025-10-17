@@ -10,7 +10,7 @@
 
 
 #include "emu.h"
-#include "generalplus_gpl16250_soc_video.h"
+#include "generalplus_gpl162xx_soc_video.h"
 
 DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GeneralPlus GPL16250 System-on-a-Chip (Video)")
 

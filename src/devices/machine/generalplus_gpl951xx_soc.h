@@ -6,13 +6,7 @@
 
 #pragma once
 
-#include "cpu/unsp/unsp.h"
-#include "screen.h"
-#include "emupal.h"
-#include "generalplus_gpl16250_soc_video.h"
-#include "spg2xx_audio.h"
-
-#include "generalplus_gpl16250_soc.h"
+#include "generalplus_gpl162xx_soc.h"
 
 class generalplus_gpl951xx_device : public sunplus_gcm394_base_device
 {

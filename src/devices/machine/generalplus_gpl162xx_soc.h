@@ -14,7 +14,7 @@
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 #include "emupal.h"
-#include "generalplus_gpl16250_soc_video.h"
+#include "generalplus_gpl162xx_soc_video.h"
 #include "spg2xx_audio.h"
 
 typedef device_delegate<void (uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)> sunplus_gcm394_cs_callback_device;
