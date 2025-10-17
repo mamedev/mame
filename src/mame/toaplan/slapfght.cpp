@@ -754,7 +754,6 @@ void slapfght_state::machine_start()
 	m_mainbank->set_entry(0);
 
 	m_getstar_status = 0;
-	m_getstar_sequence_index = 0;
 	m_getstar_status_state = 0;
 	m_getstar_cmd = 0;
 	m_gs_a = 0;
@@ -763,7 +762,6 @@ void slapfght_state::machine_start()
 
 	// savestates
 	save_item(NAME(m_getstar_status));
-	save_item(NAME(m_getstar_sequence_index));
 	save_item(NAME(m_getstar_status_state));
 	save_item(NAME(m_getstar_cmd));
 	save_item(NAME(m_gs_a));
@@ -784,7 +782,6 @@ void slapfght_state::machine_reset()
 
 	m_getstar_status = 0xc7;
 	m_getstar_status_state = 0;
-	m_getstar_sequence_index = 0;
 }
 
 /**************************************************************************/

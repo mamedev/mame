@@ -175,9 +175,8 @@ private:
 		GETSTARB2     /* "lame" bootleg with lots of ingame bugs */
 	} m_getstar_id;
 
-	int m_getstar_status = 0;
-	int m_getstar_sequence_index = 0;
-	int m_getstar_status_state = 0;
+	uint8_t m_getstar_status = 0;
+	int32_t m_getstar_status_state = 0;
 	uint8_t m_getstar_cmd = 0;
 	uint8_t m_gs_a = 0;
 	uint8_t m_gs_d = 0;

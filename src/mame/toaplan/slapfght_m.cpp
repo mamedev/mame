@@ -39,7 +39,7 @@ void slapfght_state::scroll_from_mcu_w(offs_t offset, uint8_t data)
 
 uint8_t slapfght_state::getstar_mcusim_status_r()
 {
-	static const int states[3]={ 0xc7, 0x55, 0x00 };
+	static const uint8_t states[3]={ 0xc7, 0x55, 0x00 };
 
 	if (!machine().side_effects_disabled())
 	{
