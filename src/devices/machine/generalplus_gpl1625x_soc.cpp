@@ -404,6 +404,92 @@
 // 79f5 - CMA_G_U_Out
 // 79f6 - CMA_B_V_Out
 
+// 7a00 - USBH_Config
+// 7a01 - USBH_TimeConfig
+// 7a02 - USBH_Data
+// 7a03 - USBH_Transfer 
+// 7a04 - USBH_DveAddr 
+// 7a05 - USBH_DveEP
+// 7a06 - USBH_TXCount
+// 7a07 - USBH_RXCount
+// 7a08 - USBH_FIFOInPointer
+// 7a09 - USBH_FIFOOutPointer
+// 7a0a - USBH_AutoInByteCount
+// 7a0b - USBH_AutoOutByteCount 
+// 7a0c - USBH_AutoTrans 
+// 7a0d - USBH_Status
+// 7a0e - USBH_INT 
+// 7a0f - USBH_INTEN
+
+// 7a11 - USBH_SoftRST
+// 7a12 - USBH_SOFTimer
+// 7a13 - USBH_FrameNum
+// 
+// 7a17 - USBH_INAckCount 
+// 7a18 - USBH_OutAckCount 
+// 7a19 - USBH_RSTAckCount 
+
+// 7a1b - USBH_DReadback 
+
+// 7a20 - USBH_SOF_BOND 
+// 7a21 - USBH_ISOConfig 
+
+// 7a30 - USBD_Config 
+// 7a31 - USBD_Function 
+// 7a32 - USBD_PMR
+// 7a33 - USBD_EP0Data
+// 7a34 - USBD_BIData
+// 7a35 - USBD_BOData 
+// 7a36 - USBD_INTINData 
+// 7a37 - USBD_EPEvent 
+// 7a38 - USBD_GLOINT 
+// 7a39 - USBD_INTEN 
+// 7a3a - USBD_INT
+// 7a3b - USBD_SCI NTEN 
+// 7a3c - USBD_SCINT 
+// 7a3d - USBD_EPAutoSet 
+// 7a3e - USBD_EPSetStall 
+// 7a3f - USBD_EPBufClear
+// 7a40 - USBD_EPEvntClear
+// 7a41 - USBD_EP0WrtCount
+// 7a42 - USBD_BOWrtCount
+// 7a43 - USBD_EP0BufPointer
+// 7a44 - USBD_BIBufPointer
+// 7a45 - USBD_BOBufPointer 
+// 7a46 - USBD_EP0RTR 
+// 7a47 - USBD_EP0RR
+// 7a48 - USBD_ EP0VR
+// 7a49 - USBD_ EP0IR
+// 7a4a - USBD_ EP0LR
+// 7a4b - USBD_INTBufPointer 
+// 7a4c - USBD_INTF
+// 7a4d - USBD_ALT 
+// 7a4e - USBD_ISOOData
+// 7a4f - USBD_ISOIData 
+// 7a50 - USBD_DMAWrtCountL
+// 7a51 - USBD_DMAWrtCountH 
+// 7a52 - USBD_DMAAck
+// 7a53 - USBD_DMAAckH
+// 7a54 - USBD_EPStall 
+// 7a55 - USBD_CALT
+// 7a56 - USBD_MAXALT 
+// 7a57 - USBD_Device
+// 7a58 - USBD_NullPkt 
+// 7a59 - USBD_DMAINT
+
+// 7a5b - USBD_MAXINT 
+// 7a5c - USBD_ISOEvent
+// 7a5d - USBD_ISOINTE
+// 7a5e - USBD_ISOINT
+// 7a5f - USBD_ISOOWrtCount
+// 7a60 - USBD_IOUTData
+// 7a61 - USBD_IOUTEvent 
+// 7a62 - USBD_IOUTINTEN 
+// 7a63 - USBD_IOUTINT
+// 7a64 - USBD_IOUTWrtCount
+// 7a65 - USBD_ISOOBufPointer 
+// 7a66 - USBD_ISOIBufPointer
+
 // 7af0 - Byte_Swap 
 // 7af1 - Nibble_Swap
 // 7af2 - TwoBit_Swap
