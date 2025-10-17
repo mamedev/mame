@@ -14,6 +14,7 @@
 DEFINE_DEVICE_TYPE(ESQ1X22,     esq1x22_device,     "esq1x22",     "Ensoniq 1x22 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40,     esq2x40_device,     "esq2x40",     "Ensoniq 2x40 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device, "esq2x40_sq1", "Ensoniq 2x40 VFD (SQ-1 variant)")
+DEFINE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device, "esq2x40_vfx", "Ensoniq 2x40 VFD (VFX Family variant)")
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
 static const uint16_t font[]=
@@ -116,6 +117,110 @@ static const uint16_t font[]=
 	0x0000, // 0000 0000 0000 0000 (DEL)
 };
 
+/**
+ * Character data as used in the VFX family. Bit 0..13 are ordered to match
+ * led14seg. Bit 14 activates the dot after a character; bit 15 the underline.
+ * See layout/{vfx|vfxsd|sd1}.lay . 
+ */
+static const uint16_t font_vfx[] = {
+  0x0000, // 0000 0000 0000 0000 SPACE
+  0x543f, // 0101 0100 0011 1111 '0.'
+  0x0120, // 0000 0001 0010 0000 '"'
+  0x4300, // 0100 0011 0000 0000 '1.'
+  0x03ed, // 0000 0011 1110 1101 '$'
+  0x40db, // 0100 0000 1101 1011 '2.'
+  0x0000, // 0000 0000 0000 0000 '&'
+  0x0800, // 0000 1000 0000 0000 '''
+  0x40cf, // 0100 0000 1100 1111 '3.'
+  0x40e6, // 0100 0000 1110 0110 '4.'
+  0x3fc0, // 0011 1111 1100 0000 '*'
+  0x03c0, // 0000 0011 1100 0000 '+'
+  0x0000, // 0000 0000 0000 0000 ','
+  0x00c0, // 0000 0000 1100 0000 '-'
+  0x4000, // 0100 0000 0000 0000 '.'
+  0x1400, // 0001 0100 0000 0000 '/'
+  0x143f, // 0001 0100 0011 1111 '0'
+  0x0300, // 0000 0011 0000 0000 '1'
+  0x00db, // 0000 0000 1101 1011 '2'
+  0x00cf, // 0000 0000 1100 1111 '3'
+  0x00e6, // 0000 0000 1110 0110 '4'
+  0x00ed, // 0000 0000 1110 1101 '5'
+  0x00fd, // 0000 0000 1111 1101 '6'
+  0x0007, // 0000 0000 0000 0111 '7'
+  0x00ff, // 0000 0000 1111 1111 '8'
+  0x00ef, // 0000 0000 1110 1111 '9'
+  0x0000, // 0000 0000 0000 0000 ':'
+  0x40fd, // 0100 0000 1111 1101 '6.'
+  0x3000, // 0011 0000 0000 0000 '('
+  0x00c8, // 0000 0000 1100 1000 '='
+  0x0c00, // 0000 1100 0000 0000 ')'
+  0x0000, // 0000 0000 0000 0000 '?'
+  0x025f, // 0000 0010 0101 1111 '@'
+  0x00f7, // 0000 0000 1111 0111 'A'
+  0x038f, // 0000 0011 1000 1111 'B'
+  0x0039, // 0000 0000 0011 1001 'C'
+  0x030f, // 0000 0011 0000 1111 'D'
+  0x00f9, // 0000 0000 1111 1001 'E'
+  0x00f1, // 0000 0000 1111 0001 'F'
+  0x00bd, // 0000 0000 1011 1101 'G'
+  0x00f6, // 0000 0000 1111 0110 'H'
+  0x0309, // 0000 0011 0000 1001 'I'
+  0x001e, // 0000 0000 0001 1110 'J'
+  0x3070, // 0011 0000 0111 0000 'K'
+  0x0038, // 0000 0000 0011 1000 'L'
+  0x1836, // 0001 1000 0011 0110 'M'
+  0x2836, // 0010 1000 0011 0110 'N'
+  0x003f, // 0000 0000 0011 1111 'O'
+  0x00f3, // 0000 0000 1111 0011 'P'
+  0x203f, // 0010 0000 0011 1111 'Q'
+  0x20f3, // 0010 0000 1111 0011 'R'
+  0x00ed, // 0000 0000 1110 1101 'S'
+  0x0301, // 0000 0011 0000 0001 'T'
+  0x003e, // 0000 0000 0011 1110 'U'
+  0x1430, // 0001 0100 0011 0000 'V'
+  0x2436, // 0010 0100 0011 0110 'W'
+  0x3c00, // 0011 1100 0000 0000 'X'
+  0x1a00, // 0001 1010 0000 0000 'Y'
+  0x1409, // 0001 0100 0000 1001 'Z'
+  0x0039, // 0000 0000 0011 1001 '['
+  0x40ff, // 0100 0000 1111 1111 '8.'
+  0x000f, // 0000 0000 0000 1111 ']'
+  0x2400, // 0010 0100 0000 0000 '^'
+  0x0008, // 0000 0000 0000 1000 '_'
+  0x0800, // 0000 1000 0000 0000 '`'
+  0x00f7, // 0000 0000 1111 0111 'a'
+  0x038f, // 0000 0011 1000 1111 'b'
+  0x0039, // 0000 0000 0011 1001 'c'
+  0x030f, // 0000 0011 0000 1111 'd'
+  0x00f9, // 0000 0000 1111 1001 'e'
+  0x00f1, // 0000 0000 1111 0001 'f'
+  0x00bd, // 0000 0000 1011 1101 'g'
+  0x00f6, // 0000 0000 1111 0110 'h'
+  0x0309, // 0000 0011 0000 1001 'i'
+  0x001e, // 0000 0000 0001 1110 'j'
+  0x3070, // 0011 0000 0111 0000 'k'
+  0x0038, // 0000 0000 0011 1000 'l'
+  0x1836, // 0001 1000 0011 0110 'm'
+  0x2836, // 0010 1000 0011 0110 'n'
+  0x003f, // 0000 0000 0011 1111 'o'
+  0x00f3, // 0000 0000 1111 0011 'p'
+  0x203f, // 0010 0000 0011 1111 'q'
+  0x20f3, // 0010 0000 1111 0011 'r'
+  0x00ed, // 0000 0000 1110 1101 's'
+  0x0301, // 0000 0011 0000 0001 't'
+  0x003e, // 0000 0000 0011 1110 'u'
+  0x1430, // 0001 0100 0011 0000 'v'
+  0x2436, // 0010 0100 0011 0110 'w'
+  0x3c00, // 0011 1100 0000 0000 'x'
+  0x1a00, // 0001 1010 0000 0000 'y'
+  0x1409, // 0001 0100 0000 1001 'z'
+  0x0039, // 0000 0000 0011 1001 '{'
+  0x0300, // 0000 0011 0000 0000 '|'
+  0x000f, // 0000 0000 0000 1111 '}'
+  0x2400, // 0010 0100 0000 0000 '~'
+  0x0000, // 0000 0000 0000 0000 DEL
+};
+
 esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_vfds(std::move(std::get<0>(dimensions))),
@@ -162,6 +267,53 @@ void esqvfd_device::update_display()
 		}
 	}
 }
+
+inline void esqvfd_device::cursor_left()
+{
+	m_cursx--;
+	if (m_cursx < 0)
+	{
+		m_cursx += m_cols;
+		m_cursy--;
+		if (m_cursy < 0)
+			m_cursy += m_rows;
+	}
+}
+
+inline void esqvfd_device::cursor_right()
+{
+	m_cursx++;
+	if (m_cursx >= m_cols)
+	{
+		m_cursx -= m_cols;
+		m_cursy++;
+		if (m_cursy >= m_rows)
+			m_cursy -= m_rows;
+	}
+}
+
+void esqvfd_device::set_blink_on(bool blink_on) {
+	m_blink_on = blink_on;
+
+	for (int row = 0; row < m_rows; row++)
+	{
+		for (int col = 0; col < m_cols; col++)
+		{
+			m_dirty[row][col] |= m_attrs[row][col] & AT_BLINK;
+		}
+	}
+	update_display();
+}
+
+void esqvfd_device::clear() {
+	m_cursx = m_cursy = m_curattr = 0;
+	memset(m_chars, 0, sizeof(m_chars));
+	memset(m_attrs, 0, sizeof(m_attrs));
+	memset(m_dirty, 1, sizeof(m_dirty));
+
+	update_display();
+}
+
 
 /* 2x40 VFD display used in the ESQ-1, VFX-SD, SD-1, and others */
 
@@ -220,11 +372,16 @@ void esq2x40_device::write_char(uint8_t data)
 				m_curattr |= AT_UNDERLINE;
 				break;
 
+			case 0xd4:  // move curser one step right
+				cursor_right();
+				break;
+
+			case 0xd5:  // move curser one step left
+				cursor_left();
+				break;
+
 			case 0xd6:  // clear screen
-				m_cursx = m_cursy = 0;
-				memset(m_chars, 0, sizeof(m_chars));
-				memset(m_attrs, 0, sizeof(m_attrs));
-				memset(m_dirty, 1, sizeof(m_dirty));
+				clear();
 				break;
 
 			case 0xf5:  // save cursor position
@@ -236,6 +393,10 @@ void esq2x40_device::write_char(uint8_t data)
 				m_cursx = m_savedx;
 				m_cursy = m_savedy;
 				m_curattr = m_attrs[m_cursy][m_cursx];
+				break;
+
+			case 0xfd: // also clear screen?
+				clear();
 				break;
 
 			default:
@@ -250,12 +411,8 @@ void esq2x40_device::write_char(uint8_t data)
 			m_chars[m_cursy][m_cursx] = data - ' ';
 			m_attrs[m_cursy][m_cursx] = m_curattr;
 			m_dirty[m_cursy][m_cursx] = 1;
-			m_cursx++;
 
-			if (m_cursx >= 39)
-			{
-				m_cursx = 39;
-			}
+			cursor_right();
 		}
 	}
 
@@ -293,14 +450,77 @@ bool esq2x40_device::write_contents(std::ostream &o)
 			o.put((char) (m_chars[row][col] + ' '));
 		}
 	}
+
+	// move the cursor to the saved position
+	o.put((char) 0x80 | (m_cols * m_savedy + m_savedx));
+	// and save the position
+	o.put((char) 0xf5);
+
+	// move the cursor to the current cursor position
+	o.put((char) 0x80 | (m_cols * m_cursy + m_cursx));
+
 	return true;
 }
 
 
-esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, ESQ2X40, tag, owner, clock, make_dimensions<2, 40>(*this))
+esq2x40_device::esq2x40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	esqvfd_device(mconfig, type, tag, owner, clock, make_dimensions<2, 40>(*this))
 {
 }
+esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esq2x40_device(mconfig, ESQ2X40, tag, owner, clock)
+{
+}
+
+esq2x40_vfx_device::esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esq2x40_device(mconfig, ESQ2X40_VFX, tag, owner, clock)
+{
+}
+void esq2x40_vfx_device::device_add_mconfig(machine_config &config)
+{
+	// Do not set a default layout. This display must be used
+	// within a layout that includes the VFD elements, such as
+	// vfx.lay, vfxsd.lay or sd1.lay.
+}
+
+// Handles blinking of underline and of entire character,
+void esq2x40_vfx_device::update_display()
+{
+	for (int row = 0; row < m_rows; row++)
+	{
+		for (int col = 0; col < m_cols; col++)
+		{
+			if (m_dirty[row][col])
+			{
+				uint8_t c = m_chars[row][col];
+
+				uint32_t char_segments = font_vfx[c < 96 ? c : 0];
+				auto attr = m_attrs[row][col];
+				uint32_t segments;
+
+				if ((attr & AT_BLINK) && !m_blink_on)  // something is blinked off
+				{
+					if (attr & AT_UNDERLINE) // blink the underline off
+						segments = char_segments;
+					else // there is no underline, blink the entire character
+						segments = 0;
+				}
+				else
+				{
+					if (attr & AT_UNDERLINE)
+						segments = char_segments | 0x8000;
+					else
+						segments = char_segments;
+				}
+
+				m_vfds->set((row * m_cols) + col, segments);
+
+				m_dirty[row][col] = 0;
+			}
+		}
+	}
+}
+
 
 /* 1x22 display from the VFX (not right, but it'll do for now) */
 
