@@ -47,7 +47,7 @@ end
 		"Symbols", -- always include minimum symbols for executables
 	}
 
-	if _OPTIONS["SYMBOLS"] then
+	if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~=0 and (_OPTIONS["PDB_SYMBOLS"]==nil or _OPTIONS["PDB_SYMBOLS"]==0) then
 		local llvm_obdjump = false
 		local objdump_ver = backtick('objdump --version')
 		if string.match(objdump_ver, 'LLVM version ') then

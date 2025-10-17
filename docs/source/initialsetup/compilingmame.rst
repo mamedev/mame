@@ -656,6 +656,12 @@ SYMLEVEL
     similar compilers, **1** includes line number tables and external variables,
     **2** also includes local variables, and **3** also includes macro
     definitions.
+PDB_SYMBOLS
+    Set to **1** to generate CodeView format symbols in separate PDB files,
+    allowing source-level debugging using Microsoft Visual Studio or WinDbg.
+    This option is only supported for MinGW builds using the clang compiler and
+    the LLVM linker (lld).  This option only takes effect if the **SYMBOLS**
+    option is set to a non-zero value.
 ARCHOPTS
     Additional command-line options to pass to the compiler and linker.  This is
     useful for supplying code generation or ABI options, for example to enable
