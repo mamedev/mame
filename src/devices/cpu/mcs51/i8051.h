@@ -7,8 +7,8 @@
  *
  *****************************************************************************/
 
-#ifndef MAME_CPU_MCS51_MCS51_H
-#define MAME_CPU_MCS51_MCS51_H
+#ifndef MAME_CPU_MCS51_I8051_H
+#define MAME_CPU_MCS51_I8051_H
 
 #pragma once
 

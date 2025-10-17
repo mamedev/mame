@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud
 
-#ifndef MAME_CPU_MCS51_DS5002FP_H
-#define MAME_CPU_MCS51_DS5002FP_H
+#ifndef MAME_CPU_MCS51_SAB80C535_H
+#define MAME_CPU_MCS51_SAB80C535_H
 
 #include "i80c52.h"
 
