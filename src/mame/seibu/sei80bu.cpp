@@ -56,14 +56,14 @@ u8 sei80bu_device::data_r(offs_t offset)
 	u16 const a = offset;
 	u8 src = read_byte(offset);
 
-	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
-	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
-	if ( BIT(a,11) & ~BIT(a,8) &  BIT(a,1)) src ^= 0x04;
-	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
-	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
+	if (BIT( a, 9) & BIT( a, 8))               src ^= 0x80;
+	if (BIT( a,11) & BIT( a, 4) &  BIT( a, 1)) src ^= 0x40;
+	if (BIT( a,11) & BIT(~a, 8) &  BIT( a, 1)) src ^= 0x04;
+	if (BIT( a,13) & BIT(~a, 6) &  BIT( a, 4)) src ^= 0x02;
+	if (BIT(~a,11) & BIT( a, 9) &  BIT( a, 2)) src ^= 0x01;
 
-	if (BIT(a,13) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,3,2,0,1);
-	if (BIT(a, 8) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,2,3,1,0);
+	if (BIT( a,13) & BIT( a, 4)) src = bitswap<8>(src,7,6,5,4,3,2,0,1);
+	if (BIT( a, 8) & BIT( a, 4)) src = bitswap<8>(src,7,6,5,4,2,3,1,0);
 
 	return src;
 }
@@ -73,19 +73,19 @@ u8 sei80bu_device::opcode_r(offs_t offset)
 	u16 const a = offset;
 	u8 src = read_byte(offset);
 
-	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
-	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
-	if (~BIT(a,13) & BIT(a,12))             src ^= 0x20;
-	if (~BIT(a,6)  &  BIT(a,1))             src ^= 0x10;
-	if (~BIT(a,12) &  BIT(a,2))             src ^= 0x08;
-	if ( BIT(a,11) & ~BIT(a,8) &  BIT(a,1)) src ^= 0x04;
-	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
-	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
+	if (BIT( a, 9) & BIT( a, 8))               src ^= 0x80;
+	if (BIT( a,11) & BIT( a, 4) &  BIT( a, 1)) src ^= 0x40;
+	if (BIT(~a,13) & BIT( a,12))               src ^= 0x20;
+	if (BIT(~a, 6) & BIT( a, 1))               src ^= 0x10;
+	if (BIT(~a,12) & BIT( a, 2))               src ^= 0x08;
+	if (BIT( a,11) & BIT(~a, 8) &  BIT( a, 1)) src ^= 0x04;
+	if (BIT( a,13) & BIT(~a, 6) &  BIT( a, 4)) src ^= 0x02;
+	if (BIT(~a,11) & BIT( a, 9) &  BIT( a, 2)) src ^= 0x01;
 
-	if (BIT(a,13) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,3,2,0,1);
-	if (BIT(a, 8) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,2,3,1,0);
-	if (BIT(a,12) &  BIT(a,9)) src = bitswap<8>(src,7,6,4,5,3,2,1,0);
-	if (BIT(a,11) & ~BIT(a,6)) src = bitswap<8>(src,6,7,5,4,3,2,1,0);
+	if (BIT( a,13) & BIT( a, 4)) src = bitswap<8>(src,7,6,5,4,3,2,0,1);
+	if (BIT( a, 8) & BIT( a, 4)) src = bitswap<8>(src,7,6,5,4,2,3,1,0);
+	if (BIT( a,12) & BIT( a, 9)) src = bitswap<8>(src,7,6,4,5,3,2,1,0);
+	if (BIT( a,11) & BIT(~a, 6)) src = bitswap<8>(src,6,7,5,4,3,2,1,0);
 
 	return src;
 }
