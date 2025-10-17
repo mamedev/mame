@@ -22,8 +22,8 @@ public:
 	u8 opcode_r(offs_t offset);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override { }
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD { }
 };
 
 DECLARE_DEVICE_TYPE(SEI80BU, sei80bu_device)
