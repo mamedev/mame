@@ -1172,7 +1172,117 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GPAC800A register list
-// TODO:
+//
+// 7000 - Tx3_X_Position
+// 7001 - Tx3_Y_Position
+// 7002 - Tx3_X_Offset
+// 7003 - Tx3_Y_Offset
+// 7004 - Tx3_Attribute
+// 7005 - Tx3_Control
+// 7006 - Tx3_N_PTR
+// 7007 - Tx3_A_PTR
+// 7008 - Tx4_X_Position
+// 7009 - Tx4_Y_Position
+// 700a - Tx4_X_Offset
+// 700b - Tx4_Y_Offset
+// 700c - Tx4_Attribute
+// 700d - Tx4_Control
+// 700e - Tx4_N_PTR
+// 700f - Tx4_A_PTR
+// 7010 - Tx1_X_Position
+// 7011 - Tx1_Y_Position
+// 7012 - Tx1_Attribute
+// 7013 - Tx1_Control
+// 7014 - Tx1_N_PTR
+// 7015 - Tx1_A_PTR
+// 7016 - Tx2_X_Position
+// 7017 - Tx2_Y_Position
+// 7018 - Tx2_Attribute
+// 7019 - Tx2_Control
+// 701a - Tx2_N_PTR
+// 701b - Tx2_A_PTR
+// 701c - VComValue
+// 701d - VComOffset
+// 701e - VComStep
+// 701f
+// 7020 - Segment_Tx1
+// 7021 - Segment_Tx2 
+// 7022 - Segment_sp
+// 7023 - Segment_Tx3
+// 7024 - Segment_Tx4
+//
+// 7028 - Tx4_Cosine
+// 7029 - Tx4_Sine
+// 702a - Blending
+// 702b - Segment_Tx1H
+// 702c - Segment_Tx2H
+// 702d - Segment_spH
+// 702e - Segment_Tx3H
+// 702f - Segment_Tx4H
+// 7030 - Fade_Control
+//
+// 7036 - IRQTMV
+// 7037 - IRQTMH
+// 7038 - Line_Counter
+// 7039 - LightPen_Control
+// 703a - Palette_Control
+//
+// 703e - LPHPosition
+// 703f - LPVPosition
+//
+// 7042 - SControl
+// 
+// 7062 - PPU_IRQ_EN
+// 7063 - PPU_IRQ_Status
+//
+// 7070 - SPDMA_Source
+// 7071 - SPDMA_Target
+// 7072 - SPDMA_Number
+//
+// 7078 - FBI_AddrL
+// 7079 - FBI_AddrH
+// 707a - FBO_AddrL
+// 707b - FBO_AddrH
+// 707c - FB_PPU_GO
+// 707d - BLD_Color
+// 707e - PPU_RAM_Bank
+// 707f - PPU_Enable
+//
+// 7090 - TG_CTRL1
+// 7091 - TG_CTRL2
+// 7092 - TG_HLSTART
+// 7093 - TG_HEND
+// 7094 - TG_VL0START
+// 7095 - MD_FBADDRL
+// 7096 - TG_VEND
+// 7097 - TG_HSTART
+// 7098 - MD_RGBL
+// 7099 - SEN_CTRL
+// 709a - TG_BSUPPER
+// 709b - TG_BSLOWER
+// 709c - MD_RGBH
+// 709d - MD_CR
+// 709e - TG_FBSADDRL
+// 709f - TG_FBSADDRH
+// 70a0 - TG_VL1START
+// 70a1 - TG_H_WIDTH
+// 70a2 - TG_V_WIDTH
+// 70a3 - TG_CUTSTART
+// 70a4 - TG_CUTWIDTH
+// 70a5 - TG_VSTART
+// 70a6 - MD_FBADDRH
+// 70a7 - TG_H_RATIO
+// 70a8 - TG_V_RATIO
+//
+// 7100 to 71ff - Tx_Hvoffset (when PPU_RAM_BANK is 0)
+// 7200 to 72ff - HCMValue (when PPU_RAM_BANK is 0)
+// 7100 to 72ff - Tx3_Cos / Tx3_Sin (when PPU_RAM_BANK is 1)
+//
+// 7300 to 73ff - Palette0 / Palette1 / Palette2 / Palette3 (3 banks using PAL_RAM_SEL)
+//
+// 7400 to 77ff - Standard sprite list (when PPU_RAM_BANK is 0)
+// 7400 to 74ff - Sprite0_Attribute list (when PPU_RAM_BANK is 1 and PPU_Enable bit 9 '3D' mode is disabled)
+// 7400 to 77ff - 3D sprite attribute list (when PPU_RAM_BANK is 1 and PPU_Enable bit 9 '3D' mode is enabled)
 
 void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 {
