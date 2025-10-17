@@ -76,6 +76,7 @@
 #include "speaker.h"
 #include "screen.h"
 
+#include "virusa.lh"
 #include "virusb.lh"
 
 
@@ -286,6 +287,8 @@ void acvirus_state::virusa(machine_config &config)
 	m_dsp->set_hard_omr(0xe);
 
 	SPEAKER(config, "speaker", 2).front();
+
+	config.set_default_layout(layout_virusa);
 }
 
 void acvirus_state::virusb(machine_config &config)
