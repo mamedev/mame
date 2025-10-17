@@ -110,7 +110,7 @@ uint16_t generalplus_gpspi_direct_game_state::cs0_r(offs_t offset)
 
 void generalplus_gpspi_direct_game_state::generalplus_gpspi_direct(machine_config &config)
 {
-	GP_SPI_DIRECT(config, m_maincpu, 96000000/2, m_screen);
+	GPL951XX(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspi_direct_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspi_direct_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(generalplus_gpspi_direct_game_state::portc_r));

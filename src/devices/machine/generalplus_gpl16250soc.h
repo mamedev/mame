@@ -447,12 +447,12 @@ private:
 	uint16_t spi_unk_7943_r();
 };
 
-class generalplus_gpspi_direct_device : public sunplus_gcm394_base_device
+class generalplus_gpl951xx_device : public sunplus_gcm394_base_device
 {
 public:
 	template <typename T>
-	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
-		generalplus_gpspi_direct_device(mconfig, tag, owner, clock)
+	generalplus_gpl951xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		generalplus_gpl951xx_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 		//m_csbase = 0x30000;
@@ -460,7 +460,7 @@ public:
 		m_csbase = 0xffffffff;
 	}
 
-	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generalplus_gpl951xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	void gpspi_direct_internal_map(address_map &map) ATTR_COLD;
@@ -488,6 +488,6 @@ private:
 DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
 DECLARE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device)
 DECLARE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device)
-DECLARE_DEVICE_TYPE(GP_SPI_DIRECT, generalplus_gpspi_direct_device)
+DECLARE_DEVICE_TYPE(GPL951XX, generalplus_gpl951xx_device)
 
 #endif // MAME_MACHINE_GENERALPLUS_GPL16250SOC_H
