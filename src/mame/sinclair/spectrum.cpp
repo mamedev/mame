@@ -782,7 +782,10 @@ void spectrum_state::spectrum_common(machine_config &config)
 	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
 	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
-	SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx").set_load_callback(FUNC(spectrum_state::snapshot_cb));
+	/* devices */
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,spg,z80,zx"));
+	snapshot.set_load_callback(FUNC(spectrum_state::snapshot_cb));
+	snapshot.set_interface("spectrum_snapshot");
 	QUICKLOAD(config, "quickload", "raw,scr", attotime::from_seconds(2)).set_load_callback(FUNC(spectrum_state::quickload_cb)); // The delay prevents the screen from being cleared by the RAM test at boot
 
 	CASSETTE(config, m_cassette);

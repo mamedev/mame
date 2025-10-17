@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "isa_cards.h"
 
+/*
 // video
 #include "aga.h"
 #include "amgda.h"
@@ -102,11 +103,13 @@
 #include "hpblp.h"
 #include "opus100pm.h"
 #include "pcat512me.h"
+*/
 #include "zxbus_adapter.h"
 
 
 void pc_isa8_cards(device_slot_interface &device)
 {
+/*
 	device.option_add("mda", ISA8_MDA);
 	device.option_add("cga", ISA8_CGA);
 	device.option_add("cga_ec1841", ISA8_EC1841_0002);
@@ -164,14 +167,16 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("3xtwin", ISA8_3XTWIN);
 	device.option_add("opus108pm", ISA8_OPUS108PM);
 	device.option_add("ibm_speech", ISA8_IBM_SPEECH);
+*/
 	device.option_add("zxbus_adapter", ISA8_ZXBUS);
-	device.option_add("ubpnic", ISA8_UBPNIC);
+	//device.option_add("ubpnic", ISA8_UBPNIC);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
 {
 	// any 8-bit card also works in a 16-bit slot
 	pc_isa8_cards(device);
+/*
 	device.option_replace("fdc", ISA8_FDC_AT);
 	device.option_remove("fdc_at");
 	device.option_add("fdc_superio", ISA8_FDC_SUPERIO);
@@ -238,4 +243,5 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("dc320e", TEKRAM_DC320E);
 	device.option_add("dc820", TEKRAM_DC820);
 	device.option_add("dc820b", TEKRAM_DC820B);
+*/
 }

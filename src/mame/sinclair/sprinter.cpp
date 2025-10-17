@@ -123,6 +123,7 @@ public:
 	void sprinter(machine_config &config);
 
 	INPUT_CHANGED_MEMBER(turbo_changed);
+	INPUT_CHANGED_MEMBER(on_nmi);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -279,6 +280,7 @@ private:
 	bool m_turbo;
 	bool m_turbo_hard;
 	bool m_arom16;
+	bool m_nmi_ena;
 	u8 m_rom_rg;
 	u8 m_pn;
 	u8 m_sc;
@@ -337,7 +339,7 @@ void sprinter_state::update_memory()
 	else
 	{
 		const bool cash_on = 0;
-		const bool nmi_ena = 1;
+		const bool nmi_ena = m_nmi_ena;
 		const bool sc0 = BIT(m_sc, 0);
 		const bool sc_lc = !(sc0 && m_ram_sys) && !cash_on;
 		const u8 spr_ = BIT(m_sc, 1) ? 0 : ((m_dos << 1) | (BIT(m_pn, 4) || !m_dos));
@@ -1484,6 +1486,7 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_turbo));
 	save_item(NAME(m_turbo_hard));
 	save_item(NAME(m_arom16));
+	save_item(NAME(m_nmi_ena));
 	save_item(NAME(m_rom_rg));
 	save_item(NAME(m_pn));
 	save_item(NAME(m_sc));
@@ -1526,6 +1529,13 @@ void sprinter_state::machine_start()
 
 	m_dcp_location = m_ram->pointer() + (0x40 << 14);
 
+	for (int addr = 0; addr < m_fastram.bytes(); ++addr)
+		m_fastram.target()[addr] = machine().rand();
+	for (int addr = 0; addr < m_vram.bytes(); ++addr)
+		m_vram.target()[addr] = machine().rand();
+	for (int addr = 0; addr < m_ram->size(); ++addr)
+		m_ram->pointer()[addr] = machine().rand();
+
 	const u8 port_default[0x40] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Cx - SYS PORTS COPIES
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, // Dx - RAM PAGES
@@ -1540,6 +1550,31 @@ void sprinter_state::machine_start()
 	m_hold     = {0, 0}; // cb
 	m_conf_loading = 1;
 	m_conf = 0;
+
+	int idx = Z84_MCR + 1;
+	m_maincpu->state_add_divider(-1);
+	m_maincpu->state_add(idx++, "PG0",          m_pages[0]);
+	m_maincpu->state_add(idx++, "PG1",          m_pages[1]);
+	m_maincpu->state_add(idx++, "PG2",          m_pages[2]);
+	m_maincpu->state_add(idx++, "PG3",          m_pages[3]);
+	m_maincpu->state_add(idx++, "7FFD",         m_pn);
+	m_maincpu->state_add(idx++, "1FFD",         m_sc);
+
+	m_maincpu->state_add_divider(-1);
+
+	m_maincpu->state_add(idx++, "DOS OFF",      m_dos);
+	m_maincpu->state_add(idx++, "CNF",          m_cnf);
+	m_maincpu->state_add(idx++, "PORT_Y",       m_port_y);
+	m_maincpu->state_add(idx++, "RGMOD",        m_rgmod);
+
+	m_maincpu->state_add_divider(-1);
+	m_maincpu->state_add(idx++, "ACC MODE",     m_acc_dir);
+	m_maincpu->state_add(idx++, "ACC Buffer",   m_rgacc);
+	m_maincpu->state_add(idx++, "Ext ACC",      m_alt_acc);
+	m_maincpu->state_add(idx++, "ACC Counter",  m_acc_cnt);
+
+	m_maincpu->state_add_divider(-1);
+	m_maincpu->state_add(idx++, "ISA_ADDR_EXT", m_isa_addr_ext);
 }
 
 void sprinter_state::machine_reset()
@@ -1559,6 +1594,7 @@ void sprinter_state::machine_reset()
 	m_ram_sys = 0;
 	m_sys_pg = 0;
 	m_arom16 = 0;
+	m_nmi_ena = 1; // off
 	m_cnf = 0x00;
 	m_pn = 0x00;
 	m_sc = 0x00;
@@ -1721,7 +1757,6 @@ void sprinter_state::do_mem_wait(u8 cpu_taken = 0)
 		u8 over = m_maincpu->total_cycles() % 6;
 		over = over ? (6 - over) : 0;
 		m_wait_ticks_count = over + 6 - cpu_taken;
-
 		m_maincpu->adjust_icount(-m_wait_ticks_count);
 	}
 }
@@ -1765,6 +1800,18 @@ INPUT_CHANGED_MEMBER(sprinter_state::turbo_changed)
 	m_turbo_hard = !m_turbo_hard;
 	update_cpu();
 }
+
+INPUT_CHANGED_MEMBER(sprinter_state::on_nmi)
+{
+	if ((m_io_nmi->read() & 0x01) && m_nmi_ena)
+	{
+		m_nmi_ena = false;
+		update_memory();
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		machine().debug_break();
+	}
+}
+
 
 INPUT_PORTS_START( sprinter )
 	/* PORT_NAME =  KEY Mode    CAPS Mode    SYMBOL Mode   EXT Mode   EXT+Shift Mode   BASIC Mode  */
@@ -1934,6 +1981,9 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON6)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON6) PORT_NAME("%p Z")
 
 
+	PORT_START("NMI")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sprinter_state::on_nmi), 0)
+
 	PORT_START("TURBO")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TURBO") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sprinter_state::turbo_changed), 0)
 INPUT_PORTS_END
@@ -2043,6 +2093,9 @@ ROM_START( sprinter )
 
 	ROM_SYSTEM_BIOS(6, "v3.06", "Firmware v3.06, 25.06.2025")
 	ROMX_LOAD( "sp2k-3.06.rom", 0x000000, 0x40000, CRC(187f4382) SHA1(717ed28c59f9533a9b3f9d24098b536a0d3c1573), ROM_BIOS(6))
+
+	ROM_SYSTEM_BIOS(7, "dev",   "Firmware in development")
+	ROMX_LOAD( "_sprin.bin",        0x000000, 0x40000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(7))
 ROM_END
 } // Anonymous namespace
 

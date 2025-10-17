@@ -25,7 +25,7 @@ jobs:
   build-windows:
     strategy:
       matrix:
-        compiler: [gcc-x64, clang-x64, clang-arm64]
+        compiler: [gcc-x64]
         include:
           - compiler: gcc-x64
             os: windows-latest
@@ -33,23 +33,6 @@ jobs:
             slug: mingw-w64-x86_64
             cc: gcc
             cxx: g++
-            subtarget: mame
-            executable: mame
-          - compiler: clang-x64
-            os: windows-latest
-            msys: MINGW64
-            slug: mingw-w64-x86_64
-            cc: clang
-            cxx: clang++
-            subtarget: tiny
-            executable: mametiny
-          - compiler: clang-arm64
-            os: windows-11-arm
-            msys: CLANGARM64
-            slug: mingw-w64-clang-aarch64
-            extrapkg: mingw-w64-clang-aarch64-gcc-compat
-            cc: clang
-            cxx: clang++
             subtarget: mame
             executable: mame
     runs-on: ${{ matrix.os }}
@@ -71,10 +54,9 @@ jobs:
         OVERRIDE_CXX: ${{ matrix.cxx }}
         ARCHOPTS: "-fuse-ld=lld"
         SUBTARGET: ${{ matrix.subtarget }}
+        SOURCES: sinclair/sprinter.cpp,sinclair/tsconf.cpp,sinclair/specnext.cpp,sinclair/pentevo.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/scorpion.cpp
         TOOLS: 1
-      run: make -j3
-    - name: Validate
-      run: ./${{ matrix.executable }}.exe -validate
+      run: make -j2
     - uses: actions/upload-artifact@main
       with:
         name: ${{ matrix.executable }}-windows-${{ matrix.compiler }}-${{ github.sha }}

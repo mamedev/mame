@@ -516,7 +516,7 @@ void atm_state::atm(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	config.device_remove("exp");
+	//config.device_remove("exp");
 }
 
 
@@ -587,6 +587,12 @@ ROM_START( atmtb2plus )
 	ROMX_LOAD( "atmtb213.rom", 0x020000, 0x10000, CRC(34a91d53) SHA1(8f0af0f3c0ff1644535f20545c73d01576d6e52f), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v1.37", "Dual eXtra v1.37XT: BIOS v1.07.15, CP/M v2.2, TR-DOS v5.04R")
 	ROMX_LOAD( "atmtb2x37xt.rom", 0x010000, 0x20000, CRC(e5ef44d9) SHA1(3fbb9ace7cb031e7365c19e4f8b67ed366e24064), ROM_BIOS(3))
+
+	ROM_SYSTEM_BIOS(4, "gluk", "Gluk")
+	ROMX_LOAD( "glukatm.rom", 0x020000, 0x10000, CRC(7a017f0d) SHA1(301d9195ecaeeba31b7a7d6b7c4037b8cc72a240), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "gluk2", "Gluk2")
+	ROMX_LOAD( "glukatm2.rom", 0x020000, 0x10000, CRC(64cfee77) SHA1(cd180493e6c3ae4b0a0f753f0efff2debd43a329), ROM_BIOS(5))
+
 
 	ROM_REGION(0x01000, "keyboard", ROMREGION_ERASEFF)
 	ROM_LOAD( "rf2ve3.rom",  0x0000, 0x0580, CRC(35e0f9ec) SHA1(adcf14758fab8472cfa0167af7e8326c66416416)) // XT Keyboard
