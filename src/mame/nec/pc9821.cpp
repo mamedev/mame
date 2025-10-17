@@ -891,6 +891,13 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
+
+	// 80486DX2 66MHz
+	// DOS 5.0, Windows 3.1
+	// 5.6MB RAM, up to 73.6MB
+	// 340MB HD
+	// Expansion slot C-BUS4 (4)
+	// Graphics controller S3 86C928
 }
 
 void pc9821_canbe_state::pc9821ce(machine_config &config)
@@ -901,6 +908,11 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821ce_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821ce_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// 3.5 x2
+	// 1.6MB ~ 14.6MB model S1
+	// 5.6MB ~ 14.6MB model S2
+	// pc9801-86
 
 	m_cbus[0]->set_default_option("sound_pc9821ce");
 	m_cbus[0]->set_fixed(true);
@@ -921,7 +933,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(100'000'000); // Pentium Pro, 512 kB second cache option RAM
-	PENTIUM_PRO(config.replace(), m_maincpu, xtal);
+	PENTIUM(config.replace(), m_maincpu, xtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821cx3_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821cx3_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -946,26 +958,46 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	// PC-9821CB-B04, on dedicated bus (Fax/Modem 14'400 bps) and IrDA board (115'200 bps)
 	// Optional PC-9821C3-B02 MIDI board, on dedicated bus
 	PCI_ROOT(config, "pci", 0);
-
+	// ...
 }
 
-void pc9821_mate_x_state::pc9821xs(machine_config &config)
-{
-	pc9821(config);
-	const XTAL xtal = XTAL(66'000'000);
-	I486(config.replace(), m_maincpu, xtal); // i486dx2
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-}
+//void pc9821_mate_x_state::pc9821xs(machine_config &config)
+//{
+//	pc9821(config);
+//	const XTAL xtal = XTAL(66'000'000);
+//	I486(config.replace(), m_maincpu, xtal); // i486dx2
+//	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
+//	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
+//	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+//}
 
 void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 {
 	pc9821(config);
-	PENTIUM(config.replace(), m_maincpu, 166000000); // Pentium P54C
+	PENTIUM(config.replace(), m_maincpu, 166000000); // Pentium P54C, secondary cache 256KB/512KB
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// Xa16/R specs
+	// 16MB ~ 128MB F.P.DRAM
+	// VLSI Supercore594
+	// S3 manufactured Trident TGUI9680XGi with 2MB VRAM (on board PCI)
+	// 3.5" floppy x1
+	// 3 C-Bus slots (one occupied by "K12")
+	// 2 PCI slots
+	// 1.2GB HDD
+	// CD-Rom x4
+
+	// Xa16/W specs (same as above except)
+	// Intel I430HX
+	// 32MB ~ 256MB ECC compatible EDO DRAM
+	// S3 manufactured Trident TGUI9682XGi with 2MB VRAM (on board PCI)
+	// 100Base-TX / 10Base-T ethernet (on board PCI)
+	// 1.6GB HDD
+	// CD-Rom x6 or x8
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 void pc9821_mate_r_state::pc9821ra20(machine_config &config)
@@ -975,6 +1007,16 @@ void pc9821_mate_r_state::pc9821ra20(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_r_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// Intel 440FX
+	// 16MB ~ 128MB F.P.DRAM for /N12 or 32MB ~ 256MB ECC compatible EDO DRAM for /N30
+	// S3 manufactured Trident TGUI9682XGi with 2MB VRAM (on board PCI)
+	// 1.2GB HDD for /N12 or 3GB for /N30
+	// CD-Rom x6 or x8
+	// 100Base-TX / 10Base-T ethernet (on board PCI)
+	PCI_ROOT(config, "pci", 0);
+	// ...
+
 }
 
 void pc9821_mate_r_state::pc9821ra266(machine_config &config)
@@ -986,11 +1028,21 @@ void pc9821_mate_r_state::pc9821ra266(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	// Intel 440FX
 	// 512KB CPU cache RAM
 	// Trident TGUI9682XGi + integrated 98 gfx card
 	// 3x cbus + 2x PCI slots
 	// 3GB HDD
+	// 16x CD-ROM
+	// 3.5" floppy x 1
 	// built-in ethernet 100BASE-TX/10BASE-T
+	// 32MB, max 256 MB (ECC EDO RAM)
+
+	// PC-9821Ra266/M30R has been re-released in 1998,
+	// unknown differences other than having Win98 pre-installed
+
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 void pc9821_mate_r_state::pc9821ra333(machine_config &config)
@@ -1002,11 +1054,17 @@ void pc9821_mate_r_state::pc9821ra333(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	// Celeron @ 333
 	// 128KB CPU cache RAM
+	// 32MB, max 256 MB (ECC EDO RAM)
 	// Trident TGUI9682XGi + integrated 98 gfx card
 	// 3x cbus + 2x PCI slots
 	// 6GB HDD
+	// 3.5"x1, 24xCD-ROM
 	// built-in ethernet 100BASE-TX/10BASE-T
+
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 // 9821 NOTE machine configs
@@ -1099,6 +1157,9 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 98MATE A - 80486SX 25
 
 TODO: should access SDIP from $00f6, most likely a partial A Mate dump instead
+
+Retire not done because we depend on this.
+
 */
 
 ROM_START( pc9821 )
@@ -1148,13 +1209,9 @@ ROM_START( pc9821as )
 ROM_END
 
 /*
-PC-9821AP2/U8W
-80486DX2 66MHz
-DOS 5.0, Windows 3.1
-5.6MB RAM, up to 73.6MB
-340MB HD
-Expansion slot C-BUS4 (4)
-Graphics controller S3 86C928
+
+Ap2/U8W
+
 */
 
 ROM_START( pc9821ap2 )
@@ -1194,7 +1251,7 @@ ROM_END
 98NOTE - i486SX 33
 
 NOTE: regular Ne shouldn't have Pico|Power Redwood PT86C768, and bios_ne.rom accesses one.
-Incomplete dump, will require standalone driver out of interactions with PMC so removed.
+Incomplete dump, will require on-board C-Bus slot out of interactions with PMC so removed.
 
 cfr. https://github.com/angelosa/mame_scratch/blob/main/src/redwood1.cpp
 
@@ -1206,13 +1263,7 @@ cfr. https://github.com/angelosa/mame_scratch/blob/main/src/redwood1.cpp
 //  ROM_LOAD( "font_ne.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
 
 /*
-98MULTi Ce - 80486SX 25
-
-3.5 x2
-1.6MB ~ 14.6MB model S1
-5.6MB ~ 14.6MB model S2
-pc9801-86
-
+98MULTi Ce - 80486SX @ 25
 */
 
 ROM_START( pc9821ce )
@@ -1327,21 +1378,20 @@ ROM_END
 
 /*
 98MATE X - 486/Pentium based
+
+Retired: not very useful without actual code
 */
 
-ROM_START( pc9821xs )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// "ROM SUM ERROR"
-	ROM_LOAD( "itf.rom",         0x10000, 0x008000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-	ROM_LOAD( "bios_xs.rom",     0x18000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+//ROM_START( pc9821xs )
+//	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+//	// "ROM SUM ERROR"
+//	ROM_LOAD( "itf.rom",         0x10000, 0x008000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//	ROM_LOAD( "bios_xs.rom",     0x18000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+//	// tested in RAM at PC=0 onward (specifically PC=1c)
+//	ROM_FILL( 0x2fffe, 1, 0x0d )
 
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_xs.rom",     0x00000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
-
+//	ROM_REGION( 0x80000, "chargen", 0 )
+//	ROM_LOAD( "font_xs.rom",     0x00000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
 /*
 9821Xa16
@@ -1372,12 +1422,7 @@ ROM_START( pc9821xa16 )
 ROM_END
 
 /*
-PC-9821Ra20 (98MATE R)
-
-Pentium Pro @ 200
-32MB
-3.5"2DD/2HDx1, 8xCD-ROM
-CBus: 3 slots
+Ra20 (98MATE R) - Pentium Pro @ 200
 */
 
 ROM_START( pc9821ra20 )
@@ -1397,17 +1442,7 @@ ROM_START( pc9821ra20 )
 ROM_END
 
 /*
-PC-9821Ra266
-
-Pentium II @ 266 MHz
-Trident TGUI9682XGi
-32MB, max 256 MB (ECC EDO RAM)
-3.5x1, 16xCD-ROM
-CBus: 3 slots, PCI: 2 slots
-PCI Intel 440FX (Natoma), PCI Rev. 2.1
-
-PC-9821Ra266/M30R has been re-released in 1998,
-unknown differences other than having Win98 pre-installed
+Ra266 - Pentium II @ 266 MHz
 */
 
 ROM_START( pc9821ra266 )
@@ -1427,12 +1462,7 @@ ROM_START( pc9821ra266 )
 ROM_END
 
 /*
-PC-9821Ra333 (98MATE R)
-
-Celeron @ 333
-32MB, max 256 MB (ECC EDO RAM)
-3.5x1, 24xCD-ROM
-CBus: 3 slots, PCI: 2 slots
+Ra333 (98MATE R)
 */
 
 ROM_START( pc9821ra333 )
@@ -1588,8 +1618,8 @@ COMP( 1995, pc9821cx3,  0,         0, pc9821cx3,    pc9821,   pc9821_canbe_state
 // ...
 
 // 98MATE X (i486sx/Pentium/Pentium Pro, has PCI, comes with various SVGA cards)
-COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING )
-COMP( 1996, pc9821xa16,  pc9821xs,    0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING )
+//COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING )
+COMP( 1996, pc9821xa16,  0,    0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING )
 
 // 98MATE VALUESTAR (Pentium, comes with Windows 95 and several programs pre-installed)
 //COMP( 1998, pc9821v13,   0,           0, pc9821v13,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
