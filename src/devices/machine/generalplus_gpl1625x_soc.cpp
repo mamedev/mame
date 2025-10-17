@@ -490,6 +490,70 @@
 // 7a65 - USBD_ISOOBufPointer 
 // 7a66 - USBD_ISOIBufPointer
 
+// 7a80 - DMA_Ctrl0
+// 7a81 - DMA_SRC_AddrL0 
+// 7a82 - DMA_TAR_AddrL0
+// 7a83 - DMA_TCountL0
+// 7a84 - DMA_SRC_AddrH0
+// 7a85 - DMA_TAR_AddrH0
+// 7a86 - DMA_TCountH0 
+// 7a87 - DMA_MISC0 
+// 7a88 - DMA_Ctrl1 
+// 7a89 - DMA_SRC_AddrL1
+// 7a8a - DMA_TAR_AddrL1
+// 7a8b - DMA_TCountL1
+// 7a8c - DMA_SRC_AddrH1
+// 7a8d - DMA_TAR_AddrH1
+// 7a8e - DMA_TCountH1
+// 7a8f - DMA_MISC1
+// 7a90 - DMA_Ctrl2
+// 7a91 - DMA_SRC_AddrL2 
+// 7a92 - DMA_TAR_AddrL2
+// 7a93 - DMA_TCountL2
+// 7a94 - DMA_SRC_AddrH2
+// 7a95 - DMA_TAR_AddrH2
+// 7a96 - DMA_TCountH2 
+// 7a97 - DMA_MISC2
+// 7a98 - DMA_Ctrl3
+// 7a99 - DMA_SRC_AddrL3
+// 7a9a - DMA_TAR_AddrL3
+// 7a9b - DMA_TCountL3
+// 7a9c - DMA_SRC_AddrH3
+// 7a9d - DMA_TAR_AddrH3
+// 7a9e - DMA_TCountH3
+// 7a9f - DMA_MISC3
+//
+// 7ab0 - DMA_SPRISIZE0
+// 7ab1 - DMA_SPRISIZE1
+// 7ab2 - DMA_SPRISIZE2
+// 7ab3 - DMA_SPRISIZE3
+//
+// 7abd - DMA_LineLength
+// 7abe - DMA_SS
+// 7abf - DMA_INT
+//
+// 7ac0 - KS_Ctrl1
+// 7ac1 - KS_Ctrl2
+// 7ac2 - KS_Addr 
+// 7ac3 - KS_Velocity 
+//
+// 7ac8 - KS_Data0
+// 7ac9 - KS_Data1
+// 7aca - KS_Data2
+// 7acb - KS_Data3
+// 7acc - KS_Data4
+// 7acd - KS_Data5
+// 7ace - KS_Data6
+// 7acf - KS_Data7
+// 7ad0 - KS_Data8
+// 7ad1 - KS_Data9
+// 7ad2 - KS_Data10
+//
+// 7ae0 - E-Fuse0
+// 7ae1 - E-Fuse1
+// 7ae2 - E-Fuse2
+// 7ae3 - E-Fuse3
+// 
 // 7af0 - Byte_Swap 
 // 7af1 - Nibble_Swap
 // 7af2 - TwoBit_Swap
