@@ -92,6 +92,15 @@ MPCs on other hardware:
 #include "video/hd61830.h"
 #include "bus/midi/midi.h"
 #include "bus/nscsi/devices.h"
+#include "formats/dfi_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/td0_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/pc_dsk.h"
+#include "formats/ipf_dsk.h"
 #include "speaker.h"
 #include "screen.h"
 #include "emupal.h"
@@ -99,6 +108,7 @@ MPCs on other hardware:
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
 #include "machine/mb87030.h"
+#include "machine/nvram.h"
 #include "machine/pit8253.h"
 #include "machine/te7774.h"
 #include "machine/upd765.h"
@@ -149,6 +159,8 @@ private:
 	void dma_mem16w_cb(offs_t offset, uint16_t data);
 	void mpc3000_palette(palette_device &palette) const;
 
+	uint8_t fdc_hc365_r();
+
 	uint8_t subcpu_pa_r();
 	uint8_t subcpu_pb_r();
 	void subcpu_pb_w(uint8_t data);
@@ -168,8 +180,8 @@ void mpc3000_state::machine_reset()
 void mpc3000_state::mpc3000_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).mirror(0x80000).rom().region("maincpu", 0);
-	map(0x300000, 0x3fffff).ram();
-	map(0x500000, 0x500fff).ram(); // actually 8-bit battery-backed RAM
+	map(0x300000, 0x3fffff).ram();  // 2x HM658512 (512Kx8)
+	map(0x500000, 0x500fff).share("nvram");
 }
 
 void mpc3000_state::mpc3000_io_map(address_map &map)
@@ -186,8 +198,19 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x00e0, 0x00e0).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x00e2, 0x00e2).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x00e8, 0x00eb).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
+	map(0x00e8, 0x00eb).r(FUNC(mpc3000_state::fdc_hc365_r)).umask16(0xff00);
 	map(0x00f0, 0x00f7).rw("synctmr", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	map(0x00f8, 0x00ff).rw("adcexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+}
+
+// bit 0 = ED   (no idea, disk eject?)
+// bit 1 = /EDD (enhanced density if 0, DD/HD if 1?)
+// bit 2 = /HDD (high density if 0, double density if 1)
+// bits 3 & 4 = footswitches
+uint8_t mpc3000_state::fdc_hc365_r()
+{
+	uint8_t rv = m_floppy->get_device()->floppy_is_hd() ? 0x00 : 0x04;
+	return rv;
 }
 
 uint16_t mpc3000_state::dma_mem16r_cb(offs_t offset)
@@ -220,6 +243,7 @@ void mpc3000_state::mpc3000_palette(palette_device &palette) const
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
+
 uint8_t mpc3000_state::subcpu_pa_r()
 {
 	return m_keys[7 - m_key_scan_row]->read();
@@ -233,20 +257,30 @@ uint8_t mpc3000_state::subcpu_pb_r()
 // drum pad row select, active low
 void mpc3000_state::subcpu_pb_w(uint8_t data)
 {
-//  printf("subcpu port B = %02x\n", data);
 }
 
 // main buttons row select (PC1-PC3)
 void mpc3000_state::subcpu_pc_w(uint8_t data)
 {
-//  printf("subcpu port C = %02x (%02x)\n", data, data ^ 0xff);
 	m_key_scan_row = ((data ^ 0xff) >> 1) & 7;
-//  printf("port C = %02x => row %d\n", data, m_key_scan_row);
 }
 
 void mpc3000_state::floppies(device_slot_interface &device)
 {
+	device.option_add("35dd", FLOPPY_35_DD);
 	device.option_add("35hd", FLOPPY_35_HD);
+}
+
+static void add_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_DFI_FORMAT);
+	fr.add(FLOPPY_MFM_FORMAT);
+	fr.add(FLOPPY_TD0_FORMAT);
+	fr.add(FLOPPY_IMD_FORMAT);
+	fr.add(FLOPPY_DSK_FORMAT);
+	fr.add(FLOPPY_PC_FORMAT);
+	fr.add(FLOPPY_IPF_FORMAT);
+	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 void mpc3000_state::mpc3000(machine_config &config)
@@ -316,11 +350,13 @@ void mpc3000_state::mpc3000(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(mpc3000_state::mpc3000_palette), 2);
 
+	NVRAM(config, "nvram");     // LC3517 2048x8 SRAM with battery backup
+
 	UPD72069(config, m_fdc, V53_CLKOUT); // TODO: upd72069 supports motor control
 	m_fdc->intrq_wr_callback().set("intp3", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<1>));
 
-	FLOPPY_CONNECTOR(config, m_floppy, mpc3000_state::floppies, "35hd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy, mpc3000_state::floppies, "35hd", add_formats).enable_sound(true);
 
 	pit8254_device &pit(PIT8254(config, "synctmr", 0)); // MB89254
 	pit.set_clk<0>(V53_PCLKOUT);
@@ -373,7 +409,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	L7A1045(config, m_dsp, 33.8688_MHz_XTAL / 2); // clock verified by schematic
+	L7A1045(config, m_dsp, 33.8688_MHz_XTAL); // clock verified by schematic
 	m_dsp->drq_handler_cb().set(m_maincpu, FUNC(v53a_device::dreq_w<3>));
 	m_dsp->add_route(0, "speaker", 1.0, 0);
 	m_dsp->add_route(1, "speaker", 1.0, 1);
