@@ -868,7 +868,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7039 - LightPen_Control 
 // 703a - Palette_Control
 // 703b
-// 703c
+// 703c - TV_Control
 // 703d
 // 703e - LPHPosition
 // 703f - LPVPosition
@@ -876,8 +876,29 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7041
 // 7042 - SControl
 
-// 7062 - PPU_IRQ_EN
-// 7063 - PPU_IRQ_Status
+// 7050 - TFT_Ctrl
+// 7051 - TFT_V_Width       or STN_COM_Clip
+// 7052 - TFT_VSync_Setup
+// 7053 - TFT_V_Start
+// 7054 - TFT_V_End
+// 7055 - TFT_H_Width
+// 7056 - TFT_HSync_Setup
+// 7057 - TFT_H_ Start
+// 7058 - TFT_H_ End
+// 7059 - TFT_RGB_Ctrl
+// 705a - TFT_Status
+// 705b - TFT_MemMode_WriteCMD
+// 705c - TFT_MemMode_ReadCMD 
+
+// 705f - STN_Ctrl1 
+
+// 7062 - PPU_IRQ_EN     or TFT_INT_EN
+// 7063 - PPU_IRQ_Status or TFT_INT_CLR
+
+// 706c - TFT_V_Show_Start
+// 706d - TFT_V_Show_End
+// 706e - TFT_H_Show_Start
+// 706f - TFT_H_Show_End
 
 // 7070 - SPDMA_Source
 // 7071 - SPDMA_Target
@@ -894,6 +915,16 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 707e - PPU_RAM_Bank
 // 707f - PPU_Enable
 
+// 7080 - TV_Saturation  or STN_SEG
+// 7081 - TV_Hue         or STN_COM  
+// 7082 - TV_Brightness  or STN_PIC_COM 
+// 7083 - TV_Sharpness   or STN_CPWAIT    
+// 7084 - TV_Y_Gain      or STN_Ctrl2     
+// 7085 - TV_Y_Delay     or STN_GTG_SEG  
+// 7086 - TV_V_Position  or STN_GTG_COM  
+// 7087 - TV_H_Position  or STN_SEG_Clip 
+// 7088 - TV_VideoDAC
+// 
 // 70b0 - Tx1_AttributeH
 // 70b1 - Tx2_AttributeH
 // 70b2 - Tx3_AttributeH
