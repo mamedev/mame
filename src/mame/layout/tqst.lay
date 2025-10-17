@@ -89,6 +89,5 @@ license: CC0-1.0
 		</element>
 
 		<!-- lamps 64-72, 80-88, and 96-102 are part of the lamp test, but have unknown functions -->
-
 	</view>
 </mamelayout>
