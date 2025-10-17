@@ -839,15 +839,13 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 701c - VComValue
 // 701d - VComOffset
 // 701e - VComStep
-// 701f
+//
 // 7020 - Segment_Tx1
 // 7021 - Segment_Tx2
 // 7022 - Segment_sp
 // 7023 - Segment_Tx3
 // 7024 - Segment_Tx4
-// 7025
-// 7026
-// 7027
+//
 // 7028 - Tx4_Cosine
 // 7029 - Tx4_Sine 
 // 702a - Blending
@@ -857,26 +855,21 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 702e - Segment_Tx3H
 // 702f - Segment_Tx4H
 // 7030 - Fade_Control
-// 7031
-// 7032
-// 7033
-// 7034
-// 7035
+//
 // 7036 - IRQTMV
 // 7037 - IRQTMH
 // 7038 - Line_Counter
 // 7039 - LightPen_Control 
 // 703a - Palette_Control
-// 703b
+//
 // 703c - TV_Control
-// 703d
+//
 // 703e - LPHPosition
 // 703f - LPVPosition
-// 7040
-// 7041
+//
 // 7042 - SControl
-
-// 7050 - TFT_Ctrl
+//
+// 7050 - TFT_Ctrl    (bit 0 is TFT enable, which presumable changes the mappings at 7062/7063 from PPU to TFT)
 // 7051 - TFT_V_Width       or STN_COM_Clip
 // 7052 - TFT_VSync_Setup
 // 7053 - TFT_V_Start
@@ -889,23 +882,23 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 705a - TFT_Status
 // 705b - TFT_MemMode_WriteCMD
 // 705c - TFT_MemMode_ReadCMD 
-
-// 705f - STN_Ctrl1 
-
+//
+// 705f - STN_Ctrl1   (bit 0 is STN enable, which presumably changes the mappings at 708x and 7051 from TV/TFT to STN regs)
+//
 // 7062 - PPU_IRQ_EN     or TFT_INT_EN
 // 7063 - PPU_IRQ_Status or TFT_INT_CLR
-
+//
 // 706c - TFT_V_Show_Start
 // 706d - TFT_V_Show_End
 // 706e - TFT_H_Show_Start
 // 706f - TFT_H_Show_End
-
+//
 // 7070 - SPDMA_Source
 // 7071 - SPDMA_Target
 // 7072 - SPDMA_Number 
 // 7073 - HB_Ctrl
 // 7074 - HB_GO
-
+//
 // 7078 - FBI_Addr
 // 7079 - FBI_AddrH
 // 707a - FBO_AddrL
@@ -914,7 +907,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 707d - BLD_Color
 // 707e - PPU_RAM_Bank
 // 707f - PPU_Enable
-
+//
 // 7080 - TV_Saturation  or STN_SEG
 // 7081 - TV_Hue         or STN_COM  
 // 7082 - TV_Brightness  or STN_PIC_COM 
@@ -939,17 +932,17 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 70bb - Tx4_A_PTRH
 // 
 // 70d8 - BLD_Enable 
-
+//
 // 70e0 - Random0
 // 70e1 - Random1
-
+//
 // 7100 to 71ff - Tx_Hvoffset
 // 7200 to 72ff - HCMValue
 // 7300 to 73ff - Palette0 / Palette1 / Palette2 / Palette3 (4 banks)
 // 7400 to 77ff - Spriteram (2 banks) (one bank is 7400-77ff, other bank is 7400-74ff)
-
+//
 // 7800 - BodyID
-
+//
 // 7803 - SYS_CTRL
 // 7804 - CLK_Ctrl0
 // 7805 - CLK_Ctrl1
@@ -962,16 +955,16 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 780d - HALT
 // 780e - SLEEP
 // 780f - Power_State
-
+//
 // 7810 - BankSwitch_Ctrl 
-
+//
 // 7817 - PLLChange
 // 7818 - PLLCLKWait
 // 7819 - Cache_Ctrl
 // 781a - Cache_HitRate
-
+//
 // 781f - IO_SR_SMT
-
+//
 // 7820 - MCS0_Ctrl
 // 7821 - MCS1_Ctrl
 // 7822 - MCS2_Ctrl 
@@ -987,19 +980,19 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 782c - MCS4_TimingCtrl
 // 782d - RAW_WAR
 // 782e - NOR_WHold
-
+//
 // 7835 - MCS0_Page
 // 7836 - MCS1_Page
 // 7837 - MCS2_Page
 // 7838 - MCS3_Page 
 // 7839 - MCS4_Page
-
+//
 // 7840 - Mem_Ctrl
 // 7841 - Addr_Ctrl
-
+//
 // 787e - MCS_Drv
 // 787f - MCS_Dly
-
+//
 // 7888 - MEM_Drv
 // 7889 - MEM_Dly0
 // 788a - MEM_Dly1
@@ -1008,45 +1001,45 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 788d - MEM_Dly4
 // 788e - MEM_Dly5
 // 788f - MEM_Dly6
-
+//
 // 78a0 - INT_Status1
 // 78a1 - INT_Status2
-
+//
 // 78a3 - INT_Status3
 // 78a4 - INT_Priority1
 // 78a5 - INT_Priority2
 // 78a6 - INT_Priority3
-
+//
 // 78a8 - MINT_Ctrl
-
+//
 // 78b0 - TimeBaseA_Ctrl
 // 78b1 - TimeBaseB_Ctrl
 // 78b2 - TimeBaseC_Ctrl
 // 
 // 78b8 - TimeBase_Reset
-
+//
 // 78c0 - TimerA_Ctrl
 // 78c1 - TimerA_CCCtrl
 // 78c2 - TimerA_Preload
 // 78c3 - TimerA_CCReg
 // 78c4 - TimerA_UpCount
-
+//
 // 78c8 - TimerB_Ctrl
 // 78c9 - TimerB_CCCtrl
 // 78ca - TimerB_Preload
 // 78cb - TimerB_CCReg
 // 78cc - TimerB_UpCount
-
+//
 // 78d0 - TimerC_Ctrl
 // 78d1 - TimerC_CCCtrl
 // 78d2 - TimerC_Preload
 // 78d3 - TimerC_CCReg
 // 78d4 - TimerC_UpCount
-
+//
 // 78d8 - TimerD_Ctrl
 // 78da - TimerD_Preload
 // 78dc - TimerD_UpCount
-
+//
 // 78e0 - TimerE_Ctrl
 // 78e2 - TimerE_Preload
 // 78e4 - TimerE_UpCount
@@ -1054,37 +1047,37 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 78e8 - TimerF_Ctrl
 // 78ea - TimerF_Preload
 // 78ec - TimerF_UpCount 
-
+//
 // 78f0 - CHA_Ctrl
 // 78f1 - CHA_Data
 // 78f2 - CHA_FIFO
-
+//
 // 78f8 - CHB_Ctrl
 // 78f9 - CHB_Data
 // 78fa - CHB_FIFO
 // 78fb - DAC_PGA
-
+//
 // 78ff - IISEN
-
+//
 // 7920 - Second
 // 7921 - Minute
 // 7922 - Hour
 // 7924 - Alarm_Second
 // 7925 - Alarm_Minute
 // 7926 - Alarm_Hour
-
+//
 // 7934 - RTC_Ctrl
 // 7935 - RTC_INT_Status
 // 7936 - RTC_INT_Ctrl
 // 7937 - RTC_Busy 
-
+//
 // 7940 - SPI_Ctrl
 // 7941 - SPI_TXStatus
 // 7942 - SPI_TXData
 // 7943 - SPI_RXStatus
 // 7944 - SPI_RXData
 // 7945 - SPI_Misc
-
+//
 // 79a0 - DividendH
 // 79a1 - Dividend
 // 79a2 - DivisorH
@@ -1094,7 +1087,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 79a6 - RemainderH
 // 79a7 - Remainder
 // 79a8 - Divider_Status 
-
+//
 // 79e0 - SD2_DataTX
 // 79e1 - SD2_DataRX
 // 79e2 - SD2_CMD
@@ -1106,7 +1099,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 79e8 - SD2_Ctrl
 // 79e9 - SD2_BLKLEN
 // 79ea - SD2_INT
-
+//
 // 7a80 - DMA_Ctrl0
 // 7a81 - DMA_SRC_AddrL0
 // 7a82 - DMA_TAR_AddrL0
@@ -1123,7 +1116,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7a8d - DMA_TAR_AddrH1
 // 7a8e - DMA_TCountH1
 // 7a8f - DMA_MISC1
-
+//
 // 7ab0 - DMA_SPRISIZE0
 // 7ab1 - DMA_SPRISIZE1 
 //
@@ -1136,16 +1129,48 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7af2 - TwoBit_Swap
 // 7af3 - Bit_Reverse
 //
-// 7b00 to 7b9f - sound channels 0-15
+// (Sound)
+// 7b80 - Channel Enable
+// 7b81 - Main volume
+// 7b82 - Channel FIQ Enable
+// 7b83 - Channel FIQ Status
+// 7b84 - Beat base counter
+// 7b85 - Beat counter
+// 7b86 - Envelope interval select (Ch 3-0)
+// 7b87 - Envelope interval select (Ch 7-4)
+// 7b88 - Envelope interval select (Ch 11-8)
+// 7b89 - Envelope interval select (Ch 15-12)
+// 7b8a - Envelope fast ramp down
+// 7b8b - Stop channel status
+//
+// 7b8d - Control Flags
+// 7b8e - Compressor Control
+// 7b8f - Channel status
+// 7b90 - Left channel mixer input
+// 7b91 - Right channel mixer input
+// 7b92 - Left channel mixer output
+// 7b93 - Right channel mixer output
+// 7b94 - Channel Repeat Enable control
+// 7b95 - Channel Env Mode
+// 7b96 - Channel Tone Release Control
+// 7b97 - Channel Env Irq Status
+// 7b98 - Channel Pitch Bend Enable
+//
+// 7b9a - Attack/Release Time Control
+//
+// 7b9f - Wave Table Bank Address
+// 
 // 7ba5 - SPU_CtrPW
+// 
 // 7bb2 - SPU_CtrPWaveOutL 
 // 7bb3 - SPU_CtrPWaveOutR
+//
 // 7bb6 - SPU_CtrChToneRelease_H
 //
-// 7c00 - 7cff Sound
-// 7e00 - 7eff Sound
+// 7c00 - 7cff Sound Attribute
+// 7e00 - 7eff Sound Phase
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GPAC800A register list
 // TODO:
 
