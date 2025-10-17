@@ -1,0 +1,425 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Felipe Sanches
+-->
+<mamelayout version="2">
+
+	<element name="metal_sheet">
+		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<element name="kb_panel">
+		<image><data><![CDATA[
+			<svg width="960" height="550">
+				<!-- bounds of the printed sheet with the keyboard art -->
+				<rect fill="#21221f" stroke="none" x="0" y="0" width="960" height="550" rx="20" ry="20" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="power_on_led">
+		<disk><color red="0.7" green="0" blue="0" /></disk>
+	</element>
+
+	<element name="grey_key_61" defstate="0">
+		<rect>
+			<color state="0" red="0.4" green="0.4" blue="0.4" />
+			<color state="1" red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="61" height="61"/>
+		</rect>
+		<rect>
+			<color state="0" red="0.6" green="0.6" blue="0.6" />
+			<color state="1" red="0.3" green="0.3" blue="0.3" />
+			<bounds x="7" y="7" width="48" height="48"/>
+		</rect>
+	</element>
+
+	<element name="yellow_key_61" defstate="0">
+		<rect>
+			<color state="0" red="0.4" green="0.4" blue="0.4" />
+			<color state="1" red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="61" height="61"/>
+		</rect>
+		<rect>
+			<color state="0" red="0.67" green="0.58" blue="0.13" />
+			<color state="1" red="0.34" green="0.30" blue="0.06" />
+			<bounds x="7" y="7" width="48" height="48"/>
+		</rect>
+	</element>
+
+	<element name="yellow_key_84" defstate="0">
+		<rect>
+			<color state="0" red="0.4" green="0.4" blue="0.4" />
+			<color state="1" red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="84" height="61"/>
+		</rect>
+		<rect>
+			<color state="0" red="0.67" green="0.58" blue="0.13" />
+			<color state="1" red="0.34" green="0.30" blue="0.06" />
+			<bounds x="7" y="7" width="71" height="48"/>
+		</rect>
+	</element>
+
+	<element name="yellow_key_101" defstate="0">
+		<rect>
+			<color state="0" red="0.4" green="0.4" blue="0.4" />
+			<color state="1" red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="101" height="61"/>
+		</rect>
+		<rect>
+			<color state="0" red="0.67" green="0.58" blue="0.13" />
+			<color state="1" red="0.34" green="0.30" blue="0.06" />
+			<bounds x="7" y="7" width="88" height="48"/>
+		</rect>
+	</element>
+
+	<element name="grey_key_109" defstate="0">
+		<rect>
+			<color state="0" red="0.4" green="0.4" blue="0.4" />
+			<color state="1" red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="109" height="61"/>
+		</rect>
+		<rect>
+			<color state="0" red="0.6" green="0.6" blue="0.6" />
+			<color state="1" red="0.3" green="0.3" blue="0.3" />
+			<bounds x="7" y="7" width="96" height="48"/>
+		</rect>
+	</element>
+
+	<element name="grey_key_502" defstate="0"> <!-- the space bar -->
+		<rect>
+			<color state="0" red="0.4" green="0.4" blue="0.4" />
+			<color state="1" red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="502" height="61"/>
+		</rect>
+		<rect>
+			<color state="0" red="0.6" green="0.6" blue="0.6" />
+			<color state="1" red="0.3" green="0.3" blue="0.3" />
+			<bounds x="7" y="7" width="489" height="48"/>
+		</rect>
+	</element>
+
+	<element name="blue_line">
+		<rect><color red="0.33" green="0.58" blue="0.82" /></rect>
+	</element>
+
+	<element name="black_rect">
+		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<element name="grey_rect">
+		<rect>
+			<color state="0" red="0.6" green="0.6" blue="0.6" />
+			<color state="1" red="0.3" green="0.3" blue="0.3" />
+		</rect>
+	</element>
+
+	<element name="right_arrow">
+		<image><data><![CDATA[
+			<svg width="28" height="7">
+				<path fill="#191919" stroke="none" d="
+					M 15.1,0 V 2.3 H 0 v 2.4 H 15.1 v 2.3 l 12.9,-3.5 z
+				"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="up_arrow">
+		<image><data><![CDATA[
+			<svg width="7" height="16">
+				<path fill="#191919" stroke="none" d="
+					M 0,12.4 H 2.3 v 3.6 h 2.4 v -3.6 h 2.3 l -3.5,-12.4 z				
+				"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+
+	<element name="vet_text"><text string="VET"><color red="0.33" green="0.58" blue="0.82" /></text></element>
+	<element name="3000_text"><text string="3000"><color red="0.33" green="0.58" blue="0.82" /></text></element>
+	<element name="video_titler_text"><text string="Video Titler"><color red="0.33" green="0.58" blue="0.82" /></text></element>
+
+	<element name="tms_text"><text string="tms"><color red="0.33" green="0.58" blue="0.82" /></text></element>
+	<element name="video_text"><text string="video"><color red="0.33" green="0.58" blue="0.82" /></text></element>
+
+	<element name="1_1_text"><text string="1"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_2_text"><text string="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_3_text"><text string="3"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_4_text"><text string="4"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_5_text"><text string="5"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_6_text"><text string="6"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_7_text"><text string="7"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_8_text"><text string="8"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_9_text"><text string="9"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_10_text"><text string="0"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1_11_text"><text string=":"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="1c_1_text"><text string="á"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_2_text"><text string="â"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_3_text"><text string="ã"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_4_text"><text string="à"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_5_text"><text string="é"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_6_text"><text string="ê"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_7_text"><text string="í"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_8_text"><text string="ó"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_9_text"><text string="ô"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_10_text"><text string="õ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1c_11_text"><text string="ú"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="1s_1_text"><text string="!"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_2_text"><text string="?"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_3_text"><text string="."><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_4_text"><text string="$"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_5_text"><text string="%"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_6_text"><text string="-"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_7_text"><text string="&quot;"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_8_text"><text string="("><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_9_text"><text string=")"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_10_text"><text string=","><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="1s_11_text"><text string="/"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="2_1_text"><text string="Q"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2_2_text"><text string="W"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2_3_text"><text string="E"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2_4_text"><text string="R"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2_5_text"><text string="T"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2_6_text"><text string="Y"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2_7_text"><text string="U"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2_8_text"><text string="I"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2_9_text"><text string="O"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2_10_text"><text string="P"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="2c_1_text"><text string="ç"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2c_2_text"><text string="Á"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2c_3_text"><text string="Â"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2c_4_text"><text string="Ã"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2c_5_text"><text string="À"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2c_6_text"><text string="É"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2c_7_text"><text string="Ê"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2c_8_text"><text string="Í"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2c_9_text"><text string="Ó"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="2c_10_text"><text string="Ô"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="3_1_text"><text string="A"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3_2_text"><text string="S"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3_3_text"><text string="D"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3_4_text"><text string="F"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3_5_text"><text string="G"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3_6_text"><text string="H"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3_7_text"><text string="J"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3_8_text"><text string="K"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3_9_text"><text string="L"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="3c_1_text"><text string="Õ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3c_2_text"><text string="Ú"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="3c_3_text"><text string="Ç"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="4_1_text"><text string="Z"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="4_2_text"><text string="X"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="4_3_text"><text string="C"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="4_4_text"><text string="V"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="4_5_text"><text string="B"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="4_6_text"><text string="N"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="4_7_text"><text string="M"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<element name="ext_text"><text string="EXT"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="mode_text"><text string="MODE"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="control_text"><text string="CONTROL"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="shift_text"><text string="SHIFT"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="cursor_text"><text string="CURSOR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="obj_text"><text string="OBJ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="clear_text"><text string="CLEAR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="return_text"><text string="RETURN"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="auto_text"><text string="AUTO"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="center_text"><text string="CENTER"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="C_text"><text string="C"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="border_text"><text string="BORDER"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="blank_text"><text string="BLANK"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="color_text"><text string="COLOR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="page_text"><text string="PAGE"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+
+	<group name="Keyboard">
+		<bounds x="-10" y="-33" width="1000" height="648"/>
+		<element ref="metal_sheet"><bounds x="-10" y="-33" width="1000" height="648"/></element>
+
+		<element ref="kb_panel"><bounds x="10" y="16" width="960" height="550"/></element>
+		<element ref="power_on_led"><bounds x="13" y="0" width="7" height="7" /></element>
+
+		<element ref="vet_text"><bounds x="452" y="40" width="113" height="70"/></element>
+		<element ref="3000_text"><bounds x="561" y="61" width="132" height="70"/></element>
+		<element ref="video_titler_text"><bounds x="757" y="62" width="180" height="40"/></element>
+
+		<element ref="blue_line"><bounds x="44" y="106" width="510" height="8"/></element>
+		<element ref="blue_line"><bounds x="695" y="106" width="241" height="8"/></element>
+		<element ref="blue_line"><bounds x="44" y="122" width="892" height="15"/></element>
+
+		<element ref="tms_text"><bounds x="820" y="494" width="118" height="58"/></element>
+		<element ref="video_text"><bounds x="850" y="540" width="48" height="17"/></element>
+
+		<!-- first row of keys (top one) -->
+		<element ref="grey_key_61" inputtag="ROW1" inputmask="0x01"><!-- 1 --><bounds x="85" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW2" inputmask="0x01"><!-- 2 --><bounds x="148" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW3" inputmask="0x01"><!-- 3 --><bounds x="211" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW4" inputmask="0x01"><!-- 4 --><bounds x="274" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW5" inputmask="0x01"><!-- 5 --><bounds x="337" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW6" inputmask="0x01"><!-- 6 --><bounds x="400" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW1" inputmask="0x10"><!-- 7 --><bounds x="463" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW2" inputmask="0x10"><!-- 8 --><bounds x="526" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW3" inputmask="0x10"><!-- 9 --><bounds x="589" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW4" inputmask="0x10"><!-- 0 --><bounds x="652" y="202" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW5" inputmask="0x10"><!-- : --><bounds x="715" y="202" width="61" height="61"/></element>
+
+		<element ref="yellow_key_61" inputtag="ROW6" inputmask="0x10"><!-- Up / Down --><bounds x="778" y="202" width="61" height="61"/></element>
+		<element ref="up_arrow"><bounds x="805.5" y="214" width="7" height="16"/></element>
+		<element ref="up_arrow"><orientation rotate="180" /><bounds x="805.5" y="236" width="7" height="16"/></element>
+		
+		<element ref="yellow_key_61" inputtag="ROW7" inputmask="0x10"><!-- Left / Right --><bounds x="841" y="202" width="61" height="61"/></element>
+		<element ref="right_arrow"><bounds x="858" y="220" width="28" height="7"/></element>
+		<element ref="right_arrow"><orientation rotate="180" /><bounds x="858" y="239" width="28" height="7"/></element>
+
+		<repeat count="11">
+			<param name="n" start="1" increment="1" />
+			<param name="x" start="98" increment="63" />
+			<param name="xs" start="107" increment="63" />
+			<param name="xc" start="125" increment="63" />
+			<element ref="1_~n~_text"><bounds x="~x~" y="232" width="14" height="25"/></element>
+			<element ref="1s_~n~_text"><bounds x="~xs~" y="212" width="8" height="18"/></element>
+			<element ref="1c_~n~_text"><bounds x="~xc~" y="238" width="6" height="15"/></element>
+		</repeat>
+
+		<!-- 2nd row of keys -->
+		<element ref="yellow_key_61" inputtag="ROW3" inputmask="0x08"><!-- EXT / MODE --><bounds x="52" y="265" width="61" height="61"/></element>
+		<element ref="ext_text"><bounds x="73" y="283" width="21" height="12"/></element>
+		<element ref="mode_text"><bounds x="69" y="300" width="28" height="12"/></element>
+
+		<element ref="grey_key_61" inputtag="ROW1" inputmask="0x02"><!-- Q --><bounds x="115" y="265" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW2" inputmask="0x02"><!-- W --><bounds x="178" y="265" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW3" inputmask="0x02"><!-- E --><bounds x="241" y="265" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW4" inputmask="0x02"><!-- R --><bounds x="304" y="265" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW5" inputmask="0x02"><!-- T --><bounds x="367" y="265" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW6" inputmask="0x02"><!-- Y --><bounds x="430" y="265" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW1" inputmask="0x20"><!-- U --><bounds x="493" y="265" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW2" inputmask="0x20"><!-- I --><bounds x="556" y="265" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW3" inputmask="0x20"><!-- O --><bounds x="619" y="265" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW4" inputmask="0x20"><!-- P --><bounds x="682" y="265" width="61" height="61"/></element>
+
+		<element ref="yellow_key_61" inputtag="ROW5" inputmask="0x20"><!-- CURSOR --><bounds x="745" y="265" width="61" height="61"/></element>
+		<element ref="cursor_text"><bounds x="754" y="286" width="44" height="12"/></element>
+
+		<element ref="yellow_key_61" inputtag="ROW6" inputmask="0x20"><!-- OBJ --><bounds x="808" y="265" width="61" height="61"/></element>
+		<element ref="obj_text"><bounds x="829" y="286" width="21" height="12"/></element>
+
+		<element ref="yellow_key_61" inputtag="ROW7" inputmask="0x20"><!-- CLEAR --><bounds x="871" y="265" width="61" height="61"/></element>
+		<element ref="clear_text"><bounds x="884" y="286" width="36" height="12"/></element>
+
+		<repeat count="10">
+			<param name="n" start="1" increment="1" />
+			<param name="x" start="128" increment="63" />
+			<param name="xc" start="156" increment="63" />
+			<element ref="2_~n~_text"><bounds x="~x~" y="275" width="14" height="25"/></element>
+			<element ref="2c_~n~_text"><bounds x="~xc~" y="302" width="6" height="15"/></element>
+		</repeat>
+
+
+		<!-- 3rd row of keys -->
+		<element ref="yellow_key_84" inputtag="ROW2" inputmask="0x08"><!-- CONTROL --><bounds x="52" y="328" width="84" height="61"/></element>
+		<element ref="control_text"><bounds x="69" y="351" width="50" height="12"/></element>
+
+		<element ref="grey_key_61" inputtag="ROW1" inputmask="0x04"><!-- A --><bounds x="138" y="328" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW2" inputmask="0x04"><!-- S --><bounds x="201" y="328" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW3" inputmask="0x04"><!-- D --><bounds x="264" y="328" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW4" inputmask="0x04"><!-- F --><bounds x="327" y="328" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW5" inputmask="0x04"><!-- G --><bounds x="390" y="328" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW6" inputmask="0x04"><!-- H --><bounds x="453" y="328" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW1" inputmask="0x40"><!-- J --><bounds x="516" y="328" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW2" inputmask="0x40"><!-- K --><bounds x="579" y="328" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW3" inputmask="0x40"><!-- L --><bounds x="642" y="328" width="61" height="61"/></element>
+
+		<element ref="yellow_key_101" inputtag="ROW4" inputmask="0x40"><!-- RETURN --><bounds x="705" y="328" width="101" height="61"/></element>
+		<element ref="return_text"><bounds x="731" y="351" width="44" height="12"/></element>
+
+		<element ref="yellow_key_61" inputtag="ROW5" inputmask="0x40"><!-- AUTO CENTER --><bounds x="808" y="328" width="61" height="61"/></element>
+		<element ref="auto_text"><bounds x="824" y="343" width="29" height="12"/></element>
+		<element ref="center_text"><bounds x="817" y="357" width="44" height="12"/></element>
+
+		<element ref="yellow_key_61" inputtag="ROW6" inputmask="0x08"><!-- C --><bounds x="871" y="328" width="61" height="61"/></element>
+		<element ref="C_text"><bounds x="885" y="338" width="14" height="25"/></element>
+
+		<repeat count="9">
+			<param name="n" start="1" increment="1" />
+			<param name="x" start="152" increment="63" />
+			<element ref="3_~n~_text"><bounds x="~x~" y="338" width="14" height="25"/></element>
+		</repeat>
+		<repeat count="3">
+			<param name="n" start="1" increment="1" />
+			<param name="xc" start="178" increment="63" />
+			<element ref="3c_~n~_text"><bounds x="~xc~" y="365" width="6" height="15"/></element>
+		</repeat>
+
+		<repeat count="5">
+			<param name="x" start="360" increment="63" />
+			<element ref="black_rect"><bounds x="~x~" y="362" width="15" height="15"/></element>
+		</repeat>
+		<element ref="grey_rect" inputtag="ROW4" inputmask="0x04"><!-- symbol at F key --><bounds x="361" y="363" width="13" height="6"/></element>
+		<element ref="grey_rect" inputtag="ROW5" inputmask="0x04"><!-- symbol at G key --><bounds x="424" y="370" width="13" height="6"/></element>
+		<element ref="grey_rect" inputtag="ROW6" inputmask="0x04"><!-- symbol at H key --><bounds x="494" y="363" width="6" height="13"/></element>
+		<element ref="grey_rect" inputtag="ROW1" inputmask="0x40"><!-- symbol at J key --><bounds x="550" y="363" width="6" height="13"/></element>
+
+
+		<!-- 4th row of keys -->
+		<element ref="grey_key_109" inputtag="ROW1" inputmask="0x08"><!-- SHIFT --><bounds x="52" y="391" width="109" height="61"/></element>
+		<element ref="shift_text"><bounds x="89" y="417" width="36" height="12"/></element>
+
+		<element ref="grey_key_61" inputtag="ROW7" inputmask="0x01"><!-- Z --><bounds x="172" y="391" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW7" inputmask="0x02"><!-- X --><bounds x="235" y="391" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW7" inputmask="0x04"><!-- C --><bounds x="298" y="391" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW7" inputmask="0x40"><!-- V --><bounds x="361" y="391" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW7" inputmask="0x80"><!-- B --><bounds x="424" y="391" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW1" inputmask="0x80"><!-- N --><bounds x="487" y="391" width="61" height="61"/></element>
+		<element ref="grey_key_61" inputtag="ROW2" inputmask="0x80"><!-- M --><bounds x="550" y="391" width="61" height="61"/></element>
+
+		<element ref="yellow_key_61" inputtag="ROW4" inputmask="0x80"><!-- BORDER BLANK --><bounds x="613" y="391" width="61" height="61"/></element>
+		<element ref="border_text"><bounds x="622" y="410" width="43" height="12"/></element>
+		<element ref="blank_text"><bounds x="626" y="425" width="36" height="12"/></element>
+
+		<element ref="yellow_key_61" inputtag="ROW5" inputmask="0x80"><!-- COLOR --><bounds x="676" y="391" width="61" height="61"/></element>
+		<element ref="color_text"><bounds x="689" y="417" width="36" height="12"/></element>
+
+		<element ref="yellow_key_61" inputtag="ROW6" inputmask="0x80"><!-- PAGE --><bounds x="739" y="391" width="61" height="61"/></element>
+		<element ref="page_text"><bounds x="756" y="417" width="28" height="12"/></element>
+
+		<element ref="grey_key_109" inputtag="ROW1" inputmask="0x08"><!-- SHIFT --><bounds x="808" y="391" width="109" height="61"/></element>
+		<element ref="shift_text"><bounds x="845" y="417" width="36" height="12"/></element>
+
+
+		<repeat count="7">
+			<param name="n" start="1" increment="1" />
+			<param name="x" start="186" increment="63" />
+			<element ref="4_~n~_text"><bounds x="~x~" y="401" width="14" height="25"/></element>
+		</repeat>
+
+
+		<!-- 5th row of keys (just the space bar) -->
+		<element ref="grey_key_502" inputtag="ROW3" inputmask="0x80"><!-- SPACEBAR --><bounds x="235" y="454" width="502" height="61"/></element>
+	</group>
+
+
+	<view name="Default Layout">
+		<bounds x="0" y="0" width="1840" height="648"/>
+
+		<group ref="Keyboard"><bounds x="0" y="0" width="1000" height="648"/></group>
+		<screen index="0"><bounds x="1000" y="0" width="840" height="648"/></screen>
+	</view>
+
+
+	<view name="Screen">
+		<screen index="0"><bounds x="0" y="0" width="840" height="648"/></screen>
+	</view>
+
+
+	<view name="Keyboard">
+		<group ref="Keyboard"><bounds x="0" y="0" width="1000" height="648"/></group>
+	</view>
+
+</mamelayout>
