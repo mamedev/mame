@@ -31,14 +31,9 @@ device_memory_interface::space_config_vector sound_pc9821ce_device::memory_space
 	};
 }
 
-// TODO: blank it for now (needs to load from driver machine_config instead)
-ROM_START( sound_pc9821ce )
-	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
-ROM_END
-
 const tiny_rom_entry *sound_pc9821ce_device::device_rom_region() const
 {
-	return ROM_NAME( sound_pc9821ce );
+	return nullptr;
 }
 
 void sound_pc9821ce_device::device_add_mconfig(machine_config &config)
@@ -157,14 +152,9 @@ device_memory_interface::space_config_vector sound_pc9821cx3_device::memory_spac
 	};
 }
 
-// TODO: blank it for now (needs to load from driver machine_config instead)
-ROM_START( sound_pc9821cx3 )
-	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
-ROM_END
-
 const tiny_rom_entry *sound_pc9821cx3_device::device_rom_region() const
 {
-	return ROM_NAME( sound_pc9821cx3 );
+	return nullptr;
 }
 
 void sound_pc9821cx3_device::device_add_mconfig(machine_config &config)

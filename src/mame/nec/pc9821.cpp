@@ -9,6 +9,8 @@ follow-up to PC-9801 for the consumer market
 References:
 - https://www.satotomi.com/sl9821/sl9821_tec5.html for PEGC MMIO
 - Mate-R_bible.pdf for late machine HW pics and info
+- https://retrostuff.org/2017/04/11/nec-pc-9821-bios-translation/
+
 
 TODO (pc9821):
 - non-fatal "cache error" at POST for all machines listed here;
@@ -39,12 +41,12 @@ TODO (pc9821cx3):
 - 0xfa2c8 contains ITF test routines, to access it's supposedly CTRL+CAPS+KANA,
   which currently doesn't work. It also never returns a valid processor or CPU clock,
   is it a debug side-effect or supposed to be read somehow?
-- Expects 0xc0000-0xdffff to be r/w at PC=0x104e8, currently failing for inner C-Bus mappings.
-  Is PCI supposed to overlay the C-Bus section?
-- Eventually jump off the weeds by taking an invalid irq in timer test;
-- Reportedly should display a CanBe logo at POST (always blue with white fg?),
-  at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
-  Where this is mapped is currently unknown;
+- Entering into setup mode (fd26a ax|=80), de-quiet splash screen (first menu, 3rd option)
+  then exit will have following effects:
+\- MAME hardlocks (?)
+\- fatal TIMER ERROR (often)
+\- non-fatal SIMM and 2nd cache errors (allows boot for a bit, will crash in
+   msdos62 with an error code 21)
 
 TODO (pc9821xa16/pc9821ra20/pc9821ra266/pc9821ra333):
 - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
@@ -681,8 +683,8 @@ void pc9821_canbe_state::pc9821cx3_map(address_map &map)
 	// bp 0xfd25a,1,{eax |= 0x91;g}
 	m_bios_view[4](0x000f8000, 0x000fffff).rom().region("biosrom", 0x38000);
 //	m_bios_view[5](0x000f8000, 0x000fffff).rom().region("biosrom", 0x30000);
-	// setup mode (assumed)
-//	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x40000);
+	// setup mode
+	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x40000);
 
 	// NEC PC-9800 series logo (same place as view 4?)
 	m_bios_view[8](0x000f8000, 0x000fffff).rom().region("biosrom", 0x38000);
@@ -1285,6 +1287,9 @@ ROM_START( pc9821ce )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
+	ROM_REGION( 0x4000, "cbus0:sound_pc9821ce:sound_bios", ROMREGION_ERASE00 )
+	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
+
 	LOAD_KANJI_ROMS
 	// Uses SCSI not IDE
 //	LOAD_IDE_ROM
@@ -1323,12 +1328,17 @@ ROM_START( pc9821cx3 )
 	// TODO: all of the 512k space seems valid
 	// all GFXs are 1bpp packed with different pitches
 	// 0 - 0x56xx: CanBe mascot GFX animations
-	// 0x1fda8 (?) - 0x2458f: monitor GFXs
+	// 0x08000 - 0x0ffff: empty (no checksum)
+	// 0x10000 - 0x104df: small x86 snippet
+	// 0x18000 - 0x1ffff: AJANIME4 (empty)
+	// 0x20000 - 0x2458f: monitor GFXs
 	// 0x24590 - 0x36xxx: more CanBe mascot GFX animations
 	// 0x38000: PnP bootblock?
 	// 0x3c000: NEC & CanBe logo GFXs
 	// 0x40000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
 	// 0x42000: setup menu
+	// 0x54000: sound BIOS
+	// 0x58000: PCI refs + ACFG, unknown
 	ROM_COPY( "biosrom", 0x78000, 0x10000, 0x08000 ) // ITF?
 	ROM_COPY( "biosrom", 0x70000, 0x18000, 0x08000 ) // BIOS?
 	ROM_COPY( "biosrom", 0x68000, 0x20000, 0x08000 )
@@ -1372,8 +1382,11 @@ ROM_START( pc9821cx3 )
 	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASE00 )
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 
+	ROM_REGION( 0x4000, "cbus0:sound_pc9821cx3:sound_bios", 0)
+	ROM_COPY( "biosrom", 0x54000, 0x00000, 0x04000 )
+
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
-	ROM_COPY( "biosrom", 0x58000, 0x00000, 0x02000 )
+	ROM_COPY( "biosrom", 0x40000, 0x00000, 0x02000 )
 ROM_END
 
 /*
