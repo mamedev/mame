@@ -3625,6 +3625,9 @@ void specnext_state::tbblue(machine_config &config)
 	m_im2->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+	m_ctc->zc_callback<1>().set(m_ctc, FUNC(z80ctc_device::trg2));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_ctc->intr_callback().set(FUNC(specnext_state::ctc_irq_on));
 
 	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
