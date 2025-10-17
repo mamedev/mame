@@ -66,4 +66,3 @@ void specnext_im2_device::device_reset()
 	m_vector_base = 0;
 	m_vector_lo = 0xff;
 }
-
