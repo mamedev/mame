@@ -61,14 +61,37 @@
 // 7039 - LightPen_Control
 // 703a - Palette_Control
 //
+// 703c - TV_Control
+// 
 // 703e - LPHPosition
 // 703f - LPVPosition
 //
 // 7042 - SControl
-// 
-// 7062 - PPU_IRQ_EN
-// 7063 - PPU_IRQ_Status
 //
+// 7050 - TFT_Ctrl 
+// 7051 - TFT_V_Width      or STN_COM_Clip
+// 7052 - TFT_VSync_Setup
+// 7053 - TFT_V_Start
+// 7054 - TFT_V_End 
+// 7055 - TFT_H_Width
+// 7056 - TFT_HSync_Setup
+// 7057 - TFT_H_ Start
+// 7058 - TFT_H_ End
+// 7059 - TFT_RGB_Ctrl 
+// 705a - TFT_Status 
+// 705b - TFT_MemMode_WriteCMD
+// 705c - TFT_MemMode_ReadCMD
+// 
+// 705f - STN_Ctrl1
+// 
+// 7062 - PPU_IRQ_EN      or TFT_INT_EN 
+// 7063 - PPU_IRQ_Status  or TFT_INT_CLR
+//
+// 706c - TFT_V_Show_Start
+// 706d - TFT_V_Show_End
+// 706e - TFT_H_Show_Start
+// 706f - TFT_H_Show_End 
+// 
 // 7070 - SPDMA_Source
 // 7071 - SPDMA_Target
 // 7072 - SPDMA_Number
@@ -82,6 +105,16 @@
 // 707e - PPU_RAM_Bank
 // 707f - PPU_Enable
 //
+// 7080 - TV_Saturation   or STN_SEG 
+// 7081 - TV_Hue          or STN_COM 
+// 7082 - TV_Brightness   or STN_PIC_COM
+// 7083 - TV_Sharpness    or STN_CPWAIT
+// 7084 - TV_Y_Gain       or STN_Ctrl2 
+// 7085 - TV_Y_Delay      or STN_GTG_SEG 
+// 7086 - TV_V_Position   or STN_GTG_COM
+// 7087 - TV_H_Position   or STN_SEG_Clip 
+// 7088 - TV_VedioDAC 
+// 
 // 7090 - TG_CTRL1
 // 7091 - TG_CTRL2
 // 7092 - TG_HLSTART
@@ -107,6 +140,8 @@
 // 70a6 - MD_FBADDRH
 // 70a7 - TG_H_RATIO
 // 70a8 - TG_V_RATIO
+// 70a9 - MD_HPOS
+// 70aa - MD_VPOS
 //
 // 7100 to 71ff - Tx_Hvoffset (when PPU_RAM_BANK is 0)
 // 7200 to 72ff - HCMValue (when PPU_RAM_BANK is 0)
@@ -118,25 +153,75 @@
 // 7400 to 74ff - Sprite0_Attribute list (when PPU_RAM_BANK is 1 and PPU_Enable bit 9 '3D' mode is disabled)
 // 7400 to 77ff - 3D sprite attribute list (when PPU_RAM_BANK is 1 and PPU_Enable bit 9 '3D' mode is enabled)
 //
-// 7800 - P_BodyID
-// 7803 - P_SYS_CTRL
-// 7804 - P_CLK_Ctrl0
-// 7805 - P_CLK_Ctrl1
-// 7806 - P_Reset_Flag
-// 7807 - P_Clock_Ctrl
-// 7808 - P_LVR_Ctrl
-// 780a - P_Watchdog_Ctrl
-// 780b - P_Watchdog_Clear
-// 780c - P_WAIT
-// 780d - P_HALT
-// 780e - P_SLEEP
-// 780f - P_Power_State
+// 7800 - BodyID
+// 7803 - SYS_CTRL
+// 7804 - CLK_Ctrl0
+// 7805 - CLK_Ctrl1
+// 7806 - Reset_Flag
+// 7807 - Clock_Ctrl
+// 7808 - LVR_Ctrl
+// 780a - Watchdog_Ctrl
+// 780b - Watchdog_Clear
+// 780c - WAIT
+// 780d - HALT
+// 780e - SLEEP
+// 780f - Power_State
 
-// 7817 - P_PLLN
-// 7818 - P_PLLWiatCLK
-// 7819 - P_Cache_Ctrl
-// 781a - P_Cache_HitRate
-// 781f - P_IO_SR_SMT
+// 7810 - BankSwitch_Ctrl 
+
+// 7816 - MAPSEL 
+// 7817 - PLLN
+// 7818 - PLLWiatCLK
+// 7819 - Cache_Ctrl
+// 781a - Cache_HitRate
+// 781f - IO_SR_SMT
+
+// 7820 - MCS0_Ctrl 
+// 7821 - MCS1_Ctrl
+// 7822 - MCS2_Ctrl
+// 7823 - MCS3_Ctrl
+// 7824 - MCS4_Ctrl
+// 7825 - PSRAM_Ctrl
+// 7826 - MCS_BYTE_SEL
+// 7827 - MCS3_WETimingCtrl
+// 7828 - MCS4_WETimingCtrl
+// 7829 - MCS3_RDTimingCtrl
+// 782a - MCS4_RDTimingCtrl
+// 782b - MCS3_TimingCtrl
+// 782c - MCS4_TimingCtrl
+// 782d - RAW_WAR
+// 782e - NOR_WHold
+// 782f - SDRAM_EN
+
+// 7835 - MCS0_Page
+// 7836 - MCS1_Page
+// 7837 - MCS2_Page
+// 7838 - MCS3_Page
+// 7839 - MCS4_Page
+// 783a - SDRAM_Ctrl0
+// 783b - SDRAM_Ctrl1
+// 783c - SDRAM_Timing
+// 783d - SDRAM_CBRCYC
+// 783e - SDRAM_MISC
+
+// 7840 - Mem_Ctrl
+// 7841 - Addr_Ctrl
+
+// 7874 - SDRAM_Drv
+// 7875 - SDRAM_Dly
+
+// 787e - MCS_Drv
+// 787f - MCS_Dly
+
+// 7888 - MEM_Drv
+// 7889 - MEM_Dly0
+// 788a - MEM_Dly1
+// 788b - MEM_Dly2
+// 788c - MEM_Dly3
+// 788d - MEM_Dly4
+// 788e - MEM_Dly5
+// 788f - MEM_Dly6
+
 
 DEFINE_DEVICE_TYPE(GPAC800,   generalplus_gpac800_device,  "gpac800",    "GeneralPlus GPL1625x System-on-a-Chip (with NAND handling)")
 DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800spi", "GeneralPlus GPL1625x System-on-a-Chip (with SPI handling)")
