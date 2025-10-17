@@ -585,6 +585,8 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7c00 to 7cff - Audio
 	// 7e00 to 7eff - Audio
 
+	// 8000 - 8fff internal boot ROM (same on all devices of the same type, not OTP)
+
 	map(0x009000, 0x3fffff).rom().region("spidirect", 0);
 }
 

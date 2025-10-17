@@ -2,10 +2,12 @@
 // copyright-holders:David Haywood
 /*****************************************************************************
 
-  SunPlus "GCM394" (based on die pictures)
+	GPL16220A - 320x240 output, 16K words internal RAM
+	GPL16230A - expands RAM to 28K words, adds SDRAM support, adds NAND Flash/ROM/OTP support, USB support
+	GPL16240VA (GPAC500?) - adds 640x480 output
+	GPL16250VA (GPAC800?) - adds '3D' sprite mode, 
 
-  Note, these are all the same chip but in different configurations so
-  should be tidied up and made to use callbacks
+	die is marked 'GCM394' on some chips
 
 **********************************************************************/
 
