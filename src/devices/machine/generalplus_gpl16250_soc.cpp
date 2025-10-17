@@ -3,9 +3,17 @@
 /*****************************************************************************
 
 	GPL16220A - 320x240 output, 16K words internal RAM
-	GPL16230A (GPAC500?) - expands RAM to 28K words, adds SDRAM support, adds NAND Flash/ROM/OTP support, USB support
-	GPL16240VA - adds 640x480 output
-	GPL16250VA (GPAC800?) - adds '3D' sprite mode, 
+	GPL16230A (GPAC500A) - expands RAM to 28K words, adds SDRAM support, adds NAND Flash/ROM/OTP support, USB support
+	GPL16240VA - adds 640x480 output (V = VGA support?)
+	GPL16250VA (GPAC800A) - adds '3D' sprite mode, 
+
+	there is also the 'B' series
+	these only have 12K words RAM? but have the extra maths unit at 0x79A0?
+
+	GPL16218B
+	GPL16238B (this could be GPAC500B)
+	GPL16248VB
+	GPL16258VB (this could be GPAC800B)
 
 	die is marked 'GCM394' on some chips
 
@@ -798,7 +806,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 	}
 }
 
-// GPAC500 register list
+// GPAC500B register list
 
 // 7000 - Tx3_X_Position
 // 7001 - Tx3_Y_Position
@@ -1107,7 +1115,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7e00 - 7eff Sound
 
 
-// GPAC900 register list
+// GPAC800A register list
 // TODO:
 
 void sunplus_gcm394_base_device::base_internal_map(address_map &map)
