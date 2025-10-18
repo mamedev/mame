@@ -11,6 +11,7 @@
 #include "formats/fsblk.h"
 
 #include "corestr.h"
+#include "hashing.h"
 #include "ioprocs.h"
 #include "path.h"
 #include "strformat.h"
@@ -38,9 +39,12 @@ static void display_usage(const char *first_argument)
 	fprintf(stderr, "       %s flopconvert [input_format|auto] output_format <inputfile> <outputfile> -- Convert a floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s flopcreate output_format filesystem <outputfile>                       -- Create a preformatted floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s flopdir input_format filesystem <image>                                -- List the contents of a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s flophashes input_format filesystem <image>                             -- List hashes for each file on a floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s flopread input_format filesystem <image> <path> <outputfile>           -- Extract a file from a floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s flopwrite input_format filesystem <image> <inputfile> <path>           -- Write a file into a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s flopchmeta format filesystem <image> [<path>] [-<name> <value> ...]    -- Change metadata for a file or volume on a floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s hddir filesystem <image>                                               -- List the contents of a hard disk image\n", exe_name.c_str());
+	fprintf(stderr, "       %s hdhashes filesystem <image>                                            -- List hashes for each file on a hard disk image\n", exe_name.c_str());
 	fprintf(stderr, "       %s hdread filesystem <image> <path> <outputfile>                          -- Extract a file from a hard disk image\n", exe_name.c_str());
 	fprintf(stderr, "       %s hdwrite filesystem <image> <inputfile> <path>                          -- Write a file into a hard disk image\n", exe_name.c_str());
 	fprintf(stderr, "       %s version                                                                -- Display the current version of floptool\n", exe_name.c_str());
@@ -342,6 +346,25 @@ static void dir_scan(fs::filesystem_t *fs, u32 depth, const std::vector<std::str
 	}
 }
 
+static void dir_report(const std::vector<std::vector<std::string>> &entries, size_t nc)
+{
+	std::vector<u32> sizes(nc);
+
+	for(const auto &e : entries)
+		for(unsigned int i=0; i != nc; i++)
+			sizes[i] = std::max<u32>(sizes[i], e[i].size());
+
+	for(const auto &e : entries) {
+		std::string l;
+		for(unsigned int i=0; i != nc; i++) {
+			if(i)
+				l += ' ';
+			l += util::string_format("%-*s", sizes[i], e[i]);
+		}
+		printf("%s\n", l.c_str());
+	}
+}
+
 static int generic_dir(image_handler &ih)
 {
 	auto [fsm, fs] = ih.get_fs();
@@ -378,21 +401,7 @@ static int generic_dir(image_handler &ih)
 
 	dir_scan(fs, 0, std::vector<std::string>(), entries, nmap, names.size(), dmetad, fmetad);
 
-	std::vector<u32> sizes(names.size());
-
-	for(const auto &e : entries)
-		for(unsigned int i=0; i != names.size(); i++)
-			sizes[i] = std::max<u32>(sizes[i], e[i].size());
-
-	for(const auto &e : entries) {
-		std::string l;
-		for(unsigned int i=0; i != names.size(); i++) {
-			if(i)
-				l += ' ';
-			l += util::string_format("%-*s", sizes[i], e[i]);
-		}
-		printf("%s\n", l.c_str());
-	}
+	dir_report(entries, names.size());
 
 	return 0;
 }
@@ -464,6 +473,154 @@ static int hddir(int argc, char *argv[])
 	}
 
 	return generic_dir(ih);
+}
+
+
+static std::error_condition dir_scan_hashes(fs::filesystem_t *fs, u32 depth, const std::vector<std::string> &path, std::vector<std::vector<std::string>> &entries)
+{
+	std::string head;
+	for(u32 i = 0; i != depth; i++)
+		head += "  ";
+	auto [err, contents] = fs->directory_contents(path);
+	if(err)
+		return err;
+	for(const auto &c : contents) {
+		size_t id = entries.size();
+		entries.resize(id+1);
+		entries[id].resize(entries[0].size());
+		auto npath = path;
+		npath.push_back(c.m_name);
+		switch(c.m_type) {
+		case fs::dir_entry_type::dir: {
+			entries[id][0] = head + "dir  " + c.m_name;
+			if(std::error_condition err = dir_scan_hashes(fs, depth+1, npath, entries))
+				entries[id][3] = err.message();
+			break;
+		}
+		case fs::dir_entry_type::file: {
+			entries[id][0] = head + "file " + c.m_name;
+			{
+				auto [err, dfork] = fs->file_read(npath);
+				if(err)
+					entries[id][3] = err.message();
+				else {
+					entries[id][1] = std::to_string(dfork.size());
+					entries[id][2] = util::crc32_creator::simple(dfork.data(), dfork.size()).as_string();
+					entries[id][3] = util::sha1_creator::simple(dfork.data(), dfork.size()).as_string();
+				}
+			}
+			if(entries[id].size() > 4) {
+				auto [err2, rfork] = fs->file_rsrc_read(npath);
+				if(err2)
+					entries[id][6] = err2.message();
+				else if(!rfork.empty()) {
+					entries[id][4] = std::to_string(rfork.size());
+					entries[id][5] = util::crc32_creator::simple(rfork.data(), rfork.size()).as_string();
+					entries[id][6] = util::sha1_creator::simple(rfork.data(), rfork.size()).as_string();
+				}
+			}
+			break;
+		}
+		}
+	}
+	return std::error_condition();
+}
+
+static int generic_hashes(image_handler &ih)
+{
+	auto [fsm, fs] = ih.get_fs();
+
+	std::vector<std::vector<std::string>> entries;
+
+	entries.resize(1);
+	entries[0].push_back("name");
+	entries[0].push_back("length");
+	entries[0].push_back("crc32");
+	entries[0].push_back("sha1");
+	if(fsm->has_rsrc()) {
+		entries[0].push_back("rsrc_length");
+		entries[0].push_back("rsrc_crc32");
+		entries[0].push_back("rsrc_sha1");
+	}
+
+	std::error_condition err = dir_scan_hashes(fs, 0, std::vector<std::string>(), entries);
+	if(err) {
+		fprintf(stderr, "Error scanning directory: %s\n", err.message().c_str());
+		return 1;
+	}
+
+	dir_report(entries, entries[0].size());
+
+	return 0;
+}
+
+static int flophashes(int argc, char *argv[])
+{
+	if(argc!=5) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage(argv[0]);
+		return 1;
+	}
+
+	image_handler ih;
+	ih.set_on_disk_path(argv[4]);
+
+	const floppy_format_info *source_format = find_floppy_source_format(argv[2], ih);
+	if(!source_format)
+		return 1;
+
+	auto fs = formats.find_filesystem_format_by_key(argv[3]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[3]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_read()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[3]);
+		return 1;
+	}
+
+	if(ih.floppy_load(*source_format)) {
+		fprintf(stderr, "Error: Loading as format '%s' failed\n", source_format->m_format->name());
+		return 1;
+	}
+
+	if(ih.floppy_mount_fs(*fs)) {
+		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
+		return 1;
+	}
+
+	return generic_hashes(ih);
+}
+
+static int hdhashes(int argc, char *argv[])
+{
+	if(argc!=4) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage(argv[0]);
+		return 1;
+	}
+
+	image_handler ih;
+	ih.set_on_disk_path(argv[3]);
+
+	auto fs = formats.find_filesystem_format_by_key(argv[2]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_read()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[2]);
+		return 1;
+	}
+
+	if(ih.hd_mount_fs(*fs)) {
+		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
+		return 1;
+	}
+
+	return generic_hashes(ih);
 }
 
 
@@ -625,8 +782,8 @@ static int flopwrite(int argc, char *argv[])
 		return 1;
 	}
 
-	if(!fs->m_manager || !fs->m_manager->can_read()) {
-		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[3]);
+	if(!fs->m_manager || !fs->m_manager->can_write()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement writing\n", argv[3]);
 		return 1;
 	}
 
@@ -659,7 +816,6 @@ static int hdwrite(int argc, char *argv[])
 		return 1;
 	}
 
-
 	image_handler ih;
 	ih.set_on_disk_path(argv[3]);
 
@@ -669,8 +825,8 @@ static int hdwrite(int argc, char *argv[])
 		return 1;
 	}
 
-	if(!fs->m_manager || !fs->m_manager->can_read()) {
-		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[2]);
+	if(!fs->m_manager || !fs->m_manager->can_write()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement writing\n", argv[2]);
 		return 1;
 	}
 
@@ -679,7 +835,99 @@ static int hdwrite(int argc, char *argv[])
 		return 1;
 	}
 
+	// FIXME: this doesn't actually save anything
 	return generic_write(ih, argv[4], argv[5]);
+}
+
+
+static int generic_chmeta(image_handler &ih, fs::meta_data &&meta, bool isfile, const char *srcpath)
+{
+	auto [fsm, fs] = ih.get_fs();
+
+	const auto metad = isfile ? fsm->file_meta_description() : fsm->volume_meta_description();
+	for(const auto &nv : meta.meta) {
+		auto it = std::find_if(metad.begin(), metad.end(), [&nv] (const fs::meta_description &desc) { return desc.m_name == nv.first; });
+		if(it == metad.end()) {
+			fprintf(stderr, "Error: Filesystem '%s' does not provide %s metadata for %s\n",
+					fsm->name(),
+					fs::meta_data::entry_name(nv.first),
+					isfile ? "files" : "volumes");
+			return 1;
+		}
+		if(it->m_ro) {
+			fprintf(stderr, "Error: Filesystem '%s' does not permit changing %s metadata on a %s\n",
+					fsm->name(),
+					fs::meta_data::entry_name(nv.first),
+					isfile ? "file" : "volume");
+			return 1;
+		}
+		if(it->m_validator && !it->m_validator(nv.second)) {
+			fprintf(stderr, "Error: Filesystem '%s' does not recognize '%s' as valid %s metadata (%s)\n",
+					fsm->name(),
+					nv.second.as_string().c_str(),
+					fs::meta_data::entry_name(nv.first),
+					it->m_tooltip);
+			return 1;
+		}
+	}
+
+	std::error_condition err;
+	if(isfile) {
+		std::vector<std::string> path = ih.path_split(srcpath);
+		err = fs->metadata_change(path, meta);
+	} else
+		err = fs->volume_metadata_change(meta);
+
+	if(err) {
+		fprintf(stderr, "%s metadata change failed: %s\n", isfile ? "File" : "Volume", err.message().c_str());
+		return 1;
+	}
+
+	return 0;
+}
+
+static int flopchmeta(int argc, char *argv[])
+{
+	fs::meta_data meta = extract_meta_data(argc, argv);
+
+	if(argc!=5 && argc!=6) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage(argv[0]);
+		return 1;
+	}
+
+	image_handler ih;
+	ih.set_on_disk_path(argv[4]);
+
+	const floppy_format_info *source_format = find_floppy_source_format(argv[2], ih);
+	if(!source_format)
+		return 1;
+
+	auto fs = formats.find_filesystem_format_by_key(argv[3]);
+	if(!fs || !fs->m_manager) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[3]);
+		return 1;
+	}
+
+	if(ih.floppy_load(*source_format)) {
+		fprintf(stderr, "Error: Loading as format '%s' failed\n", source_format->m_format->name());
+		return 1;
+	}
+
+	if(ih.floppy_mount_fs(*fs)) {
+		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
+		return 1;
+	}
+
+	int err = generic_chmeta(ih, std::move(meta), argc==6, argc==6 ? argv[5] : "");
+	if(err)
+		return err;
+
+	ih.fs_to_floppy();
+	if(ih.floppy_save(*source_format))
+		return 1;
+
+	return 0;
 }
 
 static int version(int argc, char *argv[])
@@ -707,12 +955,18 @@ int CLIB_DECL main(int argc, char *argv[])
 			return flopcreate(argc, argv);
 		else if(!core_stricmp("flopdir", argv[1]))
 			return flopdir(argc, argv);
+		else if(!core_stricmp("flophashes", argv[1]))
+			return flophashes(argc, argv);
 		else if(!core_stricmp("flopread", argv[1]))
 			return flopread(argc, argv);
 		else if(!core_stricmp("flopwrite", argv[1]))
 			return flopwrite(argc, argv);
+		else if(!core_stricmp("flopchmeta", argv[1]))
+			return flopchmeta(argc, argv);
 		else if(!core_stricmp("hddir", argv[1]))
 			return hddir(argc, argv);
+		else if(!core_stricmp("hdhashes", argv[1]))
+			return hdhashes(argc, argv);
 		else if(!core_stricmp("hdread", argv[1]))
 			return hdread(argc, argv);
 		else if(!core_stricmp("hdwrite", argv[1]))
