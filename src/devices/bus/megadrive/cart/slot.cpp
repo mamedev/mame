@@ -34,12 +34,23 @@ void device_megadrive_cart_interface::interface_pre_start()
 {
 	if (!m_slot->started())
 		throw device_missing_dependencies();
+	m_cold_reset = true;
 }
 
 void device_megadrive_cart_interface::interface_post_start()
 {
-	m_slot->m_space_mem->install_device(0x000000, 0xdfffff, *this, &device_megadrive_cart_interface::cart_map);
-	m_slot->m_space_io->install_device(0x00, 0xff, *this, &device_megadrive_cart_interface::time_io_map);
+}
+
+void device_megadrive_cart_interface::interface_pre_reset()
+{
+	// FIXME: interface_post_start is too early for loose cart
+	// unmapping won't avoid the "Fatal error: A memory_view can be present in only one address map." for some carts
+	if (m_cold_reset)
+	{
+		m_slot->m_space_mem->install_device(0x000000, 0xdfffff, *this, &device_megadrive_cart_interface::cart_map);
+		m_slot->m_space_io->install_device(0x00, 0xff, *this, &device_megadrive_cart_interface::time_io_map);
+		m_cold_reset = false;
+	}
 }
 
 void device_megadrive_cart_interface::cart_map(address_map &map)
@@ -92,6 +103,7 @@ device_memory_interface::space_config_vector megadrive_cart_slot_device::memory_
 void megadrive_cart_slot_device::device_start()
 {
 	m_cart = get_card_device();
+
 	m_space_mem = &space(AS_PROGRAM);
 	m_space_io = &space(AS_IO);
 }
@@ -139,7 +151,7 @@ std::pair<std::error_condition, std::string> megadrive_cart_slot_device::call_lo
 		}
 		else
 		{
-			err = load_loose();
+			err = load_loose(image_core_file());
 		}
 
 		if (err)
@@ -153,26 +165,8 @@ std::error_condition megadrive_cart_slot_device::load_swlist()
 {
 	using namespace bus::megadrive;
 
-//	uint16_t *ROM;
-//	uint32_t length = get_software_region_length("rom");
 	const char  *slot_name;
-//
-//	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
-//	length = m_cart->get_padded_size(length);
-//
-//	memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), length, 2, ENDIANNESS_BIG);
-//	auto const [err, actual] = read_at(file, offset, romregion->base(), len);
-//	if (err || (len != actual))
-//		return std::make_pair(err ? err : std::errc::io_error, "Error reading ROM data from cartridge file");
-//
-////	m_cart->rom_alloc(length);
-////	ROM = m_cart->get_rom_base();
-//	memcpy(romregion, get_software_region("rom"), get_software_region_length("rom"));
-//
-//	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
-//	if (length > get_software_region_length("rom"))
-//		memset(romregion + get_software_region_length("rom")/2, 0xffff, (length - get_software_region_length("rom"))/2);
-//
+
 	slot_name = get_feature("slot");
 	if (slot_name == nullptr)
 		slot_name = slotoptions::MD_STD;
@@ -181,83 +175,28 @@ std::error_condition megadrive_cart_slot_device::load_swlist()
 	return std::error_condition(m_cart->load());
 }
 
-std::error_condition megadrive_cart_slot_device::load_loose()
+std::error_condition megadrive_cart_slot_device::load_loose(util::random_read &file)
 {
-	return std::error_condition();
+	auto const len = length();
 
-//	unsigned char *ROM;
-//	bool is_smd, is_md;
-//	uint32_t tmplen = length(), offset, len;
-//	std::vector<uint8_t> tmpROM(tmplen);
-//
-//	// STEP 1: store a (possibly headered) copy of the file and determine its type (SMD? MD? BIN?)
-//	fread(&tmpROM[0], tmplen);
-//	is_smd = false; //genesis_is_SMD(&tmpROM[0x200], tmplen - 0x200);
-//	is_md = (tmpROM[0x80] == 'E') && (tmpROM[0x81] == 'A') && (tmpROM[0x82] == 'M' || tmpROM[0x82] == 'G');
-//
-//	// take header into account, if any
-//	offset = is_smd ? 0x200 : 0;
-//
-//	// STEP 2: allocate space for the real copy of the game
-//	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
-//	len = m_cart->get_padded_size(tmplen - offset);
-//
-//	// this contains an hack for SSF2: its current bankswitch code needs larger ROM space to work
-//	// m_cart->rom_alloc((len == 0x500000) ? 0x900000 : len);
-//
-//	// STEP 3: copy the game data in the appropriate way
-//	ROM = (unsigned char *)m_cart->get_rom_base();
-//
-//	if (is_smd)
-//	{
-//		osd_printf_debug("SMD!\n");
-//
-//		for (int ptr = 0; ptr < (tmplen - 0x200) / 0x2000; ptr += 2)
-//		{
-//			for (int x = 0; x < 0x2000; x++)
-//			{
-//				ROM[ptr * 0x2000 + x * 2 + 0] = tmpROM[0x200 + ((ptr + 1) * 0x2000) + x];
-//				ROM[ptr * 0x2000 + x * 2 + 1] = tmpROM[0x200 + ((ptr + 0) * 0x2000) + x];
-//			}
-//		}
-//	}
-//	else if (is_md)
-//	{
-//		osd_printf_debug("MD!\n");
-//
-//		for (int ptr = 0; ptr < tmplen; ptr += 2)
-//		{
-//			ROM[ptr] = tmpROM[(tmplen >> 1) + (ptr >> 1)];
-//			ROM[ptr + 1] = tmpROM[(ptr >> 1)];
-//		}
-//	}
-//	else
-//	{
-//		osd_printf_debug("BIN!\n");
-//
-//		fseek(0, SEEK_SET);
-//		fread(ROM, len);
-//	}
-//
-//	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
-//	//if (len > (tmplen - offset))
-//	//	memset(m_cart->get_rom_base() + (tmplen - offset)/2, 0xffff, (len - tmplen + offset)/2);
-//
-//	// STEP 4: determine the cart type (to deal with sram/eeprom & pirate mappers)
-//	// m_type = get_cart_type(ROM, tmplen - offset);
-//
-//// CPU needs to access ROM as a ROM_REGION16_BE, so we need to compensate on LE machines
-//#ifdef LSB_FIRST
-//	unsigned char fliptemp;
-//	for (int ptr = 0; ptr < len; ptr += 2)
-//	{
-//		fliptemp = ROM[ptr];
-//		ROM[ptr] = ROM[ptr+1];
-//		ROM[ptr+1] = fliptemp;
-//	}
-//#endif
-//
-//	return std::error_condition();
+	if (len)
+	{
+		logerror("Allocating %lu byte cartridge ROM region\n", len);
+		memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), len, 2, ENDIANNESS_BIG);
+		u16 *const rombase = reinterpret_cast<u16 *>(romregion->base());
+		auto const cnt = fread(rombase, len);
+
+		if (cnt != len)
+			return std::error_condition(std::errc::io_error);
+
+		if (ENDIANNESS_NATIVE != ENDIANNESS_BIG)
+		{
+			for (u32 i = 0; (len / 2) > i; ++i)
+				rombase[i] = swapendian_int16(rombase[i]);
+		}
+	}
+
+	return std::error_condition(m_cart->load());
 }
 
 
@@ -292,20 +231,6 @@ std::string megadrive_cart_slot_device::get_default_card_software(get_default_ca
 		return software_get_default_slot(slotoptions::MD_STD);
 	}
 }
-
-
-uint32_t device_megadrive_cart_interface::get_padded_size(uint32_t size)
-{
-	uint32_t pad_size = 0x10000;
-	while (size > pad_size)
-		pad_size <<= 1;
-
-	if (pad_size < 0x800000 && size < pad_size)
-		return pad_size;
-	else
-		return size;
-}
-
 
 void megadrive_cart_slot_device::call_unload()
 {

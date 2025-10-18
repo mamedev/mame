@@ -25,17 +25,36 @@ megadrive_rom_device::megadrive_rom_device(const machine_config &mconfig, const 
 {
 }
 
+std::error_condition megadrive_rom_device::load()
+{
+	// if there's no ROM region, there's nothing to do
+	//printf("load()\n");
+	memory_region *const romregion(cart_rom_region());
+	if (!romregion || !romregion->bytes())
+		return std::error_condition();
+
+	auto const bytes(romregion->bytes());
+	if (0x400000 < bytes)
+	{
+		osd_printf_error("Unsupported cartridge ROM size");
+		return image_error::INVALIDLENGTH;
+	}
+
+	m_rom_mask = device_generic_cart_interface::map_non_power_of_two(
+		unsigned(romregion->bytes()),
+		[this, base = &romregion->as_u8()] (unsigned entry, unsigned page)
+		{
+			m_rom->configure_entry(0, &base[0]);
+		});
+	m_rom_mirror = 0x3f'ffff ^ m_rom_mask;
+
+	logerror("Map linear rom with mask: %08x mirror: %08x\n", m_rom_mask, m_rom_mirror);
+
+	return std::error_condition();
+}
+
 void megadrive_rom_device::device_start()
 {
-	memory_region *const romregion(cart_rom_region());
-	m_rom_mask = device_generic_cart_interface::map_non_power_of_two(
-			unsigned(romregion->bytes()),
-			[this, base = &romregion->as_u8()] (unsigned entry, unsigned page)
-			{
-				m_rom->configure_entry(0, &base[0]);
-			});
-	m_rom_mirror = 0x3f'ffff ^ m_rom_mask;
-	logerror("Map linear rom with mask: %08x mirror: %08x\n", m_rom_mask, m_rom_mirror);
 }
 
 void megadrive_rom_device::device_reset()

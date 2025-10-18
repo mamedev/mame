@@ -43,6 +43,8 @@ public:
 	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
+	void install_cart_mem();
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
@@ -61,7 +63,7 @@ private:
 	address_space *m_space_io;
 
 	std::error_condition load_swlist();
-	std::error_condition load_loose();
+	std::error_condition load_loose(util::random_read &file);
 };
 
 class device_megadrive_cart_interface : public device_interface
@@ -69,8 +71,6 @@ class device_megadrive_cart_interface : public device_interface
 public:
 	// construction/destruction
 	virtual ~device_megadrive_cart_interface();
-
-	uint32_t get_padded_size(uint32_t size);
 
 	bool loaded_through_softlist() const { return m_slot && m_slot->loaded_through_softlist(); }
 	char const *get_feature(std::string_view feature_name) const { return m_slot ? m_slot->get_feature(feature_name) : nullptr; }
@@ -90,11 +90,14 @@ protected:
 
 	virtual void interface_pre_start() override;
 	virtual void interface_post_start() override;
+	virtual void interface_pre_reset() override;
 	megadrive_cart_slot_device *const m_slot;
 
 	virtual void cart_map(address_map &map) ATTR_COLD;
 	virtual void time_io_map(address_map &map) ATTR_COLD;
 
+private:
+	bool m_cold_reset;
 	// device_start, /MRES B2
 	// device_reset, /VRES B27
 };

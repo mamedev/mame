@@ -20,6 +20,8 @@ public:
 protected:
 	megadrive_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual std::error_condition load() override ATTR_COLD;
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
