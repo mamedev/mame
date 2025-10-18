@@ -45,14 +45,7 @@
 
 #include "video/upd7220.h"
 
-#include "bus/cbus/amd98.h"
-#include "bus/cbus/pc9801_26.h"
-#include "bus/cbus/pc9801_55.h"
-#include "bus/cbus/pc9801_86.h"
-#include "bus/cbus/pc9801_118.h"
-#include "bus/cbus/mpu_pc98.h"
 #include "bus/cbus/pc9801_cbus.h"
-#include "bus/cbus/sb16_ct2720.h"
 
 #include "pc98_cd.h"
 #include "pc98_kbd.h"
@@ -62,12 +55,12 @@
 #include "bus/ata/atadev.h"
 #include "bus/ata/ataintf.h"
 
-#include "debugger.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
+#include "formats/img_dsk.h"
 #include "formats/pc98_dsk.h"
 #include "formats/pc98fdi_dsk.h"
 #include "formats/fdd_dsk.h"
@@ -148,8 +141,8 @@ public:
 		, m_dsw1(*this, "DSW1")
 		, m_dsw2(*this, "DSW2")
 		, m_ppi_mouse(*this, "ppi_mouse")
-		, m_fdc_2hd(*this, "upd765_2hd")
-		, m_fdc_2dd(*this, "upd765_2dd")
+		, m_fdc_2hd(*this, "fdc_2hd")
+		, m_fdc_2dd(*this, "fdc_2dd")
 		, m_ram(*this, RAM_TAG)
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
