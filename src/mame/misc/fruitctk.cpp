@@ -104,7 +104,7 @@ protected:
 private:
 	void display_7seg_data_w(uint8_t data);
 	void multiplex_7seg_w(uint8_t data);
-	void io_map(address_map &map);
+	void data_map(address_map &map);
 	void program_map(address_map &map);
     uint8_t keyboard_r();
 	uint8_t m_selected_7seg_module = 0;
@@ -226,7 +226,7 @@ void fruitctk_state::program_map(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void fruitctk_state::io_map(address_map &map)
+void fruitctk_state::data_map(address_map &map)
 {
     map(0x8000, 0x87ff).ram().share("nvram");
     map(0xc000, 0xc001).w("opll", FUNC(ym2413_device::write));
@@ -251,7 +251,7 @@ void fruitctk_state::fruitctk(machine_config &config)
 	/* basic machine hardware */
 	i8051_device &maincpu(I8051(config, "maincpu", XTAL(12'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &fruitctk_state::program_map);
-	maincpu.set_addrmap(AS_IO, &fruitctk_state::io_map);
+	maincpu.set_addrmap(AS_IO, &fruitctk_state::data_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
 	maincpu.port_out_cb<1>().set(FUNC(fruitctk_state::p1_w));
    
@@ -298,6 +298,7 @@ ROM_END
 
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 
 
 
