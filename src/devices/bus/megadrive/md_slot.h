@@ -42,6 +42,7 @@ enum
 	EA_NHLPA,                    /* NHLPA Hockey 93 / Rings of Power */
 	BRIAN_LARA,                  /* Brian Lara Cricket 96 */
 	PSOLAR,                      /* Pier Solar (STM95 EEPROM) */
+	PAPRIUM,                     /* Paprium (EEPROM gated behind FPGA+STM32) */
 
 	// J-Cart
 	CM_JCART,                    /* Pete Sampras Tennis */
