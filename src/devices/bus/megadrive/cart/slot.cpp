@@ -6,17 +6,6 @@
 
 #include "options.h"
 
-#include <algorithm>
-#include <cstring>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <sstream>
-#include <string_view>
-#include <tuple>
-#include <utility>
-#include <vector>
-
 
 DEFINE_DEVICE_TYPE(MEGADRIVE_CART_SLOT, megadrive_cart_slot_device, "megadrive_cart_slot", "MegaDrive Cartridge Slot")
 
