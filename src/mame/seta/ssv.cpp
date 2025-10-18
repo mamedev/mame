@@ -56,7 +56,8 @@ STA-0001B   SSV_SUB     01  Vasara 2                                Visco
 
 (1) Uses ST010 MCU / Math chip
 (2) Uses ST-0009 & ST-0020 & Light Gun
-(3) Uses NEC V810 CPU as sub cpu for the AI (basically the same as the majinsen games on st0016)
+(3) Uses NEC V810 CPU as sub cpu for the AI (basically the same as the mayjinsen games on
+    seta/simple_st0016.cpp)
 
 SSV Hardware Overview
 Sammy/Seta/Visco, 1993-2001
