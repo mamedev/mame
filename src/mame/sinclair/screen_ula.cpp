@@ -65,7 +65,6 @@ void screen_ula_device::draw_border(bitmap_rgb32 &bitmap, const rectangle &clipr
 		rectangle clip = { SCREEN_AREA.left() << 1, (SCREEN_AREA.right() << 1) | 1, SCREEN_AREA.top(), SCREEN_AREA.bottom() };
 		clip.offset(m_offset_h, m_offset_v);
 		clip &= cliprect;
-		clip.setx(clip.left() & ~1, clip.right() | 1);
 
 		if (!clip.empty())
 			bitmap.fill(palette().pen_color(UTM_FALLBACK_PEN), clip);

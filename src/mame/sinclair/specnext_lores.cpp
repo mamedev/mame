@@ -40,7 +40,6 @@ void specnext_lores_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, co
 	rectangle clip = { m_clip_x1 << 1, (m_clip_x2 << 1) | 1, m_clip_y1, m_clip_y2 };
 	clip.offset(m_offset_h, m_offset_v);
 	clip &= cliprect;
-	clip.setx(clip.left() & ~3, clip.right() | 3);
 
 	if (clip.empty())
 		return;
@@ -50,12 +49,13 @@ void specnext_lores_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, co
 	const u16 pen_base = (m_lores_palette_select ? m_palette_alt_offset : m_palette_base_offset) | (m_lores_palette_offset << 4);
 	const u8 *screen_location = m_host_ram_ptr + (5 << 14);
 
-	const u16 x_min = ((((clip.left() - m_offset_h) >> 1) + m_scroll_x) % SCREEN_AREA.width()) >> 1;
+	const u16 x4_min = (clip.left() - m_offset_h + (m_scroll_x << 1) + (SCREEN_AREA.width() << 1)) % (SCREEN_AREA.width() << 1);
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); ++vpos)
 	{
 		const u16 y = ((vpos - m_offset_v + m_scroll_y) % SCREEN_AREA.height()) >> 1;
-		u16 x = x_min ;
-		const u8 *scr = &screen_location[x + ((y < 48) ?  128 * y : (128 * (y - 48) + 0x2000))];
+		u16 x4 = x4_min;
+		u8 off4 = x4 & 3;
+		const u8 *scr = &screen_location[(x4 >> 2) + ((y < 48) ?  128 * y : (128 * (y - 48) + 0x2000))];
 
 		u32 *pix = &(bitmap.pix(vpos, clip.left()));
 		u8 *prio = &(screen.priority().pix(vpos, clip.left()));
@@ -64,18 +64,22 @@ void specnext_lores_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, co
 			const rgb_t pen = palette().pen_color(pen_base + *scr);
 			if ((pen != gt0) && (pen != gt1))
 			{
-				*(pix + 0) = pen;
-				*(pix + 1) = pen;
-				*(pix + 2) = pen;
-				*(pix + 3) = pen;
-				*(prio + 0) |= pcode;
-				*(prio + 1) |= pcode;
-				*(prio + 2) |= pcode;
-				*(prio + 3) |= pcode;
+				for (u8 i = 0; (i < 4 - off4) && ((hpos + i) <= clip.right()); ++i)
+				{
+					*(pix + i) = pen;
+					*(prio + i) |= pcode;
+				}
 			}
-
-			++x %= SCREEN_AREA.width() >> 1;
-			if (x == 0)
+			if (off4)
+			{
+				hpos -= off4;
+				pix -= off4;
+				prio -= off4;
+				x4 -= off4;
+				off4 = 0;
+			}
+			x4 = (x4 + 4) % (SCREEN_AREA.width() << 1);
+			if (x4 == 0)
 				scr = &screen_location[(y < 48) ?  128 * y : (128 * (y - 48) + 0x2000)];
 			else
 				++scr;

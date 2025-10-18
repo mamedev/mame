@@ -926,12 +926,9 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		// background
 		if (m_nr_68_ula_en)
-		{
 			m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
-		}
-		else {
+		else
 			bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
-		}
 
 		static const u8 lcfg[][3] =
 		{
@@ -2068,6 +2065,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_palette_sub_idx = 0;
 		break;
 	case 0x41:
+		m_screen->update_now();
 		palette_val_w(0b00, (nr_wr_dat << 1) | BIT(nr_wr_dat, 1) | BIT(nr_wr_dat, 0));
 		if (m_nr_43_palette_autoinc_disable == 0)
 			++m_nr_palette_idx;
