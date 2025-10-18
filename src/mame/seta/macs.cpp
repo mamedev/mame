@@ -105,7 +105,6 @@ private:
 	required_shared_ptr<uint8_t> m_ram2;
 	void rambank_w(uint8_t data);
 	uint8_t input_r(offs_t offset);
-	void macs_rom_bank_w(uint8_t data);
 	void output_w(offs_t offset, uint8_t data);
 
 	optional_device<st0016_cpu_device> m_maincpu;
