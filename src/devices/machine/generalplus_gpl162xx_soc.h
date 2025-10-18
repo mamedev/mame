@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_GENERALPLUS_GPL16250_SOC_H
-#define MAME_MACHINE_GENERALPLUS_GPL16250_SOC_H
+#ifndef MAME_MACHINE_GENERALPLUS_GPL162XX_SOC_H
+#define MAME_MACHINE_GENERALPLUS_GPL162XX_SOC_H
 
 #pragma once
 
@@ -376,4 +376,4 @@ DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
 
 
 
-#endif // MAME_MACHINE_GENERALPLUS_GPL16250_SOC_H
+#endif // MAME_MACHINE_GENERALPLUS_GPL162XX_SOC_H

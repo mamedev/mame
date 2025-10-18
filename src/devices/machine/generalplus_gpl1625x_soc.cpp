@@ -558,7 +558,12 @@
 // 7af1 - Nibble_Swap
 // 7af2 - TwoBit_Swap
 // 7af3 - Bit_Reverse
-
+//
+// 7b80 to 7b9f Sound Channel 0-15 regs
+// 7ba0 to 7bbf Sound Channel 16-31 regs
+//
+// 7c00 - 7dff Sound Attribute
+// 7e00 - 7fff Sound Phase
 
 DEFINE_DEVICE_TYPE(GPAC800,   generalplus_gpac800_device,  "gpac800",    "GeneralPlus GPL1625x System-on-a-Chip (with NAND handling)")
 DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800spi", "GeneralPlus GPL1625x System-on-a-Chip (with SPI handling)")
