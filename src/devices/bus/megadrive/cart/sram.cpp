@@ -25,6 +25,9 @@ megadrive_rom_sram_device::megadrive_rom_sram_device(const machine_config &mconf
 
 std::error_condition megadrive_rom_sram_device::load()
 {
+	const auto err = megadrive_rom_device::load();
+	if (err)
+		return image_error::BADSOFTWARE;
 	memory_region *const nvramregion(cart_sram_region());
 
 	if (nvramregion)
