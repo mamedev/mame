@@ -2096,6 +2096,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0x4a:
 		{
+			m_screen->update_now();
 			m_nr_4a_fallback_rgb = nr_wr_dat;
 			rgb_t fb = rgbexpand<3,3,3>((m_nr_4a_fallback_rgb << 1) | BIT(m_nr_4a_fallback_rgb, 1) | BIT(m_nr_4a_fallback_rgb, 0), 6, 3, 0);
 			m_palette->set_pen_color(UTM_FALLBACK_PEN, fb);
