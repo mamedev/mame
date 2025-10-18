@@ -990,6 +990,11 @@ ROM_START( inmotion )
 	ROM_LOAD16_WORD_SWAP( "mx26l25722mc.bin", 0x000000, 0x2000000, CRC(81125997) SHA1(824607a3665b1351bccf27de4885a26ca86b40a5) )
 ROM_END
 
+ROM_START( wiii3spt )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vii3_7.bin", 0x000000, 0x2000000, CRC(f9176352) SHA1(ec05432c6d5a94a3eba0ece74c3cf3feeada007f) )
+ROM_END
+
 ROM_START( marc101 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "m489.u6", 0x0000000, 0x4000000, CRC(0a01695f) SHA1(1a13c5eb9dffdc91fc68a98e8f35bd8a019a8373) )
@@ -1037,6 +1042,8 @@ CONS( 200?, foxsport, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, 
 // doesn't really have 198 games, closer to 20, with duplicates starting on different levels
 // as with the above sets, inputs aren't currently hooked up, menu can be used by modifying 0x100f in RAM (it's 0x1010 for wiwi18)
 CONS( 200?, inmotion, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "Grafix", "IN Motion - Motion Controlled Video Games Console (Hot Game 198 in 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, wiii3spt, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "<unknown>", "Wiii3 7-in1 Sports", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // thtere is another 'Drahtlose Spielekonsole 48-in-1' with '11 hyper sports games' (including Running) which are clearly SunPlus and would fit here, with the 37 non-hyper sports games presumably again being a NES/Famiclone cart
 
