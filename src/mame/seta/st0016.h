@@ -34,23 +34,20 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
 	const address_space_config m_io_space_config;
 	const address_space_config m_space_config;
 	const address_space_config m_charam_space_config;
 	const address_space_config m_extrom_space_config;
 
-	virtual space_config_vector memory_space_config() const override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 private:
-	bool ismacs() const { return m_game_flag & 0x80; }
-	bool ismacs1() const { return (m_game_flag & 0x180) == 0x180; }
-	bool ismacs2() const { return (m_game_flag & 0x180) == 0x080; }
-
 	static constexpr unsigned MAX_SPR_BANK   = 0x10;
 	static constexpr unsigned MAX_CHAR_BANK  = 0x10000;
 	static constexpr unsigned MAX_PAL_BANK   = 4;
@@ -71,7 +68,6 @@ private:
 	memory_share_creator<u8> m_paletteram;
 
 	u32 m_fixedrom_offset;
-	u8 m_dma_offset;
 	u32 m_game_flag;
 
 	memory_access<21, 0, 0, ENDIANNESS_LITTLE>::specific m_charam_space;
@@ -82,6 +78,10 @@ private:
 
 	u8 m_vregs[0xc0];
 	u8 m_ramgfx;
+
+	bool ismacs() const { return m_game_flag & 0x80; }
+	bool ismacs1() const { return (m_game_flag & 0x180) == 0x180; }
+	bool ismacs2() const { return (m_game_flag & 0x180) == 0x080; }
 
 	void sprite_bank_w(u8 data);
 	void palette_bank_w(u8 data);
@@ -110,8 +110,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device)
-
 
 #endif // MAME_SETA_ST0016_H
