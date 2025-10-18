@@ -61,7 +61,7 @@
 #include "emu.h"
 
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/clock.h"
 #include "machine/i2cmem.h"
 #include "machine/timer.h"

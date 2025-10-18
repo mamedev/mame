@@ -38,7 +38,7 @@
 #include "emu.h"
 #include "applecd.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/m6502/m3745x.h"
 #include "machine/ncr5380.h"
 

@@ -19,7 +19,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "video/hd44780.h"
 //#include "sound/speaker.h"
 

@@ -13,7 +13,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/eepromser.h"
 
 #define VERBOSE 0

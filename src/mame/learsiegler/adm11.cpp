@@ -28,7 +28,7 @@
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/eeprompar.h"
 #include "video/scn2674.h"
 #include "screen.h"

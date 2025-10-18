@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/mcs48/mcs48.h"
 //#include "imagedev/cassette.h"
 #include "machine/bankdev.h"

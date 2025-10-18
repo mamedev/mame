@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "gaelco_ds5002fp.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/ds5002fp.h"
 #include "machine/nvram.h"
 
 

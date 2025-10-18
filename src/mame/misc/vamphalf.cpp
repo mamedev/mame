@@ -63,7 +63,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/e132xs/e132xs.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"

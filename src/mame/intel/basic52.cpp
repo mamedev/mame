@@ -23,7 +23,7 @@ Sound: BASIC-31 has sound, and BASIC-52 doesn't. The sound command is PWM.
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "machine/i8255.h"
 #include "bus/rs232/terminal.h"
 #include "bus/rs232/rs232.h"

@@ -2,7 +2,7 @@
 // copyright-holders:Steve Ellenoff
 
 #include "emu.h"
-#include "mcs51.h"
+#include "i8051.h"
 
 #define VERBOSE (0)
 

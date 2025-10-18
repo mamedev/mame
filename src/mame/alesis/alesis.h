@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "video/hd44780.h"

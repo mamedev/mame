@@ -33,12 +33,19 @@ TODO:
 #define XTAL_5B 24.576_MHz_XTAL
 #define XTAL_5D 33.8688_MHz_XTAL
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
 DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118")
+
+pc9801_118_device::pc9801_118_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_opn3(*this, "opn3")
+{
+}
+
+pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_118_device(mconfig, PC9801_118, tag, owner, clock)
+{
+}
 
 void pc9801_118_device::device_add_mconfig(machine_config &config)
 {
@@ -130,20 +137,6 @@ const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 	return ROM_NAME( pc9801_118 );
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  pc9801_118_device - constructor
-//-------------------------------------------------
-
-pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_118, tag, owner, clock),
-		m_bus(*this, DEVICE_SELF_OWNER),
-		m_opn3(*this, "opn3")
-{
-}
 
 void pc9801_118_device::device_start()
 {

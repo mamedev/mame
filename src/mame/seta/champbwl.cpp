@@ -230,6 +230,7 @@ public:
 	{ }
 
 	void doraemon(machine_config &config);
+	void doraemonp(machine_config &config);
 
 private:
 	required_device<ticket_dispenser_device> m_hopper;
@@ -238,7 +239,8 @@ private:
 
 	void screen_vblank(int state);
 
-	void prg_map(address_map &map) ATTR_COLD;
+	void doraemon_base_map(address_map &map) ATTR_COLD;
+	void doraemon_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -331,7 +333,7 @@ void doraemon_state::outputs_w(uint8_t data)
 }
 
 
-void doraemon_state::prg_map(address_map &map)
+void doraemon_state::doraemon_base_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr(m_mainbank);
@@ -343,10 +345,16 @@ void doraemon_state::prg_map(address_map &map)
 	map(0xe300, 0xe303).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));
 	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8)); // enable / disable background transparency
 	map(0xf000, 0xf000).portr("IN0").w(FUNC(doraemon_state::outputs_w));
-	map(0xf002, 0xf002).portr("IN1").nopw(); // Ack?
-	map(0xf004, 0xf004).nopw();              // Ack?
-	map(0xf006, 0xf006).portr("DSW").nopw(); // Ack?
-	map(0xf800, 0xf800).nopw();              // 0
+	map(0xf002, 0xf002).portr("IN1").nopw();  // Ack?
+	map(0xf004, 0xf004).nopw();               // Ack?
+	map(0xf006, 0xf006).portr("DSW1").nopw(); // Ack?
+	map(0xf800, 0xf800).nopw();               // 0
+}
+
+void doraemon_state::doraemon_map(address_map &map)
+{
+	doraemon_base_map(map);
+	map(0xf007, 0xf007).portr("DSW2").nopw(); // Ack?
 }
 
 
@@ -433,14 +441,96 @@ static INPUT_PORTS_START( champbwl )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( doraemon_base )
+	PORT_START("DSW1")  // f006
+	PORT_DIPNAME( 0x01, 0x00, "1 Bet" )                                                     PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x02, 0x00, "¥100 Chg." )                                                 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "6"  )        PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, "5"  )        PORT_CONDITION("DSW1", 0x01, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x02, "11" )        PORT_CONDITION("DSW1", 0x01, EQUALS,    0x01)
+	PORT_DIPSETTING(    0x00, "10" )        PORT_CONDITION("DSW1", 0x01, EQUALS,    0x01)
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )                                      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )                                          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )                                          PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )                                          PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                                          PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )                                          PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN0")   // f000
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_MEMORY_RESET )  PORT_NAME( "Data Clear" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1    )      PORT_NAME( "¥100" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN2    )      PORT_NAME( "¥10" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN3    )      PORT_NAME( "Medal" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 )      PORT_NAME( "Freeze" )  PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+
+	PORT_START("IN1")   // f002
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON3  )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM   )      PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // sensor
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW  )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( doraemon )
-	PORT_START("DSW")   // f006
-	PORT_DIPNAME( 0x0f, 0x09, "Gift Out" )
-	PORT_DIPSETTING(    0x0f,   "2 %" )
-	PORT_DIPSETTING(    0x0e,   "5 %" )
-	PORT_DIPSETTING(    0x0d,   "7 %" )
+	PORT_INCLUDE(doraemon_base)
+
+	PORT_START("DSW2")  // f007
+	PORT_DIPNAME( 0x07, 0x01, "Rank" )                                                      PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x06, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x04, "7" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0x08, 0x08, "Payout rate variation" )                                     PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "Small" )
+	PORT_DIPSETTING(    0x00, "Big" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )                                          PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )                                          PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )                                          PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )                                          PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( doraemonp )
+	PORT_INCLUDE(doraemon_base)
+
+	PORT_MODIFY("DSW1")  // f006
+	PORT_DIPNAME( 0x0f, 0x09, "Gift Out" )                                                  PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x0f,  "2.5 %" )
+	PORT_DIPSETTING(    0x0e,  "5 %" )
+	PORT_DIPSETTING(    0x0d,  "7.5 %" )
 	PORT_DIPSETTING(    0x0c,  "10 %" )
-	PORT_DIPSETTING(    0x0b,  "12 %" )
+	PORT_DIPSETTING(    0x0b,  "12.5 %" )
 	PORT_DIPSETTING(    0x0a,  "15 %" )
 	PORT_DIPSETTING(    0x09,  "20 %" )
 	PORT_DIPSETTING(    0x08,  "25 %" )
@@ -452,38 +542,17 @@ static INPUT_PORTS_START( doraemon )
 	PORT_DIPSETTING(    0x02, "100 %" )
 	PORT_DIPSETTING(    0x01, "100 %" )
 	PORT_DIPSETTING(    0x00, "100 %" )
-	PORT_DIPNAME( 0x10, 0x10, "Games For 100 Yen" )
+	PORT_DIPNAME( 0x10, 0x10, "Games For 100 Yen" )                                         PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )                                      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN0")   // f000
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE2 )  PORT_NAME( "Data Clear" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1    )
+	PORT_MODIFY("IN0")   // f000
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1    )      PORT_NAME( "Coin" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE3 )  PORT_NAME( "Freeze" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-
-	PORT_START("IN1")   // f002
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3  )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // sensor
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 
@@ -591,7 +660,7 @@ void doraemon_state::doraemon(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &doraemon_state::prg_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &doraemon_state::doraemon_map);
 	m_maincpu->set_vblank_int("screen", FUNC(doraemon_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -617,6 +686,13 @@ void doraemon_state::doraemon(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	X1_010(config, "x1snd", 14.318181_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void doraemon_state::doraemonp(machine_config &config)
+{
+	// basic machine hardware
+	doraemon(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &doraemon_state::doraemon_base_map);
 }
 
 
@@ -728,23 +804,42 @@ Notes:
                     X1-010  (QFP80)    Sound Chip, 16Bit PCM
 
       ROMs -
-            Filename  Type                          Use
-            -----------------------------------------------
-            U1        27C1001 UV EEPROM (FDIP32W)   Z80 Program
+            Filename        Type                         Use
+            --------------------------------------------------------
+            U1              27C1001 UV EPROM (FDIP32W)   Z80 Program
 
-            U7        27C1001 UV EEPROM (FDIP32W) \
-            U9        27C1001 UV EEPROM (FDIP32W) | GFX
-            U15       27C1001 UV EEPROM (FDIP32W) |
-            U22       27C1001 UV EEPROM (FDIP32W) /
+            U7              27C1001 UV EPROM (FDIP32W) \
+            U9              27C1001 UV EPROM (FDIP32W) | GFX
+            U15             27C1001 UV EPROM (FDIP32W) |
+            U22             27C1001 UV EPROM (FDIP32W) /
 
-            U26-01    82S147 PROM (DIP20)
-            U27-01    82S147 PROM (DIP20)
+            U26-01          82S147 PROM (DIP20)
+            U27-01          82S147 PROM (DIP20)
 
-            U43       27C4001 UV EEPROM (DIP32)   \
-            U51       27C4001 UV EEPROM (DIP32)   / PCM Samples
+            DHS_V1.1.U43    1Mb MASK ROM (DIP32)       \
+            DHS_V1.1.U51    1Mb MASK ROM (DIP32)       / PCM Samples
 */
 
 ROM_START( doraemon )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u1.bin", 0x00000, 0x20000, CRC(0b61f34a) SHA1(75cf36dc0c1a2eff7f7574ea34503b5637691bf5) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "u22.bin", 0x00000, 0x20000, CRC(c959688e) SHA1(51abf75a93819ed966a9256c463b3c0c9f421286) )
+	ROM_LOAD( "u15.bin", 0x20000, 0x20000, CRC(8d9a9ff8) SHA1(d062ce5a7cc3fd3e6cb95ff4ec416d519e491182) )
+	ROM_LOAD( "u9.bin",  0x40000, 0x20000, CRC(bf31b73e) SHA1(3f1ed61996eb7c62d7904918946dd0462b870ee4) )
+	ROM_LOAD( "u7.bin",  0x60000, 0x20000, CRC(2656e1e0) SHA1(9d2a21309c83d0a6b63a8127f9f7752f9dfc1e85) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )
+	ROM_LOAD( "dhs_v1.1.u43", 0x00000, 0x80000, CRC(d684d92a) SHA1(935f39e5efb923a8c7cd0caa6fa6b78a5d78ef30) )
+	ROM_LOAD( "dhs_v1.1.u51", 0x80000, 0x80000, CRC(35cbcb31) SHA1(4ab59e5d5ba917fa2d809e2dc6216c801d3927e7) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "u26-01.bin", 0x00000, 0x200, CRC(9d431542) SHA1(d8895052c5016574f13bf4c096d191534062b9a1) )
+	ROM_LOAD( "u27-01.bin", 0x00200, 0x200, CRC(66245fc7) SHA1(c94d9dce7b557c21a3dc1f3f8a1b29594715c994) )
+ROM_END
+
+ROM_START( doraemonp )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "u1.bin", 0x00000, 0x20000, CRC(d338b9ca) SHA1(5f59c994db81577dc6074362c8b6b93f8fe592f6) )
 
@@ -755,8 +850,8 @@ ROM_START( doraemon )
 	ROM_LOAD( "u7.bin",  0x60000, 0x20000, CRC(2f850973) SHA1(7dbad160aefaf8b0a85e64f58b9fa0fb4049e65d) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )
-	ROM_LOAD( "u43.bin", 0x00000, 0x80000, CRC(d684d92a) SHA1(935f39e5efb923a8c7cd0caa6fa6b78a5d78ef30) )
-	ROM_LOAD( "u51.bin", 0x80000, 0x80000, CRC(35cbcb31) SHA1(4ab59e5d5ba917fa2d809e2dc6216c801d3927e7) )
+	ROM_LOAD( "dhs_v1.1.u43", 0x00000, 0x80000, CRC(d684d92a) SHA1(935f39e5efb923a8c7cd0caa6fa6b78a5d78ef30) )
+	ROM_LOAD( "dhs_v1.1.u51", 0x80000, 0x80000, CRC(35cbcb31) SHA1(4ab59e5d5ba917fa2d809e2dc6216c801d3927e7) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "u26-01.bin", 0x00000, 0x200, CRC(9d431542) SHA1(d8895052c5016574f13bf4c096d191534062b9a1) )
@@ -766,7 +861,9 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1989,  champbwl,  0,        champbwl, champbwl, champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1989,  champbwla, champbwl, champbwl, champbwl, champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling (location test)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989,  champbwl,  0,        champbwl,  champbwl,  champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989,  champbwla, champbwl, champbwl,  champbwl,  champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling (location test)",   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993?, doraemon,  0,        doraemon, doraemon, doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
+// TODO: parent set freezes when winning during gameplay, probably due to bad hopper mapping. Needs further checks:
+GAME( 1993?, doraemon,  0,        doraemon,  doraemon,  doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon Slot",                          MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
+GAME( 1993?, doraemonp, doraemon, doraemonp, doraemonp, doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993

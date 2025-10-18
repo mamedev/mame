@@ -96,7 +96,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 
 #include "screen.h"
 #include "softlist_dev.h"

@@ -10,7 +10,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 //#include "bus/midi/midi.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/adc0804.h"
 #include "machine/nvram.h"
 #include "pg200.h"

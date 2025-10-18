@@ -29,6 +29,7 @@
 #include "emu.h"
 
 #include "cpu/e132xs/e132xs.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"

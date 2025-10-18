@@ -21,6 +21,6 @@ int specnext_ctc_device::z80daisy_irq_ack()
 {
 	int const channel = (z80ctc_device::z80daisy_irq_ack() - m_vector) / 2;
 	return ((channel > 0) || (channel_int_state(0) == Z80_DAISY_IEO))
-		? (m_vector + (channel + 3) * 2)
+		? (m_vector + ((channel + 3) << 1))
 		: m_vector;
 }

@@ -9,7 +9,7 @@
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
 #include "bus/z29_kbd/keyboard.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
 #include "screen.h"

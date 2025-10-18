@@ -3296,10 +3296,19 @@ void upd72069_device::auxcmd_w(uint8_t data)
 	case 0x36: // reset
 		soft_reset();
 		break;
+	case 0x0e:
 	case 0x1e: // motor on, probably
 		for(unsigned i = 0; i < 4; i++)
 			if(flopi[i].dev)
 				flopi[i].dev->mon_w(!BIT(data, i + 4));
+		main_phase = PHASE_RESULT;
+		result[0] = ST0_UNK;
+		result_pos = 1;
+		break;
+	case 0x88:
+	case 0x1b:
+	case 0x4f:
+	case 0xd3: // unknown
 		main_phase = PHASE_RESULT;
 		result[0] = ST0_UNK;
 		result_pos = 1;

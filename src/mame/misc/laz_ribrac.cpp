@@ -21,7 +21,7 @@ Awesome tossem u21 = 27c512
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
