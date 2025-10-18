@@ -55,7 +55,8 @@ TODO (pc9821ra20/pc9821ra266/pc9821ra333):
 - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
   involved bankswitch with Pentium based machines);
 
-TODO: (pc9821Nr15/pc9821Nr166)
+TODO: (pc9821nr15/pc9821nr166/pc9821nw150)
+- Keeps looping on SET THE SOFTWARE DIP (wants extended UPD4993A mode?)
 - Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
 - Skipping that will eventually error out with a "MEMORY ERROR" (never reads extended memory);
 
@@ -1576,7 +1577,8 @@ ROM_START( pc9821nr15 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1615,7 +1617,8 @@ ROM_START( pc9821nr166 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1631,7 +1634,8 @@ ROM_START( pc9821nw150 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 	LOAD_IDE_ROM
 ROM_END
 
