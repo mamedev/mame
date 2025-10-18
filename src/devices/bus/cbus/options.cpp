@@ -13,6 +13,7 @@
 #include "pc9801_cbus.h"
 #include "sb16_ct2720.h"
 #include "sound.h"
+#include "wavestar.h"
 
 
 void pc98_cbus_devices(device_slot_interface &device)
@@ -29,6 +30,7 @@ void pc98_cbus_devices(device_slot_interface &device)
 	device.option_add("amd98",      AMD98);
 	device.option_add("mpu_pc98",   MPU_PC98);
 	device.option_add("sb16",       SB16_CT2720);
+	device.option_add("wavestar",   QVISION_WAVESTAR);
 
 	// doujinshi HW
 // MAD Factory / Doujin Hard (同人ハード)

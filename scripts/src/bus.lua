@@ -5469,6 +5469,8 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.h",
 		MAME_DIR .. "src/devices/bus/cbus/sound.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/sound.h",
+		MAME_DIR .. "src/devices/bus/cbus/wavestar.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/wavestar.h",
 	}
 end
 
