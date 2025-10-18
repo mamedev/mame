@@ -74,7 +74,6 @@ class macs_state : public driver_device
 public:
 	macs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_cart_bank(0)
 		, m_ram2(*this, "ram2")
 		, m_maincpu(*this,"maincpu")
 		, m_cart1(*this, "slot_a")
@@ -86,26 +85,20 @@ public:
 		, m_rambank(*this, "rambank%u", 1)
 	{ }
 
-	void macs(machine_config &config);
+	void macs(machine_config &config) ATTR_COLD;
 
-	void init_macs();
-	void init_kisekaeh();
-	void init_kisekaem();
-	void init_macs2();
+	void init_macs() ATTR_COLD;
+	void init_kisekaeh() ATTR_COLD;
+	void init_kisekaem() ATTR_COLD;
+	void init_macs2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	uint8_t m_mux_data = 0;
-	uint8_t m_rev = 0;
-	uint8_t m_cart_bank = 0;
 	std::unique_ptr<uint8_t[]> m_ram1;
 	required_shared_ptr<uint8_t> m_ram2;
-	void rambank_w(uint8_t data);
-	uint8_t input_r(offs_t offset);
-	void output_w(offs_t offset, uint8_t data);
 
 	optional_device<st0016_cpu_device> m_maincpu;
 	optional_device<generic_slot_device> m_cart1;
@@ -116,6 +109,13 @@ private:
 
 	required_memory_bank m_rombank;
 	required_memory_bank_array<2> m_rambank;
+
+	uint8_t m_mux_data = 0;
+	uint8_t m_rev = 0;
+
+	void rambank_w(uint8_t data);
+	uint8_t input_r(offs_t offset);
+	void output_w(offs_t offset, uint8_t data);
 
 	void macs_extrom_mem(address_map &map) ATTR_COLD;
 	void macs_io(address_map &map) ATTR_COLD;
@@ -146,7 +146,7 @@ uint8_t macs_state::input_r(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0:
+	case 0:
 		{
 			/*It's bit-wise*/
 			switch (m_mux_data & 0x0f)
@@ -162,17 +162,17 @@ uint8_t macs_state::input_r(offs_t offset)
 					return 0xff;
 			}
 		}
-		case 1: return m_sys_io[0]->read();
-		case 2: return m_dsw_io[0]->read();
-		case 3: return m_dsw_io[1]->read();
-		case 4: return m_dsw_io[2]->read();
-		case 5: return m_dsw_io[3]->read();
-		case 6: return m_dsw_io[4]->read();
-		case 7: return m_sys_io[1]->read();
-		default:
-			if (!machine().side_effects_disabled())
-				popmessage("Unmapped I/O read at PC = %04x offset = %02x", m_maincpu->pc(), offset + 0xc0);
-			break;
+	case 1: return m_sys_io[0]->read();
+	case 2: return m_dsw_io[0]->read();
+	case 3: return m_dsw_io[1]->read();
+	case 4: return m_dsw_io[2]->read();
+	case 5: return m_dsw_io[3]->read();
+	case 6: return m_dsw_io[4]->read();
+	case 7: return m_sys_io[1]->read();
+	default:
+		if (!machine().side_effects_disabled())
+			popmessage("Unmapped I/O read at PC = %04x offset = %02x", m_maincpu->pc(), offset + 0xc0);
+		break;
 	}
 
 	return 0xff;
@@ -183,7 +183,7 @@ void macs_state::output_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0:
+	case 0:
 		/*
 		--x- ---- sets RAM bank?
 		---- -x-- Cassette B slot
@@ -197,14 +197,15 @@ void macs_state::output_w(offs_t offset, uint8_t data)
 			    locks up. */
 			m_rambank[0]->set_entry(BIT(data, 5));
 
-			m_cart_bank = (data & 0xc) >> 2;
-			m_rombank->set_entry(m_cart_bank);
+			m_rombank->set_entry((data >> 2) & 0x03);
 		}
 
 		m_rambank[1]->set_entry(BIT(data, 5));
 		break;
-		case 2: m_mux_data = data; break;
 
+	case 2:
+		m_mux_data = data;
+		break;
 	}
 }
 
