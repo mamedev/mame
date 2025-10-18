@@ -157,6 +157,7 @@ public:
 	}
 
 	void pc9821xa16(machine_config &config);
+	void pc9821xv13(machine_config &config);
 //	void pc9821xs(machine_config &config);
 };
 

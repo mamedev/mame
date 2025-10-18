@@ -10,7 +10,7 @@ References:
 - https://www.satotomi.com/sl9821/sl9821_tec5.html for PEGC MMIO
 - Mate-R_bible.pdf for late machine HW pics and info
 - https://retrostuff.org/2017/04/11/nec-pc-9821-bios-translation/
-
+- http://ookumaneko.s1005.xrea.com/pcibios.htm (Ra266 PCI Config Space at the end)
 
 TODO (pc9821):
 - non-fatal "cache error" at POST for all machines listed here;
@@ -42,13 +42,16 @@ TODO (pc9821cx3):
   which currently doesn't work. It also never returns a valid processor or CPU clock,
   is it a debug side-effect or supposed to be read somehow?
 - Entering into setup mode (fd26a ax|=80), de-quiet splash screen (first menu, 3rd option)
-  then exit will have following effects:
+  then exit will have following mutually exclusive effects:
 \- MAME hardlocks (?)
 \- fatal TIMER ERROR (often)
 \- non-fatal SIMM and 2nd cache errors (allows boot for a bit, will crash in
    msdos62 with an error code 21)
 
-TODO (pc9821xa16/pc9821ra20/pc9821ra266/pc9821ra333):
+TODO (pc9821xa16/pc9821xv13):
+- PARITY ERROR 00000000
+
+TODO (pc9821ra20/pc9821ra266/pc9821ra333):
 - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
   involved bankswitch with Pentium based machines);
 
@@ -976,14 +979,14 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 {
 	pc9821(config);
-	PENTIUM(config.replace(), m_maincpu, 166000000); // Pentium P54C, secondary cache 256KB/512KB
+	PENTIUM(config.replace(), m_maincpu, 166'000'000); // Pentium P54C, secondary cache 256KB/512KB
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	// Xa16/R specs
 	// 16MB ~ 128MB F.P.DRAM
-	// VLSI Supercore594
+	// VLSI Supercore594 (PCI rev 2.0)
 	// S3 manufactured Trident TGUI9680XGi with 2MB VRAM (on board PCI)
 	// 3.5" floppy x1
 	// 3 C-Bus slots (one occupied by "K12")
@@ -992,12 +995,28 @@ void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 	// CD-Rom x4
 
 	// Xa16/W specs (same as above except)
-	// Intel I430HX
+	// Intel I430HX (PCI rev 2.1)
 	// 32MB ~ 256MB ECC compatible EDO DRAM
 	// S3 manufactured Trident TGUI9682XGi with 2MB VRAM (on board PCI)
 	// 100Base-TX / 10Base-T ethernet (on board PCI)
 	// 1.6GB HDD
 	// CD-Rom x6 or x8
+	PCI_ROOT(config, "pci", 0);
+	// ...
+}
+
+void pc9821_mate_x_state::pc9821xv13(machine_config &config)
+{
+	pc9821(config);
+	PENTIUM(config.replace(), m_maincpu, 133'000'000); // Pentium, secondary cache 256KB/512KB
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// Xv13/R identical to Xa16/R specs with an extra C-Bus slot
+
+	// Xv13/W identical to Xa16/W specs with MGA-2064W as PCI GFX card
+	// PCI rev 2.0 or 2.1
 	PCI_ROOT(config, "pci", 0);
 	// ...
 }
@@ -1142,7 +1161,7 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 	ROM_IGNORE( 0x2000 )
 
 // all of these are half size :/
-#define LOAD_KANJI_ROMS \
+#define LOAD_KANJI_ROMS(_ram_fill_) \
 	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF ) \
 	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) ) \
 	ROM_CONTINUE(                      0x20000, 0x4000  ) \
@@ -1152,7 +1171,7 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 	ROM_CONTINUE(                      0x60000, 0x4000  ) \
 	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) ) \
 	ROM_CONTINUE(                      0x60001, 0x4000  ) \
-	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x100000, "kanji", _ram_fill_ ) \
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 
 /*
@@ -1177,7 +1196,7 @@ ROM_START( pc9821 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1206,7 +1225,7 @@ ROM_START( pc9821as )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1242,7 +1261,7 @@ ROM_START( pc9821ap2 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
 	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
@@ -1290,7 +1309,7 @@ ROM_START( pc9821ce )
 	ROM_REGION( 0x4000, "cbus0:sound_pc9821ce:sound_bios", ROMREGION_ERASE00 )
 	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	// Uses SCSI not IDE
 //	LOAD_IDE_ROM
 ROM_END
@@ -1367,20 +1386,9 @@ ROM_START( pc9821cx3 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
-	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
-	ROM_CONTINUE(                      0x20000, 0x4000  )
-	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
-	ROM_CONTINUE(                      0x20001, 0x4000  )
-	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
-	ROM_CONTINUE(                      0x60000, 0x4000  )
-	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
-	ROM_CONTINUE(                      0x60001, 0x4000  )
-
 	// NOTE: needs 0-fill erase for initialization
 	// cfr. $afe00 and $ad400 range
-	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASE00 )
-	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 
 	ROM_REGION( 0x4000, "cbus0:sound_pc9821cx3:sound_bios", 0)
 	ROM_COPY( "biosrom", 0x54000, 0x00000, 0x04000 )
@@ -1407,13 +1415,7 @@ Retired: not very useful without actual code
 //	ROM_LOAD( "font_xs.rom",     0x00000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
 /*
-9821Xa16
-
-Pentium P54C @ 166
-32MB
-3.5"2DD/2HDx1, 8xCD-ROM
-CBus: 3 slots
-
+Xa16 - Pentium P54C @ 166
 */
 
 ROM_START( pc9821xa16 )
@@ -1422,6 +1424,8 @@ ROM_START( pc9821xa16 )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: all of the 256k space seems valid
+	// 0x00000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
+	// 0x04000: setup mode
 	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
 	ROM_COPY( "biosrom", 0x20000, 0x28000, 0x08000 )
 	ROM_COPY( "biosrom", 0x18000, 0x20000, 0x08000 )
@@ -1430,12 +1434,43 @@ ROM_START( pc9821xa16 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x00000, 0x00000, 0x02000 )
 ROM_END
 
 /*
-Ra20 (98MATE R) - Pentium Pro @ 200
+Xv13 - Pentium @ 133
+*/
+
+ROM_START( pc9821xv13 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "wth4g01_bios.bin", 0x00000, 0x040000, CRC(4c5019e9) SHA1(1a30744d5583c5f05c134b385a8074bfc0fe4d10) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	// 0x00000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
+	// 0x04000: setup mode
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x20000, 0x28000, 0x08000 )
+	ROM_COPY( "biosrom", 0x18000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x10000, 0x18000, 0x08000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x00000, 0x00000, 0x02000 )
+ROM_END
+
+
+/*
+Ra20 - Pentium Pro @ 200
 */
 
 ROM_START( pc9821ra20 )
@@ -1450,7 +1485,7 @@ ROM_START( pc9821ra20 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1470,7 +1505,7 @@ ROM_START( pc9821ra266 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1490,7 +1525,7 @@ ROM_START( pc9821ra333 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1541,7 +1576,7 @@ ROM_START( pc9821nr15 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1580,7 +1615,7 @@ ROM_START( pc9821nr166 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1596,7 +1631,7 @@ ROM_START( pc9821nw150 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1632,7 +1667,8 @@ COMP( 1995, pc9821cx3,  0,         0, pc9821cx3,    pc9821,   pc9821_canbe_state
 
 // 98MATE X (i486sx/Pentium/Pentium Pro, has PCI, comes with various SVGA cards)
 //COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING )
-COMP( 1996, pc9821xa16,  0,    0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING )
+COMP( 1996, pc9821xa16,  0,             0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING )
+COMP( 1996, pc9821xv13,  pc9821xa16,    0, pc9821xv13,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xv13/W16 (98MATE X)",        MACHINE_NOT_WORKING )
 
 // 98MATE VALUESTAR (Pentium, comes with Windows 95 and several programs pre-installed)
 //COMP( 1998, pc9821v13,   0,           0, pc9821v13,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
