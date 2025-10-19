@@ -1,64 +1,16 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese, Matthew Daniels
 /********************************************************************
 
     Sega Model 2 3D rasterization functions
 
 ********************************************************************/
 
-#undef MODEL2_CHECKER
-#undef MODEL2_TEXTURED
-#undef MODEL2_TRANSLUCENT
 
-#ifndef MODEL2_FUNC
-#error "Model 2 renderer: No function defined!"
-#endif
-
-#ifndef MODEL2_FUNC_NAME
-#error "Model 2 renderer: No function name defined!"
-#endif
-
-#if MODEL2_FUNC == 0
-#undef MODEL2_CHECKER
-#undef MODEL2_TEXTURED
-#undef MODEL2_TRANSLUCENT
-#elif MODEL2_FUNC == 1
-#undef MODEL2_CHECKER
-#undef MODEL2_TEXTURED
-#define MODEL2_TRANSLUCENT
-#elif MODEL2_FUNC == 2
-#undef MODEL2_CHECKER
-#define MODEL2_TEXTURED
-#undef MODEL2_TRANSLUCENT
-#elif MODEL2_FUNC == 3
-#undef MODEL2_CHECKER
-#define MODEL2_TEXTURED
-#define MODEL2_TRANSLUCENT
-#elif MODEL2_FUNC == 4
-#define MODEL2_CHECKER
-#undef MODEL2_TEXTURED
-#undef MODEL2_TRANSLUCENT
-#elif MODEL2_FUNC == 5
-#define MODEL2_CHECKER
-#undef MODEL2_TEXTURED
-#define MODEL2_TRANSLUCENT
-#elif MODEL2_FUNC == 6
-#define MODEL2_CHECKER
-#define MODEL2_TEXTURED
-#undef MODEL2_TRANSLUCENT
-#elif MODEL2_FUNC == 7
-#define MODEL2_CHECKER
-#define MODEL2_TEXTURED
-#define MODEL2_TRANSLUCENT
-#else
-#error "Model 2 renderer: Invalid function selected!"
-#endif
-
-#ifndef MODEL2_TEXTURED
 /* non-textured render path */
-void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
+template <bool checker, bool translucent>
+void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
 {
-#if !defined( MODEL2_TRANSLUCENT)
 	model2_state *state = object.state;
 	u32 *const p = &m_destmap.pix(scanline);
 	u8  *gamma_value = &state->m_gamma_table[0];
@@ -71,11 +23,10 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	u8   luma;
 	u32  tr, tg, tb;
 	int     x;
-#endif
+
 	/* if it's translucent, there's nothing to render */
-#if defined( MODEL2_TRANSLUCENT)
-	return;
-#else
+	if (translucent)
+		return;
 
 	luma = object.luma >> 2;
 
@@ -99,20 +50,11 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	color = rgb_t(tr, tg, tb);
 
 	for(x = extent.startx; x < extent.stopx; x++)
-#if defined(MODEL2_CHECKER)
-		if ((x^scanline) & 1) p[x] = color;
-#else
-		p[x] = color;
-#endif
-#endif
+		if (!checker || (x^scanline) & 1) p[x] = color;
 }
 
-#else
-#define MODEL2_CONCAT(x, y) x##y
-#define MODEL2_XCONCAT(x, y) MODEL2_CONCAT(x, y)
-#define MODEL2_BILINEAR_FUNC_NAME MODEL2_XCONCAT(MODEL2_FUNC_NAME,_BilinearSample)
-
-u32 MODEL2_BILINEAR_FUNC_NAME(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv )
+template <bool translucent>
+u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv )
 {
 	float lodfactor[6] = { 256.0f, 128.0f, 64.0f, 32.0f, 16.0f, 8.0f };
 	u32  tex_mirr_x = object.texmirrorx;
@@ -127,9 +69,6 @@ u32 MODEL2_BILINEAR_FUNC_NAME(const m2_poly_extra_data& object, const u32 miplev
 	int32_t u = fu * lodfactor[miplevel];
 	int32_t v = fv * lodfactor[miplevel];
 	u32  t, tex1, tex2, tex3, tex4, frac1, frac2, frac3, frac4;
-#if defined(MODEL2_TRANSLUCENT)
-	u32  alp, alp1, alp2, alp3, alp4;
-#endif
 	int u2, u2n;
 	int v2, v2n;
 
@@ -165,36 +104,38 @@ u32 MODEL2_BILINEAR_FUNC_NAME(const m2_poly_extra_data& object, const u32 miplev
 	tex2 = get_texel(tex_x, tex_y, u2n, v2, sheet);
 	tex3 = get_texel(tex_x, tex_y, u2, v2n, sheet);
 	tex4 = get_texel(tex_x, tex_y, u2n, v2n, sheet);
-#if defined(MODEL2_TRANSLUCENT)
-	alp1 = (tex1 + 1) >> 4;
-	alp2 = (tex2 + 1) >> 4;
-	alp3 = (tex3 + 1) >> 4;
-	alp4 = (tex4 + 1) >> 4;
-	alp = alp1 * frac2 * frac4 + alp2 * frac1 * frac4 + alp3 * frac2 * frac3 + alp4 * frac1 * frac3;
-	if (alp >= 0x8000)
-		return 0xFFFFFFFF;
+	if (translucent)
+	{
+		u32 alp1 = (tex1 + 1) >> 4;
+		u32 alp2 = (tex2 + 1) >> 4;
+		u32 alp3 = (tex3 + 1) >> 4;
+		u32 alp4 = (tex4 + 1) >> 4;
+		u32 alp = alp1 * frac2 * frac4 + alp2 * frac1 * frac4 + alp3 * frac2 * frac3 + alp4 * frac1 * frac3;
+		if (alp >= 0x8000)
+			return 0xFFFFFFFF;
 
-	// Anti Alpha Highlighted Edges
-	tex1 &= alp1 - 1;
-	tex2 &= alp2 - 1;
-	tex3 &= alp3 - 1;
-	tex4 &= alp4 - 1;
-	u32 maxValidTex = std::max(std::max(std::max(tex1, tex2), tex3), tex4);
-	if (alp1)
-		tex1 = maxValidTex;
-	if (alp2)
-		tex2 = maxValidTex;
-	if (alp3)
-		tex3 = maxValidTex;
-	if (alp4)
-		tex4 = maxValidTex;
-#endif
+		// Anti Alpha Highlighted Edges
+		tex1 &= alp1 - 1;
+		tex2 &= alp2 - 1;
+		tex3 &= alp3 - 1;
+		tex4 &= alp4 - 1;
+		u32 maxValidTex = std::max(std::max(std::max(tex1, tex2), tex3), tex4);
+		if (alp1)
+			tex1 = maxValidTex;
+		if (alp2)
+			tex2 = maxValidTex;
+		if (alp3)
+			tex3 = maxValidTex;
+		if (alp4)
+			tex4 = maxValidTex;
+	}
 	t = tex1 * frac2 * frac4 + tex2 * frac1 * frac4 + tex3 * frac2 * frac3 + tex4 * frac1 * frac3;
 	return t >> 8;
 }
 
 /* textured render path */
-void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
+template <bool checker, bool translucent>
+void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
 {
 	model2_state *state = object.state;
 	u32 *const p = &m_destmap.pix(scanline);
@@ -229,10 +170,8 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 
 	for (x = extent.startx; x < extent.stopx; x++, uoz += dudxoz, voz += dvdxoz, ooz += dooz)
 	{
-#if defined(MODEL2_CHECKER)
-		if (((x ^ scanline) & 1) == 0)
+		if (checker && ((x ^ scanline) & 1) == 0)
 			continue;
-#endif
 
 		float z = recip_approx(ooz);
 		float mml = log2(norm * z) - 2.0f; // No parts are squared so no need for the usual 0.5 factor
@@ -240,11 +179,11 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 		float fu = uoz * z;
 		float fv = voz * z;
 
-		t = MODEL2_BILINEAR_FUNC_NAME(object, level, fu, fv);
+		t = fetch_bilinear_texel<translucent>(object, level, fu, fv);
 		if (t == 0xFFFFFFFF)
 			continue;
 
-		t2 = MODEL2_BILINEAR_FUNC_NAME(object, level + 1, fu, fv);
+		t2 = fetch_bilinear_texel<translucent>(object, level + 1, fu, fv);
 		if (t2 != 0xFFFFFFFF)
 		{
 			// Trilinear combination
@@ -271,5 +210,3 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 		p[x] = rgb_t(tr, tg, tb);
 	}
 }
-
-#endif
