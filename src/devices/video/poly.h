@@ -372,7 +372,7 @@ private:
 		if (value >= BaseType(std::numeric_limits<int32_t>::max()))
 			return std::numeric_limits<int32_t>::max();
 		const BaseType ipart = std::floor(value);
-		else if (ipart < BaseType(std::numeric_limits<int32_t>::min()))
+		if (ipart < BaseType(std::numeric_limits<int32_t>::min()))
 			return std::numeric_limits<int32_t>::min();
 
 		// round
