@@ -117,7 +117,7 @@ public:
 		VFX,
 		VFX_SD,
 		SD_1,
-		SD_1_32		
+		SD_1_32
 	};
 
 protected:
