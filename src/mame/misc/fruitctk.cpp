@@ -251,7 +251,7 @@ void fruitctk_state::fruitctk(machine_config &config)
 	/* basic machine hardware */
 	i8051_device &maincpu(I8051(config, "maincpu", XTAL(12'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &fruitctk_state::program_map);
-	maincpu.set_addrmap(AS_IO, &fruitctk_state::data_map);
+	maincpu.set_addrmap(AS_DATA, &fruitctk_state::data_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
 	maincpu.port_out_cb<1>().set(FUNC(fruitctk_state::p1_w));
    
@@ -298,3 +298,4 @@ ROM_END
 
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
