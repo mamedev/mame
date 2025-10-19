@@ -1801,7 +1801,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 		The IIc Technical Reference says: "if the IOUDis switch is on, both
 		reading from and writing to addresses C058 through C05D are reserved".
 		The IIc does not have an internal gameio port, and the annunciators
-		are not available on the external DB-9 connector, so even if state
+		are not available on the external DE-9 connector, so even if state
 		changes, it can't go anywhere, and can't be read back.
 		*/
 	}
@@ -5252,6 +5252,10 @@ void apple2e_state::apple2c(machine_config &config)
 
 	// IIc and friends have no cassette port
 	config.device_remove(A2_CASSETTE_TAG);
+
+	// IIc has no internal gameio port, only the external connector
+	config.device_remove("gameio");
+	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::joystick_options, nullptr);
 
 	config.device_remove("sl1");   // IIc has no slots, of course :)
 	config.device_remove("sl2");
