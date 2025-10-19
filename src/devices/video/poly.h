@@ -366,12 +366,28 @@ private:
 
 	// round in a cross-platform consistent manner
 	inline int32_t round_coordinate(BaseType value)
-	{
-		int32_t result = int32_t(std::floor(value));
-		if (value > 0 && result < 0)
-			return INT_MAX - 1;
-		return result + (value - BaseType(result) > BaseType(0.5));
-	}
+{
+    // 1. SATURATION CHECK (Overflow/Underflow Prevention)
+    if (value >= static_cast<BaseType>(INT32_MAX))
+        return INT32_MAX; // Saturate at the maximum positive value.
+
+    if (value <= static_cast<BaseType>(INT32_MIN))
+        return INT32_MIN; // Saturate at the minimum negative value.
+
+    // 2. FLOOR AND SAFE CONVERSION
+    BaseType floored = std::floor(value);
+    int32_t result = static_cast<int32_t>(floored);
+
+    // 3. ROUNDING LOGIC
+    if (value - floored > BaseType(0.5))
+    {
+        // 4. DEFENSIVE INCREMENT (Final Overflow Check)
+        if (result < INT32_MAX)
+            ++result;
+    }
+
+    return result;
+}
 
 	// internal helpers
 	primitive_info &primitive_alloc(int minx, int maxx, int miny, int maxy, render_delegate callback)
