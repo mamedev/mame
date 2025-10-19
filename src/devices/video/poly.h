@@ -364,30 +364,28 @@ private:
 	using primitive_array = poly_array<primitive_info, 0>;
 	using unit_array = poly_array<work_unit, 0>;
 
-	// round in a cross-platform consistent manner
+	// round in a cross-platform consistent manner	
 	inline int32_t round_coordinate(BaseType value)
-{
-    // 1. SATURATION CHECK (Overflow/Underflow Prevention)
-    if (value >= static_cast<BaseType>(INT32_MAX))
-        return INT32_MAX; // Saturate at the maximum positive value.
+	{
+		// 1. Saturation check (prevent overflow/underflow)
+		if (value >= static_cast<BaseType>(std::numeric_limits<int32_t>::max()))
+			return std::numeric_limits<int32_t>::max();
+		if (value <= static_cast<BaseType>(std::numeric_limits<int32_t>::min()))
+			return std::numeric_limits<int32_t>::min();
 
-    if (value <= static_cast<BaseType>(INT32_MIN))
-        return INT32_MIN; // Saturate at the minimum negative value.
+		// 2. Floor and fractional part
+		const BaseType ipart = std::floor(value);
+		const BaseType fpart = value - ipart;
 
-    // 2. FLOOR AND SAFE CONVERSION
-    BaseType floored = std::floor(value);
-    int32_t result = static_cast<int32_t>(floored);
+		// 3. Convert safely
+		int32_t result = static_cast<int32_t>(ipart);
 
-    // 3. ROUNDING LOGIC
-    if (value - floored > BaseType(0.5))
-    {
-        // 4. DEFENSIVE INCREMENT (Final Overflow Check)
-        if (result < INT32_MAX)
-            ++result;
-    }
+		// 4. Round up if fraction > 0.5 (with defensive overflow check)
+		if (fpart > BaseType(0.5) && result < std::numeric_limits<int32_t>::max())
+			++result;
 
-    return result;
-}
+		return result;
+	}	
 
 	// internal helpers
 	primitive_info &primitive_alloc(int minx, int maxx, int miny, int maxy, render_delegate callback)
