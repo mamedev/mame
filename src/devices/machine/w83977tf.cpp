@@ -11,6 +11,7 @@ TODO:
      status only three times (and port $61 is claimed by PIIX4 for PCI SERR# read only)
 - DRQ (savquest enables DRQ3 for LPT)
 - Hookup LPT modes;
+- subclass for megadrive magistr16 system (uses w83977f/w83977af)
 
 **************************************************************************************************/
 

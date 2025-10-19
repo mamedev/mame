@@ -2142,6 +2142,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/m95320.h,MACHINES["M95320"] = true
+---------------------------------------------------
+
+if (MACHINES["M95320"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/m95320.cpp",
+		MAME_DIR .. "src/devices/machine/m95320.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/macseconds.h,MACHINES["MACSECONDS"] = true
 ---------------------------------------------------
 
