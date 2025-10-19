@@ -676,13 +676,13 @@ public:
 	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
 	void set_yoffset(int16_t yoffs) { m_yoffs = yoffs; }
 
-	template <bool checker, bool translucent>
+	template <bool Checker, bool Translucent>
 	void draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
-	template <bool translucent>
+	template <bool Translucent>
 	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv);
 
-	template <bool checker, bool translucent>
+	template <bool Checker, bool Translucent>
 	void draw_scanline_tex(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 private:

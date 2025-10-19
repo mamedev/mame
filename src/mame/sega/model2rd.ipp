@@ -8,7 +8,7 @@
 
 
 /* non-textured render path */
-template <bool checker, bool translucent>
+template <bool Checker, bool Translucent>
 void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
 {
 	model2_state *state = object.state;
@@ -25,7 +25,7 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 	int     x;
 
 	/* if it's translucent, there's nothing to render */
-	if (translucent)
+	if (Translucent)
 		return;
 
 	luma = object.luma >> 2;
@@ -50,10 +50,10 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 	color = rgb_t(tr, tg, tb);
 
 	for(x = extent.startx; x < extent.stopx; x++)
-		if (!checker || (x^scanline) & 1) p[x] = color;
+		if (!Checker || (x^scanline) & 1) p[x] = color;
 }
 
-template <bool translucent>
+template <bool Translucent>
 u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv )
 {
 	float lodfactor[6] = { 256.0f, 128.0f, 64.0f, 32.0f, 16.0f, 8.0f };
@@ -104,7 +104,7 @@ u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, cons
 	tex2 = get_texel(tex_x, tex_y, u2n, v2, sheet);
 	tex3 = get_texel(tex_x, tex_y, u2, v2n, sheet);
 	tex4 = get_texel(tex_x, tex_y, u2n, v2n, sheet);
-	if (translucent)
+	if (Translucent)
 	{
 		u32 alp1 = (tex1 + 1) >> 4;
 		u32 alp2 = (tex2 + 1) >> 4;
@@ -134,7 +134,7 @@ u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, cons
 }
 
 /* textured render path */
-template <bool checker, bool translucent>
+template <bool Checker, bool Translucent>
 void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
 {
 	model2_state *state = object.state;
@@ -170,7 +170,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t& extent
 
 	for (x = extent.startx; x < extent.stopx; x++, uoz += dudxoz, voz += dvdxoz, ooz += dooz)
 	{
-		if (checker && ((x ^ scanline) & 1) == 0)
+		if (Checker && ((x ^ scanline) & 1) == 0)
 			continue;
 
 		float z = recip_approx(ooz);
@@ -179,11 +179,11 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t& extent
 		float fu = uoz * z;
 		float fv = voz * z;
 
-		t = fetch_bilinear_texel<translucent>(object, level, fu, fv);
+		t = fetch_bilinear_texel<Translucent>(object, level, fu, fv);
 		if (t == 0xFFFFFFFF)
 			continue;
 
-		t2 = fetch_bilinear_texel<translucent>(object, level + 1, fu, fv);
+		t2 = fetch_bilinear_texel<Translucent>(object, level + 1, fu, fv);
 		if (t2 != 0xFFFFFFFF)
 		{
 			// Trilinear combination
