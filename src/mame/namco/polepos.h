@@ -71,8 +71,8 @@ protected:
 	optional_region_ptr<uint8_t> m_52xx_region;
 	required_region_ptr<uint8_t> m_road_region;
 	required_region_ptr<uint8_t> m_scalelut_region;
-	optional_ioport_array<2> m_analog_io;
-	optional_ioport m_steer_io;
+	required_ioport_array<2> m_analog_io;
+	required_ioport m_steer_io;
 
 	uint8_t m_steer_last = 0;
 	uint8_t m_steer_delta = 0;

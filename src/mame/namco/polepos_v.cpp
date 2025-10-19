@@ -381,7 +381,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap, bool big,
 	uint32_t const transmask = m_palette->transpen_mask(*gfx, color, 0x1f);
 	int const coloroffs = gfx->colorbase() + color * gfx->granularity();
 
-	if (flipx) flipx = big ? 0x1f : 0x0f;
+	int const offsxor = flipx ? (big ? 0x1f : 0x0f) : 0;
 
 	for (int y = 0; y <= sizey; y++)
 	{
@@ -402,7 +402,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap, bool big,
 			{
 				if (xx < 0x100)
 				{
-					int const pen = src[offs/2 ^ flipx];
+					int const pen = src[offs/2 ^ offsxor];
 
 					if (!((transmask >> pen) & 1))
 						bitmap.pix(yy, xx) = pen + coloroffs;
