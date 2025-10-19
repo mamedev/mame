@@ -47,25 +47,6 @@ namespace {
 
 #define DEBUG_CHAR
 
-#define SPRITE_GLOBAL_X 0
-#define SPRITE_GLOBAL_Y 1
-#define SUBLIST_OFFSET  2
-#define SUBLIST_LENGTH  3
-
-#define SUBLIST_OFFSET_SHIFT 3
-#define SPRITE_LIST_END_MARKER 0x8000
-
-#define SPRITE_TILE    0
-#define SPRITE_PALETTE 1
-#define SPRITE_LOCAL_X 2
-#define SPRITE_LOCAL_Y 3
-#define SPRITE_SIZE    4
-
-#define SPRITE_SUBLIST_ENTRY_LENGTH 8
-#define SPRITE_LIST_ENTRY_LENGTH    4
-
-#define SPRITE_DATA_GRANULARITY 0x80
-
 class srmp5_state : public driver_device
 {
 public:
@@ -76,7 +57,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this,"soundcpu")
 		, m_chrrom(*this, "chr")
-		, m_soundbank(*this, "soundbank")
 		, m_keys(*this, "KEY.%u", 0)
 		, m_chrbank(0)
 	{
@@ -84,9 +64,35 @@ public:
 
 	void srmp5(machine_config &config);
 
-	void init_srmp5();
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
+	enum
+	{
+		SPRITE_GLOBAL_X = 0,
+		SPRITE_GLOBAL_Y,
+		SUBLIST_OFFSET,
+		SUBLIST_LENGTH
+	};
+
+	static constexpr uint32_t SUBLIST_OFFSET_SHIFT = 3;
+	static constexpr uint16_t SPRITE_LIST_END_MARKER = 0x8000;
+
+	enum
+	{
+		SPRITE_TILE = 0,
+		SPRITE_PALETTE,
+		SPRITE_LOCAL_X,
+		SPRITE_LOCAL_Y,
+		SPRITE_SIZE
+	};
+
+	static constexpr uint32_t SPRITE_SUBLIST_ENTRY_LENGTH = 8;
+	static constexpr uint32_t SPRITE_LIST_ENTRY_LENGTH    = 4;
+
+	static constexpr uint32_t SPRITE_DATA_GRANULARITY = 0x80;
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<r3051_device> m_maincpu;
@@ -94,21 +100,19 @@ private:
 
 	required_region_ptr<uint16_t> m_chrrom;
 
-	required_memory_bank m_soundbank;
-
 	required_ioport_array<4> m_keys;
 
-	uint32_t m_chrbank;
+	uint32_t m_chrbank = 0;
 	std::unique_ptr<uint16_t[]> m_tileram;
 	std::unique_ptr<uint16_t[]> m_sprram;
 
-	uint8_t m_input_select;
+	uint8_t m_input_select = 0;
 
-	uint8_t m_cmd1;
-	uint8_t m_cmd2;
-	uint8_t m_cmd_stat;
+	uint8_t m_cmd1 = 0;
+	uint8_t m_cmd2 = 0;
+	uint8_t m_cmd_stat = 0;
 
-	uint32_t m_vidregs[0x120 / 4];
+	uint32_t m_vidregs[0x120 / 4]{};
 #ifdef DEBUG_CHAR
 	std::unique_ptr<uint8_t[]> m_tileduty;
 #endif
@@ -129,11 +133,10 @@ private:
 	uint8_t cmd1_r();
 	uint8_t cmd2_r();
 	uint8_t cmd_stat8_r();
-	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void st0016_rom_bank_w(uint8_t data);
 	void srmp5_mem(address_map &map) ATTR_COLD;
+	void st0016_extrom_map(address_map &map) ATTR_COLD;
 	void st0016_io(address_map &map) ATTR_COLD;
 	void st0016_mem(address_map &map) ATTR_COLD;
 };
@@ -141,35 +144,34 @@ private:
 
 uint32_t srmp5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int address,height,width,sizex,sizey;
-	uint16_t *sprite_list=m_sprram.get();
-	uint16_t *sprite_list_end=&m_sprram[0x4000]; //guess
-	uint8_t *pixels=(uint8_t *)m_tileram.get();
-	const pen_t * const pens = m_palette->pens();
+	const uint16_t *sprite_list = m_sprram.get();
+	const uint16_t *sprite_list_end = &m_sprram[0x4000]; //guess
+	const uint8_t *pixels = (uint8_t *)m_tileram.get();
+	const pen_t *const pens = m_palette->pens();
 
 //Table surface seems to be tiles, but display corrupts when switching the scene if always ON.
 //Currently the tiles are OFF.
 #ifdef BG_ENABLE
-	uint8_t tile_width  = (m_vidregs[2] >> 0) & 0xFF;
-	uint8_t tile_height = (m_vidregs[2] >> 8) & 0xFF;
-	if(tile_width && tile_height)
+	uint8_t tile_width  = (m_vidregs[2] >> 0) & 0xff;
+	uint8_t tile_height = (m_vidregs[2] >> 8) & 0xff;
+	if (tile_width && tile_height)
 	{
 		// 16x16 tile
 		uint16_t *map = &sprram[0x2000];
-		for(int yw = 0; yw < tile_height; yw++)
+		for (int yw = 0; yw < tile_height; yw++)
 		{
-			for(int xw = 0; xw < tile_width; xw++)
+			for (int xw = 0; xw < tile_width; xw++)
 			{
 				uint16_t tile = map[yw * 128 + xw * 2];
-				if(tile >= 0x2000) continue;
+				if (tile >= 0x2000) continue;
 
 				address = tile * SPRITE_DATA_GRANULARITY;
-				for(int y = 0; y < 16; y++)
+				for (int y = 0; y < 16; y++)
 				{
-					for(int x = 0; x < 16; x++)
+					for (int x = 0; x < 16; x++)
 					{
 						uint8_t pen = pixels[BYTE_XOR_LE(address)];
-						if(pen)
+						if (pen)
 						{
 							bitmap.pix(yw * 16 + y, xw * 16 + x) = pens[pen];
 						}
@@ -183,46 +185,48 @@ uint32_t srmp5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 #endif
 		bitmap.fill(0, cliprect);
 
-	while((sprite_list[SUBLIST_OFFSET]&SPRITE_LIST_END_MARKER)==0 && sprite_list<sprite_list_end)
+	while ((sprite_list[SUBLIST_OFFSET] & SPRITE_LIST_END_MARKER) == 0 && sprite_list < sprite_list_end)
 	{
-		uint16_t *sprite_sublist=&m_sprram[sprite_list[SUBLIST_OFFSET]<<SUBLIST_OFFSET_SHIFT];
-		uint16_t sublist_length=sprite_list[SUBLIST_LENGTH];
-		int16_t global_x,global_y;
+		const uint16_t *sprite_sublist = &m_sprram[sprite_list[SUBLIST_OFFSET] << SUBLIST_OFFSET_SHIFT];
+		uint16_t sublist_length = sprite_list[SUBLIST_LENGTH];
 
-		if(0!=sprite_list[SUBLIST_OFFSET])
+		if (0 != sprite_list[SUBLIST_OFFSET])
 		{
-			global_x=(int16_t)sprite_list[SPRITE_GLOBAL_X];
-			global_y=(int16_t)sprite_list[SPRITE_GLOBAL_Y];
-			while(sublist_length)
+			const int16_t global_x = (int16_t)sprite_list[SPRITE_GLOBAL_X];
+			const int16_t global_y = (int16_t)sprite_list[SPRITE_GLOBAL_Y];
+			while (sublist_length)
 			{
-				int x=(int16_t)sprite_sublist[SPRITE_LOCAL_X]+global_x;
-				int y=(int16_t)sprite_sublist[SPRITE_LOCAL_Y]+global_y;
-				width =(sprite_sublist[SPRITE_SIZE]>> 4)&0xf;
-				height=(sprite_sublist[SPRITE_SIZE]>>12)&0xf;
+				int x = (int16_t)sprite_sublist[SPRITE_LOCAL_X] + global_x;
+				int y = (int16_t)sprite_sublist[SPRITE_LOCAL_Y] + global_y;
+				const int width  = (sprite_sublist[SPRITE_SIZE] >>  4) & 0xf;
+				const int height = (sprite_sublist[SPRITE_SIZE] >> 12) & 0xf;
 
-				sizex=(sprite_sublist[SPRITE_SIZE]>>0)&0xf;
-				sizey=(sprite_sublist[SPRITE_SIZE]>>8)&0xf;
+				const int sizex = (sprite_sublist[SPRITE_SIZE] >> 0) & 0xf;
+				const int sizey = (sprite_sublist[SPRITE_SIZE] >> 8) & 0xf;
+				const bool flipx = BIT(sprite_sublist[SPRITE_PALETTE], 15);
+				const bool flipy = BIT(sprite_sublist[SPRITE_PALETTE], 14);
+				const int color = sprite_sublist[SPRITE_PALETTE] & 0xff;
 
-				address=(sprite_sublist[SPRITE_TILE] & ~(sprite_sublist[SPRITE_SIZE] >> 11 & 7))*SPRITE_DATA_GRANULARITY;
-				y -= (height + 1) * (sizey + 1)-1;
-				for(int xw=0;xw<=width;xw++)
+				int address = (sprite_sublist[SPRITE_TILE] & ~(sprite_sublist[SPRITE_SIZE] >> 11 & 7)) * SPRITE_DATA_GRANULARITY;
+				y -= (height + 1) * (sizey + 1) - 1;
+				for (int xw = 0; xw <= width; xw++)
 				{
-					int xb = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (width-xw)*(sizex+1)+x: xw*(sizex+1)+x;
-					for(int yw=0;yw<=height;yw++)
+					const int xb = flipx ? (width - xw) * (sizex + 1) + x: xw * (sizex + 1) + x;
+					for (int yw = 0; yw <= height; yw++)
 					{
-						int yb = yw*(sizey+1)+y;
-						for(int ys=0;ys<=sizey;ys++)
+						const int yb = yw * (sizey + 1) + y;
+						for (int ys = 0; ys <= sizey; ys++)
 						{
-							int ys2 = (sprite_sublist[SPRITE_PALETTE] & 0x4000) ? ys : (sizey - ys);
-							for(int xs=0;xs<=sizex;xs++)
+							const int ys2 = flipy ? ys : (sizey - ys);
+							for (int xs = 0; xs <= sizex; xs++)
 							{
-								uint8_t pen=pixels[BYTE_XOR_LE(address)&(0x100000-1)];
-								int xs2 = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (sizex - xs) : xs;
-								if(pen)
+								const uint8_t pen = pixels[BYTE_XOR_LE(address & 0xfffff)];
+								const int xs2 = flipx ? (sizex - xs) : xs;
+								if (pen)
 								{
-									if(cliprect.contains(xb+xs2, yb+ys2))
+									if (cliprect.contains(xb + xs2, yb + ys2))
 									{
-										bitmap.pix(yb+ys2, xb+xs2) = pens[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
+										bitmap.pix(yb + ys2, xb + xs2) = pens[pen + (color << 8)];
 									}
 								}
 								++address;
@@ -230,16 +234,16 @@ uint32_t srmp5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 						}
 					}
 				}
-				sprite_sublist+=SPRITE_SUBLIST_ENTRY_LENGTH;
+				sprite_sublist += SPRITE_SUBLIST_ENTRY_LENGTH;
 				--sublist_length;
 			}
 		}
-		sprite_list+=SPRITE_LIST_ENTRY_LENGTH;
+		sprite_list += SPRITE_LIST_ENTRY_LENGTH;
 	}
 
 #ifdef DEBUG_CHAR
 	{
-		for(int i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			if (m_tileduty[i] == 1)
 			{
@@ -255,7 +259,11 @@ uint32_t srmp5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void srmp5_state::machine_start()
 {
-	m_soundbank->configure_entries(0, 256, memregion("soundcpu")->base(), 0x4000);
+	m_tileram = std::make_unique<uint16_t[]>(0x100000/2);
+	m_sprram  = std::make_unique<uint16_t[]>(0x080000/2);
+#ifdef DEBUG_CHAR
+	m_tileduty= make_unique_clear<uint8_t[]>(0x2000);
+#endif
 
 	save_item(NAME(m_input_select));
 	save_item(NAME(m_cmd1));
@@ -282,7 +290,7 @@ uint32_t srmp5_state::tileram_r(offs_t offset)
 
 void srmp5_state::tileram_w(offs_t offset, uint32_t data)
 {
-	m_tileram[offset] = data & 0xFFFF; //lower 16bit only
+	m_tileram[offset] = data & 0xffff; //lower 16bit only
 #ifdef DEBUG_CHAR
 	m_tileduty[offset >> 6] = 1;
 #endif
@@ -295,7 +303,7 @@ uint32_t srmp5_state::spr_r(offs_t offset)
 
 void srmp5_state::spr_w(offs_t offset, uint32_t data)
 {
-	m_sprram[offset] = data & 0xFFFF; //lower 16bit only
+	m_sprram[offset] = data & 0xffff; //lower 16bit only
 }
 
 uint32_t srmp5_state::chrrom_r(offs_t offset)
@@ -305,7 +313,7 @@ uint32_t srmp5_state::chrrom_r(offs_t offset)
 
 void srmp5_state::input_select_w(uint32_t data)
 {
-	m_input_select = data & 0x0F;
+	m_input_select = data & 0x0f;
 }
 
 uint32_t srmp5_state::srmp5_inputs_r()
@@ -334,13 +342,13 @@ uint32_t srmp5_state::srmp5_inputs_r()
 //almost all cmds are sound related
 void srmp5_state::cmd1_w(uint32_t data)
 {
-	m_cmd1 = data & 0xFF;
+	m_cmd1 = data & 0xff;
 	logerror("cmd1_w %08X\n", data);
 }
 
 void srmp5_state::cmd2_w(uint32_t data)
 {
-	m_cmd2 = data & 0xFF;
+	m_cmd2 = data & 0xff;
 	m_cmd_stat = 5;
 	logerror("cmd2_w %08X\n", data);
 }
@@ -352,20 +360,22 @@ uint32_t srmp5_state::cmd_stat32_r()
 
 uint32_t srmp5_state::srmp5_vidregs_r(offs_t offset)
 {
-	logerror("vidregs read  %08X %08X\n", offset << 2, m_vidregs[offset]);
+	if (!machine().side_effects_disabled())
+		logerror("%s: vidregs read  %08X %08X\n", machine().describe_context(), offset << 2, m_vidregs[offset]);
 	return m_vidregs[offset];
 }
 
 void srmp5_state::srmp5_vidregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vidregs[offset]);
-	if(offset != 0x10C / 4)
-		logerror("vidregs write %08X %08X\n", offset << 2, m_vidregs[offset]);
+	if (offset != 0x10C / 4)
+		logerror("%s: vidregs write %08X %08X\n", machine().describe_context(), offset << 2, m_vidregs[offset]);
 }
 
 uint32_t srmp5_state::irq_ack_clear()
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
@@ -400,18 +410,22 @@ void srmp5_state::srmp5_mem(address_map &map)
 	map(0x1eff003c, 0x1eff003f).r(FUNC(srmp5_state::irq_ack_clear));
 }
 
+void srmp5_state::st0016_extrom_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().region("soundcpu", 0);
+}
+
 void srmp5_state::st0016_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("soundbank");
-	//map(0xe900, 0xe9ff) // sound - internal
-	//map(0xec00, 0xec1f).rw(FUNC(srmp5_state::st0016_character_ram_r), FUNC(srmp5_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram();
 }
 
 uint8_t srmp5_state::cmd1_r()
 {
-	m_cmd_stat = 0;
+	if (!machine().side_effects_disabled())
+	{
+		m_cmd_stat = 0;
+	}
 	return m_cmd1;
 }
 
@@ -425,23 +439,13 @@ uint8_t srmp5_state::cmd_stat8_r()
 	return m_cmd_stat;
 }
 
-// common rombank? should go in machine/st0016 with larger address space exposed?
-void srmp5_state::st0016_rom_bank_w(uint8_t data)
-{
-	m_soundbank->set_entry(data);
-}
-
-
 void srmp5_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//map(0x00, 0xbf).rw(FUNC(srmp5_state::st0016_vregs_r), FUNC(srmp5_state::st0016_vregs_w));
 	map(0xc0, 0xc0).r(FUNC(srmp5_state::cmd1_r));
 	map(0xc1, 0xc1).r(FUNC(srmp5_state::cmd2_r));
 	map(0xc2, 0xc2).r(FUNC(srmp5_state::cmd_stat8_r));
-	map(0xe1, 0xe1).w(FUNC(srmp5_state::st0016_rom_bank_w));
-	map(0xe7, 0xe7).w(FUNC(srmp5_state::st0016_rom_bank_w));
-	//map(0xf0, 0xf0).r(FUNC(srmp5_state::st0016_dma_r));
+	map(0xe7, 0xe7).w(m_soundcpu, FUNC(st0016_cpu_device::rom_bank_w));
 }
 
 
@@ -580,6 +584,7 @@ void srmp5_state::srmp5(machine_config &config)
 	ST0016_CPU(config, m_soundcpu, XTAL(42'954'545) / 6); // 7.159 MHz (42.9545 MHz / 6)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &srmp5_state::st0016_mem);
 	m_soundcpu->set_addrmap(AS_IO, &srmp5_state::st0016_io);
+	m_soundcpu->set_addrmap(st0016_cpu_device::AS_EXTROM, &srmp5_state::st0016_extrom_map);
 	m_soundcpu->set_vblank_int("screen", FUNC(srmp5_state::irq0_line_hold));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -631,16 +636,7 @@ ROM_START( srmp5 )
 #endif
 ROM_END
 
-void srmp5_state::init_srmp5()
-{
-	m_tileram = std::make_unique<uint16_t[]>(0x100000/2);
-	m_sprram  = std::make_unique<uint16_t[]>(0x080000/2);
-#ifdef DEBUG_CHAR
-	m_tileduty= make_unique_clear<uint8_t[]>(0x2000);
-#endif
-}
-
 } // anonymous namespace
 
 
-GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, init_srmp5, ROT0, "Seta", "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, empty_init, ROT0, "Seta", "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

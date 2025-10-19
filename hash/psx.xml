@@ -921,7 +921,7 @@ The game freezes when loading (after the intro)
 	</software>
 
 	<software name="aitd2_us" cloneof="aitd2">
-		<!-- 
+		<!--
 		http://redump.org/disc/3083
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).cue" size="115" crc="e7e7f0de" sha1="4e282f1c2fe8f2252ce18601611673feceb3fb64"/>
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).bin" size="715309056" crc="83f2a2d1" sha1="d928e147ca1ef265929e1c51d8f8ae39de2a24f9"/>
@@ -28823,7 +28823,7 @@ The game freezes when loading (after the intro)
 	</software>
 
 	<software name="ult8ball" cloneof="actpool">
-		<!-- 
+		<!--
 		redump.org/disc/7723
 		<rom name="Ultimate 8 Ball (USA).cue" size="2650" crc="f00be595" sha1="058e5414628f6a53e0120328559be5aede8da8c9"/>
 		<rom name="Ultimate 8 Ball (USA) (Track 01).bin" size="63652176" crc="2dbd76d4" sha1="3eebb555ff77f3e873741735155416cb7559d036"/>
@@ -37737,7 +37737,7 @@ The game only boot on PAL
 	</software>
 
 	<software name="aitd2_jp" cloneof="aitd2">
-		<!-- 
+		<!--
 		http://redump.org/disc/13174
 		<rom name="Alone in the Dark 2 (Japan).cue" size="93" crc="3eaa5bd8" sha1="8cd56d33586e170116a80e8fb247be26ebadc1d9"/>
 		<rom name="Alone in the Dark 2 (Japan).bin" size="715297296" crc="2bffe515" sha1="e78721a8c4b4d16d846e111928bd7701f85e243b"/>
@@ -61271,7 +61271,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="aitd2">
-		<!-- 
+		<!--
 		http://redump.org/disc/485
 		<rom name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It).cue" size="124" crc="f7ce671d" sha1="6ea73167cc18018d4cd0372d2a4fb990e7f86fd5"/>
 		<rom name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It).bin" size="714170688" crc="74fbb4a8" sha1="ac18785261cca340268dbd27ee156ca2436fcff2"/>
@@ -62683,7 +62683,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/12627
 		<rom name="TechnoMage - Return of Eternity (Europe).cue" size="106" crc="6ed71521" sha1="71223456d07192ab9c9a24e814829fa600dd6ce6"/>
 		<rom name="TechnoMage - Return of Eternity (Europe).bin" size="682315200" crc="6010fa91" sha1="790600d94f38efd28519fef767b2c8c52526aadb"/>
@@ -62705,7 +62705,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="technomg_nl" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/27310
 		<rom name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands).cue" size="120" crc="5fa9cd4f" sha1="869470d8bf84b0742d3326dc310baa657951a5dd"/>
 		<rom name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands).bin" size="714481152" crc="1e10a432" sha1="6a9edb882ddaae2f1ae8913e179dc2be30b80e85"/>
@@ -62727,7 +62727,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="technomg_de" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/25284
 		<rom name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany).cue" size="115" crc="cf387233" sha1="29692072a8b82d95b696c0740c00023eee52df4d"/>
 		<rom name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany).bin" size="674652384" crc="9ccd3eac" sha1="5f4727482ba67c11f20f1901c0cc1f382a2f3a09"/>
@@ -62749,7 +62749,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="technomg_es" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/49569
 		<rom name="Technomage - El Retorno de la Eternidad (Spain).cue" size="113" crc="0b433ae7" sha1="0d4bfd43ff3d2984c862dfbd3f0b674741dedaff"/>
 		<rom name="Technomage - El Retorno de la Eternidad (Spain).bin" size="669393312" crc="0b82d025" sha1="02b2a823f207b1a3e42452a50df5259dbb7cf413"/>
@@ -62771,7 +62771,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="technomg_fr" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/49569
 		<rom name="TechnoMage - En Quete de L'Eternite (France).cue" size="110" crc="c17633fb" sha1="aefe1d47c49e1ef47bd6c2e059f93d39db238fd5"/>
 		<rom name="TechnoMage - En Quete de L'Eternite (France).bin" size="679666848" crc="a111b887" sha1="c54b68713ff2c4a0f43dff411243bb1ff538e6a8"/>
@@ -62793,7 +62793,7 @@ During gameplay, the commentary speech audio is playing too fast
 	</software>
 
 	<software name="technomg_it" cloneof="technomg">
-		<!-- 
+		<!--
 		http://redump.org/disc/46130
 		<rom name="TechnoMage - Ritorno all'Eternita (Italy).cue" size="107" crc="3cbf68ca" sha1="69a1e3cad8753b0e82e1cf5ca434d72706a287bb"/>
 		<rom name="TechnoMage - Ritorno all'Eternita (Italy).bin" size="672236880" crc="c28f565a" sha1="a84bdb4eab9571a3baa9a663ce7b93c8c3bb6e06"/>

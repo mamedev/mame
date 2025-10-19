@@ -368,6 +368,34 @@ ROM_START( airobo )
 	ROM_LOAD( "tc58nvg2s0hta00.bin", 0x0000, 0x22000000, CRC(6cfa4600) SHA1(152c04532ae2587dea590d169e87534924f5ea89) )
 ROM_END
 
+ROM_START( rotom2 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00.u2", 0x0000, 0x8800000, CRC(b77c9469) SHA1(ba0b9f5ea65971bc9d858f109a3543b3126ab6ee) )
+ROM_END
+
+ROM_START( neopad )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00.u2", 0x0000, 0x8800000, CRC(3b8f8c48) SHA1(1995d443c1ce8e44c9256c994e1f91eb5857b80c) )
+ROM_END
+
+
+ROM_START( sumikpc )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00.nfrom1", 0x0000, 0x8800000, CRC(3187a2cc) SHA1(166719b0cd45d7d6b5523ed528b64afac2fb58b7) )
+ROM_END
+
+
+
+
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
@@ -435,7 +463,9 @@ CONS( 2013, kidizmp,         0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom (Germany, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters Rotom Tablet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ポケモン図鑑 スマホロトム
+CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pokemon Zukan - Sumaho Rotom (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32610 - 「それいけ！アンパンマン」スポーツ育脳マット
 CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: Sports Ikunou Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
@@ -489,5 +519,20 @@ CONS( 2021, chiikpc,            0,        0,      gpl32612, gpl32612, generalplu
 // 学びの最強王になれ! 最強王図鑑パソコン
 CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Manabi no Sai-Kyo-Oh ni Nare! Sai-Kyo-Oh Zukan PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// uses GPL32600A
+// マウスできせかえ! すみっコぐらしパソコンプラス
+CONS( 2019, sumikpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Kisekae! Sumikko Gurashi PC Plus (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a unit with purple top
+
+
 // ディズニー&ディズニー／ピクサーキャラクターズ できた!がいっぱい ドリームトイパッド
 CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",          "Disney & Disney/Pixar Characters Dekita! ga Ippai Dream Toy Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32610
+// カメラでリンク! ポケモン図鑑 スマホロトム
+CONS( 201?, rotom2,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Camera de Link! Pokemon Zukan - Sumaho Rotom (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32611
+// 小学館の図鑑 NEO Pad - 生きもの編 (this is the standard green version)
+CONS( 201?, neopad,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Shogakukan no Zukan NEO Pad - Ikimono-hen (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// a blue version exists with the subtitle Norimono + Kuraberu-hen (乗りもの＋くらべる編).
+// another green version with 'DX' on the end of the title also exists

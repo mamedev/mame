@@ -6,7 +6,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
@@ -141,7 +141,7 @@ protected:
 
 private:
 	void f1dream_map(address_map &map) ATTR_COLD;
-	void f1dream_mcu_io(address_map &map) ATTR_COLD;
+	void f1dream_mcu_data(address_map &map) ATTR_COLD;
 
 	void out3_w(u8 data);
 

@@ -5,23 +5,23 @@
 
 #pragma once
 
-#include "awpvid.h"       //Fruit Machines Only
+#include "awpvid.h" // Fruit Machines Only
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/6821pia.h"
 #include "machine/i8279.h"
 #include "machine/mc68681.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
-#include "machine/roc10937.h"   // vfd
-#include "machine/steppers.h"   // stepper motor
+#include "machine/steppers.h" // stepper motor
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/okim6376.h"
 #include "sound/upd7759.h"
 #include "sound/ymopl.h"
+#include "video/roc10937.h" // vfd
 
 
 class maygay1b_state : public driver_device

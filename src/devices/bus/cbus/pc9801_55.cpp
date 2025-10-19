@@ -2,27 +2,21 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC PC-9801-55/-55U/-55L
+NEC PC-9801-55/-55U/-55L
 
-    SCSI interface, running on WD33C93A
+SCSI interface, running on WD33C93A
 
-    TODO:
-    - Is PC-9801-55 also running on this except with WD33C93 instead?
-      Will see once we obtain a dump of that;
-    - DIP is never taken (definitely lies at vector 0x2c -> PC=0xdc01e);
-    - DRQ
-    - All roms seems to be misdumped (too generous sizes), is it intentional?
+TODO:
+- Accesses registers that doesn't exist in wd33c9x core, NEC overlay?
+- DIP is never taken (definitely lies at vector 0x2c -> PC=0xdc01e);
+- DMA / DRQ;
+- PC-9801-55 also runs on this except with vanilla WD33C93 instead;
 
 **************************************************************************************************/
 
 #include "emu.h"
 #include "bus/cbus/pc9801_55.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
 DEFINE_DEVICE_TYPE(PC9801_55U, pc9801_55u_device, "pc9801_55u", "NEC PC-9801-55U")
 DEFINE_DEVICE_TYPE(PC9801_55L, pc9801_55l_device, "pc9801_55l", "NEC PC-9801-55L")
 
@@ -51,10 +45,6 @@ const tiny_rom_entry *pc9801_55l_device::device_rom_region() const
 {
 	return ROM_NAME( pc9801_55l );
 }
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
 
 void pc9801_55_device::scsi_irq_w(int state)
 {
@@ -164,19 +154,9 @@ pc9801_55l_device::pc9801_55l_device(const machine_config &mconfig, const char *
 
 }
 
-
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
 void pc9801_55_device::device_validity_check(validity_checker &valid) const
 {
 }
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void pc9801_55_device::device_start()
 {

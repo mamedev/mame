@@ -150,7 +150,7 @@ void sed1356_device::map(address_map &map)
 
 void sed1356_device::vram_map(address_map &map)
 {
-	map(0x00000, 0x80000).ram().share(m_vram);
+	map(0x00000, 0x7ffff).ram().share(m_vram);
 }
 
 uint8_t sed1356_device::revision_r(offs_t offset)

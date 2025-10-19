@@ -286,8 +286,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	// TODO: Needs verification on real hardware
-	static const int m_sound_timer_usec = 2400;
 	static constexpr int JVS_BUFFER_SIZE = 1024;
 
 	required_shared_ptr<uint32_t> m_work_ram;
@@ -310,17 +308,17 @@ private:
 	output_finder<2> m_pcb_digit;
 	memory_view m_cg_view;
 
-	emu_timer *m_sound_irq_timer = nullptr;
+	bool m_sound_irq_enabled = false;
 	bool m_exrgb = false;
 
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
 	void soundtimer_en_w(uint16_t data);
-	void soundtimer_count_w(uint16_t data);
+	void soundtimer_ack_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
 	void jamma_jvs_w(uint8_t data);
 
-	TIMER_CALLBACK_MEMBER(sound_irq);
+	INTERRUPT_GEN_MEMBER(sound_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -431,31 +429,19 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 
 /*****************************************************************************/
 
-TIMER_CALLBACK_MEMBER(nwktr_state::sound_irq)
+INTERRUPT_GEN_MEMBER(nwktr_state::sound_irq)
 {
-	m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	if (m_sound_irq_enabled)
+		m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
-
 
 void nwktr_state::soundtimer_en_w(uint16_t data)
 {
-	if (BIT(data, 0))
-	{
-		// Reset and disable timer
-		m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
-		m_sound_irq_timer->enable(false);
-	}
-	else
-	{
-		// Enable timer
-		m_sound_irq_timer->enable(true);
-	}
+	m_sound_irq_enabled = !BIT(data, 0);
 }
 
-void nwktr_state::soundtimer_count_w(uint16_t data)
+void nwktr_state::soundtimer_ack_w(uint16_t data)
 {
-	// Reset the count
-	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
 	m_audiocpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
@@ -470,10 +456,7 @@ void nwktr_state::machine_start()
 	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_work_ram);
 
-	m_sound_irq_timer = timer_alloc(FUNC(nwktr_state::sound_irq), this);
-
-	m_exrgb = false;
-
+	save_item(NAME(m_sound_irq_enabled));
 	save_item(NAME(m_exrgb));
 }
 
@@ -511,7 +494,7 @@ void nwktr_state::sound_memmap(address_map &map)
 	map(0x200000, 0x200fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w)); // Ricoh RF5C400
 	map(0x300000, 0x30001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
 	map(0x500000, 0x500001).w(FUNC(nwktr_state::soundtimer_en_w)).nopr();
-	map(0x600000, 0x600001).w(FUNC(nwktr_state::soundtimer_count_w)).nopr();
+	map(0x600000, 0x600001).w(FUNC(nwktr_state::soundtimer_ack_w)).nopr();
 }
 
 /*****************************************************************************/
@@ -638,22 +621,25 @@ void nwktr_state::machine_reset()
 {
 	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	m_sound_irq_enabled = false;
 }
 
 void nwktr_state::nwktr(machine_config &config)
 {
 	// basic machine hardware
-	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2); // PowerPC 403GA 32MHz
+	PPC403GA(config, m_maincpu, 64_MHz_XTAL / 2); // PowerPC 403GA 32MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nwktr_state::ppc_map);
 
-	M68000(config, m_audiocpu, XTAL(64'000'000)/4); // 16MHz
+	M68000(config, m_audiocpu, 64_MHz_XTAL / 4); // 16MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nwktr_state::sound_memmap);
+	m_audiocpu->set_periodic_int(FUNC(nwktr_state::sound_irq), attotime::from_hz(16.9344_MHz_XTAL / 384 / 128)); // 344.5Hz (44100 / 128)
 
-	ADSP21062(config, m_dsp[0], XTAL(36'000'000));
+	ADSP21062(config, m_dsp[0], 36_MHz_XTAL);
 	m_dsp[0]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp[0]->set_addrmap(AS_DATA, &nwktr_state::sharc_map<0>);
 
-	ADSP21062(config, m_dsp[1], XTAL(36'000'000));
+	ADSP21062(config, m_dsp[1], 36_MHz_XTAL);
 	m_dsp[1]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp[1]->set_addrmap(AS_DATA, &nwktr_state::sharc_map<1>);
 
@@ -668,7 +654,7 @@ void nwktr_state::nwktr(machine_config &config)
 	K033906(config, "k033906_2", 0, m_voodoo[1]);
 
 	// video hardware
-	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
+	VOODOO_1(config, m_voodoo[0], 50_MHz_XTAL);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
 	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -677,7 +663,7 @@ void nwktr_state::nwktr(machine_config &config)
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
+	VOODOO_1(config, m_voodoo[1], 50_MHz_XTAL);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
 	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -688,7 +674,7 @@ void nwktr_state::nwktr(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// default 24KHz parameter in both 001604 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
-	screen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
+	screen.set_raw(64_MHz_XTAL / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
 	screen.set_screen_update(FUNC(nwktr_state::screen_update));
 
 	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 65536 / 4);
@@ -702,10 +688,10 @@ void nwktr_state::nwktr(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	K056800(config, m_k056800, XTAL(16'934'400));
+	K056800(config, m_k056800, 16.9344_MHz_XTAL);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
-	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(16'934'400)));  // as per Guru readme above
+	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", 16.9344_MHz_XTAL)); // as per Guru readme above
 	rfsnd.add_route(0, "speaker", 1.0, 0);
 	rfsnd.add_route(1, "speaker", 1.0, 1);
 

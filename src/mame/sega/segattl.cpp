@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli, Scott Stone
+// copyright-holders: Fabio Priuli, Scott Stone
+
 /***************************************************************************
 
  known Sega Discrete Hardware Games
@@ -12,7 +13,7 @@
     Balloon Gun
     Bomber
     Break Open
-    Bullet Mark
+    Bullet Mark                                                      94359X-P                  PRO-1.106 PRO-3.144
     Cartoon Gun
     Castling
     Crash Course
@@ -69,7 +70,7 @@ namespace {
 // start
 #define MASTER_CLOCK    7159000
 #define V_TOTAL         (0x105+1)       // 262
-#define H_TOTAL         (0x1C6+1)       // 454
+#define H_TOTAL         (0x1c6+1)       // 454
 
 #define HBSTART                 (H_TOTAL)
 #define HBEND                   (80)
@@ -90,15 +91,7 @@ public:
 	{
 	}
 
-	void segattl(machine_config &config);
-
-protected:
-
-	// driver_device overrides
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
-	virtual void video_start() override ATTR_COLD;
+	void segattl(machine_config &config) ATTR_COLD;
 
 private:
 	// devices
@@ -121,26 +114,12 @@ static NETLIST_START(segattl)
 }
 
 
-
-void segattl_state::machine_start()
-{
-}
-
-void segattl_state::machine_reset()
-{
-}
-
-
-void segattl_state::video_start()
-{
-}
-
 void segattl_state::segattl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_segattl);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
@@ -166,16 +145,21 @@ PR-08.50    TI 74S287
 */
 
 ROM_START( fonz )
-	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "ic86.86",  0x000, 0x200, CRC(627a7795) SHA1(88304451ffbd7231d397ada632c7bf6f8cbe7598) )
+	ROM_LOAD( "ic87.87",  0x200, 0x200, CRC(d7dd14c7) SHA1(2f112197d7caafb4cb7e2658ea8b298e15aba6ac) )
+	ROM_LOAD( "pr-09.49", 0x400, 0x100, CRC(2e293727) SHA1(a03eb4aa726a2e2c872f40dfd1628b00d4edfa33) )
+	ROM_LOAD( "pr-08.50", 0x500, 0x100, CRC(6c763af7) SHA1(fdfa310f54b88610c1f59345f5fc72b3b90641ad) )
+ROM_END
 
-	ROM_REGION( 0x0600, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "ic86.86",      0x000, 0x200, CRC(627a7795) SHA1(88304451ffbd7231d397ada632c7bf6f8cbe7598) )
-	ROM_LOAD( "ic87.87",      0x200, 0x200, CRC(d7dd14c7) SHA1(2f112197d7caafb4cb7e2658ea8b298e15aba6ac) )
-	ROM_LOAD( "pr-09.49",     0x400, 0x100, CRC(2e293727) SHA1(a03eb4aa726a2e2c872f40dfd1628b00d4edfa33) )
-	ROM_LOAD( "pr-08.50",     0x500, 0x100, CRC(6c763af7) SHA1(fdfa310f54b88610c1f59345f5fc72b3b90641ad) )
+ROM_START( bmark )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "pro-1.106", 0x000, 0x100, CRC(395fbea5) SHA1(975478fed331594f21aa72e047f2da69991f7795) )
+	ROM_LOAD( "pro-3.144", 0x100, 0x100, CRC(5815894e) SHA1(aa879764c4f1775f0ac3b2e75124a483637487ed) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1976, fonz, 0, segattl, 0, segattl_state, empty_init, ROT0, "Sega", "Fonz", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, fonz,  0, segattl, 0, segattl_state, empty_init, ROT0, "Sega", "Fonz",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1975, bmark, 0, segattl, 0, segattl_state, empty_init, ROT0, "Sega", "Bullet Mark", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

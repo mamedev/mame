@@ -61,7 +61,6 @@ protected:
 
 	// inline helpers
 	inline uint16_t indexram(uint8_t r);
-	inline uint16_t indexrom(uint8_t r);
 	inline void inc_x(uint8_t r);
 	inline void inc_y(uint8_t r);
 
@@ -70,8 +69,6 @@ protected:
 
 private:
 	void set_busy_flag(int period);
-	void draw_char_40(uint8_t *c, uint16_t x, uint16_t y);
-	void draw_char_80(uint8_t *c, uint16_t x, uint16_t y);
 	void set_video_mode(void);
 	void init_accented_chars(void);
 	uint8_t read_char(uint8_t index, uint16_t addr);
@@ -79,14 +76,26 @@ private:
 	void zoom(uint8_t *pix, uint16_t n);
 	uint16_t indexblock(uint16_t x, uint16_t y);
 	std::tuple<uint8_t, uint8_t, bool> makecolors(uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool cursor);
-	void bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool underline);
-	void quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, uint16_t y);
-	void bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, bool cursor);
+
+	// Dispatch rendering of character (x, y) to one of the specialized
+	// drawing functions (bichrome40/quadrichrome40/bichrome80).
 	void makechar(uint16_t x, uint16_t y);
-	void draw_border(uint16_t line);
 	void makechar_16x40(uint16_t x, uint16_t y);
 	void makechar_24x40(uint16_t x, uint16_t y);
 	void makechar_12x80(uint16_t x, uint16_t y);
+
+	// Call draw_char_40/80 to draw the given character ** at (x + 1, y + 1) **.
+	// Why at (x + 1, y + 1) and not just at (x, y)? Because we need to leave
+	// some blank space at the top and at the left of the text area for the
+	// margin.
+	void bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool underline);
+	void quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, uint16_t y);
+	void bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, bool cursor);
+
+	void draw_char_40(uint8_t *c, uint16_t x, uint16_t y);
+	void draw_char_80(uint8_t *c, uint16_t x, uint16_t y);
+	void draw_border(uint16_t line);
+
 	void ef9345_exec(uint8_t cmd);
 
 	void ef9345(address_map &map) ATTR_COLD;

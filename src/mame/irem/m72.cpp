@@ -924,7 +924,7 @@ void m72_mcu_state::i80c31_mem_map(address_map &map)
 	map(0x0000, 0x1fff).rom().region("mcu", 0);
 }
 
-void m72_mcu_state::mcu_io_map(address_map &map)
+void m72_mcu_state::mcu_data_map(address_map &map)
 {
 	/* External access */
 	map(0x0000, 0x0000).rw(FUNC(m72_mcu_state::mcu_sample_r), FUNC(m72_mcu_state::mcu_low_w));
@@ -1738,7 +1738,7 @@ void m72_mcu_state::m72_8751(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000))); // Uses its own XTAL
-	mcu.set_addrmap(AS_IO, &m72_mcu_state::mcu_io_map);
+	mcu.set_addrmap(AS_DATA, &m72_mcu_state::mcu_data_map);
 	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 }
 
@@ -1756,7 +1756,7 @@ void m72_mcu_state::imgfightjb(machine_config &config)
 	m72_8751(config);
 	i80c31_device &mcu(I80C31(config.replace(), m_mcu, XTAL(32'000'000) / 4));
 	mcu.set_addrmap(AS_PROGRAM, &m72_mcu_state::i80c31_mem_map);
-	mcu.set_addrmap(AS_IO, &m72_mcu_state::mcu_io_map);
+	mcu.set_addrmap(AS_DATA, &m72_mcu_state::mcu_data_map);
 	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 
 	// TODO: uses 6116 type RAM instead of MB8421 and MB8431

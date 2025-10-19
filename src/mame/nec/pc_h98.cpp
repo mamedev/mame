@@ -2,11 +2,12 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC PC-H[yper] 98
+NEC PC-H[yper] 98
 
-    TODO:
-    - NESA bus in place of C-Bus plus a billion of overrides from the base PC-98 ...
-    - needs a specific chargen "FONT24.ROM" for anything that isn't a H98S;
+TODO:
+- NESA bus in place of C-Bus plus a billion of overrides from the base PC-98 ...
+- needs a specific chargen "FONT24.ROM" for anything that isn't a H98S;
+- Hookup AGDC upd72120_device;
 
 **************************************************************************************************/
 
@@ -142,7 +143,7 @@ static INPUT_PORTS_START( pc_h98 )
 
 	PORT_START("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_CONFNAME( 0x04, 0x04, "Load IDE BIOS" )
+	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END

@@ -1310,6 +1310,18 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
+	<software name="duel">
+		<description>DUEL: A Dogfight in Space</description>
+		<year>1982</year>
+		<publisher>Dayspring Computer Enterprises</publisher>
+		<info name="developer" value="Bill Boucher"/>
+		<info name="usage" value="Boot to Monitor, LOG. Player 1: Z to Rotate CCW, X to Rotate CW, C to Accelerate, V to Fire. Player 2: Numpad + to Rotate CCW, Numpad = to Rotate CW, Numpad 0 to Accelerate, Numpad . to Fire" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="8470074">
+				<rom name="duel.wav" size="8470074" crc="e4c35a75" sha1="79a2697223eab3947Baeb1999d40505eb93b2442" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="dybug">
 		<description>DYBUG2</description>
 		<year>1981</year>

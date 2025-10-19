@@ -17,6 +17,8 @@
 
 #include "screen.h"
 
+#include <algorithm>
+
 
 #define MODE24x40   0
 #define MODEVAR40   1
@@ -63,16 +65,6 @@ inline uint16_t ef9345_device::indexram(uint8_t r)
 	if (y < 8)
 		y &= 1;
 	return ((x&0x3f) | ((x & 0x40) << 6) | ((x & 0x80) << 4) | ((y & 0x1f) << 6) | ((y & 0x20) << 8));
-}
-
-// calculate the internal ROM offset
-inline uint16_t ef9345_device::indexrom(uint8_t r)
-{
-	uint8_t x = m_registers[r];
-	uint8_t y = m_registers[r - 1];
-	if (y < 8)
-		y &= 1;
-	return((x&0x3f)|((x&0x40)<<6)|((x&0x80)<<4)|((y&0x1f)<<6));
 }
 
 // increment x
@@ -213,7 +205,10 @@ TIMER_CALLBACK_MEMBER(ef9345_device::blink_tick)
 void ef9345_device::set_busy_flag(int period)
 {
 	m_bf = 1;
-	m_busy_timer->adjust(attotime::from_nsec(period));
+	if (period < 0)
+		m_busy_timer->reset();
+	else
+		m_busy_timer->adjust(attotime::from_nsec(period));
 }
 
 // draw a char in 40 char line mode
@@ -540,9 +535,8 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 	//B3-5 = set number
 	//A0-6 = 4 color palette
 
-	uint8_t i, j, n, col[8], pix[80];
-	uint8_t lowresolution = (b & 0x02) >> 1, ramx, ramy, ramblock;
-	uint16_t ramindex;
+	uint8_t col[8], pix[80];
+	const uint8_t lowresolution = BIT(b, 1);
 
 	if (m_variant == EF9345_MODE::TYPE_TS9347)
 	{
@@ -550,34 +544,30 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 		return;
 	}
 
-	//quadrichrome don't suppor double size
+	//quadrichrome don't support double size
 	m_last_dial[x] = 0;
 
 	//initialize the color table
-	for (j = 1, n = 0, i = 0; i < 8; i++)
+	for (uint8_t n = 0, i = 0; i < 8; i++)
 	{
 		col[i] = 7;
 
-		if (a & j)
+		if (BIT(a, i))
 			col[n++] = i;
-
-		j <<= 1;
 	}
 
 	//find block number in ram
-	ramblock = 0;
-	if (b & 0x20)   ramblock |= 4;      //B5
-	if (b & 0x08)   ramblock |= 2;      //B3
-	if (b & 0x10)   ramblock |= 1;      //B4
+	const uint8_t ramblock = bitswap<3>(b, 5, 3, 4); // B5 B3 B4
 
 	//find character address in ram
-	ramx = c & 0x03;
-	ramy =(c & 0x7f) >> 2;
-	ramindex = 0x0800 * ramblock + 0x40 * ramy + ramx;
-	if (lowresolution) ramindex += 5 * (b & 0x04);
+	const uint8_t ramx = c & 0x03;
+	const uint8_t ramy = (c >> 2) & 0x1f;
+	uint16_t ramindex = (0x0800 * ramblock) + (0x40 * ramy) + ramx;
+	if (lowresolution)
+		ramindex += 5 * (b & 0x04);
 
 	//fill pixel table
-	for (i = 0, j = 0; i < 10; i++)
+	for (uint8_t i = 0, j = 0; i < 10; i++)
 	{
 		uint8_t ch = read_char(0x0c, ramindex + 4 * (i >> lowresolution));
 		pix[j] = pix[j + 1] = col[(ch & 0x03) >> 0]; j += 2;
@@ -593,44 +583,43 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, bool cursor)
 {
 	uint8_t c0, c1, pix[60];
-	uint16_t i, j, d;
 
-	bool insert = BIT(m_dor, (a & 1) ? 7 : 3);      //insert = DOR7/DOR3
-	c1 = (a & 1) ? (m_dor >> 4) & 7 : m_dor & 7;    //foreground color = DOR
-	c0 =  m_mat & 7;                                //background color = MAT
+	const bool insert = BIT(m_dor, (a & 1) ? 7 : 3);    //insert = DOR7/DOR3
+	c1 = (m_dor >> ((a & 1) ? 4 : 0)) & 7;              //foreground color = DOR
+	c0 =  m_mat & 7;                                    //background color = MAT
 
-	switch(c & 0x80)
+	if (m_variant == EF9345_MODE::TYPE_TS9347 || !BIT(c, 7)) //alphanumeric G0 set
 	{
-	case 0: //alphanumeric G0 set
-	{
+		// On the TS9347, G11 comes right after G0 starting from char 128.
+		uint8_t index = (c & 0x80) ? 3 : 0;
+
 		//A0: D = color set
 		//A1: U = underline
 		//A2: F = flash
 		//A3: N = negative
 		//C0-6: character code
-		bool underline = (a & 2) >> 1;
-		bool flash = (a & 4) >> 2;
-		bool negative = (a & 8) >> 3;
+		bool underline = BIT(a, 1);
+		bool flash = BIT(a, 2);
+		bool negative = BIT(a, 3);
 
 		bool cursor_underline;
 		std::tie(c0, c1, cursor_underline) = makecolors(c0, c1, insert, flash, false, negative, cursor);
 		underline ^= cursor_underline;
 
-		d = ((c & 0x7f) >> 2) * 0x40 + (c & 0x03);  //char position
+		const uint16_t d = ((c >> 2) & 0x1f) * 0x40 + (c & 0x03);  //char position
 
-		for (i=0, j=0; i < 10; i++)
+		for (uint16_t i=0, j=0; i < 10; i++)
 		{
-			uint8_t ch = read_char(0, d + 4 * i);
+			uint8_t ch = read_char(index, d + 4 * i);
 			for (uint8_t b=0; b<6; b++)
-				pix[j++] = (ch & (1<<b)) ? c1 : c0;
+				pix[j++] = BIT(ch, b) ? c1 : c0;
 		}
 
 		//draw the underline
 		if (underline)
-			memset(&pix[54], c1, 6);
-		break;
+			std::fill_n(&pix[54], 6, c1);
 	}
-	default: //dedicated mosaic set
+	else //dedicated mosaic set (EF9345 only)
 	{
 		//A0: D = color set
 		//A1-3: 3 blocks de 6 pixels
@@ -639,51 +628,46 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, boo
 		bool cursor_underline;
 		std::tie(c0, c1, cursor_underline) = makecolors(c0, c1, insert, false, false, false, cursor);
 
-		pix[ 0] = (c & 0x01) ? c1 : c0;
-		pix[ 3] = (c & 0x02) ? c1 : c0;
-		pix[12] = (c & 0x04) ? c1 : c0;
-		pix[15] = (c & 0x08) ? c1 : c0;
-		pix[24] = (c & 0x10) ? c1 : c0;
-		pix[27] = (c & 0x20) ? c1 : c0;
-		pix[36] = (c & 0x40) ? c1 : c0;
-		pix[39] = (a & 0x02) ? c1 : c0;
-		pix[48] = (a & 0x04) ? c1 : c0;
-		pix[51] = (a & 0x08) ? c1 : c0;
+		pix[ 0] = BIT(c, 0) ? c1 : c0;
+		pix[ 3] = BIT(c, 1) ? c1 : c0;
+		pix[12] = BIT(c, 2) ? c1 : c0;
+		pix[15] = BIT(c, 3) ? c1 : c0;
+		pix[24] = BIT(c, 4) ? c1 : c0;
+		pix[27] = BIT(c, 5) ? c1 : c0;
+		pix[36] = BIT(c, 6) ? c1 : c0;
+		pix[39] = BIT(a, 1) ? c1 : c0;
+		pix[48] = BIT(a, 2) ? c1 : c0;
+		pix[51] = BIT(a, 3) ? c1 : c0;
 
-		for (i = 0; i < 60; i += 12)
+		for (uint16_t i = 0; i < 60; i += 12)
 		{
 			pix[i + 6] = pix[i];
 			pix[i + 9] = pix[i + 3];
 		}
 
-		for (i = 0; i < 60; i += 3)
+		for (uint16_t i = 0; i < 60; i += 3)
 			pix[i + 2] = pix[i + 1] = pix[i];
 
 		//draw the underline
 		if (cursor_underline)
-			memset(&pix[54], c1, 6);
-		break;
-	}
+			std::fill_n(&pix[54], 6, c1);
 	}
 
-	draw_char_80(pix, x, y);
+	draw_char_80(pix, x + 1, y + 1);
 }
 
 // generate 16 bits 40 columns char
 void ef9345_device::makechar_16x40(uint16_t x, uint16_t y)
 {
-	uint8_t a, b, c0, c1, i, f, m, n, u, type, dial;
-	uint16_t address, iblock;
+	const uint16_t iblock = (m_mat & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
+	const uint8_t a = m_videoram->read_byte(m_block + iblock);
+	const uint8_t b = m_videoram->read_byte(m_block + iblock + 0x0800);
 
-	iblock = (m_mat & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
-	a = m_videoram->read_byte(m_block + iblock);
-	b = m_videoram->read_byte(m_block + iblock + 0x0800);
-
-	dial = get_dial(x, (a & 0x80) ? 0 : (((a & 0x20) >> 5) | ((a & 0x10) >> 3)));
+	const uint8_t dial = get_dial(x, BIT(a, 7) ? 0 : bitswap<2>(a, 4, 5));
 
 	//type and address of the char
-	type = ((b & 0x80) >> 4) | ((a & 0x80) >> 6);
-	address = ((b & 0x7f) >> 2) * 0x40 + (b & 0x03);
+	uint8_t type = ((b & 0x80) >> 4) | ((a & 0x80) >> 6);
+	uint16_t address = ((b >> 2) & 0x1f) * 0x40 + (b & 0x03);
 
 	//reset attributes latch
 	if (x == 0)
@@ -708,13 +692,13 @@ void ef9345_device::makechar_16x40(uint16_t x, uint16_t y)
 	}
 
 	//char attributes
-	c0 = m_latchc0;                         //background
-	c1 = a & 0x07;                          //foreground
-	i = m_latchi;                           //insert mode
-	f  = (a & 0x08) >> 3;                   //flash
-	m = m_latchm;                           //conceal
-	n  = (a & 0x80) ? 0: ((a & 0x40) >> 6); //negative
-	u = m_latchu;                           //underline
+	const uint8_t c0 = m_latchc0;                   //background
+	const uint8_t c1 = a & 0x07;                    //foreground
+	const uint8_t i = m_latchi;                     //insert mode
+	const uint8_t f  = BIT(a, 3);                   //flash
+	const uint8_t m = m_latchm;                     //conceal
+	const uint8_t n  = BIT(a, 7) ? 0 : BIT(a, 6);   //negative
+	const uint8_t u = m_latchu;                     //underline
 
 	bichrome40(type, address, dial, iblock, x, y, c0, c1, i, f, m, n, u);
 }
@@ -722,13 +706,10 @@ void ef9345_device::makechar_16x40(uint16_t x, uint16_t y)
 // generate 24 bits 40 columns char
 void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 {
-	uint8_t a, b, c, c0, c1, i, f, m, n, u, type, dial;
-	uint16_t address, iblock;
-
-	iblock = (m_mat & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
-	c = m_videoram->read_byte(m_block + iblock);
-	b = m_videoram->read_byte(m_block + iblock + 0x0800);
-	a = m_videoram->read_byte(m_block + iblock + 0x1000);
+	const uint16_t iblock = (m_mat & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
+	const uint8_t c = m_videoram->read_byte(m_block + iblock);
+	const uint8_t b = m_videoram->read_byte(m_block + iblock + 0x0800);
+	const uint8_t a = m_videoram->read_byte(m_block + iblock + 0x1000);
 
 	if ((b & 0xc0) == 0xc0)
 	{
@@ -736,20 +717,22 @@ void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 		return;
 	}
 
-	dial = get_dial(x, (b & 0x02) + ((b & 0x08) >> 3));
+	const uint8_t dial = get_dial(x, bitswap<2>(b, 1, 3));
 
 	//type and address of the char
-	address = ((c & 0x7f) >> 2) * 0x40 + (c & 0x03);
-	type = (b & 0xf0) >> 4;
+	const uint16_t address = ((c >> 2) & 0x1f) * 0x40 + (c & 0x03);
+	uint8_t type = (b & 0xf0) >> 4;
+	if (m_variant == EF9345_MODE::TYPE_TS9347 && !(type & 0x8))
+		type &= 0x3; // drop the i2 bit, which is not part of the type
 
 	//char attributes
-	c0 = a & 0x07;                  //background
-	c1 = (a & 0x70) >> 4;           //foreground
-	i = b & 0x01;                   //insert
-	f = (a & 0x08) >> 3;            //flash
-	m = (b & 0x04) >> 2;            //conceal
-	n = ((a & 0x80) >> 7);          //negative
-	u = (((b & 0x60) == 0) || ((b & 0xc0) == 0x40)) ? ((b & 0x10) >> 4) : 0; //underline
+	const uint8_t c0 = a & 0x07;        //background
+	const uint8_t c1 = (a >> 4) & 0x07; //foreground
+	const uint8_t i = BIT(b, 0);        //insert
+	const uint8_t f = BIT(a, 3);        //flash
+	const uint8_t m = BIT(b, 2);        //conceal
+	const uint8_t n = BIT(a, 7);        //negative
+	const uint8_t u = (((b & 0x60) == 0) || ((b & 0xc0) == 0x40)) ? BIT(b, 4) : 0; //underline
 
 	bichrome40(type, address, dial, iblock, x, y, c0, c1, i, f, m, n, u);
 }
@@ -757,17 +740,17 @@ void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 // generate 12 bits 80 columns char
 void ef9345_device::makechar_12x80(uint16_t x, uint16_t y)
 {
-	uint16_t iblock = indexblock(x, y);
-	bool cursor_odd = BIT(m_registers[7], 7);
+	const uint16_t iblock = indexblock(x, y);
+	const bool cursor_odd = BIT(m_registers[7], 7);
 
 	//test if the cursor is on one of the two characters that we are rendering.
 	uint8_t i = (m_registers[6] & 0x1f);
 	if (i < 8)
 		i &= 1;
-	bool cursor = iblock == 0x40 * i + (m_registers[7] & 0x3f);
+	const bool cursor = iblock == (0x40 * i + (m_registers[7] & 0x3f));
 
-	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1, cursor && !cursor_odd);
-	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1, cursor && cursor_odd);
+	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x, y, cursor && !cursor_odd);
+	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 1, y, cursor && cursor_odd);
 }
 
 void ef9345_device::draw_border(uint16_t line)
@@ -845,6 +828,21 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			m_videoram->write_byte(a, m_registers[1]);
 			m_videoram->write_byte(a + 0x0800, m_registers[2]);
 			if (cmd&1) inc_x(7);
+			break;
+		case 0x05:  //CLF: Clear page 24 bits
+		case 0x07:  //CLG: Clear page 16 bits
+			set_busy_flag(-1);
+			for (int i = 0; i < 32 * 40; i++)
+			{
+				a = indexram(7);
+				m_videoram->write_byte(a, m_registers[1]);
+				m_videoram->write_byte(a + 0x0800, m_registers[2]);
+				if (cmd == 0x05)
+					m_videoram->write_byte(a + 0x1000, m_registers[3]);
+				inc_x(7);
+				if ((m_registers[7] & 0x3f) == 0)
+					inc_y(6);
+			}
 			break;
 		case 0x08:  //KRF: ram->R1,R2,R3
 		case 0x09:  //KRF: ram->R1,R2,R3 + increment
@@ -980,7 +978,16 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			set_busy_flag(3500);
 			switch(cmd&7)
 			{
-				case 0:     m_registers[1] = m_charset[indexrom(7) & 0x1fff]; break;
+				case 0:
+				{
+					uint8_t type = ((m_registers[6]&0x20)>>3) | ((m_registers[7]&0x40)>>5) | ((m_registers[7]&0x80)>>7);
+					if (m_variant == EF9345_MODE::TYPE_TS9347)
+						type &= 0x3; // 4-7 are aliases of 0-3 on the TS9347
+
+					uint16_t addr = ((m_registers[6]&0x1f)<<6) | (m_registers[7]&0x3f);
+					m_registers[1] = read_char(type, addr); // read slice from ROM
+					break;
+				}
 				case 1:     m_registers[1] = m_tgs; break;
 				case 2:     m_registers[1] = m_mat; break;
 				case 3:     m_registers[1] = m_pat; break;
@@ -1019,7 +1026,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			uint8_t r2 = (cmd&0x04) ? 5 : 7;
 			int busy = 2000;
 
-			for (i = 0; i < 1280; i++)
+			for (i = 0; i < 32 * 40; i++)
 			{
 				a1 = indexram(r1); a2 = indexram(r2);
 				m_videoram->write_byte(a2, m_videoram->read_byte(a1));
@@ -1046,8 +1053,6 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			set_busy_flag(busy);
 		}
 		break;
-		case 0x05:  //CLF: Clear page 24 bits
-		case 0x07:  //CLG: Clear page 16 bits
 		case 0x40:  //KRC: R1 -> ram
 		case 0x41:  //KRC: R1 -> ram + inc
 		case 0x48:  //KRC: 80 characters - 8 bits
@@ -1070,15 +1075,18 @@ uint32_t ef9345_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void ef9345_device::update_scanline(uint16_t scanline)
 {
-	uint16_t i;
-
 	if (scanline == 250)
+	{
+		// We are past the end of the screen, clear the VSYNC flag.
 		m_state &= 0xfb;
+	}
 
 	// If we are interrupting a running command, delay its completion.
 	if (m_busy_timer->enabled())
 		m_busy_timer->adjust(m_busy_timer->remaining() + attotime::from_nsec(104000));
 
+	// Draw the margin at the left and right sides of the row we are about to update.
+	// Note: the row we are about to update is (scanline / 10) + 1.
 	if (m_char_mode == MODE12x80 || m_char_mode == MODE8x80)
 	{
 		draw_char_80(m_border, 0, (scanline / 10) + 1);
@@ -1092,24 +1100,30 @@ void ef9345_device::update_scanline(uint16_t scanline)
 
 	if (scanline == 0)
 	{
+		// Set the VSYNC flag.
 		m_state |= 0x04;
+
+		// Before starting with the first row of text, also draw a blank row as top margin.
 		draw_border(0);
+
+		// Update the first row of text.
 		if (m_pat & 1)
 		{
-			for (i = 0; i < 40; i++)
+			for (uint16_t i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
 		}
 		else
 		{
-			for (i = 0; i < 42; i++)
+			for (uint16_t i = 0; i < 42; i++)
 				draw_char_40(m_border, i, 1);
 		}
 	}
 	else if (scanline < 120)
 	{
+		// Update the current row.
 		if (m_pat & 2)
 		{
-			for (i = 0; i < 40; i++)
+			for (uint16_t i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
 		}
 		else
@@ -1119,22 +1133,26 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	}
 	else if (scanline < 250)
 	{
+		// Update the current row.
 		if (m_variant == EF9345_MODE::TYPE_TS9347)
 		{
-			for (i = 0; i < 40; i++)
+			for (uint16_t i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
 		}
 		else
 		{
 			if (m_pat & 4) // Lower bulk enable
 			{
-				for (i = 0; i < 40; i++)
+				for (uint16_t i = 0; i < 40; i++)
 					makechar(i, (scanline / 10));
 			}
 			else
 			{
 				draw_border(scanline / 10);
 			}
+
+			// If we have just updated the last row of text, draw an extra blank row for the bottom
+			// margin.
 			if (scanline == 240)
 				draw_border(26);
 		}
@@ -1146,12 +1164,11 @@ uint8_t ef9345_device::data_r(offs_t offset)
 	if (offset & 7)
 		return m_registers[offset & 7];
 
-	if (m_bf)
-		m_state |= 0x80;
-	else
-		m_state &= 0x7f;
+	const uint8_t result = m_bf ? (m_state | 0x80) : (m_state & 0x7f);
+	if (!machine().side_effects_disabled())
+		m_state = result;
 
-	return m_state;
+	return result;
 }
 
 void ef9345_device::data_w(offs_t offset, uint8_t data)

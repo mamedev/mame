@@ -434,7 +434,7 @@ uint32_t dassault_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void dassault_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_priority);
+	m_priority = data;
 }
 
 void dassault_state::main_irq_ack_w(uint16_t data)

@@ -739,9 +739,9 @@ protected:
 		m_start.resolve();
 	}
 
-	virtual void device_start() override ATTR_COLD
+	virtual void driver_start() override ATTR_COLD
 	{
-		taitogn_state::device_start();
+		taitogn_state::driver_start();
 
 		save_item(NAME(m_trackball));
 		save_item(NAME(m_weight));

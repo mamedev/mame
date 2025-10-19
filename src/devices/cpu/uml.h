@@ -46,11 +46,19 @@ namespace uml
 	constexpr int MAPVAR_END = MAPVAR_M0 + MAPVAR_COUNT;
 
 	// flag definitions
-	constexpr u8 FLAG_C = 0x01;     // carry flag
-	constexpr u8 FLAG_V = 0x02;     // overflow flag (defined for integer only)
-	constexpr u8 FLAG_Z = 0x04;     // zero flag
-	constexpr u8 FLAG_S = 0x08;     // sign flag (defined for integer only)
-	constexpr u8 FLAG_U = 0x10;     // unordered flag (defined for FP only)
+	enum : unsigned
+	{
+		FLAG_BIT_C = 0,
+		FLAG_BIT_V,
+		FLAG_BIT_Z,
+		FLAG_BIT_S,
+		FLAG_BIT_U
+	};
+	constexpr u8 FLAG_C = 1U << FLAG_BIT_C; // carry flag
+	constexpr u8 FLAG_V = 1U << FLAG_BIT_V; // overflow flag (defined for integer only)
+	constexpr u8 FLAG_Z = 1U << FLAG_BIT_Z; // zero flag
+	constexpr u8 FLAG_S = 1U << FLAG_BIT_S; // sign flag (defined for integer only)
+	constexpr u8 FLAG_U = 1U << FLAG_BIT_U; // unordered flag (defined for FP only)
 
 	// flag combinations
 	constexpr u8 FLAGS_NONE = 0x00;

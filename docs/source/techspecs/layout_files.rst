@@ -1496,5 +1496,5 @@ internal layouts included in MAME.
     Effectively using groups as a procedural programming language to build up an
     image of a trainer board.
 `beena.lay <https://git.redump.net/mame/tree/src/mame/layout/beena.lay?h=mame0261>`_
-    Using event-based scripting to dynamically position elements and draw elemnt
+    Using event-based scripting to dynamically position elements and draw element
     content programmatically.

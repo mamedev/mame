@@ -170,9 +170,9 @@ files{
 	MAME_DIR .. "src/mame/gaelco/gaelco_wrally_sprites.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco_ds5002fp.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco_ds5002fp.h",
-	MAME_DIR .. "src/mame/venture/looping.cpp",
-	MAME_DIR .. "src/mame/misc/supertnk.cpp",
 	MAME_DIR .. "src/mame/misc/goldnpkr.cpp",
+	MAME_DIR .. "src/mame/videogames/looping.cpp",
+	MAME_DIR .. "src/mame/videogames/supertnk.cpp",
 }
 end
 

@@ -12,6 +12,6 @@ midway/astrocde.cpp
 midway/gridlee.cpp
 midway/williams.cpp
 misc/goldnpkr.cpp
-misc/supertnk.cpp
 rare/kinst.cpp
-venture/looping.cpp
+videogames/looping.cpp
+videogames/supertnk.cpp

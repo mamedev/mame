@@ -208,6 +208,7 @@ private:
 
 	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sprite_callback(int &code, int &color, int colbank);
 
 	void bankswitch_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
@@ -368,13 +369,15 @@ void contra_state::flipscreen_w(int state)
 
 ***************************************************************************/
 
+void contra_state::sprite_callback(int &code, int &color, int colbank)
+{
+	color += colbank;
+}
+
 template <uint8_t Which>
 void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
-	int base_color = (m_k007121[Which]->ctrl_r(6) & 0x30) * 2;
-	int global_x_offset = m_k007121[Which]->flipscreen() ? 16 : 40;
-
-	m_k007121[Which]->sprites_draw(bitmap, cliprect, base_color, global_x_offset, 0, priority_bitmap, (uint32_t)-1);
+	m_k007121[Which]->sprites_draw(bitmap, cliprect, priority_bitmap, (uint32_t)-1);
 }
 
 uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -610,12 +613,16 @@ void contra_state::contra(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	K007121(config, m_k007121[0], 0, gfx_contra_1, m_palette, m_screen);
+	m_k007121[0]->set_sprite_offsets(40, 16);
 	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<0>));
 	m_k007121[0]->set_flipscreen_cb().append(FUNC(contra_state::flipscreen_w<2>));
+	m_k007121[0]->set_sprite_callback(FUNC(contra_state::sprite_callback));
 
 	K007121(config, m_k007121[1], 0, gfx_contra_2, m_palette, m_screen);
+	m_k007121[1]->set_sprite_offsets(40, 16);
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<1>));
+	m_k007121[1]->set_sprite_callback(FUNC(contra_state::sprite_callback));
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

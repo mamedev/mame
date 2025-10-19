@@ -13,18 +13,15 @@
 
 #pragma once
 
-#include <cstdint>
 #include <cassert>
-
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* comment parameters */
-constexpr int MAX_COMMENTS{4000};
-constexpr int MAX_DATA_RANGES{1000};
-constexpr int COMMENT_POOL_SIZE{MAX_COMMENTS * 40};
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 
 /***************************************************************************
@@ -32,132 +29,114 @@ constexpr int COMMENT_POOL_SIZE{MAX_COMMENTS * 40};
 ***************************************************************************/
 
 // use x86code * to reference generated code
-typedef uint8_t       x86code;
+typedef uint8_t x86code;
 
 
-/* code logging info */
-struct log_comment
-{
-	x86code* base = nullptr;
-	const char* string = nullptr;
-};
-
-
-/* data ranges */
-struct data_range_t
-{
-	x86code* base = nullptr;
-	x86code* end = nullptr;
-	int size = 0;
-};
-
-
-/* the code logging context */
+// the code logging context
 struct x86log_context
 {
+private:
+	// comment parameters
+	static inline constexpr int MAX_COMMENTS = 4000;
+	static inline constexpr int MAX_DATA_RANGES = 1000;
+	static inline constexpr int COMMENT_POOL_SIZE = MAX_COMMENTS * 40;
+
+	// code logging info
+	struct log_comment
+	{
+		x86code const *base;
+		char const *string;
+	};
+
+	// data ranges
+	struct data_range_t
+	{
+		x86code const *base;
+		x86code const *end;
+		int size;
+	};
+
 	std::string filename;                       // name of the file
-	FILE* file = nullptr;                       // file we are logging to
+	FILE *file = nullptr;                       // file we are logging to
 
-	data_range_t data_range[MAX_DATA_RANGES];   // list of data ranges
-	int data_range_count = 0;                   // number of data ranges
+	std::vector<data_range_t> data_range;       // list of data ranges
 
-	log_comment comment_list[MAX_COMMENTS];     // list of comments
-	int comment_count = 0;                      // number of live comments
+	std::vector<log_comment> comment_list;      // list of comments
 
 	char comment_pool[COMMENT_POOL_SIZE];       // string pool to hold comments
-	char* comment_pool_next = nullptr;          // pointer to next string pool location
-};
+	char *comment_pool_next = nullptr;          // pointer to next string pool location
+
+	void reset_log() noexcept;
+
+public:
+	using ptr = std::unique_ptr<x86log_context>;
+
+	// create a new context
+	static ptr create(std::string_view filename);
+
+	// release a context
+	~x86log_context();
+
+	// mark a given range as data for logging purposes
+	void mark_as_data(x86code const *base, x86code const *end, int size) noexcept;
+
+	// disassemble a range of code and reset accumulated information
+	void disasm_code_range(const char *label, x86code const *start, x86code const *stop);
 
 
+	/*-------------------------------------------------
+		add_comment - add a comment associated
+		with a given code pointer
+	-------------------------------------------------*/
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* create a new context */
-x86log_context* x86log_create_context(const char* filename);
-
-/* release a context */
-void x86log_free_context(x86log_context* log) noexcept;
-
-/* add a comment associated with a given code pointer */
-template <typename... Ts>
-inline void x86log_add_comment(
-	x86log_context* log, x86code* base, const char* format, Ts&&... xs);
-
-/* mark a given range as data for logging purposes */
-void x86log_mark_as_data(
-	x86log_context* log, x86code* base, x86code* end, int size) noexcept;
-
-/* disassemble a range of code and reset accumulated information */
-void x86log_disasm_code_range(
-	x86log_context* log, const char* label, x86code* start, x86code* stop);
-
-/* manually printf information to the log file */
-template <typename... Ts>
-inline void x86log_printf(x86log_context* log, const char* format, Ts&&... xs);
-
-
-/*-------------------------------------------------
-    x86log_add_comment - add a comment associated
-    with a given code pointer
--------------------------------------------------*/
-
-template <typename... Ts>
-inline void x86log_add_comment(
-	x86log_context* log, x86code* base, const char* format, Ts&&... xs)
-{
-	char* string = log->comment_pool_next;
-	log_comment* comment;
-
-	assert(log->comment_count < MAX_COMMENTS);
-	assert(log->comment_pool_next + strlen(format) + 256 <
-			log->comment_pool + COMMENT_POOL_SIZE);
-
-	/* we assume comments are registered in order; enforce this */
-	assert(log->comment_count == 0 ||
-			base >= log->comment_list[log->comment_count - 1].base);
-
-	/* if we exceed the maxima, skip it */
-	if(log->comment_count >= MAX_COMMENTS) return;
-	if(log->comment_pool_next + strlen(format) + 256 >=
-		log->comment_pool + COMMENT_POOL_SIZE)
-		return;
-
-	/* do the printf to the string pool */
-	log->comment_pool_next +=
-		sprintf(log->comment_pool_next, format, std::forward<Ts>(xs)...) + 1;
-
-	/* fill in the new comment */
-	comment = &log->comment_list[log->comment_count++];
-	comment->base = base;
-	comment->string = string;
-}
-
-
-/*-------------------------------------------------
-    x86log_printf - manually printf information to
-    the log file
--------------------------------------------------*/
-
-template <typename... Ts>
-inline void x86log_printf(x86log_context* log, const char* format, Ts&&... xs)
-{
-	/* open the file, creating it if necessary */
-	if(log->file == nullptr)
+	template <typename... Ts>
+	void add_comment(x86code const *base, const char *format, Ts &&... xs) noexcept
 	{
-		log->file = fopen(log->filename.c_str(), "w");
+		assert((comment_pool_next + strlen(format) + 256) < std::end(comment_pool));
 
-		if(log->file == nullptr) return;
+		// we assume comments are registered in order; enforce this
+		assert(comment_list.empty() || (base >= comment_list.back().base));
+
+		// if we exceed the maxima, skip it
+		if ((comment_pool_next + strlen(format) + 256) >= std::end(comment_pool))
+			return;
+
+		// do the printf to the string pool
+		std::size_t const available = std::end(comment_pool) - comment_pool_next;
+		auto const needed = std::snprintf(comment_pool_next, available, format, std::forward<Ts>(xs)...);
+		if ((needed < 0) || ((needed + 1) > available))
+			return;
+
+		// fill in the new comment
+		try
+		{
+			comment_list.emplace_back(log_comment{ base, comment_pool_next });
+			comment_pool_next += needed + 1;
+		}
+		catch (std::bad_alloc const &)
+		{
+		}
 	}
 
-	assert(log->file != nullptr);
 
-	/* do the printf */
-	fprintf(log->file, format, std::forward<Ts>(xs)...);
+	/*-------------------------------------------------
+	    printf - manually printf information to
+	    the log file
+	-------------------------------------------------*/
 
-	/* flush the file */
-	fflush(log->file);
-}
+	template <typename... Ts>
+	void printf(const char *format, Ts &&... xs)
+	{
+		if (!file)
+		{
+			file = std::fopen(filename.c_str(), "w");
+			if (!file)
+				return;
+		}
+
+		std::fprintf(file, format, std::forward<Ts>(xs)...);
+		std::fflush(file);
+	}
+};
 
 #endif // MAME_CPU_X86LOG_H

@@ -2,9 +2,9 @@
 // copyright-holders:m1macrophage
 
 /*
-The LinnDrum (unofficially also known as LM-2) is a digital drum machine. It
-stores and plays digital samples (recordings of acoustic dumps), some of which
-are processed by analog filters or other analog circuits.
+The LinnDrum is a digital drum machine. It stores and plays digital samples
+(recordings of acoustic drums), some of which are processed by analog filters or
+amplifiers.
 
 The firmware runs on a Z80. It controls the UI (reads buttons, drives displays
 and LEDs), synchronization with other devices, cassette I/O, and voice
@@ -16,8 +16,8 @@ selection, decay time), bringing the number of possible sounds to 28. However,
 end-users can only trigger 23 sounds, and can control mixing and panning
 for 15 of them (some are grouped together). Each voice core can run
 independently, for a max polyphony of 10. Only one variation per core can be
-active at a time. The "click" and "beep" sounds can be played independently of
-each other and the voice cores.
+active at a time. The "click" and "beep" sounds can be played simultaneously
+with each other and the voice cores.
 
 There are multiple voice architectures:
 
@@ -43,7 +43,7 @@ There are multiple voice architectures:
   sidestick. The voice core output is post-processed by a single-pole lowpass RC
   filter. The end-user can control the sample rate via a tuning knob.
   This section also includes the circuit for the "click" sound (metronome),
-  which triggers pulses of fixed length, and the circuit for  the "beep" sound,
+  which triggers pulses of fixed length, and the circuit for the "beep" sound,
   which allows the firmware to generate pulses of arbitrary length.
 
 * The "tom / conga" section is similar to the "snare / sidestick" one. It
@@ -57,12 +57,6 @@ There are multiple voice architectures:
 
 The driver is based on the LinnDrum's service manual and schematics, and is
 intended as an educational tool.
-
-Reasons for MACHINE_IMPERFECT_SOUND:
-* Missing a few sample checksums.
-* Missing bass drum LPF and filter envelope.
-* Missing tom / conga LPF and filter envelope.
-* Linear, instead of tanh response for hi-hat VCA.
 
 PCBoards:
 * CPU board. 2 sections in schematics:
@@ -100,6 +94,7 @@ Example:
 #include "sound/spkrdev.h"
 #include "sound/va_eg.h"
 #include "sound/va_vca.h"
+#include "sound/va_vcf.h"
 #include "speaker.h"
 
 #include "linn_linndrum.lh"
@@ -113,13 +108,19 @@ Example:
 #define LOG_MIX              (1U << 7)
 #define LOG_PITCH            (1U << 8)
 #define LOG_HAT_EG           (1U << 9)
+#define LOG_CALIBRATION      (1U << 10)
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_CALIBRATION)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
 namespace {
+
+// Voltage rails.
+constexpr const float VPLUS = 15;
+constexpr const float VMINUS = -15;
+constexpr const float VCC = 5;
 
 enum mux_voices
 {
@@ -179,8 +180,176 @@ enum mixer_channels
 	NUM_MIXER_CHANNELS
 };
 
+// The bass drum and tom/conga voices are post-processed by VCFs with hardcoded
+// envelopes. The EG will quickly open up the filter in the first ~5ms, and then
+// more gradually close it off. This setup allows the attack transients through,
+// while filtering high-frequency noise at low signal levels. Such noise could
+// be more apparent for these bass-heavy voices.
+class linndrum_vcf_eg_device : public device_t, public device_sound_interface
+{
+public:
+	// trimmer_tag: the input port tag of the CV offset trimmer.
+	// eg_r_output: the resistor at the output of the EG buffer (mux: R135, tom: no designation).
+	// cv_r_summer_output: the resistor at the output of the CV op-amp (mux: R133, tom: no designation).
+	linndrum_vcf_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *trimmer_tag, float eg_r_output, float cv_r_summer_output) ATTR_COLD;
+	linndrum_vcf_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
+
+	void trigger();
+
+	DECLARE_INPUT_CHANGED_MEMBER(freq_cv_offset_changed);
+
+protected:
+	void sound_stream_update(sound_stream &stream) override;
+
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+
+private:
+	float get_freq_cv(float v_eg) const;
+	void update_freq_cv_offset();
+	TIMER_DEVICE_CALLBACK_MEMBER(trigger_timer_elapsed);
+
+	required_ioport m_offset_trimmer;
+	required_device<timer_device> m_trigger_timer;  // LM556 - mux: U37A, tom: U22A
+	required_device<va_rc_eg_device> m_rc;  // mux: R132, R142, C70. tom: no designations.
+
+	sound_stream *m_stream;
+	float m_i_offset;
+
+	// The bass and tom/conga envelope generator circuits have the same topology,
+	// but some of the components differ. The differing components are passed
+	// as constructor arguments and stored in the const member variables below.
+	// The rest are defined as constants.
+
+	// Note that the tom section in the service manual is missing component
+	// designations for all passive components. All component designations below
+	// are for the bass EG in the mux section.
+
+	const float m_eg_r_output;  // mux:R135
+	const float m_cv_scale;  // mux:R133-R128 voltage divider.
+
+	static inline constexpr float TIMER_R = RES_K(510);  // mux:R9
+	static inline constexpr float TIMER_C = CAP_U(0.01);  // mux:C7
+
+	// The schematic shows the charging resistor as 100K for the tom EG, and
+	// 10K for the bass EG. However, the description of the EG in the service
+	// manual states that the CV takes ~5ms to go from 50mv to -50mv in the
+	// attack phase. This is only possible with a 10K resistor, so using that.
+	static inline constexpr float EG_R_CHARGE = RES_K(10);  // mux:R139
+	static inline constexpr float EG_R_DISCHARGE = RES_M(1);  // mux:R142
+	static inline constexpr float EG_R_CHARGE_EFFECTIVE = RES_2_PARALLEL(EG_R_CHARGE, EG_R_DISCHARGE);
+	static inline constexpr float EG_V_TARGET = VCC * RES_VOLTAGE_DIVIDER(EG_R_CHARGE, EG_R_DISCHARGE);
+	static inline constexpr float EG_C = CAP_U(0.1);  // mux:C70
+
+	static inline constexpr float CV_R_TRIMMER_MAX = RES_K(10);  // no designation
+	static inline constexpr float CV_R_OFFSET = RES_K(47);  // mux:R137
+	static inline constexpr float CV_R_SUMMER_FEEDBACK = RES_K(2.4);  // mux:R136
+	static inline constexpr float CV_R_DIVIDER_BOTTOM = RES_K(1);  // mux:R128
+};
+
 }  // anonymous namespace
 
+DEFINE_DEVICE_TYPE(LINNDRUM_VCF_EG, linndrum_vcf_eg_device, "linndrum_vcf_eg", "LinnDrum filter envelope generator");
+
+linndrum_vcf_eg_device::linndrum_vcf_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *trimmer_tag, float eg_r_output, float cv_r_summer_output)
+	: device_t(mconfig, LINNDRUM_VCF_EG, tag, owner, 0)
+	, device_sound_interface(mconfig, *this)
+	, m_offset_trimmer(*this, trimmer_tag)
+	, m_trigger_timer(*this, "trigger_timer")
+	, m_rc(*this, "rc")
+	, m_stream(nullptr)
+	, m_i_offset(0)
+	, m_eg_r_output(eg_r_output)
+	, m_cv_scale(RES_VOLTAGE_DIVIDER(cv_r_summer_output, CV_R_DIVIDER_BOTTOM))
+{
+}
+
+linndrum_vcf_eg_device::linndrum_vcf_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: linndrum_vcf_eg_device(mconfig, tag, owner, ":trimmer_bass_freq_cv_offset", 1, 1)
+{
+}
+
+// Starts EG attack.
+void linndrum_vcf_eg_device::trigger()
+{
+	m_rc->set_r(EG_R_CHARGE_EFFECTIVE);
+	m_rc->set_target_v(EG_V_TARGET);
+	m_trigger_timer->adjust(PERIOD_OF_555_MONOSTABLE(TIMER_R, TIMER_C));
+}
+
+// Starts EG release.
+TIMER_DEVICE_CALLBACK_MEMBER(linndrum_vcf_eg_device::trigger_timer_elapsed)
+{
+	m_rc->set_r(EG_R_DISCHARGE);
+	m_rc->set_target_v(0);
+}
+
+float linndrum_vcf_eg_device::get_freq_cv(float v_eg) const
+{
+	const float i_eg = v_eg / m_eg_r_output;
+	return -(i_eg + m_i_offset) * CV_R_SUMMER_FEEDBACK * m_cv_scale;
+}
+
+void linndrum_vcf_eg_device::update_freq_cv_offset()
+{
+	// The frequency CV offset can be adjusted by a trimmer.
+
+	// The code below computes the current through resistor R to GND. R1 and R2
+	// are the two sides of the trimmer.
+	//
+	//  V+ --- R1 --*-- R2 --- V-
+	//              |
+	//              R
+	//              |
+	//             GND (virtual)
+
+	m_stream->update();
+
+	constexpr float R = CV_R_OFFSET;
+	const float R2 = CV_R_TRIMMER_MAX * m_offset_trimmer->read() / 100.0;
+	const float R1 = CV_R_TRIMMER_MAX - R2;
+
+	// vx: voltage at the junction of all resistors.
+	const float vx = (R * R1 * VMINUS + R * R2 * VPLUS) / (R * R1 + R * R2 + R1 * R2);
+	m_i_offset = vx / R;
+
+	LOGMASKED(LOG_CALIBRATION, "%s: CV Offset current: %f. CV range: %f - %f\n",
+	          tag(), m_i_offset, get_freq_cv(0), get_freq_cv(EG_V_TARGET));
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(linndrum_vcf_eg_device::freq_cv_offset_changed)
+{
+	update_freq_cv_offset();
+}
+
+void linndrum_vcf_eg_device::sound_stream_update(sound_stream &stream)
+{
+	const int n = stream.samples();
+	for (int i = 0; i < n; ++i)
+		stream.put(0, i, get_freq_cv(stream.get(0, i)));
+}
+
+void linndrum_vcf_eg_device::device_add_mconfig(machine_config &config)
+{
+	TIMER(config, m_trigger_timer).configure_generic(FUNC(linndrum_vcf_eg_device::trigger_timer_elapsed));
+	VA_RC_EG(config, m_rc).set_c(EG_C);
+	m_rc->add_route(0, *this, 1.0);
+}
+
+void linndrum_vcf_eg_device::device_start()
+{
+	save_item(NAME(m_i_offset));
+	m_stream = stream_alloc(1, 1, machine().sample_rate());
+}
+
+void linndrum_vcf_eg_device::device_reset()
+{
+	update_freq_cv_offset();
+}
+
+
+namespace {
 
 class linndrum_audio_device : public device_t
 {
@@ -189,7 +358,7 @@ public:
 
 	void mux_drum_w(int voice, u8 data, bool is_strobe = true);
 	void snare_w(u8 data);  // Snare and sidestick.
-	void tom_w(u8 data);  // Tom and conga.
+	void tom_w(u8 data, bool is_strobe);  // Tom and conga.
 	void strobe_click_w(u8 data);
 	void beep_w(int state);
 
@@ -230,6 +399,7 @@ private:
 	required_device<timer_device> m_mux_timer;  // 74LS627 (U77A).
 	required_device_array<dac76_device, NUM_MUX_VOICES> m_mux_dac;  // AM6070 (U88).
 	required_device_array<filter_volume_device, NUM_MUX_VOICES> m_mux_volume;  // CD4053 (U90), R60, R62.
+	required_device<linndrum_vcf_eg_device> m_bass_eg;
 	required_device<timer_device> m_hat_trigger_timer;  // U37B (LM556).
 	required_device<va_rc_eg_device> m_hat_eg;
 	required_device<va_vca_device> m_hat_vca;  // CEM3360 (U91B).
@@ -258,6 +428,7 @@ private:
 	required_memory_region m_conga_samples;  // 2 x 2732 ROMs (U66, U67).
 	required_device<timer_device> m_tom_timer;  // 74LS627 (U77B).
 	required_device<dac76_device> m_tom_dac;  // AM6070 (U82).
+	required_device<linndrum_vcf_eg_device> m_tom_eg;
 	required_device_array<filter_volume_device, NUM_TOM_VOICES> m_tom_out;  // U87 (CD4051) outputs 0, 1, 4, 5, 6.
 	bool m_tom_counting = false;  // /Q1 of U73 (74LS74).
 	u16 m_tom_counter = 0;  // 14-bit counter (2 x 74LS393, U70, U71).
@@ -301,8 +472,6 @@ private:
 	static constexpr const float OUTPUT_C_FEEDBACK = CAP_P(1000);
 	static constexpr const float R_ON_CD4053 = RES_R(125);  // Typical Ron resistance for 15V supply (-7.5V / 7.5V).
 
-	static constexpr const float VPLUS = 15;  // Volts.
-	static constexpr const float VCC = 5;  // Volts.
 	static constexpr const float MUX_DAC_IREF = VPLUS / (RES_K(15) + RES_K(15));  // R55 + R57.
 	static constexpr const float TOM_DAC_IREF = MUX_DAC_IREF;  // Configured in the same way.
 	// All DAC current-to-voltage converter resistors, for both positive and
@@ -347,6 +516,8 @@ private:
 	};
 };
 
+}  // anonymous namespace
+
 DEFINE_DEVICE_TYPE(LINNDRUM_AUDIO, linndrum_audio_device, "linndrum_audio_device", "LinnDrum audio circuits");
 
 linndrum_audio_device::linndrum_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -357,6 +528,7 @@ linndrum_audio_device::linndrum_audio_device(const machine_config &mconfig, cons
 	, m_mux_timer(*this, "mux_drum_timer")
 	, m_mux_dac(*this, "mux_drums_virtual_dac_%u", 1)
 	, m_mux_volume(*this, "mux_drums_volume_control_%u", 1)
+	, m_bass_eg(*this, "bass_vcf_eg")
 	, m_hat_trigger_timer(*this, "hat_trigger_timer")
 	, m_hat_eg(*this, "hat_eg")
 	, m_hat_vca(*this, "hat_vca")
@@ -374,6 +546,7 @@ linndrum_audio_device::linndrum_audio_device(const machine_config &mconfig, cons
 	, m_conga_samples(*this, ":sample_conga")
 	, m_tom_timer(*this, "tom_conga_timer")
 	, m_tom_dac(*this, "tom_conga_dac")
+	, m_tom_eg(*this, "tom_conga_vcf_eg")
 	, m_tom_out(*this, "tom_conga_out_%u", 0)
 	, m_volume(*this, ":pot_gain_%u", 1)
 	, m_pan(*this, ":pot_pan_%u", 1)
@@ -404,7 +577,12 @@ void linndrum_audio_device::mux_drum_w(int voice, u8 data, bool is_strobe)
 	const bool attenuate = !BIT(data, 1) && voice != MV_CLAP && voice != MV_COWBELL;
 	m_mux_volume[voice]->set_gain(attenuate ? ATTENUATION : 1);
 
-	if (voice == MV_HAT)
+	if (voice == MV_BASS)
+	{
+		if (is_strobe)
+			m_bass_eg->trigger();
+	}
+	else if (voice == MV_HAT)
 	{
 		m_hat_open = BIT(data, 2);
 		m_hat_triggered = is_strobe;
@@ -445,7 +623,7 @@ void linndrum_audio_device::snare_w(u8 data)
 
 	// While there is a capacitor (C29, 0.01 UF) attached to the DAC's Iref
 	// input, it is too small to have a musical effect. Changes in current will
-	// stablizie within 0.1 ms, and such changes only happen at voice trigger.
+	// stabilize within 0.1 ms, and such changes only happen at voice trigger.
 
 	static constexpr const float R0 = RES_K(3.3);  // R70.
 	static constexpr const float R1 = RES_K(380);  // R69.
@@ -466,7 +644,7 @@ void linndrum_audio_device::snare_w(u8 data)
 	LOGMASKED(LOG_STROBES, "Strobed snare / sidestick: %02x (iref: %f)\n", data, iref);
 }
 
-void linndrum_audio_device::tom_w(u8 data)
+void linndrum_audio_device::tom_w(u8 data, bool is_strobe)
 {
 	m_tom_counting = BIT(data, 0);
 	if (!m_tom_counting)
@@ -492,7 +670,7 @@ void linndrum_audio_device::tom_w(u8 data)
 		case 4: m_tom_selected_pitch = TV_LOW_TOMS; break;
 		case 5: m_tom_selected_pitch = TV_MID_TOMS; break;
 		case 6: m_tom_selected_pitch = TV_HI_TOMS; break;
-		default: LOG("Firmware bug: invalid pitch variation for tom/conga.\n");
+		default: logerror("Firmware bug: invalid pitch variation for tom/conga.\n");
 	}
 	update_tom_pitch();
 
@@ -503,6 +681,9 @@ void linndrum_audio_device::tom_w(u8 data)
 	const s8 selected_output = m_tom_counting ? m_tom_selected_pitch : -1;
 	for (int i = 0; i < NUM_TOM_VOICES; ++i)
 		m_tom_out[i]->set_gain((i == selected_output) ? 1 : 0);
+
+	if (is_strobe)
+		m_tom_eg->trigger();
 
 	LOGMASKED(LOG_STROBES, "Strobed tom / conga: %02x (is_tom: %d, pitch:%d, output: %d, %s)\n",
 			  data, m_tom_selected, m_tom_selected_pitch, selected_output,
@@ -574,6 +755,13 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 		m_mux_dac[voice]->add_route(0, m_mux_volume[voice], 1.0);
 	}
 
+	// The bass VCF has a cutoff frequency of ~1.4KHz, which transiently
+	// increases to ~100KHz when the voice triggers.
+	LINNDRUM_VCF_EG(config, m_bass_eg, ":trimmer_bass_freq_cv_offset", RES_K(18), RES_K(5.1));  // R135, R133.
+	auto &bass_vcf = CEM3320_LPF4(config, "bass_vcf", CAP_P(150), RES_K(100));
+	m_mux_volume[MV_BASS]->add_route(0, bass_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
+	m_bass_eg->add_route(0, bass_vcf, 1.0, cem3320_lpf4_device::INPUT_FREQ);
+
 	TIMER(config, m_hat_trigger_timer).configure_generic(FUNC(linndrum_audio_device::hat_trigger_timer_tick));  // LM556 (U37B).
 	VA_RC_EG(config, m_hat_eg).set_c(HAT_C22);
 	VA_VCA(config, m_hat_vca).configure_cem3360_linear_cv();
@@ -605,23 +793,33 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	SPEAKER_SOUND(config, m_beep).set_levels(2, LEVELS);
 
 	// *** Tom / conga section.
+	// The schematic for this section is missing designations for all passive
+	// components.
 
 	TIMER(config, m_tom_timer).configure_generic(FUNC(linndrum_audio_device::tom_timer_tick));  // 74LS627 (U77B).
 	DAC76(config, m_tom_dac, 0);  // AM6070 (U82).
 	// Schematic is missing the second resistor, but that's almost certainly an error.
-	// It is also missing component designations.
 	m_tom_dac->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);
 	m_tom_dac->set_fixed_iref(TOM_DAC_IREF);
+
+	// The tom VCF has a cutoff frequency of ~650Hz, which transiently
+	// increases to ~46KHz when the voice triggers.
+	LINNDRUM_VCF_EG(config, m_tom_eg, ":trimmer_tom_freq_cv_offset", RES_K(10), RES_K(10));
+	auto &tom_vcf = CEM3320_LPF4(config, "tom_conga_vcf", CAP_P(330), RES_K(100));
+	m_tom_dac->add_route(0, tom_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
+	m_tom_eg->add_route(0, tom_vcf, 1.0, cem3320_lpf4_device::INPUT_FREQ);
+
 	for (int i = 0; i < NUM_TOM_VOICES; ++i)
 	{
 		FILTER_VOLUME(config, m_tom_out[i]);  // One of U87'S (CD4051) outputs.
-		m_tom_dac->add_route(0, m_tom_out[i], 1.0);
+		tom_vcf.add_route(0, m_tom_out[i], 1.0);
 	}
 
-	// *** Mixer.
+	// *** Mixer and output section.
+
 	const std::array<device_sound_interface *, NUM_MIXER_CHANNELS> voice_outputs =
 	{
-		m_mux_volume[MV_BASS],
+		&bass_vcf,
 		m_snare_out,
 		m_sidestick_out,
 		m_hat_vca,
@@ -647,7 +845,8 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	{
 		// The filter and gain will be configured in update_volume_and_pan().
 		FILTER_RC(config, m_voice_hpf[i]);
-		voice_outputs[i]->add_route(0, m_voice_hpf[i], 1.0);
+		// An op-amp inverter is attached to the output of the bass VCF.
+		voice_outputs[i]->add_route(0, m_voice_hpf[i], (i == MIX_BASS) ? -1.0 : 1.0);
 		m_voice_hpf[i]->add_route(0, m_left_mixer, 1.0);
 		m_voice_hpf[i]->add_route(0, m_right_mixer, 1.0);
 	}
@@ -834,7 +1033,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(linndrum_audio_device::tom_timer_tick)
 	if (BIT(m_tom_counter, 13))  // Counter reached 0x2000 (8192).
 	{
 		// All outputs of U42B and U73B (74LS74 flip-flops) are cleared.
-		tom_w(0);
+		tom_w(0, false);
 		return;
 	}
 
@@ -924,7 +1123,7 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 		// Capacitor to ground, at the wiper of the "click" volume fader.
 		static constexpr const float C_CLICK_WIPER = CAP_U(0.047);  // No designation.
 
-		// All "click" filter configurations result in singificant attenutation
+		// All "click" filter configurations result in significant attenuation
 		// (< 0.2x), which makes the click very quiet. The filter characteristics
 		// (gain and Fc) have been verified with simulations. So it is possible
 		// there is an error in the schematic. Different capacitor values, or a
@@ -1038,7 +1237,7 @@ void linndrum_audio_device::update_tom_pitch()
 
 	if (m_tom_selected_pitch < 0)
 	{
-		LOG("Firmware or driver bug: floating input to pitch CV op-amp.\n");
+		logerror("Firmware or driver bug: floating input to pitch CV op-amp.\n");
 		return;
 	}
 
@@ -1066,7 +1265,7 @@ void linndrum_audio_device::update_tom_pitch()
 
 void linndrum_audio_device::update_hat_decay()
 {
-	// When the hat is configed as "open", the EG will discharge through a 1M
+	// When the hat is configured as "open", the EG will discharge through a 1M
 	// resistor. When the hat is "closed", a CD4053 will add a parallel
 	// discharge path through the "hihat decay" pot.
 	float eg_r = HAT_R33;
@@ -1268,7 +1467,7 @@ void linndrum_state::update_tempo_timer()
 	static constexpr const float P1_MAX = RES_K(100);
 
 	// Using `100 - pot value` because the higher (the more clockwise) the pot
-	// is turned, the lower the resistance and the fastest the tempo.
+	// is turned, the lower the resistance and the faster the tempo.
 	const float tempo_r = (100 - m_tempo_pot->read()) * P1_MAX / 100.0F;
 	const attotime period = PERIOD_OF_555_ASTABLE(R1, R2 + tempo_r, C2);
 	m_tempo_timer->adjust(period, 0, period);
@@ -1319,7 +1518,7 @@ u8 linndrum_state::get_voice_data(u8 data) const
 	}
 	else
 	{
-		LOG("Firmware bug: floating voice data bus when strobing a voice.\n");
+		logerror("Firmware bug: floating voice data bus when strobing a voice.\n");
 		return 0x0f;  // Floating TTL inputs. Will likely resolve to 1s.
 	}
 }
@@ -1346,7 +1545,7 @@ void linndrum_state::memory_map(address_map &map)
 	map(0x1f85, 0x1f85).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->mux_drum_w(MV_BASS, get_voice_data(data)); }));
 	map(0x1f86, 0x1f86).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->snare_w(get_voice_data(data)); }));
 	map(0x1f87, 0x1f87).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->mux_drum_w(MV_HAT, get_voice_data(data)); }));
-	map(0x1f88, 0x1f88).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->tom_w(get_voice_data(data)); }));
+	map(0x1f88, 0x1f88).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->tom_w(get_voice_data(data), true); }));
 	map(0x1f89, 0x1f89).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->mux_drum_w(MV_RIDE, get_voice_data(data)); }));
 	map(0x1f8a, 0x1f8a).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->mux_drum_w(MV_CRASH, get_voice_data(data)); }));
 	map(0x1f8b, 0x1f8b).mirror(0x0030).lw8(NAME([this] (u8 data) { m_audio->mux_drum_w(MV_CABASA, get_voice_data(data)); }));
@@ -1604,6 +1803,19 @@ INPUT_PORTS_START(linndrum)
 	PORT_ADJUSTER(100, "CLAPS GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CLAPS)
 	PORT_START("pot_gain_16")
 	PORT_ADJUSTER(100, "CLICK GAIN") PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(linndrum_audio_device::mix_changed), MIX_CLICK)
+
+	// The service manual shows the CV being held at ~50mV when the voice is not
+	// triggered. The default value of the trimmer achieves that.
+	PORT_START("trimmer_tom_freq_cv_offset")
+	PORT_ADJUSTER(13, "TRIMMER: TOM/CONGA CUTOFF CV OFFSET")
+		PORT_CHANGED_MEMBER("linndrum_audio:tom_conga_vcf_eg", FUNC(linndrum_vcf_eg_device::freq_cv_offset_changed), 0)
+
+	// Same as above: the default value achieves a resting CV of ~50mV. The
+	// default value is different from the one above, because some of the
+	// component values for the rest of the circuit differ.
+	PORT_START("trimmer_bass_freq_cv_offset")
+	PORT_ADJUSTER(29, "TRIMMER: BASS CUTOFF CV OFFSET")
+		PORT_CHANGED_MEMBER("linndrum_audio:bass_vcf_eg", FUNC(linndrum_vcf_eg_device::freq_cv_offset_changed), 0)
 INPUT_PORTS_END
 
 ROM_START(linndrum)
@@ -1675,4 +1887,5 @@ ROM_END
 
 }  // anonymous namespace
 
+// Tagged as MACHINE_IMPERFECT_SOUND because of missing some checksums.
 SYST(1982, linndrum, 0, 0, linndrum, linndrum, linndrum_state, empty_init, "Linn Electronics", "LinnDrum", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)

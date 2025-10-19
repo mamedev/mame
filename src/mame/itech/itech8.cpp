@@ -527,13 +527,6 @@
 #define LOGCONTROL(...)   LOGMASKED(LOG_CONTROL,   __VA_ARGS__)
 
 
-
-
-static constexpr XTAL CLOCK_8MHz = XTAL(8'000'000);
-static constexpr XTAL CLOCK_12MHz = XTAL(12'000'000);
-
-
-
 /*************************************
  *
  *  Interrupt handling
@@ -602,8 +595,8 @@ void itech8_state::ninclown_irq(int state)
 
 void itech8_state::nmi_ack_w(u8 data)
 {
-// doesn't seem to hold for every game (e.g., hstennis)
-//  m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	// doesn't seem to hold for every game (e.g., hstennis)
+	//m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -613,9 +606,6 @@ void itech8_state::nmi_ack_w(u8 data)
  *  Machine initialization
  *
  *************************************/
-
-
-
 
 void sstrike_state::machine_start()
 {
@@ -802,7 +792,6 @@ void itech8_state::ym2203_portb_out(u8 data)
  *
  *************************************/
 
-
 void itech8_state::gtg2_sound_data_w(u8 data)
 {
 	// on the later GTG2 board, they swizzle the data lines
@@ -829,7 +818,7 @@ void itech8_state::grom_bank_w(u8 data)
 
 u16 itech8_state::rom_constant_r(offs_t offset)
 {
-//  Ninja Clowns reads this area for program ROM checksum
+	// Ninja Clowns reads this area for program ROM checksum
 	if (!machine().side_effects_disabled())
 		LOGPROT("Read ROM constant area %04x\n",offset*2+0x40000);
 	return 0xd840;
@@ -1696,6 +1685,7 @@ static INPUT_PORTS_START( gpgolf )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  TMS34061 interfacing
@@ -1709,6 +1699,7 @@ void itech8_state::generate_tms34061_interrupt(int state)
 	if (state) LOGVIDEO("------------ DISPLAY INT (%d) --------------\n", m_screen->vpos());
 }
 
+
 /*************************************
  *
  *  Machine driver
@@ -1719,7 +1710,7 @@ void itech8_state::generate_tms34061_interrupt(int state)
 
 void itech8_state::itech8_core_devices(machine_config &config)
 {
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
@@ -1732,9 +1723,9 @@ void itech8_state::itech8_core_devices(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(itech8_state::generate_nmi));
 
 	TMS34061(config, m_tms34061, 0);
-	m_tms34061->set_rowshift(8);  // VRAM address is (row << rowshift) | col
+	m_tms34061->set_rowshift(8); // VRAM address is (row << rowshift) | col
 	m_tms34061->set_vram_size(itech8_state::VRAM_SIZE);
-	m_tms34061->int_callback().set(FUNC(itech8_state::generate_tms34061_interrupt));      // interrupt gen callback
+	m_tms34061->int_callback().set(FUNC(itech8_state::generate_tms34061_interrupt));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1744,7 +1735,7 @@ void itech8_state::itech8_core_devices(machine_config &config)
 
 void itech8_state::itech8_core_lo(machine_config &config)
 {
-	MC6809(config, m_maincpu, CLOCK_8MHz);
+	MC6809(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::common_lo_map);
 
 	itech8_core_devices(config);
@@ -1759,11 +1750,11 @@ void itech8_state::itech8_core_hi(machine_config &config)
 void itech8_state::itech8_sound_ym2203(machine_config &config)
 {
 	// basic machine hardware
-	MC6809(config, m_soundcpu, CLOCK_8MHz);
+	MC6809(config, m_soundcpu, 8_MHz_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound2203_map);
 
 	// sound hardware
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", CLOCK_8MHz/2));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 8_MHz_XTAL/2));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 	ymsnd.port_b_write_callback().set(FUNC(itech8_state::ym2203_portb_out));
 	ymsnd.add_route(0, "mono", 0.07);
@@ -1771,18 +1762,18 @@ void itech8_state::itech8_sound_ym2203(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.07);
 	ymsnd.add_route(3, "mono", 0.75);
 
-	okim6295_device &oki(OKIM6295(config, "oki", CLOCK_8MHz/8, okim6295_device::PIN7_HIGH)); // was /128, not /132, so unsure so pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH)); // was /128, not /132, so unsure so pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void itech8_state::itech8_sound_ym2608b(machine_config &config)
 {
 	// basic machine hardware
-	MC6809(config, m_soundcpu, CLOCK_8MHz);
+	MC6809(config, m_soundcpu, 8_MHz_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound2608b_map);
 
 	// sound hardware
-	ym2608_device &ymsnd(YM2608(config, "ymsnd", CLOCK_8MHz));
+	ym2608_device &ymsnd(YM2608(config, "ymsnd", 8_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 	ymsnd.port_b_write_callback().set(FUNC(itech8_state::ym2203_portb_out));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.75);
@@ -1791,7 +1782,7 @@ void itech8_state::itech8_sound_ym2608b(machine_config &config)
 void itech8_state::itech8_sound_ym3812(machine_config &config)
 {
 	// basic machine hardware
-	MC6809(config, m_soundcpu, CLOCK_8MHz);
+	MC6809(config, m_soundcpu, 8_MHz_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound3812_map);
 
 	pia6821_device &pia(PIA6821(config, "pia"));
@@ -1800,32 +1791,32 @@ void itech8_state::itech8_sound_ym3812(machine_config &config)
 	pia.writepb_handler().set(FUNC(itech8_state::pia_portb_out));
 
 	// sound hardware
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", CLOCK_8MHz/2));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 8_MHz_XTAL/2));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	okim6295_device &oki(OKIM6295(config, "oki", CLOCK_8MHz/8, okim6295_device::PIN7_HIGH)); // was /128, not /132, so unsure so pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH)); // was /128, not /132, so unsure so pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void itech8_state::itech8_sound_ym3812_external(machine_config &config)
 {
 	// basic machine hardware
-	MC6809(config, m_soundcpu, CLOCK_8MHz);
+	MC6809(config, m_soundcpu, 8_MHz_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound3812_external_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 
-	via6522_device &via(MOS6522(config, "via6522", CLOCK_8MHz/4));
+	via6522_device &via(MOS6522(config, "via6522", 8_MHz_XTAL/4));
 	via.writepb_handler().set(FUNC(itech8_state::pia_portb_out));
 	via.irq_handler().set("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	// sound hardware
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", CLOCK_8MHz/2));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 8_MHz_XTAL/2));
 	ymsnd.irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	okim6295_device &oki(OKIM6295(config, "oki", CLOCK_8MHz/8, okim6295_device::PIN7_HIGH)); // was /128, not /132, so unsure so pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH)); // was /128, not /132, so unsure so pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
@@ -1882,7 +1873,7 @@ void slikshot_state::slikshot_hi(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &slikshot_state::mem_hi_map);
 
-	Z80(config, m_subcpu, CLOCK_8MHz/2);
+	Z80(config, m_subcpu, 8_MHz_XTAL/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &slikshot_state::z80_mem_map);
 	m_subcpu->set_addrmap(AS_IO, &slikshot_state::z80_io_map);
 
@@ -1897,7 +1888,7 @@ void slikshot_state::slikshot_lo(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &slikshot_state::mem_lo_map);
 
-	Z80(config, m_subcpu, CLOCK_8MHz/2);
+	Z80(config, m_subcpu, 8_MHz_XTAL/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &slikshot_state::z80_mem_map);
 	m_subcpu->set_addrmap(AS_IO, &slikshot_state::z80_io_map);
 
@@ -1937,7 +1928,7 @@ void itech8_state::rimrockn(machine_config &config)
 	itech8_core_devices(config);
 	itech8_sound_ym3812_external(config);
 
-	HD6309(config, m_maincpu, CLOCK_12MHz);
+	HD6309(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::rimrockn_map);
 
 	m_screen->set_visarea(24, 375, 0, 239);
@@ -1949,9 +1940,9 @@ void itech8_state::ninclown(machine_config &config)
 	itech8_core_devices(config);
 	itech8_sound_ym3812_external(config);
 
-	//  m_nvram->set_custom_handler([this](nvram_device &, void *p, size_t s) { memcpy(p, memregion("maincpu")->base(), s); }, "vectors");
+	//m_nvram->set_custom_handler([this](nvram_device &, void *p, size_t s) { memcpy(p, memregion("maincpu")->base(), s); }, "vectors");
 
-	M68000(config, m_maincpu, CLOCK_12MHz);
+	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::ninclown_map);
 
 	m_screen->set_visarea(64, 423, 0, 239);
@@ -2746,6 +2737,7 @@ void itech8_state::init_neckneck()
 	m_visarea.set(8, 375, 0, 239);
 }
 
+
 /*************************************
  *
  *  Game drivers
@@ -2800,6 +2792,6 @@ GAME( 1991, rimrockn12b, rimrockn, rimrockn,          rimrockn, itech8_state,   
 GAME( 1991, ninclown,   0,         ninclown,          ninclown, itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Ninja Clowns (27 oct 91)", 0 )
 
 // Golden Tee Golf II-style PCB
-GAME( 1992, gpgolf,     0,         gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Golden Par Golf (Joystick, V1.1)", 0 ) // Seems to stall during Demo Mode??
-GAME( 1991, gpgolfa,    gpgolf,    gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Golden Par Golf (Joystick, V1.0)", 0 ) // Seems to stall during Demo Mode??
+GAME( 1992, gpgolf,     0,         gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Golden Par Golf (Joystick, V1.1)", 0 )
+GAME( 1991, gpgolfa,    gpgolf,    gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Golden Par Golf (Joystick, V1.0)", 0 )
 GAME( 1992, gtg2,       0,         gtg2,              gtg2,     itech8_state,   init_invbank,  ROT0,   "Strata / Incredible Technologies",         "Golden Tee Golf II (Trackball, V2.2)", 0 )

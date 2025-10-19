@@ -242,7 +242,6 @@ static const md_slot slot_list[] =
 
 	{ SSF2, "rom_ssf2" },
 	{ CM_2IN1, "rom_cm2in1" },
-	{ RADICA, "rom_radica" },
 //  { GAME_KANDUME, "rom_gkand" },  // what's needed by this?
 
 	{ TILESMJ2, "rom_16mj2" },
@@ -625,7 +624,7 @@ void base_md_cart_slot_device::setup_nvram()
 			break;
 		case SEGA_FRAM:
 			m_cart->m_nvram_start = 0x200000;
-			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("fram") - 1;
+			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("sram") - 1;
 			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
@@ -695,7 +694,7 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 	kof98_sig[]     = { 0x9b, 0xfc, 0x00, 0x00, 0x4a, 0x00 },
 	s15in1_sig[]    = { 0x22, 0x3c, 0x00, 0xa1, 0x30, 0x00 },
 	kof99_sig[]     = { 0x20, 0x3c, 0x30, 0x00, 0x00, 0xa1 }, // move.l  #$300000A1,d0
-	radica_sig[]    = { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
+//	radica_sig[]    = { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
 	soulb_sig[]     = { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff }, // move.w  #$C,($FF020A).l (what happens if check fails)
 	s19in1_sig[]    = { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38 },
 	rockman_sig[]   = { 0xea, 0x80 };
@@ -834,9 +833,9 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 			break;
 
 		case 0x400000:
-			if (!memcmp(&ROM[0x3c031c], radica_sig, sizeof(radica_sig)) ||
-				!memcmp(&ROM[0x3f031c], radica_sig, sizeof(radica_sig))) // ssf+gng + radica vol1
-				type = RADICA;
+			//if (!memcmp(&ROM[0x3c031c], radica_sig, sizeof(radica_sig)) ||
+			//	!memcmp(&ROM[0x3f031c], radica_sig, sizeof(radica_sig))) // ssf+gng + radica vol1
+			//	type = RADICA;
 
 			if (!memcmp(&ROM[0x028460], soulb_sig, sizeof(soulb_sig)))
 				type = SOULBLAD;

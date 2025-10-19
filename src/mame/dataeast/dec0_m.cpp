@@ -13,7 +13,7 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 
 /******************************************************************************/

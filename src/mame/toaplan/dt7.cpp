@@ -15,6 +15,7 @@
     - service mode doesn't display properly
     - currently only coins up with service button
     - sound dies after one stage?
+	- merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
 */
 
 
@@ -585,7 +586,7 @@ ROM_START( dt7 )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
 	/* It's a NEC V25 (PLCC94) (encrypted program uploaded by main CPU) */
-	/* Note, same markings as other games found in toaplan2.cpp, but table is different! */
+	/* Note, same markings as other games found in toaplan/toaplan2.cpp, but table is different! */
 
 	ROM_REGION( 0x400000, "gp9001_0", 0 )
 	ROM_LOAD( "3a.49", 0x000000, 0x080000, CRC(ba8e378c) SHA1(d5eb4a839d6b3c2b9bf0bd87f06859a01a2c0cbf) )

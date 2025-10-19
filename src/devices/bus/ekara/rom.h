@@ -61,6 +61,7 @@ protected:
 	virtual bool is_write_access_not_rom(void) override;
 
 	uint8_t m_buscontrol[3];
+	uint8_t m_bus_write_control_mask; // config
 };
 
 

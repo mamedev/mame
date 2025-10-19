@@ -66,7 +66,7 @@ void cxd8442q_device::map(address_map &map)
 {
 	// Each channel has the same structure
 	// The devices are mapped at the platform level, so this device only needs to handle the DMA and assorted details
-	map(0x0, 0x3).select(0x30000).rw(FUNC(cxd8442q_device::read_fifo_size), FUNC(cxd8442q_device::write_fifo_size));
+	map(0x00, 0x03).select(0x30000).rw(FUNC(cxd8442q_device::read_fifo_size), FUNC(cxd8442q_device::write_fifo_size));
 	map(0x04, 0x07).select(0x30000).rw(FUNC(cxd8442q_device::read_address), FUNC(cxd8442q_device::write_address));
 	map(0x0c, 0x0f).select(0x30000).rw(FUNC(cxd8442q_device::read_dma_mode), FUNC(cxd8442q_device::write_dma_mode));
 	map(0x18, 0x1b).select(0x30000).rw(FUNC(cxd8442q_device::read_intctrl), FUNC(cxd8442q_device::write_intctrl));

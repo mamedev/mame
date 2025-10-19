@@ -23,6 +23,8 @@ public:
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
 
+	virtual int get_image_offset(const format &f, int head, int track) const override;
+
 private:
 	static const format formats[];
 };

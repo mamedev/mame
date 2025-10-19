@@ -136,115 +136,161 @@ Bucky:
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_SOUND (1 << 1)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
 namespace {
 
 #define MOO_DEBUG 0
 #define MOO_DMADELAY (100)
 
-class moo_state : public driver_device
+// base class
+class moo_base_state : public driver_device
 {
-public:
-	moo_state(const machine_config &mconfig, device_type type, const char *tag) :
+protected:
+	moo_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_workram(*this, "workram"),
-		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_oki(*this, "oki"),
-		m_k054539(*this, "k054539"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
-		m_k053252(*this, "k053252"),
 		m_k056832(*this, "k056832"),
 		m_k054338(*this, "k054338"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_k054321(*this, "k054321")
+		m_io_eepromout(*this, "EEPROMOUT"),
+		m_workram(*this, "workram"),
+		m_spriteram(*this, "spriteram")
+	{ }
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	required_device<k056832_device> m_k056832;
+	required_device<k054338_device> m_k054338;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
+	required_ioport m_io_eepromout;
+
+	/* memory pointers */
+	optional_shared_ptr<uint16_t> m_workram;
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	/* video-related */
+	uint16_t    m_sprite_colorbase = 0;
+	uint16_t    m_layer_colorbase[4];
+	int32_t     m_layerpri[3];
+	int32_t     m_alpha_enabled = 0;
+	uint16_t    m_zmask = 0;
+
+	/* misc */
+	uint16_t    m_cur_control2 = 0;
+
+	emu_timer *m_dmaend_timer = nullptr;
+
+	uint16_t control2_r();
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	DECLARE_VIDEO_START(moo);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	void object_dma();
+	K056832_CB_MEMBER(tile_callback);
+	K053246_CB_MEMBER(sprite_callback);
+};
+
+// with K053990 protection
+class moo_prot_state : public moo_base_state
+{
+public:
+	moo_prot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		moo_base_state(mconfig, type, tag),
+		m_soundcpu(*this, "soundcpu"),
+		m_k054539(*this, "k054539"),
+		m_k053252(*this, "k053252"),
+		m_k054321(*this, "k054321"),
+		m_soundbank(*this, "soundbank"),
+		m_protram(*this, "protram")
 	{ }
 
 	void bucky(machine_config &config) ATTR_COLD;
 	void moo(machine_config &config) ATTR_COLD;
-	void moobl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	/* memory pointers */
-	optional_shared_ptr<uint16_t> m_workram;
-	required_shared_ptr<uint16_t> m_spriteram;
-
-	/* video-related */
-	int         m_sprite_colorbase = 0;
-	int         m_layer_colorbase[4];
-	int         m_layerpri[3];
-	int         m_alpha_enabled = 0;
-	uint16_t    m_zmask = 0;
-
-	/* misc */
-	uint16_t    m_protram[16];
-	uint16_t    m_cur_control2 = 0;
-
 	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<okim6295_device> m_oki;
-	optional_device<k054539_device> m_k054539;
-	required_device<k053247_device> m_k053246;
-	required_device<k053251_device> m_k053251;
-	optional_device<k053252_device> m_k053252;
-	required_device<k056832_device> m_k056832;
-	required_device<k054338_device> m_k054338;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	optional_device<k054321_device> m_k054321;
+	required_device<cpu_device> m_soundcpu;
+	required_device<k054539_device> m_k054539;
+	required_device<k053252_device> m_k053252;
+	required_device<k054321_device> m_k054321;
 
-	emu_timer *m_dmaend_timer = nullptr;
-	uint16_t control2_r();
-	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	required_memory_bank m_soundbank;
+
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_protram;
+
 	void sound_irq_w(uint16_t data);
 	void sound_bankswitch_w(uint8_t data);
 	void moo_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void moobl_oki_bank_w(uint16_t data);
-	DECLARE_VIDEO_START(moo);
 	DECLARE_VIDEO_START(bucky);
-	uint32_t screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(moo_interrupt);
-	INTERRUPT_GEN_MEMBER(moobl_interrupt);
-	TIMER_CALLBACK_MEMBER(dmaend_callback);
-	void moo_objdma();
-	K056832_CB_MEMBER(tile_callback);
-	K053246_CB_MEMBER(sprite_callback);
 	void bucky_map(address_map &map) ATTR_COLD;
 	void moo_map(address_map &map) ATTR_COLD;
-	void moobl_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-K053246_CB_MEMBER(moo_state::sprite_callback)
+// bootleg hardware
+class moobl_state : public moo_base_state
 {
-	int pri = (*color & 0x03e0) >> 4;
+public:
+	moobl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		moo_base_state(mconfig, type, tag),
+		m_oki(*this, "oki")
+	{ }
+
+	void moobl(machine_config &config) ATTR_COLD;
+
+private:
+	/* devices */
+	required_device<okim6295_device> m_oki;
+
+	void moobl_oki_bank_w(uint16_t data);
+	INTERRUPT_GEN_MEMBER(moobl_interrupt);
+	void moobl_map(address_map &map) ATTR_COLD;
+};
+
+
+K053246_CB_MEMBER(moo_base_state::sprite_callback)
+{
+	const int pri = (color & 0x03e0) >> 4;
 
 	if (pri <= m_layerpri[2])
-		*priority_mask = 0;
+		priority_mask = 0;
 	else if (pri <= m_layerpri[1])
-		*priority_mask = 0xf0;
+		priority_mask = 0xf0;
 	else if (pri <= m_layerpri[0])
-		*priority_mask = 0xf0|0xcc;
+		priority_mask = 0xf0|0xcc;
 	else
-		*priority_mask = 0xf0|0xcc|0xaa;
+		priority_mask = 0xf0|0xcc|0xaa;
 
-	*color = m_sprite_colorbase | (*color & 0x001f);
+	color = m_sprite_colorbase | (color & 0x001f);
 }
 
-K056832_CB_MEMBER(moo_state::tile_callback)
+K056832_CB_MEMBER(moo_base_state::tile_callback)
 {
-	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
+	color = m_layer_colorbase[layer] | (color >> 2 & 0x0f);
 }
 
-VIDEO_START_MEMBER(moo_state,moo)
+VIDEO_START_MEMBER(moo_base_state,moo)
 {
 	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
 
@@ -258,7 +304,7 @@ VIDEO_START_MEMBER(moo_state,moo)
 	m_k056832->set_layer_offs(3,  6 + 1, 0);
 }
 
-VIDEO_START_MEMBER(moo_state,bucky)
+VIDEO_START_MEMBER(moo_prot_state,bucky)
 {
 	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
 
@@ -274,11 +320,11 @@ VIDEO_START_MEMBER(moo_state,bucky)
 	m_k056832->set_layer_offs(3,  6, 0);
 }
 
-uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t moo_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
 	int layers[3];
-	int new_colorbase, plane, dirty, alpha;
+	int plane, dirty;
 
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
 	m_layer_colorbase[0] = 0x70;
@@ -287,7 +333,7 @@ uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		for (plane = 1; plane < 4; plane++)
 		{
-			new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
+			const int new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 			if (m_layer_colorbase[plane] != new_colorbase)
 			{
 				m_layer_colorbase[plane] = new_colorbase;
@@ -299,7 +345,7 @@ uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		for (dirty = 0, plane = 1; plane < 4; plane++)
 		{
-			new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
+			const int new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 			if (m_layer_colorbase[plane] != new_colorbase)
 			{
 				m_layer_colorbase[plane] = new_colorbase;
@@ -333,7 +379,7 @@ uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitma
 	// There is probably a control bit somewhere to turn off alpha blending.
 	m_alpha_enabled = m_k054338->register_r(K338_REG_CONTROL) & K338_CTL_MIXPRI; // DUMMY
 
-	alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) & 0xff : 255;
+	const int alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) & 0xff : 255;
 
 	if (alpha > 0)
 		m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);
@@ -345,12 +391,12 @@ uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 
-uint16_t moo_state::control2_r()
+uint16_t moo_base_state::control2_r()
 {
 	return m_cur_control2;
 }
 
-void moo_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void moo_base_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// bit 0  is data
 	// bit 1  is cs (active low)
@@ -362,29 +408,23 @@ void moo_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	COMBINE_DATA(&m_cur_control2);
 
-	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
+	m_io_eepromout->write(m_cur_control2, 0xff);
 
-	if (m_cur_control2 & 0x100)
-		m_k053246->k053246_set_objcha_line(ASSERT_LINE);
-	else
-		m_k053246->k053246_set_objcha_line(CLEAR_LINE);
+	m_k053246->k053246_set_objcha_line(BIT(m_cur_control2, 8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-void moo_state::moo_objdma()
+void moo_base_state::object_dma()
 {
 	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
-	int num_inactive;
-	uint16_t *src, *dst;
-	int counter = m_k053246->k053247_get_dy();
-
-	m_k053246->k053247_get_ram( &dst);
-	src = m_spriteram;
-	num_inactive = counter = 256;
+	uint16_t *dst;
+	m_k053246->k053247_get_ram(&dst);
+	const uint16_t *src = m_spriteram;
+	int num_inactive = 256, counter = 256;
 
 	do
 	{
-		if ((*src & 0x8000) && (*src & m_zmask))
+		if (BIT(*src, 15) && (*src & m_zmask))
 		{
 			memcpy(dst, src, 0x10);
 			dst += 8;
@@ -405,30 +445,30 @@ void moo_state::moo_objdma()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(moo_state::dmaend_callback)
+TIMER_CALLBACK_MEMBER(moo_base_state::dmaend_callback)
 {
-	if (m_cur_control2 & 0x800)
+	if (BIT(m_cur_control2, 11))
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(moo_state::moo_interrupt)
+INTERRUPT_GEN_MEMBER(moo_prot_state::moo_interrupt)
 {
 	if (m_k053246->k053246_is_irq_enabled())
 	{
-		moo_objdma();
+		object_dma();
 
 		// schedule DMA end interrupt (delay shortened to catch up with V-blank)
 		m_dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
 	}
 
 	// trigger V-blank interrupt
-	if (m_cur_control2 & 0x20)
+	if (BIT(m_cur_control2, 5))
 		device.execute().set_input_line(5, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(moo_state::moobl_interrupt)
+INTERRUPT_GEN_MEMBER(moobl_state::moobl_interrupt)
 {
-	moo_objdma();
+	object_dma();
 
 	// schedule DMA end interrupt (delay shortened to catch up with V-blank)
 	m_dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
@@ -437,14 +477,14 @@ INTERRUPT_GEN_MEMBER(moo_state::moobl_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-void moo_state::sound_irq_w(uint16_t data)
+void moo_prot_state::sound_irq_w(uint16_t data)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-void moo_state::sound_bankswitch_w(uint8_t data)
+void moo_prot_state::sound_bankswitch_w(uint8_t data)
 {
-	membank("bank1")->set_base(memregion("soundcpu")->base() + 0x10000 + (data&0xf)*0x4000);
+	m_soundbank->set_entry(data & 0x0f);
 }
 
 
@@ -452,7 +492,7 @@ void moo_state::sound_bankswitch_w(uint8_t data)
 
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
-uint16_t moo_state::k053247_scattered_word_r(offs_t offset, uint16_t mem_mask)
+uint16_t moo_base_state::k053247_scattered_word_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset & 0x0078)
 		return m_spriteram[offset];
@@ -463,7 +503,7 @@ uint16_t moo_state::k053247_scattered_word_r(offs_t offset, uint16_t mem_mask)
 	}
 }
 
-void moo_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void moo_base_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x0078)
 		COMBINE_DATA(m_spriteram + offset);
@@ -478,24 +518,22 @@ void moo_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_t 
 #endif
 
 
-void moo_state::moo_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+void moo_prot_state::moo_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint32_t src1, src2, dst, length, a, b, res;
-
 	COMBINE_DATA(&m_protram[offset]);
 
 	if (offset == 0xc)  // trigger operation
 	{
-		src1 = (m_protram[1] & 0xff) << 16 | m_protram[0];
-		src2 = (m_protram[3] & 0xff) << 16 | m_protram[2];
-		dst = (m_protram[5] & 0xff) << 16 | m_protram[4];
-		length = m_protram[0xf];
+		uint32_t src1 = (m_protram[1] & 0xff) << 16 | m_protram[0];
+		uint32_t src2 = (m_protram[3] & 0xff) << 16 | m_protram[2];
+		uint32_t dst = (m_protram[5] & 0xff) << 16 | m_protram[4];
+		uint32_t length = m_protram[0xf];
 
 		while (length)
 		{
-			a = space.read_word(src1);
-			b = space.read_word(src2);
-			res = a + 2 * b;
+			const uint32_t a = space.read_word(src1);
+			const uint32_t b = space.read_word(src2);
+			const uint32_t res = a + 2 * b;
 
 			space.write_word(dst, res);
 
@@ -508,14 +546,14 @@ void moo_state::moo_prot_w(address_space &space, offs_t offset, uint16_t data, u
 }
 
 
-void moo_state::moobl_oki_bank_w(uint16_t data)
+void moobl_state::moobl_oki_bank_w(uint16_t data)
 {
-	logerror("%x to OKI bank\n", data);
+	LOGMASKED(LOG_SOUND, "%s: %04x to OKI bank\n", machine().describe_context(), data);
 
 	m_oki->set_rom_bank(data & 0x0f);
 }
 
-void moo_state::moo_map(address_map &map)
+void moo_prot_state::moo_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x0c0000, 0x0c003f).w(m_k056832, FUNC(k056832_device::word_w));
@@ -524,21 +562,20 @@ void moo_state::moo_map(address_map &map)
 	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));      /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
-	map(0x0ce000, 0x0ce01f).w(FUNC(moo_state::moo_prot_w));
+	map(0x0ce000, 0x0ce01f).w(FUNC(moo_prot_state::moo_prot_w)).share(m_protram);
 	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); /* CCU regs (ignored) */
-	map(0x0d4000, 0x0d4001).w(FUNC(moo_state::sound_irq_w));
+	map(0x0d4000, 0x0d4001).w(FUNC(moo_prot_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));        /* VSCCS regs */
 	map(0x0da000, 0x0da001).portr("P1_P3");
 	map(0x0da002, 0x0da003).portr("P2_P4");
 	map(0x0dc000, 0x0dc001).portr("IN0");
 	map(0x0dc002, 0x0dc003).portr("IN1");
-	map(0x0de000, 0x0de001).rw(FUNC(moo_state::control2_r), FUNC(moo_state::control2_w));
+	map(0x0de000, 0x0de001).rw(FUNC(moo_prot_state::control2_r), FUNC(moo_prot_state::control2_w));
 	map(0x100000, 0x17ffff).rom();
-	map(0x180000, 0x18ffff).ram().share("workram");     /* Work RAM */
-	map(0x190000, 0x19ffff).ram().share("spriteram");   /* Sprite RAM */
-	map(0x1a0000, 0x1a1fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  /* Graphic planes */
-	map(0x1a2000, 0x1a3fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  /* Graphic planes mirror */
+	map(0x180000, 0x18ffff).ram().share(m_workram);     /* Work RAM */
+	map(0x190000, 0x19ffff).ram().share(m_spriteram);   /* Sprite RAM */
+	map(0x1a0000, 0x1a1fff).mirror(0x002000).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  /* Graphic planes */
 	map(0x1b0000, 0x1b1fff).r(m_k056832, FUNC(k056832_device::rom_word_r));   /* Passthrough to tile roms */
 	map(0x1c0000, 0x1c1fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 #if MOO_DEBUG
@@ -550,7 +587,7 @@ void moo_state::moo_map(address_map &map)
 #endif
 }
 
-void moo_state::moobl_map(address_map &map)
+void moobl_state::moobl_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x0c0000, 0x0c003f).w(m_k056832, FUNC(k056832_device::word_w));
@@ -560,47 +597,45 @@ void moo_state::moobl_map(address_map &map)
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));       /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x0d0000, 0x0d001f).nopw();                   /* CCU regs (ignored) */
-	map(0x0d6ffc, 0x0d6ffd).w(FUNC(moo_state::moobl_oki_bank_w));
+	map(0x0d6ffc, 0x0d6ffd).w(FUNC(moobl_state::moobl_oki_bank_w));
 	map(0x0d6fff, 0x0d6fff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));     /* VSCCS regs */
 	map(0x0da000, 0x0da001).portr("P1_P3");
 	map(0x0da002, 0x0da003).portr("P2_P4");
 	map(0x0dc000, 0x0dc001).portr("IN0");
 	map(0x0dc002, 0x0dc003).portr("IN1");
-	map(0x0de000, 0x0de001).rw(FUNC(moo_state::control2_r), FUNC(moo_state::control2_w));
+	map(0x0de000, 0x0de001).rw(FUNC(moobl_state::control2_r), FUNC(moobl_state::control2_w));
 	map(0x100000, 0x17ffff).rom();
-	map(0x180000, 0x18ffff).ram().share("workram");      /* Work RAM */
-	map(0x190000, 0x19ffff).ram().share("spriteram");    /* Sprite RAM */
-	map(0x1a0000, 0x1a1fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); /* Graphic planes */
-	map(0x1a2000, 0x1a3fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  /* Graphic planes mirror */
+	map(0x180000, 0x18ffff).ram().share(m_workram);      /* Work RAM */
+	map(0x190000, 0x19ffff).ram().share(m_spriteram);    /* Sprite RAM */
+	map(0x1a0000, 0x1a1fff).mirror(0x002000).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); /* Graphic planes */
 	map(0x1b0000, 0x1b1fff).r(m_k056832, FUNC(k056832_device::rom_word_r));   /* Passthrough to tile roms */
 	map(0x1c0000, 0x1c1fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
-void moo_state::bucky_map(address_map &map)
+void moo_prot_state::bucky_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x08ffff).ram();
-	map(0x090000, 0x09ffff).ram().share("spriteram");   /* Sprite RAM */
+	map(0x090000, 0x09ffff).ram().share(m_spriteram);   /* Sprite RAM */
 	map(0x0a0000, 0x0affff).ram();                         /* extra sprite RAM? */
 	map(0x0c0000, 0x0c003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x0c2000, 0x0c2007).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));      /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
-	map(0x0ce000, 0x0ce01f).w(FUNC(moo_state::moo_prot_w));
+	map(0x0ce000, 0x0ce01f).w(FUNC(moo_prot_state::moo_prot_w)).share(m_protram);
 	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); /* CCU regs (ignored) */
 	map(0x0d2000, 0x0d203f).m("k054000", FUNC(k054000_device::map)).umask16(0x00ff);
-	map(0x0d4000, 0x0d4001).w(FUNC(moo_state::sound_irq_w));
+	map(0x0d4000, 0x0d4001).w(FUNC(moo_prot_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));        /* VSCCS regs */
 	map(0x0da000, 0x0da001).portr("P1_P3");
 	map(0x0da002, 0x0da003).portr("P2_P4");
 	map(0x0dc000, 0x0dc001).portr("IN0");
 	map(0x0dc002, 0x0dc003).portr("IN1");
-	map(0x0de000, 0x0de001).rw(FUNC(moo_state::control2_r), FUNC(moo_state::control2_w));
-	map(0x180000, 0x181fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  /* Graphic planes */
-	map(0x182000, 0x183fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  /* Graphic planes mirror */
+	map(0x0de000, 0x0de001).rw(FUNC(moo_prot_state::control2_r), FUNC(moo_prot_state::control2_w));
+	map(0x180000, 0x181fff).mirror(0x002000).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  /* Graphic planes */
 	map(0x184000, 0x187fff).ram();                         /* extra tile RAM? */
 	map(0x190000, 0x191fff).r(m_k056832, FUNC(k056832_device::rom_word_r));   /* Passthrough to tile roms */
 	map(0x1b0000, 0x1b3fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -614,15 +649,15 @@ void moo_state::bucky_map(address_map &map)
 #endif
 }
 
-void moo_state::sound_map(address_map &map)
+void moo_prot_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_soundbank);
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe22f).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xec00, 0xec01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(FUNC(moo_state::sound_bankswitch_w));
+	map(0xf800, 0xf800).w(FUNC(moo_prot_state::sound_bankswitch_w));
 }
 
 static INPUT_PORTS_START( moo )
@@ -680,29 +715,23 @@ static INPUT_PORTS_START( bucky )
 INPUT_PORTS_END
 
 
-void moo_state::machine_start()
+void moo_base_state::machine_start()
 {
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_alpha_enabled));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
-	save_item(NAME(m_protram));
 
-	m_dmaend_timer = timer_alloc(FUNC(moo_state::dmaend_callback), this);
+	m_dmaend_timer = timer_alloc(FUNC(moo_base_state::dmaend_callback), this);
 }
 
-void moo_state::machine_reset()
+void moo_base_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 16; i++)
-		m_protram[i] = 0;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_layer_colorbase[i] = 0;
 
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		m_layerpri[i] = 0;
 
 	m_cur_control2 = 0;
@@ -710,15 +739,31 @@ void moo_state::machine_reset()
 	m_sprite_colorbase = 0;
 }
 
-void moo_state::moo(machine_config &config)
+void moo_prot_state::machine_start()
+{
+	moo_base_state::machine_start();
+
+	m_soundbank->configure_entries(0, 16, memregion("soundcpu")->base(), 0x4000);
+	m_soundbank->set_entry(0);
+}
+
+void moo_prot_state::machine_reset()
+{
+	moo_base_state::machine_reset();
+
+	for (int i = 0; i < 16; i++)
+		m_protram[i] = 0;
+}
+
+void moo_prot_state::moo(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // 16MHz verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::moo_map);
-	m_maincpu->set_vblank_int("screen", FUNC(moo_state::moo_interrupt));
+	m_maincpu->set_addrmap(AS_PROGRAM, &moo_prot_state::moo_map);
+	m_maincpu->set_vblank_int("screen", FUNC(moo_prot_state::moo_interrupt));
 
 	Z80(config, m_soundcpu, 32_MHz_XTAL / 4); // 8MHz verified
-	m_soundcpu->set_addrmap(AS_PROGRAM, &moo_state::sound_map);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &moo_prot_state::sound_map);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
@@ -732,21 +777,21 @@ void moo_state::moo(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); // should give IRQ4 sufficient time to update scroll registers
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
-	m_screen->set_screen_update(FUNC(moo_state::screen_update_moo));
+	m_screen->set_screen_update(FUNC(moo_prot_state::screen_update));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
 	m_palette->enable_highlights();
 
-	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
+	MCFG_VIDEO_START_OVERRIDE(moo_prot_state,moo)
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
+	m_k053246->set_sprite_callback(FUNC(moo_prot_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48+1, 23);
 	m_k053246->set_palette("palette");
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback));
+	m_k056832->set_tile_callback(FUNC(moo_prot_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette("palette");
 
@@ -768,12 +813,12 @@ void moo_state::moo(machine_config &config)
 	m_k054539->add_route(1, "speaker", 0.50, 0);
 }
 
-void moo_state::moobl(machine_config &config)
+void moobl_state::moobl(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::moobl_map);
-	m_maincpu->set_vblank_int("screen", FUNC(moo_state::moobl_interrupt));
+	m_maincpu->set_addrmap(AS_PROGRAM, &moobl_state::moobl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(moobl_state::moobl_interrupt));
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
@@ -784,21 +829,21 @@ void moo_state::moobl(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); // should give IRQ4 sufficient time to update scroll registers
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
-	m_screen->set_screen_update(FUNC(moo_state::screen_update_moo));
+	m_screen->set_screen_update(FUNC(moobl_state::screen_update));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
 	m_palette->enable_highlights();
 
-	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
+	MCFG_VIDEO_START_OVERRIDE(moobl_state,moo)
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
+	m_k053246->set_sprite_callback(FUNC(moobl_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48+1, 23);
 	m_k053246->set_palette("palette");
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback));
+	m_k056832->set_tile_callback(FUNC(moobl_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette("palette");
 
@@ -813,11 +858,11 @@ void moo_state::moobl(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
-void moo_state::bucky(machine_config &config)
+void moo_prot_state::bucky(machine_config &config)
 {
 	moo(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::bucky_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &moo_prot_state::bucky_map);
 
 	K054000(config, "k054000", 0);
 
@@ -826,7 +871,7 @@ void moo_state::bucky(machine_config &config)
 	/* video hardware */
 	m_palette->set_format(palette_device::xRGB_888, 4096);
 
-	MCFG_VIDEO_START_OVERRIDE(moo_state,bucky)
+	MCFG_VIDEO_START_OVERRIDE(moo_prot_state,bucky)
 }
 
 
@@ -840,10 +885,9 @@ ROM_START( moomesa ) /* Version EA */
 	ROM_LOAD16_BYTE( "151a03.t5", 0x100000, 0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
 	ROM_LOAD16_BYTE( "151a04.t6", 0x100001, 0x40000, CRC(3b24706a) SHA1(c2a77944284e35ff57f0774fa7b67e53d3b63e1f) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "151a07.f5",  0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -875,10 +919,9 @@ ROM_START( moomesauac ) /* Version UA */
 	ROM_LOAD16_BYTE( "151a03.t5", 0x100000, 0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
 	ROM_LOAD16_BYTE( "151a04.t6", 0x100001, 0x40000, CRC(3b24706a) SHA1(c2a77944284e35ff57f0774fa7b67e53d3b63e1f) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "151a07.f5",  0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -910,10 +953,9 @@ ROM_START( moomesauab ) /* Version UA */
 	ROM_LOAD16_BYTE( "151a03.t5", 0x100000, 0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
 	ROM_LOAD16_BYTE( "151a04.t6", 0x100001, 0x40000, CRC(3b24706a) SHA1(c2a77944284e35ff57f0774fa7b67e53d3b63e1f) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "151a07.f5",  0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -945,10 +987,9 @@ ROM_START( moomesaaab ) /* Version AA */
 	ROM_LOAD16_BYTE( "151a03.t5", 0x100000, 0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
 	ROM_LOAD16_BYTE( "151a04.t6", 0x100001, 0x40000, CRC(3b24706a) SHA1(c2a77944284e35ff57f0774fa7b67e53d3b63e1f) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "151a07.f5",  0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -980,10 +1021,9 @@ ROM_START( bucky ) /* Version EA */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
 	ROM_LOAD16_BYTE( "173a04.t6", 0x200001, 0x20000, CRC(7dd54d6f) SHA1(b0ee8ec445b92254bca881eefd4449972fed506a) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -1016,10 +1056,9 @@ ROM_START( buckyea ) /* Version EA */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
 	ROM_LOAD16_BYTE( "173a04.t6", 0x200001, 0x20000, CRC(7dd54d6f) SHA1(b0ee8ec445b92254bca881eefd4449972fed506a) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -1052,10 +1091,9 @@ ROM_START( buckyjaa ) /* Version JA */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
 	ROM_LOAD16_BYTE( "173a04.t6", 0x200001, 0x20000, CRC(7dd54d6f) SHA1(b0ee8ec445b92254bca881eefd4449972fed506a) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -1088,10 +1126,9 @@ ROM_START( buckyuab ) /* Version UA */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
 	ROM_LOAD16_BYTE( "173a04.t6", 0x200001, 0x20000, CRC(7dd54d6f) SHA1(b0ee8ec445b92254bca881eefd4449972fed506a) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -1124,10 +1161,9 @@ ROM_START( buckyaab ) /* Version AA */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
 	ROM_LOAD16_BYTE( "173a04.t6", 0x200001, 0x20000, CRC(7dd54d6f) SHA1(b0ee8ec445b92254bca881eefd4449972fed506a) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -1160,10 +1196,9 @@ ROM_START( buckyaa ) /* Version AA */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
 	ROM_LOAD16_BYTE( "173a04.t6", 0x200001, 0x20000, CRC(7dd54d6f) SHA1(b0ee8ec445b92254bca881eefd4449972fed506a) )
 
-	ROM_REGION( 0x050000, "soundcpu", 0 )
+	ROM_REGION( 0x040000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
-	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "k056832", 0 )
 	/* tilemaps */
@@ -1244,15 +1279,15 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, moomesa,    0,       moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesauac, moomesa, moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesauab, moomesa, moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesaaab, moomesa, moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesabl,  moomesa, moobl,   moo,   moo_state, empty_init, ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // based on Version AA
+GAME( 1992, moomesa,    0,       moo,     moo,   moo_prot_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesauac, moomesa, moo,     moo,   moo_prot_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesauab, moomesa, moo,     moo,   moo_prot_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesaaab, moomesa, moo,     moo,   moo_prot_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesabl,  moomesa, moobl,   moo,   moobl_state,    empty_init, ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // based on Version AA
 
-GAME( 1992, bucky,      0,       bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver EAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyea,    bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver EA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyjaa,   bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver JAA)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyuab,   bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver UAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyaab,   bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver AAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyaa,    bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver AA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bucky,      0,       bucky,   bucky, moo_prot_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver EAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyea,    bucky,   bucky,   bucky, moo_prot_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver EA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyjaa,   bucky,   bucky,   bucky, moo_prot_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver JAA)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyuab,   bucky,   bucky,   bucky, moo_prot_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver UAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyaab,   bucky,   bucky,   bucky, moo_prot_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver AAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyaa,    bucky,   bucky,   bucky, moo_prot_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver AA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

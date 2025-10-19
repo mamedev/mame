@@ -21,7 +21,7 @@ TODO: add GAL logic to route the ROMs to the DAC and output that onto a screen
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/saa1043.h"
 
 #include "pm5644.lh"
@@ -37,10 +37,12 @@ public:
 	patgen_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_leds(*this, "led%u", 0U)
+		m_io_keyboard(*this, "COL%u", 0U),
+		m_io_dsw(*this, "DSW"),
+		m_leds(*this, "led%u%u", 0U, 0U)
 	{ }
 
-	void patgen(machine_config &config);
+	void patgen(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -48,7 +50,6 @@ protected:
 
 private:
 	void i80c31_data(address_map &map) ATTR_COLD;
-	void i80c31_io(address_map &map) ATTR_COLD;
 	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	u8 i80c31_p1_r();
@@ -62,17 +63,19 @@ private:
 	u8 m_port1;
 
 	required_device<i80c31_device> m_maincpu;
-	output_finder<28> m_leds;
+	required_ioport_array<4> m_io_keyboard;
+	required_ioport m_io_dsw;
+	output_finder<3, 8> m_leds;
 };
 
 void patgen_state::i80c31_prg(address_map &map)
 {
-	map(0x0000, 0xFFFF).rom();
+	map(0x0000, 0xffff).rom();
 }
 
-void patgen_state::i80c31_io(address_map &map)
+void patgen_state::i80c31_data(address_map &map)
 {
-	map(0x0000, 0x1FFF).ram();
+	map(0x0000, 0x1fff).ram();
 	map(0x8000, 0x8000).r(FUNC(patgen_state::keyboard_r));
 	map(0x8000, 0x8002).w(FUNC(patgen_state::led_w));
 	map(0x8004, 0x8004).w(FUNC(patgen_state::control_w));
@@ -80,17 +83,12 @@ void patgen_state::i80c31_io(address_map &map)
 	map(0x8006, 0x8006).w(FUNC(patgen_state::ch23_w));
 }
 
-void patgen_state::i80c31_data(address_map &map)
-{
-	map(0x000, 0x1FF).ram();
-}
-
 u8 patgen_state::i80c31_p1_r()
 {
-	m_port1 = ioport("DSW")->read();
+	m_port1 = m_io_dsw->read();
 	//P1.4 2-WIRE SELECT
 	//P1.5 FIELD1
-	m_port1 = m_port1 | 0xC0;
+	m_port1 = m_port1 | 0xc0;
 	//P1.6 SCL pullup
 	//P1.7 SDA pullup
 	return m_port1;
@@ -98,19 +96,20 @@ u8 patgen_state::i80c31_p1_r()
 
 u8 patgen_state::keyboard_r()
 {
-	u8 col0 = ioport("COL0")->read();
-	u8 col1 = ioport("COL1")->read();
-	u8 col2 = ioport("COL2")->read();
-	u8 col3 = ioport("COL3")->read();
+	u8 const col0 = m_io_keyboard[0]->read();
+	u8 const col1 = m_io_keyboard[1]->read();
+	u8 const col2 = m_io_keyboard[2]->read();
+	u8 const col3 = m_io_keyboard[3]->read();
 
 	u8 kb_state = col0 && col1 && col2 && col3;
 
-	if (col1 != 0xFF)
-		kb_state = kb_state & 0xDF;
-	if (col2 != 0xFF)
-		kb_state = kb_state & 0xBF;
-	if (col3 != 0xFF)
-		kb_state = kb_state & 0x7F;
+	// FIXME: this block has no effect because the statement about always yields 0 or 1 from the Boolean operators
+	if (col1 != 0xff)
+		kb_state &= 0xdf;
+	if (col2 != 0xff)
+		kb_state &= 0xbf;
+	if (col3 != 0xff)
+		kb_state &= 0x7f;
 
 	return kb_state;
 }
@@ -119,10 +118,9 @@ void patgen_state::led_w(offs_t offset, uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 	{
-		uint8_t led_index = ((offset & 0x0F) * 10) + i;
 		bool led_value = BIT(data, i);
-		LOG("LED %d is %d\n",led_index,led_value);
-		m_leds[led_index] = !led_value;
+		LOG("LED %d%d is %d\n", offset & 0x0f, i, led_value);
+		m_leds[offset & 0x0f][i] = !led_value;
 	}
 }
 
@@ -206,7 +204,6 @@ void patgen_state::patgen(machine_config &config)
 	I80C31(config, m_maincpu, 16_MHz_XTAL); // Philips PCB80C31BH
 	m_maincpu->set_addrmap(AS_PROGRAM, &patgen_state::i80c31_prg);
 	m_maincpu->set_addrmap(AS_DATA, &patgen_state::i80c31_data);
-	m_maincpu->set_addrmap(AS_IO, &patgen_state::i80c31_io);
 	m_maincpu->port_in_cb<1>().set(FUNC(patgen_state::i80c31_p1_r));
 
 	saa1043_device &saa1043(SAA1043(config, "saa1043", XTAL(5'000'000)));

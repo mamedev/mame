@@ -101,7 +101,7 @@ TODO: - Distinguish door switches using manual
 ***********************************************************************************************************/
 
 #include "emu.h"
-#include "awpvid.h"       //Fruit Machines Only
+#include "awpvid.h" // Fruit Machines Only
 
 #include "mpu4_characteriser_pal.h"
 
@@ -113,9 +113,9 @@ TODO: - Distinguish door switches using manual
 
 #include "cpu/m6800/m6800.h"
 #include "machine/steppers.h"
-#include "machine/roc10937.h"
 #include "machine/meters.h"
 #include "machine/rescap.h"
+#include "video/roc10937.h"
 
 #include "mpu3.lh"
 

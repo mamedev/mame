@@ -11,7 +11,6 @@ Undumped games on similar hardware (ES-9402 or ES-9410):
 * Lucky Pierrot / Wonder Circus
 * Miracle Seven
 * Miracle Seven - Heaven's Gate Turbo
-* Multi Spin
 * Royal Choice Poker
 
 TODO:

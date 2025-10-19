@@ -273,21 +273,10 @@
 
 void t11_device::trap_to(uint16_t vector)
 {
-	if (c_insn_set & IS_VM1)
-	{
-		m_vsel = vector;
-		if (vector == T11_ILLINST || vector == T11_TIMEOUT)
-			m_mcir = MCIR_ILL;
-		else
-			m_mcir = MCIR_SET;
-	}
-	else
-	{
-		PUSH(PSW);
-		PUSH(PC);
-		PC = RWORD(vector);
-		PSW = RWORD(vector + 2);
-	}
+	PUSH(PSW);
+	PUSH(PC);
+	PC = RWORD(vector);
+	PSW = RWORD(vector + 2);
 	m_check_irqs = true;
 }
 
@@ -337,7 +326,8 @@ void t11_device::halt(uint16_t op)
 	m_icount -= 48;
 	if (c_insn_set & IS_VM1)
 	{
-		trap_to(VM1_HALT);
+		m_mcir = MCIR_HALT;
+		m_vsel = VM1_HALT;
 	}
 	else
 	{

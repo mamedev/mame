@@ -76,16 +76,6 @@ void bbc_state::mos_w(offs_t offset, uint8_t data)
 }
 
 
-/**************************************
-   Analogue Joystick
-**************************************/
-
-int bbc_state::get_analogue_input(int channel_number)
-{
-	return m_analog->ch_r(channel_number) << 8;
-}
-
-
 /***************************************
    Cassette Motor
 ****************************************/
@@ -255,7 +245,6 @@ void bbc_state::setup_device_roms()
 	std::string region_tag;
 	memory_region *rom_region;
 	device_t *exp_device;
-	device_t *ext_device;
 
 	// insert ROM(s) for internal expansion boards
 	if (m_internal && (exp_device = dynamic_cast<device_t*>(m_internal->get_card_device())))
@@ -290,42 +279,6 @@ void bbc_state::setup_device_roms()
 		if (m_cart[i] && (rom_region = memregion(region_tag.assign(m_cart[i]->tag()).append(ELECTRON_CART_ROM_REGION_TAG).c_str())))
 		{
 			memcpy(m_region_rom->base() + (i * 0x8000), rom_region->base(), rom_region->bytes());
-		}
-	}
-
-	// insert ROM(s) for Expansion port devices (Compact only), with additional Mertec slots
-	if (m_exp && (ext_device = dynamic_cast<device_t*>(m_exp->get_card_device())))
-	{
-		// only the Mertec device has ext_rom region and should be placed in romslots 0,1
-		if (ext_device->memregion("ext_rom"))
-		{
-			memcpy(m_region_rom->base(), ext_device->memregion("ext_rom")->base(), ext_device->memregion("ext_rom")->bytes());
-		}
-
-		bbc_analogue_slot_device* analogue_port = ext_device->subdevice<bbc_analogue_slot_device>("analogue");
-		if (analogue_port && (exp_device = dynamic_cast<device_t*>(analogue_port->get_card_device())))
-		{
-			insert_device_rom(exp_device->memregion("exp_rom"));
-		}
-
-		bbc_userport_slot_device* user_port = ext_device->subdevice<bbc_userport_slot_device>("userport");
-		if (user_port && (exp_device = dynamic_cast<device_t*>(user_port->get_card_device())))
-		{
-			insert_device_rom(exp_device->memregion("exp_rom"));
-		}
-
-		bbc_1mhzbus_slot_device* exp_port = ext_device->subdevice<bbc_1mhzbus_slot_device>("2mhzbus");
-		while (exp_port != nullptr)
-		{
-			if ((exp_device = dynamic_cast<device_t*>(exp_port->get_card_device())))
-			{
-				insert_device_rom(exp_device->memregion("exp_rom"));
-				exp_port = exp_device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus");
-			}
-			else
-			{
-				exp_port = nullptr;
-			}
 		}
 	}
 

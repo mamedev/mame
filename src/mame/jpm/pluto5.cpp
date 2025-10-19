@@ -194,17 +194,20 @@ namespace {
 class pluto5_state : public driver_device
 {
 public:
-	pluto5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	pluto5_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void pluto5(machine_config &config);
 
 	void init_hb();
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
-	uint16_t* m_cpuregion = 0;
+	uint16_t* m_cpuregion = nullptr;
 	std::unique_ptr<uint16_t[]> m_mainram;
 
 	uint16_t pluto5_mem_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -214,8 +217,6 @@ private:
 
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
-
-	virtual void machine_start() override ATTR_COLD;
 };
 
 uint16_t pluto5_state::pluto5_mem_r(offs_t offset, uint16_t mem_mask)
@@ -245,9 +246,7 @@ void pluto5_state::pluto5_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		default:
 			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
-
 	}
-
 }
 
 
@@ -270,7 +269,6 @@ void pluto5_state::pluto5(machine_config &config)
 {
 	M68340(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pluto5_state::pluto5_map);
-
 
 	SPEAKER(config, "speaker", 2).front();
 	// unknown sound

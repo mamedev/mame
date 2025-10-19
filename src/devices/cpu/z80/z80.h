@@ -140,13 +140,12 @@ protected:
 	devcb_write_line m_busack_cb;
 
 	static constexpr u8 SA_BUSRQ         = 0;
-	static constexpr u8 SA_BUSACK        = 1;
-	static constexpr u8 SA_NMI_PENDING   = 2;
-	static constexpr u8 SA_IRQ_ON        = 3;
-	static constexpr u8 SA_HALT          = 4;
-	static constexpr u8 SA_AFTER_EI      = 5;
-	static constexpr u8 SA_AFTER_LDAIR   = 6;
-	static constexpr u8 SA_NSC800_IRQ_ON = 7;
+	static constexpr u8 SA_NMI_PENDING   = 1;
+	static constexpr u8 SA_IRQ_ON        = 2;
+	static constexpr u8 SA_HALT          = 3;
+	static constexpr u8 SA_AFTER_EI      = 4;
+	static constexpr u8 SA_AFTER_LDAIR   = 5;
+	static constexpr u8 SA_NSC800_IRQ_ON = 6;
 	u8 m_service_attention; // bitmap for required handling in service step
 
 	PAIR16       m_prvpc;

@@ -63,7 +63,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/sab80c535.h"
 #include "machine/intelfsh.h"
 #include "speaker.h"
 
@@ -95,7 +95,7 @@ private:
 
 void acvirus_state::machine_start()
 {
-	m_rombank->configure_entries(0, 15, memregion("maincpu")->base(), 0x8000);
+	m_rombank->configure_entries(0, 16, memregion("maincpu")->base(), 0x8000);
 	m_rombank->set_entry(3);
 }
 
@@ -106,7 +106,7 @@ void acvirus_state::machine_reset()
 void acvirus_state::virus_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0); // fixed 32K of flash image
-	map(0x8000, 0xffff).bankr("rombank");
+	map(0x8000, 0xffff).bankr(m_rombank);
 }
 
 void acvirus_state::virus(machine_config &config)

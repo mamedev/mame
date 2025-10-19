@@ -12,8 +12,10 @@ Floppies were 8 inch IBM format.
 ****************************************************************************/
 
 #include "emu.h"
-//#include "bus/qbus/qbus.h"
+
+#include "bus/qbus/qbus.h"
 #include "cpu/t11/t11.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -26,6 +28,7 @@ public:
 	terak_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_qbus(*this, "qbus")
 	{ }
 
 	void terak(machine_config &config);
@@ -41,9 +44,14 @@ private:
 
 	uint8_t m_unit = 0;
 	uint8_t m_cmd = 0;
+
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	required_device<t11_device> m_maincpu;
+
+	void reset_w(int state);
+
+	required_device<lsi11_device> m_maincpu;
+	required_device<qbus_device> m_qbus;
 };
 
 uint16_t terak_state::terak_fdc_status_r()
@@ -91,6 +99,12 @@ static INPUT_PORTS_START( terak )
 INPUT_PORTS_END
 
 
+static const z80_daisy_config daisy_chain[] =
+{
+	{ "qbus" },
+	{ nullptr }
+};
+
 void terak_state::machine_reset()
 {
 }
@@ -104,13 +118,23 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
+void terak_state::reset_w(int state)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_qbus->init_w();
+	}
+}
+
 
 void terak_state::terak(machine_config &config)
 {
 	/* basic machine hardware */
-	T11(config, m_maincpu, 4'000'000); // FIXME: actually LSI-11
+	LSI11(config, m_maincpu, 4'000'000);
 	m_maincpu->set_initial_mode(6 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &terak_state::mem_map);
+	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->out_reset().set(FUNC(terak_state::reset_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -122,11 +146,21 @@ void terak_state::terak(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	QBUS(config, m_qbus, 0);
+	m_qbus->set_space(m_maincpu, AS_PROGRAM);
+	m_qbus->bevnt().set_inputline(m_maincpu, t11_device::CP2_LINE);
+	m_qbus->birq4().set_inputline(m_maincpu, t11_device::VEC_LINE);
+	QBUS_SLOT(config, "qbus" ":1", qbus_cards, nullptr);
+	QBUS_SLOT(config, "qbus" ":2", qbus_cards, nullptr);
+	QBUS_SLOT(config, "qbus" ":3", qbus_cards, nullptr);
+	QBUS_SLOT(config, "qbus" ":4", qbus_cards, nullptr);
 }
 
 /* ROM definition */
 ROM_START( terak )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	// QX disk bootstrap
 	ROM_LOAD( "terak.rom", 0173000, 0x0080, CRC(fd654b8e) SHA1(273a9933b68a290c5aedcd6d69faa7b1d22c0344))
 
 	ROM_REGION( 0x2000, "kbd", 0)

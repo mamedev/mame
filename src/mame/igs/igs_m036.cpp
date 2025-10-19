@@ -265,14 +265,14 @@ ROM_END
 
 
 /*******************************************************************
-Long Hu Zheng Ba Te Bie Ban, IGS, 2009
-Que Huang Zheng Ba, IGS, 2007
+Long Hu Zhengba Tebie Ban, IGS, 2009
+Que Huang Zhengba, IGS, 2007
 (Year not shown on title screens but date shown on error screen when program ROM removed)
 Hardware Info by Guru
 ---------------------
 
-PCB-0701-01-IU   (Que Huang Zheng Ba)
-PCB-0799-02-IU-1 (Long Hu Zheng Ba Te Bie Ban)
+PCB-0701-01-IU   (Que Huang Zhengba)
+PCB-0799-02-IU-1 (Long Hu Zhengba Tebie Ban)
 |----|  |-------------------------------|  |------|
 |    |--|             JAMMA             |--|      |
 |                              ULN2004    TDA1519 |
@@ -300,8 +300,8 @@ Notes:
       TT5665 - Tontek Design Technology TT5665 8-Channel (or 4-Channel L/R Stereo) ADPCM Voice Synthesis LSI
                Clock input 4.952MHz, pin 25 (SS) high, S0 and S1 low. Game sound is very low quality.
      EPM3032 - Altera EPM3032 CPLD in PLCC44 package
-               Sticker on Que Huang Zheng Ba: "IU U23"
-               Sticker on Long Hu Zheng Ba Te Bie Ban: "IU-1 U23"
+               Sticker on Que Huang Zhengba: "IU U23"
+               Sticker on Long Hu Zhengba Tebie Ban: "IU-1 U23"
      TDA1519 - NXP TDA1519 6W Stereo Power Amplifier IC
       UPC844 - NEC uPC844 Quad Operational Amplifier
       QS3257 - IDT QS3257 Mux/Demux (=74LS257)
@@ -325,8 +325,8 @@ Notes:
                The ROM is not pin compatible with 27C160 and must be dumped using a custom adapter.
                This ROM is the game-specific program code. There is common code inside the IGS036 SOC because
                if the program ROM is removed and booted the screen shows 'PROGRAM ROM ERROR'
-                - Que Huang Zheng Ba: V100CN_U18.U18
-                - Long Hu Zheng Ba Te Bie Ban: S101CN_U18.U18
+                - Que Huang Zhengba: V100CN_U18.U18
+                - Long Hu Zhengba Tebie Ban: S101CN_U18.U18
      U27-U31 - EV29LV640MT 8Mx8-bit/4Mx16-bit DIP48 Flash ROM (U29 & U31 not populated). ROM data is 16-bit.
                U27 - Audio Samples for TT5665
                Other ROMs - Graphics
@@ -518,6 +518,12 @@ ROM_END
 
 // this PCB has IGS036 MCU, R5F21256SN MCU, TT5665, ALTERA EPM3032ALC44-10N (stickered IS U15)
 // ROM labels actually are written "super 70's..."
+// X1 = 4.3520H7J
+//
+// IS U15 = ALTERA EPM3032ALC44-10N
+// F9 U28 = IGS036
+// U32 = R5F21256SN
+// U14 = TT5665 / 0749 / A78QE31
 ROM_START( super70s )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -526,18 +532,16 @@ ROM_START( super70s )
 	ROM_REGION( 0x8000, "mcu", 0 )
 	ROM_LOAD( "r5f21256sn.u32", 0x0000, 0x8000, NO_DUMP )
 
-	// this seems to be dumped half sized if compared to other dumps in the driver of this same kind of ROM
+	// this ROM is bad and can't be read correctly. Needs another PCB.
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "super_70s_v-100us.u31", 0x000000, 0x100000, BAD_DUMP CRC(60020aa3) SHA1(f6be4f9588192ef1e57182e5a61228440e5cfa64) ) // EV29LV160, BADADDR    xxxxxxxxxxxxxxxxxx-x
+	ROM_LOAD( "super_70s_v-100us.u31", 0x000000, 0x200000, BAD_DUMP CRC(0c499853) SHA1(f939dc81653680db2a8172789d9f490c0fb06f2b) ) // EV29LV160, BADADDR   xxxxxxxxxxx-xxxxxxxxx
 
-	// this seems to be dumped half sized if compared to other dumps in the driver of this same kind of ROM
-	ROM_REGION( 0x400000, "tt5665", 0 ) // samples
-	ROM_LOAD( "super_70s_v100us_u27.u27", 0x000000, 0x400000, BAD_DUMP CRC(a57fbc1c) SHA1(c7b0c72e678cd4120f576283eca8d718c058994c) ) // EV29LV640, 11xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "super_70s_v100us_u27.u27", 0x000000, 0x800000, CRC(626ea089) SHA1(3bd0c8db432d23d6482045eda0af234e2de6bdfa) ) // EV29LV640
 
-	// these seem to be dumped half sized if compared to other dumps in the driver of this same kind of ROM
-	ROM_REGION( 0x800000, "gfx", 0 )
-	ROM_LOAD( "super_70s_v100us_u25.u25", 0x000000, 0x400000, BAD_DUMP CRC(41baefa5) SHA1(1817bf43b3f72df35d50ef1ceb151d77ecfb988b) ) // EV29LV640
-	ROM_LOAD( "super_70s_v100us_u26.u26", 0x400000, 0x400000, BAD_DUMP CRC(39bb6c75) SHA1(bc52e51f1ad3588253cb42eb61baa11d0720c5a5) ) // EV29LV640
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "super_70s_v100us_u25.u25", 0x000000, 0x800000, CRC(1b8f3be3) SHA1(ce0cbe7c0ac9f103f1a621c6f9878d235bceba4c) ) // EV29LV640
+	ROM_LOAD( "super_70s_v100us_u26.u26", 0x800000, 0x800000, CRC(3f829def) SHA1(94708eef23ceca287c64dc06e9a2d21584372ba9) ) // EV29LV640
 ROM_END
 
 
@@ -850,7 +854,7 @@ GAME( 200?, cjdh2d,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_key<cjd
 
 GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<cjddzsp_key>,  ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<qhzb_key>,     ROT0, "IGS",           "Que Huang Zheng Ba (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<qhzb_key>,     ROT0, "IGS",           "Que Huang Zhengba (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhtb_key>,     ROT0, "IGS",           "Long Hu Tebie Ban (S101CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龍虎特別版 - Lónghǔ tèbié bǎn
 
@@ -888,7 +892,7 @@ GAME( 2010, hlddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hld
 
 GAME( 2010, zjddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<zjddz_key>,    ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zheng Ba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 201?, hyleyuan, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hyleyuan_key>, ROT0, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

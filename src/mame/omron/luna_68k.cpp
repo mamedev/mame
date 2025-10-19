@@ -79,6 +79,8 @@ public:
 		, m_ioc_fdc(*this, "fdc")
 		, m_ioc_scc(*this, "scc")
 		, m_ioc_cio(*this, "cio")
+		, m_ioc_ram(*this, "ioc_ram")
+		, m_ioc_boot(*this, "ioc_boot")
 		// gpu
 		, m_gpu_cpu(*this, "gpu")
 		, m_gpu_dac(*this, "dac")
@@ -115,6 +117,33 @@ private:
 		return 0;
 	}
 
+	u16 ioc_ram_r(offs_t offset)
+	{
+		return m_ioc_ram[offset];
+	}
+
+	void ioc_ram_w(offs_t offset, u16 data, u16 mem_mask)
+	{
+		m_ioc_ram[offset] = (m_ioc_ram[offset] & ~mem_mask) | (data & mem_mask);
+	}
+
+	void ioc_boot_disable_w(offs_t offset, u16 data)
+	{
+		if (!machine().side_effects_disabled())
+			m_ioc_boot.disable();
+		m_ioc_ram[offset & 0x1ffff] = data;
+	}
+
+	void ram_size_w(u32 data)
+	{
+		// FIXME: ram size/enable?
+		if (data != m_ram_size)
+		{
+			m_ram_size = data;
+			m_cpu->space(0).install_ram(0, m_ram->mask(), m_ram->pointer());
+		}
+	}
+
 	// devices
 	required_device<m68030_device> m_cpu;
 	required_device<ram_device> m_ram;
@@ -132,6 +161,8 @@ private:
 	required_device<mb8877_device> m_ioc_fdc;
 	required_device<z80scc_device> m_ioc_scc;
 	required_device<z8536_device> m_ioc_cio;
+	required_shared_ptr<u16> m_ioc_ram;
+	memory_view m_ioc_boot;
 
 	// gpu
 	required_device<m68020fpu_device> m_gpu_cpu;
@@ -139,6 +170,8 @@ private:
 	required_device<mc68901_device> m_gpu_mfp;
 	required_device<rs232_port_device> m_gpu_tty;
 	required_device_array<mc68681_device, 2> m_gpu_duart;
+
+	u32 m_ram_size = 0U;
 };
 
 void luna_68k_state::machine_start()
@@ -149,15 +182,20 @@ void luna_68k_state::machine_reset()
 {
 	// mirror eprom at reset
 	m_cpu->space(AS_PROGRAM).install_rom(0, m_eprom.bytes() - 1, m_eprom);
+
+	m_ioc_boot.select(0);
 }
 
 void luna_68k_state::cpu_map(address_map &map)
 {
-	//map(0x20280080, 0x20280083).lr32([]() { return 1; }, "?");
+	map(0x20280000, 0x202bffff).rw(FUNC(luna_68k_state::ioc_ram_r), FUNC(luna_68k_state::ioc_ram_w));
 
 	map(0x30000000, 0x3fffffff).r(FUNC(luna_68k_state::bus_error_r));
-	map(0x30000d00, 0x30000d1f).m(m_ioc_spc[0], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
-	map(0x30000d20, 0x30000d3f).m(m_ioc_spc[1], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
+	if (0) // FIXME: won't boot to monitor if this is enabled
+	{
+		map(0x30000d00, 0x30000d1f).m(m_ioc_spc[0], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
+		map(0x30000d20, 0x30000d3f).m(m_ioc_spc[1], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
+	}
 
 	map(0x40000000, 0x4001ffff).rom().region("eprom", 0);
 
@@ -166,8 +204,7 @@ void luna_68k_state::cpu_map(address_map &map)
 	map(0x60000000, 0x60000003).rw(m_stc, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 
 	map(0x70000000, 0x70000003).lr32([]() { return 0x000000fc; }, "sw3"); // FIXME: possibly CPU board DIP switch? (1=UP)
-	map(0x78000000, 0x78000003).lw32(
-		[this](u32 data) { m_cpu->space(0).install_ram(0, m_ram->mask(), m_ram->pointer()); }, "ram_size"); // FIXME: ram size/enable?
+	map(0x78000000, 0x78000003).w(FUNC(luna_68k_state::ram_size_w));
 
 	map(0xd01f8000, 0xd01f8003).r(FUNC(luna_68k_state::bus_error_r)); // acrtc graphics
 	map(0xe1f00038, 0xe1f0003b).nopr(); // jrc graphics
@@ -192,8 +229,9 @@ void luna_68k_state::ioc_cpu_map(address_map &map)
 	// hd63450ps10 x 2 dma
 	// z0853606psc cio
 
-	map(0x000000, 0x03ffff).ram().mirror(0x100000); // HM62256LP-10x8 (32768x8) - 256KB
-	map(0x000000, 0x000fff).rom().region("ioc", 0);
+	map(0x000000, 0x03ffff).ram().share(m_ioc_ram).mirror(0x100000); // HM62256LP-10x8 (32768x8) - 256KB
+	map(0x000000, 0x000fff).view(m_ioc_boot);
+	m_ioc_boot[0](0x000000, 0x000fff).rom().region("ioc", 0).w(FUNC(luna_68k_state::ioc_boot_disable_w));
 	map(0xfc0000, 0xfcffff).rom().region("ioc", 0);
 	map(0xfe0000, 0xfe0fff).rom().region("ioc", 0);
 

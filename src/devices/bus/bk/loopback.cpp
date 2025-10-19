@@ -1,0 +1,59 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
+/***************************************************************************
+
+    Loopback cart for ROM test routines
+
+***************************************************************************/
+
+#include "emu.h"
+#include "loopback.h"
+
+
+//**************************************************************************
+//  CONSTANTS/MACROS
+//**************************************************************************
+
+#define VERBOSE 0
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(BK_LOOPBACK, bk_loopback_device, "bk_loopback", "Loopback")
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  bk_loopback_device - constructor
+//-------------------------------------------------
+
+bk_loopback_device::bk_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BK_LOOPBACK, tag, owner, clock)
+	, device_bk_parallel_interface(mconfig, *this)
+{
+}
+
+
+//**************************************************************************
+//  IMPLEMENTATION
+//**************************************************************************
+
+void bk_loopback_device::device_start()
+{
+	save_item(NAME(m_data));
+}
+
+uint16_t bk_loopback_device::io_r()
+{
+	return m_data;
+}
+
+void bk_loopback_device::io_w(uint16_t data, bool word)
+{
+	m_data = data;
+}

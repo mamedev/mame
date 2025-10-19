@@ -3423,18 +3423,13 @@
 		</rect>
 	</element>
 	<element name="led_digit_red">
-		<led7seg invert="1">
+		<led7seg>
 			<color red="1.0" green="0.0" blue="0.0"/>
 		</led7seg>
 	</element>
 	<element name="led_digit_green">
-		<led7seg invert="1">
+		<led7seg>
 			<color red="0.0" green="1.0" blue="0.0"/>
-		</led7seg>
-	</element>
-	<element name="led_digit_blue">
-		<led7seg invert="1">
-			<color red="0.0" green="0.5" blue="1.0"/>
 		</led7seg>
 	</element>
 	<element name="vfd0">
@@ -4572,7 +4567,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="624" y="301" width="30" height="40"/>
 		</element>
-		<element name="digit7" ref="led_digit_red">
+		<element name="digiti7" ref="led_digit_red">
 			<bounds x="624" y="301" width="30" height="40"/>
 		</element>
 		<element ref="led_digit_rect_red">
@@ -4582,7 +4577,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="564" y="301" width="30" height="40"/>
 		</element>
-		<element name="digit5" ref="led_digit_red">
+		<element name="digiti5" ref="led_digit_red">
 			<bounds x="564" y="301" width="30" height="40"/>
 		</element>
 		<element ref="led_digit_rect_red">
@@ -4592,7 +4587,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="594" y="301" width="30" height="40"/>
 		</element>
-		<element name="digit6" ref="led_digit_red">
+		<element name="digiti6" ref="led_digit_red">
 			<bounds x="594" y="301" width="30" height="40"/>
 		</element>
 		<element ref="led_digit_rect_red">
@@ -4602,7 +4597,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="661" y="115" width="30" height="40"/>
 		</element>
-		<element name="digit14" ref="led_digit_red">
+		<element name="digiti14" ref="led_digit_red">
 			<bounds x="661" y="115" width="30" height="40"/>
 		</element>
 		<element ref="led_digit_rect_red">
@@ -4612,7 +4607,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="631" y="115" width="30" height="40"/>
 		</element>
-		<element name="digit13" ref="led_digit_red">
+		<element name="digiti13" ref="led_digit_red">
 			<bounds x="631" y="115" width="30" height="40"/>
 		</element>
 		<element ref="led_digit_rect_red">
@@ -4622,7 +4617,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="691" y="115" width="30" height="40"/>
 		</element>
-		<element name="digit15" ref="led_digit_red">
+		<element name="digiti15" ref="led_digit_red">
 			<bounds x="691" y="115" width="30" height="40"/>
 		</element>
 		<element ref="led_digit_rect_red">
@@ -4632,7 +4627,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="641" y="206" width="26" height="36"/>
 		</element>
-		<element name="digit10" ref="led_digit_red">
+		<element name="digiti10" ref="led_digit_red">
 			<bounds x="641" y="206" width="26" height="36"/>
 		</element>
 		<element ref="led_digit_rect_red">
@@ -4642,7 +4637,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="665" y="206" width="26" height="36"/>
 		</element>
-		<element name="digit11" ref="led_digit_red">
+		<element name="digiti11" ref="led_digit_red">
 			<bounds x="665" y="206" width="26" height="36"/>
 		</element>
 		<element ref="led_digit_rect_red">
@@ -4652,7 +4647,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="691" y="206" width="26" height="36"/>
 		</element>
-		<element name="digit12" ref="led_digit_red">
+		<element name="digiti12" ref="led_digit_red">
 			<bounds x="691" y="206" width="26" height="36"/>
 		</element>
 		<element ref="led_digit_rect_red">
@@ -4662,7 +4657,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="414" y="241" width="30" height="40"/>
 		</element>
-		<element name="digit9" ref="led_digit_green">
+		<element name="digiti9" ref="led_digit_green">
 			<bounds x="414" y="241" width="30" height="40"/>
 		</element>
 		<element ref="led_digit_rect_green">
@@ -4672,7 +4667,7 @@
 		<element ref="led_digit_rect_black">
 			<bounds x="384" y="241" width="30" height="40"/>
 		</element>
-		<element name="digit8" ref="led_digit_green">
+		<element name="digiti8" ref="led_digit_green">
 			<bounds x="384" y="241" width="30" height="40"/>
 		</element>
 		<element ref="led_digit_rect_green">

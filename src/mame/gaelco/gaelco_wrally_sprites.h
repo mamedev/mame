@@ -7,13 +7,12 @@
 
 #include "screen.h"
 
-class gaelco_wrally_sprites_device : public device_t
+class gaelco_wrally_sprites_device : public device_t, public device_video_interface
 {
 public:
 	gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	void draw_sprites(const rectangle &cliprect, uint16_t* spriteram, int flip_screen);
 	void mix_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
@@ -28,7 +27,6 @@ protected:
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
 
 	bitmap_ind16 m_temp_bitmap_sprites;
 };

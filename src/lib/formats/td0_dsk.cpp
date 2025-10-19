@@ -1052,9 +1052,4 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-bool td0_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const td0_format FLOPPY_TD0_FORMAT;

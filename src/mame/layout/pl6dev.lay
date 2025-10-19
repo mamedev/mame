@@ -51,7 +51,7 @@ license:CC0-1.0
 	</element>
 
 	<element name="vfd">
-		<led14segsc><color red="0.0" green="0.75" blue="0.9" /></led14segsc>
+		<led16segsc><color red="0.0" green="0.75" blue="0.9" /></led16segsc>
 	</element>
 
 	<view name="Lamps">

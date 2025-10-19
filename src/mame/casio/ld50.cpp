@@ -50,7 +50,7 @@
 #include "emu.h"
 
 #include "bus/midi/midioutport.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"

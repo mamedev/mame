@@ -111,7 +111,6 @@ protected:
 	template<int Layer> void pf_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void master_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
-	DECLARE_MACHINE_RESET(m92);
 	u32 screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

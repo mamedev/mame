@@ -10,27 +10,35 @@
 
 #include "emu.h"
 #include "io_we.h"
+
+#include "bus/bbc/analogue/analogue.h"
+#include "bus/bbc/userport/userport.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "machine/upd7002.h"
-#include "bus/bbc/analogue/analogue.h"
-#include "bus/bbc/userport/userport.h"
 
 
 namespace {
 
 // ======================> arc_bbcio_we_device
 
-class arc_bbcio_we_device :
-	public device_t,
-	public device_archimedes_podule_interface
+class arc_bbcio_we_device : public device_t, public device_archimedes_podule_interface
 {
 public:
-	// construction/destruction
-	arc_bbcio_we_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_bbcio_we_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, ARC_BBCIO_WE, tag, owner, clock)
+		, device_archimedes_podule_interface(mconfig, *this)
+		, m_podule_rom(*this, "podule_rom")
+		, m_irqs(*this, "irqs")
+		, m_upd7002(*this, "upd7002")
+		, m_rom_page(0)
+		, m_adc_irq(0)
+		, m_via_irq(0)
+	{
+	}
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -45,13 +53,9 @@ protected:
 private:
 	required_memory_region m_podule_rom;
 	required_device<input_merger_device> m_irqs;
-	required_device<bbc_analogue_slot_device> m_analog;
 	required_device<upd7002_device> m_upd7002;
 
 	u8 m_rom_page;
-
-	int get_analogue_input(int channel_number);
-	void upd7002_eoc(int state);
 
 	int m_adc_irq;
 	int m_via_irq;
@@ -99,7 +103,7 @@ void arc_bbcio_we_device::device_add_mconfig(machine_config &config)
 
 	via6522_device &via(MOS6522(config, "via", DERIVED_CLOCK(1, 4)));
 	via.irq_handler().set([this](int state) { m_via_irq = state; m_irqs->in_w<0>(state); });
-	via.readpa_handler().set(m_analog, FUNC(bbc_analogue_slot_device::pb_r)).lshift(2);
+	via.readpa_handler().set("analog", FUNC(bbc_analogue_slot_device::pb_r)).lshift(2);
 	via.writepa_handler().set([this](u8 data) { m_rom_page = data; });
 	via.readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
 	via.writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
@@ -111,35 +115,13 @@ void arc_bbcio_we_device::device_add_mconfig(machine_config &config)
 	userport.cb2_handler().set("via", FUNC(via6522_device::write_cb2));
 
 	upd7002_device &upd7002(UPD7002(config, "upd7002", DERIVED_CLOCK(1, 4)));
-	upd7002.set_get_analogue_callback(FUNC(arc_bbcio_we_device::get_analogue_input));
-	upd7002.set_eoc_callback(FUNC(arc_bbcio_we_device::upd7002_eoc));
+	upd7002.get_analogue_callback().set("analog", FUNC(bbc_analogue_slot_device::ch_r));
+	upd7002.eoc_callback().set([this](int state) { m_adc_irq = !state; m_irqs->in_w<1>(!state); });
 
-	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
-	m_analog->lpstb_handler().set("via", FUNC(via6522_device::write_ca1));
+	bbc_analogue_slot_device &analog(BBC_ANALOGUE_SLOT(config, "analog", bbc_analogue_devices, nullptr));
+	analog.lpstb_handler().set("via", FUNC(via6522_device::write_ca1));
 
 	// TODO: internal A3000 version adds IIC port
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  arc_bbcio_we_device - constructor
-//-------------------------------------------------
-
-arc_bbcio_we_device::arc_bbcio_we_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ARC_BBCIO_WE, tag, owner, clock)
-	, device_archimedes_podule_interface(mconfig, *this)
-	, m_podule_rom(*this, "podule_rom")
-	, m_irqs(*this, "irqs")
-	, m_analog(*this, "analogue")
-	, m_upd7002(*this, "upd7002")
-	, m_rom_page(0)
-	, m_adc_irq(0)
-	, m_via_irq(0)
-{
 }
 
 
@@ -162,29 +144,7 @@ void arc_bbcio_we_device::device_reset()
 	m_rom_page = 0x00;
 }
 
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-int arc_bbcio_we_device::get_analogue_input(int channel_number)
-{
-	return m_analog->ch_r(channel_number) << 8;
-}
-
-void arc_bbcio_we_device::upd7002_eoc(int state)
-{
-	m_adc_irq = !state;
-
-	m_irqs->in_w<1>(!state);
-}
-
-
 } // anonymous namespace
 
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(ARC_BBCIO_WE, device_archimedes_podule_interface, arc_bbcio_we_device, "arc_bbcio_we", "Watford Electronics BBC User I/O Card")

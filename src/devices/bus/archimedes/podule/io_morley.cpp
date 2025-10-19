@@ -18,27 +18,26 @@
 
 #include "emu.h"
 #include "io_morley.h"
+
+#include "bus/bbc/analogue/analogue.h"
+#include "bus/bbc/userport/userport.h"
+#include "bus/midi/midi.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/upd7002.h"
-#include "bus/bbc/analogue/analogue.h"
-#include "bus/bbc/userport/userport.h"
-#include "bus/midi/midi.h"
 
 
 namespace {
 
 // ======================> arc_io_morley_device
 
-class arc_io_morley_device :
-	public device_t,
-	public device_archimedes_podule_interface
+class arc_io_morley_device : public device_t, public device_archimedes_podule_interface
 {
 protected:
 	arc_io_morley_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -48,12 +47,8 @@ protected:
 
 	required_memory_region m_podule_rom;
 	required_device<input_merger_device> m_irqs;
-	optional_device<bbc_analogue_slot_device> m_analog;
 
 	u8 m_rom_page;
-
-	int get_analogue_input(int channel_number);
-	void upd7002_eoc(int state);
 };
 
 
@@ -197,7 +192,7 @@ void arc_io_morley_device::add_userport(machine_config &config)
 {
 	via6522_device &via(MOS6522(config, "via", DERIVED_CLOCK(1, 4)));
 	via.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
-	via.readpa_handler().set(m_analog, FUNC(bbc_analogue_slot_device::pb_r)).lshift(2);
+	via.readpa_handler().set("analog", FUNC(bbc_analogue_slot_device::pb_r)).lshift(2);
 	via.writepa_handler().set([this](u8 data) { m_rom_page = data; });
 	via.readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
 	via.writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
@@ -212,11 +207,11 @@ void arc_io_morley_device::add_userport(machine_config &config)
 void arc_io_morley_device::add_analogue(machine_config &config)
 {
 	upd7002_device &upd7002(UPD7002(config, "upd7002", DERIVED_CLOCK(1, 4)));
-	upd7002.set_get_analogue_callback(FUNC(arc_io_morley_device::get_analogue_input));
-	upd7002.set_eoc_callback(FUNC(arc_io_morley_device::upd7002_eoc));
+	upd7002.get_analogue_callback().set("analog", FUNC(bbc_analogue_slot_device::ch_r));
+	upd7002.eoc_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>)).invert();
 
-	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
-	m_analog->lpstb_handler().set("via", FUNC(via6522_device::write_ca1));
+	bbc_analogue_slot_device &analog(BBC_ANALOGUE_SLOT(config, "analog", bbc_analogue_devices, nullptr));
+	analog.lpstb_handler().set("via", FUNC(via6522_device::write_ca1));
 }
 
 void arc_io_morley_device::add_midi(machine_config &config)
@@ -271,7 +266,6 @@ arc_io_morley_device::arc_io_morley_device(const machine_config &mconfig, device
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")
 	, m_irqs(*this, "irqs")
-	, m_analog(*this, "analogue")
 	, m_rom_page(0)
 {
 }
@@ -311,27 +305,8 @@ void arc_io_morley_device::device_reset()
 	m_rom_page = 0x00;
 }
 
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-int arc_io_morley_device::get_analogue_input(int channel_number)
-{
-	return m_analog->ch_r(channel_number) << 8;
-}
-
-void arc_io_morley_device::upd7002_eoc(int state)
-{
-	m_irqs->in_w<1>(!state);
-}
-
 } // anonymous namespace
 
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(ARC_BBCIO_AGA30, device_archimedes_podule_interface, arc_bbcio_aga30_device, "arc_bbcio_aga30", "Acorn AGA30 BBC I/O Podule")
 DEFINE_DEVICE_TYPE_PRIVATE(ARC_UA_MORLEY, device_archimedes_podule_interface, arc_ua_morley_device, "arc_ua_morley", "Morley Electronics Analogue and User Interface")

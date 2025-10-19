@@ -2627,8 +2627,11 @@ ROM_START( calspeed )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
-	ROM_LOAD( "329_calif_speed_31.u96", 0x0000, 0x2000, CRC(8b470160) SHA1(4e4cc431432f07423cff2d711ae03de0a4e22f97) ) // actual label 329_calif_speed_31''
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_SYSTEM_BIOS( 0, "329", "Security PIC 329" )
+	ROMX_LOAD( "329_calif_speed_31.u96", 0x0000, 0x2000, CRC(8b470160) SHA1(4e4cc431432f07423cff2d711ae03de0a4e22f97), ROM_BIOS(0) ) // actual label 329_calif_speed_31''
+	ROM_SYSTEM_BIOS( 1, "328", "Security PIC 328" )
+	ROMX_LOAD( "328_calif_speed_25.u96", 0x0000, 0x2000, CRC(0b0d88cc) SHA1(e83ad1a4622801c670bdc23ac58d699c5ac4b8e4), ROM_BIOS(1) ) // actual label 328_calif_speed_25''
 ROM_END
 
 
@@ -2656,8 +2659,10 @@ ROM_START( calspeeda )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
-	ROM_LOAD( "329_calif_speed_31.u96", 0x0000, 0x2000, CRC(8b470160) SHA1(4e4cc431432f07423cff2d711ae03de0a4e22f97) )
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "329_calif_speed_31.u96", 0x0000, 0x2000, CRC(8b470160) SHA1(4e4cc431432f07423cff2d711ae03de0a4e22f97) ) // actual label 329_calif_speed_31''
+	ROM_LOAD( "328_calif_speed_25.u96", 0x0000, 0x2000, CRC(0b0d88cc) SHA1(e83ad1a4622801c670bdc23ac58d699c5ac4b8e4) ) // actual label 328_calif_speed_25''
+	// load one over another for now as MAME doesn't support 2 ROM_REGIONs with ROM_SYSTEM_BIOS macros in the same set
 ROM_END
 
 
@@ -2673,8 +2678,11 @@ ROM_START( calspeedb )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
-	ROM_LOAD( "329_calif_speed_31.u96", 0x0000, 0x2000, CRC(8b470160) SHA1(4e4cc431432f07423cff2d711ae03de0a4e22f97) )
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_SYSTEM_BIOS( 0, "329", "Security PIC 329" )
+	ROMX_LOAD( "329_calif_speed_31.u96", 0x0000, 0x2000, CRC(8b470160) SHA1(4e4cc431432f07423cff2d711ae03de0a4e22f97), ROM_BIOS(0) ) // actual label 329_calif_speed_31''
+	ROM_SYSTEM_BIOS( 1, "328", "Security PIC 328" )
+	ROMX_LOAD( "328_calif_speed_25.u96", 0x0000, 0x2000, CRC(0b0d88cc) SHA1(e83ad1a4622801c670bdc23ac58d699c5ac4b8e4), ROM_BIOS(1) ) // actual label 328_calif_speed_25''
 ROM_END
 
 

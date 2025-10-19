@@ -3928,6 +3928,27 @@ ROM_START( yattrmnp ) // ROM board stickered 837-13598
 	ROM_LOAD( "315-5930.ic19", 0x000, 0x117, CRC(d1201563) SHA1(a133b07240c0a4eb8bae4b438d98fc6148fb7f4f) )
 ROM_END
 
+// つりぼり大会 (Tsuribori Taikai)
+ROM_START( tsuribor ) // 837-12765-01 ROM BD
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic22", 0x0200000, 0x0200000, CRC(f18764a5) SHA1(4fefbc813f06fcc9d4bcc6737979a1ecbe42c498) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic24", 0x0400000, 0x0200000, CRC(47810ffc) SHA1(d2454d9859a0d1f04236083527e22d91b26723de) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic26", 0x0600000, 0x0200000, CRC(d36a3b4c) SHA1(16c9e063feaaea2b2b59fab15f3dd7442f0d48da) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic28", 0x0800000, 0x0200000, CRC(341fb80e) SHA1(a4a69d2becd0378d7ed079a9433f9b92c1d22be1) )
+	ROM_LOAD16_WORD_SWAP( "lh28f016sut.ic30", 0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) ) // same as some other sets
+	// ic32, ic34 and ic36 are populated but the flashes are empty (0xff filled)
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD16_WORD_SWAP( "tsuribor.nv", 0x0000, 0x0080, CRC(47c7fa6e) SHA1(93daa50900579a60e33034afc35778313019c40b) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "315-6055.ic12", 0x000, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the front side of the cart
+	ROM_LOAD( "315-6056.ic13", 0x200, 0x117, NO_DUMP ) // PALCE16V8H-10JC on the back side of the cart
+ROM_END
+
 GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "ST-V BIOS", MACHINE_IS_BIOS_ROOT )
 
 //GAME YEAR, NAME,     PARENT,  MACH,     INP,      STATE,       INIT,            MONITOR
@@ -4046,6 +4067,7 @@ GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,  
 GAME( 1996, magzun,    stvbios, magzun,   stv,      stv_state,   init_magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
 GAME( 1998, yattrmnp,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Yatterman Plus (J 981006 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs emulation of the medal specific hardware
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, tsuribor,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Tsuribori Taikai (JAE 980605 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, chalgolf,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Challenge Golf (J 990326 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game, REV.A) (J 990202 V1.000)", MACHINE_NOT_WORKING ) // require SH2's SCI serial port emulated, to communicate with coin/medal-related I/O board
 GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

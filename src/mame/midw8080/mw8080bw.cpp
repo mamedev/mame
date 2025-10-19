@@ -3255,7 +3255,7 @@ ROM_END
 
 /* Irecsa bootleg on original Midway PCB.
    There is a Space King II on a PCB silkscreened with Irecsa logos (straight copy of the Midway one), with probably
-   the same ROM contents. */ 
+   the same ROM contents. */
 ROM_START( spcking2ir )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gm2_1-2_tms2516.h",  0x0000, 0x0800, CRC(a5cad5b7) SHA1(2f1179d2aabd6fa9b86656bcdea1896909a49aae) )
@@ -3304,10 +3304,10 @@ ROM_END
 /* 730 */ GAME(  1978, bowler,      0,        bowler,   bowler,   bowler_state,   empty_init, ROT90,  "Midway",                                   "Bowling Alley",                                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 739 */ GAMEL( 1978, invaders,    0,        invaders, invaders, invaders_state, empty_init, ROT270, "Taito / Midway",                           "Space Invaders / Space Invaders M",              MACHINE_SUPPORTS_SAVE, layout_invaders )
 /* 742 */ GAME(  1978, blueshrk,    0,        blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "Midway",                                   "Blue Shark",                                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-          GAME(  1978, blueshrkmr,  blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)",                   "Blue Shark (Model Racing bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-          GAME(  1978, blueshrkmr2, blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)",                   "Blue Shark (Model Racing bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+		  GAME(  1978, blueshrkmr,  blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)",                   "Blue Shark (Model Racing bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+		  GAME(  1978, blueshrkmr2, blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)",                   "Blue Shark (Model Racing bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 749 4 Player Bowling Alley (cocktail, dump does not exist) */
 /* 851 */ GAMEL( 1980, invad2ct,    0,        invad2ct, invad2ct, mw8080bw_state, empty_init, ROT90,  "Midway",                                   "Space Invaders II (Midway, cocktail)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
-          GAMEL( 1980, spcking2ir,  invad2ct, invaders, invaders, invaders_state, empty_init, ROT270, "bootleg (Irecsa)",                         "Space King Part II (Space Invaders II bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
+		  GAMEL( 1980, spcking2ir,  invad2ct, invaders, invaders, invaders_state, empty_init, ROT270, "bootleg (Irecsa)",                         "Space King Part II (Space Invaders II bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
 /* 852 Space Invaders Deluxe (color hardware, not in this driver) */
 /* 870 Space Invaders Deluxe (cocktail, dump does not exist) */
