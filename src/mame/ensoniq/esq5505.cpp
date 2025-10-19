@@ -189,10 +189,12 @@
 
 namespace {
 
-#define GENERIC (0)
-#define EPS     (1)
-#define SQ1     (2)
-#define VFX     (3)
+enum esq5505_system_type : int {
+	GENERIC = 0,
+	EPS,
+	SQ1,
+	VFX
+};
 
 #define KEYBOARD_HACK (1)   // turn on to play the SQ-1, SD-1, and SD-1 32-voice: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
 
@@ -233,12 +235,13 @@ public:
 	{ }
 
 	void common(machine_config &config);
-	void vfx(machine_config &config);
-	void sq1(machine_config &config);
-	void vfxsd(machine_config &config);
-	void sd132(machine_config &config);
+	void vfx(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX);
+	void vfxsd(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX_SD);
+	void sd1(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1);
+	void sd132(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1_32);
 	void eps(machine_config &config);
 	void common32(machine_config &config);
+	void sq1(machine_config &config);
 	void ks32(machine_config &config);
 
 	void init_eps();
@@ -785,15 +788,6 @@ void esq5505_state::common(machine_config &config)
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
 
-	ENSONIQ_VFX_CARTRIDGE_SLOT(config, m_cartslot);
-	m_cartslot->option_add_internal("cart", ENSONIQ_VFX_CARTRIDGE);
-	m_cartslot->set_default_option("cart");
-	m_cartslot->set_fixed(true);
-
-	ESQPANEL2X40_VFX(config, m_panel);
-	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
-	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
-
 	MC68681(config, m_duart, 4000000);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
@@ -831,9 +825,19 @@ void esq5505_state::common(machine_config &config)
 	m_otis->add_route(7, "pump", 1.0, 7);
 }
 
-void esq5505_state::vfx(machine_config &config)
+void esq5505_state::vfx(machine_config &config, int panel_type)
 {
 	common(config);
+
+	ESQPANEL2X40_VFX(config, m_panel, panel_type);
+	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
+	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
+
+	ENSONIQ_VFX_CARTRIDGE_SLOT(config, m_cartslot);
+	m_cartslot->option_add_internal("cart", ENSONIQ_VFX_CARTRIDGE);
+	m_cartslot->set_default_option("cart");
+	m_cartslot->set_fixed(true);
+
 	NVRAM(config, m_osram_nvram, nvram_device::DEFAULT_NONE);
 }
 
@@ -845,7 +849,7 @@ void esq5505_state::eps(machine_config &config)
 
 	m_duart->set_clock(10_MHz_XTAL / 2);
 
-	ESQPANEL1X22(config.replace(), m_panel);
+	ESQPANEL1X22(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
@@ -861,10 +865,10 @@ void esq5505_state::eps(machine_config &config)
 	m_dmac->dma_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }
 
-void esq5505_state::vfxsd(machine_config &config)
+void esq5505_state::vfxsd(machine_config &config, int panel_type)
 {
-	// Like the VFX
-	vfx(config);
+	// Like the VFX, but passing through the panel type
+	vfx(config, panel_type);
 	// but with an updated memory map that includes FDC and sequence RAM
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
 	// and nvram for the sequencer RAM as well
@@ -877,6 +881,25 @@ void esq5505_state::vfxsd(machine_config &config)
 	// On the VFX-SD, the floppy connector always has exactly one 3.5inch DD floppy drive.
 	WD1772(config, m_fdc, 8000000);
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
+}
+
+void esq5505_state::sd1(machine_config &config, int panel_type)
+{
+	// Like the VFX-SD but with its own panel type
+	vfxsd(config, panel_type);
+}
+
+// Like the sd1, but with some clock speeds faster.
+void esq5505_state::sd132(machine_config &config, int panel_type)
+{
+	auto clock = 30.47618_MHz_XTAL / 2;
+
+	// Like the SD-1 but with its own panel type
+	sd1(config, panel_type);
+
+	m_maincpu->set_clock(clock);
+	m_otis->set_clock(clock);
+	m_pump->set_clock(clock);
 }
 
 // 32-voice machines with the VFX-SD type config
@@ -942,23 +965,12 @@ void esq5505_state::common32(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
 }
 
-// Like the VFX-SD config, but with some clock speeds faster.
-void esq5505_state::sd132(machine_config &config)
-{
-	auto clock = 30.47618_MHz_XTAL / 2;
-
-	vfxsd(config);
-	m_maincpu->set_clock(clock);
-	m_otis->set_clock(clock);
-	m_pump->set_clock(clock);
-}
-
 void esq5505_state::sq1(machine_config &config)
 {
 	common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::sq1_map);
 
-	ESQPANEL2X16_SQ1(config.replace(), m_panel);
+	ESQPANEL2X16_SQ1(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 }
@@ -1277,7 +1289,7 @@ CONS( 1988, eps,    0,   0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "
 CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1989, vfxsd,  0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1990, eps16p, eps, 0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, sd1,    0,   0, sd1,   vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1990, sq1,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1990, sqrack, sq1, 0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1991, sq2,    0,   0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD

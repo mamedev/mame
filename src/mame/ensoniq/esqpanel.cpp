@@ -9,6 +9,7 @@
 #include "ioport.h"
 #include "main.h"
 
+#include "esq2by40_vfx.lh"
 #include "vfx.lh"
 #include "vfxsd.lh"
 #include "sd1.lh"
@@ -18,12 +19,6 @@
 
 #define VERBOSE 0
 #include "logmacro.h"
-
-template <typename Format, typename... Params> inline static void logerror(Format &&fmt, Params &&... args) {
-	util::stream_format(std::cerr,
-			"%s",
-			util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
-}
 
 //**************************************************************************
 // External panel support
@@ -720,17 +715,19 @@ void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 {
 	ESQ2X40_VFX(config, m_vfd, 60);
 
-	const std::string &name = owner()->shortname();
-	if (name == "vfx")
+	if (m_panel_type == VFX)
 		config.set_default_layout(layout_vfx);
-	else if (name == "vfxsd")
+	else if (m_panel_type == VFX_SD)
 		config.set_default_layout(layout_vfxsd);
-	else // "sd1" or "sd132"
-		config.set_default_layout(layout_sd1);
+	else if (m_panel_type == SD_1 || m_panel_type == SD_1_32)
+	  config.set_default_layout(layout_sd1);
+	else // lowest common demonimator as the default: just the VFD.
+		config.set_default_layout(layout_esq2by40_vfx);
 }
 
-esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, int panel_type, uint32_t clock) :
 	esqpanel_device(mconfig, ESQPANEL2X40_VFX, tag, owner, clock),
+	m_panel_type(panel_type),
 	m_vfd(*this, "vfd"),
 	m_lights(*this, "lights"),
 	m_buttons_0(*this, "buttons_0"),
