@@ -77,13 +77,14 @@ This was pointed out by Bart Puype
 #include "emu.h"
 #include "psikyo.h"
 
-#include "cpu/z80/z80.h"
-#include "cpu/z80/lz8420m.h"
 #include "cpu/m68000/m68020.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "cpu/z80/lz8420m.h"
+#include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "sound/ymopn.h"
+
 #include "speaker.h"
 
 
@@ -167,7 +168,7 @@ void s1945_state::s1945_mcu_command_w(u8 data)
 		m_s1945_mcu_index = m_s1945_mcu_inlatch;
 		break;
 	case 0x013:
-//          logerror("MCU: Table read index %02x\n", m_s1945_mcu_index);
+		//logerror("MCU: Table read index %02x\n", m_s1945_mcu_index);
 		m_s1945_mcu_latching = 1;
 		if (m_s1945_mcu_table != nullptr)
 			m_s1945_mcu_latch1 = m_s1945_mcu_table[m_s1945_mcu_index];
@@ -193,7 +194,7 @@ void s1945_state::s1945_mcu_command_w(u8 data)
 		m_s1945_mcu_latching |= 4;
 		break;
 	default:
-//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, m_maincpu->pc());
+		//logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, m_maincpu->pc());
 		break;
 	}
 }
@@ -291,11 +292,11 @@ void psikyo_bootleg_state::s1945bl_bootleg_map(address_map &map)
 	map(0x200000, 0x200fff).ram().share(m_bootleg_spritebuffer);              // RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
 
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
-	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).rw(FUNC(psikyo_bootleg_state::vram_r<0>), FUNC(psikyo_bootleg_state::vram_w<0>));      // Layer 0
-	map(0x802000, 0x803fff).rw(FUNC(psikyo_bootleg_state::vram_r<1>), FUNC(psikyo_bootleg_state::vram_w<1>));      // Layer 1
-	map(0x804000, 0x807fff).ram().share(m_vregs);                                                  // RAM + Vregs
-	map(0xc00000, 0xc0000b).r(FUNC(psikyo_bootleg_state::gunbird_input_r));                                // input ports
+	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");                 // Palette
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_bootleg_state::vram_r<0>), FUNC(psikyo_bootleg_state::vram_w<0>));   // Layer 0
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_bootleg_state::vram_r<1>), FUNC(psikyo_bootleg_state::vram_w<1>));   // Layer 1
+	map(0x804000, 0x807fff).ram().share(m_vregs);                                                               // RAM + Vregs
+	map(0xc00000, 0xc0000b).r(FUNC(psikyo_bootleg_state::gunbird_input_r));                                     // input ports
 
 	map(0xc00018, 0xc00018).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc00019, 0xc00019).w(FUNC(psikyo_bootleg_state::s1945bl_okibank_w<0>));
@@ -357,7 +358,7 @@ void psikyo_state::sngkace_sound_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();                         // ROM
 	map(0x7800, 0x7fff).ram();                         // RAM
-	map(0x8000, 0xffff).bankr(m_audiobank);                    // Banked ROM
+	map(0x8000, 0xffff).bankr(m_audiobank);            // Banked ROM
 }
 
 void psikyo_state::sngkace_sound_io_map(address_map &map)
@@ -477,7 +478,7 @@ int psikyo_state::z80_nmi_r()
 		if (!machine().side_effects_disabled())
 		{
 			machine().scheduler().synchronize();
-//      logerror("%s: Read coin port during Z80 NMI\n", machine().describe_context());
+			//logerror("%s: Read coin port during Z80 NMI\n", machine().describe_context());
 		}
 	}
 
@@ -1078,6 +1079,7 @@ void psikyo_state::machine_start()
 void s1945_state::machine_start()
 {
 	psikyo_state::machine_start();
+
 	m_s1945_mcu_direction = 0x00;
 	m_s1945_mcu_inlatch = 0xff;
 	m_s1945_mcu_latch1 = 0xff;
@@ -1102,6 +1104,8 @@ void s1945_state::machine_start()
 
 void s1945_state::machine_reset()
 {
+	psikyo_state::machine_reset();
+
 	m_mcu_status = 0;
 }
 
