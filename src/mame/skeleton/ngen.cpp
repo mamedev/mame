@@ -322,7 +322,7 @@ void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x81:
 	case 0x82:
 	case 0x83:
-		dma_bank_w(offset-0x80,data & 0xff, 0xffff);
+		dma_bank_w(offset & 0x03,data & 0xff, 0xffff);
 		break;
 	case 0xc0:  // X-Bus modules reset
 		m_xbus_current = 0;
@@ -396,7 +396,7 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 	case 0x81:
 	case 0x82:
 	case 0x83:
-		ret = dma_bank_r(offset, 0xffff);
+		ret = dma_bank_r(offset & 0x03, 0xffff);
 		break;
 	case 0x10c:
 		if(ACCESSING_BITS_0_7)
