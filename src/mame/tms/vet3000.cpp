@@ -167,9 +167,10 @@ static INPUT_PORTS_START( vet3000 )
 INPUT_PORTS_END
 
 
-#define MAIN_CLOCK 3.579545_MHz_XTAL
 void vet3000_state::vet3000(machine_config &config)
 {
+	static constexpr XTAL MAIN_CLOCK = 3.579545_MHz_XTAL;
+
 	/* basic machine hardware */
 	MC6809(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vet3000_state::program_map);
