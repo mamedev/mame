@@ -3305,8 +3305,15 @@ void upd72069_device::auxcmd_w(uint8_t data)
 		result[0] = ST0_UNK;
 		result_pos = 1;
 		break;
+	case 0x1b: // this is a guess based on the mpc3000, it might really be 98/88
+	case 0x5b:
+		cur_rate = data == 0x5b ? 500000 : 250000;
+		main_phase = PHASE_RESULT;
+		result[0] = ST0_UNK;
+		result_pos = 1;
+		break;
+	case 0x98:
 	case 0x88:
-	case 0x1b:
 	case 0x4f:
 	case 0xd3: // unknown
 		main_phase = PHASE_RESULT;
