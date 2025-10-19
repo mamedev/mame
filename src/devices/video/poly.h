@@ -37,8 +37,9 @@
 
 #pragma once
 
-#include <climits>
 #include <atomic>
+#include <climits>
+#include <limits>
 
 
 #define KEEP_POLY_STATISTICS 0
@@ -365,12 +366,19 @@ private:
 	using unit_array = poly_array<work_unit, 0>;
 
 	// round in a cross-platform consistent manner
-	inline int32_t round_coordinate(BaseType value)
+	static int32_t round_coordinate(BaseType value)
 	{
-		int32_t result = int32_t(std::floor(value));
-		if (value > 0 && result < 0)
-			return INT_MAX - 1;
-		return result + (value - BaseType(result) > BaseType(0.5));
+		// saturate (avoid overflow/underflow)
+		if (value >= BaseType(std::numeric_limits<int32_t>::max()))
+			return std::numeric_limits<int32_t>::max();
+		const BaseType ipart = std::floor(value);
+		if (ipart < BaseType(std::numeric_limits<int32_t>::min()))
+			return std::numeric_limits<int32_t>::min();
+
+		// round
+		// TODO: this rounds the midpoint towards negative infinity - should it use more standard behaviour?
+		const BaseType fpart = value - ipart;
+		return int32_t(ipart) + ((fpart > BaseType(0.5)) ? 1 : 0);
 	}
 
 	// internal helpers
