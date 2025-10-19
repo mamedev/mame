@@ -2454,8 +2454,8 @@ void ssv_state::ssv(machine_config &config)
 	m_ensoniq->set_region2("ensoniq.2");
 	m_ensoniq->set_region3("ensoniq.3");
 	m_ensoniq->set_channels(1);
-	m_ensoniq->add_route(0, "speaker", 0.075, 0);
-	m_ensoniq->add_route(1, "speaker", 0.075, 1);
+	m_ensoniq->add_route(0, "speaker", 1.2, 0);
+	m_ensoniq->add_route(1, "speaker", 1.2, 1);
 }
 
 void drifto94_state::drifto94(machine_config &config)

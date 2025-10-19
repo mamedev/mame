@@ -63,12 +63,12 @@ void esq_5505_5510_pump_device::device_clock_changed()
 
 void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream)
 {
-#define SAMPLE_SHIFT 4
-	constexpr sound_stream::sample_t input_scale = 32768.0 / (1 << SAMPLE_SHIFT);
+	constexpr sound_stream::sample_t input_scale = 32768.0;
+	constexpr sound_stream::sample_t output_scale = 1.0 / input_scale;
 
 	// Push the 'Aux' output samples directly into the output stream
-	stream.put(2, 0, stream.get(0, 0) * (1.0 / (1 << SAMPLE_SHIFT)));
-	stream.put(3, 0, stream.get(1, 0) * (1.0 / (1 << SAMPLE_SHIFT)));
+	stream.put(2, 0, stream.get(0, 0));
+	stream.put(3, 0, stream.get(1, 0));
 
 	// Push the 'FX1', 'FX2' and 'DRY' samples into the ESP
 	m_esp->ser_w(0, s32(stream.get(2, 0) * input_scale));
@@ -92,8 +92,8 @@ void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream)
 #endif
 
 	// Read the processed result from the ESP.
-	sound_stream::sample_t l = sound_stream::sample_t(m_esp->ser_r(6)) * (1.0 / 32768.0);
-	sound_stream::sample_t r = sound_stream::sample_t(m_esp->ser_r(7)) * (1.0 / 32768.0);
+	sound_stream::sample_t l = sound_stream::sample_t(m_esp->ser_r(6)) * output_scale;
+	sound_stream::sample_t r = sound_stream::sample_t(m_esp->ser_r(7)) * output_scale;
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
 	// if we're processing the fake program through the ESP, the result should just be that of adding the inputs
