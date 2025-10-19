@@ -97,6 +97,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	required_region_ptr<u16> m_font;
 };
 
 class esq2x40_sq1_device : public esqvfd_device {

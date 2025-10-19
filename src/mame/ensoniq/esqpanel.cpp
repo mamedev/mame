@@ -720,7 +720,7 @@ void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 	else if (m_panel_type == VFX_SD)
 		config.set_default_layout(layout_vfxsd);
 	else if (m_panel_type == SD_1 || m_panel_type == SD_1_32)
-	  config.set_default_layout(layout_sd1);
+		config.set_default_layout(layout_sd1);
 	else // lowest common demonimator as the default: just the VFD.
 		config.set_default_layout(layout_esq2by40_vfx);
 }
