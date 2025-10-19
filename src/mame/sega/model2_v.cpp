@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese, Matthew Daniels
 /*********************************************************************************************************************************
 
     Sega Model 2 Geometry Engine and 3D Rasterizer Emulation
@@ -90,6 +90,7 @@
 
 #include "emu.h"
 #include "model2.h"
+#include "model2rd.ipp"
 
 #include <cmath>
 #include <limits>
@@ -851,35 +852,19 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 		tri->v[2].pz = 1.0f / (tri->v[2].pz + std::numeric_limits<float>::min());
 		tri->v[2].pu = tri->v[2].pu * tri->v[2].pz * (1.0f / 8.0f);
 		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * (1.0f / 8.0f);
-
-		// Note : The class model2_renderer has an array of function pointers in it named m_renderfuncs, in theory this simply
-		//        needs to be passed into the render_triangle function as such model2_renderer::m_renderfuncs[renderer], but
-		//        I was unable to make it work when converting to the new polygon rasterizer interface.
-		switch (renderer)
-		{
-		case 0: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_0, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 1: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_1, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 2: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_2, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 3: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_3, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 4: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_4, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 5: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_5, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 6: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_6, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 7: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_7, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		}
 	}
-	else
+
+	switch (renderer)
 	{
-		switch (renderer)
-		{
-		case 0: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_0, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 1: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_1, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 2: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_2, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 3: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_3, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 4: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_4, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 5: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_5, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 6: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_6, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 7: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_7, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		}
+	case 0: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<false, false>, this), tri->v[0], tri->v[1], tri->v[2]); break;
+	case 1: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<false, true>, this),  tri->v[0], tri->v[1], tri->v[2]); break;
+	case 2: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<false, false>, this),   tri->v[0], tri->v[1], tri->v[2]); break;
+	case 3: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<false, true>, this),    tri->v[0], tri->v[1], tri->v[2]); break;
+	case 4: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<true, false>, this),  tri->v[0], tri->v[1], tri->v[2]); break;
+	case 5: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<true, true>, this),   tri->v[0], tri->v[1], tri->v[2]); break;
+	case 6: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<true, false>, this),    tri->v[0], tri->v[1], tri->v[2]); break;
+	case 7: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<true, true>, this),     tri->v[0], tri->v[1], tri->v[2]); break;
+
 	}
 }
 
