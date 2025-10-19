@@ -398,6 +398,24 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	/* default to standard cmos interfacing */
 	for (auto & elem : m_forced_inputs)
 		elem = 0;
+
+	for(int i=0; i != 8; i++) {
+		m_port_in_cb[i].bind().set([this, i]() { return port_default_r(i); });
+		m_port_out_cb[i].bind().set([this, i](u8 data) { port_default_w(i, data); });
+	}
+}
+
+
+u8 mcs51_cpu_device::port_default_r(int port)
+{
+	if(!machine().side_effects_disabled())
+		logerror("read of un-hooked port %d (PC=%X)\n", port, m_ppc);
+	return 0xff;
+}
+
+void mcs51_cpu_device::port_default_w(int port, u8 data)
+{
+	logerror("write of un-hooked port %d %02x\n", port, data);
 }
 
 i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

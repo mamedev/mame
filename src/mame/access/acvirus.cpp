@@ -84,13 +84,18 @@ public:
 	void init_virus();
 
 private:
+	required_device<sab80c535_device> m_maincpu;
+	required_memory_bank m_rombank;
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void virus_map(address_map &map) ATTR_COLD;
+	void prog_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
-	required_memory_bank m_rombank;
+	void p5_w(u8 data);
+
+	u8 p402_r();
 };
 
 void acvirus_state::machine_start()
@@ -103,16 +108,34 @@ void acvirus_state::machine_reset()
 {
 }
 
-void acvirus_state::virus_map(address_map &map)
+void acvirus_state::p5_w(u8 data)
+{
+	m_rombank->set_entry((data >> 4) & 15);
+}
+
+u8 acvirus_state::p402_r()
+{
+	return 0x02; // ready?
+}
+
+void acvirus_state::prog_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0); // fixed 32K of flash image
 	map(0x8000, 0xffff).bankr(m_rombank);
 }
 
+void acvirus_state::data_map(address_map &map)
+{
+	map(0x0402, 0x0402).r (FUNC(acvirus_state::p402_r));
+}
+
+
 void acvirus_state::virus(machine_config &config)
 {
 	SAB80C535(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::virus_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
+	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
+	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
 	SPEAKER(config, "speaker", 2).front();
 }
