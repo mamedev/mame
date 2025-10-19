@@ -354,6 +354,8 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
+	rgb_t color_xbgr555(u16 data);
+
 	void z80_map(address_map &map) ATTR_COLD;
 
 private:
@@ -450,6 +452,8 @@ private:
 	void share_w(offs_t offset, u16 data);
 	INTERRUPT_GEN_MEMBER(interrupt);
 
+	rgb_t color_xbgr444(u16 data);
+
 	void main_map(address_map &map) ATTR_COLD;
 	void sub_io(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
@@ -470,6 +474,16 @@ void base_state::fixed_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_
 {
 	sprite_colbank = (sprite_ctrl & 0x3c) << 2;
 	pri_mask = 0xf0; // sprites over top bg layer
+}
+
+rgb_t base_state::color_xbgr555(u16 data)
+{
+	return rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
+
+rgb_t cadash_state::color_xbgr444(u16 data)
+{
+	return rgb_t(pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 }
 
 
@@ -589,7 +603,7 @@ void bonzeadv_state::main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x0fffff).rom();
 	map(0x10c000, 0x10ffff).ram();
-	map(0x200000, 0x200007).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
+	map(0x200000, 0x200007).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));
 	map(0x390000, 0x390001).portr("DSWA");
 	map(0x3a0000, 0x3a0001).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0x3b0000, 0x3b0001).portr("DSWB");
@@ -609,7 +623,7 @@ void msm_state::asuka_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x1076f0, 0x1076f1).nopr(); // Mofflott init does dummy reads here
-	map(0x200000, 0x20000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
+	map(0x200000, 0x20000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));
 	map(0x3a0000, 0x3a0003).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0001, 0x3e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -631,7 +645,7 @@ void cadash_state::main_map(address_map &map)
 	map(0x100000, 0x107fff).ram();
 	map(0x800000, 0x800fff).rw(FUNC(cadash_state::share_r), FUNC(cadash_state::share_w));    // network RAM
 	map(0x900000, 0x90000f).rw("tc0220ioc", FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0xa00000, 0xa0000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_4bpg_word_w));
+	map(0xa00000, 0xa0000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));
 	map(0xb00000, 0xb03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  // sprite RAM
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    // tilemaps
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
@@ -640,7 +654,7 @@ void cadash_state::main_map(address_map &map)
 void base_state::eto_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
+	map(0x100000, 0x10000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));
 	map(0x200000, 0x203fff).ram();
 	map(0x300000, 0x30000f).rw("tc0220ioc", FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x400000, 0x40000f).r("tc0220ioc", FUNC(tc0220ioc_device::read)).umask16(0x00ff);   // service mode mirror
@@ -1119,7 +1133,9 @@ void bonzeadv_state::bonzeadv(machine_config &config)
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(bonzeadv_state::color_xbgr555));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1174,7 +1190,9 @@ void msm_state::asuka(machine_config &config)
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(msm_state::color_xbgr555));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1242,7 +1260,9 @@ void cadash_state::cadash(machine_config &config)
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(cadash_state::color_xbgr444));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1297,7 +1317,9 @@ void msm_state::mofflott(machine_config &config)
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(msm_state::color_xbgr555));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1360,7 +1382,9 @@ void base_state::eto(machine_config &config)
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr", 0));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(base_state::color_xbgr555));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
