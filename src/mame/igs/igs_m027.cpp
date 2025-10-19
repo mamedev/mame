@@ -4702,7 +4702,7 @@ GAME(  2001, cjsxp,         0,        cjsxp,        cjsxp,         igs_m027_stat
 GAME(  2000, tshs,          0,        zhongguo,     tshs,          igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V201CN)", 0 )
 GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // unemulated sound chips
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
-GAME(  200?, mgfx,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // inputs, outputs, Oki banking
+GAME(  2000, mgfx,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // inputs, outputs, Oki banking
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
