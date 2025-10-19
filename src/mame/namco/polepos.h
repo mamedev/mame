@@ -41,7 +41,7 @@ public:
 		m_52xx_region(*this, "52xx"),
 		m_road_region(*this, "road"),
 		m_scalelut_region(*this, "scalelut"),
-		m_analog_io{*this, {"BRAKE", "ACCEL"}},
+		m_analog_io(*this, {"BRAKE", "ACCEL"}),
 		m_steer_io(*this, "STEER")
 	{ }
 
