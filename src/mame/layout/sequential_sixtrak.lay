@@ -444,6 +444,7 @@ copyright-holders:m1macrophage
 	</element>
 
 	<!-- button, knob and wheel labels -->
+
 	<repeat count="10">
 		<param name="i" start="0" increment="1"/>
 		<element name="txt_num_~i~">
@@ -503,6 +504,7 @@ copyright-holders:m1macrophage
 	</element>
 
 	<!-- display elements -->
+
 	<element name="display">
 		<rect><color state="0" red="0.24" green="0.14" blue="0.15"/></rect>
 	</element>
@@ -862,7 +864,6 @@ copyright-holders:m1macrophage
 	<view name="Default Layout">
 		<bounds x="0" y="0" width="1520" height="700"/>
 
-
 		<!-- case -->
 
 		<element ref="panel"><bounds x="30" y="20" width="1465" height="320"/></element>
@@ -872,22 +873,21 @@ copyright-holders:m1macrophage
 		<element ref="dark_wood"><bounds x="1477" y="350" width="18" height="310"/></element>
 		<element ref="wood"><bounds x="1495" y="0" width="25" height="660"/></element>
 
-		<param name="label" value="txt_pitch"/>
 		<param name="input" value="pitch_wheel"/>
+		<param name="label" value="txt_pitch"/>
 		<group ref="wheel"><bounds x="75" y="164" width="20" height="145"/></group>
 
-		<param name="label" value="txt_mod"/>
 		<param name="input" value="mod_wheel"/>
+		<param name="label" value="txt_mod"/>
 		<group ref="wheel"><bounds x="150" y="164" width="20" height="145"/></group>
 
-		<param name="label" value="tune"/>
 		<param name="input" value="tune_knob"/>
+		<param name="label" value="tune"/>
 		<group ref="master_knob"><bounds x="1350" y="100" width="70" height="75"/></group>
 
-		<param name="label" value="volume"/>
 		<param name="input" value="master_volume_knob"/>
+		<param name="label" value="volume"/>
 		<group ref="master_knob"><bounds x="1350" y="210" width="70" height="75"/></group>
-
 
 		<!-- multri-track section -->
 
@@ -899,8 +899,8 @@ copyright-holders:m1macrophage
 		<element ref="txt_arp"><bounds x="343" y="295" width="80" height="11"/></element>
 		<element ref="txt_stack"><bounds x="453" y="295" width="80" height="11"/></element>
 
-		<param name="label" value="txt_track_volume"/>
 		<param name="input" value="track_volume_knob"/>
+		<param name="label" value="txt_track_volume"/>
 		<group ref="labeled_knob"><bounds x="238" y="160" width="70" height="60"/></group>
 
 		<param name="mask" value="0x40"/>
@@ -913,8 +913,8 @@ copyright-holders:m1macrophage
 		<param name="led" value="led_legato"/>
 		<group ref="led_button"><bounds x="385" y="160" width="50" height="50"/></group>
 
-		<param name="label" value="txt_speed"/>
 		<param name="input" value="speed_knob"/>
+		<param name="label" value="txt_speed"/>
 		<group ref="labeled_knob"><bounds x="458" y="160" width="70" height="60"/></group>
 
 		<repeat count="6">
@@ -933,12 +933,11 @@ copyright-holders:m1macrophage
 			<group ref="led_button"><bounds x="~x~" y="240" width="50" height="50"/></group>
 		</repeat>
 
-
 		<!-- parameters section -->
+
 		<element ref="parameters_box"><bounds x="575" y="60" width="356" height="250"/></element>
 		<element ref="parameters"><bounds x="575" y="60" width="356" height="250"/></element>
 		<element ref="parameters_label"><bounds x="703" y="54" width="100" height="14"/></element>
-
 
 		<!-- control section -->
 
@@ -959,14 +958,13 @@ copyright-holders:m1macrophage
 			<group ref="led_button"><bounds x="~x~" y="122" width="50" height="50"/></group>
 		</repeat>
 
-		<param name="label" value="txt_control_3"/>
 		<param name="input" value="value_knob"/>
+		<param name="label" value="txt_control_3"/>
 		<group ref="labeled_knob"><bounds x="1000" y="173" width="70" height="60"/></group>
 
 		<param name="mask" value="0x20"/>
 		<param name="led" value="led_record"/>
 		<group ref="record_button"><bounds x="1010" y="240" width="50" height="50"/></group>
-
 
 		<!-- select section -->
 
@@ -981,8 +979,8 @@ copyright-holders:m1macrophage
 			<param name="y" start="95" increment="53"/>
 			<repeat count="3">
 				<param name="x" start="1160" increment="55"/>
-				<param name="label" start="~labelstart~" increment="1"/>
 				<param name="mask" start="~maskstart~" lshift="1"/>
+				<param name="label" start="~labelstart~" increment="1"/>
 				<group ref="select_button"><bounds x="~x~" y="~y~" width="22" height="35"/></group>
 			</repeat>
 		</repeat>
@@ -1007,7 +1005,6 @@ copyright-holders:m1macrophage
 		<param name="mask" value="0x01"/>
 		<param name="label" value="0"/>
 		<group ref="select_button"><bounds x="1215" y="255" width="22" height="35"/></group>
-
 
 		<!-- keyboard -->
 
