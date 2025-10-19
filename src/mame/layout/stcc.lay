@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-authors:hap
+authors:AnthonyRyuki
 -->
 <mamelayout version="2">
 
@@ -13,3 +13,4 @@ authors:hap
 		</screen>
 	</view>
 </mamelayout>
+
