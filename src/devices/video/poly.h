@@ -379,7 +379,7 @@ private:
 		// TODO: this rounds the midpoint towards negative infinity - should it use more standard behaviour?
 		const BaseType fpart = value - ipart;
 		return int32_t(ipart) + ((fpart > BaseType(0.5)) ? 1 : 0);
-	}	
+	}
 
 	// internal helpers
 	primitive_info &primitive_alloc(int minx, int maxx, int miny, int maxy, render_delegate callback)
