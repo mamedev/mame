@@ -112,6 +112,7 @@ void ym7101_device::device_start()
 	save_item(STRUCT_MEMBER(m_dma, active));
 	save_item(STRUCT_MEMBER(m_dma, fill));
 
+	save_item(NAME(m_ie2));
 	save_item(NAME(m_ie1));
 	save_item(NAME(m_vr));
 	save_item(NAME(m_de));
@@ -160,7 +161,7 @@ void ym7101_device::device_reset()
 	m_vr = false;
 	m_vram_mask = 0xffff;
 	m_de = false;
-	m_ie0 = false;
+	m_ie0 = m_ie1 = m_ie2 = false;
 	m_vint_pending = 0;
 	m_plane_a_name_table = 0;
 	m_plane_b_name_table = 0;
@@ -638,10 +639,11 @@ void ym7101_device::regs_map(address_map &map)
 	// <-- mode 4 ignores everything beyond this point
 	map(11, 11).lw8(NAME([this] (u8 data) {
 		LOGREGS("#11: Mode Register 3 %02x\n", data);
+		m_ie2 = !!BIT(data, 3);
 		m_vs = BIT(data, 2);
 		m_hs = data & 3;
 		LOGREGS("\tIE2: %d VS: %d HS: %d\n"
-			, BIT(data, 3)
+			, m_ie2
 			, m_vs
 			, m_hs
 		);

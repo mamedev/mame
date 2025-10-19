@@ -40518,6 +40518,9 @@ segartv
 vf5
 vtennis3
 
+@source:sega/magistr16.cpp
+magistr16
+
 @source:sega/mdconsole.cpp
 32x
 32x_mcd
