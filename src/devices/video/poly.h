@@ -37,8 +37,9 @@
 
 #pragma once
 
-#include <climits>
 #include <atomic>
+#include <climits>
+#include <limits>
 
 
 #define KEEP_POLY_STATISTICS 0
@@ -364,27 +365,20 @@ private:
 	using primitive_array = poly_array<primitive_info, 0>;
 	using unit_array = poly_array<work_unit, 0>;
 
-	// round in a cross-platform consistent manner	
-	inline int32_t round_coordinate(BaseType value)
+	// round in a cross-platform consistent manner
+	static int32_t round_coordinate(BaseType value)
 	{
-		// 1. Saturation check (prevent overflow/underflow)
-		if (value >= static_cast<BaseType>(std::numeric_limits<int32_t>::max()))
+		// saturate (avoid overflow/underflow)
+		if (value >= BaseType(std::numeric_limits<int32_t>::max()))
 			return std::numeric_limits<int32_t>::max();
-		if (value <= static_cast<BaseType>(std::numeric_limits<int32_t>::min()))
+		const BaseType ipart = std::floor(value);
+		else if (ipart < BaseType(std::numeric_limits<int32_t>::min()))
 			return std::numeric_limits<int32_t>::min();
 
-		// 2. Floor and fractional part
-		const BaseType ipart = std::floor(value);
+		// round
+		// TODO: this rounds the midpoint towards negative infinity - should it use more standard behaviour?
 		const BaseType fpart = value - ipart;
-
-		// 3. Convert safely
-		int32_t result = static_cast<int32_t>(ipart);
-
-		// 4. Round up if fraction > 0.5 (with defensive overflow check)
-		if (fpart > BaseType(0.5) && result < std::numeric_limits<int32_t>::max())
-			++result;
-
-		return result;
+		return int32_t(ipart) + ((fpart > BaseType(0.5)) ? 1 : 0);
 	}	
 
 	// internal helpers
