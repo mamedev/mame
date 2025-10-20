@@ -6,9 +6,11 @@
 #pragma once
 
 #include "bus/isa/isa.h"
+#include "imagedev/floppy.h"
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
 #include "machine/pc_lpt.h"
+#include "machine/upd765.h"
 
 class w83977tf_device : public device_t,
 						 public device_isa16_card_interface,
@@ -32,6 +34,11 @@ public:
 //  auto ndtr2() { return m_ndtr2_callback.bind(); }
 //  auto nrts2() { return m_nrts2_callback.bind(); }
 
+	auto gpio1_read() { return m_gpio1_read_cb.bind(); }
+	auto gpio1_write() { return m_gpio1_write_cb.bind(); }
+
+
+	static void floppy_formats(format_registration &fr);
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -42,6 +49,7 @@ protected:
 private:
 	const address_space_config m_space_config;
 
+	required_device<n82077aa_device> m_fdc;
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<ds12885_device> m_rtc;
 	required_device<pc_lpt_device> m_lpt;
@@ -59,6 +67,9 @@ private:
 //  devcb_write_line m_ndtr2_callback;
 //  devcb_write_line m_nrts2_callback;
 
+	devcb_read8 m_gpio1_read_cb;
+	devcb_write8 m_gpio1_write_cb;
+
 	u8 m_index;
 	u8 m_logical_index;
 	bool m_activate[0xb];
@@ -66,14 +77,17 @@ private:
 	u8 m_hefras;
 	u8 m_lockreg;
 	u8 m_lock_sequence;
+
 	u8 m_keyb_irq_line;
 	u8 m_mouse_irq_line;
 	u8 m_rtc_irq_line;
 	u8 m_lpt_irq_line;
 	u8 m_lpt_drq_line;
 	u8 m_lpt_mode;
+	u16 m_fdc_address;
 	u16 m_keyb_address[2];
 	u16 m_lpt_address;
+	u16 m_gpio1_address;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, u8 data);
