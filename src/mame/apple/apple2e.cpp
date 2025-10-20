@@ -2073,7 +2073,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 			}
 			return uFloatingBus7;
 
-		case 0x61:  // button 0 or Open Apple
+		case 0x61:  // button 0 or Open Apple (or mouse button 1 on IIc)
 		case 0x69:
 			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
@@ -2135,6 +2135,65 @@ u8 apple2e_state::c000_r(offs_t offset)
 	}
 
 	return read_floatingbus();
+}
+
+u8 apple2e_state::c000_iic_r(offs_t offset)
+{
+	if(machine().side_effects_disabled()) return read_floatingbus();
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+
+	switch (offset)
+	{
+		case 0x15:  // read & reset mouse X0 interrupt flag
+			lower_irq(IRQ_MOUSEXY);
+			return (m_xirq ? 0x80 : 0x00) | m_transchar;
+
+		case 0x17:  // read & reset mouse Y0 interrupt flag
+			lower_irq(IRQ_MOUSEXY);
+			return (m_yirq ? 0x80 : 0x00) | m_transchar;
+
+		case 0x19:  // read VBL
+			return (m_vbl ? 0x80 : 0x00) | m_transchar;
+
+		case 0x40:  // read XYMask (IIc only)
+			return m_xy ? 0x80 : 0x00;
+
+		case 0x41:  // read VBL mask (IIc only)
+			return m_vblmask ? 0x80 : 0x00;
+
+		case 0x42:  // read X0Edge (IIc only)
+			return m_x0edge ? 0x80 : 0x00;
+
+		case 0x43:  // read Y0Edge (IIc only)
+			return m_y0edge ? 0x80 : 0x00;
+
+		case 0x60: // 40/80 column switch (IIc and Franklin ACE 500 only)
+			return ((m_sysconfig.read_safe(0) & 0x40) ? 0x80 : 0) | uFloatingBus7;
+
+		case 0x63:  // mouse button 2 (no other function on IIc)
+		case 0x6b:
+			return (m_mouseb->read() ? 0 : 0x80) | uFloatingBus7;
+
+		case 0x66: // mouse X1 (IIc only)
+		case 0x6e:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			return (m_x1 ? 0x80 : 0) | uFloatingBus7;
+
+		case 0x67: // mouse Y1 (IIc only)
+		case 0x6f:
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
+
+		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
+			do_io(offset);  // side-effect reset paddle timers and VBL interrupt
+			return (m_ioudis ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0x79: case 0x7b: case 0x7d: case 0x7f:  // read DHIRES
+			do_io(offset);  // side-effect reset paddle timers and VBL interrupt
+			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
+	}
+
+	return c000_r(offset);
 }
 
 u8 apple2e_state::c000_laser_r(offs_t offset)
@@ -2446,135 +2505,6 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			do_io(offset);
 			break;
 	}
-}
-
-u8 apple2e_state::c000_iic_r(offs_t offset)
-{
-	if(machine().side_effects_disabled()) return read_floatingbus();
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
-
-	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
-	{
-		return m_transchar | m_strobe;
-	}
-
-	switch (offset)
-	{
-		case 0x10:  // read any key down, reset keyboard strobe
-			{
-				u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-				m_strobe = 0;
-				return rv;
-			}
-
-		case 0x11:  // read LCRAM2 (LC Dxxx bank), also reads like $C010 without strobe reset
-			return (m_lcram2 ? 0x80 : 0x00) | m_transchar;
-
-		case 0x12:  // read LCRAM (is LC readable?)
-			return (m_lcram ? 0x80 : 0x00) | m_transchar;
-
-		case 0x13:  // read RAMRD
-			return (m_ramrd ? 0x80 : 0x00) | m_transchar;
-
-		case 0x14:  // read RAMWRT
-			return (m_ramwrt ? 0x80 : 0x00) | m_transchar;
-
-		case 0x15:  // read & reset mouse X0 interrupt flag
-			lower_irq(IRQ_MOUSEXY);
-			return (m_xirq ? 0x80 : 0x00) | m_transchar;
-
-		case 0x16:  // read ALTZP
-			return (m_altzp ? 0x80 : 0x00) | m_transchar;
-
-		case 0x17:  // read & reset mouse Y0 interrupt flag
-			lower_irq(IRQ_MOUSEXY);
-			return (m_yirq ? 0x80 : 0x00) | m_transchar;
-
-		case 0x18:  // read 80STORE
-			return (m_video->get_80store() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x19:  // read VBL
-			return (m_vbl ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1a:  // read TEXT
-			return (m_video->get_graphics() ? 0x00 : 0x80) | m_transchar;
-
-		case 0x1b:  // read MIXED
-			return (m_video->get_mix() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1c:  // read PAGE2
-			return (m_video->get_page2() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1d:  // read HIRES
-			return (m_video->get_hires() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1e:  // read ALTCHARSET
-			return (m_video->get_altcharset() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1f:  // read 80COL
-			return (m_video->get_80col() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x40:  // read XYMask (IIc only)
-			return m_xy ? 0x80 : 0x00;
-
-		case 0x41:  // read VBL mask (IIc only)
-			return m_vblmask ? 0x80 : 0x00;
-
-		case 0x42:  // read X0Edge (IIc only)
-			return m_x0edge ? 0x80 : 0x00;
-
-		case 0x43:  // read Y0Edge (IIc only)
-			return m_y0edge ? 0x80 : 0x00;
-
-		case 0x60: // 40/80 column switch (IIc and Franklin ACE 500 only)
-			return ((m_sysconfig.read_safe(0) & 0x40) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x61:  // button 0 or Open Apple or mouse button 1
-		case 0x69:
-			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x62:  // button 1 or Solid Apple
-		case 0x6a:
-			return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x63:  // mouse button 2 (no other function on IIc)
-		case 0x6b:
-			return (m_mouseb->read() ? 0 : 0x80) | uFloatingBus7;
-
-		case 0x64:  // joy 1 X axis
-		case 0x6c:
-			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x65:  // joy 1 Y axis
-		case 0x6d:
-			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x66: // mouse X1 (IIc only)
-		case 0x6e:
-			return (m_x1 ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x67: // mouse Y1 (IIc only)
-		case 0x6f:
-			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
-			m_vbl = false;
-			lower_irq(IRQ_VBL);
-			return (m_ioudis ? 0x80 : 0x00) | uFloatingBus7;
-
-		case 0x79: case 0x7b: case 0x7d: case 0x7f:  // read DHIRES
-			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
-
-		default:
-			do_io(offset);
-			if ((m_accel_unlocked) && (offset == 0x5c))
-			{
-				return m_accel_slotspk;
-			}
-			break;
-	}
-
-	return read_floatingbus();
 }
 
 void apple2e_state::update_iic_mouse()
