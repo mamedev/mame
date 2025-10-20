@@ -242,6 +242,18 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
+	<software name="justkngt" supported="yes">
+		<description>Justice Knight</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5557516">
+				<rom name="Justice Knight.wav" size="5557516" crc="629af146" sha1="28409f2b837758eddf609f2b4bfec33b797fc0b3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mj05" supported="no">
 		<description>MJ-05</description>
 		<year>1983</year>
