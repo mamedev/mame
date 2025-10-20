@@ -180,6 +180,10 @@
 #include "speaker.h"
 #include "vfxcart.h"
 
+#include "vfx.lh"
+#include "vfxsd.lh"
+#include "sd1.lh"
+
 #include <cstdarg>
 #include <cstdio>
 
@@ -235,10 +239,10 @@ public:
 	{ }
 
 	void common(machine_config &config);
-	void vfx(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX);
-	void vfxsd(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX_SD);
-	void sd1(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1);
-	void sd132(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1_32);
+	void vfx(machine_config &config);
+	void vfxsd(machine_config &config);
+	void sd1(machine_config &config);
+	void sd132(machine_config &config);
 	void eps(machine_config &config);
 	void common32(machine_config &config);
 	void sq1(machine_config &config);
@@ -825,13 +829,15 @@ void esq5505_state::common(machine_config &config)
 	m_otis->add_route(7, "pump", 1.0, 7);
 }
 
-void esq5505_state::vfx(machine_config &config, int panel_type)
+void esq5505_state::vfx(machine_config &config)
 {
 	common(config);
 
-	ESQPANEL2X40_VFX(config, m_panel, panel_type);
+	ESQPANEL2X40_VFX(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
+
+	config.set_default_layout(layout_vfx);
 
 	ENSONIQ_VFX_CARTRIDGE_SLOT(config, m_cartslot);
 	m_cartslot->option_add_internal("cart", ENSONIQ_VFX_CARTRIDGE);
@@ -865,14 +871,16 @@ void esq5505_state::eps(machine_config &config)
 	m_dmac->dma_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }
 
-void esq5505_state::vfxsd(machine_config &config, int panel_type)
+void esq5505_state::vfxsd(machine_config &config)
 {
-	// Like the VFX, but passing through the panel type
-	vfx(config, panel_type);
+	// Like the VFX
+	vfx(config);
 	// but with an updated memory map that includes FDC and sequence RAM
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
 	// and nvram for the sequencer RAM as well
 	NVRAM(config, m_seqram_nvram, nvram_device::DEFAULT_NONE);
+	// and its own layout
+	config.set_default_layout(layout_vfxsd);
 
 	SPEAKER(config, "aux", 2).front();
 	m_pump->add_route(2, "aux", 1.0, 0);
@@ -883,19 +891,20 @@ void esq5505_state::vfxsd(machine_config &config, int panel_type)
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
 }
 
-void esq5505_state::sd1(machine_config &config, int panel_type)
+void esq5505_state::sd1(machine_config &config)
 {
-	// Like the VFX-SD but with its own panel type
-	vfxsd(config, panel_type);
+	// Like the VFX-SD
+	vfxsd(config);
+	// but with its own layout
+	config.set_default_layout(layout_sd1);
 }
 
 // Like the sd1, but with some clock speeds faster.
-void esq5505_state::sd132(machine_config &config, int panel_type)
+void esq5505_state::sd132(machine_config &config)
 {
 	auto clock = 30.47618_MHz_XTAL / 2;
 
-	// Like the SD-1 but with its own panel type
-	sd1(config, panel_type);
+	sd1(config);
 
 	m_maincpu->set_clock(clock);
 	m_otis->set_clock(clock);
