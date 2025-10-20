@@ -44,6 +44,7 @@ enum
 	FM_WRITEBUFFER1, // part 1 of write to buffer sequence
 	FM_WRITEBUFFER2, // part 2 of write to buffer sequence
 	FM_FAST_RESET,
+	FM_WRITEPAGEWINBOND,
 };
 
 
@@ -344,6 +345,7 @@ tc58fvt800_device::tc58fvt800_device(const machine_config &mconfig, const char *
 winbond_w29c020c_device::winbond_w29c020c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, WINBOND_W29C020C, tag, owner, clock, 0x40000, MFG_WINBOND, 0x45) {
 	m_addrmask = 0xffff;
+	m_page_size = 0x80;
 }
 
 //-------------------------------------------------
@@ -524,7 +526,8 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 				case 2: data = 0xfe << 8; break;
 				default:
 					// should be address $3fff2 only
-					logerror("warning: lockout read %06x\n", address);
+					if (!machine().side_effects_disabled())
+						logerror("warning: lockout read %06x\n", address);
 					data = 0xfe << 8;
 					break;
 			}
@@ -761,6 +764,12 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 				m_sdp = true;
 				m_flash_mode = FM_WRITEPAGEATMEL;
 				m_byte_count = 0;
+			}
+			else if (m_maker_id == MFG_WINBOND)
+			{
+				logerror("%s: enter Winbond SDP\n", machine().describe_context());
+				m_byte_count = 0;
+				m_flash_mode = FM_WRITEPAGEWINBOND;
 			}
 			else
 			{
@@ -1101,6 +1110,29 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			}
 		}
 		break;
+	case FM_WRITEPAGEWINBOND:
+		if ((address & 0xffff) == 0x5555 && (data & 0xff) == 0x20)
+		{
+			m_flash_mode = FM_NORMAL;
+		}
+		else
+		{
+			// TODO: magistr16 writes in byte units, confirm me
+			// (and propagates due of 68k byte smearing)
+			m_data[address*2] = data >> 8;
+			m_data[address*2+1] = data;
+
+			m_byte_count++;
+
+			if (m_byte_count == m_page_size)
+			{
+				m_flash_mode = FM_NORMAL;
+				m_sdp = false;
+				m_byte_count = 0;
+			}
+		}
+		break;
+
 	case FM_CLEARPART1:
 		if( ( data & 0xff ) == 0xd0 )
 		{
