@@ -405,6 +405,13 @@ public:
 	macronix_29f1610mc_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class winbond_w29c020c_device : public intelfsh16_device
+{
+public:
+	winbond_w29c020c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(INTEL_28F016S5,          intel_28f016s5_device)
@@ -458,5 +465,6 @@ DECLARE_DEVICE_TYPE(SST_39VF400A,            sst_39vf400a_device)
 DECLARE_DEVICE_TYPE(ATMEL_49F4096,           atmel_49f4096_device)
 DECLARE_DEVICE_TYPE(CAT28F020,               cat28f020_device)
 DECLARE_DEVICE_TYPE(TC58FVT800,              tc58fvt800_device)
+DECLARE_DEVICE_TYPE(WINBOND_W29C020C,        winbond_w29c020c_device)
 
 #endif // MAME_MACHINE_INTELFSH_H

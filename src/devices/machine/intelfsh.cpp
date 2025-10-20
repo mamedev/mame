@@ -140,6 +140,7 @@ DEFINE_DEVICE_TYPE(CAT28F020,                cat28f020_device,                "c
 
 DEFINE_DEVICE_TYPE(TC58FVT800,               tc58fvt800_device,               "tc58fvt800",               "Toshiba TC58FVT800 Flash")
 
+DEFINE_DEVICE_TYPE(WINBOND_W29C020C,         winbond_w29c020c_device,               "winbond_w29c020c",               "Winbond W29C020C Flash")
 
 
 //**************************************************************************
@@ -340,6 +341,11 @@ tms_29f040_device::tms_29f040_device(const machine_config &mconfig, const char *
 tc58fvt800_device::tc58fvt800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, TC58FVT800, tag, owner, clock, 0x100000, MFG_TOSHIBA, 0x4f) { m_top_boot_sector = true; }
 
+winbond_w29c020c_device::winbond_w29c020c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, WINBOND_W29C020C, tag, owner, clock, 0x40000, MFG_WINBOND, 0x45) {
+	m_addrmask = 0xffff;
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -504,6 +510,23 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 				case 0x06: logerror("Extended Memory Block Verify Code not implemented.\n"); break;
 				case 0x1c: data = m_device_id2; break;
 				case 0x1e: data = m_device_id3; break;
+			}
+		}
+		else if (m_maker_id == MFG_WINBOND)
+		{
+			// magistr16 checks that the device ID returns either 0x45 or 0x46, on upper byte
+			// (repeated in both nibbles? cfr. page 8)
+			switch (address)
+			{
+				case 0: data = m_maker_id << 8; break;
+				case 1: data = m_device_id << 8; break;
+				// TODO: lockout mode returns 0xff (unused by magistr16)
+				case 2: data = 0xfe << 8; break;
+				default:
+					// should be address $3fff2 only
+					logerror("warning: lockout read %06x\n", address);
+					data = 0xfe << 8;
+					break;
 			}
 		}
 		else
@@ -957,6 +980,11 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_sdp = false;
 			m_flash_mode = FM_WRITEPAGEATMEL;
 			m_byte_count = 0;
+		}
+		else if (m_maker_id == MFG_WINBOND && (data & 0xff) == 0x60 && (( address & 0xffff ) == 0x5555))
+		{
+			m_flash_mode = FM_READAMDID3;
+			logerror("%s: Winbond enter ID mode\n", machine().describe_context());
 		}
 		else
 		{
