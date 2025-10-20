@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Felipe Sanches
 /***************************************************************************
 
     acvirus.cpp - Access Virus series
@@ -65,7 +65,11 @@
 #include "emu.h"
 #include "cpu/mcs51/sab80c535.h"
 #include "machine/intelfsh.h"
+#include "video/hd44780.h"
+#include "emupal.h"
 #include "speaker.h"
+#include "screen.h"
+#include "virusb.lh"
 
 
 namespace {
@@ -76,15 +80,18 @@ public:
 	acvirus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_lcdc(*this, "lcdc"),
 		m_rombank(*this, "rombank")
 	{ }
 
 	void virus(machine_config &config);
+	void virusb(machine_config &config);
 
 	void init_virus();
 
 private:
 	required_device<sab80c535_device> m_maincpu;
+	required_device<hd44780_device> m_lcdc;
 	required_memory_bank m_rombank;
 
 	virtual void machine_start() override ATTR_COLD;
@@ -96,7 +103,10 @@ private:
 	void p5_w(u8 data);
 
 	u8 p402_r();
+
+	void palette_init(palette_device &palette);
 };
+
 
 void acvirus_state::machine_start()
 {
@@ -129,6 +139,11 @@ void acvirus_state::data_map(address_map &map)
 	map(0x0402, 0x0402).r (FUNC(acvirus_state::p402_r));
 }
 
+void acvirus_state::palette_init(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t(142, 241, 0));
+	palette.set_pen_color(1, rgb_t(0, 48, 0));
+}
 
 void acvirus_state::virus(machine_config &config)
 {
@@ -137,10 +152,38 @@ void acvirus_state::virus(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
+/*
+	This may be hooked either to memorymap or to some of the ports:
+	map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::data_r), FUNC(hd44780_device::data_w)).umask16(0x00ff);
+	map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w)).umask16(0x00ff);
+*/
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 8*2+1);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(acvirus_state::palette_init), 2);
+
+	/* Actual device is LM16255 */
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
+	m_lcdc->set_lcd_size(2, 16);
+
 	SPEAKER(config, "speaker", 2).front();
 }
 
+void acvirus_state::virusb(machine_config &config)
+{
+	virus(config);
+
+	config.set_default_layout(layout_virusb);
+}
+
 static INPUT_PORTS_START( virus )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( virusb )
 INPUT_PORTS_END
 
 ROM_START( virusa )
@@ -177,7 +220,7 @@ ROM_END
 
 
 CONS( 1997, virusa,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 1999, virusb,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1999, virusb,     0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 CONS( 2002, virusc,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 CONS( 2001, virusrck,   0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 CONS( 2002, virusrckxl, 0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
