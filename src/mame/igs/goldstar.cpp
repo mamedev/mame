@@ -478,6 +478,7 @@ public:
 	void init_cmtetrisd() ATTR_COLD;
 	void init_cmtetriskr() ATTR_COLD;
 	void init_cmv4() ATTR_COLD;
+	void init_cmv823() ATTR_COLD;
 	void init_crazybonb() ATTR_COLD;
 	void init_cutya() ATTR_COLD;
 	void init_eldoraddoa() ATTR_COLD;
@@ -16179,8 +16180,10 @@ ROM_END
 //  ED-96 V8.23 (encrypted)
 ROM_START( cmv823 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sub-pcb.bin",   0x0000, 0x10000, CRC(0dae1586) SHA1(0e217fdd54b5855ef8a8543d1af861f577f8e0d3) )
-
+	ROM_LOAD( "sub-pcb.bin", 0x4000, 0x4000, CRC(0dae1586) SHA1(0e217fdd54b5855ef8a8543d1af861f577f8e0d3) )
+	ROM_CONTINUE(            0x0000, 0x4000 )
+	ROM_CONTINUE(            0x8000, 0x8000 )
+ 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "m5.256",   0x00000, 0x8000, CRC(19cc1d67) SHA1(47487f9362bfb36a32100ed772960628844462bf) )
 	ROM_LOAD( "m6.256",   0x08000, 0x8000, CRC(63b3df4e) SHA1(9bacd23da598805ec18ec5ad15cab95d71eb9262) )
@@ -27799,6 +27802,40 @@ void cmaster_state::init_cmv4()
 	rom[0x020d] = 0x9b;
 }
 
+
+void cmaster_state::init_cmv823()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i += 0x100)
+	{
+		if ((i & 0xc000) != 0x8000)
+		{
+			std::swap_ranges(&rom[i + 0x30], &rom[i + 0x40], &rom[i + 0x10]);
+			std::swap_ranges(&rom[i + 0x20], &rom[i + 0x30], &rom[i + 0x30]);
+			std::swap_ranges(&rom[i + 0x20], &rom[i + 0x30], &rom[i + 0x00]);
+			std::swap_ranges(&rom[i + 0x60], &rom[i + 0x70], &rom[i + 0x50]);
+			std::swap_ranges(&rom[i + 0x80], &rom[i + 0x90], &rom[i + 0xb0]);
+			std::swap_ranges(&rom[i + 0xd0], &rom[i + 0xe0], &rom[i + 0xf0]);
+			std::swap_ranges(&rom[i + 0xc0], &rom[i + 0xd0], &rom[i + 0xd0]);
+			std::swap_ranges(&rom[i + 0xc0], &rom[i + 0xd0], &rom[i + 0xe0]);
+		}
+	}
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		if ((i & 0xc000) != 0x8000)
+		{
+			switch (i & 0x10)
+			{
+				case 0x00: BIT(rom[i], 3) ? rom[i] = bitswap<8>(rom[i] ^ 0x33, 5, 1, 2, 0, 3, 6, 7, 4) : rom[i] = bitswap<8>(rom[i] ^ 0xa6, 6, 4, 7, 2, 3, 5, 0, 1); break;
+				case 0x10: BIT(rom[i], 7) ? rom[i] = bitswap<8>(rom[i] ^ 0x2b, 7, 3, 6, 1, 2, 0, 4, 5) : rom[i] = bitswap<8>(rom[i] ^ 0x51, 7, 5, 0, 3, 4, 1, 6, 2); break;
+			}
+		}
+	}
+}
+
+
 void cmaster_state::init_hamhouse()
 {
 	init_cmv4();
@@ -29583,7 +29620,7 @@ GAME(  1994, chryanglb,  ncb3,     chryanglb, chryanglb, cmaster_state, init_chr
 
 // cherry master hardware has a rather different mem map, but is basically the same
 GAMEL( 198?, cmv801,     0,        cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",           0,                 layout_cmv4 )  // says ED-96 where the manufacturer is on some games...
-GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  empty_init,     ROT0, "Corsica",           "Cherry Master (ED-96 V8.23)",                 MACHINE_NOT_WORKING, layout_cmasterb )  // encrypted
+GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  init_cmv823,    ROT0, "Corsica",           "Cherry Master (ED-96 V8.23)",                 MACHINE_NOT_WORKING, layout_cmasterb )  // encrypted
 
 
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
