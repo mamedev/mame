@@ -13,20 +13,39 @@
 #include "emu.h"
 #include "printer.h"
 
+#include "bus/centronics/ctronics.h"
+#include "machine/output_latch.h"
+
+
+namespace {
 
 //**************************************************************************
-//  CONSTANTS/MACROS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-#define VERBOSE 0
+// ======================> bk_printer_device
 
+class bk_printer_device : public device_t, public device_bk_parallel_interface
+{
+public:
+	// construction/destruction
+	bk_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD { m_data = 0; };
 
-DEFINE_DEVICE_TYPE(BK_PRINTER, bk_printer_device, "bk_printer", "Printer Interface")
+	virtual uint16_t io_r() override;
+	virtual void io_w(uint16_t data, bool word) override;
 
+private:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
+
+	uint16_t m_data;
+};
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -71,3 +90,12 @@ void bk_printer_device::io_w(uint16_t data, bool word)
 	if (!BIT(data, 8)) m_cent_data_out->write(~data);
 	m_centronics->write_strobe(BIT(data, 8));
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(BK_PRINTER, device_qbus_card_interface, bk_printer_device, "bk_printer", "BK Printer Interface")

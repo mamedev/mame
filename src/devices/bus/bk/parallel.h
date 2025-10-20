@@ -115,4 +115,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BK_PARALLEL_SLOT, bk_parallel_slot_device)
 
-#endif // MAME_BUS_BK_PARALLEL_H
+#endif

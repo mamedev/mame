@@ -10,11 +10,29 @@
 #include "joystick.h"
 
 
+namespace {
+
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BK_JOYSTICK, bk_joystick_device, "bk_joystick", "BK Joystick Interface")
+// ======================> bk_joystick_device
+
+class bk_joystick_device : public device_t, public device_bk_parallel_interface
+{
+public:
+	// construction/destruction
+	bk_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD {};
+
+	virtual uint16_t io_r() override;
+
+private:
+	required_ioport m_joy;
+};
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -70,3 +88,12 @@ uint16_t bk_joystick_device::io_r()
 {
 	return m_joy->read();
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(BK_JOYSTICK, device_qbus_card_interface, bk_joystick_device, "bk_joystick", "BK Joystick Interface")

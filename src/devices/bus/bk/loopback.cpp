@@ -10,19 +10,30 @@
 #include "loopback.h"
 
 
-//**************************************************************************
-//  CONSTANTS/MACROS
-//**************************************************************************
-
-#define VERBOSE 0
-
+namespace {
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BK_LOOPBACK, bk_loopback_device, "bk_loopback", "Loopback")
+// ======================> bk_loopback_device
 
+class bk_loopback_device : public device_t, public device_bk_parallel_interface
+{
+public:
+	// construction/destruction
+	bk_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD { m_data = 0; };
+
+	virtual uint16_t io_r() override;
+	virtual void io_w(uint16_t data, bool word) override;
+
+private:
+	uint16_t m_data;
+};
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -57,3 +68,12 @@ void bk_loopback_device::io_w(uint16_t data, bool word)
 {
 	m_data = data;
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(BK_LOOPBACK, device_qbus_card_interface, bk_loopback_device, "bk_loopback", "BK Loopback")

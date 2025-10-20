@@ -10,20 +10,36 @@
 #include "emu.h"
 #include "covox.h"
 
+#include "sound/dac.h"
+#include "speaker.h"
+
+
+namespace {
 
 //**************************************************************************
-//  CONSTANTS/MACROS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-#define VERBOSE 0
+// ======================> bk_covox_device
 
+class bk_covox_device : public device_t, public device_bk_parallel_interface
+{
+public:
+	// construction/destruction
+	bk_covox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+protected:
+	virtual void device_start() override ATTR_COLD {};
 
-DEFINE_DEVICE_TYPE(BK_COVOX, bk_covox_device, "bk_covox", "Mono Covox Interface")
+	virtual uint16_t io_r() override;
+	virtual void io_w(uint16_t data, bool word) override;
 
+private:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	required_device<dac_byte_interface> m_dac;
+	required_device<bk_parallel_slot_device> m_up;
+};
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -54,11 +70,6 @@ void bk_covox_device::device_add_mconfig(machine_config &config)
 	BK_PARALLEL_SLOT(config, m_up, DERIVED_CLOCK(1, 1), bk_parallel_devices, nullptr);
 }
 
-void bk_covox_device::device_start()
-{
-	save_item(NAME(m_data));
-}
-
 uint16_t bk_covox_device::io_r()
 {
 	return m_up->read() ^ 0xffff;
@@ -66,7 +77,15 @@ uint16_t bk_covox_device::io_r()
 
 void bk_covox_device::io_w(uint16_t data, bool word)
 {
-	m_data = data;
 	m_dac->write(data);
 	m_up->write(0, data ^ 0xffff, word);
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(BK_COVOX, device_qbus_card_interface, bk_covox_device, "bk_covox", "BK Mono Covox Interface")
