@@ -427,7 +427,7 @@ public:
 	bool m_35sel, m_hdsel, m_intdrive;
 
 private:
-	int m_speaker_state, m_cassette_state, m_cassette_out;
+	int m_speaker_state, m_cassette_state;
 
 	double m_joystick_x1_time, m_joystick_y1_time, m_joystick_x2_time, m_joystick_y2_time;
 
@@ -894,7 +894,6 @@ void apple2e_state::machine_start()
 	m_speaker_state = 0;
 	m_speaker->level_w(m_speaker_state);
 	m_cassette_state = 0;
-	m_cassette_out = 0;
 	if (m_cassette)
 	{
 		m_cassette->output(-1.0f);
@@ -2388,14 +2387,6 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 
 		case 0x0f:  // ALTCHARSETON
 			m_video->altcharset_w(true);
-			break;
-
-		case 0x20:  // cassette output
-			if (m_cassette)
-			{
-				m_cassette_out ^= 1;
-				m_cassette->output(m_cassette_out ? 1.0f : -1.0f);
-			}
 			break;
 
 		case 0x5a:  // Zip accelerator unlock
