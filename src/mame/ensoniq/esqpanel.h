@@ -114,7 +114,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
 	virtual const std::string get_front_panel_html_file() const override { return "/esqpanel/vfx/FrontPanel.html"; }
@@ -132,11 +131,6 @@ private:
 	required_device<esq2x40_vfx_device> m_vfd;
 
 	output_finder<> m_lights;
-
-	required_ioport m_buttons_0;
-	required_ioport m_buttons_32;
-	required_ioport m_analog_data_entry;
-	required_ioport m_analog_volume;
 
 	TIMER_CALLBACK_MEMBER(update_blink);
 	void update_lights();

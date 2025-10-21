@@ -717,11 +717,7 @@ void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	esqpanel_device(mconfig, ESQPANEL2X40_VFX, tag, owner, clock),
 	m_vfd(*this, "vfd"),
-	m_lights(*this, "lights"),
-	m_buttons_0(*this, "buttons_0"),
-	m_buttons_32(*this, "buttons_32"),
-	m_analog_data_entry(*this, "analog_data_entry"),
-	m_analog_volume(*this, "analog_volume")
+	m_lights(*this, "lights")
 {
 	m_eps_mode = false;
 	// The VFX family have 16 lights on the panel.
@@ -781,40 +777,6 @@ void esqpanel2x40_vfx_device::device_reset()
 		m_blink_timer->adjust(initial_delay, 0, sample_time);
 		m_blink_timer->enable(true);
 	}
-}
-
-static INPUT_PORTS_START(esqpanel2x40_vfx_device)
-	PORT_START("buttons_0")
-	for (int i = 0; i < 32; i++)
-	{
-		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), i)
-	}
-
-	PORT_START("buttons_32")
-	for (int i = 0; i < 32; i++)
-	{
-		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), 32 + i)
-	}
-
-	PORT_START("analog_data_entry")
-	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
-	configurer.field_alloc(IPT_ADJUSTER, 0x200, 0x3ff, "Data Entry");
-	configurer.field_set_min_max(0, 0x3ff);
-	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 3)
-
-	PORT_START("analog_volume")
-	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
-	configurer.field_alloc(IPT_ADJUSTER, 0x3ff, 0x3ff, "Volume");
-	configurer.field_set_min_max(0, 0x3ff);
-	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 5)
-
-INPUT_PORTS_END
-
-ioport_constructor esqpanel2x40_vfx_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(esqpanel2x40_vfx_device);
 }
 
 // A button is pressed on the internal panel

@@ -995,6 +995,34 @@ void esq5505_state::ks32(machine_config &config)
 }
 
 static INPUT_PORTS_START( vfx )
+	PORT_START("buttons_0")
+	for (int i = 0; i < 32; i++)
+	{
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
+		PORT_CHANGED_MEMBER("panel", FUNC(esqpanel2x40_vfx_device::button_change), i)
+	}
+
+	PORT_START("buttons_32")
+	for (int i = 0; i < 32; i++)
+	{
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
+		PORT_CHANGED_MEMBER("panel", FUNC(esqpanel2x40_vfx_device::button_change), 32 + i)
+	}
+
+	PORT_START("analog_data_entry")
+	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
+	configurer.field_alloc(IPT_ADJUSTER, 0x200, 0x3ff, "Data Entry");
+	configurer.field_set_min_max(0, 0x3ff);
+	PORT_CHANGED_MEMBER("panel", FUNC(esqpanel2x40_vfx_device::analog_value_change), 3)
+
+	PORT_START("analog_volume")
+	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
+	configurer.field_alloc(IPT_ADJUSTER, 0x3ff, 0x3ff, "Volume");
+	configurer.field_set_min_max(0, 0x3ff);
+	PORT_CHANGED_MEMBER("panel", FUNC(esqpanel2x40_vfx_device::analog_value_change), 5)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( eps )
 #if KEYBOARD_HACK
 	PORT_START("KEY0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq5505_state::key_stroke), 0x80)
@@ -1294,10 +1322,10 @@ void esq5505_state::init_denib()
 } // Anonymous namespace
 
 
-CONS( 1988, eps,    0,   0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1988, eps,    0,   0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1989, vfxsd,  0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1990, eps16p, eps, 0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1990, eps16p, eps, 0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1990, sd1,    0,   0, sd1,   vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1990, sq1,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
 CONS( 1990, sqrack, sq1, 0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
