@@ -404,6 +404,14 @@ ROM_START( neopad )
 	ROM_LOAD( "tc58nvg0s3hta00.u2", 0x0000, 0x8800000, CRC(3b8f8c48) SHA1(1995d443c1ce8e44c9256c994e1f91eb5857b80c) )
 ROM_END
 
+ROM_START( spicanot )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x10800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "fs33nd02gs.nfrom201", 0x0000, 0x10800000, CRC(b7bff67c) SHA1(f2bc9c8937d62abfad3f91a1e4a3834d3687ea57) )
+ROM_END
+
 ROM_START( sumikpc )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
@@ -611,3 +619,6 @@ CONS( 201?, rotom2,             0,        0,      gpl32612, gpl32612, generalplu
 CONS( 201?, neopad,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Shogakukan no Zukan NEO Pad - Ikimono-hen (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // a blue version exists with the subtitle Norimono + Kuraberu-hen (乗りもの＋くらべる編).
 // another green version with 'DX' on the end of the title also exists
+
+// uses GPL32611
+CONS( 201?, spicanot,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Takara Tomy",          "Spica Note (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
