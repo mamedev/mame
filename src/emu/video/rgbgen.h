@@ -11,6 +11,8 @@
 #ifndef MAME_EMU_VIDEO_RGBGEN_H
 #define MAME_EMU_VIDEO_RGBGEN_H
 
+#include <algorithm>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -19,15 +21,15 @@
 class rgbaint_t
 {
 public:
-	rgbaint_t(): m_a(0), m_r(0), m_g(0), m_b(0) { }
+	rgbaint_t() = default;
 	explicit rgbaint_t(u32 rgba) { set(rgba); }
 	rgbaint_t(s32 a, s32 r, s32 g, s32 b) { set(a, r, g, b); }
-	explicit rgbaint_t(const rgb_t& rgba) { set(rgba); }
+	explicit rgbaint_t(const rgb_t &rgba) { set(rgba); }
 
-	rgbaint_t(const rgbaint_t& other) = default;
-	rgbaint_t &operator=(const rgbaint_t& other) = default;
+	rgbaint_t(const rgbaint_t &other) = default;
+	rgbaint_t &operator=(const rgbaint_t &other) = default;
 
-	void set(const rgbaint_t& other) { set(other.m_a, other.m_r, other.m_g, other.m_b); }
+	void set(const rgbaint_t &other) { *this = other; }
 	void set(u32 rgba) { set((rgba >> 24) & 0xff, (rgba >> 16) & 0xff, (rgba >> 8) & 0xff, rgba & 0xff); }
 	void set(s32 a, s32 r, s32 g, s32 b)
 	{
@@ -36,9 +38,9 @@ public:
 		m_g = g;
 		m_b = b;
 	}
-	void set(const rgb_t& rgba) { set(rgba.a(), rgba.r(), rgba.g(), rgba.b()); }
+	void set(const rgb_t &rgba) { set(rgba.a(), rgba.r(), rgba.g(), rgba.b()); }
 	// This function sets all elements to the same val
-	void set_all(const s32& val) { set(val, val, val, val); }
+	void set_all(s32 val) { set(val, val, val, val); }
 	// This function zeros all elements
 	void zero() { set_all(0); }
 	// This function zeros only the alpha element
@@ -48,18 +50,18 @@ public:
 
 	rgb_t to_rgba_clamp() const
 	{
-		const u8 a = (m_a < 0) ? 0 : (m_a > 255) ? 255 : m_a;
-		const u8 r = (m_r < 0) ? 0 : (m_r > 255) ? 255 : m_r;
-		const u8 g = (m_g < 0) ? 0 : (m_g > 255) ? 255 : m_g;
-		const u8 b = (m_b < 0) ? 0 : (m_b > 255) ? 255 : m_b;
+		const auto a = u8(u32(std::clamp<s32>(m_a, 0, 255)));
+		const auto r = u8(u32(std::clamp<s32>(m_r, 0, 255)));
+		const auto g = u8(u32(std::clamp<s32>(m_g, 0, 255)));
+		const auto b = u8(u32(std::clamp<s32>(m_b, 0, 255)));
 		return rgb_t(a, r, g, b);
 	}
 
-	void set_a16(const s32 value) { m_a = value; }
-	void set_a(const s32 value) { m_a = value; }
-	void set_r(const s32 value) { m_r = value; }
-	void set_g(const s32 value) { m_g = value; }
-	void set_b(const s32 value) { m_b = value; }
+	void set_a16(s32 value) { m_a = value; }
+	void set_a(s32 value) { m_a = value; }
+	void set_r(s32 value) { m_r = value; }
+	void set_g(s32 value) { m_g = value; }
+	void set_b(s32 value) { m_b = value; }
 
 	u8 get_a() const { return u8(u32(m_a)); }
 	u8 get_r() const { return u8(u32(m_r)); }
@@ -72,22 +74,22 @@ public:
 	s32 get_b32() const { return m_b; }
 
 	// These selects return an rgbaint_t with all fields set to the element choosen (a, r, g, or b)
-	rgbaint_t select_alpha32() const { return rgbaint_t(get_a32(), get_a32(), get_a32(), get_a32()); }
-	rgbaint_t select_red32() const { return rgbaint_t(get_r32(), get_r32(), get_r32(), get_r32()); }
-	rgbaint_t select_green32() const { return rgbaint_t(get_g32(), get_g32(), get_g32(), get_g32()); }
-	rgbaint_t select_blue32() const { return rgbaint_t(get_b32(), get_b32(), get_b32(), get_b32()); }
+	rgbaint_t select_alpha32() const { return rgbaint_t(m_a, m_a, m_a, m_a); }
+	rgbaint_t select_red32() const { return rgbaint_t(m_r, m_r, m_r, m_r); }
+	rgbaint_t select_green32() const { return rgbaint_t(m_g, m_g, m_g, m_g); }
+	rgbaint_t select_blue32() const { return rgbaint_t(m_b, m_b, m_b, m_b); }
 
-	inline void add(const rgbaint_t& color)
+	void add(const rgbaint_t &color)
 	{
 		add_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
 	}
 
-	inline void add_imm(const s32 imm)
+	void add_imm(s32 imm)
 	{
 		add_imm_rgba(imm, imm, imm, imm);
 	}
 
-	inline void add_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	void add_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 		m_a += a;
 		m_r += r;
@@ -95,17 +97,17 @@ public:
 		m_b += b;
 	}
 
-	inline void sub(const rgbaint_t& color)
+	void sub(const rgbaint_t &color)
 	{
 		sub_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
 	}
 
-	inline void sub_imm(const s32 imm)
+	void sub_imm(s32 imm)
 	{
 		sub_imm_rgba(imm, imm, imm, imm);
 	}
 
-	inline void sub_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	void sub_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 		m_a -= a;
 		m_r -= r;
@@ -113,17 +115,17 @@ public:
 		m_b -= b;
 	}
 
-	inline void subr(const rgbaint_t& color)
+	void subr(const rgbaint_t &color)
 	{
 		subr_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
 	}
 
-	inline void subr_imm(const s32 imm)
+	void subr_imm(s32 imm)
 	{
 		subr_imm_rgba(imm, imm, imm, imm);
 	}
 
-	inline void subr_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	void subr_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 		m_a = a - m_a;
 		m_r = r - m_r;
@@ -131,17 +133,17 @@ public:
 		m_b = b - m_b;
 	}
 
-	inline void mul(const rgbaint_t& color)
+	void mul(const rgbaint_t &color)
 	{
 		mul_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
 	}
 
-	inline void mul_imm(const s32 imm)
+	void mul_imm(s32 imm)
 	{
 		mul_imm_rgba(imm, imm, imm, imm);
 	}
 
-	inline void mul_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	void mul_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 		m_a *= a;
 		m_r *= r;
@@ -149,7 +151,7 @@ public:
 		m_b *= b;
 	}
 
-	inline void shl(const rgbaint_t& shift)
+	void shl(const rgbaint_t &shift)
 	{
 		m_a = (u32(shift.m_a) > 31) ? 0 : (m_a << shift.m_a);
 		m_r = (u32(shift.m_r) > 31) ? 0 : (m_r << shift.m_r);
@@ -157,23 +159,22 @@ public:
 		m_b = (u32(shift.m_b) > 31) ? 0 : (m_b << shift.m_b);
 	}
 
-	inline void shl_imm(const u8 shift)
+	void shl_imm(u8 shift)
 	{
-		if (shift == 0)
-			return;
 		if (shift > 31)
 		{
 			zero();
-			return;
 		}
-
-		m_a <<= shift;
-		m_r <<= shift;
-		m_g <<= shift;
-		m_b <<= shift;
+		else
+		{
+			m_a <<= shift;
+			m_r <<= shift;
+			m_g <<= shift;
+			m_b <<= shift;
+		}
 	}
 
-	inline void shr(const rgbaint_t& shift)
+	void shr(const rgbaint_t &shift)
 	{
 		m_a = (u32(shift.m_a) > 31) ? 0 : s32(u32(m_a) >> shift.m_a);
 		m_r = (u32(shift.m_r) > 31) ? 0 : s32(u32(m_r) >> shift.m_r);
@@ -181,23 +182,22 @@ public:
 		m_b = (u32(shift.m_b) > 31) ? 0 : s32(u32(m_b) >> shift.m_b);
 	}
 
-	inline void shr_imm(const u8 shift)
+	void shr_imm(u8 shift)
 	{
-		if (shift == 0)
-			return;
 		if (shift > 31)
 		{
 			zero();
-			return;
 		}
-
-		m_a = s32(u32(m_a) >> shift);
-		m_r = s32(u32(m_r) >> shift);
-		m_g = s32(u32(m_g) >> shift);
-		m_b = s32(u32(m_b) >> shift);
+		else
+		{
+			m_a = s32(u32(m_a) >> shift);
+			m_r = s32(u32(m_r) >> shift);
+			m_g = s32(u32(m_g) >> shift);
+			m_b = s32(u32(m_b) >> shift);
+		}
 	}
 
-	inline void sra(const rgbaint_t& shift)
+	void sra(const rgbaint_t &shift)
 	{
 		m_a >>= (u32(shift.m_a) > 31) ? 31 : shift.m_a;
 		m_r >>= (u32(shift.m_r) > 31) ? 31 : shift.m_r;
@@ -205,7 +205,7 @@ public:
 		m_b >>= (u32(shift.m_b) > 31) ? 31 : shift.m_b;
 	}
 
-	inline void sra_imm(const u8 shift)
+	void sra_imm(u8 shift)
 	{
 		const u8 s = std::min<u8>(shift, 31);
 		m_a >>= s;
@@ -214,17 +214,17 @@ public:
 		m_b >>= s;
 	}
 
-	void or_reg(const rgbaint_t& color) { or_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }
-	void and_reg(const rgbaint_t& color) { and_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }
-	void xor_reg(const rgbaint_t& color) { xor_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }
+	void or_reg(const rgbaint_t &color) { or_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }
+	void and_reg(const rgbaint_t &color) { and_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }
+	void xor_reg(const rgbaint_t &color) { xor_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }
 
-	void andnot_reg(const rgbaint_t& color) { and_imm_rgba(~color.m_a, ~color.m_r, ~color.m_g, ~color.m_b); }
+	void andnot_reg(const rgbaint_t &color) { and_imm_rgba(~color.m_a, ~color.m_r, ~color.m_g, ~color.m_b); }
 
 	void or_imm(s32 imm) { or_imm_rgba(imm, imm, imm, imm); }
 	void and_imm(s32 imm) { and_imm_rgba(imm, imm, imm, imm); }
 	void xor_imm(s32 imm) { xor_imm_rgba(imm, imm, imm, imm); }
 
-	inline void or_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	void or_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 		m_a |= a;
 		m_r |= r;
@@ -232,7 +232,7 @@ public:
 		m_b |= b;
 	}
 
-	inline void and_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	void and_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 		m_a &= a;
 		m_r &= r;
@@ -240,7 +240,7 @@ public:
 		m_b &= b;
 	}
 
-	inline void xor_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	void xor_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 		m_a ^= a;
 		m_r ^= r;
@@ -248,25 +248,23 @@ public:
 		m_b ^= b;
 	}
 
-	inline void clamp_and_clear(const u32 sign)
+	void clamp_and_clear(u32 sign)
 	{
-		if (m_a & sign) m_a = 0;
-		if (m_r & sign) m_r = 0;
-		if (m_g & sign) m_g = 0;
-		if (m_b & sign) m_b = 0;
-
-		clamp_to_uint8();
+		m_a = (m_a & sign) ? 0 : std::min<s32>(m_a, 255);
+		m_r = (m_r & sign) ? 0 : std::min<s32>(m_r, 255);
+		m_g = (m_g & sign) ? 0 : std::min<s32>(m_g, 255);
+		m_b = (m_b & sign) ? 0 : std::min<s32>(m_b, 255);
 	}
 
-	inline void clamp_to_uint8()
+	void clamp_to_uint8()
 	{
-		m_a = (m_a < 0) ? 0 : (m_a > 255) ? 255 : m_a;
-		m_r = (m_r < 0) ? 0 : (m_r > 255) ? 255 : m_r;
-		m_g = (m_g < 0) ? 0 : (m_g > 255) ? 255 : m_g;
-		m_b = (m_b < 0) ? 0 : (m_b > 255) ? 255 : m_b;
+		m_a = std::clamp<s32>(m_a, 0, 255);
+		m_r = std::clamp<s32>(m_r, 0, 255);
+		m_g = std::clamp<s32>(m_g, 0, 255);
+		m_b = std::clamp<s32>(m_b, 0, 255);
 	}
 
-	inline void sign_extend(const u32 compare, const u32 sign)
+	void sign_extend(u32 compare, u32 sign)
 	{
 		if ((m_a & compare) == compare)
 			m_a |= sign;
@@ -281,32 +279,68 @@ public:
 			m_b |= sign;
 	}
 
-	inline void min(const s32 value)
+	void min(s32 value)
 	{
-		m_a = (m_a > value) ? value : m_a;
-		m_r = (m_r > value) ? value : m_r;
-		m_g = (m_g > value) ? value : m_g;
-		m_b = (m_b > value) ? value : m_b;
+		m_a = std::min(m_a, value);
+		m_r = std::min(m_r, value);
+		m_g = std::min(m_g, value);
+		m_b = std::min(m_b, value);
 	}
 
-	inline void max(const s32 value)
+	void max(s32 value)
 	{
-		m_a = (m_a < value) ? value : m_a;
-		m_r = (m_r < value) ? value : m_r;
-		m_g = (m_g < value) ? value : m_g;
-		m_b = (m_b < value) ? value : m_b;
+		m_a = std::max(m_a, value);
+		m_r = std::max(m_r, value);
+		m_g = std::max(m_g, value);
+		m_b = std::max(m_b, value);
 	}
 
-	void blend(const rgbaint_t& other, u8 factor);
+	void blend(const rgbaint_t &other, u8 factor)
+	{
+		const s32 scale1 = s32(u32(factor));
+		const s32 scale2 = 256 - scale1;
 
-	void scale_and_clamp(const rgbaint_t& scale);
-	void scale_imm_and_clamp(const s32 scale);
-	void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2);
-	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other);
+		m_a = ((m_a * scale1) + (other.m_a * scale2)) >> 8;
+		m_r = ((m_r * scale1) + (other.m_r * scale2)) >> 8;
+		m_g = ((m_g * scale1) + (other.m_g * scale2)) >> 8;
+		m_b = ((m_b * scale1) + (other.m_b * scale2)) >> 8;
+	}
 
-	void cmpeq(const rgbaint_t& value) { cmpeq_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
-	void cmpgt(const rgbaint_t& value) { cmpgt_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
-	void cmplt(const rgbaint_t& value) { cmplt_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
+	void scale_and_clamp(const rgbaint_t &scale)
+	{
+		m_a = std::clamp<s32>((m_a * scale.m_a) >> 8, 0, 255);
+		m_r = std::clamp<s32>((m_r * scale.m_r) >> 8, 0, 255);
+		m_g = std::clamp<s32>((m_g * scale.m_g) >> 8, 0, 255);
+		m_b = std::clamp<s32>((m_b * scale.m_b) >> 8, 0, 255);
+	}
+
+	void scale_imm_and_clamp(s32 scale)
+	{
+		m_a = std::clamp<s32>((m_a * scale) >> 8, 0, 255);
+		m_r = std::clamp<s32>((m_r * scale) >> 8, 0, 255);
+		m_g = std::clamp<s32>((m_g * scale) >> 8, 0, 255);
+		m_b = std::clamp<s32>((m_b * scale) >> 8, 0, 255);
+	}
+
+	void scale_add_and_clamp(const rgbaint_t &scale, const rgbaint_t &other)
+	{
+		m_a = std::clamp<s32>(((m_a * scale.m_a) >> 8) + other.m_a, 0, 255);
+		m_r = std::clamp<s32>(((m_r * scale.m_r) >> 8) + other.m_r, 0, 255);
+		m_g = std::clamp<s32>(((m_g * scale.m_g) >> 8) + other.m_g, 0, 255);
+		m_b = std::clamp<s32>(((m_b * scale.m_b) >> 8) + other.m_b, 0, 255);
+	}
+
+	void scale2_add_and_clamp(const rgbaint_t &scale, const rgbaint_t &other, const rgbaint_t &scale2)
+	{
+		m_a = std::clamp<s32>(((m_a * scale.m_a) + (other.m_a * scale2.m_a)) >> 8, 0, 255);
+		m_r = std::clamp<s32>(((m_r * scale.m_r) + (other.m_r * scale2.m_r)) >> 8, 0, 255);
+		m_g = std::clamp<s32>(((m_g * scale.m_g) + (other.m_g * scale2.m_g)) >> 8, 0, 255);
+		m_b = std::clamp<s32>(((m_b * scale.m_b) + (other.m_b * scale2.m_b)) >> 8, 0, 255);
+	}
+
+	void cmpeq(const rgbaint_t &value) { cmpeq_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
+	void cmpgt(const rgbaint_t &value) { cmpgt_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
+	void cmplt(const rgbaint_t &value) { cmplt_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
 
 	void cmpeq_imm(s32 value) { cmpeq_imm_rgba(value, value, value, value); }
 	void cmpgt_imm(s32 value) { cmpgt_imm_rgba(value, value, value, value); }
@@ -336,47 +370,47 @@ public:
 		m_b = (m_b < b) ? 0xffffffff : 0;
 	}
 
-	void merge_alpha16(const rgbaint_t& alpha)
+	void merge_alpha16(const rgbaint_t &alpha)
 	{
 		m_a = alpha.m_a;
 	}
 
-	void merge_alpha(const rgbaint_t& alpha)
+	void merge_alpha(const rgbaint_t &alpha)
 	{
 		m_a = alpha.m_a;
 	}
 
-	rgbaint_t& operator+=(const rgbaint_t& other)
+	rgbaint_t &operator+=(const rgbaint_t &other)
 	{
 		add_imm_rgba(other.m_a, other.m_r, other.m_g, other.m_b);
 		return *this;
 	}
 
-	rgbaint_t& operator+=(const s32 other)
+	rgbaint_t &operator+=(s32 other)
 	{
 		add_imm_rgba(other, other, other, other);
 		return *this;
 	}
 
-	rgbaint_t &operator-=(const rgbaint_t& other)
+	rgbaint_t &operator-=(const rgbaint_t &other)
 	{
 		sub_imm_rgba(other.m_a, other.m_r, other.m_g, other.m_b);
 		return *this;
 	}
 
-	rgbaint_t& operator*=(const rgbaint_t& other)
+	rgbaint_t &operator*=(const rgbaint_t &other)
 	{
 		mul_imm_rgba(other.m_a, other.m_r, other.m_g, other.m_b);
 		return *this;
 	}
 
-	rgbaint_t& operator*=(const s32 other)
+	rgbaint_t &operator*=(s32 other)
 	{
 		mul_imm_rgba(other, other, other, other);
 		return *this;
 	}
 
-	rgbaint_t& operator>>=(const s32 shift)
+	rgbaint_t &operator>>=(u8 shift)
 	{
 		sra_imm(shift);
 		return *this;

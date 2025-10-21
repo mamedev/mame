@@ -392,10 +392,10 @@ void validate_rgb()
 	volatile s32 expected_a, expected_r, expected_g, expected_b;
 	volatile s32 actual_a, actual_r, actual_g, actual_b;
 	volatile s32 imm;
-	rgbaint_t rgb, other;
+	rgbaint_t rgb;
 	rgb_t packed;
 	auto check_expected =
-			[&] (const char *desc)
+			[&expected_a, &expected_r, &expected_g, &expected_b, &rgb] (const char *desc)
 			{
 				const volatile s32 a = rgb.get_a32();
 				const volatile s32 r = rgb.get_r32();
