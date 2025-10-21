@@ -92,6 +92,9 @@ void w83977tf_device::device_reset()
 	m_lpt_drq_line = 4; // disabled
 	m_lpt_mode = 0x3f;
 
+	m_fdc_address = 0x3f8;
+	m_gpio1_address = 0x100;
+
 	m_fdc_irq_line = 0;
 	m_fdc_drq_line = 4;
 
