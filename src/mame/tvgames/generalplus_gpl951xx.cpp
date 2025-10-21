@@ -266,6 +266,35 @@ ROM_START( dsgnpal )
 	ROM_LOAD16_WORD_SWAP( "gpr25l64.ic2", 0x0000, 0x800000, CRC(a1017ea8) SHA1(bd4b553ff71e763cd3fd726c49f5408eac3b7984) )
 ROM_END
 
+ROM_START( segapet1 )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "pink_gpr25l64.ic3", 0x0000, 0x800000, CRC(3bb709d1) SHA1(8a1b34d6cdd856685182d19b86c5cb68a006f816) )
+ROM_END
+
+ROM_START( segapet1a )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "yellow_gpr25l64.ic3", 0x0000, 0x800000, CRC(073218b8) SHA1(8501e69dc2b2cda9e4c289a14d6a16fe832e722c) )
+ROM_END
+
+ROM_START( segapet2 )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "purple_gpr25l64.ic3", 0x0000, 0x800000, CRC(e223eabf) SHA1(fa88173361af7f8cb7651bd7ccb73d7137eb6cf9) )
+ROM_END
+
+ROM_START( segapet2a )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "orange_gpr25l64.ic3", 0x0000, 0x800000, CRC(25605da6) SHA1(2733f30037551b2e5895efbb19ed953e81405141) )
+ROM_END
+
+ROM_START( segapet3 )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "pink_gpr25l64.ic3", 0x0000, 0x800000, CRC(4b60f556) SHA1(3487c7b42e1b818ac1fe3a9429320519574ca4ac) )
+ROM_END
+
+ROM_START( segapet3a )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "blue_gpr25l64.ic3", 0x0000, 0x800000, CRC(02a63c63) SHA1(54d8c1c52a30d7b2a21f69439d9ff2ef7b2a606b) )
+ROM_END
 
 void generalplus_gpspi_direct_game_state::init_fif()
 {
@@ -326,3 +355,14 @@ CONS( 201?, smkgurasa, smkguras, 0, generalplus_gpspi_direct, bfmpac, generalplu
 
 // there seem to be different versions of this available, is the software the same?
 CONS( 201?, dsgnpal, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// for these Sega Toys pets the clones might end up being duplicates with only different user data, however they might also have different factory default data for each colour
+CONS( 2019, segapet1,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (type 1, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2019, segapet1a, segapet1, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (type 1, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS( 2019, segapet2,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (type 2, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2019, segapet2a, segapet2, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (type 2, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// these ones have motors in the ears
+CONS( 2020, segapet3,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (type 3, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2020, segapet3a, segapet3, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (type 3, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
