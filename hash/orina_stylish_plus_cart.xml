@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="orina_stylish_plus_cart" description="Takara Tomy Orina Stylish+ Cartridges">
+
+	<!-- "Demon Slayer" and "Sanrio Characters" cartridges also exist -->
+	
+	<software name="sumikko" supported="no">
+		<description>Sumikko Gurashi</description>
+		<year>2021</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="orina_stylish_plus_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gpr25l08.bin" size="0x100000" crc="0d08c929" sha1="373777d2b72a135d601a7bee5a61dc8326780b02"/> <!-- OKI M5268 -->
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

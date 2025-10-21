@@ -43857,6 +43857,9 @@ c8002
 @source:skeleton/optomaxv.cpp
 optomaxv
 
+@source:skeleton/orinasp.cpp
+orinasp
+
 @source:skeleton/p8k.cpp
 p8000
 p8000_16
