@@ -322,6 +322,16 @@ ROM_START( bandplap )
 	ROM_LOAD( "gpr25l64.u3", 0x0000, 0x800000, CRC(f85c388d) SHA1(59e30b51e2d6598881eb64edc027e0e27756631f) )
 ROM_END
 
+ROM_START( bananlap )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u3", 0x0000, 0x800000, CRC(46441cd5) SHA1(da1891a21e23c60492719c2b953e453885fc1bde) )
+ROM_END
+
+ROM_START( bandolap )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u3", 0x0000, 0x800000, CRC(d9b1cb41) SHA1(03d550138973519522746298bce2865d85a5c4f2) )
+ROM_END
+
 ROM_START( chiikpc )
 	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l12833f.u6", 0x0000, 0x1000000, CRC(bde74209) SHA1(8a91554ae653f4ed54fd354049c32b545e4d359d) )
@@ -518,12 +528,11 @@ CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_g
 // unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
 CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-// unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
+// (these all use the same PCB) - unknown SoC (uses a glob) has GPspispi header, ARM based, SPI ROM
 CONS( 2014, bandplap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney Princess 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
-// unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
 CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
+CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // company is called 深圳市飞讯互动科技有限公司
 // surface details erased on SoC for both of these
