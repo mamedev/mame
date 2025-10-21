@@ -328,7 +328,7 @@ Loading error, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
-	<software name="plrstar2" supported="partial">
+	<software name="plrstar2" supported="no">
 		<description>Polar Star II</description>
 		<year>1983</year>
 		<publisher>Hyo-Kin Soft</publisher>
