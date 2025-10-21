@@ -1277,22 +1277,29 @@ void validate_rgb()
 
 	// test bilinear_filter and bilinear_filter_rgbaint
 	// SSE implementation carries more internal precision between the bilinear stages
+	auto const filter_expected =
+			[] (u8 x00, u8 x01, u8 x10, u8 x11, u8 u, u8 v)
+			{
 #if defined(MAME_RGB_HIGH_PRECISION)
-	const int first_shift = 1;
+				const unsigned shift_inner = 0;
+				const unsigned shift_outer = 1;
 #else
-	const int first_shift = 8;
+				const unsigned shift_inner = 1;
+				const unsigned shift_outer = 0;
 #endif
+				const unsigned upper = (((x00 * (256U - u)) >> shift_inner) + ((x01 * u) >> shift_inner)) >> shift_outer;
+				const unsigned lower = (((x10 * (256U - u)) >> shift_inner) + ((x11 * u) >> shift_inner)) >> shift_outer;
+				return u8(((upper * (256U - v)) + (lower * v)) >> (16 - shift_inner - shift_outer));
+			};
 	for (int index = 0; index < 1000; index++)
 	{
-		u8 u, v;
 		rgbaint_t rgb_point[4];
-		u32 top_row, bottom_row;
-
 		for (int i = 0; i < 4; i++)
 		{
 			rgb_point[i].set(random_u32());
 		}
 
+		u8 u, v;
 		switch (index)
 		{
 			case 0: u = 0; v = 0; break;
@@ -1307,21 +1314,10 @@ void validate_rgb()
 				break;
 		}
 
-		top_row = (rgb_point[0].get_a() * (256 - u) + rgb_point[1].get_a() * u) >> first_shift;
-		bottom_row = (rgb_point[2].get_a() * (256 - u) + rgb_point[3].get_a() * u) >> first_shift;
-		expected_a = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
-
-		top_row = (rgb_point[0].get_r() * (256 - u) + rgb_point[1].get_r() * u) >> first_shift;
-		bottom_row = (rgb_point[2].get_r() * (256 - u) + rgb_point[3].get_r() * u) >> first_shift;
-		expected_r = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
-
-		top_row = (rgb_point[0].get_g() * (256 - u) + rgb_point[1].get_g() * u) >> first_shift;
-		bottom_row = (rgb_point[2].get_g() * (256 - u) + rgb_point[3].get_g() * u) >> first_shift;
-		expected_g = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
-
-		top_row = (rgb_point[0].get_b() * (256 - u) + rgb_point[1].get_b() * u) >> first_shift;
-		bottom_row = (rgb_point[2].get_b() * (256 - u) + rgb_point[3].get_b() * u) >> first_shift;
-		expected_b = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
+		expected_a = filter_expected(rgb_point[0].get_a(), rgb_point[1].get_a(), rgb_point[2].get_a(), rgb_point[3].get_a(), u, v);
+		expected_r = filter_expected(rgb_point[0].get_r(), rgb_point[1].get_r(), rgb_point[2].get_r(), rgb_point[3].get_r(), u, v);
+		expected_g = filter_expected(rgb_point[0].get_g(), rgb_point[1].get_g(), rgb_point[2].get_g(), rgb_point[3].get_g(), u, v);
+		expected_b = filter_expected(rgb_point[0].get_b(), rgb_point[1].get_b(), rgb_point[2].get_b(), rgb_point[3].get_b(), u, v);
 
 		imm = rgbaint_t::bilinear_filter(rgb_point[0].to_rgba(), rgb_point[1].to_rgba(), rgb_point[2].to_rgba(), rgb_point[3].to_rgba(), u, v);
 		rgb.set(imm);
