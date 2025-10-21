@@ -441,7 +441,7 @@ private:
 
 	bool m_an0, m_an1, m_an2, m_an3;
 
-	bool m_vbl, m_vblmask;
+	bool m_vblmask;
 
 	bool m_xy, m_x0edge, m_y0edge;
 	bool m_x0, m_x1, m_y0, m_y1;
@@ -1090,7 +1090,6 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_ramrd));
 	save_item(NAME(m_ramwrt));
 	save_item(NAME(m_ioudis));
-	save_item(NAME(m_vbl));
 	save_item(NAME(m_vblmask));
 	save_item(NAME(m_romswitch));
 	save_item(NAME(m_irqmask));
@@ -1182,7 +1181,7 @@ void apple2e_state::machine_reset()
 	m_lcwriteenable = true;
 
 	m_video->monohgr_w(m_iscecm);
-	m_vbl = m_vblmask = false;
+	m_vblmask = false;
 	m_irqmask = 0;
 	m_strobe = 0;
 	m_franklin_last_fkeys = 0;
@@ -1316,10 +1315,7 @@ void apple2e_state::raise_irq(int irq)
 {
 	m_irqmask |= (1 << irq);
 
-	if (m_irqmask)
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 void apple2e_state::lower_irq(int irq)
@@ -1357,8 +1353,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 
 	if (scanline == 192)
 	{
-		m_vbl = true;
-
 		if (m_vblmask)
 		{
 			raise_irq(IRQ_VBL);
@@ -1947,7 +1941,6 @@ void apple2e_state::do_io(int offset)
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			if ((m_isiic) || (m_isace500))
 			{
-				m_vbl = false;
 				lower_irq(IRQ_VBL);
 			}
 
@@ -2152,8 +2145,8 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 			lower_irq(IRQ_MOUSEXY);
 			return (m_yirq ? 0x80 : 0x00) | m_transchar;
 
-		case 0x19:  // read VBL
-			return (m_vbl ? 0x80 : 0x00) | m_transchar;
+		case 0x19:  // read VBLINT (does not reset, see Apple IIc Technical Note #9)
+			return ((m_irqmask & (1 << IRQ_VBL)) ? 0x80 : 0x00) | m_transchar;
 
 		case 0x40:  // read XYMask (IIc only)
 			return m_xy ? 0x80 : 0x00;
@@ -2645,7 +2638,7 @@ u8 apple2e_state::laser_mouse_r(offs_t offset)
 			return (m_yirq ? 0x80 : 0) | uFloatingBus7;
 
 		case 0xe: // VBL interrupt status
-			return ((m_irqmask & IRQ_VBL) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_irqmask & (1 << IRQ_VBL)) ? 0x80 : 0x00) | uFloatingBus7;
 	}
 
 	return 0xff;
