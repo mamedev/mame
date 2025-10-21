@@ -94,7 +94,7 @@ void terak_state::terak(machine_config &config)
 	m_qbus->bus_error_callback().set([this] (int state) { m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero); });
 	m_qbus->bevnt().set_inputline(m_maincpu, t11_device::CP2_LINE);
 	m_qbus->birq4().set_inputline(m_maincpu, t11_device::VEC_LINE);
-	QBUS_SLOT(config, "qbus" ":1", qbus_cards, "terak_qx");
+	QBUS_SLOT(config, "qbus" ":1", qbus_cards, nullptr);
 	QBUS_SLOT(config, "qbus" ":2", qbus_cards, "terak_v");
 	QBUS_SLOT(config, "qbus" ":3", qbus_cards, nullptr);
 	QBUS_SLOT(config, "qbus" ":4", qbus_cards, nullptr);
