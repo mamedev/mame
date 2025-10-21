@@ -19488,6 +19488,9 @@ taturtf
 @source:handheld/generalplus_gpel31xx.cpp
 tamameet
 
+@source:handheld/gw35th.cpp
+gwsmb35
+
 @source:handheld/hh_cop400.cpp
 bshipg
 comparca
