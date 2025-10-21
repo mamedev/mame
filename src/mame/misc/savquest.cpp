@@ -108,7 +108,7 @@ protected:
 private:
 	required_device<voodoo_2_pci_device> m_voodoo2;
 
-	int m_haspind = 0;
+	//int m_haspind = 0;
 	int m_haspstate = 0;
 	enum hasp_states
 	{
@@ -117,14 +117,14 @@ private:
 		HASPSTATE_PASSEND,
 		HASPSTATE_READ
 	};
-	int m_hasp_passind = 0;
-	uint8_t m_hasp_tmppass[0x29]{};
-	uint8_t m_port379 = 0;
-	int m_hasp_passmode = 0;
-	int m_hasp_prodind = 0;
+	//int m_hasp_passind = 0;
+	//uint8_t m_hasp_tmppass[0x29]{};
+	//uint8_t m_port379 = 0;
+	//int m_hasp_passmode = 0;
+	//int m_hasp_prodind = 0;
 
-//	uint8_t parallel_port_r(offs_t offset);
-//	void parallel_port_w(offs_t offset, uint8_t data);
+	//uint8_t parallel_port_r(offs_t offset);
+	//void parallel_port_w(offs_t offset, uint8_t data);
 
 	void savquest_io(address_map &map) ATTR_COLD;
 	void savquest_map(address_map &map) ATTR_COLD;
