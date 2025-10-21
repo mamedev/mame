@@ -2149,16 +2149,16 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 			return ((m_irqmask & (1 << IRQ_VBL)) ? 0x80 : 0x00) | m_transchar;
 
 		case 0x40:  // read XYMask (IIc only)
-			return m_xy ? 0x80 : 0x00;
+			return (m_xy ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x41:  // read VBL mask (IIc only)
-			return m_vblmask ? 0x80 : 0x00;
+			return (m_vblmask ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x42:  // read X0Edge (IIc only)
-			return m_x0edge ? 0x80 : 0x00;
+			return (m_x0edge ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x43:  // read Y0Edge (IIc only)
-			return m_y0edge ? 0x80 : 0x00;
+			return (m_y0edge ? 0x80 : 0x00) | uFloatingBus7;
 
 		case 0x60: // 40/80 column switch (IIc and Franklin ACE 500 only)
 			return ((m_sysconfig.read_safe(0) & 0x40) ? 0x80 : 0) | uFloatingBus7;
