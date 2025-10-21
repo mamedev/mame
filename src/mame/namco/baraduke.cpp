@@ -96,6 +96,7 @@ TODO:
   but they don't seem to work as expected. During the first few frames they are
   written out of order and hooking them up in the usual way causes the MCU to
   stop receiving interrupts.
+- Merge sprite draw function into namco/namcos1_sprite.cpp
 
 
 DIP locations verified for:
