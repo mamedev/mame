@@ -136,6 +136,7 @@ public:
 	void vt36x_altswap_16mb(machine_config& config);
 	void vt36x_altswap_32mb_4banks_red5mam(machine_config& config);
 
+	void vt36x_vibesswap_8mb(machine_config& config);
 	void vt36x_vibesswap_16mb(machine_config& config);
 	void vt36x_gbox2020_16mb(machine_config& config);
 	void vt36x_s10swap_8mb(machine_config& config);
@@ -465,6 +466,12 @@ void vt36x_state::vt36x_vibesswap_16mb(machine_config &config)
 	//m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+}
+
+void vt36x_state::vt36x_vibesswap_8mb(machine_config &config)
+{
+	vt36x_vibesswap_16mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
 }
 
 void vt36x_state::vt36x_gbox2020_16mb(machine_config &config)
@@ -1104,6 +1111,11 @@ ROM_START( d9_500 )
 	ROM_LOAD( "w25q128jv.u3", 0x00000, 0x1000000, CRC(66b137ce) SHA1(699ffaaf086bdb2001b0c4323b1e098f2dd3f885) )
 ROM_END
 
+ROM_START( zl383 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "s29gl064n90tfi04.u2", 0x00000, 0x800000, CRC(58e0011e) SHA1(38a3ed236f055b1a73cbb9582fc5ea151a296ba9) )
+ROM_END
+
 ROM_START( dgun2572 )
 	ROM_REGION( 0x2000000, "mainrom", 0 ) // extra pins on subboard not marked
 	ROM_LOAD( "dreamgearwgun.bin", 0x00000, 0x2000000, CRC(92b55c75) SHA1(c7b2319e304a4bf480b5dcd4f24af2e6ba834d0d) )
@@ -1288,6 +1300,8 @@ CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, em
 
 // boots and runs, but not all games have been tested
 CONS( 202?, t3_630,   0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "630 Games in 1 Handheld (T3)", MACHINE_NOT_WORKING )
+
+CONS( 202?, zl383,    0,        0,  vt36x_vibesswap_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has extra protection?
 CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
