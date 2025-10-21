@@ -1280,13 +1280,9 @@ void validate_rgb()
 	auto const filter_expected =
 			[] (u8 x00, u8 x01, u8 x10, u8 x11, u8 u, u8 v)
 			{
-#if defined(MAME_RGB_HIGH_PRECISION)
-				const unsigned shift_inner = 0;
-				const unsigned shift_outer = 1;
-#else
-				const unsigned shift_inner = 1;
-				const unsigned shift_outer = 0;
-#endif
+				const unsigned shift_inner = rgbaint_t::FILTER_SHIFT_INNER;
+				const unsigned shift_outer = rgbaint_t::FILTER_SHIFT_OUTER;
+
 				const unsigned upper = (((x00 * (256U - u)) >> shift_inner) + ((x01 * u) >> shift_inner)) >> shift_outer;
 				const unsigned lower = (((x10 * (256U - u)) >> shift_inner) + ((x11 * u) >> shift_inner)) >> shift_outer;
 				return u8(((upper * (256U - v)) + (lower * v)) >> (16 - shift_inner - shift_outer));
