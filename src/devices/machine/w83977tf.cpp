@@ -6,9 +6,6 @@ Winbond W83977TF
 
 TODO:
 - PoC for a generic (LPC) Super I/O type, consider abstracting common points with fdc37c93x;
-- savquest (in pciagp) fails keyboard self test
-  \- bp e140c,1,{eax&=~1;g} bit 0 stuck high from port $64, "receives" while essentially reading
-     status only three times (and port $61 is claimed by PIIX4 for PCI SERR# read only)
 - DRQ (savquest enables DRQ3 for LPT)
 - Hookup LPT modes;
 - subclass for megadrive magistr16 system (uses w83977f/w83977af)
