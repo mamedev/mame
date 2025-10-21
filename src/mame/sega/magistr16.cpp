@@ -12,8 +12,9 @@ Notes:
 - error #100A: generic Magistr16 HW error, missing "BIOS" header at $400000
   (what would return when run on stock MD)
 - error #1004: flash type error PC=fc07da
-- error #1008: GPIO/EEPROM error? Pings a Super I/O device at $100
-- error #100C: checksum error;
+- error #1008: GPIO1 Super I/O device at $100 AT90S1200
+- error #1009: <seen in the same path as #1008>
+- error #100C: checksum error (on main cart);
 
 TODO:
 - accomodate YM7101 to use PAL semantics and V30 modes
@@ -327,24 +328,33 @@ void magistr16_state::machine_reset()
  */
 
 // AT90S1200 comms, also from $300000 in cart space for "music"
+/*
+ * ---- --x- Atmel PB6/MISO
+ */
 u8 magistr16_state::gpio1_r()
 {
 	return 0;
 }
 
+/*
+ * x--- ---- Atmel PB5/MOSI
+ * -x-- ---- Atmel PB7/SCK
+ * --xx ---- <used on $300000 checks> PB0~1/AIN0~1?
+ */
 void magistr16_state::gpio1_w(u8 data)
 {
-
+	if (data & 0x3f)
+		logerror("gpio1_w: unknown bit set %02x\n",data);
 }
 
 static void isa_internal_devices(device_slot_interface &device)
 {
+	// TODO: Winbond w83977f
 	device.option_add("w83977tf", W83977TF);
 }
 
 void magistr16_state::winbond_superio_config(device_t *device)
 {
-	// TODO: Winbond w83977f
 	auto *state = device->subdevice<magistr16_state>(":");
 
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);

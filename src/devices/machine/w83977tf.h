@@ -78,6 +78,9 @@ private:
 	u8 m_lockreg;
 	u8 m_lock_sequence;
 
+	u8 m_fdc_irq_line;
+	u8 m_fdc_drq_line;
+	u8 m_fdd_mode;
 	u8 m_keyb_irq_line;
 	u8 m_mouse_irq_line;
 	u8 m_rtc_irq_line;
@@ -99,6 +102,9 @@ private:
 	void logical_device_select_w(offs_t offset, u8 data);
 	template <unsigned N> u8 activate_r(offs_t offset);
 	template <unsigned N> void activate_w(offs_t offset, u8 data);
+
+	void irq_floppy_w(int state);
+	void drq_floppy_w(int state);
 
 	u8 keyb_irq_r(offs_t offset);
 	void keyb_irq_w(offs_t offset, u8 data);
@@ -127,6 +133,7 @@ private:
 	void irq_parallel_w(int state);
 
 	void request_irq(int irq, int state);
+	void request_dma(int dreq, int state);
 };
 
 DECLARE_DEVICE_TYPE(W83977TF, w83977tf_device);
