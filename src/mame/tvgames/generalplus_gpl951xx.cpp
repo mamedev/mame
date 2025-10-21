@@ -246,6 +246,11 @@ ROM_START( pokgoget )
 	ROM_LOAD16_WORD_SWAP( "mx25l25645g.u1", 0x0000, 0x2000000, CRC(a76ae22f) SHA1(3fa5eeedb3fe343a7707d76710298377b22b0681) )
 ROM_END
 
+ROM_START( pokebala )
+	ROM_REGION16_BE(0x2000000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l25645g.u4", 0x0000, 0x2000000, CRC(e35d434a) SHA1(74061831b25476ec8aa7dec5f9d64ff79b0db88e) )
+ROM_END
+
 ROM_START( smkcatch )
 	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "gpr25l64.u2", 0x0000, 0x800000,  CRC(e2f52c4a) SHA1(f79862d27152cff8f96151c672d9762a3897a593) )
@@ -296,6 +301,11 @@ ROM_START( segapet3a )
 	ROM_LOAD16_WORD_SWAP( "blue_gpr25l64.ic3", 0x0000, 0x800000, CRC(02a63c63) SHA1(54d8c1c52a30d7b2a21f69439d9ff2ef7b2a606b) )
 ROM_END
 
+ROM_START( bubltea )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gpr25l64.ic2", 0x0000, 0x800000, CRC(a6d73241) SHA1(bc67d932ffc83d91dc2d64f40bbce08c1e8b9f4e) )
+ROM_END
+
 void generalplus_gpspi_direct_game_state::init_fif()
 {
 	uint16_t* spirom16 = (uint16_t*)memregion("maincpu:spidirect")->base();
@@ -343,6 +353,7 @@ CONS(2021, punifrnd, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplu
 // Pocket Monsters ガチッとゲットだぜ! モンスターボールゴー! - Pocket Monsters is printed on the inner shell, but not the box?
 CONS(2021, pokgoget, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball Go! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
+CONS(2021, pokebala, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Pokemon Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // 2020 (device) / 2021 (box) version of Sumikko Gurashi a cloud shaped device
 // Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
@@ -366,3 +377,5 @@ CONS( 2019, segapet2a, segapet2, 0, generalplus_gpspi_direct, bfspyhnt, generalp
 // these ones have motors in the ears
 CONS( 2020, segapet3,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (type 3, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS( 2020, segapet3a, segapet3, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (type 3, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS( 201?, bubltea,   0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Bandai", "Bubble Tea Pet", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
