@@ -513,6 +513,7 @@ CONS( 201?, dphh8633,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl3
 CONS( 2016, dphh8661,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8661", MACHINE_NOT_WORKING ) // from PCP? (logo on back of console) 2016 date on PCB
 
 // also has the 0xE4 XOR, also doesn't currently boot, could be yet another internal ROM
-CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
+// there are also OK-560 and OK-568 models which may have different ROM or be on different hardware
+CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet (OK-550)", MACHINE_NOT_WORKING )
 
 CONS( 2020, qpet,          0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "M&D", "Q Pet (2nd version)", MACHINE_NOT_WORKING )
