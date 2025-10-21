@@ -350,15 +350,6 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-void coleco_state::coleco_vdp_interrupt(int state)
-{
-	// NMI on rising edge
-	if (state && !m_last_nmi_state)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-
-	m_last_nmi_state = state;
-}
-
 TIMER_CALLBACK_MEMBER(coleco_state::paddle_d7reset_callback)
 {
 	m_joy_d7_state[param] = 0;
@@ -530,7 +521,6 @@ void coleco_state::machine_start()
 	}
 
 	save_item(NAME(m_joy_mode));
-	save_item(NAME(m_last_nmi_state));
 	save_item(NAME(m_joy_irq_state));
 	save_item(NAME(m_joy_d7_state));
 	save_item(NAME(m_joy_analog_state));
@@ -546,7 +536,6 @@ void bit90_state::machine_start()
 
 void coleco_state::machine_reset()
 {
-	m_last_nmi_state = 0;
 }
 
 void bit90_state::machine_reset()
@@ -583,7 +572,7 @@ void coleco_state::coleco(machine_config &config)
 	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
@@ -617,7 +606,7 @@ void coleco_state::colecop(machine_config &config)
 	tms9929a_device &vdp(TMS9929A(config.replace(), "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
 void bit90_state::bit90(machine_config &config)
@@ -632,7 +621,7 @@ void bit90_state::bit90(machine_config &config)
 	tms9929a_device &vdp(TMS9929A(config, "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
@@ -672,7 +661,7 @@ void coleco_state::dina(machine_config &config)
 	tms9929a_device &vdp(TMS9929A(config.replace(), "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
 
