@@ -3904,6 +3904,60 @@ if (BUSES["MEGADRIVE"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/megadrive/cart/slot.h,BUSES["MEGADRIVE_CART"] = true
+---------------------------------------------------
+
+if (BUSES["MEGADRIVE_CART"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/megadrive/cart/action_replay.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/action_replay.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/avartisan.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/avartisan.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/eeprom.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/eeprom.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/everdrive.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/everdrive.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/gamtec.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/gamtec.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/jcart.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/jcart.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/options.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/options.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/mcpirate.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/mcpirate.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/miky.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/miky.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/multigame.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/multigame.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/rockworld.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/rockworld.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/rom.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/rom.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/seganet.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/seganet.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/sfteam.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/sfteam.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/smb.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/smb.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/smw64.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/smw64.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/slot.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/slot.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/sram.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/sram.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/ssf.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/ssf.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/t5740.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/t5740.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/tekkensp.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/tekkensp.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/xboy.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/xboy.h",
+	}
+end
+
 
 ---------------------------------------------------
 --
@@ -5486,6 +5540,8 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/mif201.h",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
+		MAME_DIR .. "src/devices/bus/cbus/options.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/options.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.cpp",
@@ -5498,6 +5554,10 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
 		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.h",
+		MAME_DIR .. "src/devices/bus/cbus/sound.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/sound.h",
+		MAME_DIR .. "src/devices/bus/cbus/wavestar.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/wavestar.h",
 	}
 end
 
@@ -5924,6 +5984,8 @@ if (BUSES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/bus/pci/opti82c861.h",
 		MAME_DIR .. "src/devices/bus/pci/pdc20262.cpp",
 		MAME_DIR .. "src/devices/bus/pci/pdc20262.h",
+		MAME_DIR .. "src/devices/bus/pci/permedia2.cpp",
+		MAME_DIR .. "src/devices/bus/pci/permedia2.h",
 		MAME_DIR .. "src/devices/bus/pci/promotion.cpp",
 		MAME_DIR .. "src/devices/bus/pci/promotion.h",
 		MAME_DIR .. "src/devices/bus/pci/riva128.cpp",

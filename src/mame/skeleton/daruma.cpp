@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 //TODO: #include "ds348.lh"

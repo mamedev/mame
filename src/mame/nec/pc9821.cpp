@@ -6,48 +6,66 @@ NEC PC-9821
 
 follow-up to PC-9801 for the consumer market
 
-TODO (PC-9821):
+References:
+- https://www.satotomi.com/sl9821/sl9821_tec5.html for PEGC MMIO
+- Mate-R_bible.pdf for late machine HW pics and info
+- https://retrostuff.org/2017/04/11/nec-pc-9821-bios-translation/
+- http://ookumaneko.s1005.xrea.com/pcibios.htm (Ra266 PCI Config Space at the end)
+
+TODO (pc9821):
 - non-fatal "cache error" at POST for all machines listed here;
 - undumped IDE ROM, kludged to work;
 - further state machine breakdowns;
 
-TODO (PC-9821Ap2):
-- Lack of key repeat makes it unable to enter SETUP mode normally.
-  bp 0xf8a32,1,{esi|=40;g} to simulate holding HELP key at power-on/reset;
+TODO (pc9821ap2):
+- To enter SETUP mode, unmap F3 or move MAME soft reset out of F3 then hold HELP key.
+\- alternative: bp 0xf8a32,1,{esi|=40;g} to simulate holding HELP key at power-on/reset;
+- Unimplemented 15MB memory hole mark for Windows NT
+\- cfr. io_wab.txt, interfaces with VGA core thru local bus via address-data ports at $fa2-3
 
-TODO (PC-9821As):
+TODO (pc9821as):
 - unimplemented SDIP specific access;
 - "SYSTEM SHUTDOWN" while accessing above;
-- Update: it never goes into above after I changed default m_dma_access_ctrl to 0xfe?
+- Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
 
-TODO (PC-9821Cx3):
-- "MICON ERROR" at POST, we currently return a ready state in remote control register
-  to bypass it, is it expected behaviour?
+TODO (pc9821ce):
+- Needs SCSI to boot stuff, or 2.5" option IDE for 98NOTE;
+- Can't boot any floppy;
+
+TODO (pc9821cx3):
+- Incomplete bank mapping, keeps looping over the same routine when hopping to PnP BIOS after
+  soft reset thru 0x0000:04fa program flow;
 - Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os
   $b00-$b03, kanji RAM $a9 and $f0 (mostly bit 5, built-in 27 inches HDD check?) then keeps
   looping;
 - 0xfa2c8 contains ITF test routines, to access it's supposedly CTRL+CAPS+KANA,
   which currently doesn't work. It also never returns a valid processor or CPU clock,
   is it a debug side-effect or supposed to be read somehow?
-- Expects 0xc0000-0xdffff to be r/w at PC=0x104e8, currently failing for inner C-Bus mappings.
-  Is PCI supposed to overlay the C-Bus section?
-- Eventually jump off the weeds by taking an invalid irq in timer test;
-- Reportedly should display a CanBe logo at POST (always blue with white fg?),
-  at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
-  Where this is mapped is currently unknown;
+- Entering into setup mode (fd26a ax|=80), de-quiet splash screen (first menu, 3rd option)
+  then exit will have following mutually exclusive effects:
+\- MAME hardlocks (?)
+\- fatal TIMER ERROR (often)
+\- non-fatal SIMM and 2nd cache errors (allows boot for a bit, will crash in
+   msdos62 with an error code 21)
 
-TODO (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333):
+TODO (pc9821xa16/pc9821xv13):
+- PARITY ERROR 00000000
+
+TODO (pc9821ra20/pc9821ra266/pc9821ra333):
 - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
   involved bankswitch with Pentium based machines);
 
-TODO: (PC-9821Nr15/PC-9821Nr166)
+TODO: (pc9821nr15/pc9821nr166/pc9821nw150)
+- Keeps looping on SET THE SOFTWARE DIP (wants extended UPD4993A mode?)
 - Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
-- Skipping that will eventually die with a "MEMORY ERROR" (never reads extended memory);
+- Skipping that will eventually error out with a "MEMORY ERROR" (never reads extended memory);
 
 **************************************************************************************************/
 
 #include "emu.h"
 #include "pc9821.h"
+
+#include "machine/pci.h"
 
 // TODO: remove me, cfr. pc9801.cpp; verify that 9801 clocks are correct for 9821 series as well
 #define BASE_CLOCK      XTAL(31'948'800)    // verified for PC-9801RS/FA
@@ -612,89 +630,100 @@ void pc9821_mate_a_state::pc9821as_io(address_map &map)
  * CanBe overrides
  */
 
-/*
- * CanBe Remote control
- * I/O $f4a: remote index (write only?)
- * I/O $f4b: remote data r/w
- * [0x00] <unknown>
- * [0x01] Windows Sound System related
- * ---- xxxx irq select
- * ---- 1000 INT8
- * ---- 0011 INT0
- * ---- 0010 INT41
- * ---- 0000 INT5
- * [0x02] <unknown>
- * [0x03] Remote control reset
- * ---- -x-- (1) Mic through (loopback?)
- * ---- ---x (1) Remote control reset
- * [0x04] Mute control
- * ---- ---x (Global?) sound mute
- * [0x10] Remote control data status
- * ---- --x- (1) device ready (0) busy
- * ---- ---x (1) received data available
- * [0x11] Remote control code
- * <returns the button pressed in 2 bytes form, 2nd byte is the XOR-ed version of 1st>
- * [0x12] <unknown>
- * [0x13] Power control
- * <succession of bytes to power on/off>
- * [0x14] remote irq control
- * ---- -x-- irq enable
- * ---- --xx irq select
- * ---- --11 INT41
- * ---- --10 INT1
- * ---- --01 INT2
- * ---- --00 INT0
- * [0x30] VOL1,2 YMF288 Left sound output
- * [0x31] VOL1,2 YMF288 Right sound output
- * [0x32] VOL3,4 Line Left input
- * [0x33] VOL3,4 Line Right input
- * [0x34] <unknown>
- * [0x35] <unknown>
- */
-// TODO: export remote control to an actual device, and pinpoint actual name
-void pc9821_canbe_state::remote_addr_w(offs_t offset, u8 data)
+void pc9821_canbe_state::itf_43d_bank_w(offs_t offset, uint8_t data)
 {
-	m_remote.index = data;
+	// assume overlay disabled on writes to $43d
+	m_bios_view.disable();
+	pc9801vm_state::itf_43d_bank_w(offset, data);
 }
 
-u8 pc9821_canbe_state::remote_data_r(offs_t offset)
+void pc9821_canbe_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 {
-	uint8_t res;
-
-	res = 0;
-
-	logerror("%s: remote control reg read %02x\n", machine().describe_context(), m_remote.index);
-
-	switch(m_remote.index)
+	if ((data & 0xf8) == 0xe0)
 	{
-		case 0x10:
-			res |= 2; // POST will throw "MICOM ERROR" otherwise
-			break;
+		logerror("C-Bus overlay set %02x\n", data);
+		m_bios_view.select(data & 0x7);
+		return;
 	}
-	return res;
+
+	// Exit setup mode disarms overlay with a 0xe8 write
+	// (or writes are >> 1 and undocumented mem is wrong?)
+	if ((data & 0xf8) == 0xe8)
+	{
+		logerror("C-Bus overlay disable (%02x)\n", data);
+		m_bios_view.disable();
+		return;
+	}
+
+	pc9801vm_state::cbus_43f_bank_w(offset, data);
 }
 
-void pc9821_canbe_state::remote_data_w(offs_t offset, u8 data)
+
+void pc9821_canbe_state::pc9821ce_map(address_map &map)
 {
-	switch(m_remote.index)
-	{
-		default:
-			logerror("%s: remote control reg write %02x %02x\n", machine().describe_context(), m_remote.index, data);
-	}
+	pc9821_map(map);
+	map(0x000f8000, 0x000fffff).view(m_bios_view);
+	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x18000);
+}
+
+void pc9821_canbe_state::pc9821ce_io(address_map &map)
+{
+	pc9821_io(map);
+	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) {
+		if (data == 0xa0 || data == 0xe0)
+			m_sdip->bank_w(BIT(data, 6));
+		else
+			a20_ctrl_w(3, data);
+	}));
 }
 
 void pc9821_canbe_state::pc9821cx3_map(address_map &map)
 {
 	pc9821_map(map);
 	// TODO: overwritten by C-bus mapping, but definitely tested as RAM on POST
-	map(0x000c0000, 0x000dffff).ram();
+	// map(0x000c0000, 0x000dffff).ram();
+	map(0x000f8000, 0x000fffff).view(m_bios_view);
+	// TODO: remaining settings
+	// bp 0xfd25a,1,{eax |= 0x91;g}
+	m_bios_view[4](0x000f8000, 0x000fffff).rom().region("biosrom", 0x38000);
+//	m_bios_view[5](0x000f8000, 0x000fffff).rom().region("biosrom", 0x30000);
+	// setup mode
+	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x40000);
+
+	// NEC PC-9800 series logo (same place as view 4?)
+	m_bios_view[8](0x000f8000, 0x000fffff).rom().region("biosrom", 0x38000);
+	// Computer GFXs
+	m_bios_view[14](0x000f8000, 0x000fffff).rom().region("biosrom", 0x20000);
 }
 
 void pc9821_canbe_state::pc9821cx3_io(address_map &map)
 {
 	pc9821_io(map);
-	map(0x0f4a, 0x0f4a).w(FUNC(pc9821_canbe_state::remote_addr_w));
-	map(0x0f4b, 0x0f4b).rw(FUNC(pc9821_canbe_state::remote_data_r), FUNC(pc9821_canbe_state::remote_data_w));
+	// TODO: MBCFG index/data devices (as C-Bus option)
+//	map(0x0411, 0x0411) index
+//	map(0x0413, 0x0413) data
+//	map(0x0b00, 0x0b00) index
+//	map(0x0b02, 0x0b02) data
+	map(0x043d, 0x043d).w(FUNC(pc9821_canbe_state::itf_43d_bank_w));
+	// TODO: uses its own banking scheme to accomodate extra GFX ROM size
+	map(0x043f, 0x043f).lw8(NAME([this] (offs_t offset, u8 data) {
+		if ((data & 0xf8) == 0xe0)
+		{
+			logerror("C-Bus overlay set %02x\n", data);
+			m_bios_view.select(data & 0x7);
+			return;
+		}
+
+		if ((data & 0xf8) == 0xe8)
+		{
+			logerror("C-Bus overlay set %02x\n", data);
+			m_bios_view.select((data & 0x7) | 8);
+			return;
+		}
+
+		pc9801vm_state::cbus_43f_bank_w(offset, data);
+	}));
+
 }
 
 static INPUT_PORTS_START( pc9821 )
@@ -749,7 +778,7 @@ static INPUT_PORTS_START( pc9821 )
 
 	PORT_START("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_CONFNAME( 0x04, 0x04, "Load IDE BIOS" )
+	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
@@ -783,6 +812,21 @@ MACHINE_RESET_MEMBER(pc9821_state,pc9821)
 	m_pc9821_window_bank = 0x08;
 	m_pegc_mmio_view.disable();
 }
+
+MACHINE_RESET_MEMBER(pc9821_mate_a_state,pc9821ap2)
+{
+	MACHINE_RESET_CALL_MEMBER(pc9821);
+
+	m_bios_view.disable();
+}
+
+MACHINE_RESET_MEMBER(pc9821_canbe_state,pc9821_canbe)
+{
+	MACHINE_RESET_CALL_MEMBER(pc9821);
+
+	m_bios_view.disable();
+}
+
 
 // TODO: setter for DMAC clock should follow up whatever is the CPU clock
 
@@ -837,6 +881,7 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 	m_ppi_sys->in_pa_callback().set(m_ppi_sys, FUNC(i8255_device::pa_r));
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 }
 
 void pc9821_mate_a_state::pc9821ap2(machine_config &config)
@@ -851,23 +896,44 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
+
+	// 80486DX2 66MHz
+	// DOS 5.0, Windows 3.1
+	// 5.6MB RAM, up to 73.6MB
+	// 340MB HD
+	// Expansion slot C-BUS4 (4)
+	// Graphics controller S3 86C928
 }
 
-void pc9821_canbe_state::pc9821ce2(machine_config &config)
+void pc9821_canbe_state::pc9821ce(machine_config &config)
 {
 	pc9821(config);
 	const XTAL xtal = XTAL(25'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486sx
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_canbe_state::pc9821ce_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821ce_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+	// 3.5 x2
+	// 1.6MB ~ 14.6MB model S1
+	// 5.6MB ~ 14.6MB model S2
+	// pc9801-86
 
-	m_cbus[0]->set_default_option("pc9801_118");
+	m_cbus[0]->set_default_option("sound_pc9821ce");
+	m_cbus[0]->set_fixed(true);
+
+	config_floppy_35hd(config);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
+	MCFG_MACHINE_RESET_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 }
+
+//void pc9821_canbe_state::pc9821ce2(machine_config &config)
+//{
+//	pc9821ce(config);
+//	m_cbus[0]->set_default_option("pc9801_118");
+//}
 
 void pc9821_canbe_state::pc9821cx3(machine_config &config)
 {
@@ -881,9 +947,11 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
-	m_cbus[0]->set_default_option("pc9801_118");
+	m_cbus[0]->set_default_option("sound_pc9821cx3");
+	m_cbus[0]->set_fixed(true);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
+	MCFG_MACHINE_RESET_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 
 	// VLSI Supercore594 (Wildcat) PCI 2.0
 	// GD5440
@@ -895,25 +963,63 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	// C-Bus x 3
 	// PC-9821CB-B04, on dedicated bus (Fax/Modem 14'400 bps) and IrDA board (115'200 bps)
 	// Optional PC-9821C3-B02 MIDI board, on dedicated bus
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
-void pc9821_mate_x_state::pc9821xs(machine_config &config)
-{
-	pc9821(config);
-	const XTAL xtal = XTAL(66'000'000);
-	I486(config.replace(), m_maincpu, xtal); // i486dx2
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-}
+//void pc9821_mate_x_state::pc9821xs(machine_config &config)
+//{
+//	pc9821(config);
+//	const XTAL xtal = XTAL(66'000'000);
+//	I486(config.replace(), m_maincpu, xtal); // i486dx2
+//	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
+//	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
+//	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+//}
 
 void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 {
 	pc9821(config);
-	PENTIUM(config.replace(), m_maincpu, 166000000); // Pentium P54C
+	PENTIUM(config.replace(), m_maincpu, 166'000'000); // Pentium P54C, secondary cache 256KB/512KB
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// Xa16/R specs
+	// 16MB ~ 128MB F.P.DRAM
+	// VLSI Supercore594 (PCI rev 2.0)
+	// S3 manufactured Trident TGUI9680XGi with 2MB VRAM (on board PCI)
+	// 3.5" floppy x1
+	// 3 C-Bus slots (one occupied by "K12")
+	// 2 PCI slots
+	// 1.2GB HDD
+	// CD-Rom x4
+
+	// Xa16/W specs (same as above except)
+	// Intel I430HX (PCI rev 2.1)
+	// 32MB ~ 256MB ECC compatible EDO DRAM
+	// S3 manufactured Trident TGUI9682XGi with 2MB VRAM (on board PCI)
+	// 100Base-TX / 10Base-T ethernet (on board PCI)
+	// 1.6GB HDD
+	// CD-Rom x6 or x8
+	PCI_ROOT(config, "pci", 0);
+	// ...
+}
+
+void pc9821_mate_x_state::pc9821xv13(machine_config &config)
+{
+	pc9821(config);
+	PENTIUM(config.replace(), m_maincpu, 133'000'000); // Pentium, secondary cache 256KB/512KB
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// Xv13/R identical to Xa16/R specs with an extra C-Bus slot
+
+	// Xv13/W identical to Xa16/W specs with MGA-2064W as PCI GFX card
+	// PCI rev 2.0 or 2.1
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 void pc9821_mate_r_state::pc9821ra20(machine_config &config)
@@ -923,6 +1029,16 @@ void pc9821_mate_r_state::pc9821ra20(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_r_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// Intel 440FX
+	// 16MB ~ 128MB F.P.DRAM for /N12 or 32MB ~ 256MB ECC compatible EDO DRAM for /N30
+	// S3 manufactured Trident TGUI9682XGi with 2MB VRAM (on board PCI)
+	// 1.2GB HDD for /N12 or 3GB for /N30
+	// CD-Rom x6 or x8
+	// 100Base-TX / 10Base-T ethernet (on board PCI)
+	PCI_ROOT(config, "pci", 0);
+	// ...
+
 }
 
 void pc9821_mate_r_state::pc9821ra266(machine_config &config)
@@ -934,11 +1050,21 @@ void pc9821_mate_r_state::pc9821ra266(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	// Intel 440FX
 	// 512KB CPU cache RAM
 	// Trident TGUI9682XGi + integrated 98 gfx card
 	// 3x cbus + 2x PCI slots
 	// 3GB HDD
+	// 16x CD-ROM
+	// 3.5" floppy x 1
 	// built-in ethernet 100BASE-TX/10BASE-T
+	// 32MB, max 256 MB (ECC EDO RAM)
+
+	// PC-9821Ra266/M30R has been re-released in 1998,
+	// unknown differences other than having Win98 pre-installed
+
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 void pc9821_mate_r_state::pc9821ra333(machine_config &config)
@@ -950,11 +1076,17 @@ void pc9821_mate_r_state::pc9821ra333(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	// Celeron @ 333
 	// 128KB CPU cache RAM
+	// 32MB, max 256 MB (ECC EDO RAM)
 	// Trident TGUI9682XGi + integrated 98 gfx card
 	// 3x cbus + 2x PCI slots
 	// 6GB HDD
+	// 3.5"x1, 24xCD-ROM
 	// built-in ethernet 100BASE-TX/10BASE-T
+
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 // 9821 NOTE machine configs
@@ -1020,7 +1152,8 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 	// Ni-cd (?) battery with 1.5 ~ 2.3 hours of duration
 }
 
-/* took from "raw" memory dump */
+// TODO: this shouldn't be necessary for any 9821
+// They all have one form or another of internal IDE BIOS instead.
 #define LOAD_IDE_ROM \
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) ) \
 	ROM_LOAD( "d8000.rom", 0x0000, 0x2000, BAD_DUMP CRC(5dda57cc) SHA1(d0dead41c5b763008a4d777aedddce651eb6dcbb) ) \
@@ -1029,7 +1162,7 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 	ROM_IGNORE( 0x2000 )
 
 // all of these are half size :/
-#define LOAD_KANJI_ROMS \
+#define LOAD_KANJI_ROMS(_ram_fill_) \
 	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF ) \
 	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) ) \
 	ROM_CONTINUE(                      0x20000, 0x4000  ) \
@@ -1039,13 +1172,16 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 	ROM_CONTINUE(                      0x60000, 0x4000  ) \
 	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) ) \
 	ROM_CONTINUE(                      0x60001, 0x4000  ) \
-	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x100000, "kanji", _ram_fill_ ) \
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 
 /*
 98MATE A - 80486SX 25
 
 TODO: should access SDIP from $00f6, most likely a partial A Mate dump instead
+
+Retire not done because we depend on this.
+
 */
 
 ROM_START( pc9821 )
@@ -1061,7 +1197,7 @@ ROM_START( pc9821 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1090,18 +1226,14 @@ ROM_START( pc9821as )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
 /*
-PC-9821AP2/U8W
-80486DX2 66MHz
-DOS 5.0, Windows 3.1
-5.6MB RAM, up to 73.6MB
-340MB HD
-Expansion slot C-BUS4 (4)
-Graphics controller S3 86C928
+
+Ap2/U8W
+
 */
 
 ROM_START( pc9821ap2 )
@@ -1130,7 +1262,7 @@ ROM_START( pc9821ap2 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
 	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
@@ -1141,7 +1273,7 @@ ROM_END
 98NOTE - i486SX 33
 
 NOTE: regular Ne shouldn't have Pico|Power Redwood PT86C768, and bios_ne.rom accesses one.
-Incomplete dump, will require standalone driver out of interactions with PMC so removed.
+Incomplete dump, will require on-board C-Bus slot out of interactions with PMC so removed.
 
 cfr. https://github.com/angelosa/mame_scratch/blob/main/src/redwood1.cpp
 
@@ -1153,24 +1285,52 @@ cfr. https://github.com/angelosa/mame_scratch/blob/main/src/redwood1.cpp
 //  ROM_LOAD( "font_ne.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
 
 /*
-98MULTi Ce2 - 80486SX 25
+98MULTi Ce - 80486SX @ 25
 */
 
-ROM_START( pc9821ce2 )
+ROM_START( pc9821ce )
+	ROM_REGION16_LE( 0x80000, "biosrom", ROMREGION_ERASEFF )
+	// second half blank
+	ROM_LOAD( "nyf5200_d27c4000d-15.bin", 0x000000, 0x080000, CRC(4c2fa623) SHA1(3acc1da7e32711a7579575b1520b44f6b2c3c2f8) )
+
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// baddump: missing setup menu bank
-	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, BAD_DUMP CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
-	ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
+	// 0x00000 KBCRT X47 891105
+	// 0x0c000 sound BIOS
+	// 0x10000 sound BIOS copy
+	// 0x16000 <to be identified>
+	// 0x1a000 setup menu
+	ROM_COPY( "biosrom", 0x38000, 0x28000, 0x08000 )
+	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x08000 )
+	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
+	ROM_REGION( 0x4000, "cbus0:sound_pc9821ce:sound_bios", ROMREGION_ERASE00 )
+	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
+
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
+	// Uses SCSI not IDE
+//	LOAD_IDE_ROM
 ROM_END
 
+
 /*
-PC-9821CX3
+98MULTi Ce2 - 80486SX 25
+
+Retired: missing setup menu bank
+getitf98 dump known to exist, in case anyone bothers to assemble a franken def ...
+*/
+
+//ROM_START( pc9821ce2 )
+//	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+//	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, BAD_DUMP CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
+//	ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
+
+
+/*
+PC-9821Cx3
 
 Pentium @ 100 MHz
 16MB, max 128 MB
@@ -1188,13 +1348,19 @@ ROM_START( pc9821cx3 )
 	// TODO: all of the 512k space seems valid
 	// all GFXs are 1bpp packed with different pitches
 	// 0 - 0x56xx: CanBe mascot GFX animations
-	// 0x1fda8 (?) - 0x2458f: monitor GFXs
+	// 0x08000 - 0x0ffff: empty (no checksum)
+	// 0x10000 - 0x104df: small x86 snippet
+	// 0x18000 - 0x1ffff: AJANIME4 (empty)
+	// 0x20000 - 0x2458f: monitor GFXs
 	// 0x24590 - 0x36xxx: more CanBe mascot GFX animations
+	// 0x38000: PnP bootblock?
 	// 0x3c000: NEC & CanBe logo GFXs
 	// 0x40000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
 	// 0x42000: setup menu
-	ROM_COPY( "biosrom", 0x78000, 0x10000, 0x08000 ) // ITF
-	ROM_COPY( "biosrom", 0x70000, 0x18000, 0x08000 ) // BIOS, probably wrong (reset vector at 0x67ff0)
+	// 0x54000: sound BIOS
+	// 0x58000: PCI refs + ACFG, unknown
+	ROM_COPY( "biosrom", 0x78000, 0x10000, 0x08000 ) // ITF?
+	ROM_COPY( "biosrom", 0x70000, 0x18000, 0x08000 ) // BIOS?
 	ROM_COPY( "biosrom", 0x68000, 0x20000, 0x08000 )
 	ROM_COPY( "biosrom", 0x60000, 0x28000, 0x08000 )
 
@@ -1221,36 +1387,36 @@ ROM_START( pc9821cx3 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
+	// NOTE: needs 0-fill erase for initialization
+	// cfr. $afe00 and $ad400 range
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
+
+	ROM_REGION( 0x4000, "cbus0:sound_pc9821cx3:sound_bios", 0)
+	ROM_COPY( "biosrom", 0x54000, 0x00000, 0x04000 )
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x40000, 0x00000, 0x02000 )
 ROM_END
 
 /*
 98MATE X - 486/Pentium based
+
+Retired: not very useful without actual code
 */
 
-ROM_START( pc9821xs )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// "ROM SUM ERROR"
-	ROM_LOAD( "itf.rom",         0x10000, 0x008000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-	ROM_LOAD( "bios_xs.rom",     0x18000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+//ROM_START( pc9821xs )
+//	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+//	// "ROM SUM ERROR"
+//	ROM_LOAD( "itf.rom",         0x10000, 0x008000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//	ROM_LOAD( "bios_xs.rom",     0x18000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+//	// tested in RAM at PC=0 onward (specifically PC=1c)
+//	ROM_FILL( 0x2fffe, 1, 0x0d )
 
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_xs.rom",     0x00000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
-
+//	ROM_REGION( 0x80000, "chargen", 0 )
+//	ROM_LOAD( "font_xs.rom",     0x00000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
 /*
-9821Xa16
-
-Pentium P54C @ 166
-32MB
-3.5"2DD/2HDx1, 8xCD-ROM
-CBus: 3 slots
-
+Xa16 - Pentium P54C @ 166
 */
 
 ROM_START( pc9821xa16 )
@@ -1259,6 +1425,8 @@ ROM_START( pc9821xa16 )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: all of the 256k space seems valid
+	// 0x00000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
+	// 0x04000: setup mode
 	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
 	ROM_COPY( "biosrom", 0x20000, 0x28000, 0x08000 )
 	ROM_COPY( "biosrom", 0x18000, 0x20000, 0x08000 )
@@ -1267,17 +1435,43 @@ ROM_START( pc9821xa16 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x00000, 0x00000, 0x02000 )
 ROM_END
 
 /*
-PC-9821Ra20 (98MATE R)
+Xv13 - Pentium @ 133
+*/
 
-Pentium Pro @ 200
-32MB
-3.5"2DD/2HDx1, 8xCD-ROM
-CBus: 3 slots
+ROM_START( pc9821xv13 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "wth4g01_bios.bin", 0x00000, 0x040000, CRC(4c5019e9) SHA1(1a30744d5583c5f05c134b385a8074bfc0fe4d10) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	// 0x00000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
+	// 0x04000: setup mode
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x20000, 0x28000, 0x08000 )
+	ROM_COPY( "biosrom", 0x18000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x10000, 0x18000, 0x08000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x00000, 0x00000, 0x02000 )
+ROM_END
+
+
+/*
+Ra20 - Pentium Pro @ 200
 */
 
 ROM_START( pc9821ra20 )
@@ -1292,22 +1486,12 @@ ROM_START( pc9821ra20 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
 /*
-PC-9821Ra266
-
-Pentium II @ 266 MHz
-Trident TGUI9682XGi
-32MB, max 256 MB (ECC EDO RAM)
-3.5x1, 16xCD-ROM
-CBus: 3 slots, PCI: 2 slots
-PCI Intel 440FX (Natoma), PCI Rev. 2.1
-
-PC-9821Ra266/M30R has been re-released in 1998,
-unknown differences other than having Win98 pre-installed
+Ra266 - Pentium II @ 266 MHz
 */
 
 ROM_START( pc9821ra266 )
@@ -1322,17 +1506,12 @@ ROM_START( pc9821ra266 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
 /*
-PC-9821Ra333 (98MATE R)
-
-Celeron @ 333
-32MB, max 256 MB (ECC EDO RAM)
-3.5x1, 24xCD-ROM
-CBus: 3 slots, PCI: 2 slots
+Ra333 (98MATE R)
 */
 
 ROM_START( pc9821ra333 )
@@ -1347,7 +1526,7 @@ ROM_START( pc9821ra333 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1398,7 +1577,8 @@ ROM_START( pc9821nr15 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1437,7 +1617,8 @@ ROM_START( pc9821nr166 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1453,7 +1634,8 @@ ROM_START( pc9821nw150 )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	LOAD_KANJI_ROMS
+	// keeps throwing PASSWORD DESTROYED with 1-fill
+	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 	LOAD_IDE_ROM
 ROM_END
 
@@ -1463,11 +1645,11 @@ ROM_END
 // To mark this we intentionally add square brackets here as optional omission notation.
 
 // 98MULTi (i386, desktop)
-COMP( 1992, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state,        init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state,        init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING )
 
 // 98MATE [A] (i486, desktop, has 98 MATE local bus "ML", with optional RL-like high-reso)
-COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING )
+COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     0 )
 
 // SC-9821A (rebranded MATE A machines with minor differences such as SW power control)
 // ...
@@ -1476,8 +1658,9 @@ COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_
 // ...
 
 // 98MULTi CanBe (i486/Pentium, desktop & tower, Multimedia PC with optional TV Tuner & remote control function, Fax, Modem, MPEG-2, FX-98IF for PC-FX compatibility etc. etc.)
-COMP( 1994, pc9821ce2,   0,           0, pc9821ce2,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1995, pc9821cx3,   pc9821ce2,   0, pc9821cx3,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1993, pc9821ce,   0,         0, pc9821ce,     pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce (98MULTi CanBe)",    MACHINE_NOT_WORKING )
+//COMP( 1994, pc9821ce2,  pc9821ce,  0, pc9821ce2,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
+COMP( 1995, pc9821cx3,  0,         0, pc9821cx3,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
 
 // 98MULTi CanBe Jam (Pentium Pro equipped, laptop, Multimedia PC as above + JEIDA 4.2/PCMCIA 2.1)
 // ...
@@ -1487,17 +1670,22 @@ COMP( 1995, pc9821cx3,   pc9821ce2,   0, pc9821cx3,    pc9821,   pc9821_canbe_st
 // ...
 
 // 98MATE X (i486sx/Pentium/Pentium Pro, has PCI, comes with various SVGA cards)
-COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1996, pc9821xa16,  pc9821xs,    0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xs (98MATE X)",          MACHINE_NOT_WORKING )
+COMP( 1996, pc9821xa16,  0,             0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING )
+COMP( 1996, pc9821xv13,  pc9821xa16,    0, pc9821xv13,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xv13/W16 (98MATE X)",        MACHINE_NOT_WORKING )
 
 // 98MATE VALUESTAR (Pentium, comes with Windows 95 and several programs pre-installed)
 //COMP( 1998, pc9821v13,   0,           0, pc9821v13,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 //COMP( 1998, pc9821v20,   pc9821v13,   0, pc9821v20,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V20 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE R (Pentium Pro, otherwise same as 98MATE X?)
-COMP( 1996, pc9821ra20,  0,            0, pc9821ra20,  pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, pc9821ra266, pc9821ra20,   0, pc9821ra266, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821ra20,  0,            0, pc9821ra20,  pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING )
+COMP( 1997, pc9821ra266, pc9821ra20,   0, pc9821ra266, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra266 (98MATE R)",       MACHINE_NOT_WORKING )
+COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING )
+
+// pc9821rvII26: Pentium II 266 MHz / ReliantComputer Champion 1.0 (i440bx clone?) / MGA-2064W
+// Beefiest known desktop PC-98, can be DIY to mount AGP cards thru PCI bridge
+// cfr. http://pc.ni-land.com/bunshitsu/mate-r/rv26upg04.htm
 
 // 98MATE SERVER, pc9821rs* (Server variant of 98MATE R. Inherits concepts from SV-H98 98SERVER)
 // ...
@@ -1507,9 +1695,9 @@ COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_s
 //COMP( 1994, pc9821ne,    0,            0, pc9821ne,    pc9821,   pc9821_note_state,       init_pc9801_kanji,   "NEC",   "PC-9821Ne (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98NOTE Lavie
-COMP( 1996, pc9821nr15,  0,            0, pc9821nr15,  pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, pc9821nr166, pc9821nr15,   0, pc9821nr166, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1997, pc9821nw150, pc9821nr15,   0, pc9821nw150, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nw150 (98NOTE Lavie)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, pc9821nr15,  0,            0, pc9821nr15,  pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING )
+COMP( 1997, pc9821nr166, pc9821nr15,   0, pc9821nr166, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr166 (98NOTE Lavie)",   MACHINE_NOT_WORKING )
+COMP( 1997, pc9821nw150, pc9821nr15,   0, pc9821nw150, pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nw150 (98NOTE Lavie)",   MACHINE_NOT_WORKING )
 
 // 98NOTE Light
 // ...

@@ -51,7 +51,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/pdp8/hd6120.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "imagedev/floppy.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"

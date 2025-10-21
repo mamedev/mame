@@ -110,6 +110,7 @@ void adam_fdc_device::floppy_formats(format_registration &fr)
 static void adam_fdc_floppies(device_slot_interface &device)
 {
 	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dsdd", FLOPPY_525_DD);
 }
 
 
@@ -129,7 +130,7 @@ void adam_fdc_device::device_add_mconfig(machine_config &config)
 	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	FLOPPY_CONNECTOR(config, m_connector, adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_connector, adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -301,6 +302,9 @@ void adam_fdc_device::p1_w(uint8_t data)
 	}
 
 	m_fdc->set_floppy(m_floppy);
+
+	// side select (320KB)
+	if (m_floppy) m_floppy->ss_w(!BIT(data, 4));
 
 	// motor enable
 	if (m_floppy) m_floppy->mon_w(!BIT(data, 6));

@@ -21,7 +21,7 @@ TODO: add GAL logic to route the ROMs to the DAC and output that onto a screen
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/saa1043.h"
 
 #include "pm5644.lh"

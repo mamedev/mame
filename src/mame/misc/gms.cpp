@@ -104,7 +104,7 @@ super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/pic16x8x/pic16x8x.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"

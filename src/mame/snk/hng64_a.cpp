@@ -312,8 +312,8 @@ void hng64_state::hng64_audio(machine_config &config)
 
 	m_dsp->add_route(0, "speaker", 1.0, 0);
 	m_dsp->add_route(1, "speaker", 1.0, 1);
-	m_dsp->add_route(3, "rear", 1.0, 0);
-	m_dsp->add_route(5, "subwoofer", 1.0, 0);
+	m_dsp->add_route(9, "rear", 1.0, 0);
+	m_dsp->add_route(8, "subwoofer", 1.0, 0);
 }
 
 void hng64_state::hng64_audio_bbust2(machine_config &config)
@@ -327,7 +327,7 @@ void hng64_state::hng64_audio_bbust2(machine_config &config)
 
 	m_dsp->add_route(0, "speaker", 1.0, 0);
 	m_dsp->add_route(1, "speaker", 1.0, 1);
-	m_dsp->add_route(3, "gun_1", 1.0, 0);
-	m_dsp->add_route(4, "gun_2", 1.0, 0);
-	m_dsp->add_route(5, "gun_3", 1.0, 0);
+	m_dsp->add_route(4, "gun_1", 1.0, 0);
+	m_dsp->add_route(9, "gun_2", 1.0, 0);
+	m_dsp->add_route(8, "gun_3", 1.0, 0);
 }

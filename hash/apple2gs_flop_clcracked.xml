@@ -10,7 +10,9 @@ license:CC0-1.0
 		<description>4th &amp; Inches (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Tony Manso, Ed Bogas, Les Pardew" />
+		<info name="programmer" value="Tony Manso" />
+		<info name="programmer" value="Ed Bogas" />
+		<info name="programmer" value="Les Pardew" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -37,7 +39,9 @@ license:CC0-1.0
 		<description>Aesop's Fables (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="William Demas, Joseph Hewitt IV, and June Stark" />
+		<info name="programmer" value="William Demas" />
+		<info name="programmer" value="Joseph Hewitt IV" />
+		<info name="programmer" value="June Stark" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -63,7 +67,9 @@ license:CC0-1.0
 		<description>All About America (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="Stanley Brewster, June Stark, and Joseph B. Hewitt IV" />
+		<info name="programmer" value="Stanley Brewster" />
+		<info name="programmer" value="June Stark" />
+		<info name="programmer" value="Joseph B. Hewitt IV" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 03." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -114,7 +120,8 @@ license:CC0-1.0
 		<description>Arkanoid (version 12-Jan-89) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
-		<info name="programmer" value="Ryan Ridges and John Lund" />
+		<info name="programmer" value="Ryan Ridges" />
+		<info name="programmer" value="John Lund" />
 		<info name="version" value="12-Jan-89 - ROM 03 compatible" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -136,7 +143,8 @@ license:CC0-1.0
 		<description>Arkanoid II: Revenge of Doh (version 29-Aug-89) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
-		<info name="programmer" value="Ryan Ridges and John Lund" />
+		<info name="programmer" value="Ryan Ridges" />
+		<info name="programmer" value="John Lund" />
 		<info name="version" value="29-Aug-89" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -157,7 +165,8 @@ license:CC0-1.0
 		<description>Arkanoid II: Revenge of Doh (version 18-Jul-89) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
-		<info name="programmer" value="Ryan Ridges and John Lund" />
+		<info name="programmer" value="Ryan Ridges" />
+		<info name="programmer" value="John Lund" />
 		<info name="version" value="18-Jul-89" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -178,7 +187,16 @@ license:CC0-1.0
 		<description>Battle Chess (trex crack)</description>
 		<year>1989</year>
 		<publisher>Interplay Productions</publisher>
-		<info name="programmer" value="Jim Sproul, Todd J. Camasta, Bruce Schlickbernd, Kurt Heiden, Bill (Weez) Dugan, Thomas R. Decker, Troy P. Worrell, Michael Quarles, Rebecca Heineman, and Alan Pavlish" />
+		<info name="programmer" value="Jim Sproul" />
+		<info name="programmer" value="Todd J. Camasta" />
+		<info name="programmer" value="Bruce Schlickbernd" />
+		<info name="programmer" value="Kurt Heiden" />
+		<info name="programmer" value="Bill (Weez) Dugan" />
+		<info name="programmer" value="Thomas R. Decker" />
+		<info name="programmer" value="Troy P. Worrell" />
+		<info name="programmer" value="Michael Quarles" />
+		<info name="programmer" value="Rebecca Heineman" />
+		<info name="programmer" value="Alan Pavlish" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -195,7 +213,11 @@ license:CC0-1.0
 		<description>Block Out (version 1.0) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>California Dreams</publisher>
-		<info name="programmer" value="Alexander Ustaszewski, Marek Jackiewicz, Adam Skorupinski, Marcin Szostakowski, and Marcin Grzegorzewski" />
+		<info name="programmer" value="Alexander Ustaszewski" />
+		<info name="programmer" value="Marek Jackiewicz" />
+		<info name="programmer" value="Adam Skorupinski" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Marcin Grzegorzewski" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -254,7 +276,11 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-194" />
-		<info name="programmer" value="Gene Breault, Charolyn Kapplinger, Diane Portner, Steven D. Splinter, and Paul R. Wenker" />
+		<info name="programmer" value="Gene Breault" />
+		<info name="programmer" value="Charolyn Kapplinger" />
+		<info name="programmer" value="Diane Portner" />
+		<info name="programmer" value="Steven D. Splinter" />
+		<info name="programmer" value="Paul R. Wenker" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -272,7 +298,13 @@ license:CC0-1.0
 		<description>California Games (trex crack)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
-		<info name="programmer" value="Jimmy Huey, Dan Chang, Jenny Martin, Sheryl Knowles, Bill Bogenreif, Matt Householder, and Ron Fortier" />
+		<info name="programmer" value="Jimmy Huey" />
+		<info name="programmer" value="Dan Chang" />
+		<info name="programmer" value="Jenny Martin" />
+		<info name="programmer" value="Sheryl Knowles" />
+		<info name="programmer" value="Bill Bogenreif" />
+		<info name="programmer" value="Matt Householder" />
+		<info name="programmer" value="Ron Fortier" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -289,7 +321,11 @@ license:CC0-1.0
 		<description>Captain Blood (trex crack)</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Philippe Ulrich, Didier Bouchon, Jean-Michel Jarre, Alexis Martial, and Michael Rho" />
+		<info name="programmer" value="Philippe Ulrich" />
+		<info name="programmer" value="Didier Bouchon" />
+		<info name="programmer" value="Jean-Michel Jarre" />
+		<info name="programmer" value="Alexis Martial" />
+		<info name="programmer" value="Michael Rho" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
@@ -306,7 +342,8 @@ license:CC0-1.0
 		<description>Cavern Cobra (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
-		<info name="programmer" value="Greg Hale and Richard L. Seaborne" />
+		<info name="programmer" value="Greg Hale" />
+		<info name="programmer" value="Richard L. Seaborne" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -325,7 +362,11 @@ license:CC0-1.0
 		<description>Club Backgammon (version 2.0) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
-		<info name="programmer" value="Staszek Bartkowski, Jarek Olszewski, Dorota B&#x142;aszczak, Maciej Markuszewski, and Marcin Szostakowski" />
+		<info name="programmer" value="Staszek Bartkowski" />
+		<info name="programmer" value="Jarek Olszewski" />
+		<info name="programmer" value="Dorota B&#x142;aszczak" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Marcin Szostakowski" />
 		<info name="version" value="2.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -345,7 +386,11 @@ license:CC0-1.0
 		<description>Club Backgammon (version 1.0) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
-		<info name="programmer" value="Staszek Bartkowski, Jarek Olszewski, Dorota B&#x142;aszczak, Maciej Markuszewski, and Marcin Szostakowski" />
+		<info name="programmer" value="Staszek Bartkowski" />
+		<info name="programmer" value="Jarek Olszewski" />
+		<info name="programmer" value="Dorota B&#x142;aszczak" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Marcin Szostakowski" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -365,7 +410,10 @@ license:CC0-1.0
 		<description>Cribbage King / Gin King (version 1.01) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>The Software Toolworks</publisher>
-		<info name="programmer" value="Mark Manyen, Don Laabs, David M. Linnehan, and Elizabeth Scafati" />
+		<info name="programmer" value="Mark Manyen" />
+		<info name="programmer" value="Don Laabs" />
+		<info name="programmer" value="David M. Linnehan" />
+		<info name="programmer" value="Elizabeth Scafati" />
 		<info name="version" value="1.01" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -392,7 +440,22 @@ license:CC0-1.0
 		<description>Defender of the Crown (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Cinemaware</publisher>
-		<info name="programmer" value="Kellyn Beeck, James Sachs, Ivan Manley, Robert Jacob, Phyllis Jacob, Pat Cook, Jim Cuomo, Tom Warner, Jeff Hilbers, Steve Quinn, Richard La Barre, John Cutter, Rob Landeros, Doug Smith, Betsy Scafati, and Wayne Brockman" />
+		<info name="programmer" value="Kellyn Beeck" />
+		<info name="programmer" value="James Sachs" />
+		<info name="programmer" value="Ivan Manley" />
+		<info name="programmer" value="Robert Jacob" />
+		<info name="programmer" value="Phyllis Jacob" />
+		<info name="programmer" value="Pat Cook" />
+		<info name="programmer" value="Jim Cuomo" />
+		<info name="programmer" value="Tom Warner" />
+		<info name="programmer" value="Jeff Hilbers" />
+		<info name="programmer" value="Steve Quinn" />
+		<info name="programmer" value="Richard La Barre" />
+		<info name="programmer" value="John Cutter" />
+		<info name="programmer" value="Rob Landeros" />
+		<info name="programmer" value="Doug Smith" />
+		<info name="programmer" value="Betsy Scafati" />
+		<info name="programmer" value="Wayne Brockman" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -418,7 +481,19 @@ license:CC0-1.0
 		<description>Déjà Vu (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>ICOM Simulations</publisher>
-		<info name="programmer" value="Fred Allen, David Marsh, Karl Roelofs, Todd Squires, Craig Erickson, Kurt Nelson, Steven Hays, Terry Schulenburg, Darin Adler, Jay Zipnick, Waldermar Horwat, Mark Waterman, and Tod Zipnick" />
+		<info name="programmer" value="Fred Allen" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Karl Roelofs" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Craig Erickson" />
+		<info name="programmer" value="Kurt Nelson" />
+		<info name="programmer" value="Steven Hays" />
+		<info name="programmer" value="Terry Schulenburg" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Waldermar Horwat" />
+		<info name="programmer" value="Mark Waterman" />
+		<info name="programmer" value="Tod Zipnick" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -444,7 +519,21 @@ license:CC0-1.0
 		<description>Déjà Vu II: Lost in Las Vegas (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Fred Allen, David Marsh, Michael Manning, Todd Squires, David Feldman, Paul Snively, Brian Baker, Karl Roelofs, Ed Dluzen, Darin Adler, Jay Zipnick, Waldemar Horwat, Julia Ulano, Tod Zipnick, and Mitch Adler" />
+		<info name="programmer" value="Fred Allen" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Michael Manning" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="David Feldman" />
+		<info name="programmer" value="Paul Snively" />
+		<info name="programmer" value="Brian Baker" />
+		<info name="programmer" value="Karl Roelofs" />
+		<info name="programmer" value="Ed Dluzen" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="programmer" value="Julia Ulano" />
+		<info name="programmer" value="Tod Zipnick" />
+		<info name="programmer" value="Mitch Adler" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -471,7 +560,10 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-252" />
-		<info name="programmer" value="Diane Portner, Michael Stein, Brian Walker, and Paul Wenker" />
+		<info name="programmer" value="Diane Portner" />
+		<info name="programmer" value="Michael Stein" />
+		<info name="programmer" value="Brian Walker" />
+		<info name="programmer" value="Paul Wenker" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -497,7 +589,10 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-223" />
-		<info name="programmer" value="Susan Gabrys, John J. Krenz, Diane Portner, and Steve Splinter" />
+		<info name="programmer" value="Susan Gabrys" />
+		<info name="programmer" value="John J. Krenz" />
+		<info name="programmer" value="Diane Portner" />
+		<info name="programmer" value="Steve Splinter" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -522,7 +617,8 @@ license:CC0-1.0
 		<description>Destroyer (trex crack)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
-		<info name="programmer" value="Michael Kosaka and Chuck Sommerville" />
+		<info name="programmer" value="Michael Kosaka" />
+		<info name="programmer" value="Chuck Sommerville" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -586,7 +682,8 @@ license:CC0-1.0
 		<description>Fantavision (version 2.1) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Scott Anderson and Ken Rosen" />
+		<info name="programmer" value="Scott Anderson" />
+		<info name="programmer" value="Ken Rosen" />
 		<info name="version" value="2.1" />
 		<info name="usage" value="Requires a 256K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -608,7 +705,8 @@ license:CC0-1.0
 		<description>Fantavision (version 1.0) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Scott Anderson and Ken Rosen" />
+		<info name="programmer" value="Scott Anderson" />
+		<info name="programmer" value="Ken Rosen" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 256K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -630,7 +728,11 @@ license:CC0-1.0
 		<description>Fast Break (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Steve Cartwright, Greg Hospelhorn, George Wong, Pam Levins, and Roseann Mitchell" />
+		<info name="programmer" value="Steve Cartwright" />
+		<info name="programmer" value="Greg Hospelhorn" />
+		<info name="programmer" value="George Wong" />
+		<info name="programmer" value="Pam Levins" />
+		<info name="programmer" value="Roseann Mitchell" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -684,7 +786,12 @@ license:CC0-1.0
 		<description>GBA Championship Basketball: Two-on-Two (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
-		<info name="programmer" value="Paul Terry, Jack Thornton, Scott Orr, John Cutter, Troy Lyndon, and Russell Lieblich" />
+		<info name="programmer" value="Paul Terry" />
+		<info name="programmer" value="Jack Thornton" />
+		<info name="programmer" value="Scott Orr" />
+		<info name="programmer" value="John Cutter" />
+		<info name="programmer" value="Troy Lyndon" />
+		<info name="programmer" value="Russell Lieblich" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2023-04-13 -->
@@ -735,7 +842,10 @@ license:CC0-1.0
 		<description>Gnarly Golf (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Fanfare by Britannica</publisher>
-		<info name="programmer" value="Jim Coliz Jr., Darren Bartlett, Andy Hildebrand, and Greg Thomas" />
+		<info name="programmer" value="Jim Coliz, Jr." />
+		<info name="programmer" value="Darren Bartlett" />
+		<info name="programmer" value="Andy Hildebrand" />
+		<info name="programmer" value="Greg Thomas" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -761,7 +871,13 @@ license:CC0-1.0
 		<description>Grand Prix Circuit (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Don Mattrick, Brad Gour, Allan Johanson, Erik Kiss, Amory Wong, Rick Friesen, and Kris Hatlelid" />
+		<info name="programmer" value="Don Mattrick" />
+		<info name="programmer" value="Brad Gour" />
+		<info name="programmer" value="Allan Johanson" />
+		<info name="programmer" value="Erik Kiss" />
+		<info name="programmer" value="Amory Wong" />
+		<info name="programmer" value="Rick Friesen" />
+		<info name="programmer" value="Kris Hatlelid" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -780,7 +896,8 @@ license:CC0-1.0
 		<description>Great Western Shootout (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Britannica Software</publisher>
-		<info name="programmer" value="Scott Patterson and Matt Crysdale" />
+		<info name="programmer" value="Scott Patterson" />
+		<info name="programmer" value="Matt Crysdale" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -826,7 +943,10 @@ license:CC0-1.0
 		<description>Hardball! (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Dan Thompson, Ed Bogas, John Boechler, and Mike Benna" />
+		<info name="programmer" value="Dan Thompson" />
+		<info name="programmer" value="Ed Bogas" />
+		<info name="programmer" value="John Boechler" />
+		<info name="programmer" value="Mike Benna" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -862,7 +982,10 @@ license:CC0-1.0
 		<description>Impossible Mission II (trex crack)</description>
 		<year>1989</year>
 		<publisher>Epyx</publisher>
-		<info name="programmer" value="Istvan Cseri, Gyula Horvath, Pal Komondi, and Sultan" />
+		<info name="programmer" value="Istvan Cseri" />
+		<info name="programmer" value="Gyula Horvath" />
+		<info name="programmer" value="Pal Komondi" />
+		<info name="programmer" value="Sultan" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -935,7 +1058,8 @@ license:CC0-1.0
 		<description>Jigsaw (version 1.4 - 022988) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Britannica Software</publisher>
-		<info name="programmer" value="Javier Rullan Ruano and Huibert Aalbers" />
+		<info name="programmer" value="Javier Rullan Ruano" />
+		<info name="programmer" value="Huibert Aalbers" />
 		<info name="version" value="1.4" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -987,7 +1111,16 @@ license:CC0-1.0
 		<description>King's Quest II - Romancing The Throne (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Roberta Williams, Jeff Stephenson, Chris Iden, Robert Heitman, Ken Williams, Sol Ackerman, Scott Murphy, Doug MacNeill, Mark Crowe, and Al Lowe" />
+		<info name="programmer" value="Roberta Williams" />
+		<info name="programmer" value="Jeff Stephenson" />
+		<info name="programmer" value="Chris Iden" />
+		<info name="programmer" value="Robert Heitman" />
+		<info name="programmer" value="Ken Williams" />
+		<info name="programmer" value="Sol Ackerman" />
+		<info name="programmer" value="Scott Murphy" />
+		<info name="programmer" value="Doug MacNeill" />
+		<info name="programmer" value="Mark Crowe" />
+		<info name="programmer" value="Al Lowe" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1011,7 +1144,22 @@ license:CC0-1.0
 		<description>King's Quest III - To Hier is Human (trex crack)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Roberta Williams, Al Lowe, Bob Kernaghan, Robert E. Heitman, Jeff Stephenson, Chris Iden, Doug MacNeill, Margaret Lowe, Dale Carlson, Jennifer Cobb, Chad Bye, Jeremy T. Cromwell, Carlos Escobar, Annette Childs, Greg Steffen, and Ken Williams" />
+		<info name="programmer" value="Roberta Williams" />
+		<info name="programmer" value="Al Lowe" />
+		<info name="programmer" value="Bob Kernaghan" />
+		<info name="programmer" value="Robert E. Heitman" />
+		<info name="programmer" value="Jeff Stephenson" />
+		<info name="programmer" value="Chris Iden" />
+		<info name="programmer" value="Doug MacNeill" />
+		<info name="programmer" value="Margaret Lowe" />
+		<info name="programmer" value="Dale Carlson" />
+		<info name="programmer" value="Jennifer Cobb" />
+		<info name="programmer" value="Chad Bye" />
+		<info name="programmer" value="Jeremy T. Cromwell" />
+		<info name="programmer" value="Carlos Escobar" />
+		<info name="programmer" value="Annette Childs" />
+		<info name="programmer" value="Greg Steffen" />
+		<info name="programmer" value="Ken Williams" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1035,7 +1183,12 @@ license:CC0-1.0
 		<description>LaserForce (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Fanfare</publisher>
-		<info name="programmer" value="Javier Rullan, Huibert Aalbers, Thierry Méchain, Stéphane Renaudin, J-C. Doré, and Olivier Guichaoua" />
+		<info name="programmer" value="Javier Rullan" />
+		<info name="programmer" value="Huibert Aalbers" />
+		<info name="programmer" value="Thierry Méchain" />
+		<info name="programmer" value="Stéphane Renaudin" />
+		<info name="programmer" value="J-C. Doré" />
+		<info name="programmer" value="Olivier Guichaoua" />
 		<info name="usage" value="Requires a 1.25MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1061,7 +1214,14 @@ license:CC0-1.0
 		<description>Leisure Suit Larry in The Land of the Lounge Lizards (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Al Lowe, Chuck Benton, Mark Crowe, Jeff Stephenson, Chris Iden, Bob Heitman, Ken Williams, and Carlos Escobar" />
+		<info name="programmer" value="Al Lowe" />
+		<info name="programmer" value="Chuck Benton" />
+		<info name="programmer" value="Mark Crowe" />
+		<info name="programmer" value="Jeff Stephenson" />
+		<info name="programmer" value="Chris Iden" />
+		<info name="programmer" value="Bob Heitman" />
+		<info name="programmer" value="Ken Williams" />
+		<info name="programmer" value="Carlos Escobar" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1085,7 +1245,9 @@ license:CC0-1.0
 		<description>Magical Myths (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="Stan Brewster, Joseph B. Hewitt IV, and June Stark" />
+		<info name="programmer" value="Stan Brewster" />
+		<info name="programmer" value="Joseph B. Hewitt IV" />
+		<info name="programmer" value="June Stark" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1111,7 +1273,10 @@ license:CC0-1.0
 		<description>Mancala (version 1.0) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
-		<info name="programmer" value="Jarek Olszewski, Maciej Markuszewski, Marcin Szostakowski, and Dorota Błaszczak" />
+		<info name="programmer" value="Jarek Olszewski" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Dorota Błaszczak" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1187,7 +1352,9 @@ license:CC0-1.0
 		<description>Math Wizard (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="William Demas, June Stark, and Joseph B. Hewitt IV" />
+		<info name="programmer" value="William Demas" />
+		<info name="programmer" value="June Stark" />
+		<info name="programmer" value="Joseph B. Hewitt IV" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1267,7 +1434,9 @@ license:CC0-1.0
 		<description>Mean 18 (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Rex Bradford, George Karalias, and Mark Lesser" />
+		<info name="programmer" value="Rex Bradford" />
+		<info name="programmer" value="George Karalias" />
+		<info name="programmer" value="Mark Lesser" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1307,7 +1476,12 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A249" />
-		<info name="programmer" value="John J. Krenz, Brian Nesse, Michael Palmquist, Steve Splinter, Michael Stein, and Paul Wenker" />
+		<info name="programmer" value="John J. Krenz" />
+		<info name="programmer" value="Brian Nesse" />
+		<info name="programmer" value="Michael Palmquist" />
+		<info name="programmer" value="Steve Splinter" />
+		<info name="programmer" value="Michael Stein" />
+		<info name="programmer" value="Paul Wenker" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1362,7 +1536,9 @@ license:CC0-1.0
 		<description>Music Construction Set (version 1.0) (trex crack)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Will Harvey, Jim Nitchals, and Doug Fulton" />
+		<info name="programmer" value="Will Harvey" />
+		<info name="programmer" value="Jim Nitchals" />
+		<info name="programmer" value="Doug Fulton" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1433,7 +1609,8 @@ license:CC0-1.0
 		<description>Qix (version 1.4? 16-Jan-90) (cleanly cracked)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
-		<info name="programmer" value="Ryan Ridges and John Lund" />
+		<info name="programmer" value="Ryan Ridges" />
+		<info name="programmer" value="John Lund" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1479,7 +1656,8 @@ license:CC0-1.0
 		<description>Read-a-Rama (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="Stan Brewster and Joseph Hewitt" />
+		<info name="programmer" value="Stan Brewster" />
+		<info name="programmer" value="Joseph Hewitt" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1511,7 +1689,8 @@ license:CC0-1.0
 		<description>Reader Rabbit (version 2.0) (trex crack)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>
-		<info name="programmer" value="Pete Rowe and Aaron Weiss" />
+		<info name="programmer" value="Pete Rowe" />
+		<info name="programmer" value="Aaron Weiss" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<info name="version" value="2.0" />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1529,7 +1708,8 @@ license:CC0-1.0
 		<description>Reader Rabbit (version 2.2) (trex crack)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>
-		<info name="programmer" value="Pete Rowe and Aaron Weiss" />
+		<info name="programmer" value="Pete Rowe" />
+		<info name="programmer" value="Aaron Weiss" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<info name="version" value="2.2" />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1547,7 +1727,8 @@ license:CC0-1.0
 		<description>Reader Rabbit (version 2.3) (trex crack)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>
-		<info name="programmer" value="Pete Rowe and Aaron Weiss" />
+		<info name="programmer" value="Pete Rowe" />
+		<info name="programmer" value="Aaron Weiss" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<info name="version" value="2.3" />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1565,7 +1746,8 @@ license:CC0-1.0
 		<description>Reading and Me (version 1.0) (trex crack)</description>
 		<year>1988</year>
 		<publisher>Davidson &amp; Associates</publisher>
-		<info name="programmer" value="Louis X. Savain and C. K. Haun" />
+		<info name="programmer" value="Louis X. Savain" />
+		<info name="programmer" value="C. K. Haun" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1590,7 +1772,9 @@ license:CC0-1.0
 		<description>Sea Strike (version 1.0) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
-		<info name="programmer" value="Richard L. Seaborne, Jeff A. Lefferts, and Mei-Ying Dell'Aquila" />
+		<info name="programmer" value="Richard L. Seaborne" />
+		<info name="programmer" value="Jeff A. Lefferts" />
+		<info name="programmer" value="Mei-Ying Dell'Aquila" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1610,7 +1794,14 @@ license:CC0-1.0
 		<description>Serve and Volley (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Rick Banks, Paul Butler, Ken Shimizu, Danny Chin, Paul Battersby, Jeffrey J. Sigler, Grant Campbell, and Jay Stevens" />
+		<info name="programmer" value="Rick Banks" />
+		<info name="programmer" value="Paul Butler" />
+		<info name="programmer" value="Ken Shimizu" />
+		<info name="programmer" value="Danny Chin" />
+		<info name="programmer" value="Paul Battersby" />
+		<info name="programmer" value="Jeffrey J. Sigler" />
+		<info name="programmer" value="Grant Campbell" />
+		<info name="programmer" value="Jay Stevens" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1629,7 +1820,8 @@ license:CC0-1.0
 		<description>Shanghai (version 15-Sep-87) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
-		<info name="programmer" value="Brodie Lockard and Ivan Manley" />
+		<info name="programmer" value="Brodie Lockard" />
+		<info name="programmer" value="Ivan Manley" />
 		<info name="version" value="15-Sep-87" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1650,7 +1842,8 @@ license:CC0-1.0
 		<description>Shanghai (version 20-Jan-87) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
-		<info name="programmer" value="Brodie Lockard and Ivan Manley" />
+		<info name="programmer" value="Brodie Lockard" />
+		<info name="programmer" value="Ivan Manley" />
 		<info name="version" value="20-Jan-87" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1672,7 +1865,8 @@ license:CC0-1.0
 		<description>ShowOff (version 1.1) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Serge Hervy and Jean-Claude Lévy" />
+		<info name="programmer" value="Serge Hervy" />
+		<info name="programmer" value="Jean-Claude Lévy" />
 		<info name="version" value="1.1" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1705,7 +1899,8 @@ license:CC0-1.0
 		<description>ShowOff (Version 1.0) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Serge Hervy and Jean-Claude Lévy" />
+		<info name="programmer" value="Serge Hervy" />
+		<info name="programmer" value="Jean-Claude Lévy" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1740,7 +1935,8 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Microprose</publisher>
 		<info name="developer" value="Sid Meier" />
-		<info name="programmer" value="Dan Chang &amp; Ed Magnin" />
+		<info name="programmer" value="Dan Chang " />
+		<info name="programmer" value="Ed Magnin" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2023-02-24 -->
@@ -1760,7 +1956,15 @@ license:CC0-1.0
 		<description>Silent Service (version 925.01) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Microprose</publisher>
-		<info name="programmer" value="Sid Meier, Ed Magnin, Jim Synoski, Michael Haire, Michele Mahan, Silas Warner, Al Roireau, Larry Martin, and Edward Bever" />
+		<info name="programmer" value="Sid Meier" />
+		<info name="programmer" value="Ed Magnin" />
+		<info name="programmer" value="Jim Synoski" />
+		<info name="programmer" value="Michael Haire" />
+		<info name="programmer" value="Michele Mahan" />
+		<info name="programmer" value="Silas Warner" />
+		<info name="programmer" value="Al Roireau" />
+		<info name="programmer" value="Larry Martin" />
+		<info name="programmer" value="Edward Bever" />
 		<info name="version" value="925.01" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1780,7 +1984,18 @@ license:CC0-1.0
 		<description>Silpheed - Super Dogfighter (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="John Rettig, Stuart Goldstein, Mark Seibert, Satoshi Uesaki, Nobuyuki Ogawa, Akira Eye, Fumihito Kasatani, Nobuyuki Aoshima, Hiromi Ohba, Takeshi Miyaji, Osamu Harada, and Youichi Miyaji" />
+		<info name="programmer" value="John Rettig" />
+		<info name="programmer" value="Stuart Goldstein" />
+		<info name="programmer" value="Mark Seibert" />
+		<info name="programmer" value="Satoshi Uesaki" />
+		<info name="programmer" value="Nobuyuki Ogawa" />
+		<info name="programmer" value="Akira Eye" />
+		<info name="programmer" value="Fumihito Kasatani" />
+		<info name="programmer" value="Nobuyuki Aoshima" />
+		<info name="programmer" value="Hiromi Ohba" />
+		<info name="programmer" value="Takeshi Miyaji" />
+		<info name="programmer" value="Osamu Harada" />
+		<info name="programmer" value="Youichi Miyaji" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1804,7 +2019,10 @@ license:CC0-1.0
 		<description>Skate or Die! IIgs (version 1.1 07-Oct-88) (trex crack)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer" />
+		<info name="programmer" value="Michael Kosaka" />
+		<info name="programmer" value="Stephen Landrum" />
+		<info name="programmer" value="David Bunch" />
+		<info name="programmer" value="Michelle Shelfer" />
 		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
 		<info name="version" value="1.1 07-Oct-88 - ROM 03 compatible" />
 		<!-- sod.sys16 dated 07-Oct-88 -->
@@ -1825,7 +2043,10 @@ license:CC0-1.0
 		<description>Skate or Die! IIgs (version 1.0 12-Aug-88) (trex crack)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer" />
+		<info name="programmer" value="Michael Kosaka" />
+		<info name="programmer" value="Stephen Landrum" />
+		<info name="programmer" value="David Bunch" />
+		<info name="programmer" value="Michelle Shelfer" />
 		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
 		<info name="version" value="1.0 12-Aug-88 - ROM 03 compatible" />
 		<!-- sod.sys16 dated 12-Aug-88 -->
@@ -1846,7 +2067,12 @@ license:CC0-1.0
 		<description>Space Quest: The Sarien Encounter (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Scott Murphy, Mark Crowe, Jeff Stephenson, Chris Iden, Sol Ackerman, and Ken Williams" />
+		<info name="programmer" value="Scott Murphy" />
+		<info name="programmer" value="Mark Crowe" />
+		<info name="programmer" value="Jeff Stephenson" />
+		<info name="programmer" value="Chris Iden" />
+		<info name="programmer" value="Sol Ackerman" />
+		<info name="programmer" value="Ken Williams" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
@@ -1870,7 +2096,12 @@ license:CC0-1.0
 		<description>Space Quest II: Vohaul's Revenge (trex crack)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Scott Murphy, Mark Crowe, Jeff Stephenson, Chris Iden, Sol Ackerman, and Ken Williams" />
+		<info name="programmer" value="Scott Murphy" />
+		<info name="programmer" value="Mark Crowe" />
+		<info name="programmer" value="Jeff Stephenson" />
+		<info name="programmer" value="Chris Iden" />
+		<info name="programmer" value="Sol Ackerman" />
+		<info name="programmer" value="Ken Williams" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1927,7 +2158,12 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A275" />
-		<info name="programmer" value="Charolyn Kapplinger, Patricia Korn, John J. Krenz, Brian S. Nesse, Jean Sharp, and Steve Zehm" />
+		<info name="programmer" value="Charolyn Kapplinger" />
+		<info name="programmer" value="Patricia Korn" />
+		<info name="programmer" value="John J. Krenz" />
+		<info name="programmer" value="Brian S. Nesse" />
+		<info name="programmer" value="Jean Sharp" />
+		<info name="programmer" value="Steve Zehm" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1955,7 +2191,10 @@ license:CC0-1.0
 		<year>1991</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A276" />
-		<info name="programmer" value="Patricia Korn, Brian S. Nesse, Dee Dee Roedel &amp; Jean Sharp" />
+		<info name="programmer" value="Patricia Korn" />
+		<info name="programmer" value="Brian S. Nesse" />
+		<info name="programmer" value="Dee Dee Roedel " />
+		<info name="programmer" value="Jean Sharp" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1983,7 +2222,9 @@ license:CC0-1.0
 		<year>1991</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A298" />
-		<info name="programmer" value="Charolyn Kapplinger, Patricia Korn, and Jean Sharp" />
+		<info name="programmer" value="Charolyn Kapplinger" />
+		<info name="programmer" value="Patricia Korn" />
+		<info name="programmer" value="Jean Sharp" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2027,7 +2268,12 @@ license:CC0-1.0
 		<description>Superstar Ice Hockey (trex crack)</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Ed Ringler, Andrew Caldwell, Clayton Wishoff, Simon Ffinch, Ed Ringler Sr., and Chris Oke" />
+		<info name="programmer" value="Ed Ringler" />
+		<info name="programmer" value="Andrew Caldwell" />
+		<info name="programmer" value="Clayton Wishoff" />
+		<info name="programmer" value="Simon Ffinch" />
+		<info name="programmer" value="Ed Ringler Sr." />
+		<info name="programmer" value="Chris Oke" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
@@ -2044,7 +2290,8 @@ license:CC0-1.0
 		<description>Tales From The Arabian Nights (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="Stanley Brewster and June Stark" />
+		<info name="programmer" value="Stanley Brewster" />
+		<info name="programmer" value="June Stark" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2070,7 +2317,9 @@ license:CC0-1.0
 		<description>Task Force (cleanly cracked)</description>
 		<year>1990</year>
 		<publisher>Britannica Software</publisher>
-		<info name="programmer" value="Scott L. Patterson, Matthew Crysdale, and Gregory A. Thomas" />
+		<info name="programmer" value="Scott L. Patterson" />
+		<info name="programmer" value="Matthew Crysdale" />
+		<info name="programmer" value="Gregory A. Thomas" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2096,7 +2345,15 @@ license:CC0-1.0
 		<description>Tetris (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Spectrum HoloByte</publisher>
-		<info name="programmer" value="Roland Gustafsson, Sean B. Barger, Dan Geisler, Daniel L. Guerra, Jody Sather, Ed Bogas, Neil Cormia, Ty Roberts, and Gary Clayton" />
+		<info name="programmer" value="Roland Gustafsson" />
+		<info name="programmer" value="Sean B. Barger" />
+		<info name="programmer" value="Dan Geisler" />
+		<info name="programmer" value="Daniel L. Guerra" />
+		<info name="programmer" value="Jody Sather" />
+		<info name="programmer" value="Ed Bogas" />
+		<info name="programmer" value="Neil Cormia" />
+		<info name="programmer" value="Ty Roberts" />
+		<info name="programmer" value="Gary Clayton" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2115,7 +2372,15 @@ license:CC0-1.0
 		<description>The Adventures of Sinbad (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="Curt Toumanian, Steve Quinn, Jeff Hilbers, Rob Landeros, Russ Truelove, Bill Williams, Jim Simmons, Andrew Caldwell, Douglass Sharp" />
+		<info name="programmer" value="Curt Toumanian" />
+		<info name="programmer" value="Steve Quinn" />
+		<info name="programmer" value="Jeff Hilbers" />
+		<info name="programmer" value="Rob Landeros" />
+		<info name="programmer" value="Russ Truelove" />
+		<info name="programmer" value="Bill Williams" />
+		<info name="programmer" value="Jim Simmons" />
+		<info name="programmer" value="Andrew Caldwell" />
+		<info name="programmer" value="Douglass Sharp" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM1 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2141,7 +2406,19 @@ license:CC0-1.0
 		<description>The Duel: Test Drive II (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Allan Johnson, Erik Kiss, Amory Wong, Don Mattrick, Rick Friesen, Bruce Dawson, Randy Dillon, Brad Gour, Kris Hatlelid, Chris Taylor, John Boechler, Tony Lee, and Theresa Henry" />
+		<info name="programmer" value="Allan Johnson" />
+		<info name="programmer" value="Erik Kiss" />
+		<info name="programmer" value="Amory Wong" />
+		<info name="programmer" value="Don Mattrick" />
+		<info name="programmer" value="Rick Friesen" />
+		<info name="programmer" value="Bruce Dawson" />
+		<info name="programmer" value="Randy Dillon" />
+		<info name="programmer" value="Brad Gour" />
+		<info name="programmer" value="Kris Hatlelid" />
+		<info name="programmer" value="Chris Taylor" />
+		<info name="programmer" value="John Boechler" />
+		<info name="programmer" value="Tony Lee" />
+		<info name="programmer" value="Theresa Henry" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2186,7 +2463,8 @@ license:CC0-1.0
 		<description>The Fidelity Chessmaster 2100 (version 1.1 17-Nov-88) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>The Software Toolworks</publisher>
-		<info name="programmer" value="Troy Heere and Mark Manyen" />
+		<info name="programmer" value="Troy Heere" />
+		<info name="programmer" value="Mark Manyen" />
 		<info name="version" value="1.1 17-Nov-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2214,7 +2492,8 @@ license:CC0-1.0
 		<description>The Fidelity Chessmaster 2100 (version 1.01 28-Sep-88) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>The Software Toolworks</publisher>
-		<info name="programmer" value="Troy Heere and Mark Manyen" />
+		<info name="programmer" value="Troy Heere" />
+		<info name="programmer" value="Mark Manyen" />
 		<info name="version" value="1.01 28-Sep-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2242,7 +2521,9 @@ license:CC0-1.0
 		<description>The Graphics Studio (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Greg Hospelhorn, Peter Wickman, Richard Antaki" />
+		<info name="programmer" value="Greg Hospelhorn" />
+		<info name="programmer" value="Peter Wickman" />
+		<info name="programmer" value="Richard Antaki" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2261,7 +2542,11 @@ license:CC0-1.0
 		<description>The Immortal (trex crack)</description>
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Will Harvey, Ian Gooding, Michael Marcanted, Brett G. Durrett, and Douglas Fulton" />
+		<info name="programmer" value="Will Harvey" />
+		<info name="programmer" value="Ian Gooding" />
+		<info name="programmer" value="Michael Marcanted" />
+		<info name="programmer" value="Brett G. Durrett" />
+		<info name="programmer" value="Douglas Fulton" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2311,7 +2596,13 @@ license:CC0-1.0
 		<description>The Last Ninja (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
-		<info name="programmer" value="Jeff Silverman, John Kroeckel, J. David Koch, Erol Otus, Doug Barnett, Russell Lieblich, and Nicky Robinson" />
+		<info name="programmer" value="Jeff Silverman" />
+		<info name="programmer" value="John Kroeckel" />
+		<info name="programmer" value="J. David Koch" />
+		<info name="programmer" value="Erol Otus" />
+		<info name="programmer" value="Doug Barnett" />
+		<info name="programmer" value="Russell Lieblich" />
+		<info name="programmer" value="Nicky Robinson" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2330,7 +2621,8 @@ license:CC0-1.0
 		<description>The Logic Master (version 1.5) (cleanly cracked)</description>
 		<year>1990</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="William Demas and June Stark" />
+		<info name="programmer" value="William Demas" />
+		<info name="programmer" value="June Stark" />
 		<info name="version" value="1.5" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2402,7 +2694,9 @@ license:CC0-1.0
 		<description>The New Talking Stickybear Shapes (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
-		<info name="programmer" value="Richard Hefter, David Cunningham, and Susan Dubicki" />
+		<info name="programmer" value="Richard Hefter" />
+		<info name="programmer" value="David Cunningham" />
+		<info name="programmer" value="Susan Dubicki" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2025-01-25 -->
@@ -2421,7 +2715,15 @@ license:CC0-1.0
 		<description>The Print Shop (version 1.0) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="David Balsam, Martin Kahn, Corey Kosak, Ann E. Kronen, Susan E. Schlangen, Richard Whittaker, Michelle McBride, Don Albrecht, and Leila Bronstein" />
+		<info name="programmer" value="David Balsam" />
+		<info name="programmer" value="Martin Kahn" />
+		<info name="programmer" value="Corey Kosak" />
+		<info name="programmer" value="Ann E. Kronen" />
+		<info name="programmer" value="Susan E. Schlangen" />
+		<info name="programmer" value="Richard Whittaker" />
+		<info name="programmer" value="Michelle McBride" />
+		<info name="programmer" value="Don Albrecht" />
+		<info name="programmer" value="Leila Bronstein" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2442,7 +2744,15 @@ license:CC0-1.0
 		<description>The Third Courier (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Carol Manley, Ivan Manley, Mike Branham, Robert Clardy, Chris Barker, Scott Wallin, Miik Nichols, Sheldon Safir, and Mark Wallace" />
+		<info name="programmer" value="Carol Manley" />
+		<info name="programmer" value="Ivan Manley" />
+		<info name="programmer" value="Mike Branham" />
+		<info name="programmer" value="Robert Clardy" />
+		<info name="programmer" value="Chris Barker" />
+		<info name="programmer" value="Scott Wallin" />
+		<info name="programmer" value="Miik Nichols" />
+		<info name="programmer" value="Sheldon Safir" />
+		<info name="programmer" value="Mark Wallace" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2468,7 +2778,8 @@ license:CC0-1.0
 		<description>The Tower of Myraglen (version 1.0) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
-		<info name="programmer" value="Richard L. Seaborne and Jeff A. Lamberts" />
+		<info name="programmer" value="Richard L. Seaborne" />
+		<info name="programmer" value="Jeff A. Lamberts" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2495,7 +2806,13 @@ license:CC0-1.0
 		<description>The Three Stooges (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Cinemaware</publisher>
-		<info name="programmer" value="John Cutter, Robert Jacob, Phyllis Jacob, Ed Magnin, Russell Truelove, Jim Simmons, and Patrick Cook" />
+		<info name="programmer" value="John Cutter" />
+		<info name="programmer" value="Robert Jacob" />
+		<info name="programmer" value="Phyllis Jacob" />
+		<info name="programmer" value="Ed Magnin" />
+		<info name="programmer" value="Russell Truelove" />
+		<info name="programmer" value="Jim Simmons" />
+		<info name="programmer" value="Patrick Cook" />
 		<info name="usage" value="Requires an 1.25MB Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2521,7 +2838,9 @@ license:CC0-1.0
 		<description>The Wonders of the Animal Kingdom (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="Stan Brewster, Joseph Hewitt, and June Stark" />
+		<info name="programmer" value="Stan Brewster" />
+		<info name="programmer" value="Joseph Hewitt" />
+		<info name="programmer" value="June Stark" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2547,7 +2866,8 @@ license:CC0-1.0
 		<description>The Word Master (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="William Demas and Joseph Hewitt" />
+		<info name="programmer" value="William Demas" />
+		<info name="programmer" value="Joseph Hewitt" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2566,7 +2886,13 @@ license:CC0-1.0
 		<description>Thexder (version 1.0) (trex crack) (No OS, not self booting)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby" />
+		<info name="programmer" value="H. Godai" />
+		<info name="programmer" value="S. Uesaka" />
+		<info name="programmer" value="Michael D. Branham" />
+		<info name="programmer" value="Robert C. Clardy" />
+		<info name="programmer" value="John P. Conley" />
+		<info name="programmer" value="Lloyd Ollmann, Jr." />
+		<info name="programmer" value="Michael Ormsby" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2586,7 +2912,13 @@ license:CC0-1.0
 		<description>Thexder (version 2.7) (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby" />
+		<info name="programmer" value="H. Godai" />
+		<info name="programmer" value="S. Uesaka" />
+		<info name="programmer" value="Michael D. Branham" />
+		<info name="programmer" value="Robert C. Clardy" />
+		<info name="programmer" value="John P. Conley" />
+		<info name="programmer" value="Lloyd Ollmann, Jr." />
+		<info name="programmer" value="Michael Ormsby" />
 		<info name="version" value="2.7" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2604,7 +2936,8 @@ license:CC0-1.0
 		<description>TopDraw (version 1.01A (8/4/87)) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>StyleWare</publisher>
-		<info name="programmer" value="Robert A. Hearn and Jeff G. Erickson" />
+		<info name="programmer" value="Robert A. Hearn" />
+		<info name="programmer" value="Jeff G. Erickson" />
 		<info name="version" value="1.01A (8/4/87)" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -2624,7 +2957,8 @@ license:CC0-1.0
 		<description>TopDraw (version 1.00A (7/12/87)) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>StyleWare</publisher>
-		<info name="programmer" value="Robert A. Hearn and Jeff G. Erickson" />
+		<info name="programmer" value="Robert A. Hearn" />
+		<info name="programmer" value="Jeff G. Erickson" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<info name="version" value="1.00A (7/12/87)" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -2643,7 +2977,10 @@ license:CC0-1.0
 		<description>TrianGo (version 1.0) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
-		<info name="programmer" value="Staszek Bartkowski, Marcin Szostakowski, Maciej Markuszewski, Dorota Błaszczak" />
+		<info name="programmer" value="Staszek Bartkowski" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Dorota Błaszczak" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2663,7 +3000,19 @@ license:CC0-1.0
 		<description>Uninvited (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>ICOM Simulations</publisher>
-		<info name="programmer" value="Fred Allen, David Marsh, Karl Roelofs, Todd Squires, Craig Erickson, Steven Hays, Terry Schulenburg, Darin Adler, Jay Zipnick, Waldemar Horwat, Mark Waterman, Tod Zipnick, and Billy Wolf" />
+		<info name="programmer" value="Fred Allen" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Karl Roelofs" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Craig Erickson" />
+		<info name="programmer" value="Steven Hays" />
+		<info name="programmer" value="Terry Schulenburg" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="programmer" value="Mark Waterman" />
+		<info name="programmer" value="Tod Zipnick" />
+		<info name="programmer" value="Billy Wolf" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2689,7 +3038,12 @@ license:CC0-1.0
 		<description>USA GeoGraph (Version 1.0) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
-		<info name="programmer" value="Nelson Whyatt, Paul R. Wenker, Wayne Studer, Steven D. Splinter, John L. Krenz, and Charolyn Kapplinger" />
+		<info name="programmer" value="Nelson Whyatt" />
+		<info name="programmer" value="Paul R. Wenker" />
+		<info name="programmer" value="Wayne Studer" />
+		<info name="programmer" value="Steven D. Splinter" />
+		<info name="programmer" value="John L. Krenz" />
+		<info name="programmer" value="Charolyn Kapplinger" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2716,7 +3070,10 @@ license:CC0-1.0
 		<description>Vegas Craps (version 1.0) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
-		<info name="programmer" value="Krzysztof Koziarski, Maciej Markuszewski, Marcin Szostakowski, and Dorota Błaszczak" />
+		<info name="programmer" value="Krzysztof Koziarski" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Dorota Błaszczak" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2736,7 +3093,11 @@ license:CC0-1.0
 		<description>Vegas Gambler (version 1.1 25-Jul-88) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
-		<info name="programmer" value="Marek Jackiewicz, Andrzej Miciłkiewicz, Marcin Szostakowski, Maciej Markuszewski, and Dorota Błaszczak" />
+		<info name="programmer" value="Marek Jackiewicz" />
+		<info name="programmer" value="Andrzej Miciłkiewicz" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Dorota Błaszczak" />
 		<info name="version" value="1.1 25-Jul-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2757,7 +3118,11 @@ license:CC0-1.0
 		<description>Vegas Gambler (version 1.0 07-Jun-88) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
-		<info name="programmer" value="Marek Jackiewicz, Andrzej Miciłkiewicz, Marcin Szostakowski, Maciej Markuszewski, and Dorota Błaszczak" />
+		<info name="programmer" value="Marek Jackiewicz" />
+		<info name="programmer" value="Andrzej Miciłkiewicz" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Dorota Błaszczak" />
 		<info name="version" value="1.0 07-Jun-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2778,7 +3143,22 @@ license:CC0-1.0
 		<description>War in Middle Earth (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
-		<info name="programmer" value="Ron Harris, Robert Clardy, Alan B. Clark, Graeme Devine, Mike Branham, Lloyd Ollmann, Jr., John Conley, Jim McBride, Michael Park, David Schroeder, Michael Ormsby, Mike Christy, Ann Dickens Clardy, Marcus Streets, Mark Riley, and Mike Singleton" />
+		<info name="programmer" value="Ron Harris" />
+		<info name="programmer" value="Robert Clardy" />
+		<info name="programmer" value="Alan B. Clark" />
+		<info name="programmer" value="Graeme Devine" />
+		<info name="programmer" value="Mike Branham" />
+		<info name="programmer" value="Lloyd Ollmann, Jr." />
+		<info name="programmer" value="John Conley" />
+		<info name="programmer" value="Jim McBride" />
+		<info name="programmer" value="Michael Park" />
+		<info name="programmer" value="David Schroeder" />
+		<info name="programmer" value="Michael Ormsby" />
+		<info name="programmer" value="Mike Christy" />
+		<info name="programmer" value="Ann Dickens Clardy" />
+		<info name="programmer" value="Marcus Streets" />
+		<info name="programmer" value="Mark Riley" />
+		<info name="programmer" value="Mike Singleton" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2804,7 +3184,17 @@ license:CC0-1.0
 		<description>Where in the U.S.A. is Carmen Sandiego? (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood, Lauren Elliot, Peter Adams, Leila Bronstein, Julie Glavin, Michelle McBride, Dan Guerra, Les Pardue, Bevan Hulfenstein, Louis Evans, and Tom Rettig" />
+		<info name="programmer" value="Gene Portwood" />
+		<info name="programmer" value="Lauren Elliot" />
+		<info name="programmer" value="Peter Adams" />
+		<info name="programmer" value="Leila Bronstein" />
+		<info name="programmer" value="Julie Glavin" />
+		<info name="programmer" value="Michelle McBride" />
+		<info name="programmer" value="Dan Guerra" />
+		<info name="programmer" value="Les Pardue" />
+		<info name="programmer" value="Bevan Hulfenstein" />
+		<info name="programmer" value="Louis Evans" />
+		<info name="programmer" value="Tom Rettig" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2830,7 +3220,12 @@ license:CC0-1.0
 		<description>Where in the World is Carmen Sandiego? (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood, Lauren Elliott, Loring Vogel, Leila Bronstein, Don Albrecht, and Michelle McBride" />
+		<info name="programmer" value="Gene Portwood" />
+		<info name="programmer" value="Lauren Elliott" />
+		<info name="programmer" value="Loring Vogel" />
+		<info name="programmer" value="Leila Bronstein" />
+		<info name="programmer" value="Don Albrecht" />
+		<info name="programmer" value="Michelle McBride" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2890,7 +3285,13 @@ license:CC0-1.0
 		<description>World GeoGraph (Version 1.3) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
-		<info name="programmer" value="Charolyn Kapplinger, John L. Krenz, Diane Portner, Steven D. Splinter, Wayne Studer, Paul R. Wenker, and Nelson Whyatt" />
+		<info name="programmer" value="Charolyn Kapplinger" />
+		<info name="programmer" value="John L. Krenz" />
+		<info name="programmer" value="Diane Portner" />
+		<info name="programmer" value="Steven D. Splinter" />
+		<info name="programmer" value="Wayne Studer" />
+		<info name="programmer" value="Paul R. Wenker" />
+		<info name="programmer" value="Nelson Whyatt" />
 		<info name="version" value="1.3" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2934,7 +3335,10 @@ license:CC0-1.0
 		<description>Writer's Choice Elite (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
-		<info name="programmer" value="Richard Danais, Nancy Philippine, Bernard Gallet, and Luc Barthelet" />
+		<info name="programmer" value="Richard Danais" />
+		<info name="programmer" value="Nancy Philippine" />
+		<info name="programmer" value="Bernard Gallet" />
+		<info name="programmer" value="Luc Barthelet" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2953,7 +3357,8 @@ license:CC0-1.0
 		<description>Xenocide (version 25-Sep-89) (unprotected)</description>
 		<year>1989</year>
 		<publisher>Micro Revelations</publisher>
-		<info name="programmer" value="Brian Greenstone and Dave Triplett" />
+		<info name="programmer" value="Brian Greenstone" />
+		<info name="programmer" value="Dave Triplett" />
 		<info name="version" value="25-Sep-89" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2974,7 +3379,8 @@ license:CC0-1.0
 		<description>Xenocide (version 11-Aug-89) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Micro Revelations</publisher>
-		<info name="programmer" value="Brian Greenstone and Dave Triplett" />
+		<info name="programmer" value="Brian Greenstone" />
+		<info name="programmer" value="Dave Triplett" />
 		<info name="version" value="11-Aug-89" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -2995,7 +3401,10 @@ license:CC0-1.0
 		<description>Zany Golf (trex crack)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Will Harvey, Jim Nitchals, Ian Gooding, and Doug Fulton" />
+		<info name="programmer" value="Will Harvey" />
+		<info name="programmer" value="Jim Nitchals" />
+		<info name="programmer" value="Ian Gooding" />
+		<info name="programmer" value="Doug Fulton" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->

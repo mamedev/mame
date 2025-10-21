@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese, Matthew Daniels
 /*
     Sega Model 2: i960KB + (5x TGP) or (2x SHARC) or (2x TGPx4)
     System 24 tilemaps
@@ -7,7 +7,7 @@
     (68000 + YM3438 + 2x MultiPCM) or (68000 + SCSP)
 
     Hardware and protection reverse-engineering and general assistance by ElSemi.
-    MAME driver by R. Belmont, Olivier Galibert, ElSemi and Angelo Salese.
+    MAME driver by R. Belmont, Olivier Galibert, ElSemi, Angelo Salese and Matthew Daniels.
 
     TODO:
     - Mip Mapping still needs to be properly sorted in the renderer;
@@ -93,6 +93,7 @@
 
 #include "model1io2.lh"
 #include "segabill.lh"
+#include "stcc.lh"
 
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 u32 model2_state::timers_r(offs_t offset)
@@ -7607,10 +7608,10 @@ GAME( 1998, pltkids,    0,        model2b_5881, pltkids,   model2b_state, init_p
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 GAME( 1996, skisuprg,   0,        skisuprg,     skisuprg,  model2c_state, empty_init,    ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, stcc,       0,        stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stccb,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stcca,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stcco,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAMEL( 1996, stcc,       0,        stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_stcc )
+GAMEL( 1996, stccb,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_stcc )
+GAMEL( 1996, stcca,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_stcc )
+GAMEL( 1996, stcco,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_stcc )
 GAME( 1996, waverunr,   0,        waverunr,     waverunr,  model2c_state, empty_init,    ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, bel,        0,        bel,          bel,       model2c_state, empty_init,    ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,       0,        hotd,         hotd,      model2c_state, empty_init,    ROT0, "Sega",   "The House of the Dead (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

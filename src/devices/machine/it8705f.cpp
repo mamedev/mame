@@ -240,11 +240,11 @@ void it8705f_device::config_map(address_map &map)
 	);
 	m_logical_view[0](0x74, 0x74).lrw8(
 		NAME([this] () {
-			return m_pc_lpt_drq_line;
+			return m_pc_fdc_drq_line;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_pc_fdc_drq_line = data & 0x7;
-			LOG("LDN0 (FDC): drq %s (%02x)\n", BIT(m_pc_lpt_drq_line, 2) ? "disabled" : "enabled", data);
+			LOG("LDN0 (FDC): drq %s (%02x)\n", BIT(m_pc_fdc_drq_line, 2) ? "disabled" : "enabled", data);
 		})
 	);
 	// TODO: m_logical_view[0](0xf0, 0xf1) FDC config
@@ -422,7 +422,7 @@ void it8705f_device::irq_floppy_w(int state)
 
 void it8705f_device::drq_floppy_w(int state)
 {
-	if (!m_activate[0])
+	if (!m_activate[0] || BIT(m_pc_fdc_drq_line, 2))
 		return;
 	request_dma(m_pc_fdc_drq_line, state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -613,7 +613,7 @@ void address_space_installer::check_optimize_all(const char *function, int width
 				}
 		}
 
-		// 4. Ajusting the mirror
+		// 4. Adjusting the mirror
 		nmirror &= ~default_lowbits_mask;
 
 		// 5. Recompute changing_bits, it matters for the next optimization.  No need to round up through

@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "sound/okiadpcm.h"
 #include "dirom.h"
 

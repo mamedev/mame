@@ -52,7 +52,7 @@ main PCB (marked 9101):
 #include "emu.h"
 
 #include "cpu/m6502/m6502.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"

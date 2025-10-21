@@ -12,7 +12,7 @@
 
 #include "m72_a.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/mb8421.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"

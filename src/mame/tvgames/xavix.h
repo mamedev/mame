@@ -28,6 +28,8 @@
 // some games (eg Radica Opus) run off a 3.579545MHz XTAL ( same as the above /6 ) so presumably there is a divider / multiplier circuit on some PCBs?
 // TODO: what's the PAL clock?
 
+class xavix_state;
+
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -42,6 +44,7 @@ public:
 	void enable_voice(int voice, bool update_only);
 	void disable_voice(int voice);
 	bool is_voice_enabled(int voice);
+	uint32_t sample_ram_read(uint32_t page, uint16_t offset) const;
 
 	// rate handling
 	void set_tempo(int index, uint8_t value);
@@ -59,6 +62,12 @@ public:
 	void set_dac_gain(uint8_t amp_data);
 	void set_output_mode(bool mono);
 	void set_mastervol(uint8_t data);
+	attotime tempo_period(uint8_t tempo) const;
+	double tempo_frequency(uint8_t tempo) const;
+	double tempo_tick_hz(uint8_t tempo) const;
+	uint32_t  phase_step_per_tick(uint32_t rate) const;
+	uint32_t envelope_period_ticks(uint8_t tp) const;
+
 
 protected:
 	// device-level overrides
@@ -73,8 +82,9 @@ private:
 	sound_stream* m_stream = nullptr;
 
 	// global timing
-	uint8_t m_tp_dev[4] = { 0, 0, 0, 0 };
-	uint8_t m_cyclerate_dev = 1;
+	uint8_t m_tempo_div[4] = { 0, 0, 0, 0 };
+	uint8_t m_cyclerate_div = 1;
+	uint32_t m_sequencer_rate_hz;
 
 	// callbacks
 	devcb_read8  m_readregs_cb;
@@ -85,14 +95,13 @@ private:
 	struct xavix_voice {
 		uint8_t   enabled = 0;
 		uint32_t  position = 0;
-		uint32_t  loopposition = 0;
-		uint32_t  loopendposition = 0;
-		uint32_t  startposition = 0;
+		uint32_t  loop_position = 0;
+		uint32_t  start_position = 0;
 
-		uint32_t  envpositionleft = 0;
-		uint32_t  envpositionright = 0;
-		uint8_t   envbank = 0;
-		uint8_t   envmode = 0;
+		uint32_t  env_pos_left = 0;
+		uint32_t  env_pos_right = 0;
+		uint8_t   env_bank = 0;
+		uint8_t   env_mode = 0;
 
 		uint8_t   bank = 0;
 		uint32_t  rate = 0;
@@ -111,16 +120,17 @@ private:
 		uint8_t   env_active_right = 1;
 
 		// misc (vm1/vm2 helpers, tickers)
-		uint8_t   env_phase = 0;
+		bool      log_env_started = false;
+		bool      log_env_stopped = false;
+		bool      log_env_paused = false;
 
-		uint8_t la_byte = 0;  // shadow of LA (low address byte)
-		uint8_t ra_byte = 0;  // shadow of RA (low address byte)
+		uint16_t noise_state = 0;
 	};
 
 	// mixer state
 	struct xavix_mixer
 	{
-		uint8_t monoural = 0;
+		uint8_t monaural = 0;
 		uint8_t capacity = 0;
 		uint8_t amp = 2;
 
@@ -136,18 +146,13 @@ private:
 	xavix_mixer m_mix;
 	xavix_voice m_voice[16];
 
-	uint32_t m_pitch_countdown[16];
-
 	// helpers
-	uint32_t tempo_to_period_samples(uint8_t tp) const;
+	uint32_t tempo_to_period_ticks(uint8_t tp) const;
 	uint8_t decay(uint8_t x);
+	void step_pitch(int voice);
 	void step_envelope(int voice);
 	uint8_t fetch_env_byte(int voice, int channel, uint32_t idx);
 	uint8_t fetch_env_byte_direct(int voice, int channel, uint16_t addr);
-	void step_pitch(int voice);
-	void step_side1(int channel, int voice, const uint8_t la, const uint8_t ra);
-	void step_side_env_vm1(int channel, xavix_voice v, int voice);
-	void step_side_env_vm2(int channel, xavix_voice v, int voice);
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)
@@ -219,6 +224,8 @@ public:
 
 	void init_xavix();
 	void init_no_timer() { init_xavix(); m_disable_timer_irq_hack = true; }
+
+	uint8_t sound_current_page() const;
 
 	void ioevent_trg01(int state);
 	void ioevent_trg02(int state);
@@ -583,6 +590,9 @@ protected:
 	uint8_t anport3_r() { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; }
 
 	void update_irqs();
+	void refresh_sound_irq_state();
+	void reprogram_sound_timer(int index);
+	
 	uint8_t m_irqsource = 0;
 
 	uint8_t m_vectorenable = 0;

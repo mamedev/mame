@@ -23,8 +23,8 @@ public:
 
 	uint8_t dma_r_cb(offs_t offset);
 	void dma_w_cb(offs_t offset, uint8_t data);
-	uint16_t dma_r16_cb();
-	void dma_w16_cb(uint16_t data);
+	uint16_t dma_r16_cb(offs_t offset, uint16_t mem_mask);
+	void dma_w16_cb(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 protected:
 	// device-level overrides
@@ -62,6 +62,7 @@ private:
 		int32_t b = 0, l = 0; // filter state
 		uint8_t send_dest = 0;
 		uint8_t send_level = 0;
+		uint8_t sample_type = 0; // 0 = 16-bit, 1 = 12-bit non-linear
 	};
 
 	devcb_write_line m_drq_handler;
@@ -75,6 +76,8 @@ private:
 	double  m_sample_rate;
 
 	uint64_t m_regs[REGS_PER_VOICE][NUM_VOICES];
+
+	uint32_t m_ram_mask;
 
 	void voice_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t voiceregs_r(offs_t offset);

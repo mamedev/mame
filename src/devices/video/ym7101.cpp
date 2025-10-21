@@ -112,6 +112,7 @@ void ym7101_device::device_start()
 	save_item(STRUCT_MEMBER(m_dma, active));
 	save_item(STRUCT_MEMBER(m_dma, fill));
 
+	save_item(NAME(m_ie2));
 	save_item(NAME(m_ie1));
 	save_item(NAME(m_vr));
 	save_item(NAME(m_de));
@@ -124,6 +125,8 @@ void ym7101_device::device_start()
 	save_item(NAME(m_hscroll_address));
 	save_item(NAME(m_hsz));
 	save_item(NAME(m_vsz));
+	save_item(NAME(m_hpage));
+	save_item(NAME(m_vpage));
 	save_item(NAME(m_auto_increment));
 	save_item(NAME(m_plane_a_name_table));
 	save_item(NAME(m_window_name_table));
@@ -158,7 +161,7 @@ void ym7101_device::device_reset()
 	m_vr = false;
 	m_vram_mask = 0xffff;
 	m_de = false;
-	m_ie0 = false;
+	m_ie0 = m_ie1 = m_ie2 = false;
 	m_vint_pending = 0;
 	m_plane_a_name_table = 0;
 	m_plane_b_name_table = 0;
@@ -483,6 +486,53 @@ void ym7101_device::vsram_map(address_map &map)
 
 static const char *const size_names[] = { "256 pixels/32 cells", "512 pixels/64 cells", "<invalid>", "1024 pixels/128 cells" };
 
+void ym7101_device::calculate_plane_sizes()
+{
+	const u16 page_masks[] = { 32, 64, 1, 128 };
+
+	m_hpage = page_masks[m_hsz];
+	m_vpage = page_masks[m_vsz];
+
+	// https://gendev.spritesmind.net/forum/viewtopic.php?p=31307#p31307
+	// Triggering 1x settings that aren't 11x00 or 00x11 trigger various forms of overrides ...
+	if (m_hsz & 2 || m_vsz & 2)
+	{
+		if (m_hsz == 2)
+		{
+			// forces 32x1 regardless of VSZ
+			m_hpage = 32;
+			m_vpage = 1;
+			LOG("Prohibited plane setting HSZ 2 VSZ %d (forced to 32x1)\n", m_vsz);
+		}
+		else if (m_hsz == 3)
+		{
+			// forces 128x32 regardless of VSZ
+			m_vpage = 32;
+			if (m_vsz)
+				LOG("Prohibited plane setting HSZ 3 VSZ %d (forced to 128x32)\n", m_vsz);
+		}
+		else if (m_vsz == 2)
+		{
+			if (m_hsz == 0)
+				popmessage("ym7101.cpp: prohibited plane setting HSZ 0 VSZ 2 (mirroring?)");
+			else
+			{
+				// forces NNx32, H untouched
+				// hulk uses HSZ=1 VSZ=2 on title screen
+				m_vpage = 32;
+				LOG("Prohibited plane setting HSZ %d VSZ 2 (forced to V32)\n", m_hsz);
+			}
+		}
+		else if (m_vsz == 3 && m_hsz == 1)
+		{
+			// forces 64x64
+			m_hpage = 64;
+			m_vpage = 64;
+			LOG("Prohibited plane setting HSZ 1 VSZ 3 (forced to 64x64)\n");
+		}
+	}
+}
+
 // https://plutiedev.com/vdp-registers
 // https://segaretro.org/Sega_Mega_Drive/VDP_registers
 // NOTE: in decimal units, classic Yamaha
@@ -589,10 +639,11 @@ void ym7101_device::regs_map(address_map &map)
 	// <-- mode 4 ignores everything beyond this point
 	map(11, 11).lw8(NAME([this] (u8 data) {
 		LOGREGS("#11: Mode Register 3 %02x\n", data);
+		m_ie2 = !!BIT(data, 3);
 		m_vs = BIT(data, 2);
 		m_hs = data & 3;
 		LOGREGS("\tIE2: %d VS: %d HS: %d\n"
-			, BIT(data, 3)
+			, m_ie2
 			, m_vs
 			, m_hs
 		);
@@ -640,8 +691,8 @@ void ym7101_device::regs_map(address_map &map)
 			, m_vsz
 			, size_names[m_vsz]
 		);
-		if (m_hsz == 2 || m_vsz == 2 || (m_vsz == 3 && m_hsz != 0) || (m_hsz == 3 && m_vsz != 0))
-			popmessage("ym7101.cpp: illegal plane size set %d %d", m_hsz, m_vsz);
+
+		calculate_plane_sizes();
 	}));
 	map(17, 17).lw8(NAME([this] (u8 data) {
 		m_rigt = !!BIT(data, 7);
@@ -853,10 +904,8 @@ void ym7101_device::prepare_tile_line(int scanline)
 	const u16 tile_mask = 0x7ff;
 	//const u16 page_mask[] = { 0x7ff, 0x1fff, 0x1fff, 0x1fff };
 
-	const u16 page_masks[] = { 32, 64, 1, 128 };
-
-	const u16 h_page = page_masks[m_hsz];
-	const u16 v_page = page_masks[m_vsz];
+//	const u16 m_hpage = page_masks[m_hsz];
+//	const u16 m_vpage = page_masks[m_vsz];
 
 	// AV Artisan games will set plane B base with 0x18000
 	const u32 plane_a_name_base = (m_plane_a_name_table & m_vram_mask) >> 1;
@@ -928,8 +977,8 @@ void ym7101_device::prepare_tile_line(int scanline)
 		{
 			const u16 scrollx_a = m_vram[(m_hscroll_address >> 1) + scroll_x_base];
 			const u16 scrolly_a = m_vsram[x & scroll_y_mask];
-			const u16 vcolumn_a = (scrolly_a + scanline) & ((v_page * 8) - 1);
-			const u32 tile_offset_a = ((x - (scrollx_a >> 3)) & ((h_page * 1) - 1)) + ((vcolumn_a >> 3) * (h_page >> 0));
+			const u16 vcolumn_a = (scrolly_a + scanline) & ((m_vpage * 8) - 1);
+			const u32 tile_offset_a = ((x - (scrollx_a >> 3)) & ((m_hpage * 1) - 1)) + ((vcolumn_a >> 3) * (m_hpage >> 0));
 			scrolly_a_frac = scrolly_a & 7;
 			scrollx_a_frac = scrollx_a & 7;
 
@@ -945,8 +994,8 @@ void ym7101_device::prepare_tile_line(int scanline)
 		const u16 scrollx_b_frac = scrollx_b & 7;
 		const u16 scrolly_b = m_vsram[(x & scroll_y_mask) + 1];
 		const u16 scrolly_b_frac = scrolly_b & 7;
-		const u16 vcolumn_b = (scrolly_b + scanline) & ((v_page * 8) - 1);
-		const u32 tile_offset_b = ((x - (scrollx_b >> 3)) & ((h_page * 1) - 1)) + ((vcolumn_b >> 3) * (h_page >> 0));
+		const u16 vcolumn_b = (scrolly_b + scanline) & ((m_vpage * 8) - 1);
+		const u32 tile_offset_b = ((x - (scrollx_b >> 3)) & ((m_hpage * 1) - 1)) + ((vcolumn_b >> 3) * (m_hpage >> 0));
 		const u16 id_flags_b = m_vram[(plane_b_name_base + tile_offset_b) & m_vram_mask];
 		const u16 tile_b = id_flags_b & tile_mask;
 		const u8 flipx_b = BIT(id_flags_b, 11) ? 4 : 3;

@@ -77,9 +77,87 @@ Has [PC9801-86] DAC FIFO issues
 		</part>
 	</software>
 
+	<software name="plamo3x" supported="partial">
+		<!--
+		Origin: Plamo Linux ring.gr.jp
+		plamo-3.x.iso         sha1=a454655ddf48934d01a508911f3c4825434cee7c md5=c0a2ff5216fd3457399268f2ba0d983a
+		plamo-3.x-contrib.iso sha1=d80d57bfc3ecf05343f0bcbdde30bd5e10525137 md5=0c969f5643aa48355551902f54f563f1
+		-->
+		<description>Plamo Linux 3.x</description>
+		<year>2003</year>
+		<publisher>Plamo Linux</publisher>
+		<notes><![CDATA[
+Slackware-based distro
+https://git.sr.ht/~nkali/plamo98-goodies/tree/main/item/plamo3x/install.md
+pc9821ap2: installer randomly corrupt logs at startup when entering 256 color mode (clear output fixes it)
+Cannot install GRUB once install completed, need workaround (verify)
+Booting with load rootdsk from (fd1) fails (verify, GRUB has issues specifically with these disks)
+]]></notes>
+		<info name="usage" value="cfr. detailed URL in XML notes node" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="bootdsk.img" size="1474560" crc="38647e2a" sha1="b959b43cbacc5b189fd6246312413cda9fe8ff19" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Root Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="rootdsk.img" size="1474560" crc="e8fd82e8" sha1="9c23f79967d2af34c7790d14166645e35fd56e55" />
+			</dataarea>
+		</part>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="plamo-3.x" sha1="6dbb4e58161b8117832d95c524b98d8addb5cade"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="plamo-3.x-contrib" sha1="35aa2f1bf839be0417a45bcc309f5f64457285c6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="plamo33"  supported="partial">
+		<!--
+		Origin: Plamo Linux ring.gr.jp
+		plamo-3.3.iso         sha1=80012a39c4567ac649fd3ba94c3e51e1e8a29e8d md5=ace1849cbf2cdfc6b657e2e2254f0821
+		plamo-3.3-contrib.iso sha1=15aba189c5846db625589135aa248134e311afa3 md5=af5f608ec74d356b8fb1fa307ccbcbe4
+		-->
+		<description>Plamo Linux 3.3</description>
+		<year>2003</year>
+		<publisher>Plamo Linux</publisher>
+		<notes><![CDATA[
+Slackware-based distro, cfr. plamo3x
+]]></notes>
+		<info name="usage" value="cfr. detailed URL in plamo3x XML notes node" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="bootdsk.img" size="1474560" crc="f8cc84cc" sha1="64e3d3d148a931adb8607cdd5f35d4273cd7ea87" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Root Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="rootdsk.img" size="1474560" crc="a686291e" sha1="fa5e61023925788774458e7f49ea2a16efadef1b" />
+			</dataarea>
+		</part>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="plamo-3.3" sha1="6f8b0a3c0d947bb30cd632cad7789a77ac664f8d"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="plamo-3.3-contrib" sha1="a2abdc63bae1e9e7ddcf5458941909c2dad5b8fd"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!--
 
-	Current status of Windows OSes:
+	Outdated status of Windows OSes (i.e. test me again, move to notes)
 
 	Windows 95: works, but the PC-9801-86 driver has some trouble playing sounds
 	Windows 98: installer complains about not having at least a 66 MHz CPU
@@ -308,7 +386,7 @@ Has [PC9801-86] DAC FIFO issues
 		</part>
 	</software>
 
-	<software name="win95" supported="partial">
+	<software name="win95">
 		<!--
 		Origin: Unknown
 		<rom name="Microsoft Windows 95 PC-98 (JPN).iso" size="81395712" crc="d402c155" sha1="14d10f62db11397ea46bdf02d1619f1b8e1ff345"/>
@@ -366,6 +444,7 @@ Has [PC9801-86] DAC FIFO issues
 		</part>
 	</software>
 
+	<!-- TODO: retest me, potentially lift partial -->
 	<software name="win95o2" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
@@ -465,7 +544,7 @@ Has [PC9801-86] DAC FIFO issues
 		</part>
 	</software>
 
-	<software name="xa12c8ss">
+	<software name="xa12c8ss" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -477,6 +556,9 @@ Has [PC9801-86] DAC FIFO issues
 		<description>PC-9821Xa12C8 System Software</description>
 		<year>1995</year>
 		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Media for undumped pc9821xa12
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Install Disk #1" />
 			<dataarea name="flop" size="1261568">

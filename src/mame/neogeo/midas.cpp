@@ -56,7 +56,7 @@
 #include "neogeo_spr.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"

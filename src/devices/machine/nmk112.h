@@ -40,8 +40,8 @@ private:
 
 	void oki_map(unsigned which, address_map &map) ATTR_COLD;
 
-	optional_memory_bank_array<4> m_samplebank[2];
-	optional_memory_bank_array<4> m_tablebank[2];
+	memory_bank_array_creator<4> m_samplebank[2];
+	memory_bank_array_creator<4> m_tablebank[2];
 	optional_region_ptr_array<uint8_t, 2> m_rom;
 
 	// internal state
@@ -49,7 +49,7 @@ private:
 	/* which chips have their sample address table divided into pages */
 	uint8_t m_page_mask;
 
-	uint32_t m_size[2];
+	uint8_t m_bankmask[2];
 };
 
 DECLARE_DEVICE_TYPE(NMK112, nmk112_device)

@@ -6,16 +6,16 @@ Winbond W83977TF
 
 TODO:
 - PoC for a generic (LPC) Super I/O type, consider abstracting common points with fdc37c93x;
-- savquest (in pciagp) fails keyboard self test
-  \- bp e140c,1,{eax&=~1;g} bit 0 stuck high from port $64, "receives" while essentially reading
-     status only three times (and port $61 is claimed by PIIX4 for PCI SERR# read only)
 - DRQ (savquest enables DRQ3 for LPT)
 - Hookup LPT modes;
+- subclass for megadrive magistr16 system (uses w83977f/w83977af)
 
 **************************************************************************************************/
 
 #include "emu.h"
 #include "w83977tf.h"
+
+#include "formats/naslite_dsk.h"
 
 //#include "machine/ds128x.h"
 #include "machine/pckeybrd.h"
@@ -34,6 +34,7 @@ w83977tf_device::w83977tf_device(const machine_config &mconfig, const char *tag,
 	, device_isa16_card_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("superio_config_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(w83977tf_device::config_map), this))
+	, m_fdc(*this, "fdc")
 	, m_kbdc(*this, "pc_kbdc")
 	, m_rtc(*this, "rtc")
 	, m_lpt(*this, "lpt")
@@ -49,6 +50,8 @@ w83977tf_device::w83977tf_device(const machine_config &mconfig, const char *tag,
 //  , m_txd2_callback(*this)
 //  , m_ndtr2_callback(*this)
 //  , m_nrts2_callback(*this)
+	, m_gpio1_read_cb(*this, 0xff)
+	, m_gpio1_write_cb(*this)
 	, m_index(0)
 	, m_logical_index(0)
 	, m_hefras(0)
@@ -69,12 +72,11 @@ w83977tf_device::~w83977tf_device()
 void w83977tf_device::device_start()
 {
 	set_isa_device();
-	//m_isa->set_dma_channel(0, this, true);
-	//m_isa->set_dma_channel(1, this, true);
-	//m_isa->set_dma_channel(2, this, true);
-	//m_isa->set_dma_channel(3, this, true);
+	m_isa->set_dma_channel(0, this, true);
+	m_isa->set_dma_channel(1, this, true);
+	m_isa->set_dma_channel(2, this, true);
+	m_isa->set_dma_channel(3, this, true);
 	remap(AS_IO, 0, 0x400);
-
 }
 
 void w83977tf_device::device_reset()
@@ -89,6 +91,17 @@ void w83977tf_device::device_reset()
 	m_lpt_irq_line = 7;
 	m_lpt_drq_line = 4; // disabled
 	m_lpt_mode = 0x3f;
+
+	m_fdc_address = 0x3f8;
+	m_gpio1_address = 0x100;
+
+	m_fdc_irq_line = 0;
+	m_fdc_drq_line = 4;
+
+	m_fdd_mode = 0x0e;
+
+	m_fdc->set_mode(upd765_family_device::mode_t::AT);
+	m_fdc->set_rate(500000);
 }
 
 device_memory_interface::space_config_vector w83977tf_device::memory_space_config() const
@@ -98,8 +111,28 @@ device_memory_interface::space_config_vector w83977tf_device::memory_space_confi
 	};
 }
 
+static void pc_hd_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+void w83977tf_device::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_NASLITE_FORMAT);
+}
+
 void w83977tf_device::device_add_mconfig(machine_config &config)
 {
+	N82077AA(config, m_fdc, XTAL(24'000'000), upd765_family_device::mode_t::PS2);
+	m_fdc->intrq_wr_callback().set(FUNC(w83977tf_device::irq_floppy_w));
+	m_fdc->drq_wr_callback().set(FUNC(w83977tf_device::drq_floppy_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", w83977tf_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", w83977tf_device::floppy_formats);
+
 	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(FUNC(w83977tf_device::irq_parallel_w));
 
@@ -110,6 +143,7 @@ void w83977tf_device::device_add_mconfig(machine_config &config)
 	m_rtc->set_century_index(0x32);
 
 	// TODO: W83C435 controller
+	// (doesn't work with LLE at all)
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
 	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
@@ -131,6 +165,11 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 		u16 superio_base = m_hefras ? 0x370 : 0x3f0;
 		m_isa->install_device(superio_base, superio_base + 3, read8sm_delegate(*this, FUNC(w83977tf_device::read)), write8sm_delegate(*this, FUNC(w83977tf_device::write)));
 
+		if (m_activate[0] & 1)
+		{
+			m_isa->install_device(m_fdc_address, m_fdc_address + 7, *m_fdc, &n82077aa_device::map);
+		}
+
 		// can't map below 0x100
 		if (m_activate[1] & 1 && m_lpt_address & 0xf00)
 		{
@@ -143,10 +182,18 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 			m_isa->install_device(m_keyb_address[1], m_keyb_address[1], read8sm_delegate(*this, FUNC(w83977tf_device::keybc_status_r)), write8sm_delegate(*this, FUNC(w83977tf_device::keybc_command_w)));
 		}
 
+		if (m_activate[7] & 1)
+		{
+			m_isa->install_device(m_gpio1_address, m_gpio1_address,
+				read8sm_delegate(*this, [this](offs_t offset) { return m_gpio1_read_cb(); }, "gpio1_r"),
+				write8sm_delegate(*this, [this](offs_t offset, u8 data) { m_gpio1_write_cb(data); }, "gpio1_w")
+			);
+		}
+
 		if (m_activate[8] & 1)
 		{
 			// TODO: from port
-			m_isa->install_device(0x70, 0x7f, read8sm_delegate(*this, FUNC(w83977tf_device::rtc_r)), write8sm_delegate(*this, FUNC(w83977tf_device::rtc_w)));
+			m_isa->install_device(0x70, 0x71, read8sm_delegate(*this, FUNC(w83977tf_device::rtc_r)), write8sm_delegate(*this, FUNC(w83977tf_device::rtc_w)));
 		}
 	}
 }
@@ -213,7 +260,58 @@ void w83977tf_device::config_map(address_map &map)
 	map(0x30, 0xff).view(m_logical_view);
 	// FDC
 	m_logical_view[0](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<0>), FUNC(w83977tf_device::activate_w<0>));
-	m_logical_view[0](0x31, 0xff).unmaprw();
+	m_logical_view[0](0x60, 0x61).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_fdc_address >> (offset * 8)) & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			const u8 shift = offset * 8;
+			m_fdc_address &= 0xff << shift;
+			m_fdc_address |= data << (shift ^ 8);
+			m_fdc_address &= ~0xf007;
+			LOG("LD0 (FDC): remap %04x ([%d] %02x)\n", m_fdc_address, offset, data);
+
+			remap(AS_IO, 0, 0x400);
+		})
+	);
+	m_logical_view[0](0x70, 0x70).lrw8(
+		NAME([this] () {
+			return m_fdc_irq_line;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_fdc_irq_line = data & 0xf;
+			LOG("LD0 (FDC): irq routed to %02x\n", m_fdc_irq_line);
+		})
+	);
+	m_logical_view[0](0x74, 0x74).lrw8(
+		NAME([this] () {
+			return m_fdc_drq_line;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_fdc_drq_line = data & 0x7;
+			LOG("LD0 (FDC): drq %s (%02x)\n", BIT(m_fdc_drq_line, 2) ? "disabled" : "enabled", data);
+		})
+	);
+	m_logical_view[0](0xf0, 0xf0).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_fdd_mode;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_fdd_mode = data;
+			LOG("LD0 (FDD): mode %02x\n", data);
+
+			switch((m_fdd_mode & 0xc) >> 2)
+			{
+				case 0: m_fdc->set_mode(upd765_family_device::mode_t::M30); break;
+				case 1: m_fdc->set_mode(upd765_family_device::mode_t::PS2); break;
+				case 3: m_fdc->set_mode(upd765_family_device::mode_t::AT);  break;
+				default:
+					popmessage("FDD: select <reserved> mode 2");
+					break;
+			}
+		})
+	);
+
 	// LPT
 	m_logical_view[1](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<1>), FUNC(w83977tf_device::activate_w<1>));
 	m_logical_view[1](0x60, 0x61).lrw8(
@@ -224,6 +322,7 @@ void w83977tf_device::config_map(address_map &map)
 			const u8 shift = offset * 8;
 			m_lpt_address &= 0xff << shift;
 			m_lpt_address |= data << (shift ^ 8);
+			m_lpt_address &= ~0xf003;
 			LOG("LD1 (LPT): remap %04x ([%d] %02x)\n", m_lpt_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);
@@ -281,6 +380,7 @@ void w83977tf_device::config_map(address_map &map)
 	m_logical_view[3](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<3>), FUNC(w83977tf_device::activate_w<3>));
 	m_logical_view[3](0x31, 0xff).unmaprw();
 	// <reserved>
+	// RTC on W83977F
 	m_logical_view[4](0x30, 0xff).unmaprw();
 	// KBC
 	m_logical_view[5](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<5>), FUNC(w83977tf_device::activate_w<5>));
@@ -301,7 +401,20 @@ void w83977tf_device::config_map(address_map &map)
 	m_logical_view[6](0x30, 0xff).unmaprw();
 	// GPIO1
 	m_logical_view[7](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<7>), FUNC(w83977tf_device::activate_w<7>));
-	m_logical_view[7](0x31, 0xff).unmaprw();
+	m_logical_view[7](0x60, 0x61).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_gpio1_address >> (offset * 8)) & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			const u8 shift = offset * 8;
+			m_gpio1_address &= 0xff << shift;
+			m_gpio1_address |= data << (shift ^ 8);
+			LOG("LD7 (GPIO1): remap %04x ([%d] %02x)\n", m_gpio1_address, offset, data);
+
+			remap(AS_IO, 0, 0x400);
+		})
+	);
+	//m_logical_view[7](0x31, 0xff).unmaprw();
 	// GPIO2
 	// doc doesn't explicitly mention this being at logical dev 8, assume from intialization
 	m_logical_view[8](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<8>), FUNC(w83977tf_device::activate_w<8>));
@@ -397,6 +510,45 @@ void w83977tf_device::request_irq(int irq, int state)
 	}
 }
 
+void w83977tf_device::request_dma(int dreq, int state)
+{
+	switch (dreq)
+	{
+	case 0:
+		m_isa->drq0_w(state);
+		break;
+	case 1:
+		m_isa->drq1_w(state);
+		break;
+	case 2:
+		m_isa->drq2_w(state);
+		break;
+	case 3:
+		m_isa->drq3_w(state);
+		break;
+	}
+}
+
+
+/*
+ * Device #0 (FDC)
+ */
+
+void w83977tf_device::irq_floppy_w(int state)
+{
+	if (!m_activate[0])
+		return;
+	request_irq(m_fdc_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void w83977tf_device::drq_floppy_w(int state)
+{
+	if (!m_activate[0] || BIT(m_fdc_drq_line, 2))
+		return;
+	request_dma(m_fdc_drq_line, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
 /*
  * Device #1 (Parallel)
  */
@@ -464,12 +616,12 @@ void w83977tf_device::mouse_irq_w(offs_t offset, u8 data)
 
 u8 w83977tf_device::keybc_status_r(offs_t offset)
 {
-	return (m_kbdc->data_r(4) & 0xff);
+	return (m_kbdc->port64_r(0) & 0xff);
 }
 
 void w83977tf_device::keybc_command_w(offs_t offset, u8 data)
 {
-	m_kbdc->data_w(4, data);
+	m_kbdc->port64_w(0, data);
 }
 
 // $60-$61 selects data port, $62-$63 command port

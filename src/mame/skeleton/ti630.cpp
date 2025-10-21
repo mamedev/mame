@@ -35,7 +35,7 @@ It means we probably would have to emulate a modem device for it to treat commun
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"

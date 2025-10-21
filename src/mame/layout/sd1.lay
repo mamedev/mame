@@ -1,0 +1,1197 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+  <!-- Decoration definitions -->
+  <element name="triangle_up">
+	<image>
+	  <data>
+		<![CDATA[
+		  <svg width="2" height="1" viewBox="0 0 2 1">
+		  <path stroke="none" fill="#ffffff" d="M0 1H2L 1 0Z" />
+		  </svg>
+
+		]]></data>
+	</image>
+  </element>
+  <element name="triangle_down">
+	<image>
+	  <data>
+		<![CDATA[
+		  <svg width="2" height="1" viewBox="0 0 2 1">
+		  <path stroke="none" fill="#ffffff" d="M0 0H2L1 1Z" />
+		  </svg>
+
+		]]></data>
+	</image>
+  </element>
+  <element name="rect_222222">
+	<rect>
+	  <color red="0.133" green="0.133" blue="0.133" />
+	</rect>
+  </element>
+  <element name="rect_000000">
+	<rect>
+	  <color red="0" green="0" blue="0" />
+	</rect>
+  </element>
+  <element name="rect_db5f6a">
+	<rect>
+	  <color red="0.859" green="0.373" blue="0.416" />
+	</rect>
+  </element>
+  <element name="rect_ffffff">
+	<rect>
+	  <color red="1" green="1" blue="1" />
+	</rect>
+  </element>
+
+  <!-- VFD -->
+  <!-- The VFD elements -->
+  <element name="segments" defstate="0">
+	<led14seg>
+	  <color red="0.45" green="1.0" blue="0.95" />
+	</led14seg>
+  </element>
+
+  <element name="dot" defstate="0">
+	<disk statemask="0x4000" state="0"><color red="0.06" green="0.12" blue="0.10" /></disk>
+	<disk statemask="0x4000" state="0x4000"><color red="0.45" green="1.00" blue="0.95" /></disk>
+  </element>
+
+  <element name="underline" defstate="0">
+	<rect statemask="0x8000" state="0"><color red="0.06" green="0.12" blue="0.10" /></rect>
+	<rect statemask="0x8000" state="0x8000"><color red="0.45" green="1.00" blue="0.95" /></rect>
+  </element>
+
+  <group name="vfd_cell">
+	<bounds x="0" y="0" width="342" height="572" />
+	<element ref="segments" name="~input~"><bounds x="50" y="69" width="214" height="311" /></element>
+	<element ref="dot" name="~input~"><bounds x="253" y="337" width="42" height="42" /></element>
+	<element ref="underline" name="~input~"><bounds x="43" y="441" width="183" height="25" /></element>
+  </group>
+
+  <element name="vfd_background">
+	<rect>
+	  <color red="0.0" green="0.0" blue="0.0" />
+	</rect>
+  </element>
+
+  <group name="vfd">
+	<element ref="vfd_background">
+	  <bounds x="0" y="0" width="13680" height="1144" />
+	</element>
+
+	<!-- VFDs -->
+	<repeat count="2">
+	  <param name="s" start="0" increment="40" />
+	  <param name="y" start="0" increment="572" />
+	  <repeat count="40">
+		<param name="n" start="~s~" increment="1" />
+		<param name="x" start="0" increment="342" />
+
+		<param name="input" value="vfd~n~" />
+		<group ref="vfd_cell">
+		  <bounds x="~x~" y="~y~" width="342" height="572" />
+		</group>
+
+	  </repeat>
+	</repeat>
+  </group>
+
+  <!-- Text items -->
+  <element name="text_bankset">
+	<text string="BankSet" />
+  </element>
+  <element name="text_sounds">
+	<text string="Sounds" />
+  </element>
+  <element name="text_presets">
+	<text string="Presets" />
+  </element>
+  <element name="text_0">
+	<text string="0" />
+  </element>
+  <element name="text_1">
+	<text string="1" />
+  </element>
+  <element name="text_2">
+	<text string="2" />
+  </element>
+  <element name="text_3">
+	<text string="3" />
+  </element>
+  <element name="text_4">
+	<text string="4" />
+  </element>
+  <element name="text_5">
+	<text string="5" />
+  </element>
+  <element name="text_6">
+	<text string="6" />
+  </element>
+  <element name="text_7">
+	<text string="7" />
+  </element>
+  <element name="text_8">
+	<text string="8" />
+  </element>
+  <element name="text_9">
+	<text string="9" />
+  </element>
+  <element name="text_L_replace">
+	<text string="Replace" align="1" />
+  </element>
+  <element name="text_L_program">
+	<text string="Program" align="1" />
+  </element>
+  <element name="text_L_select">
+	<text string="Select" align="1" />
+  </element>
+  <element name="text_L_voice">
+	<text string="Voice" align="1" />
+  </element>
+  <element name="text_L_copy">
+	<text string="Copy" align="1" />
+  </element>
+  <element name="text_L_write">
+	<text string="Write" align="1" />
+  </element>
+  <element name="text_L_compare">
+	<text string="Compare" align="1" />
+  </element>
+  <element name="text_L_patch">
+	<text string="Patch" align="1" />
+  </element>
+  <element name="text_L_midi">
+	<text string="MIDI" align="1" />
+  </element>
+  <element name="text_L_effects">
+	<text string="Effects" align="1" />
+  </element>
+  <element name="text_L_key">
+	<text string="Key" align="1" />
+  </element>
+  <element name="text_L_zone">
+	<text string="Zone" align="1" />
+  </element>
+  <element name="text_L_trans_">
+	<text string="Trans-" align="1" />
+  </element>
+  <element name="text_L_pose">
+	<text string="pose" align="1" />
+  </element>
+  <element name="text_L_release">
+	<text string="Release" align="1" />
+  </element>
+  <element name="text_L_volume">
+	<text string="Volume" align="1" />
+  </element>
+  <element name="text_L_pan">
+	<text string="Pan" align="1" />
+  </element>
+  <element name="text_L_timbre">
+	<text string="Timbre" align="1" />
+  </element>
+  <element name="text_L_wave">
+	<text string="Wave" align="1" />
+  </element>
+  <element name="text_L_mod">
+	<text string="Mod" align="1" />
+  </element>
+  <element name="text_L_mixer">
+	<text string="Mixer" align="1" />
+  </element>
+  <element name="text_L_control">
+	<text string="Control" align="1" />
+  </element>
+  <element name="text_L_pitch">
+	<text string="Pitch" align="1" />
+  </element>
+  <element name="text_L_filters">
+	<text string="Filters" align="1" />
+  </element>
+  <element name="text_L_output">
+	<text string="Output" align="1" />
+  </element>
+  <element name="text_L_lfo">
+	<text string="LFO" align="1" />
+  </element>
+  <element name="text_L_env1">
+	<text string="Env1" align="1" />
+  </element>
+  <element name="text_L_env2">
+	<text string="Env2" align="1" />
+  </element>
+  <element name="text_L_env3">
+	<text string="Env3" align="1" />
+  </element>
+  <element name="text_L_data_entry">
+	<text string="Data Entry" align="1" />
+  </element>
+  <element name="text_L_performance">
+	<text string="Performance" align="1" />
+  </element>
+  <element name="text_L_programming">
+	<text string="Programming" align="1" />
+  </element>
+  <element name="text_seq">
+	<text string="Seq" />
+  </element>
+  <element name="text_tracks">
+	<text string="Tracks" />
+  </element>
+  <element name="text_1_6">
+	<text string="1-6" />
+  </element>
+  <element name="text_7_12">
+	<text string="7-12" />
+  </element>
+  <element name="text_L_rec">
+	<text string="Rec" align="1" />
+  </element>
+  <element name="text_L_stop">
+	<text string="Stop" align="1" />
+  </element>
+  <element name="text_L__cont">
+	<text string="/Cont" align="1" />
+  </element>
+  <element name="text_L_play">
+	<text string="Play" align="1" />
+  </element>
+  <element name="text_L_click">
+	<text string="Click" align="1" />
+  </element>
+  <element name="text_L_seq">
+	<text string="Seq" align="1" />
+  </element>
+  <element name="text_L_locate">
+	<text string="Locate" align="1" />
+  </element>
+  <element name="text_L_song">
+	<text string="Song" align="1" />
+  </element>
+  <element name="text_L_track">
+	<text string="Track" align="1" />
+  </element>
+  <element name="text_L_master">
+	<text string="Master" align="1" />
+  </element>
+  <element name="text_L_storage">
+	<text string="Storage" align="1" />
+  </element>
+  <element name="text_edit">
+	<text string="Edit" />
+  </element>
+  <element name="text_L_system">
+	<text string="System" align="1" />
+  </element>
+  <element name="text_L_sequencer">
+	<text string="Sequencer" align="1" />
+  </element>
+  <!-- Button shapes -->
+  <element name="button_15_10_light">
+	<image state="0">
+	  <color red="0.733" green="0.733" blue="0.733" />
+	  <data>
+		<![CDATA[
+		  <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
+		]]></data>
+	</image>
+	<image state="1">
+	  <color red="1" green="1" blue="1" />
+	  <data>
+		<![CDATA[
+		  <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
+		]]></data>
+	</image>
+  </element>
+  <element name="button_15_10_medium">
+	<image state="0">
+	  <color red="0.467" green="0.467" blue="0.467" />
+	  <data>
+		<![CDATA[
+		  <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
+		]]></data>
+	</image>
+	<image state="1">
+	  <color red="1" green="1" blue="1" />
+	  <data>
+		<![CDATA[
+		  <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
+		]]></data>
+	</image>
+  </element>
+  <element name="button_15_5_dark">
+	<image state="0">
+	  <color red="0.2" green="0.2" blue="0.2" />
+	  <data>
+		<![CDATA[
+		  <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
+		]]></data>
+	</image>
+	<image state="1">
+	  <color red="1" green="1" blue="1" />
+	  <data>
+		<![CDATA[
+		  <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
+		]]></data>
+	</image>
+  </element>
+  <element name="button_15_5_light">
+	<image state="0">
+	  <color red="0.733" green="0.733" blue="0.733" />
+	  <data>
+		<![CDATA[
+		  <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
+		]]></data>
+	</image>
+	<image state="1">
+	  <color red="1" green="1" blue="1" />
+	  <data>
+		<![CDATA[
+		  <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
+		]]></data>
+	</image>
+  </element>
+
+  <!-- Light items -->
+  <element name="light_15">
+	<rect state="0" statemask="0x8000">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x8000" statemask="0x8000">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_13">
+	<rect state="0" statemask="0x2000">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x2000" statemask="0x2000">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_7">
+	<rect state="0" statemask="0x0080">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0080" statemask="0x0080">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_14">
+	<rect state="0" statemask="0x4000">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x4000" statemask="0x4000">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_6">
+	<rect state="0" statemask="0x0040">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0040" statemask="0x0040">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_4">
+	<rect state="0" statemask="0x0010">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0010" statemask="0x0010">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_12">
+	<rect state="0" statemask="0x1000">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x1000" statemask="0x1000">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_3">
+	<rect state="0" statemask="0x0008">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0008" statemask="0x0008">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_11">
+	<rect state="0" statemask="0x0800">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0800" statemask="0x0800">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_2">
+	<rect state="0" statemask="0x0004">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0004" statemask="0x0004">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_10">
+	<rect state="0" statemask="0x0400">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0400" statemask="0x0400">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_1">
+	<rect state="0" statemask="0x0002">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0002" statemask="0x0002">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_9">
+	<rect state="0" statemask="0x0200">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0200" statemask="0x0200">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_5">
+	<rect state="0" statemask="0x0020">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0020" statemask="0x0020">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_0">
+	<rect state="0" statemask="0x0001">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0001" statemask="0x0001">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+  <element name="light_8">
+	<rect state="0" statemask="0x0100">
+	  <color red="0.0667" green="0.133" blue="0.0667" />
+	</rect>
+	<rect state="0x0100" statemask="0x0100">
+	  <color red="0.133" green="1" blue="0.133" />
+	</rect>
+  </element>
+
+  <!-- Slider definitions -->
+  <element name="invisible_rect">
+	<rect>
+	  <color red="0" green="0" blue="0" />
+	</rect>
+  </element>
+  <element name="slider_frame">
+	<rect>
+	  <color red="0.2" green="0.2" blue="0.2" />
+	  <bounds x="0" y="0" width="8" height="24" />
+	</rect>
+	<rect>
+	  <color red="0" green="0" blue="0" />
+	  <bounds x="0.5" y="0.5" width="7" height="23" />
+	</rect>
+  </element>
+  <element name="slider_knob">
+	<rect>
+	  <color red="0.2" green="0.2" blue="0.2" />
+	  <bounds x="0.75" y="0.75" width="6.5" height="4" />
+	</rect>
+	<rect>
+	  <color red="0.267" green="0.267" blue="0.267" />
+	  <bounds x="0.75" y="0.75" width="6.5" height="0.75" />
+	</rect>
+	<rect>
+	  <color red="0.133" green="0.133" blue="0.133" />
+	  <bounds x="0.75" y="2.5" width="6.5" height="0.25" />
+	</rect>
+	<rect>
+	  <color red="0.267" green="0.267" blue="0.267" />
+	  <bounds x="0.75" y="2.75" width="6.5" height="0.25" />
+	</rect>
+	<rect>
+	  <color red="0.133" green="0.133" blue="0.133" />
+	  <bounds x="0.75" y="4" width="6.5" height="0.75" />
+	</rect>
+  </element>
+  <group name="slider">
+	<element ref="slider_frame">
+	  <bounds x="0" y="0" width="8" height="24" />
+	</element>
+	<element ref="invisible_rect" id="slider_~slider_id~">
+	  <bounds x="0.75" y="0.75" width="6.5" height="22.5" />
+	</element>
+	<element ref="slider_knob" id="slider_knob_~slider_id~">
+	  <animate inputtag="~port_name~" inputmask="0x7f" />
+	  <bounds x="0.75" y="0.75" width="6.5" height="4" state="1023" />
+	  <bounds x="0.75" y="19.25" width="6.5" height="4" state="0" />
+	</element>
+  </group>
+
+  <!-- Panel Group -->
+  <group name="panel">
+	<element ref="rect_222222">
+	  <bounds x="-95" y="-10" width="545" height="108" />
+	</element>
+	<element ref="rect_000000">
+	  <bounds x="25" y="-5" width="230" height="67.5" />
+	</element>
+	<element ref="triangle_down">
+	  <bounds x="-37.5" y="50" width="5" height="2.5" />
+	</element>
+	<element ref="triangle_up">
+	  <bounds x="-37.5" y="25" width="5" height="2.5" />
+	</element>
+	<element ref="rect_db5f6a">
+	  <bounds x="-90" y="92.5" width="415" height="0.5" />
+	</element>
+	<element ref="rect_db5f6a">
+	  <bounds x="270" y="92.5" width="55" height="0.5" />
+	</element>
+	<element ref="rect_db5f6a">
+	  <bounds x="327.5" y="92.5" width="55" height="0.5" />
+	</element>
+	<element ref="rect_db5f6a">
+	  <bounds x="385" y="92.5" width="60" height="0.5" />
+	</element>
+	<element ref="rect_ffffff">
+	  <bounds x="285" y="66" width="7.5" height="0.25" />
+	</element>
+	<element ref="rect_ffffff">
+	  <bounds x="307.5" y="66" width="7.5" height="0.25" />
+	</element>
+	<element ref="rect_ffffff">
+	  <bounds x="327.5" y="26" width="17.5" height="0.25" />
+	</element>
+	<element ref="rect_ffffff">
+	  <bounds x="355" y="26" width="17.5" height="0.25" />
+	</element>
+	<element ref="rect_db5f6a">
+	  <bounds x="327.5" y="4.5" width="55" height="0.5" />
+	</element>
+	<group ref="vfd">
+	  <bounds x="37.5" y="22.678" width="205" height="17.143" />
+
+	</group>
+	<element ref="text_bankset">
+	  <bounds x="25" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_sounds">
+	  <bounds x="40" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_presets">
+	  <bounds x="55" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_0">
+	  <bounds x="105" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_1">
+	  <bounds x="120" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_2">
+	  <bounds x="135" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_3">
+	  <bounds x="150" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_4">
+	  <bounds x="165" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_5">
+	  <bounds x="180" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_6">
+	  <bounds x="195" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_7">
+	  <bounds x="210" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_8">
+	  <bounds x="225" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_9">
+	  <bounds x="240" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_replace">
+	  <bounds x="270" y="63.9" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_program">
+	  <bounds x="270" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_select">
+	  <bounds x="385" y="63.9" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_voice">
+	  <bounds x="385" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_copy">
+	  <bounds x="400" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_write">
+	  <bounds x="415" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_compare">
+	  <bounds x="430" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_patch">
+	  <bounds x="270" y="41.4" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_select">
+	  <bounds x="270" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_midi">
+	  <bounds x="285" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_effects">
+	  <bounds x="300" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_key">
+	  <bounds x="270" y="23.9" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_zone">
+	  <bounds x="270" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_trans_">
+	  <bounds x="285" y="23.9" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_pose">
+	  <bounds x="285" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_release">
+	  <bounds x="300" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_volume">
+	  <bounds x="270" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_pan">
+	  <bounds x="285" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_timbre">
+	  <bounds x="300" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_wave">
+	  <bounds x="385" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_mod">
+	  <bounds x="400" y="41.4" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_mixer">
+	  <bounds x="400" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_program">
+	  <bounds x="415" y="41.4" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_control">
+	  <bounds x="415" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_effects">
+	  <bounds x="430" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_pitch">
+	  <bounds x="385" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_pitch">
+	  <bounds x="400" y="23.9" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_mod">
+	  <bounds x="400" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_filters">
+	  <bounds x="415" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_output">
+	  <bounds x="430" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_lfo">
+	  <bounds x="385" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_env1">
+	  <bounds x="400" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_env2">
+	  <bounds x="415" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_env3">
+	  <bounds x="430" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_volume">
+	  <bounds x="-90" y="87.5" width="35" height="4.3" />
+	</element>
+	<element ref="text_L_data_entry">
+	  <bounds x="-42.5" y="87.5" width="35" height="4.3" />
+	</element>
+	<element ref="text_L_performance">
+	  <bounds x="270" y="87.5" width="35" height="4.3" />
+	</element>
+	<element ref="text_L_programming">
+	  <bounds x="385" y="87.5" width="35" height="4.3" />
+	</element>
+	<element ref="text_seq">
+	  <bounds x="70" y="87.5" width="15" height="4.3" />
+	</element>
+	<element ref="text_tracks">
+	  <bounds x="292.5" y="63.9" width="15" height="4.3" />
+	</element>
+	<element ref="text_1_6">
+	  <bounds x="285" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_7_12">
+	  <bounds x="300" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_rec">
+	  <bounds x="327.5" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_stop">
+	  <bounds x="342.5" y="63.9" width="15" height="4.3" />
+	</element>
+	<element ref="text_L__cont">
+	  <bounds x="342.5" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_play">
+	  <bounds x="357.5" y="68.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_click">
+	  <bounds x="327.5" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_seq">
+	  <bounds x="342.5" y="41.4" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_control">
+	  <bounds x="342.5" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_locate">
+	  <bounds x="357.5" y="45.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_song">
+	  <bounds x="327.5" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_seq">
+	  <bounds x="342.5" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_track">
+	  <bounds x="357.5" y="28.2" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_master">
+	  <bounds x="327.5" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_storage">
+	  <bounds x="342.5" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_midi">
+	  <bounds x="357.5" y="6.4" width="15" height="4.3" />
+	</element>
+	<element ref="text_L_control">
+	  <bounds x="357.5" y="10.7" width="15" height="4.3" />
+	</element>
+	<element ref="text_edit">
+	  <bounds x="345" y="23.9" width="10" height="4.3" />
+	</element>
+	<element ref="text_L_system">
+	  <bounds x="327.5" y="0.2" width="35" height="4.3" />
+	</element>
+	<element ref="text_L_sequencer">
+	  <bounds x="327.5" y="87.5" width="25" height="4.3" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00100000" ref="button_15_10_light" id="button_52__cartbankset">
+	  <bounds x="25" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00200000" ref="button_15_10_light" id="button_53__sounds">
+	  <bounds x="40" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00400000" ref="button_15_10_light" id="button_54__presets">
+	  <bounds x="55" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00800000" ref="button_15_10_medium" id="button_55__0">
+	  <bounds x="105" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x01000000" ref="button_15_10_medium" id="button_56__1">
+	  <bounds x="120" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x02000000" ref="button_15_10_medium" id="button_57__2">
+	  <bounds x="135" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00004000" ref="button_15_10_medium" id="button_46__3">
+	  <bounds x="150" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00008000" ref="button_15_10_medium" id="button_47__4">
+	  <bounds x="165" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00010000" ref="button_15_10_medium" id="button_48__5">
+	  <bounds x="180" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00020000" ref="button_15_10_medium" id="button_49__6">
+	  <bounds x="195" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000008" ref="button_15_10_medium" id="button_35__7">
+	  <bounds x="210" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000004" ref="button_15_10_medium" id="button_34__8">
+	  <bounds x="225" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x02000000" ref="button_15_10_medium" id="button_25__9">
+	  <bounds x="240" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x20000000" ref="button_15_10_medium" id="button_29_replace_program">
+	  <bounds x="270" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000020" ref="button_15_10_medium" id="button_5_select_voice">
+	  <bounds x="385" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000200" ref="button_15_10_medium" id="button_9_copy">
+	  <bounds x="400" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000008" ref="button_15_10_medium" id="button_3_write">
+	  <bounds x="415" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000100" ref="button_15_10_medium" id="button_8_compare">
+	  <bounds x="430" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x04000000" ref="button_15_5_dark" id="button_26_patch_select">
+	  <bounds x="270" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x08000000" ref="button_15_5_dark" id="button_27_midi">
+	  <bounds x="285" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x10000000" ref="button_15_5_dark" id="button_28_effects">
+	  <bounds x="300" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000080" ref="button_15_5_dark" id="button_39_key_zone">
+	  <bounds x="270" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000100" ref="button_15_5_dark" id="button_40_transpose">
+	  <bounds x="285" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000200" ref="button_15_5_dark" id="button_41_release">
+	  <bounds x="300" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000010" ref="button_15_5_dark" id="button_36_volume">
+	  <bounds x="270" y="15" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000020" ref="button_15_5_dark" id="button_37_pan">
+	  <bounds x="285" y="15" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000040" ref="button_15_5_dark" id="button_38_timbre">
+	  <bounds x="300" y="15" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000010" ref="button_15_5_dark" id="button_4_wave">
+	  <bounds x="385" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000040" ref="button_15_5_dark" id="button_6_mod_mixer">
+	  <bounds x="400" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000004" ref="button_15_5_dark" id="button_2_program_control">
+	  <bounds x="415" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000080" ref="button_15_5_dark" id="button_7_effects">
+	  <bounds x="430" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000800" ref="button_15_5_dark" id="button_11_pitch">
+	  <bounds x="385" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00002000" ref="button_15_5_dark" id="button_13_pitch_mod">
+	  <bounds x="400" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00008000" ref="button_15_5_dark" id="button_15_filters">
+	  <bounds x="415" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00020000" ref="button_15_5_dark" id="button_17_output">
+	  <bounds x="430" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00000400" ref="button_15_5_dark" id="button_10_lfo">
+	  <bounds x="385" y="15" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00001000" ref="button_15_5_dark" id="button_12_env1">
+	  <bounds x="400" y="15" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00004000" ref="button_15_5_dark" id="button_14_env2">
+	  <bounds x="415" y="15" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00010000" ref="button_15_5_dark" id="button_16_env3">
+	  <bounds x="430" y="15" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00040000" ref="button_15_5_dark" id="button_50__display_below_left">
+	  <bounds x="80" y="52.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00001000" ref="button_15_5_dark" id="button_44__display_below_middle">
+	  <bounds x="142.5" y="52.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00002000" ref="button_15_5_dark" id="button_45__display_below_right">
+	  <bounds x="200" y="52.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x04000000" ref="button_15_5_dark" id="button_58__display_above_left">
+	  <bounds x="80" y="0" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000400" ref="button_15_5_dark" id="button_42__diplay_above_center">
+	  <bounds x="142.5" y="0" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000800" ref="button_15_5_dark" id="button_43__display_above_right">
+	  <bounds x="200" y="0" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x80000000" ref="button_15_5_dark" id="button_63__decrement">
+	  <bounds x="-42.5" y="55" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x40000000" ref="button_15_5_dark" id="button_62__increment">
+	  <bounds x="-42.5" y="30" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00080000" ref="button_15_10_light" id="button_51__seq">
+	  <bounds x="70" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x40000000" ref="button_15_10_medium" id="button_30_1_6">
+	  <bounds x="285" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x80000000" ref="button_15_10_medium" id="button_31_7_12">
+	  <bounds x="300" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00080000" ref="button_15_10_medium" id="button_19_rec">
+	  <bounds x="327.5" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00400000" ref="button_15_10_medium" id="button_22_stop__cont">
+	  <bounds x="342.5" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00800000" ref="button_15_10_medium" id="button_23_play">
+	  <bounds x="357.5" y="72.5" width="15" height="10" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000001" ref="button_15_5_dark" id="button_32_click">
+	  <bounds x="327.5" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00040000" ref="button_15_5_dark" id="button_18_seq_control">
+	  <bounds x="342.5" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x00000002" ref="button_15_5_dark" id="button_33_locate">
+	  <bounds x="357.5" y="50" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x10000000" ref="button_15_5_dark" id="button_60_song">
+	  <bounds x="327.5" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x08000000" ref="button_15_5_dark" id="button_59_seq">
+	  <bounds x="342.5" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_32" inputmask="0x20000000" ref="button_15_5_dark" id="button_61_track">
+	  <bounds x="357.5" y="32.5" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00100000" ref="button_15_5_light" id="button_20_master">
+	  <bounds x="327.5" y="15" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x00200000" ref="button_15_5_light" id="button_21_storage">
+	  <bounds x="342.5" y="15" width="15" height="5" />
+	</element>
+	<element inputtag="buttons_0" inputmask="0x01000000" ref="button_15_5_light" id="button_24_midi_control">
+	  <bounds x="357.5" y="15" width="15" height="5" />
+	</element>
+	<element name="lights" ref="light_15">
+	  <bounds x="30" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_13">
+	  <bounds x="45" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_7">
+	  <bounds x="60" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_14">
+	  <bounds x="110" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_6">
+	  <bounds x="125" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_4">
+	  <bounds x="140" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_12">
+	  <bounds x="155" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_3">
+	  <bounds x="170" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_11">
+	  <bounds x="185" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_2">
+	  <bounds x="200" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_10">
+	  <bounds x="215" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_1">
+	  <bounds x="230" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_9">
+	  <bounds x="245" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_5">
+	  <bounds x="435" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_0">
+	  <bounds x="290" y="72.9" width="5" height="3.3333" />
+	</element>
+	<element name="lights" ref="light_8">
+	  <bounds x="305" y="72.9" width="5" height="3.3333" />
+	</element>
+	<param name="slider_id" value="data_entry" />
+	<param name="port_name" value="analog_data_entry" />
+	<group ref="slider">
+	  <bounds x="-20" y="10" width="20" height="60" />
+	</group>
+	<param name="slider_id" value="volume" />
+	<param name="port_name" value="analog_volume" />
+	<group ref="slider">
+	  <bounds x="-90" y="10" width="20" height="60" />
+	</group>
+  </group>
+
+  <!-- Panel View -->
+  <view name="Panel">
+	<group ref="panel" />
+  </view>
+  <script>
+	<![CDATA[
+	  -- file is the layout file object
+	  -- set a function to call after resolving tags
+	  file:set_resolve_tags_callback(
+		function ()
+		  -- file.device is the device that caused the layout to be loaded
+		  -- in this case, it's the esqpanel2x40_vfx object.
+
+		  for view_name, view in pairs(file.views) do
+			install_slider_callbacks(view)
+
+			add_vertical_slider(view, "slider_volume", "slider_knob_volume", "analog_volume")
+			add_vertical_slider(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry")
+
+			-- TODO: Display a warning about how to enable sliders
+			-- view.items["warning"]:set_state(0)
+		  end
+		end
+	  )
+
+	  -----------------------------------------------------------------------
+	  -- Simplified Slider library starts.
+	  -- Can be copied as-is to other layouts.
+	  -- It is simplified from its source:
+	  -- * This one never reads from the port, only writes to it.
+	  -- * Only when clickling on the knob itself does it start to drag the knob.
+	  -- * The value is calculated based on the position of the knob within the click area.
+	  -----------------------------------------------------------------------
+	  local sliders = {}   -- Stores slider information.
+	  local pointers = {}  -- Tracks pointer state.
+
+	  function clamp(x)
+		if x < 0 then return 0 elseif x > 1023 then return 1023 else return x end
+	  end
+
+	  -- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+	  -- The click area's vertical size must exactly span the range of the
+	  -- knob's movement.
+	  function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+		local slider = {}
+
+		slider.clickarea = view.items[clickarea_id]
+		if slider.clickarea == nil then
+		  emu.print_error("Slider element: '" .. clickarea_id .. "' not found.")
+		  return
+		end
+
+		slider.knob = view.items[knob_id]
+		if slider.knob == nil then
+		  emu.print_error("Slider knob element: '" .. knob_id .. "' not found.")
+		  return
+		end
+
+		local port = file.device:ioport(port_name)
+		if port == nil then
+		  emu.print_error("Port: '" .. port_name .. "' not found.")
+		  return
+		end
+
+		slider.field = nil
+		for k, val in pairs(port.fields) do
+		  slider.field = val
+		  break
+		end
+		if slider.field == nil then
+		  emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+		  return
+		end
+
+		table.insert(sliders, slider)
+	  end
+
+	  local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+		-- If a button is not pressed, reset the state of the current pointer.
+		if btn & 1 == 0 then
+		  pointers[id] = nil
+		  return
+		end
+
+		-- If a button was just pressed, find the affected slider, if any.
+		if dn & 1 ~= 0 then
+		  for i = 1, #sliders do
+			if sliders[i].knob.bounds:includes(x, y) then
+			  local clickarea = sliders[i].clickarea
+			  local knob = sliders[i].knob
+			  local dy = y - knob.bounds.y0
+			  pointers[id] = {
+				selected_slider = i,
+				dy = dy -- position within the knob where it was clicked
+			  }
+			  break
+			end
+		  end
+		end
+
+		-- If there is no slider selected by the current pointer, we are done.
+		if pointers[id] == nil then
+		  return
+		end
+
+		-- A slider is selected. Update state and, indirectly, slider knob position,
+		-- based on the pointer's Y position. The attached IO field must be
+		-- an IPT_ADJUSTER with a range of 0-1023.
+
+		local pointer = pointers[id]
+		local slider = sliders[pointer.selected_slider]
+		local knob = slider.knob
+		local clickarea = slider.clickarea
+
+		local yy = y - pointer.dy
+		local fraction = (yy - clickarea.bounds.y0) / (clickarea.bounds.height - knob.bounds.height)
+		local new_value = 1023 * (1 - fraction)
+		new_value = math.floor(new_value + 0.5)
+		clamped_value = clamp(new_value)
+		slider.field.user_value = clamped_value
+	  end
+
+	  local function pointer_left(type, id, dev, x, y, up, cnt)
+		pointers[id] = nil
+	  end
+
+	  local function pointer_aborted(type, id, dev, x, y, up, cnt)
+		pointers[id] = nil
+	  end
+
+	  local function forget_pointers()
+		pointers = {}
+	  end
+
+	  function install_slider_callbacks(view)
+		view:set_pointer_updated_callback(pointer_updated)
+		view:set_pointer_left_callback(pointer_left)
+		view:set_pointer_aborted_callback(pointer_aborted)
+		view:set_forget_pointers_callback(forget_pointers)
+	  end
+	  -----------------------------------------------------------------------
+	  -- Slider library ends.
+	  -----------------------------------------------------------------------
+
+
+
+	]]></script>
+</mamelayout>
+

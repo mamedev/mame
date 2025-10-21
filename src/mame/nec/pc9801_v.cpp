@@ -396,7 +396,8 @@ uint8_t pc9801_state::pc9801_a0_r(offs_t offset)
 	{
 		switch((offset & 0xe) + 1)
 		{
-			case 0x09://cg window font read
+			// cg window font read
+			case 0x09:
 			{
 				uint32_t pcg_offset;
 

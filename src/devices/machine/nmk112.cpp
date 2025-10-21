@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "nmk112.h"
 
+#include "bus/generic/slot.h"
 
 
 DEFINE_DEVICE_TYPE(NMK112, nmk112_device, "nmk112", "NMK112")
@@ -22,13 +23,9 @@ nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, dev
 	, m_tablebank{ { *this, "tablebank_0_%u", 0U }, { *this, "tablebank_1_%u", 0U } }
 	, m_rom(*this, { finder_base::DUMMY_TAG, finder_base::DUMMY_TAG })
 	, m_page_mask(0xff)
-	, m_size{ 0, 0 }
+	, m_bankmask{ 0, 0 }
 {
 }
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void nmk112_device::device_start()
 {
@@ -36,24 +33,35 @@ void nmk112_device::device_start()
 	{
 		if (m_rom[c])
 		{
-			m_size[c] = m_rom[c].bytes();
+			const auto size = m_rom[c].bytes();
+			if (size & 0x0ffff)
+			{
+				throw emu_fatalerror(
+						"%s: ROM region %s has unsupported size 0x%X (must be a multiple of 64KiB)",
+						tag(),
+						m_rom[c].finder_tag(),
+						size);
+			}
 
 			// bank slot configurations
-			for (int i = 0; i < 4; i++)
+			m_bankmask[c] = device_generic_cart_interface::map_non_power_of_two(
+					std::min<unsigned>(size / 0x10000, 0x100),
+					[this, c] (unsigned entry, unsigned page)
+					{
+						const uint32_t pagebase = uint32_t(page) << 16;
+						for (unsigned i = 0; i < 4; i++)
+						{
+							const uint32_t tablebase = pagebase | (i << 8);
+							m_samplebank[c][i]->configure_entry(entry, &m_rom[c][pagebase]);
+							if (is_paged(c))
+								m_tablebank[c][i]->configure_entry(entry, &m_rom[c][tablebase]);
+						}
+					});
+
+			for (unsigned i = 0; i < 4; i++)
 			{
-				for (int b = 0; b < 256; b++)
-				{
-					if (m_samplebank[c][i])
-						m_samplebank[c][i]->configure_entry(b, &m_rom[c][(b << 16) % m_size[c]]);
-
-					if (m_tablebank[c][i])
-						m_tablebank[c][i]->configure_entry(b, &m_rom[c][((i << 8) + (b << 16)) % m_size[c]]);
-				}
-
-				if (m_samplebank[c][i])
-					m_samplebank[c][i]->set_entry(0);
-
-				if (m_tablebank[c][i])
+				m_samplebank[c][i]->set_entry(0);
+				if (is_paged(c))
 					m_tablebank[c][i]->set_entry(0);
 			}
 		}
@@ -80,13 +88,12 @@ void nmk112_device::okibank_w(offs_t offset, u8 data)
 	const int chip = BIT(offset, 2);
 	const int banknum = offset & 3;
 
-	if (m_size[chip])
+	if (m_bankmask[chip])
 	{
-		if (m_samplebank[chip][banknum])
-			m_samplebank[chip][banknum]->set_entry(data);
+		m_samplebank[chip][banknum]->set_entry(data & m_bankmask[chip]);
 
-		if (m_tablebank[chip][banknum])
-			m_tablebank[chip][banknum]->set_entry(data);
+		if (is_paged(chip))
+			m_tablebank[chip][banknum]->set_entry(data & m_bankmask[chip]);
 	}
 }
 

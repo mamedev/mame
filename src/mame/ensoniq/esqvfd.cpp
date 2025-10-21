@@ -14,6 +14,7 @@
 DEFINE_DEVICE_TYPE(ESQ1X22,     esq1x22_device,     "esq1x22",     "Ensoniq 1x22 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40,     esq2x40_device,     "esq2x40",     "Ensoniq 2x40 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device, "esq2x40_sq1", "Ensoniq 2x40 VFD (SQ-1 variant)")
+DEFINE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device, "esq2x40_vfx", "Ensoniq 2x40 VFD (VFX Family variant)")
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
 static const uint16_t font[]=
@@ -163,6 +164,53 @@ void esqvfd_device::update_display()
 	}
 }
 
+inline void esqvfd_device::cursor_left()
+{
+	m_cursx--;
+	if (m_cursx < 0)
+	{
+		m_cursx += m_cols;
+		m_cursy--;
+		if (m_cursy < 0)
+			m_cursy += m_rows;
+	}
+}
+
+inline void esqvfd_device::cursor_right()
+{
+	m_cursx++;
+	if (m_cursx >= m_cols)
+	{
+		m_cursx -= m_cols;
+		m_cursy++;
+		if (m_cursy >= m_rows)
+			m_cursy -= m_rows;
+	}
+}
+
+void esqvfd_device::set_blink_on(bool blink_on) {
+	m_blink_on = blink_on;
+
+	for (int row = 0; row < m_rows; row++)
+	{
+		for (int col = 0; col < m_cols; col++)
+		{
+			m_dirty[row][col] |= m_attrs[row][col] & AT_BLINK;
+		}
+	}
+	update_display();
+}
+
+void esqvfd_device::clear() {
+	m_cursx = m_cursy = m_curattr = 0;
+	memset(m_chars, 0, sizeof(m_chars));
+	memset(m_attrs, 0, sizeof(m_attrs));
+	memset(m_dirty, 1, sizeof(m_dirty));
+
+	update_display();
+}
+
+
 /* 2x40 VFD display used in the ESQ-1, VFX-SD, SD-1, and others */
 
 void esq2x40_device::device_add_mconfig(machine_config &config)
@@ -220,11 +268,16 @@ void esq2x40_device::write_char(uint8_t data)
 				m_curattr |= AT_UNDERLINE;
 				break;
 
+			case 0xd4:  // move curser one step right
+				cursor_right();
+				break;
+
+			case 0xd5:  // move curser one step left
+				cursor_left();
+				break;
+
 			case 0xd6:  // clear screen
-				m_cursx = m_cursy = 0;
-				memset(m_chars, 0, sizeof(m_chars));
-				memset(m_attrs, 0, sizeof(m_attrs));
-				memset(m_dirty, 1, sizeof(m_dirty));
+				clear();
 				break;
 
 			case 0xf5:  // save cursor position
@@ -236,6 +289,10 @@ void esq2x40_device::write_char(uint8_t data)
 				m_cursx = m_savedx;
 				m_cursy = m_savedy;
 				m_curattr = m_attrs[m_cursy][m_cursx];
+				break;
+
+			case 0xfd: // also clear screen?
+				clear();
 				break;
 
 			default:
@@ -250,12 +307,8 @@ void esq2x40_device::write_char(uint8_t data)
 			m_chars[m_cursy][m_cursx] = data - ' ';
 			m_attrs[m_cursy][m_cursx] = m_curattr;
 			m_dirty[m_cursy][m_cursx] = 1;
-			m_cursx++;
 
-			if (m_cursx >= 39)
-			{
-				m_cursx = 39;
-			}
+			cursor_right();
 		}
 	}
 
@@ -293,14 +346,89 @@ bool esq2x40_device::write_contents(std::ostream &o)
 			o.put((char) (m_chars[row][col] + ' '));
 		}
 	}
+
+	// move the cursor to the saved position
+	o.put((char) 0x80 | (m_cols * m_savedy + m_savedx));
+	// and save the position
+	o.put((char) 0xf5);
+
+	// move the cursor to the current cursor position
+	o.put((char) 0x80 | (m_cols * m_cursy + m_cursx));
+
 	return true;
 }
 
 
-esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, ESQ2X40, tag, owner, clock, make_dimensions<2, 40>(*this))
+esq2x40_device::esq2x40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	esqvfd_device(mconfig, type, tag, owner, clock, make_dimensions<2, 40>(*this))
 {
 }
+esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esq2x40_device(mconfig, ESQ2X40, tag, owner, clock)
+{
+}
+
+ROM_START( esq2x40_vfx_device )
+	ROM_REGION16_BE( 192, "font", 0 )
+	ROM_LOAD( "esqvfd_font_vfx.bin", 0, 192, CRC(58dc335b) SHA1(097fc3e1930a49ab61f73ea7a6191c892004f823) )
+ROM_END
+
+const tiny_rom_entry *esq2x40_vfx_device::device_rom_region() const
+{
+	return ROM_NAME( esq2x40_vfx_device );
+}
+
+esq2x40_vfx_device::esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esq2x40_device(mconfig, ESQ2X40_VFX, tag, owner, clock),
+	m_font(*this, "font")
+{
+}
+
+void esq2x40_vfx_device::device_add_mconfig(machine_config &config)
+{
+	// Do not set a default layout. This display must be used
+	// within a layout that includes the VFD elements, such as
+	// vfx.lay, vfxsd.lay or sd1.lay.
+}
+
+// Handles blinking of underline and of entire character,
+void esq2x40_vfx_device::update_display()
+{
+	for (int row = 0; row < m_rows; row++)
+	{
+		for (int col = 0; col < m_cols; col++)
+		{
+			if (m_dirty[row][col])
+			{
+				uint8_t c = m_chars[row][col];
+
+				uint16_t char_segments = m_font[c < 96 ? c : 0];
+				auto attr = m_attrs[row][col];
+				uint16_t segments;
+
+				if ((attr & AT_BLINK) && !m_blink_on)  // something is blinked off
+				{
+					if (attr & AT_UNDERLINE) // blink the underline off
+						segments = char_segments;
+					else // there is no underline, blink the entire character
+						segments = 0;
+				}
+				else
+				{
+					if (attr & AT_UNDERLINE)
+						segments = char_segments | 0x8000;
+					else
+						segments = char_segments;
+				}
+
+				m_vfds->set((row * m_cols) + col, segments);
+
+				m_dirty[row][col] = 0;
+			}
+		}
+	}
+}
+
 
 /* 1x22 display from the VFX (not right, but it'll do for now) */
 
