@@ -8,11 +8,13 @@
 
 #include "screen.h"
 
+#include <utility>
+
 class namcos1_sprite_device : public device_t, public device_gfx_interface
 {
 public:
 	// delegates
-	using shadow_delegate = device_delegate<bool (u8 color, u8 *table)>;
+	using shadow_delegate = device_delegate<std::pair<bool, u8*> (u8 color)>;
 	using pri_delegate = device_delegate<u32 (u8 attr1, u8 attr2)>;
 	using gfxbank_delegate = device_delegate<u32 (u32 code, u32 bank)>;
 

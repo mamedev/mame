@@ -42,7 +42,7 @@ namcos1_sprite_device::namcos1_sprite_device(const machine_config &mconfig, cons
 
 void namcos1_sprite_device::device_start()
 {
-	m_shadow_cb.resolve_safe(false);
+	m_shadow_cb.resolve_safe(std::make_pair(false, nullptr));
 	m_pri_cb.resolve_safe(0);
 	m_gfxbank_cb.resolve();
 
@@ -100,8 +100,6 @@ void namcos1_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	const int sprite_xoffs = m_spriteram[0x07f5] + ((m_spriteram[0x07f4] & 1) << 8);
 	const int sprite_yoffs = m_spriteram[0x07f7];
 
-	u8 *shadow_table = nullptr;
-
 	while (source >= finish)
 	{
 		const u8 attr1 = source[10];
@@ -136,10 +134,10 @@ void namcos1_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 		sy++; // sprites are buffered and delayed by one scanline
 
-		const bool is_shadow = m_shadow_cb(color, shadow_table);
+		const std::pair<bool, u8*> shadow = m_shadow_cb(color);
 
 		gfx->set_source_clip(tx, sizex, ty, sizey);
-		if (is_shadow && (shadow_table != nullptr))
+		if (shadow.first && (shadow.second != nullptr))
 		{
 			gfx->prio_transtable(bitmap,cliprect,
 					sprite,
@@ -148,7 +146,7 @@ void namcos1_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 					sx & 0x1ff,
 					((sy + 16) & 0xff) - 16,
 					screen.priority(), pri_mask,
-					shadow_table);
+					shadow.second);
 		}
 		else
 		{

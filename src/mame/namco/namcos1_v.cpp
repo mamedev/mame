@@ -88,10 +88,9 @@ void namcos1_state::video_start()
 
 ***************************************************************************/
 
-bool namcos1_state::sprite_shadow_cb(u8 color, u8 *table)
+std::pair<bool, u8*> namcos1_state::sprite_shadow_cb(u8 color)
 {
-	table = m_drawmode_table;
-	return color == 0x7f;
+	return std::make_pair(color == 0x7f, m_drawmode_table);
 }
 
 u32 namcos1_state::sprite_pri_cb(u8 attr1, u8 attr2)
