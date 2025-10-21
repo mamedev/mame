@@ -794,14 +794,15 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	m2_poly_extra_data& extra = poly->object_data().next();
 	u8 renderer;
 
-	/* select renderer based on attributes (bit15 = checker, bit14 = textured, bit13 = transparent */
-	renderer = (tri->texheader[0] >> 13) & 7;
+	/* select renderer based on attributes (bit14 = textured, bit13 = transparent) */
+	renderer = (tri->texheader[0] >> 13) & 3;
 
 	/* calculate and clip to viewport */
 	rectangle vp(tri->viewport[0] + m_xoffs, tri->viewport[2] + m_xoffs, (384-tri->viewport[3]) + m_yoffs, (384-tri->viewport[1]) + m_yoffs);
 	vp &= cliprect;
 
 	extra.state = &m_state;
+	extra.checker = (tri->texheader[0] >> 15) & 1;
 	extra.lumabase = (tri->texheader[1] & 0xff) << 7;
 	extra.colorbase = (tri->texheader[3] >> 6) & 0x3ff;
 	extra.luma = tri->luma;
@@ -856,15 +857,10 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 
 	switch (renderer)
 	{
-	case 0: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<false, false>, this), tri->v[0], tri->v[1], tri->v[2]); break;
-	case 1: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<false, true>, this),  tri->v[0], tri->v[1], tri->v[2]); break;
-	case 2: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<false, false>, this),   tri->v[0], tri->v[1], tri->v[2]); break;
-	case 3: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<false, true>, this),    tri->v[0], tri->v[1], tri->v[2]); break;
-	case 4: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<true, false>, this),  tri->v[0], tri->v[1], tri->v[2]); break;
-	case 5: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<true, true>, this),   tri->v[0], tri->v[1], tri->v[2]); break;
-	case 6: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<true, false>, this),    tri->v[0], tri->v[1], tri->v[2]); break;
-	case 7: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<true, true>, this),     tri->v[0], tri->v[1], tri->v[2]); break;
-
+	case 0: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<false>, this), tri->v[0], tri->v[1], tri->v[2]); break;
+	case 1: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<true>,  this), tri->v[0], tri->v[1], tri->v[2]); break;
+	case 2: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<false>,   this), tri->v[0], tri->v[1], tri->v[2]); break;
+	case 3: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<true>,    this), tri->v[0], tri->v[1], tri->v[2]); break;
 	}
 }
 
