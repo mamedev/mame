@@ -115,6 +115,6 @@ private:
 /*----------- defined in drivers/radio86.c -----------*/
 
 INPUT_PORTS_EXTERN( radio86 );
-INPUT_PORTS_EXTERN( ms7007 );
+INPUT_PORTS_EXTERN( rk7007 );
 
 #endif // MAME_USSR_RADIO86_H
