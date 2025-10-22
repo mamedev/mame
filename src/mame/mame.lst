@@ -20989,6 +20989,7 @@ cjdh2a
 cjdh2b
 cjdh2c
 cjdh2d
+cjjl
 cjgdy
 dahuaxy
 hlddz
@@ -43576,6 +43577,9 @@ fanucspgm
 
 @source:skeleton/fc100.cpp
 fc100
+
+@source:skeleton/fdek_h8s.cpp
+battkids
 
 @source:skeleton/fk1.cpp
 fk1
