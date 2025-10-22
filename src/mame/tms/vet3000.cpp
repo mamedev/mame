@@ -70,18 +70,19 @@ void vet3000_state::machine_start()
 };
 
 
-void vet3000_state::keyboard_w(u8 data){
+void vet3000_state::keyboard_w(u8 data)
+{
 	m_scan = data;
 };
 
 
 u8 vet3000_state::keyboard_r()
 {
+	u8 value = 0xff;
 	for (u8 i=0; i<7; i++)
 		if (!BIT(m_scan, i))
-			return m_row[i]->read();
-
-	return 0xff;
+			value &= m_row[i]->read();
+	return value;
 }
 
 
