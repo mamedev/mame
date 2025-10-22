@@ -886,9 +886,6 @@ void telestrat_state::telstrat(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:2", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:3", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
-	
-	SOFTWARE_LIST(config, "flop_list").set_original("telstrat_flop");
-
 }
 
 
