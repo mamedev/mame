@@ -352,8 +352,8 @@ CONS(2021, punifrnd, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplu
 
 // Pocket Monsters ガチッとゲットだぜ! モンスターボールゴー! - Pocket Monsters is printed on the inner shell, but not the box?
 CONS(2021, pokgoget, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball Go! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-
-CONS(2021, pokebala, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Pokemon Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// ガチッとゲットだぜ! モンスターボール
+CONS(2021, pokebala, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // 2020 (device) / 2021 (box) version of Sumikko Gurashi a cloud shaped device
 // Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
@@ -368,15 +368,19 @@ CONS( 201?, smkgurasa, smkguras, 0, generalplus_gpspi_direct, bfmpac, generalplu
 CONS( 201?, dsgnpal, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // for these Sega Toys pets the clones might end up being duplicates with only different user data, however they might also have different factory default data for each colour
-CONS( 2018, segapet1,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (2018 version, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS( 2018, segapet1a, segapet1, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (2018 version, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-// a 'DX' version also exists, unclear if it's different software or just different packaging with bonuses
+// もっちりペット もっちまるず
+CONS( 2018, segapet1,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2018 version, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2018, segapet1a, segapet1, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2018 version, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// a 'DX' version (dated 2020) also exists, unclear if it's different software or just different packaging with bonuses
 
-CONS( 2019, segapet2,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (2019 version, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS( 2019, segapet2a, segapet2, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (2019 version, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// also もっちりペット もっちまるず
+CONS( 2019, segapet2,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2019, segapet2a, segapet2, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-// these ones have motors in the ears
-CONS( 2020, segapet3,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (2020 version, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS( 2020, segapet3a, segapet3, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Soft Pet Toy (2020 version, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// these ones have motors in the ears and a more fluffy cover
+// もっちふわペット もっちまるず
+CONS( 2020, segapet3,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Mocchifuwa Pet Mocchimaruzu (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2020, segapet3a, segapet3, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Mocchifuwa Pet Mocchimaruzu (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS( 201?, bubltea,   0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Bandai", "Bubble Tea Pet", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// まぜまぜミックス！ぷにタピちゃん
+CONS( 201?, bubltea,   0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Bandai", "Mazemaze Mix! Puni Tapi-chan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

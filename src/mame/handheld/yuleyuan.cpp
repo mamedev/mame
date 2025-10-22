@@ -69,4 +69,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2022, yuleyuan, 0, yuleyuan, yuleyuan, yuleyuan_state, empty_init, ROT0, "Yule Yuan", "Yule Yuan Electronic Pet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// 星座电子宠物机
+GAME( 2022, yuleyuan, 0, yuleyuan, yuleyuan, yuleyuan_state, empty_init, ROT0, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model

@@ -537,10 +537,14 @@ CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // (these all use the same PCB) - unknown SoC (uses a glob) has GPspispi header, ARM based, SPI ROM
-CONS( 2014, bandplap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney Princess 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon 2014 Laptop (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// ディズニー&ディズニー／ピクサーキャラクターズ ワンダフルスイートパソコン
+CONS( 2014, bandplap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Wonderful Sweet PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// ディズニー&ディズニー／ピクサーキャラクターズ ワンダフルドリームパソコン
+CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Wonderful Dream PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// あそんでまなべる！マウスでクリック！アンパンマンパソコン
+CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// ドラえもんステップアップパソコン
+CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Step Up PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // company is called 深圳市飞讯互动科技有限公司
 // surface details erased on SoC for both of these
@@ -604,7 +608,8 @@ CONS( 2021, sumipc21,            0,        0,      gpl32612, gpl32612, generalpl
 CONS( 2016, segdis16,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney Characters Magical Pad -Girls Lesson- (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32600A
-CONS( 2020, dinopc,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Dinosaur PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// マウスでバトル!! 恐竜図鑑パソコン
+CONS( 2020, dinopc,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Mouse de Battle!! Kyouryuu Zukan PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
 // ディズニー&ディズニー／ピクサーキャラクターズ できた!がいっぱい ドリームトイパッド
