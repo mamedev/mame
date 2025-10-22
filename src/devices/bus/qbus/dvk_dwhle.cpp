@@ -27,23 +27,6 @@
 #define LOGDBG(format, ...)   LOGMASKED(LOG_DBG, "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
 
 
-#define raise_drqa()	do { \
-	m_regs[REGISTER_SI] |= KZDSI_DONE; \
-	raise_virq(m_bus->birq4_w, m_regs[REGISTER_SI], CSR_IE, m_drqa); } while (0)
-
-#define clear_drqa()	do { \
-	m_regs[REGISTER_SI] &= ~KZDSI_DONE; \
-	clear_virq(m_bus->birq4_w, m_regs[REGISTER_SI], CSR_IE, m_drqa); } while (0)
-
-#define raise_drqb()	do { \
-	m_regs[REGISTER_SI] |= KZDSI_DRQ1; \
-	raise_virq(m_bus->birq4_w, m_regs[REGISTER_SI], CSR_IE, m_drqb); } while (0)
-
-#define clear_drqb()	do { \
-	m_regs[REGISTER_SI] &= ~KZDSI_DRQ1; \
-	clear_virq(m_bus->birq4_w, m_regs[REGISTER_SI], CSR_IE, m_drqb); } while (0)
-
-
 namespace {
 
 enum
@@ -141,6 +124,11 @@ private:
 
 	void command(int command);
 	int sector_to_lba(unsigned int cylinder, unsigned int head, unsigned int sector, uint32_t *lba);
+
+	inline void raise_drqa();
+	inline void clear_drqa();
+	inline void raise_drqb();
+	inline void clear_drqb();
 
 	harddisk_image_device *m_image;
 	const hard_disk_file::info *m_hd_geom;
@@ -292,6 +280,31 @@ std::error_condition dvk_dwhle_device::load_hd(device_image_interface &image)
 
 void dvk_dwhle_device::unload_hd(device_image_interface &image)
 {
+}
+
+
+inline void dvk_dwhle_device::raise_drqa()
+{
+	m_regs[REGISTER_SI] |= KZDSI_DONE;
+	raise_virq(m_bus->birq4_w, m_regs[REGISTER_SI], CSR_IE, m_drqa);
+}
+
+inline void dvk_dwhle_device::clear_drqa()
+{
+	m_regs[REGISTER_SI] &= ~KZDSI_DONE;
+	clear_virq(m_bus->birq4_w, m_regs[REGISTER_SI], CSR_IE, m_drqa);
+}
+
+inline void dvk_dwhle_device::raise_drqb()
+{
+	m_regs[REGISTER_SI] |= KZDSI_DRQ1;
+	raise_virq(m_bus->birq4_w, m_regs[REGISTER_SI], CSR_IE, m_drqb);
+}
+
+inline void dvk_dwhle_device::clear_drqb()
+{
+	m_regs[REGISTER_SI] &= ~KZDSI_DRQ1;
+	clear_virq(m_bus->birq4_w, m_regs[REGISTER_SI], CSR_IE, m_drqb);
 }
 
 
