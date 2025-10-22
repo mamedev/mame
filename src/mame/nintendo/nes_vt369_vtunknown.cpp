@@ -653,6 +653,13 @@ ROM_START( rtvgc300cr )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( rtvgc300pj )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "jg7800pjm-1.u6", 0x00000, 0x4000000, CRC(ea472bf0) SHA1(2864d96da0ecf123f1b143aa53c7faab5ed121d2) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( dgun2561 ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "dgun2561.bin", 0x00000, 0x4000000, CRC(a6e627b4) SHA1(2667d2feb02de349387f9dcfa5418e7ed3afeef6) )
@@ -1233,6 +1240,7 @@ CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
 CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
 CONS( 2017, rtvgc300cr,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Disney Cars - 300 Games (JG7800DC-1)", MACHINE_NOT_WORKING )
+CONS( 2018, rtvgc300pj,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - PJ Masks - 300 Games (JG7800PJM-1)", MACHINE_NOT_WORKING )
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
@@ -1246,9 +1254,6 @@ CONS( 2017, rtvgc300cr,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
 
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
-
-    (units for use with TV)
-    Lexibook Retro TV Game Console (300 Games) - PJ Masks
 
     (more?)
 
