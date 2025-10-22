@@ -27,22 +27,24 @@ int specnext_im2_device::z80daisy_irq_state()
 
 int specnext_im2_device::z80daisy_irq_ack()
 {
-	return m_vector_base | m_vector_lo;
+	m_state |= Z80_DAISY_IEO;
+	return m_vector;
 }
 
 void specnext_im2_device::z80daisy_irq_reti()
 {
+	m_state &= ~Z80_DAISY_IEO;
 }
 
 TIMER_CALLBACK_MEMBER(specnext_im2_device::irq_off)
 {
-	m_state = 0;
+	m_state &= ~Z80_DAISY_INT;
 	m_intr_cb(CLEAR_LINE);
 }
 
-void specnext_im2_device::int_w(u8 vector_lo)
+void specnext_im2_device::int_w(u8 vector)
 {
-	m_vector_lo = vector_lo;
+	m_vector = vector;
 	m_state = Z80_DAISY_INT;
 	m_intr_cb(ASSERT_LINE);
 	m_irq_off_timer->adjust(clocks_to_attotime(32));
@@ -54,8 +56,7 @@ void specnext_im2_device::device_start()
 	m_irq_off_timer = timer_alloc(FUNC(specnext_im2_device::irq_off), this);
 
 	save_item(NAME(m_state));
-	save_item(NAME(m_vector_base));
-	save_item(NAME(m_vector_lo));
+	save_item(NAME(m_vector));
 }
 
 void specnext_im2_device::device_reset()
@@ -63,6 +64,5 @@ void specnext_im2_device::device_reset()
 	m_irq_off_timer->reset();
 
 	m_state = 0;
-	m_vector_base = 0;
-	m_vector_lo = 0xff;
+	m_vector = 0xff;
 }
