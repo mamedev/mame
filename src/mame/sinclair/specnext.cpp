@@ -2804,7 +2804,7 @@ void specnext_state::map_io(address_map &map)
 	map(0x253b, 0x253b).lrw8(NAME([this]() { return m_next_regs.read_byte(m_nr_register); })
 		, NAME([this](u8 data) { m_next_regs.write_byte(m_nr_register, data); }));
 	map(0x303b, 0x303b).lrw8(NAME([this]() {
-		return port_sprite_io_en() ? m_sprites->mirror_num_r() : 0x00;
+		return port_sprite_io_en() ? m_sprites->status_r() : 0x00;
 	}), NAME([this](u8 data) {
 		if (port_sprite_io_en())
 			m_sprites->io_w(0x303b, data);
