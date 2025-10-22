@@ -22,9 +22,13 @@ TODO:
 
 #include <algorithm>
 
-#define VERBOSE (LOG_GENERAL)
+#define LOG_FDC       (1U << 1)
+
+#define VERBOSE (LOG_GENERAL | LOG_FDC)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
+
+#define LOGFDC(...)     LOGMASKED(LOG_FDC, __VA_ARGS__)
 
 
 DEFINE_DEVICE_TYPE(W83977TF, w83977tf_device, "w83977tf", "Winbond W83977TF Super I/O")
@@ -76,7 +80,8 @@ void w83977tf_device::device_start()
 	m_isa->set_dma_channel(1, this, true);
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
-	remap(AS_IO, 0, 0x400);
+	save_pointer(NAME(m_activate), 0xb);
+//	remap(AS_IO, 0, 0x400);
 }
 
 void w83977tf_device::device_reset()
@@ -92,6 +97,8 @@ void w83977tf_device::device_reset()
 	m_lpt_drq_line = 4; // disabled
 	m_lpt_mode = 0x3f;
 
+	std::fill(std::begin(m_activate), std::end(m_activate), false);
+
 	m_fdc_address = 0x3f8;
 	m_gpio1_address = 0x100;
 
@@ -99,9 +106,14 @@ void w83977tf_device::device_reset()
 	m_fdc_drq_line = 4;
 
 	m_fdd_mode = 0x0e;
+	m_fdd_crf1 = 0x00;
+	m_fdd_crf2 = 0xff;
+	m_fdd_crf4 = 0x00;
 
 	m_fdc->set_mode(upd765_family_device::mode_t::AT);
 	m_fdc->set_rate(500000);
+
+	remap(AS_IO, 0, 0x400);
 }
 
 device_memory_interface::space_config_vector w83977tf_device::memory_space_config() const
@@ -127,7 +139,7 @@ void w83977tf_device::floppy_formats(format_registration &fr)
 
 void w83977tf_device::device_add_mconfig(machine_config &config)
 {
-	N82077AA(config, m_fdc, XTAL(24'000'000), upd765_family_device::mode_t::PS2);
+	N82077AA(config, m_fdc, XTAL(24'000'000), upd765_family_device::mode_t::AT);
 	m_fdc->intrq_wr_callback().set(FUNC(w83977tf_device::irq_floppy_w));
 	m_fdc->drq_wr_callback().set(FUNC(w83977tf_device::drq_floppy_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", w83977tf_device::floppy_formats).enable_sound(true);
@@ -162,9 +174,6 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
 	{
-		u16 superio_base = m_hefras ? 0x370 : 0x3f0;
-		m_isa->install_device(superio_base, superio_base + 3, read8sm_delegate(*this, FUNC(w83977tf_device::read)), write8sm_delegate(*this, FUNC(w83977tf_device::write)));
-
 		if (m_activate[0] & 1)
 		{
 			m_isa->install_device(m_fdc_address, m_fdc_address + 7, *m_fdc, &n82077aa_device::map);
@@ -195,6 +204,10 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 			// TODO: from port
 			m_isa->install_device(0x70, 0x71, read8sm_delegate(*this, FUNC(w83977tf_device::rtc_r)), write8sm_delegate(*this, FUNC(w83977tf_device::rtc_w)));
 		}
+
+		// need to install at the end, to ensure not clashing with FDC when hefras=0
+		u16 superio_base = m_hefras ? 0x370 : 0x3f0;
+		m_isa->install_device(superio_base, superio_base + 1, read8sm_delegate(*this, FUNC(w83977tf_device::read)), write8sm_delegate(*this, FUNC(w83977tf_device::write)));
 	}
 }
 
@@ -269,7 +282,7 @@ void w83977tf_device::config_map(address_map &map)
 			m_fdc_address &= 0xff << shift;
 			m_fdc_address |= data << (shift ^ 8);
 			m_fdc_address &= ~0xf007;
-			LOG("LD0 (FDC): remap %04x ([%d] %02x)\n", m_fdc_address, offset, data);
+			LOGFDC("LD0 (FDC): remap %04x ([%d] %02x)\n", m_fdc_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);
 		})
@@ -280,7 +293,7 @@ void w83977tf_device::config_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_fdc_irq_line = data & 0xf;
-			LOG("LD0 (FDC): irq routed to %02x\n", m_fdc_irq_line);
+			LOGFDC("LD0 (FDC): irq routed to %02x\n", m_fdc_irq_line);
 		})
 	);
 	m_logical_view[0](0x74, 0x74).lrw8(
@@ -289,16 +302,17 @@ void w83977tf_device::config_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_fdc_drq_line = data & 0x7;
-			LOG("LD0 (FDC): drq %s (%02x)\n", BIT(m_fdc_drq_line, 2) ? "disabled" : "enabled", data);
+			LOGFDC("LD0 (FDC): drq %s (%02x)\n", BIT(m_fdc_drq_line, 2) ? "disabled" : "enabled", data);
 		})
 	);
 	m_logical_view[0](0xf0, 0xf0).lrw8(
 		NAME([this] (offs_t offset) {
+			LOGFDC("LD0 (FDD): CRF0 mode read\n");
 			return m_fdd_mode;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_fdd_mode = data;
-			LOG("LD0 (FDD): mode %02x\n", data);
+			LOGFDC("LD0 (FDD): CRF0 mode %02x\n", data);
 
 			switch((m_fdd_mode & 0xc) >> 2)
 			{
@@ -309,6 +323,36 @@ void w83977tf_device::config_map(address_map &map)
 					popmessage("FDD: select <reserved> mode 2");
 					break;
 			}
+		})
+	);
+	m_logical_view[0](0xf1, 0xf1).lrw8(
+		NAME([this] () {
+			LOGFDC("LD0 (FDD): CRF1 mode read\n");
+			return m_fdd_crf1;
+		}),
+		NAME([this] (u8 data) {
+			m_fdd_crf1 = data;
+			LOGFDC("LD0 (FDD): CRF1 mode write %02x\n", data);
+		})
+	);
+	m_logical_view[0](0xf2, 0xf2).lrw8(
+		NAME([this] () {
+			LOGFDC("LD0 (FDD): CRF2 mode read\n");
+			return m_fdd_crf2;
+		}),
+		NAME([this] (u8 data) {
+			m_fdd_crf2 = data;
+			LOGFDC("LD0 (FDD): CRF2 mode write %02x\n", data);
+		})
+	);
+	m_logical_view[0](0xf4, 0xf4).lrw8(
+		NAME([this] () {
+			LOGFDC("LD0 (FDD): CRF4 mode read\n");
+			return m_fdd_crf4;
+		}),
+		NAME([this] (u8 data) {
+			m_fdd_crf4 = data;
+			LOGFDC("LD0 (FDD): CRF4 mode write %02x\n", data);
 		})
 	);
 

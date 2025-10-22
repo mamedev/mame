@@ -80,7 +80,7 @@ private:
 
 	u8 m_fdc_irq_line;
 	u8 m_fdc_drq_line;
-	u8 m_fdd_mode;
+	u8 m_fdd_mode, m_fdd_crf1, m_fdd_crf2, m_fdd_crf4;
 	u8 m_keyb_irq_line;
 	u8 m_mouse_irq_line;
 	u8 m_rtc_irq_line;
