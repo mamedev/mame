@@ -617,6 +617,7 @@ struct m2_poly_extra_data
 	model2_state *  state;
 	u32      lumabase;
 	u32      colorbase;
+	u8       checker;
 	u32 *    texsheet[6];
 	u32      texwidth[6];
 	u32      texheight[6];
@@ -676,19 +677,19 @@ public:
 	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
 	void set_yoffset(int16_t yoffs) { m_yoffs = yoffs; }
 
-	template <bool Checker, bool Translucent>
+	template <bool Translucent>
 	void draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 	template <bool Translucent>
-	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv);
-
-	template <bool Checker, bool Translucent>
 	void draw_scanline_tex(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 private:
 	model2_state& m_state;
 	bitmap_rgb32 m_destmap;
 	int16_t m_xoffs = 0, m_yoffs = 0;
+
+	template <bool Translucent>
+	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv);
 };
 
 typedef model2_renderer::vertex_t poly_vertex;

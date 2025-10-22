@@ -12,7 +12,7 @@
 
 
 // non-textured render path
-template <bool Checker, bool Translucent>
+template <bool Translucent>
 void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
 {
 	model2_state *state = object.state;
@@ -24,9 +24,9 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 	const u16 *colortable_g = &state->m_colorxlat[0x4000/2];
 	const u16 *colortable_b = &state->m_colorxlat[0x8000/2];
 	u32  color = object.colorbase;
+	u8   checker = object.checker;
 	u8   luma;
 	u32  tr, tg, tb;
-	int  x;
 
 	// if it's translucent, there's nothing to render
 	if (Translucent)
@@ -53,8 +53,13 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 	// build the final color
 	color = rgb_t(tr, tg, tb);
 
-	for (x = extent.startx; x < extent.stopx; x++)
-		if (!Checker || ((x ^ scanline) & 1)) p[x] = color;
+	int x = extent.startx;
+	int dx = checker ? 2 : 1;
+	if (checker && !((x ^ scanline) & 1))
+		x++;
+
+	for (; x < extent.stopx; x += dx)
+		p[x] = color;
 }
 
 template <bool Translucent>
@@ -138,7 +143,7 @@ u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, cons
 }
 
 // textured render path
-template <bool Checker, bool Translucent>
+template <bool Translucent>
 void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent, const m2_poly_extra_data& object, int threadid)
 {
 	model2_state *state = object.state;
@@ -151,6 +156,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	const u16 *lumaram = &state->m_lumaram[0];
 	u32  colorbase = object.colorbase;
 	u32  lumabase = object.lumabase;
+	u8   checker = object.checker;
 	u8  *gamma_value = &state->m_gamma_table[0];
 	float ooz = extent.param[0].start;
 	float uoz = extent.param[1].start;
@@ -164,7 +170,6 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	int  tr, tg, tb;
 	u32	t, t2;
 	u8 luma;
-	int x;
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;
 
@@ -172,11 +177,13 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	colortable_g += ((colorbase >>  5) & 0x1f) << 8;
 	colortable_b += ((colorbase >> 10) & 0x1f) << 8;
 
-	for (x = extent.startx; x < extent.stopx; x++, uoz += dudxoz, voz += dvdxoz, ooz += dooz)
-	{
-		if (Checker && !((x ^ scanline) & 1))
-			continue;
+	int x = extent.startx;
+	int dx = checker ? 2 : 1;
+	if (checker && !((x ^ scanline) & 1))
+		x++;
 
+	for (; x < extent.stopx; x += dx, uoz += dudxoz, voz += dvdxoz, ooz += dooz)
+	{
 		float z = recip_approx(ooz);
 		float mml = log2f(norm * z) - 2.0F; // No parts are squared so no need for the usual 0.5 factor
 		u32 level = std::min(std::max(0, (int)mml), 4); // We need room for one more level for trilinear
