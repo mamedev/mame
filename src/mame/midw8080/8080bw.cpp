@@ -681,24 +681,57 @@ void _8080bw_state::astropal(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-void _8080bw_state::cosmo_map(address_map &map)
+void cosmo_state::machine_start()
+{
+	//_8080bw_state::machine_start();
+
+	MACHINE_START_CALL_MEMBER(extra_8080bw);
+
+	stars_init();
+
+	save_item(NAME(m_stars_sidescroll));
+	save_item(NAME(m_star_speed));
+	save_item(NAME(m_rng_offs));
+	save_item(NAME(m_bright_star));
+	save_item(NAME(m_stars));
+	save_item(NAME(m_star_rng_origin));
+	save_item(NAME(m_star_rng_origin_frame));
+}
+
+void cosmo_state::stars_w(uint8_t data)
+{
+	m_stars_sidescroll = data & 0x08;  // Sideways
+	m_star_speed = data & 0x07;  // Speed
+}
+
+uint8_t cosmo_state::stars_r()
+{
+	// Returns 6 bits from the RNG
+	uint8_t rng = ~m_stars[m_rng_offs];
+	m_rng_offs += m_screen->frame_number();
+	m_rng_offs %= STAR_RNG_PERIOD;
+	return rng & 0x3f;
+}
+
+void cosmo_state::program_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("main_ram");
 	map(0x4000, 0x57ff).rom();
+	map(0x5800, 0x5800).r(FUNC(cosmo_state::stars_r)).w(FUNC(cosmo_state::stars_w));
 	map(0x5c00, 0x5fff).ram().share("colorram");
 }
 
-// at least one of these MWA8_NOPs must be sound related
-void _8080bw_state::cosmo_io_map(address_map &map)
+// at least one of ports 0-2 must be sound related
+void cosmo_state::io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("IN0").nopw();
-	map(0x01, 0x01).portr("IN1").nopw();
-	map(0x02, 0x02).portr("IN2").nopw();
-	map(0x03, 0x03).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::cosmo_sh_port_2_w));
+	map(0x00, 0x00).portr("IN0").lw8(NAME([this] (uint8_t data) { logerror("port 0 write @ %x = %x\n", m_maincpu->pc(), data); }));
+	map(0x01, 0x01).portr("IN1").lw8(NAME([this] (uint8_t data) { logerror("port 1 write @ %x = %x\n", m_maincpu->pc(), data); }));
+	map(0x02, 0x02).portr("IN2").lw8(NAME([this] (uint8_t data) { logerror("port 2 write @ %x = %x\n", m_maincpu->pc(), data); }));
+	map(0x03, 0x03).w(FUNC(cosmo_state::invadpt2_sh_port_1_w));
+	map(0x05, 0x05).w(FUNC(cosmo_state::sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).nopw();
+	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { logerror("port 7 write @ %x = %x\n", m_maincpu->pc(), data); }));
 }
 
 
@@ -715,21 +748,21 @@ static INPUT_PORTS_START( cosmo )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" ) // must be HIGH normally or the joystick won't work
 INPUT_PORTS_END
 
-void _8080bw_state::cosmo(machine_config &config)
+void cosmo_state::cosmo(machine_config &config)
 {
 	mw8080bw_root(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::cosmo_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::cosmo_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmo_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &cosmo_state::io_map);
 
 	WATCHDOG_TIMER(config, m_watchdog);
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	// video hardware
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_cosmo));
+	m_screen->set_raw(MW8080BW_PIXEL_CLOCK*4, MW8080BW_HTOTAL*4, MW8080BW_HBEND*4, MW8080BW_HPIXCOUNT*4, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART);
+	m_screen->set_screen_update(FUNC(cosmo_state::screen_update));
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	PALETTE(config, m_palette, FUNC(cosmo_state::palette_init), 72);
 
 	// sound hardware
 	invaders_samples_audio(config);
@@ -6109,7 +6142,7 @@ GAME( 1979, galxwarst2,  galxwars, invadpt2,  galxwars,  _8080bw_state,  empty_i
 GAME( 1979, starw,       galxwars, invnomb,   galxwars,  invaders_state, empty_init,    ROT270, "bootleg",                            "Star Wars (bootleg of Galaxy Wars, set 1)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starw1,      galxwars, starw1,    galxwars,  _8080bw_state,  empty_init,    ROT270, "bootleg (Yamashita)",                "Star Wars (bootleg of Galaxy Wars, set 2)",                       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, cosmo,       0,        cosmo,     cosmo,     _8080bw_state,  empty_init,    ROT90,  "TDS & MINTS",                        "Cosmo",                                                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, cosmo,       0,        cosmo,     cosmo,     cosmo_state,    empty_init,    ROT90,  "TDS & MINTS",                        "Cosmo",                                                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1980?,invrvnge,    0,        invrvnge,  invrvnge,  invrvnge_state, init_invrvnge, ROT270, "Zenitone-Microsec Ltd.",             "Invader's Revenge (set 1)",                                       MACHINE_SUPPORTS_SAVE ) // Copyright is either late-1980, or early-1981
 GAME( 1980?,invrvngea,   invrvnge, invrvnge,  invrvnge,  invrvnge_state, init_invrvnge, ROT270, "Zenitone-Microsec Ltd.",             "Invader's Revenge (set 2)",                                       MACHINE_SUPPORTS_SAVE )
