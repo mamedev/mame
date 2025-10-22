@@ -6,14 +6,14 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_CBUS_PC9801_118_H
-#define MAME_BUS_CBUS_PC9801_118_H
+#ifndef MAME_BUS_PC98_CBUS_PC9801_118_H
+#define MAME_BUS_PC98_CBUS_PC9801_118_H
 
 #pragma once
 
 #include "sound/ymopn.h"
 
-#include "pc9801_cbus.h"
+#include "slot.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -46,7 +46,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	required_device<pc9801_slot_device> m_bus;
+	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ym2608_device> m_opn3;
 private:
 
@@ -67,4 +67,4 @@ DECLARE_DEVICE_TYPE(PC9801_118, pc9801_118_device)
 
 
 
-#endif // MAME_BUS_CBUS_PC9801_118_H
+#endif // MAME_BUS_PC98_CBUS_PC9801_118_H

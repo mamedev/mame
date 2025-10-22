@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_CBUS_SOUND_H
-#define MAME_BUS_CBUS_SOUND_H
+#ifndef MAME_BUS_PC98_CBUS_SOUND_H
+#define MAME_BUS_PC98_CBUS_SOUND_H
 
 #pragma once
 
 #include "pc9801_86.h"
 #include "pc9801_118.h"
-#include "pc9801_cbus.h"
+#include "slot.h"
 
 #include "machine/eepromser.h"
 
@@ -71,4 +71,4 @@ DECLARE_DEVICE_TYPE(SOUND_PC9821CE,  sound_pc9821ce_device)
 DECLARE_DEVICE_TYPE(SOUND_PC9821CX3, sound_pc9821cx3_device)
 
 
-#endif // MAME_BUS_CBUS_SOUND_H
+#endif // MAME_BUS_PC98_CBUS_SOUND_H

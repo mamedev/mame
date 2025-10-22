@@ -6,12 +6,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_CBUS_AMD98_H
-#define MAME_BUS_CBUS_AMD98_H
+#ifndef MAME_BUS_PC98_CBUS_AMD98_H
+#define MAME_BUS_PC98_CBUS_AMD98_H
 
 #pragma once
 
-#include "bus/cbus/pc9801_cbus.h"
+#include "slot.h"
 #include "sound/ay8910.h"
 
 //**************************************************************************
@@ -46,7 +46,7 @@ private:
 
 	uint8_t m_ay3_latch, m_ay3_ff;
 
-	required_device<pc9801_slot_device> m_bus;
+	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ay8910_device>  m_ay1;
 	required_device<ay8910_device>  m_ay2;
 	required_device<ay8910_device>  m_ay3;
@@ -56,4 +56,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(AMD98, amd98_device)
 
-#endif // MAME_BUS_CBUS_AMD98_H
+#endif // MAME_BUS_PC98_CBUS_AMD98_H

@@ -83,6 +83,8 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 #include "emu.h"
 #include "pc88va.h"
 
+#include "bus/pc98_cbus/options.h"
+
 #include "softlist_dev.h"
 
 #include <iostream>
@@ -1378,15 +1380,6 @@ void pc88va_state::machine_reset()
 	m_sound_irq_pending = false;
 }
 
-// TODO: add just a subset for now, all needs to be verified if compatible with C-Bus.
-static void pc88va_cbus_devices(device_slot_interface &device)
-{
-	device.option_add("pc9801_55u", PC9801_55U);
-	device.option_add("pc9801_55l", PC9801_55L);
-	device.option_add("mif_201",    MIF201);
-	device.option_add("mpu_pc98",   MPU_PC98);
-}
-
 // TODO: make it to work and backport to C-Bus
 void pc88va_state::pc88va_sasi(machine_config &config)
 {
@@ -1416,7 +1409,7 @@ void pc88va_state::pc88va_sasi(machine_config &config)
 // cfr. schematics pg. 260, "external bus, videoboard connector"
 void pc88va_state::pc88va_cbus(machine_config &config)
 {
-	PC9801CBUS_SLOT(config, m_cbus[0], pc88va_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, m_cbus[0], pc88va_cbus_devices, nullptr);
 	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
@@ -1425,7 +1418,7 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	m_cbus[0]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<0>));
 	m_cbus[0]->int_cb<4>().set("ir10", FUNC(input_merger_device::in_w<0>));
 
-	PC9801CBUS_SLOT(config, m_cbus[1], pc88va_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, m_cbus[1], pc88va_cbus_devices, nullptr);
 	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));

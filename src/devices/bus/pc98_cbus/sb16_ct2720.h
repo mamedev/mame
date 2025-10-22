@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_CBUS_SB16_CT2720_H
-#define MAME_BUS_CBUS_SB16_CT2720_H
+#ifndef MAME_BUS_PC98_CBUS_SB16_CT2720_H
+#define MAME_BUS_PC98_CBUS_SB16_CT2720_H
 
 #pragma once
 
-#include "bus/cbus/pc9801_cbus.h"
+#include "slot.h"
 //#include "bus/midi/midi.h"
 //#include "bus/pc_joy/pc_joy.h"
 #include "sound/ct1745.h"
@@ -38,7 +38,7 @@ protected:
 private:
 	void io_map(address_map &map) ATTR_COLD;
 
-	required_device<pc9801_slot_device> m_bus;
+	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ymf262_device> m_opl3;
 	required_device<ct1745_mixer_device> m_mixer;
 	required_device<dac_16bit_r2r_device> m_ldac;
@@ -49,4 +49,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SB16_CT2720, sb16_ct2720_device)
 
-#endif // MAME_BUS_CBUS_SB16_CT2720_H
+#endif // MAME_BUS_PC98_CBUS_SB16_CT2720_H

@@ -16,7 +16,7 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "bus/cbus/wavestar.h"
+#include "bus/pc98_cbus/wavestar.h"
 
 DEFINE_DEVICE_TYPE(QVISION_WAVESTAR, qvision_wavestar_device, "qvision_wavestar", "QVision WaveStar")
 

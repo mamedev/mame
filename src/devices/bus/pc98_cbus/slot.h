@@ -58,8 +58,8 @@
                             <B>          <A>
 
 **********************************************************************/
-#ifndef MAME_BUS_CBUS_PC9801_CBUS_H
-#define MAME_BUS_CBUS_PC9801_CBUS_H
+#ifndef MAME_BUS_PC98_CBUS_SLOT_H
+#define MAME_BUS_PC98_CBUS_SLOT_H
 
 #pragma once
 
@@ -71,12 +71,12 @@
 
 
 
-//class pc9801_slot_device;
+//class pc98_cbus_slot_device;
 
 #if 0
 class device_pc9801_slot_card_interface : public device_slot_card_interface
 {
-	friend class pc9801_slot_device;
+	friend class pc98_cbus_slot_device;
 
 public:
 	// construction/destruction
@@ -85,22 +85,22 @@ public:
 };
 #endif
 
-// ======================> pc9801_slot_device
+// ======================> pc98_cbus_slot_device
 
-class pc9801_slot_device : public device_t, public device_slot_interface
+class pc98_cbus_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
 	template <typename T>
-	pc9801_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: pc9801_slot_device(mconfig, tag, owner, (uint32_t)0)
+	pc98_cbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: pc98_cbus_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
@@ -133,6 +133,6 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(PC9801CBUS_SLOT, pc9801_slot_device)
+DECLARE_DEVICE_TYPE(PC98_CBUS_SLOT, pc98_cbus_slot_device)
 
-#endif // MAME_BUS_CBUS_PC9801_CBUS_H
+#endif // MAME_BUS_PC98_CBUS_SLOT_H

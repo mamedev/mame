@@ -6,12 +6,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_CBUS_PC9801_55_H
-#define MAME_BUS_CBUS_PC9801_55_H
+#ifndef MAME_BUS_PC98_CBUS_PC9801_55_H
+#define MAME_BUS_PC98_CBUS_PC9801_55_H
 
 #pragma once
 
-#include "bus/cbus/pc9801_cbus.h"
+#include "slot.h"
 #include "bus/nscsi/devices.h"
 #include "machine/nscsi_bus.h"
 #include "machine/wd33c9x.h"
@@ -44,7 +44,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	required_device<pc9801_slot_device> m_bus;
+	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<nscsi_bus_device> m_scsi_bus;
 	required_device<wd33c9x_base_device> m_wdc;
 
@@ -77,4 +77,4 @@ private:
 DECLARE_DEVICE_TYPE(PC9801_55U, pc9801_55u_device)
 DECLARE_DEVICE_TYPE(PC9801_55L, pc9801_55l_device)
 
-#endif // MAME_BUS_CBUS_PC9801_55_H
+#endif // MAME_BUS_PC98_CBUS_PC9801_55_H

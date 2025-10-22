@@ -21,7 +21,7 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "bus/cbus/sb16_ct2720.h"
+#include "bus/pc98_cbus/sb16_ct2720.h"
 #include "speaker.h"
 
 

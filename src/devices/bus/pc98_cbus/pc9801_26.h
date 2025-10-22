@@ -6,12 +6,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_CBUS_PC9801_26_H
-#define MAME_BUS_CBUS_PC9801_26_H
+#ifndef MAME_BUS_PC98_CBUS_PC9801_26_H
+#define MAME_BUS_PC98_CBUS_PC9801_26_H
 
 #pragma once
 
-#include "pc9801_cbus.h"
+#include "slot.h"
 
 #include "bus/msx/ctrl/ctrl.h"
 #include "sound/ymopn.h"
@@ -43,7 +43,7 @@ protected:
 	u16 read_io_base();
 
 private:
-	required_device<pc9801_slot_device> m_bus;
+	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ym2203_device>  m_opn;
 	required_device_array<msx_general_purpose_port_device, 2U> m_joy;
 	required_ioport m_irq_jp;
@@ -66,4 +66,4 @@ DECLARE_DEVICE_TYPE(PC9801_26, pc9801_26_device)
 
 
 
-#endif // MAME_BUS_CBUS_PC9801_26_H
+#endif // MAME_BUS_PC98_CBUS_PC9801_26_H

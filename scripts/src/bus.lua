@@ -5533,35 +5533,35 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/cbus/pc9801_cbus.h,BUSES["CBUS"] = true
+--@src/devices/bus/pc98_cbus/slot.h,BUSES["PC98_CBUS"] = true
 ---------------------------------------------------
 
-if (BUSES["CBUS"]~=null) then
+if (BUSES["PC98_CBUS"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/cbus/amd98.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/amd98.h",
-		MAME_DIR .. "src/devices/bus/cbus/mif201.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/mif201.h",
-		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
-		MAME_DIR .. "src/devices/bus/cbus/options.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/options.h",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.h",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
-		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.h",
-		MAME_DIR .. "src/devices/bus/cbus/sound.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/sound.h",
-		MAME_DIR .. "src/devices/bus/cbus/wavestar.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/wavestar.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/amd98.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/amd98.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/mif201.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/mif201.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/mpu_pc98.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/mpu_pc98.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/options.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/options.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_26.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_26.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_55.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_55.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_86.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_86.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_118.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_118.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/sb16_ct2720.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/sb16_ct2720.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/slot.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/slot.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/sound.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/sound.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/wavestar.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/wavestar.h",
 	}
 end
 

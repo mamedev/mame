@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
-#ifndef MAME_BUS_CBUS_MIF201_H
-#define MAME_BUS_CBUS_MIF201_H
+#ifndef MAME_BUS_PC98_CBUS_MIF201_H
+#define MAME_BUS_PC98_CBUS_MIF201_H
 
 #pragma once
 
-#include "bus/cbus/pc9801_cbus.h"
+#include "slot.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 
@@ -32,7 +32,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	required_device<pc9801_slot_device> m_bus;
+	required_device<pc98_cbus_slot_device> m_bus;
 	required_device_array<i8251_device, 2> m_uart;
 	required_device<pit8253_device>  m_pit;
 
@@ -43,4 +43,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MIF201, mif201_device)
 
-#endif // MAME_BUS_CBUS_MIF201_H
+#endif // MAME_BUS_PC98_CBUS_MIF201_H

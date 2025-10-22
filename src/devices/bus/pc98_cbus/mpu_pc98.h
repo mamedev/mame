@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont,Kevin Horton
-#ifndef MAME_BUS_CBUS_MPU_PC98_H
-#define MAME_BUS_CBUS_MPU_PC98_H
+#ifndef MAME_BUS_PC98_CBUS_MPU_PC98_H
+#define MAME_BUS_PC98_CBUS_MPU_PC98_H
 
 #pragma once
 
-#include "bus/cbus/pc9801_cbus.h"
+#include "slot.h"
 #include "machine/mpu401.h"
 
 //**************************************************************************
@@ -34,7 +34,7 @@ private:
 
 	void map(address_map &map) ATTR_COLD;
 
-	required_device<pc9801_slot_device> m_bus;
+	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<mpu401_device> m_mpu401;
 };
 
@@ -42,4 +42,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MPU_PC98, mpu_pc98_device)
 
-#endif // MAME_BUS_CBUS_MPU_PC98_H
+#endif // MAME_BUS_PC98_CBUS_MPU_PC98_H

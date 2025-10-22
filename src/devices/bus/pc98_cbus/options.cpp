@@ -9,8 +9,8 @@
 #include "pc9801_55.h"
 #include "pc9801_86.h"
 #include "pc9801_118.h"
+#include "mif201.h"
 #include "mpu_pc98.h"
-#include "pc9801_cbus.h"
 #include "sb16_ct2720.h"
 #include "sound.h"
 #include "wavestar.h"
@@ -41,5 +41,14 @@ void pc98_cbus_devices(device_slot_interface &device)
 	// internal sound options
 	device.option_add_internal("sound_pc9821ce",  SOUND_PC9821CE);
 	device.option_add_internal("sound_pc9821cx3", SOUND_PC9821CX3);
+}
+
+// TODO: add just a subset for now, all needs to be verified if compatible with C-Bus.
+void pc88va_cbus_devices(device_slot_interface &device)
+{
+	device.option_add("pc9801_55u", PC9801_55U);
+	device.option_add("pc9801_55l", PC9801_55L);
+	device.option_add("mif_201",    MIF201);
+	device.option_add("mpu_pc98",   MPU_PC98);
 }
 

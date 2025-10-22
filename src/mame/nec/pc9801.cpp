@@ -58,8 +58,8 @@ TODO (pc9801ux):
 #include "emu.h"
 #include "pc9801.h"
 
-#include "bus/cbus/amd98.h"
-#include "bus/cbus/options.h"
+#include "bus/pc98_cbus/amd98.h"
+#include "bus/pc98_cbus/options.h"
 #include "machine/input_merger.h"
 
 void pc98_base_state::rtc_w(uint8_t data)
@@ -1994,7 +1994,7 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
-	PC9801CBUS_SLOT(config, m_cbus[0], pc98_cbus_devices, "pc9801_26");
+	PC98_CBUS_SLOT(config, m_cbus[0], pc98_cbus_devices, "pc9801_26");
 	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
@@ -2005,7 +2005,7 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	m_cbus[0]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
 	m_cbus[0]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
 
-	PC9801CBUS_SLOT(config, m_cbus[1], pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, m_cbus[1], pc98_cbus_devices, nullptr);
 	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
@@ -2667,8 +2667,8 @@ ROM_START( pc9801fs )
 	LOAD_KANJI_ROMS
 //  LOAD_IDE_ROM
 
-//	ROM_REGION( 0x4000, "scsi", ROMREGION_ERASEVAL(0xcb) )
-//	ROM_COPY( "biosrom", 0x16000, 0x00000, 0x02000 )
+//  ROM_REGION( 0x4000, "scsi", ROMREGION_ERASEVAL(0xcb) )
+//  ROM_COPY( "biosrom", 0x16000, 0x00000, 0x02000 )
 ROM_END
 
 /*

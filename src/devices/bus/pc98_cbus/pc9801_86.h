@@ -6,12 +6,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_CBUS_PC9801_86_H
-#define MAME_BUS_CBUS_PC9801_86_H
+#ifndef MAME_BUS_PC98_CBUS_PC9801_86_H
+#define MAME_BUS_PC98_CBUS_PC9801_86_H
 
 #pragma once
 
-#include "pc9801_cbus.h"
+#include "slot.h"
 
 #include "bus/msx/ctrl/ctrl.h"
 #include "machine/input_merger.h"
@@ -54,7 +54,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(dac_tick);
 
-	required_device<pc9801_slot_device> m_bus;
+	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ym2608_device>  m_opna;
 	required_device<input_merger_device> m_irqs;
 
@@ -137,4 +137,4 @@ DECLARE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device)
 DECLARE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device)
 
 
-#endif // MAME_BUS_CBUS_PC9801_86_H
+#endif // MAME_BUS_PC98_CBUS_PC9801_86_H

@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_CBUS_WAVESTAR_H
-#define MAME_BUS_CBUS_WAVESTAR_H
+#ifndef MAME_BUS_PC98_CBUS_WAVESTAR_H
+#define MAME_BUS_PC98_CBUS_WAVESTAR_H
 
 #pragma once
 
-#include "pc9801_cbus.h"
+#include "slot.h"
 
 #include "cpu/h8/h83042.h"
 
@@ -28,7 +28,7 @@ protected:
 private:
 	void h8_map(address_map &map) ATTR_COLD;
 
-	required_device<pc9801_slot_device> m_bus;
+	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<h83040_device> m_cpu;
 };
 
@@ -36,4 +36,4 @@ private:
 DECLARE_DEVICE_TYPE(QVISION_WAVESTAR,  qvision_wavestar_device)
 
 
-#endif // MAME_BUS_CBUS_WAVESTAR_H
+#endif // MAME_BUS_PC98_CBUS_WAVESTAR_H
