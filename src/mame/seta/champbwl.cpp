@@ -281,13 +281,13 @@ uint8_t champbwl_state::trackball_reset_r()
 
 void champbwl_state::misc_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
-	machine().bookkeeping().coin_lockout_w(0, ~data & 8);
-	machine().bookkeeping().coin_lockout_w(1, ~data & 4);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 2));
 
-	m_mainbank->set_entry((data & 0x30) >> 4);
+	m_mainbank->set_entry((data >> 4) & 0x03);
 
 	m_input_select = BIT(data, 7);
 }
@@ -472,23 +472,23 @@ static INPUT_PORTS_START( doraemon_base )
 
 	PORT_START("IN0")   // f000
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_MEMORY_RESET )  PORT_NAME( "Data Clear" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1    )      PORT_NAME( "¥100" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN2    )      PORT_NAME( "¥10" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN3    )      PORT_NAME( "Medal" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1 )         PORT_NAME( "¥100" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN2 )         PORT_NAME( "¥10" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN3 )         PORT_NAME( "Medal" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 )      PORT_NAME( "Freeze" )  PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN1")   // f002
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2  )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SLOT_STOP1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SLOT_STOP2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON3  )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM   )      PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // sensor
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SLOT_STOP3 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // sensor
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( doraemon )
@@ -526,22 +526,22 @@ static INPUT_PORTS_START( doraemonp )
 
 	PORT_MODIFY("DSW1")  // f006
 	PORT_DIPNAME( 0x0f, 0x09, "Gift Out" )                                                  PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x0f,  "2.5 %" )
-	PORT_DIPSETTING(    0x0e,  "5 %" )
-	PORT_DIPSETTING(    0x0d,  "7.5 %" )
-	PORT_DIPSETTING(    0x0c,  "10 %" )
-	PORT_DIPSETTING(    0x0b,  "12.5 %" )
-	PORT_DIPSETTING(    0x0a,  "15 %" )
-	PORT_DIPSETTING(    0x09,  "20 %" )
-	PORT_DIPSETTING(    0x08,  "25 %" )
-	PORT_DIPSETTING(    0x07,  "30 %" )
-	PORT_DIPSETTING(    0x06,  "40 %" )
-	PORT_DIPSETTING(    0x05,  "60 %" )
-	PORT_DIPSETTING(    0x04,  "80 %" )
-	PORT_DIPSETTING(    0x03, "100 %" )
-	PORT_DIPSETTING(    0x02, "100 %" )
-	PORT_DIPSETTING(    0x01, "100 %" )
-	PORT_DIPSETTING(    0x00, "100 %" )
+	PORT_DIPSETTING(    0x0f,  "2.5%" )
+	PORT_DIPSETTING(    0x0e,  "5%" )
+	PORT_DIPSETTING(    0x0d,  "7.5%" )
+	PORT_DIPSETTING(    0x0c,  "10%" )
+	PORT_DIPSETTING(    0x0b,  "12.5%" )
+	PORT_DIPSETTING(    0x0a,  "15%" )
+	PORT_DIPSETTING(    0x09,  "20%" )
+	PORT_DIPSETTING(    0x08,  "25%" )
+	PORT_DIPSETTING(    0x07,  "30%" )
+	PORT_DIPSETTING(    0x06,  "40%" )
+	PORT_DIPSETTING(    0x05,  "60%" )
+	PORT_DIPSETTING(    0x04,  "80%" )
+	PORT_DIPSETTING(    0x03, "100%" )
+	PORT_DIPSETTING(    0x02, "100%" )
+	PORT_DIPSETTING(    0x01, "100%" )
+	PORT_DIPSETTING(    0x00, "100%" )
 	PORT_DIPNAME( 0x10, 0x10, "Games For 100 Yen" )                                         PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -864,6 +864,6 @@ ROM_END
 GAME( 1989,  champbwl,  0,        champbwl,  champbwl,  champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1989,  champbwla, champbwl, champbwl,  champbwl,  champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling (location test)",   MACHINE_SUPPORTS_SAVE )
 
-// TODO: parent set freezes when winning during gameplay, probably due to bad hopper mapping. Needs further checks:
-GAME( 1993?, doraemon,  0,        doraemon,  doraemon,  doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon Slot",                          MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
-GAME( 1993?, doraemonp, doraemon, doraemonp, doraemonp, doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
+// TODO: parent set doesn't accept ¥100 coin (only ¥10), medal and 10¥ counters are missing, and it freezes on winning
+GAME( 1993?, doraemon,  0,        doraemon,  doraemon,  doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon Slot",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on PCB suggests late-1993
+GAME( 1993?, doraemonp, doraemon, doraemonp, doraemonp, doraemon_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on PCB suggests late-1993
