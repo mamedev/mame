@@ -18,22 +18,23 @@
     even the implemenation of virtual devices.  In effect, this system was the
     first to support a hardware virtual 8086 mode.
 
-    TODO: while an attempt has been made to emulate the virtualization
-    hardware, it is mostly unverified, and will almost certainly not work.
-    In order to verify it, someone needs to unearth a copy of the AT&T Unix
-    release that was developed and sold specifically for the 6300+, in
-    addition to the OS Merge (AKA Simul-Task) software that's needed to run
-    Unix and DOS concurrently.  There are seven disks labelled "UNIX System V
-    Release 2.0 Foundation Set" and one labelled "UNIX System V Release 2.0
-    Simul-Task OS Merge Disk".  All disks are also labelled with "AT&T
-    Personal Computer 6300 Plus".  Anyone with a disk set to donate or sell
-    is kindly requested to contact donohoe00 on the VCFed forum or github.
+    TODO: The virtualization hardware was verified by running the Customer
+    Diagnotics.  However, it is not known if the version of AT&T Unix that
+    was developed and sold specifically for the 6300+ will run correctly.
+    The same goes for the OS Merge (AKA Simul-Task) software that's needed to
+    run Unix and DOS concurrently.  There are seven disks labelled "UNIX
+    System V Release 2.0 Foundation Set" and one labelled "UNIX System V
+    Release 2.0 Simul-Task OS Merge Disk".  All disks are also labelled with
+    "AT&T Personal Computer 6300 Plus".  Anyone with a disk set to donate or
+    sell is kindly requested to contact donohoe00 on the VCFed forum or github.
 
-    Some of the enhanced functionality, such as switching in and out of
-    protected mode, has been verified (since the BIOS does this in order to
-    test memory above 640K).  This involves external logic to reset the CPU
-    (the only way to return to Real Mode) and to enable/disable address
-    lines A20-A23.
+    NOTE: The Timeslice and Sanity Timer Customer Diagnotics tests are
+    failing.  This was observed to be due to the tests using busy loops
+    to measure time, with little or no tolerance.  The emulation is not
+    close enough to cycle accurate for the execution time to exactly match
+    the real hardware.  In any case, the Timeslice interrupt has been
+    observed to fire at the expected time, and the and the Sanity Timer
+    has been observed to reset the CPU at the expected time.
 
     Sources:
 
@@ -85,7 +86,7 @@ public:
 		m_keyboard(*this, "keyboard"),
 		m_ctc(*this, "ctc"),
 		m_mmu(*this, "mmu"),
-		m_dsw(*this, "DSW"),
+		m_dsw2(*this, "DSW2"),
 		m_map_rom(*this, "addrmap"),
 		m_nmi_enable(false)
 	{ }
@@ -115,21 +116,18 @@ private:
 	 *     1: MEMSETUP  : Set to enable writing of the memory access table.
 	 *                    Each entry is a 1-bit enable/disable.  Entries must
 	 *                    be written one bit at a time (D0 provides the value
-	 *                    to write).  Since A10-A19 are used to index the
-	 *                    table, the 1024 entries of the table must
-	 *                    (apparently) be written via an unused 1M region of
-	 *                    physical address space, with a stride of 1K.
-	 *                    Therefore it only makes sense to write the table when
-	 *                    in protected mode (accesses via the lower 1M range
-	 *                    likely don't even work, precluding it from being
-	 *                    written in Real Mode).
-	 *     3: IORDTRAP  : Enable readout of data/address/flags
-	 *                    pertaining to trapped IO access(es) via TRAPCE.
+	 *                    to write).  A10-A19 are used to index the table.
+	 *                    While this bit is set, all memory writes from the
+	 *                    main CPU have no effect, other than to update the
+	 *                    memory access table.
+	 *     3: IORDTRAP  : Enable inhibition and trapping of IO reads in
+	 *                    accordance with contents of IO protection table.
 	 *     4: _PWRUP    : Indicates type of reset to the Boot ROM.  The value
 	 *                  : set here will be reflected in the BITREAD register.
 	 *                     0: Perform power-on initialization sequence
 	 *                     1: Reset was triggered to return from protected mode
-	 *     5: IOWRTRAP  : Enable writing of IO trap registers via TRAPCE.
+	 *     5: IOWRTRAP  : Enable inhibition and trapping of IO writes in
+	 *                    accordance with contents of IO protection table.
 	 *     6: MEMFENCE  : Enable inhibition of memory writes in accordance
 	 *                  : with contents of memory access table.
 	 *     7: PROTECTEN : When set, enables A20-A23 address lines and disables
@@ -149,17 +147,16 @@ private:
 	 *
 	 *   Access registers at the current index which store data/address/flags
 	 *   pertaining to trapped IO access(es).  Register index automatically
-	 *   advances on write.  Any access will clear the _TRAPIO signal (???),
-	 *   in order to deassert _NMI.
+	 *   advances on write.  Any access will clear the _TRAPIO signal.
 	 *
-	 *   BIT(regaddr, 0): Must be zero???
-	 *   BIT(regaddr, 1): Chip Select (S2L/S2R)
-	 *   BIT(regaddr, 2): 4-bit register file select
+	 *   BIT(regaddr, 0): Don't care (???)
+	 *   BIT(regaddr, 1): Select register file(s) to output from (0:1 or 2)
+	 *   BIT(regaddr, 2): Select register file low/high nibble (S2L/S2R)
 	 *
-	 *   3f60: XXXX|LA11:LA8
-	 *   3f62: Data 7:0
-	 *   3f64: XXXX|LA7:LA4
-	 *   3f66: LA0|_LBHE|_IORC|0|LA3:1|A0*
+	 *   3f60: LA0|_LBHE|_IORC|0|LA3:1|A0*
+	 *   3f62: XXXX|LA7:LA4
+	 *   3f64: Data 7:0
+	 *   3f66: XXXX|LA11:LA8
 	 *
 	 * 3f80-3f9f: VXLATEN
 	 *
@@ -207,21 +204,21 @@ private:
 
 	enum {
 		// PROTECTEN register bits
-		B_VIRT_PE_IOSETUP	= 0x01,
-		B_VIRT_PE_MEMSETUP 	= 0x02,
-		B_VIRT_PE_IORDTRAP 	= 0x08,
-		B_VIRT_PE_PWRUP		= 0x10,
-		B_VIRT_PE_IOWRTRAP	= 0x20,
-		B_VIRT_PE_MEMFENCE	= 0x40,
-		B_VIRT_PE_PROTECTEN	= 0x80,
+		B_VIRT_PE_IOSETUP		= 0x01,
+		B_VIRT_PE_MEMSETUP		= 0x02,
+		B_VIRT_PE_IORDTRAP		= 0x08,
+		B_VIRT_PE__PWRUP		= 0x10,		// Active Low
+		B_VIRT_PE_IOWRTRAP		= 0x20,
+		B_VIRT_PE_MEMFENCE		= 0x40,
+		B_VIRT_PE_PROTECTEN		= 0x80,
 
 		// BITREAD register bits
-		B_VIRT_BR_PROTECTEN	= 0x01,
-		B_VIRT_BR_SANITYNMI	= 0x02,
-		B_VIRT_BR_TRAPIO	= 0x04,
-		B_VIRT_BR_NMI		= 0x08,
-		B_VIRT_BR_TS		= 0x10,
-		B_VIRT_BR_PWRUP		= 0x20,
+		B_VIRT_BR_PROTECTEN		= 0x01,
+		B_VIRT_BR__SANITYNMI	= 0x02,		// Active Low
+		B_VIRT_BR__TRAPIO		= 0x04,		// Active Low
+		B_VIRT_BR_NMI			= 0x08,
+		B_VIRT_BR_TS			= 0x10,
+		B_VIRT_BR__PWRUP		= 0x20,		// Active Low
 	};
 
 	void dma_segment_w(offs_t offset, uint8_t data);
@@ -264,7 +261,7 @@ private:
 	required_device<m24_keyboard_device> m_keyboard;
 	required_device<z80ctc_device> m_ctc;
 	required_device<att6300p_mmu_device> m_mmu;
-	required_ioport m_dsw;
+	required_ioport m_dsw2;
 	required_memory_region m_map_rom;
 
 	uint8_t m_dma_segment[4];
@@ -285,7 +282,6 @@ private:
 
 	uint8_t m_p2_out;
 	bool m_kbdata;
-	bool m_kb_int;
 
 	uint8_t kbc_p1_r();
 	void kbc_p2_w(uint8_t data);
@@ -320,8 +316,6 @@ private:
 	bool m_protected;
 	bool m_mapping_sel;
 	bool m_warm_reset;
-	bool m_trapio_read_enabled;
-	bool m_trapio_write_enabled;
 
 	uint8_t m_trapio_reg_idx;
 	uint16_t m_trapio_reg[4][4];
@@ -362,7 +356,6 @@ void att6300p_state::machine_start()
 
 	m_ctrlport_a = 0;
 	m_ctrlport_b = 0;
-	m_kb_int = false;
 
 	m_nmi_active = false;
 	m_chck_active = false;
@@ -372,8 +365,6 @@ void att6300p_state::machine_start()
 	m_nmi_enable = false;
 
 	m_warm_reset = false;
-	m_trapio_read_enabled = false;
-	m_trapio_write_enabled = false;
 
 	m_trapio_reg_idx = 0;
 
@@ -391,11 +382,8 @@ void att6300p_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_p2_out));
 	save_item(NAME(m_kbdata));
-	save_item(NAME(m_kb_int));
 	save_item(NAME(m_protected));
 	save_item(NAME(m_warm_reset));
-	save_item(NAME(m_trapio_read_enabled));
-	save_item(NAME(m_trapio_write_enabled));
 	save_item(NAME(m_trapio_reg_idx));
 	save_item(NAME(m_trapio_reg));
 }
@@ -417,14 +405,16 @@ void att6300p_state::trapio_cb(uint32_t data)
 	uint8_t val = (data>>16) & 0xff;
 	uint8_t flags = (data>>24) & 0xf;
 
-	m_trapio_reg[m_trapio_reg_idx][0] = (addr >> 8);
-	m_trapio_reg[m_trapio_reg_idx][1] = val & 0xff;
-	m_trapio_reg[m_trapio_reg_idx][2] = (addr>>4) & 0xf;
-	m_trapio_reg[m_trapio_reg_idx][3] = flags << 4 | (addr & 0xf);
+	m_trapio_reg[m_trapio_reg_idx][0] = flags | (addr & 0xf) << 4;
+	m_trapio_reg[m_trapio_reg_idx][1] = ((addr>>4) & 0xf);
+	m_trapio_reg[m_trapio_reg_idx][2] = val & 0xff;
+	m_trapio_reg[m_trapio_reg_idx][3] = ((addr >> 8) & 0xf);
 
 	m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
 
 	m_trapio_active = true;
+
+	update_nmi();
 }
 
 void att6300p_state::dma_segment_w(offs_t offset, uint8_t data)
@@ -523,12 +513,6 @@ void att6300p_state::update_speaker()
 	}
 }
 
-void att6300p_state::update_ir1()
-{
-	// TimeSlice interrupt is shared with KBD interrupt
-	m_pic->ir1_w((m_kb_int || m_ts_int) ? 1 : 0);
-}
-
 int att6300p_state::kbc_t0_r()
 {
 	return 1;
@@ -541,8 +525,7 @@ int att6300p_state::kbc_t1_r()
 
 uint8_t att6300p_state::keyboard_data_r()
 {
-	m_kb_int = false;
-	update_ir1();
+	m_pic->ir1_w(0);
 	return m_kbc->upi41_master_r(0);
 }
 
@@ -577,7 +560,7 @@ uint8_t att6300p_state::ctrlport_a_r()
 uint8_t att6300p_state::ctrlport_b_r()
 {
 	// Bit 0 = NC
-	// Bit 1 = DSW2-5 (80287 present)
+	// Bit 1 = DSW2-4 (80287 present)
 	// Bit 2 = ~RI1
 	// Bit 3 = ~DSR1
 	// Bit 4 = ~OUT2 (8254)
@@ -585,7 +568,7 @@ uint8_t att6300p_state::ctrlport_b_r()
 	// Bit 6 = IOCHK
 	// Bit 7 = MBMERR (MRD parity check)
 
-	if (BIT(m_dsw->read(), 12))
+	if (BIT(m_dsw2->read(), 4))
 		m_ctrlport_b |= 0x02;
 	else
 		m_ctrlport_b &= 0xfd;
@@ -616,13 +599,14 @@ void att6300p_state::nmi_enable_w(uint8_t data)
 
 void att6300p_state::update_nmi()
 {
-	m_nmi_active = (m_trapio_active ||
-	  (m_nmi_enable && BIT(m_ctrlport_b, 6) && !BIT(m_ctrlport_a, 4)));
+	bool old_nmi_active = m_nmi_active;
+	bool iochk_active = (BIT(m_ctrlport_b, 6) && !BIT(m_ctrlport_a, 4));
+	m_nmi_active = (m_nmi_enable && (m_trapio_active || iochk_active));
 
-	if (m_nmi_active)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	if (m_nmi_active && !old_nmi_active)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
 }
 
 uint8_t att6300p_state::kbc_p1_r()
@@ -641,10 +625,9 @@ void att6300p_state::kbc_p2_w(uint8_t data)
 	// the clock change and output the data in time.
 	machine().scheduler().perfect_quantum(attotime::from_usec(50));
 
-	if (m_kb_int != BIT(data, 4))
+	if (BIT(data, 4))
 	{
-		m_kb_int = BIT(data, 4);
-		update_ir1();
+		m_pic->ir1_w(1);
 	}
 }
 
@@ -661,7 +644,7 @@ void att6300p_state::zc01_cb(int state)
 	{
 		// Timeslice interrupt
 		m_ts_int = true;
-		update_ir1();
+		m_pic->ir1_w(1);
 	}
 }
 
@@ -742,7 +725,7 @@ uint8_t att6300p_state::timeslice_r(offs_t offset)
 {
 	m_sanity_active = false;
 	m_ts_int = false;
-	update_ir1();
+	m_pic->ir1_w(0);
 
 	return m_ctc->read(offset & 3);
 }
@@ -751,7 +734,7 @@ void att6300p_state::timeslice_w(offs_t offset, uint8_t data)
 {
 	m_sanity_active = false;
 	m_ts_int = false;
-	update_ir1();
+	m_pic->ir1_w(0);
 
 	m_ctc->write(offset & 3, data);
 }
@@ -763,10 +746,10 @@ void att6300p_state::protecten_w(offs_t offset, uint8_t data)
 	m_mmu->set_mem_setup_enabled(data & B_VIRT_PE_MEMSETUP);
 	m_mmu->set_io_setup_enabled(data & B_VIRT_PE_IOSETUP);
 	m_mmu->set_memprot_enabled(data & B_VIRT_PE_MEMFENCE);
+	m_mmu->set_io_read_traps_enabled(data & B_VIRT_PE_IORDTRAP);
+	m_mmu->set_io_write_traps_enabled(data & B_VIRT_PE_IOWRTRAP);
 
-	m_trapio_read_enabled = data & B_VIRT_PE_IORDTRAP;
-	m_trapio_write_enabled = data & B_VIRT_PE_IOWRTRAP;
-	m_warm_reset = data & B_VIRT_PE_PWRUP;
+	m_warm_reset = (data & B_VIRT_PE__PWRUP);
 }
 
 uint8_t att6300p_state::trapce_r(offs_t offset)
@@ -774,13 +757,7 @@ uint8_t att6300p_state::trapce_r(offs_t offset)
 	m_trapio_active = false;
 	update_nmi();
 
-	// Surely IORDTRAP has some other more useful purpose?
-	if (m_trapio_read_enabled)
-	{
-		return m_trapio_reg[m_trapio_reg_idx][(offset>>1) & 0x3];
-	}
-
-	return 0xff;
+	return m_trapio_reg[m_trapio_reg_idx][(offset>>1) & 0x3];
 }
 
 void att6300p_state::trapce_w(offs_t offset, uint8_t data)
@@ -788,13 +765,9 @@ void att6300p_state::trapce_w(offs_t offset, uint8_t data)
 	m_trapio_active = false;
 	update_nmi();
 
-	if (m_trapio_write_enabled)
-	{
-		m_trapio_reg[m_trapio_reg_idx][(offset>>1) & 0x3] = data;
+	m_trapio_reg[m_trapio_reg_idx][(offset>>1) & 0x3] = data;
 
-		// Should the advance be conditional on register address bit 0???
-		m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
-	}
+	m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
 }
 
 uint8_t att6300p_state::vxlaten_r(offs_t offset)
@@ -810,11 +783,11 @@ void att6300p_state::vxlaten_w(offs_t offset, uint8_t data)
 uint8_t att6300p_state::bitread_r(offs_t offset)
 {
 	  return (m_protected ? B_VIRT_BR_PROTECTEN : 0) |
-		(m_sanity_active ? 0 : B_VIRT_BR_SANITYNMI) |
-		(m_trapio_active ? 0 : B_VIRT_BR_TRAPIO) |
+		(m_sanity_active ? 0 : B_VIRT_BR__SANITYNMI) |
+		(m_trapio_active ? 0 : B_VIRT_BR__TRAPIO) |
 		(m_nmi_active ? B_VIRT_BR_NMI: 0) |
 		(m_ts_int ? B_VIRT_BR_TS : 0) |
-		(m_warm_reset ? B_VIRT_BR_PWRUP : 0);
+		(m_warm_reset ? B_VIRT_BR__PWRUP : 0);
 }
 
 uint8_t att6300p_state::adadv_r(offs_t offset)
@@ -857,7 +830,8 @@ void att6300p_state::att6300p_io_map(address_map &map)
 	map(0x0061, 0x0061).rw(FUNC(att6300p_state::ctrlport_a_r), FUNC(att6300p_state::ctrlport_a_w));
 	map(0x0062, 0x0062).r(FUNC(att6300p_state::ctrlport_b_r));
 	map(0x0064, 0x0064).r(FUNC(att6300p_state::keyboard_status_r));
-	map(0x0066, 0x0067).portr("DSW");
+	map(0x0066, 0x0066).portr("DSW2");
+	map(0x0067, 0x0067).portr("DSW1");
 	map(0x0070, 0x007f).rw("mm58274", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
 	map(0x0080, 0x0083).mirror(0xc).w(FUNC(att6300p_state::dma_segment_w));
 	map(0x00a0, 0x00a1).mirror(0xe).w(FUNC(att6300p_state::nmi_enable_w));
@@ -871,10 +845,10 @@ void att6300p_state::att6300p_vmem_map(address_map &map)
 void att6300p_state::att6300p_vio_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).mirror(0xc000).rw(m_mmu, FUNC(att6300p_mmu_device::io_r), FUNC(att6300p_mmu_device::io_w));
+	map(0x0000, 0x03ff).mirror(0x0400).rw(m_mmu, FUNC(att6300p_mmu_device::io_r), FUNC(att6300p_mmu_device::io_w));
 	map(0x3f00, 0x3f00).mirror(0x001f).rw(FUNC(att6300p_state::reset_r), FUNC(att6300p_state::reset_w));
 	map(0x3f20, 0x3f20).mirror(0x001f).w(FUNC(att6300p_state::protecten_w));
-	map(0x3f40, 0x3f40).mirror(0x001f).rw(FUNC(att6300p_state::timeslice_r), FUNC(att6300p_state::timeslice_w));
+	map(0x3f40, 0x3f43).mirror(0x001c).rw(FUNC(att6300p_state::timeslice_r), FUNC(att6300p_state::timeslice_w));
 	map(0x3f60, 0x3f7f).rw(FUNC(att6300p_state::trapce_r), FUNC(att6300p_state::trapce_w));
 	map(0x3f80, 0x3f80).mirror(0x001f).rw(FUNC(att6300p_state::vxlaten_r), FUNC(att6300p_state::vxlaten_w));
 	map(0x3fa0, 0x3fa0).mirror(0x001f).r(FUNC(att6300p_state::bitread_r));
@@ -883,46 +857,46 @@ void att6300p_state::att6300p_vio_map(address_map &map)
 }
 
 static INPUT_PORTS_START( att6300p )
-	PORT_START("DSW")
+	PORT_START("DSW1")
 
-	// DSW1
-	PORT_DIPNAME( 0x0001, 0x0000, "Drive B Type")
-	PORT_DIPSETTING(      0x0000, "96 TPI" )
-	PORT_DIPSETTING(      0x0001, "48 TPI" )
-	PORT_DIPNAME( 0x0002, 0x0000, "Drive A Type")
-	PORT_DIPSETTING(      0x0000, "96 TPI" )
-	PORT_DIPSETTING(      0x0002, "48 TPI" )
-	PORT_DIPNAME( 0x000c, 0x0000, "Hard Disk Type")
-	PORT_DIPSETTING(      0x0000, "0" )
-	PORT_DIPSETTING(      0x0040, "1" )
-	PORT_DIPSETTING(      0x0080, "2" )
-	PORT_DIPSETTING(      0x00c0, "3" )
-	PORT_DIPNAME( 0x0030, 0x0010, "Display Type")
-	PORT_DIPSETTING(      0x0000, "Monochrome" )
-	PORT_DIPSETTING(      0x0010, "Color 80x25" )
-	PORT_DIPSETTING(      0x0020, "Color 40x25" )
-	PORT_DIPNAME( 0x00c0, 0x0080, "Number of floppy drives")
-	PORT_DIPSETTING(      0x00c0, "1" )
-	PORT_DIPSETTING(      0x0080, "2" )
-	PORT_DIPSETTING(      0x0040, "3" )
+	PORT_DIPNAME( 0x01, 0x00, "Drive B Type")
+	PORT_DIPSETTING(    0x00, "96 TPI" )
+	PORT_DIPSETTING(    0x01, "48 TPI" )
+	PORT_DIPNAME( 0x02, 0x00, "Drive A Type")
+	PORT_DIPSETTING(    0x00, "96 TPI" )
+	PORT_DIPSETTING(    0x02, "48 TPI" )
+	PORT_DIPNAME( 0x0c, 0x00, "Hard Disk Type")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPNAME( 0x30, 0x10, "Display Type")
+	PORT_DIPSETTING(    0x00, "Monochrome" )
+	PORT_DIPSETTING(    0x10, "Color 80x25" )
+	PORT_DIPSETTING(    0x20, "Color 40x25" )
+	PORT_DIPNAME( 0xc0, 0x80, "Number of floppy drives")
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
 
-	// DSW2
-	PORT_DIPNAME( 0x0f00, 0x0400, "Motherboard RAM banks")
-	PORT_DIPSETTING(      0x0e00, "128K - 128/0")
-	PORT_DIPSETTING(      0x0d00, "256K - 128/128")
-	PORT_DIPSETTING(      0x0700, "512K - 512/0")
-	PORT_DIPSETTING(      0x0600, "640K - 128/512")
-	PORT_DIPSETTING(      0x0500, "640K - 512/128")
-	PORT_DIPSETTING(      0x0400, "1M - 512/512")
-	PORT_DIPNAME( 0x1000, 0x0000, "80287 installed")
-	PORT_DIPSETTING(      0x0000, DEF_STR(No) )
-	PORT_DIPSETTING(      0x1000, DEF_STR(Yes) )
-	PORT_DIPNAME( 0x4000, 0x4000, "HDD ROM")
-	PORT_DIPSETTING(      0x0000, "External" )
-	PORT_DIPSETTING(      0x4000, "Internal" )
-	PORT_DIPNAME( 0x8000, 0x00, "EPROM Size")
-	PORT_DIPSETTING(      0x0000, "32K" )
-	PORT_DIPSETTING(      0x8000, "64K" )
+	PORT_START("DSW2")
+
+	PORT_DIPNAME( 0x0f, 0x0b, "Motherboard RAM banks")
+	PORT_DIPSETTING(    0x01, "128K - 128/0")
+	PORT_DIPSETTING(    0x02, "256K - 128/128")
+	PORT_DIPSETTING(    0x08, "512K - 512/0")
+	PORT_DIPSETTING(    0x09, "640K - 128/512")
+	PORT_DIPSETTING(    0x0a, "640K - 512/128")
+	PORT_DIPSETTING(    0x0b, "1M - 512/512")
+	PORT_DIPNAME( 0x10, 0x00, "80287 installed")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x10, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x40, 0x40, "HDD ROM")
+	PORT_DIPSETTING(    0x00, "External" )
+	PORT_DIPSETTING(    0x40, "Internal" )
+	PORT_DIPNAME( 0x80, 0x00, "EPROM Size")
+	PORT_DIPSETTING(    0x00, "32K" )
+	PORT_DIPSETTING(    0x80, "64K" )
 INPUT_PORTS_END
 
 void att6300p_state::floppy_formats(format_registration &fr)
@@ -968,7 +942,7 @@ void att6300p_state::att6300p(machine_config &config)
 
 	PIC8259(config, m_pic);
 	m_pic->in_sp_callback().set_constant(1);
-    m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(14.318181_MHz_XTAL / 12);		// IOCLK/4

@@ -30,6 +30,8 @@ public:
 	void set_mem_setup_enabled(bool enabled);
 	void set_io_setup_enabled(bool enabled);
 	void set_memprot_enabled(bool enabled);
+	void set_io_read_traps_enabled(bool enabled);
+	void set_io_write_traps_enabled(bool enabled);
 
 	auto trapio_callback() { return m_trapio.bind(); }
 
@@ -58,15 +60,17 @@ private:
 	uint32_t m_mem_prot_limit;
 	bool m_mem_setup_enabled;
 	bool m_io_setup_enabled;
+	bool m_io_read_traps_enabled;
+	bool m_io_write_traps_enabled;
 
 	bool m_mem_prot_table[1024];
 	uint8_t m_io_prot_table[4096];
 
 	// Per-port IO protection flags
 	enum {
-		IO_PROT_INHIBIT_WRITE	= 1,
-		IO_PROT_INHIBIT_READ	= 2,
-		IO_PROT_TRAP			= 4
+		IO_PROT_NOTRAP			= 2,
+		IO_PROT_INHIBIT_READ	= 4,
+		IO_PROT_INHIBIT_WRITE	= 8,
 	};
 
 	// Flags for trapped IO accesses

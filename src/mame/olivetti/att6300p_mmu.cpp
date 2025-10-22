@@ -47,6 +47,8 @@ void att6300p_mmu_device::device_start()
 	save_item(NAME(m_mem_wr_fastpath));
 	save_item(NAME(m_mem_prot_table));
 	save_item(NAME(m_io_prot_table));
+	save_item(NAME(m_io_read_traps_enabled));
+	save_item(NAME(m_io_write_traps_enabled));
 }
 
 void att6300p_mmu_device::device_reset()
@@ -54,6 +56,10 @@ void att6300p_mmu_device::device_reset()
 	set_protected_mode_enabled(false);
 	m_mem_wr_fastpath = true;
 	m_mem_prot_limit = 0;
+	m_io_setup_enabled = false;
+	m_mem_setup_enabled = false;
+	m_io_read_traps_enabled = false;
+	m_io_write_traps_enabled = false;
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -126,6 +132,16 @@ void att6300p_mmu_device::set_memprot_enabled(bool enabled)
 	update_fastpath();
 }
 
+void att6300p_mmu_device::set_io_read_traps_enabled(bool enabled)
+{
+	m_io_read_traps_enabled = enabled;
+}
+
+void att6300p_mmu_device::set_io_write_traps_enabled(bool enabled)
+{
+	m_io_write_traps_enabled = enabled;
+}
+
 uint16_t att6300p_mmu_device::mem_r(offs_t offset, uint16_t mem_mask)
 {
 	offset = remap(m_map_table, offset<<1, m_map_imask, m_map_omask);
@@ -145,14 +161,19 @@ void att6300p_mmu_device::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			return;
 		}
 
-		if (m_mem_setup_enabled && offset >= 0x100000)
+		if (m_mem_setup_enabled)
 		{
 			m_mem_prot_table[(offset>>10) & 0x3ff] = (data & 1);
+			return;
 		}
 
 		if (m_io_setup_enabled && (offset & 0xff8000) == 0xf8000)
 		{
-			m_io_prot_table[offset & 0xfff] = (data & 0xf);
+			if (mem_mask == 0xff00) {
+				m_io_prot_table[(offset|1) & 0xfff] = ((data >> 8) & 0xf);
+			} else {
+				m_io_prot_table[offset & 0xfff] = (data & 0xf);
+			}
 		}
 	}
 
@@ -201,33 +222,37 @@ uint16_t att6300p_mmu_device::io_r(offs_t offset, uint16_t mem_mask)
 			case 0xffff:
 				flags = 0;
 				bytes = 2;
-				shift = 0;
+				shift = 8;
 				break;
 		}
 
 		for (int i = 0; ; )
 		{
 			uint8_t prot = m_io_prot_table[offset];
-			if (prot & IO_PROT_TRAP)
-			{
-				m_trapio(offset | flags << 24);
-			}
+			uint8_t val;
 
-			if (prot & IO_PROT_INHIBIT_READ)
+			if (m_io_read_traps_enabled && (prot & IO_PROT_INHIBIT_READ))
 			{
-				data |= 0xff << shift;
+				val = 0xff;
 			}
 			else
 			{
-				data |= m_io->read_byte(offset) << shift;
+				val = m_io->read_byte(offset);
 			}
+
+			if (m_io_read_traps_enabled && ((prot & IO_PROT_NOTRAP) == 0))
+			{
+				m_trapio(offset | val << 16 | flags << 24);
+			}
+
+			data |= val << shift;
 
 			if (++i == bytes)
 			{
 				break;
 			}
 
-			shift += 8;
+			shift = 0;
 			offset |= 1;
 		}
 
@@ -284,14 +309,14 @@ void att6300p_mmu_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		for (int i = 0; ; )
 		{
 			uint8_t prot = m_io_prot_table[offset];
-			if (!(prot & IO_PROT_INHIBIT_WRITE))
+			if (!m_io_write_traps_enabled || !(prot & IO_PROT_INHIBIT_WRITE))
 			{
 				m_io->write_byte(offset, data & 0xff);
 			}
 
-			if (prot & IO_PROT_TRAP)
+			if (m_io_write_traps_enabled && ((prot & IO_PROT_NOTRAP) == 0))
 			{
-				m_trapio(offset | (data&0xff) << 8 | flags << 24);
+				m_trapio(offset | (data&0xff) << 16 | flags << 24);
 			}
 
 			if (++i == bytes)
