@@ -56,6 +56,8 @@ probably for Rev B), and is intended as an educational tool.
 #include "machine/pit8253.h"
 #include "machine/rescap.h"
 
+#include "sequential_sixtrak.lh"
+
 #define LOG_CV              (1U << 1)
 #define LOG_KEYS            (1U << 2)
 #define LOG_ADC_VALUE_KNOB  (1U << 3)
@@ -104,8 +106,7 @@ private:
 	required_ioport m_speed_knob;
 	required_ioport m_value_knob;
 	required_ioport m_tune_knob;
-	output_finder<> m_left_digit;
-	output_finder<> m_right_digit;
+	output_finder<2> m_digits;
 
 	u8 m_key_row = 0;
 	u16 m_dac_value = 0;
@@ -126,8 +127,7 @@ sixtrak_state::sixtrak_state(const machine_config &mconfig, device_type type, co
 	, m_speed_knob(*this, "speed_knob")
 	, m_value_knob(*this, "value_knob")
 	, m_tune_knob(*this, "tune_knob")
-	, m_left_digit(*this, "digit_left")
-	, m_right_digit(*this, "digit_right")
+	, m_digits(*this, "digit_%u", 1U)
 {
 	for (auto &voice_cvs : m_cvs)
 		std::fill(voice_cvs.begin(), voice_cvs.end(), 0.0);
@@ -172,12 +172,12 @@ double sixtrak_state::get_voltage_mux_out() const
 	{
 		case 0: return get_dac_v(false);
 		case 1: return get_dac_v(true);
-		case 2: return m_value_knob->read() * KNOB_MAX_V / 100.0;
-		case 3: return m_tune_knob->read() * KNOB_MAX_V / 100.0;
-		case 4: return m_mod_wheel->read() * WHEEL_MAX_V / 100.0;
-		case 5: return m_track_vol_knob->read() * KNOB_MAX_V / 100.0;
-		case 6: return m_pitch_wheel->read() * WHEEL_MAX_V / 100.0;
-		case 7: return m_speed_knob->read() * KNOB_MAX_V / 100.0;
+		case 2: return m_value_knob->read() * KNOB_MAX_V / m_value_knob->field(1)->maxval();
+		case 3: return m_tune_knob->read() * KNOB_MAX_V / m_tune_knob->field(1)->maxval();
+		case 4: return m_mod_wheel->read() * WHEEL_MAX_V / m_mod_wheel->field(1)->maxval();
+		case 5: return m_track_vol_knob->read() * KNOB_MAX_V / m_track_vol_knob->field(1)->maxval();
+		case 6: return m_pitch_wheel->read() * WHEEL_MAX_V / m_pitch_wheel->field(1)->maxval();
+		case 7: return m_speed_knob->read() * KNOB_MAX_V / m_speed_knob->field(1)->maxval();
 	}
 
 	assert(false);  // Execution should not reach here.
@@ -248,8 +248,8 @@ void sixtrak_state::digit_w(u8 data)
 	{
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0
 	};
-	m_left_digit = PATTERNS_CD4511[BIT(data, 0, 4)];
-	m_right_digit = PATTERNS_CD4511[BIT(data, 4, 4)];
+	m_digits[0] = PATTERNS_CD4511[BIT(data, 0, 4)];  // left
+	m_digits[1] = PATTERNS_CD4511[BIT(data, 4, 4)];  // right
 }
 
 u8 sixtrak_state::misc_r()
@@ -269,8 +269,8 @@ u8 sixtrak_state::misc_r()
 	{
 		if (m_voltage_mux_input == 2)
 		{
-			LOGMASKED(LOG_ADC_VALUE_KNOB, "ADC value - pot v: %f, dac v: %f, comp: %d\n",
-					  get_voltage_mux_out(), get_dac_v(true), d2);
+			LOGMASKED(LOG_ADC_VALUE_KNOB, "ADC value - input: %d, pot v: %f, dac v: %f, comp: %d\n",
+					  m_value_knob->read(), get_voltage_mux_out(), get_dac_v(true), d2);
 		}
 		else if (m_voltage_mux_input == 6)
 		{
@@ -359,8 +359,7 @@ void sixtrak_state::machine_start()
 	save_item(NAME(m_voltage_mux_input));
 	save_item(NAME(m_cvs));
 
-	m_left_digit.resolve();
-	m_right_digit.resolve();
+	m_digits.resolve();
 
 	m_maincpu->space(AS_IO).install_readwrite_before_time(
 		0x00, 0xff, ws_time_delegate(*this, FUNC(sixtrak_state::iorq_wait_state)));
@@ -397,6 +396,8 @@ void sixtrak_state::sixtrak(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("midiacia", FUNC(acia6850_device::write_rxd));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
+	config.set_default_layout(layout_sequential_sixtrak);
+
 	auto &u148 = OUTPUT_LATCH(config, "tune_latch");  // CD40174
 	// Bit 0: sound output on/off.
 	// Bit 1, 2, 4: autotune-related.
@@ -412,17 +413,17 @@ void sixtrak_state::sixtrak(machine_config &config)
 	u102.bit_handler<5>().set_output("led_track_6").invert();
 
 	auto &u101 = OUTPUT_LATCH(config, "led_latch_1");  // 74LS174
-	u101.bit_handler<0>().set_output("led_seq_a").invert();
-	u101.bit_handler<1>().set_output("led_seq_b").invert();
-	u101.bit_handler<2>().set_output("led_arp_up_down").invert();
-	u101.bit_handler<3>().set_output("led_arp_assign").invert();
-	u101.bit_handler<4>().set_output("led_stack_a").invert();
-	u101.bit_handler<5>().set_output("led_stack_b").invert();
+	u101.bit_handler<0>().set_output("led_bottom_1").invert();  // led_seq_a
+	u101.bit_handler<1>().set_output("led_bottom_2").invert();  // led_sq_b
+	u101.bit_handler<2>().set_output("led_bottom_3").invert();  // led_arp_up_down
+	u101.bit_handler<3>().set_output("led_bottom_4").invert();  // led_arp_assign
+	u101.bit_handler<4>().set_output("led_bottom_5").invert();  // led_stack_a
+	u101.bit_handler<5>().set_output("led_bottom_6").invert();  // led_stack_b
 
 	auto &u149 = OUTPUT_LATCH(config, "led_latch_2");  // 74LS174
-	u149.bit_handler<0>().set_output("led_program").invert();
-	u149.bit_handler<1>().set_output("led_param").invert();
-	u149.bit_handler<2>().set_output("led_value").invert();
+	u149.bit_handler<0>().set_output("led_control_1").invert();  // led_program
+	u149.bit_handler<1>().set_output("led_control_2").invert();  // led_param
+	u149.bit_handler<2>().set_output("led_control_3").invert();  // led_value
 	u149.bit_handler<3>().set_output("led_record").invert();
 	u149.bit_handler<4>().set_output("led_record_track").invert();
 	u149.bit_handler<5>().set_output("led_legato").invert();
@@ -552,22 +553,25 @@ INPUT_PORTS_START(sixtrak)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CONTROL FOOTSWITCH") PORT_CODE(KEYCODE_SPACE)
 
 	PORT_START("pitch_wheel")  // R1, 100K linear.
-	PORT_BIT(0x7f, 50, IPT_PADDLE) PORT_NAME("PITCH") PORT_MINMAX(0, 100) PORT_SENSITIVITY(30) PORT_KEYDELTA(5) PORT_CENTERDELTA(10)
+	PORT_BIT(0xff, 50, IPT_PADDLE) PORT_NAME("PITCH") PORT_MINMAX(0, 100) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(30)
 
 	PORT_START("mod_wheel")  // R2, 100K linear.
 	PORT_ADJUSTER(0, "MOD")
 
 	PORT_START("track_volume_knob")  // Knob, R119(?), 10K lineaar.
-	PORT_ADJUSTER(50, "TRACK VOL")
+	PORT_ADJUSTER(100, "TRACK VOL")
 
 	PORT_START("speed_knob")  // Knob, R115, 10K linear.
 	PORT_ADJUSTER(50, "SPEED")
 
 	PORT_START("value_knob")  // Knob, R163, 10K linear.
-	PORT_ADJUSTER(50, "VALUE")
+	PORT_ADJUSTER(0, "VALUE")
 
 	PORT_START("tune_knob")  // Knob, R138(?), 10K linear.
 	PORT_ADJUSTER(50, "TUNE")
+
+	PORT_START("master_volume_knob")  // Knob, R197, 10K audio taper.
+	PORT_ADJUSTER(100, "MASTER VOL")
 INPUT_PORTS_END
 
 // The firmware version can be displayed by pressing RECORD TRACK and SELECT 5.
