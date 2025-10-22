@@ -35,6 +35,10 @@ public:
 	static constexpr uint8_t POWER_FAIL = PF_LINE;
 	static constexpr uint8_t BUS_ERROR = 8;
 
+	// memory flags
+	static constexpr uint16_t UNALIGNED_BYTE = 1;
+	static constexpr uint16_t UNALIGNED_WORD = 2;
+
 	// construction/destruction
 	t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

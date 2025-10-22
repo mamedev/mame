@@ -138,13 +138,39 @@ void t11_device::WBYTE(int addr, int data)
 
 int t11_device::RWORD(int addr)
 {
-	return m_program.read_word(addr & 0xfffe);
+	if (addr < 0160000)
+		return m_program.read_word(addr & 0xfffe);
+	else // accessing I/O page
+	{
+		auto flags = m_program.lookup_read_word_flags(addr);
+		if (!flags)
+			return m_program.read_word(addr & 0xfffe);
+		else if (flags & UNALIGNED_WORD)
+			return m_program.read_word_unaligned(addr);
+		else if (flags & UNALIGNED_BYTE)
+			return m_program.read_byte(addr);
+		else
+			return m_program.read_word(addr & 0xfffe);
+	}
 }
 
 
 void t11_device::WWORD(int addr, int data)
 {
-	m_program.write_word(addr & 0xfffe, data);
+	if (addr < 0160000)
+		m_program.write_word(addr & 0xfffe, data);
+	else // accessing I/O page
+	{
+		auto flags = m_program.lookup_write_word_flags(addr);
+		if (!flags)
+			m_program.write_word(addr & 0xfffe, data);
+		else if (flags & UNALIGNED_WORD)
+			m_program.write_word_unaligned(addr, data);
+		else if (flags & UNALIGNED_BYTE)
+			m_program.write_byte(addr, data);
+		else
+			m_program.write_word(addr & 0xfffe, data);
+	}
 }
 
 
