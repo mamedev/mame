@@ -482,6 +482,13 @@ void esq5505_state::eps_cpu_space_map(address_map &map)
 void esq5505_state::machine_start()
 {
 	LOG("machine_start()\n");
+
+	esqpanel2x40_vfx_device *vfx_panel = downcast<esqpanel2x40_vfx_device *>(static_cast<esqpanel_device *>(m_panel));
+	if (vfx_panel != nullptr)
+	{
+		vfx_panel->connect_io_ports(*this);
+	}
+
 	if (m_floppy_connector) {
 		floppy_image_device *floppy = m_floppy_connector->get_device();
 		if (floppy) {
@@ -995,31 +1002,7 @@ void esq5505_state::ks32(machine_config &config)
 }
 
 static INPUT_PORTS_START( vfx )
-	PORT_START("buttons_0")
-	for (int i = 0; i < 32; i++)
-	{
-		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
-		PORT_CHANGED_MEMBER("panel", FUNC(esqpanel2x40_vfx_device::button_change), i)
-	}
-
-	PORT_START("buttons_32")
-	for (int i = 0; i < 32; i++)
-	{
-		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
-		PORT_CHANGED_MEMBER("panel", FUNC(esqpanel2x40_vfx_device::button_change), 32 + i)
-	}
-
-	PORT_START("analog_data_entry")
-	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
-	configurer.field_alloc(IPT_ADJUSTER, 0x200, 0x3ff, "Data Entry");
-	configurer.field_set_min_max(0, 0x3ff);
-	PORT_CHANGED_MEMBER("panel", FUNC(esqpanel2x40_vfx_device::analog_value_change), 3)
-
-	PORT_START("analog_volume")
-	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
-	configurer.field_alloc(IPT_ADJUSTER, 0x3ff, 0x3ff, "Volume");
-	configurer.field_set_min_max(0, 0x3ff);
-	PORT_CHANGED_MEMBER("panel", FUNC(esqpanel2x40_vfx_device::analog_value_change), 5)
+	esqpanel2x40_vfx_device::add_io_ports(owner, configurer, "panel");
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eps )

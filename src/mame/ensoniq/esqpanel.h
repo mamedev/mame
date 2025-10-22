@@ -110,6 +110,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(button_change);
 	DECLARE_INPUT_CHANGED_MEMBER(analog_value_change);
 
+	static void add_io_ports(device_t &owner, ioport_configurer &configurer, const char *tag);
+	void connect_io_ports(device_t &device);
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -132,11 +135,16 @@ private:
 
 	output_finder<> m_lights;
 
+	ioport_port *m_buttons_0 = nullptr;
+	ioport_port *m_buttons_32 = nullptr;
+	ioport_port *m_analog_data_entry = nullptr;
+	ioport_port *m_analog_volume = nullptr;
+
 	TIMER_CALLBACK_MEMBER(update_blink);
 	void update_lights();
 
-	ioport_value get_adjuster_value(required_ioport &ioport);
-	void set_adjuster_value(required_ioport &ioport, const ioport_value & value);
+	ioport_value get_adjuster_value(ioport_port *port);
+	void set_adjuster_value(ioport_port *port, const ioport_value &value);
 };
 
 class esqpanel2x40_sq1_device : public esqpanel_device {
