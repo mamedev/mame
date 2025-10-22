@@ -109,14 +109,14 @@ private:
 	required_device<voodoo_2_pci_device> m_voodoo2;
 
 	//int m_haspind = 0;
-	int m_haspstate = 0;
-	enum hasp_states
-	{
-		HASPSTATE_NONE,
-		HASPSTATE_PASSBEG,
-		HASPSTATE_PASSEND,
-		HASPSTATE_READ
-	};
+	//int m_haspstate = 0;
+	//enum hasp_states
+	//{
+	//	HASPSTATE_NONE,
+	//	HASPSTATE_PASSBEG,
+	//	HASPSTATE_PASSEND,
+	//	HASPSTATE_READ
+	//};
 	//int m_hasp_passind = 0;
 	//uint8_t m_hasp_tmppass[0x29]{};
 	//uint8_t m_port379 = 0;
@@ -135,11 +135,6 @@ private:
 
 // TODO: move into parallel port device
 #if 0
-static const uint8_t m_hasp_cmppass[] = {0xc3, 0xd9, 0xd3, 0xfb, 0x9d, 0x89, 0xb9, 0xa1, 0xb3, 0xc1, 0xf1, 0xcd, 0xdf, 0x9d}; /* 0x9d or 0x9e */
-static const uint8_t m_hasp_prodinfo[] = {0x51, 0x4c, 0x52, 0x4d, 0x53, 0x4e, 0x53, 0x4e, 0x53, 0x49, 0x53, 0x48, 0x53, 0x4b, 0x53, 0x4a,
-										0x53, 0x43, 0x53, 0x45, 0x52, 0x46, 0x53, 0x43, 0x53, 0x41, 0xac, 0x40, 0x53, 0xbc, 0x53, 0x42,
-										0x53, 0x57, 0x53, 0x5d, 0x52, 0x5e, 0x53, 0x5b, 0x53, 0x59, 0xac, 0x58, 0x53, 0xa4
-										};
 
 uint8_t savquest_state::parallel_port_r(offs_t offset)
 {
@@ -437,7 +432,6 @@ void savquest_state::machine_start()
 
 void savquest_state::machine_reset()
 {
-	m_haspstate = HASPSTATE_NONE;
 }
 
 static void isa_internal_devices(device_slot_interface &device)
@@ -460,10 +454,10 @@ void savquest_state::winbond_superio_config(device_t *device)
 //  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 //  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 
-//    auto *lpt = device->subdevice<pc_lpt_device>("lpt");
-//    auto *centronics = lpt->subdevice<centronics_device>("centronics");
-//    centronics->set_default_option(hasp_dongle_here);
-//
+    auto *lpt = device->subdevice<pc_lpt_device>("lpt");
+    auto *centronics = lpt->subdevice<centronics_device>("centronics");
+    centronics->set_default_option("hasp_savquest");
+	centronics->set_fixed(true);
 }
 
 
