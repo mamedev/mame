@@ -54,6 +54,27 @@ harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &m
 
 void harddriv_sound_board_device::device_start()
 {
+	// Allocate and start AM6012 DAC mixer timer at 96 kHz (hardware-faithful)
+	m_am6012_timer = timer_alloc(FUNC(harddriv_sound_board_device::am6012_stream_tick), this);
+	m_am6012_timer->adjust(attotime::from_hz(96000), 0, attotime::from_hz(96000));
+
+	// Initialize analog-emulation state
+	m_am6012_code = 0x0800;
+	m_prev_out12  = 0x0800;
+	m_dac_lp1 = m_dac_lp2 = m_dac_lp3 = (0x0800 << 8);
+	m_mute_ramp = 255;
+	m_dac_muted = 0;
+	m_dither_lfsr = 0xACE1;
+
+	// Save-state support
+	save_item(NAME(m_am6012_code));
+	save_item(NAME(m_prev_out12));
+	save_item(NAME(m_dac_lp1));
+	save_item(NAME(m_dac_lp2));
+	save_item(NAME(m_dac_lp3));
+	save_item(NAME(m_mute_ramp));
+	save_item(NAME(m_dac_muted));
+	save_item(NAME(m_dither_lfsr));
 }
 
 //-------------------------------------------------
@@ -64,6 +85,8 @@ void harddriv_sound_board_device::device_reset()
 {
 	m_last_bio_cycles = 0;
 	m_sounddsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	// Ensure we start unmuted cleanly (no click)
+	m_mute_ramp = 255;
 }
 
 /*************************************
@@ -326,8 +349,8 @@ int harddriv_sound_board_device::hdsnddsp_get_bio()
 
 void harddriv_sound_board_device::hdsnddsp_dac_w(uint16_t data)
 {
-	/* /DACL */
-	m_dac->write((data >> 4) ^ 0x800); // schematics show d0-3 are ignored & the msb is inverted
+	/* /DACL : latch 12-bit AM6012 code */
+	m_am6012_code = uint16_t(((data ^ 0x8000) >> 4) & 0x0fff); // schematics show d0-3 are ignored & the msb is inverted
 }
 
 
@@ -340,8 +363,8 @@ void harddriv_sound_board_device::hdsnddsp_comport_w(uint16_t data)
 
 void harddriv_sound_board_device::hdsnddsp_mute_w(uint16_t data)
 {
-	/* mute DAC audio, D0=1 */
-	logerror("%s:mute DAC=%d\n", machine().describe_context(), data);
+	/* mute DAC audio, D0=1 (soft-ramped in stream) */
+	m_dac_muted = (data & 1) ? 1 : 0;
 }
 
 
@@ -423,6 +446,56 @@ void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 	map(4, 4).w(FUNC(harddriv_sound_board_device::hdsnddsp_mute_w));
 	map(5, 5).w(FUNC(harddriv_sound_board_device::hdsnddsp_gen68kirq_w));
 	map(6, 7).w(FUNC(harddriv_sound_board_device::hdsnddsp_soundaddr_w));
+}
+
+
+//-------------------------------------------------
+//  am6012_stream_tick - generate DAC output
+//  Emulates the Driver Sound board analog chain:
+//  AM6012 (12-bit multiplying DAC, MSB inverted) ->
+//  TL084 I/V + 2-pole active LPF + extra pole ->
+//  soft mute ramp and tiny TPDF dither.
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(harddriv_sound_board_device::am6012_stream_tick)
+{
+	// Soft mute glide (slow to avoid clicks)
+	if (m_dac_muted) { if (m_mute_ramp > 0) m_mute_ramp -= 1; }
+	else              { if (m_mute_ramp < 255) m_mute_ramp += 1; }
+
+	// 3-pole low-pass: two main poles + one gentle pole
+	// Defaults tuned for ~10–12 kHz band edge at 96 kHz mixer
+	const int K12 = 176; // ≈ 10.5 kHz per pole
+	const int K3  =  96; // gentle cleanup pole
+
+	int target = int(m_am6012_code) << 8; // 12-bit to 24.8 fixed-point
+
+	m_dac_lp1 += ((target    - m_dac_lp1) * K12) >> 8;
+	m_dac_lp2 += ((m_dac_lp1 - m_dac_lp2) * K12) >> 8;
+	m_dac_lp3 += ((m_dac_lp2 - m_dac_lp3) * K3 ) >> 8;
+
+	int filtered = m_dac_lp3 >> 8; // back to 12-bit domain
+
+	// Slew limit per sample to catch fast spikes without dulling transients
+	const int maxstep = 0x36; // tuned with TL084 behavior in mind
+	int delta = filtered - m_prev_out12;
+	if (delta >  maxstep) filtered = m_prev_out12 + maxstep;
+	if (delta < -maxstep) filtered = m_prev_out12 - maxstep;
+	m_prev_out12 = filtered;
+
+	// Apply soft mute around midscale (0x800)
+	int centered = filtered - 0x0800;
+	centered = (centered * int(m_mute_ramp)) / 255;
+
+	// TPDF dither: ±1 LSB using 16-bit LFSR (poly 0xB400)
+	m_dither_lfsr = (m_dither_lfsr >> 1) ^ (uint16_t)(-(m_dither_lfsr & 1) & 0xB400u);
+	int tpdf = int(m_dither_lfsr & 1) - int((m_dither_lfsr >> 1) & 1);
+	int out12 = centered + 0x0800 + tpdf;
+
+	if (out12 < 0) out12 = 0; else if (out12 > 0x0fff) out12 = 0x0fff;
+
+	// Present final code to the DAC device (routed to speaker in config)
+	if (m_dac) m_dac->write(uint16_t(out12));
 }
 
 
