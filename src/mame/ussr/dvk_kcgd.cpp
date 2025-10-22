@@ -14,7 +14,6 @@
     Lower 32K of VRAM are not used to store pixel data.
 
     To do:
-    - K1801VM2 CPU core (interrupts and EVNT pin, full EIS set, other insns)
     - verify hsync/vsync frequencies
     - mouse
     - mono/color CRT
