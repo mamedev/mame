@@ -22,6 +22,7 @@
 #include "qg640.h"
 #include "qtx.h"
 #include "tdl12.h"
+#include "terak_v.h"
 #include "uknc_kmd.h"
 
 // serial ports
@@ -43,6 +44,7 @@ void qbus_cards(device_slot_interface &device)
 	device.option_add("qg640", MATROX_QG640);
 	device.option_add("by", BK_KMD);
 	device.option_add("tdl12", TDL12);
+	device.option_add("terak_v", TERAK_V);
 }
 
 

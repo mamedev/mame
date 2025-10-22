@@ -5020,6 +5020,8 @@ if (BUSES["QBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/qbus/qtx.h",
 		MAME_DIR .. "src/devices/bus/qbus/tdl12.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/tdl12.h",
+		MAME_DIR .. "src/devices/bus/qbus/terak_v.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/terak_v.h",
 		MAME_DIR .. "src/devices/bus/qbus/uknc_kmd.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/uknc_kmd.h",
 	}
