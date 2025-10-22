@@ -20,6 +20,10 @@ HTG1395 3-in-1 (Car racing, Soccer, The eagle preys on the chicken)
 
 (and likely many more)
 
+Other Gametech keychain games possibly using this HW:
+- Pikorin Bros. (ピコリンブロス)
+- Tetris Mini
+
 TODO:
 - add LCD deflicker like hh_sm510?
 
@@ -87,7 +91,7 @@ public:
 
 	void ht1130_common(machine_config &config);
 	void ga888(machine_config &config);
-	void kc55in1(machine_config &config);
+	void piko55(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -270,13 +274,13 @@ ROM_END
 
 /*******************************************************************************
 
-  ピコリン55 (Pikorin 55)
+  Pikorin 55 (ピコリン55) - keychain game
   * Holtek HT1130
   * 8*12 LCD screen + 8 custom segments, 1-bit sound
 
 *******************************************************************************/
 
-static INPUT_PORTS_START( kc55in1 )
+static INPUT_PORTS_START( piko55 )
 	PORT_START("PS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("On / Pause") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_ht11xx_state::input_wakeup), 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -294,13 +298,13 @@ static INPUT_PORTS_START( kc55in1 )
 INPUT_PORTS_END
 
 
-void hh_ht1130_state::kc55in1(machine_config &config)
+void hh_ht1130_state::piko55(machine_config &config)
 {
 	ht1130_common(config);
 }
 
 
-ROM_START( kc55in1 )
+ROM_START( piko55 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "keychain55in1.bin", 0x0000, 0x1000, CRC(c8623cf2) SHA1(27fe405a8a866bfc6a857af886ed00f64083c2cc) ) // visual decap
 
@@ -324,4 +328,4 @@ ROM_END
 //    YEAR  NAME     	PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY,     	FULLNAME,                                 	FLAGS
 CONS( 1993, brke23p2, 	0,      0,      brke23p2, brke23p2, hh_ht1190_state, empty_init, "E-Star",    	"Brick Game 96 in 1 (E-23 Plus Mark II)",	MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // some other dieshots have 1996 on them, it is also possible the software is from Holtek
 CONS( 199?, ga888,    	0,      0,      ga888,    ga888,    hh_ht1130_state, empty_init, "<unknown>", 	"Block Game & Echo Key GA888",				MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // clone of Tetris Jr?
-CONS( 199?, kc55in1,    0,      0,    	kc55in1,  kc55in1,  hh_ht1130_state, empty_init, "Gametech", 	"ピコリン55 (Pikorin 55)",					 MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
+CONS( 199?, piko55,     0,      0,      piko55,   piko55,   hh_ht1130_state, empty_init, "Gametech", 	"Pikorin 55",                               MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
