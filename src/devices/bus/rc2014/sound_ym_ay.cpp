@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound.h"
+#include "sound_ym_ay.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
