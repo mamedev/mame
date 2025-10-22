@@ -45,7 +45,7 @@
     bit 3: CPS Follow
     bit 4: Counter Delay
     bit 5: AppleTalk Delay
-    bit 6: Joystick Delay (reverse logic: 0 = delay is ON)
+    bit 6: Joystick Delay
     bit 7: C/D cache disable
 
     $C05D is the speed percentage:
@@ -896,7 +896,7 @@ void apple2gs_state::machine_reset()
 	m_accel_unlocked = false;
 	m_accel_stage = 0;
 	m_accel_slotspk = 0x41; // speaker and slot 6 slow
-	m_accel_gsxsettings = 0;
+	m_accel_gsxsettings = 0x49; // paddle slow, CPS, GS
 	m_accel_percent = 0;    // 100% speed
 	m_accel_present = false;
 	m_accel_temp_slowdown = false;
@@ -1430,7 +1430,7 @@ void apple2gs_state::do_io(int offset)
 
 		case 0x70:  // PTRIG triggers paddles on read or write
 			// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
-			if ((m_accel_present) && !BIT(m_accel_gsxsettings, 6))
+			if ((m_accel_present) && BIT(m_accel_gsxsettings, 6))
 			{
 				m_accel_temp_slowdown = true;
 				m_acceltimer->adjust(attotime::from_msec(5));
@@ -2063,6 +2063,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				m_accel_gsxsettings = data & 0xf8;
 				m_accel_gsxsettings |= 0x01;    // indicate this is a GS
 			}
+			do_io(offset);
 			break;
 
 		case 0x5a: // Zip accelerator unlock
@@ -2085,9 +2086,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				else if (m_accel_unlocked)
 				{
 					// disable acceleration
+					m_accel_fast = false;
 					accel_normal_speed();
-					m_accel_unlocked = false;
-					m_accel_stage = 0;
 				}
 			}
 			do_io(offset);
@@ -2096,6 +2096,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 		case 0x5b: // Zip full speed
 			if (m_accel_unlocked)
 			{
+				m_accel_fast = true;
 				accel_full_speed();
 			}
 			do_io(offset);
@@ -2114,6 +2115,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			{
 				m_accel_percent = data;
 			}
+			do_io(offset);
 			break;
 
 		case 0x68: // STATEREG
