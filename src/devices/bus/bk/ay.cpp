@@ -14,19 +14,36 @@
 #include "emu.h"
 #include "ay.h"
 
+#include "sound/ay8910.h"
+#include "speaker.h"
+
+
+namespace {
 
 //**************************************************************************
-//  CONSTANTS/MACROS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-#define VERBOSE 0
+// ======================> bk_ay_device
 
+class bk_ay_device : public device_t, public device_bk_parallel_interface
+{
+public:
+	// construction/destruction
+	bk_ay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+protected:
+	virtual void device_start() override ATTR_COLD {};
 
-DEFINE_DEVICE_TYPE(BK_AY, bk_ay_device, "bk_ay", "Single AY Interface")
+	virtual uint16_t io_r() override;
+	virtual void io_w(uint16_t data, bool word) override;
+
+private:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	required_device<ym2149_device> m_ay;
+	required_device<bk_parallel_slot_device> m_up;
+};
 
 
 //**************************************************************************
@@ -77,3 +94,12 @@ void bk_ay_device::io_w(uint16_t data, bool word)
 		m_ay->data_w(data);
 	m_up->write(0, data ^ 0xffff, word);
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(BK_AY, device_qbus_card_interface, bk_ay_device, "bk_ay", "BK Single AY Interface")

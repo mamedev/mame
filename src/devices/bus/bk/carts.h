@@ -14,4 +14,4 @@
 
 void bk_parallel_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_BK_CARTS_H
+#endif
