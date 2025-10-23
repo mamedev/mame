@@ -1514,6 +1514,7 @@ void pc88va_state::pc88va(machine_config &config)
 	// TODO: set pc98 compatible
 	// Needs a MS-Engine disk dump first, that applies an overlay on PC Engine OS so that it can run PC-98 software
 	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc88va");
 }
 
 
