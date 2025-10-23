@@ -16,8 +16,7 @@ public:
 
 	auto intr_callback() { return m_intr_cb.bind(); }
 
-	void vector_w(u8 vector) { m_vector_base = vector; }
-	void int_w(u8 vector_lo = 0xff);
+	void int_w(u8 vector = 0xff);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -34,8 +33,7 @@ protected:
 
 private:
 	u8 m_state;
-	u8 m_vector_base;
-	u8 m_vector_lo;
+	u8 m_vector;
 
 };
 
