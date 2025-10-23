@@ -592,15 +592,25 @@ void brikett_state::mephisto3(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( mephisto ) // module s/n 00226xx (898xx Mask ROMs), 01011xx (911xx Mask ROMs)
+ROM_START( mephisto ) // module s/n 01052xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("89810", 0x0000, 0x0400, CRC(6816be9e) SHA1(f5f1d5084925fe239f5b2ecf4724751e0dc4fc51) ) // CDP1833CE, also seen with label 91143
-	ROM_LOAD("89811", 0x0400, 0x0400, CRC(15febc73) SHA1(10353a7f021993f2cf7d509a928425617e1786fb) ) // " or 91144
-	ROM_LOAD("89812", 0x0800, 0x0400, CRC(5e45eb65) SHA1(9d46e5f405bd48705d1e29826917522595fc9768) ) // " or 91145
-	ROM_LOAD("89813", 0x0c00, 0x0400, CRC(62da3d89) SHA1(a7f9ada7037e0bd61420358c147b2f57ee47ebcb) ) // " or 91146
-	ROM_LOAD("89814", 0x1000, 0x0400, CRC(8e212d9c) SHA1(5df221ce8ca4fbb74f34f31738db4c2efee7fb01) ) // " or 91163
-	ROM_LOAD("89815", 0x1400, 0x0400, CRC(072e0b01) SHA1(5b1074932b3f21ab01392250061c093de4af3624) ) // " or 91147
-	// 911xx Mask ROMs have the same contents as 898xx Mask ROMs, some modules have both 898xx and 911xx
+	ROM_LOAD("91143", 0x0000, 0x0400, CRC(6816be9e) SHA1(f5f1d5084925fe239f5b2ecf4724751e0dc4fc51) ) // CDP1833CE
+	ROM_LOAD("91144", 0x0400, 0x0400, CRC(15febc73) SHA1(10353a7f021993f2cf7d509a928425617e1786fb) ) // "
+	ROM_LOAD("91145", 0x0800, 0x0400, CRC(5e45eb65) SHA1(9d46e5f405bd48705d1e29826917522595fc9768) ) // "
+	ROM_LOAD("91146", 0x0c00, 0x0400, CRC(62da3d89) SHA1(a7f9ada7037e0bd61420358c147b2f57ee47ebcb) ) // "
+	ROM_LOAD("91184", 0x1000, 0x0400, CRC(5f0b22c1) SHA1(4027751e4c46f34114948a6868510fb827508a7e) ) // " (newer)
+	ROM_LOAD("91147", 0x1400, 0x0400, CRC(072e0b01) SHA1(5b1074932b3f21ab01392250061c093de4af3624) ) // "
+ROM_END
+
+ROM_START( mephistoa ) // module s/n 00226xx (898xx Mask ROMs), 01011xx (911xx Mask ROMs)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("91143", 0x0000, 0x0400, CRC(6816be9e) SHA1(f5f1d5084925fe239f5b2ecf4724751e0dc4fc51) ) // CDP1833CE, also seen with label 89810
+	ROM_LOAD("91144", 0x0400, 0x0400, CRC(15febc73) SHA1(10353a7f021993f2cf7d509a928425617e1786fb) ) // " or 89811
+	ROM_LOAD("91145", 0x0800, 0x0400, CRC(5e45eb65) SHA1(9d46e5f405bd48705d1e29826917522595fc9768) ) // " or 89812
+	ROM_LOAD("91146", 0x0c00, 0x0400, CRC(62da3d89) SHA1(a7f9ada7037e0bd61420358c147b2f57ee47ebcb) ) // " or 89813
+	ROM_LOAD("91163", 0x1000, 0x0400, CRC(8e212d9c) SHA1(5df221ce8ca4fbb74f34f31738db4c2efee7fb01) ) // " or 89814
+	ROM_LOAD("91147", 0x1400, 0x0400, CRC(072e0b01) SHA1(5b1074932b3f21ab01392250061c093de4af3624) ) // " or 89815
+	// 898xx Mask ROMs have the same contents as 911xx Mask ROMs, some modules have both 898xx and 911xx
 ROM_END
 
 ROM_START( mephisto1x )
@@ -694,7 +704,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME         PARENT      COMPAT  MACHINE      INPUT        STATE          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, mephisto,    0,          0,      mephisto,    mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, mephisto,    0,          0,      mephisto,    mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, mephistoa,   mephisto,   0,      mephisto,    mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto (set 2)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1981, mephisto1x,  0,          0,      mephisto2,   mephisto2,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE ) // France
 SYST( 1982, mephistoj,   0,          0,      mephistoj,   mephistoj,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE ) // there's also a "Mephisto Junior" from 1990
