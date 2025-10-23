@@ -1155,6 +1155,11 @@ ROM_START( a6plus )
 	DISK_IMAGE( "a6plus", 0, SHA1(ce8fb23443008c921c6541e71da37c1dc6a06e5f) )
 ROM_END
 
+ROM_START( h12p1000 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "h12pro1000.u12", 0x00000, 0x2000000, CRC(b471cb79) SHA1(2324d82a6ae00537090fb534cdf4e4ac6a74ebaf) )
+ROM_END
+
 
 void vt369_state::init_lxcmcypp()
 {
@@ -1325,6 +1330,9 @@ CONS( 2018, goretrop,  0,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,  
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
 // there are other S10 units available
 CONS( 202?, s10fake,   0,  0,  vt36x_s10swap_8mb, vt369, vt36x_state, init_s10fake, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
+
+// banking(?) issues, some games don't boot (writes data to ALU mirror, then some other ports)
+CONS( 202?, h12p1000,  0,        0,  vt36x,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
