@@ -508,7 +508,7 @@ const double XTAL::known_xtals[] = {
 	 61'440'000, // 61.44_MHz_XTAL         Donkey Kong
 	 64'000'000, // 64_MHz_XTAL            BattleToads
 	 64'108'800, // 64.1088_MHz_XTAL       HP Topcat high-res
-	 66'000'000, // 66_MHz_XTAL            -
+	 66'000'000, // 66_MHz_XTAL            Access Virus A
 	 66'666'700, // 66.6667_MHz_XTAL       Later Midway games
 	 67'737'600, // 67.7376_MHz_XTAL       PSX-based h/w, Sony ZN1-2-based
 	 68'850'000, // 68.85_MHz_XTAL         Wyse WY-50
@@ -527,8 +527,10 @@ const double XTAL::known_xtals[] = {
 	100'000'000, // 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based
 	101'491'200, // 101.4912_MHz_XTAL      PSX-based Namco System 10
 	105'561'000, // 105.561_MHz_XTAL       Sun cgsix
+	108'000'000, // 108_MHz_XTAL           Access Virus B
 	108'108'000, // 108.108_MHz_XTAL       HP 98550 high-res color card
 	120'000'000, // 120_MHz_XTAL           Astro Corp.'s Stone Age
+	136'000'000, // 136_MHz_XTAL           Access Virus C
 	200'000'000  // 200_MHz_XTAL           Base SH4 CPU (Naomi, Hikaru etc.)
 };
 
