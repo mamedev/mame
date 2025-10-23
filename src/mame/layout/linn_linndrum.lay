@@ -592,19 +592,19 @@ copyright-holders:m1macrophage
 				local view = file.views["Default Layout"]
 				install_slider_callbacks(view)
 
-				add_simplecounter_knob(view, "knob_pot_tempo", "pot_tempo", 1.5)
-				add_simplecounter_knob(view, "knob_pot_volume", "pot_volume", 1.5)
+				add_knob(view, "knob_pot_tempo", "pot_tempo", 1.5, VERTICAL)
+				add_knob(view, "knob_pot_volume", "pot_volume", 1.5, VERTICAL)
 				for i = 1, 6 do
 					local knob_input = "pot_tuning_" .. i
-					add_simplecounter_knob(view, "knob_" .. knob_input, knob_input, 3.5)
+					add_knob(view, "knob_" .. knob_input, knob_input, 3.5, VERTICAL)
 				end
-				add_simplecounter_knob(view, "knob_pot_hihat_decay", "pot_hihat_decay", 3.5)
+				add_knob(view, "knob_pot_hihat_decay", "pot_hihat_decay", 3.5, VERTICAL)
 
 				for i = 1, 16 do
 					local pan_input = "pot_pan_" .. i
-					add_vertical_slider(view, "slider_" .. pan_input, "slider_knob_" .. pan_input, pan_input)
+					add_slider(view, "slider_" .. pan_input, "slider_knob_" .. pan_input, pan_input)
 					local gain_input = "pot_gain_" .. i
-					add_vertical_slider(view, "slider_" .. gain_input, "slider_knob_" .. gain_input, gain_input)
+					add_slider(view, "slider_" .. gain_input, "slider_knob_" .. gain_input, gain_input)
 				end
 
 				view.items["warning"]:set_state(0)
@@ -614,13 +614,16 @@ copyright-holders:m1macrophage
 		-- Slider and knob library starts.
 		-- Can be copied as-is to other layouts.
 		-----------------------------------------------------------------------
+		VERTICAL = 0
+		HORIZONTAL = 1
+
 		local widgets = {}   -- Stores slider and knob information.
 		local pointers = {}  -- Tracks pointer state.
 
 		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
 		-- The click area's vertical size must exactly span the range of the
 		-- knob's movement.
-		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+		function add_slider(view, clickarea_id, knob_id, port_name)
 			table.insert(widgets, {
 				clickarea   = get_layout_item(view, clickarea_id),
 				slider_knob = get_layout_item(view, knob_id),
@@ -630,12 +633,13 @@ copyright-holders:m1macrophage
 
 		-- A sweep between the attached field's min and max values requires
 		-- moving the pointer by `scale * clickarea.height` pixes.
-		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+		function add_knob(view, clickarea_id, port_name, scale, drag_direction)
 			table.insert(widgets, {
-				clickarea = get_layout_item(view, clickarea_id),
-				field     = get_port_field(port_name),
-				is_knob   = true,
-				scale     = scale })
+				clickarea     = get_layout_item(view, clickarea_id),
+				field         = get_port_field(port_name),
+				is_knob       = true,
+				scale         = scale,
+				is_horizontal = (drag_direction == HORIZONTAL) })
 		end
 
 		function get_layout_item(view, item_id)
@@ -657,17 +661,32 @@ copyright-holders:m1macrophage
 				field = val
 				break
 			end
+			local field_msg = "Needs to either be an IPT_ADJUSTER, or an analog port with auto-center."
 			if field == nil then
-				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			if field.is_analog and (not field.centerdelta or field.centerdelta == 0) then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
 				return nil
 			end
 			return field
 		end
 
+		local function release_pointer(pointer_id)
+			if pointers[pointer_id] then
+				local field = widgets[pointers[pointer_id].selected_widget].field
+				if field.is_analog then
+					field:clear_value()
+				end
+			end
+			pointers[pointer_id] = nil
+		end
+
 		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
 			-- If a button is not pressed, reset the state of the current pointer.
 			if btn & 1 == 0 then
-				pointers[id] = nil
+				release_pointer(id)
 				return
 			end
 
@@ -686,8 +705,9 @@ copyright-holders:m1macrophage
 						pointers[id] = {
 							selected_widget = i,
 							relative = relative,
+							start_x = x,
 							start_y = y,
-							start_value = widgets[i].field.user_value }
+							start_value = widgets[i].field.port:read() }
 						break
 					end
 				end
@@ -698,8 +718,7 @@ copyright-holders:m1macrophage
 				return
 			end
 
-			-- A widget is selected. Update its state based on the pointer's Y
-			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
+			-- A widget is selected. Update its state based on the pointer's position.
 
 			local pointer = pointers[id]
 			local widget = widgets[pointer.selected_widget]
@@ -710,8 +729,13 @@ copyright-holders:m1macrophage
 
 			local new_value
 			if widget.is_knob then
-				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
-				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				if widget.is_horizontal then
+					local step_x = value_range / (widget.scale * widget.clickarea.bounds.width)
+					new_value = pointer.start_value + (x - pointer.start_x) * step_x
+				else
+					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+					new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				end
 			else
 				local knob_half_height = widget.slider_knob.bounds.height / 2
 				local min_y = widget.clickarea.bounds.y0 + knob_half_height
@@ -731,18 +755,26 @@ copyright-holders:m1macrophage
 			new_value = math.floor(new_value + 0.5)
 			if new_value < min_value then new_value = min_value end
 			if new_value > max_value then new_value = max_value end
-			widget.field.user_value = new_value
+
+			if widget.field.is_analog then
+				widget.field:set_value(new_value)
+			else
+				widget.field.user_value = new_value
+			end
 		end
 
 		local function pointer_left(type, id, dev, x, y, up, cnt)
-			pointers[id] = nil
+			release_pointer(id)
 		end
 
 		local function pointer_aborted(type, id, dev, x, y, up, cnt)
-			pointers[id] = nil
+			release_pointer(id)
 		end
 
 		local function forget_pointers()
+			for id, pointer in pairs(pointers) do
+				release_pointer(id)
+			end
 			pointers = {}
 		end
 
