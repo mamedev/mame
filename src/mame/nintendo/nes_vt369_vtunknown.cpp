@@ -136,6 +136,7 @@ public:
 	void vt36x_altswap_16mb(machine_config& config);
 	void vt36x_altswap_32mb_4banks_red5mam(machine_config& config);
 
+	void vt36x_vibesswap_8mb(machine_config& config);
 	void vt36x_vibesswap_16mb(machine_config& config);
 	void vt36x_gbox2020_16mb(machine_config& config);
 	void vt36x_s10swap_8mb(machine_config& config);
@@ -467,6 +468,12 @@ void vt36x_state::vt36x_vibesswap_16mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
 
+void vt36x_state::vt36x_vibesswap_8mb(machine_config &config)
+{
+	vt36x_vibesswap_16mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
+}
+
 void vt36x_state::vt36x_gbox2020_16mb(machine_config &config)
 {
 	vt36x_swap_16mb(config);
@@ -634,12 +641,24 @@ ROM_END
 
 ROM_START( rtvgc300fz )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
-	// some of the higher address lines might be swapped
 	ROM_LOAD( "jg7800fz.bin", 0x00000, 0x4000000, CRC(c9d319d2) SHA1(9d0d1435b802f63ce11b94ce54d11f4065b324cc) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( rtvgc300cr )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "jg7800dc-1.u6", 0x00000, 0x4000000, CRC(a21af365) SHA1(8af1370ccfd79c34de39d14c53438246519b16ba) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( rtvgc300pj )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "jg7800pjm-1.u6", 0x00000, 0x4000000, CRC(ea472bf0) SHA1(2864d96da0ecf123f1b143aa53c7faab5ed121d2) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
 
 ROM_START( dgun2561 ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
@@ -1094,6 +1113,15 @@ ROM_START( d12power )
 	ROM_LOAD( "25q128.u2", 0x00000, 0x1000000, CRC(02650ad4) SHA1(ca346409e11732d97b892c356fc5da61dc16ab01) )
 ROM_END
 
+ROM_START( d9_500 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "w25q128jv.u3", 0x00000, 0x1000000, CRC(66b137ce) SHA1(699ffaaf086bdb2001b0c4323b1e098f2dd3f885) )
+ROM_END
+
+ROM_START( zl383 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "s29gl064n90tfi04.u2", 0x00000, 0x800000, CRC(58e0011e) SHA1(38a3ed236f055b1a73cbb9582fc5ea151a296ba9) )
+ROM_END
 
 ROM_START( dgun2572 )
 	ROM_REGION( 0x2000000, "mainrom", 0 ) // extra pins on subboard not marked
@@ -1211,6 +1239,8 @@ CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
 CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
 CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2017, rtvgc300cr,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Disney Cars - 300 Games (JG7800DC-1)", MACHINE_NOT_WORKING )
+CONS( 2018, rtvgc300pj,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - PJ Masks - 300 Games (JG7800PJM-1)", MACHINE_NOT_WORKING )
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
@@ -1224,10 +1254,6 @@ CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
 
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
-
-    (units for use with TV)
-    Lexibook Retro TV Game Console (300 Games) - Cars
-    Lexibook Retro TV Game Console (300 Games) - PJ Masks
 
     (more?)
 
@@ -1279,6 +1305,8 @@ CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, em
 
 // boots and runs, but not all games have been tested
 CONS( 202?, t3_630,   0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "630 Games in 1 Handheld (T3)", MACHINE_NOT_WORKING )
+
+CONS( 202?, zl383,    0,        0,  vt36x_vibesswap_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has extra protection?
 CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
@@ -1369,6 +1397,9 @@ CONS( 201?, tiger108,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, 
 CONS( 201?, gon100,    0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "Game On 100-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 201?, d12power,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "SZDiiER", "Power - Charging and playing games (D12) (416-in-1)", MACHINE_IMPERFECT_GRAPHICS )
+
+// Super Chinese backgrounds don't show properly at least, sold as 'D9' but PCB has D-10D-V1.1 21-8-30 on it
+CONS( 2021, d9_500,    0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "D9 500 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // GB-50 console supports loading games from SD card (not emulated), main ROM is QSPI flash
 // Games loaded from SD card are loaded into the QSPI flash at 0x800000 - dump is from a clean factory console

@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// seems to be a GPCExxx series SunPlus CPU
+// GPCE4064 series seems very likely for the Super Impulse titles
+// 
+// GPCE4P064B is an OTP part with support for 30Kbyte OTP ROM (+2Kbyte 'test' area) which matches mapacman
+// it also lacks Port C, which appears to be unused here
+
 /*
    NOTES:
 
@@ -466,44 +472,114 @@ uint16_t generalplus_gpl_unknown_state::reg3095_r(offs_t offset)
 void generalplus_gpl_unknown_state::map(address_map &map)
 {
 	map(0x000000, 0x000fff).ram(); // RAM
-	//map(0x001000, 0x0017ff).ram(); // acts like open bus?
+	//map(0x001000, 0x0017ff).ram(); // Cache area, can be configured as RAM instead
 
-	//map(0x003000, 0x003fff).ram(); // system regs
-	map(0x003001, 0x003001).rw(FUNC(generalplus_gpl_unknown_state::reg3001_r), FUNC(generalplus_gpl_unknown_state::reg3001_w));
-	map(0x003002, 0x003002).rw(FUNC(generalplus_gpl_unknown_state::reg3002_r), FUNC(generalplus_gpl_unknown_state::reg3002_w));
-	map(0x003003, 0x003003).rw(FUNC(generalplus_gpl_unknown_state::reg3003_r), FUNC(generalplus_gpl_unknown_state::reg3003_w));
-	map(0x003004, 0x003004).r(FUNC(generalplus_gpl_unknown_state::reg3004_r));  // input from here is acted upon
-	map(0x003005, 0x003005).rw(FUNC(generalplus_gpl_unknown_state::reg3005_r), FUNC(generalplus_gpl_unknown_state::reg3005_w));
-	map(0x003006, 0x003006).r(FUNC(generalplus_gpl_unknown_state::reg3006_r));
-	map(0x003007, 0x003007).r(FUNC(generalplus_gpl_unknown_state::reg3007_r));
+	// 3000 - IOA_Data
+	map(0x003001, 0x003001).rw(FUNC(generalplus_gpl_unknown_state::reg3001_r), FUNC(generalplus_gpl_unknown_state::reg3001_w)); // IOA_Buffer
+	map(0x003002, 0x003002).rw(FUNC(generalplus_gpl_unknown_state::reg3002_r), FUNC(generalplus_gpl_unknown_state::reg3002_w)); // IOA_Dir
+	map(0x003003, 0x003003).rw(FUNC(generalplus_gpl_unknown_state::reg3003_r), FUNC(generalplus_gpl_unknown_state::reg3003_w)); // IOA_Attrib
+	map(0x003004, 0x003004).r(FUNC(generalplus_gpl_unknown_state::reg3004_r)); // IOB_Data - input from here is acted upon
+	map(0x003005, 0x003005).rw(FUNC(generalplus_gpl_unknown_state::reg3005_r), FUNC(generalplus_gpl_unknown_state::reg3005_w)); // IOB_Buffer
+	map(0x003006, 0x003006).r(FUNC(generalplus_gpl_unknown_state::reg3006_r)); // IOB_Dir
+	map(0x003007, 0x003007).r(FUNC(generalplus_gpl_unknown_state::reg3007_r)); // IOB_Attrib
+	// 3008 - IOC_Data
+	// 3009 - IOC_Buffer
+	// 300a - IOC_Dir
+	// 300b - IOC_Attrib
+	// 300c - IOA_WakeUp_Mask
+	// 300d - IOB_WakeUp_Mask
+	// 300e - IOC_WakeUp_Mask
+	map(0x00300f, 0x00300f).r(FUNC(generalplus_gpl_unknown_state::reg300f_r)); // IO_Ctrl 
 
-	map(0x00300f, 0x00300f).r(FUNC(generalplus_gpl_unknown_state::reg300f_r));
+	// 3010 - TimerA_Data
+	// 3011 - TimerA_CNTR
+	// 3012 - TimerB_Data
+	// 3013 - TimerB_CNTR
+	// 3014 - TimerC_Data
+	// 3015 - TimerC_CNTR
+	map(0x003016, 0x003016).r(FUNC(generalplus_gpl_unknown_state::reg3016_r)); // 3016 - Timer_Ctrl
 
-	map(0x003016, 0x003016).r(FUNC(generalplus_gpl_unknown_state::reg3016_r));
+	// 3020 - PWM0_Ctrl
+	// 3021 - PWM1_Ctrl
+	// 3022 - PWM2_Ctrl
+	// 3023 - PWM3_Ctrl
 
-	map(0x003034, 0x003034).w(FUNC(generalplus_gpl_unknown_state::reg3034_w));
+	// 3030 - System_Clock
+	// 3031 - System_Reset
+	// 3032 - Reset_LVD_Ctrl
+	// 3033 - Timebase_Clear
+	map(0x003034, 0x003034).w(FUNC(generalplus_gpl_unknown_state::reg3034_w)); // Watchdog_Clear
+	// 3035 - Wait_Ctrl
+	// 3036 - System_Sleep
 
-	map(0x003041, 0x003041).w(FUNC(generalplus_gpl_unknown_state::reg3041_audiodac_w));
+	// 3039 - Cache_Ctrl
+	// 303a - Cache_Hit_Rate
+	// 303b - Stack_INT_Level
 
-	map(0x003050, 0x003050).rw(FUNC(generalplus_gpl_unknown_state::reg3050_r), FUNC(generalplus_gpl_unknown_state::reg3050_w));
-	map(0x003051, 0x003051).w(FUNC(generalplus_gpl_unknown_state::reg3051_w));
-	map(0x003052, 0x003052).r(FUNC(generalplus_gpl_unknown_state::reg3052_r));
-	map(0x003053, 0x003053).r(FUNC(generalplus_gpl_unknown_state::reg3053_r));
+	// 3040 - DAC_Ctrl
+	map(0x003041, 0x003041).w(FUNC(generalplus_gpl_unknown_state::reg3041_audiodac_w)); // DAC_CH1_Data
+	// 3042 - DAC_CH2_Data
+	// 3043 - PPAMCtrl
 
-	map(0x003090, 0x003090).r(FUNC(generalplus_gpl_unknown_state::reg3090_r));
-	map(0x003091, 0x003091).r(FUNC(generalplus_gpl_unknown_state::reg3091_r));
-	map(0x003092, 0x003092).w(FUNC(generalplus_gpl_unknown_state::reg3092_lcd_w));
-	map(0x003094, 0x003094).r(FUNC(generalplus_gpl_unknown_state::reg3094_r));  // potential interesting
-	map(0x003095, 0x003095).r(FUNC(generalplus_gpl_unknown_state::reg3095_r));  // mostly a status flag
+	map(0x003050, 0x003050).rw(FUNC(generalplus_gpl_unknown_state::reg3050_r), FUNC(generalplus_gpl_unknown_state::reg3050_w)); // INT_Ctrl 
+	map(0x003051, 0x003051).w(FUNC(generalplus_gpl_unknown_state::reg3051_w)); // INT_Status 
+	map(0x003052, 0x003052).r(FUNC(generalplus_gpl_unknown_state::reg3052_r)); // FIQ_SEL
+	map(0x003053, 0x003053).r(FUNC(generalplus_gpl_unknown_state::reg3053_r)); // INT2_Ctrl
+	// 3054 - INT2_Status
+	// 3055 - FIQ2_SEL
 
-	map(0x0030e0, 0x0030e0).w(FUNC(generalplus_gpl_unknown_state::reg30e0_w));
-	map(0x0030e1, 0x0030e1).w(FUNC(generalplus_gpl_unknown_state::reg30e1_w));
-	map(0x0030e2, 0x0030e2).w(FUNC(generalplus_gpl_unknown_state::reg30e2_w));
-	map(0x0030e3, 0x0030e3).w(FUNC(generalplus_gpl_unknown_state::reg30e3_w));
-	map(0x0030e4, 0x0030e4).r(FUNC(generalplus_gpl_unknown_state::reg30e4_r));  // potentially interesting (must not return 0x0000 or 'flash error')
-	map(0x0030e5, 0x0030e5).r(FUNC(generalplus_gpl_unknown_state::reg30e5_r));  // potentially interesting (also status flag)
+	// 3070 - ADC_Ctrl
+	// 3071 - ADC_Data
+	// 3072 - ADC_LineIn_BitCtrl 
+	// 3073 - ADC_PGA_Ctrl
+	// 3074 - ADC_FIFO_Ctrl 
 
-	map(0x004000, 0x00bfff).rom().region("maincpu", 0x0000);
+	map(0x003090, 0x003090).r(FUNC(generalplus_gpl_unknown_state::reg3090_r)); // SPI2_Ctrl
+	map(0x003091, 0x003091).r(FUNC(generalplus_gpl_unknown_state::reg3091_r)); // SPI2_TXStatus
+	map(0x003092, 0x003092).w(FUNC(generalplus_gpl_unknown_state::reg3092_lcd_w)); // SPI2_TXData
+	// 3093 - SPI2_RXStatus
+	map(0x003094, 0x003094).r(FUNC(generalplus_gpl_unknown_state::reg3094_r)); // SPI2_RXData - potential interesting
+	map(0x003095, 0x003095).r(FUNC(generalplus_gpl_unknown_state::reg3095_r)); // SPI2_Misc - mostly a status flag
+
+	// 309a - SPI2_DMA_Start
+	// 309b - SPI2_DMA_BC
+	// 309c - SPI2_RX_DMA_ADDR
+	// 309d - SPI2_TX_DMA_ADDR
+	// 309e - SPI2_DMA_INT_Ctrl
+	// 309f - SPI2_RX_ICE
+
+	// 30b0 - BUF_ACTIVE
+	// 30b1 - LINK_BUF10
+	// 30b2 - LINK_BUF32
+	// 30b3 - LINK_BUF54
+
+	// 30d0 - CTS_Ctrl0
+	// 30d1 - CTS_Ctrl1
+	// 30d2 - CTS_TMADATA
+	// 30d3 - CTS_TMACNT
+	// 30d4 - CTS_TMBDATA
+	// 30d5 - CTS_TMBCNT
+	// 30d6 - CTS_CAPTMB
+	// 30d7 - CTS_MUTCTRL
+
+	map(0x0030e0, 0x0030e0).w(FUNC(generalplus_gpl_unknown_state::reg30e0_w)); // SPI_Ctrl
+	map(0x0030e1, 0x0030e1).w(FUNC(generalplus_gpl_unknown_state::reg30e1_w)); // SPI_TXStatus
+	map(0x0030e2, 0x0030e2).w(FUNC(generalplus_gpl_unknown_state::reg30e2_w)); // SPI_TXData
+	map(0x0030e3, 0x0030e3).w(FUNC(generalplus_gpl_unknown_state::reg30e3_w)); // SPI_RXStatus
+	map(0x0030e4, 0x0030e4).r(FUNC(generalplus_gpl_unknown_state::reg30e4_r)); // SPI_RXData - potentially interesting (must not return 0x0000 or 'flash error')
+	map(0x0030e5, 0x0030e5).r(FUNC(generalplus_gpl_unknown_state::reg30e5_r)); // SPI_Misc - potentially interesting (also status flag)
+	// 30e6 - SPI_Man_Ctrl
+	// 30e7 - SPI_Auto_Ctrl
+	// 30e8 - SPI_PRGM_BC
+	// 30e9 - SPI_BANK 
+	// 30ea - SPI_DMA_Start
+	// 30eb - SPI_DMA_BC
+	// 30ec - SPI_RX_DMA_ADDR
+	// 30ed - SPI_TX_DMA_ADDR
+	// 30ee - SPI_DMA_INT_Ctrl
+	// 30ef - SPI_RX_ICE
+
+	map(0x004000, 0x00bfff).rom().region("maincpu", 0x0000); // 0x4000 - 0x47ff is 'test program'
 	map(0x00c000, 0x00ffff).rom().region("maincpu", 0x0000);
 
 	map(0x200000, 0x3fffff).rom().region("spi", 0x0000); // has direct access to SPI ROM
@@ -558,7 +634,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer3 )
 
 void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &config)
 {
-	UNSP_20(config, m_maincpu, 96000000); // internal ROM uses unsp2.0 opcodes, unknown clock
+	UNSP_20(config, m_maincpu, 96000000); // internal ROM uses unsp2.0 opcodes, should be 48MHz but glitches (due to timer hookups?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl_unknown_state::map);
 	m_maincpu->set_vectorbase(0x4010); // there is also a set of vectors for what looks to be a burn-in test at 4000, maybe external pin selects?
 

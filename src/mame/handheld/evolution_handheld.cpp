@@ -87,6 +87,18 @@ ROM_START( buttdtct )
 	ROM_LOAD( "25l64.ic4", 0x000000, 0x800000, CRC(a70a2b0d) SHA1(fe5517d58297b737f9b6f645f76bea2a5dae1eb6) )
 ROM_END
 
+ROM_START( pokexyqz )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD( "mx25l12835f.u3", 0x000000, 0x1000000, CRC(98e86224) SHA1(63872b7fb8a4ebb3260e3fbded03a93ae5403948) )
+
+	ROM_REGION( 0x4200000, "nand", 0 )
+	ROM_LOAD( "mx23j51243tc.u5", 0x000000, 0x4200000, CRC(2f2c6c0c) SHA1(b47dbd33909306aa882e4a3f246af3150de94837) )
+
+	ROM_REGION( 0x800, "i2cmem", 0 )
+	ROM_LOAD( "24c16.u8", 0x000, 0x800, CRC(a607979b) SHA1(b06d0bac7844d571dd3cde9f2e0440b2555c3820) )
+
+	// also has an SD card slot (was empty)
+ROM_END
 
 } // anonymous namespace
 
@@ -97,3 +109,5 @@ CONS( 2018, smkatsum,    0,       0,      evolhh, evolhh, evolution_handheldgame
 
 // おしりたんてい ププッとかいけつゲーム
 CONS( 2020, buttdtct,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a pink 'for girls' unit, exists in other colours, software likely the same
+
+CONS( 2015, pokexyqz,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokemon Encyclopedia Z Pokemon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

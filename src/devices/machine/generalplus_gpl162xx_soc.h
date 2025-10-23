@@ -6,15 +6,15 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_GENERALPLUS_GPL16250SOC_H
-#define MAME_MACHINE_GENERALPLUS_GPL16250SOC_H
+#ifndef MAME_MACHINE_GENERALPLUS_GPL162XX_SOC_H
+#define MAME_MACHINE_GENERALPLUS_GPL162XX_SOC_H
 
 #pragma once
 
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 #include "emupal.h"
-#include "generalplus_gpl16250soc_video.h"
+#include "generalplus_gpl162xx_soc_video.h"
 #include "spg2xx_audio.h"
 
 typedef device_delegate<void (uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)> sunplus_gcm394_cs_callback_device;
@@ -369,125 +369,11 @@ public:
 };
 
 
-class generalplus_gpac800_device : public sunplus_gcm394_base_device
-{
-public:
-	template <typename T>
-	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
-		generalplus_gpac800_device(mconfig, tag, owner, clock)
-	{
-		m_screen.set_tag(std::forward<T>(screen_tag));
-		m_csbase = 0x30000;
-	}
-
-	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	void gpac800_internal_map(address_map &map) ATTR_COLD;
-
-	//virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-private:
-	void recalculate_calculate_effective_nand_address();
-
-	uint16_t nand_7850_status_r();
-	uint16_t nand_7854_r();
-	void nand_dma_ctrl_w(uint16_t data);
-	void nand_7850_w(uint16_t data);
-	void nand_command_w(uint16_t data);
-	void nand_addr_low_w(uint16_t data);
-	void nand_addr_high_w(uint16_t data);
-	uint16_t nand_ecc_low_byte_error_flag_1_r();
-	void nand_7856_type_w(uint16_t data);
-	void nand_7857_w(uint16_t data);
-	void nand_785b_w(uint16_t data);
-	void nand_785c_w(uint16_t data);
-	void nand_785d_w(uint16_t data);
-	uint16_t nand_785e_r();
-
-	uint16_t m_nandcommand;
-
-	uint16_t m_nand_addr_low;
-	uint16_t m_nand_addr_high;
-
-	uint16_t m_nand_dma_ctrl;
-	uint16_t m_nand_7850;
-	uint16_t m_nand_785d;
-	uint16_t m_nand_785c;
-	uint16_t m_nand_785b;
-	uint16_t m_nand_7856;
-	uint16_t m_nand_7857;
-
-	int m_curblockaddr;
-	uint32_t m_effectiveaddress;
-};
-
-
-class generalplus_gpspispi_device : public sunplus_gcm394_base_device
-{
-public:
-	template <typename T>
-	generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
-		generalplus_gpspispi_device(mconfig, tag, owner, clock)
-	{
-		m_screen.set_tag(std::forward<T>(screen_tag));
-		m_csbase = 0x30000;
-	}
-
-	generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	void gpspispi_internal_map(address_map &map) ATTR_COLD;
-
-	//virtual void device_start() override ATTR_COLD;
-	//virtual void device_reset() override ATTR_COLD;
-
-private:
-	uint16_t spi_unk_7943_r();
-};
-
-class generalplus_gpspi_direct_device : public sunplus_gcm394_base_device
-{
-public:
-	template <typename T>
-	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
-		generalplus_gpspi_direct_device(mconfig, tag, owner, clock)
-	{
-		m_screen.set_tag(std::forward<T>(screen_tag));
-		//m_csbase = 0x30000;
-		// TODO: is cs_space even used by this type?
-		m_csbase = 0xffffffff;
-	}
-
-	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	void gpspi_direct_internal_map(address_map &map) ATTR_COLD;
-
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-private:
-	uint16_t ramread_r(offs_t offset);
-	void ramwrite_w(offs_t offset, uint16_t data);
-	uint16_t spi_direct_7b40_r();
-	uint16_t spi_direct_7b46_r();
-	uint16_t spi_direct_7af0_r();
-	void spi_direct_7af0_w(uint16_t data);
-	uint16_t spi_direct_79f5_r();
-	uint16_t spi_direct_78e8_r();
-	void spi_direct_78e8_w(uint16_t data);
-	uint16_t spi_direct_79f4_r();
-
-	uint16_t m_7af0;
-};
 
 
 
 DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
-DECLARE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device)
-DECLARE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device)
-DECLARE_DEVICE_TYPE(GP_SPI_DIRECT, generalplus_gpspi_direct_device)
 
-#endif // MAME_MACHINE_GENERALPLUS_GPL16250SOC_H
+
+
+#endif // MAME_MACHINE_GENERALPLUS_GPL162XX_SOC_H
