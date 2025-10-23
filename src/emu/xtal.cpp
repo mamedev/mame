@@ -312,6 +312,7 @@ const double XTAL::known_xtals[] = {
 	 17'734'475, // 17.734475_MHz_XTAL     4x PAL subcarrier - "
 	 17'734'476, // 17.734476_MHz_XTAL     4x PAL subcarrier - "
 	 17'812'000, // 17.812_MHz_XTAL        Videopac C52
+	 17'820'000, // 17.82_MHz_XTAL         Convergent AWS-2xx
 	 17'971'200, // 17.9712_MHz_XTAL       Compucolor II, Hazeltine Esprit III
 	 18'000'000, // 18_MHz_XTAL            S.A.R, Ikari Warriors 3
 	 18'414'000, // 18.414_MHz_XTAL        Ann Arbor Ambassador
