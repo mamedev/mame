@@ -1810,7 +1810,7 @@ uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_rgb32
 			}
 			
 			rectangle const visible1alt(0*8, (16+48)*8-1,  4*8,  16*8-1);
-			rectangle const visible2alt(0*8, (16+48)*8-1, 16*8,  28*8-1);
+			rectangle const visible2alt(0*8, (16+48)*8-1, 16*8,  30*8-1);
 
 			m_reel_tilemap[0]->draw(screen, bitmap, visible1alt, 0, 0);
 			m_reel_tilemap[1]->draw(screen, bitmap, visible2alt, 0, 0);
@@ -2571,7 +2571,7 @@ void wingco_state::magodds_outb850_w(uint8_t data)
 	else
 		m_tile_bank = 0;
 
-	//popmessage("magodds_outb850_w %02x", data);
+//	popmessage("magodds_outb850_w %02x", data);
 
 	m_fg_tilemap->mark_all_dirty();
 }
@@ -29846,7 +29846,7 @@ GAMEL( 1990, bonuscha,   bonusch,  bonusch,  bonusch,  unkch_state,    init_bonc
 
 
 // --- Magical Odds hardware ---
-GAME(  1992, magodds,    0,        magodds,  magodds,  wingco_state,   init_magodds,   ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             0 )
+GAME(  1992, magodds,    0,        magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             0 )
 GAME(  1992, magoddsa,   magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             0 )
 GAME(  1992, magoddsb,   magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             0 )
 GAME(  1991, magoddsc,   magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
