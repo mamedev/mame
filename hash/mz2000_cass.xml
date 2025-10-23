@@ -230,7 +230,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 	<software name="iceblock" supported="yes">
 		<description>Ice Block</description>
 		<year>1983</year>
-		<publisher>Db Soft</publisher>
+		<publisher>dB Soft</publisher>
 		<info name="alt_title" value="アイス・ブロック"/>
 		<info name="usage" value="IPL"/>
 		<part name="cass1" interface="mz_cass">
