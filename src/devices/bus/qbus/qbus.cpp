@@ -15,6 +15,7 @@
 // storage
 #include "bk_kmd.h"
 #include "dsd4432.h"
+#include "dvk_dwhle.h"
 #include "dvk_kgd.h"
 #include "dvk_kmd.h"
 #include "dvk_mx.h"
@@ -35,6 +36,7 @@ void qbus_cards(device_slot_interface &device)
 	device.option_add("pc11", DEC_PC11); /* Paper tape reader and punch */
 	device.option_add("qts1", TTI_QTS1);
 	device.option_add("dsd4432", DSD4432);
+	device.option_add("dw", DVK_DWHLE);
 	device.option_add("irps", BK_IRPS);
 	device.option_add("kgd", DVK_KGD);
 	device.option_add("ktlk", DVK_KTLK);
