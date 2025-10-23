@@ -19475,9 +19475,6 @@ smkatsum
 gamekin3
 gameking
 
-@source:handheld/gmaster.cpp
-gmaster
-
 @source:handheld/generalplus_gpce4.cpp
 mapacman
 parcade
@@ -19488,6 +19485,9 @@ taturtf
 
 @source:handheld/generalplus_gpel31xx.cpp
 tamameet
+
+@source:handheld/gmaster.cpp
+gmaster
 
 @source:handheld/gw35th.cpp
 gwsmb35
