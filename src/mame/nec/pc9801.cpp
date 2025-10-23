@@ -15,7 +15,6 @@ TODO:
 - Port over pc88va SASI version in common C-Bus option;
 - Remove kludge for POR bit in a20_ctrl_w fn;
 \- Causes "SYSTEM SHUTDOWN"s on OS installs/reboots (soft reset the machine manually);
-- hookup PC80S31K device for 2d type floppies, fix loading bug (missing specific BIOS?)
 - CMT support (-03/-13/-36 i/f or cbus only, supported by i86/V30 fully compatible machines
   only);
 - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?

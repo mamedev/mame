@@ -1,13 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
 
-NEC PC-80S31K
-
-***************************************************************************/
-
-#ifndef MAME_NEC_PC80S31K_H
-#define MAME_NEC_PC80S31K_H
+#ifndef MAME_BUS_NEC_FDD_PC80S31K_H
+#define MAME_BUS_NEC_FDD_PC80S31K_H
 
 #pragma once
 
@@ -16,10 +11,6 @@ NEC PC-80S31K
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/upd765.h"
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
 
 class pc80s31_device : public device_t
 {
@@ -126,9 +117,8 @@ private:
 	bool m_dmae = false;
 };
 
-// device type definition
 DECLARE_DEVICE_TYPE(PC80S31,       pc80s31_device)
 DECLARE_DEVICE_TYPE(PC80S31K,      pc80s31k_device)
 DECLARE_DEVICE_TYPE(PC88VA2_FD_IF, pc88va2_fd_if_device)
 
-#endif // MAME_NEC_PC80S31K_H
+#endif // MAME_BUS_NEC_FDD_PC80S31K_H

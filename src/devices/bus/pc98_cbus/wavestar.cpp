@@ -16,7 +16,7 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "bus/pc98_cbus/wavestar.h"
+#include "wavestar.h"
 
 DEFINE_DEVICE_TYPE(QVISION_WAVESTAR, qvision_wavestar_device, "qvision_wavestar", "QVision WaveStar")
 
@@ -93,7 +93,7 @@ void qvision_wavestar_device::h8_map(address_map &map)
 {
 	map(0x00000, 0x07fff).rom();
 	map(0x10000, 0x17fff).ram(); // initialized to 0x80 at startup
-//	map(0x20000, 0x2000f) C-Bus DAC host connection?
-//	map(0x20030, 0x20031) address/data pair
+//  map(0x20000, 0x2000f) C-Bus DAC host connection?
+//  map(0x20030, 0x20031) address/data pair
 }
 

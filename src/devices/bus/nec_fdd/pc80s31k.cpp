@@ -2,50 +2,48 @@
 // copyright-holders:Angelo Salese, Olivier Galibert
 /**************************************************************************************************
 
-    NEC PC-80S31(K) Mini Disk Unit
+NEC PC-80S31(K) Mini Disk Unit
 
-    Z80 + μPD765 + PPI that connects in cross with an host PPI
+Z80 + μPD765 + PPI that connects in cross with an host PPI
 
-    "Mini" as compared to the PC-8881 8-inch floppy I/F
+"Mini" as compared to the PC-8881 8-inch floppy I/F
 
-    Design is decidedly derived from Epson TF-20 and friends,
-    cfr. devices/bus/epson_sio/tf20.cpp
+Design is decidedly derived from Epson TF-20 and friends,
+cfr. devices/bus/epson_sio/tf20.cpp
 
-    PC-80S32 is the external version of what PC-8801mkII uses built-in,
-    capabilities are unknown at current time.
+PC-80S32 is the external version of what PC-8801mkII uses built-in,
+capabilities are unknown at current time.
 
-    Eventually internalized in later PC-88 models,
-    Observed PCBs for internal boards are marked PWD-516 with a 8 digit revision number.
-    For simpicity's sake we just name these board over host classes instead.
+Eventually internalized in later PC-88 models,
+Observed PCBs for internal boards are marked PWD-516 with a 8 digit revision number.
+For simplicity's sake we just name these board over host classes instead.
 
-    TODO:
-    - PC=0x7dd reads from FDC bit 3 in ST3 (twosid_r fn),
-      expecting a bit 3 high for all the PC8001 games otherwise keeps looping and eventually dies.
-      Are those incorrectly identified as 2DD? Hacked to work for now;
-    - set_input_line_vector fn doesn't work properly when issued from a device_reset,
-      we currently just implement the irq_callback instead;
-    - Bus option;
-    - Cascade mode, i.e. the CN2 connector used to accept a second disk unit for drive 2 & 3;
-    - pc80s31k: verify that irq vector write (I/O port $f0) belongs here or just
-      whatever PC88VA uses.
-    - printer interface (used for debugging? 4-bit serial?)
-    - Pinpoint what host I/O ports $f6, $f7 truly are
-      (direct FDC access from this device or a different beast? cfr. play6lim with pc8001mk2)
-    - filemst tries to access undocumented I/O port $09 at PC=5000:
-      \- If that's 0 then it tries to read a vector at [0x8000];
-      \- It then tries to read at memory [0xc0ff], set the value read in [0xf012];
-      \- Expects that ROM [0x0000] is not equal to 0xc3;
-      Bottom line: Is it trying to access some custom HW?
-    - Hookup a bridge for internal BIOSes (later PC8801 models);
-    - Save state support (resuming fails latch hookups here);
-    - pc88va2_fd_if_device: currently not hooked up to pc88va2, deasserts DRQ too fast, sub CPU
-      incorrectly tells to master that floppies aren't 2HD?
+TODO:
+- Bus option;
+- Cascade mode, i.e. the CN2 connector used to accept a second disk unit for drive 2 & 3;
+- PC=0x7dd reads from FDC bit 3 in ST3 (twosid_r fn),
+  expecting a bit 3 high for all the PC8001 games otherwise keeps looping and eventually dies.
+  Are those incorrectly identified as 2DD? Hacked to work for now;
+- set_input_line_vector fn doesn't work properly when issued from a device_reset,
+  we currently just implement the irq_callback instead;
+- pc80s31k: verify that irq vector write (I/O port $f0) belongs here or just
+  whatever PC88VA uses.
+- printer interface (used for debugging? 4-bit serial?)
+- Pinpoint what host I/O ports $f6, $f7 truly are
+  (direct FDC access from this device or a different beast? cfr. play6lim with pc8001mk2)
+- filemst tries to access undocumented I/O port $09 at PC=5000:
+  \- If that's 0 then it tries to read a vector at [0x8000];
+  \- It then tries to read at memory [0xc0ff], set the value read in [0xf012];
+  \- Expects that ROM [0x0000] is not equal to 0xc3;
+  Bottom line: Is it trying to access some custom HW?
+- Hookup a bridge for internal BIOSes (later PC8801 models);
+- Save state support (resuming fails latch hookups here);
+- pc88va2_fd_if_device: currently not hooked up to pc88va2, deasserts DRQ too fast, sub CPU
+  incorrectly tells to master that floppies aren't 2HD?
 
 ===================================================================================================
 
 PCB (PC-80S31K)
-
-===================================================================================================
 
     |--------------------------------------|
     |      P1 P2 P3         X1             |
@@ -74,8 +72,6 @@ PCB (PC-80S31K)
 ===================================================================================================
 
 Command Protocol
-
-===================================================================================================
 
 Command & parameters are normally communicated from Host via port B
 (read on port A on FDC side)
@@ -137,8 +133,6 @@ FDC normally puts ST0-1-2 to RAM buffers $7f0d-f, CHRN data in $7f10-13
 Port C
 Used as a communication protocol flags
 
-===================================================================================================
-
  Host side
  (swap 4-bit nibbles and r/w direction for FDC side, all bits are active high):
  x--- ---- (w) ATN AtenTioN:
@@ -174,8 +168,8 @@ Used as a communication protocol flags
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC80S31, pc80s31_device,   "pc80s31",  "NEC PC-80S31 Mini Disk Unit I/F")
-DEFINE_DEVICE_TYPE(PC80S31K, pc80s31k_device, "pc80s31k", "NEC PC-80S31K Mini Disk Unit I/F")
+DEFINE_DEVICE_TYPE(PC80S31,       pc80s31_device,       "pc80s31",       "NEC PC-80S31 Mini Disk Unit I/F")
+DEFINE_DEVICE_TYPE(PC80S31K,      pc80s31k_device,      "pc80s31k",      "NEC PC-80S31K Mini Disk Unit I/F")
 DEFINE_DEVICE_TYPE(PC88VA2_FD_IF, pc88va2_fd_if_device, "pc88va2_fd_if", "NEC PC-88VA2 floppy disk interface \"PWD-516 72405162\"")
 
 //**************************************************************************

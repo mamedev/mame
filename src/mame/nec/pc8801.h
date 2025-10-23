@@ -15,6 +15,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "bus/msx/ctrl/ctrl.h"
+#include "bus/nec_fdd/pc80s31k.h"
 #include "bus/pc8801/pc8801_31.h"
 #include "bus/pc8801/pc8801_exp.h"
 #include "cpu/z80/z80.h"
@@ -25,7 +26,6 @@
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
-#include "pc80s31k.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
 

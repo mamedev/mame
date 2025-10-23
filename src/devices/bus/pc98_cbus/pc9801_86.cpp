@@ -33,7 +33,8 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "bus/pc98_cbus/pc9801_86.h"
+#include "pc9801_86.h"
+
 #include "speaker.h"
 
 #define QUEUE_SIZE 32768

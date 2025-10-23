@@ -11,9 +11,9 @@
 
 #pragma once
 
-//#include "pc80s31k.h"
 #include "pc88va_sgp.h"
 
+//#include "bus/nec_fdd/pc80s31k.h"
 #include "bus/pc98_cbus/slot.h"
 #include "bus/msx/ctrl/ctrl.h"
 #include "bus/scsi/pc9801_sasi.h"

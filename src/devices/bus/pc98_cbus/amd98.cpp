@@ -28,7 +28,8 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "bus/pc98_cbus/amd98.h"
+
+#include "amd98.h"
 #include "speaker.h"
 
 #define LOG_LATCH   (1U << 1)   // Detailed AY3 latch setups

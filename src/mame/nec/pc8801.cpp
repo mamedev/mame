@@ -19,8 +19,6 @@
         (uses external minidisk), only model with working border color, other misc banking bits.
       - refactor memory banking to use address maps & views;
       - double check dipswitches;
-      - Slotify PC80S31K, also needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801. **partially done**
-        Also notice that there are common points with SPC-1000 and TF-20 FDDs;
       - backport/merge what is portable to PC-8001;
       - Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
         Needs identification effort about what's internal to machine models and what instead

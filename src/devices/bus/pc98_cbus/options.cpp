@@ -5,6 +5,7 @@
 #include "options.h"
 
 #include "amd98.h"
+#include "fdd_2d.h"
 #include "pc9801_26.h"
 #include "pc9801_55.h"
 #include "pc9801_86.h"
@@ -26,11 +27,15 @@ void pc98_cbus_devices(device_slot_interface &device)
 	device.option_add("pc9801_86",  PC9801_86);
 	device.option_add("pc9801_118", PC9801_118);
 	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
+
 //  Spark Board
 	device.option_add("amd98",      AMD98);
 	device.option_add("mpu_pc98",   MPU_PC98);
 	device.option_add("sb16",       SB16_CT2720);
 	device.option_add("wavestar",   QVISION_WAVESTAR);
+
+	// File Bay
+	device.option_add("fdd_2d",     FDD_2D_BRIDGE);
 
 	// doujinshi HW
 // MAD Factory / Doujin Hard (同人ハード)

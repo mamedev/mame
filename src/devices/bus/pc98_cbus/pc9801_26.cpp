@@ -14,7 +14,7 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "bus/pc98_cbus/pc9801_26.h"
+#include "pc9801_26.h"
 
 #include "sound/ymopn.h"
 #include "speaker.h"
