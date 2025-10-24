@@ -46,6 +46,11 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual uint8_t dack_r(int line) override;
+	virtual void dack_w(int line, uint8_t data) override;
+	virtual void eop_w(int state) override;
+	void update_dreq_mapping(int dreq, int logical);
+
 private:
 	const address_space_config m_space_config;
 
@@ -73,6 +78,8 @@ private:
 	u8 m_index;
 	u8 m_logical_index;
 	bool m_activate[0xb];
+	int m_dreq_mapping[4];
+	int m_last_dma_line;
 
 	u8 m_hefras;
 	u8 m_lockreg;

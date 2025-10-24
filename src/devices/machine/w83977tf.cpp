@@ -113,6 +113,8 @@ void w83977tf_device::device_reset()
 	m_fdc->set_mode(upd765_family_device::mode_t::AT);
 	m_fdc->set_rate(500000);
 
+	m_last_dma_line = -1;
+
 	remap(AS_IO, 0, 0x400);
 }
 
@@ -125,6 +127,7 @@ device_memory_interface::space_config_vector w83977tf_device::memory_space_confi
 
 static void pc_hd_floppies(device_slot_interface &device)
 {
+	device.option_add("35ed", FLOPPY_35_ED);
 	device.option_add("525hd", FLOPPY_525_HD);
 	device.option_add("35hd", FLOPPY_35_HD);
 	device.option_add("525dd", FLOPPY_525_DD);
@@ -303,6 +306,7 @@ void w83977tf_device::config_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			m_fdc_drq_line = data & 0x7;
 			LOGFDC("LD0 (FDC): drq %s (%02x)\n", BIT(m_fdc_drq_line, 2) ? "disabled" : "enabled", data);
+			update_dreq_mapping(m_fdc_drq_line, 0);
 		})
 	);
 	m_logical_view[0](0xf0, 0xf0).lrw8(
@@ -388,6 +392,7 @@ void w83977tf_device::config_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			m_lpt_drq_line = data & 0x7;
 			LOG("LD1 (LPT): drq %s (%02x)\n", BIT(m_lpt_drq_line, 2) ? "disabled" : "enabled", data);
+			update_dreq_mapping(m_lpt_drq_line, 1);
 		})
 	);
 /*
@@ -729,3 +734,65 @@ void w83977tf_device::rtc_irq_w(offs_t offset, u8 data)
 	m_rtc_irq_line = data & 0xf;
 	LOG("LD9 (GPIO2): RTC irq routed to %02x\n", m_rtc_irq_line);
 }
+
+/*
+ * DMA
+ */
+
+void w83977tf_device::update_dreq_mapping(int dreq, int logical)
+{
+	if ((dreq < 0) || (dreq >= 4))
+		return;
+	for (int n = 0; n < 4; n++)
+		if (m_dreq_mapping[n] == logical)
+			m_dreq_mapping[n] = -1;
+	m_dreq_mapping[dreq] = logical;
+}
+
+void w83977tf_device::eop_w(int state)
+{
+	// dma transfer finished
+	if (m_last_dma_line < 0)
+		return;
+	switch (m_dreq_mapping[m_last_dma_line])
+	{
+	case 0:
+		m_fdc->tc_w(state == ASSERT_LINE);
+		break;
+	default:
+		break;
+	}
+	//m_last_dma_line = -1;
+}
+
+// TODO: LPT bindings
+uint8_t w83977tf_device::dack_r(int line)
+{
+	// transferring data from device to memory using dma
+	// read one byte from device
+	m_last_dma_line = line;
+	switch (m_dreq_mapping[line])
+	{
+	case 0:
+		return m_fdc->dma_r();
+	default:
+		break;
+	}
+	return 0;
+}
+
+void w83977tf_device::dack_w(int line, uint8_t data)
+{
+	// transferring data from memory to device using dma
+	// write one byte to device
+	m_last_dma_line = line;
+	switch (m_dreq_mapping[line])
+	{
+	case 0:
+		m_fdc->dma_w(data);
+		break;
+	default:
+		break;
+	}
+}
+
