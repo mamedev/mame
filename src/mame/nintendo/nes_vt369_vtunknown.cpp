@@ -762,6 +762,13 @@ ROM_START( lxcmcybt ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcyfd ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "dory.u2", 0x00000, 0x4000000, CRC(315bf615) SHA1(3b8b9c6428084ae82a38b7bcfe029180501f1488) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcydpn ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "dp150.bin", 0x00000, 0x4000000, CRC(dce19f81) SHA1(e74190d5eea4c31ec0cdcc374b988db2dc1d37c6) )
@@ -778,10 +785,16 @@ ROM_END
 
 ROM_START( lxcmcypp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
 	ROM_LOAD( "pawpatrol_compact.bin", 0x00000, 0x4000000, CRC(bf536762) SHA1(80dde8426a636bae33a82d779e564fa743eb3776) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( lxcmcyppa ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "2365pa-5.u2", 0x00000, 0x4000000, CRC(181e2dc6) SHA1(5fc4e1fafa7c94f971fd2e5f4e36629002ee246f) )
+
+	VT3XX_INTERNAL_NO_SWAP
 ROM_END
 
 ROM_START( lxcypkdp ) // all games selectable
@@ -1149,6 +1162,11 @@ ROM_START( a6plus )
 	DISK_IMAGE( "a6plus", 0, SHA1(ce8fb23443008c921c6541e71da37c1dc6a06e5f) )
 ROM_END
 
+ROM_START( h12p1000 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "h12pro1000.u12", 0x00000, 0x2000000, CRC(b471cb79) SHA1(2324d82a6ae00537090fb534cdf4e4ac6a74ebaf) )
+ROM_END
+
 
 void vt369_state::init_lxcmcypp()
 {
@@ -1211,20 +1229,22 @@ CONS( 2012, lexi30,  0,0,  vt36x_8mb, vt369_rot, vt36x_state, empty_init, "Lexib
 CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
 
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
-CONS( 2012, lxcmcysp,  0,  0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
-CONS( 200?, lxcmc250,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
-CONS( 2012, lxcmcydp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcysp,  0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
+CONS( 200?, lxcmc250,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcydp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_NOT_WORKING )
 // JL2365 models (150-in-1 versions)
-CONS( 200?, lxcmcysw,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels (JL2365SW)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ)", MACHINE_NOT_WORKING )
-CONS( 2018, lxcmcypj,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks (JL2365PJM)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyba,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcycr,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2365DC)", MACHINE_NOT_WORKING )
-// JL2367 models (150-in-1 versions, newer case style) - the data order is swapped for these (is this common to the JL2367 shell types?)
-CONS( 2018, lxcmcypp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_NOT_WORKING )
-CONS( 2020, lxcmcybt,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman (JL2367BAT)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcydpn, 0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Disney Princess (JL2367DP, 150-in-1)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyspn, 0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2367SP, 150-in-1)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels (JL2365SW)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfz,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ)", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcypj,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks (JL2365PJM)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyba,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcycr,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2365DC)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyfd,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Finding Dory", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcyppa, lxcmcypp,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-5)", MACHINE_NOT_WORKING ) // yes, it has the bitswap even if it's a JL2365 unit
+// JL2367 models (150-in-1 versions, newer case style)
+CONS( 2018, lxcmcypp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_NOT_WORKING )
+CONS( 2020, lxcmcybt,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman (JL2367BAT)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcydpn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Disney Princess (JL2367DP, 150-in-1)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyspn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2367SP, 150-in-1)", MACHINE_NOT_WORKING )
 
 // JL1895 models, Cyber Arcade Pocket.  This make strange use of the LCDC, the menus are vertical (so must be copied to the LCD rotated) but the games are horizontal as usual
 CONS( 201?, lxcypkdp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Disney Princess (JL1895DP)", MACHINE_NOT_WORKING )
@@ -1318,6 +1338,9 @@ CONS( 2018, goretrop,  0,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,  
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
 // there are other S10 units available
 CONS( 202?, s10fake,   0,  0,  vt36x_s10swap_8mb, vt369, vt36x_state, init_s10fake, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
+
+// banking(?) issues, some games don't boot (writes data to ALU mirror, then some other ports)
+CONS( 202?, h12p1000,  0,        0,  vt36x,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
