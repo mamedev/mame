@@ -2597,9 +2597,9 @@ void namcos23_state::c435_matrix_vector_immed_mul() // 0.3
 	s16 m[9];
 	s32 v[3];
 	memcpy(m, c435_getm(m_c435.buffer[2]), sizeof(s16) * 9);
-	v[0] = ((s32)m_c435.buffer[4] << 16) | (u16)m_c435.buffer[5];
-	v[1] = ((s32)m_c435.buffer[6] << 16) | (u16)m_c435.buffer[7];
-	v[2] = ((s32)m_c435.buffer[8] << 16) | (u16)m_c435.buffer[9];
+	v[0] = (s32(m_c435.buffer[4]) << 16) | u16(m_c435.buffer[5]);
+	v[1] = (s32(m_c435.buffer[6]) << 16) | u16(m_c435.buffer[7]);
+	v[2] = (s32(m_c435.buffer[8]) << 16) | u16(m_c435.buffer[9]);
 
 	if (BIT(m_c435.buffer[0], 10))
 		transpose_matrix(m);
@@ -3397,9 +3397,9 @@ void namcos23_renderer::render_sprite_scanline(s32 scanline, const extent_t& ext
 		if (pen != 0xff)
 		{
 			const u32 rgb = (u32)pal[pen];
-			s32 r = (s32)((rgb >> 16) & 0xff);
-			s32 g = (s32)((rgb >> 8) & 0xff);
-			s32 b = (s32)(rgb & 0xff);
+			s32 r = s32((rgb >> 16) & 0xff);
+			s32 g = s32((rgb >> 8) & 0xff);
+			s32 b = s32(rgb & 0xff);
 
 			if (fadefactor != 0xff)
 			{
@@ -3411,9 +3411,9 @@ void namcos23_renderer::render_sprite_scanline(s32 scanline, const extent_t& ext
 			if (alphafactor != 0xff && (alpha_enabled || pen == alpha_pen))
 			{
 				const u32 drgb = dest[x];
-				const s32 dr = (s32)((drgb >> 16) & 0xff);
-				const s32 dg = (s32)((drgb >> 8) & 0xff);
-				const s32 db = (s32)(drgb & 0xff);
+				const s32 dr = s32((drgb >> 16) & 0xff);
+				const s32 dg = s32((drgb >> 8) & 0xff);
+				const s32 db = s32(drgb & 0xff);
 				r = ((r * alphafactor) + (dr * alphafactor_inv)) >> 8;
 				g = ((g * alphafactor) + (dg * alphafactor_inv)) >> 8;
 				b = ((b * alphafactor) + (db * alphafactor_inv)) >> 8;
@@ -3484,9 +3484,9 @@ void namcos23_renderer::render_scanline(s32 scanline, const extent_t& extent, co
 		{
 			ty += rd.tbase;
 			u32 tex_rgb = texture_lookup(pens, penshift, penmask, tx, ty, pen);
-			s32 r = (s32)((tex_rgb >> 16) & 0xff);
-			s32 g = (s32)((tex_rgb >> 8) & 0xff);
-			s32 b = (s32)(tex_rgb & 0xff);
+			s32 r = s32((tex_rgb >> 16) & 0xff);
+			s32 g = s32((tex_rgb >> 8) & 0xff);
+			s32 b = s32(tex_rgb & 0xff);
 
 			if (Shade)
 			{
@@ -3515,9 +3515,9 @@ void namcos23_renderer::render_scanline(s32 scanline, const extent_t& extent, co
 			if (Blend || (PolyAlpha && (alpha_enabled || pen == alpha_pen)))
 			{
 				drgb = dest[x];
-				dr = (s32)((drgb >> 16) & 0xff);
-				dg = (s32)((drgb >> 8) & 0xff);
-				db = (s32)(drgb & 0xff);
+				dr = s32((drgb >> 16) & 0xff);
+				dg = s32((drgb >> 8) & 0xff);
+				db = s32(drgb & 0xff);
 			}
 
 			if (PolyAlpha && (alpha_enabled || pen == alpha_pen))
@@ -3791,8 +3791,8 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 
 	for (int i = 0; i < ne; i++)
 	{
-		pv[i].x = (s32)re->immediate.x[i] / 16384.f;
-		pv[i].y = (s32)re->immediate.y[i] / 16384.f;
+		pv[i].x = s32(re->immediate.x[i]) / 16384.f;
+		pv[i].y = s32(re->immediate.y[i]) / 16384.f;
 		pv[i].p[0] = (s32)re->immediate.z[i] / 16384.f;
 		pv[i].p[1] = (s32)re->immediate.u[i];
 		pv[i].p[2] = (s32)re->immediate.v[i];

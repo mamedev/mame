@@ -408,7 +408,7 @@ void namcos1_state::virtual_map(address_map &map)
 	map(0x2f0000, 0x2f7fff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram8_r), FUNC(namco_c123tmap_device::videoram8_w));
 	map(0x2f8000, 0x2f9fff).rw(FUNC(namcos1_state::no_key_r), FUNC(namcos1_state::no_key_w));
 	map(0x2fc000, 0x2fc7ff).ram().share("scratchpad");
-	map(0x2fc800, 0x2fcfff).rw(m_spritegen, FUNC(namcos1_sprite_device::spriteram_r), FUNC(namcos1_sprite_device::spriteram_w));
+	map(0x2fc800, 0x2fcfff).m(m_spritegen, FUNC(namcos1_sprite_device::spriteram_map));
 	map(0x2fd000, 0x2fd01f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control8_r), FUNC(namco_c123tmap_device::control8_w)).mirror(0xfe0);
 	map(0x2fe000, 0x2fe3ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
 	map(0x2ff000, 0x2ff7ff).ram().share(m_triram).mirror(0x800);

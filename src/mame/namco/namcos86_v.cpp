@@ -168,8 +168,6 @@ u32 namcos86_state::sprite_bank_cb(u32 code, u32 bank)
 
 u32 namcos86_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// flip screen is embedded in the sprite control registers
-	m_spritegen->update_flip();
 	m_tilegen[0]->init_scroll(flip_screen());
 	m_tilegen[1]->init_scroll(flip_screen());
 

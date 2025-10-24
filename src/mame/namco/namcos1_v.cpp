@@ -88,7 +88,7 @@ void namcos1_state::video_start()
 
 ***************************************************************************/
 
-std::pair<bool, u8*> namcos1_state::sprite_shadow_cb(u8 color)
+std::pair<bool, u8 const *> namcos1_state::sprite_shadow_cb(u8 color)
 {
 	return std::make_pair(color == 0x7f, m_drawmode_table);
 }
@@ -108,9 +108,6 @@ u32 namcos1_state::sprite_bank_cb(u32 code, u32 bank)
 u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle new_clip = cliprect;
-
-	// flip screen is embedded in the sprite control registers
-	m_spritegen->update_flip();
 
 	// background color
 	bitmap.fill(m_c116->black_pen(), cliprect);

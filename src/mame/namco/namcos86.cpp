@@ -329,7 +329,7 @@ void namcos86_state::cpu1_map(address_map &map)
 	map(0x2000, 0x3fff).rw(m_tilegen[1], FUNC(namco_cus4xtmap_device::vram_r), FUNC(namco_cus4xtmap_device::vram_w));
 
 	map(0x4000, 0x57ff).ram().share("sharedram");
-	map(0x5800, 0x5fff).rw(m_spritegen, FUNC(namcos1_sprite_device::spriteram_r), FUNC(namcos1_sprite_device::spriteram_w));
+	map(0x5800, 0x5fff).m(m_spritegen, FUNC(namcos1_sprite_device::spriteram_map));
 
 	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM
 

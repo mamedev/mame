@@ -30,12 +30,12 @@ namcos1_sprite_device::namcos1_sprite_device(const machine_config &mconfig, cons
 	device_t(mconfig, NAMCOS1_SPRITE, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
 	m_spriteram(*this, "spriteram", 0x800, ENDIANNESS_BIG), // actually used area only
-	m_copy_sprites(false),
-	m_flip_screen(false),
 	m_shadow_cb(*this),
 	m_pri_cb(*this),
 	m_gfxbank_cb(*this),
-	m_flip_cb(*this)
+	m_flip_cb(*this),
+	m_copy_sprites(false),
+	m_flip_screen(false)
 {
 }
 
@@ -52,6 +52,12 @@ void namcos1_sprite_device::device_start()
 
 /**************************************************************************************/
 
+void namcos1_sprite_device::spriteram_map(address_map &map)
+{
+	map(0x0000, 0x0800).ram().w(FUNC(namcos1_sprite_device::spriteram_w)).share(m_spriteram);
+}
+
+
 u8 namcos1_sprite_device::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
@@ -65,6 +71,14 @@ void namcos1_sprite_device::spriteram_w(offs_t offset, u8 data)
 	// a write to this offset tells the sprite chip to buffer the sprite list
 	if (offset == 0x7f2)
 		m_copy_sprites = true;
+
+	// flip screen is embedded in the sprite control registers
+	if (offset == 0x7f6)
+	{
+		const bool flip = BIT(data, 0);
+		if (flip != m_flip_screen)
+			m_flip_cb(m_flip_screen = data);
+	}
 }
 
 
@@ -92,9 +106,9 @@ sprite format (original docs from namcos1.cpp):
 
 void namcos1_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const int sprite_size[4] = { 16, 8, 32, 4 };
-	const u8 *source = &m_spriteram[0x800-0x20]; // the last is NOT a sprite
-	const u8 *finish = &m_spriteram[0];
+	constexpr int sprite_size[4] = { 16, 8, 32, 4 };
+	u8 const *source = &m_spriteram[0x800-0x20]; // the last is NOT a sprite
+	u8 const *const finish = &m_spriteram[0];
 	gfx_element *gfx = this->gfx(0);
 
 	const int sprite_xoffs = m_spriteram[0x07f5] + ((m_spriteram[0x07f4] & 1) << 8);
@@ -134,10 +148,10 @@ void namcos1_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 		sy++; // sprites are buffered and delayed by one scanline
 
-		const std::pair<bool, u8*> shadow = m_shadow_cb(color);
+		const auto [shadow_on, shadow_table] = m_shadow_cb(color);
 
 		gfx->set_source_clip(tx, sizex, ty, sizey);
-		if (shadow.first && (shadow.second != nullptr))
+		if (shadow_on && shadow_table)
 		{
 			gfx->prio_transtable(bitmap,cliprect,
 					sprite,
@@ -146,7 +160,7 @@ void namcos1_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 					sx & 0x1ff,
 					((sy + 16) & 0xff) - 16,
 					screen.priority(), pri_mask,
-					shadow.second);
+					shadow_table);
 		}
 		else
 		{
@@ -176,10 +190,4 @@ void namcos1_sprite_device::copy_sprites()
 
 		m_copy_sprites = false;
 	}
-}
-
-void namcos1_sprite_device::update_flip()
-{
-	m_flip_screen = BIT(m_spriteram[0x7f6], 0);
-	m_flip_cb(m_flip_screen);
 }

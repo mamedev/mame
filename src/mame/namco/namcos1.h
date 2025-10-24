@@ -18,6 +18,7 @@
 
 #include <utility>
 
+
 class namcos1_state : public driver_device
 {
 public:
@@ -138,7 +139,7 @@ protected:
 	void key_type_2_init(int key_id);
 	void key_type_3_init(int key_id, int reg, int rng, int swap4_arg, int swap4, int bottom4, int top4);
 
-	std::pair<bool, u8*> sprite_shadow_cb(u8 color);
+	std::pair<bool, u8 const *> sprite_shadow_cb(u8 color);
 	u32 sprite_pri_cb(u8 attr1, u8 attr2);
 	u32 sprite_bank_cb(u32 code, u32 bank);
 	void TilemapCB(u16 code, int &tile, int &mask);
