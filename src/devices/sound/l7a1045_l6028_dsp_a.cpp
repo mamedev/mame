@@ -79,10 +79,6 @@
     2  ----------------   aaaaaaaaaaaaaaaa   aaaa--------AAAA
         a = loop start address, bits 19-0
         A = loop start address, bits 23-20
-        If bit 15 of m is NOT set, then the base is the offset from the start of the sample
-        to the loop start, and the end of the sample is the loop start plus the multiplier.
-        This is currently speculation based on HNG64 behavior.  Once the MPC3000 runs it should
-        be possible to better understand this.
 
     3  ----------------   vvvvvvvvvvvvvvvv   ----------------
         v = volume envelope starting value (16 bit, maaaaybe signed?)
@@ -114,8 +110,10 @@
 
     9  ----------------   ----------------   ---------------- (written as an atomic update)
 
-    a  ----------------   ----------------   ----------------
-        Unknown, written once on bootup for HNG64 games.
+    a  ----------------   aaaaaaaaaaaaaaaa   vvvvvvvvvvvvvvdd
+        a is sample address in 0x10000 sample buffer
+        v is volume level
+        d is destination, 00 left channel, 01 right channel, 10 ??, 11 feedback to delay buffer
 
     TODO:
     - How does the delay effect work?
@@ -126,10 +124,12 @@
 #include "l7a1045_l6028_dsp_a.h"
 #include "debugger.h"
 
-#define LOG_REGISTERS   (1U << 1)
-#define LOG_READBACK    (1U << 2)
-#define LOG_KEYON       (1U << 3)
-#define LOG_DMA         (1U << 4)
+#define LOG_REGISTERS           (1U << 1)
+#define LOG_READBACK_POSITION   (1U << 2)
+#define LOG_READBACK_VOL        (1U << 3)
+#define LOG_READBACK_FILTER     (1U << 4)
+#define LOG_KEYON               (1U << 5)
+#define LOG_DMA                 (1U << 6)
 
 #define VERBOSE (0)
 
@@ -147,6 +147,9 @@ enum
 	L6028_Filter_Env_Target,
 	L6028_Mixer_Params
 };
+
+static constexpr int CONTROL_DMA_START      = 6;
+static constexpr int CONTROL_KEY_ON         = 8;
 
 DEFINE_DEVICE_TYPE(L7A1045, l7a1045_sound_device, "l7a1045", "L7A1045 L6028 DSP-A")
 
@@ -239,7 +242,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				pos += (frac >> 12);
 				frac &= 0xfff;
 
-				if ((start + pos) >= end)
+				if ((end > start) && ((start + pos) >= end))
 				{
 					pos = (vptr->end - vptr->start) - vptr->loop_start;
 				}
@@ -247,13 +250,12 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				switch (vptr->sample_type)
 				{
 					case 0: // 16-bit linear, little-endian
-						address = ((start << 1) + (pos << 1));
-						sample = (int8_t(m_rom[address + 1]) << 8) | int8_t(m_rom[address]);
-
+						address = ((start << 1) + (pos << 1)) & m_ram_mask;
+						sample = (int8_t(m_rom[address + 1]) << 8) | m_rom[address];
 						break;
 
 					case 1: // 12-bit non-linear, encoded into 8 bits
-						address = (start + pos) & (m_ram_mask);
+						address = (start + pos) & m_ram_mask;
 						data = m_rom[address];
 						sample = (data & 0xfc) >> 2;
 						if (sample & 0x20)
@@ -386,19 +388,20 @@ uint16_t l7a1045_sound_device::voiceregs_r(offs_t offset)
 		m_regs[0][m_cur_channel] |= (uint64_t(current_addr) << 12);
 		m_regs[0][m_cur_channel] |= vptr->frac & 0x0fff;
 
-		LOGMASKED(LOG_REGISTERS, "ch %d cur pos %08x final %012llx\n", m_cur_channel, current_addr, m_regs[0][m_cur_channel]);
+		LOGMASKED(LOG_READBACK_POSITION, "ch %d cur pos %08x final %012llx (%s)\n", m_cur_channel, current_addr, m_regs[0][m_cur_channel], machine().describe_context());
 	}
 	break;
 
 	case L6028_Volume_Env:
 		m_regs[3][m_cur_channel] &= 0xffff'0000'ffff;
 		m_regs[3][m_cur_channel] |= (uint64_t(vptr->env_volume) << 16);
-		LOGMASKED(LOG_READBACK, "ch %d read env vol %x => %012llx\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel]);
+		LOGMASKED(LOG_READBACK_VOL, "ch %d read env vol %x => %012llx (%s)\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel], machine().describe_context());
 		break;
 
 	case L6028_Filter_Env:
 		m_regs[5][m_cur_channel] &= 0xffff'0000'ffff;
 		m_regs[5][m_cur_channel] |= (uint64_t(vptr->flt_freq) << 16);
+		LOGMASKED(LOG_READBACK_FILTER, "ch %d read filter cutoff %x => %012llx\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel]);
 		break;
 	}
 
@@ -457,6 +460,12 @@ void l7a1045_sound_device::voiceregs_w(offs_t offset, uint16_t data)
 		case L6028_Volume_Env:
 			vptr->env_volume = (m_regs[L6028_Volume_Env][m_cur_channel] & 0xffff'0000) >> 16;
 			vptr->env_pos = 0;
+
+			// MPC3000 writes timed 0 to offset 0 to silence
+			if (offset == 0 && data == 0)
+			{
+				m_key &= ~(1 << m_cur_channel);
+			}
 			break;
 
 		// envelope target volumes plus step rate
@@ -518,15 +527,22 @@ uint16_t l7a1045_sound_device::control_r()
 {
 	return 0;
 }
-
-// 4f is written here to assert DRQ, at which point the V53 DMAs the key on word
+// bit 0 = set for wave DMA transfers
+// bit 1 = set for wave DMA transfers
+// bit 2 = set for wave DMA transfers
+// bit 3 = set for stereo recording and wave DMA transfers
+// bit 4 = set for stereo recording
+// bit 5 = DMA direction (0 = write, 1 = read)
+// bit 6 = DMA start
+// bit 7 = set when DMA complete?
+// bit 8 = key on current channel
 void l7a1045_sound_device::control_w(uint16_t data)
 {
 	m_stream->update();
 
 	LOGMASKED(LOG_REGISTERS, "%s: %04x to control (ch %d)\n", tag(), data, m_cur_channel);
 
-	if (BIT(data, 8)) // key on
+	if (BIT(data, CONTROL_KEY_ON))
 	{
 		l7a1045_voice* const vptr = &m_voice[m_cur_channel];
 
@@ -542,7 +558,7 @@ void l7a1045_sound_device::control_w(uint16_t data)
 		LOGMASKED(LOG_KEYON, "      raw 6 %012llx 7 %012llx\n", m_regs[6][m_cur_channel], m_regs[7][m_cur_channel]);
 	}
 
-	m_drq_handler(BIT(data, 0));
+	m_drq_handler(BIT(data, CONTROL_DMA_START));
 }
 
 void l7a1045_sound_device::atomic_w(uint16_t data)
@@ -551,23 +567,7 @@ void l7a1045_sound_device::atomic_w(uint16_t data)
 	m_regs[m_cur_register][m_cur_channel] = 0;
 }
 
-uint8_t l7a1045_sound_device::dma_r_cb(offs_t offset)
-{
-	const offs_t byteoffs = m_voice[0].start + m_voice[0].pos;
-	LOGMASKED(LOG_DMA, "%s DMA 8 read: start %08x offs %08x => %08x\n", tag(), m_voice[0].start, m_voice[0].pos, byteoffs);
-	m_voice[0].pos++;
-	return m_rom[byteoffs];
-}
-
-void l7a1045_sound_device::dma_w_cb(offs_t offset, uint8_t data)
-{
-	const offs_t byteoffs = m_voice[0].start + m_voice[0].pos;
-	LOGMASKED(LOG_DMA, "%s DMA 8 write %02x: start %08x offs %08x => %08x\n", tag(), data, m_voice[0].start, m_voice[0].pos, byteoffs);
-	m_voice[0].pos++;
-	m_rom[byteoffs] = data;
-}
-
-uint16_t l7a1045_sound_device::dma_r16_cb(offs_t offset, uint16_t mem_mask)
+uint16_t l7a1045_sound_device::dma_r16_cb()
 {
 	const offs_t byteoffs = (m_voice[0].start << 1) + (m_voice[0].pos << 1);
 	LOGMASKED(LOG_DMA, "%s DMA 16 read: start %08x offs %08x => %08x\n", tag(), m_voice[0].start, m_voice[0].pos, byteoffs);
@@ -580,7 +580,7 @@ uint16_t l7a1045_sound_device::dma_r16_cb(offs_t offset, uint16_t mem_mask)
 	return m_rom[byteoffs] | (m_rom[byteoffs + 1] << 8);
 }
 
-void l7a1045_sound_device::dma_w16_cb(offs_t offset, uint16_t data, uint16_t mem_mask)
+void l7a1045_sound_device::dma_w16_cb(uint16_t data)
 {
 	const offs_t byteoffs = (m_voice[0].start << 1) + (m_voice[0].pos << 1);
 	LOGMASKED(LOG_DMA, "%s DMA 16 write %04x: start %08x offs %08x => %08x\n", tag(), data, m_voice[0].start, m_voice[0].pos, byteoffs);

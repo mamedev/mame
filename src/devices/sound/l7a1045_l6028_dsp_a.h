@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "dirom.h"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -12,19 +14,32 @@
 // ======================> l7a1045_sound_device
 
 class l7a1045_sound_device : public device_t,
-							public device_sound_interface
+							 public device_sound_interface
 {
 public:
+	enum
+	{
+		L6028_LEFT = 0,     // left channel of main stereo pair
+		L6028_RIGHT,        // right channel of main stereo pair
+
+		L6028_OUT0,         // discrete outputs, numbered according to Akai usage
+		L6028_OUT1,
+		L6028_OUT2,
+		L6028_OUT3,
+		L6028_OUT4,
+		L6028_OUT5,
+		L6028_OUT6,
+		L6028_OUT7
+	};
+
 	l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void map(address_map &map);
 
 	auto drq_handler_cb() { return m_drq_handler.bind(); }
 
-	uint8_t dma_r_cb(offs_t offset);
-	void dma_w_cb(offs_t offset, uint8_t data);
-	uint16_t dma_r16_cb(offs_t offset, uint16_t mem_mask);
-	void dma_w16_cb(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t dma_r16_cb();
+	void dma_w16_cb(uint16_t data);
 
 protected:
 	// device-level overrides
