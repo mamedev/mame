@@ -6,6 +6,7 @@
 
 #include "amd98.h"
 #include "fdd_2d.h"
+#include "pc9801_14.h"
 #include "pc9801_26.h"
 #include "pc9801_55.h"
 #include "pc9801_86.h"
@@ -20,7 +21,7 @@
 void pc98_cbus_devices(device_slot_interface &device)
 {
 	// official HW
-//  PC-9801-14
+	device.option_add("pc9801_14",  PC9801_14);
 	device.option_add("pc9801_26",  PC9801_26);
 	device.option_add("pc9801_55u", PC9801_55U);
 	device.option_add("pc9801_55l", PC9801_55L);

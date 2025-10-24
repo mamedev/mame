@@ -60,12 +60,14 @@ void it8705f_device::device_start()
 	m_isa->set_dma_channel(1, this, true);
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
+	save_pointer(NAME(m_activate), 9);
 }
 
 void it8705f_device::device_reset()
 {
 	m_index = 0;
 	m_lock_sequence_index = 0;
+	std::fill(std::begin(m_activate), std::end(m_activate), false);
 
 	m_fdc_irq_line = 6;
 	m_fdc_drq_line = 2;

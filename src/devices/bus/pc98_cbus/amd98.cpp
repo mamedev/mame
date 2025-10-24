@@ -8,7 +8,7 @@ System Sacom AMD-98 (AmuseMent boarD)
 Superseded by later NEC in-house sound boards
 
 TODO:
-- not sure if it's AY8910 or YM2203, from a PCB pic it looks with stock AY logos?
+- not sure if it's AY8910 or YM2149, from a PCB pic it looks with stock AY logos?
 - f/f not completely understood;
 - PIT control;
 - PCM section;
