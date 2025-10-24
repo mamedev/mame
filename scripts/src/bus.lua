@@ -4540,6 +4540,8 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/coco_wpk.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_wpk2p.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_wpk2p.h",
+		MAME_DIR .. "src/devices/bus/coco/coco_xsid.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_xsid.h",
 		MAME_DIR .. "src/devices/bus/coco/cococart.cpp",
 		MAME_DIR .. "src/devices/bus/coco/cococart.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_amtor.cpp",
