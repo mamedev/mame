@@ -613,6 +613,7 @@ ROM_START( mephistoa ) // module s/n 00226xx (898xx Mask ROMs), 01011xx (911xx M
 	// 898xx Mask ROMs have the same contents as 911xx Mask ROMs, some modules have both 898xx and 911xx
 ROM_END
 
+
 ROM_START( mephisto1x )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("3-2911_adi.1", 0x0000, 0x1000, CRC(0d62fa67) SHA1(b4bd934fec595f37f99b74eb341d220c511c07a5) ) // CM3200-2
@@ -629,9 +630,9 @@ ROM_END
 ROM_START( mephisto2 ) // module s/n 01142xx (HN462532G EPROMs), 00476xx (TC5334P Mask ROMs)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("4005_02_351_02.1", 0x0000, 0x1000, CRC(5b13d7bf) SHA1(e1b7dee278a03f75e8a1554715fca4c7fbbc1cb8) ) // HN462532G
-	ROM_LOAD("4005_02_351_02.2", 0x1000, 0x1000, CRC(e93bf521) SHA1(42f9adce0d5e25b1b9d10217f8e3e0994d7b70d5) ) // "
-	ROM_LOAD("4005_02_351_02.3", 0x2000, 0x1000, CRC(430dac62) SHA1(a0e23fcb4cfa27778a9398bd4994a7792e4541d0) ) // "
-	// TC5334P Mask ROM contents is the same (labels 5619 03 351, 5620 03 351, 5621 03 351)
+	ROM_LOAD("4005_02_352_02.2", 0x1000, 0x1000, CRC(e93bf521) SHA1(42f9adce0d5e25b1b9d10217f8e3e0994d7b70d5) ) // "
+	ROM_LOAD("4005_02_353_02.3", 0x2000, 0x1000, CRC(430dac62) SHA1(a0e23fcb4cfa27778a9398bd4994a7792e4541d0) ) // "
+	// TC5334P Mask ROM contents is the same (labels 5619 03 351, 5620 03 352, 5621 03 353)
 ROM_END
 
 ROM_START( mephisto2a ) // module s/n 01085xx
