@@ -4,17 +4,9 @@
 #define MAME_SOUND_L7A1045_L6028_DSP_A_H
 
 #pragma once
-
-#include "dirom.h"
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> l7a1045_sound_device
-
 class l7a1045_sound_device : public device_t,
-							 public device_sound_interface
+							 public device_sound_interface,
+							 public device_memory_interface
 {
 public:
 	enum
@@ -48,6 +40,9 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	static const int NUM_VOICES = 32;
@@ -84,7 +79,6 @@ private:
 	sound_stream    *m_stream;
 	l7a1045_voice   m_voice[NUM_VOICES];
 	uint32_t        m_key;
-	required_region_ptr<uint8_t> m_rom;
 
 	uint8_t m_cur_channel;
 	uint8_t m_cur_register;
@@ -92,7 +86,9 @@ private:
 
 	uint64_t m_regs[REGS_PER_VOICE][NUM_VOICES];
 
-	uint32_t m_ram_mask;
+	address_space_config m_mem_config;
+
+	memory_access<25, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
 
 	void voice_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t voiceregs_r(offs_t offset);

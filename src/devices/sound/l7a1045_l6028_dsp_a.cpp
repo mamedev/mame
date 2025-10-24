@@ -159,11 +159,11 @@ static constexpr int channel_remap[8] = { 3, 1, 7, 5, 2, 0, 6, 4 };
 l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, L7A1045, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
+	  device_memory_interface(mconfig, *this),
 	  m_drq_handler(*this),
 	  m_stream(nullptr),
 	  m_key(0),
-	  m_rom(*this, DEVICE_SELF),
-	  m_ram_mask(0)
+	  m_mem_config("l6028", ENDIANNESS_LITTLE, 16, 25)
 {
 }
 
@@ -175,11 +175,14 @@ void l7a1045_sound_device::map(address_map &map)
 	map(0x000c, 0x000d).w(FUNC(l7a1045_sound_device::atomic_w));
 }
 
+device_memory_interface::space_config_vector l7a1045_sound_device::memory_space_config() const
+{
+	return space_config_vector{std::make_pair(AS_DATA, &m_mem_config)};
+}
+
 void l7a1045_sound_device::device_start()
 {
-	// Check that the ROM region length is a power of two that we can make a mask from
-	assert(!(m_rom.length() & (m_rom.length() - 1)));
-	m_ram_mask = m_rom.length() - 1;
+	space(AS_DATA).cache(m_cache);
 
 	// Allocate the stream
 	m_sample_rate = clock() / 768.0f;
@@ -250,13 +253,13 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				switch (vptr->sample_type)
 				{
 					case 0: // 16-bit linear, little-endian
-						address = ((start << 1) + (pos << 1)) & m_ram_mask;
-						sample = (int8_t(m_rom[address + 1]) << 8) | m_rom[address];
+						address = ((start << 1) + (pos << 1));
+						sample = (int16_t)m_cache.read_word(address);
 						break;
 
 					case 1: // 12-bit non-linear, encoded into 8 bits
-						address = (start + pos) & m_ram_mask;
-						data = m_rom[address];
+						address = (start + pos);
+						data = m_cache.read_byte(address);
 						sample = (data & 0xfc) >> 2;
 						if (sample & 0x20)
 							sample -= 0x40;
@@ -573,11 +576,7 @@ uint16_t l7a1045_sound_device::dma_r16_cb()
 	LOGMASKED(LOG_DMA, "%s DMA 16 read: start %08x offs %08x => %08x\n", tag(), m_voice[0].start, m_voice[0].pos, byteoffs);
 
 	m_voice[0].pos++;
-	if (byteoffs > m_ram_mask)
-	{
-		return 0xffff;
-	}
-	return m_rom[byteoffs] | (m_rom[byteoffs + 1] << 8);
+	return m_cache.read_word(byteoffs);
 }
 
 void l7a1045_sound_device::dma_w16_cb(uint16_t data)
@@ -586,9 +585,5 @@ void l7a1045_sound_device::dma_w16_cb(uint16_t data)
 	LOGMASKED(LOG_DMA, "%s DMA 16 write %04x: start %08x offs %08x => %08x\n", tag(), data, m_voice[0].start, m_voice[0].pos, byteoffs);
 
 	m_voice[0].pos++;
-	if (byteoffs <= m_ram_mask)
-	{
-		m_rom[byteoffs] = data & 0xff;
-		m_rom[byteoffs + 1] = (data >> 8) & 0xff;
-	}
+	m_cache.write_word(byteoffs, data);
 }

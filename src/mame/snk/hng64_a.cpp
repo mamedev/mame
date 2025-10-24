@@ -273,7 +273,10 @@ void hng64_state::tcu_tm2_cb(int state)
 	m_audiocpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
+void hng64_state::dsp_map(address_map &map)
+{
+	map(0x0000'0000, 0x00ff'ffff).rom().region("l7a1045", 0);
+}
 
 void hng64_state::hng64_audio_base(machine_config &config)
 {
@@ -290,6 +293,7 @@ void hng64_state::hng64_audio_base(machine_config &config)
 	m_audiocpu->tout_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
 
 	L7A1045(config, m_dsp, 33.8688_MHz_XTAL);
+	m_dsp->set_addrmap(AS_DATA, &hng64_state::dsp_map);
 	m_dsp->drq_handler_cb().set(m_audiocpu, FUNC(v53a_device::dreq_w<3>));
 }
 
