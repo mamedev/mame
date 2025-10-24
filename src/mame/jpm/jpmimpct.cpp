@@ -106,6 +106,7 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 #include "jpmimpct.lh"
 #include "cluedo.lh"
+#include "trivialp.lh"
 #include "scrabble.lh"
 #include "hngmnjpm.lh"
 #include "coronatn.lh"
@@ -1861,9 +1862,9 @@ GAMEL( 1995, cluedo,    0,        impact_video_touch, cluedo,   jpmimpct_video_s
 GAMEL( 1995, cluedod,   cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_cluedo )
 GAMEL( 1995, cluedo2c,  cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_cluedo )
 GAMEL( 1995, cluedo2,   cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_cluedo )
-GAME( 1996, trivialp,  0,        impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpd, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpo, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, trivialp,  0,        impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE, layout_trivialp )
+GAMEL( 1996, trivialpd, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE, layout_trivialp )
+GAMEL( 1996, trivialpo, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE, layout_trivialp )
 GAMEL( 1997, scrabble,  0,        impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE, layout_scrabble )
 GAMEL( 1997, scrabbled, scrabble, impact_video_touch, scrabble, jpmimpct_video_state, empty_init, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE, layout_scrabble )
 
