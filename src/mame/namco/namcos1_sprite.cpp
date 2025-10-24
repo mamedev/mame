@@ -54,7 +54,7 @@ void namcos1_sprite_device::device_start()
 
 void namcos1_sprite_device::spriteram_map(address_map &map)
 {
-	map(0x0000, 0x0800).ram().w(FUNC(namcos1_sprite_device::spriteram_w)).share(m_spriteram);
+	map(0x0000, 0x07ff).ram().w(FUNC(namcos1_sprite_device::spriteram_w)).share(m_spriteram);
 }
 
 
