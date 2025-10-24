@@ -762,6 +762,13 @@ ROM_START( lxcmcybt ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcyfd ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "dory.u2", 0x00000, 0x4000000, CRC(315bf615) SHA1(3b8b9c6428084ae82a38b7bcfe029180501f1488) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcydpn ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "dp150.bin", 0x00000, 0x4000000, CRC(dce19f81) SHA1(e74190d5eea4c31ec0cdcc374b988db2dc1d37c6) )
@@ -1231,6 +1238,7 @@ CONS( 200?, lxcmcyfz,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_s
 CONS( 2018, lxcmcypj,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks (JL2365PJM)", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcyba,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcycr,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2365DC)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyfd,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Finding Dory", MACHINE_NOT_WORKING )
 CONS( 2018, lxcmcyppa, lxcmcypp,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-5)", MACHINE_NOT_WORKING ) // yes, it has the bitswap even if it's a JL2365 unit
 // JL2367 models (150-in-1 versions, newer case style)
 CONS( 2018, lxcmcypp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_NOT_WORKING )
