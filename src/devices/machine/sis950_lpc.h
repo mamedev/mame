@@ -169,7 +169,7 @@ private:
 	bool m_at_spkrdata = 0;
 	uint8_t m_channel_check = 0;
 	int m_dma_channel = -1;
-//  bool m_cur_eop = false;
+	bool m_cur_eop = false;
 	uint16_t m_dma_high_byte = 0;
 
 	void cpu_a20_w(int state);
@@ -181,6 +181,30 @@ private:
 	void nmi_control_w(uint8_t data);
 	void at_speaker_set_spkrdata(uint8_t data);
 	void iochck_w(int state);
+
+	uint8_t pc_dma8237_0_dack_r();
+	uint8_t pc_dma8237_1_dack_r();
+	uint8_t pc_dma8237_2_dack_r();
+	uint8_t pc_dma8237_3_dack_r();
+	uint8_t pc_dma8237_5_dack_r();
+	uint8_t pc_dma8237_6_dack_r();
+	uint8_t pc_dma8237_7_dack_r();
+	void pc_dma8237_0_dack_w(uint8_t data);
+	void pc_dma8237_1_dack_w(uint8_t data);
+	void pc_dma8237_2_dack_w(uint8_t data);
+	void pc_dma8237_3_dack_w(uint8_t data);
+	void pc_dma8237_5_dack_w(uint8_t data);
+	void pc_dma8237_6_dack_w(uint8_t data);
+	void pc_dma8237_7_dack_w(uint8_t data);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
+	void at_dma8237_out_eop(int state);
 };
 
 DECLARE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device)

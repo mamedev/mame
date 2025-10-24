@@ -2105,18 +2105,18 @@ u8 apple2e_state::c000_r(offs_t offset)
 
 			if (m_accel_unlocked)
 			{
-				if (offset == 0x5b)
+				if (offset == 0x5b) // Zip status flags
 				{
+					// bits 0-1 are cache size; [8, 16, 32, 64]kB
+					const u8 b01 = 0x03;
+					// bit 3 is set if a temporary delay is active due to slot or softswitch access
+					const u8 b3 = m_accel_temp_slowdown ? 0x08 : 0x00;
+					// bit 4 is set if the Zip is disabled
+					const u8 b4 = m_accel_fast ? 0x00 : 0x10;
 					// bit 7 is a 1.0035 millisecond clock; the value changes every 0.50175 milliseconds
-					const int time = machine().time().as_ticks(1.0f / 0.00050175f);
-					if (time & 1)
-					{
-						return 0x03;
-					}
-					else
-					{
-						return 0x83;
-					}
+					const int time = machine().time().as_ticks(1.0F / 0.00050175F);
+					const u8 b7 = (time & 1) ? 0x80 : 0x00;
+					return b7 | b4 | b3 | b01;
 				}
 				else if (offset == 0x5c)
 				{

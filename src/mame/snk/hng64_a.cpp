@@ -259,16 +259,6 @@ u8 hng64_state::dma_memr_cb(offs_t offset)
 	return m_audiocpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-void hng64_state::dma_iow3_cb(u8 data)
-{
-	// currently it reads a block of 0x20 '0x00' values from a very specific block of RAM where there is a 0x20 space in the data and transfers them repeatedly, I assume
-	// this is some kind of buffer for the audio or DSP and eventually will be populated with other values...
-	// if this comes to life maybe something interesting is happening!
-
-	if (data != 0x00)
-		LOGSOUND("dma_iow3_cb %02x\n", data);
-}
-
 void hng64_state::tcu_tm0_cb(int state)
 {
 	// this goes high once near startup
@@ -292,7 +282,8 @@ void hng64_state::hng64_audio_base(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &hng64_state::sound_io_map);
 	m_audiocpu->out_hreq_cb().set(FUNC(hng64_state::dma_hreq_cb));
 	m_audiocpu->in_memr_cb().set(FUNC(hng64_state::dma_memr_cb));
-	m_audiocpu->out_iow_cb<3>().set(FUNC(hng64_state::dma_iow3_cb));
+	m_audiocpu->in_io16r_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_r16_cb));
+	m_audiocpu->out_io16w_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_w16_cb));
 
 	m_audiocpu->tout_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
 	m_audiocpu->tout_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
@@ -310,10 +301,10 @@ void hng64_state::hng64_audio(machine_config &config)
 	SPEAKER(config, "rear", 1).rear_center();
 	SPEAKER(config, "subwoofer", 1).lfe();
 
-	m_dsp->add_route(0, "speaker", 1.0, 0);
-	m_dsp->add_route(1, "speaker", 1.0, 1);
-	m_dsp->add_route(9, "rear", 1.0, 0);
-	m_dsp->add_route(8, "subwoofer", 1.0, 0);
+	m_dsp->add_route(l7a1045_sound_device::L6028_LEFT, "speaker", 1.0, 0);
+	m_dsp->add_route(l7a1045_sound_device::L6028_RIGHT, "speaker", 1.0, 1);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT7, "rear", 1.0, 0);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT6, "subwoofer", 1.0, 0);
 }
 
 void hng64_state::hng64_audio_bbust2(machine_config &config)
@@ -325,9 +316,9 @@ void hng64_state::hng64_audio_bbust2(machine_config &config)
 	SPEAKER(config, "gun_2", 1).front_center();
 	SPEAKER(config, "gun_3", 1).front_center();
 
-	m_dsp->add_route(0, "speaker", 1.0, 0);
-	m_dsp->add_route(1, "speaker", 1.0, 1);
-	m_dsp->add_route(4, "gun_1", 1.0, 0);
-	m_dsp->add_route(9, "gun_2", 1.0, 0);
-	m_dsp->add_route(8, "gun_3", 1.0, 0);
+	m_dsp->add_route(l7a1045_sound_device::L6028_LEFT, "speaker", 1.0, 0);
+	m_dsp->add_route(l7a1045_sound_device::L6028_RIGHT, "speaker", 1.0, 1);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT2, "gun_1", 1.0, 0);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT7, "gun_2", 1.0, 0);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT6, "gun_3", 1.0, 0);
 }

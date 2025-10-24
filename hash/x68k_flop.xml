@@ -23098,18 +23098,6 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<software name="akazucc" supported="no">
-		<!-- same content as the PC98 disk! -->
-		<description>Akazukin Cha Cha - CG Works ver 1.00</description>
-		<year>1994</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="akazukin_cha_cha_cg.xdf" size="1261568" crc="6062e4cf" sha1="910c826b387519601db369b8064e4eb488cdd00c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="akazopa">
 		<description>Akazukin Cha Cha no Chotto dake yo - Otameshi Plus Alpha ver 0.53</description>
 		<year>1996</year>

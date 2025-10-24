@@ -51,7 +51,7 @@ private:
 	required_device<upd7201_device> m_serial1;  // Cluster networking and Keyboard
 //	required_device<upd7201_device> m_serial2;  // RS-232C ports
 
-	required_memory_region m_fontrom;
+	required_region_ptr<u8> m_fontrom;
 
 	void pit_out0_w(int state);
 	void pit_out1_w(int state);
@@ -78,17 +78,13 @@ void aws_state::pit_out2_w(int state)
 
 I8275_DRAW_CHARACTER_MEMBER(aws_state::display_pixels)
 {
-	using namespace i8275_attributes;
-
-	rgb_t const pixel = rgb_t(0x00, 0xff, 0x00);
-	rgb_t const black = rgb_t(0x00, 0x00, 0x00);
-
+//	using namespace i8275_attributes;
 	for(int i=0;i<9;i++)
 	{
 		if(i>=7)
-			bitmap.pix(y, x + i) = black;
+			bitmap.pix(y, x + i) = rgb_t::black();
 		else
-			bitmap.pix(y, x + i) = BIT(m_fontrom->base()[((linecount & 0x0f) << 7) | (charcode & 0x7f)],i) ? pixel : black;
+			bitmap.pix(y, x + i) = BIT(m_fontrom[((linecount & 0x0f) << 7) | (charcode & 0x7f)],i) ? rgb_t::white() : rgb_t::black();
 	}
 }
 
@@ -120,13 +116,13 @@ void aws_state::aws_mem(address_map &map)
 
 void aws_state::aws_io(address_map &map)
 {
-	map(0x0000, 0x000f).rw("dmac", FUNC(i8257_device::read), FUNC(i8257_device::write));
-	map(0x0020, 0x0023).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write)).umask16(0x00ff);
-	map(0x0040, 0x0047).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0060, 0x0067).rw("serial1", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::cd_ba_w)).umask16(0x00ff);
+	map(0x0000, 0x000f).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x0020, 0x0023).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)).umask16(0x00ff);
+	map(0x0040, 0x0047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x0060, 0x0067).rw(m_serial1, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::cd_ba_w)).umask16(0x00ff);
 	// 0x80-0x8f - i8272/uPD765 floppy or 8X320 HDC
-	map(0x0080, 0x008f).m("fdc", FUNC(i8272a_device::map));
-	map(0x00a0, 0x00a1).rw("pic",FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0080, 0x008f).m(m_fdc, FUNC(i8272a_device::map));
+	map(0x00a0, 0x00a1).rw(m_pic,FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	// 0xa4      - Extended communication status/controller
 	// 0xa8-0xab - uPD7201 serial (RS-232)
 	// 0xac-0xaf - 8253 timer (RS-232)
@@ -150,7 +146,7 @@ void aws_state::aws(machine_config &config)
 	m_dmac->out_hrq_cb().set(FUNC(aws_state::hrq_w));
 	m_dmac->in_memr_cb().set(FUNC(aws_state::ram_r));
 	m_dmac->out_memw_cb().set(FUNC(aws_state::ram_w));
-	m_dmac->out_iow_cb<2>().set("crtc",FUNC(i8275_device::dack_w));
+	m_dmac->out_iow_cb<2>().set(m_crtc,FUNC(i8275_device::dack_w));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
@@ -161,7 +157,7 @@ void aws_state::aws(machine_config &config)
 	m_pit->out_handler<2>().set(FUNC(aws_state::pit_out2_w));  // Timer interrupt
 
 	UPD7201(config, m_serial1, 24_MHz_XTAL / 8);
-	m_serial1->out_int_callback().set("pic",FUNC(pic8259_device::ir1_w));
+	m_serial1->out_int_callback().set(m_pic,FUNC(pic8259_device::ir1_w));
 
 	// video
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -169,13 +165,13 @@ void aws_state::aws(machine_config &config)
 	screen.set_size(720, 320);
 	screen.set_visarea(0, 719, 0, 319);
 	screen.set_refresh_hz(60);
-	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
+	screen.set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
 
 	I8275(config, m_crtc, 17.82_MHz_XTAL / 9);  // divisor unsure?
 	m_crtc->set_character_width(9);
 	// TODO: display callback
 	m_crtc->set_display_callback(FUNC(aws_state::display_pixels));
-	m_crtc->drq_wr_callback().set("dmac",FUNC(i8257_device::dreq2_w));
+	m_crtc->drq_wr_callback().set(m_dmac,FUNC(i8257_device::dreq2_w));
 	m_crtc->set_screen("screen");
 
 	// FDC board
@@ -188,7 +184,7 @@ ROM_START( aws220 )
 	ROM_REGION16_LE( 0x1000, "bios", 0)
 	ROM_LOAD( "72-00077_l.bin",  0x000000, 0x001000, CRC(87ca4912) SHA1(c4f7ecda8d007bb212166cfa3cdf494da3966ca9) )  // bootstrap ROM v6.0
 
-	ROM_REGION16_LE( 0x1000, "fontrom", 0 )
+	ROM_REGION( 0x1000, "fontrom", 0 )
 	ROM_LOAD( "72-00098_r.bin",  0x000000, 0x001000, CRC(e74c12a7) SHA1(0cde785aad1bdad5b44c41ba5b05bfb0eb0b1092) )
 
 ROM_END

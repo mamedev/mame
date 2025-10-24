@@ -26,3 +26,9 @@ name corresponding the system short name (or ROM set name) with the extension
 file **mooncrst.hi** in the **hiscore** folder in your plugin data folder.  The
 settings for the hiscore support plugin are stored in the file **plugin.cfg** in
 the **hiscore** folder in the plugin data folder (this file is in JSON format).
+
+The hiscore support plugin can be disabled on a game-by-game basis by toggling the 
+**Enable Hiscore Support for this game** option within the plugin's menu.  By
+default, the plugin is enabled for all games.  Games that have been excluded are
+tracked in a json file **exclude_games.json** that is stored in the 
+**plugins/hiscore** folder.

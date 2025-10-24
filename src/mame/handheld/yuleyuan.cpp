@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
+// Driver for virtual pets by Yule Yuan (育乐元)
+
 // TODO: code is scrambled/encrypted, put this where it belongs after descrambling
 // (probably a GeneralPlus)
 

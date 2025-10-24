@@ -24,13 +24,12 @@ Undumped games known to run on this PCB:
 * Multi Spin
 
 TODO
-- EEPROM write doesn't work;
+- EEPROM write doesn't always work;
 - layout for lamps;
 - sprite colors aren't always correct (i.e. specd9 title screen). Is palette banked, too?;
 - verify sprites / tilemaps priorities;
 - flip screen support;
 - only a small part of the videoregs are (perhaps) understood;
-- d9flower needs correct EEPROM;
 - IRQ handling not 100% correct;
 - device-ify ES-9409 and share with excellent/dblcrown.cpp.
 */
@@ -506,7 +505,7 @@ ROM_START( d9flower ) // Dream 9 Flower string, but images seem more Flower 9 Dr
 	ROM_LOAD( "5.u23", 0x000000, 0x080000, CRC(b6ad2e58) SHA1(84c0cdc155f641d4e5d8ae99acbfa5b297762418) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, CRC(c52c6e49) SHA1(7e5920baf45f68e7fc5f0b5640fa121a19608224) )
+	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, CRC(3ffcac74) SHA1(43bd5324b27e9859f235c5d9b1545e012431a5a4) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "3.u37", 0x000, 0x117, BAD_DUMP CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // not dumped for this set, but marked same
@@ -525,7 +524,7 @@ ROM_START( d9flowera ) // same GFX / sound ROMs as d9flower, updated program (bu
 	ROM_LOAD( "j5.u23", 0x000000, 0x080000, CRC(b6ad2e58) SHA1(84c0cdc155f641d4e5d8ae99acbfa5b297762418) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, CRC(3ffcac74) SHA1(43bd5324b27e9859f235c5d9b1545e012431a5a4) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "003.u37", 0x000, 0x117, BAD_DUMP CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // not dumped for this set, but probably same
