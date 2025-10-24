@@ -94,6 +94,7 @@ void pc9801_14_device::io_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) { m_pit->write(2, data); }));
 	map(0x018e, 0x018e).lrw8(
 		NAME([this] (offs_t offset) {
+			LOG("PC9801-14: read DSW\n");
 			return 0x80; // dip switch
 		}),
 		NAME([this] (offs_t offset, u8 data) {
