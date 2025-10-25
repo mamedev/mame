@@ -49352,6 +49352,9 @@ jackrabts
 monymony
 monymony2
 
+@source:zilog/s8k.cpp
+s8000
+
 @source:zpa/iq151.cpp
 iq151
 
