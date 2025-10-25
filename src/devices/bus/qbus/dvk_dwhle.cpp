@@ -16,6 +16,8 @@
 #include "imagedev/harddriv.h"
 #include "machine/pdp11.h"
 
+#include <algorithm>
+
 
 #define LOG_DBG     (1U << 1)
 
@@ -93,16 +95,10 @@ public:
 	// construction/destruction
 	dvk_dwhle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	std::error_condition load_hd(device_image_interface &image);
-	void unload_hd(device_image_interface &image);
-
-	uint16_t read(offs_t offset);
-	void write(offs_t offset, uint16_t data);
-
 	virtual void init_w() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -110,7 +106,7 @@ protected:
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
-	virtual void z80daisy_irq_reti() override {};
+	virtual void z80daisy_irq_reti() override { }
 
 	TIMER_CALLBACK_MEMBER(wait_tick);
 	TIMER_CALLBACK_MEMBER(seek_tick);
@@ -118,17 +114,23 @@ protected:
 	TIMER_CALLBACK_MEMBER(write_tick);
 
 private:
-	bool m_installed;
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data);
 
-	line_state m_drqa, m_drqb;
+	std::error_condition load_hd(device_image_interface &image);
+	void unload_hd(device_image_interface &image);
 
 	void command(int command);
 	int sector_to_lba(unsigned int cylinder, unsigned int head, unsigned int sector, uint32_t *lba);
 
-	inline void raise_drqa();
-	inline void clear_drqa();
-	inline void raise_drqb();
-	inline void clear_drqb();
+	void raise_drqa();
+	void clear_drqa();
+	void raise_drqb();
+	void clear_drqb();
+
+	bool m_installed;
+
+	line_state m_drqa, m_drqb;
 
 	harddisk_image_device *m_image;
 	const hard_disk_file::info *m_hd_geom;
@@ -205,10 +207,10 @@ void dvk_dwhle_device::device_reset()
 
 void dvk_dwhle_device::init_w()
 {
-	memset(m_regs, 0, sizeof(m_regs));
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 	m_regs[REGISTER_ERR] = 128/4;
-	m_regs[REGISTER_CSR] = KZDCSR_DONE|KZDCSR_DRDY;
-	m_regs[REGISTER_SI] = KZDSI_DONE|KZDSI_SLOW;
+	m_regs[REGISTER_CSR] = KZDCSR_DONE | KZDCSR_DRDY;
+	m_regs[REGISTER_SI] = KZDSI_DONE | KZDSI_SLOW;
 
 	m_drqa = m_drqb = CLEAR_LINE;
 	m_bus->birq4_w(CLEAR_LINE);

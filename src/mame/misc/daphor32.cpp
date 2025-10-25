@@ -43,10 +43,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	//required_device<ef9364_device> m_ef9364;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_device<palette_device> m_palette;
-
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -62,9 +58,14 @@ private:
 	void ppi2_portc_w(uint8_t data);
 	void ppi3_portc_w(uint8_t data);
 
+	void kbd_put(uint8_t data);
+
+	//required_device<ef9364_device> m_ef9364;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_device<palette_device> m_palette;
+
 	uint8_t m_ppi_c;
 
-	void kbd_put(uint8_t data);
 	uint8_t m_kbd_data;
 };
 
@@ -73,7 +74,7 @@ void daphor_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom().region("maincpu", 0);
 	map(0x6000, 0x8fff).ram();
-	map(0xe000, 0xffff).ram().share("videoram");
+	map(0xe000, 0xffff).ram().share(m_videoram);
 }
 
 void daphor_state::io_map(address_map &map)

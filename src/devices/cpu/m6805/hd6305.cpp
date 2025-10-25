@@ -22,7 +22,7 @@ TODO:
 #define LOG_MISC    (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_SCI | LOG_MISC)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGIOPORT(...)  LOGMASKED(LOG_IOPORT, __VA_ARGS__)
@@ -128,15 +128,15 @@ void hd6305_device::port_ddr_w(u8 data)
 {
 	if(data != m_port_ddr[Port]) {
 		LOGIOPORT("port %d ddr %c%c%c%c%c%c%c%c\n",
-			 Port,
-			 BIT(data, 7) ? 'o': 'i',
-			 BIT(data, 6) ? 'o': 'i',
-			 BIT(data, 5) ? 'o': 'i',
-			 BIT(data, 4) ? 'o': 'i',
-			 BIT(data, 3) ? 'o': 'i',
-			 BIT(data, 2) ? 'o': 'i',
-			 BIT(data, 1) ? 'o': 'i',
-			 BIT(data, 0) ? 'o': 'i');
+				Port,
+				BIT(data, 7) ? 'o': 'i',
+				BIT(data, 6) ? 'o': 'i',
+				BIT(data, 5) ? 'o': 'i',
+				BIT(data, 4) ? 'o': 'i',
+				BIT(data, 3) ? 'o': 'i',
+				BIT(data, 2) ? 'o': 'i',
+				BIT(data, 1) ? 'o': 'i',
+				BIT(data, 0) ? 'o': 'i');
 
 		m_port_ddr[Port] = data;
 		m_write_port[Port](Port, m_port_data[Port] | ~data, data);
@@ -210,11 +210,11 @@ void hd6305_device::timer_ctrl_w(u8 data)
 	m_tcr = (m_tcr & data & 0x80) | (data & 0x7f);
 	if((old ^ m_tcr) & 0x7f) {
 		LOGTIMER("timer ctrl %02x irq=%s, %s clock=%s%s prescale=%d\n", data,
-				 BIT(m_tcr, 7) ? "on" : "off",
-				 BIT(m_tcr, 6) ? "disabled" : "enabled",
-				 BIT(m_tcr, 4, 2) == 0 ? "e" : BIT(m_tcr, 4, 2) == 1 ? "e&timer" : BIT(m_tcr, 4, 2) == 2 ? "off" : "timer",
-				 BIT(m_tcr, 3) ? " reset prescaler" : "",
-				 1 << BIT(m_tcr, 0, 3));
+				BIT(m_tcr, 7) ? "on" : "off",
+				BIT(m_tcr, 6) ? "disabled" : "enabled",
+				BIT(m_tcr, 4, 2) == 0 ? "e" : BIT(m_tcr, 4, 2) == 1 ? "e&timer" : BIT(m_tcr, 4, 2) == 2 ? "off" : "timer",
+				BIT(m_tcr, 3) ? " reset prescaler" : "",
+				1 << BIT(m_tcr, 0, 3));
 
 		if(BIT(m_tcr, 4, 2) != 0)
 			logerror("WARNING: timer mode not implemented\n");
@@ -247,9 +247,9 @@ void hd6305_device::misc_w(u8 data)
 {
 	m_mr = (m_mr & data & 0x80) | (data & 0x60) | 0x1f;
 	LOGMISC("misc %02x  int2=%s, %s  int=%s\n", data,
-			 BIT(m_mr, 7) ? "on" : "off",
-			 BIT(m_mr, 6) ? "disabled" : "enabled",
-			 BIT(m_mr, 5) ? "edge" : "level");
+			BIT(m_mr, 7) ? "on" : "off",
+			BIT(m_mr, 6) ? "disabled" : "enabled",
+			BIT(m_mr, 5) ? "edge" : "level");
 }
 
 void hd6305_device::sci_timer_step()
@@ -297,10 +297,10 @@ void hd6305_device::sci_ctrl_w(u8 data)
 {
 	m_scr = data;
 	LOGSCI("sci ctrl %02x  d3=%s d4=%s d5=%s rate=%d\n", data,
-			 BIT(data, 7) ? "data_out" : "gpio",
-			 BIT(data, 6) ? "data_in" : "gpio",
-			 BIT(data, 5) == 0 ? "gpio" : BIT(data, 4) ? "clock_in" : "clock_out",
-			 clock()/(1 << (BIT(data, 0, 4) + 3)));
+			BIT(data, 7) ? "data_out" : "gpio",
+			BIT(data, 6) ? "data_in" : "gpio",
+			BIT(data, 5) == 0 ? "gpio" : BIT(data, 4) ? "clock_in" : "clock_out",
+			clock() / (1 << (BIT(data, 0, 4) + 3)));
 }
 
 u8 hd6305_device::sci_ssr_r()
@@ -312,11 +312,11 @@ void hd6305_device::sci_ssr_w(u8 data)
 {
 	m_ssr = ((m_ssr & data) & 0xc0) | (data & 0x38) | 7;
 	LOGSCI("sci ssr w %02x sci irq=%s, %s  timer2 irq=%s, %s%s\n", data,
-			 BIT(m_ssr, 7) ? "on" : "off",
-			 BIT(m_ssr, 5) ? "disabled" : "enabled",
-			 BIT(m_ssr, 6) ? "on" : "off",
-			 BIT(m_ssr, 4) ? "disabled" : "enabled",
-			 BIT(m_ssr, 3) ? "reset sci prescaler" : "");
+			BIT(m_ssr, 7) ? "on" : "off",
+			BIT(m_ssr, 5) ? "disabled" : "enabled",
+			BIT(m_ssr, 6) ? "on" : "off",
+			BIT(m_ssr, 4) ? "disabled" : "enabled",
+			BIT(m_ssr, 3) ? "reset sci prescaler" : "");
 
 	if((m_ssr & 0xa0) == 0x80)
 		m_pending_interrupts |= 1 << HD6305_INT_SCI;
