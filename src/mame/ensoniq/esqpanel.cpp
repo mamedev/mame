@@ -10,9 +10,6 @@
 #include "main.h"
 
 #include "esq2by40_vfx.lh"
-#include "vfx.lh"
-#include "vfxsd.lh"
-#include "sd1.lh"
 
 #include <algorithm>
 
@@ -714,30 +711,59 @@ esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const ch
 void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 {
 	ESQ2X40_VFX(config, m_vfd, 60);
-
-	if (m_panel_type == VFX)
-		config.set_default_layout(layout_vfx);
-	else if (m_panel_type == VFX_SD)
-		config.set_default_layout(layout_vfxsd);
-	else if (m_panel_type == SD_1 || m_panel_type == SD_1_32)
-		config.set_default_layout(layout_sd1);
-	else // lowest common demonimator as the default: just the VFD.
-		config.set_default_layout(layout_esq2by40_vfx);
+	config.set_default_layout(layout_esq2by40_vfx);
 }
 
-esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, int panel_type, uint32_t clock) :
+esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	esqpanel_device(mconfig, ESQPANEL2X40_VFX, tag, owner, clock),
-	m_panel_type(panel_type),
 	m_vfd(*this, "vfd"),
-	m_lights(*this, "lights"),
-	m_buttons_0(*this, "buttons_0"),
-	m_buttons_32(*this, "buttons_32"),
-	m_analog_data_entry(*this, "analog_data_entry"),
-	m_analog_volume(*this, "analog_volume")
+	m_lights(*this, "lights")
 {
 	m_eps_mode = false;
 	// The VFX family have 16 lights on the panel.
 	m_light_states.resize(16);
+}
+
+// Adds these input ports to the owning device, so that it can load the layout and the layout
+// still find the io ports; but with callbacks going to the esqpanel2x40_vfx_device instance
+// with the specified tag.
+void esqpanel2x40_vfx_device::add_io_ports(device_t &owner, ioport_configurer &configurer, const char *tag) {
+	PORT_START("panel_buttons_0")
+	for (int i = 0; i < 32; i++)
+	{
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
+		PORT_CHANGED_MEMBER(tag, FUNC(esqpanel2x40_vfx_device::button_change), i)
+	}
+
+	PORT_START("panel_buttons_32")
+	for (int i = 0; i < 32; i++)
+	{
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
+		PORT_CHANGED_MEMBER(tag, FUNC(esqpanel2x40_vfx_device::button_change), 32 + i)
+	}
+
+	PORT_START("panel_analog_data_entry")
+	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
+	configurer.field_alloc(IPT_ADJUSTER, 0x200, 0x3ff, "Data Entry");
+	configurer.field_set_min_max(0, 0x3ff);
+	PORT_CHANGED_MEMBER(tag, FUNC(esqpanel2x40_vfx_device::analog_value_change), 3)
+
+	PORT_START("panel_analog_volume")
+	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
+	configurer.field_alloc(IPT_ADJUSTER, 0x3ff, 0x3ff, "Volume");
+	configurer.field_set_min_max(0, 0x3ff);
+	PORT_CHANGED_MEMBER(tag, FUNC(esqpanel2x40_vfx_device::analog_value_change), 5)
+}
+
+// Because the io ports now belong to another device, it needs to tell us where to find them,
+// so that we can read and write them if we need to. This allows the owner of the io ports to do just that.
+void esqpanel2x40_vfx_device::connect_io_ports(device_t &device)
+{
+	LOG("Connecting IO ports\n");
+	m_buttons_0 = device.ioport("panel_buttons_0");
+	m_buttons_32 = device.ioport("panel_buttons_32");
+	m_analog_data_entry = device.ioport("panel_analog_data_entry");
+	m_analog_volume = device.ioport("panel_analog_volume");
 }
 
 bool esqpanel2x40_vfx_device::write_contents(std::ostream &o)
@@ -795,40 +821,6 @@ void esqpanel2x40_vfx_device::device_reset()
 	}
 }
 
-static INPUT_PORTS_START(esqpanel2x40_vfx_device)
-	PORT_START("buttons_0")
-	for (int i = 0; i < 32; i++)
-	{
-		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), i)
-	}
-
-	PORT_START("buttons_32")
-	for (int i = 0; i < 32; i++)
-	{
-		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), 32 + i)
-	}
-
-	PORT_START("analog_data_entry")
-	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
-	configurer.field_alloc(IPT_ADJUSTER, 0x200, 0x3ff, "Data Entry");
-	configurer.field_set_min_max(0, 0x3ff);
-	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 3)
-
-	PORT_START("analog_volume")
-	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
-	configurer.field_alloc(IPT_ADJUSTER, 0x3ff, 0x3ff, "Volume");
-	configurer.field_set_min_max(0, 0x3ff);
-	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 5)
-
-INPUT_PORTS_END
-
-ioport_constructor esqpanel2x40_vfx_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(esqpanel2x40_vfx_device);
-}
-
 // A button is pressed on the internal panel
 INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::button_change)
 {
@@ -845,17 +837,19 @@ INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::analog_value_change)
 	esqpanel_device::set_analog_value(channel, value);
 }
 
-ioport_value esqpanel2x40_vfx_device::get_adjuster_value(required_ioport &ioport)
+ioport_value esqpanel2x40_vfx_device::get_adjuster_value(ioport_port *port)
 {
-	auto field = ioport->fields().first();
+	if (!port) return 0;
+	auto field = port->fields().first();
 	ioport_field::user_settings user_settings;
 	field->get_user_settings(user_settings);
 	return user_settings.value;
 }
 
-void esqpanel2x40_vfx_device::set_adjuster_value(required_ioport &ioport, const ioport_value & value)
+void esqpanel2x40_vfx_device::set_adjuster_value(ioport_port *port, const ioport_value &value)
 {
-	auto field = ioport->fields().first();
+	if (!port) return;
+	auto field = port->fields().first();
 	ioport_field::user_settings user_settings;
 	field->get_user_settings(user_settings);
 	user_settings.value = value;

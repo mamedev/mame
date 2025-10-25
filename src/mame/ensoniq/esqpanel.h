@@ -105,26 +105,18 @@ protected:
 
 class esqpanel2x40_vfx_device : public esqpanel_device {
 public:
-	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, int panel_type = UNKNOWN, uint32_t clock = 0);
+	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_INPUT_CHANGED_MEMBER(button_change);
 	DECLARE_INPUT_CHANGED_MEMBER(analog_value_change);
 
-	void set_family_member(int family_member);
-
-	enum panel_types : int {
-		UNKNOWN = 0,
-		VFX,
-		VFX_SD,
-		SD_1,
-		SD_1_32
-	};
+	static void add_io_ports(device_t &owner, ioport_configurer &configurer, const char *tag);
+	void connect_io_ports(device_t &device);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override;
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
 	virtual const std::string get_front_panel_html_file() const override { return "/esqpanel/vfx/FrontPanel.html"; }
@@ -136,8 +128,6 @@ protected:
 	static constexpr uint8_t AT_BLINK       = 0x02;
 
 private:
-	int m_panel_type;
-
 	emu_timer *m_blink_timer = nullptr;
 	uint8_t m_blink_phase;
 
@@ -145,16 +135,16 @@ private:
 
 	output_finder<> m_lights;
 
-	required_ioport m_buttons_0;
-	required_ioport m_buttons_32;
-	required_ioport m_analog_data_entry;
-	required_ioport m_analog_volume;
+	ioport_port *m_buttons_0 = nullptr;
+	ioport_port *m_buttons_32 = nullptr;
+	ioport_port *m_analog_data_entry = nullptr;
+	ioport_port *m_analog_volume = nullptr;
 
 	TIMER_CALLBACK_MEMBER(update_blink);
 	void update_lights();
 
-	ioport_value get_adjuster_value(required_ioport &ioport);
-	void set_adjuster_value(required_ioport &ioport, const ioport_value & value);
+	ioport_value get_adjuster_value(ioport_port *port);
+	void set_adjuster_value(ioport_port *port, const ioport_value &value);
 };
 
 class esqpanel2x40_sq1_device : public esqpanel_device {
