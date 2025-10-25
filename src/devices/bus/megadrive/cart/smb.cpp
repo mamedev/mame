@@ -7,7 +7,8 @@ Super Mario Bros cart mappers
 "decode error" printed if protection fails
 
 TODO:
-- are these really hacked versions? Rockman X3 does a few Gamtec style checks, ignored by the code
+- rockmnx3 patches out gamtec.cpp style checks, those are actually enforced in rockmnx3b.
+  For simplicity we emulate both here but latter should eventually be split.
 
 **************************************************************************************************/
 
