@@ -68,16 +68,16 @@ private:
 
 	// Per-port IO protection flags
 	enum {
-		IO_PROT_NOTRAP			= 2,
-		IO_PROT_INHIBIT_READ	= 4,
-		IO_PROT_INHIBIT_WRITE	= 8,
+		IO_PROT_NOTRAP          = 2,
+		IO_PROT_INHIBIT_READ    = 4,
+		IO_PROT_INHIBIT_WRITE   = 8,
 	};
 
 	// Flags for trapped IO accesses
 	enum {
-		TRAPIO_FLAG__IORC		= 2,	// Active Low
-		TRAPIO_FLAG__LBHE		= 4,	// Active Low
-		TRAPIO_FLAG_LA0			= 8
+		TRAPIO_FLAG__IORC       = 2,    // Active Low
+		TRAPIO_FLAG__LBHE       = 4,    // Active Low
+		TRAPIO_FLAG_LA0         = 8
 	};
 };
 

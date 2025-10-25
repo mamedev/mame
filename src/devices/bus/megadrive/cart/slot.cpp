@@ -45,24 +45,24 @@ void device_megadrive_cart_interface::interface_pre_reset()
 void device_megadrive_cart_interface::cart_map(address_map &map)
 {
 	// NOTE: is host responsibility to handle open bus access
-//	map(0x000000, 0x3fffff).unmaprw();
+//  map(0x000000, 0x3fffff).unmaprw();
 }
 
 // $a13000 base
 void device_megadrive_cart_interface::time_io_map(address_map &map)
 {
-//	map(0x00, 0xff).unmaprw();
+//  map(0x00, 0xff).unmaprw();
 }
 
 
 //void device_megadrive_cart_interface::rom_alloc(size_t size)
 //{
-//	if (m_rom == nullptr)
-//	{
-//		m_rom = (uint16_t *)device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 2, ENDIANNESS_BIG)->base();
-//		m_rom_size = size;
-//		m_rom_mask = size - 1;
-//	}
+//  if (m_rom == nullptr)
+//  {
+//      m_rom = (uint16_t *)device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 2, ENDIANNESS_BIG)->base();
+//      m_rom_size = size;
+//      m_rom_mask = size - 1;
+//  }
 //}
 
 
@@ -101,31 +101,31 @@ const char *megadrive_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32
 {
 	using namespace bus::megadrive;
 
-//	int type = slotoptions::MD_STD;
+//  int type = slotoptions::MD_STD;
 	// TODO: not caring about loose detection for now
 	return slotoptions::MD_STD;
 }
 
 //static int md_get_pcb_id(const char *slot)
 //{
-//	for (auto & elem : slot_list)
-//	{
-//		if (!strcmp(elem.slot_option, slot))
-//			return elem.pcb_id;
-//	}
+//  for (auto & elem : slot_list)
+//  {
+//      if (!strcmp(elem.slot_option, slot))
+//          return elem.pcb_id;
+//  }
 //
-//	return MD_STD;
+//  return MD_STD;
 //}
 
 //static const char *md_get_slot(int type)
 //{
-//	for (auto & elem : slot_list)
-//	{
-//		if (elem.pcb_id == type)
-//			return elem.slot_option;
-//	}
+//  for (auto & elem : slot_list)
+//  {
+//      if (elem.pcb_id == type)
+//          return elem.slot_option;
+//  }
 //
-//	return "rom";
+//  return "rom";
 //}
 
 std::pair<std::error_condition, std::string> megadrive_cart_slot_device::call_load()
@@ -160,7 +160,7 @@ std::error_condition megadrive_cart_slot_device::load_swlist()
 	if (slot_name == nullptr)
 		slot_name = slotoptions::MD_STD;
 
-//	printf("%s\n", slot_name);
+//  printf("%s\n", slot_name);
 	return std::error_condition(m_cart->load());
 }
 
@@ -210,7 +210,7 @@ std::string megadrive_cart_slot_device::get_default_card_software(get_default_ca
 
 		uint32_t const offset = 0; // genesis_is_SMD(&rom[0x200], len - 0x200) ? 0x200 : 0;
 
-//		int const type = get_cart_type(&rom[offset], len - offset);
+//      int const type = get_cart_type(&rom[offset], len - offset);
 		char const *const slot_string = get_cart_type(&rom[offset], len - offset);
 
 		return std::string(slot_string);
@@ -225,8 +225,8 @@ void megadrive_cart_slot_device::call_unload()
 {
 	if (m_cart)
 		m_cart->unload();
-//	if (m_cart && m_cart->get_nvram_base() && m_cart->get_nvram_size())
-//		battery_save(m_cart->get_nvram_base(), m_cart->get_nvram_size());
+//  if (m_cart && m_cart->get_nvram_base() && m_cart->get_nvram_size())
+//      battery_save(m_cart->get_nvram_base(), m_cart->get_nvram_size());
 }
 
 // 0x000000-0x3fffff

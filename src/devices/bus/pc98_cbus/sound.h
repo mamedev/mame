@@ -41,7 +41,7 @@ private:
 };
 
 class sound_pc9821cx3_device : public pc9801_118_device
-						     , public device_memory_interface
+							 , public device_memory_interface
 {
 public:
 	// construction/destruction

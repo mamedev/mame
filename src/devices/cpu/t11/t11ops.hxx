@@ -1124,7 +1124,7 @@ void t11_device::xor_ded(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 30;
 void t11_device::xor_ix(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 30; { XOR_M(IX);  } }
 void t11_device::xor_ixd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 36; { XOR_M(IXD); } }
 
-void t11_device::ash_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { ASH_R(RG);  } }	// XXX icount is fake
+void t11_device::ash_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { ASH_R(RG);  } }   // XXX icount is fake
 void t11_device::ash_rgd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { ASH_M(RGD); } }
 void t11_device::ash_in(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 21; { ASH_M(IN);  } }
 void t11_device::ash_ind(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 27; { ASH_M(IND); } }
@@ -1133,7 +1133,7 @@ void t11_device::ash_ded(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; 
 void t11_device::ash_ix(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 30; { ASH_M(IX);  } }
 void t11_device::ash_ixd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 36; { ASH_M(IXD); } }
 
-void t11_device::ashc_rg(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 12; { ASHC_R(RG);  } }	// XXX icount is fake
+void t11_device::ashc_rg(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 12; { ASHC_R(RG);  } }  // XXX icount is fake
 void t11_device::ashc_rgd(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 21; { ASHC_M(RGD); } }
 void t11_device::ashc_in(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { ASHC_M(IN);  } }
 void t11_device::ashc_ind(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 27; { ASHC_M(IND); } }
@@ -1142,7 +1142,7 @@ void t11_device::ashc_ded(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 30; 
 void t11_device::ashc_ix(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; { ASHC_M(IX);  } }
 void t11_device::ashc_ixd(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 36; { ASHC_M(IXD); } }
 
-void t11_device::mul_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { MUL_R(RG);  } }	// XXX icount is fake
+void t11_device::mul_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { MUL_R(RG);  } }   // XXX icount is fake
 void t11_device::mul_rgd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { MUL_M(RGD); } }
 void t11_device::mul_in(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 21; { MUL_M(IN);  } }
 void t11_device::mul_ind(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 27; { MUL_M(IND); } }
@@ -1151,7 +1151,7 @@ void t11_device::mul_ded(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; 
 void t11_device::mul_ix(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 30; { MUL_M(IX);  } }
 void t11_device::mul_ixd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 36; { MUL_M(IXD); } }
 
-void t11_device::div_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { DIV_R(RG);  } }	// XXX icount is fake
+void t11_device::div_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { DIV_R(RG);  } }   // XXX icount is fake
 void t11_device::div_rgd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { DIV_M(RGD); } }
 void t11_device::div_in(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 21; { DIV_M(IN);  } }
 void t11_device::div_ind(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 27; { DIV_M(IND); } }

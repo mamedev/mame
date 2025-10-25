@@ -2,22 +2,22 @@
 // copyright-holders:David Haywood
 /*****************************************************************************
 
-	GPL16220A - 320x240 output, 16K words internal RAM
-	GPL16230A (GPAC500A) - expands RAM to 28K words, adds SDRAM support, adds NAND Flash/ROM/OTP support, USB support
-	GPL16240VA - adds 640x480 output (V = VGA support?)
-	GPL16250VA (GPAC800A) - adds '3D' sprite mode (see generalplus_gpl1625x_soc.cpp)
+    GPL16220A - 320x240 output, 16K words internal RAM
+    GPL16230A (GPAC500A) - expands RAM to 28K words, adds SDRAM support, adds NAND Flash/ROM/OTP support, USB support
+    GPL16240VA - adds 640x480 output (V = VGA support?)
+    GPL16250VA (GPAC800A) - adds '3D' sprite mode (see generalplus_gpl1625x_soc.cpp)
 
-	there is also the 'B' series
-	these only have 12K words RAM? but have the extra maths unit at 0x79A0?
+    there is also the 'B' series
+    these only have 12K words RAM? but have the extra maths unit at 0x79A0?
 
-	GPL16218B
-	GPL16238B (this could be GPAC500B)
-	GPL16248VB
-	GPL16258VB (this could be GPAC800B) (see generalplus_gpl1625x_soc.cpp)
+    GPL16218B
+    GPL16238B (this could be GPAC500B)
+    GPL16248VB
+    GPL16258VB (this could be GPAC800B) (see generalplus_gpl1625x_soc.cpp)
 
-	die is marked 'GCM394' on some chips
+    die is marked 'GCM394' on some chips
 
-	The GPAC500 / GPAC800 might be slightly customized rather than direct rebadgings
+    The GPAC500 / GPAC800 might be slightly customized rather than direct rebadgings
 
 **********************************************************************/
 
@@ -818,7 +818,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7016 - Tx2_X_Position
 // 7017 - Tx2_Y_Position
 // 7018 - Tx2_Attribute
-// 7019 - Tx2_Control 
+// 7019 - Tx2_Control
 // 701a - Tx2_N_PTR
 // 701b - Tx2_A_PTR
 // 701c - VComValue
@@ -832,7 +832,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7024 - Segment_Tx4
 //
 // 7028 - Tx4_Cosine
-// 7029 - Tx4_Sine 
+// 7029 - Tx4_Sine
 // 702a - Blending
 // 702b - Segment_Tx1H
 // 702c - Segment_Tx2H
@@ -844,7 +844,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7036 - IRQTMV
 // 7037 - IRQTMH
 // 7038 - Line_Counter
-// 7039 - LightPen_Control 
+// 7039 - LightPen_Control
 // 703a - Palette_Control
 //
 // 703c - TV_Control
@@ -866,7 +866,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7059 - TFT_RGB_Ctrl
 // 705a - TFT_Status
 // 705b - TFT_MemMode_WriteCMD
-// 705c - TFT_MemMode_ReadCMD 
+// 705c - TFT_MemMode_ReadCMD
 //
 // 705f - STN_Ctrl1   (bit 0 is STN enable, which presumably changes the mappings at 708x and 7051 from TV/TFT to STN regs)
 //
@@ -880,7 +880,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 //
 // 7070 - SPDMA_Source
 // 7071 - SPDMA_Target
-// 7072 - SPDMA_Number 
+// 7072 - SPDMA_Number
 // 7073 - HB_Ctrl
 // 7074 - HB_GO
 //
@@ -894,15 +894,15 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 707f - PPU_Enable
 //
 // 7080 - TV_Saturation  or STN_SEG
-// 7081 - TV_Hue         or STN_COM  
-// 7082 - TV_Brightness  or STN_PIC_COM 
-// 7083 - TV_Sharpness   or STN_CPWAIT    
-// 7084 - TV_Y_Gain      or STN_Ctrl2     
-// 7085 - TV_Y_Delay     or STN_GTG_SEG  
-// 7086 - TV_V_Position  or STN_GTG_COM  
-// 7087 - TV_H_Position  or STN_SEG_Clip 
+// 7081 - TV_Hue         or STN_COM
+// 7082 - TV_Brightness  or STN_PIC_COM
+// 7083 - TV_Sharpness   or STN_CPWAIT
+// 7084 - TV_Y_Gain      or STN_Ctrl2
+// 7085 - TV_Y_Delay     or STN_GTG_SEG
+// 7086 - TV_V_Position  or STN_GTG_COM
+// 7087 - TV_H_Position  or STN_SEG_Clip
 // 7088 - TV_VideoDAC
-// 
+//
 // 70b0 - Tx1_AttributeH
 // 70b1 - Tx2_AttributeH
 // 70b2 - Tx3_AttributeH
@@ -915,8 +915,8 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 70b9 - Tx3_A_PTRH
 // 70ba - Tx4_N_PTRH
 // 70bb - Tx4_A_PTRH
-// 
-// 70d8 - BLD_Enable 
+//
+// 70d8 - BLD_Enable
 //
 // 70e0 - Random0
 // 70e1 - Random1
@@ -941,7 +941,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 780e - SLEEP
 // 780f - Power_State
 //
-// 7810 - BankSwitch_Ctrl 
+// 7810 - BankSwitch_Ctrl
 //
 // 7817 - PLLChange
 // 7818 - PLLCLKWait
@@ -952,7 +952,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 //
 // 7820 - MCS0_Ctrl
 // 7821 - MCS1_Ctrl
-// 7822 - MCS2_Ctrl 
+// 7822 - MCS2_Ctrl
 // 7823 - MCS3_Ctrl
 // 7824 - MCS4_Ctrl
 // 7825 - PSRAM_Ctrl
@@ -969,7 +969,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7835 - MCS0_Page
 // 7836 - MCS1_Page
 // 7837 - MCS2_Page
-// 7838 - MCS3_Page 
+// 7838 - MCS3_Page
 // 7839 - MCS4_Page
 //
 // 7840 - Mem_Ctrl
@@ -1000,7 +1000,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 78b0 - TimeBaseA_Ctrl
 // 78b1 - TimeBaseB_Ctrl
 // 78b2 - TimeBaseC_Ctrl
-// 
+//
 // 78b8 - TimeBase_Reset
 //
 // 78c0 - TimerA_Ctrl
@@ -1028,10 +1028,10 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 78e0 - TimerE_Ctrl
 // 78e2 - TimerE_Preload
 // 78e4 - TimerE_UpCount
-// 
+//
 // 78e8 - TimerF_Ctrl
 // 78ea - TimerF_Preload
-// 78ec - TimerF_UpCount 
+// 78ec - TimerF_UpCount
 //
 // 78f0 - CHA_Ctrl
 // 78f1 - CHA_Data
@@ -1054,7 +1054,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7934 - RTC_Ctrl
 // 7935 - RTC_INT_Status
 // 7936 - RTC_INT_Ctrl
-// 7937 - RTC_Busy 
+// 7937 - RTC_Busy
 //
 // 7940 - SPI_Ctrl
 // 7941 - SPI_TXStatus
@@ -1071,7 +1071,7 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 79a5 - Quotient
 // 79a6 - RemainderH
 // 79a7 - Remainder
-// 79a8 - Divider_Status 
+// 79a8 - Divider_Status
 //
 // 79e0 - SD2_DataTX
 // 79e1 - SD2_DataRX
@@ -1103,12 +1103,12 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7a8f - DMA_MISC1
 //
 // 7ab0 - DMA_SPRISIZE0
-// 7ab1 - DMA_SPRISIZE1 
+// 7ab1 - DMA_SPRISIZE1
 //
 // 7abd - DMA_LineLength
 // 7abe - DMA_SS
 // 7abf - DMA_INT
-// 
+//
 // 7af0 - Byte_Swap
 // 7af1 - Nibble_Swap
 // 7af2 - TwoBit_Swap
@@ -1144,10 +1144,10 @@ void sunplus_gcm394_base_device::unk_w(offs_t offset, uint16_t data)
 // 7b9a - Attack/Release Time Control
 //
 // 7b9f - Wave Table Bank Address
-// 
+//
 // 7ba5 - SPU_CtrPW
-// 
-// 7bb2 - SPU_CtrPWaveOutL 
+//
+// 7bb2 - SPU_CtrPWaveOutL
 // 7bb3 - SPU_CtrPWaveOutR
 //
 // 7bb6 - SPU_CtrChToneRelease_H

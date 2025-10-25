@@ -3,7 +3,7 @@
 
 // seems to be a GPCExxx series SunPlus CPU
 // GPCE4064 series seems very likely for the Super Impulse titles
-// 
+//
 // GPCE4P064B is an OTP part with support for 30Kbyte OTP ROM (+2Kbyte 'test' area) which matches mapacman
 // it also lacks Port C, which appears to be unused here
 
@@ -489,7 +489,7 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 	// 300c - IOA_WakeUp_Mask
 	// 300d - IOB_WakeUp_Mask
 	// 300e - IOC_WakeUp_Mask
-	map(0x00300f, 0x00300f).r(FUNC(generalplus_gpl_unknown_state::reg300f_r)); // IO_Ctrl 
+	map(0x00300f, 0x00300f).r(FUNC(generalplus_gpl_unknown_state::reg300f_r)); // IO_Ctrl
 
 	// 3010 - TimerA_Data
 	// 3011 - TimerA_CNTR
@@ -521,8 +521,8 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 	// 3042 - DAC_CH2_Data
 	// 3043 - PPAMCtrl
 
-	map(0x003050, 0x003050).rw(FUNC(generalplus_gpl_unknown_state::reg3050_r), FUNC(generalplus_gpl_unknown_state::reg3050_w)); // INT_Ctrl 
-	map(0x003051, 0x003051).w(FUNC(generalplus_gpl_unknown_state::reg3051_w)); // INT_Status 
+	map(0x003050, 0x003050).rw(FUNC(generalplus_gpl_unknown_state::reg3050_r), FUNC(generalplus_gpl_unknown_state::reg3050_w)); // INT_Ctrl
+	map(0x003051, 0x003051).w(FUNC(generalplus_gpl_unknown_state::reg3051_w)); // INT_Status
 	map(0x003052, 0x003052).r(FUNC(generalplus_gpl_unknown_state::reg3052_r)); // FIQ_SEL
 	map(0x003053, 0x003053).r(FUNC(generalplus_gpl_unknown_state::reg3053_r)); // INT2_Ctrl
 	// 3054 - INT2_Status
@@ -530,9 +530,9 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 
 	// 3070 - ADC_Ctrl
 	// 3071 - ADC_Data
-	// 3072 - ADC_LineIn_BitCtrl 
+	// 3072 - ADC_LineIn_BitCtrl
 	// 3073 - ADC_PGA_Ctrl
-	// 3074 - ADC_FIFO_Ctrl 
+	// 3074 - ADC_FIFO_Ctrl
 
 	map(0x003090, 0x003090).r(FUNC(generalplus_gpl_unknown_state::reg3090_r)); // SPI2_Ctrl
 	map(0x003091, 0x003091).r(FUNC(generalplus_gpl_unknown_state::reg3091_r)); // SPI2_TXStatus
@@ -571,7 +571,7 @@ void generalplus_gpl_unknown_state::map(address_map &map)
 	// 30e6 - SPI_Man_Ctrl
 	// 30e7 - SPI_Auto_Ctrl
 	// 30e8 - SPI_PRGM_BC
-	// 30e9 - SPI_BANK 
+	// 30e9 - SPI_BANK
 	// 30ea - SPI_DMA_Start
 	// 30eb - SPI_DMA_BC
 	// 30ec - SPI_RX_DMA_ADDR

@@ -119,7 +119,7 @@ public:
 	}
 
 	void pc9821ce(machine_config &config);
-//	void pc9821ce2(machine_config &config);
+//  void pc9821ce2(machine_config &config);
 	void pc9821cx3(machine_config &config);
 
 protected:
@@ -158,7 +158,7 @@ public:
 
 	void pc9821xa16(machine_config &config);
 	void pc9821xv13(machine_config &config);
-//	void pc9821xs(machine_config &config);
+//  void pc9821xs(machine_config &config);
 };
 
 // Mate R

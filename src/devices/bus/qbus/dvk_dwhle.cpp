@@ -362,7 +362,7 @@ uint16_t dvk_dwhle_device::read(offs_t offset)
 	case REGISTER_CSR:
 		data = m_regs[offset] & KZDCSR_RD;
 		// fails interrupt test
-//		clear_drqa();
+		//clear_drqa();
 		break;
 
 	case REGISTER_SI:
@@ -558,7 +558,7 @@ TIMER_CALLBACK_MEMBER(dvk_dwhle_device::write_tick)
 		m_regs[REGISTER_SI] &= ~KZDSI_BUSY;
 		m_regs[REGISTER_ERR] |= KZDERR_AM;
 		m_regs[REGISTER_CSR] |= KZDCSR_ERR;
-//		raise_drqb();
+		//raise_drqb();
 	}
 }
 

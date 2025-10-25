@@ -3,21 +3,21 @@
 
 /*
     Namco System 1/86 Sprites - found on Namco System 1, System 86,
-	Baraduke/Alien Sector and Metro-Cross hardware
+    Baraduke/Alien Sector and Metro-Cross hardware
 
     based on docs in namcos86.cpp and namcos1.cpp,
-	they configured with following chips:
-	- CUS39 ULA sprite generator
-	- CUS35/CUS48 ULA sprite address generator
+    they configured with following chips:
+    - CUS39 ULA sprite generator
+    - CUS35/CUS48 ULA sprite address generator
 
     "Shadow" sprites are used in namcos1.cpp
 
     Device used in the following drivers:
     - namco/namcos86.cpp
-	- namco/namcos1.cpp
+    - namco/namcos1.cpp
 
-	Using same sprite hardware but not using this implementation currently:
-	- namco/baraduke.cpp
+    Using same sprite hardware but not using this implementation currently:
+    - namco/baraduke.cpp
 
 */
 

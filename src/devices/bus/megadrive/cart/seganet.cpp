@@ -54,7 +54,7 @@ void megadrive_seganet_device::cart_map(address_map &map)
 
 void megadrive_seganet_device::time_io_map(address_map &map)
 {
-//	map(0x01, 0x01) unknown, used in tandem with 0xf1 writes, ram bank select?
+//  map(0x01, 0x01) unknown, used in tandem with 0xf1 writes, ram bank select?
 	map(0xf1, 0xf1).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			// assumed, bclr #$1 at PC=5e282

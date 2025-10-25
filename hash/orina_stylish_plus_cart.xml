@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="orina_stylish_plus_cart" description="Takara Tomy Orina Stylish+ Cartridges">
 
 	<!-- "Demon Slayer" and "Sanrio Characters" cartridges also exist -->
-	
+
 	<software name="sumikko" supported="no">
 		<description>Sumikko Gurashi</description>
 		<year>2021</year>

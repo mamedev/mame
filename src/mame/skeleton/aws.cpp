@@ -49,7 +49,7 @@ private:
 	required_device<i8272a_device> m_fdc;
 	required_device<i8275_device> m_crtc;
 	required_device<upd7201_device> m_serial1;  // Cluster networking and Keyboard
-//	required_device<upd7201_device> m_serial2;  // RS-232C ports
+//  required_device<upd7201_device> m_serial2;  // RS-232C ports
 
 	required_region_ptr<u8> m_fontrom;
 
@@ -78,7 +78,7 @@ void aws_state::pit_out2_w(int state)
 
 I8275_DRAW_CHARACTER_MEMBER(aws_state::display_pixels)
 {
-//	using namespace i8275_attributes;
+//  using namespace i8275_attributes;
 	for(int i=0;i<9;i++)
 	{
 		if(i>=7)

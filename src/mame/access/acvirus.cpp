@@ -153,9 +153,9 @@ void acvirus_state::virus(machine_config &config)
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
 /*
-	This may be hooked either to memorymap or to some of the ports:
-	map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::data_r), FUNC(hd44780_device::data_w)).umask16(0x00ff);
-	map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w)).umask16(0x00ff);
+    This may be hooked either to memorymap or to some of the ports:
+    map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::data_r), FUNC(hd44780_device::data_w)).umask16(0x00ff);
+    map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w)).umask16(0x00ff);
 */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);

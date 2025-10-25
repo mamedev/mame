@@ -36,7 +36,7 @@ private:
 	u8 m_prev_data;
 	int m_select_in_state;
 
-//	int m_haspind = 0;
+//  int m_haspind = 0;
 	int m_haspstate = 0;
 	enum hasp_states
 	{
@@ -45,11 +45,11 @@ private:
 		HASPSTATE_PASSEND,
 		HASPSTATE_READ
 	};
-//	int m_hasp_passind = 0;
-//	uint8_t m_hasp_tmppass[0x29]{};
-//	uint8_t m_port379 = 0;
-//	int m_hasp_passmode = 0;
-//	int m_hasp_prodind = 0;
+//  int m_hasp_passind = 0;
+//  uint8_t m_hasp_tmppass[0x29]{};
+//  uint8_t m_port379 = 0;
+//  int m_hasp_passmode = 0;
+//  int m_hasp_prodind = 0;
 
 	void update_state();
 };

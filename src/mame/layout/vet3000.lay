@@ -129,7 +129,7 @@ copyright-holders:Felipe Sanches
 		<image><data><![CDATA[
 			<svg width="7" height="16">
 				<path fill="#191919" stroke="none" d="
-					M 0,12.4 H 2.3 v 3.6 h 2.4 v -3.6 h 2.3 l -3.5,-12.4 z				
+					M 0,12.4 H 2.3 v 3.6 h 2.4 v -3.6 h 2.3 l -3.5,-12.4 z
 				"/>
 			</svg>
 		]]></data></image>
@@ -273,7 +273,7 @@ copyright-holders:Felipe Sanches
 		<element ref="yellow_key_61" inputtag="ROW6" inputmask="0x10"><!-- Up / Down --><bounds x="778" y="202" width="61" height="61"/></element>
 		<element ref="up_arrow"><bounds x="805.5" y="214" width="7" height="16"/></element>
 		<element ref="up_arrow"><orientation rotate="180" /><bounds x="805.5" y="236" width="7" height="16"/></element>
-		
+
 		<element ref="yellow_key_61" inputtag="ROW7" inputmask="0x10"><!-- Left / Right --><bounds x="841" y="202" width="61" height="61"/></element>
 		<element ref="right_arrow"><bounds x="858" y="220" width="28" height="7"/></element>
 		<element ref="right_arrow"><orientation rotate="180" /><bounds x="858" y="239" width="28" height="7"/></element>

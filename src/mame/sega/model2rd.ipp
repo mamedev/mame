@@ -168,7 +168,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	float dvdyoz = extent.param[2].dpdy;
 	float norm = sqrtf( std::max(dudxoz * dudxoz + dvdxoz * dvdxoz, dudyoz * dudyoz + dvdyoz * dvdyoz) );
 	int  tr, tg, tb;
-	u32	t, t2;
+	u32 t, t2;
 	u8 luma;
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;

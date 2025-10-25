@@ -295,8 +295,8 @@ void ngen_state::cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_ma
 // Largely guesswork at this stage
 void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//	if(offset < 0x140)
-//		logerror("Peripheral write %04x data %04x mask %04x\n",offset,data,mem_mask);
+//  if(offset < 0x140)
+//      logerror("Peripheral write %04x data %04x mask %04x\n",offset,data,mem_mask);
 	switch(offset)
 	{
 	case 0x00:
@@ -962,8 +962,8 @@ void ngen_state::ngen386i_mem(address_map &map)
 void ngen_state::ngen386_io(address_map &map)
 {
 	map(0x0000, 0x0001).rw(FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
-//	map(0xf800, 0xfeff).rw(FUNC(ngen_state::peripheral_r), FUNC(ngen_state::peripheral_w)).umask16(0x00ff);
-//	map(0xf904, 0xf907).rw("pit",FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask32(0x00ff00ff);
+//  map(0xf800, 0xfeff).rw(FUNC(ngen_state::peripheral_r), FUNC(ngen_state::peripheral_w)).umask16(0x00ff);
+//  map(0xf904, 0xf907).rw("pit",FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask32(0x00ff00ff);
 	map(0xf800, 0xf81f).rw("dmac",FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
 	map(0xf828, 0xf83f).rw(FUNC(ngen_state::dma_bank_r), FUNC(ngen_state::dma_bank_w)).umask32(0x0000ffff);
 	map(0xfc24, 0xfc27).rw("pic",FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask32(0x00ff00ff);

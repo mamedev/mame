@@ -592,7 +592,7 @@ protected:
 	void update_irqs();
 	void refresh_sound_irq_state();
 	void reprogram_sound_timer(int index);
-	
+
 	uint8_t m_irqsource = 0;
 
 	uint8_t m_vectorenable = 0;

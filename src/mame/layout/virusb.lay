@@ -72,7 +72,7 @@ license:CC0-1.0
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6"/>
 			<bounds x="22" y="2" width="3" height="12"/>
-		</rect>		
+		</rect>
 		<disk>
 			<color red="1" green="1" blue="1" alpha="0.05"/>
 			<bounds x="5" y="5" width="37" height="37"/>
@@ -151,8 +151,8 @@ license:CC0-1.0
 
 	<group name="knob_saturation">
 		<!-- FIXME: This one should have dots only in the left half
-			and the word "SATURATION" along a circular path to the right.
-			but I don't know how to draw that in the .lay schema
+		    and the word "SATURATION" along a circular path to the right.
+		    but I don't know how to draw that in the .lay schema
 		-->
 		<element ref="gray_line"><bounds x="36.5" y="15" width="4" height="8"/></element>
 		<group ref="knob_base"><bounds x="0" y="7" width="77" height="59"/></group>

@@ -323,8 +323,8 @@ uint16_t kcgd_state::vram_mmap_r(offs_t offset)
  *
  * 167774:
  *
- * 0-2	R	mouse coordinate data
- * 3	R	mouse button state
+ * 0-2  R   mouse coordinate data
+ * 3    R   mouse button state
  */
 
 void kcgd_state::palette_control(offs_t offset, uint16_t data, uint16_t mem_mask)

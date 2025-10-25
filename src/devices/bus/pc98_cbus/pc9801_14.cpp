@@ -46,7 +46,7 @@ pc9801_14_device::pc9801_14_device(const machine_config &mconfig, const char *ta
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_ppi(*this, "ppi")
 	, m_pit(*this, "pit")
-//	, m_tms(*this, "tms")
+//  , m_tms(*this, "tms")
 {
 }
 
@@ -66,7 +66,7 @@ void pc9801_14_device::device_add_mconfig(machine_config &config)
 	I8255(config, m_ppi);
 	m_ppi->out_pa_callback().set([this](uint8_t data) { LOG("TMS3631: PA envelope 1 %02x\n", data); });
 	m_ppi->out_pb_callback().set([this](uint8_t data) { LOG("TMS3631: PB envelope 2 %02x\n", data); });
-//	m_ppi->in_pc_callback().set_constant(0x08);
+//  m_ppi->in_pc_callback().set_constant(0x08);
 	m_ppi->out_pc_callback().set([this](uint8_t data) { LOG("TMS3631: data %02x\n", data); });
 
 	// TODO: TMS3631-RI104 & TMS3631-RI105

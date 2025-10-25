@@ -325,7 +325,7 @@ ROM_END
 
 *******************************************************************************/
 
-//    YEAR  NAME     	PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY,     	FULLNAME,                                 	FLAGS
-CONS( 1993, brke23p2, 	0,      0,      brke23p2, brke23p2, hh_ht1190_state, empty_init, "E-Star",    	"Brick Game 96 in 1 (E-23 Plus Mark II)",	MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // some other dieshots have 1996 on them, it is also possible the software is from Holtek
-CONS( 199?, ga888,    	0,      0,      ga888,    ga888,    hh_ht1130_state, empty_init, "<unknown>", 	"Block Game & Echo Key GA888",				MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // clone of Tetris Jr?
-CONS( 199?, piko55,     0,      0,      piko55,   piko55,   hh_ht1130_state, empty_init, "Gametech", 	"Pikorin 55",                               MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY,       FULLNAME,                                   FLAGS
+CONS( 1993, brke23p2,   0,      0,      brke23p2, brke23p2, hh_ht1190_state, empty_init, "E-Star",      "Brick Game 96 in 1 (E-23 Plus Mark II)",   MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // some other dieshots have 1996 on them, it is also possible the software is from Holtek
+CONS( 199?, ga888,      0,      0,      ga888,    ga888,    hh_ht1130_state, empty_init, "<unknown>",   "Block Game & Echo Key GA888",              MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND ) // clone of Tetris Jr?
+CONS( 199?, piko55,     0,      0,      piko55,   piko55,   hh_ht1130_state, empty_init, "Gametech",    "Pikorin 55",                               MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )

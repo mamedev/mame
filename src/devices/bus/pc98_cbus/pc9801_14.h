@@ -37,7 +37,7 @@ private:
 	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<i8255_device> m_ppi;
 	required_device<pit8253_device> m_pit;
-//	required_device<tms3631_device> m_tms;
+//  required_device<tms3631_device> m_tms;
 };
 
 // device type definition

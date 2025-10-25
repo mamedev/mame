@@ -11,10 +11,10 @@ local lfs = require('lfs')
 
 local exports = {
 	name = 'hiscore',
-    version = '1.1.0',
-    description = 'Hiscore with per-game exclusion support',
-    license = 'CC0',
-    author = { name = 'borgar@borgar.net + aaciii@yahoo.com' }
+	version = '1.1.0',
+	description = 'Hiscore with per-game exclusion support',
+	license = 'CC0',
+	author = { name = 'borgar@borgar.net + aaciii@yahoo.com' }
 }
 
 local hiscore = exports
@@ -30,46 +30,46 @@ end
 local excluded_games = {}
 
 local function save_exclusions()
-    if not hiscore_plugin_path then return end
-    local exclude_file = hiscore_plugin_path .. '/exclude_games.json'
-    local file = io.open(exclude_file, 'w')
-    if file then
-        local data = { excluded_games = {} }
-        for game, _ in pairs(excluded_games) do
-            table.insert(data.excluded_games, game)
-        end
-        file:write(json.stringify(data, { indent = true }))
-        file:close()
-        emu.print_verbose('[Hiscore] Exclusions saved.')
-    else
-        emu.print_error('[Hiscore] Failed to save exclusions.')
-    end
+	if not hiscore_plugin_path then return end
+	local exclude_file = hiscore_plugin_path .. '/exclude_games.json'
+	local file = io.open(exclude_file, 'w')
+	if file then
+		local data = { excluded_games = {} }
+		for game, _ in pairs(excluded_games) do
+			table.insert(data.excluded_games, game)
+		end
+		file:write(json.stringify(data, { indent = true }))
+		file:close()
+		emu.print_verbose('[Hiscore] Exclusions saved.')
+	else
+		emu.print_error('[Hiscore] Failed to save exclusions.')
+	end
 end
 
 -- added function to load list of excluded games (hiscore support disabled)
 local function load_exclusions()
-    if not hiscore_plugin_path then return end
-    local exclude_file = hiscore_plugin_path .. '/exclude_games.json'
-    local file = io.open(exclude_file, 'r')
-    if file then
-        local content = file:read('*all')
-        file:close()
-        local data = json.decode(content)
-        if data and data.excluded_games then
-            for _, game in ipairs(data.excluded_games) do
-                excluded_games[game] = true
-            end
-            emu.print_verbose('[Hiscore] Exclusions loaded.')
-        end
-    else
-        emu.print_verbose('[Hiscore] No exclude_games.json found. No exclusions active.')
-    end
+	if not hiscore_plugin_path then return end
+	local exclude_file = hiscore_plugin_path .. '/exclude_games.json'
+	local file = io.open(exclude_file, 'r')
+	if file then
+		local content = file:read('*all')
+		file:close()
+		local data = json.decode(content)
+		if data and data.excluded_games then
+			for _, game in ipairs(data.excluded_games) do
+				excluded_games[game] = true
+			end
+			emu.print_verbose('[Hiscore] Exclusions loaded.')
+		end
+	else
+		emu.print_verbose('[Hiscore] No exclude_games.json found. No exclusions active.')
+	end
 end
 
 -- added function to determine if active game is on the exclusion list (hiscore support disabled)
 local function is_game_excluded()
-    local game = emu.romname()
-    return excluded_games[game] == true
+	local game = emu.romname()
+	return excluded_games[game] == true
 end
 
 
@@ -133,58 +133,58 @@ function hiscore.startplugin()
 	end
 
 	-- build menu
-    local function populate_menu()
-      local items = {}
+	local function populate_menu()
+	  local items = {}
 
-      table.insert(items, { _p('plugin-hiscore', 'Hiscore Support Options'), '', 'off' })
-      table.insert(items, { '---', '', '' })
+	  table.insert(items, { _p('plugin-hiscore', 'Hiscore Support Options'), '', 'off' })
+	  table.insert(items, { '---', '', '' })
 
-      local game = emu.romname()
-      local enabled = not is_game_excluded()
-      local status = enabled and 'Yes' or 'No'
-      table.insert(items, { "Enable Hiscore Support for this game", status, enabled and 'l' or 'r' })
+	  local game = emu.romname()
+	  local enabled = not is_game_excluded()
+	  local status = enabled and 'Yes' or 'No'
+	  table.insert(items, { "Enable Hiscore Support for this game", status, enabled and 'l' or 'r' })
 
-      local setting = timed_save and _p('plugin-hiscore', 'When updated') or _p('plugin-hiscore', 'On exit')
-      table.insert(items, { _p('plugin-hiscore', 'Save scores'), setting, timed_save and 'l' or 'r' })
+	  local setting = timed_save and _p('plugin-hiscore', 'When updated') or _p('plugin-hiscore', 'On exit')
+	  table.insert(items, { _p('plugin-hiscore', 'Save scores'), setting, timed_save and 'l' or 'r' })
 
-      return items
-    end
+	  return items
+	end
 
 	-- handle menu events
-    local function handle_menu(index, event)
-        
+	local function handle_menu(index, event)
+
 	  -- added menu item to enable/disable hiscore support for this game
 	  if index == 3 then
-        if event == 'left' or event == 'right' then
-          local game = emu.romname()
-          if event == 'left' then
-            -- Disable Hiscore Support for this game (add to exclude list)
-            excluded_games[game] = true
-            emu.print_verbose(string.format('[Hiscore] Hiscore support disabled for game "%s"', game))
-          elseif event == 'right' then
-            -- Enable Hiscore Support for this game (remove from exclude list)
-            excluded_games[game] = nil
-            emu.print_verbose(string.format('[Hiscore] Hiscore support enabled for game "%s"', game))
-          end
-          save_exclusions()
-          return true
-        else
-          return false
-        end
-      end
+		if event == 'left' or event == 'right' then
+		  local game = emu.romname()
+		  if event == 'left' then
+			-- Disable Hiscore Support for this game (add to exclude list)
+			excluded_games[game] = true
+			emu.print_verbose(string.format('[Hiscore] Hiscore support disabled for game "%s"', game))
+		  elseif event == 'right' then
+			-- Enable Hiscore Support for this game (remove from exclude list)
+			excluded_games[game] = nil
+			emu.print_verbose(string.format('[Hiscore] Hiscore support enabled for game "%s"', game))
+		  end
+		  save_exclusions()
+		  return true
+		else
+		  return false
+		end
+	  end
 
-      -- previous menu item to select when scores are saved remains unchanged (now on menu index #4)
+	  -- previous menu item to select when scores are saved remains unchanged (now on menu index #4)
 	  if index == 4 then
-        if event == 'left' then
-          timed_save = false
-          return true
-        elseif event == 'right' then
-          timed_save = true
-          return true
-        end
-      end
-      return false
-    end
+		if event == 'left' then
+		  timed_save = false
+		  return true
+		elseif event == 'right' then
+		  timed_save = true
+		  return true
+		end
+	  end
+	  return false
+	end
 
 
 	local hiscoredata_path = "hiscore.dat";
@@ -306,11 +306,11 @@ function hiscore.startplugin()
 
 	local function write_scores ( posdata )
 	  -- check if game is on the exclude list before writing
-      if is_game_excluded() then
-        emu.print_verbose('[Hiscore] Skipping write_scores - excluded game: ' .. emu.romname())
-        return
-      end
-	
+	  if is_game_excluded() then
+		emu.print_verbose('[Hiscore] Skipping write_scores - excluded game: ' .. emu.romname())
+		return
+	  end
+
 	  emu.print_verbose("hiscore: write_scores")
 	  local output = io.open(get_file_name(), "wb");
 	  if not output then
@@ -334,11 +334,11 @@ function hiscore.startplugin()
 
 
 	local function read_scores ( posdata )
-      -- check if game is on the exclude list before loading scores
+	  -- check if game is on the exclude list before loading scores
 	  if is_game_excluded() then
-        emu.print_verbose('[Hiscore] Skipping read_scores - excluded game: ' .. emu.romname())
-        return false
-      end
+		emu.print_verbose('[Hiscore] Skipping read_scores - excluded game: ' .. emu.romname())
+		return false
+	  end
 
 	  local input = io.open(get_file_name(), "rb");
 	  if input then
@@ -433,7 +433,7 @@ function hiscore.startplugin()
 		last_write_time = -10
 		emu.print_verbose("Starting " .. emu.gamename())
 		read_config();
-		
+
 		-- re-load game exclusions list on reset
 		load_exclusions();
 		local dat = read_hiscore_dat()

@@ -2,30 +2,30 @@
 // copyright-holders:Felipe Sanches
 /***************************************************************************
 
-	VET 3000, "The Video Effects Titler"
+    VET 3000, "The Video Effects Titler"
 
-	https://www.youtube.com/watch?v=DJXlqe2UXKs
-	https://datassette.org/node/106385
+    https://www.youtube.com/watch?v=DJXlqe2UXKs
+    https://datassette.org/node/106385
 
 
-	Notes:
+    Notes:
         ------------------------------------------------------------
-	There's some model and company info in the back of the unit:
+    There's some model and company info in the back of the unit:
 
-		VET 3000
-		TMS - Tecnologia em
-		Micro Sistemas
-		CGC 52.733.847/0001-89
-		Made in Brazil
-
-        ------------------------------------------------------------
-	There are 2 rear video connectors (In and Out) but the video
-	input is currently not supported.
+        VET 3000
+        TMS - Tecnologia em
+        Micro Sistemas
+        CGC 52.733.847/0001-89
+        Made in Brazil
 
         ------------------------------------------------------------
-	There's also a 36-pin (2*18) pcb edge rear connector labeled
-	"interface" but the purpose of this is not know yet and so
-	it is currently not documented in this driver.
+    There are 2 rear video connectors (In and Out) but the video
+    input is currently not supported.
+
+        ------------------------------------------------------------
+    There's also a 36-pin (2*18) pcb edge rear connector labeled
+    "interface" but the purpose of this is not know yet and so
+    it is currently not documented in this driver.
 
 ***************************************************************************/
 

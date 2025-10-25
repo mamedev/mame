@@ -622,7 +622,7 @@ struct m2_poly_extra_data
 	u32      texwidth[6];
 	u32      texheight[6];
 	u32      texx[6];
-	u32		 texy[6];
+	u32      texy[6];
 	u8       texmirrorx;
 	u8       texmirrory;
 	u8       luma;

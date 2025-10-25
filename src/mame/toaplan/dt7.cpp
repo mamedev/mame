@@ -15,7 +15,7 @@
     - service mode doesn't display properly
     - currently only coins up with service button
     - sound dies after one stage?
-	- merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
+    - merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
 */
 
 

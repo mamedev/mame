@@ -315,7 +315,7 @@ void linndrum_vcf_eg_device::update_freq_cv_offset()
 	m_i_offset = vx / R;
 
 	LOGMASKED(LOG_CALIBRATION, "%s: CV Offset current: %f. CV range: %f - %f\n",
-	          tag(), m_i_offset, get_freq_cv(0), get_freq_cv(EG_V_TARGET));
+			  tag(), m_i_offset, get_freq_cv(0), get_freq_cv(EG_V_TARGET));
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(linndrum_vcf_eg_device::freq_cv_offset_changed)

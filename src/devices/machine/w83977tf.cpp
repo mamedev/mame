@@ -48,12 +48,12 @@ w83977tf_device::w83977tf_device(const machine_config &mconfig, const char *tag,
 	, m_irq1_callback(*this)
 	, m_irq8_callback(*this)
 	, m_irq9_callback(*this)
-//  , m_txd1_callback(*this)
-//  , m_ndtr1_callback(*this)
-//  , m_nrts1_callback(*this)
-//  , m_txd2_callback(*this)
-//  , m_ndtr2_callback(*this)
-//  , m_nrts2_callback(*this)
+	//, m_txd1_callback(*this)
+	//, m_ndtr1_callback(*this)
+	//, m_nrts1_callback(*this)
+	//, m_txd2_callback(*this)
+	//, m_ndtr2_callback(*this)
+	//, m_nrts2_callback(*this)
 	, m_gpio1_read_cb(*this, 0xff)
 	, m_gpio1_write_cb(*this)
 	, m_index(0)
@@ -81,7 +81,7 @@ void w83977tf_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
 	save_pointer(NAME(m_activate), 0xb);
-//	remap(AS_IO, 0, 0x400);
+	//remap(AS_IO, 0, 0x400);
 }
 
 void w83977tf_device::device_reset()

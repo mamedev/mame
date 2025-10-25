@@ -2,10 +2,10 @@
 // copyright-holders:
 
 /*
-	This is a placeholder driver for the Orina Stylish Plus so that a
-	Software List for the cartridges can exist.
+    This is a placeholder driver for the Orina Stylish Plus so that a
+    Software List for the cartridges can exist.
 
-	Internal hardware of machine is currently unknown
+    Internal hardware of machine is currently unknown
 */
 
 #include "emu.h"

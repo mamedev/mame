@@ -58,9 +58,9 @@ namespace
 	// - DAC timing knobs:
 	//     - lead/lag shift the latch strobe within the 16-cycle frame,
 	//     - gap!=0 issues a second write strobe (at 3−lag+gap), duplicating the held sample within the frame.
-	//	   - no titles found that change these from the defaults, so unable to test.
+	//     - no titles found that change these from the defaults, so unable to test.
 	//   These alter *when* a channel is latched (and can duplicate it), but not the state-machine rate itself.
-	
+
 	static constexpr uint8_t MIXER_ORDER_MULTIPLEX[16] = { 0x0, 0xa, 0x7, 0xd, 0xc, 0x6, 0xb, 0x1, 0x4, 0xe, 0x3, 0x9, 0x8, 0x2, 0xf, 0x5 };
 	static constexpr uint8_t MIXER_ORDER_BROADCAST[16] = { 0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf };
 	static constexpr int AMP_TABLE[8] = { 2, 4, 8, 12, 16, 20, 20, 20 };
@@ -409,7 +409,7 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 	m_voice[voice].enabled = 1;
 	m_voice[voice].bank = wave_addr_bank;
 	m_voice[voice].position = uint32_t(wave_addr) << 14;
-	// TODO: Work out why subtracting a single sample from the wave loop address is needed for loops to be in tune. 
+	// TODO: Work out why subtracting a single sample from the wave loop address is needed for loops to be in tune.
 	m_voice[voice].loop_position = (wave_loop_addr ? (uint32_t(wave_loop_addr - 1) << 14) : 0);
 	m_voice[voice].start_position = m_voice[voice].position;
 	m_voice[voice].noise_state = wave_addr ? wave_addr : 0xace1u;
@@ -576,40 +576,40 @@ void xavix_sound_device::set_output_mode(bool mono)
 
 uint32_t xavix_sound_device::tempo_to_period_ticks(uint8_t tp) const
 {
-    if (!tp) return 0;                                 // paused
-    const uint32_t s = uint32_t(m_cyclerate_div) + 1;  // cyclerate+1
-    uint64_t samples = (uint64_t(s) * 1024u + (tp / 2)) / tp; // round-nearest
-    if (samples < 1) samples = 1;
-    if (samples > 2'000'000u) samples = 2'000'000u;
-    return uint32_t(samples);
+	if (!tp) return 0;                                 // paused
+	const uint32_t s = uint32_t(m_cyclerate_div) + 1;  // cyclerate+1
+	uint64_t samples = (uint64_t(s) * 1024u + (tp / 2)) / tp; // round-nearest
+	if (samples < 1) samples = 1;
+	if (samples > 2'000'000u) samples = 2'000'000u;
+	return uint32_t(samples);
 }
 
 uint32_t xavix_sound_device::envelope_period_ticks(uint8_t tp) const
 {
-    const uint32_t base = tempo_to_period_ticks(tp);
-    if (!base) return 0;
-    const uint64_t scaled = uint64_t(base) * 16u;      // envelope cadence
-    return uint32_t(scaled > 64'000'000u ? 64'000'000u : scaled);
+	const uint32_t base = tempo_to_period_ticks(tp);
+	if (!base) return 0;
+	const uint64_t scaled = uint64_t(base) * 16u;      // envelope cadence
+	return uint32_t(scaled > 64'000'000u ? 64'000'000u : scaled);
 }
 
 attotime xavix_sound_device::tempo_period(uint8_t tempo) const
 {
-    const uint32_t samples = tempo_to_period_ticks(tempo);
-    if (!samples) return attotime::never;
-    return attotime::from_ticks(samples, m_sequencer_rate_hz); // engine ticks
+	const uint32_t samples = tempo_to_period_ticks(tempo);
+	if (!samples) return attotime::never;
+	return attotime::from_ticks(samples, m_sequencer_rate_hz); // engine ticks
 }
 
 double xavix_sound_device::tempo_tick_hz(uint8_t tempo) const
 {
-    const uint32_t samples = tempo_to_period_ticks(tempo);
-    return samples ? (double(m_sequencer_rate_hz) / double(samples)) : 0.0;
+	const uint32_t samples = tempo_to_period_ticks(tempo);
+	return samples ? (double(m_sequencer_rate_hz) / double(samples)) : 0.0;
 }
 
 uint32_t xavix_sound_device::phase_step_per_tick(uint32_t rate) const
 {
-    if (!rate) return 0;
-    uint64_t step = rate; // sequencer rate equals timing base
-    return uint32_t(step ? step : 1);
+	if (!rate) return 0;
+	uint64_t step = rate; // sequencer rate equals timing base
+	return uint32_t(step ? step : 1);
 }
 
 void xavix_sound_device::set_tempo(int index, uint8_t value)
@@ -951,7 +951,7 @@ uint8_t xavix_state::sound_voice_startstop_r(offs_t offset)
 void xavix_state::sound_voice_startstop_w(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_VOICE, "[voice] startstop offs=%d data=%02x prev=%02x\n",
-    	offset, data, m_soundreg16_0[offset]);
+		offset, data, m_soundreg16_0[offset]);
 	for (int i = 0; i < 8; i++)
 	{
 		const int voice_state      = BIT(data, i);
@@ -1164,5 +1164,5 @@ void xavix_state::reprogram_sound_timer(int index)
 	const std::string period_text = period.as_string(18);
 	m_sound_timer[index]->adjust(period, index, period);
 	LOGMASKED(LOG_TIMER, "[timer] %d arm tempo=%02x freq=%.6fHz period=%s\n",
-    	index, tempo, frequency, period_text.c_str());
+		index, tempo, frequency, period_text.c_str());
 }

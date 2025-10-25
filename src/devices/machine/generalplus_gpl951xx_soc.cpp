@@ -98,7 +98,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7014 - Tx1_N_PTR
 	// 7015 - Tx1_A_PTR
 	// 7016 - Tx2_X_Position
-	// 7017 - Tx2_Y_Position 
+	// 7017 - Tx2_Y_Position
 	// 7018 - Tx2_Attribute
 	// 7019 - Tx2_Contro
 	// 701a - Tx2_N_PTR
@@ -119,9 +119,9 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 702e - Segment_Tx3H
 	//
 	// 7030 - Fade_Control
-	// 
+	//
 	// 703a - Palette_Control
-	// 
+	//
 	// 7042 - SControl
 	//
 	// 7050 - TFT_Ctrl
@@ -140,7 +140,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	//
 	// 705e - STN_PIC_SEG
 	// 705f - STN_Ctrl1
-	// 
+	//
 	// 7062 - TFT_INT_EN
 	// 7063 - TFT_INT_CLR
 	// 7064 - US_Ctrl
@@ -148,24 +148,24 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7066 - US_Vscaling
 	// 7067 - US_Width
 	// 7068 - US_Height
-	// 7069 - US_Hoffset 
+	// 7069 - US_Hoffset
 	// 706a - US_Voffset
 	//
 	// 706c - TFT_V_Show_Start
 	// 706d - TFT_V_Show_End
 	// 706e - TFT_H_Show_Start
-	// 706f - TFT_H_Show_End 
-	// 
+	// 706f - TFT_H_Show_End
+	//
 	// 7070 - SPDMA_Source
 	// 7071 - SPDMA_Target
 	// 7072 - SPDMA_Number
 	// 7073 - HB_Ctrl
 	// 7074 - HB_GO
-	// 
-	// 707d - BLD_Color 
+	//
+	// 707d - BLD_Color
 	//
 	// 707e - PPU_RAM_BANK
-	// 707f - PPU_Enable 
+	// 707f - PPU_Enable
 	//
 	// 7080 - STN_SEG
 	// 7081 - STN_COM
@@ -173,8 +173,8 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7083 - STN_CPWait
 	// 7084 - STN_Ctrl2
 	// 7085 - STN_GTG_SEG
-	// 7086 - STN_GTG_COM 
-	// 
+	// 7086 - STN_GTG_COM
+	//
 	// 70b4 - Tx1_N_PTRH
 	// 70b5 - Tx1_A_PTRH
 	// 70b6 - Tx2_N_PTRH
@@ -187,7 +187,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	//
 	// 70e0 - Random0 (15-bit)
 	// 70e1 - Random1 (15-bit)
-	// 
+	//
 	// 7100 to 71ff - Tx_Hvoffset
 	// 7200 to 72ff - HCMValue
 	// 7300 to 73ff - Palette (banked)
@@ -203,7 +203,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7807 - Clock_Ctrl
 	// 7808 - LVR_Ctrl
 	// 7809 - PM_Ctrl
-	// 780a - Watchdog_Ctrl 
+	// 780a - Watchdog_Ctrl
 	map(0x00780b, 0x00780b).nopw(); // Watchdog_Clear
 	// 780c - WAIT
 	// 780d - HALT
@@ -232,7 +232,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7831 - CHECKSUM1_LB
 	// 7832 - CHECKSUM0_HB
 	// 7833 - CHECKSUM1_HB
-	// 
+	//
 	// 7848 - ECC_LPRL_HB
 	// 7849 - ECC_LPRH_HB
 	// 784a - ECC_CPR_HB
@@ -248,10 +248,10 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7853 - NF_AddrH
 	// 7854 - NF_Data
 	// 7855 - NF_INT_Ctrl
-	// 7856 - unused            or BCH_Control 
+	// 7856 - unused            or BCH_Control
 	// 7857 - ECC_Ctrl
 	// 7858 - ECC_LPRL_LB     or BCH_Error
-	// 7859 - ECC_LPRH_LB     or BCH_Parity0 
+	// 7859 - ECC_LPRH_LB     or BCH_Parity0
 	// 785a - ECC_CPR_LB      or BCH_Parity1
 	// 785b - ECC_LPR_CKL_LB  or BCH_Parity2
 	// 785c - ECC_LPR_CKH_LB  or BCH_Parity3
@@ -331,7 +331,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 78b1 - TimeBaseB_Ctrl
 	// 78b2 - TimeBaseC_Ctrl
 
-	// 78b8 - TimeBase_Reset 
+	// 78b8 - TimeBase_Reset
 
 	// 78c0 - I2C_Ctrl
 	// 78c1 - I2C_Status
@@ -358,7 +358,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 78ee
 	// 78ef
 
-	// 78f0 - CHA_Ctrl 
+	// 78f0 - CHA_Ctrl
 	// 78f1 - CHA_Data
 	// 78f2 - CHA_FIFO
 	// 78f3
@@ -500,7 +500,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7a58 - USBD_ EP0VR
 	// 7a59 - USBD_ EP0IR
 	// 7a5a - USBD_ EP0LR
-	// 
+	//
 	// 7a60 - USBD_DMAWrtCountL
 	// 7a61 - USBD_DMAWrtCountH
 	// 7a62 - USBD_DMAAckL
@@ -544,7 +544,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7ac4 - CTS_Ctrl2
 	// 7ac5 - CTS_Status
 	// 7ac6 - CTS_Ctrl3
-	// 
+	//
 	// 7ac8 - CTS_FIFOLevel
 	// 7ac9 - CTS_CNT
 

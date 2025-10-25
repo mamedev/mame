@@ -10,7 +10,7 @@
     TODO:
     - Needs proper AWE64 emulation defined as a slot option default, with
       fallbacks to AWE32 and SB16;
-	\- to workaround: attrib -R C:\IMMERSIA\BIN\IMMOS.BAT then edit file to swap sound card
+    \- to workaround: attrib -R C:\IMMERSIA\BIN\IMMOS.BAT then edit file to swap sound card
 
     - When switching gfx mode during boot routine it still sets a terminal debug mode (with cut down screen portions)
       instead of normal Voodoo drawing. Culprit may be an I/O port reading or a Voodoo bug;
@@ -112,10 +112,10 @@ private:
 	//int m_haspstate = 0;
 	//enum hasp_states
 	//{
-	//	HASPSTATE_NONE,
-	//	HASPSTATE_PASSBEG,
-	//	HASPSTATE_PASSEND,
-	//	HASPSTATE_READ
+	//  HASPSTATE_NONE,
+	//  HASPSTATE_PASSBEG,
+	//  HASPSTATE_PASSEND,
+	//  HASPSTATE_READ
 	//};
 	//int m_hasp_passind = 0;
 	//uint8_t m_hasp_tmppass[0x29]{};
@@ -454,9 +454,9 @@ void savquest_state::winbond_superio_config(device_t *device)
 //  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 //  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 
-    auto *lpt = device->subdevice<pc_lpt_device>("lpt");
-    auto *centronics = lpt->subdevice<centronics_device>("centronics");
-    centronics->set_default_option("hasp_savquest");
+	auto *lpt = device->subdevice<pc_lpt_device>("lpt");
+	auto *centronics = lpt->subdevice<centronics_device>("centronics");
+	centronics->set_default_option("hasp_savquest");
 	centronics->set_fixed(true);
 }
 
@@ -497,7 +497,7 @@ void savquest_state::savquest(machine_config &config)
 	m_voodoo2->set_tmumem(4, 4); /* this is the 12Mb card */
 	m_voodoo2->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 
-//	m_voodoo2->vblank_callback().set(FUNC(savquest_state::vblank_assert));
+//  m_voodoo2->vblank_callback().set(FUNC(savquest_state::vblank_assert));
 
 	screen_device &screen(SCREEN(config, "voodoo_screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(57);
@@ -511,15 +511,15 @@ void savquest_state::savquest(machine_config &config)
 	PCI_SLOT(config, "pci:1", pci_cards, 9, 0, 1, 2, 3, "virge").set_fixed(true);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
-//	PCI_SLOT(config, "pci:4", pci_cards, 12, 3, 0, 1, 2, "voodoo2");
+//  PCI_SLOT(config, "pci:4", pci_cards, 12, 3, 0, 1, 2, "voodoo2");
 }
 
 ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
 	ROM_LOAD( "p2xbl_award_451pg.bin", 0x00000, 0x040000, CRC(37d0030e) SHA1(c6773d0e02325116f95c497b9953f59a9ac81317) )
 
-//	ROM_REGION32_LE( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
-//	ROM_LOAD( "vgabios.bin",   0x000000, 0x010000, CRC(a81423d6) SHA1(a099af621ce7fbaa55a2d9947d9f07e04f1b5fca) )
+//  ROM_REGION32_LE( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
+//  ROM_LOAD( "vgabios.bin",   0x000000, 0x010000, CRC(a81423d6) SHA1(a099af621ce7fbaa55a2d9947d9f07e04f1b5fca) )
 
 	ROM_REGION( 0x080, "rtc", 0 )    /* default NVRAM */
 	ROM_LOAD( "savquest_ds12885.bin", 0x0000, 0x080, BAD_DUMP CRC(e9270019) SHA1(4d900ca317d93c915c80a9053528b741746f08a1) )

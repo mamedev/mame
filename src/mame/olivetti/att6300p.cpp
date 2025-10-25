@@ -204,21 +204,21 @@ private:
 
 	enum {
 		// PROTECTEN register bits
-		B_VIRT_PE_IOSETUP		= 0x01,
-		B_VIRT_PE_MEMSETUP		= 0x02,
-		B_VIRT_PE_IORDTRAP		= 0x08,
-		B_VIRT_PE__PWRUP		= 0x10,		// Active Low
-		B_VIRT_PE_IOWRTRAP		= 0x20,
-		B_VIRT_PE_MEMFENCE		= 0x40,
-		B_VIRT_PE_PROTECTEN		= 0x80,
+		B_VIRT_PE_IOSETUP       = 0x01,
+		B_VIRT_PE_MEMSETUP      = 0x02,
+		B_VIRT_PE_IORDTRAP      = 0x08,
+		B_VIRT_PE__PWRUP        = 0x10,     // Active Low
+		B_VIRT_PE_IOWRTRAP      = 0x20,
+		B_VIRT_PE_MEMFENCE      = 0x40,
+		B_VIRT_PE_PROTECTEN     = 0x80,
 
 		// BITREAD register bits
-		B_VIRT_BR_PROTECTEN		= 0x01,
-		B_VIRT_BR__SANITYNMI	= 0x02,		// Active Low
-		B_VIRT_BR__TRAPIO		= 0x04,		// Active Low
-		B_VIRT_BR_NMI			= 0x08,
-		B_VIRT_BR_TS			= 0x10,
-		B_VIRT_BR__PWRUP		= 0x20,		// Active Low
+		B_VIRT_BR_PROTECTEN     = 0x01,
+		B_VIRT_BR__SANITYNMI    = 0x02,     // Active Low
+		B_VIRT_BR__TRAPIO       = 0x04,     // Active Low
+		B_VIRT_BR_NMI           = 0x08,
+		B_VIRT_BR_TS            = 0x10,
+		B_VIRT_BR__PWRUP        = 0x20,     // Active Low
 	};
 
 	void dma_segment_w(offs_t offset, uint8_t data);
@@ -520,7 +520,7 @@ int att6300p_state::kbc_t0_r()
 
 int att6300p_state::kbc_t1_r()
 {
-	return BIT(m_ctrlport_a, 7);	// Keyboard Enable
+	return BIT(m_ctrlport_a, 7);    // Keyboard Enable
 }
 
 uint8_t att6300p_state::keyboard_data_r()
@@ -945,7 +945,7 @@ void att6300p_state::att6300p(machine_config &config)
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	PIT8254(config, m_pit);
-	m_pit->set_clk<0>(14.318181_MHz_XTAL / 12);		// IOCLK/4
+	m_pit->set_clk<0>(14.318181_MHz_XTAL / 12);     // IOCLK/4
 	m_pit->set_clk<1>(14.318181_MHz_XTAL / 12);
 	m_pit->set_clk<2>(14.318181_MHz_XTAL / 12);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
@@ -955,7 +955,7 @@ void att6300p_state::att6300p(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	ISA8(config, m_isabus, 14.318181_MHz_XTAL / 3);	// IOCLK
+	ISA8(config, m_isabus, 14.318181_MHz_XTAL / 3); // IOCLK
 	m_isabus->set_memspace(m_mmu, AS_PROGRAM);
 	m_isabus->set_iospace(m_mmu, AS_IO);
 	m_isabus->irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
@@ -1018,7 +1018,7 @@ void att6300p_state::att6300p(machine_config &config)
 
 	MM58274C(config, "mm58274", 32.768_kHz_XTAL);
 
-	Z80CTC(config, m_ctc, 12_MHz_XTAL / 4);		// PCLK/2
+	Z80CTC(config, m_ctc, 12_MHz_XTAL / 4);     // PCLK/2
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<1>().set(FUNC(att6300p_state::zc01_cb));
 	m_ctc->zc_callback<2>().set(FUNC(att6300p_state::zc02_cb));

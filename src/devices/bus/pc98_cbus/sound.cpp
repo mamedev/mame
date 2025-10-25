@@ -99,19 +99,19 @@ void sound_pc9821ce_device::pnp_io_map(address_map &map)
 	// ??-? -??- <unknown>
 	// --x- ---- using SCSI (mapping or mounting?)
 	// ---- x--- Sound ports PnP
-//	map(0x10, 0x10)
+//  map(0x10, 0x10)
 
 	// ???? ??-- <unknown>
 	// ---- --xx SCSI I/O port
-//	map(0x20, 0x20)
+//  map(0x20, 0x20)
 
 	// ???? ?--- <unknown>
 	// ---- -111 SCSI not used
 	// ---- -000 SCSI used
-//	map(0x21, 0x21)
+//  map(0x21, 0x21)
 
-//	map(0x30, 0x30) Sound irq related
-//	map(0x40, 0x40) <unknown>
+//  map(0x30, 0x30) Sound irq related
+//  map(0x40, 0x40) <unknown>
 
 	// CPU flag
 	// -100 High
@@ -122,9 +122,9 @@ void sound_pc9821ce_device::pnp_io_map(address_map &map)
 		NAME([] () { return 4; })
 	);
 
-//	map(0x52, 0x52) <unknown>
+//  map(0x52, 0x52) <unknown>
 
-//	map(0xf0, 0xf0) <unknown>
+//  map(0xf0, 0xf0) <unknown>
 }
 
 /*

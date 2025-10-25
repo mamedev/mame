@@ -40,7 +40,7 @@
 // 701e - VComStep
 // 701f
 // 7020 - Segment_Tx1
-// 7021 - Segment_Tx2 
+// 7021 - Segment_Tx2
 // 7022 - Segment_sp
 // 7023 - Segment_Tx3
 // 7024 - Segment_Tx4
@@ -62,36 +62,36 @@
 // 703a - Palette_Control
 //
 // 703c - TV_Control
-// 
+//
 // 703e - LPHPosition
 // 703f - LPVPosition
 //
 // 7042 - SControl
 //
-// 7050 - TFT_Ctrl 
+// 7050 - TFT_Ctrl
 // 7051 - TFT_V_Width      or STN_COM_Clip
 // 7052 - TFT_VSync_Setup
 // 7053 - TFT_V_Start
-// 7054 - TFT_V_End 
+// 7054 - TFT_V_End
 // 7055 - TFT_H_Width
 // 7056 - TFT_HSync_Setup
 // 7057 - TFT_H_ Start
 // 7058 - TFT_H_ End
-// 7059 - TFT_RGB_Ctrl 
-// 705a - TFT_Status 
+// 7059 - TFT_RGB_Ctrl
+// 705a - TFT_Status
 // 705b - TFT_MemMode_WriteCMD
 // 705c - TFT_MemMode_ReadCMD
-// 
+//
 // 705f - STN_Ctrl1
-// 
-// 7062 - PPU_IRQ_EN      or TFT_INT_EN 
+//
+// 7062 - PPU_IRQ_EN      or TFT_INT_EN
 // 7063 - PPU_IRQ_Status  or TFT_INT_CLR
 //
 // 706c - TFT_V_Show_Start
 // 706d - TFT_V_Show_End
 // 706e - TFT_H_Show_Start
-// 706f - TFT_H_Show_End 
-// 
+// 706f - TFT_H_Show_End
+//
 // 7070 - SPDMA_Source
 // 7071 - SPDMA_Target
 // 7072 - SPDMA_Number
@@ -105,16 +105,16 @@
 // 707e - PPU_RAM_Bank
 // 707f - PPU_Enable
 //
-// 7080 - TV_Saturation   or STN_SEG 
-// 7081 - TV_Hue          or STN_COM 
+// 7080 - TV_Saturation   or STN_SEG
+// 7081 - TV_Hue          or STN_COM
 // 7082 - TV_Brightness   or STN_PIC_COM
 // 7083 - TV_Sharpness    or STN_CPWAIT
-// 7084 - TV_Y_Gain       or STN_Ctrl2 
-// 7085 - TV_Y_Delay      or STN_GTG_SEG 
+// 7084 - TV_Y_Gain       or STN_Ctrl2
+// 7085 - TV_Y_Delay      or STN_GTG_SEG
 // 7086 - TV_V_Position   or STN_GTG_COM
-// 7087 - TV_H_Position   or STN_SEG_Clip 
-// 7088 - TV_VedioDAC 
-// 
+// 7087 - TV_H_Position   or STN_SEG_Clip
+// 7088 - TV_VedioDAC
+//
 // 7090 - TG_CTRL1
 // 7091 - TG_CTRL2
 // 7092 - TG_HLSTART
@@ -167,17 +167,17 @@
 // 780e - SLEEP
 // 780f - Power_State
 
-// 7810 - BankSwitch_Ctrl 
+// 7810 - BankSwitch_Ctrl
 
-// 7816 - MAPSEL 
+// 7816 - MAPSEL
 // 7817 - PLLN
 // 7818 - PLLWiatCLK
 // 7819 - Cache_Ctrl
 // 781a - Cache_HitRate
-// 
+//
 // 781f - IO_SR_SMT
 
-// 7820 - MCS0_Ctrl 
+// 7820 - MCS0_Ctrl
 // 7821 - MCS1_Ctrl
 // 7822 - MCS2_Ctrl
 // 7823 - MCS3_Ctrl
@@ -208,12 +208,12 @@
 // 783d - SDRAM_CBRCYC
 // 783e - SDRAM_MISC
 // 783f - SDR_STATUS
-// 
+//
 // 7840 - Mem_Ctrl
 // 7841 - Addr_Ctrl
 
 // 784e - ECC_ERR0_HB (?)
-// 784f - ECC_ERR1_HB (?) 
+// 784f - ECC_ERR1_HB (?)
 
 // 7850 - NF_Ctrl
 // 7851 - NF_CMD
@@ -228,9 +228,9 @@
 // 785a - ECC_CPR_LB
 // 785b - ECC_LPR_CKL_LB
 // 785c - ECC_LPR_CKH_LB
-// 785d - ECC_CPCKR_LB 
+// 785d - ECC_CPCKR_LB
 // 785e - ECC_ERR0_LB
-// 785f - ECC_ERR1_LB 
+// 785f - ECC_ERR1_LB
 
 // 7860 - IOA_Data
 // 7861 - IOA_Buffer
@@ -248,21 +248,21 @@
 // 7870 - IOC_Data
 // 7871 - IOC_Buffer
 // 7872 - IOC_Dir
-// 7873 - IOC_Attrib 
+// 7873 - IOC_Attrib
 // 7874 - SDRAM_Drv
 // 7875 - IOC_Drv
 // 7876 - SDRAM_Dly
 // 7877 - IOC_Latch
-// 7878 - IOD_Data 
+// 7878 - IOD_Data
 // 7879 - IOD_Buffer
-// 787a - IOD_Dir 
-// 787b - IOD_Attrib 
+// 787a - IOD_Dir
+// 787b - IOD_Attrib
 // 787c - IOD_Drv
-// 787d - IOD_Dly 
+// 787d - IOD_Dly
 // 787e - CS_Drv / MCS_Drv
 // 787f - CS_Dly / MCS_Dly
 // 7880 - IOE_Data
-// 7881 - IOE_Buffer 
+// 7881 - IOE_Buffer
 // 7882 - IOE_Dir
 // 7883 - IOE_Attrib
 // 7884 - IOE_Drv
@@ -310,7 +310,7 @@
 // 78d3 - TimerC_CCReg
 // 78d4 - TimerC_UpCount
 
-// 78d8 - TimerD_Ctrl 
+// 78d8 - TimerD_Ctrl
 // 78da - TimerD_Preload
 // 78dc - TimerD_UpCount
 
@@ -319,12 +319,12 @@
 // 78e4 - TimerE_UpCount
 // 78e8 - TimerF_Ctrl
 // 78ea - TimerF_Preload
-// 78ec - TimerF_UpCount 
+// 78ec - TimerF_UpCount
 
 // 78f0 - CHA_Ctrl
 // 78f1 - CHA_Data
 // 78f2 - CHA_FIFO
-// 
+//
 // 78f8 - CHB_Ctrl
 // 78f9 - CHB_Data
 // 78fa - CHB_FIFO
@@ -332,173 +332,173 @@
 
 // 78ff - IISEN
 
-// 7900 - UART_Data 
-// 7901 - UART_RXStatus 
-// 7902 - UART_Ctrl 
+// 7900 - UART_Data
+// 7901 - UART_RXStatus
+// 7902 - UART_Ctrl
 // 7903 - UART_BaudRate
 // 7904 - UART_Status
 // 7905 - UART_FIFO
-// 7906 - UART_TXDLY 
-// 7907 - IrDA_BaudRate 
-// 7908 - IrDA_Ctrl 
+// 7906 - UART_TXDLY
+// 7907 - IrDA_BaudRate
+// 7908 - IrDA_Ctrl
 // 7909 - IrDA_LowPower
 
 // 7920 - Second
 // 7921 - Minute
-// 7922 - Hour 
+// 7922 - Hour
 
-// 7924 - Alarm_Second 
+// 7924 - Alarm_Second
 // 7925 - Alarm_Minute
-// 7926 - Alarm_Hour 
+// 7926 - Alarm_Hour
 
 // 7934 - RTC_Ctrl
 // 7935 - RTC_INT_Status
-// 7936 - RTC_INT_Ctrl 
+// 7936 - RTC_INT_Ctrl
 // 7937 - RTC_Busy
 
-// 7940 - SPI_Ctrl 
+// 7940 - SPI_Ctrl
 // 7941 - SPI_TXStatus
 // 7942 - SPI_TXData
-// 7943 - SPI_RXStatus 
+// 7943 - SPI_RXStatus
 // 7944 - SPI_RXData
 // 7945 - SPI_Misc
 
-// 7960 - ADC_Setup 
-// 7961 - MADC_Ctrl 
+// 7960 - ADC_Setup
+// 7961 - MADC_Ctrl
 // 7962 - MADC_Data
-// 7963 - ASADC_Ctrl 
-// 7964 - ASDAC_Data 
+// 7963 - ASADC_Ctrl
+// 7964 - ASDAC_Data
 
-// 7966 - USELINEIN 
+// 7966 - USELINEIN
 // 7967 - SH_WAIT
 
 // 79d0 - SD1_DataTX
 // 79d1 - SD1_DataRX
 // 79d2 - SD1_CMD
-// 79d3 - SD1_ArgL 
+// 79d3 - SD1_ArgL
 // 79d4 - SD1_ArgH
 // 79d5 - SD1_RespL
 // 79d6 - SD1_RespH
 // 79d7 - SD1_Status
-// 79d8 - SD1_Ctrl 
+// 79d8 - SD1_Ctrl
 // 79d9 - SD1_BLKLEN
 // 79da - SD1_INT
 
 // 79e0 - SD2_DataTX
 // 79e1 - SD2_DataRX
 // 79e2 - SD2_CMD
-// 79e3 - SD2_ArgL 
+// 79e3 - SD2_ArgL
 // 79e4 - SD2_ArgH
 // 79e5 - SD2_RespL
 // 79e6 - SD2_RespH
 // 79e7 - SD2_Status
-// 79e8 - SD2_Ctrl 
+// 79e8 - SD2_Ctrl
 // 79e9 - SD2_BLKLEN
 // 79ea - SD2_INT
 
 // 79f0 - CMA_R_Y_In
 // 79f1 - CMA_G_U_In
-// 79f2 - CMA_B_V_In 
-// 79f3 - CMA_Ctrl 
-// 79f4 - CMA_R_Y_Out 
+// 79f2 - CMA_B_V_In
+// 79f3 - CMA_Ctrl
+// 79f4 - CMA_R_Y_Out
 // 79f5 - CMA_G_U_Out
 // 79f6 - CMA_B_V_Out
 
 // 7a00 - USBH_Config
 // 7a01 - USBH_TimeConfig
 // 7a02 - USBH_Data
-// 7a03 - USBH_Transfer 
-// 7a04 - USBH_DveAddr 
+// 7a03 - USBH_Transfer
+// 7a04 - USBH_DveAddr
 // 7a05 - USBH_DveEP
 // 7a06 - USBH_TXCount
 // 7a07 - USBH_RXCount
 // 7a08 - USBH_FIFOInPointer
 // 7a09 - USBH_FIFOOutPointer
 // 7a0a - USBH_AutoInByteCount
-// 7a0b - USBH_AutoOutByteCount 
-// 7a0c - USBH_AutoTrans 
+// 7a0b - USBH_AutoOutByteCount
+// 7a0c - USBH_AutoTrans
 // 7a0d - USBH_Status
-// 7a0e - USBH_INT 
+// 7a0e - USBH_INT
 // 7a0f - USBH_INTEN
 
 // 7a11 - USBH_SoftRST
 // 7a12 - USBH_SOFTimer
 // 7a13 - USBH_FrameNum
-// 
-// 7a17 - USBH_INAckCount 
-// 7a18 - USBH_OutAckCount 
-// 7a19 - USBH_RSTAckCount 
+//
+// 7a17 - USBH_INAckCount
+// 7a18 - USBH_OutAckCount
+// 7a19 - USBH_RSTAckCount
 
-// 7a1b - USBH_DReadback 
+// 7a1b - USBH_DReadback
 
-// 7a20 - USBH_SOF_BOND 
-// 7a21 - USBH_ISOConfig 
+// 7a20 - USBH_SOF_BOND
+// 7a21 - USBH_ISOConfig
 
-// 7a30 - USBD_Config 
-// 7a31 - USBD_Function 
+// 7a30 - USBD_Config
+// 7a31 - USBD_Function
 // 7a32 - USBD_PMR
 // 7a33 - USBD_EP0Data
 // 7a34 - USBD_BIData
-// 7a35 - USBD_BOData 
-// 7a36 - USBD_INTINData 
-// 7a37 - USBD_EPEvent 
-// 7a38 - USBD_GLOINT 
-// 7a39 - USBD_INTEN 
+// 7a35 - USBD_BOData
+// 7a36 - USBD_INTINData
+// 7a37 - USBD_EPEvent
+// 7a38 - USBD_GLOINT
+// 7a39 - USBD_INTEN
 // 7a3a - USBD_INT
-// 7a3b - USBD_SCI NTEN 
-// 7a3c - USBD_SCINT 
-// 7a3d - USBD_EPAutoSet 
-// 7a3e - USBD_EPSetStall 
+// 7a3b - USBD_SCI NTEN
+// 7a3c - USBD_SCINT
+// 7a3d - USBD_EPAutoSet
+// 7a3e - USBD_EPSetStall
 // 7a3f - USBD_EPBufClear
 // 7a40 - USBD_EPEvntClear
 // 7a41 - USBD_EP0WrtCount
 // 7a42 - USBD_BOWrtCount
 // 7a43 - USBD_EP0BufPointer
 // 7a44 - USBD_BIBufPointer
-// 7a45 - USBD_BOBufPointer 
-// 7a46 - USBD_EP0RTR 
+// 7a45 - USBD_BOBufPointer
+// 7a46 - USBD_EP0RTR
 // 7a47 - USBD_EP0RR
 // 7a48 - USBD_ EP0VR
 // 7a49 - USBD_ EP0IR
 // 7a4a - USBD_ EP0LR
-// 7a4b - USBD_INTBufPointer 
+// 7a4b - USBD_INTBufPointer
 // 7a4c - USBD_INTF
-// 7a4d - USBD_ALT 
+// 7a4d - USBD_ALT
 // 7a4e - USBD_ISOOData
-// 7a4f - USBD_ISOIData 
+// 7a4f - USBD_ISOIData
 // 7a50 - USBD_DMAWrtCountL
-// 7a51 - USBD_DMAWrtCountH 
+// 7a51 - USBD_DMAWrtCountH
 // 7a52 - USBD_DMAAck
 // 7a53 - USBD_DMAAckH
-// 7a54 - USBD_EPStall 
+// 7a54 - USBD_EPStall
 // 7a55 - USBD_CALT
-// 7a56 - USBD_MAXALT 
+// 7a56 - USBD_MAXALT
 // 7a57 - USBD_Device
-// 7a58 - USBD_NullPkt 
+// 7a58 - USBD_NullPkt
 // 7a59 - USBD_DMAINT
 
-// 7a5b - USBD_MAXINT 
+// 7a5b - USBD_MAXINT
 // 7a5c - USBD_ISOEvent
 // 7a5d - USBD_ISOINTE
 // 7a5e - USBD_ISOINT
 // 7a5f - USBD_ISOOWrtCount
 // 7a60 - USBD_IOUTData
-// 7a61 - USBD_IOUTEvent 
-// 7a62 - USBD_IOUTINTEN 
+// 7a61 - USBD_IOUTEvent
+// 7a62 - USBD_IOUTINTEN
 // 7a63 - USBD_IOUTINT
 // 7a64 - USBD_IOUTWrtCount
-// 7a65 - USBD_ISOOBufPointer 
+// 7a65 - USBD_ISOOBufPointer
 // 7a66 - USBD_ISOIBufPointer
 
 // 7a80 - DMA_Ctrl0
-// 7a81 - DMA_SRC_AddrL0 
+// 7a81 - DMA_SRC_AddrL0
 // 7a82 - DMA_TAR_AddrL0
 // 7a83 - DMA_TCountL0
 // 7a84 - DMA_SRC_AddrH0
 // 7a85 - DMA_TAR_AddrH0
-// 7a86 - DMA_TCountH0 
-// 7a87 - DMA_MISC0 
-// 7a88 - DMA_Ctrl1 
+// 7a86 - DMA_TCountH0
+// 7a87 - DMA_MISC0
+// 7a88 - DMA_Ctrl1
 // 7a89 - DMA_SRC_AddrL1
 // 7a8a - DMA_TAR_AddrL1
 // 7a8b - DMA_TCountL1
@@ -507,12 +507,12 @@
 // 7a8e - DMA_TCountH1
 // 7a8f - DMA_MISC1
 // 7a90 - DMA_Ctrl2
-// 7a91 - DMA_SRC_AddrL2 
+// 7a91 - DMA_SRC_AddrL2
 // 7a92 - DMA_TAR_AddrL2
 // 7a93 - DMA_TCountL2
 // 7a94 - DMA_SRC_AddrH2
 // 7a95 - DMA_TAR_AddrH2
-// 7a96 - DMA_TCountH2 
+// 7a96 - DMA_TCountH2
 // 7a97 - DMA_MISC2
 // 7a98 - DMA_Ctrl3
 // 7a99 - DMA_SRC_AddrL3
@@ -534,8 +534,8 @@
 //
 // 7ac0 - KS_Ctrl1
 // 7ac1 - KS_Ctrl2
-// 7ac2 - KS_Addr 
-// 7ac3 - KS_Velocity 
+// 7ac2 - KS_Addr
+// 7ac3 - KS_Velocity
 //
 // 7ac8 - KS_Data0
 // 7ac9 - KS_Data1
@@ -553,8 +553,8 @@
 // 7ae1 - E-Fuse1
 // 7ae2 - E-Fuse2
 // 7ae3 - E-Fuse3
-// 
-// 7af0 - Byte_Swap 
+//
+// 7af0 - Byte_Swap
 // 7af1 - Nibble_Swap
 // 7af2 - TwoBit_Swap
 // 7af3 - Bit_Reverse

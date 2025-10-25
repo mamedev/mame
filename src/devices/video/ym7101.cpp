@@ -104,11 +104,11 @@ void ym7101_device::device_start()
 	save_item(STRUCT_MEMBER(m_command, latch));
 	save_item(STRUCT_MEMBER(m_command, address));
 	save_item(STRUCT_MEMBER(m_command, code));
-//  save_item(STRUCT_MEMBER(m_command, write_state));
+	//save_item(STRUCT_MEMBER(m_command, write_state));
 
 	save_item(STRUCT_MEMBER(m_dma, source_address));
 	save_item(STRUCT_MEMBER(m_dma, length));
-//  save_item(STRUCT_MEMBER(m_dma, mode));
+	//save_item(STRUCT_MEMBER(m_dma, mode));
 	save_item(STRUCT_MEMBER(m_dma, active));
 	save_item(STRUCT_MEMBER(m_dma, fill));
 
@@ -904,8 +904,8 @@ void ym7101_device::prepare_tile_line(int scanline)
 	const u16 tile_mask = 0x7ff;
 	//const u16 page_mask[] = { 0x7ff, 0x1fff, 0x1fff, 0x1fff };
 
-//	const u16 m_hpage = page_masks[m_hsz];
-//	const u16 m_vpage = page_masks[m_vsz];
+	//const u16 m_hpage = page_masks[m_hsz];
+	//const u16 m_vpage = page_masks[m_vsz];
 
 	// AV Artisan games will set plane B base with 0x18000
 	const u32 plane_a_name_base = (m_plane_a_name_table & m_vram_mask) >> 1;
