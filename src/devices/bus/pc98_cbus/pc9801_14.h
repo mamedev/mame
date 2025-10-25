@@ -14,7 +14,6 @@
 class pc9801_14_device : public device_t
 {
 public:
-	// construction/destruction
 	pc9801_14_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr feature_type unemulated_features() { return feature::SOUND; }
@@ -23,11 +22,12 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 protected:
-	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	// optional information overrides
+
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 

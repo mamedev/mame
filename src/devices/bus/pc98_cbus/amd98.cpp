@@ -16,14 +16,14 @@ TODO:
 ===================================================================================================
 
 - Known games with AMD-98 support
-    Brown's Run (System Sacom)
-    Dome (System Sacom)
-    Highway Star (System Sacom)
-    Marchen Veil I (System Sacom)
-    Marchen Veil II (System Sacom)
-    Zone (System Sacom)
-    Relics (Bothtec)
-    Thexder (Game Arts)
+  brownrun
+  dome
+  highway
+  marchen1
+  marchen2
+  zone
+  relics
+  thexder
 
 **************************************************************************************************/
 
