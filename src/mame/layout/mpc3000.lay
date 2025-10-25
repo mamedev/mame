@@ -29,7 +29,6 @@
 					<line transform="rotate(270)" x1="0" y1="0" x2="20" y2="0"/>
 					<line transform="rotate(300)" x1="0" y1="0" x2="20" y2="0"/>
 					<line transform="rotate(330)" x1="0" y1="0" x2="20" y2="0"/>
-
 			</svg>
 		]]></data></image>
 	</element>
@@ -52,7 +51,7 @@
 	<element name="slider_minr"><text string="0"><color red="0.0" green="0.0" blue="0.0"/></text></element>
 	<element name="line"><rect><color red="0.0" green="0.0" blue="0.0"/></rect></element>
 	<element name="sliderwell"><rect><color red="0.20" green="0.21" blue="0.25"/></rect></element>
-	<element name="variationsliderknob">
+	<element name="variation_knob">
 		<rect><bounds x="0" y="0" width="28" height="55"/><color red="0.2" green="0.2" blue="0.2"/></rect>
 		<rect><bounds x="2" y="2" width="24" height="50"/><color red="0.8" green="0.8" blue="0.8"/></rect>
 		<rect><bounds x="2" y="18" width="24" height="20"/><color red="0.941" green="0.941" blue="0.941"/></rect>
@@ -87,24 +86,24 @@
 		<element ref="sliderwell"><bounds x="11" y="53" width="16" height="116"/></element>
 	</group>
 
-<!-- Build Slider - TODO: inputtag 'variation' doesn't exist yet -->
+<!-- Build Slider -->
 	<group name="variationslider">
-		<element ref="sliderwell"><bounds x="11" y="170" width="16" height="180"/></element>
+		<element ref="sliderwell"><bounds x="11" y="235" width="16" height="570"/></element>
 		<element ref="transparent" id="variation_area">
-			<bounds x="0" y="170" width="38" height="180"/>
+			<bounds x="0" y="225" width="38" height="590"/>
 		</element>
-		<element ref="variationsliderknob" id="variation_slider_knob">
-			<animate inputtag="variation" inputmask="0x01"/>
-			<bounds state="100" x="7" y="116" width="24" height="50"/>
-			<bounds state="0" x="7" y="255" width="24" height="50"/>
+		<element ref="variation_knob" id="variation_knob">
+			<animate inputtag="VARIATION" inputmask="0xff"/>
+			<bounds state="100" x="7" y="180" width="24" height="150"/>
+			<bounds state="0" x="7" y="710" width="24" height="150"/>
 		</element>
 	</group>
 
 <!-- Data entry knob elements -->
-	<element name="dataentry_knob"><disk><color red="0.717" green="0.717" blue="0.717"/></disk></element>
+	<element name="dataentry_top"><disk><color red="0.717" green="0.717" blue="0.717"/></disk></element>
 	<element name="dataentry_outer"><disk><color red="0.0" green="0.0" blue="0.0"/></disk></element>
-	<element name="dataentry_value">
-		<simplecounter maxstate="100" digits="2"><color red="0.517" green="0.517" blue="0.517"/></simplecounter>
+	<element name="dataentry_knob">
+		<simplecounter maxstate="100" digits="1"><color red="0.517" green="0.517" blue="0.517"/></simplecounter>
 	</element>
 
 <!-- Left side knob labels -->
@@ -117,7 +116,7 @@
 	<element name="button-black-outline"><rect></rect></element>
 	<element name="button-black-outline1">
 		<image><data><![CDATA[
-			<svg width="215" height="136" xmlns="http://www.w3.org/2000/svg">
+			<svg width="215" height="136">
 			  <rect x="0" y="0" width="215" height="136" rx="30" ry="30" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.6"/>
 			</svg>
 			]]></data>
@@ -251,12 +250,12 @@
 	<group name="left-buttons">
 
 		<!-- Note Variation Header and Border -->
-		<element ref="line">        <bounds x="5"   y="1180" width="60" height="10" /><color red="0" green="0" blue="0" /></element>
-		<element ref="variation-header-text">         <bounds x="80" y="1150" width="475" height="70" /><color red="0" green="0" blue="0" /></element>
-		<element ref="line">        <bounds x="555" y="1180" width="60" height="10" /><color red="0" green="0" blue="0" /></element>
+		<element ref="line"><bounds x="5" y="1180" width="60" height="10" /><color red="0" green="0" blue="0" /></element>
+		<element ref="variation-header-text"><bounds x="80" y="1150" width="475" height="70" /><color red="0" green="0" blue="0" /></element>
+		<element ref="line"><bounds x="555" y="1180" width="60" height="10" /><color red="0" green="0" blue="0" /></element>
 		<element ref="variation-header-line-vertical"><bounds x="5"   y="1180" width="10" height="1650" /><color red="0" green="0" blue="0" /></element>
 		<element ref="variation-header-line-vertical"><bounds x="605" y="1180" width="10" height="1650" /><color red="0" green="0" blue="0" /></element>
-		<element ref="line">  <bounds x="5"   y="2825" width="610" height="10" /><color red="0" green="0" blue="0" /></element>
+		<element ref="line"><bounds x="5" y="2825" width="610" height="10" /><color red="0" green="0" blue="0" /></element>
 
 		<!-- Pad Bank -->
 		<element ref="button-black-outline1"><bounds x="200" y="315" width="215" height="136" /><color red="0.0" green="0.0" blue="0.0" /></element>
@@ -444,7 +443,7 @@
 		<element ref="led"><bounds x="790" y="1590" width="30" height="30" /><animate name="led3" /><color state="0" red="0.0" green="0.0" blue="0.0" /><color state="1" red="1.0" green="0.0" blue="0.0" /></element>
 	</group>
 
-<!-- Data Entry Section Header -->
+<!-- Data Entry Header Text -->
 	<element name="dataentry-header-text"><text align="1" string="DATA ENTRY" /></element>
 
 <!-- Data Entry Buttons -->
@@ -624,13 +623,13 @@
 		</image>
 	</element>
 
-<!-- Cursor Section -->
+<!-- Cursor Header Text -->
 	<element name="cursor-header-text"><text align="1" string="CURSOR" /></element>
 
 <!-- Cursor Buttons -->
 	<group name="cursor-buttons">
 
-		<!-- Cursor Header-->
+		<!-- Cursor Header -->
 		<element ref="line">              <bounds x="110" y="30" width="395" height="15" /><color red="0" green="0" blue="0" /></element>
 		<element ref="cursor-header-text"><bounds x="527" y="0" width="250" height="70" /><color red="0" green="0" blue="0" /></element>
 		<element ref="line">              <bounds x="740" y="30" width="395" height="15" /><color red="0" green="0" blue="0" /></element>
@@ -672,7 +671,7 @@
 <!-- Real Time Buttons -->
 	<group name="realtime-buttons">
 
-		<!-- Real Time Header-->
+		<!-- Real Time Header -->
 		<element ref="line"><bounds x="105" y="30" width="385" height="15" /><color red="0" green="0" blue="0" /></element>
 		<element ref="realtime-header-text"><bounds x="510" y="0" width="300" height="70" /><color red="0" green="0" blue="0" /></element>
 		<element ref="line"><bounds x="790" y="30" width="385" height="15" /><color red="0" green="0" blue="0" /></element>
@@ -730,7 +729,7 @@
 <!-- Play/Rec Buttons Row 1 -->
 	<group name="playrec1-buttons">
 
-		<!-- Play/Rec Header-->
+		<!-- Play/Rec Header -->
 		<element ref="line"><bounds x="5" y="30" width="875" height="15" /><color red="0" green="0" blue="0" /></element>
 		<element ref="playrec-header-text"><bounds x="860" y="0" width="350" height="70" /><color red="0" green="0" blue="0" /></element>
 		<element ref="line"><bounds x="1175" y="30" width="875" height="15" /><color red="0" green="0" blue="0" /></element>
@@ -740,14 +739,14 @@
 		<element ref="button-white" inputtag="Y4" inputmask="0x08">
 			<bounds x="130" y="200" width="285" height="216" /></element>
 		<element ref="button-text-black-frew"><bounds x="65" y="230" width="400" height="140" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="button-text-black-v">   <bounds x="135" y="110" width="40" height="60" /><color red="0.0" green="0.0" blue="0.0" /></element>
+		<element ref="button-text-black-u">   <bounds x="135" y="110" width="40" height="60" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!-- < -->
 		<element ref="button-black-outline"><bounds x="495" y="185" width="315" height="246" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="button-white" inputtag="Y4" inputmask="0x10">
 			<bounds x="510" y="200" width="285" height="216" /></element>
 		<element ref="button-text-black-rew"><bounds x="442" y="230" width="400" height="140" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="button-text-black-u">  <bounds x="515" y="110" width="40" height="60" /><color red="0.0" green="0.0" blue="0.0" /></element>
+		<element ref="button-text-black-v">  <bounds x="515" y="110" width="40" height="60" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!-- Locate -->
 		<element ref="button-black-outline"><bounds x="875" y="185" width="315" height="246" /><color red="0.0" green="0.0" blue="0.0" /></element>
@@ -849,6 +848,9 @@
 	</group>
 
 <!-- MPC3000 Texts -->
+	<element name="akai-logo-text"><text align="1" string="AKAI" /></element>
+	<element name="mpc3000-logo-text"><text align="1" string="MPC3000" /></element>
+	<element name="professional-logo-text"><text align="2" string="professional" /></element>
 	<element name="midi"><text align="1" string="MIDI PRODUCTION CENTER" /></element>
 	<element name="integ"><text align="1" string="INTEGRATED  RHYTHM  MACHINE" /></element>
 	<element name="16bit"><text align="2" string="16  BIT  DRUM  SAMPLER / MIDI  SEQUENCER" /></element>
@@ -898,7 +900,7 @@
 	<element name="greybg"><rect><bounds x="0" y="0" width="1000" height="1000" /><color red="0.7" green="0.7" blue="0.7" /></rect></element>
 
 <!-- Drum Pad Labels  - Note the pad names are different on some earlier/later releases.
-                        An alternative overlay can be done to swtch pad names -->
+                        An alternative overlay can be done to switch pad names -->
 	<element name="drum-label-ride1"><text align="1" string="RIDE 1            13" /></element>
 	<element name="drum-label-ride2"><text align="1" string="RIDE 2            14" /></element>
 	<element name="drum-label-crash1"><text align="1" string="CRASH 1           15" /></element>
@@ -927,13 +929,13 @@
 
 	<element name="drumpad-grey1" defstate="0">
 		<image state="0"><data><![CDATA[
-			<svg width="460" height="460" xmlns="http://www.w3.org/2000/svg">
+			<svg width="460" height="460">
 			  <rect state="0" x="0" y="0" width="460" height="460" rx="25" ry="25" fill="rgb(128,128,128)" stroke="rgb(128,128,128)" stroke-width="0.6"/>
 			</svg>
 			]]></data>
 		</image>
 		<image state="1"><data><![CDATA[
-			<svg width="460" height="460" xmlns="http://www.w3.org/2000/svg">
+			<svg width="460" height="460">
 			  <rect state="0" x="0" y="0" width="460" height="460" rx="25" ry="25" fill="rgb(102,102,102)" stroke="rgb(102,102,102)" stroke-width="0.6"/>
 			</svg>
 			]]></data>
@@ -942,7 +944,7 @@
 
 	<element name="drumpad-black-outline1">
 		<image><data><![CDATA[
-			<svg width="490" height="490" xmlns="http://www.w3.org/2000/svg">
+			<svg width="490" height="490">
 			  <rect x="0" y="0" width="490" height="490" rx="40" ry="40" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.6"/>
 			</svg>
 			]]></data>
@@ -958,28 +960,28 @@
 		<element ref="line"><bounds x="1455" y="30" width="1235" height="15" /></element>
 
 		<!-- ROW 1 -->
-		<!--Drum Pad 13-->
+		<!--Drum Pad 13 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="360" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x10">
 			<bounds x="235" y="375" width="460" height="460" />
 		</element>
 		<element ref="drum-label-ride1"><bounds x="240" y="285" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drum Pad 14-->
+		<!--Drum Pad 14 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="360" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x20">
 			<bounds x="825" y="375" width="460" height="460" />
 		</element>
 		<element ref="drum-label-ride2"><bounds x="830" y="285" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 15-->
+		<!--Drumpad 15 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="360" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x40">
 			<bounds x="1415" y="375" width="460" height="460" />
 		</element>
 		<element ref="drum-label-crash1"><bounds x="1420" y="285" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 16-->
+		<!--Drumpad 16 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="360" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x80">
 			<bounds x="2005" y="375" width="460" height="460" />
@@ -987,28 +989,28 @@
 		<element ref="drum-label-crash2"><bounds x="2010" y="285" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!-- ROW 2 -->
-		<!--Drumpad 9-->
+		<!--Drumpad 9 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="950" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x10">
 			<bounds x="235" y="965" width="460" height="460" />
 		</element>
 		<element ref="drum-label-tom1"><bounds x="240" y="875" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 10-->
+		<!--Drumpad 10 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="950" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x20">
 			<bounds x="825" y="965" width="460" height="460" />
 		</element>
 		<element ref="drum-label-tom2"><bounds x="830" y="875" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 11-->
+		<!--Drumpad 11 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="950" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x40">
 			<bounds x="1415" y="965" width="460" height="460" />
 		</element>
 		<element ref="drum-label-tom3"><bounds x="1420" y="875" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 12-->
+		<!--Drumpad 12 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="950" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x80">
 			<bounds x="2005" y="965" width="460" height="460" />
@@ -1016,28 +1018,28 @@
 		<element ref="drum-label-tom4"><bounds x="2010" y="875" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!-- ROW 3 -->
-		<!--Drumpad 5-->
+		<!--Drumpad 5 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="1540" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x10">
 			<bounds x="235" y="1555" width="460" height="460" />
 		</element>
 		<element ref="drum-label-hihatfoot"><bounds x="240" y="1465" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 6-->
+		<!--Drumpad 6 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="1540" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x20">
 			<bounds x="825" y="1555" width="460" height="460" />
 		</element>
 		<element ref="drum-label-hihatclosed"><bounds x="830" y="1465" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 7-->
+		<!--Drumpad 7 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="1540" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x40">
 			<bounds x="1415" y="1555" width="460" height="460" />
 		</element>
 		<element ref="drum-label-hihatloose"><bounds x="1420" y="1465" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 8-->
+		<!--Drumpad 8 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="1540" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x80">
 			<bounds x="2005" y="1555" width="460" height="460" />
@@ -1045,28 +1047,28 @@
 		<element ref="drum-label-hihatopen"><bounds x="2010" y="1465" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!-- ROW 4 -->
-		<!--Drumpad 1-->
+		<!--Drumpad 1 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="2130" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x10">
 			<bounds x="235" y="2145" width="460" height="460" />
 		</element>
 		<element ref="drum-label-kick"><bounds x="240" y="2055" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 2-->
+		<!--Drumpad 2 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="2130" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x20">
 			<bounds x="825" y="2145" width="460" height="460" />
 		</element>
 		<element ref="drum-label-kickalt"><bounds x="830" y="2055" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 3-->
+		<!--Drumpad 3 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="2130" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x40">
 			<bounds x="1415" y="2145" width="460" height="460" />
 		</element>
 		<element ref="drum-label-snare"><bounds x="1420" y="2055" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
-		<!--Drumpad 4-->
+		<!--Drumpad 4 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="2130" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x80">
 			<bounds x="2005" y="2145" width="460" height="460" />
@@ -1099,8 +1101,6 @@
 <!-- Guide .png image when editing layout -->
 <!--    <element ref="background"><bounds x="0" y="0" width="6381" height="5433" /></element>-->
 
-<!-- Panel SVG Logos -->
-
 <!-- Screen and Case -->
 		<element ref="button-black-outline"><bounds x="630" y="770" width="3030" height="1280" /><color red="0.0" green="0.0" blue="0.0" /></element>
 		<element ref="button-black-outline"><bounds x="660" y="800" width="2970" height="1220" /><color red="0.827" green="0.827" blue="0.827" /></element>
@@ -1116,6 +1116,11 @@
 		<group ref="vents"><bounds x="3915" y="430" width="2225" height="40" /></group>
 		<group ref="vents"><bounds x="3915" y="505" width="2225" height="40" /></group>
 		<group ref="vents"><bounds x="3915" y="580" width="2225" height="40" /></group>
+
+<!-- Panel Text Logos -->
+		<element ref="akai-logo-text"><bounds x="480" y="155" width="500" height="310" /><color red="0.902" green="0.117" blue="0.149" /></element>
+		<element ref="professional-logo-text"><bounds x="460" y="420" width="500" height="120" /><color red="0.902" green="0.117" blue="0.149" /></element>
+		<element ref="mpc3000-logo-text"><bounds x="2760" y="780" width="1500" height="230" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 <!-- Left Side Knob Labels -->
 		<element ref="knob-volume"><bounds x="155" y="710" width="350" height="70" /><color red="0.0" green="0.0" blue="0.0" /></element>
@@ -1149,18 +1154,21 @@
 		<element ref="knob-position"><bounds x="225" y="1930" width="170" height="40" /><color red="0.5" green="0.5" blue="0.5" /></element>
 		<element ref="knob-position"><bounds x="234" y="1935" width="160" height="30" /><color red="0.78" green="0.8" blue="0.678" /></element>
 
-<!-- Variation Slider - TODO: Slider needs to be hooked up in MAME -->
+<!-- Left Button Group - Here due to layering, must be drawn before slider -->
+		<group ref="left-buttons"><bounds x="100" y="2495" width="615" height="2805" /></group>
+
+<!-- Variation Slider -->
 		<group ref="variationscale"><bounds x="295" y="4440" width="50" height="782"/></group>
 		<group ref="variationscale"><bounds x="475" y="4440" width="50" height="782"/></group>
 		<group ref="variationscaleminmaxl"><bounds x="212" y="4405" width="80" height="840"/></group>
 		<group ref="variationscaleminmaxr"><bounds x="535" y="4405" width="80" height="840"/></group>
-		<group ref="variationslider"><bounds x="295" y="4155" width="230" height="1100"/></group>
+		<group ref="variationslider"><bounds x="295" y="4337" width="230" height="990"/></group>
 
-<!-- Data Entry Knob - TODO: inputtag 'dataentry' doesn't exist yet -->
+<!-- Data Entry Knob -->
 		<element ref="dataentry_outer" ><bounds x="4055" y="2845" width="530" height="530"/></element>
-		<element ref="dataentry_knob" ><bounds x="4070" y="2860" width="500" height="500"/></element>
-		<element ref="dataentry_value" inputtag="dataentry" inputmask="0x01" inputraw="yes">
-			<bounds x="4265" y="3060" width="100" height="100"/>
+		<element ref="dataentry_top" ><bounds x="4070" y="2860" width="500" height="500"/></element>
+		<element ref="dataentry_knob" id="dataentry_knob" inputtag="DATAENTRY" inputmask="0xffff" inputraw="yes">
+			<bounds x="4215" y="3040" width="200" height="150"/>
 		</element>
 
 <!-- All Button Modules -->
@@ -1169,7 +1177,6 @@
 		<group ref="commands-buttons"><bounds x="5110" y="730" width="915" height="1781" /></group>
 		<group ref="softkey-buttons"><bounds x="1240" y="2120" width="1830" height="236" /></group>
 		<group ref="dataentry-buttons"><bounds x="3890" y="730" width="860" height="2070" /></group>
-		<group ref="left-buttons"><bounds x="100" y="2495" width="615" height="2805" /></group>
 		<group ref="realtime-buttons"><bounds x="4050" y="3550" width="1940" height="431" /></group>
 		<element ref="greybg"><bounds x="3820" y="4050" width="2395" height="1145" /></element>
 		<group ref="playrec1-buttons"><bounds x="3935" y="4100" width="2160" height="431" /></group>
@@ -1186,17 +1193,13 @@
 
 	</view>
 
-<!-- TODO - Enable When Knobs Emulated (add below 'install_slider_callbacks(view)'
-                add_simplecounter_knob(view, "dataentry_knob", "dataentry", 1.5)
-                add_vertical_slider(view, "variation_area", "variation_knob", "variation")
--->
-
 	<script><![CDATA[
 		file:set_resolve_tags_callback(
 			function()
 				local view = file.views["Default Layout"]
 				install_slider_callbacks(view)
-
+				add_simplecounter_knob(view, "dataentry_knob", "DATAENTRY", 1.5)
+				add_vertical_slider(view, "variation_area", "variation_knob", "VARIATION")
 				view.items["warning"]:set_state(0)
 			end)
 

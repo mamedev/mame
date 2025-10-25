@@ -76,13 +76,12 @@ MPCs on other hardware:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/midi/midi.h"
+#include "bus/nscsi/devices.h"
 #include "cpu/nec/v5x.h"
 #include "cpu/upd7810/upd7810.h"
 #include "imagedev/floppy.h"
-#include "sound/l7a1045_l6028_dsp_a.h"
-#include "video/hd61830.h"
-#include "bus/midi/midi.h"
-#include "bus/nscsi/devices.h"
 #include "formats/dfi_dsk.h"
 #include "formats/hxchfe_dsk.h"
 #include "formats/hxcmfm_dsk.h"
@@ -92,9 +91,6 @@ MPCs on other hardware:
 #include "formats/dsk_dsk.h"
 #include "formats/pc_dsk.h"
 #include "formats/ipf_dsk.h"
-#include "speaker.h"
-#include "screen.h"
-#include "emupal.h"
 #include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
@@ -104,6 +100,13 @@ MPCs on other hardware:
 #include "machine/te7774.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
+#include "sound/l7a1045_l6028_dsp_a.h"
+#include "video/hd61830.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "softlist_dev.h"
+#include "speaker.h"
 
 #include "mpc3000.lh"
 
@@ -567,6 +570,8 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_dsp->add_route(l7a1045_sound_device::L6028_OUT7, "outputs", 1.0, 7);
 
 	TIMER(config, "dialtimer").configure_periodic(FUNC(mpc3000_state::dial_timer_tick), attotime::from_hz(60.0));
+
+	SOFTWARE_LIST(config, "flop_mpc3000").set_original("mpc3000_flop");
 
 	config.set_default_layout(layout_mpc3000);
 }
