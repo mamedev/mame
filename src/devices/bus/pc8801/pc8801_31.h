@@ -11,8 +11,10 @@
 
 #pragma once
 
-#include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
+#include "bus/nscsi/devices.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cb.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -37,17 +39,18 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(select_off);
+	TIMER_CALLBACK_MEMBER(select_off_cb);
 
 private:
-	required_device<nscsi_bus_device> m_scsibus;
+	required_device<nscsi_bus_device> m_sasibus;
+	required_device<nscsi_callback_device> m_sasi;
 
 	devcb_write_line m_rom_bank_cb;
 
 	emu_timer *m_sel_off_timer;
 
-	u8 scsi_status_r();
-	void scsi_sel_w(u8 data);
+	u8 status_r();
+	void select_w(u8 data);
 	void scsi_reset_w(u8 data);
 	u8 clock_r();
 	void volume_control_w(u8 data);
@@ -57,6 +60,9 @@ private:
 
 	bool m_clock_hb;
 	bool m_cddrive_enable;
+	int m_sasi_sel;
+
+	void sasi_sel_w(int line);
 };
 
 
