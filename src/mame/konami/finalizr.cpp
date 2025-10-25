@@ -15,6 +15,7 @@ TODO:
 
 #include "emu.h"
 
+#include "k005885.h"
 #include "konami1.h"
 #include "konamipt.h"
 
@@ -42,12 +43,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_scroll(*this, "scroll"),
-		m_colorram(*this, "colorram%u", 1U),
-		m_videoram(*this, "videoram%u", 1U),
-		m_spriteram(*this, "spriteram%u", 1U)
+		m_k005885(*this, "k005885"),
+		m_palette(*this, "palette")
 	{ }
 
 	void finalizr(machine_config &config);
@@ -55,44 +52,24 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<mcs48_cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<k005885_device> m_k005885;
 	required_device<palette_device> m_palette;
 
-	// memory pointers
-	required_shared_ptr<uint8_t> m_scroll;
-	required_shared_ptr_array<uint8_t, 2> m_colorram;
-	required_shared_ptr_array<uint8_t, 2> m_videoram;
-	required_shared_ptr_array<uint8_t, 2> m_spriteram;
-
-	// video-related
-	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_spriterambank = 0U;
-	uint8_t m_charbank = 0U;
-
-	// misc
-	uint8_t m_nmi_enable = 0U;
-	uint8_t m_irq_enable = 0U;
-
 	void coin_w(uint8_t data);
-	void flipscreen_w(uint8_t data);
 	void sound_irq_w(uint8_t data);
 	void sound_irqen_w(uint8_t data);
 	int bootleg_t1_r();
-	void videoctrl_w(uint8_t data);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank);
 	void palette(palette_device &palette) const;
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void nmi_callback(int state);
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 };
@@ -177,109 +154,92 @@ void finalizr_state::palette(palette_device &palette) const
 	}
 }
 
-TILE_GET_INFO_MEMBER(finalizr_state::get_bg_tile_info)
+void finalizr_state::tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank)
 {
-	int const attr = m_colorram[0][tile_index];
-	int const code = m_videoram[0][tile_index] + ((attr & 0xc0) << 2) + (m_charbank << 10);
-	int const color = attr & 0x0f;
-	int const flags = TILE_FLIPYX((attr & 0x30) >> 4);
-
-	tileinfo.set(0, code, color, flags);
+	code += (attr & 0xc0) << 2;
+	if (layer == 0)
+		code += codebank << 10;
+	color = attr & 0x0f;
+	flags = TILE_FLIPYX((attr & 0x30) >> 4);
+	gfx = 0;
 }
-
-TILE_GET_INFO_MEMBER(finalizr_state::get_fg_tile_info)
-{
-	int const attr = m_colorram[1][tile_index];
-	int const code = m_videoram[1][tile_index] + ((attr & 0xc0) << 2);
-	int const color = attr & 0x0f;
-	int const flags = TILE_FLIPYX((attr & 0x30) >> 4);
-
-	tileinfo.set(0, code, color, flags);
-}
-
-void finalizr_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(finalizr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(finalizr_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-}
-
 
 
 /**************************************************************************/
 
-void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void finalizr_state::sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy)
 {
-	gfx_element *gfx1 = m_gfxdecode->gfx(1);
-	gfx_element *gfx2 = m_gfxdecode->gfx(2);
+	sx = 32 + 1 + (sx & 0xff) - (sx & 0x100);
+	code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
+	color += 16;
 
-	uint8_t const *sr = m_spriterambank ? m_spriteram[1] : m_spriteram[0];
+	int width = 1, height = 1;
 
-	for (int offs = 0; offs <= m_spriteram[0].bytes() - 5; offs += 5)
+	if (size >= 0x10)
 	{
-		int sx = 32 + 1 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
-		int sy = sr[offs + 2];
-		int flipx = sr[offs + 4] & 0x20;
-		int flipy = sr[offs + 4] & 0x40;
-		int code = sr[offs] + ((sr[offs + 1] & 0x0f) << 8);
-		int const color = ((sr[offs + 1] & 0xf0) >> 4);
-
-//      (sr[offs + 4] & 0x02) is used, meaning unknown
-
-		int const size = sr[offs + 4] & 0x1c;
-
-		if (size >= 0x10)
+		// 32x32
+		if (flip)
 		{
-			// 32x32
-			if (flip_screen())
-			{
-				sx = 256 - sx;
-				sy = 224 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
+			sx = 256 - sx;
+			sy = 224 - sy;
+		}
 
-			gfx1->transpen(bitmap, cliprect, code + 0, color, flipx, flipy, flipx ? sx + 16 : sx, flipy ? sy + 16 : sy, 0);
-			gfx1->transpen(bitmap, cliprect, code + 1, color, flipx, flipy, flipx ? sx : sx + 16, flipy ? sy + 16 : sy, 0);
-			gfx1->transpen(bitmap, cliprect, code + 2, color, flipx, flipy, flipx ? sx + 16: sx , flipy ? sy : sy + 16, 0);
-			gfx1->transpen(bitmap, cliprect, code + 3, color, flipx, flipy, flipx ? sx : sx + 16, flipy ? sy : sy + 16, 0);
+		code &= ~3;
+		width = 4;
+		height = 4;
+	}
+	else
+	{
+		if (flip)
+		{
+			sx = (BIT(size, 3) ? 280: 272) - sx;
+			sy = (BIT(size, 2) ? 248: 240) - sy;
+		}
+
+		if (size == 0x00)
+		{
+			// 16x16
+			code &= ~3;
+			width = 2;
+			height = 2;
 		}
 		else
 		{
-			if (flip_screen())
+			if (size == 0x04)
 			{
-				sx = ((size & 0x08) ? 280: 272) - sx;
-				sy = ((size & 0x04) ? 248: 240) - sy;
-				flipx = !flipx;
-				flipy = !flipy;
+				// 16x8
+				code &= ~1;
+				width = 2;
+				height = 1;
 			}
-
-			if (size == 0x00)
+			else if (size == 0x08)
 			{
-				// 16x16
-				gfx1->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
+				// 8x16
+				code &= ~2;
+				width = 1;
+				height = 2;
 			}
-			else
+			else if (size == 0x0c)
 			{
-				code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-
-				if (size == 0x04)
-				{
-					// 16x8
-					gfx2->transpen(bitmap, cliprect, code &~1, color, flipx, flipy, flipx ? sx + 8 : sx, sy, 0);
-					gfx2->transpen(bitmap, cliprect, code | 1, color, flipx, flipy, flipx ? sx : sx + 8, sy, 0);
-				}
-				else if (size == 0x08)
-				{
-					// 8x16
-					gfx2->transpen(bitmap, cliprect, code &~2, color, flipx, flipy, sx, flipy ? sy + 8 : sy, 0);
-					gfx2->transpen(bitmap, cliprect, code | 2, color, flipx, flipy, sx, flipy ? sy : sy + 8, 0);
-				}
-				else if (size == 0x0c)
-				{
-					// 8x8
-					gfx2->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
-				}
+				// 8x8
+				width = 1;
+				height = 1;
 			}
+		}
+	}
+	static const int x_offset[4] = {  0,  1,  4,  5 };
+	static const int y_offset[4] = {  0,  2,  8, 10 };
+	for (int dy = 0; dy < height; dy++)
+	{
+		const int ey = flipy ? (height - dy - 1) : dy;
+		for (int dx = 0; dx < width; dx++)
+		{
+			const int ex = flipx ? (width - dx - 1) : dx;
+			sgfx->transpen(bitmap, cliprect,
+					code + x_offset[ex] + y_offset[ey],
+					color,
+					flipx, flipy,
+					sx + dx * 8, sy + dy * 8, 0);
 		}
 	}
 }
@@ -287,13 +247,10 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t finalizr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->mark_all_dirty();
-	m_fg_tilemap->mark_all_dirty();
+	m_k005885->tilemap_set_scrollx(0, 0, m_k005885->get_xscroll() - 32);
+	m_k005885->tilemap_draw(0, screen, bitmap, cliprect, 0, 0);
 
-	m_bg_tilemap->set_scrollx(0, *m_scroll - 32);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	draw_sprites(bitmap, cliprect);
+	m_k005885->sprite_draw(screen, bitmap, cliprect, flip_screen(), m_k005885->get_spriterambank(), 0x200, 0);
 
 	// draw top status region
 	const rectangle &visarea = screen.visible_area();
@@ -310,7 +267,7 @@ uint32_t finalizr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		clip.max_x = visarea.min_x + 31;
 	}
 
-	m_fg_tilemap->draw(screen, bitmap, clip, 0, 0);
+	m_k005885->tilemap_draw(1, screen, bitmap, clip, 0, 0);
 
 	return 0;
 }
@@ -319,32 +276,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::scanline)
 {
 	int const scanline = param;
 
-	if (scanline == 240 && m_irq_enable) // vblank irq
-		m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-	else if (((scanline % 32) == 0) && m_nmi_enable) // timer irq
+	if (scanline == 240) // vblank irq
+		m_k005885->irq_set();
+	else if ((scanline % 32) == 0) // timer irq
+		m_k005885->nmi_set();
+}
+
+
+void finalizr_state::nmi_callback(int state)
+{
+	if (state)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-void finalizr_state::videoctrl_w(uint8_t data)
-{
-	m_charbank = data & 3;
-	m_spriterambank = data & 8;
-	// other bits unknown
-}
-
 void finalizr_state::coin_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
-}
-
-void finalizr_state::flipscreen_w(uint8_t data)
-{
-	m_nmi_enable = data & 0x01;
-	m_irq_enable = data & 0x02;
-
-	flip_screen_set(~data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 void finalizr_state::sound_irq_w(uint8_t data)
@@ -359,7 +308,7 @@ void finalizr_state::sound_irqen_w(uint8_t data)
 	    bit 0x40 goes active high to enable the DAC ?
 	*/
 
-	if ((data & 0x80) == 0)
+	if (BIT(~data, 7))
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -376,12 +325,8 @@ int finalizr_state::bootleg_t1_r()
 void finalizr_state::main_map(address_map &map)
 {
 	// Konami 005885
-	map(0x0000, 0x0000).nopw();
-	map(0x0001, 0x0001).writeonly().share(m_scroll);
-	map(0x0002, 0x0002).nopw();
-	map(0x0003, 0x0003).w(FUNC(finalizr_state::videoctrl_w));
-	map(0x0004, 0x0004).w(FUNC(finalizr_state::flipscreen_w));
-//  map(0x0020, 0x003f).writeonly().share(m_scroll);
+	map(0x0000, 0x0004).m(m_k005885, FUNC(k005885_device::regs_map));
+//  map(0x0020, 0x003f).w(m_k005885, FUNC(k005885_device::scroll_w));
 
 	map(0x0800, 0x0800).portr("DSW3");
 	map(0x0808, 0x0808).portr("DSW2");
@@ -395,14 +340,8 @@ void finalizr_state::main_map(address_map &map)
 	map(0x081b, 0x081b).nopw();        // Loads the snd command into the snd latch
 	map(0x081c, 0x081c).w(FUNC(finalizr_state::sound_irq_w)); // custom sound chip
 	map(0x081d, 0x081d).w("soundlatch", FUNC(generic_latch_8_device::write)); // custom sound chip
-	map(0x2000, 0x23ff).ram().share(m_colorram[0]);
-	map(0x2400, 0x27ff).ram().share(m_videoram[0]);
-	map(0x2800, 0x2bff).ram().share(m_colorram[1]);
-	map(0x2c00, 0x2fff).ram().share(m_videoram[1]);
-	map(0x3000, 0x31ff).ram().share(m_spriteram[0]);
-	map(0x3200, 0x37ff).ram();
-	map(0x3800, 0x39ff).ram().share(m_spriteram[1]);
-	map(0x3a00, 0x3fff).ram();
+	map(0x2000, 0x2fff).rw(m_k005885, FUNC(k005885_device::vram_r), FUNC(k005885_device::vram_w));
+	map(0x3000, 0x3fff).rw(m_k005885, FUNC(k005885_device::spriteram_r), FUNC(k005885_device::spriteram_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -483,26 +422,12 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_finalizr )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,                   0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 16*16, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               16*16, 16 )  // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_packed_msb, 0, 16*2 )
 GFXDECODE_END
 
 
 void finalizr_state::machine_start()
 {
-	save_item(NAME(m_spriterambank));
-	save_item(NAME(m_charbank));
-	save_item(NAME(m_nmi_enable));
-	save_item(NAME(m_irq_enable));
-}
-
-void finalizr_state::machine_reset()
-{
-	m_spriterambank = 0;
-	m_charbank = 0;
-	m_nmi_enable = 0;
-	m_irq_enable = 0;
 }
 
 void finalizr_state::finalizr(machine_config &config)
@@ -528,7 +453,14 @@ void finalizr_state::finalizr(machine_config &config)
 	screen.set_screen_update(FUNC(finalizr_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_finalizr);
+	K005885(config, m_k005885, 18.432_MHz_XTAL, gfx_finalizr, m_palette, "screen");
+	m_k005885->set_split_tilemap(true);
+	m_k005885->set_irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
+	m_k005885->set_nmi_cb().set(FUNC(finalizr_state::nmi_callback));
+	m_k005885->set_flipscreen_cb().set(FUNC(finalizr_state::flip_screen_set)).invert();
+	m_k005885->set_sprite_callback(FUNC(finalizr_state::sprite_callback));
+	m_k005885->set_tile_callback(FUNC(finalizr_state::tile_callback));
+
 	PALETTE(config, m_palette, FUNC(finalizr_state::palette), 2*16*16, 32);
 
 	// sound hardware
@@ -569,7 +501,7 @@ ROM_START( finalizr )
 	ROM_REGION( 0x0800, "audiocpu", 0 ) // Konami custom
 	ROM_LOAD( "snd01_715-057p.8a", 0x0000, 0x0800, CRC(5459ab95) SHA1(3537b1b3ff0196493a6a03a1578cb2878b1c52bd) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "k005885", 0 )
 	ROM_LOAD16_BYTE( "523h04.5e",    0x00000, 0x4000, CRC(c056d710) SHA1(3fe0ab7ef3bce7298c2a073d0985c33f9dc40062) )
 	ROM_LOAD16_BYTE( "523h07.5f",    0x00001, 0x4000, CRC(50e512ba) SHA1(f916afb9df1872f9de571d20b9045b20d9172eaa) )
 	ROM_LOAD16_BYTE( "523h05.6e",    0x08000, 0x4000, CRC(ae0d0f76) SHA1(6dd0119e4ba7ebb32ba1ca6395f80d18f1617ce8) )
@@ -594,7 +526,7 @@ ROM_START( finalizra )
 	ROM_REGION( 0x0800, "audiocpu", 0 ) // Konami custom
 	ROM_LOAD( "snd01_715-057p.8a", 0x0000, 0x0800, CRC(5459ab95) SHA1(3537b1b3ff0196493a6a03a1578cb2878b1c52bd) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "k005885", 0 )
 	ROM_LOAD16_BYTE( "523h04.5e",    0x00000, 0x4000, CRC(c056d710) SHA1(3fe0ab7ef3bce7298c2a073d0985c33f9dc40062) )
 	ROM_LOAD16_BYTE( "523h07.5f",    0x00001, 0x4000, CRC(50e512ba) SHA1(f916afb9df1872f9de571d20b9045b20d9172eaa) )
 	ROM_LOAD16_BYTE( "523h05.6e",    0x08000, 0x4000, CRC(ae0d0f76) SHA1(6dd0119e4ba7ebb32ba1ca6395f80d18f1617ce8) )
@@ -618,7 +550,7 @@ ROM_START( finalizrb )
 	ROM_REGION( 0x0800, "audiocpu", 0 ) // 8749
 	ROM_LOAD( "d8749hd.bin",  0x0000, 0x0800, CRC(978dfc33) SHA1(13d24ce577b88bf6ec2e970d36dc67a7ec691c55) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "k005885", 0 )
 	ROM_LOAD16_BYTE( "523h04.5e",    0x00000, 0x4000, CRC(c056d710) SHA1(3fe0ab7ef3bce7298c2a073d0985c33f9dc40062) )
 	ROM_LOAD16_BYTE( "523h07.5f",    0x00001, 0x4000, CRC(50e512ba) SHA1(f916afb9df1872f9de571d20b9045b20d9172eaa) )
 	ROM_LOAD16_BYTE( "523h05.6e",    0x08000, 0x4000, CRC(ae0d0f76) SHA1(6dd0119e4ba7ebb32ba1ca6395f80d18f1617ce8) )
