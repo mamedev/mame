@@ -24230,13 +24230,8 @@ ROM_START( noved )
 	ROM_LOAD( "w27c512 winbond eeprom u27.bin", 0x0000, 0x8000, CRC(5f0882de) SHA1(a32a64f905f755dbe146710ed441fa78e55acbaf) )  // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE(                                         0x8000 )
 
-	// taken from new fruit bonus '96, might be wrong
-	ROM_REGION( 0x200, "proms", 0 )  // palette
-	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, BAD_DUMP CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
-	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, BAD_DUMP CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
-
-	ROM_REGION( 0x100, "proms2", 0 )  // colours again?
-	ROM_LOAD( "w27c512 winbond eeprom u57.bin", 0x00000, 0x100, CRC(84256478) SHA1(90c1abe26487682712d4514b113311400bf37ff3) )  // BADADDR  --------xxxxxxxx
+	ROM_REGION( 0x200, "proms", 0 )  // colours
+	ROM_LOAD( "w27c512 winbond eeprom u57.bin", 0x0000, 0x100, CRC(84256478) SHA1(90c1abe26487682712d4514b113311400bf37ff3) )  // BADADDR  --------xxxxxxxx
 	ROM_IGNORE( 0x0ff00 )
 ROM_END
 
@@ -29608,6 +29603,19 @@ void cmaster_state::init_noved()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x5551] = 0x00;  // avoids link error
+
+	// split the byte nibbles creating 4bit data for the whole game palette.
+	uint8_t *proms = memregion("proms")->base();
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t nibble1 = proms[i] >> 4;
+		uint8_t nibble2 = proms[i] & 0x0f;
+		proms[i] = nibble1;
+		proms[i + 0x100] = nibble2;
+	}
+
+	m_palette->update();
 }
 
 
