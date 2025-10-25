@@ -22,9 +22,9 @@ const char *const sonix16_disassembler::conds[] = { "eq", "ne", "gt", "ge", "lt"
 const char *const sonix16_disassembler::mods[] = { "", ", im", ", 1", ", -1" };
 
 const sonix16_disassembler::instruction sonix16_disassembler::instructions[] = {
-	{ 0x0000, 0x8000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "call 0x%06x", (pc + 1 & 0xff8000) + (opcode & 0x7fff)); }},
-	{ 0x8000, 0xf000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "jmp 0x%06x", (pc + 1 + util::sext(opcode, 12)) & 0xffffff); }},
-	{ 0x9000, 0xf000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "j%s 0x%06x", conds[(opcode >> 8) & 0xf], (pc + 1 + util::sext(opcode, 8)) & 0xffffff); }},
+	{ 0x0000, 0x8000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "call 0x%06x", ((pc + 1) & 0xff8000) + (opcode & 0x7fff)); }},
+	{ 0x8000, 0xf000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "jmp 0x%06x", ((pc + 1) + util::sext(opcode, 12)) & 0xffffff); }},
+	{ 0x9000, 0xf000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "j%s 0x%06x", conds[(opcode >> 8) & 0xf], ((pc + 1) + util::sext(opcode, 8)) & 0xffffff); }},
 	{ 0xa000, 0xf000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "RAM(0x%03x) = %s", (opcode & 0x800) >> 3 | (opcode & 0xff), regs[(opcode >> 8) & 7]); }},
 	{ 0xb000, 0xf000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = RAM(0x%03x)", regs[(opcode >> 8) & 7], (opcode & 0x800) >> 3 | (opcode & 0xff)); }},
 	{ 0xc000, 0xf800, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s.h = 0x%02x", immregs[(opcode >> 8) & 7], opcode & 0xff); }},
