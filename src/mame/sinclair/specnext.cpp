@@ -130,6 +130,7 @@ public:
 		, m_sprites(*this, "sprites")
 		, m_io_issue(*this, "ISSUE")
 		, m_io_video(*this, "VIDEO")
+		, m_io_layers(*this, "LYRS")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 	{}
 
@@ -351,6 +352,7 @@ private:
 	required_device<specnext_sprites_device> m_sprites;
 	required_ioport m_io_issue;
 	optional_ioport m_io_video;
+	optional_ioport m_io_layers;
 	required_ioport_array<3> m_io_mouse;
 
 	video_timings_info m_video_timings;
@@ -934,12 +936,18 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	rectangle clip320x256 = m_clip320x256;
 	clip320x256 &= cliprect;
 
+	const u8 layers_dev = ~m_io_layers->read();
+	const bool tiles_en = m_nr_6b_tm_en && BIT(layers_dev, 0);
+	const bool ula_en = m_nr_68_ula_en && BIT(layers_dev, 1);
+	const bool layer2_en = m_port_123b_layer2_en && BIT(layers_dev, 2);
+	const bool sprites_en = m_nr_15_sprite_en && BIT(layers_dev, 3);
+
 	screen.priority().fill(0, cliprect);
 	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
 	if (m_nr_15_layer_priority < 0b110)
 	{
 		// background
-		if (m_nr_68_ula_en)
+		if (ula_en)
 			m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
 		else
 			bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
@@ -957,65 +965,63 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		};
 
 		const u8 (&l)[3] = lcfg[m_nr_15_layer_priority];
-		if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), l[0]);
-		if (m_nr_68_ula_en && BIT(~m_nr_6b_tm_control, 3))
+		if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), l[0]);
+		if (ula_en && BIT(~m_nr_6b_tm_control, 3))
 		{
 			if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, l[0]);
 			else m_ula_scr->draw(screen, bitmap, clip256x192, flash, l[0]);
 		}
-		if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), l[0]);
-		m_layer2->draw(screen, bitmap, clip320x256, l[1], l[2]);
+		if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), l[0]);
+		if (layer2_en) m_layer2->draw(screen, bitmap, clip320x256, l[1], l[2]);
 	}
 	else // colors mixing case
 	{
 		bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
-
-		const bool is_textmode = BIT(m_nr_6b_tm_control, 3);
 		if (m_nr_68_blend_mode == 0b00) // Use ULA as blend layer
 		{
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), is_textmode ? 1 : 0xff);
-			if (m_nr_68_ula_en && !is_textmode)
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
+			if (ula_en && BIT(~m_nr_6b_tm_control, 3))
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), is_textmode ? 1 : 2);
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
 		}
 		else if (m_nr_68_blend_mode == 0b10) // Use result of ULA + Tilemap
 		{
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
-			if (m_nr_68_ula_en && !is_textmode)
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
+			if (ula_en && BIT(~m_nr_6b_tm_control, 3))
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
 		}
 		else if (m_nr_68_blend_mode == 0b11) // Use Tilemap as blend layer
 		{
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
-			if (m_nr_68_ula_en && !is_textmode)
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
+			if (ula_en && BIT(~m_nr_6b_tm_control, 3))
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
 			}
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
 		}
 		else // No blending (disable blend)
 		{
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
-			if (m_nr_68_ula_en && !is_textmode)
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
+			if (ula_en && BIT(~m_nr_6b_tm_control, 3))
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
 			}
-			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
 		}
 		// mixes only to 1
-		m_layer2->draw_mix(screen, bitmap, clip320x256, m_nr_15_layer_priority & 1);
+		if (layer2_en) m_layer2->draw_mix(screen, bitmap, clip320x256, m_nr_15_layer_priority & 1);
 	}
 	// sprites below foreground
-	if (m_nr_15_sprite_en) m_sprites->draw(screen, bitmap, clip320x256, GFX_PMASK_8);
+	if (sprites_en) m_sprites->draw(screen, bitmap, clip320x256, GFX_PMASK_8);
 
 	return 0;
 }
@@ -2987,6 +2993,21 @@ INPUT_PORTS_START(specnext)
 	PORT_MODIFY("NMI")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI MF") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(specnext_state::on_mf_nmi), 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI DivMMC") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(specnext_state::on_divmmc_nmi), 0)
+
+	PORT_START("LYRS")
+	PORT_DIPNAME( 0x08, 0x00, "No Sprites" ) PORT_DIPLOCATION("LYRS:4")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x08, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x00, "No Layer2" ) PORT_DIPLOCATION("LYRS:5")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x04, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "No ULA/LoRes" ) PORT_DIPLOCATION("LYRS:6")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x02, DEF_STR(On))
+	PORT_DIPNAME( 0x01, 0x00, "No Tiles" ) PORT_DIPLOCATION("LYRS:7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x01, DEF_STR(On))
+
 INPUT_PORTS_END
 
 void specnext_state::machine_start()
