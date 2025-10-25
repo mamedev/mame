@@ -195,6 +195,10 @@ void mpc3000_state::machine_start()
 {
 	save_item(NAME(m_key_scan_row));
 	save_item(NAME(m_drum_scan_row));
+	save_item(NAME(m_variation_slider));
+	save_item(NAME(m_last_dial));
+	save_item(NAME(m_count_dial));
+	save_item(NAME(m_quadrature_phase));
 }
 
 void mpc3000_state::machine_reset()
@@ -205,7 +209,7 @@ void mpc3000_state::mpc3000_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).mirror(0x80000).rom().region("maincpu", 0);
 	map(0x300000, 0x3fffff).ram();  // 2x HM658512 (512Kx8)
-	map(0x500000, 0x500fff).share("nvram");
+	map(0x500000, 0x500fff).ram().share("nvram");
 }
 
 void mpc3000_state::mpc3000_io_map(address_map &map)
