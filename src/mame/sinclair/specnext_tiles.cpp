@@ -101,7 +101,7 @@ void specnext_tiles_device::tilemap_update()
 	{
 		m_tilemap[i]->set_palette_offset(BIT(m_control, 4) ? m_palette_alt_offset : m_palette_base_offset);
 		m_tilemap[i]->set_transparent_pen(m_transp_colour);
-		m_tilemap[i]->set_scrollx(-m_offset_h + (m_tm_scroll_x << 1));
+		m_tilemap[i]->set_scrollx(-m_offset_h + m_tm_scroll_x);
 		m_tilemap[i]->set_scrolly(-m_offset_v + m_tm_scroll_y);
 		m_tilemap[i]->mark_mapping_dirty();
 		m_tilemap[i]->mark_all_dirty();
