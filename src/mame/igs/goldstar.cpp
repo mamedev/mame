@@ -16221,7 +16221,7 @@ ROM_START( cmv823 )
 	ROM_LOAD( "m2.64",     0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
 
 	ROM_REGION( 0x10000, "user1", 0 )  // taken from other set, was missing in this dump
-	ROM_LOAD( "27512.u53",  0x0000, 0x10000, BAD_DUMP CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+	ROM_LOAD( "27512.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
 	ROM_REGION( 0x200, "proms", 0 )  // pal
 	ROM_LOAD( "prom2.287", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
@@ -27865,6 +27865,10 @@ void cmaster_state::init_cmv823()
 			}
 		}
 	}
+
+//  forcing PPI mode 0 for all, and A, B & C as input.
+	rom[0x001f] = 0x9b;
+	rom[0x0023] = 0x9b;
 }
 
 
@@ -29670,8 +29674,8 @@ GAME(  1994, chryanglb,  ncb3,     chryanglb, chryanglb, cmaster_state, init_chr
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
-GAMEL( 198?, cmv801,     0,        cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",           0,                 layout_cmv4 )  // says ED-96 where the manufacturer is on some games...
-GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  init_cmv823,    ROT0, "Corsica",           "Cherry Master (ED-96 V8.23)",                 MACHINE_NOT_WORKING, layout_cmasterb )  // encrypted
+GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  init_cmv823,    ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.23)",     0,                 layout_cmv4 )  // encrypted
+GAMEL( 198?, cmv801,     cmv823,   cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.01)",     0,                 layout_cmv4 )  // says ED-96 where the manufacturer is on some games...
 
 
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
