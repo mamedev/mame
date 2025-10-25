@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// TODO: identify the CPU type! - there are vectors(?) near the start
-
 #include "emu.h"
 
-#include "cpu/evolution/evo.h"
+#include "cpu/sonix16/sonix16.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -31,7 +29,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<evo_cpu_device> m_maincpu;
+	required_device<sonix16_device> m_maincpu;
 
 	void evolution_map(address_map &map) ATTR_COLD;
 };
@@ -55,13 +53,13 @@ uint32_t evolution_handheldgame_state::screen_update(screen_device &screen, bitm
 
 void evolution_handheldgame_state::evolution_map(address_map &map)
 {
-	map(0x000000, 0x01ffff).mirror(0x400000).rom().region("maincpu", 0x00000);
+	map(0x000000, 0x1fffff).mirror(0x400000).rom().region("maincpu", 0x00000);
 }
 
 
 void evolution_handheldgame_state::evolhh(machine_config &config)
 {
-	EVOLUTION_CPU(config, m_maincpu, XTAL(16'000'000));
+	SONIX16(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::evolution_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

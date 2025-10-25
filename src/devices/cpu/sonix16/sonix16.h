@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_CPU_EVOLUTION_EVO_H
-#define MAME_CPU_EVOLUTION_EVO_H
+#ifndef MAME_CPU_SONIX16_SONIX16_H
+#define MAME_CPU_SONIX16_SONIX16_H
 
 #pragma once
 
 
-class evo_cpu_device : public cpu_device
+class sonix16_device : public cpu_device
 {
 public:
 	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
 
-	evo_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sonix16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -29,6 +29,7 @@ protected:
 
 private:
 	address_space_config m_program_config;
+	address_space_config m_data_config;
 
 	uint32_t m_pc;
 
@@ -36,6 +37,6 @@ private:
 };
 
 
-DECLARE_DEVICE_TYPE(EVOLUTION_CPU, evo_cpu_device)
+DECLARE_DEVICE_TYPE(SONIX16, sonix16_device)
 
-#endif // MAME_CPU_EVOLUTION_EVO_H
+#endif // MAME_CPU_SONIX16_SONIX16_H

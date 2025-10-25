@@ -4141,20 +4141,20 @@ if opt_tool(CPUS, "DDP516") then
 end
 
 --------------------------------------------------
--- Whatever is in the Evolution
---@src/devices/cpu/evolution/evo.h,CPUS["EVOLUTION"] = true
+-- Sonix 16-bit DSP
+--@src/devices/cpu/sonix16/sonix16.h,CPUS["SONIX16"] = true
 --------------------------------------------------
 
-if CPUS["EVOLUTION"] then
+if CPUS["SONIX16"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/evolution/evo.cpp",
-		MAME_DIR .. "src/devices/cpu/evolution/evo.h",
+		MAME_DIR .. "src/devices/cpu/sonix16/sonix16.cpp",
+		MAME_DIR .. "src/devices/cpu/sonix16/sonix16.h",
 	}
 end
 
-if opt_tool(CPUS, "EVOLUTION") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.h")
+if opt_tool(CPUS, "SONIX16") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sonix16/sonix16d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sonix16/sonix16d.h")
 end
 
 --------------------------------------------------
