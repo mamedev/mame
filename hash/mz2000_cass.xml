@@ -139,6 +139,19 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		</part>
 	</software>
 
+	<software name="gangman" supported="yes">
+		<description>Gang Man</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="ギャングマン"/>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3474088">
+				<rom name="gangman.wav" size="3474088" crc="41ac815e" sha1="0441e79bf3a1a31eb931b76db20d6a41c6e23ecd" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="harvestc" supported="no">
 		<description>Harvest (Color)</description>
 		<year>1983?</year>
@@ -214,6 +227,32 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
+	<software name="iceblock" supported="yes">
+		<description>Ice Block</description>
+		<year>1983</year>
+		<publisher>dB Soft</publisher>
+		<info name="alt_title" value="アイス・ブロック"/>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10047002">
+				<rom name="iceblock.wav" size="10047002" crc="7a351254" sha1="8ee7c107715f8cfea10b2948b58a0da2afdaf2c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="itasand" supported="yes">
+		<description>Itasandrias</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="イタサンドリアス"/>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3912958">
+				<rom name="itasandrias.wav" size="3912958" crc="da6bd73d" sha1="79f5cd35a0929932d32f0661ec69bdb99181c3c2" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This was was obtained by removing the MTW header from the available jelda.mtw.
      was any info lost? i.e. was the wav inside the mtw the complete content of the MZ tape? -->
 	<software name="jelda" supported="no">
@@ -238,6 +277,20 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 			<!-- baddump: missing Monitor TS-2000 bootstrap (in the original .mtw as raw binary) -->
 			<dataarea name="cass" size="6435154">
 				<rom name="jelda2.wav" size="6435154" crc="b7d61f11" sha1="8ff3932682e70f74f5d542059450e1a83b987c6a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="justice" supported="yes">
+		<description>Justice Knight</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="WB-1010"/>
+		<info name="alt_title" value="カセットテープソフト"/>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5557516">
+				<rom name="wb-1010.wav" size="5557516" crc="629af146" sha1="28409f2b837758eddf609f2b4bfec33b797fc0b3" />
 			</dataarea>
 		</part>
 	</software>
@@ -271,6 +324,19 @@ Loading error, boots with Z80 clock set at 3.2 MHz (80%)
 				<!-- <rom name="cg-30.wav" size="1835692" crc="371cf080" sha1="5b84658ffe5475bb851860ea918e14162f6771b2" /> -->
 				<!-- NOTE: this is the only RevengeOfTheHubz dump that actually works in .mzt only (?) -->
 				<rom name="cg-30.mzt" size="7809" crc="668ae553" sha1="ce6dcc3d2931e5f1e337bec3ee1b8ff318e30b06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plrstar2" supported="no">
+		<description>Polar Star II</description>
+		<year>1983</year>
+		<publisher>Hyo-Kin Soft</publisher>
+				<notes><![CDATA[Loads but gameplay won't start]]></notes>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6078700">
+				<rom name="polar.wav" size="6078700" crc="b6df3477" sha1="288bab5b38612160f6db867ad31cb9fd9f696925" />
 			</dataarea>
 		</part>
 	</software>
@@ -320,6 +386,20 @@ Gets stuck during loading
 			<dataarea name="cass" size="2464686">
 				<!-- .mzt to .wav converted -->
 				<rom name="cg-39.wav" size="2464686" crc="79651365" sha1="af85fbd36f7291bb6f77026870e1970198fcdfab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprdoor" supported="yes">
+		<description>Super Doors</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="WB-1026"/>
+		<info name="alt_title" value="スーパードアーズ"/>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2992512">
+				<rom name="wb-1026.wav" size="2992512" crc="638e1cb9" sha1="4de8ad5e0543cd487b820e242684f8fff101a2e0" />
 			</dataarea>
 		</part>
 	</software>
@@ -418,5 +498,17 @@ Has issues displaying title screen in color mode, incompatible? (verify)
 		</part>
 	</software>
 
+	<software name="zerofght" supported="yes">
+		<description>Zero Fighter</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="ゼロファイター"/>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2755948">
+				<rom name="zero.wav" size="2755948" crc="c64af8ba" sha1="35bbc817baa5ddacc806fcc1f7eac20b807264d2" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
