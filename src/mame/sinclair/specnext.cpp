@@ -942,16 +942,16 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	const bool layer2_en = m_port_123b_layer2_en && BIT(layers_dev, 2);
 	const bool sprites_en = m_nr_15_sprite_en && BIT(layers_dev, 3);
 
-	screen.priority().fill(0, cliprect);
 	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
+	screen.priority().fill(0, cliprect);
+	// background
+	if (ula_en)
+		m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
+	else
+		bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
+
 	if (m_nr_15_layer_priority < 0b110)
 	{
-		// background
-		if (ula_en)
-			m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
-		else
-			bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
-
 		static const u8 lcfg[][3] =
 		{
 			// tiles+ula priority; l2 prioryty; l2 mask
@@ -976,7 +976,6 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 	else // colors mixing case
 	{
-		bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
 		if (m_nr_68_blend_mode == 0b00) // Use ULA as blend layer
 		{
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
