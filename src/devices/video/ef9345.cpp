@@ -732,7 +732,7 @@ void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 	const uint8_t f = BIT(a, 3);        //flash
 	const uint8_t m = BIT(b, 2);        //conceal
 	const uint8_t n = BIT(a, 7);        //negative
-	const uint8_t u = (((b & 0x60) == 0) || ((b & 0xc0) == 0x40)) ? BIT(b, 4) : 0; //underline
+	const uint8_t u = (((type & 0x6) == 0) || ((type & 0xc) == 0x4)) ? BIT(b, 4) : 0; //underline
 
 	bichrome40(type, address, dial, iblock, x, y, c0, c1, i, f, m, n, u);
 }
