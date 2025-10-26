@@ -584,8 +584,15 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, boo
 {
 	uint8_t c0, c1, pix[60];
 
-	const bool insert = BIT(m_dor, (a & 1) ? 7 : 3);    //insert = DOR7/DOR3
-	c1 = (m_dor >> ((a & 1) ? 4 : 0)) & 7;              //foreground color = DOR
+	// Undocumented difference from the EF9345: on the TS9347 the insert bit
+	// is taken directly from A0.
+	bool insert;
+	if (m_variant == EF9345_MODE::TYPE_EF9345)
+		insert = BIT(m_dor, BIT(a, 0) ? 7 : 3);         //insert = DOR7/DOR3
+	else
+		insert = BIT(a, 0);                             //insert = A0
+
+	c1 = (m_dor >> (BIT(a, 0) ? 4 : 0)) & 7;            //foreground color = DOR
 	c0 =  m_mat & 7;                                    //background color = MAT
 
 	if (m_variant == EF9345_MODE::TYPE_TS9347 || !BIT(c, 7)) //alphanumeric G0 set
