@@ -340,6 +340,7 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 
 void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 {
+	uint32_t frame, msf, track = 0;
 	LOGCMD("0xde GET DIR INFO (NEC)\n");
 
 	if (!image->exists())
@@ -348,12 +349,14 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 		return;
 	}
 
+	const cdrom_file::toc &toc = image->get_toc();
+
 	// NOTE: PC8801-30 CD player wants 4 bytes back vs. PC Engine
 	switch(scsi_cmdbuf[1])
 	{
 		case 0x00:
 			scsi_cmdbuf[0] = dec_2_bcd(1);
-			scsi_cmdbuf[1] = dec_2_bcd(image->get_last_track());
+			scsi_cmdbuf[1] = dec_2_bcd(toc.numtrks);
 			scsi_cmdbuf[2] = 0;
 			scsi_cmdbuf[3] = 0;
 			LOGCMD("Get first and last track numbers => 1-%02x\n", scsi_cmdbuf[1]);
@@ -363,14 +366,15 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 			break;
 		case 0x01:
 		{
-			const uint32_t start_lba = image->get_track_start(0xaa);
-			const uint32_t start_frame = to_msf(start_lba);
-			LOGCMD("Get total disk size in MSF format => %06x\n", start_frame);
+			frame = toc.tracks[toc.numtrks-1].logframeofs;
+			frame += toc.tracks[toc.numtrks-1].frames;
+			msf = to_msf(frame);
+			LOGCMD("Get total disk size in MSF format => %06x\n", msf);
 
 			//scsi_cmdbuf[0] = image->get_adr_control(image->get_last_track());
-			scsi_cmdbuf[0] = dec_2_bcd(BIT(start_frame, 16, 8)); // minutes
-			scsi_cmdbuf[1] = dec_2_bcd(BIT(start_frame, 8, 8));  // seconds
-			scsi_cmdbuf[2] = dec_2_bcd(BIT(start_frame, 0, 8));  // frames
+			scsi_cmdbuf[0] = dec_2_bcd(BIT(msf, 16, 8)); // minutes
+			scsi_cmdbuf[1] = dec_2_bcd(BIT(msf, 8, 8));  // seconds
+			scsi_cmdbuf[2] = dec_2_bcd(BIT(msf, 0, 8));  // frames
 			scsi_cmdbuf[3] = 0;
 
 			scsi_data_in(SBUF_MAIN, 4);
@@ -383,25 +387,26 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 			uint8_t track_type;
 			if (scsi_cmdbuf[2] == 0xaa)
 			{
-				const uint32_t start_lba = image->get_track_start(image->get_last_track());
-				frame = to_msf(start_lba);
+				frame = toc.tracks[toc.numtrks-1].logframeofs;
+				frame += toc.tracks[toc.numtrks-1].frames;
 				LOGCMD("Get lead-out => %06x\n", frame);
 				// TODO: correct?
 				track_type = 0x04;
 			}
 			else
 			{
-				const u8 track = std::max(bcd_2_dec(scsi_cmdbuf[2]), 1U);
-				const uint32_t start_lba = image->get_track_start(track);
-				frame = to_msf(start_lba);
-				LOGCMD("Get track info track = %d, frame = %d\n", track, frame);
+				track = std::max(bcd_2_dec(scsi_cmdbuf[2]), 1U);
+				frame = toc.tracks[track-1].logframeofs;
 
-				track_type = image->get_track_type(track) == cdrom_file::CD_TRACK_AUDIO ? 0x00 : 0x04;
+				track_type = toc.tracks[track-1].trktype == cdrom_file::CD_TRACK_AUDIO ? 0x00 : 0x04;
+				LOGCMD("Get track info track = %d, frame = %d %s\n", track, frame, track_type ? "data" : "audio");
 			}
 
-			scsi_cmdbuf[0] = dec_2_bcd(BIT(frame, 16, 8)); // minutes
-			scsi_cmdbuf[1] = dec_2_bcd(BIT(frame, 8, 8));  // seconds
-			scsi_cmdbuf[2] = dec_2_bcd(BIT(frame, 0, 8));  // frames
+			msf = to_msf(frame + 150);
+
+			scsi_cmdbuf[0] = dec_2_bcd(BIT(msf, 16, 8)); // minutes
+			scsi_cmdbuf[1] = dec_2_bcd(BIT(msf, 8, 8));  // seconds
+			scsi_cmdbuf[2] = dec_2_bcd(BIT(msf, 0, 8));  // frames
 			scsi_cmdbuf[3] = track_type;
 
 			scsi_data_in(SBUF_MAIN, 4);
@@ -409,6 +414,9 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 
 			break;
 		}
+		default:
+			popmessage("nec_get_dir_info: unknown subcommand %02x", scsi_cmdbuf[1]);
+			break;
 	}
 }
 
@@ -416,6 +424,15 @@ void nscsi_cdrom_pc8801_30_device::scsi_command()
 {
 	switch (scsi_cmdbuf[0])
 	{
+		case SC_MODE_SELECT_6:
+			LOG("command MODE SELECT 6 length %d\n", scsi_cmdbuf[4]);
+
+			// accept mode select parameter data
+			// wants 11 bytes compared to regular cd.h
+			scsi_cmdbuf[4] += 1;
+			nscsi_cdrom_device::scsi_command();
+			break;
+
 		case 0xd8: nec_set_audio_start_position(); break;
 		case 0xd9: nec_set_audio_stop_position();  break;
 		case 0xda: nec_pause();                    break;

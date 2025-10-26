@@ -1788,6 +1788,9 @@ void pc8801mc_state::pc8801mc(machine_config &config)
 
 	PC8801_31(config, m_cdrom_if, 0);
 	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
+	m_cdrom_if->drq_cb().set(m_dma, FUNC(i8257_device::dreq1_w));
+	m_dma->in_ior_cb<1>().set(m_cdrom_if, FUNC(pc8801_31_device::dma_r));
+//	m_dma->out_iow_cb<1>().set([] (u8 data) { printf("SASI iow\n"); });
 }
 
 ROM_START( pc8801 )

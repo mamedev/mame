@@ -2,11 +2,11 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC PC8801-31 CD-ROM I/F
+NEC PC8801-31 CD-ROM I/F
 
-    TODO:
-    - Interface with PC8801-30 (the actual CD drive);
-    - Make it a slot option for PC-8801MA (does it have same ROM as the internal MC version?)
+TODO:
+- Interface with PC8801-30 (the actual CD drive);
+- Make it a slot option for PC-8801MA (does it have same ROM as the internal MC version?)
 
 **************************************************************************************************/
 
@@ -41,6 +41,7 @@ pc8801_31_device::pc8801_31_device(const machine_config &mconfig, const char *ta
 	, m_sasibus(*this, "sasi")
 	, m_sasi(*this, "sasi:7:sasicb")
 	, m_rom_bank_cb(*this)
+	, m_drq_cb(*this)
 	, m_sel_off_timer(nullptr)
 {
 }
@@ -126,27 +127,7 @@ TIMER_CALLBACK_MEMBER(pc8801_31_device::select_off_cb)
 void pc8801_31_device::amap(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(pc8801_31_device::status_r), FUNC(pc8801_31_device::select_w));
-	map(0x01, 0x01).lrw8(
-		NAME([this]() {
-			u8 res = m_sasi->read();
-			if ((m_sasi->req_r()) && (m_sasi->io_r()))
-			{
-				m_sasi->ack_w(1);
-				m_sasi->ack_w(0);
-			}
-			return res;
-		}),
-		NAME([this](u8 data) {
-			m_sasi->write(data);
-
-			if (m_sasi->req_r())
-			{
-				m_sasi->ack_w(1);
-				//m_sasi->write(0);
-				m_sasi->ack_w(0);
-			}
-		})
-	);
+	map(0x01, 0x01).rw(FUNC(pc8801_31_device::data_r), FUNC(pc8801_31_device::data_w));
 	map(0x04, 0x04).w(FUNC(pc8801_31_device::scsi_reset_w));
 	map(0x08, 0x08).rw(FUNC(pc8801_31_device::clock_r), FUNC(pc8801_31_device::volume_control_w));
 	map(0x09, 0x09).rw(FUNC(pc8801_31_device::id_r), FUNC(pc8801_31_device::rom_bank_w));
@@ -200,6 +181,29 @@ void pc8801_31_device::select_w(u8 data)
 	}
 	else
 		m_sasi->sel_w(0);
+}
+
+u8 pc8801_31_device::data_r()
+{
+	u8 res = m_sasi->read();
+	if ((m_sasi->req_r()) && (m_sasi->io_r()))
+	{
+		m_sasi->ack_w(1);
+		m_sasi->ack_w(0);
+	}
+	return res;
+}
+
+void pc8801_31_device::data_w(u8 data)
+{
+	m_sasi->write(data);
+
+	if (m_sasi->req_r())
+	{
+		m_sasi->ack_w(1);
+		//m_sasi->write(0);
+		m_sasi->ack_w(0);
+	}
 }
 
 /*

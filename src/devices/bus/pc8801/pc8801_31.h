@@ -29,6 +29,8 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 	auto rom_bank_cb() { return m_rom_bank_cb.bind(); }
+	auto drq_cb() { return m_drq_cb.bind(); }
+	auto dma_r() { return data_r(); }
 
 	// I/O operations
 	void amap(address_map &map) ATTR_COLD;
@@ -46,11 +48,14 @@ private:
 	required_device<nscsi_callback_device> m_sasi;
 
 	devcb_write_line m_rom_bank_cb;
+	devcb_write_line m_drq_cb;
 
 	emu_timer *m_sel_off_timer;
 
 	u8 status_r();
 	void select_w(u8 data);
+	u8 data_r();
+	void data_w(u8 data);
 	void scsi_reset_w(u8 data);
 	u8 clock_r();
 	void volume_control_w(u8 data);
@@ -62,7 +67,7 @@ private:
 	bool m_cddrive_enable;
 	int m_sasi_sel;
 
-	void sasi_sel_w(int line);
+	void sasi_sel_w(int state);
 };
 
 
