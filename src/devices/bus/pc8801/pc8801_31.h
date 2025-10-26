@@ -13,6 +13,7 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
+#include "bus/nscsi/pc8801_30.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_cb.h"
 
@@ -45,6 +46,7 @@ protected:
 
 private:
 	required_device<nscsi_bus_device> m_sasibus;
+	required_device<nscsi_cdrom_pc8801_30_device> m_cddrive;
 	required_device<nscsi_callback_device> m_sasi;
 
 	devcb_write_line m_rom_bank_cb;
@@ -61,7 +63,7 @@ private:
 	void volume_control_w(u8 data);
 	u8 id_r();
 	void rom_bank_w(u8 data);
-	u8 volume_meter_r();
+	template <unsigned N> u8 volume_meter_r();
 
 	bool m_clock_hb;
 	bool m_cddrive_enable;

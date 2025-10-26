@@ -24,6 +24,13 @@ nscsi_cdrom_pc8801_30_device::nscsi_cdrom_pc8801_30_device(const machine_config 
 {
 }
 
+void nscsi_cdrom_pc8801_30_device::device_add_mconfig(machine_config &config)
+{
+	nscsi_cdrom_device::device_add_mconfig(config);
+	cdda->audio_end_cb().set(FUNC(nscsi_cdrom_pc8801_30_device::cdda_end_mark_cb));
+}
+
+
 void nscsi_cdrom_pc8801_30_device::device_reset()
 {
 	nscsi_cdrom_device::device_reset();
@@ -135,7 +142,7 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 		// - manhole (fires this during Sunsoft logo but expects playback on successive
 		//            credit sequence instead)
 		//if (m_end_frame > m_current_frame)
-		//  m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
+		//  cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 
 		// These ones additionally wants a CDDA pause issued:
 		// - audio CD player ("fade out" button trigger, otherwise will playback the
@@ -446,5 +453,43 @@ void nscsi_cdrom_pc8801_30_device::scsi_command()
 			nscsi_cdrom_device::scsi_command();
 			break;
 	}
+}
+
+void nscsi_cdrom_pc8801_30_device::cdda_end_mark_cb(int state)
+{
+	if (state != ASSERT_LINE)
+		return;
+
+	LOGCDDA("CDDA end mark %d\n", m_cdda_play_mode & 3);
+
+	// handle end playback event
+	if (m_end_mark == 1)
+	{
+		switch (m_cdda_play_mode & 3)
+		{
+			case 1:
+			{
+				// TODO: should seek rather than be instant
+				LOGCDDA(" - Play with repeat %d %d\n", m_current_frame, m_end_frame);
+				cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
+				m_end_mark = 1;
+				break;
+			}
+			case 2:
+				LOGCDDA(" - IRQ when finished\n");
+				//set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+				m_end_mark = 0;
+				break;
+			case 3:
+				LOGCDDA(" - Play without repeat\n");
+				// fzone2 / fzone2j wants a STOP thru SUBQ command during intro
+				m_cdda_status = PCE_CD_CDDA_OFF;
+				cdda->stop_audio();
+				m_end_mark = 0;
+				break;
+		}
+	}
+	else
+		LOGCDDA(" - No end mark encountered, check me\n");
 }
 

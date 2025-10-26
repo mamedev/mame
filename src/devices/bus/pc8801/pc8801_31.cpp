@@ -39,6 +39,7 @@ DEFINE_DEVICE_TYPE(PC8801_31, pc8801_31_device, "pc8801_31", "NEC PC8801-31 CD-R
 pc8801_31_device::pc8801_31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC8801_31, tag, owner, clock)
 	, m_sasibus(*this, "sasi")
+	, m_cddrive(*this, "sasi:0:cdrom")
 	, m_sasi(*this, "sasi:7:sasicb")
 	, m_rom_bank_cb(*this)
 	, m_drq_cb(*this)
@@ -60,14 +61,14 @@ static void pc8801_scsi_devices(device_slot_interface &device)
 
 void pc8801_31_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "speaker", 2).front_center();
+	SPEAKER(config, "headphone", 2).front_center();
 
 	NSCSI_BUS(config, m_sasibus);
 	NSCSI_CONNECTOR(config, "sasi:0").option_set("cdrom", NSCSI_CDROM_PC8801_30).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 0.5, 0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 0.5, 1);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^headphone", 0.5, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^headphone", 0.5, 1);
 		});
 	NSCSI_CONNECTOR(config, "sasi:1", pc8801_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "sasi:2", pc8801_scsi_devices, nullptr);
@@ -131,8 +132,8 @@ void pc8801_31_device::amap(address_map &map)
 	map(0x04, 0x04).w(FUNC(pc8801_31_device::scsi_reset_w));
 	map(0x08, 0x08).rw(FUNC(pc8801_31_device::clock_r), FUNC(pc8801_31_device::volume_control_w));
 	map(0x09, 0x09).rw(FUNC(pc8801_31_device::id_r), FUNC(pc8801_31_device::rom_bank_w));
-	map(0x0b, 0x0b).r(FUNC(pc8801_31_device::volume_meter_r));
-	map(0x0d, 0x0d).r(FUNC(pc8801_31_device::volume_meter_r));
+	map(0x0b, 0x0b).r(FUNC(pc8801_31_device::volume_meter_r<1>));
+	map(0x0d, 0x0d).r(FUNC(pc8801_31_device::volume_meter_r<0>));
 	map(0x0f, 0x0f).lw8(
 		NAME([this](u8 data) { m_cddrive_enable = bool(BIT(data, 0)); })
 	);
@@ -280,11 +281,13 @@ void pc8801_31_device::rom_bank_w(u8 data)
  * i.e. a value of 0x70 will make the uppermost tick to flicker more than 0x74,
  * while 0x7c won't flicker at all
  *
+ * ? may just be sign, ignored by HW
+ *
  */
-// TODO: templatìze, measure via real HW tests
-u8 pc8801_31_device::volume_meter_r()
+// TODO: templatìze, measure via real HW tests, is $9c / $9e actually low port?
+template <unsigned N> u8 pc8801_31_device::volume_meter_r()
 {
-	return 0;
+	return m_cddrive->get_channel_sample(N) >> 8;
 }
 
 void pc8801_31_device::sasi_sel_w(int state)
