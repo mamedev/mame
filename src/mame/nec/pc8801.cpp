@@ -284,6 +284,12 @@ uint8_t pc8801_state::dma_mem_r(offs_t offset)
 	return m_work_ram[offset & 0xffff];
 }
 
+void pc8801_state::dma_mem_w(offs_t offset, u8 data)
+{
+//	printf("%04x %02x\n", offset, data);
+	m_work_ram[offset & 0xffff] = data;
+}
+
 uint8_t pc8801_state::alu_r(offs_t offset)
 {
 	uint8_t b, r, g;
@@ -1691,6 +1697,7 @@ void pc8801_state::pc8801(machine_config &config)
 	I8257(config, m_dma, MASTER_CLOCK);
 	m_dma->out_hrq_cb().set(FUNC(pc8801_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(pc8801_state::dma_mem_r));
+	m_dma->out_memw_cb().set(FUNC(pc8801_state::dma_mem_w));
 	// CH0: 5-inch floppy DMA
 	// CH1: 8-inch floppy DMA, SCSI CD-ROM interface (on MA/MC)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
