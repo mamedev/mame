@@ -5002,10 +5002,14 @@ end
 
 if (BUSES["QBUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/qbus/bk_altpro.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/bk_altpro.h",
 		MAME_DIR .. "src/devices/bus/qbus/bk_irps.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/bk_irps.h",
 		MAME_DIR .. "src/devices/bus/qbus/bk_kmd.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/bk_kmd.h",
+		MAME_DIR .. "src/devices/bus/qbus/bk_samara.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/bk_samara.h",
 		MAME_DIR .. "src/devices/bus/qbus/dsd4432.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/dsd4432.h",
 		MAME_DIR .. "src/devices/bus/qbus/dvk_dwhle.cpp",
