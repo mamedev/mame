@@ -79,6 +79,7 @@ void pc8801_31_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "sasi:7", default_scsi_devices, "sasicb", true)
 		.option_add_internal("sasicb", NSCSI_CB)
 		.machine_config([this](device_t* device) {
+			downcast<nscsi_callback_device&>(*device).req_callback().set(*this, FUNC(pc8801_31_device::sasi_req_w));
 			downcast<nscsi_callback_device&>(*device).sel_callback().set(*this, FUNC(pc8801_31_device::sasi_sel_w));
 		});
 
@@ -292,6 +293,23 @@ template <unsigned N> u8 pc8801_31_device::volume_meter_r()
 
 void pc8801_31_device::sasi_sel_w(int state)
 {
-	//m_sasi->req_w(state);
 	m_sasi_sel = state;
+}
+
+void pc8801_31_device::sasi_req_w(int state)
+{
+	if (!m_sasi_req && state)
+	{
+		if (!m_sasi->cd_r() && !m_sasi->msg_r())
+			m_drq_cb(1);
+		// else if (m_sasi->cd_r())
+		// 	m_irq_cb(1);
+	}
+	else if(m_sasi_req && !state)
+	{
+		m_sasi->ack_w(0);
+		m_drq_cb(0);
+		// m_irq_cb(0);
+	}
+	m_sasi_req = state;
 }

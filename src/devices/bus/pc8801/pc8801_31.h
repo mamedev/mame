@@ -68,7 +68,9 @@ private:
 	bool m_clock_hb;
 	bool m_cddrive_enable;
 	int m_sasi_sel;
+	int m_sasi_req;
 
+	void sasi_req_w(int state);
 	void sasi_sel_w(int state);
 };
 
