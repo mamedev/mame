@@ -459,6 +459,11 @@ ROM_START( k10_2l )
 	ROM_LOAD( "s29gl128n10tfi01.u4", 0x00000, 0x1000000, CRC(3ca75ab7) SHA1(a4e4f939c26b4a2f361261fa8b5303c6eeee9c41) )
 ROM_END
 
+ROM_START( micac250 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "250in1microarcade.u2", 0x000000, 0x1000000, CRC(3bb2a65c) SHA1(294eb2165466981a79e1d4ec535038e73fbca4de) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -518,3 +523,4 @@ CONS( 2020, lxpcpp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 CONS( 201?, k10_5l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (5 languages)", MACHINE_NOT_WORKING )
 CONS( 201?, k10_2l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (2 languages)", MACHINE_NOT_WORKING )
 
+CONS( 202?, micac250, 0,        0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Micro Arcade 250-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
