@@ -7,6 +7,7 @@ NEC PC8801-31 CD-ROM I/F
 TODO:
 - Interface with PC8801-30 (the actual CD drive);
 - Make it a slot option for PC-8801MA (does it have same ROM as the internal MC version?)
+- Document BIOS program flow (PC=1000)
 
 **************************************************************************************************/
 
@@ -188,9 +189,10 @@ void pc8801_31_device::select_w(u8 data)
 u8 pc8801_31_device::data_r()
 {
 	u8 res = m_sasi->read();
-	if ((m_sasi->req_r()) && (m_sasi->io_r()))
+	if (m_sasi->bsy_r() && m_sasi->io_r() && !machine().side_effects_disabled())
 	{
 		m_sasi->ack_w(1);
+		//m_sasi->write(0);
 		m_sasi->ack_w(0);
 	}
 	return res;
@@ -200,7 +202,7 @@ void pc8801_31_device::data_w(u8 data)
 {
 	m_sasi->write(data);
 
-	if (m_sasi->req_r())
+	if (m_sasi->bsy_r() && !m_sasi->io_r())
 	{
 		m_sasi->ack_w(1);
 		//m_sasi->write(0);
@@ -300,16 +302,20 @@ void pc8801_31_device::sasi_req_w(int state)
 {
 	if (!m_sasi_req && state)
 	{
-		if (!m_sasi->cd_r() && !m_sasi->msg_r())
+		// IO needed otherwise it will keep running the DRQ
+		if (!m_sasi->cd_r() && !m_sasi->msg_r() && m_sasi->io_r())
+		{
 			m_drq_cb(1);
+		}
 		// else if (m_sasi->cd_r())
 		// 	m_irq_cb(1);
 	}
 	else if(m_sasi_req && !state)
 	{
-		m_sasi->ack_w(0);
+		//m_sasi->ack_w(0);
 		m_drq_cb(0);
 		// m_irq_cb(0);
 	}
+
 	m_sasi_req = state;
 }
