@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    Mono Covox interface
+    BK Covox interface
 
 ***************************************************************************/
 
@@ -14,6 +14,7 @@
 #include "parallel.h"
 
 
-DECLARE_DEVICE_TYPE(BK_COVOX, device_qbus_card_interface)
+DECLARE_DEVICE_TYPE(BK_COVOX, device_bk_parallel_interface)
+DECLARE_DEVICE_TYPE(BK_COVOX_STEREO, device_bk_parallel_interface)
 
 #endif
