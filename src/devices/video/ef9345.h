@@ -39,8 +39,18 @@ public:
 	void update_scanline(uint16_t scanline);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-protected:
+	enum char_mode_t : uint8_t {
+		// 40 column modes:
+		MODE24x40, // long codes
+		MODEVAR40, // variable codes
+		MODE16x40, // short codes
 
+		// 80 column modes:
+		MODE8x80,  // long codes
+		MODE12x80, // variable codes
+	};
+
+protected:
 	enum class EF9345_MODE {
 		TYPE_EF9345    = 0x001,
 		TYPE_TS9347    = 0x002
@@ -67,7 +77,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 	TIMER_CALLBACK_MEMBER(blink_tick);
 
-private:
 	void set_busy_flag(int period);
 	void set_video_mode(void);
 	void init_accented_chars(void);
@@ -76,6 +85,12 @@ private:
 	void zoom(uint8_t *pix, uint16_t n);
 	uint16_t indexblock(uint16_t x, uint16_t y);
 	std::tuple<uint8_t, uint8_t, bool> makecolors(uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool cursor);
+
+	virtual char_mode_t parse_video_mode() const;
+
+	// Computes the index of the memory row containing data for the y-th
+	// screen row.
+	virtual uint16_t indexrow(uint16_t y);
 
 	// Dispatch rendering of character (x, y) to one of the specialized
 	// drawing functions (bichrome40/quadrichrome40/bichrome80).
@@ -105,7 +120,7 @@ private:
 	address_space *m_videoram;
 
 	uint8_t m_bf;                             //busy flag
-	uint8_t m_char_mode;                      //40 or 80 chars for line
+	char_mode_t m_char_mode;                  //40 or 80 chars for line
 	uint8_t m_acc_char[0x2000];               //accented chars
 	uint8_t m_registers[8];                   //registers R0-R7
 	uint8_t m_state;                          //status register
@@ -135,7 +150,13 @@ class ts9347_device : public ef9345_device
 {
 public:
 	ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual char_mode_t parse_video_mode() const override;
+	virtual uint16_t indexrow(uint16_t y) override;
 };
+
+ALLOW_SAVE_TYPE(ef9345_device::char_mode_t)
 
 // device type definition
 DECLARE_DEVICE_TYPE(EF9345, ef9345_device)
