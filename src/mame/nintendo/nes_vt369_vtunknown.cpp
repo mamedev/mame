@@ -673,6 +673,13 @@ ROM_START( lxcmcy ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( jl2377 ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl2377.u2", 0x00000, 0x4000000, CRC(cb3643c8) SHA1(c0d6211eddf28d1541e791d0bd3e5aef9f1d4d46) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcysw ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "starwars_jl2365swr-1.u2", 0x00000, 0x4000000, CRC(a34669db) SHA1(fc5c432492473cd0896ef95a67832d422294925a) )
@@ -1244,6 +1251,9 @@ CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 // similar menus to the lxccminn/lxccplan sets
 CONS( 2013, lxcmcy,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 200 in 1 (JL2355)", MACHINE_NOT_WORKING )
 CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING )
+
+// JL2367-V1.03 20200228 on PCB, JL2377 on case
+CONS( 2020, jl2377,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - 250 in 1 (JL2377)", MACHINE_NOT_WORKING )
 
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
 CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
