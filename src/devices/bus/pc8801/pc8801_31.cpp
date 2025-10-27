@@ -5,9 +5,9 @@
 NEC PC8801-31 CD-ROM I/F
 
 TODO:
-- Interface with PC8801-30 (the actual CD drive);
-- Make it a slot option for PC-8801MA (does it have same ROM as the internal MC version?)
-- Document BIOS program flow (PC=1000)
+- Make it a slot option for PC-8801MA (does it have same ROM as the internal MC version?);
+- volume fader;
+- Document BIOS program flow (PC=1000);
 
 **************************************************************************************************/
 
@@ -136,6 +136,7 @@ void pc8801_31_device::amap(address_map &map)
 	map(0x09, 0x09).rw(FUNC(pc8801_31_device::id_r), FUNC(pc8801_31_device::rom_bank_w));
 	map(0x0b, 0x0b).r(FUNC(pc8801_31_device::volume_meter_r<1>));
 	map(0x0d, 0x0d).r(FUNC(pc8801_31_device::volume_meter_r<0>));
+	// TODO: bit 6 also used at startup, what for?
 	map(0x0f, 0x0f).lw8(
 		NAME([this](u8 data) { m_cddrive_enable = bool(BIT(data, 0)); })
 	);
@@ -164,6 +165,8 @@ u8 pc8801_31_device::status_r()
 		m_sasi->io_r() << 3 |
 		m_cddrive_enable);
 
+	// at boot up SEL=1 drives BSY, MSG, CD and IO low
+	// according to Takeda nobubufu (+ redbook CD) also wants this behaviour
 	if (m_sasi_sel)
 		res &= ~0xb8;
 
@@ -189,7 +192,9 @@ void pc8801_31_device::select_w(u8 data)
 u8 pc8801_31_device::data_r()
 {
 	u8 res = m_sasi->read();
-	if (m_sasi->bsy_r() && m_sasi->io_r() && !machine().side_effects_disabled())
+
+	//if (m_sasi->bsy_r() && m_sasi->io_r() && !machine().side_effects_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_sasi->ack_w(1);
 		//m_sasi->write(0);
@@ -202,7 +207,9 @@ void pc8801_31_device::data_w(u8 data)
 {
 	m_sasi->write(data);
 
-	if (m_sasi->bsy_r() && !m_sasi->io_r())
+	// do not guard against anything, just ack the byte
+	// (mirrors cares after the Views logo)
+	//if (m_sasi->bsy_r()) //&& !m_sasi->io_r())
 	{
 		m_sasi->ack_w(1);
 		//m_sasi->write(0);
@@ -287,7 +294,7 @@ void pc8801_31_device::rom_bank_w(u8 data)
  * ? may just be sign, ignored by HW
  *
  */
-// TODO: templatìze, measure via real HW tests, is $9c / $9e actually low port?
+// TODO: measure via real HW tests, is $9c / $9e actually low CDDA readback?
 template <unsigned N> u8 pc8801_31_device::volume_meter_r()
 {
 	return m_cddrive->get_channel_sample(N) >> 8;
@@ -319,3 +326,4 @@ void pc8801_31_device::sasi_req_w(int state)
 
 	m_sasi_req = state;
 }
+

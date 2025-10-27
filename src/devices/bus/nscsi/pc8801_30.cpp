@@ -19,8 +19,8 @@
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_PC8801_30, nscsi_cdrom_pc8801_30_device, "scsi_pc8801_30", "SCSI NEC PC8801-30 CD-ROM")
 
-nscsi_cdrom_pc8801_30_device::nscsi_cdrom_pc8801_30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_cdrom_device(mconfig, NSCSI_CDROM_PC8801_30, tag, owner, clock)
+nscsi_cdrom_pc8801_30_device::nscsi_cdrom_pc8801_30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nscsi_cdrom_device(mconfig, NSCSI_CDROM_PC8801_30, tag, owner, clock)
 {
 }
 
@@ -431,6 +431,10 @@ void nscsi_cdrom_pc8801_30_device::scsi_command()
 {
 	switch (scsi_cmdbuf[0])
 	{
+		case SC_READ_6:
+			nscsi_cdrom_device::scsi_command();
+			LOGCMD("SC_READ_6: lba: %02x%02x%02x blocks: %02x\n", scsi_cmdbuf[1], scsi_cmdbuf[2], scsi_cmdbuf[3], scsi_cmdbuf[4]);
+			break;
 		case SC_MODE_SELECT_6:
 			LOG("command MODE SELECT 6 length %d\n", scsi_cmdbuf[4]);
 
@@ -447,9 +451,10 @@ void nscsi_cdrom_pc8801_30_device::scsi_command()
 		case 0xde: nec_get_dir_info();             break;
 
 		default:
-			if (scsi_cmdbuf[0] != 0)
-				LOGCMD("Not yet emulated command %02x\n", scsi_cmdbuf[0]);
 			// TODO: purge commands that don't exist on this implementation
+			if (scsi_cmdbuf[0] != SC_TEST_UNIT_READY && scsi_cmdbuf[0] != SC_REQUEST_SENSE)
+				popmessage("PC8801-30: potentially unavailable %02x command trigger", scsi_cmdbuf[0]);
+
 			nscsi_cdrom_device::scsi_command();
 			break;
 	}

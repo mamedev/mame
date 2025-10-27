@@ -9,8 +9,6 @@ license:CC0-1.0
 PC-8801-31 SW list
 
 TODO:
-- Add Mirrors dump (ones floating around are in .ccd/.sub/.img format);
-- Add DIOS CD-ROM Ban dump (undumped?)
 - Reportedly later Koei and Falcom releases can optionally load the correlated audio CD soundtracks.
   Pinpoint how exactly they detect the presence of a valid CD-ROM, add candidates here.
 
@@ -20,7 +18,11 @@ TODO:
 		<description>CD Takarabako</description>
 		<year>1989</year>
 		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Several items quickly returns back to main menu
+]]></notes>
 		<info name="alt_title" value="ＣＤたから箱"/>
+		<sharedfeat name="mouseport_default" value="mouse" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -33,7 +35,11 @@ TODO:
 		<description>CD Takarabako (alt)</description>
 		<year>1989</year>
 		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Several items quickly returns back to main menu
+]]></notes>
 		<info name="alt_title" value="ＣＤたから箱"/>
+		<sharedfeat name="mouseport_default" value="mouse" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -47,7 +53,10 @@ TODO:
 		<year>1990</year>
 		<publisher>ザインソフト (Zain Soft)</publisher>
 		<notes><![CDATA[
-Throws "CD-ROM" not working after loading floppy
+[i8214] Overruns VRTC with ei reti during initial ADPCM setup
+Main menu is heavily glitched (needs tvram misc_ctrl bit 4 off)
+Eventually crashes in opening after first speech, or in-game
+Known to have [FDC] copy protection for user disk creation (the .d88 dump won't load in MAME)
 ]]></notes>
 		<info name="release" value="19900308"/>
 		<info name="alt_title" value="ディオス CD-ROM版"/>
@@ -70,8 +79,8 @@ Throws "CD-ROM" not working after loading floppy
 		<year>1990</year>
 		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
 		<notes><![CDATA[
-Incomplete CD-Rom support
-FDC stalls [Tries to match CHRN=(00 00 0x 01) with existing N=03, 2DD image?]
+Needs [redbook] volume fader
+Not extensively tested
 ]]></notes>
 		<info name="release" value="19901210"/>
 		<info name="alt_title" value="ミラーズ"/>
@@ -119,9 +128,8 @@ FDC stalls [Tries to match CHRN=(00 00 0x 01) with existing N=03, 2DD image?]
 		<!--combined image-->
 		<!--rom name="mirrors.d88" size="1250128" crc="6534e06f" sha1="d704a29480c476b50638e7c7ac28fcd5f91fa376"/-->
 
-		<!-- TODO: check order / labels -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Save Disk" />
+			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="416688">
 				<rom name="mirrors_01.d88" size="416688" crc="17934f60" sha1="4379da035a8c4d5b0bf503151e401f72b061ff59"/>
 			</dataarea>
@@ -135,7 +143,7 @@ FDC stalls [Tries to match CHRN=(00 00 0x 01) with existing N=03, 2DD image?]
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Main Disk" />
+			<feature name="part_id" value="Save Disk" />
 			<dataarea name="flop" size="416688">
 				<rom name="mirrors_03.d88" size="416688" crc="4dbe9a3e" sha1="0fff6446fd85c5826ee1d40942d185d71e676f92"/>
 			</dataarea>
