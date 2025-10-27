@@ -460,6 +460,7 @@ CONS( 200?, arcade3d,    0,     0,        lexizeus,     lexiseal, spg2xx_lexizeu
 
 CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown> / JungleTac", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// marked as SPG260
 CONS( 2010, cybrtvfe,    0,     0,        lexiseal,     lexiseal, spg2xx_cybrtvfe_game_state, init_zeus, "Lexibook", "Cyber Arcade TV - Ferrari (JL2500FE)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited / JungleTac", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
