@@ -20,12 +20,6 @@
 #include <algorithm>
 
 
-#define MODE24x40   0
-#define MODEVAR40   1
-#define MODE8x80    2
-#define MODE12x80   3
-#define MODE16x40   4
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -239,16 +233,7 @@ void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 // set then ef9345 mode
 void ef9345_device::set_video_mode(void)
 {
-	if (m_variant == EF9345_MODE::TYPE_TS9347)
-	{
-		// Only TGS 7 & 6 used for the char mode with the TS9347
-		m_char_mode = ((m_tgs & 0xc0) >> 6);
-	}
-	else
-	{
-		// PAT 7, TGS 7 & 6
-		m_char_mode = ((m_pat & 0x80) >> 5) | ((m_tgs & 0xc0) >> 6);
-	}
+	m_char_mode = parse_video_mode();
 
 	uint16_t new_width = (m_char_mode == MODE12x80 || m_char_mode == MODE8x80) ? 492 : 336;
 
@@ -271,6 +256,27 @@ void ef9345_device::set_video_mode(void)
 
 	//address of the current memory block
 	m_block = 0x0800 * ((((m_ror & 0xf0) >> 4) | ((m_ror & 0x40) >> 5) | ((m_ror & 0x20) >> 3)) & 0x0c);
+}
+
+ef9345_device::char_mode_t ef9345_device::parse_video_mode() const
+{
+	uint8_t selector = (BIT(m_pat, 7) << 2) | bitswap<2>(m_tgs, 7, 6);
+	switch (selector)
+	{
+	default:
+		logerror("Unknown EF9345 mode: 0x%x\n", selector);
+		[[fallthrough]];
+	case 0b000:
+		return MODE24x40;
+	case 0b001:
+		return MODEVAR40;
+	case 0b100:
+		return MODE16x40;
+	case 0b011:
+		return MODE12x80;
+	case 0b010:
+		return MODE8x80;
+	}
 }
 
 // initialize the ef9345 accented chars
@@ -382,25 +388,7 @@ void ef9345_device::zoom(uint8_t *pix, uint16_t n)
 // calculate the address of the char x,y
 uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 {
-	uint16_t i = x, j;
-
-	if (m_variant == EF9345_MODE::TYPE_EF9345)
-	{
-		// On the EF9345 the service row is always displayed at the top, and
-		// it can be fetched from either Y=0 or Y=1.
-		j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
-	}
-	else
-	{
-		// On the TS9347 the service row is displayed either at the top or at
-		// the bottom, and it is always fetched from Y=0.
-		if (m_tgs & 1)
-			j = (y == 24) ? 0 : ((m_ror & 0x1f) + y);
-		else
-			j = (y == 0) ? 0 : ((m_ror & 0x1f) + y - 1);
-	}
-
-	j = (j > 31) ? (j - 24) : j;
+	uint16_t i = x, j = indexrow(y);
 
 	//right side of a double width character
 	if ((m_tgs & 0x80) == 0 && x > 0)
@@ -411,6 +399,16 @@ uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 	}
 
 	return 0x40 * j + i;
+}
+
+uint16_t ef9345_device::indexrow(uint16_t y)
+{
+	uint16_t j;
+
+	// On the EF9345 the service row can be fetched from either Y=0 or Y=1.
+	j = (y == 0) ? BIT(m_tgs, 5) : ((m_ror & 0x1f) + y - 1);
+
+	return (j > 31) ? (j - 24) : j;
 }
 
 // applies the insert, flash, conceal and negative attributes,
@@ -782,12 +780,6 @@ void ef9345_device::makechar(uint16_t x, uint16_t y)
 			makechar_24x40(x, y);
 			break;
 		case MODEVAR40:
-			if (m_variant == EF9345_MODE::TYPE_TS9347)
-			{ // TS9347 char mode definition is different.
-				makechar_16x40(x, y);
-				break;
-			}
-			[[fallthrough]];
 		case MODE8x80:
 			logerror("Unemulated EF9345 mode: %02x\n", m_char_mode);
 			break;
@@ -795,17 +787,7 @@ void ef9345_device::makechar(uint16_t x, uint16_t y)
 			makechar_12x80(x, y);
 			break;
 		case MODE16x40:
-			if (m_variant == EF9345_MODE::TYPE_TS9347)
-			{
-				logerror("Unemulated EF9345 mode: %02x\n", m_char_mode);
-			}
-			else
-			{
-				makechar_16x40(x, y);
-			}
-			break;
-		default:
-			logerror("Unknown EF9345 mode: %02x\n", m_char_mode);
+			makechar_16x40(x, y);
 			break;
 	}
 }
@@ -1184,4 +1166,35 @@ void ef9345_device::data_w(offs_t offset, uint8_t data)
 
 	if (offset & 8)
 		ef9345_exec(m_registers[0] & 0xff);
+}
+
+ef9345_device::char_mode_t ts9347_device::parse_video_mode() const
+{
+	switch (bitswap<2>(m_tgs, 7, 6))
+	{
+	case 0b00:
+		return MODE24x40;
+	case 0b01:
+		return MODE16x40;
+	case 0b11:
+		return MODE12x80;
+	case 0b10:
+		return MODE8x80;
+	default: // unreachable
+		abort();
+	}
+}
+
+uint16_t ts9347_device::indexrow(uint16_t y)
+{
+	uint16_t j;
+
+	// On the TS9347 the service row is displayed either at the top or at
+	// the bottom, and it is always fetched from Y=0.
+	if (m_tgs & 1)
+		j = (y == 24) ? 0 : ((m_ror & 0x1f) + y);
+	else
+		j = (y == 0) ? 0 : ((m_ror & 0x1f) + y - 1);
+
+	return (j > 31) ? (j - 24) : j;
 }
