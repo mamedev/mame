@@ -16,6 +16,17 @@
     Adam, but no images of these are confirmed to exist and they are
     not supported by any extant FDC variant.
 
+
+                              5.25"                   3.5"
+                        160KB       320KB       720KB       1.44MB
+    Device shortname    (SSDD)      (DSDD)      (DSDD)      (DSHD)
+
+    adam_fdc            Yes         No          No          No
+    adam_fdc_320kb      Yes         Yes         No          No
+    adam_fdc_a720dipi   No          No          Yes         No
+    adam_fdc_fp720at    No          No          Yes         No
+    adam_fdc_mihddd     No          No          Yes         Yes
+
 */
 
 #include "emu.h"

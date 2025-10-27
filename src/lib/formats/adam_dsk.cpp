@@ -283,6 +283,7 @@ bool adam_format::save(util::random_read_write &io, const std::vector<uint32_t> 
 	image.get_actual_geometry(tracks, heads);
 
 	// Find an appropriate format
+	// TODO: Analyze the cell structure of a track rather than rely on the variant field being set correctly
 	const format_desc *f = &s_formats[0];
 	while (f->form_factor != image.get_form_factor() || f->variant != image.get_variant()
 			|| f->track_count > tracks || f->head_count > heads)
