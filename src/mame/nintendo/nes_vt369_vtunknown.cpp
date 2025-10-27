@@ -719,14 +719,7 @@ ROM_END
 
 ROM_START( lxcmcyco ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "jl2360dc-1.u1", 0x00000, 0x0800000, CRC(30178eaf) SHA1(f9f4b48b192d3fc84dc7e1385b36096c342015aa) )
-	ROM_CONTINUE(0x1000000, 0x0800000)
-	ROM_CONTINUE(0x0800000, 0x0800000)
-	ROM_CONTINUE(0x1800000, 0x0800000)
-	ROM_CONTINUE(0x2000000, 0x0800000)
-	ROM_CONTINUE(0x3000000, 0x0800000)
-	ROM_CONTINUE(0x2800000, 0x0800000)
-	ROM_CONTINUE(0x3800000, 0x0800000)
+	ROM_LOAD( "jl2360dc-1.u1", 0x00000, 0x4000000, CRC(710fcafc) SHA1(bfd7dba546b62f1ea337d6f7f8f32ffccffa0a0d) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -742,14 +735,7 @@ ROM_END
 
 ROM_START( lxcmcyspa ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "jl2350sp.u2", 0x00000, 0x0800000, CRC(e7159f25) SHA1(92a168f178dcc5cecae60d504d6d329ce1b66b01) )
-	ROM_CONTINUE(0x1000000, 0x0800000)
-	ROM_CONTINUE(0x0800000, 0x0800000)
-	ROM_CONTINUE(0x1800000, 0x0800000)
-	ROM_CONTINUE(0x2000000, 0x0800000)
-	ROM_CONTINUE(0x3000000, 0x0800000)
-	ROM_CONTINUE(0x2800000, 0x0800000)
-	ROM_CONTINUE(0x3800000, 0x0800000)
+	ROM_LOAD( "jl2350sp.u2", 0x00000, 0x4000000, CRC(54c66fe0) SHA1(44d71881c0edb2c913f144fe0da8026958c6cfbb) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -1202,6 +1188,7 @@ void vt369_state::init_lxcmcypp()
 
 void vt369_state::init_dgun2572()
 {
+	// this might simply be due to an incorrect pinout when dumping
 	u8 *rom = memregion("mainrom")->base();
 	for (offs_t base = 0; base < 0x2000000; base += 0x200)
 	{
