@@ -138,6 +138,19 @@ public:
 	INPUT_CHANGED_MEMBER(on_mf_nmi);
 	INPUT_CHANGED_MEMBER(on_divmmc_nmi);
 
+	virtual std::vector<device_symbol> get_device_symbols() const override { 
+		return {
+			device_symbol("mmu0", [this]() { return m_mmu[0]; }),
+			device_symbol("mmu1", [this]() { return m_mmu[1]; }),
+			device_symbol("mmu2", [this]() { return m_mmu[2]; }),
+			device_symbol("mmu3", [this]() { return m_mmu[3]; }),
+			device_symbol("mmu4", [this]() { return m_mmu[4]; }),
+			device_symbol("mmu5", [this]() { return m_mmu[5]; }),
+			device_symbol("mmu6", [this]() { return m_mmu[6]; }),
+			device_symbol("mmu7", [this]() { return m_mmu[7]; }),
+		};
+	}
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;

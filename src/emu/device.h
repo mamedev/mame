@@ -451,6 +451,28 @@ extern emu::detail::device_registrar const registered_device_types;
 /// \sa device_t::device_start device_interface::interface_pre_start
 class device_missing_dependencies : public emu_exception { };
 
+/// \brief Symbol exposed by a device for debugging
+///
+/// Represents a named symbol exposed by a device for use by the
+/// debugger system.
+class device_symbol {
+public:
+	typedef std::function<u64()> getter_func;
+	typedef std::function<void(u64 value)> setter_func;
+
+	// construction/destruction
+	device_symbol(const char *name, getter_func getter, setter_func setter = nullptr)
+		: m_name(name), m_getter(getter), m_setter(setter) { }
+	
+	const char *name() const { return m_name; }
+	getter_func getter() const { return m_getter; }
+	setter_func setter() const { return m_setter; }
+
+private:
+    const char *m_name;
+	getter_func m_getter;
+	setter_func m_setter;
+};
 
 /// \brief Base class for devices
 ///
@@ -619,6 +641,8 @@ public:
 	virtual ~device_t();
 
 	// getters
+	virtual std::vector<device_symbol> get_device_symbols() const { return {}; }
+	
 	bool has_running_machine() const { return m_machine != nullptr; }
 	running_machine &machine() const { /*assert(m_machine != nullptr);*/ return *m_machine; }
 	const char *tag() const { return m_tag.c_str(); }
