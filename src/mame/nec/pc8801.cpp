@@ -1773,10 +1773,10 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->port_b_write_callback().set(FUNC(pc8801fh_state::opn_portb_w));
 
 	// TODO: per-channel mixing is unconfirmed
-	m_opna->add_route(0, m_speaker, 0.75, 0);
-	m_opna->add_route(0, m_speaker, 0.75, 1);
-	m_opna->add_route(1, m_speaker, 0.75, 0);
-	m_opna->add_route(2, m_speaker, 0.75, 1);
+	m_opna->add_route(0, m_speaker, 0.25, 0);
+	m_opna->add_route(0, m_speaker, 0.25, 1);
+	m_opna->add_route(1, m_speaker, 0.50, 0);
+	m_opna->add_route(2, m_speaker, 0.50, 1);
 
 	// TODO: add possible configuration override for baudrate here
 	// ...

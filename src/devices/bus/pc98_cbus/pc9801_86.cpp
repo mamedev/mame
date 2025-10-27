@@ -100,10 +100,10 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 		m_joy_sel = data;
 	});
 	// TODO: confirm mixing
-	m_opna->add_route(0, "speaker", 0.75, 0);
-	m_opna->add_route(0, "speaker", 0.75, 1);
-	m_opna->add_route(1, "speaker", 1.00, 0);
-	m_opna->add_route(2, "speaker", 1.00, 1);
+	m_opna->add_route(0, "speaker", 0.25, 0);
+	m_opna->add_route(0, "speaker", 0.25, 1);
+	m_opna->add_route(1, "speaker", 0.50, 0);
+	m_opna->add_route(2, "speaker", 0.50, 1);
 
 	// 2x burr brown pcm61p
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
