@@ -717,6 +717,22 @@ ROM_START( lxcmcydp ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcyco ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// TODO: check if address lines really are meant to be like this for these 120-in-1 units
+	ROM_LOAD( "jl2360dc-1.u1", 0x00000, 0x0800000, CRC(30178eaf) SHA1(f9f4b48b192d3fc84dc7e1385b36096c342015aa) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+
 ROM_START( lxcmcysp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
@@ -1222,8 +1238,8 @@ CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369, vt36x_state, empty_init,    "L
 
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
 CONS( 2012, lxcmcysp,  0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
-CONS( 200?, lxcmc250,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
 CONS( 2012, lxcmcydp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyco,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2360DC-1, 120-in-1)", MACHINE_NOT_WORKING )
 // JL2365 models (150-in-1 versions)
 CONS( 200?, lxcmcysw,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels (JL2365SW)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcyfz,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ)", MACHINE_NOT_WORKING )
@@ -1251,6 +1267,8 @@ CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 // similar menus to the lxccminn/lxccplan sets
 CONS( 2013, lxcmcy,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 200 in 1 (JL2355)", MACHINE_NOT_WORKING )
 CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING )
+
+CONS( 200?, lxcmc250,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
 
 // JL2367-V1.03 20200228 on PCB, JL2377 on case
 CONS( 2020, jl2377,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - 250 in 1 (JL2377)", MACHINE_NOT_WORKING )
