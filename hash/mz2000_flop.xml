@@ -301,7 +301,7 @@ FRONT LINE: works
 		<description>Miranda</description>
 		<year>200?</year>
 		<publisher>Unknown</publisher>
-		<usage>In DISK MONITOR, type l 1,"MIRANDA"</usage>
+		<info name="usage" value="In DISK MONITOR, type l 1,&#34;MIRANDA&#34;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="305328">
 				<rom name="miranda.d88" size="305328" crc="c5cad887" sha1="ed092e7752c04ab0842c68195b00b98b09ebf388"/>
@@ -313,7 +313,7 @@ FRONT LINE: works
 		<description>Uootoy</description>
 		<year>1986</year>
 		<publisher>Denjin</publisher>
-		<usage>In DISK MONITOR, type l 1,"UOOTOY RUN"</usage>
+		<info name="usage" value="In DISK MONITOR, type l 1,&#34;UOOTOY RUN&#34;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="305328">
 				<rom name="uootoy.d88" size="305328" crc="cd8d08a2" sha1="f0500bdba64fdfc068897c818220dd24a6933f89"/>
