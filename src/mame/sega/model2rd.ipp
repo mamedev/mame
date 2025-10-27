@@ -178,9 +178,16 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	colortable_b += ((colorbase >> 10) & 0x1f) << 8;
 
 	int x = extent.startx;
-	int dx = checker ? 2 : 1;
-	if (checker && !((x ^ scanline) & 1))
-		x++;
+	int dx = 1;
+	if (checker)
+	{
+		// if the first pixel is transparent, skip to the next one
+		if (!((x ^ scanline) & 1))
+			x++, ooz += dooz, uoz += dudxoz, voz += dvdxoz;
+
+		// increment by 2 pixels each time, skipping every other pixel
+		dx = 2, dooz *= 2.0f, dudxoz *= 2.0f, dvdxoz *= 2.0f;
+	}
 
 	for (; x < extent.stopx; x += dx, uoz += dudxoz, voz += dvdxoz, ooz += dooz)
 	{
