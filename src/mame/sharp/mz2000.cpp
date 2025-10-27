@@ -1412,7 +1412,7 @@ void mz80b_state::mz80b(machine_config &config)
 	// mz800 actually reads $f8-$fa from IPL
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,dat", attotime::from_seconds(1)));
 	snapshot.set_load_callback(FUNC(mz80b_state::snapshot_cb));
-
+	snapshot.set_interface("mz_snap");
 	SOFTWARE_LIST(config, "flop_list").set_original("mz80b_flop");
 	SOFTWARE_LIST(config, "cass_list").set_original("mz80b_cass");
 }
@@ -1428,6 +1428,7 @@ void mz2000_state::mz2000(machine_config &config)
 
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mz2000_flop");
 	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("MONO");
+	SOFTWARE_LIST(config,"snap_list").set_original("mz2000_snap");
 	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("mz2000");
 }
 
