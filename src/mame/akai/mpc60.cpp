@@ -302,7 +302,7 @@ uint8_t mpc60_state::ppi_pb_r()
 {
 	uint8_t rv = 0;
 
-	rv |= m_floppy->get_device()->ready_r() ? 0x04 : 0x00;
+	rv |= m_floppy->get_device()->ready_r() ? 0x00 : 0x04;
 
 	return rv;
 }
@@ -317,6 +317,12 @@ uint8_t mpc60_state::ppi_pb_r()
 // PC7 = Something to do with the ADC
 void mpc60_state::ppi_pc_w(uint8_t data)
 {
+	// TBD: when should we actually do this?
+	if (BIT(data, 0) && m_floppy->get_device())
+	{
+		m_fdc->set_floppy(m_floppy->get_device());
+	}
+
 	m_fdc->reset_w(BIT(data, 0));
 	m_floppy->get_device()->mon_w(BIT(data, 6) ^ 1);
 }
