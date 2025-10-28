@@ -26,7 +26,8 @@ Several items quickly returns back to main menu
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cd takarabako (japan)" sha1="fa04ebd2556c6508a2401e9a261b8bce843164c0"/>
+				<!-- baddump: missing indices from track 3 -->
+				<disk name="cd takarabako (japan)" sha1="fa04ebd2556c6508a2401e9a261b8bce843164c0" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -43,7 +44,8 @@ Several items quickly returns back to main menu
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cd takarabako (japan) (alt)" sha1="1975f9f054ca1827fdf0c3eb2c8ba0dc4b4357b0"/>
+				<!-- baddump: missing indices from track 3 -->
+				<disk name="cd takarabako (japan) (alt)" sha1="1975f9f054ca1827fdf0c3eb2c8ba0dc4b4357b0" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -69,7 +71,8 @@ Known to have [FDC] copy protection for user disk creation (the .d88 dump won't 
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="dios (japan)" sha1="d7023222681862904756422c1465abeb3b09bd07"/>
+				<!-- baddump: missing indices from track 3 -->
+				<disk name="dios (japan)" sha1="d7023222681862904756422c1465abeb3b09bd07" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
