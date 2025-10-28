@@ -859,7 +859,7 @@ uint8_t sh7604_device::tdr_r()
 void sh7604_device::tdr_w(uint8_t data)
 {
 	m_tdr = data;
-	//printf("%c", data & 0xff);
+	printf("%c", data & 0xff);
 }
 
 uint8_t sh7604_device::ssr_r()

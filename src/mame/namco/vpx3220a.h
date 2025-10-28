@@ -28,6 +28,9 @@ protected:
 	virtual void write_data(u16 offset, u8 data) override;
 
 private:
+	u16 get_fp_reg();
+	void set_fp_reg();
+
 	enum subaddr_t : u8;
 	enum fpaddr_t : u16;
 
@@ -52,9 +55,12 @@ private:
 	u8 m_driver_a;
 	u8 m_driver_b;
 
+	u16 m_fpdata;
 	u16 m_fpaddr;
 	u8 m_fpsta;
-	bool m_fp_lsb;
+	bool m_want_fp_lsb;
+	bool m_accessing_fp;
+	bool m_want_fp_data_lsb;
 
 	u16 m_fp_tint;
 	u16 m_fp_gain;
@@ -76,9 +82,7 @@ private:
 	u16 m_fp_sgain;
 	u16 m_fp_vsdt;
 	u16 m_fp_cmdwd;
-	u16 m_fp_infowd;
 	u16 m_fp_tvstndwr;
-	u16 m_fp_tvstndrd;
 };
 
 DECLARE_DEVICE_TYPE(VPX3220A, vpx3220a_device)

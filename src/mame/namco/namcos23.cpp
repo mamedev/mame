@@ -2168,7 +2168,7 @@ protected:
 	u32 sh2_unk_r(offs_t offset, u32 mem_mask = ~0);
 	void sh2_unk_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 sh2_unk6200000_r(offs_t offset, u32 mem_mask = ~0);
-	u32 sh2_kludge_r();
+	//u32 sh2_kludge_r();
 	void vpx_i2c_sdao_w(int state);
 	u8 vpx_i2c_r();
 	void vpx_i2c_w(u8 data);
@@ -5906,10 +5906,10 @@ void namcoss23_gmen_state::vpx_i2c_w(u8 data)
 	m_vpx->scl_write(BIT(data, 1));
 }
 
-u32 namcoss23_gmen_state::sh2_kludge_r()
+/*u32 namcoss23_gmen_state::sh2_kludge_r()
 {
 	return 0x22115566;
-}
+}*/
 
 void namcoss23_gmen_state::mips_map(address_map &map)
 {
@@ -5917,7 +5917,7 @@ void namcoss23_gmen_state::mips_map(address_map &map)
 	map(0x0e400000, 0x0e400003).r(FUNC(namcoss23_gmen_state::sh2_trigger_r));
 	map(0x0e600000, 0x0e600003).r(FUNC(namcoss23_gmen_state::mips_sh2_unk_r));
 	map(0x0e700000, 0x0e70ffff).rw(FUNC(namcoss23_gmen_state::sh2_shared_r), FUNC(namcoss23_gmen_state::sh2_shared_w));
-	map(0x0e70c000, 0x0e70c003).r(FUNC(namcoss23_gmen_state::sh2_kludge_r));
+	//map(0x0e70c000, 0x0e70c003).r(FUNC(namcoss23_gmen_state::sh2_kludge_r));
 }
 
 void namcoss23_gmen_state::sh2_map(address_map &map)
@@ -6613,13 +6613,14 @@ void namcoss23_gmen_state::gmen(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcoss23_gmen_state::mips_map);
 
-	SH7604(config, m_sh2, XTAL(28'700'000));
+	SH7604(config, m_sh2, XTAL(20'000'000));
 	m_sh2->set_addrmap(AS_PROGRAM, &namcoss23_gmen_state::sh2_map);
 
 	VPX3220A(config, m_vpx, 0);
 	m_vpx->sda_callback().set(FUNC(namcoss23_gmen_state::vpx_i2c_sdao_w));
 
 	MD8412B(config, m_firewire, 0);
+	m_firewire->int_callback().set_inputline(m_sh2, 8);
 }
 
 void namcoss23_gmen_state::gunwars(machine_config &config)
@@ -6816,28 +6817,28 @@ static INPUT_PORTS_START(gmen)
 	PORT_INCLUDE(s23)
 
 	PORT_START("GMENDSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, "SH-2 Bit 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "SH-2 Bit 1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "SH-2 Bit 2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "SH-2 Bit 3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, "Enable Serial Output" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "SH-2 Bit 5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "SH-2 Bit 6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Enter Boot Monitor" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
