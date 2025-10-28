@@ -35,12 +35,12 @@
 	5  Lambda sensor
 	6  GND Air sensor
 	7  GND
-	8  not populated (P1.3)
+	8  Check engine (not populated) (P1.3)
 	9  GND
 	10 GND
 	11 Injector (P1.5)
 	12 Injector (P1.5)
-	13 Ignition Power
+	13 Ignition (ADC IN1)
 	14 Air in temperature (ADC IN3)
 	15 Air amount (ADC IN0)
 	16 GND
@@ -52,15 +52,14 @@
 	22 GND
 	23 Injector (P1.5)
 	24 Injector (P1.5)
-	22 GND
+	25 GND
 
 **************************************************************************/
 
 /*
     TODO:
 
-    - Create a layout that shows the fuel pump, distributor and fuel injectors
-	- Hook up RPM to interrupt
+	- Map RPM to an input and the interrupt speed
 	- Figure out how the ADC is accessed
 */
 
@@ -117,14 +116,20 @@ void digijet_state::io_map(address_map &map)
 	map(0x30, 0x3f).w(FUNC(digijet_state::start_adc));
 };
 
+void digijet_state::prg_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom().region("maincpu", 0);
+};
+
 uint8_t digijet_state::read_adc(offs_t offset)
 {
-	return m_io_adc[offset & 0x03]->read();
+	return m_io_adc[offset & 0x03]->read(); //FIXME this is a hack
+	// The address lines connected to the ADC are A8-A11 but those can't be accessed externally by this CPU
 };
 
 void digijet_state::start_adc(uint8_t data)
 {
-	;
+	;// Connected to the START pin is the CPUs WR and the CPUs RD to the ADC OE and ALE
 };
 
 void digijet_state::p1_w(uint8_t data)
@@ -145,8 +150,10 @@ void digijet_state::p1_w(uint8_t data)
 uint8_t digijet_state::p2_r()
 {
 	// bits 5 and 6 are the lambda sensor
-	// 3, 4 and 7 are floating
-	return 0xff;
+	// 4 and 7 are floating
+	uint8_t out = 0x9f;
+	//out << LAMBDA1 LAMBDA2
+	return out;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(digijet_state::rpm_int)
@@ -157,27 +164,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(digijet_state::rpm_int)
 
 static INPUT_PORTS_START( digijet )
 PORT_START("ADC0")
-PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_NAME("Air amount")
+PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Air amount")
 
 PORT_START("ADC1")
-PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_NAME("Ignition")
+PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_NAME("Ignition")
 
 PORT_START("ADC2")
-PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_NAME("Coolant temperature")
+PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Coolant temperature")
 
 PORT_START("ADC3")
-PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_NAME("Air temperature")
+PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_NAME("Air temperature")
+
+PORT_START("LAMBDA1")
+PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+PORT_START("LAMBDA2")
+PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 
 PORT_START("THROTTLE")
-PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 
 INPUT_PORTS_END
 
 void digijet_state::digijet(machine_config &config)
 {
 	/* basic machine hardware */
-	I8049(config, m_maincpu, XTAL(11'000'000));
+	I8039(config, m_maincpu, XTAL(11'000'000));
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &digijet_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
 	
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
@@ -194,8 +208,9 @@ void digijet_state::digijet(machine_config &config)
 void digijet_state::digijet90(machine_config &config)
 {
 	/* basic machine hardware */
-	I8049(config, m_maincpu, XTAL(7'372'800));
+	I8039(config, m_maincpu, XTAL(7'372'800));
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &digijet_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
 	
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
@@ -215,7 +230,7 @@ ROM_START( digijet )
 ROM_END
 
 ROM_START( digijet90 )
-	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 ) // repeats itself 4 times
 	ROM_LOAD( "fabb05_03_03.bin", 0x0000, 0x2000, CRC(8c96bcdf) SHA1(73b26914cd15ca3a5e0d7427de9ce4b4e311fb00) ) // Volkswagen 1990, Germany
 ROM_END
 
