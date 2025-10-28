@@ -472,6 +472,7 @@ void mpc60_state::mpc60(machine_config &config)
 	m_panelcpu->an1_func().set(FUNC(mpc60_state::an1_r));
 	m_panelcpu->an2_func().set(FUNC(mpc60_state::an2_r));
 	m_panelcpu->an3_func().set(FUNC(mpc60_state::an3_r));
+	m_panelcpu->an4_func().set(FUNC(mpc60_state::an4_r));
 
 	//MB89371(config, "sio01", 20_MHz_XTAL / 4);
 	//MB89371(config, "sio23", 20_MHz_XTAL / 4);
