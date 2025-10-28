@@ -59,7 +59,6 @@
 /*
     TODO:
 
-	- Map RPM to an input and the interrupt speed
 	- Figure out how the ADC is accessed
 */
 
@@ -79,6 +78,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_watchdog(*this, "watchdog")
+		, m_rpm_timer(*this, "rpm")
 		, m_io_adc(*this, "ADC%u", 0U)
 	{
 	}
@@ -89,6 +89,7 @@ public:
 private:
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
+	required_device<timer_device> m_rpm_timer;
 	required_ioport_array<4> m_io_adc;
 
 	virtual void machine_start() override ATTR_COLD;
@@ -103,11 +104,13 @@ private:
 	void start_adc(uint8_t data);
 
 	bool m_rpm = false;
+	bool m_interrupt_enable = true;
 };
 
 void digijet_state::machine_start()
 {
 	save_item(NAME(m_rpm));
+	save_item(NAME(m_interrupt_enable));
 };
 
 void digijet_state::io_map(address_map &map)
@@ -134,10 +137,13 @@ void digijet_state::start_adc(uint8_t data)
 
 void digijet_state::p1_w(uint8_t data)
 {
+	bool blockint = BIT(data, 0);
 	bool check = BIT(data,3);
 	bool fuel = BIT(data,4);
 	bool inject = BIT(data,5);
 	bool watchdog = BIT(data,6);
+
+	m_interrupt_enable = blockint;
 
 	machine().output().set_value("led_fuel", !fuel);
 	machine().output().set_value("led_inject", !inject);
@@ -161,8 +167,14 @@ uint8_t digijet_state::p2_r()
 
 TIMER_DEVICE_CALLBACK_MEMBER(digijet_state::rpm_int)
 {
-	m_maincpu->set_input_line(MCS48_INPUT_IRQ, m_rpm ? CLEAR_LINE : ASSERT_LINE);
-	m_rpm = !m_rpm;
+	if (m_interrupt_enable) {
+		m_maincpu->set_input_line(MCS48_INPUT_IRQ, m_rpm ? CLEAR_LINE : ASSERT_LINE);
+		m_rpm = !m_rpm;
+	} else {
+		m_maincpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
+		m_rpm = false;
+	}
+
 }
 
 static INPUT_PORTS_START( digijet )
@@ -187,6 +199,9 @@ PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 PORT_START("THROTTLE")
 PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 
+PORT_START("RPM")
+PORT_BIT( 0xff, 0x80, IPT_PEDAL3 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Engine RPM")
+
 INPUT_PORTS_END
 
 void digijet_state::digijet(machine_config &config)
@@ -203,7 +218,7 @@ void digijet_state::digijet(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(68)); // ???
 
-	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000*2/60)); // 1000r/m * 2 (m_rpm toggle) / 60s
+	TIMER(config, m_rpm_timer).configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000*2/60)); // 1000r/m * 2 (m_rpm toggle) / 60s
 
 	config.set_default_layout(layout_vw);
 }
@@ -222,7 +237,7 @@ void digijet_state::digijet90(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(68)); // 0.68uF * 10kOhm
 
-	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000*2/60)); // 1000rpm / 60s
+	TIMER(config, m_rpm_timer).configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000*2/60)); // 1000r/m * 2 (m_rpm toggle) / 60s
 
 	config.set_default_layout(layout_vw);
 }
