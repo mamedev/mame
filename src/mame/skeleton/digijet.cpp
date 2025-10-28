@@ -98,7 +98,7 @@ private:
 	void prg_map(address_map &map) ATTR_COLD;
 
 	void p1_w(uint8_t data);
-	uint8_t p2_r();
+
 	TIMER_DEVICE_CALLBACK_MEMBER( rpm_int );
 	uint8_t read_adc(offs_t offset);
 	void start_adc(uint8_t data);
@@ -155,16 +155,6 @@ void digijet_state::p1_w(uint8_t data)
 	}
 };
 
-uint8_t digijet_state::p2_r()
-{
-	// bits 5 and 6 are the lambda sensor
-	// 4 and 7 are floating
-	uint8_t out = 0x9f;
-	out |= (this->ioport("LAMBDA1")->read() << 5);
-	out |= (this->ioport("LAMBDA2")->read() << 6);
-	return out;
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(digijet_state::rpm_int)
 {
 	if (m_interrupt_enable) {
@@ -190,11 +180,12 @@ PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100)
 PORT_START("ADC3")
 PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_NAME("Air temperature")
 
-PORT_START("LAMBDA1")
-PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+PORT_START("LAMBDA")
+PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-PORT_START("LAMBDA2")
-PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 
 PORT_START("THROTTLE")
 PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )
@@ -213,7 +204,7 @@ void digijet_state::digijet(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
 	
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
-	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
+	m_maincpu->p2_in_cb().set_ioport("LAMBDA");
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(68)); // ???
@@ -232,7 +223,7 @@ void digijet_state::digijet90(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
 	
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
-	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
+	m_maincpu->p2_in_cb().set_ioport("LAMBDA");
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(68)); // 0.68uF * 10kOhm
