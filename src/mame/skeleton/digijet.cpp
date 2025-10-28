@@ -144,7 +144,9 @@ void digijet_state::p1_w(uint8_t data)
 	machine().output().set_value("led_check", !check);
 	
 	if (watchdog)
+	{
 		m_watchdog->watchdog_reset();
+	}
 };
 
 uint8_t digijet_state::p2_r()
@@ -152,7 +154,8 @@ uint8_t digijet_state::p2_r()
 	// bits 5 and 6 are the lambda sensor
 	// 4 and 7 are floating
 	uint8_t out = 0x9f;
-	//out << LAMBDA1 LAMBDA2
+	out |= (this->ioport("LAMBDA1")->read() << 5);
+	out |= (this->ioport("LAMBDA2")->read() << 6);
 	return out;
 };
 
