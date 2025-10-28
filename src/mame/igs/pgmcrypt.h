@@ -65,5 +65,8 @@ void tswxp_decrypt(running_machine& machine) ATTR_COLD;
 void jking04_decrypt(running_machine& machine) ATTR_COLD;
 void royal5p_decrypt(running_machine& machine) ATTR_COLD;
 void jhg3d_decrypt(running_machine& machine) ATTR_COLD;
+void mgfx_decrypt(running_machine& machine) ATTR_COLD;
+void tarzan2_decrypt(running_machine& machine) ATTR_COLD;
+void magtree_decrypt(running_machine& machine) ATTR_COLD;
 
 #endif // MAME_IGS_PGMCRYPT_H

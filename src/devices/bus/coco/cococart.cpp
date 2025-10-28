@@ -58,6 +58,7 @@
 #include "coco_sym12.h"
 #include "coco_wpk.h"
 #include "coco_wpk2p.h"
+#include "coco_xsid.h"
 
 #include "dragon_amtor.h"
 #include "dragon_claw.h"
@@ -576,7 +577,8 @@ std::pair<std::error_condition, std::string> cococart_slot_device::call_load()
 	{
 		memory_region *cart_mem = m_cart->get_cart_memregion();
 		u8 *base = cart_mem->base();
-		offs_t read_length, cart_length = cart_mem->bytes();
+		offs_t read_length = cart_mem->bytes();
+		offs_t cart_length = cart_mem->bytes();
 
 		if (loaded_through_softlist())
 		{
@@ -844,6 +846,7 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("wpk2", COCO_WPK2);
 	device.option_add("wpkrs", COCO_WPKRS);
 	device.option_add("wpk2p", COCO_WPK2P);
+	device.option_add("xsid", COCO_XSID);
 }
 
 
@@ -897,6 +900,7 @@ void dragon_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("stecomp", COCO_STEREO_COMPOSER);
 	device.option_add("sym12", COCO_SYM12);
 	device.option_add("wpk2p", COCO_WPK2P);
+	device.option_add("xsid", COCO_XSID);
 }
 
 

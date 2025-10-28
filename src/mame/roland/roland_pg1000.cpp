@@ -2,44 +2,44 @@
 // copyright-holders:Felipe Sanches
 /****************************************************************************
 
-	Roland PG-1000 programmer.
+    Roland PG-1000 programmer.
 
-	To be used alongside Roland D-50/D-550/MT-32
-
------------------------------------------------------------------------------
-
-	Notes:
-		midiin1 is the usual "MIDI IN" port.
-		midiin2 is the "Parameter In" port.
-
-	usage:
-		mame pg1000 -midiin1 "ctrl" -midiin2 "synth" -midiout "synth"
-
-	where:
-		"ctrl" is a MIDI OUT device such as
-		an external usb midi keyboard controller.
-
-		"synth" is a D-50 or a D-550.
-		(and I guess it may work with a Roland MT-32 as well)
-
-	During development, I tested this setup using a real Roland D-550.
+    To be used alongside Roland D-50/D-550/MT-32
 
 -----------------------------------------------------------------------------
 
-	Known driver bug:
+    Notes:
+        midiin1 is the usual "MIDI IN" port.
+        midiin2 is the "Parameter In" port.
 
-	This driver is almost perfectly functional, but remains marked with the
-	MACHINE_NOT_WORKING flag due to an unresolved issue related to its
-	MIDI ports.
+    usage:
+        mame pg1000 -midiin1 "ctrl" -midiin2 "synth" -midiout "synth"
 
-	While running it hooked up to an USB-MIDI controller, the MIDI messages
-	are not perfectly repeated from MIDI IN to MIDI OUT as they should be.
-	Instead, sometimes we get some data corruption, specially when using
-	the sustain pedal.
+    where:
+        "ctrl" is a MIDI OUT device such as
+        an external usb midi keyboard controller.
 
-	I suspect this may be some CPU bug, perhaps an incorrect or incomplete
-	implementation of one of the upd7810 instructions used in the serial
-	port code-path.
+        "synth" is a D-50 or a D-550.
+        (and I guess it may work with a Roland MT-32 as well)
+
+    During development, I tested this setup using a real Roland D-550.
+
+-----------------------------------------------------------------------------
+
+    Known driver bug:
+
+    This driver is almost perfectly functional, but remains marked with the
+    MACHINE_NOT_WORKING flag due to an unresolved issue related to its
+    MIDI ports.
+
+    While running it hooked up to an USB-MIDI controller, the MIDI messages
+    are not perfectly repeated from MIDI IN to MIDI OUT as they should be.
+    Instead, sometimes we get some data corruption, specially when using
+    the sustain pedal.
+
+    I suspect this may be some CPU bug, perhaps an incorrect or incomplete
+    implementation of one of the upd7810 instructions used in the serial
+    port code-path.
 
 ****************************************************************************/
 

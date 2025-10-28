@@ -91,6 +91,21 @@ protected:
 	static inline constexpr int TM_SEARCH             = 0x02;
 	static inline constexpr int TM_SEARCH_TRANSFER    = 0x03;
 
+	enum
+	{
+		SEQ_WAIT_READY = 0,
+		SEQ_REQUEST_BUS,
+		SEQ_WAITING_ACK,
+		SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS,
+		SEQ_TRANS1_READ_SOURCE,
+		SEQ_TRANS1_INC_DEC_DEST_ADDRESS,
+		SEQ_TRANS1_WRITE_DEST,
+		SEQ_TRANS1_BYTE_MATCH,
+		SEQ_TRANS1_INC_BYTE_COUNTER,
+		SEQ_TRANS1_SET_FLAGS,
+		SEQ_FINISH
+	};
+
 	z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
@@ -112,14 +127,18 @@ protected:
 	void do_search();
 	void setup_next_read(int rr);
 
-	u16 &REG(unsigned m, unsigned s) noexcept { return m_regs[REGNUM(m, s)]; }
+	virtual TIMER_CALLBACK_MEMBER(clock_w);
 
+	u16 &REG(unsigned m, unsigned s) noexcept { return m_regs[REGNUM(m, s)]; }
 	static constexpr unsigned REGNUM(unsigned m, unsigned s) { return (m << 3) + s; }
+
+	emu_timer *m_timer;
 
 	u16 m_addressA;
 	u16 m_addressB;
 	u16 m_count;
 	u16 m_byte_counter;
+	int m_dma_seq;
 
 	u8  m_num_follow;
 	u8  m_cur_follow;
@@ -131,7 +150,6 @@ private:
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
 
-	TIMER_CALLBACK_MEMBER(clock_w);
 	TIMER_CALLBACK_MEMBER(rdy_write_callback);
 
 	// internal state
@@ -144,12 +162,9 @@ private:
 	devcb_read8        m_in_iorq_cb;
 	devcb_write8       m_out_iorq_cb;
 
-	emu_timer *m_timer;
-
 	u16  m_regs[(6 << 3) + 1 + 1];
 	u8   m_read_cur_follow;
 	u8   m_status;
-	int  m_dma_seq;
 
 	int m_rdy;
 	int m_force_ready;

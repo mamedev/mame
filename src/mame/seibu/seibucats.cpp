@@ -87,7 +87,7 @@ class seibucats_state : public seibuspi_base_state
 {
 public:
 	seibucats_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seibuspi_base_state(mconfig, type, tag)
+		: seibuspi_base_state(mconfig, type, tag, 0x4000, 0x2000, 6) // see above - RAM size is correct?
 //        m_key(*this, "KEY%u", 0)
 	{
 	}
@@ -128,14 +128,7 @@ void seibucats_state::video_start()
 	m_video_dma_address = 0;
 	m_layer_enable = 0;
 
-	m_palette_ram_size = 0x4000; // TODO : correct?
-	m_sprite_ram_size = 0x2000; // TODO : correct?
-	m_sprite_bpp = 6; // see above
-
-	m_palette_ram = make_unique_clear<u32[]>(m_palette_ram_size/4);
-	m_sprite_ram = make_unique_clear<u32[]>(m_sprite_ram_size/4);
-
-	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
+	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram.bytes(), 32, ENDIANNESS_LITTLE, 2);
 
 	memset(m_alpha_table, 0, 0x2000); // TODO : no alpha blending?
 }

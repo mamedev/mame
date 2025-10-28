@@ -380,7 +380,7 @@ ROM_START( sb16 )
 	ROM_LOAD("ct1741_v413_xor.bin", 0x00, 0x40, CRC(5243d15a) SHA1(c7637c92828843f47e6e2f956af639b07aee4571))
 ROM_END
 
-void sb16_lle_device::sb16_io(address_map &map)
+void sb16_lle_device::sb16_data(address_map &map)
 {
 	map(0x0000, 0x0000).mirror(0xff00).rw(FUNC(sb16_lle_device::dsp_data_r), FUNC(sb16_lle_device::dsp_data_w));
 //  map(0x0001, 0x0001) // MIDI related?
@@ -428,7 +428,7 @@ const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 void sb16_lle_device::device_add_mconfig(machine_config &config)
 {
 	I80C52(config, m_cpu, XTAL(24'000'000));
-	m_cpu->set_addrmap(AS_IO, &sb16_lle_device::sb16_io);
+	m_cpu->set_addrmap(AS_DATA, &sb16_lle_device::sb16_data);
 	m_cpu->port_in_cb<1>().set(FUNC(sb16_lle_device::p1_r));
 	m_cpu->port_out_cb<1>().set(FUNC(sb16_lle_device::p1_w));
 	m_cpu->port_in_cb<2>().set(FUNC(sb16_lle_device::p2_r));

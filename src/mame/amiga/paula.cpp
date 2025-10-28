@@ -375,12 +375,17 @@ void paula_device::sound_stream_update(sound_stream &stream)
 					if (chan->curlength == 0)
 					{
 						dma_reload(chan, false);
-						// silence the data pointer, avoid DC offset
+						// reload the data pointer, otherwise aliasing / buzzing outside
+						// the given buffer will be heard
 						// - xenon2 sets up location=0x63298 length=0x20
 						// for silencing channels on-the-fly without relying on irqs.
 						// Without this the location will read at 0x632d8 (data=0x7a7d), causing annoying buzzing.
-						// - Ocean games (bchvolly, batmancc) also rely on this
-						chan->dat = 0; //m_chipmem_r(chan->curlocation);
+						chan->dat = m_chipmem_r(chan->curlocation);
+						// TODO: Ocean games (batmancc in particular) throws DC offset on main theme
+						// if we non-zero the data. This however will break swos9596 and
+						// "Mind Walker", latter using short 1 word DMA samples.
+						// https://github.com/mamedev/mame/commit/8a9fb029a29a8a0f653ce4a8e011453834ef1fda#commitcomment-168255001
+						//chan->dat = 0;
 					}
 				}
 

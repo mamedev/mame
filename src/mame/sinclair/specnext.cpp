@@ -19,13 +19,13 @@
 
 #include "emu.h"
 
-#include "beta_m.h"
 #include "screen_ula.h"
 #include "spec128.h"
 #include "specnext_copper.h"
 #include "specnext_ctc.h"
 #include "specnext_divmmc.h"
 #include "specnext_dma.h"
+#include "specnext_im2.h"
 #include "specnext_multiface.h"
 #include "specnext_layer2.h"
 #include "specnext_lores.h"
@@ -44,17 +44,28 @@
 #define LOG_IO     (1U << 1)
 #define LOG_MEM    (1U << 2)
 #define LOG_COPPER (1U << 3)
+#define LOG_INT    (1U << 4)
 
-//#define VERBOSE ( LOG_GENERAL | LOG_IO | /*LOG_MEM |*/ LOG_COPPER )
+//#define VERBOSE ( LOG_GENERAL /*| LOG_IO | LOG_MEM | LOG_COPPER*/ | LOG_INT )
 #include "logmacro.h"
 
 #define LOGIO(...)     LOGMASKED(LOG_IO,     __VA_ARGS__)
 #define LOGMEM(...)    LOGMASKED(LOG_MEM,    __VA_ARGS__)
 #define LOGCOPPER(...) LOGMASKED(LOG_COPPER, __VA_ARGS__)
+#define LOGINT(...)    LOGMASKED(LOG_INT,    __VA_ARGS__)
 
 namespace {
 
 #define TIMINGS_PERFECT     0
+
+constexpr u8 INT_PRIORITY_LINE     = 0;
+constexpr u8 INT_PRIORITY_UART0_RX = 1;
+constexpr u8 INT_PRIORITY_UART1_RX = 2;
+constexpr u8 INT_PRIORITY_CTC      = 3; // 3-10 reserved for 8 chanels, only 4 used atm
+constexpr u8 INT_PRIORITY_ULA      = 11;
+constexpr u8 INT_PRIORITY_UART0_TX = 12;
+constexpr u8 INT_PRIORITY_UART1_TX = 13;
+
 
 struct video_timings_info {
 	u16 min_hblank;
@@ -99,9 +110,11 @@ public:
 		, m_view5(*this, "mem_view5")
 		, m_view6(*this, "mem_view6")
 		, m_view7(*this, "mem_view7")
+		, m_im2_line(*this, "im2_line")
+		, m_im2_ula(*this, "im2_ula")
 		, m_copper(*this, "copper")
 		, m_ctc(*this, "ctc")
-		, m_dma(*this, "ndma")
+		, m_dma(*this, "dma")
 		, m_i2c(*this, "i2c")
 		, m_sdcard(*this, "sdcard")
 		, m_ay(*this, "ay%u", 0U)
@@ -135,7 +148,7 @@ protected:
 
 	u8 do_m1(offs_t offset);
 	void do_mf_nmi();
-	void leave_nmi(int status);
+	void leave_nmi(int state);
 	void map_fetch(address_map &map) ATTR_COLD;
 	void map_mem(address_map &map) ATTR_COLD;
 	void map_io(address_map &map) ATTR_COLD;
@@ -176,14 +189,14 @@ private:
 	static const u8 G_VIDEO_INC = 0b11;
 	static const u16 UTM_FALLBACK_PEN = 0x800;
 
-	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
 	INTERRUPT_GEN_MEMBER(specnext_interrupt);
 	TIMER_CALLBACK_MEMBER(line_irq_on);
+	void ctc_irq_on(int state);
 	INTERRUPT_GEN_MEMBER(line_interrupt);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 	TIMER_CALLBACK_MEMBER(spi_clock);
 	void line_irq_adjust();
+	template <unsigned DeviceId> void int_w(int state);
 
 	u8 g_machine_id() { return m_io_issue->read() ? MACHINE_NEXT : MACHINE_TBBLUE; }
 	u8 g_board_issue() { return m_io_issue->read(); }
@@ -318,6 +331,8 @@ private:
 	memory_bank_creator m_bank_boot_rom;
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
+	required_device<specnext_im2_device> m_im2_line;
+	required_device<specnext_im2_device> m_im2_ula;
 	required_device<specnext_copper_device> m_copper;
 	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
@@ -539,6 +554,7 @@ private:
 	u8 m_nr_fa_xadc_d1;
 
 	bool m_pulse_int_n;
+	u16 m_im2_int_status; // u14
 	u8 m_nr_09_scanlines; // u2
 
 	u8 m_eff_nr_03_machine_timing; // u3
@@ -568,8 +584,6 @@ private:
 	u8 m_spi_miso_dat;
 	bool m_i2c_scl_data;
 	bool m_i2c_sda_data;
-
-	u16 m_irq_mask;
 };
 
 void specnext_state::bank_update(u8 bank, u8 count)
@@ -926,12 +940,9 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		// background
 		if (m_nr_68_ula_en)
-		{
 			m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
-		}
-		else {
+		else
 			bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
-		}
 
 		static const u8 lcfg[][3] =
 		{
@@ -1460,7 +1471,7 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = vpos_to_cvc(m_screen->vpos()) & 0xff;
 		break;
 	case 0x20:
-		port_253b_dat = 0;//(BIT(im2_int_status, 0) <<) | (BIT(im2_int_status, 11) <<) | (0b00 <<) | BIT(im2_int_status, 3, 4);
+		port_253b_dat = (BIT(m_im2_int_status, INT_PRIORITY_LINE) << 7) | (BIT(m_im2_int_status, INT_PRIORITY_ULA) << 6) | (0b00 << 4) | BIT(m_im2_int_status, INT_PRIORITY_CTC, 4);
 		break;
 	case 0x22:
 		port_253b_dat = ((!m_pulse_int_n) << 7) | (0b0000 << 3) | (port_ff_interrupt_disable() << 2) | (m_nr_22_line_interrupt_en << 1) | BIT(m_nr_23_line_interrupt, 8);
@@ -1689,19 +1700,20 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		}
 		break;
 	case 0xc5:
-		port_253b_dat = 0;//ctc_int_en;
+		port_253b_dat = m_ctc->ctrl_int_r();
 		break;
 	case 0xc6:
 		port_253b_dat = (0 << 7) | (m_nr_c6_int_en_2_654 << 4) | (0 << 3) | m_nr_c6_int_en_2_210;
 		break;
 	case 0xc8:
-		port_253b_dat = (0b000000 << 2);// | (im2_int_status(0) << 1) | im2_int_status(11);
+		port_253b_dat = (0b000000 << 2) | (BIT(m_im2_int_status, INT_PRIORITY_LINE) << 1) | BIT(m_im2_int_status, INT_PRIORITY_ULA);
 		break;
 	case 0xc9:
-		port_253b_dat = 0;//im2_int_status(10 downto 3);
+		port_253b_dat = BIT(m_im2_int_status, INT_PRIORITY_CTC, 8);
 		break;
 	case 0xca:
-		port_253b_dat = (0 << 7);// | (im2_int_status(13) <<  6) | (im2_int_status(2) << 5) | (im2_int_status(2) << 4) | (0 << 3) | (im2_int_status(12) << 2) | (im2_int_status(1) << 1) | im2_int_status(1);
+		port_253b_dat = (0b0 << 7) | (BIT(m_im2_int_status, INT_PRIORITY_UART1_TX) <<  6) | (BIT(m_im2_int_status, INT_PRIORITY_UART1_RX) << 5) | (BIT(m_im2_int_status, INT_PRIORITY_UART1_RX) << 4)
+					| (0b0 << 3) | (BIT(m_im2_int_status, INT_PRIORITY_UART0_TX) << 2) | (BIT(m_im2_int_status, INT_PRIORITY_UART0_RX) << 1) | BIT(m_im2_int_status, INT_PRIORITY_UART0_RX);
 		break;
 	case 0xcc:
 		port_253b_dat = (m_nr_cc_dma_int_en_0_7 << 7) | (0b00000 << 2) | m_nr_cc_dma_int_en_0_10;
@@ -1996,11 +2008,13 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
 		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x0100) | (BIT(nr_wr_dat, 0) << 8);
 		line_irq_adjust();
-		port_ff_w((m_port_ff_data & 0xbf) | (BIT(nr_wr_dat, 1) << 6));
+		port_ff_w((m_port_ff_data & 0xbf) | (BIT(nr_wr_dat, 2) << 6));
+		LOGINT("[Line Interrupt Control] ULA: %d; Line: %d; Line#: %03x\n", BIT(~nr_wr_dat, 2), m_nr_22_line_interrupt_en, m_nr_23_line_interrupt);
 		break;
 	case 0x23:
 		m_nr_23_line_interrupt = (m_nr_23_line_interrupt & ~0x00ff) | nr_wr_dat;
 		line_irq_adjust();
+		LOGINT("[Line Interrupt Value] %03x\n", m_nr_23_line_interrupt);
 		break;
 	case 0x26:
 		m_screen->update_now();
@@ -2068,6 +2082,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_palette_sub_idx = 0;
 		break;
 	case 0x41:
+		m_screen->update_now();
 		palette_val_w(0b00, (nr_wr_dat << 1) | BIT(nr_wr_dat, 1) | BIT(nr_wr_dat, 0));
 		if (m_nr_43_palette_autoinc_disable == 0)
 			++m_nr_palette_idx;
@@ -2098,6 +2113,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0x4a:
 		{
+			m_screen->update_now();
 			m_nr_4a_fallback_rgb = nr_wr_dat;
 			rgb_t fb = rgbexpand<3,3,3>((m_nr_4a_fallback_rgb << 1) | BIT(m_nr_4a_fallback_rgb, 1) | BIT(m_nr_4a_fallback_rgb, 0), 6, 3, 0);
 			m_palette->set_pen_color(UTM_FALLBACK_PEN, fb);
@@ -2308,6 +2324,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_c0_stackless_nmi = BIT(nr_wr_dat, 3);
 		m_maincpu->nmi_stackless_w(m_nr_c0_stackless_nmi);
 		m_nr_c0_int_mode_pulse_0_im2_1 = BIT(nr_wr_dat, 0);
+		LOGINT("[Interrupt Control] Vector: %02x; HW IM2: %d\n", m_nr_c0_im2_vector << 5, m_nr_c0_int_mode_pulse_0_im2_1);
 		break;
 	case 0xc2:
 		m_nr_c2_retn_address_lsb = nr_wr_dat;
@@ -2320,13 +2337,14 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_22_line_interrupt_en = BIT(nr_wr_dat, 1);
 		line_irq_adjust();
 		port_ff_w((m_port_ff_data & 0xbf) | (BIT(~nr_wr_dat, 0) << 6));
+		LOGINT("[INT EN 0] Line: %d; ULA: %d\n", m_nr_22_line_interrupt_en, BIT(nr_wr_dat, 0));
 		break;
 	case 0xc5:
 		{
 			u8 active = BIT(nr_wr_dat, 0, 4);
-			for (auto ch = 0; ch < 4; ++ch, active >>= 1)
-				m_ctc->write(ch, 1 | ((active & 1) ? 0 : 2)); // for inactive: CONTROL + RESET
+			m_ctc->ctrl_int_w(active);
 		}
+		LOGINT("[INT EN 1] CTC7..0: %02x\n", nr_wr_dat);
 		break;
 	case 0xc6:
 		m_nr_c6_int_en_2_654 = (BIT(nr_wr_dat, 6) << 2) | (BIT(nr_wr_dat, 5) << 1) | BIT(nr_wr_dat, 4);
@@ -2335,13 +2353,19 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0xcc:
 		m_nr_cc_dma_int_en_0_7 = BIT(nr_wr_dat, 7);
 		m_nr_cc_dma_int_en_0_10 = BIT(nr_wr_dat, 0, 2);
+		LOGINT("[DMA INT EN 0] NMI: %d; Line: %d; ULA: %d\n", m_nr_cc_dma_int_en_0_7, m_nr_cc_dma_int_en_0_10 >> 1, m_nr_cc_dma_int_en_0_10 & 1);
 		break;
 	case 0xcd:
 		m_nr_cd_dma_int_en_1 = nr_wr_dat;
+		LOGINT("[DMA INT EN 1] CTC7..0: %02x\n", m_nr_cd_dma_int_en_1);
 		break;
 	case 0xce:
 		m_nr_ce_dma_int_en_2_654 = BIT(nr_wr_dat, 4, 3);
 		m_nr_ce_dma_int_en_2_210 = BIT(nr_wr_dat, 0, 3);
+		break;
+	case 0xcf:
+		if (nr_wr_dat)
+			LOG("wR: CF <- %x, but 0 expected\n", nr_wr_dat);
 		break;
 	case 0xd8:
 		m_nr_d8_io_trap_fdc_en = BIT(nr_wr_dat, 0);
@@ -2399,7 +2423,10 @@ void specnext_state::nr_07_cpu_speed_w(u8 data)
 {
 	m_nr_07_cpu_speed = data & 3;
 	m_maincpu->set_clock_scale(1 << m_nr_07_cpu_speed);
+	m_ctc->set_clock_scale(1 << m_nr_07_cpu_speed);
 	m_dma->set_clock_scale(1 << m_nr_07_cpu_speed);
+	m_im2_line->set_clock_scale(1 << m_nr_07_cpu_speed);
+	m_im2_ula->set_clock_scale(1 << m_nr_07_cpu_speed);
 }
 
 void specnext_state::nr_14_global_transparent_rgb_w(u8 data)
@@ -2420,30 +2447,43 @@ void specnext_state::nr_1a_ula_clip_y2_w(u8 data)
 
 static const z80_daisy_config z80_daisy_chain[] =
 {
-	{ "ndma" },
+	{ "im2_line" },
 	{ "ctc" },
+	{ "im2_ula" },
+	//{ "dma" },
 	{ nullptr }
 };
 
-TIMER_CALLBACK_MEMBER(specnext_state::irq_off)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	m_irq_mask = 0;
-}
-
 TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	m_irq_mask |= 1 << 11;
-	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+	m_im2_ula->int_w((m_nr_02_bus_reset || !m_nr_c0_int_mode_pulse_0_im2_1) ? 0xff : ((m_nr_c0_im2_vector << 5) | (INT_PRIORITY_ULA << 1)));
 }
 
 TIMER_CALLBACK_MEMBER(specnext_state::line_irq_on)
 {
 	m_screen->update_now();
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	m_irq_mask |= 1 << 0;
-	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+	m_im2_line->int_w((m_nr_02_bus_reset || !m_nr_c0_int_mode_pulse_0_im2_1) ? 0xff : ((m_nr_c0_im2_vector << 5) | (INT_PRIORITY_LINE << 1)));
+}
+
+void specnext_state::ctc_irq_on(int state)
+{
+	specnext_state::int_w<INT_PRIORITY_CTC>(state); // TODO + chanel
+}
+
+template <unsigned DeviceId> void specnext_state::int_w(int state)
+{
+	if (state)
+	{
+		if (!m_im2_int_status)
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_im2_int_status |= (1 << DeviceId);
+	}
+	else
+	{
+		m_im2_int_status &= ~(1 << DeviceId);
+		if (!m_im2_int_status)
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
 }
 
 INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
@@ -2473,27 +2513,6 @@ void specnext_state::line_irq_adjust()
 		m_irq_line_timer->reset();
 }
 
-IRQ_CALLBACK_MEMBER(specnext_state::irq_callback)
-{
-	if (!m_nr_02_bus_reset)
-	{
-		return 0xff;
-	}
-	else
-	{
-		u8 vector = 11;
-		if (m_irq_mask)
-		{
-			vector = 0;
-			u16 i = 1;
-			for (; ~m_irq_mask & i; ++vector, i <<= 1);
-			m_irq_mask &= ~i;
-
-		}
-		return (m_nr_c0_im2_vector << 5) | (vector << 2);
-	}
-}
-
 INPUT_CHANGED_MEMBER(specnext_state::on_mf_nmi)
 {
 	m_nr_02_generate_mf_nmi = newval & 1;
@@ -2519,7 +2538,7 @@ void specnext_state::do_mf_nmi()
 	}
 }
 
-void specnext_state::leave_nmi(int status)
+void specnext_state::leave_nmi(int state)
 {
 	m_mf->cpu_retn_seen_w(1);
 	m_mf->clock_w();
@@ -2824,7 +2843,7 @@ void specnext_state::map_io(address_map &map)
 	map(0x253b, 0x253b).lrw8(NAME([this]() { return m_next_regs.read_byte(m_nr_register); })
 		, NAME([this](u8 data) { m_next_regs.write_byte(m_nr_register, data); }));
 	map(0x303b, 0x303b).lrw8(NAME([this]() {
-		return port_sprite_io_en() ? m_sprites->mirror_num_r() : 0x00;
+		return port_sprite_io_en() ? m_sprites->status_r() : 0x00;
 	}), NAME([this](u8 data) {
 		if (port_sprite_io_en())
 			m_sprites->io_w(0x303b, data);
@@ -3187,6 +3206,7 @@ void specnext_state::machine_start()
 	save_item(NAME(m_nr_f9_xadc_d0));
 	save_item(NAME(m_nr_fa_xadc_d1));
 	save_item(NAME(m_pulse_int_n));
+	save_item(NAME(m_im2_int_status));
 	save_item(NAME(m_nr_09_scanlines));
 	save_item(NAME(m_eff_nr_03_machine_timing));
 	save_item(NAME(m_eff_nr_05_5060));
@@ -3209,7 +3229,6 @@ void specnext_state::machine_start()
 	save_item(NAME(m_spi_miso_dat));
 	save_item(NAME(m_i2c_scl_data));
 	save_item(NAME(m_i2c_sda_data));
-	save_item(NAME(m_irq_mask));
 }
 
 void specnext_state::reset_hard()
@@ -3349,6 +3368,7 @@ void specnext_state::machine_reset()
 	//z80_retn_seen_28_d  = 0;
 	//im2_dma_delay  = 0;
 	m_pulse_int_n  = 1;
+	m_im2_int_status = 0x00;
 	m_nr_c2_retn_address_lsb  = 0x00;
 	m_nr_c3_retn_address_msb  = 0x00;
 	//z80_stackless_retn_en  = 0;
@@ -3580,7 +3600,6 @@ void specnext_state::machine_reset()
 	mmu_x2_w(6, 0x00);
 
 	m_ay_select = 0;
-	m_irq_mask = 0;
 }
 
 static const gfx_layout bootrom_charlayout =
@@ -3636,18 +3655,26 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_memory_map(&specnext_state::map_mem);
 	m_maincpu->set_io_map(&specnext_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(specnext_state::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
 	m_maincpu->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
 	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
 
+	SPECNEXT_IM2(config, m_im2_line, 28_MHz_XTAL / 8);
+	m_im2_line->intr_callback().set(FUNC(specnext_state::int_w<INT_PRIORITY_LINE>));
+
+	SPECNEXT_IM2(config, m_im2_ula, 28_MHz_XTAL / 8);
+	m_im2_ula->intr_callback().set(FUNC(specnext_state::int_w<INT_PRIORITY_ULA>));
+
 	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);
-	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+	m_ctc->zc_callback<1>().set(m_ctc, FUNC(z80ctc_device::trg2));
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
+	m_ctc->intr_callback().set(FUNC(specnext_state::ctc_irq_on));
 
 	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
-	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(specnext_state::dma_mreq_r));
 	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
 	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });

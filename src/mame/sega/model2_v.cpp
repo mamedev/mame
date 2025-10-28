@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese, Matthew Daniels
 /*********************************************************************************************************************************
 
     Sega Model 2 Geometry Engine and 3D Rasterizer Emulation
@@ -90,6 +90,7 @@
 
 #include "emu.h"
 #include "model2.h"
+#include "model2rd.ipp"
 
 #include <cmath>
 #include <limits>
@@ -793,14 +794,15 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	m2_poly_extra_data& extra = poly->object_data().next();
 	u8 renderer;
 
-	/* select renderer based on attributes (bit15 = checker, bit14 = textured, bit13 = transparent */
-	renderer = (tri->texheader[0] >> 13) & 7;
+	/* select renderer based on attributes (bit14 = textured, bit13 = transparent) */
+	renderer = (tri->texheader[0] >> 13) & 3;
 
 	/* calculate and clip to viewport */
 	rectangle vp(tri->viewport[0] + m_xoffs, tri->viewport[2] + m_xoffs, (384-tri->viewport[3]) + m_yoffs, (384-tri->viewport[1]) + m_yoffs);
 	vp &= cliprect;
 
 	extra.state = &m_state;
+	extra.checker = (tri->texheader[0] >> 15) & 1;
 	extra.lumabase = (tri->texheader[1] & 0xff) << 7;
 	extra.colorbase = (tri->texheader[3] >> 6) & 0x3ff;
 	extra.luma = tri->luma;
@@ -816,10 +818,10 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 		u32 posx = 32 * ( (tri->texheader[2] >> 0) & 0x3f );
 		u32 posy = 32 * ( (tri->texheader[2] >> 6) & 0x1f );
 
-		// 6 MIPS LEVELS
-		// EACH MIP LEVEL HAS HALF WIDTH AND HALF HEIGHT
-		// LOCATED RECURSIVELY IN THE BOTTOM RIGHT CORNER OF 2048x1024
-		// EACH LEVEL HAS FLIPPED RAM BANKS
+		// 6 mips levels
+		// each mip level has half width and half height of the level above
+		// mips are located recursively in the bottom right corner of 2048x1024
+		// each level has flipped ram banks compared to the level above
 		for (u32 mip = 0; mip < 6; mip++)
 		{
 			extra.texsheet[mip] = sheet;
@@ -851,35 +853,14 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 		tri->v[2].pz = 1.0f / (tri->v[2].pz + std::numeric_limits<float>::min());
 		tri->v[2].pu = tri->v[2].pu * tri->v[2].pz * (1.0f / 8.0f);
 		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * (1.0f / 8.0f);
-
-		// Note : The class model2_renderer has an array of function pointers in it named m_renderfuncs, in theory this simply
-		//        needs to be passed into the render_triangle function as such model2_renderer::m_renderfuncs[renderer], but
-		//        I was unable to make it work when converting to the new polygon rasterizer interface.
-		switch (renderer)
-		{
-		case 0: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_0, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 1: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_1, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 2: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_2, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 3: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_3, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 4: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_4, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 5: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_5, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 6: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_6, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 7: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_7, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		}
 	}
-	else
+
+	switch (renderer)
 	{
-		switch (renderer)
-		{
-		case 0: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_0, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 1: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_1, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 2: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_2, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 3: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_3, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 4: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_4, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 5: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_5, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 6: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_6, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		case 7: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_7, this), tri->v[0], tri->v[1], tri->v[2]); break;
-		}
+	case 0: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<false>, this), tri->v[0], tri->v[1], tri->v[2]); break;
+	case 1: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<true>,  this), tri->v[0], tri->v[1], tri->v[2]); break;
+	case 2: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<false>,   this), tri->v[0], tri->v[1], tri->v[2]); break;
+	case 3: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<true>,    this), tri->v[0], tri->v[1], tri->v[2]); break;
 	}
 }
 

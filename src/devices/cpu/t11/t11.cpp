@@ -51,7 +51,7 @@ lsi11_device::lsi11_device(const machine_config &mconfig, const char *tag, devic
 	: t11_device(mconfig, LSI11, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this)
 {
-	c_insn_set = IS_LEIS | IS_MXPS; // EISFIS is an option
+	c_insn_set = IS_LEIS | IS_EIS | IS_MXPS; // EISFIS is an option
 }
 
 /*
@@ -69,6 +69,12 @@ k1801vm1_device::k1801vm1_device(const machine_config &mconfig, const char *tag,
 	c_insn_set = IS_LEIS | IS_MXPS | IS_VM1;
 }
 
+/*
+ * Not implemented:
+ *
+ * instruction timing (+ memory timing), bug compatibility (@PC addressing mode),
+ * HALT mode, traps: double bus error and bus error on vector fetch.
+ */
 k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, K1801VM2, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this)
@@ -138,13 +144,39 @@ void t11_device::WBYTE(int addr, int data)
 
 int t11_device::RWORD(int addr)
 {
-	return m_program.read_word(addr & 0xfffe);
+	if (addr < 0160000)
+		return m_program.read_word(addr & 0xfffe);
+	else // accessing I/O page
+	{
+		auto flags = m_program.lookup_read_word_flags(addr);
+		if (!flags)
+			return m_program.read_word(addr & 0xfffe);
+		else if (flags & UNALIGNED_WORD)
+			return m_program.read_word_unaligned(addr);
+		else if (flags & UNALIGNED_BYTE)
+			return m_program.read_byte(addr);
+		else
+			return m_program.read_word(addr & 0xfffe);
+	}
 }
 
 
 void t11_device::WWORD(int addr, int data)
 {
-	m_program.write_word(addr & 0xfffe, data);
+	if (addr < 0160000)
+		m_program.write_word(addr & 0xfffe, data);
+	else // accessing I/O page
+	{
+		auto flags = m_program.lookup_write_word_flags(addr);
+		if (!flags)
+			m_program.write_word(addr & 0xfffe, data);
+		else if (flags & UNALIGNED_WORD)
+			m_program.write_word_unaligned(addr, data);
+		else if (flags & UNALIGNED_BYTE)
+			m_program.write_byte(addr, data);
+		else
+			m_program.write_word(addr & 0xfffe, data);
+	}
 }
 
 
@@ -365,7 +397,7 @@ void k1801vm1_device::t11_check_irqs()
 	// 8. external HALT (nIRQ1 pin, level triggered); PSW11, PSW10
 	else if (m_hlt_active)
 	{
-		m_hlt_active = 0;
+		m_hlt_active = false;
 		mcir = MCIR_HALT;
 		vsel = VM1_HALT;
 	}
@@ -506,6 +538,88 @@ void t11_device::take_interrupt(uint8_t vector)
 	m_wait_state = 0;
 }
 
+// priorities from technical manual, pp. 152, 154
+void k1801vm2_device::t11_check_irqs()
+{
+	int8_t              mcir = MCIR_NONE;
+	uint16_t            vsel = 0;
+
+	if (m_mcir != MCIR_NONE)
+	{
+		mcir = m_mcir;
+		vsel = m_vsel;
+	}
+	// 1. bus error; nm
+	else if (m_bus_error)
+	{
+		m_bus_error = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_TIMEOUT;
+	}
+	// 2. illegal insn; nm
+	else if (m_mcir == MCIR_ILL)
+	{
+		take_interrupt(vsel);
+	}
+	// 3. trace trap; WCPU
+	else if (m_trace_trap)
+	{
+		if (GET_T)
+		{
+			mcir = MCIR_IRQ;
+			vsel = T11_BPT;
+		}
+		else
+			m_trace_trap = false;
+	}
+	else if (GET_T)
+	{
+		m_trace_trap = true;
+	}
+	// 4. power fail; PSW7, PSW8
+	else if (m_power_fail)
+	{
+		m_power_fail = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_PWRFAIL;
+	}
+	// 5. external HALT (nHALT pin); PSW8
+	else if (m_hlt_active)
+	{
+		m_hlt_active = false;
+		mcir = MCIR_HALT;
+		vsel = VM2_HALT;
+	}
+	// 6. line clock (nEVNT pin, edge triggered); PSW7
+	else if (m_cp[2] && !GET_I)
+	{
+		m_cp[2] = false;
+		mcir = MCIR_IRQ;
+		vsel = VM1_EVNT;
+	}
+	// 7. nVIRQ pin; PSW7
+	else if (m_vec_active && !GET_I)
+	{
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		int vec = (intf != nullptr) ? intf->z80daisy_irq_ack() : m_in_iack_func(0);
+		if (vec == -1 || vec == 0)
+		{
+			m_vec_active = 0;
+			return;
+		}
+		mcir = MCIR_IRQ;
+		vsel = vec;
+	}
+
+	switch (mcir)
+	{
+	case MCIR_IRQ:
+		take_interrupt(vsel);
+		break;
+	}
+
+	m_mcir = MCIR_NONE;
+}
 
 
 /*************************************
@@ -682,6 +796,9 @@ void k1801vm2_device::device_reset()
 
 	PC = RWORD(c_initial_mode);
 	PSW = RWORD(c_initial_mode+2);
+
+	m_mcir = MCIR_NONE;
+	m_vsel = 0;
 }
 
 

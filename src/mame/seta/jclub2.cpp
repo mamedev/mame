@@ -204,7 +204,6 @@ public:
 	jclub2o_state(const machine_config &mconfig, device_type type, const char *tag) :
 		jclub2_state(mconfig, type, tag),
 		m_soundcpu(*this, "soundcpu"),
-		m_soundbank(*this, "soundbank"),
 		m_soundlatch{0},
 		m_soundlatch_status(0)
 	{ }
@@ -216,7 +215,6 @@ protected:
 
 private:
 	required_device<st0016_cpu_device> m_soundcpu;
-	required_memory_bank m_soundbank;
 
 	uint8_t m_soundlatch[2];
 	uint8_t m_soundlatch_status;
@@ -227,13 +225,13 @@ private:
 	template <unsigned Which> uint8_t soundlatch_r();
 	template <unsigned Which> void soundlatch_w(uint8_t data);
 	uint8_t soundlatch_status_r();
-	void st0016_rom_bank_w(uint8_t data); // temp?
 
 	// 68EC020 <-> ST-0016
 	template <unsigned Which> uint32_t soundlatch_word_r();
 	template <unsigned Which> void soundlatch_word_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void jclub2o_map(address_map &map) ATTR_COLD;
+	void sound_extrom_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
@@ -621,12 +619,6 @@ void jclub2o_state::jclub2o_map(address_map &map)
 
 // ST-0016 map
 
-// common rombank? should go in seta/st0016.cpp with larger address space exposed?
-void jclub2o_state::st0016_rom_bank_w(uint8_t data)
-{
-	m_soundbank->set_entry(data & 0x1f);
-}
-
 template <unsigned Which>
 uint8_t jclub2o_state::soundlatch_r()
 {
@@ -643,26 +635,25 @@ void jclub2o_state::soundlatch_w(uint8_t data)
 	LOGMASKED(LOG_SOUND, "%s: soundlatch_w<%02x> %02x\n", machine().describe_context(), Which, m_soundlatch[Which]);
 }
 
+void jclub2o_state::sound_extrom_map(address_map &map)
+{
+	map.global_mask(0x7ffff);
+	map(0x00000, 0x7ffff).rom().region("soundcpu", 0);
+}
+
 void jclub2o_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr(m_soundbank);
 	map(0xe800, 0xe8ff).ram();
-	//map(0xe900, 0xe9ff) // sound - internal
-	//map(0xec00, 0xec1f).rw(FUNC(jclub2o_state::st0016_character_ram_r), FUNC(jclub2o_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram();
 }
 
 void jclub2o_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	//map(0x00, 0xbf).rw(FUNC(jclub2o_state::st0016_vregs_r), FUNC(jclub2o_state::st0016_vregs_w));
 	map(0xc0, 0xc0).rw(FUNC(jclub2o_state::soundlatch_r<0>), FUNC(jclub2o_state::soundlatch_w<0>));
 	map(0xc1, 0xc1).rw(FUNC(jclub2o_state::soundlatch_r<1>), FUNC(jclub2o_state::soundlatch_w<1>));
 	map(0xc2, 0xc2).r(FUNC(jclub2o_state::soundlatch_status_r));
-	map(0xe1, 0xe1).w(FUNC(jclub2o_state::st0016_rom_bank_w));
 	map(0xe7, 0xe7).nopw(); // watchdog?
-	//map(0xf0, 0xf0).r(FUNC(jclub2o_state::st0016_dma_r));
 }
 
 
@@ -1118,8 +1109,6 @@ void jclub2o_state::machine_start()
 {
 	common_state::machine_start();
 
-	m_soundbank->configure_entries(0, 32, memregion("soundcpu")->base(), 0x4000);
-
 	save_item(NAME(m_soundlatch));
 	save_item(NAME(m_soundlatch_status));
 }
@@ -1148,6 +1137,7 @@ void jclub2o_state::jclub2o(machine_config &config)
 	ST0016_CPU(config, m_soundcpu, 8000000);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &jclub2o_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &jclub2o_state::sound_io_map);
+	m_soundcpu->set_addrmap(st0016_cpu_device::AS_EXTROM, &jclub2o_state::sound_extrom_map);
 	m_soundcpu->set_vblank_int("screen", FUNC(jclub2o_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1291,7 +1281,7 @@ Many XTALs :  48.0000 MHz, 33.3333 MHz, 4.91520 MHz, 42.9545 MHz(x2), 105.0000 M
 Graphics   :  SETA ST-0020
 
 Others     :  SETA ST-0013
-              SETA ST-0016  <-- z80 core + simple gfx + sound, see st0016.cpp
+              SETA ST-0016  <-- z80 core + simple gfx + sound, see seta/st0016.cpp
               SETA ST-0017
 
 Rams       :  Toshiba TC514800AJ-70

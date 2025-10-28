@@ -116,7 +116,16 @@ license:CC0-1.0
 		<description>King's Quest (version 1.10)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Roberta Williams, Charles Tingley, Ken MacNeill, Arthur Abraham, Doug MacNeill, Greg Rowland, Jeff Stephenson, Sol Ackerman, Chris Iden, and Mark Langbehn" />
+		<info name="programmer" value="Roberta Williams" />
+		<info name="programmer" value="Charles Tingley" />
+		<info name="programmer" value="Ken MacNeill" />
+		<info name="programmer" value="Arthur Abraham" />
+		<info name="programmer" value="Doug MacNeill" />
+		<info name="programmer" value="Greg Rowland" />
+		<info name="programmer" value="Jeff Stephenson" />
+		<info name="programmer" value="Sol Ackerman" />
+		<info name="programmer" value="Chris Iden" />
+		<info name="programmer" value="Mark Langbehn" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.10" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -141,7 +150,8 @@ license:CC0-1.0
 		<description>Smash Hit Racquetball (version 1.01)</description>
 		<year>1986</year>
 		<publisher>Primera Software</publisher>
-		<info name="programmer" value="Gregory Simons and Mei-Ying Dell'Aquila" />
+		<info name="programmer" value="Gregory Simons" />
+		<info name="programmer" value="Mei-Ying Dell'Aquila" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1.01" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
@@ -158,7 +168,8 @@ license:CC0-1.0
 		<description>The Ancient Art of War</description>
 		<year>1985</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Dave Murry and Barry Murry" />
+		<info name="programmer" value="Dave Murry" />
+		<info name="programmer" value="Barry Murry" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
 		<!--Dump released: 2022-09-28-->
@@ -207,7 +218,14 @@ license:CC0-1.0
 		<description>One on One</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Eric Hammond, Bob Studer, Jaime Cummins, John Botteri, Matthew Sarconi, Greg Johnson, David Porter, and Randy Jongens" />
+		<info name="programmer" value="Eric Hammond" />
+		<info name="programmer" value="Bob Studer" />
+		<info name="programmer" value="Jaime Cummins" />
+		<info name="programmer" value="John Botteri" />
+		<info name="programmer" value="Matthew Sarconi" />
+		<info name="programmer" value="Greg Johnson" />
+		<info name="programmer" value="David Porter" />
+		<info name="programmer" value="Randy Jongens" />
 		<info name="usage" value="self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
 		<!--Dump released: 2022-09-28-->
@@ -311,7 +329,10 @@ license:CC0-1.0
 		<description>Dark Castle (version 1.0)</description>
 		<year>1986</year>
 		<publisher> Silicon Beach Software</publisher>
-		<info name="programmer" value="Jonathan Gay, Mark Stephen Pierce, Eric Zocher, and Dick Noel" />
+		<info name="programmer" value="Jonathan Gay" />
+		<info name="programmer" value="Mark Stephen Pierce" />
+		<info name="programmer" value="Eric Zocher" />
+		<info name="programmer" value="Dick Noel" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
@@ -335,7 +356,9 @@ license:CC0-1.0
 		<description>Oids (version 1.4)</description>
 		<year>1992</year>
 		<publisher>FTL Games</publisher>
-		<info name="programmer" value="Dan Hewitt, Kirk A. Baker, and Joe Holt" />
+		<info name="programmer" value="Dan Hewitt" />
+		<info name="programmer" value="Kirk A. Baker" />
+		<info name="programmer" value="Joe Holt" />
 		<info name="usage" value="Can be played in black &amp; white, 2-bit or 4-bit color and runs on a Mac Plus or later 68K Mac (color support requires a Mac II or later)." />
 		<info name="version" value="1.4" />
 		<sharedfeat name="compatibility" value="macplus,macii" />
@@ -369,7 +392,16 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="ICOM Simulations" />
-		<info name="programmer" value="Dave Feldman, David Marsh, Terry Schulenburg, Karl Roelofs, Jay Zipnick, Todd Squires, Darin Adler, Tod Zipnick, Waldemar Horwat, Steve Hays" />
+		<info name="programmer" value="Dave Feldman" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Terry Schulenburg" />
+		<info name="programmer" value="Karl Roelofs" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="Tod Zipnick" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="programmer" value="Steve Hays" />
 		<info name="usage" value="Self-boots and runs on a Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<sharedfeat name="incompatibility" value="mac128k" />
@@ -394,7 +426,8 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Ozark Softscape" />
-		<info name="programmer" value="Randy Jongens and David Porter" />
+		<info name="programmer" value="Randy Jongens" />
+		<info name="programmer" value="David Porter" />
 		<info name="usage" value="Self-boots and runs on a Mac 512K, Mac 512Ke, and Mac Plus." />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
 		<!--Dump released: 2022-10-05-->
@@ -410,7 +443,10 @@ license:CC0-1.0
 		<description>Enchanted Scepters</description>
 		<year>1984</year>
 		<publisher>Silicon Beach Software</publisher>
-		<info name="programmer" value="William C. Appleton, Eric Zocher, Martin E. Funderlic, Charlie Jackson" />
+		<info name="programmer" value="William C. Appleton" />
+		<info name="programmer" value="Eric Zocher" />
+		<info name="programmer" value="Martin E. Funderlic" />
+		<info name="programmer" value="Charlie Jackson" />
 		<info name="usage" value="Self-boots and runs on a Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-10-05-->
@@ -426,7 +462,10 @@ license:CC0-1.0
 		<description>Beyond Dark Castle</description>
 		<year>1987</year>
 		<publisher>Silicon Beach Software</publisher>
-		<info name="programmer" value="Jonathan Gay, Mark Stephen Pierce, Eric Zocher, and Dick Noel" />
+		<info name="programmer" value="Jonathan Gay" />
+		<info name="programmer" value="Mark Stephen Pierce" />
+		<info name="programmer" value="Eric Zocher" />
+		<info name="programmer" value="Dick Noel" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-10-05-->
@@ -449,7 +488,11 @@ license:CC0-1.0
 		<description>Arkanoid (version 1.00)</description>
 		<year>1988</year>
 		<publisher>Taito America Corp</publisher>
-		<info name="programmer" value="Rick Ross, Chris Chirogene, Torben Larsen, Bob Hires, and Mike Bazzell" />
+		<info name="programmer" value="Rick Ross" />
+		<info name="programmer" value="Chris Chirogene" />
+		<info name="programmer" value="Torben Larsen" />
+		<info name="programmer" value="Bob Hires" />
+		<info name="programmer" value="Mike Bazzell" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, 512Ke, and Mac Plus." />
 		<info name="version" value="1.00" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
@@ -484,7 +527,9 @@ license:CC0-1.0
 		<description>Maze Survival</description>
 		<year>1987</year>
 		<publisher>BLUE WHALE gameworks</publisher>
-		<info name="programmer" value="L. Bardi, B. Arias, and P. Fritz" />
+		<info name="programmer" value="L. Bardi" />
+		<info name="programmer" value="B. Arias" />
+		<info name="programmer" value="P. Fritz" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<sharedfeat name="incompatibility" value="macse,macclasc" />
@@ -501,7 +546,7 @@ license:CC0-1.0
 		<description>Frogger (version 1.0)</description>
 		<year>1984</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value=" Kevin VanAllen Hunt" />
+		<info name="programmer" value="Kevin VanAllen Hunt" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, and Mac 512Ke." />
 		<info name="version" value="1.0 1984-03-01" />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke" />
@@ -518,7 +563,9 @@ license:CC0-1.0
 		<description>SimCity (version 1.2, black &amp; white)</description>
 		<year>1989</year>
 		<publisher>Maxis</publisher>
-		<info name="programmer" value="Will Wright, Robert A. Strobel, and Brett G. Durrett" />
+		<info name="programmer" value="Will Wright" />
+		<info name="programmer" value="Robert A. Strobel" />
+		<info name="programmer" value="Brett G. Durrett" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
@@ -535,7 +582,16 @@ license:CC0-1.0
 		<description>Falcon (version 1.0)</description>
 		<year>1987</year>
 		<publisher>Spectrum Holobyte</publisher>
-		<info name="programmer" value="Gilman Louie, Mark Johnson, Gary Poon, Bob Coston, Jody Sather, Jeff Stokol, Kuswara Pranawahadi, Ty Roberts, Gary Clayton, and Ed Bogas" />
+		<info name="programmer" value="Gilman Louie" />
+		<info name="programmer" value="Mark Johnson" />
+		<info name="programmer" value="Gary Poon" />
+		<info name="programmer" value="Bob Coston" />
+		<info name="programmer" value="Jody Sather" />
+		<info name="programmer" value="Jeff Stokol" />
+		<info name="programmer" value="Kuswara Pranawahadi" />
+		<info name="programmer" value="Ty Roberts" />
+		<info name="programmer" value="Gary Clayton" />
+		<info name="programmer" value="Ed Bogas" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
@@ -610,7 +666,8 @@ license:CC0-1.0
 		<description>Zork III (release 17 / 840727-C)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
-		<info name="programmer" value="Marc Blank and Dave Lebling" />
+		<info name="programmer" value="Marc Blank" />
+		<info name="programmer" value="Dave Lebling" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 17 / 840727-C" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -695,7 +752,8 @@ license:CC0-1.0
 		<description>The Hitchhiker's Guide to the Galaxy (release 47 / 840914-C)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
-		<info name="programmer" value="Douglas Adams and Steve Meretzky" />
+		<info name="programmer" value="Douglas Adams" />
+		<info name="programmer" value="Steve Meretzky" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 47 / 840914-C" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -712,7 +770,8 @@ license:CC0-1.0
 		<description>Zork I: The Great Underground Empire (release 76 / 840509)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
-		<info name="programmer" value="Dave Lebling and Marc Blank" />
+		<info name="programmer" value="Dave Lebling" />
+		<info name="programmer" value="Marc Blank" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 76 / 840509" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -814,7 +873,8 @@ license:CC0-1.0
 		<description>Enchanter (release 24 / 851118-G)</description>
 		<year>1985</year>
 		<publisher>Infocom</publisher>
-		<info name="programmer" value="Marc Blank and Dave Lebling" />
+		<info name="programmer" value="Marc Blank" />
+		<info name="programmer" value="Dave Lebling" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 24 / 851118-G" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -961,7 +1021,10 @@ license:CC0-1.0
 		<description>The Print Shop (version 1.2)</description>
 		<year>1986</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Chris Jochumson, Ann Kronen, Richard Whittaker, and David Balsam" />
+		<info name="programmer" value="Chris Jochumson" />
+		<info name="programmer" value="Ann Kronen" />
+		<info name="programmer" value="Richard Whittaker" />
+		<info name="programmer" value="David Balsam" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
@@ -985,7 +1048,9 @@ license:CC0-1.0
 		<description>Flight Simulator (version 1.02)</description>
 		<year>1986</year>
 		<publisher>Microsoft</publisher>
-		<info name="programmer" value="Bruce Artwick, Mike Kulas, and Paul Travis" />
+		<info name="programmer" value="Bruce Artwick" />
+		<info name="programmer" value="Mike Kulas" />
+		<info name="programmer" value="Paul Travis" />
 		<info name="usage" value="Self-boots and runs on Mac 128K (some features unavailable), Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.02" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1002,7 +1067,10 @@ license:CC0-1.0
 		<description>Run for the Money</description>
 		<year>1983</year>
 		<publisher>Scarborough Systems</publisher>
-		<info name="programmer" value="Tom Snyder, G.R. Fryling, Peter Reynolds, and Arthur Lewbel, Ph.D." />
+		<info name="programmer" value="Tom Snyder" />
+		<info name="programmer" value="G.R. Fryling" />
+		<info name="programmer" value="Peter Reynolds" />
+		<info name="programmer" value="Arthur Lewbel, Ph.D." />
 		<info name="usage" value="Self-boots and runs on Mac 128K and Mac 512K." />
 		<sharedfeat name="compatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2022-11-02-->
@@ -1018,7 +1086,10 @@ license:CC0-1.0
 		<description>Master Tracks Pro (version 4.0)</description>
 		<year>1989</year>
 		<publisher>Passport Designs</publisher>
-		<info name="programmer" value="Dave Howell, Lowell Levinger, Don Williams, and David Kusek" />
+		<info name="programmer" value="Dave Howell" />
+		<info name="programmer" value="Lowell Levinger" />
+		<info name="programmer" value="Don Williams" />
+		<info name="programmer" value="David Kusek" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke and Mac Plus." />
 		<info name="version" value="4.0" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus" />
@@ -1035,7 +1106,18 @@ license:CC0-1.0
 		<description>Where in Time is Carmen Sandiego? (version 1.0)</description>
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood, Lauren Elliott, Jack Trainor, Matt Siegel, Don Albrecht, Leila Bronstein, Michelle Bushneff, Maureen Gilhooly, Julie Glavin, Barbara Lawrence, Tom Rettig, and Michael Barrett" />
+		<info name="programmer" value="Gene Portwood" />
+		<info name="programmer" value="Lauren Elliott" />
+		<info name="programmer" value="Jack Trainor" />
+		<info name="programmer" value="Matt Siegel" />
+		<info name="programmer" value="Don Albrecht" />
+		<info name="programmer" value="Leila Bronstein" />
+		<info name="programmer" value="Michelle Bushneff" />
+		<info name="programmer" value="Maureen Gilhooly" />
+		<info name="programmer" value="Julie Glavin" />
+		<info name="programmer" value="Barbara Lawrence" />
+		<info name="programmer" value="Tom Rettig" />
+		<info name="programmer" value="Michael Barrett" />
 		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, Mac LC, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,maclc,macii" />
@@ -1065,7 +1147,15 @@ license:CC0-1.0
 		<description>Apache Strike (version 1.2)</description>
 		<year>1987</year>
 		<publisher>Silicon Beach Software</publisher>
-		<info name="programmer" value="William Appleton, Frank Boosman, Eric Zocher, Charlie Jackson, Mari Hughes, Glenn Arnold, John Knott, Mark Pierce, Linda McLennan" />
+		<info name="programmer" value="William Appleton" />
+		<info name="programmer" value="Frank Boosman" />
+		<info name="programmer" value="Eric Zocher" />
+		<info name="programmer" value="Charlie Jackson" />
+		<info name="programmer" value="Mari Hughes" />
+		<info name="programmer" value="Glenn Arnold" />
+		<info name="programmer" value="John Knott" />
+		<info name="programmer" value="Mark Pierce" />
+		<info name="programmer" value="Linda McLennan" />
 		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,macii" />
@@ -1082,7 +1172,16 @@ license:CC0-1.0
 		<description>Wizardry VI: Bane of the Cosmic Forge</description>
 		<year>1990</year>
 		<publisher>Sir-Tech Software</publisher>
-		<info name="programmer" value="D. W. Bradley, Gary Speegle, Chris Appel, Renata Dolnick, Suzanne Snelling, Paul McCall, Brenda Garno, Steve Miller, Jeff Noyle and David Triggerson" />
+		<info name="programmer" value="D. W. Bradley" />
+		<info name="programmer" value="Gary Speegle" />
+		<info name="programmer" value="Chris Appel" />
+		<info name="programmer" value="Renata Dolnick" />
+		<info name="programmer" value="Suzanne Snelling" />
+		<info name="programmer" value="Paul McCall" />
+		<info name="programmer" value="Brenda Garno" />
+		<info name="programmer" value="Steve Miller" />
+		<info name="programmer" value="Jeff Noyle" />
+		<info name="programmer" value="David Triggerson" />
 		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="macplus,macse,macclasc" />
 		<!--Dump released: 2022-11-18-->
@@ -1129,7 +1228,10 @@ license:CC0-1.0
 		<description>Airborne!</description>
 		<year>1984</year>
 		<publisher>Silicon Beach Software</publisher>
-		<info name="programmer" value="Jonathan Gay, Eric Zocher, Charlie Jackson, and Joe Ferrara" />
+		<info name="programmer" value="Jonathan Gay" />
+		<info name="programmer" value="Eric Zocher" />
+		<info name="programmer" value="Charlie Jackson" />
+		<info name="programmer" value="Joe Ferrara" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-11-19-->
@@ -1145,7 +1247,12 @@ license:CC0-1.0
 		<description>Mac Vegas (version 1.1)</description>
 		<year>1985</year>
 		<publisher>Videx</publisher>
-		<info name="programmer" value="Darrel Aldrich, Ron Aldrich, Walter Wittel, Robert Scott Bettis, Mark Borgerson, and Randy Dana-Frigault" />
+		<info name="programmer" value="Darrel Aldrich" />
+		<info name="programmer" value="Ron Aldrich" />
+		<info name="programmer" value="Walter Wittel" />
+		<info name="programmer" value="Robert Scott Bettis" />
+		<info name="programmer" value="Mark Borgerson" />
+		<info name="programmer" value="Randy Dana-Frigault" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SEFD, and Mac Classic." />
 		<info name="version" value="1.1" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1163,7 +1270,14 @@ license:CC0-1.0
 		<description>Dragonworld</description>
 		<year>1985</year>
 		<publisher>Telarium</publisher>
-		<info name="programmer" value="Byron Press, Michael Reaves, J. Brynne Stephens, Michael P. Meyer, John Pierard, Robert Strong, Seth McEvoy, and Lee Jacknow" />
+		<info name="programmer" value="Byron Press" />
+		<info name="programmer" value="Michael Reaves" />
+		<info name="programmer" value="J. Brynne Stephens" />
+		<info name="programmer" value="Michael P. Meyer" />
+		<info name="programmer" value="John Pierard" />
+		<info name="programmer" value="Robert Strong" />
+		<info name="programmer" value="Seth McEvoy" />
+		<info name="programmer" value="Lee Jacknow" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<sharedfeat name="incompatibility" value="mac128k" />
@@ -1228,7 +1342,10 @@ license:CC0-1.0
 		<description>The Toy Shop (version 1.1)</description>
 		<year>1986</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Jim Calhoun, Kyle Wickware, Glenn Axworthy, and Lauren Elliott" />
+		<info name="programmer" value="Jim Calhoun" />
+		<info name="programmer" value="Kyle Wickware" />
+		<info name="programmer" value="Glenn Axworthy" />
+		<info name="programmer" value="Lauren Elliott" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1293,7 +1410,11 @@ license:CC0-1.0
 		<description>Sub Battle Simulator</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
-		<info name="programmer" value="Gordon Walton, John Polasek, D.R. Gilman, Mike Jones, and Sean Hill" />
+		<info name="programmer" value="Gordon Walton" />
+		<info name="programmer" value="John Polasek" />
+		<info name="programmer" value="D.R. Gilman" />
+		<info name="programmer" value="Mike Jones" />
+		<info name="programmer" value="Sean Hill" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released:  2022-12-08-->
@@ -1327,7 +1448,11 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Rainbird</publisher>
 		<info name="developer" value="Magnetic Scrolls" />
-		<info name="programmer" value="Geoff Quilley, Rob Steggles, Tony Lambert, Jeremy San, and Duncan Maclean" />
+		<info name="programmer" value="Geoff Quilley" />
+		<info name="programmer" value="Rob Steggles" />
+		<info name="programmer" value="Tony Lambert" />
+		<info name="programmer" value="Jeremy San" />
+		<info name="programmer" value="Duncan Maclean" />
 		<info name="usage" value="Requires a bootable system disk (not included) and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.3" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1345,7 +1470,10 @@ license:CC0-1.0
 		<description>Downhill Racer</description>
 		<year>1986</year>
 		<publisher>Miles Computing</publisher>
-		<info name="programmer" value="Gregory Simons, Scott Levy, Mark Jeffery, and Mei-Ying C. Dell'Aquila" />
+		<info name="programmer" value="Gregory Simons" />
+		<info name="programmer" value="Scott Levy" />
+		<info name="programmer" value="Mark Jeffery" />
+		<info name="programmer" value="Mei-Ying C. Dell'Aquila" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<sharedfeat name="incompatibility" value="mac128k" />
@@ -1362,7 +1490,8 @@ license:CC0-1.0
 		<description>Dollars and Sense (version 1.3)</description>
 		<year>1984</year>
 		<publisher>Monogram Publishing</publisher>
-		<info name="programmer" value="Frank Mullin and Curt Bianchi" />
+		<info name="programmer" value="Frank Mullin" />
+		<info name="programmer" value="Curt Bianchi" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.3" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1379,7 +1508,12 @@ license:CC0-1.0
 		<description>Alternate Reality: The City (version 3.0)</description>
 		<year>1987</year>
 		<publisher>Datasoft</publisher>
-		<info name="programmer" value="Jim Ratcliff, Rick Mirsky, Philip Price, Gary Gilbertson, Steve Hofmann, and Bonita Long-Hemsath" />
+		<info name="programmer" value="Jim Ratcliff" />
+		<info name="programmer" value="Rick Mirsky" />
+		<info name="programmer" value="Philip Price" />
+		<info name="programmer" value="Gary Gilbertson" />
+		<info name="programmer" value="Steve Hofmann" />
+		<info name="programmer" value="Bonita Long-Hemsath" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="3.0" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
@@ -1404,7 +1538,15 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Activision</publisher>
 		<info name="developer" value="Interplay Productions" />
-		<info name="programmer" value="Ayman Adham, Rebecca Heineman, Jay Patel, Troy P. Worrell, David Lowery, Curt Tourmanian, Greg Miller, Brian Fargo, Michael Cranford" />
+		<info name="programmer" value="Ayman Adham" />
+		<info name="programmer" value="Rebecca Heineman" />
+		<info name="programmer" value="Jay Patel" />
+		<info name="programmer" value="Troy P. Worrell" />
+		<info name="programmer" value="David Lowery" />
+		<info name="programmer" value="Curt Tourmanian" />
+		<info name="programmer" value="Greg Miller" />
+		<info name="programmer" value="Brian Fargo" />
+		<info name="programmer" value="Michael Cranford" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-12-->
@@ -1456,7 +1598,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Activision</publisher>
 		<info name="developer" value="Interplay Productions" />
-		<info name="programmer" value="Allen Adham, Rebecca Heineman, and Troy P. Worrell" />
+		<info name="programmer" value="Allen Adham" />
+		<info name="programmer" value="Rebecca Heineman" />
+		<info name="programmer" value="Troy P. Worrell" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
@@ -1490,7 +1634,8 @@ license:CC0-1.0
 		<description>Sierra Championship Boxing</description>
 		<year>1985</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="Dave Murry and Barry Murry" />
+		<info name="programmer" value="Dave Murry" />
+		<info name="programmer" value="Barry Murry" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
@@ -1538,7 +1683,14 @@ license:CC0-1.0
 		<description>Defender of the Crown</description>
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Jack Trainor, Steve Quinn, Jim Cuomo, Phyllis Jacob, Robert Jacob, Peter Oliphant, John Cutter, and Kellyn Beeck" />
+		<info name="programmer" value="Jack Trainor" />
+		<info name="programmer" value="Steve Quinn" />
+		<info name="programmer" value="Jim Cuomo" />
+		<info name="programmer" value="Phyllis Jacob" />
+		<info name="programmer" value="Robert Jacob" />
+		<info name="programmer" value="Peter Oliphant" />
+		<info name="programmer" value="John Cutter" />
+		<info name="programmer" value="Kellyn Beeck" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-12-14-->
@@ -1554,7 +1706,13 @@ license:CC0-1.0
 		<description>The King of Chicago</description>
 		<year>1986</year>
 		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Doug Sharp, Robert Jacob, Phyllis Jacob, John Cutter, Eric Rosser, Paul Walsh, and Inga Velde" />
+		<info name="programmer" value="Doug Sharp" />
+		<info name="programmer" value="Robert Jacob" />
+		<info name="programmer" value="Phyllis Jacob" />
+		<info name="programmer" value="John Cutter" />
+		<info name="programmer" value="Eric Rosser" />
+		<info name="programmer" value="Paul Walsh" />
+		<info name="programmer" value="Inga Velde" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
@@ -1571,7 +1729,11 @@ license:CC0-1.0
 		<description>Macintosh Pascal (version 1.0)</description>
 		<year>1984</year>
 		<publisher>THINK Technologies</publisher>
-		<info name="programmer" value="Terry L. Lucas, Peter J. Maruhnic, Andrew Singer, Mel Conway, and Jon Hueras" />
+		<info name="programmer" value="Terry L. Lucas" />
+		<info name="programmer" value="Peter J. Maruhnic" />
+		<info name="programmer" value="Andrew Singer" />
+		<info name="programmer" value="Mel Conway" />
+		<info name="programmer" value="Jon Hueras" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1588,7 +1750,8 @@ license:CC0-1.0
 		<description>Fusillade (version 1.0)</description>
 		<year>1985</year>
 		<publisher>Miles Computing</publisher>
-		<info name="programmer" value="David Simons and Alvin Wen" />
+		<info name="programmer" value="David Simons" />
+		<info name="programmer" value="Alvin Wen" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1605,7 +1768,8 @@ license:CC0-1.0
 		<description>Orb Quest: Part I: The Search for Seven Wards (version 1.04)</description>
 		<year>1986</year>
 		<publisher>QWare</publisher>
-		<info name="programmer" value="Edward Schultz and Michael M. Mayer" />
+		<info name="programmer" value="Edward Schultz" />
+		<info name="programmer" value="Michael M. Mayer" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.04" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1623,7 +1787,8 @@ license:CC0-1.0
 		<description>Speed Reader II (version 1.1)</description>
 		<year>1985</year>
 		<publisher>Davidson &amp; Associates</publisher>
-		<info name="programmer" value="Jan Davidson, Ph.D. and Joel Cannon" />
+		<info name="programmer" value="Jan Davidson, Ph.D." />
+		<info name="programmer" value="Joel Cannon" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1752,7 +1917,8 @@ license:CC0-1.0
 		<description>Pinball Construction Set (version 2.5)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Bill Budge and Bob Upshaw" />
+		<info name="programmer" value="Bill Budge" />
+		<info name="programmer" value="Bob Upshaw" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.5" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -1786,7 +1952,15 @@ license:CC0-1.0
 		<description>Déjà Vu: A Nightmare Comes True!!</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Todd Squires, Craig Erickson, Kurt Nelson, Steve Hays, Terry Schulenberg, Darin Adler, Jay Zipnick, Waldemar Horwat, and Mark Waterman" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Craig Erickson" />
+		<info name="programmer" value="Kurt Nelson" />
+		<info name="programmer" value="Steve Hays" />
+		<info name="programmer" value="Terry Schulenberg" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="programmer" value="Mark Waterman" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<sharedfeat name="incompatibility" value="mac128k" />
@@ -1810,7 +1984,22 @@ license:CC0-1.0
 		<description>Déjà Vu II: Lost in Las Vegas!!</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Fred Allen, Darin Adler, Julia Ulano, Michael Manning, Jay Zipnick, Todd Squires, Brian Maker, David Feldman, Steve Hays, Mitch Adler, Karl Roelofs, Tod Zipnick, David Marsh, Waldemar Horwat, Paul Snively, and Ed Dluzen" />
+		<info name="programmer" value="Fred Allen" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="Julia Ulano" />
+		<info name="programmer" value="Michael Manning" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Brian Maker" />
+		<info name="programmer" value="David Feldman" />
+		<info name="programmer" value="Steve Hays" />
+		<info name="programmer" value="Mitch Adler" />
+		<info name="programmer" value="Karl Roelofs" />
+		<info name="programmer" value="Tod Zipnick" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="programmer" value="Paul Snively" />
+		<info name="programmer" value="Ed Dluzen" />
 		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-03-30-->
@@ -1826,7 +2015,9 @@ license:CC0-1.0
 		<description>Rogue (version 1.0)</description>
 		<year>1985</year>
 		<publisher>Epyx</publisher>
-		<info name="programmer" value="Michael Toy, Glenn Wichman, and Ken Arnold" />
+		<info name="programmer" value="Michael Toy" />
+		<info name="programmer" value="Glenn Wichman" />
+		<info name="programmer" value="Ken Arnold" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
@@ -1913,7 +2104,13 @@ license:CC0-1.0
 		<description>Where in Europe is Carmen Sandiego? (version 1.0)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood, Lauren Elliott, Chris Jochumson, Don Albrecht, Arturo Sinclair, Mark Schlicting, and Tom Rettig" />
+		<info name="programmer" value="Gene Portwood" />
+		<info name="programmer" value="Lauren Elliott" />
+		<info name="programmer" value="Chris Jochumson" />
+		<info name="programmer" value="Don Albrecht" />
+		<info name="programmer" value="Arturo Sinclair" />
+		<info name="programmer" value="Mark Schlicting" />
+		<info name="programmer" value="Tom Rettig" />
 		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
@@ -1937,7 +2134,9 @@ license:CC0-1.0
 		<description>Shufflepuck Cafe (version 1.0)</description>
 		<year>1988</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Christopher Gross, Lauren Elliott, and Gene Portwood" />
+		<info name="programmer" value="Christopher Gross" />
+		<info name="programmer" value="Lauren Elliott" />
+		<info name="programmer" value="Gene Portwood" />
 		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
@@ -1997,7 +2196,9 @@ license:CC0-1.0
 		<description>SimCity (version 1.1)</description>
 		<year>1989</year>
 		<publisher>Maxis</publisher>
-		<info name="programmer" value="Will Wright, Robert A. Strobel, and Brett G. Durrett" />
+		<info name="programmer" value="Will Wright" />
+		<info name="programmer" value="Robert A. Strobel" />
+		<info name="programmer" value="Brett G. Durrett" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -2031,7 +2232,19 @@ license:CC0-1.0
 		<description>The Duel: Test Drive II</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Randy Dillon, Amory Wong, Rick Friesen, Don Mattrick, Bruce Dawson, Chris Taylor, Al Johanson, Brad Gour, Erik Kiss, Kris Hatlelid, John Boechler, Tony Lee, and Theresa Henry" />
+		<info name="programmer" value="Randy Dillon" />
+		<info name="programmer" value="Amory Wong" />
+		<info name="programmer" value="Rick Friesen" />
+		<info name="programmer" value="Don Mattrick" />
+		<info name="programmer" value="Bruce Dawson" />
+		<info name="programmer" value="Chris Taylor" />
+		<info name="programmer" value="Al Johanson" />
+		<info name="programmer" value="Brad Gour" />
+		<info name="programmer" value="Erik Kiss" />
+		<info name="programmer" value="Kris Hatlelid" />
+		<info name="programmer" value="John Boechler" />
+		<info name="programmer" value="Tony Lee" />
+		<info name="programmer" value="Theresa Henry" />
 		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II (monochrome only)." />
 		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-04-06-->
@@ -2047,7 +2260,8 @@ license:CC0-1.0
 		<description>Master Tracks Pro (version 1.10)</description>
 		<year>1987</year>
 		<publisher>Passport Designs</publisher>
-		<info name="programmer" value="Dave Kusek and Don Williams" />
+		<info name="programmer" value="Dave Kusek" />
+		<info name="programmer" value="Don Williams" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.10" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -2065,7 +2279,8 @@ license:CC0-1.0
 		<description>Master Tracks Pro (version 2.00h)</description>
 		<year>1987</year>
 		<publisher>Passport Designs</publisher>
-		<info name="programmer" value="Dave Kusek and Don Williams" />
+		<info name="programmer" value="Dave Kusek" />
+		<info name="programmer" value="Don Williams" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.00h" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -2083,7 +2298,9 @@ license:CC0-1.0
 		<description>Master Tracks Pro (version 3.4a)</description>
 		<year>1989</year>
 		<publisher>Passport Designs</publisher>
-		<info name="programmer" value="David Kusek, Don Williams, and Dave Howell" />
+		<info name="programmer" value="David Kusek" />
+		<info name="programmer" value="Don Williams" />
+		<info name="programmer" value="Dave Howell" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="3.4a" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
@@ -2203,7 +2420,8 @@ license:CC0-1.0
 		<description>MacGammon! (version 1.0)</description>
 		<year>1984</year>
 		<publisher>Expert Systems</publisher>
-		<info name="programmer" value="Thomas Hoffman and Steven Slesinger" />
+		<info name="programmer" value="Thomas Hoffman" />
+		<info name="programmer" value="Steven Slesinger" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -2220,7 +2438,10 @@ license:CC0-1.0
 		<description>Archon</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Anne Westfall, Jon Freeman, Paul Reiche III, and Jim Nitchals" />
+		<info name="programmer" value="Anne Westfall" />
+		<info name="programmer" value="Jon Freeman" />
+		<info name="programmer" value="Paul Reiche III" />
+		<info name="programmer" value="Jim Nitchals" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
 		<!-- Dump released: 2024-11-09 -->
@@ -2236,7 +2457,8 @@ license:CC0-1.0
 		<description>Fraction Action</description>
 		<year>1985</year>
 		<publisher>Unicorn Software</publisher>
-		<info name="programmer" value="David Howard Flatman and Ray Tripamer" />
+		<info name="programmer" value="David Howard Flatman" />
+		<info name="programmer" value="Ray Tripamer" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<sharedfeat name="incompatibility" value="macse,macclasc" />
@@ -3230,7 +3452,9 @@ license:CC0-1.0
 		<description>FullPaint (version 1.0)</description>
 		<year>1986</year>
 		<publisher>Ann Arbor Softworks</publisher>
-		<info name="programmer" value="Steve Newman, Scott Wiener, and Jeff Young" />
+		<info name="programmer" value="Steve Newman" />
+		<info name="programmer" value="Scott Wiener" />
+		<info name="programmer" value="Jeff Young" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, and Mac SE FDHD" />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -3248,7 +3472,10 @@ license:CC0-1.0
 		<description>Fast Break</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Steve Cartwright, Greg Hospelhorn, George Wong, and Roseann Mitchell" />
+		<info name="programmer" value="Steve Cartwright" />
+		<info name="programmer" value="Greg Hospelhorn" />
+		<info name="programmer" value="George Wong" />
+		<info name="programmer" value="Roseann Mitchell" />
 		<info name="usage" value="Self-boots and runs on Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
@@ -3265,7 +3492,8 @@ license:CC0-1.0
 		<description>Grid Wars (version 1.0)</description>
 		<year>1985</year>
 		<publisher>Ann Arbor Softworks</publisher>
-		<info name="programmer" value="Roy Harvey and Fred Zinn" />
+		<info name="programmer" value="Roy Harvey" />
+		<info name="programmer" value="Fred Zinn" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="MC68000" />
@@ -3317,7 +3545,10 @@ license:CC0-1.0
 		<description>HardBall</description>
 		<year>1986</year>
 		<publisher>Accolade</publisher>
-		<info name="programmer" value="Bob Whitehead, Mike Benna, Tony Lee, and Ed Bogas" />
+		<info name="programmer" value="Bob Whitehead" />
+		<info name="programmer" value="Mike Benna" />
+		<info name="programmer" value="Tony Lee" />
+		<info name="programmer" value="Ed Bogas" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SEFD, and Mac Classic." />
 		<sharedfeat name="compatibility" value="MC68000" />
 		<sharedfeat name="incompatibility" value="mac128k" />
@@ -3334,7 +3565,12 @@ license:CC0-1.0
 		<description>Nigel's World (version 1.0.1)</description>
 		<year>1991</year>
 		<publisher> Lawrence Productions</publisher>
-		<info name="programmer" value="Todd James Harris, Susan Wiltse, Justine R. Hencey, Jamie McCarthy, Renee West, and Steve Vance" />
+		<info name="programmer" value="Todd James Harris" />
+		<info name="programmer" value="Susan Wiltse" />
+		<info name="programmer" value="Justine R. Hencey" />
+		<info name="programmer" value="Jamie McCarthy" />
+		<info name="programmer" value="Renee West" />
+		<info name="programmer" value="Steve Vance" />
 		<info name="usage" value="Requires hard disk installation and runs on Mac II or later." />
 		<info name="version" value="1.0.1" />
 		<sharedfeat name="incompatibility" value="MC68000" />

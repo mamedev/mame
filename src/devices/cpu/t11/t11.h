@@ -35,6 +35,10 @@ public:
 	static constexpr uint8_t POWER_FAIL = PF_LINE;
 	static constexpr uint8_t BUS_ERROR = 8;
 
+	// memory flags
+	static constexpr uint16_t UNALIGNED_BYTE = 1;
+	static constexpr uint16_t UNALIGNED_WORD = 2;
+
 	// construction/destruction
 	t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -679,6 +683,38 @@ protected:
 	void add_ixd_ded(uint16_t op);
 	void add_ixd_ix(uint16_t op);
 	void add_ixd_ixd(uint16_t op);
+	void ash_rg(uint16_t op);
+	void ash_rgd(uint16_t op);
+	void ash_in(uint16_t op);
+	void ash_ind(uint16_t op);
+	void ash_de(uint16_t op);
+	void ash_ded(uint16_t op);
+	void ash_ix(uint16_t op);
+	void ash_ixd(uint16_t op);
+	void ashc_rg(uint16_t op);
+	void ashc_rgd(uint16_t op);
+	void ashc_in(uint16_t op);
+	void ashc_ind(uint16_t op);
+	void ashc_de(uint16_t op);
+	void ashc_ded(uint16_t op);
+	void ashc_ix(uint16_t op);
+	void ashc_ixd(uint16_t op);
+	void mul_rg(uint16_t op);
+	void mul_rgd(uint16_t op);
+	void mul_in(uint16_t op);
+	void mul_ind(uint16_t op);
+	void mul_de(uint16_t op);
+	void mul_ded(uint16_t op);
+	void mul_ix(uint16_t op);
+	void mul_ixd(uint16_t op);
+	void div_rg(uint16_t op);
+	void div_rgd(uint16_t op);
+	void div_in(uint16_t op);
+	void div_ind(uint16_t op);
+	void div_de(uint16_t op);
+	void div_ded(uint16_t op);
+	void div_ix(uint16_t op);
+	void div_ixd(uint16_t op);
 	void xor_rg(uint16_t op);
 	void xor_rgd(uint16_t op);
 	void xor_in(uint16_t op);
@@ -1194,6 +1230,12 @@ protected:
 	void sub_ixd_ded(uint16_t op);
 	void sub_ixd_ix(uint16_t op);
 	void sub_ixd_ixd(uint16_t op);
+
+	// SIMH code
+	int _ash(int source, int dest, int *psw);
+	int _ashc(int source, int source1, int dest, int *psw);
+	int _mul(int source, int dest, int *psw);
+	int _div(int source, int source1, int dest, int *remainder, int *psw);
 };
 
 class lsi11_device : public t11_device, public z80_daisy_chain_interface
@@ -1236,6 +1278,8 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	virtual void t11_check_irqs() override;
 };
 
 

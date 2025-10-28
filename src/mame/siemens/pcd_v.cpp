@@ -5,7 +5,7 @@
 #include "pcd.h"
 
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "screen.h"
 
 
@@ -125,7 +125,7 @@ void pcx_video_device::pcx_vid_map(address_map &map)
 	map(0x0000, 0x5fff).rom().region("graphics", 0);
 }
 
-void pcx_video_device::pcx_vid_io(address_map &map)
+void pcx_video_device::pcx_vid_data(address_map &map)
 {
 	map(0x8000, 0x8007).rw(m_crtc, FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x8008, 0x8008).r(FUNC(pcx_video_device::unk_r));
@@ -149,7 +149,7 @@ void pcx_video_device::device_add_mconfig(machine_config &config)
 {
 	i8031_device &gfx(I8031(config, "graphics", 24_MHz_XTAL / 2));
 	gfx.set_addrmap(AS_PROGRAM, &pcx_video_device::pcx_vid_map);
-	gfx.set_addrmap(AS_IO, &pcx_video_device::pcx_vid_io);
+	gfx.set_addrmap(AS_DATA, &pcx_video_device::pcx_vid_data);
 	gfx.port_out_cb<1>().set(FUNC(pcx_video_device::p1_w));
 	gfx.port_in_cb<3>().set(FUNC(pcx_video_device::p3_r));
 	gfx.port_out_cb<3>().set(FUNC(pcx_video_device::p3_w));

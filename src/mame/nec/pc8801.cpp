@@ -19,8 +19,6 @@
         (uses external minidisk), only model with working border color, other misc banking bits.
       - refactor memory banking to use address maps & views;
       - double check dipswitches;
-      - Slotify PC80S31K, also needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801. **partially done**
-        Also notice that there are common points with SPC-1000 and TF-20 FDDs;
       - backport/merge what is portable to PC-8001;
       - Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
         Needs identification effort about what's internal to machine models and what instead
@@ -284,6 +282,12 @@ uint8_t pc8801_state::dma_mem_r(offs_t offset)
 {
 	// TODO: TVRAM readback
 	return m_work_ram[offset & 0xffff];
+}
+
+void pc8801_state::dma_mem_w(offs_t offset, u8 data)
+{
+//	printf("%04x %02x\n", offset, data);
+	m_work_ram[offset & 0xffff] = data;
 }
 
 uint8_t pc8801_state::alu_r(offs_t offset)
@@ -1693,6 +1697,7 @@ void pc8801_state::pc8801(machine_config &config)
 	I8257(config, m_dma, MASTER_CLOCK);
 	m_dma->out_hrq_cb().set(FUNC(pc8801_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(pc8801_state::dma_mem_r));
+	m_dma->out_memw_cb().set(FUNC(pc8801_state::dma_mem_w));
 	// CH0: 5-inch floppy DMA
 	// CH1: 8-inch floppy DMA, SCSI CD-ROM interface (on MA/MC)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
@@ -1768,10 +1773,10 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->port_b_write_callback().set(FUNC(pc8801fh_state::opn_portb_w));
 
 	// TODO: per-channel mixing is unconfirmed
-	m_opna->add_route(0, m_speaker, 0.75, 0);
-	m_opna->add_route(0, m_speaker, 0.75, 1);
-	m_opna->add_route(1, m_speaker, 0.75, 0);
-	m_opna->add_route(2, m_speaker, 0.75, 1);
+	m_opna->add_route(0, m_speaker, 0.25, 0);
+	m_opna->add_route(0, m_speaker, 0.25, 1);
+	m_opna->add_route(1, m_speaker, 0.50, 0);
+	m_opna->add_route(2, m_speaker, 0.50, 1);
 
 	// TODO: add possible configuration override for baudrate here
 	// ...
@@ -1790,6 +1795,9 @@ void pc8801mc_state::pc8801mc(machine_config &config)
 
 	PC8801_31(config, m_cdrom_if, 0);
 	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
+	m_cdrom_if->drq_cb().set(m_dma, FUNC(i8257_device::dreq1_w));
+	m_dma->in_ior_cb<1>().set(m_cdrom_if, FUNC(pc8801_31_device::dma_r));
+//	m_dma->out_iow_cb<1>().set([] (u8 data) { printf("SASI iow\n"); });
 }
 
 ROM_START( pc8801 )

@@ -63,7 +63,7 @@ TODO:
   * data in transparent pen? nope
   * color bit 15? nope
   * writes to $100/104/108 might be interesting...
-- not sure if layer priorities are completely right
+- not sure if layer priorities are completely right - it's maybe differs per game?
 
 */
 

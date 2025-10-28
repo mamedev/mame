@@ -513,7 +513,7 @@ CONS( 2020, lxpcpp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 // unclear SoC types maybe even different
 // Rush'n Attack has the raster split in the wrong place on the 5 language version (mountains in first stage) when using real hardware
 // said game also requires either extra RAM on the PCB (none visible) or a SoC that natively supports that
-// 
+//
 // not set as clones as each other because the games lists are different
 CONS( 201?, k10_5l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (5 languages)", MACHINE_NOT_WORKING )
 CONS( 201?, k10_2l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (2 languages)", MACHINE_NOT_WORKING )

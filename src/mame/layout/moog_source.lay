@@ -48,7 +48,7 @@ copyright-holders:m1macrophage
 				</g>
 
 				<!-- Mod wheel arrow. -->
-				<g transform="translate(55, 82)">W
+				<g transform="translate(55, 82)">
 					<polygon fill="#d1e0e0" points="0,0 2,5 -2,5"/>
 					<line stroke="#d1e0e0" stroke-width="1" x1="0" y1="5" x2="0" y2="18"/>
 				</g>

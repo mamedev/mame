@@ -51,7 +51,8 @@ KEYBOARD / DISPLAY PCB (4 digits, there are version with five)
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/eepromser.h"
 
 namespace {

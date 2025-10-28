@@ -355,7 +355,7 @@ void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// 1: ROM at 00000000, RAM at 10000000
 		m_mainbank.select(data & 1);
 	}
-	else if (offset >= 0x10 && offset <= 0x13)	// clear i960 IRQ line
+	else if (offset >= 0x10 && offset <= 0x13)  // clear i960 IRQ line
 	{
 		// data value doesn't seem to matter
 		m_maincpu->set_input_line(m_irq_type[offset & 3], CLEAR_LINE);

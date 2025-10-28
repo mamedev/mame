@@ -102,7 +102,7 @@ Substitutes:
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 
@@ -141,7 +141,7 @@ private:
 	u8 m_inp_mux = 0;
 
 	void main_map(address_map &map) ATTR_COLD;
-	void main_io(address_map &map) ATTR_COLD;
+	void main_data(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void bank_w(u8 data);
@@ -228,7 +228,7 @@ void talkingbb_state::main_map(address_map &map)
 	map(0x8000, 0xffff).r(FUNC(talkingbb_state::bank_r));
 }
 
-void talkingbb_state::main_io(address_map &map)
+void talkingbb_state::main_data(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x7800).ram();
 	map(0x8000, 0x8000).mirror(0x7fff).rw(FUNC(talkingbb_state::input_r), FUNC(talkingbb_state::input_w));
@@ -313,7 +313,7 @@ void talkingbb_state::talkingbb(machine_config &config)
 	// basic machine hardware
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &talkingbb_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &talkingbb_state::main_io);
+	m_maincpu->set_addrmap(AS_DATA, &talkingbb_state::main_data);
 	m_maincpu->port_out_cb<1>().set("dac", FUNC(dac_8bit_r2r_device::write));
 	m_maincpu->port_out_cb<3>().set(FUNC(talkingbb_state::bank_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(talkingbb_state::switch_r));

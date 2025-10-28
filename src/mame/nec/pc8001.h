@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include "pc80s31k.h"
-
 #include "bus/centronics/ctronics.h"
+#include "bus/nec_fdd/pc80s31k.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"

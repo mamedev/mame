@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "vm1timer.h"
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 
@@ -81,7 +81,7 @@ void k1801vm1_timer_device::device_reset()
 
 void k1801vm1_timer_device::init_w()
 {
-//	m_limit is not reset by INIT or DCLO
+//  m_limit is not reset by INIT or DCLO
 	m_csr = 0;
 }
 

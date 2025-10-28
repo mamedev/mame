@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese, Matthew Daniels
 #ifndef MAME_SEGA_MODEL2_H
 #define MAME_SEGA_MODEL2_H
 
@@ -103,8 +103,6 @@ public:
 	void init_srallyc();
 	void init_powsledm();
 
-	void sound_ready_w(int state);
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -153,7 +151,6 @@ protected:
 	std::unique_ptr<raster_state> m_raster;
 	std::unique_ptr<geo_state> m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
-	bool m_sound_irq_pending = false;
 	u8 m_gearsel = 0;
 	u8 m_lightgun_mux = 0;
 
@@ -225,6 +222,7 @@ protected:
 	void reset_model2_scsp();
 	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  void screen_vblank_model2(int state);
+	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
 
@@ -619,11 +617,12 @@ struct m2_poly_extra_data
 	model2_state *  state;
 	u32      lumabase;
 	u32      colorbase;
+	u8       checker;
 	u32 *    texsheet[6];
 	u32      texwidth[6];
 	u32      texheight[6];
 	u32      texx[6];
-	u32		 texy[6];
+	u32      texy[6];
 	u8       texmirrorx;
 	u8       texmirrory;
 	u8       luma;
@@ -668,14 +667,6 @@ public:
 		, m_state(state)
 		, m_destmap(512, 512)
 	{
-		m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
-		m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;
-		m_renderfuncs[2] = &model2_renderer::model2_3d_render_2;
-		m_renderfuncs[3] = &model2_renderer::model2_3d_render_3;
-		m_renderfuncs[4] = &model2_renderer::model2_3d_render_4;
-		m_renderfuncs[5] = &model2_renderer::model2_3d_render_5;
-		m_renderfuncs[6] = &model2_renderer::model2_3d_render_6;
-		m_renderfuncs[7] = &model2_renderer::model2_3d_render_7;
 		m_xoffs = 90;
 		m_yoffs = -8;
 	}
@@ -686,68 +677,19 @@ public:
 	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
 	void set_yoffset(int16_t yoffs) { m_yoffs = yoffs; }
 
-	/* checker = 0, textured = 0, transparent = 0 */
-	#define MODEL2_FUNC 0
-	#define MODEL2_FUNC_NAME    model2_3d_render_0
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
+	template <bool Translucent>
+	void draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
-	/* checker = 0, textured = 0, translucent = 1 */
-	#define MODEL2_FUNC 1
-	#define MODEL2_FUNC_NAME    model2_3d_render_1
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 0, textured = 1, translucent = 0 */
-	#define MODEL2_FUNC 2
-	#define MODEL2_FUNC_NAME    model2_3d_render_2
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 0, textured = 1, translucent = 1 */
-	#define MODEL2_FUNC 3
-	#define MODEL2_FUNC_NAME    model2_3d_render_3
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 1, textured = 0, translucent = 0 */
-	#define MODEL2_FUNC 4
-	#define MODEL2_FUNC_NAME    model2_3d_render_4
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 1, textured = 0, translucent = 1 */
-	#define MODEL2_FUNC 5
-	#define MODEL2_FUNC_NAME    model2_3d_render_5
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 1, textured = 1, translucent = 0 */
-	#define MODEL2_FUNC 6
-	#define MODEL2_FUNC_NAME    model2_3d_render_6
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 1, textured = 1, translucent = 1 */
-	#define MODEL2_FUNC 7
-	#define MODEL2_FUNC_NAME    model2_3d_render_7
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	scanline_render_func m_renderfuncs[8];
+	template <bool Translucent>
+	void draw_scanline_tex(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
 
 private:
 	model2_state& m_state;
 	bitmap_rgb32 m_destmap;
 	int16_t m_xoffs = 0, m_yoffs = 0;
+
+	template <bool Translucent>
+	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv);
 };
 
 typedef model2_renderer::vertex_t poly_vertex;

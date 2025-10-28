@@ -85,7 +85,7 @@ ________________________________________________________________________________
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
 
@@ -132,7 +132,7 @@ void microdar_state::microdar(machine_config &config)
 {
 	I80C51(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &microdar_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &microdar_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &microdar_state::ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // GM76C88ALK-15 + battery
 	I2C_24C16(config, m_eeprom);

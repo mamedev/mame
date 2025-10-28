@@ -82,10 +82,10 @@ void generalplus_gp327902_game_state::arm_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram(); // 16M-bit internal SDRAM
 
-	map(0xc0020070, 0xc0020073).r(FUNC(generalplus_gp327902_game_state::c0020070_unk_r));
-	map(0xc0060000, 0xc0060003).w(FUNC(generalplus_gp327902_game_state::c0060000_unk_w));
-	map(0xc008000c, 0xc008000f).r(FUNC(generalplus_gp327902_game_state::c008000c_unk_r));
-	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gp327902_game_state::d000003c_unk_r));
+	map(0xc0020070, 0xc0020073).r(FUNC(generalplus_gp327902_game_state::c0020070_unk_r)); // P_TIMERD_UPCOUNT
+	map(0xc0060000, 0xc0060003).w(FUNC(generalplus_gp327902_game_state::c0060000_unk_w)); // P_UART_DATA
+	map(0xc008000c, 0xc008000f).r(FUNC(generalplus_gp327902_game_state::c008000c_unk_r)); // P_SPI_RX_STATUS
+	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gp327902_game_state::d000003c_unk_r)); // P_SYSTEM_POWER_STATE
 
 	map(0xf8000000, 0xf80003ff).ram(); // writes pointers used by exceptions (including IRQs) here
 }
