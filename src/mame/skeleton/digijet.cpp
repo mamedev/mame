@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /*************************************************************************
 
-    drivers/digijet.cpp
+    skeleton/digijet.cpp
 
     Skeleton driver for the Volkswagen Digijet series of automotive ECUs
 
@@ -28,7 +28,7 @@
 	|________________________|
 
 	Connector
-	1  RPM
+	1  Engine RPM
 	2  Coolant temperture (ADC IN2)
 	3  GND
 	4  Throttle switch (T0)
@@ -59,11 +59,14 @@
 /*
     TODO:
 
-    - Everything
+    - Create a layout that shows the fuel pump, distributor and fuel injectors
+	- Hook up RPM to interrupt
+	- Figure out how the ADC is accessed
 */
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
 
 #include "vw.lh"
 
@@ -94,6 +97,7 @@ private:
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
 	void p2_w(uint8_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER( rpm_int );
 	uint8_t read_adc();
 	void start_adc(uint8_t data);
 
@@ -145,6 +149,12 @@ void digijet_state::p2_w(uint8_t data)
 	popmessage("p2 %04x",data);
 };
 
+TIMER_DEVICE_CALLBACK_MEMBER(digijet_state::rpm_int)
+{
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
+}
+
 static INPUT_PORTS_START( digijet )
 PORT_START("ADC0")
 PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_NAME("Air amount")
@@ -174,6 +184,8 @@ void digijet_state::digijet(machine_config &config)
 	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
+
+	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000/60)); // 1000rpm / 60s
 }
 
 void digijet_state::digijet90(machine_config &config)
@@ -187,6 +199,8 @@ void digijet_state::digijet90(machine_config &config)
 	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
 	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
+
+	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000/60)); // 1000rpm / 60s
 }
 
 ROM_START( digijet )
