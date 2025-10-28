@@ -79,8 +79,8 @@ Known to have [FDC] copy protection for user disk creation (the .d88 dump won't 
 		<year>1990</year>
 		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
 		<notes><![CDATA[
-Needs [redbook] volume fader
 Not extensively tested
+Bogus [redbook] during intro with track 5 while fade-out without waiting enough (btanb?)
 ]]></notes>
 		<info name="release" value="19901210"/>
 		<info name="alt_title" value="ミラーズ"/>
@@ -119,8 +119,7 @@ Not extensively tested
 		<year>1990</year>
 		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
 		<notes><![CDATA[
-Incomplete CD-Rom support
-FDC stalls [Tries to match CHRN=(00 00 0x 01) with existing N=03, 2DD image?]
+Not extensively tested
 ]]></notes>
 		<info name="release" value="19901210"/>
 		<info name="alt_title" value="ミラーズ"/>
