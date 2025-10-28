@@ -128,12 +128,15 @@ void digijet_state::start_adc(uint8_t data)
 
 void digijet_state::p1_w(uint8_t data)
 {
-	bool irq = BIT(data,0);
-	bool unkn = BIT(data,3); 
+	bool unkn = BIT(data,3);
 	bool fuel = BIT(data,4);
 	bool inject = BIT(data,5);
-	//bool watchdog = BIT(data,6);
-	popmessage("irq %01x unk %01x fuel %01x inj %01x",irq,unkn,fuel,inject);
+	bool watchdog = BIT(data,6);
+
+	machine().output().set_value("led_fuel", fuel);
+	machine().output().set_value("led_inject", inject);
+	machine().output().set_value("led_unkn", unkn);
+	machine().output().set_value("led_wd", watchdog);
 };
 
 uint8_t digijet_state::p2_r()
@@ -186,6 +189,8 @@ void digijet_state::digijet(machine_config &config)
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
 
 	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000/60)); // 1000rpm / 60s
+
+	config.set_default_layout(layout_vw);
 }
 
 void digijet_state::digijet90(machine_config &config)
@@ -201,6 +206,8 @@ void digijet_state::digijet90(machine_config &config)
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
 
 	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000/60)); // 1000rpm / 60s
+
+	config.set_default_layout(layout_vw);
 }
 
 ROM_START( digijet )
