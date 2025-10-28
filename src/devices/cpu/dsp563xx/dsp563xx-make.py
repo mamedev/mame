@@ -8,6 +8,13 @@ class IType(IntEnum):
     npar = 1
     move = 2
 
+class FType(IntEnum):
+    fixed = 0
+    vars = 1
+    keyed_vars = 1
+    keyed = 2
+    none = 3
+
 functions = {}
 
 class Function:
@@ -19,12 +26,24 @@ class Function:
         self.pcount = pcount
         self.values = values
         self.ivals, self.icount = self.preexpand()
+        self.svals = self.preexpand_slotted()
         self.bcount = None
         if self.icount:
             for bcount in range(16):
                 if (1 << bcount) >= self.icount:
                     self.bcount = bcount
                     break
+
+    def get_ftype(self):
+        if self.pcount < 0:
+            return FType.keyed
+        if self.values[0] == 'val':
+            return FType.fixed
+        if self.values[0] == 'single' or self.values[0] == 'split':
+            return FType.vars
+        if self.values[0] == 'single-alt' or self.values[0] == 'split-alt':
+            return FType.keyed_vars
+        return FType.none
 
     def gen_vals(self, values):
         r = []
@@ -44,6 +63,29 @@ class Function:
                 r.append(ii)
                 ii += 1
         return r, ii
+
+    def gen_vals_slotted(self, values):
+        r = []
+        ii = 0
+        for va in values:
+            if va == None:
+                ii += 1
+            elif 'rh' in va or 'rl' in va:
+                rr = []
+                for j in range(4):
+                    rr.append(ii)
+                    ii += 1
+                r.append([va, rr])
+            elif va == 'r' or va == 'n' or va == 'm' or va[:2] == '(r' or va == '-(r)':
+                rr = []
+                for j in range(8):
+                    rr.append(ii)
+                    ii += 1
+                r.append([va, rr])
+            else:
+                r.append([va, [ii]])
+                ii += 1
+        return r
 
     def preexpand(self):
         if self.values[0] == 'range':
@@ -70,13 +112,43 @@ class Function:
         elif self.values[0] == 'pass':
             return None, None
 
-    def dual_split(self, m1, vals):
+    def preexpand_slotted(self):
+        if self.values[0] == 'range' or self.values[0] == 'split-range':
+            return None
+
+        elif self.values[0] == 'single':
+            return [self.gen_vals_slotted(self.values[1])]
+
+        elif self.values[0] == 'single-alt':
+            return [self.gen_vals_slotted(self.values[1][:len(self.values[1])//2]), self.gen_vals_slotted(self.values[1][len(self.values[1])//2:])]
+
+        elif self.values[0] == 'split':
+            return [self.gen_vals_slotted(self.values[2])]
+
+        elif self.values[0] == 'split-alt':
+            return [self.gen_vals_slotted(self.values[2][:len(self.values[2])//2]), self.gen_vals_slotted(self.values[2][len(self.values[2])//2:])]
+
+        elif self.values[0] == 'val':
+            return None
+
+        elif self.values[0] == 'pass':
+            return None
+
+    def apply_nosplit(self, idxs, vals, bit):
+        r = []
+        for v in idxs:
+            for i in vals:
+                r.append(v | (i << bit))
+        return r
+
+    def apply_split(self, idxs, vals, bit1, bit2, m1):
         m2 = (1 << m1) - 1
         r = []
-        for v in vals:
-            i1 = v >> m1
-            i2 = v & m2
-            r.append([i1, i2])
+        for i in vals:
+            i1 = i >> m1
+            i2 = i & m2
+            for v in idxs:
+                r.append(v | (i1 << bit1) | (i2 << bit2))
         return r
         
     def expand_idxs(self, params, idxs):
@@ -85,26 +157,46 @@ class Function:
             sys.exit(1)
         if self.pcount < 0:
             return idxs
-        r = []
-        for v in idxs:
-            if self.values[0] == 'range' or self.values[0] == 'single' or self.values[0] == 'single-alt' or self.values[0] == 'val':
-                bit = params[0]
-                for i in self.ivals:
-                    r.append(v | (i << bit))
+        if self.values[0] == 'range' or self.values[0] == 'single' or self.values[0] == 'single-alt' or self.values[0] == 'val':
+            return self.apply_nosplit(idxs, self.ivals, params[0])
+        elif self.values[0] == 'split-range' or self.values[0] == 'split' or self.values[0] == 'split-alt':
+            return self.apply_split(idxs, self.ivals, params[0], params[1], self.values[1])
+        elif self.values[0] == 'pass':
+            return idxs
+        else:
+            print("unknown expansion %s" % self.values[0])
+            sys.exit(1)
 
-            elif self.values[0] == 'split-range' or self.values[0] == 'split' or self.values[0] == 'split-alt':
-                bit1 = params[0]
-                bit2 = params[1]
-                for e in self.dual_split(self.values[1], self.ivals):
-                    r.append(v | (e[0] << bit1) | (e[1] << bit2))
+    def get_slot_count(self):
+        if self.svals == None or self.pcount < 0:
+            return 1        
+        return len(self.svals[0])
 
-            elif self.values[0] == 'pass':
-                r.append(v)
-
+    def get_val_idxs_slotted(self, slot, params, idxs):
+        if self.values[0] == 'val' or self.values[0] == 'range':
+            return None, self.apply_nosplit(idxs, self.ivals, params[0])
+        if self.values[0] == 'split-range':
+            return None, self.apply_split(idxs, self.ivals, params[0], params[1], self.values[1])
+        if self.svals == None:
+            return None, idxs
+        variant = 0
+        if self.values[0] == 'single-alt' or self.values[0] == 'split-alt':
+            variant = (idxs[0] >> params[-1]) & 1
+        if self.pcount < 0:
+            if self.values[0] == 'single' or self.values[0] == 'single-alt':
+                entryid = (idxs[0] >> params[0]) & ((1 << self.bcount) - 1)
             else:
-                print("unknown expansion %s" % self.values[0])
-                sys.exit(1)
-        return r
+                assert(self.values[0] == 'split' or self.values[0] == 'split-alt')
+                entryid = (idxs[0] >> params[0]) & ((1 << self.values[1]) - 1)
+                entryid |= ((idxs[0] >> params[1]) & (1 << (self.bcount - self.values[1]) - 1)) << self.values[1]
+            return self.svals[variant][entryid][0], idxs
+        else:
+            entry = self.svals[variant][slot]
+            if self.values[0] == 'single' or self.values[0] == 'single-alt':
+                return entry[0], self.apply_nosplit(idxs, entry[1], params[0])
+            else:
+                assert(self.values[0] == 'split' or self.values[0] == 'split-alt')
+                return entry[0], self.apply_split(idxs, entry[1], params[0], params[1], self.values[1])
 
     def need_array(self):
         return self.values[0] == "single" or self.values[0] == "single-alt" or self.values[0] == "split" or self.values[0] == "split-alt"
@@ -322,11 +414,12 @@ Function("damo1_b", -1, ["single", ['x0', 'y0', 'x0', 'y0', 'y1', 'x0', 'y0', 'x
 Function("damo2", 1, ["single", ['y1', 'x0', 'y0', 'x1']])
 
 class Slot:
-    def __init__(self, func):
+    def __init__(self, name, func):
         global functions
         if func not in functions:
             print("Unknown function %s" % func)
             sys.exit(1)
+        self.name = name
         self.func = functions[func]
         self.params = []
         self.used = False
@@ -343,18 +436,52 @@ class Slot:
     def param(self):
         return self.func.param(self.params)
 
+    def get_ftype(self):
+        return self.func.get_ftype()
+
+    def get_slot_count(self):
+        return self.func.get_slot_count()
+
+    def get_val_idxs_slotted(self, slot, idxs):
+        return self.func.get_val_idxs_slotted(slot, self.params, idxs)
+
+class Variant:
+    def __init__(self, inst, cid, has_ex):
+        self.inst = inst
+        self.cid = cid
+        self.slots = {}
+        self.has_ex = has_ex
+
+    def add_slot(self, s, value):
+        self.slots[s.name] = value
+
+    def create_name(self, segs):
+        self.name = ''
+        for s in segs:
+            if type(s) == str:
+                self.name += s
+            else:
+                if s.name in self.slots:
+                    self.name += self.slots[s.name]
+                else:
+                    self.name += '[' + s.name + ']'
+
+    def generate_code(self, f, post):
+        print('\t\tunhandled("%s");' % self.name, file=f)
 
 class Instruction:
-    def __init__(self, id, idx, mode, head, itable, table):
-        self.id = id
-        table.append(self)
+    def __init__(self, idx, mode, head, ditable, dtable, citable, ctable):
+        self.did = len(dtable)
+        self.cid = len(ctable)
+        dtable.append(self)
         self.mode = mode
         sidx = self.find_separator(head)
         self.idstr = head[:sidx].rstrip(' \t')
         self.parse_slots(head, sidx+2)
         self.check_ex()
-        self.fill_itable(id, itable, table, mode, idx)
+        self.fill_ditable(ditable, dtable, idx)
         self.parse_dasm(head[6:sidx].strip(' \t').rstrip(' \t'))
+        self.fill_citable(citable, ctable, idx)
 
     def find_separator(self, head):
         sidx = 6
@@ -391,7 +518,7 @@ class Instruction:
             if pos == len(head):
                 print("Missing ( after function name %s [%s]" % (fname, head[0]))
                 sys.exit(1)
-            sinfo = Slot(fname)
+            sinfo = Slot(sname, fname)
             pos += 1
             while True:
                 while pos != len(head) and head[pos] == ' ':
@@ -428,9 +555,9 @@ class Instruction:
                 self.has_ex = True
                 break
 
-    def fill_itable(self, id, itable, table, mode, idx):
+    def fill_ditable(self, ditable, dtable, idx):
         global functions
-        shift = 8 if mode == IType.move else 0
+        shift = 8 if self.mode == IType.move else 0
         idxs = [idx << shift]
         idxc = None
         if idx == idxc:
@@ -443,10 +570,10 @@ class Instruction:
             print('.'.join(["%06x" % _ for _ in idxs]))
         for idx in idxs:
             idx2 = idx >> shift
-            if itable[idx2] != 0:
-                print("Collision %06x [%s] [%s]" % (idx, self.idstr, table[itable[idx2]].idstr))
+            if ditable[idx2] != 0:
+                print("Collision %06x [%s] [%s]" % (idx, self.idstr, dtable[ditable[idx2]].idstr))
                 sys.exit(1)
-            itable[idx2] = id
+            ditable[idx2] = self.did
 
     def parse_dasm(self, dasm):
         self.segs = []
@@ -515,17 +642,60 @@ class Instruction:
         else:
             return '"' + da + '"'
 
+    def fill_citable(self, citable, ctable, idx):
+        slotorder = []
+        has_ex = False
+        for slot, sinfo in self.slots.items():
+            if sinfo.func.has_ex:
+                has_ex = True
+            slotorder.append([sinfo.get_ftype(), sinfo])
+        slotorder.sort(key=lambda s: s[0])
+#        print("%s: %s" % (self.idstr, ' '.join([s[1].name+'.'+s[1].func.name+('.%d' % s[0]) for s in slotorder])))
+        shift = 8 if self.mode == IType.move else 0
+        indexes = [0]*len(slotorder)
+        imax = []
+        for s in slotorder:
+            imax.append(s[1].get_slot_count())
+        while True:
+            idxs = [idx << shift]
+            cid = len(ctable)
+            vv = Variant(self, cid, has_ex)
+            ctable.append(vv)
+            for si in range(len(slotorder)):
+                s = slotorder[si][1]
+                entry, idxs = s.get_val_idxs_slotted(indexes[si], idxs)
+                if entry != None:
+                    vv.add_slot(s, entry)
+            vv.create_name(self.segs)
+#            print("%4d: %s %s" % (cid, vv.name, '.'.join(['%06x' % _ for _ in idxs])))
+#            print("%4d: %s" % (cid, vv.name))
+            for idxl in idxs:
+                idx2 = idxl >> shift
+                citable[idx2] = cid
+            si = len(slotorder) - 1
+            while si >= 0:
+                indexes[si] += 1
+                if indexes[si] < imax[si]:
+                    break
+                indexes[si] = 0
+                si -= 1
+            if si == -1:
+                break            
+
 class ISA:
     def __init__(self):
-        self.ipar = [0] * 0x100
-        self.ipars = [ None ]
-        self.ipar_id = 1
-        self.npar = [0] * 0x1000000
-        self.npars = [ None ]
-        self.npar_id = 1
-        self.move = [0] * 0x10000
-        self.moves = [ None ]
-        self.move_id = 1
+        self.dipar = [0] * 0x100
+        self.dipars = [ None ]
+        self.dnpar = [0] * 0x1000000
+        self.dnpars = [ None ]
+        self.dmove = [0] * 0x10000
+        self.dmoves = [ None ]
+        self.cipar = [0] * 0x100
+        self.cipars = [ None ]
+        self.cnpar = [0] * 0x1000000
+        self.cnpars = [ None ]
+        self.cmove = [0] * 0x10000
+        self.cmoves = [ None ]
         self.inst = None
 
     def load(self, fname):
@@ -536,16 +706,13 @@ class ISA:
             if ll[0] != ' ' and ll[0] != '\t':
                 if ll[:4] == '....':
                     idx = int(ll[4:6], 16)
-                    self.inst = Instruction(self.ipar_id, idx, IType.ipar, ll, self.ipar, self.ipars)
-                    self.ipar_id += 1
+                    self.inst = Instruction(idx, IType.ipar, ll, self.dipar, self.dipars, self.cipar, self.cipars)
                 elif ll[4:6] == '..':
                     idx = int(ll[0:4], 16)
-                    self.inst = Instruction(self.move_id, idx, IType.move, ll, self.move, self.moves)
-                    self.move_id += 1
+                    self.inst = Instruction(idx, IType.move, ll, self.dmove, self.dmoves, self.cmove, self.cmoves)
                 else:
                     idx = int(ll[:6], 16)
-                    self.inst = Instruction(self.npar_id, idx, IType.npar, ll, self.npar, self.npars)
-                    self.npar_id += 1
+                    self.inst = Instruction(idx, IType.npar, ll, self.dnpar, self.dnpars, self.cnpar, self.cnpars)
             else:
                 pass
 
@@ -559,18 +726,21 @@ class ISA:
                 if i0 == 0:
                     i0 = i
                 i1 = i
-        return r / (len(array) if len(array) != 0x1000000 else 0x100000) * 100, i0, i1
+        return r / (len(array) if len(array) != 0x1000000 else 0x100000) * 100, i0, i1, r
 
     def dump(self):
-        print("d ipar = %4d (%5.2f%%     %02x-    %02x)" % (self.ipar_id, *self.coverage(self.ipar)))
-        print("d npar = %4d (%5.2f%% %06x-%06x)" % (self.npar_id, *self.coverage(self.npar)))
-        print("d move = %4d (%5.2f%%   %04x-  %04x)" % (self.move_id, *self.coverage(self.move)))
+        print("d ipar = %4d (%5.2f%%     %02x-    %02x %6x)" % (len(self.dipars), *self.coverage(self.dipar)))
+        print("d npar = %4d (%5.2f%% %06x-%06x %6x)" % (len(self.dnpars), *self.coverage(self.dnpar)))
+        print("d move = %4d (%5.2f%%   %04x-  %04x %6x)" % (len(self.dmoves), *self.coverage(self.dmove)))
+        print("c ipar = %4d (%5.2f%%     %02x-    %02x %6x)" % (len(self.cipars), *self.coverage(self.cipar)))
+        print("c npar = %4d (%5.2f%% %06x-%06x %6x)" % (len(self.cnpars), *self.coverage(self.cnpar)))
+        print("c move = %4d (%5.2f%%   %04x-  %04x %6x)" % (len(self.cmoves), *self.coverage(self.cmove)))
                     
 
     def check_move_npar_collisions(self):
         for i in range(0x1000000):
-            if self.npar[i] != 0 and self.move[i >> 8] != 0:
-                print("move/npar collision %06x [%s] [%s]" % (i, self.moves[self.move[i>>8]].idstr, self.npars[self.npar[i]]))
+            if self.dnpar[i] != 0 and self.dmove[i >> 8] != 0:
+                print("move/npar collision %06x [%s] [%s]" % (i, self.dmoves[self.dmove[i>>8]].idstr, self.dnpars[self.dnpar[i]]))
                 sys.exit(1)
 
     def gen_index_array(self, f, array):
@@ -582,9 +752,10 @@ class ISA:
 
     def gen_ex_array(self, f, insts):
         s = '\t'
-        for i in range(0, 64 if len(insts) <= 64 else 256, 64):
+        total = 64*((len(insts) + 63) // 64)
+        for i in range(0, total, 64):
             v = 0
-            if i:
+            if (i & 7) != 0:
                 s += ' '
             for j in range(64):
                 if i+j >= len(insts):
@@ -592,9 +763,13 @@ class ISA:
                 if (i+j) and insts[i+j].has_ex:
                     v |= 1 << j
             s += '0x%016x' % v
-            if len(insts) > 64:
+            if total > 64:
                 s += ','
-        print(s, file=f)
+            if (i & (7*64)) == (7*64):
+                print(s, file=f)
+                s = '\t'
+        if len(s) > 1:
+            print(s, file=f)
 
     def gen_dasm_switch(self, f, insts):
         for i in range(len(insts)):
@@ -603,6 +778,15 @@ class ISA:
             else:
                 print("\tcase %d: return %s;" % (i, insts[i].dasm_format()), file=f);
 
+    def gen_interp_switch(self, f, insts, post):
+        for i in range(len(insts)):
+            print('\tcase %d: // %s' % (i, '-' if i == 0 else insts[i].name), file=f)
+            if insts[i] == None:
+                print("\t\tbreak;", file=f)
+            else:
+                insts[i].generate_code(f, post);
+                print("\t\tbreak;", file=f)
+                       
     def gen_disasm(self, fname):
         f = open(fname, "wt")
         print("// license:BSD-3-Clause", file=f)
@@ -614,23 +798,23 @@ class ISA:
         print("#include \"dsp563xxd.h\"", file=f)
         print("", file=f)
         print("const u8 dsp563xx_disassembler::t_ipar[0x100] = {", file=f)
-        self.gen_index_array(f, self.ipar)
+        self.gen_index_array(f, self.dipar)
         print("};", file=f)
         print("", file=f)
         print("const u8 dsp563xx_disassembler::t_move[0x10000] = {", file=f)
-        self.gen_index_array(f, self.move)
+        self.gen_index_array(f, self.dmove)
         print("};", file=f)
         print("", file=f)
         print("const u8 dsp563xx_disassembler::t_npar[0x100000] = {", file=f)
-        self.gen_index_array(f, self.npar[:0x100000])
+        self.gen_index_array(f, self.dnpar[:0x100000])
         print("};", file=f)
         print("", file=f)
         print("const u64 dsp563xx_disassembler::t_move_ex =", file=f)
-        self.gen_ex_array(f, self.moves)
+        self.gen_ex_array(f, self.dmoves)
         print(";", file=f)
         print("", file=f)
         print("const u64 dsp563xx_disassembler::t_npar_ex[4] = {", file=f)
-        self.gen_ex_array(f, self.npars)
+        self.gen_ex_array(f, self.dnpars)
         print("};", file=f)
         print("", file=f)
         for _,ff in functions.items():
@@ -640,7 +824,7 @@ class ISA:
         print("std::string dsp563xx_disassembler::disasm_ipar(u8 kipar, u32 opcode, u32 exv, u32 pc)", file=f)
         print("{", file=f)
         print("\tswitch(kipar) {", file=f)
-        self.gen_dasm_switch(f, self.ipars)
+        self.gen_dasm_switch(f, self.dipars)
         print("\t}", file=f)
         print("\tabort();", file=f)
         print("}", file=f)
@@ -648,7 +832,7 @@ class ISA:
         print("std::string dsp563xx_disassembler::disasm_move(u8 kmove, u32 opcode, u32 exv, u32 pc)", file=f)
         print("{", file=f)
         print("\tswitch(kmove) {", file=f)
-        self.gen_dasm_switch(f, self.moves)
+        self.gen_dasm_switch(f, self.dmoves)
         print("\t}", file=f)
         print("\tabort();", file=f)
         print("}", file=f)
@@ -656,17 +840,84 @@ class ISA:
         print("std::string dsp563xx_disassembler::disasm_npar(u8 knpar, u32 opcode, u32 exv, u32 pc)", file=f)
         print("{", file=f)
         print("\tswitch(knpar) {", file=f)
-        self.gen_dasm_switch(f, self.npars)
+        self.gen_dasm_switch(f, self.dnpars)
         print("\t}", file=f)
         print("\tabort();", file=f)
         print("}", file=f)
 
+    def gen_itable(self, fname):
+        f = open(fname, "wt")
+        print("// license:BSD-3-Clause", file=f)
+        print("// copyright-holders:Olivier Galibert", file=f)
+        print("", file=f)
+        print("// Generated file, do not edit, run dsp563xx-make.py instead", file=f)
+        print("", file=f)
+        print("#include \"emu.h\"", file=f)
+        print("#include \"dsp563xx.h\"", file=f)
+        print("", file=f)
+        print("const u16 dsp563xx_device::t_ipar[0x100] = {", file=f)
+        self.gen_index_array(f, self.cipar)
+        print("};", file=f)
+        print("", file=f)
+        print("const u16 dsp563xx_device::t_move[0x10000] = {", file=f)
+        self.gen_index_array(f, self.cmove)
+        print("};", file=f)
+        print("", file=f)
+        print("const u16 dsp563xx_device::t_npar[0x100000] = {", file=f)
+        self.gen_index_array(f, self.cnpar[:0x100000])
+        print("};", file=f)
+        print("", file=f)
+        print("const u64 dsp563xx_device::t_move_ex[39] = {", file=f)
+        self.gen_ex_array(f, self.cmoves)
+        print("};", file=f)
+        print("", file=f)
+        print("const u64 dsp563xx_device::t_npar_ex[71] = {", file=f)
+        self.gen_ex_array(f, self.cnpars)
+        print("};", file=f)
+
+    def gen_interp(self, fname):
+        f = open(fname, "wt")
+        print("// license:BSD-3-Clause", file=f)
+        print("// copyright-holders:Olivier Galibert", file=f)
+        print("", file=f)
+        print("// Generated file, do not edit, run dsp563xx-make.py instead", file=f)
+        print("", file=f)
+        print("#include \"emu.h\"", file=f)
+        print("#include \"dsp563xx.h\"", file=f)
+        print("", file=f)
+        print("void dsp563xx_device::execute_ipar(u16 kipar)", file=f)
+        print("{", file=f)
+        print("\tswitch(kipar) {", file=f)
+        self.gen_interp_switch(f, self.cipars, False)
+        print("\t}", file=f)
+        print("}", file=f)
+        print("", file=f)
+        print("void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)", file=f)
+        print("{", file=f)
+        print("\tswitch(kmove) {", file=f)
+        self.gen_interp_switch(f, self.cmoves, False)
+        print("\t}", file=f)
+        print("}", file=f)
+        print("", file=f)
+        print("void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)", file=f)
+        print("{", file=f)
+        print("\tswitch(kmove) {", file=f)
+        self.gen_interp_switch(f, self.cmoves, True)
+        print("\t}", file=f)
+        print("}", file=f)
+        print("", file=f)
+        print("void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)", file=f)
+        print("{", file=f)
+        print("\tswitch(knpar) {", file=f)
+        self.gen_interp_switch(f, self.cnpars, False)
+        print("\t}", file=f)
+        print("}", file=f)
+        
 isa = ISA()
 isa.load("dsp563xx.lst")
 isa.check_move_npar_collisions()
 isa.dump()
 
-#print(isa.npar[0x050c00])
-
 isa.gen_disasm("dsp563xxd-tables.cpp")
-
+isa.gen_itable("dsp563xx-tables.cpp")
+isa.gen_interp("dsp563xx-interp.cpp")

@@ -4284,6 +4284,8 @@ end
 
 if CPUS["DSP563XX"] then
 	files {
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx-tables.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx-interp.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx.h",
 		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56303.cpp",

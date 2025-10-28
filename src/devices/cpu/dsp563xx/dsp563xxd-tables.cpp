@@ -34844,7 +34844,7 @@ const u64 dsp563xx_disassembler::t_move_ex =
 ;
 
 const u64 dsp563xx_disassembler::t_npar_ex[4] = {
-	0x17e7f3e4208828cc, 0xf8bf22a3de040bf2, 0x09333080c480bebf, 0x00000020401b0450,
+	0x17e7f3e4208828cc,0xf8bf22a3de040bf2,0x09333080c480bebf,0x00000020401b0450,
 };
 
 const char *const dsp563xx_disassembler::ts_acc[2] = { "a", "b" };

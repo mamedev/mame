@@ -8,6 +8,8 @@
 ....32 asl d                 - d:acc(3)
 ....22 asr d                 - d:acc(3)
 ....13 clr d                 - d:acc(3)
+	$d:w(0);
+
 ....05 cmp s,d               - s:daos3(4, 3) d:acc(3)
 ....07 cmpm s,d              - s:daos3(4, 3) d:acc(3)
 ....43 eor s,d               - s:daos(4) d:acc(3)
@@ -34,6 +36,9 @@
 
 2000..                       -
 2000.. #i,d                  - d:fvbr1(16) i:imm8(8)
+	%>
+	$d:w($i);
+
 2000.. s,d                   - s:fvbr1(13) d:fvbr1(8)
 2040.. ea                    - ea:eam4(8)
 40c0.. x:ea,d                - d:fvbr1s(20, 16) ea:eam1(8)
