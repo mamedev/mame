@@ -356,6 +356,7 @@ public:
 
 	void init_palnibbles() ATTR_COLD;
 
+	void p1_lamps_w(uint8_t data);
 	void p2_lamps_w(uint8_t data);
 
 protected:
@@ -395,7 +396,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
-	void p1_lamps_w(uint8_t data);
 	void fg_vidram_w(offs_t offset, uint8_t data);
 	void fg_atrram_w(offs_t offset, uint8_t data);
 	void bg_vidram_w(offs_t offset, uint8_t data);
@@ -517,6 +517,7 @@ public:
 	void init_rm7b() ATTR_COLD;
 	void init_wcat3a() ATTR_COLD;
 	template <uint8_t Xor_value> void init_tsk() ATTR_COLD;
+	void coincount_w(uint8_t data);
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -532,7 +533,6 @@ private:
 	void wcat3a_outport0_w(uint8_t data);
 	void girl_scroll_w(uint8_t data);
 	void background_col_w(uint8_t data);
-	void coincount_w(uint8_t data);
 	void pkm_out0_w(uint8_t data);
 	void czb_vid_reg_w(uint8_t data);
 	void jkm_vid_reg_w(uint8_t data);
@@ -1562,9 +1562,6 @@ uint32_t cmast97_state::screen_update_cmast97(screen_device &screen, bitmap_rgb3
 	if (!(m_enable_reg & 0x01))
 		return 0;
 
-	if (m_enable_reg & 0x02)
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
 	if (m_enable_reg & 0x10)
 	{
 		for (int i = 0; i < 64; i++)
@@ -1574,9 +1571,18 @@ uint32_t cmast97_state::screen_update_cmast97(screen_device &screen, bitmap_rgb3
 			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
 		}
 
-		m_reel_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-		m_reel_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		m_reel_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+		const rectangle visible1(14*8, (14+46)*8-1,  4*8,  (4+7)*8-1);
+		const rectangle visible2(14*8, (14+46)*8-1, 12*8, (12+7)*8-1);
+		const rectangle visible3(14*8, (14+46)*8-1, 20*8, (20+7)*8-1);
+
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+	}
+	else
+	{
+		if (m_enable_reg & 0x02)
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
 	if (m_enable_reg & 0x08)
@@ -1969,13 +1975,13 @@ uint32_t unkch_state::screen_update_unkch(screen_device &screen, bitmap_rgb32 &b
 
 void cmast97_state::cmast97_palette_init(palette_device &palette) const
 {
-	// TODO: probably wrong
 	uint8_t const *const colours = memregion("proms")->base();
-	for (int i = 0; i < 0x200; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t const data = colours[i];
-		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		uint16_t const data = (colours[i + 0x100] + (colours[i] << 8)) >> 1;
+		palette.set_pen_color(i, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 	}
+
 }
 
 void goldstar_state::cm_palette(palette_device &palette) const
@@ -3784,7 +3790,7 @@ void cmaster_state::super7_portmap(address_map &map)
 	map(0x82, 0x82).w("aysnd", FUNC(ay8910_device::data_w));
 }
 
-void cmast97_state::cmast97_portmap(address_map &map)  // TODO: other reads/writes
+void cmast97_state::cmast97_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).lw8(NAME([this] (uint8_t data) { m_enable_reg = data; m_gfx_view.select(BIT(m_enable_reg, 4)); } ));
@@ -3794,8 +3800,8 @@ void cmast97_state::cmast97_portmap(address_map &map)  // TODO: other reads/writ
 	map(0x0c, 0x0c).portr("DSW1");
 	map(0x0d, 0x0d).portr("DSW2");
 	map(0x0e, 0x0e).portr("DSW3");
-	map(0x10, 0x10).portr("IN0");
-	map(0x11, 0x11).portr("IN1");
+	map(0x10, 0x10).portr("IN0").w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x11, 0x11).portr("IN1").w(FUNC(cmaster_state::coincount_w));
 	map(0x12, 0x12).portr("IN2");
 }
 
@@ -13974,7 +13980,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( gfx_cmast97 )
 	GFXDECODE_ENTRY( "gfx", 0,       cmast97_layout,   0x0, 16 )
-	GFXDECODE_ENTRY( "gfx", 0x20000, cmast97_layout32, 0x0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x20000, cmast97_layout32, 0xb0, 16 )
 	GFXDECODE_ENTRY( "gfx", 0x40000, cmast97_layout,   0x0, 16 )
 GFXDECODE_END
 
@@ -14335,7 +14341,7 @@ void cmast97_state::cmast97(machine_config &config)
 	m_gfxdecode->set_info(gfx_cmast97);
 
 	m_palette->set_init(FUNC(cmast97_state::cmast97_palette_init));
-	m_palette->set_entries(512);
+	m_palette->set_entries(256);
 
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
@@ -14456,7 +14462,7 @@ void cmaster_state::eldoradd(machine_config &config)
 {
 	cmast92(config);
 
-	m_gfxdecode->set_info(gfx_cmast97);  // TODO: wrong, needs correct decode
+	m_gfxdecode->set_info(gfx_cmast97);
 }
 
 void cmaster_state::ll3(machine_config &config)
@@ -29769,10 +29775,10 @@ GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_ini
 GAME(  1991, eldoraddo,  eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddob, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V2.0D)",                           MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddoc, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1J)",                           MACHINE_NOT_WORKING ) // different GFX hw?
-GAME(  1996, cmast97,    0,        cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette
-GAME(  1996, cmast97a,   cmast97,  cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette
-GAME(  1996, cmast97i,   cmast97,  cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette
-GAME(  1997, jpknight,   0,        cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna / R-Stone",    "Jackpot Knight (V1.1)",                       MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette, check inputs
+GAME(  1996, cmast97,    0,        cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             MACHINE_NOT_WORKING )
+GAME(  1996, cmast97a,   cmast97,  cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2)",             MACHINE_NOT_WORKING )
+GAME(  1996, cmast97i,   cmast97,  cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     MACHINE_NOT_WORKING )
+GAME(  1997, jpknight,   0,        cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna / R-Stone",    "Jackpot Knight (V1.1)",                       MACHINE_NOT_WORKING ) // check inputs
 GAME(  1999, cmast99,    0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,   cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
