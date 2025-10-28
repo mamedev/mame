@@ -67,6 +67,7 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/timer.h"
+#include "machine/watchdog.h"
 
 #include "vw.lh"
 
@@ -78,6 +79,7 @@ public:
 	digijet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_watchdog(*this, "watchdog")
 		, m_io_adc(*this, "ADC%u", 0U)
 	{
 	}
@@ -87,6 +89,7 @@ public:
 
 private:
 	required_device<mcs48_cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_ioport_array<4> m_io_adc;
 
 	virtual void machine_start() override ATTR_COLD;
@@ -96,47 +99,47 @@ private:
 
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
-	void p2_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER( rpm_int );
-	uint8_t read_adc();
+	uint8_t read_adc(offs_t offset);
 	void start_adc(uint8_t data);
 
-	uint8_t m_adc_channel = 0x07;
-
+	bool m_rpm = false;
 };
 
 void digijet_state::machine_start()
 {
-	save_item(NAME(m_adc_channel));
-}
+	save_item(NAME(m_rpm));
+};
 
 void digijet_state::io_map(address_map &map)
 {
 	map(0x30, 0x3f).r(FUNC(digijet_state::read_adc));
 	map(0x30, 0x3f).w(FUNC(digijet_state::start_adc));
-}
+};
 
-uint8_t digijet_state::read_adc()
+uint8_t digijet_state::read_adc(offs_t offset)
 {
-	return m_io_adc[m_adc_channel]->read();
+	return m_io_adc[offset & 0x03]->read();
 };
 
 void digijet_state::start_adc(uint8_t data)
 {
 	;
-}
+};
 
 void digijet_state::p1_w(uint8_t data)
 {
-	bool unkn = BIT(data,3);
+	bool check = BIT(data,3);
 	bool fuel = BIT(data,4);
 	bool inject = BIT(data,5);
 	bool watchdog = BIT(data,6);
 
-	machine().output().set_value("led_fuel", fuel);
-	machine().output().set_value("led_inject", inject);
-	machine().output().set_value("led_unkn", unkn);
-	machine().output().set_value("led_wd", watchdog);
+	machine().output().set_value("led_fuel", !fuel);
+	machine().output().set_value("led_inject", !inject);
+	machine().output().set_value("led_check", !check);
+	
+	if (watchdog)
+		m_watchdog->watchdog_reset();
 };
 
 uint8_t digijet_state::p2_r()
@@ -146,16 +149,10 @@ uint8_t digijet_state::p2_r()
 	return 0xff;
 };
 
-void digijet_state::p2_w(uint8_t data)
-{
-	m_adc_channel = data & 0x07;
-	popmessage("p2 %04x",data);
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(digijet_state::rpm_int)
 {
-	m_maincpu->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
-	m_maincpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, m_rpm ? CLEAR_LINE : ASSERT_LINE);
+	m_rpm = !m_rpm;
 }
 
 static INPUT_PORTS_START( digijet )
@@ -185,10 +182,11 @@ void digijet_state::digijet(machine_config &config)
 	
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
-	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
 
-	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000/60)); // 1000rpm / 60s
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(68)); // ???
+
+	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000*2/60)); // 1000r/m * 2 (m_rpm toggle) / 60s
 
 	config.set_default_layout(layout_vw);
 }
@@ -202,10 +200,11 @@ void digijet_state::digijet90(machine_config &config)
 	
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(digijet_state::p2_r));
-	m_maincpu->p2_out_cb().set(FUNC(digijet_state::p2_w));
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
 
-	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000/60)); // 1000rpm / 60s
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(68)); // 0.68uF * 10kOhm
+
+	TIMER(config, "rpm").configure_periodic(FUNC(digijet_state::rpm_int), attotime::from_hz(1000*2/60)); // 1000rpm / 60s
 
 	config.set_default_layout(layout_vw);
 }
