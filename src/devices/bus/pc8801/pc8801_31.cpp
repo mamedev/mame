@@ -135,9 +135,12 @@ void pc8801_31_device::amap(address_map &map)
 	map(0x09, 0x09).rw(FUNC(pc8801_31_device::id_r), FUNC(pc8801_31_device::rom_bank_w));
 	map(0x0b, 0x0b).r(FUNC(pc8801_31_device::volume_meter_r<1>));
 	map(0x0d, 0x0d).r(FUNC(pc8801_31_device::volume_meter_r<0>));
-	// TODO: bit 6 also used at startup, what for?
 	map(0x0f, 0x0f).lw8(
-		NAME([this](u8 data) { m_cddrive_enable = bool(BIT(data, 0)); })
+		NAME([this](u8 data) {
+			// takabako and dioscd disables DMA for SUBQ commands to work right
+			m_dma_enable = !!(BIT(data, 6));
+			m_cddrive_enable = !!(BIT(data, 0));
+		})
 	);
 }
 
@@ -304,7 +307,7 @@ void pc8801_31_device::sasi_req_w(int state)
 	if (!m_sasi_req && state)
 	{
 		// IO needed otherwise it will keep running the DRQ
-		if (!m_sasi->cd_r() && !m_sasi->msg_r() && m_sasi->io_r())
+		if (m_dma_enable && !m_sasi->cd_r() && !m_sasi->msg_r() && m_sasi->io_r())
 		{
 			m_drq_cb(1);
 		}

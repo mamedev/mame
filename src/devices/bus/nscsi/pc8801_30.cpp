@@ -11,13 +11,15 @@
 #define LOG_CDDA           (1U << 2)
 #define LOG_FADER          (1U << 3)
 
-#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_FADER)
+#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGCMD(...)         LOGMASKED(LOG_CMD, __VA_ARGS__)
 #define LOGCDDA(...)        LOGMASKED(LOG_CDDA, __VA_ARGS__)
 #define LOGFADER(...)       LOGMASKED(LOG_FADER, __VA_ARGS__)
+
+#define LIVE_SUBQ_VIEW    0
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_PC8801_30, nscsi_cdrom_pc8801_30_device, "scsi_pc8801_30", "SCSI NEC PC8801-30 CD-ROM")
 
@@ -84,6 +86,12 @@ bool nscsi_cdrom_pc8801_30_device::scsi_command_done(u8 command, u8 length)
 	}
 }
 
+//attotime nscsi_cdrom_pc8801_30_device::scsi_data_command_delay()
+//{
+//	return attotime::from_msec(1'000'000 / 44'150);
+//}
+//
+
 void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 {
 	u32 frame = 0;
@@ -110,7 +118,6 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 			const u8 s = bcd_2_dec(scsi_cmdbuf[3]);
 			const u8 f = bcd_2_dec(scsi_cmdbuf[4]);
 			frame = f + 75 * (s + m * 60);
-
 
 			const u32 pregap = toc.tracks[image->get_track(frame)].pregap;
 
@@ -322,17 +329,15 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 		return;
 	}
 
-	frame = m_current_frame;
+	frame = cdda->get_audio_lba();
 
 	switch (m_cdda_status)
 	{
 		case PCE_CD_CDDA_PAUSED:
 			scsi_cmdbuf[0] = 2;
-			frame = cdda->get_audio_lba();
 			break;
 		case PCE_CD_CDDA_PLAYING:
 			scsi_cmdbuf[0] = 0;
-			frame = cdda->get_audio_lba();
 			break;
 		default:
 			scsi_cmdbuf[0] = 3;
@@ -343,11 +348,11 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 	track = image->get_track(frame);
 	msf_rel = cdrom_file::lba_to_msf_alt(frame - image->get_track_start(track));
 
-	scsi_cmdbuf[1] = 0x01 | ((image->get_track_type(image->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
+	scsi_cmdbuf[1] = 0x01 | ((image->get_track_type(track+1) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
 	// track
 	scsi_cmdbuf[2] = dec_2_bcd(track+1);
 	// index
-	scsi_cmdbuf[3] = 1;
+	scsi_cmdbuf[3] = std::max(image->get_track_index(frame), 1U);
 	// MSF (relative)
 	scsi_cmdbuf[4] = dec_2_bcd((msf_rel >> 16) & 0xFF);
 	scsi_cmdbuf[5] = dec_2_bcd((msf_rel >> 8) & 0xFF);
@@ -356,18 +361,18 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 	scsi_cmdbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xFF);
 	scsi_cmdbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xFF);
 	scsi_cmdbuf[9] = dec_2_bcd(msf_abs & 0xFF);
-	//if(LIVE_SUBQ_VIEW)
-	//{
-	//	const std::vector<std::string> status_types = {"standby", "play", "pause"};
-	//	popmessage("SUBQ - status %s type %02x|track %d index %d| MSF rel %06x MSF abs %06x\n"
-	//		, status_types[m_cdda_status]
-	//		, m_data_buffer[1]
-	//		, track + 1
-	//		, 1
-	//		, msf_rel
-	//		, msf_abs
-	//	);
-	//}
+	if(LIVE_SUBQ_VIEW)
+	{
+		const std::vector<std::string> status_types = {"standby", "play", "pause"};
+		popmessage("SUBQ - status %s type %02x|track %d index %d| MSF rel %06x MSF abs %06x\n"
+			, status_types[m_cdda_status]
+			, scsi_cmdbuf[1]
+			, track + 1
+			, scsi_cmdbuf[3]
+			, msf_rel
+			, msf_abs
+		);
+	}
 
 	scsi_data_in(SBUF_MAIN, 10);
 	scsi_status_complete(SS_GOOD);
@@ -527,6 +532,7 @@ void nscsi_cdrom_pc8801_30_device::cdda_end_mark_cb(int state)
 		LOGCDDA(" - No end mark encountered, check me\n");
 }
 
+// TODO: emulated here for simplicity, but should be an external mixer chip
 void nscsi_cdrom_pc8801_30_device::fader_control_w(u8 data)
 {
 	if (data & 0xf8)

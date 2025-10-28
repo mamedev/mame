@@ -66,6 +66,7 @@ private:
 
 	bool m_clock_hb;
 	bool m_cddrive_enable;
+	bool m_dma_enable;
 	int m_sasi_sel;
 	int m_sasi_req;
 

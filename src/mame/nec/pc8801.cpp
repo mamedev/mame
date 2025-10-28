@@ -281,6 +281,8 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 uint8_t pc8801_state::dma_mem_r(offs_t offset)
 {
 	// TODO: TVRAM readback
+	//if ((offset & 0xf000) == 0xf000)
+	//	return m_hi_work_ram[offset & 0xfff];
 	return m_work_ram[offset & 0xffff];
 }
 
@@ -1645,7 +1647,8 @@ void pc8801_state::pc8801(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::int_ack_cb));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
-	config.set_perfect_quantum(m_maincpu);
+//	config.set_perfect_quantum(m_maincpu);
+	// TODO: get rid of this
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
 //  config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK/1024));
