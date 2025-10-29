@@ -14,7 +14,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-@class MAMEDebugCommandHistory, MAMEDebugView, MAMEDisassemblyView, MAMERegistersView;
+@class MAMEDebugCommandHistory, MAMEDebugView, MAMEDisassemblyView, MAMERegistersView, MAMESrcDebugView;
 
 @interface MAMEDebugConsole : MAMEDebugWindowHandler <NSTextFieldDelegate, NSSplitViewDelegate>
 {
@@ -24,6 +24,10 @@
 	NSSplitView             *regSplit, *dasmSplit;
 	MAMERegistersView       *regView;
 	MAMEDisassemblyView     *dasmView;
+	NSScrollView            *dasmScroll;
+	MAMESrcDebugView        *srcdbgView;
+	NSPopUpButton           *sourceButton;
+	NSView                  *srcdbgContainerView;
 	MAMEDebugView           *consoleView;
 	NSTextField             *commandField;
 }
@@ -31,6 +35,9 @@
 - (id)initWithMachine:(running_machine &)m;
 
 - (void)setCPU:(device_t *)device;
+- (BOOL)sourceFrameActive;
+
+- (IBAction)sourceDebugBarChanged:(id)sender;
 
 - (IBAction)doCommand:(id)sender;
 
@@ -65,5 +72,9 @@
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)max ofSubviewAt:(NSInteger)offs;
 - (BOOL)splitView:(NSSplitView *)sender canCollapseSubview:(NSView *)subview;
 - (void)splitView:(NSSplitView *)sender resizeSubviewsWithOldSize:(NSSize)oldSize;
+
+- (void)setDisasemblyView:(BOOL)value;
+- (BOOL) getDisasemblyView;
+- (void) setSourceButton:(int)index;
 
 @end

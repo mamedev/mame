@@ -60,6 +60,11 @@ protected:
 	static DWORD const  DEBUG_WINDOW_STYLE_EX = 0;
 
 	static int const    EDGE_WIDTH = 3;
+
+	// TODO: This duplicates consolewin_info::MAX_VIEWS
+	// I removed it in commit c25a4b8 to avoid the duplication,
+	// but it was then added back again in commit 0bdb4f0.  Would
+	// like to understand why...
 	static int const    MAX_VIEWS = 4;
 
 	enum
@@ -107,6 +112,8 @@ protected:
 		ID_SHOW_RAW,
 		ID_SHOW_ENCRYPTED,
 		ID_SHOW_COMMENTS,
+		ID_SHOW_SOURCE,
+		ID_SHOW_DISASM,
 
 		ID_SHOW_BREAKPOINTS,
 		ID_SHOW_WATCHPOINTS,
@@ -136,6 +143,7 @@ protected:
 	virtual void update_menu() { }
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam);
 	virtual void draw_contents(HDC dc);
+	virtual bool source_stepping_active() { return false; }
 	void draw_border(HDC dc, RECT &bounds);
 	void draw_border(HDC dc, HWND child);
 

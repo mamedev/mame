@@ -52,6 +52,9 @@ private:
 	// Callback to allow MAME to refresh the view
 	static void debuggerViewUpdate(debug_view &debugView, void *osdPrivate);
 
+	// Helper to update scrollbar from data in view
+	void updateScrollRangesAndValues();
+
 	running_machine &m_machine;
 	debug_view *m_view;
 
