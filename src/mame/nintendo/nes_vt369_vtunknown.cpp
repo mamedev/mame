@@ -1057,6 +1057,13 @@ ROM_START( lexi30 )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( jl1810gr )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "jl1810gr.u3", 0x00000, 0x1000000, CRC(c0a62d05) SHA1(1d5536e96d65ee9a0aab2fd5b155ee87d5eb2938) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( matet10 )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "tetriskeychain_p25q16sh_856015.bin", 0x00000, 0x200000, CRC(7a7251ea) SHA1(7ace8482a54f6b06982a90328779c21266d864fa) )
@@ -1231,10 +1238,12 @@ CONS( 201?, dvnimbus,   0,        0,  vt369_unk_16mb, vt369, vt36x_state, empty_
 
 ****************************************************************************************************************/
 
-CONS( 2012, lexi30,  0,0,  vt36x_8mb, vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2012, lexi30,    0,  0,  vt36x_8mb,  vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center - 30-in-1 (JL1800_01)", MACHINE_NOT_WORKING | ROT270 )
 
+// Q2 1.8 VER1.2 2012.03.18 on PCB
+CONS( 2012, jl1810gr,  0,  0,  vt36x_16mb, vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center - 60-in-1 (JL1810GR)", MACHINE_NOT_WORKING | ROT270 )
 
-CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
+CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
 
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
 CONS( 2012, lxcmcysp,  0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
