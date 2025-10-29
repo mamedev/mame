@@ -10,7 +10,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 //#include "bus/midi/midi.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/adc0804.h"
 #include "machine/nvram.h"
 #include "pg200.h"
@@ -208,7 +208,7 @@ void roland_jx3p_state::jx3p(machine_config &config)
 {
 	I8031(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_jx3p_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &roland_jx3p_state::jk3p_ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &roland_jx3p_state::jk3p_ext_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(roland_jx3p_state::analog_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
@@ -224,7 +224,7 @@ void roland_jx3p_state::jx3p(machine_config &config)
 void roland_jx3p_state::mks30(machine_config &config)
 {
 	jx3p(config);
-	m_maincpu->set_addrmap(AS_IO, &roland_jx3p_state::mks30_ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &roland_jx3p_state::mks30_ext_map);
 
 	GENERIC_CARTSLOT(config, m_cartslot, generic_plain_slot, nullptr, "mks30_cart");
 }
@@ -235,7 +235,7 @@ void roland_jx3p_state::gr700(machine_config &config)
 
 	I8031(config, m_ifcpu, 12_MHz_XTAL);
 	m_ifcpu->set_addrmap(AS_PROGRAM, &roland_jx3p_state::if_prog_map);
-	m_ifcpu->set_addrmap(AS_IO, &roland_jx3p_state::if_ext_map);
+	m_ifcpu->set_addrmap(AS_DATA, &roland_jx3p_state::if_ext_map);
 	m_ifcpu->port_out_cb<1>().set(FUNC(roland_jx3p_state::if_anlg_mux_w));
 	m_ifcpu->port_in_cb<3>().set("adc", FUNC(adc0803_device::intr_r)).lshift(4);
 

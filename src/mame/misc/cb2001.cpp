@@ -67,7 +67,7 @@ TODO:
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/nec/v25.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"

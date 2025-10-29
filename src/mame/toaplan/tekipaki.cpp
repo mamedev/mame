@@ -15,7 +15,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 /*
 
@@ -335,7 +334,7 @@ ROM_START( whoopee )
 	ROM_LOAD16_BYTE( "whoopee.1", 0x000000, 0x020000, CRC(28882e7e) SHA1(8fcd278a7d005eb81cd9e461139c0c0f756a4fa4) )
 	ROM_LOAD16_BYTE( "whoopee.2", 0x000001, 0x020000, CRC(6796f133) SHA1(d4e657be260ba3fd3f0556ade617882513b52685) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )            /* Sound HD647180 code */
+	ROM_REGION( 0x8000, "audiocpu", 0 )            /* Sound HD647180 code */
 	ROM_LOAD( "hd647180.025", 0x00000, 0x08000, CRC(c02436f6) SHA1(385343f88991646ec23b385eaea82718f1251ea6) )
 
 	ROM_REGION( 0x200000, "gp9001", 0 )

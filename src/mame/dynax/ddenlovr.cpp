@@ -11959,7 +11959,23 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( hginga )
+ROM_START( hginga ) // shows version 1.00 like below, but program ROM label has extra -1.
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
+	ROM_LOAD( "8101-1.2b", 0x00000, 0x40000, CRC(923c70c5) SHA1(9a042f1813f78276f90d4dcc94a206a2b216aed4) )
+	ROM_RELOAD(            0x10000, 0x40000 )
+
+	ROM_REGION( 0x180000, "blitter", ROMREGION_ERASEFF )
+	ROM_LOAD( "8102.9a",  0x000000, 0x80000, CRC(0074af23) SHA1(39cd978bcc34b27fc896094cf2dd3b7d4596ab00) )
+	ROM_LOAD( "8103.10a", 0x080000, 0x80000, CRC(a3a4ecb5) SHA1(08264cf131fd4c02d8b5925564cf8daa56e0bbc2) )
+	ROM_LOAD( "8104.11a", 0x100000, 0x20000, CRC(24513af9) SHA1(ee1f440b64c1f8c1efc6f0c60e25cab257407865) )
+	ROM_RELOAD(           0x120000, 0x20000 )
+	ROM_RELOAD(           0x140000, 0x20000 )
+	ROM_RELOAD(           0x160000, 0x20000 )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )  // Samples - none
+ROM_END
+
+ROM_START( hgingaa )
 	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )  // Z80 Code + space for banked RAM
 	ROM_LOAD( "8101.2b", 0x00000, 0x40000, CRC(77a64b71) SHA1(3426998746c834435ff10a8d1c6502ea64a5f2e2) )
 	ROM_RELOAD(          0x10000, 0x40000 )
@@ -12647,6 +12663,21 @@ ROM_START( jongteia ) // TSM005-0004 T-Top soft/NAGOYA JAPAN, very similar to th
 	ROM_LOAD( "t83071.2a", 0x000000, 0x200000, CRC(c53d840c) SHA1(5a935320f48bdc8f3b9ed105dcdd0c6e33c3c38c) )
 ROM_END
 
+// 花札 華椿
+ROM_START( htsubaki )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "53302.5b", 0x00000, 0x80000, CRC(91ea64e6) SHA1(db200656c430191735817133525acfa303e04e57) )
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "53303.7b",  0x000000, 0x200000, CRC(5be92db3) SHA1(c84a4d56364158d6bd90a35728b5792e2c913acb) )
+	ROM_LOAD( "53304.8b",  0x200000, 0x200000, CRC(e6d426ea) SHA1(39ab29ef28a75d1833fe6adb51c932a8902d1742) )
+	ROM_LOAD( "53305.10b", 0x400000, 0x200000, CRC(9ff82238) SHA1(372870758c523bc70484ebbefddbc84e3c313023) )
+	ROM_LOAD( "53306.12b", 0x600000, 0x200000, CRC(54b2a248) SHA1(0f63d1399aecc37fecf0449054aae5638142a8ab) )
+
+	ROM_REGION( 0x200000, "oki", 0 )     // samples
+	ROM_LOAD( "53301.2a", 0x000000, 0x200000, CRC(e1ae834a) SHA1(5bf29d5e59e5f99ad56d9812e3e1b88bcc828341) )
+ROM_END
+
 /***************************************************************************
 
 Mahjong Dai Reach
@@ -13108,7 +13139,8 @@ GAME( 1993, animaljrj,   animaljr, mmpanic,   animaljr,   mmpanic_state,  empty_
 GAME( 1994, mjmyster,    0,        mjmyster,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World (Japan, set 1)",                    MACHINE_NO_COCKTAIL  )
 GAME( 1994, mjmywrld,    mjmyster, mjmywrld,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World (Japan, set 2)",                    MACHINE_NO_COCKTAIL  )
 
-GAME( 1994, hginga,      0,        hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan)",                                    MACHINE_NO_COCKTAIL  )
+GAME( 1994, hginga,      0,        hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan, ver 1.00, rev 1)",                   MACHINE_NO_COCKTAIL  )
+GAME( 1994, hgingaa,     hginga,   hginga,    hginga,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga (Japan, ver 1.00)",                          MACHINE_NO_COCKTAIL  )
 
 GAME( 1994, mjmyuniv,    0,        mjmyuniv,  mjmyster,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                   MACHINE_NO_COCKTAIL  )
 GAME( 1995, mjmyunivh,   mjmyuniv, mjmyuniv,  mjmyunivh,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Maa Zoek Lung Hing Fu Dai (Hong Kong, D106T)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // One GFX ROM isn't dumped
@@ -13174,6 +13206,8 @@ GAME( 1998, mjreach1a,   mjreach1, mjreach1,  mjreach1,   hanakanz_state, empty_
 
 GAME( 1999, jongtei,     0,        jongtei,   jongtei,    hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, NM532-01)",                             MACHINE_NO_COCKTAIL  )
 GAME( 2000, jongteia,    jongtei,  jongteia,  jongtei,    hanakanz_state, empty_init,    ROT0, "Dynax (Techno-Top license)",                  "Mahjong Jong-Tei (Japan, Techno-Top license)",                   MACHINE_NO_COCKTAIL  )
+
+GAME( 1999, htsubaki,    0,        jongtei,   hnrose,     hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Tsubaki (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  ) // need inputs /DSW
 
 GAME( 2000, mjgnight,    0,        mjgnight,  mjgnight,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                      MACHINE_NO_COCKTAIL  )
 

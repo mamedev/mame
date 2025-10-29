@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+We currently lack any native MPC3000 disks, so these are the first 4 MPC60 factory
+disks loaded into the MPC3000 emulation and saved in MPC3000 format onto 1.44MB
+FAT12 floppies.
+-->
+<softwarelist name="mpc3000_flop" description="Akai MPC3000 floppies">
+	<software name="mpc60d1">
+		<description>MPC60 Disk 1 - Studio Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mpc60_studio_set.dsk" size="1474560" crc="16cf6895" sha1="7c821ed2fd1e2720cdc67e9db4163360f318f2da"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpc60d2">
+		<description>MPC60 Disk 2 - Rock Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mpc60_rock_set.dsk" size="1474560" crc="57172f94" sha1="06a01b20c9fdd0be4f604af1afd89907b06a5c60"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpc60d3">
+		<description>MPC60 Disk 3 - Dry Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mpc60_dry_set.dsk" size="1474560" crc="215dc3f3" sha1="e81bcf749a98a6728fe56e1ed09f659a0c5a6079"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpc60d4">
+		<description>MPC60 Disk 4 - Synth Set</description>
+		<year>1988</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mpc60_synth_set.dsk" size="1474560" crc="28960fa3" sha1="4a778c570d395d39292de11e9519f0cf243841e8"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

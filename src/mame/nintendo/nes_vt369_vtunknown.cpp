@@ -136,6 +136,7 @@ public:
 	void vt36x_altswap_16mb(machine_config& config);
 	void vt36x_altswap_32mb_4banks_red5mam(machine_config& config);
 
+	void vt36x_vibesswap_8mb(machine_config& config);
 	void vt36x_vibesswap_16mb(machine_config& config);
 	void vt36x_gbox2020_16mb(machine_config& config);
 	void vt36x_s10swap_8mb(machine_config& config);
@@ -467,6 +468,12 @@ void vt36x_state::vt36x_vibesswap_16mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
 
+void vt36x_state::vt36x_vibesswap_8mb(machine_config &config)
+{
+	vt36x_vibesswap_16mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
+}
+
 void vt36x_state::vt36x_gbox2020_16mb(machine_config &config)
 {
 	vt36x_swap_16mb(config);
@@ -634,12 +641,24 @@ ROM_END
 
 ROM_START( rtvgc300fz )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
-	// some of the higher address lines might be swapped
 	ROM_LOAD( "jg7800fz.bin", 0x00000, 0x4000000, CRC(c9d319d2) SHA1(9d0d1435b802f63ce11b94ce54d11f4065b324cc) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( rtvgc300cr )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "jg7800dc-1.u6", 0x00000, 0x4000000, CRC(a21af365) SHA1(8af1370ccfd79c34de39d14c53438246519b16ba) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( rtvgc300pj )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "jg7800pjm-1.u6", 0x00000, 0x4000000, CRC(ea472bf0) SHA1(2864d96da0ecf123f1b143aa53c7faab5ed121d2) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
 
 ROM_START( dgun2561 ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
@@ -743,6 +762,13 @@ ROM_START( lxcmcybt ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcyfd ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "dory.u2", 0x00000, 0x4000000, CRC(315bf615) SHA1(3b8b9c6428084ae82a38b7bcfe029180501f1488) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcydpn ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "dp150.bin", 0x00000, 0x4000000, CRC(dce19f81) SHA1(e74190d5eea4c31ec0cdcc374b988db2dc1d37c6) )
@@ -759,10 +785,16 @@ ROM_END
 
 ROM_START( lxcmcypp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
 	ROM_LOAD( "pawpatrol_compact.bin", 0x00000, 0x4000000, CRC(bf536762) SHA1(80dde8426a636bae33a82d779e564fa743eb3776) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( lxcmcyppa ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "2365pa-5.u2", 0x00000, 0x4000000, CRC(181e2dc6) SHA1(5fc4e1fafa7c94f971fd2e5f4e36629002ee246f) )
+
+	VT3XX_INTERNAL_NO_SWAP
 ROM_END
 
 ROM_START( lxcypkdp ) // all games selectable
@@ -775,6 +807,14 @@ ROM_END
 ROM_START( lxcypksp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "pocketspiderman.u2", 0x00000, 0x4000000, CRC(3e1af689) SHA1(e2ca78c35cd6d827928cf284ea3dcf8b397d347c) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( lxcypkpp ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl1895pa.u2", 0x00000, 0x4000000,  CRC(8f30441e) SHA1(20ada0c50077f174c8248a4123edb2566fe9a5a6) )
+	ROM_IGNORE(0x4000000) // used a bigger ROM than needed, 2nd half is blank
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -1006,6 +1046,11 @@ ROM_START( vibes240 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( t3_630 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.bin", 0x00000, 0x1000000, CRC(7458a598) SHA1(cd35dda56c4531095c7026c88e02e35b1aae730a) )
+ROM_END
+
 ROM_START( lexi30 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "lexi30.u3", 0x00000, 0x800000, CRC(0d4307ea) SHA1(0d7cf492f796b0bb871deebaca38a3ff3b2ed1e6) )
@@ -1089,6 +1134,15 @@ ROM_START( d12power )
 	ROM_LOAD( "25q128.u2", 0x00000, 0x1000000, CRC(02650ad4) SHA1(ca346409e11732d97b892c356fc5da61dc16ab01) )
 ROM_END
 
+ROM_START( d9_500 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "w25q128jv.u3", 0x00000, 0x1000000, CRC(66b137ce) SHA1(699ffaaf086bdb2001b0c4323b1e098f2dd3f885) )
+ROM_END
+
+ROM_START( zl383 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "s29gl064n90tfi04.u2", 0x00000, 0x800000, CRC(58e0011e) SHA1(38a3ed236f055b1a73cbb9582fc5ea151a296ba9) )
+ROM_END
 
 ROM_START( dgun2572 )
 	ROM_REGION( 0x2000000, "mainrom", 0 ) // extra pins on subboard not marked
@@ -1099,6 +1153,26 @@ ROM_END
 ROM_START( gb50_150 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "w25q128jvsiq.bin", 0x00000, 0x1000000, CRC(3cc43fcb) SHA1(6c5e09fadb14e99e6db8c316026d124326a90557) )
+ROM_END
+
+ROM_START( a6plus )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "w25q64jv.u3", 0x00000, 0x800000, CRC(c62f9570) SHA1(eed64d7b022a1274892992ec53d41f189679ebd3) )
+
+	// 512MByte SD Card, seems to contain remains of a linux install in the filesystem
+	// There are NES images also present, used by the device, but they don't seem to be in the filesystem so
+	// probably accessed directly?
+	//
+	// When a game is selected it loads from the card (showing a 'loading' screen) unless the game is the
+	// previous one loaded, in which case it boots immediately, presumably due to already existing in the
+	// flash ROM
+	DISK_REGION( "sdcard" )
+	DISK_IMAGE( "a6plus", 0, SHA1(ce8fb23443008c921c6541e71da37c1dc6a06e5f) )
+ROM_END
+
+ROM_START( h12p1000 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "h12pro1000.u12", 0x00000, 0x2000000, CRC(b471cb79) SHA1(2324d82a6ae00537090fb534cdf4e4ac6a74ebaf) )
 ROM_END
 
 
@@ -1163,24 +1237,27 @@ CONS( 2012, lexi30,  0,0,  vt36x_8mb, vt369_rot, vt36x_state, empty_init, "Lexib
 CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
 
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
-CONS( 2012, lxcmcysp,  0,  0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
-CONS( 200?, lxcmc250,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
-CONS( 2012, lxcmcydp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcysp,  0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
+CONS( 200?, lxcmc250,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcydp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_NOT_WORKING )
 // JL2365 models (150-in-1 versions)
-CONS( 200?, lxcmcysw,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels (JL2365SW)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ)", MACHINE_NOT_WORKING )
-CONS( 2018, lxcmcypj,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks (JL2365PJM)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyba,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcycr,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2365DC)", MACHINE_NOT_WORKING )
-// JL2367 models (150-in-1 versions, newer case style) - the data order is swapped for these (is this common to the JL2367 shell types?)
-CONS( 2018, lxcmcypp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_NOT_WORKING )
-CONS( 2020, lxcmcybt,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman (JL2367BAT)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcydpn, 0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Disney Princess (JL2367DP, 150-in-1)", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyspn, 0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2367SP, 150-in-1)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels (JL2365SW)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfz,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ)", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcypj,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks (JL2365PJM)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyba,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcycr,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2365DC)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyfd,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Finding Dory", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcyppa, lxcmcypp,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-5)", MACHINE_NOT_WORKING ) // yes, it has the bitswap even if it's a JL2365 unit
+// JL2367 models (150-in-1 versions, newer case style)
+CONS( 2018, lxcmcypp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_NOT_WORKING )
+CONS( 2020, lxcmcybt,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman (JL2367BAT)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcydpn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Disney Princess (JL2367DP, 150-in-1)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyspn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2367SP, 150-in-1)", MACHINE_NOT_WORKING )
 
 // JL1895 models, Cyber Arcade Pocket.  This make strange use of the LCDC, the menus are vertical (so must be copied to the LCD rotated) but the games are horizontal as usual
 CONS( 201?, lxcypkdp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Disney Princess (JL1895DP)", MACHINE_NOT_WORKING )
 CONS( 201?, lxcypksp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Spider-Man (JL1895SP-2)", MACHINE_NOT_WORKING )
+CONS( 201?, lxcypkpp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Paw Patrol (JL1895PA)", MACHINE_NOT_WORKING )
 
 CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse (JL2800MN)", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes (JL2800PL)", MACHINE_NOT_WORKING )
@@ -1191,6 +1268,8 @@ CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
 CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
 CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2017, rtvgc300cr,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Disney Cars - 300 Games (JG7800DC-1)", MACHINE_NOT_WORKING )
+CONS( 2018, rtvgc300pj,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - PJ Masks - 300 Games (JG7800PJM-1)", MACHINE_NOT_WORKING )
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
@@ -1204,10 +1283,6 @@ CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
 
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
-
-    (units for use with TV)
-    Lexibook Retro TV Game Console (300 Games) - Cars
-    Lexibook Retro TV Game Console (300 Games) - PJ Masks
 
     (more?)
 
@@ -1257,6 +1332,11 @@ CONS( 2020, gbox2020, gbox2019, 0, vt36x_gbox2020_16mb, vt369, vt36x_state, empt
 // boots with bad colors
 CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+// boots and runs, but not all games have been tested
+CONS( 202?, t3_630,   0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "630 Games in 1 Handheld (T3)", MACHINE_NOT_WORKING )
+
+CONS( 202?, zl383,    0,        0,  vt36x_vibesswap_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 // has extra protection?
 CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
@@ -1267,6 +1347,9 @@ CONS( 2018, goretrop,  0,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,  
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
 // there are other S10 units available
 CONS( 202?, s10fake,   0,  0,  vt36x_s10swap_8mb, vt369, vt36x_state, init_s10fake, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
+
+// banking(?) issues, some games don't boot (writes data to ALU mirror, then some other ports)
+CONS( 202?, h12p1000,  0,        0,  vt36x,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
@@ -1347,7 +1430,14 @@ CONS( 201?, gon100,    0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, 
 
 CONS( 201?, d12power,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "SZDiiER", "Power - Charging and playing games (D12) (416-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 
+// Super Chinese backgrounds don't show properly at least, sold as 'D9' but PCB has D-10D-V1.1 21-8-30 on it
+CONS( 2021, d9_500,    0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "D9 500 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 // GB-50 console supports loading games from SD card (not emulated), main ROM is QSPI flash
 // Games loaded from SD card are loaded into the QSPI flash at 0x800000 - dump is from a clean factory console
 // PCB is marked "389" so possibly VT389 but VT369 string in a debug message in firmware
 CONS( 2019, gb50_150,  0,        0,  vt36x_16mb_sdcard, vt369, vt36x_state, empty_init, "<unknown>",  "GB-50 Retro Station Pocket System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// Games are stored on an SD card (outside of the filesystem?)
+// 8Bt is as printed on the box, not a typo
+CONS( 202?, a6plus,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro Arcade FC A6Plus - 8Bt Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

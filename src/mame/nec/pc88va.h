@@ -11,10 +11,10 @@
 
 #pragma once
 
-//#include "pc80s31k.h"
 #include "pc88va_sgp.h"
 
-#include "bus/cbus/pc9801_cbus.h"
+//#include "bus/nec_fdd/pc80s31k.h"
+#include "bus/pc98_cbus/slot.h"
 #include "bus/msx/ctrl/ctrl.h"
 #include "bus/scsi/pc9801_sasi.h"
 #include "bus/scsi/scsi.h"
@@ -31,16 +31,6 @@
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
 #include "sound/ymopn.h"
-
-//#include "bus/cbus/amd98.h"
-#include "bus/cbus/mif201.h"
-#include "bus/cbus/mpu_pc98.h"
-//#include "bus/cbus/pc9801_26.h"
-#include "bus/cbus/pc9801_55.h"
-//#include "bus/cbus/pc9801_86.h"
-//#include "bus/cbus/pc9801_118.h"
-//#include "bus/cbus/sb16_ct2720.h"
-
 
 #include "emupal.h"
 #include "screen.h"
@@ -132,7 +122,7 @@ private:
 //  required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<upd4990a_device> m_rtc;
-	required_device_array<pc9801_slot_device, 2> m_cbus;
+	required_device_array<pc98_cbus_slot_device, 2> m_cbus;
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<ym2608_device> m_opna;
 	required_device<speaker_device> m_speaker;

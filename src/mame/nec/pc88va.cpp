@@ -34,7 +34,7 @@ TODO:
 - Every PC Engine OS boot tries to write TVRAM ASCII data on every boot to
   $exxxx ROM region, banking bug?
 - all N88 BASIC entries tries to do stuff with EMM, more banking?
-- Share SASI i/f (PC-9801-07?) as C-Bus option;
+- Share SASI i/f (PC-9801-07?) as C-Bus option, fix implementation;
 
 (old notes, to be reordered)
 - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
@@ -82,6 +82,8 @@ brk 8Ch AH=02h read calendar clock -> CH = hour, CL = minutes, DH = seconds, DL 
 
 #include "emu.h"
 #include "pc88va.h"
+
+#include "bus/pc98_cbus/options.h"
 
 #include "softlist_dev.h"
 
@@ -641,7 +643,6 @@ uint8_t pc88va_state::sasi_status_r()
  */
 void pc88va_state::sasi_ctrl_w(uint8_t data)
 {
-
 	m_sasibus->write_sel(BIT(data, 5));
 
 	if(m_sasi_ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
@@ -1379,15 +1380,6 @@ void pc88va_state::machine_reset()
 	m_sound_irq_pending = false;
 }
 
-// TODO: add just a subset for now, all needs to be verified if compatible with C-Bus.
-static void pc88va_cbus_devices(device_slot_interface &device)
-{
-	device.option_add("pc9801_55u", PC9801_55U);
-	device.option_add("pc9801_55l", PC9801_55L);
-	device.option_add("mif_201",    MIF201);
-	device.option_add("mpu_pc98",   MPU_PC98);
-}
-
 // TODO: make it to work and backport to C-Bus
 void pc88va_state::pc88va_sasi(machine_config &config)
 {
@@ -1417,7 +1409,7 @@ void pc88va_state::pc88va_sasi(machine_config &config)
 // cfr. schematics pg. 260, "external bus, videoboard connector"
 void pc88va_state::pc88va_cbus(machine_config &config)
 {
-	PC9801CBUS_SLOT(config, m_cbus[0], pc88va_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, m_cbus[0], pc88va_cbus_devices, nullptr);
 	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
@@ -1426,7 +1418,7 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	m_cbus[0]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<0>));
 	m_cbus[0]->int_cb<4>().set("ir10", FUNC(input_merger_device::in_w<0>));
 
-	PC9801CBUS_SLOT(config, m_cbus[1], pc88va_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, m_cbus[1], pc88va_cbus_devices, nullptr);
 	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
@@ -1514,14 +1506,15 @@ void pc88va_state::pc88va(machine_config &config)
 	m_opna->port_b_read_callback().set(FUNC(pc88va_state::opn_portb_r));
 	m_opna->port_b_write_callback().set(FUNC(pc88va_state::opn_portb_w));
 	// TODO: per-channel mixing is unconfirmed
-	m_opna->add_route(0, m_speaker, 0.75, 0);
-	m_opna->add_route(0, m_speaker, 0.75, 1);
-	m_opna->add_route(1, m_speaker, 0.75, 0);
-	m_opna->add_route(2, m_speaker, 0.75, 1);
+	m_opna->add_route(0, m_speaker, 0.25, 0);
+	m_opna->add_route(0, m_speaker, 0.25, 1);
+	m_opna->add_route(1, m_speaker, 0.50, 0);
+	m_opna->add_route(2, m_speaker, 0.50, 1);
 
 	// TODO: set pc98 compatible
 	// Needs a MS-Engine disk dump first, that applies an overlay on PC Engine OS so that it can run PC-98 software
 	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc88va");
 }
 
 

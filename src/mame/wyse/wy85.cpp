@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "bus/wysekbd/wysekbd.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "machine/er1400.h"
 #include "machine/mc68681.h"
 #include "sound/beep.h"
@@ -341,7 +341,7 @@ void wy85_state::wy85(machine_config &config)
 {
 	I8032(config, m_maincpu, 11_MHz_XTAL); // SCN8032H
 	m_maincpu->set_addrmap(AS_PROGRAM, &wy85_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &wy85_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &wy85_state::io_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(wy85_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(wy85_state::p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(wy85_state::p3_r));

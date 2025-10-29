@@ -50,7 +50,7 @@ Audio inputs are emulated using MAME's audio input capabilities.
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "machine/rescap.h"
@@ -541,7 +541,7 @@ void midiverb_state::midiverb(machine_config &config)
 {
 	I80C31(config, m_maincpu, 6_MHz_XTAL);  // U55.
 	m_maincpu->set_addrmap(AS_PROGRAM, &midiverb_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &midiverb_state::external_memory_map);
+	m_maincpu->set_addrmap(AS_DATA, &midiverb_state::external_memory_map);
 
 	m_maincpu->port_out_cb<1>().set(FUNC(midiverb_state::digit_select_w)).mask(0x03);  // P1.0-P1.1
 	m_maincpu->port_out_cb<1>().append(m_dsp, FUNC(midiverb_dsp_device::program_select_w)).rshift(2);  // P1.2-P1.7

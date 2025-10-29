@@ -18,7 +18,7 @@
 #include "emu.h"
 #include "cherry_mx1500.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 
 
 // device type definition
@@ -316,7 +316,7 @@ void cherry_g80_1500_device::device_add_mconfig(machine_config &config)
 {
 	i8032_device &mcu(I8032(config, m_mcu, 7'392'000)); // exact type and clock unknown (might actually use a more conventional 7.3728 MHz XTAL, as on G80-1000)
 	mcu.set_addrmap(AS_PROGRAM, &cherry_g80_1500_device::prog_map);
-	mcu.set_addrmap(AS_IO, &cherry_g80_1500_device::ext_map);
+	mcu.set_addrmap(AS_DATA, &cherry_g80_1500_device::ext_map);
 	mcu.port_out_cb<1>().set(FUNC(cherry_g80_1500_device::mcu_p1_w));
 	mcu.port_in_cb<3>().set(FUNC(cherry_g80_1500_device::mcu_p3_r));
 	mcu.port_out_cb<3>().set(FUNC(cherry_g80_1500_device::mcu_p3_w));

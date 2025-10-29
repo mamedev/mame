@@ -91,7 +91,7 @@ public:
 	uint8_t unk_r();
 	void p1_w(uint8_t data);
 
-	void pcx_vid_io(address_map &map) ATTR_COLD;
+	void pcx_vid_data(address_map &map) ATTR_COLD;
 	void pcx_vid_map(address_map &map) ATTR_COLD;
 	void pcx_char_ram(address_map &map) ATTR_COLD;
 	void pcx_attr_ram(address_map &map) ATTR_COLD;

@@ -196,6 +196,7 @@ protected:
 	TILE_GET_INFO_MEMBER(bioship_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(powerins_get_bg_tile_info);
+	DECLARE_VIDEO_START(manybloc);
 	DECLARE_VIDEO_START(macross);
 	DECLARE_VIDEO_START(bioship);
 	DECLARE_VIDEO_START(strahl);
@@ -247,13 +248,10 @@ protected:
 	void mustangb_map(address_map &map) ATTR_COLD;
 	void mustangb3_map(address_map &map) ATTR_COLD;
 	void mustangb3_sound_map(address_map &map) ATTR_COLD;
-	void oki1_map(address_map &map) ATTR_COLD;
-	void oki2_map(address_map &map) ATTR_COLD;
 	void powerins_map(address_map &map) ATTR_COLD;
 	void powerins_sound_map(address_map &map) ATTR_COLD;
 	void powerins_bootleg_audio_io_map(address_map &map) ATTR_COLD;
 	void powerinsa_map(address_map &map) ATTR_COLD;
-	void powerinsa_oki_map(address_map &map) ATTR_COLD;
 	void raphero_map(address_map &map) ATTR_COLD;
 	void raphero_sound_mem_map(address_map &map) ATTR_COLD;
 	void ssmissin_map(address_map &map) ATTR_COLD;
@@ -266,7 +264,6 @@ protected:
 	void tdragon_map(address_map &map) ATTR_COLD;
 	void tdragonb_map(address_map &map) ATTR_COLD;
 	void tdragonb2_map(address_map &map) ATTR_COLD;
-	void tdragonb2_oki_map(address_map &map) ATTR_COLD;
 	void tdragonb3_map(address_map &map) ATTR_COLD;
 	void tharrier_map(address_map &map) ATTR_COLD;
 	void tharrier_sound_io_map(address_map &map) ATTR_COLD;
@@ -274,6 +271,13 @@ protected:
 	void twinactn_map(address_map &map) ATTR_COLD;
 	void vandyke_map(address_map &map) ATTR_COLD;
 	void vandykeb_map(address_map &map) ATTR_COLD;
+
+	void oki1_map(address_map &map) ATTR_COLD;
+	void oki2_map(address_map &map) ATTR_COLD;
+	void nmk112_oki0_map(address_map &map) ATTR_COLD;
+	void nmk112_oki1_map(address_map &map) ATTR_COLD;
+	void powerinsa_oki_map(address_map &map) ATTR_COLD;
+	void tdragonb2_oki_map(address_map &map) ATTR_COLD;
 };
 
 class tdragon_prot_state : public nmk16_state

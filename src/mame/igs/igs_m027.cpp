@@ -204,6 +204,9 @@ public:
 	void init_royal5p() ATTR_COLD;
 	void init_jhg3d() ATTR_COLD;
 	void init_gonefsh() ATTR_COLD;
+	void init_mgfx() ATTR_COLD;
+	void init_tarzan2() ATTR_COLD;
+	void init_magtree() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -3142,6 +3145,25 @@ ROM_START( jking02 ) // PCB-0367-05-FG-1
 	ROM_LOAD( "igs_w4201_speech_v103.u28", 0x000000, 0x200000, CRC(fb72d4b5) SHA1(c4f434fb20ac3df8d08aaf62f1dfad03f6f619ef) ) // M27C160, 1xxxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
+ROM_START( tarzan2 ) // PCB-0367-07-FG-1
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "t2_027a.u32", 0x0000, 0x4000, NO_DUMP ) // dead PCB, no way to trojan
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "tarzan_ii_v-101xb.u23", 0x00000, 0x80000, CRC(46400562) SHA1(7f0dc9b68ce63c190a9c2b2bf2c4f21fe89a1bbf) ) // 27C4096
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "tarzan_ii_textu12.u12", 0x00000, 0x80000, CRC(22dcebd0) SHA1(0383f017135230d020d12c8c6cc3aeb136fe9106) ) // M27C4002
+
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "tarzan_ii_a4202_u13.u13", 0x000000, 0x400000, CRC(97a68f85) SHA1(177c8c23fd0d585b24a71359ede005ac9a2e4d4d) ) // 27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
+	ROM_LOAD( "tarzan_ii_cg_u11.u11",    0x400000, 0x080000, CRC(9e101ef3) SHA1(86593754c00408eea078c01731716ab6d61c6dcd) ) // M27C4002, FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "igs_w4201_speech_v103.u28", 0x000000, 0x200000, CRC(fb72d4b5) SHA1(c4f434fb20ac3df8d08aaf62f1dfad03f6f619ef) ) // M27C160, 1xxxxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
 ROM_START( olympic5 ) // PCB type not readable, layout almost identical to PCB-0367-05-FG-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
@@ -3196,6 +3218,25 @@ ROM_START( royal5p ) // PCB-0367-08-FG-1
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "r5+_sp_u37.u37", 0x000000, 0x200000, CRC(030ffdb4) SHA1(7ba129d0301e4e3d58245e733a505ff035395089) ) // 27C160, BADADDR   --xxxxxxxxxxxxxxxxxxx
+ROM_END
+
+// game title isn't sure, however comparing strings to Crazy Bugs seems to confirm it's Magic Tree
+ROM_START( magtree ) // PCB-0367-08-FG-1, all labels not readable
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "m10_027a.u32", 0x0000, 0x4000, NO_DUMP ) // marked MT/PR (Magic Tree?). Dead PCB, so not possible to trojan
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "27c4002.u23", 0x00000, 0x80000, CRC(e61ee1d8) SHA1(4ed11bc733f461e6ec59f6c98927905502ea1c2f) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "27c4002.u12", 0x00000, 0x80000, CRC(3e95242e) SHA1(b8188897afb25559af3e1392e16a8e044c23731a) )
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m27c160.u13", 0x000000, 0x200000, CRC(f7da0faf) SHA1(9598240e386cb469f9cbbb6f9f7f9687e3cbf0e0) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "m27c160.u37", 0x000000, 0x200000, CRC(f97cf8c9) SHA1(a95a53f071503d0463e1a356a37fdfc5c81ebe28) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 // Games with prg at u16
@@ -3537,7 +3578,7 @@ ROM_END
 ROM_START( mgzz100cn ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery)
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "f1_027a.bin", 0x00000, 0x4000, CRC(4b270edb) SHA1(3b4821f7cb785056809c121e6508348df123bfa1) )
+	ROM_LOAD( "f1_027a.u23", 0x00000, 0x4000, CRC(4b270edb) SHA1(3b4821f7cb785056809c121e6508348df123bfa1) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-100cn.u10", 0x000000, 0x80000, CRC(278964f7) SHA1(75e48e3124d038f16f93fe3c1f63dd1568f0c018) )
@@ -3550,6 +3591,26 @@ ROM_START( mgzz100cn ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sp.u14", 0x00000, 0x80000, CRC(f037952e) SHA1(0fa83e164937c9e8245861da7fd11f225525918d) )
+ROM_END
+
+
+// 满贯福星 (Mǎnguàn Fúxīng)
+ROM_START( mgfx ) // IGS PCB 0295-00 (IGS027A, M6295, IGS031, 8255, Battery, 22 MHz XTAL)
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "w6_027a.u23", 0x00000, 0x4000, CRC(7a8a2ea6) SHA1(88f580dc267986cf979de4ef1981758417f106e9) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-104t.u10", 0x000000, 0x80000, CRC(e6e304f7) SHA1(e99cecbbd938affb521b28583af5f8171d397ec2) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t3402.u9", 0x000000, 0x80000, CRC(19b37f83) SHA1(d49bd0c1357bfe76182976c0142c2dded415ac7a) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a3401.u17", 0x000000, 0x400000, CRC(c031f069) SHA1(bb2a6a65e31d730bff8d3e1b8efeafe1a93a73b4) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s3403.u14", 0x00000, 0x80000, CRC(f101f38d) SHA1(f8c6dd0bfe9a27423781039f28d102661cf26f4b) )
 ROM_END
 
 
@@ -4626,6 +4687,26 @@ void igs_m027_state::init_gonefsh()
 	m_igs017_igs031->tarzan_decrypt_sprites(0x200000, 0x200000);
 }
 
+void igs_m027_state::init_mgfx()
+{
+	mgfx_decrypt(machine());
+	m_igs017_igs031->set_text_reverse_bits(false);
+}
+
+void igs_m027_state::init_tarzan2()
+{
+	tarzan2_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
+	pgm_create_dummy_internal_arm_region();
+}
+
+void igs_m027_state::init_magtree()
+{
+	magtree_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
 } // anonymous namespace
 
 
@@ -4675,11 +4756,12 @@ GAME(  2001, cjsxp,         0,        cjsxp,        cjsxp,         igs_m027_stat
 GAME(  2000, tshs,          0,        zhongguo,     tshs,          igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V201CN)", 0 )
 GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // unemulated sound chips
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
+GAME(  2000, mgfx,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // inputs, outputs, Oki banking
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,       0,        chessc2,      gonefsh,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME(  200?, gonefsh2,      0,        chessc2,      gonefsh,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME(  2002, gonefsh2,      0,        chessc2,      gonefsh,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 // these can select between two different games via DIP switch (currently unemulated feature)
 GAME(  2007, cjddzs,        0,        cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V302CN)", MACHINE_NOT_WORKING )
@@ -4696,3 +4778,5 @@ GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
 GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, init_jhg3d,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
+GAME(  200?, tarzan2,       jking02,  m027_1ppi<false>, base,     igs_m027_state, init_tarzan2,  ROT0, "IGS", "Tarzan II (V101XB)", MACHINE_NOT_WORKING )
+GAME(  2006, magtree,       crzybugs, m027_1ppi<false>, base,     igs_m027_state, init_magtree,  ROT0, "IGS", "Magic Tree (V200PR)", MACHINE_NOT_WORKING )

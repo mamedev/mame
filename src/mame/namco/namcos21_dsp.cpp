@@ -259,7 +259,7 @@ void namcos21_dsp_device::winrun_dsp_io(address_map &map)
 
 void namcos21_dsp_device::device_add_mconfig(machine_config &config)
 {
-	tms32025_device& dsp(TMS32025(config, m_dsp, 24000000*2)); /* 48 MHz? overclocked */
+	tms32025_device& dsp(TMS32025(config, m_dsp, 40_MHz_XTAL)); // 40 MHz oscillator on DSP board
 	dsp.set_addrmap(AS_PROGRAM, &namcos21_dsp_device::winrun_dsp_program);
 	dsp.set_addrmap(AS_DATA, &namcos21_dsp_device::winrun_dsp_data);
 	dsp.set_addrmap(AS_IO, &namcos21_dsp_device::winrun_dsp_io);

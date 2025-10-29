@@ -1476,6 +1476,6 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz80b_state,  empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING )
-COMP( 1982, mz2000, 0,      0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2000", MACHINE_NOT_WORKING )
-COMP( 1983, mz2200, mz2000, 0,      mz2200,  mz80bj, mz2200_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING ) // Released in July 17 1983
+COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz80b_state,  empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING ) // not enough software to promote
+COMP( 1982, mz2000, 0,      0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2000", 0 )
+COMP( 1983, mz2200, mz2000, 0,      mz2200,  mz80bj, mz2200_state, empty_init, "Sharp", "MZ-2200", 0 ) // Released in July 17 1983

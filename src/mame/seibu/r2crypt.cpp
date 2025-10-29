@@ -211,7 +211,7 @@ static uint32_t core_decrypt(uint32_t ciphertext, int i1, int i2, int i3, int i4
 	const uint16_t x1Low = (x5[i2]<<11) ^ x11[i3] ^ gm(i4);
 	const uint32_t x1 = x1Low | (bitswap<16>(x1Low, 0,8,1,9, 2,10,3,11, 4,12,5,13, 6,14,7,15)<<16);
 
-	return partial_carry_sum32(v1, x1 ^ preXor, carryMask) ^ postXor;
+	return seibu_partial_carry_sum32(v1, x1 ^ preXor, carryMask) ^ postXor;
 }
 
 void raiden2_decrypt_sprites(uint32_t *data, uint32_t size)

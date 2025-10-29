@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-//#include "cpu/mcs51/mcs51.h"
+//#include "cpu/mcs51/i8051.h"
 #include "machine/pci.h"
 
 namespace {

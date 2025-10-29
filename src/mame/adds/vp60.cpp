@@ -9,7 +9,7 @@ No significant progress can be made until the 8051 has its internal ROM dumped.
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 //#include "machine/er2055.h"
 #include "video/i8275.h"
 #include "screen.h"
@@ -34,7 +34,7 @@ private:
 	u8 crtc_r(offs_t offset);
 	void crtc_w(offs_t offset, u8 data);
 
-	void io_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 	void kbd_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 
@@ -62,7 +62,7 @@ void vp60_state::mem_map(address_map &map)
 	map(0x0000, 0x2fff).rom().region("maincpu", 0);
 }
 
-void vp60_state::io_map(address_map &map)
+void vp60_state::data_map(address_map &map)
 {
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc000).select(0x100).mirror(0xff).rw(FUNC(vp60_state::crtc_r), FUNC(vp60_state::crtc_w));
@@ -80,7 +80,7 @@ void vp60_state::vp60(machine_config &config)
 {
 	I8051(config, m_maincpu, 10.92_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vp60_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &vp60_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &vp60_state::data_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.92_MHz_XTAL, 1600, 0, 1280, 270, 0, 250);

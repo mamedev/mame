@@ -208,14 +208,14 @@ DEFINE_DEVICE_TYPE(POLEPOS_SOUND, polepos_sound_device, "polepos_sound", "Pole P
 //-------------------------------------------------
 
 polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, POLEPOS_SOUND, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_data(*this, DEVICE_SELF),
-		m_current_position(0),
-		m_sample_msb(0),
-		m_sample_lsb(0),
-		m_sample_enable(false),
-		m_stream(nullptr)
+	: device_t(mconfig, POLEPOS_SOUND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_data(*this, DEVICE_SELF)
+	, m_current_position(0)
+	, m_sample_msb(0)
+	, m_sample_lsb(0)
+	, m_sample_enable(false)
+	, m_stream(nullptr)
 {
 }
 
@@ -277,13 +277,13 @@ void polepos_sound_device::sound_stream_update(sound_stream &stream)
 		return;
 
 	/* determine the effective clock rate */
-	uint32_t clock = (unscaled_clock() / 16) * ((m_sample_msb + 1) * 64 + m_sample_lsb + 1) / (64*64);
-	uint32_t step = (clock << 12) / OUTPUT_RATE;
+	uint32_t const clock = (unscaled_clock() / 16) * ((m_sample_msb + 1) * 64 + m_sample_lsb + 1) / (64*64);
+	uint32_t const step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */
-	unsigned slot = (m_sample_msb >> 3) & 7;
-	double volume = volume_table[slot];
-	const uint8_t *base = &m_data[slot * 0x800];
+	unsigned const slot = (m_sample_msb >> 3) & 7;
+	double const volume = volume_table[slot];
+	uint8_t const *const base = &m_data[slot * 0x800];
 
 	/* fill in the sample */
 	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)

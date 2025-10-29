@@ -8,7 +8,7 @@
 #include "awpvid.h" // Fruit Machines Only
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/6821pia.h"
 #include "machine/i8279.h"
 #include "machine/mc68681.h"

@@ -62,7 +62,7 @@ Current status:
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/tms5220.h"
 #include "bus/rs232/terminal.h"
 #include "bus/rs232/rs232.h"
@@ -181,7 +181,7 @@ void pes_state::pes(machine_config &config)
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, XTAL(10'245'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pes_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &pes_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &pes_state::io_map);
 	m_maincpu->port_in_cb<1>().set(m_speech, FUNC(tms5220_device::status_r));
 	m_maincpu->port_out_cb<1>().set(m_speech, FUNC(tms5220_device::data_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(pes_state::port3_r));

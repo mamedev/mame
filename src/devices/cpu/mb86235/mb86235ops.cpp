@@ -41,8 +41,8 @@
 #define F1  0x20000000
 #define F2  0x40000000
 
-#define FSET(f) m_core->st |= (f)
-#define FCLR(f) m_core->st &= ~(f)
+#define FSET(f) do { m_core->st |= (f); } while (false)
+#define FCLR(f) do { m_core->st &= ~(f); } while (false)
 
 void mb86235_device::handle_single_step_execution()
 {
@@ -179,19 +179,31 @@ inline uint32_t mb86235_device::decode_ea(uint8_t mode, uint8_t rx, uint8_t ry, 
 	return 0;
 }
 
-inline uint32_t mb86235_device::read_bus(bool isbbus, uint32_t addr)
+inline uint32_t mb86235_device::read_abus(uint32_t addr)
 {
-	return isbbus == true ? m_datab.read_dword(addr & 0x3ff) : m_dataa.read_dword(addr & 0x3ff);
-}
-
-inline void mb86235_device::write_bus(bool isbbus, uint32_t addr, uint32_t data)
-{
-	if(isbbus == true)
-		m_datab.write_dword(addr & 0x3ff,data);
+	if ((addr & 0x3fff) >= 0x400)
+		return m_external.read_dword((addr & 0x3fff) + (m_core->eb & 0xffc000));
 	else
-		m_dataa.write_dword(addr & 0x3ff,data);
+		return m_dataa.read_dword(addr & 0x3ff);
 }
 
+inline uint32_t mb86235_device::read_bbus(uint32_t addr)
+{
+	return m_datab.read_dword(addr & 0x3ff);
+}
+
+inline void mb86235_device::write_abus(uint32_t addr, uint32_t data)
+{
+	if ((addr & 0x3fff) >= 0x400)
+		m_external.write_dword((addr & 0x3fff) + (m_core->eb & 0xffc000), data);
+	else
+		m_dataa.write_dword(addr & 0x3ff, data);
+}
+
+inline void mb86235_device::write_bbus(uint32_t addr, uint32_t data)
+{
+	m_datab.write_dword(addr & 0x3ff, data);
+}
 
 /*********************
  *
@@ -894,9 +906,9 @@ void mb86235_device::do_alu2_trans2_1(uint64_t op)
 	case 2:
 	{
 		uint32_t addr = decode_ea(op & 0xf, (op >> 17) & 7, (op >> 14) & 7, 0, false);
-		ares = read_bus(false, addr);
+		ares = read_abus(addr);
 		addr = decode_ea(op & 0xf, (op >> 7) & 7, (op >> 4) & 7, 0, true);
-		bres = read_bus(true, addr);
+		bres = read_bbus(addr);
 		break;
 	}
 	default:
@@ -921,9 +933,9 @@ void mb86235_device::do_alu2_trans2_1(uint64_t op)
 	case 1:
 	{
 		uint32_t addr = decode_ea(op & 0xf, (op >> 17) & 7, (op >> 14) & 7, 0, false);
-		write_bus(false, addr, ares);
+		write_abus(addr, ares);
 		addr = decode_ea(op & 0xf, (op >> 7) & 7, (op >> 4) & 7, 0, true);
-		write_bus(true, addr, bres);
+		write_bbus(addr, bres);
 		break;
 	}
 	}
@@ -940,7 +952,7 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 		if(BIT(op, 25)) // ext -> int
 		{
 			uint32_t addr = m_core->eb+m_core->eo;
-			res = m_dataa.read_dword(addr);
+			res = m_external.read_dword(addr);
 
 			// do alu
 			do_alu2(op);
@@ -949,8 +961,11 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 			if(dr & 0x40)
 			{
 				bool isbbus = (dr & 0x20) == 0x20;
-				addr = decode_ea(op & 0xf,dr & 7,(op >> 4) & 7, (op >> 7) & 0x1f,isbbus);
-				write_bus(isbbus,addr,res);
+				addr = decode_ea(op & 0xf,dr & 7,(op >> 4) & 7, (op >> 7) & 0x1f,isbbus) & 0x3ff;
+				if (isbbus)
+					write_bbus(addr, res);
+				else
+					write_abus(addr, res);
 			}
 			else
 				set_transfer_reg(dr,res);
@@ -966,8 +981,8 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 			if (sr & 0x40)
 			{
 				bool isbbus = (sr & 0x20) == 0x20;
-				uint32_t addr = decode_ea(op & 0xf, sr & 7, (op >> 4) & 7, (op >> 7) & 0x1f, isbbus);
-				res = read_bus(isbbus, addr);
+				uint32_t addr = decode_ea(op & 0xf, sr & 7, (op >> 4) & 7, (op >> 7) & 0x1f, isbbus) & 0x3ff;
+				res = isbbus ? read_bbus(addr) : read_abus(addr);
 			}
 			else
 				res = get_transfer_reg(sr);
@@ -976,7 +991,7 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 			do_alu2(op);
 
 			uint32_t addr = m_core->eb + m_core->eo;
-			m_dataa.write_dword(addr, res);
+			m_external.write_dword(addr, res);
 
 			int8_t disp_offs = (op >> 19) & 0x3f;
 			if (disp_offs & 0x20)
@@ -995,7 +1010,7 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 			{
 				bool isbbus = (sr & 0x20) == 0x20;
 				uint32_t addr = decode_ea(op & 0xf,sr & 7,(op >> 4) & 7, (op >> 7) & 0x1f,isbbus);
-				res = read_bus(isbbus,addr);
+				res = isbbus ? read_bbus(addr) : read_abus(addr);
 			}
 		}
 		else
@@ -1012,7 +1027,10 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 
 			bool isbbus = (dr & 0x20) == 0x20;
 			uint32_t addr = decode_ea(op & 0xf,dr & 7,(op >> 4) & 7, (op >> 7) & 0x1f,isbbus);
-			write_bus(isbbus,addr,res);
+			if (isbbus)
+				write_bbus(addr, res);
+			else
+				write_abus(addr, res);
 		}
 		else
 			set_transfer_reg(dr,res);
@@ -1039,7 +1057,7 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	case 2:
 	{
 		uint32_t addr = decode_ea((op >> 20) & 0xf, (op >> 30) & 7, (op >> 27) & 7, (op >> 24) & 7, false);
-		ares = read_bus(false, addr);
+		ares = read_abus(addr);
 		break;
 	}
 	default:
@@ -1060,7 +1078,7 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	case 2:
 	{
 		uint32_t addr = decode_ea(op & 0xf, (op >> 10) & 7, (op >> 7) & 7, (op >> 4) & 7, true);
-		bres = read_bus(true, addr);
+		bres = read_bbus(addr);
 		break;
 	}
 	default:
@@ -1084,7 +1102,7 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	case 1:
 	{
 		uint32_t addr = decode_ea((op >> 20) & 0xf, (op >> 30) & 7, (op >> 27) & 7, (op >> 24) & 7, false);
-		write_bus(false, addr, ares);
+		write_abus(addr, ares);
 		break;
 	}
 	}
@@ -1102,7 +1120,7 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	case 1:
 	{
 		uint32_t addr = decode_ea(op & 0xf, (op >> 10) & 7, (op >> 7) & 7, (op >> 4) & 7, true);
-		write_bus(true, addr, bres);
+		write_bbus(addr, bres);
 		break;
 	}
 	}
@@ -1119,7 +1137,7 @@ void mb86235_device::do_alu1_trans1_2(uint64_t op)
 		if(BIT(op, 37)) // ext->int
 		{
 			uint32_t addr = m_core->eb+m_core->eo;
-			uint32_t res = m_dataa.read_dword(addr);
+			uint32_t res = m_external.read_dword(addr);
 
 			// do alu
 			do_alu1(op);
@@ -1128,8 +1146,11 @@ void mb86235_device::do_alu1_trans1_2(uint64_t op)
 			if(dr & 0x40)
 			{
 				bool isbbus = (dr & 0x20) == 0x20;
-				addr = decode_ea(op & 0xf, dr & 7, (op >> 4) & 7, (op >> 7) & 0x3fff, isbbus);
-				write_bus(isbbus, addr, res);
+				addr = decode_ea(op & 0xf, dr & 7, (op >> 4) & 7, (op >> 7) & 0x3fff, isbbus) & 0x3ff;
+				if (isbbus)
+					write_bbus(addr, res);
+				else
+					write_abus(addr, res);
 			}
 			else
 				set_transfer_reg(dr,res);
@@ -1149,8 +1170,8 @@ void mb86235_device::do_alu1_trans1_2(uint64_t op)
 				else
 				{
 					bool isbbus = (sr & 0x20) == 0x20;
-					uint32_t addr = decode_ea(op & 0xf, sr & 7, (op >> 4) & 7, (op >> 7) & 0x3fff, isbbus);
-					res = read_bus(isbbus, addr);
+					uint32_t addr = decode_ea(op & 0xf, sr & 7, (op >> 4) & 7, (op >> 7) & 0x3fff, isbbus) & 0x3ff;
+					res = isbbus ? read_bbus(addr) : read_abus(addr);
 				}
 			}
 			else
@@ -1160,7 +1181,7 @@ void mb86235_device::do_alu1_trans1_2(uint64_t op)
 			do_alu1(op);
 
 			uint32_t addr = m_core->eb + m_core->eo;
-			m_dataa.write_dword(addr,res);
+			m_external.write_dword(addr, res);
 
 			int8_t disp_offs = (op >> 31) & 0x3f;
 			if (disp_offs & 0x20)
@@ -1179,7 +1200,7 @@ void mb86235_device::do_alu1_trans1_2(uint64_t op)
 			{
 				bool isbbus = (sr & 0x20) == 0x20;
 				uint32_t addr = decode_ea(op & 0xf,sr & 7,(op >> 4) & 7, (op >> 7) & 0x3fff,isbbus);
-				res = read_bus(isbbus,addr);
+				res = isbbus ? read_bbus(addr) : read_abus(addr);
 			}
 		}
 		else
@@ -1196,7 +1217,10 @@ void mb86235_device::do_alu1_trans1_2(uint64_t op)
 
 			bool isbbus = (dr & 0x20) == 0x20;
 			uint32_t addr = decode_ea(op & 0xf,dr & 7,(op >> 4) & 7, (op >> 7) & 0x3fff,isbbus);
-			write_bus(isbbus,addr,res);
+			if (isbbus)
+				write_bbus(addr, res);
+			else
+				write_abus(addr, res);
 		}
 		else
 			set_transfer_reg(dr,res);
@@ -1213,7 +1237,10 @@ void mb86235_device::do_trans1_3(uint64_t op)
 	{
 		bool isbbus = (dr & 0x20) == 0x20;
 		uint32_t addr = decode_ea(op & 0xf,dr & 7,(op >> 4) & 7, (op >> 7) & 0xfff,isbbus);
-		write_bus(isbbus,addr,imm);
+		if (isbbus)
+			write_bbus(addr, imm);
+		else
+			write_abus(addr, imm);
 	}
 	else // direct imm reg
 		set_transfer_reg(dr,imm);
@@ -1262,16 +1289,16 @@ inline uint32_t mb86235_device::do_control_dst(uint64_t op)
 		addr = BIT(op, 11) ? m_core->mb[(op >> 6) & 7] : m_core->ma[(op >> 6) & 7];
 		break;
 	case 4:
-		addr = read_bus(false, op & 0x3ff);
+		addr = read_abus(op & 0x3ff);
 		break;
 	case 5:
-		addr = read_bus(true, op & 0x3ff);
+		addr = read_bbus(op & 0x3ff);
 		break;
 	case 6:
-		addr = read_bus(false, m_core->ar[(op >> 6) & 7]);
+		addr = read_abus(m_core->ar[(op >> 6) & 7]);
 		break;
 	case 7:
-		addr = read_bus(true, m_core->ar[(op >> 6) & 7]);
+		addr = read_bbus(m_core->ar[(op >> 6) & 7]);
 		break;
 	}
 

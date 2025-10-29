@@ -14,6 +14,10 @@ public:
 	virtual void write_char(uint8_t data) = 0;
 	virtual void update_display();
 	virtual bool write_contents(std::ostream &o) { return false; }
+	virtual void clear();
+	virtual void cursor_left();
+	virtual void cursor_right();
+	virtual void set_blink_on(bool blink_on);
 
 	// why isn't the font just stored in this order?
 	static uint32_t conv_segments(uint16_t segin) { return bitswap<15>(segin, 12, 11, 7, 6, 4, 10, 3, 14, 15, 0, 13, 9, 5, 1, 2); }
@@ -41,15 +45,14 @@ protected:
 	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions);
 
 	static constexpr uint8_t AT_NORMAL      = 0x00;
-	static constexpr uint8_t AT_BOLD        = 0x01;
-	static constexpr uint8_t AT_UNDERLINE   = 0x02;
-	static constexpr uint8_t AT_BLINK       = 0x04;
-	static constexpr uint8_t AT_BLINKED     = 0x80;   // set when character should be blinked off
+	static constexpr uint8_t AT_UNDERLINE   = 0x01;
+	static constexpr uint8_t AT_BLINK       = 0x02;
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 	output_helper::ptr m_vfds;
+	bool m_blink_on = false;
 	int m_cursx = 0, m_cursy = 0;
 	int m_savedx = 0, m_savedy = 0;
 	int const m_rows = 0, m_cols = 0;
@@ -74,6 +77,7 @@ private:
 
 class esq2x40_device : public esqvfd_device {
 public:
+	esq2x40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(uint8_t data) override;
@@ -81,6 +85,22 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+};
+
+class esq2x40_vfx_device : public esq2x40_device {
+public:
+	esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual void update_display() override;
+
+	template <int R, int C> static dimensions_param make_dimensions(device_t &device) { return dimensions_param(std::make_unique<output_helper_impl<R * C> >(device), R, C); }
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	required_region_ptr<u16> m_font;
 };
 
 class esq2x40_sq1_device : public esqvfd_device {
@@ -99,5 +119,6 @@ private:
 DECLARE_DEVICE_TYPE(ESQ1X22,     esq1x22_device)
 DECLARE_DEVICE_TYPE(ESQ2X40,     esq2x40_device)
 DECLARE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device)
+DECLARE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device)
 
 #endif // MAME_ENSONIQ_ESQVFD_H
