@@ -31,8 +31,8 @@ TODO:
 - HD63310 seems to have more features than the DPRAM chips emulated in machine/mb8421.cpp. Maybe reason for the above problem?
 - Audio CPU is currently disabled. It seems to read inputs, too.
 - Reel colors may be correct, tilemap ones probably not.
-- Reel scroll / offset.
-- Reel 3 attribute RAM doesn't seem to update correctly? For now reel 3 is disabled.
+- Reel priority / transparent pen.
+- Reel 3 attribute RAM doesn't seem to update correctly? For now reel 3 is disabled, but it's definitely needed (draws the GAME OVER test).
 */
 
 #include "emu.h"
@@ -63,7 +63,7 @@ public:
 		m_attrram(*this, "attrram"),
 		m_reel_tileram(*this, "reel_tileram%u", 0U),
 		m_reel_attrram(*this, "reel_attrram%u", 0U),
-		//m_reelscrollram(*this, "reelscrollram%u", 0U),
+		m_reel_scrollram(*this, "reels_scrollram%u", 0U),
 		m_mainrombank(*this, "mainrombank"),
 		m_gfxview(*this, "gfxview")
 	{
@@ -86,6 +86,7 @@ private:
 	required_shared_ptr<uint8_t> m_attrram;
 	required_shared_ptr_array<uint8_t, 3> m_reel_tileram;
 	required_shared_ptr_array<uint8_t, 3> m_reel_attrram;
+	optional_shared_ptr_array<uint8_t, 3> m_reel_scrollram;
 	required_memory_bank m_mainrombank;
 	memory_view m_gfxview;
 
@@ -122,7 +123,7 @@ void cointek_state::video_start()
 
 	for (auto &reel : m_reel_tilemap)
 	{
-		reel->set_scroll_cols(64);
+		reel->set_scroll_cols(32);
 		reel->set_transparent_pen(0xff);
 	}
 }
@@ -178,6 +179,10 @@ void cointek_state::reel_attrram_w(offs_t offset, uint8_t data)
 
 uint32_t cointek_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int j = 0x00; j < 0x03; j++)
+		for (int i = 0x00; i < 0x40; i += 0x02)
+			m_reel_tilemap[j]->set_scrolly(i / 2, m_reel_scrollram[j][i]);
+
 	m_reel_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	m_reel_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	//m_reel_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
@@ -233,7 +238,10 @@ void cointek_state::program_map(address_map &map)
 	m_gfxview[1](0xe000, 0xe7ff).ram().w(FUNC(cointek_state::reel_tileram_w<1>)).share(m_reel_tileram[1]);
 	m_gfxview[0](0xe800, 0xefff).ram().w(FUNC(cointek_state::reel_attrram_w<2>)).share(m_reel_attrram[2]);
 	m_gfxview[1](0xe800, 0xefff).ram().w(FUNC(cointek_state::reel_tileram_w<2>)).share(m_reel_tileram[2]);
-	map(0xf040, 0xf13f).ram(); // TODO: reel offsets?
+	map(0xf040, 0xf07f).ram().share(m_reel_scrollram[0]);
+	map(0xf080, 0xf0bf).ram().share(m_reel_scrollram[1]);
+	map(0xf0c0, 0xf0ff).ram().share(m_reel_scrollram[2]);
+	map(0xf100, 0xf13f).ram(); // TODO: written too, but for what?
 
 	// map(0xf800, 0xfbff).ram().share(m_dpram);
 	// HACK: needs HD63310 implementation, feeding expected values for now
