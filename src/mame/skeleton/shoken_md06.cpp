@@ -151,6 +151,11 @@ void shoken_md06_state::petitlot(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &shoken_md06_state::io_map);
 
 	RTC62423(config, "rtc", 0);
+}
+
+void shoken_md06_state::polarstar(machine_config &config)
+{
+	petitlot(config);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -174,5 +179,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2001, petitlot,   0, petitlot, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2010, polarstar2, 0, petitlot, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, petitlot,   0, petitlot,  petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2004, polarstar2, 0, polarstar, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
