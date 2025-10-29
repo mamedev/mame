@@ -5,9 +5,9 @@
 #include "seibu_helper.h"
 #include "seibuspi_m.h"
 
-static u32 partial_carry_sum16(u32 add1, u32 add2, u32 carry_mask)
+static u32 seibu_partial_carry_sum16(u32 add1, u32 add2, u32 carry_mask)
 {
-	return partial_carry_sum(add1, add2, carry_mask, 16);
+	return seibu_partial_carry_sum(add1, add2, carry_mask, 16);
 }
 
 
@@ -231,8 +231,8 @@ void seibuspi_sprite_decrypt(u8 *src, int rom_size)
 				   (key( 8,addr) << 30) |
 				   (key( 0,addr) << 31);
 
-		s1 = partial_carry_sum(s1, add1, 0x3a59, 16) ^ 0x843a;
-		s2 = partial_carry_sum(s2, add2, 0x28d49cac, 32) ^ 0xc8e29f84;
+		s1 = seibu_partial_carry_sum(s1, add1, 0x3a59, 16) ^ 0x843a;
+		s2 = seibu_partial_carry_sum(s2, add2, 0x28d49cac, 32) ^ 0xc8e29f84;
 
 
 		// reorder the bits in the order MAME expects to decode the graphics
@@ -277,8 +277,8 @@ CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000
 CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00005237 & 0000FFFF // okok
 CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000A948 & 0000FFFF // okok
 
-        plane54   = partial_carry_sum16(plane54, 0xabcb, 0x55aa) ^ 0x6699;
-        plane3210 = partial_carry_sum32(plane3210, 0x654321d9 ^ 0x42, 0x1d463748) ^ 0x0ca352a9;
+        plane54   = seibu_partial_carry_sum16(plane54, 0xabcb, 0x55aa) ^ 0x6699;
+        plane3210 = seibu_partial_carry_sum32(plane3210, 0x654321d9 ^ 0x42, 0x1d463748) ^ 0x0ca352a9;
 
 ******************************************************************************************/
 
@@ -307,8 +307,8 @@ void seibuspi_rise10_sprite_decrypt(u8 *rom, int size)
 				27,6,15,21,1,28,10,20,
 				7,31,26,0,18,9,19,8);
 
-		plane54   = partial_carry_sum16(plane54, 0xabcb, 0x55aa) ^ 0x6699;
-		plane3210 = partial_carry_sum32(plane3210, 0x654321d9 ^ 0x42, 0x1d463748) ^ 0x0ca352a9;
+		plane54   = seibu_partial_carry_sum16(plane54, 0xabcb, 0x55aa) ^ 0x6699;
+		plane3210 = seibu_partial_carry_sum32(plane3210, 0x654321d9 ^ 0x42, 0x1d463748) ^ 0x0ca352a9;
 
 		rom[0 * size + 2 * i]     = plane54   >>  8;
 		rom[0 * size + 2 * i + 1] = plane54   >>  0;
@@ -347,8 +347,8 @@ cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 000021D9
 cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00005B3B & 0000FFFF // okok
 cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00000300 & 0000FFFF
 
-        plane543 = partial_carry_sum32( plane543, 0xabcb64, 0x55aadd ) ^ 0xab6a4c;
-        plane210 = partial_carry_sum24( plane210,        i, 0xd6375b ) ^ 0x8bf23b;
+        plane543 = seibu_partial_carry_sum32( plane543, 0xabcb64, 0x55aadd ) ^ 0xab6a4c;
+        plane210 = seibu_partial_carry_sum24( plane210,        i, 0xd6375b ) ^ 0x8bf23b;
 
 
 feversoc
@@ -367,9 +367,9 @@ CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = EAAE
 CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = D5AC0000 & FFFF0000 // okok
 CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 03000000 & FFFF0000
 
-        plane543 = partial_carry_sum32(plane543, 0x9df5b2, 0x9ae999) ^ 0x4a32e9;
-        plane210 = partial_carry_sum24(plane210,        i, 0x968bd5) ^ 0x1d97ac;
-        plane210 = partial_carry_sum24(plane210,        1, 0x000001);
+        plane543 = seibu_partial_carry_sum32(plane543, 0x9df5b2, 0x9ae999) ^ 0x4a32e9;
+        plane210 = seibu_partial_carry_sum24(plane210,        i, 0x968bd5) ^ 0x1d97ac;
+        plane210 = seibu_partial_carry_sum24(plane210,        1, 0x000001);
 
 ******************************************************************************************/
 
@@ -433,10 +433,10 @@ static void seibuspi_rise11_sprite_decrypt(u8 *rom, int size,
 					   (BIT(b1, 5)<<22) |
 					   (BIT(b3,15)<<23);
 
-		plane543 = partial_carry_sum32(plane543, k1, k2) ^ k3;
-		plane210 = partial_carry_sum24(plane210,  i, k4) ^ k5;
+		plane543 = seibu_partial_carry_sum32(plane543, k1, k2) ^ k3;
+		plane210 = seibu_partial_carry_sum24(plane210,  i, k4) ^ k5;
 		if (feversoc_kludge)
-			plane210 = partial_carry_sum24(plane210,  1, 0x000001);
+			plane210 = seibu_partial_carry_sum24(plane210,  1, 0x000001);
 
 		rom[0 * size + 2 * i]     = plane543 >> 16;
 		rom[0 * size + 2 * i + 1] = plane543 >>  8;

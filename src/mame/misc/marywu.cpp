@@ -19,7 +19,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/nvram.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
@@ -53,7 +53,7 @@ private:
 	void ay2_port_a_w(uint8_t data);
 	void ay2_port_b_w(uint8_t data);
 	uint8_t keyboard_r();
-	void io_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_selected_7seg_module = 0;
@@ -101,9 +101,9 @@ static INPUT_PORTS_START( marywu )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4) // K3
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("P1")
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P1.6") PORT_CODE(KEYCODE_C) // If press or IP_ACTIVE_LOW Will cause Error 30 if press
-    PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.7") PORT_CODE(KEYCODE_V) // If press during startup, it will cause error 76.
+	PORT_START("P1")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P1.6") PORT_CODE(KEYCODE_C) // If press or IP_ACTIVE_LOW Will cause Error 30 if press
+	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.7") PORT_CODE(KEYCODE_V) // If press during startup, it will cause error 76.
 INPUT_PORTS_END
 
 void marywu_state::ay1_port_a_w(uint8_t data)
@@ -163,7 +163,7 @@ void marywu_state::program_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void marywu_state::io_map(address_map &map)
+void marywu_state::data_map(address_map &map)
 {
 	map(0x8000, 0x87ff).mirror(0x0800).ram().share("nvram"); /* HM6116: 2kbytes of Static RAM */
 	map(0x9000, 0x9001).mirror(0x0ffc).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
@@ -187,7 +187,7 @@ void marywu_state::marywu(machine_config &config)
 	/* basic machine hardware */
 	i80c31_device &maincpu(I80C31(config, "maincpu", XTAL(10'738'635))); //actual CPU is a Winbond w78c31b-24
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
-	maincpu.set_addrmap(AS_IO, &marywu_state::io_map);
+	maincpu.set_addrmap(AS_DATA, &marywu_state::data_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 	maincpu.port_in_cb<1>().set_ioport("P1");
 

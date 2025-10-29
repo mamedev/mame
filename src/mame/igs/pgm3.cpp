@@ -147,7 +147,7 @@ void pgm3_state::machine_reset()
 
 	// the first 0x20000 bytes are encrypted with this key, it then uses other keys to decrypt the rest
 	// the decryption is done in hardware, not software
-    decryptaes(rom_aes_key, rom_aes_iv, 0x10000000, 0x00000000, 0x20000);
+	decryptaes(rom_aes_key, rom_aes_iv, 0x10000000, 0x00000000, 0x20000);
 
 	// if we want to boot from somewhere else, change this
 	//m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x04000000);

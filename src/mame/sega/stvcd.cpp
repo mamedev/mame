@@ -127,7 +127,114 @@ void stvcd_device::device_add_mconfig(machine_config &config)
 
 void stvcd_device::device_start()
 {
+	save_item(NAME(sectlenin));
+	save_item(NAME(sectlenout));
+	save_item(NAME(lastbuf));
+	save_item(NAME(playtype));
+	save_item(NAME(xfercount));
+	save_item(NAME(calcsize));
+	save_item(NAME(xferoffs));
+	save_item(NAME(xfersect));
+	save_item(NAME(xfersectpos));
+	save_item(NAME(xfersectnum));
+	save_item(NAME(xferdnum));
+	save_item(NAME(cddevicenum));
+	save_item(NAME(cr1));
+	save_item(NAME(cr2));
+	save_item(NAME(cr3));
+	save_item(NAME(cr4));
+	save_item(NAME(prev_cr1));
+	save_item(NAME(prev_cr2));
+	save_item(NAME(prev_cr3));
+	save_item(NAME(prev_cr4));
+	save_item(NAME(status_type));
+	save_item(NAME(hirqmask));
+	save_item(NAME(hirqreg));
+	save_item(NAME(cd_stat));
+	save_item(NAME(cd_curfad));
+	save_item(NAME(cd_fad_seek));
+	save_item(NAME(fadstoplay));
+	save_item(NAME(in_buffer));
+	save_item(NAME(oddframe));
+	save_item(NAME(buffull));
+	save_item(NAME(sectorstore));
+	save_item(NAME(freeblocks));
+	save_item(NAME(cur_track));
+	save_item(NAME(cmd_pending));
+	save_item(NAME(cd_speed));
+	save_item(NAME(cdda_maxrepeat));
+	save_item(NAME(cdda_repeat_count));
+	save_item(NAME(tray_is_closed));
+	save_item(NAME(numfiles));
+	save_item(NAME(firstfile));
 }
+
+void stvcd_device::device_reset()
+{
+	int32_t i, j;
+
+	hirqmask = 0xffff;
+	hirqreg = 0xffff;
+	cr1 = 'C';
+	cr2 = ('D'<<8) | 'B';
+	cr3 = ('L'<<8) | 'O';
+	cr4 = ('C'<<8) | 'K';
+	cd_stat = CD_STAT_PAUSE;
+	cd_stat |= CD_STAT_PERI;
+	cur_track = 0xff;
+
+	curdir.clear();
+
+	xfertype = XFERTYPE_INVALID;
+	xfertype32 = XFERTYPE32_INVALID;
+
+	// reset flag vars
+	buffull = sectorstore = 0;
+
+	freeblocks = 200;
+
+	sectlenin = sectlenout = 2048;
+
+	lastbuf = 0xff;
+
+	// reset buffer partitions
+	for (i = 0; i < MAX_FILTERS; i++)
+	{
+		partitions[i].size = -1;
+		partitions[i].numblks = 0;
+
+		for (j = 0; j < MAX_BLOCKS; j++)
+		{
+			partitions[i].blocks[j] = (blockT *)nullptr;
+			partitions[i].bnum[j] = 0xff;
+		}
+	}
+
+	// reset blocks
+	for (i = 0; i < MAX_BLOCKS; i++)
+	{
+		blocks[i].size = -1;
+		memset(&blocks[i].data, 0, cdrom_file::MAX_SECTOR_DATA);
+	}
+
+	// open device
+	if (m_cdrom_image->exists())
+	{
+		LOG("Opened CD-ROM successfully, reading root directory\n");
+		read_new_dir(0xffffff);    // read root directory
+	}
+	else
+	{
+		cd_stat = CD_STAT_NODISC;
+	}
+
+	cd_speed = 2;
+	cdda_repeat_count = 0;
+	tray_is_closed = 1;
+
+	m_sector_timer->adjust(attotime::from_hz(150));   // 150 sectors / second = 300kBytes/second
+}
+
 
 device_memory_interface::space_config_vector stvcd_device::memory_space_config() const
 {
@@ -2034,73 +2141,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
 	{
 		cr_standard_return(cd_stat);
 	}
-}
-
-// global functions
-void stvcd_device::device_reset()
-{
-	int32_t i, j;
-
-	hirqmask = 0xffff;
-	hirqreg = 0xffff;
-	cr1 = 'C';
-	cr2 = ('D'<<8) | 'B';
-	cr3 = ('L'<<8) | 'O';
-	cr4 = ('C'<<8) | 'K';
-	cd_stat = CD_STAT_PAUSE;
-	cd_stat |= CD_STAT_PERI;
-	cur_track = 0xff;
-
-	curdir.clear();
-
-	xfertype = XFERTYPE_INVALID;
-	xfertype32 = XFERTYPE32_INVALID;
-
-	// reset flag vars
-	buffull = sectorstore = 0;
-
-	freeblocks = 200;
-
-	sectlenin = sectlenout = 2048;
-
-	lastbuf = 0xff;
-
-	// reset buffer partitions
-	for (i = 0; i < MAX_FILTERS; i++)
-	{
-		partitions[i].size = -1;
-		partitions[i].numblks = 0;
-
-		for (j = 0; j < MAX_BLOCKS; j++)
-		{
-			partitions[i].blocks[j] = (blockT *)nullptr;
-			partitions[i].bnum[j] = 0xff;
-		}
-	}
-
-	// reset blocks
-	for (i = 0; i < MAX_BLOCKS; i++)
-	{
-		blocks[i].size = -1;
-		memset(&blocks[i].data, 0, cdrom_file::MAX_SECTOR_DATA);
-	}
-
-	// open device
-	if (m_cdrom_image->exists())
-	{
-		LOG("Opened CD-ROM successfully, reading root directory\n");
-		read_new_dir(0xffffff);    // read root directory
-	}
-	else
-	{
-		cd_stat = CD_STAT_NODISC;
-	}
-
-	cd_speed = 2;
-	cdda_repeat_count = 0;
-	tray_is_closed = 1;
-
-	m_sector_timer->adjust(attotime::from_hz(150));   // 150 sectors / second = 300kBytes/second
 }
 
 stvcd_device::blockT *stvcd_device::cd_alloc_block(uint8_t *blknum)

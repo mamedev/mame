@@ -382,7 +382,7 @@ private:
 	u16 filter_2_a_r(offs_t offset);
 	u16 level_2_r(offs_t offset);
 	u16 filter_b_r(offs_t offset);
-	
+
 	void filter_1_a_w(offs_t offset, u16 data);
 	void level_1_w(offs_t offset, u16 data);
 	void filter_2_a_w(offs_t offset, u16 data);
@@ -422,7 +422,7 @@ private:
 	template<int sel> void vol_w(offs_t offset, u16 data);
 
 	static s32 volume_apply(s32 level, s32 sample);
-	
+
 	static s32 mixer_att(s32 sample, s32 att);
 
 	// Control registers
@@ -466,7 +466,7 @@ private:
 
 	void meg_reverb_map(address_map &map) ATTR_COLD;
 
-	
+
 	virtual u16 swp30d_const_r(u16 address) const override;
 	virtual u16 swp30d_offset_r(u16 address) const override;
 

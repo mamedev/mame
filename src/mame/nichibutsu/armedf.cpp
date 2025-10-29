@@ -317,7 +317,7 @@ Notes:
 #include "armedf.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/rescap.h"
 #include "sound/dac.h"
@@ -634,7 +634,7 @@ void bigfghtr_state::bigfghtr_mcu_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 }
 
-void bigfghtr_state::bigfghtr_mcu_io_map(address_map &map)
+void bigfghtr_state::bigfghtr_mcu_data_map(address_map &map)
 {
 	map(0x00000, 0x005ff).w(FUNC(bigfghtr_state::mcu_spritelist_w)); //Sprite RAM, guess shared as well
 	map(0x00600, 0x03fff).ram().share("sharedram");
@@ -1327,7 +1327,7 @@ void bigfghtr_state::bigfghtr(machine_config &config)
 
 	i8751_device &mcu(I8751(config, "mcu", XTAL(16'000'000)/2));   // verified
 	mcu.set_addrmap(AS_PROGRAM, &bigfghtr_state::bigfghtr_mcu_map);
-	mcu.set_addrmap(AS_IO, &bigfghtr_state::bigfghtr_mcu_io_map);
+	mcu.set_addrmap(AS_DATA, &bigfghtr_state::bigfghtr_mcu_data_map);
 	mcu.port_in_cb<1>().set_constant(0xdf); // bit 5: bus contention related?
 
 	video_config(config, 12, 8, 248);

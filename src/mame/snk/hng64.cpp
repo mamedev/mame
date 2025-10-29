@@ -2584,7 +2584,6 @@ void hng64_state::hng64(machine_config &config)
 	PALETTE(config, m_palette_fade1).set_format(palette_device::xRGB_888, 0x1000);
 	PALETTE(config, m_palette_3d).set_format(palette_device::xRGB_888, 0x1000 * 0x10);
 
-	hng64_audio(config);
 	hng64_network(config);
 
 	tmp87ph40an_device &iomcu(TMP87PH40AN(config, m_iomcu, 8_MHz_XTAL));
@@ -2624,6 +2623,7 @@ void hng64_state::hng64(machine_config &config)
 void hng64_state::hng64_default(machine_config &config)
 {
 	hng64(config);
+	hng64_audio(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps_out_cb<0>().set(FUNC(hng64_state::default_lamps_w<0>));
@@ -2639,6 +2639,7 @@ void hng64_state::hng64_default(machine_config &config)
 void hng64_state::hng64_drive(machine_config &config)
 {
 	hng64(config);
+	hng64_audio(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps_out_cb<5>().set(FUNC(hng64_state::drive_lamps5_w)); // force feedback steering
@@ -2649,6 +2650,7 @@ void hng64_state::hng64_drive(machine_config &config)
 void hng64_state::hng64_shoot(machine_config &config)
 {
 	hng64(config);
+	hng64_audio_bbust2(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::shoot_lamps6_w)); // start lamps (some missing?!)
@@ -2658,6 +2660,7 @@ void hng64_state::hng64_shoot(machine_config &config)
 void hng64_state::hng64_fight(machine_config &config)
 {
 	hng64(config);
+	hng64_audio(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::fight_lamps6_w)); // coin counters
@@ -3225,7 +3228,7 @@ GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hn
 
 /* Games */
 GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK",       "Roads Edge / Round Trip RV (rev.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )  /* 001 */
-GAME( 1998, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64 / Samurai Spirits / Paewang Jeonseol 64", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* 002 */
+GAME( 1997, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64 / Samurai Spirits / Paewang Jeonseol 64", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* 002 */
 GAME( 1998, xrally,   hng64, hng64_drive,   hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK",       "Xtreme Rally / Off Beat Racer!", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )  /* 003 */
 GAME( 1998, bbust2,   hng64, hng64_shoot,   hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK / ADK", "Beast Busters: Second Nightmare", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  /* 004 */ // ADK credited in the ending sequence
 GAME( 1998, sams64_2, hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* 005 */

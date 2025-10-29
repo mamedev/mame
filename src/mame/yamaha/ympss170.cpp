@@ -4,9 +4,11 @@
 #include "emu.h"
 #include "cpu/m6800/m6801.h"
 #include "sound/ymopl.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
-//#include "pss170.lh"
+#include "pss170.lh"
 
 namespace {
 
@@ -16,9 +18,9 @@ public:
 	yamaha_pss170_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_display(*this, "display")
 		, m_ym2413(*this, "opll")
 		, m_keys(*this, "P%u", 0U)
-		, m_instr_led(*this, "7seg")
 	{
 	}
 
@@ -29,53 +31,37 @@ protected:
 
 private:
 	u8 p4_r();
-	void p2_w(u8 data);
 
 	required_device<hd6301y0_cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
 	required_device<ym2413_device> m_ym2413;
 	required_ioport_array<14> m_keys;
-	output_finder<16> m_instr_led;
 
 	u8 m_p3 = 0, m_p5 = 0, m_p6 = 0;
-	u8 m_ledsel = 0;
 };
 
 void yamaha_pss170_state::machine_start()
 {
-	m_instr_led.resolve();
-
-	save_item(NAME(m_ledsel));
 	save_item(NAME(m_p3));
 	save_item(NAME(m_p5));
 	save_item(NAME(m_p6));
 }
 
-void yamaha_pss170_state::p2_w(u8 data)
-{
-	if(m_ledsel & 0x40)
-	{
-		for(int i = 0; i < 8; i++)
-			m_instr_led[i] = BIT(data, i);
-	}
-	if(m_ledsel & 0x80)
-	{
-		for(int i = 0; i < 8; i++)
-			m_instr_led[i + 8] = BIT(data, i);
-	}}
-
 u8 yamaha_pss170_state::p4_r()
 {
+	u8 data = 0xff;
+
 	for(int i = 0; i < 8; i++)
 	{
 		if(!(m_p5 & (1 << i)))
-			return m_keys[i]->read();
+			data &= m_keys[i]->read();
 	}
 	for(int i = 0; i < 6; i++)
 	{
 		if(!(m_p6 & (1 << i)))
-			return m_keys[i + 8]->read();
+			data &= m_keys[i + 8]->read();
 	}
-	return 0xff;
+	return data;
 }
 
 static INPUT_PORTS_START(pss170)
@@ -86,7 +72,7 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A 5")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G#5")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G 5")
-	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F#5")
@@ -95,7 +81,7 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D#5")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D 5")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C#5")
-	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C 5")
@@ -104,7 +90,7 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A 4")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G#4")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G 4")
-	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F#4")
@@ -113,7 +99,7 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D#4")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D 4")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C#4")
-	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C 4")
@@ -122,7 +108,7 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A 3")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G#3")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G 3")
-	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F#3")
@@ -131,7 +117,7 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D#3")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D 3")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C#3")
-	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C 3")
@@ -140,7 +126,7 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A 2")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G#2")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G 2")
-	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F#2")
@@ -149,7 +135,7 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D#2")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D 2")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C#2")
-	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C 2")
@@ -158,7 +144,7 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("AUTO BASS CHORD")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("AUTO CHORD")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("AUTO BASS")
-	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ACCOMP VOLUME MIN")
@@ -209,29 +195,31 @@ static INPUT_PORTS_START(pss170)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEMONSTRATION START/STOP")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STEREO SYMPHONIC")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-
 INPUT_PORTS_END
 
 void yamaha_pss170_state::pss170(machine_config &config)
 {
 	HD6301Y0(config, m_maincpu, 4_MHz_XTAL); // Yamaha XC194A0
 	m_maincpu->in_p4_cb().set(FUNC(yamaha_pss170_state::p4_r));
-	m_maincpu->out_p1_cb().set([this](u8 d){ m_ledsel = d; });
-	m_maincpu->out_p2_cb().set(FUNC(yamaha_pss170_state::p2_w));
+	m_maincpu->out_p1_cb().set([this](u8 d){ m_display->write_my(d >> 6); });
+	m_maincpu->out_p2_cb().set([this](u8 d){ m_display->write_mx(d ^ 0x80); });
 	m_maincpu->out_p3_cb().set([this](u8 d){ m_p3 = d; });
 	m_maincpu->out_p5_cb().set([this](u8 d){ m_p5 = d; });
 	m_maincpu->out_p6_cb().set([this](u8 d){ m_p6 = d; });
 	m_maincpu->out_p7_cb().set([this](u8 d){ if(!(d & 2)) m_ym2413->write(d & 1, m_p3); if(!(d & 0x10)) m_ym2413->reset(); });
 
+	PWM_DISPLAY(config, m_display).set_size(2, 8);
+	m_display->set_segmask(0x03, 0xff);
+
+	config.set_default_layout(layout_pss170);
+
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, m_ym2413, 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 3.00);
-
-	//config.set_default_layout(layout_pss170);
 }
 
 ROM_START(pss170)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("xc194a0.bin", 0x0000, 0x4000, CRC(b7601a8f) SHA1(b9c20b09d52d7df3e732fb8143807db082a33efd))
+	ROM_LOAD("xc194a0_31y0b61p.ic1", 0x0000, 0x4000, CRC(b7601a8f) SHA1(b9c20b09d52d7df3e732fb8143807db082a33efd))
 ROM_END
 
 } // anonymous namespace

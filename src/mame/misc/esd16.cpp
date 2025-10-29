@@ -1897,6 +1897,32 @@ ROM_START( tangtang )
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(00514989) SHA1(86cdca86ed48962e3bda13f9e6f8e573e176dec0) )
 ROM_END
 
+ROM_START( tangtanga )
+	ROM_REGION( 0x080000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "esd_2.cu02", 0x000000, 0x040000, CRC(3d244f6f) SHA1(1d30a62481bebe9b7d4a7671b08849dc2c0da609) )
+	ROM_LOAD16_BYTE( "esd_1.cu03", 0x000001, 0x040000, CRC(9e24a934) SHA1(07426f09642185dd08d5301927f9dc64824f8680) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(d48ecc5c) SHA1(5015dd775980542eb29a08bffe1a09ea87d56272) )
+
+	ROM_REGION( 0x180000, "spr", 0 )    // Sprites, 16x16x5
+	ROM_LOAD16_BYTE( "xju07.bin", 0x000000, 0x040000, CRC(556acac3) SHA1(10e919e63b434da80fb261db1d8967cb11e95e00) )
+	ROM_LOAD16_BYTE( "xju06.bin", 0x000001, 0x040000, CRC(01f59ff7) SHA1(a62a2d5c2d107f67fecfc08fdb5d801ee39c3875) )
+	ROM_LOAD16_BYTE( "xju05.bin", 0x080000, 0x040000, CRC(679302cf) SHA1(911c2f7e0e809ee28e4f2364788fd51d2bcef24e) )
+	ROM_LOAD16_BYTE( "xju04.bin", 0x080001, 0x040000, CRC(f999b9d7) SHA1(9e4d0e68cdc429c7563b8ad51c072d68ffed09dc) )
+	ROM_LOAD16_BYTE( "xju08.bin", 0x100000, 0x040000, CRC(ecc2d8c7) SHA1(1aabdf7204fcdff8d46cb50de8b097e3775dddf3) )
+
+	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
+	ROM_LOAD32_WORD( "fu35.bin", 0x000000, 0x200000, CRC(84f3f833) SHA1(f84e41d93dc47a58ada800b921a7e5902b7631cd) )
+	ROM_LOAD32_WORD( "fu34.bin", 0x000002, 0x200000, CRC(bf91f543) SHA1(7c149fed8b8044850cd6b798622a91c45336cd47) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(f2dfb02d) SHA1(04001488697aad3e5b2d15c9f5a81dc2b7d0952c) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(00514989) SHA1(86cdca86ed48962e3bda13f9e6f8e573e176dec0) )
+ROM_END
+
 /*
 
 SWAT Police (c) 2001 ESD
@@ -2192,7 +2218,8 @@ GAME( 2000, deluxe5a,    deluxe5,  tangtang,  hedpanic, esd16_state, empty_init,
 GAME( 2000, deluxe5b,    deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
 GAME( 2000, deluxe4u,    deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, tangtang,    0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tangtang,    0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000, set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tangtanga,   tangtang, tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000, set 2)",   MACHINE_SUPPORTS_SAVE )
 GAME( 2001, swatpolc,    0,        hedpanic,  swatpolc, esd16_state, empty_init, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )
 
 // Z Soft PCB, uses PIC instead of Z80

@@ -65,7 +65,6 @@ void screen_ula_device::draw_border(bitmap_rgb32 &bitmap, const rectangle &clipr
 		rectangle clip = { SCREEN_AREA.left() << 1, (SCREEN_AREA.right() << 1) | 1, SCREEN_AREA.top(), SCREEN_AREA.bottom() };
 		clip.offset(m_offset_h, m_offset_v);
 		clip &= cliprect;
-		clip.setx(clip.left() & ~1, clip.right() | 1);
 
 		if (!clip.empty())
 			bitmap.fill(palette().pen_color(UTM_FALLBACK_PEN), clip);
@@ -80,7 +79,6 @@ void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const 
 	rectangle clip = { m_ula_clip_x1 << 1, (m_ula_clip_x2 << 1) | 1, m_ula_clip_y1, m_ula_clip_y2 };
 	clip.offset(m_offset_h, m_offset_v);
 	clip &= cliprect;
-	clip.setx(clip.left() & ~1, clip.right() | 1);
 
 	if (!clip.empty())
 	{
@@ -100,14 +98,15 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
 	const u8 *screen_location = m_host_ram_ptr + ((m_ula_shadow_en ? 7 : 5) << 14) + (timex_alt ? 0x2000 : 0);
 
-	const u16 x_min = (((clip.left() - m_offset_h) >> 1) + m_ula_scroll_x) % SCREEN_AREA.width();
+	const u16 x2_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1)) % (SCREEN_AREA.width() << 1);
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		u16 hpos = clip.left();
 		u16 y = (vpos - m_offset_v + m_ula_scroll_y) % SCREEN_AREA.height();
-		u16 x = x_min;
-		const u8 *scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
-		const u8 *attr = hicolor ? &scr[0x2000] : &screen_location[0x1800 + (((y & 0xf8) << 2) | (x >> 3))];
+		u16 x2 = x2_min;
+		bool off2 = x2 & 1;
+		const u8 *scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | ((x2 >> 3) >> 1)];
+		const u8 *attr = hicolor ? &scr[0x2000] : &screen_location[0x1800 + (((y & 0xf8) << 2) | ((x2 >> 3) >> 1))];
 		u32 *pix = &(bitmap.pix(vpos, hpos));
 		u8 *prio = &(priority_bitmap.pix(vpos, hpos));
 		while (hpos <= clip.right())
@@ -117,19 +116,30 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 			const rgb_t ink = pi.second;
 
 			const u8 pix8 = (flash && (*attr & 0x80)) ? ~*scr : *scr;
-			for (u8 b = (0x80 >> (x & 7)); b && (hpos <= clip.right()); b >>= 1, ++x, hpos += 2, pix += 2, prio += 2)
+			for (u8 b = (0x80 >> ((x2 >> 1) & 7)); b && (hpos <= clip.right()); b >>= 1, x2 += 2, hpos += 2, pix += 2, prio += 2)
 			{
 				const rgb_t pen = (pix8 & b) ? ink : pap;
 				if ((pen != gt0) && (pen != gt1))
 				{
 					*pix = pen;
-					*(pix + 1) = pen;
-					*(prio) |= pcode;
-					*(prio + 1) |= pcode;
+					*prio |= pcode;
+					if (hpos < clip.right())
+					{
+						*(pix + 1) = pen;
+						*(prio + 1) |= pcode;
+					}
 				}
 			}
-			x %= SCREEN_AREA.width();
-			if (x == 0)
+			if (off2)
+			{
+				hpos -= 1;
+				pix -= 1;
+				prio -= 1;
+				x2 -= 1;
+				off2 = false;
+			}
+			x2 %= SCREEN_AREA.width() << 1;
+			if (x2 == 0)
 			{
 				scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5)];
 				attr = hicolor ? &scr[0x2000] : &screen_location[0x1800 + (((y & 0xf8) << 2))];

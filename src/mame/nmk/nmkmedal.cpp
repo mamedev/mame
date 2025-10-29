@@ -184,6 +184,9 @@ private:
 	void drail_mem_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 	void sweethrt_mem_map(address_map &map) ATTR_COLD;
+
+	void nmk112_oki0_map(address_map &map) ATTR_COLD;
+	void nmk112_oki1_map(address_map &map) ATTR_COLD;
 };
 
 class omatsuri_state : public nmkmedal_state
@@ -262,6 +265,17 @@ void omatsuri_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom().region("maincpu", 0);
 	map(0xd000, 0xefff).ram();
+}
+
+
+void hpierrot_state::nmk112_oki0_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki0_map));
+}
+
+void hpierrot_state::nmk112_oki1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki1_map));
 }
 
 
@@ -349,7 +363,10 @@ void hpierrot_state::drail(machine_config &config)
 	nmk112.set_rom0_tag("oki");
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+
+	okim6295_device &oki(OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)); // divider and pin not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.set_addrmap(0, &hpierrot_state::nmk112_oki0_map);
 }
 
 void hpierrot_state::sweethrt(machine_config &config)
@@ -362,9 +379,13 @@ void hpierrot_state::sweethrt(machine_config &config)
 	nmk112.set_rom1_tag("oki2");
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+	okim6295_device &oki1(OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)); // divider and pin not verified
+	oki1.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki1.set_addrmap(0, &hpierrot_state::nmk112_oki0_map);
 
-	OKIM6295(config, "oki2", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+	okim6295_device &oki2(OKIM6295(config, "oki2", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)); // divider and pin not verified
+	oki2.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki2.set_addrmap(0, &hpierrot_state::nmk112_oki1_map);
 }
 
 void omatsuri_state::omatsuri(machine_config &config)
@@ -384,8 +405,8 @@ ROM_START( drail ) // handwritten labels
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_dream rail v08c 2c0c v987275.u1", 0x00000, 0x10000, CRC(c14fae88) SHA1(f0478b563ac851372bc0b93772d89ab70ad61877) ) // 通ドリームレール V08C 2C0C V957220, 1xxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0xc0000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
-	ROM_LOAD( "2_dream rail pcm.u11", 0x40000, 0x80000, CRC(efdc1eea) SHA1(c39fed6f97b71556b468e0872a8240fe7b6495e6) ) // ドリームレールPCM
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "2_dream rail pcm.u11", 0x00000, 0x80000, CRC(efdc1eea) SHA1(c39fed6f97b71556b468e0872a8240fe7b6495e6) ) // ドリームレールPCM
 	// empty socket 3.u10
 ROM_END
 
@@ -394,8 +415,8 @@ ROM_START( sluster2 ) // same PCB as drail
 	ROM_LOAD( "slusterii_v987275.u1", 0x00000, 0x10000, CRC(5139ac8f) SHA1(90739006e8f76cda460ef59b9a9cca40800bb44f) ) // SラスターII V987275, 11xxxxxxxxxxxxxx = 0xFF
 
 
-	ROM_REGION( 0xc0000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
-	ROM_LOAD( "sluster2_2.u11", 0x40000, 0x80000, CRC(d8aa034c) SHA1(0082eec841c7278698a4a1ef4be3b2bb605d3582) ) // Sラスター2 ADPCM 2
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sluster2_2.u11", 0x00000, 0x80000, CRC(d8aa034c) SHA1(0082eec841c7278698a4a1ef4be3b2bb605d3582) ) // Sラスター2 ADPCM 2
 	// empty socket 3.u10
 ROM_END
 
@@ -427,13 +448,13 @@ ROM_START( sweethrt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sweethart-typeb-v96b290.u55", 0x00000, 0x10000, CRC(d5ccce6d) SHA1(ef4c1a19df0bcf7961dc8df0ebc7a1654f4a86ca) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x140000, "oki", 0 ) // NMK112 device expects the first 0x40000 bytes to be left empty.
-	ROM_LOAD( "sweethart-typeb-sound-2.u37", 0x40000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
-	ROM_LOAD( "sweethart-typeb-sound-3.u38", 0xc0000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "sweethart-typeb-sound-2.u37", 0x00000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
+	ROM_LOAD( "sweethart-typeb-sound-3.u38", 0x80000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x140000, "oki2", 0) // identical to the above
-	ROM_LOAD( "sweethart-typeb-sound-4.u18", 0x40000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
-	ROM_LOAD( "sweethart-typeb-sound-5.u19", 0xc0000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x100000, "oki2", 0)
+	ROM_LOAD( "sweethart-typeb-sound-4.u18", 0x00000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
+	ROM_LOAD( "sweethart-typeb-sound-5.u19", 0x80000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 ROM_START( omatsuri ) // seems to hit some unimplemented CPU regs
@@ -474,6 +495,8 @@ ROM_START( plpittashi ) // all ROM labels handwritten
 ROM_END
 
 // POW98200 main PCB + POW98202 ROM PCB with small label "9806 マノ" (9806 mano)
+// ザ・ラブジェネレーション
+// video reference: https://www.youtube.com/watch?v=sEYzAluGN_s
 ROM_START( pllovegene )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lovegene_1.1", 0x00000, 0x10000, CRC(d14701f2) SHA1(6d80db4b5fb04a1c9989adaa03db800768216730) ) // actual label "ラブ ジェネ 1"
@@ -496,4 +519,4 @@ GAME( 1998, plpittashi, 0,        omatsuri, trocana, omatsuri_state, empty_init,
 GAME( 1998, sluster2,   0,        drail,    trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Super Luster II",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, H10072,·V040P, V98727 strings
 GAME( 1999, omatsuri,   0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
 GAME( 1999, pldoraemon, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Doraemon (Power Link)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99204°, DORAMON (sic), STEPPING_PCB200_CAP75 strings
-GAME( 1999, pllovegene, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Generation (Power Link)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // LOVE GE NMK LTD MK LTD CHAN16± V98616
+GAME( 1999, pllovegene, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "The Love Generation (Power Link)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // LOVE GE NMK LTD MK LTD CHAN16± V98616

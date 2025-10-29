@@ -102,7 +102,6 @@ public:
 	void lupin3a(machine_config &config);
 	void indianbt(machine_config &config);
 	void starw1(machine_config &config);
-	void cosmo(machine_config &config);
 	void spcewars(machine_config &config);
 	void cosmicmo(machine_config &config);
 	void ballbomb(machine_config &config);
@@ -164,7 +163,6 @@ private:
 	void spcewars_sh_port_w(uint8_t data);
 	void lrescue_sh_port_1_w(uint8_t data);
 	void lrescue_sh_port_2_w(uint8_t data);
-	void cosmo_sh_port_2_w(uint8_t data);
 	void ballbomb_01_w(uint8_t data);
 	void ballbomb_sh_port_1_w(uint8_t data);
 	void ballbomb_sh_port_2_w(uint8_t data);
@@ -198,7 +196,6 @@ private:
 
 	void sflush_palette(palette_device &palette) const;
 
-	uint32_t screen_update_cosmo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_schaser(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_schasercv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sflush(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -221,8 +218,6 @@ private:
 	void attackfcu_io_map(address_map &map) ATTR_COLD;
 	void ballbomb_io_map(address_map &map) ATTR_COLD;
 	void cosmicmo_io_map(address_map &map) ATTR_COLD;
-	void cosmo_io_map(address_map &map) ATTR_COLD;
-	void cosmo_map(address_map &map) ATTR_COLD;
 	void crashrd_io_map(address_map &map) ATTR_COLD;
 	void escmars_map(address_map &map) ATTR_COLD;
 	void indianbt_io_map(address_map &map) ATTR_COLD;
@@ -454,6 +449,47 @@ private:
 	uint8_t m_port03 = 0;
 	uint8_t m_port05 = 0;
 	bool m_sound_enable = 0;
+};
+
+/*************************************/
+/* Cosmo                     */
+/*************************************/
+
+class cosmo_state : public _8080bw_state
+{
+public:
+	cosmo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		_8080bw_state(mconfig, type, tag)
+	{
+	}
+
+	void cosmo(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	static constexpr uint32_t STAR_RNG_PERIOD = ((1 << 17) - 1);
+	uint32_t m_rng_offs = 0;
+	uint8_t m_stars_sidescroll = 0;
+	uint8_t m_star_speed = 3;
+	uint8_t m_bright_star = 0;
+	uint8_t m_stars[STAR_RNG_PERIOD] {};
+	uint32_t m_star_rng_origin = 0;
+	uint32_t m_star_rng_origin_frame = 0;
+
+	void sh_port_2_w(uint8_t data);
+	uint8_t stars_r();
+	void stars_w(uint8_t data);
+	void palette_init(palette_device &palette) const ATTR_COLD;
+	void stars_init() ATTR_COLD;
+	void stars_update_origin();
+	void set_pixel(bitmap_rgb32 &bitmap, uint8_t y, uint32_t x, int color);
+	void set_8_pixels(bitmap_rgb32 &bitmap, uint8_t y, uint32_t x, uint8_t data, int fore_color, int back_color);
+	void stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs, uint8_t starmask);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 

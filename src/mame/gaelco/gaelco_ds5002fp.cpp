@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "gaelco_ds5002fp.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/ds5002fp.h"
 #include "machine/nvram.h"
 
 
@@ -42,7 +42,7 @@ void gaelco_ds5002fp_device::device_add_mconfig(machine_config &config)
 {
 	ds5002fp_device &mcu(DS5002FP(config, "mcu", DERIVED_CLOCK(1, 1)));
 	mcu.set_addrmap(AS_PROGRAM, &gaelco_ds5002fp_device::dallas_rom);
-	mcu.set_addrmap(AS_IO, &gaelco_ds5002fp_device::dallas_ram);
+	mcu.set_addrmap(AS_DATA, &gaelco_ds5002fp_device::dallas_ram);
 
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 }

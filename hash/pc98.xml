@@ -66754,19 +66754,6 @@ Crashes with a BASIC error when accessing house near starting point, incomplete 
 
 <!-- !Doujinshi -->
 
-	<!-- X68000 / PC-9801 hybrid -->
-	<software name="0x0f">
-		<description>0x0F exp.3</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="usage" value="Run PC98.BAT from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="0x0f_exp3.hdm" size="1261568" crc="5e51b3e3" sha1="df99f88c8202d39d3ab8f0ffa8205f89c91e8885" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="5galscon" supported="no">
 		<description>Five Gals Connection</description>
 		<year>19??</year>
@@ -66868,19 +66855,6 @@ Throws non-fatal HIMEM.SYS HMA error during boot (investigate)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="red_riding_hood.fdi" size="1265664" crc="f6bb8d19" sha1="027409e3a4a1b1927ca0da9079c053e316988ce5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Hybrid disk. Supports PC-9801, PC-88VA, FM Towns and X68000. -->
-	<software name="akazucc">
-		<description>Akazukin Cha Cha - CG Works ver 1.00</description>
-		<year>1994</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="usage" value="Run PC98.BAT from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="little_red_riding_hood_chacha_-_cg_works_ver1.hdm" size="1261568" crc="6062e4cf" sha1="910c826b387519601db369b8064e4eb488cdd00c" offset="0" />
 			</dataarea>
 		</part>
 	</software>

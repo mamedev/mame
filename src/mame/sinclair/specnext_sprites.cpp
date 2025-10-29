@@ -199,6 +199,34 @@ void specnext_sprites_device::update_config()
 	m_clip_window.offset(m_offset_h, m_offset_v);
 }
 
+u8 specnext_sprites_device::status_r()
+{
+	if (m_sprites_cache.empty()) update_sprites_cache();
+
+	bool max_sprites = 0; // TODO line reached max count allowed
+	bool collision = 0;
+	for (auto s1 = begin(m_sprites_cache); !collision && s1 != end(m_sprites_cache); ++s1)
+	{
+		const u16 x1 = s1->x & 0x1ff;
+		const u16 w1 = 16 << ((s1->rotate & 1) ? s1->yscale : s1->xscale);
+		const u16 y1 = s1->y & 0x1ff;
+		const u16 h1 = 16 << ((s1->rotate & 1) ? s1->xscale : s1->yscale);
+		for (auto s2 = s1 + 1; !collision && s2 != end(m_sprites_cache); ++s2)
+		{
+			const u16 x2 = s2->x & 0x1ff;
+			const u16 w2 = 16 << ((s2->rotate & 1) ? s2->yscale : s2->xscale);
+			const u16 y2 = s2->y & 0x1ff;
+			const u16 h2 = 16 << ((s2->rotate & 1) ? s2->xscale : s2->yscale);
+			bool c = (x1 < x2 + w2) && (x2 < x1 + w1) && (y1 < y2 + h2) && (y2 < y1 + h1);
+			if (c)
+				; // TODO detect if pixel(s) are not transparent
+			collision |= c;
+		}
+	}
+
+	return (max_sprites << 1) | collision;
+}
+
 void specnext_sprites_device::io_w(offs_t addr, u8 data)
 {
 	bool attr_num_change = 0;

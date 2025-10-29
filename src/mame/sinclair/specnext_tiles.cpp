@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 	if (BIT(m_control, 1))
 	{
 		code |= BIT(attr, 0) << 8;
-		category = BIT(m_control, 0) ? 1 : 2;
+		category = BIT(m_control, 0) ? 2 : 1;
 	}
 	else
 	{
@@ -110,7 +110,7 @@ void specnext_tiles_device::tilemap_update()
 	m_tiles_info = m_host_ram_ptr + ((BIT(m_tm_map_base, 6) ? 7 : 5) << 14) + ((m_tm_map_base & 0x3f) << 8);
 }
 
-void specnext_tiles_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode)
+void specnext_tiles_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode, u8 priority_mask)
 {
 	rectangle clip = rectangle{ m_clip_x1 << 1, (m_clip_x2 << 1) | 1, m_clip_y1, m_clip_y2 };
 	clip &= SCREEN_AREA;
@@ -119,7 +119,7 @@ void specnext_tiles_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, co
 	clip &= cliprect;
 
 	if (!clip.empty())
-		m_tilemap[BIT(m_control, 6)]->draw(screen, bitmap, clip, flags, pcode);
+		m_tilemap[BIT(m_control, 6)]->draw(screen, bitmap, clip, flags, pcode, priority_mask);
 }
 
 void specnext_tiles_device::device_add_mconfig(machine_config &config)

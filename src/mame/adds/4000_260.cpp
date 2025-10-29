@@ -27,7 +27,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -277,7 +277,7 @@ void _4000_260_state::_4000_260(machine_config &config)
 {
 	I80C32(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_4000_260_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &_4000_260_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &_4000_260_state::ext_map);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 

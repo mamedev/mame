@@ -81,7 +81,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/ymopn.h"
@@ -162,7 +162,7 @@ private:
 
 	void base_sound_map(address_map &map) ATTR_COLD;
 	void chelnovjbl_mcu_map(address_map &map) ATTR_COLD;
-	void chelnovjbl_mcu_io_map(address_map &map) ATTR_COLD;
+	void chelnovjbl_mcu_data_map(address_map &map) ATTR_COLD;
 	void karnov_map(address_map &map) ATTR_COLD;
 	void karnovjbl_map(address_map &map) ATTR_COLD;
 	void karnov_sound_map(address_map &map) ATTR_COLD;
@@ -267,7 +267,7 @@ void karnov_state::chelnovjbl_mcu_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 }
 
-void karnov_state::chelnovjbl_mcu_io_map(address_map &map)
+void karnov_state::chelnovjbl_mcu_data_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(FUNC(karnov_state::mcu_data_l_r), FUNC(karnov_state::mcu_data_l_w));
@@ -835,7 +835,7 @@ void karnov_state::chelnovjbl(machine_config &config)
 
 	I8031(config, m_mcu, 8_MHz_XTAL); // info below states 8MHz for MCU
 	m_mcu->set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
-	m_mcu->set_addrmap(AS_IO, &karnov_state::chelnovjbl_mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &karnov_state::chelnovjbl_mcu_data_map);
 	m_mcu->port_out_cb<1>().set(FUNC(karnov_state::mcubl_p1_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
 }

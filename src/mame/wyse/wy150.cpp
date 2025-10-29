@@ -14,7 +14,7 @@
 ************************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/nvram.h"
 #include "screen.h"
 
@@ -76,7 +76,7 @@ void wy150_state::wy150(machine_config &config)
 {
 	i80c32_device &maincpu(I80C32(config, "maincpu", 11_MHz_XTAL)); // Philips P80C32SBPN (e.g.)
 	maincpu.set_addrmap(AS_PROGRAM, &wy150_state::prog_map);
-	maincpu.set_addrmap(AS_IO, &wy150_state::ext_map);
+	maincpu.set_addrmap(AS_DATA, &wy150_state::ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 8464 or 5564 or similar (e.g. Winbond W2465-70LL) + battery
 
