@@ -39,7 +39,6 @@ Ra's Scepter        YES
 Hawaii              YES
 
 Notes:
-* Is "Hawaii" the same game as "Treasure Hunting"? No
 * The dslayrr sets appear to be pre-setup, have passwords set(?)
 * Game information in the rom entries comes from `AstroGame/data/setup2.txt` or `AstroGame/INF.ini`
 

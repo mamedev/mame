@@ -1727,7 +1727,8 @@ void apple2e_state::cec_lcrom_update()
 // most softswitches don't care about read vs write, so handle them here
 void apple2e_state::do_io(int offset)
 {
-	if(machine().side_effects_disabled()) return;
+	if (machine().side_effects_disabled())
+		return;
 
 	// Handle C058-C05F according to IOUDIS
 	if ((offset & 0xf8) == 0x58)
@@ -1978,7 +1979,6 @@ void apple2e_state::do_io(int offset)
 
 u8 apple2e_state::c000_r(offs_t offset)
 {
-	if(machine().side_effects_disabled()) return read_floatingbus();
 	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
@@ -1990,8 +1990,9 @@ u8 apple2e_state::c000_r(offs_t offset)
 	{
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
-				u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-				m_strobe = 0;
+				const u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+				if (!machine().side_effects_disabled())
+					m_strobe = 0;
 				return rv;
 			}
 
@@ -2042,17 +2043,18 @@ u8 apple2e_state::c000_r(offs_t offset)
 
 		case 0x26:  // Ace 2x00 DIP switches
 			if (m_isace2200)
-			{
 				return (m_sysconfig->read() & 0x80) | uFloatingBus7;
-			}
 			break;
 
 		case 0x27: // Ace 2x00 F key strobe
 			if (m_isace2200)
 			{
-				m_strobe = 0;
 				const u8 rv = m_franklin_strobe;
-				m_franklin_strobe = 0x80;
+				if (!machine().side_effects_disabled())
+				{
+					m_strobe = 0;
+					m_franklin_strobe = 0x80;
+				}
 				return rv;
 			}
 			break;
@@ -2079,22 +2081,26 @@ u8 apple2e_state::c000_r(offs_t offset)
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x65:  // joy 1 Y axis
 		case 0x6d:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x66: // joy 2 X axis
 		case 0x6e:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // joy 2 Y axis
 		case 0x6f:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		// Apple IIe Technical Reference (1985/1987) lists RDIOUDIS and RDDHIRES,
@@ -2131,8 +2137,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 
 u8 apple2e_state::c000_iic_r(offs_t offset)
 {
-	if(machine().side_effects_disabled()) return read_floatingbus();
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	switch (offset)
 	{
@@ -2168,12 +2173,14 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 
 		case 0x66: // mouse X1 (IIc only)
 		case 0x6e:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return (m_x1 ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // mouse Y1 (IIc only)
 		case 0x6f:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
@@ -2190,7 +2197,7 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 
 u8 apple2e_state::c000_laser_r(offs_t offset)
 {
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	switch (offset)
 	{

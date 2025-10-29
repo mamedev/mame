@@ -26,7 +26,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD { m_data = 0; };
+	virtual void device_reset() override ATTR_COLD { m_data = 0; }
 
 	virtual uint16_t io_r() override;
 	virtual void io_w(uint16_t data, bool word) override;
@@ -76,4 +76,4 @@ void bk_loopback_device::io_w(uint16_t data, bool word)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(BK_LOOPBACK, device_qbus_card_interface, bk_loopback_device, "bk_loopback", "BK Loopback")
+DEFINE_DEVICE_TYPE_PRIVATE(BK_LOOPBACK, device_bk_parallel_interface, bk_loopback_device, "bk_loopback", "BK Loopback")

@@ -233,10 +233,10 @@ void cointek_state::program_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().w(FUNC(cointek_state::attrram_w)).share(m_attrram);
 	map(0xd800, 0xefff).view(m_gfxview);
 	m_gfxview[0](0xd800, 0xdfff).ram().w(FUNC(cointek_state::reel_attrram_w<0>)).share(m_reel_attrram[0]);
-	m_gfxview[1](0xd800, 0xdfff).ram().w(FUNC(cointek_state::reel_tileram_w<0>)).share(m_reel_tileram[0]);
 	m_gfxview[0](0xe000, 0xe7ff).ram().w(FUNC(cointek_state::reel_attrram_w<1>)).share(m_reel_attrram[1]);
-	m_gfxview[1](0xe000, 0xe7ff).ram().w(FUNC(cointek_state::reel_tileram_w<1>)).share(m_reel_tileram[1]);
 	m_gfxview[0](0xe800, 0xefff).ram().w(FUNC(cointek_state::reel_attrram_w<2>)).share(m_reel_attrram[2]);
+	m_gfxview[1](0xd800, 0xdfff).ram().w(FUNC(cointek_state::reel_tileram_w<0>)).share(m_reel_tileram[0]);
+	m_gfxview[1](0xe000, 0xe7ff).ram().w(FUNC(cointek_state::reel_tileram_w<1>)).share(m_reel_tileram[1]);
 	m_gfxview[1](0xe800, 0xefff).ram().w(FUNC(cointek_state::reel_tileram_w<2>)).share(m_reel_tileram[2]);
 	map(0xf040, 0xf07f).ram().share(m_reel_scrollram[0]);
 	map(0xf080, 0xf0bf).ram().share(m_reel_scrollram[1]);

@@ -14,6 +14,6 @@
 #include "parallel.h"
 
 
-DECLARE_DEVICE_TYPE(BK_AY, device_qbus_card_interface)
+DECLARE_DEVICE_TYPE(BK_AY, device_bk_parallel_interface)
 
 #endif
