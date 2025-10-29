@@ -339,90 +339,150 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 	</element>
 
 	<element name="str_flags_t">
-		<text string="TRANSBORDO"><color red="0" green="0" blue="0" /></text>
+		<text string="T R A N S B O R D O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_flags_v">
 		<text string="VAI - UM"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_ula">
-		<text string="UNIDADE ARITMÉTICA E LÓGICA" ><color red="0" green="0" blue="0" /></text>
+		<text string="U  N  I  D  A  D  E">
+			<bounds x="0" y="0" width="163" height="15"></bounds><color red="0" green="0" blue="0" />
+		</text>
+		<text string="A R I T M É T I C A   E   L Ó G I C A">
+			<bounds x="0" y="16" width="165" height="16"></bounds><color red="0" green="0" blue="0" />
+		</text>
 	</element>
-
 	<element name="str_rc">
-		<text string="DADOS DO PAINEL"><color red="0" green="0" blue="0" /></text>
+		<text string="D  A  D  O  S         D  O         P  A  I  N  E  L"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_pc">
-		<text string="ENDEREÇO DE INSTRUÇÃO"><color red="0" green="0" blue="0" /></text>
+		<text string="E  N  D  E  R  E  Ç  O     D  E     I  N  S  T  R  U  Ç  Ã  O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_mem_addr">
-		<text string="ENDEREÇO DA MEMÓRIA"><color red="0" green="0" blue="0" /></text>
+		<text string="E  N  D  E  R  E  Ç  O        N  A        M  E  M  Ó  R  I  A"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_acc">
-		<text string="ACUMULADOR"><color red="0" green="0" blue="0" /></text>
+		<text string="A  C  U  M  U  L  A  D  O  R"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_opcode">
-		<text string="CÓDIGO DE INSTRUÇÃO"><color red="0" green="0" blue="0" /></text>
+		<text string="C Ó D I G O   D E   I N S T R U Ç Ã O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_mem_data">
-		<text string="DADOS DA MEMÓRIA"><color red="0" green="0" blue="0" /></text>
+		<text string="D A D O S     D A    M E M Ó R I A"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_mem">
 		<text string="MEMÓRIA"><color red="0" green="0" blue="0" /></text>
 	</element>
 
-
 	<element name="str_NORMAL">
-		<text string="NORMAL"><color red="0" green="0" blue="0" /></text>
+		<text string="N O R M A L"><color red="0" green="0" blue="0" /></text>
 	</element>
-
-
 	<element name="str_CICLOUNICO">
-		<text string="CICLO ÚNICO">
-			<color red="0" green="0" blue="0" /></text>
+		<text string="C I C L O  Ú N I C O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_INSTRUCAOUNICA">
-		<text string="INSTRUÇÃO ÚNICA">
-			<color red="0" green="0" blue="0" /></text>
+		<text string="I N S T R U Ç Ã O">
+			<bounds x="0" y="0" width="68" height="12"></bounds><color red="0" green="0" blue="0" />
+		</text>
+		<text string="Ú N I C A">
+			<bounds x="0" y="13" width="68" height="12"></bounds><color red="0" green="0" blue="0" />
+		</text>
 	</element>
-
 	<element name="str_ENDERECAMENTO">
 		<text string="ENDEREÇAMENTO"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_ARMAZENAMENTO">
 		<text string="ARMAZENAMENTO"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_EXPOSICAO">
-		<text string="EXPOSIÇÃO"><color red="0" green="0" blue="0" /></text>
+		<text string="E X P O S I Ç Ã O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
-
-
 	<element name="str_ESPERA">
-		<text string="ESPERA"><color red="0" green="0" blue="0" /></text>
+		<text string="E S P E R A"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_INTERRUPCAO">
 		<text string="INTERRUPÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_PARTIDA">
-		<text string="PARTIDA"><color red="0" green="0" blue="0" /></text>
+		<text string="P A R T I D A"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_PREPARACAO">
 		<text string="PREPARAÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
+
+	<element name="str_OCTAL"><text string="OCTAL"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_HEXADECIMAL"><text string="HEXADECIMAL"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_HEXAD"><text string="HEXAD"><color red="0" green="0" blue="0" /></text></element>
+
+	<element name="str_entrada_dados">
+		<text string="E N T R A D A     M A N U A L     D E     D A D O S"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="str_fases_operacao">
+		<text string="F  A  S  E  S    D  E    O  P  E  R  A  Ç  Ã  O"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="str_modo_operacao">
+		<text string="M O D O   D E   O P E R A Ç Ã O"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="str_memoria"><text string="M E M Ó R I A"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_comando"><text string="C O M A N D O"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_enderecamento_spaces"><text string="E N D E R E Ç A M E N T O"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_memoria_spaces"><text string="M   E   M   Ó   R   I   A"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_entrada_saida">
+		<text string="E N T R A D A">
+			<bounds x="0" y="0" width="48" height="18"></bounds><color red="0" green="0" blue="0" />
+		</text>
+		<text string="E">
+			<bounds x="0" y="20" width="48" height="18"></bounds><color red="0" green="0" blue="0" />
+		</text>
+		<text string="S A Í D A">
+			<bounds x="0" y="40" width="48" height="18"></bounds><color red="0" green="0" blue="0" />
+		</text>
+	</element>
+
+	<element name="str_busca"><text string="B U S C A"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_execucao"><text string="E X E C U Ç Ã O"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_indexacao"><text string="INDEXAÇÃO"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_indireto"><text string="I N D I R E T O"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_parado"><text string="PARADO"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_externo"><text string="EXTERNO"><color red="0" green="0" blue="0"/></text></element>
+
+	<element name="str_fixo"><text string="F I X O"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_sequencial"><text string="SEQÜENCIAL"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_liberada"><text string="LIBERADA"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_protegida"><text string="PROTEGIDA"><color red="0" green="0" blue="0"/></text></element>
+
+	<!-- numeros 0-9 -->
+	<repeat count="10">
+		<param name="i" start="0" increment="1"/>
+		<element name="str_num_~i~">
+			<!-- text background -->
+			<rect>
+				<color red="0.47" green="0.64" blue="0.51" />
+				<bounds x="0" y="0" width="18" height="16"/>
+			</rect>
+			<!-- text value -->
+			<text string="~i~">
+				<color red="0" green="0" blue="0"/>
+				<bounds x="0" y="0" width="18" height="16"/>
+			</text>
+		</element>
+	</repeat>
+	<!-- numeros 10-11 -->
+	<repeat count="2">
+		<param name="i" start="10" increment="1"/>
+		<element name="str_num_~i~">
+			<!-- text background -->
+			<rect>
+				<color red="0.47" green="0.64" blue="0.51" />
+				<bounds x="0" y="0" width="18" height="16"/>
+			</rect>
+			<!-- text value -->
+			<text string="~i~">
+				<color red="0" green="0" blue="0"/>
+				<bounds x="4" y="0" width="14" height="16"/>
+			</text>
+		</element>
+	</repeat>
 
 <!-- define background -->
 
@@ -439,6 +499,8 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		</element>
 
 		<!-- define lamps -->
+
+		<!-- ENDEREÇO NA MEMÓRIA -->
 		<repeat count="12">
 			<param name="lamp_x" start="762" increment="28"/>
 			<param name="lamp_id" start="11" increment="-1"/>
@@ -448,10 +510,9 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			</element>
 		</repeat>
 
-		<element ref="str_mem_addr">
-			<bounds x="840" y="121" width="195" height="18" />
-		</element>
+		<element ref="str_mem_addr"><bounds x="782" y="121" width="290" height="16" /></element>
 
+		<!-- ENDEREÇO DE INSTRUÇÃO -->
 		<repeat count="12">
 			<param name="lamp_x" start="762" increment="28"/>
 			<param name="lamp_id" start="11" increment="-1"/>
@@ -461,26 +522,26 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			</element>
 		</repeat>
 
-		<element ref="str_pc">
-			<bounds x="823" y="237" width="214" height="18" />
-		</element>
+		<element ref="str_pc"><bounds x="779" y="235" width="300" height="16" /></element>
 
+		<!-- transbordo -->
 		<element name="flags1" ref="bit_lamp" inputtag="FLAGS" inputmask="0x002">
 			<bounds x="765" y="272" width="11" height="11" />
 		</element>
 
-		<element ref="str_flags_t">
-			<bounds x="722" y="301" width="106" height="18" />
-		</element>
+		<element ref="str_flags_t"><bounds x="722" y="297" width="101" height="15" /></element>
 
+		<!-- vai-um -->
 		<element name="flags0" ref="bit_lamp" inputtag="FLAGS" inputmask="0x001">
 			<bounds x="1069" y="272" width="11" height="11" />
 		</element>
 
-		<element ref="str_flags_v">
-			<bounds x="1052" y="301" width="57" height="18" />
-		</element>
+		<element ref="str_flags_v"><bounds x="1052" y="297" width="57" height="16" /></element>
 
+		<!-- ula -->
+		<element ref="str_ula"><bounds x="830" y="390" width="165" height="30" /></element>
+
+		<!-- DADOS DO PAINEL -->
 		<repeat count="12">
 			<param name="lamp_x" start="762" increment="28"/>
 			<param name="lamp_id" start="11" increment="-1"/>
@@ -490,10 +551,9 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			</element>
 		</repeat>
 
-		<element ref="str_rc">
-			<bounds x="830" y="529" width="215" height="18" />
-		</element>
+		<element ref="str_rc"><bounds x="805" y="527" width="240" height="16" /></element>
 
+		<!-- ACUMULADOR -->
 		<repeat count="8">
 			<param name="lamp_x" start="233" increment="28"/>
 			<param name="lamp_id" start="7" increment="-1"/>
@@ -503,10 +563,9 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			</element>
 		</repeat>
 
-		<element ref="str_acc">
-			<bounds x="273" y="239" width="140" height="18" />
-		</element>
+		<element ref="str_acc"><bounds x="266" y="237" width="140" height="16" /></element>
 
+		<!-- CÓDIGO DE INSTRUÇÃO -->
 		<repeat count="8">
 			<param name="lamp_x" start="233" increment="28"/>
 			<param name="lamp_id" start="7" increment="-1"/>
@@ -516,10 +575,9 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			</element>
 		</repeat>
 
-		<element ref="str_opcode">
-			<bounds x="251" y="356" width="193" height="18" />
-		</element>
+		<element ref="str_opcode"><bounds x="239" y="356" width="200" height="16" /></element>
 
+		<!-- DADOS DA MEMÓRIA -->
 		<repeat count="8">
 			<param name="lamp_x" start="233" increment="28"/>
 			<param name="lamp_id" start="7" increment="-1"/>
@@ -529,9 +587,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			</element>
 		</repeat>
 
-		<element ref="str_mem_data">
-			<bounds x="242" y="476" width="216" height="18" />
-		</element>
+		<element ref="str_mem_data"><bounds x="248" y="476" width="176" height="16" /></element>
 
 		<!-- define horizontal lines -->
 		<element ref="line">
@@ -978,7 +1034,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="93" y="994" width="42" height="42" />
 		</element>
 		<element ref="str_NORMAL">
-			<bounds x="90" y="963" width="60" height="18" />
+			<bounds x="83" y="960" width="70" height="16" />
 		</element>
 
 		<!-- CICLOUNICO -->
@@ -986,7 +1042,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="200" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_CICLOUNICO">
-			<bounds x="185" y="963" width="72" height="18" />
+			<bounds x="184" y="961" width="78" height="11" />
 		</element>
 
 		<!-- INSTRUCAOUNICA -->
@@ -994,7 +1050,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="310" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_INSTRUCAOUNICA">
-			<bounds x="294" y="961" width="68" height="22" />
+			<bounds x="293" y="960" width="70" height="22" />
 		</element>
 
 		<!-- ENDERECAMENTO -->
@@ -1002,7 +1058,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="413" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_ENDERECAMENTO">
-			<bounds x="397" y="963" width="70" height="18" />
+			<bounds x="393" y="960" width="78" height="16" />
 		</element>
 
 		<!-- ARMAZENAMENTO -->
@@ -1010,7 +1066,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="520" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_ARMAZENAMENTO">
-			<bounds x="501" y="963" width="72" height="18" />
+			<bounds x="497" y="960" width="79" height="16" />
 		</element>
 
 		<!-- EXPOSICAO -->
@@ -1018,35 +1074,39 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="626" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_EXPOSICAO">
-			<bounds x="614" y="963" width="68" height="18" />
+			<bounds x="603" y="960" width="78" height="13" />
 		</element>
 
+		<!-- ESPERA -->
 		<element name="ESPERA" ref="button" inputtag="BUTTONS" inputmask="0x040">
 			<bounds x="915" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_ESPERA">
-			<bounds x="912" y="963" width="58" height="18" />
+			<bounds x="907" y="960" width="64" height="16" />
 		</element>
 
+		<!-- INTERRUPCAO -->
 		<element name="INTERRUPCAO" ref="button" inputtag="BUTTONS" inputmask="0x080">
 			<bounds x="1022" y="994" width="42" height="42"  />
 		</element>
 		<element ref="str_INTERRUPCAO">
-			<bounds x="1005" y="963" width="74" height="18" />
+			<bounds x="1004" y="960" width="76" height="14" />
 		</element>
 
+		<!-- PARTIDA -->
 		<element name="PARTIDA" ref="sqr_button" inputtag="BUTTONS" inputmask="0x100">
 			<bounds x="1120" y="992" width="56" height="46"  />
 		</element>
 		<element ref="str_PARTIDA">
-			<bounds x="1119" y="962" width="66" height="20" />
+			<bounds x="1114" y="960" width="67" height="16" />
 		</element>
 
+		<!-- PREPARACAO -->
 		<element name="PREPARACAO" ref="button" inputtag="BUTTONS" inputmask="0x200">
 			<bounds x="1128" y="1092" width="42" height="42"  />
 		</element>
 		<element ref="str_PREPARACAO">
-			<bounds x="1114" y="1154" width="68" height="18" />
+			<bounds x="1114" y="1152" width="70" height="16" />
 		</element>
 
 		<!-- define circles -->
@@ -1220,11 +1280,26 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 
 		<!-- 'FASES DE OPERACAO' lamps -->
 		<repeat count="5">
+			<param name="i" start="1" increment="1"/>
+			<param name="x" start="108" increment="89"/>
+			<element ref="str_num_~i~"><bounds x="~x~" y="626" width="18" height="16"/></element>
+		</repeat> <!-- labels -->
+		<repeat count="5">
 			<param name="lamp_x" start="98" increment="89"/>
 			<element ref="state_lamp">
 				<bounds x="~lamp_x~" y="651" width="36" height="36" />
 			</element>
-		</repeat>
+		</repeat> <!-- lamps -->
+
+		<element ref="str_num_6"><bounds x="197" y="717" width="18" height="16"/></element>
+		<element ref="state_lamp">
+			<bounds x="187" y="742" width="36" height="36" />
+		</element>
+
+		<element ref="str_num_7"><bounds x="374" y="717" width="18" height="16"/></element>
+		<element ref="state_lamp">
+			<bounds x="364" y="742" width="36" height="36" />
+		</element>
 
 		<element ref="state_lamp">
 			<bounds x="579" y="651" width="36" height="36" />
@@ -1233,12 +1308,61 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="688" y="651" width="36" height="36" />
 		</element>
 
-		<element ref="state_lamp">
-			<bounds x="187" y="742" width="36" height="36" />
-		</element>
-		<element ref="state_lamp">
-			<bounds x="364" y="742" width="36" height="36" />
-		</element>
+		<!-- texts -->
+		<element ref="str_entrada_dados"><bounds x="476" y="872" width="321" height="17"/></element>
+		<element ref="str_fases_operacao"><bounds x="176" y="561" width="240" height="16"/></element>
+		<element ref="str_modo_operacao"><bounds x="290" y="1049" width="185" height="16"/></element>
+		<element ref="str_memoria"><bounds x="499" y="931" width="75" height="16"/></element>
+		<element ref="str_comando"><bounds x="1003" y="1050" width="80" height="16"/></element>
+
+		<element ref="str_enderecamento_spaces"><bounds x="809" y="711" width="136" height="16"/></element>
+		<element ref="str_memoria"><bounds x="1070" y="711" width="80" height="16"/></element>
+
+		<element ref="str_memoria_spaces"><bounds x="284" y="154" width="115" height="16"/></element>
+
+		<repeat count="12">
+			<param name="i" start="0" increment="1"/>
+			<param name="x" start="157" increment="85"/>
+			<element ref="str_num_~i~"><bounds x="~x~" y="780" width="18" height="16"/></element>
+		</repeat>
+
+		<element ref="str_OCTAL"><bounds x="129" y="774" width="32" height="12"/></element>
+		<element ref="str_HEXADECIMAL"><bounds x="129" y="892" width="64" height="12"/></element>
+
+		<repeat count="3">
+			<param name="y1" start="169" increment="120"/>
+			<param name="y2" start="215" increment="120"/>
+
+			<element ref="str_OCTAL"><bounds x="228" y="~y1~" width="32" height="12"/></element>
+			<element ref="str_HEXAD"><bounds x="228" y="~y2~" width="32" height="12"/></element>
+		</repeat>
+
+		<repeat count="2">
+			<param name="y1" start="50" increment="115"/>
+			<param name="y2" start="96" increment="120"/>
+
+			<element ref="str_OCTAL"><bounds x="755" y="~y1~" width="32" height="12"/></element>
+			<element ref="str_HEXAD"><bounds x="755" y="~y2~" width="32" height="12"/></element>
+		</repeat>
+		<element ref="str_OCTAL"><bounds x="755" y="456" width="32" height="12"/></element>
+		<element ref="str_HEXAD"><bounds x="755" y="505" width="32" height="12"/></element>
+
+		<element ref="str_entrada_saida"><bounds x="137" y="222" width="48" height="36"/></element>
+
+		<!-- fases de operação -->
+		<element ref="str_busca"><bounds x="136" y="610" width="55" height="16"/></element>
+		<element ref="str_execucao"><bounds x="297" y="610" width="85" height="16"/></element>
+		<element ref="str_indexacao"><bounds x="440" y="610" width="69" height="16"/></element>
+		<element ref="str_indireto"><bounds x="255" y="698" width="80" height="16"/></element>
+
+		<element ref="str_parado"><bounds x="574" y="625" width="46" height="16"/></element>
+		<element ref="str_externo"><bounds x="682" y="625" width="50" height="16"/></element>
+
+		<!-- switches -->
+		<element ref="str_fixo"><bounds x="795" y="615" width="40" height="16"/></element>
+		<element ref="str_sequencial"><bounds x="913" y="615" width="72" height="16"/></element>
+		<element ref="str_liberada"><bounds x="1012" y="615" width="56" height="16"/></element>
+		<element ref="str_protegida"><bounds x="1146" y="615" width="68" height="16"/></element>
 
 	</view>
 </mamelayout>
