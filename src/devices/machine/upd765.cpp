@@ -3292,12 +3292,15 @@ void upd72067_device::auxcmd_w(uint8_t data)
 
 void upd72069_device::auxcmd_w(uint8_t data)
 {
+	// 72068 has all but two of the following auxiliary commands
 	switch(data) {
-	case 0x36: // reset
+	case 0x36: // software reset
 		soft_reset();
 		break;
-	case 0x0e:
-	case 0x1e: // motor on, probably
+	case 0x0e: case 0x1e: case 0x2e: case 0x3e: // enable motors
+	case 0x4e: case 0x5e: case 0x6e: case 0x7e:
+	case 0x8e: case 0x9e: case 0xae: case 0xbe:
+	case 0xce: case 0xde: case 0xee: case 0xfe:
 		for(unsigned i = 0; i < 4; i++)
 			if(flopi[i].dev)
 				flopi[i].dev->mon_w(!BIT(data, i + 4));
@@ -3305,17 +3308,43 @@ void upd72069_device::auxcmd_w(uint8_t data)
 		result[0] = ST0_UNK;
 		result_pos = 1;
 		break;
-	case 0x1b: // this is a guess based on the mpc3000, it might really be 98/88
-	case 0x5b:
-		cur_rate = data == 0x5b ? 500000 : 250000;
+	case 0x0b: case 0x1b: case 0x2b: case 0x3b: // control internal mode
+	case 0x4b: case 0x5b: case 0x6b: case 0x7b:
+	case 0x8b: case 0x9b: case 0xab: case 0xbb:
+	case 0xcb: case 0xdb: case 0xeb: case 0xfb:
+		switch(data & 0xc0)
+		{
+		case 0x00: cur_rate = 250000; break;
+		case 0x40: cur_rate = 500000; break;
+		case 0x80: cur_rate = 600000; break;
+		case 0xc0: cur_rate = 300000; break;
+		}
 		main_phase = PHASE_RESULT;
 		result[0] = ST0_UNK;
 		result_pos = 1;
 		break;
-	case 0x98:
-	case 0x88:
-	case 0x4f:
-	case 0xd3: // unknown
+	case 0x88: case 0x98: case 0xa8: case 0xb8: // control data transfer rate (72069 exclusive)
+	case 0xc8: case 0xd8: case 0xe8: case 0xf8:
+		switch(data & 0x70)
+		{
+		case 0x00: cur_rate = 250000; break;
+		case 0x10: case 0x40: cur_rate = 500000; break;
+		case 0x20: case 0x70: cur_rate = 600000; break;
+		case 0x30: cur_rate = 300000; break;
+		case 0x50: cur_rate = 1000000; break;
+		case 0x60: cur_rate = 1250000; break;
+		}
+		main_phase = PHASE_RESULT;
+		result[0] = ST0_UNK;
+		result_pos = 1;
+		break;
+	case 0xc3: case 0xd3: case 0xe3: case 0xf3: // precompensation (72069 exclusive)
+	case 0x4f: // select IBM format (select 77 tracks on some other 7206x variants)
+	case 0x5f: // select ECMA/ISO format (select 255 tracks on some other 7206x variants)
+	case 0x35: // set standby
+	case 0x47: // start clock
+	case 0x34: // reset standby
+	case 0x33: // enable external mode
 		main_phase = PHASE_RESULT;
 		result[0] = ST0_UNK;
 		result_pos = 1;

@@ -65,10 +65,10 @@ public:
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
-	virtual void z80daisy_irq_reti() override {};
+	virtual void z80daisy_irq_reti() override {}
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -88,10 +88,8 @@ protected:
 	static constexpr uint16_t EMTCSR_WR      = CSR_IE;
 
 private:
-	std::unique_ptr<uint16_t[]> m_videoram_base;
-	std::unique_ptr<uint8_t[]> m_textram_base, m_chargen_base;
-	uint16_t *m_videoram;
-	uint8_t *m_textram, *m_chargen;
+	std::unique_ptr<uint16_t[]> m_videoram;
+	std::unique_ptr<uint8_t[]> m_textram, m_chargen;
 
 	line_state m_rxrdy, m_txrdy, m_emrdy;
 	int m_rxvec, m_txvec, m_emvec;
@@ -142,7 +140,7 @@ terak_v_device::terak_v_device(const machine_config &mconfig, const char *tag, d
 
 uint32_t terak_v_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 240; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const int g = BIT(m_vcr, 5 - (y / 80));
 		const int t = BIT(m_vcr, 2 - (y / 80));
@@ -208,23 +206,23 @@ void terak_v_device::device_add_mconfig(machine_config &config)
 
 void terak_v_device::device_start()
 {
+	m_timer_wait = timer_alloc(FUNC(terak_v_device::wait_tick), this);
+
+	m_videoram = std::make_unique<uint16_t[]>(49152 / 2);
+
+	m_textram = std::make_unique<uint8_t[]>(4096);
+
+	m_chargen = std::make_unique<uint8_t[]>(4096);
+
 	// save state
 	save_item(NAME(m_installed));
 	save_item(NAME(m_gar));
 	save_item(NAME(m_vir));
 	save_item(NAME(m_vcr));
 	save_item(NAME(m_edb));
-
-	m_timer_wait = timer_alloc(FUNC(terak_v_device::wait_tick), this);
-
-	m_videoram_base = std::make_unique<uint16_t[]>(49152 / 2);
-	m_videoram = m_videoram_base.get();
-
-	m_textram_base = std::make_unique<uint8_t[]>(4096);
-	m_textram = m_textram_base.get();
-
-	m_chargen_base = std::make_unique<uint8_t[]>(4096);
-	m_chargen = m_chargen_base.get();
+	save_pointer(NAME(m_videoram), 49152 / 2);
+	save_pointer(NAME(m_textram), 4096);
+	save_pointer(NAME(m_chargen), 4096);
 
 	m_installed = false;
 }
@@ -238,13 +236,16 @@ void terak_v_device::device_reset()
 {
 	if (!m_installed)
 	{
-		m_bus->program_space().install_ram(0020000, 0157777, m_videoram);
-		m_bus->program_space().install_readwrite_handler(0160000, 0167777, emu::rw_delegate(*this, FUNC(terak_v_device::text_read)),
-			emu::rw_delegate(*this, FUNC(terak_v_device::text_write)));
-		m_bus->install_device(0177560, 0177567, read16sm_delegate(*this, FUNC(terak_v_device::emu_read)),
-			write16sm_delegate(*this, FUNC(terak_v_device::emu_write)));
-		m_bus->install_device(0177740, 0177747, read16sm_delegate(*this, FUNC(terak_v_device::read)),
-			write16sm_delegate(*this, FUNC(terak_v_device::write)));
+		m_bus->program_space().install_ram(0020000, 0157777, m_videoram.get());
+		m_bus->program_space().install_readwrite_handler(0160000, 0167777,
+				emu::rw_delegate(*this, FUNC(terak_v_device::text_read)),
+				emu::rw_delegate(*this, FUNC(terak_v_device::text_write)));
+		m_bus->install_device(0177560, 0177567,
+				read16sm_delegate(*this, FUNC(terak_v_device::emu_read)),
+				write16sm_delegate(*this, FUNC(terak_v_device::emu_write)));
+		m_bus->install_device(0177740, 0177747,
+				read16sm_delegate(*this, FUNC(terak_v_device::read)),
+				write16sm_delegate(*this, FUNC(terak_v_device::write)));
 		m_gar = m_vir = m_vcr = m_edb = 0;
 
 		m_installed = true;
@@ -432,13 +433,13 @@ void terak_v_device::emu_write(offs_t offset, uint16_t data)
 
 uint16_t terak_v_device::text_read(offs_t offset)
 {
-	uint8_t *p = BIT(m_vcr, 7) ? m_chargen : m_textram;
+	const uint8_t *p = BIT(m_vcr, 7) ? m_chargen.get() : m_textram.get();
 	return p[offset + offset] | (p[offset + offset + 1] << 8);
 }
 
 void terak_v_device::text_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint8_t *p = BIT(m_vcr, 7) ? m_chargen : m_textram;
+	uint8_t *p = BIT(m_vcr, 7) ? m_chargen.get() : m_textram.get();
 	if (ACCESSING_BITS_0_7)
 	{
 		p[offset + offset] = data;

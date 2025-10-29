@@ -17,8 +17,7 @@
     The various 80C5xx chips are i8051-based SoCs with additional I/O ports,
     256 bytes of internal RAM like the 8052, and an analog/digital converter.
 
-    The top 4 bits of port P5 select the bank at 0x8000.  P5 is not implemented in
-    any of the MCS-51 variants we support yet.
+    The top 4 bits of port P5 select the bank at 0x8000.
 
     Hardware Notes:
     The DSP has three SRAM chips, probably 128 kbyte each
@@ -70,7 +69,10 @@
 #include "speaker.h"
 #include "screen.h"
 #include "virusb.lh"
-
+#include "cpu/dsp563xx/dsp56303.h"
+#include "cpu/dsp563xx/dsp56311.h"
+#include "cpu/dsp563xx/dsp56362.h"
+#include "cpu/dsp563xx/dsp56364.h"
 
 namespace {
 
@@ -81,17 +83,20 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lcdc(*this, "lcdc"),
+		m_dsp(*this, "dsp"),
 		m_rombank(*this, "rombank")
 	{ }
 
-	void virus(machine_config &config);
+	void virusa(machine_config &config);
 	void virusb(machine_config &config);
+	void virusc(machine_config &config);
 
 	void init_virus();
 
 private:
 	required_device<sab80c535_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
+	required_device<dsp563xx_device> m_dsp;
 	required_memory_bank m_rombank;
 
 	virtual void machine_start() override ATTR_COLD;
@@ -100,6 +105,8 @@ private:
 	void prog_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
 
+	u8 p1_r();
+	void p1_w(u8 data);
 	void p5_w(u8 data);
 
 	u8 p402_r();
@@ -117,6 +124,20 @@ void acvirus_state::machine_start()
 void acvirus_state::machine_reset()
 {
 }
+
+u8 acvirus_state::p1_r()
+{
+	return 0; // m_lcdc ready?
+}
+
+void acvirus_state::p1_w(u8 data)
+{
+	m_lcdc->db_w(((data << 3) & 0xf0) | 0x08);
+	m_lcdc->e_w(BIT(data, 5));
+	m_lcdc->rw_w(BIT(data, 6));
+	m_lcdc->rs_w(BIT(data, 7));
+}
+
 
 void acvirus_state::p5_w(u8 data)
 {
@@ -145,18 +166,15 @@ void acvirus_state::palette_init(palette_device &palette)
 	palette.set_pen_color(1, rgb_t(0, 48, 0));
 }
 
-void acvirus_state::virus(machine_config &config)
+void acvirus_state::virusa(machine_config &config)
 {
 	SAB80C535(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
+	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
-/*
-    This may be hooked either to memorymap or to some of the ports:
-    map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::data_r), FUNC(hd44780_device::data_w)).umask16(0x00ff);
-    map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w)).umask16(0x00ff);
-*/
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -167,23 +185,74 @@ void acvirus_state::virus(machine_config &config)
 	PALETTE(config, "palette", FUNC(acvirus_state::palette_init), 2);
 
 	/* Actual device is LM16255 */
-	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
+
+	DSP56303(config, m_dsp, 66_MHz_XTAL);
+	m_dsp->set_hard_omr(0xe);
 
 	SPEAKER(config, "speaker", 2).front();
 }
 
 void acvirus_state::virusb(machine_config &config)
 {
-	virus(config);
+	SAB80C535(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
+	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
+	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
+	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 8*2+1);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(acvirus_state::palette_init), 2);
+
+	/* Actual device is LM16255 */
+	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
+	m_lcdc->set_lcd_size(2, 16);
+
+	DSP56311(config, m_dsp, 108_MHz_XTAL);
+	m_dsp->set_hard_omr(0xe);
+
+	SPEAKER(config, "speaker", 2).front();
 
 	config.set_default_layout(layout_virusb);
 }
 
-static INPUT_PORTS_START( virus )
-INPUT_PORTS_END
+void acvirus_state::virusc(machine_config &config)
+{
+	SAB80C535(config, m_maincpu, XTAL(24'000'000)); // 515 really
+	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
+	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
+	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
+	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
-static INPUT_PORTS_START( virusb )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 8*2+1);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(acvirus_state::palette_init), 2);
+
+	/* Actual device is LM16255 */
+	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
+	m_lcdc->set_lcd_size(2, 16);
+
+	DSP56362(config, m_dsp, 136_MHz_XTAL);
+	m_dsp->set_hard_omr(0xe);
+
+	SPEAKER(config, "speaker", 2).front();
+}
+
+static INPUT_PORTS_START( virus )
 INPUT_PORTS_END
 
 ROM_START( virusa )
@@ -219,9 +288,9 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1997, virusa,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 1999, virusb,     0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2002, virusc,     0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2001, virusrck,   0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2002, virusrckxl, 0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2004, viruscl,    0, 0, virus, virus, acvirus_state, empty_init, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 1997, virusa,     0, 0, virusa, virus, acvirus_state, empty_init, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 1999, virusb,     0, 0, virusb, virus, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2002, virusc,     0, 0, virusc, virus, acvirus_state, empty_init, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2001, virusrck,   0, 0, virusb, virus, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2002, virusrckxl, 0, 0, virusc, virus, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2004, viruscl,    0, 0, virusb, virus, acvirus_state, empty_init, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

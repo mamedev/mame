@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#include <assert.h>
-#include <cstring>
-
 #include "formats/rx01_dsk.h"
+
+#include <cassert>
+#include <cstring>
 
 
 static FLOPPY_IDENTIFY(rx01_identify)

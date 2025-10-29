@@ -158,7 +158,7 @@ offs_t sonix16_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	while((opcode & instructions[i].mask) != instructions[i].value)
 		i++;
 
-	instructions[i].fct(stream, opcode, (instructions[i].size >= 2) ? opcodes.r16(pc+1) : 0, pc);
+	instructions[i].fct(stream, opcode, ((instructions[i].size & LENGTHMASK) >= 2) ? opcodes.r16(pc+1) : 0, pc);
 
 	return instructions[i].size;
 }

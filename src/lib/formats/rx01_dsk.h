@@ -8,12 +8,12 @@
 
 *********************************************************************/
 
-#ifndef RX01_DSK_H
-#define RX01_DSK_H
+#ifndef MAME_FORMATS_RX01_DSK_H
+#define MAME_FORMATS_RX01_DSK_H
 
 #include "flopimg.h"
 #include "formats/basicdsk.h"
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(rx01);
 
-#endif /* RX01_DSK_H */
+#endif // MAME_FORMATS_RX01_DSK_H

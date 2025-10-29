@@ -5125,6 +5125,24 @@ ROM_START( mlander )
 	ROM_LOAD( "02.bin",     0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
+
+// I/O board - Taito # CV070005/CVN00002
+// CPU board - Taito # AA017757 label= CVN00004
+// ROM board - Taito # AA017756 label= CVN00003
+ROM_START( mlandera )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // all labels handwritten
+	ROM_LOAD( "ml-1_u36.u36",       0x0000, 0x0800, CRC(2bbc4778) SHA1(0167f1ac1501ab0b4c4e555023fa5efed59d56ae) ) // 2516
+	ROM_LOAD( "ml-2_u35.u35",       0x0800, 0x0800, CRC(752fb664) SHA1(18bb304b1ad9124693982e13ccc7be5dfe391b04) ) // 2516
+	ROM_LOAD( "ml-3_u34.u34",       0x1000, 0x0800, CRC(64e53458) SHA1(629f2434eea4d31dc9db0ee7bc8364cd2bf08a04) ) // 2516
+	ROM_LOAD( "ml-4_u33.u33",       0x1800, 0x0800, CRC(c9a74571) SHA1(b1671d19eff17f7adb274013c8f11eb044ebdd28) ) // 2516
+	ROM_LOAD( "ml-5_u32_rev_d.u32", 0x4000, 0x0800, CRC(db5e57cd) SHA1(ef8ff9c533cca269fd54e8535002a78febf9f9d0) ) // 2516
+	ROM_LOAD( "ml-6_u31.u31",       0x4800, 0x0800, CRC(bfb0f65d) SHA1(ea0943d764a16094b6e2289f62ef117c9f838c98) ) // 2716
+
+	ROM_REGION( 0x0800, "proms", 0 )        // color map
+	ROM_LOAD( "cv01.bin", 0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "cv02.bin", 0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
+ROM_END
+
 ROM_START( grescue )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lrescue.1",    0x0000, 0x0800, CRC(2bbc4778) SHA1(0167f1ac1501ab0b4c4e555023fa5efed59d56ae) )
@@ -6097,7 +6115,8 @@ GAME( 1980, laser,       spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_i
 
 GAME( 1979, lrescue,     0,        lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "Taito",                              "Lunar Rescue",                                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, grescue,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "Taito (Universal license?)",         "Galaxy Rescue",                                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue, set 1)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mlandera,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue, set 2)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, lrescuem,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 1)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescuem2,   lrescue,  lrescuem2, lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescueabl,  lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Artic)",                    "Lunar Rescue (Artic bootleg)",                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

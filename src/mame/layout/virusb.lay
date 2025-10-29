@@ -735,7 +735,7 @@ license:CC0-1.0
 		<element ref="black_rect"><bounds x="517" y="344" width="255" height="82"/></element>
 		<element ref="screen_metalic_border"><bounds x="523" y="346" width="243" height="78"/></element>
 		<element ref="screen_green_border"><bounds x="537" y="359" width="215" height="53"/></element>
-		<screen index="0"><bounds x="548" y="369" width="192" height="32"/></screen>
+		<screen index="0"><bounds x="548" y="370" width="192" height="34"/></screen>
 		<repeat count="2">
 			<param name="y" start="369" increment="18" />
 			<repeat count="16">

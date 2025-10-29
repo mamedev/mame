@@ -29,7 +29,7 @@ public:
 	bk_covox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override ATTR_COLD {};
+	virtual void device_start() override ATTR_COLD {}
 
 	virtual uint16_t io_r() override;
 	virtual void io_w(uint16_t data, bool word) override;
@@ -88,4 +88,4 @@ void bk_covox_device::io_w(uint16_t data, bool word)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(BK_COVOX, device_qbus_card_interface, bk_covox_device, "bk_covox", "BK Mono Covox Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(BK_COVOX, device_bk_parallel_interface, bk_covox_device, "bk_covox", "BK Mono Covox Interface")
