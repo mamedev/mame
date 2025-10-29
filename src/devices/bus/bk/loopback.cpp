@@ -76,4 +76,4 @@ void bk_loopback_device::io_w(uint16_t data, bool word)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(BK_LOOPBACK, device_qbus_card_interface, bk_loopback_device, "bk_loopback", "BK Loopback")
+DEFINE_DEVICE_TYPE_PRIVATE(BK_LOOPBACK, device_bk_parallel_interface, bk_loopback_device, "bk_loopback", "BK Loopback")
