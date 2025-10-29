@@ -135,6 +135,12 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 			const u32 pregap = toc.tracks[image->get_track(track_number - 1)].pregap;
 			LOGCMD("TRACK=%d (pregap = %d)\n", track_number, pregap);
 			frame = toc.tracks[ track_number - 1 ].logframeofs;
+
+			// tested in takabako item #2 (no end position command issued)
+			const u8 last_track = image->get_last_track() - 1;
+			m_last_frame = image->get_track_start(last_track);
+			m_last_frame += toc.tracks[last_track].frames;
+			m_end_frame = m_last_frame;
 			// Not right for emeraldd, breaks intro lip sync
 			//frame -= std::max(pregap, (u32)150);
 			break;
