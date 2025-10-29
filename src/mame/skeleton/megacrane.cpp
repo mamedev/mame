@@ -8,6 +8,24 @@
 	It plays music during gameplay and voice effects when inserting a coin or
 	when the game is over.
 
+	________________________________________
+	|  ELAUT PCB 0220 REV02                 |
+	D  Relay                  L6203  BD243  |
+	B  Relay    TBAB10S                     |
+	1  Relay              J5                |
+	5                                       |
+	|  HEF4021  ISD1420P                    |
+	D  HEF4021  4116R-1          L6506      |
+	B     ULN2003  4094  PM99BH   YMZ284    |
+	2       4094                 W27E512    |
+	5   JP2                74HCT573 74HCT00 |
+	|  HEF4021  HEF4010                XTAL |
+	IE                        68HC11E1CFN2  |
+	C   JP3          TLP521          DIPSW1 |
+	10 HEF4511 HEF4094 FM25040  LED         |
+	|   EUROGRIJPER REV02                   |
+	________________________________________|
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -43,7 +61,7 @@ private:
 
 void megacrane_state::mem_map(address_map &map)
 {
-	map(0x8000, 0xffff).rom().region("program", 0x8000);
+	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
 
 	map(0x8000, 0x8000).w(m_ymz, FUNC(ymz284_device::address_w));
 	map(0x8001, 0x8001).w(m_ymz, FUNC(ymz284_device::data_w));
@@ -116,7 +134,7 @@ void megacrane_state::megacrane(machine_config &config)
 
 
 ROM_START(megacrane)
-    ROM_REGION(0x10000, "program", 0)
+    ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("elaut_2001_eu_mg_i_02.39.07.u5", 0x0000, 0x10000, CRC(feb5cfa1) SHA1(3c091543c0419ea15a5d66d2b9602668e7c35b10))
 	ROM_REGION(0x2000, "voice", 0)
 	ROM_LOAD("elaut_2001_sound_megacrane.u5", 0x0000, 0x2000, NO_DUMP) //ISD1420P
