@@ -381,10 +381,11 @@ void paula_device::sound_stream_update(sound_stream &stream)
 						// for silencing channels on-the-fly without relying on irqs.
 						// Without this the location will read at 0x632d8 (data=0x7a7d), causing annoying buzzing.
 						chan->dat = m_chipmem_r(chan->curlocation);
-						// TODO: Ocean games (batmancc in particular) throws DC offset on main theme
-						// if we non-zero the data. This however will break swos9596 and
-						// "Mind Walker", latter using short 1 word DMA samples.
+						// batmancc throws DC offset on main theme if we non-zero the data.
+						// This however will break swos9596 and
+						// "Mind Walker" game, latter using short 1 word DMA samples.
 						// https://github.com/mamedev/mame/commit/8a9fb029a29a8a0f653ce4a8e011453834ef1fda#commitcomment-168255001
+						// Notice batmancc may just be a btanb, needs verifying on real HW.
 						//chan->dat = 0;
 					}
 				}

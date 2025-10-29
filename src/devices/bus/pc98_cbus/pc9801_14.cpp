@@ -6,9 +6,6 @@ PC9801-14 sound board
 
 TMS3631 sound chip (same as Siel DK-600 / Opera 6)
 4 octaves, 12 notes, 8 channels
-CH1 and CH2 are fixed to center with no envelope
-CH3-5 are fixed to the left
-CH6-8 to the right
 7 knobs on back panel, F2/F4/F8/F16 then L/R and VOL
 
 References:
@@ -46,7 +43,7 @@ pc9801_14_device::pc9801_14_device(const machine_config &mconfig, const char *ta
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_ppi(*this, "ppi")
 	, m_pit(*this, "pit")
-//  , m_tms(*this, "tms")
+	, m_tms(*this, "tms")
 {
 }
 
@@ -67,12 +64,24 @@ void pc9801_14_device::device_add_mconfig(machine_config &config)
 	m_ppi->out_pa_callback().set([this](uint8_t data) { LOG("TMS3631: PA envelope 1 %02x\n", data); });
 	m_ppi->out_pb_callback().set([this](uint8_t data) { LOG("TMS3631: PB envelope 2 %02x\n", data); });
 //  m_ppi->in_pc_callback().set_constant(0x08);
-	m_ppi->out_pc_callback().set([this](uint8_t data) { LOG("TMS3631: data %02x\n", data); });
+	m_ppi->out_pc_callback().set(m_tms, FUNC(tms3631_device::data_w));
 
 	// TODO: TMS3631-RI104 & TMS3631-RI105
-	// TMS3631(config, m_tms, 1'996'800);
-	// m_tms->add_route(0, "speaker", 0.5, 0);
-	// m_tms->add_route(1, "speaker", 0.5, 1);
+	TMS3631(config, m_tms, 1'996'800);
+	// CH1 and CH2 are fixed to center with no envelope
+	m_tms->add_route(0, "speaker", 0.5, 0);
+	m_tms->add_route(0, "speaker", 0.5, 1);
+	m_tms->add_route(1, "speaker", 0.5, 0);
+	m_tms->add_route(1, "speaker", 0.5, 1);
+	// CH3-5 are fixed to the left
+	m_tms->add_route(2, "speaker", 0.5, 0);
+	m_tms->add_route(3, "speaker", 0.5, 0);
+	m_tms->add_route(4, "speaker", 0.5, 0);
+	// CH6-8 to the right
+	m_tms->add_route(5, "speaker", 0.5, 1);
+	m_tms->add_route(6, "speaker", 0.5, 1);
+	m_tms->add_route(7, "speaker", 0.5, 1);
+
 }
 
 ROM_START( pc9801_14 )
@@ -128,7 +137,7 @@ void pc9801_14_device::io_map(address_map &map)
 	// 0x00 and 0xff values aren't valid
 	map(0x008e, 0x008e).lr8(NAME([this] () { LOG("PC9801-14: read base port / identifier\n"); return 0x08; }));
 	// mirror according to io_sound.txt
-	map(0x0188, 0x0188).mirror(2).lw8(NAME([this] (offs_t offset, u8 data) { LOG("TMS3631 mask %02x\n", data); }));
+	map(0x0188, 0x0188).mirror(2).w(m_tms, FUNC(tms3631_device::enable_w));
 	map(0x018c, 0x018c).lrw8(
 		NAME([this] (offs_t offset) { return m_pit->read(2); }),
 		NAME([this] (offs_t offset, u8 data) { m_pit->write(2, data); })
