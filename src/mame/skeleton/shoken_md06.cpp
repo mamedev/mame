@@ -18,6 +18,13 @@ push-button (reset?)
 unpopulates spaces marked for MSM9810B and ROM
 
 DIP sheets are available
+
+ポーラスター2 (Polar Star 2) by Showa Giken (Shoken)
+'MB-01 MAIN-B' PCB:
+KL5C80A12CFP CPU
+RTC62423 RTC
+push-button (reset?)
+16.00000 MHz XTAL
 */
 
 
@@ -65,19 +72,10 @@ void shoken_md06_state::program_map(address_map &map)
 void shoken_md06_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).nopw();
-	map(0x80, 0x80).noprw();
-}
-
-void shoken_md06_state::sound_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x40, 0x40).nopw();
-	map(0x80, 0x80).noprw();
-
 	map(0x3b, 0x3b).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write));
+	map(0x40, 0x40).nopw();
+	map(0x80, 0x80).noprw();
 }
-
 
 static INPUT_PORTS_START( petitlot )
 	PORT_START("IN0")
@@ -157,14 +155,6 @@ void shoken_md06_state::petitlot(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	// TODO: sound related ICs aren't present?
-}
-
-void shoken_md06_state::polarstar(machine_config &config)
-{
-	petitlot(config);
-	m_maincpu->set_addrmap(AS_IO, &shoken_md06_state::sound_io_map);
-
 	okim9810_device &oki(OKIM9810(config, "oki", 16_MHz_XTAL / 12));
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0); //divider guessed
 }
@@ -184,5 +174,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2001, petitlot,   0, petitlot,  petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2010, polarstar2, 0, polarstar, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, petitlot,   0, petitlot, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2010, polarstar2, 0, petitlot, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
