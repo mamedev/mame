@@ -46,6 +46,8 @@ public:
 	void set_initial_mode(const uint16_t mode) { c_initial_mode = mode; }
 	auto out_reset() { return m_out_reset_func.bind(); }
 	auto in_iack() { return m_in_iack_func.bind(); }
+	auto out_bankswitch() { return m_out_bankswitch_func.bind(); }
+	auto in_sel1() { return m_in_sel1_func.bind(); }
 
 protected:
 	enum
@@ -62,7 +64,9 @@ protected:
 		VM1_EVNT        = 0100, // EVNT pin vector
 		VM1_IRQ3        = 0270, // IRQ3 pin vector
 		VM1_HALT        = 0160002, // HALT instruction vector
-		VM2_HALT        = 0170  // HALT instruction vector
+		VM2_HALT        = 0170, // HALT instruction vector
+		VM2_DBLERR	= 0174,	// Double bus error vector
+		VM2_VECERR	= 0274	// Bus error on vector fetch
 	};
 	// K1801 microcode constants
 	enum
@@ -120,6 +124,8 @@ protected:
 	PAIR                m_ppc;    /* previous program counter */
 	PAIR                m_reg[8];
 	PAIR                m_psw;
+	PAIR                m_cpc;    /* shadow copy of program counter */
+	PAIR                m_cpsw;   /* shadow copy of psw register */
 	uint16_t            m_initial_pc;
 	uint8_t             m_wait_state;
 	int8_t              m_mcir;
@@ -141,6 +147,8 @@ protected:
 
 	devcb_write_line    m_out_reset_func;
 	devcb_read8         m_in_iack_func;
+	devcb_write_line    m_out_bankswitch_func;
+	devcb_read8         m_in_sel1_func;
 
 	inline int ROPCODE();
 	inline int RBYTE(int addr);
@@ -159,6 +167,9 @@ protected:
 
 	void op_0000(uint16_t op);
 	void op_0001(uint16_t op);
+	void op_0002(uint16_t op);
+	void op_0003(uint16_t op);
+	void op_7a00(uint16_t op);
 	void halt(uint16_t op);
 	void illegal(uint16_t op);
 	void illegal4(uint16_t op);
@@ -1280,6 +1291,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual void t11_check_irqs() override;
+	void take_interrupt_user(uint16_t vector);
+	void take_interrupt_halt(uint16_t vector);
 };
 
 

@@ -47953,6 +47953,14 @@ mk98
 @source:ussr/ms0515.cpp
 ms0515
 
+@source:ussr/ms1201.cpp
+ms120101
+ms120102
+dvk1
+dvk2
+dvk3
+dvk3m
+
 @source:ussr/ms6102.cpp
 ms6102
 
@@ -47972,6 +47980,9 @@ orionzms
 
 @source:ussr/partner.cpp
 partner
+
+@source:ussr/pk11.cpp
+pk11
 
 @source:ussr/pk32.cpp
 pk32
