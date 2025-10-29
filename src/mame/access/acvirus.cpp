@@ -105,6 +105,8 @@ private:
 	void prog_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
 
+	u8 p1_r();
+	void p1_w(u8 data);
 	void p5_w(u8 data);
 
 	u8 p402_r();
@@ -122,6 +124,20 @@ void acvirus_state::machine_start()
 void acvirus_state::machine_reset()
 {
 }
+
+u8 acvirus_state::p1_r()
+{
+	return 0; // m_lcdc ready?
+}
+
+void acvirus_state::p1_w(u8 data)
+{
+	m_lcdc->db_w(((data << 3) & 0xf0) | 0x08);
+	m_lcdc->e_w(BIT(data, 5));
+	m_lcdc->rw_w(BIT(data, 6));
+	m_lcdc->rs_w(BIT(data, 7));
+}
+
 
 void acvirus_state::p5_w(u8 data)
 {
@@ -155,13 +171,10 @@ void acvirus_state::virusa(machine_config &config)
 	SAB80C535(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
+	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
-/*
-    This may be hooked either to memorymap or to some of the ports:
-    map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::data_r), FUNC(hd44780_device::data_w)).umask16(0x00ff);
-    map(0x?, 0x?).rw("lcdc", FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w)).umask16(0x00ff);
-*/
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -186,6 +199,8 @@ void acvirus_state::virusb(machine_config &config)
 	SAB80C535(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
+	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -214,6 +229,8 @@ void acvirus_state::virusc(machine_config &config)
 	SAB80C535(config, m_maincpu, XTAL(24'000'000)); // 515 really
 	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
+	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
