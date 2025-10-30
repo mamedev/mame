@@ -32,7 +32,7 @@ TODO:
 - Audio CPU is currently disabled. It seems to read inputs, too.
 - Reel colors may be correct, tilemap ones probably not.
 - Reel priority / transparent pen.
-- Reel 3 attribute RAM doesn't seem to update correctly? For now reel 3 is disabled, but it's definitely needed (draws the GAME OVER test).
+- Reel 3 attribute RAM doesn't seem to update correctly? For now reel 3 is disabled, but it's definitely needed (draws the GAME OVER text).
 */
 
 #include "emu.h"
@@ -417,7 +417,7 @@ void cointek_state::init_goldline()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int i = 0; i < 0x10000; i++) // TODO: seems good but needs verifying
+	for (int i = 0; i < 0x10000; i++)
 		if (!(i & 0x1000))
 			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 5, 2, 1, 0);
 
