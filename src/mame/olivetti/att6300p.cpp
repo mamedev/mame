@@ -60,12 +60,12 @@
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"
-
-#include "softlist_dev.h"
 
 
 namespace {
@@ -782,7 +782,7 @@ void att6300p_state::vxlaten_w(offs_t offset, uint8_t data)
 
 uint8_t att6300p_state::bitread_r(offs_t offset)
 {
-	  return (m_protected ? B_VIRT_BR_PROTECTEN : 0) |
+	return (m_protected ? B_VIRT_BR_PROTECTEN : 0) |
 		(m_sanity_active ? 0 : B_VIRT_BR__SANITYNMI) |
 		(m_trapio_active ? 0 : B_VIRT_BR__TRAPIO) |
 		(m_nmi_active ? B_VIRT_BR_NMI: 0) |
@@ -860,43 +860,43 @@ void att6300p_state::att6300p_vio_map(address_map &map)
 static INPUT_PORTS_START( att6300p )
 	PORT_START("DSW1")
 
-	PORT_DIPNAME( 0x01, 0x01, "Drive B Type")			PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Drive B Type")           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, "96 TPI" )
 	PORT_DIPSETTING(    0x00, "48 TPI" )
-	PORT_DIPNAME( 0x02, 0x02, "Drive A Type")			PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Drive A Type")           PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "96 TPI" )
 	PORT_DIPSETTING(    0x00, "48 TPI" )
-	PORT_DIPNAME( 0x04, 0x04, "Hard Disk 1 Type")		PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "Hard Disk 1 Type")       PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPNAME( 0x08, 0x08, "Hard Disk 0 Type")		PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Hard Disk 0 Type")       PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPNAME( 0x30, 0x20, "Display Type")			PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPNAME( 0x30, 0x20, "Display Type")           PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x10, "Color 40x25" )
 	PORT_DIPSETTING(    0x20, "Color 80x25" )
 	PORT_DIPSETTING(    0x30, "Monochrome" )
-	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")	PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")    PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x80, "3" )
 
 	PORT_START("DSW2")
 
-	PORT_DIPNAME( 0x0f, 0x0b, "Motherboard RAM banks")	PORT_DIPLOCATION("DSW2:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0b, "Motherboard RAM banks")  PORT_DIPLOCATION("DSW2:1,2,3,4")
 	PORT_DIPSETTING(    0x01, "128K - 128/0")
 	PORT_DIPSETTING(    0x02, "256K - 128/128")
 	PORT_DIPSETTING(    0x08, "512K - 512/0")
 	PORT_DIPSETTING(    0x09, "640K - 128/512")
 	PORT_DIPSETTING(    0x0a, "640K - 512/128")
 	PORT_DIPSETTING(    0x0b, "1M - 512/512")
-	PORT_DIPNAME( 0x10, 0x10, "80287 installed")		PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "80287 installed")        PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x10, DEF_STR(No) )
-	PORT_DIPNAME( 0x40, 0x40, "HDD ROM")		        PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "HDD ROM")                PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, "Internal" )
 	PORT_DIPSETTING(    0x40, "External" )
-	PORT_DIPNAME( 0x80, 0x80, "EPROM Size")		        PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "EPROM Size")             PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x00, "64K" )
 	PORT_DIPSETTING(    0x80, "32K" )
 INPUT_PORTS_END

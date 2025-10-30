@@ -92,7 +92,7 @@ void att6300p_mmu_device::set_protected_mode_enabled(bool enabled)
 void att6300p_mmu_device::update_fastpath()
 {
 	m_mem_wr_fastpath = (m_mem_prot_limit == 0 &&
-	  !m_mem_setup_enabled && !m_io_setup_enabled);
+		!m_mem_setup_enabled && !m_io_setup_enabled);
 }
 
 void att6300p_mmu_device::set_mem_mapping(uint32_t target_addr[32])
@@ -195,7 +195,7 @@ uint16_t att6300p_mmu_device::io_r(offs_t offset, uint16_t mem_mask)
 				return m_io->read_byte(offset | 1) << 8;
 			case 0xffff:
 				return m_io->read_byte(offset) |
-				  m_io->read_byte(offset | 1) << 8;
+					m_io->read_byte(offset | 1) << 8;
 		}
 	}
 	else
@@ -241,7 +241,8 @@ uint16_t att6300p_mmu_device::io_r(offs_t offset, uint16_t mem_mask)
 
 			if (m_io_read_traps_enabled && ((prot & IO_PROT_NOTRAP) == 0))
 			{
-				m_trapio(offset | val << 16 | flags << 24);
+				if (!machine().side_effects_disabled())
+					m_trapio(offset | val << 16 | flags << 24);
 			}
 
 			data |= val << shift;
