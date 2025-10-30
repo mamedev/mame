@@ -10,9 +10,9 @@
 #include "main.h"
 
 #include "esq2by40_vfx.lh"
+#include "sd1.lh"
 #include "vfx.lh"
 #include "vfxsd.lh"
-#include "sd1.lh"
 
 #include <algorithm>
 

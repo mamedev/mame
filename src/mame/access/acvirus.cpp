@@ -62,45 +62,50 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/sab80c535.h"
-#include "machine/intelfsh.h"
-#include "video/hd44780.h"
-#include "emupal.h"
-#include "speaker.h"
-#include "screen.h"
-#include "virusb.lh"
+
 #include "cpu/dsp563xx/dsp56303.h"
 #include "cpu/dsp563xx/dsp56311.h"
 #include "cpu/dsp563xx/dsp56362.h"
 #include "cpu/dsp563xx/dsp56364.h"
+#include "cpu/mcs51/sab80c535.h"
+#include "machine/intelfsh.h"
+#include "video/hd44780.h"
+
+#include "emupal.h"
+#include "speaker.h"
+#include "screen.h"
+
+#include "virusb.lh"
+
 
 namespace {
 
 class acvirus_state : public driver_device
 {
 public:
-	acvirus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	acvirus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lcdc(*this, "lcdc"),
 		m_dsp(*this, "dsp"),
 		m_rombank(*this, "rombank")
 	{ }
 
-	void virusa(machine_config &config);
-	void virusb(machine_config &config);
-	void virusc(machine_config &config);
+	void virusa(machine_config &config) ATTR_COLD;
+	void virusb(machine_config &config) ATTR_COLD;
+	void virusc(machine_config &config) ATTR_COLD;
 
-	void init_virus();
+	void init_virus() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<sab80c535_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<dsp563xx_device> m_dsp;
 	required_memory_bank m_rombank;
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	void prog_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
@@ -111,7 +116,7 @@ private:
 
 	u8 p402_r();
 
-	void palette_init(palette_device &palette);
+	void palette_init(palette_device &palette) ATTR_COLD;
 };
 
 

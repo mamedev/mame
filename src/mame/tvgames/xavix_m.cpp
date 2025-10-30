@@ -4,6 +4,13 @@
 #include "emu.h"
 #include "xavix.h"
 
+#define LOG_CFG        (1U << 1)
+#define LOG_TEMPO      (1U << 2)
+#define LOG_TIMER      (1U << 3)
+#define LOG_IRQ        (1U << 4)
+#define LOG_VOICE      (1U << 5)
+#define LOG_ENV        (1U << 6)
+
 // #define VERBOSE 1
 #include "logmacro.h"
 
@@ -816,6 +823,256 @@ void xavix_state::irq_source_w(uint8_t data)
 {
 	LOG("%s: irq_source_w %02x\n", machine().describe_context(), data);
 	// cleared on startup in monster truck, no purpose?
+}
+
+
+uint8_t xavix_state::sound_current_page() const
+{
+	return m_sound_regbase & 0x3f;
+}
+
+uint8_t xavix_state::sound_regram_read_cb(offs_t offset)
+{
+	// 0x00 would be zero page memory; assume it's not valid
+	if ((m_sound_regbase & 0x3f) != 0x00)
+	{
+		const uint16_t memorybase = (m_sound_regbase & 0x3f) << 8;
+		return m_mainram[memorybase + offset];
+	}
+	return 0x00;
+}
+
+void xavix_state::sound_regram_write_cb(offs_t offset, u8 data)
+{
+	if ((m_sound_regbase & 0x3f) != 0x00)
+	{
+		const uint16_t memorybase = (m_sound_regbase & 0x3f) << 8;
+		m_mainram[memorybase + offset] = data;
+	}
+}
+
+uint8_t xavix_state::sound_voice_startstop_r(offs_t offset)
+{
+	return m_soundreg16_0[offset];
+}
+
+void xavix_state::sound_voice_startstop_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_VOICE, "[voice] startstop offs=%d data=%02x prev=%02x\n",
+		offset, data, m_soundreg16_0[offset]);
+	for (int i = 0; i < 8; i++)
+	{
+		const int voice_state      = BIT(data, i);
+		const int old_voice_state  = BIT(m_soundreg16_0[offset], i);
+		if (voice_state != old_voice_state)
+		{
+			const int voice = (offset * 8 + i);
+			if (voice_state) m_sound->enable_voice(voice, false);
+			else             m_sound->disable_voice(voice);
+		}
+	}
+	m_soundreg16_0[offset] = data;
+}
+
+uint8_t xavix_state::sound_voice_updateenv_r(offs_t offset)
+{
+	// On real hardware, might be read-only or always return 0.
+	return 0x00;
+}
+
+void xavix_state::sound_voice_updateenv_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_ENV, "[env] update offs=%d mask=%02x\n", offset, data);
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(data, i))
+		{
+			const int voice = (offset * 8 + i);
+			m_sound->enable_voice(voice, true);
+		}
+	}
+}
+
+uint8_t xavix_state::sound_voice_status_r(offs_t offset)
+{
+	uint8_t ret = 0x00;
+	for (int i = 0; i < 8; i++)
+	{
+		const int voice = (offset * 8 + i);
+		if (m_sound->is_voice_enabled(voice))
+			ret |= 1 << i;
+	}
+	return ret;
+}
+
+uint8_t xavix_state::sound_regbase_r()
+{
+	return m_sound_regbase & 0x3f; // upper bits read as 0
+}
+
+void xavix_state::sound_regbase_w(uint8_t data)
+{
+	// upper 6 bits of RAM address where the per-voice register sets live
+	m_sound_regbase = data & 0x3f;
+}
+
+uint8_t xavix_state::sound_cyclerate_r()
+{
+	return m_cyclerate;
+}
+
+void xavix_state::sound_cyclerate_w(uint8_t data)
+{
+	m_cyclerate = data; // store for readback / debug
+	if (m_sound) m_sound->set_cyclerate(data);
+	LOGMASKED(LOG_CFG, "[cfg] cyclerate=%02x\n", m_cyclerate);
+}
+
+uint8_t xavix_state::sound_volume_r() { return m_sound->sound_volume_r(); }
+void    xavix_state::sound_volume_w(uint8_t data) { m_sound->sound_volume_w(data); }
+
+uint8_t xavix_state::sound_mixer_r() { return m_sound->sound_mixer_r(); }
+void    xavix_state::sound_mixer_w(uint8_t data) { m_sound->sound_mixer_w(data); }
+
+uint8_t xavix_state::sound_dac_control_r() { return m_sound->dac_control_r(); }
+void    xavix_state::sound_dac_control_w(uint8_t data) { m_sound->dac_control_w(data); }
+
+// tempo registers
+uint8_t xavix_state::sound_tp0_r() { return m_tp[0]; }
+uint8_t xavix_state::sound_tp1_r() { return m_tp[1]; }
+uint8_t xavix_state::sound_tp2_r() { return m_tp[2]; }
+uint8_t xavix_state::sound_tp3_r() { return m_tp[3]; }
+
+void xavix_state::sound_tp0_w(uint8_t data)
+{
+	m_tp[0] = data;
+	if (m_sound) m_sound->set_tempo(0, data);
+	LOGMASKED(LOG_TEMPO, "[tempo] tp[%d]=%02x\n", 0, data);
+	reprogram_sound_timer(0);
+}
+
+void xavix_state::sound_tp1_w(uint8_t data)
+{
+	m_tp[1] = data;
+	if (m_sound) m_sound->set_tempo(1, data);
+	LOGMASKED(LOG_TEMPO, "[tempo] tp[%d]=%02x\n", 1, data);
+	reprogram_sound_timer(1);
+}
+
+void xavix_state::sound_tp2_w(uint8_t data)
+{
+	m_tp[2] = data;
+	if (m_sound) m_sound->set_tempo(2, data);
+	LOGMASKED(LOG_TEMPO, "[tempo] tp[%d]=%02x\n", 2, data);
+	reprogram_sound_timer(2);
+}
+
+void xavix_state::sound_tp3_w(uint8_t data)
+{
+	m_tp[3] = data;
+	if (m_sound) m_sound->set_tempo(3, data);
+	LOGMASKED(LOG_TEMPO, "[tempo] tp[%d]=%02x\n", 3, data);
+	reprogram_sound_timer(3);
+}
+
+uint8_t xavix_state::sound_irq_status_r()
+{
+	// UK e-kara carts check the upper nibble for sound-timer IRQ source
+	return m_sound_irqstatus;
+}
+
+void xavix_state::sound_irq_status_w(uint8_t data)
+{
+	const uint8_t old_enable = m_sound_irqstatus & 0x0f;
+
+	const uint8_t clear_mask = (data >> 4) & 0x0f;
+	if (clear_mask)
+		m_sound_irqstatus &= ~(clear_mask << 4);
+
+	const uint8_t new_enable = data & 0x0f;
+	m_sound_irqstatus = (m_sound_irqstatus & 0xf0) | new_enable;
+
+	const uint8_t pending = (m_sound_irqstatus >> 4) & 0x0f;
+	LOGMASKED(LOG_IRQ, "[irq] status_w %02x old_en=%02x new_en=%02x clear=%02x pending=%02x\n",
+		data, old_enable, new_enable, clear_mask, pending);
+
+	const uint8_t changed = old_enable ^ new_enable;
+	if (changed)
+	{
+		for (int t = 0; t < 4; t++)
+			if (changed & (1 << t))
+				reprogram_sound_timer(t);
+	}
+
+	refresh_sound_irq_state();
+	update_irqs();
+}
+
+// used by ekara (UK cartridges), rad_bass, rad_crdn
+TIMER_CALLBACK_MEMBER(xavix_state::sound_timer_done)
+{
+	// param = timer number 0,1,2 or 3
+	const uint8_t enable_mask = 1U << param;
+	if (!BIT(m_sound_irqstatus, param))
+		return;
+
+	m_sound_irqstatus |= (enable_mask << 4);
+	LOGMASKED(LOG_TIMER, "[timer] %d latch pending=%02x\n",
+		param, (m_sound_irqstatus >> 4) & 0x0f);
+	refresh_sound_irq_state();
+	update_irqs();
+}
+
+void xavix_state::refresh_sound_irq_state()
+{
+	const uint8_t enable = m_sound_irqstatus & 0x0f;
+	const uint8_t pending = (m_sound_irqstatus >> 4) & 0x0f;
+
+	if (enable & pending)
+		m_irqsource |= 0x80;
+	else
+		m_irqsource &= ~0x80;
+
+	LOGMASKED(LOG_IRQ,   "[irq] line %s enable=%02x pending=%02x\n",
+		((enable & pending) ? "assert" : "clear"), enable, pending);
+}
+
+void xavix_state::reprogram_sound_timer(int index)
+{
+	if (index < 0 || index >= 4)
+		return;
+	if (!m_sound_timer[index])
+		return;
+
+	const uint8_t mask = 1U << index;
+	if (!(m_sound_irqstatus & mask))
+	{
+		LOGMASKED(LOG_TIMER, "[timer] %d stop (enable=0)\n", index);
+		m_sound_timer[index]->adjust(attotime::never, index);
+		return;
+	}
+
+	const uint8_t tempo = m_tp[index];
+	if (tempo == 0)
+	{
+		LOGMASKED(LOG_TIMER, "[timer] %d stop (tempo=0)\n", index);
+		m_sound_timer[index]->adjust(attotime::never, index);
+		return;
+	}
+
+	const double frequency = m_sound->tempo_tick_hz(tempo);
+	if (frequency <= 0.0)
+	{
+		LOGMASKED(LOG_TIMER, "[timer] %d stop (period unavailable)\n", index);
+		m_sound_timer[index]->adjust(attotime::never, index);
+		return;
+	}
+
+	const attotime period = attotime::from_hz(frequency);
+	const std::string period_text = period.as_string(18);
+	m_sound_timer[index]->adjust(period, index, period);
+	LOGMASKED(LOG_TIMER, "[timer] %d arm tempo=%02x freq=%.6fHz period=%s\n",
+		index, tempo, frequency, period_text.c_str());
 }
 
 
