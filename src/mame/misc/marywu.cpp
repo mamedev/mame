@@ -14,7 +14,15 @@
     31 LEDs, 13 modules of double-digit 7-seg displays and 4 push-buttons).
   * we may also have user inputs from the coin slot and from the
     cabinet buttons, for making bets.
-
+  * P1 bits are:
+    ENABLE (output)
+    入表 (output)
+    出表 (output)
+    SSR (output)
+    入表檢查 (input)
+    出表檢查 (input)
+    HOPPER SW (input)
+    洗分 SW (input)
 **************************************************************************/
 
 #include "emu.h"
