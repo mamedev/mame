@@ -76,15 +76,12 @@
 
     - Texturing code could use a real good speed optimization.
     - The U and V coordinates provided by the game are in 13.3 fixed point format.
-    - The luma/texel combination algorithm is not known. There are currently some small color glitches here and
-    there, and this might be the culprit.
     - The log tables and distance coefficients are used to calculate the number of texels per world unit that need to
     be used to render a texture. Textures can also be provided with smaller levels of details and a LOD bit selector
     in the texture header tells the rasterizer which texture map to use. The rasterizer then can average two texture
     maps to do mip mapping. More information can be found on the 2B manual, on the 'Texturing' and 'Data Format' chapters.
-    This is currently unemulated. We always use the texture data from the bigger texture map.
-    - The rasterizer supports up to 128x128 'microtex' textures, which are supposed to be higher resolution textures used
-    to display more detail when a texture is real close to the viewer. This is currently unemulated.
+    - The rasterizer supports 128x128 'microtextures' which are typically used to add more details to a texture when it is
+	close enough to the viewer.
 
 *********************************************************************************************************************************/
 
@@ -230,8 +227,8 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *v
 			out[outcount].x = cur->x + ((v[nextvert].x - cur->x) * scale);
 			out[outcount].y = cur->y + ((v[nextvert].y - cur->y) * scale);
 			out[outcount].pz = cur->pz + ((v[nextvert].pz - cur->pz) * scale);
-			out[outcount].pu = (u16)((float)cur->pu + (((float)v[nextvert].pu - (float)cur->pu) * scale));
-			out[outcount].pv = (u16)((float)cur->pv + (((float)v[nextvert].pv - (float)cur->pv) * scale));
+			out[outcount].pu = cur->pu + ((v[nextvert].pu - cur->pu) * scale);
+			out[outcount].pv = cur->pv + ((v[nextvert].pv - cur->pv) * scale);
 			outcount++;
 		}
 
@@ -412,6 +409,10 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 	/* set the luma value of this quad */
 	object.luma = (raster->command_buffer[9] >> 15) & 0xff;
 
+	/* set the texture LOD of this quad */
+	object.texlod = ((raster->command_buffer[10] >> 8) & 0x7f80) - 0x3f80;
+	object.texlod += raster->log_ram[raster->command_buffer[10] & 0x7fff];
+
 	/* determine whether we can cull this quad */
 	cull = check_culling(raster,attr,min_z,max_z);
 
@@ -488,6 +489,7 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 				tri->texheader[2] = object.texheader[2];
 				tri->texheader[3] = object.texheader[3];
 				tri->luma = object.luma;
+				tri->texlod = object.texlod;
 
 				/* set the viewport */
 				tri->viewport[0] = raster->viewport[0];
@@ -638,6 +640,10 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 	/* set the luma value of this triangle */
 	object.luma = (raster->command_buffer[9] >> 15) & 0xff;
 
+	/* set the texture LOD of this triangle */
+	object.texlod = ((raster->command_buffer[10] >> 8) & 0x7f80) - 0x3f80;
+	object.texlod += raster->log_ram[raster->command_buffer[10] & 0x7fff];
+
 	/* determine whether we can cull this triangle */
 	cull = check_culling(raster,attr,min_z,max_z);
 
@@ -715,6 +721,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 				tri->texheader[2] = object.texheader[2];
 				tri->texheader[3] = object.texheader[3];
 				tri->luma = object.luma;
+				tri->texlod = object.texlod;
 
 				/* set the viewport */
 				tri->viewport[0] = raster->viewport[0];
@@ -806,43 +813,29 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	extra.lumabase = (tri->texheader[1] & 0xff) << 7;
 	extra.colorbase = (tri->texheader[3] >> 6) & 0x3ff;
 	extra.luma = tri->luma;
+	extra.texlod = tri->texlod;
 
 	if (renderer & 2)
 	{
 		extra.texmirrorx = (tri->texheader[0] >> 8) & 1;
 		extra.texmirrory = (tri->texheader[0] >> 9) & 1;
 
-		u32* sheet = (tri->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
-		u32 width = 32 << ((tri->texheader[0] >> 0) & 0x7);
-		u32 height = 32 << ((tri->texheader[0] >> 3) & 0x7);
-		u32 posx = 32 * ( (tri->texheader[2] >> 0) & 0x3f );
-		u32 posy = 32 * ( (tri->texheader[2] >> 6) & 0x1f );
+		// disable smooth wrapping if mirroring is enabled
+		extra.texwrapx = (tri->texheader[0] >> 6) & 1 & ~extra.texmirrorx;
+		extra.texwrapy = (tri->texheader[0] >> 7) & 1 & ~extra.texmirrory;
 
-		// 6 mips levels
-		// each mip level has half width and half height of the level above
-		// mips are located recursively in the bottom right corner of 2048x1024
-		// each level has flipped ram banks compared to the level above
-		for (u32 mip = 0; mip < 6; mip++)
-		{
-			extra.texsheet[mip] = sheet;
-			extra.texwidth[mip] = width;
-			extra.texheight[mip] = height;
-			extra.texx[mip] = posx;
-			extra.texy[mip] = posy;
+		extra.texsheet[0] = (tri->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
+		extra.texsheet[1] = (tri->texheader[2] & 0x1000) ? m_state.m_textureram0 : m_state.m_textureram1;
+		extra.texwidth = 32 << ((tri->texheader[0] >> 0) & 0x7);
+		extra.texheight = 32 << ((tri->texheader[0] >> 3) & 0x7);
+		extra.texx = 32 * ((tri->texheader[2] >> 0) & 0x3f);
+		extra.texy = 32 * ((tri->texheader[2] >> 6) & 0x1f);
 
-			width /= 2;
-			height /= 2;
-			posx = 2048 - (2048 - posx) / 2;
-			posy = 1024 - (1024 - posy) / 2;
-			if (sheet == m_state.m_textureram0)
-			{
-				sheet = m_state.m_textureram1;
-			}
-			else
-			{
-				sheet = m_state.m_textureram0;
-			}
-		}
+		// microtexture parameters
+		extra.utex = (tri->texheader[0] >> 12) & 1;
+		extra.utexminlod = (tri->texheader[0] >> 10) & 3;
+		extra.utexx = ((tri->texheader[2] >> 13) & 1) * 128;
+		extra.utexy = ((tri->texheader[2] >> 14) & 3) * 128;
 
 		tri->v[0].pz = 1.0f / (tri->v[0].pz + std::numeric_limits<float>::min());
 		tri->v[0].pu = tri->v[0].pu * tri->v[0].pz * (1.0f / 8.0f);
@@ -1155,7 +1148,7 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 						if ( address & 0x800000 )
 							raster->texture_ram[address & 0xffff] = raster->command_buffer[2];
 						else
-							raster->log_ram[address & 0xffff] = raster->command_buffer[2];
+							raster->log_ram[address & 0x7fff] = raster->command_buffer[2];
 
 						/* increment the address and decrease the count */
 						raster->command_buffer[0]++;
@@ -2612,7 +2605,7 @@ void model2_state::video_start()
 	/* init various video-related pointers */
 	m_palram = make_unique_clear<u16[]>(0x4000/2);
 	m_colorxlat = make_unique_clear<u16[]>(0xc000/2);
-	m_lumaram = make_unique_clear<u16[]>(0x10000/2);
+	m_lumaram = make_unique_clear<u8[]>(0x8000);
 	m_fbvramA = make_unique_clear<u16[]>(0x80000/2);
 	m_fbvramB = make_unique_clear<u16[]>(0x80000/2);
 
@@ -2631,7 +2624,7 @@ void model2_state::video_start()
 	save_item(NAME(m_render_mode));
 	save_pointer(NAME(m_palram), 0x4000/2);
 	save_pointer(NAME(m_colorxlat), 0xc000/2);
-	save_pointer(NAME(m_lumaram), 0x10000/2);
+	save_pointer(NAME(m_lumaram), 0x8000);
 	save_pointer(NAME(m_gamma_table), 256);
 }
 
@@ -2689,6 +2682,7 @@ void model2_state::tri_list_dump(FILE *dst)
 		fprintf( dst, "texheader - 2: %04x\n", m_raster->tri_list[i].texheader[2] );
 		fprintf( dst, "texheader - 3: %04x\n", m_raster->tri_list[i].texheader[3] );
 		fprintf( dst, "luma: %02x\n", m_raster->tri_list[i].luma );
+		fprintf( dst, "texlod: %08x\n", m_raster->tri_list[i].texlod );
 		fprintf( dst, "vp.sx: %04x\n", m_raster->tri_list[i].viewport[0] );
 		fprintf( dst, "vp.sy: %04x\n", m_raster->tri_list[i].viewport[1] );
 		fprintf( dst, "vp.ex: %04x\n", m_raster->tri_list[i].viewport[2] );
