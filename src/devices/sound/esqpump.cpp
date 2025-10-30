@@ -29,7 +29,7 @@ esq_5505_5510_pump_device::esq_5505_5510_pump_device(const machine_config &mconf
 
 void esq_5505_5510_pump_device::device_start()
 {
-	// The VFX only has a single pait of stereo outputs, 'Main'; these will be channels 0 and 1,
+	// The VFX only has a single pair of stereo outputs, 'Main'; these will be channels 0 and 1,
 	// and will be routed to the 'speaker' output device.
 	// VFX-SD and later have a separate 'Aux' stereo output that bypasses ESP effect processing;
 	// these will be channels 2 and 3 and can be routed to a separate 'aux' output device.
