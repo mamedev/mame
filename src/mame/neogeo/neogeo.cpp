@@ -1013,6 +1013,22 @@ void neogeo_base_state::audio_command_w(uint8_t data)
  *
  *************************************/
 
+//
+// fullset Project Neon debug port
+//
+void neogeo_base_state::devDebug_w(u8 data)
+{
+    static char debugStr[256];
+    static char *strPtr = debugStr;
+
+    if (!(*strPtr++ = data)) {
+        printf("%s", strPtr = debugStr);
+	}
+}
+
+//
+//
+//
 uint16_t neogeo_base_state::unmapped_r(address_space &space)
 {
 	uint16_t ret;
@@ -1534,6 +1550,38 @@ void neogeo_base_state::set_slot_idx(int slot)
 			space.install_read_port(0x280000, 0x280001, "IN5");
 			space.install_read_port(0x2c0000, 0x2c0001, "IN6");
 			break;
+		
+		//
+		// fullset Project Neon i/o ports. Probably should implement these as a protection device (like above games)
+		// so that these ports are not wired up for all games. Another day...
+		//
+		case NEOGEO_NEON:
+			// unmap default P bankswitch handler
+			space.unmap_write(0x2ffff0, 0x2fffff);
+		
+			// enable mcu debug in mame, not present on real cart
+			space.install_write_handler(0x500000, 0x500001, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_enable_debug_w)));
+
+			// (w) bank select (r) status
+			space.install_write_handler(0x200000, 0x200001, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_bank_w)));
+			space.install_read_handler(0x200000, 0x200001, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_status_r)));
+
+			// fix and adpcm banks select (not implemented)
+			space.install_write_handler(0x200002, 0x200003, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_auxbank_w)));
+
+			// mcu irq trigger
+			space.install_write_handler(0x200004, 0x200005, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_irq_w)));
+		
+			// game to mcu / mcu to game ram
+			space.install_write_handler(0x210000, 0x21004f, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_ram_w)));
+			space.install_read_handler(0x210000, 0x21004f, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::neon_mcu_ram_r)));
+			
+			printf("\n\n*** Fullset Cart Handlers Installed ***\n\n");
+			
+			break;
+
+		default:
+			break;
 		}
 	}
 }
@@ -1721,6 +1769,15 @@ void neogeo_base_state::base_main_map(address_map &map)
 	map(0x3c0000, 0x3c000f).mirror(0x01fff0).w(FUNC(neogeo_base_state::video_register_w));
 	map(0x3e0000, 0x3fffff).r(FUNC(neogeo_base_state::unmapped_r));
 	map(0x400000, 0x401fff).mirror(0x3fe000).rw(FUNC(neogeo_base_state::paletteram_r), FUNC(neogeo_base_state::paletteram_w));
+
+	//
+	// fullset Project Neon debug port
+	//
+	map(0xc00000, 0xc1ffff).mirror(0x0e0000).w(FUNC(neogeo_base_state::devDebug_w));
+
+	//
+	//
+	//
 }
 
 void ngarcade_base_state::neogeo_main_map(address_map &map)

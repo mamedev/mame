@@ -74,6 +74,11 @@ enum
 	NEOGEO_KOF10TH,
 	NEOGEO_VLINER,
 	NEOGEO_JOCKEYGP,
+
+	//
+	// fullset Project Neon custom cart type
+	//
+	NEOGEO_NEON,
 };
 
 
@@ -222,6 +227,22 @@ public:
 	uint16_t protection_r(address_space &space, offs_t offset);
 	void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t addon_r(offs_t offset);
+
+	//
+	// fullset Project Neon r/w port handlers
+	//
+	void neon_enable_debug_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	void neon_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t neon_mcu_status_r(offs_t offset);
+	void neon_auxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void neon_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void neon_mcu_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t neon_mcu_ram_r(offs_t offset);
+
+	//
+	//
+	//
 
 	void set_cart_type(const char *slot);
 	int get_type() { return m_type; }

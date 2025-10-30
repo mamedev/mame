@@ -114,4 +114,9 @@ void neogeo_cart(device_slot_interface &device)
 
 	device.option_add_internal("boot_kf10th",   NEOGEO_KOF10TH_CART);
 	device.option_add_internal("boot_sbp",      NEOGEO_SBP_CART);
+
+	//
+	// fullset Project Neon r/w cart type handler
+	//
+	device.option_add_internal("fsng1_neon",  NEOGEO_ROM);
 }

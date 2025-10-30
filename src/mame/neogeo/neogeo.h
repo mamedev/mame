@@ -47,6 +47,16 @@ public:
 	ioport_value get_audio_result();
 
 protected:
+	//
+	// fullset Project Neon
+	//
+	void devDebug_w(u8 data);
+	void neon_bank_w(u16 data);
+	u16 neon_bank_r();
+
+	//
+	//
+	//
 	neogeo_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
