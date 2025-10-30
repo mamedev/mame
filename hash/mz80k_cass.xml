@@ -283,7 +283,7 @@ Once the program has loaded, type RUN then RETURN to start the program.
 		<publisher>Unknown</publisher>
 		<info name="usage" value="LOAD then ENTER" />
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="8319">
+			<dataarea name="cass" size="16865">
 				<rom name="minotaurs cave.m12" size="16865" crc="67472c34" sha1="384d0fe8e6ef6c30eb7f9b4afc82019fdb11680e"/>
 			</dataarea>
 		</part>
