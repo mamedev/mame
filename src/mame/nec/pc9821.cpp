@@ -30,7 +30,7 @@ TODO (pc9821as):
 
 TODO (pc9821ce):
 - Needs SCSI to boot stuff, or 2.5" option IDE for 98NOTE;
-- Can't boot any floppy;
+- Can't boot any floppy, thinks it's never ready/leaves motor off;
 
 TODO (pc9821cx3):
 - Incomplete bank mapping, keeps looping over the same routine when hopping to PnP BIOS after
@@ -488,6 +488,7 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0070, 0x007f).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
+	// TODO: check me, should derive from templated fn instead
 	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
 	map(0x00a0, 0x00af).rw(FUNC(pc9821_state::pc9821_a0_r), FUNC(pc9821_state::pc9821_a0_w)); //upd7220 bitmap ports / display registers
 //  map(0x00b0, 0x00b3) PC9861k (serial port?)
@@ -782,6 +783,18 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
+
+// works better without the SDIP hack
+static INPUT_PORTS_START( pc9821ce )
+	PORT_INCLUDE( pc9821 )
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
+
+	PORT_MODIFY("DSW3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
+INPUT_PORTS_END
+
 
 MACHINE_START_MEMBER(pc9821_state,pc9821)
 {
@@ -1658,7 +1671,7 @@ COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_
 // ...
 
 // 98MULTi CanBe (i486/Pentium, desktop & tower, Multimedia PC with optional TV Tuner & remote control function, Fax, Modem, MPEG-2, FX-98IF for PC-FX compatibility etc. etc.)
-COMP( 1993, pc9821ce,   0,         0, pc9821ce,     pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce (98MULTi CanBe)",    MACHINE_NOT_WORKING )
+COMP( 1993, pc9821ce,   0,         0, pc9821ce,     pc9821ce, pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce (98MULTi CanBe)",    MACHINE_NOT_WORKING )
 //COMP( 1994, pc9821ce2,  pc9821ce,  0, pc9821ce2,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
 COMP( 1995, pc9821cx3,  0,         0, pc9821cx3,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
 
