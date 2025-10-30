@@ -95,7 +95,7 @@ public:
 					m_listening = false;
 					actual = 0;
 
-					return error::NONE;
+					return error::FAILURE;
 				}
 			}
 		}
