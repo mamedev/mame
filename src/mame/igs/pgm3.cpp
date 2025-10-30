@@ -45,32 +45,36 @@
 #include "screen.h"
 
 #include "util/aes256cbc.h"
+#include "util/endianness.h"
+
 
 namespace {
 
 class pgm3_state : public driver_device
 {
 public:
-	pgm3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pgm3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram")
 	{ }
 
-	void pgm3(machine_config &config);
+	void pgm3(machine_config &config) ATTR_COLD;
 
-	void init_kov3hd();
+	void init_kov3hd() ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+
 	uint32_t screen_update_pgm3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_pgm3(int state);
-	required_device<cpu_device> m_maincpu;
-	void pgm3_map(address_map &map) ATTR_COLD;
 	void decryptaes(const uint8_t *key, const uint8_t *iv, int source, int dest, int length);
 
+	void pgm3_map(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u32> m_mainram;
 };
 
@@ -78,7 +82,7 @@ void pgm3_state::decryptaes(const uint8_t *key, const uint8_t *iv, int source, i
 {
 	using namespace aes256cbc;
 
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	AES_CTX ctx;
 	uint8_t inbuffer[16];
 	uint8_t outbufer[16];
@@ -135,7 +139,7 @@ void pgm3_state::machine_start()
 void pgm3_state::machine_reset()
 {
 	// perform a bootstrap to bypass the level 0 internal_mask as it might not be properly dumped
-	uint8_t* bootrom = memregion("internal_mask")->base();
+	auto bootrom = util::little_endian_cast<uint8_t>(&memregion("internal_mask")->as_u32());
 	uint8_t rom_aes_key[32];
 	uint8_t rom_aes_iv[16];
 
