@@ -204,8 +204,6 @@ protected:
 	void geo_init(memory_region *polygon_rom);
 	u32 render_mode_r();
 	void render_mode_w(u32 data);
-	u16 lumaram_r(offs_t offset);
-	void lumaram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 lumaram_r(offs_t offset);
 	void lumaram_w(offs_t offset, u8 data);
 	u16 fbvram_bankA_r(offs_t offset);
