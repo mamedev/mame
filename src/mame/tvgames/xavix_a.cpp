@@ -685,12 +685,6 @@ uint8_t xavix_sound_device::fetch_env_byte_direct(int voice, int channel, uint16
 	const uint32_t rom = (uint32_t(bank) << 16) | uint32_t(addr);
 	const uint8_t  val = m_readsamples_cb(rom);
 
-	// One-shot “first fetch” debug per voice & side to verify addressing.
-	static bool first_seen[16][2] = { { false } };
-	const int side = channel ? 1 : 0;
-	if (!first_seen[voice][side])
-		first_seen[voice][side] = true;
-
 	return val;
 }
 

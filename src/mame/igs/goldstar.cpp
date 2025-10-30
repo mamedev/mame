@@ -8324,6 +8324,7 @@ static INPUT_PORTS_START( lucky8t )
 INPUT_PORTS_END
 
 
+#if 0
 static INPUT_PORTS_START( cbonus )
 	PORT_INCLUDE( lucky8b )
 
@@ -8431,6 +8432,7 @@ static INPUT_PORTS_START( cbonus )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+#endif
 
 // no manual - best guesses
 static INPUT_PORTS_START( cbaai )
@@ -17560,6 +17562,7 @@ ROM_START( cmasterl )  // most similar to cmasterbv but without the extra ROM
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+#if 0
 //  MB1 NHOLD
 //  BET is the STOP ALL
 ROM_START( cmasterm )
@@ -17629,6 +17632,7 @@ ROM_START( cmastern )
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
+#endif
 
 
 /*
@@ -21025,6 +21029,7 @@ ROM_START( cb2 ) // W4 base board + Dyna D8905 CPU board
 ROM_END
 
 
+#if 0
 /*
   Cherry Bonus
   チェリーボーナス (Cherī Bōnasu)
@@ -21062,6 +21067,7 @@ ROM_START( cbonus )
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "u1.bin", 0x0000, 0x0020, CRC(267004c8) SHA1(2c790e71b1c21961c5ced7b0ce8fbbb9fa5d806b) )
 ROM_END
+#endif
 
 /*
   W4 base board + CPU board.
@@ -29708,8 +29714,8 @@ GAMEL( 1991, cmasteri,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, cmasterj,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 10, BET stops all)",  0,          layout_cmasterb )
 GAMEL( 1991, cmasterk,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 11, TAKE stops all)", 0,          layout_cmasterb )
 GAMEL( 1991, cmasterl,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 12)",          0,                 layout_cmasterb )
-GAMEL( 1991, cmasterm,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 13, BET stops all)",  0,          layout_cmasterb )
-GAMEL( 1991, cmastern,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 14, TAKE stops all)", 0,          layout_cmasterb )
+//GAMEL( 1991, cmasterm,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 13, BET stops all)",  0,          layout_cmasterb )
+//GAMEL( 1991, cmastern,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 14, TAKE stops all)", 0,          layout_cmasterb )
 GAMEL( 1991, skillmst,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v5.0)",                 0,                 layout_cmasterb )
 GAMEL( 1991, skillmsta,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v3.0)",                 0,                 layout_cmasterb )
 GAMEL( 1991, cutyline,   0,        cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cuty Line (LC-88, ver.1.01)",                 0,                 layout_cmasterb )
@@ -29826,8 +29832,8 @@ GAMEL( 1995, wcat3,      0,        wcat3,    wcat3,    wingco_state,   init_wcat
 GAMEL( 199?, animalw,    0,        animalw,  lucky8t,  wingco_state,   empty_init,     ROT0, "GPS",               "Animal Wonders (ver A900 66)",                             0,                     layout_lucky8p1 )    // DIPs need to be checked
 GAMEL( 199?, animalwbl,  animalw,  lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900, bootleg)",                       0,                     layout_lucky8p1 )    // DIPs need to be checked
 GAMEL( 1989, cb2,        0,        lucky8,   lucky8,   wingco_state,   init_cb2,       ROT0, "Dyna",              "Cherry Bonus II (V2.00 06/01)",                            0,                     layout_lucky8 )
-GAMEL( 1988, cbonus,     0,        lucky8,   cbonus,   wingco_state,   empty_init,     ROT0, "Dyna",              "Cherry Bonus (Dyna v1.01 20fev)",                          0,                     layout_lucky8p1 )    // original dyna on wing board
-GAMEL( 1990, cbaai,      cbonus,   cbaai,    cbaai,    wingco_state,   init_cbaai,     ROT0, "bootleg (A.A.I.)",  "Cherry Bonus (A.A.I. bootleg)",                            0,                     layout_lucky8p1 )    // jumps to 0xf430 where expects code
+//GAMEL( 1988, cbonus,     0,        lucky8,   cbonus,   wingco_state,   empty_init,     ROT0, "Dyna",              "Cherry Bonus (Dyna v1.01 20fev)",                          0,                     layout_lucky8p1 )    // original dyna on wing board
+GAMEL( 1990, cbaai,      0/*cbonus*/,   cbaai,    cbaai,    wingco_state,   init_cbaai,     ROT0, "bootleg (A.A.I.)",  "Cherry Bonus (A.A.I. bootleg)",                            0,                     layout_lucky8p1 )    // jumps to 0xf430 where expects code
 GAMEL( 199?, ttactoe,    0,        lucky8t,  ttactoe,  wingco_state,   empty_init,     ROT0, "bootleg (Sundance)","Tic Tac Toe (Sundance bootleg of New Lucky 8 Lines)",      0,                     layout_lucky8 )      // needs more DSW figured out
 GAME(  1995, superdrg,   0,        superdrg, superdrg, wingco_state,   empty_init,     ROT0, "OCT",               "Super Dragon (Ver 211)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - SUPER DROGON 950828 211 (sic)
 

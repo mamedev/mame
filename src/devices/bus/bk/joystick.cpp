@@ -96,4 +96,4 @@ uint16_t bk_joystick_device::io_r()
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(BK_JOYSTICK, device_qbus_card_interface, bk_joystick_device, "bk_joystick", "BK Joystick Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(BK_JOYSTICK, device_bk_parallel_interface, bk_joystick_device, "bk_joystick", "BK Joystick Interface")

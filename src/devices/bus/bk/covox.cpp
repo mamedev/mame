@@ -88,4 +88,4 @@ void bk_covox_device::io_w(uint16_t data, bool word)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(BK_COVOX, device_qbus_card_interface, bk_covox_device, "bk_covox", "BK Mono Covox Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(BK_COVOX, device_bk_parallel_interface, bk_covox_device, "bk_covox", "BK Mono Covox Interface")
