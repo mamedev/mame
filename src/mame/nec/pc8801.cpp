@@ -3,38 +3,41 @@
 // thanks-to: Alex Marshall
 /**************************************************************************************************
 
-    PC-8801 (c) 1981 NEC
+PC-8801 (c) 1981 NEC
 
-    driver by Angelo Salese, original MESS PC-88SR driver by ???
+References:
+- http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
+- http://www7b.biglobe.ne.jp/~crazyunit/pc88.html
+- http://www.maroon.dti.ne.jp/youkan/pc88/index.html
+- https://web.archive.org/web/20190404052331/https://retrocomputerpeople.web.fc2.com/machines/nec/8801/index.html
 
-    TODO:
-    - cassette support;
-    - waitstates;
-    - support for partial palette updates (pretty off in p8suite analog RGB test if enabled);
-    - understand why i8214 needs a dis hack setter (depends on attached i8212?);
-    - clean-ups:
-      - slotify extended work RAM, make sure that p8suite memtest88 detects it properly;
-      - better state machine isolation of features between various models.
-        Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
-        (uses external minidisk), only model with working border color, other misc banking bits.
-      - refactor memory banking to use address maps & views;
-      - double check dipswitches;
-      - backport/merge what is portable to PC-8001;
-      - Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
-        Needs identification effort about what's internal to machine models and what instead
-        can be optionally installed;
-    - implement proper joypad / mouse (PC-8872) DB9 port connector, consider deriving from vcs_ctrl;
-    - Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
-      guessing from the back panels seems that each model can install between 1 to 3 cards.
-      Also note: most cards aren't compatible between each other;
+TODO:
+- cassette support;
+- refactor memory banking to use address maps & views;
+- waitstates (relevant for V1 mode);
+- hook Z80_INPUT_LINE_BUSRQ to DMA interactions in place of HALT (common with pc8001);
+- complete support for partial palette updates (pretty off in p8suite analog RGB test);
+- understand why i8214 needs a dis hack setter (depends on attached i8212?);
+- slotify extended work RAM, make sure that p8suite memtest88 detects it properly;
+- better state machine isolation of features between various models.
+  Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
+  (uses external minidisk instead), only model with working border color, other misc banking bits.
+- double check dipswitches;
+- backport/merge what is portable to PC-8001;
+- Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
+  Needs identification effort about what's internal to machine models and what instead
+  can be optionally installed;
+- Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
+  guessing from the back panels seems that each model can install between 1 to 3 cards.
+  Also note: most cards aren't compatible between each other;
 
-    Notes:
-    - Later models have washed out palette with some SWs, with no red component.
-      This is because you have to set up the V1 / V2 DIP-SW to V1 mode for those games
-      (BIOS sets up analog palette and never changes back otherwise).
-      cfr. SW list usage SW notes that specifically needs V1.
+Notes:
+- Later models have washed out palette with some SWs, with no red component.
+  This is because you have to set up the V1 / V2 DIP-SW to V1 mode for those games
+  (BIOS sets up analog palette and never changes back otherwise).
+  cfr. SW list usage SW notes that specifically needs V1.
 
-======================================================================================================================================
+===================================================================================================
 
     PC-88xx Models (and similar machines like PC-80xx and PC-98DO)
 
@@ -93,13 +96,7 @@
      * CD-ROM BIOS: 0x0000 - 0x7fff
      * Dictionary: 0xc000 - 0xffff (32 Banks)
 
-    References:
-    - https://retrocomputerpeople.web.fc2.com/machines/nec/8801/
-    - http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
-    - http://www7b.biglobe.ne.jp/~crazyunit/pc88.html
-    - http://www.maroon.dti.ne.jp/youkan/pc88/index.html
-
-*************************************************************************************************************************************/
+**************************************************************************************************/
 
 
 #include "emu.h"

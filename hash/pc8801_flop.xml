@@ -10530,6 +10530,9 @@ Not extensively tested
 		<description>Dragon Slayer - Eiyuu Densetsu</description>
 		<year>1989</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Uses [redbook] audio CD on PC-8801MC
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説"/>

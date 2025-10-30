@@ -237,8 +237,9 @@ u8 pc8801_31_device::clock_r()
 	// Checked 11 times on POST before giving up, definitely some kind of timing-based CD-ROM or board identification.
 	// If check passes the BIOS goes on with the "CD-System initialize\n[Space]->CD player" screen.
 	// A similar PCE pattern is mapped as "CDDA data select".
-	// There's no way to load floppies with this always on unless STOP key is held on boot (which doesn't look convenient).
-	// TODO: identify source and verify how much fast this really is.
+
+	// Update: pc8801_flop:dslayed is the odd one: if this is active it tries to load a redbook CD
+	// even if one isn't inserted, hanging in the process. Sense for CD motor?
 	m_clock_hb ^= 1;
 	return m_clock_hb << 7;
 }

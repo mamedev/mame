@@ -190,6 +190,8 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 		// - audio CD player ("fade out" button trigger, otherwise will playback the
 		//                    very next track at the end of the sequence)
 		// - ppersia (picking up sword in stage 1, cancels then restarts redbook BGM)
+		// TODO: pc8801_flop:dslayed contradicts here, almost never playing a redbook
+		// perhaps pc8801-30 doesn't have this register hooked up?
 		cdda->pause_audio(1);
 		m_cdda_play_mode = 3;
 		m_end_mark = 0;
