@@ -1027,7 +1027,6 @@ void model2_tgp_state::tex1_w(offs_t offset, u32 data)
 	}
 }
 
-u16 model2_state::lumaram_r(offs_t offset)
 u8 model2_state::lumaram_r(offs_t offset)
 {
 	return m_lumaram[offset];
