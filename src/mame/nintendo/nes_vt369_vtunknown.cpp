@@ -834,17 +834,17 @@ ROM_START( lxcmc250 ) // all games selectable
 ROM_END
 
 ROM_START( lxccminn ) // all games selectable
-	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
-	ROM_LOAD( "minnie_lexibook.bin", 0x00000, 0x4000000, CRC(3f8e5a69) SHA1(c9f11f3e5f9b73832a191f4d1620a85c1b70f79e) )
-	ROM_IGNORE(0x4000000)
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// has also been seen with double sized ROM, but 2nd half only contained garbage and upper pin wasn't connected
+	ROM_LOAD( "minnie_lexibook.bin", 0x00000, 0x4000000, CRC(1434460c) SHA1(9a0951f630d5412172e0a912d043897e4b8e9007) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( lxccplan ) // all games selectable
-	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
-	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(76e1a962) SHA1(83b801c0e0e941ceb1c93e565e833b07c09412c3))
-	ROM_IGNORE(0x4000000)
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// has also been seen with double sized ROM, but 2nd half only contained garbage and upper pin wasn't connected
+	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(f9ba6cfc) SHA1(e0f83f286653fb410638c01b928b391c5868d14f) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
