@@ -80,7 +80,7 @@ public:
 	required_shared_ptr<u32> m_textureram1;
 	std::unique_ptr<u16[]> m_palram;
 	std::unique_ptr<u16[]> m_colorxlat;
-	std::unique_ptr<u16[]> m_lumaram;
+	std::unique_ptr<u8[]> m_lumaram;
 	u8 m_gamma_table[256]{};
 	std::unique_ptr<model2_renderer> m_poly;
 
@@ -206,6 +206,8 @@ protected:
 	void render_mode_w(u32 data);
 	u16 lumaram_r(offs_t offset);
 	void lumaram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 lumaram_r(offs_t offset);
+	void lumaram_w(offs_t offset, u8 data);
 	u16 fbvram_bankA_r(offs_t offset);
 	void fbvram_bankA_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 fbvram_bankB_r(offs_t offset);
@@ -618,13 +620,20 @@ struct m2_poly_extra_data
 	u32      lumabase;
 	u32      colorbase;
 	u8       checker;
-	u32 *    texsheet[6];
-	u32      texwidth[6];
-	u32      texheight[6];
-	u32      texx[6];
-	u32      texy[6];
+	u32 *    texsheet[2];
+	u32      texwidth;
+	u32      texheight;
+	u32      texx;
+	u32      texy;
+	u8       texwrapx;
+	u8       texwrapy;
 	u8       texmirrorx;
 	u8       texmirrory;
+	u8       utex;
+	u8       utexminlod;
+	u32      utexx;
+	u32      utexy;
+	s32      texlod;
 	u8       luma;
 };
 
@@ -689,7 +698,7 @@ private:
 	int16_t m_xoffs = 0, m_yoffs = 0;
 
 	template <bool Translucent>
-	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv);
+	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const s32 miplevel, s32 fu, s32 fv);
 };
 
 typedef model2_renderer::vertex_t poly_vertex;
@@ -733,6 +742,7 @@ struct model2_state::triangle
 	u16             z = 0;
 	u16             texheader[4] = { 0, 0, 0, 0 };
 	u8              luma = 0;
+	s32             texlod = 0;
 	int16_t         viewport[4] = { 0, 0, 0, 0 };
 	int16_t         center[2] = { 0, 0 };
 	u8              window = 0;
@@ -750,6 +760,7 @@ struct model2_state::quad_m2
 	u16             z = 0;
 	u16             texheader[4] = { 0, 0, 0, 0 };
 	u8              luma = 0;
+	s32             texlod = 0;
 };
 
 /*******************************************
@@ -789,7 +800,7 @@ struct model2_state::raster_state
 	u16             min_z = 0;                      // Minimum sortable Z value
 	u16             max_z = 0;                      // Maximum sortable Z value
 	u16             texture_ram[0x10000];           // Texture RAM pointer
-	u8              log_ram[0x40000];               // Log RAM pointer
+	u8              log_ram[0x8000];                // Log RAM pointer
 	u8              cur_window = 0;                 // Current window
 	plane           clip_plane[4][4];               // Polygon clipping planes
 };

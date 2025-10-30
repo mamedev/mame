@@ -10,7 +10,6 @@
     MAME driver by R. Belmont, Olivier Galibert, ElSemi, Angelo Salese and Matthew Daniels.
 
     TODO:
-    - Mip Mapping still needs to be properly sorted in the renderer;
     - outputs and artwork (for gearbox indicators);
     - clean-ups;
 
@@ -1029,13 +1028,14 @@ void model2_tgp_state::tex1_w(offs_t offset, u32 data)
 }
 
 u16 model2_state::lumaram_r(offs_t offset)
+u8 model2_state::lumaram_r(offs_t offset)
 {
 	return m_lumaram[offset];
 }
 
-void model2_state::lumaram_w(offs_t offset, u16 data, u16 mem_mask)
+void model2_state::lumaram_w(offs_t offset, u8 data)
 {
-	COMBINE_DATA(&m_lumaram[offset]);
+	m_lumaram[offset] = data;
 }
 
 /* Top Skater reads here and discards the result */
@@ -1107,8 +1107,6 @@ void model2_state::model2_base_mem(address_map &map)
 	// format is xGGGGGRRRRRBBBBB (512x400)
 	map(0x11600000, 0x1167ffff).rw(FUNC(model2_state::fbvram_bankA_r), FUNC(model2_state::fbvram_bankA_w)).flags(i960_cpu_device::BURST); // framebuffer A (last bronx title screen)
 	map(0x11680000, 0x116fffff).rw(FUNC(model2_state::fbvram_bankB_r), FUNC(model2_state::fbvram_bankB_w)).flags(i960_cpu_device::BURST); // framebuffer B
-
-	map(0x12800000, 0x1281ffff).rw(FUNC(model2_state::lumaram_r), FUNC(model2_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 }
 
 /* common map for 5881 protection */
@@ -1244,8 +1242,11 @@ void model2_tgp_state::model2_tgp_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2_tgp_state::copro_ctl1_r), FUNC(model2_tgp_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2_tgp_state::geo_ctl1_w));
 
+	map(0x10800000, 0x10800003).nopr(); // polygon count register
+
 	map(0x12000000, 0x121fffff).ram().w(FUNC(model2o_state::tex0_w)).mirror(0x200000).share("textureram0").flags(i960_cpu_device::BURST);   // texture RAM 0
 	map(0x12400000, 0x125fffff).ram().w(FUNC(model2o_state::tex1_w)).mirror(0x200000).share("textureram1").flags(i960_cpu_device::BURST);   // texture RAM 1
+	map(0x12800000, 0x1281ffff).rw(FUNC(model2_tgp_state::lumaram_r), FUNC(model2_tgp_state::lumaram_w)).umask32(0x000000ff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 }
 
 /* original Model 2 overrides */
@@ -1390,6 +1391,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x11300000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
 	map(0x11400000, 0x1140ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
 	map(0x12800000, 0x1281ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
+	map(0x11400000, 0x1140ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask16(0x00ff).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
@@ -1426,6 +1428,7 @@ void model2c_state::model2c_crx_mem(address_map &map)
 	map(0x11200000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
 	map(0x11400000, 0x1140ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
 	map(0x12800000, 0x1281ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
+	map(0x11400000, 0x1140ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask16(0x00ff).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c80000, 0x01c80001).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w)).umask16(0x00ff);
