@@ -569,11 +569,12 @@ private:
 class model2c_state : public model2_state
 {
 public:
-	model2c_state(const machine_config &mconfig, device_type type, const char *tag)
-		: model2_state(mconfig, type, tag),
-		  m_copro_tgpx4(*this, "copro_tgpx4"),
-		  m_copro_tgpx4_program(*this, "copro_tgpx4_program")
-	{}
+	model2c_state(const machine_config &mconfig, device_type type, const char *tag) :
+		model2_state(mconfig, type, tag),
+		m_copro_tgpx4(*this, "copro_tgpx4"),
+		m_copro_tgpx4_program(*this, "copro_tgpx4_program")
+	{
+	}
 
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);
@@ -664,36 +665,40 @@ static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4>
 {
 public:
-	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
-
-public:
 	using triangle = model2_state::triangle;
 
-	model2_renderer(model2_state& state)
-		: poly_manager<float, m2_poly_extra_data, 4>(state.machine())
-		, m_state(state)
-		, m_destmap(512, 512)
+	model2_renderer(model2_state& state) :
+		poly_manager<float, m2_poly_extra_data, 4>(state.machine()),
+		m_render_callbacks{
+				{ &model2_renderer::draw_scanline_solid<false>, this },
+				{ &model2_renderer::draw_scanline_solid<true>, this },
+				{ &model2_renderer::draw_scanline_tex<false>, this },
+				{ &model2_renderer::draw_scanline_tex<true>, this } },
+		m_state(state),
+		m_destmap(512, 512),
+		m_xoffs(90),
+		m_yoffs(-8)
 	{
-		m_xoffs = 90;
-		m_yoffs = -8;
 	}
 
-	bitmap_rgb32& destmap() { return m_destmap; }
+	bitmap_rgb32 &destmap() { return m_destmap; }
 
 	void model2_3d_render(triangle *tri, const rectangle &cliprect);
 	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
 	void set_yoffset(int16_t yoffs) { m_yoffs = yoffs; }
 
 	template <bool Translucent>
-	void draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
+	void draw_scanline_solid(int32_t scanline, const extent_t &extent, const m2_poly_extra_data &object, int threadid);
 
 	template <bool Translucent>
-	void draw_scanline_tex(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
+	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const m2_poly_extra_data &object, int threadid);
 
 private:
-	model2_state& m_state;
+	render_delegate m_render_callbacks[4];
+
+	model2_state &m_state;
 	bitmap_rgb32 m_destmap;
-	int16_t m_xoffs = 0, m_yoffs = 0;
+	int16_t m_xoffs, m_yoffs;
 
 	template <bool Translucent>
 	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const s32 miplevel, s32 fu, s32 fv);

@@ -78,21 +78,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	// stream
-	sound_stream* m_stream = nullptr;
-
-	// global timing
-	uint8_t m_tempo_div[4] = { 0, 0, 0, 0 };
-	uint8_t m_cyclerate_div = 1;
-	uint32_t m_sequencer_rate_hz;
-
-	// callbacks
-	devcb_read8  m_readregs_cb;
-	devcb_write8 m_writeregs_cb;     // used to mirror vm1 phase to LA/RA
-	devcb_read8  m_readsamples_cb;
-
 	// voice state
-	struct xavix_voice {
+	struct xavix_voice
+	{
 		uint8_t   enabled = 0;
 		uint32_t  position = 0;
 		uint32_t  loop_position = 0;
@@ -142,6 +130,19 @@ private:
 		uint8_t mastervol = 0xff;
 		int32_t gain = 2;
 	};
+
+	// stream
+	sound_stream *m_stream = nullptr;
+
+	// global timing
+	uint8_t m_tempo_div[4] = { 0, 0, 0, 0 };
+	uint8_t m_cyclerate_div = 1;
+	uint32_t m_sequencer_rate_hz;
+
+	// callbacks
+	devcb_read8  m_readregs_cb;
+	devcb_write8 m_writeregs_cb;     // used to mirror vm1 phase to LA/RA
+	devcb_read8  m_readsamples_cb;
 
 	xavix_mixer m_mix;
 	xavix_voice m_voice[16];

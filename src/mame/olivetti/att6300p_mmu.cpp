@@ -169,11 +169,10 @@ void att6300p_mmu_device::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 		if (m_io_setup_enabled && (offset & 0xff8000) == 0xf8000)
 		{
-			if (mem_mask == 0xff00) {
+			if (mem_mask == 0xff00)
 				m_io_prot_table[(offset|1) & 0xfff] = ((data >> 8) & 0xf);
-			} else {
+			else
 				m_io_prot_table[offset & 0xfff] = (data & 0xf);
-			}
 		}
 	}
 

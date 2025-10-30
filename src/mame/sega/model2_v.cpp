@@ -126,11 +126,11 @@ static inline void transform_vector( poly_vertex *vector, float *matrix )
 	vector->pz = tz;
 }
 
-static inline void normalize_vector( poly_vertex *vector )
+static inline void normalize_vector(poly_vertex *vector)
 {
-	float n = sqrt( (vector->x * vector->x) + (vector->y * vector->y) + (vector->pz * vector->pz) );
+	const float n = sqrt( (vector->x * vector->x) + (vector->y * vector->y) + (vector->pz * vector->pz) );
 
-	if ( n )
+	if (n)
 	{
 		float oon = 1.0f / n;
 		vector->x *= oon;
@@ -139,12 +139,12 @@ static inline void normalize_vector( poly_vertex *vector )
 	}
 }
 
-static inline float dot_product( poly_vertex *v1, poly_vertex *v2 )
+static inline float dot_product(const poly_vertex &v1, const poly_vertex &v2)
 {
-	return (v1->x * v2->x) + (v1->y * v2->y) + (v1->pz * v2->pz);
+	return (v1.x * v2.x) + (v1.y * v2.y) + (v1.pz * v2.pz);
 }
 
-static inline void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex *v1, poly_vertex *v2 )
+static inline void vector_cross3(poly_vertex *dst, const poly_vertex *v0, const poly_vertex *v1, const poly_vertex *v2)
 {
 	poly_vertex p1, p2;
 
@@ -197,32 +197,29 @@ inline u16 model2_state::float_to_zval( float floatval )
 
 static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *vout, model2_state::plane clip_plane)
 {
-	poly_vertex *cur, *out;
-	float   curdot, nextdot, scale;
-	int32_t   i, curin, nextin, nextvert, outcount;
+	int32_t outcount = 0;
 
-	outcount = 0;
+	const poly_vertex *cur = v;
+	poly_vertex *out = vout;
 
-	cur = v;
-	out = vout;
+	float curdot = dot_product(*cur, clip_plane.normal);
+	int32_t curin = (curdot >= clip_plane.distance) ? 1 : 0;
 
-	curdot = dot_product( cur, &clip_plane.normal );
-	curin = (curdot >= clip_plane.distance) ? 1 : 0;
-
-	for( i = 0; i < num_vertices; i++ )
+	for (int32_t i = 0; i < num_vertices; i++)
 	{
-		nextvert = (i + 1) % num_vertices;
+		const int32_t nextvert = (i + 1) % num_vertices;
 
 		/* if the current point is inside the plane, add it */
-		if ( curin ) memcpy( &out[outcount++], cur, sizeof( poly_vertex ) );
+		if (curin)
+			out[outcount++] = *cur;
 
-		nextdot = dot_product( &v[nextvert], &clip_plane.normal );
-		nextin = (nextdot >= clip_plane.distance) ? 1 : 0;
+		const float nextdot = dot_product(v[nextvert], clip_plane.normal);
+		const int32_t nextin = (nextdot >= clip_plane.distance) ? 1 : 0;
 
 		/* Add a clipped vertex if one end of the current edge is inside the plane and the other is outside */
-		if ( curin != nextin && std::isnan(curdot) == false && std::isnan(nextdot) == false )
+		if ((curin != nextin) && !std::isnan(curdot) && !std::isnan(nextdot))
 		{
-			scale = (clip_plane.distance - curdot) / (nextdot - curdot);
+			const float scale = (clip_plane.distance - curdot) / (nextdot - curdot);
 
 			out[outcount].x = cur->x + ((v[nextvert].x - cur->x) * scale);
 			out[outcount].y = cur->y + ((v[nextvert].y - cur->y) * scale);
@@ -850,10 +847,12 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 
 	switch (renderer)
 	{
-	case 0: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<false>, this), tri->v[0], tri->v[1], tri->v[2]); break;
-	case 1: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_solid<true>,  this), tri->v[0], tri->v[1], tri->v[2]); break;
-	case 2: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<false>,   this), tri->v[0], tri->v[1], tri->v[2]); break;
-	case 3: render_triangle<3>(vp, render_delegate(&model2_renderer::draw_scanline_tex<true>,    this), tri->v[0], tri->v[1], tri->v[2]); break;
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		render_triangle<3>(vp, m_render_callbacks[renderer], tri->v[0], tri->v[1], tri->v[2]);
+		break;
 	}
 }
 
@@ -1302,10 +1301,10 @@ void model2_state::geo_parse_np_ns( geo_state *geo, u32 *input, u32 count )
 			transform_point( &point, geo->matrix );
 
 			/* calculate the dot product of the normal and the light vector */
-			dotl = dot_product( &normal, &geo->light );
+			dotl = dot_product(normal, geo->light);
 
 			/* calculate the dot product of the normal and the point */
-			dotp = dot_product( &normal, &point );
+			dotp = dot_product(normal, point);
 
 			/* apply focus */
 			apply_focus( geo, &point );
@@ -1449,10 +1448,10 @@ void model2_state::geo_parse_np_s( geo_state *geo, u32 *input, u32 count )
 			transform_point( &point, geo->matrix );
 
 			/* calculate the dot product of the normal and the light vector */
-			dotl = dot_product( &normal, &geo->light );
+			dotl = dot_product(normal, geo->light);
 
 			/* calculate the dot product of the normal and the point */
-			dotp = dot_product( &normal, &point );
+			dotp = dot_product(normal, point);
 
 			/* apply focus */
 			apply_focus( geo, &point );
@@ -1615,10 +1614,10 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count )
 			normalize_vector( &normal );
 
 			/* calculate the dot product of the normal and the light vector */
-			dotl = dot_product( &normal, &geo->light );
+			dotl = dot_product(normal, geo->light);
 
 			/* calculate the dot product of the normal and the point */
-			dotp = dot_product( &normal, &point );
+			dotp = dot_product(normal, point);
 
 			/* apply focus */
 			apply_focus( geo, &point );
@@ -1805,10 +1804,10 @@ void model2_state::geo_parse_nn_s( geo_state *geo, u32 *input, u32 count )
 			normalize_vector( &normal );
 
 			/* calculate the dot product of the normal and the light vector */
-			dotl = dot_product( &normal, &geo->light );
+			dotl = dot_product(normal, geo->light);
 
 			/* calculate the dot product of the normal and the point */
-			dotp = dot_product( &normal, &point );
+			dotp = dot_product(normal, point);
 
 			/* apply focus */
 			apply_focus( geo, &point );

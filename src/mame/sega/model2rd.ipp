@@ -224,7 +224,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	float dvoz = extent.param[2].dpdx;
 
 	// calculate maximum mipmap level from texture dimensions; we go down to 2x2
-	s32 max_level = (f2u((float)std::min(object.texwidth, object.texheight)) >> 23) - 128;
+	s32 max_level = (f2u(float(std::min(object.texwidth, object.texheight))) >> 23) - 128;
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;
 
@@ -244,7 +244,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 		dx = 2, dooz *= 2.0f, duoz *= 2.0f, dvoz *= 2.0f;
 	}
 
-	for (; x < extent.stopx; x += dx, ooz += dooz, uoz += duoz, voz += dvoz)
+	for ( ; x < extent.stopx; x += dx, ooz += dooz, uoz += duoz, voz += dvoz)
 	{
 		float z = recip_approx(ooz);
 

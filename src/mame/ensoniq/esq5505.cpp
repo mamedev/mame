@@ -232,20 +232,18 @@ public:
 		, m_seqram_nvram(*this, "seqram")
 	{ }
 
-	void common(machine_config &config);
-	void vfx(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX);
-	void vfxsd(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX_SD);
-	void sd1(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1);
-	void sd132(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1_32);
-	void eps(machine_config &config);
-	void common32(machine_config &config);
-	void sq1(machine_config &config);
-	void ks32(machine_config &config);
+	void vfx(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX) ATTR_COLD;
+	void vfxsd(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX_SD) ATTR_COLD;
+	void sd1(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1) ATTR_COLD;
+	void sd132(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1_32) ATTR_COLD;
+	void eps(machine_config &config) ATTR_COLD;
+	void sq1(machine_config &config) ATTR_COLD;
+	void ks32(machine_config &config) ATTR_COLD;
 
-	void init_eps();
-	void init_common();
-	void init_sq1();
-	void init_denib();
+	void init_eps() ATTR_COLD;
+	void init_sq1() ATTR_COLD;
+	void init_denib() ATTR_COLD;
+
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:
@@ -267,6 +265,11 @@ private:
 	required_shared_ptr<uint16_t> m_ram;
 	optional_device<nvram_device> m_osram_nvram;
 	optional_device<nvram_device> m_seqram_nvram;
+
+	void common(machine_config &config) ATTR_COLD;
+	void common32(machine_config &config) ATTR_COLD;
+
+	void init_common() ATTR_COLD;
 
 	uint16_t lower_r(offs_t offset);
 	void lower_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

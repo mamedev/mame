@@ -406,9 +406,9 @@ void att6300p_state::trapio_cb(uint32_t data)
 	uint8_t flags = (data>>24) & 0xf;
 
 	m_trapio_reg[m_trapio_reg_idx][0] = flags | (addr & 0xf) << 4;
-	m_trapio_reg[m_trapio_reg_idx][1] = ((addr>>4) & 0xf);
+	m_trapio_reg[m_trapio_reg_idx][1] = (addr >> 4) & 0xf;
 	m_trapio_reg[m_trapio_reg_idx][2] = val & 0xff;
-	m_trapio_reg[m_trapio_reg_idx][3] = ((addr >> 8) & 0xf);
+	m_trapio_reg[m_trapio_reg_idx][3] = (addr >> 8) & 0xf;
 
 	m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
 

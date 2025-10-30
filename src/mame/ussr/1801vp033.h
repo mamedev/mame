@@ -61,14 +61,14 @@ public:
 	void pic_write_rbuf(uint16_t data) { m_rbuf = data; }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
-	virtual void z80daisy_irq_reti() override {};
+	virtual void z80daisy_irq_reti() override {}
 
 private:
 	static constexpr uint16_t BPICCSR_RDY    = 0000040;
@@ -111,7 +111,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(K1801VP033, k1801vp033_device)
 
 #endif // MAME_USSR_1801VP033_H
