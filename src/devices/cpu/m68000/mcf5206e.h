@@ -32,7 +32,8 @@ enum {
 
 class mcf5206e_device;  // Forward declaration
 
-class coldfire_sim_device : public device_t {
+class coldfire_sim_device : public device_t
+{
 	friend class mcf5206e_device;
 
 	public:
@@ -135,7 +136,8 @@ class coldfire_sim_device : public device_t {
 
 };
 
-class coldfire_dma_device : public device_t {
+class coldfire_dma_device : public device_t
+{
 	// Manual states that the DMA channels cannot read from the internal SRAM
 	public:
 		coldfire_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -180,7 +182,8 @@ class coldfire_dma_device : public device_t {
 		devcb_write_line write_irq;
 };
 
-class coldfire_mbus_device : public device_t {
+class coldfire_mbus_device : public device_t
+{
 	public:
 		coldfire_mbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -237,7 +240,8 @@ class coldfire_mbus_device : public device_t {
 		devcb_write_line write_sda, write_scl, write_irq;
 };
 
-class coldfire_timer_device : public device_t {
+class coldfire_timer_device : public device_t
+{
 	public:
 		coldfire_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 

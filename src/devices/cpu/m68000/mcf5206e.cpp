@@ -486,7 +486,8 @@ u8 coldfire_sim_device::icr_r(offs_t offset)
 
 void coldfire_sim_device::icr_w(offs_t offset, u8 data)
 {
-	switch (offset){
+	switch (offset)
+	{
 		case 0: m_icr[offset] = (data & 0x83) + (1 << 2); break;
 		case 1: m_icr[offset] = (data & 0x83) + (2 << 2); break;
 		case 2: m_icr[offset] = (data & 0x83) + (3 << 2); break;
@@ -504,7 +505,8 @@ void coldfire_sim_device::icr_w(offs_t offset, u8 data)
 		case 14: m_icr[offset] = (data & 0x9f); break;
 		default: logerror("%s: Implausible ICR offset received: %d", this->machine().describe_context(), offset);
 	}
-	//ICR_info(m_icr[offset]);
+	//printf("%d %02x -> %02x\n", offset, data, m_icr[offset]);
+	//icr_info(m_icr[offset]);
 }
 
 // MBAR + 0x036: Interrupt Mask Register
@@ -531,12 +533,16 @@ void coldfire_sim_device::par_w(u16 data)
 void coldfire_sim_device::set_external_interrupt(int level, int state)
 {
 	// State here is inverted, inputs are active low
-	if(BIT(m_par, 6)){
+	if(BIT(m_par, 6))
+	{
 		// External IPL pins are encoded (IPL 1-7 levels)
 		m_external_ipl = level;
-	} else {
+	}
+	else
+	{
 		// External IPL pins are discrete (IRQ1, IRQ4, IRQ7)
-		switch(level){
+		switch(level)
+		{
 			case 1: BITWRITE(m_external_ipl, 0, state); break;
 			case 4: BITWRITE(m_external_ipl, 1, state); break;
 			case 7: BITWRITE(m_external_ipl, 2, state); break;
