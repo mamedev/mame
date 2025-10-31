@@ -224,7 +224,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	float dvoz = extent.param[2].dpdx;
 
 	// calculate maximum mipmap level from texture dimensions; we go down to 2x2
-	s32 max_level = (f2u(float(std::min(object.texwidth, object.texheight))) >> 23) - 128;
+	s32 max_level = 30 - count_leading_zeros_32(std::min(object.texwidth, object.texheight));
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;
 
@@ -265,9 +265,9 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 		}
 		else if (object.utex && mml < 0)
 		{
-			// microtexture; blend up to 50%
+			// microtexture; blend up to almost 50%
 			u32 t2 = fetch_bilinear_texel<Translucent>(object, -1, u, v);
-			s32 frac = std::min(-mml >> object.utexminlod, 128);
+			s32 frac = std::min(-mml >> object.utexminlod, 127);
 			t = LERP(t, t2, frac);
 		}
 
