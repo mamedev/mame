@@ -149,6 +149,28 @@ static INPUT_PORTS_START( petitlot )
 	// TODO: 5 10-position rotary switches
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( polarstar )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 void shoken_md06_state::petitlot(machine_config &config)
 {
@@ -174,7 +196,7 @@ void shoken_md06_state::polarstar(machine_config &config)
 
 ROM_START( petitlot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "md06_ver4_1.ic6", 0x00000, 0x10000, CRC(ebc81f10) SHA1(28ac52aeadfbf792da95c01b16fb88f7a5eb1d4e) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "md06_ver4_1.ic6", 0x00000, 0x10000, CRC(ebc81f10) SHA1(28ac52aeadfbf792da95c01b16fb88f7a5eb1d4e) ) // 1xxxxxxxxxxxxxxx = 0xff
 ROM_END
 
 ROM_START( polarstar2 )
@@ -187,5 +209,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2001, petitlot,   0, petitlot,  petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2004, polarstar2, 0, polarstar, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, petitlot,   0, petitlot,  petitlot,  shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2004, polarstar2, 0, polarstar, polarstar, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
