@@ -43,15 +43,18 @@ const tiny_rom_entry *dsp56364_device::device_rom_region() const
 
 void dsp56364_device::p_map(address_map &map)
 {
+	map(0x000000, 0x0001ff).ram();
 	map(0xff0000, 0xff00bf).rom().region("boot", 0);
 }
 
 void dsp56364_device::x_map(address_map &map)
 {
+	map(0x000000, 0x0003ff).ram();
 }
 
 void dsp56364_device::y_map(address_map &map)
 {
+	map(0x000000, 0x0005ff).ram();
 }
 
 DEFINE_DEVICE_TYPE(DSP56364, dsp56364_device, "dsp56364", "DSP 56364")

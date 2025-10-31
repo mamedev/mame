@@ -92,9 +92,9 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0200b0 move y:(r+o),d        - o:sda7(11, 6) r:ar(8) d:fobr(0)
 0200a0 move s,y:(r+o)        - o:sda7(11, 6) r:ar(8) s:fobr(0)
 014080 add #i,d              - i:imm6(8) d:acc(3)
-0140c0 add #i,d              - d:acc(3) i:eximm16()
+0140c0 add #i,d              - d:acc(3) i:eximm()
 014086 and #i,d              - i:imm6(8) d:acc(3)
-0140c6 and #i,d              - d:acc(3) i:eximm16()
+0140c6 and #i,d              - d:acc(3) i:eximm()
 0000b8 andi #i,ctrl          - i:imm8(8) ctrl:ctrl(0)
 	$ctrl:w($ctrl & $i);
 
@@ -180,7 +180,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0bc060 btst #n,d             - d:sbr(8) n:bit5(0)
 00c3c0 clb s,d               - s:acc(1) d:acc(0)
 014085 cmp #i,d              - i:imm6(8) d:acc(3)
-0140c5 cmp #i,d              - d:acc(3) i:eximm16()
+0140c5 cmp #i,d              - d:acc(3) i:eximm()
 0c1ff0 cmpu s1,s2            - s1:dao3(1) s2:acc(0)
 000200 debug                 -
 000300 debugcc               - cc:cc(0)
@@ -259,7 +259,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 
 00008c enddo                 -
 014083 eor #i,d              - i:imm6(8) d:acc(3)
-0140c3 eor #i,d              - d:acc(3) i:eximm24()
+0140c3 eor #i,d              - d:acc(3) i:eximm()
 0c1a00 extract s1,s2,d       - s1:actrl(1) s2:acc(4)
 0c1800 extract #co,s2,d      - s2:acc(4) d:acc(0) co:exco()
 0c1a80 extractu s1,s2,d      - s1:actrl(1) s2:acc(4)
@@ -333,10 +333,10 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 044000 lua ea,d              - ea:eam4(8) d:fvbr1(0)
 040000 lua (r+o),d           - r:ar(8) o:sda7b(11, 4) d:agu(0)
 0100c2 mac +s,#i,d           - i:imm4(8) s:damo2(4) d:acc(3) +:sign(2)
-0141c2 maci +#i,s,d          - s:damo2(4) d:acc(3) +:sign(2) i:eximm24()
+0141c2 maci +#i,s,d          - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
 012680 macss +s1,s2,d        - ss:ss1(6) d:acc(5) +:sign(4) s1:damo4_a(0) s2:damo4_b(0)
 0100c3 maccr +s,#i,d         - i:imm4(8) s:damo2(4) d:acc(3) +:sign(2)
-0141c3 macri +#i,s,d         - s:damo2(4) d:acc(3) +:sign(2) i:eximm24()
+0141c3 macri +#i,s,d         - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
 0c1b80 merge s,d             - s:dao3(1) d:acc(0)
 05c020 movec xy:ea,d1        - ea:eam1(8) xy:xyc(6) d1:fvbr2(0)
 054020 movec s1,xy:ea        - ea:eam1(8) xy:xyc(6) s1:fvbr2(0)
@@ -398,13 +398,13 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 
 0100c0 mpy +s,#i,d           - i:imm4(8) s:damo2(4) d:acc(3) +:sign(2)
 012780 mpyss +s1,s2,d        - ss:ss1(6) d:acc(5) +:sign(4) s1:damo4_a(0) s2:damo4_b(0)
-0141c0 mpyi +#i,s,d          - s:damo2(4) d:acc(3) +:sign(2) i:eximm24()
+0141c0 mpyi +#i,s,d          - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
 0100c1 mpyr +s,#i,d          - i:imm4(8) s:damo2(4) d:acc(3) +:sign(2)
-0141c1 mpyri +#i,s,d         - s:damo2(4) d:acc(3) +:sign(2) i:eximm24()
+0141c1 mpyri +#i,s,d         - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
 01d815 norm r,d              - r:ar(8) d:acc(3)
 0c1e20 normf s,d             - s:actrl(1) d:acc(0)
 014082 or #i,d               - i:imm6(8) d:acc(3)
-0140c2 or #i,d               - d:acc(3) i:eximm24()
+0140c2 or #i,d               - d:acc(3) i:eximm()
 0000f8 ori #i,ctrl           - i:imm8(8) ctrl:ctrl(0)
 000003 pflush                -
 000001 pflushun              -
@@ -424,7 +424,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 00000c rts                   -
 000087 stop                  -
 014084 sub #i,d              - i:imm6(8) d:acc(3)
-0140c4 sub #i,d              - d:acc(3) i:eximm16()
+0140c4 sub #i,d              - d:acc(3) i:eximm()
 020000 tcc s1,d1             - cc:cc(12) s1:daos3(4, 3) d1:acc(3)
 030000 tcc s1,d1 s2,d2       - cc:cc(12) s2:ar(8) s1:daos3(4, 3) d1:acc(3) d2:ar(0)
 020800 tcc s2,d2             - cc:cc(12) s2:ar(8) d2:ar(0)
