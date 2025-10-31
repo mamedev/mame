@@ -77,6 +77,13 @@ void shoken_md06_state::io_map(address_map &map)
 	map(0x80, 0x80).noprw();
 }
 
+void shoken_md06_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).nopw();
+	map(0x80, 0x80).noprw();
+}
+
 static INPUT_PORTS_START( petitlot )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -156,6 +163,7 @@ void shoken_md06_state::petitlot(machine_config &config)
 void shoken_md06_state::polarstar(machine_config &config)
 {
 	petitlot(config);
+	m_maincpu->set_addrmap(AS_IO, &shoken_md06_state::sound_io_map);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
