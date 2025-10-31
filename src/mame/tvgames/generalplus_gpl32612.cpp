@@ -617,7 +617,7 @@ CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplu
 
 // uses GPL32610
 // カメラでリンク! ポケモン図鑑 スマホロトム
-CONS( 201?, rotom2,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Camera de Link! Pokemon Zukan - Sumaho Rotom (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, rotom2,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",          "Camera de Link! Pokemon Zukan - SmaFo Rotom (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32611
 // 小学館の図鑑 NEO Pad - 生きもの編 (this is the standard green version)
