@@ -845,15 +845,7 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * (1.0f / 8.0f);
 	}
 
-	switch (renderer)
-	{
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-		render_triangle<3>(vp, m_render_callbacks[renderer], tri->v[0], tri->v[1], tri->v[2]);
-		break;
-	}
+	render_triangle<3>(vp, m_render_callbacks[renderer], tri->v[0], tri->v[1], tri->v[2]);
 }
 
 /*
