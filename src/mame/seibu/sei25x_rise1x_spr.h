@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina, Nicola Salmoria, Ville Linde, hap
-#ifndef MAME_SEIBU_SEI025X_RISE1X_SPR_H
-#define MAME_SEIBU_SEI025X_RISE1X_SPR_H
+#ifndef MAME_SEIBU_SEI25X_RISE1X_SPR_H
+#define MAME_SEIBU_SEI25X_RISE1X_SPR_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEI25X_RISE1X, sei25x_rise1x_device)
 
-#endif // MAME_SEIBU_SEI025X_RISE1X_SPR_H
+#endif // MAME_SEIBU_SEI25X_RISE1X_SPR_H
