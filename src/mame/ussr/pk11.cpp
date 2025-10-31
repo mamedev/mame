@@ -1024,7 +1024,7 @@ void pk11_state::pk11(machine_config &config)
 	K1801VM2(config, m_maincpu, XTAL(30'800'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pk11_state::pk11_mem);
 	m_maincpu->set_initial_mode(0);
-	m_maincpu->in_iack().set([this] () -> uint8_t { return 0274; }); // vector timeout handler, adds 64T
+	m_maincpu->in_iack().set([] () { return 0274; }); // vector timeout handler, adds 64T
 	m_maincpu->out_reset().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	m_maincpu->out_bankswitch().set([this] (int state) {
 		if (m_odt_map != state) {
