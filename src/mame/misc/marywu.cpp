@@ -14,7 +14,15 @@
     31 LEDs, 13 modules of double-digit 7-seg displays and 4 push-buttons).
   * we may also have user inputs from the coin slot and from the
     cabinet buttons, for making bets.
-
+  * P1 bits are:
+    ENABLE (output)
+    入表 (output)
+    出表 (output)
+    SSR (output)
+    入表檢查 (input)
+    出表檢查 (input)
+    HOPPER SW (input)
+    洗分 SW (input)
 **************************************************************************/
 
 #include "emu.h"
@@ -102,8 +110,8 @@ static INPUT_PORTS_START( marywu )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P1.6") PORT_CODE(KEYCODE_C) // If press or IP_ACTIVE_LOW Will cause Error 30 if press
-	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.7") PORT_CODE(KEYCODE_V) // If press during startup, it will cause error 76.
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN) // P1.6 - Hopper SW. If IP_ACTIVE_LOW Will cause Error 30.
+	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.7") PORT_CODE(KEYCODE_V) // 洗分 SW 
 INPUT_PORTS_END
 
 void marywu_state::ay1_port_a_w(uint8_t data)
