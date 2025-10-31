@@ -594,6 +594,7 @@ public:
 	{ }
 
 	void cmast97(machine_config &config) ATTR_COLD;
+	void jpknight(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -606,9 +607,11 @@ private:
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_cmast97_reel_tile_info);
 	
 	uint32_t screen_update_cmast97(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jpknight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cmast97_map(address_map &map) ATTR_COLD;
 	void cmast97_portmap(address_map &map) ATTR_COLD;
+	void jpknight_portmap(address_map &map) ATTR_COLD;
 	void cm97_vid_reg_w(uint8_t data);
 	uint8_t m_bgcolor = 0;
 };
@@ -1617,9 +1620,59 @@ uint32_t cmast97_state::screen_update_cmast97(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
+uint32_t cmast97_state::screen_update_jpknight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	if (!(m_enable_reg & 0x01))
+		return 0;
+
+	if (m_enable_reg & 0x10)
+	{
+		if(m_reel_bank == 0)
+		{
+			for (int i = 0; i < 64; i++)
+			{
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+			}
+
+			const rectangle visible1(14*8, (14+47)*8-1,  7*8,  (7+6)*8-1);
+			const rectangle visible2(14*8, (14+47)*8-1, 13*8, (13+6)*8-1);
+			const rectangle visible3(14*8, (14+47)*8-1, 19*8, (19+6)*8-1);
+
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+			m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+			m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+		}
+		else
+		{
+			for (int i = 0; i < 64; i++)
+			{
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			}
+			const rectangle visible1(35*8, (35+30)*8-1,  1*8,  (1+14)*8-1);
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		}
+	}
+	else
+	{
+		if (m_enable_reg & 0x02)
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
+
+	if (m_enable_reg & 0x08)
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
 uint32_t wingco_state::screen_update_lucky8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
+	logerror("screen_update_jpknight:%02x\n", m_enable_reg);
 
 	if (!(m_enable_reg & 0x01))
 		return 0;
@@ -3844,6 +3897,22 @@ void cmast97_state::cmast97_portmap(address_map &map)
 	map(0x11, 0x11).portr("IN1").w(FUNC(cmaster_state::coincount_w));
 	map(0x12, 0x12).portr("IN2");
 }
+
+void cmast97_state::jpknight_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).lw8(NAME([this] (uint8_t data) { m_enable_reg = data; m_gfx_view.select(BIT(m_enable_reg, 4)); } ));
+	map(0x01, 0x01).lw8(NAME([this] (uint8_t data) { m_tile_bank = (data & 0x0c) >> 2; if (data & 0xf3) logerror("unk tile bank w: %02x\n", data); }));
+	map(0x09, 0x09).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x0a, 0x0b).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x0c, 0x0c).portr("DSW1");
+	map(0x0d, 0x0d).portr("DSW2");
+	map(0x0e, 0x0e).portr("DSW3");
+	map(0x10, 0x10).portr("IN0").w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x11, 0x11).portr("IN1").w(FUNC(cmaster_state::coincount_w));
+	map(0x12, 0x12).portr("IN2");
+}
+
 
 void cmaster_state::cmtetriskr_portmap(address_map &map)
 {
@@ -14171,6 +14240,12 @@ static GFXDECODE_START( gfx_cmast97 )
 	GFXDECODE_ENTRY( "gfx", 0x40000, cmast97_layout,    0, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_jpknight )
+	GFXDECODE_ENTRY( "gfx", 0,       cmast97_layout,       0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x20000, cmast97_layout32,  0x80, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x40000, cmast97_layout,       0, 16 )
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_animalhs )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,           0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, animalhs_tiles8x32_layout, 128+64,  4 )
@@ -14533,6 +14608,17 @@ void cmast97_state::cmast97(machine_config &config)
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
 }
+
+void cmast97_state::jpknight(machine_config &config)
+{
+	cmast97(config);
+
+	m_maincpu->set_addrmap(AS_IO, &cmast97_state::jpknight_portmap);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cmast97_state::screen_update_jpknight));
+
+	m_gfxdecode->set_info(gfx_jpknight);
+}
+
 
 void cmaster_state::chryangl(machine_config &config)
 {
@@ -24784,7 +24870,19 @@ ROM_START( cmast97 )
 	ROM_LOAD( "82s135.c9",  0x100, 0x100, CRC(85883486) SHA1(adcee60f6fc1e8a75c529951df9e5e1ee277e131) )
 ROM_END
 
-ROM_START( cmast97a )  // D9503 DYNA
+ROM_START( cmast97a )  // D9503 DYNA, no girls, copyright 1997
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "c97.f10", 0x00000, 0x10000, CRC(fa0a6e69) SHA1(6d75cb4b4d16ae84dab55433d439f5d24fd52ed9) )
+
+	ROM_REGION( 0x080000, "gfx", 0 )
+	ROM_LOAD( "c97_27c4002.d9", 0x000000, 0x80000, CRC(2034eb3b) SHA1(548c1e7381158efa61024cafa2e1f6a57bb97d71) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s135.c8",  0x000, 0x100, CRC(4b715969) SHA1(9429dc8698f4ff9195e5e975e62546b7b7e2f856) )
+	ROM_LOAD( "82s135.c9",  0x100, 0x100, CRC(85883486) SHA1(adcee60f6fc1e8a75c529951df9e5e1ee277e131) )
+ROM_END
+
+ROM_START( cmast97b )  // D9503 DYNA, same no girls program, copyright 1996.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "c97.f10", 0x00000, 0x10000, CRC(fa0a6e69) SHA1(6d75cb4b4d16ae84dab55433d439f5d24fd52ed9) )
 
@@ -30000,9 +30098,10 @@ GAME(  1991, eldoraddo,  eldoradd, eldoradd, cmast91,  cmaster_state,  empty_ini
 GAME(  1991, eldoraddob, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V2.0D)",                           MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddoc, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1J)",                           MACHINE_NOT_WORKING ) // different GFX hw?
 GAMEL( 1996, cmast97,    0,        cmast97,  cmast97,  cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             0,    layout_cmast97 )
-GAMEL( 1996, cmast97a,   cmast97,  cmast97,  cmast97,  cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2, no girls)",   0,    layout_cmast97 )
+GAMEL( 1997, cmast97a,   cmast97,  cmast97,  cmast97,  cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2, no girls)",   0,    layout_cmast97 )
+GAMEL( 1996, cmast97b,   cmast97,  cmast97,  cmast97,  cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 3, no girls)",   0,    layout_cmast97 )
 GAMEL( 1996, cmast97i,   cmast97,  cmast97,  cmast97,  cmast97_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     0,    layout_cmast97 )
-GAME(  1997, jpknight,   0,        cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna / R-Stone",    "Jackpot Knight (V1.1)",                       MACHINE_NOT_WORKING ) // check inputs
+GAME(  1997, jpknight,   0,        jpknight, cmast97,  cmast97_state,  empty_init,     ROT0, "Dyna / R-Stone",    "Jackpot Knight (V1.1)",                       MACHINE_NOT_WORKING ) // check inputs
 GAME(  1999, cmast99,    0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,   cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
