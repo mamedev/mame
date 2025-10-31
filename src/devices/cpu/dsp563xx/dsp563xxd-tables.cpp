@@ -34844,7 +34844,7 @@ const u64 dsp563xx_disassembler::t_move_ex =
 ;
 
 const u64 dsp563xx_disassembler::t_npar_ex[4] = {
-	0x17e7f3e4208828cc,0xf8bf22a3de040bf2,0x09333080c480bebf,0x00000020401b0450,
+	0x17e7f3e4208828cc,0xf8bf22a7fe040bf2,0x09333080c480bebf,0x00000020401b0450,
 };
 
 const char *const dsp563xx_disassembler::ts_acc[2] = { "a", "b" };
@@ -35069,12 +35069,12 @@ std::string dsp563xx_disassembler::disasm_npar(u8 knpar, u32 opcode, u32 exv, u3
 	case 90: return util::string_format("do %s:[asa6],0x%06x", ts_xyc[BIT(opcode, 6, 1)], exv);
 	case 91: return util::string_format("do #0x%03x,0x%06x", bitswap<12>(opcode, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8), exv);
 	case 92: return util::string_format("do %s,0x%06x", ts_sbr_nos[BIT(opcode, 8, 6)], exv);
-	case 93: return "do forever";
+	case 93: return util::string_format("do forever,0x%06x", exv);
 	case 94: return util::string_format("dor %s:%s,0x%06x", ts_xyc[BIT(opcode, 6, 1)], ts_eam1[BIT(opcode, 8, 6)], (pc+exv) & 0xffffff);
 	case 95: return util::string_format("dor %s:[asa6],0x%06x", ts_xyc[BIT(opcode, 6, 1)], (pc+exv) & 0xffffff);
 	case 96: return util::string_format("dor #0x%03x,0x%06x", bitswap<12>(opcode, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8), (pc+exv) & 0xffffff);
 	case 97: return util::string_format("dor %s,0x%06x", ts_sbr_nos[BIT(opcode, 8, 6)], (pc+exv) & 0xffffff);
-	case 98: return "dor forever";
+	case 98: return util::string_format("dor forever,0x%06x", (pc+exv) & 0xffffff);
 	case 99: return "enddo";
 	case 100: return util::string_format("eor #0x%02x,%s", BIT(opcode, 8, 6), ts_acc[BIT(opcode, 3, 1)]);
 	case 101: return util::string_format("eor #[eximm24],%s", ts_acc[BIT(opcode, 3, 1)]);

@@ -149,11 +149,6 @@ void acvirus_state::p5_w(u8 data)
 	m_rombank->set_entry((data >> 4) & 15);
 }
 
-u8 acvirus_state::p402_r()
-{
-	return 0x02; // ready?
-}
-
 void acvirus_state::prog_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0); // fixed 32K of flash image
@@ -162,7 +157,7 @@ void acvirus_state::prog_map(address_map &map)
 
 void acvirus_state::data_map(address_map &map)
 {
-	map(0x0402, 0x0402).r (FUNC(acvirus_state::p402_r));
+	map(0x0400, 0x0407).rw(m_dsp, FUNC(dsp563xx_device::hi08_r), FUNC(dsp563xx_device::hi08_w));
 }
 
 void acvirus_state::palette_init(palette_device &palette)

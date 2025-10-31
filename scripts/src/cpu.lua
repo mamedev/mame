@@ -4296,6 +4296,8 @@ if CPUS["DSP563XX"] then
 		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56362.h",
 		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56364.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56364.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/hi08.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/hi08.h",
 	}
 end
 

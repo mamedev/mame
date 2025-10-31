@@ -42,15 +42,19 @@ const tiny_rom_entry *dsp56311_device::device_rom_region() const
 
 void dsp56311_device::p_map(address_map &map)
 {
+	map(0x000000, 0x007fff).ram();
 	map(0xff0000, 0xff00bf).rom().region("boot", 0);
 }
 
 void dsp56311_device::x_map(address_map &map)
 {
+	map(0x000000, 0x00bfff).ram();
+	map(0xffffc2, 0xffffc7).m(m_hi08, FUNC(hi08_device::map));
 }
 
 void dsp56311_device::y_map(address_map &map)
 {
+	map(0x000000, 0x00bfff).ram();
 }
 
 DEFINE_DEVICE_TYPE(DSP56311, dsp56311_device, "dsp56311", "DSP 56311")

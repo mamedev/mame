@@ -15,6 +15,17 @@ class FType(IntEnum):
     keyed = 2
     none = 3
 
+class SourceType:
+    interp_pre = 0
+    interp_post = 1
+    drc_pre = 2
+    drc_post = 3
+
+class SlotMode:
+    read = 0
+    write = 1
+    memory = 2
+
 functions = {}
 
 class Function:
@@ -299,6 +310,51 @@ class Function:
             s += ', %d' % (bit-1)
         return s
 
+    def get_value_expression(self, params):
+        if self.values[0] == "single":
+            return 'BIT(opcode, %d, %d)' % (params[0], self.bcount)
+        elif self.values[0] == "single-alt":
+            return 'bitswap<%d>(opcode, %d%s)' % (self.bcount+1, params[1], self.brange(params[0], self.bcount))
+        elif self.values[0] == 'split':
+            b2 = self.values[1]
+            b1 = self.bcount - b2
+            return 'bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
+        elif self.values[0] == 'split-alt':
+            b2 = self.values[1]
+            b1 = self.bcount - b2
+            return 'bitswap<%d>(opcode, %d%s%s)' % (self.bcount+1, params[2], self.brange(params[0], b1), self.brange(params[1], b2))
+        elif self.values[0] == 'range':
+            mode = self.values[3 if self.values[0] == "split-range" else 2]
+            if mode == 'imm' or mode == 'bit' or mode == 'abs':
+                return 'BIT(opcode, %d, %d)' % (params[0], self.bcount)
+            elif mode == 'asap':
+                return '0xffffc0 + BIT(opcode, %d, %d)' % (params[0], self.bcount)
+            elif mode == 'asaq':
+                return '0xffff80 + BIT(opcode, %d, %d)' % (params[0], self.bcount)                
+            else:
+                print('unsupported range on %s %s' % (mode, self.name))
+        elif self.values[0] == 'split-range':
+            b2 = self.values[1]
+            b1 = self.bcount - b2
+            mode = self.values[3 if self.values[0] == "split-range" else 2]
+            if mode == 'imm' or mode == 'bit':
+                return 'bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
+            elif mode == 'asap':
+                return '0xffffc0 + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
+            elif mode == 'asaq':
+                return '0xffff80 + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
+            elif mode == 'pcrel':
+                return 'm_pc + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
+            else:
+                print('unsupported split-range on %s %s' % (mode, self.name))
+        elif self.name == 'exabs' or self.name == 'eximm' or self.name == 'eam1a' or self.name == 'eam1i':
+            return 'exv'
+        elif self.name == 'expcrel':
+            return '(m_pc+exv) & 0xffffff'
+        else:
+            print('unsupported get_value_expression on %s %s' % (self.values[0], self.name))
+        return ''
+        
     def param(self, params):
         if self.values[0] == "single":
             return ', ts_%s[BIT(opcode, %d, %d)]' % (self.name, params[0], self.bcount)
@@ -413,6 +469,10 @@ Function("damo1_a",  1, ["single", ['x0', 'y0', 'x1', 'y1', 'x0', 'y0', 'x1', 'y
 Function("damo1_b", -1, ["single", ['x0', 'y0', 'x0', 'y0', 'y1', 'x0', 'y0', 'x1']])
 Function("damo2", 1, ["single", ['y1', 'x0', 'y0', 'x1']])
 
+NormalRegs = ['a', 'a0', 'a1', 'a2', 'b', 'b0', 'b1', 'b2', 'x0', 'x1', 'y0', 'y1', 'ep', 'vba', 'sc', 'sz', 'sr', 'omr', 'sp', 'ssh', 'ssl', 'la', 'lc', 'mr', 'ccr', 'com', 'eom']
+ArrayRegs = ['r', 'n', 'm']
+IndirectRegs = ['(r)-n', '(r)+n', '(r)-', '(r)+', '(r)', '(r+n)', '-(r)']
+
 class Slot:
     def __init__(self, name, func):
         global functions
@@ -445,6 +505,9 @@ class Slot:
     def get_val_idxs_slotted(self, slot, idxs):
         return self.func.get_val_idxs_slotted(slot, self.params, idxs)
 
+    def get_value_expression(self):
+        return self.func.get_value_expression(self.params)
+
 class Variant:
     def __init__(self, inst, cid, has_ex):
         self.inst = inst
@@ -467,7 +530,157 @@ class Variant:
                     self.name += '[' + s.name + ']'
 
     def generate_code(self, f, post):
-        print('\t\tunhandled("%s");' % self.name, file=f)
+        if self.inst.unhandled():
+            if self.name != '':
+                print('\t\tunhandled("%s");' % self.name, file=f)
+        else:
+            self.inst.source[SourceType.interp_post if post else SourceType.interp_pre].gen(f, self.slots, self.inst.slots)
+
+class Source:
+    def __init__(self):
+        self.text = []
+        self.slots = {}
+
+    def empty(self):
+        return len(self.text) == 0
+
+    def parse(self, line):
+        r = []
+        isa = lambda c: (c >= 'a' and c <= 'z') or (c >= '0' and c <= '9')
+        isp = lambda c: c == '+'        
+        pos = 0
+        while True:
+            spos = pos
+            while pos != len(line) and line[pos] != '$':
+                pos += 1
+            if pos != spos:
+                r.append(line[spos:pos])
+            if pos == len(line):
+                break
+            pos += 1
+            if pos == len(line):
+                print("$ at end of line")
+                sys.exit(1)
+            if not (isa(line[pos]) or isp(line[pos])):
+                print("Unexpected %c after $" % line[pos])
+                sys.exit(1)
+            spos = pos
+            if isa(line[pos]):
+                pos += 1
+                while pos != len(line) and isa(line[pos]):
+                    pos += 1
+            else:
+                pos += 1
+            sname = line[spos:pos]
+            smode = ''
+            if pos != len(line) and line[pos] == ':':
+                pos += 1
+                spos = pos
+                while pos != len(line) and isa(line[pos]):
+                    pos += 1
+                smode = line[spos:pos]
+            if smode != '' and smode != 'w' and smode != 'm':
+                print("Unexpected slot mode %s" % smode)
+                sys.exit(1)
+            smode_id = SlotMode.read if smode == '' else SlotMode.write if smode == 'w' else SlotMode.memory
+            if sname not in self.slots:
+                self.slots[sname] = [False]*3
+            self.slots[sname][smode_id] = True
+            sub = []
+            if pos != len(line) and line[pos] == '(':
+                pos += 1
+                depth = 1
+                spos = pos
+                while pos != len(line) and depth != 0:
+                    if line[pos] == '(':
+                        depth += 1
+                    if line[pos] == ')':
+                        depth -= 1
+                    pos += 1
+                if depth != 0:
+                    print("Unbalanced parenthesis")
+                    sys.exit(1)
+                sub = self.parse(line[spos:pos-1])
+            r.append([sname, smode_id, sub])
+        return r
+                
+    def add(self, line):
+        self.text.append(self.parse(line))
+
+    def expand(self, line, slots, islots):
+        global NormalRegs
+        s = ''
+        for e in line:
+            if type(e) == str:
+                s += e
+                continue
+            if e[1] == SlotMode.read:
+                s += e[0]
+            elif e[1] == SlotMode.memory:
+                if e[0] not in slots:
+                    print("uninstanciated slot (memory)", e)
+                s += 'm_' + slots[e[0]]
+            else:
+                sub = self.expand(e[2], slots, islots)
+                if e[0] in slots:
+                    slot = slots[e[0]]
+                    if slot in NormalRegs:
+                        s += 'set_%s(%s)' % (slot, sub)
+                    elif slot in ArrayRegs:
+                        si = islots[e[0]].get_value_expression() + ' & 7'
+                        s += 'set_%s(%s, %s)' % (slot, si, sub)
+                    else:
+                        print("instanciated slot (write)", e, slot)
+                else:
+                    print("Write on uninstanciated slot %s" % e[0])
+                    sys.exit(1)
+        return s
+
+    def gen(self, f, slots, islots):
+        for slot, sinfo in self.slots.items():
+            if sinfo[SlotMode.read]:
+                if slot in slots:
+                    inst = slots[slot]
+                    if inst in NormalRegs:
+                        if inst == 'a' or inst == 'b':
+                            print('\t\tu64 %s = get_%s();' % (slot, inst), file=f)
+                        else:
+                            print('\t\tu32 %s = get_%s();' % (slot, inst), file=f)
+                    elif inst in ArrayRegs:
+                        si = islots[slot].get_value_expression() + ' & 7'
+                        print('\t\tu32 %s = get_%s(%s & 7);' % (slot, inst, islots[slot].get_value_expression()), file=f)
+                    elif inst in IndirectRegs:
+                        print('\t\tint %s_r = %s & 7;' % (slot, islots[slot].get_value_expression()), file=f)
+                        if inst == '(r)-n':
+                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                            print('\t\tadd_r(%s_r, -m_n[%s_r]);' % (slot, slot), file=f)
+                        elif inst == '(r)+n':
+                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                            print('\t\tadd_r(%s_r, m_n[%s_r]);' % (slot, slot), file=f)
+                        elif inst == '(r)-':
+                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                            print('\t\tadd_r(%s_r, -1);' % (slot), file=f)
+                        elif inst == '(r)+':
+                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                            print('\t\tadd_r(%s_r, 1);' % (slot), file=f)
+                        elif inst == '(r)':
+                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                        elif inst == '(r+n)':
+                            print('\t\tu32 %s = calc_add_r(%s_r, m_n[%s_r]);' % (slot, slot, slot), file=f)
+                        elif inst == '-(r)':
+                            print('\t\tadd_r(%s_r, -1);' % (slot), file=f)
+                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                        else:
+                            print("Unimplemented IndirectRegs %s" % inst)
+                            sys.exit(1)
+                    else:
+                        print("instanciated slot (read)", slot, inst)
+                else:
+                    print('\t\tu32 %s = %s;' % (slot, islots[slot].get_value_expression()), file=f)
+                    
+        for line in self.text:
+            s = '\t\t' + self.expand(line, slots, islots)
+            print(s, file=f)
 
 class Instruction:
     def __init__(self, idx, mode, head, ditable, dtable, citable, ctable):
@@ -482,6 +695,16 @@ class Instruction:
         self.fill_ditable(ditable, dtable, idx)
         self.parse_dasm(head[6:sidx].strip(' \t').rstrip(' \t'))
         self.fill_citable(citable, ctable, idx)
+        self.source = [Source(), Source(), Source(), Source()]
+
+    def unhandled(self):
+        return self.source[SourceType.interp_pre].empty() and self.source[SourceType.interp_post].empty()
+
+    def unhandled_drc(self):
+        return self.source[SourceType.drc_pre].empty() and self.source[SourceType.drc_post].empty()
+
+    def add(self, mode, line):
+        self.source[mode].add(line)
 
     def find_separator(self, head):
         sidx = 6
@@ -699,6 +922,8 @@ class ISA:
         self.inst = None
 
     def load(self, fname):
+        inst = None
+        mode = None
         for l in open(fname, "rt"):
             ll = l.rstrip('\r\n \t')
             if len(ll) == 0 or ll[0] == '#':
@@ -706,15 +931,26 @@ class ISA:
             if ll[0] != ' ' and ll[0] != '\t':
                 if ll[:4] == '....':
                     idx = int(ll[4:6], 16)
-                    self.inst = Instruction(idx, IType.ipar, ll, self.dipar, self.dipars, self.cipar, self.cipars)
+                    inst = Instruction(idx, IType.ipar, ll, self.dipar, self.dipars, self.cipar, self.cipars)
                 elif ll[4:6] == '..':
                     idx = int(ll[0:4], 16)
-                    self.inst = Instruction(idx, IType.move, ll, self.dmove, self.dmoves, self.cmove, self.cmoves)
+                    inst = Instruction(idx, IType.move, ll, self.dmove, self.dmoves, self.cmove, self.cmoves)
                 else:
                     idx = int(ll[:6], 16)
-                    self.inst = Instruction(idx, IType.npar, ll, self.dnpar, self.dnpars, self.cnpar, self.cnpars)
+                    inst = Instruction(idx, IType.npar, ll, self.dnpar, self.dnpars, self.cnpar, self.cnpars)
+                mode = SourceType.interp_pre
             else:
-                pass
+                ll = ll.lstrip(' \t')
+                if ll[0] == '#':
+                    continue
+                if ll == '%p':
+                    mode = SourceType.interp_post
+                elif ll == '%d':
+                    mode = SourceType.drc_pre
+                elif ll == '%dp':
+                    mode = SourceType.drc_post
+                else:
+                    inst.add(mode, ll)
 
     def coverage(self, array):
         r = 0
@@ -780,12 +1016,14 @@ class ISA:
 
     def gen_interp_switch(self, f, insts, post):
         for i in range(len(insts)):
-            print('\tcase %d: // %s' % (i, '-' if i == 0 else insts[i].name), file=f)
+            print('\tcase %d: { // %s' % (i, '-' if i == 0 else insts[i].name), file=f)
             if insts[i] == None:
                 print("\t\tbreak;", file=f)
+                print("\t\t}", file=f)
             else:
                 insts[i].generate_code(f, post);
                 print("\t\tbreak;", file=f)
+                print("\t\t}", file=f)
                        
     def gen_disasm(self, fname):
         f = open(fname, "wt")
