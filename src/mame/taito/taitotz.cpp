@@ -530,6 +530,335 @@ Notes:
     0x10000105:
 */
 
+class PixxiiiPacket
+{
+public:
+	PixxiiiPacket(const char *fourcc)
+	{
+		size_t length = strlen(fourcc);
+		memset(m_fourcc, 0, 4);
+		for (size_t i = 0; i < length && i < 4; i++)
+		{
+			m_fourcc[i] = fourcc[i];
+		}
+		m_size = 8;
+	}
+	PixxiiiPacket(FILE *input)
+	{
+		deserialize(input);
+	}
+	PixxiiiPacket(const u8 *data)
+	{
+		memcpy(m_fourcc, data, 4);
+		m_size = ((u32)data[4] << 24) | ((u32)data[5] << 16) | ((u32)data[6] << 8) | data[7];
+		for (u32 i = 0; i < m_size - 8; i++)
+		{
+			m_data.push_back(data[8 + i]);
+		}
+	}
+	PixxiiiPacket()
+	{
+		clear();
+	}
+
+	~PixxiiiPacket()
+	{
+		clear();
+	}
+
+	void clear()
+	{
+		memset(m_fourcc, 0, 4);
+		m_size = 8;
+		m_data.clear();
+	}
+
+	void set_fourcc(const char *fourcc)
+	{
+		memset(m_fourcc, 0, 4);
+		const size_t length = strlen(fourcc);
+		for (size_t i = 0; i < 4 && i < length; i++)
+		{
+			m_fourcc[i] = fourcc[i];
+		}
+	}
+
+	u32 get_size()
+	{
+		return m_size;
+	}
+
+	const u8 *get_data()
+	{
+		return &m_data[0];
+	}
+
+	void add_string(const char *str, size_t max_length = SIZE_MAX)
+	{
+		size_t length = strlen(str);
+		for (size_t i = 0; i < length && i < max_length - 1; i++)
+		{
+			m_data.push_back((u8)str[i]);
+		}
+		m_data.push_back(0);
+		m_size += std::min(length, max_length);
+		m_size++;
+	}
+
+	void add_u8(const u8 data)
+	{
+		m_data.push_back(data);
+		m_size++;
+	}
+
+	void add_u8_buffer(const u8 *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			m_data.push_back(data[i]);
+		}
+		m_size += (u32)length;
+	}
+
+	void add_s8(const s8 data)
+	{
+		add_u8((u8)data);
+	}
+
+	void add_s8_buffer(const s8 *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			m_data.push_back((u8)data[i]);
+		}
+		m_size += (u32)length;
+	}
+
+	void add_u16(const u16 data)
+	{
+		m_data.push_back((u8)(data >> 8));
+		m_data.push_back((u8)data);
+		m_size += 2;
+	}
+
+	void add_u16_buffer(const u16 *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			add_u16(data[i]);
+		}
+	}
+
+	void add_s16(const s16 data)
+	{
+		add_u16((u16)data);
+	}
+
+	void add_s16_buffer(const s16 *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			add_u16((u16)data[i]);
+		}
+	}
+
+	void add_matrix(const s16 *matrix)
+	{
+		add_s16_buffer(matrix, 9);
+	}
+
+	void add_u32(const u32 data)
+	{
+		m_data.push_back((u8)(data >> 24));
+		m_data.push_back((u8)(data >> 16));
+		m_data.push_back((u8)(data >> 8));
+		m_data.push_back((u8)data);
+		m_size += 4;
+	}
+
+	void add_u32_buffer(const u32 *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			add_u32(data[i]);
+		}
+	}
+
+	void add_s32(const s32 data)
+	{
+		add_u32((u32)data);
+	}
+
+	void add_s32_buffer(const s32 *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			add_u32((u32)data[i]);
+		}
+	}
+
+	void add_vector(const s32 *vec)
+	{
+		add_s32_buffer(vec, 3);
+	}
+
+	void add_float(float data)
+	{
+		u32 &val = reinterpret_cast<u32&>(data);
+		add_u32(val);
+	}
+
+	void add_float_buffer(float *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			u32 &val = reinterpret_cast<u32&>(data[i]);
+			add_u32(val);
+		}
+	}
+
+	void add_u64(const u64 data)
+	{
+		m_data.push_back((u8)(data >> 56));
+		m_data.push_back((u8)(data >> 48));
+		m_data.push_back((u8)(data >> 40));
+		m_data.push_back((u8)(data >> 32));
+		m_data.push_back((u8)(data >> 24));
+		m_data.push_back((u8)(data >> 16));
+		m_data.push_back((u8)(data >> 8));
+		m_data.push_back((u8)data);
+		m_size += 8;
+	}
+
+	void add_u64_buffer(const u64 *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			add_u64(data[i]);
+		}
+	}
+
+	void add_s64(const s64 data)
+	{
+		add_u64((u64)data);
+	}
+
+	void add_s64_buffer(const s64 *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			add_u64((u64)data[i]);
+		}
+	}
+
+	void add_double(double data)
+	{
+		u64 &val = reinterpret_cast<u64&>(data);
+		add_u64(val);
+	}
+
+	void add_double_buffer(double *data, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+		{
+			u64 &val = reinterpret_cast<u64&>(data[i]);
+			add_u64(val);
+		}
+	}
+
+	void serialize(FILE *output)
+	{
+		fwrite(m_fourcc, 1, 4, output);
+		u8 size[4] =
+		{
+			(u8)(m_size >> 24), (u8)(m_size >> 16), (u8)(m_size >> 8), (u8)m_size
+		};
+		fwrite(size, 1, 4, output);
+		fwrite(&m_data[0], 1, m_data.size(), output);
+	}
+
+	void deserialize(FILE *input)
+	{
+		fread(m_fourcc, 1, 4, input);
+		u8 size[4];
+		fread(size, 1, 4, input);
+		m_size = ((u32)size[0] << 24) | ((u32)size[1] << 16) | ((u32)size[2] << 8) | size[3];
+		u8 value = 0;
+		for (u32 i = 0; i < m_size; i++)
+		{
+			fread(&value, 1, 1, input);
+			m_data.push_back(value);
+		}
+	}
+
+private:
+	u8 m_fourcc[4];
+	u32 m_size;
+	std::vector<u8> m_data;
+};
+
+static std::vector<PixxiiiPacket> s_packets;
+static bool s_capturing = false;
+
+static void start_capture()
+{
+	s_capturing = true;
+
+}
+
+static void finish_capture(const char *driver_name)
+{
+	size_t total_size = 8;
+	for (size_t i = 0; i < s_packets.size(); i++)
+	{
+		total_size += s_packets[i].get_size();
+	}
+
+	FILE *output = nullptr;
+	int output_index = 0;
+	char output_name[256];
+	do
+	{
+		if (output != nullptr)
+			fclose(output);
+		sprintf(output_name, "%s_%04x.ptz", driver_name, output_index);
+		output = fopen(output_name, "rb");
+		output_index++;
+	} while (output != nullptr);
+	output = fopen(output_name, "wb");
+
+	static const char *const CAPTURE_FOURCC = "PTZC";
+	fwrite(CAPTURE_FOURCC, 1, 4, output);
+
+	const u32 truncated_size = (u32)total_size;
+	u8 size_bytes[4];
+	size_bytes[0] = (u8)(truncated_size >> 24);
+	size_bytes[1] = (u8)(truncated_size >> 16);
+	size_bytes[2] = (u8)(truncated_size >> 8);
+	size_bytes[3] = (u8)truncated_size;
+	fwrite(size_bytes, 1, 4, output);
+
+	for (size_t i = 0; i < s_packets.size(); i++)
+	{
+		s_packets[i].serialize(output);
+	}
+	fclose(output);
+
+	for (size_t i = 0; i < s_packets.size(); i++)
+	{
+		s_packets[i].clear();
+	}
+	s_packets.clear();
+	s_capturing = false;
+
+	printf("PIXXIII capture saved to %s\n", output_name);
+}
+
+static PixxiiiPacket &log_packet(const char *fourcc)
+{
+	s_packets.push_back(PixxiiiPacket(fourcc));
+	return s_packets[s_packets.size() - 1];
+}
 
 namespace {
 
@@ -814,6 +1143,22 @@ void taitotz_state::video_start()
 	}
 
 	m_video_reg = 0;
+}
+
+void taitotz_state::check_pixxiii_trigger()
+{
+	if (machine().input().code_pressed_once(KEYCODE_Q))
+	{
+		start_capture();
+
+		PixxiiiPacket &scfb = log_packet("SCFB");
+		u16 const *screen_src = ;
+		scfb.add_u16_buffer((u16*)&m_screen_ram[m_scr_base], 512*384);
+	}
+	else if (s_capturing)
+	{
+		finish_capture(machine().system().name);
+	}
 }
 
 const float taitotz_renderer::DOT3_TEX_TABLE[32] =
@@ -1511,6 +1856,8 @@ void taitotz_renderer::push_direct_poly_fifo(u32 data)
 
 u32 taitotz_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	check_pixxiii_trigger();
+
 	m_renderer->draw(bitmap, cliprect);
 
 	u16 const *screen_src = (u16*)&m_screen_ram[m_scr_base];
