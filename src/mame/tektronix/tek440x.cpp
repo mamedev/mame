@@ -585,6 +585,7 @@ private:
 	void map_w(offs_t offset, u16 data, u16 mem_mask);
 	u8 mapcntl_r();
 	void mapcntl_w(u8 data);
+	void vblank_irq(int state);
 	void sound_w(u8 data);
 	u8 diag_r();
 	void diag_w(u8 data);
@@ -1284,6 +1285,11 @@ void tek440x_state::videocntl_w(u8 data)
 	m_videocntl = data;
 }
 
+void tek440x_state::vblank_irq(int state)
+{
+	if (state && BIT(m_videocntl, 6))
+		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
+}
 
 void tek440x_state::sound_w(u8 data)
 {
@@ -1717,7 +1723,7 @@ void tek440x_state::tek4404(machine_config &config)
 	m_screen->set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal (guessed), 60 Hz vertical
 	m_screen->set_screen_update(FUNC(tek440x_state::screen_update));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
+	m_screen->screen_vblank().set(FUNC(tek440x_state::vblank_irq));   //m_vint, FUNC(input_merger_all_high_device::in_w<1>));
 //	m_screen->screen_vblank().append(m_vint, FUNC(input_merger_all_high_device::in_w<2>));
 	PALETTE(config, "palette", FUNC(tek440x_state::palette),2);
 	
