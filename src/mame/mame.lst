@@ -20007,8 +20007,14 @@ talkingbb
 @source:handheld/talkingfb.cpp
 talkingfb
 
+@source:handheld/tama_4u.cpp
+tama4u
+
 @source:handheld/tama_id.cpp
 tamaid
+
+@source:handheld/tama_mix.cpp
+tamamixm
 
 @source:handheld/teammate.cpp
 teammate

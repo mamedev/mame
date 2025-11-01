@@ -67,5 +67,5 @@ ROM_END
 
 } // anonymous namespace
 
-// 2010/2/5 on PCB, 2009 on case
+// 2010/2/5 MODEL: WIZ229 on PCB, 2009 on case
 GAME( 2010, tamaid, 0, tamaid, tamaid, tama_id_state, empty_init, ROT0, "Bandai", "Tamagotchi iD (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
