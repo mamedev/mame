@@ -72,7 +72,6 @@ void shoken_md06_state::program_map(address_map &map)
 void shoken_md06_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x3b, 0x3b).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write));
 	map(0x40, 0x40).nopw();
 	map(0x80, 0x80).noprw();
 }
@@ -80,6 +79,7 @@ void shoken_md06_state::io_map(address_map &map)
 void shoken_md06_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x3b, 0x3b).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write));
 	map(0x40, 0x40).nopw();
 	map(0x80, 0x80).noprw();
 }
@@ -209,5 +209,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2001, petitlot,   0, petitlot,  petitlot,  shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2004, polarstar2, 0, polarstar, polarstar, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, petitlot,   0, petitlot,  petitlot,  shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2004, polarstar2, 0, polarstar, polarstar, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
