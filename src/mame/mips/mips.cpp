@@ -22,7 +22,7 @@
  *   RS2030      I2000    R2000    16MHz           SCSI  Desktop       aka M/12, Jupiter
  *   RC3230      R3030    R3000    25MHz  PC-ATx1  SCSI  Desktop       aka M/20, Pizazz
  *   RS3230      R3030    R3000    25MHz  PC-ATx1  SCSI  Desktop       aka M/20, Pizazz, Magnum 3000
- *   RC3240               R3000    25MHz  PC-ATx4  SCSI  Deskside      M/120 with CPU-board upgrade
+ *   RC3240      R2400    R3000    25MHz  PC-ATx4  SCSI  Deskside      M/120 with CPU-board upgrade
  *   RC3330               R3000    33MHz  PC-AT    SCSI  Desktop
  *   RS3330               R3000    33MHz  PC-AT    SCSI  Desktop
  *   RC3260               R3000    25MHz  VMEx7    SCSI  Pedestal
@@ -205,18 +205,18 @@
 #include "cpu/nec/v5x.h"
 #include "machine/ram.h"
 
-// i/o devices (common)
+// I/O devices (common)
 #include "machine/at_keybc.h"
 #include "machine/z80scc.h"
 #include "machine/upd765.h"
 #include "machine/am79c90.h"
 
-// i/o devices (rx2030)
+// I/O devices (I2000)
 #include "machine/mc146818.h"
 #include "machine/z8038.h"
 #include "machine/aic6250.h"
 
-// i/o devices (rx3230)
+// I/O devices (R3030)
 #include "machine/timekpr.h"
 #include "machine/ncr53c90.h"
 #include "mips_rambo.h"
@@ -249,15 +249,15 @@
 
 namespace {
 
-class rx2030_state : public driver_device
+class mips_i2000_state : public driver_device
 {
 public:
-	rx2030_state(machine_config const &mconfig, device_type type, char const *tag)
+	mips_i2000_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_iop(*this, "iop")
 		, m_ram(*this, "ram")
-		, m_rom(*this, "rx2030")
+		, m_rom(*this, "i2000")
 		, m_rtc(*this, "rtc")
 		, m_fio(*this, "fio")
 		, m_kbdc(*this, "kbdc")
@@ -276,11 +276,11 @@ public:
 	}
 
 	// machine config
-	void rx2030(machine_config &config);
+	void i2000(machine_config &config);
 	void rs2030(machine_config &config);
 	void rc2030(machine_config &config);
 
-	void rx2030_init();
+	void i2000_init();
 
 protected:
 	// driver_device overrides
@@ -288,7 +288,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void rx2030_map(address_map &map) ATTR_COLD;
+	void i2000_map(address_map &map) ATTR_COLD;
 	void rs2030_map(address_map &map) ATTR_COLD;
 
 	void iop_program_map(address_map &map) ATTR_COLD;
@@ -343,14 +343,14 @@ private:
 	u8 m_iop_interface = 0;
 };
 
-class rx3230_state : public driver_device
+class mips_r3030_state : public driver_device
 {
 public:
-	rx3230_state(machine_config const &mconfig, device_type type, char const *tag)
+	mips_r3030_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_ram(*this, "ram")
-		, m_rom(*this, "rx3230")
+		, m_rom(*this, "r3030")
 		, m_rambo(*this, "rambo")
 		, m_scsibus(*this, "scsi")
 		, m_scsi(*this, "scsi:7:ncr53c94")
@@ -369,11 +369,11 @@ public:
 	}
 
 	// machine config
-	void rx3230(machine_config &config);
+	void r3030(machine_config &config);
 	void rs3230(machine_config &config);
 	void rc3230(machine_config &config);
 
-	void rx3230_init();
+	void r3030_init();
 
 protected:
 	// driver_device overrides
@@ -381,7 +381,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void rx3230_map(address_map &map) ATTR_COLD;
+	void r3030_map(address_map &map) ATTR_COLD;
 	void rs3230_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
@@ -441,18 +441,18 @@ private:
 	int m_int1_state = 0;
 };
 
-void rx2030_state::machine_start()
+void mips_i2000_state::machine_start()
 {
 	save_item(NAME(m_mmu));
 	save_item(NAME(m_iop_interface));
 }
 
-void rx2030_state::machine_reset()
+void mips_i2000_state::machine_reset()
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, 1);
 }
 
-void rx2030_state::rx2030_init()
+void mips_i2000_state::i2000_init()
 {
 	m_iop_interface = IOP_NERR | DBG_ABSENT;
 
@@ -472,7 +472,7 @@ void rx2030_state::rx2030_init()
 	 * OS; the patch changes the code to broadcast to the standard broadcast
 	 * address instead.
 	 *
-	 * Technique is identical to that described for the rx3230 below.
+	 * Technique is identical to that described for the r3030 below.
 	 */
 	switch (system_bios())
 	{
@@ -488,7 +488,7 @@ void rx2030_state::rx2030_init()
 	}
 }
 
-u16 rx2030_state::mmu_r(offs_t offset, u16 mem_mask)
+u16 mips_i2000_state::mmu_r(offs_t offset, u16 mem_mask)
 {
 	offs_t const address = (m_mmu[(offset >> 11) & 0x1f] << 12) | ((offset << 1) & 0xfff);
 
@@ -500,7 +500,7 @@ u16 rx2030_state::mmu_r(offs_t offset, u16 mem_mask)
 	return data;
 }
 
-void rx2030_state::mmu_w(offs_t offset, u16 data, u16 mem_mask)
+void mips_i2000_state::mmu_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offs_t const address = (m_mmu[(offset >> 11) & 0x1f] << 12) | ((offset << 1) & 0xfff);
 
@@ -514,19 +514,19 @@ void rx2030_state::mmu_w(offs_t offset, u16 data, u16 mem_mask)
 		m_ram->write(BYTE4_XOR_BE(address + 1), data >> 8);
 }
 
-void rx2030_state::iop_program_map(address_map &map)
+void mips_i2000_state::iop_program_map(address_map &map)
 {
 	// 00000:1ffff  128k ram (64kx4, 4 parts)
 	// 20000:3ffff  128k shared (32x4k mapped pages, bits 0-11 offset, bits 12-16 mmu register)
 	// 80000:fffff  512k eprom (256k x 2 copies)
 
 	map(0x00000, 0x1ffff).ram();
-	map(0x20000, 0x3ffff).rw(FUNC(rx2030_state::mmu_r), FUNC(rx2030_state::mmu_w));
+	map(0x20000, 0x3ffff).rw(FUNC(mips_i2000_state::mmu_r), FUNC(mips_i2000_state::mmu_w));
 
-	map(0x80000, 0xbffff).rom().region("rx2030", 0).mirror(0x40000);
+	map(0x80000, 0xbffff).rom().region("i2000", 0).mirror(0x40000);
 }
 
-void rx2030_state::iop_io_map(address_map &map)
+void mips_i2000_state::iop_io_map(address_map &map)
 {
 	map(0x0000, 0x003f).lrw16(
 		NAME([this] (offs_t offset, u16 mem_mask) { return m_mmu[offset]; }),
@@ -607,7 +607,7 @@ void rx2030_state::iop_io_map(address_map &map)
 	map(0x0380, 0x0381).lw8(NAME([this](u8 data) { logerror("led_w 0x%02x\n", data); })).umask16(0xff00);
 }
 
-void rx2030_state::rx2030_map(address_map &map)
+void mips_i2000_state::i2000_map(address_map &map)
 {
 	map(0x02000000, 0x02000003).lrw8(
 		NAME([this]() { return m_iop_interface; }),
@@ -696,9 +696,9 @@ void rx2030_state::rx2030_map(address_map &map)
 	).umask32(0xff);
 }
 
-void rx2030_state::rs2030_map(address_map &map)
+void mips_i2000_state::rs2030_map(address_map &map)
 {
-	rx2030_map(map);
+	i2000_map(map);
 
 	// video hardware
 	map(0x01000000, 0x011fffff).ram().share("vram");
@@ -708,7 +708,7 @@ void rx2030_state::rs2030_map(address_map &map)
 	//map(0x01ff0080, 0x01ff0081).w() // graphics register?
 }
 
-u16 rx2030_state::lance_r(offs_t offset, u16 mem_mask)
+u16 mips_i2000_state::lance_r(offs_t offset, u16 mem_mask)
 {
 	u16 const data =
 		(m_ram->read(BYTE4_XOR_BE(offset + 1)) << 8) |
@@ -717,7 +717,7 @@ u16 rx2030_state::lance_r(offs_t offset, u16 mem_mask)
 	return data;
 }
 
-void rx2030_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
+void mips_i2000_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_ram->write(BYTE4_XOR_BE(offset + 0), data);
@@ -740,21 +740,21 @@ static void mips_rs232_devices(device_slot_interface &device)
 	device.option_add("mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 }
 
-void rx2030_state::rx2030(machine_config &config)
+void mips_i2000_state::i2000(machine_config &config)
 {
 	R2000A(config, m_cpu, 33.333_MHz_XTAL / 2, 32768, 32768);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	V50(config, m_iop, 20_MHz_XTAL);
-	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
-	m_iop->set_addrmap(AS_IO, &rx2030_state::iop_io_map);
+	m_iop->set_addrmap(AS_PROGRAM, &mips_i2000_state::iop_program_map);
+	m_iop->set_addrmap(AS_IO, &mips_i2000_state::iop_io_map);
 	m_iop->tout2_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// general dma configuration
 	m_iop->out_hreq_cb().set(m_iop, FUNC(v50_device::hack_w));
-	m_iop->in_mem16r_cb().set(FUNC(rx2030_state::mmu_r));
-	m_iop->out_mem16w_cb().set(FUNC(rx2030_state::mmu_w));
+	m_iop->in_mem16r_cb().set(FUNC(mips_i2000_state::mmu_r));
+	m_iop->out_mem16w_cb().set(FUNC(mips_i2000_state::mmu_w));
 
 	// dma channel 1: scsi
 	m_iop->in_io16r_cb<1>().set(m_scsi, FUNC(aic6250_device::dma16_r));
@@ -834,8 +834,8 @@ void rx2030_state::rx2030(machine_config &config)
 	// ethernet
 	AM7990(config, m_net);
 	m_net->intr_out().set_inputline(m_iop, INPUT_LINE_IRQ5).invert();
-	m_net->dma_in().set(FUNC(rx2030_state::lance_r));
-	m_net->dma_out().set(FUNC(rx2030_state::lance_w));
+	m_net->dma_in().set(FUNC(mips_i2000_state::lance_r));
+	m_net->dma_out().set(FUNC(mips_i2000_state::lance_w));
 
 	// buzzer
 	SPEAKER(config, "mono").front_center();
@@ -843,20 +843,20 @@ void rx2030_state::rx2030(machine_config &config)
 	m_buzzer->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void rx2030_state::rc2030(machine_config &config)
+void mips_i2000_state::rc2030(machine_config &config)
 {
-	rx2030(config);
+	i2000(config);
 
-	m_cpu->set_addrmap(AS_PROGRAM, &rx2030_state::rx2030_map);
+	m_cpu->set_addrmap(AS_PROGRAM, &mips_i2000_state::i2000_map);
 
 	m_tty[1]->set_default_option("terminal");
 }
 
-void rx2030_state::rs2030(machine_config &config)
+void mips_i2000_state::rs2030(machine_config &config)
 {
-	rx2030(config);
+	i2000(config);
 
-	m_cpu->set_addrmap(AS_PROGRAM, &rx2030_state::rs2030_map);
+	m_cpu->set_addrmap(AS_PROGRAM, &mips_i2000_state::rs2030_map);
 
 	m_kbd->set_default_option(STR_KBD_MICROSOFT_NATURAL);
 	m_tty[0]->set_default_option("mouse");
@@ -867,13 +867,13 @@ void rx2030_state::rs2030(machine_config &config)
 	// timing from VESA 1280x1024 @ 60Hz
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(pixclock, 1688, 248, 1528, 1066, 38, 1062);
-	m_screen->set_screen_update(FUNC(rx2030_state::screen_update));
+	m_screen->set_screen_update(FUNC(mips_i2000_state::screen_update));
 	m_screen->screen_vblank().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 
 	BT458(config, m_ramdac, pixclock);
 }
 
-u32 rx2030_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+u32 mips_i2000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
 	/*
 	 * The graphics board has 1280KiB of video ram fitted, which is organised
@@ -901,7 +901,7 @@ u32 rx2030_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rec
 	return 0;
 }
 
-void rx3230_state::rx3230_map(address_map &map)
+void mips_r3030_state::r3030_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).noprw(); // silence ram
 
@@ -923,13 +923,13 @@ void rx3230_state::rx3230_map(address_map &map)
 	map(0x1e000000, 0x1e000007).m(m_fdc, FUNC(i82072_device::map)).umask32(0xff);
 	//map(0x1e800000, 0x1e800003).umask32(0xff); // fdc tc
 
-	map(0x1fc00000, 0x1fc3ffff).rom().region("rx3230", 0);
-	map(0x1ff00000, 0x1ff3ffff).rom().region("rx3230", 0); // mirror
+	map(0x1fc00000, 0x1fc3ffff).rom().region("r3030", 0);
+	map(0x1ff00000, 0x1ff3ffff).rom().region("r3030", 0); // mirror
 }
 
-void rx3230_state::rs3230_map(address_map &map)
+void mips_r3030_state::rs3230_map(address_map &map)
 {
-	rx3230_map(map);
+	r3030_map(map);
 
 	map(0x10000000, 0x12ffffff).lrw32(
 		NAME([this](offs_t offset)
@@ -970,21 +970,21 @@ void rx3230_state::rs3230_map(address_map &map)
 	//map(0x16100000, 0x16100003).w(); // write 0xffffffff
 }
 
-void rx3230_state::machine_start()
+void mips_r3030_state::machine_start()
 {
 	save_item(NAME(m_int_reg));
 	save_item(NAME(m_int0_state));
 	save_item(NAME(m_int1_state));
 }
 
-void rx3230_state::machine_reset()
+void mips_r3030_state::machine_reset()
 {
 	m_int_reg = INT_CLR;
 	m_int0_state = 1;
 	m_int1_state = 1;
 }
 
-void rx3230_state::rx3230_init()
+void mips_r3030_state::r3030_init()
 {
 	// map the configured ram
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
@@ -1007,10 +1007,10 @@ void rx3230_state::rx3230_init()
 	m_rom[0x1f1b0 >> 2] = 0x2406ffff;
 }
 
-void rx3230_state::rx3230(machine_config &config)
+void mips_r3030_state::r3030(machine_config &config)
 {
 	R3000A(config, m_cpu, 50_MHz_XTAL / 2, 32768, 32768);
-	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rx3230_map);
+	m_cpu->set_addrmap(AS_PROGRAM, &mips_r3030_state::r3030_map);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
@@ -1046,18 +1046,18 @@ void rx3230_state::rx3230(machine_config &config)
 			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
 
 			adapter.set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
-			adapter.irq_handler_cb().set(*this, FUNC(rx3230_state::irq_w<INT_SCSI>)).invert();
+			adapter.irq_handler_cb().set(*this, FUNC(mips_r3030_state::irq_w<INT_SCSI>)).invert();
 			adapter.drq_handler_cb().set(m_rambo, FUNC(mips_rambo_device::drq_w<0>));
 		});
 
 	// ethernet
 	AM7990(config, m_net);
-	m_net->intr_out().set(FUNC(rx3230_state::irq_w<INT_NET>));
-	m_net->dma_in().set(FUNC(rx3230_state::lance_r));
-	m_net->dma_out().set(FUNC(rx3230_state::lance_w));
+	m_net->intr_out().set(FUNC(mips_r3030_state::irq_w<INT_NET>));
+	m_net->dma_in().set(FUNC(mips_r3030_state::lance_r));
+	m_net->dma_out().set(FUNC(mips_r3030_state::lance_w));
 
 	SCC85C30(config, m_scc, 9.8304_MHz_XTAL); // TODO: clock working but unverified
-	m_scc->out_int_callback().set(FUNC(rx3230_state::irq_w<INT_SCC>)).invert();
+	m_scc->out_int_callback().set(FUNC(mips_r3030_state::irq_w<INT_SCC>)).invert();
 
 	// scc channel A (tty0)
 	RS232_PORT(config, m_tty[0], default_rs232_devices, nullptr);
@@ -1092,7 +1092,7 @@ void rx3230_state::rx3230(machine_config &config)
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL); // TODO: confirm
 	m_kbdc->kbd_clk().set(m_kbd, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(m_kbd, FUNC(pc_kbdc_device::data_write_from_mb));
-	//m_kbdc->kbd_irq().set(FUNC(rx3230_state::irq_w<INT_KBD>));
+	//m_kbdc->kbd_irq().set(FUNC(mips_r3030_state::irq_w<INT_KBD>));
 
 	// buzzer
 	SPEAKER(config, "mono").front_center();
@@ -1110,33 +1110,33 @@ void rx3230_state::rx3230(machine_config &config)
 	// a riser which presents an ISA 16-bit slot.
 }
 
-void rx3230_state::rc3230(machine_config &config)
+void mips_r3030_state::rc3230(machine_config &config)
 {
-	rx3230(config);
+	r3030(config);
 
-	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rx3230_map);
+	m_cpu->set_addrmap(AS_PROGRAM, &mips_r3030_state::r3030_map);
 
 	m_kbd->set_default_option(STR_KBD_MICROSOFT_NATURAL);
 	//m_tty[1]->set_default_option("terminal");
 }
 
-void rx3230_state::rs3230(machine_config &config)
+void mips_r3030_state::rs3230(machine_config &config)
 {
-	rx3230(config);
+	r3030(config);
 
 	m_kbd->set_default_option(STR_KBD_MICROSOFT_NATURAL);
 
 	// FIXME: colour video board disabled for now
 	if (false)
 	{
-		m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rs3230_map);
+		m_cpu->set_addrmap(AS_PROGRAM, &mips_r3030_state::rs3230_map);
 
 		// video hardware (1280x1024x8bpp @ 60Hz), 16 parts vram
 		u32 const pixclock = 108'180'000;
 
 		// timing from VESA 1280x1024 @ 60Hz
 		m_screen->set_raw(pixclock, 1688, 248, 1528, 1066, 38, 1062);
-		m_screen->set_screen_update(FUNC(rx3230_state::screen_update));
+		m_screen->set_screen_update(FUNC(mips_r3030_state::screen_update));
 		//m_screen->screen_vblank().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 
 		BT459(config, m_ramdac, pixclock);
@@ -1147,7 +1147,7 @@ void rx3230_state::rs3230(machine_config &config)
 	}
 }
 
-template <u8 Source> void rx3230_state::irq_w(int state)
+template <u8 Source> void mips_r3030_state::irq_w(int state)
 {
 	if (state)
 		m_int_reg |= Source;
@@ -1177,14 +1177,14 @@ template <u8 Source> void rx3230_state::irq_w(int state)
 	}
 }
 
-u32 rx3230_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+u32 mips_r3030_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
 	m_ramdac->screen_update(screen, bitmap, cliprect, m_vram->pointer());
 
 	return 0;
 }
 
-u16 rx3230_state::lance_r(offs_t offset, u16 mem_mask)
+u16 mips_r3030_state::lance_r(offs_t offset, u16 mem_mask)
 {
 	u16 const data =
 		(m_ram->read(BYTE4_XOR_BE(offset + 0)) << 8) |
@@ -1193,7 +1193,7 @@ u16 rx3230_state::lance_r(offs_t offset, u16 mem_mask)
 	return data;
 }
 
-void rx3230_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
+void mips_r3030_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_ram->write(BYTE4_XOR_BE(offset + 1), data);
@@ -1202,15 +1202,15 @@ void rx3230_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
 		m_ram->write(BYTE4_XOR_BE(offset + 0), data >> 8);
 }
 
-ROM_START(rx2030)
-	ROM_REGION16_LE(0x40000, "rx2030", 0)
-	ROM_SYSTEM_BIOS(0, "v4.32", "Rx2030 v4.32, Jan 1991")
+ROM_START(i2000)
+	ROM_REGION16_LE(0x40000, "i2000", 0)
+	ROM_SYSTEM_BIOS(0, "v4.32", "I2000 v4.32, Jan 1991")
 	ROMX_LOAD("50-00121__005.u139", 0x00000, 0x10000, CRC(b2f42665) SHA1(81c83aa6b8865338fda5c03733ede91749997648), ROM_BIOS(0) | ROM_SKIP(1))
 	ROMX_LOAD("50-00120__005.u140", 0x00001, 0x10000, CRC(0ffa485e) SHA1(7cdfb81d1a547c5ccc88e1e0ef73d447cd03e9e2), ROM_BIOS(0) | ROM_SKIP(1))
 	ROMX_LOAD("50-00119__005.u141", 0x20001, 0x10000, CRC(68fb219d) SHA1(7161ad8e5e0207d8730e09753ca74bfec0e782f8), ROM_BIOS(0) | ROM_SKIP(1))
 	ROMX_LOAD("50-00118__005.u142", 0x20000, 0x10000, CRC(b59426d3) SHA1(3fc09b0368f731c2c07cf29b481f30c01e330929), ROM_BIOS(0) | ROM_SKIP(1))
 
-	ROM_SYSTEM_BIOS(1, "v4.30", "Rx2030 v4.30, Jul 1989")
+	ROM_SYSTEM_BIOS(1, "v4.30", "I2000 v4.30, Jul 1989")
 	ROMX_LOAD("50-00121__003.u139", 0x00000, 0x10000, CRC(ebc580ac) SHA1(63f9a1d344d53f32ee769f5137820faf64ffa291), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("50-00120__003.u140", 0x00001, 0x10000, CRC(e1991721) SHA1(028d33be271c95f198473b650f7800f9ca4a60b2), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("50-00119__003.u141", 0x20001, 0x10000, CRC(c8469906) SHA1(69bbf4b5c415b2e2156a4467bf9cb30e79f586ef), ROM_BIOS(1) | ROM_SKIP(1))
@@ -1240,16 +1240,16 @@ ROM_START(rx2030)
 	ROM_REGION(0x40, "rtc", 0)
 	ROM_LOAD("ds1287.bin", 0x00, 0x40, CRC(28369bf3) SHA1(64f24e1d8fb7103ab0bd3023c66490447bdcbf89))
 ROM_END
-#define rom_rc2030 rom_rx2030
-#define rom_rs2030 rom_rx2030
+#define rom_rc2030 rom_i2000
+#define rom_rs2030 rom_i2000
 
-ROM_START(rx3230)
-	ROM_REGION32_BE(0x40000, "rx3230", 0)
-	ROM_SYSTEM_BIOS(0, "v5.40", "Rx3230 v5.40, Jun 1990")
+ROM_START(r3030)
+	ROM_REGION32_BE(0x40000, "r3030", 0)
+	ROM_SYSTEM_BIOS(0, "v5.40", "R3030 v5.40, Jun 1990")
 	ROMX_LOAD("50-314-003__3230_left.bin",  0x00002, 0x20000, CRC(77ce42c9) SHA1(b2d5e5a386ed0ff840646647ba90b3c36732a7fe), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
 	ROMX_LOAD("50-314-003__3230_right.bin", 0x00000, 0x20000, CRC(5bc1ce2f) SHA1(38661234bf40b76395393459de49e48619b2b454), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
 
-	ROM_SYSTEM_BIOS(1, "v5.42", "Rx3230 v5.42, Mar 1991")
+	ROM_SYSTEM_BIOS(1, "v5.42", "R3030 v5.42, Mar 1991")
 	ROMX_LOAD("unknown.bin", 0x00002, 0x20000, NO_DUMP, ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
 	ROMX_LOAD("unknown.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
 
@@ -1259,13 +1259,13 @@ ROM_START(rx3230)
 	//ROM_REGION(0x800, "rtc", 0)
 	//ROM_LOAD("m48t02.bin", 0x000, 0x800, NO_DUMP)
 ROM_END
-#define rom_rc3230 rom_rx3230
-#define rom_rs3230 rom_rx3230
+#define rom_rc3230 rom_r3030
+#define rom_rs3230 rom_r3030
 
 }
 
-/*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME       FLAGS */
-COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030",      0)
-COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030",      0)
-COMP(1990,  rc3230,    0,      0,      rc3230,    0,     rx3230_state, rx3230_init, "MIPS",  "RC3230",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1990,  rs3230,    0,      0,      rs3230,    0,     rx3230_state, rx3230_init, "MIPS",  "Magnum 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS             INIT         COMPANY  FULLNAME       FLAGS */
+COMP(1989,  rc2030,    0,      0,      rc2030,    0,     mips_i2000_state, i2000_init, "MIPS",  "RC2030",      0)
+COMP(1989,  rs2030,    0,      0,      rs2030,    0,     mips_i2000_state, i2000_init, "MIPS",  "RS2030",      0)
+COMP(1990,  rc3230,    0,      0,      rc3230,    0,     mips_r3030_state, r3030_init, "MIPS",  "RC3230",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1990,  rs3230,    0,      0,      rs3230,    0,     mips_r3030_state, r3030_init, "MIPS",  "Magnum 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
