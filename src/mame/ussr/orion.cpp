@@ -372,9 +372,9 @@ ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT    CLASS            INIT        COMPANY      FULLNAME                                  FLAGS
 COMP( 1990, orion128, 0,        0,      orion128,   radio86, orion_state,     empty_init, "<unknown>", "Orion 128",                              MACHINE_SUPPORTS_SAVE )
-COMP( 1990, orionms,  orion128, 0,      orion128ms, ms7007,  orion_state,     empty_init, "<unknown>", "Orion 128 (MS7007)",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1990, orionms,  orion128, 0,      orion128ms, rk7007,  orion_state,     empty_init, "<unknown>", "Orion 128 (MS7007)",                     MACHINE_SUPPORTS_SAVE )
 COMP( 1990, orionz80, orion128, 0,      orionz80,   radio86, orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II",                MACHINE_SUPPORTS_SAVE )
 COMP( 1990, orionide, orion128, 0,      orionz80,   radio86, orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE",          MACHINE_SUPPORTS_SAVE )
-COMP( 1990, orionzms, orion128, 0,      orionz80ms, ms7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II (MS7007)",       MACHINE_SUPPORTS_SAVE )
-COMP( 1990, orionidm, orion128, 0,      orionz80ms, ms7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE (MS7007)", MACHINE_SUPPORTS_SAVE )
+COMP( 1990, orionzms, orion128, 0,      orionz80ms, rk7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II (MS7007)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1990, orionidm, orion128, 0,      orionz80ms, rk7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE (MS7007)", MACHINE_SUPPORTS_SAVE )
 COMP( 1994, orionpro, orion128, 0,      orionpro,   radio86, orion_pro_state, empty_init, "<unknown>", "Orion Pro",                              MACHINE_SUPPORTS_SAVE )
