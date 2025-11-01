@@ -450,6 +450,8 @@ void pc9801vm_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 // TODO: port 0xf1 (IDE select on later machines)
 uint8_t pc9801vm_state::a20_ctrl_r(offs_t offset)
 {
+	if(offset == 0)
+		return 0;
 	if(offset == 0x01)
 		return (m_gate_a20 ^ 1) | 0xfe;
 	else if(offset == 0x03)

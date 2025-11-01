@@ -11370,10 +11370,13 @@ Game directory on autobootable disk
 		</part>
 	</software>
 
-	<software name="macroscp">
-		<description>Choujikuu Yousai Macross - Complete Pack HD Senyou</description>
+	<software name="macroscp" supported="partial">
+		<description>Choujikuu Yousai Macross - SkullLeader Complete Pack HD Senyou</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<notes><![CDATA[
+Battle gameplay leaves trails with the mouse, [EGC]?
+]]></notes>
 		<info name="alt_title" value="超時空要塞マクロス スカル・リーダー コンプリートパック ＨＤ専用" />
 		<info name="release" value="19950714" />
 		<part name="flop1" interface="floppy_5_25">
