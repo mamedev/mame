@@ -3502,6 +3502,94 @@ Simplification rules
 * Immediate values for the ``count`` operand are truncated to five or
   six bits for 32-bit or 64-bit operands, respectively.
 
+.. _umlinst-bfx:
+
+BFX
+~~~
+
+Extract a contiguous bit field from an integer value.
+
++---------------------------------+-----------------------------------------------+
+| Disassembly                     | Usage                                         |
++=================================+===============================================+
+| .. code-block::                 | .. code-block:: C++                           |
+|                                 |                                               |
+|     bfxu    dst,src,shift,width |     UML_BFXU(block, dst, src, shift, width);  |
+|     bfxs    dst,src,shift,width |     UML_BFXS(block, dst, src, shift, width);  |
+|     dbfxu   dst,src,shift,width |     UML_DBFXU(block, dst, src, shift, width); |
+|     dbfxs   dst,src,shift,width |     UML_DBFXS(block, dst, src, shift, width); |
++---------------------------------+-----------------------------------------------+
+
+Extracts and right-aligns a contiguous bit field from the value of
+``src``, specified by its least significant bit position and width in
+bits.  The field must be narrower than the ``src`` operand, but it may
+wrap around from the most significant bit position to the least
+significant bit position.  BFXU and DBFXU zero-extend an unsigned field,
+while BFXS and DBFXS sign-extend a signed field.
+
+Back-ends may be able to optimise some forms of this instruction for
+example when the ``shift`` and ``width`` operands are both immediate
+values.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the extracted field will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to extract a contiguous bit field from.
+shift (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The position of the least significant bit of the field to extract,
+    where zero is the least significant bit position, and bit numbers
+    increase toward the most significant bit position.  Only the least
+    significant five bits or six bits of this operand are used,
+    depending on the instruction size.
+width (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The width of the field to extract in bits.  Only the least
+    significant five bits or six bits of this operand are used,
+    depending on the instruction size.  The result is undefined if the
+    width modulo the instruction size in bits is zero.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src``, ``shift`` and ``width``
+  operands are all immediate values, or if the ``width`` operand is the
+  immediate value zero.
+* Converted to :ref:`SHR <umlinst-shr>` or :ref:`SAR <umlinst-sar>` if
+  the ``src`` operand is not an immediate value, the ``shift`` and
+  ``width`` operands are both immediate values, and the sum of the value
+  of the ``shift`` operand and the value of the ``width`` operand is
+  equal to the instruction size in bits.
+* BFXU and DBFXU are converted to :ref:`AND <umlinst-and>` if the
+  ``shift`` operand is the immediate value zero and ``width`` operand is
+  an immediate value.
+* BFXS and DBFXS are converted to :ref:`SEXT <umlinst-sext>` if the
+  ``shift`` operand is the immediate value zero and ``width`` operand is
+  the immediate value 8, 16 or 32.
+* Immediate values for the ``src`` operand are truncated to the
+  instruction size.
+* Immediate values for the ``shift`` and ``width`` operands are
+  truncated to five or six bits for 32-bit or 64-bit operands,
+  respectively.
+
 .. _umlinst-roland:
 
 ROLAND
@@ -3572,10 +3660,10 @@ Simplification rules
   immediate value and the ``mask`` operand is an immediate value
   containing a single contiguous left-aligned sequence of set bits of
   the appropriate length for the value of the ``count`` operand.
-* Converted to :ref:`SHR <umlinst-shr>` if the ``count`` operand is an
-  immediate value and the ``mask`` operand is an immediate value
-  containing a single contiguous right-aligned sequence of set bits of
-  the appropriate length for the value of the ``count`` operand.
+* Converted to :ref:`SHR <umlinst-shr>` or :ref:`BFX <umlinst-bfx>` if
+  the ``count`` operand is an immediate value and the ``mask`` operand
+  is an immediate value containing a single contiguous right-aligned
+  sequence of set bits.
 * Immediate values for the ``src`` and ``mask`` operands are truncated
   to the instruction size.
 * Immediate values for the ``count`` operand are truncated to five or
