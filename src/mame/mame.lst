@@ -44093,6 +44093,9 @@ tamapix
 cpu09
 ivg09
 
+@source:skeleton/tc_manhattan.cpp
+triplec
+
 @source:skeleton/tecnbras.cpp
 tecnbras
 
