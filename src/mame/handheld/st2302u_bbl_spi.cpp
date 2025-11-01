@@ -466,6 +466,20 @@ ROM_START(toumapet)
 	ROM_LOAD("p25d32sh.bin", 0x000000, 0x400000, CRC(25498f00) SHA1(c5c410e29f540d7f1fd4bbb333467f8a3eaccc15) )
 ROM_END
 
+ROM_START(touma560)
+	INTERNAL_ROM_TYPE2 // still does't boot with this one, is it different internal ROM again, or just different mappings?
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("py25q64ha.bin", 0x000000, 0x800000, CRC(7974bf3c) SHA1(8467f869f86b51a86eb115e1408b30daa8f148e7) )
+ROM_END
+
+ROM_START(touma568)
+	INTERNAL_ROM_TYPE2 // still does't boot with this one, is it different internal ROM again, or just different mappings?
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("p25q64sh.bin", 0x000000, 0x800000, CRC(32f6d834) SHA1(c0dc5b4792a6d86822a666a0f8de7380d1905505) )
+ROM_END
+
 ROM_START(qpet)
 	INTERNAL_ROM_TYPE2 // not checked if it uses this ROM type
 
@@ -513,7 +527,9 @@ CONS( 201?, dphh8633,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl3
 CONS( 2016, dphh8661,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8661", MACHINE_NOT_WORKING ) // from PCP? (logo on back of console) 2016 date on PCB
 
 // also has the 0xE4 XOR, also doesn't currently boot, could be yet another internal ROM
-// there are also OK-560 and OK-568 models which may have different ROM or be on different hardware
 CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet (OK-550)", MACHINE_NOT_WORKING )
+CONS( 2021, touma560,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet (OK-560)", MACHINE_NOT_WORKING )
+CONS( 2021, touma568,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet (OK-568)", MACHINE_NOT_WORKING )
+
 
 CONS( 2020, qpet,          0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "M&D", "Q Pet (2nd version)", MACHINE_NOT_WORKING )

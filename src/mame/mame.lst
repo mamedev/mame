@@ -19461,6 +19461,8 @@ rhhc152
 supreme
 table108
 throwbck
+touma560
+touma568
 toumapet
 
 @source:handheld/chessking.cpp
@@ -20005,6 +20007,9 @@ talkingbb
 
 @source:handheld/talkingfb.cpp
 talkingfb
+
+@source:handheld/tama_id.cpp
+tamaid
 
 @source:handheld/teammate.cpp
 teammate
@@ -35758,6 +35763,7 @@ lxpcsp
 matet100
 matet220
 matet300
+micac250
 myaasa
 myaass
 mymman
@@ -35788,7 +35794,9 @@ gtct885
 h12p1000
 hkb502
 hkb502a
+jl1810gr
 jl2050
+jl2377
 lexi30
 lpgm240
 lxcap
@@ -35799,15 +35807,20 @@ lxcmc250
 lxcmcy
 lxcmcyba
 lxcmcybt
+lxcmcyco
 lxcmcycr
 lxcmcydp
 lxcmcydpn
 lxcmcyfd
 lxcmcyfz
+lxcmcyfza
+lxcmcyfzb
+lxcmcyls
 lxcmcypj
 lxcmcypp
 lxcmcyppa
 lxcmcysp
+lxcmcyspa
 lxcmcyspn
 lxcmcysw
 lxcyber
@@ -47421,6 +47434,7 @@ tvtchsb
 
 @source:tvgames/spg2xx_lexibook.cpp
 arcade3d
+cybrtvfe
 lexizeus
 lexiseal
 discpal

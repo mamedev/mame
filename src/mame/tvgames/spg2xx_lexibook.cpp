@@ -44,6 +44,18 @@ protected:
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
+class spg2xx_cybrtvfe_game_state : public spg2xx_lexiseal_game_state
+{
+public:
+	spg2xx_cybrtvfe_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_lexiseal_game_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
+
+
 class spg2xx_vsplus_game_state : public spg2xx_lexizeus_game_state
 {
 public:
@@ -258,6 +270,12 @@ void spg2xx_lexiseal_game_state::portb_w(offs_t offset, uint16_t data, uint16_t 
 		switch_bank(2);
 }
 
+void spg2xx_cybrtvfe_game_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	int bank = data & mem_mask;
+	logerror("%s: portb_w %04x %04x - %04x\n", machine().describe_context(), data, mem_mask, bank);
+	switch_bank(bank & 0x07);
+}
 
 void spg2xx_vsplus_game_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -368,6 +386,11 @@ ROM_START( disppal )
 	ROM_LOAD16_WORD_SWAP( "vgpocketdisney.u3", 0x0000, 0x400000, CRC(051bd073) SHA1(e453677437206e11fb50b8b86853e466978338a2) )
 ROM_END
 
+ROM_START( cybrtvfe )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jl2500fe.u6", 0x0000, 0x4000000, CRC(2fce6685) SHA1(6fc329204fdb401c72884349f29201fb783fe2ea) )
+ROM_END
+
 /*
 
 VG Caplet ROM pinout from Sean Riddle (2 ROMs in single package)
@@ -437,6 +460,8 @@ CONS( 200?, arcade3d,    0,     0,        lexizeus,     lexiseal, spg2xx_lexizeu
 
 CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown> / JungleTac", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// marked as SPG260
+CONS( 2010, cybrtvfe,    0,     0,        lexiseal,     lexiseal, spg2xx_cybrtvfe_game_state, init_zeus, "Lexibook", "Cyber Arcade TV - Ferrari (JL2500FE)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited / JungleTac", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
 // There are versions of the Seal 50-in-1 that actually show Lexibook on the boot screen rather than it just being on the unit.  The Seal name was also used for some VT systems
