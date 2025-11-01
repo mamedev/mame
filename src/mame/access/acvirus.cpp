@@ -109,6 +109,9 @@ private:
 
 	void prog_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
+	void dsp_p_map(address_map &map) ATTR_COLD;
+	void dsp_x_map(address_map &map) ATTR_COLD;
+	void dsp_y_map(address_map &map) ATTR_COLD;
 
 	u8 p1_r();
 	void p1_w(u8 data);
@@ -160,6 +163,21 @@ void acvirus_state::data_map(address_map &map)
 	map(0x0400, 0x0407).rw(m_dsp, FUNC(dsp563xx_device::hi08_r), FUNC(dsp563xx_device::hi08_w));
 }
 
+void acvirus_state::dsp_p_map(address_map &map)
+{
+	map(0x20000, 0x3ffff).ram();
+}
+
+void acvirus_state::dsp_x_map(address_map &map)
+{
+	map(0x20000, 0x3ffff).ram();
+}
+
+void acvirus_state::dsp_y_map(address_map &map)
+{
+	map(0x20000, 0x3ffff).ram();
+}
+
 void acvirus_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(142, 241, 0));
@@ -189,6 +207,9 @@ void acvirus_state::virusa(machine_config &config)
 	m_lcdc->set_lcd_size(2, 16);
 
 	DSP56303(config, m_dsp, 66_MHz_XTAL);
+	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
+	m_dsp->set_addrmap(dsp563xx_device::AS_X, &acvirus_state::dsp_x_map);
+	m_dsp->set_addrmap(dsp563xx_device::AS_Y, &acvirus_state::dsp_y_map);
 	m_dsp->set_hard_omr(0xe);
 
 	SPEAKER(config, "speaker", 2).front();
@@ -217,6 +238,9 @@ void acvirus_state::virusb(machine_config &config)
 	m_lcdc->set_lcd_size(2, 16);
 
 	DSP56311(config, m_dsp, 108_MHz_XTAL);
+	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
+	m_dsp->set_addrmap(dsp563xx_device::AS_X, &acvirus_state::dsp_x_map);
+	m_dsp->set_addrmap(dsp563xx_device::AS_Y, &acvirus_state::dsp_y_map);
 	m_dsp->set_hard_omr(0xe);
 
 	SPEAKER(config, "speaker", 2).front();
@@ -247,6 +271,9 @@ void acvirus_state::virusc(machine_config &config)
 	m_lcdc->set_lcd_size(2, 16);
 
 	DSP56362(config, m_dsp, 136_MHz_XTAL);
+	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
+	m_dsp->set_addrmap(dsp563xx_device::AS_X, &acvirus_state::dsp_x_map);
+	m_dsp->set_addrmap(dsp563xx_device::AS_Y, &acvirus_state::dsp_y_map);
 	m_dsp->set_hard_omr(0xe);
 
 	SPEAKER(config, "speaker", 2).front();

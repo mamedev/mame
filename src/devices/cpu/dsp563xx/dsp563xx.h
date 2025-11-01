@@ -56,7 +56,7 @@ protected:
 	static const u16 t_move[0x10000];
 	static const u16 t_npar[0x100000];
 
-	static const u64 t_move_ex[39];
+	static const u64 t_move_ex[40];
 	static const u64 t_npar_ex[71];
 		
 	dsp563xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
@@ -91,7 +91,8 @@ protected:
 	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::cache m_p;
 	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::specific m_x, m_y;
 
-	u64 m_a, m_b, m_tmp1, m_tmp2;
+	u64 m_a, m_b;
+	u32 m_tmp1, m_tmp2;
 	std::array<u32, 16> m_stackh, m_stackl;
 	u32 m_pc, m_la, m_lc, m_vba;
 	u32 m_x0, m_x1, m_y0, m_y1;
@@ -106,10 +107,12 @@ protected:
 	int m_icount;
 
 	inline void set_a(u64 v) { m_a = v & 0xffffffffffffff; }
+	inline void set_ah(u32 v) { m_a = u64(util::sext(v, 24)) << 24; }
 	inline void set_a2(u8 v) { m_a = (m_a & 0x00ffffffffffff) | (u64(v) << 48); }
 	inline void set_a1(u32 v) { m_a = (m_a & 0xff000000ffffff) | (u64(v & 0xffffff) << 24); }
 	inline void set_a0(u32 v) { m_a = (m_a & 0xffffffff000000) | u64(v & 0xffffff); }
-	inline void set_b(u64 v) { m_a = v & 0xffffffffffffff; }
+	inline void set_b(u64 v) { m_b = v & 0xffffffffffffff; }
+	inline void set_bh(u32 v) { m_b = u64(util::sext(v, 24)) << 24; }
 	inline void set_b2(u8 v) { m_b = (m_b & 0x00ffffffffffff) | (u64(v) << 48); }
 	inline void set_b1(u32 v) { m_b = (m_b & 0xff000000ffffff) | (u64(v & 0xffffff) << 24); }
 	inline void set_b0(u32 v) { m_b = (m_b & 0xffffffff000000) | u64(v & 0xffffff); }
@@ -136,36 +139,55 @@ protected:
 	inline void set_com(u8 v) { m_omr = (m_omr & 0xffff00) | v; }
 	inline void set_eom(u8 v) { m_omr = (m_omr & 0xff00ff) | (v << 8); }
 
-	inline u64 get_a() { return m_a; }
-	inline u32 get_a2() { return m_a >> 48; }
-	inline u32 get_a1() { return (m_a >> 24) & 0xffffff; }
-	inline u32 get_a0() { return m_a & 0xffffff; }
-	inline u64 get_b() { return m_b; }
-	inline u32 get_b2() { return m_b >> 48; }
-	inline u32 get_b1() { return (m_b >> 24) & 0xffffff; }
-	inline u32 get_b0() { return m_b & 0xffffff; }
-	inline u32 get_x0() { return m_x0; }
-	inline u32 get_x1() { return m_x1; }
-	inline u32 get_y0() { return m_y0; }
-	inline u32 get_y1() { return m_y1; }
-	inline u32 get_r(int index) { return m_r[index]; }
-	inline u32 get_n(int index) { return m_n[index]; }
-	inline u32 get_m(int index) { return m_m[index]; }
-	inline u32 get_ep() { return m_ep; }
-	inline u32 get_la() { return m_la; }
-	inline u32 get_lc() { return m_lc; }
-	inline u32 get_omr() { return m_omr; }
-	inline u32 get_sc() { return m_sc; }
-	inline u32 get_sp() { return m_sp; }
-	inline u32 get_sr() { return (m_emr << 16) | (m_mr << 8) | m_ccr; }
-	inline u32 get_ssh() { return m_stackh[m_sp]; }
-	inline u32 get_ssl() { return m_stackl[m_sp]; }
-	inline u32 get_sz() { return m_sz; }
-	inline u32 get_vba() { return m_vba; }
-	inline u8 get_mr() { return m_mr; }
-	inline u8 get_ccr() { return m_mr; }
-	inline u8 get_com() { return m_omr; }
-	inline u8 get_eom() { return m_omr >> 8; }
+	inline u64 get_a() const { return m_a; }
+	inline u32 get_ah() const { return std::clamp(s32(m_a >> 24), -0x00800000, 0x007fffff) & 0xffffff; }
+	inline u32 get_a2() const { return m_a >> 48; }
+	inline u32 get_a1() const { return (m_a >> 24) & 0xffffff; }
+	inline u32 get_a0() const { return m_a & 0xffffff; }
+	inline u64 get_b() const { return m_b; }
+	inline u32 get_bh() const { return std::clamp(s32(m_b >> 24), -0x00800000, 0x007fffff) & 0xffffff; }
+	inline u32 get_b2() const { return m_b >> 48; }
+	inline u32 get_b1() const { return (m_b >> 24) & 0xffffff; }
+	inline u32 get_b0() const { return m_b & 0xffffff; }
+	inline u32 get_x0() const { return m_x0; }
+	inline u32 get_x1() const { return m_x1; }
+	inline u32 get_y0() const { return m_y0; }
+	inline u32 get_y1() const { return m_y1; }
+	inline u32 get_r(int index) const { return m_r[index]; }
+	inline u32 get_n(int index) const { return m_n[index]; }
+	inline u32 get_m(int index) const { return m_m[index]; }
+	inline u32 get_ep() const { return m_ep; }
+	inline u32 get_la() const { return m_la; }
+	inline u32 get_lc() const { return m_lc; }
+	inline u32 get_omr() const { return m_omr; }
+	inline u32 get_sc() const { return m_sc; }
+	inline u32 get_sp() const { return m_sp; }
+	inline u32 get_sr() const { return (m_emr << 16) | (m_mr << 8) | m_ccr; }
+	inline u32 get_ssh() const { return m_stackh[m_sp]; }
+	inline u32 get_ssl() const { return m_stackl[m_sp]; }
+	inline u32 get_sz() const { return m_sz; }
+	inline u32 get_vba() const { return m_vba; }
+	inline u8 get_mr() const { return m_mr; }
+	inline u8 get_ccr() const { return m_mr; }
+	inline u8 get_com() const { return m_omr; }
+	inline u8 get_eom() const { return m_omr >> 8; }
+
+	inline bool test_cc() const { return (m_ccr & CCR_C) == 0; }
+	inline bool test_ge() const { return (m_ccr & (CCR_N|CCR_V)) == 0 || (m_ccr & (CCR_N|CCR_V)) == (CCR_N|CCR_V); }
+	inline bool test_ne() const { return (m_ccr & CCR_Z) == 0; }
+	inline bool test_pl() const { return (m_ccr & CCR_N) == 0; }
+	inline bool test_nn() const { return (m_ccr & CCR_Z) == 0 && (m_ccr & (CCR_U|CCR_E)) != 0; }
+	inline bool test_ec() const { return (m_ccr & CCR_E) == 0; }
+	inline bool test_lc() const { return (m_ccr & CCR_L) == 0; }
+	inline bool test_gt() const { return (m_ccr & CCR_Z) == 0 && ((m_ccr & (CCR_N|CCR_V)) == 0 || (m_ccr & (CCR_N|CCR_V)) == (CCR_N|CCR_V)); }
+	inline bool test_cs() const { return (m_ccr & CCR_C) == CCR_C; }
+	inline bool test_lt() const { return (m_ccr & (CCR_N|CCR_V)) == CCR_V || (m_ccr & (CCR_N|CCR_V)) == CCR_N; }
+	inline bool test_eq() const { return (m_ccr & CCR_Z) == CCR_Z; }
+	inline bool test_mi() const { return (m_ccr & CCR_N) == CCR_N; }
+	inline bool test_nr() const { return (m_ccr & CCR_Z) == CCR_Z || (m_ccr & (CCR_U|CCR_E)) == 0; }
+	inline bool test_es() const { return (m_ccr & CCR_E) == CCR_E; }
+	inline bool test_ls() const { return (m_ccr & CCR_L) == CCR_L; }
+	inline bool test_le() const { return (m_ccr & CCR_Z) == CCR_Z || (m_ccr & (CCR_N|CCR_V)) == CCR_V || (m_ccr & (CCR_N|CCR_V)) == CCR_N; }
 
 	inline void inc_sp() { m_sp++; }
 	inline void dec_sp() { m_sp--; }
