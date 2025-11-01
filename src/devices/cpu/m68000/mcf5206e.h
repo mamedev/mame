@@ -508,14 +508,14 @@ private:
 	// I2C host/device but Motorola
 	void mbus_sda_w(int state){ write_sda(state); }
 	void mbus_scl_w(int state){ write_scl(state); }
-	void mbus_irq_w(int state){ m_sim->set_external_interrupt(MBUS_IRQ, state); }
+	void mbus_irq_w(int state){ m_sim->set_internal_interrupt_request(MBUS_IRQ, state); }
 	required_device<coldfire_mbus_device> m_mbus;
 	devcb_write_line write_sda, write_scl;
 
 	/* DMA Modules */
 	required_device_array<coldfire_dma_device, 2> m_dma;
-	void dma0_irq_w(int state){ m_sim->set_external_interrupt(DMA_0_IRQ, state); }
-	void dma1_irq_w(int state){ m_sim->set_external_interrupt(DMA_1_IRQ, state); }
+	void dma0_irq_w(int state){ m_sim->set_internal_interrupt_request(DMA_0_IRQ, state); }
+	void dma1_irq_w(int state){ m_sim->set_internal_interrupt_request(DMA_1_IRQ, state); }
 
 };
 

@@ -1122,6 +1122,7 @@ void coldfire_mbus_device::mbus_map(address_map &map)
 TIMER_CALLBACK_MEMBER(coldfire_mbus_device::mbus_callback)
 {
 	// TODO: Do bit transfers etc
+	// gamtor wants i2c irqs, as it runs the task based EEPROM checks there.
 }
 
 void coldfire_mbus_device::madr_w(u8 data)
