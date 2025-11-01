@@ -202,6 +202,21 @@ ROM_START( lxcyrace )
 	ROM_LOAD( "25q128.u2", 0x0000, 0x1000000, CRC(4489c99d) SHA1(792d6d224584fe1f3349c64a59aa79a587dd8c17) )
 ROM_END
 
+ROM_START( lxcymsm )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(96b3ee5c) SHA1(f1e6bf46a4503877074310506d1acc4607dac331) )
+ROM_END
+
+ROM_START( lxcympp )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(570b669c) SHA1(e7fcae662c8c8cae18cf1151d6caefacfe1e9fda) )
+ROM_END
 
 void generalplus_gpspispi_game_state::init_spi()
 {
@@ -281,3 +296,5 @@ CONS(2015, pokegac2y, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, general
 CONS(202?, bk139in1,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "<unknown>", "BornKid 32 Bit Preloaded 139-in-1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // same unknown hardware as above, fewer games
 CONS(2021, lxcyrace,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Racing (JL3150)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, lxcymsm,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Superman (JL3180SU)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, lxcympp,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Paw Patrol (JL3180PA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
