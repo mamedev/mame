@@ -46,6 +46,7 @@ Labeled CS111P076 At front back
 #include "machine/i8279.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
+
 #include "speaker.h"
 
 
@@ -92,7 +93,7 @@ void my6_state::display_map(address_map &map)
 void my6_state::display_data_map(address_map &map)
 {
 	map(0xe000, 0xe7ff).ram().share("vram"); // Video ram. 64x64
-	map(0xA000, 0xA000).noprw(); // Input for display controller handled by maincpu
+	map(0xa000, 0xa000).noprw(); // Input for display controller handled by maincpu
 }
 
 void my6_state::machine_start()
@@ -107,7 +108,7 @@ void my6_state::my6(machine_config &config)
 	maincpu.set_addrmap(AS_DATA, &my6_state::data_map);
 	maincpu.set_disable(); // Disabled for now.
 
-	/* Keyboard & display interface */
+	// Keyboard & display interface
 	I8279(config, "i8279", XTAL(10'738'635) / 6); // Divisor not verified
 
 	// Programmable Peripheral Interface
