@@ -295,13 +295,15 @@ class Function:
         if self.values[0] == "range" or self.values[0] == "split-range":
             mode = self.values[3 if self.values[0] == "split-range" else 2]
             if mode == 'imm':
-                return '0x%%0%dx' % ((self.bcount + 3) // 4)
+                return '$%%0%dx' % ((self.bcount + 3) // 4)
+            elif mode == 'immm':
+                return '$%x'
             elif mode == 'bit':
                 return '%d'
-            elif mode == 'asap' or mode == 'asaq' or mode == 'pcrel':
-                return '0x%06x'                
-        if self.name == 'exabs' or self.name == 'expcrel' or self.name == 'eximm' or self.name == 'eam1a' or self.name == 'eam1i':
-            return '0x%06x'
+            elif mode == 'abs' or mode == 'asap' or mode == 'asaq' or mode == 'pcrel':
+                return '$%06x'                
+        if self.name == 'exabs' or self.name == 'exoff' or self.name == 'expcrel' or self.name == 'eximm' or self.name == 'exco' or self.name == 'eam1a' or self.name == 'eam1i':
+            return '$%06x'
         return '[' + self.name + ']'
 
     def brange(self, bit, bc):
@@ -327,10 +329,14 @@ class Function:
             mode = self.values[3 if self.values[0] == "split-range" else 2]
             if mode == 'imm' or mode == 'bit' or mode == 'abs':
                 return 'BIT(opcode, %d, %d)' % (params[0], self.bcount)
+            elif mode == 'immm':
+                return '0x800000 >> BIT(opcode, %d, %d)' % (params[0], self.bcount)
             elif mode == 'asap':
                 return '0xffffc0 + BIT(opcode, %d, %d)' % (params[0], self.bcount)
             elif mode == 'asaq':
-                return '0xffff80 + BIT(opcode, %d, %d)' % (params[0], self.bcount)                
+                return '0xffff80 + BIT(opcode, %d, %d)' % (params[0], self.bcount)
+            elif mode == 'pcrel':
+                return '(m_pc + BIT(opcode, %d, %d)) & 0xffffff' % (params[0], self.bcount)
             else:
                 print('unsupported range on %s %s' % (mode, self.name))
         elif self.values[0] == 'split-range':
@@ -344,10 +350,10 @@ class Function:
             elif mode == 'asaq':
                 return '0xffff80 + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
             elif mode == 'pcrel':
-                return 'm_pc + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
+                return '(m_pc + util::sext(bitswap<%d>(opcode%s%s), %d)) & 0xffffff' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2), self.bcount)
             else:
                 print('unsupported split-range on %s %s' % (mode, self.name))
-        elif self.name == 'exabs' or self.name == 'eximm' or self.name == 'eam1a' or self.name == 'eam1i':
+        elif self.name == 'exabs' or self.name == 'exoff' or self.name == 'eximm' or self.name == 'eam1a' or self.name == 'eam1i':
             return 'exv'
         elif self.name == 'expcrel':
             return '(m_pc+exv) & 0xffffff'
@@ -370,12 +376,16 @@ class Function:
             return ', ts_%s[bitswap<%d>(opcode, %d%s%s)]' % (self.name, self.bcount+1, params[2], self.brange(params[0], b1), self.brange(params[1], b2))
         elif self.values[0] == 'range':
             mode = self.values[3 if self.values[0] == "split-range" else 2]
-            if mode == 'imm' or mode == 'bit':
+            if mode == 'imm' or mode == 'bit' or mode == 'abs':
                 return ', BIT(opcode, %d, %d)' % (params[0], self.bcount)
+            elif mode == 'immm':
+                return ', 0x800000 >> BIT(opcode, %d, %d)' % (params[0], self.bcount)
             elif mode == 'asap':
                 return ', 0xffffc0 + BIT(opcode, %d, %d)' % (params[0], self.bcount)
             elif mode == 'asaq':
                 return ', 0xffff80 + BIT(opcode, %d, %d)' % (params[0], self.bcount)                
+            elif mode == 'pcrel':
+                return ', (pc + BIT(opcode, %d, %d)) & 0xffffff' % (params[0], self.bcount)
         elif self.values[0] == 'split-range':
             b2 = self.values[1]
             b1 = self.bcount - b2
@@ -387,8 +397,8 @@ class Function:
             elif mode == 'asaq':
                 return ', 0xffff80 + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
             elif mode == 'pcrel':
-                return ', pc + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
-        elif self.name == 'exabs' or self.name == 'eximm' or self.name == 'eam1a' or self.name == 'eam1i':
+                return ', (pc + util::sext(bitswap<%d>(opcode%s%s), %d)) & 0xffffff' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2), self.bcount)
+        elif self.name == 'exabs' or self.name == 'exoff' or self.name == 'eximm' or self.name == 'exco' or self.name == 'eam1a' or self.name == 'eam1i':
             return ', exv'
         elif self.name == 'expcrel':
             return ', (pc+exv) & 0xffffff'
@@ -410,16 +420,17 @@ Function("fvbr2", 1, ["single", ['m', None, None, 'ep', None, None, None, None, 
 Function("imm12", 2, ["split-range", 8, 4096, "imm"])
 Function("imm8", 1, ["range", 256, "imm"])
 Function("imm6", 1, ["range", 64, "imm"])
-Function("imm4", 1, ["range", 16, "imm"])
+Function("imm5m", 1, ["range", 24, "immm"])
 Function("imm1", 1, ["range", 2, "imm"])
 Function("bit5", 1, ["range", 24, "bit"])
-Function("shift5", 1, ["range", 17, "shift"])
+Function("shift6", 1, ["range", 64, "bit"])
+Function("shift5", 1, ["range", 17, "bit"])
 Function("actrl", 1, ["single", [None, None, 'a1', 'b1', 'x0', 'y0', 'x1', 'y1']])
 Function("eam4", 1, ["single", ['(r)-n', '(r)+n', '(r)-', '(r)+']])
 Function("eam1", 1, ["single", ['(r)-n', '(r)+n', '(r)-', '(r)+', '(r)', '(r+n)', None, None, None, None, None, None, None, None, '-(r)']])
 Function("eam1a", 1, ["val", 0x30, "abs"])
 Function("eam1i", 1, ["val", 0x34, "imm"])
-Function("asa6", 1, ["range", 64, "asa"])
+Function("asa6", 1, ["range", 64, "abs"])
 Function("asa6p", 1, ["range", 64, "asap"])
 Function("asa6q", 1, ["range", 64, "asaq"])
 Function("asa6qs", 2, ["split-range", 5, 64, "asaq"])
@@ -1104,11 +1115,11 @@ class ISA:
         self.gen_index_array(f, self.cnpar[:0x100000])
         print("};", file=f)
         print("", file=f)
-        print("const u64 dsp563xx_device::t_move_ex[39] = {", file=f)
+        print("const u64 dsp563xx_device::t_move_ex[40] = {", file=f)
         self.gen_ex_array(f, self.cmoves)
         print("};", file=f)
         print("", file=f)
-        print("const u64 dsp563xx_device::t_npar_ex[71] = {", file=f)
+        print("const u64 dsp563xx_device::t_npar_ex[72] = {", file=f)
         self.gen_ex_array(f, self.cnpars)
         print("};", file=f)
 

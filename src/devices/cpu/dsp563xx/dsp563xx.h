@@ -57,8 +57,8 @@ protected:
 	static const u16 t_move[0x10000];
 	static const u16 t_npar[0x100000];
 
-	static const u64 t_move_ex[39];
-	static const u64 t_npar_ex[71];
+	static const u64 t_move_ex[40];
+	static const u64 t_npar_ex[72];
 		
 	dsp563xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
 					address_map_constructor map_p, address_map_constructor map_x, address_map_constructor map_y);

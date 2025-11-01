@@ -2859,60 +2859,60 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		unhandled("n,x:-(r)");
 		break;
 		}
-	case 412: { // [abs],x0
-		unhandled("[abs],x0");
+	case 412: { // x:[abs],x0
+		unhandled("x:[abs],x0");
 		break;
 		}
-	case 413: { // [abs],x1
-		unhandled("[abs],x1");
+	case 413: { // x:[abs],x1
+		unhandled("x:[abs],x1");
 		break;
 		}
-	case 414: { // [abs],y0
-		unhandled("[abs],y0");
+	case 414: { // x:[abs],y0
+		unhandled("x:[abs],y0");
 		break;
 		}
-	case 415: { // [abs],y1
-		unhandled("[abs],y1");
+	case 415: { // x:[abs],y1
+		unhandled("x:[abs],y1");
 		break;
 		}
-	case 416: { // [abs],a0
-		unhandled("[abs],a0");
+	case 416: { // x:[abs],a0
+		unhandled("x:[abs],a0");
 		break;
 		}
-	case 417: { // [abs],b0
-		unhandled("[abs],b0");
+	case 417: { // x:[abs],b0
+		unhandled("x:[abs],b0");
 		break;
 		}
-	case 418: { // [abs],a2
-		unhandled("[abs],a2");
+	case 418: { // x:[abs],a2
+		unhandled("x:[abs],a2");
 		break;
 		}
-	case 419: { // [abs],b2
-		unhandled("[abs],b2");
+	case 419: { // x:[abs],b2
+		unhandled("x:[abs],b2");
 		break;
 		}
-	case 420: { // [abs],a1
-		unhandled("[abs],a1");
+	case 420: { // x:[abs],a1
+		unhandled("x:[abs],a1");
 		break;
 		}
-	case 421: { // [abs],b1
-		unhandled("[abs],b1");
+	case 421: { // x:[abs],b1
+		unhandled("x:[abs],b1");
 		break;
 		}
-	case 422: { // [abs],a
-		unhandled("[abs],a");
+	case 422: { // x:[abs],a
+		unhandled("x:[abs],a");
 		break;
 		}
-	case 423: { // [abs],b
-		unhandled("[abs],b");
+	case 423: { // x:[abs],b
+		unhandled("x:[abs],b");
 		break;
 		}
-	case 424: { // [abs],r
-		unhandled("[abs],r");
+	case 424: { // x:[abs],r
+		unhandled("x:[abs],r");
 		break;
 		}
-	case 425: { // [abs],n
-		unhandled("[abs],n");
+	case 425: { // x:[abs],n
+		unhandled("x:[abs],n");
 		break;
 		}
 	case 426: { // #[i],x0
@@ -2971,8051 +2971,8323 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		unhandled("#[i],n");
 		break;
 		}
-	case 440: { // x:[aa],x0
+	case 440: { // x0,x:[abs]
+		unhandled("x0,x:[abs]");
+		break;
+		}
+	case 441: { // x1,x:[abs]
+		unhandled("x1,x:[abs]");
+		break;
+		}
+	case 442: { // y0,x:[abs]
+		unhandled("y0,x:[abs]");
+		break;
+		}
+	case 443: { // y1,x:[abs]
+		unhandled("y1,x:[abs]");
+		break;
+		}
+	case 444: { // a0,x:[abs]
+		unhandled("a0,x:[abs]");
+		break;
+		}
+	case 445: { // b0,x:[abs]
+		unhandled("b0,x:[abs]");
+		break;
+		}
+	case 446: { // a2,x:[abs]
+		unhandled("a2,x:[abs]");
+		break;
+		}
+	case 447: { // b2,x:[abs]
+		unhandled("b2,x:[abs]");
+		break;
+		}
+	case 448: { // a1,x:[abs]
+		unhandled("a1,x:[abs]");
+		break;
+		}
+	case 449: { // b1,x:[abs]
+		unhandled("b1,x:[abs]");
+		break;
+		}
+	case 450: { // a,x:[abs]
+		unhandled("a,x:[abs]");
+		break;
+		}
+	case 451: { // b,x:[abs]
+		unhandled("b,x:[abs]");
+		break;
+		}
+	case 452: { // r,x:[abs]
+		unhandled("r,x:[abs]");
+		break;
+		}
+	case 453: { // n,x:[abs]
+		unhandled("n,x:[abs]");
+		break;
+		}
+	case 454: { // x:[aa],x0
 		unhandled("x:[aa],x0");
 		break;
 		}
-	case 441: { // x:[aa],x1
+	case 455: { // x:[aa],x1
 		unhandled("x:[aa],x1");
 		break;
 		}
-	case 442: { // x:[aa],y0
+	case 456: { // x:[aa],y0
 		unhandled("x:[aa],y0");
 		break;
 		}
-	case 443: { // x:[aa],y1
+	case 457: { // x:[aa],y1
 		unhandled("x:[aa],y1");
 		break;
 		}
-	case 444: { // x:[aa],a0
+	case 458: { // x:[aa],a0
 		unhandled("x:[aa],a0");
 		break;
 		}
-	case 445: { // x:[aa],b0
+	case 459: { // x:[aa],b0
 		unhandled("x:[aa],b0");
 		break;
 		}
-	case 446: { // x:[aa],a2
+	case 460: { // x:[aa],a2
 		unhandled("x:[aa],a2");
 		break;
 		}
-	case 447: { // x:[aa],b2
+	case 461: { // x:[aa],b2
 		unhandled("x:[aa],b2");
 		break;
 		}
-	case 448: { // x:[aa],a1
+	case 462: { // x:[aa],a1
 		unhandled("x:[aa],a1");
 		break;
 		}
-	case 449: { // x:[aa],b1
+	case 463: { // x:[aa],b1
 		unhandled("x:[aa],b1");
 		break;
 		}
-	case 450: { // x:[aa],a
+	case 464: { // x:[aa],a
 		unhandled("x:[aa],a");
 		break;
 		}
-	case 451: { // x:[aa],b
+	case 465: { // x:[aa],b
 		unhandled("x:[aa],b");
 		break;
 		}
-	case 452: { // x:[aa],r
+	case 466: { // x:[aa],r
 		unhandled("x:[aa],r");
 		break;
 		}
-	case 453: { // x:[aa],n
+	case 467: { // x:[aa],n
 		unhandled("x:[aa],n");
 		break;
 		}
-	case 454: { // x0,x:[aa]
+	case 468: { // x0,x:[aa]
 		unhandled("x0,x:[aa]");
 		break;
 		}
-	case 455: { // x1,x:[aa]
+	case 469: { // x1,x:[aa]
 		unhandled("x1,x:[aa]");
 		break;
 		}
-	case 456: { // y0,x:[aa]
+	case 470: { // y0,x:[aa]
 		unhandled("y0,x:[aa]");
 		break;
 		}
-	case 457: { // y1,x:[aa]
+	case 471: { // y1,x:[aa]
 		unhandled("y1,x:[aa]");
 		break;
 		}
-	case 458: { // a0,x:[aa]
+	case 472: { // a0,x:[aa]
 		unhandled("a0,x:[aa]");
 		break;
 		}
-	case 459: { // b0,x:[aa]
+	case 473: { // b0,x:[aa]
 		unhandled("b0,x:[aa]");
 		break;
 		}
-	case 460: { // a2,x:[aa]
+	case 474: { // a2,x:[aa]
 		unhandled("a2,x:[aa]");
 		break;
 		}
-	case 461: { // b2,x:[aa]
+	case 475: { // b2,x:[aa]
 		unhandled("b2,x:[aa]");
 		break;
 		}
-	case 462: { // a1,x:[aa]
+	case 476: { // a1,x:[aa]
 		unhandled("a1,x:[aa]");
 		break;
 		}
-	case 463: { // b1,x:[aa]
+	case 477: { // b1,x:[aa]
 		unhandled("b1,x:[aa]");
 		break;
 		}
-	case 464: { // a,x:[aa]
+	case 478: { // a,x:[aa]
 		unhandled("a,x:[aa]");
 		break;
 		}
-	case 465: { // b,x:[aa]
+	case 479: { // b,x:[aa]
 		unhandled("b,x:[aa]");
 		break;
 		}
-	case 466: { // r,x:[aa]
+	case 480: { // r,x:[aa]
 		unhandled("r,x:[aa]");
 		break;
 		}
-	case 467: { // n,x:[aa]
+	case 481: { // n,x:[aa]
 		unhandled("n,x:[aa]");
 		break;
 		}
-	case 468: { // x:(r)-n,x0 a,y0
+	case 482: { // x:(r)-n,x0 a,y0
 		unhandled("x:(r)-n,x0 a,y0");
 		break;
 		}
-	case 469: { // x:(r)+n,x0 a,y0
+	case 483: { // x:(r)+n,x0 a,y0
 		unhandled("x:(r)+n,x0 a,y0");
 		break;
 		}
-	case 470: { // x:(r)-,x0 a,y0
+	case 484: { // x:(r)-,x0 a,y0
 		unhandled("x:(r)-,x0 a,y0");
 		break;
 		}
-	case 471: { // x:(r)+,x0 a,y0
+	case 485: { // x:(r)+,x0 a,y0
 		unhandled("x:(r)+,x0 a,y0");
 		break;
 		}
-	case 472: { // x:(r),x0 a,y0
+	case 486: { // x:(r),x0 a,y0
 		unhandled("x:(r),x0 a,y0");
 		break;
 		}
-	case 473: { // x:(r+n),x0 a,y0
+	case 487: { // x:(r+n),x0 a,y0
 		unhandled("x:(r+n),x0 a,y0");
 		break;
 		}
-	case 474: { // x:-(r),x0 a,y0
+	case 488: { // x:-(r),x0 a,y0
 		unhandled("x:-(r),x0 a,y0");
 		break;
 		}
-	case 475: { // x:(r)-n,x0 a,y1
+	case 489: { // x:(r)-n,x0 a,y1
 		unhandled("x:(r)-n,x0 a,y1");
 		break;
 		}
-	case 476: { // x:(r)+n,x0 a,y1
+	case 490: { // x:(r)+n,x0 a,y1
 		unhandled("x:(r)+n,x0 a,y1");
 		break;
 		}
-	case 477: { // x:(r)-,x0 a,y1
+	case 491: { // x:(r)-,x0 a,y1
 		unhandled("x:(r)-,x0 a,y1");
 		break;
 		}
-	case 478: { // x:(r)+,x0 a,y1
+	case 492: { // x:(r)+,x0 a,y1
 		unhandled("x:(r)+,x0 a,y1");
 		break;
 		}
-	case 479: { // x:(r),x0 a,y1
+	case 493: { // x:(r),x0 a,y1
 		unhandled("x:(r),x0 a,y1");
 		break;
 		}
-	case 480: { // x:(r+n),x0 a,y1
+	case 494: { // x:(r+n),x0 a,y1
 		unhandled("x:(r+n),x0 a,y1");
 		break;
 		}
-	case 481: { // x:-(r),x0 a,y1
+	case 495: { // x:-(r),x0 a,y1
 		unhandled("x:-(r),x0 a,y1");
 		break;
 		}
-	case 482: { // x:(r)-n,x0 b,y0
+	case 496: { // x:(r)-n,x0 b,y0
 		unhandled("x:(r)-n,x0 b,y0");
 		break;
 		}
-	case 483: { // x:(r)+n,x0 b,y0
+	case 497: { // x:(r)+n,x0 b,y0
 		unhandled("x:(r)+n,x0 b,y0");
 		break;
 		}
-	case 484: { // x:(r)-,x0 b,y0
+	case 498: { // x:(r)-,x0 b,y0
 		unhandled("x:(r)-,x0 b,y0");
 		break;
 		}
-	case 485: { // x:(r)+,x0 b,y0
+	case 499: { // x:(r)+,x0 b,y0
 		unhandled("x:(r)+,x0 b,y0");
 		break;
 		}
-	case 486: { // x:(r),x0 b,y0
+	case 500: { // x:(r),x0 b,y0
 		unhandled("x:(r),x0 b,y0");
 		break;
 		}
-	case 487: { // x:(r+n),x0 b,y0
+	case 501: { // x:(r+n),x0 b,y0
 		unhandled("x:(r+n),x0 b,y0");
 		break;
 		}
-	case 488: { // x:-(r),x0 b,y0
+	case 502: { // x:-(r),x0 b,y0
 		unhandled("x:-(r),x0 b,y0");
 		break;
 		}
-	case 489: { // x:(r)-n,x0 b,y1
+	case 503: { // x:(r)-n,x0 b,y1
 		unhandled("x:(r)-n,x0 b,y1");
 		break;
 		}
-	case 490: { // x:(r)+n,x0 b,y1
+	case 504: { // x:(r)+n,x0 b,y1
 		unhandled("x:(r)+n,x0 b,y1");
 		break;
 		}
-	case 491: { // x:(r)-,x0 b,y1
+	case 505: { // x:(r)-,x0 b,y1
 		unhandled("x:(r)-,x0 b,y1");
 		break;
 		}
-	case 492: { // x:(r)+,x0 b,y1
+	case 506: { // x:(r)+,x0 b,y1
 		unhandled("x:(r)+,x0 b,y1");
 		break;
 		}
-	case 493: { // x:(r),x0 b,y1
+	case 507: { // x:(r),x0 b,y1
 		unhandled("x:(r),x0 b,y1");
 		break;
 		}
-	case 494: { // x:(r+n),x0 b,y1
+	case 508: { // x:(r+n),x0 b,y1
 		unhandled("x:(r+n),x0 b,y1");
 		break;
 		}
-	case 495: { // x:-(r),x0 b,y1
+	case 509: { // x:-(r),x0 b,y1
 		unhandled("x:-(r),x0 b,y1");
 		break;
 		}
-	case 496: { // x:(r)-n,x1 a,y0
+	case 510: { // x:(r)-n,x1 a,y0
 		unhandled("x:(r)-n,x1 a,y0");
 		break;
 		}
-	case 497: { // x:(r)+n,x1 a,y0
+	case 511: { // x:(r)+n,x1 a,y0
 		unhandled("x:(r)+n,x1 a,y0");
 		break;
 		}
-	case 498: { // x:(r)-,x1 a,y0
+	case 512: { // x:(r)-,x1 a,y0
 		unhandled("x:(r)-,x1 a,y0");
 		break;
 		}
-	case 499: { // x:(r)+,x1 a,y0
+	case 513: { // x:(r)+,x1 a,y0
 		unhandled("x:(r)+,x1 a,y0");
 		break;
 		}
-	case 500: { // x:(r),x1 a,y0
+	case 514: { // x:(r),x1 a,y0
 		unhandled("x:(r),x1 a,y0");
 		break;
 		}
-	case 501: { // x:(r+n),x1 a,y0
+	case 515: { // x:(r+n),x1 a,y0
 		unhandled("x:(r+n),x1 a,y0");
 		break;
 		}
-	case 502: { // x:-(r),x1 a,y0
+	case 516: { // x:-(r),x1 a,y0
 		unhandled("x:-(r),x1 a,y0");
 		break;
 		}
-	case 503: { // x:(r)-n,x1 a,y1
+	case 517: { // x:(r)-n,x1 a,y1
 		unhandled("x:(r)-n,x1 a,y1");
 		break;
 		}
-	case 504: { // x:(r)+n,x1 a,y1
+	case 518: { // x:(r)+n,x1 a,y1
 		unhandled("x:(r)+n,x1 a,y1");
 		break;
 		}
-	case 505: { // x:(r)-,x1 a,y1
+	case 519: { // x:(r)-,x1 a,y1
 		unhandled("x:(r)-,x1 a,y1");
 		break;
 		}
-	case 506: { // x:(r)+,x1 a,y1
+	case 520: { // x:(r)+,x1 a,y1
 		unhandled("x:(r)+,x1 a,y1");
 		break;
 		}
-	case 507: { // x:(r),x1 a,y1
+	case 521: { // x:(r),x1 a,y1
 		unhandled("x:(r),x1 a,y1");
 		break;
 		}
-	case 508: { // x:(r+n),x1 a,y1
+	case 522: { // x:(r+n),x1 a,y1
 		unhandled("x:(r+n),x1 a,y1");
 		break;
 		}
-	case 509: { // x:-(r),x1 a,y1
+	case 523: { // x:-(r),x1 a,y1
 		unhandled("x:-(r),x1 a,y1");
 		break;
 		}
-	case 510: { // x:(r)-n,x1 b,y0
+	case 524: { // x:(r)-n,x1 b,y0
 		unhandled("x:(r)-n,x1 b,y0");
 		break;
 		}
-	case 511: { // x:(r)+n,x1 b,y0
+	case 525: { // x:(r)+n,x1 b,y0
 		unhandled("x:(r)+n,x1 b,y0");
 		break;
 		}
-	case 512: { // x:(r)-,x1 b,y0
+	case 526: { // x:(r)-,x1 b,y0
 		unhandled("x:(r)-,x1 b,y0");
 		break;
 		}
-	case 513: { // x:(r)+,x1 b,y0
+	case 527: { // x:(r)+,x1 b,y0
 		unhandled("x:(r)+,x1 b,y0");
 		break;
 		}
-	case 514: { // x:(r),x1 b,y0
+	case 528: { // x:(r),x1 b,y0
 		unhandled("x:(r),x1 b,y0");
 		break;
 		}
-	case 515: { // x:(r+n),x1 b,y0
+	case 529: { // x:(r+n),x1 b,y0
 		unhandled("x:(r+n),x1 b,y0");
 		break;
 		}
-	case 516: { // x:-(r),x1 b,y0
+	case 530: { // x:-(r),x1 b,y0
 		unhandled("x:-(r),x1 b,y0");
 		break;
 		}
-	case 517: { // x:(r)-n,x1 b,y1
+	case 531: { // x:(r)-n,x1 b,y1
 		unhandled("x:(r)-n,x1 b,y1");
 		break;
 		}
-	case 518: { // x:(r)+n,x1 b,y1
+	case 532: { // x:(r)+n,x1 b,y1
 		unhandled("x:(r)+n,x1 b,y1");
 		break;
 		}
-	case 519: { // x:(r)-,x1 b,y1
+	case 533: { // x:(r)-,x1 b,y1
 		unhandled("x:(r)-,x1 b,y1");
 		break;
 		}
-	case 520: { // x:(r)+,x1 b,y1
+	case 534: { // x:(r)+,x1 b,y1
 		unhandled("x:(r)+,x1 b,y1");
 		break;
 		}
-	case 521: { // x:(r),x1 b,y1
+	case 535: { // x:(r),x1 b,y1
 		unhandled("x:(r),x1 b,y1");
 		break;
 		}
-	case 522: { // x:(r+n),x1 b,y1
+	case 536: { // x:(r+n),x1 b,y1
 		unhandled("x:(r+n),x1 b,y1");
 		break;
 		}
-	case 523: { // x:-(r),x1 b,y1
+	case 537: { // x:-(r),x1 b,y1
 		unhandled("x:-(r),x1 b,y1");
 		break;
 		}
-	case 524: { // x:(r)-n,a a,y0
+	case 538: { // x:(r)-n,a a,y0
 		unhandled("x:(r)-n,a a,y0");
 		break;
 		}
-	case 525: { // x:(r)+n,a a,y0
+	case 539: { // x:(r)+n,a a,y0
 		unhandled("x:(r)+n,a a,y0");
 		break;
 		}
-	case 526: { // x:(r)-,a a,y0
+	case 540: { // x:(r)-,a a,y0
 		unhandled("x:(r)-,a a,y0");
 		break;
 		}
-	case 527: { // x:(r)+,a a,y0
+	case 541: { // x:(r)+,a a,y0
 		unhandled("x:(r)+,a a,y0");
 		break;
 		}
-	case 528: { // x:(r),a a,y0
+	case 542: { // x:(r),a a,y0
 		unhandled("x:(r),a a,y0");
 		break;
 		}
-	case 529: { // x:(r+n),a a,y0
+	case 543: { // x:(r+n),a a,y0
 		unhandled("x:(r+n),a a,y0");
 		break;
 		}
-	case 530: { // x:-(r),a a,y0
+	case 544: { // x:-(r),a a,y0
 		unhandled("x:-(r),a a,y0");
 		break;
 		}
-	case 531: { // x:(r)-n,a a,y1
+	case 545: { // x:(r)-n,a a,y1
 		unhandled("x:(r)-n,a a,y1");
 		break;
 		}
-	case 532: { // x:(r)+n,a a,y1
+	case 546: { // x:(r)+n,a a,y1
 		unhandled("x:(r)+n,a a,y1");
 		break;
 		}
-	case 533: { // x:(r)-,a a,y1
+	case 547: { // x:(r)-,a a,y1
 		unhandled("x:(r)-,a a,y1");
 		break;
 		}
-	case 534: { // x:(r)+,a a,y1
+	case 548: { // x:(r)+,a a,y1
 		unhandled("x:(r)+,a a,y1");
 		break;
 		}
-	case 535: { // x:(r),a a,y1
+	case 549: { // x:(r),a a,y1
 		unhandled("x:(r),a a,y1");
 		break;
 		}
-	case 536: { // x:(r+n),a a,y1
+	case 550: { // x:(r+n),a a,y1
 		unhandled("x:(r+n),a a,y1");
 		break;
 		}
-	case 537: { // x:-(r),a a,y1
+	case 551: { // x:-(r),a a,y1
 		unhandled("x:-(r),a a,y1");
 		break;
 		}
-	case 538: { // x:(r)-n,a b,y0
+	case 552: { // x:(r)-n,a b,y0
 		unhandled("x:(r)-n,a b,y0");
 		break;
 		}
-	case 539: { // x:(r)+n,a b,y0
+	case 553: { // x:(r)+n,a b,y0
 		unhandled("x:(r)+n,a b,y0");
 		break;
 		}
-	case 540: { // x:(r)-,a b,y0
+	case 554: { // x:(r)-,a b,y0
 		unhandled("x:(r)-,a b,y0");
 		break;
 		}
-	case 541: { // x:(r)+,a b,y0
+	case 555: { // x:(r)+,a b,y0
 		unhandled("x:(r)+,a b,y0");
 		break;
 		}
-	case 542: { // x:(r),a b,y0
+	case 556: { // x:(r),a b,y0
 		unhandled("x:(r),a b,y0");
 		break;
 		}
-	case 543: { // x:(r+n),a b,y0
+	case 557: { // x:(r+n),a b,y0
 		unhandled("x:(r+n),a b,y0");
 		break;
 		}
-	case 544: { // x:-(r),a b,y0
+	case 558: { // x:-(r),a b,y0
 		unhandled("x:-(r),a b,y0");
 		break;
 		}
-	case 545: { // x:(r)-n,a b,y1
+	case 559: { // x:(r)-n,a b,y1
 		unhandled("x:(r)-n,a b,y1");
 		break;
 		}
-	case 546: { // x:(r)+n,a b,y1
+	case 560: { // x:(r)+n,a b,y1
 		unhandled("x:(r)+n,a b,y1");
 		break;
 		}
-	case 547: { // x:(r)-,a b,y1
+	case 561: { // x:(r)-,a b,y1
 		unhandled("x:(r)-,a b,y1");
 		break;
 		}
-	case 548: { // x:(r)+,a b,y1
+	case 562: { // x:(r)+,a b,y1
 		unhandled("x:(r)+,a b,y1");
 		break;
 		}
-	case 549: { // x:(r),a b,y1
+	case 563: { // x:(r),a b,y1
 		unhandled("x:(r),a b,y1");
 		break;
 		}
-	case 550: { // x:(r+n),a b,y1
+	case 564: { // x:(r+n),a b,y1
 		unhandled("x:(r+n),a b,y1");
 		break;
 		}
-	case 551: { // x:-(r),a b,y1
+	case 565: { // x:-(r),a b,y1
 		unhandled("x:-(r),a b,y1");
 		break;
 		}
-	case 552: { // x:(r)-n,b a,y0
+	case 566: { // x:(r)-n,b a,y0
 		unhandled("x:(r)-n,b a,y0");
 		break;
 		}
-	case 553: { // x:(r)+n,b a,y0
+	case 567: { // x:(r)+n,b a,y0
 		unhandled("x:(r)+n,b a,y0");
 		break;
 		}
-	case 554: { // x:(r)-,b a,y0
+	case 568: { // x:(r)-,b a,y0
 		unhandled("x:(r)-,b a,y0");
 		break;
 		}
-	case 555: { // x:(r)+,b a,y0
+	case 569: { // x:(r)+,b a,y0
 		unhandled("x:(r)+,b a,y0");
 		break;
 		}
-	case 556: { // x:(r),b a,y0
+	case 570: { // x:(r),b a,y0
 		unhandled("x:(r),b a,y0");
 		break;
 		}
-	case 557: { // x:(r+n),b a,y0
+	case 571: { // x:(r+n),b a,y0
 		unhandled("x:(r+n),b a,y0");
 		break;
 		}
-	case 558: { // x:-(r),b a,y0
+	case 572: { // x:-(r),b a,y0
 		unhandled("x:-(r),b a,y0");
 		break;
 		}
-	case 559: { // x:(r)-n,b a,y1
+	case 573: { // x:(r)-n,b a,y1
 		unhandled("x:(r)-n,b a,y1");
 		break;
 		}
-	case 560: { // x:(r)+n,b a,y1
+	case 574: { // x:(r)+n,b a,y1
 		unhandled("x:(r)+n,b a,y1");
 		break;
 		}
-	case 561: { // x:(r)-,b a,y1
+	case 575: { // x:(r)-,b a,y1
 		unhandled("x:(r)-,b a,y1");
 		break;
 		}
-	case 562: { // x:(r)+,b a,y1
+	case 576: { // x:(r)+,b a,y1
 		unhandled("x:(r)+,b a,y1");
 		break;
 		}
-	case 563: { // x:(r),b a,y1
+	case 577: { // x:(r),b a,y1
 		unhandled("x:(r),b a,y1");
 		break;
 		}
-	case 564: { // x:(r+n),b a,y1
+	case 578: { // x:(r+n),b a,y1
 		unhandled("x:(r+n),b a,y1");
 		break;
 		}
-	case 565: { // x:-(r),b a,y1
+	case 579: { // x:-(r),b a,y1
 		unhandled("x:-(r),b a,y1");
 		break;
 		}
-	case 566: { // x:(r)-n,b b,y0
+	case 580: { // x:(r)-n,b b,y0
 		unhandled("x:(r)-n,b b,y0");
 		break;
 		}
-	case 567: { // x:(r)+n,b b,y0
+	case 581: { // x:(r)+n,b b,y0
 		unhandled("x:(r)+n,b b,y0");
 		break;
 		}
-	case 568: { // x:(r)-,b b,y0
+	case 582: { // x:(r)-,b b,y0
 		unhandled("x:(r)-,b b,y0");
 		break;
 		}
-	case 569: { // x:(r)+,b b,y0
+	case 583: { // x:(r)+,b b,y0
 		unhandled("x:(r)+,b b,y0");
 		break;
 		}
-	case 570: { // x:(r),b b,y0
+	case 584: { // x:(r),b b,y0
 		unhandled("x:(r),b b,y0");
 		break;
 		}
-	case 571: { // x:(r+n),b b,y0
+	case 585: { // x:(r+n),b b,y0
 		unhandled("x:(r+n),b b,y0");
 		break;
 		}
-	case 572: { // x:-(r),b b,y0
+	case 586: { // x:-(r),b b,y0
 		unhandled("x:-(r),b b,y0");
 		break;
 		}
-	case 573: { // x:(r)-n,b b,y1
+	case 587: { // x:(r)-n,b b,y1
 		unhandled("x:(r)-n,b b,y1");
 		break;
 		}
-	case 574: { // x:(r)+n,b b,y1
+	case 588: { // x:(r)+n,b b,y1
 		unhandled("x:(r)+n,b b,y1");
 		break;
 		}
-	case 575: { // x:(r)-,b b,y1
+	case 589: { // x:(r)-,b b,y1
 		unhandled("x:(r)-,b b,y1");
 		break;
 		}
-	case 576: { // x:(r)+,b b,y1
+	case 590: { // x:(r)+,b b,y1
 		unhandled("x:(r)+,b b,y1");
 		break;
 		}
-	case 577: { // x:(r),b b,y1
+	case 591: { // x:(r),b b,y1
 		unhandled("x:(r),b b,y1");
 		break;
 		}
-	case 578: { // x:(r+n),b b,y1
+	case 592: { // x:(r+n),b b,y1
 		unhandled("x:(r+n),b b,y1");
 		break;
 		}
-	case 579: { // x:-(r),b b,y1
+	case 593: { // x:-(r),b b,y1
 		unhandled("x:-(r),b b,y1");
 		break;
 		}
-	case 580: { // x0,x:(r)-n a,y0
+	case 594: { // x0,x:(r)-n a,y0
 		unhandled("x0,x:(r)-n a,y0");
 		break;
 		}
-	case 581: { // x0,x:(r)+n a,y0
+	case 595: { // x0,x:(r)+n a,y0
 		unhandled("x0,x:(r)+n a,y0");
 		break;
 		}
-	case 582: { // x0,x:(r)- a,y0
+	case 596: { // x0,x:(r)- a,y0
 		unhandled("x0,x:(r)- a,y0");
 		break;
 		}
-	case 583: { // x0,x:(r)+ a,y0
+	case 597: { // x0,x:(r)+ a,y0
 		unhandled("x0,x:(r)+ a,y0");
 		break;
 		}
-	case 584: { // x0,x:(r) a,y0
+	case 598: { // x0,x:(r) a,y0
 		unhandled("x0,x:(r) a,y0");
 		break;
 		}
-	case 585: { // x0,x:(r+n) a,y0
+	case 599: { // x0,x:(r+n) a,y0
 		unhandled("x0,x:(r+n) a,y0");
 		break;
 		}
-	case 586: { // x0,x:-(r) a,y0
+	case 600: { // x0,x:-(r) a,y0
 		unhandled("x0,x:-(r) a,y0");
 		break;
 		}
-	case 587: { // x0,x:(r)-n a,y1
+	case 601: { // x0,x:(r)-n a,y1
 		unhandled("x0,x:(r)-n a,y1");
 		break;
 		}
-	case 588: { // x0,x:(r)+n a,y1
+	case 602: { // x0,x:(r)+n a,y1
 		unhandled("x0,x:(r)+n a,y1");
 		break;
 		}
-	case 589: { // x0,x:(r)- a,y1
+	case 603: { // x0,x:(r)- a,y1
 		unhandled("x0,x:(r)- a,y1");
 		break;
 		}
-	case 590: { // x0,x:(r)+ a,y1
+	case 604: { // x0,x:(r)+ a,y1
 		unhandled("x0,x:(r)+ a,y1");
 		break;
 		}
-	case 591: { // x0,x:(r) a,y1
+	case 605: { // x0,x:(r) a,y1
 		unhandled("x0,x:(r) a,y1");
 		break;
 		}
-	case 592: { // x0,x:(r+n) a,y1
+	case 606: { // x0,x:(r+n) a,y1
 		unhandled("x0,x:(r+n) a,y1");
 		break;
 		}
-	case 593: { // x0,x:-(r) a,y1
+	case 607: { // x0,x:-(r) a,y1
 		unhandled("x0,x:-(r) a,y1");
 		break;
 		}
-	case 594: { // x0,x:(r)-n b,y0
+	case 608: { // x0,x:(r)-n b,y0
 		unhandled("x0,x:(r)-n b,y0");
 		break;
 		}
-	case 595: { // x0,x:(r)+n b,y0
+	case 609: { // x0,x:(r)+n b,y0
 		unhandled("x0,x:(r)+n b,y0");
 		break;
 		}
-	case 596: { // x0,x:(r)- b,y0
+	case 610: { // x0,x:(r)- b,y0
 		unhandled("x0,x:(r)- b,y0");
 		break;
 		}
-	case 597: { // x0,x:(r)+ b,y0
+	case 611: { // x0,x:(r)+ b,y0
 		unhandled("x0,x:(r)+ b,y0");
 		break;
 		}
-	case 598: { // x0,x:(r) b,y0
+	case 612: { // x0,x:(r) b,y0
 		unhandled("x0,x:(r) b,y0");
 		break;
 		}
-	case 599: { // x0,x:(r+n) b,y0
+	case 613: { // x0,x:(r+n) b,y0
 		unhandled("x0,x:(r+n) b,y0");
 		break;
 		}
-	case 600: { // x0,x:-(r) b,y0
+	case 614: { // x0,x:-(r) b,y0
 		unhandled("x0,x:-(r) b,y0");
 		break;
 		}
-	case 601: { // x0,x:(r)-n b,y1
+	case 615: { // x0,x:(r)-n b,y1
 		unhandled("x0,x:(r)-n b,y1");
 		break;
 		}
-	case 602: { // x0,x:(r)+n b,y1
+	case 616: { // x0,x:(r)+n b,y1
 		unhandled("x0,x:(r)+n b,y1");
 		break;
 		}
-	case 603: { // x0,x:(r)- b,y1
+	case 617: { // x0,x:(r)- b,y1
 		unhandled("x0,x:(r)- b,y1");
 		break;
 		}
-	case 604: { // x0,x:(r)+ b,y1
+	case 618: { // x0,x:(r)+ b,y1
 		unhandled("x0,x:(r)+ b,y1");
 		break;
 		}
-	case 605: { // x0,x:(r) b,y1
+	case 619: { // x0,x:(r) b,y1
 		unhandled("x0,x:(r) b,y1");
 		break;
 		}
-	case 606: { // x0,x:(r+n) b,y1
+	case 620: { // x0,x:(r+n) b,y1
 		unhandled("x0,x:(r+n) b,y1");
 		break;
 		}
-	case 607: { // x0,x:-(r) b,y1
+	case 621: { // x0,x:-(r) b,y1
 		unhandled("x0,x:-(r) b,y1");
 		break;
 		}
-	case 608: { // x1,x:(r)-n a,y0
+	case 622: { // x1,x:(r)-n a,y0
 		unhandled("x1,x:(r)-n a,y0");
 		break;
 		}
-	case 609: { // x1,x:(r)+n a,y0
+	case 623: { // x1,x:(r)+n a,y0
 		unhandled("x1,x:(r)+n a,y0");
 		break;
 		}
-	case 610: { // x1,x:(r)- a,y0
+	case 624: { // x1,x:(r)- a,y0
 		unhandled("x1,x:(r)- a,y0");
 		break;
 		}
-	case 611: { // x1,x:(r)+ a,y0
+	case 625: { // x1,x:(r)+ a,y0
 		unhandled("x1,x:(r)+ a,y0");
 		break;
 		}
-	case 612: { // x1,x:(r) a,y0
+	case 626: { // x1,x:(r) a,y0
 		unhandled("x1,x:(r) a,y0");
 		break;
 		}
-	case 613: { // x1,x:(r+n) a,y0
+	case 627: { // x1,x:(r+n) a,y0
 		unhandled("x1,x:(r+n) a,y0");
 		break;
 		}
-	case 614: { // x1,x:-(r) a,y0
+	case 628: { // x1,x:-(r) a,y0
 		unhandled("x1,x:-(r) a,y0");
 		break;
 		}
-	case 615: { // x1,x:(r)-n a,y1
+	case 629: { // x1,x:(r)-n a,y1
 		unhandled("x1,x:(r)-n a,y1");
 		break;
 		}
-	case 616: { // x1,x:(r)+n a,y1
+	case 630: { // x1,x:(r)+n a,y1
 		unhandled("x1,x:(r)+n a,y1");
 		break;
 		}
-	case 617: { // x1,x:(r)- a,y1
+	case 631: { // x1,x:(r)- a,y1
 		unhandled("x1,x:(r)- a,y1");
 		break;
 		}
-	case 618: { // x1,x:(r)+ a,y1
+	case 632: { // x1,x:(r)+ a,y1
 		unhandled("x1,x:(r)+ a,y1");
 		break;
 		}
-	case 619: { // x1,x:(r) a,y1
+	case 633: { // x1,x:(r) a,y1
 		unhandled("x1,x:(r) a,y1");
 		break;
 		}
-	case 620: { // x1,x:(r+n) a,y1
+	case 634: { // x1,x:(r+n) a,y1
 		unhandled("x1,x:(r+n) a,y1");
 		break;
 		}
-	case 621: { // x1,x:-(r) a,y1
+	case 635: { // x1,x:-(r) a,y1
 		unhandled("x1,x:-(r) a,y1");
 		break;
 		}
-	case 622: { // x1,x:(r)-n b,y0
+	case 636: { // x1,x:(r)-n b,y0
 		unhandled("x1,x:(r)-n b,y0");
 		break;
 		}
-	case 623: { // x1,x:(r)+n b,y0
+	case 637: { // x1,x:(r)+n b,y0
 		unhandled("x1,x:(r)+n b,y0");
 		break;
 		}
-	case 624: { // x1,x:(r)- b,y0
+	case 638: { // x1,x:(r)- b,y0
 		unhandled("x1,x:(r)- b,y0");
 		break;
 		}
-	case 625: { // x1,x:(r)+ b,y0
+	case 639: { // x1,x:(r)+ b,y0
 		unhandled("x1,x:(r)+ b,y0");
 		break;
 		}
-	case 626: { // x1,x:(r) b,y0
+	case 640: { // x1,x:(r) b,y0
 		unhandled("x1,x:(r) b,y0");
 		break;
 		}
-	case 627: { // x1,x:(r+n) b,y0
+	case 641: { // x1,x:(r+n) b,y0
 		unhandled("x1,x:(r+n) b,y0");
 		break;
 		}
-	case 628: { // x1,x:-(r) b,y0
+	case 642: { // x1,x:-(r) b,y0
 		unhandled("x1,x:-(r) b,y0");
 		break;
 		}
-	case 629: { // x1,x:(r)-n b,y1
+	case 643: { // x1,x:(r)-n b,y1
 		unhandled("x1,x:(r)-n b,y1");
 		break;
 		}
-	case 630: { // x1,x:(r)+n b,y1
+	case 644: { // x1,x:(r)+n b,y1
 		unhandled("x1,x:(r)+n b,y1");
 		break;
 		}
-	case 631: { // x1,x:(r)- b,y1
+	case 645: { // x1,x:(r)- b,y1
 		unhandled("x1,x:(r)- b,y1");
 		break;
 		}
-	case 632: { // x1,x:(r)+ b,y1
+	case 646: { // x1,x:(r)+ b,y1
 		unhandled("x1,x:(r)+ b,y1");
 		break;
 		}
-	case 633: { // x1,x:(r) b,y1
+	case 647: { // x1,x:(r) b,y1
 		unhandled("x1,x:(r) b,y1");
 		break;
 		}
-	case 634: { // x1,x:(r+n) b,y1
+	case 648: { // x1,x:(r+n) b,y1
 		unhandled("x1,x:(r+n) b,y1");
 		break;
 		}
-	case 635: { // x1,x:-(r) b,y1
+	case 649: { // x1,x:-(r) b,y1
 		unhandled("x1,x:-(r) b,y1");
 		break;
 		}
-	case 636: { // a,x:(r)-n a,y0
+	case 650: { // a,x:(r)-n a,y0
 		unhandled("a,x:(r)-n a,y0");
 		break;
 		}
-	case 637: { // a,x:(r)+n a,y0
+	case 651: { // a,x:(r)+n a,y0
 		unhandled("a,x:(r)+n a,y0");
 		break;
 		}
-	case 638: { // a,x:(r)- a,y0
+	case 652: { // a,x:(r)- a,y0
 		unhandled("a,x:(r)- a,y0");
 		break;
 		}
-	case 639: { // a,x:(r)+ a,y0
+	case 653: { // a,x:(r)+ a,y0
 		unhandled("a,x:(r)+ a,y0");
 		break;
 		}
-	case 640: { // a,x:(r) a,y0
+	case 654: { // a,x:(r) a,y0
 		unhandled("a,x:(r) a,y0");
 		break;
 		}
-	case 641: { // a,x:(r+n) a,y0
+	case 655: { // a,x:(r+n) a,y0
 		unhandled("a,x:(r+n) a,y0");
 		break;
 		}
-	case 642: { // a,x:-(r) a,y0
+	case 656: { // a,x:-(r) a,y0
 		unhandled("a,x:-(r) a,y0");
 		break;
 		}
-	case 643: { // a,x:(r)-n a,y1
+	case 657: { // a,x:(r)-n a,y1
 		unhandled("a,x:(r)-n a,y1");
 		break;
 		}
-	case 644: { // a,x:(r)+n a,y1
+	case 658: { // a,x:(r)+n a,y1
 		unhandled("a,x:(r)+n a,y1");
 		break;
 		}
-	case 645: { // a,x:(r)- a,y1
+	case 659: { // a,x:(r)- a,y1
 		unhandled("a,x:(r)- a,y1");
 		break;
 		}
-	case 646: { // a,x:(r)+ a,y1
+	case 660: { // a,x:(r)+ a,y1
 		unhandled("a,x:(r)+ a,y1");
 		break;
 		}
-	case 647: { // a,x:(r) a,y1
+	case 661: { // a,x:(r) a,y1
 		unhandled("a,x:(r) a,y1");
 		break;
 		}
-	case 648: { // a,x:(r+n) a,y1
+	case 662: { // a,x:(r+n) a,y1
 		unhandled("a,x:(r+n) a,y1");
 		break;
 		}
-	case 649: { // a,x:-(r) a,y1
+	case 663: { // a,x:-(r) a,y1
 		unhandled("a,x:-(r) a,y1");
 		break;
 		}
-	case 650: { // a,x:(r)-n b,y0
+	case 664: { // a,x:(r)-n b,y0
 		unhandled("a,x:(r)-n b,y0");
 		break;
 		}
-	case 651: { // a,x:(r)+n b,y0
+	case 665: { // a,x:(r)+n b,y0
 		unhandled("a,x:(r)+n b,y0");
 		break;
 		}
-	case 652: { // a,x:(r)- b,y0
+	case 666: { // a,x:(r)- b,y0
 		unhandled("a,x:(r)- b,y0");
 		break;
 		}
-	case 653: { // a,x:(r)+ b,y0
+	case 667: { // a,x:(r)+ b,y0
 		unhandled("a,x:(r)+ b,y0");
 		break;
 		}
-	case 654: { // a,x:(r) b,y0
+	case 668: { // a,x:(r) b,y0
 		unhandled("a,x:(r) b,y0");
 		break;
 		}
-	case 655: { // a,x:(r+n) b,y0
+	case 669: { // a,x:(r+n) b,y0
 		unhandled("a,x:(r+n) b,y0");
 		break;
 		}
-	case 656: { // a,x:-(r) b,y0
+	case 670: { // a,x:-(r) b,y0
 		unhandled("a,x:-(r) b,y0");
 		break;
 		}
-	case 657: { // a,x:(r)-n b,y1
+	case 671: { // a,x:(r)-n b,y1
 		unhandled("a,x:(r)-n b,y1");
 		break;
 		}
-	case 658: { // a,x:(r)+n b,y1
+	case 672: { // a,x:(r)+n b,y1
 		unhandled("a,x:(r)+n b,y1");
 		break;
 		}
-	case 659: { // a,x:(r)- b,y1
+	case 673: { // a,x:(r)- b,y1
 		unhandled("a,x:(r)- b,y1");
 		break;
 		}
-	case 660: { // a,x:(r)+ b,y1
+	case 674: { // a,x:(r)+ b,y1
 		unhandled("a,x:(r)+ b,y1");
 		break;
 		}
-	case 661: { // a,x:(r) b,y1
+	case 675: { // a,x:(r) b,y1
 		unhandled("a,x:(r) b,y1");
 		break;
 		}
-	case 662: { // a,x:(r+n) b,y1
+	case 676: { // a,x:(r+n) b,y1
 		unhandled("a,x:(r+n) b,y1");
 		break;
 		}
-	case 663: { // a,x:-(r) b,y1
+	case 677: { // a,x:-(r) b,y1
 		unhandled("a,x:-(r) b,y1");
 		break;
 		}
-	case 664: { // b,x:(r)-n a,y0
+	case 678: { // b,x:(r)-n a,y0
 		unhandled("b,x:(r)-n a,y0");
 		break;
 		}
-	case 665: { // b,x:(r)+n a,y0
+	case 679: { // b,x:(r)+n a,y0
 		unhandled("b,x:(r)+n a,y0");
 		break;
 		}
-	case 666: { // b,x:(r)- a,y0
+	case 680: { // b,x:(r)- a,y0
 		unhandled("b,x:(r)- a,y0");
 		break;
 		}
-	case 667: { // b,x:(r)+ a,y0
+	case 681: { // b,x:(r)+ a,y0
 		unhandled("b,x:(r)+ a,y0");
 		break;
 		}
-	case 668: { // b,x:(r) a,y0
+	case 682: { // b,x:(r) a,y0
 		unhandled("b,x:(r) a,y0");
 		break;
 		}
-	case 669: { // b,x:(r+n) a,y0
+	case 683: { // b,x:(r+n) a,y0
 		unhandled("b,x:(r+n) a,y0");
 		break;
 		}
-	case 670: { // b,x:-(r) a,y0
+	case 684: { // b,x:-(r) a,y0
 		unhandled("b,x:-(r) a,y0");
 		break;
 		}
-	case 671: { // b,x:(r)-n a,y1
+	case 685: { // b,x:(r)-n a,y1
 		unhandled("b,x:(r)-n a,y1");
 		break;
 		}
-	case 672: { // b,x:(r)+n a,y1
+	case 686: { // b,x:(r)+n a,y1
 		unhandled("b,x:(r)+n a,y1");
 		break;
 		}
-	case 673: { // b,x:(r)- a,y1
+	case 687: { // b,x:(r)- a,y1
 		unhandled("b,x:(r)- a,y1");
 		break;
 		}
-	case 674: { // b,x:(r)+ a,y1
+	case 688: { // b,x:(r)+ a,y1
 		unhandled("b,x:(r)+ a,y1");
 		break;
 		}
-	case 675: { // b,x:(r) a,y1
+	case 689: { // b,x:(r) a,y1
 		unhandled("b,x:(r) a,y1");
 		break;
 		}
-	case 676: { // b,x:(r+n) a,y1
+	case 690: { // b,x:(r+n) a,y1
 		unhandled("b,x:(r+n) a,y1");
 		break;
 		}
-	case 677: { // b,x:-(r) a,y1
+	case 691: { // b,x:-(r) a,y1
 		unhandled("b,x:-(r) a,y1");
 		break;
 		}
-	case 678: { // b,x:(r)-n b,y0
+	case 692: { // b,x:(r)-n b,y0
 		unhandled("b,x:(r)-n b,y0");
 		break;
 		}
-	case 679: { // b,x:(r)+n b,y0
+	case 693: { // b,x:(r)+n b,y0
 		unhandled("b,x:(r)+n b,y0");
 		break;
 		}
-	case 680: { // b,x:(r)- b,y0
+	case 694: { // b,x:(r)- b,y0
 		unhandled("b,x:(r)- b,y0");
 		break;
 		}
-	case 681: { // b,x:(r)+ b,y0
+	case 695: { // b,x:(r)+ b,y0
 		unhandled("b,x:(r)+ b,y0");
 		break;
 		}
-	case 682: { // b,x:(r) b,y0
+	case 696: { // b,x:(r) b,y0
 		unhandled("b,x:(r) b,y0");
 		break;
 		}
-	case 683: { // b,x:(r+n) b,y0
+	case 697: { // b,x:(r+n) b,y0
 		unhandled("b,x:(r+n) b,y0");
 		break;
 		}
-	case 684: { // b,x:-(r) b,y0
+	case 698: { // b,x:-(r) b,y0
 		unhandled("b,x:-(r) b,y0");
 		break;
 		}
-	case 685: { // b,x:(r)-n b,y1
+	case 699: { // b,x:(r)-n b,y1
 		unhandled("b,x:(r)-n b,y1");
 		break;
 		}
-	case 686: { // b,x:(r)+n b,y1
+	case 700: { // b,x:(r)+n b,y1
 		unhandled("b,x:(r)+n b,y1");
 		break;
 		}
-	case 687: { // b,x:(r)- b,y1
+	case 701: { // b,x:(r)- b,y1
 		unhandled("b,x:(r)- b,y1");
 		break;
 		}
-	case 688: { // b,x:(r)+ b,y1
+	case 702: { // b,x:(r)+ b,y1
 		unhandled("b,x:(r)+ b,y1");
 		break;
 		}
-	case 689: { // b,x:(r) b,y1
+	case 703: { // b,x:(r) b,y1
 		unhandled("b,x:(r) b,y1");
 		break;
 		}
-	case 690: { // b,x:(r+n) b,y1
+	case 704: { // b,x:(r+n) b,y1
 		unhandled("b,x:(r+n) b,y1");
 		break;
 		}
-	case 691: { // b,x:-(r) b,y1
+	case 705: { // b,x:-(r) b,y1
 		unhandled("b,x:-(r) b,y1");
 		break;
 		}
-	case 692: { // x:[abs],x0 a,y0
+	case 706: { // x:[abs],x0 a,y0
 		unhandled("x:[abs],x0 a,y0");
 		break;
 		}
-	case 693: { // x:[abs],x0 a,y1
+	case 707: { // x:[abs],x0 a,y1
 		unhandled("x:[abs],x0 a,y1");
 		break;
 		}
-	case 694: { // x:[abs],x0 b,y0
+	case 708: { // x:[abs],x0 b,y0
 		unhandled("x:[abs],x0 b,y0");
 		break;
 		}
-	case 695: { // x:[abs],x0 b,y1
+	case 709: { // x:[abs],x0 b,y1
 		unhandled("x:[abs],x0 b,y1");
 		break;
 		}
-	case 696: { // x:[abs],x1 a,y0
+	case 710: { // x:[abs],x1 a,y0
 		unhandled("x:[abs],x1 a,y0");
 		break;
 		}
-	case 697: { // x:[abs],x1 a,y1
+	case 711: { // x:[abs],x1 a,y1
 		unhandled("x:[abs],x1 a,y1");
 		break;
 		}
-	case 698: { // x:[abs],x1 b,y0
+	case 712: { // x:[abs],x1 b,y0
 		unhandled("x:[abs],x1 b,y0");
 		break;
 		}
-	case 699: { // x:[abs],x1 b,y1
+	case 713: { // x:[abs],x1 b,y1
 		unhandled("x:[abs],x1 b,y1");
 		break;
 		}
-	case 700: { // x:[abs],a a,y0
+	case 714: { // x:[abs],a a,y0
 		unhandled("x:[abs],a a,y0");
 		break;
 		}
-	case 701: { // x:[abs],a a,y1
+	case 715: { // x:[abs],a a,y1
 		unhandled("x:[abs],a a,y1");
 		break;
 		}
-	case 702: { // x:[abs],a b,y0
+	case 716: { // x:[abs],a b,y0
 		unhandled("x:[abs],a b,y0");
 		break;
 		}
-	case 703: { // x:[abs],a b,y1
+	case 717: { // x:[abs],a b,y1
 		unhandled("x:[abs],a b,y1");
 		break;
 		}
-	case 704: { // x:[abs],b a,y0
+	case 718: { // x:[abs],b a,y0
 		unhandled("x:[abs],b a,y0");
 		break;
 		}
-	case 705: { // x:[abs],b a,y1
+	case 719: { // x:[abs],b a,y1
 		unhandled("x:[abs],b a,y1");
 		break;
 		}
-	case 706: { // x:[abs],b b,y0
+	case 720: { // x:[abs],b b,y0
 		unhandled("x:[abs],b b,y0");
 		break;
 		}
-	case 707: { // x:[abs],b b,y1
+	case 721: { // x:[abs],b b,y1
 		unhandled("x:[abs],b b,y1");
 		break;
 		}
-	case 708: { // x:#[i],x0 a,y0
-		unhandled("x:#[i],x0 a,y0");
+	case 722: { // #[i],x0 a,y0
+		unhandled("#[i],x0 a,y0");
 		break;
 		}
-	case 709: { // x:#[i],x0 a,y1
-		unhandled("x:#[i],x0 a,y1");
+	case 723: { // #[i],x0 a,y1
+		unhandled("#[i],x0 a,y1");
 		break;
 		}
-	case 710: { // x:#[i],x0 b,y0
-		unhandled("x:#[i],x0 b,y0");
+	case 724: { // #[i],x0 b,y0
+		unhandled("#[i],x0 b,y0");
 		break;
 		}
-	case 711: { // x:#[i],x0 b,y1
-		unhandled("x:#[i],x0 b,y1");
+	case 725: { // #[i],x0 b,y1
+		unhandled("#[i],x0 b,y1");
 		break;
 		}
-	case 712: { // x:#[i],x1 a,y0
-		unhandled("x:#[i],x1 a,y0");
+	case 726: { // #[i],x1 a,y0
+		unhandled("#[i],x1 a,y0");
 		break;
 		}
-	case 713: { // x:#[i],x1 a,y1
-		unhandled("x:#[i],x1 a,y1");
+	case 727: { // #[i],x1 a,y1
+		unhandled("#[i],x1 a,y1");
 		break;
 		}
-	case 714: { // x:#[i],x1 b,y0
-		unhandled("x:#[i],x1 b,y0");
+	case 728: { // #[i],x1 b,y0
+		unhandled("#[i],x1 b,y0");
 		break;
 		}
-	case 715: { // x:#[i],x1 b,y1
-		unhandled("x:#[i],x1 b,y1");
+	case 729: { // #[i],x1 b,y1
+		unhandled("#[i],x1 b,y1");
 		break;
 		}
-	case 716: { // x:#[i],a a,y0
-		unhandled("x:#[i],a a,y0");
+	case 730: { // #[i],a a,y0
+		unhandled("#[i],a a,y0");
 		break;
 		}
-	case 717: { // x:#[i],a a,y1
-		unhandled("x:#[i],a a,y1");
+	case 731: { // #[i],a a,y1
+		unhandled("#[i],a a,y1");
 		break;
 		}
-	case 718: { // x:#[i],a b,y0
-		unhandled("x:#[i],a b,y0");
+	case 732: { // #[i],a b,y0
+		unhandled("#[i],a b,y0");
 		break;
 		}
-	case 719: { // x:#[i],a b,y1
-		unhandled("x:#[i],a b,y1");
+	case 733: { // #[i],a b,y1
+		unhandled("#[i],a b,y1");
 		break;
 		}
-	case 720: { // x:#[i],b a,y0
-		unhandled("x:#[i],b a,y0");
+	case 734: { // #[i],b a,y0
+		unhandled("#[i],b a,y0");
 		break;
 		}
-	case 721: { // x:#[i],b a,y1
-		unhandled("x:#[i],b a,y1");
+	case 735: { // #[i],b a,y1
+		unhandled("#[i],b a,y1");
 		break;
 		}
-	case 722: { // x:#[i],b b,y0
-		unhandled("x:#[i],b b,y0");
+	case 736: { // #[i],b b,y0
+		unhandled("#[i],b b,y0");
 		break;
 		}
-	case 723: { // x:#[i],b b,y1
-		unhandled("x:#[i],b b,y1");
+	case 737: { // #[i],b b,y1
+		unhandled("#[i],b b,y1");
 		break;
 		}
-	case 724: { // a,x:(r)-n x0,a
+	case 738: { // x0,x:[abs] a,y0
+		unhandled("x0,x:[abs] a,y0");
+		break;
+		}
+	case 739: { // x0,x:[abs] a,y1
+		unhandled("x0,x:[abs] a,y1");
+		break;
+		}
+	case 740: { // x0,x:[abs] b,y0
+		unhandled("x0,x:[abs] b,y0");
+		break;
+		}
+	case 741: { // x0,x:[abs] b,y1
+		unhandled("x0,x:[abs] b,y1");
+		break;
+		}
+	case 742: { // x1,x:[abs] a,y0
+		unhandled("x1,x:[abs] a,y0");
+		break;
+		}
+	case 743: { // x1,x:[abs] a,y1
+		unhandled("x1,x:[abs] a,y1");
+		break;
+		}
+	case 744: { // x1,x:[abs] b,y0
+		unhandled("x1,x:[abs] b,y0");
+		break;
+		}
+	case 745: { // x1,x:[abs] b,y1
+		unhandled("x1,x:[abs] b,y1");
+		break;
+		}
+	case 746: { // a,x:[abs] a,y0
+		unhandled("a,x:[abs] a,y0");
+		break;
+		}
+	case 747: { // a,x:[abs] a,y1
+		unhandled("a,x:[abs] a,y1");
+		break;
+		}
+	case 748: { // a,x:[abs] b,y0
+		unhandled("a,x:[abs] b,y0");
+		break;
+		}
+	case 749: { // a,x:[abs] b,y1
+		unhandled("a,x:[abs] b,y1");
+		break;
+		}
+	case 750: { // b,x:[abs] a,y0
+		unhandled("b,x:[abs] a,y0");
+		break;
+		}
+	case 751: { // b,x:[abs] a,y1
+		unhandled("b,x:[abs] a,y1");
+		break;
+		}
+	case 752: { // b,x:[abs] b,y0
+		unhandled("b,x:[abs] b,y0");
+		break;
+		}
+	case 753: { // b,x:[abs] b,y1
+		unhandled("b,x:[abs] b,y1");
+		break;
+		}
+	case 754: { // a,x:(r)-n x0,a
 		unhandled("a,x:(r)-n x0,a");
 		break;
 		}
-	case 725: { // a,x:(r)+n x0,a
+	case 755: { // a,x:(r)+n x0,a
 		unhandled("a,x:(r)+n x0,a");
 		break;
 		}
-	case 726: { // a,x:(r)- x0,a
+	case 756: { // a,x:(r)- x0,a
 		unhandled("a,x:(r)- x0,a");
 		break;
 		}
-	case 727: { // a,x:(r)+ x0,a
+	case 757: { // a,x:(r)+ x0,a
 		unhandled("a,x:(r)+ x0,a");
 		break;
 		}
-	case 728: { // a,x:(r) x0,a
+	case 758: { // a,x:(r) x0,a
 		unhandled("a,x:(r) x0,a");
 		break;
 		}
-	case 729: { // a,x:(r+n) x0,a
+	case 759: { // a,x:(r+n) x0,a
 		unhandled("a,x:(r+n) x0,a");
 		break;
 		}
-	case 730: { // a,x:-(r) x0,a
+	case 760: { // a,x:-(r) x0,a
 		unhandled("a,x:-(r) x0,a");
 		break;
 		}
-	case 731: { // b,x:(r)-n x0,b
+	case 761: { // b,x:(r)-n x0,b
 		unhandled("b,x:(r)-n x0,b");
 		break;
 		}
-	case 732: { // b,x:(r)+n x0,b
+	case 762: { // b,x:(r)+n x0,b
 		unhandled("b,x:(r)+n x0,b");
 		break;
 		}
-	case 733: { // b,x:(r)- x0,b
+	case 763: { // b,x:(r)- x0,b
 		unhandled("b,x:(r)- x0,b");
 		break;
 		}
-	case 734: { // b,x:(r)+ x0,b
+	case 764: { // b,x:(r)+ x0,b
 		unhandled("b,x:(r)+ x0,b");
 		break;
 		}
-	case 735: { // b,x:(r) x0,b
+	case 765: { // b,x:(r) x0,b
 		unhandled("b,x:(r) x0,b");
 		break;
 		}
-	case 736: { // b,x:(r+n) x0,b
+	case 766: { // b,x:(r+n) x0,b
 		unhandled("b,x:(r+n) x0,b");
 		break;
 		}
-	case 737: { // b,x:-(r) x0,b
+	case 767: { // b,x:-(r) x0,b
 		unhandled("b,x:-(r) x0,b");
 		break;
 		}
-	case 738: { // y:(r)-n,x0
+	case 768: { // y:(r)-n,x0
 		unhandled("y:(r)-n,x0");
 		break;
 		}
-	case 739: { // y:(r)+n,x0
+	case 769: { // y:(r)+n,x0
 		unhandled("y:(r)+n,x0");
 		break;
 		}
-	case 740: { // y:(r)-,x0
+	case 770: { // y:(r)-,x0
 		unhandled("y:(r)-,x0");
 		break;
 		}
-	case 741: { // y:(r)+,x0
+	case 771: { // y:(r)+,x0
 		unhandled("y:(r)+,x0");
 		break;
 		}
-	case 742: { // y:(r),x0
+	case 772: { // y:(r),x0
 		unhandled("y:(r),x0");
 		break;
 		}
-	case 743: { // y:(r+n),x0
+	case 773: { // y:(r+n),x0
 		unhandled("y:(r+n),x0");
 		break;
 		}
-	case 744: { // y:-(r),x0
+	case 774: { // y:-(r),x0
 		unhandled("y:-(r),x0");
 		break;
 		}
-	case 745: { // y:(r)-n,x1
+	case 775: { // y:(r)-n,x1
 		unhandled("y:(r)-n,x1");
 		break;
 		}
-	case 746: { // y:(r)+n,x1
+	case 776: { // y:(r)+n,x1
 		unhandled("y:(r)+n,x1");
 		break;
 		}
-	case 747: { // y:(r)-,x1
+	case 777: { // y:(r)-,x1
 		unhandled("y:(r)-,x1");
 		break;
 		}
-	case 748: { // y:(r)+,x1
+	case 778: { // y:(r)+,x1
 		unhandled("y:(r)+,x1");
 		break;
 		}
-	case 749: { // y:(r),x1
+	case 779: { // y:(r),x1
 		unhandled("y:(r),x1");
 		break;
 		}
-	case 750: { // y:(r+n),x1
+	case 780: { // y:(r+n),x1
 		unhandled("y:(r+n),x1");
 		break;
 		}
-	case 751: { // y:-(r),x1
+	case 781: { // y:-(r),x1
 		unhandled("y:-(r),x1");
 		break;
 		}
-	case 752: { // y:(r)-n,y0
+	case 782: { // y:(r)-n,y0
 		unhandled("y:(r)-n,y0");
 		break;
 		}
-	case 753: { // y:(r)+n,y0
+	case 783: { // y:(r)+n,y0
 		unhandled("y:(r)+n,y0");
 		break;
 		}
-	case 754: { // y:(r)-,y0
+	case 784: { // y:(r)-,y0
 		unhandled("y:(r)-,y0");
 		break;
 		}
-	case 755: { // y:(r)+,y0
+	case 785: { // y:(r)+,y0
 		unhandled("y:(r)+,y0");
 		break;
 		}
-	case 756: { // y:(r),y0
+	case 786: { // y:(r),y0
 		unhandled("y:(r),y0");
 		break;
 		}
-	case 757: { // y:(r+n),y0
+	case 787: { // y:(r+n),y0
 		unhandled("y:(r+n),y0");
 		break;
 		}
-	case 758: { // y:-(r),y0
+	case 788: { // y:-(r),y0
 		unhandled("y:-(r),y0");
 		break;
 		}
-	case 759: { // y:(r)-n,y1
+	case 789: { // y:(r)-n,y1
 		unhandled("y:(r)-n,y1");
 		break;
 		}
-	case 760: { // y:(r)+n,y1
+	case 790: { // y:(r)+n,y1
 		unhandled("y:(r)+n,y1");
 		break;
 		}
-	case 761: { // y:(r)-,y1
+	case 791: { // y:(r)-,y1
 		unhandled("y:(r)-,y1");
 		break;
 		}
-	case 762: { // y:(r)+,y1
+	case 792: { // y:(r)+,y1
 		unhandled("y:(r)+,y1");
 		break;
 		}
-	case 763: { // y:(r),y1
+	case 793: { // y:(r),y1
 		unhandled("y:(r),y1");
 		break;
 		}
-	case 764: { // y:(r+n),y1
+	case 794: { // y:(r+n),y1
 		unhandled("y:(r+n),y1");
 		break;
 		}
-	case 765: { // y:-(r),y1
+	case 795: { // y:-(r),y1
 		unhandled("y:-(r),y1");
 		break;
 		}
-	case 766: { // y:(r)-n,a0
+	case 796: { // y:(r)-n,a0
 		unhandled("y:(r)-n,a0");
 		break;
 		}
-	case 767: { // y:(r)+n,a0
+	case 797: { // y:(r)+n,a0
 		unhandled("y:(r)+n,a0");
 		break;
 		}
-	case 768: { // y:(r)-,a0
+	case 798: { // y:(r)-,a0
 		unhandled("y:(r)-,a0");
 		break;
 		}
-	case 769: { // y:(r)+,a0
+	case 799: { // y:(r)+,a0
 		unhandled("y:(r)+,a0");
 		break;
 		}
-	case 770: { // y:(r),a0
+	case 800: { // y:(r),a0
 		unhandled("y:(r),a0");
 		break;
 		}
-	case 771: { // y:(r+n),a0
+	case 801: { // y:(r+n),a0
 		unhandled("y:(r+n),a0");
 		break;
 		}
-	case 772: { // y:-(r),a0
+	case 802: { // y:-(r),a0
 		unhandled("y:-(r),a0");
 		break;
 		}
-	case 773: { // y:(r)-n,b0
+	case 803: { // y:(r)-n,b0
 		unhandled("y:(r)-n,b0");
 		break;
 		}
-	case 774: { // y:(r)+n,b0
+	case 804: { // y:(r)+n,b0
 		unhandled("y:(r)+n,b0");
 		break;
 		}
-	case 775: { // y:(r)-,b0
+	case 805: { // y:(r)-,b0
 		unhandled("y:(r)-,b0");
 		break;
 		}
-	case 776: { // y:(r)+,b0
+	case 806: { // y:(r)+,b0
 		unhandled("y:(r)+,b0");
 		break;
 		}
-	case 777: { // y:(r),b0
+	case 807: { // y:(r),b0
 		unhandled("y:(r),b0");
 		break;
 		}
-	case 778: { // y:(r+n),b0
+	case 808: { // y:(r+n),b0
 		unhandled("y:(r+n),b0");
 		break;
 		}
-	case 779: { // y:-(r),b0
+	case 809: { // y:-(r),b0
 		unhandled("y:-(r),b0");
 		break;
 		}
-	case 780: { // y:(r)-n,a2
+	case 810: { // y:(r)-n,a2
 		unhandled("y:(r)-n,a2");
 		break;
 		}
-	case 781: { // y:(r)+n,a2
+	case 811: { // y:(r)+n,a2
 		unhandled("y:(r)+n,a2");
 		break;
 		}
-	case 782: { // y:(r)-,a2
+	case 812: { // y:(r)-,a2
 		unhandled("y:(r)-,a2");
 		break;
 		}
-	case 783: { // y:(r)+,a2
+	case 813: { // y:(r)+,a2
 		unhandled("y:(r)+,a2");
 		break;
 		}
-	case 784: { // y:(r),a2
+	case 814: { // y:(r),a2
 		unhandled("y:(r),a2");
 		break;
 		}
-	case 785: { // y:(r+n),a2
+	case 815: { // y:(r+n),a2
 		unhandled("y:(r+n),a2");
 		break;
 		}
-	case 786: { // y:-(r),a2
+	case 816: { // y:-(r),a2
 		unhandled("y:-(r),a2");
 		break;
 		}
-	case 787: { // y:(r)-n,b2
+	case 817: { // y:(r)-n,b2
 		unhandled("y:(r)-n,b2");
 		break;
 		}
-	case 788: { // y:(r)+n,b2
+	case 818: { // y:(r)+n,b2
 		unhandled("y:(r)+n,b2");
 		break;
 		}
-	case 789: { // y:(r)-,b2
+	case 819: { // y:(r)-,b2
 		unhandled("y:(r)-,b2");
 		break;
 		}
-	case 790: { // y:(r)+,b2
+	case 820: { // y:(r)+,b2
 		unhandled("y:(r)+,b2");
 		break;
 		}
-	case 791: { // y:(r),b2
+	case 821: { // y:(r),b2
 		unhandled("y:(r),b2");
 		break;
 		}
-	case 792: { // y:(r+n),b2
+	case 822: { // y:(r+n),b2
 		unhandled("y:(r+n),b2");
 		break;
 		}
-	case 793: { // y:-(r),b2
+	case 823: { // y:-(r),b2
 		unhandled("y:-(r),b2");
 		break;
 		}
-	case 794: { // y:(r)-n,a1
+	case 824: { // y:(r)-n,a1
 		unhandled("y:(r)-n,a1");
 		break;
 		}
-	case 795: { // y:(r)+n,a1
+	case 825: { // y:(r)+n,a1
 		unhandled("y:(r)+n,a1");
 		break;
 		}
-	case 796: { // y:(r)-,a1
+	case 826: { // y:(r)-,a1
 		unhandled("y:(r)-,a1");
 		break;
 		}
-	case 797: { // y:(r)+,a1
+	case 827: { // y:(r)+,a1
 		unhandled("y:(r)+,a1");
 		break;
 		}
-	case 798: { // y:(r),a1
+	case 828: { // y:(r),a1
 		unhandled("y:(r),a1");
 		break;
 		}
-	case 799: { // y:(r+n),a1
+	case 829: { // y:(r+n),a1
 		unhandled("y:(r+n),a1");
 		break;
 		}
-	case 800: { // y:-(r),a1
+	case 830: { // y:-(r),a1
 		unhandled("y:-(r),a1");
 		break;
 		}
-	case 801: { // y:(r)-n,b1
+	case 831: { // y:(r)-n,b1
 		unhandled("y:(r)-n,b1");
 		break;
 		}
-	case 802: { // y:(r)+n,b1
+	case 832: { // y:(r)+n,b1
 		unhandled("y:(r)+n,b1");
 		break;
 		}
-	case 803: { // y:(r)-,b1
+	case 833: { // y:(r)-,b1
 		unhandled("y:(r)-,b1");
 		break;
 		}
-	case 804: { // y:(r)+,b1
+	case 834: { // y:(r)+,b1
 		unhandled("y:(r)+,b1");
 		break;
 		}
-	case 805: { // y:(r),b1
+	case 835: { // y:(r),b1
 		unhandled("y:(r),b1");
 		break;
 		}
-	case 806: { // y:(r+n),b1
+	case 836: { // y:(r+n),b1
 		unhandled("y:(r+n),b1");
 		break;
 		}
-	case 807: { // y:-(r),b1
+	case 837: { // y:-(r),b1
 		unhandled("y:-(r),b1");
 		break;
 		}
-	case 808: { // y:(r)-n,a
+	case 838: { // y:(r)-n,a
 		unhandled("y:(r)-n,a");
 		break;
 		}
-	case 809: { // y:(r)+n,a
+	case 839: { // y:(r)+n,a
 		unhandled("y:(r)+n,a");
 		break;
 		}
-	case 810: { // y:(r)-,a
+	case 840: { // y:(r)-,a
 		unhandled("y:(r)-,a");
 		break;
 		}
-	case 811: { // y:(r)+,a
+	case 841: { // y:(r)+,a
 		unhandled("y:(r)+,a");
 		break;
 		}
-	case 812: { // y:(r),a
+	case 842: { // y:(r),a
 		unhandled("y:(r),a");
 		break;
 		}
-	case 813: { // y:(r+n),a
+	case 843: { // y:(r+n),a
 		unhandled("y:(r+n),a");
 		break;
 		}
-	case 814: { // y:-(r),a
+	case 844: { // y:-(r),a
 		unhandled("y:-(r),a");
 		break;
 		}
-	case 815: { // y:(r)-n,b
+	case 845: { // y:(r)-n,b
 		unhandled("y:(r)-n,b");
 		break;
 		}
-	case 816: { // y:(r)+n,b
+	case 846: { // y:(r)+n,b
 		unhandled("y:(r)+n,b");
 		break;
 		}
-	case 817: { // y:(r)-,b
+	case 847: { // y:(r)-,b
 		unhandled("y:(r)-,b");
 		break;
 		}
-	case 818: { // y:(r)+,b
+	case 848: { // y:(r)+,b
 		unhandled("y:(r)+,b");
 		break;
 		}
-	case 819: { // y:(r),b
+	case 849: { // y:(r),b
 		unhandled("y:(r),b");
 		break;
 		}
-	case 820: { // y:(r+n),b
+	case 850: { // y:(r+n),b
 		unhandled("y:(r+n),b");
 		break;
 		}
-	case 821: { // y:-(r),b
+	case 851: { // y:-(r),b
 		unhandled("y:-(r),b");
 		break;
 		}
-	case 822: { // y:(r)-n,r
+	case 852: { // y:(r)-n,r
 		unhandled("y:(r)-n,r");
 		break;
 		}
-	case 823: { // y:(r)+n,r
+	case 853: { // y:(r)+n,r
 		unhandled("y:(r)+n,r");
 		break;
 		}
-	case 824: { // y:(r)-,r
+	case 854: { // y:(r)-,r
 		unhandled("y:(r)-,r");
 		break;
 		}
-	case 825: { // y:(r)+,r
+	case 855: { // y:(r)+,r
 		unhandled("y:(r)+,r");
 		break;
 		}
-	case 826: { // y:(r),r
+	case 856: { // y:(r),r
 		unhandled("y:(r),r");
 		break;
 		}
-	case 827: { // y:(r+n),r
+	case 857: { // y:(r+n),r
 		unhandled("y:(r+n),r");
 		break;
 		}
-	case 828: { // y:-(r),r
+	case 858: { // y:-(r),r
 		unhandled("y:-(r),r");
 		break;
 		}
-	case 829: { // y:(r)-n,n
+	case 859: { // y:(r)-n,n
 		unhandled("y:(r)-n,n");
 		break;
 		}
-	case 830: { // y:(r)+n,n
+	case 860: { // y:(r)+n,n
 		unhandled("y:(r)+n,n");
 		break;
 		}
-	case 831: { // y:(r)-,n
+	case 861: { // y:(r)-,n
 		unhandled("y:(r)-,n");
 		break;
 		}
-	case 832: { // y:(r)+,n
+	case 862: { // y:(r)+,n
 		unhandled("y:(r)+,n");
 		break;
 		}
-	case 833: { // y:(r),n
+	case 863: { // y:(r),n
 		unhandled("y:(r),n");
 		break;
 		}
-	case 834: { // y:(r+n),n
+	case 864: { // y:(r+n),n
 		unhandled("y:(r+n),n");
 		break;
 		}
-	case 835: { // y:-(r),n
+	case 865: { // y:-(r),n
 		unhandled("y:-(r),n");
 		break;
 		}
-	case 836: { // x0,y:(r)-n
+	case 866: { // x0,y:(r)-n
 		unhandled("x0,y:(r)-n");
 		break;
 		}
-	case 837: { // x0,y:(r)+n
+	case 867: { // x0,y:(r)+n
 		unhandled("x0,y:(r)+n");
 		break;
 		}
-	case 838: { // x0,y:(r)-
+	case 868: { // x0,y:(r)-
 		unhandled("x0,y:(r)-");
 		break;
 		}
-	case 839: { // x0,y:(r)+
+	case 869: { // x0,y:(r)+
 		unhandled("x0,y:(r)+");
 		break;
 		}
-	case 840: { // x0,y:(r)
+	case 870: { // x0,y:(r)
 		unhandled("x0,y:(r)");
 		break;
 		}
-	case 841: { // x0,y:(r+n)
+	case 871: { // x0,y:(r+n)
 		unhandled("x0,y:(r+n)");
 		break;
 		}
-	case 842: { // x0,y:-(r)
+	case 872: { // x0,y:-(r)
 		unhandled("x0,y:-(r)");
 		break;
 		}
-	case 843: { // x1,y:(r)-n
+	case 873: { // x1,y:(r)-n
 		unhandled("x1,y:(r)-n");
 		break;
 		}
-	case 844: { // x1,y:(r)+n
+	case 874: { // x1,y:(r)+n
 		unhandled("x1,y:(r)+n");
 		break;
 		}
-	case 845: { // x1,y:(r)-
+	case 875: { // x1,y:(r)-
 		unhandled("x1,y:(r)-");
 		break;
 		}
-	case 846: { // x1,y:(r)+
+	case 876: { // x1,y:(r)+
 		unhandled("x1,y:(r)+");
 		break;
 		}
-	case 847: { // x1,y:(r)
+	case 877: { // x1,y:(r)
 		unhandled("x1,y:(r)");
 		break;
 		}
-	case 848: { // x1,y:(r+n)
+	case 878: { // x1,y:(r+n)
 		unhandled("x1,y:(r+n)");
 		break;
 		}
-	case 849: { // x1,y:-(r)
+	case 879: { // x1,y:-(r)
 		unhandled("x1,y:-(r)");
 		break;
 		}
-	case 850: { // y0,y:(r)-n
+	case 880: { // y0,y:(r)-n
 		unhandled("y0,y:(r)-n");
 		break;
 		}
-	case 851: { // y0,y:(r)+n
+	case 881: { // y0,y:(r)+n
 		unhandled("y0,y:(r)+n");
 		break;
 		}
-	case 852: { // y0,y:(r)-
+	case 882: { // y0,y:(r)-
 		unhandled("y0,y:(r)-");
 		break;
 		}
-	case 853: { // y0,y:(r)+
+	case 883: { // y0,y:(r)+
 		unhandled("y0,y:(r)+");
 		break;
 		}
-	case 854: { // y0,y:(r)
+	case 884: { // y0,y:(r)
 		unhandled("y0,y:(r)");
 		break;
 		}
-	case 855: { // y0,y:(r+n)
+	case 885: { // y0,y:(r+n)
 		unhandled("y0,y:(r+n)");
 		break;
 		}
-	case 856: { // y0,y:-(r)
+	case 886: { // y0,y:-(r)
 		unhandled("y0,y:-(r)");
 		break;
 		}
-	case 857: { // y1,y:(r)-n
+	case 887: { // y1,y:(r)-n
 		unhandled("y1,y:(r)-n");
 		break;
 		}
-	case 858: { // y1,y:(r)+n
+	case 888: { // y1,y:(r)+n
 		unhandled("y1,y:(r)+n");
 		break;
 		}
-	case 859: { // y1,y:(r)-
+	case 889: { // y1,y:(r)-
 		unhandled("y1,y:(r)-");
 		break;
 		}
-	case 860: { // y1,y:(r)+
+	case 890: { // y1,y:(r)+
 		unhandled("y1,y:(r)+");
 		break;
 		}
-	case 861: { // y1,y:(r)
+	case 891: { // y1,y:(r)
 		unhandled("y1,y:(r)");
 		break;
 		}
-	case 862: { // y1,y:(r+n)
+	case 892: { // y1,y:(r+n)
 		unhandled("y1,y:(r+n)");
 		break;
 		}
-	case 863: { // y1,y:-(r)
+	case 893: { // y1,y:-(r)
 		unhandled("y1,y:-(r)");
 		break;
 		}
-	case 864: { // a0,y:(r)-n
+	case 894: { // a0,y:(r)-n
 		unhandled("a0,y:(r)-n");
 		break;
 		}
-	case 865: { // a0,y:(r)+n
+	case 895: { // a0,y:(r)+n
 		unhandled("a0,y:(r)+n");
 		break;
 		}
-	case 866: { // a0,y:(r)-
+	case 896: { // a0,y:(r)-
 		unhandled("a0,y:(r)-");
 		break;
 		}
-	case 867: { // a0,y:(r)+
+	case 897: { // a0,y:(r)+
 		unhandled("a0,y:(r)+");
 		break;
 		}
-	case 868: { // a0,y:(r)
+	case 898: { // a0,y:(r)
 		unhandled("a0,y:(r)");
 		break;
 		}
-	case 869: { // a0,y:(r+n)
+	case 899: { // a0,y:(r+n)
 		unhandled("a0,y:(r+n)");
 		break;
 		}
-	case 870: { // a0,y:-(r)
+	case 900: { // a0,y:-(r)
 		unhandled("a0,y:-(r)");
 		break;
 		}
-	case 871: { // b0,y:(r)-n
+	case 901: { // b0,y:(r)-n
 		unhandled("b0,y:(r)-n");
 		break;
 		}
-	case 872: { // b0,y:(r)+n
+	case 902: { // b0,y:(r)+n
 		unhandled("b0,y:(r)+n");
 		break;
 		}
-	case 873: { // b0,y:(r)-
+	case 903: { // b0,y:(r)-
 		unhandled("b0,y:(r)-");
 		break;
 		}
-	case 874: { // b0,y:(r)+
+	case 904: { // b0,y:(r)+
 		unhandled("b0,y:(r)+");
 		break;
 		}
-	case 875: { // b0,y:(r)
+	case 905: { // b0,y:(r)
 		unhandled("b0,y:(r)");
 		break;
 		}
-	case 876: { // b0,y:(r+n)
+	case 906: { // b0,y:(r+n)
 		unhandled("b0,y:(r+n)");
 		break;
 		}
-	case 877: { // b0,y:-(r)
+	case 907: { // b0,y:-(r)
 		unhandled("b0,y:-(r)");
 		break;
 		}
-	case 878: { // a2,y:(r)-n
+	case 908: { // a2,y:(r)-n
 		unhandled("a2,y:(r)-n");
 		break;
 		}
-	case 879: { // a2,y:(r)+n
+	case 909: { // a2,y:(r)+n
 		unhandled("a2,y:(r)+n");
 		break;
 		}
-	case 880: { // a2,y:(r)-
+	case 910: { // a2,y:(r)-
 		unhandled("a2,y:(r)-");
 		break;
 		}
-	case 881: { // a2,y:(r)+
+	case 911: { // a2,y:(r)+
 		unhandled("a2,y:(r)+");
 		break;
 		}
-	case 882: { // a2,y:(r)
+	case 912: { // a2,y:(r)
 		unhandled("a2,y:(r)");
 		break;
 		}
-	case 883: { // a2,y:(r+n)
+	case 913: { // a2,y:(r+n)
 		unhandled("a2,y:(r+n)");
 		break;
 		}
-	case 884: { // a2,y:-(r)
+	case 914: { // a2,y:-(r)
 		unhandled("a2,y:-(r)");
 		break;
 		}
-	case 885: { // b2,y:(r)-n
+	case 915: { // b2,y:(r)-n
 		unhandled("b2,y:(r)-n");
 		break;
 		}
-	case 886: { // b2,y:(r)+n
+	case 916: { // b2,y:(r)+n
 		unhandled("b2,y:(r)+n");
 		break;
 		}
-	case 887: { // b2,y:(r)-
+	case 917: { // b2,y:(r)-
 		unhandled("b2,y:(r)-");
 		break;
 		}
-	case 888: { // b2,y:(r)+
+	case 918: { // b2,y:(r)+
 		unhandled("b2,y:(r)+");
 		break;
 		}
-	case 889: { // b2,y:(r)
+	case 919: { // b2,y:(r)
 		unhandled("b2,y:(r)");
 		break;
 		}
-	case 890: { // b2,y:(r+n)
+	case 920: { // b2,y:(r+n)
 		unhandled("b2,y:(r+n)");
 		break;
 		}
-	case 891: { // b2,y:-(r)
+	case 921: { // b2,y:-(r)
 		unhandled("b2,y:-(r)");
 		break;
 		}
-	case 892: { // a1,y:(r)-n
+	case 922: { // a1,y:(r)-n
 		unhandled("a1,y:(r)-n");
 		break;
 		}
-	case 893: { // a1,y:(r)+n
+	case 923: { // a1,y:(r)+n
 		unhandled("a1,y:(r)+n");
 		break;
 		}
-	case 894: { // a1,y:(r)-
+	case 924: { // a1,y:(r)-
 		unhandled("a1,y:(r)-");
 		break;
 		}
-	case 895: { // a1,y:(r)+
+	case 925: { // a1,y:(r)+
 		unhandled("a1,y:(r)+");
 		break;
 		}
-	case 896: { // a1,y:(r)
+	case 926: { // a1,y:(r)
 		unhandled("a1,y:(r)");
 		break;
 		}
-	case 897: { // a1,y:(r+n)
+	case 927: { // a1,y:(r+n)
 		unhandled("a1,y:(r+n)");
 		break;
 		}
-	case 898: { // a1,y:-(r)
+	case 928: { // a1,y:-(r)
 		unhandled("a1,y:-(r)");
 		break;
 		}
-	case 899: { // b1,y:(r)-n
+	case 929: { // b1,y:(r)-n
 		unhandled("b1,y:(r)-n");
 		break;
 		}
-	case 900: { // b1,y:(r)+n
+	case 930: { // b1,y:(r)+n
 		unhandled("b1,y:(r)+n");
 		break;
 		}
-	case 901: { // b1,y:(r)-
+	case 931: { // b1,y:(r)-
 		unhandled("b1,y:(r)-");
 		break;
 		}
-	case 902: { // b1,y:(r)+
+	case 932: { // b1,y:(r)+
 		unhandled("b1,y:(r)+");
 		break;
 		}
-	case 903: { // b1,y:(r)
+	case 933: { // b1,y:(r)
 		unhandled("b1,y:(r)");
 		break;
 		}
-	case 904: { // b1,y:(r+n)
+	case 934: { // b1,y:(r+n)
 		unhandled("b1,y:(r+n)");
 		break;
 		}
-	case 905: { // b1,y:-(r)
+	case 935: { // b1,y:-(r)
 		unhandled("b1,y:-(r)");
 		break;
 		}
-	case 906: { // a,y:(r)-n
+	case 936: { // a,y:(r)-n
 		unhandled("a,y:(r)-n");
 		break;
 		}
-	case 907: { // a,y:(r)+n
+	case 937: { // a,y:(r)+n
 		unhandled("a,y:(r)+n");
 		break;
 		}
-	case 908: { // a,y:(r)-
+	case 938: { // a,y:(r)-
 		unhandled("a,y:(r)-");
 		break;
 		}
-	case 909: { // a,y:(r)+
+	case 939: { // a,y:(r)+
 		unhandled("a,y:(r)+");
 		break;
 		}
-	case 910: { // a,y:(r)
+	case 940: { // a,y:(r)
 		unhandled("a,y:(r)");
 		break;
 		}
-	case 911: { // a,y:(r+n)
+	case 941: { // a,y:(r+n)
 		unhandled("a,y:(r+n)");
 		break;
 		}
-	case 912: { // a,y:-(r)
+	case 942: { // a,y:-(r)
 		unhandled("a,y:-(r)");
 		break;
 		}
-	case 913: { // b,y:(r)-n
+	case 943: { // b,y:(r)-n
 		unhandled("b,y:(r)-n");
 		break;
 		}
-	case 914: { // b,y:(r)+n
+	case 944: { // b,y:(r)+n
 		unhandled("b,y:(r)+n");
 		break;
 		}
-	case 915: { // b,y:(r)-
+	case 945: { // b,y:(r)-
 		unhandled("b,y:(r)-");
 		break;
 		}
-	case 916: { // b,y:(r)+
+	case 946: { // b,y:(r)+
 		unhandled("b,y:(r)+");
 		break;
 		}
-	case 917: { // b,y:(r)
+	case 947: { // b,y:(r)
 		unhandled("b,y:(r)");
 		break;
 		}
-	case 918: { // b,y:(r+n)
+	case 948: { // b,y:(r+n)
 		unhandled("b,y:(r+n)");
 		break;
 		}
-	case 919: { // b,y:-(r)
+	case 949: { // b,y:-(r)
 		unhandled("b,y:-(r)");
 		break;
 		}
-	case 920: { // r,y:(r)-n
+	case 950: { // r,y:(r)-n
 		unhandled("r,y:(r)-n");
 		break;
 		}
-	case 921: { // r,y:(r)+n
+	case 951: { // r,y:(r)+n
 		unhandled("r,y:(r)+n");
 		break;
 		}
-	case 922: { // r,y:(r)-
+	case 952: { // r,y:(r)-
 		unhandled("r,y:(r)-");
 		break;
 		}
-	case 923: { // r,y:(r)+
+	case 953: { // r,y:(r)+
 		unhandled("r,y:(r)+");
 		break;
 		}
-	case 924: { // r,y:(r)
+	case 954: { // r,y:(r)
 		unhandled("r,y:(r)");
 		break;
 		}
-	case 925: { // r,y:(r+n)
+	case 955: { // r,y:(r+n)
 		unhandled("r,y:(r+n)");
 		break;
 		}
-	case 926: { // r,y:-(r)
+	case 956: { // r,y:-(r)
 		unhandled("r,y:-(r)");
 		break;
 		}
-	case 927: { // n,y:(r)-n
+	case 957: { // n,y:(r)-n
 		unhandled("n,y:(r)-n");
 		break;
 		}
-	case 928: { // n,y:(r)+n
+	case 958: { // n,y:(r)+n
 		unhandled("n,y:(r)+n");
 		break;
 		}
-	case 929: { // n,y:(r)-
+	case 959: { // n,y:(r)-
 		unhandled("n,y:(r)-");
 		break;
 		}
-	case 930: { // n,y:(r)+
+	case 960: { // n,y:(r)+
 		unhandled("n,y:(r)+");
 		break;
 		}
-	case 931: { // n,y:(r)
+	case 961: { // n,y:(r)
 		unhandled("n,y:(r)");
 		break;
 		}
-	case 932: { // n,y:(r+n)
+	case 962: { // n,y:(r+n)
 		unhandled("n,y:(r+n)");
 		break;
 		}
-	case 933: { // n,y:-(r)
+	case 963: { // n,y:-(r)
 		unhandled("n,y:-(r)");
 		break;
 		}
-	case 934: { // [abs],x0
-		unhandled("[abs],x0");
+	case 964: { // y:[abs],x0
+		unhandled("y:[abs],x0");
 		break;
 		}
-	case 935: { // [abs],x1
-		unhandled("[abs],x1");
+	case 965: { // y:[abs],x1
+		unhandled("y:[abs],x1");
 		break;
 		}
-	case 936: { // [abs],y0
-		unhandled("[abs],y0");
+	case 966: { // y:[abs],y0
+		unhandled("y:[abs],y0");
 		break;
 		}
-	case 937: { // [abs],y1
-		unhandled("[abs],y1");
+	case 967: { // y:[abs],y1
+		unhandled("y:[abs],y1");
 		break;
 		}
-	case 938: { // [abs],a0
-		unhandled("[abs],a0");
+	case 968: { // y:[abs],a0
+		unhandled("y:[abs],a0");
 		break;
 		}
-	case 939: { // [abs],b0
-		unhandled("[abs],b0");
+	case 969: { // y:[abs],b0
+		unhandled("y:[abs],b0");
 		break;
 		}
-	case 940: { // [abs],a2
-		unhandled("[abs],a2");
+	case 970: { // y:[abs],a2
+		unhandled("y:[abs],a2");
 		break;
 		}
-	case 941: { // [abs],b2
-		unhandled("[abs],b2");
+	case 971: { // y:[abs],b2
+		unhandled("y:[abs],b2");
 		break;
 		}
-	case 942: { // [abs],a1
-		unhandled("[abs],a1");
+	case 972: { // y:[abs],a1
+		unhandled("y:[abs],a1");
 		break;
 		}
-	case 943: { // [abs],b1
-		unhandled("[abs],b1");
+	case 973: { // y:[abs],b1
+		unhandled("y:[abs],b1");
 		break;
 		}
-	case 944: { // [abs],a
-		unhandled("[abs],a");
+	case 974: { // y:[abs],a
+		unhandled("y:[abs],a");
 		break;
 		}
-	case 945: { // [abs],b
-		unhandled("[abs],b");
+	case 975: { // y:[abs],b
+		unhandled("y:[abs],b");
 		break;
 		}
-	case 946: { // [abs],r
-		unhandled("[abs],r");
+	case 976: { // y:[abs],r
+		unhandled("y:[abs],r");
 		break;
 		}
-	case 947: { // [abs],n
-		unhandled("[abs],n");
+	case 977: { // y:[abs],n
+		unhandled("y:[abs],n");
 		break;
 		}
-	case 948: { // #[i],x0
+	case 978: { // #[i],x0
 		unhandled("#[i],x0");
 		break;
 		}
-	case 949: { // #[i],x1
+	case 979: { // #[i],x1
 		unhandled("#[i],x1");
 		break;
 		}
-	case 950: { // #[i],y0
+	case 980: { // #[i],y0
 		unhandled("#[i],y0");
 		break;
 		}
-	case 951: { // #[i],y1
+	case 981: { // #[i],y1
 		unhandled("#[i],y1");
 		break;
 		}
-	case 952: { // #[i],a0
+	case 982: { // #[i],a0
 		unhandled("#[i],a0");
 		break;
 		}
-	case 953: { // #[i],b0
+	case 983: { // #[i],b0
 		unhandled("#[i],b0");
 		break;
 		}
-	case 954: { // #[i],a2
+	case 984: { // #[i],a2
 		unhandled("#[i],a2");
 		break;
 		}
-	case 955: { // #[i],b2
+	case 985: { // #[i],b2
 		unhandled("#[i],b2");
 		break;
 		}
-	case 956: { // #[i],a1
+	case 986: { // #[i],a1
 		unhandled("#[i],a1");
 		break;
 		}
-	case 957: { // #[i],b1
+	case 987: { // #[i],b1
 		unhandled("#[i],b1");
 		break;
 		}
-	case 958: { // #[i],a
+	case 988: { // #[i],a
 		unhandled("#[i],a");
 		break;
 		}
-	case 959: { // #[i],b
+	case 989: { // #[i],b
 		unhandled("#[i],b");
 		break;
 		}
-	case 960: { // #[i],r
+	case 990: { // #[i],r
 		unhandled("#[i],r");
 		break;
 		}
-	case 961: { // #[i],n
+	case 991: { // #[i],n
 		unhandled("#[i],n");
 		break;
 		}
-	case 962: { // y:[aa],x0
+	case 992: { // x0,y:[abs]
+		unhandled("x0,y:[abs]");
+		break;
+		}
+	case 993: { // x1,y:[abs]
+		unhandled("x1,y:[abs]");
+		break;
+		}
+	case 994: { // y0,y:[abs]
+		unhandled("y0,y:[abs]");
+		break;
+		}
+	case 995: { // y1,y:[abs]
+		unhandled("y1,y:[abs]");
+		break;
+		}
+	case 996: { // a0,y:[abs]
+		unhandled("a0,y:[abs]");
+		break;
+		}
+	case 997: { // b0,y:[abs]
+		unhandled("b0,y:[abs]");
+		break;
+		}
+	case 998: { // a2,y:[abs]
+		unhandled("a2,y:[abs]");
+		break;
+		}
+	case 999: { // b2,y:[abs]
+		unhandled("b2,y:[abs]");
+		break;
+		}
+	case 1000: { // a1,y:[abs]
+		unhandled("a1,y:[abs]");
+		break;
+		}
+	case 1001: { // b1,y:[abs]
+		unhandled("b1,y:[abs]");
+		break;
+		}
+	case 1002: { // a,y:[abs]
+		unhandled("a,y:[abs]");
+		break;
+		}
+	case 1003: { // b,y:[abs]
+		unhandled("b,y:[abs]");
+		break;
+		}
+	case 1004: { // r,y:[abs]
+		unhandled("r,y:[abs]");
+		break;
+		}
+	case 1005: { // n,y:[abs]
+		unhandled("n,y:[abs]");
+		break;
+		}
+	case 1006: { // y:[aa],x0
 		unhandled("y:[aa],x0");
 		break;
 		}
-	case 963: { // y:[aa],x1
+	case 1007: { // y:[aa],x1
 		unhandled("y:[aa],x1");
 		break;
 		}
-	case 964: { // y:[aa],y0
+	case 1008: { // y:[aa],y0
 		unhandled("y:[aa],y0");
 		break;
 		}
-	case 965: { // y:[aa],y1
+	case 1009: { // y:[aa],y1
 		unhandled("y:[aa],y1");
 		break;
 		}
-	case 966: { // y:[aa],a0
+	case 1010: { // y:[aa],a0
 		unhandled("y:[aa],a0");
 		break;
 		}
-	case 967: { // y:[aa],b0
+	case 1011: { // y:[aa],b0
 		unhandled("y:[aa],b0");
 		break;
 		}
-	case 968: { // y:[aa],a2
+	case 1012: { // y:[aa],a2
 		unhandled("y:[aa],a2");
 		break;
 		}
-	case 969: { // y:[aa],b2
+	case 1013: { // y:[aa],b2
 		unhandled("y:[aa],b2");
 		break;
 		}
-	case 970: { // y:[aa],a1
+	case 1014: { // y:[aa],a1
 		unhandled("y:[aa],a1");
 		break;
 		}
-	case 971: { // y:[aa],b1
+	case 1015: { // y:[aa],b1
 		unhandled("y:[aa],b1");
 		break;
 		}
-	case 972: { // y:[aa],a
+	case 1016: { // y:[aa],a
 		unhandled("y:[aa],a");
 		break;
 		}
-	case 973: { // y:[aa],b
+	case 1017: { // y:[aa],b
 		unhandled("y:[aa],b");
 		break;
 		}
-	case 974: { // y:[aa],r
+	case 1018: { // y:[aa],r
 		unhandled("y:[aa],r");
 		break;
 		}
-	case 975: { // y:[aa],n
+	case 1019: { // y:[aa],n
 		unhandled("y:[aa],n");
 		break;
 		}
-	case 976: { // x0,y:[aa]
+	case 1020: { // x0,y:[aa]
 		unhandled("x0,y:[aa]");
 		break;
 		}
-	case 977: { // x1,y:[aa]
+	case 1021: { // x1,y:[aa]
 		unhandled("x1,y:[aa]");
 		break;
 		}
-	case 978: { // y0,y:[aa]
+	case 1022: { // y0,y:[aa]
 		unhandled("y0,y:[aa]");
 		break;
 		}
-	case 979: { // y1,y:[aa]
+	case 1023: { // y1,y:[aa]
 		unhandled("y1,y:[aa]");
 		break;
 		}
-	case 980: { // a0,y:[aa]
+	case 1024: { // a0,y:[aa]
 		unhandled("a0,y:[aa]");
 		break;
 		}
-	case 981: { // b0,y:[aa]
+	case 1025: { // b0,y:[aa]
 		unhandled("b0,y:[aa]");
 		break;
 		}
-	case 982: { // a2,y:[aa]
+	case 1026: { // a2,y:[aa]
 		unhandled("a2,y:[aa]");
 		break;
 		}
-	case 983: { // b2,y:[aa]
+	case 1027: { // b2,y:[aa]
 		unhandled("b2,y:[aa]");
 		break;
 		}
-	case 984: { // a1,y:[aa]
+	case 1028: { // a1,y:[aa]
 		unhandled("a1,y:[aa]");
 		break;
 		}
-	case 985: { // b1,y:[aa]
+	case 1029: { // b1,y:[aa]
 		unhandled("b1,y:[aa]");
 		break;
 		}
-	case 986: { // a,y:[aa]
+	case 1030: { // a,y:[aa]
 		unhandled("a,y:[aa]");
 		break;
 		}
-	case 987: { // b,y:[aa]
+	case 1031: { // b,y:[aa]
 		unhandled("b,y:[aa]");
 		break;
 		}
-	case 988: { // r,y:[aa]
+	case 1032: { // r,y:[aa]
 		unhandled("r,y:[aa]");
 		break;
 		}
-	case 989: { // n,y:[aa]
+	case 1033: { // n,y:[aa]
 		unhandled("n,y:[aa]");
 		break;
 		}
-	case 990: { // a,x0 y:(r)-n,y0
+	case 1034: { // a,x0 y:(r)-n,y0
 		unhandled("a,x0 y:(r)-n,y0");
 		break;
 		}
-	case 991: { // a,x0 y:(r)+n,y0
+	case 1035: { // a,x0 y:(r)+n,y0
 		unhandled("a,x0 y:(r)+n,y0");
 		break;
 		}
-	case 992: { // a,x0 y:(r)-,y0
+	case 1036: { // a,x0 y:(r)-,y0
 		unhandled("a,x0 y:(r)-,y0");
 		break;
 		}
-	case 993: { // a,x0 y:(r)+,y0
+	case 1037: { // a,x0 y:(r)+,y0
 		unhandled("a,x0 y:(r)+,y0");
 		break;
 		}
-	case 994: { // a,x0 y:(r),y0
+	case 1038: { // a,x0 y:(r),y0
 		unhandled("a,x0 y:(r),y0");
 		break;
 		}
-	case 995: { // a,x0 y:(r+n),y0
+	case 1039: { // a,x0 y:(r+n),y0
 		unhandled("a,x0 y:(r+n),y0");
 		break;
 		}
-	case 996: { // a,x0 y:-(r),y0
+	case 1040: { // a,x0 y:-(r),y0
 		unhandled("a,x0 y:-(r),y0");
 		break;
 		}
-	case 997: { // a,x1 y:(r)-n,y0
+	case 1041: { // a,x1 y:(r)-n,y0
 		unhandled("a,x1 y:(r)-n,y0");
 		break;
 		}
-	case 998: { // a,x1 y:(r)+n,y0
+	case 1042: { // a,x1 y:(r)+n,y0
 		unhandled("a,x1 y:(r)+n,y0");
 		break;
 		}
-	case 999: { // a,x1 y:(r)-,y0
+	case 1043: { // a,x1 y:(r)-,y0
 		unhandled("a,x1 y:(r)-,y0");
 		break;
 		}
-	case 1000: { // a,x1 y:(r)+,y0
+	case 1044: { // a,x1 y:(r)+,y0
 		unhandled("a,x1 y:(r)+,y0");
 		break;
 		}
-	case 1001: { // a,x1 y:(r),y0
+	case 1045: { // a,x1 y:(r),y0
 		unhandled("a,x1 y:(r),y0");
 		break;
 		}
-	case 1002: { // a,x1 y:(r+n),y0
+	case 1046: { // a,x1 y:(r+n),y0
 		unhandled("a,x1 y:(r+n),y0");
 		break;
 		}
-	case 1003: { // a,x1 y:-(r),y0
+	case 1047: { // a,x1 y:-(r),y0
 		unhandled("a,x1 y:-(r),y0");
 		break;
 		}
-	case 1004: { // b,x0 y:(r)-n,y0
+	case 1048: { // b,x0 y:(r)-n,y0
 		unhandled("b,x0 y:(r)-n,y0");
 		break;
 		}
-	case 1005: { // b,x0 y:(r)+n,y0
+	case 1049: { // b,x0 y:(r)+n,y0
 		unhandled("b,x0 y:(r)+n,y0");
 		break;
 		}
-	case 1006: { // b,x0 y:(r)-,y0
+	case 1050: { // b,x0 y:(r)-,y0
 		unhandled("b,x0 y:(r)-,y0");
 		break;
 		}
-	case 1007: { // b,x0 y:(r)+,y0
+	case 1051: { // b,x0 y:(r)+,y0
 		unhandled("b,x0 y:(r)+,y0");
 		break;
 		}
-	case 1008: { // b,x0 y:(r),y0
+	case 1052: { // b,x0 y:(r),y0
 		unhandled("b,x0 y:(r),y0");
 		break;
 		}
-	case 1009: { // b,x0 y:(r+n),y0
+	case 1053: { // b,x0 y:(r+n),y0
 		unhandled("b,x0 y:(r+n),y0");
 		break;
 		}
-	case 1010: { // b,x0 y:-(r),y0
+	case 1054: { // b,x0 y:-(r),y0
 		unhandled("b,x0 y:-(r),y0");
 		break;
 		}
-	case 1011: { // b,x1 y:(r)-n,y0
+	case 1055: { // b,x1 y:(r)-n,y0
 		unhandled("b,x1 y:(r)-n,y0");
 		break;
 		}
-	case 1012: { // b,x1 y:(r)+n,y0
+	case 1056: { // b,x1 y:(r)+n,y0
 		unhandled("b,x1 y:(r)+n,y0");
 		break;
 		}
-	case 1013: { // b,x1 y:(r)-,y0
+	case 1057: { // b,x1 y:(r)-,y0
 		unhandled("b,x1 y:(r)-,y0");
 		break;
 		}
-	case 1014: { // b,x1 y:(r)+,y0
+	case 1058: { // b,x1 y:(r)+,y0
 		unhandled("b,x1 y:(r)+,y0");
 		break;
 		}
-	case 1015: { // b,x1 y:(r),y0
+	case 1059: { // b,x1 y:(r),y0
 		unhandled("b,x1 y:(r),y0");
 		break;
 		}
-	case 1016: { // b,x1 y:(r+n),y0
+	case 1060: { // b,x1 y:(r+n),y0
 		unhandled("b,x1 y:(r+n),y0");
 		break;
 		}
-	case 1017: { // b,x1 y:-(r),y0
+	case 1061: { // b,x1 y:-(r),y0
 		unhandled("b,x1 y:-(r),y0");
 		break;
 		}
-	case 1018: { // a,x0 y:(r)-n,y1
+	case 1062: { // a,x0 y:(r)-n,y1
 		unhandled("a,x0 y:(r)-n,y1");
 		break;
 		}
-	case 1019: { // a,x0 y:(r)+n,y1
+	case 1063: { // a,x0 y:(r)+n,y1
 		unhandled("a,x0 y:(r)+n,y1");
 		break;
 		}
-	case 1020: { // a,x0 y:(r)-,y1
+	case 1064: { // a,x0 y:(r)-,y1
 		unhandled("a,x0 y:(r)-,y1");
 		break;
 		}
-	case 1021: { // a,x0 y:(r)+,y1
+	case 1065: { // a,x0 y:(r)+,y1
 		unhandled("a,x0 y:(r)+,y1");
 		break;
 		}
-	case 1022: { // a,x0 y:(r),y1
+	case 1066: { // a,x0 y:(r),y1
 		unhandled("a,x0 y:(r),y1");
 		break;
 		}
-	case 1023: { // a,x0 y:(r+n),y1
+	case 1067: { // a,x0 y:(r+n),y1
 		unhandled("a,x0 y:(r+n),y1");
 		break;
 		}
-	case 1024: { // a,x0 y:-(r),y1
+	case 1068: { // a,x0 y:-(r),y1
 		unhandled("a,x0 y:-(r),y1");
 		break;
 		}
-	case 1025: { // a,x1 y:(r)-n,y1
+	case 1069: { // a,x1 y:(r)-n,y1
 		unhandled("a,x1 y:(r)-n,y1");
 		break;
 		}
-	case 1026: { // a,x1 y:(r)+n,y1
+	case 1070: { // a,x1 y:(r)+n,y1
 		unhandled("a,x1 y:(r)+n,y1");
 		break;
 		}
-	case 1027: { // a,x1 y:(r)-,y1
+	case 1071: { // a,x1 y:(r)-,y1
 		unhandled("a,x1 y:(r)-,y1");
 		break;
 		}
-	case 1028: { // a,x1 y:(r)+,y1
+	case 1072: { // a,x1 y:(r)+,y1
 		unhandled("a,x1 y:(r)+,y1");
 		break;
 		}
-	case 1029: { // a,x1 y:(r),y1
+	case 1073: { // a,x1 y:(r),y1
 		unhandled("a,x1 y:(r),y1");
 		break;
 		}
-	case 1030: { // a,x1 y:(r+n),y1
+	case 1074: { // a,x1 y:(r+n),y1
 		unhandled("a,x1 y:(r+n),y1");
 		break;
 		}
-	case 1031: { // a,x1 y:-(r),y1
+	case 1075: { // a,x1 y:-(r),y1
 		unhandled("a,x1 y:-(r),y1");
 		break;
 		}
-	case 1032: { // b,x0 y:(r)-n,y1
+	case 1076: { // b,x0 y:(r)-n,y1
 		unhandled("b,x0 y:(r)-n,y1");
 		break;
 		}
-	case 1033: { // b,x0 y:(r)+n,y1
+	case 1077: { // b,x0 y:(r)+n,y1
 		unhandled("b,x0 y:(r)+n,y1");
 		break;
 		}
-	case 1034: { // b,x0 y:(r)-,y1
+	case 1078: { // b,x0 y:(r)-,y1
 		unhandled("b,x0 y:(r)-,y1");
 		break;
 		}
-	case 1035: { // b,x0 y:(r)+,y1
+	case 1079: { // b,x0 y:(r)+,y1
 		unhandled("b,x0 y:(r)+,y1");
 		break;
 		}
-	case 1036: { // b,x0 y:(r),y1
+	case 1080: { // b,x0 y:(r),y1
 		unhandled("b,x0 y:(r),y1");
 		break;
 		}
-	case 1037: { // b,x0 y:(r+n),y1
+	case 1081: { // b,x0 y:(r+n),y1
 		unhandled("b,x0 y:(r+n),y1");
 		break;
 		}
-	case 1038: { // b,x0 y:-(r),y1
+	case 1082: { // b,x0 y:-(r),y1
 		unhandled("b,x0 y:-(r),y1");
 		break;
 		}
-	case 1039: { // b,x1 y:(r)-n,y1
+	case 1083: { // b,x1 y:(r)-n,y1
 		unhandled("b,x1 y:(r)-n,y1");
 		break;
 		}
-	case 1040: { // b,x1 y:(r)+n,y1
+	case 1084: { // b,x1 y:(r)+n,y1
 		unhandled("b,x1 y:(r)+n,y1");
 		break;
 		}
-	case 1041: { // b,x1 y:(r)-,y1
+	case 1085: { // b,x1 y:(r)-,y1
 		unhandled("b,x1 y:(r)-,y1");
 		break;
 		}
-	case 1042: { // b,x1 y:(r)+,y1
+	case 1086: { // b,x1 y:(r)+,y1
 		unhandled("b,x1 y:(r)+,y1");
 		break;
 		}
-	case 1043: { // b,x1 y:(r),y1
+	case 1087: { // b,x1 y:(r),y1
 		unhandled("b,x1 y:(r),y1");
 		break;
 		}
-	case 1044: { // b,x1 y:(r+n),y1
+	case 1088: { // b,x1 y:(r+n),y1
 		unhandled("b,x1 y:(r+n),y1");
 		break;
 		}
-	case 1045: { // b,x1 y:-(r),y1
+	case 1089: { // b,x1 y:-(r),y1
 		unhandled("b,x1 y:-(r),y1");
 		break;
 		}
-	case 1046: { // a,x0 y:(r)-n,a
+	case 1090: { // a,x0 y:(r)-n,a
 		unhandled("a,x0 y:(r)-n,a");
 		break;
 		}
-	case 1047: { // a,x0 y:(r)+n,a
+	case 1091: { // a,x0 y:(r)+n,a
 		unhandled("a,x0 y:(r)+n,a");
 		break;
 		}
-	case 1048: { // a,x0 y:(r)-,a
+	case 1092: { // a,x0 y:(r)-,a
 		unhandled("a,x0 y:(r)-,a");
 		break;
 		}
-	case 1049: { // a,x0 y:(r)+,a
+	case 1093: { // a,x0 y:(r)+,a
 		unhandled("a,x0 y:(r)+,a");
 		break;
 		}
-	case 1050: { // a,x0 y:(r),a
+	case 1094: { // a,x0 y:(r),a
 		unhandled("a,x0 y:(r),a");
 		break;
 		}
-	case 1051: { // a,x0 y:(r+n),a
+	case 1095: { // a,x0 y:(r+n),a
 		unhandled("a,x0 y:(r+n),a");
 		break;
 		}
-	case 1052: { // a,x0 y:-(r),a
+	case 1096: { // a,x0 y:-(r),a
 		unhandled("a,x0 y:-(r),a");
 		break;
 		}
-	case 1053: { // a,x1 y:(r)-n,a
+	case 1097: { // a,x1 y:(r)-n,a
 		unhandled("a,x1 y:(r)-n,a");
 		break;
 		}
-	case 1054: { // a,x1 y:(r)+n,a
+	case 1098: { // a,x1 y:(r)+n,a
 		unhandled("a,x1 y:(r)+n,a");
 		break;
 		}
-	case 1055: { // a,x1 y:(r)-,a
+	case 1099: { // a,x1 y:(r)-,a
 		unhandled("a,x1 y:(r)-,a");
 		break;
 		}
-	case 1056: { // a,x1 y:(r)+,a
+	case 1100: { // a,x1 y:(r)+,a
 		unhandled("a,x1 y:(r)+,a");
 		break;
 		}
-	case 1057: { // a,x1 y:(r),a
+	case 1101: { // a,x1 y:(r),a
 		unhandled("a,x1 y:(r),a");
 		break;
 		}
-	case 1058: { // a,x1 y:(r+n),a
+	case 1102: { // a,x1 y:(r+n),a
 		unhandled("a,x1 y:(r+n),a");
 		break;
 		}
-	case 1059: { // a,x1 y:-(r),a
+	case 1103: { // a,x1 y:-(r),a
 		unhandled("a,x1 y:-(r),a");
 		break;
 		}
-	case 1060: { // b,x0 y:(r)-n,a
+	case 1104: { // b,x0 y:(r)-n,a
 		unhandled("b,x0 y:(r)-n,a");
 		break;
 		}
-	case 1061: { // b,x0 y:(r)+n,a
+	case 1105: { // b,x0 y:(r)+n,a
 		unhandled("b,x0 y:(r)+n,a");
 		break;
 		}
-	case 1062: { // b,x0 y:(r)-,a
+	case 1106: { // b,x0 y:(r)-,a
 		unhandled("b,x0 y:(r)-,a");
 		break;
 		}
-	case 1063: { // b,x0 y:(r)+,a
+	case 1107: { // b,x0 y:(r)+,a
 		unhandled("b,x0 y:(r)+,a");
 		break;
 		}
-	case 1064: { // b,x0 y:(r),a
+	case 1108: { // b,x0 y:(r),a
 		unhandled("b,x0 y:(r),a");
 		break;
 		}
-	case 1065: { // b,x0 y:(r+n),a
+	case 1109: { // b,x0 y:(r+n),a
 		unhandled("b,x0 y:(r+n),a");
 		break;
 		}
-	case 1066: { // b,x0 y:-(r),a
+	case 1110: { // b,x0 y:-(r),a
 		unhandled("b,x0 y:-(r),a");
 		break;
 		}
-	case 1067: { // b,x1 y:(r)-n,a
+	case 1111: { // b,x1 y:(r)-n,a
 		unhandled("b,x1 y:(r)-n,a");
 		break;
 		}
-	case 1068: { // b,x1 y:(r)+n,a
+	case 1112: { // b,x1 y:(r)+n,a
 		unhandled("b,x1 y:(r)+n,a");
 		break;
 		}
-	case 1069: { // b,x1 y:(r)-,a
+	case 1113: { // b,x1 y:(r)-,a
 		unhandled("b,x1 y:(r)-,a");
 		break;
 		}
-	case 1070: { // b,x1 y:(r)+,a
+	case 1114: { // b,x1 y:(r)+,a
 		unhandled("b,x1 y:(r)+,a");
 		break;
 		}
-	case 1071: { // b,x1 y:(r),a
+	case 1115: { // b,x1 y:(r),a
 		unhandled("b,x1 y:(r),a");
 		break;
 		}
-	case 1072: { // b,x1 y:(r+n),a
+	case 1116: { // b,x1 y:(r+n),a
 		unhandled("b,x1 y:(r+n),a");
 		break;
 		}
-	case 1073: { // b,x1 y:-(r),a
+	case 1117: { // b,x1 y:-(r),a
 		unhandled("b,x1 y:-(r),a");
 		break;
 		}
-	case 1074: { // a,x0 y:(r)-n,b
+	case 1118: { // a,x0 y:(r)-n,b
 		unhandled("a,x0 y:(r)-n,b");
 		break;
 		}
-	case 1075: { // a,x0 y:(r)+n,b
+	case 1119: { // a,x0 y:(r)+n,b
 		unhandled("a,x0 y:(r)+n,b");
 		break;
 		}
-	case 1076: { // a,x0 y:(r)-,b
+	case 1120: { // a,x0 y:(r)-,b
 		unhandled("a,x0 y:(r)-,b");
 		break;
 		}
-	case 1077: { // a,x0 y:(r)+,b
+	case 1121: { // a,x0 y:(r)+,b
 		unhandled("a,x0 y:(r)+,b");
 		break;
 		}
-	case 1078: { // a,x0 y:(r),b
+	case 1122: { // a,x0 y:(r),b
 		unhandled("a,x0 y:(r),b");
 		break;
 		}
-	case 1079: { // a,x0 y:(r+n),b
+	case 1123: { // a,x0 y:(r+n),b
 		unhandled("a,x0 y:(r+n),b");
 		break;
 		}
-	case 1080: { // a,x0 y:-(r),b
+	case 1124: { // a,x0 y:-(r),b
 		unhandled("a,x0 y:-(r),b");
 		break;
 		}
-	case 1081: { // a,x1 y:(r)-n,b
+	case 1125: { // a,x1 y:(r)-n,b
 		unhandled("a,x1 y:(r)-n,b");
 		break;
 		}
-	case 1082: { // a,x1 y:(r)+n,b
+	case 1126: { // a,x1 y:(r)+n,b
 		unhandled("a,x1 y:(r)+n,b");
 		break;
 		}
-	case 1083: { // a,x1 y:(r)-,b
+	case 1127: { // a,x1 y:(r)-,b
 		unhandled("a,x1 y:(r)-,b");
 		break;
 		}
-	case 1084: { // a,x1 y:(r)+,b
+	case 1128: { // a,x1 y:(r)+,b
 		unhandled("a,x1 y:(r)+,b");
 		break;
 		}
-	case 1085: { // a,x1 y:(r),b
+	case 1129: { // a,x1 y:(r),b
 		unhandled("a,x1 y:(r),b");
 		break;
 		}
-	case 1086: { // a,x1 y:(r+n),b
+	case 1130: { // a,x1 y:(r+n),b
 		unhandled("a,x1 y:(r+n),b");
 		break;
 		}
-	case 1087: { // a,x1 y:-(r),b
+	case 1131: { // a,x1 y:-(r),b
 		unhandled("a,x1 y:-(r),b");
 		break;
 		}
-	case 1088: { // b,x0 y:(r)-n,b
+	case 1132: { // b,x0 y:(r)-n,b
 		unhandled("b,x0 y:(r)-n,b");
 		break;
 		}
-	case 1089: { // b,x0 y:(r)+n,b
+	case 1133: { // b,x0 y:(r)+n,b
 		unhandled("b,x0 y:(r)+n,b");
 		break;
 		}
-	case 1090: { // b,x0 y:(r)-,b
+	case 1134: { // b,x0 y:(r)-,b
 		unhandled("b,x0 y:(r)-,b");
 		break;
 		}
-	case 1091: { // b,x0 y:(r)+,b
+	case 1135: { // b,x0 y:(r)+,b
 		unhandled("b,x0 y:(r)+,b");
 		break;
 		}
-	case 1092: { // b,x0 y:(r),b
+	case 1136: { // b,x0 y:(r),b
 		unhandled("b,x0 y:(r),b");
 		break;
 		}
-	case 1093: { // b,x0 y:(r+n),b
+	case 1137: { // b,x0 y:(r+n),b
 		unhandled("b,x0 y:(r+n),b");
 		break;
 		}
-	case 1094: { // b,x0 y:-(r),b
+	case 1138: { // b,x0 y:-(r),b
 		unhandled("b,x0 y:-(r),b");
 		break;
 		}
-	case 1095: { // b,x1 y:(r)-n,b
+	case 1139: { // b,x1 y:(r)-n,b
 		unhandled("b,x1 y:(r)-n,b");
 		break;
 		}
-	case 1096: { // b,x1 y:(r)+n,b
+	case 1140: { // b,x1 y:(r)+n,b
 		unhandled("b,x1 y:(r)+n,b");
 		break;
 		}
-	case 1097: { // b,x1 y:(r)-,b
+	case 1141: { // b,x1 y:(r)-,b
 		unhandled("b,x1 y:(r)-,b");
 		break;
 		}
-	case 1098: { // b,x1 y:(r)+,b
+	case 1142: { // b,x1 y:(r)+,b
 		unhandled("b,x1 y:(r)+,b");
 		break;
 		}
-	case 1099: { // b,x1 y:(r),b
+	case 1143: { // b,x1 y:(r),b
 		unhandled("b,x1 y:(r),b");
 		break;
 		}
-	case 1100: { // b,x1 y:(r+n),b
+	case 1144: { // b,x1 y:(r+n),b
 		unhandled("b,x1 y:(r+n),b");
 		break;
 		}
-	case 1101: { // b,x1 y:-(r),b
+	case 1145: { // b,x1 y:-(r),b
 		unhandled("b,x1 y:-(r),b");
 		break;
 		}
-	case 1102: { // a,x0 y0,y:(r)-n
+	case 1146: { // a,x0 y0,y:(r)-n
 		unhandled("a,x0 y0,y:(r)-n");
 		break;
 		}
-	case 1103: { // a,x0 y0,y:(r)+n
+	case 1147: { // a,x0 y0,y:(r)+n
 		unhandled("a,x0 y0,y:(r)+n");
 		break;
 		}
-	case 1104: { // a,x0 y0,y:(r)-
+	case 1148: { // a,x0 y0,y:(r)-
 		unhandled("a,x0 y0,y:(r)-");
 		break;
 		}
-	case 1105: { // a,x0 y0,y:(r)+
+	case 1149: { // a,x0 y0,y:(r)+
 		unhandled("a,x0 y0,y:(r)+");
 		break;
 		}
-	case 1106: { // a,x0 y0,y:(r)
+	case 1150: { // a,x0 y0,y:(r)
 		unhandled("a,x0 y0,y:(r)");
 		break;
 		}
-	case 1107: { // a,x0 y0,y:(r+n)
+	case 1151: { // a,x0 y0,y:(r+n)
 		unhandled("a,x0 y0,y:(r+n)");
 		break;
 		}
-	case 1108: { // a,x0 y0,y:-(r)
+	case 1152: { // a,x0 y0,y:-(r)
 		unhandled("a,x0 y0,y:-(r)");
 		break;
 		}
-	case 1109: { // a,x1 y0,y:(r)-n
+	case 1153: { // a,x1 y0,y:(r)-n
 		unhandled("a,x1 y0,y:(r)-n");
 		break;
 		}
-	case 1110: { // a,x1 y0,y:(r)+n
+	case 1154: { // a,x1 y0,y:(r)+n
 		unhandled("a,x1 y0,y:(r)+n");
 		break;
 		}
-	case 1111: { // a,x1 y0,y:(r)-
+	case 1155: { // a,x1 y0,y:(r)-
 		unhandled("a,x1 y0,y:(r)-");
 		break;
 		}
-	case 1112: { // a,x1 y0,y:(r)+
+	case 1156: { // a,x1 y0,y:(r)+
 		unhandled("a,x1 y0,y:(r)+");
 		break;
 		}
-	case 1113: { // a,x1 y0,y:(r)
+	case 1157: { // a,x1 y0,y:(r)
 		unhandled("a,x1 y0,y:(r)");
 		break;
 		}
-	case 1114: { // a,x1 y0,y:(r+n)
+	case 1158: { // a,x1 y0,y:(r+n)
 		unhandled("a,x1 y0,y:(r+n)");
 		break;
 		}
-	case 1115: { // a,x1 y0,y:-(r)
+	case 1159: { // a,x1 y0,y:-(r)
 		unhandled("a,x1 y0,y:-(r)");
 		break;
 		}
-	case 1116: { // b,x0 y0,y:(r)-n
+	case 1160: { // b,x0 y0,y:(r)-n
 		unhandled("b,x0 y0,y:(r)-n");
 		break;
 		}
-	case 1117: { // b,x0 y0,y:(r)+n
+	case 1161: { // b,x0 y0,y:(r)+n
 		unhandled("b,x0 y0,y:(r)+n");
 		break;
 		}
-	case 1118: { // b,x0 y0,y:(r)-
+	case 1162: { // b,x0 y0,y:(r)-
 		unhandled("b,x0 y0,y:(r)-");
 		break;
 		}
-	case 1119: { // b,x0 y0,y:(r)+
+	case 1163: { // b,x0 y0,y:(r)+
 		unhandled("b,x0 y0,y:(r)+");
 		break;
 		}
-	case 1120: { // b,x0 y0,y:(r)
+	case 1164: { // b,x0 y0,y:(r)
 		unhandled("b,x0 y0,y:(r)");
 		break;
 		}
-	case 1121: { // b,x0 y0,y:(r+n)
+	case 1165: { // b,x0 y0,y:(r+n)
 		unhandled("b,x0 y0,y:(r+n)");
 		break;
 		}
-	case 1122: { // b,x0 y0,y:-(r)
+	case 1166: { // b,x0 y0,y:-(r)
 		unhandled("b,x0 y0,y:-(r)");
 		break;
 		}
-	case 1123: { // b,x1 y0,y:(r)-n
+	case 1167: { // b,x1 y0,y:(r)-n
 		unhandled("b,x1 y0,y:(r)-n");
 		break;
 		}
-	case 1124: { // b,x1 y0,y:(r)+n
+	case 1168: { // b,x1 y0,y:(r)+n
 		unhandled("b,x1 y0,y:(r)+n");
 		break;
 		}
-	case 1125: { // b,x1 y0,y:(r)-
+	case 1169: { // b,x1 y0,y:(r)-
 		unhandled("b,x1 y0,y:(r)-");
 		break;
 		}
-	case 1126: { // b,x1 y0,y:(r)+
+	case 1170: { // b,x1 y0,y:(r)+
 		unhandled("b,x1 y0,y:(r)+");
 		break;
 		}
-	case 1127: { // b,x1 y0,y:(r)
+	case 1171: { // b,x1 y0,y:(r)
 		unhandled("b,x1 y0,y:(r)");
 		break;
 		}
-	case 1128: { // b,x1 y0,y:(r+n)
+	case 1172: { // b,x1 y0,y:(r+n)
 		unhandled("b,x1 y0,y:(r+n)");
 		break;
 		}
-	case 1129: { // b,x1 y0,y:-(r)
+	case 1173: { // b,x1 y0,y:-(r)
 		unhandled("b,x1 y0,y:-(r)");
 		break;
 		}
-	case 1130: { // a,x0 y1,y:(r)-n
+	case 1174: { // a,x0 y1,y:(r)-n
 		unhandled("a,x0 y1,y:(r)-n");
 		break;
 		}
-	case 1131: { // a,x0 y1,y:(r)+n
+	case 1175: { // a,x0 y1,y:(r)+n
 		unhandled("a,x0 y1,y:(r)+n");
 		break;
 		}
-	case 1132: { // a,x0 y1,y:(r)-
+	case 1176: { // a,x0 y1,y:(r)-
 		unhandled("a,x0 y1,y:(r)-");
 		break;
 		}
-	case 1133: { // a,x0 y1,y:(r)+
+	case 1177: { // a,x0 y1,y:(r)+
 		unhandled("a,x0 y1,y:(r)+");
 		break;
 		}
-	case 1134: { // a,x0 y1,y:(r)
+	case 1178: { // a,x0 y1,y:(r)
 		unhandled("a,x0 y1,y:(r)");
 		break;
 		}
-	case 1135: { // a,x0 y1,y:(r+n)
+	case 1179: { // a,x0 y1,y:(r+n)
 		unhandled("a,x0 y1,y:(r+n)");
 		break;
 		}
-	case 1136: { // a,x0 y1,y:-(r)
+	case 1180: { // a,x0 y1,y:-(r)
 		unhandled("a,x0 y1,y:-(r)");
 		break;
 		}
-	case 1137: { // a,x1 y1,y:(r)-n
+	case 1181: { // a,x1 y1,y:(r)-n
 		unhandled("a,x1 y1,y:(r)-n");
 		break;
 		}
-	case 1138: { // a,x1 y1,y:(r)+n
+	case 1182: { // a,x1 y1,y:(r)+n
 		unhandled("a,x1 y1,y:(r)+n");
 		break;
 		}
-	case 1139: { // a,x1 y1,y:(r)-
+	case 1183: { // a,x1 y1,y:(r)-
 		unhandled("a,x1 y1,y:(r)-");
 		break;
 		}
-	case 1140: { // a,x1 y1,y:(r)+
+	case 1184: { // a,x1 y1,y:(r)+
 		unhandled("a,x1 y1,y:(r)+");
 		break;
 		}
-	case 1141: { // a,x1 y1,y:(r)
+	case 1185: { // a,x1 y1,y:(r)
 		unhandled("a,x1 y1,y:(r)");
 		break;
 		}
-	case 1142: { // a,x1 y1,y:(r+n)
+	case 1186: { // a,x1 y1,y:(r+n)
 		unhandled("a,x1 y1,y:(r+n)");
 		break;
 		}
-	case 1143: { // a,x1 y1,y:-(r)
+	case 1187: { // a,x1 y1,y:-(r)
 		unhandled("a,x1 y1,y:-(r)");
 		break;
 		}
-	case 1144: { // b,x0 y1,y:(r)-n
+	case 1188: { // b,x0 y1,y:(r)-n
 		unhandled("b,x0 y1,y:(r)-n");
 		break;
 		}
-	case 1145: { // b,x0 y1,y:(r)+n
+	case 1189: { // b,x0 y1,y:(r)+n
 		unhandled("b,x0 y1,y:(r)+n");
 		break;
 		}
-	case 1146: { // b,x0 y1,y:(r)-
+	case 1190: { // b,x0 y1,y:(r)-
 		unhandled("b,x0 y1,y:(r)-");
 		break;
 		}
-	case 1147: { // b,x0 y1,y:(r)+
+	case 1191: { // b,x0 y1,y:(r)+
 		unhandled("b,x0 y1,y:(r)+");
 		break;
 		}
-	case 1148: { // b,x0 y1,y:(r)
+	case 1192: { // b,x0 y1,y:(r)
 		unhandled("b,x0 y1,y:(r)");
 		break;
 		}
-	case 1149: { // b,x0 y1,y:(r+n)
+	case 1193: { // b,x0 y1,y:(r+n)
 		unhandled("b,x0 y1,y:(r+n)");
 		break;
 		}
-	case 1150: { // b,x0 y1,y:-(r)
+	case 1194: { // b,x0 y1,y:-(r)
 		unhandled("b,x0 y1,y:-(r)");
 		break;
 		}
-	case 1151: { // b,x1 y1,y:(r)-n
+	case 1195: { // b,x1 y1,y:(r)-n
 		unhandled("b,x1 y1,y:(r)-n");
 		break;
 		}
-	case 1152: { // b,x1 y1,y:(r)+n
+	case 1196: { // b,x1 y1,y:(r)+n
 		unhandled("b,x1 y1,y:(r)+n");
 		break;
 		}
-	case 1153: { // b,x1 y1,y:(r)-
+	case 1197: { // b,x1 y1,y:(r)-
 		unhandled("b,x1 y1,y:(r)-");
 		break;
 		}
-	case 1154: { // b,x1 y1,y:(r)+
+	case 1198: { // b,x1 y1,y:(r)+
 		unhandled("b,x1 y1,y:(r)+");
 		break;
 		}
-	case 1155: { // b,x1 y1,y:(r)
+	case 1199: { // b,x1 y1,y:(r)
 		unhandled("b,x1 y1,y:(r)");
 		break;
 		}
-	case 1156: { // b,x1 y1,y:(r+n)
+	case 1200: { // b,x1 y1,y:(r+n)
 		unhandled("b,x1 y1,y:(r+n)");
 		break;
 		}
-	case 1157: { // b,x1 y1,y:-(r)
+	case 1201: { // b,x1 y1,y:-(r)
 		unhandled("b,x1 y1,y:-(r)");
 		break;
 		}
-	case 1158: { // a,x0 a,y:(r)-n
+	case 1202: { // a,x0 a,y:(r)-n
 		unhandled("a,x0 a,y:(r)-n");
 		break;
 		}
-	case 1159: { // a,x0 a,y:(r)+n
+	case 1203: { // a,x0 a,y:(r)+n
 		unhandled("a,x0 a,y:(r)+n");
 		break;
 		}
-	case 1160: { // a,x0 a,y:(r)-
+	case 1204: { // a,x0 a,y:(r)-
 		unhandled("a,x0 a,y:(r)-");
 		break;
 		}
-	case 1161: { // a,x0 a,y:(r)+
+	case 1205: { // a,x0 a,y:(r)+
 		unhandled("a,x0 a,y:(r)+");
 		break;
 		}
-	case 1162: { // a,x0 a,y:(r)
+	case 1206: { // a,x0 a,y:(r)
 		unhandled("a,x0 a,y:(r)");
 		break;
 		}
-	case 1163: { // a,x0 a,y:(r+n)
+	case 1207: { // a,x0 a,y:(r+n)
 		unhandled("a,x0 a,y:(r+n)");
 		break;
 		}
-	case 1164: { // a,x0 a,y:-(r)
+	case 1208: { // a,x0 a,y:-(r)
 		unhandled("a,x0 a,y:-(r)");
 		break;
 		}
-	case 1165: { // a,x1 a,y:(r)-n
+	case 1209: { // a,x1 a,y:(r)-n
 		unhandled("a,x1 a,y:(r)-n");
 		break;
 		}
-	case 1166: { // a,x1 a,y:(r)+n
+	case 1210: { // a,x1 a,y:(r)+n
 		unhandled("a,x1 a,y:(r)+n");
 		break;
 		}
-	case 1167: { // a,x1 a,y:(r)-
+	case 1211: { // a,x1 a,y:(r)-
 		unhandled("a,x1 a,y:(r)-");
 		break;
 		}
-	case 1168: { // a,x1 a,y:(r)+
+	case 1212: { // a,x1 a,y:(r)+
 		unhandled("a,x1 a,y:(r)+");
 		break;
 		}
-	case 1169: { // a,x1 a,y:(r)
+	case 1213: { // a,x1 a,y:(r)
 		unhandled("a,x1 a,y:(r)");
 		break;
 		}
-	case 1170: { // a,x1 a,y:(r+n)
+	case 1214: { // a,x1 a,y:(r+n)
 		unhandled("a,x1 a,y:(r+n)");
 		break;
 		}
-	case 1171: { // a,x1 a,y:-(r)
+	case 1215: { // a,x1 a,y:-(r)
 		unhandled("a,x1 a,y:-(r)");
 		break;
 		}
-	case 1172: { // b,x0 a,y:(r)-n
+	case 1216: { // b,x0 a,y:(r)-n
 		unhandled("b,x0 a,y:(r)-n");
 		break;
 		}
-	case 1173: { // b,x0 a,y:(r)+n
+	case 1217: { // b,x0 a,y:(r)+n
 		unhandled("b,x0 a,y:(r)+n");
 		break;
 		}
-	case 1174: { // b,x0 a,y:(r)-
+	case 1218: { // b,x0 a,y:(r)-
 		unhandled("b,x0 a,y:(r)-");
 		break;
 		}
-	case 1175: { // b,x0 a,y:(r)+
+	case 1219: { // b,x0 a,y:(r)+
 		unhandled("b,x0 a,y:(r)+");
 		break;
 		}
-	case 1176: { // b,x0 a,y:(r)
+	case 1220: { // b,x0 a,y:(r)
 		unhandled("b,x0 a,y:(r)");
 		break;
 		}
-	case 1177: { // b,x0 a,y:(r+n)
+	case 1221: { // b,x0 a,y:(r+n)
 		unhandled("b,x0 a,y:(r+n)");
 		break;
 		}
-	case 1178: { // b,x0 a,y:-(r)
+	case 1222: { // b,x0 a,y:-(r)
 		unhandled("b,x0 a,y:-(r)");
 		break;
 		}
-	case 1179: { // b,x1 a,y:(r)-n
+	case 1223: { // b,x1 a,y:(r)-n
 		unhandled("b,x1 a,y:(r)-n");
 		break;
 		}
-	case 1180: { // b,x1 a,y:(r)+n
+	case 1224: { // b,x1 a,y:(r)+n
 		unhandled("b,x1 a,y:(r)+n");
 		break;
 		}
-	case 1181: { // b,x1 a,y:(r)-
+	case 1225: { // b,x1 a,y:(r)-
 		unhandled("b,x1 a,y:(r)-");
 		break;
 		}
-	case 1182: { // b,x1 a,y:(r)+
+	case 1226: { // b,x1 a,y:(r)+
 		unhandled("b,x1 a,y:(r)+");
 		break;
 		}
-	case 1183: { // b,x1 a,y:(r)
+	case 1227: { // b,x1 a,y:(r)
 		unhandled("b,x1 a,y:(r)");
 		break;
 		}
-	case 1184: { // b,x1 a,y:(r+n)
+	case 1228: { // b,x1 a,y:(r+n)
 		unhandled("b,x1 a,y:(r+n)");
 		break;
 		}
-	case 1185: { // b,x1 a,y:-(r)
+	case 1229: { // b,x1 a,y:-(r)
 		unhandled("b,x1 a,y:-(r)");
 		break;
 		}
-	case 1186: { // a,x0 b,y:(r)-n
+	case 1230: { // a,x0 b,y:(r)-n
 		unhandled("a,x0 b,y:(r)-n");
 		break;
 		}
-	case 1187: { // a,x0 b,y:(r)+n
+	case 1231: { // a,x0 b,y:(r)+n
 		unhandled("a,x0 b,y:(r)+n");
 		break;
 		}
-	case 1188: { // a,x0 b,y:(r)-
+	case 1232: { // a,x0 b,y:(r)-
 		unhandled("a,x0 b,y:(r)-");
 		break;
 		}
-	case 1189: { // a,x0 b,y:(r)+
+	case 1233: { // a,x0 b,y:(r)+
 		unhandled("a,x0 b,y:(r)+");
 		break;
 		}
-	case 1190: { // a,x0 b,y:(r)
+	case 1234: { // a,x0 b,y:(r)
 		unhandled("a,x0 b,y:(r)");
 		break;
 		}
-	case 1191: { // a,x0 b,y:(r+n)
+	case 1235: { // a,x0 b,y:(r+n)
 		unhandled("a,x0 b,y:(r+n)");
 		break;
 		}
-	case 1192: { // a,x0 b,y:-(r)
+	case 1236: { // a,x0 b,y:-(r)
 		unhandled("a,x0 b,y:-(r)");
 		break;
 		}
-	case 1193: { // a,x1 b,y:(r)-n
+	case 1237: { // a,x1 b,y:(r)-n
 		unhandled("a,x1 b,y:(r)-n");
 		break;
 		}
-	case 1194: { // a,x1 b,y:(r)+n
+	case 1238: { // a,x1 b,y:(r)+n
 		unhandled("a,x1 b,y:(r)+n");
 		break;
 		}
-	case 1195: { // a,x1 b,y:(r)-
+	case 1239: { // a,x1 b,y:(r)-
 		unhandled("a,x1 b,y:(r)-");
 		break;
 		}
-	case 1196: { // a,x1 b,y:(r)+
+	case 1240: { // a,x1 b,y:(r)+
 		unhandled("a,x1 b,y:(r)+");
 		break;
 		}
-	case 1197: { // a,x1 b,y:(r)
+	case 1241: { // a,x1 b,y:(r)
 		unhandled("a,x1 b,y:(r)");
 		break;
 		}
-	case 1198: { // a,x1 b,y:(r+n)
+	case 1242: { // a,x1 b,y:(r+n)
 		unhandled("a,x1 b,y:(r+n)");
 		break;
 		}
-	case 1199: { // a,x1 b,y:-(r)
+	case 1243: { // a,x1 b,y:-(r)
 		unhandled("a,x1 b,y:-(r)");
 		break;
 		}
-	case 1200: { // b,x0 b,y:(r)-n
+	case 1244: { // b,x0 b,y:(r)-n
 		unhandled("b,x0 b,y:(r)-n");
 		break;
 		}
-	case 1201: { // b,x0 b,y:(r)+n
+	case 1245: { // b,x0 b,y:(r)+n
 		unhandled("b,x0 b,y:(r)+n");
 		break;
 		}
-	case 1202: { // b,x0 b,y:(r)-
+	case 1246: { // b,x0 b,y:(r)-
 		unhandled("b,x0 b,y:(r)-");
 		break;
 		}
-	case 1203: { // b,x0 b,y:(r)+
+	case 1247: { // b,x0 b,y:(r)+
 		unhandled("b,x0 b,y:(r)+");
 		break;
 		}
-	case 1204: { // b,x0 b,y:(r)
+	case 1248: { // b,x0 b,y:(r)
 		unhandled("b,x0 b,y:(r)");
 		break;
 		}
-	case 1205: { // b,x0 b,y:(r+n)
+	case 1249: { // b,x0 b,y:(r+n)
 		unhandled("b,x0 b,y:(r+n)");
 		break;
 		}
-	case 1206: { // b,x0 b,y:-(r)
+	case 1250: { // b,x0 b,y:-(r)
 		unhandled("b,x0 b,y:-(r)");
 		break;
 		}
-	case 1207: { // b,x1 b,y:(r)-n
+	case 1251: { // b,x1 b,y:(r)-n
 		unhandled("b,x1 b,y:(r)-n");
 		break;
 		}
-	case 1208: { // b,x1 b,y:(r)+n
+	case 1252: { // b,x1 b,y:(r)+n
 		unhandled("b,x1 b,y:(r)+n");
 		break;
 		}
-	case 1209: { // b,x1 b,y:(r)-
+	case 1253: { // b,x1 b,y:(r)-
 		unhandled("b,x1 b,y:(r)-");
 		break;
 		}
-	case 1210: { // b,x1 b,y:(r)+
+	case 1254: { // b,x1 b,y:(r)+
 		unhandled("b,x1 b,y:(r)+");
 		break;
 		}
-	case 1211: { // b,x1 b,y:(r)
+	case 1255: { // b,x1 b,y:(r)
 		unhandled("b,x1 b,y:(r)");
 		break;
 		}
-	case 1212: { // b,x1 b,y:(r+n)
+	case 1256: { // b,x1 b,y:(r+n)
 		unhandled("b,x1 b,y:(r+n)");
 		break;
 		}
-	case 1213: { // b,x1 b,y:-(r)
+	case 1257: { // b,x1 b,y:-(r)
 		unhandled("b,x1 b,y:-(r)");
 		break;
 		}
-	case 1214: { // a,x0 x:[abs],y0
-		unhandled("a,x0 x:[abs],y0");
+	case 1258: { // a,x0 y:[abs],y0
+		unhandled("a,x0 y:[abs],y0");
 		break;
 		}
-	case 1215: { // a,x1 x:[abs],y0
-		unhandled("a,x1 x:[abs],y0");
+	case 1259: { // a,x1 y:[abs],y0
+		unhandled("a,x1 y:[abs],y0");
 		break;
 		}
-	case 1216: { // b,x0 x:[abs],y0
-		unhandled("b,x0 x:[abs],y0");
+	case 1260: { // b,x0 y:[abs],y0
+		unhandled("b,x0 y:[abs],y0");
 		break;
 		}
-	case 1217: { // b,x1 x:[abs],y0
-		unhandled("b,x1 x:[abs],y0");
+	case 1261: { // b,x1 y:[abs],y0
+		unhandled("b,x1 y:[abs],y0");
 		break;
 		}
-	case 1218: { // a,x0 x:[abs],y1
-		unhandled("a,x0 x:[abs],y1");
+	case 1262: { // a,x0 y:[abs],y1
+		unhandled("a,x0 y:[abs],y1");
 		break;
 		}
-	case 1219: { // a,x1 x:[abs],y1
-		unhandled("a,x1 x:[abs],y1");
+	case 1263: { // a,x1 y:[abs],y1
+		unhandled("a,x1 y:[abs],y1");
 		break;
 		}
-	case 1220: { // b,x0 x:[abs],y1
-		unhandled("b,x0 x:[abs],y1");
+	case 1264: { // b,x0 y:[abs],y1
+		unhandled("b,x0 y:[abs],y1");
 		break;
 		}
-	case 1221: { // b,x1 x:[abs],y1
-		unhandled("b,x1 x:[abs],y1");
+	case 1265: { // b,x1 y:[abs],y1
+		unhandled("b,x1 y:[abs],y1");
 		break;
 		}
-	case 1222: { // a,x0 x:[abs],a
-		unhandled("a,x0 x:[abs],a");
+	case 1266: { // a,x0 y:[abs],a
+		unhandled("a,x0 y:[abs],a");
 		break;
 		}
-	case 1223: { // a,x1 x:[abs],a
-		unhandled("a,x1 x:[abs],a");
+	case 1267: { // a,x1 y:[abs],a
+		unhandled("a,x1 y:[abs],a");
 		break;
 		}
-	case 1224: { // b,x0 x:[abs],a
-		unhandled("b,x0 x:[abs],a");
+	case 1268: { // b,x0 y:[abs],a
+		unhandled("b,x0 y:[abs],a");
 		break;
 		}
-	case 1225: { // b,x1 x:[abs],a
-		unhandled("b,x1 x:[abs],a");
+	case 1269: { // b,x1 y:[abs],a
+		unhandled("b,x1 y:[abs],a");
 		break;
 		}
-	case 1226: { // a,x0 x:[abs],b
-		unhandled("a,x0 x:[abs],b");
+	case 1270: { // a,x0 y:[abs],b
+		unhandled("a,x0 y:[abs],b");
 		break;
 		}
-	case 1227: { // a,x1 x:[abs],b
-		unhandled("a,x1 x:[abs],b");
+	case 1271: { // a,x1 y:[abs],b
+		unhandled("a,x1 y:[abs],b");
 		break;
 		}
-	case 1228: { // b,x0 x:[abs],b
-		unhandled("b,x0 x:[abs],b");
+	case 1272: { // b,x0 y:[abs],b
+		unhandled("b,x0 y:[abs],b");
 		break;
 		}
-	case 1229: { // b,x1 x:[abs],b
-		unhandled("b,x1 x:[abs],b");
+	case 1273: { // b,x1 y:[abs],b
+		unhandled("b,x1 y:[abs],b");
 		break;
 		}
-	case 1230: { // a,x0 x:#[i],y0
-		unhandled("a,x0 x:#[i],y0");
+	case 1274: { // a,x0 #[i],y0
+		unhandled("a,x0 #[i],y0");
 		break;
 		}
-	case 1231: { // a,x1 x:#[i],y0
-		unhandled("a,x1 x:#[i],y0");
+	case 1275: { // a,x1 #[i],y0
+		unhandled("a,x1 #[i],y0");
 		break;
 		}
-	case 1232: { // b,x0 x:#[i],y0
-		unhandled("b,x0 x:#[i],y0");
+	case 1276: { // b,x0 #[i],y0
+		unhandled("b,x0 #[i],y0");
 		break;
 		}
-	case 1233: { // b,x1 x:#[i],y0
-		unhandled("b,x1 x:#[i],y0");
+	case 1277: { // b,x1 #[i],y0
+		unhandled("b,x1 #[i],y0");
 		break;
 		}
-	case 1234: { // a,x0 x:#[i],y1
-		unhandled("a,x0 x:#[i],y1");
+	case 1278: { // a,x0 #[i],y1
+		unhandled("a,x0 #[i],y1");
 		break;
 		}
-	case 1235: { // a,x1 x:#[i],y1
-		unhandled("a,x1 x:#[i],y1");
+	case 1279: { // a,x1 #[i],y1
+		unhandled("a,x1 #[i],y1");
 		break;
 		}
-	case 1236: { // b,x0 x:#[i],y1
-		unhandled("b,x0 x:#[i],y1");
+	case 1280: { // b,x0 #[i],y1
+		unhandled("b,x0 #[i],y1");
 		break;
 		}
-	case 1237: { // b,x1 x:#[i],y1
-		unhandled("b,x1 x:#[i],y1");
+	case 1281: { // b,x1 #[i],y1
+		unhandled("b,x1 #[i],y1");
 		break;
 		}
-	case 1238: { // a,x0 x:#[i],a
-		unhandled("a,x0 x:#[i],a");
+	case 1282: { // a,x0 #[i],a
+		unhandled("a,x0 #[i],a");
 		break;
 		}
-	case 1239: { // a,x1 x:#[i],a
-		unhandled("a,x1 x:#[i],a");
+	case 1283: { // a,x1 #[i],a
+		unhandled("a,x1 #[i],a");
 		break;
 		}
-	case 1240: { // b,x0 x:#[i],a
-		unhandled("b,x0 x:#[i],a");
+	case 1284: { // b,x0 #[i],a
+		unhandled("b,x0 #[i],a");
 		break;
 		}
-	case 1241: { // b,x1 x:#[i],a
-		unhandled("b,x1 x:#[i],a");
+	case 1285: { // b,x1 #[i],a
+		unhandled("b,x1 #[i],a");
 		break;
 		}
-	case 1242: { // a,x0 x:#[i],b
-		unhandled("a,x0 x:#[i],b");
+	case 1286: { // a,x0 #[i],b
+		unhandled("a,x0 #[i],b");
 		break;
 		}
-	case 1243: { // a,x1 x:#[i],b
-		unhandled("a,x1 x:#[i],b");
+	case 1287: { // a,x1 #[i],b
+		unhandled("a,x1 #[i],b");
 		break;
 		}
-	case 1244: { // b,x0 x:#[i],b
-		unhandled("b,x0 x:#[i],b");
+	case 1288: { // b,x0 #[i],b
+		unhandled("b,x0 #[i],b");
 		break;
 		}
-	case 1245: { // b,x1 x:#[i],b
-		unhandled("b,x1 x:#[i],b");
+	case 1289: { // b,x1 #[i],b
+		unhandled("b,x1 #[i],b");
 		break;
 		}
-	case 1246: { // a,y:(r)-n y0,a
+	case 1290: { // a,x0 y0,y:[abs]
+		unhandled("a,x0 y0,y:[abs]");
+		break;
+		}
+	case 1291: { // a,x1 y0,y:[abs]
+		unhandled("a,x1 y0,y:[abs]");
+		break;
+		}
+	case 1292: { // b,x0 y0,y:[abs]
+		unhandled("b,x0 y0,y:[abs]");
+		break;
+		}
+	case 1293: { // b,x1 y0,y:[abs]
+		unhandled("b,x1 y0,y:[abs]");
+		break;
+		}
+	case 1294: { // a,x0 y1,y:[abs]
+		unhandled("a,x0 y1,y:[abs]");
+		break;
+		}
+	case 1295: { // a,x1 y1,y:[abs]
+		unhandled("a,x1 y1,y:[abs]");
+		break;
+		}
+	case 1296: { // b,x0 y1,y:[abs]
+		unhandled("b,x0 y1,y:[abs]");
+		break;
+		}
+	case 1297: { // b,x1 y1,y:[abs]
+		unhandled("b,x1 y1,y:[abs]");
+		break;
+		}
+	case 1298: { // a,x0 a,y:[abs]
+		unhandled("a,x0 a,y:[abs]");
+		break;
+		}
+	case 1299: { // a,x1 a,y:[abs]
+		unhandled("a,x1 a,y:[abs]");
+		break;
+		}
+	case 1300: { // b,x0 a,y:[abs]
+		unhandled("b,x0 a,y:[abs]");
+		break;
+		}
+	case 1301: { // b,x1 a,y:[abs]
+		unhandled("b,x1 a,y:[abs]");
+		break;
+		}
+	case 1302: { // a,x0 b,y:[abs]
+		unhandled("a,x0 b,y:[abs]");
+		break;
+		}
+	case 1303: { // a,x1 b,y:[abs]
+		unhandled("a,x1 b,y:[abs]");
+		break;
+		}
+	case 1304: { // b,x0 b,y:[abs]
+		unhandled("b,x0 b,y:[abs]");
+		break;
+		}
+	case 1305: { // b,x1 b,y:[abs]
+		unhandled("b,x1 b,y:[abs]");
+		break;
+		}
+	case 1306: { // a,y:(r)-n y0,a
 		unhandled("a,y:(r)-n y0,a");
 		break;
 		}
-	case 1247: { // a,y:(r)+n y0,a
+	case 1307: { // a,y:(r)+n y0,a
 		unhandled("a,y:(r)+n y0,a");
 		break;
 		}
-	case 1248: { // a,y:(r)- y0,a
+	case 1308: { // a,y:(r)- y0,a
 		unhandled("a,y:(r)- y0,a");
 		break;
 		}
-	case 1249: { // a,y:(r)+ y0,a
+	case 1309: { // a,y:(r)+ y0,a
 		unhandled("a,y:(r)+ y0,a");
 		break;
 		}
-	case 1250: { // a,y:(r) y0,a
+	case 1310: { // a,y:(r) y0,a
 		unhandled("a,y:(r) y0,a");
 		break;
 		}
-	case 1251: { // a,y:(r+n) y0,a
+	case 1311: { // a,y:(r+n) y0,a
 		unhandled("a,y:(r+n) y0,a");
 		break;
 		}
-	case 1252: { // a,y:-(r) y0,a
+	case 1312: { // a,y:-(r) y0,a
 		unhandled("a,y:-(r) y0,a");
 		break;
 		}
-	case 1253: { // b,y:(r)-n y0,b
+	case 1313: { // b,y:(r)-n y0,b
 		unhandled("b,y:(r)-n y0,b");
 		break;
 		}
-	case 1254: { // b,y:(r)+n y0,b
+	case 1314: { // b,y:(r)+n y0,b
 		unhandled("b,y:(r)+n y0,b");
 		break;
 		}
-	case 1255: { // b,y:(r)- y0,b
+	case 1315: { // b,y:(r)- y0,b
 		unhandled("b,y:(r)- y0,b");
 		break;
 		}
-	case 1256: { // b,y:(r)+ y0,b
+	case 1316: { // b,y:(r)+ y0,b
 		unhandled("b,y:(r)+ y0,b");
 		break;
 		}
-	case 1257: { // b,y:(r) y0,b
+	case 1317: { // b,y:(r) y0,b
 		unhandled("b,y:(r) y0,b");
 		break;
 		}
-	case 1258: { // b,y:(r+n) y0,b
+	case 1318: { // b,y:(r+n) y0,b
 		unhandled("b,y:(r+n) y0,b");
 		break;
 		}
-	case 1259: { // b,y:-(r) y0,b
+	case 1319: { // b,y:-(r) y0,b
 		unhandled("b,y:-(r) y0,b");
 		break;
 		}
-	case 1260: { // l:(r)-n,a10
+	case 1320: { // l:(r)-n,a10
 		unhandled("l:(r)-n,a10");
 		break;
 		}
-	case 1261: { // l:(r)+n,a10
+	case 1321: { // l:(r)+n,a10
 		unhandled("l:(r)+n,a10");
 		break;
 		}
-	case 1262: { // l:(r)-,a10
+	case 1322: { // l:(r)-,a10
 		unhandled("l:(r)-,a10");
 		break;
 		}
-	case 1263: { // l:(r)+,a10
+	case 1323: { // l:(r)+,a10
 		unhandled("l:(r)+,a10");
 		break;
 		}
-	case 1264: { // l:(r),a10
+	case 1324: { // l:(r),a10
 		unhandled("l:(r),a10");
 		break;
 		}
-	case 1265: { // l:(r+n),a10
+	case 1325: { // l:(r+n),a10
 		unhandled("l:(r+n),a10");
 		break;
 		}
-	case 1266: { // l:-(r),a10
+	case 1326: { // l:-(r),a10
 		unhandled("l:-(r),a10");
 		break;
 		}
-	case 1267: { // l:(r)-n,b10
+	case 1327: { // l:(r)-n,b10
 		unhandled("l:(r)-n,b10");
 		break;
 		}
-	case 1268: { // l:(r)+n,b10
+	case 1328: { // l:(r)+n,b10
 		unhandled("l:(r)+n,b10");
 		break;
 		}
-	case 1269: { // l:(r)-,b10
+	case 1329: { // l:(r)-,b10
 		unhandled("l:(r)-,b10");
 		break;
 		}
-	case 1270: { // l:(r)+,b10
+	case 1330: { // l:(r)+,b10
 		unhandled("l:(r)+,b10");
 		break;
 		}
-	case 1271: { // l:(r),b10
+	case 1331: { // l:(r),b10
 		unhandled("l:(r),b10");
 		break;
 		}
-	case 1272: { // l:(r+n),b10
+	case 1332: { // l:(r+n),b10
 		unhandled("l:(r+n),b10");
 		break;
 		}
-	case 1273: { // l:-(r),b10
+	case 1333: { // l:-(r),b10
 		unhandled("l:-(r),b10");
 		break;
 		}
-	case 1274: { // l:(r)-n,x
+	case 1334: { // l:(r)-n,x
 		unhandled("l:(r)-n,x");
 		break;
 		}
-	case 1275: { // l:(r)+n,x
+	case 1335: { // l:(r)+n,x
 		unhandled("l:(r)+n,x");
 		break;
 		}
-	case 1276: { // l:(r)-,x
+	case 1336: { // l:(r)-,x
 		unhandled("l:(r)-,x");
 		break;
 		}
-	case 1277: { // l:(r)+,x
+	case 1337: { // l:(r)+,x
 		unhandled("l:(r)+,x");
 		break;
 		}
-	case 1278: { // l:(r),x
+	case 1338: { // l:(r),x
 		unhandled("l:(r),x");
 		break;
 		}
-	case 1279: { // l:(r+n),x
+	case 1339: { // l:(r+n),x
 		unhandled("l:(r+n),x");
 		break;
 		}
-	case 1280: { // l:-(r),x
+	case 1340: { // l:-(r),x
 		unhandled("l:-(r),x");
 		break;
 		}
-	case 1281: { // l:(r)-n,y
+	case 1341: { // l:(r)-n,y
 		unhandled("l:(r)-n,y");
 		break;
 		}
-	case 1282: { // l:(r)+n,y
+	case 1342: { // l:(r)+n,y
 		unhandled("l:(r)+n,y");
 		break;
 		}
-	case 1283: { // l:(r)-,y
+	case 1343: { // l:(r)-,y
 		unhandled("l:(r)-,y");
 		break;
 		}
-	case 1284: { // l:(r)+,y
+	case 1344: { // l:(r)+,y
 		unhandled("l:(r)+,y");
 		break;
 		}
-	case 1285: { // l:(r),y
+	case 1345: { // l:(r),y
 		unhandled("l:(r),y");
 		break;
 		}
-	case 1286: { // l:(r+n),y
+	case 1346: { // l:(r+n),y
 		unhandled("l:(r+n),y");
 		break;
 		}
-	case 1287: { // l:-(r),y
+	case 1347: { // l:-(r),y
 		unhandled("l:-(r),y");
 		break;
 		}
-	case 1288: { // l:(r)-n,a
+	case 1348: { // l:(r)-n,a
 		unhandled("l:(r)-n,a");
 		break;
 		}
-	case 1289: { // l:(r)+n,a
+	case 1349: { // l:(r)+n,a
 		unhandled("l:(r)+n,a");
 		break;
 		}
-	case 1290: { // l:(r)-,a
+	case 1350: { // l:(r)-,a
 		unhandled("l:(r)-,a");
 		break;
 		}
-	case 1291: { // l:(r)+,a
+	case 1351: { // l:(r)+,a
 		unhandled("l:(r)+,a");
 		break;
 		}
-	case 1292: { // l:(r),a
+	case 1352: { // l:(r),a
 		unhandled("l:(r),a");
 		break;
 		}
-	case 1293: { // l:(r+n),a
+	case 1353: { // l:(r+n),a
 		unhandled("l:(r+n),a");
 		break;
 		}
-	case 1294: { // l:-(r),a
+	case 1354: { // l:-(r),a
 		unhandled("l:-(r),a");
 		break;
 		}
-	case 1295: { // l:(r)-n,b
+	case 1355: { // l:(r)-n,b
 		unhandled("l:(r)-n,b");
 		break;
 		}
-	case 1296: { // l:(r)+n,b
+	case 1356: { // l:(r)+n,b
 		unhandled("l:(r)+n,b");
 		break;
 		}
-	case 1297: { // l:(r)-,b
+	case 1357: { // l:(r)-,b
 		unhandled("l:(r)-,b");
 		break;
 		}
-	case 1298: { // l:(r)+,b
+	case 1358: { // l:(r)+,b
 		unhandled("l:(r)+,b");
 		break;
 		}
-	case 1299: { // l:(r),b
+	case 1359: { // l:(r),b
 		unhandled("l:(r),b");
 		break;
 		}
-	case 1300: { // l:(r+n),b
+	case 1360: { // l:(r+n),b
 		unhandled("l:(r+n),b");
 		break;
 		}
-	case 1301: { // l:-(r),b
+	case 1361: { // l:-(r),b
 		unhandled("l:-(r),b");
 		break;
 		}
-	case 1302: { // l:(r)-n,ab
+	case 1362: { // l:(r)-n,ab
 		unhandled("l:(r)-n,ab");
 		break;
 		}
-	case 1303: { // l:(r)+n,ab
+	case 1363: { // l:(r)+n,ab
 		unhandled("l:(r)+n,ab");
 		break;
 		}
-	case 1304: { // l:(r)-,ab
+	case 1364: { // l:(r)-,ab
 		unhandled("l:(r)-,ab");
 		break;
 		}
-	case 1305: { // l:(r)+,ab
+	case 1365: { // l:(r)+,ab
 		unhandled("l:(r)+,ab");
 		break;
 		}
-	case 1306: { // l:(r),ab
+	case 1366: { // l:(r),ab
 		unhandled("l:(r),ab");
 		break;
 		}
-	case 1307: { // l:(r+n),ab
+	case 1367: { // l:(r+n),ab
 		unhandled("l:(r+n),ab");
 		break;
 		}
-	case 1308: { // l:-(r),ab
+	case 1368: { // l:-(r),ab
 		unhandled("l:-(r),ab");
 		break;
 		}
-	case 1309: { // l:(r)-n,ba
+	case 1369: { // l:(r)-n,ba
 		unhandled("l:(r)-n,ba");
 		break;
 		}
-	case 1310: { // l:(r)+n,ba
+	case 1370: { // l:(r)+n,ba
 		unhandled("l:(r)+n,ba");
 		break;
 		}
-	case 1311: { // l:(r)-,ba
+	case 1371: { // l:(r)-,ba
 		unhandled("l:(r)-,ba");
 		break;
 		}
-	case 1312: { // l:(r)+,ba
+	case 1372: { // l:(r)+,ba
 		unhandled("l:(r)+,ba");
 		break;
 		}
-	case 1313: { // l:(r),ba
+	case 1373: { // l:(r),ba
 		unhandled("l:(r),ba");
 		break;
 		}
-	case 1314: { // l:(r+n),ba
+	case 1374: { // l:(r+n),ba
 		unhandled("l:(r+n),ba");
 		break;
 		}
-	case 1315: { // l:-(r),ba
+	case 1375: { // l:-(r),ba
 		unhandled("l:-(r),ba");
 		break;
 		}
-	case 1316: { // l:[abs],a10
+	case 1376: { // l:[abs],a10
 		unhandled("l:[abs],a10");
 		break;
 		}
-	case 1317: { // l:[abs],b10
+	case 1377: { // l:[abs],b10
 		unhandled("l:[abs],b10");
 		break;
 		}
-	case 1318: { // l:[abs],x
+	case 1378: { // l:[abs],x
 		unhandled("l:[abs],x");
 		break;
 		}
-	case 1319: { // l:[abs],y
+	case 1379: { // l:[abs],y
 		unhandled("l:[abs],y");
 		break;
 		}
-	case 1320: { // l:[abs],a
+	case 1380: { // l:[abs],a
 		unhandled("l:[abs],a");
 		break;
 		}
-	case 1321: { // l:[abs],b
+	case 1381: { // l:[abs],b
 		unhandled("l:[abs],b");
 		break;
 		}
-	case 1322: { // l:[abs],ab
+	case 1382: { // l:[abs],ab
 		unhandled("l:[abs],ab");
 		break;
 		}
-	case 1323: { // l:[abs],ba
+	case 1383: { // l:[abs],ba
 		unhandled("l:[abs],ba");
 		break;
 		}
-	case 1324: { // l:[aa],a10
+	case 1384: { // l:[aa],a10
 		unhandled("l:[aa],a10");
 		break;
 		}
-	case 1325: { // l:[aa],b10
+	case 1385: { // l:[aa],b10
 		unhandled("l:[aa],b10");
 		break;
 		}
-	case 1326: { // l:[aa],x
+	case 1386: { // l:[aa],x
 		unhandled("l:[aa],x");
 		break;
 		}
-	case 1327: { // l:[aa],y
+	case 1387: { // l:[aa],y
 		unhandled("l:[aa],y");
 		break;
 		}
-	case 1328: { // l:[aa],a
+	case 1388: { // l:[aa],a
 		unhandled("l:[aa],a");
 		break;
 		}
-	case 1329: { // l:[aa],b
+	case 1389: { // l:[aa],b
 		unhandled("l:[aa],b");
 		break;
 		}
-	case 1330: { // l:[aa],ab
+	case 1390: { // l:[aa],ab
 		unhandled("l:[aa],ab");
 		break;
 		}
-	case 1331: { // l:[aa],ba
+	case 1391: { // l:[aa],ba
 		unhandled("l:[aa],ba");
 		break;
 		}
-	case 1332: { // a10,l:(r)-n
+	case 1392: { // a10,l:(r)-n
 		unhandled("a10,l:(r)-n");
 		break;
 		}
-	case 1333: { // a10,l:(r)+n
+	case 1393: { // a10,l:(r)+n
 		unhandled("a10,l:(r)+n");
 		break;
 		}
-	case 1334: { // a10,l:(r)-
+	case 1394: { // a10,l:(r)-
 		unhandled("a10,l:(r)-");
 		break;
 		}
-	case 1335: { // a10,l:(r)+
+	case 1395: { // a10,l:(r)+
 		unhandled("a10,l:(r)+");
 		break;
 		}
-	case 1336: { // a10,l:(r)
+	case 1396: { // a10,l:(r)
 		unhandled("a10,l:(r)");
 		break;
 		}
-	case 1337: { // a10,l:(r+n)
+	case 1397: { // a10,l:(r+n)
 		unhandled("a10,l:(r+n)");
 		break;
 		}
-	case 1338: { // a10,l:-(r)
+	case 1398: { // a10,l:-(r)
 		unhandled("a10,l:-(r)");
 		break;
 		}
-	case 1339: { // b10,l:(r)-n
+	case 1399: { // b10,l:(r)-n
 		unhandled("b10,l:(r)-n");
 		break;
 		}
-	case 1340: { // b10,l:(r)+n
+	case 1400: { // b10,l:(r)+n
 		unhandled("b10,l:(r)+n");
 		break;
 		}
-	case 1341: { // b10,l:(r)-
+	case 1401: { // b10,l:(r)-
 		unhandled("b10,l:(r)-");
 		break;
 		}
-	case 1342: { // b10,l:(r)+
+	case 1402: { // b10,l:(r)+
 		unhandled("b10,l:(r)+");
 		break;
 		}
-	case 1343: { // b10,l:(r)
+	case 1403: { // b10,l:(r)
 		unhandled("b10,l:(r)");
 		break;
 		}
-	case 1344: { // b10,l:(r+n)
+	case 1404: { // b10,l:(r+n)
 		unhandled("b10,l:(r+n)");
 		break;
 		}
-	case 1345: { // b10,l:-(r)
+	case 1405: { // b10,l:-(r)
 		unhandled("b10,l:-(r)");
 		break;
 		}
-	case 1346: { // x,l:(r)-n
+	case 1406: { // x,l:(r)-n
 		unhandled("x,l:(r)-n");
 		break;
 		}
-	case 1347: { // x,l:(r)+n
+	case 1407: { // x,l:(r)+n
 		unhandled("x,l:(r)+n");
 		break;
 		}
-	case 1348: { // x,l:(r)-
+	case 1408: { // x,l:(r)-
 		unhandled("x,l:(r)-");
 		break;
 		}
-	case 1349: { // x,l:(r)+
+	case 1409: { // x,l:(r)+
 		unhandled("x,l:(r)+");
 		break;
 		}
-	case 1350: { // x,l:(r)
+	case 1410: { // x,l:(r)
 		unhandled("x,l:(r)");
 		break;
 		}
-	case 1351: { // x,l:(r+n)
+	case 1411: { // x,l:(r+n)
 		unhandled("x,l:(r+n)");
 		break;
 		}
-	case 1352: { // x,l:-(r)
+	case 1412: { // x,l:-(r)
 		unhandled("x,l:-(r)");
 		break;
 		}
-	case 1353: { // y,l:(r)-n
+	case 1413: { // y,l:(r)-n
 		unhandled("y,l:(r)-n");
 		break;
 		}
-	case 1354: { // y,l:(r)+n
+	case 1414: { // y,l:(r)+n
 		unhandled("y,l:(r)+n");
 		break;
 		}
-	case 1355: { // y,l:(r)-
+	case 1415: { // y,l:(r)-
 		unhandled("y,l:(r)-");
 		break;
 		}
-	case 1356: { // y,l:(r)+
+	case 1416: { // y,l:(r)+
 		unhandled("y,l:(r)+");
 		break;
 		}
-	case 1357: { // y,l:(r)
+	case 1417: { // y,l:(r)
 		unhandled("y,l:(r)");
 		break;
 		}
-	case 1358: { // y,l:(r+n)
+	case 1418: { // y,l:(r+n)
 		unhandled("y,l:(r+n)");
 		break;
 		}
-	case 1359: { // y,l:-(r)
+	case 1419: { // y,l:-(r)
 		unhandled("y,l:-(r)");
 		break;
 		}
-	case 1360: { // a,l:(r)-n
+	case 1420: { // a,l:(r)-n
 		unhandled("a,l:(r)-n");
 		break;
 		}
-	case 1361: { // a,l:(r)+n
+	case 1421: { // a,l:(r)+n
 		unhandled("a,l:(r)+n");
 		break;
 		}
-	case 1362: { // a,l:(r)-
+	case 1422: { // a,l:(r)-
 		unhandled("a,l:(r)-");
 		break;
 		}
-	case 1363: { // a,l:(r)+
+	case 1423: { // a,l:(r)+
 		unhandled("a,l:(r)+");
 		break;
 		}
-	case 1364: { // a,l:(r)
+	case 1424: { // a,l:(r)
 		unhandled("a,l:(r)");
 		break;
 		}
-	case 1365: { // a,l:(r+n)
+	case 1425: { // a,l:(r+n)
 		unhandled("a,l:(r+n)");
 		break;
 		}
-	case 1366: { // a,l:-(r)
+	case 1426: { // a,l:-(r)
 		unhandled("a,l:-(r)");
 		break;
 		}
-	case 1367: { // b,l:(r)-n
+	case 1427: { // b,l:(r)-n
 		unhandled("b,l:(r)-n");
 		break;
 		}
-	case 1368: { // b,l:(r)+n
+	case 1428: { // b,l:(r)+n
 		unhandled("b,l:(r)+n");
 		break;
 		}
-	case 1369: { // b,l:(r)-
+	case 1429: { // b,l:(r)-
 		unhandled("b,l:(r)-");
 		break;
 		}
-	case 1370: { // b,l:(r)+
+	case 1430: { // b,l:(r)+
 		unhandled("b,l:(r)+");
 		break;
 		}
-	case 1371: { // b,l:(r)
+	case 1431: { // b,l:(r)
 		unhandled("b,l:(r)");
 		break;
 		}
-	case 1372: { // b,l:(r+n)
+	case 1432: { // b,l:(r+n)
 		unhandled("b,l:(r+n)");
 		break;
 		}
-	case 1373: { // b,l:-(r)
+	case 1433: { // b,l:-(r)
 		unhandled("b,l:-(r)");
 		break;
 		}
-	case 1374: { // ab,l:(r)-n
+	case 1434: { // ab,l:(r)-n
 		unhandled("ab,l:(r)-n");
 		break;
 		}
-	case 1375: { // ab,l:(r)+n
+	case 1435: { // ab,l:(r)+n
 		unhandled("ab,l:(r)+n");
 		break;
 		}
-	case 1376: { // ab,l:(r)-
+	case 1436: { // ab,l:(r)-
 		unhandled("ab,l:(r)-");
 		break;
 		}
-	case 1377: { // ab,l:(r)+
+	case 1437: { // ab,l:(r)+
 		unhandled("ab,l:(r)+");
 		break;
 		}
-	case 1378: { // ab,l:(r)
+	case 1438: { // ab,l:(r)
 		unhandled("ab,l:(r)");
 		break;
 		}
-	case 1379: { // ab,l:(r+n)
+	case 1439: { // ab,l:(r+n)
 		unhandled("ab,l:(r+n)");
 		break;
 		}
-	case 1380: { // ab,l:-(r)
+	case 1440: { // ab,l:-(r)
 		unhandled("ab,l:-(r)");
 		break;
 		}
-	case 1381: { // ba,l:(r)-n
+	case 1441: { // ba,l:(r)-n
 		unhandled("ba,l:(r)-n");
 		break;
 		}
-	case 1382: { // ba,l:(r)+n
+	case 1442: { // ba,l:(r)+n
 		unhandled("ba,l:(r)+n");
 		break;
 		}
-	case 1383: { // ba,l:(r)-
+	case 1443: { // ba,l:(r)-
 		unhandled("ba,l:(r)-");
 		break;
 		}
-	case 1384: { // ba,l:(r)+
+	case 1444: { // ba,l:(r)+
 		unhandled("ba,l:(r)+");
 		break;
 		}
-	case 1385: { // ba,l:(r)
+	case 1445: { // ba,l:(r)
 		unhandled("ba,l:(r)");
 		break;
 		}
-	case 1386: { // ba,l:(r+n)
+	case 1446: { // ba,l:(r+n)
 		unhandled("ba,l:(r+n)");
 		break;
 		}
-	case 1387: { // ba,l:-(r)
+	case 1447: { // ba,l:-(r)
 		unhandled("ba,l:-(r)");
 		break;
 		}
-	case 1388: { // a10,l:[aa]
+	case 1448: { // a10,l:[abs]
+		unhandled("a10,l:[abs]");
+		break;
+		}
+	case 1449: { // b10,l:[abs]
+		unhandled("b10,l:[abs]");
+		break;
+		}
+	case 1450: { // x,l:[abs]
+		unhandled("x,l:[abs]");
+		break;
+		}
+	case 1451: { // y,l:[abs]
+		unhandled("y,l:[abs]");
+		break;
+		}
+	case 1452: { // a,l:[abs]
+		unhandled("a,l:[abs]");
+		break;
+		}
+	case 1453: { // b,l:[abs]
+		unhandled("b,l:[abs]");
+		break;
+		}
+	case 1454: { // ab,l:[abs]
+		unhandled("ab,l:[abs]");
+		break;
+		}
+	case 1455: { // ba,l:[abs]
+		unhandled("ba,l:[abs]");
+		break;
+		}
+	case 1456: { // a10,l:[aa]
 		unhandled("a10,l:[aa]");
 		break;
 		}
-	case 1389: { // b10,l:[aa]
+	case 1457: { // b10,l:[aa]
 		unhandled("b10,l:[aa]");
 		break;
 		}
-	case 1390: { // x,l:[aa]
+	case 1458: { // x,l:[aa]
 		unhandled("x,l:[aa]");
 		break;
 		}
-	case 1391: { // y,l:[aa]
+	case 1459: { // y,l:[aa]
 		unhandled("y,l:[aa]");
 		break;
 		}
-	case 1392: { // a,l:[aa]
+	case 1460: { // a,l:[aa]
 		unhandled("a,l:[aa]");
 		break;
 		}
-	case 1393: { // b,l:[aa]
+	case 1461: { // b,l:[aa]
 		unhandled("b,l:[aa]");
 		break;
 		}
-	case 1394: { // ab,l:[aa]
+	case 1462: { // ab,l:[aa]
 		unhandled("ab,l:[aa]");
 		break;
 		}
-	case 1395: { // ba,l:[aa]
+	case 1463: { // ba,l:[aa]
 		unhandled("ba,l:[aa]");
 		break;
 		}
-	case 1396: { // x:(r)+n,x0 y:(rh)+n,y0
+	case 1464: { // x:(r)+n,x0 y:(rh)+n,y0
 		unhandled("x:(r)+n,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1397: { // x:(r)+n,x0 y:(rh)+n,y1
+	case 1465: { // x:(r)+n,x0 y:(rh)+n,y1
 		unhandled("x:(r)+n,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1398: { // x:(r)+n,x0 y:(rh)+n,a
+	case 1466: { // x:(r)+n,x0 y:(rh)+n,a
 		unhandled("x:(r)+n,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1399: { // x:(r)+n,x0 y:(rh)+n,b
+	case 1467: { // x:(r)+n,x0 y:(rh)+n,b
 		unhandled("x:(r)+n,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1400: { // x:(r)+n,x1 y:(rh)+n,y0
+	case 1468: { // x:(r)+n,x1 y:(rh)+n,y0
 		unhandled("x:(r)+n,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1401: { // x:(r)+n,x1 y:(rh)+n,y1
+	case 1469: { // x:(r)+n,x1 y:(rh)+n,y1
 		unhandled("x:(r)+n,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1402: { // x:(r)+n,x1 y:(rh)+n,a
+	case 1470: { // x:(r)+n,x1 y:(rh)+n,a
 		unhandled("x:(r)+n,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1403: { // x:(r)+n,x1 y:(rh)+n,b
+	case 1471: { // x:(r)+n,x1 y:(rh)+n,b
 		unhandled("x:(r)+n,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1404: { // x:(r)+n,a y:(rh)+n,y0
+	case 1472: { // x:(r)+n,a y:(rh)+n,y0
 		unhandled("x:(r)+n,a y:(rh)+n,y0");
 		break;
 		}
-	case 1405: { // x:(r)+n,a y:(rh)+n,y1
+	case 1473: { // x:(r)+n,a y:(rh)+n,y1
 		unhandled("x:(r)+n,a y:(rh)+n,y1");
 		break;
 		}
-	case 1406: { // x:(r)+n,a y:(rh)+n,a
+	case 1474: { // x:(r)+n,a y:(rh)+n,a
 		unhandled("x:(r)+n,a y:(rh)+n,a");
 		break;
 		}
-	case 1407: { // x:(r)+n,a y:(rh)+n,b
+	case 1475: { // x:(r)+n,a y:(rh)+n,b
 		unhandled("x:(r)+n,a y:(rh)+n,b");
 		break;
 		}
-	case 1408: { // x:(r)+n,b y:(rh)+n,y0
+	case 1476: { // x:(r)+n,b y:(rh)+n,y0
 		unhandled("x:(r)+n,b y:(rh)+n,y0");
 		break;
 		}
-	case 1409: { // x:(r)+n,b y:(rh)+n,y1
+	case 1477: { // x:(r)+n,b y:(rh)+n,y1
 		unhandled("x:(r)+n,b y:(rh)+n,y1");
 		break;
 		}
-	case 1410: { // x:(r)+n,b y:(rh)+n,a
+	case 1478: { // x:(r)+n,b y:(rh)+n,a
 		unhandled("x:(r)+n,b y:(rh)+n,a");
 		break;
 		}
-	case 1411: { // x:(r)+n,b y:(rh)+n,b
+	case 1479: { // x:(r)+n,b y:(rh)+n,b
 		unhandled("x:(r)+n,b y:(rh)+n,b");
 		break;
 		}
-	case 1412: { // x:(r)+n,x0 y:(rh)-,y0
+	case 1480: { // x:(r)+n,x0 y:(rh)-,y0
 		unhandled("x:(r)+n,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1413: { // x:(r)+n,x0 y:(rh)-,y1
+	case 1481: { // x:(r)+n,x0 y:(rh)-,y1
 		unhandled("x:(r)+n,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1414: { // x:(r)+n,x0 y:(rh)-,a
+	case 1482: { // x:(r)+n,x0 y:(rh)-,a
 		unhandled("x:(r)+n,x0 y:(rh)-,a");
 		break;
 		}
-	case 1415: { // x:(r)+n,x0 y:(rh)-,b
+	case 1483: { // x:(r)+n,x0 y:(rh)-,b
 		unhandled("x:(r)+n,x0 y:(rh)-,b");
 		break;
 		}
-	case 1416: { // x:(r)+n,x1 y:(rh)-,y0
+	case 1484: { // x:(r)+n,x1 y:(rh)-,y0
 		unhandled("x:(r)+n,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1417: { // x:(r)+n,x1 y:(rh)-,y1
+	case 1485: { // x:(r)+n,x1 y:(rh)-,y1
 		unhandled("x:(r)+n,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1418: { // x:(r)+n,x1 y:(rh)-,a
+	case 1486: { // x:(r)+n,x1 y:(rh)-,a
 		unhandled("x:(r)+n,x1 y:(rh)-,a");
 		break;
 		}
-	case 1419: { // x:(r)+n,x1 y:(rh)-,b
+	case 1487: { // x:(r)+n,x1 y:(rh)-,b
 		unhandled("x:(r)+n,x1 y:(rh)-,b");
 		break;
 		}
-	case 1420: { // x:(r)+n,a y:(rh)-,y0
+	case 1488: { // x:(r)+n,a y:(rh)-,y0
 		unhandled("x:(r)+n,a y:(rh)-,y0");
 		break;
 		}
-	case 1421: { // x:(r)+n,a y:(rh)-,y1
+	case 1489: { // x:(r)+n,a y:(rh)-,y1
 		unhandled("x:(r)+n,a y:(rh)-,y1");
 		break;
 		}
-	case 1422: { // x:(r)+n,a y:(rh)-,a
+	case 1490: { // x:(r)+n,a y:(rh)-,a
 		unhandled("x:(r)+n,a y:(rh)-,a");
 		break;
 		}
-	case 1423: { // x:(r)+n,a y:(rh)-,b
+	case 1491: { // x:(r)+n,a y:(rh)-,b
 		unhandled("x:(r)+n,a y:(rh)-,b");
 		break;
 		}
-	case 1424: { // x:(r)+n,b y:(rh)-,y0
+	case 1492: { // x:(r)+n,b y:(rh)-,y0
 		unhandled("x:(r)+n,b y:(rh)-,y0");
 		break;
 		}
-	case 1425: { // x:(r)+n,b y:(rh)-,y1
+	case 1493: { // x:(r)+n,b y:(rh)-,y1
 		unhandled("x:(r)+n,b y:(rh)-,y1");
 		break;
 		}
-	case 1426: { // x:(r)+n,b y:(rh)-,a
+	case 1494: { // x:(r)+n,b y:(rh)-,a
 		unhandled("x:(r)+n,b y:(rh)-,a");
 		break;
 		}
-	case 1427: { // x:(r)+n,b y:(rh)-,b
+	case 1495: { // x:(r)+n,b y:(rh)-,b
 		unhandled("x:(r)+n,b y:(rh)-,b");
 		break;
 		}
-	case 1428: { // x:(r)+n,x0 y:(rh)+,y0
+	case 1496: { // x:(r)+n,x0 y:(rh)+,y0
 		unhandled("x:(r)+n,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1429: { // x:(r)+n,x0 y:(rh)+,y1
+	case 1497: { // x:(r)+n,x0 y:(rh)+,y1
 		unhandled("x:(r)+n,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1430: { // x:(r)+n,x0 y:(rh)+,a
+	case 1498: { // x:(r)+n,x0 y:(rh)+,a
 		unhandled("x:(r)+n,x0 y:(rh)+,a");
 		break;
 		}
-	case 1431: { // x:(r)+n,x0 y:(rh)+,b
+	case 1499: { // x:(r)+n,x0 y:(rh)+,b
 		unhandled("x:(r)+n,x0 y:(rh)+,b");
 		break;
 		}
-	case 1432: { // x:(r)+n,x1 y:(rh)+,y0
+	case 1500: { // x:(r)+n,x1 y:(rh)+,y0
 		unhandled("x:(r)+n,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1433: { // x:(r)+n,x1 y:(rh)+,y1
+	case 1501: { // x:(r)+n,x1 y:(rh)+,y1
 		unhandled("x:(r)+n,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1434: { // x:(r)+n,x1 y:(rh)+,a
+	case 1502: { // x:(r)+n,x1 y:(rh)+,a
 		unhandled("x:(r)+n,x1 y:(rh)+,a");
 		break;
 		}
-	case 1435: { // x:(r)+n,x1 y:(rh)+,b
+	case 1503: { // x:(r)+n,x1 y:(rh)+,b
 		unhandled("x:(r)+n,x1 y:(rh)+,b");
 		break;
 		}
-	case 1436: { // x:(r)+n,a y:(rh)+,y0
+	case 1504: { // x:(r)+n,a y:(rh)+,y0
 		unhandled("x:(r)+n,a y:(rh)+,y0");
 		break;
 		}
-	case 1437: { // x:(r)+n,a y:(rh)+,y1
+	case 1505: { // x:(r)+n,a y:(rh)+,y1
 		unhandled("x:(r)+n,a y:(rh)+,y1");
 		break;
 		}
-	case 1438: { // x:(r)+n,a y:(rh)+,a
+	case 1506: { // x:(r)+n,a y:(rh)+,a
 		unhandled("x:(r)+n,a y:(rh)+,a");
 		break;
 		}
-	case 1439: { // x:(r)+n,a y:(rh)+,b
+	case 1507: { // x:(r)+n,a y:(rh)+,b
 		unhandled("x:(r)+n,a y:(rh)+,b");
 		break;
 		}
-	case 1440: { // x:(r)+n,b y:(rh)+,y0
+	case 1508: { // x:(r)+n,b y:(rh)+,y0
 		unhandled("x:(r)+n,b y:(rh)+,y0");
 		break;
 		}
-	case 1441: { // x:(r)+n,b y:(rh)+,y1
+	case 1509: { // x:(r)+n,b y:(rh)+,y1
 		unhandled("x:(r)+n,b y:(rh)+,y1");
 		break;
 		}
-	case 1442: { // x:(r)+n,b y:(rh)+,a
+	case 1510: { // x:(r)+n,b y:(rh)+,a
 		unhandled("x:(r)+n,b y:(rh)+,a");
 		break;
 		}
-	case 1443: { // x:(r)+n,b y:(rh)+,b
+	case 1511: { // x:(r)+n,b y:(rh)+,b
 		unhandled("x:(r)+n,b y:(rh)+,b");
 		break;
 		}
-	case 1444: { // x:(r)+n,x0 y:(rh),y0
+	case 1512: { // x:(r)+n,x0 y:(rh),y0
 		unhandled("x:(r)+n,x0 y:(rh),y0");
 		break;
 		}
-	case 1445: { // x:(r)+n,x0 y:(rh),y1
+	case 1513: { // x:(r)+n,x0 y:(rh),y1
 		unhandled("x:(r)+n,x0 y:(rh),y1");
 		break;
 		}
-	case 1446: { // x:(r)+n,x0 y:(rh),a
+	case 1514: { // x:(r)+n,x0 y:(rh),a
 		unhandled("x:(r)+n,x0 y:(rh),a");
 		break;
 		}
-	case 1447: { // x:(r)+n,x0 y:(rh),b
+	case 1515: { // x:(r)+n,x0 y:(rh),b
 		unhandled("x:(r)+n,x0 y:(rh),b");
 		break;
 		}
-	case 1448: { // x:(r)+n,x1 y:(rh),y0
+	case 1516: { // x:(r)+n,x1 y:(rh),y0
 		unhandled("x:(r)+n,x1 y:(rh),y0");
 		break;
 		}
-	case 1449: { // x:(r)+n,x1 y:(rh),y1
+	case 1517: { // x:(r)+n,x1 y:(rh),y1
 		unhandled("x:(r)+n,x1 y:(rh),y1");
 		break;
 		}
-	case 1450: { // x:(r)+n,x1 y:(rh),a
+	case 1518: { // x:(r)+n,x1 y:(rh),a
 		unhandled("x:(r)+n,x1 y:(rh),a");
 		break;
 		}
-	case 1451: { // x:(r)+n,x1 y:(rh),b
+	case 1519: { // x:(r)+n,x1 y:(rh),b
 		unhandled("x:(r)+n,x1 y:(rh),b");
 		break;
 		}
-	case 1452: { // x:(r)+n,a y:(rh),y0
+	case 1520: { // x:(r)+n,a y:(rh),y0
 		unhandled("x:(r)+n,a y:(rh),y0");
 		break;
 		}
-	case 1453: { // x:(r)+n,a y:(rh),y1
+	case 1521: { // x:(r)+n,a y:(rh),y1
 		unhandled("x:(r)+n,a y:(rh),y1");
 		break;
 		}
-	case 1454: { // x:(r)+n,a y:(rh),a
+	case 1522: { // x:(r)+n,a y:(rh),a
 		unhandled("x:(r)+n,a y:(rh),a");
 		break;
 		}
-	case 1455: { // x:(r)+n,a y:(rh),b
+	case 1523: { // x:(r)+n,a y:(rh),b
 		unhandled("x:(r)+n,a y:(rh),b");
 		break;
 		}
-	case 1456: { // x:(r)+n,b y:(rh),y0
+	case 1524: { // x:(r)+n,b y:(rh),y0
 		unhandled("x:(r)+n,b y:(rh),y0");
 		break;
 		}
-	case 1457: { // x:(r)+n,b y:(rh),y1
+	case 1525: { // x:(r)+n,b y:(rh),y1
 		unhandled("x:(r)+n,b y:(rh),y1");
 		break;
 		}
-	case 1458: { // x:(r)+n,b y:(rh),a
+	case 1526: { // x:(r)+n,b y:(rh),a
 		unhandled("x:(r)+n,b y:(rh),a");
 		break;
 		}
-	case 1459: { // x:(r)+n,b y:(rh),b
+	case 1527: { // x:(r)+n,b y:(rh),b
 		unhandled("x:(r)+n,b y:(rh),b");
 		break;
 		}
-	case 1460: { // x:(r)-,x0 y:(rh)+n,y0
+	case 1528: { // x:(r)-,x0 y:(rh)+n,y0
 		unhandled("x:(r)-,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1461: { // x:(r)-,x0 y:(rh)+n,y1
+	case 1529: { // x:(r)-,x0 y:(rh)+n,y1
 		unhandled("x:(r)-,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1462: { // x:(r)-,x0 y:(rh)+n,a
+	case 1530: { // x:(r)-,x0 y:(rh)+n,a
 		unhandled("x:(r)-,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1463: { // x:(r)-,x0 y:(rh)+n,b
+	case 1531: { // x:(r)-,x0 y:(rh)+n,b
 		unhandled("x:(r)-,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1464: { // x:(r)-,x1 y:(rh)+n,y0
+	case 1532: { // x:(r)-,x1 y:(rh)+n,y0
 		unhandled("x:(r)-,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1465: { // x:(r)-,x1 y:(rh)+n,y1
+	case 1533: { // x:(r)-,x1 y:(rh)+n,y1
 		unhandled("x:(r)-,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1466: { // x:(r)-,x1 y:(rh)+n,a
+	case 1534: { // x:(r)-,x1 y:(rh)+n,a
 		unhandled("x:(r)-,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1467: { // x:(r)-,x1 y:(rh)+n,b
+	case 1535: { // x:(r)-,x1 y:(rh)+n,b
 		unhandled("x:(r)-,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1468: { // x:(r)-,a y:(rh)+n,y0
+	case 1536: { // x:(r)-,a y:(rh)+n,y0
 		unhandled("x:(r)-,a y:(rh)+n,y0");
 		break;
 		}
-	case 1469: { // x:(r)-,a y:(rh)+n,y1
+	case 1537: { // x:(r)-,a y:(rh)+n,y1
 		unhandled("x:(r)-,a y:(rh)+n,y1");
 		break;
 		}
-	case 1470: { // x:(r)-,a y:(rh)+n,a
+	case 1538: { // x:(r)-,a y:(rh)+n,a
 		unhandled("x:(r)-,a y:(rh)+n,a");
 		break;
 		}
-	case 1471: { // x:(r)-,a y:(rh)+n,b
+	case 1539: { // x:(r)-,a y:(rh)+n,b
 		unhandled("x:(r)-,a y:(rh)+n,b");
 		break;
 		}
-	case 1472: { // x:(r)-,b y:(rh)+n,y0
+	case 1540: { // x:(r)-,b y:(rh)+n,y0
 		unhandled("x:(r)-,b y:(rh)+n,y0");
 		break;
 		}
-	case 1473: { // x:(r)-,b y:(rh)+n,y1
+	case 1541: { // x:(r)-,b y:(rh)+n,y1
 		unhandled("x:(r)-,b y:(rh)+n,y1");
 		break;
 		}
-	case 1474: { // x:(r)-,b y:(rh)+n,a
+	case 1542: { // x:(r)-,b y:(rh)+n,a
 		unhandled("x:(r)-,b y:(rh)+n,a");
 		break;
 		}
-	case 1475: { // x:(r)-,b y:(rh)+n,b
+	case 1543: { // x:(r)-,b y:(rh)+n,b
 		unhandled("x:(r)-,b y:(rh)+n,b");
 		break;
 		}
-	case 1476: { // x:(r)-,x0 y:(rh)-,y0
+	case 1544: { // x:(r)-,x0 y:(rh)-,y0
 		unhandled("x:(r)-,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1477: { // x:(r)-,x0 y:(rh)-,y1
+	case 1545: { // x:(r)-,x0 y:(rh)-,y1
 		unhandled("x:(r)-,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1478: { // x:(r)-,x0 y:(rh)-,a
+	case 1546: { // x:(r)-,x0 y:(rh)-,a
 		unhandled("x:(r)-,x0 y:(rh)-,a");
 		break;
 		}
-	case 1479: { // x:(r)-,x0 y:(rh)-,b
+	case 1547: { // x:(r)-,x0 y:(rh)-,b
 		unhandled("x:(r)-,x0 y:(rh)-,b");
 		break;
 		}
-	case 1480: { // x:(r)-,x1 y:(rh)-,y0
+	case 1548: { // x:(r)-,x1 y:(rh)-,y0
 		unhandled("x:(r)-,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1481: { // x:(r)-,x1 y:(rh)-,y1
+	case 1549: { // x:(r)-,x1 y:(rh)-,y1
 		unhandled("x:(r)-,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1482: { // x:(r)-,x1 y:(rh)-,a
+	case 1550: { // x:(r)-,x1 y:(rh)-,a
 		unhandled("x:(r)-,x1 y:(rh)-,a");
 		break;
 		}
-	case 1483: { // x:(r)-,x1 y:(rh)-,b
+	case 1551: { // x:(r)-,x1 y:(rh)-,b
 		unhandled("x:(r)-,x1 y:(rh)-,b");
 		break;
 		}
-	case 1484: { // x:(r)-,a y:(rh)-,y0
+	case 1552: { // x:(r)-,a y:(rh)-,y0
 		unhandled("x:(r)-,a y:(rh)-,y0");
 		break;
 		}
-	case 1485: { // x:(r)-,a y:(rh)-,y1
+	case 1553: { // x:(r)-,a y:(rh)-,y1
 		unhandled("x:(r)-,a y:(rh)-,y1");
 		break;
 		}
-	case 1486: { // x:(r)-,a y:(rh)-,a
+	case 1554: { // x:(r)-,a y:(rh)-,a
 		unhandled("x:(r)-,a y:(rh)-,a");
 		break;
 		}
-	case 1487: { // x:(r)-,a y:(rh)-,b
+	case 1555: { // x:(r)-,a y:(rh)-,b
 		unhandled("x:(r)-,a y:(rh)-,b");
 		break;
 		}
-	case 1488: { // x:(r)-,b y:(rh)-,y0
+	case 1556: { // x:(r)-,b y:(rh)-,y0
 		unhandled("x:(r)-,b y:(rh)-,y0");
 		break;
 		}
-	case 1489: { // x:(r)-,b y:(rh)-,y1
+	case 1557: { // x:(r)-,b y:(rh)-,y1
 		unhandled("x:(r)-,b y:(rh)-,y1");
 		break;
 		}
-	case 1490: { // x:(r)-,b y:(rh)-,a
+	case 1558: { // x:(r)-,b y:(rh)-,a
 		unhandled("x:(r)-,b y:(rh)-,a");
 		break;
 		}
-	case 1491: { // x:(r)-,b y:(rh)-,b
+	case 1559: { // x:(r)-,b y:(rh)-,b
 		unhandled("x:(r)-,b y:(rh)-,b");
 		break;
 		}
-	case 1492: { // x:(r)-,x0 y:(rh)+,y0
+	case 1560: { // x:(r)-,x0 y:(rh)+,y0
 		unhandled("x:(r)-,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1493: { // x:(r)-,x0 y:(rh)+,y1
+	case 1561: { // x:(r)-,x0 y:(rh)+,y1
 		unhandled("x:(r)-,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1494: { // x:(r)-,x0 y:(rh)+,a
+	case 1562: { // x:(r)-,x0 y:(rh)+,a
 		unhandled("x:(r)-,x0 y:(rh)+,a");
 		break;
 		}
-	case 1495: { // x:(r)-,x0 y:(rh)+,b
+	case 1563: { // x:(r)-,x0 y:(rh)+,b
 		unhandled("x:(r)-,x0 y:(rh)+,b");
 		break;
 		}
-	case 1496: { // x:(r)-,x1 y:(rh)+,y0
+	case 1564: { // x:(r)-,x1 y:(rh)+,y0
 		unhandled("x:(r)-,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1497: { // x:(r)-,x1 y:(rh)+,y1
+	case 1565: { // x:(r)-,x1 y:(rh)+,y1
 		unhandled("x:(r)-,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1498: { // x:(r)-,x1 y:(rh)+,a
+	case 1566: { // x:(r)-,x1 y:(rh)+,a
 		unhandled("x:(r)-,x1 y:(rh)+,a");
 		break;
 		}
-	case 1499: { // x:(r)-,x1 y:(rh)+,b
+	case 1567: { // x:(r)-,x1 y:(rh)+,b
 		unhandled("x:(r)-,x1 y:(rh)+,b");
 		break;
 		}
-	case 1500: { // x:(r)-,a y:(rh)+,y0
+	case 1568: { // x:(r)-,a y:(rh)+,y0
 		unhandled("x:(r)-,a y:(rh)+,y0");
 		break;
 		}
-	case 1501: { // x:(r)-,a y:(rh)+,y1
+	case 1569: { // x:(r)-,a y:(rh)+,y1
 		unhandled("x:(r)-,a y:(rh)+,y1");
 		break;
 		}
-	case 1502: { // x:(r)-,a y:(rh)+,a
+	case 1570: { // x:(r)-,a y:(rh)+,a
 		unhandled("x:(r)-,a y:(rh)+,a");
 		break;
 		}
-	case 1503: { // x:(r)-,a y:(rh)+,b
+	case 1571: { // x:(r)-,a y:(rh)+,b
 		unhandled("x:(r)-,a y:(rh)+,b");
 		break;
 		}
-	case 1504: { // x:(r)-,b y:(rh)+,y0
+	case 1572: { // x:(r)-,b y:(rh)+,y0
 		unhandled("x:(r)-,b y:(rh)+,y0");
 		break;
 		}
-	case 1505: { // x:(r)-,b y:(rh)+,y1
+	case 1573: { // x:(r)-,b y:(rh)+,y1
 		unhandled("x:(r)-,b y:(rh)+,y1");
 		break;
 		}
-	case 1506: { // x:(r)-,b y:(rh)+,a
+	case 1574: { // x:(r)-,b y:(rh)+,a
 		unhandled("x:(r)-,b y:(rh)+,a");
 		break;
 		}
-	case 1507: { // x:(r)-,b y:(rh)+,b
+	case 1575: { // x:(r)-,b y:(rh)+,b
 		unhandled("x:(r)-,b y:(rh)+,b");
 		break;
 		}
-	case 1508: { // x:(r)-,x0 y:(rh),y0
+	case 1576: { // x:(r)-,x0 y:(rh),y0
 		unhandled("x:(r)-,x0 y:(rh),y0");
 		break;
 		}
-	case 1509: { // x:(r)-,x0 y:(rh),y1
+	case 1577: { // x:(r)-,x0 y:(rh),y1
 		unhandled("x:(r)-,x0 y:(rh),y1");
 		break;
 		}
-	case 1510: { // x:(r)-,x0 y:(rh),a
+	case 1578: { // x:(r)-,x0 y:(rh),a
 		unhandled("x:(r)-,x0 y:(rh),a");
 		break;
 		}
-	case 1511: { // x:(r)-,x0 y:(rh),b
+	case 1579: { // x:(r)-,x0 y:(rh),b
 		unhandled("x:(r)-,x0 y:(rh),b");
 		break;
 		}
-	case 1512: { // x:(r)-,x1 y:(rh),y0
+	case 1580: { // x:(r)-,x1 y:(rh),y0
 		unhandled("x:(r)-,x1 y:(rh),y0");
 		break;
 		}
-	case 1513: { // x:(r)-,x1 y:(rh),y1
+	case 1581: { // x:(r)-,x1 y:(rh),y1
 		unhandled("x:(r)-,x1 y:(rh),y1");
 		break;
 		}
-	case 1514: { // x:(r)-,x1 y:(rh),a
+	case 1582: { // x:(r)-,x1 y:(rh),a
 		unhandled("x:(r)-,x1 y:(rh),a");
 		break;
 		}
-	case 1515: { // x:(r)-,x1 y:(rh),b
+	case 1583: { // x:(r)-,x1 y:(rh),b
 		unhandled("x:(r)-,x1 y:(rh),b");
 		break;
 		}
-	case 1516: { // x:(r)-,a y:(rh),y0
+	case 1584: { // x:(r)-,a y:(rh),y0
 		unhandled("x:(r)-,a y:(rh),y0");
 		break;
 		}
-	case 1517: { // x:(r)-,a y:(rh),y1
+	case 1585: { // x:(r)-,a y:(rh),y1
 		unhandled("x:(r)-,a y:(rh),y1");
 		break;
 		}
-	case 1518: { // x:(r)-,a y:(rh),a
+	case 1586: { // x:(r)-,a y:(rh),a
 		unhandled("x:(r)-,a y:(rh),a");
 		break;
 		}
-	case 1519: { // x:(r)-,a y:(rh),b
+	case 1587: { // x:(r)-,a y:(rh),b
 		unhandled("x:(r)-,a y:(rh),b");
 		break;
 		}
-	case 1520: { // x:(r)-,b y:(rh),y0
+	case 1588: { // x:(r)-,b y:(rh),y0
 		unhandled("x:(r)-,b y:(rh),y0");
 		break;
 		}
-	case 1521: { // x:(r)-,b y:(rh),y1
+	case 1589: { // x:(r)-,b y:(rh),y1
 		unhandled("x:(r)-,b y:(rh),y1");
 		break;
 		}
-	case 1522: { // x:(r)-,b y:(rh),a
+	case 1590: { // x:(r)-,b y:(rh),a
 		unhandled("x:(r)-,b y:(rh),a");
 		break;
 		}
-	case 1523: { // x:(r)-,b y:(rh),b
+	case 1591: { // x:(r)-,b y:(rh),b
 		unhandled("x:(r)-,b y:(rh),b");
 		break;
 		}
-	case 1524: { // x:(r)+,x0 y:(rh)+n,y0
+	case 1592: { // x:(r)+,x0 y:(rh)+n,y0
 		unhandled("x:(r)+,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1525: { // x:(r)+,x0 y:(rh)+n,y1
+	case 1593: { // x:(r)+,x0 y:(rh)+n,y1
 		unhandled("x:(r)+,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1526: { // x:(r)+,x0 y:(rh)+n,a
+	case 1594: { // x:(r)+,x0 y:(rh)+n,a
 		unhandled("x:(r)+,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1527: { // x:(r)+,x0 y:(rh)+n,b
+	case 1595: { // x:(r)+,x0 y:(rh)+n,b
 		unhandled("x:(r)+,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1528: { // x:(r)+,x1 y:(rh)+n,y0
+	case 1596: { // x:(r)+,x1 y:(rh)+n,y0
 		unhandled("x:(r)+,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1529: { // x:(r)+,x1 y:(rh)+n,y1
+	case 1597: { // x:(r)+,x1 y:(rh)+n,y1
 		unhandled("x:(r)+,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1530: { // x:(r)+,x1 y:(rh)+n,a
+	case 1598: { // x:(r)+,x1 y:(rh)+n,a
 		unhandled("x:(r)+,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1531: { // x:(r)+,x1 y:(rh)+n,b
+	case 1599: { // x:(r)+,x1 y:(rh)+n,b
 		unhandled("x:(r)+,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1532: { // x:(r)+,a y:(rh)+n,y0
+	case 1600: { // x:(r)+,a y:(rh)+n,y0
 		unhandled("x:(r)+,a y:(rh)+n,y0");
 		break;
 		}
-	case 1533: { // x:(r)+,a y:(rh)+n,y1
+	case 1601: { // x:(r)+,a y:(rh)+n,y1
 		unhandled("x:(r)+,a y:(rh)+n,y1");
 		break;
 		}
-	case 1534: { // x:(r)+,a y:(rh)+n,a
+	case 1602: { // x:(r)+,a y:(rh)+n,a
 		unhandled("x:(r)+,a y:(rh)+n,a");
 		break;
 		}
-	case 1535: { // x:(r)+,a y:(rh)+n,b
+	case 1603: { // x:(r)+,a y:(rh)+n,b
 		unhandled("x:(r)+,a y:(rh)+n,b");
 		break;
 		}
-	case 1536: { // x:(r)+,b y:(rh)+n,y0
+	case 1604: { // x:(r)+,b y:(rh)+n,y0
 		unhandled("x:(r)+,b y:(rh)+n,y0");
 		break;
 		}
-	case 1537: { // x:(r)+,b y:(rh)+n,y1
+	case 1605: { // x:(r)+,b y:(rh)+n,y1
 		unhandled("x:(r)+,b y:(rh)+n,y1");
 		break;
 		}
-	case 1538: { // x:(r)+,b y:(rh)+n,a
+	case 1606: { // x:(r)+,b y:(rh)+n,a
 		unhandled("x:(r)+,b y:(rh)+n,a");
 		break;
 		}
-	case 1539: { // x:(r)+,b y:(rh)+n,b
+	case 1607: { // x:(r)+,b y:(rh)+n,b
 		unhandled("x:(r)+,b y:(rh)+n,b");
 		break;
 		}
-	case 1540: { // x:(r)+,x0 y:(rh)-,y0
+	case 1608: { // x:(r)+,x0 y:(rh)-,y0
 		unhandled("x:(r)+,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1541: { // x:(r)+,x0 y:(rh)-,y1
+	case 1609: { // x:(r)+,x0 y:(rh)-,y1
 		unhandled("x:(r)+,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1542: { // x:(r)+,x0 y:(rh)-,a
+	case 1610: { // x:(r)+,x0 y:(rh)-,a
 		unhandled("x:(r)+,x0 y:(rh)-,a");
 		break;
 		}
-	case 1543: { // x:(r)+,x0 y:(rh)-,b
+	case 1611: { // x:(r)+,x0 y:(rh)-,b
 		unhandled("x:(r)+,x0 y:(rh)-,b");
 		break;
 		}
-	case 1544: { // x:(r)+,x1 y:(rh)-,y0
+	case 1612: { // x:(r)+,x1 y:(rh)-,y0
 		unhandled("x:(r)+,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1545: { // x:(r)+,x1 y:(rh)-,y1
+	case 1613: { // x:(r)+,x1 y:(rh)-,y1
 		unhandled("x:(r)+,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1546: { // x:(r)+,x1 y:(rh)-,a
+	case 1614: { // x:(r)+,x1 y:(rh)-,a
 		unhandled("x:(r)+,x1 y:(rh)-,a");
 		break;
 		}
-	case 1547: { // x:(r)+,x1 y:(rh)-,b
+	case 1615: { // x:(r)+,x1 y:(rh)-,b
 		unhandled("x:(r)+,x1 y:(rh)-,b");
 		break;
 		}
-	case 1548: { // x:(r)+,a y:(rh)-,y0
+	case 1616: { // x:(r)+,a y:(rh)-,y0
 		unhandled("x:(r)+,a y:(rh)-,y0");
 		break;
 		}
-	case 1549: { // x:(r)+,a y:(rh)-,y1
+	case 1617: { // x:(r)+,a y:(rh)-,y1
 		unhandled("x:(r)+,a y:(rh)-,y1");
 		break;
 		}
-	case 1550: { // x:(r)+,a y:(rh)-,a
+	case 1618: { // x:(r)+,a y:(rh)-,a
 		unhandled("x:(r)+,a y:(rh)-,a");
 		break;
 		}
-	case 1551: { // x:(r)+,a y:(rh)-,b
+	case 1619: { // x:(r)+,a y:(rh)-,b
 		unhandled("x:(r)+,a y:(rh)-,b");
 		break;
 		}
-	case 1552: { // x:(r)+,b y:(rh)-,y0
+	case 1620: { // x:(r)+,b y:(rh)-,y0
 		unhandled("x:(r)+,b y:(rh)-,y0");
 		break;
 		}
-	case 1553: { // x:(r)+,b y:(rh)-,y1
+	case 1621: { // x:(r)+,b y:(rh)-,y1
 		unhandled("x:(r)+,b y:(rh)-,y1");
 		break;
 		}
-	case 1554: { // x:(r)+,b y:(rh)-,a
+	case 1622: { // x:(r)+,b y:(rh)-,a
 		unhandled("x:(r)+,b y:(rh)-,a");
 		break;
 		}
-	case 1555: { // x:(r)+,b y:(rh)-,b
+	case 1623: { // x:(r)+,b y:(rh)-,b
 		unhandled("x:(r)+,b y:(rh)-,b");
 		break;
 		}
-	case 1556: { // x:(r)+,x0 y:(rh)+,y0
+	case 1624: { // x:(r)+,x0 y:(rh)+,y0
 		unhandled("x:(r)+,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1557: { // x:(r)+,x0 y:(rh)+,y1
+	case 1625: { // x:(r)+,x0 y:(rh)+,y1
 		unhandled("x:(r)+,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1558: { // x:(r)+,x0 y:(rh)+,a
+	case 1626: { // x:(r)+,x0 y:(rh)+,a
 		unhandled("x:(r)+,x0 y:(rh)+,a");
 		break;
 		}
-	case 1559: { // x:(r)+,x0 y:(rh)+,b
+	case 1627: { // x:(r)+,x0 y:(rh)+,b
 		unhandled("x:(r)+,x0 y:(rh)+,b");
 		break;
 		}
-	case 1560: { // x:(r)+,x1 y:(rh)+,y0
+	case 1628: { // x:(r)+,x1 y:(rh)+,y0
 		unhandled("x:(r)+,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1561: { // x:(r)+,x1 y:(rh)+,y1
+	case 1629: { // x:(r)+,x1 y:(rh)+,y1
 		unhandled("x:(r)+,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1562: { // x:(r)+,x1 y:(rh)+,a
+	case 1630: { // x:(r)+,x1 y:(rh)+,a
 		unhandled("x:(r)+,x1 y:(rh)+,a");
 		break;
 		}
-	case 1563: { // x:(r)+,x1 y:(rh)+,b
+	case 1631: { // x:(r)+,x1 y:(rh)+,b
 		unhandled("x:(r)+,x1 y:(rh)+,b");
 		break;
 		}
-	case 1564: { // x:(r)+,a y:(rh)+,y0
+	case 1632: { // x:(r)+,a y:(rh)+,y0
 		unhandled("x:(r)+,a y:(rh)+,y0");
 		break;
 		}
-	case 1565: { // x:(r)+,a y:(rh)+,y1
+	case 1633: { // x:(r)+,a y:(rh)+,y1
 		unhandled("x:(r)+,a y:(rh)+,y1");
 		break;
 		}
-	case 1566: { // x:(r)+,a y:(rh)+,a
+	case 1634: { // x:(r)+,a y:(rh)+,a
 		unhandled("x:(r)+,a y:(rh)+,a");
 		break;
 		}
-	case 1567: { // x:(r)+,a y:(rh)+,b
+	case 1635: { // x:(r)+,a y:(rh)+,b
 		unhandled("x:(r)+,a y:(rh)+,b");
 		break;
 		}
-	case 1568: { // x:(r)+,b y:(rh)+,y0
+	case 1636: { // x:(r)+,b y:(rh)+,y0
 		unhandled("x:(r)+,b y:(rh)+,y0");
 		break;
 		}
-	case 1569: { // x:(r)+,b y:(rh)+,y1
+	case 1637: { // x:(r)+,b y:(rh)+,y1
 		unhandled("x:(r)+,b y:(rh)+,y1");
 		break;
 		}
-	case 1570: { // x:(r)+,b y:(rh)+,a
+	case 1638: { // x:(r)+,b y:(rh)+,a
 		unhandled("x:(r)+,b y:(rh)+,a");
 		break;
 		}
-	case 1571: { // x:(r)+,b y:(rh)+,b
+	case 1639: { // x:(r)+,b y:(rh)+,b
 		unhandled("x:(r)+,b y:(rh)+,b");
 		break;
 		}
-	case 1572: { // x:(r)+,x0 y:(rh),y0
+	case 1640: { // x:(r)+,x0 y:(rh),y0
 		unhandled("x:(r)+,x0 y:(rh),y0");
 		break;
 		}
-	case 1573: { // x:(r)+,x0 y:(rh),y1
+	case 1641: { // x:(r)+,x0 y:(rh),y1
 		unhandled("x:(r)+,x0 y:(rh),y1");
 		break;
 		}
-	case 1574: { // x:(r)+,x0 y:(rh),a
+	case 1642: { // x:(r)+,x0 y:(rh),a
 		unhandled("x:(r)+,x0 y:(rh),a");
 		break;
 		}
-	case 1575: { // x:(r)+,x0 y:(rh),b
+	case 1643: { // x:(r)+,x0 y:(rh),b
 		unhandled("x:(r)+,x0 y:(rh),b");
 		break;
 		}
-	case 1576: { // x:(r)+,x1 y:(rh),y0
+	case 1644: { // x:(r)+,x1 y:(rh),y0
 		unhandled("x:(r)+,x1 y:(rh),y0");
 		break;
 		}
-	case 1577: { // x:(r)+,x1 y:(rh),y1
+	case 1645: { // x:(r)+,x1 y:(rh),y1
 		unhandled("x:(r)+,x1 y:(rh),y1");
 		break;
 		}
-	case 1578: { // x:(r)+,x1 y:(rh),a
+	case 1646: { // x:(r)+,x1 y:(rh),a
 		unhandled("x:(r)+,x1 y:(rh),a");
 		break;
 		}
-	case 1579: { // x:(r)+,x1 y:(rh),b
+	case 1647: { // x:(r)+,x1 y:(rh),b
 		unhandled("x:(r)+,x1 y:(rh),b");
 		break;
 		}
-	case 1580: { // x:(r)+,a y:(rh),y0
+	case 1648: { // x:(r)+,a y:(rh),y0
 		unhandled("x:(r)+,a y:(rh),y0");
 		break;
 		}
-	case 1581: { // x:(r)+,a y:(rh),y1
+	case 1649: { // x:(r)+,a y:(rh),y1
 		unhandled("x:(r)+,a y:(rh),y1");
 		break;
 		}
-	case 1582: { // x:(r)+,a y:(rh),a
+	case 1650: { // x:(r)+,a y:(rh),a
 		unhandled("x:(r)+,a y:(rh),a");
 		break;
 		}
-	case 1583: { // x:(r)+,a y:(rh),b
+	case 1651: { // x:(r)+,a y:(rh),b
 		unhandled("x:(r)+,a y:(rh),b");
 		break;
 		}
-	case 1584: { // x:(r)+,b y:(rh),y0
+	case 1652: { // x:(r)+,b y:(rh),y0
 		unhandled("x:(r)+,b y:(rh),y0");
 		break;
 		}
-	case 1585: { // x:(r)+,b y:(rh),y1
+	case 1653: { // x:(r)+,b y:(rh),y1
 		unhandled("x:(r)+,b y:(rh),y1");
 		break;
 		}
-	case 1586: { // x:(r)+,b y:(rh),a
+	case 1654: { // x:(r)+,b y:(rh),a
 		unhandled("x:(r)+,b y:(rh),a");
 		break;
 		}
-	case 1587: { // x:(r)+,b y:(rh),b
+	case 1655: { // x:(r)+,b y:(rh),b
 		unhandled("x:(r)+,b y:(rh),b");
 		break;
 		}
-	case 1588: { // x:(r),x0 y:(rh)+n,y0
+	case 1656: { // x:(r),x0 y:(rh)+n,y0
 		unhandled("x:(r),x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1589: { // x:(r),x0 y:(rh)+n,y1
+	case 1657: { // x:(r),x0 y:(rh)+n,y1
 		unhandled("x:(r),x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1590: { // x:(r),x0 y:(rh)+n,a
+	case 1658: { // x:(r),x0 y:(rh)+n,a
 		unhandled("x:(r),x0 y:(rh)+n,a");
 		break;
 		}
-	case 1591: { // x:(r),x0 y:(rh)+n,b
+	case 1659: { // x:(r),x0 y:(rh)+n,b
 		unhandled("x:(r),x0 y:(rh)+n,b");
 		break;
 		}
-	case 1592: { // x:(r),x1 y:(rh)+n,y0
+	case 1660: { // x:(r),x1 y:(rh)+n,y0
 		unhandled("x:(r),x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1593: { // x:(r),x1 y:(rh)+n,y1
+	case 1661: { // x:(r),x1 y:(rh)+n,y1
 		unhandled("x:(r),x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1594: { // x:(r),x1 y:(rh)+n,a
+	case 1662: { // x:(r),x1 y:(rh)+n,a
 		unhandled("x:(r),x1 y:(rh)+n,a");
 		break;
 		}
-	case 1595: { // x:(r),x1 y:(rh)+n,b
+	case 1663: { // x:(r),x1 y:(rh)+n,b
 		unhandled("x:(r),x1 y:(rh)+n,b");
 		break;
 		}
-	case 1596: { // x:(r),a y:(rh)+n,y0
+	case 1664: { // x:(r),a y:(rh)+n,y0
 		unhandled("x:(r),a y:(rh)+n,y0");
 		break;
 		}
-	case 1597: { // x:(r),a y:(rh)+n,y1
+	case 1665: { // x:(r),a y:(rh)+n,y1
 		unhandled("x:(r),a y:(rh)+n,y1");
 		break;
 		}
-	case 1598: { // x:(r),a y:(rh)+n,a
+	case 1666: { // x:(r),a y:(rh)+n,a
 		unhandled("x:(r),a y:(rh)+n,a");
 		break;
 		}
-	case 1599: { // x:(r),a y:(rh)+n,b
+	case 1667: { // x:(r),a y:(rh)+n,b
 		unhandled("x:(r),a y:(rh)+n,b");
 		break;
 		}
-	case 1600: { // x:(r),b y:(rh)+n,y0
+	case 1668: { // x:(r),b y:(rh)+n,y0
 		unhandled("x:(r),b y:(rh)+n,y0");
 		break;
 		}
-	case 1601: { // x:(r),b y:(rh)+n,y1
+	case 1669: { // x:(r),b y:(rh)+n,y1
 		unhandled("x:(r),b y:(rh)+n,y1");
 		break;
 		}
-	case 1602: { // x:(r),b y:(rh)+n,a
+	case 1670: { // x:(r),b y:(rh)+n,a
 		unhandled("x:(r),b y:(rh)+n,a");
 		break;
 		}
-	case 1603: { // x:(r),b y:(rh)+n,b
+	case 1671: { // x:(r),b y:(rh)+n,b
 		unhandled("x:(r),b y:(rh)+n,b");
 		break;
 		}
-	case 1604: { // x:(r),x0 y:(rh)-,y0
+	case 1672: { // x:(r),x0 y:(rh)-,y0
 		unhandled("x:(r),x0 y:(rh)-,y0");
 		break;
 		}
-	case 1605: { // x:(r),x0 y:(rh)-,y1
+	case 1673: { // x:(r),x0 y:(rh)-,y1
 		unhandled("x:(r),x0 y:(rh)-,y1");
 		break;
 		}
-	case 1606: { // x:(r),x0 y:(rh)-,a
+	case 1674: { // x:(r),x0 y:(rh)-,a
 		unhandled("x:(r),x0 y:(rh)-,a");
 		break;
 		}
-	case 1607: { // x:(r),x0 y:(rh)-,b
+	case 1675: { // x:(r),x0 y:(rh)-,b
 		unhandled("x:(r),x0 y:(rh)-,b");
 		break;
 		}
-	case 1608: { // x:(r),x1 y:(rh)-,y0
+	case 1676: { // x:(r),x1 y:(rh)-,y0
 		unhandled("x:(r),x1 y:(rh)-,y0");
 		break;
 		}
-	case 1609: { // x:(r),x1 y:(rh)-,y1
+	case 1677: { // x:(r),x1 y:(rh)-,y1
 		unhandled("x:(r),x1 y:(rh)-,y1");
 		break;
 		}
-	case 1610: { // x:(r),x1 y:(rh)-,a
+	case 1678: { // x:(r),x1 y:(rh)-,a
 		unhandled("x:(r),x1 y:(rh)-,a");
 		break;
 		}
-	case 1611: { // x:(r),x1 y:(rh)-,b
+	case 1679: { // x:(r),x1 y:(rh)-,b
 		unhandled("x:(r),x1 y:(rh)-,b");
 		break;
 		}
-	case 1612: { // x:(r),a y:(rh)-,y0
+	case 1680: { // x:(r),a y:(rh)-,y0
 		unhandled("x:(r),a y:(rh)-,y0");
 		break;
 		}
-	case 1613: { // x:(r),a y:(rh)-,y1
+	case 1681: { // x:(r),a y:(rh)-,y1
 		unhandled("x:(r),a y:(rh)-,y1");
 		break;
 		}
-	case 1614: { // x:(r),a y:(rh)-,a
+	case 1682: { // x:(r),a y:(rh)-,a
 		unhandled("x:(r),a y:(rh)-,a");
 		break;
 		}
-	case 1615: { // x:(r),a y:(rh)-,b
+	case 1683: { // x:(r),a y:(rh)-,b
 		unhandled("x:(r),a y:(rh)-,b");
 		break;
 		}
-	case 1616: { // x:(r),b y:(rh)-,y0
+	case 1684: { // x:(r),b y:(rh)-,y0
 		unhandled("x:(r),b y:(rh)-,y0");
 		break;
 		}
-	case 1617: { // x:(r),b y:(rh)-,y1
+	case 1685: { // x:(r),b y:(rh)-,y1
 		unhandled("x:(r),b y:(rh)-,y1");
 		break;
 		}
-	case 1618: { // x:(r),b y:(rh)-,a
+	case 1686: { // x:(r),b y:(rh)-,a
 		unhandled("x:(r),b y:(rh)-,a");
 		break;
 		}
-	case 1619: { // x:(r),b y:(rh)-,b
+	case 1687: { // x:(r),b y:(rh)-,b
 		unhandled("x:(r),b y:(rh)-,b");
 		break;
 		}
-	case 1620: { // x:(r),x0 y:(rh)+,y0
+	case 1688: { // x:(r),x0 y:(rh)+,y0
 		unhandled("x:(r),x0 y:(rh)+,y0");
 		break;
 		}
-	case 1621: { // x:(r),x0 y:(rh)+,y1
+	case 1689: { // x:(r),x0 y:(rh)+,y1
 		unhandled("x:(r),x0 y:(rh)+,y1");
 		break;
 		}
-	case 1622: { // x:(r),x0 y:(rh)+,a
+	case 1690: { // x:(r),x0 y:(rh)+,a
 		unhandled("x:(r),x0 y:(rh)+,a");
 		break;
 		}
-	case 1623: { // x:(r),x0 y:(rh)+,b
+	case 1691: { // x:(r),x0 y:(rh)+,b
 		unhandled("x:(r),x0 y:(rh)+,b");
 		break;
 		}
-	case 1624: { // x:(r),x1 y:(rh)+,y0
+	case 1692: { // x:(r),x1 y:(rh)+,y0
 		unhandled("x:(r),x1 y:(rh)+,y0");
 		break;
 		}
-	case 1625: { // x:(r),x1 y:(rh)+,y1
+	case 1693: { // x:(r),x1 y:(rh)+,y1
 		unhandled("x:(r),x1 y:(rh)+,y1");
 		break;
 		}
-	case 1626: { // x:(r),x1 y:(rh)+,a
+	case 1694: { // x:(r),x1 y:(rh)+,a
 		unhandled("x:(r),x1 y:(rh)+,a");
 		break;
 		}
-	case 1627: { // x:(r),x1 y:(rh)+,b
+	case 1695: { // x:(r),x1 y:(rh)+,b
 		unhandled("x:(r),x1 y:(rh)+,b");
 		break;
 		}
-	case 1628: { // x:(r),a y:(rh)+,y0
+	case 1696: { // x:(r),a y:(rh)+,y0
 		unhandled("x:(r),a y:(rh)+,y0");
 		break;
 		}
-	case 1629: { // x:(r),a y:(rh)+,y1
+	case 1697: { // x:(r),a y:(rh)+,y1
 		unhandled("x:(r),a y:(rh)+,y1");
 		break;
 		}
-	case 1630: { // x:(r),a y:(rh)+,a
+	case 1698: { // x:(r),a y:(rh)+,a
 		unhandled("x:(r),a y:(rh)+,a");
 		break;
 		}
-	case 1631: { // x:(r),a y:(rh)+,b
+	case 1699: { // x:(r),a y:(rh)+,b
 		unhandled("x:(r),a y:(rh)+,b");
 		break;
 		}
-	case 1632: { // x:(r),b y:(rh)+,y0
+	case 1700: { // x:(r),b y:(rh)+,y0
 		unhandled("x:(r),b y:(rh)+,y0");
 		break;
 		}
-	case 1633: { // x:(r),b y:(rh)+,y1
+	case 1701: { // x:(r),b y:(rh)+,y1
 		unhandled("x:(r),b y:(rh)+,y1");
 		break;
 		}
-	case 1634: { // x:(r),b y:(rh)+,a
+	case 1702: { // x:(r),b y:(rh)+,a
 		unhandled("x:(r),b y:(rh)+,a");
 		break;
 		}
-	case 1635: { // x:(r),b y:(rh)+,b
+	case 1703: { // x:(r),b y:(rh)+,b
 		unhandled("x:(r),b y:(rh)+,b");
 		break;
 		}
-	case 1636: { // x:(r),x0 y:(rh),y0
+	case 1704: { // x:(r),x0 y:(rh),y0
 		unhandled("x:(r),x0 y:(rh),y0");
 		break;
 		}
-	case 1637: { // x:(r),x0 y:(rh),y1
+	case 1705: { // x:(r),x0 y:(rh),y1
 		unhandled("x:(r),x0 y:(rh),y1");
 		break;
 		}
-	case 1638: { // x:(r),x0 y:(rh),a
+	case 1706: { // x:(r),x0 y:(rh),a
 		unhandled("x:(r),x0 y:(rh),a");
 		break;
 		}
-	case 1639: { // x:(r),x0 y:(rh),b
+	case 1707: { // x:(r),x0 y:(rh),b
 		unhandled("x:(r),x0 y:(rh),b");
 		break;
 		}
-	case 1640: { // x:(r),x1 y:(rh),y0
+	case 1708: { // x:(r),x1 y:(rh),y0
 		unhandled("x:(r),x1 y:(rh),y0");
 		break;
 		}
-	case 1641: { // x:(r),x1 y:(rh),y1
+	case 1709: { // x:(r),x1 y:(rh),y1
 		unhandled("x:(r),x1 y:(rh),y1");
 		break;
 		}
-	case 1642: { // x:(r),x1 y:(rh),a
+	case 1710: { // x:(r),x1 y:(rh),a
 		unhandled("x:(r),x1 y:(rh),a");
 		break;
 		}
-	case 1643: { // x:(r),x1 y:(rh),b
+	case 1711: { // x:(r),x1 y:(rh),b
 		unhandled("x:(r),x1 y:(rh),b");
 		break;
 		}
-	case 1644: { // x:(r),a y:(rh),y0
+	case 1712: { // x:(r),a y:(rh),y0
 		unhandled("x:(r),a y:(rh),y0");
 		break;
 		}
-	case 1645: { // x:(r),a y:(rh),y1
+	case 1713: { // x:(r),a y:(rh),y1
 		unhandled("x:(r),a y:(rh),y1");
 		break;
 		}
-	case 1646: { // x:(r),a y:(rh),a
+	case 1714: { // x:(r),a y:(rh),a
 		unhandled("x:(r),a y:(rh),a");
 		break;
 		}
-	case 1647: { // x:(r),a y:(rh),b
+	case 1715: { // x:(r),a y:(rh),b
 		unhandled("x:(r),a y:(rh),b");
 		break;
 		}
-	case 1648: { // x:(r),b y:(rh),y0
+	case 1716: { // x:(r),b y:(rh),y0
 		unhandled("x:(r),b y:(rh),y0");
 		break;
 		}
-	case 1649: { // x:(r),b y:(rh),y1
+	case 1717: { // x:(r),b y:(rh),y1
 		unhandled("x:(r),b y:(rh),y1");
 		break;
 		}
-	case 1650: { // x:(r),b y:(rh),a
+	case 1718: { // x:(r),b y:(rh),a
 		unhandled("x:(r),b y:(rh),a");
 		break;
 		}
-	case 1651: { // x:(r),b y:(rh),b
+	case 1719: { // x:(r),b y:(rh),b
 		unhandled("x:(r),b y:(rh),b");
 		break;
 		}
-	case 1652: { // x:(r)+n,x0 y0,y:(rh)+n
+	case 1720: { // x:(r)+n,x0 y0,y:(rh)+n
 		unhandled("x:(r)+n,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1653: { // x:(r)+n,x0 y1,y:(rh)+n
+	case 1721: { // x:(r)+n,x0 y1,y:(rh)+n
 		unhandled("x:(r)+n,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1654: { // x:(r)+n,x0 a,y:(rh)+n
+	case 1722: { // x:(r)+n,x0 a,y:(rh)+n
 		unhandled("x:(r)+n,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1655: { // x:(r)+n,x0 b,y:(rh)+n
+	case 1723: { // x:(r)+n,x0 b,y:(rh)+n
 		unhandled("x:(r)+n,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1656: { // x:(r)+n,x1 y0,y:(rh)+n
+	case 1724: { // x:(r)+n,x1 y0,y:(rh)+n
 		unhandled("x:(r)+n,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1657: { // x:(r)+n,x1 y1,y:(rh)+n
+	case 1725: { // x:(r)+n,x1 y1,y:(rh)+n
 		unhandled("x:(r)+n,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1658: { // x:(r)+n,x1 a,y:(rh)+n
+	case 1726: { // x:(r)+n,x1 a,y:(rh)+n
 		unhandled("x:(r)+n,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1659: { // x:(r)+n,x1 b,y:(rh)+n
+	case 1727: { // x:(r)+n,x1 b,y:(rh)+n
 		unhandled("x:(r)+n,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1660: { // x:(r)+n,a y0,y:(rh)+n
+	case 1728: { // x:(r)+n,a y0,y:(rh)+n
 		unhandled("x:(r)+n,a y0,y:(rh)+n");
 		break;
 		}
-	case 1661: { // x:(r)+n,a y1,y:(rh)+n
+	case 1729: { // x:(r)+n,a y1,y:(rh)+n
 		unhandled("x:(r)+n,a y1,y:(rh)+n");
 		break;
 		}
-	case 1662: { // x:(r)+n,a a,y:(rh)+n
+	case 1730: { // x:(r)+n,a a,y:(rh)+n
 		unhandled("x:(r)+n,a a,y:(rh)+n");
 		break;
 		}
-	case 1663: { // x:(r)+n,a b,y:(rh)+n
+	case 1731: { // x:(r)+n,a b,y:(rh)+n
 		unhandled("x:(r)+n,a b,y:(rh)+n");
 		break;
 		}
-	case 1664: { // x:(r)+n,b y0,y:(rh)+n
+	case 1732: { // x:(r)+n,b y0,y:(rh)+n
 		unhandled("x:(r)+n,b y0,y:(rh)+n");
 		break;
 		}
-	case 1665: { // x:(r)+n,b y1,y:(rh)+n
+	case 1733: { // x:(r)+n,b y1,y:(rh)+n
 		unhandled("x:(r)+n,b y1,y:(rh)+n");
 		break;
 		}
-	case 1666: { // x:(r)+n,b a,y:(rh)+n
+	case 1734: { // x:(r)+n,b a,y:(rh)+n
 		unhandled("x:(r)+n,b a,y:(rh)+n");
 		break;
 		}
-	case 1667: { // x:(r)+n,b b,y:(rh)+n
+	case 1735: { // x:(r)+n,b b,y:(rh)+n
 		unhandled("x:(r)+n,b b,y:(rh)+n");
 		break;
 		}
-	case 1668: { // x:(r)+n,x0 y0,y:(rh)-
+	case 1736: { // x:(r)+n,x0 y0,y:(rh)-
 		unhandled("x:(r)+n,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1669: { // x:(r)+n,x0 y1,y:(rh)-
+	case 1737: { // x:(r)+n,x0 y1,y:(rh)-
 		unhandled("x:(r)+n,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1670: { // x:(r)+n,x0 a,y:(rh)-
+	case 1738: { // x:(r)+n,x0 a,y:(rh)-
 		unhandled("x:(r)+n,x0 a,y:(rh)-");
 		break;
 		}
-	case 1671: { // x:(r)+n,x0 b,y:(rh)-
+	case 1739: { // x:(r)+n,x0 b,y:(rh)-
 		unhandled("x:(r)+n,x0 b,y:(rh)-");
 		break;
 		}
-	case 1672: { // x:(r)+n,x1 y0,y:(rh)-
+	case 1740: { // x:(r)+n,x1 y0,y:(rh)-
 		unhandled("x:(r)+n,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1673: { // x:(r)+n,x1 y1,y:(rh)-
+	case 1741: { // x:(r)+n,x1 y1,y:(rh)-
 		unhandled("x:(r)+n,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1674: { // x:(r)+n,x1 a,y:(rh)-
+	case 1742: { // x:(r)+n,x1 a,y:(rh)-
 		unhandled("x:(r)+n,x1 a,y:(rh)-");
 		break;
 		}
-	case 1675: { // x:(r)+n,x1 b,y:(rh)-
+	case 1743: { // x:(r)+n,x1 b,y:(rh)-
 		unhandled("x:(r)+n,x1 b,y:(rh)-");
 		break;
 		}
-	case 1676: { // x:(r)+n,a y0,y:(rh)-
+	case 1744: { // x:(r)+n,a y0,y:(rh)-
 		unhandled("x:(r)+n,a y0,y:(rh)-");
 		break;
 		}
-	case 1677: { // x:(r)+n,a y1,y:(rh)-
+	case 1745: { // x:(r)+n,a y1,y:(rh)-
 		unhandled("x:(r)+n,a y1,y:(rh)-");
 		break;
 		}
-	case 1678: { // x:(r)+n,a a,y:(rh)-
+	case 1746: { // x:(r)+n,a a,y:(rh)-
 		unhandled("x:(r)+n,a a,y:(rh)-");
 		break;
 		}
-	case 1679: { // x:(r)+n,a b,y:(rh)-
+	case 1747: { // x:(r)+n,a b,y:(rh)-
 		unhandled("x:(r)+n,a b,y:(rh)-");
 		break;
 		}
-	case 1680: { // x:(r)+n,b y0,y:(rh)-
+	case 1748: { // x:(r)+n,b y0,y:(rh)-
 		unhandled("x:(r)+n,b y0,y:(rh)-");
 		break;
 		}
-	case 1681: { // x:(r)+n,b y1,y:(rh)-
+	case 1749: { // x:(r)+n,b y1,y:(rh)-
 		unhandled("x:(r)+n,b y1,y:(rh)-");
 		break;
 		}
-	case 1682: { // x:(r)+n,b a,y:(rh)-
+	case 1750: { // x:(r)+n,b a,y:(rh)-
 		unhandled("x:(r)+n,b a,y:(rh)-");
 		break;
 		}
-	case 1683: { // x:(r)+n,b b,y:(rh)-
+	case 1751: { // x:(r)+n,b b,y:(rh)-
 		unhandled("x:(r)+n,b b,y:(rh)-");
 		break;
 		}
-	case 1684: { // x:(r)+n,x0 y0,y:(rh)+
+	case 1752: { // x:(r)+n,x0 y0,y:(rh)+
 		unhandled("x:(r)+n,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1685: { // x:(r)+n,x0 y1,y:(rh)+
+	case 1753: { // x:(r)+n,x0 y1,y:(rh)+
 		unhandled("x:(r)+n,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1686: { // x:(r)+n,x0 a,y:(rh)+
+	case 1754: { // x:(r)+n,x0 a,y:(rh)+
 		unhandled("x:(r)+n,x0 a,y:(rh)+");
 		break;
 		}
-	case 1687: { // x:(r)+n,x0 b,y:(rh)+
+	case 1755: { // x:(r)+n,x0 b,y:(rh)+
 		unhandled("x:(r)+n,x0 b,y:(rh)+");
 		break;
 		}
-	case 1688: { // x:(r)+n,x1 y0,y:(rh)+
+	case 1756: { // x:(r)+n,x1 y0,y:(rh)+
 		unhandled("x:(r)+n,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1689: { // x:(r)+n,x1 y1,y:(rh)+
+	case 1757: { // x:(r)+n,x1 y1,y:(rh)+
 		unhandled("x:(r)+n,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1690: { // x:(r)+n,x1 a,y:(rh)+
+	case 1758: { // x:(r)+n,x1 a,y:(rh)+
 		unhandled("x:(r)+n,x1 a,y:(rh)+");
 		break;
 		}
-	case 1691: { // x:(r)+n,x1 b,y:(rh)+
+	case 1759: { // x:(r)+n,x1 b,y:(rh)+
 		unhandled("x:(r)+n,x1 b,y:(rh)+");
 		break;
 		}
-	case 1692: { // x:(r)+n,a y0,y:(rh)+
+	case 1760: { // x:(r)+n,a y0,y:(rh)+
 		unhandled("x:(r)+n,a y0,y:(rh)+");
 		break;
 		}
-	case 1693: { // x:(r)+n,a y1,y:(rh)+
+	case 1761: { // x:(r)+n,a y1,y:(rh)+
 		unhandled("x:(r)+n,a y1,y:(rh)+");
 		break;
 		}
-	case 1694: { // x:(r)+n,a a,y:(rh)+
+	case 1762: { // x:(r)+n,a a,y:(rh)+
 		unhandled("x:(r)+n,a a,y:(rh)+");
 		break;
 		}
-	case 1695: { // x:(r)+n,a b,y:(rh)+
+	case 1763: { // x:(r)+n,a b,y:(rh)+
 		unhandled("x:(r)+n,a b,y:(rh)+");
 		break;
 		}
-	case 1696: { // x:(r)+n,b y0,y:(rh)+
+	case 1764: { // x:(r)+n,b y0,y:(rh)+
 		unhandled("x:(r)+n,b y0,y:(rh)+");
 		break;
 		}
-	case 1697: { // x:(r)+n,b y1,y:(rh)+
+	case 1765: { // x:(r)+n,b y1,y:(rh)+
 		unhandled("x:(r)+n,b y1,y:(rh)+");
 		break;
 		}
-	case 1698: { // x:(r)+n,b a,y:(rh)+
+	case 1766: { // x:(r)+n,b a,y:(rh)+
 		unhandled("x:(r)+n,b a,y:(rh)+");
 		break;
 		}
-	case 1699: { // x:(r)+n,b b,y:(rh)+
+	case 1767: { // x:(r)+n,b b,y:(rh)+
 		unhandled("x:(r)+n,b b,y:(rh)+");
 		break;
 		}
-	case 1700: { // x:(r)+n,x0 y0,y:(rh)
+	case 1768: { // x:(r)+n,x0 y0,y:(rh)
 		unhandled("x:(r)+n,x0 y0,y:(rh)");
 		break;
 		}
-	case 1701: { // x:(r)+n,x0 y1,y:(rh)
+	case 1769: { // x:(r)+n,x0 y1,y:(rh)
 		unhandled("x:(r)+n,x0 y1,y:(rh)");
 		break;
 		}
-	case 1702: { // x:(r)+n,x0 a,y:(rh)
+	case 1770: { // x:(r)+n,x0 a,y:(rh)
 		unhandled("x:(r)+n,x0 a,y:(rh)");
 		break;
 		}
-	case 1703: { // x:(r)+n,x0 b,y:(rh)
+	case 1771: { // x:(r)+n,x0 b,y:(rh)
 		unhandled("x:(r)+n,x0 b,y:(rh)");
 		break;
 		}
-	case 1704: { // x:(r)+n,x1 y0,y:(rh)
+	case 1772: { // x:(r)+n,x1 y0,y:(rh)
 		unhandled("x:(r)+n,x1 y0,y:(rh)");
 		break;
 		}
-	case 1705: { // x:(r)+n,x1 y1,y:(rh)
+	case 1773: { // x:(r)+n,x1 y1,y:(rh)
 		unhandled("x:(r)+n,x1 y1,y:(rh)");
 		break;
 		}
-	case 1706: { // x:(r)+n,x1 a,y:(rh)
+	case 1774: { // x:(r)+n,x1 a,y:(rh)
 		unhandled("x:(r)+n,x1 a,y:(rh)");
 		break;
 		}
-	case 1707: { // x:(r)+n,x1 b,y:(rh)
+	case 1775: { // x:(r)+n,x1 b,y:(rh)
 		unhandled("x:(r)+n,x1 b,y:(rh)");
 		break;
 		}
-	case 1708: { // x:(r)+n,a y0,y:(rh)
+	case 1776: { // x:(r)+n,a y0,y:(rh)
 		unhandled("x:(r)+n,a y0,y:(rh)");
 		break;
 		}
-	case 1709: { // x:(r)+n,a y1,y:(rh)
+	case 1777: { // x:(r)+n,a y1,y:(rh)
 		unhandled("x:(r)+n,a y1,y:(rh)");
 		break;
 		}
-	case 1710: { // x:(r)+n,a a,y:(rh)
+	case 1778: { // x:(r)+n,a a,y:(rh)
 		unhandled("x:(r)+n,a a,y:(rh)");
 		break;
 		}
-	case 1711: { // x:(r)+n,a b,y:(rh)
+	case 1779: { // x:(r)+n,a b,y:(rh)
 		unhandled("x:(r)+n,a b,y:(rh)");
 		break;
 		}
-	case 1712: { // x:(r)+n,b y0,y:(rh)
+	case 1780: { // x:(r)+n,b y0,y:(rh)
 		unhandled("x:(r)+n,b y0,y:(rh)");
 		break;
 		}
-	case 1713: { // x:(r)+n,b y1,y:(rh)
+	case 1781: { // x:(r)+n,b y1,y:(rh)
 		unhandled("x:(r)+n,b y1,y:(rh)");
 		break;
 		}
-	case 1714: { // x:(r)+n,b a,y:(rh)
+	case 1782: { // x:(r)+n,b a,y:(rh)
 		unhandled("x:(r)+n,b a,y:(rh)");
 		break;
 		}
-	case 1715: { // x:(r)+n,b b,y:(rh)
+	case 1783: { // x:(r)+n,b b,y:(rh)
 		unhandled("x:(r)+n,b b,y:(rh)");
 		break;
 		}
-	case 1716: { // x:(r)-,x0 y0,y:(rh)+n
+	case 1784: { // x:(r)-,x0 y0,y:(rh)+n
 		unhandled("x:(r)-,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1717: { // x:(r)-,x0 y1,y:(rh)+n
+	case 1785: { // x:(r)-,x0 y1,y:(rh)+n
 		unhandled("x:(r)-,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1718: { // x:(r)-,x0 a,y:(rh)+n
+	case 1786: { // x:(r)-,x0 a,y:(rh)+n
 		unhandled("x:(r)-,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1719: { // x:(r)-,x0 b,y:(rh)+n
+	case 1787: { // x:(r)-,x0 b,y:(rh)+n
 		unhandled("x:(r)-,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1720: { // x:(r)-,x1 y0,y:(rh)+n
+	case 1788: { // x:(r)-,x1 y0,y:(rh)+n
 		unhandled("x:(r)-,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1721: { // x:(r)-,x1 y1,y:(rh)+n
+	case 1789: { // x:(r)-,x1 y1,y:(rh)+n
 		unhandled("x:(r)-,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1722: { // x:(r)-,x1 a,y:(rh)+n
+	case 1790: { // x:(r)-,x1 a,y:(rh)+n
 		unhandled("x:(r)-,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1723: { // x:(r)-,x1 b,y:(rh)+n
+	case 1791: { // x:(r)-,x1 b,y:(rh)+n
 		unhandled("x:(r)-,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1724: { // x:(r)-,a y0,y:(rh)+n
+	case 1792: { // x:(r)-,a y0,y:(rh)+n
 		unhandled("x:(r)-,a y0,y:(rh)+n");
 		break;
 		}
-	case 1725: { // x:(r)-,a y1,y:(rh)+n
+	case 1793: { // x:(r)-,a y1,y:(rh)+n
 		unhandled("x:(r)-,a y1,y:(rh)+n");
 		break;
 		}
-	case 1726: { // x:(r)-,a a,y:(rh)+n
+	case 1794: { // x:(r)-,a a,y:(rh)+n
 		unhandled("x:(r)-,a a,y:(rh)+n");
 		break;
 		}
-	case 1727: { // x:(r)-,a b,y:(rh)+n
+	case 1795: { // x:(r)-,a b,y:(rh)+n
 		unhandled("x:(r)-,a b,y:(rh)+n");
 		break;
 		}
-	case 1728: { // x:(r)-,b y0,y:(rh)+n
+	case 1796: { // x:(r)-,b y0,y:(rh)+n
 		unhandled("x:(r)-,b y0,y:(rh)+n");
 		break;
 		}
-	case 1729: { // x:(r)-,b y1,y:(rh)+n
+	case 1797: { // x:(r)-,b y1,y:(rh)+n
 		unhandled("x:(r)-,b y1,y:(rh)+n");
 		break;
 		}
-	case 1730: { // x:(r)-,b a,y:(rh)+n
+	case 1798: { // x:(r)-,b a,y:(rh)+n
 		unhandled("x:(r)-,b a,y:(rh)+n");
 		break;
 		}
-	case 1731: { // x:(r)-,b b,y:(rh)+n
+	case 1799: { // x:(r)-,b b,y:(rh)+n
 		unhandled("x:(r)-,b b,y:(rh)+n");
 		break;
 		}
-	case 1732: { // x:(r)-,x0 y0,y:(rh)-
+	case 1800: { // x:(r)-,x0 y0,y:(rh)-
 		unhandled("x:(r)-,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1733: { // x:(r)-,x0 y1,y:(rh)-
+	case 1801: { // x:(r)-,x0 y1,y:(rh)-
 		unhandled("x:(r)-,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1734: { // x:(r)-,x0 a,y:(rh)-
+	case 1802: { // x:(r)-,x0 a,y:(rh)-
 		unhandled("x:(r)-,x0 a,y:(rh)-");
 		break;
 		}
-	case 1735: { // x:(r)-,x0 b,y:(rh)-
+	case 1803: { // x:(r)-,x0 b,y:(rh)-
 		unhandled("x:(r)-,x0 b,y:(rh)-");
 		break;
 		}
-	case 1736: { // x:(r)-,x1 y0,y:(rh)-
+	case 1804: { // x:(r)-,x1 y0,y:(rh)-
 		unhandled("x:(r)-,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1737: { // x:(r)-,x1 y1,y:(rh)-
+	case 1805: { // x:(r)-,x1 y1,y:(rh)-
 		unhandled("x:(r)-,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1738: { // x:(r)-,x1 a,y:(rh)-
+	case 1806: { // x:(r)-,x1 a,y:(rh)-
 		unhandled("x:(r)-,x1 a,y:(rh)-");
 		break;
 		}
-	case 1739: { // x:(r)-,x1 b,y:(rh)-
+	case 1807: { // x:(r)-,x1 b,y:(rh)-
 		unhandled("x:(r)-,x1 b,y:(rh)-");
 		break;
 		}
-	case 1740: { // x:(r)-,a y0,y:(rh)-
+	case 1808: { // x:(r)-,a y0,y:(rh)-
 		unhandled("x:(r)-,a y0,y:(rh)-");
 		break;
 		}
-	case 1741: { // x:(r)-,a y1,y:(rh)-
+	case 1809: { // x:(r)-,a y1,y:(rh)-
 		unhandled("x:(r)-,a y1,y:(rh)-");
 		break;
 		}
-	case 1742: { // x:(r)-,a a,y:(rh)-
+	case 1810: { // x:(r)-,a a,y:(rh)-
 		unhandled("x:(r)-,a a,y:(rh)-");
 		break;
 		}
-	case 1743: { // x:(r)-,a b,y:(rh)-
+	case 1811: { // x:(r)-,a b,y:(rh)-
 		unhandled("x:(r)-,a b,y:(rh)-");
 		break;
 		}
-	case 1744: { // x:(r)-,b y0,y:(rh)-
+	case 1812: { // x:(r)-,b y0,y:(rh)-
 		unhandled("x:(r)-,b y0,y:(rh)-");
 		break;
 		}
-	case 1745: { // x:(r)-,b y1,y:(rh)-
+	case 1813: { // x:(r)-,b y1,y:(rh)-
 		unhandled("x:(r)-,b y1,y:(rh)-");
 		break;
 		}
-	case 1746: { // x:(r)-,b a,y:(rh)-
+	case 1814: { // x:(r)-,b a,y:(rh)-
 		unhandled("x:(r)-,b a,y:(rh)-");
 		break;
 		}
-	case 1747: { // x:(r)-,b b,y:(rh)-
+	case 1815: { // x:(r)-,b b,y:(rh)-
 		unhandled("x:(r)-,b b,y:(rh)-");
 		break;
 		}
-	case 1748: { // x:(r)-,x0 y0,y:(rh)+
+	case 1816: { // x:(r)-,x0 y0,y:(rh)+
 		unhandled("x:(r)-,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1749: { // x:(r)-,x0 y1,y:(rh)+
+	case 1817: { // x:(r)-,x0 y1,y:(rh)+
 		unhandled("x:(r)-,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1750: { // x:(r)-,x0 a,y:(rh)+
+	case 1818: { // x:(r)-,x0 a,y:(rh)+
 		unhandled("x:(r)-,x0 a,y:(rh)+");
 		break;
 		}
-	case 1751: { // x:(r)-,x0 b,y:(rh)+
+	case 1819: { // x:(r)-,x0 b,y:(rh)+
 		unhandled("x:(r)-,x0 b,y:(rh)+");
 		break;
 		}
-	case 1752: { // x:(r)-,x1 y0,y:(rh)+
+	case 1820: { // x:(r)-,x1 y0,y:(rh)+
 		unhandled("x:(r)-,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1753: { // x:(r)-,x1 y1,y:(rh)+
+	case 1821: { // x:(r)-,x1 y1,y:(rh)+
 		unhandled("x:(r)-,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1754: { // x:(r)-,x1 a,y:(rh)+
+	case 1822: { // x:(r)-,x1 a,y:(rh)+
 		unhandled("x:(r)-,x1 a,y:(rh)+");
 		break;
 		}
-	case 1755: { // x:(r)-,x1 b,y:(rh)+
+	case 1823: { // x:(r)-,x1 b,y:(rh)+
 		unhandled("x:(r)-,x1 b,y:(rh)+");
 		break;
 		}
-	case 1756: { // x:(r)-,a y0,y:(rh)+
+	case 1824: { // x:(r)-,a y0,y:(rh)+
 		unhandled("x:(r)-,a y0,y:(rh)+");
 		break;
 		}
-	case 1757: { // x:(r)-,a y1,y:(rh)+
+	case 1825: { // x:(r)-,a y1,y:(rh)+
 		unhandled("x:(r)-,a y1,y:(rh)+");
 		break;
 		}
-	case 1758: { // x:(r)-,a a,y:(rh)+
+	case 1826: { // x:(r)-,a a,y:(rh)+
 		unhandled("x:(r)-,a a,y:(rh)+");
 		break;
 		}
-	case 1759: { // x:(r)-,a b,y:(rh)+
+	case 1827: { // x:(r)-,a b,y:(rh)+
 		unhandled("x:(r)-,a b,y:(rh)+");
 		break;
 		}
-	case 1760: { // x:(r)-,b y0,y:(rh)+
+	case 1828: { // x:(r)-,b y0,y:(rh)+
 		unhandled("x:(r)-,b y0,y:(rh)+");
 		break;
 		}
-	case 1761: { // x:(r)-,b y1,y:(rh)+
+	case 1829: { // x:(r)-,b y1,y:(rh)+
 		unhandled("x:(r)-,b y1,y:(rh)+");
 		break;
 		}
-	case 1762: { // x:(r)-,b a,y:(rh)+
+	case 1830: { // x:(r)-,b a,y:(rh)+
 		unhandled("x:(r)-,b a,y:(rh)+");
 		break;
 		}
-	case 1763: { // x:(r)-,b b,y:(rh)+
+	case 1831: { // x:(r)-,b b,y:(rh)+
 		unhandled("x:(r)-,b b,y:(rh)+");
 		break;
 		}
-	case 1764: { // x:(r)-,x0 y0,y:(rh)
+	case 1832: { // x:(r)-,x0 y0,y:(rh)
 		unhandled("x:(r)-,x0 y0,y:(rh)");
 		break;
 		}
-	case 1765: { // x:(r)-,x0 y1,y:(rh)
+	case 1833: { // x:(r)-,x0 y1,y:(rh)
 		unhandled("x:(r)-,x0 y1,y:(rh)");
 		break;
 		}
-	case 1766: { // x:(r)-,x0 a,y:(rh)
+	case 1834: { // x:(r)-,x0 a,y:(rh)
 		unhandled("x:(r)-,x0 a,y:(rh)");
 		break;
 		}
-	case 1767: { // x:(r)-,x0 b,y:(rh)
+	case 1835: { // x:(r)-,x0 b,y:(rh)
 		unhandled("x:(r)-,x0 b,y:(rh)");
 		break;
 		}
-	case 1768: { // x:(r)-,x1 y0,y:(rh)
+	case 1836: { // x:(r)-,x1 y0,y:(rh)
 		unhandled("x:(r)-,x1 y0,y:(rh)");
 		break;
 		}
-	case 1769: { // x:(r)-,x1 y1,y:(rh)
+	case 1837: { // x:(r)-,x1 y1,y:(rh)
 		unhandled("x:(r)-,x1 y1,y:(rh)");
 		break;
 		}
-	case 1770: { // x:(r)-,x1 a,y:(rh)
+	case 1838: { // x:(r)-,x1 a,y:(rh)
 		unhandled("x:(r)-,x1 a,y:(rh)");
 		break;
 		}
-	case 1771: { // x:(r)-,x1 b,y:(rh)
+	case 1839: { // x:(r)-,x1 b,y:(rh)
 		unhandled("x:(r)-,x1 b,y:(rh)");
 		break;
 		}
-	case 1772: { // x:(r)-,a y0,y:(rh)
+	case 1840: { // x:(r)-,a y0,y:(rh)
 		unhandled("x:(r)-,a y0,y:(rh)");
 		break;
 		}
-	case 1773: { // x:(r)-,a y1,y:(rh)
+	case 1841: { // x:(r)-,a y1,y:(rh)
 		unhandled("x:(r)-,a y1,y:(rh)");
 		break;
 		}
-	case 1774: { // x:(r)-,a a,y:(rh)
+	case 1842: { // x:(r)-,a a,y:(rh)
 		unhandled("x:(r)-,a a,y:(rh)");
 		break;
 		}
-	case 1775: { // x:(r)-,a b,y:(rh)
+	case 1843: { // x:(r)-,a b,y:(rh)
 		unhandled("x:(r)-,a b,y:(rh)");
 		break;
 		}
-	case 1776: { // x:(r)-,b y0,y:(rh)
+	case 1844: { // x:(r)-,b y0,y:(rh)
 		unhandled("x:(r)-,b y0,y:(rh)");
 		break;
 		}
-	case 1777: { // x:(r)-,b y1,y:(rh)
+	case 1845: { // x:(r)-,b y1,y:(rh)
 		unhandled("x:(r)-,b y1,y:(rh)");
 		break;
 		}
-	case 1778: { // x:(r)-,b a,y:(rh)
+	case 1846: { // x:(r)-,b a,y:(rh)
 		unhandled("x:(r)-,b a,y:(rh)");
 		break;
 		}
-	case 1779: { // x:(r)-,b b,y:(rh)
+	case 1847: { // x:(r)-,b b,y:(rh)
 		unhandled("x:(r)-,b b,y:(rh)");
 		break;
 		}
-	case 1780: { // x:(r)+,x0 y0,y:(rh)+n
+	case 1848: { // x:(r)+,x0 y0,y:(rh)+n
 		unhandled("x:(r)+,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1781: { // x:(r)+,x0 y1,y:(rh)+n
+	case 1849: { // x:(r)+,x0 y1,y:(rh)+n
 		unhandled("x:(r)+,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1782: { // x:(r)+,x0 a,y:(rh)+n
+	case 1850: { // x:(r)+,x0 a,y:(rh)+n
 		unhandled("x:(r)+,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1783: { // x:(r)+,x0 b,y:(rh)+n
+	case 1851: { // x:(r)+,x0 b,y:(rh)+n
 		unhandled("x:(r)+,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1784: { // x:(r)+,x1 y0,y:(rh)+n
+	case 1852: { // x:(r)+,x1 y0,y:(rh)+n
 		unhandled("x:(r)+,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1785: { // x:(r)+,x1 y1,y:(rh)+n
+	case 1853: { // x:(r)+,x1 y1,y:(rh)+n
 		unhandled("x:(r)+,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1786: { // x:(r)+,x1 a,y:(rh)+n
+	case 1854: { // x:(r)+,x1 a,y:(rh)+n
 		unhandled("x:(r)+,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1787: { // x:(r)+,x1 b,y:(rh)+n
+	case 1855: { // x:(r)+,x1 b,y:(rh)+n
 		unhandled("x:(r)+,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1788: { // x:(r)+,a y0,y:(rh)+n
+	case 1856: { // x:(r)+,a y0,y:(rh)+n
 		unhandled("x:(r)+,a y0,y:(rh)+n");
 		break;
 		}
-	case 1789: { // x:(r)+,a y1,y:(rh)+n
+	case 1857: { // x:(r)+,a y1,y:(rh)+n
 		unhandled("x:(r)+,a y1,y:(rh)+n");
 		break;
 		}
-	case 1790: { // x:(r)+,a a,y:(rh)+n
+	case 1858: { // x:(r)+,a a,y:(rh)+n
 		unhandled("x:(r)+,a a,y:(rh)+n");
 		break;
 		}
-	case 1791: { // x:(r)+,a b,y:(rh)+n
+	case 1859: { // x:(r)+,a b,y:(rh)+n
 		unhandled("x:(r)+,a b,y:(rh)+n");
 		break;
 		}
-	case 1792: { // x:(r)+,b y0,y:(rh)+n
+	case 1860: { // x:(r)+,b y0,y:(rh)+n
 		unhandled("x:(r)+,b y0,y:(rh)+n");
 		break;
 		}
-	case 1793: { // x:(r)+,b y1,y:(rh)+n
+	case 1861: { // x:(r)+,b y1,y:(rh)+n
 		unhandled("x:(r)+,b y1,y:(rh)+n");
 		break;
 		}
-	case 1794: { // x:(r)+,b a,y:(rh)+n
+	case 1862: { // x:(r)+,b a,y:(rh)+n
 		unhandled("x:(r)+,b a,y:(rh)+n");
 		break;
 		}
-	case 1795: { // x:(r)+,b b,y:(rh)+n
+	case 1863: { // x:(r)+,b b,y:(rh)+n
 		unhandled("x:(r)+,b b,y:(rh)+n");
 		break;
 		}
-	case 1796: { // x:(r)+,x0 y0,y:(rh)-
+	case 1864: { // x:(r)+,x0 y0,y:(rh)-
 		unhandled("x:(r)+,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1797: { // x:(r)+,x0 y1,y:(rh)-
+	case 1865: { // x:(r)+,x0 y1,y:(rh)-
 		unhandled("x:(r)+,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1798: { // x:(r)+,x0 a,y:(rh)-
+	case 1866: { // x:(r)+,x0 a,y:(rh)-
 		unhandled("x:(r)+,x0 a,y:(rh)-");
 		break;
 		}
-	case 1799: { // x:(r)+,x0 b,y:(rh)-
+	case 1867: { // x:(r)+,x0 b,y:(rh)-
 		unhandled("x:(r)+,x0 b,y:(rh)-");
 		break;
 		}
-	case 1800: { // x:(r)+,x1 y0,y:(rh)-
+	case 1868: { // x:(r)+,x1 y0,y:(rh)-
 		unhandled("x:(r)+,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1801: { // x:(r)+,x1 y1,y:(rh)-
+	case 1869: { // x:(r)+,x1 y1,y:(rh)-
 		unhandled("x:(r)+,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1802: { // x:(r)+,x1 a,y:(rh)-
+	case 1870: { // x:(r)+,x1 a,y:(rh)-
 		unhandled("x:(r)+,x1 a,y:(rh)-");
 		break;
 		}
-	case 1803: { // x:(r)+,x1 b,y:(rh)-
+	case 1871: { // x:(r)+,x1 b,y:(rh)-
 		unhandled("x:(r)+,x1 b,y:(rh)-");
 		break;
 		}
-	case 1804: { // x:(r)+,a y0,y:(rh)-
+	case 1872: { // x:(r)+,a y0,y:(rh)-
 		unhandled("x:(r)+,a y0,y:(rh)-");
 		break;
 		}
-	case 1805: { // x:(r)+,a y1,y:(rh)-
+	case 1873: { // x:(r)+,a y1,y:(rh)-
 		unhandled("x:(r)+,a y1,y:(rh)-");
 		break;
 		}
-	case 1806: { // x:(r)+,a a,y:(rh)-
+	case 1874: { // x:(r)+,a a,y:(rh)-
 		unhandled("x:(r)+,a a,y:(rh)-");
 		break;
 		}
-	case 1807: { // x:(r)+,a b,y:(rh)-
+	case 1875: { // x:(r)+,a b,y:(rh)-
 		unhandled("x:(r)+,a b,y:(rh)-");
 		break;
 		}
-	case 1808: { // x:(r)+,b y0,y:(rh)-
+	case 1876: { // x:(r)+,b y0,y:(rh)-
 		unhandled("x:(r)+,b y0,y:(rh)-");
 		break;
 		}
-	case 1809: { // x:(r)+,b y1,y:(rh)-
+	case 1877: { // x:(r)+,b y1,y:(rh)-
 		unhandled("x:(r)+,b y1,y:(rh)-");
 		break;
 		}
-	case 1810: { // x:(r)+,b a,y:(rh)-
+	case 1878: { // x:(r)+,b a,y:(rh)-
 		unhandled("x:(r)+,b a,y:(rh)-");
 		break;
 		}
-	case 1811: { // x:(r)+,b b,y:(rh)-
+	case 1879: { // x:(r)+,b b,y:(rh)-
 		unhandled("x:(r)+,b b,y:(rh)-");
 		break;
 		}
-	case 1812: { // x:(r)+,x0 y0,y:(rh)+
+	case 1880: { // x:(r)+,x0 y0,y:(rh)+
 		unhandled("x:(r)+,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1813: { // x:(r)+,x0 y1,y:(rh)+
+	case 1881: { // x:(r)+,x0 y1,y:(rh)+
 		unhandled("x:(r)+,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1814: { // x:(r)+,x0 a,y:(rh)+
+	case 1882: { // x:(r)+,x0 a,y:(rh)+
 		unhandled("x:(r)+,x0 a,y:(rh)+");
 		break;
 		}
-	case 1815: { // x:(r)+,x0 b,y:(rh)+
+	case 1883: { // x:(r)+,x0 b,y:(rh)+
 		unhandled("x:(r)+,x0 b,y:(rh)+");
 		break;
 		}
-	case 1816: { // x:(r)+,x1 y0,y:(rh)+
+	case 1884: { // x:(r)+,x1 y0,y:(rh)+
 		unhandled("x:(r)+,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1817: { // x:(r)+,x1 y1,y:(rh)+
+	case 1885: { // x:(r)+,x1 y1,y:(rh)+
 		unhandled("x:(r)+,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1818: { // x:(r)+,x1 a,y:(rh)+
+	case 1886: { // x:(r)+,x1 a,y:(rh)+
 		unhandled("x:(r)+,x1 a,y:(rh)+");
 		break;
 		}
-	case 1819: { // x:(r)+,x1 b,y:(rh)+
+	case 1887: { // x:(r)+,x1 b,y:(rh)+
 		unhandled("x:(r)+,x1 b,y:(rh)+");
 		break;
 		}
-	case 1820: { // x:(r)+,a y0,y:(rh)+
+	case 1888: { // x:(r)+,a y0,y:(rh)+
 		unhandled("x:(r)+,a y0,y:(rh)+");
 		break;
 		}
-	case 1821: { // x:(r)+,a y1,y:(rh)+
+	case 1889: { // x:(r)+,a y1,y:(rh)+
 		unhandled("x:(r)+,a y1,y:(rh)+");
 		break;
 		}
-	case 1822: { // x:(r)+,a a,y:(rh)+
+	case 1890: { // x:(r)+,a a,y:(rh)+
 		unhandled("x:(r)+,a a,y:(rh)+");
 		break;
 		}
-	case 1823: { // x:(r)+,a b,y:(rh)+
+	case 1891: { // x:(r)+,a b,y:(rh)+
 		unhandled("x:(r)+,a b,y:(rh)+");
 		break;
 		}
-	case 1824: { // x:(r)+,b y0,y:(rh)+
+	case 1892: { // x:(r)+,b y0,y:(rh)+
 		unhandled("x:(r)+,b y0,y:(rh)+");
 		break;
 		}
-	case 1825: { // x:(r)+,b y1,y:(rh)+
+	case 1893: { // x:(r)+,b y1,y:(rh)+
 		unhandled("x:(r)+,b y1,y:(rh)+");
 		break;
 		}
-	case 1826: { // x:(r)+,b a,y:(rh)+
+	case 1894: { // x:(r)+,b a,y:(rh)+
 		unhandled("x:(r)+,b a,y:(rh)+");
 		break;
 		}
-	case 1827: { // x:(r)+,b b,y:(rh)+
+	case 1895: { // x:(r)+,b b,y:(rh)+
 		unhandled("x:(r)+,b b,y:(rh)+");
 		break;
 		}
-	case 1828: { // x:(r)+,x0 y0,y:(rh)
+	case 1896: { // x:(r)+,x0 y0,y:(rh)
 		unhandled("x:(r)+,x0 y0,y:(rh)");
 		break;
 		}
-	case 1829: { // x:(r)+,x0 y1,y:(rh)
+	case 1897: { // x:(r)+,x0 y1,y:(rh)
 		unhandled("x:(r)+,x0 y1,y:(rh)");
 		break;
 		}
-	case 1830: { // x:(r)+,x0 a,y:(rh)
+	case 1898: { // x:(r)+,x0 a,y:(rh)
 		unhandled("x:(r)+,x0 a,y:(rh)");
 		break;
 		}
-	case 1831: { // x:(r)+,x0 b,y:(rh)
+	case 1899: { // x:(r)+,x0 b,y:(rh)
 		unhandled("x:(r)+,x0 b,y:(rh)");
 		break;
 		}
-	case 1832: { // x:(r)+,x1 y0,y:(rh)
+	case 1900: { // x:(r)+,x1 y0,y:(rh)
 		unhandled("x:(r)+,x1 y0,y:(rh)");
 		break;
 		}
-	case 1833: { // x:(r)+,x1 y1,y:(rh)
+	case 1901: { // x:(r)+,x1 y1,y:(rh)
 		unhandled("x:(r)+,x1 y1,y:(rh)");
 		break;
 		}
-	case 1834: { // x:(r)+,x1 a,y:(rh)
+	case 1902: { // x:(r)+,x1 a,y:(rh)
 		unhandled("x:(r)+,x1 a,y:(rh)");
 		break;
 		}
-	case 1835: { // x:(r)+,x1 b,y:(rh)
+	case 1903: { // x:(r)+,x1 b,y:(rh)
 		unhandled("x:(r)+,x1 b,y:(rh)");
 		break;
 		}
-	case 1836: { // x:(r)+,a y0,y:(rh)
+	case 1904: { // x:(r)+,a y0,y:(rh)
 		unhandled("x:(r)+,a y0,y:(rh)");
 		break;
 		}
-	case 1837: { // x:(r)+,a y1,y:(rh)
+	case 1905: { // x:(r)+,a y1,y:(rh)
 		unhandled("x:(r)+,a y1,y:(rh)");
 		break;
 		}
-	case 1838: { // x:(r)+,a a,y:(rh)
+	case 1906: { // x:(r)+,a a,y:(rh)
 		unhandled("x:(r)+,a a,y:(rh)");
 		break;
 		}
-	case 1839: { // x:(r)+,a b,y:(rh)
+	case 1907: { // x:(r)+,a b,y:(rh)
 		unhandled("x:(r)+,a b,y:(rh)");
 		break;
 		}
-	case 1840: { // x:(r)+,b y0,y:(rh)
+	case 1908: { // x:(r)+,b y0,y:(rh)
 		unhandled("x:(r)+,b y0,y:(rh)");
 		break;
 		}
-	case 1841: { // x:(r)+,b y1,y:(rh)
+	case 1909: { // x:(r)+,b y1,y:(rh)
 		unhandled("x:(r)+,b y1,y:(rh)");
 		break;
 		}
-	case 1842: { // x:(r)+,b a,y:(rh)
+	case 1910: { // x:(r)+,b a,y:(rh)
 		unhandled("x:(r)+,b a,y:(rh)");
 		break;
 		}
-	case 1843: { // x:(r)+,b b,y:(rh)
+	case 1911: { // x:(r)+,b b,y:(rh)
 		unhandled("x:(r)+,b b,y:(rh)");
 		break;
 		}
-	case 1844: { // x:(r),x0 y0,y:(rh)+n
+	case 1912: { // x:(r),x0 y0,y:(rh)+n
 		unhandled("x:(r),x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1845: { // x:(r),x0 y1,y:(rh)+n
+	case 1913: { // x:(r),x0 y1,y:(rh)+n
 		unhandled("x:(r),x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1846: { // x:(r),x0 a,y:(rh)+n
+	case 1914: { // x:(r),x0 a,y:(rh)+n
 		unhandled("x:(r),x0 a,y:(rh)+n");
 		break;
 		}
-	case 1847: { // x:(r),x0 b,y:(rh)+n
+	case 1915: { // x:(r),x0 b,y:(rh)+n
 		unhandled("x:(r),x0 b,y:(rh)+n");
 		break;
 		}
-	case 1848: { // x:(r),x1 y0,y:(rh)+n
+	case 1916: { // x:(r),x1 y0,y:(rh)+n
 		unhandled("x:(r),x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1849: { // x:(r),x1 y1,y:(rh)+n
+	case 1917: { // x:(r),x1 y1,y:(rh)+n
 		unhandled("x:(r),x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1850: { // x:(r),x1 a,y:(rh)+n
+	case 1918: { // x:(r),x1 a,y:(rh)+n
 		unhandled("x:(r),x1 a,y:(rh)+n");
 		break;
 		}
-	case 1851: { // x:(r),x1 b,y:(rh)+n
+	case 1919: { // x:(r),x1 b,y:(rh)+n
 		unhandled("x:(r),x1 b,y:(rh)+n");
 		break;
 		}
-	case 1852: { // x:(r),a y0,y:(rh)+n
+	case 1920: { // x:(r),a y0,y:(rh)+n
 		unhandled("x:(r),a y0,y:(rh)+n");
 		break;
 		}
-	case 1853: { // x:(r),a y1,y:(rh)+n
+	case 1921: { // x:(r),a y1,y:(rh)+n
 		unhandled("x:(r),a y1,y:(rh)+n");
 		break;
 		}
-	case 1854: { // x:(r),a a,y:(rh)+n
+	case 1922: { // x:(r),a a,y:(rh)+n
 		unhandled("x:(r),a a,y:(rh)+n");
 		break;
 		}
-	case 1855: { // x:(r),a b,y:(rh)+n
+	case 1923: { // x:(r),a b,y:(rh)+n
 		unhandled("x:(r),a b,y:(rh)+n");
 		break;
 		}
-	case 1856: { // x:(r),b y0,y:(rh)+n
+	case 1924: { // x:(r),b y0,y:(rh)+n
 		unhandled("x:(r),b y0,y:(rh)+n");
 		break;
 		}
-	case 1857: { // x:(r),b y1,y:(rh)+n
+	case 1925: { // x:(r),b y1,y:(rh)+n
 		unhandled("x:(r),b y1,y:(rh)+n");
 		break;
 		}
-	case 1858: { // x:(r),b a,y:(rh)+n
+	case 1926: { // x:(r),b a,y:(rh)+n
 		unhandled("x:(r),b a,y:(rh)+n");
 		break;
 		}
-	case 1859: { // x:(r),b b,y:(rh)+n
+	case 1927: { // x:(r),b b,y:(rh)+n
 		unhandled("x:(r),b b,y:(rh)+n");
 		break;
 		}
-	case 1860: { // x:(r),x0 y0,y:(rh)-
+	case 1928: { // x:(r),x0 y0,y:(rh)-
 		unhandled("x:(r),x0 y0,y:(rh)-");
 		break;
 		}
-	case 1861: { // x:(r),x0 y1,y:(rh)-
+	case 1929: { // x:(r),x0 y1,y:(rh)-
 		unhandled("x:(r),x0 y1,y:(rh)-");
 		break;
 		}
-	case 1862: { // x:(r),x0 a,y:(rh)-
+	case 1930: { // x:(r),x0 a,y:(rh)-
 		unhandled("x:(r),x0 a,y:(rh)-");
 		break;
 		}
-	case 1863: { // x:(r),x0 b,y:(rh)-
+	case 1931: { // x:(r),x0 b,y:(rh)-
 		unhandled("x:(r),x0 b,y:(rh)-");
 		break;
 		}
-	case 1864: { // x:(r),x1 y0,y:(rh)-
+	case 1932: { // x:(r),x1 y0,y:(rh)-
 		unhandled("x:(r),x1 y0,y:(rh)-");
 		break;
 		}
-	case 1865: { // x:(r),x1 y1,y:(rh)-
+	case 1933: { // x:(r),x1 y1,y:(rh)-
 		unhandled("x:(r),x1 y1,y:(rh)-");
 		break;
 		}
-	case 1866: { // x:(r),x1 a,y:(rh)-
+	case 1934: { // x:(r),x1 a,y:(rh)-
 		unhandled("x:(r),x1 a,y:(rh)-");
 		break;
 		}
-	case 1867: { // x:(r),x1 b,y:(rh)-
+	case 1935: { // x:(r),x1 b,y:(rh)-
 		unhandled("x:(r),x1 b,y:(rh)-");
 		break;
 		}
-	case 1868: { // x:(r),a y0,y:(rh)-
+	case 1936: { // x:(r),a y0,y:(rh)-
 		unhandled("x:(r),a y0,y:(rh)-");
 		break;
 		}
-	case 1869: { // x:(r),a y1,y:(rh)-
+	case 1937: { // x:(r),a y1,y:(rh)-
 		unhandled("x:(r),a y1,y:(rh)-");
 		break;
 		}
-	case 1870: { // x:(r),a a,y:(rh)-
+	case 1938: { // x:(r),a a,y:(rh)-
 		unhandled("x:(r),a a,y:(rh)-");
 		break;
 		}
-	case 1871: { // x:(r),a b,y:(rh)-
+	case 1939: { // x:(r),a b,y:(rh)-
 		unhandled("x:(r),a b,y:(rh)-");
 		break;
 		}
-	case 1872: { // x:(r),b y0,y:(rh)-
+	case 1940: { // x:(r),b y0,y:(rh)-
 		unhandled("x:(r),b y0,y:(rh)-");
 		break;
 		}
-	case 1873: { // x:(r),b y1,y:(rh)-
+	case 1941: { // x:(r),b y1,y:(rh)-
 		unhandled("x:(r),b y1,y:(rh)-");
 		break;
 		}
-	case 1874: { // x:(r),b a,y:(rh)-
+	case 1942: { // x:(r),b a,y:(rh)-
 		unhandled("x:(r),b a,y:(rh)-");
 		break;
 		}
-	case 1875: { // x:(r),b b,y:(rh)-
+	case 1943: { // x:(r),b b,y:(rh)-
 		unhandled("x:(r),b b,y:(rh)-");
 		break;
 		}
-	case 1876: { // x:(r),x0 y0,y:(rh)+
+	case 1944: { // x:(r),x0 y0,y:(rh)+
 		unhandled("x:(r),x0 y0,y:(rh)+");
 		break;
 		}
-	case 1877: { // x:(r),x0 y1,y:(rh)+
+	case 1945: { // x:(r),x0 y1,y:(rh)+
 		unhandled("x:(r),x0 y1,y:(rh)+");
 		break;
 		}
-	case 1878: { // x:(r),x0 a,y:(rh)+
+	case 1946: { // x:(r),x0 a,y:(rh)+
 		unhandled("x:(r),x0 a,y:(rh)+");
 		break;
 		}
-	case 1879: { // x:(r),x0 b,y:(rh)+
+	case 1947: { // x:(r),x0 b,y:(rh)+
 		unhandled("x:(r),x0 b,y:(rh)+");
 		break;
 		}
-	case 1880: { // x:(r),x1 y0,y:(rh)+
+	case 1948: { // x:(r),x1 y0,y:(rh)+
 		unhandled("x:(r),x1 y0,y:(rh)+");
 		break;
 		}
-	case 1881: { // x:(r),x1 y1,y:(rh)+
+	case 1949: { // x:(r),x1 y1,y:(rh)+
 		unhandled("x:(r),x1 y1,y:(rh)+");
 		break;
 		}
-	case 1882: { // x:(r),x1 a,y:(rh)+
+	case 1950: { // x:(r),x1 a,y:(rh)+
 		unhandled("x:(r),x1 a,y:(rh)+");
 		break;
 		}
-	case 1883: { // x:(r),x1 b,y:(rh)+
+	case 1951: { // x:(r),x1 b,y:(rh)+
 		unhandled("x:(r),x1 b,y:(rh)+");
 		break;
 		}
-	case 1884: { // x:(r),a y0,y:(rh)+
+	case 1952: { // x:(r),a y0,y:(rh)+
 		unhandled("x:(r),a y0,y:(rh)+");
 		break;
 		}
-	case 1885: { // x:(r),a y1,y:(rh)+
+	case 1953: { // x:(r),a y1,y:(rh)+
 		unhandled("x:(r),a y1,y:(rh)+");
 		break;
 		}
-	case 1886: { // x:(r),a a,y:(rh)+
+	case 1954: { // x:(r),a a,y:(rh)+
 		unhandled("x:(r),a a,y:(rh)+");
 		break;
 		}
-	case 1887: { // x:(r),a b,y:(rh)+
+	case 1955: { // x:(r),a b,y:(rh)+
 		unhandled("x:(r),a b,y:(rh)+");
 		break;
 		}
-	case 1888: { // x:(r),b y0,y:(rh)+
+	case 1956: { // x:(r),b y0,y:(rh)+
 		unhandled("x:(r),b y0,y:(rh)+");
 		break;
 		}
-	case 1889: { // x:(r),b y1,y:(rh)+
+	case 1957: { // x:(r),b y1,y:(rh)+
 		unhandled("x:(r),b y1,y:(rh)+");
 		break;
 		}
-	case 1890: { // x:(r),b a,y:(rh)+
+	case 1958: { // x:(r),b a,y:(rh)+
 		unhandled("x:(r),b a,y:(rh)+");
 		break;
 		}
-	case 1891: { // x:(r),b b,y:(rh)+
+	case 1959: { // x:(r),b b,y:(rh)+
 		unhandled("x:(r),b b,y:(rh)+");
 		break;
 		}
-	case 1892: { // x:(r),x0 y0,y:(rh)
+	case 1960: { // x:(r),x0 y0,y:(rh)
 		unhandled("x:(r),x0 y0,y:(rh)");
 		break;
 		}
-	case 1893: { // x:(r),x0 y1,y:(rh)
+	case 1961: { // x:(r),x0 y1,y:(rh)
 		unhandled("x:(r),x0 y1,y:(rh)");
 		break;
 		}
-	case 1894: { // x:(r),x0 a,y:(rh)
+	case 1962: { // x:(r),x0 a,y:(rh)
 		unhandled("x:(r),x0 a,y:(rh)");
 		break;
 		}
-	case 1895: { // x:(r),x0 b,y:(rh)
+	case 1963: { // x:(r),x0 b,y:(rh)
 		unhandled("x:(r),x0 b,y:(rh)");
 		break;
 		}
-	case 1896: { // x:(r),x1 y0,y:(rh)
+	case 1964: { // x:(r),x1 y0,y:(rh)
 		unhandled("x:(r),x1 y0,y:(rh)");
 		break;
 		}
-	case 1897: { // x:(r),x1 y1,y:(rh)
+	case 1965: { // x:(r),x1 y1,y:(rh)
 		unhandled("x:(r),x1 y1,y:(rh)");
 		break;
 		}
-	case 1898: { // x:(r),x1 a,y:(rh)
+	case 1966: { // x:(r),x1 a,y:(rh)
 		unhandled("x:(r),x1 a,y:(rh)");
 		break;
 		}
-	case 1899: { // x:(r),x1 b,y:(rh)
+	case 1967: { // x:(r),x1 b,y:(rh)
 		unhandled("x:(r),x1 b,y:(rh)");
 		break;
 		}
-	case 1900: { // x:(r),a y0,y:(rh)
+	case 1968: { // x:(r),a y0,y:(rh)
 		unhandled("x:(r),a y0,y:(rh)");
 		break;
 		}
-	case 1901: { // x:(r),a y1,y:(rh)
+	case 1969: { // x:(r),a y1,y:(rh)
 		unhandled("x:(r),a y1,y:(rh)");
 		break;
 		}
-	case 1902: { // x:(r),a a,y:(rh)
+	case 1970: { // x:(r),a a,y:(rh)
 		unhandled("x:(r),a a,y:(rh)");
 		break;
 		}
-	case 1903: { // x:(r),a b,y:(rh)
+	case 1971: { // x:(r),a b,y:(rh)
 		unhandled("x:(r),a b,y:(rh)");
 		break;
 		}
-	case 1904: { // x:(r),b y0,y:(rh)
+	case 1972: { // x:(r),b y0,y:(rh)
 		unhandled("x:(r),b y0,y:(rh)");
 		break;
 		}
-	case 1905: { // x:(r),b y1,y:(rh)
+	case 1973: { // x:(r),b y1,y:(rh)
 		unhandled("x:(r),b y1,y:(rh)");
 		break;
 		}
-	case 1906: { // x:(r),b a,y:(rh)
+	case 1974: { // x:(r),b a,y:(rh)
 		unhandled("x:(r),b a,y:(rh)");
 		break;
 		}
-	case 1907: { // x:(r),b b,y:(rh)
+	case 1975: { // x:(r),b b,y:(rh)
 		unhandled("x:(r),b b,y:(rh)");
 		break;
 		}
-	case 1908: { // x0,x:(r)+n y:(rh)+n,y0
+	case 1976: { // x0,x:(r)+n y:(rh)+n,y0
 		unhandled("x0,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1909: { // x0,x:(r)+n y:(rh)+n,y1
+	case 1977: { // x0,x:(r)+n y:(rh)+n,y1
 		unhandled("x0,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1910: { // x0,x:(r)+n y:(rh)+n,a
+	case 1978: { // x0,x:(r)+n y:(rh)+n,a
 		unhandled("x0,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1911: { // x0,x:(r)+n y:(rh)+n,b
+	case 1979: { // x0,x:(r)+n y:(rh)+n,b
 		unhandled("x0,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1912: { // x1,x:(r)+n y:(rh)+n,y0
+	case 1980: { // x1,x:(r)+n y:(rh)+n,y0
 		unhandled("x1,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1913: { // x1,x:(r)+n y:(rh)+n,y1
+	case 1981: { // x1,x:(r)+n y:(rh)+n,y1
 		unhandled("x1,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1914: { // x1,x:(r)+n y:(rh)+n,a
+	case 1982: { // x1,x:(r)+n y:(rh)+n,a
 		unhandled("x1,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1915: { // x1,x:(r)+n y:(rh)+n,b
+	case 1983: { // x1,x:(r)+n y:(rh)+n,b
 		unhandled("x1,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1916: { // a,x:(r)+n y:(rh)+n,y0
+	case 1984: { // a,x:(r)+n y:(rh)+n,y0
 		unhandled("a,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1917: { // a,x:(r)+n y:(rh)+n,y1
+	case 1985: { // a,x:(r)+n y:(rh)+n,y1
 		unhandled("a,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1918: { // a,x:(r)+n y:(rh)+n,a
+	case 1986: { // a,x:(r)+n y:(rh)+n,a
 		unhandled("a,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1919: { // a,x:(r)+n y:(rh)+n,b
+	case 1987: { // a,x:(r)+n y:(rh)+n,b
 		unhandled("a,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1920: { // b,x:(r)+n y:(rh)+n,y0
+	case 1988: { // b,x:(r)+n y:(rh)+n,y0
 		unhandled("b,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1921: { // b,x:(r)+n y:(rh)+n,y1
+	case 1989: { // b,x:(r)+n y:(rh)+n,y1
 		unhandled("b,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1922: { // b,x:(r)+n y:(rh)+n,a
+	case 1990: { // b,x:(r)+n y:(rh)+n,a
 		unhandled("b,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1923: { // b,x:(r)+n y:(rh)+n,b
+	case 1991: { // b,x:(r)+n y:(rh)+n,b
 		unhandled("b,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1924: { // x0,x:(r)+n y:(rh)-,y0
+	case 1992: { // x0,x:(r)+n y:(rh)-,y0
 		unhandled("x0,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1925: { // x0,x:(r)+n y:(rh)-,y1
+	case 1993: { // x0,x:(r)+n y:(rh)-,y1
 		unhandled("x0,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1926: { // x0,x:(r)+n y:(rh)-,a
+	case 1994: { // x0,x:(r)+n y:(rh)-,a
 		unhandled("x0,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1927: { // x0,x:(r)+n y:(rh)-,b
+	case 1995: { // x0,x:(r)+n y:(rh)-,b
 		unhandled("x0,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1928: { // x1,x:(r)+n y:(rh)-,y0
+	case 1996: { // x1,x:(r)+n y:(rh)-,y0
 		unhandled("x1,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1929: { // x1,x:(r)+n y:(rh)-,y1
+	case 1997: { // x1,x:(r)+n y:(rh)-,y1
 		unhandled("x1,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1930: { // x1,x:(r)+n y:(rh)-,a
+	case 1998: { // x1,x:(r)+n y:(rh)-,a
 		unhandled("x1,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1931: { // x1,x:(r)+n y:(rh)-,b
+	case 1999: { // x1,x:(r)+n y:(rh)-,b
 		unhandled("x1,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1932: { // a,x:(r)+n y:(rh)-,y0
+	case 2000: { // a,x:(r)+n y:(rh)-,y0
 		unhandled("a,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1933: { // a,x:(r)+n y:(rh)-,y1
+	case 2001: { // a,x:(r)+n y:(rh)-,y1
 		unhandled("a,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1934: { // a,x:(r)+n y:(rh)-,a
+	case 2002: { // a,x:(r)+n y:(rh)-,a
 		unhandled("a,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1935: { // a,x:(r)+n y:(rh)-,b
+	case 2003: { // a,x:(r)+n y:(rh)-,b
 		unhandled("a,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1936: { // b,x:(r)+n y:(rh)-,y0
+	case 2004: { // b,x:(r)+n y:(rh)-,y0
 		unhandled("b,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1937: { // b,x:(r)+n y:(rh)-,y1
+	case 2005: { // b,x:(r)+n y:(rh)-,y1
 		unhandled("b,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1938: { // b,x:(r)+n y:(rh)-,a
+	case 2006: { // b,x:(r)+n y:(rh)-,a
 		unhandled("b,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1939: { // b,x:(r)+n y:(rh)-,b
+	case 2007: { // b,x:(r)+n y:(rh)-,b
 		unhandled("b,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1940: { // x0,x:(r)+n y:(rh)+,y0
+	case 2008: { // x0,x:(r)+n y:(rh)+,y0
 		unhandled("x0,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 1941: { // x0,x:(r)+n y:(rh)+,y1
+	case 2009: { // x0,x:(r)+n y:(rh)+,y1
 		unhandled("x0,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 1942: { // x0,x:(r)+n y:(rh)+,a
+	case 2010: { // x0,x:(r)+n y:(rh)+,a
 		unhandled("x0,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 1943: { // x0,x:(r)+n y:(rh)+,b
+	case 2011: { // x0,x:(r)+n y:(rh)+,b
 		unhandled("x0,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 1944: { // x1,x:(r)+n y:(rh)+,y0
+	case 2012: { // x1,x:(r)+n y:(rh)+,y0
 		unhandled("x1,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 1945: { // x1,x:(r)+n y:(rh)+,y1
+	case 2013: { // x1,x:(r)+n y:(rh)+,y1
 		unhandled("x1,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 1946: { // x1,x:(r)+n y:(rh)+,a
+	case 2014: { // x1,x:(r)+n y:(rh)+,a
 		unhandled("x1,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 1947: { // x1,x:(r)+n y:(rh)+,b
+	case 2015: { // x1,x:(r)+n y:(rh)+,b
 		unhandled("x1,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 1948: { // a,x:(r)+n y:(rh)+,y0
+	case 2016: { // a,x:(r)+n y:(rh)+,y0
 		unhandled("a,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 1949: { // a,x:(r)+n y:(rh)+,y1
+	case 2017: { // a,x:(r)+n y:(rh)+,y1
 		unhandled("a,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 1950: { // a,x:(r)+n y:(rh)+,a
+	case 2018: { // a,x:(r)+n y:(rh)+,a
 		unhandled("a,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 1951: { // a,x:(r)+n y:(rh)+,b
+	case 2019: { // a,x:(r)+n y:(rh)+,b
 		unhandled("a,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 1952: { // b,x:(r)+n y:(rh)+,y0
+	case 2020: { // b,x:(r)+n y:(rh)+,y0
 		unhandled("b,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 1953: { // b,x:(r)+n y:(rh)+,y1
+	case 2021: { // b,x:(r)+n y:(rh)+,y1
 		unhandled("b,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 1954: { // b,x:(r)+n y:(rh)+,a
+	case 2022: { // b,x:(r)+n y:(rh)+,a
 		unhandled("b,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 1955: { // b,x:(r)+n y:(rh)+,b
+	case 2023: { // b,x:(r)+n y:(rh)+,b
 		unhandled("b,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 1956: { // x0,x:(r)+n y:(rh),y0
+	case 2024: { // x0,x:(r)+n y:(rh),y0
 		unhandled("x0,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 1957: { // x0,x:(r)+n y:(rh),y1
+	case 2025: { // x0,x:(r)+n y:(rh),y1
 		unhandled("x0,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 1958: { // x0,x:(r)+n y:(rh),a
+	case 2026: { // x0,x:(r)+n y:(rh),a
 		unhandled("x0,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 1959: { // x0,x:(r)+n y:(rh),b
+	case 2027: { // x0,x:(r)+n y:(rh),b
 		unhandled("x0,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 1960: { // x1,x:(r)+n y:(rh),y0
+	case 2028: { // x1,x:(r)+n y:(rh),y0
 		unhandled("x1,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 1961: { // x1,x:(r)+n y:(rh),y1
+	case 2029: { // x1,x:(r)+n y:(rh),y1
 		unhandled("x1,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 1962: { // x1,x:(r)+n y:(rh),a
+	case 2030: { // x1,x:(r)+n y:(rh),a
 		unhandled("x1,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 1963: { // x1,x:(r)+n y:(rh),b
+	case 2031: { // x1,x:(r)+n y:(rh),b
 		unhandled("x1,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 1964: { // a,x:(r)+n y:(rh),y0
+	case 2032: { // a,x:(r)+n y:(rh),y0
 		unhandled("a,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 1965: { // a,x:(r)+n y:(rh),y1
+	case 2033: { // a,x:(r)+n y:(rh),y1
 		unhandled("a,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 1966: { // a,x:(r)+n y:(rh),a
+	case 2034: { // a,x:(r)+n y:(rh),a
 		unhandled("a,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 1967: { // a,x:(r)+n y:(rh),b
+	case 2035: { // a,x:(r)+n y:(rh),b
 		unhandled("a,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 1968: { // b,x:(r)+n y:(rh),y0
+	case 2036: { // b,x:(r)+n y:(rh),y0
 		unhandled("b,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 1969: { // b,x:(r)+n y:(rh),y1
+	case 2037: { // b,x:(r)+n y:(rh),y1
 		unhandled("b,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 1970: { // b,x:(r)+n y:(rh),a
+	case 2038: { // b,x:(r)+n y:(rh),a
 		unhandled("b,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 1971: { // b,x:(r)+n y:(rh),b
+	case 2039: { // b,x:(r)+n y:(rh),b
 		unhandled("b,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 1972: { // x0,x:(r)- y:(rh)+n,y0
+	case 2040: { // x0,x:(r)- y:(rh)+n,y0
 		unhandled("x0,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 1973: { // x0,x:(r)- y:(rh)+n,y1
+	case 2041: { // x0,x:(r)- y:(rh)+n,y1
 		unhandled("x0,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 1974: { // x0,x:(r)- y:(rh)+n,a
+	case 2042: { // x0,x:(r)- y:(rh)+n,a
 		unhandled("x0,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 1975: { // x0,x:(r)- y:(rh)+n,b
+	case 2043: { // x0,x:(r)- y:(rh)+n,b
 		unhandled("x0,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 1976: { // x1,x:(r)- y:(rh)+n,y0
+	case 2044: { // x1,x:(r)- y:(rh)+n,y0
 		unhandled("x1,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 1977: { // x1,x:(r)- y:(rh)+n,y1
+	case 2045: { // x1,x:(r)- y:(rh)+n,y1
 		unhandled("x1,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 1978: { // x1,x:(r)- y:(rh)+n,a
+	case 2046: { // x1,x:(r)- y:(rh)+n,a
 		unhandled("x1,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 1979: { // x1,x:(r)- y:(rh)+n,b
+	case 2047: { // x1,x:(r)- y:(rh)+n,b
 		unhandled("x1,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 1980: { // a,x:(r)- y:(rh)+n,y0
+	case 2048: { // a,x:(r)- y:(rh)+n,y0
 		unhandled("a,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 1981: { // a,x:(r)- y:(rh)+n,y1
+	case 2049: { // a,x:(r)- y:(rh)+n,y1
 		unhandled("a,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 1982: { // a,x:(r)- y:(rh)+n,a
+	case 2050: { // a,x:(r)- y:(rh)+n,a
 		unhandled("a,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 1983: { // a,x:(r)- y:(rh)+n,b
+	case 2051: { // a,x:(r)- y:(rh)+n,b
 		unhandled("a,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 1984: { // b,x:(r)- y:(rh)+n,y0
+	case 2052: { // b,x:(r)- y:(rh)+n,y0
 		unhandled("b,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 1985: { // b,x:(r)- y:(rh)+n,y1
+	case 2053: { // b,x:(r)- y:(rh)+n,y1
 		unhandled("b,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 1986: { // b,x:(r)- y:(rh)+n,a
+	case 2054: { // b,x:(r)- y:(rh)+n,a
 		unhandled("b,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 1987: { // b,x:(r)- y:(rh)+n,b
+	case 2055: { // b,x:(r)- y:(rh)+n,b
 		unhandled("b,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 1988: { // x0,x:(r)- y:(rh)-,y0
+	case 2056: { // x0,x:(r)- y:(rh)-,y0
 		unhandled("x0,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 1989: { // x0,x:(r)- y:(rh)-,y1
+	case 2057: { // x0,x:(r)- y:(rh)-,y1
 		unhandled("x0,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 1990: { // x0,x:(r)- y:(rh)-,a
+	case 2058: { // x0,x:(r)- y:(rh)-,a
 		unhandled("x0,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 1991: { // x0,x:(r)- y:(rh)-,b
+	case 2059: { // x0,x:(r)- y:(rh)-,b
 		unhandled("x0,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 1992: { // x1,x:(r)- y:(rh)-,y0
+	case 2060: { // x1,x:(r)- y:(rh)-,y0
 		unhandled("x1,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 1993: { // x1,x:(r)- y:(rh)-,y1
+	case 2061: { // x1,x:(r)- y:(rh)-,y1
 		unhandled("x1,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 1994: { // x1,x:(r)- y:(rh)-,a
+	case 2062: { // x1,x:(r)- y:(rh)-,a
 		unhandled("x1,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 1995: { // x1,x:(r)- y:(rh)-,b
+	case 2063: { // x1,x:(r)- y:(rh)-,b
 		unhandled("x1,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 1996: { // a,x:(r)- y:(rh)-,y0
+	case 2064: { // a,x:(r)- y:(rh)-,y0
 		unhandled("a,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 1997: { // a,x:(r)- y:(rh)-,y1
+	case 2065: { // a,x:(r)- y:(rh)-,y1
 		unhandled("a,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 1998: { // a,x:(r)- y:(rh)-,a
+	case 2066: { // a,x:(r)- y:(rh)-,a
 		unhandled("a,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 1999: { // a,x:(r)- y:(rh)-,b
+	case 2067: { // a,x:(r)- y:(rh)-,b
 		unhandled("a,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2000: { // b,x:(r)- y:(rh)-,y0
+	case 2068: { // b,x:(r)- y:(rh)-,y0
 		unhandled("b,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2001: { // b,x:(r)- y:(rh)-,y1
+	case 2069: { // b,x:(r)- y:(rh)-,y1
 		unhandled("b,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2002: { // b,x:(r)- y:(rh)-,a
+	case 2070: { // b,x:(r)- y:(rh)-,a
 		unhandled("b,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2003: { // b,x:(r)- y:(rh)-,b
+	case 2071: { // b,x:(r)- y:(rh)-,b
 		unhandled("b,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2004: { // x0,x:(r)- y:(rh)+,y0
+	case 2072: { // x0,x:(r)- y:(rh)+,y0
 		unhandled("x0,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2005: { // x0,x:(r)- y:(rh)+,y1
+	case 2073: { // x0,x:(r)- y:(rh)+,y1
 		unhandled("x0,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2006: { // x0,x:(r)- y:(rh)+,a
+	case 2074: { // x0,x:(r)- y:(rh)+,a
 		unhandled("x0,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2007: { // x0,x:(r)- y:(rh)+,b
+	case 2075: { // x0,x:(r)- y:(rh)+,b
 		unhandled("x0,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2008: { // x1,x:(r)- y:(rh)+,y0
+	case 2076: { // x1,x:(r)- y:(rh)+,y0
 		unhandled("x1,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2009: { // x1,x:(r)- y:(rh)+,y1
+	case 2077: { // x1,x:(r)- y:(rh)+,y1
 		unhandled("x1,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2010: { // x1,x:(r)- y:(rh)+,a
+	case 2078: { // x1,x:(r)- y:(rh)+,a
 		unhandled("x1,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2011: { // x1,x:(r)- y:(rh)+,b
+	case 2079: { // x1,x:(r)- y:(rh)+,b
 		unhandled("x1,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2012: { // a,x:(r)- y:(rh)+,y0
+	case 2080: { // a,x:(r)- y:(rh)+,y0
 		unhandled("a,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2013: { // a,x:(r)- y:(rh)+,y1
+	case 2081: { // a,x:(r)- y:(rh)+,y1
 		unhandled("a,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2014: { // a,x:(r)- y:(rh)+,a
+	case 2082: { // a,x:(r)- y:(rh)+,a
 		unhandled("a,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2015: { // a,x:(r)- y:(rh)+,b
+	case 2083: { // a,x:(r)- y:(rh)+,b
 		unhandled("a,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2016: { // b,x:(r)- y:(rh)+,y0
+	case 2084: { // b,x:(r)- y:(rh)+,y0
 		unhandled("b,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2017: { // b,x:(r)- y:(rh)+,y1
+	case 2085: { // b,x:(r)- y:(rh)+,y1
 		unhandled("b,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2018: { // b,x:(r)- y:(rh)+,a
+	case 2086: { // b,x:(r)- y:(rh)+,a
 		unhandled("b,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2019: { // b,x:(r)- y:(rh)+,b
+	case 2087: { // b,x:(r)- y:(rh)+,b
 		unhandled("b,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2020: { // x0,x:(r)- y:(rh),y0
+	case 2088: { // x0,x:(r)- y:(rh),y0
 		unhandled("x0,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2021: { // x0,x:(r)- y:(rh),y1
+	case 2089: { // x0,x:(r)- y:(rh),y1
 		unhandled("x0,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2022: { // x0,x:(r)- y:(rh),a
+	case 2090: { // x0,x:(r)- y:(rh),a
 		unhandled("x0,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2023: { // x0,x:(r)- y:(rh),b
+	case 2091: { // x0,x:(r)- y:(rh),b
 		unhandled("x0,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2024: { // x1,x:(r)- y:(rh),y0
+	case 2092: { // x1,x:(r)- y:(rh),y0
 		unhandled("x1,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2025: { // x1,x:(r)- y:(rh),y1
+	case 2093: { // x1,x:(r)- y:(rh),y1
 		unhandled("x1,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2026: { // x1,x:(r)- y:(rh),a
+	case 2094: { // x1,x:(r)- y:(rh),a
 		unhandled("x1,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2027: { // x1,x:(r)- y:(rh),b
+	case 2095: { // x1,x:(r)- y:(rh),b
 		unhandled("x1,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2028: { // a,x:(r)- y:(rh),y0
+	case 2096: { // a,x:(r)- y:(rh),y0
 		unhandled("a,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2029: { // a,x:(r)- y:(rh),y1
+	case 2097: { // a,x:(r)- y:(rh),y1
 		unhandled("a,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2030: { // a,x:(r)- y:(rh),a
+	case 2098: { // a,x:(r)- y:(rh),a
 		unhandled("a,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2031: { // a,x:(r)- y:(rh),b
+	case 2099: { // a,x:(r)- y:(rh),b
 		unhandled("a,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2032: { // b,x:(r)- y:(rh),y0
+	case 2100: { // b,x:(r)- y:(rh),y0
 		unhandled("b,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2033: { // b,x:(r)- y:(rh),y1
+	case 2101: { // b,x:(r)- y:(rh),y1
 		unhandled("b,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2034: { // b,x:(r)- y:(rh),a
+	case 2102: { // b,x:(r)- y:(rh),a
 		unhandled("b,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2035: { // b,x:(r)- y:(rh),b
+	case 2103: { // b,x:(r)- y:(rh),b
 		unhandled("b,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2036: { // x0,x:(r)+ y:(rh)+n,y0
+	case 2104: { // x0,x:(r)+ y:(rh)+n,y0
 		unhandled("x0,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2037: { // x0,x:(r)+ y:(rh)+n,y1
+	case 2105: { // x0,x:(r)+ y:(rh)+n,y1
 		unhandled("x0,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2038: { // x0,x:(r)+ y:(rh)+n,a
+	case 2106: { // x0,x:(r)+ y:(rh)+n,a
 		unhandled("x0,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2039: { // x0,x:(r)+ y:(rh)+n,b
+	case 2107: { // x0,x:(r)+ y:(rh)+n,b
 		unhandled("x0,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2040: { // x1,x:(r)+ y:(rh)+n,y0
+	case 2108: { // x1,x:(r)+ y:(rh)+n,y0
 		unhandled("x1,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2041: { // x1,x:(r)+ y:(rh)+n,y1
+	case 2109: { // x1,x:(r)+ y:(rh)+n,y1
 		unhandled("x1,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2042: { // x1,x:(r)+ y:(rh)+n,a
+	case 2110: { // x1,x:(r)+ y:(rh)+n,a
 		unhandled("x1,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2043: { // x1,x:(r)+ y:(rh)+n,b
+	case 2111: { // x1,x:(r)+ y:(rh)+n,b
 		unhandled("x1,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2044: { // a,x:(r)+ y:(rh)+n,y0
+	case 2112: { // a,x:(r)+ y:(rh)+n,y0
 		unhandled("a,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2045: { // a,x:(r)+ y:(rh)+n,y1
+	case 2113: { // a,x:(r)+ y:(rh)+n,y1
 		unhandled("a,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2046: { // a,x:(r)+ y:(rh)+n,a
+	case 2114: { // a,x:(r)+ y:(rh)+n,a
 		unhandled("a,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2047: { // a,x:(r)+ y:(rh)+n,b
+	case 2115: { // a,x:(r)+ y:(rh)+n,b
 		unhandled("a,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2048: { // b,x:(r)+ y:(rh)+n,y0
+	case 2116: { // b,x:(r)+ y:(rh)+n,y0
 		unhandled("b,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2049: { // b,x:(r)+ y:(rh)+n,y1
+	case 2117: { // b,x:(r)+ y:(rh)+n,y1
 		unhandled("b,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2050: { // b,x:(r)+ y:(rh)+n,a
+	case 2118: { // b,x:(r)+ y:(rh)+n,a
 		unhandled("b,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2051: { // b,x:(r)+ y:(rh)+n,b
+	case 2119: { // b,x:(r)+ y:(rh)+n,b
 		unhandled("b,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2052: { // x0,x:(r)+ y:(rh)-,y0
+	case 2120: { // x0,x:(r)+ y:(rh)-,y0
 		unhandled("x0,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2053: { // x0,x:(r)+ y:(rh)-,y1
+	case 2121: { // x0,x:(r)+ y:(rh)-,y1
 		unhandled("x0,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2054: { // x0,x:(r)+ y:(rh)-,a
+	case 2122: { // x0,x:(r)+ y:(rh)-,a
 		unhandled("x0,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2055: { // x0,x:(r)+ y:(rh)-,b
+	case 2123: { // x0,x:(r)+ y:(rh)-,b
 		unhandled("x0,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2056: { // x1,x:(r)+ y:(rh)-,y0
+	case 2124: { // x1,x:(r)+ y:(rh)-,y0
 		unhandled("x1,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2057: { // x1,x:(r)+ y:(rh)-,y1
+	case 2125: { // x1,x:(r)+ y:(rh)-,y1
 		unhandled("x1,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2058: { // x1,x:(r)+ y:(rh)-,a
+	case 2126: { // x1,x:(r)+ y:(rh)-,a
 		unhandled("x1,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2059: { // x1,x:(r)+ y:(rh)-,b
+	case 2127: { // x1,x:(r)+ y:(rh)-,b
 		unhandled("x1,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2060: { // a,x:(r)+ y:(rh)-,y0
+	case 2128: { // a,x:(r)+ y:(rh)-,y0
 		unhandled("a,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2061: { // a,x:(r)+ y:(rh)-,y1
+	case 2129: { // a,x:(r)+ y:(rh)-,y1
 		unhandled("a,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2062: { // a,x:(r)+ y:(rh)-,a
+	case 2130: { // a,x:(r)+ y:(rh)-,a
 		unhandled("a,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2063: { // a,x:(r)+ y:(rh)-,b
+	case 2131: { // a,x:(r)+ y:(rh)-,b
 		unhandled("a,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2064: { // b,x:(r)+ y:(rh)-,y0
+	case 2132: { // b,x:(r)+ y:(rh)-,y0
 		unhandled("b,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2065: { // b,x:(r)+ y:(rh)-,y1
+	case 2133: { // b,x:(r)+ y:(rh)-,y1
 		unhandled("b,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2066: { // b,x:(r)+ y:(rh)-,a
+	case 2134: { // b,x:(r)+ y:(rh)-,a
 		unhandled("b,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2067: { // b,x:(r)+ y:(rh)-,b
+	case 2135: { // b,x:(r)+ y:(rh)-,b
 		unhandled("b,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2068: { // x0,x:(r)+ y:(rh)+,y0
+	case 2136: { // x0,x:(r)+ y:(rh)+,y0
 		unhandled("x0,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2069: { // x0,x:(r)+ y:(rh)+,y1
+	case 2137: { // x0,x:(r)+ y:(rh)+,y1
 		unhandled("x0,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2070: { // x0,x:(r)+ y:(rh)+,a
+	case 2138: { // x0,x:(r)+ y:(rh)+,a
 		unhandled("x0,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2071: { // x0,x:(r)+ y:(rh)+,b
+	case 2139: { // x0,x:(r)+ y:(rh)+,b
 		unhandled("x0,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2072: { // x1,x:(r)+ y:(rh)+,y0
+	case 2140: { // x1,x:(r)+ y:(rh)+,y0
 		unhandled("x1,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2073: { // x1,x:(r)+ y:(rh)+,y1
+	case 2141: { // x1,x:(r)+ y:(rh)+,y1
 		unhandled("x1,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2074: { // x1,x:(r)+ y:(rh)+,a
+	case 2142: { // x1,x:(r)+ y:(rh)+,a
 		unhandled("x1,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2075: { // x1,x:(r)+ y:(rh)+,b
+	case 2143: { // x1,x:(r)+ y:(rh)+,b
 		unhandled("x1,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2076: { // a,x:(r)+ y:(rh)+,y0
+	case 2144: { // a,x:(r)+ y:(rh)+,y0
 		unhandled("a,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2077: { // a,x:(r)+ y:(rh)+,y1
+	case 2145: { // a,x:(r)+ y:(rh)+,y1
 		unhandled("a,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2078: { // a,x:(r)+ y:(rh)+,a
+	case 2146: { // a,x:(r)+ y:(rh)+,a
 		unhandled("a,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2079: { // a,x:(r)+ y:(rh)+,b
+	case 2147: { // a,x:(r)+ y:(rh)+,b
 		unhandled("a,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2080: { // b,x:(r)+ y:(rh)+,y0
+	case 2148: { // b,x:(r)+ y:(rh)+,y0
 		unhandled("b,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2081: { // b,x:(r)+ y:(rh)+,y1
+	case 2149: { // b,x:(r)+ y:(rh)+,y1
 		unhandled("b,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2082: { // b,x:(r)+ y:(rh)+,a
+	case 2150: { // b,x:(r)+ y:(rh)+,a
 		unhandled("b,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2083: { // b,x:(r)+ y:(rh)+,b
+	case 2151: { // b,x:(r)+ y:(rh)+,b
 		unhandled("b,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2084: { // x0,x:(r)+ y:(rh),y0
+	case 2152: { // x0,x:(r)+ y:(rh),y0
 		unhandled("x0,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2085: { // x0,x:(r)+ y:(rh),y1
+	case 2153: { // x0,x:(r)+ y:(rh),y1
 		unhandled("x0,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2086: { // x0,x:(r)+ y:(rh),a
+	case 2154: { // x0,x:(r)+ y:(rh),a
 		unhandled("x0,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2087: { // x0,x:(r)+ y:(rh),b
+	case 2155: { // x0,x:(r)+ y:(rh),b
 		unhandled("x0,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2088: { // x1,x:(r)+ y:(rh),y0
+	case 2156: { // x1,x:(r)+ y:(rh),y0
 		unhandled("x1,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2089: { // x1,x:(r)+ y:(rh),y1
+	case 2157: { // x1,x:(r)+ y:(rh),y1
 		unhandled("x1,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2090: { // x1,x:(r)+ y:(rh),a
+	case 2158: { // x1,x:(r)+ y:(rh),a
 		unhandled("x1,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2091: { // x1,x:(r)+ y:(rh),b
+	case 2159: { // x1,x:(r)+ y:(rh),b
 		unhandled("x1,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2092: { // a,x:(r)+ y:(rh),y0
+	case 2160: { // a,x:(r)+ y:(rh),y0
 		unhandled("a,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2093: { // a,x:(r)+ y:(rh),y1
+	case 2161: { // a,x:(r)+ y:(rh),y1
 		unhandled("a,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2094: { // a,x:(r)+ y:(rh),a
+	case 2162: { // a,x:(r)+ y:(rh),a
 		unhandled("a,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2095: { // a,x:(r)+ y:(rh),b
+	case 2163: { // a,x:(r)+ y:(rh),b
 		unhandled("a,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2096: { // b,x:(r)+ y:(rh),y0
+	case 2164: { // b,x:(r)+ y:(rh),y0
 		unhandled("b,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2097: { // b,x:(r)+ y:(rh),y1
+	case 2165: { // b,x:(r)+ y:(rh),y1
 		unhandled("b,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2098: { // b,x:(r)+ y:(rh),a
+	case 2166: { // b,x:(r)+ y:(rh),a
 		unhandled("b,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2099: { // b,x:(r)+ y:(rh),b
+	case 2167: { // b,x:(r)+ y:(rh),b
 		unhandled("b,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2100: { // x0,x:(r) y:(rh)+n,y0
+	case 2168: { // x0,x:(r) y:(rh)+n,y0
 		unhandled("x0,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2101: { // x0,x:(r) y:(rh)+n,y1
+	case 2169: { // x0,x:(r) y:(rh)+n,y1
 		unhandled("x0,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2102: { // x0,x:(r) y:(rh)+n,a
+	case 2170: { // x0,x:(r) y:(rh)+n,a
 		unhandled("x0,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2103: { // x0,x:(r) y:(rh)+n,b
+	case 2171: { // x0,x:(r) y:(rh)+n,b
 		unhandled("x0,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2104: { // x1,x:(r) y:(rh)+n,y0
+	case 2172: { // x1,x:(r) y:(rh)+n,y0
 		unhandled("x1,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2105: { // x1,x:(r) y:(rh)+n,y1
+	case 2173: { // x1,x:(r) y:(rh)+n,y1
 		unhandled("x1,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2106: { // x1,x:(r) y:(rh)+n,a
+	case 2174: { // x1,x:(r) y:(rh)+n,a
 		unhandled("x1,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2107: { // x1,x:(r) y:(rh)+n,b
+	case 2175: { // x1,x:(r) y:(rh)+n,b
 		unhandled("x1,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2108: { // a,x:(r) y:(rh)+n,y0
+	case 2176: { // a,x:(r) y:(rh)+n,y0
 		unhandled("a,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2109: { // a,x:(r) y:(rh)+n,y1
+	case 2177: { // a,x:(r) y:(rh)+n,y1
 		unhandled("a,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2110: { // a,x:(r) y:(rh)+n,a
+	case 2178: { // a,x:(r) y:(rh)+n,a
 		unhandled("a,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2111: { // a,x:(r) y:(rh)+n,b
+	case 2179: { // a,x:(r) y:(rh)+n,b
 		unhandled("a,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2112: { // b,x:(r) y:(rh)+n,y0
+	case 2180: { // b,x:(r) y:(rh)+n,y0
 		unhandled("b,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2113: { // b,x:(r) y:(rh)+n,y1
+	case 2181: { // b,x:(r) y:(rh)+n,y1
 		unhandled("b,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2114: { // b,x:(r) y:(rh)+n,a
+	case 2182: { // b,x:(r) y:(rh)+n,a
 		unhandled("b,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2115: { // b,x:(r) y:(rh)+n,b
+	case 2183: { // b,x:(r) y:(rh)+n,b
 		unhandled("b,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2116: { // x0,x:(r) y:(rh)-,y0
+	case 2184: { // x0,x:(r) y:(rh)-,y0
 		unhandled("x0,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2117: { // x0,x:(r) y:(rh)-,y1
+	case 2185: { // x0,x:(r) y:(rh)-,y1
 		unhandled("x0,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2118: { // x0,x:(r) y:(rh)-,a
+	case 2186: { // x0,x:(r) y:(rh)-,a
 		unhandled("x0,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2119: { // x0,x:(r) y:(rh)-,b
+	case 2187: { // x0,x:(r) y:(rh)-,b
 		unhandled("x0,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2120: { // x1,x:(r) y:(rh)-,y0
+	case 2188: { // x1,x:(r) y:(rh)-,y0
 		unhandled("x1,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2121: { // x1,x:(r) y:(rh)-,y1
+	case 2189: { // x1,x:(r) y:(rh)-,y1
 		unhandled("x1,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2122: { // x1,x:(r) y:(rh)-,a
+	case 2190: { // x1,x:(r) y:(rh)-,a
 		unhandled("x1,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2123: { // x1,x:(r) y:(rh)-,b
+	case 2191: { // x1,x:(r) y:(rh)-,b
 		unhandled("x1,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2124: { // a,x:(r) y:(rh)-,y0
+	case 2192: { // a,x:(r) y:(rh)-,y0
 		unhandled("a,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2125: { // a,x:(r) y:(rh)-,y1
+	case 2193: { // a,x:(r) y:(rh)-,y1
 		unhandled("a,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2126: { // a,x:(r) y:(rh)-,a
+	case 2194: { // a,x:(r) y:(rh)-,a
 		unhandled("a,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2127: { // a,x:(r) y:(rh)-,b
+	case 2195: { // a,x:(r) y:(rh)-,b
 		unhandled("a,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2128: { // b,x:(r) y:(rh)-,y0
+	case 2196: { // b,x:(r) y:(rh)-,y0
 		unhandled("b,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2129: { // b,x:(r) y:(rh)-,y1
+	case 2197: { // b,x:(r) y:(rh)-,y1
 		unhandled("b,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2130: { // b,x:(r) y:(rh)-,a
+	case 2198: { // b,x:(r) y:(rh)-,a
 		unhandled("b,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2131: { // b,x:(r) y:(rh)-,b
+	case 2199: { // b,x:(r) y:(rh)-,b
 		unhandled("b,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2132: { // x0,x:(r) y:(rh)+,y0
+	case 2200: { // x0,x:(r) y:(rh)+,y0
 		unhandled("x0,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2133: { // x0,x:(r) y:(rh)+,y1
+	case 2201: { // x0,x:(r) y:(rh)+,y1
 		unhandled("x0,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2134: { // x0,x:(r) y:(rh)+,a
+	case 2202: { // x0,x:(r) y:(rh)+,a
 		unhandled("x0,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2135: { // x0,x:(r) y:(rh)+,b
+	case 2203: { // x0,x:(r) y:(rh)+,b
 		unhandled("x0,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2136: { // x1,x:(r) y:(rh)+,y0
+	case 2204: { // x1,x:(r) y:(rh)+,y0
 		unhandled("x1,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2137: { // x1,x:(r) y:(rh)+,y1
+	case 2205: { // x1,x:(r) y:(rh)+,y1
 		unhandled("x1,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2138: { // x1,x:(r) y:(rh)+,a
+	case 2206: { // x1,x:(r) y:(rh)+,a
 		unhandled("x1,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2139: { // x1,x:(r) y:(rh)+,b
+	case 2207: { // x1,x:(r) y:(rh)+,b
 		unhandled("x1,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2140: { // a,x:(r) y:(rh)+,y0
+	case 2208: { // a,x:(r) y:(rh)+,y0
 		unhandled("a,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2141: { // a,x:(r) y:(rh)+,y1
+	case 2209: { // a,x:(r) y:(rh)+,y1
 		unhandled("a,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2142: { // a,x:(r) y:(rh)+,a
+	case 2210: { // a,x:(r) y:(rh)+,a
 		unhandled("a,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2143: { // a,x:(r) y:(rh)+,b
+	case 2211: { // a,x:(r) y:(rh)+,b
 		unhandled("a,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2144: { // b,x:(r) y:(rh)+,y0
+	case 2212: { // b,x:(r) y:(rh)+,y0
 		unhandled("b,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2145: { // b,x:(r) y:(rh)+,y1
+	case 2213: { // b,x:(r) y:(rh)+,y1
 		unhandled("b,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2146: { // b,x:(r) y:(rh)+,a
+	case 2214: { // b,x:(r) y:(rh)+,a
 		unhandled("b,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2147: { // b,x:(r) y:(rh)+,b
+	case 2215: { // b,x:(r) y:(rh)+,b
 		unhandled("b,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2148: { // x0,x:(r) y:(rh),y0
+	case 2216: { // x0,x:(r) y:(rh),y0
 		unhandled("x0,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2149: { // x0,x:(r) y:(rh),y1
+	case 2217: { // x0,x:(r) y:(rh),y1
 		unhandled("x0,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2150: { // x0,x:(r) y:(rh),a
+	case 2218: { // x0,x:(r) y:(rh),a
 		unhandled("x0,x:(r) y:(rh),a");
 		break;
 		}
-	case 2151: { // x0,x:(r) y:(rh),b
+	case 2219: { // x0,x:(r) y:(rh),b
 		unhandled("x0,x:(r) y:(rh),b");
 		break;
 		}
-	case 2152: { // x1,x:(r) y:(rh),y0
+	case 2220: { // x1,x:(r) y:(rh),y0
 		unhandled("x1,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2153: { // x1,x:(r) y:(rh),y1
+	case 2221: { // x1,x:(r) y:(rh),y1
 		unhandled("x1,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2154: { // x1,x:(r) y:(rh),a
+	case 2222: { // x1,x:(r) y:(rh),a
 		unhandled("x1,x:(r) y:(rh),a");
 		break;
 		}
-	case 2155: { // x1,x:(r) y:(rh),b
+	case 2223: { // x1,x:(r) y:(rh),b
 		unhandled("x1,x:(r) y:(rh),b");
 		break;
 		}
-	case 2156: { // a,x:(r) y:(rh),y0
+	case 2224: { // a,x:(r) y:(rh),y0
 		unhandled("a,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2157: { // a,x:(r) y:(rh),y1
+	case 2225: { // a,x:(r) y:(rh),y1
 		unhandled("a,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2158: { // a,x:(r) y:(rh),a
+	case 2226: { // a,x:(r) y:(rh),a
 		unhandled("a,x:(r) y:(rh),a");
 		break;
 		}
-	case 2159: { // a,x:(r) y:(rh),b
+	case 2227: { // a,x:(r) y:(rh),b
 		unhandled("a,x:(r) y:(rh),b");
 		break;
 		}
-	case 2160: { // b,x:(r) y:(rh),y0
+	case 2228: { // b,x:(r) y:(rh),y0
 		unhandled("b,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2161: { // b,x:(r) y:(rh),y1
+	case 2229: { // b,x:(r) y:(rh),y1
 		unhandled("b,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2162: { // b,x:(r) y:(rh),a
+	case 2230: { // b,x:(r) y:(rh),a
 		unhandled("b,x:(r) y:(rh),a");
 		break;
 		}
-	case 2163: { // b,x:(r) y:(rh),b
+	case 2231: { // b,x:(r) y:(rh),b
 		unhandled("b,x:(r) y:(rh),b");
 		break;
 		}
-	case 2164: { // x0,x:(r)+n y0,y:(rh)+n
+	case 2232: { // x0,x:(r)+n y0,y:(rh)+n
 		unhandled("x0,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2165: { // x0,x:(r)+n y1,y:(rh)+n
+	case 2233: { // x0,x:(r)+n y1,y:(rh)+n
 		unhandled("x0,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2166: { // x0,x:(r)+n a,y:(rh)+n
+	case 2234: { // x0,x:(r)+n a,y:(rh)+n
 		unhandled("x0,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2167: { // x0,x:(r)+n b,y:(rh)+n
+	case 2235: { // x0,x:(r)+n b,y:(rh)+n
 		unhandled("x0,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2168: { // x1,x:(r)+n y0,y:(rh)+n
+	case 2236: { // x1,x:(r)+n y0,y:(rh)+n
 		unhandled("x1,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2169: { // x1,x:(r)+n y1,y:(rh)+n
+	case 2237: { // x1,x:(r)+n y1,y:(rh)+n
 		unhandled("x1,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2170: { // x1,x:(r)+n a,y:(rh)+n
+	case 2238: { // x1,x:(r)+n a,y:(rh)+n
 		unhandled("x1,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2171: { // x1,x:(r)+n b,y:(rh)+n
+	case 2239: { // x1,x:(r)+n b,y:(rh)+n
 		unhandled("x1,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2172: { // a,x:(r)+n y0,y:(rh)+n
+	case 2240: { // a,x:(r)+n y0,y:(rh)+n
 		unhandled("a,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2173: { // a,x:(r)+n y1,y:(rh)+n
+	case 2241: { // a,x:(r)+n y1,y:(rh)+n
 		unhandled("a,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2174: { // a,x:(r)+n a,y:(rh)+n
+	case 2242: { // a,x:(r)+n a,y:(rh)+n
 		unhandled("a,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2175: { // a,x:(r)+n b,y:(rh)+n
+	case 2243: { // a,x:(r)+n b,y:(rh)+n
 		unhandled("a,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2176: { // b,x:(r)+n y0,y:(rh)+n
+	case 2244: { // b,x:(r)+n y0,y:(rh)+n
 		unhandled("b,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2177: { // b,x:(r)+n y1,y:(rh)+n
+	case 2245: { // b,x:(r)+n y1,y:(rh)+n
 		unhandled("b,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2178: { // b,x:(r)+n a,y:(rh)+n
+	case 2246: { // b,x:(r)+n a,y:(rh)+n
 		unhandled("b,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2179: { // b,x:(r)+n b,y:(rh)+n
+	case 2247: { // b,x:(r)+n b,y:(rh)+n
 		unhandled("b,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2180: { // x0,x:(r)+n y0,y:(rh)-
+	case 2248: { // x0,x:(r)+n y0,y:(rh)-
 		unhandled("x0,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2181: { // x0,x:(r)+n y1,y:(rh)-
+	case 2249: { // x0,x:(r)+n y1,y:(rh)-
 		unhandled("x0,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2182: { // x0,x:(r)+n a,y:(rh)-
+	case 2250: { // x0,x:(r)+n a,y:(rh)-
 		unhandled("x0,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2183: { // x0,x:(r)+n b,y:(rh)-
+	case 2251: { // x0,x:(r)+n b,y:(rh)-
 		unhandled("x0,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2184: { // x1,x:(r)+n y0,y:(rh)-
+	case 2252: { // x1,x:(r)+n y0,y:(rh)-
 		unhandled("x1,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2185: { // x1,x:(r)+n y1,y:(rh)-
+	case 2253: { // x1,x:(r)+n y1,y:(rh)-
 		unhandled("x1,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2186: { // x1,x:(r)+n a,y:(rh)-
+	case 2254: { // x1,x:(r)+n a,y:(rh)-
 		unhandled("x1,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2187: { // x1,x:(r)+n b,y:(rh)-
+	case 2255: { // x1,x:(r)+n b,y:(rh)-
 		unhandled("x1,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2188: { // a,x:(r)+n y0,y:(rh)-
+	case 2256: { // a,x:(r)+n y0,y:(rh)-
 		unhandled("a,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2189: { // a,x:(r)+n y1,y:(rh)-
+	case 2257: { // a,x:(r)+n y1,y:(rh)-
 		unhandled("a,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2190: { // a,x:(r)+n a,y:(rh)-
+	case 2258: { // a,x:(r)+n a,y:(rh)-
 		unhandled("a,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2191: { // a,x:(r)+n b,y:(rh)-
+	case 2259: { // a,x:(r)+n b,y:(rh)-
 		unhandled("a,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2192: { // b,x:(r)+n y0,y:(rh)-
+	case 2260: { // b,x:(r)+n y0,y:(rh)-
 		unhandled("b,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2193: { // b,x:(r)+n y1,y:(rh)-
+	case 2261: { // b,x:(r)+n y1,y:(rh)-
 		unhandled("b,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2194: { // b,x:(r)+n a,y:(rh)-
+	case 2262: { // b,x:(r)+n a,y:(rh)-
 		unhandled("b,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2195: { // b,x:(r)+n b,y:(rh)-
+	case 2263: { // b,x:(r)+n b,y:(rh)-
 		unhandled("b,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2196: { // x0,x:(r)+n y0,y:(rh)+
+	case 2264: { // x0,x:(r)+n y0,y:(rh)+
 		unhandled("x0,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2197: { // x0,x:(r)+n y1,y:(rh)+
+	case 2265: { // x0,x:(r)+n y1,y:(rh)+
 		unhandled("x0,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2198: { // x0,x:(r)+n a,y:(rh)+
+	case 2266: { // x0,x:(r)+n a,y:(rh)+
 		unhandled("x0,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2199: { // x0,x:(r)+n b,y:(rh)+
+	case 2267: { // x0,x:(r)+n b,y:(rh)+
 		unhandled("x0,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2200: { // x1,x:(r)+n y0,y:(rh)+
+	case 2268: { // x1,x:(r)+n y0,y:(rh)+
 		unhandled("x1,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2201: { // x1,x:(r)+n y1,y:(rh)+
+	case 2269: { // x1,x:(r)+n y1,y:(rh)+
 		unhandled("x1,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2202: { // x1,x:(r)+n a,y:(rh)+
+	case 2270: { // x1,x:(r)+n a,y:(rh)+
 		unhandled("x1,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2203: { // x1,x:(r)+n b,y:(rh)+
+	case 2271: { // x1,x:(r)+n b,y:(rh)+
 		unhandled("x1,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2204: { // a,x:(r)+n y0,y:(rh)+
+	case 2272: { // a,x:(r)+n y0,y:(rh)+
 		unhandled("a,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2205: { // a,x:(r)+n y1,y:(rh)+
+	case 2273: { // a,x:(r)+n y1,y:(rh)+
 		unhandled("a,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2206: { // a,x:(r)+n a,y:(rh)+
+	case 2274: { // a,x:(r)+n a,y:(rh)+
 		unhandled("a,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2207: { // a,x:(r)+n b,y:(rh)+
+	case 2275: { // a,x:(r)+n b,y:(rh)+
 		unhandled("a,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2208: { // b,x:(r)+n y0,y:(rh)+
+	case 2276: { // b,x:(r)+n y0,y:(rh)+
 		unhandled("b,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2209: { // b,x:(r)+n y1,y:(rh)+
+	case 2277: { // b,x:(r)+n y1,y:(rh)+
 		unhandled("b,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2210: { // b,x:(r)+n a,y:(rh)+
+	case 2278: { // b,x:(r)+n a,y:(rh)+
 		unhandled("b,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2211: { // b,x:(r)+n b,y:(rh)+
+	case 2279: { // b,x:(r)+n b,y:(rh)+
 		unhandled("b,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2212: { // x0,x:(r)+n y0,y:(rh)
+	case 2280: { // x0,x:(r)+n y0,y:(rh)
 		unhandled("x0,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2213: { // x0,x:(r)+n y1,y:(rh)
+	case 2281: { // x0,x:(r)+n y1,y:(rh)
 		unhandled("x0,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2214: { // x0,x:(r)+n a,y:(rh)
+	case 2282: { // x0,x:(r)+n a,y:(rh)
 		unhandled("x0,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2215: { // x0,x:(r)+n b,y:(rh)
+	case 2283: { // x0,x:(r)+n b,y:(rh)
 		unhandled("x0,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2216: { // x1,x:(r)+n y0,y:(rh)
+	case 2284: { // x1,x:(r)+n y0,y:(rh)
 		unhandled("x1,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2217: { // x1,x:(r)+n y1,y:(rh)
+	case 2285: { // x1,x:(r)+n y1,y:(rh)
 		unhandled("x1,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2218: { // x1,x:(r)+n a,y:(rh)
+	case 2286: { // x1,x:(r)+n a,y:(rh)
 		unhandled("x1,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2219: { // x1,x:(r)+n b,y:(rh)
+	case 2287: { // x1,x:(r)+n b,y:(rh)
 		unhandled("x1,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2220: { // a,x:(r)+n y0,y:(rh)
+	case 2288: { // a,x:(r)+n y0,y:(rh)
 		unhandled("a,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2221: { // a,x:(r)+n y1,y:(rh)
+	case 2289: { // a,x:(r)+n y1,y:(rh)
 		unhandled("a,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2222: { // a,x:(r)+n a,y:(rh)
+	case 2290: { // a,x:(r)+n a,y:(rh)
 		unhandled("a,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2223: { // a,x:(r)+n b,y:(rh)
+	case 2291: { // a,x:(r)+n b,y:(rh)
 		unhandled("a,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2224: { // b,x:(r)+n y0,y:(rh)
+	case 2292: { // b,x:(r)+n y0,y:(rh)
 		unhandled("b,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2225: { // b,x:(r)+n y1,y:(rh)
+	case 2293: { // b,x:(r)+n y1,y:(rh)
 		unhandled("b,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2226: { // b,x:(r)+n a,y:(rh)
+	case 2294: { // b,x:(r)+n a,y:(rh)
 		unhandled("b,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2227: { // b,x:(r)+n b,y:(rh)
+	case 2295: { // b,x:(r)+n b,y:(rh)
 		unhandled("b,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2228: { // x0,x:(r)- y0,y:(rh)+n
+	case 2296: { // x0,x:(r)- y0,y:(rh)+n
 		unhandled("x0,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2229: { // x0,x:(r)- y1,y:(rh)+n
+	case 2297: { // x0,x:(r)- y1,y:(rh)+n
 		unhandled("x0,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2230: { // x0,x:(r)- a,y:(rh)+n
+	case 2298: { // x0,x:(r)- a,y:(rh)+n
 		unhandled("x0,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2231: { // x0,x:(r)- b,y:(rh)+n
+	case 2299: { // x0,x:(r)- b,y:(rh)+n
 		unhandled("x0,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2232: { // x1,x:(r)- y0,y:(rh)+n
+	case 2300: { // x1,x:(r)- y0,y:(rh)+n
 		unhandled("x1,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2233: { // x1,x:(r)- y1,y:(rh)+n
+	case 2301: { // x1,x:(r)- y1,y:(rh)+n
 		unhandled("x1,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2234: { // x1,x:(r)- a,y:(rh)+n
+	case 2302: { // x1,x:(r)- a,y:(rh)+n
 		unhandled("x1,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2235: { // x1,x:(r)- b,y:(rh)+n
+	case 2303: { // x1,x:(r)- b,y:(rh)+n
 		unhandled("x1,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2236: { // a,x:(r)- y0,y:(rh)+n
+	case 2304: { // a,x:(r)- y0,y:(rh)+n
 		unhandled("a,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2237: { // a,x:(r)- y1,y:(rh)+n
+	case 2305: { // a,x:(r)- y1,y:(rh)+n
 		unhandled("a,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2238: { // a,x:(r)- a,y:(rh)+n
+	case 2306: { // a,x:(r)- a,y:(rh)+n
 		unhandled("a,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2239: { // a,x:(r)- b,y:(rh)+n
+	case 2307: { // a,x:(r)- b,y:(rh)+n
 		unhandled("a,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2240: { // b,x:(r)- y0,y:(rh)+n
+	case 2308: { // b,x:(r)- y0,y:(rh)+n
 		unhandled("b,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2241: { // b,x:(r)- y1,y:(rh)+n
+	case 2309: { // b,x:(r)- y1,y:(rh)+n
 		unhandled("b,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2242: { // b,x:(r)- a,y:(rh)+n
+	case 2310: { // b,x:(r)- a,y:(rh)+n
 		unhandled("b,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2243: { // b,x:(r)- b,y:(rh)+n
+	case 2311: { // b,x:(r)- b,y:(rh)+n
 		unhandled("b,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2244: { // x0,x:(r)- y0,y:(rh)-
+	case 2312: { // x0,x:(r)- y0,y:(rh)-
 		unhandled("x0,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2245: { // x0,x:(r)- y1,y:(rh)-
+	case 2313: { // x0,x:(r)- y1,y:(rh)-
 		unhandled("x0,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2246: { // x0,x:(r)- a,y:(rh)-
+	case 2314: { // x0,x:(r)- a,y:(rh)-
 		unhandled("x0,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2247: { // x0,x:(r)- b,y:(rh)-
+	case 2315: { // x0,x:(r)- b,y:(rh)-
 		unhandled("x0,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2248: { // x1,x:(r)- y0,y:(rh)-
+	case 2316: { // x1,x:(r)- y0,y:(rh)-
 		unhandled("x1,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2249: { // x1,x:(r)- y1,y:(rh)-
+	case 2317: { // x1,x:(r)- y1,y:(rh)-
 		unhandled("x1,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2250: { // x1,x:(r)- a,y:(rh)-
+	case 2318: { // x1,x:(r)- a,y:(rh)-
 		unhandled("x1,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2251: { // x1,x:(r)- b,y:(rh)-
+	case 2319: { // x1,x:(r)- b,y:(rh)-
 		unhandled("x1,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2252: { // a,x:(r)- y0,y:(rh)-
+	case 2320: { // a,x:(r)- y0,y:(rh)-
 		unhandled("a,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2253: { // a,x:(r)- y1,y:(rh)-
+	case 2321: { // a,x:(r)- y1,y:(rh)-
 		unhandled("a,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2254: { // a,x:(r)- a,y:(rh)-
+	case 2322: { // a,x:(r)- a,y:(rh)-
 		unhandled("a,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2255: { // a,x:(r)- b,y:(rh)-
+	case 2323: { // a,x:(r)- b,y:(rh)-
 		unhandled("a,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2256: { // b,x:(r)- y0,y:(rh)-
+	case 2324: { // b,x:(r)- y0,y:(rh)-
 		unhandled("b,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2257: { // b,x:(r)- y1,y:(rh)-
+	case 2325: { // b,x:(r)- y1,y:(rh)-
 		unhandled("b,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2258: { // b,x:(r)- a,y:(rh)-
+	case 2326: { // b,x:(r)- a,y:(rh)-
 		unhandled("b,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2259: { // b,x:(r)- b,y:(rh)-
+	case 2327: { // b,x:(r)- b,y:(rh)-
 		unhandled("b,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2260: { // x0,x:(r)- y0,y:(rh)+
+	case 2328: { // x0,x:(r)- y0,y:(rh)+
 		unhandled("x0,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2261: { // x0,x:(r)- y1,y:(rh)+
+	case 2329: { // x0,x:(r)- y1,y:(rh)+
 		unhandled("x0,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2262: { // x0,x:(r)- a,y:(rh)+
+	case 2330: { // x0,x:(r)- a,y:(rh)+
 		unhandled("x0,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2263: { // x0,x:(r)- b,y:(rh)+
+	case 2331: { // x0,x:(r)- b,y:(rh)+
 		unhandled("x0,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2264: { // x1,x:(r)- y0,y:(rh)+
+	case 2332: { // x1,x:(r)- y0,y:(rh)+
 		unhandled("x1,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2265: { // x1,x:(r)- y1,y:(rh)+
+	case 2333: { // x1,x:(r)- y1,y:(rh)+
 		unhandled("x1,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2266: { // x1,x:(r)- a,y:(rh)+
+	case 2334: { // x1,x:(r)- a,y:(rh)+
 		unhandled("x1,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2267: { // x1,x:(r)- b,y:(rh)+
+	case 2335: { // x1,x:(r)- b,y:(rh)+
 		unhandled("x1,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2268: { // a,x:(r)- y0,y:(rh)+
+	case 2336: { // a,x:(r)- y0,y:(rh)+
 		unhandled("a,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2269: { // a,x:(r)- y1,y:(rh)+
+	case 2337: { // a,x:(r)- y1,y:(rh)+
 		unhandled("a,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2270: { // a,x:(r)- a,y:(rh)+
+	case 2338: { // a,x:(r)- a,y:(rh)+
 		unhandled("a,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2271: { // a,x:(r)- b,y:(rh)+
+	case 2339: { // a,x:(r)- b,y:(rh)+
 		unhandled("a,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2272: { // b,x:(r)- y0,y:(rh)+
+	case 2340: { // b,x:(r)- y0,y:(rh)+
 		unhandled("b,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2273: { // b,x:(r)- y1,y:(rh)+
+	case 2341: { // b,x:(r)- y1,y:(rh)+
 		unhandled("b,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2274: { // b,x:(r)- a,y:(rh)+
+	case 2342: { // b,x:(r)- a,y:(rh)+
 		unhandled("b,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2275: { // b,x:(r)- b,y:(rh)+
+	case 2343: { // b,x:(r)- b,y:(rh)+
 		unhandled("b,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2276: { // x0,x:(r)- y0,y:(rh)
+	case 2344: { // x0,x:(r)- y0,y:(rh)
 		unhandled("x0,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2277: { // x0,x:(r)- y1,y:(rh)
+	case 2345: { // x0,x:(r)- y1,y:(rh)
 		unhandled("x0,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2278: { // x0,x:(r)- a,y:(rh)
+	case 2346: { // x0,x:(r)- a,y:(rh)
 		unhandled("x0,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2279: { // x0,x:(r)- b,y:(rh)
+	case 2347: { // x0,x:(r)- b,y:(rh)
 		unhandled("x0,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2280: { // x1,x:(r)- y0,y:(rh)
+	case 2348: { // x1,x:(r)- y0,y:(rh)
 		unhandled("x1,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2281: { // x1,x:(r)- y1,y:(rh)
+	case 2349: { // x1,x:(r)- y1,y:(rh)
 		unhandled("x1,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2282: { // x1,x:(r)- a,y:(rh)
+	case 2350: { // x1,x:(r)- a,y:(rh)
 		unhandled("x1,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2283: { // x1,x:(r)- b,y:(rh)
+	case 2351: { // x1,x:(r)- b,y:(rh)
 		unhandled("x1,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2284: { // a,x:(r)- y0,y:(rh)
+	case 2352: { // a,x:(r)- y0,y:(rh)
 		unhandled("a,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2285: { // a,x:(r)- y1,y:(rh)
+	case 2353: { // a,x:(r)- y1,y:(rh)
 		unhandled("a,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2286: { // a,x:(r)- a,y:(rh)
+	case 2354: { // a,x:(r)- a,y:(rh)
 		unhandled("a,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2287: { // a,x:(r)- b,y:(rh)
+	case 2355: { // a,x:(r)- b,y:(rh)
 		unhandled("a,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2288: { // b,x:(r)- y0,y:(rh)
+	case 2356: { // b,x:(r)- y0,y:(rh)
 		unhandled("b,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2289: { // b,x:(r)- y1,y:(rh)
+	case 2357: { // b,x:(r)- y1,y:(rh)
 		unhandled("b,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2290: { // b,x:(r)- a,y:(rh)
+	case 2358: { // b,x:(r)- a,y:(rh)
 		unhandled("b,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2291: { // b,x:(r)- b,y:(rh)
+	case 2359: { // b,x:(r)- b,y:(rh)
 		unhandled("b,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2292: { // x0,x:(r)+ y0,y:(rh)+n
+	case 2360: { // x0,x:(r)+ y0,y:(rh)+n
 		unhandled("x0,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2293: { // x0,x:(r)+ y1,y:(rh)+n
+	case 2361: { // x0,x:(r)+ y1,y:(rh)+n
 		unhandled("x0,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2294: { // x0,x:(r)+ a,y:(rh)+n
+	case 2362: { // x0,x:(r)+ a,y:(rh)+n
 		unhandled("x0,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2295: { // x0,x:(r)+ b,y:(rh)+n
+	case 2363: { // x0,x:(r)+ b,y:(rh)+n
 		unhandled("x0,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2296: { // x1,x:(r)+ y0,y:(rh)+n
+	case 2364: { // x1,x:(r)+ y0,y:(rh)+n
 		unhandled("x1,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2297: { // x1,x:(r)+ y1,y:(rh)+n
+	case 2365: { // x1,x:(r)+ y1,y:(rh)+n
 		unhandled("x1,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2298: { // x1,x:(r)+ a,y:(rh)+n
+	case 2366: { // x1,x:(r)+ a,y:(rh)+n
 		unhandled("x1,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2299: { // x1,x:(r)+ b,y:(rh)+n
+	case 2367: { // x1,x:(r)+ b,y:(rh)+n
 		unhandled("x1,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2300: { // a,x:(r)+ y0,y:(rh)+n
+	case 2368: { // a,x:(r)+ y0,y:(rh)+n
 		unhandled("a,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2301: { // a,x:(r)+ y1,y:(rh)+n
+	case 2369: { // a,x:(r)+ y1,y:(rh)+n
 		unhandled("a,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2302: { // a,x:(r)+ a,y:(rh)+n
+	case 2370: { // a,x:(r)+ a,y:(rh)+n
 		unhandled("a,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2303: { // a,x:(r)+ b,y:(rh)+n
+	case 2371: { // a,x:(r)+ b,y:(rh)+n
 		unhandled("a,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2304: { // b,x:(r)+ y0,y:(rh)+n
+	case 2372: { // b,x:(r)+ y0,y:(rh)+n
 		unhandled("b,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2305: { // b,x:(r)+ y1,y:(rh)+n
+	case 2373: { // b,x:(r)+ y1,y:(rh)+n
 		unhandled("b,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2306: { // b,x:(r)+ a,y:(rh)+n
+	case 2374: { // b,x:(r)+ a,y:(rh)+n
 		unhandled("b,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2307: { // b,x:(r)+ b,y:(rh)+n
+	case 2375: { // b,x:(r)+ b,y:(rh)+n
 		unhandled("b,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2308: { // x0,x:(r)+ y0,y:(rh)-
+	case 2376: { // x0,x:(r)+ y0,y:(rh)-
 		unhandled("x0,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2309: { // x0,x:(r)+ y1,y:(rh)-
+	case 2377: { // x0,x:(r)+ y1,y:(rh)-
 		unhandled("x0,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2310: { // x0,x:(r)+ a,y:(rh)-
+	case 2378: { // x0,x:(r)+ a,y:(rh)-
 		unhandled("x0,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2311: { // x0,x:(r)+ b,y:(rh)-
+	case 2379: { // x0,x:(r)+ b,y:(rh)-
 		unhandled("x0,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2312: { // x1,x:(r)+ y0,y:(rh)-
+	case 2380: { // x1,x:(r)+ y0,y:(rh)-
 		unhandled("x1,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2313: { // x1,x:(r)+ y1,y:(rh)-
+	case 2381: { // x1,x:(r)+ y1,y:(rh)-
 		unhandled("x1,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2314: { // x1,x:(r)+ a,y:(rh)-
+	case 2382: { // x1,x:(r)+ a,y:(rh)-
 		unhandled("x1,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2315: { // x1,x:(r)+ b,y:(rh)-
+	case 2383: { // x1,x:(r)+ b,y:(rh)-
 		unhandled("x1,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2316: { // a,x:(r)+ y0,y:(rh)-
+	case 2384: { // a,x:(r)+ y0,y:(rh)-
 		unhandled("a,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2317: { // a,x:(r)+ y1,y:(rh)-
+	case 2385: { // a,x:(r)+ y1,y:(rh)-
 		unhandled("a,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2318: { // a,x:(r)+ a,y:(rh)-
+	case 2386: { // a,x:(r)+ a,y:(rh)-
 		unhandled("a,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2319: { // a,x:(r)+ b,y:(rh)-
+	case 2387: { // a,x:(r)+ b,y:(rh)-
 		unhandled("a,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2320: { // b,x:(r)+ y0,y:(rh)-
+	case 2388: { // b,x:(r)+ y0,y:(rh)-
 		unhandled("b,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2321: { // b,x:(r)+ y1,y:(rh)-
+	case 2389: { // b,x:(r)+ y1,y:(rh)-
 		unhandled("b,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2322: { // b,x:(r)+ a,y:(rh)-
+	case 2390: { // b,x:(r)+ a,y:(rh)-
 		unhandled("b,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2323: { // b,x:(r)+ b,y:(rh)-
+	case 2391: { // b,x:(r)+ b,y:(rh)-
 		unhandled("b,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2324: { // x0,x:(r)+ y0,y:(rh)+
+	case 2392: { // x0,x:(r)+ y0,y:(rh)+
 		unhandled("x0,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2325: { // x0,x:(r)+ y1,y:(rh)+
+	case 2393: { // x0,x:(r)+ y1,y:(rh)+
 		unhandled("x0,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2326: { // x0,x:(r)+ a,y:(rh)+
+	case 2394: { // x0,x:(r)+ a,y:(rh)+
 		unhandled("x0,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2327: { // x0,x:(r)+ b,y:(rh)+
+	case 2395: { // x0,x:(r)+ b,y:(rh)+
 		unhandled("x0,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2328: { // x1,x:(r)+ y0,y:(rh)+
+	case 2396: { // x1,x:(r)+ y0,y:(rh)+
 		unhandled("x1,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2329: { // x1,x:(r)+ y1,y:(rh)+
+	case 2397: { // x1,x:(r)+ y1,y:(rh)+
 		unhandled("x1,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2330: { // x1,x:(r)+ a,y:(rh)+
+	case 2398: { // x1,x:(r)+ a,y:(rh)+
 		unhandled("x1,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2331: { // x1,x:(r)+ b,y:(rh)+
+	case 2399: { // x1,x:(r)+ b,y:(rh)+
 		unhandled("x1,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2332: { // a,x:(r)+ y0,y:(rh)+
+	case 2400: { // a,x:(r)+ y0,y:(rh)+
 		unhandled("a,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2333: { // a,x:(r)+ y1,y:(rh)+
+	case 2401: { // a,x:(r)+ y1,y:(rh)+
 		unhandled("a,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2334: { // a,x:(r)+ a,y:(rh)+
+	case 2402: { // a,x:(r)+ a,y:(rh)+
 		unhandled("a,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2335: { // a,x:(r)+ b,y:(rh)+
+	case 2403: { // a,x:(r)+ b,y:(rh)+
 		unhandled("a,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2336: { // b,x:(r)+ y0,y:(rh)+
+	case 2404: { // b,x:(r)+ y0,y:(rh)+
 		unhandled("b,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2337: { // b,x:(r)+ y1,y:(rh)+
+	case 2405: { // b,x:(r)+ y1,y:(rh)+
 		unhandled("b,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2338: { // b,x:(r)+ a,y:(rh)+
+	case 2406: { // b,x:(r)+ a,y:(rh)+
 		unhandled("b,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2339: { // b,x:(r)+ b,y:(rh)+
+	case 2407: { // b,x:(r)+ b,y:(rh)+
 		unhandled("b,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2340: { // x0,x:(r)+ y0,y:(rh)
+	case 2408: { // x0,x:(r)+ y0,y:(rh)
 		unhandled("x0,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2341: { // x0,x:(r)+ y1,y:(rh)
+	case 2409: { // x0,x:(r)+ y1,y:(rh)
 		unhandled("x0,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2342: { // x0,x:(r)+ a,y:(rh)
+	case 2410: { // x0,x:(r)+ a,y:(rh)
 		unhandled("x0,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2343: { // x0,x:(r)+ b,y:(rh)
+	case 2411: { // x0,x:(r)+ b,y:(rh)
 		unhandled("x0,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2344: { // x1,x:(r)+ y0,y:(rh)
+	case 2412: { // x1,x:(r)+ y0,y:(rh)
 		unhandled("x1,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2345: { // x1,x:(r)+ y1,y:(rh)
+	case 2413: { // x1,x:(r)+ y1,y:(rh)
 		unhandled("x1,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2346: { // x1,x:(r)+ a,y:(rh)
+	case 2414: { // x1,x:(r)+ a,y:(rh)
 		unhandled("x1,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2347: { // x1,x:(r)+ b,y:(rh)
+	case 2415: { // x1,x:(r)+ b,y:(rh)
 		unhandled("x1,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2348: { // a,x:(r)+ y0,y:(rh)
+	case 2416: { // a,x:(r)+ y0,y:(rh)
 		unhandled("a,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2349: { // a,x:(r)+ y1,y:(rh)
+	case 2417: { // a,x:(r)+ y1,y:(rh)
 		unhandled("a,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2350: { // a,x:(r)+ a,y:(rh)
+	case 2418: { // a,x:(r)+ a,y:(rh)
 		unhandled("a,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2351: { // a,x:(r)+ b,y:(rh)
+	case 2419: { // a,x:(r)+ b,y:(rh)
 		unhandled("a,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2352: { // b,x:(r)+ y0,y:(rh)
+	case 2420: { // b,x:(r)+ y0,y:(rh)
 		unhandled("b,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2353: { // b,x:(r)+ y1,y:(rh)
+	case 2421: { // b,x:(r)+ y1,y:(rh)
 		unhandled("b,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2354: { // b,x:(r)+ a,y:(rh)
+	case 2422: { // b,x:(r)+ a,y:(rh)
 		unhandled("b,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2355: { // b,x:(r)+ b,y:(rh)
+	case 2423: { // b,x:(r)+ b,y:(rh)
 		unhandled("b,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2356: { // x0,x:(r) y0,y:(rh)+n
+	case 2424: { // x0,x:(r) y0,y:(rh)+n
 		unhandled("x0,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2357: { // x0,x:(r) y1,y:(rh)+n
+	case 2425: { // x0,x:(r) y1,y:(rh)+n
 		unhandled("x0,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2358: { // x0,x:(r) a,y:(rh)+n
+	case 2426: { // x0,x:(r) a,y:(rh)+n
 		unhandled("x0,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2359: { // x0,x:(r) b,y:(rh)+n
+	case 2427: { // x0,x:(r) b,y:(rh)+n
 		unhandled("x0,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2360: { // x1,x:(r) y0,y:(rh)+n
+	case 2428: { // x1,x:(r) y0,y:(rh)+n
 		unhandled("x1,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2361: { // x1,x:(r) y1,y:(rh)+n
+	case 2429: { // x1,x:(r) y1,y:(rh)+n
 		unhandled("x1,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2362: { // x1,x:(r) a,y:(rh)+n
+	case 2430: { // x1,x:(r) a,y:(rh)+n
 		unhandled("x1,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2363: { // x1,x:(r) b,y:(rh)+n
+	case 2431: { // x1,x:(r) b,y:(rh)+n
 		unhandled("x1,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2364: { // a,x:(r) y0,y:(rh)+n
+	case 2432: { // a,x:(r) y0,y:(rh)+n
 		unhandled("a,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2365: { // a,x:(r) y1,y:(rh)+n
+	case 2433: { // a,x:(r) y1,y:(rh)+n
 		unhandled("a,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2366: { // a,x:(r) a,y:(rh)+n
+	case 2434: { // a,x:(r) a,y:(rh)+n
 		unhandled("a,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2367: { // a,x:(r) b,y:(rh)+n
+	case 2435: { // a,x:(r) b,y:(rh)+n
 		unhandled("a,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2368: { // b,x:(r) y0,y:(rh)+n
+	case 2436: { // b,x:(r) y0,y:(rh)+n
 		unhandled("b,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2369: { // b,x:(r) y1,y:(rh)+n
+	case 2437: { // b,x:(r) y1,y:(rh)+n
 		unhandled("b,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2370: { // b,x:(r) a,y:(rh)+n
+	case 2438: { // b,x:(r) a,y:(rh)+n
 		unhandled("b,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2371: { // b,x:(r) b,y:(rh)+n
+	case 2439: { // b,x:(r) b,y:(rh)+n
 		unhandled("b,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2372: { // x0,x:(r) y0,y:(rh)-
+	case 2440: { // x0,x:(r) y0,y:(rh)-
 		unhandled("x0,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2373: { // x0,x:(r) y1,y:(rh)-
+	case 2441: { // x0,x:(r) y1,y:(rh)-
 		unhandled("x0,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2374: { // x0,x:(r) a,y:(rh)-
+	case 2442: { // x0,x:(r) a,y:(rh)-
 		unhandled("x0,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2375: { // x0,x:(r) b,y:(rh)-
+	case 2443: { // x0,x:(r) b,y:(rh)-
 		unhandled("x0,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2376: { // x1,x:(r) y0,y:(rh)-
+	case 2444: { // x1,x:(r) y0,y:(rh)-
 		unhandled("x1,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2377: { // x1,x:(r) y1,y:(rh)-
+	case 2445: { // x1,x:(r) y1,y:(rh)-
 		unhandled("x1,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2378: { // x1,x:(r) a,y:(rh)-
+	case 2446: { // x1,x:(r) a,y:(rh)-
 		unhandled("x1,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2379: { // x1,x:(r) b,y:(rh)-
+	case 2447: { // x1,x:(r) b,y:(rh)-
 		unhandled("x1,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2380: { // a,x:(r) y0,y:(rh)-
+	case 2448: { // a,x:(r) y0,y:(rh)-
 		unhandled("a,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2381: { // a,x:(r) y1,y:(rh)-
+	case 2449: { // a,x:(r) y1,y:(rh)-
 		unhandled("a,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2382: { // a,x:(r) a,y:(rh)-
+	case 2450: { // a,x:(r) a,y:(rh)-
 		unhandled("a,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2383: { // a,x:(r) b,y:(rh)-
+	case 2451: { // a,x:(r) b,y:(rh)-
 		unhandled("a,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2384: { // b,x:(r) y0,y:(rh)-
+	case 2452: { // b,x:(r) y0,y:(rh)-
 		unhandled("b,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2385: { // b,x:(r) y1,y:(rh)-
+	case 2453: { // b,x:(r) y1,y:(rh)-
 		unhandled("b,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2386: { // b,x:(r) a,y:(rh)-
+	case 2454: { // b,x:(r) a,y:(rh)-
 		unhandled("b,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2387: { // b,x:(r) b,y:(rh)-
+	case 2455: { // b,x:(r) b,y:(rh)-
 		unhandled("b,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2388: { // x0,x:(r) y0,y:(rh)+
+	case 2456: { // x0,x:(r) y0,y:(rh)+
 		unhandled("x0,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2389: { // x0,x:(r) y1,y:(rh)+
+	case 2457: { // x0,x:(r) y1,y:(rh)+
 		unhandled("x0,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2390: { // x0,x:(r) a,y:(rh)+
+	case 2458: { // x0,x:(r) a,y:(rh)+
 		unhandled("x0,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2391: { // x0,x:(r) b,y:(rh)+
+	case 2459: { // x0,x:(r) b,y:(rh)+
 		unhandled("x0,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2392: { // x1,x:(r) y0,y:(rh)+
+	case 2460: { // x1,x:(r) y0,y:(rh)+
 		unhandled("x1,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2393: { // x1,x:(r) y1,y:(rh)+
+	case 2461: { // x1,x:(r) y1,y:(rh)+
 		unhandled("x1,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2394: { // x1,x:(r) a,y:(rh)+
+	case 2462: { // x1,x:(r) a,y:(rh)+
 		unhandled("x1,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2395: { // x1,x:(r) b,y:(rh)+
+	case 2463: { // x1,x:(r) b,y:(rh)+
 		unhandled("x1,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2396: { // a,x:(r) y0,y:(rh)+
+	case 2464: { // a,x:(r) y0,y:(rh)+
 		unhandled("a,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2397: { // a,x:(r) y1,y:(rh)+
+	case 2465: { // a,x:(r) y1,y:(rh)+
 		unhandled("a,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2398: { // a,x:(r) a,y:(rh)+
+	case 2466: { // a,x:(r) a,y:(rh)+
 		unhandled("a,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2399: { // a,x:(r) b,y:(rh)+
+	case 2467: { // a,x:(r) b,y:(rh)+
 		unhandled("a,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2400: { // b,x:(r) y0,y:(rh)+
+	case 2468: { // b,x:(r) y0,y:(rh)+
 		unhandled("b,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2401: { // b,x:(r) y1,y:(rh)+
+	case 2469: { // b,x:(r) y1,y:(rh)+
 		unhandled("b,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2402: { // b,x:(r) a,y:(rh)+
+	case 2470: { // b,x:(r) a,y:(rh)+
 		unhandled("b,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2403: { // b,x:(r) b,y:(rh)+
+	case 2471: { // b,x:(r) b,y:(rh)+
 		unhandled("b,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2404: { // x0,x:(r) y0,y:(rh)
+	case 2472: { // x0,x:(r) y0,y:(rh)
 		unhandled("x0,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2405: { // x0,x:(r) y1,y:(rh)
+	case 2473: { // x0,x:(r) y1,y:(rh)
 		unhandled("x0,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2406: { // x0,x:(r) a,y:(rh)
+	case 2474: { // x0,x:(r) a,y:(rh)
 		unhandled("x0,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2407: { // x0,x:(r) b,y:(rh)
+	case 2475: { // x0,x:(r) b,y:(rh)
 		unhandled("x0,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2408: { // x1,x:(r) y0,y:(rh)
+	case 2476: { // x1,x:(r) y0,y:(rh)
 		unhandled("x1,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2409: { // x1,x:(r) y1,y:(rh)
+	case 2477: { // x1,x:(r) y1,y:(rh)
 		unhandled("x1,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2410: { // x1,x:(r) a,y:(rh)
+	case 2478: { // x1,x:(r) a,y:(rh)
 		unhandled("x1,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2411: { // x1,x:(r) b,y:(rh)
+	case 2479: { // x1,x:(r) b,y:(rh)
 		unhandled("x1,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2412: { // a,x:(r) y0,y:(rh)
+	case 2480: { // a,x:(r) y0,y:(rh)
 		unhandled("a,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2413: { // a,x:(r) y1,y:(rh)
+	case 2481: { // a,x:(r) y1,y:(rh)
 		unhandled("a,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2414: { // a,x:(r) a,y:(rh)
+	case 2482: { // a,x:(r) a,y:(rh)
 		unhandled("a,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2415: { // a,x:(r) b,y:(rh)
+	case 2483: { // a,x:(r) b,y:(rh)
 		unhandled("a,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2416: { // b,x:(r) y0,y:(rh)
+	case 2484: { // b,x:(r) y0,y:(rh)
 		unhandled("b,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2417: { // b,x:(r) y1,y:(rh)
+	case 2485: { // b,x:(r) y1,y:(rh)
 		unhandled("b,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2418: { // b,x:(r) a,y:(rh)
+	case 2486: { // b,x:(r) a,y:(rh)
 		unhandled("b,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2419: { // b,x:(r) b,y:(rh)
+	case 2487: { // b,x:(r) b,y:(rh)
 		unhandled("b,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2420: { // ifcc
+	case 2488: { // ifcc
 		unhandled("ifcc");
 		break;
 		}
-	case 2421: { // ifge
+	case 2489: { // ifge
 		unhandled("ifge");
 		break;
 		}
-	case 2422: { // ifne
+	case 2490: { // ifne
 		unhandled("ifne");
 		break;
 		}
-	case 2423: { // ifpl
+	case 2491: { // ifpl
 		unhandled("ifpl");
 		break;
 		}
-	case 2424: { // ifnn
+	case 2492: { // ifnn
 		unhandled("ifnn");
 		break;
 		}
-	case 2425: { // ifec
+	case 2493: { // ifec
 		unhandled("ifec");
 		break;
 		}
-	case 2426: { // iflc
+	case 2494: { // iflc
 		unhandled("iflc");
 		break;
 		}
-	case 2427: { // ifgt
+	case 2495: { // ifgt
 		unhandled("ifgt");
 		break;
 		}
-	case 2428: { // ifcs
+	case 2496: { // ifcs
 		unhandled("ifcs");
 		break;
 		}
-	case 2429: { // iflt
+	case 2497: { // iflt
 		unhandled("iflt");
 		break;
 		}
-	case 2430: { // ifeq
+	case 2498: { // ifeq
 		unhandled("ifeq");
 		break;
 		}
-	case 2431: { // ifmi
+	case 2499: { // ifmi
 		unhandled("ifmi");
 		break;
 		}
-	case 2432: { // ifnr
+	case 2500: { // ifnr
 		unhandled("ifnr");
 		break;
 		}
-	case 2433: { // ifes
+	case 2501: { // ifes
 		unhandled("ifes");
 		break;
 		}
-	case 2434: { // ifls
+	case 2502: { // ifls
 		unhandled("ifls");
 		break;
 		}
-	case 2435: { // ifle
+	case 2503: { // ifle
 		unhandled("ifle");
 		break;
 		}
-	case 2436: { // ifcc.u
+	case 2504: { // ifcc.u
 		unhandled("ifcc.u");
 		break;
 		}
-	case 2437: { // ifge.u
+	case 2505: { // ifge.u
 		unhandled("ifge.u");
 		break;
 		}
-	case 2438: { // ifne.u
+	case 2506: { // ifne.u
 		unhandled("ifne.u");
 		break;
 		}
-	case 2439: { // ifpl.u
+	case 2507: { // ifpl.u
 		unhandled("ifpl.u");
 		break;
 		}
-	case 2440: { // ifnn.u
+	case 2508: { // ifnn.u
 		unhandled("ifnn.u");
 		break;
 		}
-	case 2441: { // ifec.u
+	case 2509: { // ifec.u
 		unhandled("ifec.u");
 		break;
 		}
-	case 2442: { // iflc.u
+	case 2510: { // iflc.u
 		unhandled("iflc.u");
 		break;
 		}
-	case 2443: { // ifgt.u
+	case 2511: { // ifgt.u
 		unhandled("ifgt.u");
 		break;
 		}
-	case 2444: { // ifcs.u
+	case 2512: { // ifcs.u
 		unhandled("ifcs.u");
 		break;
 		}
-	case 2445: { // iflt.u
+	case 2513: { // iflt.u
 		unhandled("iflt.u");
 		break;
 		}
-	case 2446: { // ifeq.u
+	case 2514: { // ifeq.u
 		unhandled("ifeq.u");
 		break;
 		}
-	case 2447: { // ifmi.u
+	case 2515: { // ifmi.u
 		unhandled("ifmi.u");
 		break;
 		}
-	case 2448: { // ifnr.u
+	case 2516: { // ifnr.u
 		unhandled("ifnr.u");
 		break;
 		}
-	case 2449: { // ifes.u
+	case 2517: { // ifes.u
 		unhandled("ifes.u");
 		break;
 		}
-	case 2450: { // ifls.u
+	case 2518: { // ifls.u
 		unhandled("ifls.u");
 		break;
 		}
-	case 2451: { // ifle.u
+	case 2519: { // ifle.u
 		unhandled("ifle.u");
 		break;
 		}
@@ -12685,60 +12957,60 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		unhandled("n,x:-(r)");
 		break;
 		}
-	case 412: { // [abs],x0
-		unhandled("[abs],x0");
+	case 412: { // x:[abs],x0
+		unhandled("x:[abs],x0");
 		break;
 		}
-	case 413: { // [abs],x1
-		unhandled("[abs],x1");
+	case 413: { // x:[abs],x1
+		unhandled("x:[abs],x1");
 		break;
 		}
-	case 414: { // [abs],y0
-		unhandled("[abs],y0");
+	case 414: { // x:[abs],y0
+		unhandled("x:[abs],y0");
 		break;
 		}
-	case 415: { // [abs],y1
-		unhandled("[abs],y1");
+	case 415: { // x:[abs],y1
+		unhandled("x:[abs],y1");
 		break;
 		}
-	case 416: { // [abs],a0
-		unhandled("[abs],a0");
+	case 416: { // x:[abs],a0
+		unhandled("x:[abs],a0");
 		break;
 		}
-	case 417: { // [abs],b0
-		unhandled("[abs],b0");
+	case 417: { // x:[abs],b0
+		unhandled("x:[abs],b0");
 		break;
 		}
-	case 418: { // [abs],a2
-		unhandled("[abs],a2");
+	case 418: { // x:[abs],a2
+		unhandled("x:[abs],a2");
 		break;
 		}
-	case 419: { // [abs],b2
-		unhandled("[abs],b2");
+	case 419: { // x:[abs],b2
+		unhandled("x:[abs],b2");
 		break;
 		}
-	case 420: { // [abs],a1
-		unhandled("[abs],a1");
+	case 420: { // x:[abs],a1
+		unhandled("x:[abs],a1");
 		break;
 		}
-	case 421: { // [abs],b1
-		unhandled("[abs],b1");
+	case 421: { // x:[abs],b1
+		unhandled("x:[abs],b1");
 		break;
 		}
-	case 422: { // [abs],a
-		unhandled("[abs],a");
+	case 422: { // x:[abs],a
+		unhandled("x:[abs],a");
 		break;
 		}
-	case 423: { // [abs],b
-		unhandled("[abs],b");
+	case 423: { // x:[abs],b
+		unhandled("x:[abs],b");
 		break;
 		}
-	case 424: { // [abs],r
-		unhandled("[abs],r");
+	case 424: { // x:[abs],r
+		unhandled("x:[abs],r");
 		break;
 		}
-	case 425: { // [abs],n
-		unhandled("[abs],n");
+	case 425: { // x:[abs],n
+		unhandled("x:[abs],n");
 		break;
 		}
 	case 426: { // #[i],x0
@@ -12797,8051 +13069,8323 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		unhandled("#[i],n");
 		break;
 		}
-	case 440: { // x:[aa],x0
+	case 440: { // x0,x:[abs]
+		unhandled("x0,x:[abs]");
+		break;
+		}
+	case 441: { // x1,x:[abs]
+		unhandled("x1,x:[abs]");
+		break;
+		}
+	case 442: { // y0,x:[abs]
+		unhandled("y0,x:[abs]");
+		break;
+		}
+	case 443: { // y1,x:[abs]
+		unhandled("y1,x:[abs]");
+		break;
+		}
+	case 444: { // a0,x:[abs]
+		unhandled("a0,x:[abs]");
+		break;
+		}
+	case 445: { // b0,x:[abs]
+		unhandled("b0,x:[abs]");
+		break;
+		}
+	case 446: { // a2,x:[abs]
+		unhandled("a2,x:[abs]");
+		break;
+		}
+	case 447: { // b2,x:[abs]
+		unhandled("b2,x:[abs]");
+		break;
+		}
+	case 448: { // a1,x:[abs]
+		unhandled("a1,x:[abs]");
+		break;
+		}
+	case 449: { // b1,x:[abs]
+		unhandled("b1,x:[abs]");
+		break;
+		}
+	case 450: { // a,x:[abs]
+		unhandled("a,x:[abs]");
+		break;
+		}
+	case 451: { // b,x:[abs]
+		unhandled("b,x:[abs]");
+		break;
+		}
+	case 452: { // r,x:[abs]
+		unhandled("r,x:[abs]");
+		break;
+		}
+	case 453: { // n,x:[abs]
+		unhandled("n,x:[abs]");
+		break;
+		}
+	case 454: { // x:[aa],x0
 		unhandled("x:[aa],x0");
 		break;
 		}
-	case 441: { // x:[aa],x1
+	case 455: { // x:[aa],x1
 		unhandled("x:[aa],x1");
 		break;
 		}
-	case 442: { // x:[aa],y0
+	case 456: { // x:[aa],y0
 		unhandled("x:[aa],y0");
 		break;
 		}
-	case 443: { // x:[aa],y1
+	case 457: { // x:[aa],y1
 		unhandled("x:[aa],y1");
 		break;
 		}
-	case 444: { // x:[aa],a0
+	case 458: { // x:[aa],a0
 		unhandled("x:[aa],a0");
 		break;
 		}
-	case 445: { // x:[aa],b0
+	case 459: { // x:[aa],b0
 		unhandled("x:[aa],b0");
 		break;
 		}
-	case 446: { // x:[aa],a2
+	case 460: { // x:[aa],a2
 		unhandled("x:[aa],a2");
 		break;
 		}
-	case 447: { // x:[aa],b2
+	case 461: { // x:[aa],b2
 		unhandled("x:[aa],b2");
 		break;
 		}
-	case 448: { // x:[aa],a1
+	case 462: { // x:[aa],a1
 		unhandled("x:[aa],a1");
 		break;
 		}
-	case 449: { // x:[aa],b1
+	case 463: { // x:[aa],b1
 		unhandled("x:[aa],b1");
 		break;
 		}
-	case 450: { // x:[aa],a
+	case 464: { // x:[aa],a
 		unhandled("x:[aa],a");
 		break;
 		}
-	case 451: { // x:[aa],b
+	case 465: { // x:[aa],b
 		unhandled("x:[aa],b");
 		break;
 		}
-	case 452: { // x:[aa],r
+	case 466: { // x:[aa],r
 		unhandled("x:[aa],r");
 		break;
 		}
-	case 453: { // x:[aa],n
+	case 467: { // x:[aa],n
 		unhandled("x:[aa],n");
 		break;
 		}
-	case 454: { // x0,x:[aa]
+	case 468: { // x0,x:[aa]
 		unhandled("x0,x:[aa]");
 		break;
 		}
-	case 455: { // x1,x:[aa]
+	case 469: { // x1,x:[aa]
 		unhandled("x1,x:[aa]");
 		break;
 		}
-	case 456: { // y0,x:[aa]
+	case 470: { // y0,x:[aa]
 		unhandled("y0,x:[aa]");
 		break;
 		}
-	case 457: { // y1,x:[aa]
+	case 471: { // y1,x:[aa]
 		unhandled("y1,x:[aa]");
 		break;
 		}
-	case 458: { // a0,x:[aa]
+	case 472: { // a0,x:[aa]
 		unhandled("a0,x:[aa]");
 		break;
 		}
-	case 459: { // b0,x:[aa]
+	case 473: { // b0,x:[aa]
 		unhandled("b0,x:[aa]");
 		break;
 		}
-	case 460: { // a2,x:[aa]
+	case 474: { // a2,x:[aa]
 		unhandled("a2,x:[aa]");
 		break;
 		}
-	case 461: { // b2,x:[aa]
+	case 475: { // b2,x:[aa]
 		unhandled("b2,x:[aa]");
 		break;
 		}
-	case 462: { // a1,x:[aa]
+	case 476: { // a1,x:[aa]
 		unhandled("a1,x:[aa]");
 		break;
 		}
-	case 463: { // b1,x:[aa]
+	case 477: { // b1,x:[aa]
 		unhandled("b1,x:[aa]");
 		break;
 		}
-	case 464: { // a,x:[aa]
+	case 478: { // a,x:[aa]
 		unhandled("a,x:[aa]");
 		break;
 		}
-	case 465: { // b,x:[aa]
+	case 479: { // b,x:[aa]
 		unhandled("b,x:[aa]");
 		break;
 		}
-	case 466: { // r,x:[aa]
+	case 480: { // r,x:[aa]
 		unhandled("r,x:[aa]");
 		break;
 		}
-	case 467: { // n,x:[aa]
+	case 481: { // n,x:[aa]
 		unhandled("n,x:[aa]");
 		break;
 		}
-	case 468: { // x:(r)-n,x0 a,y0
+	case 482: { // x:(r)-n,x0 a,y0
 		unhandled("x:(r)-n,x0 a,y0");
 		break;
 		}
-	case 469: { // x:(r)+n,x0 a,y0
+	case 483: { // x:(r)+n,x0 a,y0
 		unhandled("x:(r)+n,x0 a,y0");
 		break;
 		}
-	case 470: { // x:(r)-,x0 a,y0
+	case 484: { // x:(r)-,x0 a,y0
 		unhandled("x:(r)-,x0 a,y0");
 		break;
 		}
-	case 471: { // x:(r)+,x0 a,y0
+	case 485: { // x:(r)+,x0 a,y0
 		unhandled("x:(r)+,x0 a,y0");
 		break;
 		}
-	case 472: { // x:(r),x0 a,y0
+	case 486: { // x:(r),x0 a,y0
 		unhandled("x:(r),x0 a,y0");
 		break;
 		}
-	case 473: { // x:(r+n),x0 a,y0
+	case 487: { // x:(r+n),x0 a,y0
 		unhandled("x:(r+n),x0 a,y0");
 		break;
 		}
-	case 474: { // x:-(r),x0 a,y0
+	case 488: { // x:-(r),x0 a,y0
 		unhandled("x:-(r),x0 a,y0");
 		break;
 		}
-	case 475: { // x:(r)-n,x0 a,y1
+	case 489: { // x:(r)-n,x0 a,y1
 		unhandled("x:(r)-n,x0 a,y1");
 		break;
 		}
-	case 476: { // x:(r)+n,x0 a,y1
+	case 490: { // x:(r)+n,x0 a,y1
 		unhandled("x:(r)+n,x0 a,y1");
 		break;
 		}
-	case 477: { // x:(r)-,x0 a,y1
+	case 491: { // x:(r)-,x0 a,y1
 		unhandled("x:(r)-,x0 a,y1");
 		break;
 		}
-	case 478: { // x:(r)+,x0 a,y1
+	case 492: { // x:(r)+,x0 a,y1
 		unhandled("x:(r)+,x0 a,y1");
 		break;
 		}
-	case 479: { // x:(r),x0 a,y1
+	case 493: { // x:(r),x0 a,y1
 		unhandled("x:(r),x0 a,y1");
 		break;
 		}
-	case 480: { // x:(r+n),x0 a,y1
+	case 494: { // x:(r+n),x0 a,y1
 		unhandled("x:(r+n),x0 a,y1");
 		break;
 		}
-	case 481: { // x:-(r),x0 a,y1
+	case 495: { // x:-(r),x0 a,y1
 		unhandled("x:-(r),x0 a,y1");
 		break;
 		}
-	case 482: { // x:(r)-n,x0 b,y0
+	case 496: { // x:(r)-n,x0 b,y0
 		unhandled("x:(r)-n,x0 b,y0");
 		break;
 		}
-	case 483: { // x:(r)+n,x0 b,y0
+	case 497: { // x:(r)+n,x0 b,y0
 		unhandled("x:(r)+n,x0 b,y0");
 		break;
 		}
-	case 484: { // x:(r)-,x0 b,y0
+	case 498: { // x:(r)-,x0 b,y0
 		unhandled("x:(r)-,x0 b,y0");
 		break;
 		}
-	case 485: { // x:(r)+,x0 b,y0
+	case 499: { // x:(r)+,x0 b,y0
 		unhandled("x:(r)+,x0 b,y0");
 		break;
 		}
-	case 486: { // x:(r),x0 b,y0
+	case 500: { // x:(r),x0 b,y0
 		unhandled("x:(r),x0 b,y0");
 		break;
 		}
-	case 487: { // x:(r+n),x0 b,y0
+	case 501: { // x:(r+n),x0 b,y0
 		unhandled("x:(r+n),x0 b,y0");
 		break;
 		}
-	case 488: { // x:-(r),x0 b,y0
+	case 502: { // x:-(r),x0 b,y0
 		unhandled("x:-(r),x0 b,y0");
 		break;
 		}
-	case 489: { // x:(r)-n,x0 b,y1
+	case 503: { // x:(r)-n,x0 b,y1
 		unhandled("x:(r)-n,x0 b,y1");
 		break;
 		}
-	case 490: { // x:(r)+n,x0 b,y1
+	case 504: { // x:(r)+n,x0 b,y1
 		unhandled("x:(r)+n,x0 b,y1");
 		break;
 		}
-	case 491: { // x:(r)-,x0 b,y1
+	case 505: { // x:(r)-,x0 b,y1
 		unhandled("x:(r)-,x0 b,y1");
 		break;
 		}
-	case 492: { // x:(r)+,x0 b,y1
+	case 506: { // x:(r)+,x0 b,y1
 		unhandled("x:(r)+,x0 b,y1");
 		break;
 		}
-	case 493: { // x:(r),x0 b,y1
+	case 507: { // x:(r),x0 b,y1
 		unhandled("x:(r),x0 b,y1");
 		break;
 		}
-	case 494: { // x:(r+n),x0 b,y1
+	case 508: { // x:(r+n),x0 b,y1
 		unhandled("x:(r+n),x0 b,y1");
 		break;
 		}
-	case 495: { // x:-(r),x0 b,y1
+	case 509: { // x:-(r),x0 b,y1
 		unhandled("x:-(r),x0 b,y1");
 		break;
 		}
-	case 496: { // x:(r)-n,x1 a,y0
+	case 510: { // x:(r)-n,x1 a,y0
 		unhandled("x:(r)-n,x1 a,y0");
 		break;
 		}
-	case 497: { // x:(r)+n,x1 a,y0
+	case 511: { // x:(r)+n,x1 a,y0
 		unhandled("x:(r)+n,x1 a,y0");
 		break;
 		}
-	case 498: { // x:(r)-,x1 a,y0
+	case 512: { // x:(r)-,x1 a,y0
 		unhandled("x:(r)-,x1 a,y0");
 		break;
 		}
-	case 499: { // x:(r)+,x1 a,y0
+	case 513: { // x:(r)+,x1 a,y0
 		unhandled("x:(r)+,x1 a,y0");
 		break;
 		}
-	case 500: { // x:(r),x1 a,y0
+	case 514: { // x:(r),x1 a,y0
 		unhandled("x:(r),x1 a,y0");
 		break;
 		}
-	case 501: { // x:(r+n),x1 a,y0
+	case 515: { // x:(r+n),x1 a,y0
 		unhandled("x:(r+n),x1 a,y0");
 		break;
 		}
-	case 502: { // x:-(r),x1 a,y0
+	case 516: { // x:-(r),x1 a,y0
 		unhandled("x:-(r),x1 a,y0");
 		break;
 		}
-	case 503: { // x:(r)-n,x1 a,y1
+	case 517: { // x:(r)-n,x1 a,y1
 		unhandled("x:(r)-n,x1 a,y1");
 		break;
 		}
-	case 504: { // x:(r)+n,x1 a,y1
+	case 518: { // x:(r)+n,x1 a,y1
 		unhandled("x:(r)+n,x1 a,y1");
 		break;
 		}
-	case 505: { // x:(r)-,x1 a,y1
+	case 519: { // x:(r)-,x1 a,y1
 		unhandled("x:(r)-,x1 a,y1");
 		break;
 		}
-	case 506: { // x:(r)+,x1 a,y1
+	case 520: { // x:(r)+,x1 a,y1
 		unhandled("x:(r)+,x1 a,y1");
 		break;
 		}
-	case 507: { // x:(r),x1 a,y1
+	case 521: { // x:(r),x1 a,y1
 		unhandled("x:(r),x1 a,y1");
 		break;
 		}
-	case 508: { // x:(r+n),x1 a,y1
+	case 522: { // x:(r+n),x1 a,y1
 		unhandled("x:(r+n),x1 a,y1");
 		break;
 		}
-	case 509: { // x:-(r),x1 a,y1
+	case 523: { // x:-(r),x1 a,y1
 		unhandled("x:-(r),x1 a,y1");
 		break;
 		}
-	case 510: { // x:(r)-n,x1 b,y0
+	case 524: { // x:(r)-n,x1 b,y0
 		unhandled("x:(r)-n,x1 b,y0");
 		break;
 		}
-	case 511: { // x:(r)+n,x1 b,y0
+	case 525: { // x:(r)+n,x1 b,y0
 		unhandled("x:(r)+n,x1 b,y0");
 		break;
 		}
-	case 512: { // x:(r)-,x1 b,y0
+	case 526: { // x:(r)-,x1 b,y0
 		unhandled("x:(r)-,x1 b,y0");
 		break;
 		}
-	case 513: { // x:(r)+,x1 b,y0
+	case 527: { // x:(r)+,x1 b,y0
 		unhandled("x:(r)+,x1 b,y0");
 		break;
 		}
-	case 514: { // x:(r),x1 b,y0
+	case 528: { // x:(r),x1 b,y0
 		unhandled("x:(r),x1 b,y0");
 		break;
 		}
-	case 515: { // x:(r+n),x1 b,y0
+	case 529: { // x:(r+n),x1 b,y0
 		unhandled("x:(r+n),x1 b,y0");
 		break;
 		}
-	case 516: { // x:-(r),x1 b,y0
+	case 530: { // x:-(r),x1 b,y0
 		unhandled("x:-(r),x1 b,y0");
 		break;
 		}
-	case 517: { // x:(r)-n,x1 b,y1
+	case 531: { // x:(r)-n,x1 b,y1
 		unhandled("x:(r)-n,x1 b,y1");
 		break;
 		}
-	case 518: { // x:(r)+n,x1 b,y1
+	case 532: { // x:(r)+n,x1 b,y1
 		unhandled("x:(r)+n,x1 b,y1");
 		break;
 		}
-	case 519: { // x:(r)-,x1 b,y1
+	case 533: { // x:(r)-,x1 b,y1
 		unhandled("x:(r)-,x1 b,y1");
 		break;
 		}
-	case 520: { // x:(r)+,x1 b,y1
+	case 534: { // x:(r)+,x1 b,y1
 		unhandled("x:(r)+,x1 b,y1");
 		break;
 		}
-	case 521: { // x:(r),x1 b,y1
+	case 535: { // x:(r),x1 b,y1
 		unhandled("x:(r),x1 b,y1");
 		break;
 		}
-	case 522: { // x:(r+n),x1 b,y1
+	case 536: { // x:(r+n),x1 b,y1
 		unhandled("x:(r+n),x1 b,y1");
 		break;
 		}
-	case 523: { // x:-(r),x1 b,y1
+	case 537: { // x:-(r),x1 b,y1
 		unhandled("x:-(r),x1 b,y1");
 		break;
 		}
-	case 524: { // x:(r)-n,a a,y0
+	case 538: { // x:(r)-n,a a,y0
 		unhandled("x:(r)-n,a a,y0");
 		break;
 		}
-	case 525: { // x:(r)+n,a a,y0
+	case 539: { // x:(r)+n,a a,y0
 		unhandled("x:(r)+n,a a,y0");
 		break;
 		}
-	case 526: { // x:(r)-,a a,y0
+	case 540: { // x:(r)-,a a,y0
 		unhandled("x:(r)-,a a,y0");
 		break;
 		}
-	case 527: { // x:(r)+,a a,y0
+	case 541: { // x:(r)+,a a,y0
 		unhandled("x:(r)+,a a,y0");
 		break;
 		}
-	case 528: { // x:(r),a a,y0
+	case 542: { // x:(r),a a,y0
 		unhandled("x:(r),a a,y0");
 		break;
 		}
-	case 529: { // x:(r+n),a a,y0
+	case 543: { // x:(r+n),a a,y0
 		unhandled("x:(r+n),a a,y0");
 		break;
 		}
-	case 530: { // x:-(r),a a,y0
+	case 544: { // x:-(r),a a,y0
 		unhandled("x:-(r),a a,y0");
 		break;
 		}
-	case 531: { // x:(r)-n,a a,y1
+	case 545: { // x:(r)-n,a a,y1
 		unhandled("x:(r)-n,a a,y1");
 		break;
 		}
-	case 532: { // x:(r)+n,a a,y1
+	case 546: { // x:(r)+n,a a,y1
 		unhandled("x:(r)+n,a a,y1");
 		break;
 		}
-	case 533: { // x:(r)-,a a,y1
+	case 547: { // x:(r)-,a a,y1
 		unhandled("x:(r)-,a a,y1");
 		break;
 		}
-	case 534: { // x:(r)+,a a,y1
+	case 548: { // x:(r)+,a a,y1
 		unhandled("x:(r)+,a a,y1");
 		break;
 		}
-	case 535: { // x:(r),a a,y1
+	case 549: { // x:(r),a a,y1
 		unhandled("x:(r),a a,y1");
 		break;
 		}
-	case 536: { // x:(r+n),a a,y1
+	case 550: { // x:(r+n),a a,y1
 		unhandled("x:(r+n),a a,y1");
 		break;
 		}
-	case 537: { // x:-(r),a a,y1
+	case 551: { // x:-(r),a a,y1
 		unhandled("x:-(r),a a,y1");
 		break;
 		}
-	case 538: { // x:(r)-n,a b,y0
+	case 552: { // x:(r)-n,a b,y0
 		unhandled("x:(r)-n,a b,y0");
 		break;
 		}
-	case 539: { // x:(r)+n,a b,y0
+	case 553: { // x:(r)+n,a b,y0
 		unhandled("x:(r)+n,a b,y0");
 		break;
 		}
-	case 540: { // x:(r)-,a b,y0
+	case 554: { // x:(r)-,a b,y0
 		unhandled("x:(r)-,a b,y0");
 		break;
 		}
-	case 541: { // x:(r)+,a b,y0
+	case 555: { // x:(r)+,a b,y0
 		unhandled("x:(r)+,a b,y0");
 		break;
 		}
-	case 542: { // x:(r),a b,y0
+	case 556: { // x:(r),a b,y0
 		unhandled("x:(r),a b,y0");
 		break;
 		}
-	case 543: { // x:(r+n),a b,y0
+	case 557: { // x:(r+n),a b,y0
 		unhandled("x:(r+n),a b,y0");
 		break;
 		}
-	case 544: { // x:-(r),a b,y0
+	case 558: { // x:-(r),a b,y0
 		unhandled("x:-(r),a b,y0");
 		break;
 		}
-	case 545: { // x:(r)-n,a b,y1
+	case 559: { // x:(r)-n,a b,y1
 		unhandled("x:(r)-n,a b,y1");
 		break;
 		}
-	case 546: { // x:(r)+n,a b,y1
+	case 560: { // x:(r)+n,a b,y1
 		unhandled("x:(r)+n,a b,y1");
 		break;
 		}
-	case 547: { // x:(r)-,a b,y1
+	case 561: { // x:(r)-,a b,y1
 		unhandled("x:(r)-,a b,y1");
 		break;
 		}
-	case 548: { // x:(r)+,a b,y1
+	case 562: { // x:(r)+,a b,y1
 		unhandled("x:(r)+,a b,y1");
 		break;
 		}
-	case 549: { // x:(r),a b,y1
+	case 563: { // x:(r),a b,y1
 		unhandled("x:(r),a b,y1");
 		break;
 		}
-	case 550: { // x:(r+n),a b,y1
+	case 564: { // x:(r+n),a b,y1
 		unhandled("x:(r+n),a b,y1");
 		break;
 		}
-	case 551: { // x:-(r),a b,y1
+	case 565: { // x:-(r),a b,y1
 		unhandled("x:-(r),a b,y1");
 		break;
 		}
-	case 552: { // x:(r)-n,b a,y0
+	case 566: { // x:(r)-n,b a,y0
 		unhandled("x:(r)-n,b a,y0");
 		break;
 		}
-	case 553: { // x:(r)+n,b a,y0
+	case 567: { // x:(r)+n,b a,y0
 		unhandled("x:(r)+n,b a,y0");
 		break;
 		}
-	case 554: { // x:(r)-,b a,y0
+	case 568: { // x:(r)-,b a,y0
 		unhandled("x:(r)-,b a,y0");
 		break;
 		}
-	case 555: { // x:(r)+,b a,y0
+	case 569: { // x:(r)+,b a,y0
 		unhandled("x:(r)+,b a,y0");
 		break;
 		}
-	case 556: { // x:(r),b a,y0
+	case 570: { // x:(r),b a,y0
 		unhandled("x:(r),b a,y0");
 		break;
 		}
-	case 557: { // x:(r+n),b a,y0
+	case 571: { // x:(r+n),b a,y0
 		unhandled("x:(r+n),b a,y0");
 		break;
 		}
-	case 558: { // x:-(r),b a,y0
+	case 572: { // x:-(r),b a,y0
 		unhandled("x:-(r),b a,y0");
 		break;
 		}
-	case 559: { // x:(r)-n,b a,y1
+	case 573: { // x:(r)-n,b a,y1
 		unhandled("x:(r)-n,b a,y1");
 		break;
 		}
-	case 560: { // x:(r)+n,b a,y1
+	case 574: { // x:(r)+n,b a,y1
 		unhandled("x:(r)+n,b a,y1");
 		break;
 		}
-	case 561: { // x:(r)-,b a,y1
+	case 575: { // x:(r)-,b a,y1
 		unhandled("x:(r)-,b a,y1");
 		break;
 		}
-	case 562: { // x:(r)+,b a,y1
+	case 576: { // x:(r)+,b a,y1
 		unhandled("x:(r)+,b a,y1");
 		break;
 		}
-	case 563: { // x:(r),b a,y1
+	case 577: { // x:(r),b a,y1
 		unhandled("x:(r),b a,y1");
 		break;
 		}
-	case 564: { // x:(r+n),b a,y1
+	case 578: { // x:(r+n),b a,y1
 		unhandled("x:(r+n),b a,y1");
 		break;
 		}
-	case 565: { // x:-(r),b a,y1
+	case 579: { // x:-(r),b a,y1
 		unhandled("x:-(r),b a,y1");
 		break;
 		}
-	case 566: { // x:(r)-n,b b,y0
+	case 580: { // x:(r)-n,b b,y0
 		unhandled("x:(r)-n,b b,y0");
 		break;
 		}
-	case 567: { // x:(r)+n,b b,y0
+	case 581: { // x:(r)+n,b b,y0
 		unhandled("x:(r)+n,b b,y0");
 		break;
 		}
-	case 568: { // x:(r)-,b b,y0
+	case 582: { // x:(r)-,b b,y0
 		unhandled("x:(r)-,b b,y0");
 		break;
 		}
-	case 569: { // x:(r)+,b b,y0
+	case 583: { // x:(r)+,b b,y0
 		unhandled("x:(r)+,b b,y0");
 		break;
 		}
-	case 570: { // x:(r),b b,y0
+	case 584: { // x:(r),b b,y0
 		unhandled("x:(r),b b,y0");
 		break;
 		}
-	case 571: { // x:(r+n),b b,y0
+	case 585: { // x:(r+n),b b,y0
 		unhandled("x:(r+n),b b,y0");
 		break;
 		}
-	case 572: { // x:-(r),b b,y0
+	case 586: { // x:-(r),b b,y0
 		unhandled("x:-(r),b b,y0");
 		break;
 		}
-	case 573: { // x:(r)-n,b b,y1
+	case 587: { // x:(r)-n,b b,y1
 		unhandled("x:(r)-n,b b,y1");
 		break;
 		}
-	case 574: { // x:(r)+n,b b,y1
+	case 588: { // x:(r)+n,b b,y1
 		unhandled("x:(r)+n,b b,y1");
 		break;
 		}
-	case 575: { // x:(r)-,b b,y1
+	case 589: { // x:(r)-,b b,y1
 		unhandled("x:(r)-,b b,y1");
 		break;
 		}
-	case 576: { // x:(r)+,b b,y1
+	case 590: { // x:(r)+,b b,y1
 		unhandled("x:(r)+,b b,y1");
 		break;
 		}
-	case 577: { // x:(r),b b,y1
+	case 591: { // x:(r),b b,y1
 		unhandled("x:(r),b b,y1");
 		break;
 		}
-	case 578: { // x:(r+n),b b,y1
+	case 592: { // x:(r+n),b b,y1
 		unhandled("x:(r+n),b b,y1");
 		break;
 		}
-	case 579: { // x:-(r),b b,y1
+	case 593: { // x:-(r),b b,y1
 		unhandled("x:-(r),b b,y1");
 		break;
 		}
-	case 580: { // x0,x:(r)-n a,y0
+	case 594: { // x0,x:(r)-n a,y0
 		unhandled("x0,x:(r)-n a,y0");
 		break;
 		}
-	case 581: { // x0,x:(r)+n a,y0
+	case 595: { // x0,x:(r)+n a,y0
 		unhandled("x0,x:(r)+n a,y0");
 		break;
 		}
-	case 582: { // x0,x:(r)- a,y0
+	case 596: { // x0,x:(r)- a,y0
 		unhandled("x0,x:(r)- a,y0");
 		break;
 		}
-	case 583: { // x0,x:(r)+ a,y0
+	case 597: { // x0,x:(r)+ a,y0
 		unhandled("x0,x:(r)+ a,y0");
 		break;
 		}
-	case 584: { // x0,x:(r) a,y0
+	case 598: { // x0,x:(r) a,y0
 		unhandled("x0,x:(r) a,y0");
 		break;
 		}
-	case 585: { // x0,x:(r+n) a,y0
+	case 599: { // x0,x:(r+n) a,y0
 		unhandled("x0,x:(r+n) a,y0");
 		break;
 		}
-	case 586: { // x0,x:-(r) a,y0
+	case 600: { // x0,x:-(r) a,y0
 		unhandled("x0,x:-(r) a,y0");
 		break;
 		}
-	case 587: { // x0,x:(r)-n a,y1
+	case 601: { // x0,x:(r)-n a,y1
 		unhandled("x0,x:(r)-n a,y1");
 		break;
 		}
-	case 588: { // x0,x:(r)+n a,y1
+	case 602: { // x0,x:(r)+n a,y1
 		unhandled("x0,x:(r)+n a,y1");
 		break;
 		}
-	case 589: { // x0,x:(r)- a,y1
+	case 603: { // x0,x:(r)- a,y1
 		unhandled("x0,x:(r)- a,y1");
 		break;
 		}
-	case 590: { // x0,x:(r)+ a,y1
+	case 604: { // x0,x:(r)+ a,y1
 		unhandled("x0,x:(r)+ a,y1");
 		break;
 		}
-	case 591: { // x0,x:(r) a,y1
+	case 605: { // x0,x:(r) a,y1
 		unhandled("x0,x:(r) a,y1");
 		break;
 		}
-	case 592: { // x0,x:(r+n) a,y1
+	case 606: { // x0,x:(r+n) a,y1
 		unhandled("x0,x:(r+n) a,y1");
 		break;
 		}
-	case 593: { // x0,x:-(r) a,y1
+	case 607: { // x0,x:-(r) a,y1
 		unhandled("x0,x:-(r) a,y1");
 		break;
 		}
-	case 594: { // x0,x:(r)-n b,y0
+	case 608: { // x0,x:(r)-n b,y0
 		unhandled("x0,x:(r)-n b,y0");
 		break;
 		}
-	case 595: { // x0,x:(r)+n b,y0
+	case 609: { // x0,x:(r)+n b,y0
 		unhandled("x0,x:(r)+n b,y0");
 		break;
 		}
-	case 596: { // x0,x:(r)- b,y0
+	case 610: { // x0,x:(r)- b,y0
 		unhandled("x0,x:(r)- b,y0");
 		break;
 		}
-	case 597: { // x0,x:(r)+ b,y0
+	case 611: { // x0,x:(r)+ b,y0
 		unhandled("x0,x:(r)+ b,y0");
 		break;
 		}
-	case 598: { // x0,x:(r) b,y0
+	case 612: { // x0,x:(r) b,y0
 		unhandled("x0,x:(r) b,y0");
 		break;
 		}
-	case 599: { // x0,x:(r+n) b,y0
+	case 613: { // x0,x:(r+n) b,y0
 		unhandled("x0,x:(r+n) b,y0");
 		break;
 		}
-	case 600: { // x0,x:-(r) b,y0
+	case 614: { // x0,x:-(r) b,y0
 		unhandled("x0,x:-(r) b,y0");
 		break;
 		}
-	case 601: { // x0,x:(r)-n b,y1
+	case 615: { // x0,x:(r)-n b,y1
 		unhandled("x0,x:(r)-n b,y1");
 		break;
 		}
-	case 602: { // x0,x:(r)+n b,y1
+	case 616: { // x0,x:(r)+n b,y1
 		unhandled("x0,x:(r)+n b,y1");
 		break;
 		}
-	case 603: { // x0,x:(r)- b,y1
+	case 617: { // x0,x:(r)- b,y1
 		unhandled("x0,x:(r)- b,y1");
 		break;
 		}
-	case 604: { // x0,x:(r)+ b,y1
+	case 618: { // x0,x:(r)+ b,y1
 		unhandled("x0,x:(r)+ b,y1");
 		break;
 		}
-	case 605: { // x0,x:(r) b,y1
+	case 619: { // x0,x:(r) b,y1
 		unhandled("x0,x:(r) b,y1");
 		break;
 		}
-	case 606: { // x0,x:(r+n) b,y1
+	case 620: { // x0,x:(r+n) b,y1
 		unhandled("x0,x:(r+n) b,y1");
 		break;
 		}
-	case 607: { // x0,x:-(r) b,y1
+	case 621: { // x0,x:-(r) b,y1
 		unhandled("x0,x:-(r) b,y1");
 		break;
 		}
-	case 608: { // x1,x:(r)-n a,y0
+	case 622: { // x1,x:(r)-n a,y0
 		unhandled("x1,x:(r)-n a,y0");
 		break;
 		}
-	case 609: { // x1,x:(r)+n a,y0
+	case 623: { // x1,x:(r)+n a,y0
 		unhandled("x1,x:(r)+n a,y0");
 		break;
 		}
-	case 610: { // x1,x:(r)- a,y0
+	case 624: { // x1,x:(r)- a,y0
 		unhandled("x1,x:(r)- a,y0");
 		break;
 		}
-	case 611: { // x1,x:(r)+ a,y0
+	case 625: { // x1,x:(r)+ a,y0
 		unhandled("x1,x:(r)+ a,y0");
 		break;
 		}
-	case 612: { // x1,x:(r) a,y0
+	case 626: { // x1,x:(r) a,y0
 		unhandled("x1,x:(r) a,y0");
 		break;
 		}
-	case 613: { // x1,x:(r+n) a,y0
+	case 627: { // x1,x:(r+n) a,y0
 		unhandled("x1,x:(r+n) a,y0");
 		break;
 		}
-	case 614: { // x1,x:-(r) a,y0
+	case 628: { // x1,x:-(r) a,y0
 		unhandled("x1,x:-(r) a,y0");
 		break;
 		}
-	case 615: { // x1,x:(r)-n a,y1
+	case 629: { // x1,x:(r)-n a,y1
 		unhandled("x1,x:(r)-n a,y1");
 		break;
 		}
-	case 616: { // x1,x:(r)+n a,y1
+	case 630: { // x1,x:(r)+n a,y1
 		unhandled("x1,x:(r)+n a,y1");
 		break;
 		}
-	case 617: { // x1,x:(r)- a,y1
+	case 631: { // x1,x:(r)- a,y1
 		unhandled("x1,x:(r)- a,y1");
 		break;
 		}
-	case 618: { // x1,x:(r)+ a,y1
+	case 632: { // x1,x:(r)+ a,y1
 		unhandled("x1,x:(r)+ a,y1");
 		break;
 		}
-	case 619: { // x1,x:(r) a,y1
+	case 633: { // x1,x:(r) a,y1
 		unhandled("x1,x:(r) a,y1");
 		break;
 		}
-	case 620: { // x1,x:(r+n) a,y1
+	case 634: { // x1,x:(r+n) a,y1
 		unhandled("x1,x:(r+n) a,y1");
 		break;
 		}
-	case 621: { // x1,x:-(r) a,y1
+	case 635: { // x1,x:-(r) a,y1
 		unhandled("x1,x:-(r) a,y1");
 		break;
 		}
-	case 622: { // x1,x:(r)-n b,y0
+	case 636: { // x1,x:(r)-n b,y0
 		unhandled("x1,x:(r)-n b,y0");
 		break;
 		}
-	case 623: { // x1,x:(r)+n b,y0
+	case 637: { // x1,x:(r)+n b,y0
 		unhandled("x1,x:(r)+n b,y0");
 		break;
 		}
-	case 624: { // x1,x:(r)- b,y0
+	case 638: { // x1,x:(r)- b,y0
 		unhandled("x1,x:(r)- b,y0");
 		break;
 		}
-	case 625: { // x1,x:(r)+ b,y0
+	case 639: { // x1,x:(r)+ b,y0
 		unhandled("x1,x:(r)+ b,y0");
 		break;
 		}
-	case 626: { // x1,x:(r) b,y0
+	case 640: { // x1,x:(r) b,y0
 		unhandled("x1,x:(r) b,y0");
 		break;
 		}
-	case 627: { // x1,x:(r+n) b,y0
+	case 641: { // x1,x:(r+n) b,y0
 		unhandled("x1,x:(r+n) b,y0");
 		break;
 		}
-	case 628: { // x1,x:-(r) b,y0
+	case 642: { // x1,x:-(r) b,y0
 		unhandled("x1,x:-(r) b,y0");
 		break;
 		}
-	case 629: { // x1,x:(r)-n b,y1
+	case 643: { // x1,x:(r)-n b,y1
 		unhandled("x1,x:(r)-n b,y1");
 		break;
 		}
-	case 630: { // x1,x:(r)+n b,y1
+	case 644: { // x1,x:(r)+n b,y1
 		unhandled("x1,x:(r)+n b,y1");
 		break;
 		}
-	case 631: { // x1,x:(r)- b,y1
+	case 645: { // x1,x:(r)- b,y1
 		unhandled("x1,x:(r)- b,y1");
 		break;
 		}
-	case 632: { // x1,x:(r)+ b,y1
+	case 646: { // x1,x:(r)+ b,y1
 		unhandled("x1,x:(r)+ b,y1");
 		break;
 		}
-	case 633: { // x1,x:(r) b,y1
+	case 647: { // x1,x:(r) b,y1
 		unhandled("x1,x:(r) b,y1");
 		break;
 		}
-	case 634: { // x1,x:(r+n) b,y1
+	case 648: { // x1,x:(r+n) b,y1
 		unhandled("x1,x:(r+n) b,y1");
 		break;
 		}
-	case 635: { // x1,x:-(r) b,y1
+	case 649: { // x1,x:-(r) b,y1
 		unhandled("x1,x:-(r) b,y1");
 		break;
 		}
-	case 636: { // a,x:(r)-n a,y0
+	case 650: { // a,x:(r)-n a,y0
 		unhandled("a,x:(r)-n a,y0");
 		break;
 		}
-	case 637: { // a,x:(r)+n a,y0
+	case 651: { // a,x:(r)+n a,y0
 		unhandled("a,x:(r)+n a,y0");
 		break;
 		}
-	case 638: { // a,x:(r)- a,y0
+	case 652: { // a,x:(r)- a,y0
 		unhandled("a,x:(r)- a,y0");
 		break;
 		}
-	case 639: { // a,x:(r)+ a,y0
+	case 653: { // a,x:(r)+ a,y0
 		unhandled("a,x:(r)+ a,y0");
 		break;
 		}
-	case 640: { // a,x:(r) a,y0
+	case 654: { // a,x:(r) a,y0
 		unhandled("a,x:(r) a,y0");
 		break;
 		}
-	case 641: { // a,x:(r+n) a,y0
+	case 655: { // a,x:(r+n) a,y0
 		unhandled("a,x:(r+n) a,y0");
 		break;
 		}
-	case 642: { // a,x:-(r) a,y0
+	case 656: { // a,x:-(r) a,y0
 		unhandled("a,x:-(r) a,y0");
 		break;
 		}
-	case 643: { // a,x:(r)-n a,y1
+	case 657: { // a,x:(r)-n a,y1
 		unhandled("a,x:(r)-n a,y1");
 		break;
 		}
-	case 644: { // a,x:(r)+n a,y1
+	case 658: { // a,x:(r)+n a,y1
 		unhandled("a,x:(r)+n a,y1");
 		break;
 		}
-	case 645: { // a,x:(r)- a,y1
+	case 659: { // a,x:(r)- a,y1
 		unhandled("a,x:(r)- a,y1");
 		break;
 		}
-	case 646: { // a,x:(r)+ a,y1
+	case 660: { // a,x:(r)+ a,y1
 		unhandled("a,x:(r)+ a,y1");
 		break;
 		}
-	case 647: { // a,x:(r) a,y1
+	case 661: { // a,x:(r) a,y1
 		unhandled("a,x:(r) a,y1");
 		break;
 		}
-	case 648: { // a,x:(r+n) a,y1
+	case 662: { // a,x:(r+n) a,y1
 		unhandled("a,x:(r+n) a,y1");
 		break;
 		}
-	case 649: { // a,x:-(r) a,y1
+	case 663: { // a,x:-(r) a,y1
 		unhandled("a,x:-(r) a,y1");
 		break;
 		}
-	case 650: { // a,x:(r)-n b,y0
+	case 664: { // a,x:(r)-n b,y0
 		unhandled("a,x:(r)-n b,y0");
 		break;
 		}
-	case 651: { // a,x:(r)+n b,y0
+	case 665: { // a,x:(r)+n b,y0
 		unhandled("a,x:(r)+n b,y0");
 		break;
 		}
-	case 652: { // a,x:(r)- b,y0
+	case 666: { // a,x:(r)- b,y0
 		unhandled("a,x:(r)- b,y0");
 		break;
 		}
-	case 653: { // a,x:(r)+ b,y0
+	case 667: { // a,x:(r)+ b,y0
 		unhandled("a,x:(r)+ b,y0");
 		break;
 		}
-	case 654: { // a,x:(r) b,y0
+	case 668: { // a,x:(r) b,y0
 		unhandled("a,x:(r) b,y0");
 		break;
 		}
-	case 655: { // a,x:(r+n) b,y0
+	case 669: { // a,x:(r+n) b,y0
 		unhandled("a,x:(r+n) b,y0");
 		break;
 		}
-	case 656: { // a,x:-(r) b,y0
+	case 670: { // a,x:-(r) b,y0
 		unhandled("a,x:-(r) b,y0");
 		break;
 		}
-	case 657: { // a,x:(r)-n b,y1
+	case 671: { // a,x:(r)-n b,y1
 		unhandled("a,x:(r)-n b,y1");
 		break;
 		}
-	case 658: { // a,x:(r)+n b,y1
+	case 672: { // a,x:(r)+n b,y1
 		unhandled("a,x:(r)+n b,y1");
 		break;
 		}
-	case 659: { // a,x:(r)- b,y1
+	case 673: { // a,x:(r)- b,y1
 		unhandled("a,x:(r)- b,y1");
 		break;
 		}
-	case 660: { // a,x:(r)+ b,y1
+	case 674: { // a,x:(r)+ b,y1
 		unhandled("a,x:(r)+ b,y1");
 		break;
 		}
-	case 661: { // a,x:(r) b,y1
+	case 675: { // a,x:(r) b,y1
 		unhandled("a,x:(r) b,y1");
 		break;
 		}
-	case 662: { // a,x:(r+n) b,y1
+	case 676: { // a,x:(r+n) b,y1
 		unhandled("a,x:(r+n) b,y1");
 		break;
 		}
-	case 663: { // a,x:-(r) b,y1
+	case 677: { // a,x:-(r) b,y1
 		unhandled("a,x:-(r) b,y1");
 		break;
 		}
-	case 664: { // b,x:(r)-n a,y0
+	case 678: { // b,x:(r)-n a,y0
 		unhandled("b,x:(r)-n a,y0");
 		break;
 		}
-	case 665: { // b,x:(r)+n a,y0
+	case 679: { // b,x:(r)+n a,y0
 		unhandled("b,x:(r)+n a,y0");
 		break;
 		}
-	case 666: { // b,x:(r)- a,y0
+	case 680: { // b,x:(r)- a,y0
 		unhandled("b,x:(r)- a,y0");
 		break;
 		}
-	case 667: { // b,x:(r)+ a,y0
+	case 681: { // b,x:(r)+ a,y0
 		unhandled("b,x:(r)+ a,y0");
 		break;
 		}
-	case 668: { // b,x:(r) a,y0
+	case 682: { // b,x:(r) a,y0
 		unhandled("b,x:(r) a,y0");
 		break;
 		}
-	case 669: { // b,x:(r+n) a,y0
+	case 683: { // b,x:(r+n) a,y0
 		unhandled("b,x:(r+n) a,y0");
 		break;
 		}
-	case 670: { // b,x:-(r) a,y0
+	case 684: { // b,x:-(r) a,y0
 		unhandled("b,x:-(r) a,y0");
 		break;
 		}
-	case 671: { // b,x:(r)-n a,y1
+	case 685: { // b,x:(r)-n a,y1
 		unhandled("b,x:(r)-n a,y1");
 		break;
 		}
-	case 672: { // b,x:(r)+n a,y1
+	case 686: { // b,x:(r)+n a,y1
 		unhandled("b,x:(r)+n a,y1");
 		break;
 		}
-	case 673: { // b,x:(r)- a,y1
+	case 687: { // b,x:(r)- a,y1
 		unhandled("b,x:(r)- a,y1");
 		break;
 		}
-	case 674: { // b,x:(r)+ a,y1
+	case 688: { // b,x:(r)+ a,y1
 		unhandled("b,x:(r)+ a,y1");
 		break;
 		}
-	case 675: { // b,x:(r) a,y1
+	case 689: { // b,x:(r) a,y1
 		unhandled("b,x:(r) a,y1");
 		break;
 		}
-	case 676: { // b,x:(r+n) a,y1
+	case 690: { // b,x:(r+n) a,y1
 		unhandled("b,x:(r+n) a,y1");
 		break;
 		}
-	case 677: { // b,x:-(r) a,y1
+	case 691: { // b,x:-(r) a,y1
 		unhandled("b,x:-(r) a,y1");
 		break;
 		}
-	case 678: { // b,x:(r)-n b,y0
+	case 692: { // b,x:(r)-n b,y0
 		unhandled("b,x:(r)-n b,y0");
 		break;
 		}
-	case 679: { // b,x:(r)+n b,y0
+	case 693: { // b,x:(r)+n b,y0
 		unhandled("b,x:(r)+n b,y0");
 		break;
 		}
-	case 680: { // b,x:(r)- b,y0
+	case 694: { // b,x:(r)- b,y0
 		unhandled("b,x:(r)- b,y0");
 		break;
 		}
-	case 681: { // b,x:(r)+ b,y0
+	case 695: { // b,x:(r)+ b,y0
 		unhandled("b,x:(r)+ b,y0");
 		break;
 		}
-	case 682: { // b,x:(r) b,y0
+	case 696: { // b,x:(r) b,y0
 		unhandled("b,x:(r) b,y0");
 		break;
 		}
-	case 683: { // b,x:(r+n) b,y0
+	case 697: { // b,x:(r+n) b,y0
 		unhandled("b,x:(r+n) b,y0");
 		break;
 		}
-	case 684: { // b,x:-(r) b,y0
+	case 698: { // b,x:-(r) b,y0
 		unhandled("b,x:-(r) b,y0");
 		break;
 		}
-	case 685: { // b,x:(r)-n b,y1
+	case 699: { // b,x:(r)-n b,y1
 		unhandled("b,x:(r)-n b,y1");
 		break;
 		}
-	case 686: { // b,x:(r)+n b,y1
+	case 700: { // b,x:(r)+n b,y1
 		unhandled("b,x:(r)+n b,y1");
 		break;
 		}
-	case 687: { // b,x:(r)- b,y1
+	case 701: { // b,x:(r)- b,y1
 		unhandled("b,x:(r)- b,y1");
 		break;
 		}
-	case 688: { // b,x:(r)+ b,y1
+	case 702: { // b,x:(r)+ b,y1
 		unhandled("b,x:(r)+ b,y1");
 		break;
 		}
-	case 689: { // b,x:(r) b,y1
+	case 703: { // b,x:(r) b,y1
 		unhandled("b,x:(r) b,y1");
 		break;
 		}
-	case 690: { // b,x:(r+n) b,y1
+	case 704: { // b,x:(r+n) b,y1
 		unhandled("b,x:(r+n) b,y1");
 		break;
 		}
-	case 691: { // b,x:-(r) b,y1
+	case 705: { // b,x:-(r) b,y1
 		unhandled("b,x:-(r) b,y1");
 		break;
 		}
-	case 692: { // x:[abs],x0 a,y0
+	case 706: { // x:[abs],x0 a,y0
 		unhandled("x:[abs],x0 a,y0");
 		break;
 		}
-	case 693: { // x:[abs],x0 a,y1
+	case 707: { // x:[abs],x0 a,y1
 		unhandled("x:[abs],x0 a,y1");
 		break;
 		}
-	case 694: { // x:[abs],x0 b,y0
+	case 708: { // x:[abs],x0 b,y0
 		unhandled("x:[abs],x0 b,y0");
 		break;
 		}
-	case 695: { // x:[abs],x0 b,y1
+	case 709: { // x:[abs],x0 b,y1
 		unhandled("x:[abs],x0 b,y1");
 		break;
 		}
-	case 696: { // x:[abs],x1 a,y0
+	case 710: { // x:[abs],x1 a,y0
 		unhandled("x:[abs],x1 a,y0");
 		break;
 		}
-	case 697: { // x:[abs],x1 a,y1
+	case 711: { // x:[abs],x1 a,y1
 		unhandled("x:[abs],x1 a,y1");
 		break;
 		}
-	case 698: { // x:[abs],x1 b,y0
+	case 712: { // x:[abs],x1 b,y0
 		unhandled("x:[abs],x1 b,y0");
 		break;
 		}
-	case 699: { // x:[abs],x1 b,y1
+	case 713: { // x:[abs],x1 b,y1
 		unhandled("x:[abs],x1 b,y1");
 		break;
 		}
-	case 700: { // x:[abs],a a,y0
+	case 714: { // x:[abs],a a,y0
 		unhandled("x:[abs],a a,y0");
 		break;
 		}
-	case 701: { // x:[abs],a a,y1
+	case 715: { // x:[abs],a a,y1
 		unhandled("x:[abs],a a,y1");
 		break;
 		}
-	case 702: { // x:[abs],a b,y0
+	case 716: { // x:[abs],a b,y0
 		unhandled("x:[abs],a b,y0");
 		break;
 		}
-	case 703: { // x:[abs],a b,y1
+	case 717: { // x:[abs],a b,y1
 		unhandled("x:[abs],a b,y1");
 		break;
 		}
-	case 704: { // x:[abs],b a,y0
+	case 718: { // x:[abs],b a,y0
 		unhandled("x:[abs],b a,y0");
 		break;
 		}
-	case 705: { // x:[abs],b a,y1
+	case 719: { // x:[abs],b a,y1
 		unhandled("x:[abs],b a,y1");
 		break;
 		}
-	case 706: { // x:[abs],b b,y0
+	case 720: { // x:[abs],b b,y0
 		unhandled("x:[abs],b b,y0");
 		break;
 		}
-	case 707: { // x:[abs],b b,y1
+	case 721: { // x:[abs],b b,y1
 		unhandled("x:[abs],b b,y1");
 		break;
 		}
-	case 708: { // x:#[i],x0 a,y0
-		unhandled("x:#[i],x0 a,y0");
+	case 722: { // #[i],x0 a,y0
+		unhandled("#[i],x0 a,y0");
 		break;
 		}
-	case 709: { // x:#[i],x0 a,y1
-		unhandled("x:#[i],x0 a,y1");
+	case 723: { // #[i],x0 a,y1
+		unhandled("#[i],x0 a,y1");
 		break;
 		}
-	case 710: { // x:#[i],x0 b,y0
-		unhandled("x:#[i],x0 b,y0");
+	case 724: { // #[i],x0 b,y0
+		unhandled("#[i],x0 b,y0");
 		break;
 		}
-	case 711: { // x:#[i],x0 b,y1
-		unhandled("x:#[i],x0 b,y1");
+	case 725: { // #[i],x0 b,y1
+		unhandled("#[i],x0 b,y1");
 		break;
 		}
-	case 712: { // x:#[i],x1 a,y0
-		unhandled("x:#[i],x1 a,y0");
+	case 726: { // #[i],x1 a,y0
+		unhandled("#[i],x1 a,y0");
 		break;
 		}
-	case 713: { // x:#[i],x1 a,y1
-		unhandled("x:#[i],x1 a,y1");
+	case 727: { // #[i],x1 a,y1
+		unhandled("#[i],x1 a,y1");
 		break;
 		}
-	case 714: { // x:#[i],x1 b,y0
-		unhandled("x:#[i],x1 b,y0");
+	case 728: { // #[i],x1 b,y0
+		unhandled("#[i],x1 b,y0");
 		break;
 		}
-	case 715: { // x:#[i],x1 b,y1
-		unhandled("x:#[i],x1 b,y1");
+	case 729: { // #[i],x1 b,y1
+		unhandled("#[i],x1 b,y1");
 		break;
 		}
-	case 716: { // x:#[i],a a,y0
-		unhandled("x:#[i],a a,y0");
+	case 730: { // #[i],a a,y0
+		unhandled("#[i],a a,y0");
 		break;
 		}
-	case 717: { // x:#[i],a a,y1
-		unhandled("x:#[i],a a,y1");
+	case 731: { // #[i],a a,y1
+		unhandled("#[i],a a,y1");
 		break;
 		}
-	case 718: { // x:#[i],a b,y0
-		unhandled("x:#[i],a b,y0");
+	case 732: { // #[i],a b,y0
+		unhandled("#[i],a b,y0");
 		break;
 		}
-	case 719: { // x:#[i],a b,y1
-		unhandled("x:#[i],a b,y1");
+	case 733: { // #[i],a b,y1
+		unhandled("#[i],a b,y1");
 		break;
 		}
-	case 720: { // x:#[i],b a,y0
-		unhandled("x:#[i],b a,y0");
+	case 734: { // #[i],b a,y0
+		unhandled("#[i],b a,y0");
 		break;
 		}
-	case 721: { // x:#[i],b a,y1
-		unhandled("x:#[i],b a,y1");
+	case 735: { // #[i],b a,y1
+		unhandled("#[i],b a,y1");
 		break;
 		}
-	case 722: { // x:#[i],b b,y0
-		unhandled("x:#[i],b b,y0");
+	case 736: { // #[i],b b,y0
+		unhandled("#[i],b b,y0");
 		break;
 		}
-	case 723: { // x:#[i],b b,y1
-		unhandled("x:#[i],b b,y1");
+	case 737: { // #[i],b b,y1
+		unhandled("#[i],b b,y1");
 		break;
 		}
-	case 724: { // a,x:(r)-n x0,a
+	case 738: { // x0,x:[abs] a,y0
+		unhandled("x0,x:[abs] a,y0");
+		break;
+		}
+	case 739: { // x0,x:[abs] a,y1
+		unhandled("x0,x:[abs] a,y1");
+		break;
+		}
+	case 740: { // x0,x:[abs] b,y0
+		unhandled("x0,x:[abs] b,y0");
+		break;
+		}
+	case 741: { // x0,x:[abs] b,y1
+		unhandled("x0,x:[abs] b,y1");
+		break;
+		}
+	case 742: { // x1,x:[abs] a,y0
+		unhandled("x1,x:[abs] a,y0");
+		break;
+		}
+	case 743: { // x1,x:[abs] a,y1
+		unhandled("x1,x:[abs] a,y1");
+		break;
+		}
+	case 744: { // x1,x:[abs] b,y0
+		unhandled("x1,x:[abs] b,y0");
+		break;
+		}
+	case 745: { // x1,x:[abs] b,y1
+		unhandled("x1,x:[abs] b,y1");
+		break;
+		}
+	case 746: { // a,x:[abs] a,y0
+		unhandled("a,x:[abs] a,y0");
+		break;
+		}
+	case 747: { // a,x:[abs] a,y1
+		unhandled("a,x:[abs] a,y1");
+		break;
+		}
+	case 748: { // a,x:[abs] b,y0
+		unhandled("a,x:[abs] b,y0");
+		break;
+		}
+	case 749: { // a,x:[abs] b,y1
+		unhandled("a,x:[abs] b,y1");
+		break;
+		}
+	case 750: { // b,x:[abs] a,y0
+		unhandled("b,x:[abs] a,y0");
+		break;
+		}
+	case 751: { // b,x:[abs] a,y1
+		unhandled("b,x:[abs] a,y1");
+		break;
+		}
+	case 752: { // b,x:[abs] b,y0
+		unhandled("b,x:[abs] b,y0");
+		break;
+		}
+	case 753: { // b,x:[abs] b,y1
+		unhandled("b,x:[abs] b,y1");
+		break;
+		}
+	case 754: { // a,x:(r)-n x0,a
 		unhandled("a,x:(r)-n x0,a");
 		break;
 		}
-	case 725: { // a,x:(r)+n x0,a
+	case 755: { // a,x:(r)+n x0,a
 		unhandled("a,x:(r)+n x0,a");
 		break;
 		}
-	case 726: { // a,x:(r)- x0,a
+	case 756: { // a,x:(r)- x0,a
 		unhandled("a,x:(r)- x0,a");
 		break;
 		}
-	case 727: { // a,x:(r)+ x0,a
+	case 757: { // a,x:(r)+ x0,a
 		unhandled("a,x:(r)+ x0,a");
 		break;
 		}
-	case 728: { // a,x:(r) x0,a
+	case 758: { // a,x:(r) x0,a
 		unhandled("a,x:(r) x0,a");
 		break;
 		}
-	case 729: { // a,x:(r+n) x0,a
+	case 759: { // a,x:(r+n) x0,a
 		unhandled("a,x:(r+n) x0,a");
 		break;
 		}
-	case 730: { // a,x:-(r) x0,a
+	case 760: { // a,x:-(r) x0,a
 		unhandled("a,x:-(r) x0,a");
 		break;
 		}
-	case 731: { // b,x:(r)-n x0,b
+	case 761: { // b,x:(r)-n x0,b
 		unhandled("b,x:(r)-n x0,b");
 		break;
 		}
-	case 732: { // b,x:(r)+n x0,b
+	case 762: { // b,x:(r)+n x0,b
 		unhandled("b,x:(r)+n x0,b");
 		break;
 		}
-	case 733: { // b,x:(r)- x0,b
+	case 763: { // b,x:(r)- x0,b
 		unhandled("b,x:(r)- x0,b");
 		break;
 		}
-	case 734: { // b,x:(r)+ x0,b
+	case 764: { // b,x:(r)+ x0,b
 		unhandled("b,x:(r)+ x0,b");
 		break;
 		}
-	case 735: { // b,x:(r) x0,b
+	case 765: { // b,x:(r) x0,b
 		unhandled("b,x:(r) x0,b");
 		break;
 		}
-	case 736: { // b,x:(r+n) x0,b
+	case 766: { // b,x:(r+n) x0,b
 		unhandled("b,x:(r+n) x0,b");
 		break;
 		}
-	case 737: { // b,x:-(r) x0,b
+	case 767: { // b,x:-(r) x0,b
 		unhandled("b,x:-(r) x0,b");
 		break;
 		}
-	case 738: { // y:(r)-n,x0
+	case 768: { // y:(r)-n,x0
 		unhandled("y:(r)-n,x0");
 		break;
 		}
-	case 739: { // y:(r)+n,x0
+	case 769: { // y:(r)+n,x0
 		unhandled("y:(r)+n,x0");
 		break;
 		}
-	case 740: { // y:(r)-,x0
+	case 770: { // y:(r)-,x0
 		unhandled("y:(r)-,x0");
 		break;
 		}
-	case 741: { // y:(r)+,x0
+	case 771: { // y:(r)+,x0
 		unhandled("y:(r)+,x0");
 		break;
 		}
-	case 742: { // y:(r),x0
+	case 772: { // y:(r),x0
 		unhandled("y:(r),x0");
 		break;
 		}
-	case 743: { // y:(r+n),x0
+	case 773: { // y:(r+n),x0
 		unhandled("y:(r+n),x0");
 		break;
 		}
-	case 744: { // y:-(r),x0
+	case 774: { // y:-(r),x0
 		unhandled("y:-(r),x0");
 		break;
 		}
-	case 745: { // y:(r)-n,x1
+	case 775: { // y:(r)-n,x1
 		unhandled("y:(r)-n,x1");
 		break;
 		}
-	case 746: { // y:(r)+n,x1
+	case 776: { // y:(r)+n,x1
 		unhandled("y:(r)+n,x1");
 		break;
 		}
-	case 747: { // y:(r)-,x1
+	case 777: { // y:(r)-,x1
 		unhandled("y:(r)-,x1");
 		break;
 		}
-	case 748: { // y:(r)+,x1
+	case 778: { // y:(r)+,x1
 		unhandled("y:(r)+,x1");
 		break;
 		}
-	case 749: { // y:(r),x1
+	case 779: { // y:(r),x1
 		unhandled("y:(r),x1");
 		break;
 		}
-	case 750: { // y:(r+n),x1
+	case 780: { // y:(r+n),x1
 		unhandled("y:(r+n),x1");
 		break;
 		}
-	case 751: { // y:-(r),x1
+	case 781: { // y:-(r),x1
 		unhandled("y:-(r),x1");
 		break;
 		}
-	case 752: { // y:(r)-n,y0
+	case 782: { // y:(r)-n,y0
 		unhandled("y:(r)-n,y0");
 		break;
 		}
-	case 753: { // y:(r)+n,y0
+	case 783: { // y:(r)+n,y0
 		unhandled("y:(r)+n,y0");
 		break;
 		}
-	case 754: { // y:(r)-,y0
+	case 784: { // y:(r)-,y0
 		unhandled("y:(r)-,y0");
 		break;
 		}
-	case 755: { // y:(r)+,y0
+	case 785: { // y:(r)+,y0
 		unhandled("y:(r)+,y0");
 		break;
 		}
-	case 756: { // y:(r),y0
+	case 786: { // y:(r),y0
 		unhandled("y:(r),y0");
 		break;
 		}
-	case 757: { // y:(r+n),y0
+	case 787: { // y:(r+n),y0
 		unhandled("y:(r+n),y0");
 		break;
 		}
-	case 758: { // y:-(r),y0
+	case 788: { // y:-(r),y0
 		unhandled("y:-(r),y0");
 		break;
 		}
-	case 759: { // y:(r)-n,y1
+	case 789: { // y:(r)-n,y1
 		unhandled("y:(r)-n,y1");
 		break;
 		}
-	case 760: { // y:(r)+n,y1
+	case 790: { // y:(r)+n,y1
 		unhandled("y:(r)+n,y1");
 		break;
 		}
-	case 761: { // y:(r)-,y1
+	case 791: { // y:(r)-,y1
 		unhandled("y:(r)-,y1");
 		break;
 		}
-	case 762: { // y:(r)+,y1
+	case 792: { // y:(r)+,y1
 		unhandled("y:(r)+,y1");
 		break;
 		}
-	case 763: { // y:(r),y1
+	case 793: { // y:(r),y1
 		unhandled("y:(r),y1");
 		break;
 		}
-	case 764: { // y:(r+n),y1
+	case 794: { // y:(r+n),y1
 		unhandled("y:(r+n),y1");
 		break;
 		}
-	case 765: { // y:-(r),y1
+	case 795: { // y:-(r),y1
 		unhandled("y:-(r),y1");
 		break;
 		}
-	case 766: { // y:(r)-n,a0
+	case 796: { // y:(r)-n,a0
 		unhandled("y:(r)-n,a0");
 		break;
 		}
-	case 767: { // y:(r)+n,a0
+	case 797: { // y:(r)+n,a0
 		unhandled("y:(r)+n,a0");
 		break;
 		}
-	case 768: { // y:(r)-,a0
+	case 798: { // y:(r)-,a0
 		unhandled("y:(r)-,a0");
 		break;
 		}
-	case 769: { // y:(r)+,a0
+	case 799: { // y:(r)+,a0
 		unhandled("y:(r)+,a0");
 		break;
 		}
-	case 770: { // y:(r),a0
+	case 800: { // y:(r),a0
 		unhandled("y:(r),a0");
 		break;
 		}
-	case 771: { // y:(r+n),a0
+	case 801: { // y:(r+n),a0
 		unhandled("y:(r+n),a0");
 		break;
 		}
-	case 772: { // y:-(r),a0
+	case 802: { // y:-(r),a0
 		unhandled("y:-(r),a0");
 		break;
 		}
-	case 773: { // y:(r)-n,b0
+	case 803: { // y:(r)-n,b0
 		unhandled("y:(r)-n,b0");
 		break;
 		}
-	case 774: { // y:(r)+n,b0
+	case 804: { // y:(r)+n,b0
 		unhandled("y:(r)+n,b0");
 		break;
 		}
-	case 775: { // y:(r)-,b0
+	case 805: { // y:(r)-,b0
 		unhandled("y:(r)-,b0");
 		break;
 		}
-	case 776: { // y:(r)+,b0
+	case 806: { // y:(r)+,b0
 		unhandled("y:(r)+,b0");
 		break;
 		}
-	case 777: { // y:(r),b0
+	case 807: { // y:(r),b0
 		unhandled("y:(r),b0");
 		break;
 		}
-	case 778: { // y:(r+n),b0
+	case 808: { // y:(r+n),b0
 		unhandled("y:(r+n),b0");
 		break;
 		}
-	case 779: { // y:-(r),b0
+	case 809: { // y:-(r),b0
 		unhandled("y:-(r),b0");
 		break;
 		}
-	case 780: { // y:(r)-n,a2
+	case 810: { // y:(r)-n,a2
 		unhandled("y:(r)-n,a2");
 		break;
 		}
-	case 781: { // y:(r)+n,a2
+	case 811: { // y:(r)+n,a2
 		unhandled("y:(r)+n,a2");
 		break;
 		}
-	case 782: { // y:(r)-,a2
+	case 812: { // y:(r)-,a2
 		unhandled("y:(r)-,a2");
 		break;
 		}
-	case 783: { // y:(r)+,a2
+	case 813: { // y:(r)+,a2
 		unhandled("y:(r)+,a2");
 		break;
 		}
-	case 784: { // y:(r),a2
+	case 814: { // y:(r),a2
 		unhandled("y:(r),a2");
 		break;
 		}
-	case 785: { // y:(r+n),a2
+	case 815: { // y:(r+n),a2
 		unhandled("y:(r+n),a2");
 		break;
 		}
-	case 786: { // y:-(r),a2
+	case 816: { // y:-(r),a2
 		unhandled("y:-(r),a2");
 		break;
 		}
-	case 787: { // y:(r)-n,b2
+	case 817: { // y:(r)-n,b2
 		unhandled("y:(r)-n,b2");
 		break;
 		}
-	case 788: { // y:(r)+n,b2
+	case 818: { // y:(r)+n,b2
 		unhandled("y:(r)+n,b2");
 		break;
 		}
-	case 789: { // y:(r)-,b2
+	case 819: { // y:(r)-,b2
 		unhandled("y:(r)-,b2");
 		break;
 		}
-	case 790: { // y:(r)+,b2
+	case 820: { // y:(r)+,b2
 		unhandled("y:(r)+,b2");
 		break;
 		}
-	case 791: { // y:(r),b2
+	case 821: { // y:(r),b2
 		unhandled("y:(r),b2");
 		break;
 		}
-	case 792: { // y:(r+n),b2
+	case 822: { // y:(r+n),b2
 		unhandled("y:(r+n),b2");
 		break;
 		}
-	case 793: { // y:-(r),b2
+	case 823: { // y:-(r),b2
 		unhandled("y:-(r),b2");
 		break;
 		}
-	case 794: { // y:(r)-n,a1
+	case 824: { // y:(r)-n,a1
 		unhandled("y:(r)-n,a1");
 		break;
 		}
-	case 795: { // y:(r)+n,a1
+	case 825: { // y:(r)+n,a1
 		unhandled("y:(r)+n,a1");
 		break;
 		}
-	case 796: { // y:(r)-,a1
+	case 826: { // y:(r)-,a1
 		unhandled("y:(r)-,a1");
 		break;
 		}
-	case 797: { // y:(r)+,a1
+	case 827: { // y:(r)+,a1
 		unhandled("y:(r)+,a1");
 		break;
 		}
-	case 798: { // y:(r),a1
+	case 828: { // y:(r),a1
 		unhandled("y:(r),a1");
 		break;
 		}
-	case 799: { // y:(r+n),a1
+	case 829: { // y:(r+n),a1
 		unhandled("y:(r+n),a1");
 		break;
 		}
-	case 800: { // y:-(r),a1
+	case 830: { // y:-(r),a1
 		unhandled("y:-(r),a1");
 		break;
 		}
-	case 801: { // y:(r)-n,b1
+	case 831: { // y:(r)-n,b1
 		unhandled("y:(r)-n,b1");
 		break;
 		}
-	case 802: { // y:(r)+n,b1
+	case 832: { // y:(r)+n,b1
 		unhandled("y:(r)+n,b1");
 		break;
 		}
-	case 803: { // y:(r)-,b1
+	case 833: { // y:(r)-,b1
 		unhandled("y:(r)-,b1");
 		break;
 		}
-	case 804: { // y:(r)+,b1
+	case 834: { // y:(r)+,b1
 		unhandled("y:(r)+,b1");
 		break;
 		}
-	case 805: { // y:(r),b1
+	case 835: { // y:(r),b1
 		unhandled("y:(r),b1");
 		break;
 		}
-	case 806: { // y:(r+n),b1
+	case 836: { // y:(r+n),b1
 		unhandled("y:(r+n),b1");
 		break;
 		}
-	case 807: { // y:-(r),b1
+	case 837: { // y:-(r),b1
 		unhandled("y:-(r),b1");
 		break;
 		}
-	case 808: { // y:(r)-n,a
+	case 838: { // y:(r)-n,a
 		unhandled("y:(r)-n,a");
 		break;
 		}
-	case 809: { // y:(r)+n,a
+	case 839: { // y:(r)+n,a
 		unhandled("y:(r)+n,a");
 		break;
 		}
-	case 810: { // y:(r)-,a
+	case 840: { // y:(r)-,a
 		unhandled("y:(r)-,a");
 		break;
 		}
-	case 811: { // y:(r)+,a
+	case 841: { // y:(r)+,a
 		unhandled("y:(r)+,a");
 		break;
 		}
-	case 812: { // y:(r),a
+	case 842: { // y:(r),a
 		unhandled("y:(r),a");
 		break;
 		}
-	case 813: { // y:(r+n),a
+	case 843: { // y:(r+n),a
 		unhandled("y:(r+n),a");
 		break;
 		}
-	case 814: { // y:-(r),a
+	case 844: { // y:-(r),a
 		unhandled("y:-(r),a");
 		break;
 		}
-	case 815: { // y:(r)-n,b
+	case 845: { // y:(r)-n,b
 		unhandled("y:(r)-n,b");
 		break;
 		}
-	case 816: { // y:(r)+n,b
+	case 846: { // y:(r)+n,b
 		unhandled("y:(r)+n,b");
 		break;
 		}
-	case 817: { // y:(r)-,b
+	case 847: { // y:(r)-,b
 		unhandled("y:(r)-,b");
 		break;
 		}
-	case 818: { // y:(r)+,b
+	case 848: { // y:(r)+,b
 		unhandled("y:(r)+,b");
 		break;
 		}
-	case 819: { // y:(r),b
+	case 849: { // y:(r),b
 		unhandled("y:(r),b");
 		break;
 		}
-	case 820: { // y:(r+n),b
+	case 850: { // y:(r+n),b
 		unhandled("y:(r+n),b");
 		break;
 		}
-	case 821: { // y:-(r),b
+	case 851: { // y:-(r),b
 		unhandled("y:-(r),b");
 		break;
 		}
-	case 822: { // y:(r)-n,r
+	case 852: { // y:(r)-n,r
 		unhandled("y:(r)-n,r");
 		break;
 		}
-	case 823: { // y:(r)+n,r
+	case 853: { // y:(r)+n,r
 		unhandled("y:(r)+n,r");
 		break;
 		}
-	case 824: { // y:(r)-,r
+	case 854: { // y:(r)-,r
 		unhandled("y:(r)-,r");
 		break;
 		}
-	case 825: { // y:(r)+,r
+	case 855: { // y:(r)+,r
 		unhandled("y:(r)+,r");
 		break;
 		}
-	case 826: { // y:(r),r
+	case 856: { // y:(r),r
 		unhandled("y:(r),r");
 		break;
 		}
-	case 827: { // y:(r+n),r
+	case 857: { // y:(r+n),r
 		unhandled("y:(r+n),r");
 		break;
 		}
-	case 828: { // y:-(r),r
+	case 858: { // y:-(r),r
 		unhandled("y:-(r),r");
 		break;
 		}
-	case 829: { // y:(r)-n,n
+	case 859: { // y:(r)-n,n
 		unhandled("y:(r)-n,n");
 		break;
 		}
-	case 830: { // y:(r)+n,n
+	case 860: { // y:(r)+n,n
 		unhandled("y:(r)+n,n");
 		break;
 		}
-	case 831: { // y:(r)-,n
+	case 861: { // y:(r)-,n
 		unhandled("y:(r)-,n");
 		break;
 		}
-	case 832: { // y:(r)+,n
+	case 862: { // y:(r)+,n
 		unhandled("y:(r)+,n");
 		break;
 		}
-	case 833: { // y:(r),n
+	case 863: { // y:(r),n
 		unhandled("y:(r),n");
 		break;
 		}
-	case 834: { // y:(r+n),n
+	case 864: { // y:(r+n),n
 		unhandled("y:(r+n),n");
 		break;
 		}
-	case 835: { // y:-(r),n
+	case 865: { // y:-(r),n
 		unhandled("y:-(r),n");
 		break;
 		}
-	case 836: { // x0,y:(r)-n
+	case 866: { // x0,y:(r)-n
 		unhandled("x0,y:(r)-n");
 		break;
 		}
-	case 837: { // x0,y:(r)+n
+	case 867: { // x0,y:(r)+n
 		unhandled("x0,y:(r)+n");
 		break;
 		}
-	case 838: { // x0,y:(r)-
+	case 868: { // x0,y:(r)-
 		unhandled("x0,y:(r)-");
 		break;
 		}
-	case 839: { // x0,y:(r)+
+	case 869: { // x0,y:(r)+
 		unhandled("x0,y:(r)+");
 		break;
 		}
-	case 840: { // x0,y:(r)
+	case 870: { // x0,y:(r)
 		unhandled("x0,y:(r)");
 		break;
 		}
-	case 841: { // x0,y:(r+n)
+	case 871: { // x0,y:(r+n)
 		unhandled("x0,y:(r+n)");
 		break;
 		}
-	case 842: { // x0,y:-(r)
+	case 872: { // x0,y:-(r)
 		unhandled("x0,y:-(r)");
 		break;
 		}
-	case 843: { // x1,y:(r)-n
+	case 873: { // x1,y:(r)-n
 		unhandled("x1,y:(r)-n");
 		break;
 		}
-	case 844: { // x1,y:(r)+n
+	case 874: { // x1,y:(r)+n
 		unhandled("x1,y:(r)+n");
 		break;
 		}
-	case 845: { // x1,y:(r)-
+	case 875: { // x1,y:(r)-
 		unhandled("x1,y:(r)-");
 		break;
 		}
-	case 846: { // x1,y:(r)+
+	case 876: { // x1,y:(r)+
 		unhandled("x1,y:(r)+");
 		break;
 		}
-	case 847: { // x1,y:(r)
+	case 877: { // x1,y:(r)
 		unhandled("x1,y:(r)");
 		break;
 		}
-	case 848: { // x1,y:(r+n)
+	case 878: { // x1,y:(r+n)
 		unhandled("x1,y:(r+n)");
 		break;
 		}
-	case 849: { // x1,y:-(r)
+	case 879: { // x1,y:-(r)
 		unhandled("x1,y:-(r)");
 		break;
 		}
-	case 850: { // y0,y:(r)-n
+	case 880: { // y0,y:(r)-n
 		unhandled("y0,y:(r)-n");
 		break;
 		}
-	case 851: { // y0,y:(r)+n
+	case 881: { // y0,y:(r)+n
 		unhandled("y0,y:(r)+n");
 		break;
 		}
-	case 852: { // y0,y:(r)-
+	case 882: { // y0,y:(r)-
 		unhandled("y0,y:(r)-");
 		break;
 		}
-	case 853: { // y0,y:(r)+
+	case 883: { // y0,y:(r)+
 		unhandled("y0,y:(r)+");
 		break;
 		}
-	case 854: { // y0,y:(r)
+	case 884: { // y0,y:(r)
 		unhandled("y0,y:(r)");
 		break;
 		}
-	case 855: { // y0,y:(r+n)
+	case 885: { // y0,y:(r+n)
 		unhandled("y0,y:(r+n)");
 		break;
 		}
-	case 856: { // y0,y:-(r)
+	case 886: { // y0,y:-(r)
 		unhandled("y0,y:-(r)");
 		break;
 		}
-	case 857: { // y1,y:(r)-n
+	case 887: { // y1,y:(r)-n
 		unhandled("y1,y:(r)-n");
 		break;
 		}
-	case 858: { // y1,y:(r)+n
+	case 888: { // y1,y:(r)+n
 		unhandled("y1,y:(r)+n");
 		break;
 		}
-	case 859: { // y1,y:(r)-
+	case 889: { // y1,y:(r)-
 		unhandled("y1,y:(r)-");
 		break;
 		}
-	case 860: { // y1,y:(r)+
+	case 890: { // y1,y:(r)+
 		unhandled("y1,y:(r)+");
 		break;
 		}
-	case 861: { // y1,y:(r)
+	case 891: { // y1,y:(r)
 		unhandled("y1,y:(r)");
 		break;
 		}
-	case 862: { // y1,y:(r+n)
+	case 892: { // y1,y:(r+n)
 		unhandled("y1,y:(r+n)");
 		break;
 		}
-	case 863: { // y1,y:-(r)
+	case 893: { // y1,y:-(r)
 		unhandled("y1,y:-(r)");
 		break;
 		}
-	case 864: { // a0,y:(r)-n
+	case 894: { // a0,y:(r)-n
 		unhandled("a0,y:(r)-n");
 		break;
 		}
-	case 865: { // a0,y:(r)+n
+	case 895: { // a0,y:(r)+n
 		unhandled("a0,y:(r)+n");
 		break;
 		}
-	case 866: { // a0,y:(r)-
+	case 896: { // a0,y:(r)-
 		unhandled("a0,y:(r)-");
 		break;
 		}
-	case 867: { // a0,y:(r)+
+	case 897: { // a0,y:(r)+
 		unhandled("a0,y:(r)+");
 		break;
 		}
-	case 868: { // a0,y:(r)
+	case 898: { // a0,y:(r)
 		unhandled("a0,y:(r)");
 		break;
 		}
-	case 869: { // a0,y:(r+n)
+	case 899: { // a0,y:(r+n)
 		unhandled("a0,y:(r+n)");
 		break;
 		}
-	case 870: { // a0,y:-(r)
+	case 900: { // a0,y:-(r)
 		unhandled("a0,y:-(r)");
 		break;
 		}
-	case 871: { // b0,y:(r)-n
+	case 901: { // b0,y:(r)-n
 		unhandled("b0,y:(r)-n");
 		break;
 		}
-	case 872: { // b0,y:(r)+n
+	case 902: { // b0,y:(r)+n
 		unhandled("b0,y:(r)+n");
 		break;
 		}
-	case 873: { // b0,y:(r)-
+	case 903: { // b0,y:(r)-
 		unhandled("b0,y:(r)-");
 		break;
 		}
-	case 874: { // b0,y:(r)+
+	case 904: { // b0,y:(r)+
 		unhandled("b0,y:(r)+");
 		break;
 		}
-	case 875: { // b0,y:(r)
+	case 905: { // b0,y:(r)
 		unhandled("b0,y:(r)");
 		break;
 		}
-	case 876: { // b0,y:(r+n)
+	case 906: { // b0,y:(r+n)
 		unhandled("b0,y:(r+n)");
 		break;
 		}
-	case 877: { // b0,y:-(r)
+	case 907: { // b0,y:-(r)
 		unhandled("b0,y:-(r)");
 		break;
 		}
-	case 878: { // a2,y:(r)-n
+	case 908: { // a2,y:(r)-n
 		unhandled("a2,y:(r)-n");
 		break;
 		}
-	case 879: { // a2,y:(r)+n
+	case 909: { // a2,y:(r)+n
 		unhandled("a2,y:(r)+n");
 		break;
 		}
-	case 880: { // a2,y:(r)-
+	case 910: { // a2,y:(r)-
 		unhandled("a2,y:(r)-");
 		break;
 		}
-	case 881: { // a2,y:(r)+
+	case 911: { // a2,y:(r)+
 		unhandled("a2,y:(r)+");
 		break;
 		}
-	case 882: { // a2,y:(r)
+	case 912: { // a2,y:(r)
 		unhandled("a2,y:(r)");
 		break;
 		}
-	case 883: { // a2,y:(r+n)
+	case 913: { // a2,y:(r+n)
 		unhandled("a2,y:(r+n)");
 		break;
 		}
-	case 884: { // a2,y:-(r)
+	case 914: { // a2,y:-(r)
 		unhandled("a2,y:-(r)");
 		break;
 		}
-	case 885: { // b2,y:(r)-n
+	case 915: { // b2,y:(r)-n
 		unhandled("b2,y:(r)-n");
 		break;
 		}
-	case 886: { // b2,y:(r)+n
+	case 916: { // b2,y:(r)+n
 		unhandled("b2,y:(r)+n");
 		break;
 		}
-	case 887: { // b2,y:(r)-
+	case 917: { // b2,y:(r)-
 		unhandled("b2,y:(r)-");
 		break;
 		}
-	case 888: { // b2,y:(r)+
+	case 918: { // b2,y:(r)+
 		unhandled("b2,y:(r)+");
 		break;
 		}
-	case 889: { // b2,y:(r)
+	case 919: { // b2,y:(r)
 		unhandled("b2,y:(r)");
 		break;
 		}
-	case 890: { // b2,y:(r+n)
+	case 920: { // b2,y:(r+n)
 		unhandled("b2,y:(r+n)");
 		break;
 		}
-	case 891: { // b2,y:-(r)
+	case 921: { // b2,y:-(r)
 		unhandled("b2,y:-(r)");
 		break;
 		}
-	case 892: { // a1,y:(r)-n
+	case 922: { // a1,y:(r)-n
 		unhandled("a1,y:(r)-n");
 		break;
 		}
-	case 893: { // a1,y:(r)+n
+	case 923: { // a1,y:(r)+n
 		unhandled("a1,y:(r)+n");
 		break;
 		}
-	case 894: { // a1,y:(r)-
+	case 924: { // a1,y:(r)-
 		unhandled("a1,y:(r)-");
 		break;
 		}
-	case 895: { // a1,y:(r)+
+	case 925: { // a1,y:(r)+
 		unhandled("a1,y:(r)+");
 		break;
 		}
-	case 896: { // a1,y:(r)
+	case 926: { // a1,y:(r)
 		unhandled("a1,y:(r)");
 		break;
 		}
-	case 897: { // a1,y:(r+n)
+	case 927: { // a1,y:(r+n)
 		unhandled("a1,y:(r+n)");
 		break;
 		}
-	case 898: { // a1,y:-(r)
+	case 928: { // a1,y:-(r)
 		unhandled("a1,y:-(r)");
 		break;
 		}
-	case 899: { // b1,y:(r)-n
+	case 929: { // b1,y:(r)-n
 		unhandled("b1,y:(r)-n");
 		break;
 		}
-	case 900: { // b1,y:(r)+n
+	case 930: { // b1,y:(r)+n
 		unhandled("b1,y:(r)+n");
 		break;
 		}
-	case 901: { // b1,y:(r)-
+	case 931: { // b1,y:(r)-
 		unhandled("b1,y:(r)-");
 		break;
 		}
-	case 902: { // b1,y:(r)+
+	case 932: { // b1,y:(r)+
 		unhandled("b1,y:(r)+");
 		break;
 		}
-	case 903: { // b1,y:(r)
+	case 933: { // b1,y:(r)
 		unhandled("b1,y:(r)");
 		break;
 		}
-	case 904: { // b1,y:(r+n)
+	case 934: { // b1,y:(r+n)
 		unhandled("b1,y:(r+n)");
 		break;
 		}
-	case 905: { // b1,y:-(r)
+	case 935: { // b1,y:-(r)
 		unhandled("b1,y:-(r)");
 		break;
 		}
-	case 906: { // a,y:(r)-n
+	case 936: { // a,y:(r)-n
 		unhandled("a,y:(r)-n");
 		break;
 		}
-	case 907: { // a,y:(r)+n
+	case 937: { // a,y:(r)+n
 		unhandled("a,y:(r)+n");
 		break;
 		}
-	case 908: { // a,y:(r)-
+	case 938: { // a,y:(r)-
 		unhandled("a,y:(r)-");
 		break;
 		}
-	case 909: { // a,y:(r)+
+	case 939: { // a,y:(r)+
 		unhandled("a,y:(r)+");
 		break;
 		}
-	case 910: { // a,y:(r)
+	case 940: { // a,y:(r)
 		unhandled("a,y:(r)");
 		break;
 		}
-	case 911: { // a,y:(r+n)
+	case 941: { // a,y:(r+n)
 		unhandled("a,y:(r+n)");
 		break;
 		}
-	case 912: { // a,y:-(r)
+	case 942: { // a,y:-(r)
 		unhandled("a,y:-(r)");
 		break;
 		}
-	case 913: { // b,y:(r)-n
+	case 943: { // b,y:(r)-n
 		unhandled("b,y:(r)-n");
 		break;
 		}
-	case 914: { // b,y:(r)+n
+	case 944: { // b,y:(r)+n
 		unhandled("b,y:(r)+n");
 		break;
 		}
-	case 915: { // b,y:(r)-
+	case 945: { // b,y:(r)-
 		unhandled("b,y:(r)-");
 		break;
 		}
-	case 916: { // b,y:(r)+
+	case 946: { // b,y:(r)+
 		unhandled("b,y:(r)+");
 		break;
 		}
-	case 917: { // b,y:(r)
+	case 947: { // b,y:(r)
 		unhandled("b,y:(r)");
 		break;
 		}
-	case 918: { // b,y:(r+n)
+	case 948: { // b,y:(r+n)
 		unhandled("b,y:(r+n)");
 		break;
 		}
-	case 919: { // b,y:-(r)
+	case 949: { // b,y:-(r)
 		unhandled("b,y:-(r)");
 		break;
 		}
-	case 920: { // r,y:(r)-n
+	case 950: { // r,y:(r)-n
 		unhandled("r,y:(r)-n");
 		break;
 		}
-	case 921: { // r,y:(r)+n
+	case 951: { // r,y:(r)+n
 		unhandled("r,y:(r)+n");
 		break;
 		}
-	case 922: { // r,y:(r)-
+	case 952: { // r,y:(r)-
 		unhandled("r,y:(r)-");
 		break;
 		}
-	case 923: { // r,y:(r)+
+	case 953: { // r,y:(r)+
 		unhandled("r,y:(r)+");
 		break;
 		}
-	case 924: { // r,y:(r)
+	case 954: { // r,y:(r)
 		unhandled("r,y:(r)");
 		break;
 		}
-	case 925: { // r,y:(r+n)
+	case 955: { // r,y:(r+n)
 		unhandled("r,y:(r+n)");
 		break;
 		}
-	case 926: { // r,y:-(r)
+	case 956: { // r,y:-(r)
 		unhandled("r,y:-(r)");
 		break;
 		}
-	case 927: { // n,y:(r)-n
+	case 957: { // n,y:(r)-n
 		unhandled("n,y:(r)-n");
 		break;
 		}
-	case 928: { // n,y:(r)+n
+	case 958: { // n,y:(r)+n
 		unhandled("n,y:(r)+n");
 		break;
 		}
-	case 929: { // n,y:(r)-
+	case 959: { // n,y:(r)-
 		unhandled("n,y:(r)-");
 		break;
 		}
-	case 930: { // n,y:(r)+
+	case 960: { // n,y:(r)+
 		unhandled("n,y:(r)+");
 		break;
 		}
-	case 931: { // n,y:(r)
+	case 961: { // n,y:(r)
 		unhandled("n,y:(r)");
 		break;
 		}
-	case 932: { // n,y:(r+n)
+	case 962: { // n,y:(r+n)
 		unhandled("n,y:(r+n)");
 		break;
 		}
-	case 933: { // n,y:-(r)
+	case 963: { // n,y:-(r)
 		unhandled("n,y:-(r)");
 		break;
 		}
-	case 934: { // [abs],x0
-		unhandled("[abs],x0");
+	case 964: { // y:[abs],x0
+		unhandled("y:[abs],x0");
 		break;
 		}
-	case 935: { // [abs],x1
-		unhandled("[abs],x1");
+	case 965: { // y:[abs],x1
+		unhandled("y:[abs],x1");
 		break;
 		}
-	case 936: { // [abs],y0
-		unhandled("[abs],y0");
+	case 966: { // y:[abs],y0
+		unhandled("y:[abs],y0");
 		break;
 		}
-	case 937: { // [abs],y1
-		unhandled("[abs],y1");
+	case 967: { // y:[abs],y1
+		unhandled("y:[abs],y1");
 		break;
 		}
-	case 938: { // [abs],a0
-		unhandled("[abs],a0");
+	case 968: { // y:[abs],a0
+		unhandled("y:[abs],a0");
 		break;
 		}
-	case 939: { // [abs],b0
-		unhandled("[abs],b0");
+	case 969: { // y:[abs],b0
+		unhandled("y:[abs],b0");
 		break;
 		}
-	case 940: { // [abs],a2
-		unhandled("[abs],a2");
+	case 970: { // y:[abs],a2
+		unhandled("y:[abs],a2");
 		break;
 		}
-	case 941: { // [abs],b2
-		unhandled("[abs],b2");
+	case 971: { // y:[abs],b2
+		unhandled("y:[abs],b2");
 		break;
 		}
-	case 942: { // [abs],a1
-		unhandled("[abs],a1");
+	case 972: { // y:[abs],a1
+		unhandled("y:[abs],a1");
 		break;
 		}
-	case 943: { // [abs],b1
-		unhandled("[abs],b1");
+	case 973: { // y:[abs],b1
+		unhandled("y:[abs],b1");
 		break;
 		}
-	case 944: { // [abs],a
-		unhandled("[abs],a");
+	case 974: { // y:[abs],a
+		unhandled("y:[abs],a");
 		break;
 		}
-	case 945: { // [abs],b
-		unhandled("[abs],b");
+	case 975: { // y:[abs],b
+		unhandled("y:[abs],b");
 		break;
 		}
-	case 946: { // [abs],r
-		unhandled("[abs],r");
+	case 976: { // y:[abs],r
+		unhandled("y:[abs],r");
 		break;
 		}
-	case 947: { // [abs],n
-		unhandled("[abs],n");
+	case 977: { // y:[abs],n
+		unhandled("y:[abs],n");
 		break;
 		}
-	case 948: { // #[i],x0
+	case 978: { // #[i],x0
 		unhandled("#[i],x0");
 		break;
 		}
-	case 949: { // #[i],x1
+	case 979: { // #[i],x1
 		unhandled("#[i],x1");
 		break;
 		}
-	case 950: { // #[i],y0
+	case 980: { // #[i],y0
 		unhandled("#[i],y0");
 		break;
 		}
-	case 951: { // #[i],y1
+	case 981: { // #[i],y1
 		unhandled("#[i],y1");
 		break;
 		}
-	case 952: { // #[i],a0
+	case 982: { // #[i],a0
 		unhandled("#[i],a0");
 		break;
 		}
-	case 953: { // #[i],b0
+	case 983: { // #[i],b0
 		unhandled("#[i],b0");
 		break;
 		}
-	case 954: { // #[i],a2
+	case 984: { // #[i],a2
 		unhandled("#[i],a2");
 		break;
 		}
-	case 955: { // #[i],b2
+	case 985: { // #[i],b2
 		unhandled("#[i],b2");
 		break;
 		}
-	case 956: { // #[i],a1
+	case 986: { // #[i],a1
 		unhandled("#[i],a1");
 		break;
 		}
-	case 957: { // #[i],b1
+	case 987: { // #[i],b1
 		unhandled("#[i],b1");
 		break;
 		}
-	case 958: { // #[i],a
+	case 988: { // #[i],a
 		unhandled("#[i],a");
 		break;
 		}
-	case 959: { // #[i],b
+	case 989: { // #[i],b
 		unhandled("#[i],b");
 		break;
 		}
-	case 960: { // #[i],r
+	case 990: { // #[i],r
 		unhandled("#[i],r");
 		break;
 		}
-	case 961: { // #[i],n
+	case 991: { // #[i],n
 		unhandled("#[i],n");
 		break;
 		}
-	case 962: { // y:[aa],x0
+	case 992: { // x0,y:[abs]
+		unhandled("x0,y:[abs]");
+		break;
+		}
+	case 993: { // x1,y:[abs]
+		unhandled("x1,y:[abs]");
+		break;
+		}
+	case 994: { // y0,y:[abs]
+		unhandled("y0,y:[abs]");
+		break;
+		}
+	case 995: { // y1,y:[abs]
+		unhandled("y1,y:[abs]");
+		break;
+		}
+	case 996: { // a0,y:[abs]
+		unhandled("a0,y:[abs]");
+		break;
+		}
+	case 997: { // b0,y:[abs]
+		unhandled("b0,y:[abs]");
+		break;
+		}
+	case 998: { // a2,y:[abs]
+		unhandled("a2,y:[abs]");
+		break;
+		}
+	case 999: { // b2,y:[abs]
+		unhandled("b2,y:[abs]");
+		break;
+		}
+	case 1000: { // a1,y:[abs]
+		unhandled("a1,y:[abs]");
+		break;
+		}
+	case 1001: { // b1,y:[abs]
+		unhandled("b1,y:[abs]");
+		break;
+		}
+	case 1002: { // a,y:[abs]
+		unhandled("a,y:[abs]");
+		break;
+		}
+	case 1003: { // b,y:[abs]
+		unhandled("b,y:[abs]");
+		break;
+		}
+	case 1004: { // r,y:[abs]
+		unhandled("r,y:[abs]");
+		break;
+		}
+	case 1005: { // n,y:[abs]
+		unhandled("n,y:[abs]");
+		break;
+		}
+	case 1006: { // y:[aa],x0
 		unhandled("y:[aa],x0");
 		break;
 		}
-	case 963: { // y:[aa],x1
+	case 1007: { // y:[aa],x1
 		unhandled("y:[aa],x1");
 		break;
 		}
-	case 964: { // y:[aa],y0
+	case 1008: { // y:[aa],y0
 		unhandled("y:[aa],y0");
 		break;
 		}
-	case 965: { // y:[aa],y1
+	case 1009: { // y:[aa],y1
 		unhandled("y:[aa],y1");
 		break;
 		}
-	case 966: { // y:[aa],a0
+	case 1010: { // y:[aa],a0
 		unhandled("y:[aa],a0");
 		break;
 		}
-	case 967: { // y:[aa],b0
+	case 1011: { // y:[aa],b0
 		unhandled("y:[aa],b0");
 		break;
 		}
-	case 968: { // y:[aa],a2
+	case 1012: { // y:[aa],a2
 		unhandled("y:[aa],a2");
 		break;
 		}
-	case 969: { // y:[aa],b2
+	case 1013: { // y:[aa],b2
 		unhandled("y:[aa],b2");
 		break;
 		}
-	case 970: { // y:[aa],a1
+	case 1014: { // y:[aa],a1
 		unhandled("y:[aa],a1");
 		break;
 		}
-	case 971: { // y:[aa],b1
+	case 1015: { // y:[aa],b1
 		unhandled("y:[aa],b1");
 		break;
 		}
-	case 972: { // y:[aa],a
+	case 1016: { // y:[aa],a
 		unhandled("y:[aa],a");
 		break;
 		}
-	case 973: { // y:[aa],b
+	case 1017: { // y:[aa],b
 		unhandled("y:[aa],b");
 		break;
 		}
-	case 974: { // y:[aa],r
+	case 1018: { // y:[aa],r
 		unhandled("y:[aa],r");
 		break;
 		}
-	case 975: { // y:[aa],n
+	case 1019: { // y:[aa],n
 		unhandled("y:[aa],n");
 		break;
 		}
-	case 976: { // x0,y:[aa]
+	case 1020: { // x0,y:[aa]
 		unhandled("x0,y:[aa]");
 		break;
 		}
-	case 977: { // x1,y:[aa]
+	case 1021: { // x1,y:[aa]
 		unhandled("x1,y:[aa]");
 		break;
 		}
-	case 978: { // y0,y:[aa]
+	case 1022: { // y0,y:[aa]
 		unhandled("y0,y:[aa]");
 		break;
 		}
-	case 979: { // y1,y:[aa]
+	case 1023: { // y1,y:[aa]
 		unhandled("y1,y:[aa]");
 		break;
 		}
-	case 980: { // a0,y:[aa]
+	case 1024: { // a0,y:[aa]
 		unhandled("a0,y:[aa]");
 		break;
 		}
-	case 981: { // b0,y:[aa]
+	case 1025: { // b0,y:[aa]
 		unhandled("b0,y:[aa]");
 		break;
 		}
-	case 982: { // a2,y:[aa]
+	case 1026: { // a2,y:[aa]
 		unhandled("a2,y:[aa]");
 		break;
 		}
-	case 983: { // b2,y:[aa]
+	case 1027: { // b2,y:[aa]
 		unhandled("b2,y:[aa]");
 		break;
 		}
-	case 984: { // a1,y:[aa]
+	case 1028: { // a1,y:[aa]
 		unhandled("a1,y:[aa]");
 		break;
 		}
-	case 985: { // b1,y:[aa]
+	case 1029: { // b1,y:[aa]
 		unhandled("b1,y:[aa]");
 		break;
 		}
-	case 986: { // a,y:[aa]
+	case 1030: { // a,y:[aa]
 		unhandled("a,y:[aa]");
 		break;
 		}
-	case 987: { // b,y:[aa]
+	case 1031: { // b,y:[aa]
 		unhandled("b,y:[aa]");
 		break;
 		}
-	case 988: { // r,y:[aa]
+	case 1032: { // r,y:[aa]
 		unhandled("r,y:[aa]");
 		break;
 		}
-	case 989: { // n,y:[aa]
+	case 1033: { // n,y:[aa]
 		unhandled("n,y:[aa]");
 		break;
 		}
-	case 990: { // a,x0 y:(r)-n,y0
+	case 1034: { // a,x0 y:(r)-n,y0
 		unhandled("a,x0 y:(r)-n,y0");
 		break;
 		}
-	case 991: { // a,x0 y:(r)+n,y0
+	case 1035: { // a,x0 y:(r)+n,y0
 		unhandled("a,x0 y:(r)+n,y0");
 		break;
 		}
-	case 992: { // a,x0 y:(r)-,y0
+	case 1036: { // a,x0 y:(r)-,y0
 		unhandled("a,x0 y:(r)-,y0");
 		break;
 		}
-	case 993: { // a,x0 y:(r)+,y0
+	case 1037: { // a,x0 y:(r)+,y0
 		unhandled("a,x0 y:(r)+,y0");
 		break;
 		}
-	case 994: { // a,x0 y:(r),y0
+	case 1038: { // a,x0 y:(r),y0
 		unhandled("a,x0 y:(r),y0");
 		break;
 		}
-	case 995: { // a,x0 y:(r+n),y0
+	case 1039: { // a,x0 y:(r+n),y0
 		unhandled("a,x0 y:(r+n),y0");
 		break;
 		}
-	case 996: { // a,x0 y:-(r),y0
+	case 1040: { // a,x0 y:-(r),y0
 		unhandled("a,x0 y:-(r),y0");
 		break;
 		}
-	case 997: { // a,x1 y:(r)-n,y0
+	case 1041: { // a,x1 y:(r)-n,y0
 		unhandled("a,x1 y:(r)-n,y0");
 		break;
 		}
-	case 998: { // a,x1 y:(r)+n,y0
+	case 1042: { // a,x1 y:(r)+n,y0
 		unhandled("a,x1 y:(r)+n,y0");
 		break;
 		}
-	case 999: { // a,x1 y:(r)-,y0
+	case 1043: { // a,x1 y:(r)-,y0
 		unhandled("a,x1 y:(r)-,y0");
 		break;
 		}
-	case 1000: { // a,x1 y:(r)+,y0
+	case 1044: { // a,x1 y:(r)+,y0
 		unhandled("a,x1 y:(r)+,y0");
 		break;
 		}
-	case 1001: { // a,x1 y:(r),y0
+	case 1045: { // a,x1 y:(r),y0
 		unhandled("a,x1 y:(r),y0");
 		break;
 		}
-	case 1002: { // a,x1 y:(r+n),y0
+	case 1046: { // a,x1 y:(r+n),y0
 		unhandled("a,x1 y:(r+n),y0");
 		break;
 		}
-	case 1003: { // a,x1 y:-(r),y0
+	case 1047: { // a,x1 y:-(r),y0
 		unhandled("a,x1 y:-(r),y0");
 		break;
 		}
-	case 1004: { // b,x0 y:(r)-n,y0
+	case 1048: { // b,x0 y:(r)-n,y0
 		unhandled("b,x0 y:(r)-n,y0");
 		break;
 		}
-	case 1005: { // b,x0 y:(r)+n,y0
+	case 1049: { // b,x0 y:(r)+n,y0
 		unhandled("b,x0 y:(r)+n,y0");
 		break;
 		}
-	case 1006: { // b,x0 y:(r)-,y0
+	case 1050: { // b,x0 y:(r)-,y0
 		unhandled("b,x0 y:(r)-,y0");
 		break;
 		}
-	case 1007: { // b,x0 y:(r)+,y0
+	case 1051: { // b,x0 y:(r)+,y0
 		unhandled("b,x0 y:(r)+,y0");
 		break;
 		}
-	case 1008: { // b,x0 y:(r),y0
+	case 1052: { // b,x0 y:(r),y0
 		unhandled("b,x0 y:(r),y0");
 		break;
 		}
-	case 1009: { // b,x0 y:(r+n),y0
+	case 1053: { // b,x0 y:(r+n),y0
 		unhandled("b,x0 y:(r+n),y0");
 		break;
 		}
-	case 1010: { // b,x0 y:-(r),y0
+	case 1054: { // b,x0 y:-(r),y0
 		unhandled("b,x0 y:-(r),y0");
 		break;
 		}
-	case 1011: { // b,x1 y:(r)-n,y0
+	case 1055: { // b,x1 y:(r)-n,y0
 		unhandled("b,x1 y:(r)-n,y0");
 		break;
 		}
-	case 1012: { // b,x1 y:(r)+n,y0
+	case 1056: { // b,x1 y:(r)+n,y0
 		unhandled("b,x1 y:(r)+n,y0");
 		break;
 		}
-	case 1013: { // b,x1 y:(r)-,y0
+	case 1057: { // b,x1 y:(r)-,y0
 		unhandled("b,x1 y:(r)-,y0");
 		break;
 		}
-	case 1014: { // b,x1 y:(r)+,y0
+	case 1058: { // b,x1 y:(r)+,y0
 		unhandled("b,x1 y:(r)+,y0");
 		break;
 		}
-	case 1015: { // b,x1 y:(r),y0
+	case 1059: { // b,x1 y:(r),y0
 		unhandled("b,x1 y:(r),y0");
 		break;
 		}
-	case 1016: { // b,x1 y:(r+n),y0
+	case 1060: { // b,x1 y:(r+n),y0
 		unhandled("b,x1 y:(r+n),y0");
 		break;
 		}
-	case 1017: { // b,x1 y:-(r),y0
+	case 1061: { // b,x1 y:-(r),y0
 		unhandled("b,x1 y:-(r),y0");
 		break;
 		}
-	case 1018: { // a,x0 y:(r)-n,y1
+	case 1062: { // a,x0 y:(r)-n,y1
 		unhandled("a,x0 y:(r)-n,y1");
 		break;
 		}
-	case 1019: { // a,x0 y:(r)+n,y1
+	case 1063: { // a,x0 y:(r)+n,y1
 		unhandled("a,x0 y:(r)+n,y1");
 		break;
 		}
-	case 1020: { // a,x0 y:(r)-,y1
+	case 1064: { // a,x0 y:(r)-,y1
 		unhandled("a,x0 y:(r)-,y1");
 		break;
 		}
-	case 1021: { // a,x0 y:(r)+,y1
+	case 1065: { // a,x0 y:(r)+,y1
 		unhandled("a,x0 y:(r)+,y1");
 		break;
 		}
-	case 1022: { // a,x0 y:(r),y1
+	case 1066: { // a,x0 y:(r),y1
 		unhandled("a,x0 y:(r),y1");
 		break;
 		}
-	case 1023: { // a,x0 y:(r+n),y1
+	case 1067: { // a,x0 y:(r+n),y1
 		unhandled("a,x0 y:(r+n),y1");
 		break;
 		}
-	case 1024: { // a,x0 y:-(r),y1
+	case 1068: { // a,x0 y:-(r),y1
 		unhandled("a,x0 y:-(r),y1");
 		break;
 		}
-	case 1025: { // a,x1 y:(r)-n,y1
+	case 1069: { // a,x1 y:(r)-n,y1
 		unhandled("a,x1 y:(r)-n,y1");
 		break;
 		}
-	case 1026: { // a,x1 y:(r)+n,y1
+	case 1070: { // a,x1 y:(r)+n,y1
 		unhandled("a,x1 y:(r)+n,y1");
 		break;
 		}
-	case 1027: { // a,x1 y:(r)-,y1
+	case 1071: { // a,x1 y:(r)-,y1
 		unhandled("a,x1 y:(r)-,y1");
 		break;
 		}
-	case 1028: { // a,x1 y:(r)+,y1
+	case 1072: { // a,x1 y:(r)+,y1
 		unhandled("a,x1 y:(r)+,y1");
 		break;
 		}
-	case 1029: { // a,x1 y:(r),y1
+	case 1073: { // a,x1 y:(r),y1
 		unhandled("a,x1 y:(r),y1");
 		break;
 		}
-	case 1030: { // a,x1 y:(r+n),y1
+	case 1074: { // a,x1 y:(r+n),y1
 		unhandled("a,x1 y:(r+n),y1");
 		break;
 		}
-	case 1031: { // a,x1 y:-(r),y1
+	case 1075: { // a,x1 y:-(r),y1
 		unhandled("a,x1 y:-(r),y1");
 		break;
 		}
-	case 1032: { // b,x0 y:(r)-n,y1
+	case 1076: { // b,x0 y:(r)-n,y1
 		unhandled("b,x0 y:(r)-n,y1");
 		break;
 		}
-	case 1033: { // b,x0 y:(r)+n,y1
+	case 1077: { // b,x0 y:(r)+n,y1
 		unhandled("b,x0 y:(r)+n,y1");
 		break;
 		}
-	case 1034: { // b,x0 y:(r)-,y1
+	case 1078: { // b,x0 y:(r)-,y1
 		unhandled("b,x0 y:(r)-,y1");
 		break;
 		}
-	case 1035: { // b,x0 y:(r)+,y1
+	case 1079: { // b,x0 y:(r)+,y1
 		unhandled("b,x0 y:(r)+,y1");
 		break;
 		}
-	case 1036: { // b,x0 y:(r),y1
+	case 1080: { // b,x0 y:(r),y1
 		unhandled("b,x0 y:(r),y1");
 		break;
 		}
-	case 1037: { // b,x0 y:(r+n),y1
+	case 1081: { // b,x0 y:(r+n),y1
 		unhandled("b,x0 y:(r+n),y1");
 		break;
 		}
-	case 1038: { // b,x0 y:-(r),y1
+	case 1082: { // b,x0 y:-(r),y1
 		unhandled("b,x0 y:-(r),y1");
 		break;
 		}
-	case 1039: { // b,x1 y:(r)-n,y1
+	case 1083: { // b,x1 y:(r)-n,y1
 		unhandled("b,x1 y:(r)-n,y1");
 		break;
 		}
-	case 1040: { // b,x1 y:(r)+n,y1
+	case 1084: { // b,x1 y:(r)+n,y1
 		unhandled("b,x1 y:(r)+n,y1");
 		break;
 		}
-	case 1041: { // b,x1 y:(r)-,y1
+	case 1085: { // b,x1 y:(r)-,y1
 		unhandled("b,x1 y:(r)-,y1");
 		break;
 		}
-	case 1042: { // b,x1 y:(r)+,y1
+	case 1086: { // b,x1 y:(r)+,y1
 		unhandled("b,x1 y:(r)+,y1");
 		break;
 		}
-	case 1043: { // b,x1 y:(r),y1
+	case 1087: { // b,x1 y:(r),y1
 		unhandled("b,x1 y:(r),y1");
 		break;
 		}
-	case 1044: { // b,x1 y:(r+n),y1
+	case 1088: { // b,x1 y:(r+n),y1
 		unhandled("b,x1 y:(r+n),y1");
 		break;
 		}
-	case 1045: { // b,x1 y:-(r),y1
+	case 1089: { // b,x1 y:-(r),y1
 		unhandled("b,x1 y:-(r),y1");
 		break;
 		}
-	case 1046: { // a,x0 y:(r)-n,a
+	case 1090: { // a,x0 y:(r)-n,a
 		unhandled("a,x0 y:(r)-n,a");
 		break;
 		}
-	case 1047: { // a,x0 y:(r)+n,a
+	case 1091: { // a,x0 y:(r)+n,a
 		unhandled("a,x0 y:(r)+n,a");
 		break;
 		}
-	case 1048: { // a,x0 y:(r)-,a
+	case 1092: { // a,x0 y:(r)-,a
 		unhandled("a,x0 y:(r)-,a");
 		break;
 		}
-	case 1049: { // a,x0 y:(r)+,a
+	case 1093: { // a,x0 y:(r)+,a
 		unhandled("a,x0 y:(r)+,a");
 		break;
 		}
-	case 1050: { // a,x0 y:(r),a
+	case 1094: { // a,x0 y:(r),a
 		unhandled("a,x0 y:(r),a");
 		break;
 		}
-	case 1051: { // a,x0 y:(r+n),a
+	case 1095: { // a,x0 y:(r+n),a
 		unhandled("a,x0 y:(r+n),a");
 		break;
 		}
-	case 1052: { // a,x0 y:-(r),a
+	case 1096: { // a,x0 y:-(r),a
 		unhandled("a,x0 y:-(r),a");
 		break;
 		}
-	case 1053: { // a,x1 y:(r)-n,a
+	case 1097: { // a,x1 y:(r)-n,a
 		unhandled("a,x1 y:(r)-n,a");
 		break;
 		}
-	case 1054: { // a,x1 y:(r)+n,a
+	case 1098: { // a,x1 y:(r)+n,a
 		unhandled("a,x1 y:(r)+n,a");
 		break;
 		}
-	case 1055: { // a,x1 y:(r)-,a
+	case 1099: { // a,x1 y:(r)-,a
 		unhandled("a,x1 y:(r)-,a");
 		break;
 		}
-	case 1056: { // a,x1 y:(r)+,a
+	case 1100: { // a,x1 y:(r)+,a
 		unhandled("a,x1 y:(r)+,a");
 		break;
 		}
-	case 1057: { // a,x1 y:(r),a
+	case 1101: { // a,x1 y:(r),a
 		unhandled("a,x1 y:(r),a");
 		break;
 		}
-	case 1058: { // a,x1 y:(r+n),a
+	case 1102: { // a,x1 y:(r+n),a
 		unhandled("a,x1 y:(r+n),a");
 		break;
 		}
-	case 1059: { // a,x1 y:-(r),a
+	case 1103: { // a,x1 y:-(r),a
 		unhandled("a,x1 y:-(r),a");
 		break;
 		}
-	case 1060: { // b,x0 y:(r)-n,a
+	case 1104: { // b,x0 y:(r)-n,a
 		unhandled("b,x0 y:(r)-n,a");
 		break;
 		}
-	case 1061: { // b,x0 y:(r)+n,a
+	case 1105: { // b,x0 y:(r)+n,a
 		unhandled("b,x0 y:(r)+n,a");
 		break;
 		}
-	case 1062: { // b,x0 y:(r)-,a
+	case 1106: { // b,x0 y:(r)-,a
 		unhandled("b,x0 y:(r)-,a");
 		break;
 		}
-	case 1063: { // b,x0 y:(r)+,a
+	case 1107: { // b,x0 y:(r)+,a
 		unhandled("b,x0 y:(r)+,a");
 		break;
 		}
-	case 1064: { // b,x0 y:(r),a
+	case 1108: { // b,x0 y:(r),a
 		unhandled("b,x0 y:(r),a");
 		break;
 		}
-	case 1065: { // b,x0 y:(r+n),a
+	case 1109: { // b,x0 y:(r+n),a
 		unhandled("b,x0 y:(r+n),a");
 		break;
 		}
-	case 1066: { // b,x0 y:-(r),a
+	case 1110: { // b,x0 y:-(r),a
 		unhandled("b,x0 y:-(r),a");
 		break;
 		}
-	case 1067: { // b,x1 y:(r)-n,a
+	case 1111: { // b,x1 y:(r)-n,a
 		unhandled("b,x1 y:(r)-n,a");
 		break;
 		}
-	case 1068: { // b,x1 y:(r)+n,a
+	case 1112: { // b,x1 y:(r)+n,a
 		unhandled("b,x1 y:(r)+n,a");
 		break;
 		}
-	case 1069: { // b,x1 y:(r)-,a
+	case 1113: { // b,x1 y:(r)-,a
 		unhandled("b,x1 y:(r)-,a");
 		break;
 		}
-	case 1070: { // b,x1 y:(r)+,a
+	case 1114: { // b,x1 y:(r)+,a
 		unhandled("b,x1 y:(r)+,a");
 		break;
 		}
-	case 1071: { // b,x1 y:(r),a
+	case 1115: { // b,x1 y:(r),a
 		unhandled("b,x1 y:(r),a");
 		break;
 		}
-	case 1072: { // b,x1 y:(r+n),a
+	case 1116: { // b,x1 y:(r+n),a
 		unhandled("b,x1 y:(r+n),a");
 		break;
 		}
-	case 1073: { // b,x1 y:-(r),a
+	case 1117: { // b,x1 y:-(r),a
 		unhandled("b,x1 y:-(r),a");
 		break;
 		}
-	case 1074: { // a,x0 y:(r)-n,b
+	case 1118: { // a,x0 y:(r)-n,b
 		unhandled("a,x0 y:(r)-n,b");
 		break;
 		}
-	case 1075: { // a,x0 y:(r)+n,b
+	case 1119: { // a,x0 y:(r)+n,b
 		unhandled("a,x0 y:(r)+n,b");
 		break;
 		}
-	case 1076: { // a,x0 y:(r)-,b
+	case 1120: { // a,x0 y:(r)-,b
 		unhandled("a,x0 y:(r)-,b");
 		break;
 		}
-	case 1077: { // a,x0 y:(r)+,b
+	case 1121: { // a,x0 y:(r)+,b
 		unhandled("a,x0 y:(r)+,b");
 		break;
 		}
-	case 1078: { // a,x0 y:(r),b
+	case 1122: { // a,x0 y:(r),b
 		unhandled("a,x0 y:(r),b");
 		break;
 		}
-	case 1079: { // a,x0 y:(r+n),b
+	case 1123: { // a,x0 y:(r+n),b
 		unhandled("a,x0 y:(r+n),b");
 		break;
 		}
-	case 1080: { // a,x0 y:-(r),b
+	case 1124: { // a,x0 y:-(r),b
 		unhandled("a,x0 y:-(r),b");
 		break;
 		}
-	case 1081: { // a,x1 y:(r)-n,b
+	case 1125: { // a,x1 y:(r)-n,b
 		unhandled("a,x1 y:(r)-n,b");
 		break;
 		}
-	case 1082: { // a,x1 y:(r)+n,b
+	case 1126: { // a,x1 y:(r)+n,b
 		unhandled("a,x1 y:(r)+n,b");
 		break;
 		}
-	case 1083: { // a,x1 y:(r)-,b
+	case 1127: { // a,x1 y:(r)-,b
 		unhandled("a,x1 y:(r)-,b");
 		break;
 		}
-	case 1084: { // a,x1 y:(r)+,b
+	case 1128: { // a,x1 y:(r)+,b
 		unhandled("a,x1 y:(r)+,b");
 		break;
 		}
-	case 1085: { // a,x1 y:(r),b
+	case 1129: { // a,x1 y:(r),b
 		unhandled("a,x1 y:(r),b");
 		break;
 		}
-	case 1086: { // a,x1 y:(r+n),b
+	case 1130: { // a,x1 y:(r+n),b
 		unhandled("a,x1 y:(r+n),b");
 		break;
 		}
-	case 1087: { // a,x1 y:-(r),b
+	case 1131: { // a,x1 y:-(r),b
 		unhandled("a,x1 y:-(r),b");
 		break;
 		}
-	case 1088: { // b,x0 y:(r)-n,b
+	case 1132: { // b,x0 y:(r)-n,b
 		unhandled("b,x0 y:(r)-n,b");
 		break;
 		}
-	case 1089: { // b,x0 y:(r)+n,b
+	case 1133: { // b,x0 y:(r)+n,b
 		unhandled("b,x0 y:(r)+n,b");
 		break;
 		}
-	case 1090: { // b,x0 y:(r)-,b
+	case 1134: { // b,x0 y:(r)-,b
 		unhandled("b,x0 y:(r)-,b");
 		break;
 		}
-	case 1091: { // b,x0 y:(r)+,b
+	case 1135: { // b,x0 y:(r)+,b
 		unhandled("b,x0 y:(r)+,b");
 		break;
 		}
-	case 1092: { // b,x0 y:(r),b
+	case 1136: { // b,x0 y:(r),b
 		unhandled("b,x0 y:(r),b");
 		break;
 		}
-	case 1093: { // b,x0 y:(r+n),b
+	case 1137: { // b,x0 y:(r+n),b
 		unhandled("b,x0 y:(r+n),b");
 		break;
 		}
-	case 1094: { // b,x0 y:-(r),b
+	case 1138: { // b,x0 y:-(r),b
 		unhandled("b,x0 y:-(r),b");
 		break;
 		}
-	case 1095: { // b,x1 y:(r)-n,b
+	case 1139: { // b,x1 y:(r)-n,b
 		unhandled("b,x1 y:(r)-n,b");
 		break;
 		}
-	case 1096: { // b,x1 y:(r)+n,b
+	case 1140: { // b,x1 y:(r)+n,b
 		unhandled("b,x1 y:(r)+n,b");
 		break;
 		}
-	case 1097: { // b,x1 y:(r)-,b
+	case 1141: { // b,x1 y:(r)-,b
 		unhandled("b,x1 y:(r)-,b");
 		break;
 		}
-	case 1098: { // b,x1 y:(r)+,b
+	case 1142: { // b,x1 y:(r)+,b
 		unhandled("b,x1 y:(r)+,b");
 		break;
 		}
-	case 1099: { // b,x1 y:(r),b
+	case 1143: { // b,x1 y:(r),b
 		unhandled("b,x1 y:(r),b");
 		break;
 		}
-	case 1100: { // b,x1 y:(r+n),b
+	case 1144: { // b,x1 y:(r+n),b
 		unhandled("b,x1 y:(r+n),b");
 		break;
 		}
-	case 1101: { // b,x1 y:-(r),b
+	case 1145: { // b,x1 y:-(r),b
 		unhandled("b,x1 y:-(r),b");
 		break;
 		}
-	case 1102: { // a,x0 y0,y:(r)-n
+	case 1146: { // a,x0 y0,y:(r)-n
 		unhandled("a,x0 y0,y:(r)-n");
 		break;
 		}
-	case 1103: { // a,x0 y0,y:(r)+n
+	case 1147: { // a,x0 y0,y:(r)+n
 		unhandled("a,x0 y0,y:(r)+n");
 		break;
 		}
-	case 1104: { // a,x0 y0,y:(r)-
+	case 1148: { // a,x0 y0,y:(r)-
 		unhandled("a,x0 y0,y:(r)-");
 		break;
 		}
-	case 1105: { // a,x0 y0,y:(r)+
+	case 1149: { // a,x0 y0,y:(r)+
 		unhandled("a,x0 y0,y:(r)+");
 		break;
 		}
-	case 1106: { // a,x0 y0,y:(r)
+	case 1150: { // a,x0 y0,y:(r)
 		unhandled("a,x0 y0,y:(r)");
 		break;
 		}
-	case 1107: { // a,x0 y0,y:(r+n)
+	case 1151: { // a,x0 y0,y:(r+n)
 		unhandled("a,x0 y0,y:(r+n)");
 		break;
 		}
-	case 1108: { // a,x0 y0,y:-(r)
+	case 1152: { // a,x0 y0,y:-(r)
 		unhandled("a,x0 y0,y:-(r)");
 		break;
 		}
-	case 1109: { // a,x1 y0,y:(r)-n
+	case 1153: { // a,x1 y0,y:(r)-n
 		unhandled("a,x1 y0,y:(r)-n");
 		break;
 		}
-	case 1110: { // a,x1 y0,y:(r)+n
+	case 1154: { // a,x1 y0,y:(r)+n
 		unhandled("a,x1 y0,y:(r)+n");
 		break;
 		}
-	case 1111: { // a,x1 y0,y:(r)-
+	case 1155: { // a,x1 y0,y:(r)-
 		unhandled("a,x1 y0,y:(r)-");
 		break;
 		}
-	case 1112: { // a,x1 y0,y:(r)+
+	case 1156: { // a,x1 y0,y:(r)+
 		unhandled("a,x1 y0,y:(r)+");
 		break;
 		}
-	case 1113: { // a,x1 y0,y:(r)
+	case 1157: { // a,x1 y0,y:(r)
 		unhandled("a,x1 y0,y:(r)");
 		break;
 		}
-	case 1114: { // a,x1 y0,y:(r+n)
+	case 1158: { // a,x1 y0,y:(r+n)
 		unhandled("a,x1 y0,y:(r+n)");
 		break;
 		}
-	case 1115: { // a,x1 y0,y:-(r)
+	case 1159: { // a,x1 y0,y:-(r)
 		unhandled("a,x1 y0,y:-(r)");
 		break;
 		}
-	case 1116: { // b,x0 y0,y:(r)-n
+	case 1160: { // b,x0 y0,y:(r)-n
 		unhandled("b,x0 y0,y:(r)-n");
 		break;
 		}
-	case 1117: { // b,x0 y0,y:(r)+n
+	case 1161: { // b,x0 y0,y:(r)+n
 		unhandled("b,x0 y0,y:(r)+n");
 		break;
 		}
-	case 1118: { // b,x0 y0,y:(r)-
+	case 1162: { // b,x0 y0,y:(r)-
 		unhandled("b,x0 y0,y:(r)-");
 		break;
 		}
-	case 1119: { // b,x0 y0,y:(r)+
+	case 1163: { // b,x0 y0,y:(r)+
 		unhandled("b,x0 y0,y:(r)+");
 		break;
 		}
-	case 1120: { // b,x0 y0,y:(r)
+	case 1164: { // b,x0 y0,y:(r)
 		unhandled("b,x0 y0,y:(r)");
 		break;
 		}
-	case 1121: { // b,x0 y0,y:(r+n)
+	case 1165: { // b,x0 y0,y:(r+n)
 		unhandled("b,x0 y0,y:(r+n)");
 		break;
 		}
-	case 1122: { // b,x0 y0,y:-(r)
+	case 1166: { // b,x0 y0,y:-(r)
 		unhandled("b,x0 y0,y:-(r)");
 		break;
 		}
-	case 1123: { // b,x1 y0,y:(r)-n
+	case 1167: { // b,x1 y0,y:(r)-n
 		unhandled("b,x1 y0,y:(r)-n");
 		break;
 		}
-	case 1124: { // b,x1 y0,y:(r)+n
+	case 1168: { // b,x1 y0,y:(r)+n
 		unhandled("b,x1 y0,y:(r)+n");
 		break;
 		}
-	case 1125: { // b,x1 y0,y:(r)-
+	case 1169: { // b,x1 y0,y:(r)-
 		unhandled("b,x1 y0,y:(r)-");
 		break;
 		}
-	case 1126: { // b,x1 y0,y:(r)+
+	case 1170: { // b,x1 y0,y:(r)+
 		unhandled("b,x1 y0,y:(r)+");
 		break;
 		}
-	case 1127: { // b,x1 y0,y:(r)
+	case 1171: { // b,x1 y0,y:(r)
 		unhandled("b,x1 y0,y:(r)");
 		break;
 		}
-	case 1128: { // b,x1 y0,y:(r+n)
+	case 1172: { // b,x1 y0,y:(r+n)
 		unhandled("b,x1 y0,y:(r+n)");
 		break;
 		}
-	case 1129: { // b,x1 y0,y:-(r)
+	case 1173: { // b,x1 y0,y:-(r)
 		unhandled("b,x1 y0,y:-(r)");
 		break;
 		}
-	case 1130: { // a,x0 y1,y:(r)-n
+	case 1174: { // a,x0 y1,y:(r)-n
 		unhandled("a,x0 y1,y:(r)-n");
 		break;
 		}
-	case 1131: { // a,x0 y1,y:(r)+n
+	case 1175: { // a,x0 y1,y:(r)+n
 		unhandled("a,x0 y1,y:(r)+n");
 		break;
 		}
-	case 1132: { // a,x0 y1,y:(r)-
+	case 1176: { // a,x0 y1,y:(r)-
 		unhandled("a,x0 y1,y:(r)-");
 		break;
 		}
-	case 1133: { // a,x0 y1,y:(r)+
+	case 1177: { // a,x0 y1,y:(r)+
 		unhandled("a,x0 y1,y:(r)+");
 		break;
 		}
-	case 1134: { // a,x0 y1,y:(r)
+	case 1178: { // a,x0 y1,y:(r)
 		unhandled("a,x0 y1,y:(r)");
 		break;
 		}
-	case 1135: { // a,x0 y1,y:(r+n)
+	case 1179: { // a,x0 y1,y:(r+n)
 		unhandled("a,x0 y1,y:(r+n)");
 		break;
 		}
-	case 1136: { // a,x0 y1,y:-(r)
+	case 1180: { // a,x0 y1,y:-(r)
 		unhandled("a,x0 y1,y:-(r)");
 		break;
 		}
-	case 1137: { // a,x1 y1,y:(r)-n
+	case 1181: { // a,x1 y1,y:(r)-n
 		unhandled("a,x1 y1,y:(r)-n");
 		break;
 		}
-	case 1138: { // a,x1 y1,y:(r)+n
+	case 1182: { // a,x1 y1,y:(r)+n
 		unhandled("a,x1 y1,y:(r)+n");
 		break;
 		}
-	case 1139: { // a,x1 y1,y:(r)-
+	case 1183: { // a,x1 y1,y:(r)-
 		unhandled("a,x1 y1,y:(r)-");
 		break;
 		}
-	case 1140: { // a,x1 y1,y:(r)+
+	case 1184: { // a,x1 y1,y:(r)+
 		unhandled("a,x1 y1,y:(r)+");
 		break;
 		}
-	case 1141: { // a,x1 y1,y:(r)
+	case 1185: { // a,x1 y1,y:(r)
 		unhandled("a,x1 y1,y:(r)");
 		break;
 		}
-	case 1142: { // a,x1 y1,y:(r+n)
+	case 1186: { // a,x1 y1,y:(r+n)
 		unhandled("a,x1 y1,y:(r+n)");
 		break;
 		}
-	case 1143: { // a,x1 y1,y:-(r)
+	case 1187: { // a,x1 y1,y:-(r)
 		unhandled("a,x1 y1,y:-(r)");
 		break;
 		}
-	case 1144: { // b,x0 y1,y:(r)-n
+	case 1188: { // b,x0 y1,y:(r)-n
 		unhandled("b,x0 y1,y:(r)-n");
 		break;
 		}
-	case 1145: { // b,x0 y1,y:(r)+n
+	case 1189: { // b,x0 y1,y:(r)+n
 		unhandled("b,x0 y1,y:(r)+n");
 		break;
 		}
-	case 1146: { // b,x0 y1,y:(r)-
+	case 1190: { // b,x0 y1,y:(r)-
 		unhandled("b,x0 y1,y:(r)-");
 		break;
 		}
-	case 1147: { // b,x0 y1,y:(r)+
+	case 1191: { // b,x0 y1,y:(r)+
 		unhandled("b,x0 y1,y:(r)+");
 		break;
 		}
-	case 1148: { // b,x0 y1,y:(r)
+	case 1192: { // b,x0 y1,y:(r)
 		unhandled("b,x0 y1,y:(r)");
 		break;
 		}
-	case 1149: { // b,x0 y1,y:(r+n)
+	case 1193: { // b,x0 y1,y:(r+n)
 		unhandled("b,x0 y1,y:(r+n)");
 		break;
 		}
-	case 1150: { // b,x0 y1,y:-(r)
+	case 1194: { // b,x0 y1,y:-(r)
 		unhandled("b,x0 y1,y:-(r)");
 		break;
 		}
-	case 1151: { // b,x1 y1,y:(r)-n
+	case 1195: { // b,x1 y1,y:(r)-n
 		unhandled("b,x1 y1,y:(r)-n");
 		break;
 		}
-	case 1152: { // b,x1 y1,y:(r)+n
+	case 1196: { // b,x1 y1,y:(r)+n
 		unhandled("b,x1 y1,y:(r)+n");
 		break;
 		}
-	case 1153: { // b,x1 y1,y:(r)-
+	case 1197: { // b,x1 y1,y:(r)-
 		unhandled("b,x1 y1,y:(r)-");
 		break;
 		}
-	case 1154: { // b,x1 y1,y:(r)+
+	case 1198: { // b,x1 y1,y:(r)+
 		unhandled("b,x1 y1,y:(r)+");
 		break;
 		}
-	case 1155: { // b,x1 y1,y:(r)
+	case 1199: { // b,x1 y1,y:(r)
 		unhandled("b,x1 y1,y:(r)");
 		break;
 		}
-	case 1156: { // b,x1 y1,y:(r+n)
+	case 1200: { // b,x1 y1,y:(r+n)
 		unhandled("b,x1 y1,y:(r+n)");
 		break;
 		}
-	case 1157: { // b,x1 y1,y:-(r)
+	case 1201: { // b,x1 y1,y:-(r)
 		unhandled("b,x1 y1,y:-(r)");
 		break;
 		}
-	case 1158: { // a,x0 a,y:(r)-n
+	case 1202: { // a,x0 a,y:(r)-n
 		unhandled("a,x0 a,y:(r)-n");
 		break;
 		}
-	case 1159: { // a,x0 a,y:(r)+n
+	case 1203: { // a,x0 a,y:(r)+n
 		unhandled("a,x0 a,y:(r)+n");
 		break;
 		}
-	case 1160: { // a,x0 a,y:(r)-
+	case 1204: { // a,x0 a,y:(r)-
 		unhandled("a,x0 a,y:(r)-");
 		break;
 		}
-	case 1161: { // a,x0 a,y:(r)+
+	case 1205: { // a,x0 a,y:(r)+
 		unhandled("a,x0 a,y:(r)+");
 		break;
 		}
-	case 1162: { // a,x0 a,y:(r)
+	case 1206: { // a,x0 a,y:(r)
 		unhandled("a,x0 a,y:(r)");
 		break;
 		}
-	case 1163: { // a,x0 a,y:(r+n)
+	case 1207: { // a,x0 a,y:(r+n)
 		unhandled("a,x0 a,y:(r+n)");
 		break;
 		}
-	case 1164: { // a,x0 a,y:-(r)
+	case 1208: { // a,x0 a,y:-(r)
 		unhandled("a,x0 a,y:-(r)");
 		break;
 		}
-	case 1165: { // a,x1 a,y:(r)-n
+	case 1209: { // a,x1 a,y:(r)-n
 		unhandled("a,x1 a,y:(r)-n");
 		break;
 		}
-	case 1166: { // a,x1 a,y:(r)+n
+	case 1210: { // a,x1 a,y:(r)+n
 		unhandled("a,x1 a,y:(r)+n");
 		break;
 		}
-	case 1167: { // a,x1 a,y:(r)-
+	case 1211: { // a,x1 a,y:(r)-
 		unhandled("a,x1 a,y:(r)-");
 		break;
 		}
-	case 1168: { // a,x1 a,y:(r)+
+	case 1212: { // a,x1 a,y:(r)+
 		unhandled("a,x1 a,y:(r)+");
 		break;
 		}
-	case 1169: { // a,x1 a,y:(r)
+	case 1213: { // a,x1 a,y:(r)
 		unhandled("a,x1 a,y:(r)");
 		break;
 		}
-	case 1170: { // a,x1 a,y:(r+n)
+	case 1214: { // a,x1 a,y:(r+n)
 		unhandled("a,x1 a,y:(r+n)");
 		break;
 		}
-	case 1171: { // a,x1 a,y:-(r)
+	case 1215: { // a,x1 a,y:-(r)
 		unhandled("a,x1 a,y:-(r)");
 		break;
 		}
-	case 1172: { // b,x0 a,y:(r)-n
+	case 1216: { // b,x0 a,y:(r)-n
 		unhandled("b,x0 a,y:(r)-n");
 		break;
 		}
-	case 1173: { // b,x0 a,y:(r)+n
+	case 1217: { // b,x0 a,y:(r)+n
 		unhandled("b,x0 a,y:(r)+n");
 		break;
 		}
-	case 1174: { // b,x0 a,y:(r)-
+	case 1218: { // b,x0 a,y:(r)-
 		unhandled("b,x0 a,y:(r)-");
 		break;
 		}
-	case 1175: { // b,x0 a,y:(r)+
+	case 1219: { // b,x0 a,y:(r)+
 		unhandled("b,x0 a,y:(r)+");
 		break;
 		}
-	case 1176: { // b,x0 a,y:(r)
+	case 1220: { // b,x0 a,y:(r)
 		unhandled("b,x0 a,y:(r)");
 		break;
 		}
-	case 1177: { // b,x0 a,y:(r+n)
+	case 1221: { // b,x0 a,y:(r+n)
 		unhandled("b,x0 a,y:(r+n)");
 		break;
 		}
-	case 1178: { // b,x0 a,y:-(r)
+	case 1222: { // b,x0 a,y:-(r)
 		unhandled("b,x0 a,y:-(r)");
 		break;
 		}
-	case 1179: { // b,x1 a,y:(r)-n
+	case 1223: { // b,x1 a,y:(r)-n
 		unhandled("b,x1 a,y:(r)-n");
 		break;
 		}
-	case 1180: { // b,x1 a,y:(r)+n
+	case 1224: { // b,x1 a,y:(r)+n
 		unhandled("b,x1 a,y:(r)+n");
 		break;
 		}
-	case 1181: { // b,x1 a,y:(r)-
+	case 1225: { // b,x1 a,y:(r)-
 		unhandled("b,x1 a,y:(r)-");
 		break;
 		}
-	case 1182: { // b,x1 a,y:(r)+
+	case 1226: { // b,x1 a,y:(r)+
 		unhandled("b,x1 a,y:(r)+");
 		break;
 		}
-	case 1183: { // b,x1 a,y:(r)
+	case 1227: { // b,x1 a,y:(r)
 		unhandled("b,x1 a,y:(r)");
 		break;
 		}
-	case 1184: { // b,x1 a,y:(r+n)
+	case 1228: { // b,x1 a,y:(r+n)
 		unhandled("b,x1 a,y:(r+n)");
 		break;
 		}
-	case 1185: { // b,x1 a,y:-(r)
+	case 1229: { // b,x1 a,y:-(r)
 		unhandled("b,x1 a,y:-(r)");
 		break;
 		}
-	case 1186: { // a,x0 b,y:(r)-n
+	case 1230: { // a,x0 b,y:(r)-n
 		unhandled("a,x0 b,y:(r)-n");
 		break;
 		}
-	case 1187: { // a,x0 b,y:(r)+n
+	case 1231: { // a,x0 b,y:(r)+n
 		unhandled("a,x0 b,y:(r)+n");
 		break;
 		}
-	case 1188: { // a,x0 b,y:(r)-
+	case 1232: { // a,x0 b,y:(r)-
 		unhandled("a,x0 b,y:(r)-");
 		break;
 		}
-	case 1189: { // a,x0 b,y:(r)+
+	case 1233: { // a,x0 b,y:(r)+
 		unhandled("a,x0 b,y:(r)+");
 		break;
 		}
-	case 1190: { // a,x0 b,y:(r)
+	case 1234: { // a,x0 b,y:(r)
 		unhandled("a,x0 b,y:(r)");
 		break;
 		}
-	case 1191: { // a,x0 b,y:(r+n)
+	case 1235: { // a,x0 b,y:(r+n)
 		unhandled("a,x0 b,y:(r+n)");
 		break;
 		}
-	case 1192: { // a,x0 b,y:-(r)
+	case 1236: { // a,x0 b,y:-(r)
 		unhandled("a,x0 b,y:-(r)");
 		break;
 		}
-	case 1193: { // a,x1 b,y:(r)-n
+	case 1237: { // a,x1 b,y:(r)-n
 		unhandled("a,x1 b,y:(r)-n");
 		break;
 		}
-	case 1194: { // a,x1 b,y:(r)+n
+	case 1238: { // a,x1 b,y:(r)+n
 		unhandled("a,x1 b,y:(r)+n");
 		break;
 		}
-	case 1195: { // a,x1 b,y:(r)-
+	case 1239: { // a,x1 b,y:(r)-
 		unhandled("a,x1 b,y:(r)-");
 		break;
 		}
-	case 1196: { // a,x1 b,y:(r)+
+	case 1240: { // a,x1 b,y:(r)+
 		unhandled("a,x1 b,y:(r)+");
 		break;
 		}
-	case 1197: { // a,x1 b,y:(r)
+	case 1241: { // a,x1 b,y:(r)
 		unhandled("a,x1 b,y:(r)");
 		break;
 		}
-	case 1198: { // a,x1 b,y:(r+n)
+	case 1242: { // a,x1 b,y:(r+n)
 		unhandled("a,x1 b,y:(r+n)");
 		break;
 		}
-	case 1199: { // a,x1 b,y:-(r)
+	case 1243: { // a,x1 b,y:-(r)
 		unhandled("a,x1 b,y:-(r)");
 		break;
 		}
-	case 1200: { // b,x0 b,y:(r)-n
+	case 1244: { // b,x0 b,y:(r)-n
 		unhandled("b,x0 b,y:(r)-n");
 		break;
 		}
-	case 1201: { // b,x0 b,y:(r)+n
+	case 1245: { // b,x0 b,y:(r)+n
 		unhandled("b,x0 b,y:(r)+n");
 		break;
 		}
-	case 1202: { // b,x0 b,y:(r)-
+	case 1246: { // b,x0 b,y:(r)-
 		unhandled("b,x0 b,y:(r)-");
 		break;
 		}
-	case 1203: { // b,x0 b,y:(r)+
+	case 1247: { // b,x0 b,y:(r)+
 		unhandled("b,x0 b,y:(r)+");
 		break;
 		}
-	case 1204: { // b,x0 b,y:(r)
+	case 1248: { // b,x0 b,y:(r)
 		unhandled("b,x0 b,y:(r)");
 		break;
 		}
-	case 1205: { // b,x0 b,y:(r+n)
+	case 1249: { // b,x0 b,y:(r+n)
 		unhandled("b,x0 b,y:(r+n)");
 		break;
 		}
-	case 1206: { // b,x0 b,y:-(r)
+	case 1250: { // b,x0 b,y:-(r)
 		unhandled("b,x0 b,y:-(r)");
 		break;
 		}
-	case 1207: { // b,x1 b,y:(r)-n
+	case 1251: { // b,x1 b,y:(r)-n
 		unhandled("b,x1 b,y:(r)-n");
 		break;
 		}
-	case 1208: { // b,x1 b,y:(r)+n
+	case 1252: { // b,x1 b,y:(r)+n
 		unhandled("b,x1 b,y:(r)+n");
 		break;
 		}
-	case 1209: { // b,x1 b,y:(r)-
+	case 1253: { // b,x1 b,y:(r)-
 		unhandled("b,x1 b,y:(r)-");
 		break;
 		}
-	case 1210: { // b,x1 b,y:(r)+
+	case 1254: { // b,x1 b,y:(r)+
 		unhandled("b,x1 b,y:(r)+");
 		break;
 		}
-	case 1211: { // b,x1 b,y:(r)
+	case 1255: { // b,x1 b,y:(r)
 		unhandled("b,x1 b,y:(r)");
 		break;
 		}
-	case 1212: { // b,x1 b,y:(r+n)
+	case 1256: { // b,x1 b,y:(r+n)
 		unhandled("b,x1 b,y:(r+n)");
 		break;
 		}
-	case 1213: { // b,x1 b,y:-(r)
+	case 1257: { // b,x1 b,y:-(r)
 		unhandled("b,x1 b,y:-(r)");
 		break;
 		}
-	case 1214: { // a,x0 x:[abs],y0
-		unhandled("a,x0 x:[abs],y0");
+	case 1258: { // a,x0 y:[abs],y0
+		unhandled("a,x0 y:[abs],y0");
 		break;
 		}
-	case 1215: { // a,x1 x:[abs],y0
-		unhandled("a,x1 x:[abs],y0");
+	case 1259: { // a,x1 y:[abs],y0
+		unhandled("a,x1 y:[abs],y0");
 		break;
 		}
-	case 1216: { // b,x0 x:[abs],y0
-		unhandled("b,x0 x:[abs],y0");
+	case 1260: { // b,x0 y:[abs],y0
+		unhandled("b,x0 y:[abs],y0");
 		break;
 		}
-	case 1217: { // b,x1 x:[abs],y0
-		unhandled("b,x1 x:[abs],y0");
+	case 1261: { // b,x1 y:[abs],y0
+		unhandled("b,x1 y:[abs],y0");
 		break;
 		}
-	case 1218: { // a,x0 x:[abs],y1
-		unhandled("a,x0 x:[abs],y1");
+	case 1262: { // a,x0 y:[abs],y1
+		unhandled("a,x0 y:[abs],y1");
 		break;
 		}
-	case 1219: { // a,x1 x:[abs],y1
-		unhandled("a,x1 x:[abs],y1");
+	case 1263: { // a,x1 y:[abs],y1
+		unhandled("a,x1 y:[abs],y1");
 		break;
 		}
-	case 1220: { // b,x0 x:[abs],y1
-		unhandled("b,x0 x:[abs],y1");
+	case 1264: { // b,x0 y:[abs],y1
+		unhandled("b,x0 y:[abs],y1");
 		break;
 		}
-	case 1221: { // b,x1 x:[abs],y1
-		unhandled("b,x1 x:[abs],y1");
+	case 1265: { // b,x1 y:[abs],y1
+		unhandled("b,x1 y:[abs],y1");
 		break;
 		}
-	case 1222: { // a,x0 x:[abs],a
-		unhandled("a,x0 x:[abs],a");
+	case 1266: { // a,x0 y:[abs],a
+		unhandled("a,x0 y:[abs],a");
 		break;
 		}
-	case 1223: { // a,x1 x:[abs],a
-		unhandled("a,x1 x:[abs],a");
+	case 1267: { // a,x1 y:[abs],a
+		unhandled("a,x1 y:[abs],a");
 		break;
 		}
-	case 1224: { // b,x0 x:[abs],a
-		unhandled("b,x0 x:[abs],a");
+	case 1268: { // b,x0 y:[abs],a
+		unhandled("b,x0 y:[abs],a");
 		break;
 		}
-	case 1225: { // b,x1 x:[abs],a
-		unhandled("b,x1 x:[abs],a");
+	case 1269: { // b,x1 y:[abs],a
+		unhandled("b,x1 y:[abs],a");
 		break;
 		}
-	case 1226: { // a,x0 x:[abs],b
-		unhandled("a,x0 x:[abs],b");
+	case 1270: { // a,x0 y:[abs],b
+		unhandled("a,x0 y:[abs],b");
 		break;
 		}
-	case 1227: { // a,x1 x:[abs],b
-		unhandled("a,x1 x:[abs],b");
+	case 1271: { // a,x1 y:[abs],b
+		unhandled("a,x1 y:[abs],b");
 		break;
 		}
-	case 1228: { // b,x0 x:[abs],b
-		unhandled("b,x0 x:[abs],b");
+	case 1272: { // b,x0 y:[abs],b
+		unhandled("b,x0 y:[abs],b");
 		break;
 		}
-	case 1229: { // b,x1 x:[abs],b
-		unhandled("b,x1 x:[abs],b");
+	case 1273: { // b,x1 y:[abs],b
+		unhandled("b,x1 y:[abs],b");
 		break;
 		}
-	case 1230: { // a,x0 x:#[i],y0
-		unhandled("a,x0 x:#[i],y0");
+	case 1274: { // a,x0 #[i],y0
+		unhandled("a,x0 #[i],y0");
 		break;
 		}
-	case 1231: { // a,x1 x:#[i],y0
-		unhandled("a,x1 x:#[i],y0");
+	case 1275: { // a,x1 #[i],y0
+		unhandled("a,x1 #[i],y0");
 		break;
 		}
-	case 1232: { // b,x0 x:#[i],y0
-		unhandled("b,x0 x:#[i],y0");
+	case 1276: { // b,x0 #[i],y0
+		unhandled("b,x0 #[i],y0");
 		break;
 		}
-	case 1233: { // b,x1 x:#[i],y0
-		unhandled("b,x1 x:#[i],y0");
+	case 1277: { // b,x1 #[i],y0
+		unhandled("b,x1 #[i],y0");
 		break;
 		}
-	case 1234: { // a,x0 x:#[i],y1
-		unhandled("a,x0 x:#[i],y1");
+	case 1278: { // a,x0 #[i],y1
+		unhandled("a,x0 #[i],y1");
 		break;
 		}
-	case 1235: { // a,x1 x:#[i],y1
-		unhandled("a,x1 x:#[i],y1");
+	case 1279: { // a,x1 #[i],y1
+		unhandled("a,x1 #[i],y1");
 		break;
 		}
-	case 1236: { // b,x0 x:#[i],y1
-		unhandled("b,x0 x:#[i],y1");
+	case 1280: { // b,x0 #[i],y1
+		unhandled("b,x0 #[i],y1");
 		break;
 		}
-	case 1237: { // b,x1 x:#[i],y1
-		unhandled("b,x1 x:#[i],y1");
+	case 1281: { // b,x1 #[i],y1
+		unhandled("b,x1 #[i],y1");
 		break;
 		}
-	case 1238: { // a,x0 x:#[i],a
-		unhandled("a,x0 x:#[i],a");
+	case 1282: { // a,x0 #[i],a
+		unhandled("a,x0 #[i],a");
 		break;
 		}
-	case 1239: { // a,x1 x:#[i],a
-		unhandled("a,x1 x:#[i],a");
+	case 1283: { // a,x1 #[i],a
+		unhandled("a,x1 #[i],a");
 		break;
 		}
-	case 1240: { // b,x0 x:#[i],a
-		unhandled("b,x0 x:#[i],a");
+	case 1284: { // b,x0 #[i],a
+		unhandled("b,x0 #[i],a");
 		break;
 		}
-	case 1241: { // b,x1 x:#[i],a
-		unhandled("b,x1 x:#[i],a");
+	case 1285: { // b,x1 #[i],a
+		unhandled("b,x1 #[i],a");
 		break;
 		}
-	case 1242: { // a,x0 x:#[i],b
-		unhandled("a,x0 x:#[i],b");
+	case 1286: { // a,x0 #[i],b
+		unhandled("a,x0 #[i],b");
 		break;
 		}
-	case 1243: { // a,x1 x:#[i],b
-		unhandled("a,x1 x:#[i],b");
+	case 1287: { // a,x1 #[i],b
+		unhandled("a,x1 #[i],b");
 		break;
 		}
-	case 1244: { // b,x0 x:#[i],b
-		unhandled("b,x0 x:#[i],b");
+	case 1288: { // b,x0 #[i],b
+		unhandled("b,x0 #[i],b");
 		break;
 		}
-	case 1245: { // b,x1 x:#[i],b
-		unhandled("b,x1 x:#[i],b");
+	case 1289: { // b,x1 #[i],b
+		unhandled("b,x1 #[i],b");
 		break;
 		}
-	case 1246: { // a,y:(r)-n y0,a
+	case 1290: { // a,x0 y0,y:[abs]
+		unhandled("a,x0 y0,y:[abs]");
+		break;
+		}
+	case 1291: { // a,x1 y0,y:[abs]
+		unhandled("a,x1 y0,y:[abs]");
+		break;
+		}
+	case 1292: { // b,x0 y0,y:[abs]
+		unhandled("b,x0 y0,y:[abs]");
+		break;
+		}
+	case 1293: { // b,x1 y0,y:[abs]
+		unhandled("b,x1 y0,y:[abs]");
+		break;
+		}
+	case 1294: { // a,x0 y1,y:[abs]
+		unhandled("a,x0 y1,y:[abs]");
+		break;
+		}
+	case 1295: { // a,x1 y1,y:[abs]
+		unhandled("a,x1 y1,y:[abs]");
+		break;
+		}
+	case 1296: { // b,x0 y1,y:[abs]
+		unhandled("b,x0 y1,y:[abs]");
+		break;
+		}
+	case 1297: { // b,x1 y1,y:[abs]
+		unhandled("b,x1 y1,y:[abs]");
+		break;
+		}
+	case 1298: { // a,x0 a,y:[abs]
+		unhandled("a,x0 a,y:[abs]");
+		break;
+		}
+	case 1299: { // a,x1 a,y:[abs]
+		unhandled("a,x1 a,y:[abs]");
+		break;
+		}
+	case 1300: { // b,x0 a,y:[abs]
+		unhandled("b,x0 a,y:[abs]");
+		break;
+		}
+	case 1301: { // b,x1 a,y:[abs]
+		unhandled("b,x1 a,y:[abs]");
+		break;
+		}
+	case 1302: { // a,x0 b,y:[abs]
+		unhandled("a,x0 b,y:[abs]");
+		break;
+		}
+	case 1303: { // a,x1 b,y:[abs]
+		unhandled("a,x1 b,y:[abs]");
+		break;
+		}
+	case 1304: { // b,x0 b,y:[abs]
+		unhandled("b,x0 b,y:[abs]");
+		break;
+		}
+	case 1305: { // b,x1 b,y:[abs]
+		unhandled("b,x1 b,y:[abs]");
+		break;
+		}
+	case 1306: { // a,y:(r)-n y0,a
 		unhandled("a,y:(r)-n y0,a");
 		break;
 		}
-	case 1247: { // a,y:(r)+n y0,a
+	case 1307: { // a,y:(r)+n y0,a
 		unhandled("a,y:(r)+n y0,a");
 		break;
 		}
-	case 1248: { // a,y:(r)- y0,a
+	case 1308: { // a,y:(r)- y0,a
 		unhandled("a,y:(r)- y0,a");
 		break;
 		}
-	case 1249: { // a,y:(r)+ y0,a
+	case 1309: { // a,y:(r)+ y0,a
 		unhandled("a,y:(r)+ y0,a");
 		break;
 		}
-	case 1250: { // a,y:(r) y0,a
+	case 1310: { // a,y:(r) y0,a
 		unhandled("a,y:(r) y0,a");
 		break;
 		}
-	case 1251: { // a,y:(r+n) y0,a
+	case 1311: { // a,y:(r+n) y0,a
 		unhandled("a,y:(r+n) y0,a");
 		break;
 		}
-	case 1252: { // a,y:-(r) y0,a
+	case 1312: { // a,y:-(r) y0,a
 		unhandled("a,y:-(r) y0,a");
 		break;
 		}
-	case 1253: { // b,y:(r)-n y0,b
+	case 1313: { // b,y:(r)-n y0,b
 		unhandled("b,y:(r)-n y0,b");
 		break;
 		}
-	case 1254: { // b,y:(r)+n y0,b
+	case 1314: { // b,y:(r)+n y0,b
 		unhandled("b,y:(r)+n y0,b");
 		break;
 		}
-	case 1255: { // b,y:(r)- y0,b
+	case 1315: { // b,y:(r)- y0,b
 		unhandled("b,y:(r)- y0,b");
 		break;
 		}
-	case 1256: { // b,y:(r)+ y0,b
+	case 1316: { // b,y:(r)+ y0,b
 		unhandled("b,y:(r)+ y0,b");
 		break;
 		}
-	case 1257: { // b,y:(r) y0,b
+	case 1317: { // b,y:(r) y0,b
 		unhandled("b,y:(r) y0,b");
 		break;
 		}
-	case 1258: { // b,y:(r+n) y0,b
+	case 1318: { // b,y:(r+n) y0,b
 		unhandled("b,y:(r+n) y0,b");
 		break;
 		}
-	case 1259: { // b,y:-(r) y0,b
+	case 1319: { // b,y:-(r) y0,b
 		unhandled("b,y:-(r) y0,b");
 		break;
 		}
-	case 1260: { // l:(r)-n,a10
+	case 1320: { // l:(r)-n,a10
 		unhandled("l:(r)-n,a10");
 		break;
 		}
-	case 1261: { // l:(r)+n,a10
+	case 1321: { // l:(r)+n,a10
 		unhandled("l:(r)+n,a10");
 		break;
 		}
-	case 1262: { // l:(r)-,a10
+	case 1322: { // l:(r)-,a10
 		unhandled("l:(r)-,a10");
 		break;
 		}
-	case 1263: { // l:(r)+,a10
+	case 1323: { // l:(r)+,a10
 		unhandled("l:(r)+,a10");
 		break;
 		}
-	case 1264: { // l:(r),a10
+	case 1324: { // l:(r),a10
 		unhandled("l:(r),a10");
 		break;
 		}
-	case 1265: { // l:(r+n),a10
+	case 1325: { // l:(r+n),a10
 		unhandled("l:(r+n),a10");
 		break;
 		}
-	case 1266: { // l:-(r),a10
+	case 1326: { // l:-(r),a10
 		unhandled("l:-(r),a10");
 		break;
 		}
-	case 1267: { // l:(r)-n,b10
+	case 1327: { // l:(r)-n,b10
 		unhandled("l:(r)-n,b10");
 		break;
 		}
-	case 1268: { // l:(r)+n,b10
+	case 1328: { // l:(r)+n,b10
 		unhandled("l:(r)+n,b10");
 		break;
 		}
-	case 1269: { // l:(r)-,b10
+	case 1329: { // l:(r)-,b10
 		unhandled("l:(r)-,b10");
 		break;
 		}
-	case 1270: { // l:(r)+,b10
+	case 1330: { // l:(r)+,b10
 		unhandled("l:(r)+,b10");
 		break;
 		}
-	case 1271: { // l:(r),b10
+	case 1331: { // l:(r),b10
 		unhandled("l:(r),b10");
 		break;
 		}
-	case 1272: { // l:(r+n),b10
+	case 1332: { // l:(r+n),b10
 		unhandled("l:(r+n),b10");
 		break;
 		}
-	case 1273: { // l:-(r),b10
+	case 1333: { // l:-(r),b10
 		unhandled("l:-(r),b10");
 		break;
 		}
-	case 1274: { // l:(r)-n,x
+	case 1334: { // l:(r)-n,x
 		unhandled("l:(r)-n,x");
 		break;
 		}
-	case 1275: { // l:(r)+n,x
+	case 1335: { // l:(r)+n,x
 		unhandled("l:(r)+n,x");
 		break;
 		}
-	case 1276: { // l:(r)-,x
+	case 1336: { // l:(r)-,x
 		unhandled("l:(r)-,x");
 		break;
 		}
-	case 1277: { // l:(r)+,x
+	case 1337: { // l:(r)+,x
 		unhandled("l:(r)+,x");
 		break;
 		}
-	case 1278: { // l:(r),x
+	case 1338: { // l:(r),x
 		unhandled("l:(r),x");
 		break;
 		}
-	case 1279: { // l:(r+n),x
+	case 1339: { // l:(r+n),x
 		unhandled("l:(r+n),x");
 		break;
 		}
-	case 1280: { // l:-(r),x
+	case 1340: { // l:-(r),x
 		unhandled("l:-(r),x");
 		break;
 		}
-	case 1281: { // l:(r)-n,y
+	case 1341: { // l:(r)-n,y
 		unhandled("l:(r)-n,y");
 		break;
 		}
-	case 1282: { // l:(r)+n,y
+	case 1342: { // l:(r)+n,y
 		unhandled("l:(r)+n,y");
 		break;
 		}
-	case 1283: { // l:(r)-,y
+	case 1343: { // l:(r)-,y
 		unhandled("l:(r)-,y");
 		break;
 		}
-	case 1284: { // l:(r)+,y
+	case 1344: { // l:(r)+,y
 		unhandled("l:(r)+,y");
 		break;
 		}
-	case 1285: { // l:(r),y
+	case 1345: { // l:(r),y
 		unhandled("l:(r),y");
 		break;
 		}
-	case 1286: { // l:(r+n),y
+	case 1346: { // l:(r+n),y
 		unhandled("l:(r+n),y");
 		break;
 		}
-	case 1287: { // l:-(r),y
+	case 1347: { // l:-(r),y
 		unhandled("l:-(r),y");
 		break;
 		}
-	case 1288: { // l:(r)-n,a
+	case 1348: { // l:(r)-n,a
 		unhandled("l:(r)-n,a");
 		break;
 		}
-	case 1289: { // l:(r)+n,a
+	case 1349: { // l:(r)+n,a
 		unhandled("l:(r)+n,a");
 		break;
 		}
-	case 1290: { // l:(r)-,a
+	case 1350: { // l:(r)-,a
 		unhandled("l:(r)-,a");
 		break;
 		}
-	case 1291: { // l:(r)+,a
+	case 1351: { // l:(r)+,a
 		unhandled("l:(r)+,a");
 		break;
 		}
-	case 1292: { // l:(r),a
+	case 1352: { // l:(r),a
 		unhandled("l:(r),a");
 		break;
 		}
-	case 1293: { // l:(r+n),a
+	case 1353: { // l:(r+n),a
 		unhandled("l:(r+n),a");
 		break;
 		}
-	case 1294: { // l:-(r),a
+	case 1354: { // l:-(r),a
 		unhandled("l:-(r),a");
 		break;
 		}
-	case 1295: { // l:(r)-n,b
+	case 1355: { // l:(r)-n,b
 		unhandled("l:(r)-n,b");
 		break;
 		}
-	case 1296: { // l:(r)+n,b
+	case 1356: { // l:(r)+n,b
 		unhandled("l:(r)+n,b");
 		break;
 		}
-	case 1297: { // l:(r)-,b
+	case 1357: { // l:(r)-,b
 		unhandled("l:(r)-,b");
 		break;
 		}
-	case 1298: { // l:(r)+,b
+	case 1358: { // l:(r)+,b
 		unhandled("l:(r)+,b");
 		break;
 		}
-	case 1299: { // l:(r),b
+	case 1359: { // l:(r),b
 		unhandled("l:(r),b");
 		break;
 		}
-	case 1300: { // l:(r+n),b
+	case 1360: { // l:(r+n),b
 		unhandled("l:(r+n),b");
 		break;
 		}
-	case 1301: { // l:-(r),b
+	case 1361: { // l:-(r),b
 		unhandled("l:-(r),b");
 		break;
 		}
-	case 1302: { // l:(r)-n,ab
+	case 1362: { // l:(r)-n,ab
 		unhandled("l:(r)-n,ab");
 		break;
 		}
-	case 1303: { // l:(r)+n,ab
+	case 1363: { // l:(r)+n,ab
 		unhandled("l:(r)+n,ab");
 		break;
 		}
-	case 1304: { // l:(r)-,ab
+	case 1364: { // l:(r)-,ab
 		unhandled("l:(r)-,ab");
 		break;
 		}
-	case 1305: { // l:(r)+,ab
+	case 1365: { // l:(r)+,ab
 		unhandled("l:(r)+,ab");
 		break;
 		}
-	case 1306: { // l:(r),ab
+	case 1366: { // l:(r),ab
 		unhandled("l:(r),ab");
 		break;
 		}
-	case 1307: { // l:(r+n),ab
+	case 1367: { // l:(r+n),ab
 		unhandled("l:(r+n),ab");
 		break;
 		}
-	case 1308: { // l:-(r),ab
+	case 1368: { // l:-(r),ab
 		unhandled("l:-(r),ab");
 		break;
 		}
-	case 1309: { // l:(r)-n,ba
+	case 1369: { // l:(r)-n,ba
 		unhandled("l:(r)-n,ba");
 		break;
 		}
-	case 1310: { // l:(r)+n,ba
+	case 1370: { // l:(r)+n,ba
 		unhandled("l:(r)+n,ba");
 		break;
 		}
-	case 1311: { // l:(r)-,ba
+	case 1371: { // l:(r)-,ba
 		unhandled("l:(r)-,ba");
 		break;
 		}
-	case 1312: { // l:(r)+,ba
+	case 1372: { // l:(r)+,ba
 		unhandled("l:(r)+,ba");
 		break;
 		}
-	case 1313: { // l:(r),ba
+	case 1373: { // l:(r),ba
 		unhandled("l:(r),ba");
 		break;
 		}
-	case 1314: { // l:(r+n),ba
+	case 1374: { // l:(r+n),ba
 		unhandled("l:(r+n),ba");
 		break;
 		}
-	case 1315: { // l:-(r),ba
+	case 1375: { // l:-(r),ba
 		unhandled("l:-(r),ba");
 		break;
 		}
-	case 1316: { // l:[abs],a10
+	case 1376: { // l:[abs],a10
 		unhandled("l:[abs],a10");
 		break;
 		}
-	case 1317: { // l:[abs],b10
+	case 1377: { // l:[abs],b10
 		unhandled("l:[abs],b10");
 		break;
 		}
-	case 1318: { // l:[abs],x
+	case 1378: { // l:[abs],x
 		unhandled("l:[abs],x");
 		break;
 		}
-	case 1319: { // l:[abs],y
+	case 1379: { // l:[abs],y
 		unhandled("l:[abs],y");
 		break;
 		}
-	case 1320: { // l:[abs],a
+	case 1380: { // l:[abs],a
 		unhandled("l:[abs],a");
 		break;
 		}
-	case 1321: { // l:[abs],b
+	case 1381: { // l:[abs],b
 		unhandled("l:[abs],b");
 		break;
 		}
-	case 1322: { // l:[abs],ab
+	case 1382: { // l:[abs],ab
 		unhandled("l:[abs],ab");
 		break;
 		}
-	case 1323: { // l:[abs],ba
+	case 1383: { // l:[abs],ba
 		unhandled("l:[abs],ba");
 		break;
 		}
-	case 1324: { // l:[aa],a10
+	case 1384: { // l:[aa],a10
 		unhandled("l:[aa],a10");
 		break;
 		}
-	case 1325: { // l:[aa],b10
+	case 1385: { // l:[aa],b10
 		unhandled("l:[aa],b10");
 		break;
 		}
-	case 1326: { // l:[aa],x
+	case 1386: { // l:[aa],x
 		unhandled("l:[aa],x");
 		break;
 		}
-	case 1327: { // l:[aa],y
+	case 1387: { // l:[aa],y
 		unhandled("l:[aa],y");
 		break;
 		}
-	case 1328: { // l:[aa],a
+	case 1388: { // l:[aa],a
 		unhandled("l:[aa],a");
 		break;
 		}
-	case 1329: { // l:[aa],b
+	case 1389: { // l:[aa],b
 		unhandled("l:[aa],b");
 		break;
 		}
-	case 1330: { // l:[aa],ab
+	case 1390: { // l:[aa],ab
 		unhandled("l:[aa],ab");
 		break;
 		}
-	case 1331: { // l:[aa],ba
+	case 1391: { // l:[aa],ba
 		unhandled("l:[aa],ba");
 		break;
 		}
-	case 1332: { // a10,l:(r)-n
+	case 1392: { // a10,l:(r)-n
 		unhandled("a10,l:(r)-n");
 		break;
 		}
-	case 1333: { // a10,l:(r)+n
+	case 1393: { // a10,l:(r)+n
 		unhandled("a10,l:(r)+n");
 		break;
 		}
-	case 1334: { // a10,l:(r)-
+	case 1394: { // a10,l:(r)-
 		unhandled("a10,l:(r)-");
 		break;
 		}
-	case 1335: { // a10,l:(r)+
+	case 1395: { // a10,l:(r)+
 		unhandled("a10,l:(r)+");
 		break;
 		}
-	case 1336: { // a10,l:(r)
+	case 1396: { // a10,l:(r)
 		unhandled("a10,l:(r)");
 		break;
 		}
-	case 1337: { // a10,l:(r+n)
+	case 1397: { // a10,l:(r+n)
 		unhandled("a10,l:(r+n)");
 		break;
 		}
-	case 1338: { // a10,l:-(r)
+	case 1398: { // a10,l:-(r)
 		unhandled("a10,l:-(r)");
 		break;
 		}
-	case 1339: { // b10,l:(r)-n
+	case 1399: { // b10,l:(r)-n
 		unhandled("b10,l:(r)-n");
 		break;
 		}
-	case 1340: { // b10,l:(r)+n
+	case 1400: { // b10,l:(r)+n
 		unhandled("b10,l:(r)+n");
 		break;
 		}
-	case 1341: { // b10,l:(r)-
+	case 1401: { // b10,l:(r)-
 		unhandled("b10,l:(r)-");
 		break;
 		}
-	case 1342: { // b10,l:(r)+
+	case 1402: { // b10,l:(r)+
 		unhandled("b10,l:(r)+");
 		break;
 		}
-	case 1343: { // b10,l:(r)
+	case 1403: { // b10,l:(r)
 		unhandled("b10,l:(r)");
 		break;
 		}
-	case 1344: { // b10,l:(r+n)
+	case 1404: { // b10,l:(r+n)
 		unhandled("b10,l:(r+n)");
 		break;
 		}
-	case 1345: { // b10,l:-(r)
+	case 1405: { // b10,l:-(r)
 		unhandled("b10,l:-(r)");
 		break;
 		}
-	case 1346: { // x,l:(r)-n
+	case 1406: { // x,l:(r)-n
 		unhandled("x,l:(r)-n");
 		break;
 		}
-	case 1347: { // x,l:(r)+n
+	case 1407: { // x,l:(r)+n
 		unhandled("x,l:(r)+n");
 		break;
 		}
-	case 1348: { // x,l:(r)-
+	case 1408: { // x,l:(r)-
 		unhandled("x,l:(r)-");
 		break;
 		}
-	case 1349: { // x,l:(r)+
+	case 1409: { // x,l:(r)+
 		unhandled("x,l:(r)+");
 		break;
 		}
-	case 1350: { // x,l:(r)
+	case 1410: { // x,l:(r)
 		unhandled("x,l:(r)");
 		break;
 		}
-	case 1351: { // x,l:(r+n)
+	case 1411: { // x,l:(r+n)
 		unhandled("x,l:(r+n)");
 		break;
 		}
-	case 1352: { // x,l:-(r)
+	case 1412: { // x,l:-(r)
 		unhandled("x,l:-(r)");
 		break;
 		}
-	case 1353: { // y,l:(r)-n
+	case 1413: { // y,l:(r)-n
 		unhandled("y,l:(r)-n");
 		break;
 		}
-	case 1354: { // y,l:(r)+n
+	case 1414: { // y,l:(r)+n
 		unhandled("y,l:(r)+n");
 		break;
 		}
-	case 1355: { // y,l:(r)-
+	case 1415: { // y,l:(r)-
 		unhandled("y,l:(r)-");
 		break;
 		}
-	case 1356: { // y,l:(r)+
+	case 1416: { // y,l:(r)+
 		unhandled("y,l:(r)+");
 		break;
 		}
-	case 1357: { // y,l:(r)
+	case 1417: { // y,l:(r)
 		unhandled("y,l:(r)");
 		break;
 		}
-	case 1358: { // y,l:(r+n)
+	case 1418: { // y,l:(r+n)
 		unhandled("y,l:(r+n)");
 		break;
 		}
-	case 1359: { // y,l:-(r)
+	case 1419: { // y,l:-(r)
 		unhandled("y,l:-(r)");
 		break;
 		}
-	case 1360: { // a,l:(r)-n
+	case 1420: { // a,l:(r)-n
 		unhandled("a,l:(r)-n");
 		break;
 		}
-	case 1361: { // a,l:(r)+n
+	case 1421: { // a,l:(r)+n
 		unhandled("a,l:(r)+n");
 		break;
 		}
-	case 1362: { // a,l:(r)-
+	case 1422: { // a,l:(r)-
 		unhandled("a,l:(r)-");
 		break;
 		}
-	case 1363: { // a,l:(r)+
+	case 1423: { // a,l:(r)+
 		unhandled("a,l:(r)+");
 		break;
 		}
-	case 1364: { // a,l:(r)
+	case 1424: { // a,l:(r)
 		unhandled("a,l:(r)");
 		break;
 		}
-	case 1365: { // a,l:(r+n)
+	case 1425: { // a,l:(r+n)
 		unhandled("a,l:(r+n)");
 		break;
 		}
-	case 1366: { // a,l:-(r)
+	case 1426: { // a,l:-(r)
 		unhandled("a,l:-(r)");
 		break;
 		}
-	case 1367: { // b,l:(r)-n
+	case 1427: { // b,l:(r)-n
 		unhandled("b,l:(r)-n");
 		break;
 		}
-	case 1368: { // b,l:(r)+n
+	case 1428: { // b,l:(r)+n
 		unhandled("b,l:(r)+n");
 		break;
 		}
-	case 1369: { // b,l:(r)-
+	case 1429: { // b,l:(r)-
 		unhandled("b,l:(r)-");
 		break;
 		}
-	case 1370: { // b,l:(r)+
+	case 1430: { // b,l:(r)+
 		unhandled("b,l:(r)+");
 		break;
 		}
-	case 1371: { // b,l:(r)
+	case 1431: { // b,l:(r)
 		unhandled("b,l:(r)");
 		break;
 		}
-	case 1372: { // b,l:(r+n)
+	case 1432: { // b,l:(r+n)
 		unhandled("b,l:(r+n)");
 		break;
 		}
-	case 1373: { // b,l:-(r)
+	case 1433: { // b,l:-(r)
 		unhandled("b,l:-(r)");
 		break;
 		}
-	case 1374: { // ab,l:(r)-n
+	case 1434: { // ab,l:(r)-n
 		unhandled("ab,l:(r)-n");
 		break;
 		}
-	case 1375: { // ab,l:(r)+n
+	case 1435: { // ab,l:(r)+n
 		unhandled("ab,l:(r)+n");
 		break;
 		}
-	case 1376: { // ab,l:(r)-
+	case 1436: { // ab,l:(r)-
 		unhandled("ab,l:(r)-");
 		break;
 		}
-	case 1377: { // ab,l:(r)+
+	case 1437: { // ab,l:(r)+
 		unhandled("ab,l:(r)+");
 		break;
 		}
-	case 1378: { // ab,l:(r)
+	case 1438: { // ab,l:(r)
 		unhandled("ab,l:(r)");
 		break;
 		}
-	case 1379: { // ab,l:(r+n)
+	case 1439: { // ab,l:(r+n)
 		unhandled("ab,l:(r+n)");
 		break;
 		}
-	case 1380: { // ab,l:-(r)
+	case 1440: { // ab,l:-(r)
 		unhandled("ab,l:-(r)");
 		break;
 		}
-	case 1381: { // ba,l:(r)-n
+	case 1441: { // ba,l:(r)-n
 		unhandled("ba,l:(r)-n");
 		break;
 		}
-	case 1382: { // ba,l:(r)+n
+	case 1442: { // ba,l:(r)+n
 		unhandled("ba,l:(r)+n");
 		break;
 		}
-	case 1383: { // ba,l:(r)-
+	case 1443: { // ba,l:(r)-
 		unhandled("ba,l:(r)-");
 		break;
 		}
-	case 1384: { // ba,l:(r)+
+	case 1444: { // ba,l:(r)+
 		unhandled("ba,l:(r)+");
 		break;
 		}
-	case 1385: { // ba,l:(r)
+	case 1445: { // ba,l:(r)
 		unhandled("ba,l:(r)");
 		break;
 		}
-	case 1386: { // ba,l:(r+n)
+	case 1446: { // ba,l:(r+n)
 		unhandled("ba,l:(r+n)");
 		break;
 		}
-	case 1387: { // ba,l:-(r)
+	case 1447: { // ba,l:-(r)
 		unhandled("ba,l:-(r)");
 		break;
 		}
-	case 1388: { // a10,l:[aa]
+	case 1448: { // a10,l:[abs]
+		unhandled("a10,l:[abs]");
+		break;
+		}
+	case 1449: { // b10,l:[abs]
+		unhandled("b10,l:[abs]");
+		break;
+		}
+	case 1450: { // x,l:[abs]
+		unhandled("x,l:[abs]");
+		break;
+		}
+	case 1451: { // y,l:[abs]
+		unhandled("y,l:[abs]");
+		break;
+		}
+	case 1452: { // a,l:[abs]
+		unhandled("a,l:[abs]");
+		break;
+		}
+	case 1453: { // b,l:[abs]
+		unhandled("b,l:[abs]");
+		break;
+		}
+	case 1454: { // ab,l:[abs]
+		unhandled("ab,l:[abs]");
+		break;
+		}
+	case 1455: { // ba,l:[abs]
+		unhandled("ba,l:[abs]");
+		break;
+		}
+	case 1456: { // a10,l:[aa]
 		unhandled("a10,l:[aa]");
 		break;
 		}
-	case 1389: { // b10,l:[aa]
+	case 1457: { // b10,l:[aa]
 		unhandled("b10,l:[aa]");
 		break;
 		}
-	case 1390: { // x,l:[aa]
+	case 1458: { // x,l:[aa]
 		unhandled("x,l:[aa]");
 		break;
 		}
-	case 1391: { // y,l:[aa]
+	case 1459: { // y,l:[aa]
 		unhandled("y,l:[aa]");
 		break;
 		}
-	case 1392: { // a,l:[aa]
+	case 1460: { // a,l:[aa]
 		unhandled("a,l:[aa]");
 		break;
 		}
-	case 1393: { // b,l:[aa]
+	case 1461: { // b,l:[aa]
 		unhandled("b,l:[aa]");
 		break;
 		}
-	case 1394: { // ab,l:[aa]
+	case 1462: { // ab,l:[aa]
 		unhandled("ab,l:[aa]");
 		break;
 		}
-	case 1395: { // ba,l:[aa]
+	case 1463: { // ba,l:[aa]
 		unhandled("ba,l:[aa]");
 		break;
 		}
-	case 1396: { // x:(r)+n,x0 y:(rh)+n,y0
+	case 1464: { // x:(r)+n,x0 y:(rh)+n,y0
 		unhandled("x:(r)+n,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1397: { // x:(r)+n,x0 y:(rh)+n,y1
+	case 1465: { // x:(r)+n,x0 y:(rh)+n,y1
 		unhandled("x:(r)+n,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1398: { // x:(r)+n,x0 y:(rh)+n,a
+	case 1466: { // x:(r)+n,x0 y:(rh)+n,a
 		unhandled("x:(r)+n,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1399: { // x:(r)+n,x0 y:(rh)+n,b
+	case 1467: { // x:(r)+n,x0 y:(rh)+n,b
 		unhandled("x:(r)+n,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1400: { // x:(r)+n,x1 y:(rh)+n,y0
+	case 1468: { // x:(r)+n,x1 y:(rh)+n,y0
 		unhandled("x:(r)+n,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1401: { // x:(r)+n,x1 y:(rh)+n,y1
+	case 1469: { // x:(r)+n,x1 y:(rh)+n,y1
 		unhandled("x:(r)+n,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1402: { // x:(r)+n,x1 y:(rh)+n,a
+	case 1470: { // x:(r)+n,x1 y:(rh)+n,a
 		unhandled("x:(r)+n,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1403: { // x:(r)+n,x1 y:(rh)+n,b
+	case 1471: { // x:(r)+n,x1 y:(rh)+n,b
 		unhandled("x:(r)+n,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1404: { // x:(r)+n,a y:(rh)+n,y0
+	case 1472: { // x:(r)+n,a y:(rh)+n,y0
 		unhandled("x:(r)+n,a y:(rh)+n,y0");
 		break;
 		}
-	case 1405: { // x:(r)+n,a y:(rh)+n,y1
+	case 1473: { // x:(r)+n,a y:(rh)+n,y1
 		unhandled("x:(r)+n,a y:(rh)+n,y1");
 		break;
 		}
-	case 1406: { // x:(r)+n,a y:(rh)+n,a
+	case 1474: { // x:(r)+n,a y:(rh)+n,a
 		unhandled("x:(r)+n,a y:(rh)+n,a");
 		break;
 		}
-	case 1407: { // x:(r)+n,a y:(rh)+n,b
+	case 1475: { // x:(r)+n,a y:(rh)+n,b
 		unhandled("x:(r)+n,a y:(rh)+n,b");
 		break;
 		}
-	case 1408: { // x:(r)+n,b y:(rh)+n,y0
+	case 1476: { // x:(r)+n,b y:(rh)+n,y0
 		unhandled("x:(r)+n,b y:(rh)+n,y0");
 		break;
 		}
-	case 1409: { // x:(r)+n,b y:(rh)+n,y1
+	case 1477: { // x:(r)+n,b y:(rh)+n,y1
 		unhandled("x:(r)+n,b y:(rh)+n,y1");
 		break;
 		}
-	case 1410: { // x:(r)+n,b y:(rh)+n,a
+	case 1478: { // x:(r)+n,b y:(rh)+n,a
 		unhandled("x:(r)+n,b y:(rh)+n,a");
 		break;
 		}
-	case 1411: { // x:(r)+n,b y:(rh)+n,b
+	case 1479: { // x:(r)+n,b y:(rh)+n,b
 		unhandled("x:(r)+n,b y:(rh)+n,b");
 		break;
 		}
-	case 1412: { // x:(r)+n,x0 y:(rh)-,y0
+	case 1480: { // x:(r)+n,x0 y:(rh)-,y0
 		unhandled("x:(r)+n,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1413: { // x:(r)+n,x0 y:(rh)-,y1
+	case 1481: { // x:(r)+n,x0 y:(rh)-,y1
 		unhandled("x:(r)+n,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1414: { // x:(r)+n,x0 y:(rh)-,a
+	case 1482: { // x:(r)+n,x0 y:(rh)-,a
 		unhandled("x:(r)+n,x0 y:(rh)-,a");
 		break;
 		}
-	case 1415: { // x:(r)+n,x0 y:(rh)-,b
+	case 1483: { // x:(r)+n,x0 y:(rh)-,b
 		unhandled("x:(r)+n,x0 y:(rh)-,b");
 		break;
 		}
-	case 1416: { // x:(r)+n,x1 y:(rh)-,y0
+	case 1484: { // x:(r)+n,x1 y:(rh)-,y0
 		unhandled("x:(r)+n,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1417: { // x:(r)+n,x1 y:(rh)-,y1
+	case 1485: { // x:(r)+n,x1 y:(rh)-,y1
 		unhandled("x:(r)+n,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1418: { // x:(r)+n,x1 y:(rh)-,a
+	case 1486: { // x:(r)+n,x1 y:(rh)-,a
 		unhandled("x:(r)+n,x1 y:(rh)-,a");
 		break;
 		}
-	case 1419: { // x:(r)+n,x1 y:(rh)-,b
+	case 1487: { // x:(r)+n,x1 y:(rh)-,b
 		unhandled("x:(r)+n,x1 y:(rh)-,b");
 		break;
 		}
-	case 1420: { // x:(r)+n,a y:(rh)-,y0
+	case 1488: { // x:(r)+n,a y:(rh)-,y0
 		unhandled("x:(r)+n,a y:(rh)-,y0");
 		break;
 		}
-	case 1421: { // x:(r)+n,a y:(rh)-,y1
+	case 1489: { // x:(r)+n,a y:(rh)-,y1
 		unhandled("x:(r)+n,a y:(rh)-,y1");
 		break;
 		}
-	case 1422: { // x:(r)+n,a y:(rh)-,a
+	case 1490: { // x:(r)+n,a y:(rh)-,a
 		unhandled("x:(r)+n,a y:(rh)-,a");
 		break;
 		}
-	case 1423: { // x:(r)+n,a y:(rh)-,b
+	case 1491: { // x:(r)+n,a y:(rh)-,b
 		unhandled("x:(r)+n,a y:(rh)-,b");
 		break;
 		}
-	case 1424: { // x:(r)+n,b y:(rh)-,y0
+	case 1492: { // x:(r)+n,b y:(rh)-,y0
 		unhandled("x:(r)+n,b y:(rh)-,y0");
 		break;
 		}
-	case 1425: { // x:(r)+n,b y:(rh)-,y1
+	case 1493: { // x:(r)+n,b y:(rh)-,y1
 		unhandled("x:(r)+n,b y:(rh)-,y1");
 		break;
 		}
-	case 1426: { // x:(r)+n,b y:(rh)-,a
+	case 1494: { // x:(r)+n,b y:(rh)-,a
 		unhandled("x:(r)+n,b y:(rh)-,a");
 		break;
 		}
-	case 1427: { // x:(r)+n,b y:(rh)-,b
+	case 1495: { // x:(r)+n,b y:(rh)-,b
 		unhandled("x:(r)+n,b y:(rh)-,b");
 		break;
 		}
-	case 1428: { // x:(r)+n,x0 y:(rh)+,y0
+	case 1496: { // x:(r)+n,x0 y:(rh)+,y0
 		unhandled("x:(r)+n,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1429: { // x:(r)+n,x0 y:(rh)+,y1
+	case 1497: { // x:(r)+n,x0 y:(rh)+,y1
 		unhandled("x:(r)+n,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1430: { // x:(r)+n,x0 y:(rh)+,a
+	case 1498: { // x:(r)+n,x0 y:(rh)+,a
 		unhandled("x:(r)+n,x0 y:(rh)+,a");
 		break;
 		}
-	case 1431: { // x:(r)+n,x0 y:(rh)+,b
+	case 1499: { // x:(r)+n,x0 y:(rh)+,b
 		unhandled("x:(r)+n,x0 y:(rh)+,b");
 		break;
 		}
-	case 1432: { // x:(r)+n,x1 y:(rh)+,y0
+	case 1500: { // x:(r)+n,x1 y:(rh)+,y0
 		unhandled("x:(r)+n,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1433: { // x:(r)+n,x1 y:(rh)+,y1
+	case 1501: { // x:(r)+n,x1 y:(rh)+,y1
 		unhandled("x:(r)+n,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1434: { // x:(r)+n,x1 y:(rh)+,a
+	case 1502: { // x:(r)+n,x1 y:(rh)+,a
 		unhandled("x:(r)+n,x1 y:(rh)+,a");
 		break;
 		}
-	case 1435: { // x:(r)+n,x1 y:(rh)+,b
+	case 1503: { // x:(r)+n,x1 y:(rh)+,b
 		unhandled("x:(r)+n,x1 y:(rh)+,b");
 		break;
 		}
-	case 1436: { // x:(r)+n,a y:(rh)+,y0
+	case 1504: { // x:(r)+n,a y:(rh)+,y0
 		unhandled("x:(r)+n,a y:(rh)+,y0");
 		break;
 		}
-	case 1437: { // x:(r)+n,a y:(rh)+,y1
+	case 1505: { // x:(r)+n,a y:(rh)+,y1
 		unhandled("x:(r)+n,a y:(rh)+,y1");
 		break;
 		}
-	case 1438: { // x:(r)+n,a y:(rh)+,a
+	case 1506: { // x:(r)+n,a y:(rh)+,a
 		unhandled("x:(r)+n,a y:(rh)+,a");
 		break;
 		}
-	case 1439: { // x:(r)+n,a y:(rh)+,b
+	case 1507: { // x:(r)+n,a y:(rh)+,b
 		unhandled("x:(r)+n,a y:(rh)+,b");
 		break;
 		}
-	case 1440: { // x:(r)+n,b y:(rh)+,y0
+	case 1508: { // x:(r)+n,b y:(rh)+,y0
 		unhandled("x:(r)+n,b y:(rh)+,y0");
 		break;
 		}
-	case 1441: { // x:(r)+n,b y:(rh)+,y1
+	case 1509: { // x:(r)+n,b y:(rh)+,y1
 		unhandled("x:(r)+n,b y:(rh)+,y1");
 		break;
 		}
-	case 1442: { // x:(r)+n,b y:(rh)+,a
+	case 1510: { // x:(r)+n,b y:(rh)+,a
 		unhandled("x:(r)+n,b y:(rh)+,a");
 		break;
 		}
-	case 1443: { // x:(r)+n,b y:(rh)+,b
+	case 1511: { // x:(r)+n,b y:(rh)+,b
 		unhandled("x:(r)+n,b y:(rh)+,b");
 		break;
 		}
-	case 1444: { // x:(r)+n,x0 y:(rh),y0
+	case 1512: { // x:(r)+n,x0 y:(rh),y0
 		unhandled("x:(r)+n,x0 y:(rh),y0");
 		break;
 		}
-	case 1445: { // x:(r)+n,x0 y:(rh),y1
+	case 1513: { // x:(r)+n,x0 y:(rh),y1
 		unhandled("x:(r)+n,x0 y:(rh),y1");
 		break;
 		}
-	case 1446: { // x:(r)+n,x0 y:(rh),a
+	case 1514: { // x:(r)+n,x0 y:(rh),a
 		unhandled("x:(r)+n,x0 y:(rh),a");
 		break;
 		}
-	case 1447: { // x:(r)+n,x0 y:(rh),b
+	case 1515: { // x:(r)+n,x0 y:(rh),b
 		unhandled("x:(r)+n,x0 y:(rh),b");
 		break;
 		}
-	case 1448: { // x:(r)+n,x1 y:(rh),y0
+	case 1516: { // x:(r)+n,x1 y:(rh),y0
 		unhandled("x:(r)+n,x1 y:(rh),y0");
 		break;
 		}
-	case 1449: { // x:(r)+n,x1 y:(rh),y1
+	case 1517: { // x:(r)+n,x1 y:(rh),y1
 		unhandled("x:(r)+n,x1 y:(rh),y1");
 		break;
 		}
-	case 1450: { // x:(r)+n,x1 y:(rh),a
+	case 1518: { // x:(r)+n,x1 y:(rh),a
 		unhandled("x:(r)+n,x1 y:(rh),a");
 		break;
 		}
-	case 1451: { // x:(r)+n,x1 y:(rh),b
+	case 1519: { // x:(r)+n,x1 y:(rh),b
 		unhandled("x:(r)+n,x1 y:(rh),b");
 		break;
 		}
-	case 1452: { // x:(r)+n,a y:(rh),y0
+	case 1520: { // x:(r)+n,a y:(rh),y0
 		unhandled("x:(r)+n,a y:(rh),y0");
 		break;
 		}
-	case 1453: { // x:(r)+n,a y:(rh),y1
+	case 1521: { // x:(r)+n,a y:(rh),y1
 		unhandled("x:(r)+n,a y:(rh),y1");
 		break;
 		}
-	case 1454: { // x:(r)+n,a y:(rh),a
+	case 1522: { // x:(r)+n,a y:(rh),a
 		unhandled("x:(r)+n,a y:(rh),a");
 		break;
 		}
-	case 1455: { // x:(r)+n,a y:(rh),b
+	case 1523: { // x:(r)+n,a y:(rh),b
 		unhandled("x:(r)+n,a y:(rh),b");
 		break;
 		}
-	case 1456: { // x:(r)+n,b y:(rh),y0
+	case 1524: { // x:(r)+n,b y:(rh),y0
 		unhandled("x:(r)+n,b y:(rh),y0");
 		break;
 		}
-	case 1457: { // x:(r)+n,b y:(rh),y1
+	case 1525: { // x:(r)+n,b y:(rh),y1
 		unhandled("x:(r)+n,b y:(rh),y1");
 		break;
 		}
-	case 1458: { // x:(r)+n,b y:(rh),a
+	case 1526: { // x:(r)+n,b y:(rh),a
 		unhandled("x:(r)+n,b y:(rh),a");
 		break;
 		}
-	case 1459: { // x:(r)+n,b y:(rh),b
+	case 1527: { // x:(r)+n,b y:(rh),b
 		unhandled("x:(r)+n,b y:(rh),b");
 		break;
 		}
-	case 1460: { // x:(r)-,x0 y:(rh)+n,y0
+	case 1528: { // x:(r)-,x0 y:(rh)+n,y0
 		unhandled("x:(r)-,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1461: { // x:(r)-,x0 y:(rh)+n,y1
+	case 1529: { // x:(r)-,x0 y:(rh)+n,y1
 		unhandled("x:(r)-,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1462: { // x:(r)-,x0 y:(rh)+n,a
+	case 1530: { // x:(r)-,x0 y:(rh)+n,a
 		unhandled("x:(r)-,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1463: { // x:(r)-,x0 y:(rh)+n,b
+	case 1531: { // x:(r)-,x0 y:(rh)+n,b
 		unhandled("x:(r)-,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1464: { // x:(r)-,x1 y:(rh)+n,y0
+	case 1532: { // x:(r)-,x1 y:(rh)+n,y0
 		unhandled("x:(r)-,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1465: { // x:(r)-,x1 y:(rh)+n,y1
+	case 1533: { // x:(r)-,x1 y:(rh)+n,y1
 		unhandled("x:(r)-,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1466: { // x:(r)-,x1 y:(rh)+n,a
+	case 1534: { // x:(r)-,x1 y:(rh)+n,a
 		unhandled("x:(r)-,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1467: { // x:(r)-,x1 y:(rh)+n,b
+	case 1535: { // x:(r)-,x1 y:(rh)+n,b
 		unhandled("x:(r)-,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1468: { // x:(r)-,a y:(rh)+n,y0
+	case 1536: { // x:(r)-,a y:(rh)+n,y0
 		unhandled("x:(r)-,a y:(rh)+n,y0");
 		break;
 		}
-	case 1469: { // x:(r)-,a y:(rh)+n,y1
+	case 1537: { // x:(r)-,a y:(rh)+n,y1
 		unhandled("x:(r)-,a y:(rh)+n,y1");
 		break;
 		}
-	case 1470: { // x:(r)-,a y:(rh)+n,a
+	case 1538: { // x:(r)-,a y:(rh)+n,a
 		unhandled("x:(r)-,a y:(rh)+n,a");
 		break;
 		}
-	case 1471: { // x:(r)-,a y:(rh)+n,b
+	case 1539: { // x:(r)-,a y:(rh)+n,b
 		unhandled("x:(r)-,a y:(rh)+n,b");
 		break;
 		}
-	case 1472: { // x:(r)-,b y:(rh)+n,y0
+	case 1540: { // x:(r)-,b y:(rh)+n,y0
 		unhandled("x:(r)-,b y:(rh)+n,y0");
 		break;
 		}
-	case 1473: { // x:(r)-,b y:(rh)+n,y1
+	case 1541: { // x:(r)-,b y:(rh)+n,y1
 		unhandled("x:(r)-,b y:(rh)+n,y1");
 		break;
 		}
-	case 1474: { // x:(r)-,b y:(rh)+n,a
+	case 1542: { // x:(r)-,b y:(rh)+n,a
 		unhandled("x:(r)-,b y:(rh)+n,a");
 		break;
 		}
-	case 1475: { // x:(r)-,b y:(rh)+n,b
+	case 1543: { // x:(r)-,b y:(rh)+n,b
 		unhandled("x:(r)-,b y:(rh)+n,b");
 		break;
 		}
-	case 1476: { // x:(r)-,x0 y:(rh)-,y0
+	case 1544: { // x:(r)-,x0 y:(rh)-,y0
 		unhandled("x:(r)-,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1477: { // x:(r)-,x0 y:(rh)-,y1
+	case 1545: { // x:(r)-,x0 y:(rh)-,y1
 		unhandled("x:(r)-,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1478: { // x:(r)-,x0 y:(rh)-,a
+	case 1546: { // x:(r)-,x0 y:(rh)-,a
 		unhandled("x:(r)-,x0 y:(rh)-,a");
 		break;
 		}
-	case 1479: { // x:(r)-,x0 y:(rh)-,b
+	case 1547: { // x:(r)-,x0 y:(rh)-,b
 		unhandled("x:(r)-,x0 y:(rh)-,b");
 		break;
 		}
-	case 1480: { // x:(r)-,x1 y:(rh)-,y0
+	case 1548: { // x:(r)-,x1 y:(rh)-,y0
 		unhandled("x:(r)-,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1481: { // x:(r)-,x1 y:(rh)-,y1
+	case 1549: { // x:(r)-,x1 y:(rh)-,y1
 		unhandled("x:(r)-,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1482: { // x:(r)-,x1 y:(rh)-,a
+	case 1550: { // x:(r)-,x1 y:(rh)-,a
 		unhandled("x:(r)-,x1 y:(rh)-,a");
 		break;
 		}
-	case 1483: { // x:(r)-,x1 y:(rh)-,b
+	case 1551: { // x:(r)-,x1 y:(rh)-,b
 		unhandled("x:(r)-,x1 y:(rh)-,b");
 		break;
 		}
-	case 1484: { // x:(r)-,a y:(rh)-,y0
+	case 1552: { // x:(r)-,a y:(rh)-,y0
 		unhandled("x:(r)-,a y:(rh)-,y0");
 		break;
 		}
-	case 1485: { // x:(r)-,a y:(rh)-,y1
+	case 1553: { // x:(r)-,a y:(rh)-,y1
 		unhandled("x:(r)-,a y:(rh)-,y1");
 		break;
 		}
-	case 1486: { // x:(r)-,a y:(rh)-,a
+	case 1554: { // x:(r)-,a y:(rh)-,a
 		unhandled("x:(r)-,a y:(rh)-,a");
 		break;
 		}
-	case 1487: { // x:(r)-,a y:(rh)-,b
+	case 1555: { // x:(r)-,a y:(rh)-,b
 		unhandled("x:(r)-,a y:(rh)-,b");
 		break;
 		}
-	case 1488: { // x:(r)-,b y:(rh)-,y0
+	case 1556: { // x:(r)-,b y:(rh)-,y0
 		unhandled("x:(r)-,b y:(rh)-,y0");
 		break;
 		}
-	case 1489: { // x:(r)-,b y:(rh)-,y1
+	case 1557: { // x:(r)-,b y:(rh)-,y1
 		unhandled("x:(r)-,b y:(rh)-,y1");
 		break;
 		}
-	case 1490: { // x:(r)-,b y:(rh)-,a
+	case 1558: { // x:(r)-,b y:(rh)-,a
 		unhandled("x:(r)-,b y:(rh)-,a");
 		break;
 		}
-	case 1491: { // x:(r)-,b y:(rh)-,b
+	case 1559: { // x:(r)-,b y:(rh)-,b
 		unhandled("x:(r)-,b y:(rh)-,b");
 		break;
 		}
-	case 1492: { // x:(r)-,x0 y:(rh)+,y0
+	case 1560: { // x:(r)-,x0 y:(rh)+,y0
 		unhandled("x:(r)-,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1493: { // x:(r)-,x0 y:(rh)+,y1
+	case 1561: { // x:(r)-,x0 y:(rh)+,y1
 		unhandled("x:(r)-,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1494: { // x:(r)-,x0 y:(rh)+,a
+	case 1562: { // x:(r)-,x0 y:(rh)+,a
 		unhandled("x:(r)-,x0 y:(rh)+,a");
 		break;
 		}
-	case 1495: { // x:(r)-,x0 y:(rh)+,b
+	case 1563: { // x:(r)-,x0 y:(rh)+,b
 		unhandled("x:(r)-,x0 y:(rh)+,b");
 		break;
 		}
-	case 1496: { // x:(r)-,x1 y:(rh)+,y0
+	case 1564: { // x:(r)-,x1 y:(rh)+,y0
 		unhandled("x:(r)-,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1497: { // x:(r)-,x1 y:(rh)+,y1
+	case 1565: { // x:(r)-,x1 y:(rh)+,y1
 		unhandled("x:(r)-,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1498: { // x:(r)-,x1 y:(rh)+,a
+	case 1566: { // x:(r)-,x1 y:(rh)+,a
 		unhandled("x:(r)-,x1 y:(rh)+,a");
 		break;
 		}
-	case 1499: { // x:(r)-,x1 y:(rh)+,b
+	case 1567: { // x:(r)-,x1 y:(rh)+,b
 		unhandled("x:(r)-,x1 y:(rh)+,b");
 		break;
 		}
-	case 1500: { // x:(r)-,a y:(rh)+,y0
+	case 1568: { // x:(r)-,a y:(rh)+,y0
 		unhandled("x:(r)-,a y:(rh)+,y0");
 		break;
 		}
-	case 1501: { // x:(r)-,a y:(rh)+,y1
+	case 1569: { // x:(r)-,a y:(rh)+,y1
 		unhandled("x:(r)-,a y:(rh)+,y1");
 		break;
 		}
-	case 1502: { // x:(r)-,a y:(rh)+,a
+	case 1570: { // x:(r)-,a y:(rh)+,a
 		unhandled("x:(r)-,a y:(rh)+,a");
 		break;
 		}
-	case 1503: { // x:(r)-,a y:(rh)+,b
+	case 1571: { // x:(r)-,a y:(rh)+,b
 		unhandled("x:(r)-,a y:(rh)+,b");
 		break;
 		}
-	case 1504: { // x:(r)-,b y:(rh)+,y0
+	case 1572: { // x:(r)-,b y:(rh)+,y0
 		unhandled("x:(r)-,b y:(rh)+,y0");
 		break;
 		}
-	case 1505: { // x:(r)-,b y:(rh)+,y1
+	case 1573: { // x:(r)-,b y:(rh)+,y1
 		unhandled("x:(r)-,b y:(rh)+,y1");
 		break;
 		}
-	case 1506: { // x:(r)-,b y:(rh)+,a
+	case 1574: { // x:(r)-,b y:(rh)+,a
 		unhandled("x:(r)-,b y:(rh)+,a");
 		break;
 		}
-	case 1507: { // x:(r)-,b y:(rh)+,b
+	case 1575: { // x:(r)-,b y:(rh)+,b
 		unhandled("x:(r)-,b y:(rh)+,b");
 		break;
 		}
-	case 1508: { // x:(r)-,x0 y:(rh),y0
+	case 1576: { // x:(r)-,x0 y:(rh),y0
 		unhandled("x:(r)-,x0 y:(rh),y0");
 		break;
 		}
-	case 1509: { // x:(r)-,x0 y:(rh),y1
+	case 1577: { // x:(r)-,x0 y:(rh),y1
 		unhandled("x:(r)-,x0 y:(rh),y1");
 		break;
 		}
-	case 1510: { // x:(r)-,x0 y:(rh),a
+	case 1578: { // x:(r)-,x0 y:(rh),a
 		unhandled("x:(r)-,x0 y:(rh),a");
 		break;
 		}
-	case 1511: { // x:(r)-,x0 y:(rh),b
+	case 1579: { // x:(r)-,x0 y:(rh),b
 		unhandled("x:(r)-,x0 y:(rh),b");
 		break;
 		}
-	case 1512: { // x:(r)-,x1 y:(rh),y0
+	case 1580: { // x:(r)-,x1 y:(rh),y0
 		unhandled("x:(r)-,x1 y:(rh),y0");
 		break;
 		}
-	case 1513: { // x:(r)-,x1 y:(rh),y1
+	case 1581: { // x:(r)-,x1 y:(rh),y1
 		unhandled("x:(r)-,x1 y:(rh),y1");
 		break;
 		}
-	case 1514: { // x:(r)-,x1 y:(rh),a
+	case 1582: { // x:(r)-,x1 y:(rh),a
 		unhandled("x:(r)-,x1 y:(rh),a");
 		break;
 		}
-	case 1515: { // x:(r)-,x1 y:(rh),b
+	case 1583: { // x:(r)-,x1 y:(rh),b
 		unhandled("x:(r)-,x1 y:(rh),b");
 		break;
 		}
-	case 1516: { // x:(r)-,a y:(rh),y0
+	case 1584: { // x:(r)-,a y:(rh),y0
 		unhandled("x:(r)-,a y:(rh),y0");
 		break;
 		}
-	case 1517: { // x:(r)-,a y:(rh),y1
+	case 1585: { // x:(r)-,a y:(rh),y1
 		unhandled("x:(r)-,a y:(rh),y1");
 		break;
 		}
-	case 1518: { // x:(r)-,a y:(rh),a
+	case 1586: { // x:(r)-,a y:(rh),a
 		unhandled("x:(r)-,a y:(rh),a");
 		break;
 		}
-	case 1519: { // x:(r)-,a y:(rh),b
+	case 1587: { // x:(r)-,a y:(rh),b
 		unhandled("x:(r)-,a y:(rh),b");
 		break;
 		}
-	case 1520: { // x:(r)-,b y:(rh),y0
+	case 1588: { // x:(r)-,b y:(rh),y0
 		unhandled("x:(r)-,b y:(rh),y0");
 		break;
 		}
-	case 1521: { // x:(r)-,b y:(rh),y1
+	case 1589: { // x:(r)-,b y:(rh),y1
 		unhandled("x:(r)-,b y:(rh),y1");
 		break;
 		}
-	case 1522: { // x:(r)-,b y:(rh),a
+	case 1590: { // x:(r)-,b y:(rh),a
 		unhandled("x:(r)-,b y:(rh),a");
 		break;
 		}
-	case 1523: { // x:(r)-,b y:(rh),b
+	case 1591: { // x:(r)-,b y:(rh),b
 		unhandled("x:(r)-,b y:(rh),b");
 		break;
 		}
-	case 1524: { // x:(r)+,x0 y:(rh)+n,y0
+	case 1592: { // x:(r)+,x0 y:(rh)+n,y0
 		unhandled("x:(r)+,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1525: { // x:(r)+,x0 y:(rh)+n,y1
+	case 1593: { // x:(r)+,x0 y:(rh)+n,y1
 		unhandled("x:(r)+,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1526: { // x:(r)+,x0 y:(rh)+n,a
+	case 1594: { // x:(r)+,x0 y:(rh)+n,a
 		unhandled("x:(r)+,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1527: { // x:(r)+,x0 y:(rh)+n,b
+	case 1595: { // x:(r)+,x0 y:(rh)+n,b
 		unhandled("x:(r)+,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1528: { // x:(r)+,x1 y:(rh)+n,y0
+	case 1596: { // x:(r)+,x1 y:(rh)+n,y0
 		unhandled("x:(r)+,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1529: { // x:(r)+,x1 y:(rh)+n,y1
+	case 1597: { // x:(r)+,x1 y:(rh)+n,y1
 		unhandled("x:(r)+,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1530: { // x:(r)+,x1 y:(rh)+n,a
+	case 1598: { // x:(r)+,x1 y:(rh)+n,a
 		unhandled("x:(r)+,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1531: { // x:(r)+,x1 y:(rh)+n,b
+	case 1599: { // x:(r)+,x1 y:(rh)+n,b
 		unhandled("x:(r)+,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1532: { // x:(r)+,a y:(rh)+n,y0
+	case 1600: { // x:(r)+,a y:(rh)+n,y0
 		unhandled("x:(r)+,a y:(rh)+n,y0");
 		break;
 		}
-	case 1533: { // x:(r)+,a y:(rh)+n,y1
+	case 1601: { // x:(r)+,a y:(rh)+n,y1
 		unhandled("x:(r)+,a y:(rh)+n,y1");
 		break;
 		}
-	case 1534: { // x:(r)+,a y:(rh)+n,a
+	case 1602: { // x:(r)+,a y:(rh)+n,a
 		unhandled("x:(r)+,a y:(rh)+n,a");
 		break;
 		}
-	case 1535: { // x:(r)+,a y:(rh)+n,b
+	case 1603: { // x:(r)+,a y:(rh)+n,b
 		unhandled("x:(r)+,a y:(rh)+n,b");
 		break;
 		}
-	case 1536: { // x:(r)+,b y:(rh)+n,y0
+	case 1604: { // x:(r)+,b y:(rh)+n,y0
 		unhandled("x:(r)+,b y:(rh)+n,y0");
 		break;
 		}
-	case 1537: { // x:(r)+,b y:(rh)+n,y1
+	case 1605: { // x:(r)+,b y:(rh)+n,y1
 		unhandled("x:(r)+,b y:(rh)+n,y1");
 		break;
 		}
-	case 1538: { // x:(r)+,b y:(rh)+n,a
+	case 1606: { // x:(r)+,b y:(rh)+n,a
 		unhandled("x:(r)+,b y:(rh)+n,a");
 		break;
 		}
-	case 1539: { // x:(r)+,b y:(rh)+n,b
+	case 1607: { // x:(r)+,b y:(rh)+n,b
 		unhandled("x:(r)+,b y:(rh)+n,b");
 		break;
 		}
-	case 1540: { // x:(r)+,x0 y:(rh)-,y0
+	case 1608: { // x:(r)+,x0 y:(rh)-,y0
 		unhandled("x:(r)+,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1541: { // x:(r)+,x0 y:(rh)-,y1
+	case 1609: { // x:(r)+,x0 y:(rh)-,y1
 		unhandled("x:(r)+,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1542: { // x:(r)+,x0 y:(rh)-,a
+	case 1610: { // x:(r)+,x0 y:(rh)-,a
 		unhandled("x:(r)+,x0 y:(rh)-,a");
 		break;
 		}
-	case 1543: { // x:(r)+,x0 y:(rh)-,b
+	case 1611: { // x:(r)+,x0 y:(rh)-,b
 		unhandled("x:(r)+,x0 y:(rh)-,b");
 		break;
 		}
-	case 1544: { // x:(r)+,x1 y:(rh)-,y0
+	case 1612: { // x:(r)+,x1 y:(rh)-,y0
 		unhandled("x:(r)+,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1545: { // x:(r)+,x1 y:(rh)-,y1
+	case 1613: { // x:(r)+,x1 y:(rh)-,y1
 		unhandled("x:(r)+,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1546: { // x:(r)+,x1 y:(rh)-,a
+	case 1614: { // x:(r)+,x1 y:(rh)-,a
 		unhandled("x:(r)+,x1 y:(rh)-,a");
 		break;
 		}
-	case 1547: { // x:(r)+,x1 y:(rh)-,b
+	case 1615: { // x:(r)+,x1 y:(rh)-,b
 		unhandled("x:(r)+,x1 y:(rh)-,b");
 		break;
 		}
-	case 1548: { // x:(r)+,a y:(rh)-,y0
+	case 1616: { // x:(r)+,a y:(rh)-,y0
 		unhandled("x:(r)+,a y:(rh)-,y0");
 		break;
 		}
-	case 1549: { // x:(r)+,a y:(rh)-,y1
+	case 1617: { // x:(r)+,a y:(rh)-,y1
 		unhandled("x:(r)+,a y:(rh)-,y1");
 		break;
 		}
-	case 1550: { // x:(r)+,a y:(rh)-,a
+	case 1618: { // x:(r)+,a y:(rh)-,a
 		unhandled("x:(r)+,a y:(rh)-,a");
 		break;
 		}
-	case 1551: { // x:(r)+,a y:(rh)-,b
+	case 1619: { // x:(r)+,a y:(rh)-,b
 		unhandled("x:(r)+,a y:(rh)-,b");
 		break;
 		}
-	case 1552: { // x:(r)+,b y:(rh)-,y0
+	case 1620: { // x:(r)+,b y:(rh)-,y0
 		unhandled("x:(r)+,b y:(rh)-,y0");
 		break;
 		}
-	case 1553: { // x:(r)+,b y:(rh)-,y1
+	case 1621: { // x:(r)+,b y:(rh)-,y1
 		unhandled("x:(r)+,b y:(rh)-,y1");
 		break;
 		}
-	case 1554: { // x:(r)+,b y:(rh)-,a
+	case 1622: { // x:(r)+,b y:(rh)-,a
 		unhandled("x:(r)+,b y:(rh)-,a");
 		break;
 		}
-	case 1555: { // x:(r)+,b y:(rh)-,b
+	case 1623: { // x:(r)+,b y:(rh)-,b
 		unhandled("x:(r)+,b y:(rh)-,b");
 		break;
 		}
-	case 1556: { // x:(r)+,x0 y:(rh)+,y0
+	case 1624: { // x:(r)+,x0 y:(rh)+,y0
 		unhandled("x:(r)+,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1557: { // x:(r)+,x0 y:(rh)+,y1
+	case 1625: { // x:(r)+,x0 y:(rh)+,y1
 		unhandled("x:(r)+,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1558: { // x:(r)+,x0 y:(rh)+,a
+	case 1626: { // x:(r)+,x0 y:(rh)+,a
 		unhandled("x:(r)+,x0 y:(rh)+,a");
 		break;
 		}
-	case 1559: { // x:(r)+,x0 y:(rh)+,b
+	case 1627: { // x:(r)+,x0 y:(rh)+,b
 		unhandled("x:(r)+,x0 y:(rh)+,b");
 		break;
 		}
-	case 1560: { // x:(r)+,x1 y:(rh)+,y0
+	case 1628: { // x:(r)+,x1 y:(rh)+,y0
 		unhandled("x:(r)+,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1561: { // x:(r)+,x1 y:(rh)+,y1
+	case 1629: { // x:(r)+,x1 y:(rh)+,y1
 		unhandled("x:(r)+,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1562: { // x:(r)+,x1 y:(rh)+,a
+	case 1630: { // x:(r)+,x1 y:(rh)+,a
 		unhandled("x:(r)+,x1 y:(rh)+,a");
 		break;
 		}
-	case 1563: { // x:(r)+,x1 y:(rh)+,b
+	case 1631: { // x:(r)+,x1 y:(rh)+,b
 		unhandled("x:(r)+,x1 y:(rh)+,b");
 		break;
 		}
-	case 1564: { // x:(r)+,a y:(rh)+,y0
+	case 1632: { // x:(r)+,a y:(rh)+,y0
 		unhandled("x:(r)+,a y:(rh)+,y0");
 		break;
 		}
-	case 1565: { // x:(r)+,a y:(rh)+,y1
+	case 1633: { // x:(r)+,a y:(rh)+,y1
 		unhandled("x:(r)+,a y:(rh)+,y1");
 		break;
 		}
-	case 1566: { // x:(r)+,a y:(rh)+,a
+	case 1634: { // x:(r)+,a y:(rh)+,a
 		unhandled("x:(r)+,a y:(rh)+,a");
 		break;
 		}
-	case 1567: { // x:(r)+,a y:(rh)+,b
+	case 1635: { // x:(r)+,a y:(rh)+,b
 		unhandled("x:(r)+,a y:(rh)+,b");
 		break;
 		}
-	case 1568: { // x:(r)+,b y:(rh)+,y0
+	case 1636: { // x:(r)+,b y:(rh)+,y0
 		unhandled("x:(r)+,b y:(rh)+,y0");
 		break;
 		}
-	case 1569: { // x:(r)+,b y:(rh)+,y1
+	case 1637: { // x:(r)+,b y:(rh)+,y1
 		unhandled("x:(r)+,b y:(rh)+,y1");
 		break;
 		}
-	case 1570: { // x:(r)+,b y:(rh)+,a
+	case 1638: { // x:(r)+,b y:(rh)+,a
 		unhandled("x:(r)+,b y:(rh)+,a");
 		break;
 		}
-	case 1571: { // x:(r)+,b y:(rh)+,b
+	case 1639: { // x:(r)+,b y:(rh)+,b
 		unhandled("x:(r)+,b y:(rh)+,b");
 		break;
 		}
-	case 1572: { // x:(r)+,x0 y:(rh),y0
+	case 1640: { // x:(r)+,x0 y:(rh),y0
 		unhandled("x:(r)+,x0 y:(rh),y0");
 		break;
 		}
-	case 1573: { // x:(r)+,x0 y:(rh),y1
+	case 1641: { // x:(r)+,x0 y:(rh),y1
 		unhandled("x:(r)+,x0 y:(rh),y1");
 		break;
 		}
-	case 1574: { // x:(r)+,x0 y:(rh),a
+	case 1642: { // x:(r)+,x0 y:(rh),a
 		unhandled("x:(r)+,x0 y:(rh),a");
 		break;
 		}
-	case 1575: { // x:(r)+,x0 y:(rh),b
+	case 1643: { // x:(r)+,x0 y:(rh),b
 		unhandled("x:(r)+,x0 y:(rh),b");
 		break;
 		}
-	case 1576: { // x:(r)+,x1 y:(rh),y0
+	case 1644: { // x:(r)+,x1 y:(rh),y0
 		unhandled("x:(r)+,x1 y:(rh),y0");
 		break;
 		}
-	case 1577: { // x:(r)+,x1 y:(rh),y1
+	case 1645: { // x:(r)+,x1 y:(rh),y1
 		unhandled("x:(r)+,x1 y:(rh),y1");
 		break;
 		}
-	case 1578: { // x:(r)+,x1 y:(rh),a
+	case 1646: { // x:(r)+,x1 y:(rh),a
 		unhandled("x:(r)+,x1 y:(rh),a");
 		break;
 		}
-	case 1579: { // x:(r)+,x1 y:(rh),b
+	case 1647: { // x:(r)+,x1 y:(rh),b
 		unhandled("x:(r)+,x1 y:(rh),b");
 		break;
 		}
-	case 1580: { // x:(r)+,a y:(rh),y0
+	case 1648: { // x:(r)+,a y:(rh),y0
 		unhandled("x:(r)+,a y:(rh),y0");
 		break;
 		}
-	case 1581: { // x:(r)+,a y:(rh),y1
+	case 1649: { // x:(r)+,a y:(rh),y1
 		unhandled("x:(r)+,a y:(rh),y1");
 		break;
 		}
-	case 1582: { // x:(r)+,a y:(rh),a
+	case 1650: { // x:(r)+,a y:(rh),a
 		unhandled("x:(r)+,a y:(rh),a");
 		break;
 		}
-	case 1583: { // x:(r)+,a y:(rh),b
+	case 1651: { // x:(r)+,a y:(rh),b
 		unhandled("x:(r)+,a y:(rh),b");
 		break;
 		}
-	case 1584: { // x:(r)+,b y:(rh),y0
+	case 1652: { // x:(r)+,b y:(rh),y0
 		unhandled("x:(r)+,b y:(rh),y0");
 		break;
 		}
-	case 1585: { // x:(r)+,b y:(rh),y1
+	case 1653: { // x:(r)+,b y:(rh),y1
 		unhandled("x:(r)+,b y:(rh),y1");
 		break;
 		}
-	case 1586: { // x:(r)+,b y:(rh),a
+	case 1654: { // x:(r)+,b y:(rh),a
 		unhandled("x:(r)+,b y:(rh),a");
 		break;
 		}
-	case 1587: { // x:(r)+,b y:(rh),b
+	case 1655: { // x:(r)+,b y:(rh),b
 		unhandled("x:(r)+,b y:(rh),b");
 		break;
 		}
-	case 1588: { // x:(r),x0 y:(rh)+n,y0
+	case 1656: { // x:(r),x0 y:(rh)+n,y0
 		unhandled("x:(r),x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1589: { // x:(r),x0 y:(rh)+n,y1
+	case 1657: { // x:(r),x0 y:(rh)+n,y1
 		unhandled("x:(r),x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1590: { // x:(r),x0 y:(rh)+n,a
+	case 1658: { // x:(r),x0 y:(rh)+n,a
 		unhandled("x:(r),x0 y:(rh)+n,a");
 		break;
 		}
-	case 1591: { // x:(r),x0 y:(rh)+n,b
+	case 1659: { // x:(r),x0 y:(rh)+n,b
 		unhandled("x:(r),x0 y:(rh)+n,b");
 		break;
 		}
-	case 1592: { // x:(r),x1 y:(rh)+n,y0
+	case 1660: { // x:(r),x1 y:(rh)+n,y0
 		unhandled("x:(r),x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1593: { // x:(r),x1 y:(rh)+n,y1
+	case 1661: { // x:(r),x1 y:(rh)+n,y1
 		unhandled("x:(r),x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1594: { // x:(r),x1 y:(rh)+n,a
+	case 1662: { // x:(r),x1 y:(rh)+n,a
 		unhandled("x:(r),x1 y:(rh)+n,a");
 		break;
 		}
-	case 1595: { // x:(r),x1 y:(rh)+n,b
+	case 1663: { // x:(r),x1 y:(rh)+n,b
 		unhandled("x:(r),x1 y:(rh)+n,b");
 		break;
 		}
-	case 1596: { // x:(r),a y:(rh)+n,y0
+	case 1664: { // x:(r),a y:(rh)+n,y0
 		unhandled("x:(r),a y:(rh)+n,y0");
 		break;
 		}
-	case 1597: { // x:(r),a y:(rh)+n,y1
+	case 1665: { // x:(r),a y:(rh)+n,y1
 		unhandled("x:(r),a y:(rh)+n,y1");
 		break;
 		}
-	case 1598: { // x:(r),a y:(rh)+n,a
+	case 1666: { // x:(r),a y:(rh)+n,a
 		unhandled("x:(r),a y:(rh)+n,a");
 		break;
 		}
-	case 1599: { // x:(r),a y:(rh)+n,b
+	case 1667: { // x:(r),a y:(rh)+n,b
 		unhandled("x:(r),a y:(rh)+n,b");
 		break;
 		}
-	case 1600: { // x:(r),b y:(rh)+n,y0
+	case 1668: { // x:(r),b y:(rh)+n,y0
 		unhandled("x:(r),b y:(rh)+n,y0");
 		break;
 		}
-	case 1601: { // x:(r),b y:(rh)+n,y1
+	case 1669: { // x:(r),b y:(rh)+n,y1
 		unhandled("x:(r),b y:(rh)+n,y1");
 		break;
 		}
-	case 1602: { // x:(r),b y:(rh)+n,a
+	case 1670: { // x:(r),b y:(rh)+n,a
 		unhandled("x:(r),b y:(rh)+n,a");
 		break;
 		}
-	case 1603: { // x:(r),b y:(rh)+n,b
+	case 1671: { // x:(r),b y:(rh)+n,b
 		unhandled("x:(r),b y:(rh)+n,b");
 		break;
 		}
-	case 1604: { // x:(r),x0 y:(rh)-,y0
+	case 1672: { // x:(r),x0 y:(rh)-,y0
 		unhandled("x:(r),x0 y:(rh)-,y0");
 		break;
 		}
-	case 1605: { // x:(r),x0 y:(rh)-,y1
+	case 1673: { // x:(r),x0 y:(rh)-,y1
 		unhandled("x:(r),x0 y:(rh)-,y1");
 		break;
 		}
-	case 1606: { // x:(r),x0 y:(rh)-,a
+	case 1674: { // x:(r),x0 y:(rh)-,a
 		unhandled("x:(r),x0 y:(rh)-,a");
 		break;
 		}
-	case 1607: { // x:(r),x0 y:(rh)-,b
+	case 1675: { // x:(r),x0 y:(rh)-,b
 		unhandled("x:(r),x0 y:(rh)-,b");
 		break;
 		}
-	case 1608: { // x:(r),x1 y:(rh)-,y0
+	case 1676: { // x:(r),x1 y:(rh)-,y0
 		unhandled("x:(r),x1 y:(rh)-,y0");
 		break;
 		}
-	case 1609: { // x:(r),x1 y:(rh)-,y1
+	case 1677: { // x:(r),x1 y:(rh)-,y1
 		unhandled("x:(r),x1 y:(rh)-,y1");
 		break;
 		}
-	case 1610: { // x:(r),x1 y:(rh)-,a
+	case 1678: { // x:(r),x1 y:(rh)-,a
 		unhandled("x:(r),x1 y:(rh)-,a");
 		break;
 		}
-	case 1611: { // x:(r),x1 y:(rh)-,b
+	case 1679: { // x:(r),x1 y:(rh)-,b
 		unhandled("x:(r),x1 y:(rh)-,b");
 		break;
 		}
-	case 1612: { // x:(r),a y:(rh)-,y0
+	case 1680: { // x:(r),a y:(rh)-,y0
 		unhandled("x:(r),a y:(rh)-,y0");
 		break;
 		}
-	case 1613: { // x:(r),a y:(rh)-,y1
+	case 1681: { // x:(r),a y:(rh)-,y1
 		unhandled("x:(r),a y:(rh)-,y1");
 		break;
 		}
-	case 1614: { // x:(r),a y:(rh)-,a
+	case 1682: { // x:(r),a y:(rh)-,a
 		unhandled("x:(r),a y:(rh)-,a");
 		break;
 		}
-	case 1615: { // x:(r),a y:(rh)-,b
+	case 1683: { // x:(r),a y:(rh)-,b
 		unhandled("x:(r),a y:(rh)-,b");
 		break;
 		}
-	case 1616: { // x:(r),b y:(rh)-,y0
+	case 1684: { // x:(r),b y:(rh)-,y0
 		unhandled("x:(r),b y:(rh)-,y0");
 		break;
 		}
-	case 1617: { // x:(r),b y:(rh)-,y1
+	case 1685: { // x:(r),b y:(rh)-,y1
 		unhandled("x:(r),b y:(rh)-,y1");
 		break;
 		}
-	case 1618: { // x:(r),b y:(rh)-,a
+	case 1686: { // x:(r),b y:(rh)-,a
 		unhandled("x:(r),b y:(rh)-,a");
 		break;
 		}
-	case 1619: { // x:(r),b y:(rh)-,b
+	case 1687: { // x:(r),b y:(rh)-,b
 		unhandled("x:(r),b y:(rh)-,b");
 		break;
 		}
-	case 1620: { // x:(r),x0 y:(rh)+,y0
+	case 1688: { // x:(r),x0 y:(rh)+,y0
 		unhandled("x:(r),x0 y:(rh)+,y0");
 		break;
 		}
-	case 1621: { // x:(r),x0 y:(rh)+,y1
+	case 1689: { // x:(r),x0 y:(rh)+,y1
 		unhandled("x:(r),x0 y:(rh)+,y1");
 		break;
 		}
-	case 1622: { // x:(r),x0 y:(rh)+,a
+	case 1690: { // x:(r),x0 y:(rh)+,a
 		unhandled("x:(r),x0 y:(rh)+,a");
 		break;
 		}
-	case 1623: { // x:(r),x0 y:(rh)+,b
+	case 1691: { // x:(r),x0 y:(rh)+,b
 		unhandled("x:(r),x0 y:(rh)+,b");
 		break;
 		}
-	case 1624: { // x:(r),x1 y:(rh)+,y0
+	case 1692: { // x:(r),x1 y:(rh)+,y0
 		unhandled("x:(r),x1 y:(rh)+,y0");
 		break;
 		}
-	case 1625: { // x:(r),x1 y:(rh)+,y1
+	case 1693: { // x:(r),x1 y:(rh)+,y1
 		unhandled("x:(r),x1 y:(rh)+,y1");
 		break;
 		}
-	case 1626: { // x:(r),x1 y:(rh)+,a
+	case 1694: { // x:(r),x1 y:(rh)+,a
 		unhandled("x:(r),x1 y:(rh)+,a");
 		break;
 		}
-	case 1627: { // x:(r),x1 y:(rh)+,b
+	case 1695: { // x:(r),x1 y:(rh)+,b
 		unhandled("x:(r),x1 y:(rh)+,b");
 		break;
 		}
-	case 1628: { // x:(r),a y:(rh)+,y0
+	case 1696: { // x:(r),a y:(rh)+,y0
 		unhandled("x:(r),a y:(rh)+,y0");
 		break;
 		}
-	case 1629: { // x:(r),a y:(rh)+,y1
+	case 1697: { // x:(r),a y:(rh)+,y1
 		unhandled("x:(r),a y:(rh)+,y1");
 		break;
 		}
-	case 1630: { // x:(r),a y:(rh)+,a
+	case 1698: { // x:(r),a y:(rh)+,a
 		unhandled("x:(r),a y:(rh)+,a");
 		break;
 		}
-	case 1631: { // x:(r),a y:(rh)+,b
+	case 1699: { // x:(r),a y:(rh)+,b
 		unhandled("x:(r),a y:(rh)+,b");
 		break;
 		}
-	case 1632: { // x:(r),b y:(rh)+,y0
+	case 1700: { // x:(r),b y:(rh)+,y0
 		unhandled("x:(r),b y:(rh)+,y0");
 		break;
 		}
-	case 1633: { // x:(r),b y:(rh)+,y1
+	case 1701: { // x:(r),b y:(rh)+,y1
 		unhandled("x:(r),b y:(rh)+,y1");
 		break;
 		}
-	case 1634: { // x:(r),b y:(rh)+,a
+	case 1702: { // x:(r),b y:(rh)+,a
 		unhandled("x:(r),b y:(rh)+,a");
 		break;
 		}
-	case 1635: { // x:(r),b y:(rh)+,b
+	case 1703: { // x:(r),b y:(rh)+,b
 		unhandled("x:(r),b y:(rh)+,b");
 		break;
 		}
-	case 1636: { // x:(r),x0 y:(rh),y0
+	case 1704: { // x:(r),x0 y:(rh),y0
 		unhandled("x:(r),x0 y:(rh),y0");
 		break;
 		}
-	case 1637: { // x:(r),x0 y:(rh),y1
+	case 1705: { // x:(r),x0 y:(rh),y1
 		unhandled("x:(r),x0 y:(rh),y1");
 		break;
 		}
-	case 1638: { // x:(r),x0 y:(rh),a
+	case 1706: { // x:(r),x0 y:(rh),a
 		unhandled("x:(r),x0 y:(rh),a");
 		break;
 		}
-	case 1639: { // x:(r),x0 y:(rh),b
+	case 1707: { // x:(r),x0 y:(rh),b
 		unhandled("x:(r),x0 y:(rh),b");
 		break;
 		}
-	case 1640: { // x:(r),x1 y:(rh),y0
+	case 1708: { // x:(r),x1 y:(rh),y0
 		unhandled("x:(r),x1 y:(rh),y0");
 		break;
 		}
-	case 1641: { // x:(r),x1 y:(rh),y1
+	case 1709: { // x:(r),x1 y:(rh),y1
 		unhandled("x:(r),x1 y:(rh),y1");
 		break;
 		}
-	case 1642: { // x:(r),x1 y:(rh),a
+	case 1710: { // x:(r),x1 y:(rh),a
 		unhandled("x:(r),x1 y:(rh),a");
 		break;
 		}
-	case 1643: { // x:(r),x1 y:(rh),b
+	case 1711: { // x:(r),x1 y:(rh),b
 		unhandled("x:(r),x1 y:(rh),b");
 		break;
 		}
-	case 1644: { // x:(r),a y:(rh),y0
+	case 1712: { // x:(r),a y:(rh),y0
 		unhandled("x:(r),a y:(rh),y0");
 		break;
 		}
-	case 1645: { // x:(r),a y:(rh),y1
+	case 1713: { // x:(r),a y:(rh),y1
 		unhandled("x:(r),a y:(rh),y1");
 		break;
 		}
-	case 1646: { // x:(r),a y:(rh),a
+	case 1714: { // x:(r),a y:(rh),a
 		unhandled("x:(r),a y:(rh),a");
 		break;
 		}
-	case 1647: { // x:(r),a y:(rh),b
+	case 1715: { // x:(r),a y:(rh),b
 		unhandled("x:(r),a y:(rh),b");
 		break;
 		}
-	case 1648: { // x:(r),b y:(rh),y0
+	case 1716: { // x:(r),b y:(rh),y0
 		unhandled("x:(r),b y:(rh),y0");
 		break;
 		}
-	case 1649: { // x:(r),b y:(rh),y1
+	case 1717: { // x:(r),b y:(rh),y1
 		unhandled("x:(r),b y:(rh),y1");
 		break;
 		}
-	case 1650: { // x:(r),b y:(rh),a
+	case 1718: { // x:(r),b y:(rh),a
 		unhandled("x:(r),b y:(rh),a");
 		break;
 		}
-	case 1651: { // x:(r),b y:(rh),b
+	case 1719: { // x:(r),b y:(rh),b
 		unhandled("x:(r),b y:(rh),b");
 		break;
 		}
-	case 1652: { // x:(r)+n,x0 y0,y:(rh)+n
+	case 1720: { // x:(r)+n,x0 y0,y:(rh)+n
 		unhandled("x:(r)+n,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1653: { // x:(r)+n,x0 y1,y:(rh)+n
+	case 1721: { // x:(r)+n,x0 y1,y:(rh)+n
 		unhandled("x:(r)+n,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1654: { // x:(r)+n,x0 a,y:(rh)+n
+	case 1722: { // x:(r)+n,x0 a,y:(rh)+n
 		unhandled("x:(r)+n,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1655: { // x:(r)+n,x0 b,y:(rh)+n
+	case 1723: { // x:(r)+n,x0 b,y:(rh)+n
 		unhandled("x:(r)+n,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1656: { // x:(r)+n,x1 y0,y:(rh)+n
+	case 1724: { // x:(r)+n,x1 y0,y:(rh)+n
 		unhandled("x:(r)+n,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1657: { // x:(r)+n,x1 y1,y:(rh)+n
+	case 1725: { // x:(r)+n,x1 y1,y:(rh)+n
 		unhandled("x:(r)+n,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1658: { // x:(r)+n,x1 a,y:(rh)+n
+	case 1726: { // x:(r)+n,x1 a,y:(rh)+n
 		unhandled("x:(r)+n,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1659: { // x:(r)+n,x1 b,y:(rh)+n
+	case 1727: { // x:(r)+n,x1 b,y:(rh)+n
 		unhandled("x:(r)+n,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1660: { // x:(r)+n,a y0,y:(rh)+n
+	case 1728: { // x:(r)+n,a y0,y:(rh)+n
 		unhandled("x:(r)+n,a y0,y:(rh)+n");
 		break;
 		}
-	case 1661: { // x:(r)+n,a y1,y:(rh)+n
+	case 1729: { // x:(r)+n,a y1,y:(rh)+n
 		unhandled("x:(r)+n,a y1,y:(rh)+n");
 		break;
 		}
-	case 1662: { // x:(r)+n,a a,y:(rh)+n
+	case 1730: { // x:(r)+n,a a,y:(rh)+n
 		unhandled("x:(r)+n,a a,y:(rh)+n");
 		break;
 		}
-	case 1663: { // x:(r)+n,a b,y:(rh)+n
+	case 1731: { // x:(r)+n,a b,y:(rh)+n
 		unhandled("x:(r)+n,a b,y:(rh)+n");
 		break;
 		}
-	case 1664: { // x:(r)+n,b y0,y:(rh)+n
+	case 1732: { // x:(r)+n,b y0,y:(rh)+n
 		unhandled("x:(r)+n,b y0,y:(rh)+n");
 		break;
 		}
-	case 1665: { // x:(r)+n,b y1,y:(rh)+n
+	case 1733: { // x:(r)+n,b y1,y:(rh)+n
 		unhandled("x:(r)+n,b y1,y:(rh)+n");
 		break;
 		}
-	case 1666: { // x:(r)+n,b a,y:(rh)+n
+	case 1734: { // x:(r)+n,b a,y:(rh)+n
 		unhandled("x:(r)+n,b a,y:(rh)+n");
 		break;
 		}
-	case 1667: { // x:(r)+n,b b,y:(rh)+n
+	case 1735: { // x:(r)+n,b b,y:(rh)+n
 		unhandled("x:(r)+n,b b,y:(rh)+n");
 		break;
 		}
-	case 1668: { // x:(r)+n,x0 y0,y:(rh)-
+	case 1736: { // x:(r)+n,x0 y0,y:(rh)-
 		unhandled("x:(r)+n,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1669: { // x:(r)+n,x0 y1,y:(rh)-
+	case 1737: { // x:(r)+n,x0 y1,y:(rh)-
 		unhandled("x:(r)+n,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1670: { // x:(r)+n,x0 a,y:(rh)-
+	case 1738: { // x:(r)+n,x0 a,y:(rh)-
 		unhandled("x:(r)+n,x0 a,y:(rh)-");
 		break;
 		}
-	case 1671: { // x:(r)+n,x0 b,y:(rh)-
+	case 1739: { // x:(r)+n,x0 b,y:(rh)-
 		unhandled("x:(r)+n,x0 b,y:(rh)-");
 		break;
 		}
-	case 1672: { // x:(r)+n,x1 y0,y:(rh)-
+	case 1740: { // x:(r)+n,x1 y0,y:(rh)-
 		unhandled("x:(r)+n,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1673: { // x:(r)+n,x1 y1,y:(rh)-
+	case 1741: { // x:(r)+n,x1 y1,y:(rh)-
 		unhandled("x:(r)+n,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1674: { // x:(r)+n,x1 a,y:(rh)-
+	case 1742: { // x:(r)+n,x1 a,y:(rh)-
 		unhandled("x:(r)+n,x1 a,y:(rh)-");
 		break;
 		}
-	case 1675: { // x:(r)+n,x1 b,y:(rh)-
+	case 1743: { // x:(r)+n,x1 b,y:(rh)-
 		unhandled("x:(r)+n,x1 b,y:(rh)-");
 		break;
 		}
-	case 1676: { // x:(r)+n,a y0,y:(rh)-
+	case 1744: { // x:(r)+n,a y0,y:(rh)-
 		unhandled("x:(r)+n,a y0,y:(rh)-");
 		break;
 		}
-	case 1677: { // x:(r)+n,a y1,y:(rh)-
+	case 1745: { // x:(r)+n,a y1,y:(rh)-
 		unhandled("x:(r)+n,a y1,y:(rh)-");
 		break;
 		}
-	case 1678: { // x:(r)+n,a a,y:(rh)-
+	case 1746: { // x:(r)+n,a a,y:(rh)-
 		unhandled("x:(r)+n,a a,y:(rh)-");
 		break;
 		}
-	case 1679: { // x:(r)+n,a b,y:(rh)-
+	case 1747: { // x:(r)+n,a b,y:(rh)-
 		unhandled("x:(r)+n,a b,y:(rh)-");
 		break;
 		}
-	case 1680: { // x:(r)+n,b y0,y:(rh)-
+	case 1748: { // x:(r)+n,b y0,y:(rh)-
 		unhandled("x:(r)+n,b y0,y:(rh)-");
 		break;
 		}
-	case 1681: { // x:(r)+n,b y1,y:(rh)-
+	case 1749: { // x:(r)+n,b y1,y:(rh)-
 		unhandled("x:(r)+n,b y1,y:(rh)-");
 		break;
 		}
-	case 1682: { // x:(r)+n,b a,y:(rh)-
+	case 1750: { // x:(r)+n,b a,y:(rh)-
 		unhandled("x:(r)+n,b a,y:(rh)-");
 		break;
 		}
-	case 1683: { // x:(r)+n,b b,y:(rh)-
+	case 1751: { // x:(r)+n,b b,y:(rh)-
 		unhandled("x:(r)+n,b b,y:(rh)-");
 		break;
 		}
-	case 1684: { // x:(r)+n,x0 y0,y:(rh)+
+	case 1752: { // x:(r)+n,x0 y0,y:(rh)+
 		unhandled("x:(r)+n,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1685: { // x:(r)+n,x0 y1,y:(rh)+
+	case 1753: { // x:(r)+n,x0 y1,y:(rh)+
 		unhandled("x:(r)+n,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1686: { // x:(r)+n,x0 a,y:(rh)+
+	case 1754: { // x:(r)+n,x0 a,y:(rh)+
 		unhandled("x:(r)+n,x0 a,y:(rh)+");
 		break;
 		}
-	case 1687: { // x:(r)+n,x0 b,y:(rh)+
+	case 1755: { // x:(r)+n,x0 b,y:(rh)+
 		unhandled("x:(r)+n,x0 b,y:(rh)+");
 		break;
 		}
-	case 1688: { // x:(r)+n,x1 y0,y:(rh)+
+	case 1756: { // x:(r)+n,x1 y0,y:(rh)+
 		unhandled("x:(r)+n,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1689: { // x:(r)+n,x1 y1,y:(rh)+
+	case 1757: { // x:(r)+n,x1 y1,y:(rh)+
 		unhandled("x:(r)+n,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1690: { // x:(r)+n,x1 a,y:(rh)+
+	case 1758: { // x:(r)+n,x1 a,y:(rh)+
 		unhandled("x:(r)+n,x1 a,y:(rh)+");
 		break;
 		}
-	case 1691: { // x:(r)+n,x1 b,y:(rh)+
+	case 1759: { // x:(r)+n,x1 b,y:(rh)+
 		unhandled("x:(r)+n,x1 b,y:(rh)+");
 		break;
 		}
-	case 1692: { // x:(r)+n,a y0,y:(rh)+
+	case 1760: { // x:(r)+n,a y0,y:(rh)+
 		unhandled("x:(r)+n,a y0,y:(rh)+");
 		break;
 		}
-	case 1693: { // x:(r)+n,a y1,y:(rh)+
+	case 1761: { // x:(r)+n,a y1,y:(rh)+
 		unhandled("x:(r)+n,a y1,y:(rh)+");
 		break;
 		}
-	case 1694: { // x:(r)+n,a a,y:(rh)+
+	case 1762: { // x:(r)+n,a a,y:(rh)+
 		unhandled("x:(r)+n,a a,y:(rh)+");
 		break;
 		}
-	case 1695: { // x:(r)+n,a b,y:(rh)+
+	case 1763: { // x:(r)+n,a b,y:(rh)+
 		unhandled("x:(r)+n,a b,y:(rh)+");
 		break;
 		}
-	case 1696: { // x:(r)+n,b y0,y:(rh)+
+	case 1764: { // x:(r)+n,b y0,y:(rh)+
 		unhandled("x:(r)+n,b y0,y:(rh)+");
 		break;
 		}
-	case 1697: { // x:(r)+n,b y1,y:(rh)+
+	case 1765: { // x:(r)+n,b y1,y:(rh)+
 		unhandled("x:(r)+n,b y1,y:(rh)+");
 		break;
 		}
-	case 1698: { // x:(r)+n,b a,y:(rh)+
+	case 1766: { // x:(r)+n,b a,y:(rh)+
 		unhandled("x:(r)+n,b a,y:(rh)+");
 		break;
 		}
-	case 1699: { // x:(r)+n,b b,y:(rh)+
+	case 1767: { // x:(r)+n,b b,y:(rh)+
 		unhandled("x:(r)+n,b b,y:(rh)+");
 		break;
 		}
-	case 1700: { // x:(r)+n,x0 y0,y:(rh)
+	case 1768: { // x:(r)+n,x0 y0,y:(rh)
 		unhandled("x:(r)+n,x0 y0,y:(rh)");
 		break;
 		}
-	case 1701: { // x:(r)+n,x0 y1,y:(rh)
+	case 1769: { // x:(r)+n,x0 y1,y:(rh)
 		unhandled("x:(r)+n,x0 y1,y:(rh)");
 		break;
 		}
-	case 1702: { // x:(r)+n,x0 a,y:(rh)
+	case 1770: { // x:(r)+n,x0 a,y:(rh)
 		unhandled("x:(r)+n,x0 a,y:(rh)");
 		break;
 		}
-	case 1703: { // x:(r)+n,x0 b,y:(rh)
+	case 1771: { // x:(r)+n,x0 b,y:(rh)
 		unhandled("x:(r)+n,x0 b,y:(rh)");
 		break;
 		}
-	case 1704: { // x:(r)+n,x1 y0,y:(rh)
+	case 1772: { // x:(r)+n,x1 y0,y:(rh)
 		unhandled("x:(r)+n,x1 y0,y:(rh)");
 		break;
 		}
-	case 1705: { // x:(r)+n,x1 y1,y:(rh)
+	case 1773: { // x:(r)+n,x1 y1,y:(rh)
 		unhandled("x:(r)+n,x1 y1,y:(rh)");
 		break;
 		}
-	case 1706: { // x:(r)+n,x1 a,y:(rh)
+	case 1774: { // x:(r)+n,x1 a,y:(rh)
 		unhandled("x:(r)+n,x1 a,y:(rh)");
 		break;
 		}
-	case 1707: { // x:(r)+n,x1 b,y:(rh)
+	case 1775: { // x:(r)+n,x1 b,y:(rh)
 		unhandled("x:(r)+n,x1 b,y:(rh)");
 		break;
 		}
-	case 1708: { // x:(r)+n,a y0,y:(rh)
+	case 1776: { // x:(r)+n,a y0,y:(rh)
 		unhandled("x:(r)+n,a y0,y:(rh)");
 		break;
 		}
-	case 1709: { // x:(r)+n,a y1,y:(rh)
+	case 1777: { // x:(r)+n,a y1,y:(rh)
 		unhandled("x:(r)+n,a y1,y:(rh)");
 		break;
 		}
-	case 1710: { // x:(r)+n,a a,y:(rh)
+	case 1778: { // x:(r)+n,a a,y:(rh)
 		unhandled("x:(r)+n,a a,y:(rh)");
 		break;
 		}
-	case 1711: { // x:(r)+n,a b,y:(rh)
+	case 1779: { // x:(r)+n,a b,y:(rh)
 		unhandled("x:(r)+n,a b,y:(rh)");
 		break;
 		}
-	case 1712: { // x:(r)+n,b y0,y:(rh)
+	case 1780: { // x:(r)+n,b y0,y:(rh)
 		unhandled("x:(r)+n,b y0,y:(rh)");
 		break;
 		}
-	case 1713: { // x:(r)+n,b y1,y:(rh)
+	case 1781: { // x:(r)+n,b y1,y:(rh)
 		unhandled("x:(r)+n,b y1,y:(rh)");
 		break;
 		}
-	case 1714: { // x:(r)+n,b a,y:(rh)
+	case 1782: { // x:(r)+n,b a,y:(rh)
 		unhandled("x:(r)+n,b a,y:(rh)");
 		break;
 		}
-	case 1715: { // x:(r)+n,b b,y:(rh)
+	case 1783: { // x:(r)+n,b b,y:(rh)
 		unhandled("x:(r)+n,b b,y:(rh)");
 		break;
 		}
-	case 1716: { // x:(r)-,x0 y0,y:(rh)+n
+	case 1784: { // x:(r)-,x0 y0,y:(rh)+n
 		unhandled("x:(r)-,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1717: { // x:(r)-,x0 y1,y:(rh)+n
+	case 1785: { // x:(r)-,x0 y1,y:(rh)+n
 		unhandled("x:(r)-,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1718: { // x:(r)-,x0 a,y:(rh)+n
+	case 1786: { // x:(r)-,x0 a,y:(rh)+n
 		unhandled("x:(r)-,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1719: { // x:(r)-,x0 b,y:(rh)+n
+	case 1787: { // x:(r)-,x0 b,y:(rh)+n
 		unhandled("x:(r)-,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1720: { // x:(r)-,x1 y0,y:(rh)+n
+	case 1788: { // x:(r)-,x1 y0,y:(rh)+n
 		unhandled("x:(r)-,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1721: { // x:(r)-,x1 y1,y:(rh)+n
+	case 1789: { // x:(r)-,x1 y1,y:(rh)+n
 		unhandled("x:(r)-,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1722: { // x:(r)-,x1 a,y:(rh)+n
+	case 1790: { // x:(r)-,x1 a,y:(rh)+n
 		unhandled("x:(r)-,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1723: { // x:(r)-,x1 b,y:(rh)+n
+	case 1791: { // x:(r)-,x1 b,y:(rh)+n
 		unhandled("x:(r)-,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1724: { // x:(r)-,a y0,y:(rh)+n
+	case 1792: { // x:(r)-,a y0,y:(rh)+n
 		unhandled("x:(r)-,a y0,y:(rh)+n");
 		break;
 		}
-	case 1725: { // x:(r)-,a y1,y:(rh)+n
+	case 1793: { // x:(r)-,a y1,y:(rh)+n
 		unhandled("x:(r)-,a y1,y:(rh)+n");
 		break;
 		}
-	case 1726: { // x:(r)-,a a,y:(rh)+n
+	case 1794: { // x:(r)-,a a,y:(rh)+n
 		unhandled("x:(r)-,a a,y:(rh)+n");
 		break;
 		}
-	case 1727: { // x:(r)-,a b,y:(rh)+n
+	case 1795: { // x:(r)-,a b,y:(rh)+n
 		unhandled("x:(r)-,a b,y:(rh)+n");
 		break;
 		}
-	case 1728: { // x:(r)-,b y0,y:(rh)+n
+	case 1796: { // x:(r)-,b y0,y:(rh)+n
 		unhandled("x:(r)-,b y0,y:(rh)+n");
 		break;
 		}
-	case 1729: { // x:(r)-,b y1,y:(rh)+n
+	case 1797: { // x:(r)-,b y1,y:(rh)+n
 		unhandled("x:(r)-,b y1,y:(rh)+n");
 		break;
 		}
-	case 1730: { // x:(r)-,b a,y:(rh)+n
+	case 1798: { // x:(r)-,b a,y:(rh)+n
 		unhandled("x:(r)-,b a,y:(rh)+n");
 		break;
 		}
-	case 1731: { // x:(r)-,b b,y:(rh)+n
+	case 1799: { // x:(r)-,b b,y:(rh)+n
 		unhandled("x:(r)-,b b,y:(rh)+n");
 		break;
 		}
-	case 1732: { // x:(r)-,x0 y0,y:(rh)-
+	case 1800: { // x:(r)-,x0 y0,y:(rh)-
 		unhandled("x:(r)-,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1733: { // x:(r)-,x0 y1,y:(rh)-
+	case 1801: { // x:(r)-,x0 y1,y:(rh)-
 		unhandled("x:(r)-,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1734: { // x:(r)-,x0 a,y:(rh)-
+	case 1802: { // x:(r)-,x0 a,y:(rh)-
 		unhandled("x:(r)-,x0 a,y:(rh)-");
 		break;
 		}
-	case 1735: { // x:(r)-,x0 b,y:(rh)-
+	case 1803: { // x:(r)-,x0 b,y:(rh)-
 		unhandled("x:(r)-,x0 b,y:(rh)-");
 		break;
 		}
-	case 1736: { // x:(r)-,x1 y0,y:(rh)-
+	case 1804: { // x:(r)-,x1 y0,y:(rh)-
 		unhandled("x:(r)-,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1737: { // x:(r)-,x1 y1,y:(rh)-
+	case 1805: { // x:(r)-,x1 y1,y:(rh)-
 		unhandled("x:(r)-,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1738: { // x:(r)-,x1 a,y:(rh)-
+	case 1806: { // x:(r)-,x1 a,y:(rh)-
 		unhandled("x:(r)-,x1 a,y:(rh)-");
 		break;
 		}
-	case 1739: { // x:(r)-,x1 b,y:(rh)-
+	case 1807: { // x:(r)-,x1 b,y:(rh)-
 		unhandled("x:(r)-,x1 b,y:(rh)-");
 		break;
 		}
-	case 1740: { // x:(r)-,a y0,y:(rh)-
+	case 1808: { // x:(r)-,a y0,y:(rh)-
 		unhandled("x:(r)-,a y0,y:(rh)-");
 		break;
 		}
-	case 1741: { // x:(r)-,a y1,y:(rh)-
+	case 1809: { // x:(r)-,a y1,y:(rh)-
 		unhandled("x:(r)-,a y1,y:(rh)-");
 		break;
 		}
-	case 1742: { // x:(r)-,a a,y:(rh)-
+	case 1810: { // x:(r)-,a a,y:(rh)-
 		unhandled("x:(r)-,a a,y:(rh)-");
 		break;
 		}
-	case 1743: { // x:(r)-,a b,y:(rh)-
+	case 1811: { // x:(r)-,a b,y:(rh)-
 		unhandled("x:(r)-,a b,y:(rh)-");
 		break;
 		}
-	case 1744: { // x:(r)-,b y0,y:(rh)-
+	case 1812: { // x:(r)-,b y0,y:(rh)-
 		unhandled("x:(r)-,b y0,y:(rh)-");
 		break;
 		}
-	case 1745: { // x:(r)-,b y1,y:(rh)-
+	case 1813: { // x:(r)-,b y1,y:(rh)-
 		unhandled("x:(r)-,b y1,y:(rh)-");
 		break;
 		}
-	case 1746: { // x:(r)-,b a,y:(rh)-
+	case 1814: { // x:(r)-,b a,y:(rh)-
 		unhandled("x:(r)-,b a,y:(rh)-");
 		break;
 		}
-	case 1747: { // x:(r)-,b b,y:(rh)-
+	case 1815: { // x:(r)-,b b,y:(rh)-
 		unhandled("x:(r)-,b b,y:(rh)-");
 		break;
 		}
-	case 1748: { // x:(r)-,x0 y0,y:(rh)+
+	case 1816: { // x:(r)-,x0 y0,y:(rh)+
 		unhandled("x:(r)-,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1749: { // x:(r)-,x0 y1,y:(rh)+
+	case 1817: { // x:(r)-,x0 y1,y:(rh)+
 		unhandled("x:(r)-,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1750: { // x:(r)-,x0 a,y:(rh)+
+	case 1818: { // x:(r)-,x0 a,y:(rh)+
 		unhandled("x:(r)-,x0 a,y:(rh)+");
 		break;
 		}
-	case 1751: { // x:(r)-,x0 b,y:(rh)+
+	case 1819: { // x:(r)-,x0 b,y:(rh)+
 		unhandled("x:(r)-,x0 b,y:(rh)+");
 		break;
 		}
-	case 1752: { // x:(r)-,x1 y0,y:(rh)+
+	case 1820: { // x:(r)-,x1 y0,y:(rh)+
 		unhandled("x:(r)-,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1753: { // x:(r)-,x1 y1,y:(rh)+
+	case 1821: { // x:(r)-,x1 y1,y:(rh)+
 		unhandled("x:(r)-,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1754: { // x:(r)-,x1 a,y:(rh)+
+	case 1822: { // x:(r)-,x1 a,y:(rh)+
 		unhandled("x:(r)-,x1 a,y:(rh)+");
 		break;
 		}
-	case 1755: { // x:(r)-,x1 b,y:(rh)+
+	case 1823: { // x:(r)-,x1 b,y:(rh)+
 		unhandled("x:(r)-,x1 b,y:(rh)+");
 		break;
 		}
-	case 1756: { // x:(r)-,a y0,y:(rh)+
+	case 1824: { // x:(r)-,a y0,y:(rh)+
 		unhandled("x:(r)-,a y0,y:(rh)+");
 		break;
 		}
-	case 1757: { // x:(r)-,a y1,y:(rh)+
+	case 1825: { // x:(r)-,a y1,y:(rh)+
 		unhandled("x:(r)-,a y1,y:(rh)+");
 		break;
 		}
-	case 1758: { // x:(r)-,a a,y:(rh)+
+	case 1826: { // x:(r)-,a a,y:(rh)+
 		unhandled("x:(r)-,a a,y:(rh)+");
 		break;
 		}
-	case 1759: { // x:(r)-,a b,y:(rh)+
+	case 1827: { // x:(r)-,a b,y:(rh)+
 		unhandled("x:(r)-,a b,y:(rh)+");
 		break;
 		}
-	case 1760: { // x:(r)-,b y0,y:(rh)+
+	case 1828: { // x:(r)-,b y0,y:(rh)+
 		unhandled("x:(r)-,b y0,y:(rh)+");
 		break;
 		}
-	case 1761: { // x:(r)-,b y1,y:(rh)+
+	case 1829: { // x:(r)-,b y1,y:(rh)+
 		unhandled("x:(r)-,b y1,y:(rh)+");
 		break;
 		}
-	case 1762: { // x:(r)-,b a,y:(rh)+
+	case 1830: { // x:(r)-,b a,y:(rh)+
 		unhandled("x:(r)-,b a,y:(rh)+");
 		break;
 		}
-	case 1763: { // x:(r)-,b b,y:(rh)+
+	case 1831: { // x:(r)-,b b,y:(rh)+
 		unhandled("x:(r)-,b b,y:(rh)+");
 		break;
 		}
-	case 1764: { // x:(r)-,x0 y0,y:(rh)
+	case 1832: { // x:(r)-,x0 y0,y:(rh)
 		unhandled("x:(r)-,x0 y0,y:(rh)");
 		break;
 		}
-	case 1765: { // x:(r)-,x0 y1,y:(rh)
+	case 1833: { // x:(r)-,x0 y1,y:(rh)
 		unhandled("x:(r)-,x0 y1,y:(rh)");
 		break;
 		}
-	case 1766: { // x:(r)-,x0 a,y:(rh)
+	case 1834: { // x:(r)-,x0 a,y:(rh)
 		unhandled("x:(r)-,x0 a,y:(rh)");
 		break;
 		}
-	case 1767: { // x:(r)-,x0 b,y:(rh)
+	case 1835: { // x:(r)-,x0 b,y:(rh)
 		unhandled("x:(r)-,x0 b,y:(rh)");
 		break;
 		}
-	case 1768: { // x:(r)-,x1 y0,y:(rh)
+	case 1836: { // x:(r)-,x1 y0,y:(rh)
 		unhandled("x:(r)-,x1 y0,y:(rh)");
 		break;
 		}
-	case 1769: { // x:(r)-,x1 y1,y:(rh)
+	case 1837: { // x:(r)-,x1 y1,y:(rh)
 		unhandled("x:(r)-,x1 y1,y:(rh)");
 		break;
 		}
-	case 1770: { // x:(r)-,x1 a,y:(rh)
+	case 1838: { // x:(r)-,x1 a,y:(rh)
 		unhandled("x:(r)-,x1 a,y:(rh)");
 		break;
 		}
-	case 1771: { // x:(r)-,x1 b,y:(rh)
+	case 1839: { // x:(r)-,x1 b,y:(rh)
 		unhandled("x:(r)-,x1 b,y:(rh)");
 		break;
 		}
-	case 1772: { // x:(r)-,a y0,y:(rh)
+	case 1840: { // x:(r)-,a y0,y:(rh)
 		unhandled("x:(r)-,a y0,y:(rh)");
 		break;
 		}
-	case 1773: { // x:(r)-,a y1,y:(rh)
+	case 1841: { // x:(r)-,a y1,y:(rh)
 		unhandled("x:(r)-,a y1,y:(rh)");
 		break;
 		}
-	case 1774: { // x:(r)-,a a,y:(rh)
+	case 1842: { // x:(r)-,a a,y:(rh)
 		unhandled("x:(r)-,a a,y:(rh)");
 		break;
 		}
-	case 1775: { // x:(r)-,a b,y:(rh)
+	case 1843: { // x:(r)-,a b,y:(rh)
 		unhandled("x:(r)-,a b,y:(rh)");
 		break;
 		}
-	case 1776: { // x:(r)-,b y0,y:(rh)
+	case 1844: { // x:(r)-,b y0,y:(rh)
 		unhandled("x:(r)-,b y0,y:(rh)");
 		break;
 		}
-	case 1777: { // x:(r)-,b y1,y:(rh)
+	case 1845: { // x:(r)-,b y1,y:(rh)
 		unhandled("x:(r)-,b y1,y:(rh)");
 		break;
 		}
-	case 1778: { // x:(r)-,b a,y:(rh)
+	case 1846: { // x:(r)-,b a,y:(rh)
 		unhandled("x:(r)-,b a,y:(rh)");
 		break;
 		}
-	case 1779: { // x:(r)-,b b,y:(rh)
+	case 1847: { // x:(r)-,b b,y:(rh)
 		unhandled("x:(r)-,b b,y:(rh)");
 		break;
 		}
-	case 1780: { // x:(r)+,x0 y0,y:(rh)+n
+	case 1848: { // x:(r)+,x0 y0,y:(rh)+n
 		unhandled("x:(r)+,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1781: { // x:(r)+,x0 y1,y:(rh)+n
+	case 1849: { // x:(r)+,x0 y1,y:(rh)+n
 		unhandled("x:(r)+,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1782: { // x:(r)+,x0 a,y:(rh)+n
+	case 1850: { // x:(r)+,x0 a,y:(rh)+n
 		unhandled("x:(r)+,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1783: { // x:(r)+,x0 b,y:(rh)+n
+	case 1851: { // x:(r)+,x0 b,y:(rh)+n
 		unhandled("x:(r)+,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1784: { // x:(r)+,x1 y0,y:(rh)+n
+	case 1852: { // x:(r)+,x1 y0,y:(rh)+n
 		unhandled("x:(r)+,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1785: { // x:(r)+,x1 y1,y:(rh)+n
+	case 1853: { // x:(r)+,x1 y1,y:(rh)+n
 		unhandled("x:(r)+,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1786: { // x:(r)+,x1 a,y:(rh)+n
+	case 1854: { // x:(r)+,x1 a,y:(rh)+n
 		unhandled("x:(r)+,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1787: { // x:(r)+,x1 b,y:(rh)+n
+	case 1855: { // x:(r)+,x1 b,y:(rh)+n
 		unhandled("x:(r)+,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1788: { // x:(r)+,a y0,y:(rh)+n
+	case 1856: { // x:(r)+,a y0,y:(rh)+n
 		unhandled("x:(r)+,a y0,y:(rh)+n");
 		break;
 		}
-	case 1789: { // x:(r)+,a y1,y:(rh)+n
+	case 1857: { // x:(r)+,a y1,y:(rh)+n
 		unhandled("x:(r)+,a y1,y:(rh)+n");
 		break;
 		}
-	case 1790: { // x:(r)+,a a,y:(rh)+n
+	case 1858: { // x:(r)+,a a,y:(rh)+n
 		unhandled("x:(r)+,a a,y:(rh)+n");
 		break;
 		}
-	case 1791: { // x:(r)+,a b,y:(rh)+n
+	case 1859: { // x:(r)+,a b,y:(rh)+n
 		unhandled("x:(r)+,a b,y:(rh)+n");
 		break;
 		}
-	case 1792: { // x:(r)+,b y0,y:(rh)+n
+	case 1860: { // x:(r)+,b y0,y:(rh)+n
 		unhandled("x:(r)+,b y0,y:(rh)+n");
 		break;
 		}
-	case 1793: { // x:(r)+,b y1,y:(rh)+n
+	case 1861: { // x:(r)+,b y1,y:(rh)+n
 		unhandled("x:(r)+,b y1,y:(rh)+n");
 		break;
 		}
-	case 1794: { // x:(r)+,b a,y:(rh)+n
+	case 1862: { // x:(r)+,b a,y:(rh)+n
 		unhandled("x:(r)+,b a,y:(rh)+n");
 		break;
 		}
-	case 1795: { // x:(r)+,b b,y:(rh)+n
+	case 1863: { // x:(r)+,b b,y:(rh)+n
 		unhandled("x:(r)+,b b,y:(rh)+n");
 		break;
 		}
-	case 1796: { // x:(r)+,x0 y0,y:(rh)-
+	case 1864: { // x:(r)+,x0 y0,y:(rh)-
 		unhandled("x:(r)+,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1797: { // x:(r)+,x0 y1,y:(rh)-
+	case 1865: { // x:(r)+,x0 y1,y:(rh)-
 		unhandled("x:(r)+,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1798: { // x:(r)+,x0 a,y:(rh)-
+	case 1866: { // x:(r)+,x0 a,y:(rh)-
 		unhandled("x:(r)+,x0 a,y:(rh)-");
 		break;
 		}
-	case 1799: { // x:(r)+,x0 b,y:(rh)-
+	case 1867: { // x:(r)+,x0 b,y:(rh)-
 		unhandled("x:(r)+,x0 b,y:(rh)-");
 		break;
 		}
-	case 1800: { // x:(r)+,x1 y0,y:(rh)-
+	case 1868: { // x:(r)+,x1 y0,y:(rh)-
 		unhandled("x:(r)+,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1801: { // x:(r)+,x1 y1,y:(rh)-
+	case 1869: { // x:(r)+,x1 y1,y:(rh)-
 		unhandled("x:(r)+,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1802: { // x:(r)+,x1 a,y:(rh)-
+	case 1870: { // x:(r)+,x1 a,y:(rh)-
 		unhandled("x:(r)+,x1 a,y:(rh)-");
 		break;
 		}
-	case 1803: { // x:(r)+,x1 b,y:(rh)-
+	case 1871: { // x:(r)+,x1 b,y:(rh)-
 		unhandled("x:(r)+,x1 b,y:(rh)-");
 		break;
 		}
-	case 1804: { // x:(r)+,a y0,y:(rh)-
+	case 1872: { // x:(r)+,a y0,y:(rh)-
 		unhandled("x:(r)+,a y0,y:(rh)-");
 		break;
 		}
-	case 1805: { // x:(r)+,a y1,y:(rh)-
+	case 1873: { // x:(r)+,a y1,y:(rh)-
 		unhandled("x:(r)+,a y1,y:(rh)-");
 		break;
 		}
-	case 1806: { // x:(r)+,a a,y:(rh)-
+	case 1874: { // x:(r)+,a a,y:(rh)-
 		unhandled("x:(r)+,a a,y:(rh)-");
 		break;
 		}
-	case 1807: { // x:(r)+,a b,y:(rh)-
+	case 1875: { // x:(r)+,a b,y:(rh)-
 		unhandled("x:(r)+,a b,y:(rh)-");
 		break;
 		}
-	case 1808: { // x:(r)+,b y0,y:(rh)-
+	case 1876: { // x:(r)+,b y0,y:(rh)-
 		unhandled("x:(r)+,b y0,y:(rh)-");
 		break;
 		}
-	case 1809: { // x:(r)+,b y1,y:(rh)-
+	case 1877: { // x:(r)+,b y1,y:(rh)-
 		unhandled("x:(r)+,b y1,y:(rh)-");
 		break;
 		}
-	case 1810: { // x:(r)+,b a,y:(rh)-
+	case 1878: { // x:(r)+,b a,y:(rh)-
 		unhandled("x:(r)+,b a,y:(rh)-");
 		break;
 		}
-	case 1811: { // x:(r)+,b b,y:(rh)-
+	case 1879: { // x:(r)+,b b,y:(rh)-
 		unhandled("x:(r)+,b b,y:(rh)-");
 		break;
 		}
-	case 1812: { // x:(r)+,x0 y0,y:(rh)+
+	case 1880: { // x:(r)+,x0 y0,y:(rh)+
 		unhandled("x:(r)+,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1813: { // x:(r)+,x0 y1,y:(rh)+
+	case 1881: { // x:(r)+,x0 y1,y:(rh)+
 		unhandled("x:(r)+,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1814: { // x:(r)+,x0 a,y:(rh)+
+	case 1882: { // x:(r)+,x0 a,y:(rh)+
 		unhandled("x:(r)+,x0 a,y:(rh)+");
 		break;
 		}
-	case 1815: { // x:(r)+,x0 b,y:(rh)+
+	case 1883: { // x:(r)+,x0 b,y:(rh)+
 		unhandled("x:(r)+,x0 b,y:(rh)+");
 		break;
 		}
-	case 1816: { // x:(r)+,x1 y0,y:(rh)+
+	case 1884: { // x:(r)+,x1 y0,y:(rh)+
 		unhandled("x:(r)+,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1817: { // x:(r)+,x1 y1,y:(rh)+
+	case 1885: { // x:(r)+,x1 y1,y:(rh)+
 		unhandled("x:(r)+,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1818: { // x:(r)+,x1 a,y:(rh)+
+	case 1886: { // x:(r)+,x1 a,y:(rh)+
 		unhandled("x:(r)+,x1 a,y:(rh)+");
 		break;
 		}
-	case 1819: { // x:(r)+,x1 b,y:(rh)+
+	case 1887: { // x:(r)+,x1 b,y:(rh)+
 		unhandled("x:(r)+,x1 b,y:(rh)+");
 		break;
 		}
-	case 1820: { // x:(r)+,a y0,y:(rh)+
+	case 1888: { // x:(r)+,a y0,y:(rh)+
 		unhandled("x:(r)+,a y0,y:(rh)+");
 		break;
 		}
-	case 1821: { // x:(r)+,a y1,y:(rh)+
+	case 1889: { // x:(r)+,a y1,y:(rh)+
 		unhandled("x:(r)+,a y1,y:(rh)+");
 		break;
 		}
-	case 1822: { // x:(r)+,a a,y:(rh)+
+	case 1890: { // x:(r)+,a a,y:(rh)+
 		unhandled("x:(r)+,a a,y:(rh)+");
 		break;
 		}
-	case 1823: { // x:(r)+,a b,y:(rh)+
+	case 1891: { // x:(r)+,a b,y:(rh)+
 		unhandled("x:(r)+,a b,y:(rh)+");
 		break;
 		}
-	case 1824: { // x:(r)+,b y0,y:(rh)+
+	case 1892: { // x:(r)+,b y0,y:(rh)+
 		unhandled("x:(r)+,b y0,y:(rh)+");
 		break;
 		}
-	case 1825: { // x:(r)+,b y1,y:(rh)+
+	case 1893: { // x:(r)+,b y1,y:(rh)+
 		unhandled("x:(r)+,b y1,y:(rh)+");
 		break;
 		}
-	case 1826: { // x:(r)+,b a,y:(rh)+
+	case 1894: { // x:(r)+,b a,y:(rh)+
 		unhandled("x:(r)+,b a,y:(rh)+");
 		break;
 		}
-	case 1827: { // x:(r)+,b b,y:(rh)+
+	case 1895: { // x:(r)+,b b,y:(rh)+
 		unhandled("x:(r)+,b b,y:(rh)+");
 		break;
 		}
-	case 1828: { // x:(r)+,x0 y0,y:(rh)
+	case 1896: { // x:(r)+,x0 y0,y:(rh)
 		unhandled("x:(r)+,x0 y0,y:(rh)");
 		break;
 		}
-	case 1829: { // x:(r)+,x0 y1,y:(rh)
+	case 1897: { // x:(r)+,x0 y1,y:(rh)
 		unhandled("x:(r)+,x0 y1,y:(rh)");
 		break;
 		}
-	case 1830: { // x:(r)+,x0 a,y:(rh)
+	case 1898: { // x:(r)+,x0 a,y:(rh)
 		unhandled("x:(r)+,x0 a,y:(rh)");
 		break;
 		}
-	case 1831: { // x:(r)+,x0 b,y:(rh)
+	case 1899: { // x:(r)+,x0 b,y:(rh)
 		unhandled("x:(r)+,x0 b,y:(rh)");
 		break;
 		}
-	case 1832: { // x:(r)+,x1 y0,y:(rh)
+	case 1900: { // x:(r)+,x1 y0,y:(rh)
 		unhandled("x:(r)+,x1 y0,y:(rh)");
 		break;
 		}
-	case 1833: { // x:(r)+,x1 y1,y:(rh)
+	case 1901: { // x:(r)+,x1 y1,y:(rh)
 		unhandled("x:(r)+,x1 y1,y:(rh)");
 		break;
 		}
-	case 1834: { // x:(r)+,x1 a,y:(rh)
+	case 1902: { // x:(r)+,x1 a,y:(rh)
 		unhandled("x:(r)+,x1 a,y:(rh)");
 		break;
 		}
-	case 1835: { // x:(r)+,x1 b,y:(rh)
+	case 1903: { // x:(r)+,x1 b,y:(rh)
 		unhandled("x:(r)+,x1 b,y:(rh)");
 		break;
 		}
-	case 1836: { // x:(r)+,a y0,y:(rh)
+	case 1904: { // x:(r)+,a y0,y:(rh)
 		unhandled("x:(r)+,a y0,y:(rh)");
 		break;
 		}
-	case 1837: { // x:(r)+,a y1,y:(rh)
+	case 1905: { // x:(r)+,a y1,y:(rh)
 		unhandled("x:(r)+,a y1,y:(rh)");
 		break;
 		}
-	case 1838: { // x:(r)+,a a,y:(rh)
+	case 1906: { // x:(r)+,a a,y:(rh)
 		unhandled("x:(r)+,a a,y:(rh)");
 		break;
 		}
-	case 1839: { // x:(r)+,a b,y:(rh)
+	case 1907: { // x:(r)+,a b,y:(rh)
 		unhandled("x:(r)+,a b,y:(rh)");
 		break;
 		}
-	case 1840: { // x:(r)+,b y0,y:(rh)
+	case 1908: { // x:(r)+,b y0,y:(rh)
 		unhandled("x:(r)+,b y0,y:(rh)");
 		break;
 		}
-	case 1841: { // x:(r)+,b y1,y:(rh)
+	case 1909: { // x:(r)+,b y1,y:(rh)
 		unhandled("x:(r)+,b y1,y:(rh)");
 		break;
 		}
-	case 1842: { // x:(r)+,b a,y:(rh)
+	case 1910: { // x:(r)+,b a,y:(rh)
 		unhandled("x:(r)+,b a,y:(rh)");
 		break;
 		}
-	case 1843: { // x:(r)+,b b,y:(rh)
+	case 1911: { // x:(r)+,b b,y:(rh)
 		unhandled("x:(r)+,b b,y:(rh)");
 		break;
 		}
-	case 1844: { // x:(r),x0 y0,y:(rh)+n
+	case 1912: { // x:(r),x0 y0,y:(rh)+n
 		unhandled("x:(r),x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1845: { // x:(r),x0 y1,y:(rh)+n
+	case 1913: { // x:(r),x0 y1,y:(rh)+n
 		unhandled("x:(r),x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1846: { // x:(r),x0 a,y:(rh)+n
+	case 1914: { // x:(r),x0 a,y:(rh)+n
 		unhandled("x:(r),x0 a,y:(rh)+n");
 		break;
 		}
-	case 1847: { // x:(r),x0 b,y:(rh)+n
+	case 1915: { // x:(r),x0 b,y:(rh)+n
 		unhandled("x:(r),x0 b,y:(rh)+n");
 		break;
 		}
-	case 1848: { // x:(r),x1 y0,y:(rh)+n
+	case 1916: { // x:(r),x1 y0,y:(rh)+n
 		unhandled("x:(r),x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1849: { // x:(r),x1 y1,y:(rh)+n
+	case 1917: { // x:(r),x1 y1,y:(rh)+n
 		unhandled("x:(r),x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1850: { // x:(r),x1 a,y:(rh)+n
+	case 1918: { // x:(r),x1 a,y:(rh)+n
 		unhandled("x:(r),x1 a,y:(rh)+n");
 		break;
 		}
-	case 1851: { // x:(r),x1 b,y:(rh)+n
+	case 1919: { // x:(r),x1 b,y:(rh)+n
 		unhandled("x:(r),x1 b,y:(rh)+n");
 		break;
 		}
-	case 1852: { // x:(r),a y0,y:(rh)+n
+	case 1920: { // x:(r),a y0,y:(rh)+n
 		unhandled("x:(r),a y0,y:(rh)+n");
 		break;
 		}
-	case 1853: { // x:(r),a y1,y:(rh)+n
+	case 1921: { // x:(r),a y1,y:(rh)+n
 		unhandled("x:(r),a y1,y:(rh)+n");
 		break;
 		}
-	case 1854: { // x:(r),a a,y:(rh)+n
+	case 1922: { // x:(r),a a,y:(rh)+n
 		unhandled("x:(r),a a,y:(rh)+n");
 		break;
 		}
-	case 1855: { // x:(r),a b,y:(rh)+n
+	case 1923: { // x:(r),a b,y:(rh)+n
 		unhandled("x:(r),a b,y:(rh)+n");
 		break;
 		}
-	case 1856: { // x:(r),b y0,y:(rh)+n
+	case 1924: { // x:(r),b y0,y:(rh)+n
 		unhandled("x:(r),b y0,y:(rh)+n");
 		break;
 		}
-	case 1857: { // x:(r),b y1,y:(rh)+n
+	case 1925: { // x:(r),b y1,y:(rh)+n
 		unhandled("x:(r),b y1,y:(rh)+n");
 		break;
 		}
-	case 1858: { // x:(r),b a,y:(rh)+n
+	case 1926: { // x:(r),b a,y:(rh)+n
 		unhandled("x:(r),b a,y:(rh)+n");
 		break;
 		}
-	case 1859: { // x:(r),b b,y:(rh)+n
+	case 1927: { // x:(r),b b,y:(rh)+n
 		unhandled("x:(r),b b,y:(rh)+n");
 		break;
 		}
-	case 1860: { // x:(r),x0 y0,y:(rh)-
+	case 1928: { // x:(r),x0 y0,y:(rh)-
 		unhandled("x:(r),x0 y0,y:(rh)-");
 		break;
 		}
-	case 1861: { // x:(r),x0 y1,y:(rh)-
+	case 1929: { // x:(r),x0 y1,y:(rh)-
 		unhandled("x:(r),x0 y1,y:(rh)-");
 		break;
 		}
-	case 1862: { // x:(r),x0 a,y:(rh)-
+	case 1930: { // x:(r),x0 a,y:(rh)-
 		unhandled("x:(r),x0 a,y:(rh)-");
 		break;
 		}
-	case 1863: { // x:(r),x0 b,y:(rh)-
+	case 1931: { // x:(r),x0 b,y:(rh)-
 		unhandled("x:(r),x0 b,y:(rh)-");
 		break;
 		}
-	case 1864: { // x:(r),x1 y0,y:(rh)-
+	case 1932: { // x:(r),x1 y0,y:(rh)-
 		unhandled("x:(r),x1 y0,y:(rh)-");
 		break;
 		}
-	case 1865: { // x:(r),x1 y1,y:(rh)-
+	case 1933: { // x:(r),x1 y1,y:(rh)-
 		unhandled("x:(r),x1 y1,y:(rh)-");
 		break;
 		}
-	case 1866: { // x:(r),x1 a,y:(rh)-
+	case 1934: { // x:(r),x1 a,y:(rh)-
 		unhandled("x:(r),x1 a,y:(rh)-");
 		break;
 		}
-	case 1867: { // x:(r),x1 b,y:(rh)-
+	case 1935: { // x:(r),x1 b,y:(rh)-
 		unhandled("x:(r),x1 b,y:(rh)-");
 		break;
 		}
-	case 1868: { // x:(r),a y0,y:(rh)-
+	case 1936: { // x:(r),a y0,y:(rh)-
 		unhandled("x:(r),a y0,y:(rh)-");
 		break;
 		}
-	case 1869: { // x:(r),a y1,y:(rh)-
+	case 1937: { // x:(r),a y1,y:(rh)-
 		unhandled("x:(r),a y1,y:(rh)-");
 		break;
 		}
-	case 1870: { // x:(r),a a,y:(rh)-
+	case 1938: { // x:(r),a a,y:(rh)-
 		unhandled("x:(r),a a,y:(rh)-");
 		break;
 		}
-	case 1871: { // x:(r),a b,y:(rh)-
+	case 1939: { // x:(r),a b,y:(rh)-
 		unhandled("x:(r),a b,y:(rh)-");
 		break;
 		}
-	case 1872: { // x:(r),b y0,y:(rh)-
+	case 1940: { // x:(r),b y0,y:(rh)-
 		unhandled("x:(r),b y0,y:(rh)-");
 		break;
 		}
-	case 1873: { // x:(r),b y1,y:(rh)-
+	case 1941: { // x:(r),b y1,y:(rh)-
 		unhandled("x:(r),b y1,y:(rh)-");
 		break;
 		}
-	case 1874: { // x:(r),b a,y:(rh)-
+	case 1942: { // x:(r),b a,y:(rh)-
 		unhandled("x:(r),b a,y:(rh)-");
 		break;
 		}
-	case 1875: { // x:(r),b b,y:(rh)-
+	case 1943: { // x:(r),b b,y:(rh)-
 		unhandled("x:(r),b b,y:(rh)-");
 		break;
 		}
-	case 1876: { // x:(r),x0 y0,y:(rh)+
+	case 1944: { // x:(r),x0 y0,y:(rh)+
 		unhandled("x:(r),x0 y0,y:(rh)+");
 		break;
 		}
-	case 1877: { // x:(r),x0 y1,y:(rh)+
+	case 1945: { // x:(r),x0 y1,y:(rh)+
 		unhandled("x:(r),x0 y1,y:(rh)+");
 		break;
 		}
-	case 1878: { // x:(r),x0 a,y:(rh)+
+	case 1946: { // x:(r),x0 a,y:(rh)+
 		unhandled("x:(r),x0 a,y:(rh)+");
 		break;
 		}
-	case 1879: { // x:(r),x0 b,y:(rh)+
+	case 1947: { // x:(r),x0 b,y:(rh)+
 		unhandled("x:(r),x0 b,y:(rh)+");
 		break;
 		}
-	case 1880: { // x:(r),x1 y0,y:(rh)+
+	case 1948: { // x:(r),x1 y0,y:(rh)+
 		unhandled("x:(r),x1 y0,y:(rh)+");
 		break;
 		}
-	case 1881: { // x:(r),x1 y1,y:(rh)+
+	case 1949: { // x:(r),x1 y1,y:(rh)+
 		unhandled("x:(r),x1 y1,y:(rh)+");
 		break;
 		}
-	case 1882: { // x:(r),x1 a,y:(rh)+
+	case 1950: { // x:(r),x1 a,y:(rh)+
 		unhandled("x:(r),x1 a,y:(rh)+");
 		break;
 		}
-	case 1883: { // x:(r),x1 b,y:(rh)+
+	case 1951: { // x:(r),x1 b,y:(rh)+
 		unhandled("x:(r),x1 b,y:(rh)+");
 		break;
 		}
-	case 1884: { // x:(r),a y0,y:(rh)+
+	case 1952: { // x:(r),a y0,y:(rh)+
 		unhandled("x:(r),a y0,y:(rh)+");
 		break;
 		}
-	case 1885: { // x:(r),a y1,y:(rh)+
+	case 1953: { // x:(r),a y1,y:(rh)+
 		unhandled("x:(r),a y1,y:(rh)+");
 		break;
 		}
-	case 1886: { // x:(r),a a,y:(rh)+
+	case 1954: { // x:(r),a a,y:(rh)+
 		unhandled("x:(r),a a,y:(rh)+");
 		break;
 		}
-	case 1887: { // x:(r),a b,y:(rh)+
+	case 1955: { // x:(r),a b,y:(rh)+
 		unhandled("x:(r),a b,y:(rh)+");
 		break;
 		}
-	case 1888: { // x:(r),b y0,y:(rh)+
+	case 1956: { // x:(r),b y0,y:(rh)+
 		unhandled("x:(r),b y0,y:(rh)+");
 		break;
 		}
-	case 1889: { // x:(r),b y1,y:(rh)+
+	case 1957: { // x:(r),b y1,y:(rh)+
 		unhandled("x:(r),b y1,y:(rh)+");
 		break;
 		}
-	case 1890: { // x:(r),b a,y:(rh)+
+	case 1958: { // x:(r),b a,y:(rh)+
 		unhandled("x:(r),b a,y:(rh)+");
 		break;
 		}
-	case 1891: { // x:(r),b b,y:(rh)+
+	case 1959: { // x:(r),b b,y:(rh)+
 		unhandled("x:(r),b b,y:(rh)+");
 		break;
 		}
-	case 1892: { // x:(r),x0 y0,y:(rh)
+	case 1960: { // x:(r),x0 y0,y:(rh)
 		unhandled("x:(r),x0 y0,y:(rh)");
 		break;
 		}
-	case 1893: { // x:(r),x0 y1,y:(rh)
+	case 1961: { // x:(r),x0 y1,y:(rh)
 		unhandled("x:(r),x0 y1,y:(rh)");
 		break;
 		}
-	case 1894: { // x:(r),x0 a,y:(rh)
+	case 1962: { // x:(r),x0 a,y:(rh)
 		unhandled("x:(r),x0 a,y:(rh)");
 		break;
 		}
-	case 1895: { // x:(r),x0 b,y:(rh)
+	case 1963: { // x:(r),x0 b,y:(rh)
 		unhandled("x:(r),x0 b,y:(rh)");
 		break;
 		}
-	case 1896: { // x:(r),x1 y0,y:(rh)
+	case 1964: { // x:(r),x1 y0,y:(rh)
 		unhandled("x:(r),x1 y0,y:(rh)");
 		break;
 		}
-	case 1897: { // x:(r),x1 y1,y:(rh)
+	case 1965: { // x:(r),x1 y1,y:(rh)
 		unhandled("x:(r),x1 y1,y:(rh)");
 		break;
 		}
-	case 1898: { // x:(r),x1 a,y:(rh)
+	case 1966: { // x:(r),x1 a,y:(rh)
 		unhandled("x:(r),x1 a,y:(rh)");
 		break;
 		}
-	case 1899: { // x:(r),x1 b,y:(rh)
+	case 1967: { // x:(r),x1 b,y:(rh)
 		unhandled("x:(r),x1 b,y:(rh)");
 		break;
 		}
-	case 1900: { // x:(r),a y0,y:(rh)
+	case 1968: { // x:(r),a y0,y:(rh)
 		unhandled("x:(r),a y0,y:(rh)");
 		break;
 		}
-	case 1901: { // x:(r),a y1,y:(rh)
+	case 1969: { // x:(r),a y1,y:(rh)
 		unhandled("x:(r),a y1,y:(rh)");
 		break;
 		}
-	case 1902: { // x:(r),a a,y:(rh)
+	case 1970: { // x:(r),a a,y:(rh)
 		unhandled("x:(r),a a,y:(rh)");
 		break;
 		}
-	case 1903: { // x:(r),a b,y:(rh)
+	case 1971: { // x:(r),a b,y:(rh)
 		unhandled("x:(r),a b,y:(rh)");
 		break;
 		}
-	case 1904: { // x:(r),b y0,y:(rh)
+	case 1972: { // x:(r),b y0,y:(rh)
 		unhandled("x:(r),b y0,y:(rh)");
 		break;
 		}
-	case 1905: { // x:(r),b y1,y:(rh)
+	case 1973: { // x:(r),b y1,y:(rh)
 		unhandled("x:(r),b y1,y:(rh)");
 		break;
 		}
-	case 1906: { // x:(r),b a,y:(rh)
+	case 1974: { // x:(r),b a,y:(rh)
 		unhandled("x:(r),b a,y:(rh)");
 		break;
 		}
-	case 1907: { // x:(r),b b,y:(rh)
+	case 1975: { // x:(r),b b,y:(rh)
 		unhandled("x:(r),b b,y:(rh)");
 		break;
 		}
-	case 1908: { // x0,x:(r)+n y:(rh)+n,y0
+	case 1976: { // x0,x:(r)+n y:(rh)+n,y0
 		unhandled("x0,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1909: { // x0,x:(r)+n y:(rh)+n,y1
+	case 1977: { // x0,x:(r)+n y:(rh)+n,y1
 		unhandled("x0,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1910: { // x0,x:(r)+n y:(rh)+n,a
+	case 1978: { // x0,x:(r)+n y:(rh)+n,a
 		unhandled("x0,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1911: { // x0,x:(r)+n y:(rh)+n,b
+	case 1979: { // x0,x:(r)+n y:(rh)+n,b
 		unhandled("x0,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1912: { // x1,x:(r)+n y:(rh)+n,y0
+	case 1980: { // x1,x:(r)+n y:(rh)+n,y0
 		unhandled("x1,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1913: { // x1,x:(r)+n y:(rh)+n,y1
+	case 1981: { // x1,x:(r)+n y:(rh)+n,y1
 		unhandled("x1,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1914: { // x1,x:(r)+n y:(rh)+n,a
+	case 1982: { // x1,x:(r)+n y:(rh)+n,a
 		unhandled("x1,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1915: { // x1,x:(r)+n y:(rh)+n,b
+	case 1983: { // x1,x:(r)+n y:(rh)+n,b
 		unhandled("x1,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1916: { // a,x:(r)+n y:(rh)+n,y0
+	case 1984: { // a,x:(r)+n y:(rh)+n,y0
 		unhandled("a,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1917: { // a,x:(r)+n y:(rh)+n,y1
+	case 1985: { // a,x:(r)+n y:(rh)+n,y1
 		unhandled("a,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1918: { // a,x:(r)+n y:(rh)+n,a
+	case 1986: { // a,x:(r)+n y:(rh)+n,a
 		unhandled("a,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1919: { // a,x:(r)+n y:(rh)+n,b
+	case 1987: { // a,x:(r)+n y:(rh)+n,b
 		unhandled("a,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1920: { // b,x:(r)+n y:(rh)+n,y0
+	case 1988: { // b,x:(r)+n y:(rh)+n,y0
 		unhandled("b,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1921: { // b,x:(r)+n y:(rh)+n,y1
+	case 1989: { // b,x:(r)+n y:(rh)+n,y1
 		unhandled("b,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1922: { // b,x:(r)+n y:(rh)+n,a
+	case 1990: { // b,x:(r)+n y:(rh)+n,a
 		unhandled("b,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1923: { // b,x:(r)+n y:(rh)+n,b
+	case 1991: { // b,x:(r)+n y:(rh)+n,b
 		unhandled("b,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1924: { // x0,x:(r)+n y:(rh)-,y0
+	case 1992: { // x0,x:(r)+n y:(rh)-,y0
 		unhandled("x0,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1925: { // x0,x:(r)+n y:(rh)-,y1
+	case 1993: { // x0,x:(r)+n y:(rh)-,y1
 		unhandled("x0,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1926: { // x0,x:(r)+n y:(rh)-,a
+	case 1994: { // x0,x:(r)+n y:(rh)-,a
 		unhandled("x0,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1927: { // x0,x:(r)+n y:(rh)-,b
+	case 1995: { // x0,x:(r)+n y:(rh)-,b
 		unhandled("x0,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1928: { // x1,x:(r)+n y:(rh)-,y0
+	case 1996: { // x1,x:(r)+n y:(rh)-,y0
 		unhandled("x1,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1929: { // x1,x:(r)+n y:(rh)-,y1
+	case 1997: { // x1,x:(r)+n y:(rh)-,y1
 		unhandled("x1,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1930: { // x1,x:(r)+n y:(rh)-,a
+	case 1998: { // x1,x:(r)+n y:(rh)-,a
 		unhandled("x1,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1931: { // x1,x:(r)+n y:(rh)-,b
+	case 1999: { // x1,x:(r)+n y:(rh)-,b
 		unhandled("x1,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1932: { // a,x:(r)+n y:(rh)-,y0
+	case 2000: { // a,x:(r)+n y:(rh)-,y0
 		unhandled("a,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1933: { // a,x:(r)+n y:(rh)-,y1
+	case 2001: { // a,x:(r)+n y:(rh)-,y1
 		unhandled("a,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1934: { // a,x:(r)+n y:(rh)-,a
+	case 2002: { // a,x:(r)+n y:(rh)-,a
 		unhandled("a,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1935: { // a,x:(r)+n y:(rh)-,b
+	case 2003: { // a,x:(r)+n y:(rh)-,b
 		unhandled("a,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1936: { // b,x:(r)+n y:(rh)-,y0
+	case 2004: { // b,x:(r)+n y:(rh)-,y0
 		unhandled("b,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1937: { // b,x:(r)+n y:(rh)-,y1
+	case 2005: { // b,x:(r)+n y:(rh)-,y1
 		unhandled("b,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1938: { // b,x:(r)+n y:(rh)-,a
+	case 2006: { // b,x:(r)+n y:(rh)-,a
 		unhandled("b,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1939: { // b,x:(r)+n y:(rh)-,b
+	case 2007: { // b,x:(r)+n y:(rh)-,b
 		unhandled("b,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1940: { // x0,x:(r)+n y:(rh)+,y0
+	case 2008: { // x0,x:(r)+n y:(rh)+,y0
 		unhandled("x0,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 1941: { // x0,x:(r)+n y:(rh)+,y1
+	case 2009: { // x0,x:(r)+n y:(rh)+,y1
 		unhandled("x0,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 1942: { // x0,x:(r)+n y:(rh)+,a
+	case 2010: { // x0,x:(r)+n y:(rh)+,a
 		unhandled("x0,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 1943: { // x0,x:(r)+n y:(rh)+,b
+	case 2011: { // x0,x:(r)+n y:(rh)+,b
 		unhandled("x0,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 1944: { // x1,x:(r)+n y:(rh)+,y0
+	case 2012: { // x1,x:(r)+n y:(rh)+,y0
 		unhandled("x1,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 1945: { // x1,x:(r)+n y:(rh)+,y1
+	case 2013: { // x1,x:(r)+n y:(rh)+,y1
 		unhandled("x1,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 1946: { // x1,x:(r)+n y:(rh)+,a
+	case 2014: { // x1,x:(r)+n y:(rh)+,a
 		unhandled("x1,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 1947: { // x1,x:(r)+n y:(rh)+,b
+	case 2015: { // x1,x:(r)+n y:(rh)+,b
 		unhandled("x1,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 1948: { // a,x:(r)+n y:(rh)+,y0
+	case 2016: { // a,x:(r)+n y:(rh)+,y0
 		unhandled("a,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 1949: { // a,x:(r)+n y:(rh)+,y1
+	case 2017: { // a,x:(r)+n y:(rh)+,y1
 		unhandled("a,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 1950: { // a,x:(r)+n y:(rh)+,a
+	case 2018: { // a,x:(r)+n y:(rh)+,a
 		unhandled("a,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 1951: { // a,x:(r)+n y:(rh)+,b
+	case 2019: { // a,x:(r)+n y:(rh)+,b
 		unhandled("a,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 1952: { // b,x:(r)+n y:(rh)+,y0
+	case 2020: { // b,x:(r)+n y:(rh)+,y0
 		unhandled("b,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 1953: { // b,x:(r)+n y:(rh)+,y1
+	case 2021: { // b,x:(r)+n y:(rh)+,y1
 		unhandled("b,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 1954: { // b,x:(r)+n y:(rh)+,a
+	case 2022: { // b,x:(r)+n y:(rh)+,a
 		unhandled("b,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 1955: { // b,x:(r)+n y:(rh)+,b
+	case 2023: { // b,x:(r)+n y:(rh)+,b
 		unhandled("b,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 1956: { // x0,x:(r)+n y:(rh),y0
+	case 2024: { // x0,x:(r)+n y:(rh),y0
 		unhandled("x0,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 1957: { // x0,x:(r)+n y:(rh),y1
+	case 2025: { // x0,x:(r)+n y:(rh),y1
 		unhandled("x0,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 1958: { // x0,x:(r)+n y:(rh),a
+	case 2026: { // x0,x:(r)+n y:(rh),a
 		unhandled("x0,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 1959: { // x0,x:(r)+n y:(rh),b
+	case 2027: { // x0,x:(r)+n y:(rh),b
 		unhandled("x0,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 1960: { // x1,x:(r)+n y:(rh),y0
+	case 2028: { // x1,x:(r)+n y:(rh),y0
 		unhandled("x1,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 1961: { // x1,x:(r)+n y:(rh),y1
+	case 2029: { // x1,x:(r)+n y:(rh),y1
 		unhandled("x1,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 1962: { // x1,x:(r)+n y:(rh),a
+	case 2030: { // x1,x:(r)+n y:(rh),a
 		unhandled("x1,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 1963: { // x1,x:(r)+n y:(rh),b
+	case 2031: { // x1,x:(r)+n y:(rh),b
 		unhandled("x1,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 1964: { // a,x:(r)+n y:(rh),y0
+	case 2032: { // a,x:(r)+n y:(rh),y0
 		unhandled("a,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 1965: { // a,x:(r)+n y:(rh),y1
+	case 2033: { // a,x:(r)+n y:(rh),y1
 		unhandled("a,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 1966: { // a,x:(r)+n y:(rh),a
+	case 2034: { // a,x:(r)+n y:(rh),a
 		unhandled("a,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 1967: { // a,x:(r)+n y:(rh),b
+	case 2035: { // a,x:(r)+n y:(rh),b
 		unhandled("a,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 1968: { // b,x:(r)+n y:(rh),y0
+	case 2036: { // b,x:(r)+n y:(rh),y0
 		unhandled("b,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 1969: { // b,x:(r)+n y:(rh),y1
+	case 2037: { // b,x:(r)+n y:(rh),y1
 		unhandled("b,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 1970: { // b,x:(r)+n y:(rh),a
+	case 2038: { // b,x:(r)+n y:(rh),a
 		unhandled("b,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 1971: { // b,x:(r)+n y:(rh),b
+	case 2039: { // b,x:(r)+n y:(rh),b
 		unhandled("b,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 1972: { // x0,x:(r)- y:(rh)+n,y0
+	case 2040: { // x0,x:(r)- y:(rh)+n,y0
 		unhandled("x0,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 1973: { // x0,x:(r)- y:(rh)+n,y1
+	case 2041: { // x0,x:(r)- y:(rh)+n,y1
 		unhandled("x0,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 1974: { // x0,x:(r)- y:(rh)+n,a
+	case 2042: { // x0,x:(r)- y:(rh)+n,a
 		unhandled("x0,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 1975: { // x0,x:(r)- y:(rh)+n,b
+	case 2043: { // x0,x:(r)- y:(rh)+n,b
 		unhandled("x0,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 1976: { // x1,x:(r)- y:(rh)+n,y0
+	case 2044: { // x1,x:(r)- y:(rh)+n,y0
 		unhandled("x1,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 1977: { // x1,x:(r)- y:(rh)+n,y1
+	case 2045: { // x1,x:(r)- y:(rh)+n,y1
 		unhandled("x1,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 1978: { // x1,x:(r)- y:(rh)+n,a
+	case 2046: { // x1,x:(r)- y:(rh)+n,a
 		unhandled("x1,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 1979: { // x1,x:(r)- y:(rh)+n,b
+	case 2047: { // x1,x:(r)- y:(rh)+n,b
 		unhandled("x1,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 1980: { // a,x:(r)- y:(rh)+n,y0
+	case 2048: { // a,x:(r)- y:(rh)+n,y0
 		unhandled("a,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 1981: { // a,x:(r)- y:(rh)+n,y1
+	case 2049: { // a,x:(r)- y:(rh)+n,y1
 		unhandled("a,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 1982: { // a,x:(r)- y:(rh)+n,a
+	case 2050: { // a,x:(r)- y:(rh)+n,a
 		unhandled("a,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 1983: { // a,x:(r)- y:(rh)+n,b
+	case 2051: { // a,x:(r)- y:(rh)+n,b
 		unhandled("a,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 1984: { // b,x:(r)- y:(rh)+n,y0
+	case 2052: { // b,x:(r)- y:(rh)+n,y0
 		unhandled("b,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 1985: { // b,x:(r)- y:(rh)+n,y1
+	case 2053: { // b,x:(r)- y:(rh)+n,y1
 		unhandled("b,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 1986: { // b,x:(r)- y:(rh)+n,a
+	case 2054: { // b,x:(r)- y:(rh)+n,a
 		unhandled("b,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 1987: { // b,x:(r)- y:(rh)+n,b
+	case 2055: { // b,x:(r)- y:(rh)+n,b
 		unhandled("b,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 1988: { // x0,x:(r)- y:(rh)-,y0
+	case 2056: { // x0,x:(r)- y:(rh)-,y0
 		unhandled("x0,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 1989: { // x0,x:(r)- y:(rh)-,y1
+	case 2057: { // x0,x:(r)- y:(rh)-,y1
 		unhandled("x0,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 1990: { // x0,x:(r)- y:(rh)-,a
+	case 2058: { // x0,x:(r)- y:(rh)-,a
 		unhandled("x0,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 1991: { // x0,x:(r)- y:(rh)-,b
+	case 2059: { // x0,x:(r)- y:(rh)-,b
 		unhandled("x0,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 1992: { // x1,x:(r)- y:(rh)-,y0
+	case 2060: { // x1,x:(r)- y:(rh)-,y0
 		unhandled("x1,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 1993: { // x1,x:(r)- y:(rh)-,y1
+	case 2061: { // x1,x:(r)- y:(rh)-,y1
 		unhandled("x1,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 1994: { // x1,x:(r)- y:(rh)-,a
+	case 2062: { // x1,x:(r)- y:(rh)-,a
 		unhandled("x1,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 1995: { // x1,x:(r)- y:(rh)-,b
+	case 2063: { // x1,x:(r)- y:(rh)-,b
 		unhandled("x1,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 1996: { // a,x:(r)- y:(rh)-,y0
+	case 2064: { // a,x:(r)- y:(rh)-,y0
 		unhandled("a,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 1997: { // a,x:(r)- y:(rh)-,y1
+	case 2065: { // a,x:(r)- y:(rh)-,y1
 		unhandled("a,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 1998: { // a,x:(r)- y:(rh)-,a
+	case 2066: { // a,x:(r)- y:(rh)-,a
 		unhandled("a,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 1999: { // a,x:(r)- y:(rh)-,b
+	case 2067: { // a,x:(r)- y:(rh)-,b
 		unhandled("a,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2000: { // b,x:(r)- y:(rh)-,y0
+	case 2068: { // b,x:(r)- y:(rh)-,y0
 		unhandled("b,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2001: { // b,x:(r)- y:(rh)-,y1
+	case 2069: { // b,x:(r)- y:(rh)-,y1
 		unhandled("b,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2002: { // b,x:(r)- y:(rh)-,a
+	case 2070: { // b,x:(r)- y:(rh)-,a
 		unhandled("b,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2003: { // b,x:(r)- y:(rh)-,b
+	case 2071: { // b,x:(r)- y:(rh)-,b
 		unhandled("b,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2004: { // x0,x:(r)- y:(rh)+,y0
+	case 2072: { // x0,x:(r)- y:(rh)+,y0
 		unhandled("x0,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2005: { // x0,x:(r)- y:(rh)+,y1
+	case 2073: { // x0,x:(r)- y:(rh)+,y1
 		unhandled("x0,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2006: { // x0,x:(r)- y:(rh)+,a
+	case 2074: { // x0,x:(r)- y:(rh)+,a
 		unhandled("x0,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2007: { // x0,x:(r)- y:(rh)+,b
+	case 2075: { // x0,x:(r)- y:(rh)+,b
 		unhandled("x0,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2008: { // x1,x:(r)- y:(rh)+,y0
+	case 2076: { // x1,x:(r)- y:(rh)+,y0
 		unhandled("x1,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2009: { // x1,x:(r)- y:(rh)+,y1
+	case 2077: { // x1,x:(r)- y:(rh)+,y1
 		unhandled("x1,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2010: { // x1,x:(r)- y:(rh)+,a
+	case 2078: { // x1,x:(r)- y:(rh)+,a
 		unhandled("x1,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2011: { // x1,x:(r)- y:(rh)+,b
+	case 2079: { // x1,x:(r)- y:(rh)+,b
 		unhandled("x1,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2012: { // a,x:(r)- y:(rh)+,y0
+	case 2080: { // a,x:(r)- y:(rh)+,y0
 		unhandled("a,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2013: { // a,x:(r)- y:(rh)+,y1
+	case 2081: { // a,x:(r)- y:(rh)+,y1
 		unhandled("a,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2014: { // a,x:(r)- y:(rh)+,a
+	case 2082: { // a,x:(r)- y:(rh)+,a
 		unhandled("a,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2015: { // a,x:(r)- y:(rh)+,b
+	case 2083: { // a,x:(r)- y:(rh)+,b
 		unhandled("a,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2016: { // b,x:(r)- y:(rh)+,y0
+	case 2084: { // b,x:(r)- y:(rh)+,y0
 		unhandled("b,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2017: { // b,x:(r)- y:(rh)+,y1
+	case 2085: { // b,x:(r)- y:(rh)+,y1
 		unhandled("b,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2018: { // b,x:(r)- y:(rh)+,a
+	case 2086: { // b,x:(r)- y:(rh)+,a
 		unhandled("b,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2019: { // b,x:(r)- y:(rh)+,b
+	case 2087: { // b,x:(r)- y:(rh)+,b
 		unhandled("b,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2020: { // x0,x:(r)- y:(rh),y0
+	case 2088: { // x0,x:(r)- y:(rh),y0
 		unhandled("x0,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2021: { // x0,x:(r)- y:(rh),y1
+	case 2089: { // x0,x:(r)- y:(rh),y1
 		unhandled("x0,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2022: { // x0,x:(r)- y:(rh),a
+	case 2090: { // x0,x:(r)- y:(rh),a
 		unhandled("x0,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2023: { // x0,x:(r)- y:(rh),b
+	case 2091: { // x0,x:(r)- y:(rh),b
 		unhandled("x0,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2024: { // x1,x:(r)- y:(rh),y0
+	case 2092: { // x1,x:(r)- y:(rh),y0
 		unhandled("x1,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2025: { // x1,x:(r)- y:(rh),y1
+	case 2093: { // x1,x:(r)- y:(rh),y1
 		unhandled("x1,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2026: { // x1,x:(r)- y:(rh),a
+	case 2094: { // x1,x:(r)- y:(rh),a
 		unhandled("x1,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2027: { // x1,x:(r)- y:(rh),b
+	case 2095: { // x1,x:(r)- y:(rh),b
 		unhandled("x1,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2028: { // a,x:(r)- y:(rh),y0
+	case 2096: { // a,x:(r)- y:(rh),y0
 		unhandled("a,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2029: { // a,x:(r)- y:(rh),y1
+	case 2097: { // a,x:(r)- y:(rh),y1
 		unhandled("a,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2030: { // a,x:(r)- y:(rh),a
+	case 2098: { // a,x:(r)- y:(rh),a
 		unhandled("a,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2031: { // a,x:(r)- y:(rh),b
+	case 2099: { // a,x:(r)- y:(rh),b
 		unhandled("a,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2032: { // b,x:(r)- y:(rh),y0
+	case 2100: { // b,x:(r)- y:(rh),y0
 		unhandled("b,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2033: { // b,x:(r)- y:(rh),y1
+	case 2101: { // b,x:(r)- y:(rh),y1
 		unhandled("b,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2034: { // b,x:(r)- y:(rh),a
+	case 2102: { // b,x:(r)- y:(rh),a
 		unhandled("b,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2035: { // b,x:(r)- y:(rh),b
+	case 2103: { // b,x:(r)- y:(rh),b
 		unhandled("b,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2036: { // x0,x:(r)+ y:(rh)+n,y0
+	case 2104: { // x0,x:(r)+ y:(rh)+n,y0
 		unhandled("x0,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2037: { // x0,x:(r)+ y:(rh)+n,y1
+	case 2105: { // x0,x:(r)+ y:(rh)+n,y1
 		unhandled("x0,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2038: { // x0,x:(r)+ y:(rh)+n,a
+	case 2106: { // x0,x:(r)+ y:(rh)+n,a
 		unhandled("x0,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2039: { // x0,x:(r)+ y:(rh)+n,b
+	case 2107: { // x0,x:(r)+ y:(rh)+n,b
 		unhandled("x0,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2040: { // x1,x:(r)+ y:(rh)+n,y0
+	case 2108: { // x1,x:(r)+ y:(rh)+n,y0
 		unhandled("x1,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2041: { // x1,x:(r)+ y:(rh)+n,y1
+	case 2109: { // x1,x:(r)+ y:(rh)+n,y1
 		unhandled("x1,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2042: { // x1,x:(r)+ y:(rh)+n,a
+	case 2110: { // x1,x:(r)+ y:(rh)+n,a
 		unhandled("x1,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2043: { // x1,x:(r)+ y:(rh)+n,b
+	case 2111: { // x1,x:(r)+ y:(rh)+n,b
 		unhandled("x1,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2044: { // a,x:(r)+ y:(rh)+n,y0
+	case 2112: { // a,x:(r)+ y:(rh)+n,y0
 		unhandled("a,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2045: { // a,x:(r)+ y:(rh)+n,y1
+	case 2113: { // a,x:(r)+ y:(rh)+n,y1
 		unhandled("a,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2046: { // a,x:(r)+ y:(rh)+n,a
+	case 2114: { // a,x:(r)+ y:(rh)+n,a
 		unhandled("a,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2047: { // a,x:(r)+ y:(rh)+n,b
+	case 2115: { // a,x:(r)+ y:(rh)+n,b
 		unhandled("a,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2048: { // b,x:(r)+ y:(rh)+n,y0
+	case 2116: { // b,x:(r)+ y:(rh)+n,y0
 		unhandled("b,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2049: { // b,x:(r)+ y:(rh)+n,y1
+	case 2117: { // b,x:(r)+ y:(rh)+n,y1
 		unhandled("b,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2050: { // b,x:(r)+ y:(rh)+n,a
+	case 2118: { // b,x:(r)+ y:(rh)+n,a
 		unhandled("b,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2051: { // b,x:(r)+ y:(rh)+n,b
+	case 2119: { // b,x:(r)+ y:(rh)+n,b
 		unhandled("b,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2052: { // x0,x:(r)+ y:(rh)-,y0
+	case 2120: { // x0,x:(r)+ y:(rh)-,y0
 		unhandled("x0,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2053: { // x0,x:(r)+ y:(rh)-,y1
+	case 2121: { // x0,x:(r)+ y:(rh)-,y1
 		unhandled("x0,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2054: { // x0,x:(r)+ y:(rh)-,a
+	case 2122: { // x0,x:(r)+ y:(rh)-,a
 		unhandled("x0,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2055: { // x0,x:(r)+ y:(rh)-,b
+	case 2123: { // x0,x:(r)+ y:(rh)-,b
 		unhandled("x0,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2056: { // x1,x:(r)+ y:(rh)-,y0
+	case 2124: { // x1,x:(r)+ y:(rh)-,y0
 		unhandled("x1,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2057: { // x1,x:(r)+ y:(rh)-,y1
+	case 2125: { // x1,x:(r)+ y:(rh)-,y1
 		unhandled("x1,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2058: { // x1,x:(r)+ y:(rh)-,a
+	case 2126: { // x1,x:(r)+ y:(rh)-,a
 		unhandled("x1,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2059: { // x1,x:(r)+ y:(rh)-,b
+	case 2127: { // x1,x:(r)+ y:(rh)-,b
 		unhandled("x1,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2060: { // a,x:(r)+ y:(rh)-,y0
+	case 2128: { // a,x:(r)+ y:(rh)-,y0
 		unhandled("a,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2061: { // a,x:(r)+ y:(rh)-,y1
+	case 2129: { // a,x:(r)+ y:(rh)-,y1
 		unhandled("a,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2062: { // a,x:(r)+ y:(rh)-,a
+	case 2130: { // a,x:(r)+ y:(rh)-,a
 		unhandled("a,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2063: { // a,x:(r)+ y:(rh)-,b
+	case 2131: { // a,x:(r)+ y:(rh)-,b
 		unhandled("a,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2064: { // b,x:(r)+ y:(rh)-,y0
+	case 2132: { // b,x:(r)+ y:(rh)-,y0
 		unhandled("b,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2065: { // b,x:(r)+ y:(rh)-,y1
+	case 2133: { // b,x:(r)+ y:(rh)-,y1
 		unhandled("b,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2066: { // b,x:(r)+ y:(rh)-,a
+	case 2134: { // b,x:(r)+ y:(rh)-,a
 		unhandled("b,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2067: { // b,x:(r)+ y:(rh)-,b
+	case 2135: { // b,x:(r)+ y:(rh)-,b
 		unhandled("b,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2068: { // x0,x:(r)+ y:(rh)+,y0
+	case 2136: { // x0,x:(r)+ y:(rh)+,y0
 		unhandled("x0,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2069: { // x0,x:(r)+ y:(rh)+,y1
+	case 2137: { // x0,x:(r)+ y:(rh)+,y1
 		unhandled("x0,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2070: { // x0,x:(r)+ y:(rh)+,a
+	case 2138: { // x0,x:(r)+ y:(rh)+,a
 		unhandled("x0,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2071: { // x0,x:(r)+ y:(rh)+,b
+	case 2139: { // x0,x:(r)+ y:(rh)+,b
 		unhandled("x0,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2072: { // x1,x:(r)+ y:(rh)+,y0
+	case 2140: { // x1,x:(r)+ y:(rh)+,y0
 		unhandled("x1,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2073: { // x1,x:(r)+ y:(rh)+,y1
+	case 2141: { // x1,x:(r)+ y:(rh)+,y1
 		unhandled("x1,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2074: { // x1,x:(r)+ y:(rh)+,a
+	case 2142: { // x1,x:(r)+ y:(rh)+,a
 		unhandled("x1,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2075: { // x1,x:(r)+ y:(rh)+,b
+	case 2143: { // x1,x:(r)+ y:(rh)+,b
 		unhandled("x1,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2076: { // a,x:(r)+ y:(rh)+,y0
+	case 2144: { // a,x:(r)+ y:(rh)+,y0
 		unhandled("a,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2077: { // a,x:(r)+ y:(rh)+,y1
+	case 2145: { // a,x:(r)+ y:(rh)+,y1
 		unhandled("a,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2078: { // a,x:(r)+ y:(rh)+,a
+	case 2146: { // a,x:(r)+ y:(rh)+,a
 		unhandled("a,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2079: { // a,x:(r)+ y:(rh)+,b
+	case 2147: { // a,x:(r)+ y:(rh)+,b
 		unhandled("a,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2080: { // b,x:(r)+ y:(rh)+,y0
+	case 2148: { // b,x:(r)+ y:(rh)+,y0
 		unhandled("b,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2081: { // b,x:(r)+ y:(rh)+,y1
+	case 2149: { // b,x:(r)+ y:(rh)+,y1
 		unhandled("b,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2082: { // b,x:(r)+ y:(rh)+,a
+	case 2150: { // b,x:(r)+ y:(rh)+,a
 		unhandled("b,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2083: { // b,x:(r)+ y:(rh)+,b
+	case 2151: { // b,x:(r)+ y:(rh)+,b
 		unhandled("b,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2084: { // x0,x:(r)+ y:(rh),y0
+	case 2152: { // x0,x:(r)+ y:(rh),y0
 		unhandled("x0,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2085: { // x0,x:(r)+ y:(rh),y1
+	case 2153: { // x0,x:(r)+ y:(rh),y1
 		unhandled("x0,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2086: { // x0,x:(r)+ y:(rh),a
+	case 2154: { // x0,x:(r)+ y:(rh),a
 		unhandled("x0,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2087: { // x0,x:(r)+ y:(rh),b
+	case 2155: { // x0,x:(r)+ y:(rh),b
 		unhandled("x0,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2088: { // x1,x:(r)+ y:(rh),y0
+	case 2156: { // x1,x:(r)+ y:(rh),y0
 		unhandled("x1,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2089: { // x1,x:(r)+ y:(rh),y1
+	case 2157: { // x1,x:(r)+ y:(rh),y1
 		unhandled("x1,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2090: { // x1,x:(r)+ y:(rh),a
+	case 2158: { // x1,x:(r)+ y:(rh),a
 		unhandled("x1,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2091: { // x1,x:(r)+ y:(rh),b
+	case 2159: { // x1,x:(r)+ y:(rh),b
 		unhandled("x1,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2092: { // a,x:(r)+ y:(rh),y0
+	case 2160: { // a,x:(r)+ y:(rh),y0
 		unhandled("a,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2093: { // a,x:(r)+ y:(rh),y1
+	case 2161: { // a,x:(r)+ y:(rh),y1
 		unhandled("a,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2094: { // a,x:(r)+ y:(rh),a
+	case 2162: { // a,x:(r)+ y:(rh),a
 		unhandled("a,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2095: { // a,x:(r)+ y:(rh),b
+	case 2163: { // a,x:(r)+ y:(rh),b
 		unhandled("a,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2096: { // b,x:(r)+ y:(rh),y0
+	case 2164: { // b,x:(r)+ y:(rh),y0
 		unhandled("b,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2097: { // b,x:(r)+ y:(rh),y1
+	case 2165: { // b,x:(r)+ y:(rh),y1
 		unhandled("b,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2098: { // b,x:(r)+ y:(rh),a
+	case 2166: { // b,x:(r)+ y:(rh),a
 		unhandled("b,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2099: { // b,x:(r)+ y:(rh),b
+	case 2167: { // b,x:(r)+ y:(rh),b
 		unhandled("b,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2100: { // x0,x:(r) y:(rh)+n,y0
+	case 2168: { // x0,x:(r) y:(rh)+n,y0
 		unhandled("x0,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2101: { // x0,x:(r) y:(rh)+n,y1
+	case 2169: { // x0,x:(r) y:(rh)+n,y1
 		unhandled("x0,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2102: { // x0,x:(r) y:(rh)+n,a
+	case 2170: { // x0,x:(r) y:(rh)+n,a
 		unhandled("x0,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2103: { // x0,x:(r) y:(rh)+n,b
+	case 2171: { // x0,x:(r) y:(rh)+n,b
 		unhandled("x0,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2104: { // x1,x:(r) y:(rh)+n,y0
+	case 2172: { // x1,x:(r) y:(rh)+n,y0
 		unhandled("x1,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2105: { // x1,x:(r) y:(rh)+n,y1
+	case 2173: { // x1,x:(r) y:(rh)+n,y1
 		unhandled("x1,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2106: { // x1,x:(r) y:(rh)+n,a
+	case 2174: { // x1,x:(r) y:(rh)+n,a
 		unhandled("x1,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2107: { // x1,x:(r) y:(rh)+n,b
+	case 2175: { // x1,x:(r) y:(rh)+n,b
 		unhandled("x1,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2108: { // a,x:(r) y:(rh)+n,y0
+	case 2176: { // a,x:(r) y:(rh)+n,y0
 		unhandled("a,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2109: { // a,x:(r) y:(rh)+n,y1
+	case 2177: { // a,x:(r) y:(rh)+n,y1
 		unhandled("a,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2110: { // a,x:(r) y:(rh)+n,a
+	case 2178: { // a,x:(r) y:(rh)+n,a
 		unhandled("a,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2111: { // a,x:(r) y:(rh)+n,b
+	case 2179: { // a,x:(r) y:(rh)+n,b
 		unhandled("a,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2112: { // b,x:(r) y:(rh)+n,y0
+	case 2180: { // b,x:(r) y:(rh)+n,y0
 		unhandled("b,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2113: { // b,x:(r) y:(rh)+n,y1
+	case 2181: { // b,x:(r) y:(rh)+n,y1
 		unhandled("b,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2114: { // b,x:(r) y:(rh)+n,a
+	case 2182: { // b,x:(r) y:(rh)+n,a
 		unhandled("b,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2115: { // b,x:(r) y:(rh)+n,b
+	case 2183: { // b,x:(r) y:(rh)+n,b
 		unhandled("b,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2116: { // x0,x:(r) y:(rh)-,y0
+	case 2184: { // x0,x:(r) y:(rh)-,y0
 		unhandled("x0,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2117: { // x0,x:(r) y:(rh)-,y1
+	case 2185: { // x0,x:(r) y:(rh)-,y1
 		unhandled("x0,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2118: { // x0,x:(r) y:(rh)-,a
+	case 2186: { // x0,x:(r) y:(rh)-,a
 		unhandled("x0,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2119: { // x0,x:(r) y:(rh)-,b
+	case 2187: { // x0,x:(r) y:(rh)-,b
 		unhandled("x0,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2120: { // x1,x:(r) y:(rh)-,y0
+	case 2188: { // x1,x:(r) y:(rh)-,y0
 		unhandled("x1,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2121: { // x1,x:(r) y:(rh)-,y1
+	case 2189: { // x1,x:(r) y:(rh)-,y1
 		unhandled("x1,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2122: { // x1,x:(r) y:(rh)-,a
+	case 2190: { // x1,x:(r) y:(rh)-,a
 		unhandled("x1,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2123: { // x1,x:(r) y:(rh)-,b
+	case 2191: { // x1,x:(r) y:(rh)-,b
 		unhandled("x1,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2124: { // a,x:(r) y:(rh)-,y0
+	case 2192: { // a,x:(r) y:(rh)-,y0
 		unhandled("a,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2125: { // a,x:(r) y:(rh)-,y1
+	case 2193: { // a,x:(r) y:(rh)-,y1
 		unhandled("a,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2126: { // a,x:(r) y:(rh)-,a
+	case 2194: { // a,x:(r) y:(rh)-,a
 		unhandled("a,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2127: { // a,x:(r) y:(rh)-,b
+	case 2195: { // a,x:(r) y:(rh)-,b
 		unhandled("a,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2128: { // b,x:(r) y:(rh)-,y0
+	case 2196: { // b,x:(r) y:(rh)-,y0
 		unhandled("b,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2129: { // b,x:(r) y:(rh)-,y1
+	case 2197: { // b,x:(r) y:(rh)-,y1
 		unhandled("b,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2130: { // b,x:(r) y:(rh)-,a
+	case 2198: { // b,x:(r) y:(rh)-,a
 		unhandled("b,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2131: { // b,x:(r) y:(rh)-,b
+	case 2199: { // b,x:(r) y:(rh)-,b
 		unhandled("b,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2132: { // x0,x:(r) y:(rh)+,y0
+	case 2200: { // x0,x:(r) y:(rh)+,y0
 		unhandled("x0,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2133: { // x0,x:(r) y:(rh)+,y1
+	case 2201: { // x0,x:(r) y:(rh)+,y1
 		unhandled("x0,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2134: { // x0,x:(r) y:(rh)+,a
+	case 2202: { // x0,x:(r) y:(rh)+,a
 		unhandled("x0,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2135: { // x0,x:(r) y:(rh)+,b
+	case 2203: { // x0,x:(r) y:(rh)+,b
 		unhandled("x0,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2136: { // x1,x:(r) y:(rh)+,y0
+	case 2204: { // x1,x:(r) y:(rh)+,y0
 		unhandled("x1,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2137: { // x1,x:(r) y:(rh)+,y1
+	case 2205: { // x1,x:(r) y:(rh)+,y1
 		unhandled("x1,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2138: { // x1,x:(r) y:(rh)+,a
+	case 2206: { // x1,x:(r) y:(rh)+,a
 		unhandled("x1,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2139: { // x1,x:(r) y:(rh)+,b
+	case 2207: { // x1,x:(r) y:(rh)+,b
 		unhandled("x1,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2140: { // a,x:(r) y:(rh)+,y0
+	case 2208: { // a,x:(r) y:(rh)+,y0
 		unhandled("a,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2141: { // a,x:(r) y:(rh)+,y1
+	case 2209: { // a,x:(r) y:(rh)+,y1
 		unhandled("a,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2142: { // a,x:(r) y:(rh)+,a
+	case 2210: { // a,x:(r) y:(rh)+,a
 		unhandled("a,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2143: { // a,x:(r) y:(rh)+,b
+	case 2211: { // a,x:(r) y:(rh)+,b
 		unhandled("a,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2144: { // b,x:(r) y:(rh)+,y0
+	case 2212: { // b,x:(r) y:(rh)+,y0
 		unhandled("b,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2145: { // b,x:(r) y:(rh)+,y1
+	case 2213: { // b,x:(r) y:(rh)+,y1
 		unhandled("b,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2146: { // b,x:(r) y:(rh)+,a
+	case 2214: { // b,x:(r) y:(rh)+,a
 		unhandled("b,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2147: { // b,x:(r) y:(rh)+,b
+	case 2215: { // b,x:(r) y:(rh)+,b
 		unhandled("b,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2148: { // x0,x:(r) y:(rh),y0
+	case 2216: { // x0,x:(r) y:(rh),y0
 		unhandled("x0,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2149: { // x0,x:(r) y:(rh),y1
+	case 2217: { // x0,x:(r) y:(rh),y1
 		unhandled("x0,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2150: { // x0,x:(r) y:(rh),a
+	case 2218: { // x0,x:(r) y:(rh),a
 		unhandled("x0,x:(r) y:(rh),a");
 		break;
 		}
-	case 2151: { // x0,x:(r) y:(rh),b
+	case 2219: { // x0,x:(r) y:(rh),b
 		unhandled("x0,x:(r) y:(rh),b");
 		break;
 		}
-	case 2152: { // x1,x:(r) y:(rh),y0
+	case 2220: { // x1,x:(r) y:(rh),y0
 		unhandled("x1,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2153: { // x1,x:(r) y:(rh),y1
+	case 2221: { // x1,x:(r) y:(rh),y1
 		unhandled("x1,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2154: { // x1,x:(r) y:(rh),a
+	case 2222: { // x1,x:(r) y:(rh),a
 		unhandled("x1,x:(r) y:(rh),a");
 		break;
 		}
-	case 2155: { // x1,x:(r) y:(rh),b
+	case 2223: { // x1,x:(r) y:(rh),b
 		unhandled("x1,x:(r) y:(rh),b");
 		break;
 		}
-	case 2156: { // a,x:(r) y:(rh),y0
+	case 2224: { // a,x:(r) y:(rh),y0
 		unhandled("a,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2157: { // a,x:(r) y:(rh),y1
+	case 2225: { // a,x:(r) y:(rh),y1
 		unhandled("a,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2158: { // a,x:(r) y:(rh),a
+	case 2226: { // a,x:(r) y:(rh),a
 		unhandled("a,x:(r) y:(rh),a");
 		break;
 		}
-	case 2159: { // a,x:(r) y:(rh),b
+	case 2227: { // a,x:(r) y:(rh),b
 		unhandled("a,x:(r) y:(rh),b");
 		break;
 		}
-	case 2160: { // b,x:(r) y:(rh),y0
+	case 2228: { // b,x:(r) y:(rh),y0
 		unhandled("b,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2161: { // b,x:(r) y:(rh),y1
+	case 2229: { // b,x:(r) y:(rh),y1
 		unhandled("b,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2162: { // b,x:(r) y:(rh),a
+	case 2230: { // b,x:(r) y:(rh),a
 		unhandled("b,x:(r) y:(rh),a");
 		break;
 		}
-	case 2163: { // b,x:(r) y:(rh),b
+	case 2231: { // b,x:(r) y:(rh),b
 		unhandled("b,x:(r) y:(rh),b");
 		break;
 		}
-	case 2164: { // x0,x:(r)+n y0,y:(rh)+n
+	case 2232: { // x0,x:(r)+n y0,y:(rh)+n
 		unhandled("x0,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2165: { // x0,x:(r)+n y1,y:(rh)+n
+	case 2233: { // x0,x:(r)+n y1,y:(rh)+n
 		unhandled("x0,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2166: { // x0,x:(r)+n a,y:(rh)+n
+	case 2234: { // x0,x:(r)+n a,y:(rh)+n
 		unhandled("x0,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2167: { // x0,x:(r)+n b,y:(rh)+n
+	case 2235: { // x0,x:(r)+n b,y:(rh)+n
 		unhandled("x0,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2168: { // x1,x:(r)+n y0,y:(rh)+n
+	case 2236: { // x1,x:(r)+n y0,y:(rh)+n
 		unhandled("x1,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2169: { // x1,x:(r)+n y1,y:(rh)+n
+	case 2237: { // x1,x:(r)+n y1,y:(rh)+n
 		unhandled("x1,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2170: { // x1,x:(r)+n a,y:(rh)+n
+	case 2238: { // x1,x:(r)+n a,y:(rh)+n
 		unhandled("x1,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2171: { // x1,x:(r)+n b,y:(rh)+n
+	case 2239: { // x1,x:(r)+n b,y:(rh)+n
 		unhandled("x1,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2172: { // a,x:(r)+n y0,y:(rh)+n
+	case 2240: { // a,x:(r)+n y0,y:(rh)+n
 		unhandled("a,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2173: { // a,x:(r)+n y1,y:(rh)+n
+	case 2241: { // a,x:(r)+n y1,y:(rh)+n
 		unhandled("a,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2174: { // a,x:(r)+n a,y:(rh)+n
+	case 2242: { // a,x:(r)+n a,y:(rh)+n
 		unhandled("a,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2175: { // a,x:(r)+n b,y:(rh)+n
+	case 2243: { // a,x:(r)+n b,y:(rh)+n
 		unhandled("a,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2176: { // b,x:(r)+n y0,y:(rh)+n
+	case 2244: { // b,x:(r)+n y0,y:(rh)+n
 		unhandled("b,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2177: { // b,x:(r)+n y1,y:(rh)+n
+	case 2245: { // b,x:(r)+n y1,y:(rh)+n
 		unhandled("b,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2178: { // b,x:(r)+n a,y:(rh)+n
+	case 2246: { // b,x:(r)+n a,y:(rh)+n
 		unhandled("b,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2179: { // b,x:(r)+n b,y:(rh)+n
+	case 2247: { // b,x:(r)+n b,y:(rh)+n
 		unhandled("b,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2180: { // x0,x:(r)+n y0,y:(rh)-
+	case 2248: { // x0,x:(r)+n y0,y:(rh)-
 		unhandled("x0,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2181: { // x0,x:(r)+n y1,y:(rh)-
+	case 2249: { // x0,x:(r)+n y1,y:(rh)-
 		unhandled("x0,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2182: { // x0,x:(r)+n a,y:(rh)-
+	case 2250: { // x0,x:(r)+n a,y:(rh)-
 		unhandled("x0,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2183: { // x0,x:(r)+n b,y:(rh)-
+	case 2251: { // x0,x:(r)+n b,y:(rh)-
 		unhandled("x0,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2184: { // x1,x:(r)+n y0,y:(rh)-
+	case 2252: { // x1,x:(r)+n y0,y:(rh)-
 		unhandled("x1,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2185: { // x1,x:(r)+n y1,y:(rh)-
+	case 2253: { // x1,x:(r)+n y1,y:(rh)-
 		unhandled("x1,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2186: { // x1,x:(r)+n a,y:(rh)-
+	case 2254: { // x1,x:(r)+n a,y:(rh)-
 		unhandled("x1,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2187: { // x1,x:(r)+n b,y:(rh)-
+	case 2255: { // x1,x:(r)+n b,y:(rh)-
 		unhandled("x1,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2188: { // a,x:(r)+n y0,y:(rh)-
+	case 2256: { // a,x:(r)+n y0,y:(rh)-
 		unhandled("a,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2189: { // a,x:(r)+n y1,y:(rh)-
+	case 2257: { // a,x:(r)+n y1,y:(rh)-
 		unhandled("a,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2190: { // a,x:(r)+n a,y:(rh)-
+	case 2258: { // a,x:(r)+n a,y:(rh)-
 		unhandled("a,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2191: { // a,x:(r)+n b,y:(rh)-
+	case 2259: { // a,x:(r)+n b,y:(rh)-
 		unhandled("a,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2192: { // b,x:(r)+n y0,y:(rh)-
+	case 2260: { // b,x:(r)+n y0,y:(rh)-
 		unhandled("b,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2193: { // b,x:(r)+n y1,y:(rh)-
+	case 2261: { // b,x:(r)+n y1,y:(rh)-
 		unhandled("b,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2194: { // b,x:(r)+n a,y:(rh)-
+	case 2262: { // b,x:(r)+n a,y:(rh)-
 		unhandled("b,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2195: { // b,x:(r)+n b,y:(rh)-
+	case 2263: { // b,x:(r)+n b,y:(rh)-
 		unhandled("b,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2196: { // x0,x:(r)+n y0,y:(rh)+
+	case 2264: { // x0,x:(r)+n y0,y:(rh)+
 		unhandled("x0,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2197: { // x0,x:(r)+n y1,y:(rh)+
+	case 2265: { // x0,x:(r)+n y1,y:(rh)+
 		unhandled("x0,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2198: { // x0,x:(r)+n a,y:(rh)+
+	case 2266: { // x0,x:(r)+n a,y:(rh)+
 		unhandled("x0,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2199: { // x0,x:(r)+n b,y:(rh)+
+	case 2267: { // x0,x:(r)+n b,y:(rh)+
 		unhandled("x0,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2200: { // x1,x:(r)+n y0,y:(rh)+
+	case 2268: { // x1,x:(r)+n y0,y:(rh)+
 		unhandled("x1,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2201: { // x1,x:(r)+n y1,y:(rh)+
+	case 2269: { // x1,x:(r)+n y1,y:(rh)+
 		unhandled("x1,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2202: { // x1,x:(r)+n a,y:(rh)+
+	case 2270: { // x1,x:(r)+n a,y:(rh)+
 		unhandled("x1,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2203: { // x1,x:(r)+n b,y:(rh)+
+	case 2271: { // x1,x:(r)+n b,y:(rh)+
 		unhandled("x1,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2204: { // a,x:(r)+n y0,y:(rh)+
+	case 2272: { // a,x:(r)+n y0,y:(rh)+
 		unhandled("a,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2205: { // a,x:(r)+n y1,y:(rh)+
+	case 2273: { // a,x:(r)+n y1,y:(rh)+
 		unhandled("a,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2206: { // a,x:(r)+n a,y:(rh)+
+	case 2274: { // a,x:(r)+n a,y:(rh)+
 		unhandled("a,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2207: { // a,x:(r)+n b,y:(rh)+
+	case 2275: { // a,x:(r)+n b,y:(rh)+
 		unhandled("a,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2208: { // b,x:(r)+n y0,y:(rh)+
+	case 2276: { // b,x:(r)+n y0,y:(rh)+
 		unhandled("b,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2209: { // b,x:(r)+n y1,y:(rh)+
+	case 2277: { // b,x:(r)+n y1,y:(rh)+
 		unhandled("b,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2210: { // b,x:(r)+n a,y:(rh)+
+	case 2278: { // b,x:(r)+n a,y:(rh)+
 		unhandled("b,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2211: { // b,x:(r)+n b,y:(rh)+
+	case 2279: { // b,x:(r)+n b,y:(rh)+
 		unhandled("b,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2212: { // x0,x:(r)+n y0,y:(rh)
+	case 2280: { // x0,x:(r)+n y0,y:(rh)
 		unhandled("x0,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2213: { // x0,x:(r)+n y1,y:(rh)
+	case 2281: { // x0,x:(r)+n y1,y:(rh)
 		unhandled("x0,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2214: { // x0,x:(r)+n a,y:(rh)
+	case 2282: { // x0,x:(r)+n a,y:(rh)
 		unhandled("x0,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2215: { // x0,x:(r)+n b,y:(rh)
+	case 2283: { // x0,x:(r)+n b,y:(rh)
 		unhandled("x0,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2216: { // x1,x:(r)+n y0,y:(rh)
+	case 2284: { // x1,x:(r)+n y0,y:(rh)
 		unhandled("x1,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2217: { // x1,x:(r)+n y1,y:(rh)
+	case 2285: { // x1,x:(r)+n y1,y:(rh)
 		unhandled("x1,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2218: { // x1,x:(r)+n a,y:(rh)
+	case 2286: { // x1,x:(r)+n a,y:(rh)
 		unhandled("x1,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2219: { // x1,x:(r)+n b,y:(rh)
+	case 2287: { // x1,x:(r)+n b,y:(rh)
 		unhandled("x1,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2220: { // a,x:(r)+n y0,y:(rh)
+	case 2288: { // a,x:(r)+n y0,y:(rh)
 		unhandled("a,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2221: { // a,x:(r)+n y1,y:(rh)
+	case 2289: { // a,x:(r)+n y1,y:(rh)
 		unhandled("a,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2222: { // a,x:(r)+n a,y:(rh)
+	case 2290: { // a,x:(r)+n a,y:(rh)
 		unhandled("a,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2223: { // a,x:(r)+n b,y:(rh)
+	case 2291: { // a,x:(r)+n b,y:(rh)
 		unhandled("a,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2224: { // b,x:(r)+n y0,y:(rh)
+	case 2292: { // b,x:(r)+n y0,y:(rh)
 		unhandled("b,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2225: { // b,x:(r)+n y1,y:(rh)
+	case 2293: { // b,x:(r)+n y1,y:(rh)
 		unhandled("b,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2226: { // b,x:(r)+n a,y:(rh)
+	case 2294: { // b,x:(r)+n a,y:(rh)
 		unhandled("b,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2227: { // b,x:(r)+n b,y:(rh)
+	case 2295: { // b,x:(r)+n b,y:(rh)
 		unhandled("b,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2228: { // x0,x:(r)- y0,y:(rh)+n
+	case 2296: { // x0,x:(r)- y0,y:(rh)+n
 		unhandled("x0,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2229: { // x0,x:(r)- y1,y:(rh)+n
+	case 2297: { // x0,x:(r)- y1,y:(rh)+n
 		unhandled("x0,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2230: { // x0,x:(r)- a,y:(rh)+n
+	case 2298: { // x0,x:(r)- a,y:(rh)+n
 		unhandled("x0,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2231: { // x0,x:(r)- b,y:(rh)+n
+	case 2299: { // x0,x:(r)- b,y:(rh)+n
 		unhandled("x0,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2232: { // x1,x:(r)- y0,y:(rh)+n
+	case 2300: { // x1,x:(r)- y0,y:(rh)+n
 		unhandled("x1,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2233: { // x1,x:(r)- y1,y:(rh)+n
+	case 2301: { // x1,x:(r)- y1,y:(rh)+n
 		unhandled("x1,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2234: { // x1,x:(r)- a,y:(rh)+n
+	case 2302: { // x1,x:(r)- a,y:(rh)+n
 		unhandled("x1,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2235: { // x1,x:(r)- b,y:(rh)+n
+	case 2303: { // x1,x:(r)- b,y:(rh)+n
 		unhandled("x1,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2236: { // a,x:(r)- y0,y:(rh)+n
+	case 2304: { // a,x:(r)- y0,y:(rh)+n
 		unhandled("a,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2237: { // a,x:(r)- y1,y:(rh)+n
+	case 2305: { // a,x:(r)- y1,y:(rh)+n
 		unhandled("a,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2238: { // a,x:(r)- a,y:(rh)+n
+	case 2306: { // a,x:(r)- a,y:(rh)+n
 		unhandled("a,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2239: { // a,x:(r)- b,y:(rh)+n
+	case 2307: { // a,x:(r)- b,y:(rh)+n
 		unhandled("a,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2240: { // b,x:(r)- y0,y:(rh)+n
+	case 2308: { // b,x:(r)- y0,y:(rh)+n
 		unhandled("b,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2241: { // b,x:(r)- y1,y:(rh)+n
+	case 2309: { // b,x:(r)- y1,y:(rh)+n
 		unhandled("b,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2242: { // b,x:(r)- a,y:(rh)+n
+	case 2310: { // b,x:(r)- a,y:(rh)+n
 		unhandled("b,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2243: { // b,x:(r)- b,y:(rh)+n
+	case 2311: { // b,x:(r)- b,y:(rh)+n
 		unhandled("b,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2244: { // x0,x:(r)- y0,y:(rh)-
+	case 2312: { // x0,x:(r)- y0,y:(rh)-
 		unhandled("x0,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2245: { // x0,x:(r)- y1,y:(rh)-
+	case 2313: { // x0,x:(r)- y1,y:(rh)-
 		unhandled("x0,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2246: { // x0,x:(r)- a,y:(rh)-
+	case 2314: { // x0,x:(r)- a,y:(rh)-
 		unhandled("x0,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2247: { // x0,x:(r)- b,y:(rh)-
+	case 2315: { // x0,x:(r)- b,y:(rh)-
 		unhandled("x0,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2248: { // x1,x:(r)- y0,y:(rh)-
+	case 2316: { // x1,x:(r)- y0,y:(rh)-
 		unhandled("x1,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2249: { // x1,x:(r)- y1,y:(rh)-
+	case 2317: { // x1,x:(r)- y1,y:(rh)-
 		unhandled("x1,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2250: { // x1,x:(r)- a,y:(rh)-
+	case 2318: { // x1,x:(r)- a,y:(rh)-
 		unhandled("x1,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2251: { // x1,x:(r)- b,y:(rh)-
+	case 2319: { // x1,x:(r)- b,y:(rh)-
 		unhandled("x1,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2252: { // a,x:(r)- y0,y:(rh)-
+	case 2320: { // a,x:(r)- y0,y:(rh)-
 		unhandled("a,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2253: { // a,x:(r)- y1,y:(rh)-
+	case 2321: { // a,x:(r)- y1,y:(rh)-
 		unhandled("a,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2254: { // a,x:(r)- a,y:(rh)-
+	case 2322: { // a,x:(r)- a,y:(rh)-
 		unhandled("a,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2255: { // a,x:(r)- b,y:(rh)-
+	case 2323: { // a,x:(r)- b,y:(rh)-
 		unhandled("a,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2256: { // b,x:(r)- y0,y:(rh)-
+	case 2324: { // b,x:(r)- y0,y:(rh)-
 		unhandled("b,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2257: { // b,x:(r)- y1,y:(rh)-
+	case 2325: { // b,x:(r)- y1,y:(rh)-
 		unhandled("b,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2258: { // b,x:(r)- a,y:(rh)-
+	case 2326: { // b,x:(r)- a,y:(rh)-
 		unhandled("b,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2259: { // b,x:(r)- b,y:(rh)-
+	case 2327: { // b,x:(r)- b,y:(rh)-
 		unhandled("b,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2260: { // x0,x:(r)- y0,y:(rh)+
+	case 2328: { // x0,x:(r)- y0,y:(rh)+
 		unhandled("x0,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2261: { // x0,x:(r)- y1,y:(rh)+
+	case 2329: { // x0,x:(r)- y1,y:(rh)+
 		unhandled("x0,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2262: { // x0,x:(r)- a,y:(rh)+
+	case 2330: { // x0,x:(r)- a,y:(rh)+
 		unhandled("x0,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2263: { // x0,x:(r)- b,y:(rh)+
+	case 2331: { // x0,x:(r)- b,y:(rh)+
 		unhandled("x0,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2264: { // x1,x:(r)- y0,y:(rh)+
+	case 2332: { // x1,x:(r)- y0,y:(rh)+
 		unhandled("x1,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2265: { // x1,x:(r)- y1,y:(rh)+
+	case 2333: { // x1,x:(r)- y1,y:(rh)+
 		unhandled("x1,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2266: { // x1,x:(r)- a,y:(rh)+
+	case 2334: { // x1,x:(r)- a,y:(rh)+
 		unhandled("x1,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2267: { // x1,x:(r)- b,y:(rh)+
+	case 2335: { // x1,x:(r)- b,y:(rh)+
 		unhandled("x1,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2268: { // a,x:(r)- y0,y:(rh)+
+	case 2336: { // a,x:(r)- y0,y:(rh)+
 		unhandled("a,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2269: { // a,x:(r)- y1,y:(rh)+
+	case 2337: { // a,x:(r)- y1,y:(rh)+
 		unhandled("a,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2270: { // a,x:(r)- a,y:(rh)+
+	case 2338: { // a,x:(r)- a,y:(rh)+
 		unhandled("a,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2271: { // a,x:(r)- b,y:(rh)+
+	case 2339: { // a,x:(r)- b,y:(rh)+
 		unhandled("a,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2272: { // b,x:(r)- y0,y:(rh)+
+	case 2340: { // b,x:(r)- y0,y:(rh)+
 		unhandled("b,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2273: { // b,x:(r)- y1,y:(rh)+
+	case 2341: { // b,x:(r)- y1,y:(rh)+
 		unhandled("b,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2274: { // b,x:(r)- a,y:(rh)+
+	case 2342: { // b,x:(r)- a,y:(rh)+
 		unhandled("b,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2275: { // b,x:(r)- b,y:(rh)+
+	case 2343: { // b,x:(r)- b,y:(rh)+
 		unhandled("b,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2276: { // x0,x:(r)- y0,y:(rh)
+	case 2344: { // x0,x:(r)- y0,y:(rh)
 		unhandled("x0,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2277: { // x0,x:(r)- y1,y:(rh)
+	case 2345: { // x0,x:(r)- y1,y:(rh)
 		unhandled("x0,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2278: { // x0,x:(r)- a,y:(rh)
+	case 2346: { // x0,x:(r)- a,y:(rh)
 		unhandled("x0,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2279: { // x0,x:(r)- b,y:(rh)
+	case 2347: { // x0,x:(r)- b,y:(rh)
 		unhandled("x0,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2280: { // x1,x:(r)- y0,y:(rh)
+	case 2348: { // x1,x:(r)- y0,y:(rh)
 		unhandled("x1,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2281: { // x1,x:(r)- y1,y:(rh)
+	case 2349: { // x1,x:(r)- y1,y:(rh)
 		unhandled("x1,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2282: { // x1,x:(r)- a,y:(rh)
+	case 2350: { // x1,x:(r)- a,y:(rh)
 		unhandled("x1,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2283: { // x1,x:(r)- b,y:(rh)
+	case 2351: { // x1,x:(r)- b,y:(rh)
 		unhandled("x1,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2284: { // a,x:(r)- y0,y:(rh)
+	case 2352: { // a,x:(r)- y0,y:(rh)
 		unhandled("a,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2285: { // a,x:(r)- y1,y:(rh)
+	case 2353: { // a,x:(r)- y1,y:(rh)
 		unhandled("a,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2286: { // a,x:(r)- a,y:(rh)
+	case 2354: { // a,x:(r)- a,y:(rh)
 		unhandled("a,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2287: { // a,x:(r)- b,y:(rh)
+	case 2355: { // a,x:(r)- b,y:(rh)
 		unhandled("a,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2288: { // b,x:(r)- y0,y:(rh)
+	case 2356: { // b,x:(r)- y0,y:(rh)
 		unhandled("b,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2289: { // b,x:(r)- y1,y:(rh)
+	case 2357: { // b,x:(r)- y1,y:(rh)
 		unhandled("b,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2290: { // b,x:(r)- a,y:(rh)
+	case 2358: { // b,x:(r)- a,y:(rh)
 		unhandled("b,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2291: { // b,x:(r)- b,y:(rh)
+	case 2359: { // b,x:(r)- b,y:(rh)
 		unhandled("b,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2292: { // x0,x:(r)+ y0,y:(rh)+n
+	case 2360: { // x0,x:(r)+ y0,y:(rh)+n
 		unhandled("x0,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2293: { // x0,x:(r)+ y1,y:(rh)+n
+	case 2361: { // x0,x:(r)+ y1,y:(rh)+n
 		unhandled("x0,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2294: { // x0,x:(r)+ a,y:(rh)+n
+	case 2362: { // x0,x:(r)+ a,y:(rh)+n
 		unhandled("x0,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2295: { // x0,x:(r)+ b,y:(rh)+n
+	case 2363: { // x0,x:(r)+ b,y:(rh)+n
 		unhandled("x0,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2296: { // x1,x:(r)+ y0,y:(rh)+n
+	case 2364: { // x1,x:(r)+ y0,y:(rh)+n
 		unhandled("x1,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2297: { // x1,x:(r)+ y1,y:(rh)+n
+	case 2365: { // x1,x:(r)+ y1,y:(rh)+n
 		unhandled("x1,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2298: { // x1,x:(r)+ a,y:(rh)+n
+	case 2366: { // x1,x:(r)+ a,y:(rh)+n
 		unhandled("x1,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2299: { // x1,x:(r)+ b,y:(rh)+n
+	case 2367: { // x1,x:(r)+ b,y:(rh)+n
 		unhandled("x1,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2300: { // a,x:(r)+ y0,y:(rh)+n
+	case 2368: { // a,x:(r)+ y0,y:(rh)+n
 		unhandled("a,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2301: { // a,x:(r)+ y1,y:(rh)+n
+	case 2369: { // a,x:(r)+ y1,y:(rh)+n
 		unhandled("a,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2302: { // a,x:(r)+ a,y:(rh)+n
+	case 2370: { // a,x:(r)+ a,y:(rh)+n
 		unhandled("a,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2303: { // a,x:(r)+ b,y:(rh)+n
+	case 2371: { // a,x:(r)+ b,y:(rh)+n
 		unhandled("a,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2304: { // b,x:(r)+ y0,y:(rh)+n
+	case 2372: { // b,x:(r)+ y0,y:(rh)+n
 		unhandled("b,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2305: { // b,x:(r)+ y1,y:(rh)+n
+	case 2373: { // b,x:(r)+ y1,y:(rh)+n
 		unhandled("b,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2306: { // b,x:(r)+ a,y:(rh)+n
+	case 2374: { // b,x:(r)+ a,y:(rh)+n
 		unhandled("b,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2307: { // b,x:(r)+ b,y:(rh)+n
+	case 2375: { // b,x:(r)+ b,y:(rh)+n
 		unhandled("b,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2308: { // x0,x:(r)+ y0,y:(rh)-
+	case 2376: { // x0,x:(r)+ y0,y:(rh)-
 		unhandled("x0,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2309: { // x0,x:(r)+ y1,y:(rh)-
+	case 2377: { // x0,x:(r)+ y1,y:(rh)-
 		unhandled("x0,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2310: { // x0,x:(r)+ a,y:(rh)-
+	case 2378: { // x0,x:(r)+ a,y:(rh)-
 		unhandled("x0,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2311: { // x0,x:(r)+ b,y:(rh)-
+	case 2379: { // x0,x:(r)+ b,y:(rh)-
 		unhandled("x0,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2312: { // x1,x:(r)+ y0,y:(rh)-
+	case 2380: { // x1,x:(r)+ y0,y:(rh)-
 		unhandled("x1,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2313: { // x1,x:(r)+ y1,y:(rh)-
+	case 2381: { // x1,x:(r)+ y1,y:(rh)-
 		unhandled("x1,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2314: { // x1,x:(r)+ a,y:(rh)-
+	case 2382: { // x1,x:(r)+ a,y:(rh)-
 		unhandled("x1,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2315: { // x1,x:(r)+ b,y:(rh)-
+	case 2383: { // x1,x:(r)+ b,y:(rh)-
 		unhandled("x1,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2316: { // a,x:(r)+ y0,y:(rh)-
+	case 2384: { // a,x:(r)+ y0,y:(rh)-
 		unhandled("a,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2317: { // a,x:(r)+ y1,y:(rh)-
+	case 2385: { // a,x:(r)+ y1,y:(rh)-
 		unhandled("a,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2318: { // a,x:(r)+ a,y:(rh)-
+	case 2386: { // a,x:(r)+ a,y:(rh)-
 		unhandled("a,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2319: { // a,x:(r)+ b,y:(rh)-
+	case 2387: { // a,x:(r)+ b,y:(rh)-
 		unhandled("a,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2320: { // b,x:(r)+ y0,y:(rh)-
+	case 2388: { // b,x:(r)+ y0,y:(rh)-
 		unhandled("b,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2321: { // b,x:(r)+ y1,y:(rh)-
+	case 2389: { // b,x:(r)+ y1,y:(rh)-
 		unhandled("b,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2322: { // b,x:(r)+ a,y:(rh)-
+	case 2390: { // b,x:(r)+ a,y:(rh)-
 		unhandled("b,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2323: { // b,x:(r)+ b,y:(rh)-
+	case 2391: { // b,x:(r)+ b,y:(rh)-
 		unhandled("b,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2324: { // x0,x:(r)+ y0,y:(rh)+
+	case 2392: { // x0,x:(r)+ y0,y:(rh)+
 		unhandled("x0,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2325: { // x0,x:(r)+ y1,y:(rh)+
+	case 2393: { // x0,x:(r)+ y1,y:(rh)+
 		unhandled("x0,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2326: { // x0,x:(r)+ a,y:(rh)+
+	case 2394: { // x0,x:(r)+ a,y:(rh)+
 		unhandled("x0,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2327: { // x0,x:(r)+ b,y:(rh)+
+	case 2395: { // x0,x:(r)+ b,y:(rh)+
 		unhandled("x0,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2328: { // x1,x:(r)+ y0,y:(rh)+
+	case 2396: { // x1,x:(r)+ y0,y:(rh)+
 		unhandled("x1,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2329: { // x1,x:(r)+ y1,y:(rh)+
+	case 2397: { // x1,x:(r)+ y1,y:(rh)+
 		unhandled("x1,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2330: { // x1,x:(r)+ a,y:(rh)+
+	case 2398: { // x1,x:(r)+ a,y:(rh)+
 		unhandled("x1,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2331: { // x1,x:(r)+ b,y:(rh)+
+	case 2399: { // x1,x:(r)+ b,y:(rh)+
 		unhandled("x1,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2332: { // a,x:(r)+ y0,y:(rh)+
+	case 2400: { // a,x:(r)+ y0,y:(rh)+
 		unhandled("a,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2333: { // a,x:(r)+ y1,y:(rh)+
+	case 2401: { // a,x:(r)+ y1,y:(rh)+
 		unhandled("a,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2334: { // a,x:(r)+ a,y:(rh)+
+	case 2402: { // a,x:(r)+ a,y:(rh)+
 		unhandled("a,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2335: { // a,x:(r)+ b,y:(rh)+
+	case 2403: { // a,x:(r)+ b,y:(rh)+
 		unhandled("a,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2336: { // b,x:(r)+ y0,y:(rh)+
+	case 2404: { // b,x:(r)+ y0,y:(rh)+
 		unhandled("b,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2337: { // b,x:(r)+ y1,y:(rh)+
+	case 2405: { // b,x:(r)+ y1,y:(rh)+
 		unhandled("b,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2338: { // b,x:(r)+ a,y:(rh)+
+	case 2406: { // b,x:(r)+ a,y:(rh)+
 		unhandled("b,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2339: { // b,x:(r)+ b,y:(rh)+
+	case 2407: { // b,x:(r)+ b,y:(rh)+
 		unhandled("b,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2340: { // x0,x:(r)+ y0,y:(rh)
+	case 2408: { // x0,x:(r)+ y0,y:(rh)
 		unhandled("x0,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2341: { // x0,x:(r)+ y1,y:(rh)
+	case 2409: { // x0,x:(r)+ y1,y:(rh)
 		unhandled("x0,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2342: { // x0,x:(r)+ a,y:(rh)
+	case 2410: { // x0,x:(r)+ a,y:(rh)
 		unhandled("x0,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2343: { // x0,x:(r)+ b,y:(rh)
+	case 2411: { // x0,x:(r)+ b,y:(rh)
 		unhandled("x0,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2344: { // x1,x:(r)+ y0,y:(rh)
+	case 2412: { // x1,x:(r)+ y0,y:(rh)
 		unhandled("x1,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2345: { // x1,x:(r)+ y1,y:(rh)
+	case 2413: { // x1,x:(r)+ y1,y:(rh)
 		unhandled("x1,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2346: { // x1,x:(r)+ a,y:(rh)
+	case 2414: { // x1,x:(r)+ a,y:(rh)
 		unhandled("x1,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2347: { // x1,x:(r)+ b,y:(rh)
+	case 2415: { // x1,x:(r)+ b,y:(rh)
 		unhandled("x1,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2348: { // a,x:(r)+ y0,y:(rh)
+	case 2416: { // a,x:(r)+ y0,y:(rh)
 		unhandled("a,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2349: { // a,x:(r)+ y1,y:(rh)
+	case 2417: { // a,x:(r)+ y1,y:(rh)
 		unhandled("a,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2350: { // a,x:(r)+ a,y:(rh)
+	case 2418: { // a,x:(r)+ a,y:(rh)
 		unhandled("a,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2351: { // a,x:(r)+ b,y:(rh)
+	case 2419: { // a,x:(r)+ b,y:(rh)
 		unhandled("a,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2352: { // b,x:(r)+ y0,y:(rh)
+	case 2420: { // b,x:(r)+ y0,y:(rh)
 		unhandled("b,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2353: { // b,x:(r)+ y1,y:(rh)
+	case 2421: { // b,x:(r)+ y1,y:(rh)
 		unhandled("b,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2354: { // b,x:(r)+ a,y:(rh)
+	case 2422: { // b,x:(r)+ a,y:(rh)
 		unhandled("b,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2355: { // b,x:(r)+ b,y:(rh)
+	case 2423: { // b,x:(r)+ b,y:(rh)
 		unhandled("b,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2356: { // x0,x:(r) y0,y:(rh)+n
+	case 2424: { // x0,x:(r) y0,y:(rh)+n
 		unhandled("x0,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2357: { // x0,x:(r) y1,y:(rh)+n
+	case 2425: { // x0,x:(r) y1,y:(rh)+n
 		unhandled("x0,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2358: { // x0,x:(r) a,y:(rh)+n
+	case 2426: { // x0,x:(r) a,y:(rh)+n
 		unhandled("x0,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2359: { // x0,x:(r) b,y:(rh)+n
+	case 2427: { // x0,x:(r) b,y:(rh)+n
 		unhandled("x0,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2360: { // x1,x:(r) y0,y:(rh)+n
+	case 2428: { // x1,x:(r) y0,y:(rh)+n
 		unhandled("x1,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2361: { // x1,x:(r) y1,y:(rh)+n
+	case 2429: { // x1,x:(r) y1,y:(rh)+n
 		unhandled("x1,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2362: { // x1,x:(r) a,y:(rh)+n
+	case 2430: { // x1,x:(r) a,y:(rh)+n
 		unhandled("x1,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2363: { // x1,x:(r) b,y:(rh)+n
+	case 2431: { // x1,x:(r) b,y:(rh)+n
 		unhandled("x1,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2364: { // a,x:(r) y0,y:(rh)+n
+	case 2432: { // a,x:(r) y0,y:(rh)+n
 		unhandled("a,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2365: { // a,x:(r) y1,y:(rh)+n
+	case 2433: { // a,x:(r) y1,y:(rh)+n
 		unhandled("a,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2366: { // a,x:(r) a,y:(rh)+n
+	case 2434: { // a,x:(r) a,y:(rh)+n
 		unhandled("a,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2367: { // a,x:(r) b,y:(rh)+n
+	case 2435: { // a,x:(r) b,y:(rh)+n
 		unhandled("a,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2368: { // b,x:(r) y0,y:(rh)+n
+	case 2436: { // b,x:(r) y0,y:(rh)+n
 		unhandled("b,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2369: { // b,x:(r) y1,y:(rh)+n
+	case 2437: { // b,x:(r) y1,y:(rh)+n
 		unhandled("b,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2370: { // b,x:(r) a,y:(rh)+n
+	case 2438: { // b,x:(r) a,y:(rh)+n
 		unhandled("b,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2371: { // b,x:(r) b,y:(rh)+n
+	case 2439: { // b,x:(r) b,y:(rh)+n
 		unhandled("b,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2372: { // x0,x:(r) y0,y:(rh)-
+	case 2440: { // x0,x:(r) y0,y:(rh)-
 		unhandled("x0,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2373: { // x0,x:(r) y1,y:(rh)-
+	case 2441: { // x0,x:(r) y1,y:(rh)-
 		unhandled("x0,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2374: { // x0,x:(r) a,y:(rh)-
+	case 2442: { // x0,x:(r) a,y:(rh)-
 		unhandled("x0,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2375: { // x0,x:(r) b,y:(rh)-
+	case 2443: { // x0,x:(r) b,y:(rh)-
 		unhandled("x0,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2376: { // x1,x:(r) y0,y:(rh)-
+	case 2444: { // x1,x:(r) y0,y:(rh)-
 		unhandled("x1,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2377: { // x1,x:(r) y1,y:(rh)-
+	case 2445: { // x1,x:(r) y1,y:(rh)-
 		unhandled("x1,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2378: { // x1,x:(r) a,y:(rh)-
+	case 2446: { // x1,x:(r) a,y:(rh)-
 		unhandled("x1,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2379: { // x1,x:(r) b,y:(rh)-
+	case 2447: { // x1,x:(r) b,y:(rh)-
 		unhandled("x1,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2380: { // a,x:(r) y0,y:(rh)-
+	case 2448: { // a,x:(r) y0,y:(rh)-
 		unhandled("a,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2381: { // a,x:(r) y1,y:(rh)-
+	case 2449: { // a,x:(r) y1,y:(rh)-
 		unhandled("a,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2382: { // a,x:(r) a,y:(rh)-
+	case 2450: { // a,x:(r) a,y:(rh)-
 		unhandled("a,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2383: { // a,x:(r) b,y:(rh)-
+	case 2451: { // a,x:(r) b,y:(rh)-
 		unhandled("a,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2384: { // b,x:(r) y0,y:(rh)-
+	case 2452: { // b,x:(r) y0,y:(rh)-
 		unhandled("b,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2385: { // b,x:(r) y1,y:(rh)-
+	case 2453: { // b,x:(r) y1,y:(rh)-
 		unhandled("b,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2386: { // b,x:(r) a,y:(rh)-
+	case 2454: { // b,x:(r) a,y:(rh)-
 		unhandled("b,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2387: { // b,x:(r) b,y:(rh)-
+	case 2455: { // b,x:(r) b,y:(rh)-
 		unhandled("b,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2388: { // x0,x:(r) y0,y:(rh)+
+	case 2456: { // x0,x:(r) y0,y:(rh)+
 		unhandled("x0,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2389: { // x0,x:(r) y1,y:(rh)+
+	case 2457: { // x0,x:(r) y1,y:(rh)+
 		unhandled("x0,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2390: { // x0,x:(r) a,y:(rh)+
+	case 2458: { // x0,x:(r) a,y:(rh)+
 		unhandled("x0,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2391: { // x0,x:(r) b,y:(rh)+
+	case 2459: { // x0,x:(r) b,y:(rh)+
 		unhandled("x0,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2392: { // x1,x:(r) y0,y:(rh)+
+	case 2460: { // x1,x:(r) y0,y:(rh)+
 		unhandled("x1,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2393: { // x1,x:(r) y1,y:(rh)+
+	case 2461: { // x1,x:(r) y1,y:(rh)+
 		unhandled("x1,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2394: { // x1,x:(r) a,y:(rh)+
+	case 2462: { // x1,x:(r) a,y:(rh)+
 		unhandled("x1,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2395: { // x1,x:(r) b,y:(rh)+
+	case 2463: { // x1,x:(r) b,y:(rh)+
 		unhandled("x1,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2396: { // a,x:(r) y0,y:(rh)+
+	case 2464: { // a,x:(r) y0,y:(rh)+
 		unhandled("a,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2397: { // a,x:(r) y1,y:(rh)+
+	case 2465: { // a,x:(r) y1,y:(rh)+
 		unhandled("a,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2398: { // a,x:(r) a,y:(rh)+
+	case 2466: { // a,x:(r) a,y:(rh)+
 		unhandled("a,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2399: { // a,x:(r) b,y:(rh)+
+	case 2467: { // a,x:(r) b,y:(rh)+
 		unhandled("a,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2400: { // b,x:(r) y0,y:(rh)+
+	case 2468: { // b,x:(r) y0,y:(rh)+
 		unhandled("b,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2401: { // b,x:(r) y1,y:(rh)+
+	case 2469: { // b,x:(r) y1,y:(rh)+
 		unhandled("b,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2402: { // b,x:(r) a,y:(rh)+
+	case 2470: { // b,x:(r) a,y:(rh)+
 		unhandled("b,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2403: { // b,x:(r) b,y:(rh)+
+	case 2471: { // b,x:(r) b,y:(rh)+
 		unhandled("b,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2404: { // x0,x:(r) y0,y:(rh)
+	case 2472: { // x0,x:(r) y0,y:(rh)
 		unhandled("x0,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2405: { // x0,x:(r) y1,y:(rh)
+	case 2473: { // x0,x:(r) y1,y:(rh)
 		unhandled("x0,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2406: { // x0,x:(r) a,y:(rh)
+	case 2474: { // x0,x:(r) a,y:(rh)
 		unhandled("x0,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2407: { // x0,x:(r) b,y:(rh)
+	case 2475: { // x0,x:(r) b,y:(rh)
 		unhandled("x0,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2408: { // x1,x:(r) y0,y:(rh)
+	case 2476: { // x1,x:(r) y0,y:(rh)
 		unhandled("x1,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2409: { // x1,x:(r) y1,y:(rh)
+	case 2477: { // x1,x:(r) y1,y:(rh)
 		unhandled("x1,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2410: { // x1,x:(r) a,y:(rh)
+	case 2478: { // x1,x:(r) a,y:(rh)
 		unhandled("x1,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2411: { // x1,x:(r) b,y:(rh)
+	case 2479: { // x1,x:(r) b,y:(rh)
 		unhandled("x1,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2412: { // a,x:(r) y0,y:(rh)
+	case 2480: { // a,x:(r) y0,y:(rh)
 		unhandled("a,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2413: { // a,x:(r) y1,y:(rh)
+	case 2481: { // a,x:(r) y1,y:(rh)
 		unhandled("a,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2414: { // a,x:(r) a,y:(rh)
+	case 2482: { // a,x:(r) a,y:(rh)
 		unhandled("a,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2415: { // a,x:(r) b,y:(rh)
+	case 2483: { // a,x:(r) b,y:(rh)
 		unhandled("a,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2416: { // b,x:(r) y0,y:(rh)
+	case 2484: { // b,x:(r) y0,y:(rh)
 		unhandled("b,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2417: { // b,x:(r) y1,y:(rh)
+	case 2485: { // b,x:(r) y1,y:(rh)
 		unhandled("b,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2418: { // b,x:(r) a,y:(rh)
+	case 2486: { // b,x:(r) a,y:(rh)
 		unhandled("b,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2419: { // b,x:(r) b,y:(rh)
+	case 2487: { // b,x:(r) b,y:(rh)
 		unhandled("b,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2420: { // ifcc
+	case 2488: { // ifcc
 		unhandled("ifcc");
 		break;
 		}
-	case 2421: { // ifge
+	case 2489: { // ifge
 		unhandled("ifge");
 		break;
 		}
-	case 2422: { // ifne
+	case 2490: { // ifne
 		unhandled("ifne");
 		break;
 		}
-	case 2423: { // ifpl
+	case 2491: { // ifpl
 		unhandled("ifpl");
 		break;
 		}
-	case 2424: { // ifnn
+	case 2492: { // ifnn
 		unhandled("ifnn");
 		break;
 		}
-	case 2425: { // ifec
+	case 2493: { // ifec
 		unhandled("ifec");
 		break;
 		}
-	case 2426: { // iflc
+	case 2494: { // iflc
 		unhandled("iflc");
 		break;
 		}
-	case 2427: { // ifgt
+	case 2495: { // ifgt
 		unhandled("ifgt");
 		break;
 		}
-	case 2428: { // ifcs
+	case 2496: { // ifcs
 		unhandled("ifcs");
 		break;
 		}
-	case 2429: { // iflt
+	case 2497: { // iflt
 		unhandled("iflt");
 		break;
 		}
-	case 2430: { // ifeq
+	case 2498: { // ifeq
 		unhandled("ifeq");
 		break;
 		}
-	case 2431: { // ifmi
+	case 2499: { // ifmi
 		unhandled("ifmi");
 		break;
 		}
-	case 2432: { // ifnr
+	case 2500: { // ifnr
 		unhandled("ifnr");
 		break;
 		}
-	case 2433: { // ifes
+	case 2501: { // ifes
 		unhandled("ifes");
 		break;
 		}
-	case 2434: { // ifls
+	case 2502: { // ifls
 		unhandled("ifls");
 		break;
 		}
-	case 2435: { // ifle
+	case 2503: { // ifle
 		unhandled("ifle");
 		break;
 		}
-	case 2436: { // ifcc.u
+	case 2504: { // ifcc.u
 		unhandled("ifcc.u");
 		break;
 		}
-	case 2437: { // ifge.u
+	case 2505: { // ifge.u
 		unhandled("ifge.u");
 		break;
 		}
-	case 2438: { // ifne.u
+	case 2506: { // ifne.u
 		unhandled("ifne.u");
 		break;
 		}
-	case 2439: { // ifpl.u
+	case 2507: { // ifpl.u
 		unhandled("ifpl.u");
 		break;
 		}
-	case 2440: { // ifnn.u
+	case 2508: { // ifnn.u
 		unhandled("ifnn.u");
 		break;
 		}
-	case 2441: { // ifec.u
+	case 2509: { // ifec.u
 		unhandled("ifec.u");
 		break;
 		}
-	case 2442: { // iflc.u
+	case 2510: { // iflc.u
 		unhandled("iflc.u");
 		break;
 		}
-	case 2443: { // ifgt.u
+	case 2511: { // ifgt.u
 		unhandled("ifgt.u");
 		break;
 		}
-	case 2444: { // ifcs.u
+	case 2512: { // ifcs.u
 		unhandled("ifcs.u");
 		break;
 		}
-	case 2445: { // iflt.u
+	case 2513: { // iflt.u
 		unhandled("iflt.u");
 		break;
 		}
-	case 2446: { // ifeq.u
+	case 2514: { // ifeq.u
 		unhandled("ifeq.u");
 		break;
 		}
-	case 2447: { // ifmi.u
+	case 2515: { // ifmi.u
 		unhandled("ifmi.u");
 		break;
 		}
-	case 2448: { // ifnr.u
+	case 2516: { // ifnr.u
 		unhandled("ifnr.u");
 		break;
 		}
-	case 2449: { // ifes.u
+	case 2517: { // ifes.u
 		unhandled("ifes.u");
 		break;
 		}
-	case 2450: { // ifls.u
+	case 2518: { // ifls.u
 		unhandled("ifls.u");
 		break;
 		}
-	case 2451: { // ifle.u
+	case 2519: { // ifle.u
 		unhandled("ifle.u");
 		break;
 		}
@@ -22327,7 +22871,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 367: { // bra [x]
-		u32 x = m_pc + bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0);
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
 		m_npc = x;
 		break;
 		}
@@ -22424,108 +22968,108 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		unhandled("brclr #[n],y:[qq],[x]");
 		break;
 		}
-	case 391: { // brclr #[n],x0,x
-		unhandled("brclr #[n],x0,x");
+	case 391: { // brclr #[n],x0,[x]
+		unhandled("brclr #[n],x0,[x]");
 		break;
 		}
-	case 392: { // brclr #[n],x1,x
-		unhandled("brclr #[n],x1,x");
+	case 392: { // brclr #[n],x1,[x]
+		unhandled("brclr #[n],x1,[x]");
 		break;
 		}
-	case 393: { // brclr #[n],y0,x
-		unhandled("brclr #[n],y0,x");
+	case 393: { // brclr #[n],y0,[x]
+		unhandled("brclr #[n],y0,[x]");
 		break;
 		}
-	case 394: { // brclr #[n],y1,x
-		unhandled("brclr #[n],y1,x");
+	case 394: { // brclr #[n],y1,[x]
+		unhandled("brclr #[n],y1,[x]");
 		break;
 		}
-	case 395: { // brclr #[n],a0,x
-		unhandled("brclr #[n],a0,x");
+	case 395: { // brclr #[n],a0,[x]
+		unhandled("brclr #[n],a0,[x]");
 		break;
 		}
-	case 396: { // brclr #[n],b0,x
-		unhandled("brclr #[n],b0,x");
+	case 396: { // brclr #[n],b0,[x]
+		unhandled("brclr #[n],b0,[x]");
 		break;
 		}
-	case 397: { // brclr #[n],a2,x
-		unhandled("brclr #[n],a2,x");
+	case 397: { // brclr #[n],a2,[x]
+		unhandled("brclr #[n],a2,[x]");
 		break;
 		}
-	case 398: { // brclr #[n],b2,x
-		unhandled("brclr #[n],b2,x");
+	case 398: { // brclr #[n],b2,[x]
+		unhandled("brclr #[n],b2,[x]");
 		break;
 		}
-	case 399: { // brclr #[n],a1,x
-		unhandled("brclr #[n],a1,x");
+	case 399: { // brclr #[n],a1,[x]
+		unhandled("brclr #[n],a1,[x]");
 		break;
 		}
-	case 400: { // brclr #[n],b1,x
-		unhandled("brclr #[n],b1,x");
+	case 400: { // brclr #[n],b1,[x]
+		unhandled("brclr #[n],b1,[x]");
 		break;
 		}
-	case 401: { // brclr #[n],a,x
-		unhandled("brclr #[n],a,x");
+	case 401: { // brclr #[n],a,[x]
+		unhandled("brclr #[n],a,[x]");
 		break;
 		}
-	case 402: { // brclr #[n],b,x
-		unhandled("brclr #[n],b,x");
+	case 402: { // brclr #[n],b,[x]
+		unhandled("brclr #[n],b,[x]");
 		break;
 		}
-	case 403: { // brclr #[n],r,x
-		unhandled("brclr #[n],r,x");
+	case 403: { // brclr #[n],r,[x]
+		unhandled("brclr #[n],r,[x]");
 		break;
 		}
-	case 404: { // brclr #[n],n,x
-		unhandled("brclr #[n],n,x");
+	case 404: { // brclr #[n],n,[x]
+		unhandled("brclr #[n],n,[x]");
 		break;
 		}
-	case 405: { // brclr #[n],m,x
-		unhandled("brclr #[n],m,x");
+	case 405: { // brclr #[n],m,[x]
+		unhandled("brclr #[n],m,[x]");
 		break;
 		}
-	case 406: { // brclr #[n],ep,x
-		unhandled("brclr #[n],ep,x");
+	case 406: { // brclr #[n],ep,[x]
+		unhandled("brclr #[n],ep,[x]");
 		break;
 		}
-	case 407: { // brclr #[n],vba,x
-		unhandled("brclr #[n],vba,x");
+	case 407: { // brclr #[n],vba,[x]
+		unhandled("brclr #[n],vba,[x]");
 		break;
 		}
-	case 408: { // brclr #[n],sc,x
-		unhandled("brclr #[n],sc,x");
+	case 408: { // brclr #[n],sc,[x]
+		unhandled("brclr #[n],sc,[x]");
 		break;
 		}
-	case 409: { // brclr #[n],sz,x
-		unhandled("brclr #[n],sz,x");
+	case 409: { // brclr #[n],sz,[x]
+		unhandled("brclr #[n],sz,[x]");
 		break;
 		}
-	case 410: { // brclr #[n],sr,x
-		unhandled("brclr #[n],sr,x");
+	case 410: { // brclr #[n],sr,[x]
+		unhandled("brclr #[n],sr,[x]");
 		break;
 		}
-	case 411: { // brclr #[n],omr,x
-		unhandled("brclr #[n],omr,x");
+	case 411: { // brclr #[n],omr,[x]
+		unhandled("brclr #[n],omr,[x]");
 		break;
 		}
-	case 412: { // brclr #[n],sp,x
-		unhandled("brclr #[n],sp,x");
+	case 412: { // brclr #[n],sp,[x]
+		unhandled("brclr #[n],sp,[x]");
 		break;
 		}
-	case 413: { // brclr #[n],ssh,x
-		unhandled("brclr #[n],ssh,x");
+	case 413: { // brclr #[n],ssh,[x]
+		unhandled("brclr #[n],ssh,[x]");
 		break;
 		}
-	case 414: { // brclr #[n],ssl,x
-		unhandled("brclr #[n],ssl,x");
+	case 414: { // brclr #[n],ssl,[x]
+		unhandled("brclr #[n],ssl,[x]");
 		break;
 		}
-	case 415: { // brclr #[n],la,x
-		unhandled("brclr #[n],la,x");
+	case 415: { // brclr #[n],la,[x]
+		unhandled("brclr #[n],la,[x]");
 		break;
 		}
-	case 416: { // brclr #[n],lc,x
-		unhandled("brclr #[n],lc,x");
+	case 416: { // brclr #[n],lc,[x]
+		unhandled("brclr #[n],lc,[x]");
 		break;
 		}
 	case 417: { // brkcc
@@ -24040,995 +24584,987 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		unhandled("cmp #[i],b");
 		break;
 		}
-	case 732: { // cmpu a1,a
-		unhandled("cmpu a1,a");
+	case 732: { // cmpu b,a
+		unhandled("cmpu b,a");
 		break;
 		}
-	case 733: { // cmpu a1,b
-		unhandled("cmpu a1,b");
+	case 733: { // cmpu b,b
+		unhandled("cmpu b,b");
 		break;
 		}
-	case 734: { // cmpu b1,a
-		unhandled("cmpu b1,a");
-		break;
-		}
-	case 735: { // cmpu b1,b
-		unhandled("cmpu b1,b");
-		break;
-		}
-	case 736: { // cmpu x0,a
+	case 734: { // cmpu x0,a
 		unhandled("cmpu x0,a");
 		break;
 		}
-	case 737: { // cmpu x0,b
+	case 735: { // cmpu x0,b
 		unhandled("cmpu x0,b");
 		break;
 		}
-	case 738: { // cmpu y0,a
+	case 736: { // cmpu y0,a
 		unhandled("cmpu y0,a");
 		break;
 		}
-	case 739: { // cmpu y0,b
+	case 737: { // cmpu y0,b
 		unhandled("cmpu y0,b");
 		break;
 		}
-	case 740: { // cmpu x1,a
+	case 738: { // cmpu x1,a
 		unhandled("cmpu x1,a");
 		break;
 		}
-	case 741: { // cmpu x1,b
+	case 739: { // cmpu x1,b
 		unhandled("cmpu x1,b");
 		break;
 		}
-	case 742: { // cmpu y1,a
+	case 740: { // cmpu y1,a
 		unhandled("cmpu y1,a");
 		break;
 		}
-	case 743: { // cmpu y1,b
+	case 741: { // cmpu y1,b
 		unhandled("cmpu y1,b");
 		break;
 		}
-	case 744: { // debug
+	case 742: { // debug
 		unhandled("debug");
 		break;
 		}
-	case 745: { // debugcc
+	case 743: { // debugcc
 		unhandled("debugcc");
 		break;
 		}
-	case 746: { // debugge
+	case 744: { // debugge
 		unhandled("debugge");
 		break;
 		}
-	case 747: { // debugne
+	case 745: { // debugne
 		unhandled("debugne");
 		break;
 		}
-	case 748: { // debugpl
+	case 746: { // debugpl
 		unhandled("debugpl");
 		break;
 		}
-	case 749: { // debugnn
+	case 747: { // debugnn
 		unhandled("debugnn");
 		break;
 		}
-	case 750: { // debugec
+	case 748: { // debugec
 		unhandled("debugec");
 		break;
 		}
-	case 751: { // debuglc
+	case 749: { // debuglc
 		unhandled("debuglc");
 		break;
 		}
-	case 752: { // debuggt
+	case 750: { // debuggt
 		unhandled("debuggt");
 		break;
 		}
-	case 753: { // debugcs
+	case 751: { // debugcs
 		unhandled("debugcs");
 		break;
 		}
-	case 754: { // debuglt
+	case 752: { // debuglt
 		unhandled("debuglt");
 		break;
 		}
-	case 755: { // debugeq
+	case 753: { // debugeq
 		unhandled("debugeq");
 		break;
 		}
-	case 756: { // debugmi
+	case 754: { // debugmi
 		unhandled("debugmi");
 		break;
 		}
-	case 757: { // debugnr
+	case 755: { // debugnr
 		unhandled("debugnr");
 		break;
 		}
-	case 758: { // debuges
+	case 756: { // debuges
 		unhandled("debuges");
 		break;
 		}
-	case 759: { // debugls
+	case 757: { // debugls
 		unhandled("debugls");
 		break;
 		}
-	case 760: { // debugle
+	case 758: { // debugle
 		unhandled("debugle");
 		break;
 		}
-	case 761: { // dec a
+	case 759: { // dec a
 		unhandled("dec a");
 		break;
 		}
-	case 762: { // dec b
+	case 760: { // dec b
 		unhandled("dec b");
 		break;
 		}
-	case 763: { // div x0,a
+	case 761: { // div x0,a
 		unhandled("div x0,a");
 		break;
 		}
-	case 764: { // div x0,b
+	case 762: { // div x0,b
 		unhandled("div x0,b");
 		break;
 		}
-	case 765: { // div y0,a
+	case 763: { // div y0,a
 		unhandled("div y0,a");
 		break;
 		}
-	case 766: { // div y0,b
+	case 764: { // div y0,b
 		unhandled("div y0,b");
 		break;
 		}
-	case 767: { // div x1,a
+	case 765: { // div x1,a
 		unhandled("div x1,a");
 		break;
 		}
-	case 768: { // div x1,b
+	case 766: { // div x1,b
 		unhandled("div x1,b");
 		break;
 		}
-	case 769: { // div y1,a
+	case 767: { // div y1,a
 		unhandled("div y1,a");
 		break;
 		}
-	case 770: { // div y1,b
+	case 768: { // div y1,b
 		unhandled("div y1,b");
 		break;
 		}
-	case 771: { // dmacss +x0,x0,a
+	case 769: { // dmacss +x0,x0,a
 		unhandled("dmacss +x0,x0,a");
 		break;
 		}
-	case 772: { // dmacss +y0,y0,a
+	case 770: { // dmacss +y0,y0,a
 		unhandled("dmacss +y0,y0,a");
 		break;
 		}
-	case 773: { // dmacss +x1,x0,a
+	case 771: { // dmacss +x1,x0,a
 		unhandled("dmacss +x1,x0,a");
 		break;
 		}
-	case 774: { // dmacss +y1,y0,a
+	case 772: { // dmacss +y1,y0,a
 		unhandled("dmacss +y1,y0,a");
 		break;
 		}
-	case 775: { // dmacss +x1,x1,a
+	case 773: { // dmacss +x1,x1,a
 		unhandled("dmacss +x1,x1,a");
 		break;
 		}
-	case 776: { // dmacss +y1,y1,a
+	case 774: { // dmacss +y1,y1,a
 		unhandled("dmacss +y1,y1,a");
 		break;
 		}
-	case 777: { // dmacss +x0,x1,a
+	case 775: { // dmacss +x0,x1,a
 		unhandled("dmacss +x0,x1,a");
 		break;
 		}
-	case 778: { // dmacss +y0,y1,a
+	case 776: { // dmacss +y0,y1,a
 		unhandled("dmacss +y0,y1,a");
 		break;
 		}
-	case 779: { // dmacss +x0,y1,a
+	case 777: { // dmacss +x0,y1,a
 		unhandled("dmacss +x0,y1,a");
 		break;
 		}
-	case 780: { // dmacss +y0,x0,a
+	case 778: { // dmacss +y0,x0,a
 		unhandled("dmacss +y0,x0,a");
 		break;
 		}
-	case 781: { // dmacss +x1,y0,a
+	case 779: { // dmacss +x1,y0,a
 		unhandled("dmacss +x1,y0,a");
 		break;
 		}
-	case 782: { // dmacss +y1,x1,a
+	case 780: { // dmacss +y1,x1,a
 		unhandled("dmacss +y1,x1,a");
 		break;
 		}
-	case 783: { // dmacss +y1,x0,a
+	case 781: { // dmacss +y1,x0,a
 		unhandled("dmacss +y1,x0,a");
 		break;
 		}
-	case 784: { // dmacss +x0,y0,a
+	case 782: { // dmacss +x0,y0,a
 		unhandled("dmacss +x0,y0,a");
 		break;
 		}
-	case 785: { // dmacss +y0,x1,a
+	case 783: { // dmacss +y0,x1,a
 		unhandled("dmacss +y0,x1,a");
 		break;
 		}
-	case 786: { // dmacss +x1,y1,a
+	case 784: { // dmacss +x1,y1,a
 		unhandled("dmacss +x1,y1,a");
 		break;
 		}
-	case 787: { // dmacss -x0,x0,a
+	case 785: { // dmacss -x0,x0,a
 		unhandled("dmacss -x0,x0,a");
 		break;
 		}
-	case 788: { // dmacss -y0,y0,a
+	case 786: { // dmacss -y0,y0,a
 		unhandled("dmacss -y0,y0,a");
 		break;
 		}
-	case 789: { // dmacss -x1,x0,a
+	case 787: { // dmacss -x1,x0,a
 		unhandled("dmacss -x1,x0,a");
 		break;
 		}
-	case 790: { // dmacss -y1,y0,a
+	case 788: { // dmacss -y1,y0,a
 		unhandled("dmacss -y1,y0,a");
 		break;
 		}
-	case 791: { // dmacss -x1,x1,a
+	case 789: { // dmacss -x1,x1,a
 		unhandled("dmacss -x1,x1,a");
 		break;
 		}
-	case 792: { // dmacss -y1,y1,a
+	case 790: { // dmacss -y1,y1,a
 		unhandled("dmacss -y1,y1,a");
 		break;
 		}
-	case 793: { // dmacss -x0,x1,a
+	case 791: { // dmacss -x0,x1,a
 		unhandled("dmacss -x0,x1,a");
 		break;
 		}
-	case 794: { // dmacss -y0,y1,a
+	case 792: { // dmacss -y0,y1,a
 		unhandled("dmacss -y0,y1,a");
 		break;
 		}
-	case 795: { // dmacss -x0,y1,a
+	case 793: { // dmacss -x0,y1,a
 		unhandled("dmacss -x0,y1,a");
 		break;
 		}
-	case 796: { // dmacss -y0,x0,a
+	case 794: { // dmacss -y0,x0,a
 		unhandled("dmacss -y0,x0,a");
 		break;
 		}
-	case 797: { // dmacss -x1,y0,a
+	case 795: { // dmacss -x1,y0,a
 		unhandled("dmacss -x1,y0,a");
 		break;
 		}
-	case 798: { // dmacss -y1,x1,a
+	case 796: { // dmacss -y1,x1,a
 		unhandled("dmacss -y1,x1,a");
 		break;
 		}
-	case 799: { // dmacss -y1,x0,a
+	case 797: { // dmacss -y1,x0,a
 		unhandled("dmacss -y1,x0,a");
 		break;
 		}
-	case 800: { // dmacss -x0,y0,a
+	case 798: { // dmacss -x0,y0,a
 		unhandled("dmacss -x0,y0,a");
 		break;
 		}
-	case 801: { // dmacss -y0,x1,a
+	case 799: { // dmacss -y0,x1,a
 		unhandled("dmacss -y0,x1,a");
 		break;
 		}
-	case 802: { // dmacss -x1,y1,a
+	case 800: { // dmacss -x1,y1,a
 		unhandled("dmacss -x1,y1,a");
 		break;
 		}
-	case 803: { // dmacss +x0,x0,b
+	case 801: { // dmacss +x0,x0,b
 		unhandled("dmacss +x0,x0,b");
 		break;
 		}
-	case 804: { // dmacss +y0,y0,b
+	case 802: { // dmacss +y0,y0,b
 		unhandled("dmacss +y0,y0,b");
 		break;
 		}
-	case 805: { // dmacss +x1,x0,b
+	case 803: { // dmacss +x1,x0,b
 		unhandled("dmacss +x1,x0,b");
 		break;
 		}
-	case 806: { // dmacss +y1,y0,b
+	case 804: { // dmacss +y1,y0,b
 		unhandled("dmacss +y1,y0,b");
 		break;
 		}
-	case 807: { // dmacss +x1,x1,b
+	case 805: { // dmacss +x1,x1,b
 		unhandled("dmacss +x1,x1,b");
 		break;
 		}
-	case 808: { // dmacss +y1,y1,b
+	case 806: { // dmacss +y1,y1,b
 		unhandled("dmacss +y1,y1,b");
 		break;
 		}
-	case 809: { // dmacss +x0,x1,b
+	case 807: { // dmacss +x0,x1,b
 		unhandled("dmacss +x0,x1,b");
 		break;
 		}
-	case 810: { // dmacss +y0,y1,b
+	case 808: { // dmacss +y0,y1,b
 		unhandled("dmacss +y0,y1,b");
 		break;
 		}
-	case 811: { // dmacss +x0,y1,b
+	case 809: { // dmacss +x0,y1,b
 		unhandled("dmacss +x0,y1,b");
 		break;
 		}
-	case 812: { // dmacss +y0,x0,b
+	case 810: { // dmacss +y0,x0,b
 		unhandled("dmacss +y0,x0,b");
 		break;
 		}
-	case 813: { // dmacss +x1,y0,b
+	case 811: { // dmacss +x1,y0,b
 		unhandled("dmacss +x1,y0,b");
 		break;
 		}
-	case 814: { // dmacss +y1,x1,b
+	case 812: { // dmacss +y1,x1,b
 		unhandled("dmacss +y1,x1,b");
 		break;
 		}
-	case 815: { // dmacss +y1,x0,b
+	case 813: { // dmacss +y1,x0,b
 		unhandled("dmacss +y1,x0,b");
 		break;
 		}
-	case 816: { // dmacss +x0,y0,b
+	case 814: { // dmacss +x0,y0,b
 		unhandled("dmacss +x0,y0,b");
 		break;
 		}
-	case 817: { // dmacss +y0,x1,b
+	case 815: { // dmacss +y0,x1,b
 		unhandled("dmacss +y0,x1,b");
 		break;
 		}
-	case 818: { // dmacss +x1,y1,b
+	case 816: { // dmacss +x1,y1,b
 		unhandled("dmacss +x1,y1,b");
 		break;
 		}
-	case 819: { // dmacss -x0,x0,b
+	case 817: { // dmacss -x0,x0,b
 		unhandled("dmacss -x0,x0,b");
 		break;
 		}
-	case 820: { // dmacss -y0,y0,b
+	case 818: { // dmacss -y0,y0,b
 		unhandled("dmacss -y0,y0,b");
 		break;
 		}
-	case 821: { // dmacss -x1,x0,b
+	case 819: { // dmacss -x1,x0,b
 		unhandled("dmacss -x1,x0,b");
 		break;
 		}
-	case 822: { // dmacss -y1,y0,b
+	case 820: { // dmacss -y1,y0,b
 		unhandled("dmacss -y1,y0,b");
 		break;
 		}
-	case 823: { // dmacss -x1,x1,b
+	case 821: { // dmacss -x1,x1,b
 		unhandled("dmacss -x1,x1,b");
 		break;
 		}
-	case 824: { // dmacss -y1,y1,b
+	case 822: { // dmacss -y1,y1,b
 		unhandled("dmacss -y1,y1,b");
 		break;
 		}
-	case 825: { // dmacss -x0,x1,b
+	case 823: { // dmacss -x0,x1,b
 		unhandled("dmacss -x0,x1,b");
 		break;
 		}
-	case 826: { // dmacss -y0,y1,b
+	case 824: { // dmacss -y0,y1,b
 		unhandled("dmacss -y0,y1,b");
 		break;
 		}
-	case 827: { // dmacss -x0,y1,b
+	case 825: { // dmacss -x0,y1,b
 		unhandled("dmacss -x0,y1,b");
 		break;
 		}
-	case 828: { // dmacss -y0,x0,b
+	case 826: { // dmacss -y0,x0,b
 		unhandled("dmacss -y0,x0,b");
 		break;
 		}
-	case 829: { // dmacss -x1,y0,b
+	case 827: { // dmacss -x1,y0,b
 		unhandled("dmacss -x1,y0,b");
 		break;
 		}
-	case 830: { // dmacss -y1,x1,b
+	case 828: { // dmacss -y1,x1,b
 		unhandled("dmacss -y1,x1,b");
 		break;
 		}
-	case 831: { // dmacss -y1,x0,b
+	case 829: { // dmacss -y1,x0,b
 		unhandled("dmacss -y1,x0,b");
 		break;
 		}
-	case 832: { // dmacss -x0,y0,b
+	case 830: { // dmacss -x0,y0,b
 		unhandled("dmacss -x0,y0,b");
 		break;
 		}
-	case 833: { // dmacss -y0,x1,b
+	case 831: { // dmacss -y0,x1,b
 		unhandled("dmacss -y0,x1,b");
 		break;
 		}
-	case 834: { // dmacss -x1,y1,b
+	case 832: { // dmacss -x1,y1,b
 		unhandled("dmacss -x1,y1,b");
 		break;
 		}
-	case 835: { // dmacsu +x0,x0,a
+	case 833: { // dmacsu +x0,x0,a
 		unhandled("dmacsu +x0,x0,a");
 		break;
 		}
-	case 836: { // dmacsu +y0,y0,a
+	case 834: { // dmacsu +y0,y0,a
 		unhandled("dmacsu +y0,y0,a");
 		break;
 		}
-	case 837: { // dmacsu +x1,x0,a
+	case 835: { // dmacsu +x1,x0,a
 		unhandled("dmacsu +x1,x0,a");
 		break;
 		}
-	case 838: { // dmacsu +y1,y0,a
+	case 836: { // dmacsu +y1,y0,a
 		unhandled("dmacsu +y1,y0,a");
 		break;
 		}
-	case 839: { // dmacsu +x1,x1,a
+	case 837: { // dmacsu +x1,x1,a
 		unhandled("dmacsu +x1,x1,a");
 		break;
 		}
-	case 840: { // dmacsu +y1,y1,a
+	case 838: { // dmacsu +y1,y1,a
 		unhandled("dmacsu +y1,y1,a");
 		break;
 		}
-	case 841: { // dmacsu +x0,x1,a
+	case 839: { // dmacsu +x0,x1,a
 		unhandled("dmacsu +x0,x1,a");
 		break;
 		}
-	case 842: { // dmacsu +y0,y1,a
+	case 840: { // dmacsu +y0,y1,a
 		unhandled("dmacsu +y0,y1,a");
 		break;
 		}
-	case 843: { // dmacsu +x0,y1,a
+	case 841: { // dmacsu +x0,y1,a
 		unhandled("dmacsu +x0,y1,a");
 		break;
 		}
-	case 844: { // dmacsu +y0,x0,a
+	case 842: { // dmacsu +y0,x0,a
 		unhandled("dmacsu +y0,x0,a");
 		break;
 		}
-	case 845: { // dmacsu +x1,y0,a
+	case 843: { // dmacsu +x1,y0,a
 		unhandled("dmacsu +x1,y0,a");
 		break;
 		}
-	case 846: { // dmacsu +y1,x1,a
+	case 844: { // dmacsu +y1,x1,a
 		unhandled("dmacsu +y1,x1,a");
 		break;
 		}
-	case 847: { // dmacsu +y1,x0,a
+	case 845: { // dmacsu +y1,x0,a
 		unhandled("dmacsu +y1,x0,a");
 		break;
 		}
-	case 848: { // dmacsu +x0,y0,a
+	case 846: { // dmacsu +x0,y0,a
 		unhandled("dmacsu +x0,y0,a");
 		break;
 		}
-	case 849: { // dmacsu +y0,x1,a
+	case 847: { // dmacsu +y0,x1,a
 		unhandled("dmacsu +y0,x1,a");
 		break;
 		}
-	case 850: { // dmacsu +x1,y1,a
+	case 848: { // dmacsu +x1,y1,a
 		unhandled("dmacsu +x1,y1,a");
 		break;
 		}
-	case 851: { // dmacsu -x0,x0,a
+	case 849: { // dmacsu -x0,x0,a
 		unhandled("dmacsu -x0,x0,a");
 		break;
 		}
-	case 852: { // dmacsu -y0,y0,a
+	case 850: { // dmacsu -y0,y0,a
 		unhandled("dmacsu -y0,y0,a");
 		break;
 		}
-	case 853: { // dmacsu -x1,x0,a
+	case 851: { // dmacsu -x1,x0,a
 		unhandled("dmacsu -x1,x0,a");
 		break;
 		}
-	case 854: { // dmacsu -y1,y0,a
+	case 852: { // dmacsu -y1,y0,a
 		unhandled("dmacsu -y1,y0,a");
 		break;
 		}
-	case 855: { // dmacsu -x1,x1,a
+	case 853: { // dmacsu -x1,x1,a
 		unhandled("dmacsu -x1,x1,a");
 		break;
 		}
-	case 856: { // dmacsu -y1,y1,a
+	case 854: { // dmacsu -y1,y1,a
 		unhandled("dmacsu -y1,y1,a");
 		break;
 		}
-	case 857: { // dmacsu -x0,x1,a
+	case 855: { // dmacsu -x0,x1,a
 		unhandled("dmacsu -x0,x1,a");
 		break;
 		}
-	case 858: { // dmacsu -y0,y1,a
+	case 856: { // dmacsu -y0,y1,a
 		unhandled("dmacsu -y0,y1,a");
 		break;
 		}
-	case 859: { // dmacsu -x0,y1,a
+	case 857: { // dmacsu -x0,y1,a
 		unhandled("dmacsu -x0,y1,a");
 		break;
 		}
-	case 860: { // dmacsu -y0,x0,a
+	case 858: { // dmacsu -y0,x0,a
 		unhandled("dmacsu -y0,x0,a");
 		break;
 		}
-	case 861: { // dmacsu -x1,y0,a
+	case 859: { // dmacsu -x1,y0,a
 		unhandled("dmacsu -x1,y0,a");
 		break;
 		}
-	case 862: { // dmacsu -y1,x1,a
+	case 860: { // dmacsu -y1,x1,a
 		unhandled("dmacsu -y1,x1,a");
 		break;
 		}
-	case 863: { // dmacsu -y1,x0,a
+	case 861: { // dmacsu -y1,x0,a
 		unhandled("dmacsu -y1,x0,a");
 		break;
 		}
-	case 864: { // dmacsu -x0,y0,a
+	case 862: { // dmacsu -x0,y0,a
 		unhandled("dmacsu -x0,y0,a");
 		break;
 		}
-	case 865: { // dmacsu -y0,x1,a
+	case 863: { // dmacsu -y0,x1,a
 		unhandled("dmacsu -y0,x1,a");
 		break;
 		}
-	case 866: { // dmacsu -x1,y1,a
+	case 864: { // dmacsu -x1,y1,a
 		unhandled("dmacsu -x1,y1,a");
 		break;
 		}
-	case 867: { // dmacsu +x0,x0,b
+	case 865: { // dmacsu +x0,x0,b
 		unhandled("dmacsu +x0,x0,b");
 		break;
 		}
-	case 868: { // dmacsu +y0,y0,b
+	case 866: { // dmacsu +y0,y0,b
 		unhandled("dmacsu +y0,y0,b");
 		break;
 		}
-	case 869: { // dmacsu +x1,x0,b
+	case 867: { // dmacsu +x1,x0,b
 		unhandled("dmacsu +x1,x0,b");
 		break;
 		}
-	case 870: { // dmacsu +y1,y0,b
+	case 868: { // dmacsu +y1,y0,b
 		unhandled("dmacsu +y1,y0,b");
 		break;
 		}
-	case 871: { // dmacsu +x1,x1,b
+	case 869: { // dmacsu +x1,x1,b
 		unhandled("dmacsu +x1,x1,b");
 		break;
 		}
-	case 872: { // dmacsu +y1,y1,b
+	case 870: { // dmacsu +y1,y1,b
 		unhandled("dmacsu +y1,y1,b");
 		break;
 		}
-	case 873: { // dmacsu +x0,x1,b
+	case 871: { // dmacsu +x0,x1,b
 		unhandled("dmacsu +x0,x1,b");
 		break;
 		}
-	case 874: { // dmacsu +y0,y1,b
+	case 872: { // dmacsu +y0,y1,b
 		unhandled("dmacsu +y0,y1,b");
 		break;
 		}
-	case 875: { // dmacsu +x0,y1,b
+	case 873: { // dmacsu +x0,y1,b
 		unhandled("dmacsu +x0,y1,b");
 		break;
 		}
-	case 876: { // dmacsu +y0,x0,b
+	case 874: { // dmacsu +y0,x0,b
 		unhandled("dmacsu +y0,x0,b");
 		break;
 		}
-	case 877: { // dmacsu +x1,y0,b
+	case 875: { // dmacsu +x1,y0,b
 		unhandled("dmacsu +x1,y0,b");
 		break;
 		}
-	case 878: { // dmacsu +y1,x1,b
+	case 876: { // dmacsu +y1,x1,b
 		unhandled("dmacsu +y1,x1,b");
 		break;
 		}
-	case 879: { // dmacsu +y1,x0,b
+	case 877: { // dmacsu +y1,x0,b
 		unhandled("dmacsu +y1,x0,b");
 		break;
 		}
-	case 880: { // dmacsu +x0,y0,b
+	case 878: { // dmacsu +x0,y0,b
 		unhandled("dmacsu +x0,y0,b");
 		break;
 		}
-	case 881: { // dmacsu +y0,x1,b
+	case 879: { // dmacsu +y0,x1,b
 		unhandled("dmacsu +y0,x1,b");
 		break;
 		}
-	case 882: { // dmacsu +x1,y1,b
+	case 880: { // dmacsu +x1,y1,b
 		unhandled("dmacsu +x1,y1,b");
 		break;
 		}
-	case 883: { // dmacsu -x0,x0,b
+	case 881: { // dmacsu -x0,x0,b
 		unhandled("dmacsu -x0,x0,b");
 		break;
 		}
-	case 884: { // dmacsu -y0,y0,b
+	case 882: { // dmacsu -y0,y0,b
 		unhandled("dmacsu -y0,y0,b");
 		break;
 		}
-	case 885: { // dmacsu -x1,x0,b
+	case 883: { // dmacsu -x1,x0,b
 		unhandled("dmacsu -x1,x0,b");
 		break;
 		}
-	case 886: { // dmacsu -y1,y0,b
+	case 884: { // dmacsu -y1,y0,b
 		unhandled("dmacsu -y1,y0,b");
 		break;
 		}
-	case 887: { // dmacsu -x1,x1,b
+	case 885: { // dmacsu -x1,x1,b
 		unhandled("dmacsu -x1,x1,b");
 		break;
 		}
-	case 888: { // dmacsu -y1,y1,b
+	case 886: { // dmacsu -y1,y1,b
 		unhandled("dmacsu -y1,y1,b");
 		break;
 		}
-	case 889: { // dmacsu -x0,x1,b
+	case 887: { // dmacsu -x0,x1,b
 		unhandled("dmacsu -x0,x1,b");
 		break;
 		}
-	case 890: { // dmacsu -y0,y1,b
+	case 888: { // dmacsu -y0,y1,b
 		unhandled("dmacsu -y0,y1,b");
 		break;
 		}
-	case 891: { // dmacsu -x0,y1,b
+	case 889: { // dmacsu -x0,y1,b
 		unhandled("dmacsu -x0,y1,b");
 		break;
 		}
-	case 892: { // dmacsu -y0,x0,b
+	case 890: { // dmacsu -y0,x0,b
 		unhandled("dmacsu -y0,x0,b");
 		break;
 		}
-	case 893: { // dmacsu -x1,y0,b
+	case 891: { // dmacsu -x1,y0,b
 		unhandled("dmacsu -x1,y0,b");
 		break;
 		}
-	case 894: { // dmacsu -y1,x1,b
+	case 892: { // dmacsu -y1,x1,b
 		unhandled("dmacsu -y1,x1,b");
 		break;
 		}
-	case 895: { // dmacsu -y1,x0,b
+	case 893: { // dmacsu -y1,x0,b
 		unhandled("dmacsu -y1,x0,b");
 		break;
 		}
-	case 896: { // dmacsu -x0,y0,b
+	case 894: { // dmacsu -x0,y0,b
 		unhandled("dmacsu -x0,y0,b");
 		break;
 		}
-	case 897: { // dmacsu -y0,x1,b
+	case 895: { // dmacsu -y0,x1,b
 		unhandled("dmacsu -y0,x1,b");
 		break;
 		}
-	case 898: { // dmacsu -x1,y1,b
+	case 896: { // dmacsu -x1,y1,b
 		unhandled("dmacsu -x1,y1,b");
 		break;
 		}
-	case 899: { // dmacuu +x0,x0,a
+	case 897: { // dmacuu +x0,x0,a
 		unhandled("dmacuu +x0,x0,a");
 		break;
 		}
-	case 900: { // dmacuu +y0,y0,a
+	case 898: { // dmacuu +y0,y0,a
 		unhandled("dmacuu +y0,y0,a");
 		break;
 		}
-	case 901: { // dmacuu +x1,x0,a
+	case 899: { // dmacuu +x1,x0,a
 		unhandled("dmacuu +x1,x0,a");
 		break;
 		}
-	case 902: { // dmacuu +y1,y0,a
+	case 900: { // dmacuu +y1,y0,a
 		unhandled("dmacuu +y1,y0,a");
 		break;
 		}
-	case 903: { // dmacuu +x1,x1,a
+	case 901: { // dmacuu +x1,x1,a
 		unhandled("dmacuu +x1,x1,a");
 		break;
 		}
-	case 904: { // dmacuu +y1,y1,a
+	case 902: { // dmacuu +y1,y1,a
 		unhandled("dmacuu +y1,y1,a");
 		break;
 		}
-	case 905: { // dmacuu +x0,x1,a
+	case 903: { // dmacuu +x0,x1,a
 		unhandled("dmacuu +x0,x1,a");
 		break;
 		}
-	case 906: { // dmacuu +y0,y1,a
+	case 904: { // dmacuu +y0,y1,a
 		unhandled("dmacuu +y0,y1,a");
 		break;
 		}
-	case 907: { // dmacuu +x0,y1,a
+	case 905: { // dmacuu +x0,y1,a
 		unhandled("dmacuu +x0,y1,a");
 		break;
 		}
-	case 908: { // dmacuu +y0,x0,a
+	case 906: { // dmacuu +y0,x0,a
 		unhandled("dmacuu +y0,x0,a");
 		break;
 		}
-	case 909: { // dmacuu +x1,y0,a
+	case 907: { // dmacuu +x1,y0,a
 		unhandled("dmacuu +x1,y0,a");
 		break;
 		}
-	case 910: { // dmacuu +y1,x1,a
+	case 908: { // dmacuu +y1,x1,a
 		unhandled("dmacuu +y1,x1,a");
 		break;
 		}
-	case 911: { // dmacuu +y1,x0,a
+	case 909: { // dmacuu +y1,x0,a
 		unhandled("dmacuu +y1,x0,a");
 		break;
 		}
-	case 912: { // dmacuu +x0,y0,a
+	case 910: { // dmacuu +x0,y0,a
 		unhandled("dmacuu +x0,y0,a");
 		break;
 		}
-	case 913: { // dmacuu +y0,x1,a
+	case 911: { // dmacuu +y0,x1,a
 		unhandled("dmacuu +y0,x1,a");
 		break;
 		}
-	case 914: { // dmacuu +x1,y1,a
+	case 912: { // dmacuu +x1,y1,a
 		unhandled("dmacuu +x1,y1,a");
 		break;
 		}
-	case 915: { // dmacuu -x0,x0,a
+	case 913: { // dmacuu -x0,x0,a
 		unhandled("dmacuu -x0,x0,a");
 		break;
 		}
-	case 916: { // dmacuu -y0,y0,a
+	case 914: { // dmacuu -y0,y0,a
 		unhandled("dmacuu -y0,y0,a");
 		break;
 		}
-	case 917: { // dmacuu -x1,x0,a
+	case 915: { // dmacuu -x1,x0,a
 		unhandled("dmacuu -x1,x0,a");
 		break;
 		}
-	case 918: { // dmacuu -y1,y0,a
+	case 916: { // dmacuu -y1,y0,a
 		unhandled("dmacuu -y1,y0,a");
 		break;
 		}
-	case 919: { // dmacuu -x1,x1,a
+	case 917: { // dmacuu -x1,x1,a
 		unhandled("dmacuu -x1,x1,a");
 		break;
 		}
-	case 920: { // dmacuu -y1,y1,a
+	case 918: { // dmacuu -y1,y1,a
 		unhandled("dmacuu -y1,y1,a");
 		break;
 		}
-	case 921: { // dmacuu -x0,x1,a
+	case 919: { // dmacuu -x0,x1,a
 		unhandled("dmacuu -x0,x1,a");
 		break;
 		}
-	case 922: { // dmacuu -y0,y1,a
+	case 920: { // dmacuu -y0,y1,a
 		unhandled("dmacuu -y0,y1,a");
 		break;
 		}
-	case 923: { // dmacuu -x0,y1,a
+	case 921: { // dmacuu -x0,y1,a
 		unhandled("dmacuu -x0,y1,a");
 		break;
 		}
-	case 924: { // dmacuu -y0,x0,a
+	case 922: { // dmacuu -y0,x0,a
 		unhandled("dmacuu -y0,x0,a");
 		break;
 		}
-	case 925: { // dmacuu -x1,y0,a
+	case 923: { // dmacuu -x1,y0,a
 		unhandled("dmacuu -x1,y0,a");
 		break;
 		}
-	case 926: { // dmacuu -y1,x1,a
+	case 924: { // dmacuu -y1,x1,a
 		unhandled("dmacuu -y1,x1,a");
 		break;
 		}
-	case 927: { // dmacuu -y1,x0,a
+	case 925: { // dmacuu -y1,x0,a
 		unhandled("dmacuu -y1,x0,a");
 		break;
 		}
-	case 928: { // dmacuu -x0,y0,a
+	case 926: { // dmacuu -x0,y0,a
 		unhandled("dmacuu -x0,y0,a");
 		break;
 		}
-	case 929: { // dmacuu -y0,x1,a
+	case 927: { // dmacuu -y0,x1,a
 		unhandled("dmacuu -y0,x1,a");
 		break;
 		}
-	case 930: { // dmacuu -x1,y1,a
+	case 928: { // dmacuu -x1,y1,a
 		unhandled("dmacuu -x1,y1,a");
 		break;
 		}
-	case 931: { // dmacuu +x0,x0,b
+	case 929: { // dmacuu +x0,x0,b
 		unhandled("dmacuu +x0,x0,b");
 		break;
 		}
-	case 932: { // dmacuu +y0,y0,b
+	case 930: { // dmacuu +y0,y0,b
 		unhandled("dmacuu +y0,y0,b");
 		break;
 		}
-	case 933: { // dmacuu +x1,x0,b
+	case 931: { // dmacuu +x1,x0,b
 		unhandled("dmacuu +x1,x0,b");
 		break;
 		}
-	case 934: { // dmacuu +y1,y0,b
+	case 932: { // dmacuu +y1,y0,b
 		unhandled("dmacuu +y1,y0,b");
 		break;
 		}
-	case 935: { // dmacuu +x1,x1,b
+	case 933: { // dmacuu +x1,x1,b
 		unhandled("dmacuu +x1,x1,b");
 		break;
 		}
-	case 936: { // dmacuu +y1,y1,b
+	case 934: { // dmacuu +y1,y1,b
 		unhandled("dmacuu +y1,y1,b");
 		break;
 		}
-	case 937: { // dmacuu +x0,x1,b
+	case 935: { // dmacuu +x0,x1,b
 		unhandled("dmacuu +x0,x1,b");
 		break;
 		}
-	case 938: { // dmacuu +y0,y1,b
+	case 936: { // dmacuu +y0,y1,b
 		unhandled("dmacuu +y0,y1,b");
 		break;
 		}
-	case 939: { // dmacuu +x0,y1,b
+	case 937: { // dmacuu +x0,y1,b
 		unhandled("dmacuu +x0,y1,b");
 		break;
 		}
-	case 940: { // dmacuu +y0,x0,b
+	case 938: { // dmacuu +y0,x0,b
 		unhandled("dmacuu +y0,x0,b");
 		break;
 		}
-	case 941: { // dmacuu +x1,y0,b
+	case 939: { // dmacuu +x1,y0,b
 		unhandled("dmacuu +x1,y0,b");
 		break;
 		}
-	case 942: { // dmacuu +y1,x1,b
+	case 940: { // dmacuu +y1,x1,b
 		unhandled("dmacuu +y1,x1,b");
 		break;
 		}
-	case 943: { // dmacuu +y1,x0,b
+	case 941: { // dmacuu +y1,x0,b
 		unhandled("dmacuu +y1,x0,b");
 		break;
 		}
-	case 944: { // dmacuu +x0,y0,b
+	case 942: { // dmacuu +x0,y0,b
 		unhandled("dmacuu +x0,y0,b");
 		break;
 		}
-	case 945: { // dmacuu +y0,x1,b
+	case 943: { // dmacuu +y0,x1,b
 		unhandled("dmacuu +y0,x1,b");
 		break;
 		}
-	case 946: { // dmacuu +x1,y1,b
+	case 944: { // dmacuu +x1,y1,b
 		unhandled("dmacuu +x1,y1,b");
 		break;
 		}
-	case 947: { // dmacuu -x0,x0,b
+	case 945: { // dmacuu -x0,x0,b
 		unhandled("dmacuu -x0,x0,b");
 		break;
 		}
-	case 948: { // dmacuu -y0,y0,b
+	case 946: { // dmacuu -y0,y0,b
 		unhandled("dmacuu -y0,y0,b");
 		break;
 		}
-	case 949: { // dmacuu -x1,x0,b
+	case 947: { // dmacuu -x1,x0,b
 		unhandled("dmacuu -x1,x0,b");
 		break;
 		}
-	case 950: { // dmacuu -y1,y0,b
+	case 948: { // dmacuu -y1,y0,b
 		unhandled("dmacuu -y1,y0,b");
 		break;
 		}
-	case 951: { // dmacuu -x1,x1,b
+	case 949: { // dmacuu -x1,x1,b
 		unhandled("dmacuu -x1,x1,b");
 		break;
 		}
-	case 952: { // dmacuu -y1,y1,b
+	case 950: { // dmacuu -y1,y1,b
 		unhandled("dmacuu -y1,y1,b");
 		break;
 		}
-	case 953: { // dmacuu -x0,x1,b
+	case 951: { // dmacuu -x0,x1,b
 		unhandled("dmacuu -x0,x1,b");
 		break;
 		}
-	case 954: { // dmacuu -y0,y1,b
+	case 952: { // dmacuu -y0,y1,b
 		unhandled("dmacuu -y0,y1,b");
 		break;
 		}
-	case 955: { // dmacuu -x0,y1,b
+	case 953: { // dmacuu -x0,y1,b
 		unhandled("dmacuu -x0,y1,b");
 		break;
 		}
-	case 956: { // dmacuu -y0,x0,b
+	case 954: { // dmacuu -y0,x0,b
 		unhandled("dmacuu -y0,x0,b");
 		break;
 		}
-	case 957: { // dmacuu -x1,y0,b
+	case 955: { // dmacuu -x1,y0,b
 		unhandled("dmacuu -x1,y0,b");
 		break;
 		}
-	case 958: { // dmacuu -y1,x1,b
+	case 956: { // dmacuu -y1,x1,b
 		unhandled("dmacuu -y1,x1,b");
 		break;
 		}
-	case 959: { // dmacuu -y1,x0,b
+	case 957: { // dmacuu -y1,x0,b
 		unhandled("dmacuu -y1,x0,b");
 		break;
 		}
-	case 960: { // dmacuu -x0,y0,b
+	case 958: { // dmacuu -x0,y0,b
 		unhandled("dmacuu -x0,y0,b");
 		break;
 		}
-	case 961: { // dmacuu -y0,x1,b
+	case 959: { // dmacuu -y0,x1,b
 		unhandled("dmacuu -y0,x1,b");
 		break;
 		}
-	case 962: { // dmacuu -x1,y1,b
+	case 960: { // dmacuu -x1,y1,b
 		unhandled("dmacuu -x1,y1,b");
 		break;
 		}
-	case 963: { // do x:(r)-n,[expr]
+	case 961: { // do x:(r)-n,[expr]
 		unhandled("do x:(r)-n,[expr]");
 		break;
 		}
-	case 964: { // do y:(r)-n,[expr]
+	case 962: { // do y:(r)-n,[expr]
 		unhandled("do y:(r)-n,[expr]");
 		break;
 		}
-	case 965: { // do x:(r)+n,[expr]
+	case 963: { // do x:(r)+n,[expr]
 		unhandled("do x:(r)+n,[expr]");
 		break;
 		}
-	case 966: { // do y:(r)+n,[expr]
+	case 964: { // do y:(r)+n,[expr]
 		unhandled("do y:(r)+n,[expr]");
 		break;
 		}
-	case 967: { // do x:(r)-,[expr]
+	case 965: { // do x:(r)-,[expr]
 		unhandled("do x:(r)-,[expr]");
 		break;
 		}
-	case 968: { // do y:(r)-,[expr]
+	case 966: { // do y:(r)-,[expr]
 		unhandled("do y:(r)-,[expr]");
 		break;
 		}
-	case 969: { // do x:(r)+,[expr]
+	case 967: { // do x:(r)+,[expr]
 		unhandled("do x:(r)+,[expr]");
 		break;
 		}
-	case 970: { // do y:(r)+,[expr]
+	case 968: { // do y:(r)+,[expr]
 		unhandled("do y:(r)+,[expr]");
 		break;
 		}
-	case 971: { // do x:(r),[expr]
+	case 969: { // do x:(r),[expr]
 		unhandled("do x:(r),[expr]");
 		break;
 		}
-	case 972: { // do y:(r),[expr]
+	case 970: { // do y:(r),[expr]
 		unhandled("do y:(r),[expr]");
 		break;
 		}
-	case 973: { // do x:(r+n),[expr]
+	case 971: { // do x:(r+n),[expr]
 		unhandled("do x:(r+n),[expr]");
 		break;
 		}
-	case 974: { // do y:(r+n),[expr]
+	case 972: { // do y:(r+n),[expr]
 		unhandled("do y:(r+n),[expr]");
 		break;
 		}
-	case 975: { // do x:-(r),[expr]
+	case 973: { // do x:-(r),[expr]
 		unhandled("do x:-(r),[expr]");
 		break;
 		}
-	case 976: { // do y:-(r),[expr]
+	case 974: { // do y:-(r),[expr]
 		unhandled("do y:-(r),[expr]");
 		break;
 		}
-	case 977: { // do x:[aa],[expr]
+	case 975: { // do x:[aa],[expr]
 		unhandled("do x:[aa],[expr]");
 		break;
 		}
-	case 978: { // do y:[aa],[expr]
+	case 976: { // do y:[aa],[expr]
 		unhandled("do y:[aa],[expr]");
 		break;
 		}
-	case 979: { // do #[i],[expr]
+	case 977: { // do #[i],[expr]
 		u32 i = bitswap<12>(opcode, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
 		u32 expr = exv;
 		inc_sp();
@@ -25042,7 +25578,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 980: { // do x0,[expr]
+	case 978: { // do x0,[expr]
 		u32 s = get_x0();
 		u32 expr = exv;
 		inc_sp();
@@ -25056,7 +25592,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 981: { // do x1,[expr]
+	case 979: { // do x1,[expr]
 		u32 s = get_x1();
 		u32 expr = exv;
 		inc_sp();
@@ -25070,7 +25606,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 982: { // do y0,[expr]
+	case 980: { // do y0,[expr]
 		u32 s = get_y0();
 		u32 expr = exv;
 		inc_sp();
@@ -25084,7 +25620,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 983: { // do y1,[expr]
+	case 981: { // do y1,[expr]
 		u32 s = get_y1();
 		u32 expr = exv;
 		inc_sp();
@@ -25098,7 +25634,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 984: { // do a0,[expr]
+	case 982: { // do a0,[expr]
 		u32 s = get_a0();
 		u32 expr = exv;
 		inc_sp();
@@ -25112,7 +25648,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 985: { // do b0,[expr]
+	case 983: { // do b0,[expr]
 		u32 s = get_b0();
 		u32 expr = exv;
 		inc_sp();
@@ -25126,7 +25662,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 986: { // do a2,[expr]
+	case 984: { // do a2,[expr]
 		u32 s = get_a2();
 		u32 expr = exv;
 		inc_sp();
@@ -25140,7 +25676,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 987: { // do b2,[expr]
+	case 985: { // do b2,[expr]
 		u32 s = get_b2();
 		u32 expr = exv;
 		inc_sp();
@@ -25154,7 +25690,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 988: { // do a1,[expr]
+	case 986: { // do a1,[expr]
 		u32 s = get_a1();
 		u32 expr = exv;
 		inc_sp();
@@ -25168,7 +25704,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 989: { // do b1,[expr]
+	case 987: { // do b1,[expr]
 		u32 s = get_b1();
 		u32 expr = exv;
 		inc_sp();
@@ -25182,7 +25718,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 990: { // do a,[expr]
+	case 988: { // do a,[expr]
 		u64 s = get_a();
 		u32 expr = exv;
 		inc_sp();
@@ -25196,7 +25732,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 991: { // do b,[expr]
+	case 989: { // do b,[expr]
 		u64 s = get_b();
 		u32 expr = exv;
 		inc_sp();
@@ -25210,7 +25746,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 992: { // do r,[expr]
+	case 990: { // do r,[expr]
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		u32 expr = exv;
 		inc_sp();
@@ -25224,7 +25760,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 993: { // do n,[expr]
+	case 991: { // do n,[expr]
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		u32 expr = exv;
 		inc_sp();
@@ -25238,7 +25774,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 994: { // do m,[expr]
+	case 992: { // do m,[expr]
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		u32 expr = exv;
 		inc_sp();
@@ -25252,7 +25788,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 995: { // do ep,[expr]
+	case 993: { // do ep,[expr]
 		u32 s = get_ep();
 		u32 expr = exv;
 		inc_sp();
@@ -25266,7 +25802,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 996: { // do vba,[expr]
+	case 994: { // do vba,[expr]
 		u32 s = get_vba();
 		u32 expr = exv;
 		inc_sp();
@@ -25280,7 +25816,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 997: { // do sc,[expr]
+	case 995: { // do sc,[expr]
 		u32 s = get_sc();
 		u32 expr = exv;
 		inc_sp();
@@ -25294,7 +25830,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 998: { // do sz,[expr]
+	case 996: { // do sz,[expr]
 		u32 s = get_sz();
 		u32 expr = exv;
 		inc_sp();
@@ -25308,7 +25844,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 999: { // do sr,[expr]
+	case 997: { // do sr,[expr]
 		u32 s = get_sr();
 		u32 expr = exv;
 		inc_sp();
@@ -25322,7 +25858,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1000: { // do omr,[expr]
+	case 998: { // do omr,[expr]
 		u32 s = get_omr();
 		u32 expr = exv;
 		inc_sp();
@@ -25336,7 +25872,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1001: { // do sp,[expr]
+	case 999: { // do sp,[expr]
 		u32 s = get_sp();
 		u32 expr = exv;
 		inc_sp();
@@ -25350,7 +25886,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1002: { // do ssl,[expr]
+	case 1000: { // do ssl,[expr]
 		u32 s = get_ssl();
 		u32 expr = exv;
 		inc_sp();
@@ -25364,7 +25900,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1003: { // do la,[expr]
+	case 1001: { // do la,[expr]
 		u32 s = get_la();
 		u32 expr = exv;
 		inc_sp();
@@ -25378,7 +25914,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1004: { // do lc,[expr]
+	case 1002: { // do lc,[expr]
 		u32 s = get_lc();
 		u32 expr = exv;
 		inc_sp();
@@ -25392,7 +25928,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1005: { // do forever,[expr]
+	case 1003: { // do forever,[expr]
 		u32 expr = exv;
 		inc_sp();
 		set_ssh(get_la());
@@ -25405,71 +25941,71 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_emr |= EMR_FV;
 		break;
 		}
-	case 1006: { // dor x:(r)-n,[expr]
+	case 1004: { // dor x:(r)-n,[expr]
 		unhandled("dor x:(r)-n,[expr]");
 		break;
 		}
-	case 1007: { // dor y:(r)-n,[expr]
+	case 1005: { // dor y:(r)-n,[expr]
 		unhandled("dor y:(r)-n,[expr]");
 		break;
 		}
-	case 1008: { // dor x:(r)+n,[expr]
+	case 1006: { // dor x:(r)+n,[expr]
 		unhandled("dor x:(r)+n,[expr]");
 		break;
 		}
-	case 1009: { // dor y:(r)+n,[expr]
+	case 1007: { // dor y:(r)+n,[expr]
 		unhandled("dor y:(r)+n,[expr]");
 		break;
 		}
-	case 1010: { // dor x:(r)-,[expr]
+	case 1008: { // dor x:(r)-,[expr]
 		unhandled("dor x:(r)-,[expr]");
 		break;
 		}
-	case 1011: { // dor y:(r)-,[expr]
+	case 1009: { // dor y:(r)-,[expr]
 		unhandled("dor y:(r)-,[expr]");
 		break;
 		}
-	case 1012: { // dor x:(r)+,[expr]
+	case 1010: { // dor x:(r)+,[expr]
 		unhandled("dor x:(r)+,[expr]");
 		break;
 		}
-	case 1013: { // dor y:(r)+,[expr]
+	case 1011: { // dor y:(r)+,[expr]
 		unhandled("dor y:(r)+,[expr]");
 		break;
 		}
-	case 1014: { // dor x:(r),[expr]
+	case 1012: { // dor x:(r),[expr]
 		unhandled("dor x:(r),[expr]");
 		break;
 		}
-	case 1015: { // dor y:(r),[expr]
+	case 1013: { // dor y:(r),[expr]
 		unhandled("dor y:(r),[expr]");
 		break;
 		}
-	case 1016: { // dor x:(r+n),[expr]
+	case 1014: { // dor x:(r+n),[expr]
 		unhandled("dor x:(r+n),[expr]");
 		break;
 		}
-	case 1017: { // dor y:(r+n),[expr]
+	case 1015: { // dor y:(r+n),[expr]
 		unhandled("dor y:(r+n),[expr]");
 		break;
 		}
-	case 1018: { // dor x:-(r),[expr]
+	case 1016: { // dor x:-(r),[expr]
 		unhandled("dor x:-(r),[expr]");
 		break;
 		}
-	case 1019: { // dor y:-(r),[expr]
+	case 1017: { // dor y:-(r),[expr]
 		unhandled("dor y:-(r),[expr]");
 		break;
 		}
-	case 1020: { // dor x:[aa],[expr]
+	case 1018: { // dor x:[aa],[expr]
 		unhandled("dor x:[aa],[expr]");
 		break;
 		}
-	case 1021: { // dor y:[aa],[expr]
+	case 1019: { // dor y:[aa],[expr]
 		unhandled("dor y:[aa],[expr]");
 		break;
 		}
-	case 1022: { // dor #[i],[expr]
+	case 1020: { // dor #[i],[expr]
 		u32 i = bitswap<12>(opcode, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25483,7 +26019,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1023: { // dor x0,[expr]
+	case 1021: { // dor x0,[expr]
 		u32 s = get_x0();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25497,7 +26033,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1024: { // dor x1,[expr]
+	case 1022: { // dor x1,[expr]
 		u32 s = get_x1();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25511,7 +26047,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1025: { // dor y0,[expr]
+	case 1023: { // dor y0,[expr]
 		u32 s = get_y0();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25525,7 +26061,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1026: { // dor y1,[expr]
+	case 1024: { // dor y1,[expr]
 		u32 s = get_y1();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25539,7 +26075,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1027: { // dor a0,[expr]
+	case 1025: { // dor a0,[expr]
 		u32 s = get_a0();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25553,7 +26089,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1028: { // dor b0,[expr]
+	case 1026: { // dor b0,[expr]
 		u32 s = get_b0();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25567,7 +26103,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1029: { // dor a2,[expr]
+	case 1027: { // dor a2,[expr]
 		u32 s = get_a2();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25581,7 +26117,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1030: { // dor b2,[expr]
+	case 1028: { // dor b2,[expr]
 		u32 s = get_b2();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25595,7 +26131,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1031: { // dor a1,[expr]
+	case 1029: { // dor a1,[expr]
 		u32 s = get_a1();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25609,7 +26145,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1032: { // dor b1,[expr]
+	case 1030: { // dor b1,[expr]
 		u32 s = get_b1();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25623,7 +26159,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1033: { // dor a,[expr]
+	case 1031: { // dor a,[expr]
 		u64 s = get_a();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25637,7 +26173,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1034: { // dor b,[expr]
+	case 1032: { // dor b,[expr]
 		u64 s = get_b();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25651,7 +26187,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1035: { // dor r,[expr]
+	case 1033: { // dor r,[expr]
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25665,7 +26201,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1036: { // dor n,[expr]
+	case 1034: { // dor n,[expr]
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25679,7 +26215,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1037: { // dor m,[expr]
+	case 1035: { // dor m,[expr]
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25693,7 +26229,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1038: { // dor ep,[expr]
+	case 1036: { // dor ep,[expr]
 		u32 s = get_ep();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25707,7 +26243,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1039: { // dor vba,[expr]
+	case 1037: { // dor vba,[expr]
 		u32 s = get_vba();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25721,7 +26257,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1040: { // dor sc,[expr]
+	case 1038: { // dor sc,[expr]
 		u32 s = get_sc();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25735,7 +26271,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1041: { // dor sz,[expr]
+	case 1039: { // dor sz,[expr]
 		u32 s = get_sz();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25749,7 +26285,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1042: { // dor sr,[expr]
+	case 1040: { // dor sr,[expr]
 		u32 s = get_sr();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25763,7 +26299,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1043: { // dor omr,[expr]
+	case 1041: { // dor omr,[expr]
 		u32 s = get_omr();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25777,7 +26313,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1044: { // dor sp,[expr]
+	case 1042: { // dor sp,[expr]
 		u32 s = get_sp();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25791,7 +26327,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1045: { // dor ssl,[expr]
+	case 1043: { // dor ssl,[expr]
 		u32 s = get_ssl();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25805,7 +26341,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1046: { // dor la,[expr]
+	case 1044: { // dor la,[expr]
 		u32 s = get_la();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25819,7 +26355,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1047: { // dor lc,[expr]
+	case 1045: { // dor lc,[expr]
 		u32 s = get_lc();
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
@@ -25833,7 +26369,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_mr |= MR_LF;
 		break;
 		}
-	case 1048: { // dor forever,[expr]
+	case 1046: { // dor forever,[expr]
 		u32 expr = (m_pc+exv) & 0xffffff;
 		inc_sp();
 		set_ssh(get_la());
@@ -25846,8 +26382,16 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_emr |= EMR_FV;
 		break;
 		}
-	case 1049: { // enddo
+	case 1047: { // enddo
 		unhandled("enddo");
+		break;
+		}
+	case 1048: { // eor #[i],a
+		unhandled("eor #[i],a");
+		break;
+		}
+	case 1049: { // eor #[i],b
+		unhandled("eor #[i],b");
 		break;
 		}
 	case 1050: { // eor #[i],a
@@ -25858,987 +26402,979 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		unhandled("eor #[i],b");
 		break;
 		}
-	case 1052: { // eor #[i],a
-		unhandled("eor #[i],a");
-		break;
-		}
-	case 1053: { // eor #[i],b
-		unhandled("eor #[i],b");
-		break;
-		}
-	case 1054: { // extract a1,a,d
+	case 1052: { // extract a1,a,d
 		unhandled("extract a1,a,d");
 		break;
 		}
-	case 1055: { // extract a1,b,d
+	case 1053: { // extract a1,b,d
 		unhandled("extract a1,b,d");
 		break;
 		}
-	case 1056: { // extract b1,a,d
+	case 1054: { // extract b1,a,d
 		unhandled("extract b1,a,d");
 		break;
 		}
-	case 1057: { // extract b1,b,d
+	case 1055: { // extract b1,b,d
 		unhandled("extract b1,b,d");
 		break;
 		}
-	case 1058: { // extract x0,a,d
+	case 1056: { // extract x0,a,d
 		unhandled("extract x0,a,d");
 		break;
 		}
-	case 1059: { // extract x0,b,d
+	case 1057: { // extract x0,b,d
 		unhandled("extract x0,b,d");
 		break;
 		}
-	case 1060: { // extract y0,a,d
+	case 1058: { // extract y0,a,d
 		unhandled("extract y0,a,d");
 		break;
 		}
-	case 1061: { // extract y0,b,d
+	case 1059: { // extract y0,b,d
 		unhandled("extract y0,b,d");
 		break;
 		}
-	case 1062: { // extract x1,a,d
+	case 1060: { // extract x1,a,d
 		unhandled("extract x1,a,d");
 		break;
 		}
-	case 1063: { // extract x1,b,d
+	case 1061: { // extract x1,b,d
 		unhandled("extract x1,b,d");
 		break;
 		}
-	case 1064: { // extract y1,a,d
+	case 1062: { // extract y1,a,d
 		unhandled("extract y1,a,d");
 		break;
 		}
-	case 1065: { // extract y1,b,d
+	case 1063: { // extract y1,b,d
 		unhandled("extract y1,b,d");
 		break;
 		}
-	case 1066: { // extract #[co],a,a
+	case 1064: { // extract #[co],a,a
 		unhandled("extract #[co],a,a");
 		break;
 		}
-	case 1067: { // extract #[co],a,b
+	case 1065: { // extract #[co],a,b
 		unhandled("extract #[co],a,b");
 		break;
 		}
-	case 1068: { // extract #[co],b,a
+	case 1066: { // extract #[co],b,a
 		unhandled("extract #[co],b,a");
 		break;
 		}
-	case 1069: { // extract #[co],b,b
+	case 1067: { // extract #[co],b,b
 		unhandled("extract #[co],b,b");
 		break;
 		}
-	case 1070: { // extractu a1,a,d
+	case 1068: { // extractu a1,a,d
 		unhandled("extractu a1,a,d");
 		break;
 		}
-	case 1071: { // extractu a1,b,d
+	case 1069: { // extractu a1,b,d
 		unhandled("extractu a1,b,d");
 		break;
 		}
-	case 1072: { // extractu b1,a,d
+	case 1070: { // extractu b1,a,d
 		unhandled("extractu b1,a,d");
 		break;
 		}
-	case 1073: { // extractu b1,b,d
+	case 1071: { // extractu b1,b,d
 		unhandled("extractu b1,b,d");
 		break;
 		}
-	case 1074: { // extractu x0,a,d
+	case 1072: { // extractu x0,a,d
 		unhandled("extractu x0,a,d");
 		break;
 		}
-	case 1075: { // extractu x0,b,d
+	case 1073: { // extractu x0,b,d
 		unhandled("extractu x0,b,d");
 		break;
 		}
-	case 1076: { // extractu y0,a,d
+	case 1074: { // extractu y0,a,d
 		unhandled("extractu y0,a,d");
 		break;
 		}
-	case 1077: { // extractu y0,b,d
+	case 1075: { // extractu y0,b,d
 		unhandled("extractu y0,b,d");
 		break;
 		}
-	case 1078: { // extractu x1,a,d
+	case 1076: { // extractu x1,a,d
 		unhandled("extractu x1,a,d");
 		break;
 		}
-	case 1079: { // extractu x1,b,d
+	case 1077: { // extractu x1,b,d
 		unhandled("extractu x1,b,d");
 		break;
 		}
-	case 1080: { // extractu y1,a,d
+	case 1078: { // extractu y1,a,d
 		unhandled("extractu y1,a,d");
 		break;
 		}
-	case 1081: { // extractu y1,b,d
+	case 1079: { // extractu y1,b,d
 		unhandled("extractu y1,b,d");
 		break;
 		}
-	case 1082: { // extractu #[co],a,a
+	case 1080: { // extractu #[co],a,a
 		unhandled("extractu #[co],a,a");
 		break;
 		}
-	case 1083: { // extractu #[co],a,b
+	case 1081: { // extractu #[co],a,b
 		unhandled("extractu #[co],a,b");
 		break;
 		}
-	case 1084: { // extractu #[co],b,a
+	case 1082: { // extractu #[co],b,a
 		unhandled("extractu #[co],b,a");
 		break;
 		}
-	case 1085: { // extractu #[co],b,b
+	case 1083: { // extractu #[co],b,b
 		unhandled("extractu #[co],b,b");
 		break;
 		}
-	case 1086: { // illegal
+	case 1084: { // illegal
 		unhandled("illegal");
 		break;
 		}
-	case 1087: { // inc a
+	case 1085: { // inc a
 		unhandled("inc a");
 		break;
 		}
-	case 1088: { // inc b
+	case 1086: { // inc b
 		unhandled("inc b");
 		break;
 		}
-	case 1089: { // insert a1,a0,d
+	case 1087: { // insert a1,a0,d
 		unhandled("insert a1,a0,d");
 		break;
 		}
-	case 1090: { // insert a1,b0,d
+	case 1088: { // insert a1,b0,d
 		unhandled("insert a1,b0,d");
 		break;
 		}
-	case 1091: { // insert a1,x0,d
+	case 1089: { // insert a1,x0,d
 		unhandled("insert a1,x0,d");
 		break;
 		}
-	case 1092: { // insert a1,y0,d
+	case 1090: { // insert a1,y0,d
 		unhandled("insert a1,y0,d");
 		break;
 		}
-	case 1093: { // insert a1,x1,d
+	case 1091: { // insert a1,x1,d
 		unhandled("insert a1,x1,d");
 		break;
 		}
-	case 1094: { // insert a1,y1,d
+	case 1092: { // insert a1,y1,d
 		unhandled("insert a1,y1,d");
 		break;
 		}
-	case 1095: { // insert b1,a0,d
+	case 1093: { // insert b1,a0,d
 		unhandled("insert b1,a0,d");
 		break;
 		}
-	case 1096: { // insert b1,b0,d
+	case 1094: { // insert b1,b0,d
 		unhandled("insert b1,b0,d");
 		break;
 		}
-	case 1097: { // insert b1,x0,d
+	case 1095: { // insert b1,x0,d
 		unhandled("insert b1,x0,d");
 		break;
 		}
-	case 1098: { // insert b1,y0,d
+	case 1096: { // insert b1,y0,d
 		unhandled("insert b1,y0,d");
 		break;
 		}
-	case 1099: { // insert b1,x1,d
+	case 1097: { // insert b1,x1,d
 		unhandled("insert b1,x1,d");
 		break;
 		}
-	case 1100: { // insert b1,y1,d
+	case 1098: { // insert b1,y1,d
 		unhandled("insert b1,y1,d");
 		break;
 		}
-	case 1101: { // insert x0,a0,d
+	case 1099: { // insert x0,a0,d
 		unhandled("insert x0,a0,d");
 		break;
 		}
-	case 1102: { // insert x0,b0,d
+	case 1100: { // insert x0,b0,d
 		unhandled("insert x0,b0,d");
 		break;
 		}
-	case 1103: { // insert x0,x0,d
+	case 1101: { // insert x0,x0,d
 		unhandled("insert x0,x0,d");
 		break;
 		}
-	case 1104: { // insert x0,y0,d
+	case 1102: { // insert x0,y0,d
 		unhandled("insert x0,y0,d");
 		break;
 		}
-	case 1105: { // insert x0,x1,d
+	case 1103: { // insert x0,x1,d
 		unhandled("insert x0,x1,d");
 		break;
 		}
-	case 1106: { // insert x0,y1,d
+	case 1104: { // insert x0,y1,d
 		unhandled("insert x0,y1,d");
 		break;
 		}
-	case 1107: { // insert y0,a0,d
+	case 1105: { // insert y0,a0,d
 		unhandled("insert y0,a0,d");
 		break;
 		}
-	case 1108: { // insert y0,b0,d
+	case 1106: { // insert y0,b0,d
 		unhandled("insert y0,b0,d");
 		break;
 		}
-	case 1109: { // insert y0,x0,d
+	case 1107: { // insert y0,x0,d
 		unhandled("insert y0,x0,d");
 		break;
 		}
-	case 1110: { // insert y0,y0,d
+	case 1108: { // insert y0,y0,d
 		unhandled("insert y0,y0,d");
 		break;
 		}
-	case 1111: { // insert y0,x1,d
+	case 1109: { // insert y0,x1,d
 		unhandled("insert y0,x1,d");
 		break;
 		}
-	case 1112: { // insert y0,y1,d
+	case 1110: { // insert y0,y1,d
 		unhandled("insert y0,y1,d");
 		break;
 		}
-	case 1113: { // insert x1,a0,d
+	case 1111: { // insert x1,a0,d
 		unhandled("insert x1,a0,d");
 		break;
 		}
-	case 1114: { // insert x1,b0,d
+	case 1112: { // insert x1,b0,d
 		unhandled("insert x1,b0,d");
 		break;
 		}
-	case 1115: { // insert x1,x0,d
+	case 1113: { // insert x1,x0,d
 		unhandled("insert x1,x0,d");
 		break;
 		}
-	case 1116: { // insert x1,y0,d
+	case 1114: { // insert x1,y0,d
 		unhandled("insert x1,y0,d");
 		break;
 		}
-	case 1117: { // insert x1,x1,d
+	case 1115: { // insert x1,x1,d
 		unhandled("insert x1,x1,d");
 		break;
 		}
-	case 1118: { // insert x1,y1,d
+	case 1116: { // insert x1,y1,d
 		unhandled("insert x1,y1,d");
 		break;
 		}
-	case 1119: { // insert y1,a0,d
+	case 1117: { // insert y1,a0,d
 		unhandled("insert y1,a0,d");
 		break;
 		}
-	case 1120: { // insert y1,b0,d
+	case 1118: { // insert y1,b0,d
 		unhandled("insert y1,b0,d");
 		break;
 		}
-	case 1121: { // insert y1,x0,d
+	case 1119: { // insert y1,x0,d
 		unhandled("insert y1,x0,d");
 		break;
 		}
-	case 1122: { // insert y1,y0,d
+	case 1120: { // insert y1,y0,d
 		unhandled("insert y1,y0,d");
 		break;
 		}
-	case 1123: { // insert y1,x1,d
+	case 1121: { // insert y1,x1,d
 		unhandled("insert y1,x1,d");
 		break;
 		}
-	case 1124: { // insert y1,y1,d
+	case 1122: { // insert y1,y1,d
 		unhandled("insert y1,y1,d");
 		break;
 		}
-	case 1125: { // insert #[co],a0,a
+	case 1123: { // insert #[co],a0,a
 		unhandled("insert #[co],a0,a");
 		break;
 		}
-	case 1126: { // insert #[co],a0,b
+	case 1124: { // insert #[co],a0,b
 		unhandled("insert #[co],a0,b");
 		break;
 		}
-	case 1127: { // insert #[co],b0,a
+	case 1125: { // insert #[co],b0,a
 		unhandled("insert #[co],b0,a");
 		break;
 		}
-	case 1128: { // insert #[co],b0,b
+	case 1126: { // insert #[co],b0,b
 		unhandled("insert #[co],b0,b");
 		break;
 		}
-	case 1129: { // insert #[co],x0,a
+	case 1127: { // insert #[co],x0,a
 		unhandled("insert #[co],x0,a");
 		break;
 		}
-	case 1130: { // insert #[co],x0,b
+	case 1128: { // insert #[co],x0,b
 		unhandled("insert #[co],x0,b");
 		break;
 		}
-	case 1131: { // insert #[co],y0,a
+	case 1129: { // insert #[co],y0,a
 		unhandled("insert #[co],y0,a");
 		break;
 		}
-	case 1132: { // insert #[co],y0,b
+	case 1130: { // insert #[co],y0,b
 		unhandled("insert #[co],y0,b");
 		break;
 		}
-	case 1133: { // insert #[co],x1,a
+	case 1131: { // insert #[co],x1,a
 		unhandled("insert #[co],x1,a");
 		break;
 		}
-	case 1134: { // insert #[co],x1,b
+	case 1132: { // insert #[co],x1,b
 		unhandled("insert #[co],x1,b");
 		break;
 		}
-	case 1135: { // insert #[co],y1,a
+	case 1133: { // insert #[co],y1,a
 		unhandled("insert #[co],y1,a");
 		break;
 		}
-	case 1136: { // insert #[co],y1,b
+	case 1134: { // insert #[co],y1,b
 		unhandled("insert #[co],y1,b");
 		break;
 		}
-	case 1137: { // jcc [x]
+	case 1135: { // jcc [x]
 		unhandled("jcc [x]");
 		break;
 		}
-	case 1138: { // jge [x]
+	case 1136: { // jge [x]
 		unhandled("jge [x]");
 		break;
 		}
-	case 1139: { // jne [x]
+	case 1137: { // jne [x]
 		unhandled("jne [x]");
 		break;
 		}
-	case 1140: { // jpl [x]
+	case 1138: { // jpl [x]
 		unhandled("jpl [x]");
 		break;
 		}
-	case 1141: { // jnn [x]
+	case 1139: { // jnn [x]
 		unhandled("jnn [x]");
 		break;
 		}
-	case 1142: { // jec [x]
+	case 1140: { // jec [x]
 		unhandled("jec [x]");
 		break;
 		}
-	case 1143: { // jlc [x]
+	case 1141: { // jlc [x]
 		unhandled("jlc [x]");
 		break;
 		}
-	case 1144: { // jgt [x]
+	case 1142: { // jgt [x]
 		unhandled("jgt [x]");
 		break;
 		}
-	case 1145: { // jcs [x]
+	case 1143: { // jcs [x]
 		unhandled("jcs [x]");
 		break;
 		}
-	case 1146: { // jlt [x]
+	case 1144: { // jlt [x]
 		unhandled("jlt [x]");
 		break;
 		}
-	case 1147: { // jeq [x]
+	case 1145: { // jeq [x]
 		unhandled("jeq [x]");
 		break;
 		}
-	case 1148: { // jmi [x]
+	case 1146: { // jmi [x]
 		unhandled("jmi [x]");
 		break;
 		}
-	case 1149: { // jnr [x]
+	case 1147: { // jnr [x]
 		unhandled("jnr [x]");
 		break;
 		}
-	case 1150: { // jes [x]
+	case 1148: { // jes [x]
 		unhandled("jes [x]");
 		break;
 		}
-	case 1151: { // jls [x]
+	case 1149: { // jls [x]
 		unhandled("jls [x]");
 		break;
 		}
-	case 1152: { // jle [x]
+	case 1150: { // jle [x]
 		unhandled("jle [x]");
 		break;
 		}
-	case 1153: { // jcc (r)-n
+	case 1151: { // jcc (r)-n
 		unhandled("jcc (r)-n");
 		break;
 		}
-	case 1154: { // jge (r)-n
+	case 1152: { // jge (r)-n
 		unhandled("jge (r)-n");
 		break;
 		}
-	case 1155: { // jne (r)-n
+	case 1153: { // jne (r)-n
 		unhandled("jne (r)-n");
 		break;
 		}
-	case 1156: { // jpl (r)-n
+	case 1154: { // jpl (r)-n
 		unhandled("jpl (r)-n");
 		break;
 		}
-	case 1157: { // jnn (r)-n
+	case 1155: { // jnn (r)-n
 		unhandled("jnn (r)-n");
 		break;
 		}
-	case 1158: { // jec (r)-n
+	case 1156: { // jec (r)-n
 		unhandled("jec (r)-n");
 		break;
 		}
-	case 1159: { // jlc (r)-n
+	case 1157: { // jlc (r)-n
 		unhandled("jlc (r)-n");
 		break;
 		}
-	case 1160: { // jgt (r)-n
+	case 1158: { // jgt (r)-n
 		unhandled("jgt (r)-n");
 		break;
 		}
-	case 1161: { // jcs (r)-n
+	case 1159: { // jcs (r)-n
 		unhandled("jcs (r)-n");
 		break;
 		}
-	case 1162: { // jlt (r)-n
+	case 1160: { // jlt (r)-n
 		unhandled("jlt (r)-n");
 		break;
 		}
-	case 1163: { // jeq (r)-n
+	case 1161: { // jeq (r)-n
 		unhandled("jeq (r)-n");
 		break;
 		}
-	case 1164: { // jmi (r)-n
+	case 1162: { // jmi (r)-n
 		unhandled("jmi (r)-n");
 		break;
 		}
-	case 1165: { // jnr (r)-n
+	case 1163: { // jnr (r)-n
 		unhandled("jnr (r)-n");
 		break;
 		}
-	case 1166: { // jes (r)-n
+	case 1164: { // jes (r)-n
 		unhandled("jes (r)-n");
 		break;
 		}
-	case 1167: { // jls (r)-n
+	case 1165: { // jls (r)-n
 		unhandled("jls (r)-n");
 		break;
 		}
-	case 1168: { // jle (r)-n
+	case 1166: { // jle (r)-n
 		unhandled("jle (r)-n");
 		break;
 		}
-	case 1169: { // jcc (r)+n
+	case 1167: { // jcc (r)+n
 		unhandled("jcc (r)+n");
 		break;
 		}
-	case 1170: { // jge (r)+n
+	case 1168: { // jge (r)+n
 		unhandled("jge (r)+n");
 		break;
 		}
-	case 1171: { // jne (r)+n
+	case 1169: { // jne (r)+n
 		unhandled("jne (r)+n");
 		break;
 		}
-	case 1172: { // jpl (r)+n
+	case 1170: { // jpl (r)+n
 		unhandled("jpl (r)+n");
 		break;
 		}
-	case 1173: { // jnn (r)+n
+	case 1171: { // jnn (r)+n
 		unhandled("jnn (r)+n");
 		break;
 		}
-	case 1174: { // jec (r)+n
+	case 1172: { // jec (r)+n
 		unhandled("jec (r)+n");
 		break;
 		}
-	case 1175: { // jlc (r)+n
+	case 1173: { // jlc (r)+n
 		unhandled("jlc (r)+n");
 		break;
 		}
-	case 1176: { // jgt (r)+n
+	case 1174: { // jgt (r)+n
 		unhandled("jgt (r)+n");
 		break;
 		}
-	case 1177: { // jcs (r)+n
+	case 1175: { // jcs (r)+n
 		unhandled("jcs (r)+n");
 		break;
 		}
-	case 1178: { // jlt (r)+n
+	case 1176: { // jlt (r)+n
 		unhandled("jlt (r)+n");
 		break;
 		}
-	case 1179: { // jeq (r)+n
+	case 1177: { // jeq (r)+n
 		unhandled("jeq (r)+n");
 		break;
 		}
-	case 1180: { // jmi (r)+n
+	case 1178: { // jmi (r)+n
 		unhandled("jmi (r)+n");
 		break;
 		}
-	case 1181: { // jnr (r)+n
+	case 1179: { // jnr (r)+n
 		unhandled("jnr (r)+n");
 		break;
 		}
-	case 1182: { // jes (r)+n
+	case 1180: { // jes (r)+n
 		unhandled("jes (r)+n");
 		break;
 		}
-	case 1183: { // jls (r)+n
+	case 1181: { // jls (r)+n
 		unhandled("jls (r)+n");
 		break;
 		}
-	case 1184: { // jle (r)+n
+	case 1182: { // jle (r)+n
 		unhandled("jle (r)+n");
 		break;
 		}
-	case 1185: { // jcc (r)-
+	case 1183: { // jcc (r)-
 		unhandled("jcc (r)-");
 		break;
 		}
-	case 1186: { // jge (r)-
+	case 1184: { // jge (r)-
 		unhandled("jge (r)-");
 		break;
 		}
-	case 1187: { // jne (r)-
+	case 1185: { // jne (r)-
 		unhandled("jne (r)-");
 		break;
 		}
-	case 1188: { // jpl (r)-
+	case 1186: { // jpl (r)-
 		unhandled("jpl (r)-");
 		break;
 		}
-	case 1189: { // jnn (r)-
+	case 1187: { // jnn (r)-
 		unhandled("jnn (r)-");
 		break;
 		}
-	case 1190: { // jec (r)-
+	case 1188: { // jec (r)-
 		unhandled("jec (r)-");
 		break;
 		}
-	case 1191: { // jlc (r)-
+	case 1189: { // jlc (r)-
 		unhandled("jlc (r)-");
 		break;
 		}
-	case 1192: { // jgt (r)-
+	case 1190: { // jgt (r)-
 		unhandled("jgt (r)-");
 		break;
 		}
-	case 1193: { // jcs (r)-
+	case 1191: { // jcs (r)-
 		unhandled("jcs (r)-");
 		break;
 		}
-	case 1194: { // jlt (r)-
+	case 1192: { // jlt (r)-
 		unhandled("jlt (r)-");
 		break;
 		}
-	case 1195: { // jeq (r)-
+	case 1193: { // jeq (r)-
 		unhandled("jeq (r)-");
 		break;
 		}
-	case 1196: { // jmi (r)-
+	case 1194: { // jmi (r)-
 		unhandled("jmi (r)-");
 		break;
 		}
-	case 1197: { // jnr (r)-
+	case 1195: { // jnr (r)-
 		unhandled("jnr (r)-");
 		break;
 		}
-	case 1198: { // jes (r)-
+	case 1196: { // jes (r)-
 		unhandled("jes (r)-");
 		break;
 		}
-	case 1199: { // jls (r)-
+	case 1197: { // jls (r)-
 		unhandled("jls (r)-");
 		break;
 		}
-	case 1200: { // jle (r)-
+	case 1198: { // jle (r)-
 		unhandled("jle (r)-");
 		break;
 		}
-	case 1201: { // jcc (r)+
+	case 1199: { // jcc (r)+
 		unhandled("jcc (r)+");
 		break;
 		}
-	case 1202: { // jge (r)+
+	case 1200: { // jge (r)+
 		unhandled("jge (r)+");
 		break;
 		}
-	case 1203: { // jne (r)+
+	case 1201: { // jne (r)+
 		unhandled("jne (r)+");
 		break;
 		}
-	case 1204: { // jpl (r)+
+	case 1202: { // jpl (r)+
 		unhandled("jpl (r)+");
 		break;
 		}
-	case 1205: { // jnn (r)+
+	case 1203: { // jnn (r)+
 		unhandled("jnn (r)+");
 		break;
 		}
-	case 1206: { // jec (r)+
+	case 1204: { // jec (r)+
 		unhandled("jec (r)+");
 		break;
 		}
-	case 1207: { // jlc (r)+
+	case 1205: { // jlc (r)+
 		unhandled("jlc (r)+");
 		break;
 		}
-	case 1208: { // jgt (r)+
+	case 1206: { // jgt (r)+
 		unhandled("jgt (r)+");
 		break;
 		}
-	case 1209: { // jcs (r)+
+	case 1207: { // jcs (r)+
 		unhandled("jcs (r)+");
 		break;
 		}
-	case 1210: { // jlt (r)+
+	case 1208: { // jlt (r)+
 		unhandled("jlt (r)+");
 		break;
 		}
-	case 1211: { // jeq (r)+
+	case 1209: { // jeq (r)+
 		unhandled("jeq (r)+");
 		break;
 		}
-	case 1212: { // jmi (r)+
+	case 1210: { // jmi (r)+
 		unhandled("jmi (r)+");
 		break;
 		}
-	case 1213: { // jnr (r)+
+	case 1211: { // jnr (r)+
 		unhandled("jnr (r)+");
 		break;
 		}
-	case 1214: { // jes (r)+
+	case 1212: { // jes (r)+
 		unhandled("jes (r)+");
 		break;
 		}
-	case 1215: { // jls (r)+
+	case 1213: { // jls (r)+
 		unhandled("jls (r)+");
 		break;
 		}
-	case 1216: { // jle (r)+
+	case 1214: { // jle (r)+
 		unhandled("jle (r)+");
 		break;
 		}
-	case 1217: { // jcc (r)
+	case 1215: { // jcc (r)
 		unhandled("jcc (r)");
 		break;
 		}
-	case 1218: { // jge (r)
+	case 1216: { // jge (r)
 		unhandled("jge (r)");
 		break;
 		}
-	case 1219: { // jne (r)
+	case 1217: { // jne (r)
 		unhandled("jne (r)");
 		break;
 		}
-	case 1220: { // jpl (r)
+	case 1218: { // jpl (r)
 		unhandled("jpl (r)");
 		break;
 		}
-	case 1221: { // jnn (r)
+	case 1219: { // jnn (r)
 		unhandled("jnn (r)");
 		break;
 		}
-	case 1222: { // jec (r)
+	case 1220: { // jec (r)
 		unhandled("jec (r)");
 		break;
 		}
-	case 1223: { // jlc (r)
+	case 1221: { // jlc (r)
 		unhandled("jlc (r)");
 		break;
 		}
-	case 1224: { // jgt (r)
+	case 1222: { // jgt (r)
 		unhandled("jgt (r)");
 		break;
 		}
-	case 1225: { // jcs (r)
+	case 1223: { // jcs (r)
 		unhandled("jcs (r)");
 		break;
 		}
-	case 1226: { // jlt (r)
+	case 1224: { // jlt (r)
 		unhandled("jlt (r)");
 		break;
 		}
-	case 1227: { // jeq (r)
+	case 1225: { // jeq (r)
 		unhandled("jeq (r)");
 		break;
 		}
-	case 1228: { // jmi (r)
+	case 1226: { // jmi (r)
 		unhandled("jmi (r)");
 		break;
 		}
-	case 1229: { // jnr (r)
+	case 1227: { // jnr (r)
 		unhandled("jnr (r)");
 		break;
 		}
-	case 1230: { // jes (r)
+	case 1228: { // jes (r)
 		unhandled("jes (r)");
 		break;
 		}
-	case 1231: { // jls (r)
+	case 1229: { // jls (r)
 		unhandled("jls (r)");
 		break;
 		}
-	case 1232: { // jle (r)
+	case 1230: { // jle (r)
 		unhandled("jle (r)");
 		break;
 		}
-	case 1233: { // jcc (r+n)
+	case 1231: { // jcc (r+n)
 		unhandled("jcc (r+n)");
 		break;
 		}
-	case 1234: { // jge (r+n)
+	case 1232: { // jge (r+n)
 		unhandled("jge (r+n)");
 		break;
 		}
-	case 1235: { // jne (r+n)
+	case 1233: { // jne (r+n)
 		unhandled("jne (r+n)");
 		break;
 		}
-	case 1236: { // jpl (r+n)
+	case 1234: { // jpl (r+n)
 		unhandled("jpl (r+n)");
 		break;
 		}
-	case 1237: { // jnn (r+n)
+	case 1235: { // jnn (r+n)
 		unhandled("jnn (r+n)");
 		break;
 		}
-	case 1238: { // jec (r+n)
+	case 1236: { // jec (r+n)
 		unhandled("jec (r+n)");
 		break;
 		}
-	case 1239: { // jlc (r+n)
+	case 1237: { // jlc (r+n)
 		unhandled("jlc (r+n)");
 		break;
 		}
-	case 1240: { // jgt (r+n)
+	case 1238: { // jgt (r+n)
 		unhandled("jgt (r+n)");
 		break;
 		}
-	case 1241: { // jcs (r+n)
+	case 1239: { // jcs (r+n)
 		unhandled("jcs (r+n)");
 		break;
 		}
-	case 1242: { // jlt (r+n)
+	case 1240: { // jlt (r+n)
 		unhandled("jlt (r+n)");
 		break;
 		}
-	case 1243: { // jeq (r+n)
+	case 1241: { // jeq (r+n)
 		unhandled("jeq (r+n)");
 		break;
 		}
-	case 1244: { // jmi (r+n)
+	case 1242: { // jmi (r+n)
 		unhandled("jmi (r+n)");
 		break;
 		}
-	case 1245: { // jnr (r+n)
+	case 1243: { // jnr (r+n)
 		unhandled("jnr (r+n)");
 		break;
 		}
-	case 1246: { // jes (r+n)
+	case 1244: { // jes (r+n)
 		unhandled("jes (r+n)");
 		break;
 		}
-	case 1247: { // jls (r+n)
+	case 1245: { // jls (r+n)
 		unhandled("jls (r+n)");
 		break;
 		}
-	case 1248: { // jle (r+n)
+	case 1246: { // jle (r+n)
 		unhandled("jle (r+n)");
 		break;
 		}
-	case 1249: { // jcc -(r)
+	case 1247: { // jcc -(r)
 		unhandled("jcc -(r)");
 		break;
 		}
-	case 1250: { // jge -(r)
+	case 1248: { // jge -(r)
 		unhandled("jge -(r)");
 		break;
 		}
-	case 1251: { // jne -(r)
+	case 1249: { // jne -(r)
 		unhandled("jne -(r)");
 		break;
 		}
-	case 1252: { // jpl -(r)
+	case 1250: { // jpl -(r)
 		unhandled("jpl -(r)");
 		break;
 		}
-	case 1253: { // jnn -(r)
+	case 1251: { // jnn -(r)
 		unhandled("jnn -(r)");
 		break;
 		}
-	case 1254: { // jec -(r)
+	case 1252: { // jec -(r)
 		unhandled("jec -(r)");
 		break;
 		}
-	case 1255: { // jlc -(r)
+	case 1253: { // jlc -(r)
 		unhandled("jlc -(r)");
 		break;
 		}
-	case 1256: { // jgt -(r)
+	case 1254: { // jgt -(r)
 		unhandled("jgt -(r)");
 		break;
 		}
-	case 1257: { // jcs -(r)
+	case 1255: { // jcs -(r)
 		unhandled("jcs -(r)");
 		break;
 		}
-	case 1258: { // jlt -(r)
+	case 1256: { // jlt -(r)
 		unhandled("jlt -(r)");
 		break;
 		}
-	case 1259: { // jeq -(r)
+	case 1257: { // jeq -(r)
 		unhandled("jeq -(r)");
 		break;
 		}
-	case 1260: { // jmi -(r)
+	case 1258: { // jmi -(r)
 		unhandled("jmi -(r)");
 		break;
 		}
-	case 1261: { // jnr -(r)
+	case 1259: { // jnr -(r)
 		unhandled("jnr -(r)");
 		break;
 		}
-	case 1262: { // jes -(r)
+	case 1260: { // jes -(r)
 		unhandled("jes -(r)");
 		break;
 		}
-	case 1263: { // jls -(r)
+	case 1261: { // jls -(r)
 		unhandled("jls -(r)");
 		break;
 		}
-	case 1264: { // jle -(r)
+	case 1262: { // jle -(r)
 		unhandled("jle -(r)");
 		break;
 		}
-	case 1265: { // jcc [abs]
+	case 1263: { // jcc [abs]
 		unhandled("jcc [abs]");
 		break;
 		}
-	case 1266: { // jge [abs]
+	case 1264: { // jge [abs]
 		unhandled("jge [abs]");
 		break;
 		}
-	case 1267: { // jne [abs]
+	case 1265: { // jne [abs]
 		unhandled("jne [abs]");
 		break;
 		}
-	case 1268: { // jpl [abs]
+	case 1266: { // jpl [abs]
 		unhandled("jpl [abs]");
 		break;
 		}
-	case 1269: { // jnn [abs]
+	case 1267: { // jnn [abs]
 		unhandled("jnn [abs]");
 		break;
 		}
-	case 1270: { // jec [abs]
+	case 1268: { // jec [abs]
 		unhandled("jec [abs]");
 		break;
 		}
-	case 1271: { // jlc [abs]
+	case 1269: { // jlc [abs]
 		unhandled("jlc [abs]");
 		break;
 		}
-	case 1272: { // jgt [abs]
+	case 1270: { // jgt [abs]
 		unhandled("jgt [abs]");
 		break;
 		}
-	case 1273: { // jcs [abs]
+	case 1271: { // jcs [abs]
 		unhandled("jcs [abs]");
 		break;
 		}
-	case 1274: { // jlt [abs]
+	case 1272: { // jlt [abs]
 		unhandled("jlt [abs]");
 		break;
 		}
-	case 1275: { // jeq [abs]
+	case 1273: { // jeq [abs]
 		unhandled("jeq [abs]");
 		break;
 		}
-	case 1276: { // jmi [abs]
+	case 1274: { // jmi [abs]
 		unhandled("jmi [abs]");
 		break;
 		}
-	case 1277: { // jnr [abs]
+	case 1275: { // jnr [abs]
 		unhandled("jnr [abs]");
 		break;
 		}
-	case 1278: { // jes [abs]
+	case 1276: { // jes [abs]
 		unhandled("jes [abs]");
 		break;
 		}
-	case 1279: { // jls [abs]
+	case 1277: { // jls [abs]
 		unhandled("jls [abs]");
 		break;
 		}
-	case 1280: { // jle [abs]
+	case 1278: { // jle [abs]
 		unhandled("jle [abs]");
 		break;
 		}
-	case 1281: { // jclr #[n],x:(r)-n,[x]
+	case 1279: { // jclr #[n],x:(r)-n,[x]
 		unhandled("jclr #[n],x:(r)-n,[x]");
 		break;
 		}
-	case 1282: { // jclr #[n],y:(r)-n,[x]
+	case 1280: { // jclr #[n],y:(r)-n,[x]
 		unhandled("jclr #[n],y:(r)-n,[x]");
 		break;
 		}
-	case 1283: { // jclr #[n],x:(r)+n,[x]
+	case 1281: { // jclr #[n],x:(r)+n,[x]
 		unhandled("jclr #[n],x:(r)+n,[x]");
 		break;
 		}
-	case 1284: { // jclr #[n],y:(r)+n,[x]
+	case 1282: { // jclr #[n],y:(r)+n,[x]
 		unhandled("jclr #[n],y:(r)+n,[x]");
 		break;
 		}
-	case 1285: { // jclr #[n],x:(r)-,[x]
+	case 1283: { // jclr #[n],x:(r)-,[x]
 		unhandled("jclr #[n],x:(r)-,[x]");
 		break;
 		}
-	case 1286: { // jclr #[n],y:(r)-,[x]
+	case 1284: { // jclr #[n],y:(r)-,[x]
 		unhandled("jclr #[n],y:(r)-,[x]");
 		break;
 		}
-	case 1287: { // jclr #[n],x:(r)+,[x]
+	case 1285: { // jclr #[n],x:(r)+,[x]
 		unhandled("jclr #[n],x:(r)+,[x]");
 		break;
 		}
-	case 1288: { // jclr #[n],y:(r)+,[x]
+	case 1286: { // jclr #[n],y:(r)+,[x]
 		unhandled("jclr #[n],y:(r)+,[x]");
 		break;
 		}
-	case 1289: { // jclr #[n],x:(r),[x]
+	case 1287: { // jclr #[n],x:(r),[x]
 		unhandled("jclr #[n],x:(r),[x]");
 		break;
 		}
-	case 1290: { // jclr #[n],y:(r),[x]
+	case 1288: { // jclr #[n],y:(r),[x]
 		unhandled("jclr #[n],y:(r),[x]");
 		break;
 		}
-	case 1291: { // jclr #[n],x:(r+n),[x]
+	case 1289: { // jclr #[n],x:(r+n),[x]
 		unhandled("jclr #[n],x:(r+n),[x]");
 		break;
 		}
-	case 1292: { // jclr #[n],y:(r+n),[x]
+	case 1290: { // jclr #[n],y:(r+n),[x]
 		unhandled("jclr #[n],y:(r+n),[x]");
 		break;
 		}
-	case 1293: { // jclr #[n],x:-(r),[x]
+	case 1291: { // jclr #[n],x:-(r),[x]
 		unhandled("jclr #[n],x:-(r),[x]");
 		break;
 		}
-	case 1294: { // jclr #[n],y:-(r),[x]
+	case 1292: { // jclr #[n],y:-(r),[x]
 		unhandled("jclr #[n],y:-(r),[x]");
 		break;
 		}
-	case 1295: { // jclr #[n],x:[aa],[x]
+	case 1293: { // jclr #[n],x:[aa],[x]
 		unhandled("jclr #[n],x:[aa],[x]");
 		break;
 		}
-	case 1296: { // jclr #[n],y:[aa],[x]
+	case 1294: { // jclr #[n],y:[aa],[x]
 		unhandled("jclr #[n],y:[aa],[x]");
 		break;
 		}
-	case 1297: { // jclr #[n],x:[pp],[x]
+	case 1295: { // jclr #[n],x:[pp],[x]
 		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26846,7 +27382,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1298: { // jclr #[n],y:[pp],[x]
+	case 1296: { // jclr #[n],y:[pp],[x]
 		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26854,7 +27390,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1299: { // jclr #[n],x:[qq],[x]
+	case 1297: { // jclr #[n],x:[qq],[x]
 		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26862,7 +27398,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1300: { // jclr #[n],y:[qq],[x]
+	case 1298: { // jclr #[n],y:[qq],[x]
 		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26870,7 +27406,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1301: { // jclr #[n],x0,[x]
+	case 1299: { // jclr #[n],x0,[x]
 		u32 s = get_x0();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26878,7 +27414,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1302: { // jclr #[n],x1,[x]
+	case 1300: { // jclr #[n],x1,[x]
 		u32 s = get_x1();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26886,7 +27422,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1303: { // jclr #[n],y0,[x]
+	case 1301: { // jclr #[n],y0,[x]
 		u32 s = get_y0();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26894,7 +27430,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1304: { // jclr #[n],y1,[x]
+	case 1302: { // jclr #[n],y1,[x]
 		u32 s = get_y1();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26902,7 +27438,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1305: { // jclr #[n],a0,[x]
+	case 1303: { // jclr #[n],a0,[x]
 		u32 s = get_a0();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26910,7 +27446,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1306: { // jclr #[n],b0,[x]
+	case 1304: { // jclr #[n],b0,[x]
 		u32 s = get_b0();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26918,7 +27454,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1307: { // jclr #[n],a2,[x]
+	case 1305: { // jclr #[n],a2,[x]
 		u32 s = get_a2();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26926,7 +27462,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1308: { // jclr #[n],b2,[x]
+	case 1306: { // jclr #[n],b2,[x]
 		u32 s = get_b2();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26934,7 +27470,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1309: { // jclr #[n],a1,[x]
+	case 1307: { // jclr #[n],a1,[x]
 		u32 s = get_a1();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26942,7 +27478,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1310: { // jclr #[n],b1,[x]
+	case 1308: { // jclr #[n],b1,[x]
 		u32 s = get_b1();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26950,7 +27486,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1311: { // jclr #[n],a,[x]
+	case 1309: { // jclr #[n],a,[x]
 		u64 s = get_a();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26958,7 +27494,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1312: { // jclr #[n],b,[x]
+	case 1310: { // jclr #[n],b,[x]
 		u64 s = get_b();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26966,7 +27502,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1313: { // jclr #[n],r,[x]
+	case 1311: { // jclr #[n],r,[x]
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26974,7 +27510,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1314: { // jclr #[n],n,[x]
+	case 1312: { // jclr #[n],n,[x]
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26982,7 +27518,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1315: { // jclr #[n],m,[x]
+	case 1313: { // jclr #[n],m,[x]
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26990,7 +27526,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1316: { // jclr #[n],ep,[x]
+	case 1314: { // jclr #[n],ep,[x]
 		u32 s = get_ep();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -26998,7 +27534,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1317: { // jclr #[n],vba,[x]
+	case 1315: { // jclr #[n],vba,[x]
 		u32 s = get_vba();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27006,7 +27542,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1318: { // jclr #[n],sc,[x]
+	case 1316: { // jclr #[n],sc,[x]
 		u32 s = get_sc();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27014,7 +27550,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1319: { // jclr #[n],sz,[x]
+	case 1317: { // jclr #[n],sz,[x]
 		u32 s = get_sz();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27022,7 +27558,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1320: { // jclr #[n],sr,[x]
+	case 1318: { // jclr #[n],sr,[x]
 		u32 s = get_sr();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27030,7 +27566,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1321: { // jclr #[n],omr,[x]
+	case 1319: { // jclr #[n],omr,[x]
 		u32 s = get_omr();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27038,7 +27574,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1322: { // jclr #[n],sp,[x]
+	case 1320: { // jclr #[n],sp,[x]
 		u32 s = get_sp();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27046,7 +27582,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1323: { // jclr #[n],ssh,[x]
+	case 1321: { // jclr #[n],ssh,[x]
 		u32 s = get_ssh();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27054,7 +27590,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1324: { // jclr #[n],ssl,[x]
+	case 1322: { // jclr #[n],ssl,[x]
 		u32 s = get_ssl();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27062,7 +27598,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1325: { // jclr #[n],la,[x]
+	case 1323: { // jclr #[n],la,[x]
 		u32 s = get_la();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27070,7 +27606,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1326: { // jclr #[n],lc,[x]
+	case 1324: { // jclr #[n],lc,[x]
 		u32 s = get_lc();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27078,888 +27614,888 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1327: { // jmp (r)-n
+	case 1325: { // jmp (r)-n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_npc = ea;
 		break;
 		}
-	case 1328: { // jmp (r)+n
+	case 1326: { // jmp (r)+n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_npc = ea;
 		break;
 		}
-	case 1329: { // jmp (r)-
+	case 1327: { // jmp (r)-
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_npc = ea;
 		break;
 		}
-	case 1330: { // jmp (r)+
+	case 1328: { // jmp (r)+
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_npc = ea;
 		break;
 		}
-	case 1331: { // jmp (r)
+	case 1329: { // jmp (r)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_npc = ea;
 		break;
 		}
-	case 1332: { // jmp (r+n)
+	case 1330: { // jmp (r+n)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_npc = ea;
 		break;
 		}
-	case 1333: { // jmp -(r)
+	case 1331: { // jmp -(r)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_npc = ea;
 		break;
 		}
-	case 1334: { // jmp [abs]
+	case 1332: { // jmp [abs]
 		u32 abs = exv;
 		m_npc = abs;
 		break;
 		}
-	case 1335: { // jmp [x]
+	case 1333: { // jmp [x]
 		u32 x = BIT(opcode, 0, 12);
 		m_npc = x;
 		break;
 		}
-	case 1336: { // jscc [x]
+	case 1334: { // jscc [x]
 		unhandled("jscc [x]");
 		break;
 		}
-	case 1337: { // jsge [x]
+	case 1335: { // jsge [x]
 		unhandled("jsge [x]");
 		break;
 		}
-	case 1338: { // jsne [x]
+	case 1336: { // jsne [x]
 		unhandled("jsne [x]");
 		break;
 		}
-	case 1339: { // jspl [x]
+	case 1337: { // jspl [x]
 		unhandled("jspl [x]");
 		break;
 		}
-	case 1340: { // jsnn [x]
+	case 1338: { // jsnn [x]
 		unhandled("jsnn [x]");
 		break;
 		}
-	case 1341: { // jsec [x]
+	case 1339: { // jsec [x]
 		unhandled("jsec [x]");
 		break;
 		}
-	case 1342: { // jslc [x]
+	case 1340: { // jslc [x]
 		unhandled("jslc [x]");
 		break;
 		}
-	case 1343: { // jsgt [x]
+	case 1341: { // jsgt [x]
 		unhandled("jsgt [x]");
 		break;
 		}
-	case 1344: { // jscs [x]
+	case 1342: { // jscs [x]
 		unhandled("jscs [x]");
 		break;
 		}
-	case 1345: { // jslt [x]
+	case 1343: { // jslt [x]
 		unhandled("jslt [x]");
 		break;
 		}
-	case 1346: { // jseq [x]
+	case 1344: { // jseq [x]
 		unhandled("jseq [x]");
 		break;
 		}
-	case 1347: { // jsmi [x]
+	case 1345: { // jsmi [x]
 		unhandled("jsmi [x]");
 		break;
 		}
-	case 1348: { // jsnr [x]
+	case 1346: { // jsnr [x]
 		unhandled("jsnr [x]");
 		break;
 		}
-	case 1349: { // jses [x]
+	case 1347: { // jses [x]
 		unhandled("jses [x]");
 		break;
 		}
-	case 1350: { // jsls [x]
+	case 1348: { // jsls [x]
 		unhandled("jsls [x]");
 		break;
 		}
-	case 1351: { // jsle [x]
+	case 1349: { // jsle [x]
 		unhandled("jsle [x]");
 		break;
 		}
-	case 1352: { // jscc (r)-n
+	case 1350: { // jscc (r)-n
 		unhandled("jscc (r)-n");
 		break;
 		}
-	case 1353: { // jsge (r)-n
+	case 1351: { // jsge (r)-n
 		unhandled("jsge (r)-n");
 		break;
 		}
-	case 1354: { // jsne (r)-n
+	case 1352: { // jsne (r)-n
 		unhandled("jsne (r)-n");
 		break;
 		}
-	case 1355: { // jspl (r)-n
+	case 1353: { // jspl (r)-n
 		unhandled("jspl (r)-n");
 		break;
 		}
-	case 1356: { // jsnn (r)-n
+	case 1354: { // jsnn (r)-n
 		unhandled("jsnn (r)-n");
 		break;
 		}
-	case 1357: { // jsec (r)-n
+	case 1355: { // jsec (r)-n
 		unhandled("jsec (r)-n");
 		break;
 		}
-	case 1358: { // jslc (r)-n
+	case 1356: { // jslc (r)-n
 		unhandled("jslc (r)-n");
 		break;
 		}
-	case 1359: { // jsgt (r)-n
+	case 1357: { // jsgt (r)-n
 		unhandled("jsgt (r)-n");
 		break;
 		}
-	case 1360: { // jscs (r)-n
+	case 1358: { // jscs (r)-n
 		unhandled("jscs (r)-n");
 		break;
 		}
-	case 1361: { // jslt (r)-n
+	case 1359: { // jslt (r)-n
 		unhandled("jslt (r)-n");
 		break;
 		}
-	case 1362: { // jseq (r)-n
+	case 1360: { // jseq (r)-n
 		unhandled("jseq (r)-n");
 		break;
 		}
-	case 1363: { // jsmi (r)-n
+	case 1361: { // jsmi (r)-n
 		unhandled("jsmi (r)-n");
 		break;
 		}
-	case 1364: { // jsnr (r)-n
+	case 1362: { // jsnr (r)-n
 		unhandled("jsnr (r)-n");
 		break;
 		}
-	case 1365: { // jses (r)-n
+	case 1363: { // jses (r)-n
 		unhandled("jses (r)-n");
 		break;
 		}
-	case 1366: { // jsls (r)-n
+	case 1364: { // jsls (r)-n
 		unhandled("jsls (r)-n");
 		break;
 		}
-	case 1367: { // jsle (r)-n
+	case 1365: { // jsle (r)-n
 		unhandled("jsle (r)-n");
 		break;
 		}
-	case 1368: { // jscc (r)+n
+	case 1366: { // jscc (r)+n
 		unhandled("jscc (r)+n");
 		break;
 		}
-	case 1369: { // jsge (r)+n
+	case 1367: { // jsge (r)+n
 		unhandled("jsge (r)+n");
 		break;
 		}
-	case 1370: { // jsne (r)+n
+	case 1368: { // jsne (r)+n
 		unhandled("jsne (r)+n");
 		break;
 		}
-	case 1371: { // jspl (r)+n
+	case 1369: { // jspl (r)+n
 		unhandled("jspl (r)+n");
 		break;
 		}
-	case 1372: { // jsnn (r)+n
+	case 1370: { // jsnn (r)+n
 		unhandled("jsnn (r)+n");
 		break;
 		}
-	case 1373: { // jsec (r)+n
+	case 1371: { // jsec (r)+n
 		unhandled("jsec (r)+n");
 		break;
 		}
-	case 1374: { // jslc (r)+n
+	case 1372: { // jslc (r)+n
 		unhandled("jslc (r)+n");
 		break;
 		}
-	case 1375: { // jsgt (r)+n
+	case 1373: { // jsgt (r)+n
 		unhandled("jsgt (r)+n");
 		break;
 		}
-	case 1376: { // jscs (r)+n
+	case 1374: { // jscs (r)+n
 		unhandled("jscs (r)+n");
 		break;
 		}
-	case 1377: { // jslt (r)+n
+	case 1375: { // jslt (r)+n
 		unhandled("jslt (r)+n");
 		break;
 		}
-	case 1378: { // jseq (r)+n
+	case 1376: { // jseq (r)+n
 		unhandled("jseq (r)+n");
 		break;
 		}
-	case 1379: { // jsmi (r)+n
+	case 1377: { // jsmi (r)+n
 		unhandled("jsmi (r)+n");
 		break;
 		}
-	case 1380: { // jsnr (r)+n
+	case 1378: { // jsnr (r)+n
 		unhandled("jsnr (r)+n");
 		break;
 		}
-	case 1381: { // jses (r)+n
+	case 1379: { // jses (r)+n
 		unhandled("jses (r)+n");
 		break;
 		}
-	case 1382: { // jsls (r)+n
+	case 1380: { // jsls (r)+n
 		unhandled("jsls (r)+n");
 		break;
 		}
-	case 1383: { // jsle (r)+n
+	case 1381: { // jsle (r)+n
 		unhandled("jsle (r)+n");
 		break;
 		}
-	case 1384: { // jscc (r)-
+	case 1382: { // jscc (r)-
 		unhandled("jscc (r)-");
 		break;
 		}
-	case 1385: { // jsge (r)-
+	case 1383: { // jsge (r)-
 		unhandled("jsge (r)-");
 		break;
 		}
-	case 1386: { // jsne (r)-
+	case 1384: { // jsne (r)-
 		unhandled("jsne (r)-");
 		break;
 		}
-	case 1387: { // jspl (r)-
+	case 1385: { // jspl (r)-
 		unhandled("jspl (r)-");
 		break;
 		}
-	case 1388: { // jsnn (r)-
+	case 1386: { // jsnn (r)-
 		unhandled("jsnn (r)-");
 		break;
 		}
-	case 1389: { // jsec (r)-
+	case 1387: { // jsec (r)-
 		unhandled("jsec (r)-");
 		break;
 		}
-	case 1390: { // jslc (r)-
+	case 1388: { // jslc (r)-
 		unhandled("jslc (r)-");
 		break;
 		}
-	case 1391: { // jsgt (r)-
+	case 1389: { // jsgt (r)-
 		unhandled("jsgt (r)-");
 		break;
 		}
-	case 1392: { // jscs (r)-
+	case 1390: { // jscs (r)-
 		unhandled("jscs (r)-");
 		break;
 		}
-	case 1393: { // jslt (r)-
+	case 1391: { // jslt (r)-
 		unhandled("jslt (r)-");
 		break;
 		}
-	case 1394: { // jseq (r)-
+	case 1392: { // jseq (r)-
 		unhandled("jseq (r)-");
 		break;
 		}
-	case 1395: { // jsmi (r)-
+	case 1393: { // jsmi (r)-
 		unhandled("jsmi (r)-");
 		break;
 		}
-	case 1396: { // jsnr (r)-
+	case 1394: { // jsnr (r)-
 		unhandled("jsnr (r)-");
 		break;
 		}
-	case 1397: { // jses (r)-
+	case 1395: { // jses (r)-
 		unhandled("jses (r)-");
 		break;
 		}
-	case 1398: { // jsls (r)-
+	case 1396: { // jsls (r)-
 		unhandled("jsls (r)-");
 		break;
 		}
-	case 1399: { // jsle (r)-
+	case 1397: { // jsle (r)-
 		unhandled("jsle (r)-");
 		break;
 		}
-	case 1400: { // jscc (r)+
+	case 1398: { // jscc (r)+
 		unhandled("jscc (r)+");
 		break;
 		}
-	case 1401: { // jsge (r)+
+	case 1399: { // jsge (r)+
 		unhandled("jsge (r)+");
 		break;
 		}
-	case 1402: { // jsne (r)+
+	case 1400: { // jsne (r)+
 		unhandled("jsne (r)+");
 		break;
 		}
-	case 1403: { // jspl (r)+
+	case 1401: { // jspl (r)+
 		unhandled("jspl (r)+");
 		break;
 		}
-	case 1404: { // jsnn (r)+
+	case 1402: { // jsnn (r)+
 		unhandled("jsnn (r)+");
 		break;
 		}
-	case 1405: { // jsec (r)+
+	case 1403: { // jsec (r)+
 		unhandled("jsec (r)+");
 		break;
 		}
-	case 1406: { // jslc (r)+
+	case 1404: { // jslc (r)+
 		unhandled("jslc (r)+");
 		break;
 		}
-	case 1407: { // jsgt (r)+
+	case 1405: { // jsgt (r)+
 		unhandled("jsgt (r)+");
 		break;
 		}
-	case 1408: { // jscs (r)+
+	case 1406: { // jscs (r)+
 		unhandled("jscs (r)+");
 		break;
 		}
-	case 1409: { // jslt (r)+
+	case 1407: { // jslt (r)+
 		unhandled("jslt (r)+");
 		break;
 		}
-	case 1410: { // jseq (r)+
+	case 1408: { // jseq (r)+
 		unhandled("jseq (r)+");
 		break;
 		}
-	case 1411: { // jsmi (r)+
+	case 1409: { // jsmi (r)+
 		unhandled("jsmi (r)+");
 		break;
 		}
-	case 1412: { // jsnr (r)+
+	case 1410: { // jsnr (r)+
 		unhandled("jsnr (r)+");
 		break;
 		}
-	case 1413: { // jses (r)+
+	case 1411: { // jses (r)+
 		unhandled("jses (r)+");
 		break;
 		}
-	case 1414: { // jsls (r)+
+	case 1412: { // jsls (r)+
 		unhandled("jsls (r)+");
 		break;
 		}
-	case 1415: { // jsle (r)+
+	case 1413: { // jsle (r)+
 		unhandled("jsle (r)+");
 		break;
 		}
-	case 1416: { // jscc (r)
+	case 1414: { // jscc (r)
 		unhandled("jscc (r)");
 		break;
 		}
-	case 1417: { // jsge (r)
+	case 1415: { // jsge (r)
 		unhandled("jsge (r)");
 		break;
 		}
-	case 1418: { // jsne (r)
+	case 1416: { // jsne (r)
 		unhandled("jsne (r)");
 		break;
 		}
-	case 1419: { // jspl (r)
+	case 1417: { // jspl (r)
 		unhandled("jspl (r)");
 		break;
 		}
-	case 1420: { // jsnn (r)
+	case 1418: { // jsnn (r)
 		unhandled("jsnn (r)");
 		break;
 		}
-	case 1421: { // jsec (r)
+	case 1419: { // jsec (r)
 		unhandled("jsec (r)");
 		break;
 		}
-	case 1422: { // jslc (r)
+	case 1420: { // jslc (r)
 		unhandled("jslc (r)");
 		break;
 		}
-	case 1423: { // jsgt (r)
+	case 1421: { // jsgt (r)
 		unhandled("jsgt (r)");
 		break;
 		}
-	case 1424: { // jscs (r)
+	case 1422: { // jscs (r)
 		unhandled("jscs (r)");
 		break;
 		}
-	case 1425: { // jslt (r)
+	case 1423: { // jslt (r)
 		unhandled("jslt (r)");
 		break;
 		}
-	case 1426: { // jseq (r)
+	case 1424: { // jseq (r)
 		unhandled("jseq (r)");
 		break;
 		}
-	case 1427: { // jsmi (r)
+	case 1425: { // jsmi (r)
 		unhandled("jsmi (r)");
 		break;
 		}
-	case 1428: { // jsnr (r)
+	case 1426: { // jsnr (r)
 		unhandled("jsnr (r)");
 		break;
 		}
-	case 1429: { // jses (r)
+	case 1427: { // jses (r)
 		unhandled("jses (r)");
 		break;
 		}
-	case 1430: { // jsls (r)
+	case 1428: { // jsls (r)
 		unhandled("jsls (r)");
 		break;
 		}
-	case 1431: { // jsle (r)
+	case 1429: { // jsle (r)
 		unhandled("jsle (r)");
 		break;
 		}
-	case 1432: { // jscc (r+n)
+	case 1430: { // jscc (r+n)
 		unhandled("jscc (r+n)");
 		break;
 		}
-	case 1433: { // jsge (r+n)
+	case 1431: { // jsge (r+n)
 		unhandled("jsge (r+n)");
 		break;
 		}
-	case 1434: { // jsne (r+n)
+	case 1432: { // jsne (r+n)
 		unhandled("jsne (r+n)");
 		break;
 		}
-	case 1435: { // jspl (r+n)
+	case 1433: { // jspl (r+n)
 		unhandled("jspl (r+n)");
 		break;
 		}
-	case 1436: { // jsnn (r+n)
+	case 1434: { // jsnn (r+n)
 		unhandled("jsnn (r+n)");
 		break;
 		}
-	case 1437: { // jsec (r+n)
+	case 1435: { // jsec (r+n)
 		unhandled("jsec (r+n)");
 		break;
 		}
-	case 1438: { // jslc (r+n)
+	case 1436: { // jslc (r+n)
 		unhandled("jslc (r+n)");
 		break;
 		}
-	case 1439: { // jsgt (r+n)
+	case 1437: { // jsgt (r+n)
 		unhandled("jsgt (r+n)");
 		break;
 		}
-	case 1440: { // jscs (r+n)
+	case 1438: { // jscs (r+n)
 		unhandled("jscs (r+n)");
 		break;
 		}
-	case 1441: { // jslt (r+n)
+	case 1439: { // jslt (r+n)
 		unhandled("jslt (r+n)");
 		break;
 		}
-	case 1442: { // jseq (r+n)
+	case 1440: { // jseq (r+n)
 		unhandled("jseq (r+n)");
 		break;
 		}
-	case 1443: { // jsmi (r+n)
+	case 1441: { // jsmi (r+n)
 		unhandled("jsmi (r+n)");
 		break;
 		}
-	case 1444: { // jsnr (r+n)
+	case 1442: { // jsnr (r+n)
 		unhandled("jsnr (r+n)");
 		break;
 		}
-	case 1445: { // jses (r+n)
+	case 1443: { // jses (r+n)
 		unhandled("jses (r+n)");
 		break;
 		}
-	case 1446: { // jsls (r+n)
+	case 1444: { // jsls (r+n)
 		unhandled("jsls (r+n)");
 		break;
 		}
-	case 1447: { // jsle (r+n)
+	case 1445: { // jsle (r+n)
 		unhandled("jsle (r+n)");
 		break;
 		}
-	case 1448: { // jscc -(r)
+	case 1446: { // jscc -(r)
 		unhandled("jscc -(r)");
 		break;
 		}
-	case 1449: { // jsge -(r)
+	case 1447: { // jsge -(r)
 		unhandled("jsge -(r)");
 		break;
 		}
-	case 1450: { // jsne -(r)
+	case 1448: { // jsne -(r)
 		unhandled("jsne -(r)");
 		break;
 		}
-	case 1451: { // jspl -(r)
+	case 1449: { // jspl -(r)
 		unhandled("jspl -(r)");
 		break;
 		}
-	case 1452: { // jsnn -(r)
+	case 1450: { // jsnn -(r)
 		unhandled("jsnn -(r)");
 		break;
 		}
-	case 1453: { // jsec -(r)
+	case 1451: { // jsec -(r)
 		unhandled("jsec -(r)");
 		break;
 		}
-	case 1454: { // jslc -(r)
+	case 1452: { // jslc -(r)
 		unhandled("jslc -(r)");
 		break;
 		}
-	case 1455: { // jsgt -(r)
+	case 1453: { // jsgt -(r)
 		unhandled("jsgt -(r)");
 		break;
 		}
-	case 1456: { // jscs -(r)
+	case 1454: { // jscs -(r)
 		unhandled("jscs -(r)");
 		break;
 		}
-	case 1457: { // jslt -(r)
+	case 1455: { // jslt -(r)
 		unhandled("jslt -(r)");
 		break;
 		}
-	case 1458: { // jseq -(r)
+	case 1456: { // jseq -(r)
 		unhandled("jseq -(r)");
 		break;
 		}
-	case 1459: { // jsmi -(r)
+	case 1457: { // jsmi -(r)
 		unhandled("jsmi -(r)");
 		break;
 		}
-	case 1460: { // jsnr -(r)
+	case 1458: { // jsnr -(r)
 		unhandled("jsnr -(r)");
 		break;
 		}
-	case 1461: { // jses -(r)
+	case 1459: { // jses -(r)
 		unhandled("jses -(r)");
 		break;
 		}
-	case 1462: { // jsls -(r)
+	case 1460: { // jsls -(r)
 		unhandled("jsls -(r)");
 		break;
 		}
-	case 1463: { // jsle -(r)
+	case 1461: { // jsle -(r)
 		unhandled("jsle -(r)");
 		break;
 		}
-	case 1464: { // jscc [abs]
+	case 1462: { // jscc [abs]
 		unhandled("jscc [abs]");
 		break;
 		}
-	case 1465: { // jsge [abs]
+	case 1463: { // jsge [abs]
 		unhandled("jsge [abs]");
 		break;
 		}
-	case 1466: { // jsne [abs]
+	case 1464: { // jsne [abs]
 		unhandled("jsne [abs]");
 		break;
 		}
-	case 1467: { // jspl [abs]
+	case 1465: { // jspl [abs]
 		unhandled("jspl [abs]");
 		break;
 		}
-	case 1468: { // jsnn [abs]
+	case 1466: { // jsnn [abs]
 		unhandled("jsnn [abs]");
 		break;
 		}
-	case 1469: { // jsec [abs]
+	case 1467: { // jsec [abs]
 		unhandled("jsec [abs]");
 		break;
 		}
-	case 1470: { // jslc [abs]
+	case 1468: { // jslc [abs]
 		unhandled("jslc [abs]");
 		break;
 		}
-	case 1471: { // jsgt [abs]
+	case 1469: { // jsgt [abs]
 		unhandled("jsgt [abs]");
 		break;
 		}
-	case 1472: { // jscs [abs]
+	case 1470: { // jscs [abs]
 		unhandled("jscs [abs]");
 		break;
 		}
-	case 1473: { // jslt [abs]
+	case 1471: { // jslt [abs]
 		unhandled("jslt [abs]");
 		break;
 		}
-	case 1474: { // jseq [abs]
+	case 1472: { // jseq [abs]
 		unhandled("jseq [abs]");
 		break;
 		}
-	case 1475: { // jsmi [abs]
+	case 1473: { // jsmi [abs]
 		unhandled("jsmi [abs]");
 		break;
 		}
-	case 1476: { // jsnr [abs]
+	case 1474: { // jsnr [abs]
 		unhandled("jsnr [abs]");
 		break;
 		}
-	case 1477: { // jses [abs]
+	case 1475: { // jses [abs]
 		unhandled("jses [abs]");
 		break;
 		}
-	case 1478: { // jsls [abs]
+	case 1476: { // jsls [abs]
 		unhandled("jsls [abs]");
 		break;
 		}
-	case 1479: { // jsle [abs]
+	case 1477: { // jsle [abs]
 		unhandled("jsle [abs]");
 		break;
 		}
-	case 1480: { // jsclr #[n],x:(r)-n,[x]
+	case 1478: { // jsclr #[n],x:(r)-n,[x]
 		unhandled("jsclr #[n],x:(r)-n,[x]");
 		break;
 		}
-	case 1481: { // jsclr #[n],y:(r)-n,[x]
+	case 1479: { // jsclr #[n],y:(r)-n,[x]
 		unhandled("jsclr #[n],y:(r)-n,[x]");
 		break;
 		}
-	case 1482: { // jsclr #[n],x:(r)+n,[x]
+	case 1480: { // jsclr #[n],x:(r)+n,[x]
 		unhandled("jsclr #[n],x:(r)+n,[x]");
 		break;
 		}
-	case 1483: { // jsclr #[n],y:(r)+n,[x]
+	case 1481: { // jsclr #[n],y:(r)+n,[x]
 		unhandled("jsclr #[n],y:(r)+n,[x]");
 		break;
 		}
-	case 1484: { // jsclr #[n],x:(r)-,[x]
+	case 1482: { // jsclr #[n],x:(r)-,[x]
 		unhandled("jsclr #[n],x:(r)-,[x]");
 		break;
 		}
-	case 1485: { // jsclr #[n],y:(r)-,[x]
+	case 1483: { // jsclr #[n],y:(r)-,[x]
 		unhandled("jsclr #[n],y:(r)-,[x]");
 		break;
 		}
-	case 1486: { // jsclr #[n],x:(r)+,[x]
+	case 1484: { // jsclr #[n],x:(r)+,[x]
 		unhandled("jsclr #[n],x:(r)+,[x]");
 		break;
 		}
-	case 1487: { // jsclr #[n],y:(r)+,[x]
+	case 1485: { // jsclr #[n],y:(r)+,[x]
 		unhandled("jsclr #[n],y:(r)+,[x]");
 		break;
 		}
-	case 1488: { // jsclr #[n],x:(r),[x]
+	case 1486: { // jsclr #[n],x:(r),[x]
 		unhandled("jsclr #[n],x:(r),[x]");
 		break;
 		}
-	case 1489: { // jsclr #[n],y:(r),[x]
+	case 1487: { // jsclr #[n],y:(r),[x]
 		unhandled("jsclr #[n],y:(r),[x]");
 		break;
 		}
-	case 1490: { // jsclr #[n],x:(r+n),[x]
+	case 1488: { // jsclr #[n],x:(r+n),[x]
 		unhandled("jsclr #[n],x:(r+n),[x]");
 		break;
 		}
-	case 1491: { // jsclr #[n],y:(r+n),[x]
+	case 1489: { // jsclr #[n],y:(r+n),[x]
 		unhandled("jsclr #[n],y:(r+n),[x]");
 		break;
 		}
-	case 1492: { // jsclr #[n],x:-(r),[x]
+	case 1490: { // jsclr #[n],x:-(r),[x]
 		unhandled("jsclr #[n],x:-(r),[x]");
 		break;
 		}
-	case 1493: { // jsclr #[n],y:-(r),[x]
+	case 1491: { // jsclr #[n],y:-(r),[x]
 		unhandled("jsclr #[n],y:-(r),[x]");
 		break;
 		}
-	case 1494: { // jsclr #[n],x:[aa],[x]
+	case 1492: { // jsclr #[n],x:[aa],[x]
 		unhandled("jsclr #[n],x:[aa],[x]");
 		break;
 		}
-	case 1495: { // jsclr #[n],y:[aa],[x]
+	case 1493: { // jsclr #[n],y:[aa],[x]
 		unhandled("jsclr #[n],y:[aa],[x]");
 		break;
 		}
-	case 1496: { // jsclr #[n],x:[pp],[x]
+	case 1494: { // jsclr #[n],x:[pp],[x]
 		unhandled("jsclr #[n],x:[pp],[x]");
 		break;
 		}
-	case 1497: { // jsclr #[n],y:[pp],[x]
+	case 1495: { // jsclr #[n],y:[pp],[x]
 		unhandled("jsclr #[n],y:[pp],[x]");
 		break;
 		}
-	case 1498: { // jsclr #[n],x:[qq],[x]
+	case 1496: { // jsclr #[n],x:[qq],[x]
 		unhandled("jsclr #[n],x:[qq],[x]");
 		break;
 		}
-	case 1499: { // jsclr #[n],y:[qq],[x]
+	case 1497: { // jsclr #[n],y:[qq],[x]
 		unhandled("jsclr #[n],y:[qq],[x]");
 		break;
 		}
-	case 1500: { // jsclr #[n],x0,[x]
+	case 1498: { // jsclr #[n],x0,[x]
 		unhandled("jsclr #[n],x0,[x]");
 		break;
 		}
-	case 1501: { // jsclr #[n],x1,[x]
+	case 1499: { // jsclr #[n],x1,[x]
 		unhandled("jsclr #[n],x1,[x]");
 		break;
 		}
-	case 1502: { // jsclr #[n],y0,[x]
+	case 1500: { // jsclr #[n],y0,[x]
 		unhandled("jsclr #[n],y0,[x]");
 		break;
 		}
-	case 1503: { // jsclr #[n],y1,[x]
+	case 1501: { // jsclr #[n],y1,[x]
 		unhandled("jsclr #[n],y1,[x]");
 		break;
 		}
-	case 1504: { // jsclr #[n],a0,[x]
+	case 1502: { // jsclr #[n],a0,[x]
 		unhandled("jsclr #[n],a0,[x]");
 		break;
 		}
-	case 1505: { // jsclr #[n],b0,[x]
+	case 1503: { // jsclr #[n],b0,[x]
 		unhandled("jsclr #[n],b0,[x]");
 		break;
 		}
-	case 1506: { // jsclr #[n],a2,[x]
+	case 1504: { // jsclr #[n],a2,[x]
 		unhandled("jsclr #[n],a2,[x]");
 		break;
 		}
-	case 1507: { // jsclr #[n],b2,[x]
+	case 1505: { // jsclr #[n],b2,[x]
 		unhandled("jsclr #[n],b2,[x]");
 		break;
 		}
-	case 1508: { // jsclr #[n],a1,[x]
+	case 1506: { // jsclr #[n],a1,[x]
 		unhandled("jsclr #[n],a1,[x]");
 		break;
 		}
-	case 1509: { // jsclr #[n],b1,[x]
+	case 1507: { // jsclr #[n],b1,[x]
 		unhandled("jsclr #[n],b1,[x]");
 		break;
 		}
-	case 1510: { // jsclr #[n],a,[x]
+	case 1508: { // jsclr #[n],a,[x]
 		unhandled("jsclr #[n],a,[x]");
 		break;
 		}
-	case 1511: { // jsclr #[n],b,[x]
+	case 1509: { // jsclr #[n],b,[x]
 		unhandled("jsclr #[n],b,[x]");
 		break;
 		}
-	case 1512: { // jsclr #[n],r,[x]
+	case 1510: { // jsclr #[n],r,[x]
 		unhandled("jsclr #[n],r,[x]");
 		break;
 		}
-	case 1513: { // jsclr #[n],n,[x]
+	case 1511: { // jsclr #[n],n,[x]
 		unhandled("jsclr #[n],n,[x]");
 		break;
 		}
-	case 1514: { // jsclr #[n],m,[x]
+	case 1512: { // jsclr #[n],m,[x]
 		unhandled("jsclr #[n],m,[x]");
 		break;
 		}
-	case 1515: { // jsclr #[n],ep,[x]
+	case 1513: { // jsclr #[n],ep,[x]
 		unhandled("jsclr #[n],ep,[x]");
 		break;
 		}
-	case 1516: { // jsclr #[n],vba,[x]
+	case 1514: { // jsclr #[n],vba,[x]
 		unhandled("jsclr #[n],vba,[x]");
 		break;
 		}
-	case 1517: { // jsclr #[n],sc,[x]
+	case 1515: { // jsclr #[n],sc,[x]
 		unhandled("jsclr #[n],sc,[x]");
 		break;
 		}
-	case 1518: { // jsclr #[n],sz,[x]
+	case 1516: { // jsclr #[n],sz,[x]
 		unhandled("jsclr #[n],sz,[x]");
 		break;
 		}
-	case 1519: { // jsclr #[n],sr,[x]
+	case 1517: { // jsclr #[n],sr,[x]
 		unhandled("jsclr #[n],sr,[x]");
 		break;
 		}
-	case 1520: { // jsclr #[n],omr,[x]
+	case 1518: { // jsclr #[n],omr,[x]
 		unhandled("jsclr #[n],omr,[x]");
 		break;
 		}
-	case 1521: { // jsclr #[n],sp,[x]
+	case 1519: { // jsclr #[n],sp,[x]
 		unhandled("jsclr #[n],sp,[x]");
 		break;
 		}
-	case 1522: { // jsclr #[n],ssh,[x]
+	case 1520: { // jsclr #[n],ssh,[x]
 		unhandled("jsclr #[n],ssh,[x]");
 		break;
 		}
-	case 1523: { // jsclr #[n],ssl,[x]
+	case 1521: { // jsclr #[n],ssl,[x]
 		unhandled("jsclr #[n],ssl,[x]");
 		break;
 		}
-	case 1524: { // jsclr #[n],la,[x]
+	case 1522: { // jsclr #[n],la,[x]
 		unhandled("jsclr #[n],la,[x]");
 		break;
 		}
-	case 1525: { // jsclr #[n],lc,[x]
+	case 1523: { // jsclr #[n],lc,[x]
 		unhandled("jsclr #[n],lc,[x]");
 		break;
 		}
-	case 1526: { // jset #[n],x:(r)-n,[x]
+	case 1524: { // jset #[n],x:(r)-n,[x]
 		unhandled("jset #[n],x:(r)-n,[x]");
 		break;
 		}
-	case 1527: { // jset #[n],y:(r)-n,[x]
+	case 1525: { // jset #[n],y:(r)-n,[x]
 		unhandled("jset #[n],y:(r)-n,[x]");
 		break;
 		}
-	case 1528: { // jset #[n],x:(r)+n,[x]
+	case 1526: { // jset #[n],x:(r)+n,[x]
 		unhandled("jset #[n],x:(r)+n,[x]");
 		break;
 		}
-	case 1529: { // jset #[n],y:(r)+n,[x]
+	case 1527: { // jset #[n],y:(r)+n,[x]
 		unhandled("jset #[n],y:(r)+n,[x]");
 		break;
 		}
-	case 1530: { // jset #[n],x:(r)-,[x]
+	case 1528: { // jset #[n],x:(r)-,[x]
 		unhandled("jset #[n],x:(r)-,[x]");
 		break;
 		}
-	case 1531: { // jset #[n],y:(r)-,[x]
+	case 1529: { // jset #[n],y:(r)-,[x]
 		unhandled("jset #[n],y:(r)-,[x]");
 		break;
 		}
-	case 1532: { // jset #[n],x:(r)+,[x]
+	case 1530: { // jset #[n],x:(r)+,[x]
 		unhandled("jset #[n],x:(r)+,[x]");
 		break;
 		}
-	case 1533: { // jset #[n],y:(r)+,[x]
+	case 1531: { // jset #[n],y:(r)+,[x]
 		unhandled("jset #[n],y:(r)+,[x]");
 		break;
 		}
-	case 1534: { // jset #[n],x:(r),[x]
+	case 1532: { // jset #[n],x:(r),[x]
 		unhandled("jset #[n],x:(r),[x]");
 		break;
 		}
-	case 1535: { // jset #[n],y:(r),[x]
+	case 1533: { // jset #[n],y:(r),[x]
 		unhandled("jset #[n],y:(r),[x]");
 		break;
 		}
-	case 1536: { // jset #[n],x:(r+n),[x]
+	case 1534: { // jset #[n],x:(r+n),[x]
 		unhandled("jset #[n],x:(r+n),[x]");
 		break;
 		}
-	case 1537: { // jset #[n],y:(r+n),[x]
+	case 1535: { // jset #[n],y:(r+n),[x]
 		unhandled("jset #[n],y:(r+n),[x]");
 		break;
 		}
-	case 1538: { // jset #[n],x:-(r),[x]
+	case 1536: { // jset #[n],x:-(r),[x]
 		unhandled("jset #[n],x:-(r),[x]");
 		break;
 		}
-	case 1539: { // jset #[n],y:-(r),[x]
+	case 1537: { // jset #[n],y:-(r),[x]
 		unhandled("jset #[n],y:-(r),[x]");
 		break;
 		}
-	case 1540: { // jset #[n],x:[aa],[x]
+	case 1538: { // jset #[n],x:[aa],[x]
 		unhandled("jset #[n],x:[aa],[x]");
 		break;
 		}
-	case 1541: { // jset #[n],y:[aa],[x]
+	case 1539: { // jset #[n],y:[aa],[x]
 		unhandled("jset #[n],y:[aa],[x]");
 		break;
 		}
-	case 1542: { // jset #[n],x:[pp],[x]
+	case 1540: { // jset #[n],x:[pp],[x]
 		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27967,7 +28503,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1543: { // jset #[n],y:[pp],[x]
+	case 1541: { // jset #[n],y:[pp],[x]
 		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27975,7 +28511,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1544: { // jset #[n],x:[qq],[x]
+	case 1542: { // jset #[n],x:[qq],[x]
 		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27983,7 +28519,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1545: { // jset #[n],y:[qq],[x]
+	case 1543: { // jset #[n],y:[qq],[x]
 		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27991,7 +28527,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1546: { // jset #[n],x0,[x]
+	case 1544: { // jset #[n],x0,[x]
 		u32 s = get_x0();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -27999,7 +28535,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1547: { // jset #[n],x1,[x]
+	case 1545: { // jset #[n],x1,[x]
 		u32 s = get_x1();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28007,7 +28543,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1548: { // jset #[n],y0,[x]
+	case 1546: { // jset #[n],y0,[x]
 		u32 s = get_y0();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28015,7 +28551,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1549: { // jset #[n],y1,[x]
+	case 1547: { // jset #[n],y1,[x]
 		u32 s = get_y1();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28023,7 +28559,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1550: { // jset #[n],a0,[x]
+	case 1548: { // jset #[n],a0,[x]
 		u32 s = get_a0();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28031,7 +28567,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1551: { // jset #[n],b0,[x]
+	case 1549: { // jset #[n],b0,[x]
 		u32 s = get_b0();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28039,7 +28575,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1552: { // jset #[n],a2,[x]
+	case 1550: { // jset #[n],a2,[x]
 		u32 s = get_a2();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28047,7 +28583,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1553: { // jset #[n],b2,[x]
+	case 1551: { // jset #[n],b2,[x]
 		u32 s = get_b2();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28055,7 +28591,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1554: { // jset #[n],a1,[x]
+	case 1552: { // jset #[n],a1,[x]
 		u32 s = get_a1();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28063,7 +28599,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1555: { // jset #[n],b1,[x]
+	case 1553: { // jset #[n],b1,[x]
 		u32 s = get_b1();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28071,7 +28607,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1556: { // jset #[n],a,[x]
+	case 1554: { // jset #[n],a,[x]
 		u64 s = get_a();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28079,7 +28615,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1557: { // jset #[n],b,[x]
+	case 1555: { // jset #[n],b,[x]
 		u64 s = get_b();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28087,7 +28623,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1558: { // jset #[n],r,[x]
+	case 1556: { // jset #[n],r,[x]
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28095,7 +28631,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1559: { // jset #[n],n,[x]
+	case 1557: { // jset #[n],n,[x]
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28103,7 +28639,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1560: { // jset #[n],m,[x]
+	case 1558: { // jset #[n],m,[x]
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28111,7 +28647,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1561: { // jset #[n],ep,[x]
+	case 1559: { // jset #[n],ep,[x]
 		u32 s = get_ep();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28119,7 +28655,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1562: { // jset #[n],vba,[x]
+	case 1560: { // jset #[n],vba,[x]
 		u32 s = get_vba();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28127,7 +28663,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1563: { // jset #[n],sc,[x]
+	case 1561: { // jset #[n],sc,[x]
 		u32 s = get_sc();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28135,7 +28671,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1564: { // jset #[n],sz,[x]
+	case 1562: { // jset #[n],sz,[x]
 		u32 s = get_sz();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28143,7 +28679,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1565: { // jset #[n],sr,[x]
+	case 1563: { // jset #[n],sr,[x]
 		u32 s = get_sr();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28151,7 +28687,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1566: { // jset #[n],omr,[x]
+	case 1564: { // jset #[n],omr,[x]
 		u32 s = get_omr();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28159,7 +28695,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1567: { // jset #[n],sp,[x]
+	case 1565: { // jset #[n],sp,[x]
 		u32 s = get_sp();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28167,7 +28703,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1568: { // jset #[n],ssh,[x]
+	case 1566: { // jset #[n],ssh,[x]
 		u32 s = get_ssh();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28175,7 +28711,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1569: { // jset #[n],ssl,[x]
+	case 1567: { // jset #[n],ssl,[x]
 		u32 s = get_ssl();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28183,7 +28719,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1570: { // jset #[n],la,[x]
+	case 1568: { // jset #[n],la,[x]
 		u32 s = get_la();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28191,7 +28727,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1571: { // jset #[n],lc,[x]
+	case 1569: { // jset #[n],lc,[x]
 		u32 s = get_lc();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
@@ -28199,7993 +28735,8225 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_npc = x;
 		break;
 		}
-	case 1572: { // jsr (r)-n
+	case 1570: { // jsr (r)-n
 		unhandled("jsr (r)-n");
 		break;
 		}
-	case 1573: { // jsr (r)+n
+	case 1571: { // jsr (r)+n
 		unhandled("jsr (r)+n");
 		break;
 		}
-	case 1574: { // jsr (r)-
+	case 1572: { // jsr (r)-
 		unhandled("jsr (r)-");
 		break;
 		}
-	case 1575: { // jsr (r)+
+	case 1573: { // jsr (r)+
 		unhandled("jsr (r)+");
 		break;
 		}
-	case 1576: { // jsr (r)
+	case 1574: { // jsr (r)
 		unhandled("jsr (r)");
 		break;
 		}
-	case 1577: { // jsr (r+n)
+	case 1575: { // jsr (r+n)
 		unhandled("jsr (r+n)");
 		break;
 		}
-	case 1578: { // jsr -(r)
+	case 1576: { // jsr -(r)
 		unhandled("jsr -(r)");
 		break;
 		}
-	case 1579: { // jsr [abs]
+	case 1577: { // jsr [abs]
 		unhandled("jsr [abs]");
 		break;
 		}
-	case 1580: { // jsr [x]
+	case 1578: { // jsr [x]
 		unhandled("jsr [x]");
 		break;
 		}
-	case 1581: { // jsset #[n],x:(r)-n,[x]
+	case 1579: { // jsset #[n],x:(r)-n,[x]
 		unhandled("jsset #[n],x:(r)-n,[x]");
 		break;
 		}
-	case 1582: { // jsset #[n],y:(r)-n,[x]
+	case 1580: { // jsset #[n],y:(r)-n,[x]
 		unhandled("jsset #[n],y:(r)-n,[x]");
 		break;
 		}
-	case 1583: { // jsset #[n],x:(r)+n,[x]
+	case 1581: { // jsset #[n],x:(r)+n,[x]
 		unhandled("jsset #[n],x:(r)+n,[x]");
 		break;
 		}
-	case 1584: { // jsset #[n],y:(r)+n,[x]
+	case 1582: { // jsset #[n],y:(r)+n,[x]
 		unhandled("jsset #[n],y:(r)+n,[x]");
 		break;
 		}
-	case 1585: { // jsset #[n],x:(r)-,[x]
+	case 1583: { // jsset #[n],x:(r)-,[x]
 		unhandled("jsset #[n],x:(r)-,[x]");
 		break;
 		}
-	case 1586: { // jsset #[n],y:(r)-,[x]
+	case 1584: { // jsset #[n],y:(r)-,[x]
 		unhandled("jsset #[n],y:(r)-,[x]");
 		break;
 		}
-	case 1587: { // jsset #[n],x:(r)+,[x]
+	case 1585: { // jsset #[n],x:(r)+,[x]
 		unhandled("jsset #[n],x:(r)+,[x]");
 		break;
 		}
-	case 1588: { // jsset #[n],y:(r)+,[x]
+	case 1586: { // jsset #[n],y:(r)+,[x]
 		unhandled("jsset #[n],y:(r)+,[x]");
 		break;
 		}
-	case 1589: { // jsset #[n],x:(r),[x]
+	case 1587: { // jsset #[n],x:(r),[x]
 		unhandled("jsset #[n],x:(r),[x]");
 		break;
 		}
-	case 1590: { // jsset #[n],y:(r),[x]
+	case 1588: { // jsset #[n],y:(r),[x]
 		unhandled("jsset #[n],y:(r),[x]");
 		break;
 		}
-	case 1591: { // jsset #[n],x:(r+n),[x]
+	case 1589: { // jsset #[n],x:(r+n),[x]
 		unhandled("jsset #[n],x:(r+n),[x]");
 		break;
 		}
-	case 1592: { // jsset #[n],y:(r+n),[x]
+	case 1590: { // jsset #[n],y:(r+n),[x]
 		unhandled("jsset #[n],y:(r+n),[x]");
 		break;
 		}
-	case 1593: { // jsset #[n],x:-(r),[x]
+	case 1591: { // jsset #[n],x:-(r),[x]
 		unhandled("jsset #[n],x:-(r),[x]");
 		break;
 		}
-	case 1594: { // jsset #[n],y:-(r),[x]
+	case 1592: { // jsset #[n],y:-(r),[x]
 		unhandled("jsset #[n],y:-(r),[x]");
 		break;
 		}
-	case 1595: { // jsset #[n],x:[aa],[x]
+	case 1593: { // jsset #[n],x:[aa],[x]
 		unhandled("jsset #[n],x:[aa],[x]");
 		break;
 		}
-	case 1596: { // jsset #[n],y:[aa],[x]
+	case 1594: { // jsset #[n],y:[aa],[x]
 		unhandled("jsset #[n],y:[aa],[x]");
 		break;
 		}
-	case 1597: { // jsset #[n],x:[pp],[x]
+	case 1595: { // jsset #[n],x:[pp],[x]
 		unhandled("jsset #[n],x:[pp],[x]");
 		break;
 		}
-	case 1598: { // jsset #[n],y:[pp],[x]
+	case 1596: { // jsset #[n],y:[pp],[x]
 		unhandled("jsset #[n],y:[pp],[x]");
 		break;
 		}
-	case 1599: { // jsset #[n],x:[qq],[x]
+	case 1597: { // jsset #[n],x:[qq],[x]
 		unhandled("jsset #[n],x:[qq],[x]");
 		break;
 		}
-	case 1600: { // jsset #[n],y:[qq],[x]
+	case 1598: { // jsset #[n],y:[qq],[x]
 		unhandled("jsset #[n],y:[qq],[x]");
 		break;
 		}
-	case 1601: { // jsset #[n],x0,[x]
+	case 1599: { // jsset #[n],x0,[x]
 		unhandled("jsset #[n],x0,[x]");
 		break;
 		}
-	case 1602: { // jsset #[n],x1,[x]
+	case 1600: { // jsset #[n],x1,[x]
 		unhandled("jsset #[n],x1,[x]");
 		break;
 		}
-	case 1603: { // jsset #[n],y0,[x]
+	case 1601: { // jsset #[n],y0,[x]
 		unhandled("jsset #[n],y0,[x]");
 		break;
 		}
-	case 1604: { // jsset #[n],y1,[x]
+	case 1602: { // jsset #[n],y1,[x]
 		unhandled("jsset #[n],y1,[x]");
 		break;
 		}
-	case 1605: { // jsset #[n],a0,[x]
+	case 1603: { // jsset #[n],a0,[x]
 		unhandled("jsset #[n],a0,[x]");
 		break;
 		}
-	case 1606: { // jsset #[n],b0,[x]
+	case 1604: { // jsset #[n],b0,[x]
 		unhandled("jsset #[n],b0,[x]");
 		break;
 		}
-	case 1607: { // jsset #[n],a2,[x]
+	case 1605: { // jsset #[n],a2,[x]
 		unhandled("jsset #[n],a2,[x]");
 		break;
 		}
-	case 1608: { // jsset #[n],b2,[x]
+	case 1606: { // jsset #[n],b2,[x]
 		unhandled("jsset #[n],b2,[x]");
 		break;
 		}
-	case 1609: { // jsset #[n],a1,[x]
+	case 1607: { // jsset #[n],a1,[x]
 		unhandled("jsset #[n],a1,[x]");
 		break;
 		}
-	case 1610: { // jsset #[n],b1,[x]
+	case 1608: { // jsset #[n],b1,[x]
 		unhandled("jsset #[n],b1,[x]");
 		break;
 		}
-	case 1611: { // jsset #[n],a,[x]
+	case 1609: { // jsset #[n],a,[x]
 		unhandled("jsset #[n],a,[x]");
 		break;
 		}
-	case 1612: { // jsset #[n],b,[x]
+	case 1610: { // jsset #[n],b,[x]
 		unhandled("jsset #[n],b,[x]");
 		break;
 		}
-	case 1613: { // jsset #[n],r,[x]
+	case 1611: { // jsset #[n],r,[x]
 		unhandled("jsset #[n],r,[x]");
 		break;
 		}
-	case 1614: { // jsset #[n],n,[x]
+	case 1612: { // jsset #[n],n,[x]
 		unhandled("jsset #[n],n,[x]");
 		break;
 		}
-	case 1615: { // jsset #[n],m,[x]
+	case 1613: { // jsset #[n],m,[x]
 		unhandled("jsset #[n],m,[x]");
 		break;
 		}
-	case 1616: { // jsset #[n],ep,[x]
+	case 1614: { // jsset #[n],ep,[x]
 		unhandled("jsset #[n],ep,[x]");
 		break;
 		}
-	case 1617: { // jsset #[n],vba,[x]
+	case 1615: { // jsset #[n],vba,[x]
 		unhandled("jsset #[n],vba,[x]");
 		break;
 		}
-	case 1618: { // jsset #[n],sc,[x]
+	case 1616: { // jsset #[n],sc,[x]
 		unhandled("jsset #[n],sc,[x]");
 		break;
 		}
-	case 1619: { // jsset #[n],sz,[x]
+	case 1617: { // jsset #[n],sz,[x]
 		unhandled("jsset #[n],sz,[x]");
 		break;
 		}
-	case 1620: { // jsset #[n],sr,[x]
+	case 1618: { // jsset #[n],sr,[x]
 		unhandled("jsset #[n],sr,[x]");
 		break;
 		}
-	case 1621: { // jsset #[n],omr,[x]
+	case 1619: { // jsset #[n],omr,[x]
 		unhandled("jsset #[n],omr,[x]");
 		break;
 		}
-	case 1622: { // jsset #[n],sp,[x]
+	case 1620: { // jsset #[n],sp,[x]
 		unhandled("jsset #[n],sp,[x]");
 		break;
 		}
-	case 1623: { // jsset #[n],ssh,[x]
+	case 1621: { // jsset #[n],ssh,[x]
 		unhandled("jsset #[n],ssh,[x]");
 		break;
 		}
-	case 1624: { // jsset #[n],ssl,[x]
+	case 1622: { // jsset #[n],ssl,[x]
 		unhandled("jsset #[n],ssl,[x]");
 		break;
 		}
-	case 1625: { // jsset #[n],la,[x]
+	case 1623: { // jsset #[n],la,[x]
 		unhandled("jsset #[n],la,[x]");
 		break;
 		}
-	case 1626: { // jsset #[n],lc,[x]
+	case 1624: { // jsset #[n],lc,[x]
 		unhandled("jsset #[n],lc,[x]");
 		break;
 		}
-	case 1627: { // lra r,x0
+	case 1625: { // lra r,x0
 		unhandled("lra r,x0");
 		break;
 		}
-	case 1628: { // lra r,x1
+	case 1626: { // lra r,x1
 		unhandled("lra r,x1");
 		break;
 		}
-	case 1629: { // lra r,y0
+	case 1627: { // lra r,y0
 		unhandled("lra r,y0");
 		break;
 		}
-	case 1630: { // lra r,y1
+	case 1628: { // lra r,y1
 		unhandled("lra r,y1");
 		break;
 		}
-	case 1631: { // lra r,a0
+	case 1629: { // lra r,a0
 		unhandled("lra r,a0");
 		break;
 		}
-	case 1632: { // lra r,b0
+	case 1630: { // lra r,b0
 		unhandled("lra r,b0");
 		break;
 		}
-	case 1633: { // lra r,a2
+	case 1631: { // lra r,a2
 		unhandled("lra r,a2");
 		break;
 		}
-	case 1634: { // lra r,b2
+	case 1632: { // lra r,b2
 		unhandled("lra r,b2");
 		break;
 		}
-	case 1635: { // lra r,a1
+	case 1633: { // lra r,a1
 		unhandled("lra r,a1");
 		break;
 		}
-	case 1636: { // lra r,b1
+	case 1634: { // lra r,b1
 		unhandled("lra r,b1");
 		break;
 		}
-	case 1637: { // lra r,a
+	case 1635: { // lra r,a
 		unhandled("lra r,a");
 		break;
 		}
-	case 1638: { // lra r,b
+	case 1636: { // lra r,b
 		unhandled("lra r,b");
 		break;
 		}
-	case 1639: { // lra r,r
+	case 1637: { // lra r,r
 		unhandled("lra r,r");
 		break;
 		}
-	case 1640: { // lra r,n
+	case 1638: { // lra r,n
 		unhandled("lra r,n");
 		break;
 		}
-	case 1641: { // lra #[i],x0
+	case 1639: { // lra #[i],x0
 		unhandled("lra #[i],x0");
 		break;
 		}
-	case 1642: { // lra #[i],x1
+	case 1640: { // lra #[i],x1
 		unhandled("lra #[i],x1");
 		break;
 		}
-	case 1643: { // lra #[i],y0
+	case 1641: { // lra #[i],y0
 		unhandled("lra #[i],y0");
 		break;
 		}
-	case 1644: { // lra #[i],y1
+	case 1642: { // lra #[i],y1
 		unhandled("lra #[i],y1");
 		break;
 		}
-	case 1645: { // lra #[i],a0
+	case 1643: { // lra #[i],a0
 		unhandled("lra #[i],a0");
 		break;
 		}
-	case 1646: { // lra #[i],b0
+	case 1644: { // lra #[i],b0
 		unhandled("lra #[i],b0");
 		break;
 		}
-	case 1647: { // lra #[i],a2
+	case 1645: { // lra #[i],a2
 		unhandled("lra #[i],a2");
 		break;
 		}
-	case 1648: { // lra #[i],b2
+	case 1646: { // lra #[i],b2
 		unhandled("lra #[i],b2");
 		break;
 		}
-	case 1649: { // lra #[i],a1
+	case 1647: { // lra #[i],a1
 		unhandled("lra #[i],a1");
 		break;
 		}
-	case 1650: { // lra #[i],b1
+	case 1648: { // lra #[i],b1
 		unhandled("lra #[i],b1");
 		break;
 		}
-	case 1651: { // lra #[i],a
+	case 1649: { // lra #[i],a
 		unhandled("lra #[i],a");
 		break;
 		}
-	case 1652: { // lra #[i],b
+	case 1650: { // lra #[i],b
 		unhandled("lra #[i],b");
 		break;
 		}
-	case 1653: { // lra #[i],r
+	case 1651: { // lra #[i],r
 		unhandled("lra #[i],r");
 		break;
 		}
-	case 1654: { // lra #[i],n
+	case 1652: { // lra #[i],n
 		unhandled("lra #[i],n");
 		break;
 		}
-	case 1655: { // lsl #[i],a
+	case 1653: { // lsl #[i],a
 		unhandled("lsl #[i],a");
 		break;
 		}
-	case 1656: { // lsl #[i],b
+	case 1654: { // lsl #[i],b
 		unhandled("lsl #[i],b");
 		break;
 		}
-	case 1657: { // lsl a1,a
+	case 1655: { // lsl a1,a
 		unhandled("lsl a1,a");
 		break;
 		}
-	case 1658: { // lsl a1,b
+	case 1656: { // lsl a1,b
 		unhandled("lsl a1,b");
 		break;
 		}
-	case 1659: { // lsl b1,a
+	case 1657: { // lsl b1,a
 		unhandled("lsl b1,a");
 		break;
 		}
-	case 1660: { // lsl b1,b
+	case 1658: { // lsl b1,b
 		unhandled("lsl b1,b");
 		break;
 		}
-	case 1661: { // lsl x0,a
+	case 1659: { // lsl x0,a
 		unhandled("lsl x0,a");
 		break;
 		}
-	case 1662: { // lsl x0,b
+	case 1660: { // lsl x0,b
 		unhandled("lsl x0,b");
 		break;
 		}
-	case 1663: { // lsl y0,a
+	case 1661: { // lsl y0,a
 		unhandled("lsl y0,a");
 		break;
 		}
-	case 1664: { // lsl y0,b
+	case 1662: { // lsl y0,b
 		unhandled("lsl y0,b");
 		break;
 		}
-	case 1665: { // lsl x1,a
+	case 1663: { // lsl x1,a
 		unhandled("lsl x1,a");
 		break;
 		}
-	case 1666: { // lsl x1,b
+	case 1664: { // lsl x1,b
 		unhandled("lsl x1,b");
 		break;
 		}
-	case 1667: { // lsl y1,a
+	case 1665: { // lsl y1,a
 		unhandled("lsl y1,a");
 		break;
 		}
-	case 1668: { // lsl y1,b
+	case 1666: { // lsl y1,b
 		unhandled("lsl y1,b");
 		break;
 		}
-	case 1669: { // lsr #[i],a
+	case 1667: { // lsr #[i],a
 		unhandled("lsr #[i],a");
 		break;
 		}
-	case 1670: { // lsr #[i],b
+	case 1668: { // lsr #[i],b
 		unhandled("lsr #[i],b");
 		break;
 		}
-	case 1671: { // lsr a1,a
+	case 1669: { // lsr a1,a
 		unhandled("lsr a1,a");
 		break;
 		}
-	case 1672: { // lsr a1,b
+	case 1670: { // lsr a1,b
 		unhandled("lsr a1,b");
 		break;
 		}
-	case 1673: { // lsr b1,a
+	case 1671: { // lsr b1,a
 		unhandled("lsr b1,a");
 		break;
 		}
-	case 1674: { // lsr b1,b
+	case 1672: { // lsr b1,b
 		unhandled("lsr b1,b");
 		break;
 		}
-	case 1675: { // lsr x0,a
+	case 1673: { // lsr x0,a
 		unhandled("lsr x0,a");
 		break;
 		}
-	case 1676: { // lsr x0,b
+	case 1674: { // lsr x0,b
 		unhandled("lsr x0,b");
 		break;
 		}
-	case 1677: { // lsr y0,a
+	case 1675: { // lsr y0,a
 		unhandled("lsr y0,a");
 		break;
 		}
-	case 1678: { // lsr y0,b
+	case 1676: { // lsr y0,b
 		unhandled("lsr y0,b");
 		break;
 		}
-	case 1679: { // lsr x1,a
+	case 1677: { // lsr x1,a
 		unhandled("lsr x1,a");
 		break;
 		}
-	case 1680: { // lsr x1,b
+	case 1678: { // lsr x1,b
 		unhandled("lsr x1,b");
 		break;
 		}
-	case 1681: { // lsr y1,a
+	case 1679: { // lsr y1,a
 		unhandled("lsr y1,a");
 		break;
 		}
-	case 1682: { // lsr y1,b
+	case 1680: { // lsr y1,b
 		unhandled("lsr y1,b");
 		break;
 		}
-	case 1683: { // lua (r)-n,x0
+	case 1681: { // lua (r)-n,x0
 		unhandled("lua (r)-n,x0");
 		break;
 		}
-	case 1684: { // lua (r)-n,x1
+	case 1682: { // lua (r)-n,x1
 		unhandled("lua (r)-n,x1");
 		break;
 		}
-	case 1685: { // lua (r)-n,y0
+	case 1683: { // lua (r)-n,y0
 		unhandled("lua (r)-n,y0");
 		break;
 		}
-	case 1686: { // lua (r)-n,y1
+	case 1684: { // lua (r)-n,y1
 		unhandled("lua (r)-n,y1");
 		break;
 		}
-	case 1687: { // lua (r)-n,a0
+	case 1685: { // lua (r)-n,a0
 		unhandled("lua (r)-n,a0");
 		break;
 		}
-	case 1688: { // lua (r)-n,b0
+	case 1686: { // lua (r)-n,b0
 		unhandled("lua (r)-n,b0");
 		break;
 		}
-	case 1689: { // lua (r)-n,a2
+	case 1687: { // lua (r)-n,a2
 		unhandled("lua (r)-n,a2");
 		break;
 		}
-	case 1690: { // lua (r)-n,b2
+	case 1688: { // lua (r)-n,b2
 		unhandled("lua (r)-n,b2");
 		break;
 		}
-	case 1691: { // lua (r)-n,a1
+	case 1689: { // lua (r)-n,a1
 		unhandled("lua (r)-n,a1");
 		break;
 		}
-	case 1692: { // lua (r)-n,b1
+	case 1690: { // lua (r)-n,b1
 		unhandled("lua (r)-n,b1");
 		break;
 		}
-	case 1693: { // lua (r)-n,a
+	case 1691: { // lua (r)-n,a
 		unhandled("lua (r)-n,a");
 		break;
 		}
-	case 1694: { // lua (r)-n,b
+	case 1692: { // lua (r)-n,b
 		unhandled("lua (r)-n,b");
 		break;
 		}
-	case 1695: { // lua (r)-n,r
+	case 1693: { // lua (r)-n,r
 		unhandled("lua (r)-n,r");
 		break;
 		}
-	case 1696: { // lua (r)-n,n
+	case 1694: { // lua (r)-n,n
 		unhandled("lua (r)-n,n");
 		break;
 		}
-	case 1697: { // lua (r)+n,x0
+	case 1695: { // lua (r)+n,x0
 		unhandled("lua (r)+n,x0");
 		break;
 		}
-	case 1698: { // lua (r)+n,x1
+	case 1696: { // lua (r)+n,x1
 		unhandled("lua (r)+n,x1");
 		break;
 		}
-	case 1699: { // lua (r)+n,y0
+	case 1697: { // lua (r)+n,y0
 		unhandled("lua (r)+n,y0");
 		break;
 		}
-	case 1700: { // lua (r)+n,y1
+	case 1698: { // lua (r)+n,y1
 		unhandled("lua (r)+n,y1");
 		break;
 		}
-	case 1701: { // lua (r)+n,a0
+	case 1699: { // lua (r)+n,a0
 		unhandled("lua (r)+n,a0");
 		break;
 		}
-	case 1702: { // lua (r)+n,b0
+	case 1700: { // lua (r)+n,b0
 		unhandled("lua (r)+n,b0");
 		break;
 		}
-	case 1703: { // lua (r)+n,a2
+	case 1701: { // lua (r)+n,a2
 		unhandled("lua (r)+n,a2");
 		break;
 		}
-	case 1704: { // lua (r)+n,b2
+	case 1702: { // lua (r)+n,b2
 		unhandled("lua (r)+n,b2");
 		break;
 		}
-	case 1705: { // lua (r)+n,a1
+	case 1703: { // lua (r)+n,a1
 		unhandled("lua (r)+n,a1");
 		break;
 		}
-	case 1706: { // lua (r)+n,b1
+	case 1704: { // lua (r)+n,b1
 		unhandled("lua (r)+n,b1");
 		break;
 		}
-	case 1707: { // lua (r)+n,a
+	case 1705: { // lua (r)+n,a
 		unhandled("lua (r)+n,a");
 		break;
 		}
-	case 1708: { // lua (r)+n,b
+	case 1706: { // lua (r)+n,b
 		unhandled("lua (r)+n,b");
 		break;
 		}
-	case 1709: { // lua (r)+n,r
+	case 1707: { // lua (r)+n,r
 		unhandled("lua (r)+n,r");
 		break;
 		}
-	case 1710: { // lua (r)+n,n
+	case 1708: { // lua (r)+n,n
 		unhandled("lua (r)+n,n");
 		break;
 		}
-	case 1711: { // lua (r)-,x0
+	case 1709: { // lua (r)-,x0
 		unhandled("lua (r)-,x0");
 		break;
 		}
-	case 1712: { // lua (r)-,x1
+	case 1710: { // lua (r)-,x1
 		unhandled("lua (r)-,x1");
 		break;
 		}
-	case 1713: { // lua (r)-,y0
+	case 1711: { // lua (r)-,y0
 		unhandled("lua (r)-,y0");
 		break;
 		}
-	case 1714: { // lua (r)-,y1
+	case 1712: { // lua (r)-,y1
 		unhandled("lua (r)-,y1");
 		break;
 		}
-	case 1715: { // lua (r)-,a0
+	case 1713: { // lua (r)-,a0
 		unhandled("lua (r)-,a0");
 		break;
 		}
-	case 1716: { // lua (r)-,b0
+	case 1714: { // lua (r)-,b0
 		unhandled("lua (r)-,b0");
 		break;
 		}
-	case 1717: { // lua (r)-,a2
+	case 1715: { // lua (r)-,a2
 		unhandled("lua (r)-,a2");
 		break;
 		}
-	case 1718: { // lua (r)-,b2
+	case 1716: { // lua (r)-,b2
 		unhandled("lua (r)-,b2");
 		break;
 		}
-	case 1719: { // lua (r)-,a1
+	case 1717: { // lua (r)-,a1
 		unhandled("lua (r)-,a1");
 		break;
 		}
-	case 1720: { // lua (r)-,b1
+	case 1718: { // lua (r)-,b1
 		unhandled("lua (r)-,b1");
 		break;
 		}
-	case 1721: { // lua (r)-,a
+	case 1719: { // lua (r)-,a
 		unhandled("lua (r)-,a");
 		break;
 		}
-	case 1722: { // lua (r)-,b
+	case 1720: { // lua (r)-,b
 		unhandled("lua (r)-,b");
 		break;
 		}
-	case 1723: { // lua (r)-,r
+	case 1721: { // lua (r)-,r
 		unhandled("lua (r)-,r");
 		break;
 		}
-	case 1724: { // lua (r)-,n
+	case 1722: { // lua (r)-,n
 		unhandled("lua (r)-,n");
 		break;
 		}
-	case 1725: { // lua (r)+,x0
+	case 1723: { // lua (r)+,x0
 		unhandled("lua (r)+,x0");
 		break;
 		}
-	case 1726: { // lua (r)+,x1
+	case 1724: { // lua (r)+,x1
 		unhandled("lua (r)+,x1");
 		break;
 		}
-	case 1727: { // lua (r)+,y0
+	case 1725: { // lua (r)+,y0
 		unhandled("lua (r)+,y0");
 		break;
 		}
-	case 1728: { // lua (r)+,y1
+	case 1726: { // lua (r)+,y1
 		unhandled("lua (r)+,y1");
 		break;
 		}
-	case 1729: { // lua (r)+,a0
+	case 1727: { // lua (r)+,a0
 		unhandled("lua (r)+,a0");
 		break;
 		}
-	case 1730: { // lua (r)+,b0
+	case 1728: { // lua (r)+,b0
 		unhandled("lua (r)+,b0");
 		break;
 		}
-	case 1731: { // lua (r)+,a2
+	case 1729: { // lua (r)+,a2
 		unhandled("lua (r)+,a2");
 		break;
 		}
-	case 1732: { // lua (r)+,b2
+	case 1730: { // lua (r)+,b2
 		unhandled("lua (r)+,b2");
 		break;
 		}
-	case 1733: { // lua (r)+,a1
+	case 1731: { // lua (r)+,a1
 		unhandled("lua (r)+,a1");
 		break;
 		}
-	case 1734: { // lua (r)+,b1
+	case 1732: { // lua (r)+,b1
 		unhandled("lua (r)+,b1");
 		break;
 		}
-	case 1735: { // lua (r)+,a
+	case 1733: { // lua (r)+,a
 		unhandled("lua (r)+,a");
 		break;
 		}
-	case 1736: { // lua (r)+,b
+	case 1734: { // lua (r)+,b
 		unhandled("lua (r)+,b");
 		break;
 		}
-	case 1737: { // lua (r)+,r
+	case 1735: { // lua (r)+,r
 		unhandled("lua (r)+,r");
 		break;
 		}
-	case 1738: { // lua (r)+,n
+	case 1736: { // lua (r)+,n
 		unhandled("lua (r)+,n");
 		break;
 		}
-	case 1739: { // lua (r+[o]),r
+	case 1737: { // lua (r+[o]),r
 		unhandled("lua (r+[o]),r");
 		break;
 		}
-	case 1740: { // lua (r+[o]),n
+	case 1738: { // lua (r+[o]),n
 		unhandled("lua (r+[o]),n");
 		break;
 		}
-	case 1741: { // mac +y1,#[i],a
+	case 1739: { // mac +y1,#[i],a
 		unhandled("mac +y1,#[i],a");
 		break;
 		}
-	case 1742: { // mac -y1,#[i],a
+	case 1740: { // mac -y1,#[i],a
 		unhandled("mac -y1,#[i],a");
 		break;
 		}
-	case 1743: { // mac +y1,#[i],b
+	case 1741: { // mac +y1,#[i],b
 		unhandled("mac +y1,#[i],b");
 		break;
 		}
-	case 1744: { // mac -y1,#[i],b
+	case 1742: { // mac -y1,#[i],b
 		unhandled("mac -y1,#[i],b");
 		break;
 		}
-	case 1745: { // mac +x0,#[i],a
+	case 1743: { // mac +x0,#[i],a
 		unhandled("mac +x0,#[i],a");
 		break;
 		}
-	case 1746: { // mac -x0,#[i],a
+	case 1744: { // mac -x0,#[i],a
 		unhandled("mac -x0,#[i],a");
 		break;
 		}
-	case 1747: { // mac +x0,#[i],b
+	case 1745: { // mac +x0,#[i],b
 		unhandled("mac +x0,#[i],b");
 		break;
 		}
-	case 1748: { // mac -x0,#[i],b
+	case 1746: { // mac -x0,#[i],b
 		unhandled("mac -x0,#[i],b");
 		break;
 		}
-	case 1749: { // mac +y0,#[i],a
+	case 1747: { // mac +y0,#[i],a
 		unhandled("mac +y0,#[i],a");
 		break;
 		}
-	case 1750: { // mac -y0,#[i],a
+	case 1748: { // mac -y0,#[i],a
 		unhandled("mac -y0,#[i],a");
 		break;
 		}
-	case 1751: { // mac +y0,#[i],b
+	case 1749: { // mac +y0,#[i],b
 		unhandled("mac +y0,#[i],b");
 		break;
 		}
-	case 1752: { // mac -y0,#[i],b
+	case 1750: { // mac -y0,#[i],b
 		unhandled("mac -y0,#[i],b");
 		break;
 		}
-	case 1753: { // mac +x1,#[i],a
+	case 1751: { // mac +x1,#[i],a
 		unhandled("mac +x1,#[i],a");
 		break;
 		}
-	case 1754: { // mac -x1,#[i],a
+	case 1752: { // mac -x1,#[i],a
 		unhandled("mac -x1,#[i],a");
 		break;
 		}
-	case 1755: { // mac +x1,#[i],b
+	case 1753: { // mac +x1,#[i],b
 		unhandled("mac +x1,#[i],b");
 		break;
 		}
-	case 1756: { // mac -x1,#[i],b
+	case 1754: { // mac -x1,#[i],b
 		unhandled("mac -x1,#[i],b");
 		break;
 		}
-	case 1757: { // maci +#[i],y1,a
+	case 1755: { // maci +#[i],y1,a
 		unhandled("maci +#[i],y1,a");
 		break;
 		}
-	case 1758: { // maci -#[i],y1,a
+	case 1756: { // maci -#[i],y1,a
 		unhandled("maci -#[i],y1,a");
 		break;
 		}
-	case 1759: { // maci +#[i],y1,b
+	case 1757: { // maci +#[i],y1,b
 		unhandled("maci +#[i],y1,b");
 		break;
 		}
-	case 1760: { // maci -#[i],y1,b
+	case 1758: { // maci -#[i],y1,b
 		unhandled("maci -#[i],y1,b");
 		break;
 		}
-	case 1761: { // maci +#[i],x0,a
+	case 1759: { // maci +#[i],x0,a
 		unhandled("maci +#[i],x0,a");
 		break;
 		}
-	case 1762: { // maci -#[i],x0,a
+	case 1760: { // maci -#[i],x0,a
 		unhandled("maci -#[i],x0,a");
 		break;
 		}
-	case 1763: { // maci +#[i],x0,b
+	case 1761: { // maci +#[i],x0,b
 		unhandled("maci +#[i],x0,b");
 		break;
 		}
-	case 1764: { // maci -#[i],x0,b
+	case 1762: { // maci -#[i],x0,b
 		unhandled("maci -#[i],x0,b");
 		break;
 		}
-	case 1765: { // maci +#[i],y0,a
+	case 1763: { // maci +#[i],y0,a
 		unhandled("maci +#[i],y0,a");
 		break;
 		}
-	case 1766: { // maci -#[i],y0,a
+	case 1764: { // maci -#[i],y0,a
 		unhandled("maci -#[i],y0,a");
 		break;
 		}
-	case 1767: { // maci +#[i],y0,b
+	case 1765: { // maci +#[i],y0,b
 		unhandled("maci +#[i],y0,b");
 		break;
 		}
-	case 1768: { // maci -#[i],y0,b
+	case 1766: { // maci -#[i],y0,b
 		unhandled("maci -#[i],y0,b");
 		break;
 		}
-	case 1769: { // maci +#[i],x1,a
+	case 1767: { // maci +#[i],x1,a
 		unhandled("maci +#[i],x1,a");
 		break;
 		}
-	case 1770: { // maci -#[i],x1,a
+	case 1768: { // maci -#[i],x1,a
 		unhandled("maci -#[i],x1,a");
 		break;
 		}
-	case 1771: { // maci +#[i],x1,b
+	case 1769: { // maci +#[i],x1,b
 		unhandled("maci +#[i],x1,b");
 		break;
 		}
-	case 1772: { // maci -#[i],x1,b
+	case 1770: { // maci -#[i],x1,b
 		unhandled("maci -#[i],x1,b");
 		break;
 		}
-	case 1773: { // macsu +x0,x0,a
+	case 1771: { // macsu +x0,x0,a
 		unhandled("macsu +x0,x0,a");
 		break;
 		}
-	case 1774: { // macsu +y0,y0,a
+	case 1772: { // macsu +y0,y0,a
 		unhandled("macsu +y0,y0,a");
 		break;
 		}
-	case 1775: { // macsu +x1,x0,a
+	case 1773: { // macsu +x1,x0,a
 		unhandled("macsu +x1,x0,a");
 		break;
 		}
-	case 1776: { // macsu +y1,y0,a
+	case 1774: { // macsu +y1,y0,a
 		unhandled("macsu +y1,y0,a");
 		break;
 		}
-	case 1777: { // macsu +x1,x1,a
+	case 1775: { // macsu +x1,x1,a
 		unhandled("macsu +x1,x1,a");
 		break;
 		}
-	case 1778: { // macsu +y1,y1,a
+	case 1776: { // macsu +y1,y1,a
 		unhandled("macsu +y1,y1,a");
 		break;
 		}
-	case 1779: { // macsu +x0,x1,a
+	case 1777: { // macsu +x0,x1,a
 		unhandled("macsu +x0,x1,a");
 		break;
 		}
-	case 1780: { // macsu +y0,y1,a
+	case 1778: { // macsu +y0,y1,a
 		unhandled("macsu +y0,y1,a");
 		break;
 		}
-	case 1781: { // macsu +x0,y1,a
+	case 1779: { // macsu +x0,y1,a
 		unhandled("macsu +x0,y1,a");
 		break;
 		}
-	case 1782: { // macsu +y0,x0,a
+	case 1780: { // macsu +y0,x0,a
 		unhandled("macsu +y0,x0,a");
 		break;
 		}
-	case 1783: { // macsu +x1,y0,a
+	case 1781: { // macsu +x1,y0,a
 		unhandled("macsu +x1,y0,a");
 		break;
 		}
-	case 1784: { // macsu +y1,x1,a
+	case 1782: { // macsu +y1,x1,a
 		unhandled("macsu +y1,x1,a");
 		break;
 		}
-	case 1785: { // macsu +y1,x0,a
+	case 1783: { // macsu +y1,x0,a
 		unhandled("macsu +y1,x0,a");
 		break;
 		}
-	case 1786: { // macsu +x0,y0,a
+	case 1784: { // macsu +x0,y0,a
 		unhandled("macsu +x0,y0,a");
 		break;
 		}
-	case 1787: { // macsu +y0,x1,a
+	case 1785: { // macsu +y0,x1,a
 		unhandled("macsu +y0,x1,a");
 		break;
 		}
-	case 1788: { // macsu +x1,y1,a
+	case 1786: { // macsu +x1,y1,a
 		unhandled("macsu +x1,y1,a");
 		break;
 		}
-	case 1789: { // macsu -x0,x0,a
+	case 1787: { // macsu -x0,x0,a
 		unhandled("macsu -x0,x0,a");
 		break;
 		}
-	case 1790: { // macsu -y0,y0,a
+	case 1788: { // macsu -y0,y0,a
 		unhandled("macsu -y0,y0,a");
 		break;
 		}
-	case 1791: { // macsu -x1,x0,a
+	case 1789: { // macsu -x1,x0,a
 		unhandled("macsu -x1,x0,a");
 		break;
 		}
-	case 1792: { // macsu -y1,y0,a
+	case 1790: { // macsu -y1,y0,a
 		unhandled("macsu -y1,y0,a");
 		break;
 		}
-	case 1793: { // macsu -x1,x1,a
+	case 1791: { // macsu -x1,x1,a
 		unhandled("macsu -x1,x1,a");
 		break;
 		}
-	case 1794: { // macsu -y1,y1,a
+	case 1792: { // macsu -y1,y1,a
 		unhandled("macsu -y1,y1,a");
 		break;
 		}
-	case 1795: { // macsu -x0,x1,a
+	case 1793: { // macsu -x0,x1,a
 		unhandled("macsu -x0,x1,a");
 		break;
 		}
-	case 1796: { // macsu -y0,y1,a
+	case 1794: { // macsu -y0,y1,a
 		unhandled("macsu -y0,y1,a");
 		break;
 		}
-	case 1797: { // macsu -x0,y1,a
+	case 1795: { // macsu -x0,y1,a
 		unhandled("macsu -x0,y1,a");
 		break;
 		}
-	case 1798: { // macsu -y0,x0,a
+	case 1796: { // macsu -y0,x0,a
 		unhandled("macsu -y0,x0,a");
 		break;
 		}
-	case 1799: { // macsu -x1,y0,a
+	case 1797: { // macsu -x1,y0,a
 		unhandled("macsu -x1,y0,a");
 		break;
 		}
-	case 1800: { // macsu -y1,x1,a
+	case 1798: { // macsu -y1,x1,a
 		unhandled("macsu -y1,x1,a");
 		break;
 		}
-	case 1801: { // macsu -y1,x0,a
+	case 1799: { // macsu -y1,x0,a
 		unhandled("macsu -y1,x0,a");
 		break;
 		}
-	case 1802: { // macsu -x0,y0,a
+	case 1800: { // macsu -x0,y0,a
 		unhandled("macsu -x0,y0,a");
 		break;
 		}
-	case 1803: { // macsu -y0,x1,a
+	case 1801: { // macsu -y0,x1,a
 		unhandled("macsu -y0,x1,a");
 		break;
 		}
-	case 1804: { // macsu -x1,y1,a
+	case 1802: { // macsu -x1,y1,a
 		unhandled("macsu -x1,y1,a");
 		break;
 		}
-	case 1805: { // macsu +x0,x0,b
+	case 1803: { // macsu +x0,x0,b
 		unhandled("macsu +x0,x0,b");
 		break;
 		}
-	case 1806: { // macsu +y0,y0,b
+	case 1804: { // macsu +y0,y0,b
 		unhandled("macsu +y0,y0,b");
 		break;
 		}
-	case 1807: { // macsu +x1,x0,b
+	case 1805: { // macsu +x1,x0,b
 		unhandled("macsu +x1,x0,b");
 		break;
 		}
-	case 1808: { // macsu +y1,y0,b
+	case 1806: { // macsu +y1,y0,b
 		unhandled("macsu +y1,y0,b");
 		break;
 		}
-	case 1809: { // macsu +x1,x1,b
+	case 1807: { // macsu +x1,x1,b
 		unhandled("macsu +x1,x1,b");
 		break;
 		}
-	case 1810: { // macsu +y1,y1,b
+	case 1808: { // macsu +y1,y1,b
 		unhandled("macsu +y1,y1,b");
 		break;
 		}
-	case 1811: { // macsu +x0,x1,b
+	case 1809: { // macsu +x0,x1,b
 		unhandled("macsu +x0,x1,b");
 		break;
 		}
-	case 1812: { // macsu +y0,y1,b
+	case 1810: { // macsu +y0,y1,b
 		unhandled("macsu +y0,y1,b");
 		break;
 		}
-	case 1813: { // macsu +x0,y1,b
+	case 1811: { // macsu +x0,y1,b
 		unhandled("macsu +x0,y1,b");
 		break;
 		}
-	case 1814: { // macsu +y0,x0,b
+	case 1812: { // macsu +y0,x0,b
 		unhandled("macsu +y0,x0,b");
 		break;
 		}
-	case 1815: { // macsu +x1,y0,b
+	case 1813: { // macsu +x1,y0,b
 		unhandled("macsu +x1,y0,b");
 		break;
 		}
-	case 1816: { // macsu +y1,x1,b
+	case 1814: { // macsu +y1,x1,b
 		unhandled("macsu +y1,x1,b");
 		break;
 		}
-	case 1817: { // macsu +y1,x0,b
+	case 1815: { // macsu +y1,x0,b
 		unhandled("macsu +y1,x0,b");
 		break;
 		}
-	case 1818: { // macsu +x0,y0,b
+	case 1816: { // macsu +x0,y0,b
 		unhandled("macsu +x0,y0,b");
 		break;
 		}
-	case 1819: { // macsu +y0,x1,b
+	case 1817: { // macsu +y0,x1,b
 		unhandled("macsu +y0,x1,b");
 		break;
 		}
-	case 1820: { // macsu +x1,y1,b
+	case 1818: { // macsu +x1,y1,b
 		unhandled("macsu +x1,y1,b");
 		break;
 		}
-	case 1821: { // macsu -x0,x0,b
+	case 1819: { // macsu -x0,x0,b
 		unhandled("macsu -x0,x0,b");
 		break;
 		}
-	case 1822: { // macsu -y0,y0,b
+	case 1820: { // macsu -y0,y0,b
 		unhandled("macsu -y0,y0,b");
 		break;
 		}
-	case 1823: { // macsu -x1,x0,b
+	case 1821: { // macsu -x1,x0,b
 		unhandled("macsu -x1,x0,b");
 		break;
 		}
-	case 1824: { // macsu -y1,y0,b
+	case 1822: { // macsu -y1,y0,b
 		unhandled("macsu -y1,y0,b");
 		break;
 		}
-	case 1825: { // macsu -x1,x1,b
+	case 1823: { // macsu -x1,x1,b
 		unhandled("macsu -x1,x1,b");
 		break;
 		}
-	case 1826: { // macsu -y1,y1,b
+	case 1824: { // macsu -y1,y1,b
 		unhandled("macsu -y1,y1,b");
 		break;
 		}
-	case 1827: { // macsu -x0,x1,b
+	case 1825: { // macsu -x0,x1,b
 		unhandled("macsu -x0,x1,b");
 		break;
 		}
-	case 1828: { // macsu -y0,y1,b
+	case 1826: { // macsu -y0,y1,b
 		unhandled("macsu -y0,y1,b");
 		break;
 		}
-	case 1829: { // macsu -x0,y1,b
+	case 1827: { // macsu -x0,y1,b
 		unhandled("macsu -x0,y1,b");
 		break;
 		}
-	case 1830: { // macsu -y0,x0,b
+	case 1828: { // macsu -y0,x0,b
 		unhandled("macsu -y0,x0,b");
 		break;
 		}
-	case 1831: { // macsu -x1,y0,b
+	case 1829: { // macsu -x1,y0,b
 		unhandled("macsu -x1,y0,b");
 		break;
 		}
-	case 1832: { // macsu -y1,x1,b
+	case 1830: { // macsu -y1,x1,b
 		unhandled("macsu -y1,x1,b");
 		break;
 		}
-	case 1833: { // macsu -y1,x0,b
+	case 1831: { // macsu -y1,x0,b
 		unhandled("macsu -y1,x0,b");
 		break;
 		}
-	case 1834: { // macsu -x0,y0,b
+	case 1832: { // macsu -x0,y0,b
 		unhandled("macsu -x0,y0,b");
 		break;
 		}
-	case 1835: { // macsu -y0,x1,b
+	case 1833: { // macsu -y0,x1,b
 		unhandled("macsu -y0,x1,b");
 		break;
 		}
-	case 1836: { // macsu -x1,y1,b
+	case 1834: { // macsu -x1,y1,b
 		unhandled("macsu -x1,y1,b");
 		break;
 		}
-	case 1837: { // macuu +x0,x0,a
+	case 1835: { // macuu +x0,x0,a
 		unhandled("macuu +x0,x0,a");
 		break;
 		}
-	case 1838: { // macuu +y0,y0,a
+	case 1836: { // macuu +y0,y0,a
 		unhandled("macuu +y0,y0,a");
 		break;
 		}
-	case 1839: { // macuu +x1,x0,a
+	case 1837: { // macuu +x1,x0,a
 		unhandled("macuu +x1,x0,a");
 		break;
 		}
-	case 1840: { // macuu +y1,y0,a
+	case 1838: { // macuu +y1,y0,a
 		unhandled("macuu +y1,y0,a");
 		break;
 		}
-	case 1841: { // macuu +x1,x1,a
+	case 1839: { // macuu +x1,x1,a
 		unhandled("macuu +x1,x1,a");
 		break;
 		}
-	case 1842: { // macuu +y1,y1,a
+	case 1840: { // macuu +y1,y1,a
 		unhandled("macuu +y1,y1,a");
 		break;
 		}
-	case 1843: { // macuu +x0,x1,a
+	case 1841: { // macuu +x0,x1,a
 		unhandled("macuu +x0,x1,a");
 		break;
 		}
-	case 1844: { // macuu +y0,y1,a
+	case 1842: { // macuu +y0,y1,a
 		unhandled("macuu +y0,y1,a");
 		break;
 		}
-	case 1845: { // macuu +x0,y1,a
+	case 1843: { // macuu +x0,y1,a
 		unhandled("macuu +x0,y1,a");
 		break;
 		}
-	case 1846: { // macuu +y0,x0,a
+	case 1844: { // macuu +y0,x0,a
 		unhandled("macuu +y0,x0,a");
 		break;
 		}
-	case 1847: { // macuu +x1,y0,a
+	case 1845: { // macuu +x1,y0,a
 		unhandled("macuu +x1,y0,a");
 		break;
 		}
-	case 1848: { // macuu +y1,x1,a
+	case 1846: { // macuu +y1,x1,a
 		unhandled("macuu +y1,x1,a");
 		break;
 		}
-	case 1849: { // macuu +y1,x0,a
+	case 1847: { // macuu +y1,x0,a
 		unhandled("macuu +y1,x0,a");
 		break;
 		}
-	case 1850: { // macuu +x0,y0,a
+	case 1848: { // macuu +x0,y0,a
 		unhandled("macuu +x0,y0,a");
 		break;
 		}
-	case 1851: { // macuu +y0,x1,a
+	case 1849: { // macuu +y0,x1,a
 		unhandled("macuu +y0,x1,a");
 		break;
 		}
-	case 1852: { // macuu +x1,y1,a
+	case 1850: { // macuu +x1,y1,a
 		unhandled("macuu +x1,y1,a");
 		break;
 		}
-	case 1853: { // macuu -x0,x0,a
+	case 1851: { // macuu -x0,x0,a
 		unhandled("macuu -x0,x0,a");
 		break;
 		}
-	case 1854: { // macuu -y0,y0,a
+	case 1852: { // macuu -y0,y0,a
 		unhandled("macuu -y0,y0,a");
 		break;
 		}
-	case 1855: { // macuu -x1,x0,a
+	case 1853: { // macuu -x1,x0,a
 		unhandled("macuu -x1,x0,a");
 		break;
 		}
-	case 1856: { // macuu -y1,y0,a
+	case 1854: { // macuu -y1,y0,a
 		unhandled("macuu -y1,y0,a");
 		break;
 		}
-	case 1857: { // macuu -x1,x1,a
+	case 1855: { // macuu -x1,x1,a
 		unhandled("macuu -x1,x1,a");
 		break;
 		}
-	case 1858: { // macuu -y1,y1,a
+	case 1856: { // macuu -y1,y1,a
 		unhandled("macuu -y1,y1,a");
 		break;
 		}
-	case 1859: { // macuu -x0,x1,a
+	case 1857: { // macuu -x0,x1,a
 		unhandled("macuu -x0,x1,a");
 		break;
 		}
-	case 1860: { // macuu -y0,y1,a
+	case 1858: { // macuu -y0,y1,a
 		unhandled("macuu -y0,y1,a");
 		break;
 		}
-	case 1861: { // macuu -x0,y1,a
+	case 1859: { // macuu -x0,y1,a
 		unhandled("macuu -x0,y1,a");
 		break;
 		}
-	case 1862: { // macuu -y0,x0,a
+	case 1860: { // macuu -y0,x0,a
 		unhandled("macuu -y0,x0,a");
 		break;
 		}
-	case 1863: { // macuu -x1,y0,a
+	case 1861: { // macuu -x1,y0,a
 		unhandled("macuu -x1,y0,a");
 		break;
 		}
-	case 1864: { // macuu -y1,x1,a
+	case 1862: { // macuu -y1,x1,a
 		unhandled("macuu -y1,x1,a");
 		break;
 		}
-	case 1865: { // macuu -y1,x0,a
+	case 1863: { // macuu -y1,x0,a
 		unhandled("macuu -y1,x0,a");
 		break;
 		}
-	case 1866: { // macuu -x0,y0,a
+	case 1864: { // macuu -x0,y0,a
 		unhandled("macuu -x0,y0,a");
 		break;
 		}
-	case 1867: { // macuu -y0,x1,a
+	case 1865: { // macuu -y0,x1,a
 		unhandled("macuu -y0,x1,a");
 		break;
 		}
-	case 1868: { // macuu -x1,y1,a
+	case 1866: { // macuu -x1,y1,a
 		unhandled("macuu -x1,y1,a");
 		break;
 		}
-	case 1869: { // macuu +x0,x0,b
+	case 1867: { // macuu +x0,x0,b
 		unhandled("macuu +x0,x0,b");
 		break;
 		}
-	case 1870: { // macuu +y0,y0,b
+	case 1868: { // macuu +y0,y0,b
 		unhandled("macuu +y0,y0,b");
 		break;
 		}
-	case 1871: { // macuu +x1,x0,b
+	case 1869: { // macuu +x1,x0,b
 		unhandled("macuu +x1,x0,b");
 		break;
 		}
-	case 1872: { // macuu +y1,y0,b
+	case 1870: { // macuu +y1,y0,b
 		unhandled("macuu +y1,y0,b");
 		break;
 		}
-	case 1873: { // macuu +x1,x1,b
+	case 1871: { // macuu +x1,x1,b
 		unhandled("macuu +x1,x1,b");
 		break;
 		}
-	case 1874: { // macuu +y1,y1,b
+	case 1872: { // macuu +y1,y1,b
 		unhandled("macuu +y1,y1,b");
 		break;
 		}
-	case 1875: { // macuu +x0,x1,b
+	case 1873: { // macuu +x0,x1,b
 		unhandled("macuu +x0,x1,b");
 		break;
 		}
-	case 1876: { // macuu +y0,y1,b
+	case 1874: { // macuu +y0,y1,b
 		unhandled("macuu +y0,y1,b");
 		break;
 		}
-	case 1877: { // macuu +x0,y1,b
+	case 1875: { // macuu +x0,y1,b
 		unhandled("macuu +x0,y1,b");
 		break;
 		}
-	case 1878: { // macuu +y0,x0,b
+	case 1876: { // macuu +y0,x0,b
 		unhandled("macuu +y0,x0,b");
 		break;
 		}
-	case 1879: { // macuu +x1,y0,b
+	case 1877: { // macuu +x1,y0,b
 		unhandled("macuu +x1,y0,b");
 		break;
 		}
-	case 1880: { // macuu +y1,x1,b
+	case 1878: { // macuu +y1,x1,b
 		unhandled("macuu +y1,x1,b");
 		break;
 		}
-	case 1881: { // macuu +y1,x0,b
+	case 1879: { // macuu +y1,x0,b
 		unhandled("macuu +y1,x0,b");
 		break;
 		}
-	case 1882: { // macuu +x0,y0,b
+	case 1880: { // macuu +x0,y0,b
 		unhandled("macuu +x0,y0,b");
 		break;
 		}
-	case 1883: { // macuu +y0,x1,b
+	case 1881: { // macuu +y0,x1,b
 		unhandled("macuu +y0,x1,b");
 		break;
 		}
-	case 1884: { // macuu +x1,y1,b
+	case 1882: { // macuu +x1,y1,b
 		unhandled("macuu +x1,y1,b");
 		break;
 		}
-	case 1885: { // macuu -x0,x0,b
+	case 1883: { // macuu -x0,x0,b
 		unhandled("macuu -x0,x0,b");
 		break;
 		}
-	case 1886: { // macuu -y0,y0,b
+	case 1884: { // macuu -y0,y0,b
 		unhandled("macuu -y0,y0,b");
 		break;
 		}
-	case 1887: { // macuu -x1,x0,b
+	case 1885: { // macuu -x1,x0,b
 		unhandled("macuu -x1,x0,b");
 		break;
 		}
-	case 1888: { // macuu -y1,y0,b
+	case 1886: { // macuu -y1,y0,b
 		unhandled("macuu -y1,y0,b");
 		break;
 		}
-	case 1889: { // macuu -x1,x1,b
+	case 1887: { // macuu -x1,x1,b
 		unhandled("macuu -x1,x1,b");
 		break;
 		}
-	case 1890: { // macuu -y1,y1,b
+	case 1888: { // macuu -y1,y1,b
 		unhandled("macuu -y1,y1,b");
 		break;
 		}
-	case 1891: { // macuu -x0,x1,b
+	case 1889: { // macuu -x0,x1,b
 		unhandled("macuu -x0,x1,b");
 		break;
 		}
-	case 1892: { // macuu -y0,y1,b
+	case 1890: { // macuu -y0,y1,b
 		unhandled("macuu -y0,y1,b");
 		break;
 		}
-	case 1893: { // macuu -x0,y1,b
+	case 1891: { // macuu -x0,y1,b
 		unhandled("macuu -x0,y1,b");
 		break;
 		}
-	case 1894: { // macuu -y0,x0,b
+	case 1892: { // macuu -y0,x0,b
 		unhandled("macuu -y0,x0,b");
 		break;
 		}
-	case 1895: { // macuu -x1,y0,b
+	case 1893: { // macuu -x1,y0,b
 		unhandled("macuu -x1,y0,b");
 		break;
 		}
-	case 1896: { // macuu -y1,x1,b
+	case 1894: { // macuu -y1,x1,b
 		unhandled("macuu -y1,x1,b");
 		break;
 		}
-	case 1897: { // macuu -y1,x0,b
+	case 1895: { // macuu -y1,x0,b
 		unhandled("macuu -y1,x0,b");
 		break;
 		}
-	case 1898: { // macuu -x0,y0,b
+	case 1896: { // macuu -x0,y0,b
 		unhandled("macuu -x0,y0,b");
 		break;
 		}
-	case 1899: { // macuu -y0,x1,b
+	case 1897: { // macuu -y0,x1,b
 		unhandled("macuu -y0,x1,b");
 		break;
 		}
-	case 1900: { // macuu -x1,y1,b
+	case 1898: { // macuu -x1,y1,b
 		unhandled("macuu -x1,y1,b");
 		break;
 		}
-	case 1901: { // maccr +y1,#[i],a
+	case 1899: { // maccr +y1,#[i],a
 		unhandled("maccr +y1,#[i],a");
 		break;
 		}
-	case 1902: { // maccr -y1,#[i],a
+	case 1900: { // maccr -y1,#[i],a
 		unhandled("maccr -y1,#[i],a");
 		break;
 		}
-	case 1903: { // maccr +y1,#[i],b
+	case 1901: { // maccr +y1,#[i],b
 		unhandled("maccr +y1,#[i],b");
 		break;
 		}
-	case 1904: { // maccr -y1,#[i],b
+	case 1902: { // maccr -y1,#[i],b
 		unhandled("maccr -y1,#[i],b");
 		break;
 		}
-	case 1905: { // maccr +x0,#[i],a
+	case 1903: { // maccr +x0,#[i],a
 		unhandled("maccr +x0,#[i],a");
 		break;
 		}
-	case 1906: { // maccr -x0,#[i],a
+	case 1904: { // maccr -x0,#[i],a
 		unhandled("maccr -x0,#[i],a");
 		break;
 		}
-	case 1907: { // maccr +x0,#[i],b
+	case 1905: { // maccr +x0,#[i],b
 		unhandled("maccr +x0,#[i],b");
 		break;
 		}
-	case 1908: { // maccr -x0,#[i],b
+	case 1906: { // maccr -x0,#[i],b
 		unhandled("maccr -x0,#[i],b");
 		break;
 		}
-	case 1909: { // maccr +y0,#[i],a
+	case 1907: { // maccr +y0,#[i],a
 		unhandled("maccr +y0,#[i],a");
 		break;
 		}
-	case 1910: { // maccr -y0,#[i],a
+	case 1908: { // maccr -y0,#[i],a
 		unhandled("maccr -y0,#[i],a");
 		break;
 		}
-	case 1911: { // maccr +y0,#[i],b
+	case 1909: { // maccr +y0,#[i],b
 		unhandled("maccr +y0,#[i],b");
 		break;
 		}
-	case 1912: { // maccr -y0,#[i],b
+	case 1910: { // maccr -y0,#[i],b
 		unhandled("maccr -y0,#[i],b");
 		break;
 		}
-	case 1913: { // maccr +x1,#[i],a
+	case 1911: { // maccr +x1,#[i],a
 		unhandled("maccr +x1,#[i],a");
 		break;
 		}
-	case 1914: { // maccr -x1,#[i],a
+	case 1912: { // maccr -x1,#[i],a
 		unhandled("maccr -x1,#[i],a");
 		break;
 		}
-	case 1915: { // maccr +x1,#[i],b
+	case 1913: { // maccr +x1,#[i],b
 		unhandled("maccr +x1,#[i],b");
 		break;
 		}
-	case 1916: { // maccr -x1,#[i],b
+	case 1914: { // maccr -x1,#[i],b
 		unhandled("maccr -x1,#[i],b");
 		break;
 		}
-	case 1917: { // macri +#[i],y1,a
+	case 1915: { // macri +#[i],y1,a
 		unhandled("macri +#[i],y1,a");
 		break;
 		}
-	case 1918: { // macri -#[i],y1,a
+	case 1916: { // macri -#[i],y1,a
 		unhandled("macri -#[i],y1,a");
 		break;
 		}
-	case 1919: { // macri +#[i],y1,b
+	case 1917: { // macri +#[i],y1,b
 		unhandled("macri +#[i],y1,b");
 		break;
 		}
-	case 1920: { // macri -#[i],y1,b
+	case 1918: { // macri -#[i],y1,b
 		unhandled("macri -#[i],y1,b");
 		break;
 		}
-	case 1921: { // macri +#[i],x0,a
+	case 1919: { // macri +#[i],x0,a
 		unhandled("macri +#[i],x0,a");
 		break;
 		}
-	case 1922: { // macri -#[i],x0,a
+	case 1920: { // macri -#[i],x0,a
 		unhandled("macri -#[i],x0,a");
 		break;
 		}
-	case 1923: { // macri +#[i],x0,b
+	case 1921: { // macri +#[i],x0,b
 		unhandled("macri +#[i],x0,b");
 		break;
 		}
-	case 1924: { // macri -#[i],x0,b
+	case 1922: { // macri -#[i],x0,b
 		unhandled("macri -#[i],x0,b");
 		break;
 		}
-	case 1925: { // macri +#[i],y0,a
+	case 1923: { // macri +#[i],y0,a
 		unhandled("macri +#[i],y0,a");
 		break;
 		}
-	case 1926: { // macri -#[i],y0,a
+	case 1924: { // macri -#[i],y0,a
 		unhandled("macri -#[i],y0,a");
 		break;
 		}
-	case 1927: { // macri +#[i],y0,b
+	case 1925: { // macri +#[i],y0,b
 		unhandled("macri +#[i],y0,b");
 		break;
 		}
-	case 1928: { // macri -#[i],y0,b
+	case 1926: { // macri -#[i],y0,b
 		unhandled("macri -#[i],y0,b");
 		break;
 		}
-	case 1929: { // macri +#[i],x1,a
+	case 1927: { // macri +#[i],x1,a
 		unhandled("macri +#[i],x1,a");
 		break;
 		}
-	case 1930: { // macri -#[i],x1,a
+	case 1928: { // macri -#[i],x1,a
 		unhandled("macri -#[i],x1,a");
 		break;
 		}
-	case 1931: { // macri +#[i],x1,b
+	case 1929: { // macri +#[i],x1,b
 		unhandled("macri +#[i],x1,b");
 		break;
 		}
-	case 1932: { // macri -#[i],x1,b
+	case 1930: { // macri -#[i],x1,b
 		unhandled("macri -#[i],x1,b");
 		break;
 		}
-	case 1933: { // merge a1,a
+	case 1931: { // merge a1,a
 		unhandled("merge a1,a");
 		break;
 		}
-	case 1934: { // merge a1,b
+	case 1932: { // merge a1,b
 		unhandled("merge a1,b");
 		break;
 		}
-	case 1935: { // merge b1,a
+	case 1933: { // merge b1,a
 		unhandled("merge b1,a");
 		break;
 		}
-	case 1936: { // merge b1,b
+	case 1934: { // merge b1,b
 		unhandled("merge b1,b");
 		break;
 		}
-	case 1937: { // merge x0,a
+	case 1935: { // merge x0,a
 		unhandled("merge x0,a");
 		break;
 		}
-	case 1938: { // merge x0,b
+	case 1936: { // merge x0,b
 		unhandled("merge x0,b");
 		break;
 		}
-	case 1939: { // merge y0,a
+	case 1937: { // merge y0,a
 		unhandled("merge y0,a");
 		break;
 		}
-	case 1940: { // merge y0,b
+	case 1938: { // merge y0,b
 		unhandled("merge y0,b");
 		break;
 		}
-	case 1941: { // merge x1,a
+	case 1939: { // merge x1,a
 		unhandled("merge x1,a");
 		break;
 		}
-	case 1942: { // merge x1,b
+	case 1940: { // merge x1,b
 		unhandled("merge x1,b");
 		break;
 		}
-	case 1943: { // merge y1,a
+	case 1941: { // merge y1,a
 		unhandled("merge y1,a");
 		break;
 		}
-	case 1944: { // merge y1,b
+	case 1942: { // merge y1,b
 		unhandled("merge y1,b");
 		break;
 		}
-	case 1945: { // movec x:(r)-n,m
+	case 1943: { // movec x:(r)-n,m
 		unhandled("movec x:(r)-n,m");
 		break;
 		}
-	case 1946: { // movec x:(r)-n,ep
+	case 1944: { // movec x:(r)-n,ep
 		unhandled("movec x:(r)-n,ep");
 		break;
 		}
-	case 1947: { // movec x:(r)-n,vba
+	case 1945: { // movec x:(r)-n,vba
 		unhandled("movec x:(r)-n,vba");
 		break;
 		}
-	case 1948: { // movec x:(r)-n,sc
+	case 1946: { // movec x:(r)-n,sc
 		unhandled("movec x:(r)-n,sc");
 		break;
 		}
-	case 1949: { // movec x:(r)-n,sz
+	case 1947: { // movec x:(r)-n,sz
 		unhandled("movec x:(r)-n,sz");
 		break;
 		}
-	case 1950: { // movec x:(r)-n,sr
+	case 1948: { // movec x:(r)-n,sr
 		unhandled("movec x:(r)-n,sr");
 		break;
 		}
-	case 1951: { // movec x:(r)-n,omr
+	case 1949: { // movec x:(r)-n,omr
 		unhandled("movec x:(r)-n,omr");
 		break;
 		}
-	case 1952: { // movec x:(r)-n,sp
+	case 1950: { // movec x:(r)-n,sp
 		unhandled("movec x:(r)-n,sp");
 		break;
 		}
-	case 1953: { // movec x:(r)-n,ssh
+	case 1951: { // movec x:(r)-n,ssh
 		unhandled("movec x:(r)-n,ssh");
 		break;
 		}
-	case 1954: { // movec x:(r)-n,ssl
+	case 1952: { // movec x:(r)-n,ssl
 		unhandled("movec x:(r)-n,ssl");
 		break;
 		}
-	case 1955: { // movec x:(r)-n,la
+	case 1953: { // movec x:(r)-n,la
 		unhandled("movec x:(r)-n,la");
 		break;
 		}
-	case 1956: { // movec x:(r)-n,lc
+	case 1954: { // movec x:(r)-n,lc
 		unhandled("movec x:(r)-n,lc");
 		break;
 		}
-	case 1957: { // movec y:(r)-n,m
+	case 1955: { // movec y:(r)-n,m
 		unhandled("movec y:(r)-n,m");
 		break;
 		}
-	case 1958: { // movec y:(r)-n,ep
+	case 1956: { // movec y:(r)-n,ep
 		unhandled("movec y:(r)-n,ep");
 		break;
 		}
-	case 1959: { // movec y:(r)-n,vba
+	case 1957: { // movec y:(r)-n,vba
 		unhandled("movec y:(r)-n,vba");
 		break;
 		}
-	case 1960: { // movec y:(r)-n,sc
+	case 1958: { // movec y:(r)-n,sc
 		unhandled("movec y:(r)-n,sc");
 		break;
 		}
-	case 1961: { // movec y:(r)-n,sz
+	case 1959: { // movec y:(r)-n,sz
 		unhandled("movec y:(r)-n,sz");
 		break;
 		}
-	case 1962: { // movec y:(r)-n,sr
+	case 1960: { // movec y:(r)-n,sr
 		unhandled("movec y:(r)-n,sr");
 		break;
 		}
-	case 1963: { // movec y:(r)-n,omr
+	case 1961: { // movec y:(r)-n,omr
 		unhandled("movec y:(r)-n,omr");
 		break;
 		}
-	case 1964: { // movec y:(r)-n,sp
+	case 1962: { // movec y:(r)-n,sp
 		unhandled("movec y:(r)-n,sp");
 		break;
 		}
-	case 1965: { // movec y:(r)-n,ssh
+	case 1963: { // movec y:(r)-n,ssh
 		unhandled("movec y:(r)-n,ssh");
 		break;
 		}
-	case 1966: { // movec y:(r)-n,ssl
+	case 1964: { // movec y:(r)-n,ssl
 		unhandled("movec y:(r)-n,ssl");
 		break;
 		}
-	case 1967: { // movec y:(r)-n,la
+	case 1965: { // movec y:(r)-n,la
 		unhandled("movec y:(r)-n,la");
 		break;
 		}
-	case 1968: { // movec y:(r)-n,lc
+	case 1966: { // movec y:(r)-n,lc
 		unhandled("movec y:(r)-n,lc");
 		break;
 		}
-	case 1969: { // movec x:(r)+n,m
+	case 1967: { // movec x:(r)+n,m
 		unhandled("movec x:(r)+n,m");
 		break;
 		}
-	case 1970: { // movec x:(r)+n,ep
+	case 1968: { // movec x:(r)+n,ep
 		unhandled("movec x:(r)+n,ep");
 		break;
 		}
-	case 1971: { // movec x:(r)+n,vba
+	case 1969: { // movec x:(r)+n,vba
 		unhandled("movec x:(r)+n,vba");
 		break;
 		}
-	case 1972: { // movec x:(r)+n,sc
+	case 1970: { // movec x:(r)+n,sc
 		unhandled("movec x:(r)+n,sc");
 		break;
 		}
-	case 1973: { // movec x:(r)+n,sz
+	case 1971: { // movec x:(r)+n,sz
 		unhandled("movec x:(r)+n,sz");
 		break;
 		}
-	case 1974: { // movec x:(r)+n,sr
+	case 1972: { // movec x:(r)+n,sr
 		unhandled("movec x:(r)+n,sr");
 		break;
 		}
-	case 1975: { // movec x:(r)+n,omr
+	case 1973: { // movec x:(r)+n,omr
 		unhandled("movec x:(r)+n,omr");
 		break;
 		}
-	case 1976: { // movec x:(r)+n,sp
+	case 1974: { // movec x:(r)+n,sp
 		unhandled("movec x:(r)+n,sp");
 		break;
 		}
-	case 1977: { // movec x:(r)+n,ssh
+	case 1975: { // movec x:(r)+n,ssh
 		unhandled("movec x:(r)+n,ssh");
 		break;
 		}
-	case 1978: { // movec x:(r)+n,ssl
+	case 1976: { // movec x:(r)+n,ssl
 		unhandled("movec x:(r)+n,ssl");
 		break;
 		}
-	case 1979: { // movec x:(r)+n,la
+	case 1977: { // movec x:(r)+n,la
 		unhandled("movec x:(r)+n,la");
 		break;
 		}
-	case 1980: { // movec x:(r)+n,lc
+	case 1978: { // movec x:(r)+n,lc
 		unhandled("movec x:(r)+n,lc");
 		break;
 		}
-	case 1981: { // movec y:(r)+n,m
+	case 1979: { // movec y:(r)+n,m
 		unhandled("movec y:(r)+n,m");
 		break;
 		}
-	case 1982: { // movec y:(r)+n,ep
+	case 1980: { // movec y:(r)+n,ep
 		unhandled("movec y:(r)+n,ep");
 		break;
 		}
-	case 1983: { // movec y:(r)+n,vba
+	case 1981: { // movec y:(r)+n,vba
 		unhandled("movec y:(r)+n,vba");
 		break;
 		}
-	case 1984: { // movec y:(r)+n,sc
+	case 1982: { // movec y:(r)+n,sc
 		unhandled("movec y:(r)+n,sc");
 		break;
 		}
-	case 1985: { // movec y:(r)+n,sz
+	case 1983: { // movec y:(r)+n,sz
 		unhandled("movec y:(r)+n,sz");
 		break;
 		}
-	case 1986: { // movec y:(r)+n,sr
+	case 1984: { // movec y:(r)+n,sr
 		unhandled("movec y:(r)+n,sr");
 		break;
 		}
-	case 1987: { // movec y:(r)+n,omr
+	case 1985: { // movec y:(r)+n,omr
 		unhandled("movec y:(r)+n,omr");
 		break;
 		}
-	case 1988: { // movec y:(r)+n,sp
+	case 1986: { // movec y:(r)+n,sp
 		unhandled("movec y:(r)+n,sp");
 		break;
 		}
-	case 1989: { // movec y:(r)+n,ssh
+	case 1987: { // movec y:(r)+n,ssh
 		unhandled("movec y:(r)+n,ssh");
 		break;
 		}
-	case 1990: { // movec y:(r)+n,ssl
+	case 1988: { // movec y:(r)+n,ssl
 		unhandled("movec y:(r)+n,ssl");
 		break;
 		}
-	case 1991: { // movec y:(r)+n,la
+	case 1989: { // movec y:(r)+n,la
 		unhandled("movec y:(r)+n,la");
 		break;
 		}
-	case 1992: { // movec y:(r)+n,lc
+	case 1990: { // movec y:(r)+n,lc
 		unhandled("movec y:(r)+n,lc");
 		break;
 		}
-	case 1993: { // movec x:(r)-,m
+	case 1991: { // movec x:(r)-,m
 		unhandled("movec x:(r)-,m");
 		break;
 		}
-	case 1994: { // movec x:(r)-,ep
+	case 1992: { // movec x:(r)-,ep
 		unhandled("movec x:(r)-,ep");
 		break;
 		}
-	case 1995: { // movec x:(r)-,vba
+	case 1993: { // movec x:(r)-,vba
 		unhandled("movec x:(r)-,vba");
 		break;
 		}
-	case 1996: { // movec x:(r)-,sc
+	case 1994: { // movec x:(r)-,sc
 		unhandled("movec x:(r)-,sc");
 		break;
 		}
-	case 1997: { // movec x:(r)-,sz
+	case 1995: { // movec x:(r)-,sz
 		unhandled("movec x:(r)-,sz");
 		break;
 		}
-	case 1998: { // movec x:(r)-,sr
+	case 1996: { // movec x:(r)-,sr
 		unhandled("movec x:(r)-,sr");
 		break;
 		}
-	case 1999: { // movec x:(r)-,omr
+	case 1997: { // movec x:(r)-,omr
 		unhandled("movec x:(r)-,omr");
 		break;
 		}
-	case 2000: { // movec x:(r)-,sp
+	case 1998: { // movec x:(r)-,sp
 		unhandled("movec x:(r)-,sp");
 		break;
 		}
-	case 2001: { // movec x:(r)-,ssh
+	case 1999: { // movec x:(r)-,ssh
 		unhandled("movec x:(r)-,ssh");
 		break;
 		}
-	case 2002: { // movec x:(r)-,ssl
+	case 2000: { // movec x:(r)-,ssl
 		unhandled("movec x:(r)-,ssl");
 		break;
 		}
-	case 2003: { // movec x:(r)-,la
+	case 2001: { // movec x:(r)-,la
 		unhandled("movec x:(r)-,la");
 		break;
 		}
-	case 2004: { // movec x:(r)-,lc
+	case 2002: { // movec x:(r)-,lc
 		unhandled("movec x:(r)-,lc");
 		break;
 		}
-	case 2005: { // movec y:(r)-,m
+	case 2003: { // movec y:(r)-,m
 		unhandled("movec y:(r)-,m");
 		break;
 		}
-	case 2006: { // movec y:(r)-,ep
+	case 2004: { // movec y:(r)-,ep
 		unhandled("movec y:(r)-,ep");
 		break;
 		}
-	case 2007: { // movec y:(r)-,vba
+	case 2005: { // movec y:(r)-,vba
 		unhandled("movec y:(r)-,vba");
 		break;
 		}
-	case 2008: { // movec y:(r)-,sc
+	case 2006: { // movec y:(r)-,sc
 		unhandled("movec y:(r)-,sc");
 		break;
 		}
-	case 2009: { // movec y:(r)-,sz
+	case 2007: { // movec y:(r)-,sz
 		unhandled("movec y:(r)-,sz");
 		break;
 		}
-	case 2010: { // movec y:(r)-,sr
+	case 2008: { // movec y:(r)-,sr
 		unhandled("movec y:(r)-,sr");
 		break;
 		}
-	case 2011: { // movec y:(r)-,omr
+	case 2009: { // movec y:(r)-,omr
 		unhandled("movec y:(r)-,omr");
 		break;
 		}
-	case 2012: { // movec y:(r)-,sp
+	case 2010: { // movec y:(r)-,sp
 		unhandled("movec y:(r)-,sp");
 		break;
 		}
-	case 2013: { // movec y:(r)-,ssh
+	case 2011: { // movec y:(r)-,ssh
 		unhandled("movec y:(r)-,ssh");
 		break;
 		}
-	case 2014: { // movec y:(r)-,ssl
+	case 2012: { // movec y:(r)-,ssl
 		unhandled("movec y:(r)-,ssl");
 		break;
 		}
-	case 2015: { // movec y:(r)-,la
+	case 2013: { // movec y:(r)-,la
 		unhandled("movec y:(r)-,la");
 		break;
 		}
-	case 2016: { // movec y:(r)-,lc
+	case 2014: { // movec y:(r)-,lc
 		unhandled("movec y:(r)-,lc");
 		break;
 		}
-	case 2017: { // movec x:(r)+,m
+	case 2015: { // movec x:(r)+,m
 		unhandled("movec x:(r)+,m");
 		break;
 		}
-	case 2018: { // movec x:(r)+,ep
+	case 2016: { // movec x:(r)+,ep
 		unhandled("movec x:(r)+,ep");
 		break;
 		}
-	case 2019: { // movec x:(r)+,vba
+	case 2017: { // movec x:(r)+,vba
 		unhandled("movec x:(r)+,vba");
 		break;
 		}
-	case 2020: { // movec x:(r)+,sc
+	case 2018: { // movec x:(r)+,sc
 		unhandled("movec x:(r)+,sc");
 		break;
 		}
-	case 2021: { // movec x:(r)+,sz
+	case 2019: { // movec x:(r)+,sz
 		unhandled("movec x:(r)+,sz");
 		break;
 		}
-	case 2022: { // movec x:(r)+,sr
+	case 2020: { // movec x:(r)+,sr
 		unhandled("movec x:(r)+,sr");
 		break;
 		}
-	case 2023: { // movec x:(r)+,omr
+	case 2021: { // movec x:(r)+,omr
 		unhandled("movec x:(r)+,omr");
 		break;
 		}
-	case 2024: { // movec x:(r)+,sp
+	case 2022: { // movec x:(r)+,sp
 		unhandled("movec x:(r)+,sp");
 		break;
 		}
-	case 2025: { // movec x:(r)+,ssh
+	case 2023: { // movec x:(r)+,ssh
 		unhandled("movec x:(r)+,ssh");
 		break;
 		}
-	case 2026: { // movec x:(r)+,ssl
+	case 2024: { // movec x:(r)+,ssl
 		unhandled("movec x:(r)+,ssl");
 		break;
 		}
-	case 2027: { // movec x:(r)+,la
+	case 2025: { // movec x:(r)+,la
 		unhandled("movec x:(r)+,la");
 		break;
 		}
-	case 2028: { // movec x:(r)+,lc
+	case 2026: { // movec x:(r)+,lc
 		unhandled("movec x:(r)+,lc");
 		break;
 		}
-	case 2029: { // movec y:(r)+,m
+	case 2027: { // movec y:(r)+,m
 		unhandled("movec y:(r)+,m");
 		break;
 		}
-	case 2030: { // movec y:(r)+,ep
+	case 2028: { // movec y:(r)+,ep
 		unhandled("movec y:(r)+,ep");
 		break;
 		}
-	case 2031: { // movec y:(r)+,vba
+	case 2029: { // movec y:(r)+,vba
 		unhandled("movec y:(r)+,vba");
 		break;
 		}
-	case 2032: { // movec y:(r)+,sc
+	case 2030: { // movec y:(r)+,sc
 		unhandled("movec y:(r)+,sc");
 		break;
 		}
-	case 2033: { // movec y:(r)+,sz
+	case 2031: { // movec y:(r)+,sz
 		unhandled("movec y:(r)+,sz");
 		break;
 		}
-	case 2034: { // movec y:(r)+,sr
+	case 2032: { // movec y:(r)+,sr
 		unhandled("movec y:(r)+,sr");
 		break;
 		}
-	case 2035: { // movec y:(r)+,omr
+	case 2033: { // movec y:(r)+,omr
 		unhandled("movec y:(r)+,omr");
 		break;
 		}
-	case 2036: { // movec y:(r)+,sp
+	case 2034: { // movec y:(r)+,sp
 		unhandled("movec y:(r)+,sp");
 		break;
 		}
-	case 2037: { // movec y:(r)+,ssh
+	case 2035: { // movec y:(r)+,ssh
 		unhandled("movec y:(r)+,ssh");
 		break;
 		}
-	case 2038: { // movec y:(r)+,ssl
+	case 2036: { // movec y:(r)+,ssl
 		unhandled("movec y:(r)+,ssl");
 		break;
 		}
-	case 2039: { // movec y:(r)+,la
+	case 2037: { // movec y:(r)+,la
 		unhandled("movec y:(r)+,la");
 		break;
 		}
-	case 2040: { // movec y:(r)+,lc
+	case 2038: { // movec y:(r)+,lc
 		unhandled("movec y:(r)+,lc");
 		break;
 		}
-	case 2041: { // movec x:(r),m
+	case 2039: { // movec x:(r),m
 		unhandled("movec x:(r),m");
 		break;
 		}
-	case 2042: { // movec x:(r),ep
+	case 2040: { // movec x:(r),ep
 		unhandled("movec x:(r),ep");
 		break;
 		}
-	case 2043: { // movec x:(r),vba
+	case 2041: { // movec x:(r),vba
 		unhandled("movec x:(r),vba");
 		break;
 		}
-	case 2044: { // movec x:(r),sc
+	case 2042: { // movec x:(r),sc
 		unhandled("movec x:(r),sc");
 		break;
 		}
-	case 2045: { // movec x:(r),sz
+	case 2043: { // movec x:(r),sz
 		unhandled("movec x:(r),sz");
 		break;
 		}
-	case 2046: { // movec x:(r),sr
+	case 2044: { // movec x:(r),sr
 		unhandled("movec x:(r),sr");
 		break;
 		}
-	case 2047: { // movec x:(r),omr
+	case 2045: { // movec x:(r),omr
 		unhandled("movec x:(r),omr");
 		break;
 		}
-	case 2048: { // movec x:(r),sp
+	case 2046: { // movec x:(r),sp
 		unhandled("movec x:(r),sp");
 		break;
 		}
-	case 2049: { // movec x:(r),ssh
+	case 2047: { // movec x:(r),ssh
 		unhandled("movec x:(r),ssh");
 		break;
 		}
-	case 2050: { // movec x:(r),ssl
+	case 2048: { // movec x:(r),ssl
 		unhandled("movec x:(r),ssl");
 		break;
 		}
-	case 2051: { // movec x:(r),la
+	case 2049: { // movec x:(r),la
 		unhandled("movec x:(r),la");
 		break;
 		}
-	case 2052: { // movec x:(r),lc
+	case 2050: { // movec x:(r),lc
 		unhandled("movec x:(r),lc");
 		break;
 		}
-	case 2053: { // movec y:(r),m
+	case 2051: { // movec y:(r),m
 		unhandled("movec y:(r),m");
 		break;
 		}
-	case 2054: { // movec y:(r),ep
+	case 2052: { // movec y:(r),ep
 		unhandled("movec y:(r),ep");
 		break;
 		}
-	case 2055: { // movec y:(r),vba
+	case 2053: { // movec y:(r),vba
 		unhandled("movec y:(r),vba");
 		break;
 		}
-	case 2056: { // movec y:(r),sc
+	case 2054: { // movec y:(r),sc
 		unhandled("movec y:(r),sc");
 		break;
 		}
-	case 2057: { // movec y:(r),sz
+	case 2055: { // movec y:(r),sz
 		unhandled("movec y:(r),sz");
 		break;
 		}
-	case 2058: { // movec y:(r),sr
+	case 2056: { // movec y:(r),sr
 		unhandled("movec y:(r),sr");
 		break;
 		}
-	case 2059: { // movec y:(r),omr
+	case 2057: { // movec y:(r),omr
 		unhandled("movec y:(r),omr");
 		break;
 		}
-	case 2060: { // movec y:(r),sp
+	case 2058: { // movec y:(r),sp
 		unhandled("movec y:(r),sp");
 		break;
 		}
-	case 2061: { // movec y:(r),ssh
+	case 2059: { // movec y:(r),ssh
 		unhandled("movec y:(r),ssh");
 		break;
 		}
-	case 2062: { // movec y:(r),ssl
+	case 2060: { // movec y:(r),ssl
 		unhandled("movec y:(r),ssl");
 		break;
 		}
-	case 2063: { // movec y:(r),la
+	case 2061: { // movec y:(r),la
 		unhandled("movec y:(r),la");
 		break;
 		}
-	case 2064: { // movec y:(r),lc
+	case 2062: { // movec y:(r),lc
 		unhandled("movec y:(r),lc");
 		break;
 		}
-	case 2065: { // movec x:(r+n),m
+	case 2063: { // movec x:(r+n),m
 		unhandled("movec x:(r+n),m");
 		break;
 		}
-	case 2066: { // movec x:(r+n),ep
+	case 2064: { // movec x:(r+n),ep
 		unhandled("movec x:(r+n),ep");
 		break;
 		}
-	case 2067: { // movec x:(r+n),vba
+	case 2065: { // movec x:(r+n),vba
 		unhandled("movec x:(r+n),vba");
 		break;
 		}
-	case 2068: { // movec x:(r+n),sc
+	case 2066: { // movec x:(r+n),sc
 		unhandled("movec x:(r+n),sc");
 		break;
 		}
-	case 2069: { // movec x:(r+n),sz
+	case 2067: { // movec x:(r+n),sz
 		unhandled("movec x:(r+n),sz");
 		break;
 		}
-	case 2070: { // movec x:(r+n),sr
+	case 2068: { // movec x:(r+n),sr
 		unhandled("movec x:(r+n),sr");
 		break;
 		}
-	case 2071: { // movec x:(r+n),omr
+	case 2069: { // movec x:(r+n),omr
 		unhandled("movec x:(r+n),omr");
 		break;
 		}
-	case 2072: { // movec x:(r+n),sp
+	case 2070: { // movec x:(r+n),sp
 		unhandled("movec x:(r+n),sp");
 		break;
 		}
-	case 2073: { // movec x:(r+n),ssh
+	case 2071: { // movec x:(r+n),ssh
 		unhandled("movec x:(r+n),ssh");
 		break;
 		}
-	case 2074: { // movec x:(r+n),ssl
+	case 2072: { // movec x:(r+n),ssl
 		unhandled("movec x:(r+n),ssl");
 		break;
 		}
-	case 2075: { // movec x:(r+n),la
+	case 2073: { // movec x:(r+n),la
 		unhandled("movec x:(r+n),la");
 		break;
 		}
-	case 2076: { // movec x:(r+n),lc
+	case 2074: { // movec x:(r+n),lc
 		unhandled("movec x:(r+n),lc");
 		break;
 		}
-	case 2077: { // movec y:(r+n),m
+	case 2075: { // movec y:(r+n),m
 		unhandled("movec y:(r+n),m");
 		break;
 		}
-	case 2078: { // movec y:(r+n),ep
+	case 2076: { // movec y:(r+n),ep
 		unhandled("movec y:(r+n),ep");
 		break;
 		}
-	case 2079: { // movec y:(r+n),vba
+	case 2077: { // movec y:(r+n),vba
 		unhandled("movec y:(r+n),vba");
 		break;
 		}
-	case 2080: { // movec y:(r+n),sc
+	case 2078: { // movec y:(r+n),sc
 		unhandled("movec y:(r+n),sc");
 		break;
 		}
-	case 2081: { // movec y:(r+n),sz
+	case 2079: { // movec y:(r+n),sz
 		unhandled("movec y:(r+n),sz");
 		break;
 		}
-	case 2082: { // movec y:(r+n),sr
+	case 2080: { // movec y:(r+n),sr
 		unhandled("movec y:(r+n),sr");
 		break;
 		}
-	case 2083: { // movec y:(r+n),omr
+	case 2081: { // movec y:(r+n),omr
 		unhandled("movec y:(r+n),omr");
 		break;
 		}
-	case 2084: { // movec y:(r+n),sp
+	case 2082: { // movec y:(r+n),sp
 		unhandled("movec y:(r+n),sp");
 		break;
 		}
-	case 2085: { // movec y:(r+n),ssh
+	case 2083: { // movec y:(r+n),ssh
 		unhandled("movec y:(r+n),ssh");
 		break;
 		}
-	case 2086: { // movec y:(r+n),ssl
+	case 2084: { // movec y:(r+n),ssl
 		unhandled("movec y:(r+n),ssl");
 		break;
 		}
-	case 2087: { // movec y:(r+n),la
+	case 2085: { // movec y:(r+n),la
 		unhandled("movec y:(r+n),la");
 		break;
 		}
-	case 2088: { // movec y:(r+n),lc
+	case 2086: { // movec y:(r+n),lc
 		unhandled("movec y:(r+n),lc");
 		break;
 		}
-	case 2089: { // movec x:-(r),m
+	case 2087: { // movec x:-(r),m
 		unhandled("movec x:-(r),m");
 		break;
 		}
-	case 2090: { // movec x:-(r),ep
+	case 2088: { // movec x:-(r),ep
 		unhandled("movec x:-(r),ep");
 		break;
 		}
-	case 2091: { // movec x:-(r),vba
+	case 2089: { // movec x:-(r),vba
 		unhandled("movec x:-(r),vba");
 		break;
 		}
-	case 2092: { // movec x:-(r),sc
+	case 2090: { // movec x:-(r),sc
 		unhandled("movec x:-(r),sc");
 		break;
 		}
-	case 2093: { // movec x:-(r),sz
+	case 2091: { // movec x:-(r),sz
 		unhandled("movec x:-(r),sz");
 		break;
 		}
-	case 2094: { // movec x:-(r),sr
+	case 2092: { // movec x:-(r),sr
 		unhandled("movec x:-(r),sr");
 		break;
 		}
-	case 2095: { // movec x:-(r),omr
+	case 2093: { // movec x:-(r),omr
 		unhandled("movec x:-(r),omr");
 		break;
 		}
-	case 2096: { // movec x:-(r),sp
+	case 2094: { // movec x:-(r),sp
 		unhandled("movec x:-(r),sp");
 		break;
 		}
-	case 2097: { // movec x:-(r),ssh
+	case 2095: { // movec x:-(r),ssh
 		unhandled("movec x:-(r),ssh");
 		break;
 		}
-	case 2098: { // movec x:-(r),ssl
+	case 2096: { // movec x:-(r),ssl
 		unhandled("movec x:-(r),ssl");
 		break;
 		}
-	case 2099: { // movec x:-(r),la
+	case 2097: { // movec x:-(r),la
 		unhandled("movec x:-(r),la");
 		break;
 		}
-	case 2100: { // movec x:-(r),lc
+	case 2098: { // movec x:-(r),lc
 		unhandled("movec x:-(r),lc");
 		break;
 		}
-	case 2101: { // movec y:-(r),m
+	case 2099: { // movec y:-(r),m
 		unhandled("movec y:-(r),m");
 		break;
 		}
-	case 2102: { // movec y:-(r),ep
+	case 2100: { // movec y:-(r),ep
 		unhandled("movec y:-(r),ep");
 		break;
 		}
-	case 2103: { // movec y:-(r),vba
+	case 2101: { // movec y:-(r),vba
 		unhandled("movec y:-(r),vba");
 		break;
 		}
-	case 2104: { // movec y:-(r),sc
+	case 2102: { // movec y:-(r),sc
 		unhandled("movec y:-(r),sc");
 		break;
 		}
-	case 2105: { // movec y:-(r),sz
+	case 2103: { // movec y:-(r),sz
 		unhandled("movec y:-(r),sz");
 		break;
 		}
-	case 2106: { // movec y:-(r),sr
+	case 2104: { // movec y:-(r),sr
 		unhandled("movec y:-(r),sr");
 		break;
 		}
-	case 2107: { // movec y:-(r),omr
+	case 2105: { // movec y:-(r),omr
 		unhandled("movec y:-(r),omr");
 		break;
 		}
-	case 2108: { // movec y:-(r),sp
+	case 2106: { // movec y:-(r),sp
 		unhandled("movec y:-(r),sp");
 		break;
 		}
-	case 2109: { // movec y:-(r),ssh
+	case 2107: { // movec y:-(r),ssh
 		unhandled("movec y:-(r),ssh");
 		break;
 		}
-	case 2110: { // movec y:-(r),ssl
+	case 2108: { // movec y:-(r),ssl
 		unhandled("movec y:-(r),ssl");
 		break;
 		}
-	case 2111: { // movec y:-(r),la
+	case 2109: { // movec y:-(r),la
 		unhandled("movec y:-(r),la");
 		break;
 		}
-	case 2112: { // movec y:-(r),lc
+	case 2110: { // movec y:-(r),lc
 		unhandled("movec y:-(r),lc");
 		break;
 		}
-	case 2113: { // movec m,x:(r)-n
+	case 2111: { // movec m,x:(r)-n
 		unhandled("movec m,x:(r)-n");
 		break;
 		}
-	case 2114: { // movec ep,x:(r)-n
+	case 2112: { // movec ep,x:(r)-n
 		unhandled("movec ep,x:(r)-n");
 		break;
 		}
-	case 2115: { // movec vba,x:(r)-n
+	case 2113: { // movec vba,x:(r)-n
 		unhandled("movec vba,x:(r)-n");
 		break;
 		}
-	case 2116: { // movec sc,x:(r)-n
+	case 2114: { // movec sc,x:(r)-n
 		unhandled("movec sc,x:(r)-n");
 		break;
 		}
-	case 2117: { // movec sz,x:(r)-n
+	case 2115: { // movec sz,x:(r)-n
 		unhandled("movec sz,x:(r)-n");
 		break;
 		}
-	case 2118: { // movec sr,x:(r)-n
+	case 2116: { // movec sr,x:(r)-n
 		unhandled("movec sr,x:(r)-n");
 		break;
 		}
-	case 2119: { // movec omr,x:(r)-n
+	case 2117: { // movec omr,x:(r)-n
 		unhandled("movec omr,x:(r)-n");
 		break;
 		}
-	case 2120: { // movec sp,x:(r)-n
+	case 2118: { // movec sp,x:(r)-n
 		unhandled("movec sp,x:(r)-n");
 		break;
 		}
-	case 2121: { // movec ssh,x:(r)-n
+	case 2119: { // movec ssh,x:(r)-n
 		unhandled("movec ssh,x:(r)-n");
 		break;
 		}
-	case 2122: { // movec ssl,x:(r)-n
+	case 2120: { // movec ssl,x:(r)-n
 		unhandled("movec ssl,x:(r)-n");
 		break;
 		}
-	case 2123: { // movec la,x:(r)-n
+	case 2121: { // movec la,x:(r)-n
 		unhandled("movec la,x:(r)-n");
 		break;
 		}
-	case 2124: { // movec lc,x:(r)-n
+	case 2122: { // movec lc,x:(r)-n
 		unhandled("movec lc,x:(r)-n");
 		break;
 		}
-	case 2125: { // movec m,y:(r)-n
+	case 2123: { // movec m,y:(r)-n
 		unhandled("movec m,y:(r)-n");
 		break;
 		}
-	case 2126: { // movec ep,y:(r)-n
+	case 2124: { // movec ep,y:(r)-n
 		unhandled("movec ep,y:(r)-n");
 		break;
 		}
-	case 2127: { // movec vba,y:(r)-n
+	case 2125: { // movec vba,y:(r)-n
 		unhandled("movec vba,y:(r)-n");
 		break;
 		}
-	case 2128: { // movec sc,y:(r)-n
+	case 2126: { // movec sc,y:(r)-n
 		unhandled("movec sc,y:(r)-n");
 		break;
 		}
-	case 2129: { // movec sz,y:(r)-n
+	case 2127: { // movec sz,y:(r)-n
 		unhandled("movec sz,y:(r)-n");
 		break;
 		}
-	case 2130: { // movec sr,y:(r)-n
+	case 2128: { // movec sr,y:(r)-n
 		unhandled("movec sr,y:(r)-n");
 		break;
 		}
-	case 2131: { // movec omr,y:(r)-n
+	case 2129: { // movec omr,y:(r)-n
 		unhandled("movec omr,y:(r)-n");
 		break;
 		}
-	case 2132: { // movec sp,y:(r)-n
+	case 2130: { // movec sp,y:(r)-n
 		unhandled("movec sp,y:(r)-n");
 		break;
 		}
-	case 2133: { // movec ssh,y:(r)-n
+	case 2131: { // movec ssh,y:(r)-n
 		unhandled("movec ssh,y:(r)-n");
 		break;
 		}
-	case 2134: { // movec ssl,y:(r)-n
+	case 2132: { // movec ssl,y:(r)-n
 		unhandled("movec ssl,y:(r)-n");
 		break;
 		}
-	case 2135: { // movec la,y:(r)-n
+	case 2133: { // movec la,y:(r)-n
 		unhandled("movec la,y:(r)-n");
 		break;
 		}
-	case 2136: { // movec lc,y:(r)-n
+	case 2134: { // movec lc,y:(r)-n
 		unhandled("movec lc,y:(r)-n");
 		break;
 		}
-	case 2137: { // movec m,x:(r)+n
+	case 2135: { // movec m,x:(r)+n
 		unhandled("movec m,x:(r)+n");
 		break;
 		}
-	case 2138: { // movec ep,x:(r)+n
+	case 2136: { // movec ep,x:(r)+n
 		unhandled("movec ep,x:(r)+n");
 		break;
 		}
-	case 2139: { // movec vba,x:(r)+n
+	case 2137: { // movec vba,x:(r)+n
 		unhandled("movec vba,x:(r)+n");
 		break;
 		}
-	case 2140: { // movec sc,x:(r)+n
+	case 2138: { // movec sc,x:(r)+n
 		unhandled("movec sc,x:(r)+n");
 		break;
 		}
-	case 2141: { // movec sz,x:(r)+n
+	case 2139: { // movec sz,x:(r)+n
 		unhandled("movec sz,x:(r)+n");
 		break;
 		}
-	case 2142: { // movec sr,x:(r)+n
+	case 2140: { // movec sr,x:(r)+n
 		unhandled("movec sr,x:(r)+n");
 		break;
 		}
-	case 2143: { // movec omr,x:(r)+n
+	case 2141: { // movec omr,x:(r)+n
 		unhandled("movec omr,x:(r)+n");
 		break;
 		}
-	case 2144: { // movec sp,x:(r)+n
+	case 2142: { // movec sp,x:(r)+n
 		unhandled("movec sp,x:(r)+n");
 		break;
 		}
-	case 2145: { // movec ssh,x:(r)+n
+	case 2143: { // movec ssh,x:(r)+n
 		unhandled("movec ssh,x:(r)+n");
 		break;
 		}
-	case 2146: { // movec ssl,x:(r)+n
+	case 2144: { // movec ssl,x:(r)+n
 		unhandled("movec ssl,x:(r)+n");
 		break;
 		}
-	case 2147: { // movec la,x:(r)+n
+	case 2145: { // movec la,x:(r)+n
 		unhandled("movec la,x:(r)+n");
 		break;
 		}
-	case 2148: { // movec lc,x:(r)+n
+	case 2146: { // movec lc,x:(r)+n
 		unhandled("movec lc,x:(r)+n");
 		break;
 		}
-	case 2149: { // movec m,y:(r)+n
+	case 2147: { // movec m,y:(r)+n
 		unhandled("movec m,y:(r)+n");
 		break;
 		}
-	case 2150: { // movec ep,y:(r)+n
+	case 2148: { // movec ep,y:(r)+n
 		unhandled("movec ep,y:(r)+n");
 		break;
 		}
-	case 2151: { // movec vba,y:(r)+n
+	case 2149: { // movec vba,y:(r)+n
 		unhandled("movec vba,y:(r)+n");
 		break;
 		}
-	case 2152: { // movec sc,y:(r)+n
+	case 2150: { // movec sc,y:(r)+n
 		unhandled("movec sc,y:(r)+n");
 		break;
 		}
-	case 2153: { // movec sz,y:(r)+n
+	case 2151: { // movec sz,y:(r)+n
 		unhandled("movec sz,y:(r)+n");
 		break;
 		}
-	case 2154: { // movec sr,y:(r)+n
+	case 2152: { // movec sr,y:(r)+n
 		unhandled("movec sr,y:(r)+n");
 		break;
 		}
-	case 2155: { // movec omr,y:(r)+n
+	case 2153: { // movec omr,y:(r)+n
 		unhandled("movec omr,y:(r)+n");
 		break;
 		}
-	case 2156: { // movec sp,y:(r)+n
+	case 2154: { // movec sp,y:(r)+n
 		unhandled("movec sp,y:(r)+n");
 		break;
 		}
-	case 2157: { // movec ssh,y:(r)+n
+	case 2155: { // movec ssh,y:(r)+n
 		unhandled("movec ssh,y:(r)+n");
 		break;
 		}
-	case 2158: { // movec ssl,y:(r)+n
+	case 2156: { // movec ssl,y:(r)+n
 		unhandled("movec ssl,y:(r)+n");
 		break;
 		}
-	case 2159: { // movec la,y:(r)+n
+	case 2157: { // movec la,y:(r)+n
 		unhandled("movec la,y:(r)+n");
 		break;
 		}
-	case 2160: { // movec lc,y:(r)+n
+	case 2158: { // movec lc,y:(r)+n
 		unhandled("movec lc,y:(r)+n");
 		break;
 		}
-	case 2161: { // movec m,x:(r)-
+	case 2159: { // movec m,x:(r)-
 		unhandled("movec m,x:(r)-");
 		break;
 		}
-	case 2162: { // movec ep,x:(r)-
+	case 2160: { // movec ep,x:(r)-
 		unhandled("movec ep,x:(r)-");
 		break;
 		}
-	case 2163: { // movec vba,x:(r)-
+	case 2161: { // movec vba,x:(r)-
 		unhandled("movec vba,x:(r)-");
 		break;
 		}
-	case 2164: { // movec sc,x:(r)-
+	case 2162: { // movec sc,x:(r)-
 		unhandled("movec sc,x:(r)-");
 		break;
 		}
-	case 2165: { // movec sz,x:(r)-
+	case 2163: { // movec sz,x:(r)-
 		unhandled("movec sz,x:(r)-");
 		break;
 		}
-	case 2166: { // movec sr,x:(r)-
+	case 2164: { // movec sr,x:(r)-
 		unhandled("movec sr,x:(r)-");
 		break;
 		}
-	case 2167: { // movec omr,x:(r)-
+	case 2165: { // movec omr,x:(r)-
 		unhandled("movec omr,x:(r)-");
 		break;
 		}
-	case 2168: { // movec sp,x:(r)-
+	case 2166: { // movec sp,x:(r)-
 		unhandled("movec sp,x:(r)-");
 		break;
 		}
-	case 2169: { // movec ssh,x:(r)-
+	case 2167: { // movec ssh,x:(r)-
 		unhandled("movec ssh,x:(r)-");
 		break;
 		}
-	case 2170: { // movec ssl,x:(r)-
+	case 2168: { // movec ssl,x:(r)-
 		unhandled("movec ssl,x:(r)-");
 		break;
 		}
-	case 2171: { // movec la,x:(r)-
+	case 2169: { // movec la,x:(r)-
 		unhandled("movec la,x:(r)-");
 		break;
 		}
-	case 2172: { // movec lc,x:(r)-
+	case 2170: { // movec lc,x:(r)-
 		unhandled("movec lc,x:(r)-");
 		break;
 		}
-	case 2173: { // movec m,y:(r)-
+	case 2171: { // movec m,y:(r)-
 		unhandled("movec m,y:(r)-");
 		break;
 		}
-	case 2174: { // movec ep,y:(r)-
+	case 2172: { // movec ep,y:(r)-
 		unhandled("movec ep,y:(r)-");
 		break;
 		}
-	case 2175: { // movec vba,y:(r)-
+	case 2173: { // movec vba,y:(r)-
 		unhandled("movec vba,y:(r)-");
 		break;
 		}
-	case 2176: { // movec sc,y:(r)-
+	case 2174: { // movec sc,y:(r)-
 		unhandled("movec sc,y:(r)-");
 		break;
 		}
-	case 2177: { // movec sz,y:(r)-
+	case 2175: { // movec sz,y:(r)-
 		unhandled("movec sz,y:(r)-");
 		break;
 		}
-	case 2178: { // movec sr,y:(r)-
+	case 2176: { // movec sr,y:(r)-
 		unhandled("movec sr,y:(r)-");
 		break;
 		}
-	case 2179: { // movec omr,y:(r)-
+	case 2177: { // movec omr,y:(r)-
 		unhandled("movec omr,y:(r)-");
 		break;
 		}
-	case 2180: { // movec sp,y:(r)-
+	case 2178: { // movec sp,y:(r)-
 		unhandled("movec sp,y:(r)-");
 		break;
 		}
-	case 2181: { // movec ssh,y:(r)-
+	case 2179: { // movec ssh,y:(r)-
 		unhandled("movec ssh,y:(r)-");
 		break;
 		}
-	case 2182: { // movec ssl,y:(r)-
+	case 2180: { // movec ssl,y:(r)-
 		unhandled("movec ssl,y:(r)-");
 		break;
 		}
-	case 2183: { // movec la,y:(r)-
+	case 2181: { // movec la,y:(r)-
 		unhandled("movec la,y:(r)-");
 		break;
 		}
-	case 2184: { // movec lc,y:(r)-
+	case 2182: { // movec lc,y:(r)-
 		unhandled("movec lc,y:(r)-");
 		break;
 		}
-	case 2185: { // movec m,x:(r)+
+	case 2183: { // movec m,x:(r)+
 		unhandled("movec m,x:(r)+");
 		break;
 		}
-	case 2186: { // movec ep,x:(r)+
+	case 2184: { // movec ep,x:(r)+
 		unhandled("movec ep,x:(r)+");
 		break;
 		}
-	case 2187: { // movec vba,x:(r)+
+	case 2185: { // movec vba,x:(r)+
 		unhandled("movec vba,x:(r)+");
 		break;
 		}
-	case 2188: { // movec sc,x:(r)+
+	case 2186: { // movec sc,x:(r)+
 		unhandled("movec sc,x:(r)+");
 		break;
 		}
-	case 2189: { // movec sz,x:(r)+
+	case 2187: { // movec sz,x:(r)+
 		unhandled("movec sz,x:(r)+");
 		break;
 		}
-	case 2190: { // movec sr,x:(r)+
+	case 2188: { // movec sr,x:(r)+
 		unhandled("movec sr,x:(r)+");
 		break;
 		}
-	case 2191: { // movec omr,x:(r)+
+	case 2189: { // movec omr,x:(r)+
 		unhandled("movec omr,x:(r)+");
 		break;
 		}
-	case 2192: { // movec sp,x:(r)+
+	case 2190: { // movec sp,x:(r)+
 		unhandled("movec sp,x:(r)+");
 		break;
 		}
-	case 2193: { // movec ssh,x:(r)+
+	case 2191: { // movec ssh,x:(r)+
 		unhandled("movec ssh,x:(r)+");
 		break;
 		}
-	case 2194: { // movec ssl,x:(r)+
+	case 2192: { // movec ssl,x:(r)+
 		unhandled("movec ssl,x:(r)+");
 		break;
 		}
-	case 2195: { // movec la,x:(r)+
+	case 2193: { // movec la,x:(r)+
 		unhandled("movec la,x:(r)+");
 		break;
 		}
-	case 2196: { // movec lc,x:(r)+
+	case 2194: { // movec lc,x:(r)+
 		unhandled("movec lc,x:(r)+");
 		break;
 		}
-	case 2197: { // movec m,y:(r)+
+	case 2195: { // movec m,y:(r)+
 		unhandled("movec m,y:(r)+");
 		break;
 		}
-	case 2198: { // movec ep,y:(r)+
+	case 2196: { // movec ep,y:(r)+
 		unhandled("movec ep,y:(r)+");
 		break;
 		}
-	case 2199: { // movec vba,y:(r)+
+	case 2197: { // movec vba,y:(r)+
 		unhandled("movec vba,y:(r)+");
 		break;
 		}
-	case 2200: { // movec sc,y:(r)+
+	case 2198: { // movec sc,y:(r)+
 		unhandled("movec sc,y:(r)+");
 		break;
 		}
-	case 2201: { // movec sz,y:(r)+
+	case 2199: { // movec sz,y:(r)+
 		unhandled("movec sz,y:(r)+");
 		break;
 		}
-	case 2202: { // movec sr,y:(r)+
+	case 2200: { // movec sr,y:(r)+
 		unhandled("movec sr,y:(r)+");
 		break;
 		}
-	case 2203: { // movec omr,y:(r)+
+	case 2201: { // movec omr,y:(r)+
 		unhandled("movec omr,y:(r)+");
 		break;
 		}
-	case 2204: { // movec sp,y:(r)+
+	case 2202: { // movec sp,y:(r)+
 		unhandled("movec sp,y:(r)+");
 		break;
 		}
-	case 2205: { // movec ssh,y:(r)+
+	case 2203: { // movec ssh,y:(r)+
 		unhandled("movec ssh,y:(r)+");
 		break;
 		}
-	case 2206: { // movec ssl,y:(r)+
+	case 2204: { // movec ssl,y:(r)+
 		unhandled("movec ssl,y:(r)+");
 		break;
 		}
-	case 2207: { // movec la,y:(r)+
+	case 2205: { // movec la,y:(r)+
 		unhandled("movec la,y:(r)+");
 		break;
 		}
-	case 2208: { // movec lc,y:(r)+
+	case 2206: { // movec lc,y:(r)+
 		unhandled("movec lc,y:(r)+");
 		break;
 		}
-	case 2209: { // movec m,x:(r)
+	case 2207: { // movec m,x:(r)
 		unhandled("movec m,x:(r)");
 		break;
 		}
-	case 2210: { // movec ep,x:(r)
+	case 2208: { // movec ep,x:(r)
 		unhandled("movec ep,x:(r)");
 		break;
 		}
-	case 2211: { // movec vba,x:(r)
+	case 2209: { // movec vba,x:(r)
 		unhandled("movec vba,x:(r)");
 		break;
 		}
-	case 2212: { // movec sc,x:(r)
+	case 2210: { // movec sc,x:(r)
 		unhandled("movec sc,x:(r)");
 		break;
 		}
-	case 2213: { // movec sz,x:(r)
+	case 2211: { // movec sz,x:(r)
 		unhandled("movec sz,x:(r)");
 		break;
 		}
-	case 2214: { // movec sr,x:(r)
+	case 2212: { // movec sr,x:(r)
 		unhandled("movec sr,x:(r)");
 		break;
 		}
-	case 2215: { // movec omr,x:(r)
+	case 2213: { // movec omr,x:(r)
 		unhandled("movec omr,x:(r)");
 		break;
 		}
-	case 2216: { // movec sp,x:(r)
+	case 2214: { // movec sp,x:(r)
 		unhandled("movec sp,x:(r)");
 		break;
 		}
-	case 2217: { // movec ssh,x:(r)
+	case 2215: { // movec ssh,x:(r)
 		unhandled("movec ssh,x:(r)");
 		break;
 		}
-	case 2218: { // movec ssl,x:(r)
+	case 2216: { // movec ssl,x:(r)
 		unhandled("movec ssl,x:(r)");
 		break;
 		}
-	case 2219: { // movec la,x:(r)
+	case 2217: { // movec la,x:(r)
 		unhandled("movec la,x:(r)");
 		break;
 		}
-	case 2220: { // movec lc,x:(r)
+	case 2218: { // movec lc,x:(r)
 		unhandled("movec lc,x:(r)");
 		break;
 		}
-	case 2221: { // movec m,y:(r)
+	case 2219: { // movec m,y:(r)
 		unhandled("movec m,y:(r)");
 		break;
 		}
-	case 2222: { // movec ep,y:(r)
+	case 2220: { // movec ep,y:(r)
 		unhandled("movec ep,y:(r)");
 		break;
 		}
-	case 2223: { // movec vba,y:(r)
+	case 2221: { // movec vba,y:(r)
 		unhandled("movec vba,y:(r)");
 		break;
 		}
-	case 2224: { // movec sc,y:(r)
+	case 2222: { // movec sc,y:(r)
 		unhandled("movec sc,y:(r)");
 		break;
 		}
-	case 2225: { // movec sz,y:(r)
+	case 2223: { // movec sz,y:(r)
 		unhandled("movec sz,y:(r)");
 		break;
 		}
-	case 2226: { // movec sr,y:(r)
+	case 2224: { // movec sr,y:(r)
 		unhandled("movec sr,y:(r)");
 		break;
 		}
-	case 2227: { // movec omr,y:(r)
+	case 2225: { // movec omr,y:(r)
 		unhandled("movec omr,y:(r)");
 		break;
 		}
-	case 2228: { // movec sp,y:(r)
+	case 2226: { // movec sp,y:(r)
 		unhandled("movec sp,y:(r)");
 		break;
 		}
-	case 2229: { // movec ssh,y:(r)
+	case 2227: { // movec ssh,y:(r)
 		unhandled("movec ssh,y:(r)");
 		break;
 		}
-	case 2230: { // movec ssl,y:(r)
+	case 2228: { // movec ssl,y:(r)
 		unhandled("movec ssl,y:(r)");
 		break;
 		}
-	case 2231: { // movec la,y:(r)
+	case 2229: { // movec la,y:(r)
 		unhandled("movec la,y:(r)");
 		break;
 		}
-	case 2232: { // movec lc,y:(r)
+	case 2230: { // movec lc,y:(r)
 		unhandled("movec lc,y:(r)");
 		break;
 		}
-	case 2233: { // movec m,x:(r+n)
+	case 2231: { // movec m,x:(r+n)
 		unhandled("movec m,x:(r+n)");
 		break;
 		}
-	case 2234: { // movec ep,x:(r+n)
+	case 2232: { // movec ep,x:(r+n)
 		unhandled("movec ep,x:(r+n)");
 		break;
 		}
-	case 2235: { // movec vba,x:(r+n)
+	case 2233: { // movec vba,x:(r+n)
 		unhandled("movec vba,x:(r+n)");
 		break;
 		}
-	case 2236: { // movec sc,x:(r+n)
+	case 2234: { // movec sc,x:(r+n)
 		unhandled("movec sc,x:(r+n)");
 		break;
 		}
-	case 2237: { // movec sz,x:(r+n)
+	case 2235: { // movec sz,x:(r+n)
 		unhandled("movec sz,x:(r+n)");
 		break;
 		}
-	case 2238: { // movec sr,x:(r+n)
+	case 2236: { // movec sr,x:(r+n)
 		unhandled("movec sr,x:(r+n)");
 		break;
 		}
-	case 2239: { // movec omr,x:(r+n)
+	case 2237: { // movec omr,x:(r+n)
 		unhandled("movec omr,x:(r+n)");
 		break;
 		}
-	case 2240: { // movec sp,x:(r+n)
+	case 2238: { // movec sp,x:(r+n)
 		unhandled("movec sp,x:(r+n)");
 		break;
 		}
-	case 2241: { // movec ssh,x:(r+n)
+	case 2239: { // movec ssh,x:(r+n)
 		unhandled("movec ssh,x:(r+n)");
 		break;
 		}
-	case 2242: { // movec ssl,x:(r+n)
+	case 2240: { // movec ssl,x:(r+n)
 		unhandled("movec ssl,x:(r+n)");
 		break;
 		}
-	case 2243: { // movec la,x:(r+n)
+	case 2241: { // movec la,x:(r+n)
 		unhandled("movec la,x:(r+n)");
 		break;
 		}
-	case 2244: { // movec lc,x:(r+n)
+	case 2242: { // movec lc,x:(r+n)
 		unhandled("movec lc,x:(r+n)");
 		break;
 		}
-	case 2245: { // movec m,y:(r+n)
+	case 2243: { // movec m,y:(r+n)
 		unhandled("movec m,y:(r+n)");
 		break;
 		}
-	case 2246: { // movec ep,y:(r+n)
+	case 2244: { // movec ep,y:(r+n)
 		unhandled("movec ep,y:(r+n)");
 		break;
 		}
-	case 2247: { // movec vba,y:(r+n)
+	case 2245: { // movec vba,y:(r+n)
 		unhandled("movec vba,y:(r+n)");
 		break;
 		}
-	case 2248: { // movec sc,y:(r+n)
+	case 2246: { // movec sc,y:(r+n)
 		unhandled("movec sc,y:(r+n)");
 		break;
 		}
-	case 2249: { // movec sz,y:(r+n)
+	case 2247: { // movec sz,y:(r+n)
 		unhandled("movec sz,y:(r+n)");
 		break;
 		}
-	case 2250: { // movec sr,y:(r+n)
+	case 2248: { // movec sr,y:(r+n)
 		unhandled("movec sr,y:(r+n)");
 		break;
 		}
-	case 2251: { // movec omr,y:(r+n)
+	case 2249: { // movec omr,y:(r+n)
 		unhandled("movec omr,y:(r+n)");
 		break;
 		}
-	case 2252: { // movec sp,y:(r+n)
+	case 2250: { // movec sp,y:(r+n)
 		unhandled("movec sp,y:(r+n)");
 		break;
 		}
-	case 2253: { // movec ssh,y:(r+n)
+	case 2251: { // movec ssh,y:(r+n)
 		unhandled("movec ssh,y:(r+n)");
 		break;
 		}
-	case 2254: { // movec ssl,y:(r+n)
+	case 2252: { // movec ssl,y:(r+n)
 		unhandled("movec ssl,y:(r+n)");
 		break;
 		}
-	case 2255: { // movec la,y:(r+n)
+	case 2253: { // movec la,y:(r+n)
 		unhandled("movec la,y:(r+n)");
 		break;
 		}
-	case 2256: { // movec lc,y:(r+n)
+	case 2254: { // movec lc,y:(r+n)
 		unhandled("movec lc,y:(r+n)");
 		break;
 		}
-	case 2257: { // movec m,x:-(r)
+	case 2255: { // movec m,x:-(r)
 		unhandled("movec m,x:-(r)");
 		break;
 		}
-	case 2258: { // movec ep,x:-(r)
+	case 2256: { // movec ep,x:-(r)
 		unhandled("movec ep,x:-(r)");
 		break;
 		}
-	case 2259: { // movec vba,x:-(r)
+	case 2257: { // movec vba,x:-(r)
 		unhandled("movec vba,x:-(r)");
 		break;
 		}
-	case 2260: { // movec sc,x:-(r)
+	case 2258: { // movec sc,x:-(r)
 		unhandled("movec sc,x:-(r)");
 		break;
 		}
-	case 2261: { // movec sz,x:-(r)
+	case 2259: { // movec sz,x:-(r)
 		unhandled("movec sz,x:-(r)");
 		break;
 		}
-	case 2262: { // movec sr,x:-(r)
+	case 2260: { // movec sr,x:-(r)
 		unhandled("movec sr,x:-(r)");
 		break;
 		}
-	case 2263: { // movec omr,x:-(r)
+	case 2261: { // movec omr,x:-(r)
 		unhandled("movec omr,x:-(r)");
 		break;
 		}
-	case 2264: { // movec sp,x:-(r)
+	case 2262: { // movec sp,x:-(r)
 		unhandled("movec sp,x:-(r)");
 		break;
 		}
-	case 2265: { // movec ssh,x:-(r)
+	case 2263: { // movec ssh,x:-(r)
 		unhandled("movec ssh,x:-(r)");
 		break;
 		}
-	case 2266: { // movec ssl,x:-(r)
+	case 2264: { // movec ssl,x:-(r)
 		unhandled("movec ssl,x:-(r)");
 		break;
 		}
-	case 2267: { // movec la,x:-(r)
+	case 2265: { // movec la,x:-(r)
 		unhandled("movec la,x:-(r)");
 		break;
 		}
-	case 2268: { // movec lc,x:-(r)
+	case 2266: { // movec lc,x:-(r)
 		unhandled("movec lc,x:-(r)");
 		break;
 		}
-	case 2269: { // movec m,y:-(r)
+	case 2267: { // movec m,y:-(r)
 		unhandled("movec m,y:-(r)");
 		break;
 		}
-	case 2270: { // movec ep,y:-(r)
+	case 2268: { // movec ep,y:-(r)
 		unhandled("movec ep,y:-(r)");
 		break;
 		}
-	case 2271: { // movec vba,y:-(r)
+	case 2269: { // movec vba,y:-(r)
 		unhandled("movec vba,y:-(r)");
 		break;
 		}
-	case 2272: { // movec sc,y:-(r)
+	case 2270: { // movec sc,y:-(r)
 		unhandled("movec sc,y:-(r)");
 		break;
 		}
-	case 2273: { // movec sz,y:-(r)
+	case 2271: { // movec sz,y:-(r)
 		unhandled("movec sz,y:-(r)");
 		break;
 		}
-	case 2274: { // movec sr,y:-(r)
+	case 2272: { // movec sr,y:-(r)
 		unhandled("movec sr,y:-(r)");
 		break;
 		}
-	case 2275: { // movec omr,y:-(r)
+	case 2273: { // movec omr,y:-(r)
 		unhandled("movec omr,y:-(r)");
 		break;
 		}
-	case 2276: { // movec sp,y:-(r)
+	case 2274: { // movec sp,y:-(r)
 		unhandled("movec sp,y:-(r)");
 		break;
 		}
-	case 2277: { // movec ssh,y:-(r)
+	case 2275: { // movec ssh,y:-(r)
 		unhandled("movec ssh,y:-(r)");
 		break;
 		}
-	case 2278: { // movec ssl,y:-(r)
+	case 2276: { // movec ssl,y:-(r)
 		unhandled("movec ssl,y:-(r)");
 		break;
 		}
-	case 2279: { // movec la,y:-(r)
+	case 2277: { // movec la,y:-(r)
 		unhandled("movec la,y:-(r)");
 		break;
 		}
-	case 2280: { // movec lc,y:-(r)
+	case 2278: { // movec lc,y:-(r)
 		unhandled("movec lc,y:-(r)");
 		break;
 		}
-	case 2281: { // movec x:[abs],m
+	case 2279: { // movec x:[abs],m
 		unhandled("movec x:[abs],m");
 		break;
 		}
-	case 2282: { // movec x:[abs],ep
+	case 2280: { // movec x:[abs],ep
 		unhandled("movec x:[abs],ep");
 		break;
 		}
-	case 2283: { // movec x:[abs],vba
+	case 2281: { // movec x:[abs],vba
 		unhandled("movec x:[abs],vba");
 		break;
 		}
-	case 2284: { // movec x:[abs],sc
+	case 2282: { // movec x:[abs],sc
 		unhandled("movec x:[abs],sc");
 		break;
 		}
-	case 2285: { // movec x:[abs],sz
+	case 2283: { // movec x:[abs],sz
 		unhandled("movec x:[abs],sz");
 		break;
 		}
-	case 2286: { // movec x:[abs],sr
+	case 2284: { // movec x:[abs],sr
 		unhandled("movec x:[abs],sr");
 		break;
 		}
-	case 2287: { // movec x:[abs],omr
+	case 2285: { // movec x:[abs],omr
 		unhandled("movec x:[abs],omr");
 		break;
 		}
-	case 2288: { // movec x:[abs],sp
+	case 2286: { // movec x:[abs],sp
 		unhandled("movec x:[abs],sp");
 		break;
 		}
-	case 2289: { // movec x:[abs],ssh
+	case 2287: { // movec x:[abs],ssh
 		unhandled("movec x:[abs],ssh");
 		break;
 		}
-	case 2290: { // movec x:[abs],ssl
+	case 2288: { // movec x:[abs],ssl
 		unhandled("movec x:[abs],ssl");
 		break;
 		}
-	case 2291: { // movec x:[abs],la
+	case 2289: { // movec x:[abs],la
 		unhandled("movec x:[abs],la");
 		break;
 		}
-	case 2292: { // movec x:[abs],lc
+	case 2290: { // movec x:[abs],lc
 		unhandled("movec x:[abs],lc");
 		break;
 		}
-	case 2293: { // movec y:[abs],m
+	case 2291: { // movec y:[abs],m
 		unhandled("movec y:[abs],m");
 		break;
 		}
-	case 2294: { // movec y:[abs],ep
+	case 2292: { // movec y:[abs],ep
 		unhandled("movec y:[abs],ep");
 		break;
 		}
-	case 2295: { // movec y:[abs],vba
+	case 2293: { // movec y:[abs],vba
 		unhandled("movec y:[abs],vba");
 		break;
 		}
-	case 2296: { // movec y:[abs],sc
+	case 2294: { // movec y:[abs],sc
 		unhandled("movec y:[abs],sc");
 		break;
 		}
-	case 2297: { // movec y:[abs],sz
+	case 2295: { // movec y:[abs],sz
 		unhandled("movec y:[abs],sz");
 		break;
 		}
-	case 2298: { // movec y:[abs],sr
+	case 2296: { // movec y:[abs],sr
 		unhandled("movec y:[abs],sr");
 		break;
 		}
-	case 2299: { // movec y:[abs],omr
+	case 2297: { // movec y:[abs],omr
 		unhandled("movec y:[abs],omr");
 		break;
 		}
-	case 2300: { // movec y:[abs],sp
+	case 2298: { // movec y:[abs],sp
 		unhandled("movec y:[abs],sp");
 		break;
 		}
-	case 2301: { // movec y:[abs],ssh
+	case 2299: { // movec y:[abs],ssh
 		unhandled("movec y:[abs],ssh");
 		break;
 		}
-	case 2302: { // movec y:[abs],ssl
+	case 2300: { // movec y:[abs],ssl
 		unhandled("movec y:[abs],ssl");
 		break;
 		}
-	case 2303: { // movec y:[abs],la
+	case 2301: { // movec y:[abs],la
 		unhandled("movec y:[abs],la");
 		break;
 		}
-	case 2304: { // movec y:[abs],lc
+	case 2302: { // movec y:[abs],lc
 		unhandled("movec y:[abs],lc");
 		break;
 		}
-	case 2305: { // movec #[i],m
+	case 2303: { // movec #[i],m
 		unhandled("movec #[i],m");
 		break;
 		}
-	case 2306: { // movec #[i],ep
+	case 2304: { // movec #[i],ep
 		unhandled("movec #[i],ep");
 		break;
 		}
-	case 2307: { // movec #[i],vba
+	case 2305: { // movec #[i],vba
 		unhandled("movec #[i],vba");
 		break;
 		}
-	case 2308: { // movec #[i],sc
+	case 2306: { // movec #[i],sc
 		unhandled("movec #[i],sc");
 		break;
 		}
-	case 2309: { // movec #[i],sz
+	case 2307: { // movec #[i],sz
 		unhandled("movec #[i],sz");
 		break;
 		}
-	case 2310: { // movec #[i],sr
+	case 2308: { // movec #[i],sr
 		unhandled("movec #[i],sr");
 		break;
 		}
-	case 2311: { // movec #[i],omr
+	case 2309: { // movec #[i],omr
 		unhandled("movec #[i],omr");
 		break;
 		}
-	case 2312: { // movec #[i],sp
+	case 2310: { // movec #[i],sp
 		unhandled("movec #[i],sp");
 		break;
 		}
-	case 2313: { // movec #[i],ssh
+	case 2311: { // movec #[i],ssh
 		unhandled("movec #[i],ssh");
 		break;
 		}
-	case 2314: { // movec #[i],ssl
+	case 2312: { // movec #[i],ssl
 		unhandled("movec #[i],ssl");
 		break;
 		}
-	case 2315: { // movec #[i],la
+	case 2313: { // movec #[i],la
 		unhandled("movec #[i],la");
 		break;
 		}
-	case 2316: { // movec #[i],lc
+	case 2314: { // movec #[i],lc
 		unhandled("movec #[i],lc");
 		break;
 		}
-	case 2317: { // movec x:[aa],m
+	case 2315: { // movec m,x:[abs]
+		unhandled("movec m,x:[abs]");
+		break;
+		}
+	case 2316: { // movec ep,x:[abs]
+		unhandled("movec ep,x:[abs]");
+		break;
+		}
+	case 2317: { // movec vba,x:[abs]
+		unhandled("movec vba,x:[abs]");
+		break;
+		}
+	case 2318: { // movec sc,x:[abs]
+		unhandled("movec sc,x:[abs]");
+		break;
+		}
+	case 2319: { // movec sz,x:[abs]
+		unhandled("movec sz,x:[abs]");
+		break;
+		}
+	case 2320: { // movec sr,x:[abs]
+		unhandled("movec sr,x:[abs]");
+		break;
+		}
+	case 2321: { // movec omr,x:[abs]
+		unhandled("movec omr,x:[abs]");
+		break;
+		}
+	case 2322: { // movec sp,x:[abs]
+		unhandled("movec sp,x:[abs]");
+		break;
+		}
+	case 2323: { // movec ssh,x:[abs]
+		unhandled("movec ssh,x:[abs]");
+		break;
+		}
+	case 2324: { // movec ssl,x:[abs]
+		unhandled("movec ssl,x:[abs]");
+		break;
+		}
+	case 2325: { // movec la,x:[abs]
+		unhandled("movec la,x:[abs]");
+		break;
+		}
+	case 2326: { // movec lc,x:[abs]
+		unhandled("movec lc,x:[abs]");
+		break;
+		}
+	case 2327: { // movec m,y:[abs]
+		unhandled("movec m,y:[abs]");
+		break;
+		}
+	case 2328: { // movec ep,y:[abs]
+		unhandled("movec ep,y:[abs]");
+		break;
+		}
+	case 2329: { // movec vba,y:[abs]
+		unhandled("movec vba,y:[abs]");
+		break;
+		}
+	case 2330: { // movec sc,y:[abs]
+		unhandled("movec sc,y:[abs]");
+		break;
+		}
+	case 2331: { // movec sz,y:[abs]
+		unhandled("movec sz,y:[abs]");
+		break;
+		}
+	case 2332: { // movec sr,y:[abs]
+		unhandled("movec sr,y:[abs]");
+		break;
+		}
+	case 2333: { // movec omr,y:[abs]
+		unhandled("movec omr,y:[abs]");
+		break;
+		}
+	case 2334: { // movec sp,y:[abs]
+		unhandled("movec sp,y:[abs]");
+		break;
+		}
+	case 2335: { // movec ssh,y:[abs]
+		unhandled("movec ssh,y:[abs]");
+		break;
+		}
+	case 2336: { // movec ssl,y:[abs]
+		unhandled("movec ssl,y:[abs]");
+		break;
+		}
+	case 2337: { // movec la,y:[abs]
+		unhandled("movec la,y:[abs]");
+		break;
+		}
+	case 2338: { // movec lc,y:[abs]
+		unhandled("movec lc,y:[abs]");
+		break;
+		}
+	case 2339: { // movec x:[aa],m
 		unhandled("movec x:[aa],m");
 		break;
 		}
-	case 2318: { // movec x:[aa],ep
+	case 2340: { // movec x:[aa],ep
 		unhandled("movec x:[aa],ep");
 		break;
 		}
-	case 2319: { // movec x:[aa],vba
+	case 2341: { // movec x:[aa],vba
 		unhandled("movec x:[aa],vba");
 		break;
 		}
-	case 2320: { // movec x:[aa],sc
+	case 2342: { // movec x:[aa],sc
 		unhandled("movec x:[aa],sc");
 		break;
 		}
-	case 2321: { // movec x:[aa],sz
+	case 2343: { // movec x:[aa],sz
 		unhandled("movec x:[aa],sz");
 		break;
 		}
-	case 2322: { // movec x:[aa],sr
+	case 2344: { // movec x:[aa],sr
 		unhandled("movec x:[aa],sr");
 		break;
 		}
-	case 2323: { // movec x:[aa],omr
+	case 2345: { // movec x:[aa],omr
 		unhandled("movec x:[aa],omr");
 		break;
 		}
-	case 2324: { // movec x:[aa],sp
+	case 2346: { // movec x:[aa],sp
 		unhandled("movec x:[aa],sp");
 		break;
 		}
-	case 2325: { // movec x:[aa],ssh
+	case 2347: { // movec x:[aa],ssh
 		unhandled("movec x:[aa],ssh");
 		break;
 		}
-	case 2326: { // movec x:[aa],ssl
+	case 2348: { // movec x:[aa],ssl
 		unhandled("movec x:[aa],ssl");
 		break;
 		}
-	case 2327: { // movec x:[aa],la
+	case 2349: { // movec x:[aa],la
 		unhandled("movec x:[aa],la");
 		break;
 		}
-	case 2328: { // movec x:[aa],lc
+	case 2350: { // movec x:[aa],lc
 		unhandled("movec x:[aa],lc");
 		break;
 		}
-	case 2329: { // movec y:[aa],m
+	case 2351: { // movec y:[aa],m
 		unhandled("movec y:[aa],m");
 		break;
 		}
-	case 2330: { // movec y:[aa],ep
+	case 2352: { // movec y:[aa],ep
 		unhandled("movec y:[aa],ep");
 		break;
 		}
-	case 2331: { // movec y:[aa],vba
+	case 2353: { // movec y:[aa],vba
 		unhandled("movec y:[aa],vba");
 		break;
 		}
-	case 2332: { // movec y:[aa],sc
+	case 2354: { // movec y:[aa],sc
 		unhandled("movec y:[aa],sc");
 		break;
 		}
-	case 2333: { // movec y:[aa],sz
+	case 2355: { // movec y:[aa],sz
 		unhandled("movec y:[aa],sz");
 		break;
 		}
-	case 2334: { // movec y:[aa],sr
+	case 2356: { // movec y:[aa],sr
 		unhandled("movec y:[aa],sr");
 		break;
 		}
-	case 2335: { // movec y:[aa],omr
+	case 2357: { // movec y:[aa],omr
 		unhandled("movec y:[aa],omr");
 		break;
 		}
-	case 2336: { // movec y:[aa],sp
+	case 2358: { // movec y:[aa],sp
 		unhandled("movec y:[aa],sp");
 		break;
 		}
-	case 2337: { // movec y:[aa],ssh
+	case 2359: { // movec y:[aa],ssh
 		unhandled("movec y:[aa],ssh");
 		break;
 		}
-	case 2338: { // movec y:[aa],ssl
+	case 2360: { // movec y:[aa],ssl
 		unhandled("movec y:[aa],ssl");
 		break;
 		}
-	case 2339: { // movec y:[aa],la
+	case 2361: { // movec y:[aa],la
 		unhandled("movec y:[aa],la");
 		break;
 		}
-	case 2340: { // movec y:[aa],lc
+	case 2362: { // movec y:[aa],lc
 		unhandled("movec y:[aa],lc");
 		break;
 		}
-	case 2341: { // movec m,x:[aa]
+	case 2363: { // movec m,x:[aa]
 		unhandled("movec m,x:[aa]");
 		break;
 		}
-	case 2342: { // movec ep,x:[aa]
+	case 2364: { // movec ep,x:[aa]
 		unhandled("movec ep,x:[aa]");
 		break;
 		}
-	case 2343: { // movec vba,x:[aa]
+	case 2365: { // movec vba,x:[aa]
 		unhandled("movec vba,x:[aa]");
 		break;
 		}
-	case 2344: { // movec sc,x:[aa]
+	case 2366: { // movec sc,x:[aa]
 		unhandled("movec sc,x:[aa]");
 		break;
 		}
-	case 2345: { // movec sz,x:[aa]
+	case 2367: { // movec sz,x:[aa]
 		unhandled("movec sz,x:[aa]");
 		break;
 		}
-	case 2346: { // movec sr,x:[aa]
+	case 2368: { // movec sr,x:[aa]
 		unhandled("movec sr,x:[aa]");
 		break;
 		}
-	case 2347: { // movec omr,x:[aa]
+	case 2369: { // movec omr,x:[aa]
 		unhandled("movec omr,x:[aa]");
 		break;
 		}
-	case 2348: { // movec sp,x:[aa]
+	case 2370: { // movec sp,x:[aa]
 		unhandled("movec sp,x:[aa]");
 		break;
 		}
-	case 2349: { // movec ssh,x:[aa]
+	case 2371: { // movec ssh,x:[aa]
 		unhandled("movec ssh,x:[aa]");
 		break;
 		}
-	case 2350: { // movec ssl,x:[aa]
+	case 2372: { // movec ssl,x:[aa]
 		unhandled("movec ssl,x:[aa]");
 		break;
 		}
-	case 2351: { // movec la,x:[aa]
+	case 2373: { // movec la,x:[aa]
 		unhandled("movec la,x:[aa]");
 		break;
 		}
-	case 2352: { // movec lc,x:[aa]
+	case 2374: { // movec lc,x:[aa]
 		unhandled("movec lc,x:[aa]");
 		break;
 		}
-	case 2353: { // movec m,y:[aa]
+	case 2375: { // movec m,y:[aa]
 		unhandled("movec m,y:[aa]");
 		break;
 		}
-	case 2354: { // movec ep,y:[aa]
+	case 2376: { // movec ep,y:[aa]
 		unhandled("movec ep,y:[aa]");
 		break;
 		}
-	case 2355: { // movec vba,y:[aa]
+	case 2377: { // movec vba,y:[aa]
 		unhandled("movec vba,y:[aa]");
 		break;
 		}
-	case 2356: { // movec sc,y:[aa]
+	case 2378: { // movec sc,y:[aa]
 		unhandled("movec sc,y:[aa]");
 		break;
 		}
-	case 2357: { // movec sz,y:[aa]
+	case 2379: { // movec sz,y:[aa]
 		unhandled("movec sz,y:[aa]");
 		break;
 		}
-	case 2358: { // movec sr,y:[aa]
+	case 2380: { // movec sr,y:[aa]
 		unhandled("movec sr,y:[aa]");
 		break;
 		}
-	case 2359: { // movec omr,y:[aa]
+	case 2381: { // movec omr,y:[aa]
 		unhandled("movec omr,y:[aa]");
 		break;
 		}
-	case 2360: { // movec sp,y:[aa]
+	case 2382: { // movec sp,y:[aa]
 		unhandled("movec sp,y:[aa]");
 		break;
 		}
-	case 2361: { // movec ssh,y:[aa]
+	case 2383: { // movec ssh,y:[aa]
 		unhandled("movec ssh,y:[aa]");
 		break;
 		}
-	case 2362: { // movec ssl,y:[aa]
+	case 2384: { // movec ssl,y:[aa]
 		unhandled("movec ssl,y:[aa]");
 		break;
 		}
-	case 2363: { // movec la,y:[aa]
+	case 2385: { // movec la,y:[aa]
 		unhandled("movec la,y:[aa]");
 		break;
 		}
-	case 2364: { // movec lc,y:[aa]
+	case 2386: { // movec lc,y:[aa]
 		unhandled("movec lc,y:[aa]");
 		break;
 		}
-	case 2365: { // movec x0,m
+	case 2387: { // movec x0,m
 		unhandled("movec x0,m");
 		break;
 		}
-	case 2366: { // movec x0,ep
+	case 2388: { // movec x0,ep
 		unhandled("movec x0,ep");
 		break;
 		}
-	case 2367: { // movec x0,vba
+	case 2389: { // movec x0,vba
 		unhandled("movec x0,vba");
 		break;
 		}
-	case 2368: { // movec x0,sc
+	case 2390: { // movec x0,sc
 		unhandled("movec x0,sc");
 		break;
 		}
-	case 2369: { // movec x0,sz
+	case 2391: { // movec x0,sz
 		unhandled("movec x0,sz");
 		break;
 		}
-	case 2370: { // movec x0,sr
+	case 2392: { // movec x0,sr
 		unhandled("movec x0,sr");
 		break;
 		}
-	case 2371: { // movec x0,omr
+	case 2393: { // movec x0,omr
 		unhandled("movec x0,omr");
 		break;
 		}
-	case 2372: { // movec x0,sp
+	case 2394: { // movec x0,sp
 		unhandled("movec x0,sp");
 		break;
 		}
-	case 2373: { // movec x0,ssh
+	case 2395: { // movec x0,ssh
 		unhandled("movec x0,ssh");
 		break;
 		}
-	case 2374: { // movec x0,ssl
+	case 2396: { // movec x0,ssl
 		unhandled("movec x0,ssl");
 		break;
 		}
-	case 2375: { // movec x0,la
+	case 2397: { // movec x0,la
 		unhandled("movec x0,la");
 		break;
 		}
-	case 2376: { // movec x0,lc
+	case 2398: { // movec x0,lc
 		unhandled("movec x0,lc");
 		break;
 		}
-	case 2377: { // movec x1,m
+	case 2399: { // movec x1,m
 		unhandled("movec x1,m");
 		break;
 		}
-	case 2378: { // movec x1,ep
+	case 2400: { // movec x1,ep
 		unhandled("movec x1,ep");
 		break;
 		}
-	case 2379: { // movec x1,vba
+	case 2401: { // movec x1,vba
 		unhandled("movec x1,vba");
 		break;
 		}
-	case 2380: { // movec x1,sc
+	case 2402: { // movec x1,sc
 		unhandled("movec x1,sc");
 		break;
 		}
-	case 2381: { // movec x1,sz
+	case 2403: { // movec x1,sz
 		unhandled("movec x1,sz");
 		break;
 		}
-	case 2382: { // movec x1,sr
+	case 2404: { // movec x1,sr
 		unhandled("movec x1,sr");
 		break;
 		}
-	case 2383: { // movec x1,omr
+	case 2405: { // movec x1,omr
 		unhandled("movec x1,omr");
 		break;
 		}
-	case 2384: { // movec x1,sp
+	case 2406: { // movec x1,sp
 		unhandled("movec x1,sp");
 		break;
 		}
-	case 2385: { // movec x1,ssh
+	case 2407: { // movec x1,ssh
 		unhandled("movec x1,ssh");
 		break;
 		}
-	case 2386: { // movec x1,ssl
+	case 2408: { // movec x1,ssl
 		unhandled("movec x1,ssl");
 		break;
 		}
-	case 2387: { // movec x1,la
+	case 2409: { // movec x1,la
 		unhandled("movec x1,la");
 		break;
 		}
-	case 2388: { // movec x1,lc
+	case 2410: { // movec x1,lc
 		unhandled("movec x1,lc");
 		break;
 		}
-	case 2389: { // movec y0,m
+	case 2411: { // movec y0,m
 		unhandled("movec y0,m");
 		break;
 		}
-	case 2390: { // movec y0,ep
+	case 2412: { // movec y0,ep
 		unhandled("movec y0,ep");
 		break;
 		}
-	case 2391: { // movec y0,vba
+	case 2413: { // movec y0,vba
 		unhandled("movec y0,vba");
 		break;
 		}
-	case 2392: { // movec y0,sc
+	case 2414: { // movec y0,sc
 		unhandled("movec y0,sc");
 		break;
 		}
-	case 2393: { // movec y0,sz
+	case 2415: { // movec y0,sz
 		unhandled("movec y0,sz");
 		break;
 		}
-	case 2394: { // movec y0,sr
+	case 2416: { // movec y0,sr
 		unhandled("movec y0,sr");
 		break;
 		}
-	case 2395: { // movec y0,omr
+	case 2417: { // movec y0,omr
 		unhandled("movec y0,omr");
 		break;
 		}
-	case 2396: { // movec y0,sp
+	case 2418: { // movec y0,sp
 		unhandled("movec y0,sp");
 		break;
 		}
-	case 2397: { // movec y0,ssh
+	case 2419: { // movec y0,ssh
 		unhandled("movec y0,ssh");
 		break;
 		}
-	case 2398: { // movec y0,ssl
+	case 2420: { // movec y0,ssl
 		unhandled("movec y0,ssl");
 		break;
 		}
-	case 2399: { // movec y0,la
+	case 2421: { // movec y0,la
 		unhandled("movec y0,la");
 		break;
 		}
-	case 2400: { // movec y0,lc
+	case 2422: { // movec y0,lc
 		unhandled("movec y0,lc");
 		break;
 		}
-	case 2401: { // movec y1,m
+	case 2423: { // movec y1,m
 		unhandled("movec y1,m");
 		break;
 		}
-	case 2402: { // movec y1,ep
+	case 2424: { // movec y1,ep
 		unhandled("movec y1,ep");
 		break;
 		}
-	case 2403: { // movec y1,vba
+	case 2425: { // movec y1,vba
 		unhandled("movec y1,vba");
 		break;
 		}
-	case 2404: { // movec y1,sc
+	case 2426: { // movec y1,sc
 		unhandled("movec y1,sc");
 		break;
 		}
-	case 2405: { // movec y1,sz
+	case 2427: { // movec y1,sz
 		unhandled("movec y1,sz");
 		break;
 		}
-	case 2406: { // movec y1,sr
+	case 2428: { // movec y1,sr
 		unhandled("movec y1,sr");
 		break;
 		}
-	case 2407: { // movec y1,omr
+	case 2429: { // movec y1,omr
 		unhandled("movec y1,omr");
 		break;
 		}
-	case 2408: { // movec y1,sp
+	case 2430: { // movec y1,sp
 		unhandled("movec y1,sp");
 		break;
 		}
-	case 2409: { // movec y1,ssh
+	case 2431: { // movec y1,ssh
 		unhandled("movec y1,ssh");
 		break;
 		}
-	case 2410: { // movec y1,ssl
+	case 2432: { // movec y1,ssl
 		unhandled("movec y1,ssl");
 		break;
 		}
-	case 2411: { // movec y1,la
+	case 2433: { // movec y1,la
 		unhandled("movec y1,la");
 		break;
 		}
-	case 2412: { // movec y1,lc
+	case 2434: { // movec y1,lc
 		unhandled("movec y1,lc");
 		break;
 		}
-	case 2413: { // movec a0,m
+	case 2435: { // movec a0,m
 		unhandled("movec a0,m");
 		break;
 		}
-	case 2414: { // movec a0,ep
+	case 2436: { // movec a0,ep
 		unhandled("movec a0,ep");
 		break;
 		}
-	case 2415: { // movec a0,vba
+	case 2437: { // movec a0,vba
 		unhandled("movec a0,vba");
 		break;
 		}
-	case 2416: { // movec a0,sc
+	case 2438: { // movec a0,sc
 		unhandled("movec a0,sc");
 		break;
 		}
-	case 2417: { // movec a0,sz
+	case 2439: { // movec a0,sz
 		unhandled("movec a0,sz");
 		break;
 		}
-	case 2418: { // movec a0,sr
+	case 2440: { // movec a0,sr
 		unhandled("movec a0,sr");
 		break;
 		}
-	case 2419: { // movec a0,omr
+	case 2441: { // movec a0,omr
 		unhandled("movec a0,omr");
 		break;
 		}
-	case 2420: { // movec a0,sp
+	case 2442: { // movec a0,sp
 		unhandled("movec a0,sp");
 		break;
 		}
-	case 2421: { // movec a0,ssh
+	case 2443: { // movec a0,ssh
 		unhandled("movec a0,ssh");
 		break;
 		}
-	case 2422: { // movec a0,ssl
+	case 2444: { // movec a0,ssl
 		unhandled("movec a0,ssl");
 		break;
 		}
-	case 2423: { // movec a0,la
+	case 2445: { // movec a0,la
 		unhandled("movec a0,la");
 		break;
 		}
-	case 2424: { // movec a0,lc
+	case 2446: { // movec a0,lc
 		unhandled("movec a0,lc");
 		break;
 		}
-	case 2425: { // movec b0,m
+	case 2447: { // movec b0,m
 		unhandled("movec b0,m");
 		break;
 		}
-	case 2426: { // movec b0,ep
+	case 2448: { // movec b0,ep
 		unhandled("movec b0,ep");
 		break;
 		}
-	case 2427: { // movec b0,vba
+	case 2449: { // movec b0,vba
 		unhandled("movec b0,vba");
 		break;
 		}
-	case 2428: { // movec b0,sc
+	case 2450: { // movec b0,sc
 		unhandled("movec b0,sc");
 		break;
 		}
-	case 2429: { // movec b0,sz
+	case 2451: { // movec b0,sz
 		unhandled("movec b0,sz");
 		break;
 		}
-	case 2430: { // movec b0,sr
+	case 2452: { // movec b0,sr
 		unhandled("movec b0,sr");
 		break;
 		}
-	case 2431: { // movec b0,omr
+	case 2453: { // movec b0,omr
 		unhandled("movec b0,omr");
 		break;
 		}
-	case 2432: { // movec b0,sp
+	case 2454: { // movec b0,sp
 		unhandled("movec b0,sp");
 		break;
 		}
-	case 2433: { // movec b0,ssh
+	case 2455: { // movec b0,ssh
 		unhandled("movec b0,ssh");
 		break;
 		}
-	case 2434: { // movec b0,ssl
+	case 2456: { // movec b0,ssl
 		unhandled("movec b0,ssl");
 		break;
 		}
-	case 2435: { // movec b0,la
+	case 2457: { // movec b0,la
 		unhandled("movec b0,la");
 		break;
 		}
-	case 2436: { // movec b0,lc
+	case 2458: { // movec b0,lc
 		unhandled("movec b0,lc");
 		break;
 		}
-	case 2437: { // movec a2,m
+	case 2459: { // movec a2,m
 		unhandled("movec a2,m");
 		break;
 		}
-	case 2438: { // movec a2,ep
+	case 2460: { // movec a2,ep
 		unhandled("movec a2,ep");
 		break;
 		}
-	case 2439: { // movec a2,vba
+	case 2461: { // movec a2,vba
 		unhandled("movec a2,vba");
 		break;
 		}
-	case 2440: { // movec a2,sc
+	case 2462: { // movec a2,sc
 		unhandled("movec a2,sc");
 		break;
 		}
-	case 2441: { // movec a2,sz
+	case 2463: { // movec a2,sz
 		unhandled("movec a2,sz");
 		break;
 		}
-	case 2442: { // movec a2,sr
+	case 2464: { // movec a2,sr
 		unhandled("movec a2,sr");
 		break;
 		}
-	case 2443: { // movec a2,omr
+	case 2465: { // movec a2,omr
 		unhandled("movec a2,omr");
 		break;
 		}
-	case 2444: { // movec a2,sp
+	case 2466: { // movec a2,sp
 		unhandled("movec a2,sp");
 		break;
 		}
-	case 2445: { // movec a2,ssh
+	case 2467: { // movec a2,ssh
 		unhandled("movec a2,ssh");
 		break;
 		}
-	case 2446: { // movec a2,ssl
+	case 2468: { // movec a2,ssl
 		unhandled("movec a2,ssl");
 		break;
 		}
-	case 2447: { // movec a2,la
+	case 2469: { // movec a2,la
 		unhandled("movec a2,la");
 		break;
 		}
-	case 2448: { // movec a2,lc
+	case 2470: { // movec a2,lc
 		unhandled("movec a2,lc");
 		break;
 		}
-	case 2449: { // movec b2,m
+	case 2471: { // movec b2,m
 		unhandled("movec b2,m");
 		break;
 		}
-	case 2450: { // movec b2,ep
+	case 2472: { // movec b2,ep
 		unhandled("movec b2,ep");
 		break;
 		}
-	case 2451: { // movec b2,vba
+	case 2473: { // movec b2,vba
 		unhandled("movec b2,vba");
 		break;
 		}
-	case 2452: { // movec b2,sc
+	case 2474: { // movec b2,sc
 		unhandled("movec b2,sc");
 		break;
 		}
-	case 2453: { // movec b2,sz
+	case 2475: { // movec b2,sz
 		unhandled("movec b2,sz");
 		break;
 		}
-	case 2454: { // movec b2,sr
+	case 2476: { // movec b2,sr
 		unhandled("movec b2,sr");
 		break;
 		}
-	case 2455: { // movec b2,omr
+	case 2477: { // movec b2,omr
 		unhandled("movec b2,omr");
 		break;
 		}
-	case 2456: { // movec b2,sp
+	case 2478: { // movec b2,sp
 		unhandled("movec b2,sp");
 		break;
 		}
-	case 2457: { // movec b2,ssh
+	case 2479: { // movec b2,ssh
 		unhandled("movec b2,ssh");
 		break;
 		}
-	case 2458: { // movec b2,ssl
+	case 2480: { // movec b2,ssl
 		unhandled("movec b2,ssl");
 		break;
 		}
-	case 2459: { // movec b2,la
+	case 2481: { // movec b2,la
 		unhandled("movec b2,la");
 		break;
 		}
-	case 2460: { // movec b2,lc
+	case 2482: { // movec b2,lc
 		unhandled("movec b2,lc");
 		break;
 		}
-	case 2461: { // movec a1,m
+	case 2483: { // movec a1,m
 		unhandled("movec a1,m");
 		break;
 		}
-	case 2462: { // movec a1,ep
+	case 2484: { // movec a1,ep
 		unhandled("movec a1,ep");
 		break;
 		}
-	case 2463: { // movec a1,vba
+	case 2485: { // movec a1,vba
 		unhandled("movec a1,vba");
 		break;
 		}
-	case 2464: { // movec a1,sc
+	case 2486: { // movec a1,sc
 		unhandled("movec a1,sc");
 		break;
 		}
-	case 2465: { // movec a1,sz
+	case 2487: { // movec a1,sz
 		unhandled("movec a1,sz");
 		break;
 		}
-	case 2466: { // movec a1,sr
+	case 2488: { // movec a1,sr
 		unhandled("movec a1,sr");
 		break;
 		}
-	case 2467: { // movec a1,omr
+	case 2489: { // movec a1,omr
 		unhandled("movec a1,omr");
 		break;
 		}
-	case 2468: { // movec a1,sp
+	case 2490: { // movec a1,sp
 		unhandled("movec a1,sp");
 		break;
 		}
-	case 2469: { // movec a1,ssh
+	case 2491: { // movec a1,ssh
 		unhandled("movec a1,ssh");
 		break;
 		}
-	case 2470: { // movec a1,ssl
+	case 2492: { // movec a1,ssl
 		unhandled("movec a1,ssl");
 		break;
 		}
-	case 2471: { // movec a1,la
+	case 2493: { // movec a1,la
 		unhandled("movec a1,la");
 		break;
 		}
-	case 2472: { // movec a1,lc
+	case 2494: { // movec a1,lc
 		unhandled("movec a1,lc");
 		break;
 		}
-	case 2473: { // movec b1,m
+	case 2495: { // movec b1,m
 		unhandled("movec b1,m");
 		break;
 		}
-	case 2474: { // movec b1,ep
+	case 2496: { // movec b1,ep
 		unhandled("movec b1,ep");
 		break;
 		}
-	case 2475: { // movec b1,vba
+	case 2497: { // movec b1,vba
 		unhandled("movec b1,vba");
 		break;
 		}
-	case 2476: { // movec b1,sc
+	case 2498: { // movec b1,sc
 		unhandled("movec b1,sc");
 		break;
 		}
-	case 2477: { // movec b1,sz
+	case 2499: { // movec b1,sz
 		unhandled("movec b1,sz");
 		break;
 		}
-	case 2478: { // movec b1,sr
+	case 2500: { // movec b1,sr
 		unhandled("movec b1,sr");
 		break;
 		}
-	case 2479: { // movec b1,omr
+	case 2501: { // movec b1,omr
 		unhandled("movec b1,omr");
 		break;
 		}
-	case 2480: { // movec b1,sp
+	case 2502: { // movec b1,sp
 		unhandled("movec b1,sp");
 		break;
 		}
-	case 2481: { // movec b1,ssh
+	case 2503: { // movec b1,ssh
 		unhandled("movec b1,ssh");
 		break;
 		}
-	case 2482: { // movec b1,ssl
+	case 2504: { // movec b1,ssl
 		unhandled("movec b1,ssl");
 		break;
 		}
-	case 2483: { // movec b1,la
+	case 2505: { // movec b1,la
 		unhandled("movec b1,la");
 		break;
 		}
-	case 2484: { // movec b1,lc
+	case 2506: { // movec b1,lc
 		unhandled("movec b1,lc");
 		break;
 		}
-	case 2485: { // movec a,m
+	case 2507: { // movec a,m
 		unhandled("movec a,m");
 		break;
 		}
-	case 2486: { // movec a,ep
+	case 2508: { // movec a,ep
 		unhandled("movec a,ep");
 		break;
 		}
-	case 2487: { // movec a,vba
+	case 2509: { // movec a,vba
 		unhandled("movec a,vba");
 		break;
 		}
-	case 2488: { // movec a,sc
+	case 2510: { // movec a,sc
 		unhandled("movec a,sc");
 		break;
 		}
-	case 2489: { // movec a,sz
+	case 2511: { // movec a,sz
 		unhandled("movec a,sz");
 		break;
 		}
-	case 2490: { // movec a,sr
+	case 2512: { // movec a,sr
 		unhandled("movec a,sr");
 		break;
 		}
-	case 2491: { // movec a,omr
+	case 2513: { // movec a,omr
 		unhandled("movec a,omr");
 		break;
 		}
-	case 2492: { // movec a,sp
+	case 2514: { // movec a,sp
 		unhandled("movec a,sp");
 		break;
 		}
-	case 2493: { // movec a,ssh
+	case 2515: { // movec a,ssh
 		unhandled("movec a,ssh");
 		break;
 		}
-	case 2494: { // movec a,ssl
+	case 2516: { // movec a,ssl
 		unhandled("movec a,ssl");
 		break;
 		}
-	case 2495: { // movec a,la
+	case 2517: { // movec a,la
 		unhandled("movec a,la");
 		break;
 		}
-	case 2496: { // movec a,lc
+	case 2518: { // movec a,lc
 		unhandled("movec a,lc");
 		break;
 		}
-	case 2497: { // movec b,m
+	case 2519: { // movec b,m
 		unhandled("movec b,m");
 		break;
 		}
-	case 2498: { // movec b,ep
+	case 2520: { // movec b,ep
 		unhandled("movec b,ep");
 		break;
 		}
-	case 2499: { // movec b,vba
+	case 2521: { // movec b,vba
 		unhandled("movec b,vba");
 		break;
 		}
-	case 2500: { // movec b,sc
+	case 2522: { // movec b,sc
 		unhandled("movec b,sc");
 		break;
 		}
-	case 2501: { // movec b,sz
+	case 2523: { // movec b,sz
 		unhandled("movec b,sz");
 		break;
 		}
-	case 2502: { // movec b,sr
+	case 2524: { // movec b,sr
 		unhandled("movec b,sr");
 		break;
 		}
-	case 2503: { // movec b,omr
+	case 2525: { // movec b,omr
 		unhandled("movec b,omr");
 		break;
 		}
-	case 2504: { // movec b,sp
+	case 2526: { // movec b,sp
 		unhandled("movec b,sp");
 		break;
 		}
-	case 2505: { // movec b,ssh
+	case 2527: { // movec b,ssh
 		unhandled("movec b,ssh");
 		break;
 		}
-	case 2506: { // movec b,ssl
+	case 2528: { // movec b,ssl
 		unhandled("movec b,ssl");
 		break;
 		}
-	case 2507: { // movec b,la
+	case 2529: { // movec b,la
 		unhandled("movec b,la");
 		break;
 		}
-	case 2508: { // movec b,lc
+	case 2530: { // movec b,lc
 		unhandled("movec b,lc");
 		break;
 		}
-	case 2509: { // movec r,m
+	case 2531: { // movec r,m
 		unhandled("movec r,m");
 		break;
 		}
-	case 2510: { // movec r,ep
+	case 2532: { // movec r,ep
 		unhandled("movec r,ep");
 		break;
 		}
-	case 2511: { // movec r,vba
+	case 2533: { // movec r,vba
 		unhandled("movec r,vba");
 		break;
 		}
-	case 2512: { // movec r,sc
+	case 2534: { // movec r,sc
 		unhandled("movec r,sc");
 		break;
 		}
-	case 2513: { // movec r,sz
+	case 2535: { // movec r,sz
 		unhandled("movec r,sz");
 		break;
 		}
-	case 2514: { // movec r,sr
+	case 2536: { // movec r,sr
 		unhandled("movec r,sr");
 		break;
 		}
-	case 2515: { // movec r,omr
+	case 2537: { // movec r,omr
 		unhandled("movec r,omr");
 		break;
 		}
-	case 2516: { // movec r,sp
+	case 2538: { // movec r,sp
 		unhandled("movec r,sp");
 		break;
 		}
-	case 2517: { // movec r,ssh
+	case 2539: { // movec r,ssh
 		unhandled("movec r,ssh");
 		break;
 		}
-	case 2518: { // movec r,ssl
+	case 2540: { // movec r,ssl
 		unhandled("movec r,ssl");
 		break;
 		}
-	case 2519: { // movec r,la
+	case 2541: { // movec r,la
 		unhandled("movec r,la");
 		break;
 		}
-	case 2520: { // movec r,lc
+	case 2542: { // movec r,lc
 		unhandled("movec r,lc");
 		break;
 		}
-	case 2521: { // movec n,m
+	case 2543: { // movec n,m
 		unhandled("movec n,m");
 		break;
 		}
-	case 2522: { // movec n,ep
+	case 2544: { // movec n,ep
 		unhandled("movec n,ep");
 		break;
 		}
-	case 2523: { // movec n,vba
+	case 2545: { // movec n,vba
 		unhandled("movec n,vba");
 		break;
 		}
-	case 2524: { // movec n,sc
+	case 2546: { // movec n,sc
 		unhandled("movec n,sc");
 		break;
 		}
-	case 2525: { // movec n,sz
+	case 2547: { // movec n,sz
 		unhandled("movec n,sz");
 		break;
 		}
-	case 2526: { // movec n,sr
+	case 2548: { // movec n,sr
 		unhandled("movec n,sr");
 		break;
 		}
-	case 2527: { // movec n,omr
+	case 2549: { // movec n,omr
 		unhandled("movec n,omr");
 		break;
 		}
-	case 2528: { // movec n,sp
+	case 2550: { // movec n,sp
 		unhandled("movec n,sp");
 		break;
 		}
-	case 2529: { // movec n,ssh
+	case 2551: { // movec n,ssh
 		unhandled("movec n,ssh");
 		break;
 		}
-	case 2530: { // movec n,ssl
+	case 2552: { // movec n,ssl
 		unhandled("movec n,ssl");
 		break;
 		}
-	case 2531: { // movec n,la
+	case 2553: { // movec n,la
 		unhandled("movec n,la");
 		break;
 		}
-	case 2532: { // movec n,lc
+	case 2554: { // movec n,lc
 		unhandled("movec n,lc");
 		break;
 		}
-	case 2533: { // movec m,m
+	case 2555: { // movec m,m
 		unhandled("movec m,m");
 		break;
 		}
-	case 2534: { // movec m,ep
+	case 2556: { // movec m,ep
 		unhandled("movec m,ep");
 		break;
 		}
-	case 2535: { // movec m,vba
+	case 2557: { // movec m,vba
 		unhandled("movec m,vba");
 		break;
 		}
-	case 2536: { // movec m,sc
+	case 2558: { // movec m,sc
 		unhandled("movec m,sc");
 		break;
 		}
-	case 2537: { // movec m,sz
+	case 2559: { // movec m,sz
 		unhandled("movec m,sz");
 		break;
 		}
-	case 2538: { // movec m,sr
+	case 2560: { // movec m,sr
 		unhandled("movec m,sr");
 		break;
 		}
-	case 2539: { // movec m,omr
+	case 2561: { // movec m,omr
 		unhandled("movec m,omr");
 		break;
 		}
-	case 2540: { // movec m,sp
+	case 2562: { // movec m,sp
 		unhandled("movec m,sp");
 		break;
 		}
-	case 2541: { // movec m,ssh
+	case 2563: { // movec m,ssh
 		unhandled("movec m,ssh");
 		break;
 		}
-	case 2542: { // movec m,ssl
+	case 2564: { // movec m,ssl
 		unhandled("movec m,ssl");
 		break;
 		}
-	case 2543: { // movec m,la
+	case 2565: { // movec m,la
 		unhandled("movec m,la");
 		break;
 		}
-	case 2544: { // movec m,lc
+	case 2566: { // movec m,lc
 		unhandled("movec m,lc");
 		break;
 		}
-	case 2545: { // movec ep,m
+	case 2567: { // movec ep,m
 		unhandled("movec ep,m");
 		break;
 		}
-	case 2546: { // movec ep,ep
+	case 2568: { // movec ep,ep
 		unhandled("movec ep,ep");
 		break;
 		}
-	case 2547: { // movec ep,vba
+	case 2569: { // movec ep,vba
 		unhandled("movec ep,vba");
 		break;
 		}
-	case 2548: { // movec ep,sc
+	case 2570: { // movec ep,sc
 		unhandled("movec ep,sc");
 		break;
 		}
-	case 2549: { // movec ep,sz
+	case 2571: { // movec ep,sz
 		unhandled("movec ep,sz");
 		break;
 		}
-	case 2550: { // movec ep,sr
+	case 2572: { // movec ep,sr
 		unhandled("movec ep,sr");
 		break;
 		}
-	case 2551: { // movec ep,omr
+	case 2573: { // movec ep,omr
 		unhandled("movec ep,omr");
 		break;
 		}
-	case 2552: { // movec ep,sp
+	case 2574: { // movec ep,sp
 		unhandled("movec ep,sp");
 		break;
 		}
-	case 2553: { // movec ep,ssh
+	case 2575: { // movec ep,ssh
 		unhandled("movec ep,ssh");
 		break;
 		}
-	case 2554: { // movec ep,ssl
+	case 2576: { // movec ep,ssl
 		unhandled("movec ep,ssl");
 		break;
 		}
-	case 2555: { // movec ep,la
+	case 2577: { // movec ep,la
 		unhandled("movec ep,la");
 		break;
 		}
-	case 2556: { // movec ep,lc
+	case 2578: { // movec ep,lc
 		unhandled("movec ep,lc");
 		break;
 		}
-	case 2557: { // movec vba,m
+	case 2579: { // movec vba,m
 		unhandled("movec vba,m");
 		break;
 		}
-	case 2558: { // movec vba,ep
+	case 2580: { // movec vba,ep
 		unhandled("movec vba,ep");
 		break;
 		}
-	case 2559: { // movec vba,vba
+	case 2581: { // movec vba,vba
 		unhandled("movec vba,vba");
 		break;
 		}
-	case 2560: { // movec vba,sc
+	case 2582: { // movec vba,sc
 		unhandled("movec vba,sc");
 		break;
 		}
-	case 2561: { // movec vba,sz
+	case 2583: { // movec vba,sz
 		unhandled("movec vba,sz");
 		break;
 		}
-	case 2562: { // movec vba,sr
+	case 2584: { // movec vba,sr
 		unhandled("movec vba,sr");
 		break;
 		}
-	case 2563: { // movec vba,omr
+	case 2585: { // movec vba,omr
 		unhandled("movec vba,omr");
 		break;
 		}
-	case 2564: { // movec vba,sp
+	case 2586: { // movec vba,sp
 		unhandled("movec vba,sp");
 		break;
 		}
-	case 2565: { // movec vba,ssh
+	case 2587: { // movec vba,ssh
 		unhandled("movec vba,ssh");
 		break;
 		}
-	case 2566: { // movec vba,ssl
+	case 2588: { // movec vba,ssl
 		unhandled("movec vba,ssl");
 		break;
 		}
-	case 2567: { // movec vba,la
+	case 2589: { // movec vba,la
 		unhandled("movec vba,la");
 		break;
 		}
-	case 2568: { // movec vba,lc
+	case 2590: { // movec vba,lc
 		unhandled("movec vba,lc");
 		break;
 		}
-	case 2569: { // movec sc,m
+	case 2591: { // movec sc,m
 		unhandled("movec sc,m");
 		break;
 		}
-	case 2570: { // movec sc,ep
+	case 2592: { // movec sc,ep
 		unhandled("movec sc,ep");
 		break;
 		}
-	case 2571: { // movec sc,vba
+	case 2593: { // movec sc,vba
 		unhandled("movec sc,vba");
 		break;
 		}
-	case 2572: { // movec sc,sc
+	case 2594: { // movec sc,sc
 		unhandled("movec sc,sc");
 		break;
 		}
-	case 2573: { // movec sc,sz
+	case 2595: { // movec sc,sz
 		unhandled("movec sc,sz");
 		break;
 		}
-	case 2574: { // movec sc,sr
+	case 2596: { // movec sc,sr
 		unhandled("movec sc,sr");
 		break;
 		}
-	case 2575: { // movec sc,omr
+	case 2597: { // movec sc,omr
 		unhandled("movec sc,omr");
 		break;
 		}
-	case 2576: { // movec sc,sp
+	case 2598: { // movec sc,sp
 		unhandled("movec sc,sp");
 		break;
 		}
-	case 2577: { // movec sc,ssh
+	case 2599: { // movec sc,ssh
 		unhandled("movec sc,ssh");
 		break;
 		}
-	case 2578: { // movec sc,ssl
+	case 2600: { // movec sc,ssl
 		unhandled("movec sc,ssl");
 		break;
 		}
-	case 2579: { // movec sc,la
+	case 2601: { // movec sc,la
 		unhandled("movec sc,la");
 		break;
 		}
-	case 2580: { // movec sc,lc
+	case 2602: { // movec sc,lc
 		unhandled("movec sc,lc");
 		break;
 		}
-	case 2581: { // movec sz,m
+	case 2603: { // movec sz,m
 		unhandled("movec sz,m");
 		break;
 		}
-	case 2582: { // movec sz,ep
+	case 2604: { // movec sz,ep
 		unhandled("movec sz,ep");
 		break;
 		}
-	case 2583: { // movec sz,vba
+	case 2605: { // movec sz,vba
 		unhandled("movec sz,vba");
 		break;
 		}
-	case 2584: { // movec sz,sc
+	case 2606: { // movec sz,sc
 		unhandled("movec sz,sc");
 		break;
 		}
-	case 2585: { // movec sz,sz
+	case 2607: { // movec sz,sz
 		unhandled("movec sz,sz");
 		break;
 		}
-	case 2586: { // movec sz,sr
+	case 2608: { // movec sz,sr
 		unhandled("movec sz,sr");
 		break;
 		}
-	case 2587: { // movec sz,omr
+	case 2609: { // movec sz,omr
 		unhandled("movec sz,omr");
 		break;
 		}
-	case 2588: { // movec sz,sp
+	case 2610: { // movec sz,sp
 		unhandled("movec sz,sp");
 		break;
 		}
-	case 2589: { // movec sz,ssh
+	case 2611: { // movec sz,ssh
 		unhandled("movec sz,ssh");
 		break;
 		}
-	case 2590: { // movec sz,ssl
+	case 2612: { // movec sz,ssl
 		unhandled("movec sz,ssl");
 		break;
 		}
-	case 2591: { // movec sz,la
+	case 2613: { // movec sz,la
 		unhandled("movec sz,la");
 		break;
 		}
-	case 2592: { // movec sz,lc
+	case 2614: { // movec sz,lc
 		unhandled("movec sz,lc");
 		break;
 		}
-	case 2593: { // movec sr,m
+	case 2615: { // movec sr,m
 		unhandled("movec sr,m");
 		break;
 		}
-	case 2594: { // movec sr,ep
+	case 2616: { // movec sr,ep
 		unhandled("movec sr,ep");
 		break;
 		}
-	case 2595: { // movec sr,vba
+	case 2617: { // movec sr,vba
 		unhandled("movec sr,vba");
 		break;
 		}
-	case 2596: { // movec sr,sc
+	case 2618: { // movec sr,sc
 		unhandled("movec sr,sc");
 		break;
 		}
-	case 2597: { // movec sr,sz
+	case 2619: { // movec sr,sz
 		unhandled("movec sr,sz");
 		break;
 		}
-	case 2598: { // movec sr,sr
+	case 2620: { // movec sr,sr
 		unhandled("movec sr,sr");
 		break;
 		}
-	case 2599: { // movec sr,omr
+	case 2621: { // movec sr,omr
 		unhandled("movec sr,omr");
 		break;
 		}
-	case 2600: { // movec sr,sp
+	case 2622: { // movec sr,sp
 		unhandled("movec sr,sp");
 		break;
 		}
-	case 2601: { // movec sr,ssh
+	case 2623: { // movec sr,ssh
 		unhandled("movec sr,ssh");
 		break;
 		}
-	case 2602: { // movec sr,ssl
+	case 2624: { // movec sr,ssl
 		unhandled("movec sr,ssl");
 		break;
 		}
-	case 2603: { // movec sr,la
+	case 2625: { // movec sr,la
 		unhandled("movec sr,la");
 		break;
 		}
-	case 2604: { // movec sr,lc
+	case 2626: { // movec sr,lc
 		unhandled("movec sr,lc");
 		break;
 		}
-	case 2605: { // movec omr,m
+	case 2627: { // movec omr,m
 		unhandled("movec omr,m");
 		break;
 		}
-	case 2606: { // movec omr,ep
+	case 2628: { // movec omr,ep
 		unhandled("movec omr,ep");
 		break;
 		}
-	case 2607: { // movec omr,vba
+	case 2629: { // movec omr,vba
 		unhandled("movec omr,vba");
 		break;
 		}
-	case 2608: { // movec omr,sc
+	case 2630: { // movec omr,sc
 		unhandled("movec omr,sc");
 		break;
 		}
-	case 2609: { // movec omr,sz
+	case 2631: { // movec omr,sz
 		unhandled("movec omr,sz");
 		break;
 		}
-	case 2610: { // movec omr,sr
+	case 2632: { // movec omr,sr
 		unhandled("movec omr,sr");
 		break;
 		}
-	case 2611: { // movec omr,omr
+	case 2633: { // movec omr,omr
 		unhandled("movec omr,omr");
 		break;
 		}
-	case 2612: { // movec omr,sp
+	case 2634: { // movec omr,sp
 		unhandled("movec omr,sp");
 		break;
 		}
-	case 2613: { // movec omr,ssh
+	case 2635: { // movec omr,ssh
 		unhandled("movec omr,ssh");
 		break;
 		}
-	case 2614: { // movec omr,ssl
+	case 2636: { // movec omr,ssl
 		unhandled("movec omr,ssl");
 		break;
 		}
-	case 2615: { // movec omr,la
+	case 2637: { // movec omr,la
 		unhandled("movec omr,la");
 		break;
 		}
-	case 2616: { // movec omr,lc
+	case 2638: { // movec omr,lc
 		unhandled("movec omr,lc");
 		break;
 		}
-	case 2617: { // movec sp,m
+	case 2639: { // movec sp,m
 		unhandled("movec sp,m");
 		break;
 		}
-	case 2618: { // movec sp,ep
+	case 2640: { // movec sp,ep
 		unhandled("movec sp,ep");
 		break;
 		}
-	case 2619: { // movec sp,vba
+	case 2641: { // movec sp,vba
 		unhandled("movec sp,vba");
 		break;
 		}
-	case 2620: { // movec sp,sc
+	case 2642: { // movec sp,sc
 		unhandled("movec sp,sc");
 		break;
 		}
-	case 2621: { // movec sp,sz
+	case 2643: { // movec sp,sz
 		unhandled("movec sp,sz");
 		break;
 		}
-	case 2622: { // movec sp,sr
+	case 2644: { // movec sp,sr
 		unhandled("movec sp,sr");
 		break;
 		}
-	case 2623: { // movec sp,omr
+	case 2645: { // movec sp,omr
 		unhandled("movec sp,omr");
 		break;
 		}
-	case 2624: { // movec sp,sp
+	case 2646: { // movec sp,sp
 		unhandled("movec sp,sp");
 		break;
 		}
-	case 2625: { // movec sp,ssh
+	case 2647: { // movec sp,ssh
 		unhandled("movec sp,ssh");
 		break;
 		}
-	case 2626: { // movec sp,ssl
+	case 2648: { // movec sp,ssl
 		unhandled("movec sp,ssl");
 		break;
 		}
-	case 2627: { // movec sp,la
+	case 2649: { // movec sp,la
 		unhandled("movec sp,la");
 		break;
 		}
-	case 2628: { // movec sp,lc
+	case 2650: { // movec sp,lc
 		unhandled("movec sp,lc");
 		break;
 		}
-	case 2629: { // movec ssh,m
+	case 2651: { // movec ssh,m
 		unhandled("movec ssh,m");
 		break;
 		}
-	case 2630: { // movec ssh,ep
+	case 2652: { // movec ssh,ep
 		unhandled("movec ssh,ep");
 		break;
 		}
-	case 2631: { // movec ssh,vba
+	case 2653: { // movec ssh,vba
 		unhandled("movec ssh,vba");
 		break;
 		}
-	case 2632: { // movec ssh,sc
+	case 2654: { // movec ssh,sc
 		unhandled("movec ssh,sc");
 		break;
 		}
-	case 2633: { // movec ssh,sz
+	case 2655: { // movec ssh,sz
 		unhandled("movec ssh,sz");
 		break;
 		}
-	case 2634: { // movec ssh,sr
+	case 2656: { // movec ssh,sr
 		unhandled("movec ssh,sr");
 		break;
 		}
-	case 2635: { // movec ssh,omr
+	case 2657: { // movec ssh,omr
 		unhandled("movec ssh,omr");
 		break;
 		}
-	case 2636: { // movec ssh,sp
+	case 2658: { // movec ssh,sp
 		unhandled("movec ssh,sp");
 		break;
 		}
-	case 2637: { // movec ssh,ssh
+	case 2659: { // movec ssh,ssh
 		unhandled("movec ssh,ssh");
 		break;
 		}
-	case 2638: { // movec ssh,ssl
+	case 2660: { // movec ssh,ssl
 		unhandled("movec ssh,ssl");
 		break;
 		}
-	case 2639: { // movec ssh,la
+	case 2661: { // movec ssh,la
 		unhandled("movec ssh,la");
 		break;
 		}
-	case 2640: { // movec ssh,lc
+	case 2662: { // movec ssh,lc
 		unhandled("movec ssh,lc");
 		break;
 		}
-	case 2641: { // movec ssl,m
+	case 2663: { // movec ssl,m
 		unhandled("movec ssl,m");
 		break;
 		}
-	case 2642: { // movec ssl,ep
+	case 2664: { // movec ssl,ep
 		unhandled("movec ssl,ep");
 		break;
 		}
-	case 2643: { // movec ssl,vba
+	case 2665: { // movec ssl,vba
 		unhandled("movec ssl,vba");
 		break;
 		}
-	case 2644: { // movec ssl,sc
+	case 2666: { // movec ssl,sc
 		unhandled("movec ssl,sc");
 		break;
 		}
-	case 2645: { // movec ssl,sz
+	case 2667: { // movec ssl,sz
 		unhandled("movec ssl,sz");
 		break;
 		}
-	case 2646: { // movec ssl,sr
+	case 2668: { // movec ssl,sr
 		unhandled("movec ssl,sr");
 		break;
 		}
-	case 2647: { // movec ssl,omr
+	case 2669: { // movec ssl,omr
 		unhandled("movec ssl,omr");
 		break;
 		}
-	case 2648: { // movec ssl,sp
+	case 2670: { // movec ssl,sp
 		unhandled("movec ssl,sp");
 		break;
 		}
-	case 2649: { // movec ssl,ssh
+	case 2671: { // movec ssl,ssh
 		unhandled("movec ssl,ssh");
 		break;
 		}
-	case 2650: { // movec ssl,ssl
+	case 2672: { // movec ssl,ssl
 		unhandled("movec ssl,ssl");
 		break;
 		}
-	case 2651: { // movec ssl,la
+	case 2673: { // movec ssl,la
 		unhandled("movec ssl,la");
 		break;
 		}
-	case 2652: { // movec ssl,lc
+	case 2674: { // movec ssl,lc
 		unhandled("movec ssl,lc");
 		break;
 		}
-	case 2653: { // movec la,m
+	case 2675: { // movec la,m
 		unhandled("movec la,m");
 		break;
 		}
-	case 2654: { // movec la,ep
+	case 2676: { // movec la,ep
 		unhandled("movec la,ep");
 		break;
 		}
-	case 2655: { // movec la,vba
+	case 2677: { // movec la,vba
 		unhandled("movec la,vba");
 		break;
 		}
-	case 2656: { // movec la,sc
+	case 2678: { // movec la,sc
 		unhandled("movec la,sc");
 		break;
 		}
-	case 2657: { // movec la,sz
+	case 2679: { // movec la,sz
 		unhandled("movec la,sz");
 		break;
 		}
-	case 2658: { // movec la,sr
+	case 2680: { // movec la,sr
 		unhandled("movec la,sr");
 		break;
 		}
-	case 2659: { // movec la,omr
+	case 2681: { // movec la,omr
 		unhandled("movec la,omr");
 		break;
 		}
-	case 2660: { // movec la,sp
+	case 2682: { // movec la,sp
 		unhandled("movec la,sp");
 		break;
 		}
-	case 2661: { // movec la,ssh
+	case 2683: { // movec la,ssh
 		unhandled("movec la,ssh");
 		break;
 		}
-	case 2662: { // movec la,ssl
+	case 2684: { // movec la,ssl
 		unhandled("movec la,ssl");
 		break;
 		}
-	case 2663: { // movec la,la
+	case 2685: { // movec la,la
 		unhandled("movec la,la");
 		break;
 		}
-	case 2664: { // movec la,lc
+	case 2686: { // movec la,lc
 		unhandled("movec la,lc");
 		break;
 		}
-	case 2665: { // movec lc,m
+	case 2687: { // movec lc,m
 		unhandled("movec lc,m");
 		break;
 		}
-	case 2666: { // movec lc,ep
+	case 2688: { // movec lc,ep
 		unhandled("movec lc,ep");
 		break;
 		}
-	case 2667: { // movec lc,vba
+	case 2689: { // movec lc,vba
 		unhandled("movec lc,vba");
 		break;
 		}
-	case 2668: { // movec lc,sc
+	case 2690: { // movec lc,sc
 		unhandled("movec lc,sc");
 		break;
 		}
-	case 2669: { // movec lc,sz
+	case 2691: { // movec lc,sz
 		unhandled("movec lc,sz");
 		break;
 		}
-	case 2670: { // movec lc,sr
+	case 2692: { // movec lc,sr
 		unhandled("movec lc,sr");
 		break;
 		}
-	case 2671: { // movec lc,omr
+	case 2693: { // movec lc,omr
 		unhandled("movec lc,omr");
 		break;
 		}
-	case 2672: { // movec lc,sp
+	case 2694: { // movec lc,sp
 		unhandled("movec lc,sp");
 		break;
 		}
-	case 2673: { // movec lc,ssh
+	case 2695: { // movec lc,ssh
 		unhandled("movec lc,ssh");
 		break;
 		}
-	case 2674: { // movec lc,ssl
+	case 2696: { // movec lc,ssl
 		unhandled("movec lc,ssl");
 		break;
 		}
-	case 2675: { // movec lc,la
+	case 2697: { // movec lc,la
 		unhandled("movec lc,la");
 		break;
 		}
-	case 2676: { // movec lc,lc
+	case 2698: { // movec lc,lc
 		unhandled("movec lc,lc");
 		break;
 		}
-	case 2677: { // movec m,x0
+	case 2699: { // movec m,x0
 		unhandled("movec m,x0");
 		break;
 		}
-	case 2678: { // movec ep,x0
+	case 2700: { // movec ep,x0
 		unhandled("movec ep,x0");
 		break;
 		}
-	case 2679: { // movec vba,x0
+	case 2701: { // movec vba,x0
 		unhandled("movec vba,x0");
 		break;
 		}
-	case 2680: { // movec sc,x0
+	case 2702: { // movec sc,x0
 		unhandled("movec sc,x0");
 		break;
 		}
-	case 2681: { // movec sz,x0
+	case 2703: { // movec sz,x0
 		unhandled("movec sz,x0");
 		break;
 		}
-	case 2682: { // movec sr,x0
+	case 2704: { // movec sr,x0
 		unhandled("movec sr,x0");
 		break;
 		}
-	case 2683: { // movec omr,x0
+	case 2705: { // movec omr,x0
 		unhandled("movec omr,x0");
 		break;
 		}
-	case 2684: { // movec sp,x0
+	case 2706: { // movec sp,x0
 		unhandled("movec sp,x0");
 		break;
 		}
-	case 2685: { // movec ssh,x0
+	case 2707: { // movec ssh,x0
 		unhandled("movec ssh,x0");
 		break;
 		}
-	case 2686: { // movec ssl,x0
+	case 2708: { // movec ssl,x0
 		unhandled("movec ssl,x0");
 		break;
 		}
-	case 2687: { // movec la,x0
+	case 2709: { // movec la,x0
 		unhandled("movec la,x0");
 		break;
 		}
-	case 2688: { // movec lc,x0
+	case 2710: { // movec lc,x0
 		unhandled("movec lc,x0");
 		break;
 		}
-	case 2689: { // movec m,x1
+	case 2711: { // movec m,x1
 		unhandled("movec m,x1");
 		break;
 		}
-	case 2690: { // movec ep,x1
+	case 2712: { // movec ep,x1
 		unhandled("movec ep,x1");
 		break;
 		}
-	case 2691: { // movec vba,x1
+	case 2713: { // movec vba,x1
 		unhandled("movec vba,x1");
 		break;
 		}
-	case 2692: { // movec sc,x1
+	case 2714: { // movec sc,x1
 		unhandled("movec sc,x1");
 		break;
 		}
-	case 2693: { // movec sz,x1
+	case 2715: { // movec sz,x1
 		unhandled("movec sz,x1");
 		break;
 		}
-	case 2694: { // movec sr,x1
+	case 2716: { // movec sr,x1
 		unhandled("movec sr,x1");
 		break;
 		}
-	case 2695: { // movec omr,x1
+	case 2717: { // movec omr,x1
 		unhandled("movec omr,x1");
 		break;
 		}
-	case 2696: { // movec sp,x1
+	case 2718: { // movec sp,x1
 		unhandled("movec sp,x1");
 		break;
 		}
-	case 2697: { // movec ssh,x1
+	case 2719: { // movec ssh,x1
 		unhandled("movec ssh,x1");
 		break;
 		}
-	case 2698: { // movec ssl,x1
+	case 2720: { // movec ssl,x1
 		unhandled("movec ssl,x1");
 		break;
 		}
-	case 2699: { // movec la,x1
+	case 2721: { // movec la,x1
 		unhandled("movec la,x1");
 		break;
 		}
-	case 2700: { // movec lc,x1
+	case 2722: { // movec lc,x1
 		unhandled("movec lc,x1");
 		break;
 		}
-	case 2701: { // movec m,y0
+	case 2723: { // movec m,y0
 		unhandled("movec m,y0");
 		break;
 		}
-	case 2702: { // movec ep,y0
+	case 2724: { // movec ep,y0
 		unhandled("movec ep,y0");
 		break;
 		}
-	case 2703: { // movec vba,y0
+	case 2725: { // movec vba,y0
 		unhandled("movec vba,y0");
 		break;
 		}
-	case 2704: { // movec sc,y0
+	case 2726: { // movec sc,y0
 		unhandled("movec sc,y0");
 		break;
 		}
-	case 2705: { // movec sz,y0
+	case 2727: { // movec sz,y0
 		unhandled("movec sz,y0");
 		break;
 		}
-	case 2706: { // movec sr,y0
+	case 2728: { // movec sr,y0
 		unhandled("movec sr,y0");
 		break;
 		}
-	case 2707: { // movec omr,y0
+	case 2729: { // movec omr,y0
 		unhandled("movec omr,y0");
 		break;
 		}
-	case 2708: { // movec sp,y0
+	case 2730: { // movec sp,y0
 		unhandled("movec sp,y0");
 		break;
 		}
-	case 2709: { // movec ssh,y0
+	case 2731: { // movec ssh,y0
 		unhandled("movec ssh,y0");
 		break;
 		}
-	case 2710: { // movec ssl,y0
+	case 2732: { // movec ssl,y0
 		unhandled("movec ssl,y0");
 		break;
 		}
-	case 2711: { // movec la,y0
+	case 2733: { // movec la,y0
 		unhandled("movec la,y0");
 		break;
 		}
-	case 2712: { // movec lc,y0
+	case 2734: { // movec lc,y0
 		unhandled("movec lc,y0");
 		break;
 		}
-	case 2713: { // movec m,y1
+	case 2735: { // movec m,y1
 		unhandled("movec m,y1");
 		break;
 		}
-	case 2714: { // movec ep,y1
+	case 2736: { // movec ep,y1
 		unhandled("movec ep,y1");
 		break;
 		}
-	case 2715: { // movec vba,y1
+	case 2737: { // movec vba,y1
 		unhandled("movec vba,y1");
 		break;
 		}
-	case 2716: { // movec sc,y1
+	case 2738: { // movec sc,y1
 		unhandled("movec sc,y1");
 		break;
 		}
-	case 2717: { // movec sz,y1
+	case 2739: { // movec sz,y1
 		unhandled("movec sz,y1");
 		break;
 		}
-	case 2718: { // movec sr,y1
+	case 2740: { // movec sr,y1
 		unhandled("movec sr,y1");
 		break;
 		}
-	case 2719: { // movec omr,y1
+	case 2741: { // movec omr,y1
 		unhandled("movec omr,y1");
 		break;
 		}
-	case 2720: { // movec sp,y1
+	case 2742: { // movec sp,y1
 		unhandled("movec sp,y1");
 		break;
 		}
-	case 2721: { // movec ssh,y1
+	case 2743: { // movec ssh,y1
 		unhandled("movec ssh,y1");
 		break;
 		}
-	case 2722: { // movec ssl,y1
+	case 2744: { // movec ssl,y1
 		unhandled("movec ssl,y1");
 		break;
 		}
-	case 2723: { // movec la,y1
+	case 2745: { // movec la,y1
 		unhandled("movec la,y1");
 		break;
 		}
-	case 2724: { // movec lc,y1
+	case 2746: { // movec lc,y1
 		unhandled("movec lc,y1");
 		break;
 		}
-	case 2725: { // movec m,a0
+	case 2747: { // movec m,a0
 		unhandled("movec m,a0");
 		break;
 		}
-	case 2726: { // movec ep,a0
+	case 2748: { // movec ep,a0
 		unhandled("movec ep,a0");
 		break;
 		}
-	case 2727: { // movec vba,a0
+	case 2749: { // movec vba,a0
 		unhandled("movec vba,a0");
 		break;
 		}
-	case 2728: { // movec sc,a0
+	case 2750: { // movec sc,a0
 		unhandled("movec sc,a0");
 		break;
 		}
-	case 2729: { // movec sz,a0
+	case 2751: { // movec sz,a0
 		unhandled("movec sz,a0");
 		break;
 		}
-	case 2730: { // movec sr,a0
+	case 2752: { // movec sr,a0
 		unhandled("movec sr,a0");
 		break;
 		}
-	case 2731: { // movec omr,a0
+	case 2753: { // movec omr,a0
 		unhandled("movec omr,a0");
 		break;
 		}
-	case 2732: { // movec sp,a0
+	case 2754: { // movec sp,a0
 		unhandled("movec sp,a0");
 		break;
 		}
-	case 2733: { // movec ssh,a0
+	case 2755: { // movec ssh,a0
 		unhandled("movec ssh,a0");
 		break;
 		}
-	case 2734: { // movec ssl,a0
+	case 2756: { // movec ssl,a0
 		unhandled("movec ssl,a0");
 		break;
 		}
-	case 2735: { // movec la,a0
+	case 2757: { // movec la,a0
 		unhandled("movec la,a0");
 		break;
 		}
-	case 2736: { // movec lc,a0
+	case 2758: { // movec lc,a0
 		unhandled("movec lc,a0");
 		break;
 		}
-	case 2737: { // movec m,b0
+	case 2759: { // movec m,b0
 		unhandled("movec m,b0");
 		break;
 		}
-	case 2738: { // movec ep,b0
+	case 2760: { // movec ep,b0
 		unhandled("movec ep,b0");
 		break;
 		}
-	case 2739: { // movec vba,b0
+	case 2761: { // movec vba,b0
 		unhandled("movec vba,b0");
 		break;
 		}
-	case 2740: { // movec sc,b0
+	case 2762: { // movec sc,b0
 		unhandled("movec sc,b0");
 		break;
 		}
-	case 2741: { // movec sz,b0
+	case 2763: { // movec sz,b0
 		unhandled("movec sz,b0");
 		break;
 		}
-	case 2742: { // movec sr,b0
+	case 2764: { // movec sr,b0
 		unhandled("movec sr,b0");
 		break;
 		}
-	case 2743: { // movec omr,b0
+	case 2765: { // movec omr,b0
 		unhandled("movec omr,b0");
 		break;
 		}
-	case 2744: { // movec sp,b0
+	case 2766: { // movec sp,b0
 		unhandled("movec sp,b0");
 		break;
 		}
-	case 2745: { // movec ssh,b0
+	case 2767: { // movec ssh,b0
 		unhandled("movec ssh,b0");
 		break;
 		}
-	case 2746: { // movec ssl,b0
+	case 2768: { // movec ssl,b0
 		unhandled("movec ssl,b0");
 		break;
 		}
-	case 2747: { // movec la,b0
+	case 2769: { // movec la,b0
 		unhandled("movec la,b0");
 		break;
 		}
-	case 2748: { // movec lc,b0
+	case 2770: { // movec lc,b0
 		unhandled("movec lc,b0");
 		break;
 		}
-	case 2749: { // movec m,a2
+	case 2771: { // movec m,a2
 		unhandled("movec m,a2");
 		break;
 		}
-	case 2750: { // movec ep,a2
+	case 2772: { // movec ep,a2
 		unhandled("movec ep,a2");
 		break;
 		}
-	case 2751: { // movec vba,a2
+	case 2773: { // movec vba,a2
 		unhandled("movec vba,a2");
 		break;
 		}
-	case 2752: { // movec sc,a2
+	case 2774: { // movec sc,a2
 		unhandled("movec sc,a2");
 		break;
 		}
-	case 2753: { // movec sz,a2
+	case 2775: { // movec sz,a2
 		unhandled("movec sz,a2");
 		break;
 		}
-	case 2754: { // movec sr,a2
+	case 2776: { // movec sr,a2
 		unhandled("movec sr,a2");
 		break;
 		}
-	case 2755: { // movec omr,a2
+	case 2777: { // movec omr,a2
 		unhandled("movec omr,a2");
 		break;
 		}
-	case 2756: { // movec sp,a2
+	case 2778: { // movec sp,a2
 		unhandled("movec sp,a2");
 		break;
 		}
-	case 2757: { // movec ssh,a2
+	case 2779: { // movec ssh,a2
 		unhandled("movec ssh,a2");
 		break;
 		}
-	case 2758: { // movec ssl,a2
+	case 2780: { // movec ssl,a2
 		unhandled("movec ssl,a2");
 		break;
 		}
-	case 2759: { // movec la,a2
+	case 2781: { // movec la,a2
 		unhandled("movec la,a2");
 		break;
 		}
-	case 2760: { // movec lc,a2
+	case 2782: { // movec lc,a2
 		unhandled("movec lc,a2");
 		break;
 		}
-	case 2761: { // movec m,b2
+	case 2783: { // movec m,b2
 		unhandled("movec m,b2");
 		break;
 		}
-	case 2762: { // movec ep,b2
+	case 2784: { // movec ep,b2
 		unhandled("movec ep,b2");
 		break;
 		}
-	case 2763: { // movec vba,b2
+	case 2785: { // movec vba,b2
 		unhandled("movec vba,b2");
 		break;
 		}
-	case 2764: { // movec sc,b2
+	case 2786: { // movec sc,b2
 		unhandled("movec sc,b2");
 		break;
 		}
-	case 2765: { // movec sz,b2
+	case 2787: { // movec sz,b2
 		unhandled("movec sz,b2");
 		break;
 		}
-	case 2766: { // movec sr,b2
+	case 2788: { // movec sr,b2
 		unhandled("movec sr,b2");
 		break;
 		}
-	case 2767: { // movec omr,b2
+	case 2789: { // movec omr,b2
 		unhandled("movec omr,b2");
 		break;
 		}
-	case 2768: { // movec sp,b2
+	case 2790: { // movec sp,b2
 		unhandled("movec sp,b2");
 		break;
 		}
-	case 2769: { // movec ssh,b2
+	case 2791: { // movec ssh,b2
 		unhandled("movec ssh,b2");
 		break;
 		}
-	case 2770: { // movec ssl,b2
+	case 2792: { // movec ssl,b2
 		unhandled("movec ssl,b2");
 		break;
 		}
-	case 2771: { // movec la,b2
+	case 2793: { // movec la,b2
 		unhandled("movec la,b2");
 		break;
 		}
-	case 2772: { // movec lc,b2
+	case 2794: { // movec lc,b2
 		unhandled("movec lc,b2");
 		break;
 		}
-	case 2773: { // movec m,a1
+	case 2795: { // movec m,a1
 		unhandled("movec m,a1");
 		break;
 		}
-	case 2774: { // movec ep,a1
+	case 2796: { // movec ep,a1
 		unhandled("movec ep,a1");
 		break;
 		}
-	case 2775: { // movec vba,a1
+	case 2797: { // movec vba,a1
 		unhandled("movec vba,a1");
 		break;
 		}
-	case 2776: { // movec sc,a1
+	case 2798: { // movec sc,a1
 		unhandled("movec sc,a1");
 		break;
 		}
-	case 2777: { // movec sz,a1
+	case 2799: { // movec sz,a1
 		unhandled("movec sz,a1");
 		break;
 		}
-	case 2778: { // movec sr,a1
+	case 2800: { // movec sr,a1
 		unhandled("movec sr,a1");
 		break;
 		}
-	case 2779: { // movec omr,a1
+	case 2801: { // movec omr,a1
 		unhandled("movec omr,a1");
 		break;
 		}
-	case 2780: { // movec sp,a1
+	case 2802: { // movec sp,a1
 		unhandled("movec sp,a1");
 		break;
 		}
-	case 2781: { // movec ssh,a1
+	case 2803: { // movec ssh,a1
 		unhandled("movec ssh,a1");
 		break;
 		}
-	case 2782: { // movec ssl,a1
+	case 2804: { // movec ssl,a1
 		unhandled("movec ssl,a1");
 		break;
 		}
-	case 2783: { // movec la,a1
+	case 2805: { // movec la,a1
 		unhandled("movec la,a1");
 		break;
 		}
-	case 2784: { // movec lc,a1
+	case 2806: { // movec lc,a1
 		unhandled("movec lc,a1");
 		break;
 		}
-	case 2785: { // movec m,b1
+	case 2807: { // movec m,b1
 		unhandled("movec m,b1");
 		break;
 		}
-	case 2786: { // movec ep,b1
+	case 2808: { // movec ep,b1
 		unhandled("movec ep,b1");
 		break;
 		}
-	case 2787: { // movec vba,b1
+	case 2809: { // movec vba,b1
 		unhandled("movec vba,b1");
 		break;
 		}
-	case 2788: { // movec sc,b1
+	case 2810: { // movec sc,b1
 		unhandled("movec sc,b1");
 		break;
 		}
-	case 2789: { // movec sz,b1
+	case 2811: { // movec sz,b1
 		unhandled("movec sz,b1");
 		break;
 		}
-	case 2790: { // movec sr,b1
+	case 2812: { // movec sr,b1
 		unhandled("movec sr,b1");
 		break;
 		}
-	case 2791: { // movec omr,b1
+	case 2813: { // movec omr,b1
 		unhandled("movec omr,b1");
 		break;
 		}
-	case 2792: { // movec sp,b1
+	case 2814: { // movec sp,b1
 		unhandled("movec sp,b1");
 		break;
 		}
-	case 2793: { // movec ssh,b1
+	case 2815: { // movec ssh,b1
 		unhandled("movec ssh,b1");
 		break;
 		}
-	case 2794: { // movec ssl,b1
+	case 2816: { // movec ssl,b1
 		unhandled("movec ssl,b1");
 		break;
 		}
-	case 2795: { // movec la,b1
+	case 2817: { // movec la,b1
 		unhandled("movec la,b1");
 		break;
 		}
-	case 2796: { // movec lc,b1
+	case 2818: { // movec lc,b1
 		unhandled("movec lc,b1");
 		break;
 		}
-	case 2797: { // movec m,a
+	case 2819: { // movec m,a
 		unhandled("movec m,a");
 		break;
 		}
-	case 2798: { // movec ep,a
+	case 2820: { // movec ep,a
 		unhandled("movec ep,a");
 		break;
 		}
-	case 2799: { // movec vba,a
+	case 2821: { // movec vba,a
 		unhandled("movec vba,a");
 		break;
 		}
-	case 2800: { // movec sc,a
+	case 2822: { // movec sc,a
 		unhandled("movec sc,a");
 		break;
 		}
-	case 2801: { // movec sz,a
+	case 2823: { // movec sz,a
 		unhandled("movec sz,a");
 		break;
 		}
-	case 2802: { // movec sr,a
+	case 2824: { // movec sr,a
 		unhandled("movec sr,a");
 		break;
 		}
-	case 2803: { // movec omr,a
+	case 2825: { // movec omr,a
 		unhandled("movec omr,a");
 		break;
 		}
-	case 2804: { // movec sp,a
+	case 2826: { // movec sp,a
 		unhandled("movec sp,a");
 		break;
 		}
-	case 2805: { // movec ssh,a
+	case 2827: { // movec ssh,a
 		unhandled("movec ssh,a");
 		break;
 		}
-	case 2806: { // movec ssl,a
+	case 2828: { // movec ssl,a
 		unhandled("movec ssl,a");
 		break;
 		}
-	case 2807: { // movec la,a
+	case 2829: { // movec la,a
 		unhandled("movec la,a");
 		break;
 		}
-	case 2808: { // movec lc,a
+	case 2830: { // movec lc,a
 		unhandled("movec lc,a");
 		break;
 		}
-	case 2809: { // movec m,b
+	case 2831: { // movec m,b
 		unhandled("movec m,b");
 		break;
 		}
-	case 2810: { // movec ep,b
+	case 2832: { // movec ep,b
 		unhandled("movec ep,b");
 		break;
 		}
-	case 2811: { // movec vba,b
+	case 2833: { // movec vba,b
 		unhandled("movec vba,b");
 		break;
 		}
-	case 2812: { // movec sc,b
+	case 2834: { // movec sc,b
 		unhandled("movec sc,b");
 		break;
 		}
-	case 2813: { // movec sz,b
+	case 2835: { // movec sz,b
 		unhandled("movec sz,b");
 		break;
 		}
-	case 2814: { // movec sr,b
+	case 2836: { // movec sr,b
 		unhandled("movec sr,b");
 		break;
 		}
-	case 2815: { // movec omr,b
+	case 2837: { // movec omr,b
 		unhandled("movec omr,b");
 		break;
 		}
-	case 2816: { // movec sp,b
+	case 2838: { // movec sp,b
 		unhandled("movec sp,b");
 		break;
 		}
-	case 2817: { // movec ssh,b
+	case 2839: { // movec ssh,b
 		unhandled("movec ssh,b");
 		break;
 		}
-	case 2818: { // movec ssl,b
+	case 2840: { // movec ssl,b
 		unhandled("movec ssl,b");
 		break;
 		}
-	case 2819: { // movec la,b
+	case 2841: { // movec la,b
 		unhandled("movec la,b");
 		break;
 		}
-	case 2820: { // movec lc,b
+	case 2842: { // movec lc,b
 		unhandled("movec lc,b");
 		break;
 		}
-	case 2821: { // movec m,r
+	case 2843: { // movec m,r
 		unhandled("movec m,r");
 		break;
 		}
-	case 2822: { // movec ep,r
+	case 2844: { // movec ep,r
 		unhandled("movec ep,r");
 		break;
 		}
-	case 2823: { // movec vba,r
+	case 2845: { // movec vba,r
 		unhandled("movec vba,r");
 		break;
 		}
-	case 2824: { // movec sc,r
+	case 2846: { // movec sc,r
 		unhandled("movec sc,r");
 		break;
 		}
-	case 2825: { // movec sz,r
+	case 2847: { // movec sz,r
 		unhandled("movec sz,r");
 		break;
 		}
-	case 2826: { // movec sr,r
+	case 2848: { // movec sr,r
 		unhandled("movec sr,r");
 		break;
 		}
-	case 2827: { // movec omr,r
+	case 2849: { // movec omr,r
 		unhandled("movec omr,r");
 		break;
 		}
-	case 2828: { // movec sp,r
+	case 2850: { // movec sp,r
 		unhandled("movec sp,r");
 		break;
 		}
-	case 2829: { // movec ssh,r
+	case 2851: { // movec ssh,r
 		unhandled("movec ssh,r");
 		break;
 		}
-	case 2830: { // movec ssl,r
+	case 2852: { // movec ssl,r
 		unhandled("movec ssl,r");
 		break;
 		}
-	case 2831: { // movec la,r
+	case 2853: { // movec la,r
 		unhandled("movec la,r");
 		break;
 		}
-	case 2832: { // movec lc,r
+	case 2854: { // movec lc,r
 		unhandled("movec lc,r");
 		break;
 		}
-	case 2833: { // movec m,n
+	case 2855: { // movec m,n
 		unhandled("movec m,n");
 		break;
 		}
-	case 2834: { // movec ep,n
+	case 2856: { // movec ep,n
 		unhandled("movec ep,n");
 		break;
 		}
-	case 2835: { // movec vba,n
+	case 2857: { // movec vba,n
 		unhandled("movec vba,n");
 		break;
 		}
-	case 2836: { // movec sc,n
+	case 2858: { // movec sc,n
 		unhandled("movec sc,n");
 		break;
 		}
-	case 2837: { // movec sz,n
+	case 2859: { // movec sz,n
 		unhandled("movec sz,n");
 		break;
 		}
-	case 2838: { // movec sr,n
+	case 2860: { // movec sr,n
 		unhandled("movec sr,n");
 		break;
 		}
-	case 2839: { // movec omr,n
+	case 2861: { // movec omr,n
 		unhandled("movec omr,n");
 		break;
 		}
-	case 2840: { // movec sp,n
+	case 2862: { // movec sp,n
 		unhandled("movec sp,n");
 		break;
 		}
-	case 2841: { // movec ssh,n
+	case 2863: { // movec ssh,n
 		unhandled("movec ssh,n");
 		break;
 		}
-	case 2842: { // movec ssl,n
+	case 2864: { // movec ssl,n
 		unhandled("movec ssl,n");
 		break;
 		}
-	case 2843: { // movec la,n
+	case 2865: { // movec la,n
 		unhandled("movec la,n");
 		break;
 		}
-	case 2844: { // movec lc,n
+	case 2866: { // movec lc,n
 		unhandled("movec lc,n");
 		break;
 		}
-	case 2845: { // movec m,m
+	case 2867: { // movec m,m
 		unhandled("movec m,m");
 		break;
 		}
-	case 2846: { // movec ep,m
+	case 2868: { // movec ep,m
 		unhandled("movec ep,m");
 		break;
 		}
-	case 2847: { // movec vba,m
+	case 2869: { // movec vba,m
 		unhandled("movec vba,m");
 		break;
 		}
-	case 2848: { // movec sc,m
+	case 2870: { // movec sc,m
 		unhandled("movec sc,m");
 		break;
 		}
-	case 2849: { // movec sz,m
+	case 2871: { // movec sz,m
 		unhandled("movec sz,m");
 		break;
 		}
-	case 2850: { // movec sr,m
+	case 2872: { // movec sr,m
 		unhandled("movec sr,m");
 		break;
 		}
-	case 2851: { // movec omr,m
+	case 2873: { // movec omr,m
 		unhandled("movec omr,m");
 		break;
 		}
-	case 2852: { // movec sp,m
+	case 2874: { // movec sp,m
 		unhandled("movec sp,m");
 		break;
 		}
-	case 2853: { // movec ssh,m
+	case 2875: { // movec ssh,m
 		unhandled("movec ssh,m");
 		break;
 		}
-	case 2854: { // movec ssl,m
+	case 2876: { // movec ssl,m
 		unhandled("movec ssl,m");
 		break;
 		}
-	case 2855: { // movec la,m
+	case 2877: { // movec la,m
 		unhandled("movec la,m");
 		break;
 		}
-	case 2856: { // movec lc,m
+	case 2878: { // movec lc,m
 		unhandled("movec lc,m");
 		break;
 		}
-	case 2857: { // movec m,ep
+	case 2879: { // movec m,ep
 		unhandled("movec m,ep");
 		break;
 		}
-	case 2858: { // movec ep,ep
+	case 2880: { // movec ep,ep
 		unhandled("movec ep,ep");
 		break;
 		}
-	case 2859: { // movec vba,ep
+	case 2881: { // movec vba,ep
 		unhandled("movec vba,ep");
 		break;
 		}
-	case 2860: { // movec sc,ep
+	case 2882: { // movec sc,ep
 		unhandled("movec sc,ep");
 		break;
 		}
-	case 2861: { // movec sz,ep
+	case 2883: { // movec sz,ep
 		unhandled("movec sz,ep");
 		break;
 		}
-	case 2862: { // movec sr,ep
+	case 2884: { // movec sr,ep
 		unhandled("movec sr,ep");
 		break;
 		}
-	case 2863: { // movec omr,ep
+	case 2885: { // movec omr,ep
 		unhandled("movec omr,ep");
 		break;
 		}
-	case 2864: { // movec sp,ep
+	case 2886: { // movec sp,ep
 		unhandled("movec sp,ep");
 		break;
 		}
-	case 2865: { // movec ssh,ep
+	case 2887: { // movec ssh,ep
 		unhandled("movec ssh,ep");
 		break;
 		}
-	case 2866: { // movec ssl,ep
+	case 2888: { // movec ssl,ep
 		unhandled("movec ssl,ep");
 		break;
 		}
-	case 2867: { // movec la,ep
+	case 2889: { // movec la,ep
 		unhandled("movec la,ep");
 		break;
 		}
-	case 2868: { // movec lc,ep
+	case 2890: { // movec lc,ep
 		unhandled("movec lc,ep");
 		break;
 		}
-	case 2869: { // movec m,vba
+	case 2891: { // movec m,vba
 		unhandled("movec m,vba");
 		break;
 		}
-	case 2870: { // movec ep,vba
+	case 2892: { // movec ep,vba
 		unhandled("movec ep,vba");
 		break;
 		}
-	case 2871: { // movec vba,vba
+	case 2893: { // movec vba,vba
 		unhandled("movec vba,vba");
 		break;
 		}
-	case 2872: { // movec sc,vba
+	case 2894: { // movec sc,vba
 		unhandled("movec sc,vba");
 		break;
 		}
-	case 2873: { // movec sz,vba
+	case 2895: { // movec sz,vba
 		unhandled("movec sz,vba");
 		break;
 		}
-	case 2874: { // movec sr,vba
+	case 2896: { // movec sr,vba
 		unhandled("movec sr,vba");
 		break;
 		}
-	case 2875: { // movec omr,vba
+	case 2897: { // movec omr,vba
 		unhandled("movec omr,vba");
 		break;
 		}
-	case 2876: { // movec sp,vba
+	case 2898: { // movec sp,vba
 		unhandled("movec sp,vba");
 		break;
 		}
-	case 2877: { // movec ssh,vba
+	case 2899: { // movec ssh,vba
 		unhandled("movec ssh,vba");
 		break;
 		}
-	case 2878: { // movec ssl,vba
+	case 2900: { // movec ssl,vba
 		unhandled("movec ssl,vba");
 		break;
 		}
-	case 2879: { // movec la,vba
+	case 2901: { // movec la,vba
 		unhandled("movec la,vba");
 		break;
 		}
-	case 2880: { // movec lc,vba
+	case 2902: { // movec lc,vba
 		unhandled("movec lc,vba");
 		break;
 		}
-	case 2881: { // movec m,sc
+	case 2903: { // movec m,sc
 		unhandled("movec m,sc");
 		break;
 		}
-	case 2882: { // movec ep,sc
+	case 2904: { // movec ep,sc
 		unhandled("movec ep,sc");
 		break;
 		}
-	case 2883: { // movec vba,sc
+	case 2905: { // movec vba,sc
 		unhandled("movec vba,sc");
 		break;
 		}
-	case 2884: { // movec sc,sc
+	case 2906: { // movec sc,sc
 		unhandled("movec sc,sc");
 		break;
 		}
-	case 2885: { // movec sz,sc
+	case 2907: { // movec sz,sc
 		unhandled("movec sz,sc");
 		break;
 		}
-	case 2886: { // movec sr,sc
+	case 2908: { // movec sr,sc
 		unhandled("movec sr,sc");
 		break;
 		}
-	case 2887: { // movec omr,sc
+	case 2909: { // movec omr,sc
 		unhandled("movec omr,sc");
 		break;
 		}
-	case 2888: { // movec sp,sc
+	case 2910: { // movec sp,sc
 		unhandled("movec sp,sc");
 		break;
 		}
-	case 2889: { // movec ssh,sc
+	case 2911: { // movec ssh,sc
 		unhandled("movec ssh,sc");
 		break;
 		}
-	case 2890: { // movec ssl,sc
+	case 2912: { // movec ssl,sc
 		unhandled("movec ssl,sc");
 		break;
 		}
-	case 2891: { // movec la,sc
+	case 2913: { // movec la,sc
 		unhandled("movec la,sc");
 		break;
 		}
-	case 2892: { // movec lc,sc
+	case 2914: { // movec lc,sc
 		unhandled("movec lc,sc");
 		break;
 		}
-	case 2893: { // movec m,sz
+	case 2915: { // movec m,sz
 		unhandled("movec m,sz");
 		break;
 		}
-	case 2894: { // movec ep,sz
+	case 2916: { // movec ep,sz
 		unhandled("movec ep,sz");
 		break;
 		}
-	case 2895: { // movec vba,sz
+	case 2917: { // movec vba,sz
 		unhandled("movec vba,sz");
 		break;
 		}
-	case 2896: { // movec sc,sz
+	case 2918: { // movec sc,sz
 		unhandled("movec sc,sz");
 		break;
 		}
-	case 2897: { // movec sz,sz
+	case 2919: { // movec sz,sz
 		unhandled("movec sz,sz");
 		break;
 		}
-	case 2898: { // movec sr,sz
+	case 2920: { // movec sr,sz
 		unhandled("movec sr,sz");
 		break;
 		}
-	case 2899: { // movec omr,sz
+	case 2921: { // movec omr,sz
 		unhandled("movec omr,sz");
 		break;
 		}
-	case 2900: { // movec sp,sz
+	case 2922: { // movec sp,sz
 		unhandled("movec sp,sz");
 		break;
 		}
-	case 2901: { // movec ssh,sz
+	case 2923: { // movec ssh,sz
 		unhandled("movec ssh,sz");
 		break;
 		}
-	case 2902: { // movec ssl,sz
+	case 2924: { // movec ssl,sz
 		unhandled("movec ssl,sz");
 		break;
 		}
-	case 2903: { // movec la,sz
+	case 2925: { // movec la,sz
 		unhandled("movec la,sz");
 		break;
 		}
-	case 2904: { // movec lc,sz
+	case 2926: { // movec lc,sz
 		unhandled("movec lc,sz");
 		break;
 		}
-	case 2905: { // movec m,sr
+	case 2927: { // movec m,sr
 		unhandled("movec m,sr");
 		break;
 		}
-	case 2906: { // movec ep,sr
+	case 2928: { // movec ep,sr
 		unhandled("movec ep,sr");
 		break;
 		}
-	case 2907: { // movec vba,sr
+	case 2929: { // movec vba,sr
 		unhandled("movec vba,sr");
 		break;
 		}
-	case 2908: { // movec sc,sr
+	case 2930: { // movec sc,sr
 		unhandled("movec sc,sr");
 		break;
 		}
-	case 2909: { // movec sz,sr
+	case 2931: { // movec sz,sr
 		unhandled("movec sz,sr");
 		break;
 		}
-	case 2910: { // movec sr,sr
+	case 2932: { // movec sr,sr
 		unhandled("movec sr,sr");
 		break;
 		}
-	case 2911: { // movec omr,sr
+	case 2933: { // movec omr,sr
 		unhandled("movec omr,sr");
 		break;
 		}
-	case 2912: { // movec sp,sr
+	case 2934: { // movec sp,sr
 		unhandled("movec sp,sr");
 		break;
 		}
-	case 2913: { // movec ssh,sr
+	case 2935: { // movec ssh,sr
 		unhandled("movec ssh,sr");
 		break;
 		}
-	case 2914: { // movec ssl,sr
+	case 2936: { // movec ssl,sr
 		unhandled("movec ssl,sr");
 		break;
 		}
-	case 2915: { // movec la,sr
+	case 2937: { // movec la,sr
 		unhandled("movec la,sr");
 		break;
 		}
-	case 2916: { // movec lc,sr
+	case 2938: { // movec lc,sr
 		unhandled("movec lc,sr");
 		break;
 		}
-	case 2917: { // movec m,omr
+	case 2939: { // movec m,omr
 		unhandled("movec m,omr");
 		break;
 		}
-	case 2918: { // movec ep,omr
+	case 2940: { // movec ep,omr
 		unhandled("movec ep,omr");
 		break;
 		}
-	case 2919: { // movec vba,omr
+	case 2941: { // movec vba,omr
 		unhandled("movec vba,omr");
 		break;
 		}
-	case 2920: { // movec sc,omr
+	case 2942: { // movec sc,omr
 		unhandled("movec sc,omr");
 		break;
 		}
-	case 2921: { // movec sz,omr
+	case 2943: { // movec sz,omr
 		unhandled("movec sz,omr");
 		break;
 		}
-	case 2922: { // movec sr,omr
+	case 2944: { // movec sr,omr
 		unhandled("movec sr,omr");
 		break;
 		}
-	case 2923: { // movec omr,omr
+	case 2945: { // movec omr,omr
 		unhandled("movec omr,omr");
 		break;
 		}
-	case 2924: { // movec sp,omr
+	case 2946: { // movec sp,omr
 		unhandled("movec sp,omr");
 		break;
 		}
-	case 2925: { // movec ssh,omr
+	case 2947: { // movec ssh,omr
 		unhandled("movec ssh,omr");
 		break;
 		}
-	case 2926: { // movec ssl,omr
+	case 2948: { // movec ssl,omr
 		unhandled("movec ssl,omr");
 		break;
 		}
-	case 2927: { // movec la,omr
+	case 2949: { // movec la,omr
 		unhandled("movec la,omr");
 		break;
 		}
-	case 2928: { // movec lc,omr
+	case 2950: { // movec lc,omr
 		unhandled("movec lc,omr");
 		break;
 		}
-	case 2929: { // movec m,sp
+	case 2951: { // movec m,sp
 		unhandled("movec m,sp");
 		break;
 		}
-	case 2930: { // movec ep,sp
+	case 2952: { // movec ep,sp
 		unhandled("movec ep,sp");
 		break;
 		}
-	case 2931: { // movec vba,sp
+	case 2953: { // movec vba,sp
 		unhandled("movec vba,sp");
 		break;
 		}
-	case 2932: { // movec sc,sp
+	case 2954: { // movec sc,sp
 		unhandled("movec sc,sp");
 		break;
 		}
-	case 2933: { // movec sz,sp
+	case 2955: { // movec sz,sp
 		unhandled("movec sz,sp");
 		break;
 		}
-	case 2934: { // movec sr,sp
+	case 2956: { // movec sr,sp
 		unhandled("movec sr,sp");
 		break;
 		}
-	case 2935: { // movec omr,sp
+	case 2957: { // movec omr,sp
 		unhandled("movec omr,sp");
 		break;
 		}
-	case 2936: { // movec sp,sp
+	case 2958: { // movec sp,sp
 		unhandled("movec sp,sp");
 		break;
 		}
-	case 2937: { // movec ssh,sp
+	case 2959: { // movec ssh,sp
 		unhandled("movec ssh,sp");
 		break;
 		}
-	case 2938: { // movec ssl,sp
+	case 2960: { // movec ssl,sp
 		unhandled("movec ssl,sp");
 		break;
 		}
-	case 2939: { // movec la,sp
+	case 2961: { // movec la,sp
 		unhandled("movec la,sp");
 		break;
 		}
-	case 2940: { // movec lc,sp
+	case 2962: { // movec lc,sp
 		unhandled("movec lc,sp");
 		break;
 		}
-	case 2941: { // movec m,ssh
+	case 2963: { // movec m,ssh
 		unhandled("movec m,ssh");
 		break;
 		}
-	case 2942: { // movec ep,ssh
+	case 2964: { // movec ep,ssh
 		unhandled("movec ep,ssh");
 		break;
 		}
-	case 2943: { // movec vba,ssh
+	case 2965: { // movec vba,ssh
 		unhandled("movec vba,ssh");
 		break;
 		}
-	case 2944: { // movec sc,ssh
+	case 2966: { // movec sc,ssh
 		unhandled("movec sc,ssh");
 		break;
 		}
-	case 2945: { // movec sz,ssh
+	case 2967: { // movec sz,ssh
 		unhandled("movec sz,ssh");
 		break;
 		}
-	case 2946: { // movec sr,ssh
+	case 2968: { // movec sr,ssh
 		unhandled("movec sr,ssh");
 		break;
 		}
-	case 2947: { // movec omr,ssh
+	case 2969: { // movec omr,ssh
 		unhandled("movec omr,ssh");
 		break;
 		}
-	case 2948: { // movec sp,ssh
+	case 2970: { // movec sp,ssh
 		unhandled("movec sp,ssh");
 		break;
 		}
-	case 2949: { // movec ssh,ssh
+	case 2971: { // movec ssh,ssh
 		unhandled("movec ssh,ssh");
 		break;
 		}
-	case 2950: { // movec ssl,ssh
+	case 2972: { // movec ssl,ssh
 		unhandled("movec ssl,ssh");
 		break;
 		}
-	case 2951: { // movec la,ssh
+	case 2973: { // movec la,ssh
 		unhandled("movec la,ssh");
 		break;
 		}
-	case 2952: { // movec lc,ssh
+	case 2974: { // movec lc,ssh
 		unhandled("movec lc,ssh");
 		break;
 		}
-	case 2953: { // movec m,ssl
+	case 2975: { // movec m,ssl
 		unhandled("movec m,ssl");
 		break;
 		}
-	case 2954: { // movec ep,ssl
+	case 2976: { // movec ep,ssl
 		unhandled("movec ep,ssl");
 		break;
 		}
-	case 2955: { // movec vba,ssl
+	case 2977: { // movec vba,ssl
 		unhandled("movec vba,ssl");
 		break;
 		}
-	case 2956: { // movec sc,ssl
+	case 2978: { // movec sc,ssl
 		unhandled("movec sc,ssl");
 		break;
 		}
-	case 2957: { // movec sz,ssl
+	case 2979: { // movec sz,ssl
 		unhandled("movec sz,ssl");
 		break;
 		}
-	case 2958: { // movec sr,ssl
+	case 2980: { // movec sr,ssl
 		unhandled("movec sr,ssl");
 		break;
 		}
-	case 2959: { // movec omr,ssl
+	case 2981: { // movec omr,ssl
 		unhandled("movec omr,ssl");
 		break;
 		}
-	case 2960: { // movec sp,ssl
+	case 2982: { // movec sp,ssl
 		unhandled("movec sp,ssl");
 		break;
 		}
-	case 2961: { // movec ssh,ssl
+	case 2983: { // movec ssh,ssl
 		unhandled("movec ssh,ssl");
 		break;
 		}
-	case 2962: { // movec ssl,ssl
+	case 2984: { // movec ssl,ssl
 		unhandled("movec ssl,ssl");
 		break;
 		}
-	case 2963: { // movec la,ssl
+	case 2985: { // movec la,ssl
 		unhandled("movec la,ssl");
 		break;
 		}
-	case 2964: { // movec lc,ssl
+	case 2986: { // movec lc,ssl
 		unhandled("movec lc,ssl");
 		break;
 		}
-	case 2965: { // movec m,la
+	case 2987: { // movec m,la
 		unhandled("movec m,la");
 		break;
 		}
-	case 2966: { // movec ep,la
+	case 2988: { // movec ep,la
 		unhandled("movec ep,la");
 		break;
 		}
-	case 2967: { // movec vba,la
+	case 2989: { // movec vba,la
 		unhandled("movec vba,la");
 		break;
 		}
-	case 2968: { // movec sc,la
+	case 2990: { // movec sc,la
 		unhandled("movec sc,la");
 		break;
 		}
-	case 2969: { // movec sz,la
+	case 2991: { // movec sz,la
 		unhandled("movec sz,la");
 		break;
 		}
-	case 2970: { // movec sr,la
+	case 2992: { // movec sr,la
 		unhandled("movec sr,la");
 		break;
 		}
-	case 2971: { // movec omr,la
+	case 2993: { // movec omr,la
 		unhandled("movec omr,la");
 		break;
 		}
-	case 2972: { // movec sp,la
+	case 2994: { // movec sp,la
 		unhandled("movec sp,la");
 		break;
 		}
-	case 2973: { // movec ssh,la
+	case 2995: { // movec ssh,la
 		unhandled("movec ssh,la");
 		break;
 		}
-	case 2974: { // movec ssl,la
+	case 2996: { // movec ssl,la
 		unhandled("movec ssl,la");
 		break;
 		}
-	case 2975: { // movec la,la
+	case 2997: { // movec la,la
 		unhandled("movec la,la");
 		break;
 		}
-	case 2976: { // movec lc,la
+	case 2998: { // movec lc,la
 		unhandled("movec lc,la");
 		break;
 		}
-	case 2977: { // movec m,lc
+	case 2999: { // movec m,lc
 		unhandled("movec m,lc");
 		break;
 		}
-	case 2978: { // movec ep,lc
+	case 3000: { // movec ep,lc
 		unhandled("movec ep,lc");
 		break;
 		}
-	case 2979: { // movec vba,lc
+	case 3001: { // movec vba,lc
 		unhandled("movec vba,lc");
 		break;
 		}
-	case 2980: { // movec sc,lc
+	case 3002: { // movec sc,lc
 		unhandled("movec sc,lc");
 		break;
 		}
-	case 2981: { // movec sz,lc
+	case 3003: { // movec sz,lc
 		unhandled("movec sz,lc");
 		break;
 		}
-	case 2982: { // movec sr,lc
+	case 3004: { // movec sr,lc
 		unhandled("movec sr,lc");
 		break;
 		}
-	case 2983: { // movec omr,lc
+	case 3005: { // movec omr,lc
 		unhandled("movec omr,lc");
 		break;
 		}
-	case 2984: { // movec sp,lc
+	case 3006: { // movec sp,lc
 		unhandled("movec sp,lc");
 		break;
 		}
-	case 2985: { // movec ssh,lc
+	case 3007: { // movec ssh,lc
 		unhandled("movec ssh,lc");
 		break;
 		}
-	case 2986: { // movec ssl,lc
+	case 3008: { // movec ssl,lc
 		unhandled("movec ssl,lc");
 		break;
 		}
-	case 2987: { // movec la,lc
+	case 3009: { // movec la,lc
 		unhandled("movec la,lc");
 		break;
 		}
-	case 2988: { // movec lc,lc
+	case 3010: { // movec lc,lc
 		unhandled("movec lc,lc");
 		break;
 		}
-	case 2989: { // movec #[i],m
+	case 3011: { // movec #[i],m
 		unhandled("movec #[i],m");
 		break;
 		}
-	case 2990: { // movec #[i],ep
+	case 3012: { // movec #[i],ep
 		unhandled("movec #[i],ep");
 		break;
 		}
-	case 2991: { // movec #[i],vba
+	case 3013: { // movec #[i],vba
 		unhandled("movec #[i],vba");
 		break;
 		}
-	case 2992: { // movec #[i],sc
+	case 3014: { // movec #[i],sc
 		unhandled("movec #[i],sc");
 		break;
 		}
-	case 2993: { // movec #[i],sz
+	case 3015: { // movec #[i],sz
 		unhandled("movec #[i],sz");
 		break;
 		}
-	case 2994: { // movec #[i],sr
+	case 3016: { // movec #[i],sr
 		unhandled("movec #[i],sr");
 		break;
 		}
-	case 2995: { // movec #[i],omr
+	case 3017: { // movec #[i],omr
 		unhandled("movec #[i],omr");
 		break;
 		}
-	case 2996: { // movec #[i],sp
+	case 3018: { // movec #[i],sp
 		unhandled("movec #[i],sp");
 		break;
 		}
-	case 2997: { // movec #[i],ssh
+	case 3019: { // movec #[i],ssh
 		unhandled("movec #[i],ssh");
 		break;
 		}
-	case 2998: { // movec #[i],ssl
+	case 3020: { // movec #[i],ssl
 		unhandled("movec #[i],ssl");
 		break;
 		}
-	case 2999: { // movec #[i],la
+	case 3021: { // movec #[i],la
 		unhandled("movec #[i],la");
 		break;
 		}
-	case 3000: { // movec #[i],lc
+	case 3022: { // movec #[i],lc
 		unhandled("movec #[i],lc");
 		break;
 		}
-	case 3001: { // movem p:(r)-n,x0
+	case 3023: { // movem p:(r)-n,x0
 		unhandled("movem p:(r)-n,x0");
 		break;
 		}
-	case 3002: { // movem p:(r)-n,x1
+	case 3024: { // movem p:(r)-n,x1
 		unhandled("movem p:(r)-n,x1");
 		break;
 		}
-	case 3003: { // movem p:(r)-n,y0
+	case 3025: { // movem p:(r)-n,y0
 		unhandled("movem p:(r)-n,y0");
 		break;
 		}
-	case 3004: { // movem p:(r)-n,y1
+	case 3026: { // movem p:(r)-n,y1
 		unhandled("movem p:(r)-n,y1");
 		break;
 		}
-	case 3005: { // movem p:(r)-n,a0
+	case 3027: { // movem p:(r)-n,a0
 		unhandled("movem p:(r)-n,a0");
 		break;
 		}
-	case 3006: { // movem p:(r)-n,b0
+	case 3028: { // movem p:(r)-n,b0
 		unhandled("movem p:(r)-n,b0");
 		break;
 		}
-	case 3007: { // movem p:(r)-n,a2
+	case 3029: { // movem p:(r)-n,a2
 		unhandled("movem p:(r)-n,a2");
 		break;
 		}
-	case 3008: { // movem p:(r)-n,b2
+	case 3030: { // movem p:(r)-n,b2
 		unhandled("movem p:(r)-n,b2");
 		break;
 		}
-	case 3009: { // movem p:(r)-n,a1
+	case 3031: { // movem p:(r)-n,a1
 		unhandled("movem p:(r)-n,a1");
 		break;
 		}
-	case 3010: { // movem p:(r)-n,b1
+	case 3032: { // movem p:(r)-n,b1
 		unhandled("movem p:(r)-n,b1");
 		break;
 		}
-	case 3011: { // movem p:(r)-n,a
+	case 3033: { // movem p:(r)-n,a
 		unhandled("movem p:(r)-n,a");
 		break;
 		}
-	case 3012: { // movem p:(r)-n,b
+	case 3034: { // movem p:(r)-n,b
 		unhandled("movem p:(r)-n,b");
 		break;
 		}
-	case 3013: { // movem p:(r)-n,r
+	case 3035: { // movem p:(r)-n,r
 		unhandled("movem p:(r)-n,r");
 		break;
 		}
-	case 3014: { // movem p:(r)-n,n
+	case 3036: { // movem p:(r)-n,n
 		unhandled("movem p:(r)-n,n");
 		break;
 		}
-	case 3015: { // movem p:(r)-n,m
+	case 3037: { // movem p:(r)-n,m
 		unhandled("movem p:(r)-n,m");
 		break;
 		}
-	case 3016: { // movem p:(r)-n,ep
+	case 3038: { // movem p:(r)-n,ep
 		unhandled("movem p:(r)-n,ep");
 		break;
 		}
-	case 3017: { // movem p:(r)-n,vba
+	case 3039: { // movem p:(r)-n,vba
 		unhandled("movem p:(r)-n,vba");
 		break;
 		}
-	case 3018: { // movem p:(r)-n,sc
+	case 3040: { // movem p:(r)-n,sc
 		unhandled("movem p:(r)-n,sc");
 		break;
 		}
-	case 3019: { // movem p:(r)-n,sz
+	case 3041: { // movem p:(r)-n,sz
 		unhandled("movem p:(r)-n,sz");
 		break;
 		}
-	case 3020: { // movem p:(r)-n,sr
+	case 3042: { // movem p:(r)-n,sr
 		unhandled("movem p:(r)-n,sr");
 		break;
 		}
-	case 3021: { // movem p:(r)-n,omr
+	case 3043: { // movem p:(r)-n,omr
 		unhandled("movem p:(r)-n,omr");
 		break;
 		}
-	case 3022: { // movem p:(r)-n,sp
+	case 3044: { // movem p:(r)-n,sp
 		unhandled("movem p:(r)-n,sp");
 		break;
 		}
-	case 3023: { // movem p:(r)-n,ssh
+	case 3045: { // movem p:(r)-n,ssh
 		unhandled("movem p:(r)-n,ssh");
 		break;
 		}
-	case 3024: { // movem p:(r)-n,ssl
+	case 3046: { // movem p:(r)-n,ssl
 		unhandled("movem p:(r)-n,ssl");
 		break;
 		}
-	case 3025: { // movem p:(r)-n,la
+	case 3047: { // movem p:(r)-n,la
 		unhandled("movem p:(r)-n,la");
 		break;
 		}
-	case 3026: { // movem p:(r)-n,lc
+	case 3048: { // movem p:(r)-n,lc
 		unhandled("movem p:(r)-n,lc");
 		break;
 		}
-	case 3027: { // movem p:(r)+n,x0
+	case 3049: { // movem p:(r)+n,x0
 		unhandled("movem p:(r)+n,x0");
 		break;
 		}
-	case 3028: { // movem p:(r)+n,x1
+	case 3050: { // movem p:(r)+n,x1
 		unhandled("movem p:(r)+n,x1");
 		break;
 		}
-	case 3029: { // movem p:(r)+n,y0
+	case 3051: { // movem p:(r)+n,y0
 		unhandled("movem p:(r)+n,y0");
 		break;
 		}
-	case 3030: { // movem p:(r)+n,y1
+	case 3052: { // movem p:(r)+n,y1
 		unhandled("movem p:(r)+n,y1");
 		break;
 		}
-	case 3031: { // movem p:(r)+n,a0
+	case 3053: { // movem p:(r)+n,a0
 		unhandled("movem p:(r)+n,a0");
 		break;
 		}
-	case 3032: { // movem p:(r)+n,b0
+	case 3054: { // movem p:(r)+n,b0
 		unhandled("movem p:(r)+n,b0");
 		break;
 		}
-	case 3033: { // movem p:(r)+n,a2
+	case 3055: { // movem p:(r)+n,a2
 		unhandled("movem p:(r)+n,a2");
 		break;
 		}
-	case 3034: { // movem p:(r)+n,b2
+	case 3056: { // movem p:(r)+n,b2
 		unhandled("movem p:(r)+n,b2");
 		break;
 		}
-	case 3035: { // movem p:(r)+n,a1
+	case 3057: { // movem p:(r)+n,a1
 		unhandled("movem p:(r)+n,a1");
 		break;
 		}
-	case 3036: { // movem p:(r)+n,b1
+	case 3058: { // movem p:(r)+n,b1
 		unhandled("movem p:(r)+n,b1");
 		break;
 		}
-	case 3037: { // movem p:(r)+n,a
+	case 3059: { // movem p:(r)+n,a
 		unhandled("movem p:(r)+n,a");
 		break;
 		}
-	case 3038: { // movem p:(r)+n,b
+	case 3060: { // movem p:(r)+n,b
 		unhandled("movem p:(r)+n,b");
 		break;
 		}
-	case 3039: { // movem p:(r)+n,r
+	case 3061: { // movem p:(r)+n,r
 		unhandled("movem p:(r)+n,r");
 		break;
 		}
-	case 3040: { // movem p:(r)+n,n
+	case 3062: { // movem p:(r)+n,n
 		unhandled("movem p:(r)+n,n");
 		break;
 		}
-	case 3041: { // movem p:(r)+n,m
+	case 3063: { // movem p:(r)+n,m
 		unhandled("movem p:(r)+n,m");
 		break;
 		}
-	case 3042: { // movem p:(r)+n,ep
+	case 3064: { // movem p:(r)+n,ep
 		unhandled("movem p:(r)+n,ep");
 		break;
 		}
-	case 3043: { // movem p:(r)+n,vba
+	case 3065: { // movem p:(r)+n,vba
 		unhandled("movem p:(r)+n,vba");
 		break;
 		}
-	case 3044: { // movem p:(r)+n,sc
+	case 3066: { // movem p:(r)+n,sc
 		unhandled("movem p:(r)+n,sc");
 		break;
 		}
-	case 3045: { // movem p:(r)+n,sz
+	case 3067: { // movem p:(r)+n,sz
 		unhandled("movem p:(r)+n,sz");
 		break;
 		}
-	case 3046: { // movem p:(r)+n,sr
+	case 3068: { // movem p:(r)+n,sr
 		unhandled("movem p:(r)+n,sr");
 		break;
 		}
-	case 3047: { // movem p:(r)+n,omr
+	case 3069: { // movem p:(r)+n,omr
 		unhandled("movem p:(r)+n,omr");
 		break;
 		}
-	case 3048: { // movem p:(r)+n,sp
+	case 3070: { // movem p:(r)+n,sp
 		unhandled("movem p:(r)+n,sp");
 		break;
 		}
-	case 3049: { // movem p:(r)+n,ssh
+	case 3071: { // movem p:(r)+n,ssh
 		unhandled("movem p:(r)+n,ssh");
 		break;
 		}
-	case 3050: { // movem p:(r)+n,ssl
+	case 3072: { // movem p:(r)+n,ssl
 		unhandled("movem p:(r)+n,ssl");
 		break;
 		}
-	case 3051: { // movem p:(r)+n,la
+	case 3073: { // movem p:(r)+n,la
 		unhandled("movem p:(r)+n,la");
 		break;
 		}
-	case 3052: { // movem p:(r)+n,lc
+	case 3074: { // movem p:(r)+n,lc
 		unhandled("movem p:(r)+n,lc");
 		break;
 		}
-	case 3053: { // movem p:(r)-,x0
+	case 3075: { // movem p:(r)-,x0
 		unhandled("movem p:(r)-,x0");
 		break;
 		}
-	case 3054: { // movem p:(r)-,x1
+	case 3076: { // movem p:(r)-,x1
 		unhandled("movem p:(r)-,x1");
 		break;
 		}
-	case 3055: { // movem p:(r)-,y0
+	case 3077: { // movem p:(r)-,y0
 		unhandled("movem p:(r)-,y0");
 		break;
 		}
-	case 3056: { // movem p:(r)-,y1
+	case 3078: { // movem p:(r)-,y1
 		unhandled("movem p:(r)-,y1");
 		break;
 		}
-	case 3057: { // movem p:(r)-,a0
+	case 3079: { // movem p:(r)-,a0
 		unhandled("movem p:(r)-,a0");
 		break;
 		}
-	case 3058: { // movem p:(r)-,b0
+	case 3080: { // movem p:(r)-,b0
 		unhandled("movem p:(r)-,b0");
 		break;
 		}
-	case 3059: { // movem p:(r)-,a2
+	case 3081: { // movem p:(r)-,a2
 		unhandled("movem p:(r)-,a2");
 		break;
 		}
-	case 3060: { // movem p:(r)-,b2
+	case 3082: { // movem p:(r)-,b2
 		unhandled("movem p:(r)-,b2");
 		break;
 		}
-	case 3061: { // movem p:(r)-,a1
+	case 3083: { // movem p:(r)-,a1
 		unhandled("movem p:(r)-,a1");
 		break;
 		}
-	case 3062: { // movem p:(r)-,b1
+	case 3084: { // movem p:(r)-,b1
 		unhandled("movem p:(r)-,b1");
 		break;
 		}
-	case 3063: { // movem p:(r)-,a
+	case 3085: { // movem p:(r)-,a
 		unhandled("movem p:(r)-,a");
 		break;
 		}
-	case 3064: { // movem p:(r)-,b
+	case 3086: { // movem p:(r)-,b
 		unhandled("movem p:(r)-,b");
 		break;
 		}
-	case 3065: { // movem p:(r)-,r
+	case 3087: { // movem p:(r)-,r
 		unhandled("movem p:(r)-,r");
 		break;
 		}
-	case 3066: { // movem p:(r)-,n
+	case 3088: { // movem p:(r)-,n
 		unhandled("movem p:(r)-,n");
 		break;
 		}
-	case 3067: { // movem p:(r)-,m
+	case 3089: { // movem p:(r)-,m
 		unhandled("movem p:(r)-,m");
 		break;
 		}
-	case 3068: { // movem p:(r)-,ep
+	case 3090: { // movem p:(r)-,ep
 		unhandled("movem p:(r)-,ep");
 		break;
 		}
-	case 3069: { // movem p:(r)-,vba
+	case 3091: { // movem p:(r)-,vba
 		unhandled("movem p:(r)-,vba");
 		break;
 		}
-	case 3070: { // movem p:(r)-,sc
+	case 3092: { // movem p:(r)-,sc
 		unhandled("movem p:(r)-,sc");
 		break;
 		}
-	case 3071: { // movem p:(r)-,sz
+	case 3093: { // movem p:(r)-,sz
 		unhandled("movem p:(r)-,sz");
 		break;
 		}
-	case 3072: { // movem p:(r)-,sr
+	case 3094: { // movem p:(r)-,sr
 		unhandled("movem p:(r)-,sr");
 		break;
 		}
-	case 3073: { // movem p:(r)-,omr
+	case 3095: { // movem p:(r)-,omr
 		unhandled("movem p:(r)-,omr");
 		break;
 		}
-	case 3074: { // movem p:(r)-,sp
+	case 3096: { // movem p:(r)-,sp
 		unhandled("movem p:(r)-,sp");
 		break;
 		}
-	case 3075: { // movem p:(r)-,ssh
+	case 3097: { // movem p:(r)-,ssh
 		unhandled("movem p:(r)-,ssh");
 		break;
 		}
-	case 3076: { // movem p:(r)-,ssl
+	case 3098: { // movem p:(r)-,ssl
 		unhandled("movem p:(r)-,ssl");
 		break;
 		}
-	case 3077: { // movem p:(r)-,la
+	case 3099: { // movem p:(r)-,la
 		unhandled("movem p:(r)-,la");
 		break;
 		}
-	case 3078: { // movem p:(r)-,lc
+	case 3100: { // movem p:(r)-,lc
 		unhandled("movem p:(r)-,lc");
 		break;
 		}
-	case 3079: { // movem p:(r)+,x0
+	case 3101: { // movem p:(r)+,x0
 		unhandled("movem p:(r)+,x0");
 		break;
 		}
-	case 3080: { // movem p:(r)+,x1
+	case 3102: { // movem p:(r)+,x1
 		unhandled("movem p:(r)+,x1");
 		break;
 		}
-	case 3081: { // movem p:(r)+,y0
+	case 3103: { // movem p:(r)+,y0
 		unhandled("movem p:(r)+,y0");
 		break;
 		}
-	case 3082: { // movem p:(r)+,y1
+	case 3104: { // movem p:(r)+,y1
 		unhandled("movem p:(r)+,y1");
 		break;
 		}
-	case 3083: { // movem p:(r)+,a0
+	case 3105: { // movem p:(r)+,a0
 		unhandled("movem p:(r)+,a0");
 		break;
 		}
-	case 3084: { // movem p:(r)+,b0
+	case 3106: { // movem p:(r)+,b0
 		unhandled("movem p:(r)+,b0");
 		break;
 		}
-	case 3085: { // movem p:(r)+,a2
+	case 3107: { // movem p:(r)+,a2
 		unhandled("movem p:(r)+,a2");
 		break;
 		}
-	case 3086: { // movem p:(r)+,b2
+	case 3108: { // movem p:(r)+,b2
 		unhandled("movem p:(r)+,b2");
 		break;
 		}
-	case 3087: { // movem p:(r)+,a1
+	case 3109: { // movem p:(r)+,a1
 		unhandled("movem p:(r)+,a1");
 		break;
 		}
-	case 3088: { // movem p:(r)+,b1
+	case 3110: { // movem p:(r)+,b1
 		unhandled("movem p:(r)+,b1");
 		break;
 		}
-	case 3089: { // movem p:(r)+,a
+	case 3111: { // movem p:(r)+,a
 		unhandled("movem p:(r)+,a");
 		break;
 		}
-	case 3090: { // movem p:(r)+,b
+	case 3112: { // movem p:(r)+,b
 		unhandled("movem p:(r)+,b");
 		break;
 		}
-	case 3091: { // movem p:(r)+,r
+	case 3113: { // movem p:(r)+,r
 		unhandled("movem p:(r)+,r");
 		break;
 		}
-	case 3092: { // movem p:(r)+,n
+	case 3114: { // movem p:(r)+,n
 		unhandled("movem p:(r)+,n");
 		break;
 		}
-	case 3093: { // movem p:(r)+,m
+	case 3115: { // movem p:(r)+,m
 		unhandled("movem p:(r)+,m");
 		break;
 		}
-	case 3094: { // movem p:(r)+,ep
+	case 3116: { // movem p:(r)+,ep
 		unhandled("movem p:(r)+,ep");
 		break;
 		}
-	case 3095: { // movem p:(r)+,vba
+	case 3117: { // movem p:(r)+,vba
 		unhandled("movem p:(r)+,vba");
 		break;
 		}
-	case 3096: { // movem p:(r)+,sc
+	case 3118: { // movem p:(r)+,sc
 		unhandled("movem p:(r)+,sc");
 		break;
 		}
-	case 3097: { // movem p:(r)+,sz
+	case 3119: { // movem p:(r)+,sz
 		unhandled("movem p:(r)+,sz");
 		break;
 		}
-	case 3098: { // movem p:(r)+,sr
+	case 3120: { // movem p:(r)+,sr
 		unhandled("movem p:(r)+,sr");
 		break;
 		}
-	case 3099: { // movem p:(r)+,omr
+	case 3121: { // movem p:(r)+,omr
 		unhandled("movem p:(r)+,omr");
 		break;
 		}
-	case 3100: { // movem p:(r)+,sp
+	case 3122: { // movem p:(r)+,sp
 		unhandled("movem p:(r)+,sp");
 		break;
 		}
-	case 3101: { // movem p:(r)+,ssh
+	case 3123: { // movem p:(r)+,ssh
 		unhandled("movem p:(r)+,ssh");
 		break;
 		}
-	case 3102: { // movem p:(r)+,ssl
+	case 3124: { // movem p:(r)+,ssl
 		unhandled("movem p:(r)+,ssl");
 		break;
 		}
-	case 3103: { // movem p:(r)+,la
+	case 3125: { // movem p:(r)+,la
 		unhandled("movem p:(r)+,la");
 		break;
 		}
-	case 3104: { // movem p:(r)+,lc
+	case 3126: { // movem p:(r)+,lc
 		unhandled("movem p:(r)+,lc");
 		break;
 		}
-	case 3105: { // movem p:(r),x0
+	case 3127: { // movem p:(r),x0
 		unhandled("movem p:(r),x0");
 		break;
 		}
-	case 3106: { // movem p:(r),x1
+	case 3128: { // movem p:(r),x1
 		unhandled("movem p:(r),x1");
 		break;
 		}
-	case 3107: { // movem p:(r),y0
+	case 3129: { // movem p:(r),y0
 		unhandled("movem p:(r),y0");
 		break;
 		}
-	case 3108: { // movem p:(r),y1
+	case 3130: { // movem p:(r),y1
 		unhandled("movem p:(r),y1");
 		break;
 		}
-	case 3109: { // movem p:(r),a0
+	case 3131: { // movem p:(r),a0
 		unhandled("movem p:(r),a0");
 		break;
 		}
-	case 3110: { // movem p:(r),b0
+	case 3132: { // movem p:(r),b0
 		unhandled("movem p:(r),b0");
 		break;
 		}
-	case 3111: { // movem p:(r),a2
+	case 3133: { // movem p:(r),a2
 		unhandled("movem p:(r),a2");
 		break;
 		}
-	case 3112: { // movem p:(r),b2
+	case 3134: { // movem p:(r),b2
 		unhandled("movem p:(r),b2");
 		break;
 		}
-	case 3113: { // movem p:(r),a1
+	case 3135: { // movem p:(r),a1
 		unhandled("movem p:(r),a1");
 		break;
 		}
-	case 3114: { // movem p:(r),b1
+	case 3136: { // movem p:(r),b1
 		unhandled("movem p:(r),b1");
 		break;
 		}
-	case 3115: { // movem p:(r),a
+	case 3137: { // movem p:(r),a
 		unhandled("movem p:(r),a");
 		break;
 		}
-	case 3116: { // movem p:(r),b
+	case 3138: { // movem p:(r),b
 		unhandled("movem p:(r),b");
 		break;
 		}
-	case 3117: { // movem p:(r),r
+	case 3139: { // movem p:(r),r
 		unhandled("movem p:(r),r");
 		break;
 		}
-	case 3118: { // movem p:(r),n
+	case 3140: { // movem p:(r),n
 		unhandled("movem p:(r),n");
 		break;
 		}
-	case 3119: { // movem p:(r),m
+	case 3141: { // movem p:(r),m
 		unhandled("movem p:(r),m");
 		break;
 		}
-	case 3120: { // movem p:(r),ep
+	case 3142: { // movem p:(r),ep
 		unhandled("movem p:(r),ep");
 		break;
 		}
-	case 3121: { // movem p:(r),vba
+	case 3143: { // movem p:(r),vba
 		unhandled("movem p:(r),vba");
 		break;
 		}
-	case 3122: { // movem p:(r),sc
+	case 3144: { // movem p:(r),sc
 		unhandled("movem p:(r),sc");
 		break;
 		}
-	case 3123: { // movem p:(r),sz
+	case 3145: { // movem p:(r),sz
 		unhandled("movem p:(r),sz");
 		break;
 		}
-	case 3124: { // movem p:(r),sr
+	case 3146: { // movem p:(r),sr
 		unhandled("movem p:(r),sr");
 		break;
 		}
-	case 3125: { // movem p:(r),omr
+	case 3147: { // movem p:(r),omr
 		unhandled("movem p:(r),omr");
 		break;
 		}
-	case 3126: { // movem p:(r),sp
+	case 3148: { // movem p:(r),sp
 		unhandled("movem p:(r),sp");
 		break;
 		}
-	case 3127: { // movem p:(r),ssh
+	case 3149: { // movem p:(r),ssh
 		unhandled("movem p:(r),ssh");
 		break;
 		}
-	case 3128: { // movem p:(r),ssl
+	case 3150: { // movem p:(r),ssl
 		unhandled("movem p:(r),ssl");
 		break;
 		}
-	case 3129: { // movem p:(r),la
+	case 3151: { // movem p:(r),la
 		unhandled("movem p:(r),la");
 		break;
 		}
-	case 3130: { // movem p:(r),lc
+	case 3152: { // movem p:(r),lc
 		unhandled("movem p:(r),lc");
 		break;
 		}
-	case 3131: { // movem p:(r+n),x0
+	case 3153: { // movem p:(r+n),x0
 		unhandled("movem p:(r+n),x0");
 		break;
 		}
-	case 3132: { // movem p:(r+n),x1
+	case 3154: { // movem p:(r+n),x1
 		unhandled("movem p:(r+n),x1");
 		break;
 		}
-	case 3133: { // movem p:(r+n),y0
+	case 3155: { // movem p:(r+n),y0
 		unhandled("movem p:(r+n),y0");
 		break;
 		}
-	case 3134: { // movem p:(r+n),y1
+	case 3156: { // movem p:(r+n),y1
 		unhandled("movem p:(r+n),y1");
 		break;
 		}
-	case 3135: { // movem p:(r+n),a0
+	case 3157: { // movem p:(r+n),a0
 		unhandled("movem p:(r+n),a0");
 		break;
 		}
-	case 3136: { // movem p:(r+n),b0
+	case 3158: { // movem p:(r+n),b0
 		unhandled("movem p:(r+n),b0");
 		break;
 		}
-	case 3137: { // movem p:(r+n),a2
+	case 3159: { // movem p:(r+n),a2
 		unhandled("movem p:(r+n),a2");
 		break;
 		}
-	case 3138: { // movem p:(r+n),b2
+	case 3160: { // movem p:(r+n),b2
 		unhandled("movem p:(r+n),b2");
 		break;
 		}
-	case 3139: { // movem p:(r+n),a1
+	case 3161: { // movem p:(r+n),a1
 		unhandled("movem p:(r+n),a1");
 		break;
 		}
-	case 3140: { // movem p:(r+n),b1
+	case 3162: { // movem p:(r+n),b1
 		unhandled("movem p:(r+n),b1");
 		break;
 		}
-	case 3141: { // movem p:(r+n),a
+	case 3163: { // movem p:(r+n),a
 		unhandled("movem p:(r+n),a");
 		break;
 		}
-	case 3142: { // movem p:(r+n),b
+	case 3164: { // movem p:(r+n),b
 		unhandled("movem p:(r+n),b");
 		break;
 		}
-	case 3143: { // movem p:(r+n),r
+	case 3165: { // movem p:(r+n),r
 		unhandled("movem p:(r+n),r");
 		break;
 		}
-	case 3144: { // movem p:(r+n),n
+	case 3166: { // movem p:(r+n),n
 		unhandled("movem p:(r+n),n");
 		break;
 		}
-	case 3145: { // movem p:(r+n),m
+	case 3167: { // movem p:(r+n),m
 		unhandled("movem p:(r+n),m");
 		break;
 		}
-	case 3146: { // movem p:(r+n),ep
+	case 3168: { // movem p:(r+n),ep
 		unhandled("movem p:(r+n),ep");
 		break;
 		}
-	case 3147: { // movem p:(r+n),vba
+	case 3169: { // movem p:(r+n),vba
 		unhandled("movem p:(r+n),vba");
 		break;
 		}
-	case 3148: { // movem p:(r+n),sc
+	case 3170: { // movem p:(r+n),sc
 		unhandled("movem p:(r+n),sc");
 		break;
 		}
-	case 3149: { // movem p:(r+n),sz
+	case 3171: { // movem p:(r+n),sz
 		unhandled("movem p:(r+n),sz");
 		break;
 		}
-	case 3150: { // movem p:(r+n),sr
+	case 3172: { // movem p:(r+n),sr
 		unhandled("movem p:(r+n),sr");
 		break;
 		}
-	case 3151: { // movem p:(r+n),omr
+	case 3173: { // movem p:(r+n),omr
 		unhandled("movem p:(r+n),omr");
 		break;
 		}
-	case 3152: { // movem p:(r+n),sp
+	case 3174: { // movem p:(r+n),sp
 		unhandled("movem p:(r+n),sp");
 		break;
 		}
-	case 3153: { // movem p:(r+n),ssh
+	case 3175: { // movem p:(r+n),ssh
 		unhandled("movem p:(r+n),ssh");
 		break;
 		}
-	case 3154: { // movem p:(r+n),ssl
+	case 3176: { // movem p:(r+n),ssl
 		unhandled("movem p:(r+n),ssl");
 		break;
 		}
-	case 3155: { // movem p:(r+n),la
+	case 3177: { // movem p:(r+n),la
 		unhandled("movem p:(r+n),la");
 		break;
 		}
-	case 3156: { // movem p:(r+n),lc
+	case 3178: { // movem p:(r+n),lc
 		unhandled("movem p:(r+n),lc");
 		break;
 		}
-	case 3157: { // movem p:-(r),x0
+	case 3179: { // movem p:-(r),x0
 		unhandled("movem p:-(r),x0");
 		break;
 		}
-	case 3158: { // movem p:-(r),x1
+	case 3180: { // movem p:-(r),x1
 		unhandled("movem p:-(r),x1");
 		break;
 		}
-	case 3159: { // movem p:-(r),y0
+	case 3181: { // movem p:-(r),y0
 		unhandled("movem p:-(r),y0");
 		break;
 		}
-	case 3160: { // movem p:-(r),y1
+	case 3182: { // movem p:-(r),y1
 		unhandled("movem p:-(r),y1");
 		break;
 		}
-	case 3161: { // movem p:-(r),a0
+	case 3183: { // movem p:-(r),a0
 		unhandled("movem p:-(r),a0");
 		break;
 		}
-	case 3162: { // movem p:-(r),b0
+	case 3184: { // movem p:-(r),b0
 		unhandled("movem p:-(r),b0");
 		break;
 		}
-	case 3163: { // movem p:-(r),a2
+	case 3185: { // movem p:-(r),a2
 		unhandled("movem p:-(r),a2");
 		break;
 		}
-	case 3164: { // movem p:-(r),b2
+	case 3186: { // movem p:-(r),b2
 		unhandled("movem p:-(r),b2");
 		break;
 		}
-	case 3165: { // movem p:-(r),a1
+	case 3187: { // movem p:-(r),a1
 		unhandled("movem p:-(r),a1");
 		break;
 		}
-	case 3166: { // movem p:-(r),b1
+	case 3188: { // movem p:-(r),b1
 		unhandled("movem p:-(r),b1");
 		break;
 		}
-	case 3167: { // movem p:-(r),a
+	case 3189: { // movem p:-(r),a
 		unhandled("movem p:-(r),a");
 		break;
 		}
-	case 3168: { // movem p:-(r),b
+	case 3190: { // movem p:-(r),b
 		unhandled("movem p:-(r),b");
 		break;
 		}
-	case 3169: { // movem p:-(r),r
+	case 3191: { // movem p:-(r),r
 		unhandled("movem p:-(r),r");
 		break;
 		}
-	case 3170: { // movem p:-(r),n
+	case 3192: { // movem p:-(r),n
 		unhandled("movem p:-(r),n");
 		break;
 		}
-	case 3171: { // movem p:-(r),m
+	case 3193: { // movem p:-(r),m
 		unhandled("movem p:-(r),m");
 		break;
 		}
-	case 3172: { // movem p:-(r),ep
+	case 3194: { // movem p:-(r),ep
 		unhandled("movem p:-(r),ep");
 		break;
 		}
-	case 3173: { // movem p:-(r),vba
+	case 3195: { // movem p:-(r),vba
 		unhandled("movem p:-(r),vba");
 		break;
 		}
-	case 3174: { // movem p:-(r),sc
+	case 3196: { // movem p:-(r),sc
 		unhandled("movem p:-(r),sc");
 		break;
 		}
-	case 3175: { // movem p:-(r),sz
+	case 3197: { // movem p:-(r),sz
 		unhandled("movem p:-(r),sz");
 		break;
 		}
-	case 3176: { // movem p:-(r),sr
+	case 3198: { // movem p:-(r),sr
 		unhandled("movem p:-(r),sr");
 		break;
 		}
-	case 3177: { // movem p:-(r),omr
+	case 3199: { // movem p:-(r),omr
 		unhandled("movem p:-(r),omr");
 		break;
 		}
-	case 3178: { // movem p:-(r),sp
+	case 3200: { // movem p:-(r),sp
 		unhandled("movem p:-(r),sp");
 		break;
 		}
-	case 3179: { // movem p:-(r),ssh
+	case 3201: { // movem p:-(r),ssh
 		unhandled("movem p:-(r),ssh");
 		break;
 		}
-	case 3180: { // movem p:-(r),ssl
+	case 3202: { // movem p:-(r),ssl
 		unhandled("movem p:-(r),ssl");
 		break;
 		}
-	case 3181: { // movem p:-(r),la
+	case 3203: { // movem p:-(r),la
 		unhandled("movem p:-(r),la");
 		break;
 		}
-	case 3182: { // movem p:-(r),lc
+	case 3204: { // movem p:-(r),lc
 		unhandled("movem p:-(r),lc");
 		break;
 		}
-	case 3183: { // movem x0,p:(r)-n
+	case 3205: { // movem x0,p:(r)-n
 		unhandled("movem x0,p:(r)-n");
 		break;
 		}
-	case 3184: { // movem x1,p:(r)-n
+	case 3206: { // movem x1,p:(r)-n
 		unhandled("movem x1,p:(r)-n");
 		break;
 		}
-	case 3185: { // movem y0,p:(r)-n
+	case 3207: { // movem y0,p:(r)-n
 		unhandled("movem y0,p:(r)-n");
 		break;
 		}
-	case 3186: { // movem y1,p:(r)-n
+	case 3208: { // movem y1,p:(r)-n
 		unhandled("movem y1,p:(r)-n");
 		break;
 		}
-	case 3187: { // movem a0,p:(r)-n
+	case 3209: { // movem a0,p:(r)-n
 		unhandled("movem a0,p:(r)-n");
 		break;
 		}
-	case 3188: { // movem b0,p:(r)-n
+	case 3210: { // movem b0,p:(r)-n
 		unhandled("movem b0,p:(r)-n");
 		break;
 		}
-	case 3189: { // movem a2,p:(r)-n
+	case 3211: { // movem a2,p:(r)-n
 		unhandled("movem a2,p:(r)-n");
 		break;
 		}
-	case 3190: { // movem b2,p:(r)-n
+	case 3212: { // movem b2,p:(r)-n
 		unhandled("movem b2,p:(r)-n");
 		break;
 		}
-	case 3191: { // movem a1,p:(r)-n
+	case 3213: { // movem a1,p:(r)-n
 		unhandled("movem a1,p:(r)-n");
 		break;
 		}
-	case 3192: { // movem b1,p:(r)-n
+	case 3214: { // movem b1,p:(r)-n
 		unhandled("movem b1,p:(r)-n");
 		break;
 		}
-	case 3193: { // movem a,p:(r)-n
+	case 3215: { // movem a,p:(r)-n
 		unhandled("movem a,p:(r)-n");
 		break;
 		}
-	case 3194: { // movem b,p:(r)-n
+	case 3216: { // movem b,p:(r)-n
 		unhandled("movem b,p:(r)-n");
 		break;
 		}
-	case 3195: { // movem r,p:(r)-n
+	case 3217: { // movem r,p:(r)-n
 		unhandled("movem r,p:(r)-n");
 		break;
 		}
-	case 3196: { // movem n,p:(r)-n
+	case 3218: { // movem n,p:(r)-n
 		unhandled("movem n,p:(r)-n");
 		break;
 		}
-	case 3197: { // movem m,p:(r)-n
+	case 3219: { // movem m,p:(r)-n
 		unhandled("movem m,p:(r)-n");
 		break;
 		}
-	case 3198: { // movem ep,p:(r)-n
+	case 3220: { // movem ep,p:(r)-n
 		unhandled("movem ep,p:(r)-n");
 		break;
 		}
-	case 3199: { // movem vba,p:(r)-n
+	case 3221: { // movem vba,p:(r)-n
 		unhandled("movem vba,p:(r)-n");
 		break;
 		}
-	case 3200: { // movem sc,p:(r)-n
+	case 3222: { // movem sc,p:(r)-n
 		unhandled("movem sc,p:(r)-n");
 		break;
 		}
-	case 3201: { // movem sz,p:(r)-n
+	case 3223: { // movem sz,p:(r)-n
 		unhandled("movem sz,p:(r)-n");
 		break;
 		}
-	case 3202: { // movem sr,p:(r)-n
+	case 3224: { // movem sr,p:(r)-n
 		unhandled("movem sr,p:(r)-n");
 		break;
 		}
-	case 3203: { // movem omr,p:(r)-n
+	case 3225: { // movem omr,p:(r)-n
 		unhandled("movem omr,p:(r)-n");
 		break;
 		}
-	case 3204: { // movem sp,p:(r)-n
+	case 3226: { // movem sp,p:(r)-n
 		unhandled("movem sp,p:(r)-n");
 		break;
 		}
-	case 3205: { // movem ssh,p:(r)-n
+	case 3227: { // movem ssh,p:(r)-n
 		unhandled("movem ssh,p:(r)-n");
 		break;
 		}
-	case 3206: { // movem ssl,p:(r)-n
+	case 3228: { // movem ssl,p:(r)-n
 		unhandled("movem ssl,p:(r)-n");
 		break;
 		}
-	case 3207: { // movem la,p:(r)-n
+	case 3229: { // movem la,p:(r)-n
 		unhandled("movem la,p:(r)-n");
 		break;
 		}
-	case 3208: { // movem lc,p:(r)-n
+	case 3230: { // movem lc,p:(r)-n
 		unhandled("movem lc,p:(r)-n");
 		break;
 		}
-	case 3209: { // movem x0,p:(r)+n
+	case 3231: { // movem x0,p:(r)+n
 		unhandled("movem x0,p:(r)+n");
 		break;
 		}
-	case 3210: { // movem x1,p:(r)+n
+	case 3232: { // movem x1,p:(r)+n
 		unhandled("movem x1,p:(r)+n");
 		break;
 		}
-	case 3211: { // movem y0,p:(r)+n
+	case 3233: { // movem y0,p:(r)+n
 		unhandled("movem y0,p:(r)+n");
 		break;
 		}
-	case 3212: { // movem y1,p:(r)+n
+	case 3234: { // movem y1,p:(r)+n
 		unhandled("movem y1,p:(r)+n");
 		break;
 		}
-	case 3213: { // movem a0,p:(r)+n
+	case 3235: { // movem a0,p:(r)+n
 		unhandled("movem a0,p:(r)+n");
 		break;
 		}
-	case 3214: { // movem b0,p:(r)+n
+	case 3236: { // movem b0,p:(r)+n
 		unhandled("movem b0,p:(r)+n");
 		break;
 		}
-	case 3215: { // movem a2,p:(r)+n
+	case 3237: { // movem a2,p:(r)+n
 		unhandled("movem a2,p:(r)+n");
 		break;
 		}
-	case 3216: { // movem b2,p:(r)+n
+	case 3238: { // movem b2,p:(r)+n
 		unhandled("movem b2,p:(r)+n");
 		break;
 		}
-	case 3217: { // movem a1,p:(r)+n
+	case 3239: { // movem a1,p:(r)+n
 		unhandled("movem a1,p:(r)+n");
 		break;
 		}
-	case 3218: { // movem b1,p:(r)+n
+	case 3240: { // movem b1,p:(r)+n
 		unhandled("movem b1,p:(r)+n");
 		break;
 		}
-	case 3219: { // movem a,p:(r)+n
+	case 3241: { // movem a,p:(r)+n
 		unhandled("movem a,p:(r)+n");
 		break;
 		}
-	case 3220: { // movem b,p:(r)+n
+	case 3242: { // movem b,p:(r)+n
 		unhandled("movem b,p:(r)+n");
 		break;
 		}
-	case 3221: { // movem r,p:(r)+n
+	case 3243: { // movem r,p:(r)+n
 		unhandled("movem r,p:(r)+n");
 		break;
 		}
-	case 3222: { // movem n,p:(r)+n
+	case 3244: { // movem n,p:(r)+n
 		unhandled("movem n,p:(r)+n");
 		break;
 		}
-	case 3223: { // movem m,p:(r)+n
+	case 3245: { // movem m,p:(r)+n
 		unhandled("movem m,p:(r)+n");
 		break;
 		}
-	case 3224: { // movem ep,p:(r)+n
+	case 3246: { // movem ep,p:(r)+n
 		unhandled("movem ep,p:(r)+n");
 		break;
 		}
-	case 3225: { // movem vba,p:(r)+n
+	case 3247: { // movem vba,p:(r)+n
 		unhandled("movem vba,p:(r)+n");
 		break;
 		}
-	case 3226: { // movem sc,p:(r)+n
+	case 3248: { // movem sc,p:(r)+n
 		unhandled("movem sc,p:(r)+n");
 		break;
 		}
-	case 3227: { // movem sz,p:(r)+n
+	case 3249: { // movem sz,p:(r)+n
 		unhandled("movem sz,p:(r)+n");
 		break;
 		}
-	case 3228: { // movem sr,p:(r)+n
+	case 3250: { // movem sr,p:(r)+n
 		unhandled("movem sr,p:(r)+n");
 		break;
 		}
-	case 3229: { // movem omr,p:(r)+n
+	case 3251: { // movem omr,p:(r)+n
 		unhandled("movem omr,p:(r)+n");
 		break;
 		}
-	case 3230: { // movem sp,p:(r)+n
+	case 3252: { // movem sp,p:(r)+n
 		unhandled("movem sp,p:(r)+n");
 		break;
 		}
-	case 3231: { // movem ssh,p:(r)+n
+	case 3253: { // movem ssh,p:(r)+n
 		unhandled("movem ssh,p:(r)+n");
 		break;
 		}
-	case 3232: { // movem ssl,p:(r)+n
+	case 3254: { // movem ssl,p:(r)+n
 		unhandled("movem ssl,p:(r)+n");
 		break;
 		}
-	case 3233: { // movem la,p:(r)+n
+	case 3255: { // movem la,p:(r)+n
 		unhandled("movem la,p:(r)+n");
 		break;
 		}
-	case 3234: { // movem lc,p:(r)+n
+	case 3256: { // movem lc,p:(r)+n
 		unhandled("movem lc,p:(r)+n");
 		break;
 		}
-	case 3235: { // movem x0,p:(r)-
+	case 3257: { // movem x0,p:(r)-
 		unhandled("movem x0,p:(r)-");
 		break;
 		}
-	case 3236: { // movem x1,p:(r)-
+	case 3258: { // movem x1,p:(r)-
 		unhandled("movem x1,p:(r)-");
 		break;
 		}
-	case 3237: { // movem y0,p:(r)-
+	case 3259: { // movem y0,p:(r)-
 		unhandled("movem y0,p:(r)-");
 		break;
 		}
-	case 3238: { // movem y1,p:(r)-
+	case 3260: { // movem y1,p:(r)-
 		unhandled("movem y1,p:(r)-");
 		break;
 		}
-	case 3239: { // movem a0,p:(r)-
+	case 3261: { // movem a0,p:(r)-
 		unhandled("movem a0,p:(r)-");
 		break;
 		}
-	case 3240: { // movem b0,p:(r)-
+	case 3262: { // movem b0,p:(r)-
 		unhandled("movem b0,p:(r)-");
 		break;
 		}
-	case 3241: { // movem a2,p:(r)-
+	case 3263: { // movem a2,p:(r)-
 		unhandled("movem a2,p:(r)-");
 		break;
 		}
-	case 3242: { // movem b2,p:(r)-
+	case 3264: { // movem b2,p:(r)-
 		unhandled("movem b2,p:(r)-");
 		break;
 		}
-	case 3243: { // movem a1,p:(r)-
+	case 3265: { // movem a1,p:(r)-
 		unhandled("movem a1,p:(r)-");
 		break;
 		}
-	case 3244: { // movem b1,p:(r)-
+	case 3266: { // movem b1,p:(r)-
 		unhandled("movem b1,p:(r)-");
 		break;
 		}
-	case 3245: { // movem a,p:(r)-
+	case 3267: { // movem a,p:(r)-
 		unhandled("movem a,p:(r)-");
 		break;
 		}
-	case 3246: { // movem b,p:(r)-
+	case 3268: { // movem b,p:(r)-
 		unhandled("movem b,p:(r)-");
 		break;
 		}
-	case 3247: { // movem r,p:(r)-
+	case 3269: { // movem r,p:(r)-
 		unhandled("movem r,p:(r)-");
 		break;
 		}
-	case 3248: { // movem n,p:(r)-
+	case 3270: { // movem n,p:(r)-
 		unhandled("movem n,p:(r)-");
 		break;
 		}
-	case 3249: { // movem m,p:(r)-
+	case 3271: { // movem m,p:(r)-
 		unhandled("movem m,p:(r)-");
 		break;
 		}
-	case 3250: { // movem ep,p:(r)-
+	case 3272: { // movem ep,p:(r)-
 		unhandled("movem ep,p:(r)-");
 		break;
 		}
-	case 3251: { // movem vba,p:(r)-
+	case 3273: { // movem vba,p:(r)-
 		unhandled("movem vba,p:(r)-");
 		break;
 		}
-	case 3252: { // movem sc,p:(r)-
+	case 3274: { // movem sc,p:(r)-
 		unhandled("movem sc,p:(r)-");
 		break;
 		}
-	case 3253: { // movem sz,p:(r)-
+	case 3275: { // movem sz,p:(r)-
 		unhandled("movem sz,p:(r)-");
 		break;
 		}
-	case 3254: { // movem sr,p:(r)-
+	case 3276: { // movem sr,p:(r)-
 		unhandled("movem sr,p:(r)-");
 		break;
 		}
-	case 3255: { // movem omr,p:(r)-
+	case 3277: { // movem omr,p:(r)-
 		unhandled("movem omr,p:(r)-");
 		break;
 		}
-	case 3256: { // movem sp,p:(r)-
+	case 3278: { // movem sp,p:(r)-
 		unhandled("movem sp,p:(r)-");
 		break;
 		}
-	case 3257: { // movem ssh,p:(r)-
+	case 3279: { // movem ssh,p:(r)-
 		unhandled("movem ssh,p:(r)-");
 		break;
 		}
-	case 3258: { // movem ssl,p:(r)-
+	case 3280: { // movem ssl,p:(r)-
 		unhandled("movem ssl,p:(r)-");
 		break;
 		}
-	case 3259: { // movem la,p:(r)-
+	case 3281: { // movem la,p:(r)-
 		unhandled("movem la,p:(r)-");
 		break;
 		}
-	case 3260: { // movem lc,p:(r)-
+	case 3282: { // movem lc,p:(r)-
 		unhandled("movem lc,p:(r)-");
 		break;
 		}
-	case 3261: { // movem x0,p:(r)+
+	case 3283: { // movem x0,p:(r)+
 		unhandled("movem x0,p:(r)+");
 		break;
 		}
-	case 3262: { // movem x1,p:(r)+
+	case 3284: { // movem x1,p:(r)+
 		unhandled("movem x1,p:(r)+");
 		break;
 		}
-	case 3263: { // movem y0,p:(r)+
+	case 3285: { // movem y0,p:(r)+
 		unhandled("movem y0,p:(r)+");
 		break;
 		}
-	case 3264: { // movem y1,p:(r)+
+	case 3286: { // movem y1,p:(r)+
 		unhandled("movem y1,p:(r)+");
 		break;
 		}
-	case 3265: { // movem a0,p:(r)+
+	case 3287: { // movem a0,p:(r)+
 		unhandled("movem a0,p:(r)+");
 		break;
 		}
-	case 3266: { // movem b0,p:(r)+
+	case 3288: { // movem b0,p:(r)+
 		unhandled("movem b0,p:(r)+");
 		break;
 		}
-	case 3267: { // movem a2,p:(r)+
+	case 3289: { // movem a2,p:(r)+
 		unhandled("movem a2,p:(r)+");
 		break;
 		}
-	case 3268: { // movem b2,p:(r)+
+	case 3290: { // movem b2,p:(r)+
 		unhandled("movem b2,p:(r)+");
 		break;
 		}
-	case 3269: { // movem a1,p:(r)+
+	case 3291: { // movem a1,p:(r)+
 		unhandled("movem a1,p:(r)+");
 		break;
 		}
-	case 3270: { // movem b1,p:(r)+
+	case 3292: { // movem b1,p:(r)+
 		unhandled("movem b1,p:(r)+");
 		break;
 		}
-	case 3271: { // movem a,p:(r)+
+	case 3293: { // movem a,p:(r)+
 		unhandled("movem a,p:(r)+");
 		break;
 		}
-	case 3272: { // movem b,p:(r)+
+	case 3294: { // movem b,p:(r)+
 		unhandled("movem b,p:(r)+");
 		break;
 		}
-	case 3273: { // movem r,p:(r)+
+	case 3295: { // movem r,p:(r)+
 		unhandled("movem r,p:(r)+");
 		break;
 		}
-	case 3274: { // movem n,p:(r)+
+	case 3296: { // movem n,p:(r)+
 		unhandled("movem n,p:(r)+");
 		break;
 		}
-	case 3275: { // movem m,p:(r)+
+	case 3297: { // movem m,p:(r)+
 		unhandled("movem m,p:(r)+");
 		break;
 		}
-	case 3276: { // movem ep,p:(r)+
+	case 3298: { // movem ep,p:(r)+
 		unhandled("movem ep,p:(r)+");
 		break;
 		}
-	case 3277: { // movem vba,p:(r)+
+	case 3299: { // movem vba,p:(r)+
 		unhandled("movem vba,p:(r)+");
 		break;
 		}
-	case 3278: { // movem sc,p:(r)+
+	case 3300: { // movem sc,p:(r)+
 		unhandled("movem sc,p:(r)+");
 		break;
 		}
-	case 3279: { // movem sz,p:(r)+
+	case 3301: { // movem sz,p:(r)+
 		unhandled("movem sz,p:(r)+");
 		break;
 		}
-	case 3280: { // movem sr,p:(r)+
+	case 3302: { // movem sr,p:(r)+
 		unhandled("movem sr,p:(r)+");
 		break;
 		}
-	case 3281: { // movem omr,p:(r)+
+	case 3303: { // movem omr,p:(r)+
 		unhandled("movem omr,p:(r)+");
 		break;
 		}
-	case 3282: { // movem sp,p:(r)+
+	case 3304: { // movem sp,p:(r)+
 		unhandled("movem sp,p:(r)+");
 		break;
 		}
-	case 3283: { // movem ssh,p:(r)+
+	case 3305: { // movem ssh,p:(r)+
 		unhandled("movem ssh,p:(r)+");
 		break;
 		}
-	case 3284: { // movem ssl,p:(r)+
+	case 3306: { // movem ssl,p:(r)+
 		unhandled("movem ssl,p:(r)+");
 		break;
 		}
-	case 3285: { // movem la,p:(r)+
+	case 3307: { // movem la,p:(r)+
 		unhandled("movem la,p:(r)+");
 		break;
 		}
-	case 3286: { // movem lc,p:(r)+
+	case 3308: { // movem lc,p:(r)+
 		unhandled("movem lc,p:(r)+");
 		break;
 		}
-	case 3287: { // movem x0,p:(r)
+	case 3309: { // movem x0,p:(r)
 		unhandled("movem x0,p:(r)");
 		break;
 		}
-	case 3288: { // movem x1,p:(r)
+	case 3310: { // movem x1,p:(r)
 		unhandled("movem x1,p:(r)");
 		break;
 		}
-	case 3289: { // movem y0,p:(r)
+	case 3311: { // movem y0,p:(r)
 		unhandled("movem y0,p:(r)");
 		break;
 		}
-	case 3290: { // movem y1,p:(r)
+	case 3312: { // movem y1,p:(r)
 		unhandled("movem y1,p:(r)");
 		break;
 		}
-	case 3291: { // movem a0,p:(r)
+	case 3313: { // movem a0,p:(r)
 		unhandled("movem a0,p:(r)");
 		break;
 		}
-	case 3292: { // movem b0,p:(r)
+	case 3314: { // movem b0,p:(r)
 		unhandled("movem b0,p:(r)");
 		break;
 		}
-	case 3293: { // movem a2,p:(r)
+	case 3315: { // movem a2,p:(r)
 		unhandled("movem a2,p:(r)");
 		break;
 		}
-	case 3294: { // movem b2,p:(r)
+	case 3316: { // movem b2,p:(r)
 		unhandled("movem b2,p:(r)");
 		break;
 		}
-	case 3295: { // movem a1,p:(r)
+	case 3317: { // movem a1,p:(r)
 		unhandled("movem a1,p:(r)");
 		break;
 		}
-	case 3296: { // movem b1,p:(r)
+	case 3318: { // movem b1,p:(r)
 		unhandled("movem b1,p:(r)");
 		break;
 		}
-	case 3297: { // movem a,p:(r)
+	case 3319: { // movem a,p:(r)
 		unhandled("movem a,p:(r)");
 		break;
 		}
-	case 3298: { // movem b,p:(r)
+	case 3320: { // movem b,p:(r)
 		unhandled("movem b,p:(r)");
 		break;
 		}
-	case 3299: { // movem r,p:(r)
+	case 3321: { // movem r,p:(r)
 		unhandled("movem r,p:(r)");
 		break;
 		}
-	case 3300: { // movem n,p:(r)
+	case 3322: { // movem n,p:(r)
 		unhandled("movem n,p:(r)");
 		break;
 		}
-	case 3301: { // movem m,p:(r)
+	case 3323: { // movem m,p:(r)
 		unhandled("movem m,p:(r)");
 		break;
 		}
-	case 3302: { // movem ep,p:(r)
+	case 3324: { // movem ep,p:(r)
 		unhandled("movem ep,p:(r)");
 		break;
 		}
-	case 3303: { // movem vba,p:(r)
+	case 3325: { // movem vba,p:(r)
 		unhandled("movem vba,p:(r)");
 		break;
 		}
-	case 3304: { // movem sc,p:(r)
+	case 3326: { // movem sc,p:(r)
 		unhandled("movem sc,p:(r)");
 		break;
 		}
-	case 3305: { // movem sz,p:(r)
+	case 3327: { // movem sz,p:(r)
 		unhandled("movem sz,p:(r)");
 		break;
 		}
-	case 3306: { // movem sr,p:(r)
+	case 3328: { // movem sr,p:(r)
 		unhandled("movem sr,p:(r)");
 		break;
 		}
-	case 3307: { // movem omr,p:(r)
+	case 3329: { // movem omr,p:(r)
 		unhandled("movem omr,p:(r)");
 		break;
 		}
-	case 3308: { // movem sp,p:(r)
+	case 3330: { // movem sp,p:(r)
 		unhandled("movem sp,p:(r)");
 		break;
 		}
-	case 3309: { // movem ssh,p:(r)
+	case 3331: { // movem ssh,p:(r)
 		unhandled("movem ssh,p:(r)");
 		break;
 		}
-	case 3310: { // movem ssl,p:(r)
+	case 3332: { // movem ssl,p:(r)
 		unhandled("movem ssl,p:(r)");
 		break;
 		}
-	case 3311: { // movem la,p:(r)
+	case 3333: { // movem la,p:(r)
 		unhandled("movem la,p:(r)");
 		break;
 		}
-	case 3312: { // movem lc,p:(r)
+	case 3334: { // movem lc,p:(r)
 		unhandled("movem lc,p:(r)");
 		break;
 		}
-	case 3313: { // movem x0,p:(r+n)
+	case 3335: { // movem x0,p:(r+n)
 		unhandled("movem x0,p:(r+n)");
 		break;
 		}
-	case 3314: { // movem x1,p:(r+n)
+	case 3336: { // movem x1,p:(r+n)
 		unhandled("movem x1,p:(r+n)");
 		break;
 		}
-	case 3315: { // movem y0,p:(r+n)
+	case 3337: { // movem y0,p:(r+n)
 		unhandled("movem y0,p:(r+n)");
 		break;
 		}
-	case 3316: { // movem y1,p:(r+n)
+	case 3338: { // movem y1,p:(r+n)
 		unhandled("movem y1,p:(r+n)");
 		break;
 		}
-	case 3317: { // movem a0,p:(r+n)
+	case 3339: { // movem a0,p:(r+n)
 		unhandled("movem a0,p:(r+n)");
 		break;
 		}
-	case 3318: { // movem b0,p:(r+n)
+	case 3340: { // movem b0,p:(r+n)
 		unhandled("movem b0,p:(r+n)");
 		break;
 		}
-	case 3319: { // movem a2,p:(r+n)
+	case 3341: { // movem a2,p:(r+n)
 		unhandled("movem a2,p:(r+n)");
 		break;
 		}
-	case 3320: { // movem b2,p:(r+n)
+	case 3342: { // movem b2,p:(r+n)
 		unhandled("movem b2,p:(r+n)");
 		break;
 		}
-	case 3321: { // movem a1,p:(r+n)
+	case 3343: { // movem a1,p:(r+n)
 		unhandled("movem a1,p:(r+n)");
 		break;
 		}
-	case 3322: { // movem b1,p:(r+n)
+	case 3344: { // movem b1,p:(r+n)
 		unhandled("movem b1,p:(r+n)");
 		break;
 		}
-	case 3323: { // movem a,p:(r+n)
+	case 3345: { // movem a,p:(r+n)
 		unhandled("movem a,p:(r+n)");
 		break;
 		}
-	case 3324: { // movem b,p:(r+n)
+	case 3346: { // movem b,p:(r+n)
 		unhandled("movem b,p:(r+n)");
 		break;
 		}
-	case 3325: { // movem r,p:(r+n)
+	case 3347: { // movem r,p:(r+n)
 		unhandled("movem r,p:(r+n)");
 		break;
 		}
-	case 3326: { // movem n,p:(r+n)
+	case 3348: { // movem n,p:(r+n)
 		unhandled("movem n,p:(r+n)");
 		break;
 		}
-	case 3327: { // movem m,p:(r+n)
+	case 3349: { // movem m,p:(r+n)
 		unhandled("movem m,p:(r+n)");
 		break;
 		}
-	case 3328: { // movem ep,p:(r+n)
+	case 3350: { // movem ep,p:(r+n)
 		unhandled("movem ep,p:(r+n)");
 		break;
 		}
-	case 3329: { // movem vba,p:(r+n)
+	case 3351: { // movem vba,p:(r+n)
 		unhandled("movem vba,p:(r+n)");
 		break;
 		}
-	case 3330: { // movem sc,p:(r+n)
+	case 3352: { // movem sc,p:(r+n)
 		unhandled("movem sc,p:(r+n)");
 		break;
 		}
-	case 3331: { // movem sz,p:(r+n)
+	case 3353: { // movem sz,p:(r+n)
 		unhandled("movem sz,p:(r+n)");
 		break;
 		}
-	case 3332: { // movem sr,p:(r+n)
+	case 3354: { // movem sr,p:(r+n)
 		unhandled("movem sr,p:(r+n)");
 		break;
 		}
-	case 3333: { // movem omr,p:(r+n)
+	case 3355: { // movem omr,p:(r+n)
 		unhandled("movem omr,p:(r+n)");
 		break;
 		}
-	case 3334: { // movem sp,p:(r+n)
+	case 3356: { // movem sp,p:(r+n)
 		unhandled("movem sp,p:(r+n)");
 		break;
 		}
-	case 3335: { // movem ssh,p:(r+n)
+	case 3357: { // movem ssh,p:(r+n)
 		unhandled("movem ssh,p:(r+n)");
 		break;
 		}
-	case 3336: { // movem ssl,p:(r+n)
+	case 3358: { // movem ssl,p:(r+n)
 		unhandled("movem ssl,p:(r+n)");
 		break;
 		}
-	case 3337: { // movem la,p:(r+n)
+	case 3359: { // movem la,p:(r+n)
 		unhandled("movem la,p:(r+n)");
 		break;
 		}
-	case 3338: { // movem lc,p:(r+n)
+	case 3360: { // movem lc,p:(r+n)
 		unhandled("movem lc,p:(r+n)");
 		break;
 		}
-	case 3339: { // movem x0,p:-(r)
+	case 3361: { // movem x0,p:-(r)
 		unhandled("movem x0,p:-(r)");
 		break;
 		}
-	case 3340: { // movem x1,p:-(r)
+	case 3362: { // movem x1,p:-(r)
 		unhandled("movem x1,p:-(r)");
 		break;
 		}
-	case 3341: { // movem y0,p:-(r)
+	case 3363: { // movem y0,p:-(r)
 		unhandled("movem y0,p:-(r)");
 		break;
 		}
-	case 3342: { // movem y1,p:-(r)
+	case 3364: { // movem y1,p:-(r)
 		unhandled("movem y1,p:-(r)");
 		break;
 		}
-	case 3343: { // movem a0,p:-(r)
+	case 3365: { // movem a0,p:-(r)
 		unhandled("movem a0,p:-(r)");
 		break;
 		}
-	case 3344: { // movem b0,p:-(r)
+	case 3366: { // movem b0,p:-(r)
 		unhandled("movem b0,p:-(r)");
 		break;
 		}
-	case 3345: { // movem a2,p:-(r)
+	case 3367: { // movem a2,p:-(r)
 		unhandled("movem a2,p:-(r)");
 		break;
 		}
-	case 3346: { // movem b2,p:-(r)
+	case 3368: { // movem b2,p:-(r)
 		unhandled("movem b2,p:-(r)");
 		break;
 		}
-	case 3347: { // movem a1,p:-(r)
+	case 3369: { // movem a1,p:-(r)
 		unhandled("movem a1,p:-(r)");
 		break;
 		}
-	case 3348: { // movem b1,p:-(r)
+	case 3370: { // movem b1,p:-(r)
 		unhandled("movem b1,p:-(r)");
 		break;
 		}
-	case 3349: { // movem a,p:-(r)
+	case 3371: { // movem a,p:-(r)
 		unhandled("movem a,p:-(r)");
 		break;
 		}
-	case 3350: { // movem b,p:-(r)
+	case 3372: { // movem b,p:-(r)
 		unhandled("movem b,p:-(r)");
 		break;
 		}
-	case 3351: { // movem r,p:-(r)
+	case 3373: { // movem r,p:-(r)
 		unhandled("movem r,p:-(r)");
 		break;
 		}
-	case 3352: { // movem n,p:-(r)
+	case 3374: { // movem n,p:-(r)
 		unhandled("movem n,p:-(r)");
 		break;
 		}
-	case 3353: { // movem m,p:-(r)
+	case 3375: { // movem m,p:-(r)
 		unhandled("movem m,p:-(r)");
 		break;
 		}
-	case 3354: { // movem ep,p:-(r)
+	case 3376: { // movem ep,p:-(r)
 		unhandled("movem ep,p:-(r)");
 		break;
 		}
-	case 3355: { // movem vba,p:-(r)
+	case 3377: { // movem vba,p:-(r)
 		unhandled("movem vba,p:-(r)");
 		break;
 		}
-	case 3356: { // movem sc,p:-(r)
+	case 3378: { // movem sc,p:-(r)
 		unhandled("movem sc,p:-(r)");
 		break;
 		}
-	case 3357: { // movem sz,p:-(r)
+	case 3379: { // movem sz,p:-(r)
 		unhandled("movem sz,p:-(r)");
 		break;
 		}
-	case 3358: { // movem sr,p:-(r)
+	case 3380: { // movem sr,p:-(r)
 		unhandled("movem sr,p:-(r)");
 		break;
 		}
-	case 3359: { // movem omr,p:-(r)
+	case 3381: { // movem omr,p:-(r)
 		unhandled("movem omr,p:-(r)");
 		break;
 		}
-	case 3360: { // movem sp,p:-(r)
+	case 3382: { // movem sp,p:-(r)
 		unhandled("movem sp,p:-(r)");
 		break;
 		}
-	case 3361: { // movem ssh,p:-(r)
+	case 3383: { // movem ssh,p:-(r)
 		unhandled("movem ssh,p:-(r)");
 		break;
 		}
-	case 3362: { // movem ssl,p:-(r)
+	case 3384: { // movem ssl,p:-(r)
 		unhandled("movem ssl,p:-(r)");
 		break;
 		}
-	case 3363: { // movem la,p:-(r)
+	case 3385: { // movem la,p:-(r)
 		unhandled("movem la,p:-(r)");
 		break;
 		}
-	case 3364: { // movem lc,p:-(r)
+	case 3386: { // movem lc,p:-(r)
 		unhandled("movem lc,p:-(r)");
 		break;
 		}
-	case 3365: { // movem p:[abs],x0
+	case 3387: { // movem p:[abs],x0
 		unhandled("movem p:[abs],x0");
 		break;
 		}
-	case 3366: { // movem p:[abs],x1
+	case 3388: { // movem p:[abs],x1
 		unhandled("movem p:[abs],x1");
 		break;
 		}
-	case 3367: { // movem p:[abs],y0
+	case 3389: { // movem p:[abs],y0
 		unhandled("movem p:[abs],y0");
 		break;
 		}
-	case 3368: { // movem p:[abs],y1
+	case 3390: { // movem p:[abs],y1
 		unhandled("movem p:[abs],y1");
 		break;
 		}
-	case 3369: { // movem p:[abs],a0
+	case 3391: { // movem p:[abs],a0
 		unhandled("movem p:[abs],a0");
 		break;
 		}
-	case 3370: { // movem p:[abs],b0
+	case 3392: { // movem p:[abs],b0
 		unhandled("movem p:[abs],b0");
 		break;
 		}
-	case 3371: { // movem p:[abs],a2
+	case 3393: { // movem p:[abs],a2
 		unhandled("movem p:[abs],a2");
 		break;
 		}
-	case 3372: { // movem p:[abs],b2
+	case 3394: { // movem p:[abs],b2
 		unhandled("movem p:[abs],b2");
 		break;
 		}
-	case 3373: { // movem p:[abs],a1
+	case 3395: { // movem p:[abs],a1
 		unhandled("movem p:[abs],a1");
 		break;
 		}
-	case 3374: { // movem p:[abs],b1
+	case 3396: { // movem p:[abs],b1
 		unhandled("movem p:[abs],b1");
 		break;
 		}
-	case 3375: { // movem p:[abs],a
+	case 3397: { // movem p:[abs],a
 		unhandled("movem p:[abs],a");
 		break;
 		}
-	case 3376: { // movem p:[abs],b
+	case 3398: { // movem p:[abs],b
 		unhandled("movem p:[abs],b");
 		break;
 		}
-	case 3377: { // movem p:[abs],r
+	case 3399: { // movem p:[abs],r
 		unhandled("movem p:[abs],r");
 		break;
 		}
-	case 3378: { // movem p:[abs],n
+	case 3400: { // movem p:[abs],n
 		unhandled("movem p:[abs],n");
 		break;
 		}
-	case 3379: { // movem p:[abs],m
+	case 3401: { // movem p:[abs],m
 		unhandled("movem p:[abs],m");
 		break;
 		}
-	case 3380: { // movem p:[abs],ep
+	case 3402: { // movem p:[abs],ep
 		unhandled("movem p:[abs],ep");
 		break;
 		}
-	case 3381: { // movem p:[abs],vba
+	case 3403: { // movem p:[abs],vba
 		unhandled("movem p:[abs],vba");
 		break;
 		}
-	case 3382: { // movem p:[abs],sc
+	case 3404: { // movem p:[abs],sc
 		unhandled("movem p:[abs],sc");
 		break;
 		}
-	case 3383: { // movem p:[abs],sz
+	case 3405: { // movem p:[abs],sz
 		unhandled("movem p:[abs],sz");
 		break;
 		}
-	case 3384: { // movem p:[abs],sr
+	case 3406: { // movem p:[abs],sr
 		unhandled("movem p:[abs],sr");
 		break;
 		}
-	case 3385: { // movem p:[abs],omr
+	case 3407: { // movem p:[abs],omr
 		unhandled("movem p:[abs],omr");
 		break;
 		}
-	case 3386: { // movem p:[abs],sp
+	case 3408: { // movem p:[abs],sp
 		unhandled("movem p:[abs],sp");
 		break;
 		}
-	case 3387: { // movem p:[abs],ssh
+	case 3409: { // movem p:[abs],ssh
 		unhandled("movem p:[abs],ssh");
 		break;
 		}
-	case 3388: { // movem p:[abs],ssl
+	case 3410: { // movem p:[abs],ssl
 		unhandled("movem p:[abs],ssl");
 		break;
 		}
-	case 3389: { // movem p:[abs],la
+	case 3411: { // movem p:[abs],la
 		unhandled("movem p:[abs],la");
 		break;
 		}
-	case 3390: { // movem p:[abs],lc
+	case 3412: { // movem p:[abs],lc
 		unhandled("movem p:[abs],lc");
 		break;
 		}
-	case 3391: { // movem p:[aa],x0
+	case 3413: { // movem x0,p:[abs]
+		unhandled("movem x0,p:[abs]");
+		break;
+		}
+	case 3414: { // movem x1,p:[abs]
+		unhandled("movem x1,p:[abs]");
+		break;
+		}
+	case 3415: { // movem y0,p:[abs]
+		unhandled("movem y0,p:[abs]");
+		break;
+		}
+	case 3416: { // movem y1,p:[abs]
+		unhandled("movem y1,p:[abs]");
+		break;
+		}
+	case 3417: { // movem a0,p:[abs]
+		unhandled("movem a0,p:[abs]");
+		break;
+		}
+	case 3418: { // movem b0,p:[abs]
+		unhandled("movem b0,p:[abs]");
+		break;
+		}
+	case 3419: { // movem a2,p:[abs]
+		unhandled("movem a2,p:[abs]");
+		break;
+		}
+	case 3420: { // movem b2,p:[abs]
+		unhandled("movem b2,p:[abs]");
+		break;
+		}
+	case 3421: { // movem a1,p:[abs]
+		unhandled("movem a1,p:[abs]");
+		break;
+		}
+	case 3422: { // movem b1,p:[abs]
+		unhandled("movem b1,p:[abs]");
+		break;
+		}
+	case 3423: { // movem a,p:[abs]
+		unhandled("movem a,p:[abs]");
+		break;
+		}
+	case 3424: { // movem b,p:[abs]
+		unhandled("movem b,p:[abs]");
+		break;
+		}
+	case 3425: { // movem r,p:[abs]
+		unhandled("movem r,p:[abs]");
+		break;
+		}
+	case 3426: { // movem n,p:[abs]
+		unhandled("movem n,p:[abs]");
+		break;
+		}
+	case 3427: { // movem m,p:[abs]
+		unhandled("movem m,p:[abs]");
+		break;
+		}
+	case 3428: { // movem ep,p:[abs]
+		unhandled("movem ep,p:[abs]");
+		break;
+		}
+	case 3429: { // movem vba,p:[abs]
+		unhandled("movem vba,p:[abs]");
+		break;
+		}
+	case 3430: { // movem sc,p:[abs]
+		unhandled("movem sc,p:[abs]");
+		break;
+		}
+	case 3431: { // movem sz,p:[abs]
+		unhandled("movem sz,p:[abs]");
+		break;
+		}
+	case 3432: { // movem sr,p:[abs]
+		unhandled("movem sr,p:[abs]");
+		break;
+		}
+	case 3433: { // movem omr,p:[abs]
+		unhandled("movem omr,p:[abs]");
+		break;
+		}
+	case 3434: { // movem sp,p:[abs]
+		unhandled("movem sp,p:[abs]");
+		break;
+		}
+	case 3435: { // movem ssh,p:[abs]
+		unhandled("movem ssh,p:[abs]");
+		break;
+		}
+	case 3436: { // movem ssl,p:[abs]
+		unhandled("movem ssl,p:[abs]");
+		break;
+		}
+	case 3437: { // movem la,p:[abs]
+		unhandled("movem la,p:[abs]");
+		break;
+		}
+	case 3438: { // movem lc,p:[abs]
+		unhandled("movem lc,p:[abs]");
+		break;
+		}
+	case 3439: { // movem p:[aa],x0
 		unhandled("movem p:[aa],x0");
 		break;
 		}
-	case 3392: { // movem p:[aa],x1
+	case 3440: { // movem p:[aa],x1
 		unhandled("movem p:[aa],x1");
 		break;
 		}
-	case 3393: { // movem p:[aa],y0
+	case 3441: { // movem p:[aa],y0
 		unhandled("movem p:[aa],y0");
 		break;
 		}
-	case 3394: { // movem p:[aa],y1
+	case 3442: { // movem p:[aa],y1
 		unhandled("movem p:[aa],y1");
 		break;
 		}
-	case 3395: { // movem p:[aa],a0
+	case 3443: { // movem p:[aa],a0
 		unhandled("movem p:[aa],a0");
 		break;
 		}
-	case 3396: { // movem p:[aa],b0
+	case 3444: { // movem p:[aa],b0
 		unhandled("movem p:[aa],b0");
 		break;
 		}
-	case 3397: { // movem p:[aa],a2
+	case 3445: { // movem p:[aa],a2
 		unhandled("movem p:[aa],a2");
 		break;
 		}
-	case 3398: { // movem p:[aa],b2
+	case 3446: { // movem p:[aa],b2
 		unhandled("movem p:[aa],b2");
 		break;
 		}
-	case 3399: { // movem p:[aa],a1
+	case 3447: { // movem p:[aa],a1
 		unhandled("movem p:[aa],a1");
 		break;
 		}
-	case 3400: { // movem p:[aa],b1
+	case 3448: { // movem p:[aa],b1
 		unhandled("movem p:[aa],b1");
 		break;
 		}
-	case 3401: { // movem p:[aa],a
+	case 3449: { // movem p:[aa],a
 		unhandled("movem p:[aa],a");
 		break;
 		}
-	case 3402: { // movem p:[aa],b
+	case 3450: { // movem p:[aa],b
 		unhandled("movem p:[aa],b");
 		break;
 		}
-	case 3403: { // movem p:[aa],r
+	case 3451: { // movem p:[aa],r
 		unhandled("movem p:[aa],r");
 		break;
 		}
-	case 3404: { // movem p:[aa],n
+	case 3452: { // movem p:[aa],n
 		unhandled("movem p:[aa],n");
 		break;
 		}
-	case 3405: { // movem p:[aa],m
+	case 3453: { // movem p:[aa],m
 		unhandled("movem p:[aa],m");
 		break;
 		}
-	case 3406: { // movem p:[aa],ep
+	case 3454: { // movem p:[aa],ep
 		unhandled("movem p:[aa],ep");
 		break;
 		}
-	case 3407: { // movem p:[aa],vba
+	case 3455: { // movem p:[aa],vba
 		unhandled("movem p:[aa],vba");
 		break;
 		}
-	case 3408: { // movem p:[aa],sc
+	case 3456: { // movem p:[aa],sc
 		unhandled("movem p:[aa],sc");
 		break;
 		}
-	case 3409: { // movem p:[aa],sz
+	case 3457: { // movem p:[aa],sz
 		unhandled("movem p:[aa],sz");
 		break;
 		}
-	case 3410: { // movem p:[aa],sr
+	case 3458: { // movem p:[aa],sr
 		unhandled("movem p:[aa],sr");
 		break;
 		}
-	case 3411: { // movem p:[aa],omr
+	case 3459: { // movem p:[aa],omr
 		unhandled("movem p:[aa],omr");
 		break;
 		}
-	case 3412: { // movem p:[aa],sp
+	case 3460: { // movem p:[aa],sp
 		unhandled("movem p:[aa],sp");
 		break;
 		}
-	case 3413: { // movem p:[aa],ssh
+	case 3461: { // movem p:[aa],ssh
 		unhandled("movem p:[aa],ssh");
 		break;
 		}
-	case 3414: { // movem p:[aa],ssl
+	case 3462: { // movem p:[aa],ssl
 		unhandled("movem p:[aa],ssl");
 		break;
 		}
-	case 3415: { // movem p:[aa],la
+	case 3463: { // movem p:[aa],la
 		unhandled("movem p:[aa],la");
 		break;
 		}
-	case 3416: { // movem p:[aa],lc
+	case 3464: { // movem p:[aa],lc
 		unhandled("movem p:[aa],lc");
 		break;
 		}
-	case 3417: { // movem x0,p:[aa]
+	case 3465: { // movem x0,p:[aa]
 		unhandled("movem x0,p:[aa]");
 		break;
 		}
-	case 3418: { // movem x1,p:[aa]
+	case 3466: { // movem x1,p:[aa]
 		unhandled("movem x1,p:[aa]");
 		break;
 		}
-	case 3419: { // movem y0,p:[aa]
+	case 3467: { // movem y0,p:[aa]
 		unhandled("movem y0,p:[aa]");
 		break;
 		}
-	case 3420: { // movem y1,p:[aa]
+	case 3468: { // movem y1,p:[aa]
 		unhandled("movem y1,p:[aa]");
 		break;
 		}
-	case 3421: { // movem a0,p:[aa]
+	case 3469: { // movem a0,p:[aa]
 		unhandled("movem a0,p:[aa]");
 		break;
 		}
-	case 3422: { // movem b0,p:[aa]
+	case 3470: { // movem b0,p:[aa]
 		unhandled("movem b0,p:[aa]");
 		break;
 		}
-	case 3423: { // movem a2,p:[aa]
+	case 3471: { // movem a2,p:[aa]
 		unhandled("movem a2,p:[aa]");
 		break;
 		}
-	case 3424: { // movem b2,p:[aa]
+	case 3472: { // movem b2,p:[aa]
 		unhandled("movem b2,p:[aa]");
 		break;
 		}
-	case 3425: { // movem a1,p:[aa]
+	case 3473: { // movem a1,p:[aa]
 		unhandled("movem a1,p:[aa]");
 		break;
 		}
-	case 3426: { // movem b1,p:[aa]
+	case 3474: { // movem b1,p:[aa]
 		unhandled("movem b1,p:[aa]");
 		break;
 		}
-	case 3427: { // movem a,p:[aa]
+	case 3475: { // movem a,p:[aa]
 		unhandled("movem a,p:[aa]");
 		break;
 		}
-	case 3428: { // movem b,p:[aa]
+	case 3476: { // movem b,p:[aa]
 		unhandled("movem b,p:[aa]");
 		break;
 		}
-	case 3429: { // movem r,p:[aa]
+	case 3477: { // movem r,p:[aa]
 		unhandled("movem r,p:[aa]");
 		break;
 		}
-	case 3430: { // movem n,p:[aa]
+	case 3478: { // movem n,p:[aa]
 		unhandled("movem n,p:[aa]");
 		break;
 		}
-	case 3431: { // movem m,p:[aa]
+	case 3479: { // movem m,p:[aa]
 		unhandled("movem m,p:[aa]");
 		break;
 		}
-	case 3432: { // movem ep,p:[aa]
+	case 3480: { // movem ep,p:[aa]
 		unhandled("movem ep,p:[aa]");
 		break;
 		}
-	case 3433: { // movem vba,p:[aa]
+	case 3481: { // movem vba,p:[aa]
 		unhandled("movem vba,p:[aa]");
 		break;
 		}
-	case 3434: { // movem sc,p:[aa]
+	case 3482: { // movem sc,p:[aa]
 		unhandled("movem sc,p:[aa]");
 		break;
 		}
-	case 3435: { // movem sz,p:[aa]
+	case 3483: { // movem sz,p:[aa]
 		unhandled("movem sz,p:[aa]");
 		break;
 		}
-	case 3436: { // movem sr,p:[aa]
+	case 3484: { // movem sr,p:[aa]
 		unhandled("movem sr,p:[aa]");
 		break;
 		}
-	case 3437: { // movem omr,p:[aa]
+	case 3485: { // movem omr,p:[aa]
 		unhandled("movem omr,p:[aa]");
 		break;
 		}
-	case 3438: { // movem sp,p:[aa]
+	case 3486: { // movem sp,p:[aa]
 		unhandled("movem sp,p:[aa]");
 		break;
 		}
-	case 3439: { // movem ssh,p:[aa]
+	case 3487: { // movem ssh,p:[aa]
 		unhandled("movem ssh,p:[aa]");
 		break;
 		}
-	case 3440: { // movem ssl,p:[aa]
+	case 3488: { // movem ssl,p:[aa]
 		unhandled("movem ssl,p:[aa]");
 		break;
 		}
-	case 3441: { // movem la,p:[aa]
+	case 3489: { // movem la,p:[aa]
 		unhandled("movem la,p:[aa]");
 		break;
 		}
-	case 3442: { // movem lc,p:[aa]
+	case 3490: { // movem lc,p:[aa]
 		unhandled("movem lc,p:[aa]");
 		break;
 		}
-	case 3443: { // movep x:(r)-n,x:[pp]
+	case 3491: { // movep x:(r)-n,x:[pp]
 		unhandled("movep x:(r)-n,x:[pp]");
 		break;
 		}
-	case 3444: { // movep y:(r)-n,x:[pp]
+	case 3492: { // movep y:(r)-n,x:[pp]
 		unhandled("movep y:(r)-n,x:[pp]");
 		break;
 		}
-	case 3445: { // movep x:(r)+n,x:[pp]
+	case 3493: { // movep x:(r)+n,x:[pp]
 		unhandled("movep x:(r)+n,x:[pp]");
 		break;
 		}
-	case 3446: { // movep y:(r)+n,x:[pp]
+	case 3494: { // movep y:(r)+n,x:[pp]
 		unhandled("movep y:(r)+n,x:[pp]");
 		break;
 		}
-	case 3447: { // movep x:(r)-,x:[pp]
+	case 3495: { // movep x:(r)-,x:[pp]
 		unhandled("movep x:(r)-,x:[pp]");
 		break;
 		}
-	case 3448: { // movep y:(r)-,x:[pp]
+	case 3496: { // movep y:(r)-,x:[pp]
 		unhandled("movep y:(r)-,x:[pp]");
 		break;
 		}
-	case 3449: { // movep x:(r)+,x:[pp]
+	case 3497: { // movep x:(r)+,x:[pp]
 		unhandled("movep x:(r)+,x:[pp]");
 		break;
 		}
-	case 3450: { // movep y:(r)+,x:[pp]
+	case 3498: { // movep y:(r)+,x:[pp]
 		unhandled("movep y:(r)+,x:[pp]");
 		break;
 		}
-	case 3451: { // movep x:(r),x:[pp]
+	case 3499: { // movep x:(r),x:[pp]
 		unhandled("movep x:(r),x:[pp]");
 		break;
 		}
-	case 3452: { // movep y:(r),x:[pp]
+	case 3500: { // movep y:(r),x:[pp]
 		unhandled("movep y:(r),x:[pp]");
 		break;
 		}
-	case 3453: { // movep x:(r+n),x:[pp]
+	case 3501: { // movep x:(r+n),x:[pp]
 		unhandled("movep x:(r+n),x:[pp]");
 		break;
 		}
-	case 3454: { // movep y:(r+n),x:[pp]
+	case 3502: { // movep y:(r+n),x:[pp]
 		unhandled("movep y:(r+n),x:[pp]");
 		break;
 		}
-	case 3455: { // movep x:-(r),x:[pp]
+	case 3503: { // movep x:-(r),x:[pp]
 		unhandled("movep x:-(r),x:[pp]");
 		break;
 		}
-	case 3456: { // movep y:-(r),x:[pp]
+	case 3504: { // movep y:-(r),x:[pp]
 		unhandled("movep y:-(r),x:[pp]");
 		break;
 		}
-	case 3457: { // movep x:(r)-n,y:[pp]
+	case 3505: { // movep x:(r)-n,y:[pp]
 		unhandled("movep x:(r)-n,y:[pp]");
 		break;
 		}
-	case 3458: { // movep y:(r)-n,y:[pp]
+	case 3506: { // movep y:(r)-n,y:[pp]
 		unhandled("movep y:(r)-n,y:[pp]");
 		break;
 		}
-	case 3459: { // movep x:(r)+n,y:[pp]
+	case 3507: { // movep x:(r)+n,y:[pp]
 		unhandled("movep x:(r)+n,y:[pp]");
 		break;
 		}
-	case 3460: { // movep y:(r)+n,y:[pp]
+	case 3508: { // movep y:(r)+n,y:[pp]
 		unhandled("movep y:(r)+n,y:[pp]");
 		break;
 		}
-	case 3461: { // movep x:(r)-,y:[pp]
+	case 3509: { // movep x:(r)-,y:[pp]
 		unhandled("movep x:(r)-,y:[pp]");
 		break;
 		}
-	case 3462: { // movep y:(r)-,y:[pp]
+	case 3510: { // movep y:(r)-,y:[pp]
 		unhandled("movep y:(r)-,y:[pp]");
 		break;
 		}
-	case 3463: { // movep x:(r)+,y:[pp]
+	case 3511: { // movep x:(r)+,y:[pp]
 		unhandled("movep x:(r)+,y:[pp]");
 		break;
 		}
-	case 3464: { // movep y:(r)+,y:[pp]
+	case 3512: { // movep y:(r)+,y:[pp]
 		unhandled("movep y:(r)+,y:[pp]");
 		break;
 		}
-	case 3465: { // movep x:(r),y:[pp]
+	case 3513: { // movep x:(r),y:[pp]
 		unhandled("movep x:(r),y:[pp]");
 		break;
 		}
-	case 3466: { // movep y:(r),y:[pp]
+	case 3514: { // movep y:(r),y:[pp]
 		unhandled("movep y:(r),y:[pp]");
 		break;
 		}
-	case 3467: { // movep x:(r+n),y:[pp]
+	case 3515: { // movep x:(r+n),y:[pp]
 		unhandled("movep x:(r+n),y:[pp]");
 		break;
 		}
-	case 3468: { // movep y:(r+n),y:[pp]
+	case 3516: { // movep y:(r+n),y:[pp]
 		unhandled("movep y:(r+n),y:[pp]");
 		break;
 		}
-	case 3469: { // movep x:-(r),y:[pp]
+	case 3517: { // movep x:-(r),y:[pp]
 		unhandled("movep x:-(r),y:[pp]");
 		break;
 		}
-	case 3470: { // movep y:-(r),y:[pp]
+	case 3518: { // movep y:-(r),y:[pp]
 		unhandled("movep y:-(r),y:[pp]");
 		break;
 		}
-	case 3471: { // movep x:[pp],x:(r)-n
+	case 3519: { // movep x:[pp],x:(r)-n
 		unhandled("movep x:[pp],x:(r)-n");
 		break;
 		}
-	case 3472: { // movep x:[pp],y:(r)-n
+	case 3520: { // movep x:[pp],y:(r)-n
 		unhandled("movep x:[pp],y:(r)-n");
 		break;
 		}
-	case 3473: { // movep x:[pp],x:(r)+n
+	case 3521: { // movep x:[pp],x:(r)+n
 		unhandled("movep x:[pp],x:(r)+n");
 		break;
 		}
-	case 3474: { // movep x:[pp],y:(r)+n
+	case 3522: { // movep x:[pp],y:(r)+n
 		unhandled("movep x:[pp],y:(r)+n");
 		break;
 		}
-	case 3475: { // movep x:[pp],x:(r)-
+	case 3523: { // movep x:[pp],x:(r)-
 		unhandled("movep x:[pp],x:(r)-");
 		break;
 		}
-	case 3476: { // movep x:[pp],y:(r)-
+	case 3524: { // movep x:[pp],y:(r)-
 		unhandled("movep x:[pp],y:(r)-");
 		break;
 		}
-	case 3477: { // movep x:[pp],x:(r)+
+	case 3525: { // movep x:[pp],x:(r)+
 		unhandled("movep x:[pp],x:(r)+");
 		break;
 		}
-	case 3478: { // movep x:[pp],y:(r)+
+	case 3526: { // movep x:[pp],y:(r)+
 		unhandled("movep x:[pp],y:(r)+");
 		break;
 		}
-	case 3479: { // movep x:[pp],x:(r)
+	case 3527: { // movep x:[pp],x:(r)
 		unhandled("movep x:[pp],x:(r)");
 		break;
 		}
-	case 3480: { // movep x:[pp],y:(r)
+	case 3528: { // movep x:[pp],y:(r)
 		unhandled("movep x:[pp],y:(r)");
 		break;
 		}
-	case 3481: { // movep x:[pp],x:(r+n)
+	case 3529: { // movep x:[pp],x:(r+n)
 		unhandled("movep x:[pp],x:(r+n)");
 		break;
 		}
-	case 3482: { // movep x:[pp],y:(r+n)
+	case 3530: { // movep x:[pp],y:(r+n)
 		unhandled("movep x:[pp],y:(r+n)");
 		break;
 		}
-	case 3483: { // movep x:[pp],x:-(r)
+	case 3531: { // movep x:[pp],x:-(r)
 		unhandled("movep x:[pp],x:-(r)");
 		break;
 		}
-	case 3484: { // movep x:[pp],y:-(r)
+	case 3532: { // movep x:[pp],y:-(r)
 		unhandled("movep x:[pp],y:-(r)");
 		break;
 		}
-	case 3485: { // movep y:[pp],x:(r)-n
+	case 3533: { // movep y:[pp],x:(r)-n
 		unhandled("movep y:[pp],x:(r)-n");
 		break;
 		}
-	case 3486: { // movep y:[pp],y:(r)-n
+	case 3534: { // movep y:[pp],y:(r)-n
 		unhandled("movep y:[pp],y:(r)-n");
 		break;
 		}
-	case 3487: { // movep y:[pp],x:(r)+n
+	case 3535: { // movep y:[pp],x:(r)+n
 		unhandled("movep y:[pp],x:(r)+n");
 		break;
 		}
-	case 3488: { // movep y:[pp],y:(r)+n
+	case 3536: { // movep y:[pp],y:(r)+n
 		unhandled("movep y:[pp],y:(r)+n");
 		break;
 		}
-	case 3489: { // movep y:[pp],x:(r)-
+	case 3537: { // movep y:[pp],x:(r)-
 		unhandled("movep y:[pp],x:(r)-");
 		break;
 		}
-	case 3490: { // movep y:[pp],y:(r)-
+	case 3538: { // movep y:[pp],y:(r)-
 		unhandled("movep y:[pp],y:(r)-");
 		break;
 		}
-	case 3491: { // movep y:[pp],x:(r)+
+	case 3539: { // movep y:[pp],x:(r)+
 		unhandled("movep y:[pp],x:(r)+");
 		break;
 		}
-	case 3492: { // movep y:[pp],y:(r)+
+	case 3540: { // movep y:[pp],y:(r)+
 		unhandled("movep y:[pp],y:(r)+");
 		break;
 		}
-	case 3493: { // movep y:[pp],x:(r)
+	case 3541: { // movep y:[pp],x:(r)
 		unhandled("movep y:[pp],x:(r)");
 		break;
 		}
-	case 3494: { // movep y:[pp],y:(r)
+	case 3542: { // movep y:[pp],y:(r)
 		unhandled("movep y:[pp],y:(r)");
 		break;
 		}
-	case 3495: { // movep y:[pp],x:(r+n)
+	case 3543: { // movep y:[pp],x:(r+n)
 		unhandled("movep y:[pp],x:(r+n)");
 		break;
 		}
-	case 3496: { // movep y:[pp],y:(r+n)
+	case 3544: { // movep y:[pp],y:(r+n)
 		unhandled("movep y:[pp],y:(r+n)");
 		break;
 		}
-	case 3497: { // movep y:[pp],x:-(r)
+	case 3545: { // movep y:[pp],x:-(r)
 		unhandled("movep y:[pp],x:-(r)");
 		break;
 		}
-	case 3498: { // movep y:[pp],y:-(r)
+	case 3546: { // movep y:[pp],y:-(r)
 		unhandled("movep y:[pp],y:-(r)");
 		break;
 		}
-	case 3499: { // movep x:[abs],x:[pp]
+	case 3547: { // movep x:[abs],x:[pp]
 		unhandled("movep x:[abs],x:[pp]");
 		break;
 		}
-	case 3500: { // movep y:[abs],x:[pp]
+	case 3548: { // movep y:[abs],x:[pp]
 		unhandled("movep y:[abs],x:[pp]");
 		break;
 		}
-	case 3501: { // movep x:[abs],y:[pp]
+	case 3549: { // movep x:[abs],y:[pp]
 		unhandled("movep x:[abs],y:[pp]");
 		break;
 		}
-	case 3502: { // movep y:[abs],y:[pp]
+	case 3550: { // movep y:[abs],y:[pp]
 		unhandled("movep y:[abs],y:[pp]");
 		break;
 		}
-	case 3503: { // movep #[i],x:[pp]
+	case 3551: { // movep x:[pp],x:[abs]
+		unhandled("movep x:[pp],x:[abs]");
+		break;
+		}
+	case 3552: { // movep x:[pp],y:[abs]
+		unhandled("movep x:[pp],y:[abs]");
+		break;
+		}
+	case 3553: { // movep y:[pp],x:[abs]
+		unhandled("movep y:[pp],x:[abs]");
+		break;
+		}
+	case 3554: { // movep y:[pp],y:[abs]
+		unhandled("movep y:[pp],y:[abs]");
+		break;
+		}
+	case 3555: { // movep #[i],x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 i = exv;
 		m_x.write_dword(pp, i);
 		break;
 		}
-	case 3504: { // movep #[i],y:[pp]
+	case 3556: { // movep #[i],y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 i = exv;
 		m_y.write_dword(pp, i);
 		break;
 		}
-	case 3505: { // movep x:(r)-n,x:[qq]
+	case 3557: { // movep x:(r)-n,x:[qq]
 		unhandled("movep x:(r)-n,x:[qq]");
 		break;
 		}
-	case 3506: { // movep y:(r)-n,x:[qq]
+	case 3558: { // movep y:(r)-n,x:[qq]
 		unhandled("movep y:(r)-n,x:[qq]");
 		break;
 		}
-	case 3507: { // movep x:(r)+n,x:[qq]
+	case 3559: { // movep x:(r)+n,x:[qq]
 		unhandled("movep x:(r)+n,x:[qq]");
 		break;
 		}
-	case 3508: { // movep y:(r)+n,x:[qq]
+	case 3560: { // movep y:(r)+n,x:[qq]
 		unhandled("movep y:(r)+n,x:[qq]");
 		break;
 		}
-	case 3509: { // movep x:(r)-,x:[qq]
+	case 3561: { // movep x:(r)-,x:[qq]
 		unhandled("movep x:(r)-,x:[qq]");
 		break;
 		}
-	case 3510: { // movep y:(r)-,x:[qq]
+	case 3562: { // movep y:(r)-,x:[qq]
 		unhandled("movep y:(r)-,x:[qq]");
 		break;
 		}
-	case 3511: { // movep x:(r)+,x:[qq]
+	case 3563: { // movep x:(r)+,x:[qq]
 		unhandled("movep x:(r)+,x:[qq]");
 		break;
 		}
-	case 3512: { // movep y:(r)+,x:[qq]
+	case 3564: { // movep y:(r)+,x:[qq]
 		unhandled("movep y:(r)+,x:[qq]");
 		break;
 		}
-	case 3513: { // movep x:(r),x:[qq]
+	case 3565: { // movep x:(r),x:[qq]
 		unhandled("movep x:(r),x:[qq]");
 		break;
 		}
-	case 3514: { // movep y:(r),x:[qq]
+	case 3566: { // movep y:(r),x:[qq]
 		unhandled("movep y:(r),x:[qq]");
 		break;
 		}
-	case 3515: { // movep x:(r+n),x:[qq]
+	case 3567: { // movep x:(r+n),x:[qq]
 		unhandled("movep x:(r+n),x:[qq]");
 		break;
 		}
-	case 3516: { // movep y:(r+n),x:[qq]
+	case 3568: { // movep y:(r+n),x:[qq]
 		unhandled("movep y:(r+n),x:[qq]");
 		break;
 		}
-	case 3517: { // movep x:-(r),x:[qq]
+	case 3569: { // movep x:-(r),x:[qq]
 		unhandled("movep x:-(r),x:[qq]");
 		break;
 		}
-	case 3518: { // movep y:-(r),x:[qq]
+	case 3570: { // movep y:-(r),x:[qq]
 		unhandled("movep y:-(r),x:[qq]");
 		break;
 		}
-	case 3519: { // movep x:[qq],x:(r)-n
+	case 3571: { // movep x:[qq],x:(r)-n
 		unhandled("movep x:[qq],x:(r)-n");
 		break;
 		}
-	case 3520: { // movep x:[qq],y:(r)-n
+	case 3572: { // movep x:[qq],y:(r)-n
 		unhandled("movep x:[qq],y:(r)-n");
 		break;
 		}
-	case 3521: { // movep x:[qq],x:(r)+n
+	case 3573: { // movep x:[qq],x:(r)+n
 		unhandled("movep x:[qq],x:(r)+n");
 		break;
 		}
-	case 3522: { // movep x:[qq],y:(r)+n
+	case 3574: { // movep x:[qq],y:(r)+n
 		unhandled("movep x:[qq],y:(r)+n");
 		break;
 		}
-	case 3523: { // movep x:[qq],x:(r)-
+	case 3575: { // movep x:[qq],x:(r)-
 		unhandled("movep x:[qq],x:(r)-");
 		break;
 		}
-	case 3524: { // movep x:[qq],y:(r)-
+	case 3576: { // movep x:[qq],y:(r)-
 		unhandled("movep x:[qq],y:(r)-");
 		break;
 		}
-	case 3525: { // movep x:[qq],x:(r)+
+	case 3577: { // movep x:[qq],x:(r)+
 		unhandled("movep x:[qq],x:(r)+");
 		break;
 		}
-	case 3526: { // movep x:[qq],y:(r)+
+	case 3578: { // movep x:[qq],y:(r)+
 		unhandled("movep x:[qq],y:(r)+");
 		break;
 		}
-	case 3527: { // movep x:[qq],x:(r)
+	case 3579: { // movep x:[qq],x:(r)
 		unhandled("movep x:[qq],x:(r)");
 		break;
 		}
-	case 3528: { // movep x:[qq],y:(r)
+	case 3580: { // movep x:[qq],y:(r)
 		unhandled("movep x:[qq],y:(r)");
 		break;
 		}
-	case 3529: { // movep x:[qq],x:(r+n)
+	case 3581: { // movep x:[qq],x:(r+n)
 		unhandled("movep x:[qq],x:(r+n)");
 		break;
 		}
-	case 3530: { // movep x:[qq],y:(r+n)
+	case 3582: { // movep x:[qq],y:(r+n)
 		unhandled("movep x:[qq],y:(r+n)");
 		break;
 		}
-	case 3531: { // movep x:[qq],x:-(r)
+	case 3583: { // movep x:[qq],x:-(r)
 		unhandled("movep x:[qq],x:-(r)");
 		break;
 		}
-	case 3532: { // movep x:[qq],y:-(r)
+	case 3584: { // movep x:[qq],y:-(r)
 		unhandled("movep x:[qq],y:-(r)");
 		break;
 		}
-	case 3533: { // movep x:[abs],x:[qq]
+	case 3585: { // movep x:[abs],x:[qq]
 		unhandled("movep x:[abs],x:[qq]");
 		break;
 		}
-	case 3534: { // movep y:[abs],x:[qq]
+	case 3586: { // movep y:[abs],x:[qq]
 		unhandled("movep y:[abs],x:[qq]");
 		break;
 		}
-	case 3535: { // movep #[i],x:[qq]
+	case 3587: { // movep x:[qq],x:[abs]
+		unhandled("movep x:[qq],x:[abs]");
+		break;
+		}
+	case 3588: { // movep x:[qq],y:[abs]
+		unhandled("movep x:[qq],y:[abs]");
+		break;
+		}
+	case 3589: { // movep #[i],x:[qq]
 		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
 		u32 i = exv;
 		m_x.write_dword(qq, i);
 		break;
 		}
-	case 3536: { // movep x:(r)-n,y:[qq]
+	case 3590: { // movep x:(r)-n,y:[qq]
 		unhandled("movep x:(r)-n,y:[qq]");
 		break;
 		}
-	case 3537: { // movep y:(r)-n,y:[qq]
+	case 3591: { // movep y:(r)-n,y:[qq]
 		unhandled("movep y:(r)-n,y:[qq]");
 		break;
 		}
-	case 3538: { // movep x:(r)+n,y:[qq]
+	case 3592: { // movep x:(r)+n,y:[qq]
 		unhandled("movep x:(r)+n,y:[qq]");
 		break;
 		}
-	case 3539: { // movep y:(r)+n,y:[qq]
+	case 3593: { // movep y:(r)+n,y:[qq]
 		unhandled("movep y:(r)+n,y:[qq]");
 		break;
 		}
-	case 3540: { // movep x:(r)-,y:[qq]
+	case 3594: { // movep x:(r)-,y:[qq]
 		unhandled("movep x:(r)-,y:[qq]");
 		break;
 		}
-	case 3541: { // movep y:(r)-,y:[qq]
+	case 3595: { // movep y:(r)-,y:[qq]
 		unhandled("movep y:(r)-,y:[qq]");
 		break;
 		}
-	case 3542: { // movep x:(r)+,y:[qq]
+	case 3596: { // movep x:(r)+,y:[qq]
 		unhandled("movep x:(r)+,y:[qq]");
 		break;
 		}
-	case 3543: { // movep y:(r)+,y:[qq]
+	case 3597: { // movep y:(r)+,y:[qq]
 		unhandled("movep y:(r)+,y:[qq]");
 		break;
 		}
-	case 3544: { // movep x:(r),y:[qq]
+	case 3598: { // movep x:(r),y:[qq]
 		unhandled("movep x:(r),y:[qq]");
 		break;
 		}
-	case 3545: { // movep y:(r),y:[qq]
+	case 3599: { // movep y:(r),y:[qq]
 		unhandled("movep y:(r),y:[qq]");
 		break;
 		}
-	case 3546: { // movep x:(r+n),y:[qq]
+	case 3600: { // movep x:(r+n),y:[qq]
 		unhandled("movep x:(r+n),y:[qq]");
 		break;
 		}
-	case 3547: { // movep y:(r+n),y:[qq]
+	case 3601: { // movep y:(r+n),y:[qq]
 		unhandled("movep y:(r+n),y:[qq]");
 		break;
 		}
-	case 3548: { // movep x:-(r),y:[qq]
+	case 3602: { // movep x:-(r),y:[qq]
 		unhandled("movep x:-(r),y:[qq]");
 		break;
 		}
-	case 3549: { // movep y:-(r),y:[qq]
+	case 3603: { // movep y:-(r),y:[qq]
 		unhandled("movep y:-(r),y:[qq]");
 		break;
 		}
-	case 3550: { // movep y:[qq],x:(r)-n
+	case 3604: { // movep y:[qq],x:(r)-n
 		unhandled("movep y:[qq],x:(r)-n");
 		break;
 		}
-	case 3551: { // movep y:[qq],y:(r)-n
+	case 3605: { // movep y:[qq],y:(r)-n
 		unhandled("movep y:[qq],y:(r)-n");
 		break;
 		}
-	case 3552: { // movep y:[qq],x:(r)+n
+	case 3606: { // movep y:[qq],x:(r)+n
 		unhandled("movep y:[qq],x:(r)+n");
 		break;
 		}
-	case 3553: { // movep y:[qq],y:(r)+n
+	case 3607: { // movep y:[qq],y:(r)+n
 		unhandled("movep y:[qq],y:(r)+n");
 		break;
 		}
-	case 3554: { // movep y:[qq],x:(r)-
+	case 3608: { // movep y:[qq],x:(r)-
 		unhandled("movep y:[qq],x:(r)-");
 		break;
 		}
-	case 3555: { // movep y:[qq],y:(r)-
+	case 3609: { // movep y:[qq],y:(r)-
 		unhandled("movep y:[qq],y:(r)-");
 		break;
 		}
-	case 3556: { // movep y:[qq],x:(r)+
+	case 3610: { // movep y:[qq],x:(r)+
 		unhandled("movep y:[qq],x:(r)+");
 		break;
 		}
-	case 3557: { // movep y:[qq],y:(r)+
+	case 3611: { // movep y:[qq],y:(r)+
 		unhandled("movep y:[qq],y:(r)+");
 		break;
 		}
-	case 3558: { // movep y:[qq],x:(r)
+	case 3612: { // movep y:[qq],x:(r)
 		unhandled("movep y:[qq],x:(r)");
 		break;
 		}
-	case 3559: { // movep y:[qq],y:(r)
+	case 3613: { // movep y:[qq],y:(r)
 		unhandled("movep y:[qq],y:(r)");
 		break;
 		}
-	case 3560: { // movep y:[qq],x:(r+n)
+	case 3614: { // movep y:[qq],x:(r+n)
 		unhandled("movep y:[qq],x:(r+n)");
 		break;
 		}
-	case 3561: { // movep y:[qq],y:(r+n)
+	case 3615: { // movep y:[qq],y:(r+n)
 		unhandled("movep y:[qq],y:(r+n)");
 		break;
 		}
-	case 3562: { // movep y:[qq],x:-(r)
+	case 3616: { // movep y:[qq],x:-(r)
 		unhandled("movep y:[qq],x:-(r)");
 		break;
 		}
-	case 3563: { // movep y:[qq],y:-(r)
+	case 3617: { // movep y:[qq],y:-(r)
 		unhandled("movep y:[qq],y:-(r)");
 		break;
 		}
-	case 3564: { // movep x:[abs],y:[qq]
+	case 3618: { // movep x:[abs],y:[qq]
 		unhandled("movep x:[abs],y:[qq]");
 		break;
 		}
-	case 3565: { // movep y:[abs],y:[qq]
+	case 3619: { // movep y:[abs],y:[qq]
 		unhandled("movep y:[abs],y:[qq]");
 		break;
 		}
-	case 3566: { // movep #[i],y:[qq]
+	case 3620: { // movep #[i],y:[qq]
 		unhandled("movep #[i],y:[qq]");
 		break;
 		}
-	case 3567: { // movep p:(r)-n,x:[pp]
+	case 3621: { // movep y:[qq],x:[abs]
+		unhandled("movep y:[qq],x:[abs]");
+		break;
+		}
+	case 3622: { // movep y:[qq],y:[abs]
+		unhandled("movep y:[qq],y:[abs]");
+		break;
+		}
+	case 3623: { // movep p:(r)-n,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
@@ -36193,7 +36961,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_x.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3568: { // movep p:(r)+n,x:[pp]
+	case 3624: { // movep p:(r)+n,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
@@ -36201,7 +36969,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_x.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3569: { // movep p:(r)-,x:[pp]
+	case 3625: { // movep p:(r)-,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
@@ -36209,7 +36977,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_x.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3570: { // movep p:(r)+,x:[pp]
+	case 3626: { // movep p:(r)+,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
@@ -36217,21 +36985,21 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_x.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3571: { // movep p:(r),x:[pp]
+	case 3627: { // movep p:(r),x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_x.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3572: { // movep p:(r+n),x:[pp]
+	case 3628: { // movep p:(r+n),x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_x.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3573: { // movep p:-(r),x:[pp]
+	case 3629: { // movep p:-(r),x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
@@ -36239,7 +37007,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_x.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3574: { // movep p:(r)-n,y:[pp]
+	case 3630: { // movep p:(r)-n,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
@@ -36247,7 +37015,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_y.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3575: { // movep p:(r)+n,y:[pp]
+	case 3631: { // movep p:(r)+n,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
@@ -36255,7 +37023,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_y.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3576: { // movep p:(r)-,y:[pp]
+	case 3632: { // movep p:(r)-,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
@@ -36263,7 +37031,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_y.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3577: { // movep p:(r)+,y:[pp]
+	case 3633: { // movep p:(r)+,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
@@ -36271,21 +37039,21 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_y.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3578: { // movep p:(r),y:[pp]
+	case 3634: { // movep p:(r),y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_y.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3579: { // movep p:(r+n),y:[pp]
+	case 3635: { // movep p:(r+n),y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_y.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3580: { // movep p:-(r),y:[pp]
+	case 3636: { // movep p:-(r),y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
@@ -36293,7 +37061,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_y.write_dword(pp, m_p.read_dword(ea));
 		break;
 		}
-	case 3581: { // movep x:[pp],p:(r)-n
+	case 3637: { // movep x:[pp],p:(r)-n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -36301,7 +37069,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
-	case 3582: { // movep x:[pp],p:(r)+n
+	case 3638: { // movep x:[pp],p:(r)+n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -36309,7 +37077,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
-	case 3583: { // movep x:[pp],p:(r)-
+	case 3639: { // movep x:[pp],p:(r)-
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -36317,7 +37085,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
-	case 3584: { // movep x:[pp],p:(r)+
+	case 3640: { // movep x:[pp],p:(r)+
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -36325,21 +37093,21 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
-	case 3585: { // movep x:[pp],p:(r)
+	case 3641: { // movep x:[pp],p:(r)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		m_p.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
-	case 3586: { // movep x:[pp],p:(r+n)
+	case 3642: { // movep x:[pp],p:(r+n)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		m_p.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
-	case 3587: { // movep x:[pp],p:-(r)
+	case 3643: { // movep x:[pp],p:-(r)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -36347,7 +37115,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
-	case 3588: { // movep y:[pp],p:(r)-n
+	case 3644: { // movep y:[pp],p:(r)-n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -36355,7 +37123,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
-	case 3589: { // movep y:[pp],p:(r)+n
+	case 3645: { // movep y:[pp],p:(r)+n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -36363,7 +37131,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
-	case 3590: { // movep y:[pp],p:(r)-
+	case 3646: { // movep y:[pp],p:(r)-
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -36371,7 +37139,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
-	case 3591: { // movep y:[pp],p:(r)+
+	case 3647: { // movep y:[pp],p:(r)+
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -36379,21 +37147,21 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
-	case 3592: { // movep y:[pp],p:(r)
+	case 3648: { // movep y:[pp],p:(r)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		m_p.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
-	case 3593: { // movep y:[pp],p:(r+n)
+	case 3649: { // movep y:[pp],p:(r+n)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		m_p.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
-	case 3594: { // movep y:[pp],p:-(r)
+	case 3650: { // movep y:[pp],p:-(r)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -36401,3899 +37169,3915 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_p.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
-	case 3595: { // movep p:[abs],x:[pp]
+	case 3651: { // movep p:[abs],x:[pp]
 		unhandled("movep p:[abs],x:[pp]");
 		break;
 		}
-	case 3596: { // movep p:[abs],y:[pp]
+	case 3652: { // movep p:[abs],y:[pp]
 		unhandled("movep p:[abs],y:[pp]");
 		break;
 		}
-	case 3597: { // movep p:(r)-n,x:[qq]
+	case 3653: { // movep x:[pp],p:[abs]
+		unhandled("movep x:[pp],p:[abs]");
+		break;
+		}
+	case 3654: { // movep y:[pp],p:[abs]
+		unhandled("movep y:[pp],p:[abs]");
+		break;
+		}
+	case 3655: { // movep p:(r)-n,x:[qq]
 		unhandled("movep p:(r)-n,x:[qq]");
 		break;
 		}
-	case 3598: { // movep p:(r)+n,x:[qq]
+	case 3656: { // movep p:(r)+n,x:[qq]
 		unhandled("movep p:(r)+n,x:[qq]");
 		break;
 		}
-	case 3599: { // movep p:(r)-,x:[qq]
+	case 3657: { // movep p:(r)-,x:[qq]
 		unhandled("movep p:(r)-,x:[qq]");
 		break;
 		}
-	case 3600: { // movep p:(r)+,x:[qq]
+	case 3658: { // movep p:(r)+,x:[qq]
 		unhandled("movep p:(r)+,x:[qq]");
 		break;
 		}
-	case 3601: { // movep p:(r),x:[qq]
+	case 3659: { // movep p:(r),x:[qq]
 		unhandled("movep p:(r),x:[qq]");
 		break;
 		}
-	case 3602: { // movep p:(r+n),x:[qq]
+	case 3660: { // movep p:(r+n),x:[qq]
 		unhandled("movep p:(r+n),x:[qq]");
 		break;
 		}
-	case 3603: { // movep p:-(r),x:[qq]
+	case 3661: { // movep p:-(r),x:[qq]
 		unhandled("movep p:-(r),x:[qq]");
 		break;
 		}
-	case 3604: { // movep p:(r)-n,y:[qq]
+	case 3662: { // movep p:(r)-n,y:[qq]
 		unhandled("movep p:(r)-n,y:[qq]");
 		break;
 		}
-	case 3605: { // movep p:(r)+n,y:[qq]
+	case 3663: { // movep p:(r)+n,y:[qq]
 		unhandled("movep p:(r)+n,y:[qq]");
 		break;
 		}
-	case 3606: { // movep p:(r)-,y:[qq]
+	case 3664: { // movep p:(r)-,y:[qq]
 		unhandled("movep p:(r)-,y:[qq]");
 		break;
 		}
-	case 3607: { // movep p:(r)+,y:[qq]
+	case 3665: { // movep p:(r)+,y:[qq]
 		unhandled("movep p:(r)+,y:[qq]");
 		break;
 		}
-	case 3608: { // movep p:(r),y:[qq]
+	case 3666: { // movep p:(r),y:[qq]
 		unhandled("movep p:(r),y:[qq]");
 		break;
 		}
-	case 3609: { // movep p:(r+n),y:[qq]
+	case 3667: { // movep p:(r+n),y:[qq]
 		unhandled("movep p:(r+n),y:[qq]");
 		break;
 		}
-	case 3610: { // movep p:-(r),y:[qq]
+	case 3668: { // movep p:-(r),y:[qq]
 		unhandled("movep p:-(r),y:[qq]");
 		break;
 		}
-	case 3611: { // movep x:[qq],p:(r)-n
+	case 3669: { // movep x:[qq],p:(r)-n
 		unhandled("movep x:[qq],p:(r)-n");
 		break;
 		}
-	case 3612: { // movep x:[qq],p:(r)+n
+	case 3670: { // movep x:[qq],p:(r)+n
 		unhandled("movep x:[qq],p:(r)+n");
 		break;
 		}
-	case 3613: { // movep x:[qq],p:(r)-
+	case 3671: { // movep x:[qq],p:(r)-
 		unhandled("movep x:[qq],p:(r)-");
 		break;
 		}
-	case 3614: { // movep x:[qq],p:(r)+
+	case 3672: { // movep x:[qq],p:(r)+
 		unhandled("movep x:[qq],p:(r)+");
 		break;
 		}
-	case 3615: { // movep x:[qq],p:(r)
+	case 3673: { // movep x:[qq],p:(r)
 		unhandled("movep x:[qq],p:(r)");
 		break;
 		}
-	case 3616: { // movep x:[qq],p:(r+n)
+	case 3674: { // movep x:[qq],p:(r+n)
 		unhandled("movep x:[qq],p:(r+n)");
 		break;
 		}
-	case 3617: { // movep x:[qq],p:-(r)
+	case 3675: { // movep x:[qq],p:-(r)
 		unhandled("movep x:[qq],p:-(r)");
 		break;
 		}
-	case 3618: { // movep y:[qq],p:(r)-n
+	case 3676: { // movep y:[qq],p:(r)-n
 		unhandled("movep y:[qq],p:(r)-n");
 		break;
 		}
-	case 3619: { // movep y:[qq],p:(r)+n
+	case 3677: { // movep y:[qq],p:(r)+n
 		unhandled("movep y:[qq],p:(r)+n");
 		break;
 		}
-	case 3620: { // movep y:[qq],p:(r)-
+	case 3678: { // movep y:[qq],p:(r)-
 		unhandled("movep y:[qq],p:(r)-");
 		break;
 		}
-	case 3621: { // movep y:[qq],p:(r)+
+	case 3679: { // movep y:[qq],p:(r)+
 		unhandled("movep y:[qq],p:(r)+");
 		break;
 		}
-	case 3622: { // movep y:[qq],p:(r)
+	case 3680: { // movep y:[qq],p:(r)
 		unhandled("movep y:[qq],p:(r)");
 		break;
 		}
-	case 3623: { // movep y:[qq],p:(r+n)
+	case 3681: { // movep y:[qq],p:(r+n)
 		unhandled("movep y:[qq],p:(r+n)");
 		break;
 		}
-	case 3624: { // movep y:[qq],p:-(r)
+	case 3682: { // movep y:[qq],p:-(r)
 		unhandled("movep y:[qq],p:-(r)");
 		break;
 		}
-	case 3625: { // movep p:[abs],x:[qq]
+	case 3683: { // movep p:[abs],x:[qq]
 		unhandled("movep p:[abs],x:[qq]");
 		break;
 		}
-	case 3626: { // movep p:[abs],y:[qq]
+	case 3684: { // movep p:[abs],y:[qq]
 		unhandled("movep p:[abs],y:[qq]");
 		break;
 		}
-	case 3627: { // movep x0,x:[pp]
+	case 3685: { // movep x:[qq],p:[abs]
+		unhandled("movep x:[qq],p:[abs]");
+		break;
+		}
+	case 3686: { // movep y:[qq],p:[abs]
+		unhandled("movep y:[qq],p:[abs]");
+		break;
+		}
+	case 3687: { // movep x0,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_x0();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3628: { // movep x1,x:[pp]
+	case 3688: { // movep x1,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_x1();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3629: { // movep y0,x:[pp]
+	case 3689: { // movep y0,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_y0();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3630: { // movep y1,x:[pp]
+	case 3690: { // movep y1,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_y1();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3631: { // movep a0,x:[pp]
+	case 3691: { // movep a0,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_a0();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3632: { // movep b0,x:[pp]
+	case 3692: { // movep b0,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_b0();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3633: { // movep a2,x:[pp]
+	case 3693: { // movep a2,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_a2();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3634: { // movep b2,x:[pp]
+	case 3694: { // movep b2,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_b2();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3635: { // movep a1,x:[pp]
+	case 3695: { // movep a1,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_a1();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3636: { // movep b1,x:[pp]
+	case 3696: { // movep b1,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_b1();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3637: { // movep a,x:[pp]
+	case 3697: { // movep a,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u64 s = get_a();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3638: { // movep b,x:[pp]
+	case 3698: { // movep b,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u64 s = get_b();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3639: { // movep r,x:[pp]
+	case 3699: { // movep r,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3640: { // movep n,x:[pp]
+	case 3700: { // movep n,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3641: { // movep m,x:[pp]
+	case 3701: { // movep m,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3642: { // movep ep,x:[pp]
+	case 3702: { // movep ep,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_ep();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3643: { // movep vba,x:[pp]
+	case 3703: { // movep vba,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_vba();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3644: { // movep sc,x:[pp]
+	case 3704: { // movep sc,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_sc();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3645: { // movep sz,x:[pp]
+	case 3705: { // movep sz,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_sz();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3646: { // movep sr,x:[pp]
+	case 3706: { // movep sr,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_sr();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3647: { // movep omr,x:[pp]
+	case 3707: { // movep omr,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_omr();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3648: { // movep sp,x:[pp]
+	case 3708: { // movep sp,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_sp();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3649: { // movep ssh,x:[pp]
+	case 3709: { // movep ssh,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_ssh();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3650: { // movep ssl,x:[pp]
+	case 3710: { // movep ssl,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_ssl();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3651: { // movep la,x:[pp]
+	case 3711: { // movep la,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_la();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3652: { // movep lc,x:[pp]
+	case 3712: { // movep lc,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_lc();
 		m_x.write_dword(pp, s);
 		break;
 		}
-	case 3653: { // movep x0,y:[pp]
+	case 3713: { // movep x0,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_x0();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3654: { // movep x1,y:[pp]
+	case 3714: { // movep x1,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_x1();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3655: { // movep y0,y:[pp]
+	case 3715: { // movep y0,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_y0();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3656: { // movep y1,y:[pp]
+	case 3716: { // movep y1,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_y1();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3657: { // movep a0,y:[pp]
+	case 3717: { // movep a0,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_a0();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3658: { // movep b0,y:[pp]
+	case 3718: { // movep b0,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_b0();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3659: { // movep a2,y:[pp]
+	case 3719: { // movep a2,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_a2();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3660: { // movep b2,y:[pp]
+	case 3720: { // movep b2,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_b2();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3661: { // movep a1,y:[pp]
+	case 3721: { // movep a1,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_a1();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3662: { // movep b1,y:[pp]
+	case 3722: { // movep b1,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_b1();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3663: { // movep a,y:[pp]
+	case 3723: { // movep a,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u64 s = get_a();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3664: { // movep b,y:[pp]
+	case 3724: { // movep b,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u64 s = get_b();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3665: { // movep r,y:[pp]
+	case 3725: { // movep r,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3666: { // movep n,y:[pp]
+	case 3726: { // movep n,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3667: { // movep m,y:[pp]
+	case 3727: { // movep m,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3668: { // movep ep,y:[pp]
+	case 3728: { // movep ep,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_ep();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3669: { // movep vba,y:[pp]
+	case 3729: { // movep vba,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_vba();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3670: { // movep sc,y:[pp]
+	case 3730: { // movep sc,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_sc();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3671: { // movep sz,y:[pp]
+	case 3731: { // movep sz,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_sz();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3672: { // movep sr,y:[pp]
+	case 3732: { // movep sr,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_sr();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3673: { // movep omr,y:[pp]
+	case 3733: { // movep omr,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_omr();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3674: { // movep sp,y:[pp]
+	case 3734: { // movep sp,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_sp();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3675: { // movep ssh,y:[pp]
+	case 3735: { // movep ssh,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_ssh();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3676: { // movep ssl,y:[pp]
+	case 3736: { // movep ssl,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_ssl();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3677: { // movep la,y:[pp]
+	case 3737: { // movep la,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_la();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3678: { // movep lc,y:[pp]
+	case 3738: { // movep lc,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		u32 s = get_lc();
 		m_y.write_dword(pp, s);
 		break;
 		}
-	case 3679: { // movep x:[pp],x0
+	case 3739: { // movep x:[pp],x0
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_x0(m_x.read_dword(pp));
 		break;
 		}
-	case 3680: { // movep x:[pp],x1
+	case 3740: { // movep x:[pp],x1
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_x1(m_x.read_dword(pp));
 		break;
 		}
-	case 3681: { // movep x:[pp],y0
+	case 3741: { // movep x:[pp],y0
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_y0(m_x.read_dword(pp));
 		break;
 		}
-	case 3682: { // movep x:[pp],y1
+	case 3742: { // movep x:[pp],y1
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_y1(m_x.read_dword(pp));
 		break;
 		}
-	case 3683: { // movep x:[pp],a0
+	case 3743: { // movep x:[pp],a0
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_a0(m_x.read_dword(pp));
 		break;
 		}
-	case 3684: { // movep x:[pp],b0
+	case 3744: { // movep x:[pp],b0
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_b0(m_x.read_dword(pp));
 		break;
 		}
-	case 3685: { // movep x:[pp],a2
+	case 3745: { // movep x:[pp],a2
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_a2(m_x.read_dword(pp));
 		break;
 		}
-	case 3686: { // movep x:[pp],b2
+	case 3746: { // movep x:[pp],b2
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_b2(m_x.read_dword(pp));
 		break;
 		}
-	case 3687: { // movep x:[pp],a1
+	case 3747: { // movep x:[pp],a1
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_a1(m_x.read_dword(pp));
 		break;
 		}
-	case 3688: { // movep x:[pp],b1
+	case 3748: { // movep x:[pp],b1
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_b1(m_x.read_dword(pp));
 		break;
 		}
-	case 3689: { // movep x:[pp],a
+	case 3749: { // movep x:[pp],a
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_a(m_x.read_dword(pp));
 		break;
 		}
-	case 3690: { // movep x:[pp],b
+	case 3750: { // movep x:[pp],b
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_b(m_x.read_dword(pp));
 		break;
 		}
-	case 3691: { // movep x:[pp],r
+	case 3751: { // movep x:[pp],r
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_r(BIT(opcode, 8, 6) & 7, m_x.read_dword(pp));
 		break;
 		}
-	case 3692: { // movep x:[pp],n
+	case 3752: { // movep x:[pp],n
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_n(BIT(opcode, 8, 6) & 7, m_x.read_dword(pp));
 		break;
 		}
-	case 3693: { // movep x:[pp],m
+	case 3753: { // movep x:[pp],m
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_m(BIT(opcode, 8, 6) & 7, m_x.read_dword(pp));
 		break;
 		}
-	case 3694: { // movep x:[pp],ep
+	case 3754: { // movep x:[pp],ep
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_ep(m_x.read_dword(pp));
 		break;
 		}
-	case 3695: { // movep x:[pp],vba
+	case 3755: { // movep x:[pp],vba
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_vba(m_x.read_dword(pp));
 		break;
 		}
-	case 3696: { // movep x:[pp],sc
+	case 3756: { // movep x:[pp],sc
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_sc(m_x.read_dword(pp));
 		break;
 		}
-	case 3697: { // movep x:[pp],sz
+	case 3757: { // movep x:[pp],sz
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_sz(m_x.read_dword(pp));
 		break;
 		}
-	case 3698: { // movep x:[pp],sr
+	case 3758: { // movep x:[pp],sr
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_sr(m_x.read_dword(pp));
 		break;
 		}
-	case 3699: { // movep x:[pp],omr
+	case 3759: { // movep x:[pp],omr
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_omr(m_x.read_dword(pp));
 		break;
 		}
-	case 3700: { // movep x:[pp],sp
+	case 3760: { // movep x:[pp],sp
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_sp(m_x.read_dword(pp));
 		break;
 		}
-	case 3701: { // movep x:[pp],ssh
+	case 3761: { // movep x:[pp],ssh
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_ssh(m_x.read_dword(pp));
 		break;
 		}
-	case 3702: { // movep x:[pp],ssl
+	case 3762: { // movep x:[pp],ssl
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_ssl(m_x.read_dword(pp));
 		break;
 		}
-	case 3703: { // movep x:[pp],la
+	case 3763: { // movep x:[pp],la
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_la(m_x.read_dword(pp));
 		break;
 		}
-	case 3704: { // movep x:[pp],lc
+	case 3764: { // movep x:[pp],lc
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_lc(m_x.read_dword(pp));
 		break;
 		}
-	case 3705: { // movep y:[pp],x0
+	case 3765: { // movep y:[pp],x0
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_x0(m_y.read_dword(pp));
 		break;
 		}
-	case 3706: { // movep y:[pp],x1
+	case 3766: { // movep y:[pp],x1
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_x1(m_y.read_dword(pp));
 		break;
 		}
-	case 3707: { // movep y:[pp],y0
+	case 3767: { // movep y:[pp],y0
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_y0(m_y.read_dword(pp));
 		break;
 		}
-	case 3708: { // movep y:[pp],y1
+	case 3768: { // movep y:[pp],y1
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_y1(m_y.read_dword(pp));
 		break;
 		}
-	case 3709: { // movep y:[pp],a0
+	case 3769: { // movep y:[pp],a0
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_a0(m_y.read_dword(pp));
 		break;
 		}
-	case 3710: { // movep y:[pp],b0
+	case 3770: { // movep y:[pp],b0
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_b0(m_y.read_dword(pp));
 		break;
 		}
-	case 3711: { // movep y:[pp],a2
+	case 3771: { // movep y:[pp],a2
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_a2(m_y.read_dword(pp));
 		break;
 		}
-	case 3712: { // movep y:[pp],b2
+	case 3772: { // movep y:[pp],b2
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_b2(m_y.read_dword(pp));
 		break;
 		}
-	case 3713: { // movep y:[pp],a1
+	case 3773: { // movep y:[pp],a1
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_a1(m_y.read_dword(pp));
 		break;
 		}
-	case 3714: { // movep y:[pp],b1
+	case 3774: { // movep y:[pp],b1
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_b1(m_y.read_dword(pp));
 		break;
 		}
-	case 3715: { // movep y:[pp],a
+	case 3775: { // movep y:[pp],a
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_a(m_y.read_dword(pp));
 		break;
 		}
-	case 3716: { // movep y:[pp],b
+	case 3776: { // movep y:[pp],b
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_b(m_y.read_dword(pp));
 		break;
 		}
-	case 3717: { // movep y:[pp],r
+	case 3777: { // movep y:[pp],r
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_r(BIT(opcode, 8, 6) & 7, m_y.read_dword(pp));
 		break;
 		}
-	case 3718: { // movep y:[pp],n
+	case 3778: { // movep y:[pp],n
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_n(BIT(opcode, 8, 6) & 7, m_y.read_dword(pp));
 		break;
 		}
-	case 3719: { // movep y:[pp],m
+	case 3779: { // movep y:[pp],m
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_m(BIT(opcode, 8, 6) & 7, m_y.read_dword(pp));
 		break;
 		}
-	case 3720: { // movep y:[pp],ep
+	case 3780: { // movep y:[pp],ep
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_ep(m_y.read_dword(pp));
 		break;
 		}
-	case 3721: { // movep y:[pp],vba
+	case 3781: { // movep y:[pp],vba
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_vba(m_y.read_dword(pp));
 		break;
 		}
-	case 3722: { // movep y:[pp],sc
+	case 3782: { // movep y:[pp],sc
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_sc(m_y.read_dword(pp));
 		break;
 		}
-	case 3723: { // movep y:[pp],sz
+	case 3783: { // movep y:[pp],sz
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_sz(m_y.read_dword(pp));
 		break;
 		}
-	case 3724: { // movep y:[pp],sr
+	case 3784: { // movep y:[pp],sr
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_sr(m_y.read_dword(pp));
 		break;
 		}
-	case 3725: { // movep y:[pp],omr
+	case 3785: { // movep y:[pp],omr
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_omr(m_y.read_dword(pp));
 		break;
 		}
-	case 3726: { // movep y:[pp],sp
+	case 3786: { // movep y:[pp],sp
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_sp(m_y.read_dword(pp));
 		break;
 		}
-	case 3727: { // movep y:[pp],ssh
+	case 3787: { // movep y:[pp],ssh
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_ssh(m_y.read_dword(pp));
 		break;
 		}
-	case 3728: { // movep y:[pp],ssl
+	case 3788: { // movep y:[pp],ssl
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_ssl(m_y.read_dword(pp));
 		break;
 		}
-	case 3729: { // movep y:[pp],la
+	case 3789: { // movep y:[pp],la
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_la(m_y.read_dword(pp));
 		break;
 		}
-	case 3730: { // movep y:[pp],lc
+	case 3790: { // movep y:[pp],lc
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
 		set_lc(m_y.read_dword(pp));
 		break;
 		}
-	case 3731: { // movep x0,x:[qq]
+	case 3791: { // movep x0,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_x0();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3732: { // movep x1,x:[qq]
+	case 3792: { // movep x1,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_x1();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3733: { // movep y0,x:[qq]
+	case 3793: { // movep y0,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_y0();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3734: { // movep y1,x:[qq]
+	case 3794: { // movep y1,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_y1();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3735: { // movep a0,x:[qq]
+	case 3795: { // movep a0,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_a0();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3736: { // movep b0,x:[qq]
+	case 3796: { // movep b0,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_b0();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3737: { // movep a2,x:[qq]
+	case 3797: { // movep a2,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_a2();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3738: { // movep b2,x:[qq]
+	case 3798: { // movep b2,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_b2();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3739: { // movep a1,x:[qq]
+	case 3799: { // movep a1,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_a1();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3740: { // movep b1,x:[qq]
+	case 3800: { // movep b1,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_b1();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3741: { // movep a,x:[qq]
+	case 3801: { // movep a,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u64 s = get_a();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3742: { // movep b,x:[qq]
+	case 3802: { // movep b,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u64 s = get_b();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3743: { // movep r,x:[qq]
+	case 3803: { // movep r,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3744: { // movep n,x:[qq]
+	case 3804: { // movep n,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3745: { // movep m,x:[qq]
+	case 3805: { // movep m,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3746: { // movep ep,x:[qq]
+	case 3806: { // movep ep,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_ep();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3747: { // movep vba,x:[qq]
+	case 3807: { // movep vba,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_vba();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3748: { // movep sc,x:[qq]
+	case 3808: { // movep sc,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_sc();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3749: { // movep sz,x:[qq]
+	case 3809: { // movep sz,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_sz();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3750: { // movep sr,x:[qq]
+	case 3810: { // movep sr,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_sr();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3751: { // movep omr,x:[qq]
+	case 3811: { // movep omr,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_omr();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3752: { // movep sp,x:[qq]
+	case 3812: { // movep sp,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_sp();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3753: { // movep ssh,x:[qq]
+	case 3813: { // movep ssh,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_ssh();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3754: { // movep ssl,x:[qq]
+	case 3814: { // movep ssl,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_ssl();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3755: { // movep la,x:[qq]
+	case 3815: { // movep la,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_la();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3756: { // movep lc,x:[qq]
+	case 3816: { // movep lc,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_lc();
 		m_x.write_dword(qq, s);
 		break;
 		}
-	case 3757: { // movep x:[qq],x0
+	case 3817: { // movep x:[qq],x0
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_x0(m_x.read_dword(qq));
 		break;
 		}
-	case 3758: { // movep x:[qq],x1
+	case 3818: { // movep x:[qq],x1
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_x1(m_x.read_dword(qq));
 		break;
 		}
-	case 3759: { // movep x:[qq],y0
+	case 3819: { // movep x:[qq],y0
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_y0(m_x.read_dword(qq));
 		break;
 		}
-	case 3760: { // movep x:[qq],y1
+	case 3820: { // movep x:[qq],y1
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_y1(m_x.read_dword(qq));
 		break;
 		}
-	case 3761: { // movep x:[qq],a0
+	case 3821: { // movep x:[qq],a0
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_a0(m_x.read_dword(qq));
 		break;
 		}
-	case 3762: { // movep x:[qq],b0
+	case 3822: { // movep x:[qq],b0
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_b0(m_x.read_dword(qq));
 		break;
 		}
-	case 3763: { // movep x:[qq],a2
+	case 3823: { // movep x:[qq],a2
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_a2(m_x.read_dword(qq));
 		break;
 		}
-	case 3764: { // movep x:[qq],b2
+	case 3824: { // movep x:[qq],b2
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_b2(m_x.read_dword(qq));
 		break;
 		}
-	case 3765: { // movep x:[qq],a1
+	case 3825: { // movep x:[qq],a1
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_a1(m_x.read_dword(qq));
 		break;
 		}
-	case 3766: { // movep x:[qq],b1
+	case 3826: { // movep x:[qq],b1
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_b1(m_x.read_dword(qq));
 		break;
 		}
-	case 3767: { // movep x:[qq],a
+	case 3827: { // movep x:[qq],a
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_a(m_x.read_dword(qq));
 		break;
 		}
-	case 3768: { // movep x:[qq],b
+	case 3828: { // movep x:[qq],b
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_b(m_x.read_dword(qq));
 		break;
 		}
-	case 3769: { // movep x:[qq],r
+	case 3829: { // movep x:[qq],r
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_r(BIT(opcode, 8, 6) & 7, m_x.read_dword(qq));
 		break;
 		}
-	case 3770: { // movep x:[qq],n
+	case 3830: { // movep x:[qq],n
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_n(BIT(opcode, 8, 6) & 7, m_x.read_dword(qq));
 		break;
 		}
-	case 3771: { // movep x:[qq],m
+	case 3831: { // movep x:[qq],m
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_m(BIT(opcode, 8, 6) & 7, m_x.read_dword(qq));
 		break;
 		}
-	case 3772: { // movep x:[qq],ep
+	case 3832: { // movep x:[qq],ep
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_ep(m_x.read_dword(qq));
 		break;
 		}
-	case 3773: { // movep x:[qq],vba
+	case 3833: { // movep x:[qq],vba
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_vba(m_x.read_dword(qq));
 		break;
 		}
-	case 3774: { // movep x:[qq],sc
+	case 3834: { // movep x:[qq],sc
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_sc(m_x.read_dword(qq));
 		break;
 		}
-	case 3775: { // movep x:[qq],sz
+	case 3835: { // movep x:[qq],sz
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_sz(m_x.read_dword(qq));
 		break;
 		}
-	case 3776: { // movep x:[qq],sr
+	case 3836: { // movep x:[qq],sr
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_sr(m_x.read_dword(qq));
 		break;
 		}
-	case 3777: { // movep x:[qq],omr
+	case 3837: { // movep x:[qq],omr
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_omr(m_x.read_dword(qq));
 		break;
 		}
-	case 3778: { // movep x:[qq],sp
+	case 3838: { // movep x:[qq],sp
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_sp(m_x.read_dword(qq));
 		break;
 		}
-	case 3779: { // movep x:[qq],ssh
+	case 3839: { // movep x:[qq],ssh
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_ssh(m_x.read_dword(qq));
 		break;
 		}
-	case 3780: { // movep x:[qq],ssl
+	case 3840: { // movep x:[qq],ssl
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_ssl(m_x.read_dword(qq));
 		break;
 		}
-	case 3781: { // movep x:[qq],la
+	case 3841: { // movep x:[qq],la
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_la(m_x.read_dword(qq));
 		break;
 		}
-	case 3782: { // movep x:[qq],lc
+	case 3842: { // movep x:[qq],lc
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_lc(m_x.read_dword(qq));
 		break;
 		}
-	case 3783: { // movep x0,y:[qq]
+	case 3843: { // movep x0,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_x0();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3784: { // movep x1,y:[qq]
+	case 3844: { // movep x1,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_x1();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3785: { // movep y0,y:[qq]
+	case 3845: { // movep y0,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_y0();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3786: { // movep y1,y:[qq]
+	case 3846: { // movep y1,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_y1();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3787: { // movep a0,y:[qq]
+	case 3847: { // movep a0,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_a0();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3788: { // movep b0,y:[qq]
+	case 3848: { // movep b0,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_b0();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3789: { // movep a2,y:[qq]
+	case 3849: { // movep a2,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_a2();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3790: { // movep b2,y:[qq]
+	case 3850: { // movep b2,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_b2();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3791: { // movep a1,y:[qq]
+	case 3851: { // movep a1,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_a1();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3792: { // movep b1,y:[qq]
+	case 3852: { // movep b1,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_b1();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3793: { // movep a,y:[qq]
+	case 3853: { // movep a,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u64 s = get_a();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3794: { // movep b,y:[qq]
+	case 3854: { // movep b,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u64 s = get_b();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3795: { // movep r,y:[qq]
+	case 3855: { // movep r,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3796: { // movep n,y:[qq]
+	case 3856: { // movep n,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3797: { // movep m,y:[qq]
+	case 3857: { // movep m,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3798: { // movep ep,y:[qq]
+	case 3858: { // movep ep,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_ep();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3799: { // movep vba,y:[qq]
+	case 3859: { // movep vba,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_vba();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3800: { // movep sc,y:[qq]
+	case 3860: { // movep sc,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_sc();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3801: { // movep sz,y:[qq]
+	case 3861: { // movep sz,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_sz();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3802: { // movep sr,y:[qq]
+	case 3862: { // movep sr,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_sr();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3803: { // movep omr,y:[qq]
+	case 3863: { // movep omr,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_omr();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3804: { // movep sp,y:[qq]
+	case 3864: { // movep sp,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_sp();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3805: { // movep ssh,y:[qq]
+	case 3865: { // movep ssh,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_ssh();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3806: { // movep ssl,y:[qq]
+	case 3866: { // movep ssl,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_ssl();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3807: { // movep la,y:[qq]
+	case 3867: { // movep la,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_la();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3808: { // movep lc,y:[qq]
+	case 3868: { // movep lc,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		u32 s = get_lc();
 		m_y.write_dword(qq, s);
 		break;
 		}
-	case 3809: { // movep y:[qq],x0
+	case 3869: { // movep y:[qq],x0
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_x0(m_y.read_dword(qq));
 		break;
 		}
-	case 3810: { // movep y:[qq],x1
+	case 3870: { // movep y:[qq],x1
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_x1(m_y.read_dword(qq));
 		break;
 		}
-	case 3811: { // movep y:[qq],y0
+	case 3871: { // movep y:[qq],y0
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_y0(m_y.read_dword(qq));
 		break;
 		}
-	case 3812: { // movep y:[qq],y1
+	case 3872: { // movep y:[qq],y1
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_y1(m_y.read_dword(qq));
 		break;
 		}
-	case 3813: { // movep y:[qq],a0
+	case 3873: { // movep y:[qq],a0
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_a0(m_y.read_dword(qq));
 		break;
 		}
-	case 3814: { // movep y:[qq],b0
+	case 3874: { // movep y:[qq],b0
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_b0(m_y.read_dword(qq));
 		break;
 		}
-	case 3815: { // movep y:[qq],a2
+	case 3875: { // movep y:[qq],a2
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_a2(m_y.read_dword(qq));
 		break;
 		}
-	case 3816: { // movep y:[qq],b2
+	case 3876: { // movep y:[qq],b2
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_b2(m_y.read_dword(qq));
 		break;
 		}
-	case 3817: { // movep y:[qq],a1
+	case 3877: { // movep y:[qq],a1
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_a1(m_y.read_dword(qq));
 		break;
 		}
-	case 3818: { // movep y:[qq],b1
+	case 3878: { // movep y:[qq],b1
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_b1(m_y.read_dword(qq));
 		break;
 		}
-	case 3819: { // movep y:[qq],a
+	case 3879: { // movep y:[qq],a
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_a(m_y.read_dword(qq));
 		break;
 		}
-	case 3820: { // movep y:[qq],b
+	case 3880: { // movep y:[qq],b
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_b(m_y.read_dword(qq));
 		break;
 		}
-	case 3821: { // movep y:[qq],r
+	case 3881: { // movep y:[qq],r
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_r(BIT(opcode, 8, 6) & 7, m_y.read_dword(qq));
 		break;
 		}
-	case 3822: { // movep y:[qq],n
+	case 3882: { // movep y:[qq],n
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_n(BIT(opcode, 8, 6) & 7, m_y.read_dword(qq));
 		break;
 		}
-	case 3823: { // movep y:[qq],m
+	case 3883: { // movep y:[qq],m
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_m(BIT(opcode, 8, 6) & 7, m_y.read_dword(qq));
 		break;
 		}
-	case 3824: { // movep y:[qq],ep
+	case 3884: { // movep y:[qq],ep
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_ep(m_y.read_dword(qq));
 		break;
 		}
-	case 3825: { // movep y:[qq],vba
+	case 3885: { // movep y:[qq],vba
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_vba(m_y.read_dword(qq));
 		break;
 		}
-	case 3826: { // movep y:[qq],sc
+	case 3886: { // movep y:[qq],sc
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_sc(m_y.read_dword(qq));
 		break;
 		}
-	case 3827: { // movep y:[qq],sz
+	case 3887: { // movep y:[qq],sz
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_sz(m_y.read_dword(qq));
 		break;
 		}
-	case 3828: { // movep y:[qq],sr
+	case 3888: { // movep y:[qq],sr
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_sr(m_y.read_dword(qq));
 		break;
 		}
-	case 3829: { // movep y:[qq],omr
+	case 3889: { // movep y:[qq],omr
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_omr(m_y.read_dword(qq));
 		break;
 		}
-	case 3830: { // movep y:[qq],sp
+	case 3890: { // movep y:[qq],sp
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_sp(m_y.read_dword(qq));
 		break;
 		}
-	case 3831: { // movep y:[qq],ssh
+	case 3891: { // movep y:[qq],ssh
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_ssh(m_y.read_dword(qq));
 		break;
 		}
-	case 3832: { // movep y:[qq],ssl
+	case 3892: { // movep y:[qq],ssl
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_ssl(m_y.read_dword(qq));
 		break;
 		}
-	case 3833: { // movep y:[qq],la
+	case 3893: { // movep y:[qq],la
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_la(m_y.read_dword(qq));
 		break;
 		}
-	case 3834: { // movep y:[qq],lc
+	case 3894: { // movep y:[qq],lc
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
 		set_lc(m_y.read_dword(qq));
 		break;
 		}
-	case 3835: { // mpy +y1,#[i],a
+	case 3895: { // mpy +y1,#[i],a
 		unhandled("mpy +y1,#[i],a");
 		break;
 		}
-	case 3836: { // mpy -y1,#[i],a
+	case 3896: { // mpy -y1,#[i],a
 		unhandled("mpy -y1,#[i],a");
 		break;
 		}
-	case 3837: { // mpy +y1,#[i],b
+	case 3897: { // mpy +y1,#[i],b
 		unhandled("mpy +y1,#[i],b");
 		break;
 		}
-	case 3838: { // mpy -y1,#[i],b
+	case 3898: { // mpy -y1,#[i],b
 		unhandled("mpy -y1,#[i],b");
 		break;
 		}
-	case 3839: { // mpy +x0,#[i],a
+	case 3899: { // mpy +x0,#[i],a
 		unhandled("mpy +x0,#[i],a");
 		break;
 		}
-	case 3840: { // mpy -x0,#[i],a
+	case 3900: { // mpy -x0,#[i],a
 		unhandled("mpy -x0,#[i],a");
 		break;
 		}
-	case 3841: { // mpy +x0,#[i],b
+	case 3901: { // mpy +x0,#[i],b
 		unhandled("mpy +x0,#[i],b");
 		break;
 		}
-	case 3842: { // mpy -x0,#[i],b
+	case 3902: { // mpy -x0,#[i],b
 		unhandled("mpy -x0,#[i],b");
 		break;
 		}
-	case 3843: { // mpy +y0,#[i],a
+	case 3903: { // mpy +y0,#[i],a
 		unhandled("mpy +y0,#[i],a");
 		break;
 		}
-	case 3844: { // mpy -y0,#[i],a
+	case 3904: { // mpy -y0,#[i],a
 		unhandled("mpy -y0,#[i],a");
 		break;
 		}
-	case 3845: { // mpy +y0,#[i],b
+	case 3905: { // mpy +y0,#[i],b
 		unhandled("mpy +y0,#[i],b");
 		break;
 		}
-	case 3846: { // mpy -y0,#[i],b
+	case 3906: { // mpy -y0,#[i],b
 		unhandled("mpy -y0,#[i],b");
 		break;
 		}
-	case 3847: { // mpy +x1,#[i],a
+	case 3907: { // mpy +x1,#[i],a
 		unhandled("mpy +x1,#[i],a");
 		break;
 		}
-	case 3848: { // mpy -x1,#[i],a
+	case 3908: { // mpy -x1,#[i],a
 		unhandled("mpy -x1,#[i],a");
 		break;
 		}
-	case 3849: { // mpy +x1,#[i],b
+	case 3909: { // mpy +x1,#[i],b
 		unhandled("mpy +x1,#[i],b");
 		break;
 		}
-	case 3850: { // mpy -x1,#[i],b
+	case 3910: { // mpy -x1,#[i],b
 		unhandled("mpy -x1,#[i],b");
 		break;
 		}
-	case 3851: { // mpysu +x0,x0,a
+	case 3911: { // mpysu +x0,x0,a
 		unhandled("mpysu +x0,x0,a");
 		break;
 		}
-	case 3852: { // mpysu +y0,y0,a
+	case 3912: { // mpysu +y0,y0,a
 		unhandled("mpysu +y0,y0,a");
 		break;
 		}
-	case 3853: { // mpysu +x1,x0,a
+	case 3913: { // mpysu +x1,x0,a
 		unhandled("mpysu +x1,x0,a");
 		break;
 		}
-	case 3854: { // mpysu +y1,y0,a
+	case 3914: { // mpysu +y1,y0,a
 		unhandled("mpysu +y1,y0,a");
 		break;
 		}
-	case 3855: { // mpysu +x1,x1,a
+	case 3915: { // mpysu +x1,x1,a
 		unhandled("mpysu +x1,x1,a");
 		break;
 		}
-	case 3856: { // mpysu +y1,y1,a
+	case 3916: { // mpysu +y1,y1,a
 		unhandled("mpysu +y1,y1,a");
 		break;
 		}
-	case 3857: { // mpysu +x0,x1,a
+	case 3917: { // mpysu +x0,x1,a
 		unhandled("mpysu +x0,x1,a");
 		break;
 		}
-	case 3858: { // mpysu +y0,y1,a
+	case 3918: { // mpysu +y0,y1,a
 		unhandled("mpysu +y0,y1,a");
 		break;
 		}
-	case 3859: { // mpysu +x0,y1,a
+	case 3919: { // mpysu +x0,y1,a
 		unhandled("mpysu +x0,y1,a");
 		break;
 		}
-	case 3860: { // mpysu +y0,x0,a
+	case 3920: { // mpysu +y0,x0,a
 		unhandled("mpysu +y0,x0,a");
 		break;
 		}
-	case 3861: { // mpysu +x1,y0,a
+	case 3921: { // mpysu +x1,y0,a
 		unhandled("mpysu +x1,y0,a");
 		break;
 		}
-	case 3862: { // mpysu +y1,x1,a
+	case 3922: { // mpysu +y1,x1,a
 		unhandled("mpysu +y1,x1,a");
 		break;
 		}
-	case 3863: { // mpysu +y1,x0,a
+	case 3923: { // mpysu +y1,x0,a
 		unhandled("mpysu +y1,x0,a");
 		break;
 		}
-	case 3864: { // mpysu +x0,y0,a
+	case 3924: { // mpysu +x0,y0,a
 		unhandled("mpysu +x0,y0,a");
 		break;
 		}
-	case 3865: { // mpysu +y0,x1,a
+	case 3925: { // mpysu +y0,x1,a
 		unhandled("mpysu +y0,x1,a");
 		break;
 		}
-	case 3866: { // mpysu +x1,y1,a
+	case 3926: { // mpysu +x1,y1,a
 		unhandled("mpysu +x1,y1,a");
 		break;
 		}
-	case 3867: { // mpysu -x0,x0,a
+	case 3927: { // mpysu -x0,x0,a
 		unhandled("mpysu -x0,x0,a");
 		break;
 		}
-	case 3868: { // mpysu -y0,y0,a
+	case 3928: { // mpysu -y0,y0,a
 		unhandled("mpysu -y0,y0,a");
 		break;
 		}
-	case 3869: { // mpysu -x1,x0,a
+	case 3929: { // mpysu -x1,x0,a
 		unhandled("mpysu -x1,x0,a");
 		break;
 		}
-	case 3870: { // mpysu -y1,y0,a
+	case 3930: { // mpysu -y1,y0,a
 		unhandled("mpysu -y1,y0,a");
 		break;
 		}
-	case 3871: { // mpysu -x1,x1,a
+	case 3931: { // mpysu -x1,x1,a
 		unhandled("mpysu -x1,x1,a");
 		break;
 		}
-	case 3872: { // mpysu -y1,y1,a
+	case 3932: { // mpysu -y1,y1,a
 		unhandled("mpysu -y1,y1,a");
 		break;
 		}
-	case 3873: { // mpysu -x0,x1,a
+	case 3933: { // mpysu -x0,x1,a
 		unhandled("mpysu -x0,x1,a");
 		break;
 		}
-	case 3874: { // mpysu -y0,y1,a
+	case 3934: { // mpysu -y0,y1,a
 		unhandled("mpysu -y0,y1,a");
 		break;
 		}
-	case 3875: { // mpysu -x0,y1,a
+	case 3935: { // mpysu -x0,y1,a
 		unhandled("mpysu -x0,y1,a");
 		break;
 		}
-	case 3876: { // mpysu -y0,x0,a
+	case 3936: { // mpysu -y0,x0,a
 		unhandled("mpysu -y0,x0,a");
 		break;
 		}
-	case 3877: { // mpysu -x1,y0,a
+	case 3937: { // mpysu -x1,y0,a
 		unhandled("mpysu -x1,y0,a");
 		break;
 		}
-	case 3878: { // mpysu -y1,x1,a
+	case 3938: { // mpysu -y1,x1,a
 		unhandled("mpysu -y1,x1,a");
 		break;
 		}
-	case 3879: { // mpysu -y1,x0,a
+	case 3939: { // mpysu -y1,x0,a
 		unhandled("mpysu -y1,x0,a");
 		break;
 		}
-	case 3880: { // mpysu -x0,y0,a
+	case 3940: { // mpysu -x0,y0,a
 		unhandled("mpysu -x0,y0,a");
 		break;
 		}
-	case 3881: { // mpysu -y0,x1,a
+	case 3941: { // mpysu -y0,x1,a
 		unhandled("mpysu -y0,x1,a");
 		break;
 		}
-	case 3882: { // mpysu -x1,y1,a
+	case 3942: { // mpysu -x1,y1,a
 		unhandled("mpysu -x1,y1,a");
 		break;
 		}
-	case 3883: { // mpysu +x0,x0,b
+	case 3943: { // mpysu +x0,x0,b
 		unhandled("mpysu +x0,x0,b");
 		break;
 		}
-	case 3884: { // mpysu +y0,y0,b
+	case 3944: { // mpysu +y0,y0,b
 		unhandled("mpysu +y0,y0,b");
 		break;
 		}
-	case 3885: { // mpysu +x1,x0,b
+	case 3945: { // mpysu +x1,x0,b
 		unhandled("mpysu +x1,x0,b");
 		break;
 		}
-	case 3886: { // mpysu +y1,y0,b
+	case 3946: { // mpysu +y1,y0,b
 		unhandled("mpysu +y1,y0,b");
 		break;
 		}
-	case 3887: { // mpysu +x1,x1,b
+	case 3947: { // mpysu +x1,x1,b
 		unhandled("mpysu +x1,x1,b");
 		break;
 		}
-	case 3888: { // mpysu +y1,y1,b
+	case 3948: { // mpysu +y1,y1,b
 		unhandled("mpysu +y1,y1,b");
 		break;
 		}
-	case 3889: { // mpysu +x0,x1,b
+	case 3949: { // mpysu +x0,x1,b
 		unhandled("mpysu +x0,x1,b");
 		break;
 		}
-	case 3890: { // mpysu +y0,y1,b
+	case 3950: { // mpysu +y0,y1,b
 		unhandled("mpysu +y0,y1,b");
 		break;
 		}
-	case 3891: { // mpysu +x0,y1,b
+	case 3951: { // mpysu +x0,y1,b
 		unhandled("mpysu +x0,y1,b");
 		break;
 		}
-	case 3892: { // mpysu +y0,x0,b
+	case 3952: { // mpysu +y0,x0,b
 		unhandled("mpysu +y0,x0,b");
 		break;
 		}
-	case 3893: { // mpysu +x1,y0,b
+	case 3953: { // mpysu +x1,y0,b
 		unhandled("mpysu +x1,y0,b");
 		break;
 		}
-	case 3894: { // mpysu +y1,x1,b
+	case 3954: { // mpysu +y1,x1,b
 		unhandled("mpysu +y1,x1,b");
 		break;
 		}
-	case 3895: { // mpysu +y1,x0,b
+	case 3955: { // mpysu +y1,x0,b
 		unhandled("mpysu +y1,x0,b");
 		break;
 		}
-	case 3896: { // mpysu +x0,y0,b
+	case 3956: { // mpysu +x0,y0,b
 		unhandled("mpysu +x0,y0,b");
 		break;
 		}
-	case 3897: { // mpysu +y0,x1,b
+	case 3957: { // mpysu +y0,x1,b
 		unhandled("mpysu +y0,x1,b");
 		break;
 		}
-	case 3898: { // mpysu +x1,y1,b
+	case 3958: { // mpysu +x1,y1,b
 		unhandled("mpysu +x1,y1,b");
 		break;
 		}
-	case 3899: { // mpysu -x0,x0,b
+	case 3959: { // mpysu -x0,x0,b
 		unhandled("mpysu -x0,x0,b");
 		break;
 		}
-	case 3900: { // mpysu -y0,y0,b
+	case 3960: { // mpysu -y0,y0,b
 		unhandled("mpysu -y0,y0,b");
 		break;
 		}
-	case 3901: { // mpysu -x1,x0,b
+	case 3961: { // mpysu -x1,x0,b
 		unhandled("mpysu -x1,x0,b");
 		break;
 		}
-	case 3902: { // mpysu -y1,y0,b
+	case 3962: { // mpysu -y1,y0,b
 		unhandled("mpysu -y1,y0,b");
 		break;
 		}
-	case 3903: { // mpysu -x1,x1,b
+	case 3963: { // mpysu -x1,x1,b
 		unhandled("mpysu -x1,x1,b");
 		break;
 		}
-	case 3904: { // mpysu -y1,y1,b
+	case 3964: { // mpysu -y1,y1,b
 		unhandled("mpysu -y1,y1,b");
 		break;
 		}
-	case 3905: { // mpysu -x0,x1,b
+	case 3965: { // mpysu -x0,x1,b
 		unhandled("mpysu -x0,x1,b");
 		break;
 		}
-	case 3906: { // mpysu -y0,y1,b
+	case 3966: { // mpysu -y0,y1,b
 		unhandled("mpysu -y0,y1,b");
 		break;
 		}
-	case 3907: { // mpysu -x0,y1,b
+	case 3967: { // mpysu -x0,y1,b
 		unhandled("mpysu -x0,y1,b");
 		break;
 		}
-	case 3908: { // mpysu -y0,x0,b
+	case 3968: { // mpysu -y0,x0,b
 		unhandled("mpysu -y0,x0,b");
 		break;
 		}
-	case 3909: { // mpysu -x1,y0,b
+	case 3969: { // mpysu -x1,y0,b
 		unhandled("mpysu -x1,y0,b");
 		break;
 		}
-	case 3910: { // mpysu -y1,x1,b
+	case 3970: { // mpysu -y1,x1,b
 		unhandled("mpysu -y1,x1,b");
 		break;
 		}
-	case 3911: { // mpysu -y1,x0,b
+	case 3971: { // mpysu -y1,x0,b
 		unhandled("mpysu -y1,x0,b");
 		break;
 		}
-	case 3912: { // mpysu -x0,y0,b
+	case 3972: { // mpysu -x0,y0,b
 		unhandled("mpysu -x0,y0,b");
 		break;
 		}
-	case 3913: { // mpysu -y0,x1,b
+	case 3973: { // mpysu -y0,x1,b
 		unhandled("mpysu -y0,x1,b");
 		break;
 		}
-	case 3914: { // mpysu -x1,y1,b
+	case 3974: { // mpysu -x1,y1,b
 		unhandled("mpysu -x1,y1,b");
 		break;
 		}
-	case 3915: { // mpyuu +x0,x0,a
+	case 3975: { // mpyuu +x0,x0,a
 		unhandled("mpyuu +x0,x0,a");
 		break;
 		}
-	case 3916: { // mpyuu +y0,y0,a
+	case 3976: { // mpyuu +y0,y0,a
 		unhandled("mpyuu +y0,y0,a");
 		break;
 		}
-	case 3917: { // mpyuu +x1,x0,a
+	case 3977: { // mpyuu +x1,x0,a
 		unhandled("mpyuu +x1,x0,a");
 		break;
 		}
-	case 3918: { // mpyuu +y1,y0,a
+	case 3978: { // mpyuu +y1,y0,a
 		unhandled("mpyuu +y1,y0,a");
 		break;
 		}
-	case 3919: { // mpyuu +x1,x1,a
+	case 3979: { // mpyuu +x1,x1,a
 		unhandled("mpyuu +x1,x1,a");
 		break;
 		}
-	case 3920: { // mpyuu +y1,y1,a
+	case 3980: { // mpyuu +y1,y1,a
 		unhandled("mpyuu +y1,y1,a");
 		break;
 		}
-	case 3921: { // mpyuu +x0,x1,a
+	case 3981: { // mpyuu +x0,x1,a
 		unhandled("mpyuu +x0,x1,a");
 		break;
 		}
-	case 3922: { // mpyuu +y0,y1,a
+	case 3982: { // mpyuu +y0,y1,a
 		unhandled("mpyuu +y0,y1,a");
 		break;
 		}
-	case 3923: { // mpyuu +x0,y1,a
+	case 3983: { // mpyuu +x0,y1,a
 		unhandled("mpyuu +x0,y1,a");
 		break;
 		}
-	case 3924: { // mpyuu +y0,x0,a
+	case 3984: { // mpyuu +y0,x0,a
 		unhandled("mpyuu +y0,x0,a");
 		break;
 		}
-	case 3925: { // mpyuu +x1,y0,a
+	case 3985: { // mpyuu +x1,y0,a
 		unhandled("mpyuu +x1,y0,a");
 		break;
 		}
-	case 3926: { // mpyuu +y1,x1,a
+	case 3986: { // mpyuu +y1,x1,a
 		unhandled("mpyuu +y1,x1,a");
 		break;
 		}
-	case 3927: { // mpyuu +y1,x0,a
+	case 3987: { // mpyuu +y1,x0,a
 		unhandled("mpyuu +y1,x0,a");
 		break;
 		}
-	case 3928: { // mpyuu +x0,y0,a
+	case 3988: { // mpyuu +x0,y0,a
 		unhandled("mpyuu +x0,y0,a");
 		break;
 		}
-	case 3929: { // mpyuu +y0,x1,a
+	case 3989: { // mpyuu +y0,x1,a
 		unhandled("mpyuu +y0,x1,a");
 		break;
 		}
-	case 3930: { // mpyuu +x1,y1,a
+	case 3990: { // mpyuu +x1,y1,a
 		unhandled("mpyuu +x1,y1,a");
 		break;
 		}
-	case 3931: { // mpyuu -x0,x0,a
+	case 3991: { // mpyuu -x0,x0,a
 		unhandled("mpyuu -x0,x0,a");
 		break;
 		}
-	case 3932: { // mpyuu -y0,y0,a
+	case 3992: { // mpyuu -y0,y0,a
 		unhandled("mpyuu -y0,y0,a");
 		break;
 		}
-	case 3933: { // mpyuu -x1,x0,a
+	case 3993: { // mpyuu -x1,x0,a
 		unhandled("mpyuu -x1,x0,a");
 		break;
 		}
-	case 3934: { // mpyuu -y1,y0,a
+	case 3994: { // mpyuu -y1,y0,a
 		unhandled("mpyuu -y1,y0,a");
 		break;
 		}
-	case 3935: { // mpyuu -x1,x1,a
+	case 3995: { // mpyuu -x1,x1,a
 		unhandled("mpyuu -x1,x1,a");
 		break;
 		}
-	case 3936: { // mpyuu -y1,y1,a
+	case 3996: { // mpyuu -y1,y1,a
 		unhandled("mpyuu -y1,y1,a");
 		break;
 		}
-	case 3937: { // mpyuu -x0,x1,a
+	case 3997: { // mpyuu -x0,x1,a
 		unhandled("mpyuu -x0,x1,a");
 		break;
 		}
-	case 3938: { // mpyuu -y0,y1,a
+	case 3998: { // mpyuu -y0,y1,a
 		unhandled("mpyuu -y0,y1,a");
 		break;
 		}
-	case 3939: { // mpyuu -x0,y1,a
+	case 3999: { // mpyuu -x0,y1,a
 		unhandled("mpyuu -x0,y1,a");
 		break;
 		}
-	case 3940: { // mpyuu -y0,x0,a
+	case 4000: { // mpyuu -y0,x0,a
 		unhandled("mpyuu -y0,x0,a");
 		break;
 		}
-	case 3941: { // mpyuu -x1,y0,a
+	case 4001: { // mpyuu -x1,y0,a
 		unhandled("mpyuu -x1,y0,a");
 		break;
 		}
-	case 3942: { // mpyuu -y1,x1,a
+	case 4002: { // mpyuu -y1,x1,a
 		unhandled("mpyuu -y1,x1,a");
 		break;
 		}
-	case 3943: { // mpyuu -y1,x0,a
+	case 4003: { // mpyuu -y1,x0,a
 		unhandled("mpyuu -y1,x0,a");
 		break;
 		}
-	case 3944: { // mpyuu -x0,y0,a
+	case 4004: { // mpyuu -x0,y0,a
 		unhandled("mpyuu -x0,y0,a");
 		break;
 		}
-	case 3945: { // mpyuu -y0,x1,a
+	case 4005: { // mpyuu -y0,x1,a
 		unhandled("mpyuu -y0,x1,a");
 		break;
 		}
-	case 3946: { // mpyuu -x1,y1,a
+	case 4006: { // mpyuu -x1,y1,a
 		unhandled("mpyuu -x1,y1,a");
 		break;
 		}
-	case 3947: { // mpyuu +x0,x0,b
+	case 4007: { // mpyuu +x0,x0,b
 		unhandled("mpyuu +x0,x0,b");
 		break;
 		}
-	case 3948: { // mpyuu +y0,y0,b
+	case 4008: { // mpyuu +y0,y0,b
 		unhandled("mpyuu +y0,y0,b");
 		break;
 		}
-	case 3949: { // mpyuu +x1,x0,b
+	case 4009: { // mpyuu +x1,x0,b
 		unhandled("mpyuu +x1,x0,b");
 		break;
 		}
-	case 3950: { // mpyuu +y1,y0,b
+	case 4010: { // mpyuu +y1,y0,b
 		unhandled("mpyuu +y1,y0,b");
 		break;
 		}
-	case 3951: { // mpyuu +x1,x1,b
+	case 4011: { // mpyuu +x1,x1,b
 		unhandled("mpyuu +x1,x1,b");
 		break;
 		}
-	case 3952: { // mpyuu +y1,y1,b
+	case 4012: { // mpyuu +y1,y1,b
 		unhandled("mpyuu +y1,y1,b");
 		break;
 		}
-	case 3953: { // mpyuu +x0,x1,b
+	case 4013: { // mpyuu +x0,x1,b
 		unhandled("mpyuu +x0,x1,b");
 		break;
 		}
-	case 3954: { // mpyuu +y0,y1,b
+	case 4014: { // mpyuu +y0,y1,b
 		unhandled("mpyuu +y0,y1,b");
 		break;
 		}
-	case 3955: { // mpyuu +x0,y1,b
+	case 4015: { // mpyuu +x0,y1,b
 		unhandled("mpyuu +x0,y1,b");
 		break;
 		}
-	case 3956: { // mpyuu +y0,x0,b
+	case 4016: { // mpyuu +y0,x0,b
 		unhandled("mpyuu +y0,x0,b");
 		break;
 		}
-	case 3957: { // mpyuu +x1,y0,b
+	case 4017: { // mpyuu +x1,y0,b
 		unhandled("mpyuu +x1,y0,b");
 		break;
 		}
-	case 3958: { // mpyuu +y1,x1,b
+	case 4018: { // mpyuu +y1,x1,b
 		unhandled("mpyuu +y1,x1,b");
 		break;
 		}
-	case 3959: { // mpyuu +y1,x0,b
+	case 4019: { // mpyuu +y1,x0,b
 		unhandled("mpyuu +y1,x0,b");
 		break;
 		}
-	case 3960: { // mpyuu +x0,y0,b
+	case 4020: { // mpyuu +x0,y0,b
 		unhandled("mpyuu +x0,y0,b");
 		break;
 		}
-	case 3961: { // mpyuu +y0,x1,b
+	case 4021: { // mpyuu +y0,x1,b
 		unhandled("mpyuu +y0,x1,b");
 		break;
 		}
-	case 3962: { // mpyuu +x1,y1,b
+	case 4022: { // mpyuu +x1,y1,b
 		unhandled("mpyuu +x1,y1,b");
 		break;
 		}
-	case 3963: { // mpyuu -x0,x0,b
+	case 4023: { // mpyuu -x0,x0,b
 		unhandled("mpyuu -x0,x0,b");
 		break;
 		}
-	case 3964: { // mpyuu -y0,y0,b
+	case 4024: { // mpyuu -y0,y0,b
 		unhandled("mpyuu -y0,y0,b");
 		break;
 		}
-	case 3965: { // mpyuu -x1,x0,b
+	case 4025: { // mpyuu -x1,x0,b
 		unhandled("mpyuu -x1,x0,b");
 		break;
 		}
-	case 3966: { // mpyuu -y1,y0,b
+	case 4026: { // mpyuu -y1,y0,b
 		unhandled("mpyuu -y1,y0,b");
 		break;
 		}
-	case 3967: { // mpyuu -x1,x1,b
+	case 4027: { // mpyuu -x1,x1,b
 		unhandled("mpyuu -x1,x1,b");
 		break;
 		}
-	case 3968: { // mpyuu -y1,y1,b
+	case 4028: { // mpyuu -y1,y1,b
 		unhandled("mpyuu -y1,y1,b");
 		break;
 		}
-	case 3969: { // mpyuu -x0,x1,b
+	case 4029: { // mpyuu -x0,x1,b
 		unhandled("mpyuu -x0,x1,b");
 		break;
 		}
-	case 3970: { // mpyuu -y0,y1,b
+	case 4030: { // mpyuu -y0,y1,b
 		unhandled("mpyuu -y0,y1,b");
 		break;
 		}
-	case 3971: { // mpyuu -x0,y1,b
+	case 4031: { // mpyuu -x0,y1,b
 		unhandled("mpyuu -x0,y1,b");
 		break;
 		}
-	case 3972: { // mpyuu -y0,x0,b
+	case 4032: { // mpyuu -y0,x0,b
 		unhandled("mpyuu -y0,x0,b");
 		break;
 		}
-	case 3973: { // mpyuu -x1,y0,b
+	case 4033: { // mpyuu -x1,y0,b
 		unhandled("mpyuu -x1,y0,b");
 		break;
 		}
-	case 3974: { // mpyuu -y1,x1,b
+	case 4034: { // mpyuu -y1,x1,b
 		unhandled("mpyuu -y1,x1,b");
 		break;
 		}
-	case 3975: { // mpyuu -y1,x0,b
+	case 4035: { // mpyuu -y1,x0,b
 		unhandled("mpyuu -y1,x0,b");
 		break;
 		}
-	case 3976: { // mpyuu -x0,y0,b
+	case 4036: { // mpyuu -x0,y0,b
 		unhandled("mpyuu -x0,y0,b");
 		break;
 		}
-	case 3977: { // mpyuu -y0,x1,b
+	case 4037: { // mpyuu -y0,x1,b
 		unhandled("mpyuu -y0,x1,b");
 		break;
 		}
-	case 3978: { // mpyuu -x1,y1,b
+	case 4038: { // mpyuu -x1,y1,b
 		unhandled("mpyuu -x1,y1,b");
 		break;
 		}
-	case 3979: { // mpyi +#[i],y1,a
+	case 4039: { // mpyi +#[i],y1,a
 		unhandled("mpyi +#[i],y1,a");
 		break;
 		}
-	case 3980: { // mpyi -#[i],y1,a
+	case 4040: { // mpyi -#[i],y1,a
 		unhandled("mpyi -#[i],y1,a");
 		break;
 		}
-	case 3981: { // mpyi +#[i],y1,b
+	case 4041: { // mpyi +#[i],y1,b
 		unhandled("mpyi +#[i],y1,b");
 		break;
 		}
-	case 3982: { // mpyi -#[i],y1,b
+	case 4042: { // mpyi -#[i],y1,b
 		unhandled("mpyi -#[i],y1,b");
 		break;
 		}
-	case 3983: { // mpyi +#[i],x0,a
+	case 4043: { // mpyi +#[i],x0,a
 		unhandled("mpyi +#[i],x0,a");
 		break;
 		}
-	case 3984: { // mpyi -#[i],x0,a
+	case 4044: { // mpyi -#[i],x0,a
 		unhandled("mpyi -#[i],x0,a");
 		break;
 		}
-	case 3985: { // mpyi +#[i],x0,b
+	case 4045: { // mpyi +#[i],x0,b
 		unhandled("mpyi +#[i],x0,b");
 		break;
 		}
-	case 3986: { // mpyi -#[i],x0,b
+	case 4046: { // mpyi -#[i],x0,b
 		unhandled("mpyi -#[i],x0,b");
 		break;
 		}
-	case 3987: { // mpyi +#[i],y0,a
+	case 4047: { // mpyi +#[i],y0,a
 		unhandled("mpyi +#[i],y0,a");
 		break;
 		}
-	case 3988: { // mpyi -#[i],y0,a
+	case 4048: { // mpyi -#[i],y0,a
 		unhandled("mpyi -#[i],y0,a");
 		break;
 		}
-	case 3989: { // mpyi +#[i],y0,b
+	case 4049: { // mpyi +#[i],y0,b
 		unhandled("mpyi +#[i],y0,b");
 		break;
 		}
-	case 3990: { // mpyi -#[i],y0,b
+	case 4050: { // mpyi -#[i],y0,b
 		unhandled("mpyi -#[i],y0,b");
 		break;
 		}
-	case 3991: { // mpyi +#[i],x1,a
+	case 4051: { // mpyi +#[i],x1,a
 		unhandled("mpyi +#[i],x1,a");
 		break;
 		}
-	case 3992: { // mpyi -#[i],x1,a
+	case 4052: { // mpyi -#[i],x1,a
 		unhandled("mpyi -#[i],x1,a");
 		break;
 		}
-	case 3993: { // mpyi +#[i],x1,b
+	case 4053: { // mpyi +#[i],x1,b
 		unhandled("mpyi +#[i],x1,b");
 		break;
 		}
-	case 3994: { // mpyi -#[i],x1,b
+	case 4054: { // mpyi -#[i],x1,b
 		unhandled("mpyi -#[i],x1,b");
 		break;
 		}
-	case 3995: { // mpyr +y1,#[i],a
+	case 4055: { // mpyr +y1,#[i],a
 		unhandled("mpyr +y1,#[i],a");
 		break;
 		}
-	case 3996: { // mpyr -y1,#[i],a
+	case 4056: { // mpyr -y1,#[i],a
 		unhandled("mpyr -y1,#[i],a");
 		break;
 		}
-	case 3997: { // mpyr +y1,#[i],b
+	case 4057: { // mpyr +y1,#[i],b
 		unhandled("mpyr +y1,#[i],b");
 		break;
 		}
-	case 3998: { // mpyr -y1,#[i],b
+	case 4058: { // mpyr -y1,#[i],b
 		unhandled("mpyr -y1,#[i],b");
 		break;
 		}
-	case 3999: { // mpyr +x0,#[i],a
+	case 4059: { // mpyr +x0,#[i],a
 		unhandled("mpyr +x0,#[i],a");
 		break;
 		}
-	case 4000: { // mpyr -x0,#[i],a
+	case 4060: { // mpyr -x0,#[i],a
 		unhandled("mpyr -x0,#[i],a");
 		break;
 		}
-	case 4001: { // mpyr +x0,#[i],b
+	case 4061: { // mpyr +x0,#[i],b
 		unhandled("mpyr +x0,#[i],b");
 		break;
 		}
-	case 4002: { // mpyr -x0,#[i],b
+	case 4062: { // mpyr -x0,#[i],b
 		unhandled("mpyr -x0,#[i],b");
 		break;
 		}
-	case 4003: { // mpyr +y0,#[i],a
+	case 4063: { // mpyr +y0,#[i],a
 		unhandled("mpyr +y0,#[i],a");
 		break;
 		}
-	case 4004: { // mpyr -y0,#[i],a
+	case 4064: { // mpyr -y0,#[i],a
 		unhandled("mpyr -y0,#[i],a");
 		break;
 		}
-	case 4005: { // mpyr +y0,#[i],b
+	case 4065: { // mpyr +y0,#[i],b
 		unhandled("mpyr +y0,#[i],b");
 		break;
 		}
-	case 4006: { // mpyr -y0,#[i],b
+	case 4066: { // mpyr -y0,#[i],b
 		unhandled("mpyr -y0,#[i],b");
 		break;
 		}
-	case 4007: { // mpyr +x1,#[i],a
+	case 4067: { // mpyr +x1,#[i],a
 		unhandled("mpyr +x1,#[i],a");
 		break;
 		}
-	case 4008: { // mpyr -x1,#[i],a
+	case 4068: { // mpyr -x1,#[i],a
 		unhandled("mpyr -x1,#[i],a");
 		break;
 		}
-	case 4009: { // mpyr +x1,#[i],b
+	case 4069: { // mpyr +x1,#[i],b
 		unhandled("mpyr +x1,#[i],b");
 		break;
 		}
-	case 4010: { // mpyr -x1,#[i],b
+	case 4070: { // mpyr -x1,#[i],b
 		unhandled("mpyr -x1,#[i],b");
 		break;
 		}
-	case 4011: { // mpyri +#[i],y1,a
+	case 4071: { // mpyri +#[i],y1,a
 		unhandled("mpyri +#[i],y1,a");
 		break;
 		}
-	case 4012: { // mpyri -#[i],y1,a
+	case 4072: { // mpyri -#[i],y1,a
 		unhandled("mpyri -#[i],y1,a");
 		break;
 		}
-	case 4013: { // mpyri +#[i],y1,b
+	case 4073: { // mpyri +#[i],y1,b
 		unhandled("mpyri +#[i],y1,b");
 		break;
 		}
-	case 4014: { // mpyri -#[i],y1,b
+	case 4074: { // mpyri -#[i],y1,b
 		unhandled("mpyri -#[i],y1,b");
 		break;
 		}
-	case 4015: { // mpyri +#[i],x0,a
+	case 4075: { // mpyri +#[i],x0,a
 		unhandled("mpyri +#[i],x0,a");
 		break;
 		}
-	case 4016: { // mpyri -#[i],x0,a
+	case 4076: { // mpyri -#[i],x0,a
 		unhandled("mpyri -#[i],x0,a");
 		break;
 		}
-	case 4017: { // mpyri +#[i],x0,b
+	case 4077: { // mpyri +#[i],x0,b
 		unhandled("mpyri +#[i],x0,b");
 		break;
 		}
-	case 4018: { // mpyri -#[i],x0,b
+	case 4078: { // mpyri -#[i],x0,b
 		unhandled("mpyri -#[i],x0,b");
 		break;
 		}
-	case 4019: { // mpyri +#[i],y0,a
+	case 4079: { // mpyri +#[i],y0,a
 		unhandled("mpyri +#[i],y0,a");
 		break;
 		}
-	case 4020: { // mpyri -#[i],y0,a
+	case 4080: { // mpyri -#[i],y0,a
 		unhandled("mpyri -#[i],y0,a");
 		break;
 		}
-	case 4021: { // mpyri +#[i],y0,b
+	case 4081: { // mpyri +#[i],y0,b
 		unhandled("mpyri +#[i],y0,b");
 		break;
 		}
-	case 4022: { // mpyri -#[i],y0,b
+	case 4082: { // mpyri -#[i],y0,b
 		unhandled("mpyri -#[i],y0,b");
 		break;
 		}
-	case 4023: { // mpyri +#[i],x1,a
+	case 4083: { // mpyri +#[i],x1,a
 		unhandled("mpyri +#[i],x1,a");
 		break;
 		}
-	case 4024: { // mpyri -#[i],x1,a
+	case 4084: { // mpyri -#[i],x1,a
 		unhandled("mpyri -#[i],x1,a");
 		break;
 		}
-	case 4025: { // mpyri +#[i],x1,b
+	case 4085: { // mpyri +#[i],x1,b
 		unhandled("mpyri +#[i],x1,b");
 		break;
 		}
-	case 4026: { // mpyri -#[i],x1,b
+	case 4086: { // mpyri -#[i],x1,b
 		unhandled("mpyri -#[i],x1,b");
 		break;
 		}
-	case 4027: { // norm r,a
+	case 4087: { // norm r,a
 		unhandled("norm r,a");
 		break;
 		}
-	case 4028: { // norm r,b
+	case 4088: { // norm r,b
 		unhandled("norm r,b");
 		break;
 		}
-	case 4029: { // normf a1,a
+	case 4089: { // normf a1,a
 		unhandled("normf a1,a");
 		break;
 		}
-	case 4030: { // normf a1,b
+	case 4090: { // normf a1,b
 		unhandled("normf a1,b");
 		break;
 		}
-	case 4031: { // normf b1,a
+	case 4091: { // normf b1,a
 		unhandled("normf b1,a");
 		break;
 		}
-	case 4032: { // normf b1,b
+	case 4092: { // normf b1,b
 		unhandled("normf b1,b");
 		break;
 		}
-	case 4033: { // normf x0,a
+	case 4093: { // normf x0,a
 		unhandled("normf x0,a");
 		break;
 		}
-	case 4034: { // normf x0,b
+	case 4094: { // normf x0,b
 		unhandled("normf x0,b");
 		break;
 		}
-	case 4035: { // normf y0,a
+	case 4095: { // normf y0,a
 		unhandled("normf y0,a");
 		break;
 		}
-	case 4036: { // normf y0,b
+	case 4096: { // normf y0,b
 		unhandled("normf y0,b");
 		break;
 		}
-	case 4037: { // normf x1,a
+	case 4097: { // normf x1,a
 		unhandled("normf x1,a");
 		break;
 		}
-	case 4038: { // normf x1,b
+	case 4098: { // normf x1,b
 		unhandled("normf x1,b");
 		break;
 		}
-	case 4039: { // normf y1,a
+	case 4099: { // normf y1,a
 		unhandled("normf y1,a");
 		break;
 		}
-	case 4040: { // normf y1,b
+	case 4100: { // normf y1,b
 		unhandled("normf y1,b");
 		break;
 		}
-	case 4041: { // or #[i],a
+	case 4101: { // or #[i],a
 		unhandled("or #[i],a");
 		break;
 		}
-	case 4042: { // or #[i],b
+	case 4102: { // or #[i],b
 		unhandled("or #[i],b");
 		break;
 		}
-	case 4043: { // or #[i],a
+	case 4103: { // or #[i],a
 		unhandled("or #[i],a");
 		break;
 		}
-	case 4044: { // or #[i],b
+	case 4104: { // or #[i],b
 		unhandled("or #[i],b");
 		break;
 		}
-	case 4045: { // ori #[i],mr
+	case 4105: { // ori #[i],mr
 		unhandled("ori #[i],mr");
 		break;
 		}
-	case 4046: { // ori #[i],ccr
+	case 4106: { // ori #[i],ccr
 		unhandled("ori #[i],ccr");
 		break;
 		}
-	case 4047: { // ori #[i],com
+	case 4107: { // ori #[i],com
 		unhandled("ori #[i],com");
 		break;
 		}
-	case 4048: { // ori #[i],eom
+	case 4108: { // ori #[i],eom
 		unhandled("ori #[i],eom");
 		break;
 		}
-	case 4049: { // pflush
+	case 4109: { // pflush
 		unhandled("pflush");
 		break;
 		}
-	case 4050: { // pflushun
+	case 4110: { // pflushun
 		unhandled("pflushun");
 		break;
 		}
-	case 4051: { // pfree
+	case 4111: { // pfree
 		unhandled("pfree");
 		break;
 		}
-	case 4052: { // plock (r)-n
+	case 4112: { // plock (r)-n
 		unhandled("plock (r)-n");
 		break;
 		}
-	case 4053: { // plock (r)+n
+	case 4113: { // plock (r)+n
 		unhandled("plock (r)+n");
 		break;
 		}
-	case 4054: { // plock (r)-
+	case 4114: { // plock (r)-
 		unhandled("plock (r)-");
 		break;
 		}
-	case 4055: { // plock (r)+
+	case 4115: { // plock (r)+
 		unhandled("plock (r)+");
 		break;
 		}
-	case 4056: { // plock (r)
+	case 4116: { // plock (r)
 		unhandled("plock (r)");
 		break;
 		}
-	case 4057: { // plock (r+n)
+	case 4117: { // plock (r+n)
 		unhandled("plock (r+n)");
 		break;
 		}
-	case 4058: { // plock -(r)
+	case 4118: { // plock -(r)
 		unhandled("plock -(r)");
 		break;
 		}
-	case 4059: { // plock [abs]
+	case 4119: { // plock [abs]
 		unhandled("plock [abs]");
 		break;
 		}
-	case 4060: { // plockr [x]
+	case 4120: { // plockr [x]
 		unhandled("plockr [x]");
 		break;
 		}
-	case 4061: { // punlock (r)-n
+	case 4121: { // punlock (r)-n
 		unhandled("punlock (r)-n");
 		break;
 		}
-	case 4062: { // punlock (r)+n
+	case 4122: { // punlock (r)+n
 		unhandled("punlock (r)+n");
 		break;
 		}
-	case 4063: { // punlock (r)-
+	case 4123: { // punlock (r)-
 		unhandled("punlock (r)-");
 		break;
 		}
-	case 4064: { // punlock (r)+
+	case 4124: { // punlock (r)+
 		unhandled("punlock (r)+");
 		break;
 		}
-	case 4065: { // punlock (r)
+	case 4125: { // punlock (r)
 		unhandled("punlock (r)");
 		break;
 		}
-	case 4066: { // punlock (r+n)
+	case 4126: { // punlock (r+n)
 		unhandled("punlock (r+n)");
 		break;
 		}
-	case 4067: { // punlock -(r)
+	case 4127: { // punlock -(r)
 		unhandled("punlock -(r)");
 		break;
 		}
-	case 4068: { // punlock [abs]
+	case 4128: { // punlock [abs]
 		unhandled("punlock [abs]");
 		break;
 		}
-	case 4069: { // punlockr [x]
+	case 4129: { // punlockr [x]
 		unhandled("punlockr [x]");
 		break;
 		}
-	case 4070: { // rep x:(r)-n
+	case 4130: { // rep x:(r)-n
 		unhandled("rep x:(r)-n");
 		break;
 		}
-	case 4071: { // rep y:(r)-n
+	case 4131: { // rep y:(r)-n
 		unhandled("rep y:(r)-n");
 		break;
 		}
-	case 4072: { // rep x:(r)+n
+	case 4132: { // rep x:(r)+n
 		unhandled("rep x:(r)+n");
 		break;
 		}
-	case 4073: { // rep y:(r)+n
+	case 4133: { // rep y:(r)+n
 		unhandled("rep y:(r)+n");
 		break;
 		}
-	case 4074: { // rep x:(r)-
+	case 4134: { // rep x:(r)-
 		unhandled("rep x:(r)-");
 		break;
 		}
-	case 4075: { // rep y:(r)-
+	case 4135: { // rep y:(r)-
 		unhandled("rep y:(r)-");
 		break;
 		}
-	case 4076: { // rep x:(r)+
+	case 4136: { // rep x:(r)+
 		unhandled("rep x:(r)+");
 		break;
 		}
-	case 4077: { // rep y:(r)+
+	case 4137: { // rep y:(r)+
 		unhandled("rep y:(r)+");
 		break;
 		}
-	case 4078: { // rep x:(r)
+	case 4138: { // rep x:(r)
 		unhandled("rep x:(r)");
 		break;
 		}
-	case 4079: { // rep y:(r)
+	case 4139: { // rep y:(r)
 		unhandled("rep y:(r)");
 		break;
 		}
-	case 4080: { // rep x:(r+n)
+	case 4140: { // rep x:(r+n)
 		unhandled("rep x:(r+n)");
 		break;
 		}
-	case 4081: { // rep y:(r+n)
+	case 4141: { // rep y:(r+n)
 		unhandled("rep y:(r+n)");
 		break;
 		}
-	case 4082: { // rep x:-(r)
+	case 4142: { // rep x:-(r)
 		unhandled("rep x:-(r)");
 		break;
 		}
-	case 4083: { // rep y:-(r)
+	case 4143: { // rep y:-(r)
 		unhandled("rep y:-(r)");
 		break;
 		}
-	case 4084: { // rep x:[aa]
+	case 4144: { // rep x:[aa]
 		unhandled("rep x:[aa]");
 		break;
 		}
-	case 4085: { // rep y:[aa]
+	case 4145: { // rep y:[aa]
 		unhandled("rep y:[aa]");
 		break;
 		}
-	case 4086: { // rep #[i]
+	case 4146: { // rep #[i]
 		unhandled("rep #[i]");
 		break;
 		}
-	case 4087: { // rep x0
+	case 4147: { // rep x0
 		unhandled("rep x0");
 		break;
 		}
-	case 4088: { // rep x1
+	case 4148: { // rep x1
 		unhandled("rep x1");
 		break;
 		}
-	case 4089: { // rep y0
+	case 4149: { // rep y0
 		unhandled("rep y0");
 		break;
 		}
-	case 4090: { // rep y1
+	case 4150: { // rep y1
 		unhandled("rep y1");
 		break;
 		}
-	case 4091: { // rep a0
+	case 4151: { // rep a0
 		unhandled("rep a0");
 		break;
 		}
-	case 4092: { // rep b0
+	case 4152: { // rep b0
 		unhandled("rep b0");
 		break;
 		}
-	case 4093: { // rep a2
+	case 4153: { // rep a2
 		unhandled("rep a2");
 		break;
 		}
-	case 4094: { // rep b2
+	case 4154: { // rep b2
 		unhandled("rep b2");
 		break;
 		}
-	case 4095: { // rep a1
+	case 4155: { // rep a1
 		unhandled("rep a1");
 		break;
 		}
-	case 4096: { // rep b1
+	case 4156: { // rep b1
 		unhandled("rep b1");
 		break;
 		}
-	case 4097: { // rep a
+	case 4157: { // rep a
 		unhandled("rep a");
 		break;
 		}
-	case 4098: { // rep b
+	case 4158: { // rep b
 		unhandled("rep b");
 		break;
 		}
-	case 4099: { // rep r
+	case 4159: { // rep r
 		unhandled("rep r");
 		break;
 		}
-	case 4100: { // rep n
+	case 4160: { // rep n
 		unhandled("rep n");
 		break;
 		}
-	case 4101: { // rep m
+	case 4161: { // rep m
 		unhandled("rep m");
 		break;
 		}
-	case 4102: { // rep ep
+	case 4162: { // rep ep
 		unhandled("rep ep");
 		break;
 		}
-	case 4103: { // rep vba
+	case 4163: { // rep vba
 		unhandled("rep vba");
 		break;
 		}
-	case 4104: { // rep sc
+	case 4164: { // rep sc
 		unhandled("rep sc");
 		break;
 		}
-	case 4105: { // rep sz
+	case 4165: { // rep sz
 		unhandled("rep sz");
 		break;
 		}
-	case 4106: { // rep sr
+	case 4166: { // rep sr
 		unhandled("rep sr");
 		break;
 		}
-	case 4107: { // rep omr
+	case 4167: { // rep omr
 		unhandled("rep omr");
 		break;
 		}
-	case 4108: { // rep sp
+	case 4168: { // rep sp
 		unhandled("rep sp");
 		break;
 		}
-	case 4109: { // rep ssh
+	case 4169: { // rep ssh
 		unhandled("rep ssh");
 		break;
 		}
-	case 4110: { // rep ssl
+	case 4170: { // rep ssl
 		unhandled("rep ssl");
 		break;
 		}
-	case 4111: { // rep la
+	case 4171: { // rep la
 		unhandled("rep la");
 		break;
 		}
-	case 4112: { // rep lc
+	case 4172: { // rep lc
 		unhandled("rep lc");
 		break;
 		}
-	case 4113: { // reset
+	case 4173: { // reset
 		unhandled("reset");
 		break;
 		}
-	case 4114: { // rti
+	case 4174: { // rti
 		unhandled("rti");
 		break;
 		}
-	case 4115: { // rts
+	case 4175: { // rts
 		unhandled("rts");
 		break;
 		}
-	case 4116: { // stop
+	case 4176: { // stop
 		unhandled("stop");
 		break;
 		}
-	case 4117: { // sub #[i],a
+	case 4177: { // sub #[i],a
 		unhandled("sub #[i],a");
 		break;
 		}
-	case 4118: { // sub #[i],b
+	case 4178: { // sub #[i],b
 		unhandled("sub #[i],b");
 		break;
 		}
-	case 4119: { // sub #[i],a
+	case 4179: { // sub #[i],a
 		unhandled("sub #[i],a");
 		break;
 		}
-	case 4120: { // sub #[i],b
+	case 4180: { // sub #[i],b
 		unhandled("sub #[i],b");
 		break;
 		}
-	case 4121: { // tcc b,a
+	case 4181: { // tcc b,a
 		unhandled("tcc b,a");
 		break;
 		}
-	case 4122: { // tcc b,b
+	case 4182: { // tcc b,b
 		unhandled("tcc b,b");
 		break;
 		}
-	case 4123: { // tcc x0,a
+	case 4183: { // tcc x0,a
 		unhandled("tcc x0,a");
 		break;
 		}
-	case 4124: { // tcc x0,b
+	case 4184: { // tcc x0,b
 		unhandled("tcc x0,b");
 		break;
 		}
-	case 4125: { // tcc y0,a
+	case 4185: { // tcc y0,a
 		unhandled("tcc y0,a");
 		break;
 		}
-	case 4126: { // tcc y0,b
+	case 4186: { // tcc y0,b
 		unhandled("tcc y0,b");
 		break;
 		}
-	case 4127: { // tcc x1,a
+	case 4187: { // tcc x1,a
 		unhandled("tcc x1,a");
 		break;
 		}
-	case 4128: { // tcc x1,b
+	case 4188: { // tcc x1,b
 		unhandled("tcc x1,b");
 		break;
 		}
-	case 4129: { // tcc y1,a
+	case 4189: { // tcc y1,a
 		unhandled("tcc y1,a");
 		break;
 		}
-	case 4130: { // tcc y1,b
+	case 4190: { // tcc y1,b
 		unhandled("tcc y1,b");
 		break;
 		}
-	case 4131: { // tge b,a
+	case 4191: { // tge b,a
 		unhandled("tge b,a");
 		break;
 		}
-	case 4132: { // tge b,b
+	case 4192: { // tge b,b
 		unhandled("tge b,b");
 		break;
 		}
-	case 4133: { // tge x0,a
+	case 4193: { // tge x0,a
 		unhandled("tge x0,a");
 		break;
 		}
-	case 4134: { // tge x0,b
+	case 4194: { // tge x0,b
 		unhandled("tge x0,b");
 		break;
 		}
-	case 4135: { // tge y0,a
+	case 4195: { // tge y0,a
 		unhandled("tge y0,a");
 		break;
 		}
-	case 4136: { // tge y0,b
+	case 4196: { // tge y0,b
 		unhandled("tge y0,b");
 		break;
 		}
-	case 4137: { // tge x1,a
+	case 4197: { // tge x1,a
 		unhandled("tge x1,a");
 		break;
 		}
-	case 4138: { // tge x1,b
+	case 4198: { // tge x1,b
 		unhandled("tge x1,b");
 		break;
 		}
-	case 4139: { // tge y1,a
+	case 4199: { // tge y1,a
 		unhandled("tge y1,a");
 		break;
 		}
-	case 4140: { // tge y1,b
+	case 4200: { // tge y1,b
 		unhandled("tge y1,b");
 		break;
 		}
-	case 4141: { // tne b,a
+	case 4201: { // tne b,a
 		unhandled("tne b,a");
 		break;
 		}
-	case 4142: { // tne b,b
+	case 4202: { // tne b,b
 		unhandled("tne b,b");
 		break;
 		}
-	case 4143: { // tne x0,a
+	case 4203: { // tne x0,a
 		unhandled("tne x0,a");
 		break;
 		}
-	case 4144: { // tne x0,b
+	case 4204: { // tne x0,b
 		unhandled("tne x0,b");
 		break;
 		}
-	case 4145: { // tne y0,a
+	case 4205: { // tne y0,a
 		unhandled("tne y0,a");
 		break;
 		}
-	case 4146: { // tne y0,b
+	case 4206: { // tne y0,b
 		unhandled("tne y0,b");
 		break;
 		}
-	case 4147: { // tne x1,a
+	case 4207: { // tne x1,a
 		unhandled("tne x1,a");
 		break;
 		}
-	case 4148: { // tne x1,b
+	case 4208: { // tne x1,b
 		unhandled("tne x1,b");
 		break;
 		}
-	case 4149: { // tne y1,a
+	case 4209: { // tne y1,a
 		unhandled("tne y1,a");
 		break;
 		}
-	case 4150: { // tne y1,b
+	case 4210: { // tne y1,b
 		unhandled("tne y1,b");
 		break;
 		}
-	case 4151: { // tpl b,a
+	case 4211: { // tpl b,a
 		unhandled("tpl b,a");
 		break;
 		}
-	case 4152: { // tpl b,b
+	case 4212: { // tpl b,b
 		unhandled("tpl b,b");
 		break;
 		}
-	case 4153: { // tpl x0,a
+	case 4213: { // tpl x0,a
 		unhandled("tpl x0,a");
 		break;
 		}
-	case 4154: { // tpl x0,b
+	case 4214: { // tpl x0,b
 		unhandled("tpl x0,b");
 		break;
 		}
-	case 4155: { // tpl y0,a
+	case 4215: { // tpl y0,a
 		unhandled("tpl y0,a");
 		break;
 		}
-	case 4156: { // tpl y0,b
+	case 4216: { // tpl y0,b
 		unhandled("tpl y0,b");
 		break;
 		}
-	case 4157: { // tpl x1,a
+	case 4217: { // tpl x1,a
 		unhandled("tpl x1,a");
 		break;
 		}
-	case 4158: { // tpl x1,b
+	case 4218: { // tpl x1,b
 		unhandled("tpl x1,b");
 		break;
 		}
-	case 4159: { // tpl y1,a
+	case 4219: { // tpl y1,a
 		unhandled("tpl y1,a");
 		break;
 		}
-	case 4160: { // tpl y1,b
+	case 4220: { // tpl y1,b
 		unhandled("tpl y1,b");
 		break;
 		}
-	case 4161: { // tnn b,a
+	case 4221: { // tnn b,a
 		unhandled("tnn b,a");
 		break;
 		}
-	case 4162: { // tnn b,b
+	case 4222: { // tnn b,b
 		unhandled("tnn b,b");
 		break;
 		}
-	case 4163: { // tnn x0,a
+	case 4223: { // tnn x0,a
 		unhandled("tnn x0,a");
 		break;
 		}
-	case 4164: { // tnn x0,b
+	case 4224: { // tnn x0,b
 		unhandled("tnn x0,b");
 		break;
 		}
-	case 4165: { // tnn y0,a
+	case 4225: { // tnn y0,a
 		unhandled("tnn y0,a");
 		break;
 		}
-	case 4166: { // tnn y0,b
+	case 4226: { // tnn y0,b
 		unhandled("tnn y0,b");
 		break;
 		}
-	case 4167: { // tnn x1,a
+	case 4227: { // tnn x1,a
 		unhandled("tnn x1,a");
 		break;
 		}
-	case 4168: { // tnn x1,b
+	case 4228: { // tnn x1,b
 		unhandled("tnn x1,b");
 		break;
 		}
-	case 4169: { // tnn y1,a
+	case 4229: { // tnn y1,a
 		unhandled("tnn y1,a");
 		break;
 		}
-	case 4170: { // tnn y1,b
+	case 4230: { // tnn y1,b
 		unhandled("tnn y1,b");
 		break;
 		}
-	case 4171: { // tec b,a
+	case 4231: { // tec b,a
 		unhandled("tec b,a");
 		break;
 		}
-	case 4172: { // tec b,b
+	case 4232: { // tec b,b
 		unhandled("tec b,b");
 		break;
 		}
-	case 4173: { // tec x0,a
+	case 4233: { // tec x0,a
 		unhandled("tec x0,a");
 		break;
 		}
-	case 4174: { // tec x0,b
+	case 4234: { // tec x0,b
 		unhandled("tec x0,b");
 		break;
 		}
-	case 4175: { // tec y0,a
+	case 4235: { // tec y0,a
 		unhandled("tec y0,a");
 		break;
 		}
-	case 4176: { // tec y0,b
+	case 4236: { // tec y0,b
 		unhandled("tec y0,b");
 		break;
 		}
-	case 4177: { // tec x1,a
+	case 4237: { // tec x1,a
 		unhandled("tec x1,a");
 		break;
 		}
-	case 4178: { // tec x1,b
+	case 4238: { // tec x1,b
 		unhandled("tec x1,b");
 		break;
 		}
-	case 4179: { // tec y1,a
+	case 4239: { // tec y1,a
 		unhandled("tec y1,a");
 		break;
 		}
-	case 4180: { // tec y1,b
+	case 4240: { // tec y1,b
 		unhandled("tec y1,b");
 		break;
 		}
-	case 4181: { // tlc b,a
+	case 4241: { // tlc b,a
 		unhandled("tlc b,a");
 		break;
 		}
-	case 4182: { // tlc b,b
+	case 4242: { // tlc b,b
 		unhandled("tlc b,b");
 		break;
 		}
-	case 4183: { // tlc x0,a
+	case 4243: { // tlc x0,a
 		unhandled("tlc x0,a");
 		break;
 		}
-	case 4184: { // tlc x0,b
+	case 4244: { // tlc x0,b
 		unhandled("tlc x0,b");
 		break;
 		}
-	case 4185: { // tlc y0,a
+	case 4245: { // tlc y0,a
 		unhandled("tlc y0,a");
 		break;
 		}
-	case 4186: { // tlc y0,b
+	case 4246: { // tlc y0,b
 		unhandled("tlc y0,b");
 		break;
 		}
-	case 4187: { // tlc x1,a
+	case 4247: { // tlc x1,a
 		unhandled("tlc x1,a");
 		break;
 		}
-	case 4188: { // tlc x1,b
+	case 4248: { // tlc x1,b
 		unhandled("tlc x1,b");
 		break;
 		}
-	case 4189: { // tlc y1,a
+	case 4249: { // tlc y1,a
 		unhandled("tlc y1,a");
 		break;
 		}
-	case 4190: { // tlc y1,b
+	case 4250: { // tlc y1,b
 		unhandled("tlc y1,b");
 		break;
 		}
-	case 4191: { // tgt b,a
+	case 4251: { // tgt b,a
 		unhandled("tgt b,a");
 		break;
 		}
-	case 4192: { // tgt b,b
+	case 4252: { // tgt b,b
 		unhandled("tgt b,b");
 		break;
 		}
-	case 4193: { // tgt x0,a
+	case 4253: { // tgt x0,a
 		unhandled("tgt x0,a");
 		break;
 		}
-	case 4194: { // tgt x0,b
+	case 4254: { // tgt x0,b
 		unhandled("tgt x0,b");
 		break;
 		}
-	case 4195: { // tgt y0,a
+	case 4255: { // tgt y0,a
 		unhandled("tgt y0,a");
 		break;
 		}
-	case 4196: { // tgt y0,b
+	case 4256: { // tgt y0,b
 		unhandled("tgt y0,b");
 		break;
 		}
-	case 4197: { // tgt x1,a
+	case 4257: { // tgt x1,a
 		unhandled("tgt x1,a");
 		break;
 		}
-	case 4198: { // tgt x1,b
+	case 4258: { // tgt x1,b
 		unhandled("tgt x1,b");
 		break;
 		}
-	case 4199: { // tgt y1,a
+	case 4259: { // tgt y1,a
 		unhandled("tgt y1,a");
 		break;
 		}
-	case 4200: { // tgt y1,b
+	case 4260: { // tgt y1,b
 		unhandled("tgt y1,b");
 		break;
 		}
-	case 4201: { // tcs b,a
+	case 4261: { // tcs b,a
 		unhandled("tcs b,a");
 		break;
 		}
-	case 4202: { // tcs b,b
+	case 4262: { // tcs b,b
 		unhandled("tcs b,b");
 		break;
 		}
-	case 4203: { // tcs x0,a
+	case 4263: { // tcs x0,a
 		unhandled("tcs x0,a");
 		break;
 		}
-	case 4204: { // tcs x0,b
+	case 4264: { // tcs x0,b
 		unhandled("tcs x0,b");
 		break;
 		}
-	case 4205: { // tcs y0,a
+	case 4265: { // tcs y0,a
 		unhandled("tcs y0,a");
 		break;
 		}
-	case 4206: { // tcs y0,b
+	case 4266: { // tcs y0,b
 		unhandled("tcs y0,b");
 		break;
 		}
-	case 4207: { // tcs x1,a
+	case 4267: { // tcs x1,a
 		unhandled("tcs x1,a");
 		break;
 		}
-	case 4208: { // tcs x1,b
+	case 4268: { // tcs x1,b
 		unhandled("tcs x1,b");
 		break;
 		}
-	case 4209: { // tcs y1,a
+	case 4269: { // tcs y1,a
 		unhandled("tcs y1,a");
 		break;
 		}
-	case 4210: { // tcs y1,b
+	case 4270: { // tcs y1,b
 		unhandled("tcs y1,b");
 		break;
 		}
-	case 4211: { // tlt b,a
+	case 4271: { // tlt b,a
 		unhandled("tlt b,a");
 		break;
 		}
-	case 4212: { // tlt b,b
+	case 4272: { // tlt b,b
 		unhandled("tlt b,b");
 		break;
 		}
-	case 4213: { // tlt x0,a
+	case 4273: { // tlt x0,a
 		unhandled("tlt x0,a");
 		break;
 		}
-	case 4214: { // tlt x0,b
+	case 4274: { // tlt x0,b
 		unhandled("tlt x0,b");
 		break;
 		}
-	case 4215: { // tlt y0,a
+	case 4275: { // tlt y0,a
 		unhandled("tlt y0,a");
 		break;
 		}
-	case 4216: { // tlt y0,b
+	case 4276: { // tlt y0,b
 		unhandled("tlt y0,b");
 		break;
 		}
-	case 4217: { // tlt x1,a
+	case 4277: { // tlt x1,a
 		unhandled("tlt x1,a");
 		break;
 		}
-	case 4218: { // tlt x1,b
+	case 4278: { // tlt x1,b
 		unhandled("tlt x1,b");
 		break;
 		}
-	case 4219: { // tlt y1,a
+	case 4279: { // tlt y1,a
 		unhandled("tlt y1,a");
 		break;
 		}
-	case 4220: { // tlt y1,b
+	case 4280: { // tlt y1,b
 		unhandled("tlt y1,b");
 		break;
 		}
-	case 4221: { // teq b,a
+	case 4281: { // teq b,a
 		unhandled("teq b,a");
 		break;
 		}
-	case 4222: { // teq b,b
+	case 4282: { // teq b,b
 		unhandled("teq b,b");
 		break;
 		}
-	case 4223: { // teq x0,a
+	case 4283: { // teq x0,a
 		unhandled("teq x0,a");
 		break;
 		}
-	case 4224: { // teq x0,b
+	case 4284: { // teq x0,b
 		unhandled("teq x0,b");
 		break;
 		}
-	case 4225: { // teq y0,a
+	case 4285: { // teq y0,a
 		unhandled("teq y0,a");
 		break;
 		}
-	case 4226: { // teq y0,b
+	case 4286: { // teq y0,b
 		unhandled("teq y0,b");
 		break;
 		}
-	case 4227: { // teq x1,a
+	case 4287: { // teq x1,a
 		unhandled("teq x1,a");
 		break;
 		}
-	case 4228: { // teq x1,b
+	case 4288: { // teq x1,b
 		unhandled("teq x1,b");
 		break;
 		}
-	case 4229: { // teq y1,a
+	case 4289: { // teq y1,a
 		unhandled("teq y1,a");
 		break;
 		}
-	case 4230: { // teq y1,b
+	case 4290: { // teq y1,b
 		unhandled("teq y1,b");
 		break;
 		}
-	case 4231: { // tmi b,a
+	case 4291: { // tmi b,a
 		unhandled("tmi b,a");
 		break;
 		}
-	case 4232: { // tmi b,b
+	case 4292: { // tmi b,b
 		unhandled("tmi b,b");
 		break;
 		}
-	case 4233: { // tmi x0,a
+	case 4293: { // tmi x0,a
 		unhandled("tmi x0,a");
 		break;
 		}
-	case 4234: { // tmi x0,b
+	case 4294: { // tmi x0,b
 		unhandled("tmi x0,b");
 		break;
 		}
-	case 4235: { // tmi y0,a
+	case 4295: { // tmi y0,a
 		unhandled("tmi y0,a");
 		break;
 		}
-	case 4236: { // tmi y0,b
+	case 4296: { // tmi y0,b
 		unhandled("tmi y0,b");
 		break;
 		}
-	case 4237: { // tmi x1,a
+	case 4297: { // tmi x1,a
 		unhandled("tmi x1,a");
 		break;
 		}
-	case 4238: { // tmi x1,b
+	case 4298: { // tmi x1,b
 		unhandled("tmi x1,b");
 		break;
 		}
-	case 4239: { // tmi y1,a
+	case 4299: { // tmi y1,a
 		unhandled("tmi y1,a");
 		break;
 		}
-	case 4240: { // tmi y1,b
+	case 4300: { // tmi y1,b
 		unhandled("tmi y1,b");
 		break;
 		}
-	case 4241: { // tnr b,a
+	case 4301: { // tnr b,a
 		unhandled("tnr b,a");
 		break;
 		}
-	case 4242: { // tnr b,b
+	case 4302: { // tnr b,b
 		unhandled("tnr b,b");
 		break;
 		}
-	case 4243: { // tnr x0,a
+	case 4303: { // tnr x0,a
 		unhandled("tnr x0,a");
 		break;
 		}
-	case 4244: { // tnr x0,b
+	case 4304: { // tnr x0,b
 		unhandled("tnr x0,b");
 		break;
 		}
-	case 4245: { // tnr y0,a
+	case 4305: { // tnr y0,a
 		unhandled("tnr y0,a");
 		break;
 		}
-	case 4246: { // tnr y0,b
+	case 4306: { // tnr y0,b
 		unhandled("tnr y0,b");
 		break;
 		}
-	case 4247: { // tnr x1,a
+	case 4307: { // tnr x1,a
 		unhandled("tnr x1,a");
 		break;
 		}
-	case 4248: { // tnr x1,b
+	case 4308: { // tnr x1,b
 		unhandled("tnr x1,b");
 		break;
 		}
-	case 4249: { // tnr y1,a
+	case 4309: { // tnr y1,a
 		unhandled("tnr y1,a");
 		break;
 		}
-	case 4250: { // tnr y1,b
+	case 4310: { // tnr y1,b
 		unhandled("tnr y1,b");
 		break;
 		}
-	case 4251: { // tes b,a
+	case 4311: { // tes b,a
 		unhandled("tes b,a");
 		break;
 		}
-	case 4252: { // tes b,b
+	case 4312: { // tes b,b
 		unhandled("tes b,b");
 		break;
 		}
-	case 4253: { // tes x0,a
+	case 4313: { // tes x0,a
 		unhandled("tes x0,a");
 		break;
 		}
-	case 4254: { // tes x0,b
+	case 4314: { // tes x0,b
 		unhandled("tes x0,b");
 		break;
 		}
-	case 4255: { // tes y0,a
+	case 4315: { // tes y0,a
 		unhandled("tes y0,a");
 		break;
 		}
-	case 4256: { // tes y0,b
+	case 4316: { // tes y0,b
 		unhandled("tes y0,b");
 		break;
 		}
-	case 4257: { // tes x1,a
+	case 4317: { // tes x1,a
 		unhandled("tes x1,a");
 		break;
 		}
-	case 4258: { // tes x1,b
+	case 4318: { // tes x1,b
 		unhandled("tes x1,b");
 		break;
 		}
-	case 4259: { // tes y1,a
+	case 4319: { // tes y1,a
 		unhandled("tes y1,a");
 		break;
 		}
-	case 4260: { // tes y1,b
+	case 4320: { // tes y1,b
 		unhandled("tes y1,b");
 		break;
 		}
-	case 4261: { // tls b,a
+	case 4321: { // tls b,a
 		unhandled("tls b,a");
 		break;
 		}
-	case 4262: { // tls b,b
+	case 4322: { // tls b,b
 		unhandled("tls b,b");
 		break;
 		}
-	case 4263: { // tls x0,a
+	case 4323: { // tls x0,a
 		unhandled("tls x0,a");
 		break;
 		}
-	case 4264: { // tls x0,b
+	case 4324: { // tls x0,b
 		unhandled("tls x0,b");
 		break;
 		}
-	case 4265: { // tls y0,a
+	case 4325: { // tls y0,a
 		unhandled("tls y0,a");
 		break;
 		}
-	case 4266: { // tls y0,b
+	case 4326: { // tls y0,b
 		unhandled("tls y0,b");
 		break;
 		}
-	case 4267: { // tls x1,a
+	case 4327: { // tls x1,a
 		unhandled("tls x1,a");
 		break;
 		}
-	case 4268: { // tls x1,b
+	case 4328: { // tls x1,b
 		unhandled("tls x1,b");
 		break;
 		}
-	case 4269: { // tls y1,a
+	case 4329: { // tls y1,a
 		unhandled("tls y1,a");
 		break;
 		}
-	case 4270: { // tls y1,b
+	case 4330: { // tls y1,b
 		unhandled("tls y1,b");
 		break;
 		}
-	case 4271: { // tle b,a
+	case 4331: { // tle b,a
 		unhandled("tle b,a");
 		break;
 		}
-	case 4272: { // tle b,b
+	case 4332: { // tle b,b
 		unhandled("tle b,b");
 		break;
 		}
-	case 4273: { // tle x0,a
+	case 4333: { // tle x0,a
 		unhandled("tle x0,a");
 		break;
 		}
-	case 4274: { // tle x0,b
+	case 4334: { // tle x0,b
 		unhandled("tle x0,b");
 		break;
 		}
-	case 4275: { // tle y0,a
+	case 4335: { // tle y0,a
 		unhandled("tle y0,a");
 		break;
 		}
-	case 4276: { // tle y0,b
+	case 4336: { // tle y0,b
 		unhandled("tle y0,b");
 		break;
 		}
-	case 4277: { // tle x1,a
+	case 4337: { // tle x1,a
 		unhandled("tle x1,a");
 		break;
 		}
-	case 4278: { // tle x1,b
+	case 4338: { // tle x1,b
 		unhandled("tle x1,b");
 		break;
 		}
-	case 4279: { // tle y1,a
+	case 4339: { // tle y1,a
 		unhandled("tle y1,a");
 		break;
 		}
-	case 4280: { // tle y1,b
+	case 4340: { // tle y1,b
 		unhandled("tle y1,b");
 		break;
 		}
-	case 4281: { // tcc b,a r,r
+	case 4341: { // tcc b,a r,r
 		unhandled("tcc b,a r,r");
 		break;
 		}
-	case 4282: { // tcc b,b r,r
+	case 4342: { // tcc b,b r,r
 		unhandled("tcc b,b r,r");
 		break;
 		}
-	case 4283: { // tcc x0,a r,r
+	case 4343: { // tcc x0,a r,r
 		unhandled("tcc x0,a r,r");
 		break;
 		}
-	case 4284: { // tcc x0,b r,r
+	case 4344: { // tcc x0,b r,r
 		unhandled("tcc x0,b r,r");
 		break;
 		}
-	case 4285: { // tcc y0,a r,r
+	case 4345: { // tcc y0,a r,r
 		unhandled("tcc y0,a r,r");
 		break;
 		}
-	case 4286: { // tcc y0,b r,r
+	case 4346: { // tcc y0,b r,r
 		unhandled("tcc y0,b r,r");
 		break;
 		}
-	case 4287: { // tcc x1,a r,r
+	case 4347: { // tcc x1,a r,r
 		unhandled("tcc x1,a r,r");
 		break;
 		}
-	case 4288: { // tcc x1,b r,r
+	case 4348: { // tcc x1,b r,r
 		unhandled("tcc x1,b r,r");
 		break;
 		}
-	case 4289: { // tcc y1,a r,r
+	case 4349: { // tcc y1,a r,r
 		unhandled("tcc y1,a r,r");
 		break;
 		}
-	case 4290: { // tcc y1,b r,r
+	case 4350: { // tcc y1,b r,r
 		unhandled("tcc y1,b r,r");
 		break;
 		}
-	case 4291: { // tge b,a r,r
+	case 4351: { // tge b,a r,r
 		unhandled("tge b,a r,r");
 		break;
 		}
-	case 4292: { // tge b,b r,r
+	case 4352: { // tge b,b r,r
 		unhandled("tge b,b r,r");
 		break;
 		}
-	case 4293: { // tge x0,a r,r
+	case 4353: { // tge x0,a r,r
 		unhandled("tge x0,a r,r");
 		break;
 		}
-	case 4294: { // tge x0,b r,r
+	case 4354: { // tge x0,b r,r
 		unhandled("tge x0,b r,r");
 		break;
 		}
-	case 4295: { // tge y0,a r,r
+	case 4355: { // tge y0,a r,r
 		unhandled("tge y0,a r,r");
 		break;
 		}
-	case 4296: { // tge y0,b r,r
+	case 4356: { // tge y0,b r,r
 		unhandled("tge y0,b r,r");
 		break;
 		}
-	case 4297: { // tge x1,a r,r
+	case 4357: { // tge x1,a r,r
 		unhandled("tge x1,a r,r");
 		break;
 		}
-	case 4298: { // tge x1,b r,r
+	case 4358: { // tge x1,b r,r
 		unhandled("tge x1,b r,r");
 		break;
 		}
-	case 4299: { // tge y1,a r,r
+	case 4359: { // tge y1,a r,r
 		unhandled("tge y1,a r,r");
 		break;
 		}
-	case 4300: { // tge y1,b r,r
+	case 4360: { // tge y1,b r,r
 		unhandled("tge y1,b r,r");
 		break;
 		}
-	case 4301: { // tne b,a r,r
+	case 4361: { // tne b,a r,r
 		unhandled("tne b,a r,r");
 		break;
 		}
-	case 4302: { // tne b,b r,r
+	case 4362: { // tne b,b r,r
 		unhandled("tne b,b r,r");
 		break;
 		}
-	case 4303: { // tne x0,a r,r
+	case 4363: { // tne x0,a r,r
 		unhandled("tne x0,a r,r");
 		break;
 		}
-	case 4304: { // tne x0,b r,r
+	case 4364: { // tne x0,b r,r
 		unhandled("tne x0,b r,r");
 		break;
 		}
-	case 4305: { // tne y0,a r,r
+	case 4365: { // tne y0,a r,r
 		unhandled("tne y0,a r,r");
 		break;
 		}
-	case 4306: { // tne y0,b r,r
+	case 4366: { // tne y0,b r,r
 		unhandled("tne y0,b r,r");
 		break;
 		}
-	case 4307: { // tne x1,a r,r
+	case 4367: { // tne x1,a r,r
 		unhandled("tne x1,a r,r");
 		break;
 		}
-	case 4308: { // tne x1,b r,r
+	case 4368: { // tne x1,b r,r
 		unhandled("tne x1,b r,r");
 		break;
 		}
-	case 4309: { // tne y1,a r,r
+	case 4369: { // tne y1,a r,r
 		unhandled("tne y1,a r,r");
 		break;
 		}
-	case 4310: { // tne y1,b r,r
+	case 4370: { // tne y1,b r,r
 		unhandled("tne y1,b r,r");
 		break;
 		}
-	case 4311: { // tpl b,a r,r
+	case 4371: { // tpl b,a r,r
 		unhandled("tpl b,a r,r");
 		break;
 		}
-	case 4312: { // tpl b,b r,r
+	case 4372: { // tpl b,b r,r
 		unhandled("tpl b,b r,r");
 		break;
 		}
-	case 4313: { // tpl x0,a r,r
+	case 4373: { // tpl x0,a r,r
 		unhandled("tpl x0,a r,r");
 		break;
 		}
-	case 4314: { // tpl x0,b r,r
+	case 4374: { // tpl x0,b r,r
 		unhandled("tpl x0,b r,r");
 		break;
 		}
-	case 4315: { // tpl y0,a r,r
+	case 4375: { // tpl y0,a r,r
 		unhandled("tpl y0,a r,r");
 		break;
 		}
-	case 4316: { // tpl y0,b r,r
+	case 4376: { // tpl y0,b r,r
 		unhandled("tpl y0,b r,r");
 		break;
 		}
-	case 4317: { // tpl x1,a r,r
+	case 4377: { // tpl x1,a r,r
 		unhandled("tpl x1,a r,r");
 		break;
 		}
-	case 4318: { // tpl x1,b r,r
+	case 4378: { // tpl x1,b r,r
 		unhandled("tpl x1,b r,r");
 		break;
 		}
-	case 4319: { // tpl y1,a r,r
+	case 4379: { // tpl y1,a r,r
 		unhandled("tpl y1,a r,r");
 		break;
 		}
-	case 4320: { // tpl y1,b r,r
+	case 4380: { // tpl y1,b r,r
 		unhandled("tpl y1,b r,r");
 		break;
 		}
-	case 4321: { // tnn b,a r,r
+	case 4381: { // tnn b,a r,r
 		unhandled("tnn b,a r,r");
 		break;
 		}
-	case 4322: { // tnn b,b r,r
+	case 4382: { // tnn b,b r,r
 		unhandled("tnn b,b r,r");
 		break;
 		}
-	case 4323: { // tnn x0,a r,r
+	case 4383: { // tnn x0,a r,r
 		unhandled("tnn x0,a r,r");
 		break;
 		}
-	case 4324: { // tnn x0,b r,r
+	case 4384: { // tnn x0,b r,r
 		unhandled("tnn x0,b r,r");
 		break;
 		}
-	case 4325: { // tnn y0,a r,r
+	case 4385: { // tnn y0,a r,r
 		unhandled("tnn y0,a r,r");
 		break;
 		}
-	case 4326: { // tnn y0,b r,r
+	case 4386: { // tnn y0,b r,r
 		unhandled("tnn y0,b r,r");
 		break;
 		}
-	case 4327: { // tnn x1,a r,r
+	case 4387: { // tnn x1,a r,r
 		unhandled("tnn x1,a r,r");
 		break;
 		}
-	case 4328: { // tnn x1,b r,r
+	case 4388: { // tnn x1,b r,r
 		unhandled("tnn x1,b r,r");
 		break;
 		}
-	case 4329: { // tnn y1,a r,r
+	case 4389: { // tnn y1,a r,r
 		unhandled("tnn y1,a r,r");
 		break;
 		}
-	case 4330: { // tnn y1,b r,r
+	case 4390: { // tnn y1,b r,r
 		unhandled("tnn y1,b r,r");
 		break;
 		}
-	case 4331: { // tec b,a r,r
+	case 4391: { // tec b,a r,r
 		unhandled("tec b,a r,r");
 		break;
 		}
-	case 4332: { // tec b,b r,r
+	case 4392: { // tec b,b r,r
 		unhandled("tec b,b r,r");
 		break;
 		}
-	case 4333: { // tec x0,a r,r
+	case 4393: { // tec x0,a r,r
 		unhandled("tec x0,a r,r");
 		break;
 		}
-	case 4334: { // tec x0,b r,r
+	case 4394: { // tec x0,b r,r
 		unhandled("tec x0,b r,r");
 		break;
 		}
-	case 4335: { // tec y0,a r,r
+	case 4395: { // tec y0,a r,r
 		unhandled("tec y0,a r,r");
 		break;
 		}
-	case 4336: { // tec y0,b r,r
+	case 4396: { // tec y0,b r,r
 		unhandled("tec y0,b r,r");
 		break;
 		}
-	case 4337: { // tec x1,a r,r
+	case 4397: { // tec x1,a r,r
 		unhandled("tec x1,a r,r");
 		break;
 		}
-	case 4338: { // tec x1,b r,r
+	case 4398: { // tec x1,b r,r
 		unhandled("tec x1,b r,r");
 		break;
 		}
-	case 4339: { // tec y1,a r,r
+	case 4399: { // tec y1,a r,r
 		unhandled("tec y1,a r,r");
 		break;
 		}
-	case 4340: { // tec y1,b r,r
+	case 4400: { // tec y1,b r,r
 		unhandled("tec y1,b r,r");
 		break;
 		}
-	case 4341: { // tlc b,a r,r
+	case 4401: { // tlc b,a r,r
 		unhandled("tlc b,a r,r");
 		break;
 		}
-	case 4342: { // tlc b,b r,r
+	case 4402: { // tlc b,b r,r
 		unhandled("tlc b,b r,r");
 		break;
 		}
-	case 4343: { // tlc x0,a r,r
+	case 4403: { // tlc x0,a r,r
 		unhandled("tlc x0,a r,r");
 		break;
 		}
-	case 4344: { // tlc x0,b r,r
+	case 4404: { // tlc x0,b r,r
 		unhandled("tlc x0,b r,r");
 		break;
 		}
-	case 4345: { // tlc y0,a r,r
+	case 4405: { // tlc y0,a r,r
 		unhandled("tlc y0,a r,r");
 		break;
 		}
-	case 4346: { // tlc y0,b r,r
+	case 4406: { // tlc y0,b r,r
 		unhandled("tlc y0,b r,r");
 		break;
 		}
-	case 4347: { // tlc x1,a r,r
+	case 4407: { // tlc x1,a r,r
 		unhandled("tlc x1,a r,r");
 		break;
 		}
-	case 4348: { // tlc x1,b r,r
+	case 4408: { // tlc x1,b r,r
 		unhandled("tlc x1,b r,r");
 		break;
 		}
-	case 4349: { // tlc y1,a r,r
+	case 4409: { // tlc y1,a r,r
 		unhandled("tlc y1,a r,r");
 		break;
 		}
-	case 4350: { // tlc y1,b r,r
+	case 4410: { // tlc y1,b r,r
 		unhandled("tlc y1,b r,r");
 		break;
 		}
-	case 4351: { // tgt b,a r,r
+	case 4411: { // tgt b,a r,r
 		unhandled("tgt b,a r,r");
 		break;
 		}
-	case 4352: { // tgt b,b r,r
+	case 4412: { // tgt b,b r,r
 		unhandled("tgt b,b r,r");
 		break;
 		}
-	case 4353: { // tgt x0,a r,r
+	case 4413: { // tgt x0,a r,r
 		unhandled("tgt x0,a r,r");
 		break;
 		}
-	case 4354: { // tgt x0,b r,r
+	case 4414: { // tgt x0,b r,r
 		unhandled("tgt x0,b r,r");
 		break;
 		}
-	case 4355: { // tgt y0,a r,r
+	case 4415: { // tgt y0,a r,r
 		unhandled("tgt y0,a r,r");
 		break;
 		}
-	case 4356: { // tgt y0,b r,r
+	case 4416: { // tgt y0,b r,r
 		unhandled("tgt y0,b r,r");
 		break;
 		}
-	case 4357: { // tgt x1,a r,r
+	case 4417: { // tgt x1,a r,r
 		unhandled("tgt x1,a r,r");
 		break;
 		}
-	case 4358: { // tgt x1,b r,r
+	case 4418: { // tgt x1,b r,r
 		unhandled("tgt x1,b r,r");
 		break;
 		}
-	case 4359: { // tgt y1,a r,r
+	case 4419: { // tgt y1,a r,r
 		unhandled("tgt y1,a r,r");
 		break;
 		}
-	case 4360: { // tgt y1,b r,r
+	case 4420: { // tgt y1,b r,r
 		unhandled("tgt y1,b r,r");
 		break;
 		}
-	case 4361: { // tcs b,a r,r
+	case 4421: { // tcs b,a r,r
 		unhandled("tcs b,a r,r");
 		break;
 		}
-	case 4362: { // tcs b,b r,r
+	case 4422: { // tcs b,b r,r
 		unhandled("tcs b,b r,r");
 		break;
 		}
-	case 4363: { // tcs x0,a r,r
+	case 4423: { // tcs x0,a r,r
 		unhandled("tcs x0,a r,r");
 		break;
 		}
-	case 4364: { // tcs x0,b r,r
+	case 4424: { // tcs x0,b r,r
 		unhandled("tcs x0,b r,r");
 		break;
 		}
-	case 4365: { // tcs y0,a r,r
+	case 4425: { // tcs y0,a r,r
 		unhandled("tcs y0,a r,r");
 		break;
 		}
-	case 4366: { // tcs y0,b r,r
+	case 4426: { // tcs y0,b r,r
 		unhandled("tcs y0,b r,r");
 		break;
 		}
-	case 4367: { // tcs x1,a r,r
+	case 4427: { // tcs x1,a r,r
 		unhandled("tcs x1,a r,r");
 		break;
 		}
-	case 4368: { // tcs x1,b r,r
+	case 4428: { // tcs x1,b r,r
 		unhandled("tcs x1,b r,r");
 		break;
 		}
-	case 4369: { // tcs y1,a r,r
+	case 4429: { // tcs y1,a r,r
 		unhandled("tcs y1,a r,r");
 		break;
 		}
-	case 4370: { // tcs y1,b r,r
+	case 4430: { // tcs y1,b r,r
 		unhandled("tcs y1,b r,r");
 		break;
 		}
-	case 4371: { // tlt b,a r,r
+	case 4431: { // tlt b,a r,r
 		unhandled("tlt b,a r,r");
 		break;
 		}
-	case 4372: { // tlt b,b r,r
+	case 4432: { // tlt b,b r,r
 		unhandled("tlt b,b r,r");
 		break;
 		}
-	case 4373: { // tlt x0,a r,r
+	case 4433: { // tlt x0,a r,r
 		unhandled("tlt x0,a r,r");
 		break;
 		}
-	case 4374: { // tlt x0,b r,r
+	case 4434: { // tlt x0,b r,r
 		unhandled("tlt x0,b r,r");
 		break;
 		}
-	case 4375: { // tlt y0,a r,r
+	case 4435: { // tlt y0,a r,r
 		unhandled("tlt y0,a r,r");
 		break;
 		}
-	case 4376: { // tlt y0,b r,r
+	case 4436: { // tlt y0,b r,r
 		unhandled("tlt y0,b r,r");
 		break;
 		}
-	case 4377: { // tlt x1,a r,r
+	case 4437: { // tlt x1,a r,r
 		unhandled("tlt x1,a r,r");
 		break;
 		}
-	case 4378: { // tlt x1,b r,r
+	case 4438: { // tlt x1,b r,r
 		unhandled("tlt x1,b r,r");
 		break;
 		}
-	case 4379: { // tlt y1,a r,r
+	case 4439: { // tlt y1,a r,r
 		unhandled("tlt y1,a r,r");
 		break;
 		}
-	case 4380: { // tlt y1,b r,r
+	case 4440: { // tlt y1,b r,r
 		unhandled("tlt y1,b r,r");
 		break;
 		}
-	case 4381: { // teq b,a r,r
+	case 4441: { // teq b,a r,r
 		unhandled("teq b,a r,r");
 		break;
 		}
-	case 4382: { // teq b,b r,r
+	case 4442: { // teq b,b r,r
 		unhandled("teq b,b r,r");
 		break;
 		}
-	case 4383: { // teq x0,a r,r
+	case 4443: { // teq x0,a r,r
 		unhandled("teq x0,a r,r");
 		break;
 		}
-	case 4384: { // teq x0,b r,r
+	case 4444: { // teq x0,b r,r
 		unhandled("teq x0,b r,r");
 		break;
 		}
-	case 4385: { // teq y0,a r,r
+	case 4445: { // teq y0,a r,r
 		unhandled("teq y0,a r,r");
 		break;
 		}
-	case 4386: { // teq y0,b r,r
+	case 4446: { // teq y0,b r,r
 		unhandled("teq y0,b r,r");
 		break;
 		}
-	case 4387: { // teq x1,a r,r
+	case 4447: { // teq x1,a r,r
 		unhandled("teq x1,a r,r");
 		break;
 		}
-	case 4388: { // teq x1,b r,r
+	case 4448: { // teq x1,b r,r
 		unhandled("teq x1,b r,r");
 		break;
 		}
-	case 4389: { // teq y1,a r,r
+	case 4449: { // teq y1,a r,r
 		unhandled("teq y1,a r,r");
 		break;
 		}
-	case 4390: { // teq y1,b r,r
+	case 4450: { // teq y1,b r,r
 		unhandled("teq y1,b r,r");
 		break;
 		}
-	case 4391: { // tmi b,a r,r
+	case 4451: { // tmi b,a r,r
 		unhandled("tmi b,a r,r");
 		break;
 		}
-	case 4392: { // tmi b,b r,r
+	case 4452: { // tmi b,b r,r
 		unhandled("tmi b,b r,r");
 		break;
 		}
-	case 4393: { // tmi x0,a r,r
+	case 4453: { // tmi x0,a r,r
 		unhandled("tmi x0,a r,r");
 		break;
 		}
-	case 4394: { // tmi x0,b r,r
+	case 4454: { // tmi x0,b r,r
 		unhandled("tmi x0,b r,r");
 		break;
 		}
-	case 4395: { // tmi y0,a r,r
+	case 4455: { // tmi y0,a r,r
 		unhandled("tmi y0,a r,r");
 		break;
 		}
-	case 4396: { // tmi y0,b r,r
+	case 4456: { // tmi y0,b r,r
 		unhandled("tmi y0,b r,r");
 		break;
 		}
-	case 4397: { // tmi x1,a r,r
+	case 4457: { // tmi x1,a r,r
 		unhandled("tmi x1,a r,r");
 		break;
 		}
-	case 4398: { // tmi x1,b r,r
+	case 4458: { // tmi x1,b r,r
 		unhandled("tmi x1,b r,r");
 		break;
 		}
-	case 4399: { // tmi y1,a r,r
+	case 4459: { // tmi y1,a r,r
 		unhandled("tmi y1,a r,r");
 		break;
 		}
-	case 4400: { // tmi y1,b r,r
+	case 4460: { // tmi y1,b r,r
 		unhandled("tmi y1,b r,r");
 		break;
 		}
-	case 4401: { // tnr b,a r,r
+	case 4461: { // tnr b,a r,r
 		unhandled("tnr b,a r,r");
 		break;
 		}
-	case 4402: { // tnr b,b r,r
+	case 4462: { // tnr b,b r,r
 		unhandled("tnr b,b r,r");
 		break;
 		}
-	case 4403: { // tnr x0,a r,r
+	case 4463: { // tnr x0,a r,r
 		unhandled("tnr x0,a r,r");
 		break;
 		}
-	case 4404: { // tnr x0,b r,r
+	case 4464: { // tnr x0,b r,r
 		unhandled("tnr x0,b r,r");
 		break;
 		}
-	case 4405: { // tnr y0,a r,r
+	case 4465: { // tnr y0,a r,r
 		unhandled("tnr y0,a r,r");
 		break;
 		}
-	case 4406: { // tnr y0,b r,r
+	case 4466: { // tnr y0,b r,r
 		unhandled("tnr y0,b r,r");
 		break;
 		}
-	case 4407: { // tnr x1,a r,r
+	case 4467: { // tnr x1,a r,r
 		unhandled("tnr x1,a r,r");
 		break;
 		}
-	case 4408: { // tnr x1,b r,r
+	case 4468: { // tnr x1,b r,r
 		unhandled("tnr x1,b r,r");
 		break;
 		}
-	case 4409: { // tnr y1,a r,r
+	case 4469: { // tnr y1,a r,r
 		unhandled("tnr y1,a r,r");
 		break;
 		}
-	case 4410: { // tnr y1,b r,r
+	case 4470: { // tnr y1,b r,r
 		unhandled("tnr y1,b r,r");
 		break;
 		}
-	case 4411: { // tes b,a r,r
+	case 4471: { // tes b,a r,r
 		unhandled("tes b,a r,r");
 		break;
 		}
-	case 4412: { // tes b,b r,r
+	case 4472: { // tes b,b r,r
 		unhandled("tes b,b r,r");
 		break;
 		}
-	case 4413: { // tes x0,a r,r
+	case 4473: { // tes x0,a r,r
 		unhandled("tes x0,a r,r");
 		break;
 		}
-	case 4414: { // tes x0,b r,r
+	case 4474: { // tes x0,b r,r
 		unhandled("tes x0,b r,r");
 		break;
 		}
-	case 4415: { // tes y0,a r,r
+	case 4475: { // tes y0,a r,r
 		unhandled("tes y0,a r,r");
 		break;
 		}
-	case 4416: { // tes y0,b r,r
+	case 4476: { // tes y0,b r,r
 		unhandled("tes y0,b r,r");
 		break;
 		}
-	case 4417: { // tes x1,a r,r
+	case 4477: { // tes x1,a r,r
 		unhandled("tes x1,a r,r");
 		break;
 		}
-	case 4418: { // tes x1,b r,r
+	case 4478: { // tes x1,b r,r
 		unhandled("tes x1,b r,r");
 		break;
 		}
-	case 4419: { // tes y1,a r,r
+	case 4479: { // tes y1,a r,r
 		unhandled("tes y1,a r,r");
 		break;
 		}
-	case 4420: { // tes y1,b r,r
+	case 4480: { // tes y1,b r,r
 		unhandled("tes y1,b r,r");
 		break;
 		}
-	case 4421: { // tls b,a r,r
+	case 4481: { // tls b,a r,r
 		unhandled("tls b,a r,r");
 		break;
 		}
-	case 4422: { // tls b,b r,r
+	case 4482: { // tls b,b r,r
 		unhandled("tls b,b r,r");
 		break;
 		}
-	case 4423: { // tls x0,a r,r
+	case 4483: { // tls x0,a r,r
 		unhandled("tls x0,a r,r");
 		break;
 		}
-	case 4424: { // tls x0,b r,r
+	case 4484: { // tls x0,b r,r
 		unhandled("tls x0,b r,r");
 		break;
 		}
-	case 4425: { // tls y0,a r,r
+	case 4485: { // tls y0,a r,r
 		unhandled("tls y0,a r,r");
 		break;
 		}
-	case 4426: { // tls y0,b r,r
+	case 4486: { // tls y0,b r,r
 		unhandled("tls y0,b r,r");
 		break;
 		}
-	case 4427: { // tls x1,a r,r
+	case 4487: { // tls x1,a r,r
 		unhandled("tls x1,a r,r");
 		break;
 		}
-	case 4428: { // tls x1,b r,r
+	case 4488: { // tls x1,b r,r
 		unhandled("tls x1,b r,r");
 		break;
 		}
-	case 4429: { // tls y1,a r,r
+	case 4489: { // tls y1,a r,r
 		unhandled("tls y1,a r,r");
 		break;
 		}
-	case 4430: { // tls y1,b r,r
+	case 4490: { // tls y1,b r,r
 		unhandled("tls y1,b r,r");
 		break;
 		}
-	case 4431: { // tle b,a r,r
+	case 4491: { // tle b,a r,r
 		unhandled("tle b,a r,r");
 		break;
 		}
-	case 4432: { // tle b,b r,r
+	case 4492: { // tle b,b r,r
 		unhandled("tle b,b r,r");
 		break;
 		}
-	case 4433: { // tle x0,a r,r
+	case 4493: { // tle x0,a r,r
 		unhandled("tle x0,a r,r");
 		break;
 		}
-	case 4434: { // tle x0,b r,r
+	case 4494: { // tle x0,b r,r
 		unhandled("tle x0,b r,r");
 		break;
 		}
-	case 4435: { // tle y0,a r,r
+	case 4495: { // tle y0,a r,r
 		unhandled("tle y0,a r,r");
 		break;
 		}
-	case 4436: { // tle y0,b r,r
+	case 4496: { // tle y0,b r,r
 		unhandled("tle y0,b r,r");
 		break;
 		}
-	case 4437: { // tle x1,a r,r
+	case 4497: { // tle x1,a r,r
 		unhandled("tle x1,a r,r");
 		break;
 		}
-	case 4438: { // tle x1,b r,r
+	case 4498: { // tle x1,b r,r
 		unhandled("tle x1,b r,r");
 		break;
 		}
-	case 4439: { // tle y1,a r,r
+	case 4499: { // tle y1,a r,r
 		unhandled("tle y1,a r,r");
 		break;
 		}
-	case 4440: { // tle y1,b r,r
+	case 4500: { // tle y1,b r,r
 		unhandled("tle y1,b r,r");
 		break;
 		}
-	case 4441: { // tcc r,r
+	case 4501: { // tcc r,r
 		unhandled("tcc r,r");
 		break;
 		}
-	case 4442: { // tge r,r
+	case 4502: { // tge r,r
 		unhandled("tge r,r");
 		break;
 		}
-	case 4443: { // tne r,r
+	case 4503: { // tne r,r
 		unhandled("tne r,r");
 		break;
 		}
-	case 4444: { // tpl r,r
+	case 4504: { // tpl r,r
 		unhandled("tpl r,r");
 		break;
 		}
-	case 4445: { // tnn r,r
+	case 4505: { // tnn r,r
 		unhandled("tnn r,r");
 		break;
 		}
-	case 4446: { // tec r,r
+	case 4506: { // tec r,r
 		unhandled("tec r,r");
 		break;
 		}
-	case 4447: { // tlc r,r
+	case 4507: { // tlc r,r
 		unhandled("tlc r,r");
 		break;
 		}
-	case 4448: { // tgt r,r
+	case 4508: { // tgt r,r
 		unhandled("tgt r,r");
 		break;
 		}
-	case 4449: { // tcs r,r
+	case 4509: { // tcs r,r
 		unhandled("tcs r,r");
 		break;
 		}
-	case 4450: { // tlt r,r
+	case 4510: { // tlt r,r
 		unhandled("tlt r,r");
 		break;
 		}
-	case 4451: { // teq r,r
+	case 4511: { // teq r,r
 		unhandled("teq r,r");
 		break;
 		}
-	case 4452: { // tmi r,r
+	case 4512: { // tmi r,r
 		unhandled("tmi r,r");
 		break;
 		}
-	case 4453: { // tnr r,r
+	case 4513: { // tnr r,r
 		unhandled("tnr r,r");
 		break;
 		}
-	case 4454: { // tes r,r
+	case 4514: { // tes r,r
 		unhandled("tes r,r");
 		break;
 		}
-	case 4455: { // tls r,r
+	case 4515: { // tls r,r
 		unhandled("tls r,r");
 		break;
 		}
-	case 4456: { // tle r,r
+	case 4516: { // tle r,r
 		unhandled("tle r,r");
 		break;
 		}
-	case 4457: { // trap
+	case 4517: { // trap
 		unhandled("trap");
 		break;
 		}
-	case 4458: { // trapcc
+	case 4518: { // trapcc
 		unhandled("trapcc");
 		break;
 		}
-	case 4459: { // trapge
+	case 4519: { // trapge
 		unhandled("trapge");
 		break;
 		}
-	case 4460: { // trapne
+	case 4520: { // trapne
 		unhandled("trapne");
 		break;
 		}
-	case 4461: { // trappl
+	case 4521: { // trappl
 		unhandled("trappl");
 		break;
 		}
-	case 4462: { // trapnn
+	case 4522: { // trapnn
 		unhandled("trapnn");
 		break;
 		}
-	case 4463: { // trapec
+	case 4523: { // trapec
 		unhandled("trapec");
 		break;
 		}
-	case 4464: { // traplc
+	case 4524: { // traplc
 		unhandled("traplc");
 		break;
 		}
-	case 4465: { // trapgt
+	case 4525: { // trapgt
 		unhandled("trapgt");
 		break;
 		}
-	case 4466: { // trapcs
+	case 4526: { // trapcs
 		unhandled("trapcs");
 		break;
 		}
-	case 4467: { // traplt
+	case 4527: { // traplt
 		unhandled("traplt");
 		break;
 		}
-	case 4468: { // trapeq
+	case 4528: { // trapeq
 		unhandled("trapeq");
 		break;
 		}
-	case 4469: { // trapmi
+	case 4529: { // trapmi
 		unhandled("trapmi");
 		break;
 		}
-	case 4470: { // trapnr
+	case 4530: { // trapnr
 		unhandled("trapnr");
 		break;
 		}
-	case 4471: { // trapes
+	case 4531: { // trapes
 		unhandled("trapes");
 		break;
 		}
-	case 4472: { // trapls
+	case 4532: { // trapls
 		unhandled("trapls");
 		break;
 		}
-	case 4473: { // traple
+	case 4533: { // traple
 		unhandled("traple");
 		break;
 		}
-	case 4474: { // vsl a,[i],l:(r)-n
+	case 4534: { // vsl a,[i],l:(r)-n
 		unhandled("vsl a,[i],l:(r)-n");
 		break;
 		}
-	case 4475: { // vsl a,[i],l:(r)+n
+	case 4535: { // vsl a,[i],l:(r)+n
 		unhandled("vsl a,[i],l:(r)+n");
 		break;
 		}
-	case 4476: { // vsl a,[i],l:(r)-
+	case 4536: { // vsl a,[i],l:(r)-
 		unhandled("vsl a,[i],l:(r)-");
 		break;
 		}
-	case 4477: { // vsl a,[i],l:(r)+
+	case 4537: { // vsl a,[i],l:(r)+
 		unhandled("vsl a,[i],l:(r)+");
 		break;
 		}
-	case 4478: { // vsl a,[i],l:(r)
+	case 4538: { // vsl a,[i],l:(r)
 		unhandled("vsl a,[i],l:(r)");
 		break;
 		}
-	case 4479: { // vsl a,[i],l:(r+n)
+	case 4539: { // vsl a,[i],l:(r+n)
 		unhandled("vsl a,[i],l:(r+n)");
 		break;
 		}
-	case 4480: { // vsl a,[i],l:-(r)
+	case 4540: { // vsl a,[i],l:-(r)
 		unhandled("vsl a,[i],l:-(r)");
 		break;
 		}
-	case 4481: { // vsl b,[i],l:(r)-n
+	case 4541: { // vsl b,[i],l:(r)-n
 		unhandled("vsl b,[i],l:(r)-n");
 		break;
 		}
-	case 4482: { // vsl b,[i],l:(r)+n
+	case 4542: { // vsl b,[i],l:(r)+n
 		unhandled("vsl b,[i],l:(r)+n");
 		break;
 		}
-	case 4483: { // vsl b,[i],l:(r)-
+	case 4543: { // vsl b,[i],l:(r)-
 		unhandled("vsl b,[i],l:(r)-");
 		break;
 		}
-	case 4484: { // vsl b,[i],l:(r)+
+	case 4544: { // vsl b,[i],l:(r)+
 		unhandled("vsl b,[i],l:(r)+");
 		break;
 		}
-	case 4485: { // vsl b,[i],l:(r)
+	case 4545: { // vsl b,[i],l:(r)
 		unhandled("vsl b,[i],l:(r)");
 		break;
 		}
-	case 4486: { // vsl b,[i],l:(r+n)
+	case 4546: { // vsl b,[i],l:(r+n)
 		unhandled("vsl b,[i],l:(r+n)");
 		break;
 		}
-	case 4487: { // vsl b,[i],l:-(r)
+	case 4547: { // vsl b,[i],l:-(r)
 		unhandled("vsl b,[i],l:-(r)");
 		break;
 		}
-	case 4488: { // vsl a,[i],l:[abs]
+	case 4548: { // vsl a,[i],l:[abs]
 		unhandled("vsl a,[i],l:[abs]");
 		break;
 		}
-	case 4489: { // vsl b,[i],l:[abs]
+	case 4549: { // vsl b,[i],l:[abs]
 		unhandled("vsl b,[i],l:[abs]");
 		break;
 		}
-	case 4490: { // wait
+	case 4550: { // wait
 		unhandled("wait");
 		break;
 		}
