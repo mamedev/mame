@@ -225,6 +225,7 @@
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -729,6 +730,7 @@ static void mips_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("tape", NSCSI_TAPE);
 }
 
 static void mips_rs232_devices(device_slot_interface &device)
