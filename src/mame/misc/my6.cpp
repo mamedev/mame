@@ -129,7 +129,7 @@ void my6_state::my6(machine_config &config)
 
 ROM_START( socc2004 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "W78E52B.c5", 0x00000, 0x2000,  NO_DUMP ) // Protected. Contains internal rom code.
+	ROM_LOAD( "w78e52b.c5", 0x00000, 0x2000,  NO_DUMP ) // Protected. Contains internal rom code.
 	
 	ROM_REGION( 0x10000, "eeprom", 0 )
 	ROM_LOAD( "2_tms2c5122jl.c6", 0x00000, 0x10000,  CRC(05EF99CD) SHA1(591c51ced0acc3231c9629a060f9c42a2db9fbe0) ) // Sticker labeled 2. Hex FF filled at 0x0000-0x1fff.
