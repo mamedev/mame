@@ -68,11 +68,9 @@ private:
 	void data_map(address_map &map) ATTR_COLD;
 	void display_map(address_map &map) ATTR_COLD;
 	void display_data_map(address_map &map) ATTR_COLD;
-
 };
 
 static INPUT_PORTS_START( socc2004 )
-
 INPUT_PORTS_END
 
 void my6_state::program_map(address_map &map)
@@ -83,7 +81,6 @@ void my6_state::program_map(address_map &map)
 
 void my6_state::data_map(address_map &map)
 {
-
 }
 
 void my6_state::display_map(address_map &map)
@@ -95,10 +92,10 @@ void my6_state::display_data_map(address_map &map)
 {
 	map(0xE000, 0xE7FF).ram().share("vram"); //Video ram. 64x64
     map(0xA000, 0xA000).noprw(); // Input for display controller handled by maincpu
-	
+}
+
 void my6_state::machine_start()
 {
-
 }
 
 void my6_state::my6(machine_config &config)
@@ -134,15 +131,14 @@ ROM_START( socc2004 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "W78E52B.c5", 0x00000, 0x2000,  NO_DUMP ) // Protected. Contains internal rom code.
 	
-	ROM_REGION( 0x10000, "eeprom", 0 ) // 
+	ROM_REGION( 0x10000, "eeprom", 0 )
 	ROM_LOAD( "2_tms2c5122jl.c6", 0x00000, 0x10000,  CRC(05EF99CD) SHA1(591c51ced0acc3231c9629a060f9c42a2db9fbe0) ) // Sticker labeled 2. Hex FF filled at 0x0000-0x1fff.
    
-    ROM_REGION( 0x10000, "display", 0 ) //
+    ROM_REGION( 0x10000, "display", 0 )
     ROM_LOAD( "tms27c512_2jl.c2", 0x0000, 0x10000,   CRC(3FBD0A4A) SHA1(d2b5d09d1f4209411ca884c9fa4a73276846c780) ) //  32kb Two Program Rom code. Soccer 2004 and Soccer 2002 bpp1 gfx.
    
     ROM_REGION( 0x100000, "snd", 0 )
     ROM_LOAD( "m27c801.bin", 0x00000, 0x100000,  CRC(BBF4A74C) SHA1(662aaaea0df23c14c2b802d117a342a9bdf13845) ) // Unsigned 8-bit pcm.
-
 ROM_END
 
 } // anonymous namespace
