@@ -11,6 +11,7 @@ dsp563xx_device::dsp563xx_device(const machine_config &mconfig, device_type type
 								 address_map_constructor map_p, address_map_constructor map_x, address_map_constructor map_y) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_hi08(*this, "hi08"),
+	m_shi(*this, "shi"),
 	m_p_config("p", ENDIANNESS_LITTLE, 32, 24, -2, map_p),
 	m_x_config("x", ENDIANNESS_LITTLE, 32, 24, -2, map_x),
 	m_y_config("y", ENDIANNESS_LITTLE, 32, 24, -2, map_y)
@@ -211,11 +212,6 @@ void dsp563xx_device::state_string_export(const device_state_entry &entry, std::
 std::unique_ptr<util::disasm_interface> dsp563xx_device::create_disassembler()
 {
 	return std::make_unique<dsp563xx_disassembler>();
-}
-
-void dsp563xx_device::device_add_mconfig(machine_config &config)
-{
-	HI08(config, m_hi08);
 }
 
 void dsp563xx_device::hi08_w(offs_t offset, u8 data)

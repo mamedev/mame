@@ -159,10 +159,19 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	} else {
 		m_ccr &= ~CCR_C;
 		$xy:m.write_dword($pp, t | m);
-    }
+	}
 
 010020 bset #n,xy:qq         - qq:asa6q(8) xy:xyc(6) n:bit5(0)
 0ac060 bset #n,d             - d:sbr(8) n:bit5(0)
+	u32 t = $d;
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+		$d:w(t | m);
+	}
+
 0d1080 bsr x                 - x:expcrel()
 050800 bsr x                 - x:pcrel(6, 0)
 0d1880 bsr r                 - r:ar(8)

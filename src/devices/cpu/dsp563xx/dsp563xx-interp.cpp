@@ -23275,107 +23275,341 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 599: { // bset #[n],x0
-		unhandled("bset #[n],x0");
+		u32 d = get_x0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_x0(t | m);
+		}
 		break;
 		}
 	case 600: { // bset #[n],x1
-		unhandled("bset #[n],x1");
+		u32 d = get_x1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_x1(t | m);
+		}
 		break;
 		}
 	case 601: { // bset #[n],y0
-		unhandled("bset #[n],y0");
+		u32 d = get_y0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_y0(t | m);
+		}
 		break;
 		}
 	case 602: { // bset #[n],y1
-		unhandled("bset #[n],y1");
+		u32 d = get_y1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_y1(t | m);
+		}
 		break;
 		}
 	case 603: { // bset #[n],a0
-		unhandled("bset #[n],a0");
+		u32 d = get_a0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_a0(t | m);
+		}
 		break;
 		}
 	case 604: { // bset #[n],b0
-		unhandled("bset #[n],b0");
+		u32 d = get_b0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_b0(t | m);
+		}
 		break;
 		}
 	case 605: { // bset #[n],a2
-		unhandled("bset #[n],a2");
+		u32 d = get_a2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_a2(t | m);
+		}
 		break;
 		}
 	case 606: { // bset #[n],b2
-		unhandled("bset #[n],b2");
+		u32 d = get_b2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_b2(t | m);
+		}
 		break;
 		}
 	case 607: { // bset #[n],a1
-		unhandled("bset #[n],a1");
+		u32 d = get_a1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_a1(t | m);
+		}
 		break;
 		}
 	case 608: { // bset #[n],b1
-		unhandled("bset #[n],b1");
+		u32 d = get_b1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_b1(t | m);
+		}
 		break;
 		}
 	case 609: { // bset #[n],a
-		unhandled("bset #[n],a");
+		u64 d = get_a();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_a(t | m);
+		}
 		break;
 		}
 	case 610: { // bset #[n],b
-		unhandled("bset #[n],b");
+		u64 d = get_b();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_b(t | m);
+		}
 		break;
 		}
 	case 611: { // bset #[n],r
-		unhandled("bset #[n],r");
+		u32 d = get_r(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_r(BIT(opcode, 8, 6) & 7, t | m);
+		}
 		break;
 		}
 	case 612: { // bset #[n],n
-		unhandled("bset #[n],n");
+		u32 d = get_n(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_n(BIT(opcode, 8, 6) & 7, t | m);
+		}
 		break;
 		}
 	case 613: { // bset #[n],m
-		unhandled("bset #[n],m");
+		u32 d = get_m(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_m(BIT(opcode, 8, 6) & 7, t | m);
+		}
 		break;
 		}
 	case 614: { // bset #[n],ep
-		unhandled("bset #[n],ep");
+		u32 d = get_ep();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_ep(t | m);
+		}
 		break;
 		}
 	case 615: { // bset #[n],vba
-		unhandled("bset #[n],vba");
+		u32 d = get_vba();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_vba(t | m);
+		}
 		break;
 		}
 	case 616: { // bset #[n],sc
-		unhandled("bset #[n],sc");
+		u32 d = get_sc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_sc(t | m);
+		}
 		break;
 		}
 	case 617: { // bset #[n],sz
-		unhandled("bset #[n],sz");
+		u32 d = get_sz();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_sz(t | m);
+		}
 		break;
 		}
 	case 618: { // bset #[n],sr
-		unhandled("bset #[n],sr");
+		u32 d = get_sr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_sr(t | m);
+		}
 		break;
 		}
 	case 619: { // bset #[n],omr
-		unhandled("bset #[n],omr");
+		u32 d = get_omr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_omr(t | m);
+		}
 		break;
 		}
 	case 620: { // bset #[n],sp
-		unhandled("bset #[n],sp");
+		u32 d = get_sp();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_sp(t | m);
+		}
 		break;
 		}
 	case 621: { // bset #[n],ssh
-		unhandled("bset #[n],ssh");
+		u32 d = get_ssh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_ssh(t | m);
+		}
 		break;
 		}
 	case 622: { // bset #[n],ssl
-		unhandled("bset #[n],ssl");
+		u32 d = get_ssl();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_ssl(t | m);
+		}
 		break;
 		}
 	case 623: { // bset #[n],la
-		unhandled("bset #[n],la");
+		u32 d = get_la();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_la(t | m);
+		}
 		break;
 		}
 	case 624: { // bset #[n],lc
-		unhandled("bset #[n],lc");
+		u32 d = get_lc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		set_lc(t | m);
+		}
 		break;
 		}
 	case 625: { // bsr [x]

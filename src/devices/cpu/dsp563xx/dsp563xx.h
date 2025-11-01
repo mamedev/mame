@@ -9,6 +9,7 @@
 #pragma once
 
 #include "hi08.h"
+#include "shi.h"
 
 enum {
 	DSP563XX_PC, DSP563XX_A, DSP563XX_B, DSP563XX_X0, DSP563XX_X1, DSP563XX_Y0, DSP563XX_Y1,
@@ -73,7 +74,6 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual u32 get_reset_vector() const = 0;
 
@@ -84,7 +84,8 @@ protected:
 
 	void unhandled(const char *inst);
 
-	required_device<hi08_device> m_hi08;
+	optional_device<hi08_device> m_hi08;
+	optional_device<dsp5636x_shi_device> m_shi;
 
 	address_space_config m_p_config, m_x_config, m_y_config;
 
