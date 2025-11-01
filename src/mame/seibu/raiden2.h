@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "sei25x_rise1x_spr.h"
 #include "seibu_crtc.h"
 #include "seibucop.h"
 
@@ -29,6 +30,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
+		, m_spritegen(*this, "spritegen")
 		, m_mainbank(*this, "mainbank")
 		, m_raiden2cop(*this, "raiden2cop")
 
@@ -51,10 +53,10 @@ public:
 		std::fill(std::begin(m_scrollvals), std::end(m_scrollvals), 0);
 	}
 
-	void raidendx(machine_config &config);
-	void xsedae(machine_config &config);
-	void zeroteam(machine_config &config);
-	void raiden2(machine_config &config);
+	void raidendx(machine_config &config) ATTR_COLD;
+	void xsedae(machine_config &config) ATTR_COLD;
+	void zeroteam(machine_config &config) ATTR_COLD;
+	void raiden2(machine_config &config) ATTR_COLD;
 
 	void init_raidendx();
 	void init_xsedae();
@@ -76,6 +78,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<sei25x_rise1x_device> m_spritegen;
 	optional_memory_bank m_mainbank;
 	optional_device<raiden2cop_device> m_raiden2cop;
 
@@ -100,7 +103,7 @@ protected:
 
 	const s32 *m_cur_spri = nullptr; // cfg
 
-	bitmap_ind16 m_tile_bitmap, m_sprite_bitmap;
+	bitmap_ind16 m_tile_bitmap;
 
 	void sprite_prot_x_w(u16 data);
 	void sprite_prot_y_w(u16 data);
@@ -127,9 +130,8 @@ protected:
 
 	void bank_reset(int bgbank, int fgbank, int midbank, int txbank);
 
-	void draw_sprites(const rectangle &cliprect);
-
 	DECLARE_GFXDECODE_MEMBER(gfx_raiden2);
+	DECLARE_GFXDECODE_MEMBER(gfx_raiden2_spr);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
@@ -142,6 +144,8 @@ protected:
 	void init_blending(const u16 *table);
 
 	void zeroteam_sound_map(address_map &map) ATTR_COLD;
+
+	void base_video(machine_config &config) ATTR_COLD;
 
 private:
 	u8 m_prg_bank;
