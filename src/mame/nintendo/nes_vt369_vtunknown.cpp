@@ -768,6 +768,13 @@ ROM_START( lxcmcybt ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcyls ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "lexibook_stitch.bin", 0x00000, 0x4000000, CRC(f15f6a2d) SHA1(b92dbf0ce12aea0b58c7a873a3c72afcae11cde5) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcyfd ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "dory.u2", 0x00000, 0x4000000, CRC(315bf615) SHA1(3b8b9c6428084ae82a38b7bcfe029180501f1488) )
@@ -1263,6 +1270,7 @@ CONS( 2018, lxcmcyppa, lxcmcypp,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_s
 // JL2367 models (150-in-1 versions, newer case style)
 CONS( 2018, lxcmcypp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_NOT_WORKING )
 CONS( 2020, lxcmcybt,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman (JL2367BAT)", MACHINE_NOT_WORKING )
+CONS( 2021, lxcmcyls,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Lilo & Stitch (JL2367D)", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcydpn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Disney Princess (JL2367DP, 150-in-1)", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcyspn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2367SP, 150-in-1)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcyfzb, lxcmcyfz,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Frozen (JL2367FZ)", MACHINE_NOT_WORKING )

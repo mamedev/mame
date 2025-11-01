@@ -19460,6 +19460,8 @@ rhhc152
 supreme
 table108
 throwbck
+touma560
+touma568
 toumapet
 
 @source:handheld/chessking.cpp
@@ -20004,6 +20006,9 @@ talkingbb
 
 @source:handheld/talkingfb.cpp
 talkingfb
+
+@source:handheld/tama_id.cpp
+tamaid
 
 @source:handheld/teammate.cpp
 teammate
@@ -35804,6 +35809,7 @@ lxcmcyfd
 lxcmcyfz
 lxcmcyfza
 lxcmcyfzb
+lxcmcyls
 lxcmcypj
 lxcmcypp
 lxcmcyppa
