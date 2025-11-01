@@ -930,28 +930,6 @@ void funcube_state::outputs_w(uint8_t data)
 	funcube_debug_outputs();
 }
 
-// TODO: provide this hookup from Coldfire internals
-
-/*
-enum {
-	CF_PPDAT    =   0x1c8/4,
-	CF_MBSR     =   0x1ec/4
-};
-
-uint32_t mcf5206e_peripheral_device::seta2_coldfire_regs_r(offs_t offset)
-{
-	switch( offset )
-	{
-		case CF_MBSR:
-			return machine().rand();
-
-		case CF_PPDAT:
-			return ioport(":BATTERY")->read() << 16;
-	}
-
-	return m_coldfire_regs[offset];
-}*/
-
 uint8_t funcube_state::battery_r()
 {
 	return m_in_battery->read() ? 0x40 : 0x00;
@@ -2518,14 +2496,13 @@ void funcube_state::funcube2(machine_config &config)
 	funcube(config);
 	MCF5206E(config.replace(), m_maincpu, XTAL(25'447'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube2_map);
+	downcast<mcf5206e_device &>(*m_maincpu).gpio_r_cb().set_ioport("BATTERY");
 
 	m_sub->read_port4().set([]() -> u8 { return 0; }); // unused
 
 	// video hardware
 	m_screen->set_visarea(0x0, 0x140-1, 0x00, 0xf0-1);
 	m_screen->screen_vblank().set(FUNC(funcube_state::screen_vblank));
-	// TODO: check me in mcf5206e core
-	// should take autovector 0x64
 	m_screen->screen_vblank().append_inputline(m_maincpu, 1);
 }
 

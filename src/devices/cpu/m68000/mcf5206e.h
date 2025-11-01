@@ -336,6 +336,7 @@ public:
 	auto set_irq_acknowledge_callback() ATTR_COLD { return m_sim->irq_vector_cb.bind(); }
 
 	// Parallel Port
+	auto gpio_r_cb() { return m_gpio_r_cb.bind(); }
 	auto gpio_w_cb() { return m_gpio_w_cb.bind(); }
 	void gpio_pin_w(int pin, int state);
 	void gpio_port_w(u8 state);
@@ -492,16 +493,15 @@ private:
 	devcb_write_line write_tx1, write_tx2;
 
 	/* parallel port */
-	// just an 8 bit gpio port
-	inline u8 ppddr_r(){ return m_ppddr; }
-	inline u8 ppdat_r(){ return (m_ppdat_in | (m_ppdat_out & m_ppddr)); }
+	u8 ppddr_r();
+	u8 ppdat_r();
 
 	void ppddr_w(u8 data);
 	void ppdat_w(u8 data);
 
 	u8 m_ppddr;
-	u8 m_ppdat_in;
 	u8 m_ppdat_out;
+	devcb_read8 m_gpio_r_cb;
 	devcb_write8 m_gpio_w_cb;
 
 	/* MBUS Module */
