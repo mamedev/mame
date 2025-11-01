@@ -97,7 +97,6 @@ blnctry:
 #include "seta2.h"
 
 #include "cpu/m68000/mcf5206e.h"
-#include "machine/mcf5206e.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
@@ -930,6 +929,28 @@ void funcube_state::outputs_w(uint8_t data)
 
 	funcube_debug_outputs();
 }
+
+// TODO: provide this hookup from Coldfire internals
+
+/*
+enum {
+	CF_PPDAT    =   0x1c8/4,
+	CF_MBSR     =   0x1ec/4
+};
+
+uint32_t mcf5206e_peripheral_device::seta2_coldfire_regs_r(offs_t offset)
+{
+	switch( offset )
+	{
+		case CF_MBSR:
+			return machine().rand();
+
+		case CF_PPDAT:
+			return ioport(":BATTERY")->read() << 16;
+	}
+
+	return m_coldfire_regs[offset];
+}*/
 
 uint8_t funcube_state::battery_r()
 {

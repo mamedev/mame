@@ -367,12 +367,13 @@ protected:
 	void execute_set_input(int inputnum, int state) override;
 
 	virtual space_config_vector memory_space_config() const override;
-	address_space_config m_coldfire_register_map;
+	address_space_config m_mbar_config;
 	address_space_config m_coldfire_vector_map;
 
 private:
+	bool is_mbar_access(offs_t offset);
 
-	void coldfire_register_map(address_map &map) ATTR_COLD;
+	void mbar_map(address_map &map) ATTR_COLD;
 	void coldfire_vector_map(address_map &map) ATTR_COLD;
 
 	void init_regs(bool first_init);
