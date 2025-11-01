@@ -30,7 +30,7 @@ TODO (pc9821as):
 
 TODO (pc9821ce):
 - Needs SCSI to boot stuff, or 2.5" option IDE for 98NOTE;
-- Can't boot any floppy;
+- Can't boot any floppy, thinks it's never ready/leaves motor off;
 
 TODO (pc9821cx3):
 - Incomplete bank mapping, keeps looping over the same routine when hopping to PnP BIOS after
@@ -488,6 +488,7 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0070, 0x007f).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
+	// TODO: check me, should derive from templated fn instead
 	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
 	map(0x00a0, 0x00af).rw(FUNC(pc9821_state::pc9821_a0_r), FUNC(pc9821_state::pc9821_a0_w)); //upd7220 bitmap ports / display registers
 //  map(0x00b0, 0x00b3) PC9861k (serial port?)
@@ -686,7 +687,7 @@ void pc9821_canbe_state::pc9821cx3_map(address_map &map)
 	// TODO: remaining settings
 	// bp 0xfd25a,1,{eax |= 0x91;g}
 	m_bios_view[4](0x000f8000, 0x000fffff).rom().region("biosrom", 0x38000);
-//	m_bios_view[5](0x000f8000, 0x000fffff).rom().region("biosrom", 0x30000);
+//  m_bios_view[5](0x000f8000, 0x000fffff).rom().region("biosrom", 0x30000);
 	// setup mode
 	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x40000);
 
@@ -700,10 +701,10 @@ void pc9821_canbe_state::pc9821cx3_io(address_map &map)
 {
 	pc9821_io(map);
 	// TODO: MBCFG index/data devices (as C-Bus option)
-//	map(0x0411, 0x0411) index
-//	map(0x0413, 0x0413) data
-//	map(0x0b00, 0x0b00) index
-//	map(0x0b02, 0x0b02) data
+//  map(0x0411, 0x0411) index
+//  map(0x0413, 0x0413) data
+//  map(0x0b00, 0x0b00) index
+//  map(0x0b02, 0x0b02) data
 	map(0x043d, 0x043d).w(FUNC(pc9821_canbe_state::itf_43d_bank_w));
 	// TODO: uses its own banking scheme to accomodate extra GFX ROM size
 	map(0x043f, 0x043f).lw8(NAME([this] (offs_t offset, u8 data) {
@@ -782,6 +783,18 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
+
+// works better without the SDIP hack
+static INPUT_PORTS_START( pc9821ce )
+	PORT_INCLUDE( pc9821 )
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
+
+	PORT_MODIFY("DSW3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
+INPUT_PORTS_END
+
 
 MACHINE_START_MEMBER(pc9821_state,pc9821)
 {
@@ -931,8 +944,8 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 
 //void pc9821_canbe_state::pc9821ce2(machine_config &config)
 //{
-//	pc9821ce(config);
-//	m_cbus[0]->set_default_option("pc9801_118");
+//  pc9821ce(config);
+//  m_cbus[0]->set_default_option("pc9801_118");
 //}
 
 void pc9821_canbe_state::pc9821cx3(machine_config &config)
@@ -969,12 +982,12 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 
 //void pc9821_mate_x_state::pc9821xs(machine_config &config)
 //{
-//	pc9821(config);
-//	const XTAL xtal = XTAL(66'000'000);
-//	I486(config.replace(), m_maincpu, xtal); // i486dx2
-//	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
-//	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
-//	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+//  pc9821(config);
+//  const XTAL xtal = XTAL(66'000'000);
+//  I486(config.replace(), m_maincpu, xtal); // i486dx2
+//  m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_x_state::pc9821_map);
+//  m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
+//  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 //}
 
 void pc9821_mate_x_state::pc9821xa16(machine_config &config)
@@ -1312,7 +1325,7 @@ ROM_START( pc9821ce )
 
 	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
 	// Uses SCSI not IDE
-//	LOAD_IDE_ROM
+//  LOAD_IDE_ROM
 ROM_END
 
 
@@ -1324,9 +1337,9 @@ getitf98 dump known to exist, in case anyone bothers to assemble a franken def .
 */
 
 //ROM_START( pc9821ce2 )
-//	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-//	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, BAD_DUMP CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
-//	ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
+//  ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+//  ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, BAD_DUMP CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
+//  ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
 
 
 /*
@@ -1405,15 +1418,15 @@ Retired: not very useful without actual code
 */
 
 //ROM_START( pc9821xs )
-//	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-//	// "ROM SUM ERROR"
-//	ROM_LOAD( "itf.rom",         0x10000, 0x008000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-//	ROM_LOAD( "bios_xs.rom",     0x18000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
-//	// tested in RAM at PC=0 onward (specifically PC=1c)
-//	ROM_FILL( 0x2fffe, 1, 0x0d )
+//  ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+//  // "ROM SUM ERROR"
+//  ROM_LOAD( "itf.rom",         0x10000, 0x008000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//  ROM_LOAD( "bios_xs.rom",     0x18000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+//  // tested in RAM at PC=0 onward (specifically PC=1c)
+//  ROM_FILL( 0x2fffe, 1, 0x0d )
 
-//	ROM_REGION( 0x80000, "chargen", 0 )
-//	ROM_LOAD( "font_xs.rom",     0x00000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
+//  ROM_REGION( 0x80000, "chargen", 0 )
+//  ROM_LOAD( "font_xs.rom",     0x00000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
 /*
 Xa16 - Pentium P54C @ 166
@@ -1658,7 +1671,7 @@ COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_
 // ...
 
 // 98MULTi CanBe (i486/Pentium, desktop & tower, Multimedia PC with optional TV Tuner & remote control function, Fax, Modem, MPEG-2, FX-98IF for PC-FX compatibility etc. etc.)
-COMP( 1993, pc9821ce,   0,         0, pc9821ce,     pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce (98MULTi CanBe)",    MACHINE_NOT_WORKING )
+COMP( 1993, pc9821ce,   0,         0, pc9821ce,     pc9821ce, pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce (98MULTi CanBe)",    MACHINE_NOT_WORKING )
 //COMP( 1994, pc9821ce2,  pc9821ce,  0, pc9821ce2,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Ce2 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
 COMP( 1995, pc9821cx3,  0,         0, pc9821cx3,    pc9821,   pc9821_canbe_state, init_pc9801_kanji,   "NEC",   "PC-9821Cx3 (98MULTi CanBe)",    MACHINE_NOT_WORKING )
 

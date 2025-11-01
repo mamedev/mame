@@ -151,7 +151,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_outlatch(*this, "outlatch"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_sprites(*this, "sprites"),
 		m_okibank(*this, "okibank"),
@@ -194,7 +193,6 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<gaelco_wrally_sprites_device> m_sprites;
 	required_memory_bank m_okibank;
@@ -256,8 +254,8 @@ TILE_GET_INFO_MEMBER(wrally_state::get_tile_info)
 
 void wrally_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_sprites, tilemap_get_info_delegate(*this, FUNC(wrally_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tilemap[1] = &machine().tilemap().create(*m_sprites, tilemap_get_info_delegate(*this, FUNC(wrally_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
 
 	m_tilemap[0]->set_transmask(0, 0xff01, 0x00ff); // this layer is split in two (pens 1..7, pens 8-15)
 	m_tilemap[1]->set_transparent_pen(0);
@@ -542,11 +540,9 @@ void wrally_state::wrally(machine_config &config)
 	screen.set_screen_update(FUNC(wrally_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wrally);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*8);
 
-	GAELCO_WRALLY_SPRITES(config, m_sprites, 0);
-	m_sprites->set_gfxdecode_tag("gfxdecode");
+	GAELCO_WRALLY_SPRITES(config, m_sprites, 0, m_palette, gfx_wrally);
 	m_sprites->set_screen("screen");
 
 	LS259(config, m_outlatch);

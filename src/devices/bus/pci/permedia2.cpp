@@ -24,7 +24,7 @@ permedia2_device::permedia2_device(const machine_config &mconfig, device_type ty
 	, m_vga(*this, "vga")
 	, m_vga_rom(*this, "vga_rom")
 {
-    // TODO: can change class code
+	// TODO: can change class code
 	set_ids(0x104c3d07, 0x01, 0x030100, 0x104c3d07);
 }
 
@@ -36,7 +36,7 @@ permedia2_device::permedia2_device(const machine_config &mconfig, const char *ta
 
 ROM_START( permedia2 )
 	ROM_REGION32_LE( 0x20000, "vga_rom", ROMREGION_ERASEFF )
-    // TODO: 4 other dumps available on VGALegacyMK3, separate Sun versions to own subclass
+	// TODO: 4 other dumps available on VGALegacyMK3, separate Sun versions to own subclass
 	ROM_SYSTEM_BIOS( 0, "creative",   "03/03/98 Creative Graphics Blaster Exxtreme" )
 	ROMX_LOAD( "creative.vbi",  0x00000, 0x08000, CRC(3e622da7) SHA1(b06f89777badfdb7cd4c76b414ba19fcaed243c9), ROM_BIOS(0) )
 	// Tech-Source Inc. Raptor GFX
@@ -69,7 +69,7 @@ void permedia2_device::device_add_mconfig(machine_config &config)
 	// TODO: bump to TVP4020 core
 	VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
-    // either 4 or 8MB
+	// either 4 or 8MB
 	m_vga->set_vram_size(8*1024*1024);
 
 }

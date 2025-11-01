@@ -250,7 +250,7 @@ void oktagon2008_device::device_add_mconfig(machine_config &config)
 		downcast<ncr53c94_device &>(*device).irq_handler_cb().set(*this, FUNC(oktagon2008_device::irq_w));
 	});
 
-	I2C_24C04(config, m_eeprom);
+	I2C_24C04(config, m_eeprom); // 24C02 on some PCBs; only addresses 0x100-0x10e appear to be used by the firmware
 }
 
 ROM_START(oktagon2008)

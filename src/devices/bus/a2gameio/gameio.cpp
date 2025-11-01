@@ -22,10 +22,10 @@
     The Apple IIgs also recognizes a switch input 3, though this is
     placed on pin 9 of the internal connector rather than 16.
 
-    The Apple IIe, IIc and IIgs also have an external DE-9 connector
-    that carries a subset of the signals, excluding the annunciator
-    outputs and utility strobe (which the IIc and IIgs do not have).
-    The Laser 3000 provides only the 9-pin connector.
+    The Apple IIe, IIc and IIgs have an external DE-9 connector
+    that carries a subset of the signals, excluding the utility strobe
+    (which the IIc and IIgs do not have) and annunciator outputs.
+    The Apple IIc and Laser clones provide only the 9-pin connector.
 
 **********************************************************************
                             ____________

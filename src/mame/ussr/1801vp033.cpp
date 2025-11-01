@@ -35,7 +35,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(K1801VP033, k1801vp033_device, "1801vp1_033", "1801VP1-033")
+DEFINE_DEVICE_TYPE(K1801VP033, k1801vp033_device, "1801vp1_033", "1801VP1-033 parallel/serial interface")
 
 
 

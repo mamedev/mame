@@ -9,8 +9,8 @@ DEFINE_DEVICE_TYPE(BLMBYCAR_SPRITES, blmbycar_sprites_device, "blmbycar_sprites"
 
 gaelco_wrally_sprites_device::gaelco_wrally_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -71,7 +71,7 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 {
 	m_temp_bitmap_sprites.fill(0, cliprect);
 
-	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *const sprgfx = gfx(0);
 
 	for (int i = 6 / 2; i < (0x1000 - 6) / 2; i += 4)
 	{
@@ -92,26 +92,26 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 		}
 
 		// wrally adjusts sx by 0x0f, blmbycar implementation was 0x10
-		uint8_t const *const gfx_src = gfx->get_data(number % gfx->elements());
+		uint8_t const *const gfx_src = sprgfx->get_data(number % sprgfx->elements());
 
-		for (int py = 0; py < gfx->height(); py++)
+		for (int py = 0; py < sprgfx->height(); py++)
 		{
 			/* get a pointer to the current line in the screen bitmap */
 			const int ypos = ((sy + py) & 0x1ff);
 			uint16_t *const srcy = &m_temp_bitmap_sprites.pix(ypos);
 
-			const int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
+			const int gfx_py = yflip ? (sprgfx->height() - 1 - py) : py;
 
-			uint8_t const *const gfx_row = &gfx_src[gfx->rowbytes() * gfx_py];
+			uint8_t const *const gfx_row = &gfx_src[sprgfx->rowbytes() * gfx_py];
 
 			if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y)) continue;
 
-			for (int px = 0; px < gfx->width(); px++)
+			for (int px = 0; px < sprgfx->width(); px++)
 			{
 				/* get current pixel */
 				const int xpos = (((sx + px) & 0x3ff) - 0x0f) & 0x3ff;
 				uint16_t *const pixel = srcy + xpos;
-				const int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
+				const int gfx_px = xflip ? (sprgfx->width() - 1 - px) : px;
 
 				/* get asociated pen for the current sprite pixel */
 				const int gfx_pen = gfx_row[gfx_px];

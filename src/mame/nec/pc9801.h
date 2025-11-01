@@ -45,7 +45,7 @@
 
 #include "video/upd7220.h"
 
-#include "bus/cbus/pc9801_cbus.h"
+#include "bus/pc98_cbus/slot.h"
 
 #include "pc98_cd.h"
 #include "pc98_kbd.h"
@@ -177,7 +177,7 @@ protected:
 	optional_device<ram_device> m_ram;
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
-	required_device_array<pc9801_slot_device, 2> m_cbus;
+	required_device_array<pc98_cbus_slot_device, 2> m_cbus;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 private:

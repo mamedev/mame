@@ -34,15 +34,16 @@ Main components found on its main PCB:
 
 #include "emu.h"
 
+#include "sun_gem.h"
+
+//#include "bus/pci/permedia2.h"
+
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sparc/sparc.h"
 
 #include "machine/pci.h"
 
 #include "softlist_dev.h"
-
-#include "sun_gem.h"
-//#include "bus/pci/permedia2.h"
 
 
 namespace {

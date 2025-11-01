@@ -602,7 +602,6 @@ Notes:
 #include "machine/nvram.h"
 #include "speaker.h"
 
-#include "vr.lh"
 #include "model1io2.lh"
 
 // On the real system, another 315-5338A is acting as slave

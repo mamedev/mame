@@ -119,4 +119,6 @@ DECLARE_DEVICE_TYPE(S24TILE,   segas24_tile_device)
 DECLARE_DEVICE_TYPE(S24SPRITE, segas24_sprite_device)
 DECLARE_DEVICE_TYPE(S24MIXER,  segas24_mixer_device)
 
+extern const internal_layout layout_vr; // for games that support a 16:9 option (Model 1 and Model 2 use this)
+
 #endif // MAME_SEGA_SEGAIC24_H

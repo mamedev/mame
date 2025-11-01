@@ -550,8 +550,8 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 		VA_RC_EG(config, m_mux_eg[i]).set_c(MUX_EG_C[i]);
 		DAC08(config, m_mux_dac[i]);
 		VA_VCA(config, m_mux_vca[i]);
-		m_mux_dac[i]->add_route(0, m_mux_vca[i], 1.0, 0);
-		m_mux_eg[i]->add_route(0, m_mux_vca[i], mux_dac_scale, 1);
+		m_mux_dac[i]->add_route(0, m_mux_vca[i], 1.0, va_vca_device::INPUT_AUDIO);
+		m_mux_eg[i]->add_route(0, m_mux_vca[i], mux_dac_scale, va_vca_device::INPUT_GAIN);
 	}
 
 
@@ -573,8 +573,8 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 
 	VA_RC_EG(config, m_hat_eg).set_c(CAP_U(1));  // C71
 	auto &hat_vca = VA_VCA(config, "hat_vca");  // 2SD1469R, Q32
-	hat_hpf.add_route(0, hat_vca, HAT_VCA_SCALE, 0);
-	m_hat_eg->add_route(0, hat_vca, 1.0 / VCC, 1);
+	hat_hpf.add_route(0, hat_vca, HAT_VCA_SCALE, va_vca_device::INPUT_AUDIO);
+	m_hat_eg->add_route(0, hat_vca, 1.0 / VCC, va_vca_device::INPUT_GAIN);
 
 
 	// *** Single sound section ***
@@ -596,8 +596,8 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 
 		VA_RC_EG(config, m_cymbal_eg[i]).set_c(CYMBAL_EG_C[i]);
 		VA_VCA(config, m_cymbal_vca[i]);  // 2SD1469R [Q14, Q15]
-		m_cymbal_hpf[i]->add_route(0, m_cymbal_vca[i], CYMBAL_VCA_SCALE, 0);
-		m_cymbal_eg[i]->add_route(0, m_cymbal_vca[i], 1.0 / VCC, 1);
+		m_cymbal_hpf[i]->add_route(0, m_cymbal_vca[i], CYMBAL_VCA_SCALE, va_vca_device::INPUT_AUDIO);
+		m_cymbal_eg[i]->add_route(0, m_cymbal_vca[i], 1.0 / VCC, va_vca_device::INPUT_GAIN);
 	}
 
 

@@ -15,7 +15,6 @@ TODO:
 - Port over pc88va SASI version in common C-Bus option;
 - Remove kludge for POR bit in a20_ctrl_w fn;
 \- Causes "SYSTEM SHUTDOWN"s on OS installs/reboots (soft reset the machine manually);
-- hookup PC80S31K device for 2d type floppies, fix loading bug (missing specific BIOS?)
 - CMT support (-03/-13/-36 i/f or cbus only, supported by i86/V30 fully compatible machines
   only);
 - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
@@ -58,8 +57,8 @@ TODO (pc9801ux):
 #include "emu.h"
 #include "pc9801.h"
 
-#include "bus/cbus/amd98.h"
-#include "bus/cbus/options.h"
+#include "bus/pc98_cbus/amd98.h"
+#include "bus/pc98_cbus/options.h"
 #include "machine/input_merger.h"
 
 void pc98_base_state::rtc_w(uint8_t data)
@@ -1994,7 +1993,7 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
-	PC9801CBUS_SLOT(config, m_cbus[0], pc98_cbus_devices, "pc9801_26");
+	PC98_CBUS_SLOT(config, m_cbus[0], pc98_cbus_devices, "pc9801_26");
 	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
@@ -2005,7 +2004,7 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	m_cbus[0]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
 	m_cbus[0]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
 
-	PC9801CBUS_SLOT(config, m_cbus[1], pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, m_cbus[1], pc98_cbus_devices, nullptr);
 	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
 	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
@@ -2142,6 +2141,7 @@ void pc9801_state::pc9801_common(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("pc98");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc98");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2420,9 +2420,6 @@ ROM_START( pc9801 )
 
 	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x800, "kbd_mcu", ROMREGION_ERASEFF)
-	ROM_LOAD( "mcu.bin", 0x0000, 0x0800, NO_DUMP ) //connected through a i8251 UART, needs decapping
-
 	ROM_REGION( 0x80000, "chargen", 0 )
 	// TODO: original dump, needs heavy bitswap mods
 	ROM_LOAD( "sfz4w 00.bin",   0x00000, 0x02000, CRC(11197271) SHA1(8dbd2f25daeed545ea2c74d849f0a209ceaf4dd7) )
@@ -2431,7 +2428,22 @@ ROM_START( pc9801 )
 	// bad dump, 8x16 charset? (it's on the kanji board)
 	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) )
 
-	LOAD_KANJI_ROMS
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	// original pc9801f dump, half size
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_CONTINUE(                      0x20000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_CONTINUE(                      0x20001, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_CONTINUE(                      0x60000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	ROM_CONTINUE(                      0x60001, 0x4000  )
+
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	// raw extracted from pc9801vm (after driver_init conversion)
+	ROM_LOAD( "kanji.bin", 0, 0x100000, BAD_DUMP CRC(2de4336f) SHA1(dd783d4dca5812561f853ad0307ae90420292f09) )
+
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -2458,9 +2470,6 @@ ROM_START( pc9801f )
 	ROM_LOAD16_BYTE( "urf02-01.bin", 0x00001, 0x4000, BAD_DUMP CRC(62a86928) SHA1(4160a6db096dbeff18e50cbee98f5d5c1a29e2d1) )
 	ROM_LOAD( "2hdif.rom", 0x10000, 0x1000, BAD_DUMP CRC(9652011b) SHA1(b607707d74b5a7d3ba211825de31a8f32aec8146) ) // needs dumping from a board
 
-	ROM_REGION( 0x800, "kbd_mcu", ROMREGION_ERASEFF)
-	ROM_LOAD( "mcu.bin", 0x0000, 0x0800, NO_DUMP ) //connected through a i8251 UART, needs decapping
-
 	ROM_REGION( 0x80000, "chargen", 0 )
 	// note: ROM labels of following two may be swapped
 	//original is a bad dump, this is taken from i386 model
@@ -2468,7 +2477,22 @@ ROM_START( pc9801f )
 	//bad dump, 8x16 charset? (it's on the kanji board)
 	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) )
 
-	LOAD_KANJI_ROMS
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	// original pc9801f dump, half size
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_CONTINUE(                      0x20000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_CONTINUE(                      0x20001, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_CONTINUE(                      0x60000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	ROM_CONTINUE(                      0x60001, 0x4000  )
+
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	// raw extracted from pc9801vm (after driver_init conversion)
+	ROM_LOAD( "kanji.bin", 0, 0x100000, BAD_DUMP CRC(2de4336f) SHA1(dd783d4dca5812561f853ad0307ae90420292f09) )
+
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 ROM_END
 
 /*
@@ -2667,8 +2691,8 @@ ROM_START( pc9801fs )
 	LOAD_KANJI_ROMS
 //  LOAD_IDE_ROM
 
-//	ROM_REGION( 0x4000, "scsi", ROMREGION_ERASEVAL(0xcb) )
-//	ROM_COPY( "biosrom", 0x16000, 0x00000, 0x02000 )
+//  ROM_REGION( 0x4000, "scsi", ROMREGION_ERASEVAL(0xcb) )
+//  ROM_COPY( "biosrom", 0x16000, 0x00000, 0x02000 )
 ROM_END
 
 /*
@@ -2908,8 +2932,8 @@ void pc9801vm_state::init_pc9801vm_kanji()
 // specifically happening for PC9801RS. This will be hopefully put into stone with driver splits at some point in future.
 
 // "vanilla" class (i86, E/F/M)
-COMP( 1982, pc9801,     0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801",   MACHINE_NOT_WORKING ) // genuine dump
-COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1982, pc9801,     0,        0, pc9801,    pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801",   MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING ) // genuine dump
 
 // N5200 (started as a vanilla PC-98 business line derivative,
 //        eventually diverged into its own thing and incorporated various Hyper 98 features.

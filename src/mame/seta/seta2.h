@@ -196,14 +196,12 @@ private:
 	uint8_t nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset] = data; }
 
-	uint32_t debug_r();
+	uint16_t debug_r();
 	uint8_t coins_r();
 	void leds_w(uint8_t data);
 	uint8_t outputs_r();
 	void outputs_w(uint8_t data);
 	uint8_t battery_r();
-
-	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 
 	void funcube2_map(address_map &map) ATTR_COLD;
 	void funcube_map(address_map &map) ATTR_COLD;

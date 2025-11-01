@@ -37,7 +37,7 @@
 #define LOG_DRAM        (1U << 7)
 #define LOG_SIM         (1U << 8)
 #define LOG_DMA         (1U << 9)
-#define VERBOSE         ( LOG_DEBUG | LOG_UART | LOG_SWDT | LOG_MBUS | LOG_DRAM | LOG_SIM | LOG_DMA )
+#define VERBOSE         ( LOG_DEBUG | LOG_UART | LOG_SWDT | LOG_MBUS | LOG_DRAM | LOG_SIM | LOG_DMA | LOG_TIMER )
 #include "logmacro.h"
 
 #define INT_LEVEL(N)    ((N&0x1c) >> 2)
@@ -220,8 +220,9 @@ void mcf5206e_device::coldfire_register_map(address_map &map)
 	map(0xf0000240, 0xf000025f).m(m_dma[1], FUNC(coldfire_dma_device::dma_map));
 }
 
-void mcf5206e_device::coldfire_vector_map(address_map &map){
-	map(0xfffffe0, 0xffffffc).r(m_sim, FUNC(coldfire_sim_device::interrupt_callback));
+void mcf5206e_device::coldfire_vector_map(address_map &map)
+{
+	map(0xfffffe0, 0xfffffff).r(m_sim, FUNC(coldfire_sim_device::interrupt_callback));
 }
 
 /*
@@ -343,7 +344,8 @@ void mcf5206e_device::ppddr_w(u8 data)
 {
 	LOGMASKED(LOG_DEBUG, "%s: (Port A Data Direction Register) PPDDR_w %02x\n", this->machine().describe_context(), data);
 
-	if(m_ppddr != data){
+	if(m_ppddr != data)
+	{
 		// Updating the register updates the pins immediately
 		u8 mask = 0;
 		if(!BIT(m_sim->get_par(), 4)) mask |= 0x0f; // PP 0-3 / DDATA 0-3
@@ -414,7 +416,6 @@ void coldfire_sim_device::device_reset()
 
 	m_simr = 0xc0;
 	m_marb = 0x00;
-	m_ipr = 0x3ffe;
 	m_sypcr = 0x00;
 	m_swivr = 0x0f;
 	m_imr = 0x3ffe;
@@ -462,13 +463,15 @@ void coldfire_sim_device::sim_map(address_map &map)
 }
 
 // MBAR + 0x003: SIM Configuration Register - Not really applicable to MAME as there's no BDM port currently but hey.
-void  coldfire_sim_device::simr_w(u8 data){
+void  coldfire_sim_device::simr_w(u8 data)
+{
 	LOGMASKED(LOG_DEBUG, "%s: SIMR_w %02x\n", this->machine().describe_context(), data);
 	m_simr = data;
 }
 
 // MBAR + 0x003: Bus Master Arbitration Control
-void coldfire_sim_device::marb_w(u8 data){
+void coldfire_sim_device::marb_w(u8 data)
+{
 	LOGMASKED(LOG_DEBUG, "%s: (Bus Master Arbitration Control) MARB_w %02x\n", this->machine().describe_context(), data);
 	m_marb = data;
 }
@@ -476,7 +479,8 @@ void coldfire_sim_device::marb_w(u8 data){
 // MBAR + 0x014 -> 0x022: Interupt Control Registers
 u8 coldfire_sim_device::icr_r(offs_t offset)
 {
-	if(offset > 15){
+	if(offset > 15)
+	{
 		logerror("%s: Request to read invalid ICR offset received: %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
@@ -486,7 +490,8 @@ u8 coldfire_sim_device::icr_r(offs_t offset)
 
 void coldfire_sim_device::icr_w(offs_t offset, u8 data)
 {
-	switch (offset){
+	switch (offset)
+	{
 		case 0: m_icr[offset] = (data & 0x83) + (1 << 2); break;
 		case 1: m_icr[offset] = (data & 0x83) + (2 << 2); break;
 		case 2: m_icr[offset] = (data & 0x83) + (3 << 2); break;
@@ -504,7 +509,8 @@ void coldfire_sim_device::icr_w(offs_t offset, u8 data)
 		case 14: m_icr[offset] = (data & 0x9f); break;
 		default: logerror("%s: Implausible ICR offset received: %d", this->machine().describe_context(), offset);
 	}
-	//ICR_info(m_icr[offset]);
+	//printf("%d %02x -> %02x\n", offset, data, m_icr[offset]);
+	//icr_info(m_icr[offset]);
 }
 
 // MBAR + 0x036: Interrupt Mask Register
@@ -531,12 +537,16 @@ void coldfire_sim_device::par_w(u16 data)
 void coldfire_sim_device::set_external_interrupt(int level, int state)
 {
 	// State here is inverted, inputs are active low
-	if(BIT(m_par, 6)){
+	if(BIT(m_par, 6))
+	{
 		// External IPL pins are encoded (IPL 1-7 levels)
 		m_external_ipl = level;
-	} else {
+	}
+	else
+	{
 		// External IPL pins are discrete (IRQ1, IRQ4, IRQ7)
-		switch(level){
+		switch(level)
+		{
 			case 1: BITWRITE(m_external_ipl, 0, state); break;
 			case 4: BITWRITE(m_external_ipl, 1, state); break;
 			case 7: BITWRITE(m_external_ipl, 2, state); break;
@@ -545,29 +555,46 @@ void coldfire_sim_device::set_external_interrupt(int level, int state)
 	}
 }
 
+void mcf5206e_device::execute_set_input(int inputnum, int state)
+{
+	m68000_musashi_device::execute_set_input(inputnum, state);
+	// HACK: make it accept external interrupts
+	if (inputnum == 1 || inputnum == 4 || inputnum == 7)
+		m_sim->set_ipr(inputnum, state);
+
+	if (BIT(m_sim->get_par(), 6))
+		popmessage("mcf5206e: encoded interrupt priority!");
+}
+
 // Return the vector for the highest priority and level interrupt
 u8 coldfire_sim_device::interrupt_callback(offs_t level)
 {
 	u8 ipl = (level >> 1) & 7;  // Should be 2 for coldFire, really
+
 	u8 highest_priority_icr = 0;
 	u8 highest_priority_device = 0;
 
-	if(!this->machine().side_effects_disabled()) {
+	if(!this->machine().side_effects_disabled())
+	{
 		//logerror("%s: interrupt_callback(%u), ipl: %x, m_ipr: %x, m_imr: %x\n", this->machine().describe_context(), level, ipl, m_ipr, m_imr);
 		m_maincpu->set_input_line(ipl, CLEAR_LINE);
 	}
 
-	for (int i = 0; i < 15; i++) {
+	for (int i = 0; i < 15; i++)
+	{
 		//if(!this->machine().side_effects_disabled()) logerror("i: %x, m_icr: %x, ipl: %x, ipr_bit: %x\n", i, INT_LEVEL(m_icr[i]), ipl, BIT(m_ipr, 1 + i));
-		if (BIT(m_ipr, 1 +i) && (INT_LEVEL(m_icr[i]) == ipl)) {
-			if (highest_priority_device == 0 || INT_PRIORITY(m_icr[i]) > INT_PRIORITY(highest_priority_icr)) {
+		if (BIT(m_ipr, 1 + i) && (INT_LEVEL(m_icr[i]) == ipl))
+		{
+			if (highest_priority_device == 0 || INT_PRIORITY(m_icr[i]) > INT_PRIORITY(highest_priority_icr))
+			{
 				highest_priority_icr = m_icr[i];
 				highest_priority_device = i + 1;
 			}
 		}
 	}
 
-	if (highest_priority_device == 0) {
+	if (highest_priority_device == 0)
+	{
 		if(!this->machine().side_effects_disabled()) logerror("%s: Spurious interrupt detected: %u\n", this->machine().describe_context(), ipl);
 		return EXCEPTION_SPURIOUS_INTERRUPT;
 	}
@@ -577,11 +604,15 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 	u8 vector = 0xff;
 
 	// Check if ICR specifies to use autovectoring
-	if (BIT(highest_priority_icr, 7)) {
+	if (BIT(highest_priority_icr, 7))
+	{
 		vector = m68000_base_device::autovector(ipl);
-	} else {
+	}
+	else
+	{
 		// Determine the correct vector to return
-		switch (highest_priority_device) {
+		switch (highest_priority_device)
+		{
 			case EXTERNAL_IPL_1:
 			case EXTERNAL_IPL_2:
 			case EXTERNAL_IPL_3:
@@ -589,27 +620,34 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 			case EXTERNAL_IPL_5:
 			case EXTERNAL_IPL_6:
 			case EXTERNAL_IPL_7:
-				if (!BIT(highest_priority_icr, 7)) vector = irq_vector_cb();
+				if (!BIT(highest_priority_icr, 7))
+					vector = irq_vector_cb();
 				break;
 			case WATCHDOG_IRQ:
-				if (!BIT(highest_priority_icr, 7)) vector = m_swivr;
+				if (!BIT(highest_priority_icr, 7))
+					vector = m_swivr;
 				break;
 			case UART_1_IRQ:
-				if (!BIT(highest_priority_icr, 7)) vector = m_maincpu->m_uart[0]->get_irq_vector();
+				if (!BIT(highest_priority_icr, 7))
+					vector = m_maincpu->m_uart[0]->get_irq_vector();
 				break;
 			case UART_2_IRQ:
-				if (!BIT(highest_priority_icr, 7)) vector = m_maincpu->m_uart[1]->get_irq_vector();
+				if (!BIT(highest_priority_icr, 7))
+					vector = m_maincpu->m_uart[1]->get_irq_vector();
 				break;
 			case DMA_0_IRQ:
-				if (!BIT(highest_priority_icr, 7)) vector = m_maincpu->m_dma[0]->get_irq_vector();
+				if (!BIT(highest_priority_icr, 7))
+					vector = m_maincpu->m_dma[0]->get_irq_vector();
 				//m_maincpu->m_dma[0]->dma_int_callback();
 				break;
 			case DMA_1_IRQ:
-				if (!BIT(highest_priority_icr, 7)) vector = m_maincpu->m_dma[1]->get_irq_vector();
+				if (!BIT(highest_priority_icr, 7))
+					vector = m_maincpu->m_dma[1]->get_irq_vector();
 				//m_maincpu->m_dma[1]->dma_int_callback();
 				break;
 			default:
-				if(!this->machine().side_effects_disabled()) logerror("%s: Vector required for device that only supports autovectoring: %u, %u\n",
+				if(!this->machine().side_effects_disabled())
+					logerror("%s: Vector required for device that only supports autovectoring: %u, %u\n",
 						this->machine().describe_context(), ipl, highest_priority_device);
 				vector = EXCEPTION_UNINITIALIZED_INTERRUPT;
 				break;
@@ -625,11 +663,16 @@ void coldfire_sim_device::set_interrupt(int interrupt, int state)
 
 	//LOGMASKED(LOG_DEBUG, "%s: set_interrupt(%u, %u): %x, %d, %d\n", this->machine().describe_context(), interrupt, state, m_ipr, BIT(m_imr, interrupt), m_imr & interrupt);
 
+	//printf("%d %d -> %04x %04x\n", interrupt, state, m_imr, m_ipr);
+
 	// IMR enables interrupts when bit is 0
-	if(state != CLEAR_LINE){
-		if(!BIT(m_imr, interrupt)){
+	if(state != CLEAR_LINE)
+	{
+		if(!BIT(m_imr, interrupt))
+		{
 			u8 icr = 0;
-			switch (interrupt){
+			switch (interrupt)
+			{
 				case EXTERNAL_IPL_1: icr = m_icr[ICR1]; break;
 				case EXTERNAL_IPL_2: icr = m_icr[ICR2]; break;
 				case EXTERNAL_IPL_3: icr = m_icr[ICR3]; break;
@@ -667,7 +710,8 @@ void coldfire_sim_device::rsr_w(u8 data)
 // MBAR + 0x041
 void coldfire_sim_device::sypcr_w(u8 data)
 {
-	if(!m_sypcr_locked){
+	if(!m_sypcr_locked)
+	{
 		// SYPCR is a write-once register, whatever is written first remains until system reset.
 		LOGMASKED(LOG_SWDT, "%s: (System Protection Control) SYPCR_w %02x\n", this->machine().describe_context(), data);
 		m_sypcr_locked = true;
@@ -675,12 +719,17 @@ void coldfire_sim_device::sypcr_w(u8 data)
 
 		// Bus monitoring is not supported (nor will it be?)
 
-		if(BIT(m_sypcr, 6)){
+		if(BIT(m_sypcr, 6))
+		{
 			m_swdt->watchdog_enable(BIT(data, 7));
-		} else {
-			// Set timer for interrupt
 		}
-	} else {
+		else
+		{
+			// TODO: Set timer for interrupt
+		}
+	}
+	else
+	{
 		LOG("%s: Write to SYPCR_w (%02x) when PCR is locked\n", this->machine().describe_context(), data);
 	}
 }
@@ -696,8 +745,10 @@ void coldfire_sim_device::swivr_w(u8 data)
 void coldfire_sim_device::swsr_w(u8 data)
 {
 	LOGMASKED(LOG_SWDT, "%s: (Software Watchdog Service Routine) SWIVR_r %02x\n", this->machine().describe_context(), data);
-	if(data == swdt_reset_sequence[m_swdt_w_count]) m_swdt_w_count++;
-	if(m_swdt_w_count == 2) {
+	if(data == swdt_reset_sequence[m_swdt_w_count])
+		m_swdt_w_count++;
+	if(m_swdt_w_count == 2)
+	{
 		m_swdt->watchdog_reset();
 		m_swdt_w_count = 0;
 	}
@@ -713,8 +764,8 @@ TIMER_CALLBACK_MEMBER(coldfire_sim_device::swdt_callback)
  * Timer Module/s
  * Creates an MCF5206e compatible 16-bit timer
  */
-coldfire_timer_device::coldfire_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, COLDFIRE_TIMER, tag, owner, clock)
+coldfire_timer_device::coldfire_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, COLDFIRE_TIMER, tag, owner, clock)
 	, write_irq(*this)
 {
 }
@@ -740,7 +791,8 @@ void coldfire_timer_device::device_start()
 	save_item(NAME(m_timer_start_time));
 }
 
-void coldfire_timer_device::device_reset(){
+void coldfire_timer_device::device_reset()
+{
 	m_tmr = 0x0000;
 	m_trr = 0xffff;
 	m_tcn = 0x0000;
@@ -753,19 +805,24 @@ void coldfire_timer_device::device_reset(){
 
 TIMER_CALLBACK_MEMBER(coldfire_timer_device::timer_callback)
 {
-	if(m_tmr & T_FRR){
+	if(m_tmr & T_FRR)
+	{
 		// FRR resets counter to 0
 		m_tcn = 0;
 	}
 	m_ter |= T_EREF;
-	write_irq(ASSERT_LINE);
+
+	// TODO: capture edge irq modes
+	if(BIT(m_tmr, 4))
+		write_irq(ASSERT_LINE);
 }
 
 void coldfire_timer_device::tmr_w(u16 data)
 {
 	u16 cmd = data;
 
-	if((m_tmr & T_RST) && !(cmd & T_RST)){
+	if((m_tmr & T_RST) && !(cmd & T_RST))
+	{
 		// T_RST high to low resets the entire timer
 		device_reset();
 		return;
@@ -773,8 +830,9 @@ void coldfire_timer_device::tmr_w(u16 data)
 
 	m_tmr = cmd;
 
-	if (m_tmr & T_RST){
-		// todo: add tin pin support
+	if(m_tmr & T_RST)
+	{
+		// TODO: add tin pin support
 		int div, start, interval;
 		start = (m_trr - m_tcn);
 		div = ((m_tmr & 0xff00) >> 8) + 1;                      // 1 -> 256 division scale
@@ -861,8 +919,8 @@ void mcf5206e_device::init_regs(bool first_init)
  * Hosts I2C and Motorola extensions to the format. Can act as a device or host.
 */
 
-coldfire_mbus_device::coldfire_mbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, COLDFIRE_MBUS, tag, owner, clock)
+coldfire_mbus_device::coldfire_mbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, COLDFIRE_MBUS, tag, owner, clock)
 	, write_sda(*this)
 	, write_scl(*this)
 	, write_irq(*this)
@@ -916,7 +974,7 @@ void coldfire_mbus_device::mbus_map(address_map &map)
 
 TIMER_CALLBACK_MEMBER(coldfire_mbus_device::mbus_callback)
 {
-	// Do bit transfers etc
+	// TODO: Do bit transfers etc
 }
 
 void coldfire_mbus_device::madr_w(u8 data)
@@ -972,8 +1030,8 @@ void coldfire_mbus_device::mbdr_w(u8 data)
  *
 */
 
-coldfire_dma_device::coldfire_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, COLDFIRE_DMA, tag, owner, clock)
+coldfire_dma_device::coldfire_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, COLDFIRE_DMA, tag, owner, clock)
 	, write_irq(*this)
 {
 }

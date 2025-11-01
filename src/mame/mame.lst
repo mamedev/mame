@@ -17733,6 +17733,7 @@ hkagerou
 hnrose
 hparadis
 htengoku
+htsubaki
 janshinp
 jongoh
 jongtei
@@ -18176,7 +18177,9 @@ pwrflip
 fever13
 goldstrk
 lastbank
+lpierrot
 mir7hg
+mir7hgt
 ukiyobox
 wcircus
 
@@ -19445,14 +19448,17 @@ bbl380
 dgun2953
 dphh8630
 dphh8633
+dphh8661
 mc_cb203
 pg118
+ppg118
 qpet
 ragc153
 retro150
 retro150a
 rhhc152
 supreme
+table108
 throwbck
 toumapet
 
@@ -19462,12 +19468,33 @@ chesskng
 @source:handheld/dbridgec.cpp
 dbridgec
 
+@source:handheld/evolution_handheld.cpp
+buttdtct
+evolhh
+pokexyqz
+smkatsum
+yuleyuan
+
 @source:handheld/gameking.cpp
 gamekin3
 gameking
 
+@source:handheld/generalplus_gpce4.cpp
+mapacman
+parcade
+siddr
+tagalaga
+taspinv
+taturtf
+
+@source:handheld/generalplus_gpel31xx.cpp
+tamameet
+
 @source:handheld/gmaster.cpp
 gmaster
+
+@source:handheld/gw35th.cpp
+gwsmb35
 
 @source:handheld/hh_cop400.cpp
 bshipg
@@ -19561,6 +19588,7 @@ zackman
 @source:handheld/hh_ht11xx.cpp
 brke23p2
 ga888
+piko55
 
 @source:handheld/hh_melps4.cpp
 cfrogger
@@ -20062,6 +20090,7 @@ mephisto3a
 mephisto3b
 mephisto3c
 mephisto3d
+mephistoa
 mephistoe2
 mephistoe2a
 mephistoj
@@ -20563,6 +20592,7 @@ cb3s51
 cbaai
 cbonus
 cherry96
+cherry96a
 chry10
 chryangl
 chryangla
@@ -20580,6 +20610,9 @@ cmast92
 cmast92a
 cmast97
 cmast97a
+cmast97b
+cmast97bl16
+cmast97bl18
 cmast97i
 cmast99
 cmast99b
@@ -20929,6 +20962,7 @@ lhzb4
 lhzb4dhb
 lthyp
 luckycrs
+magtree
 mgcs3
 mgfx
 mgzz
@@ -20941,6 +20975,7 @@ qlgs
 royal5p
 sdwx
 slqz3
+tarzan2
 tct2p
 tripslot
 tshs
@@ -20986,6 +21021,7 @@ cjdh2a
 cjdh2b
 cjdh2c
 cjdh2d
+cjjl
 cjgdy
 dahuaxy
 hlddz
@@ -28278,6 +28314,7 @@ lrescuem2
 lupin3
 lupin3a
 mlander
+mlandera
 moonbase
 moonbasea
 orbite
@@ -30054,7 +30091,7 @@ wof_v11
 wof_v16
 
 @source:misc/cointek.cpp
-unkct
+goldline
 
 @source:misc/comebaby.cpp
 comebaby
@@ -30166,6 +30203,9 @@ cwheel
 
 @source:misc/cybertnk.cpp
 cybertnk
+
+@source:misc/daphor32.cpp
+daphor32
 
 @source:misc/daryde.cpp
 cricket
@@ -35729,6 +35769,7 @@ typo240
 240in1ar
 a6plus
 d12power
+d9_500
 denv150
 dgun2561
 dgun2572
@@ -35742,6 +35783,7 @@ gcs2mgp
 gon100
 goretrop
 gtct885
+h12p1000
 hkb502
 hkb502a
 jl2050
@@ -35758,14 +35800,17 @@ lxcmcybt
 lxcmcycr
 lxcmcydp
 lxcmcydpn
+lxcmcyfd
 lxcmcyfz
 lxcmcypj
 lxcmcypp
+lxcmcyppa
 lxcmcysp
 lxcmcyspn
 lxcmcysw
 lxcyber
 lxcypkdp
+lxcypkpp
 lxcypksp
 matet10
 matetsl
@@ -35783,7 +35828,9 @@ rbbrite
 rd5_240
 red5mam
 rtvgc300
+rtvgc300cr
 rtvgc300fz
+rtvgc300pj
 s10fake
 sealvt
 supr200
@@ -35796,6 +35843,7 @@ tup240
 unk128vt
 unkra200
 vibes240
+zl383
 zonefusn
 
 @source:nintendo/nes_vt42xx.cpp
@@ -37846,8 +37894,10 @@ mav_200
 mav_400
 mav_401
 mav_402
+mav_404g
 mj_130
 rab_103s
+rab_110be
 rab_130
 rab_320
 stwr_101
@@ -40518,6 +40568,9 @@ segartv
 vf5
 vtennis3
 
+@source:sega/magistr16.cpp
+magistr16
+
 @source:sega/mdconsole.cpp
 32x
 32x_mcd
@@ -40583,6 +40636,7 @@ mympac
 mympaca
 mypac
 mypaca
+mysf2
 mysinv
 reactmd
 sarc110
@@ -43289,6 +43343,9 @@ os214
 attache
 attache816
 
+@source:skeleton/aws.cpp
+aws220
+
 @source:skeleton/ax20.cpp
 ax20
 
@@ -43548,11 +43605,6 @@ eurocom2
 microtrol
 waveterm
 
-@source:skeleton/evolution_handheld.cpp
-buttdtct
-evolhh
-smkatsum
-
 @source:skeleton/extrema_m27sv.cpp
 multgmxl
 
@@ -43568,6 +43620,9 @@ fanucspgm
 
 @source:skeleton/fc100.cpp
 fc100
+
+@source:skeleton/fdek_h8s.cpp
+battkids
 
 @source:skeleton/fk1.cpp
 fk1
@@ -43739,6 +43794,9 @@ madmoney2
 apvm110
 apvm110a
 
+@source:skeleton/megacrane.cpp
+megacrane
+
 @source:skeleton/mes.cpp
 mes
 
@@ -43844,6 +43902,9 @@ c8002
 
 @source:skeleton/optomaxv.cpp
 optomaxv
+
+@source:skeleton/orina_stylish_plus.cpp
+orinasp
 
 @source:skeleton/p8k.cpp
 p8000
@@ -46540,6 +46601,9 @@ gizmondo
 kontiki
 tiki100
 
+@source:tms/vet3000.cpp
+vet3000
+
 @source:toaplan/batsugun.cpp
 batsugun
 batsuguna
@@ -47051,7 +47115,7 @@ pokegac2y
 pokegach
 prailpls
 
-@source:tvgames/generalplus_gpl16250_spi_direct.cpp
+@source:tvgames/generalplus_gpl951xx.cpp
 fixitflx
 bfdigdug
 bfgalaga
@@ -47059,7 +47123,9 @@ bfmpac
 bfpacman
 bfspyhnt
 bftetris
+bubltea
 dsgnpal
+pokebala
 pokgoget
 punifrnd
 punij1m
@@ -47067,6 +47133,12 @@ punij1pk
 punij1pu
 punij2pk
 punirune
+segapet1
+segapet1a
+segapet2
+segapet2a
+segapet3
+segapet3a
 smkcatch
 smkguras
 smkgurasa
@@ -47082,7 +47154,12 @@ airobo
 anpanm19
 arcadege
 ardancem
+bananlap
+bandolap
+bandplap
+bandslap
 chiikpc
+dinopc
 dmnslayg
 intrtvg
 jak_swbstrik
@@ -47096,22 +47173,18 @@ neopad
 pdcm2
 pocketmp
 pocketmr
+pokepeac
 rotom2
 saikyopc
+segdis16
 smatomo
+spicanot
 sumikpc
-tamameet
+sumikpcp
+sumipc21
 tmydistb
 zippity
 zippityuk
-
-@source:tvgames/generalplus_gpl_unknown.cpp
-mapacman
-parcade
-siddr
-tagalaga
-taspinv
-taturtf
 
 @source:tvgames/generalplus_gpm453x_nand.cpp
 leapland
@@ -47425,9 +47498,11 @@ ddmmeg12
 ddmsup
 foxsport
 guitrbus
+inmotion
 lexifit
 marc101
 marc250
+wiii3spt
 wiwi18
 
 @source:tvgames/spg2xx_zone.cpp
@@ -48700,6 +48775,7 @@ rocktris
 
 @source:zaccaria/galaxia.cpp
 astrowar
+astrowara
 galaxia
 galaxiaa
 galaxiab

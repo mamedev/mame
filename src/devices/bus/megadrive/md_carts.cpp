@@ -41,11 +41,13 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_nflqb96",  MD_EEPROM_NFLQB96);
 	device.option_add_internal("rom_cslam",  MD_EEPROM_CSLAM);
 	device.option_add_internal("rom_nhlpa",  MD_EEPROM_NHLPA);
-	device.option_add_internal("rom_blara",  MD_EEPROM_BLARA);
+	device.option_add_internal("rom_blara95",  MD_EEPROM_BLARA);
+	device.option_add_internal("rom_blara96",  MD_EEPROM_BLARA);
 	device.option_add_internal("rom_eeprom_mode1",  MD_EEPROM_MODE1);
 // J-Cart controller (Sampras Tennis)
+	device.option_add_internal("rom_jcart_sampras",  MD_JCART);
 	device.option_add_internal("rom_jcart",  MD_JCART);
-// J-Cart controller + EEPROM handling (not supported fully yet)
+	// J-Cart controller + EEPROM handling (not supported fully yet)
 	device.option_add_internal("rom_codemast",  MD_SEPROM_CODEMAST);
 	device.option_add_internal("rom_mm96",  MD_SEPROM_MM96);
 // STM95 EEPROM
@@ -56,7 +58,6 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_ggenie",  MD_ROM_GAMEGENIE);
 // unique bankswitch
 	device.option_add_internal("rom_ssf2",  MD_ROM_SSF2);
-	device.option_add_internal("rom_radica",  MD_ROM_RADICA);
 // pirate mappers (protection and/or bankswitch)
 	device.option_add_internal("rom_16mj2",  MD_ROM_16MJ2);
 	device.option_add_internal("rom_bugs",  MD_ROM_BUGSLIFE);
@@ -85,7 +86,6 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_sram_arg96",  MD_ROM_SRAM_ARG96);
 	device.option_add_internal("rom_tc2000",  MD_ROM_TC2000);
 	device.option_add_internal("rom_tekkensp",  MD_ROM_TEKKENSP);
-	device.option_add_internal("rom_topf",  MD_ROM_TOPF);
 
 	device.option_add_internal("rom_titan", MD_ROM_TITAN);
 

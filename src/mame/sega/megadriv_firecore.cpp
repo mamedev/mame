@@ -254,6 +254,10 @@ ROM_START( mysinv )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( mysf2 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29gl128.u2", 0x000000, 0x1000000, CRC(7938a212) SHA1(306cffd048fb271fa26cd2f61cbd2c3a94116292) )
+ROM_END
 
 
 /*
@@ -430,7 +434,7 @@ void megadriv_firecore_state::init_dcat()
 void megadriv_firecore_state::init_mdhh100()
 {
 	m_romsize = memregion("maincpu")->bytes();
-	m_externalbank = 0x7800000;
+	m_externalbank = m_romsize-0x800000;
 	init_megadriv();
 }
 
@@ -461,6 +465,8 @@ CONS( 2021, mygalag,   0,        0, megadriv_firecore_3button_ntsc,  mympac, meg
 CONS( 2021, mygalaga,  mygalag,  0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 CONS( 2021, mysinv,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT90 )
+
+CONS( 2021, mysf2,     0,        0, megadriv_firecore_6button_ntsc,  msi_6button, megadriv_firecore_state, init_mdhh100,       "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING )
 
 CONS( 2012, atgame40,  0,        0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_firecore_state, init_atgame40, "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
 

@@ -2833,8 +2833,8 @@ CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02_2mb,  tomshoot,xavix_i2c_
 // トミカ カーナビドライブ / トミー
 CONS( 2003, tcarnavi,  0,          0,  xavix_4mb_nv,     tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
-// ちゃんぴよんピンボール
-CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08_4mb,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// 痛快！娯楽活劇 ちゃんぴよんピンボール
+CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08_4mb,  tomcpin,  xavix_i2c_state,  init_xavix,    "Tomy / SSD Company LTD",                       "Tsuukai! Goraku Katsugeki - Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // 日本一周 僕はプラレール運転士
 CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
