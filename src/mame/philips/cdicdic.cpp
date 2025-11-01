@@ -41,17 +41,6 @@ TODO:
 #define VERBOSE         (0)
 #include "logmacro.h"
 
-
-namespace {
-
-[[maybe_unused]] constexpr int16_t clip_int16(int32_t sample)
-{
-	return int16_t(std::clamp<int32_t>(sample, -32768, 32767));
-}
-
-} // anonymous namespace
-
-
 // device type definition
 DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CD-i CDIC")
 
@@ -267,15 +256,31 @@ const uint8_t cdicdic_device::s_sector_scramble[2448] =
 //  MEMBER FUNCTIONS
 //**************************************************************************
 
-void cdicdic_device::decode_xa_unit(const uint8_t param, int16_t sample, int16_t &sample0, int16_t &sample1, int16_t &out_buffer)
-{
-	int16_t const *const filter = s_xa_filter_coef[(param >> 4) & 3];
-	uint8_t const range = (param & 0xf);
-	sample = (sample >> range) + ((filter[0] * sample0 + filter[1] * sample1 + 128) >> 8);
+static inline int16_t clip_int16(int32_t sample) {
+	if (sample < -32768)
+		return -32768;
+	if (sample > 32767)
+		return 32767;
+	return static_cast<int16_t>(sample);
+}
 
-	//int16_t const sample16 = clip_int16(sample);
-	sample1 = std::exchange(sample0, sample);
-	out_buffer = sample0;
+inline void rotate_samples(int16_t val, int16_t& a, int16_t& b, int16_t& output) {
+	b = a;
+	a = val;
+	output = a;
+}
+
+void cdicdic_device::decode_xa_unit(const uint8_t param, int16_t sample, int16_t& sample0, int16_t& sample1, int16_t& out_buffer)
+{
+	const int16_t* filter = s_xa_filter_coef[(param >> 4) & 3]; // High bits are reserved.
+	uint8_t range = (param & 0xf);
+	if (range > 12) range = 12; // Should be at most 8. Some decoders set 13..15 to 9.
+
+	int32_t sample32 = (int32_t)sample; // Work in 32-bit, clamp to avoid peaking audio.
+	sample32 = (sample32 >> range) + (((int32_t)filter[0] * sample0 + (int32_t)filter[1] * sample1 + 128) >> 8);
+
+	sample = clip_int16(sample32);
+	rotate_samples(sample, sample0, sample1, out_buffer);
 }
 
 void cdicdic_device::decode_xa_mono(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp)
