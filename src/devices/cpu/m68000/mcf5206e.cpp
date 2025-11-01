@@ -72,15 +72,15 @@ mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag,
 	, m_sim(*this, "sim")
 	, m_timer(*this, "timer%u", 1U)
 	, write_chip_select(*this)
-	, m_uart(*this, "coldfire_uart%u", 1U)
+	, m_uart(*this, "uart%u", 1U)
 	, write_tx1(*this)
 	, write_tx2(*this)
 	, m_gpio_r_cb(*this, 0xff)
 	, m_gpio_w_cb(*this)
-	, m_mbus(*this, "coldfire_mbus")
+	, m_mbus(*this, "mbus")
 	, write_sda(*this)
 	, write_scl(*this)
-	, m_dma(*this, "coldfire_dma%u", 0U)
+	, m_dma(*this, "dma%u", 0U)
 {
 }
 
@@ -346,9 +346,9 @@ void mcf5206e_device::mbar_map(address_map &map)
 	map(0x100, 0x11f).m(m_timer[0], FUNC(coldfire_timer_device::timer_map));
 	map(0x120, 0x13f).m(m_timer[1], FUNC(coldfire_timer_device::timer_map));
 
-	// uart (mc68681 derrived)
-	map(0x140, 0x17c).rw(m_uart[0], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write));
-	map(0x180, 0x1bc).rw(m_uart[1], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write));
+	// uart (mc68681 derived)
+	map(0x140, 0x17f).rw(m_uart[0], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write)).umask32(0xff000000);
+	map(0x180, 0x1bf).rw(m_uart[1], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write)).umask32(0xff000000);
 
 	// parallel port
 	map(0x1c5, 0x1c5).rw(FUNC(mcf5206e_device::ppddr_r), FUNC(mcf5206e_device::ppddr_w));
