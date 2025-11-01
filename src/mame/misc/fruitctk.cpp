@@ -7,11 +7,12 @@ Notes: (Wip)
 K0+K1 = RESET
 K0 = credits reset
 K1 = Coin in/out display
-K2 = Account coins? 
+K2 = Account coins?
 also Shown program date
 1999 09 13 2002
 K3 = Check account
 K1+K3 = 0 to 19  value, Press play to enter, If is Incorrect will shown Error 21
+
 Errors
 
 00 RAM
@@ -25,45 +26,53 @@ Errors
 33 Coin IN account error
 34 Coin OUT account error
 52 Keyboard pressed at power on, or coin in cheat
-35 requires reset k0+k1 to write data on ram
+35 ???. Requires Reset k0+k1 to write data on ram
 
 Notes by the Dumper:
-keyboard keys MUST NOT be pressed 
+keyboard keys MUST NOT be pressed
 counters in-out must be NC (0, LOW)
 coin acceptor NC 0 LOW
-hopper sensor NC 0 LOW 
+hopper sensor NC 0 LOW
 
 Hardware info: (Wip)
 
-Board:
-1x 8 dip switch
-1x 4 dip switch
-k0 k1 k2 k4 - misspelled as k3
-at89c52 or Syncmos sm8951ac25p
+Main Board:
 
-gm76c28a-10 or p511ssl-10
+Components:
+1x AT89C52 or Syncmos SM8951AC25P
+1x GM76C28A-10 or P511SSL-10
+1x M27C512-10F1 or W27C512
+1x W27C020-70
+1x ?  - altera 7032 plds
+1x U2413 - ym2413
+1x U6295 - oki m6295
+1x 8910 Unmarked plcc-44 ic - AY-8910 clone
 
-m27c512-10f1 or w27c512
-w27c020-70
+Dip switch
+1x 8 Dip switch
+1x 4 Dip switch
 
-?  - altera 7032 for I/O?
-u2413 - ym2413
-u6295 - oki m6295
-?     - 8910 clone
+Button:
+k0 k1 k2 k4 - Misspelled as k3
 
-Led board
+Led board:
+
+Components:
 X2 M82C55A-2
-new8279
+x1 NEW8279
 
 Todo:
-Dip switch
-Led Controller
-Layout.
 
-if press to insert coin will to error 02 or error 30 
+*Figure out the Dip switch and Hopper motor bits.
 
-debug:
-pc = 424 - bypass error 02 error.
+*Led Controller and Layout.
+
+*Error 02  IN/OUT Counter meters not detected at power on.
+If press to insert coin will to error 02 or error 30.
+Debug:
+pc = 424 - skip to error 02 error.
+
+*Verify M6294 and AY-3-89100 clock frequency.
 
 */
 
@@ -106,9 +115,9 @@ private:
 	void multiplex_7seg_w(uint8_t data);
 	void data_map(address_map &map);
 	void program_map(address_map &map);
-    uint8_t keyboard_r();
+	uint8_t keyboard_r();
 	uint8_t m_selected_7seg_module = 0;
-    output_finder<32> m_digits;
+	output_finder<32> m_digits;
 	output_finder<30> m_leds;
 	required_ioport_array<4> m_inputs;
 	required_device<hopper_device> m_hopper;
@@ -119,27 +128,27 @@ private:
 static INPUT_PORTS_START( fruitctk )
 
 	PORT_START("INPUTS1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_Q) PORT_NAME("Bet 8")  
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 7")  
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 6")  
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_Q) PORT_NAME("Bet 8")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_W) PORT_NAME("Bet 7")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_E) PORT_NAME("Bet 6")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_R) PORT_NAME("Bet 5")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4") 
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_T) PORT_NAME("Bet 4")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_Y) PORT_NAME("Bet 3")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_U) PORT_NAME("Bet 2")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_I) PORT_NAME("Bet 1")
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_GAMBLE_DEAL ) PORT_CODE(KEYCODE_O) PORT_NAME("Start")     
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_GAMBLE_DEAL ) PORT_CODE(KEYCODE_O) PORT_NAME("Start")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_LOW  ) PORT_CODE(KEYCODE_P) // D-UP Low?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_HIGH ) PORT_CODE(KEYCODE_A) // D-UP High?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_CODE(KEYCODE_S) // unused?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_CODE(KEYCODE_D) PORT_NAME("Credit")     
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_CODE(KEYCODE_F) PORT_NAME("Win")     
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_CODE(KEYCODE_D) PORT_NAME("Credit")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_CODE(KEYCODE_F) PORT_NAME("Win")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_G) // Payout?
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CODE(KEYCODE_H)// Coin. will cause error 30
 
 	PORT_START("INPUTS3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_J)  
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_K)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
@@ -149,25 +158,25 @@ static INPUT_PORTS_START( fruitctk )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_B)
 
 	PORT_START("INPUTS4")
-    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED  )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED  )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED  )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED  ) 
-    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("K3") // K0
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED  )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("K3") // K0
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("K2") // K1
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("K1") // K2
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("K0") // K3
-	
-	PORT_START("P1")
-    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // is from hopper? will cause error 02 During reset nvram
-    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
-    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
 
-    PORT_START("DSW1")
+	PORT_START("P1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // is from hopper? will cause error 02 During reset nvram
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
@@ -177,7 +186,7 @@ static INPUT_PORTS_START( fruitctk )
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 
-    PORT_START("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
@@ -189,9 +198,9 @@ void fruitctk_state::p1_w(uint8_t data)
 {
 
 	m_hopper->motor_w(BIT(data, 3)); // ?? from guessed. Wrong
-    logerror("P1.0 Write to %02x\n", data);
+	logerror("P1.0 Write to %02x\n", data);
 
-	
+
 }
 
 void fruitctk_state::multiplex_7seg_w(uint8_t data)
@@ -228,21 +237,21 @@ void fruitctk_state::program_map(address_map &map)
 
 void fruitctk_state::data_map(address_map &map)
 {
-    map(0x8000, 0x87ff).ram().share("nvram");
-    map(0xc000, 0xc001).w("opll", FUNC(ym2413_device::write));
-    map(0x9002, 0x9003).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-    map(0xb000, 0xb001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-    map(0xb004, 0xb004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-    map(0xb008, 0xb00a).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
-    map(0xb00b, 0xb00b).unmapw(); // ?? Write = 80
-    map(0xb00c, 0xb00c).unmapw(); // Led
-    map(0xb00d, 0xb00f).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0xc000, 0xc001).w("opll", FUNC(ym2413_device::write));
+	map(0x9002, 0x9003).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0xb000, 0xb001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xb004, 0xb004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xb008, 0xb00a).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
+	map(0xb00b, 0xb00b).unmapw(); // ?? Write = 80
+	map(0xb00c, 0xb00c).unmapw(); // Led
+	map(0xb00d, 0xb00f).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
 }
 
 void fruitctk_state::machine_start()
 {
 	m_digits.resolve();
-	m_leds.resolve();	
+	m_leds.resolve();
 }
 
 void fruitctk_state::fruitctk(machine_config &config)
@@ -254,23 +263,23 @@ void fruitctk_state::fruitctk(machine_config &config)
 	maincpu.set_addrmap(AS_DATA, &fruitctk_state::data_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
 	maincpu.port_out_cb<1>().set(FUNC(fruitctk_state::p1_w));
-   
+
 	HOPPER(config, m_hopper, attotime::from_msec(10));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Keyboard & display interface */
-    i8279_device &kbdc(I8279(config, "i8279", XTAL(12'000'000) / 6)); // divisor not verified
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(12'000'000) / 6)); // divisor not verified
 	kbdc.out_sl_callback().set(FUNC(fruitctk_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(fruitctk_state::keyboard_r));          // keyboard Return Lines
 	kbdc.out_disp_callback().set(FUNC(fruitctk_state::display_7seg_data_w));
-   
-	/* Programmable Peripheral Interface */ 
-    I8255A(config, "ppi1");
-    I8255A(config, "ppi2");
-	 
+
+	/* Programmable Peripheral Interface */
+	I8255A(config, "ppi1");
+	I8255A(config, "ppi2");
+
 	/* Video */
 //  config.set_default_layout(layout_marywu);
-	
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(12'000'000) / 6)); // divisor not verified
@@ -289,8 +298,8 @@ ROM_START( fruitctk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w27c512.bin", 0x0000, 0x10000, CRC(2A1B63C1) SHA1(631a95c684db961283f45b4bfe67fa58d79b2191) )
 
-    ROM_REGION( 0x40000, "oki", 0 )
-    ROM_LOAD( "w27c02.bin", 0x00000, 0x40000, CRC(A8217121) SHA1(a35004f00632b552b587dfa12c1698abada5e300) ) // only contains music
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "w27c02.bin", 0x00000, 0x40000, CRC(A8217121) SHA1(a35004f00632b552b587dfa12c1698abada5e300) ) // only contains music
 ROM_END
 
 } // anonymous namespace
@@ -298,4 +307,3 @@ ROM_END
 
 //    YEAR    NAME        PARENT   MACHINE       INPUT      STATE            INIT        ROT    COMPANY        FULLNAME            FLAGS
 GAME( 2002?,  fruitctk,   0,       fruitctk,     fruitctk,  fruitctk_state,  empty_init, ROT0,  "<unknown>",  "Fruit Cocktail",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
