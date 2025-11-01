@@ -24,10 +24,20 @@ void dsp563xx_device::device_start()
 	space(AS_X).specific(m_x);
 	space(AS_Y).specific(m_y);
 
+	using namespace std::placeholders;
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_ccr).formatstr("%8s").noshow();
 	state_add(DSP563XX_PC,     "PC",        m_pc).formatstr("%06X");
+	state_add(DSP563XX_LA, "LA", m_la).formatstr("%06X");
+	state_add(DSP563XX_LC, "LC", m_lc).formatstr("%06X");
+	state_add<u32>(DSP563XX_SR, "SR", std::bind(&dsp563xx_device::get_sr, this), std::bind(&dsp563xx_device::set_sr, this, _1)).formatstr("%06X");
+	state_add(DSP563XX_EMR, "EMR", m_emr).noshow();
+	state_add(DSP563XX_MR, "MR", m_mr).noshow();
+	state_add(DSP563XX_CCR, "CCR", m_ccr).noshow();
+	state_add(DSP563XX_OMR, "OMR", m_omr).formatstr("%06X");
+	state_add<u32>(DSP563XX_SSH, "SSH", std::bind(&dsp563xx_device::get_ssh, this), std::bind(&dsp563xx_device::set_ssh, this, _1)).formatstr("%06X");
+	state_add<u32>(DSP563XX_SSL, "SSL", std::bind(&dsp563xx_device::get_ssl, this), std::bind(&dsp563xx_device::set_ssl, this, _1)).formatstr("%06X");
 	state_add(DSP563XX_A, "A", m_a).formatstr("%014X");
 	state_add(DSP563XX_B, "B", m_b).formatstr("%014X");
 	state_add(DSP563XX_X0, "X0", m_x0).formatstr("%06X");
@@ -160,7 +170,7 @@ void dsp563xx_device::execute_run()
 		m_icount --;
 		if(loop) {
 			if(m_lc != 1 || (m_emr & EMR_FV)) {
-				m_lc = (m_lc-1) & 0xffff;
+				m_lc = m_lc ? m_lc-1 : 0xffff;
 				m_npc = get_ssh();
 			} else {
 				set_sr(get_ssl());

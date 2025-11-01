@@ -47,9 +47,20 @@
 
 2040.. ea                    - ea:eam4(8)
 40c0.. x:ea,d                - d:fvbr1s(20, 16) ea:eam1(8)
+	m_tmp1 = m_x.read_dword($ea);
+	%p
+	$d:w(m_tmp1);
+
 4040.. s,x:ea                - s:fvbr1s(20, 16) ea:eam1(8)
+	m_tmp1 = $s;
+	%p
+	m_x.write_dword($ea, m_tmp1);
+
 40c0.. x:abs,d               - d:fvbr1s(20, 16) abs:eam1a(8)
 40c0.. #i,d                  - d:fvbr1s(20, 16) i:eam1i(8)
+	%p
+	$d:w($i);
+
 4040.. s,x:abs               - s:fvbr1s(20, 16) abs:eam1a(8)
 4080.. x:aa,d                - d:fvbr1s(20, 16) aa:asa6(8)
 4000.. s,x:aa                - s:fvbr1s(20, 16) aa:asa6(8)
@@ -106,6 +117,11 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0c1d00 asl #i,s2,d           - i:shift6(1) s2:acc(7) d:acc(0)
 0c1e40 asl s1,s2,d           - s2:acc(4) s1:actrl(1) d:acc(0)
 0c1c00 asr #i,s2,d           - i:shift6(1) s2:acc(7) d:acc(0)
+	u64 s = $s2;
+	u8 n = $i;
+	m_ccr = (m_ccr & ~(CCR_V|CCR_C)) | (n != 0 && BIT(s, n) ? CCR_C : 0);
+	$d:w(util::sext(s, BIT(m_emr, 1) ? 40 : 56) >> n);
+
 0c1e60 asr s1,s2,d           - s2:acc(4) s1:actrl(1) d:acc(0)
 0d1040 bcc x                 - cc:cc(0) x:expcrel()
 050400 bcc x                 - cc:cc(12) x:pcrel(6, 0)
@@ -122,6 +138,15 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0a8000 bclr #n,xy:pp         - pp:asa6p(8) xy:xyc(6) n:bit5(0)
 010000 bclr #n,xy:qq         - qq:asa6q(8) xy:xyc(6) n:bit5(0)
 0ac040 bclr #n,d             - d:sbr(8) n:bit5(0)
+	u32 t = $d;
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+		$d:w(t & ~m);
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
 0d10c0 bra x                 - x:expcrel()
 	m_npc = $x;
 
@@ -178,8 +203,23 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	}
 
 0d1080 bsr x                 - x:expcrel()
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	m_npc = $x;
+
 050800 bsr x                 - x:pcrel(6, 0)
+	inc_sp();
+	set_ssh(m_pc+1);
+	set_ssl(get_sr());
+	m_npc = $x;
+
 0d1880 bsr r                 - r:ar(8)
+	inc_sp();
+	set_ssh(m_pc+1);
+	set_ssl(get_sr());
+	m_npc = $r;
+
 0d8020 bsset #n,xy:ea,x      - ea:eam1(8) xy:xyc(6) n:bit5(0) x:expcrel()
 0d8020 bsset #n,xy:abs,x     - abs:eam1a(8) xy:xyc(6) n:bit5(0) x:expcrel()
 0d80a0 bsset #n,xy:aa,x      - aa:asa6(8) xy:xyc(6) n:bit5(0) x:expcrel()
@@ -211,7 +251,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 
 06c000 do s,expr             - s:sbr_nos(8) expr:exabs()
@@ -222,7 +262,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 
 000203 do forever,expr       - expr:exabs()
@@ -232,7 +272,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 	m_emr |= EMR_FV;
 
@@ -246,7 +286,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 
 06c010 dor s,expr            - s:sbr_nos(8) expr:expcrel()
@@ -257,7 +297,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 
 000202 dor forever,expr      - expr:expcrel()
@@ -267,7 +307,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 	m_emr |= EMR_FV;
 
@@ -331,8 +371,23 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 		m_npc = $x;
 
 0bc080 jsr ea                - ea:eam1(8)
+	inc_sp();
+	set_ssh(m_pc+1);
+	set_ssl(get_sr());
+	m_npc = $ea;
+
 0bc080 jsr abs               - abs:eam1a(8)
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	m_npc = $abs;
+
 0d0000 jsr x                 - x:abs12(0)
+	inc_sp();
+	set_ssh(m_pc+1);
+	set_ssl(get_sr());
+	m_npc = $x;
+
 0b40a0 jsset #n,xy:ea,x      - ea:eam1(8) xy:xyc(6) n:bit5(0) x:exabs()
 0b00a0 jsset #n,xy:aa,x      - aa:asa6(8) xy:xyc(6) n:bit5(0) x:exabs()
 0b80a0 jsset #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:exabs()
@@ -353,19 +408,37 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0141c3 macri +#i,s,d         - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
 0c1b80 merge s,d             - s:dao3(1) d:acc(0)
 05c020 movec xy:ea,d1        - ea:eam1(8) xy:xyc(6) d1:fvbr2(0)
+	$d1:w($xy:m.read_dword($ea));
+
 054020 movec s1,xy:ea        - ea:eam1(8) xy:xyc(6) s1:fvbr2(0)
+	$xy:m.write_dword($ea, $s1);
+
 05c020 movec xy:abs,d1       - abs:eam1a(8) xy:xyc(6) d1:fvbr2(0)
 05c020 movec #i,d1           - i:eam1i(8) d1:fvbr2(0)
+	$d1:w($i);
+
 054020 movec s1,xy:abs       - abs:eam1a(8) xy:xyc(6) s1:fvbr2(0)
 058020 movec xy:aa,d1        - aa:asa6(8) xy:xyc(6) d1:fvbr2(0)
 050020 movec s1,xy:aa        - aa:asa6(8) xy:xyc(6) s1:fvbr2(0)
 04c0a0 movec s2,d1           - s2:sbr(8) d1:fvbr2(0)
+	$d1:w($s2);
+
 0440a0 movec s1,d2           - d2:sbr(8) s1:fvbr2(0)
 0500a0 movec #i,d1           - i:imm8(8) d1:fvbr2(0)
+	$d1:w($i);
+
 07c080 movem p:ea,d          - ea:eam1(8) d:sbr(0)
+	$d:w(m_p.read_dword($ea));
+
 074080 movem s,p:ea          - ea:eam1(8) s:sbr(0)
+	m_p.write_dword($ea, $s);
+
 07c080 movem p:abs,d         - abs:eam1a(8) d:sbr(0)
+	$d:w(m_p.read_dword($abs));
+
 074080 movem s,p:abs         - abs:eam1a(8) s:sbr(0)
+	m_p.write_dword($abs, $s);
+
 078000 movem p:aa,d          - aa:asa6(8) d:sbr(0)
 070000 movem s,p:aa          - aa:asa6(8) s:sbr(0)
 08c080 movep xym:ea,xyp:pp   - xyp:xyc(16) ea:eam1(8) xym:xyc(6) pp:asa6p(0)
@@ -427,6 +500,8 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 014082 or #i,d               - i:imm6(8) d:acc(3)
 0140c2 or #i,d               - d:acc(3) i:eximm()
 0000f8 ori #i,ctrl           - i:imm8(8) ctrl:ctrl(0)
+	$ctrl:w($ctrl | $i);
+
 000003 pflush                -
 000001 pflushun              -
 000002 pfree                 -
@@ -442,7 +517,14 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 06c020 rep s                 - s:sbr(8)
 000084 reset                 -
 000004 rti                   -
+	m_npc = get_ssh();
+	set_sr(get_ssl());
+	dec_sp();
+
 00000c rts                   -
+	m_npc = get_ssh();
+	dec_sp();
+
 000087 stop                  -
 014084 sub #i,d              - i:imm6(8) d:acc(3)
 0140c4 sub #i,d              - d:acc(3) i:eximm()
