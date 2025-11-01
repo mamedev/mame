@@ -314,26 +314,6 @@ void pc9801_state::sasi_ctrl_w(uint8_t data)
 //  m_sasibus->write_sel(BIT(data, 0));
 }
 
-uint8_t pc9801_state::f0_r(offs_t offset)
-{
-	if(offset == 0)
-	{
-		// iterate thru all devices to check if an AMD98 is present
-		// TODO: move to cbus
-		// TODO: is this really part of PC-98 spec or it's coming from the device itself, as dip/jumper?
-		for (amd98_device &amd98 : device_type_enumerator<amd98_device>(machine().root_device()))
-		{
-			logerror("%s: Read AMD98 ID %s\n", machine().describe_context(), amd98.tag());
-			return 0x18; // return the right ID
-		}
-
-		logerror("%s: Read port 0 from 0xf0 (AMD98 check?)\n", machine().describe_context());
-		return 0; // card not present
-	}
-
-	return 0xff;
-}
-
 void pc9801_state::pc9801_map(address_map &map)
 {
 	map(0xa0000, 0xa3fff).rw(FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w)); //TVRAM
@@ -382,7 +362,6 @@ void pc9801_state::pc9801_io(address_map &map)
 	map(0x00a0, 0x00af).rw(FUNC(pc9801_state::pc9801_a0_r), FUNC(pc9801_state::pc9801_a0_w)); //upd7220 bitmap ports / display registers
 	map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
-	map(0x00f0, 0x00ff).r(FUNC(pc9801_state::f0_r)).umask16(0x00ff);
 }
 
 /*************************************
@@ -468,7 +447,7 @@ void pc9801vm_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 	}
 }
 
-
+// TODO: port 0xf1 (IDE select on later machines)
 uint8_t pc9801vm_state::a20_ctrl_r(offs_t offset)
 {
 	if(offset == 0x01)
@@ -476,7 +455,7 @@ uint8_t pc9801vm_state::a20_ctrl_r(offs_t offset)
 	else if(offset == 0x03)
 		return (m_gate_a20 ^ 1) | (m_nmi_ff << 1);
 
-	return f0_r(offset);
+	return 0xff;
 }
 
 void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)

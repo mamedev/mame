@@ -12,6 +12,7 @@
 #pragma once
 
 #include "slot.h"
+#include "machine/pit8253.h"
 #include "sound/ay8910.h"
 
 //**************************************************************************
@@ -28,9 +29,6 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
-
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -41,6 +39,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
+	void io_map(address_map &map);
 	void ay3_address_w(uint8_t data);
 	void ay3_data_latch_w(uint8_t data);
 
@@ -50,7 +49,7 @@ private:
 	required_device<ay8910_device>  m_ay1;
 	required_device<ay8910_device>  m_ay2;
 	required_device<ay8910_device>  m_ay3;
-
+	required_device<pit8253_device> m_pit;
 };
 
 // device type definition
