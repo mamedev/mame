@@ -64,7 +64,8 @@ void microkorg_state::microkorg(machine_config &config)
 
 	FUJITSU_29LV800B(config, "flash"); // MBM29LV800BA-90PFTN
 
-	DSP56362(config, "dsp", 12.288_MHz_XTAL / 4); // DSPB56362PV100
+	dsp56362_device &dsp(DSP56362(config, "dsp", 12.288_MHz_XTAL / 4)); // DSPB56362PV100
+	dsp.set_hard_omr(0b0101); // slave SPI bootstrap
 	//dsp.miso_callback().set(m_maincpu, FUNC(h8s2320_device::sci_rx_w<0>));
 	//dsp.hreq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 
