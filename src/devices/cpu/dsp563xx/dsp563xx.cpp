@@ -158,16 +158,6 @@ void dsp563xx_device::execute_run()
 		} else
 			exv = 0;
 		m_npc = (m_pc + (ex ? 2 : 1)) & 0xffffff;
-		m_skip = false;
-		if(kmove)
-			execute_pre_move(kmove, opcode, exv);
-		if(kipar && !m_skip)
-			execute_ipar(kipar);
-		if(kmove)
-			execute_post_move(kmove, opcode, exv);
-		if(knpar)
-			execute_npar(knpar, opcode, exv);
-		m_icount --;
 		if(loop) {
 			if(m_lc != 1 || (m_emr & EMR_FV)) {
 				m_lc = m_lc ? m_lc-1 : 0xffff;
@@ -180,6 +170,16 @@ void dsp563xx_device::execute_run()
 				dec_sp();
 			}
 		}
+		m_skip = false;
+		if(kmove)
+			execute_pre_move(kmove, opcode, exv);
+		if(kipar && !m_skip)
+			execute_ipar(kipar);
+		if(kmove)
+			execute_post_move(kmove, opcode, exv);
+		if(knpar)
+			execute_npar(knpar, opcode, exv);
+		m_icount --;
 		m_pc = m_npc;
 	}
 }

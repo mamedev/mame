@@ -1780,143 +1780,143 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 156: { // a,x0
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 157: { // a,x1
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 158: { // a,y0
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 159: { // a,y1
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 160: { // a,a0
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 161: { // a,b0
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 162: { // a,a2
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 163: { // a,b2
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 164: { // a,a1
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 165: { // a,b1
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 166: { // a,a
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 167: { // a,b
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 168: { // a,r
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 169: { // a,n
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 170: { // b,x0
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 171: { // b,x1
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 172: { // b,y0
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 173: { // b,y1
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 174: { // b,a0
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 175: { // b,b0
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 176: { // b,a2
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 177: { // b,b2
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 178: { // b,a1
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 179: { // b,b1
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 180: { // b,a
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 181: { // b,b
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 182: { // b,r
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 183: { // b,n
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 184: { // r,x0
@@ -2060,19 +2060,31 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 212: { // (r)-n
-		unhandled("(r)-n");
+		int ea_r = BIT(opcode, 8, 5) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		(void)(ea);
 		break;
 		}
 	case 213: { // (r)+n
-		unhandled("(r)+n");
+		int ea_r = BIT(opcode, 8, 5) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		(void)(ea);
 		break;
 		}
 	case 214: { // (r)-
-		unhandled("(r)-");
+		int ea_r = BIT(opcode, 8, 5) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		(void)(ea);
 		break;
 		}
 	case 215: { // (r)+
-		unhandled("(r)+");
+		int ea_r = BIT(opcode, 8, 5) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		(void)(ea);
 		break;
 		}
 	case 216: { // x:(r)-n,x0
@@ -3084,73 +3096,73 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 384: { // a,x:(r)-n
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 385: { // a,x:(r)+n
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 386: { // a,x:(r)-
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 387: { // a,x:(r)+
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 388: { // a,x:(r)
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 389: { // a,x:(r+n)
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 390: { // a,x:-(r)
-		u64 s = get_a();
-		m_tmp1 = s;
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 391: { // b,x:(r)-n
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 392: { // b,x:(r)+n
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 393: { // b,x:(r)-
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 394: { // b,x:(r)+
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 395: { // b,x:(r)
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 396: { // b,x:(r+n)
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 397: { // b,x:-(r)
-		u64 s = get_b();
-		m_tmp1 = s;
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 398: { // r,x:(r)-n
@@ -3224,8420 +3236,10882 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 412: { // x:[abs],x0
-		unhandled("x:[abs],x0");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 413: { // x:[abs],x1
-		unhandled("x:[abs],x1");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 414: { // x:[abs],y0
-		unhandled("x:[abs],y0");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 415: { // x:[abs],y1
-		unhandled("x:[abs],y1");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 416: { // x:[abs],a0
-		unhandled("x:[abs],a0");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 417: { // x:[abs],b0
-		unhandled("x:[abs],b0");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 418: { // x:[abs],a2
-		unhandled("x:[abs],a2");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 419: { // x:[abs],b2
-		unhandled("x:[abs],b2");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 420: { // x:[abs],a1
-		unhandled("x:[abs],a1");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 421: { // x:[abs],b1
-		unhandled("x:[abs],b1");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 422: { // x:[abs],a
-		unhandled("x:[abs],a");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 423: { // x:[abs],b
-		unhandled("x:[abs],b");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 424: { // x:[abs],r
-		unhandled("x:[abs],r");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
 	case 425: { // x:[abs],n
-		unhandled("x:[abs],n");
+		u32 abs = exv;
+		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 426: { // #[i],x0
+	case 426: { // x0,x:[abs]
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 427: { // #[i],x1
+	case 427: { // x1,x:[abs]
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 428: { // #[i],y0
+	case 428: { // y0,x:[abs]
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 429: { // #[i],y1
+	case 429: { // y1,x:[abs]
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 430: { // #[i],a0
+	case 430: { // a0,x:[abs]
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 431: { // #[i],b0
+	case 431: { // b0,x:[abs]
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 432: { // #[i],a2
+	case 432: { // a2,x:[abs]
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 433: { // #[i],b2
+	case 433: { // b2,x:[abs]
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 434: { // #[i],a1
+	case 434: { // a1,x:[abs]
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 435: { // #[i],b1
+	case 435: { // b1,x:[abs]
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 436: { // #[i],a
+	case 436: { // a,x:[abs]
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 437: { // #[i],b
+	case 437: { // b,x:[abs]
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 438: { // #[i],r
+	case 438: { // r,x:[abs]
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 439: { // #[i],n
+	case 439: { // n,x:[abs]
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 440: { // x0,x:[abs]
-		unhandled("x0,x:[abs]");
+	case 440: { // #[i],x0
 		break;
 		}
-	case 441: { // x1,x:[abs]
-		unhandled("x1,x:[abs]");
+	case 441: { // #[i],x1
 		break;
 		}
-	case 442: { // y0,x:[abs]
-		unhandled("y0,x:[abs]");
+	case 442: { // #[i],y0
 		break;
 		}
-	case 443: { // y1,x:[abs]
-		unhandled("y1,x:[abs]");
+	case 443: { // #[i],y1
 		break;
 		}
-	case 444: { // a0,x:[abs]
-		unhandled("a0,x:[abs]");
+	case 444: { // #[i],a0
 		break;
 		}
-	case 445: { // b0,x:[abs]
-		unhandled("b0,x:[abs]");
+	case 445: { // #[i],b0
 		break;
 		}
-	case 446: { // a2,x:[abs]
-		unhandled("a2,x:[abs]");
+	case 446: { // #[i],a2
 		break;
 		}
-	case 447: { // b2,x:[abs]
-		unhandled("b2,x:[abs]");
+	case 447: { // #[i],b2
 		break;
 		}
-	case 448: { // a1,x:[abs]
-		unhandled("a1,x:[abs]");
+	case 448: { // #[i],a1
 		break;
 		}
-	case 449: { // b1,x:[abs]
-		unhandled("b1,x:[abs]");
+	case 449: { // #[i],b1
 		break;
 		}
-	case 450: { // a,x:[abs]
-		unhandled("a,x:[abs]");
+	case 450: { // #[i],a
 		break;
 		}
-	case 451: { // b,x:[abs]
-		unhandled("b,x:[abs]");
+	case 451: { // #[i],b
 		break;
 		}
-	case 452: { // r,x:[abs]
-		unhandled("r,x:[abs]");
+	case 452: { // #[i],r
 		break;
 		}
-	case 453: { // n,x:[abs]
-		unhandled("n,x:[abs]");
+	case 453: { // #[i],n
 		break;
 		}
 	case 454: { // x:[aa],x0
-		unhandled("x:[aa],x0");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 455: { // x:[aa],x1
-		unhandled("x:[aa],x1");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 456: { // x:[aa],y0
-		unhandled("x:[aa],y0");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 457: { // x:[aa],y1
-		unhandled("x:[aa],y1");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 458: { // x:[aa],a0
-		unhandled("x:[aa],a0");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 459: { // x:[aa],b0
-		unhandled("x:[aa],b0");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 460: { // x:[aa],a2
-		unhandled("x:[aa],a2");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 461: { // x:[aa],b2
-		unhandled("x:[aa],b2");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 462: { // x:[aa],a1
-		unhandled("x:[aa],a1");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 463: { // x:[aa],b1
-		unhandled("x:[aa],b1");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 464: { // x:[aa],a
-		unhandled("x:[aa],a");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 465: { // x:[aa],b
-		unhandled("x:[aa],b");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 466: { // x:[aa],r
-		unhandled("x:[aa],r");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 467: { // x:[aa],n
-		unhandled("x:[aa],n");
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
 	case 468: { // x0,x:[aa]
-		unhandled("x0,x:[aa]");
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
 	case 469: { // x1,x:[aa]
-		unhandled("x1,x:[aa]");
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
 	case 470: { // y0,x:[aa]
-		unhandled("y0,x:[aa]");
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
 	case 471: { // y1,x:[aa]
-		unhandled("y1,x:[aa]");
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
 	case 472: { // a0,x:[aa]
-		unhandled("a0,x:[aa]");
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
 	case 473: { // b0,x:[aa]
-		unhandled("b0,x:[aa]");
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
 	case 474: { // a2,x:[aa]
-		unhandled("a2,x:[aa]");
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
 	case 475: { // b2,x:[aa]
-		unhandled("b2,x:[aa]");
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
 	case 476: { // a1,x:[aa]
-		unhandled("a1,x:[aa]");
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
 	case 477: { // b1,x:[aa]
-		unhandled("b1,x:[aa]");
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
 	case 478: { // a,x:[aa]
-		unhandled("a,x:[aa]");
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 479: { // b,x:[aa]
-		unhandled("b,x:[aa]");
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
 	case 480: { // r,x:[aa]
-		unhandled("r,x:[aa]");
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
 	case 481: { // n,x:[aa]
-		unhandled("n,x:[aa]");
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
 	case 482: { // x:(r)-n,x0 a,y0
-		unhandled("x:(r)-n,x0 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 483: { // x:(r)+n,x0 a,y0
-		unhandled("x:(r)+n,x0 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 484: { // x:(r)-,x0 a,y0
-		unhandled("x:(r)-,x0 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 485: { // x:(r)+,x0 a,y0
-		unhandled("x:(r)+,x0 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 486: { // x:(r),x0 a,y0
-		unhandled("x:(r),x0 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 487: { // x:(r+n),x0 a,y0
-		unhandled("x:(r+n),x0 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 488: { // x:-(r),x0 a,y0
-		unhandled("x:-(r),x0 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 489: { // x:(r)-n,x0 a,y1
-		unhandled("x:(r)-n,x0 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 490: { // x:(r)+n,x0 a,y1
-		unhandled("x:(r)+n,x0 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 491: { // x:(r)-,x0 a,y1
-		unhandled("x:(r)-,x0 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 492: { // x:(r)+,x0 a,y1
-		unhandled("x:(r)+,x0 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 493: { // x:(r),x0 a,y1
-		unhandled("x:(r),x0 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 494: { // x:(r+n),x0 a,y1
-		unhandled("x:(r+n),x0 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 495: { // x:-(r),x0 a,y1
-		unhandled("x:-(r),x0 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 496: { // x:(r)-n,x0 b,y0
-		unhandled("x:(r)-n,x0 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 497: { // x:(r)+n,x0 b,y0
-		unhandled("x:(r)+n,x0 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 498: { // x:(r)-,x0 b,y0
-		unhandled("x:(r)-,x0 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 499: { // x:(r)+,x0 b,y0
-		unhandled("x:(r)+,x0 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 500: { // x:(r),x0 b,y0
-		unhandled("x:(r),x0 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 501: { // x:(r+n),x0 b,y0
-		unhandled("x:(r+n),x0 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 502: { // x:-(r),x0 b,y0
-		unhandled("x:-(r),x0 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 503: { // x:(r)-n,x0 b,y1
-		unhandled("x:(r)-n,x0 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 504: { // x:(r)+n,x0 b,y1
-		unhandled("x:(r)+n,x0 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 505: { // x:(r)-,x0 b,y1
-		unhandled("x:(r)-,x0 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 506: { // x:(r)+,x0 b,y1
-		unhandled("x:(r)+,x0 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 507: { // x:(r),x0 b,y1
-		unhandled("x:(r),x0 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 508: { // x:(r+n),x0 b,y1
-		unhandled("x:(r+n),x0 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 509: { // x:-(r),x0 b,y1
-		unhandled("x:-(r),x0 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 510: { // x:(r)-n,x1 a,y0
-		unhandled("x:(r)-n,x1 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 511: { // x:(r)+n,x1 a,y0
-		unhandled("x:(r)+n,x1 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 512: { // x:(r)-,x1 a,y0
-		unhandled("x:(r)-,x1 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 513: { // x:(r)+,x1 a,y0
-		unhandled("x:(r)+,x1 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 514: { // x:(r),x1 a,y0
-		unhandled("x:(r),x1 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 515: { // x:(r+n),x1 a,y0
-		unhandled("x:(r+n),x1 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 516: { // x:-(r),x1 a,y0
-		unhandled("x:-(r),x1 a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 517: { // x:(r)-n,x1 a,y1
-		unhandled("x:(r)-n,x1 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 518: { // x:(r)+n,x1 a,y1
-		unhandled("x:(r)+n,x1 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 519: { // x:(r)-,x1 a,y1
-		unhandled("x:(r)-,x1 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 520: { // x:(r)+,x1 a,y1
-		unhandled("x:(r)+,x1 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 521: { // x:(r),x1 a,y1
-		unhandled("x:(r),x1 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 522: { // x:(r+n),x1 a,y1
-		unhandled("x:(r+n),x1 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 523: { // x:-(r),x1 a,y1
-		unhandled("x:-(r),x1 a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 524: { // x:(r)-n,x1 b,y0
-		unhandled("x:(r)-n,x1 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 525: { // x:(r)+n,x1 b,y0
-		unhandled("x:(r)+n,x1 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 526: { // x:(r)-,x1 b,y0
-		unhandled("x:(r)-,x1 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 527: { // x:(r)+,x1 b,y0
-		unhandled("x:(r)+,x1 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 528: { // x:(r),x1 b,y0
-		unhandled("x:(r),x1 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 529: { // x:(r+n),x1 b,y0
-		unhandled("x:(r+n),x1 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 530: { // x:-(r),x1 b,y0
-		unhandled("x:-(r),x1 b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 531: { // x:(r)-n,x1 b,y1
-		unhandled("x:(r)-n,x1 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 532: { // x:(r)+n,x1 b,y1
-		unhandled("x:(r)+n,x1 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 533: { // x:(r)-,x1 b,y1
-		unhandled("x:(r)-,x1 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 534: { // x:(r)+,x1 b,y1
-		unhandled("x:(r)+,x1 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 535: { // x:(r),x1 b,y1
-		unhandled("x:(r),x1 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 536: { // x:(r+n),x1 b,y1
-		unhandled("x:(r+n),x1 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 537: { // x:-(r),x1 b,y1
-		unhandled("x:-(r),x1 b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 538: { // x:(r)-n,a a,y0
-		unhandled("x:(r)-n,a a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 539: { // x:(r)+n,a a,y0
-		unhandled("x:(r)+n,a a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 540: { // x:(r)-,a a,y0
-		unhandled("x:(r)-,a a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 541: { // x:(r)+,a a,y0
-		unhandled("x:(r)+,a a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 542: { // x:(r),a a,y0
-		unhandled("x:(r),a a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 543: { // x:(r+n),a a,y0
-		unhandled("x:(r+n),a a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 544: { // x:-(r),a a,y0
-		unhandled("x:-(r),a a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 545: { // x:(r)-n,a a,y1
-		unhandled("x:(r)-n,a a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 546: { // x:(r)+n,a a,y1
-		unhandled("x:(r)+n,a a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 547: { // x:(r)-,a a,y1
-		unhandled("x:(r)-,a a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 548: { // x:(r)+,a a,y1
-		unhandled("x:(r)+,a a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 549: { // x:(r),a a,y1
-		unhandled("x:(r),a a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 550: { // x:(r+n),a a,y1
-		unhandled("x:(r+n),a a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 551: { // x:-(r),a a,y1
-		unhandled("x:-(r),a a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 552: { // x:(r)-n,a b,y0
-		unhandled("x:(r)-n,a b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 553: { // x:(r)+n,a b,y0
-		unhandled("x:(r)+n,a b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 554: { // x:(r)-,a b,y0
-		unhandled("x:(r)-,a b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 555: { // x:(r)+,a b,y0
-		unhandled("x:(r)+,a b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 556: { // x:(r),a b,y0
-		unhandled("x:(r),a b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 557: { // x:(r+n),a b,y0
-		unhandled("x:(r+n),a b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 558: { // x:-(r),a b,y0
-		unhandled("x:-(r),a b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 559: { // x:(r)-n,a b,y1
-		unhandled("x:(r)-n,a b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 560: { // x:(r)+n,a b,y1
-		unhandled("x:(r)+n,a b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 561: { // x:(r)-,a b,y1
-		unhandled("x:(r)-,a b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 562: { // x:(r)+,a b,y1
-		unhandled("x:(r)+,a b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 563: { // x:(r),a b,y1
-		unhandled("x:(r),a b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 564: { // x:(r+n),a b,y1
-		unhandled("x:(r+n),a b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 565: { // x:-(r),a b,y1
-		unhandled("x:-(r),a b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 566: { // x:(r)-n,b a,y0
-		unhandled("x:(r)-n,b a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 567: { // x:(r)+n,b a,y0
-		unhandled("x:(r)+n,b a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 568: { // x:(r)-,b a,y0
-		unhandled("x:(r)-,b a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 569: { // x:(r)+,b a,y0
-		unhandled("x:(r)+,b a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 570: { // x:(r),b a,y0
-		unhandled("x:(r),b a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 571: { // x:(r+n),b a,y0
-		unhandled("x:(r+n),b a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 572: { // x:-(r),b a,y0
-		unhandled("x:-(r),b a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 573: { // x:(r)-n,b a,y1
-		unhandled("x:(r)-n,b a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 574: { // x:(r)+n,b a,y1
-		unhandled("x:(r)+n,b a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 575: { // x:(r)-,b a,y1
-		unhandled("x:(r)-,b a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 576: { // x:(r)+,b a,y1
-		unhandled("x:(r)+,b a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 577: { // x:(r),b a,y1
-		unhandled("x:(r),b a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 578: { // x:(r+n),b a,y1
-		unhandled("x:(r+n),b a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 579: { // x:-(r),b a,y1
-		unhandled("x:-(r),b a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 580: { // x:(r)-n,b b,y0
-		unhandled("x:(r)-n,b b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 581: { // x:(r)+n,b b,y0
-		unhandled("x:(r)+n,b b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 582: { // x:(r)-,b b,y0
-		unhandled("x:(r)-,b b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 583: { // x:(r)+,b b,y0
-		unhandled("x:(r)+,b b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 584: { // x:(r),b b,y0
-		unhandled("x:(r),b b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 585: { // x:(r+n),b b,y0
-		unhandled("x:(r+n),b b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 586: { // x:-(r),b b,y0
-		unhandled("x:-(r),b b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 587: { // x:(r)-n,b b,y1
-		unhandled("x:(r)-n,b b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 588: { // x:(r)+n,b b,y1
-		unhandled("x:(r)+n,b b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 589: { // x:(r)-,b b,y1
-		unhandled("x:(r)-,b b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 590: { // x:(r)+,b b,y1
-		unhandled("x:(r)+,b b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 591: { // x:(r),b b,y1
-		unhandled("x:(r),b b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 592: { // x:(r+n),b b,y1
-		unhandled("x:(r+n),b b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 593: { // x:-(r),b b,y1
-		unhandled("x:-(r),b b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(ea);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 594: { // x0,x:(r)-n a,y0
-		unhandled("x0,x:(r)-n a,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 595: { // x0,x:(r)+n a,y0
-		unhandled("x0,x:(r)+n a,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 596: { // x0,x:(r)- a,y0
-		unhandled("x0,x:(r)- a,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 597: { // x0,x:(r)+ a,y0
-		unhandled("x0,x:(r)+ a,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 598: { // x0,x:(r) a,y0
-		unhandled("x0,x:(r) a,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 599: { // x0,x:(r+n) a,y0
-		unhandled("x0,x:(r+n) a,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 600: { // x0,x:-(r) a,y0
-		unhandled("x0,x:-(r) a,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 601: { // x0,x:(r)-n a,y1
-		unhandled("x0,x:(r)-n a,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 602: { // x0,x:(r)+n a,y1
-		unhandled("x0,x:(r)+n a,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 603: { // x0,x:(r)- a,y1
-		unhandled("x0,x:(r)- a,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 604: { // x0,x:(r)+ a,y1
-		unhandled("x0,x:(r)+ a,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 605: { // x0,x:(r) a,y1
-		unhandled("x0,x:(r) a,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 606: { // x0,x:(r+n) a,y1
-		unhandled("x0,x:(r+n) a,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 607: { // x0,x:-(r) a,y1
-		unhandled("x0,x:-(r) a,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 608: { // x0,x:(r)-n b,y0
-		unhandled("x0,x:(r)-n b,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 609: { // x0,x:(r)+n b,y0
-		unhandled("x0,x:(r)+n b,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 610: { // x0,x:(r)- b,y0
-		unhandled("x0,x:(r)- b,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 611: { // x0,x:(r)+ b,y0
-		unhandled("x0,x:(r)+ b,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 612: { // x0,x:(r) b,y0
-		unhandled("x0,x:(r) b,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 613: { // x0,x:(r+n) b,y0
-		unhandled("x0,x:(r+n) b,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 614: { // x0,x:-(r) b,y0
-		unhandled("x0,x:-(r) b,y0");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 615: { // x0,x:(r)-n b,y1
-		unhandled("x0,x:(r)-n b,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 616: { // x0,x:(r)+n b,y1
-		unhandled("x0,x:(r)+n b,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 617: { // x0,x:(r)- b,y1
-		unhandled("x0,x:(r)- b,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 618: { // x0,x:(r)+ b,y1
-		unhandled("x0,x:(r)+ b,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 619: { // x0,x:(r) b,y1
-		unhandled("x0,x:(r) b,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 620: { // x0,x:(r+n) b,y1
-		unhandled("x0,x:(r+n) b,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 621: { // x0,x:-(r) b,y1
-		unhandled("x0,x:-(r) b,y1");
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 622: { // x1,x:(r)-n a,y0
-		unhandled("x1,x:(r)-n a,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 623: { // x1,x:(r)+n a,y0
-		unhandled("x1,x:(r)+n a,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 624: { // x1,x:(r)- a,y0
-		unhandled("x1,x:(r)- a,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 625: { // x1,x:(r)+ a,y0
-		unhandled("x1,x:(r)+ a,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 626: { // x1,x:(r) a,y0
-		unhandled("x1,x:(r) a,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 627: { // x1,x:(r+n) a,y0
-		unhandled("x1,x:(r+n) a,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 628: { // x1,x:-(r) a,y0
-		unhandled("x1,x:-(r) a,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 629: { // x1,x:(r)-n a,y1
-		unhandled("x1,x:(r)-n a,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 630: { // x1,x:(r)+n a,y1
-		unhandled("x1,x:(r)+n a,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 631: { // x1,x:(r)- a,y1
-		unhandled("x1,x:(r)- a,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 632: { // x1,x:(r)+ a,y1
-		unhandled("x1,x:(r)+ a,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 633: { // x1,x:(r) a,y1
-		unhandled("x1,x:(r) a,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 634: { // x1,x:(r+n) a,y1
-		unhandled("x1,x:(r+n) a,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 635: { // x1,x:-(r) a,y1
-		unhandled("x1,x:-(r) a,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 636: { // x1,x:(r)-n b,y0
-		unhandled("x1,x:(r)-n b,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 637: { // x1,x:(r)+n b,y0
-		unhandled("x1,x:(r)+n b,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 638: { // x1,x:(r)- b,y0
-		unhandled("x1,x:(r)- b,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 639: { // x1,x:(r)+ b,y0
-		unhandled("x1,x:(r)+ b,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 640: { // x1,x:(r) b,y0
-		unhandled("x1,x:(r) b,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 641: { // x1,x:(r+n) b,y0
-		unhandled("x1,x:(r+n) b,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 642: { // x1,x:-(r) b,y0
-		unhandled("x1,x:-(r) b,y0");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 643: { // x1,x:(r)-n b,y1
-		unhandled("x1,x:(r)-n b,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 644: { // x1,x:(r)+n b,y1
-		unhandled("x1,x:(r)+n b,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 645: { // x1,x:(r)- b,y1
-		unhandled("x1,x:(r)- b,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 646: { // x1,x:(r)+ b,y1
-		unhandled("x1,x:(r)+ b,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 647: { // x1,x:(r) b,y1
-		unhandled("x1,x:(r) b,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 648: { // x1,x:(r+n) b,y1
-		unhandled("x1,x:(r+n) b,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 649: { // x1,x:-(r) b,y1
-		unhandled("x1,x:-(r) b,y1");
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 650: { // a,x:(r)-n a,y0
-		unhandled("a,x:(r)-n a,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 651: { // a,x:(r)+n a,y0
-		unhandled("a,x:(r)+n a,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 652: { // a,x:(r)- a,y0
-		unhandled("a,x:(r)- a,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 653: { // a,x:(r)+ a,y0
-		unhandled("a,x:(r)+ a,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 654: { // a,x:(r) a,y0
-		unhandled("a,x:(r) a,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 655: { // a,x:(r+n) a,y0
-		unhandled("a,x:(r+n) a,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 656: { // a,x:-(r) a,y0
-		unhandled("a,x:-(r) a,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 657: { // a,x:(r)-n a,y1
-		unhandled("a,x:(r)-n a,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 658: { // a,x:(r)+n a,y1
-		unhandled("a,x:(r)+n a,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 659: { // a,x:(r)- a,y1
-		unhandled("a,x:(r)- a,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 660: { // a,x:(r)+ a,y1
-		unhandled("a,x:(r)+ a,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 661: { // a,x:(r) a,y1
-		unhandled("a,x:(r) a,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 662: { // a,x:(r+n) a,y1
-		unhandled("a,x:(r+n) a,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 663: { // a,x:-(r) a,y1
-		unhandled("a,x:-(r) a,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 664: { // a,x:(r)-n b,y0
-		unhandled("a,x:(r)-n b,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 665: { // a,x:(r)+n b,y0
-		unhandled("a,x:(r)+n b,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 666: { // a,x:(r)- b,y0
-		unhandled("a,x:(r)- b,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 667: { // a,x:(r)+ b,y0
-		unhandled("a,x:(r)+ b,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 668: { // a,x:(r) b,y0
-		unhandled("a,x:(r) b,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 669: { // a,x:(r+n) b,y0
-		unhandled("a,x:(r+n) b,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 670: { // a,x:-(r) b,y0
-		unhandled("a,x:-(r) b,y0");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 671: { // a,x:(r)-n b,y1
-		unhandled("a,x:(r)-n b,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 672: { // a,x:(r)+n b,y1
-		unhandled("a,x:(r)+n b,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 673: { // a,x:(r)- b,y1
-		unhandled("a,x:(r)- b,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 674: { // a,x:(r)+ b,y1
-		unhandled("a,x:(r)+ b,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 675: { // a,x:(r) b,y1
-		unhandled("a,x:(r) b,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 676: { // a,x:(r+n) b,y1
-		unhandled("a,x:(r+n) b,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 677: { // a,x:-(r) b,y1
-		unhandled("a,x:-(r) b,y1");
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 678: { // b,x:(r)-n a,y0
-		unhandled("b,x:(r)-n a,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 679: { // b,x:(r)+n a,y0
-		unhandled("b,x:(r)+n a,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 680: { // b,x:(r)- a,y0
-		unhandled("b,x:(r)- a,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 681: { // b,x:(r)+ a,y0
-		unhandled("b,x:(r)+ a,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 682: { // b,x:(r) a,y0
-		unhandled("b,x:(r) a,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 683: { // b,x:(r+n) a,y0
-		unhandled("b,x:(r+n) a,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 684: { // b,x:-(r) a,y0
-		unhandled("b,x:-(r) a,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 685: { // b,x:(r)-n a,y1
-		unhandled("b,x:(r)-n a,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 686: { // b,x:(r)+n a,y1
-		unhandled("b,x:(r)+n a,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 687: { // b,x:(r)- a,y1
-		unhandled("b,x:(r)- a,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 688: { // b,x:(r)+ a,y1
-		unhandled("b,x:(r)+ a,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 689: { // b,x:(r) a,y1
-		unhandled("b,x:(r) a,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 690: { // b,x:(r+n) a,y1
-		unhandled("b,x:(r+n) a,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 691: { // b,x:-(r) a,y1
-		unhandled("b,x:-(r) a,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 692: { // b,x:(r)-n b,y0
-		unhandled("b,x:(r)-n b,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 693: { // b,x:(r)+n b,y0
-		unhandled("b,x:(r)+n b,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 694: { // b,x:(r)- b,y0
-		unhandled("b,x:(r)- b,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 695: { // b,x:(r)+ b,y0
-		unhandled("b,x:(r)+ b,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 696: { // b,x:(r) b,y0
-		unhandled("b,x:(r) b,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 697: { // b,x:(r+n) b,y0
-		unhandled("b,x:(r+n) b,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 698: { // b,x:-(r) b,y0
-		unhandled("b,x:-(r) b,y0");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 699: { // b,x:(r)-n b,y1
-		unhandled("b,x:(r)-n b,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 700: { // b,x:(r)+n b,y1
-		unhandled("b,x:(r)+n b,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 701: { // b,x:(r)- b,y1
-		unhandled("b,x:(r)- b,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 702: { // b,x:(r)+ b,y1
-		unhandled("b,x:(r)+ b,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 703: { // b,x:(r) b,y1
-		unhandled("b,x:(r) b,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 704: { // b,x:(r+n) b,y1
-		unhandled("b,x:(r+n) b,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 705: { // b,x:-(r) b,y1
-		unhandled("b,x:-(r) b,y1");
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 706: { // x:[abs],x0 a,y0
-		unhandled("x:[abs],x0 a,y0");
+		u32 abs = exv;
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 707: { // x:[abs],x0 a,y1
-		unhandled("x:[abs],x0 a,y1");
+		u32 abs = exv;
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 708: { // x:[abs],x0 b,y0
-		unhandled("x:[abs],x0 b,y0");
+		u32 abs = exv;
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 709: { // x:[abs],x0 b,y1
-		unhandled("x:[abs],x0 b,y1");
+		u32 abs = exv;
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 710: { // x:[abs],x1 a,y0
-		unhandled("x:[abs],x1 a,y0");
+		u32 abs = exv;
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 711: { // x:[abs],x1 a,y1
-		unhandled("x:[abs],x1 a,y1");
+		u32 abs = exv;
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 712: { // x:[abs],x1 b,y0
-		unhandled("x:[abs],x1 b,y0");
+		u32 abs = exv;
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 713: { // x:[abs],x1 b,y1
-		unhandled("x:[abs],x1 b,y1");
+		u32 abs = exv;
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 714: { // x:[abs],a a,y0
-		unhandled("x:[abs],a a,y0");
+		u32 abs = exv;
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 715: { // x:[abs],a a,y1
-		unhandled("x:[abs],a a,y1");
+		u32 abs = exv;
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 716: { // x:[abs],a b,y0
-		unhandled("x:[abs],a b,y0");
+		u32 abs = exv;
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 717: { // x:[abs],a b,y1
-		unhandled("x:[abs],a b,y1");
+		u32 abs = exv;
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 718: { // x:[abs],b a,y0
-		unhandled("x:[abs],b a,y0");
+		u32 abs = exv;
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 719: { // x:[abs],b a,y1
-		unhandled("x:[abs],b a,y1");
+		u32 abs = exv;
+		u32 s2_h = get_ah();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 720: { // x:[abs],b b,y0
-		unhandled("x:[abs],b b,y0");
+		u32 abs = exv;
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
 	case 721: { // x:[abs],b b,y1
-		unhandled("x:[abs],b b,y1");
+		u32 abs = exv;
+		u32 s2_h = get_bh();
+		m_tmp1 = m_x.read_dword(abs);
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 722: { // #[i],x0 a,y0
-		unhandled("#[i],x0 a,y0");
+	case 722: { // x0,x:[abs] a,y0
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 723: { // #[i],x0 a,y1
-		unhandled("#[i],x0 a,y1");
+	case 723: { // x0,x:[abs] a,y1
+		u32 s1 = get_x0();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 724: { // #[i],x0 b,y0
-		unhandled("#[i],x0 b,y0");
+	case 724: { // x0,x:[abs] b,y0
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 725: { // #[i],x0 b,y1
-		unhandled("#[i],x0 b,y1");
+	case 725: { // x0,x:[abs] b,y1
+		u32 s1 = get_x0();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 726: { // #[i],x1 a,y0
-		unhandled("#[i],x1 a,y0");
+	case 726: { // x1,x:[abs] a,y0
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 727: { // #[i],x1 a,y1
-		unhandled("#[i],x1 a,y1");
+	case 727: { // x1,x:[abs] a,y1
+		u32 s1 = get_x1();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 728: { // #[i],x1 b,y0
-		unhandled("#[i],x1 b,y0");
+	case 728: { // x1,x:[abs] b,y0
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 729: { // #[i],x1 b,y1
-		unhandled("#[i],x1 b,y1");
+	case 729: { // x1,x:[abs] b,y1
+		u32 s1 = get_x1();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 730: { // #[i],a a,y0
-		unhandled("#[i],a a,y0");
+	case 730: { // a,x:[abs] a,y0
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 731: { // #[i],a a,y1
-		unhandled("#[i],a a,y1");
+	case 731: { // a,x:[abs] a,y1
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 732: { // #[i],a b,y0
-		unhandled("#[i],a b,y0");
+	case 732: { // a,x:[abs] b,y0
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 733: { // #[i],a b,y1
-		unhandled("#[i],a b,y1");
+	case 733: { // a,x:[abs] b,y1
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 734: { // #[i],b a,y0
-		unhandled("#[i],b a,y0");
+	case 734: { // b,x:[abs] a,y0
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 735: { // #[i],b a,y1
-		unhandled("#[i],b a,y1");
+	case 735: { // b,x:[abs] a,y1
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 736: { // #[i],b b,y0
-		unhandled("#[i],b b,y0");
+	case 736: { // b,x:[abs] b,y0
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 737: { // #[i],b b,y1
-		unhandled("#[i],b b,y1");
+	case 737: { // b,x:[abs] b,y1
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 738: { // x0,x:[abs] a,y0
-		unhandled("x0,x:[abs] a,y0");
+	case 738: { // #[i],x0 a,y0
+		u32 s2_h = get_ah();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 739: { // x0,x:[abs] a,y1
-		unhandled("x0,x:[abs] a,y1");
+	case 739: { // #[i],x0 a,y1
+		u32 s2_h = get_ah();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 740: { // x0,x:[abs] b,y0
-		unhandled("x0,x:[abs] b,y0");
+	case 740: { // #[i],x0 b,y0
+		u32 s2_h = get_bh();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 741: { // x0,x:[abs] b,y1
-		unhandled("x0,x:[abs] b,y1");
+	case 741: { // #[i],x0 b,y1
+		u32 s2_h = get_bh();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 742: { // x1,x:[abs] a,y0
-		unhandled("x1,x:[abs] a,y0");
+	case 742: { // #[i],x1 a,y0
+		u32 s2_h = get_ah();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 743: { // x1,x:[abs] a,y1
-		unhandled("x1,x:[abs] a,y1");
+	case 743: { // #[i],x1 a,y1
+		u32 s2_h = get_ah();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 744: { // x1,x:[abs] b,y0
-		unhandled("x1,x:[abs] b,y0");
+	case 744: { // #[i],x1 b,y0
+		u32 s2_h = get_bh();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 745: { // x1,x:[abs] b,y1
-		unhandled("x1,x:[abs] b,y1");
+	case 745: { // #[i],x1 b,y1
+		u32 s2_h = get_bh();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 746: { // a,x:[abs] a,y0
-		unhandled("a,x:[abs] a,y0");
+	case 746: { // #[i],a a,y0
+		u32 s2_h = get_ah();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 747: { // a,x:[abs] a,y1
-		unhandled("a,x:[abs] a,y1");
+	case 747: { // #[i],a a,y1
+		u32 s2_h = get_ah();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 748: { // a,x:[abs] b,y0
-		unhandled("a,x:[abs] b,y0");
+	case 748: { // #[i],a b,y0
+		u32 s2_h = get_bh();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 749: { // a,x:[abs] b,y1
-		unhandled("a,x:[abs] b,y1");
+	case 749: { // #[i],a b,y1
+		u32 s2_h = get_bh();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 750: { // b,x:[abs] a,y0
-		unhandled("b,x:[abs] a,y0");
+	case 750: { // #[i],b a,y0
+		u32 s2_h = get_ah();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 751: { // b,x:[abs] a,y1
-		unhandled("b,x:[abs] a,y1");
+	case 751: { // #[i],b a,y1
+		u32 s2_h = get_ah();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 752: { // b,x:[abs] b,y0
-		unhandled("b,x:[abs] b,y0");
+	case 752: { // #[i],b b,y0
+		u32 s2_h = get_bh();
+		m_tmp1 = s2_h;
 		break;
 		}
-	case 753: { // b,x:[abs] b,y1
-		unhandled("b,x:[abs] b,y1");
+	case 753: { // #[i],b b,y1
+		u32 s2_h = get_bh();
+		m_tmp1 = s2_h;
 		break;
 		}
 	case 754: { // a,x:(r)-n x0,a
-		unhandled("a,x:(r)-n x0,a");
+		m_tmp1 = get_a();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 755: { // a,x:(r)+n x0,a
-		unhandled("a,x:(r)+n x0,a");
+		m_tmp1 = get_a();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 756: { // a,x:(r)- x0,a
-		unhandled("a,x:(r)- x0,a");
+		m_tmp1 = get_a();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 757: { // a,x:(r)+ x0,a
-		unhandled("a,x:(r)+ x0,a");
+		m_tmp1 = get_a();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 758: { // a,x:(r) x0,a
-		unhandled("a,x:(r) x0,a");
+		m_tmp1 = get_a();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 759: { // a,x:(r+n) x0,a
-		unhandled("a,x:(r+n) x0,a");
+		m_tmp1 = get_a();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 760: { // a,x:-(r) x0,a
-		unhandled("a,x:-(r) x0,a");
+		m_tmp1 = get_a();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 761: { // b,x:(r)-n x0,b
-		unhandled("b,x:(r)-n x0,b");
+		m_tmp1 = get_bh();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 762: { // b,x:(r)+n x0,b
-		unhandled("b,x:(r)+n x0,b");
+		m_tmp1 = get_bh();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 763: { // b,x:(r)- x0,b
-		unhandled("b,x:(r)- x0,b");
+		m_tmp1 = get_bh();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 764: { // b,x:(r)+ x0,b
-		unhandled("b,x:(r)+ x0,b");
+		m_tmp1 = get_bh();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 765: { // b,x:(r) x0,b
-		unhandled("b,x:(r) x0,b");
+		m_tmp1 = get_bh();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 766: { // b,x:(r+n) x0,b
-		unhandled("b,x:(r+n) x0,b");
+		m_tmp1 = get_bh();
+		m_tmp2 = get_x0();
 		break;
 		}
 	case 767: { // b,x:-(r) x0,b
-		unhandled("b,x:-(r) x0,b");
+		m_tmp1 = get_bh();
+		m_tmp2 = get_x0();
 		break;
 		}
-	case 768: { // y:(r)-n,x0
-		unhandled("y:(r)-n,x0");
+	case 768: { // a,x:[abs] x0,a
+		m_tmp1 = get_a();
+		m_tmp2 = get_x0();
 		break;
 		}
-	case 769: { // y:(r)+n,x0
-		unhandled("y:(r)+n,x0");
+	case 769: { // b,x:[abs] x0,b
+		m_tmp1 = get_bh();
+		m_tmp2 = get_x0();
 		break;
 		}
-	case 770: { // y:(r)-,x0
-		unhandled("y:(r)-,x0");
+	case 770: { // y:(r)-n,x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 771: { // y:(r)+,x0
-		unhandled("y:(r)+,x0");
+	case 771: { // y:(r)+n,x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 772: { // y:(r),x0
-		unhandled("y:(r),x0");
+	case 772: { // y:(r)-,x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 773: { // y:(r+n),x0
-		unhandled("y:(r+n),x0");
+	case 773: { // y:(r)+,x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 774: { // y:-(r),x0
-		unhandled("y:-(r),x0");
+	case 774: { // y:(r),x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 775: { // y:(r)-n,x1
-		unhandled("y:(r)-n,x1");
+	case 775: { // y:(r+n),x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 776: { // y:(r)+n,x1
-		unhandled("y:(r)+n,x1");
+	case 776: { // y:-(r),x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 777: { // y:(r)-,x1
-		unhandled("y:(r)-,x1");
+	case 777: { // y:(r)-n,x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 778: { // y:(r)+,x1
-		unhandled("y:(r)+,x1");
+	case 778: { // y:(r)+n,x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 779: { // y:(r),x1
-		unhandled("y:(r),x1");
+	case 779: { // y:(r)-,x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 780: { // y:(r+n),x1
-		unhandled("y:(r+n),x1");
+	case 780: { // y:(r)+,x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 781: { // y:-(r),x1
-		unhandled("y:-(r),x1");
+	case 781: { // y:(r),x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 782: { // y:(r)-n,y0
-		unhandled("y:(r)-n,y0");
+	case 782: { // y:(r+n),x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 783: { // y:(r)+n,y0
-		unhandled("y:(r)+n,y0");
+	case 783: { // y:-(r),x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 784: { // y:(r)-,y0
-		unhandled("y:(r)-,y0");
+	case 784: { // y:(r)-n,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 785: { // y:(r)+,y0
-		unhandled("y:(r)+,y0");
+	case 785: { // y:(r)+n,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 786: { // y:(r),y0
-		unhandled("y:(r),y0");
+	case 786: { // y:(r)-,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 787: { // y:(r+n),y0
-		unhandled("y:(r+n),y0");
+	case 787: { // y:(r)+,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 788: { // y:-(r),y0
-		unhandled("y:-(r),y0");
+	case 788: { // y:(r),y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 789: { // y:(r)-n,y1
-		unhandled("y:(r)-n,y1");
+	case 789: { // y:(r+n),y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 790: { // y:(r)+n,y1
-		unhandled("y:(r)+n,y1");
+	case 790: { // y:-(r),y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 791: { // y:(r)-,y1
-		unhandled("y:(r)-,y1");
+	case 791: { // y:(r)-n,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 792: { // y:(r)+,y1
-		unhandled("y:(r)+,y1");
+	case 792: { // y:(r)+n,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 793: { // y:(r),y1
-		unhandled("y:(r),y1");
+	case 793: { // y:(r)-,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 794: { // y:(r+n),y1
-		unhandled("y:(r+n),y1");
+	case 794: { // y:(r)+,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 795: { // y:-(r),y1
-		unhandled("y:-(r),y1");
+	case 795: { // y:(r),y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 796: { // y:(r)-n,a0
-		unhandled("y:(r)-n,a0");
+	case 796: { // y:(r+n),y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 797: { // y:(r)+n,a0
-		unhandled("y:(r)+n,a0");
+	case 797: { // y:-(r),y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 798: { // y:(r)-,a0
-		unhandled("y:(r)-,a0");
+	case 798: { // y:(r)-n,a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 799: { // y:(r)+,a0
-		unhandled("y:(r)+,a0");
+	case 799: { // y:(r)+n,a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 800: { // y:(r),a0
-		unhandled("y:(r),a0");
+	case 800: { // y:(r)-,a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 801: { // y:(r+n),a0
-		unhandled("y:(r+n),a0");
+	case 801: { // y:(r)+,a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 802: { // y:-(r),a0
-		unhandled("y:-(r),a0");
+	case 802: { // y:(r),a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 803: { // y:(r)-n,b0
-		unhandled("y:(r)-n,b0");
+	case 803: { // y:(r+n),a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 804: { // y:(r)+n,b0
-		unhandled("y:(r)+n,b0");
+	case 804: { // y:-(r),a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 805: { // y:(r)-,b0
-		unhandled("y:(r)-,b0");
+	case 805: { // y:(r)-n,b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 806: { // y:(r)+,b0
-		unhandled("y:(r)+,b0");
+	case 806: { // y:(r)+n,b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 807: { // y:(r),b0
-		unhandled("y:(r),b0");
+	case 807: { // y:(r)-,b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 808: { // y:(r+n),b0
-		unhandled("y:(r+n),b0");
+	case 808: { // y:(r)+,b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 809: { // y:-(r),b0
-		unhandled("y:-(r),b0");
+	case 809: { // y:(r),b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 810: { // y:(r)-n,a2
-		unhandled("y:(r)-n,a2");
+	case 810: { // y:(r+n),b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 811: { // y:(r)+n,a2
-		unhandled("y:(r)+n,a2");
+	case 811: { // y:-(r),b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 812: { // y:(r)-,a2
-		unhandled("y:(r)-,a2");
+	case 812: { // y:(r)-n,a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 813: { // y:(r)+,a2
-		unhandled("y:(r)+,a2");
+	case 813: { // y:(r)+n,a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 814: { // y:(r),a2
-		unhandled("y:(r),a2");
+	case 814: { // y:(r)-,a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 815: { // y:(r+n),a2
-		unhandled("y:(r+n),a2");
+	case 815: { // y:(r)+,a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 816: { // y:-(r),a2
-		unhandled("y:-(r),a2");
+	case 816: { // y:(r),a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 817: { // y:(r)-n,b2
-		unhandled("y:(r)-n,b2");
+	case 817: { // y:(r+n),a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 818: { // y:(r)+n,b2
-		unhandled("y:(r)+n,b2");
+	case 818: { // y:-(r),a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 819: { // y:(r)-,b2
-		unhandled("y:(r)-,b2");
+	case 819: { // y:(r)-n,b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 820: { // y:(r)+,b2
-		unhandled("y:(r)+,b2");
+	case 820: { // y:(r)+n,b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 821: { // y:(r),b2
-		unhandled("y:(r),b2");
+	case 821: { // y:(r)-,b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 822: { // y:(r+n),b2
-		unhandled("y:(r+n),b2");
+	case 822: { // y:(r)+,b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 823: { // y:-(r),b2
-		unhandled("y:-(r),b2");
+	case 823: { // y:(r),b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 824: { // y:(r)-n,a1
-		unhandled("y:(r)-n,a1");
+	case 824: { // y:(r+n),b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 825: { // y:(r)+n,a1
-		unhandled("y:(r)+n,a1");
+	case 825: { // y:-(r),b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 826: { // y:(r)-,a1
-		unhandled("y:(r)-,a1");
+	case 826: { // y:(r)-n,a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 827: { // y:(r)+,a1
-		unhandled("y:(r)+,a1");
+	case 827: { // y:(r)+n,a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 828: { // y:(r),a1
-		unhandled("y:(r),a1");
+	case 828: { // y:(r)-,a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 829: { // y:(r+n),a1
-		unhandled("y:(r+n),a1");
+	case 829: { // y:(r)+,a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 830: { // y:-(r),a1
-		unhandled("y:-(r),a1");
+	case 830: { // y:(r),a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 831: { // y:(r)-n,b1
-		unhandled("y:(r)-n,b1");
+	case 831: { // y:(r+n),a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 832: { // y:(r)+n,b1
-		unhandled("y:(r)+n,b1");
+	case 832: { // y:-(r),a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 833: { // y:(r)-,b1
-		unhandled("y:(r)-,b1");
+	case 833: { // y:(r)-n,b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 834: { // y:(r)+,b1
-		unhandled("y:(r)+,b1");
+	case 834: { // y:(r)+n,b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 835: { // y:(r),b1
-		unhandled("y:(r),b1");
+	case 835: { // y:(r)-,b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 836: { // y:(r+n),b1
-		unhandled("y:(r+n),b1");
+	case 836: { // y:(r)+,b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 837: { // y:-(r),b1
-		unhandled("y:-(r),b1");
+	case 837: { // y:(r),b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 838: { // y:(r)-n,a
-		unhandled("y:(r)-n,a");
+	case 838: { // y:(r+n),b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 839: { // y:(r)+n,a
-		unhandled("y:(r)+n,a");
+	case 839: { // y:-(r),b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 840: { // y:(r)-,a
-		unhandled("y:(r)-,a");
+	case 840: { // y:(r)-n,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 841: { // y:(r)+,a
-		unhandled("y:(r)+,a");
+	case 841: { // y:(r)+n,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 842: { // y:(r),a
-		unhandled("y:(r),a");
+	case 842: { // y:(r)-,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 843: { // y:(r+n),a
-		unhandled("y:(r+n),a");
+	case 843: { // y:(r)+,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 844: { // y:-(r),a
-		unhandled("y:-(r),a");
+	case 844: { // y:(r),a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 845: { // y:(r)-n,b
-		unhandled("y:(r)-n,b");
+	case 845: { // y:(r+n),a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 846: { // y:(r)+n,b
-		unhandled("y:(r)+n,b");
+	case 846: { // y:-(r),a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 847: { // y:(r)-,b
-		unhandled("y:(r)-,b");
+	case 847: { // y:(r)-n,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 848: { // y:(r)+,b
-		unhandled("y:(r)+,b");
+	case 848: { // y:(r)+n,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 849: { // y:(r),b
-		unhandled("y:(r),b");
+	case 849: { // y:(r)-,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 850: { // y:(r+n),b
-		unhandled("y:(r+n),b");
+	case 850: { // y:(r)+,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 851: { // y:-(r),b
-		unhandled("y:-(r),b");
+	case 851: { // y:(r),b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 852: { // y:(r)-n,r
-		unhandled("y:(r)-n,r");
+	case 852: { // y:(r+n),b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 853: { // y:(r)+n,r
-		unhandled("y:(r)+n,r");
+	case 853: { // y:-(r),b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 854: { // y:(r)-,r
-		unhandled("y:(r)-,r");
+	case 854: { // y:(r)-n,r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 855: { // y:(r)+,r
-		unhandled("y:(r)+,r");
+	case 855: { // y:(r)+n,r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 856: { // y:(r),r
-		unhandled("y:(r),r");
+	case 856: { // y:(r)-,r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 857: { // y:(r+n),r
-		unhandled("y:(r+n),r");
+	case 857: { // y:(r)+,r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 858: { // y:-(r),r
-		unhandled("y:-(r),r");
+	case 858: { // y:(r),r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 859: { // y:(r)-n,n
-		unhandled("y:(r)-n,n");
+	case 859: { // y:(r+n),r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 860: { // y:(r)+n,n
-		unhandled("y:(r)+n,n");
+	case 860: { // y:-(r),r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 861: { // y:(r)-,n
-		unhandled("y:(r)-,n");
+	case 861: { // y:(r)-n,n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 862: { // y:(r)+,n
-		unhandled("y:(r)+,n");
+	case 862: { // y:(r)+n,n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 863: { // y:(r),n
-		unhandled("y:(r),n");
+	case 863: { // y:(r)-,n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 864: { // y:(r+n),n
-		unhandled("y:(r+n),n");
+	case 864: { // y:(r)+,n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 865: { // y:-(r),n
-		unhandled("y:-(r),n");
+	case 865: { // y:(r),n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 866: { // x0,y:(r)-n
-		unhandled("x0,y:(r)-n");
+	case 866: { // y:(r+n),n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 867: { // x0,y:(r)+n
-		unhandled("x0,y:(r)+n");
+	case 867: { // y:-(r),n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
 		break;
 		}
-	case 868: { // x0,y:(r)-
-		unhandled("x0,y:(r)-");
+	case 868: { // x0,y:(r)-n
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 869: { // x0,y:(r)+
-		unhandled("x0,y:(r)+");
+	case 869: { // x0,y:(r)+n
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 870: { // x0,y:(r)
-		unhandled("x0,y:(r)");
+	case 870: { // x0,y:(r)-
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 871: { // x0,y:(r+n)
-		unhandled("x0,y:(r+n)");
+	case 871: { // x0,y:(r)+
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 872: { // x0,y:-(r)
-		unhandled("x0,y:-(r)");
+	case 872: { // x0,y:(r)
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 873: { // x1,y:(r)-n
-		unhandled("x1,y:(r)-n");
+	case 873: { // x0,y:(r+n)
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 874: { // x1,y:(r)+n
-		unhandled("x1,y:(r)+n");
+	case 874: { // x0,y:-(r)
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 875: { // x1,y:(r)-
-		unhandled("x1,y:(r)-");
+	case 875: { // x1,y:(r)-n
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 876: { // x1,y:(r)+
-		unhandled("x1,y:(r)+");
+	case 876: { // x1,y:(r)+n
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 877: { // x1,y:(r)
-		unhandled("x1,y:(r)");
+	case 877: { // x1,y:(r)-
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 878: { // x1,y:(r+n)
-		unhandled("x1,y:(r+n)");
+	case 878: { // x1,y:(r)+
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 879: { // x1,y:-(r)
-		unhandled("x1,y:-(r)");
+	case 879: { // x1,y:(r)
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 880: { // y0,y:(r)-n
-		unhandled("y0,y:(r)-n");
+	case 880: { // x1,y:(r+n)
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 881: { // y0,y:(r)+n
-		unhandled("y0,y:(r)+n");
+	case 881: { // x1,y:-(r)
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 882: { // y0,y:(r)-
-		unhandled("y0,y:(r)-");
+	case 882: { // y0,y:(r)-n
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 883: { // y0,y:(r)+
-		unhandled("y0,y:(r)+");
+	case 883: { // y0,y:(r)+n
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 884: { // y0,y:(r)
-		unhandled("y0,y:(r)");
+	case 884: { // y0,y:(r)-
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 885: { // y0,y:(r+n)
-		unhandled("y0,y:(r+n)");
+	case 885: { // y0,y:(r)+
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 886: { // y0,y:-(r)
-		unhandled("y0,y:-(r)");
+	case 886: { // y0,y:(r)
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 887: { // y1,y:(r)-n
-		unhandled("y1,y:(r)-n");
+	case 887: { // y0,y:(r+n)
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 888: { // y1,y:(r)+n
-		unhandled("y1,y:(r)+n");
+	case 888: { // y0,y:-(r)
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 889: { // y1,y:(r)-
-		unhandled("y1,y:(r)-");
+	case 889: { // y1,y:(r)-n
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 890: { // y1,y:(r)+
-		unhandled("y1,y:(r)+");
+	case 890: { // y1,y:(r)+n
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 891: { // y1,y:(r)
-		unhandled("y1,y:(r)");
+	case 891: { // y1,y:(r)-
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 892: { // y1,y:(r+n)
-		unhandled("y1,y:(r+n)");
+	case 892: { // y1,y:(r)+
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 893: { // y1,y:-(r)
-		unhandled("y1,y:-(r)");
+	case 893: { // y1,y:(r)
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 894: { // a0,y:(r)-n
-		unhandled("a0,y:(r)-n");
+	case 894: { // y1,y:(r+n)
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 895: { // a0,y:(r)+n
-		unhandled("a0,y:(r)+n");
+	case 895: { // y1,y:-(r)
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 896: { // a0,y:(r)-
-		unhandled("a0,y:(r)-");
+	case 896: { // a0,y:(r)-n
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 897: { // a0,y:(r)+
-		unhandled("a0,y:(r)+");
+	case 897: { // a0,y:(r)+n
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 898: { // a0,y:(r)
-		unhandled("a0,y:(r)");
+	case 898: { // a0,y:(r)-
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 899: { // a0,y:(r+n)
-		unhandled("a0,y:(r+n)");
+	case 899: { // a0,y:(r)+
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 900: { // a0,y:-(r)
-		unhandled("a0,y:-(r)");
+	case 900: { // a0,y:(r)
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 901: { // b0,y:(r)-n
-		unhandled("b0,y:(r)-n");
+	case 901: { // a0,y:(r+n)
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 902: { // b0,y:(r)+n
-		unhandled("b0,y:(r)+n");
+	case 902: { // a0,y:-(r)
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 903: { // b0,y:(r)-
-		unhandled("b0,y:(r)-");
+	case 903: { // b0,y:(r)-n
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 904: { // b0,y:(r)+
-		unhandled("b0,y:(r)+");
+	case 904: { // b0,y:(r)+n
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 905: { // b0,y:(r)
-		unhandled("b0,y:(r)");
+	case 905: { // b0,y:(r)-
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 906: { // b0,y:(r+n)
-		unhandled("b0,y:(r+n)");
+	case 906: { // b0,y:(r)+
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 907: { // b0,y:-(r)
-		unhandled("b0,y:-(r)");
+	case 907: { // b0,y:(r)
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 908: { // a2,y:(r)-n
-		unhandled("a2,y:(r)-n");
+	case 908: { // b0,y:(r+n)
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 909: { // a2,y:(r)+n
-		unhandled("a2,y:(r)+n");
+	case 909: { // b0,y:-(r)
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 910: { // a2,y:(r)-
-		unhandled("a2,y:(r)-");
+	case 910: { // a2,y:(r)-n
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 911: { // a2,y:(r)+
-		unhandled("a2,y:(r)+");
+	case 911: { // a2,y:(r)+n
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 912: { // a2,y:(r)
-		unhandled("a2,y:(r)");
+	case 912: { // a2,y:(r)-
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 913: { // a2,y:(r+n)
-		unhandled("a2,y:(r+n)");
+	case 913: { // a2,y:(r)+
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 914: { // a2,y:-(r)
-		unhandled("a2,y:-(r)");
+	case 914: { // a2,y:(r)
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 915: { // b2,y:(r)-n
-		unhandled("b2,y:(r)-n");
+	case 915: { // a2,y:(r+n)
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 916: { // b2,y:(r)+n
-		unhandled("b2,y:(r)+n");
+	case 916: { // a2,y:-(r)
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 917: { // b2,y:(r)-
-		unhandled("b2,y:(r)-");
+	case 917: { // b2,y:(r)-n
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 918: { // b2,y:(r)+
-		unhandled("b2,y:(r)+");
+	case 918: { // b2,y:(r)+n
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 919: { // b2,y:(r)
-		unhandled("b2,y:(r)");
+	case 919: { // b2,y:(r)-
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 920: { // b2,y:(r+n)
-		unhandled("b2,y:(r+n)");
+	case 920: { // b2,y:(r)+
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 921: { // b2,y:-(r)
-		unhandled("b2,y:-(r)");
+	case 921: { // b2,y:(r)
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 922: { // a1,y:(r)-n
-		unhandled("a1,y:(r)-n");
+	case 922: { // b2,y:(r+n)
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 923: { // a1,y:(r)+n
-		unhandled("a1,y:(r)+n");
+	case 923: { // b2,y:-(r)
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 924: { // a1,y:(r)-
-		unhandled("a1,y:(r)-");
+	case 924: { // a1,y:(r)-n
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 925: { // a1,y:(r)+
-		unhandled("a1,y:(r)+");
+	case 925: { // a1,y:(r)+n
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 926: { // a1,y:(r)
-		unhandled("a1,y:(r)");
+	case 926: { // a1,y:(r)-
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 927: { // a1,y:(r+n)
-		unhandled("a1,y:(r+n)");
+	case 927: { // a1,y:(r)+
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 928: { // a1,y:-(r)
-		unhandled("a1,y:-(r)");
+	case 928: { // a1,y:(r)
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 929: { // b1,y:(r)-n
-		unhandled("b1,y:(r)-n");
+	case 929: { // a1,y:(r+n)
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 930: { // b1,y:(r)+n
-		unhandled("b1,y:(r)+n");
+	case 930: { // a1,y:-(r)
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 931: { // b1,y:(r)-
-		unhandled("b1,y:(r)-");
+	case 931: { // b1,y:(r)-n
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 932: { // b1,y:(r)+
-		unhandled("b1,y:(r)+");
+	case 932: { // b1,y:(r)+n
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 933: { // b1,y:(r)
-		unhandled("b1,y:(r)");
+	case 933: { // b1,y:(r)-
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 934: { // b1,y:(r+n)
-		unhandled("b1,y:(r+n)");
+	case 934: { // b1,y:(r)+
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 935: { // b1,y:-(r)
-		unhandled("b1,y:-(r)");
+	case 935: { // b1,y:(r)
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 936: { // a,y:(r)-n
-		unhandled("a,y:(r)-n");
+	case 936: { // b1,y:(r+n)
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 937: { // a,y:(r)+n
-		unhandled("a,y:(r)+n");
+	case 937: { // b1,y:-(r)
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 938: { // a,y:(r)-
-		unhandled("a,y:(r)-");
+	case 938: { // a,y:(r)-n
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 939: { // a,y:(r)+
-		unhandled("a,y:(r)+");
+	case 939: { // a,y:(r)+n
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 940: { // a,y:(r)
-		unhandled("a,y:(r)");
+	case 940: { // a,y:(r)-
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 941: { // a,y:(r+n)
-		unhandled("a,y:(r+n)");
+	case 941: { // a,y:(r)+
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 942: { // a,y:-(r)
-		unhandled("a,y:-(r)");
+	case 942: { // a,y:(r)
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 943: { // b,y:(r)-n
-		unhandled("b,y:(r)-n");
+	case 943: { // a,y:(r+n)
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 944: { // b,y:(r)+n
-		unhandled("b,y:(r)+n");
+	case 944: { // a,y:-(r)
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 945: { // b,y:(r)-
-		unhandled("b,y:(r)-");
+	case 945: { // b,y:(r)-n
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 946: { // b,y:(r)+
-		unhandled("b,y:(r)+");
+	case 946: { // b,y:(r)+n
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 947: { // b,y:(r)
-		unhandled("b,y:(r)");
+	case 947: { // b,y:(r)-
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 948: { // b,y:(r+n)
-		unhandled("b,y:(r+n)");
+	case 948: { // b,y:(r)+
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 949: { // b,y:-(r)
-		unhandled("b,y:-(r)");
+	case 949: { // b,y:(r)
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 950: { // r,y:(r)-n
-		unhandled("r,y:(r)-n");
+	case 950: { // b,y:(r+n)
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 951: { // r,y:(r)+n
-		unhandled("r,y:(r)+n");
+	case 951: { // b,y:-(r)
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 952: { // r,y:(r)-
-		unhandled("r,y:(r)-");
+	case 952: { // r,y:(r)-n
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 953: { // r,y:(r)+
-		unhandled("r,y:(r)+");
+	case 953: { // r,y:(r)+n
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 954: { // r,y:(r)
-		unhandled("r,y:(r)");
+	case 954: { // r,y:(r)-
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 955: { // r,y:(r+n)
-		unhandled("r,y:(r+n)");
+	case 955: { // r,y:(r)+
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 956: { // r,y:-(r)
-		unhandled("r,y:-(r)");
+	case 956: { // r,y:(r)
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 957: { // n,y:(r)-n
-		unhandled("n,y:(r)-n");
+	case 957: { // r,y:(r+n)
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 958: { // n,y:(r)+n
-		unhandled("n,y:(r)+n");
+	case 958: { // r,y:-(r)
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 959: { // n,y:(r)-
-		unhandled("n,y:(r)-");
+	case 959: { // n,y:(r)-n
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 960: { // n,y:(r)+
-		unhandled("n,y:(r)+");
+	case 960: { // n,y:(r)+n
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 961: { // n,y:(r)
-		unhandled("n,y:(r)");
+	case 961: { // n,y:(r)-
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 962: { // n,y:(r+n)
-		unhandled("n,y:(r+n)");
+	case 962: { // n,y:(r)+
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 963: { // n,y:-(r)
-		unhandled("n,y:-(r)");
+	case 963: { // n,y:(r)
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 964: { // y:[abs],x0
-		unhandled("y:[abs],x0");
+	case 964: { // n,y:(r+n)
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 965: { // y:[abs],x1
-		unhandled("y:[abs],x1");
+	case 965: { // n,y:-(r)
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 966: { // y:[abs],y0
-		unhandled("y:[abs],y0");
+	case 966: { // y:[abs],x0
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 967: { // y:[abs],y1
-		unhandled("y:[abs],y1");
+	case 967: { // y:[abs],x1
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 968: { // y:[abs],a0
-		unhandled("y:[abs],a0");
+	case 968: { // y:[abs],y0
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 969: { // y:[abs],b0
-		unhandled("y:[abs],b0");
+	case 969: { // y:[abs],y1
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 970: { // y:[abs],a2
-		unhandled("y:[abs],a2");
+	case 970: { // y:[abs],a0
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 971: { // y:[abs],b2
-		unhandled("y:[abs],b2");
+	case 971: { // y:[abs],b0
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 972: { // y:[abs],a1
-		unhandled("y:[abs],a1");
+	case 972: { // y:[abs],a2
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 973: { // y:[abs],b1
-		unhandled("y:[abs],b1");
+	case 973: { // y:[abs],b2
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 974: { // y:[abs],a
-		unhandled("y:[abs],a");
+	case 974: { // y:[abs],a1
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 975: { // y:[abs],b
-		unhandled("y:[abs],b");
+	case 975: { // y:[abs],b1
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 976: { // y:[abs],r
-		unhandled("y:[abs],r");
+	case 976: { // y:[abs],a
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 977: { // y:[abs],n
-		unhandled("y:[abs],n");
+	case 977: { // y:[abs],b
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 978: { // #[i],x0
-		unhandled("#[i],x0");
+	case 978: { // y:[abs],r
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 979: { // #[i],x1
-		unhandled("#[i],x1");
+	case 979: { // y:[abs],n
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
 		break;
 		}
-	case 980: { // #[i],y0
-		unhandled("#[i],y0");
+	case 980: { // x0,y:[abs]
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 981: { // #[i],y1
-		unhandled("#[i],y1");
+	case 981: { // x1,y:[abs]
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 982: { // #[i],a0
-		unhandled("#[i],a0");
+	case 982: { // y0,y:[abs]
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 983: { // #[i],b0
-		unhandled("#[i],b0");
+	case 983: { // y1,y:[abs]
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 984: { // #[i],a2
-		unhandled("#[i],a2");
+	case 984: { // a0,y:[abs]
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 985: { // #[i],b2
-		unhandled("#[i],b2");
+	case 985: { // b0,y:[abs]
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 986: { // #[i],a1
-		unhandled("#[i],a1");
+	case 986: { // a2,y:[abs]
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 987: { // #[i],b1
-		unhandled("#[i],b1");
+	case 987: { // b2,y:[abs]
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 988: { // #[i],a
-		unhandled("#[i],a");
+	case 988: { // a1,y:[abs]
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 989: { // #[i],b
-		unhandled("#[i],b");
+	case 989: { // b1,y:[abs]
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 990: { // #[i],r
-		unhandled("#[i],r");
+	case 990: { // a,y:[abs]
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 991: { // #[i],n
-		unhandled("#[i],n");
+	case 991: { // b,y:[abs]
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 992: { // x0,y:[abs]
-		unhandled("x0,y:[abs]");
+	case 992: { // r,y:[abs]
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 993: { // x1,y:[abs]
-		unhandled("x1,y:[abs]");
+	case 993: { // n,y:[abs]
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 994: { // y0,y:[abs]
-		unhandled("y0,y:[abs]");
+	case 994: { // #[i],x0
 		break;
 		}
-	case 995: { // y1,y:[abs]
-		unhandled("y1,y:[abs]");
+	case 995: { // #[i],x1
 		break;
 		}
-	case 996: { // a0,y:[abs]
-		unhandled("a0,y:[abs]");
+	case 996: { // #[i],y0
 		break;
 		}
-	case 997: { // b0,y:[abs]
-		unhandled("b0,y:[abs]");
+	case 997: { // #[i],y1
 		break;
 		}
-	case 998: { // a2,y:[abs]
-		unhandled("a2,y:[abs]");
+	case 998: { // #[i],a0
 		break;
 		}
-	case 999: { // b2,y:[abs]
-		unhandled("b2,y:[abs]");
+	case 999: { // #[i],b0
 		break;
 		}
-	case 1000: { // a1,y:[abs]
-		unhandled("a1,y:[abs]");
+	case 1000: { // #[i],a2
 		break;
 		}
-	case 1001: { // b1,y:[abs]
-		unhandled("b1,y:[abs]");
+	case 1001: { // #[i],b2
 		break;
 		}
-	case 1002: { // a,y:[abs]
-		unhandled("a,y:[abs]");
+	case 1002: { // #[i],a1
 		break;
 		}
-	case 1003: { // b,y:[abs]
-		unhandled("b,y:[abs]");
+	case 1003: { // #[i],b1
 		break;
 		}
-	case 1004: { // r,y:[abs]
-		unhandled("r,y:[abs]");
+	case 1004: { // #[i],a
 		break;
 		}
-	case 1005: { // n,y:[abs]
-		unhandled("n,y:[abs]");
+	case 1005: { // #[i],b
 		break;
 		}
-	case 1006: { // y:[aa],x0
-		unhandled("y:[aa],x0");
+	case 1006: { // #[i],r
 		break;
 		}
-	case 1007: { // y:[aa],x1
-		unhandled("y:[aa],x1");
+	case 1007: { // #[i],n
 		break;
 		}
-	case 1008: { // y:[aa],y0
-		unhandled("y:[aa],y0");
+	case 1008: { // y:[aa],x0
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1009: { // y:[aa],y1
-		unhandled("y:[aa],y1");
+	case 1009: { // y:[aa],x1
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1010: { // y:[aa],a0
-		unhandled("y:[aa],a0");
+	case 1010: { // y:[aa],y0
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1011: { // y:[aa],b0
-		unhandled("y:[aa],b0");
+	case 1011: { // y:[aa],y1
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1012: { // y:[aa],a2
-		unhandled("y:[aa],a2");
+	case 1012: { // y:[aa],a0
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1013: { // y:[aa],b2
-		unhandled("y:[aa],b2");
+	case 1013: { // y:[aa],b0
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1014: { // y:[aa],a1
-		unhandled("y:[aa],a1");
+	case 1014: { // y:[aa],a2
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1015: { // y:[aa],b1
-		unhandled("y:[aa],b1");
+	case 1015: { // y:[aa],b2
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1016: { // y:[aa],a
-		unhandled("y:[aa],a");
+	case 1016: { // y:[aa],a1
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1017: { // y:[aa],b
-		unhandled("y:[aa],b");
+	case 1017: { // y:[aa],b1
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1018: { // y:[aa],r
-		unhandled("y:[aa],r");
+	case 1018: { // y:[aa],a
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1019: { // y:[aa],n
-		unhandled("y:[aa],n");
+	case 1019: { // y:[aa],b
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1020: { // x0,y:[aa]
-		unhandled("x0,y:[aa]");
+	case 1020: { // y:[aa],r
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1021: { // x1,y:[aa]
-		unhandled("x1,y:[aa]");
+	case 1021: { // y:[aa],n
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
 		break;
 		}
-	case 1022: { // y0,y:[aa]
-		unhandled("y0,y:[aa]");
+	case 1022: { // x0,y:[aa]
+		u32 s = get_x0();
+		m_tmp1 = s;
 		break;
 		}
-	case 1023: { // y1,y:[aa]
-		unhandled("y1,y:[aa]");
+	case 1023: { // x1,y:[aa]
+		u32 s = get_x1();
+		m_tmp1 = s;
 		break;
 		}
-	case 1024: { // a0,y:[aa]
-		unhandled("a0,y:[aa]");
+	case 1024: { // y0,y:[aa]
+		u32 s = get_y0();
+		m_tmp1 = s;
 		break;
 		}
-	case 1025: { // b0,y:[aa]
-		unhandled("b0,y:[aa]");
+	case 1025: { // y1,y:[aa]
+		u32 s = get_y1();
+		m_tmp1 = s;
 		break;
 		}
-	case 1026: { // a2,y:[aa]
-		unhandled("a2,y:[aa]");
+	case 1026: { // a0,y:[aa]
+		u32 s = get_a0();
+		m_tmp1 = s;
 		break;
 		}
-	case 1027: { // b2,y:[aa]
-		unhandled("b2,y:[aa]");
+	case 1027: { // b0,y:[aa]
+		u32 s = get_b0();
+		m_tmp1 = s;
 		break;
 		}
-	case 1028: { // a1,y:[aa]
-		unhandled("a1,y:[aa]");
+	case 1028: { // a2,y:[aa]
+		u32 s = get_a2();
+		m_tmp1 = s;
 		break;
 		}
-	case 1029: { // b1,y:[aa]
-		unhandled("b1,y:[aa]");
+	case 1029: { // b2,y:[aa]
+		u32 s = get_b2();
+		m_tmp1 = s;
 		break;
 		}
-	case 1030: { // a,y:[aa]
-		unhandled("a,y:[aa]");
+	case 1030: { // a1,y:[aa]
+		u32 s = get_a1();
+		m_tmp1 = s;
 		break;
 		}
-	case 1031: { // b,y:[aa]
-		unhandled("b,y:[aa]");
+	case 1031: { // b1,y:[aa]
+		u32 s = get_b1();
+		m_tmp1 = s;
 		break;
 		}
-	case 1032: { // r,y:[aa]
-		unhandled("r,y:[aa]");
+	case 1032: { // a,y:[aa]
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 1033: { // n,y:[aa]
-		unhandled("n,y:[aa]");
+	case 1033: { // b,y:[aa]
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
 		break;
 		}
-	case 1034: { // a,x0 y:(r)-n,y0
-		unhandled("a,x0 y:(r)-n,y0");
+	case 1034: { // r,y:[aa]
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 1035: { // a,x0 y:(r)+n,y0
-		unhandled("a,x0 y:(r)+n,y0");
+	case 1035: { // n,y:[aa]
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
-	case 1036: { // a,x0 y:(r)-,y0
-		unhandled("a,x0 y:(r)-,y0");
+	case 1036: { // a,x0 y:(r)-n,y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1037: { // a,x0 y:(r)+,y0
-		unhandled("a,x0 y:(r)+,y0");
+	case 1037: { // a,x0 y:(r)+n,y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1038: { // a,x0 y:(r),y0
-		unhandled("a,x0 y:(r),y0");
+	case 1038: { // a,x0 y:(r)-,y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1039: { // a,x0 y:(r+n),y0
-		unhandled("a,x0 y:(r+n),y0");
+	case 1039: { // a,x0 y:(r)+,y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1040: { // a,x0 y:-(r),y0
-		unhandled("a,x0 y:-(r),y0");
+	case 1040: { // a,x0 y:(r),y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1041: { // a,x1 y:(r)-n,y0
-		unhandled("a,x1 y:(r)-n,y0");
+	case 1041: { // a,x0 y:(r+n),y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1042: { // a,x1 y:(r)+n,y0
-		unhandled("a,x1 y:(r)+n,y0");
+	case 1042: { // a,x0 y:-(r),y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1043: { // a,x1 y:(r)-,y0
-		unhandled("a,x1 y:(r)-,y0");
+	case 1043: { // a,x1 y:(r)-n,y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1044: { // a,x1 y:(r)+,y0
-		unhandled("a,x1 y:(r)+,y0");
+	case 1044: { // a,x1 y:(r)+n,y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1045: { // a,x1 y:(r),y0
-		unhandled("a,x1 y:(r),y0");
+	case 1045: { // a,x1 y:(r)-,y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1046: { // a,x1 y:(r+n),y0
-		unhandled("a,x1 y:(r+n),y0");
+	case 1046: { // a,x1 y:(r)+,y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1047: { // a,x1 y:-(r),y0
-		unhandled("a,x1 y:-(r),y0");
+	case 1047: { // a,x1 y:(r),y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1048: { // b,x0 y:(r)-n,y0
-		unhandled("b,x0 y:(r)-n,y0");
+	case 1048: { // a,x1 y:(r+n),y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1049: { // b,x0 y:(r)+n,y0
-		unhandled("b,x0 y:(r)+n,y0");
+	case 1049: { // a,x1 y:-(r),y0
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1050: { // b,x0 y:(r)-,y0
-		unhandled("b,x0 y:(r)-,y0");
+	case 1050: { // b,x0 y:(r)-n,y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1051: { // b,x0 y:(r)+,y0
-		unhandled("b,x0 y:(r)+,y0");
+	case 1051: { // b,x0 y:(r)+n,y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1052: { // b,x0 y:(r),y0
-		unhandled("b,x0 y:(r),y0");
+	case 1052: { // b,x0 y:(r)-,y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1053: { // b,x0 y:(r+n),y0
-		unhandled("b,x0 y:(r+n),y0");
+	case 1053: { // b,x0 y:(r)+,y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1054: { // b,x0 y:-(r),y0
-		unhandled("b,x0 y:-(r),y0");
+	case 1054: { // b,x0 y:(r),y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1055: { // b,x1 y:(r)-n,y0
-		unhandled("b,x1 y:(r)-n,y0");
+	case 1055: { // b,x0 y:(r+n),y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1056: { // b,x1 y:(r)+n,y0
-		unhandled("b,x1 y:(r)+n,y0");
+	case 1056: { // b,x0 y:-(r),y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1057: { // b,x1 y:(r)-,y0
-		unhandled("b,x1 y:(r)-,y0");
+	case 1057: { // b,x1 y:(r)-n,y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1058: { // b,x1 y:(r)+,y0
-		unhandled("b,x1 y:(r)+,y0");
+	case 1058: { // b,x1 y:(r)+n,y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1059: { // b,x1 y:(r),y0
-		unhandled("b,x1 y:(r),y0");
+	case 1059: { // b,x1 y:(r)-,y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1060: { // b,x1 y:(r+n),y0
-		unhandled("b,x1 y:(r+n),y0");
+	case 1060: { // b,x1 y:(r)+,y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1061: { // b,x1 y:-(r),y0
-		unhandled("b,x1 y:-(r),y0");
+	case 1061: { // b,x1 y:(r),y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1062: { // a,x0 y:(r)-n,y1
-		unhandled("a,x0 y:(r)-n,y1");
+	case 1062: { // b,x1 y:(r+n),y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1063: { // a,x0 y:(r)+n,y1
-		unhandled("a,x0 y:(r)+n,y1");
+	case 1063: { // b,x1 y:-(r),y0
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1064: { // a,x0 y:(r)-,y1
-		unhandled("a,x0 y:(r)-,y1");
+	case 1064: { // a,x0 y:(r)-n,y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1065: { // a,x0 y:(r)+,y1
-		unhandled("a,x0 y:(r)+,y1");
+	case 1065: { // a,x0 y:(r)+n,y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1066: { // a,x0 y:(r),y1
-		unhandled("a,x0 y:(r),y1");
+	case 1066: { // a,x0 y:(r)-,y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1067: { // a,x0 y:(r+n),y1
-		unhandled("a,x0 y:(r+n),y1");
+	case 1067: { // a,x0 y:(r)+,y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1068: { // a,x0 y:-(r),y1
-		unhandled("a,x0 y:-(r),y1");
+	case 1068: { // a,x0 y:(r),y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1069: { // a,x1 y:(r)-n,y1
-		unhandled("a,x1 y:(r)-n,y1");
+	case 1069: { // a,x0 y:(r+n),y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1070: { // a,x1 y:(r)+n,y1
-		unhandled("a,x1 y:(r)+n,y1");
+	case 1070: { // a,x0 y:-(r),y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1071: { // a,x1 y:(r)-,y1
-		unhandled("a,x1 y:(r)-,y1");
+	case 1071: { // a,x1 y:(r)-n,y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1072: { // a,x1 y:(r)+,y1
-		unhandled("a,x1 y:(r)+,y1");
+	case 1072: { // a,x1 y:(r)+n,y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1073: { // a,x1 y:(r),y1
-		unhandled("a,x1 y:(r),y1");
+	case 1073: { // a,x1 y:(r)-,y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1074: { // a,x1 y:(r+n),y1
-		unhandled("a,x1 y:(r+n),y1");
+	case 1074: { // a,x1 y:(r)+,y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1075: { // a,x1 y:-(r),y1
-		unhandled("a,x1 y:-(r),y1");
+	case 1075: { // a,x1 y:(r),y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1076: { // b,x0 y:(r)-n,y1
-		unhandled("b,x0 y:(r)-n,y1");
+	case 1076: { // a,x1 y:(r+n),y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1077: { // b,x0 y:(r)+n,y1
-		unhandled("b,x0 y:(r)+n,y1");
+	case 1077: { // a,x1 y:-(r),y1
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1078: { // b,x0 y:(r)-,y1
-		unhandled("b,x0 y:(r)-,y1");
+	case 1078: { // b,x0 y:(r)-n,y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1079: { // b,x0 y:(r)+,y1
-		unhandled("b,x0 y:(r)+,y1");
+	case 1079: { // b,x0 y:(r)+n,y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1080: { // b,x0 y:(r),y1
-		unhandled("b,x0 y:(r),y1");
+	case 1080: { // b,x0 y:(r)-,y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1081: { // b,x0 y:(r+n),y1
-		unhandled("b,x0 y:(r+n),y1");
+	case 1081: { // b,x0 y:(r)+,y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1082: { // b,x0 y:-(r),y1
-		unhandled("b,x0 y:-(r),y1");
+	case 1082: { // b,x0 y:(r),y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1083: { // b,x1 y:(r)-n,y1
-		unhandled("b,x1 y:(r)-n,y1");
+	case 1083: { // b,x0 y:(r+n),y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1084: { // b,x1 y:(r)+n,y1
-		unhandled("b,x1 y:(r)+n,y1");
+	case 1084: { // b,x0 y:-(r),y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1085: { // b,x1 y:(r)-,y1
-		unhandled("b,x1 y:(r)-,y1");
+	case 1085: { // b,x1 y:(r)-n,y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1086: { // b,x1 y:(r)+,y1
-		unhandled("b,x1 y:(r)+,y1");
+	case 1086: { // b,x1 y:(r)+n,y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1087: { // b,x1 y:(r),y1
-		unhandled("b,x1 y:(r),y1");
+	case 1087: { // b,x1 y:(r)-,y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1088: { // b,x1 y:(r+n),y1
-		unhandled("b,x1 y:(r+n),y1");
+	case 1088: { // b,x1 y:(r)+,y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1089: { // b,x1 y:-(r),y1
-		unhandled("b,x1 y:-(r),y1");
+	case 1089: { // b,x1 y:(r),y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1090: { // a,x0 y:(r)-n,a
-		unhandled("a,x0 y:(r)-n,a");
+	case 1090: { // b,x1 y:(r+n),y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1091: { // a,x0 y:(r)+n,a
-		unhandled("a,x0 y:(r)+n,a");
+	case 1091: { // b,x1 y:-(r),y1
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1092: { // a,x0 y:(r)-,a
-		unhandled("a,x0 y:(r)-,a");
+	case 1092: { // a,x0 y:(r)-n,a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1093: { // a,x0 y:(r)+,a
-		unhandled("a,x0 y:(r)+,a");
+	case 1093: { // a,x0 y:(r)+n,a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1094: { // a,x0 y:(r),a
-		unhandled("a,x0 y:(r),a");
+	case 1094: { // a,x0 y:(r)-,a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1095: { // a,x0 y:(r+n),a
-		unhandled("a,x0 y:(r+n),a");
+	case 1095: { // a,x0 y:(r)+,a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1096: { // a,x0 y:-(r),a
-		unhandled("a,x0 y:-(r),a");
+	case 1096: { // a,x0 y:(r),a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1097: { // a,x1 y:(r)-n,a
-		unhandled("a,x1 y:(r)-n,a");
+	case 1097: { // a,x0 y:(r+n),a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1098: { // a,x1 y:(r)+n,a
-		unhandled("a,x1 y:(r)+n,a");
+	case 1098: { // a,x0 y:-(r),a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1099: { // a,x1 y:(r)-,a
-		unhandled("a,x1 y:(r)-,a");
+	case 1099: { // a,x1 y:(r)-n,a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1100: { // a,x1 y:(r)+,a
-		unhandled("a,x1 y:(r)+,a");
+	case 1100: { // a,x1 y:(r)+n,a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1101: { // a,x1 y:(r),a
-		unhandled("a,x1 y:(r),a");
+	case 1101: { // a,x1 y:(r)-,a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1102: { // a,x1 y:(r+n),a
-		unhandled("a,x1 y:(r+n),a");
+	case 1102: { // a,x1 y:(r)+,a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1103: { // a,x1 y:-(r),a
-		unhandled("a,x1 y:-(r),a");
+	case 1103: { // a,x1 y:(r),a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1104: { // b,x0 y:(r)-n,a
-		unhandled("b,x0 y:(r)-n,a");
+	case 1104: { // a,x1 y:(r+n),a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1105: { // b,x0 y:(r)+n,a
-		unhandled("b,x0 y:(r)+n,a");
+	case 1105: { // a,x1 y:-(r),a
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1106: { // b,x0 y:(r)-,a
-		unhandled("b,x0 y:(r)-,a");
+	case 1106: { // b,x0 y:(r)-n,a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1107: { // b,x0 y:(r)+,a
-		unhandled("b,x0 y:(r)+,a");
+	case 1107: { // b,x0 y:(r)+n,a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1108: { // b,x0 y:(r),a
-		unhandled("b,x0 y:(r),a");
+	case 1108: { // b,x0 y:(r)-,a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1109: { // b,x0 y:(r+n),a
-		unhandled("b,x0 y:(r+n),a");
+	case 1109: { // b,x0 y:(r)+,a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1110: { // b,x0 y:-(r),a
-		unhandled("b,x0 y:-(r),a");
+	case 1110: { // b,x0 y:(r),a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1111: { // b,x1 y:(r)-n,a
-		unhandled("b,x1 y:(r)-n,a");
+	case 1111: { // b,x0 y:(r+n),a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1112: { // b,x1 y:(r)+n,a
-		unhandled("b,x1 y:(r)+n,a");
+	case 1112: { // b,x0 y:-(r),a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1113: { // b,x1 y:(r)-,a
-		unhandled("b,x1 y:(r)-,a");
+	case 1113: { // b,x1 y:(r)-n,a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1114: { // b,x1 y:(r)+,a
-		unhandled("b,x1 y:(r)+,a");
+	case 1114: { // b,x1 y:(r)+n,a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1115: { // b,x1 y:(r),a
-		unhandled("b,x1 y:(r),a");
+	case 1115: { // b,x1 y:(r)-,a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1116: { // b,x1 y:(r+n),a
-		unhandled("b,x1 y:(r+n),a");
+	case 1116: { // b,x1 y:(r)+,a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1117: { // b,x1 y:-(r),a
-		unhandled("b,x1 y:-(r),a");
+	case 1117: { // b,x1 y:(r),a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1118: { // a,x0 y:(r)-n,b
-		unhandled("a,x0 y:(r)-n,b");
+	case 1118: { // b,x1 y:(r+n),a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1119: { // a,x0 y:(r)+n,b
-		unhandled("a,x0 y:(r)+n,b");
+	case 1119: { // b,x1 y:-(r),a
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1120: { // a,x0 y:(r)-,b
-		unhandled("a,x0 y:(r)-,b");
+	case 1120: { // a,x0 y:(r)-n,b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1121: { // a,x0 y:(r)+,b
-		unhandled("a,x0 y:(r)+,b");
+	case 1121: { // a,x0 y:(r)+n,b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1122: { // a,x0 y:(r),b
-		unhandled("a,x0 y:(r),b");
+	case 1122: { // a,x0 y:(r)-,b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1123: { // a,x0 y:(r+n),b
-		unhandled("a,x0 y:(r+n),b");
+	case 1123: { // a,x0 y:(r)+,b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1124: { // a,x0 y:-(r),b
-		unhandled("a,x0 y:-(r),b");
+	case 1124: { // a,x0 y:(r),b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1125: { // a,x1 y:(r)-n,b
-		unhandled("a,x1 y:(r)-n,b");
+	case 1125: { // a,x0 y:(r+n),b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1126: { // a,x1 y:(r)+n,b
-		unhandled("a,x1 y:(r)+n,b");
+	case 1126: { // a,x0 y:-(r),b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1127: { // a,x1 y:(r)-,b
-		unhandled("a,x1 y:(r)-,b");
+	case 1127: { // a,x1 y:(r)-n,b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1128: { // a,x1 y:(r)+,b
-		unhandled("a,x1 y:(r)+,b");
+	case 1128: { // a,x1 y:(r)+n,b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1129: { // a,x1 y:(r),b
-		unhandled("a,x1 y:(r),b");
+	case 1129: { // a,x1 y:(r)-,b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1130: { // a,x1 y:(r+n),b
-		unhandled("a,x1 y:(r+n),b");
+	case 1130: { // a,x1 y:(r)+,b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1131: { // a,x1 y:-(r),b
-		unhandled("a,x1 y:-(r),b");
+	case 1131: { // a,x1 y:(r),b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1132: { // b,x0 y:(r)-n,b
-		unhandled("b,x0 y:(r)-n,b");
+	case 1132: { // a,x1 y:(r+n),b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1133: { // b,x0 y:(r)+n,b
-		unhandled("b,x0 y:(r)+n,b");
+	case 1133: { // a,x1 y:-(r),b
+		u32 s1_h = get_ah();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1134: { // b,x0 y:(r)-,b
-		unhandled("b,x0 y:(r)-,b");
+	case 1134: { // b,x0 y:(r)-n,b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1135: { // b,x0 y:(r)+,b
-		unhandled("b,x0 y:(r)+,b");
+	case 1135: { // b,x0 y:(r)+n,b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1136: { // b,x0 y:(r),b
-		unhandled("b,x0 y:(r),b");
+	case 1136: { // b,x0 y:(r)-,b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1137: { // b,x0 y:(r+n),b
-		unhandled("b,x0 y:(r+n),b");
+	case 1137: { // b,x0 y:(r)+,b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1138: { // b,x0 y:-(r),b
-		unhandled("b,x0 y:-(r),b");
+	case 1138: { // b,x0 y:(r),b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1139: { // b,x1 y:(r)-n,b
-		unhandled("b,x1 y:(r)-n,b");
+	case 1139: { // b,x0 y:(r+n),b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1140: { // b,x1 y:(r)+n,b
-		unhandled("b,x1 y:(r)+n,b");
+	case 1140: { // b,x0 y:-(r),b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1141: { // b,x1 y:(r)-,b
-		unhandled("b,x1 y:(r)-,b");
+	case 1141: { // b,x1 y:(r)-n,b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1142: { // b,x1 y:(r)+,b
-		unhandled("b,x1 y:(r)+,b");
+	case 1142: { // b,x1 y:(r)+n,b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1143: { // b,x1 y:(r),b
-		unhandled("b,x1 y:(r),b");
+	case 1143: { // b,x1 y:(r)-,b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1144: { // b,x1 y:(r+n),b
-		unhandled("b,x1 y:(r+n),b");
+	case 1144: { // b,x1 y:(r)+,b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1145: { // b,x1 y:-(r),b
-		unhandled("b,x1 y:-(r),b");
+	case 1145: { // b,x1 y:(r),b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1146: { // a,x0 y0,y:(r)-n
-		unhandled("a,x0 y0,y:(r)-n");
+	case 1146: { // b,x1 y:(r+n),b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1147: { // a,x0 y0,y:(r)+n
-		unhandled("a,x0 y0,y:(r)+n");
+	case 1147: { // b,x1 y:-(r),b
+		u32 s1_h = get_bh();
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(ea);
 		break;
 		}
-	case 1148: { // a,x0 y0,y:(r)-
-		unhandled("a,x0 y0,y:(r)-");
+	case 1148: { // a,x0 y0,y:(r)-n
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1149: { // a,x0 y0,y:(r)+
-		unhandled("a,x0 y0,y:(r)+");
+	case 1149: { // a,x0 y0,y:(r)+n
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1150: { // a,x0 y0,y:(r)
-		unhandled("a,x0 y0,y:(r)");
+	case 1150: { // a,x0 y0,y:(r)-
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1151: { // a,x0 y0,y:(r+n)
-		unhandled("a,x0 y0,y:(r+n)");
+	case 1151: { // a,x0 y0,y:(r)+
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1152: { // a,x0 y0,y:-(r)
-		unhandled("a,x0 y0,y:-(r)");
+	case 1152: { // a,x0 y0,y:(r)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1153: { // a,x1 y0,y:(r)-n
-		unhandled("a,x1 y0,y:(r)-n");
+	case 1153: { // a,x0 y0,y:(r+n)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1154: { // a,x1 y0,y:(r)+n
-		unhandled("a,x1 y0,y:(r)+n");
+	case 1154: { // a,x0 y0,y:-(r)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1155: { // a,x1 y0,y:(r)-
-		unhandled("a,x1 y0,y:(r)-");
+	case 1155: { // a,x1 y0,y:(r)-n
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1156: { // a,x1 y0,y:(r)+
-		unhandled("a,x1 y0,y:(r)+");
+	case 1156: { // a,x1 y0,y:(r)+n
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1157: { // a,x1 y0,y:(r)
-		unhandled("a,x1 y0,y:(r)");
+	case 1157: { // a,x1 y0,y:(r)-
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1158: { // a,x1 y0,y:(r+n)
-		unhandled("a,x1 y0,y:(r+n)");
+	case 1158: { // a,x1 y0,y:(r)+
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1159: { // a,x1 y0,y:-(r)
-		unhandled("a,x1 y0,y:-(r)");
+	case 1159: { // a,x1 y0,y:(r)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1160: { // b,x0 y0,y:(r)-n
-		unhandled("b,x0 y0,y:(r)-n");
+	case 1160: { // a,x1 y0,y:(r+n)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1161: { // b,x0 y0,y:(r)+n
-		unhandled("b,x0 y0,y:(r)+n");
+	case 1161: { // a,x1 y0,y:-(r)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1162: { // b,x0 y0,y:(r)-
-		unhandled("b,x0 y0,y:(r)-");
+	case 1162: { // b,x0 y0,y:(r)-n
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1163: { // b,x0 y0,y:(r)+
-		unhandled("b,x0 y0,y:(r)+");
+	case 1163: { // b,x0 y0,y:(r)+n
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1164: { // b,x0 y0,y:(r)
-		unhandled("b,x0 y0,y:(r)");
+	case 1164: { // b,x0 y0,y:(r)-
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1165: { // b,x0 y0,y:(r+n)
-		unhandled("b,x0 y0,y:(r+n)");
+	case 1165: { // b,x0 y0,y:(r)+
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1166: { // b,x0 y0,y:-(r)
-		unhandled("b,x0 y0,y:-(r)");
+	case 1166: { // b,x0 y0,y:(r)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1167: { // b,x1 y0,y:(r)-n
-		unhandled("b,x1 y0,y:(r)-n");
+	case 1167: { // b,x0 y0,y:(r+n)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1168: { // b,x1 y0,y:(r)+n
-		unhandled("b,x1 y0,y:(r)+n");
+	case 1168: { // b,x0 y0,y:-(r)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1169: { // b,x1 y0,y:(r)-
-		unhandled("b,x1 y0,y:(r)-");
+	case 1169: { // b,x1 y0,y:(r)-n
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1170: { // b,x1 y0,y:(r)+
-		unhandled("b,x1 y0,y:(r)+");
+	case 1170: { // b,x1 y0,y:(r)+n
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1171: { // b,x1 y0,y:(r)
-		unhandled("b,x1 y0,y:(r)");
+	case 1171: { // b,x1 y0,y:(r)-
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1172: { // b,x1 y0,y:(r+n)
-		unhandled("b,x1 y0,y:(r+n)");
+	case 1172: { // b,x1 y0,y:(r)+
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1173: { // b,x1 y0,y:-(r)
-		unhandled("b,x1 y0,y:-(r)");
+	case 1173: { // b,x1 y0,y:(r)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1174: { // a,x0 y1,y:(r)-n
-		unhandled("a,x0 y1,y:(r)-n");
+	case 1174: { // b,x1 y0,y:(r+n)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1175: { // a,x0 y1,y:(r)+n
-		unhandled("a,x0 y1,y:(r)+n");
+	case 1175: { // b,x1 y0,y:-(r)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1176: { // a,x0 y1,y:(r)-
-		unhandled("a,x0 y1,y:(r)-");
+	case 1176: { // a,x0 y1,y:(r)-n
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1177: { // a,x0 y1,y:(r)+
-		unhandled("a,x0 y1,y:(r)+");
+	case 1177: { // a,x0 y1,y:(r)+n
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1178: { // a,x0 y1,y:(r)
-		unhandled("a,x0 y1,y:(r)");
+	case 1178: { // a,x0 y1,y:(r)-
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1179: { // a,x0 y1,y:(r+n)
-		unhandled("a,x0 y1,y:(r+n)");
+	case 1179: { // a,x0 y1,y:(r)+
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1180: { // a,x0 y1,y:-(r)
-		unhandled("a,x0 y1,y:-(r)");
+	case 1180: { // a,x0 y1,y:(r)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1181: { // a,x1 y1,y:(r)-n
-		unhandled("a,x1 y1,y:(r)-n");
+	case 1181: { // a,x0 y1,y:(r+n)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1182: { // a,x1 y1,y:(r)+n
-		unhandled("a,x1 y1,y:(r)+n");
+	case 1182: { // a,x0 y1,y:-(r)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1183: { // a,x1 y1,y:(r)-
-		unhandled("a,x1 y1,y:(r)-");
+	case 1183: { // a,x1 y1,y:(r)-n
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1184: { // a,x1 y1,y:(r)+
-		unhandled("a,x1 y1,y:(r)+");
+	case 1184: { // a,x1 y1,y:(r)+n
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1185: { // a,x1 y1,y:(r)
-		unhandled("a,x1 y1,y:(r)");
+	case 1185: { // a,x1 y1,y:(r)-
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1186: { // a,x1 y1,y:(r+n)
-		unhandled("a,x1 y1,y:(r+n)");
+	case 1186: { // a,x1 y1,y:(r)+
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1187: { // a,x1 y1,y:-(r)
-		unhandled("a,x1 y1,y:-(r)");
+	case 1187: { // a,x1 y1,y:(r)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1188: { // b,x0 y1,y:(r)-n
-		unhandled("b,x0 y1,y:(r)-n");
+	case 1188: { // a,x1 y1,y:(r+n)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1189: { // b,x0 y1,y:(r)+n
-		unhandled("b,x0 y1,y:(r)+n");
+	case 1189: { // a,x1 y1,y:-(r)
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1190: { // b,x0 y1,y:(r)-
-		unhandled("b,x0 y1,y:(r)-");
+	case 1190: { // b,x0 y1,y:(r)-n
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1191: { // b,x0 y1,y:(r)+
-		unhandled("b,x0 y1,y:(r)+");
+	case 1191: { // b,x0 y1,y:(r)+n
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1192: { // b,x0 y1,y:(r)
-		unhandled("b,x0 y1,y:(r)");
+	case 1192: { // b,x0 y1,y:(r)-
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1193: { // b,x0 y1,y:(r+n)
-		unhandled("b,x0 y1,y:(r+n)");
+	case 1193: { // b,x0 y1,y:(r)+
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1194: { // b,x0 y1,y:-(r)
-		unhandled("b,x0 y1,y:-(r)");
+	case 1194: { // b,x0 y1,y:(r)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1195: { // b,x1 y1,y:(r)-n
-		unhandled("b,x1 y1,y:(r)-n");
+	case 1195: { // b,x0 y1,y:(r+n)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1196: { // b,x1 y1,y:(r)+n
-		unhandled("b,x1 y1,y:(r)+n");
+	case 1196: { // b,x0 y1,y:-(r)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1197: { // b,x1 y1,y:(r)-
-		unhandled("b,x1 y1,y:(r)-");
+	case 1197: { // b,x1 y1,y:(r)-n
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1198: { // b,x1 y1,y:(r)+
-		unhandled("b,x1 y1,y:(r)+");
+	case 1198: { // b,x1 y1,y:(r)+n
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1199: { // b,x1 y1,y:(r)
-		unhandled("b,x1 y1,y:(r)");
+	case 1199: { // b,x1 y1,y:(r)-
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1200: { // b,x1 y1,y:(r+n)
-		unhandled("b,x1 y1,y:(r+n)");
+	case 1200: { // b,x1 y1,y:(r)+
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1201: { // b,x1 y1,y:-(r)
-		unhandled("b,x1 y1,y:-(r)");
+	case 1201: { // b,x1 y1,y:(r)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1202: { // a,x0 a,y:(r)-n
-		unhandled("a,x0 a,y:(r)-n");
+	case 1202: { // b,x1 y1,y:(r+n)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1203: { // a,x0 a,y:(r)+n
-		unhandled("a,x0 a,y:(r)+n");
+	case 1203: { // b,x1 y1,y:-(r)
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1204: { // a,x0 a,y:(r)-
-		unhandled("a,x0 a,y:(r)-");
+	case 1204: { // a,x0 a,y:(r)-n
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1205: { // a,x0 a,y:(r)+
-		unhandled("a,x0 a,y:(r)+");
+	case 1205: { // a,x0 a,y:(r)+n
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1206: { // a,x0 a,y:(r)
-		unhandled("a,x0 a,y:(r)");
+	case 1206: { // a,x0 a,y:(r)-
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1207: { // a,x0 a,y:(r+n)
-		unhandled("a,x0 a,y:(r+n)");
+	case 1207: { // a,x0 a,y:(r)+
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1208: { // a,x0 a,y:-(r)
-		unhandled("a,x0 a,y:-(r)");
+	case 1208: { // a,x0 a,y:(r)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1209: { // a,x1 a,y:(r)-n
-		unhandled("a,x1 a,y:(r)-n");
+	case 1209: { // a,x0 a,y:(r+n)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1210: { // a,x1 a,y:(r)+n
-		unhandled("a,x1 a,y:(r)+n");
+	case 1210: { // a,x0 a,y:-(r)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1211: { // a,x1 a,y:(r)-
-		unhandled("a,x1 a,y:(r)-");
+	case 1211: { // a,x1 a,y:(r)-n
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1212: { // a,x1 a,y:(r)+
-		unhandled("a,x1 a,y:(r)+");
+	case 1212: { // a,x1 a,y:(r)+n
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1213: { // a,x1 a,y:(r)
-		unhandled("a,x1 a,y:(r)");
+	case 1213: { // a,x1 a,y:(r)-
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1214: { // a,x1 a,y:(r+n)
-		unhandled("a,x1 a,y:(r+n)");
+	case 1214: { // a,x1 a,y:(r)+
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1215: { // a,x1 a,y:-(r)
-		unhandled("a,x1 a,y:-(r)");
+	case 1215: { // a,x1 a,y:(r)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1216: { // b,x0 a,y:(r)-n
-		unhandled("b,x0 a,y:(r)-n");
+	case 1216: { // a,x1 a,y:(r+n)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1217: { // b,x0 a,y:(r)+n
-		unhandled("b,x0 a,y:(r)+n");
+	case 1217: { // a,x1 a,y:-(r)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1218: { // b,x0 a,y:(r)-
-		unhandled("b,x0 a,y:(r)-");
+	case 1218: { // b,x0 a,y:(r)-n
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1219: { // b,x0 a,y:(r)+
-		unhandled("b,x0 a,y:(r)+");
+	case 1219: { // b,x0 a,y:(r)+n
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1220: { // b,x0 a,y:(r)
-		unhandled("b,x0 a,y:(r)");
+	case 1220: { // b,x0 a,y:(r)-
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1221: { // b,x0 a,y:(r+n)
-		unhandled("b,x0 a,y:(r+n)");
+	case 1221: { // b,x0 a,y:(r)+
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1222: { // b,x0 a,y:-(r)
-		unhandled("b,x0 a,y:-(r)");
+	case 1222: { // b,x0 a,y:(r)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1223: { // b,x1 a,y:(r)-n
-		unhandled("b,x1 a,y:(r)-n");
+	case 1223: { // b,x0 a,y:(r+n)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1224: { // b,x1 a,y:(r)+n
-		unhandled("b,x1 a,y:(r)+n");
+	case 1224: { // b,x0 a,y:-(r)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1225: { // b,x1 a,y:(r)-
-		unhandled("b,x1 a,y:(r)-");
+	case 1225: { // b,x1 a,y:(r)-n
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1226: { // b,x1 a,y:(r)+
-		unhandled("b,x1 a,y:(r)+");
+	case 1226: { // b,x1 a,y:(r)+n
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1227: { // b,x1 a,y:(r)
-		unhandled("b,x1 a,y:(r)");
+	case 1227: { // b,x1 a,y:(r)-
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1228: { // b,x1 a,y:(r+n)
-		unhandled("b,x1 a,y:(r+n)");
+	case 1228: { // b,x1 a,y:(r)+
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1229: { // b,x1 a,y:-(r)
-		unhandled("b,x1 a,y:-(r)");
+	case 1229: { // b,x1 a,y:(r)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1230: { // a,x0 b,y:(r)-n
-		unhandled("a,x0 b,y:(r)-n");
+	case 1230: { // b,x1 a,y:(r+n)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1231: { // a,x0 b,y:(r)+n
-		unhandled("a,x0 b,y:(r)+n");
+	case 1231: { // b,x1 a,y:-(r)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1232: { // a,x0 b,y:(r)-
-		unhandled("a,x0 b,y:(r)-");
+	case 1232: { // a,x0 b,y:(r)-n
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1233: { // a,x0 b,y:(r)+
-		unhandled("a,x0 b,y:(r)+");
+	case 1233: { // a,x0 b,y:(r)+n
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1234: { // a,x0 b,y:(r)
-		unhandled("a,x0 b,y:(r)");
+	case 1234: { // a,x0 b,y:(r)-
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1235: { // a,x0 b,y:(r+n)
-		unhandled("a,x0 b,y:(r+n)");
+	case 1235: { // a,x0 b,y:(r)+
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1236: { // a,x0 b,y:-(r)
-		unhandled("a,x0 b,y:-(r)");
+	case 1236: { // a,x0 b,y:(r)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1237: { // a,x1 b,y:(r)-n
-		unhandled("a,x1 b,y:(r)-n");
+	case 1237: { // a,x0 b,y:(r+n)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1238: { // a,x1 b,y:(r)+n
-		unhandled("a,x1 b,y:(r)+n");
+	case 1238: { // a,x0 b,y:-(r)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1239: { // a,x1 b,y:(r)-
-		unhandled("a,x1 b,y:(r)-");
+	case 1239: { // a,x1 b,y:(r)-n
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1240: { // a,x1 b,y:(r)+
-		unhandled("a,x1 b,y:(r)+");
+	case 1240: { // a,x1 b,y:(r)+n
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1241: { // a,x1 b,y:(r)
-		unhandled("a,x1 b,y:(r)");
+	case 1241: { // a,x1 b,y:(r)-
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1242: { // a,x1 b,y:(r+n)
-		unhandled("a,x1 b,y:(r+n)");
+	case 1242: { // a,x1 b,y:(r)+
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1243: { // a,x1 b,y:-(r)
-		unhandled("a,x1 b,y:-(r)");
+	case 1243: { // a,x1 b,y:(r)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1244: { // b,x0 b,y:(r)-n
-		unhandled("b,x0 b,y:(r)-n");
+	case 1244: { // a,x1 b,y:(r+n)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1245: { // b,x0 b,y:(r)+n
-		unhandled("b,x0 b,y:(r)+n");
+	case 1245: { // a,x1 b,y:-(r)
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1246: { // b,x0 b,y:(r)-
-		unhandled("b,x0 b,y:(r)-");
+	case 1246: { // b,x0 b,y:(r)-n
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1247: { // b,x0 b,y:(r)+
-		unhandled("b,x0 b,y:(r)+");
+	case 1247: { // b,x0 b,y:(r)+n
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1248: { // b,x0 b,y:(r)
-		unhandled("b,x0 b,y:(r)");
+	case 1248: { // b,x0 b,y:(r)-
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1249: { // b,x0 b,y:(r+n)
-		unhandled("b,x0 b,y:(r+n)");
+	case 1249: { // b,x0 b,y:(r)+
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1250: { // b,x0 b,y:-(r)
-		unhandled("b,x0 b,y:-(r)");
+	case 1250: { // b,x0 b,y:(r)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1251: { // b,x1 b,y:(r)-n
-		unhandled("b,x1 b,y:(r)-n");
+	case 1251: { // b,x0 b,y:(r+n)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1252: { // b,x1 b,y:(r)+n
-		unhandled("b,x1 b,y:(r)+n");
+	case 1252: { // b,x0 b,y:-(r)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1253: { // b,x1 b,y:(r)-
-		unhandled("b,x1 b,y:(r)-");
+	case 1253: { // b,x1 b,y:(r)-n
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1254: { // b,x1 b,y:(r)+
-		unhandled("b,x1 b,y:(r)+");
+	case 1254: { // b,x1 b,y:(r)+n
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1255: { // b,x1 b,y:(r)
-		unhandled("b,x1 b,y:(r)");
+	case 1255: { // b,x1 b,y:(r)-
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1256: { // b,x1 b,y:(r+n)
-		unhandled("b,x1 b,y:(r+n)");
+	case 1256: { // b,x1 b,y:(r)+
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1257: { // b,x1 b,y:-(r)
-		unhandled("b,x1 b,y:-(r)");
+	case 1257: { // b,x1 b,y:(r)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1258: { // a,x0 y:[abs],y0
-		unhandled("a,x0 y:[abs],y0");
+	case 1258: { // b,x1 b,y:(r+n)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1259: { // a,x1 y:[abs],y0
-		unhandled("a,x1 y:[abs],y0");
+	case 1259: { // b,x1 b,y:-(r)
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1260: { // b,x0 y:[abs],y0
-		unhandled("b,x0 y:[abs],y0");
+	case 1260: { // a,x0 y:[abs],y0
+		u32 s1_h = get_ah();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1261: { // b,x1 y:[abs],y0
-		unhandled("b,x1 y:[abs],y0");
+	case 1261: { // a,x1 y:[abs],y0
+		u32 s1_h = get_ah();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1262: { // a,x0 y:[abs],y1
-		unhandled("a,x0 y:[abs],y1");
+	case 1262: { // b,x0 y:[abs],y0
+		u32 s1_h = get_bh();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1263: { // a,x1 y:[abs],y1
-		unhandled("a,x1 y:[abs],y1");
+	case 1263: { // b,x1 y:[abs],y0
+		u32 s1_h = get_bh();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1264: { // b,x0 y:[abs],y1
-		unhandled("b,x0 y:[abs],y1");
+	case 1264: { // a,x0 y:[abs],y1
+		u32 s1_h = get_ah();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1265: { // b,x1 y:[abs],y1
-		unhandled("b,x1 y:[abs],y1");
+	case 1265: { // a,x1 y:[abs],y1
+		u32 s1_h = get_ah();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1266: { // a,x0 y:[abs],a
-		unhandled("a,x0 y:[abs],a");
+	case 1266: { // b,x0 y:[abs],y1
+		u32 s1_h = get_bh();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1267: { // a,x1 y:[abs],a
-		unhandled("a,x1 y:[abs],a");
+	case 1267: { // b,x1 y:[abs],y1
+		u32 s1_h = get_bh();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1268: { // b,x0 y:[abs],a
-		unhandled("b,x0 y:[abs],a");
+	case 1268: { // a,x0 y:[abs],a
+		u32 s1_h = get_ah();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1269: { // b,x1 y:[abs],a
-		unhandled("b,x1 y:[abs],a");
+	case 1269: { // a,x1 y:[abs],a
+		u32 s1_h = get_ah();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1270: { // a,x0 y:[abs],b
-		unhandled("a,x0 y:[abs],b");
+	case 1270: { // b,x0 y:[abs],a
+		u32 s1_h = get_bh();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1271: { // a,x1 y:[abs],b
-		unhandled("a,x1 y:[abs],b");
+	case 1271: { // b,x1 y:[abs],a
+		u32 s1_h = get_bh();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1272: { // b,x0 y:[abs],b
-		unhandled("b,x0 y:[abs],b");
+	case 1272: { // a,x0 y:[abs],b
+		u32 s1_h = get_ah();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1273: { // b,x1 y:[abs],b
-		unhandled("b,x1 y:[abs],b");
+	case 1273: { // a,x1 y:[abs],b
+		u32 s1_h = get_ah();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1274: { // a,x0 #[i],y0
-		unhandled("a,x0 #[i],y0");
+	case 1274: { // b,x0 y:[abs],b
+		u32 s1_h = get_bh();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1275: { // a,x1 #[i],y0
-		unhandled("a,x1 #[i],y0");
+	case 1275: { // b,x1 y:[abs],b
+		u32 s1_h = get_bh();
+		u32 abs = exv;
+		m_tmp1 = s1_h;
+		m_tmp2 = m_y.read_dword(abs);
 		break;
 		}
-	case 1276: { // b,x0 #[i],y0
-		unhandled("b,x0 #[i],y0");
+	case 1276: { // a,x0 y0,y:[abs]
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1277: { // b,x1 #[i],y0
-		unhandled("b,x1 #[i],y0");
+	case 1277: { // a,x1 y0,y:[abs]
+		u32 s1_h = get_ah();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1278: { // a,x0 #[i],y1
-		unhandled("a,x0 #[i],y1");
+	case 1278: { // b,x0 y0,y:[abs]
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1279: { // a,x1 #[i],y1
-		unhandled("a,x1 #[i],y1");
+	case 1279: { // b,x1 y0,y:[abs]
+		u32 s1_h = get_bh();
+		u32 s2 = get_y0();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1280: { // b,x0 #[i],y1
-		unhandled("b,x0 #[i],y1");
+	case 1280: { // a,x0 y1,y:[abs]
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1281: { // b,x1 #[i],y1
-		unhandled("b,x1 #[i],y1");
+	case 1281: { // a,x1 y1,y:[abs]
+		u32 s1_h = get_ah();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1282: { // a,x0 #[i],a
-		unhandled("a,x0 #[i],a");
+	case 1282: { // b,x0 y1,y:[abs]
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1283: { // a,x1 #[i],a
-		unhandled("a,x1 #[i],a");
+	case 1283: { // b,x1 y1,y:[abs]
+		u32 s1_h = get_bh();
+		u32 s2 = get_y1();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2;
 		break;
 		}
-	case 1284: { // b,x0 #[i],a
-		unhandled("b,x0 #[i],a");
+	case 1284: { // a,x0 a,y:[abs]
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1285: { // b,x1 #[i],a
-		unhandled("b,x1 #[i],a");
+	case 1285: { // a,x1 a,y:[abs]
+		u32 s1_h = get_ah();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1286: { // a,x0 #[i],b
-		unhandled("a,x0 #[i],b");
+	case 1286: { // b,x0 a,y:[abs]
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1287: { // a,x1 #[i],b
-		unhandled("a,x1 #[i],b");
+	case 1287: { // b,x1 a,y:[abs]
+		u32 s1_h = get_bh();
+		u32 s2_h = get_ah();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1288: { // b,x0 #[i],b
-		unhandled("b,x0 #[i],b");
+	case 1288: { // a,x0 b,y:[abs]
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1289: { // b,x1 #[i],b
-		unhandled("b,x1 #[i],b");
+	case 1289: { // a,x1 b,y:[abs]
+		u32 s1_h = get_ah();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1290: { // a,x0 y0,y:[abs]
-		unhandled("a,x0 y0,y:[abs]");
+	case 1290: { // b,x0 b,y:[abs]
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1291: { // a,x1 y0,y:[abs]
-		unhandled("a,x1 y0,y:[abs]");
+	case 1291: { // b,x1 b,y:[abs]
+		u32 s1_h = get_bh();
+		u32 s2_h = get_bh();
+		m_tmp1 = s1_h;
+		m_tmp2 = s2_h;
 		break;
 		}
-	case 1292: { // b,x0 y0,y:[abs]
-		unhandled("b,x0 y0,y:[abs]");
+	case 1292: { // a,x0 #[i],y0
+		u32 s1_h = get_ah();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1293: { // b,x1 y0,y:[abs]
-		unhandled("b,x1 y0,y:[abs]");
+	case 1293: { // a,x1 #[i],y0
+		u32 s1_h = get_ah();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1294: { // a,x0 y1,y:[abs]
-		unhandled("a,x0 y1,y:[abs]");
+	case 1294: { // b,x0 #[i],y0
+		u32 s1_h = get_bh();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1295: { // a,x1 y1,y:[abs]
-		unhandled("a,x1 y1,y:[abs]");
+	case 1295: { // b,x1 #[i],y0
+		u32 s1_h = get_bh();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1296: { // b,x0 y1,y:[abs]
-		unhandled("b,x0 y1,y:[abs]");
+	case 1296: { // a,x0 #[i],y1
+		u32 s1_h = get_ah();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1297: { // b,x1 y1,y:[abs]
-		unhandled("b,x1 y1,y:[abs]");
+	case 1297: { // a,x1 #[i],y1
+		u32 s1_h = get_ah();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1298: { // a,x0 a,y:[abs]
-		unhandled("a,x0 a,y:[abs]");
+	case 1298: { // b,x0 #[i],y1
+		u32 s1_h = get_bh();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1299: { // a,x1 a,y:[abs]
-		unhandled("a,x1 a,y:[abs]");
+	case 1299: { // b,x1 #[i],y1
+		u32 s1_h = get_bh();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1300: { // b,x0 a,y:[abs]
-		unhandled("b,x0 a,y:[abs]");
+	case 1300: { // a,x0 #[i],a
+		u32 s1_h = get_ah();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1301: { // b,x1 a,y:[abs]
-		unhandled("b,x1 a,y:[abs]");
+	case 1301: { // a,x1 #[i],a
+		u32 s1_h = get_ah();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1302: { // a,x0 b,y:[abs]
-		unhandled("a,x0 b,y:[abs]");
+	case 1302: { // b,x0 #[i],a
+		u32 s1_h = get_bh();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1303: { // a,x1 b,y:[abs]
-		unhandled("a,x1 b,y:[abs]");
+	case 1303: { // b,x1 #[i],a
+		u32 s1_h = get_bh();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1304: { // b,x0 b,y:[abs]
-		unhandled("b,x0 b,y:[abs]");
+	case 1304: { // a,x0 #[i],b
+		u32 s1_h = get_ah();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1305: { // b,x1 b,y:[abs]
-		unhandled("b,x1 b,y:[abs]");
+	case 1305: { // a,x1 #[i],b
+		u32 s1_h = get_ah();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1306: { // a,y:(r)-n y0,a
-		unhandled("a,y:(r)-n y0,a");
+	case 1306: { // b,x0 #[i],b
+		u32 s1_h = get_bh();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1307: { // a,y:(r)+n y0,a
-		unhandled("a,y:(r)+n y0,a");
+	case 1307: { // b,x1 #[i],b
+		u32 s1_h = get_bh();
+		m_tmp1 = s1_h;
 		break;
 		}
-	case 1308: { // a,y:(r)- y0,a
-		unhandled("a,y:(r)- y0,a");
+	case 1308: { // a,y:(r)-n y0,a
+		m_tmp1 = get_ah();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1309: { // a,y:(r)+ y0,a
-		unhandled("a,y:(r)+ y0,a");
+	case 1309: { // a,y:(r)+n y0,a
+		m_tmp1 = get_ah();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1310: { // a,y:(r) y0,a
-		unhandled("a,y:(r) y0,a");
+	case 1310: { // a,y:(r)- y0,a
+		m_tmp1 = get_ah();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1311: { // a,y:(r+n) y0,a
-		unhandled("a,y:(r+n) y0,a");
+	case 1311: { // a,y:(r)+ y0,a
+		m_tmp1 = get_ah();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1312: { // a,y:-(r) y0,a
-		unhandled("a,y:-(r) y0,a");
+	case 1312: { // a,y:(r) y0,a
+		m_tmp1 = get_ah();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1313: { // b,y:(r)-n y0,b
-		unhandled("b,y:(r)-n y0,b");
+	case 1313: { // a,y:(r+n) y0,a
+		m_tmp1 = get_ah();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1314: { // b,y:(r)+n y0,b
-		unhandled("b,y:(r)+n y0,b");
+	case 1314: { // a,y:-(r) y0,a
+		m_tmp1 = get_ah();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1315: { // b,y:(r)- y0,b
-		unhandled("b,y:(r)- y0,b");
+	case 1315: { // b,y:(r)-n y0,b
+		m_tmp1 = get_bh();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1316: { // b,y:(r)+ y0,b
-		unhandled("b,y:(r)+ y0,b");
+	case 1316: { // b,y:(r)+n y0,b
+		m_tmp1 = get_bh();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1317: { // b,y:(r) y0,b
-		unhandled("b,y:(r) y0,b");
+	case 1317: { // b,y:(r)- y0,b
+		m_tmp1 = get_bh();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1318: { // b,y:(r+n) y0,b
-		unhandled("b,y:(r+n) y0,b");
+	case 1318: { // b,y:(r)+ y0,b
+		m_tmp1 = get_bh();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1319: { // b,y:-(r) y0,b
-		unhandled("b,y:-(r) y0,b");
+	case 1319: { // b,y:(r) y0,b
+		m_tmp1 = get_bh();
+		m_tmp2 = get_y0();
 		break;
 		}
-	case 1320: { // l:(r)-n,a10
+	case 1320: { // b,y:(r+n) y0,b
+		m_tmp1 = get_bh();
+		m_tmp2 = get_y0();
+		break;
+		}
+	case 1321: { // b,y:-(r) y0,b
+		m_tmp1 = get_bh();
+		m_tmp2 = get_y0();
+		break;
+		}
+	case 1322: { // a,y:[abs] y0,a
+		m_tmp1 = get_ah();
+		m_tmp2 = get_y0();
+		break;
+		}
+	case 1323: { // b,y:[abs] y0,b
+		m_tmp1 = get_bh();
+		m_tmp2 = get_y0();
+		break;
+		}
+	case 1324: { // l:(r)-n,a10
 		unhandled("l:(r)-n,a10");
 		break;
 		}
-	case 1321: { // l:(r)+n,a10
+	case 1325: { // l:(r)+n,a10
 		unhandled("l:(r)+n,a10");
 		break;
 		}
-	case 1322: { // l:(r)-,a10
+	case 1326: { // l:(r)-,a10
 		unhandled("l:(r)-,a10");
 		break;
 		}
-	case 1323: { // l:(r)+,a10
+	case 1327: { // l:(r)+,a10
 		unhandled("l:(r)+,a10");
 		break;
 		}
-	case 1324: { // l:(r),a10
+	case 1328: { // l:(r),a10
 		unhandled("l:(r),a10");
 		break;
 		}
-	case 1325: { // l:(r+n),a10
+	case 1329: { // l:(r+n),a10
 		unhandled("l:(r+n),a10");
 		break;
 		}
-	case 1326: { // l:-(r),a10
+	case 1330: { // l:-(r),a10
 		unhandled("l:-(r),a10");
 		break;
 		}
-	case 1327: { // l:(r)-n,b10
+	case 1331: { // l:(r)-n,b10
 		unhandled("l:(r)-n,b10");
 		break;
 		}
-	case 1328: { // l:(r)+n,b10
+	case 1332: { // l:(r)+n,b10
 		unhandled("l:(r)+n,b10");
 		break;
 		}
-	case 1329: { // l:(r)-,b10
+	case 1333: { // l:(r)-,b10
 		unhandled("l:(r)-,b10");
 		break;
 		}
-	case 1330: { // l:(r)+,b10
+	case 1334: { // l:(r)+,b10
 		unhandled("l:(r)+,b10");
 		break;
 		}
-	case 1331: { // l:(r),b10
+	case 1335: { // l:(r),b10
 		unhandled("l:(r),b10");
 		break;
 		}
-	case 1332: { // l:(r+n),b10
+	case 1336: { // l:(r+n),b10
 		unhandled("l:(r+n),b10");
 		break;
 		}
-	case 1333: { // l:-(r),b10
+	case 1337: { // l:-(r),b10
 		unhandled("l:-(r),b10");
 		break;
 		}
-	case 1334: { // l:(r)-n,x
+	case 1338: { // l:(r)-n,x
 		unhandled("l:(r)-n,x");
 		break;
 		}
-	case 1335: { // l:(r)+n,x
+	case 1339: { // l:(r)+n,x
 		unhandled("l:(r)+n,x");
 		break;
 		}
-	case 1336: { // l:(r)-,x
+	case 1340: { // l:(r)-,x
 		unhandled("l:(r)-,x");
 		break;
 		}
-	case 1337: { // l:(r)+,x
+	case 1341: { // l:(r)+,x
 		unhandled("l:(r)+,x");
 		break;
 		}
-	case 1338: { // l:(r),x
+	case 1342: { // l:(r),x
 		unhandled("l:(r),x");
 		break;
 		}
-	case 1339: { // l:(r+n),x
+	case 1343: { // l:(r+n),x
 		unhandled("l:(r+n),x");
 		break;
 		}
-	case 1340: { // l:-(r),x
+	case 1344: { // l:-(r),x
 		unhandled("l:-(r),x");
 		break;
 		}
-	case 1341: { // l:(r)-n,y
+	case 1345: { // l:(r)-n,y
 		unhandled("l:(r)-n,y");
 		break;
 		}
-	case 1342: { // l:(r)+n,y
+	case 1346: { // l:(r)+n,y
 		unhandled("l:(r)+n,y");
 		break;
 		}
-	case 1343: { // l:(r)-,y
+	case 1347: { // l:(r)-,y
 		unhandled("l:(r)-,y");
 		break;
 		}
-	case 1344: { // l:(r)+,y
+	case 1348: { // l:(r)+,y
 		unhandled("l:(r)+,y");
 		break;
 		}
-	case 1345: { // l:(r),y
+	case 1349: { // l:(r),y
 		unhandled("l:(r),y");
 		break;
 		}
-	case 1346: { // l:(r+n),y
+	case 1350: { // l:(r+n),y
 		unhandled("l:(r+n),y");
 		break;
 		}
-	case 1347: { // l:-(r),y
+	case 1351: { // l:-(r),y
 		unhandled("l:-(r),y");
 		break;
 		}
-	case 1348: { // l:(r)-n,a
+	case 1352: { // l:(r)-n,a
 		unhandled("l:(r)-n,a");
 		break;
 		}
-	case 1349: { // l:(r)+n,a
+	case 1353: { // l:(r)+n,a
 		unhandled("l:(r)+n,a");
 		break;
 		}
-	case 1350: { // l:(r)-,a
+	case 1354: { // l:(r)-,a
 		unhandled("l:(r)-,a");
 		break;
 		}
-	case 1351: { // l:(r)+,a
+	case 1355: { // l:(r)+,a
 		unhandled("l:(r)+,a");
 		break;
 		}
-	case 1352: { // l:(r),a
+	case 1356: { // l:(r),a
 		unhandled("l:(r),a");
 		break;
 		}
-	case 1353: { // l:(r+n),a
+	case 1357: { // l:(r+n),a
 		unhandled("l:(r+n),a");
 		break;
 		}
-	case 1354: { // l:-(r),a
+	case 1358: { // l:-(r),a
 		unhandled("l:-(r),a");
 		break;
 		}
-	case 1355: { // l:(r)-n,b
+	case 1359: { // l:(r)-n,b
 		unhandled("l:(r)-n,b");
 		break;
 		}
-	case 1356: { // l:(r)+n,b
+	case 1360: { // l:(r)+n,b
 		unhandled("l:(r)+n,b");
 		break;
 		}
-	case 1357: { // l:(r)-,b
+	case 1361: { // l:(r)-,b
 		unhandled("l:(r)-,b");
 		break;
 		}
-	case 1358: { // l:(r)+,b
+	case 1362: { // l:(r)+,b
 		unhandled("l:(r)+,b");
 		break;
 		}
-	case 1359: { // l:(r),b
+	case 1363: { // l:(r),b
 		unhandled("l:(r),b");
 		break;
 		}
-	case 1360: { // l:(r+n),b
+	case 1364: { // l:(r+n),b
 		unhandled("l:(r+n),b");
 		break;
 		}
-	case 1361: { // l:-(r),b
+	case 1365: { // l:-(r),b
 		unhandled("l:-(r),b");
 		break;
 		}
-	case 1362: { // l:(r)-n,ab
+	case 1366: { // l:(r)-n,ab
 		unhandled("l:(r)-n,ab");
 		break;
 		}
-	case 1363: { // l:(r)+n,ab
+	case 1367: { // l:(r)+n,ab
 		unhandled("l:(r)+n,ab");
 		break;
 		}
-	case 1364: { // l:(r)-,ab
+	case 1368: { // l:(r)-,ab
 		unhandled("l:(r)-,ab");
 		break;
 		}
-	case 1365: { // l:(r)+,ab
+	case 1369: { // l:(r)+,ab
 		unhandled("l:(r)+,ab");
 		break;
 		}
-	case 1366: { // l:(r),ab
+	case 1370: { // l:(r),ab
 		unhandled("l:(r),ab");
 		break;
 		}
-	case 1367: { // l:(r+n),ab
+	case 1371: { // l:(r+n),ab
 		unhandled("l:(r+n),ab");
 		break;
 		}
-	case 1368: { // l:-(r),ab
+	case 1372: { // l:-(r),ab
 		unhandled("l:-(r),ab");
 		break;
 		}
-	case 1369: { // l:(r)-n,ba
+	case 1373: { // l:(r)-n,ba
 		unhandled("l:(r)-n,ba");
 		break;
 		}
-	case 1370: { // l:(r)+n,ba
+	case 1374: { // l:(r)+n,ba
 		unhandled("l:(r)+n,ba");
 		break;
 		}
-	case 1371: { // l:(r)-,ba
+	case 1375: { // l:(r)-,ba
 		unhandled("l:(r)-,ba");
 		break;
 		}
-	case 1372: { // l:(r)+,ba
+	case 1376: { // l:(r)+,ba
 		unhandled("l:(r)+,ba");
 		break;
 		}
-	case 1373: { // l:(r),ba
+	case 1377: { // l:(r),ba
 		unhandled("l:(r),ba");
 		break;
 		}
-	case 1374: { // l:(r+n),ba
+	case 1378: { // l:(r+n),ba
 		unhandled("l:(r+n),ba");
 		break;
 		}
-	case 1375: { // l:-(r),ba
+	case 1379: { // l:-(r),ba
 		unhandled("l:-(r),ba");
 		break;
 		}
-	case 1376: { // l:[abs],a10
+	case 1380: { // l:[abs],a10
 		unhandled("l:[abs],a10");
 		break;
 		}
-	case 1377: { // l:[abs],b10
+	case 1381: { // l:[abs],b10
 		unhandled("l:[abs],b10");
 		break;
 		}
-	case 1378: { // l:[abs],x
+	case 1382: { // l:[abs],x
 		unhandled("l:[abs],x");
 		break;
 		}
-	case 1379: { // l:[abs],y
+	case 1383: { // l:[abs],y
 		unhandled("l:[abs],y");
 		break;
 		}
-	case 1380: { // l:[abs],a
+	case 1384: { // l:[abs],a
 		unhandled("l:[abs],a");
 		break;
 		}
-	case 1381: { // l:[abs],b
+	case 1385: { // l:[abs],b
 		unhandled("l:[abs],b");
 		break;
 		}
-	case 1382: { // l:[abs],ab
+	case 1386: { // l:[abs],ab
 		unhandled("l:[abs],ab");
 		break;
 		}
-	case 1383: { // l:[abs],ba
+	case 1387: { // l:[abs],ba
 		unhandled("l:[abs],ba");
 		break;
 		}
-	case 1384: { // l:[aa],a10
+	case 1388: { // l:[aa],a10
 		unhandled("l:[aa],a10");
 		break;
 		}
-	case 1385: { // l:[aa],b10
+	case 1389: { // l:[aa],b10
 		unhandled("l:[aa],b10");
 		break;
 		}
-	case 1386: { // l:[aa],x
+	case 1390: { // l:[aa],x
 		unhandled("l:[aa],x");
 		break;
 		}
-	case 1387: { // l:[aa],y
+	case 1391: { // l:[aa],y
 		unhandled("l:[aa],y");
 		break;
 		}
-	case 1388: { // l:[aa],a
+	case 1392: { // l:[aa],a
 		unhandled("l:[aa],a");
 		break;
 		}
-	case 1389: { // l:[aa],b
+	case 1393: { // l:[aa],b
 		unhandled("l:[aa],b");
 		break;
 		}
-	case 1390: { // l:[aa],ab
+	case 1394: { // l:[aa],ab
 		unhandled("l:[aa],ab");
 		break;
 		}
-	case 1391: { // l:[aa],ba
+	case 1395: { // l:[aa],ba
 		unhandled("l:[aa],ba");
 		break;
 		}
-	case 1392: { // a10,l:(r)-n
+	case 1396: { // a10,l:(r)-n
 		unhandled("a10,l:(r)-n");
 		break;
 		}
-	case 1393: { // a10,l:(r)+n
+	case 1397: { // a10,l:(r)+n
 		unhandled("a10,l:(r)+n");
 		break;
 		}
-	case 1394: { // a10,l:(r)-
+	case 1398: { // a10,l:(r)-
 		unhandled("a10,l:(r)-");
 		break;
 		}
-	case 1395: { // a10,l:(r)+
+	case 1399: { // a10,l:(r)+
 		unhandled("a10,l:(r)+");
 		break;
 		}
-	case 1396: { // a10,l:(r)
+	case 1400: { // a10,l:(r)
 		unhandled("a10,l:(r)");
 		break;
 		}
-	case 1397: { // a10,l:(r+n)
+	case 1401: { // a10,l:(r+n)
 		unhandled("a10,l:(r+n)");
 		break;
 		}
-	case 1398: { // a10,l:-(r)
+	case 1402: { // a10,l:-(r)
 		unhandled("a10,l:-(r)");
 		break;
 		}
-	case 1399: { // b10,l:(r)-n
+	case 1403: { // b10,l:(r)-n
 		unhandled("b10,l:(r)-n");
 		break;
 		}
-	case 1400: { // b10,l:(r)+n
+	case 1404: { // b10,l:(r)+n
 		unhandled("b10,l:(r)+n");
 		break;
 		}
-	case 1401: { // b10,l:(r)-
+	case 1405: { // b10,l:(r)-
 		unhandled("b10,l:(r)-");
 		break;
 		}
-	case 1402: { // b10,l:(r)+
+	case 1406: { // b10,l:(r)+
 		unhandled("b10,l:(r)+");
 		break;
 		}
-	case 1403: { // b10,l:(r)
+	case 1407: { // b10,l:(r)
 		unhandled("b10,l:(r)");
 		break;
 		}
-	case 1404: { // b10,l:(r+n)
+	case 1408: { // b10,l:(r+n)
 		unhandled("b10,l:(r+n)");
 		break;
 		}
-	case 1405: { // b10,l:-(r)
+	case 1409: { // b10,l:-(r)
 		unhandled("b10,l:-(r)");
 		break;
 		}
-	case 1406: { // x,l:(r)-n
+	case 1410: { // x,l:(r)-n
 		unhandled("x,l:(r)-n");
 		break;
 		}
-	case 1407: { // x,l:(r)+n
+	case 1411: { // x,l:(r)+n
 		unhandled("x,l:(r)+n");
 		break;
 		}
-	case 1408: { // x,l:(r)-
+	case 1412: { // x,l:(r)-
 		unhandled("x,l:(r)-");
 		break;
 		}
-	case 1409: { // x,l:(r)+
+	case 1413: { // x,l:(r)+
 		unhandled("x,l:(r)+");
 		break;
 		}
-	case 1410: { // x,l:(r)
+	case 1414: { // x,l:(r)
 		unhandled("x,l:(r)");
 		break;
 		}
-	case 1411: { // x,l:(r+n)
+	case 1415: { // x,l:(r+n)
 		unhandled("x,l:(r+n)");
 		break;
 		}
-	case 1412: { // x,l:-(r)
+	case 1416: { // x,l:-(r)
 		unhandled("x,l:-(r)");
 		break;
 		}
-	case 1413: { // y,l:(r)-n
+	case 1417: { // y,l:(r)-n
 		unhandled("y,l:(r)-n");
 		break;
 		}
-	case 1414: { // y,l:(r)+n
+	case 1418: { // y,l:(r)+n
 		unhandled("y,l:(r)+n");
 		break;
 		}
-	case 1415: { // y,l:(r)-
+	case 1419: { // y,l:(r)-
 		unhandled("y,l:(r)-");
 		break;
 		}
-	case 1416: { // y,l:(r)+
+	case 1420: { // y,l:(r)+
 		unhandled("y,l:(r)+");
 		break;
 		}
-	case 1417: { // y,l:(r)
+	case 1421: { // y,l:(r)
 		unhandled("y,l:(r)");
 		break;
 		}
-	case 1418: { // y,l:(r+n)
+	case 1422: { // y,l:(r+n)
 		unhandled("y,l:(r+n)");
 		break;
 		}
-	case 1419: { // y,l:-(r)
+	case 1423: { // y,l:-(r)
 		unhandled("y,l:-(r)");
 		break;
 		}
-	case 1420: { // a,l:(r)-n
+	case 1424: { // a,l:(r)-n
 		unhandled("a,l:(r)-n");
 		break;
 		}
-	case 1421: { // a,l:(r)+n
+	case 1425: { // a,l:(r)+n
 		unhandled("a,l:(r)+n");
 		break;
 		}
-	case 1422: { // a,l:(r)-
+	case 1426: { // a,l:(r)-
 		unhandled("a,l:(r)-");
 		break;
 		}
-	case 1423: { // a,l:(r)+
+	case 1427: { // a,l:(r)+
 		unhandled("a,l:(r)+");
 		break;
 		}
-	case 1424: { // a,l:(r)
+	case 1428: { // a,l:(r)
 		unhandled("a,l:(r)");
 		break;
 		}
-	case 1425: { // a,l:(r+n)
+	case 1429: { // a,l:(r+n)
 		unhandled("a,l:(r+n)");
 		break;
 		}
-	case 1426: { // a,l:-(r)
+	case 1430: { // a,l:-(r)
 		unhandled("a,l:-(r)");
 		break;
 		}
-	case 1427: { // b,l:(r)-n
+	case 1431: { // b,l:(r)-n
 		unhandled("b,l:(r)-n");
 		break;
 		}
-	case 1428: { // b,l:(r)+n
+	case 1432: { // b,l:(r)+n
 		unhandled("b,l:(r)+n");
 		break;
 		}
-	case 1429: { // b,l:(r)-
+	case 1433: { // b,l:(r)-
 		unhandled("b,l:(r)-");
 		break;
 		}
-	case 1430: { // b,l:(r)+
+	case 1434: { // b,l:(r)+
 		unhandled("b,l:(r)+");
 		break;
 		}
-	case 1431: { // b,l:(r)
+	case 1435: { // b,l:(r)
 		unhandled("b,l:(r)");
 		break;
 		}
-	case 1432: { // b,l:(r+n)
+	case 1436: { // b,l:(r+n)
 		unhandled("b,l:(r+n)");
 		break;
 		}
-	case 1433: { // b,l:-(r)
+	case 1437: { // b,l:-(r)
 		unhandled("b,l:-(r)");
 		break;
 		}
-	case 1434: { // ab,l:(r)-n
+	case 1438: { // ab,l:(r)-n
 		unhandled("ab,l:(r)-n");
 		break;
 		}
-	case 1435: { // ab,l:(r)+n
+	case 1439: { // ab,l:(r)+n
 		unhandled("ab,l:(r)+n");
 		break;
 		}
-	case 1436: { // ab,l:(r)-
+	case 1440: { // ab,l:(r)-
 		unhandled("ab,l:(r)-");
 		break;
 		}
-	case 1437: { // ab,l:(r)+
+	case 1441: { // ab,l:(r)+
 		unhandled("ab,l:(r)+");
 		break;
 		}
-	case 1438: { // ab,l:(r)
+	case 1442: { // ab,l:(r)
 		unhandled("ab,l:(r)");
 		break;
 		}
-	case 1439: { // ab,l:(r+n)
+	case 1443: { // ab,l:(r+n)
 		unhandled("ab,l:(r+n)");
 		break;
 		}
-	case 1440: { // ab,l:-(r)
+	case 1444: { // ab,l:-(r)
 		unhandled("ab,l:-(r)");
 		break;
 		}
-	case 1441: { // ba,l:(r)-n
+	case 1445: { // ba,l:(r)-n
 		unhandled("ba,l:(r)-n");
 		break;
 		}
-	case 1442: { // ba,l:(r)+n
+	case 1446: { // ba,l:(r)+n
 		unhandled("ba,l:(r)+n");
 		break;
 		}
-	case 1443: { // ba,l:(r)-
+	case 1447: { // ba,l:(r)-
 		unhandled("ba,l:(r)-");
 		break;
 		}
-	case 1444: { // ba,l:(r)+
+	case 1448: { // ba,l:(r)+
 		unhandled("ba,l:(r)+");
 		break;
 		}
-	case 1445: { // ba,l:(r)
+	case 1449: { // ba,l:(r)
 		unhandled("ba,l:(r)");
 		break;
 		}
-	case 1446: { // ba,l:(r+n)
+	case 1450: { // ba,l:(r+n)
 		unhandled("ba,l:(r+n)");
 		break;
 		}
-	case 1447: { // ba,l:-(r)
+	case 1451: { // ba,l:-(r)
 		unhandled("ba,l:-(r)");
 		break;
 		}
-	case 1448: { // a10,l:[abs]
+	case 1452: { // a10,l:[abs]
 		unhandled("a10,l:[abs]");
 		break;
 		}
-	case 1449: { // b10,l:[abs]
+	case 1453: { // b10,l:[abs]
 		unhandled("b10,l:[abs]");
 		break;
 		}
-	case 1450: { // x,l:[abs]
+	case 1454: { // x,l:[abs]
 		unhandled("x,l:[abs]");
 		break;
 		}
-	case 1451: { // y,l:[abs]
+	case 1455: { // y,l:[abs]
 		unhandled("y,l:[abs]");
 		break;
 		}
-	case 1452: { // a,l:[abs]
+	case 1456: { // a,l:[abs]
 		unhandled("a,l:[abs]");
 		break;
 		}
-	case 1453: { // b,l:[abs]
+	case 1457: { // b,l:[abs]
 		unhandled("b,l:[abs]");
 		break;
 		}
-	case 1454: { // ab,l:[abs]
+	case 1458: { // ab,l:[abs]
 		unhandled("ab,l:[abs]");
 		break;
 		}
-	case 1455: { // ba,l:[abs]
+	case 1459: { // ba,l:[abs]
 		unhandled("ba,l:[abs]");
 		break;
 		}
-	case 1456: { // a10,l:[aa]
+	case 1460: { // a10,l:[aa]
 		unhandled("a10,l:[aa]");
 		break;
 		}
-	case 1457: { // b10,l:[aa]
+	case 1461: { // b10,l:[aa]
 		unhandled("b10,l:[aa]");
 		break;
 		}
-	case 1458: { // x,l:[aa]
+	case 1462: { // x,l:[aa]
 		unhandled("x,l:[aa]");
 		break;
 		}
-	case 1459: { // y,l:[aa]
+	case 1463: { // y,l:[aa]
 		unhandled("y,l:[aa]");
 		break;
 		}
-	case 1460: { // a,l:[aa]
+	case 1464: { // a,l:[aa]
 		unhandled("a,l:[aa]");
 		break;
 		}
-	case 1461: { // b,l:[aa]
+	case 1465: { // b,l:[aa]
 		unhandled("b,l:[aa]");
 		break;
 		}
-	case 1462: { // ab,l:[aa]
+	case 1466: { // ab,l:[aa]
 		unhandled("ab,l:[aa]");
 		break;
 		}
-	case 1463: { // ba,l:[aa]
+	case 1467: { // ba,l:[aa]
 		unhandled("ba,l:[aa]");
 		break;
 		}
-	case 1464: { // x:(r)+n,x0 y:(rh)+n,y0
+	case 1468: { // x:(r)+n,x0 y:(rh)+n,y0
 		unhandled("x:(r)+n,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1465: { // x:(r)+n,x0 y:(rh)+n,y1
+	case 1469: { // x:(r)+n,x0 y:(rh)+n,y1
 		unhandled("x:(r)+n,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1466: { // x:(r)+n,x0 y:(rh)+n,a
+	case 1470: { // x:(r)+n,x0 y:(rh)+n,a
 		unhandled("x:(r)+n,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1467: { // x:(r)+n,x0 y:(rh)+n,b
+	case 1471: { // x:(r)+n,x0 y:(rh)+n,b
 		unhandled("x:(r)+n,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1468: { // x:(r)+n,x1 y:(rh)+n,y0
+	case 1472: { // x:(r)+n,x1 y:(rh)+n,y0
 		unhandled("x:(r)+n,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1469: { // x:(r)+n,x1 y:(rh)+n,y1
+	case 1473: { // x:(r)+n,x1 y:(rh)+n,y1
 		unhandled("x:(r)+n,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1470: { // x:(r)+n,x1 y:(rh)+n,a
+	case 1474: { // x:(r)+n,x1 y:(rh)+n,a
 		unhandled("x:(r)+n,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1471: { // x:(r)+n,x1 y:(rh)+n,b
+	case 1475: { // x:(r)+n,x1 y:(rh)+n,b
 		unhandled("x:(r)+n,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1472: { // x:(r)+n,a y:(rh)+n,y0
+	case 1476: { // x:(r)+n,a y:(rh)+n,y0
 		unhandled("x:(r)+n,a y:(rh)+n,y0");
 		break;
 		}
-	case 1473: { // x:(r)+n,a y:(rh)+n,y1
+	case 1477: { // x:(r)+n,a y:(rh)+n,y1
 		unhandled("x:(r)+n,a y:(rh)+n,y1");
 		break;
 		}
-	case 1474: { // x:(r)+n,a y:(rh)+n,a
+	case 1478: { // x:(r)+n,a y:(rh)+n,a
 		unhandled("x:(r)+n,a y:(rh)+n,a");
 		break;
 		}
-	case 1475: { // x:(r)+n,a y:(rh)+n,b
+	case 1479: { // x:(r)+n,a y:(rh)+n,b
 		unhandled("x:(r)+n,a y:(rh)+n,b");
 		break;
 		}
-	case 1476: { // x:(r)+n,b y:(rh)+n,y0
+	case 1480: { // x:(r)+n,b y:(rh)+n,y0
 		unhandled("x:(r)+n,b y:(rh)+n,y0");
 		break;
 		}
-	case 1477: { // x:(r)+n,b y:(rh)+n,y1
+	case 1481: { // x:(r)+n,b y:(rh)+n,y1
 		unhandled("x:(r)+n,b y:(rh)+n,y1");
 		break;
 		}
-	case 1478: { // x:(r)+n,b y:(rh)+n,a
+	case 1482: { // x:(r)+n,b y:(rh)+n,a
 		unhandled("x:(r)+n,b y:(rh)+n,a");
 		break;
 		}
-	case 1479: { // x:(r)+n,b y:(rh)+n,b
+	case 1483: { // x:(r)+n,b y:(rh)+n,b
 		unhandled("x:(r)+n,b y:(rh)+n,b");
 		break;
 		}
-	case 1480: { // x:(r)+n,x0 y:(rh)-,y0
+	case 1484: { // x:(r)+n,x0 y:(rh)-,y0
 		unhandled("x:(r)+n,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1481: { // x:(r)+n,x0 y:(rh)-,y1
+	case 1485: { // x:(r)+n,x0 y:(rh)-,y1
 		unhandled("x:(r)+n,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1482: { // x:(r)+n,x0 y:(rh)-,a
+	case 1486: { // x:(r)+n,x0 y:(rh)-,a
 		unhandled("x:(r)+n,x0 y:(rh)-,a");
 		break;
 		}
-	case 1483: { // x:(r)+n,x0 y:(rh)-,b
+	case 1487: { // x:(r)+n,x0 y:(rh)-,b
 		unhandled("x:(r)+n,x0 y:(rh)-,b");
 		break;
 		}
-	case 1484: { // x:(r)+n,x1 y:(rh)-,y0
+	case 1488: { // x:(r)+n,x1 y:(rh)-,y0
 		unhandled("x:(r)+n,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1485: { // x:(r)+n,x1 y:(rh)-,y1
+	case 1489: { // x:(r)+n,x1 y:(rh)-,y1
 		unhandled("x:(r)+n,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1486: { // x:(r)+n,x1 y:(rh)-,a
+	case 1490: { // x:(r)+n,x1 y:(rh)-,a
 		unhandled("x:(r)+n,x1 y:(rh)-,a");
 		break;
 		}
-	case 1487: { // x:(r)+n,x1 y:(rh)-,b
+	case 1491: { // x:(r)+n,x1 y:(rh)-,b
 		unhandled("x:(r)+n,x1 y:(rh)-,b");
 		break;
 		}
-	case 1488: { // x:(r)+n,a y:(rh)-,y0
+	case 1492: { // x:(r)+n,a y:(rh)-,y0
 		unhandled("x:(r)+n,a y:(rh)-,y0");
 		break;
 		}
-	case 1489: { // x:(r)+n,a y:(rh)-,y1
+	case 1493: { // x:(r)+n,a y:(rh)-,y1
 		unhandled("x:(r)+n,a y:(rh)-,y1");
 		break;
 		}
-	case 1490: { // x:(r)+n,a y:(rh)-,a
+	case 1494: { // x:(r)+n,a y:(rh)-,a
 		unhandled("x:(r)+n,a y:(rh)-,a");
 		break;
 		}
-	case 1491: { // x:(r)+n,a y:(rh)-,b
+	case 1495: { // x:(r)+n,a y:(rh)-,b
 		unhandled("x:(r)+n,a y:(rh)-,b");
 		break;
 		}
-	case 1492: { // x:(r)+n,b y:(rh)-,y0
+	case 1496: { // x:(r)+n,b y:(rh)-,y0
 		unhandled("x:(r)+n,b y:(rh)-,y0");
 		break;
 		}
-	case 1493: { // x:(r)+n,b y:(rh)-,y1
+	case 1497: { // x:(r)+n,b y:(rh)-,y1
 		unhandled("x:(r)+n,b y:(rh)-,y1");
 		break;
 		}
-	case 1494: { // x:(r)+n,b y:(rh)-,a
+	case 1498: { // x:(r)+n,b y:(rh)-,a
 		unhandled("x:(r)+n,b y:(rh)-,a");
 		break;
 		}
-	case 1495: { // x:(r)+n,b y:(rh)-,b
+	case 1499: { // x:(r)+n,b y:(rh)-,b
 		unhandled("x:(r)+n,b y:(rh)-,b");
 		break;
 		}
-	case 1496: { // x:(r)+n,x0 y:(rh)+,y0
+	case 1500: { // x:(r)+n,x0 y:(rh)+,y0
 		unhandled("x:(r)+n,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1497: { // x:(r)+n,x0 y:(rh)+,y1
+	case 1501: { // x:(r)+n,x0 y:(rh)+,y1
 		unhandled("x:(r)+n,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1498: { // x:(r)+n,x0 y:(rh)+,a
+	case 1502: { // x:(r)+n,x0 y:(rh)+,a
 		unhandled("x:(r)+n,x0 y:(rh)+,a");
 		break;
 		}
-	case 1499: { // x:(r)+n,x0 y:(rh)+,b
+	case 1503: { // x:(r)+n,x0 y:(rh)+,b
 		unhandled("x:(r)+n,x0 y:(rh)+,b");
 		break;
 		}
-	case 1500: { // x:(r)+n,x1 y:(rh)+,y0
+	case 1504: { // x:(r)+n,x1 y:(rh)+,y0
 		unhandled("x:(r)+n,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1501: { // x:(r)+n,x1 y:(rh)+,y1
+	case 1505: { // x:(r)+n,x1 y:(rh)+,y1
 		unhandled("x:(r)+n,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1502: { // x:(r)+n,x1 y:(rh)+,a
+	case 1506: { // x:(r)+n,x1 y:(rh)+,a
 		unhandled("x:(r)+n,x1 y:(rh)+,a");
 		break;
 		}
-	case 1503: { // x:(r)+n,x1 y:(rh)+,b
+	case 1507: { // x:(r)+n,x1 y:(rh)+,b
 		unhandled("x:(r)+n,x1 y:(rh)+,b");
 		break;
 		}
-	case 1504: { // x:(r)+n,a y:(rh)+,y0
+	case 1508: { // x:(r)+n,a y:(rh)+,y0
 		unhandled("x:(r)+n,a y:(rh)+,y0");
 		break;
 		}
-	case 1505: { // x:(r)+n,a y:(rh)+,y1
+	case 1509: { // x:(r)+n,a y:(rh)+,y1
 		unhandled("x:(r)+n,a y:(rh)+,y1");
 		break;
 		}
-	case 1506: { // x:(r)+n,a y:(rh)+,a
+	case 1510: { // x:(r)+n,a y:(rh)+,a
 		unhandled("x:(r)+n,a y:(rh)+,a");
 		break;
 		}
-	case 1507: { // x:(r)+n,a y:(rh)+,b
+	case 1511: { // x:(r)+n,a y:(rh)+,b
 		unhandled("x:(r)+n,a y:(rh)+,b");
 		break;
 		}
-	case 1508: { // x:(r)+n,b y:(rh)+,y0
+	case 1512: { // x:(r)+n,b y:(rh)+,y0
 		unhandled("x:(r)+n,b y:(rh)+,y0");
 		break;
 		}
-	case 1509: { // x:(r)+n,b y:(rh)+,y1
+	case 1513: { // x:(r)+n,b y:(rh)+,y1
 		unhandled("x:(r)+n,b y:(rh)+,y1");
 		break;
 		}
-	case 1510: { // x:(r)+n,b y:(rh)+,a
+	case 1514: { // x:(r)+n,b y:(rh)+,a
 		unhandled("x:(r)+n,b y:(rh)+,a");
 		break;
 		}
-	case 1511: { // x:(r)+n,b y:(rh)+,b
+	case 1515: { // x:(r)+n,b y:(rh)+,b
 		unhandled("x:(r)+n,b y:(rh)+,b");
 		break;
 		}
-	case 1512: { // x:(r)+n,x0 y:(rh),y0
+	case 1516: { // x:(r)+n,x0 y:(rh),y0
 		unhandled("x:(r)+n,x0 y:(rh),y0");
 		break;
 		}
-	case 1513: { // x:(r)+n,x0 y:(rh),y1
+	case 1517: { // x:(r)+n,x0 y:(rh),y1
 		unhandled("x:(r)+n,x0 y:(rh),y1");
 		break;
 		}
-	case 1514: { // x:(r)+n,x0 y:(rh),a
+	case 1518: { // x:(r)+n,x0 y:(rh),a
 		unhandled("x:(r)+n,x0 y:(rh),a");
 		break;
 		}
-	case 1515: { // x:(r)+n,x0 y:(rh),b
+	case 1519: { // x:(r)+n,x0 y:(rh),b
 		unhandled("x:(r)+n,x0 y:(rh),b");
 		break;
 		}
-	case 1516: { // x:(r)+n,x1 y:(rh),y0
+	case 1520: { // x:(r)+n,x1 y:(rh),y0
 		unhandled("x:(r)+n,x1 y:(rh),y0");
 		break;
 		}
-	case 1517: { // x:(r)+n,x1 y:(rh),y1
+	case 1521: { // x:(r)+n,x1 y:(rh),y1
 		unhandled("x:(r)+n,x1 y:(rh),y1");
 		break;
 		}
-	case 1518: { // x:(r)+n,x1 y:(rh),a
+	case 1522: { // x:(r)+n,x1 y:(rh),a
 		unhandled("x:(r)+n,x1 y:(rh),a");
 		break;
 		}
-	case 1519: { // x:(r)+n,x1 y:(rh),b
+	case 1523: { // x:(r)+n,x1 y:(rh),b
 		unhandled("x:(r)+n,x1 y:(rh),b");
 		break;
 		}
-	case 1520: { // x:(r)+n,a y:(rh),y0
+	case 1524: { // x:(r)+n,a y:(rh),y0
 		unhandled("x:(r)+n,a y:(rh),y0");
 		break;
 		}
-	case 1521: { // x:(r)+n,a y:(rh),y1
+	case 1525: { // x:(r)+n,a y:(rh),y1
 		unhandled("x:(r)+n,a y:(rh),y1");
 		break;
 		}
-	case 1522: { // x:(r)+n,a y:(rh),a
+	case 1526: { // x:(r)+n,a y:(rh),a
 		unhandled("x:(r)+n,a y:(rh),a");
 		break;
 		}
-	case 1523: { // x:(r)+n,a y:(rh),b
+	case 1527: { // x:(r)+n,a y:(rh),b
 		unhandled("x:(r)+n,a y:(rh),b");
 		break;
 		}
-	case 1524: { // x:(r)+n,b y:(rh),y0
+	case 1528: { // x:(r)+n,b y:(rh),y0
 		unhandled("x:(r)+n,b y:(rh),y0");
 		break;
 		}
-	case 1525: { // x:(r)+n,b y:(rh),y1
+	case 1529: { // x:(r)+n,b y:(rh),y1
 		unhandled("x:(r)+n,b y:(rh),y1");
 		break;
 		}
-	case 1526: { // x:(r)+n,b y:(rh),a
+	case 1530: { // x:(r)+n,b y:(rh),a
 		unhandled("x:(r)+n,b y:(rh),a");
 		break;
 		}
-	case 1527: { // x:(r)+n,b y:(rh),b
+	case 1531: { // x:(r)+n,b y:(rh),b
 		unhandled("x:(r)+n,b y:(rh),b");
 		break;
 		}
-	case 1528: { // x:(r)-,x0 y:(rh)+n,y0
+	case 1532: { // x:(r)-,x0 y:(rh)+n,y0
 		unhandled("x:(r)-,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1529: { // x:(r)-,x0 y:(rh)+n,y1
+	case 1533: { // x:(r)-,x0 y:(rh)+n,y1
 		unhandled("x:(r)-,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1530: { // x:(r)-,x0 y:(rh)+n,a
+	case 1534: { // x:(r)-,x0 y:(rh)+n,a
 		unhandled("x:(r)-,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1531: { // x:(r)-,x0 y:(rh)+n,b
+	case 1535: { // x:(r)-,x0 y:(rh)+n,b
 		unhandled("x:(r)-,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1532: { // x:(r)-,x1 y:(rh)+n,y0
+	case 1536: { // x:(r)-,x1 y:(rh)+n,y0
 		unhandled("x:(r)-,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1533: { // x:(r)-,x1 y:(rh)+n,y1
+	case 1537: { // x:(r)-,x1 y:(rh)+n,y1
 		unhandled("x:(r)-,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1534: { // x:(r)-,x1 y:(rh)+n,a
+	case 1538: { // x:(r)-,x1 y:(rh)+n,a
 		unhandled("x:(r)-,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1535: { // x:(r)-,x1 y:(rh)+n,b
+	case 1539: { // x:(r)-,x1 y:(rh)+n,b
 		unhandled("x:(r)-,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1536: { // x:(r)-,a y:(rh)+n,y0
+	case 1540: { // x:(r)-,a y:(rh)+n,y0
 		unhandled("x:(r)-,a y:(rh)+n,y0");
 		break;
 		}
-	case 1537: { // x:(r)-,a y:(rh)+n,y1
+	case 1541: { // x:(r)-,a y:(rh)+n,y1
 		unhandled("x:(r)-,a y:(rh)+n,y1");
 		break;
 		}
-	case 1538: { // x:(r)-,a y:(rh)+n,a
+	case 1542: { // x:(r)-,a y:(rh)+n,a
 		unhandled("x:(r)-,a y:(rh)+n,a");
 		break;
 		}
-	case 1539: { // x:(r)-,a y:(rh)+n,b
+	case 1543: { // x:(r)-,a y:(rh)+n,b
 		unhandled("x:(r)-,a y:(rh)+n,b");
 		break;
 		}
-	case 1540: { // x:(r)-,b y:(rh)+n,y0
+	case 1544: { // x:(r)-,b y:(rh)+n,y0
 		unhandled("x:(r)-,b y:(rh)+n,y0");
 		break;
 		}
-	case 1541: { // x:(r)-,b y:(rh)+n,y1
+	case 1545: { // x:(r)-,b y:(rh)+n,y1
 		unhandled("x:(r)-,b y:(rh)+n,y1");
 		break;
 		}
-	case 1542: { // x:(r)-,b y:(rh)+n,a
+	case 1546: { // x:(r)-,b y:(rh)+n,a
 		unhandled("x:(r)-,b y:(rh)+n,a");
 		break;
 		}
-	case 1543: { // x:(r)-,b y:(rh)+n,b
+	case 1547: { // x:(r)-,b y:(rh)+n,b
 		unhandled("x:(r)-,b y:(rh)+n,b");
 		break;
 		}
-	case 1544: { // x:(r)-,x0 y:(rh)-,y0
+	case 1548: { // x:(r)-,x0 y:(rh)-,y0
 		unhandled("x:(r)-,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1545: { // x:(r)-,x0 y:(rh)-,y1
+	case 1549: { // x:(r)-,x0 y:(rh)-,y1
 		unhandled("x:(r)-,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1546: { // x:(r)-,x0 y:(rh)-,a
+	case 1550: { // x:(r)-,x0 y:(rh)-,a
 		unhandled("x:(r)-,x0 y:(rh)-,a");
 		break;
 		}
-	case 1547: { // x:(r)-,x0 y:(rh)-,b
+	case 1551: { // x:(r)-,x0 y:(rh)-,b
 		unhandled("x:(r)-,x0 y:(rh)-,b");
 		break;
 		}
-	case 1548: { // x:(r)-,x1 y:(rh)-,y0
+	case 1552: { // x:(r)-,x1 y:(rh)-,y0
 		unhandled("x:(r)-,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1549: { // x:(r)-,x1 y:(rh)-,y1
+	case 1553: { // x:(r)-,x1 y:(rh)-,y1
 		unhandled("x:(r)-,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1550: { // x:(r)-,x1 y:(rh)-,a
+	case 1554: { // x:(r)-,x1 y:(rh)-,a
 		unhandled("x:(r)-,x1 y:(rh)-,a");
 		break;
 		}
-	case 1551: { // x:(r)-,x1 y:(rh)-,b
+	case 1555: { // x:(r)-,x1 y:(rh)-,b
 		unhandled("x:(r)-,x1 y:(rh)-,b");
 		break;
 		}
-	case 1552: { // x:(r)-,a y:(rh)-,y0
+	case 1556: { // x:(r)-,a y:(rh)-,y0
 		unhandled("x:(r)-,a y:(rh)-,y0");
 		break;
 		}
-	case 1553: { // x:(r)-,a y:(rh)-,y1
+	case 1557: { // x:(r)-,a y:(rh)-,y1
 		unhandled("x:(r)-,a y:(rh)-,y1");
 		break;
 		}
-	case 1554: { // x:(r)-,a y:(rh)-,a
+	case 1558: { // x:(r)-,a y:(rh)-,a
 		unhandled("x:(r)-,a y:(rh)-,a");
 		break;
 		}
-	case 1555: { // x:(r)-,a y:(rh)-,b
+	case 1559: { // x:(r)-,a y:(rh)-,b
 		unhandled("x:(r)-,a y:(rh)-,b");
 		break;
 		}
-	case 1556: { // x:(r)-,b y:(rh)-,y0
+	case 1560: { // x:(r)-,b y:(rh)-,y0
 		unhandled("x:(r)-,b y:(rh)-,y0");
 		break;
 		}
-	case 1557: { // x:(r)-,b y:(rh)-,y1
+	case 1561: { // x:(r)-,b y:(rh)-,y1
 		unhandled("x:(r)-,b y:(rh)-,y1");
 		break;
 		}
-	case 1558: { // x:(r)-,b y:(rh)-,a
+	case 1562: { // x:(r)-,b y:(rh)-,a
 		unhandled("x:(r)-,b y:(rh)-,a");
 		break;
 		}
-	case 1559: { // x:(r)-,b y:(rh)-,b
+	case 1563: { // x:(r)-,b y:(rh)-,b
 		unhandled("x:(r)-,b y:(rh)-,b");
 		break;
 		}
-	case 1560: { // x:(r)-,x0 y:(rh)+,y0
+	case 1564: { // x:(r)-,x0 y:(rh)+,y0
 		unhandled("x:(r)-,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1561: { // x:(r)-,x0 y:(rh)+,y1
+	case 1565: { // x:(r)-,x0 y:(rh)+,y1
 		unhandled("x:(r)-,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1562: { // x:(r)-,x0 y:(rh)+,a
+	case 1566: { // x:(r)-,x0 y:(rh)+,a
 		unhandled("x:(r)-,x0 y:(rh)+,a");
 		break;
 		}
-	case 1563: { // x:(r)-,x0 y:(rh)+,b
+	case 1567: { // x:(r)-,x0 y:(rh)+,b
 		unhandled("x:(r)-,x0 y:(rh)+,b");
 		break;
 		}
-	case 1564: { // x:(r)-,x1 y:(rh)+,y0
+	case 1568: { // x:(r)-,x1 y:(rh)+,y0
 		unhandled("x:(r)-,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1565: { // x:(r)-,x1 y:(rh)+,y1
+	case 1569: { // x:(r)-,x1 y:(rh)+,y1
 		unhandled("x:(r)-,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1566: { // x:(r)-,x1 y:(rh)+,a
+	case 1570: { // x:(r)-,x1 y:(rh)+,a
 		unhandled("x:(r)-,x1 y:(rh)+,a");
 		break;
 		}
-	case 1567: { // x:(r)-,x1 y:(rh)+,b
+	case 1571: { // x:(r)-,x1 y:(rh)+,b
 		unhandled("x:(r)-,x1 y:(rh)+,b");
 		break;
 		}
-	case 1568: { // x:(r)-,a y:(rh)+,y0
+	case 1572: { // x:(r)-,a y:(rh)+,y0
 		unhandled("x:(r)-,a y:(rh)+,y0");
 		break;
 		}
-	case 1569: { // x:(r)-,a y:(rh)+,y1
+	case 1573: { // x:(r)-,a y:(rh)+,y1
 		unhandled("x:(r)-,a y:(rh)+,y1");
 		break;
 		}
-	case 1570: { // x:(r)-,a y:(rh)+,a
+	case 1574: { // x:(r)-,a y:(rh)+,a
 		unhandled("x:(r)-,a y:(rh)+,a");
 		break;
 		}
-	case 1571: { // x:(r)-,a y:(rh)+,b
+	case 1575: { // x:(r)-,a y:(rh)+,b
 		unhandled("x:(r)-,a y:(rh)+,b");
 		break;
 		}
-	case 1572: { // x:(r)-,b y:(rh)+,y0
+	case 1576: { // x:(r)-,b y:(rh)+,y0
 		unhandled("x:(r)-,b y:(rh)+,y0");
 		break;
 		}
-	case 1573: { // x:(r)-,b y:(rh)+,y1
+	case 1577: { // x:(r)-,b y:(rh)+,y1
 		unhandled("x:(r)-,b y:(rh)+,y1");
 		break;
 		}
-	case 1574: { // x:(r)-,b y:(rh)+,a
+	case 1578: { // x:(r)-,b y:(rh)+,a
 		unhandled("x:(r)-,b y:(rh)+,a");
 		break;
 		}
-	case 1575: { // x:(r)-,b y:(rh)+,b
+	case 1579: { // x:(r)-,b y:(rh)+,b
 		unhandled("x:(r)-,b y:(rh)+,b");
 		break;
 		}
-	case 1576: { // x:(r)-,x0 y:(rh),y0
+	case 1580: { // x:(r)-,x0 y:(rh),y0
 		unhandled("x:(r)-,x0 y:(rh),y0");
 		break;
 		}
-	case 1577: { // x:(r)-,x0 y:(rh),y1
+	case 1581: { // x:(r)-,x0 y:(rh),y1
 		unhandled("x:(r)-,x0 y:(rh),y1");
 		break;
 		}
-	case 1578: { // x:(r)-,x0 y:(rh),a
+	case 1582: { // x:(r)-,x0 y:(rh),a
 		unhandled("x:(r)-,x0 y:(rh),a");
 		break;
 		}
-	case 1579: { // x:(r)-,x0 y:(rh),b
+	case 1583: { // x:(r)-,x0 y:(rh),b
 		unhandled("x:(r)-,x0 y:(rh),b");
 		break;
 		}
-	case 1580: { // x:(r)-,x1 y:(rh),y0
+	case 1584: { // x:(r)-,x1 y:(rh),y0
 		unhandled("x:(r)-,x1 y:(rh),y0");
 		break;
 		}
-	case 1581: { // x:(r)-,x1 y:(rh),y1
+	case 1585: { // x:(r)-,x1 y:(rh),y1
 		unhandled("x:(r)-,x1 y:(rh),y1");
 		break;
 		}
-	case 1582: { // x:(r)-,x1 y:(rh),a
+	case 1586: { // x:(r)-,x1 y:(rh),a
 		unhandled("x:(r)-,x1 y:(rh),a");
 		break;
 		}
-	case 1583: { // x:(r)-,x1 y:(rh),b
+	case 1587: { // x:(r)-,x1 y:(rh),b
 		unhandled("x:(r)-,x1 y:(rh),b");
 		break;
 		}
-	case 1584: { // x:(r)-,a y:(rh),y0
+	case 1588: { // x:(r)-,a y:(rh),y0
 		unhandled("x:(r)-,a y:(rh),y0");
 		break;
 		}
-	case 1585: { // x:(r)-,a y:(rh),y1
+	case 1589: { // x:(r)-,a y:(rh),y1
 		unhandled("x:(r)-,a y:(rh),y1");
 		break;
 		}
-	case 1586: { // x:(r)-,a y:(rh),a
+	case 1590: { // x:(r)-,a y:(rh),a
 		unhandled("x:(r)-,a y:(rh),a");
 		break;
 		}
-	case 1587: { // x:(r)-,a y:(rh),b
+	case 1591: { // x:(r)-,a y:(rh),b
 		unhandled("x:(r)-,a y:(rh),b");
 		break;
 		}
-	case 1588: { // x:(r)-,b y:(rh),y0
+	case 1592: { // x:(r)-,b y:(rh),y0
 		unhandled("x:(r)-,b y:(rh),y0");
 		break;
 		}
-	case 1589: { // x:(r)-,b y:(rh),y1
+	case 1593: { // x:(r)-,b y:(rh),y1
 		unhandled("x:(r)-,b y:(rh),y1");
 		break;
 		}
-	case 1590: { // x:(r)-,b y:(rh),a
+	case 1594: { // x:(r)-,b y:(rh),a
 		unhandled("x:(r)-,b y:(rh),a");
 		break;
 		}
-	case 1591: { // x:(r)-,b y:(rh),b
+	case 1595: { // x:(r)-,b y:(rh),b
 		unhandled("x:(r)-,b y:(rh),b");
 		break;
 		}
-	case 1592: { // x:(r)+,x0 y:(rh)+n,y0
+	case 1596: { // x:(r)+,x0 y:(rh)+n,y0
 		unhandled("x:(r)+,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1593: { // x:(r)+,x0 y:(rh)+n,y1
+	case 1597: { // x:(r)+,x0 y:(rh)+n,y1
 		unhandled("x:(r)+,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1594: { // x:(r)+,x0 y:(rh)+n,a
+	case 1598: { // x:(r)+,x0 y:(rh)+n,a
 		unhandled("x:(r)+,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1595: { // x:(r)+,x0 y:(rh)+n,b
+	case 1599: { // x:(r)+,x0 y:(rh)+n,b
 		unhandled("x:(r)+,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1596: { // x:(r)+,x1 y:(rh)+n,y0
+	case 1600: { // x:(r)+,x1 y:(rh)+n,y0
 		unhandled("x:(r)+,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1597: { // x:(r)+,x1 y:(rh)+n,y1
+	case 1601: { // x:(r)+,x1 y:(rh)+n,y1
 		unhandled("x:(r)+,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1598: { // x:(r)+,x1 y:(rh)+n,a
+	case 1602: { // x:(r)+,x1 y:(rh)+n,a
 		unhandled("x:(r)+,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1599: { // x:(r)+,x1 y:(rh)+n,b
+	case 1603: { // x:(r)+,x1 y:(rh)+n,b
 		unhandled("x:(r)+,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1600: { // x:(r)+,a y:(rh)+n,y0
+	case 1604: { // x:(r)+,a y:(rh)+n,y0
 		unhandled("x:(r)+,a y:(rh)+n,y0");
 		break;
 		}
-	case 1601: { // x:(r)+,a y:(rh)+n,y1
+	case 1605: { // x:(r)+,a y:(rh)+n,y1
 		unhandled("x:(r)+,a y:(rh)+n,y1");
 		break;
 		}
-	case 1602: { // x:(r)+,a y:(rh)+n,a
+	case 1606: { // x:(r)+,a y:(rh)+n,a
 		unhandled("x:(r)+,a y:(rh)+n,a");
 		break;
 		}
-	case 1603: { // x:(r)+,a y:(rh)+n,b
+	case 1607: { // x:(r)+,a y:(rh)+n,b
 		unhandled("x:(r)+,a y:(rh)+n,b");
 		break;
 		}
-	case 1604: { // x:(r)+,b y:(rh)+n,y0
+	case 1608: { // x:(r)+,b y:(rh)+n,y0
 		unhandled("x:(r)+,b y:(rh)+n,y0");
 		break;
 		}
-	case 1605: { // x:(r)+,b y:(rh)+n,y1
+	case 1609: { // x:(r)+,b y:(rh)+n,y1
 		unhandled("x:(r)+,b y:(rh)+n,y1");
 		break;
 		}
-	case 1606: { // x:(r)+,b y:(rh)+n,a
+	case 1610: { // x:(r)+,b y:(rh)+n,a
 		unhandled("x:(r)+,b y:(rh)+n,a");
 		break;
 		}
-	case 1607: { // x:(r)+,b y:(rh)+n,b
+	case 1611: { // x:(r)+,b y:(rh)+n,b
 		unhandled("x:(r)+,b y:(rh)+n,b");
 		break;
 		}
-	case 1608: { // x:(r)+,x0 y:(rh)-,y0
+	case 1612: { // x:(r)+,x0 y:(rh)-,y0
 		unhandled("x:(r)+,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1609: { // x:(r)+,x0 y:(rh)-,y1
+	case 1613: { // x:(r)+,x0 y:(rh)-,y1
 		unhandled("x:(r)+,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1610: { // x:(r)+,x0 y:(rh)-,a
+	case 1614: { // x:(r)+,x0 y:(rh)-,a
 		unhandled("x:(r)+,x0 y:(rh)-,a");
 		break;
 		}
-	case 1611: { // x:(r)+,x0 y:(rh)-,b
+	case 1615: { // x:(r)+,x0 y:(rh)-,b
 		unhandled("x:(r)+,x0 y:(rh)-,b");
 		break;
 		}
-	case 1612: { // x:(r)+,x1 y:(rh)-,y0
+	case 1616: { // x:(r)+,x1 y:(rh)-,y0
 		unhandled("x:(r)+,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1613: { // x:(r)+,x1 y:(rh)-,y1
+	case 1617: { // x:(r)+,x1 y:(rh)-,y1
 		unhandled("x:(r)+,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1614: { // x:(r)+,x1 y:(rh)-,a
+	case 1618: { // x:(r)+,x1 y:(rh)-,a
 		unhandled("x:(r)+,x1 y:(rh)-,a");
 		break;
 		}
-	case 1615: { // x:(r)+,x1 y:(rh)-,b
+	case 1619: { // x:(r)+,x1 y:(rh)-,b
 		unhandled("x:(r)+,x1 y:(rh)-,b");
 		break;
 		}
-	case 1616: { // x:(r)+,a y:(rh)-,y0
+	case 1620: { // x:(r)+,a y:(rh)-,y0
 		unhandled("x:(r)+,a y:(rh)-,y0");
 		break;
 		}
-	case 1617: { // x:(r)+,a y:(rh)-,y1
+	case 1621: { // x:(r)+,a y:(rh)-,y1
 		unhandled("x:(r)+,a y:(rh)-,y1");
 		break;
 		}
-	case 1618: { // x:(r)+,a y:(rh)-,a
+	case 1622: { // x:(r)+,a y:(rh)-,a
 		unhandled("x:(r)+,a y:(rh)-,a");
 		break;
 		}
-	case 1619: { // x:(r)+,a y:(rh)-,b
+	case 1623: { // x:(r)+,a y:(rh)-,b
 		unhandled("x:(r)+,a y:(rh)-,b");
 		break;
 		}
-	case 1620: { // x:(r)+,b y:(rh)-,y0
+	case 1624: { // x:(r)+,b y:(rh)-,y0
 		unhandled("x:(r)+,b y:(rh)-,y0");
 		break;
 		}
-	case 1621: { // x:(r)+,b y:(rh)-,y1
+	case 1625: { // x:(r)+,b y:(rh)-,y1
 		unhandled("x:(r)+,b y:(rh)-,y1");
 		break;
 		}
-	case 1622: { // x:(r)+,b y:(rh)-,a
+	case 1626: { // x:(r)+,b y:(rh)-,a
 		unhandled("x:(r)+,b y:(rh)-,a");
 		break;
 		}
-	case 1623: { // x:(r)+,b y:(rh)-,b
+	case 1627: { // x:(r)+,b y:(rh)-,b
 		unhandled("x:(r)+,b y:(rh)-,b");
 		break;
 		}
-	case 1624: { // x:(r)+,x0 y:(rh)+,y0
+	case 1628: { // x:(r)+,x0 y:(rh)+,y0
 		unhandled("x:(r)+,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1625: { // x:(r)+,x0 y:(rh)+,y1
+	case 1629: { // x:(r)+,x0 y:(rh)+,y1
 		unhandled("x:(r)+,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1626: { // x:(r)+,x0 y:(rh)+,a
+	case 1630: { // x:(r)+,x0 y:(rh)+,a
 		unhandled("x:(r)+,x0 y:(rh)+,a");
 		break;
 		}
-	case 1627: { // x:(r)+,x0 y:(rh)+,b
+	case 1631: { // x:(r)+,x0 y:(rh)+,b
 		unhandled("x:(r)+,x0 y:(rh)+,b");
 		break;
 		}
-	case 1628: { // x:(r)+,x1 y:(rh)+,y0
+	case 1632: { // x:(r)+,x1 y:(rh)+,y0
 		unhandled("x:(r)+,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1629: { // x:(r)+,x1 y:(rh)+,y1
+	case 1633: { // x:(r)+,x1 y:(rh)+,y1
 		unhandled("x:(r)+,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1630: { // x:(r)+,x1 y:(rh)+,a
+	case 1634: { // x:(r)+,x1 y:(rh)+,a
 		unhandled("x:(r)+,x1 y:(rh)+,a");
 		break;
 		}
-	case 1631: { // x:(r)+,x1 y:(rh)+,b
+	case 1635: { // x:(r)+,x1 y:(rh)+,b
 		unhandled("x:(r)+,x1 y:(rh)+,b");
 		break;
 		}
-	case 1632: { // x:(r)+,a y:(rh)+,y0
+	case 1636: { // x:(r)+,a y:(rh)+,y0
 		unhandled("x:(r)+,a y:(rh)+,y0");
 		break;
 		}
-	case 1633: { // x:(r)+,a y:(rh)+,y1
+	case 1637: { // x:(r)+,a y:(rh)+,y1
 		unhandled("x:(r)+,a y:(rh)+,y1");
 		break;
 		}
-	case 1634: { // x:(r)+,a y:(rh)+,a
+	case 1638: { // x:(r)+,a y:(rh)+,a
 		unhandled("x:(r)+,a y:(rh)+,a");
 		break;
 		}
-	case 1635: { // x:(r)+,a y:(rh)+,b
+	case 1639: { // x:(r)+,a y:(rh)+,b
 		unhandled("x:(r)+,a y:(rh)+,b");
 		break;
 		}
-	case 1636: { // x:(r)+,b y:(rh)+,y0
+	case 1640: { // x:(r)+,b y:(rh)+,y0
 		unhandled("x:(r)+,b y:(rh)+,y0");
 		break;
 		}
-	case 1637: { // x:(r)+,b y:(rh)+,y1
+	case 1641: { // x:(r)+,b y:(rh)+,y1
 		unhandled("x:(r)+,b y:(rh)+,y1");
 		break;
 		}
-	case 1638: { // x:(r)+,b y:(rh)+,a
+	case 1642: { // x:(r)+,b y:(rh)+,a
 		unhandled("x:(r)+,b y:(rh)+,a");
 		break;
 		}
-	case 1639: { // x:(r)+,b y:(rh)+,b
+	case 1643: { // x:(r)+,b y:(rh)+,b
 		unhandled("x:(r)+,b y:(rh)+,b");
 		break;
 		}
-	case 1640: { // x:(r)+,x0 y:(rh),y0
+	case 1644: { // x:(r)+,x0 y:(rh),y0
 		unhandled("x:(r)+,x0 y:(rh),y0");
 		break;
 		}
-	case 1641: { // x:(r)+,x0 y:(rh),y1
+	case 1645: { // x:(r)+,x0 y:(rh),y1
 		unhandled("x:(r)+,x0 y:(rh),y1");
 		break;
 		}
-	case 1642: { // x:(r)+,x0 y:(rh),a
+	case 1646: { // x:(r)+,x0 y:(rh),a
 		unhandled("x:(r)+,x0 y:(rh),a");
 		break;
 		}
-	case 1643: { // x:(r)+,x0 y:(rh),b
+	case 1647: { // x:(r)+,x0 y:(rh),b
 		unhandled("x:(r)+,x0 y:(rh),b");
 		break;
 		}
-	case 1644: { // x:(r)+,x1 y:(rh),y0
+	case 1648: { // x:(r)+,x1 y:(rh),y0
 		unhandled("x:(r)+,x1 y:(rh),y0");
 		break;
 		}
-	case 1645: { // x:(r)+,x1 y:(rh),y1
+	case 1649: { // x:(r)+,x1 y:(rh),y1
 		unhandled("x:(r)+,x1 y:(rh),y1");
 		break;
 		}
-	case 1646: { // x:(r)+,x1 y:(rh),a
+	case 1650: { // x:(r)+,x1 y:(rh),a
 		unhandled("x:(r)+,x1 y:(rh),a");
 		break;
 		}
-	case 1647: { // x:(r)+,x1 y:(rh),b
+	case 1651: { // x:(r)+,x1 y:(rh),b
 		unhandled("x:(r)+,x1 y:(rh),b");
 		break;
 		}
-	case 1648: { // x:(r)+,a y:(rh),y0
+	case 1652: { // x:(r)+,a y:(rh),y0
 		unhandled("x:(r)+,a y:(rh),y0");
 		break;
 		}
-	case 1649: { // x:(r)+,a y:(rh),y1
+	case 1653: { // x:(r)+,a y:(rh),y1
 		unhandled("x:(r)+,a y:(rh),y1");
 		break;
 		}
-	case 1650: { // x:(r)+,a y:(rh),a
+	case 1654: { // x:(r)+,a y:(rh),a
 		unhandled("x:(r)+,a y:(rh),a");
 		break;
 		}
-	case 1651: { // x:(r)+,a y:(rh),b
+	case 1655: { // x:(r)+,a y:(rh),b
 		unhandled("x:(r)+,a y:(rh),b");
 		break;
 		}
-	case 1652: { // x:(r)+,b y:(rh),y0
+	case 1656: { // x:(r)+,b y:(rh),y0
 		unhandled("x:(r)+,b y:(rh),y0");
 		break;
 		}
-	case 1653: { // x:(r)+,b y:(rh),y1
+	case 1657: { // x:(r)+,b y:(rh),y1
 		unhandled("x:(r)+,b y:(rh),y1");
 		break;
 		}
-	case 1654: { // x:(r)+,b y:(rh),a
+	case 1658: { // x:(r)+,b y:(rh),a
 		unhandled("x:(r)+,b y:(rh),a");
 		break;
 		}
-	case 1655: { // x:(r)+,b y:(rh),b
+	case 1659: { // x:(r)+,b y:(rh),b
 		unhandled("x:(r)+,b y:(rh),b");
 		break;
 		}
-	case 1656: { // x:(r),x0 y:(rh)+n,y0
+	case 1660: { // x:(r),x0 y:(rh)+n,y0
 		unhandled("x:(r),x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1657: { // x:(r),x0 y:(rh)+n,y1
+	case 1661: { // x:(r),x0 y:(rh)+n,y1
 		unhandled("x:(r),x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1658: { // x:(r),x0 y:(rh)+n,a
+	case 1662: { // x:(r),x0 y:(rh)+n,a
 		unhandled("x:(r),x0 y:(rh)+n,a");
 		break;
 		}
-	case 1659: { // x:(r),x0 y:(rh)+n,b
+	case 1663: { // x:(r),x0 y:(rh)+n,b
 		unhandled("x:(r),x0 y:(rh)+n,b");
 		break;
 		}
-	case 1660: { // x:(r),x1 y:(rh)+n,y0
+	case 1664: { // x:(r),x1 y:(rh)+n,y0
 		unhandled("x:(r),x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1661: { // x:(r),x1 y:(rh)+n,y1
+	case 1665: { // x:(r),x1 y:(rh)+n,y1
 		unhandled("x:(r),x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1662: { // x:(r),x1 y:(rh)+n,a
+	case 1666: { // x:(r),x1 y:(rh)+n,a
 		unhandled("x:(r),x1 y:(rh)+n,a");
 		break;
 		}
-	case 1663: { // x:(r),x1 y:(rh)+n,b
+	case 1667: { // x:(r),x1 y:(rh)+n,b
 		unhandled("x:(r),x1 y:(rh)+n,b");
 		break;
 		}
-	case 1664: { // x:(r),a y:(rh)+n,y0
+	case 1668: { // x:(r),a y:(rh)+n,y0
 		unhandled("x:(r),a y:(rh)+n,y0");
 		break;
 		}
-	case 1665: { // x:(r),a y:(rh)+n,y1
+	case 1669: { // x:(r),a y:(rh)+n,y1
 		unhandled("x:(r),a y:(rh)+n,y1");
 		break;
 		}
-	case 1666: { // x:(r),a y:(rh)+n,a
+	case 1670: { // x:(r),a y:(rh)+n,a
 		unhandled("x:(r),a y:(rh)+n,a");
 		break;
 		}
-	case 1667: { // x:(r),a y:(rh)+n,b
+	case 1671: { // x:(r),a y:(rh)+n,b
 		unhandled("x:(r),a y:(rh)+n,b");
 		break;
 		}
-	case 1668: { // x:(r),b y:(rh)+n,y0
+	case 1672: { // x:(r),b y:(rh)+n,y0
 		unhandled("x:(r),b y:(rh)+n,y0");
 		break;
 		}
-	case 1669: { // x:(r),b y:(rh)+n,y1
+	case 1673: { // x:(r),b y:(rh)+n,y1
 		unhandled("x:(r),b y:(rh)+n,y1");
 		break;
 		}
-	case 1670: { // x:(r),b y:(rh)+n,a
+	case 1674: { // x:(r),b y:(rh)+n,a
 		unhandled("x:(r),b y:(rh)+n,a");
 		break;
 		}
-	case 1671: { // x:(r),b y:(rh)+n,b
+	case 1675: { // x:(r),b y:(rh)+n,b
 		unhandled("x:(r),b y:(rh)+n,b");
 		break;
 		}
-	case 1672: { // x:(r),x0 y:(rh)-,y0
+	case 1676: { // x:(r),x0 y:(rh)-,y0
 		unhandled("x:(r),x0 y:(rh)-,y0");
 		break;
 		}
-	case 1673: { // x:(r),x0 y:(rh)-,y1
+	case 1677: { // x:(r),x0 y:(rh)-,y1
 		unhandled("x:(r),x0 y:(rh)-,y1");
 		break;
 		}
-	case 1674: { // x:(r),x0 y:(rh)-,a
+	case 1678: { // x:(r),x0 y:(rh)-,a
 		unhandled("x:(r),x0 y:(rh)-,a");
 		break;
 		}
-	case 1675: { // x:(r),x0 y:(rh)-,b
+	case 1679: { // x:(r),x0 y:(rh)-,b
 		unhandled("x:(r),x0 y:(rh)-,b");
 		break;
 		}
-	case 1676: { // x:(r),x1 y:(rh)-,y0
+	case 1680: { // x:(r),x1 y:(rh)-,y0
 		unhandled("x:(r),x1 y:(rh)-,y0");
 		break;
 		}
-	case 1677: { // x:(r),x1 y:(rh)-,y1
+	case 1681: { // x:(r),x1 y:(rh)-,y1
 		unhandled("x:(r),x1 y:(rh)-,y1");
 		break;
 		}
-	case 1678: { // x:(r),x1 y:(rh)-,a
+	case 1682: { // x:(r),x1 y:(rh)-,a
 		unhandled("x:(r),x1 y:(rh)-,a");
 		break;
 		}
-	case 1679: { // x:(r),x1 y:(rh)-,b
+	case 1683: { // x:(r),x1 y:(rh)-,b
 		unhandled("x:(r),x1 y:(rh)-,b");
 		break;
 		}
-	case 1680: { // x:(r),a y:(rh)-,y0
+	case 1684: { // x:(r),a y:(rh)-,y0
 		unhandled("x:(r),a y:(rh)-,y0");
 		break;
 		}
-	case 1681: { // x:(r),a y:(rh)-,y1
+	case 1685: { // x:(r),a y:(rh)-,y1
 		unhandled("x:(r),a y:(rh)-,y1");
 		break;
 		}
-	case 1682: { // x:(r),a y:(rh)-,a
+	case 1686: { // x:(r),a y:(rh)-,a
 		unhandled("x:(r),a y:(rh)-,a");
 		break;
 		}
-	case 1683: { // x:(r),a y:(rh)-,b
+	case 1687: { // x:(r),a y:(rh)-,b
 		unhandled("x:(r),a y:(rh)-,b");
 		break;
 		}
-	case 1684: { // x:(r),b y:(rh)-,y0
+	case 1688: { // x:(r),b y:(rh)-,y0
 		unhandled("x:(r),b y:(rh)-,y0");
 		break;
 		}
-	case 1685: { // x:(r),b y:(rh)-,y1
+	case 1689: { // x:(r),b y:(rh)-,y1
 		unhandled("x:(r),b y:(rh)-,y1");
 		break;
 		}
-	case 1686: { // x:(r),b y:(rh)-,a
+	case 1690: { // x:(r),b y:(rh)-,a
 		unhandled("x:(r),b y:(rh)-,a");
 		break;
 		}
-	case 1687: { // x:(r),b y:(rh)-,b
+	case 1691: { // x:(r),b y:(rh)-,b
 		unhandled("x:(r),b y:(rh)-,b");
 		break;
 		}
-	case 1688: { // x:(r),x0 y:(rh)+,y0
+	case 1692: { // x:(r),x0 y:(rh)+,y0
 		unhandled("x:(r),x0 y:(rh)+,y0");
 		break;
 		}
-	case 1689: { // x:(r),x0 y:(rh)+,y1
+	case 1693: { // x:(r),x0 y:(rh)+,y1
 		unhandled("x:(r),x0 y:(rh)+,y1");
 		break;
 		}
-	case 1690: { // x:(r),x0 y:(rh)+,a
+	case 1694: { // x:(r),x0 y:(rh)+,a
 		unhandled("x:(r),x0 y:(rh)+,a");
 		break;
 		}
-	case 1691: { // x:(r),x0 y:(rh)+,b
+	case 1695: { // x:(r),x0 y:(rh)+,b
 		unhandled("x:(r),x0 y:(rh)+,b");
 		break;
 		}
-	case 1692: { // x:(r),x1 y:(rh)+,y0
+	case 1696: { // x:(r),x1 y:(rh)+,y0
 		unhandled("x:(r),x1 y:(rh)+,y0");
 		break;
 		}
-	case 1693: { // x:(r),x1 y:(rh)+,y1
+	case 1697: { // x:(r),x1 y:(rh)+,y1
 		unhandled("x:(r),x1 y:(rh)+,y1");
 		break;
 		}
-	case 1694: { // x:(r),x1 y:(rh)+,a
+	case 1698: { // x:(r),x1 y:(rh)+,a
 		unhandled("x:(r),x1 y:(rh)+,a");
 		break;
 		}
-	case 1695: { // x:(r),x1 y:(rh)+,b
+	case 1699: { // x:(r),x1 y:(rh)+,b
 		unhandled("x:(r),x1 y:(rh)+,b");
 		break;
 		}
-	case 1696: { // x:(r),a y:(rh)+,y0
+	case 1700: { // x:(r),a y:(rh)+,y0
 		unhandled("x:(r),a y:(rh)+,y0");
 		break;
 		}
-	case 1697: { // x:(r),a y:(rh)+,y1
+	case 1701: { // x:(r),a y:(rh)+,y1
 		unhandled("x:(r),a y:(rh)+,y1");
 		break;
 		}
-	case 1698: { // x:(r),a y:(rh)+,a
+	case 1702: { // x:(r),a y:(rh)+,a
 		unhandled("x:(r),a y:(rh)+,a");
 		break;
 		}
-	case 1699: { // x:(r),a y:(rh)+,b
+	case 1703: { // x:(r),a y:(rh)+,b
 		unhandled("x:(r),a y:(rh)+,b");
 		break;
 		}
-	case 1700: { // x:(r),b y:(rh)+,y0
+	case 1704: { // x:(r),b y:(rh)+,y0
 		unhandled("x:(r),b y:(rh)+,y0");
 		break;
 		}
-	case 1701: { // x:(r),b y:(rh)+,y1
+	case 1705: { // x:(r),b y:(rh)+,y1
 		unhandled("x:(r),b y:(rh)+,y1");
 		break;
 		}
-	case 1702: { // x:(r),b y:(rh)+,a
+	case 1706: { // x:(r),b y:(rh)+,a
 		unhandled("x:(r),b y:(rh)+,a");
 		break;
 		}
-	case 1703: { // x:(r),b y:(rh)+,b
+	case 1707: { // x:(r),b y:(rh)+,b
 		unhandled("x:(r),b y:(rh)+,b");
 		break;
 		}
-	case 1704: { // x:(r),x0 y:(rh),y0
+	case 1708: { // x:(r),x0 y:(rh),y0
 		unhandled("x:(r),x0 y:(rh),y0");
 		break;
 		}
-	case 1705: { // x:(r),x0 y:(rh),y1
+	case 1709: { // x:(r),x0 y:(rh),y1
 		unhandled("x:(r),x0 y:(rh),y1");
 		break;
 		}
-	case 1706: { // x:(r),x0 y:(rh),a
+	case 1710: { // x:(r),x0 y:(rh),a
 		unhandled("x:(r),x0 y:(rh),a");
 		break;
 		}
-	case 1707: { // x:(r),x0 y:(rh),b
+	case 1711: { // x:(r),x0 y:(rh),b
 		unhandled("x:(r),x0 y:(rh),b");
 		break;
 		}
-	case 1708: { // x:(r),x1 y:(rh),y0
+	case 1712: { // x:(r),x1 y:(rh),y0
 		unhandled("x:(r),x1 y:(rh),y0");
 		break;
 		}
-	case 1709: { // x:(r),x1 y:(rh),y1
+	case 1713: { // x:(r),x1 y:(rh),y1
 		unhandled("x:(r),x1 y:(rh),y1");
 		break;
 		}
-	case 1710: { // x:(r),x1 y:(rh),a
+	case 1714: { // x:(r),x1 y:(rh),a
 		unhandled("x:(r),x1 y:(rh),a");
 		break;
 		}
-	case 1711: { // x:(r),x1 y:(rh),b
+	case 1715: { // x:(r),x1 y:(rh),b
 		unhandled("x:(r),x1 y:(rh),b");
 		break;
 		}
-	case 1712: { // x:(r),a y:(rh),y0
+	case 1716: { // x:(r),a y:(rh),y0
 		unhandled("x:(r),a y:(rh),y0");
 		break;
 		}
-	case 1713: { // x:(r),a y:(rh),y1
+	case 1717: { // x:(r),a y:(rh),y1
 		unhandled("x:(r),a y:(rh),y1");
 		break;
 		}
-	case 1714: { // x:(r),a y:(rh),a
+	case 1718: { // x:(r),a y:(rh),a
 		unhandled("x:(r),a y:(rh),a");
 		break;
 		}
-	case 1715: { // x:(r),a y:(rh),b
+	case 1719: { // x:(r),a y:(rh),b
 		unhandled("x:(r),a y:(rh),b");
 		break;
 		}
-	case 1716: { // x:(r),b y:(rh),y0
+	case 1720: { // x:(r),b y:(rh),y0
 		unhandled("x:(r),b y:(rh),y0");
 		break;
 		}
-	case 1717: { // x:(r),b y:(rh),y1
+	case 1721: { // x:(r),b y:(rh),y1
 		unhandled("x:(r),b y:(rh),y1");
 		break;
 		}
-	case 1718: { // x:(r),b y:(rh),a
+	case 1722: { // x:(r),b y:(rh),a
 		unhandled("x:(r),b y:(rh),a");
 		break;
 		}
-	case 1719: { // x:(r),b y:(rh),b
+	case 1723: { // x:(r),b y:(rh),b
 		unhandled("x:(r),b y:(rh),b");
 		break;
 		}
-	case 1720: { // x:(r)+n,x0 y0,y:(rh)+n
+	case 1724: { // x:(r)+n,x0 y0,y:(rh)+n
 		unhandled("x:(r)+n,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1721: { // x:(r)+n,x0 y1,y:(rh)+n
+	case 1725: { // x:(r)+n,x0 y1,y:(rh)+n
 		unhandled("x:(r)+n,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1722: { // x:(r)+n,x0 a,y:(rh)+n
+	case 1726: { // x:(r)+n,x0 a,y:(rh)+n
 		unhandled("x:(r)+n,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1723: { // x:(r)+n,x0 b,y:(rh)+n
+	case 1727: { // x:(r)+n,x0 b,y:(rh)+n
 		unhandled("x:(r)+n,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1724: { // x:(r)+n,x1 y0,y:(rh)+n
+	case 1728: { // x:(r)+n,x1 y0,y:(rh)+n
 		unhandled("x:(r)+n,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1725: { // x:(r)+n,x1 y1,y:(rh)+n
+	case 1729: { // x:(r)+n,x1 y1,y:(rh)+n
 		unhandled("x:(r)+n,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1726: { // x:(r)+n,x1 a,y:(rh)+n
+	case 1730: { // x:(r)+n,x1 a,y:(rh)+n
 		unhandled("x:(r)+n,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1727: { // x:(r)+n,x1 b,y:(rh)+n
+	case 1731: { // x:(r)+n,x1 b,y:(rh)+n
 		unhandled("x:(r)+n,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1728: { // x:(r)+n,a y0,y:(rh)+n
+	case 1732: { // x:(r)+n,a y0,y:(rh)+n
 		unhandled("x:(r)+n,a y0,y:(rh)+n");
 		break;
 		}
-	case 1729: { // x:(r)+n,a y1,y:(rh)+n
+	case 1733: { // x:(r)+n,a y1,y:(rh)+n
 		unhandled("x:(r)+n,a y1,y:(rh)+n");
 		break;
 		}
-	case 1730: { // x:(r)+n,a a,y:(rh)+n
+	case 1734: { // x:(r)+n,a a,y:(rh)+n
 		unhandled("x:(r)+n,a a,y:(rh)+n");
 		break;
 		}
-	case 1731: { // x:(r)+n,a b,y:(rh)+n
+	case 1735: { // x:(r)+n,a b,y:(rh)+n
 		unhandled("x:(r)+n,a b,y:(rh)+n");
 		break;
 		}
-	case 1732: { // x:(r)+n,b y0,y:(rh)+n
+	case 1736: { // x:(r)+n,b y0,y:(rh)+n
 		unhandled("x:(r)+n,b y0,y:(rh)+n");
 		break;
 		}
-	case 1733: { // x:(r)+n,b y1,y:(rh)+n
+	case 1737: { // x:(r)+n,b y1,y:(rh)+n
 		unhandled("x:(r)+n,b y1,y:(rh)+n");
 		break;
 		}
-	case 1734: { // x:(r)+n,b a,y:(rh)+n
+	case 1738: { // x:(r)+n,b a,y:(rh)+n
 		unhandled("x:(r)+n,b a,y:(rh)+n");
 		break;
 		}
-	case 1735: { // x:(r)+n,b b,y:(rh)+n
+	case 1739: { // x:(r)+n,b b,y:(rh)+n
 		unhandled("x:(r)+n,b b,y:(rh)+n");
 		break;
 		}
-	case 1736: { // x:(r)+n,x0 y0,y:(rh)-
+	case 1740: { // x:(r)+n,x0 y0,y:(rh)-
 		unhandled("x:(r)+n,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1737: { // x:(r)+n,x0 y1,y:(rh)-
+	case 1741: { // x:(r)+n,x0 y1,y:(rh)-
 		unhandled("x:(r)+n,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1738: { // x:(r)+n,x0 a,y:(rh)-
+	case 1742: { // x:(r)+n,x0 a,y:(rh)-
 		unhandled("x:(r)+n,x0 a,y:(rh)-");
 		break;
 		}
-	case 1739: { // x:(r)+n,x0 b,y:(rh)-
+	case 1743: { // x:(r)+n,x0 b,y:(rh)-
 		unhandled("x:(r)+n,x0 b,y:(rh)-");
 		break;
 		}
-	case 1740: { // x:(r)+n,x1 y0,y:(rh)-
+	case 1744: { // x:(r)+n,x1 y0,y:(rh)-
 		unhandled("x:(r)+n,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1741: { // x:(r)+n,x1 y1,y:(rh)-
+	case 1745: { // x:(r)+n,x1 y1,y:(rh)-
 		unhandled("x:(r)+n,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1742: { // x:(r)+n,x1 a,y:(rh)-
+	case 1746: { // x:(r)+n,x1 a,y:(rh)-
 		unhandled("x:(r)+n,x1 a,y:(rh)-");
 		break;
 		}
-	case 1743: { // x:(r)+n,x1 b,y:(rh)-
+	case 1747: { // x:(r)+n,x1 b,y:(rh)-
 		unhandled("x:(r)+n,x1 b,y:(rh)-");
 		break;
 		}
-	case 1744: { // x:(r)+n,a y0,y:(rh)-
+	case 1748: { // x:(r)+n,a y0,y:(rh)-
 		unhandled("x:(r)+n,a y0,y:(rh)-");
 		break;
 		}
-	case 1745: { // x:(r)+n,a y1,y:(rh)-
+	case 1749: { // x:(r)+n,a y1,y:(rh)-
 		unhandled("x:(r)+n,a y1,y:(rh)-");
 		break;
 		}
-	case 1746: { // x:(r)+n,a a,y:(rh)-
+	case 1750: { // x:(r)+n,a a,y:(rh)-
 		unhandled("x:(r)+n,a a,y:(rh)-");
 		break;
 		}
-	case 1747: { // x:(r)+n,a b,y:(rh)-
+	case 1751: { // x:(r)+n,a b,y:(rh)-
 		unhandled("x:(r)+n,a b,y:(rh)-");
 		break;
 		}
-	case 1748: { // x:(r)+n,b y0,y:(rh)-
+	case 1752: { // x:(r)+n,b y0,y:(rh)-
 		unhandled("x:(r)+n,b y0,y:(rh)-");
 		break;
 		}
-	case 1749: { // x:(r)+n,b y1,y:(rh)-
+	case 1753: { // x:(r)+n,b y1,y:(rh)-
 		unhandled("x:(r)+n,b y1,y:(rh)-");
 		break;
 		}
-	case 1750: { // x:(r)+n,b a,y:(rh)-
+	case 1754: { // x:(r)+n,b a,y:(rh)-
 		unhandled("x:(r)+n,b a,y:(rh)-");
 		break;
 		}
-	case 1751: { // x:(r)+n,b b,y:(rh)-
+	case 1755: { // x:(r)+n,b b,y:(rh)-
 		unhandled("x:(r)+n,b b,y:(rh)-");
 		break;
 		}
-	case 1752: { // x:(r)+n,x0 y0,y:(rh)+
+	case 1756: { // x:(r)+n,x0 y0,y:(rh)+
 		unhandled("x:(r)+n,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1753: { // x:(r)+n,x0 y1,y:(rh)+
+	case 1757: { // x:(r)+n,x0 y1,y:(rh)+
 		unhandled("x:(r)+n,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1754: { // x:(r)+n,x0 a,y:(rh)+
+	case 1758: { // x:(r)+n,x0 a,y:(rh)+
 		unhandled("x:(r)+n,x0 a,y:(rh)+");
 		break;
 		}
-	case 1755: { // x:(r)+n,x0 b,y:(rh)+
+	case 1759: { // x:(r)+n,x0 b,y:(rh)+
 		unhandled("x:(r)+n,x0 b,y:(rh)+");
 		break;
 		}
-	case 1756: { // x:(r)+n,x1 y0,y:(rh)+
+	case 1760: { // x:(r)+n,x1 y0,y:(rh)+
 		unhandled("x:(r)+n,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1757: { // x:(r)+n,x1 y1,y:(rh)+
+	case 1761: { // x:(r)+n,x1 y1,y:(rh)+
 		unhandled("x:(r)+n,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1758: { // x:(r)+n,x1 a,y:(rh)+
+	case 1762: { // x:(r)+n,x1 a,y:(rh)+
 		unhandled("x:(r)+n,x1 a,y:(rh)+");
 		break;
 		}
-	case 1759: { // x:(r)+n,x1 b,y:(rh)+
+	case 1763: { // x:(r)+n,x1 b,y:(rh)+
 		unhandled("x:(r)+n,x1 b,y:(rh)+");
 		break;
 		}
-	case 1760: { // x:(r)+n,a y0,y:(rh)+
+	case 1764: { // x:(r)+n,a y0,y:(rh)+
 		unhandled("x:(r)+n,a y0,y:(rh)+");
 		break;
 		}
-	case 1761: { // x:(r)+n,a y1,y:(rh)+
+	case 1765: { // x:(r)+n,a y1,y:(rh)+
 		unhandled("x:(r)+n,a y1,y:(rh)+");
 		break;
 		}
-	case 1762: { // x:(r)+n,a a,y:(rh)+
+	case 1766: { // x:(r)+n,a a,y:(rh)+
 		unhandled("x:(r)+n,a a,y:(rh)+");
 		break;
 		}
-	case 1763: { // x:(r)+n,a b,y:(rh)+
+	case 1767: { // x:(r)+n,a b,y:(rh)+
 		unhandled("x:(r)+n,a b,y:(rh)+");
 		break;
 		}
-	case 1764: { // x:(r)+n,b y0,y:(rh)+
+	case 1768: { // x:(r)+n,b y0,y:(rh)+
 		unhandled("x:(r)+n,b y0,y:(rh)+");
 		break;
 		}
-	case 1765: { // x:(r)+n,b y1,y:(rh)+
+	case 1769: { // x:(r)+n,b y1,y:(rh)+
 		unhandled("x:(r)+n,b y1,y:(rh)+");
 		break;
 		}
-	case 1766: { // x:(r)+n,b a,y:(rh)+
+	case 1770: { // x:(r)+n,b a,y:(rh)+
 		unhandled("x:(r)+n,b a,y:(rh)+");
 		break;
 		}
-	case 1767: { // x:(r)+n,b b,y:(rh)+
+	case 1771: { // x:(r)+n,b b,y:(rh)+
 		unhandled("x:(r)+n,b b,y:(rh)+");
 		break;
 		}
-	case 1768: { // x:(r)+n,x0 y0,y:(rh)
+	case 1772: { // x:(r)+n,x0 y0,y:(rh)
 		unhandled("x:(r)+n,x0 y0,y:(rh)");
 		break;
 		}
-	case 1769: { // x:(r)+n,x0 y1,y:(rh)
+	case 1773: { // x:(r)+n,x0 y1,y:(rh)
 		unhandled("x:(r)+n,x0 y1,y:(rh)");
 		break;
 		}
-	case 1770: { // x:(r)+n,x0 a,y:(rh)
+	case 1774: { // x:(r)+n,x0 a,y:(rh)
 		unhandled("x:(r)+n,x0 a,y:(rh)");
 		break;
 		}
-	case 1771: { // x:(r)+n,x0 b,y:(rh)
+	case 1775: { // x:(r)+n,x0 b,y:(rh)
 		unhandled("x:(r)+n,x0 b,y:(rh)");
 		break;
 		}
-	case 1772: { // x:(r)+n,x1 y0,y:(rh)
+	case 1776: { // x:(r)+n,x1 y0,y:(rh)
 		unhandled("x:(r)+n,x1 y0,y:(rh)");
 		break;
 		}
-	case 1773: { // x:(r)+n,x1 y1,y:(rh)
+	case 1777: { // x:(r)+n,x1 y1,y:(rh)
 		unhandled("x:(r)+n,x1 y1,y:(rh)");
 		break;
 		}
-	case 1774: { // x:(r)+n,x1 a,y:(rh)
+	case 1778: { // x:(r)+n,x1 a,y:(rh)
 		unhandled("x:(r)+n,x1 a,y:(rh)");
 		break;
 		}
-	case 1775: { // x:(r)+n,x1 b,y:(rh)
+	case 1779: { // x:(r)+n,x1 b,y:(rh)
 		unhandled("x:(r)+n,x1 b,y:(rh)");
 		break;
 		}
-	case 1776: { // x:(r)+n,a y0,y:(rh)
+	case 1780: { // x:(r)+n,a y0,y:(rh)
 		unhandled("x:(r)+n,a y0,y:(rh)");
 		break;
 		}
-	case 1777: { // x:(r)+n,a y1,y:(rh)
+	case 1781: { // x:(r)+n,a y1,y:(rh)
 		unhandled("x:(r)+n,a y1,y:(rh)");
 		break;
 		}
-	case 1778: { // x:(r)+n,a a,y:(rh)
+	case 1782: { // x:(r)+n,a a,y:(rh)
 		unhandled("x:(r)+n,a a,y:(rh)");
 		break;
 		}
-	case 1779: { // x:(r)+n,a b,y:(rh)
+	case 1783: { // x:(r)+n,a b,y:(rh)
 		unhandled("x:(r)+n,a b,y:(rh)");
 		break;
 		}
-	case 1780: { // x:(r)+n,b y0,y:(rh)
+	case 1784: { // x:(r)+n,b y0,y:(rh)
 		unhandled("x:(r)+n,b y0,y:(rh)");
 		break;
 		}
-	case 1781: { // x:(r)+n,b y1,y:(rh)
+	case 1785: { // x:(r)+n,b y1,y:(rh)
 		unhandled("x:(r)+n,b y1,y:(rh)");
 		break;
 		}
-	case 1782: { // x:(r)+n,b a,y:(rh)
+	case 1786: { // x:(r)+n,b a,y:(rh)
 		unhandled("x:(r)+n,b a,y:(rh)");
 		break;
 		}
-	case 1783: { // x:(r)+n,b b,y:(rh)
+	case 1787: { // x:(r)+n,b b,y:(rh)
 		unhandled("x:(r)+n,b b,y:(rh)");
 		break;
 		}
-	case 1784: { // x:(r)-,x0 y0,y:(rh)+n
+	case 1788: { // x:(r)-,x0 y0,y:(rh)+n
 		unhandled("x:(r)-,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1785: { // x:(r)-,x0 y1,y:(rh)+n
+	case 1789: { // x:(r)-,x0 y1,y:(rh)+n
 		unhandled("x:(r)-,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1786: { // x:(r)-,x0 a,y:(rh)+n
+	case 1790: { // x:(r)-,x0 a,y:(rh)+n
 		unhandled("x:(r)-,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1787: { // x:(r)-,x0 b,y:(rh)+n
+	case 1791: { // x:(r)-,x0 b,y:(rh)+n
 		unhandled("x:(r)-,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1788: { // x:(r)-,x1 y0,y:(rh)+n
+	case 1792: { // x:(r)-,x1 y0,y:(rh)+n
 		unhandled("x:(r)-,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1789: { // x:(r)-,x1 y1,y:(rh)+n
+	case 1793: { // x:(r)-,x1 y1,y:(rh)+n
 		unhandled("x:(r)-,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1790: { // x:(r)-,x1 a,y:(rh)+n
+	case 1794: { // x:(r)-,x1 a,y:(rh)+n
 		unhandled("x:(r)-,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1791: { // x:(r)-,x1 b,y:(rh)+n
+	case 1795: { // x:(r)-,x1 b,y:(rh)+n
 		unhandled("x:(r)-,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1792: { // x:(r)-,a y0,y:(rh)+n
+	case 1796: { // x:(r)-,a y0,y:(rh)+n
 		unhandled("x:(r)-,a y0,y:(rh)+n");
 		break;
 		}
-	case 1793: { // x:(r)-,a y1,y:(rh)+n
+	case 1797: { // x:(r)-,a y1,y:(rh)+n
 		unhandled("x:(r)-,a y1,y:(rh)+n");
 		break;
 		}
-	case 1794: { // x:(r)-,a a,y:(rh)+n
+	case 1798: { // x:(r)-,a a,y:(rh)+n
 		unhandled("x:(r)-,a a,y:(rh)+n");
 		break;
 		}
-	case 1795: { // x:(r)-,a b,y:(rh)+n
+	case 1799: { // x:(r)-,a b,y:(rh)+n
 		unhandled("x:(r)-,a b,y:(rh)+n");
 		break;
 		}
-	case 1796: { // x:(r)-,b y0,y:(rh)+n
+	case 1800: { // x:(r)-,b y0,y:(rh)+n
 		unhandled("x:(r)-,b y0,y:(rh)+n");
 		break;
 		}
-	case 1797: { // x:(r)-,b y1,y:(rh)+n
+	case 1801: { // x:(r)-,b y1,y:(rh)+n
 		unhandled("x:(r)-,b y1,y:(rh)+n");
 		break;
 		}
-	case 1798: { // x:(r)-,b a,y:(rh)+n
+	case 1802: { // x:(r)-,b a,y:(rh)+n
 		unhandled("x:(r)-,b a,y:(rh)+n");
 		break;
 		}
-	case 1799: { // x:(r)-,b b,y:(rh)+n
+	case 1803: { // x:(r)-,b b,y:(rh)+n
 		unhandled("x:(r)-,b b,y:(rh)+n");
 		break;
 		}
-	case 1800: { // x:(r)-,x0 y0,y:(rh)-
+	case 1804: { // x:(r)-,x0 y0,y:(rh)-
 		unhandled("x:(r)-,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1801: { // x:(r)-,x0 y1,y:(rh)-
+	case 1805: { // x:(r)-,x0 y1,y:(rh)-
 		unhandled("x:(r)-,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1802: { // x:(r)-,x0 a,y:(rh)-
+	case 1806: { // x:(r)-,x0 a,y:(rh)-
 		unhandled("x:(r)-,x0 a,y:(rh)-");
 		break;
 		}
-	case 1803: { // x:(r)-,x0 b,y:(rh)-
+	case 1807: { // x:(r)-,x0 b,y:(rh)-
 		unhandled("x:(r)-,x0 b,y:(rh)-");
 		break;
 		}
-	case 1804: { // x:(r)-,x1 y0,y:(rh)-
+	case 1808: { // x:(r)-,x1 y0,y:(rh)-
 		unhandled("x:(r)-,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1805: { // x:(r)-,x1 y1,y:(rh)-
+	case 1809: { // x:(r)-,x1 y1,y:(rh)-
 		unhandled("x:(r)-,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1806: { // x:(r)-,x1 a,y:(rh)-
+	case 1810: { // x:(r)-,x1 a,y:(rh)-
 		unhandled("x:(r)-,x1 a,y:(rh)-");
 		break;
 		}
-	case 1807: { // x:(r)-,x1 b,y:(rh)-
+	case 1811: { // x:(r)-,x1 b,y:(rh)-
 		unhandled("x:(r)-,x1 b,y:(rh)-");
 		break;
 		}
-	case 1808: { // x:(r)-,a y0,y:(rh)-
+	case 1812: { // x:(r)-,a y0,y:(rh)-
 		unhandled("x:(r)-,a y0,y:(rh)-");
 		break;
 		}
-	case 1809: { // x:(r)-,a y1,y:(rh)-
+	case 1813: { // x:(r)-,a y1,y:(rh)-
 		unhandled("x:(r)-,a y1,y:(rh)-");
 		break;
 		}
-	case 1810: { // x:(r)-,a a,y:(rh)-
+	case 1814: { // x:(r)-,a a,y:(rh)-
 		unhandled("x:(r)-,a a,y:(rh)-");
 		break;
 		}
-	case 1811: { // x:(r)-,a b,y:(rh)-
+	case 1815: { // x:(r)-,a b,y:(rh)-
 		unhandled("x:(r)-,a b,y:(rh)-");
 		break;
 		}
-	case 1812: { // x:(r)-,b y0,y:(rh)-
+	case 1816: { // x:(r)-,b y0,y:(rh)-
 		unhandled("x:(r)-,b y0,y:(rh)-");
 		break;
 		}
-	case 1813: { // x:(r)-,b y1,y:(rh)-
+	case 1817: { // x:(r)-,b y1,y:(rh)-
 		unhandled("x:(r)-,b y1,y:(rh)-");
 		break;
 		}
-	case 1814: { // x:(r)-,b a,y:(rh)-
+	case 1818: { // x:(r)-,b a,y:(rh)-
 		unhandled("x:(r)-,b a,y:(rh)-");
 		break;
 		}
-	case 1815: { // x:(r)-,b b,y:(rh)-
+	case 1819: { // x:(r)-,b b,y:(rh)-
 		unhandled("x:(r)-,b b,y:(rh)-");
 		break;
 		}
-	case 1816: { // x:(r)-,x0 y0,y:(rh)+
+	case 1820: { // x:(r)-,x0 y0,y:(rh)+
 		unhandled("x:(r)-,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1817: { // x:(r)-,x0 y1,y:(rh)+
+	case 1821: { // x:(r)-,x0 y1,y:(rh)+
 		unhandled("x:(r)-,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1818: { // x:(r)-,x0 a,y:(rh)+
+	case 1822: { // x:(r)-,x0 a,y:(rh)+
 		unhandled("x:(r)-,x0 a,y:(rh)+");
 		break;
 		}
-	case 1819: { // x:(r)-,x0 b,y:(rh)+
+	case 1823: { // x:(r)-,x0 b,y:(rh)+
 		unhandled("x:(r)-,x0 b,y:(rh)+");
 		break;
 		}
-	case 1820: { // x:(r)-,x1 y0,y:(rh)+
+	case 1824: { // x:(r)-,x1 y0,y:(rh)+
 		unhandled("x:(r)-,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1821: { // x:(r)-,x1 y1,y:(rh)+
+	case 1825: { // x:(r)-,x1 y1,y:(rh)+
 		unhandled("x:(r)-,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1822: { // x:(r)-,x1 a,y:(rh)+
+	case 1826: { // x:(r)-,x1 a,y:(rh)+
 		unhandled("x:(r)-,x1 a,y:(rh)+");
 		break;
 		}
-	case 1823: { // x:(r)-,x1 b,y:(rh)+
+	case 1827: { // x:(r)-,x1 b,y:(rh)+
 		unhandled("x:(r)-,x1 b,y:(rh)+");
 		break;
 		}
-	case 1824: { // x:(r)-,a y0,y:(rh)+
+	case 1828: { // x:(r)-,a y0,y:(rh)+
 		unhandled("x:(r)-,a y0,y:(rh)+");
 		break;
 		}
-	case 1825: { // x:(r)-,a y1,y:(rh)+
+	case 1829: { // x:(r)-,a y1,y:(rh)+
 		unhandled("x:(r)-,a y1,y:(rh)+");
 		break;
 		}
-	case 1826: { // x:(r)-,a a,y:(rh)+
+	case 1830: { // x:(r)-,a a,y:(rh)+
 		unhandled("x:(r)-,a a,y:(rh)+");
 		break;
 		}
-	case 1827: { // x:(r)-,a b,y:(rh)+
+	case 1831: { // x:(r)-,a b,y:(rh)+
 		unhandled("x:(r)-,a b,y:(rh)+");
 		break;
 		}
-	case 1828: { // x:(r)-,b y0,y:(rh)+
+	case 1832: { // x:(r)-,b y0,y:(rh)+
 		unhandled("x:(r)-,b y0,y:(rh)+");
 		break;
 		}
-	case 1829: { // x:(r)-,b y1,y:(rh)+
+	case 1833: { // x:(r)-,b y1,y:(rh)+
 		unhandled("x:(r)-,b y1,y:(rh)+");
 		break;
 		}
-	case 1830: { // x:(r)-,b a,y:(rh)+
+	case 1834: { // x:(r)-,b a,y:(rh)+
 		unhandled("x:(r)-,b a,y:(rh)+");
 		break;
 		}
-	case 1831: { // x:(r)-,b b,y:(rh)+
+	case 1835: { // x:(r)-,b b,y:(rh)+
 		unhandled("x:(r)-,b b,y:(rh)+");
 		break;
 		}
-	case 1832: { // x:(r)-,x0 y0,y:(rh)
+	case 1836: { // x:(r)-,x0 y0,y:(rh)
 		unhandled("x:(r)-,x0 y0,y:(rh)");
 		break;
 		}
-	case 1833: { // x:(r)-,x0 y1,y:(rh)
+	case 1837: { // x:(r)-,x0 y1,y:(rh)
 		unhandled("x:(r)-,x0 y1,y:(rh)");
 		break;
 		}
-	case 1834: { // x:(r)-,x0 a,y:(rh)
+	case 1838: { // x:(r)-,x0 a,y:(rh)
 		unhandled("x:(r)-,x0 a,y:(rh)");
 		break;
 		}
-	case 1835: { // x:(r)-,x0 b,y:(rh)
+	case 1839: { // x:(r)-,x0 b,y:(rh)
 		unhandled("x:(r)-,x0 b,y:(rh)");
 		break;
 		}
-	case 1836: { // x:(r)-,x1 y0,y:(rh)
+	case 1840: { // x:(r)-,x1 y0,y:(rh)
 		unhandled("x:(r)-,x1 y0,y:(rh)");
 		break;
 		}
-	case 1837: { // x:(r)-,x1 y1,y:(rh)
+	case 1841: { // x:(r)-,x1 y1,y:(rh)
 		unhandled("x:(r)-,x1 y1,y:(rh)");
 		break;
 		}
-	case 1838: { // x:(r)-,x1 a,y:(rh)
+	case 1842: { // x:(r)-,x1 a,y:(rh)
 		unhandled("x:(r)-,x1 a,y:(rh)");
 		break;
 		}
-	case 1839: { // x:(r)-,x1 b,y:(rh)
+	case 1843: { // x:(r)-,x1 b,y:(rh)
 		unhandled("x:(r)-,x1 b,y:(rh)");
 		break;
 		}
-	case 1840: { // x:(r)-,a y0,y:(rh)
+	case 1844: { // x:(r)-,a y0,y:(rh)
 		unhandled("x:(r)-,a y0,y:(rh)");
 		break;
 		}
-	case 1841: { // x:(r)-,a y1,y:(rh)
+	case 1845: { // x:(r)-,a y1,y:(rh)
 		unhandled("x:(r)-,a y1,y:(rh)");
 		break;
 		}
-	case 1842: { // x:(r)-,a a,y:(rh)
+	case 1846: { // x:(r)-,a a,y:(rh)
 		unhandled("x:(r)-,a a,y:(rh)");
 		break;
 		}
-	case 1843: { // x:(r)-,a b,y:(rh)
+	case 1847: { // x:(r)-,a b,y:(rh)
 		unhandled("x:(r)-,a b,y:(rh)");
 		break;
 		}
-	case 1844: { // x:(r)-,b y0,y:(rh)
+	case 1848: { // x:(r)-,b y0,y:(rh)
 		unhandled("x:(r)-,b y0,y:(rh)");
 		break;
 		}
-	case 1845: { // x:(r)-,b y1,y:(rh)
+	case 1849: { // x:(r)-,b y1,y:(rh)
 		unhandled("x:(r)-,b y1,y:(rh)");
 		break;
 		}
-	case 1846: { // x:(r)-,b a,y:(rh)
+	case 1850: { // x:(r)-,b a,y:(rh)
 		unhandled("x:(r)-,b a,y:(rh)");
 		break;
 		}
-	case 1847: { // x:(r)-,b b,y:(rh)
+	case 1851: { // x:(r)-,b b,y:(rh)
 		unhandled("x:(r)-,b b,y:(rh)");
 		break;
 		}
-	case 1848: { // x:(r)+,x0 y0,y:(rh)+n
+	case 1852: { // x:(r)+,x0 y0,y:(rh)+n
 		unhandled("x:(r)+,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1849: { // x:(r)+,x0 y1,y:(rh)+n
+	case 1853: { // x:(r)+,x0 y1,y:(rh)+n
 		unhandled("x:(r)+,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1850: { // x:(r)+,x0 a,y:(rh)+n
+	case 1854: { // x:(r)+,x0 a,y:(rh)+n
 		unhandled("x:(r)+,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1851: { // x:(r)+,x0 b,y:(rh)+n
+	case 1855: { // x:(r)+,x0 b,y:(rh)+n
 		unhandled("x:(r)+,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1852: { // x:(r)+,x1 y0,y:(rh)+n
+	case 1856: { // x:(r)+,x1 y0,y:(rh)+n
 		unhandled("x:(r)+,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1853: { // x:(r)+,x1 y1,y:(rh)+n
+	case 1857: { // x:(r)+,x1 y1,y:(rh)+n
 		unhandled("x:(r)+,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1854: { // x:(r)+,x1 a,y:(rh)+n
+	case 1858: { // x:(r)+,x1 a,y:(rh)+n
 		unhandled("x:(r)+,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1855: { // x:(r)+,x1 b,y:(rh)+n
+	case 1859: { // x:(r)+,x1 b,y:(rh)+n
 		unhandled("x:(r)+,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1856: { // x:(r)+,a y0,y:(rh)+n
+	case 1860: { // x:(r)+,a y0,y:(rh)+n
 		unhandled("x:(r)+,a y0,y:(rh)+n");
 		break;
 		}
-	case 1857: { // x:(r)+,a y1,y:(rh)+n
+	case 1861: { // x:(r)+,a y1,y:(rh)+n
 		unhandled("x:(r)+,a y1,y:(rh)+n");
 		break;
 		}
-	case 1858: { // x:(r)+,a a,y:(rh)+n
+	case 1862: { // x:(r)+,a a,y:(rh)+n
 		unhandled("x:(r)+,a a,y:(rh)+n");
 		break;
 		}
-	case 1859: { // x:(r)+,a b,y:(rh)+n
+	case 1863: { // x:(r)+,a b,y:(rh)+n
 		unhandled("x:(r)+,a b,y:(rh)+n");
 		break;
 		}
-	case 1860: { // x:(r)+,b y0,y:(rh)+n
+	case 1864: { // x:(r)+,b y0,y:(rh)+n
 		unhandled("x:(r)+,b y0,y:(rh)+n");
 		break;
 		}
-	case 1861: { // x:(r)+,b y1,y:(rh)+n
+	case 1865: { // x:(r)+,b y1,y:(rh)+n
 		unhandled("x:(r)+,b y1,y:(rh)+n");
 		break;
 		}
-	case 1862: { // x:(r)+,b a,y:(rh)+n
+	case 1866: { // x:(r)+,b a,y:(rh)+n
 		unhandled("x:(r)+,b a,y:(rh)+n");
 		break;
 		}
-	case 1863: { // x:(r)+,b b,y:(rh)+n
+	case 1867: { // x:(r)+,b b,y:(rh)+n
 		unhandled("x:(r)+,b b,y:(rh)+n");
 		break;
 		}
-	case 1864: { // x:(r)+,x0 y0,y:(rh)-
+	case 1868: { // x:(r)+,x0 y0,y:(rh)-
 		unhandled("x:(r)+,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1865: { // x:(r)+,x0 y1,y:(rh)-
+	case 1869: { // x:(r)+,x0 y1,y:(rh)-
 		unhandled("x:(r)+,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1866: { // x:(r)+,x0 a,y:(rh)-
+	case 1870: { // x:(r)+,x0 a,y:(rh)-
 		unhandled("x:(r)+,x0 a,y:(rh)-");
 		break;
 		}
-	case 1867: { // x:(r)+,x0 b,y:(rh)-
+	case 1871: { // x:(r)+,x0 b,y:(rh)-
 		unhandled("x:(r)+,x0 b,y:(rh)-");
 		break;
 		}
-	case 1868: { // x:(r)+,x1 y0,y:(rh)-
+	case 1872: { // x:(r)+,x1 y0,y:(rh)-
 		unhandled("x:(r)+,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1869: { // x:(r)+,x1 y1,y:(rh)-
+	case 1873: { // x:(r)+,x1 y1,y:(rh)-
 		unhandled("x:(r)+,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1870: { // x:(r)+,x1 a,y:(rh)-
+	case 1874: { // x:(r)+,x1 a,y:(rh)-
 		unhandled("x:(r)+,x1 a,y:(rh)-");
 		break;
 		}
-	case 1871: { // x:(r)+,x1 b,y:(rh)-
+	case 1875: { // x:(r)+,x1 b,y:(rh)-
 		unhandled("x:(r)+,x1 b,y:(rh)-");
 		break;
 		}
-	case 1872: { // x:(r)+,a y0,y:(rh)-
+	case 1876: { // x:(r)+,a y0,y:(rh)-
 		unhandled("x:(r)+,a y0,y:(rh)-");
 		break;
 		}
-	case 1873: { // x:(r)+,a y1,y:(rh)-
+	case 1877: { // x:(r)+,a y1,y:(rh)-
 		unhandled("x:(r)+,a y1,y:(rh)-");
 		break;
 		}
-	case 1874: { // x:(r)+,a a,y:(rh)-
+	case 1878: { // x:(r)+,a a,y:(rh)-
 		unhandled("x:(r)+,a a,y:(rh)-");
 		break;
 		}
-	case 1875: { // x:(r)+,a b,y:(rh)-
+	case 1879: { // x:(r)+,a b,y:(rh)-
 		unhandled("x:(r)+,a b,y:(rh)-");
 		break;
 		}
-	case 1876: { // x:(r)+,b y0,y:(rh)-
+	case 1880: { // x:(r)+,b y0,y:(rh)-
 		unhandled("x:(r)+,b y0,y:(rh)-");
 		break;
 		}
-	case 1877: { // x:(r)+,b y1,y:(rh)-
+	case 1881: { // x:(r)+,b y1,y:(rh)-
 		unhandled("x:(r)+,b y1,y:(rh)-");
 		break;
 		}
-	case 1878: { // x:(r)+,b a,y:(rh)-
+	case 1882: { // x:(r)+,b a,y:(rh)-
 		unhandled("x:(r)+,b a,y:(rh)-");
 		break;
 		}
-	case 1879: { // x:(r)+,b b,y:(rh)-
+	case 1883: { // x:(r)+,b b,y:(rh)-
 		unhandled("x:(r)+,b b,y:(rh)-");
 		break;
 		}
-	case 1880: { // x:(r)+,x0 y0,y:(rh)+
+	case 1884: { // x:(r)+,x0 y0,y:(rh)+
 		unhandled("x:(r)+,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1881: { // x:(r)+,x0 y1,y:(rh)+
+	case 1885: { // x:(r)+,x0 y1,y:(rh)+
 		unhandled("x:(r)+,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1882: { // x:(r)+,x0 a,y:(rh)+
+	case 1886: { // x:(r)+,x0 a,y:(rh)+
 		unhandled("x:(r)+,x0 a,y:(rh)+");
 		break;
 		}
-	case 1883: { // x:(r)+,x0 b,y:(rh)+
+	case 1887: { // x:(r)+,x0 b,y:(rh)+
 		unhandled("x:(r)+,x0 b,y:(rh)+");
 		break;
 		}
-	case 1884: { // x:(r)+,x1 y0,y:(rh)+
+	case 1888: { // x:(r)+,x1 y0,y:(rh)+
 		unhandled("x:(r)+,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1885: { // x:(r)+,x1 y1,y:(rh)+
+	case 1889: { // x:(r)+,x1 y1,y:(rh)+
 		unhandled("x:(r)+,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1886: { // x:(r)+,x1 a,y:(rh)+
+	case 1890: { // x:(r)+,x1 a,y:(rh)+
 		unhandled("x:(r)+,x1 a,y:(rh)+");
 		break;
 		}
-	case 1887: { // x:(r)+,x1 b,y:(rh)+
+	case 1891: { // x:(r)+,x1 b,y:(rh)+
 		unhandled("x:(r)+,x1 b,y:(rh)+");
 		break;
 		}
-	case 1888: { // x:(r)+,a y0,y:(rh)+
+	case 1892: { // x:(r)+,a y0,y:(rh)+
 		unhandled("x:(r)+,a y0,y:(rh)+");
 		break;
 		}
-	case 1889: { // x:(r)+,a y1,y:(rh)+
+	case 1893: { // x:(r)+,a y1,y:(rh)+
 		unhandled("x:(r)+,a y1,y:(rh)+");
 		break;
 		}
-	case 1890: { // x:(r)+,a a,y:(rh)+
+	case 1894: { // x:(r)+,a a,y:(rh)+
 		unhandled("x:(r)+,a a,y:(rh)+");
 		break;
 		}
-	case 1891: { // x:(r)+,a b,y:(rh)+
+	case 1895: { // x:(r)+,a b,y:(rh)+
 		unhandled("x:(r)+,a b,y:(rh)+");
 		break;
 		}
-	case 1892: { // x:(r)+,b y0,y:(rh)+
+	case 1896: { // x:(r)+,b y0,y:(rh)+
 		unhandled("x:(r)+,b y0,y:(rh)+");
 		break;
 		}
-	case 1893: { // x:(r)+,b y1,y:(rh)+
+	case 1897: { // x:(r)+,b y1,y:(rh)+
 		unhandled("x:(r)+,b y1,y:(rh)+");
 		break;
 		}
-	case 1894: { // x:(r)+,b a,y:(rh)+
+	case 1898: { // x:(r)+,b a,y:(rh)+
 		unhandled("x:(r)+,b a,y:(rh)+");
 		break;
 		}
-	case 1895: { // x:(r)+,b b,y:(rh)+
+	case 1899: { // x:(r)+,b b,y:(rh)+
 		unhandled("x:(r)+,b b,y:(rh)+");
 		break;
 		}
-	case 1896: { // x:(r)+,x0 y0,y:(rh)
+	case 1900: { // x:(r)+,x0 y0,y:(rh)
 		unhandled("x:(r)+,x0 y0,y:(rh)");
 		break;
 		}
-	case 1897: { // x:(r)+,x0 y1,y:(rh)
+	case 1901: { // x:(r)+,x0 y1,y:(rh)
 		unhandled("x:(r)+,x0 y1,y:(rh)");
 		break;
 		}
-	case 1898: { // x:(r)+,x0 a,y:(rh)
+	case 1902: { // x:(r)+,x0 a,y:(rh)
 		unhandled("x:(r)+,x0 a,y:(rh)");
 		break;
 		}
-	case 1899: { // x:(r)+,x0 b,y:(rh)
+	case 1903: { // x:(r)+,x0 b,y:(rh)
 		unhandled("x:(r)+,x0 b,y:(rh)");
 		break;
 		}
-	case 1900: { // x:(r)+,x1 y0,y:(rh)
+	case 1904: { // x:(r)+,x1 y0,y:(rh)
 		unhandled("x:(r)+,x1 y0,y:(rh)");
 		break;
 		}
-	case 1901: { // x:(r)+,x1 y1,y:(rh)
+	case 1905: { // x:(r)+,x1 y1,y:(rh)
 		unhandled("x:(r)+,x1 y1,y:(rh)");
 		break;
 		}
-	case 1902: { // x:(r)+,x1 a,y:(rh)
+	case 1906: { // x:(r)+,x1 a,y:(rh)
 		unhandled("x:(r)+,x1 a,y:(rh)");
 		break;
 		}
-	case 1903: { // x:(r)+,x1 b,y:(rh)
+	case 1907: { // x:(r)+,x1 b,y:(rh)
 		unhandled("x:(r)+,x1 b,y:(rh)");
 		break;
 		}
-	case 1904: { // x:(r)+,a y0,y:(rh)
+	case 1908: { // x:(r)+,a y0,y:(rh)
 		unhandled("x:(r)+,a y0,y:(rh)");
 		break;
 		}
-	case 1905: { // x:(r)+,a y1,y:(rh)
+	case 1909: { // x:(r)+,a y1,y:(rh)
 		unhandled("x:(r)+,a y1,y:(rh)");
 		break;
 		}
-	case 1906: { // x:(r)+,a a,y:(rh)
+	case 1910: { // x:(r)+,a a,y:(rh)
 		unhandled("x:(r)+,a a,y:(rh)");
 		break;
 		}
-	case 1907: { // x:(r)+,a b,y:(rh)
+	case 1911: { // x:(r)+,a b,y:(rh)
 		unhandled("x:(r)+,a b,y:(rh)");
 		break;
 		}
-	case 1908: { // x:(r)+,b y0,y:(rh)
+	case 1912: { // x:(r)+,b y0,y:(rh)
 		unhandled("x:(r)+,b y0,y:(rh)");
 		break;
 		}
-	case 1909: { // x:(r)+,b y1,y:(rh)
+	case 1913: { // x:(r)+,b y1,y:(rh)
 		unhandled("x:(r)+,b y1,y:(rh)");
 		break;
 		}
-	case 1910: { // x:(r)+,b a,y:(rh)
+	case 1914: { // x:(r)+,b a,y:(rh)
 		unhandled("x:(r)+,b a,y:(rh)");
 		break;
 		}
-	case 1911: { // x:(r)+,b b,y:(rh)
+	case 1915: { // x:(r)+,b b,y:(rh)
 		unhandled("x:(r)+,b b,y:(rh)");
 		break;
 		}
-	case 1912: { // x:(r),x0 y0,y:(rh)+n
+	case 1916: { // x:(r),x0 y0,y:(rh)+n
 		unhandled("x:(r),x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1913: { // x:(r),x0 y1,y:(rh)+n
+	case 1917: { // x:(r),x0 y1,y:(rh)+n
 		unhandled("x:(r),x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1914: { // x:(r),x0 a,y:(rh)+n
+	case 1918: { // x:(r),x0 a,y:(rh)+n
 		unhandled("x:(r),x0 a,y:(rh)+n");
 		break;
 		}
-	case 1915: { // x:(r),x0 b,y:(rh)+n
+	case 1919: { // x:(r),x0 b,y:(rh)+n
 		unhandled("x:(r),x0 b,y:(rh)+n");
 		break;
 		}
-	case 1916: { // x:(r),x1 y0,y:(rh)+n
+	case 1920: { // x:(r),x1 y0,y:(rh)+n
 		unhandled("x:(r),x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1917: { // x:(r),x1 y1,y:(rh)+n
+	case 1921: { // x:(r),x1 y1,y:(rh)+n
 		unhandled("x:(r),x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1918: { // x:(r),x1 a,y:(rh)+n
+	case 1922: { // x:(r),x1 a,y:(rh)+n
 		unhandled("x:(r),x1 a,y:(rh)+n");
 		break;
 		}
-	case 1919: { // x:(r),x1 b,y:(rh)+n
+	case 1923: { // x:(r),x1 b,y:(rh)+n
 		unhandled("x:(r),x1 b,y:(rh)+n");
 		break;
 		}
-	case 1920: { // x:(r),a y0,y:(rh)+n
+	case 1924: { // x:(r),a y0,y:(rh)+n
 		unhandled("x:(r),a y0,y:(rh)+n");
 		break;
 		}
-	case 1921: { // x:(r),a y1,y:(rh)+n
+	case 1925: { // x:(r),a y1,y:(rh)+n
 		unhandled("x:(r),a y1,y:(rh)+n");
 		break;
 		}
-	case 1922: { // x:(r),a a,y:(rh)+n
+	case 1926: { // x:(r),a a,y:(rh)+n
 		unhandled("x:(r),a a,y:(rh)+n");
 		break;
 		}
-	case 1923: { // x:(r),a b,y:(rh)+n
+	case 1927: { // x:(r),a b,y:(rh)+n
 		unhandled("x:(r),a b,y:(rh)+n");
 		break;
 		}
-	case 1924: { // x:(r),b y0,y:(rh)+n
+	case 1928: { // x:(r),b y0,y:(rh)+n
 		unhandled("x:(r),b y0,y:(rh)+n");
 		break;
 		}
-	case 1925: { // x:(r),b y1,y:(rh)+n
+	case 1929: { // x:(r),b y1,y:(rh)+n
 		unhandled("x:(r),b y1,y:(rh)+n");
 		break;
 		}
-	case 1926: { // x:(r),b a,y:(rh)+n
+	case 1930: { // x:(r),b a,y:(rh)+n
 		unhandled("x:(r),b a,y:(rh)+n");
 		break;
 		}
-	case 1927: { // x:(r),b b,y:(rh)+n
+	case 1931: { // x:(r),b b,y:(rh)+n
 		unhandled("x:(r),b b,y:(rh)+n");
 		break;
 		}
-	case 1928: { // x:(r),x0 y0,y:(rh)-
+	case 1932: { // x:(r),x0 y0,y:(rh)-
 		unhandled("x:(r),x0 y0,y:(rh)-");
 		break;
 		}
-	case 1929: { // x:(r),x0 y1,y:(rh)-
+	case 1933: { // x:(r),x0 y1,y:(rh)-
 		unhandled("x:(r),x0 y1,y:(rh)-");
 		break;
 		}
-	case 1930: { // x:(r),x0 a,y:(rh)-
+	case 1934: { // x:(r),x0 a,y:(rh)-
 		unhandled("x:(r),x0 a,y:(rh)-");
 		break;
 		}
-	case 1931: { // x:(r),x0 b,y:(rh)-
+	case 1935: { // x:(r),x0 b,y:(rh)-
 		unhandled("x:(r),x0 b,y:(rh)-");
 		break;
 		}
-	case 1932: { // x:(r),x1 y0,y:(rh)-
+	case 1936: { // x:(r),x1 y0,y:(rh)-
 		unhandled("x:(r),x1 y0,y:(rh)-");
 		break;
 		}
-	case 1933: { // x:(r),x1 y1,y:(rh)-
+	case 1937: { // x:(r),x1 y1,y:(rh)-
 		unhandled("x:(r),x1 y1,y:(rh)-");
 		break;
 		}
-	case 1934: { // x:(r),x1 a,y:(rh)-
+	case 1938: { // x:(r),x1 a,y:(rh)-
 		unhandled("x:(r),x1 a,y:(rh)-");
 		break;
 		}
-	case 1935: { // x:(r),x1 b,y:(rh)-
+	case 1939: { // x:(r),x1 b,y:(rh)-
 		unhandled("x:(r),x1 b,y:(rh)-");
 		break;
 		}
-	case 1936: { // x:(r),a y0,y:(rh)-
+	case 1940: { // x:(r),a y0,y:(rh)-
 		unhandled("x:(r),a y0,y:(rh)-");
 		break;
 		}
-	case 1937: { // x:(r),a y1,y:(rh)-
+	case 1941: { // x:(r),a y1,y:(rh)-
 		unhandled("x:(r),a y1,y:(rh)-");
 		break;
 		}
-	case 1938: { // x:(r),a a,y:(rh)-
+	case 1942: { // x:(r),a a,y:(rh)-
 		unhandled("x:(r),a a,y:(rh)-");
 		break;
 		}
-	case 1939: { // x:(r),a b,y:(rh)-
+	case 1943: { // x:(r),a b,y:(rh)-
 		unhandled("x:(r),a b,y:(rh)-");
 		break;
 		}
-	case 1940: { // x:(r),b y0,y:(rh)-
+	case 1944: { // x:(r),b y0,y:(rh)-
 		unhandled("x:(r),b y0,y:(rh)-");
 		break;
 		}
-	case 1941: { // x:(r),b y1,y:(rh)-
+	case 1945: { // x:(r),b y1,y:(rh)-
 		unhandled("x:(r),b y1,y:(rh)-");
 		break;
 		}
-	case 1942: { // x:(r),b a,y:(rh)-
+	case 1946: { // x:(r),b a,y:(rh)-
 		unhandled("x:(r),b a,y:(rh)-");
 		break;
 		}
-	case 1943: { // x:(r),b b,y:(rh)-
+	case 1947: { // x:(r),b b,y:(rh)-
 		unhandled("x:(r),b b,y:(rh)-");
 		break;
 		}
-	case 1944: { // x:(r),x0 y0,y:(rh)+
+	case 1948: { // x:(r),x0 y0,y:(rh)+
 		unhandled("x:(r),x0 y0,y:(rh)+");
 		break;
 		}
-	case 1945: { // x:(r),x0 y1,y:(rh)+
+	case 1949: { // x:(r),x0 y1,y:(rh)+
 		unhandled("x:(r),x0 y1,y:(rh)+");
 		break;
 		}
-	case 1946: { // x:(r),x0 a,y:(rh)+
+	case 1950: { // x:(r),x0 a,y:(rh)+
 		unhandled("x:(r),x0 a,y:(rh)+");
 		break;
 		}
-	case 1947: { // x:(r),x0 b,y:(rh)+
+	case 1951: { // x:(r),x0 b,y:(rh)+
 		unhandled("x:(r),x0 b,y:(rh)+");
 		break;
 		}
-	case 1948: { // x:(r),x1 y0,y:(rh)+
+	case 1952: { // x:(r),x1 y0,y:(rh)+
 		unhandled("x:(r),x1 y0,y:(rh)+");
 		break;
 		}
-	case 1949: { // x:(r),x1 y1,y:(rh)+
+	case 1953: { // x:(r),x1 y1,y:(rh)+
 		unhandled("x:(r),x1 y1,y:(rh)+");
 		break;
 		}
-	case 1950: { // x:(r),x1 a,y:(rh)+
+	case 1954: { // x:(r),x1 a,y:(rh)+
 		unhandled("x:(r),x1 a,y:(rh)+");
 		break;
 		}
-	case 1951: { // x:(r),x1 b,y:(rh)+
+	case 1955: { // x:(r),x1 b,y:(rh)+
 		unhandled("x:(r),x1 b,y:(rh)+");
 		break;
 		}
-	case 1952: { // x:(r),a y0,y:(rh)+
+	case 1956: { // x:(r),a y0,y:(rh)+
 		unhandled("x:(r),a y0,y:(rh)+");
 		break;
 		}
-	case 1953: { // x:(r),a y1,y:(rh)+
+	case 1957: { // x:(r),a y1,y:(rh)+
 		unhandled("x:(r),a y1,y:(rh)+");
 		break;
 		}
-	case 1954: { // x:(r),a a,y:(rh)+
+	case 1958: { // x:(r),a a,y:(rh)+
 		unhandled("x:(r),a a,y:(rh)+");
 		break;
 		}
-	case 1955: { // x:(r),a b,y:(rh)+
+	case 1959: { // x:(r),a b,y:(rh)+
 		unhandled("x:(r),a b,y:(rh)+");
 		break;
 		}
-	case 1956: { // x:(r),b y0,y:(rh)+
+	case 1960: { // x:(r),b y0,y:(rh)+
 		unhandled("x:(r),b y0,y:(rh)+");
 		break;
 		}
-	case 1957: { // x:(r),b y1,y:(rh)+
+	case 1961: { // x:(r),b y1,y:(rh)+
 		unhandled("x:(r),b y1,y:(rh)+");
 		break;
 		}
-	case 1958: { // x:(r),b a,y:(rh)+
+	case 1962: { // x:(r),b a,y:(rh)+
 		unhandled("x:(r),b a,y:(rh)+");
 		break;
 		}
-	case 1959: { // x:(r),b b,y:(rh)+
+	case 1963: { // x:(r),b b,y:(rh)+
 		unhandled("x:(r),b b,y:(rh)+");
 		break;
 		}
-	case 1960: { // x:(r),x0 y0,y:(rh)
+	case 1964: { // x:(r),x0 y0,y:(rh)
 		unhandled("x:(r),x0 y0,y:(rh)");
 		break;
 		}
-	case 1961: { // x:(r),x0 y1,y:(rh)
+	case 1965: { // x:(r),x0 y1,y:(rh)
 		unhandled("x:(r),x0 y1,y:(rh)");
 		break;
 		}
-	case 1962: { // x:(r),x0 a,y:(rh)
+	case 1966: { // x:(r),x0 a,y:(rh)
 		unhandled("x:(r),x0 a,y:(rh)");
 		break;
 		}
-	case 1963: { // x:(r),x0 b,y:(rh)
+	case 1967: { // x:(r),x0 b,y:(rh)
 		unhandled("x:(r),x0 b,y:(rh)");
 		break;
 		}
-	case 1964: { // x:(r),x1 y0,y:(rh)
+	case 1968: { // x:(r),x1 y0,y:(rh)
 		unhandled("x:(r),x1 y0,y:(rh)");
 		break;
 		}
-	case 1965: { // x:(r),x1 y1,y:(rh)
+	case 1969: { // x:(r),x1 y1,y:(rh)
 		unhandled("x:(r),x1 y1,y:(rh)");
 		break;
 		}
-	case 1966: { // x:(r),x1 a,y:(rh)
+	case 1970: { // x:(r),x1 a,y:(rh)
 		unhandled("x:(r),x1 a,y:(rh)");
 		break;
 		}
-	case 1967: { // x:(r),x1 b,y:(rh)
+	case 1971: { // x:(r),x1 b,y:(rh)
 		unhandled("x:(r),x1 b,y:(rh)");
 		break;
 		}
-	case 1968: { // x:(r),a y0,y:(rh)
+	case 1972: { // x:(r),a y0,y:(rh)
 		unhandled("x:(r),a y0,y:(rh)");
 		break;
 		}
-	case 1969: { // x:(r),a y1,y:(rh)
+	case 1973: { // x:(r),a y1,y:(rh)
 		unhandled("x:(r),a y1,y:(rh)");
 		break;
 		}
-	case 1970: { // x:(r),a a,y:(rh)
+	case 1974: { // x:(r),a a,y:(rh)
 		unhandled("x:(r),a a,y:(rh)");
 		break;
 		}
-	case 1971: { // x:(r),a b,y:(rh)
+	case 1975: { // x:(r),a b,y:(rh)
 		unhandled("x:(r),a b,y:(rh)");
 		break;
 		}
-	case 1972: { // x:(r),b y0,y:(rh)
+	case 1976: { // x:(r),b y0,y:(rh)
 		unhandled("x:(r),b y0,y:(rh)");
 		break;
 		}
-	case 1973: { // x:(r),b y1,y:(rh)
+	case 1977: { // x:(r),b y1,y:(rh)
 		unhandled("x:(r),b y1,y:(rh)");
 		break;
 		}
-	case 1974: { // x:(r),b a,y:(rh)
+	case 1978: { // x:(r),b a,y:(rh)
 		unhandled("x:(r),b a,y:(rh)");
 		break;
 		}
-	case 1975: { // x:(r),b b,y:(rh)
+	case 1979: { // x:(r),b b,y:(rh)
 		unhandled("x:(r),b b,y:(rh)");
 		break;
 		}
-	case 1976: { // x0,x:(r)+n y:(rh)+n,y0
+	case 1980: { // x0,x:(r)+n y:(rh)+n,y0
 		unhandled("x0,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1977: { // x0,x:(r)+n y:(rh)+n,y1
+	case 1981: { // x0,x:(r)+n y:(rh)+n,y1
 		unhandled("x0,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1978: { // x0,x:(r)+n y:(rh)+n,a
+	case 1982: { // x0,x:(r)+n y:(rh)+n,a
 		unhandled("x0,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1979: { // x0,x:(r)+n y:(rh)+n,b
+	case 1983: { // x0,x:(r)+n y:(rh)+n,b
 		unhandled("x0,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1980: { // x1,x:(r)+n y:(rh)+n,y0
+	case 1984: { // x1,x:(r)+n y:(rh)+n,y0
 		unhandled("x1,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1981: { // x1,x:(r)+n y:(rh)+n,y1
+	case 1985: { // x1,x:(r)+n y:(rh)+n,y1
 		unhandled("x1,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1982: { // x1,x:(r)+n y:(rh)+n,a
+	case 1986: { // x1,x:(r)+n y:(rh)+n,a
 		unhandled("x1,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1983: { // x1,x:(r)+n y:(rh)+n,b
+	case 1987: { // x1,x:(r)+n y:(rh)+n,b
 		unhandled("x1,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1984: { // a,x:(r)+n y:(rh)+n,y0
+	case 1988: { // a,x:(r)+n y:(rh)+n,y0
 		unhandled("a,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1985: { // a,x:(r)+n y:(rh)+n,y1
+	case 1989: { // a,x:(r)+n y:(rh)+n,y1
 		unhandled("a,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1986: { // a,x:(r)+n y:(rh)+n,a
+	case 1990: { // a,x:(r)+n y:(rh)+n,a
 		unhandled("a,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1987: { // a,x:(r)+n y:(rh)+n,b
+	case 1991: { // a,x:(r)+n y:(rh)+n,b
 		unhandled("a,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1988: { // b,x:(r)+n y:(rh)+n,y0
+	case 1992: { // b,x:(r)+n y:(rh)+n,y0
 		unhandled("b,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1989: { // b,x:(r)+n y:(rh)+n,y1
+	case 1993: { // b,x:(r)+n y:(rh)+n,y1
 		unhandled("b,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1990: { // b,x:(r)+n y:(rh)+n,a
+	case 1994: { // b,x:(r)+n y:(rh)+n,a
 		unhandled("b,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1991: { // b,x:(r)+n y:(rh)+n,b
+	case 1995: { // b,x:(r)+n y:(rh)+n,b
 		unhandled("b,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1992: { // x0,x:(r)+n y:(rh)-,y0
+	case 1996: { // x0,x:(r)+n y:(rh)-,y0
 		unhandled("x0,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1993: { // x0,x:(r)+n y:(rh)-,y1
+	case 1997: { // x0,x:(r)+n y:(rh)-,y1
 		unhandled("x0,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1994: { // x0,x:(r)+n y:(rh)-,a
+	case 1998: { // x0,x:(r)+n y:(rh)-,a
 		unhandled("x0,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1995: { // x0,x:(r)+n y:(rh)-,b
+	case 1999: { // x0,x:(r)+n y:(rh)-,b
 		unhandled("x0,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1996: { // x1,x:(r)+n y:(rh)-,y0
+	case 2000: { // x1,x:(r)+n y:(rh)-,y0
 		unhandled("x1,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1997: { // x1,x:(r)+n y:(rh)-,y1
+	case 2001: { // x1,x:(r)+n y:(rh)-,y1
 		unhandled("x1,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1998: { // x1,x:(r)+n y:(rh)-,a
+	case 2002: { // x1,x:(r)+n y:(rh)-,a
 		unhandled("x1,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1999: { // x1,x:(r)+n y:(rh)-,b
+	case 2003: { // x1,x:(r)+n y:(rh)-,b
 		unhandled("x1,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 2000: { // a,x:(r)+n y:(rh)-,y0
+	case 2004: { // a,x:(r)+n y:(rh)-,y0
 		unhandled("a,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 2001: { // a,x:(r)+n y:(rh)-,y1
+	case 2005: { // a,x:(r)+n y:(rh)-,y1
 		unhandled("a,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 2002: { // a,x:(r)+n y:(rh)-,a
+	case 2006: { // a,x:(r)+n y:(rh)-,a
 		unhandled("a,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 2003: { // a,x:(r)+n y:(rh)-,b
+	case 2007: { // a,x:(r)+n y:(rh)-,b
 		unhandled("a,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 2004: { // b,x:(r)+n y:(rh)-,y0
+	case 2008: { // b,x:(r)+n y:(rh)-,y0
 		unhandled("b,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 2005: { // b,x:(r)+n y:(rh)-,y1
+	case 2009: { // b,x:(r)+n y:(rh)-,y1
 		unhandled("b,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 2006: { // b,x:(r)+n y:(rh)-,a
+	case 2010: { // b,x:(r)+n y:(rh)-,a
 		unhandled("b,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 2007: { // b,x:(r)+n y:(rh)-,b
+	case 2011: { // b,x:(r)+n y:(rh)-,b
 		unhandled("b,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 2008: { // x0,x:(r)+n y:(rh)+,y0
+	case 2012: { // x0,x:(r)+n y:(rh)+,y0
 		unhandled("x0,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 2009: { // x0,x:(r)+n y:(rh)+,y1
+	case 2013: { // x0,x:(r)+n y:(rh)+,y1
 		unhandled("x0,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 2010: { // x0,x:(r)+n y:(rh)+,a
+	case 2014: { // x0,x:(r)+n y:(rh)+,a
 		unhandled("x0,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 2011: { // x0,x:(r)+n y:(rh)+,b
+	case 2015: { // x0,x:(r)+n y:(rh)+,b
 		unhandled("x0,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 2012: { // x1,x:(r)+n y:(rh)+,y0
+	case 2016: { // x1,x:(r)+n y:(rh)+,y0
 		unhandled("x1,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 2013: { // x1,x:(r)+n y:(rh)+,y1
+	case 2017: { // x1,x:(r)+n y:(rh)+,y1
 		unhandled("x1,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 2014: { // x1,x:(r)+n y:(rh)+,a
+	case 2018: { // x1,x:(r)+n y:(rh)+,a
 		unhandled("x1,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 2015: { // x1,x:(r)+n y:(rh)+,b
+	case 2019: { // x1,x:(r)+n y:(rh)+,b
 		unhandled("x1,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 2016: { // a,x:(r)+n y:(rh)+,y0
+	case 2020: { // a,x:(r)+n y:(rh)+,y0
 		unhandled("a,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 2017: { // a,x:(r)+n y:(rh)+,y1
+	case 2021: { // a,x:(r)+n y:(rh)+,y1
 		unhandled("a,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 2018: { // a,x:(r)+n y:(rh)+,a
+	case 2022: { // a,x:(r)+n y:(rh)+,a
 		unhandled("a,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 2019: { // a,x:(r)+n y:(rh)+,b
+	case 2023: { // a,x:(r)+n y:(rh)+,b
 		unhandled("a,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 2020: { // b,x:(r)+n y:(rh)+,y0
+	case 2024: { // b,x:(r)+n y:(rh)+,y0
 		unhandled("b,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 2021: { // b,x:(r)+n y:(rh)+,y1
+	case 2025: { // b,x:(r)+n y:(rh)+,y1
 		unhandled("b,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 2022: { // b,x:(r)+n y:(rh)+,a
+	case 2026: { // b,x:(r)+n y:(rh)+,a
 		unhandled("b,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 2023: { // b,x:(r)+n y:(rh)+,b
+	case 2027: { // b,x:(r)+n y:(rh)+,b
 		unhandled("b,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 2024: { // x0,x:(r)+n y:(rh),y0
+	case 2028: { // x0,x:(r)+n y:(rh),y0
 		unhandled("x0,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 2025: { // x0,x:(r)+n y:(rh),y1
+	case 2029: { // x0,x:(r)+n y:(rh),y1
 		unhandled("x0,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 2026: { // x0,x:(r)+n y:(rh),a
+	case 2030: { // x0,x:(r)+n y:(rh),a
 		unhandled("x0,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 2027: { // x0,x:(r)+n y:(rh),b
+	case 2031: { // x0,x:(r)+n y:(rh),b
 		unhandled("x0,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 2028: { // x1,x:(r)+n y:(rh),y0
+	case 2032: { // x1,x:(r)+n y:(rh),y0
 		unhandled("x1,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 2029: { // x1,x:(r)+n y:(rh),y1
+	case 2033: { // x1,x:(r)+n y:(rh),y1
 		unhandled("x1,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 2030: { // x1,x:(r)+n y:(rh),a
+	case 2034: { // x1,x:(r)+n y:(rh),a
 		unhandled("x1,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 2031: { // x1,x:(r)+n y:(rh),b
+	case 2035: { // x1,x:(r)+n y:(rh),b
 		unhandled("x1,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 2032: { // a,x:(r)+n y:(rh),y0
+	case 2036: { // a,x:(r)+n y:(rh),y0
 		unhandled("a,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 2033: { // a,x:(r)+n y:(rh),y1
+	case 2037: { // a,x:(r)+n y:(rh),y1
 		unhandled("a,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 2034: { // a,x:(r)+n y:(rh),a
+	case 2038: { // a,x:(r)+n y:(rh),a
 		unhandled("a,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 2035: { // a,x:(r)+n y:(rh),b
+	case 2039: { // a,x:(r)+n y:(rh),b
 		unhandled("a,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 2036: { // b,x:(r)+n y:(rh),y0
+	case 2040: { // b,x:(r)+n y:(rh),y0
 		unhandled("b,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 2037: { // b,x:(r)+n y:(rh),y1
+	case 2041: { // b,x:(r)+n y:(rh),y1
 		unhandled("b,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 2038: { // b,x:(r)+n y:(rh),a
+	case 2042: { // b,x:(r)+n y:(rh),a
 		unhandled("b,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 2039: { // b,x:(r)+n y:(rh),b
+	case 2043: { // b,x:(r)+n y:(rh),b
 		unhandled("b,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 2040: { // x0,x:(r)- y:(rh)+n,y0
+	case 2044: { // x0,x:(r)- y:(rh)+n,y0
 		unhandled("x0,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 2041: { // x0,x:(r)- y:(rh)+n,y1
+	case 2045: { // x0,x:(r)- y:(rh)+n,y1
 		unhandled("x0,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 2042: { // x0,x:(r)- y:(rh)+n,a
+	case 2046: { // x0,x:(r)- y:(rh)+n,a
 		unhandled("x0,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 2043: { // x0,x:(r)- y:(rh)+n,b
+	case 2047: { // x0,x:(r)- y:(rh)+n,b
 		unhandled("x0,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 2044: { // x1,x:(r)- y:(rh)+n,y0
+	case 2048: { // x1,x:(r)- y:(rh)+n,y0
 		unhandled("x1,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 2045: { // x1,x:(r)- y:(rh)+n,y1
+	case 2049: { // x1,x:(r)- y:(rh)+n,y1
 		unhandled("x1,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 2046: { // x1,x:(r)- y:(rh)+n,a
+	case 2050: { // x1,x:(r)- y:(rh)+n,a
 		unhandled("x1,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 2047: { // x1,x:(r)- y:(rh)+n,b
+	case 2051: { // x1,x:(r)- y:(rh)+n,b
 		unhandled("x1,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 2048: { // a,x:(r)- y:(rh)+n,y0
+	case 2052: { // a,x:(r)- y:(rh)+n,y0
 		unhandled("a,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 2049: { // a,x:(r)- y:(rh)+n,y1
+	case 2053: { // a,x:(r)- y:(rh)+n,y1
 		unhandled("a,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 2050: { // a,x:(r)- y:(rh)+n,a
+	case 2054: { // a,x:(r)- y:(rh)+n,a
 		unhandled("a,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 2051: { // a,x:(r)- y:(rh)+n,b
+	case 2055: { // a,x:(r)- y:(rh)+n,b
 		unhandled("a,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 2052: { // b,x:(r)- y:(rh)+n,y0
+	case 2056: { // b,x:(r)- y:(rh)+n,y0
 		unhandled("b,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 2053: { // b,x:(r)- y:(rh)+n,y1
+	case 2057: { // b,x:(r)- y:(rh)+n,y1
 		unhandled("b,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 2054: { // b,x:(r)- y:(rh)+n,a
+	case 2058: { // b,x:(r)- y:(rh)+n,a
 		unhandled("b,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 2055: { // b,x:(r)- y:(rh)+n,b
+	case 2059: { // b,x:(r)- y:(rh)+n,b
 		unhandled("b,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 2056: { // x0,x:(r)- y:(rh)-,y0
+	case 2060: { // x0,x:(r)- y:(rh)-,y0
 		unhandled("x0,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2057: { // x0,x:(r)- y:(rh)-,y1
+	case 2061: { // x0,x:(r)- y:(rh)-,y1
 		unhandled("x0,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2058: { // x0,x:(r)- y:(rh)-,a
+	case 2062: { // x0,x:(r)- y:(rh)-,a
 		unhandled("x0,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2059: { // x0,x:(r)- y:(rh)-,b
+	case 2063: { // x0,x:(r)- y:(rh)-,b
 		unhandled("x0,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2060: { // x1,x:(r)- y:(rh)-,y0
+	case 2064: { // x1,x:(r)- y:(rh)-,y0
 		unhandled("x1,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2061: { // x1,x:(r)- y:(rh)-,y1
+	case 2065: { // x1,x:(r)- y:(rh)-,y1
 		unhandled("x1,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2062: { // x1,x:(r)- y:(rh)-,a
+	case 2066: { // x1,x:(r)- y:(rh)-,a
 		unhandled("x1,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2063: { // x1,x:(r)- y:(rh)-,b
+	case 2067: { // x1,x:(r)- y:(rh)-,b
 		unhandled("x1,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2064: { // a,x:(r)- y:(rh)-,y0
+	case 2068: { // a,x:(r)- y:(rh)-,y0
 		unhandled("a,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2065: { // a,x:(r)- y:(rh)-,y1
+	case 2069: { // a,x:(r)- y:(rh)-,y1
 		unhandled("a,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2066: { // a,x:(r)- y:(rh)-,a
+	case 2070: { // a,x:(r)- y:(rh)-,a
 		unhandled("a,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2067: { // a,x:(r)- y:(rh)-,b
+	case 2071: { // a,x:(r)- y:(rh)-,b
 		unhandled("a,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2068: { // b,x:(r)- y:(rh)-,y0
+	case 2072: { // b,x:(r)- y:(rh)-,y0
 		unhandled("b,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2069: { // b,x:(r)- y:(rh)-,y1
+	case 2073: { // b,x:(r)- y:(rh)-,y1
 		unhandled("b,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2070: { // b,x:(r)- y:(rh)-,a
+	case 2074: { // b,x:(r)- y:(rh)-,a
 		unhandled("b,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2071: { // b,x:(r)- y:(rh)-,b
+	case 2075: { // b,x:(r)- y:(rh)-,b
 		unhandled("b,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2072: { // x0,x:(r)- y:(rh)+,y0
+	case 2076: { // x0,x:(r)- y:(rh)+,y0
 		unhandled("x0,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2073: { // x0,x:(r)- y:(rh)+,y1
+	case 2077: { // x0,x:(r)- y:(rh)+,y1
 		unhandled("x0,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2074: { // x0,x:(r)- y:(rh)+,a
+	case 2078: { // x0,x:(r)- y:(rh)+,a
 		unhandled("x0,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2075: { // x0,x:(r)- y:(rh)+,b
+	case 2079: { // x0,x:(r)- y:(rh)+,b
 		unhandled("x0,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2076: { // x1,x:(r)- y:(rh)+,y0
+	case 2080: { // x1,x:(r)- y:(rh)+,y0
 		unhandled("x1,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2077: { // x1,x:(r)- y:(rh)+,y1
+	case 2081: { // x1,x:(r)- y:(rh)+,y1
 		unhandled("x1,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2078: { // x1,x:(r)- y:(rh)+,a
+	case 2082: { // x1,x:(r)- y:(rh)+,a
 		unhandled("x1,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2079: { // x1,x:(r)- y:(rh)+,b
+	case 2083: { // x1,x:(r)- y:(rh)+,b
 		unhandled("x1,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2080: { // a,x:(r)- y:(rh)+,y0
+	case 2084: { // a,x:(r)- y:(rh)+,y0
 		unhandled("a,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2081: { // a,x:(r)- y:(rh)+,y1
+	case 2085: { // a,x:(r)- y:(rh)+,y1
 		unhandled("a,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2082: { // a,x:(r)- y:(rh)+,a
+	case 2086: { // a,x:(r)- y:(rh)+,a
 		unhandled("a,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2083: { // a,x:(r)- y:(rh)+,b
+	case 2087: { // a,x:(r)- y:(rh)+,b
 		unhandled("a,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2084: { // b,x:(r)- y:(rh)+,y0
+	case 2088: { // b,x:(r)- y:(rh)+,y0
 		unhandled("b,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2085: { // b,x:(r)- y:(rh)+,y1
+	case 2089: { // b,x:(r)- y:(rh)+,y1
 		unhandled("b,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2086: { // b,x:(r)- y:(rh)+,a
+	case 2090: { // b,x:(r)- y:(rh)+,a
 		unhandled("b,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2087: { // b,x:(r)- y:(rh)+,b
+	case 2091: { // b,x:(r)- y:(rh)+,b
 		unhandled("b,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2088: { // x0,x:(r)- y:(rh),y0
+	case 2092: { // x0,x:(r)- y:(rh),y0
 		unhandled("x0,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2089: { // x0,x:(r)- y:(rh),y1
+	case 2093: { // x0,x:(r)- y:(rh),y1
 		unhandled("x0,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2090: { // x0,x:(r)- y:(rh),a
+	case 2094: { // x0,x:(r)- y:(rh),a
 		unhandled("x0,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2091: { // x0,x:(r)- y:(rh),b
+	case 2095: { // x0,x:(r)- y:(rh),b
 		unhandled("x0,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2092: { // x1,x:(r)- y:(rh),y0
+	case 2096: { // x1,x:(r)- y:(rh),y0
 		unhandled("x1,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2093: { // x1,x:(r)- y:(rh),y1
+	case 2097: { // x1,x:(r)- y:(rh),y1
 		unhandled("x1,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2094: { // x1,x:(r)- y:(rh),a
+	case 2098: { // x1,x:(r)- y:(rh),a
 		unhandled("x1,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2095: { // x1,x:(r)- y:(rh),b
+	case 2099: { // x1,x:(r)- y:(rh),b
 		unhandled("x1,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2096: { // a,x:(r)- y:(rh),y0
+	case 2100: { // a,x:(r)- y:(rh),y0
 		unhandled("a,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2097: { // a,x:(r)- y:(rh),y1
+	case 2101: { // a,x:(r)- y:(rh),y1
 		unhandled("a,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2098: { // a,x:(r)- y:(rh),a
+	case 2102: { // a,x:(r)- y:(rh),a
 		unhandled("a,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2099: { // a,x:(r)- y:(rh),b
+	case 2103: { // a,x:(r)- y:(rh),b
 		unhandled("a,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2100: { // b,x:(r)- y:(rh),y0
+	case 2104: { // b,x:(r)- y:(rh),y0
 		unhandled("b,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2101: { // b,x:(r)- y:(rh),y1
+	case 2105: { // b,x:(r)- y:(rh),y1
 		unhandled("b,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2102: { // b,x:(r)- y:(rh),a
+	case 2106: { // b,x:(r)- y:(rh),a
 		unhandled("b,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2103: { // b,x:(r)- y:(rh),b
+	case 2107: { // b,x:(r)- y:(rh),b
 		unhandled("b,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2104: { // x0,x:(r)+ y:(rh)+n,y0
+	case 2108: { // x0,x:(r)+ y:(rh)+n,y0
 		unhandled("x0,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2105: { // x0,x:(r)+ y:(rh)+n,y1
+	case 2109: { // x0,x:(r)+ y:(rh)+n,y1
 		unhandled("x0,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2106: { // x0,x:(r)+ y:(rh)+n,a
+	case 2110: { // x0,x:(r)+ y:(rh)+n,a
 		unhandled("x0,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2107: { // x0,x:(r)+ y:(rh)+n,b
+	case 2111: { // x0,x:(r)+ y:(rh)+n,b
 		unhandled("x0,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2108: { // x1,x:(r)+ y:(rh)+n,y0
+	case 2112: { // x1,x:(r)+ y:(rh)+n,y0
 		unhandled("x1,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2109: { // x1,x:(r)+ y:(rh)+n,y1
+	case 2113: { // x1,x:(r)+ y:(rh)+n,y1
 		unhandled("x1,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2110: { // x1,x:(r)+ y:(rh)+n,a
+	case 2114: { // x1,x:(r)+ y:(rh)+n,a
 		unhandled("x1,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2111: { // x1,x:(r)+ y:(rh)+n,b
+	case 2115: { // x1,x:(r)+ y:(rh)+n,b
 		unhandled("x1,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2112: { // a,x:(r)+ y:(rh)+n,y0
+	case 2116: { // a,x:(r)+ y:(rh)+n,y0
 		unhandled("a,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2113: { // a,x:(r)+ y:(rh)+n,y1
+	case 2117: { // a,x:(r)+ y:(rh)+n,y1
 		unhandled("a,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2114: { // a,x:(r)+ y:(rh)+n,a
+	case 2118: { // a,x:(r)+ y:(rh)+n,a
 		unhandled("a,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2115: { // a,x:(r)+ y:(rh)+n,b
+	case 2119: { // a,x:(r)+ y:(rh)+n,b
 		unhandled("a,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2116: { // b,x:(r)+ y:(rh)+n,y0
+	case 2120: { // b,x:(r)+ y:(rh)+n,y0
 		unhandled("b,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2117: { // b,x:(r)+ y:(rh)+n,y1
+	case 2121: { // b,x:(r)+ y:(rh)+n,y1
 		unhandled("b,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2118: { // b,x:(r)+ y:(rh)+n,a
+	case 2122: { // b,x:(r)+ y:(rh)+n,a
 		unhandled("b,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2119: { // b,x:(r)+ y:(rh)+n,b
+	case 2123: { // b,x:(r)+ y:(rh)+n,b
 		unhandled("b,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2120: { // x0,x:(r)+ y:(rh)-,y0
+	case 2124: { // x0,x:(r)+ y:(rh)-,y0
 		unhandled("x0,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2121: { // x0,x:(r)+ y:(rh)-,y1
+	case 2125: { // x0,x:(r)+ y:(rh)-,y1
 		unhandled("x0,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2122: { // x0,x:(r)+ y:(rh)-,a
+	case 2126: { // x0,x:(r)+ y:(rh)-,a
 		unhandled("x0,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2123: { // x0,x:(r)+ y:(rh)-,b
+	case 2127: { // x0,x:(r)+ y:(rh)-,b
 		unhandled("x0,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2124: { // x1,x:(r)+ y:(rh)-,y0
+	case 2128: { // x1,x:(r)+ y:(rh)-,y0
 		unhandled("x1,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2125: { // x1,x:(r)+ y:(rh)-,y1
+	case 2129: { // x1,x:(r)+ y:(rh)-,y1
 		unhandled("x1,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2126: { // x1,x:(r)+ y:(rh)-,a
+	case 2130: { // x1,x:(r)+ y:(rh)-,a
 		unhandled("x1,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2127: { // x1,x:(r)+ y:(rh)-,b
+	case 2131: { // x1,x:(r)+ y:(rh)-,b
 		unhandled("x1,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2128: { // a,x:(r)+ y:(rh)-,y0
+	case 2132: { // a,x:(r)+ y:(rh)-,y0
 		unhandled("a,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2129: { // a,x:(r)+ y:(rh)-,y1
+	case 2133: { // a,x:(r)+ y:(rh)-,y1
 		unhandled("a,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2130: { // a,x:(r)+ y:(rh)-,a
+	case 2134: { // a,x:(r)+ y:(rh)-,a
 		unhandled("a,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2131: { // a,x:(r)+ y:(rh)-,b
+	case 2135: { // a,x:(r)+ y:(rh)-,b
 		unhandled("a,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2132: { // b,x:(r)+ y:(rh)-,y0
+	case 2136: { // b,x:(r)+ y:(rh)-,y0
 		unhandled("b,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2133: { // b,x:(r)+ y:(rh)-,y1
+	case 2137: { // b,x:(r)+ y:(rh)-,y1
 		unhandled("b,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2134: { // b,x:(r)+ y:(rh)-,a
+	case 2138: { // b,x:(r)+ y:(rh)-,a
 		unhandled("b,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2135: { // b,x:(r)+ y:(rh)-,b
+	case 2139: { // b,x:(r)+ y:(rh)-,b
 		unhandled("b,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2136: { // x0,x:(r)+ y:(rh)+,y0
+	case 2140: { // x0,x:(r)+ y:(rh)+,y0
 		unhandled("x0,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2137: { // x0,x:(r)+ y:(rh)+,y1
+	case 2141: { // x0,x:(r)+ y:(rh)+,y1
 		unhandled("x0,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2138: { // x0,x:(r)+ y:(rh)+,a
+	case 2142: { // x0,x:(r)+ y:(rh)+,a
 		unhandled("x0,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2139: { // x0,x:(r)+ y:(rh)+,b
+	case 2143: { // x0,x:(r)+ y:(rh)+,b
 		unhandled("x0,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2140: { // x1,x:(r)+ y:(rh)+,y0
+	case 2144: { // x1,x:(r)+ y:(rh)+,y0
 		unhandled("x1,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2141: { // x1,x:(r)+ y:(rh)+,y1
+	case 2145: { // x1,x:(r)+ y:(rh)+,y1
 		unhandled("x1,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2142: { // x1,x:(r)+ y:(rh)+,a
+	case 2146: { // x1,x:(r)+ y:(rh)+,a
 		unhandled("x1,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2143: { // x1,x:(r)+ y:(rh)+,b
+	case 2147: { // x1,x:(r)+ y:(rh)+,b
 		unhandled("x1,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2144: { // a,x:(r)+ y:(rh)+,y0
+	case 2148: { // a,x:(r)+ y:(rh)+,y0
 		unhandled("a,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2145: { // a,x:(r)+ y:(rh)+,y1
+	case 2149: { // a,x:(r)+ y:(rh)+,y1
 		unhandled("a,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2146: { // a,x:(r)+ y:(rh)+,a
+	case 2150: { // a,x:(r)+ y:(rh)+,a
 		unhandled("a,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2147: { // a,x:(r)+ y:(rh)+,b
+	case 2151: { // a,x:(r)+ y:(rh)+,b
 		unhandled("a,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2148: { // b,x:(r)+ y:(rh)+,y0
+	case 2152: { // b,x:(r)+ y:(rh)+,y0
 		unhandled("b,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2149: { // b,x:(r)+ y:(rh)+,y1
+	case 2153: { // b,x:(r)+ y:(rh)+,y1
 		unhandled("b,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2150: { // b,x:(r)+ y:(rh)+,a
+	case 2154: { // b,x:(r)+ y:(rh)+,a
 		unhandled("b,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2151: { // b,x:(r)+ y:(rh)+,b
+	case 2155: { // b,x:(r)+ y:(rh)+,b
 		unhandled("b,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2152: { // x0,x:(r)+ y:(rh),y0
+	case 2156: { // x0,x:(r)+ y:(rh),y0
 		unhandled("x0,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2153: { // x0,x:(r)+ y:(rh),y1
+	case 2157: { // x0,x:(r)+ y:(rh),y1
 		unhandled("x0,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2154: { // x0,x:(r)+ y:(rh),a
+	case 2158: { // x0,x:(r)+ y:(rh),a
 		unhandled("x0,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2155: { // x0,x:(r)+ y:(rh),b
+	case 2159: { // x0,x:(r)+ y:(rh),b
 		unhandled("x0,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2156: { // x1,x:(r)+ y:(rh),y0
+	case 2160: { // x1,x:(r)+ y:(rh),y0
 		unhandled("x1,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2157: { // x1,x:(r)+ y:(rh),y1
+	case 2161: { // x1,x:(r)+ y:(rh),y1
 		unhandled("x1,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2158: { // x1,x:(r)+ y:(rh),a
+	case 2162: { // x1,x:(r)+ y:(rh),a
 		unhandled("x1,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2159: { // x1,x:(r)+ y:(rh),b
+	case 2163: { // x1,x:(r)+ y:(rh),b
 		unhandled("x1,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2160: { // a,x:(r)+ y:(rh),y0
+	case 2164: { // a,x:(r)+ y:(rh),y0
 		unhandled("a,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2161: { // a,x:(r)+ y:(rh),y1
+	case 2165: { // a,x:(r)+ y:(rh),y1
 		unhandled("a,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2162: { // a,x:(r)+ y:(rh),a
+	case 2166: { // a,x:(r)+ y:(rh),a
 		unhandled("a,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2163: { // a,x:(r)+ y:(rh),b
+	case 2167: { // a,x:(r)+ y:(rh),b
 		unhandled("a,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2164: { // b,x:(r)+ y:(rh),y0
+	case 2168: { // b,x:(r)+ y:(rh),y0
 		unhandled("b,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2165: { // b,x:(r)+ y:(rh),y1
+	case 2169: { // b,x:(r)+ y:(rh),y1
 		unhandled("b,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2166: { // b,x:(r)+ y:(rh),a
+	case 2170: { // b,x:(r)+ y:(rh),a
 		unhandled("b,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2167: { // b,x:(r)+ y:(rh),b
+	case 2171: { // b,x:(r)+ y:(rh),b
 		unhandled("b,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2168: { // x0,x:(r) y:(rh)+n,y0
+	case 2172: { // x0,x:(r) y:(rh)+n,y0
 		unhandled("x0,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2169: { // x0,x:(r) y:(rh)+n,y1
+	case 2173: { // x0,x:(r) y:(rh)+n,y1
 		unhandled("x0,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2170: { // x0,x:(r) y:(rh)+n,a
+	case 2174: { // x0,x:(r) y:(rh)+n,a
 		unhandled("x0,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2171: { // x0,x:(r) y:(rh)+n,b
+	case 2175: { // x0,x:(r) y:(rh)+n,b
 		unhandled("x0,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2172: { // x1,x:(r) y:(rh)+n,y0
+	case 2176: { // x1,x:(r) y:(rh)+n,y0
 		unhandled("x1,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2173: { // x1,x:(r) y:(rh)+n,y1
+	case 2177: { // x1,x:(r) y:(rh)+n,y1
 		unhandled("x1,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2174: { // x1,x:(r) y:(rh)+n,a
+	case 2178: { // x1,x:(r) y:(rh)+n,a
 		unhandled("x1,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2175: { // x1,x:(r) y:(rh)+n,b
+	case 2179: { // x1,x:(r) y:(rh)+n,b
 		unhandled("x1,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2176: { // a,x:(r) y:(rh)+n,y0
+	case 2180: { // a,x:(r) y:(rh)+n,y0
 		unhandled("a,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2177: { // a,x:(r) y:(rh)+n,y1
+	case 2181: { // a,x:(r) y:(rh)+n,y1
 		unhandled("a,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2178: { // a,x:(r) y:(rh)+n,a
+	case 2182: { // a,x:(r) y:(rh)+n,a
 		unhandled("a,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2179: { // a,x:(r) y:(rh)+n,b
+	case 2183: { // a,x:(r) y:(rh)+n,b
 		unhandled("a,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2180: { // b,x:(r) y:(rh)+n,y0
+	case 2184: { // b,x:(r) y:(rh)+n,y0
 		unhandled("b,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2181: { // b,x:(r) y:(rh)+n,y1
+	case 2185: { // b,x:(r) y:(rh)+n,y1
 		unhandled("b,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2182: { // b,x:(r) y:(rh)+n,a
+	case 2186: { // b,x:(r) y:(rh)+n,a
 		unhandled("b,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2183: { // b,x:(r) y:(rh)+n,b
+	case 2187: { // b,x:(r) y:(rh)+n,b
 		unhandled("b,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2184: { // x0,x:(r) y:(rh)-,y0
+	case 2188: { // x0,x:(r) y:(rh)-,y0
 		unhandled("x0,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2185: { // x0,x:(r) y:(rh)-,y1
+	case 2189: { // x0,x:(r) y:(rh)-,y1
 		unhandled("x0,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2186: { // x0,x:(r) y:(rh)-,a
+	case 2190: { // x0,x:(r) y:(rh)-,a
 		unhandled("x0,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2187: { // x0,x:(r) y:(rh)-,b
+	case 2191: { // x0,x:(r) y:(rh)-,b
 		unhandled("x0,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2188: { // x1,x:(r) y:(rh)-,y0
+	case 2192: { // x1,x:(r) y:(rh)-,y0
 		unhandled("x1,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2189: { // x1,x:(r) y:(rh)-,y1
+	case 2193: { // x1,x:(r) y:(rh)-,y1
 		unhandled("x1,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2190: { // x1,x:(r) y:(rh)-,a
+	case 2194: { // x1,x:(r) y:(rh)-,a
 		unhandled("x1,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2191: { // x1,x:(r) y:(rh)-,b
+	case 2195: { // x1,x:(r) y:(rh)-,b
 		unhandled("x1,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2192: { // a,x:(r) y:(rh)-,y0
+	case 2196: { // a,x:(r) y:(rh)-,y0
 		unhandled("a,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2193: { // a,x:(r) y:(rh)-,y1
+	case 2197: { // a,x:(r) y:(rh)-,y1
 		unhandled("a,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2194: { // a,x:(r) y:(rh)-,a
+	case 2198: { // a,x:(r) y:(rh)-,a
 		unhandled("a,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2195: { // a,x:(r) y:(rh)-,b
+	case 2199: { // a,x:(r) y:(rh)-,b
 		unhandled("a,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2196: { // b,x:(r) y:(rh)-,y0
+	case 2200: { // b,x:(r) y:(rh)-,y0
 		unhandled("b,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2197: { // b,x:(r) y:(rh)-,y1
+	case 2201: { // b,x:(r) y:(rh)-,y1
 		unhandled("b,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2198: { // b,x:(r) y:(rh)-,a
+	case 2202: { // b,x:(r) y:(rh)-,a
 		unhandled("b,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2199: { // b,x:(r) y:(rh)-,b
+	case 2203: { // b,x:(r) y:(rh)-,b
 		unhandled("b,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2200: { // x0,x:(r) y:(rh)+,y0
+	case 2204: { // x0,x:(r) y:(rh)+,y0
 		unhandled("x0,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2201: { // x0,x:(r) y:(rh)+,y1
+	case 2205: { // x0,x:(r) y:(rh)+,y1
 		unhandled("x0,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2202: { // x0,x:(r) y:(rh)+,a
+	case 2206: { // x0,x:(r) y:(rh)+,a
 		unhandled("x0,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2203: { // x0,x:(r) y:(rh)+,b
+	case 2207: { // x0,x:(r) y:(rh)+,b
 		unhandled("x0,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2204: { // x1,x:(r) y:(rh)+,y0
+	case 2208: { // x1,x:(r) y:(rh)+,y0
 		unhandled("x1,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2205: { // x1,x:(r) y:(rh)+,y1
+	case 2209: { // x1,x:(r) y:(rh)+,y1
 		unhandled("x1,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2206: { // x1,x:(r) y:(rh)+,a
+	case 2210: { // x1,x:(r) y:(rh)+,a
 		unhandled("x1,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2207: { // x1,x:(r) y:(rh)+,b
+	case 2211: { // x1,x:(r) y:(rh)+,b
 		unhandled("x1,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2208: { // a,x:(r) y:(rh)+,y0
+	case 2212: { // a,x:(r) y:(rh)+,y0
 		unhandled("a,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2209: { // a,x:(r) y:(rh)+,y1
+	case 2213: { // a,x:(r) y:(rh)+,y1
 		unhandled("a,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2210: { // a,x:(r) y:(rh)+,a
+	case 2214: { // a,x:(r) y:(rh)+,a
 		unhandled("a,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2211: { // a,x:(r) y:(rh)+,b
+	case 2215: { // a,x:(r) y:(rh)+,b
 		unhandled("a,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2212: { // b,x:(r) y:(rh)+,y0
+	case 2216: { // b,x:(r) y:(rh)+,y0
 		unhandled("b,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2213: { // b,x:(r) y:(rh)+,y1
+	case 2217: { // b,x:(r) y:(rh)+,y1
 		unhandled("b,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2214: { // b,x:(r) y:(rh)+,a
+	case 2218: { // b,x:(r) y:(rh)+,a
 		unhandled("b,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2215: { // b,x:(r) y:(rh)+,b
+	case 2219: { // b,x:(r) y:(rh)+,b
 		unhandled("b,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2216: { // x0,x:(r) y:(rh),y0
+	case 2220: { // x0,x:(r) y:(rh),y0
 		unhandled("x0,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2217: { // x0,x:(r) y:(rh),y1
+	case 2221: { // x0,x:(r) y:(rh),y1
 		unhandled("x0,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2218: { // x0,x:(r) y:(rh),a
+	case 2222: { // x0,x:(r) y:(rh),a
 		unhandled("x0,x:(r) y:(rh),a");
 		break;
 		}
-	case 2219: { // x0,x:(r) y:(rh),b
+	case 2223: { // x0,x:(r) y:(rh),b
 		unhandled("x0,x:(r) y:(rh),b");
 		break;
 		}
-	case 2220: { // x1,x:(r) y:(rh),y0
+	case 2224: { // x1,x:(r) y:(rh),y0
 		unhandled("x1,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2221: { // x1,x:(r) y:(rh),y1
+	case 2225: { // x1,x:(r) y:(rh),y1
 		unhandled("x1,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2222: { // x1,x:(r) y:(rh),a
+	case 2226: { // x1,x:(r) y:(rh),a
 		unhandled("x1,x:(r) y:(rh),a");
 		break;
 		}
-	case 2223: { // x1,x:(r) y:(rh),b
+	case 2227: { // x1,x:(r) y:(rh),b
 		unhandled("x1,x:(r) y:(rh),b");
 		break;
 		}
-	case 2224: { // a,x:(r) y:(rh),y0
+	case 2228: { // a,x:(r) y:(rh),y0
 		unhandled("a,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2225: { // a,x:(r) y:(rh),y1
+	case 2229: { // a,x:(r) y:(rh),y1
 		unhandled("a,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2226: { // a,x:(r) y:(rh),a
+	case 2230: { // a,x:(r) y:(rh),a
 		unhandled("a,x:(r) y:(rh),a");
 		break;
 		}
-	case 2227: { // a,x:(r) y:(rh),b
+	case 2231: { // a,x:(r) y:(rh),b
 		unhandled("a,x:(r) y:(rh),b");
 		break;
 		}
-	case 2228: { // b,x:(r) y:(rh),y0
+	case 2232: { // b,x:(r) y:(rh),y0
 		unhandled("b,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2229: { // b,x:(r) y:(rh),y1
+	case 2233: { // b,x:(r) y:(rh),y1
 		unhandled("b,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2230: { // b,x:(r) y:(rh),a
+	case 2234: { // b,x:(r) y:(rh),a
 		unhandled("b,x:(r) y:(rh),a");
 		break;
 		}
-	case 2231: { // b,x:(r) y:(rh),b
+	case 2235: { // b,x:(r) y:(rh),b
 		unhandled("b,x:(r) y:(rh),b");
 		break;
 		}
-	case 2232: { // x0,x:(r)+n y0,y:(rh)+n
+	case 2236: { // x0,x:(r)+n y0,y:(rh)+n
 		unhandled("x0,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2233: { // x0,x:(r)+n y1,y:(rh)+n
+	case 2237: { // x0,x:(r)+n y1,y:(rh)+n
 		unhandled("x0,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2234: { // x0,x:(r)+n a,y:(rh)+n
+	case 2238: { // x0,x:(r)+n a,y:(rh)+n
 		unhandled("x0,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2235: { // x0,x:(r)+n b,y:(rh)+n
+	case 2239: { // x0,x:(r)+n b,y:(rh)+n
 		unhandled("x0,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2236: { // x1,x:(r)+n y0,y:(rh)+n
+	case 2240: { // x1,x:(r)+n y0,y:(rh)+n
 		unhandled("x1,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2237: { // x1,x:(r)+n y1,y:(rh)+n
+	case 2241: { // x1,x:(r)+n y1,y:(rh)+n
 		unhandled("x1,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2238: { // x1,x:(r)+n a,y:(rh)+n
+	case 2242: { // x1,x:(r)+n a,y:(rh)+n
 		unhandled("x1,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2239: { // x1,x:(r)+n b,y:(rh)+n
+	case 2243: { // x1,x:(r)+n b,y:(rh)+n
 		unhandled("x1,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2240: { // a,x:(r)+n y0,y:(rh)+n
+	case 2244: { // a,x:(r)+n y0,y:(rh)+n
 		unhandled("a,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2241: { // a,x:(r)+n y1,y:(rh)+n
+	case 2245: { // a,x:(r)+n y1,y:(rh)+n
 		unhandled("a,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2242: { // a,x:(r)+n a,y:(rh)+n
+	case 2246: { // a,x:(r)+n a,y:(rh)+n
 		unhandled("a,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2243: { // a,x:(r)+n b,y:(rh)+n
+	case 2247: { // a,x:(r)+n b,y:(rh)+n
 		unhandled("a,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2244: { // b,x:(r)+n y0,y:(rh)+n
+	case 2248: { // b,x:(r)+n y0,y:(rh)+n
 		unhandled("b,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2245: { // b,x:(r)+n y1,y:(rh)+n
+	case 2249: { // b,x:(r)+n y1,y:(rh)+n
 		unhandled("b,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2246: { // b,x:(r)+n a,y:(rh)+n
+	case 2250: { // b,x:(r)+n a,y:(rh)+n
 		unhandled("b,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2247: { // b,x:(r)+n b,y:(rh)+n
+	case 2251: { // b,x:(r)+n b,y:(rh)+n
 		unhandled("b,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2248: { // x0,x:(r)+n y0,y:(rh)-
+	case 2252: { // x0,x:(r)+n y0,y:(rh)-
 		unhandled("x0,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2249: { // x0,x:(r)+n y1,y:(rh)-
+	case 2253: { // x0,x:(r)+n y1,y:(rh)-
 		unhandled("x0,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2250: { // x0,x:(r)+n a,y:(rh)-
+	case 2254: { // x0,x:(r)+n a,y:(rh)-
 		unhandled("x0,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2251: { // x0,x:(r)+n b,y:(rh)-
+	case 2255: { // x0,x:(r)+n b,y:(rh)-
 		unhandled("x0,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2252: { // x1,x:(r)+n y0,y:(rh)-
+	case 2256: { // x1,x:(r)+n y0,y:(rh)-
 		unhandled("x1,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2253: { // x1,x:(r)+n y1,y:(rh)-
+	case 2257: { // x1,x:(r)+n y1,y:(rh)-
 		unhandled("x1,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2254: { // x1,x:(r)+n a,y:(rh)-
+	case 2258: { // x1,x:(r)+n a,y:(rh)-
 		unhandled("x1,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2255: { // x1,x:(r)+n b,y:(rh)-
+	case 2259: { // x1,x:(r)+n b,y:(rh)-
 		unhandled("x1,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2256: { // a,x:(r)+n y0,y:(rh)-
+	case 2260: { // a,x:(r)+n y0,y:(rh)-
 		unhandled("a,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2257: { // a,x:(r)+n y1,y:(rh)-
+	case 2261: { // a,x:(r)+n y1,y:(rh)-
 		unhandled("a,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2258: { // a,x:(r)+n a,y:(rh)-
+	case 2262: { // a,x:(r)+n a,y:(rh)-
 		unhandled("a,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2259: { // a,x:(r)+n b,y:(rh)-
+	case 2263: { // a,x:(r)+n b,y:(rh)-
 		unhandled("a,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2260: { // b,x:(r)+n y0,y:(rh)-
+	case 2264: { // b,x:(r)+n y0,y:(rh)-
 		unhandled("b,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2261: { // b,x:(r)+n y1,y:(rh)-
+	case 2265: { // b,x:(r)+n y1,y:(rh)-
 		unhandled("b,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2262: { // b,x:(r)+n a,y:(rh)-
+	case 2266: { // b,x:(r)+n a,y:(rh)-
 		unhandled("b,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2263: { // b,x:(r)+n b,y:(rh)-
+	case 2267: { // b,x:(r)+n b,y:(rh)-
 		unhandled("b,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2264: { // x0,x:(r)+n y0,y:(rh)+
+	case 2268: { // x0,x:(r)+n y0,y:(rh)+
 		unhandled("x0,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2265: { // x0,x:(r)+n y1,y:(rh)+
+	case 2269: { // x0,x:(r)+n y1,y:(rh)+
 		unhandled("x0,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2266: { // x0,x:(r)+n a,y:(rh)+
+	case 2270: { // x0,x:(r)+n a,y:(rh)+
 		unhandled("x0,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2267: { // x0,x:(r)+n b,y:(rh)+
+	case 2271: { // x0,x:(r)+n b,y:(rh)+
 		unhandled("x0,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2268: { // x1,x:(r)+n y0,y:(rh)+
+	case 2272: { // x1,x:(r)+n y0,y:(rh)+
 		unhandled("x1,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2269: { // x1,x:(r)+n y1,y:(rh)+
+	case 2273: { // x1,x:(r)+n y1,y:(rh)+
 		unhandled("x1,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2270: { // x1,x:(r)+n a,y:(rh)+
+	case 2274: { // x1,x:(r)+n a,y:(rh)+
 		unhandled("x1,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2271: { // x1,x:(r)+n b,y:(rh)+
+	case 2275: { // x1,x:(r)+n b,y:(rh)+
 		unhandled("x1,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2272: { // a,x:(r)+n y0,y:(rh)+
+	case 2276: { // a,x:(r)+n y0,y:(rh)+
 		unhandled("a,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2273: { // a,x:(r)+n y1,y:(rh)+
+	case 2277: { // a,x:(r)+n y1,y:(rh)+
 		unhandled("a,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2274: { // a,x:(r)+n a,y:(rh)+
+	case 2278: { // a,x:(r)+n a,y:(rh)+
 		unhandled("a,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2275: { // a,x:(r)+n b,y:(rh)+
+	case 2279: { // a,x:(r)+n b,y:(rh)+
 		unhandled("a,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2276: { // b,x:(r)+n y0,y:(rh)+
+	case 2280: { // b,x:(r)+n y0,y:(rh)+
 		unhandled("b,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2277: { // b,x:(r)+n y1,y:(rh)+
+	case 2281: { // b,x:(r)+n y1,y:(rh)+
 		unhandled("b,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2278: { // b,x:(r)+n a,y:(rh)+
+	case 2282: { // b,x:(r)+n a,y:(rh)+
 		unhandled("b,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2279: { // b,x:(r)+n b,y:(rh)+
+	case 2283: { // b,x:(r)+n b,y:(rh)+
 		unhandled("b,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2280: { // x0,x:(r)+n y0,y:(rh)
+	case 2284: { // x0,x:(r)+n y0,y:(rh)
 		unhandled("x0,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2281: { // x0,x:(r)+n y1,y:(rh)
+	case 2285: { // x0,x:(r)+n y1,y:(rh)
 		unhandled("x0,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2282: { // x0,x:(r)+n a,y:(rh)
+	case 2286: { // x0,x:(r)+n a,y:(rh)
 		unhandled("x0,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2283: { // x0,x:(r)+n b,y:(rh)
+	case 2287: { // x0,x:(r)+n b,y:(rh)
 		unhandled("x0,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2284: { // x1,x:(r)+n y0,y:(rh)
+	case 2288: { // x1,x:(r)+n y0,y:(rh)
 		unhandled("x1,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2285: { // x1,x:(r)+n y1,y:(rh)
+	case 2289: { // x1,x:(r)+n y1,y:(rh)
 		unhandled("x1,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2286: { // x1,x:(r)+n a,y:(rh)
+	case 2290: { // x1,x:(r)+n a,y:(rh)
 		unhandled("x1,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2287: { // x1,x:(r)+n b,y:(rh)
+	case 2291: { // x1,x:(r)+n b,y:(rh)
 		unhandled("x1,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2288: { // a,x:(r)+n y0,y:(rh)
+	case 2292: { // a,x:(r)+n y0,y:(rh)
 		unhandled("a,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2289: { // a,x:(r)+n y1,y:(rh)
+	case 2293: { // a,x:(r)+n y1,y:(rh)
 		unhandled("a,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2290: { // a,x:(r)+n a,y:(rh)
+	case 2294: { // a,x:(r)+n a,y:(rh)
 		unhandled("a,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2291: { // a,x:(r)+n b,y:(rh)
+	case 2295: { // a,x:(r)+n b,y:(rh)
 		unhandled("a,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2292: { // b,x:(r)+n y0,y:(rh)
+	case 2296: { // b,x:(r)+n y0,y:(rh)
 		unhandled("b,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2293: { // b,x:(r)+n y1,y:(rh)
+	case 2297: { // b,x:(r)+n y1,y:(rh)
 		unhandled("b,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2294: { // b,x:(r)+n a,y:(rh)
+	case 2298: { // b,x:(r)+n a,y:(rh)
 		unhandled("b,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2295: { // b,x:(r)+n b,y:(rh)
+	case 2299: { // b,x:(r)+n b,y:(rh)
 		unhandled("b,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2296: { // x0,x:(r)- y0,y:(rh)+n
+	case 2300: { // x0,x:(r)- y0,y:(rh)+n
 		unhandled("x0,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2297: { // x0,x:(r)- y1,y:(rh)+n
+	case 2301: { // x0,x:(r)- y1,y:(rh)+n
 		unhandled("x0,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2298: { // x0,x:(r)- a,y:(rh)+n
+	case 2302: { // x0,x:(r)- a,y:(rh)+n
 		unhandled("x0,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2299: { // x0,x:(r)- b,y:(rh)+n
+	case 2303: { // x0,x:(r)- b,y:(rh)+n
 		unhandled("x0,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2300: { // x1,x:(r)- y0,y:(rh)+n
+	case 2304: { // x1,x:(r)- y0,y:(rh)+n
 		unhandled("x1,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2301: { // x1,x:(r)- y1,y:(rh)+n
+	case 2305: { // x1,x:(r)- y1,y:(rh)+n
 		unhandled("x1,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2302: { // x1,x:(r)- a,y:(rh)+n
+	case 2306: { // x1,x:(r)- a,y:(rh)+n
 		unhandled("x1,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2303: { // x1,x:(r)- b,y:(rh)+n
+	case 2307: { // x1,x:(r)- b,y:(rh)+n
 		unhandled("x1,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2304: { // a,x:(r)- y0,y:(rh)+n
+	case 2308: { // a,x:(r)- y0,y:(rh)+n
 		unhandled("a,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2305: { // a,x:(r)- y1,y:(rh)+n
+	case 2309: { // a,x:(r)- y1,y:(rh)+n
 		unhandled("a,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2306: { // a,x:(r)- a,y:(rh)+n
+	case 2310: { // a,x:(r)- a,y:(rh)+n
 		unhandled("a,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2307: { // a,x:(r)- b,y:(rh)+n
+	case 2311: { // a,x:(r)- b,y:(rh)+n
 		unhandled("a,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2308: { // b,x:(r)- y0,y:(rh)+n
+	case 2312: { // b,x:(r)- y0,y:(rh)+n
 		unhandled("b,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2309: { // b,x:(r)- y1,y:(rh)+n
+	case 2313: { // b,x:(r)- y1,y:(rh)+n
 		unhandled("b,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2310: { // b,x:(r)- a,y:(rh)+n
+	case 2314: { // b,x:(r)- a,y:(rh)+n
 		unhandled("b,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2311: { // b,x:(r)- b,y:(rh)+n
+	case 2315: { // b,x:(r)- b,y:(rh)+n
 		unhandled("b,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2312: { // x0,x:(r)- y0,y:(rh)-
+	case 2316: { // x0,x:(r)- y0,y:(rh)-
 		unhandled("x0,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2313: { // x0,x:(r)- y1,y:(rh)-
+	case 2317: { // x0,x:(r)- y1,y:(rh)-
 		unhandled("x0,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2314: { // x0,x:(r)- a,y:(rh)-
+	case 2318: { // x0,x:(r)- a,y:(rh)-
 		unhandled("x0,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2315: { // x0,x:(r)- b,y:(rh)-
+	case 2319: { // x0,x:(r)- b,y:(rh)-
 		unhandled("x0,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2316: { // x1,x:(r)- y0,y:(rh)-
+	case 2320: { // x1,x:(r)- y0,y:(rh)-
 		unhandled("x1,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2317: { // x1,x:(r)- y1,y:(rh)-
+	case 2321: { // x1,x:(r)- y1,y:(rh)-
 		unhandled("x1,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2318: { // x1,x:(r)- a,y:(rh)-
+	case 2322: { // x1,x:(r)- a,y:(rh)-
 		unhandled("x1,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2319: { // x1,x:(r)- b,y:(rh)-
+	case 2323: { // x1,x:(r)- b,y:(rh)-
 		unhandled("x1,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2320: { // a,x:(r)- y0,y:(rh)-
+	case 2324: { // a,x:(r)- y0,y:(rh)-
 		unhandled("a,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2321: { // a,x:(r)- y1,y:(rh)-
+	case 2325: { // a,x:(r)- y1,y:(rh)-
 		unhandled("a,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2322: { // a,x:(r)- a,y:(rh)-
+	case 2326: { // a,x:(r)- a,y:(rh)-
 		unhandled("a,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2323: { // a,x:(r)- b,y:(rh)-
+	case 2327: { // a,x:(r)- b,y:(rh)-
 		unhandled("a,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2324: { // b,x:(r)- y0,y:(rh)-
+	case 2328: { // b,x:(r)- y0,y:(rh)-
 		unhandled("b,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2325: { // b,x:(r)- y1,y:(rh)-
+	case 2329: { // b,x:(r)- y1,y:(rh)-
 		unhandled("b,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2326: { // b,x:(r)- a,y:(rh)-
+	case 2330: { // b,x:(r)- a,y:(rh)-
 		unhandled("b,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2327: { // b,x:(r)- b,y:(rh)-
+	case 2331: { // b,x:(r)- b,y:(rh)-
 		unhandled("b,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2328: { // x0,x:(r)- y0,y:(rh)+
+	case 2332: { // x0,x:(r)- y0,y:(rh)+
 		unhandled("x0,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2329: { // x0,x:(r)- y1,y:(rh)+
+	case 2333: { // x0,x:(r)- y1,y:(rh)+
 		unhandled("x0,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2330: { // x0,x:(r)- a,y:(rh)+
+	case 2334: { // x0,x:(r)- a,y:(rh)+
 		unhandled("x0,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2331: { // x0,x:(r)- b,y:(rh)+
+	case 2335: { // x0,x:(r)- b,y:(rh)+
 		unhandled("x0,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2332: { // x1,x:(r)- y0,y:(rh)+
+	case 2336: { // x1,x:(r)- y0,y:(rh)+
 		unhandled("x1,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2333: { // x1,x:(r)- y1,y:(rh)+
+	case 2337: { // x1,x:(r)- y1,y:(rh)+
 		unhandled("x1,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2334: { // x1,x:(r)- a,y:(rh)+
+	case 2338: { // x1,x:(r)- a,y:(rh)+
 		unhandled("x1,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2335: { // x1,x:(r)- b,y:(rh)+
+	case 2339: { // x1,x:(r)- b,y:(rh)+
 		unhandled("x1,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2336: { // a,x:(r)- y0,y:(rh)+
+	case 2340: { // a,x:(r)- y0,y:(rh)+
 		unhandled("a,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2337: { // a,x:(r)- y1,y:(rh)+
+	case 2341: { // a,x:(r)- y1,y:(rh)+
 		unhandled("a,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2338: { // a,x:(r)- a,y:(rh)+
+	case 2342: { // a,x:(r)- a,y:(rh)+
 		unhandled("a,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2339: { // a,x:(r)- b,y:(rh)+
+	case 2343: { // a,x:(r)- b,y:(rh)+
 		unhandled("a,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2340: { // b,x:(r)- y0,y:(rh)+
+	case 2344: { // b,x:(r)- y0,y:(rh)+
 		unhandled("b,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2341: { // b,x:(r)- y1,y:(rh)+
+	case 2345: { // b,x:(r)- y1,y:(rh)+
 		unhandled("b,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2342: { // b,x:(r)- a,y:(rh)+
+	case 2346: { // b,x:(r)- a,y:(rh)+
 		unhandled("b,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2343: { // b,x:(r)- b,y:(rh)+
+	case 2347: { // b,x:(r)- b,y:(rh)+
 		unhandled("b,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2344: { // x0,x:(r)- y0,y:(rh)
+	case 2348: { // x0,x:(r)- y0,y:(rh)
 		unhandled("x0,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2345: { // x0,x:(r)- y1,y:(rh)
+	case 2349: { // x0,x:(r)- y1,y:(rh)
 		unhandled("x0,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2346: { // x0,x:(r)- a,y:(rh)
+	case 2350: { // x0,x:(r)- a,y:(rh)
 		unhandled("x0,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2347: { // x0,x:(r)- b,y:(rh)
+	case 2351: { // x0,x:(r)- b,y:(rh)
 		unhandled("x0,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2348: { // x1,x:(r)- y0,y:(rh)
+	case 2352: { // x1,x:(r)- y0,y:(rh)
 		unhandled("x1,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2349: { // x1,x:(r)- y1,y:(rh)
+	case 2353: { // x1,x:(r)- y1,y:(rh)
 		unhandled("x1,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2350: { // x1,x:(r)- a,y:(rh)
+	case 2354: { // x1,x:(r)- a,y:(rh)
 		unhandled("x1,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2351: { // x1,x:(r)- b,y:(rh)
+	case 2355: { // x1,x:(r)- b,y:(rh)
 		unhandled("x1,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2352: { // a,x:(r)- y0,y:(rh)
+	case 2356: { // a,x:(r)- y0,y:(rh)
 		unhandled("a,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2353: { // a,x:(r)- y1,y:(rh)
+	case 2357: { // a,x:(r)- y1,y:(rh)
 		unhandled("a,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2354: { // a,x:(r)- a,y:(rh)
+	case 2358: { // a,x:(r)- a,y:(rh)
 		unhandled("a,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2355: { // a,x:(r)- b,y:(rh)
+	case 2359: { // a,x:(r)- b,y:(rh)
 		unhandled("a,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2356: { // b,x:(r)- y0,y:(rh)
+	case 2360: { // b,x:(r)- y0,y:(rh)
 		unhandled("b,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2357: { // b,x:(r)- y1,y:(rh)
+	case 2361: { // b,x:(r)- y1,y:(rh)
 		unhandled("b,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2358: { // b,x:(r)- a,y:(rh)
+	case 2362: { // b,x:(r)- a,y:(rh)
 		unhandled("b,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2359: { // b,x:(r)- b,y:(rh)
+	case 2363: { // b,x:(r)- b,y:(rh)
 		unhandled("b,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2360: { // x0,x:(r)+ y0,y:(rh)+n
+	case 2364: { // x0,x:(r)+ y0,y:(rh)+n
 		unhandled("x0,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2361: { // x0,x:(r)+ y1,y:(rh)+n
+	case 2365: { // x0,x:(r)+ y1,y:(rh)+n
 		unhandled("x0,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2362: { // x0,x:(r)+ a,y:(rh)+n
+	case 2366: { // x0,x:(r)+ a,y:(rh)+n
 		unhandled("x0,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2363: { // x0,x:(r)+ b,y:(rh)+n
+	case 2367: { // x0,x:(r)+ b,y:(rh)+n
 		unhandled("x0,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2364: { // x1,x:(r)+ y0,y:(rh)+n
+	case 2368: { // x1,x:(r)+ y0,y:(rh)+n
 		unhandled("x1,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2365: { // x1,x:(r)+ y1,y:(rh)+n
+	case 2369: { // x1,x:(r)+ y1,y:(rh)+n
 		unhandled("x1,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2366: { // x1,x:(r)+ a,y:(rh)+n
+	case 2370: { // x1,x:(r)+ a,y:(rh)+n
 		unhandled("x1,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2367: { // x1,x:(r)+ b,y:(rh)+n
+	case 2371: { // x1,x:(r)+ b,y:(rh)+n
 		unhandled("x1,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2368: { // a,x:(r)+ y0,y:(rh)+n
+	case 2372: { // a,x:(r)+ y0,y:(rh)+n
 		unhandled("a,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2369: { // a,x:(r)+ y1,y:(rh)+n
+	case 2373: { // a,x:(r)+ y1,y:(rh)+n
 		unhandled("a,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2370: { // a,x:(r)+ a,y:(rh)+n
+	case 2374: { // a,x:(r)+ a,y:(rh)+n
 		unhandled("a,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2371: { // a,x:(r)+ b,y:(rh)+n
+	case 2375: { // a,x:(r)+ b,y:(rh)+n
 		unhandled("a,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2372: { // b,x:(r)+ y0,y:(rh)+n
+	case 2376: { // b,x:(r)+ y0,y:(rh)+n
 		unhandled("b,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2373: { // b,x:(r)+ y1,y:(rh)+n
+	case 2377: { // b,x:(r)+ y1,y:(rh)+n
 		unhandled("b,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2374: { // b,x:(r)+ a,y:(rh)+n
+	case 2378: { // b,x:(r)+ a,y:(rh)+n
 		unhandled("b,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2375: { // b,x:(r)+ b,y:(rh)+n
+	case 2379: { // b,x:(r)+ b,y:(rh)+n
 		unhandled("b,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2376: { // x0,x:(r)+ y0,y:(rh)-
+	case 2380: { // x0,x:(r)+ y0,y:(rh)-
 		unhandled("x0,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2377: { // x0,x:(r)+ y1,y:(rh)-
+	case 2381: { // x0,x:(r)+ y1,y:(rh)-
 		unhandled("x0,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2378: { // x0,x:(r)+ a,y:(rh)-
+	case 2382: { // x0,x:(r)+ a,y:(rh)-
 		unhandled("x0,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2379: { // x0,x:(r)+ b,y:(rh)-
+	case 2383: { // x0,x:(r)+ b,y:(rh)-
 		unhandled("x0,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2380: { // x1,x:(r)+ y0,y:(rh)-
+	case 2384: { // x1,x:(r)+ y0,y:(rh)-
 		unhandled("x1,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2381: { // x1,x:(r)+ y1,y:(rh)-
+	case 2385: { // x1,x:(r)+ y1,y:(rh)-
 		unhandled("x1,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2382: { // x1,x:(r)+ a,y:(rh)-
+	case 2386: { // x1,x:(r)+ a,y:(rh)-
 		unhandled("x1,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2383: { // x1,x:(r)+ b,y:(rh)-
+	case 2387: { // x1,x:(r)+ b,y:(rh)-
 		unhandled("x1,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2384: { // a,x:(r)+ y0,y:(rh)-
+	case 2388: { // a,x:(r)+ y0,y:(rh)-
 		unhandled("a,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2385: { // a,x:(r)+ y1,y:(rh)-
+	case 2389: { // a,x:(r)+ y1,y:(rh)-
 		unhandled("a,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2386: { // a,x:(r)+ a,y:(rh)-
+	case 2390: { // a,x:(r)+ a,y:(rh)-
 		unhandled("a,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2387: { // a,x:(r)+ b,y:(rh)-
+	case 2391: { // a,x:(r)+ b,y:(rh)-
 		unhandled("a,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2388: { // b,x:(r)+ y0,y:(rh)-
+	case 2392: { // b,x:(r)+ y0,y:(rh)-
 		unhandled("b,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2389: { // b,x:(r)+ y1,y:(rh)-
+	case 2393: { // b,x:(r)+ y1,y:(rh)-
 		unhandled("b,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2390: { // b,x:(r)+ a,y:(rh)-
+	case 2394: { // b,x:(r)+ a,y:(rh)-
 		unhandled("b,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2391: { // b,x:(r)+ b,y:(rh)-
+	case 2395: { // b,x:(r)+ b,y:(rh)-
 		unhandled("b,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2392: { // x0,x:(r)+ y0,y:(rh)+
+	case 2396: { // x0,x:(r)+ y0,y:(rh)+
 		unhandled("x0,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2393: { // x0,x:(r)+ y1,y:(rh)+
+	case 2397: { // x0,x:(r)+ y1,y:(rh)+
 		unhandled("x0,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2394: { // x0,x:(r)+ a,y:(rh)+
+	case 2398: { // x0,x:(r)+ a,y:(rh)+
 		unhandled("x0,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2395: { // x0,x:(r)+ b,y:(rh)+
+	case 2399: { // x0,x:(r)+ b,y:(rh)+
 		unhandled("x0,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2396: { // x1,x:(r)+ y0,y:(rh)+
+	case 2400: { // x1,x:(r)+ y0,y:(rh)+
 		unhandled("x1,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2397: { // x1,x:(r)+ y1,y:(rh)+
+	case 2401: { // x1,x:(r)+ y1,y:(rh)+
 		unhandled("x1,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2398: { // x1,x:(r)+ a,y:(rh)+
+	case 2402: { // x1,x:(r)+ a,y:(rh)+
 		unhandled("x1,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2399: { // x1,x:(r)+ b,y:(rh)+
+	case 2403: { // x1,x:(r)+ b,y:(rh)+
 		unhandled("x1,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2400: { // a,x:(r)+ y0,y:(rh)+
+	case 2404: { // a,x:(r)+ y0,y:(rh)+
 		unhandled("a,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2401: { // a,x:(r)+ y1,y:(rh)+
+	case 2405: { // a,x:(r)+ y1,y:(rh)+
 		unhandled("a,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2402: { // a,x:(r)+ a,y:(rh)+
+	case 2406: { // a,x:(r)+ a,y:(rh)+
 		unhandled("a,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2403: { // a,x:(r)+ b,y:(rh)+
+	case 2407: { // a,x:(r)+ b,y:(rh)+
 		unhandled("a,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2404: { // b,x:(r)+ y0,y:(rh)+
+	case 2408: { // b,x:(r)+ y0,y:(rh)+
 		unhandled("b,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2405: { // b,x:(r)+ y1,y:(rh)+
+	case 2409: { // b,x:(r)+ y1,y:(rh)+
 		unhandled("b,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2406: { // b,x:(r)+ a,y:(rh)+
+	case 2410: { // b,x:(r)+ a,y:(rh)+
 		unhandled("b,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2407: { // b,x:(r)+ b,y:(rh)+
+	case 2411: { // b,x:(r)+ b,y:(rh)+
 		unhandled("b,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2408: { // x0,x:(r)+ y0,y:(rh)
+	case 2412: { // x0,x:(r)+ y0,y:(rh)
 		unhandled("x0,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2409: { // x0,x:(r)+ y1,y:(rh)
+	case 2413: { // x0,x:(r)+ y1,y:(rh)
 		unhandled("x0,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2410: { // x0,x:(r)+ a,y:(rh)
+	case 2414: { // x0,x:(r)+ a,y:(rh)
 		unhandled("x0,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2411: { // x0,x:(r)+ b,y:(rh)
+	case 2415: { // x0,x:(r)+ b,y:(rh)
 		unhandled("x0,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2412: { // x1,x:(r)+ y0,y:(rh)
+	case 2416: { // x1,x:(r)+ y0,y:(rh)
 		unhandled("x1,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2413: { // x1,x:(r)+ y1,y:(rh)
+	case 2417: { // x1,x:(r)+ y1,y:(rh)
 		unhandled("x1,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2414: { // x1,x:(r)+ a,y:(rh)
+	case 2418: { // x1,x:(r)+ a,y:(rh)
 		unhandled("x1,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2415: { // x1,x:(r)+ b,y:(rh)
+	case 2419: { // x1,x:(r)+ b,y:(rh)
 		unhandled("x1,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2416: { // a,x:(r)+ y0,y:(rh)
+	case 2420: { // a,x:(r)+ y0,y:(rh)
 		unhandled("a,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2417: { // a,x:(r)+ y1,y:(rh)
+	case 2421: { // a,x:(r)+ y1,y:(rh)
 		unhandled("a,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2418: { // a,x:(r)+ a,y:(rh)
+	case 2422: { // a,x:(r)+ a,y:(rh)
 		unhandled("a,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2419: { // a,x:(r)+ b,y:(rh)
+	case 2423: { // a,x:(r)+ b,y:(rh)
 		unhandled("a,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2420: { // b,x:(r)+ y0,y:(rh)
+	case 2424: { // b,x:(r)+ y0,y:(rh)
 		unhandled("b,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2421: { // b,x:(r)+ y1,y:(rh)
+	case 2425: { // b,x:(r)+ y1,y:(rh)
 		unhandled("b,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2422: { // b,x:(r)+ a,y:(rh)
+	case 2426: { // b,x:(r)+ a,y:(rh)
 		unhandled("b,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2423: { // b,x:(r)+ b,y:(rh)
+	case 2427: { // b,x:(r)+ b,y:(rh)
 		unhandled("b,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2424: { // x0,x:(r) y0,y:(rh)+n
+	case 2428: { // x0,x:(r) y0,y:(rh)+n
 		unhandled("x0,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2425: { // x0,x:(r) y1,y:(rh)+n
+	case 2429: { // x0,x:(r) y1,y:(rh)+n
 		unhandled("x0,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2426: { // x0,x:(r) a,y:(rh)+n
+	case 2430: { // x0,x:(r) a,y:(rh)+n
 		unhandled("x0,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2427: { // x0,x:(r) b,y:(rh)+n
+	case 2431: { // x0,x:(r) b,y:(rh)+n
 		unhandled("x0,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2428: { // x1,x:(r) y0,y:(rh)+n
+	case 2432: { // x1,x:(r) y0,y:(rh)+n
 		unhandled("x1,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2429: { // x1,x:(r) y1,y:(rh)+n
+	case 2433: { // x1,x:(r) y1,y:(rh)+n
 		unhandled("x1,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2430: { // x1,x:(r) a,y:(rh)+n
+	case 2434: { // x1,x:(r) a,y:(rh)+n
 		unhandled("x1,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2431: { // x1,x:(r) b,y:(rh)+n
+	case 2435: { // x1,x:(r) b,y:(rh)+n
 		unhandled("x1,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2432: { // a,x:(r) y0,y:(rh)+n
+	case 2436: { // a,x:(r) y0,y:(rh)+n
 		unhandled("a,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2433: { // a,x:(r) y1,y:(rh)+n
+	case 2437: { // a,x:(r) y1,y:(rh)+n
 		unhandled("a,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2434: { // a,x:(r) a,y:(rh)+n
+	case 2438: { // a,x:(r) a,y:(rh)+n
 		unhandled("a,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2435: { // a,x:(r) b,y:(rh)+n
+	case 2439: { // a,x:(r) b,y:(rh)+n
 		unhandled("a,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2436: { // b,x:(r) y0,y:(rh)+n
+	case 2440: { // b,x:(r) y0,y:(rh)+n
 		unhandled("b,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2437: { // b,x:(r) y1,y:(rh)+n
+	case 2441: { // b,x:(r) y1,y:(rh)+n
 		unhandled("b,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2438: { // b,x:(r) a,y:(rh)+n
+	case 2442: { // b,x:(r) a,y:(rh)+n
 		unhandled("b,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2439: { // b,x:(r) b,y:(rh)+n
+	case 2443: { // b,x:(r) b,y:(rh)+n
 		unhandled("b,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2440: { // x0,x:(r) y0,y:(rh)-
+	case 2444: { // x0,x:(r) y0,y:(rh)-
 		unhandled("x0,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2441: { // x0,x:(r) y1,y:(rh)-
+	case 2445: { // x0,x:(r) y1,y:(rh)-
 		unhandled("x0,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2442: { // x0,x:(r) a,y:(rh)-
+	case 2446: { // x0,x:(r) a,y:(rh)-
 		unhandled("x0,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2443: { // x0,x:(r) b,y:(rh)-
+	case 2447: { // x0,x:(r) b,y:(rh)-
 		unhandled("x0,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2444: { // x1,x:(r) y0,y:(rh)-
+	case 2448: { // x1,x:(r) y0,y:(rh)-
 		unhandled("x1,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2445: { // x1,x:(r) y1,y:(rh)-
+	case 2449: { // x1,x:(r) y1,y:(rh)-
 		unhandled("x1,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2446: { // x1,x:(r) a,y:(rh)-
+	case 2450: { // x1,x:(r) a,y:(rh)-
 		unhandled("x1,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2447: { // x1,x:(r) b,y:(rh)-
+	case 2451: { // x1,x:(r) b,y:(rh)-
 		unhandled("x1,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2448: { // a,x:(r) y0,y:(rh)-
+	case 2452: { // a,x:(r) y0,y:(rh)-
 		unhandled("a,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2449: { // a,x:(r) y1,y:(rh)-
+	case 2453: { // a,x:(r) y1,y:(rh)-
 		unhandled("a,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2450: { // a,x:(r) a,y:(rh)-
+	case 2454: { // a,x:(r) a,y:(rh)-
 		unhandled("a,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2451: { // a,x:(r) b,y:(rh)-
+	case 2455: { // a,x:(r) b,y:(rh)-
 		unhandled("a,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2452: { // b,x:(r) y0,y:(rh)-
+	case 2456: { // b,x:(r) y0,y:(rh)-
 		unhandled("b,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2453: { // b,x:(r) y1,y:(rh)-
+	case 2457: { // b,x:(r) y1,y:(rh)-
 		unhandled("b,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2454: { // b,x:(r) a,y:(rh)-
+	case 2458: { // b,x:(r) a,y:(rh)-
 		unhandled("b,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2455: { // b,x:(r) b,y:(rh)-
+	case 2459: { // b,x:(r) b,y:(rh)-
 		unhandled("b,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2456: { // x0,x:(r) y0,y:(rh)+
+	case 2460: { // x0,x:(r) y0,y:(rh)+
 		unhandled("x0,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2457: { // x0,x:(r) y1,y:(rh)+
+	case 2461: { // x0,x:(r) y1,y:(rh)+
 		unhandled("x0,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2458: { // x0,x:(r) a,y:(rh)+
+	case 2462: { // x0,x:(r) a,y:(rh)+
 		unhandled("x0,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2459: { // x0,x:(r) b,y:(rh)+
+	case 2463: { // x0,x:(r) b,y:(rh)+
 		unhandled("x0,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2460: { // x1,x:(r) y0,y:(rh)+
+	case 2464: { // x1,x:(r) y0,y:(rh)+
 		unhandled("x1,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2461: { // x1,x:(r) y1,y:(rh)+
+	case 2465: { // x1,x:(r) y1,y:(rh)+
 		unhandled("x1,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2462: { // x1,x:(r) a,y:(rh)+
+	case 2466: { // x1,x:(r) a,y:(rh)+
 		unhandled("x1,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2463: { // x1,x:(r) b,y:(rh)+
+	case 2467: { // x1,x:(r) b,y:(rh)+
 		unhandled("x1,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2464: { // a,x:(r) y0,y:(rh)+
+	case 2468: { // a,x:(r) y0,y:(rh)+
 		unhandled("a,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2465: { // a,x:(r) y1,y:(rh)+
+	case 2469: { // a,x:(r) y1,y:(rh)+
 		unhandled("a,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2466: { // a,x:(r) a,y:(rh)+
+	case 2470: { // a,x:(r) a,y:(rh)+
 		unhandled("a,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2467: { // a,x:(r) b,y:(rh)+
+	case 2471: { // a,x:(r) b,y:(rh)+
 		unhandled("a,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2468: { // b,x:(r) y0,y:(rh)+
+	case 2472: { // b,x:(r) y0,y:(rh)+
 		unhandled("b,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2469: { // b,x:(r) y1,y:(rh)+
+	case 2473: { // b,x:(r) y1,y:(rh)+
 		unhandled("b,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2470: { // b,x:(r) a,y:(rh)+
+	case 2474: { // b,x:(r) a,y:(rh)+
 		unhandled("b,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2471: { // b,x:(r) b,y:(rh)+
+	case 2475: { // b,x:(r) b,y:(rh)+
 		unhandled("b,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2472: { // x0,x:(r) y0,y:(rh)
+	case 2476: { // x0,x:(r) y0,y:(rh)
 		unhandled("x0,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2473: { // x0,x:(r) y1,y:(rh)
+	case 2477: { // x0,x:(r) y1,y:(rh)
 		unhandled("x0,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2474: { // x0,x:(r) a,y:(rh)
+	case 2478: { // x0,x:(r) a,y:(rh)
 		unhandled("x0,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2475: { // x0,x:(r) b,y:(rh)
+	case 2479: { // x0,x:(r) b,y:(rh)
 		unhandled("x0,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2476: { // x1,x:(r) y0,y:(rh)
+	case 2480: { // x1,x:(r) y0,y:(rh)
 		unhandled("x1,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2477: { // x1,x:(r) y1,y:(rh)
+	case 2481: { // x1,x:(r) y1,y:(rh)
 		unhandled("x1,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2478: { // x1,x:(r) a,y:(rh)
+	case 2482: { // x1,x:(r) a,y:(rh)
 		unhandled("x1,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2479: { // x1,x:(r) b,y:(rh)
+	case 2483: { // x1,x:(r) b,y:(rh)
 		unhandled("x1,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2480: { // a,x:(r) y0,y:(rh)
+	case 2484: { // a,x:(r) y0,y:(rh)
 		unhandled("a,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2481: { // a,x:(r) y1,y:(rh)
+	case 2485: { // a,x:(r) y1,y:(rh)
 		unhandled("a,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2482: { // a,x:(r) a,y:(rh)
+	case 2486: { // a,x:(r) a,y:(rh)
 		unhandled("a,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2483: { // a,x:(r) b,y:(rh)
+	case 2487: { // a,x:(r) b,y:(rh)
 		unhandled("a,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2484: { // b,x:(r) y0,y:(rh)
+	case 2488: { // b,x:(r) y0,y:(rh)
 		unhandled("b,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2485: { // b,x:(r) y1,y:(rh)
+	case 2489: { // b,x:(r) y1,y:(rh)
 		unhandled("b,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2486: { // b,x:(r) a,y:(rh)
+	case 2490: { // b,x:(r) a,y:(rh)
 		unhandled("b,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2487: { // b,x:(r) b,y:(rh)
+	case 2491: { // b,x:(r) b,y:(rh)
 		unhandled("b,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2488: { // ifcc
+	case 2492: { // ifcc
 		unhandled("ifcc");
 		break;
 		}
-	case 2489: { // ifge
+	case 2493: { // ifge
 		unhandled("ifge");
 		break;
 		}
-	case 2490: { // ifne
+	case 2494: { // ifne
 		unhandled("ifne");
 		break;
 		}
-	case 2491: { // ifpl
+	case 2495: { // ifpl
 		unhandled("ifpl");
 		break;
 		}
-	case 2492: { // ifnn
+	case 2496: { // ifnn
 		unhandled("ifnn");
 		break;
 		}
-	case 2493: { // ifec
+	case 2497: { // ifec
 		unhandled("ifec");
 		break;
 		}
-	case 2494: { // iflc
+	case 2498: { // iflc
 		unhandled("iflc");
 		break;
 		}
-	case 2495: { // ifgt
+	case 2499: { // ifgt
 		unhandled("ifgt");
 		break;
 		}
-	case 2496: { // ifcs
+	case 2500: { // ifcs
 		unhandled("ifcs");
 		break;
 		}
-	case 2497: { // iflt
+	case 2501: { // iflt
 		unhandled("iflt");
 		break;
 		}
-	case 2498: { // ifeq
+	case 2502: { // ifeq
 		unhandled("ifeq");
 		break;
 		}
-	case 2499: { // ifmi
+	case 2503: { // ifmi
 		unhandled("ifmi");
 		break;
 		}
-	case 2500: { // ifnr
+	case 2504: { // ifnr
 		unhandled("ifnr");
 		break;
 		}
-	case 2501: { // ifes
+	case 2505: { // ifes
 		unhandled("ifes");
 		break;
 		}
-	case 2502: { // ifls
+	case 2506: { // ifls
 		unhandled("ifls");
 		break;
 		}
-	case 2503: { // ifle
+	case 2507: { // ifle
 		unhandled("ifle");
 		break;
 		}
-	case 2504: { // ifcc.u
+	case 2508: { // ifcc.u
 		unhandled("ifcc.u");
 		break;
 		}
-	case 2505: { // ifge.u
+	case 2509: { // ifge.u
 		unhandled("ifge.u");
 		break;
 		}
-	case 2506: { // ifne.u
+	case 2510: { // ifne.u
 		unhandled("ifne.u");
 		break;
 		}
-	case 2507: { // ifpl.u
+	case 2511: { // ifpl.u
 		unhandled("ifpl.u");
 		break;
 		}
-	case 2508: { // ifnn.u
+	case 2512: { // ifnn.u
 		unhandled("ifnn.u");
 		break;
 		}
-	case 2509: { // ifec.u
+	case 2513: { // ifec.u
 		unhandled("ifec.u");
 		break;
 		}
-	case 2510: { // iflc.u
+	case 2514: { // iflc.u
 		unhandled("iflc.u");
 		break;
 		}
-	case 2511: { // ifgt.u
+	case 2515: { // ifgt.u
 		unhandled("ifgt.u");
 		break;
 		}
-	case 2512: { // ifcs.u
+	case 2516: { // ifcs.u
 		unhandled("ifcs.u");
 		break;
 		}
-	case 2513: { // iflt.u
+	case 2517: { // iflt.u
 		unhandled("iflt.u");
 		break;
 		}
-	case 2514: { // ifeq.u
+	case 2518: { // ifeq.u
 		unhandled("ifeq.u");
 		break;
 		}
-	case 2515: { // ifmi.u
+	case 2519: { // ifmi.u
 		unhandled("ifmi.u");
 		break;
 		}
-	case 2516: { // ifnr.u
+	case 2520: { // ifnr.u
 		unhandled("ifnr.u");
 		break;
 		}
-	case 2517: { // ifes.u
+	case 2521: { // ifes.u
 		unhandled("ifes.u");
 		break;
 		}
-	case 2518: { // ifls.u
+	case 2522: { // ifls.u
 		unhandled("ifls.u");
 		break;
 		}
-	case 2519: { // ifle.u
+	case 2523: { // ifle.u
 		unhandled("ifle.u");
 		break;
 		}
@@ -11764,11 +14238,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 26: { // x0,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 27: { // x0,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 28: { // x0,r
@@ -11820,11 +14294,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 40: { // x1,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 41: { // x1,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 42: { // x1,r
@@ -11876,11 +14350,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 54: { // y0,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 55: { // y0,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 56: { // y0,r
@@ -11932,11 +14406,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 68: { // y1,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 69: { // y1,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 70: { // y1,r
@@ -11988,11 +14462,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 82: { // a0,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 83: { // a0,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 84: { // a0,r
@@ -12044,11 +14518,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 96: { // b0,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 97: { // b0,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 98: { // b0,r
@@ -12100,11 +14574,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 110: { // a2,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 111: { // a2,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 112: { // a2,r
@@ -12156,11 +14630,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 124: { // b2,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 125: { // b2,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 126: { // b2,r
@@ -12212,11 +14686,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 138: { // a1,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 139: { // a1,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 140: { // a1,r
@@ -12268,11 +14742,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 152: { // b1,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 153: { // b1,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 154: { // b1,r
@@ -12324,11 +14798,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 166: { // a,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 167: { // a,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 168: { // a,r
@@ -12380,11 +14854,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 180: { // b,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 181: { // b,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 182: { // b,r
@@ -12436,11 +14910,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 194: { // r,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 195: { // r,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 196: { // r,r
@@ -12492,11 +14966,11 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 208: { // n,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 209: { // n,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 210: { // n,r
@@ -12508,19 +14982,15 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 212: { // (r)-n
-		unhandled("(r)-n");
 		break;
 		}
 	case 213: { // (r)+n
-		unhandled("(r)+n");
 		break;
 		}
 	case 214: { // (r)-
-		unhandled("(r)-");
 		break;
 		}
 	case 215: { // (r)+
-		unhandled("(r)+");
 		break;
 		}
 	case 216: { // x:(r)-n,x0
@@ -12804,59 +15274,59 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 286: { // x:(r)-n,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 287: { // x:(r)+n,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 288: { // x:(r)-,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 289: { // x:(r)+,a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 290: { // x:(r),a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 291: { // x:(r+n),a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 292: { // x:-(r),a
-		set_a(m_tmp1);
+		set_ah(m_tmp1);
 		break;
 		}
 	case 293: { // x:(r)-n,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 294: { // x:(r)+n,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 295: { // x:(r)-,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 296: { // x:(r)+,b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 297: { // x:(r),b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 298: { // x:(r+n),b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 299: { // x:-(r),b
-		set_b(m_tmp1);
+		set_bh(m_tmp1);
 		break;
 		}
 	case 300: { // x:(r)-n,r
@@ -13574,8448 +16044,10128 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 412: { // x:[abs],x0
-		unhandled("x:[abs],x0");
+		set_x0(m_tmp1);
 		break;
 		}
 	case 413: { // x:[abs],x1
-		unhandled("x:[abs],x1");
+		set_x1(m_tmp1);
 		break;
 		}
 	case 414: { // x:[abs],y0
-		unhandled("x:[abs],y0");
+		set_y0(m_tmp1);
 		break;
 		}
 	case 415: { // x:[abs],y1
-		unhandled("x:[abs],y1");
+		set_y1(m_tmp1);
 		break;
 		}
 	case 416: { // x:[abs],a0
-		unhandled("x:[abs],a0");
+		set_a0(m_tmp1);
 		break;
 		}
 	case 417: { // x:[abs],b0
-		unhandled("x:[abs],b0");
+		set_b0(m_tmp1);
 		break;
 		}
 	case 418: { // x:[abs],a2
-		unhandled("x:[abs],a2");
+		set_a2(m_tmp1);
 		break;
 		}
 	case 419: { // x:[abs],b2
-		unhandled("x:[abs],b2");
+		set_b2(m_tmp1);
 		break;
 		}
 	case 420: { // x:[abs],a1
-		unhandled("x:[abs],a1");
+		set_a1(m_tmp1);
 		break;
 		}
 	case 421: { // x:[abs],b1
-		unhandled("x:[abs],b1");
+		set_b1(m_tmp1);
 		break;
 		}
 	case 422: { // x:[abs],a
-		unhandled("x:[abs],a");
+		set_ah(m_tmp1);
 		break;
 		}
 	case 423: { // x:[abs],b
-		unhandled("x:[abs],b");
+		set_bh(m_tmp1);
 		break;
 		}
 	case 424: { // x:[abs],r
-		unhandled("x:[abs],r");
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
 	case 425: { // x:[abs],n
-		unhandled("x:[abs],n");
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 426: { // #[i],x0
+	case 426: { // x0,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 427: { // x1,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 428: { // y0,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 429: { // y1,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 430: { // a0,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 431: { // b0,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 432: { // a2,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 433: { // b2,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 434: { // a1,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 435: { // b1,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 436: { // a,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 437: { // b,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 438: { // r,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 439: { // n,x:[abs]
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 440: { // #[i],x0
 		u32 i = exv;
 		set_x0(i);
 		break;
 		}
-	case 427: { // #[i],x1
+	case 441: { // #[i],x1
 		u32 i = exv;
 		set_x1(i);
 		break;
 		}
-	case 428: { // #[i],y0
+	case 442: { // #[i],y0
 		u32 i = exv;
 		set_y0(i);
 		break;
 		}
-	case 429: { // #[i],y1
+	case 443: { // #[i],y1
 		u32 i = exv;
 		set_y1(i);
 		break;
 		}
-	case 430: { // #[i],a0
+	case 444: { // #[i],a0
 		u32 i = exv;
 		set_a0(i);
 		break;
 		}
-	case 431: { // #[i],b0
+	case 445: { // #[i],b0
 		u32 i = exv;
 		set_b0(i);
 		break;
 		}
-	case 432: { // #[i],a2
+	case 446: { // #[i],a2
 		u32 i = exv;
 		set_a2(i);
 		break;
 		}
-	case 433: { // #[i],b2
+	case 447: { // #[i],b2
 		u32 i = exv;
 		set_b2(i);
 		break;
 		}
-	case 434: { // #[i],a1
+	case 448: { // #[i],a1
 		u32 i = exv;
 		set_a1(i);
 		break;
 		}
-	case 435: { // #[i],b1
+	case 449: { // #[i],b1
 		u32 i = exv;
 		set_b1(i);
 		break;
 		}
-	case 436: { // #[i],a
+	case 450: { // #[i],a
 		u32 i = exv;
-		set_a(i);
+		set_ah(i);
 		break;
 		}
-	case 437: { // #[i],b
+	case 451: { // #[i],b
 		u32 i = exv;
-		set_b(i);
+		set_bh(i);
 		break;
 		}
-	case 438: { // #[i],r
+	case 452: { // #[i],r
 		u32 i = exv;
 		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, i);
 		break;
 		}
-	case 439: { // #[i],n
+	case 453: { // #[i],n
 		u32 i = exv;
 		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, i);
 		break;
 		}
-	case 440: { // x0,x:[abs]
-		unhandled("x0,x:[abs]");
-		break;
-		}
-	case 441: { // x1,x:[abs]
-		unhandled("x1,x:[abs]");
-		break;
-		}
-	case 442: { // y0,x:[abs]
-		unhandled("y0,x:[abs]");
-		break;
-		}
-	case 443: { // y1,x:[abs]
-		unhandled("y1,x:[abs]");
-		break;
-		}
-	case 444: { // a0,x:[abs]
-		unhandled("a0,x:[abs]");
-		break;
-		}
-	case 445: { // b0,x:[abs]
-		unhandled("b0,x:[abs]");
-		break;
-		}
-	case 446: { // a2,x:[abs]
-		unhandled("a2,x:[abs]");
-		break;
-		}
-	case 447: { // b2,x:[abs]
-		unhandled("b2,x:[abs]");
-		break;
-		}
-	case 448: { // a1,x:[abs]
-		unhandled("a1,x:[abs]");
-		break;
-		}
-	case 449: { // b1,x:[abs]
-		unhandled("b1,x:[abs]");
-		break;
-		}
-	case 450: { // a,x:[abs]
-		unhandled("a,x:[abs]");
-		break;
-		}
-	case 451: { // b,x:[abs]
-		unhandled("b,x:[abs]");
-		break;
-		}
-	case 452: { // r,x:[abs]
-		unhandled("r,x:[abs]");
-		break;
-		}
-	case 453: { // n,x:[abs]
-		unhandled("n,x:[abs]");
-		break;
-		}
 	case 454: { // x:[aa],x0
-		unhandled("x:[aa],x0");
+		set_x0(m_tmp1);
 		break;
 		}
 	case 455: { // x:[aa],x1
-		unhandled("x:[aa],x1");
+		set_x1(m_tmp1);
 		break;
 		}
 	case 456: { // x:[aa],y0
-		unhandled("x:[aa],y0");
+		set_y0(m_tmp1);
 		break;
 		}
 	case 457: { // x:[aa],y1
-		unhandled("x:[aa],y1");
+		set_y1(m_tmp1);
 		break;
 		}
 	case 458: { // x:[aa],a0
-		unhandled("x:[aa],a0");
+		set_a0(m_tmp1);
 		break;
 		}
 	case 459: { // x:[aa],b0
-		unhandled("x:[aa],b0");
+		set_b0(m_tmp1);
 		break;
 		}
 	case 460: { // x:[aa],a2
-		unhandled("x:[aa],a2");
+		set_a2(m_tmp1);
 		break;
 		}
 	case 461: { // x:[aa],b2
-		unhandled("x:[aa],b2");
+		set_b2(m_tmp1);
 		break;
 		}
 	case 462: { // x:[aa],a1
-		unhandled("x:[aa],a1");
+		set_a1(m_tmp1);
 		break;
 		}
 	case 463: { // x:[aa],b1
-		unhandled("x:[aa],b1");
+		set_b1(m_tmp1);
 		break;
 		}
 	case 464: { // x:[aa],a
-		unhandled("x:[aa],a");
+		set_ah(m_tmp1);
 		break;
 		}
 	case 465: { // x:[aa],b
-		unhandled("x:[aa],b");
+		set_bh(m_tmp1);
 		break;
 		}
 	case 466: { // x:[aa],r
-		unhandled("x:[aa],r");
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
 	case 467: { // x:[aa],n
-		unhandled("x:[aa],n");
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
 	case 468: { // x0,x:[aa]
-		unhandled("x0,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 469: { // x1,x:[aa]
-		unhandled("x1,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 470: { // y0,x:[aa]
-		unhandled("y0,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 471: { // y1,x:[aa]
-		unhandled("y1,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 472: { // a0,x:[aa]
-		unhandled("a0,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 473: { // b0,x:[aa]
-		unhandled("b0,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 474: { // a2,x:[aa]
-		unhandled("a2,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 475: { // b2,x:[aa]
-		unhandled("b2,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 476: { // a1,x:[aa]
-		unhandled("a1,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 477: { // b1,x:[aa]
-		unhandled("b1,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 478: { // a,x:[aa]
-		unhandled("a,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 479: { // b,x:[aa]
-		unhandled("b,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 480: { // r,x:[aa]
-		unhandled("r,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 481: { // n,x:[aa]
-		unhandled("n,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
 		break;
 		}
 	case 482: { // x:(r)-n,x0 a,y0
-		unhandled("x:(r)-n,x0 a,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 483: { // x:(r)+n,x0 a,y0
-		unhandled("x:(r)+n,x0 a,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 484: { // x:(r)-,x0 a,y0
-		unhandled("x:(r)-,x0 a,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 485: { // x:(r)+,x0 a,y0
-		unhandled("x:(r)+,x0 a,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 486: { // x:(r),x0 a,y0
-		unhandled("x:(r),x0 a,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 487: { // x:(r+n),x0 a,y0
-		unhandled("x:(r+n),x0 a,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 488: { // x:-(r),x0 a,y0
-		unhandled("x:-(r),x0 a,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 489: { // x:(r)-n,x0 a,y1
-		unhandled("x:(r)-n,x0 a,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 490: { // x:(r)+n,x0 a,y1
-		unhandled("x:(r)+n,x0 a,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 491: { // x:(r)-,x0 a,y1
-		unhandled("x:(r)-,x0 a,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 492: { // x:(r)+,x0 a,y1
-		unhandled("x:(r)+,x0 a,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 493: { // x:(r),x0 a,y1
-		unhandled("x:(r),x0 a,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 494: { // x:(r+n),x0 a,y1
-		unhandled("x:(r+n),x0 a,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 495: { // x:-(r),x0 a,y1
-		unhandled("x:-(r),x0 a,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 496: { // x:(r)-n,x0 b,y0
-		unhandled("x:(r)-n,x0 b,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 497: { // x:(r)+n,x0 b,y0
-		unhandled("x:(r)+n,x0 b,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 498: { // x:(r)-,x0 b,y0
-		unhandled("x:(r)-,x0 b,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 499: { // x:(r)+,x0 b,y0
-		unhandled("x:(r)+,x0 b,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 500: { // x:(r),x0 b,y0
-		unhandled("x:(r),x0 b,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 501: { // x:(r+n),x0 b,y0
-		unhandled("x:(r+n),x0 b,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 502: { // x:-(r),x0 b,y0
-		unhandled("x:-(r),x0 b,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 503: { // x:(r)-n,x0 b,y1
-		unhandled("x:(r)-n,x0 b,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 504: { // x:(r)+n,x0 b,y1
-		unhandled("x:(r)+n,x0 b,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 505: { // x:(r)-,x0 b,y1
-		unhandled("x:(r)-,x0 b,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 506: { // x:(r)+,x0 b,y1
-		unhandled("x:(r)+,x0 b,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 507: { // x:(r),x0 b,y1
-		unhandled("x:(r),x0 b,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 508: { // x:(r+n),x0 b,y1
-		unhandled("x:(r+n),x0 b,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 509: { // x:-(r),x0 b,y1
-		unhandled("x:-(r),x0 b,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 510: { // x:(r)-n,x1 a,y0
-		unhandled("x:(r)-n,x1 a,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 511: { // x:(r)+n,x1 a,y0
-		unhandled("x:(r)+n,x1 a,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 512: { // x:(r)-,x1 a,y0
-		unhandled("x:(r)-,x1 a,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 513: { // x:(r)+,x1 a,y0
-		unhandled("x:(r)+,x1 a,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 514: { // x:(r),x1 a,y0
-		unhandled("x:(r),x1 a,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 515: { // x:(r+n),x1 a,y0
-		unhandled("x:(r+n),x1 a,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 516: { // x:-(r),x1 a,y0
-		unhandled("x:-(r),x1 a,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 517: { // x:(r)-n,x1 a,y1
-		unhandled("x:(r)-n,x1 a,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 518: { // x:(r)+n,x1 a,y1
-		unhandled("x:(r)+n,x1 a,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 519: { // x:(r)-,x1 a,y1
-		unhandled("x:(r)-,x1 a,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 520: { // x:(r)+,x1 a,y1
-		unhandled("x:(r)+,x1 a,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 521: { // x:(r),x1 a,y1
-		unhandled("x:(r),x1 a,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 522: { // x:(r+n),x1 a,y1
-		unhandled("x:(r+n),x1 a,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 523: { // x:-(r),x1 a,y1
-		unhandled("x:-(r),x1 a,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 524: { // x:(r)-n,x1 b,y0
-		unhandled("x:(r)-n,x1 b,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 525: { // x:(r)+n,x1 b,y0
-		unhandled("x:(r)+n,x1 b,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 526: { // x:(r)-,x1 b,y0
-		unhandled("x:(r)-,x1 b,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 527: { // x:(r)+,x1 b,y0
-		unhandled("x:(r)+,x1 b,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 528: { // x:(r),x1 b,y0
-		unhandled("x:(r),x1 b,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 529: { // x:(r+n),x1 b,y0
-		unhandled("x:(r+n),x1 b,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 530: { // x:-(r),x1 b,y0
-		unhandled("x:-(r),x1 b,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 531: { // x:(r)-n,x1 b,y1
-		unhandled("x:(r)-n,x1 b,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 532: { // x:(r)+n,x1 b,y1
-		unhandled("x:(r)+n,x1 b,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 533: { // x:(r)-,x1 b,y1
-		unhandled("x:(r)-,x1 b,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 534: { // x:(r)+,x1 b,y1
-		unhandled("x:(r)+,x1 b,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 535: { // x:(r),x1 b,y1
-		unhandled("x:(r),x1 b,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 536: { // x:(r+n),x1 b,y1
-		unhandled("x:(r+n),x1 b,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 537: { // x:-(r),x1 b,y1
-		unhandled("x:-(r),x1 b,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 538: { // x:(r)-n,a a,y0
-		unhandled("x:(r)-n,a a,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 539: { // x:(r)+n,a a,y0
-		unhandled("x:(r)+n,a a,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 540: { // x:(r)-,a a,y0
-		unhandled("x:(r)-,a a,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 541: { // x:(r)+,a a,y0
-		unhandled("x:(r)+,a a,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 542: { // x:(r),a a,y0
-		unhandled("x:(r),a a,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 543: { // x:(r+n),a a,y0
-		unhandled("x:(r+n),a a,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 544: { // x:-(r),a a,y0
-		unhandled("x:-(r),a a,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 545: { // x:(r)-n,a a,y1
-		unhandled("x:(r)-n,a a,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 546: { // x:(r)+n,a a,y1
-		unhandled("x:(r)+n,a a,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 547: { // x:(r)-,a a,y1
-		unhandled("x:(r)-,a a,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 548: { // x:(r)+,a a,y1
-		unhandled("x:(r)+,a a,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 549: { // x:(r),a a,y1
-		unhandled("x:(r),a a,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 550: { // x:(r+n),a a,y1
-		unhandled("x:(r+n),a a,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 551: { // x:-(r),a a,y1
-		unhandled("x:-(r),a a,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 552: { // x:(r)-n,a b,y0
-		unhandled("x:(r)-n,a b,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 553: { // x:(r)+n,a b,y0
-		unhandled("x:(r)+n,a b,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 554: { // x:(r)-,a b,y0
-		unhandled("x:(r)-,a b,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 555: { // x:(r)+,a b,y0
-		unhandled("x:(r)+,a b,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 556: { // x:(r),a b,y0
-		unhandled("x:(r),a b,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 557: { // x:(r+n),a b,y0
-		unhandled("x:(r+n),a b,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 558: { // x:-(r),a b,y0
-		unhandled("x:-(r),a b,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 559: { // x:(r)-n,a b,y1
-		unhandled("x:(r)-n,a b,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 560: { // x:(r)+n,a b,y1
-		unhandled("x:(r)+n,a b,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 561: { // x:(r)-,a b,y1
-		unhandled("x:(r)-,a b,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 562: { // x:(r)+,a b,y1
-		unhandled("x:(r)+,a b,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 563: { // x:(r),a b,y1
-		unhandled("x:(r),a b,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 564: { // x:(r+n),a b,y1
-		unhandled("x:(r+n),a b,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 565: { // x:-(r),a b,y1
-		unhandled("x:-(r),a b,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 566: { // x:(r)-n,b a,y0
-		unhandled("x:(r)-n,b a,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 567: { // x:(r)+n,b a,y0
-		unhandled("x:(r)+n,b a,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 568: { // x:(r)-,b a,y0
-		unhandled("x:(r)-,b a,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 569: { // x:(r)+,b a,y0
-		unhandled("x:(r)+,b a,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 570: { // x:(r),b a,y0
-		unhandled("x:(r),b a,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 571: { // x:(r+n),b a,y0
-		unhandled("x:(r+n),b a,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 572: { // x:-(r),b a,y0
-		unhandled("x:-(r),b a,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 573: { // x:(r)-n,b a,y1
-		unhandled("x:(r)-n,b a,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 574: { // x:(r)+n,b a,y1
-		unhandled("x:(r)+n,b a,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 575: { // x:(r)-,b a,y1
-		unhandled("x:(r)-,b a,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 576: { // x:(r)+,b a,y1
-		unhandled("x:(r)+,b a,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 577: { // x:(r),b a,y1
-		unhandled("x:(r),b a,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 578: { // x:(r+n),b a,y1
-		unhandled("x:(r+n),b a,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 579: { // x:-(r),b a,y1
-		unhandled("x:-(r),b a,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 580: { // x:(r)-n,b b,y0
-		unhandled("x:(r)-n,b b,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 581: { // x:(r)+n,b b,y0
-		unhandled("x:(r)+n,b b,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 582: { // x:(r)-,b b,y0
-		unhandled("x:(r)-,b b,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 583: { // x:(r)+,b b,y0
-		unhandled("x:(r)+,b b,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 584: { // x:(r),b b,y0
-		unhandled("x:(r),b b,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 585: { // x:(r+n),b b,y0
-		unhandled("x:(r+n),b b,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 586: { // x:-(r),b b,y0
-		unhandled("x:-(r),b b,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 587: { // x:(r)-n,b b,y1
-		unhandled("x:(r)-n,b b,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 588: { // x:(r)+n,b b,y1
-		unhandled("x:(r)+n,b b,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 589: { // x:(r)-,b b,y1
-		unhandled("x:(r)-,b b,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 590: { // x:(r)+,b b,y1
-		unhandled("x:(r)+,b b,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 591: { // x:(r),b b,y1
-		unhandled("x:(r),b b,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 592: { // x:(r+n),b b,y1
-		unhandled("x:(r+n),b b,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 593: { // x:-(r),b b,y1
-		unhandled("x:-(r),b b,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 594: { // x0,x:(r)-n a,y0
-		unhandled("x0,x:(r)-n a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 595: { // x0,x:(r)+n a,y0
-		unhandled("x0,x:(r)+n a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 596: { // x0,x:(r)- a,y0
-		unhandled("x0,x:(r)- a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 597: { // x0,x:(r)+ a,y0
-		unhandled("x0,x:(r)+ a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 598: { // x0,x:(r) a,y0
-		unhandled("x0,x:(r) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 599: { // x0,x:(r+n) a,y0
-		unhandled("x0,x:(r+n) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 600: { // x0,x:-(r) a,y0
-		unhandled("x0,x:-(r) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 601: { // x0,x:(r)-n a,y1
-		unhandled("x0,x:(r)-n a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 602: { // x0,x:(r)+n a,y1
-		unhandled("x0,x:(r)+n a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 603: { // x0,x:(r)- a,y1
-		unhandled("x0,x:(r)- a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 604: { // x0,x:(r)+ a,y1
-		unhandled("x0,x:(r)+ a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 605: { // x0,x:(r) a,y1
-		unhandled("x0,x:(r) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 606: { // x0,x:(r+n) a,y1
-		unhandled("x0,x:(r+n) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 607: { // x0,x:-(r) a,y1
-		unhandled("x0,x:-(r) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 608: { // x0,x:(r)-n b,y0
-		unhandled("x0,x:(r)-n b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 609: { // x0,x:(r)+n b,y0
-		unhandled("x0,x:(r)+n b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 610: { // x0,x:(r)- b,y0
-		unhandled("x0,x:(r)- b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 611: { // x0,x:(r)+ b,y0
-		unhandled("x0,x:(r)+ b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 612: { // x0,x:(r) b,y0
-		unhandled("x0,x:(r) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 613: { // x0,x:(r+n) b,y0
-		unhandled("x0,x:(r+n) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 614: { // x0,x:-(r) b,y0
-		unhandled("x0,x:-(r) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 615: { // x0,x:(r)-n b,y1
-		unhandled("x0,x:(r)-n b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 616: { // x0,x:(r)+n b,y1
-		unhandled("x0,x:(r)+n b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 617: { // x0,x:(r)- b,y1
-		unhandled("x0,x:(r)- b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 618: { // x0,x:(r)+ b,y1
-		unhandled("x0,x:(r)+ b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 619: { // x0,x:(r) b,y1
-		unhandled("x0,x:(r) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 620: { // x0,x:(r+n) b,y1
-		unhandled("x0,x:(r+n) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 621: { // x0,x:-(r) b,y1
-		unhandled("x0,x:-(r) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 622: { // x1,x:(r)-n a,y0
-		unhandled("x1,x:(r)-n a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 623: { // x1,x:(r)+n a,y0
-		unhandled("x1,x:(r)+n a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 624: { // x1,x:(r)- a,y0
-		unhandled("x1,x:(r)- a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 625: { // x1,x:(r)+ a,y0
-		unhandled("x1,x:(r)+ a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 626: { // x1,x:(r) a,y0
-		unhandled("x1,x:(r) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 627: { // x1,x:(r+n) a,y0
-		unhandled("x1,x:(r+n) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 628: { // x1,x:-(r) a,y0
-		unhandled("x1,x:-(r) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 629: { // x1,x:(r)-n a,y1
-		unhandled("x1,x:(r)-n a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 630: { // x1,x:(r)+n a,y1
-		unhandled("x1,x:(r)+n a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 631: { // x1,x:(r)- a,y1
-		unhandled("x1,x:(r)- a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 632: { // x1,x:(r)+ a,y1
-		unhandled("x1,x:(r)+ a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 633: { // x1,x:(r) a,y1
-		unhandled("x1,x:(r) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 634: { // x1,x:(r+n) a,y1
-		unhandled("x1,x:(r+n) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 635: { // x1,x:-(r) a,y1
-		unhandled("x1,x:-(r) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 636: { // x1,x:(r)-n b,y0
-		unhandled("x1,x:(r)-n b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 637: { // x1,x:(r)+n b,y0
-		unhandled("x1,x:(r)+n b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 638: { // x1,x:(r)- b,y0
-		unhandled("x1,x:(r)- b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 639: { // x1,x:(r)+ b,y0
-		unhandled("x1,x:(r)+ b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 640: { // x1,x:(r) b,y0
-		unhandled("x1,x:(r) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 641: { // x1,x:(r+n) b,y0
-		unhandled("x1,x:(r+n) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 642: { // x1,x:-(r) b,y0
-		unhandled("x1,x:-(r) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 643: { // x1,x:(r)-n b,y1
-		unhandled("x1,x:(r)-n b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 644: { // x1,x:(r)+n b,y1
-		unhandled("x1,x:(r)+n b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 645: { // x1,x:(r)- b,y1
-		unhandled("x1,x:(r)- b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 646: { // x1,x:(r)+ b,y1
-		unhandled("x1,x:(r)+ b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 647: { // x1,x:(r) b,y1
-		unhandled("x1,x:(r) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 648: { // x1,x:(r+n) b,y1
-		unhandled("x1,x:(r+n) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 649: { // x1,x:-(r) b,y1
-		unhandled("x1,x:-(r) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 650: { // a,x:(r)-n a,y0
-		unhandled("a,x:(r)-n a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 651: { // a,x:(r)+n a,y0
-		unhandled("a,x:(r)+n a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 652: { // a,x:(r)- a,y0
-		unhandled("a,x:(r)- a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 653: { // a,x:(r)+ a,y0
-		unhandled("a,x:(r)+ a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 654: { // a,x:(r) a,y0
-		unhandled("a,x:(r) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 655: { // a,x:(r+n) a,y0
-		unhandled("a,x:(r+n) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 656: { // a,x:-(r) a,y0
-		unhandled("a,x:-(r) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 657: { // a,x:(r)-n a,y1
-		unhandled("a,x:(r)-n a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 658: { // a,x:(r)+n a,y1
-		unhandled("a,x:(r)+n a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 659: { // a,x:(r)- a,y1
-		unhandled("a,x:(r)- a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 660: { // a,x:(r)+ a,y1
-		unhandled("a,x:(r)+ a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 661: { // a,x:(r) a,y1
-		unhandled("a,x:(r) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 662: { // a,x:(r+n) a,y1
-		unhandled("a,x:(r+n) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 663: { // a,x:-(r) a,y1
-		unhandled("a,x:-(r) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 664: { // a,x:(r)-n b,y0
-		unhandled("a,x:(r)-n b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 665: { // a,x:(r)+n b,y0
-		unhandled("a,x:(r)+n b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 666: { // a,x:(r)- b,y0
-		unhandled("a,x:(r)- b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 667: { // a,x:(r)+ b,y0
-		unhandled("a,x:(r)+ b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 668: { // a,x:(r) b,y0
-		unhandled("a,x:(r) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 669: { // a,x:(r+n) b,y0
-		unhandled("a,x:(r+n) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 670: { // a,x:-(r) b,y0
-		unhandled("a,x:-(r) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 671: { // a,x:(r)-n b,y1
-		unhandled("a,x:(r)-n b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 672: { // a,x:(r)+n b,y1
-		unhandled("a,x:(r)+n b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 673: { // a,x:(r)- b,y1
-		unhandled("a,x:(r)- b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 674: { // a,x:(r)+ b,y1
-		unhandled("a,x:(r)+ b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 675: { // a,x:(r) b,y1
-		unhandled("a,x:(r) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 676: { // a,x:(r+n) b,y1
-		unhandled("a,x:(r+n) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 677: { // a,x:-(r) b,y1
-		unhandled("a,x:-(r) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 678: { // b,x:(r)-n a,y0
-		unhandled("b,x:(r)-n a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 679: { // b,x:(r)+n a,y0
-		unhandled("b,x:(r)+n a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 680: { // b,x:(r)- a,y0
-		unhandled("b,x:(r)- a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 681: { // b,x:(r)+ a,y0
-		unhandled("b,x:(r)+ a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 682: { // b,x:(r) a,y0
-		unhandled("b,x:(r) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 683: { // b,x:(r+n) a,y0
-		unhandled("b,x:(r+n) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 684: { // b,x:-(r) a,y0
-		unhandled("b,x:-(r) a,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 685: { // b,x:(r)-n a,y1
-		unhandled("b,x:(r)-n a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 686: { // b,x:(r)+n a,y1
-		unhandled("b,x:(r)+n a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 687: { // b,x:(r)- a,y1
-		unhandled("b,x:(r)- a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 688: { // b,x:(r)+ a,y1
-		unhandled("b,x:(r)+ a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 689: { // b,x:(r) a,y1
-		unhandled("b,x:(r) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 690: { // b,x:(r+n) a,y1
-		unhandled("b,x:(r+n) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 691: { // b,x:-(r) a,y1
-		unhandled("b,x:-(r) a,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 692: { // b,x:(r)-n b,y0
-		unhandled("b,x:(r)-n b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 693: { // b,x:(r)+n b,y0
-		unhandled("b,x:(r)+n b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 694: { // b,x:(r)- b,y0
-		unhandled("b,x:(r)- b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 695: { // b,x:(r)+ b,y0
-		unhandled("b,x:(r)+ b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 696: { // b,x:(r) b,y0
-		unhandled("b,x:(r) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 697: { // b,x:(r+n) b,y0
-		unhandled("b,x:(r+n) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 698: { // b,x:-(r) b,y0
-		unhandled("b,x:-(r) b,y0");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 699: { // b,x:(r)-n b,y1
-		unhandled("b,x:(r)-n b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 700: { // b,x:(r)+n b,y1
-		unhandled("b,x:(r)+n b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 701: { // b,x:(r)- b,y1
-		unhandled("b,x:(r)- b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 702: { // b,x:(r)+ b,y1
-		unhandled("b,x:(r)+ b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 703: { // b,x:(r) b,y1
-		unhandled("b,x:(r) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 704: { // b,x:(r+n) b,y1
-		unhandled("b,x:(r+n) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 705: { // b,x:-(r) b,y1
-		unhandled("b,x:-(r) b,y1");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 706: { // x:[abs],x0 a,y0
-		unhandled("x:[abs],x0 a,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 707: { // x:[abs],x0 a,y1
-		unhandled("x:[abs],x0 a,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 708: { // x:[abs],x0 b,y0
-		unhandled("x:[abs],x0 b,y0");
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 709: { // x:[abs],x0 b,y1
-		unhandled("x:[abs],x0 b,y1");
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 710: { // x:[abs],x1 a,y0
-		unhandled("x:[abs],x1 a,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 711: { // x:[abs],x1 a,y1
-		unhandled("x:[abs],x1 a,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 712: { // x:[abs],x1 b,y0
-		unhandled("x:[abs],x1 b,y0");
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 713: { // x:[abs],x1 b,y1
-		unhandled("x:[abs],x1 b,y1");
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 714: { // x:[abs],a a,y0
-		unhandled("x:[abs],a a,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 715: { // x:[abs],a a,y1
-		unhandled("x:[abs],a a,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 716: { // x:[abs],a b,y0
-		unhandled("x:[abs],a b,y0");
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 717: { // x:[abs],a b,y1
-		unhandled("x:[abs],a b,y1");
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 718: { // x:[abs],b a,y0
-		unhandled("x:[abs],b a,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 719: { // x:[abs],b a,y1
-		unhandled("x:[abs],b a,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
 	case 720: { // x:[abs],b b,y0
-		unhandled("x:[abs],b b,y0");
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
 	case 721: { // x:[abs],b b,y1
-		unhandled("x:[abs],b b,y1");
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 722: { // #[i],x0 a,y0
-		unhandled("#[i],x0 a,y0");
+	case 722: { // x0,x:[abs] a,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 723: { // #[i],x0 a,y1
-		unhandled("#[i],x0 a,y1");
+	case 723: { // x0,x:[abs] a,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 724: { // #[i],x0 b,y0
-		unhandled("#[i],x0 b,y0");
+	case 724: { // x0,x:[abs] b,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 725: { // #[i],x0 b,y1
-		unhandled("#[i],x0 b,y1");
+	case 725: { // x0,x:[abs] b,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 726: { // #[i],x1 a,y0
-		unhandled("#[i],x1 a,y0");
+	case 726: { // x1,x:[abs] a,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 727: { // #[i],x1 a,y1
-		unhandled("#[i],x1 a,y1");
+	case 727: { // x1,x:[abs] a,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 728: { // #[i],x1 b,y0
-		unhandled("#[i],x1 b,y0");
+	case 728: { // x1,x:[abs] b,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 729: { // #[i],x1 b,y1
-		unhandled("#[i],x1 b,y1");
+	case 729: { // x1,x:[abs] b,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 730: { // #[i],a a,y0
-		unhandled("#[i],a a,y0");
+	case 730: { // a,x:[abs] a,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 731: { // #[i],a a,y1
-		unhandled("#[i],a a,y1");
+	case 731: { // a,x:[abs] a,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 732: { // #[i],a b,y0
-		unhandled("#[i],a b,y0");
+	case 732: { // a,x:[abs] b,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 733: { // #[i],a b,y1
-		unhandled("#[i],a b,y1");
+	case 733: { // a,x:[abs] b,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 734: { // #[i],b a,y0
-		unhandled("#[i],b a,y0");
+	case 734: { // b,x:[abs] a,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 735: { // #[i],b a,y1
-		unhandled("#[i],b a,y1");
+	case 735: { // b,x:[abs] a,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 736: { // #[i],b b,y0
-		unhandled("#[i],b b,y0");
+	case 736: { // b,x:[abs] b,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 737: { // #[i],b b,y1
-		unhandled("#[i],b b,y1");
+	case 737: { // b,x:[abs] b,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 738: { // x0,x:[abs] a,y0
-		unhandled("x0,x:[abs] a,y0");
+	case 738: { // #[i],x0 a,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_x0(i);
 		break;
 		}
-	case 739: { // x0,x:[abs] a,y1
-		unhandled("x0,x:[abs] a,y1");
+	case 739: { // #[i],x0 a,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_x0(i);
 		break;
 		}
-	case 740: { // x0,x:[abs] b,y0
-		unhandled("x0,x:[abs] b,y0");
+	case 740: { // #[i],x0 b,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_x0(i);
 		break;
 		}
-	case 741: { // x0,x:[abs] b,y1
-		unhandled("x0,x:[abs] b,y1");
+	case 741: { // #[i],x0 b,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_x0(i);
 		break;
 		}
-	case 742: { // x1,x:[abs] a,y0
-		unhandled("x1,x:[abs] a,y0");
+	case 742: { // #[i],x1 a,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_x1(i);
 		break;
 		}
-	case 743: { // x1,x:[abs] a,y1
-		unhandled("x1,x:[abs] a,y1");
+	case 743: { // #[i],x1 a,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_x1(i);
 		break;
 		}
-	case 744: { // x1,x:[abs] b,y0
-		unhandled("x1,x:[abs] b,y0");
+	case 744: { // #[i],x1 b,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_x1(i);
 		break;
 		}
-	case 745: { // x1,x:[abs] b,y1
-		unhandled("x1,x:[abs] b,y1");
+	case 745: { // #[i],x1 b,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_x1(i);
 		break;
 		}
-	case 746: { // a,x:[abs] a,y0
-		unhandled("a,x:[abs] a,y0");
+	case 746: { // #[i],a a,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_ah(i);
 		break;
 		}
-	case 747: { // a,x:[abs] a,y1
-		unhandled("a,x:[abs] a,y1");
+	case 747: { // #[i],a a,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_ah(i);
 		break;
 		}
-	case 748: { // a,x:[abs] b,y0
-		unhandled("a,x:[abs] b,y0");
+	case 748: { // #[i],a b,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_ah(i);
 		break;
 		}
-	case 749: { // a,x:[abs] b,y1
-		unhandled("a,x:[abs] b,y1");
+	case 749: { // #[i],a b,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_ah(i);
 		break;
 		}
-	case 750: { // b,x:[abs] a,y0
-		unhandled("b,x:[abs] a,y0");
+	case 750: { // #[i],b a,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_bh(i);
 		break;
 		}
-	case 751: { // b,x:[abs] a,y1
-		unhandled("b,x:[abs] a,y1");
+	case 751: { // #[i],b a,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_bh(i);
 		break;
 		}
-	case 752: { // b,x:[abs] b,y0
-		unhandled("b,x:[abs] b,y0");
+	case 752: { // #[i],b b,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_bh(i);
 		break;
 		}
-	case 753: { // b,x:[abs] b,y1
-		unhandled("b,x:[abs] b,y1");
+	case 753: { // #[i],b b,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_bh(i);
 		break;
 		}
 	case 754: { // a,x:(r)-n x0,a
-		unhandled("a,x:(r)-n x0,a");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
 		break;
 		}
 	case 755: { // a,x:(r)+n x0,a
-		unhandled("a,x:(r)+n x0,a");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
 		break;
 		}
 	case 756: { // a,x:(r)- x0,a
-		unhandled("a,x:(r)- x0,a");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
 		break;
 		}
 	case 757: { // a,x:(r)+ x0,a
-		unhandled("a,x:(r)+ x0,a");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
 		break;
 		}
 	case 758: { // a,x:(r) x0,a
-		unhandled("a,x:(r) x0,a");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
 		break;
 		}
 	case 759: { // a,x:(r+n) x0,a
-		unhandled("a,x:(r+n) x0,a");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
 		break;
 		}
 	case 760: { // a,x:-(r) x0,a
-		unhandled("a,x:-(r) x0,a");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
 		break;
 		}
 	case 761: { // b,x:(r)-n x0,b
-		unhandled("b,x:(r)-n x0,b");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
 	case 762: { // b,x:(r)+n x0,b
-		unhandled("b,x:(r)+n x0,b");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
 	case 763: { // b,x:(r)- x0,b
-		unhandled("b,x:(r)- x0,b");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
 	case 764: { // b,x:(r)+ x0,b
-		unhandled("b,x:(r)+ x0,b");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
 	case 765: { // b,x:(r) x0,b
-		unhandled("b,x:(r) x0,b");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
 	case 766: { // b,x:(r+n) x0,b
-		unhandled("b,x:(r+n) x0,b");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
 	case 767: { // b,x:-(r) x0,b
-		unhandled("b,x:-(r) x0,b");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 768: { // y:(r)-n,x0
-		unhandled("y:(r)-n,x0");
+	case 768: { // a,x:[abs] x0,a
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_a(m_tmp2);
 		break;
 		}
-	case 769: { // y:(r)+n,x0
-		unhandled("y:(r)+n,x0");
+	case 769: { // b,x:[abs] x0,b
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 770: { // y:(r)-,x0
-		unhandled("y:(r)-,x0");
+	case 770: { // y:(r)-n,x0
+		set_x0(m_tmp1);
 		break;
 		}
-	case 771: { // y:(r)+,x0
-		unhandled("y:(r)+,x0");
+	case 771: { // y:(r)+n,x0
+		set_x0(m_tmp1);
 		break;
 		}
-	case 772: { // y:(r),x0
-		unhandled("y:(r),x0");
+	case 772: { // y:(r)-,x0
+		set_x0(m_tmp1);
 		break;
 		}
-	case 773: { // y:(r+n),x0
-		unhandled("y:(r+n),x0");
+	case 773: { // y:(r)+,x0
+		set_x0(m_tmp1);
 		break;
 		}
-	case 774: { // y:-(r),x0
-		unhandled("y:-(r),x0");
+	case 774: { // y:(r),x0
+		set_x0(m_tmp1);
 		break;
 		}
-	case 775: { // y:(r)-n,x1
-		unhandled("y:(r)-n,x1");
+	case 775: { // y:(r+n),x0
+		set_x0(m_tmp1);
 		break;
 		}
-	case 776: { // y:(r)+n,x1
-		unhandled("y:(r)+n,x1");
+	case 776: { // y:-(r),x0
+		set_x0(m_tmp1);
 		break;
 		}
-	case 777: { // y:(r)-,x1
-		unhandled("y:(r)-,x1");
+	case 777: { // y:(r)-n,x1
+		set_x1(m_tmp1);
 		break;
 		}
-	case 778: { // y:(r)+,x1
-		unhandled("y:(r)+,x1");
+	case 778: { // y:(r)+n,x1
+		set_x1(m_tmp1);
 		break;
 		}
-	case 779: { // y:(r),x1
-		unhandled("y:(r),x1");
+	case 779: { // y:(r)-,x1
+		set_x1(m_tmp1);
 		break;
 		}
-	case 780: { // y:(r+n),x1
-		unhandled("y:(r+n),x1");
+	case 780: { // y:(r)+,x1
+		set_x1(m_tmp1);
 		break;
 		}
-	case 781: { // y:-(r),x1
-		unhandled("y:-(r),x1");
+	case 781: { // y:(r),x1
+		set_x1(m_tmp1);
 		break;
 		}
-	case 782: { // y:(r)-n,y0
-		unhandled("y:(r)-n,y0");
+	case 782: { // y:(r+n),x1
+		set_x1(m_tmp1);
 		break;
 		}
-	case 783: { // y:(r)+n,y0
-		unhandled("y:(r)+n,y0");
+	case 783: { // y:-(r),x1
+		set_x1(m_tmp1);
 		break;
 		}
-	case 784: { // y:(r)-,y0
-		unhandled("y:(r)-,y0");
+	case 784: { // y:(r)-n,y0
+		set_y0(m_tmp1);
 		break;
 		}
-	case 785: { // y:(r)+,y0
-		unhandled("y:(r)+,y0");
+	case 785: { // y:(r)+n,y0
+		set_y0(m_tmp1);
 		break;
 		}
-	case 786: { // y:(r),y0
-		unhandled("y:(r),y0");
+	case 786: { // y:(r)-,y0
+		set_y0(m_tmp1);
 		break;
 		}
-	case 787: { // y:(r+n),y0
-		unhandled("y:(r+n),y0");
+	case 787: { // y:(r)+,y0
+		set_y0(m_tmp1);
 		break;
 		}
-	case 788: { // y:-(r),y0
-		unhandled("y:-(r),y0");
+	case 788: { // y:(r),y0
+		set_y0(m_tmp1);
 		break;
 		}
-	case 789: { // y:(r)-n,y1
-		unhandled("y:(r)-n,y1");
+	case 789: { // y:(r+n),y0
+		set_y0(m_tmp1);
 		break;
 		}
-	case 790: { // y:(r)+n,y1
-		unhandled("y:(r)+n,y1");
+	case 790: { // y:-(r),y0
+		set_y0(m_tmp1);
 		break;
 		}
-	case 791: { // y:(r)-,y1
-		unhandled("y:(r)-,y1");
+	case 791: { // y:(r)-n,y1
+		set_y1(m_tmp1);
 		break;
 		}
-	case 792: { // y:(r)+,y1
-		unhandled("y:(r)+,y1");
+	case 792: { // y:(r)+n,y1
+		set_y1(m_tmp1);
 		break;
 		}
-	case 793: { // y:(r),y1
-		unhandled("y:(r),y1");
+	case 793: { // y:(r)-,y1
+		set_y1(m_tmp1);
 		break;
 		}
-	case 794: { // y:(r+n),y1
-		unhandled("y:(r+n),y1");
+	case 794: { // y:(r)+,y1
+		set_y1(m_tmp1);
 		break;
 		}
-	case 795: { // y:-(r),y1
-		unhandled("y:-(r),y1");
+	case 795: { // y:(r),y1
+		set_y1(m_tmp1);
 		break;
 		}
-	case 796: { // y:(r)-n,a0
-		unhandled("y:(r)-n,a0");
+	case 796: { // y:(r+n),y1
+		set_y1(m_tmp1);
 		break;
 		}
-	case 797: { // y:(r)+n,a0
-		unhandled("y:(r)+n,a0");
+	case 797: { // y:-(r),y1
+		set_y1(m_tmp1);
 		break;
 		}
-	case 798: { // y:(r)-,a0
-		unhandled("y:(r)-,a0");
+	case 798: { // y:(r)-n,a0
+		set_a0(m_tmp1);
 		break;
 		}
-	case 799: { // y:(r)+,a0
-		unhandled("y:(r)+,a0");
+	case 799: { // y:(r)+n,a0
+		set_a0(m_tmp1);
 		break;
 		}
-	case 800: { // y:(r),a0
-		unhandled("y:(r),a0");
+	case 800: { // y:(r)-,a0
+		set_a0(m_tmp1);
 		break;
 		}
-	case 801: { // y:(r+n),a0
-		unhandled("y:(r+n),a0");
+	case 801: { // y:(r)+,a0
+		set_a0(m_tmp1);
 		break;
 		}
-	case 802: { // y:-(r),a0
-		unhandled("y:-(r),a0");
+	case 802: { // y:(r),a0
+		set_a0(m_tmp1);
 		break;
 		}
-	case 803: { // y:(r)-n,b0
-		unhandled("y:(r)-n,b0");
+	case 803: { // y:(r+n),a0
+		set_a0(m_tmp1);
 		break;
 		}
-	case 804: { // y:(r)+n,b0
-		unhandled("y:(r)+n,b0");
+	case 804: { // y:-(r),a0
+		set_a0(m_tmp1);
 		break;
 		}
-	case 805: { // y:(r)-,b0
-		unhandled("y:(r)-,b0");
+	case 805: { // y:(r)-n,b0
+		set_b0(m_tmp1);
 		break;
 		}
-	case 806: { // y:(r)+,b0
-		unhandled("y:(r)+,b0");
+	case 806: { // y:(r)+n,b0
+		set_b0(m_tmp1);
 		break;
 		}
-	case 807: { // y:(r),b0
-		unhandled("y:(r),b0");
+	case 807: { // y:(r)-,b0
+		set_b0(m_tmp1);
 		break;
 		}
-	case 808: { // y:(r+n),b0
-		unhandled("y:(r+n),b0");
+	case 808: { // y:(r)+,b0
+		set_b0(m_tmp1);
 		break;
 		}
-	case 809: { // y:-(r),b0
-		unhandled("y:-(r),b0");
+	case 809: { // y:(r),b0
+		set_b0(m_tmp1);
 		break;
 		}
-	case 810: { // y:(r)-n,a2
-		unhandled("y:(r)-n,a2");
+	case 810: { // y:(r+n),b0
+		set_b0(m_tmp1);
 		break;
 		}
-	case 811: { // y:(r)+n,a2
-		unhandled("y:(r)+n,a2");
+	case 811: { // y:-(r),b0
+		set_b0(m_tmp1);
 		break;
 		}
-	case 812: { // y:(r)-,a2
-		unhandled("y:(r)-,a2");
+	case 812: { // y:(r)-n,a2
+		set_a2(m_tmp1);
 		break;
 		}
-	case 813: { // y:(r)+,a2
-		unhandled("y:(r)+,a2");
+	case 813: { // y:(r)+n,a2
+		set_a2(m_tmp1);
 		break;
 		}
-	case 814: { // y:(r),a2
-		unhandled("y:(r),a2");
+	case 814: { // y:(r)-,a2
+		set_a2(m_tmp1);
 		break;
 		}
-	case 815: { // y:(r+n),a2
-		unhandled("y:(r+n),a2");
+	case 815: { // y:(r)+,a2
+		set_a2(m_tmp1);
 		break;
 		}
-	case 816: { // y:-(r),a2
-		unhandled("y:-(r),a2");
+	case 816: { // y:(r),a2
+		set_a2(m_tmp1);
 		break;
 		}
-	case 817: { // y:(r)-n,b2
-		unhandled("y:(r)-n,b2");
+	case 817: { // y:(r+n),a2
+		set_a2(m_tmp1);
 		break;
 		}
-	case 818: { // y:(r)+n,b2
-		unhandled("y:(r)+n,b2");
+	case 818: { // y:-(r),a2
+		set_a2(m_tmp1);
 		break;
 		}
-	case 819: { // y:(r)-,b2
-		unhandled("y:(r)-,b2");
+	case 819: { // y:(r)-n,b2
+		set_b2(m_tmp1);
 		break;
 		}
-	case 820: { // y:(r)+,b2
-		unhandled("y:(r)+,b2");
+	case 820: { // y:(r)+n,b2
+		set_b2(m_tmp1);
 		break;
 		}
-	case 821: { // y:(r),b2
-		unhandled("y:(r),b2");
+	case 821: { // y:(r)-,b2
+		set_b2(m_tmp1);
 		break;
 		}
-	case 822: { // y:(r+n),b2
-		unhandled("y:(r+n),b2");
+	case 822: { // y:(r)+,b2
+		set_b2(m_tmp1);
 		break;
 		}
-	case 823: { // y:-(r),b2
-		unhandled("y:-(r),b2");
+	case 823: { // y:(r),b2
+		set_b2(m_tmp1);
 		break;
 		}
-	case 824: { // y:(r)-n,a1
-		unhandled("y:(r)-n,a1");
+	case 824: { // y:(r+n),b2
+		set_b2(m_tmp1);
 		break;
 		}
-	case 825: { // y:(r)+n,a1
-		unhandled("y:(r)+n,a1");
+	case 825: { // y:-(r),b2
+		set_b2(m_tmp1);
 		break;
 		}
-	case 826: { // y:(r)-,a1
-		unhandled("y:(r)-,a1");
+	case 826: { // y:(r)-n,a1
+		set_a1(m_tmp1);
 		break;
 		}
-	case 827: { // y:(r)+,a1
-		unhandled("y:(r)+,a1");
+	case 827: { // y:(r)+n,a1
+		set_a1(m_tmp1);
 		break;
 		}
-	case 828: { // y:(r),a1
-		unhandled("y:(r),a1");
+	case 828: { // y:(r)-,a1
+		set_a1(m_tmp1);
 		break;
 		}
-	case 829: { // y:(r+n),a1
-		unhandled("y:(r+n),a1");
+	case 829: { // y:(r)+,a1
+		set_a1(m_tmp1);
 		break;
 		}
-	case 830: { // y:-(r),a1
-		unhandled("y:-(r),a1");
+	case 830: { // y:(r),a1
+		set_a1(m_tmp1);
 		break;
 		}
-	case 831: { // y:(r)-n,b1
-		unhandled("y:(r)-n,b1");
+	case 831: { // y:(r+n),a1
+		set_a1(m_tmp1);
 		break;
 		}
-	case 832: { // y:(r)+n,b1
-		unhandled("y:(r)+n,b1");
+	case 832: { // y:-(r),a1
+		set_a1(m_tmp1);
 		break;
 		}
-	case 833: { // y:(r)-,b1
-		unhandled("y:(r)-,b1");
+	case 833: { // y:(r)-n,b1
+		set_b1(m_tmp1);
 		break;
 		}
-	case 834: { // y:(r)+,b1
-		unhandled("y:(r)+,b1");
+	case 834: { // y:(r)+n,b1
+		set_b1(m_tmp1);
 		break;
 		}
-	case 835: { // y:(r),b1
-		unhandled("y:(r),b1");
+	case 835: { // y:(r)-,b1
+		set_b1(m_tmp1);
 		break;
 		}
-	case 836: { // y:(r+n),b1
-		unhandled("y:(r+n),b1");
+	case 836: { // y:(r)+,b1
+		set_b1(m_tmp1);
 		break;
 		}
-	case 837: { // y:-(r),b1
-		unhandled("y:-(r),b1");
+	case 837: { // y:(r),b1
+		set_b1(m_tmp1);
 		break;
 		}
-	case 838: { // y:(r)-n,a
-		unhandled("y:(r)-n,a");
+	case 838: { // y:(r+n),b1
+		set_b1(m_tmp1);
 		break;
 		}
-	case 839: { // y:(r)+n,a
-		unhandled("y:(r)+n,a");
+	case 839: { // y:-(r),b1
+		set_b1(m_tmp1);
 		break;
 		}
-	case 840: { // y:(r)-,a
-		unhandled("y:(r)-,a");
+	case 840: { // y:(r)-n,a
+		set_ah(m_tmp1);
 		break;
 		}
-	case 841: { // y:(r)+,a
-		unhandled("y:(r)+,a");
+	case 841: { // y:(r)+n,a
+		set_ah(m_tmp1);
 		break;
 		}
-	case 842: { // y:(r),a
-		unhandled("y:(r),a");
+	case 842: { // y:(r)-,a
+		set_ah(m_tmp1);
 		break;
 		}
-	case 843: { // y:(r+n),a
-		unhandled("y:(r+n),a");
+	case 843: { // y:(r)+,a
+		set_ah(m_tmp1);
 		break;
 		}
-	case 844: { // y:-(r),a
-		unhandled("y:-(r),a");
+	case 844: { // y:(r),a
+		set_ah(m_tmp1);
 		break;
 		}
-	case 845: { // y:(r)-n,b
-		unhandled("y:(r)-n,b");
+	case 845: { // y:(r+n),a
+		set_ah(m_tmp1);
 		break;
 		}
-	case 846: { // y:(r)+n,b
-		unhandled("y:(r)+n,b");
+	case 846: { // y:-(r),a
+		set_ah(m_tmp1);
 		break;
 		}
-	case 847: { // y:(r)-,b
-		unhandled("y:(r)-,b");
+	case 847: { // y:(r)-n,b
+		set_bh(m_tmp1);
 		break;
 		}
-	case 848: { // y:(r)+,b
-		unhandled("y:(r)+,b");
+	case 848: { // y:(r)+n,b
+		set_bh(m_tmp1);
 		break;
 		}
-	case 849: { // y:(r),b
-		unhandled("y:(r),b");
+	case 849: { // y:(r)-,b
+		set_bh(m_tmp1);
 		break;
 		}
-	case 850: { // y:(r+n),b
-		unhandled("y:(r+n),b");
+	case 850: { // y:(r)+,b
+		set_bh(m_tmp1);
 		break;
 		}
-	case 851: { // y:-(r),b
-		unhandled("y:-(r),b");
+	case 851: { // y:(r),b
+		set_bh(m_tmp1);
 		break;
 		}
-	case 852: { // y:(r)-n,r
-		unhandled("y:(r)-n,r");
+	case 852: { // y:(r+n),b
+		set_bh(m_tmp1);
 		break;
 		}
-	case 853: { // y:(r)+n,r
-		unhandled("y:(r)+n,r");
+	case 853: { // y:-(r),b
+		set_bh(m_tmp1);
 		break;
 		}
-	case 854: { // y:(r)-,r
-		unhandled("y:(r)-,r");
+	case 854: { // y:(r)-n,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 855: { // y:(r)+,r
-		unhandled("y:(r)+,r");
+	case 855: { // y:(r)+n,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 856: { // y:(r),r
-		unhandled("y:(r),r");
+	case 856: { // y:(r)-,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 857: { // y:(r+n),r
-		unhandled("y:(r+n),r");
+	case 857: { // y:(r)+,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 858: { // y:-(r),r
-		unhandled("y:-(r),r");
+	case 858: { // y:(r),r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 859: { // y:(r)-n,n
-		unhandled("y:(r)-n,n");
+	case 859: { // y:(r+n),r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 860: { // y:(r)+n,n
-		unhandled("y:(r)+n,n");
+	case 860: { // y:-(r),r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 861: { // y:(r)-,n
-		unhandled("y:(r)-,n");
+	case 861: { // y:(r)-n,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 862: { // y:(r)+,n
-		unhandled("y:(r)+,n");
+	case 862: { // y:(r)+n,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 863: { // y:(r),n
-		unhandled("y:(r),n");
+	case 863: { // y:(r)-,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 864: { // y:(r+n),n
-		unhandled("y:(r+n),n");
+	case 864: { // y:(r)+,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 865: { // y:-(r),n
-		unhandled("y:-(r),n");
+	case 865: { // y:(r),n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 866: { // x0,y:(r)-n
-		unhandled("x0,y:(r)-n");
+	case 866: { // y:(r+n),n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 867: { // x0,y:(r)+n
-		unhandled("x0,y:(r)+n");
+	case 867: { // y:-(r),n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 868: { // x0,y:(r)-
-		unhandled("x0,y:(r)-");
+	case 868: { // x0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 869: { // x0,y:(r)+
-		unhandled("x0,y:(r)+");
+	case 869: { // x0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 870: { // x0,y:(r)
-		unhandled("x0,y:(r)");
+	case 870: { // x0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 871: { // x0,y:(r+n)
-		unhandled("x0,y:(r+n)");
+	case 871: { // x0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 872: { // x0,y:-(r)
-		unhandled("x0,y:-(r)");
+	case 872: { // x0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 873: { // x1,y:(r)-n
-		unhandled("x1,y:(r)-n");
+	case 873: { // x0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 874: { // x1,y:(r)+n
-		unhandled("x1,y:(r)+n");
+	case 874: { // x0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 875: { // x1,y:(r)-
-		unhandled("x1,y:(r)-");
+	case 875: { // x1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 876: { // x1,y:(r)+
-		unhandled("x1,y:(r)+");
+	case 876: { // x1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 877: { // x1,y:(r)
-		unhandled("x1,y:(r)");
+	case 877: { // x1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 878: { // x1,y:(r+n)
-		unhandled("x1,y:(r+n)");
+	case 878: { // x1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 879: { // x1,y:-(r)
-		unhandled("x1,y:-(r)");
+	case 879: { // x1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 880: { // y0,y:(r)-n
-		unhandled("y0,y:(r)-n");
+	case 880: { // x1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 881: { // y0,y:(r)+n
-		unhandled("y0,y:(r)+n");
+	case 881: { // x1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 882: { // y0,y:(r)-
-		unhandled("y0,y:(r)-");
+	case 882: { // y0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 883: { // y0,y:(r)+
-		unhandled("y0,y:(r)+");
+	case 883: { // y0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 884: { // y0,y:(r)
-		unhandled("y0,y:(r)");
+	case 884: { // y0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 885: { // y0,y:(r+n)
-		unhandled("y0,y:(r+n)");
+	case 885: { // y0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 886: { // y0,y:-(r)
-		unhandled("y0,y:-(r)");
+	case 886: { // y0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 887: { // y1,y:(r)-n
-		unhandled("y1,y:(r)-n");
+	case 887: { // y0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 888: { // y1,y:(r)+n
-		unhandled("y1,y:(r)+n");
+	case 888: { // y0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 889: { // y1,y:(r)-
-		unhandled("y1,y:(r)-");
+	case 889: { // y1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 890: { // y1,y:(r)+
-		unhandled("y1,y:(r)+");
+	case 890: { // y1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 891: { // y1,y:(r)
-		unhandled("y1,y:(r)");
+	case 891: { // y1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 892: { // y1,y:(r+n)
-		unhandled("y1,y:(r+n)");
+	case 892: { // y1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 893: { // y1,y:-(r)
-		unhandled("y1,y:-(r)");
+	case 893: { // y1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 894: { // a0,y:(r)-n
-		unhandled("a0,y:(r)-n");
+	case 894: { // y1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 895: { // a0,y:(r)+n
-		unhandled("a0,y:(r)+n");
+	case 895: { // y1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 896: { // a0,y:(r)-
-		unhandled("a0,y:(r)-");
+	case 896: { // a0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 897: { // a0,y:(r)+
-		unhandled("a0,y:(r)+");
+	case 897: { // a0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 898: { // a0,y:(r)
-		unhandled("a0,y:(r)");
+	case 898: { // a0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 899: { // a0,y:(r+n)
-		unhandled("a0,y:(r+n)");
+	case 899: { // a0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 900: { // a0,y:-(r)
-		unhandled("a0,y:-(r)");
+	case 900: { // a0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 901: { // b0,y:(r)-n
-		unhandled("b0,y:(r)-n");
+	case 901: { // a0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 902: { // b0,y:(r)+n
-		unhandled("b0,y:(r)+n");
+	case 902: { // a0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 903: { // b0,y:(r)-
-		unhandled("b0,y:(r)-");
+	case 903: { // b0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 904: { // b0,y:(r)+
-		unhandled("b0,y:(r)+");
+	case 904: { // b0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 905: { // b0,y:(r)
-		unhandled("b0,y:(r)");
+	case 905: { // b0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 906: { // b0,y:(r+n)
-		unhandled("b0,y:(r+n)");
+	case 906: { // b0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 907: { // b0,y:-(r)
-		unhandled("b0,y:-(r)");
+	case 907: { // b0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 908: { // a2,y:(r)-n
-		unhandled("a2,y:(r)-n");
+	case 908: { // b0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 909: { // a2,y:(r)+n
-		unhandled("a2,y:(r)+n");
+	case 909: { // b0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 910: { // a2,y:(r)-
-		unhandled("a2,y:(r)-");
+	case 910: { // a2,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 911: { // a2,y:(r)+
-		unhandled("a2,y:(r)+");
+	case 911: { // a2,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 912: { // a2,y:(r)
-		unhandled("a2,y:(r)");
+	case 912: { // a2,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 913: { // a2,y:(r+n)
-		unhandled("a2,y:(r+n)");
+	case 913: { // a2,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 914: { // a2,y:-(r)
-		unhandled("a2,y:-(r)");
+	case 914: { // a2,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 915: { // b2,y:(r)-n
-		unhandled("b2,y:(r)-n");
+	case 915: { // a2,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 916: { // b2,y:(r)+n
-		unhandled("b2,y:(r)+n");
+	case 916: { // a2,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 917: { // b2,y:(r)-
-		unhandled("b2,y:(r)-");
+	case 917: { // b2,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 918: { // b2,y:(r)+
-		unhandled("b2,y:(r)+");
+	case 918: { // b2,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 919: { // b2,y:(r)
-		unhandled("b2,y:(r)");
+	case 919: { // b2,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 920: { // b2,y:(r+n)
-		unhandled("b2,y:(r+n)");
+	case 920: { // b2,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 921: { // b2,y:-(r)
-		unhandled("b2,y:-(r)");
+	case 921: { // b2,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 922: { // a1,y:(r)-n
-		unhandled("a1,y:(r)-n");
+	case 922: { // b2,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 923: { // a1,y:(r)+n
-		unhandled("a1,y:(r)+n");
+	case 923: { // b2,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 924: { // a1,y:(r)-
-		unhandled("a1,y:(r)-");
+	case 924: { // a1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 925: { // a1,y:(r)+
-		unhandled("a1,y:(r)+");
+	case 925: { // a1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 926: { // a1,y:(r)
-		unhandled("a1,y:(r)");
+	case 926: { // a1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 927: { // a1,y:(r+n)
-		unhandled("a1,y:(r+n)");
+	case 927: { // a1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 928: { // a1,y:-(r)
-		unhandled("a1,y:-(r)");
+	case 928: { // a1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 929: { // b1,y:(r)-n
-		unhandled("b1,y:(r)-n");
+	case 929: { // a1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 930: { // b1,y:(r)+n
-		unhandled("b1,y:(r)+n");
+	case 930: { // a1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 931: { // b1,y:(r)-
-		unhandled("b1,y:(r)-");
+	case 931: { // b1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 932: { // b1,y:(r)+
-		unhandled("b1,y:(r)+");
+	case 932: { // b1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 933: { // b1,y:(r)
-		unhandled("b1,y:(r)");
+	case 933: { // b1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 934: { // b1,y:(r+n)
-		unhandled("b1,y:(r+n)");
+	case 934: { // b1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 935: { // b1,y:-(r)
-		unhandled("b1,y:-(r)");
+	case 935: { // b1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 936: { // a,y:(r)-n
-		unhandled("a,y:(r)-n");
+	case 936: { // b1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 937: { // a,y:(r)+n
-		unhandled("a,y:(r)+n");
+	case 937: { // b1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 938: { // a,y:(r)-
-		unhandled("a,y:(r)-");
+	case 938: { // a,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 939: { // a,y:(r)+
-		unhandled("a,y:(r)+");
+	case 939: { // a,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 940: { // a,y:(r)
-		unhandled("a,y:(r)");
+	case 940: { // a,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 941: { // a,y:(r+n)
-		unhandled("a,y:(r+n)");
+	case 941: { // a,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 942: { // a,y:-(r)
-		unhandled("a,y:-(r)");
+	case 942: { // a,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 943: { // b,y:(r)-n
-		unhandled("b,y:(r)-n");
+	case 943: { // a,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 944: { // b,y:(r)+n
-		unhandled("b,y:(r)+n");
+	case 944: { // a,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 945: { // b,y:(r)-
-		unhandled("b,y:(r)-");
+	case 945: { // b,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 946: { // b,y:(r)+
-		unhandled("b,y:(r)+");
+	case 946: { // b,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 947: { // b,y:(r)
-		unhandled("b,y:(r)");
+	case 947: { // b,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 948: { // b,y:(r+n)
-		unhandled("b,y:(r+n)");
+	case 948: { // b,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 949: { // b,y:-(r)
-		unhandled("b,y:-(r)");
+	case 949: { // b,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 950: { // r,y:(r)-n
-		unhandled("r,y:(r)-n");
+	case 950: { // b,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 951: { // r,y:(r)+n
-		unhandled("r,y:(r)+n");
+	case 951: { // b,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 952: { // r,y:(r)-
-		unhandled("r,y:(r)-");
+	case 952: { // r,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 953: { // r,y:(r)+
-		unhandled("r,y:(r)+");
+	case 953: { // r,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 954: { // r,y:(r)
-		unhandled("r,y:(r)");
+	case 954: { // r,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 955: { // r,y:(r+n)
-		unhandled("r,y:(r+n)");
+	case 955: { // r,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 956: { // r,y:-(r)
-		unhandled("r,y:-(r)");
+	case 956: { // r,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 957: { // n,y:(r)-n
-		unhandled("n,y:(r)-n");
+	case 957: { // r,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 958: { // n,y:(r)+n
-		unhandled("n,y:(r)+n");
+	case 958: { // r,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 959: { // n,y:(r)-
-		unhandled("n,y:(r)-");
+	case 959: { // n,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 960: { // n,y:(r)+
-		unhandled("n,y:(r)+");
+	case 960: { // n,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 961: { // n,y:(r)
-		unhandled("n,y:(r)");
+	case 961: { // n,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 962: { // n,y:(r+n)
-		unhandled("n,y:(r+n)");
+	case 962: { // n,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 963: { // n,y:-(r)
-		unhandled("n,y:-(r)");
+	case 963: { // n,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 964: { // y:[abs],x0
-		unhandled("y:[abs],x0");
+	case 964: { // n,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 965: { // y:[abs],x1
-		unhandled("y:[abs],x1");
+	case 965: { // n,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
 		break;
 		}
-	case 966: { // y:[abs],y0
-		unhandled("y:[abs],y0");
+	case 966: { // y:[abs],x0
+		set_x0(m_tmp1);
 		break;
 		}
-	case 967: { // y:[abs],y1
-		unhandled("y:[abs],y1");
+	case 967: { // y:[abs],x1
+		set_x1(m_tmp1);
 		break;
 		}
-	case 968: { // y:[abs],a0
-		unhandled("y:[abs],a0");
+	case 968: { // y:[abs],y0
+		set_y0(m_tmp1);
 		break;
 		}
-	case 969: { // y:[abs],b0
-		unhandled("y:[abs],b0");
+	case 969: { // y:[abs],y1
+		set_y1(m_tmp1);
 		break;
 		}
-	case 970: { // y:[abs],a2
-		unhandled("y:[abs],a2");
+	case 970: { // y:[abs],a0
+		set_a0(m_tmp1);
 		break;
 		}
-	case 971: { // y:[abs],b2
-		unhandled("y:[abs],b2");
+	case 971: { // y:[abs],b0
+		set_b0(m_tmp1);
 		break;
 		}
-	case 972: { // y:[abs],a1
-		unhandled("y:[abs],a1");
+	case 972: { // y:[abs],a2
+		set_a2(m_tmp1);
 		break;
 		}
-	case 973: { // y:[abs],b1
-		unhandled("y:[abs],b1");
+	case 973: { // y:[abs],b2
+		set_b2(m_tmp1);
 		break;
 		}
-	case 974: { // y:[abs],a
-		unhandled("y:[abs],a");
+	case 974: { // y:[abs],a1
+		set_a1(m_tmp1);
 		break;
 		}
-	case 975: { // y:[abs],b
-		unhandled("y:[abs],b");
+	case 975: { // y:[abs],b1
+		set_b1(m_tmp1);
 		break;
 		}
-	case 976: { // y:[abs],r
-		unhandled("y:[abs],r");
+	case 976: { // y:[abs],a
+		set_ah(m_tmp1);
 		break;
 		}
-	case 977: { // y:[abs],n
-		unhandled("y:[abs],n");
+	case 977: { // y:[abs],b
+		set_bh(m_tmp1);
 		break;
 		}
-	case 978: { // #[i],x0
-		unhandled("#[i],x0");
+	case 978: { // y:[abs],r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 979: { // #[i],x1
-		unhandled("#[i],x1");
+	case 979: { // y:[abs],n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 980: { // #[i],y0
-		unhandled("#[i],y0");
+	case 980: { // x0,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 981: { // #[i],y1
-		unhandled("#[i],y1");
+	case 981: { // x1,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 982: { // #[i],a0
-		unhandled("#[i],a0");
+	case 982: { // y0,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 983: { // #[i],b0
-		unhandled("#[i],b0");
+	case 983: { // y1,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 984: { // #[i],a2
-		unhandled("#[i],a2");
+	case 984: { // a0,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 985: { // #[i],b2
-		unhandled("#[i],b2");
+	case 985: { // b0,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 986: { // #[i],a1
-		unhandled("#[i],a1");
+	case 986: { // a2,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 987: { // #[i],b1
-		unhandled("#[i],b1");
+	case 987: { // b2,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 988: { // #[i],a
-		unhandled("#[i],a");
+	case 988: { // a1,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 989: { // #[i],b
-		unhandled("#[i],b");
+	case 989: { // b1,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 990: { // #[i],r
-		unhandled("#[i],r");
+	case 990: { // a,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 991: { // #[i],n
-		unhandled("#[i],n");
+	case 991: { // b,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 992: { // x0,y:[abs]
-		unhandled("x0,y:[abs]");
+	case 992: { // r,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 993: { // x1,y:[abs]
-		unhandled("x1,y:[abs]");
+	case 993: { // n,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 994: { // y0,y:[abs]
-		unhandled("y0,y:[abs]");
+	case 994: { // #[i],x0
+		u32 i = exv;
+		set_x0(i);
 		break;
 		}
-	case 995: { // y1,y:[abs]
-		unhandled("y1,y:[abs]");
+	case 995: { // #[i],x1
+		u32 i = exv;
+		set_x1(i);
 		break;
 		}
-	case 996: { // a0,y:[abs]
-		unhandled("a0,y:[abs]");
+	case 996: { // #[i],y0
+		u32 i = exv;
+		set_y0(i);
 		break;
 		}
-	case 997: { // b0,y:[abs]
-		unhandled("b0,y:[abs]");
+	case 997: { // #[i],y1
+		u32 i = exv;
+		set_y1(i);
 		break;
 		}
-	case 998: { // a2,y:[abs]
-		unhandled("a2,y:[abs]");
+	case 998: { // #[i],a0
+		u32 i = exv;
+		set_a0(i);
 		break;
 		}
-	case 999: { // b2,y:[abs]
-		unhandled("b2,y:[abs]");
+	case 999: { // #[i],b0
+		u32 i = exv;
+		set_b0(i);
 		break;
 		}
-	case 1000: { // a1,y:[abs]
-		unhandled("a1,y:[abs]");
+	case 1000: { // #[i],a2
+		u32 i = exv;
+		set_a2(i);
 		break;
 		}
-	case 1001: { // b1,y:[abs]
-		unhandled("b1,y:[abs]");
+	case 1001: { // #[i],b2
+		u32 i = exv;
+		set_b2(i);
 		break;
 		}
-	case 1002: { // a,y:[abs]
-		unhandled("a,y:[abs]");
+	case 1002: { // #[i],a1
+		u32 i = exv;
+		set_a1(i);
 		break;
 		}
-	case 1003: { // b,y:[abs]
-		unhandled("b,y:[abs]");
+	case 1003: { // #[i],b1
+		u32 i = exv;
+		set_b1(i);
 		break;
 		}
-	case 1004: { // r,y:[abs]
-		unhandled("r,y:[abs]");
+	case 1004: { // #[i],a
+		u32 i = exv;
+		set_ah(i);
 		break;
 		}
-	case 1005: { // n,y:[abs]
-		unhandled("n,y:[abs]");
+	case 1005: { // #[i],b
+		u32 i = exv;
+		set_bh(i);
 		break;
 		}
-	case 1006: { // y:[aa],x0
-		unhandled("y:[aa],x0");
+	case 1006: { // #[i],r
+		u32 i = exv;
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, i);
 		break;
 		}
-	case 1007: { // y:[aa],x1
-		unhandled("y:[aa],x1");
+	case 1007: { // #[i],n
+		u32 i = exv;
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, i);
 		break;
 		}
-	case 1008: { // y:[aa],y0
-		unhandled("y:[aa],y0");
+	case 1008: { // y:[aa],x0
+		set_x0(m_tmp1);
 		break;
 		}
-	case 1009: { // y:[aa],y1
-		unhandled("y:[aa],y1");
+	case 1009: { // y:[aa],x1
+		set_x1(m_tmp1);
 		break;
 		}
-	case 1010: { // y:[aa],a0
-		unhandled("y:[aa],a0");
+	case 1010: { // y:[aa],y0
+		set_y0(m_tmp1);
 		break;
 		}
-	case 1011: { // y:[aa],b0
-		unhandled("y:[aa],b0");
+	case 1011: { // y:[aa],y1
+		set_y1(m_tmp1);
 		break;
 		}
-	case 1012: { // y:[aa],a2
-		unhandled("y:[aa],a2");
+	case 1012: { // y:[aa],a0
+		set_a0(m_tmp1);
 		break;
 		}
-	case 1013: { // y:[aa],b2
-		unhandled("y:[aa],b2");
+	case 1013: { // y:[aa],b0
+		set_b0(m_tmp1);
 		break;
 		}
-	case 1014: { // y:[aa],a1
-		unhandled("y:[aa],a1");
+	case 1014: { // y:[aa],a2
+		set_a2(m_tmp1);
 		break;
 		}
-	case 1015: { // y:[aa],b1
-		unhandled("y:[aa],b1");
+	case 1015: { // y:[aa],b2
+		set_b2(m_tmp1);
 		break;
 		}
-	case 1016: { // y:[aa],a
-		unhandled("y:[aa],a");
+	case 1016: { // y:[aa],a1
+		set_a1(m_tmp1);
 		break;
 		}
-	case 1017: { // y:[aa],b
-		unhandled("y:[aa],b");
+	case 1017: { // y:[aa],b1
+		set_b1(m_tmp1);
 		break;
 		}
-	case 1018: { // y:[aa],r
-		unhandled("y:[aa],r");
+	case 1018: { // y:[aa],a
+		set_ah(m_tmp1);
 		break;
 		}
-	case 1019: { // y:[aa],n
-		unhandled("y:[aa],n");
+	case 1019: { // y:[aa],b
+		set_bh(m_tmp1);
 		break;
 		}
-	case 1020: { // x0,y:[aa]
-		unhandled("x0,y:[aa]");
+	case 1020: { // y:[aa],r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 1021: { // x1,y:[aa]
-		unhandled("x1,y:[aa]");
+	case 1021: { // y:[aa],n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 1022: { // y0,y:[aa]
-		unhandled("y0,y:[aa]");
+	case 1022: { // x0,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1023: { // y1,y:[aa]
-		unhandled("y1,y:[aa]");
+	case 1023: { // x1,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1024: { // a0,y:[aa]
-		unhandled("a0,y:[aa]");
+	case 1024: { // y0,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1025: { // b0,y:[aa]
-		unhandled("b0,y:[aa]");
+	case 1025: { // y1,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1026: { // a2,y:[aa]
-		unhandled("a2,y:[aa]");
+	case 1026: { // a0,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1027: { // b2,y:[aa]
-		unhandled("b2,y:[aa]");
+	case 1027: { // b0,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1028: { // a1,y:[aa]
-		unhandled("a1,y:[aa]");
+	case 1028: { // a2,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1029: { // b1,y:[aa]
-		unhandled("b1,y:[aa]");
+	case 1029: { // b2,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1030: { // a,y:[aa]
-		unhandled("a,y:[aa]");
+	case 1030: { // a1,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1031: { // b,y:[aa]
-		unhandled("b,y:[aa]");
+	case 1031: { // b1,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1032: { // r,y:[aa]
-		unhandled("r,y:[aa]");
+	case 1032: { // a,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1033: { // n,y:[aa]
-		unhandled("n,y:[aa]");
+	case 1033: { // b,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1034: { // a,x0 y:(r)-n,y0
-		unhandled("a,x0 y:(r)-n,y0");
+	case 1034: { // r,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1035: { // a,x0 y:(r)+n,y0
-		unhandled("a,x0 y:(r)+n,y0");
+	case 1035: { // n,y:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 1036: { // a,x0 y:(r)-,y0
-		unhandled("a,x0 y:(r)-,y0");
+	case 1036: { // a,x0 y:(r)-n,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1037: { // a,x0 y:(r)+,y0
-		unhandled("a,x0 y:(r)+,y0");
+	case 1037: { // a,x0 y:(r)+n,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1038: { // a,x0 y:(r),y0
-		unhandled("a,x0 y:(r),y0");
+	case 1038: { // a,x0 y:(r)-,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1039: { // a,x0 y:(r+n),y0
-		unhandled("a,x0 y:(r+n),y0");
+	case 1039: { // a,x0 y:(r)+,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1040: { // a,x0 y:-(r),y0
-		unhandled("a,x0 y:-(r),y0");
+	case 1040: { // a,x0 y:(r),y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1041: { // a,x1 y:(r)-n,y0
-		unhandled("a,x1 y:(r)-n,y0");
+	case 1041: { // a,x0 y:(r+n),y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1042: { // a,x1 y:(r)+n,y0
-		unhandled("a,x1 y:(r)+n,y0");
+	case 1042: { // a,x0 y:-(r),y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1043: { // a,x1 y:(r)-,y0
-		unhandled("a,x1 y:(r)-,y0");
+	case 1043: { // a,x1 y:(r)-n,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1044: { // a,x1 y:(r)+,y0
-		unhandled("a,x1 y:(r)+,y0");
+	case 1044: { // a,x1 y:(r)+n,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1045: { // a,x1 y:(r),y0
-		unhandled("a,x1 y:(r),y0");
+	case 1045: { // a,x1 y:(r)-,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1046: { // a,x1 y:(r+n),y0
-		unhandled("a,x1 y:(r+n),y0");
+	case 1046: { // a,x1 y:(r)+,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1047: { // a,x1 y:-(r),y0
-		unhandled("a,x1 y:-(r),y0");
+	case 1047: { // a,x1 y:(r),y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1048: { // b,x0 y:(r)-n,y0
-		unhandled("b,x0 y:(r)-n,y0");
+	case 1048: { // a,x1 y:(r+n),y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1049: { // b,x0 y:(r)+n,y0
-		unhandled("b,x0 y:(r)+n,y0");
+	case 1049: { // a,x1 y:-(r),y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1050: { // b,x0 y:(r)-,y0
-		unhandled("b,x0 y:(r)-,y0");
+	case 1050: { // b,x0 y:(r)-n,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1051: { // b,x0 y:(r)+,y0
-		unhandled("b,x0 y:(r)+,y0");
+	case 1051: { // b,x0 y:(r)+n,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1052: { // b,x0 y:(r),y0
-		unhandled("b,x0 y:(r),y0");
+	case 1052: { // b,x0 y:(r)-,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1053: { // b,x0 y:(r+n),y0
-		unhandled("b,x0 y:(r+n),y0");
+	case 1053: { // b,x0 y:(r)+,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1054: { // b,x0 y:-(r),y0
-		unhandled("b,x0 y:-(r),y0");
+	case 1054: { // b,x0 y:(r),y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1055: { // b,x1 y:(r)-n,y0
-		unhandled("b,x1 y:(r)-n,y0");
+	case 1055: { // b,x0 y:(r+n),y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1056: { // b,x1 y:(r)+n,y0
-		unhandled("b,x1 y:(r)+n,y0");
+	case 1056: { // b,x0 y:-(r),y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1057: { // b,x1 y:(r)-,y0
-		unhandled("b,x1 y:(r)-,y0");
+	case 1057: { // b,x1 y:(r)-n,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1058: { // b,x1 y:(r)+,y0
-		unhandled("b,x1 y:(r)+,y0");
+	case 1058: { // b,x1 y:(r)+n,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1059: { // b,x1 y:(r),y0
-		unhandled("b,x1 y:(r),y0");
+	case 1059: { // b,x1 y:(r)-,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1060: { // b,x1 y:(r+n),y0
-		unhandled("b,x1 y:(r+n),y0");
+	case 1060: { // b,x1 y:(r)+,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1061: { // b,x1 y:-(r),y0
-		unhandled("b,x1 y:-(r),y0");
+	case 1061: { // b,x1 y:(r),y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1062: { // a,x0 y:(r)-n,y1
-		unhandled("a,x0 y:(r)-n,y1");
+	case 1062: { // b,x1 y:(r+n),y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1063: { // a,x0 y:(r)+n,y1
-		unhandled("a,x0 y:(r)+n,y1");
+	case 1063: { // b,x1 y:-(r),y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1064: { // a,x0 y:(r)-,y1
-		unhandled("a,x0 y:(r)-,y1");
+	case 1064: { // a,x0 y:(r)-n,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1065: { // a,x0 y:(r)+,y1
-		unhandled("a,x0 y:(r)+,y1");
+	case 1065: { // a,x0 y:(r)+n,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1066: { // a,x0 y:(r),y1
-		unhandled("a,x0 y:(r),y1");
+	case 1066: { // a,x0 y:(r)-,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1067: { // a,x0 y:(r+n),y1
-		unhandled("a,x0 y:(r+n),y1");
+	case 1067: { // a,x0 y:(r)+,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1068: { // a,x0 y:-(r),y1
-		unhandled("a,x0 y:-(r),y1");
+	case 1068: { // a,x0 y:(r),y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1069: { // a,x1 y:(r)-n,y1
-		unhandled("a,x1 y:(r)-n,y1");
+	case 1069: { // a,x0 y:(r+n),y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1070: { // a,x1 y:(r)+n,y1
-		unhandled("a,x1 y:(r)+n,y1");
+	case 1070: { // a,x0 y:-(r),y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1071: { // a,x1 y:(r)-,y1
-		unhandled("a,x1 y:(r)-,y1");
+	case 1071: { // a,x1 y:(r)-n,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1072: { // a,x1 y:(r)+,y1
-		unhandled("a,x1 y:(r)+,y1");
+	case 1072: { // a,x1 y:(r)+n,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1073: { // a,x1 y:(r),y1
-		unhandled("a,x1 y:(r),y1");
+	case 1073: { // a,x1 y:(r)-,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1074: { // a,x1 y:(r+n),y1
-		unhandled("a,x1 y:(r+n),y1");
+	case 1074: { // a,x1 y:(r)+,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1075: { // a,x1 y:-(r),y1
-		unhandled("a,x1 y:-(r),y1");
+	case 1075: { // a,x1 y:(r),y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1076: { // b,x0 y:(r)-n,y1
-		unhandled("b,x0 y:(r)-n,y1");
+	case 1076: { // a,x1 y:(r+n),y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1077: { // b,x0 y:(r)+n,y1
-		unhandled("b,x0 y:(r)+n,y1");
+	case 1077: { // a,x1 y:-(r),y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1078: { // b,x0 y:(r)-,y1
-		unhandled("b,x0 y:(r)-,y1");
+	case 1078: { // b,x0 y:(r)-n,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1079: { // b,x0 y:(r)+,y1
-		unhandled("b,x0 y:(r)+,y1");
+	case 1079: { // b,x0 y:(r)+n,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1080: { // b,x0 y:(r),y1
-		unhandled("b,x0 y:(r),y1");
+	case 1080: { // b,x0 y:(r)-,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1081: { // b,x0 y:(r+n),y1
-		unhandled("b,x0 y:(r+n),y1");
+	case 1081: { // b,x0 y:(r)+,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1082: { // b,x0 y:-(r),y1
-		unhandled("b,x0 y:-(r),y1");
+	case 1082: { // b,x0 y:(r),y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1083: { // b,x1 y:(r)-n,y1
-		unhandled("b,x1 y:(r)-n,y1");
+	case 1083: { // b,x0 y:(r+n),y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1084: { // b,x1 y:(r)+n,y1
-		unhandled("b,x1 y:(r)+n,y1");
+	case 1084: { // b,x0 y:-(r),y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1085: { // b,x1 y:(r)-,y1
-		unhandled("b,x1 y:(r)-,y1");
+	case 1085: { // b,x1 y:(r)-n,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1086: { // b,x1 y:(r)+,y1
-		unhandled("b,x1 y:(r)+,y1");
+	case 1086: { // b,x1 y:(r)+n,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1087: { // b,x1 y:(r),y1
-		unhandled("b,x1 y:(r),y1");
+	case 1087: { // b,x1 y:(r)-,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1088: { // b,x1 y:(r+n),y1
-		unhandled("b,x1 y:(r+n),y1");
+	case 1088: { // b,x1 y:(r)+,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1089: { // b,x1 y:-(r),y1
-		unhandled("b,x1 y:-(r),y1");
+	case 1089: { // b,x1 y:(r),y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1090: { // a,x0 y:(r)-n,a
-		unhandled("a,x0 y:(r)-n,a");
+	case 1090: { // b,x1 y:(r+n),y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1091: { // a,x0 y:(r)+n,a
-		unhandled("a,x0 y:(r)+n,a");
+	case 1091: { // b,x1 y:-(r),y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1092: { // a,x0 y:(r)-,a
-		unhandled("a,x0 y:(r)-,a");
+	case 1092: { // a,x0 y:(r)-n,a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1093: { // a,x0 y:(r)+,a
-		unhandled("a,x0 y:(r)+,a");
+	case 1093: { // a,x0 y:(r)+n,a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1094: { // a,x0 y:(r),a
-		unhandled("a,x0 y:(r),a");
+	case 1094: { // a,x0 y:(r)-,a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1095: { // a,x0 y:(r+n),a
-		unhandled("a,x0 y:(r+n),a");
+	case 1095: { // a,x0 y:(r)+,a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1096: { // a,x0 y:-(r),a
-		unhandled("a,x0 y:-(r),a");
+	case 1096: { // a,x0 y:(r),a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1097: { // a,x1 y:(r)-n,a
-		unhandled("a,x1 y:(r)-n,a");
+	case 1097: { // a,x0 y:(r+n),a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1098: { // a,x1 y:(r)+n,a
-		unhandled("a,x1 y:(r)+n,a");
+	case 1098: { // a,x0 y:-(r),a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1099: { // a,x1 y:(r)-,a
-		unhandled("a,x1 y:(r)-,a");
+	case 1099: { // a,x1 y:(r)-n,a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1100: { // a,x1 y:(r)+,a
-		unhandled("a,x1 y:(r)+,a");
+	case 1100: { // a,x1 y:(r)+n,a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1101: { // a,x1 y:(r),a
-		unhandled("a,x1 y:(r),a");
+	case 1101: { // a,x1 y:(r)-,a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1102: { // a,x1 y:(r+n),a
-		unhandled("a,x1 y:(r+n),a");
+	case 1102: { // a,x1 y:(r)+,a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1103: { // a,x1 y:-(r),a
-		unhandled("a,x1 y:-(r),a");
+	case 1103: { // a,x1 y:(r),a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1104: { // b,x0 y:(r)-n,a
-		unhandled("b,x0 y:(r)-n,a");
+	case 1104: { // a,x1 y:(r+n),a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1105: { // b,x0 y:(r)+n,a
-		unhandled("b,x0 y:(r)+n,a");
+	case 1105: { // a,x1 y:-(r),a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1106: { // b,x0 y:(r)-,a
-		unhandled("b,x0 y:(r)-,a");
+	case 1106: { // b,x0 y:(r)-n,a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1107: { // b,x0 y:(r)+,a
-		unhandled("b,x0 y:(r)+,a");
+	case 1107: { // b,x0 y:(r)+n,a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1108: { // b,x0 y:(r),a
-		unhandled("b,x0 y:(r),a");
+	case 1108: { // b,x0 y:(r)-,a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1109: { // b,x0 y:(r+n),a
-		unhandled("b,x0 y:(r+n),a");
+	case 1109: { // b,x0 y:(r)+,a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1110: { // b,x0 y:-(r),a
-		unhandled("b,x0 y:-(r),a");
+	case 1110: { // b,x0 y:(r),a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1111: { // b,x1 y:(r)-n,a
-		unhandled("b,x1 y:(r)-n,a");
+	case 1111: { // b,x0 y:(r+n),a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1112: { // b,x1 y:(r)+n,a
-		unhandled("b,x1 y:(r)+n,a");
+	case 1112: { // b,x0 y:-(r),a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1113: { // b,x1 y:(r)-,a
-		unhandled("b,x1 y:(r)-,a");
+	case 1113: { // b,x1 y:(r)-n,a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1114: { // b,x1 y:(r)+,a
-		unhandled("b,x1 y:(r)+,a");
+	case 1114: { // b,x1 y:(r)+n,a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1115: { // b,x1 y:(r),a
-		unhandled("b,x1 y:(r),a");
+	case 1115: { // b,x1 y:(r)-,a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1116: { // b,x1 y:(r+n),a
-		unhandled("b,x1 y:(r+n),a");
+	case 1116: { // b,x1 y:(r)+,a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1117: { // b,x1 y:-(r),a
-		unhandled("b,x1 y:-(r),a");
+	case 1117: { // b,x1 y:(r),a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1118: { // a,x0 y:(r)-n,b
-		unhandled("a,x0 y:(r)-n,b");
+	case 1118: { // b,x1 y:(r+n),a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1119: { // a,x0 y:(r)+n,b
-		unhandled("a,x0 y:(r)+n,b");
+	case 1119: { // b,x1 y:-(r),a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1120: { // a,x0 y:(r)-,b
-		unhandled("a,x0 y:(r)-,b");
+	case 1120: { // a,x0 y:(r)-n,b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1121: { // a,x0 y:(r)+,b
-		unhandled("a,x0 y:(r)+,b");
+	case 1121: { // a,x0 y:(r)+n,b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1122: { // a,x0 y:(r),b
-		unhandled("a,x0 y:(r),b");
+	case 1122: { // a,x0 y:(r)-,b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1123: { // a,x0 y:(r+n),b
-		unhandled("a,x0 y:(r+n),b");
+	case 1123: { // a,x0 y:(r)+,b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1124: { // a,x0 y:-(r),b
-		unhandled("a,x0 y:-(r),b");
+	case 1124: { // a,x0 y:(r),b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1125: { // a,x1 y:(r)-n,b
-		unhandled("a,x1 y:(r)-n,b");
+	case 1125: { // a,x0 y:(r+n),b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1126: { // a,x1 y:(r)+n,b
-		unhandled("a,x1 y:(r)+n,b");
+	case 1126: { // a,x0 y:-(r),b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1127: { // a,x1 y:(r)-,b
-		unhandled("a,x1 y:(r)-,b");
+	case 1127: { // a,x1 y:(r)-n,b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1128: { // a,x1 y:(r)+,b
-		unhandled("a,x1 y:(r)+,b");
+	case 1128: { // a,x1 y:(r)+n,b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1129: { // a,x1 y:(r),b
-		unhandled("a,x1 y:(r),b");
+	case 1129: { // a,x1 y:(r)-,b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1130: { // a,x1 y:(r+n),b
-		unhandled("a,x1 y:(r+n),b");
+	case 1130: { // a,x1 y:(r)+,b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1131: { // a,x1 y:-(r),b
-		unhandled("a,x1 y:-(r),b");
+	case 1131: { // a,x1 y:(r),b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1132: { // b,x0 y:(r)-n,b
-		unhandled("b,x0 y:(r)-n,b");
+	case 1132: { // a,x1 y:(r+n),b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1133: { // b,x0 y:(r)+n,b
-		unhandled("b,x0 y:(r)+n,b");
+	case 1133: { // a,x1 y:-(r),b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1134: { // b,x0 y:(r)-,b
-		unhandled("b,x0 y:(r)-,b");
+	case 1134: { // b,x0 y:(r)-n,b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1135: { // b,x0 y:(r)+,b
-		unhandled("b,x0 y:(r)+,b");
+	case 1135: { // b,x0 y:(r)+n,b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1136: { // b,x0 y:(r),b
-		unhandled("b,x0 y:(r),b");
+	case 1136: { // b,x0 y:(r)-,b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1137: { // b,x0 y:(r+n),b
-		unhandled("b,x0 y:(r+n),b");
+	case 1137: { // b,x0 y:(r)+,b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1138: { // b,x0 y:-(r),b
-		unhandled("b,x0 y:-(r),b");
+	case 1138: { // b,x0 y:(r),b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1139: { // b,x1 y:(r)-n,b
-		unhandled("b,x1 y:(r)-n,b");
+	case 1139: { // b,x0 y:(r+n),b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1140: { // b,x1 y:(r)+n,b
-		unhandled("b,x1 y:(r)+n,b");
+	case 1140: { // b,x0 y:-(r),b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1141: { // b,x1 y:(r)-,b
-		unhandled("b,x1 y:(r)-,b");
+	case 1141: { // b,x1 y:(r)-n,b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1142: { // b,x1 y:(r)+,b
-		unhandled("b,x1 y:(r)+,b");
+	case 1142: { // b,x1 y:(r)+n,b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1143: { // b,x1 y:(r),b
-		unhandled("b,x1 y:(r),b");
+	case 1143: { // b,x1 y:(r)-,b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1144: { // b,x1 y:(r+n),b
-		unhandled("b,x1 y:(r+n),b");
+	case 1144: { // b,x1 y:(r)+,b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1145: { // b,x1 y:-(r),b
-		unhandled("b,x1 y:-(r),b");
+	case 1145: { // b,x1 y:(r),b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1146: { // a,x0 y0,y:(r)-n
-		unhandled("a,x0 y0,y:(r)-n");
+	case 1146: { // b,x1 y:(r+n),b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1147: { // a,x0 y0,y:(r)+n
-		unhandled("a,x0 y0,y:(r)+n");
+	case 1147: { // b,x1 y:-(r),b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1148: { // a,x0 y0,y:(r)-
-		unhandled("a,x0 y0,y:(r)-");
+	case 1148: { // a,x0 y0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1149: { // a,x0 y0,y:(r)+
-		unhandled("a,x0 y0,y:(r)+");
+	case 1149: { // a,x0 y0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1150: { // a,x0 y0,y:(r)
-		unhandled("a,x0 y0,y:(r)");
+	case 1150: { // a,x0 y0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1151: { // a,x0 y0,y:(r+n)
-		unhandled("a,x0 y0,y:(r+n)");
+	case 1151: { // a,x0 y0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1152: { // a,x0 y0,y:-(r)
-		unhandled("a,x0 y0,y:-(r)");
+	case 1152: { // a,x0 y0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1153: { // a,x1 y0,y:(r)-n
-		unhandled("a,x1 y0,y:(r)-n");
+	case 1153: { // a,x0 y0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1154: { // a,x1 y0,y:(r)+n
-		unhandled("a,x1 y0,y:(r)+n");
+	case 1154: { // a,x0 y0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1155: { // a,x1 y0,y:(r)-
-		unhandled("a,x1 y0,y:(r)-");
+	case 1155: { // a,x1 y0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1156: { // a,x1 y0,y:(r)+
-		unhandled("a,x1 y0,y:(r)+");
+	case 1156: { // a,x1 y0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1157: { // a,x1 y0,y:(r)
-		unhandled("a,x1 y0,y:(r)");
+	case 1157: { // a,x1 y0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1158: { // a,x1 y0,y:(r+n)
-		unhandled("a,x1 y0,y:(r+n)");
+	case 1158: { // a,x1 y0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1159: { // a,x1 y0,y:-(r)
-		unhandled("a,x1 y0,y:-(r)");
+	case 1159: { // a,x1 y0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1160: { // b,x0 y0,y:(r)-n
-		unhandled("b,x0 y0,y:(r)-n");
+	case 1160: { // a,x1 y0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1161: { // b,x0 y0,y:(r)+n
-		unhandled("b,x0 y0,y:(r)+n");
+	case 1161: { // a,x1 y0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1162: { // b,x0 y0,y:(r)-
-		unhandled("b,x0 y0,y:(r)-");
+	case 1162: { // b,x0 y0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1163: { // b,x0 y0,y:(r)+
-		unhandled("b,x0 y0,y:(r)+");
+	case 1163: { // b,x0 y0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1164: { // b,x0 y0,y:(r)
-		unhandled("b,x0 y0,y:(r)");
+	case 1164: { // b,x0 y0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1165: { // b,x0 y0,y:(r+n)
-		unhandled("b,x0 y0,y:(r+n)");
+	case 1165: { // b,x0 y0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1166: { // b,x0 y0,y:-(r)
-		unhandled("b,x0 y0,y:-(r)");
+	case 1166: { // b,x0 y0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1167: { // b,x1 y0,y:(r)-n
-		unhandled("b,x1 y0,y:(r)-n");
+	case 1167: { // b,x0 y0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1168: { // b,x1 y0,y:(r)+n
-		unhandled("b,x1 y0,y:(r)+n");
+	case 1168: { // b,x0 y0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1169: { // b,x1 y0,y:(r)-
-		unhandled("b,x1 y0,y:(r)-");
+	case 1169: { // b,x1 y0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1170: { // b,x1 y0,y:(r)+
-		unhandled("b,x1 y0,y:(r)+");
+	case 1170: { // b,x1 y0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1171: { // b,x1 y0,y:(r)
-		unhandled("b,x1 y0,y:(r)");
+	case 1171: { // b,x1 y0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1172: { // b,x1 y0,y:(r+n)
-		unhandled("b,x1 y0,y:(r+n)");
+	case 1172: { // b,x1 y0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1173: { // b,x1 y0,y:-(r)
-		unhandled("b,x1 y0,y:-(r)");
+	case 1173: { // b,x1 y0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1174: { // a,x0 y1,y:(r)-n
-		unhandled("a,x0 y1,y:(r)-n");
+	case 1174: { // b,x1 y0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1175: { // a,x0 y1,y:(r)+n
-		unhandled("a,x0 y1,y:(r)+n");
+	case 1175: { // b,x1 y0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1176: { // a,x0 y1,y:(r)-
-		unhandled("a,x0 y1,y:(r)-");
+	case 1176: { // a,x0 y1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1177: { // a,x0 y1,y:(r)+
-		unhandled("a,x0 y1,y:(r)+");
+	case 1177: { // a,x0 y1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1178: { // a,x0 y1,y:(r)
-		unhandled("a,x0 y1,y:(r)");
+	case 1178: { // a,x0 y1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1179: { // a,x0 y1,y:(r+n)
-		unhandled("a,x0 y1,y:(r+n)");
+	case 1179: { // a,x0 y1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1180: { // a,x0 y1,y:-(r)
-		unhandled("a,x0 y1,y:-(r)");
+	case 1180: { // a,x0 y1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1181: { // a,x1 y1,y:(r)-n
-		unhandled("a,x1 y1,y:(r)-n");
+	case 1181: { // a,x0 y1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1182: { // a,x1 y1,y:(r)+n
-		unhandled("a,x1 y1,y:(r)+n");
+	case 1182: { // a,x0 y1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1183: { // a,x1 y1,y:(r)-
-		unhandled("a,x1 y1,y:(r)-");
+	case 1183: { // a,x1 y1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1184: { // a,x1 y1,y:(r)+
-		unhandled("a,x1 y1,y:(r)+");
+	case 1184: { // a,x1 y1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1185: { // a,x1 y1,y:(r)
-		unhandled("a,x1 y1,y:(r)");
+	case 1185: { // a,x1 y1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1186: { // a,x1 y1,y:(r+n)
-		unhandled("a,x1 y1,y:(r+n)");
+	case 1186: { // a,x1 y1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1187: { // a,x1 y1,y:-(r)
-		unhandled("a,x1 y1,y:-(r)");
+	case 1187: { // a,x1 y1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1188: { // b,x0 y1,y:(r)-n
-		unhandled("b,x0 y1,y:(r)-n");
+	case 1188: { // a,x1 y1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1189: { // b,x0 y1,y:(r)+n
-		unhandled("b,x0 y1,y:(r)+n");
+	case 1189: { // a,x1 y1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1190: { // b,x0 y1,y:(r)-
-		unhandled("b,x0 y1,y:(r)-");
+	case 1190: { // b,x0 y1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1191: { // b,x0 y1,y:(r)+
-		unhandled("b,x0 y1,y:(r)+");
+	case 1191: { // b,x0 y1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1192: { // b,x0 y1,y:(r)
-		unhandled("b,x0 y1,y:(r)");
+	case 1192: { // b,x0 y1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1193: { // b,x0 y1,y:(r+n)
-		unhandled("b,x0 y1,y:(r+n)");
+	case 1193: { // b,x0 y1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1194: { // b,x0 y1,y:-(r)
-		unhandled("b,x0 y1,y:-(r)");
+	case 1194: { // b,x0 y1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1195: { // b,x1 y1,y:(r)-n
-		unhandled("b,x1 y1,y:(r)-n");
+	case 1195: { // b,x0 y1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1196: { // b,x1 y1,y:(r)+n
-		unhandled("b,x1 y1,y:(r)+n");
+	case 1196: { // b,x0 y1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1197: { // b,x1 y1,y:(r)-
-		unhandled("b,x1 y1,y:(r)-");
+	case 1197: { // b,x1 y1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1198: { // b,x1 y1,y:(r)+
-		unhandled("b,x1 y1,y:(r)+");
+	case 1198: { // b,x1 y1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1199: { // b,x1 y1,y:(r)
-		unhandled("b,x1 y1,y:(r)");
+	case 1199: { // b,x1 y1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1200: { // b,x1 y1,y:(r+n)
-		unhandled("b,x1 y1,y:(r+n)");
+	case 1200: { // b,x1 y1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1201: { // b,x1 y1,y:-(r)
-		unhandled("b,x1 y1,y:-(r)");
+	case 1201: { // b,x1 y1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1202: { // a,x0 a,y:(r)-n
-		unhandled("a,x0 a,y:(r)-n");
+	case 1202: { // b,x1 y1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1203: { // a,x0 a,y:(r)+n
-		unhandled("a,x0 a,y:(r)+n");
+	case 1203: { // b,x1 y1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1204: { // a,x0 a,y:(r)-
-		unhandled("a,x0 a,y:(r)-");
+	case 1204: { // a,x0 a,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1205: { // a,x0 a,y:(r)+
-		unhandled("a,x0 a,y:(r)+");
+	case 1205: { // a,x0 a,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1206: { // a,x0 a,y:(r)
-		unhandled("a,x0 a,y:(r)");
+	case 1206: { // a,x0 a,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1207: { // a,x0 a,y:(r+n)
-		unhandled("a,x0 a,y:(r+n)");
+	case 1207: { // a,x0 a,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1208: { // a,x0 a,y:-(r)
-		unhandled("a,x0 a,y:-(r)");
+	case 1208: { // a,x0 a,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1209: { // a,x1 a,y:(r)-n
-		unhandled("a,x1 a,y:(r)-n");
+	case 1209: { // a,x0 a,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1210: { // a,x1 a,y:(r)+n
-		unhandled("a,x1 a,y:(r)+n");
+	case 1210: { // a,x0 a,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1211: { // a,x1 a,y:(r)-
-		unhandled("a,x1 a,y:(r)-");
+	case 1211: { // a,x1 a,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1212: { // a,x1 a,y:(r)+
-		unhandled("a,x1 a,y:(r)+");
+	case 1212: { // a,x1 a,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1213: { // a,x1 a,y:(r)
-		unhandled("a,x1 a,y:(r)");
+	case 1213: { // a,x1 a,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1214: { // a,x1 a,y:(r+n)
-		unhandled("a,x1 a,y:(r+n)");
+	case 1214: { // a,x1 a,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1215: { // a,x1 a,y:-(r)
-		unhandled("a,x1 a,y:-(r)");
+	case 1215: { // a,x1 a,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1216: { // b,x0 a,y:(r)-n
-		unhandled("b,x0 a,y:(r)-n");
+	case 1216: { // a,x1 a,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1217: { // b,x0 a,y:(r)+n
-		unhandled("b,x0 a,y:(r)+n");
+	case 1217: { // a,x1 a,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1218: { // b,x0 a,y:(r)-
-		unhandled("b,x0 a,y:(r)-");
+	case 1218: { // b,x0 a,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1219: { // b,x0 a,y:(r)+
-		unhandled("b,x0 a,y:(r)+");
+	case 1219: { // b,x0 a,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1220: { // b,x0 a,y:(r)
-		unhandled("b,x0 a,y:(r)");
+	case 1220: { // b,x0 a,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1221: { // b,x0 a,y:(r+n)
-		unhandled("b,x0 a,y:(r+n)");
+	case 1221: { // b,x0 a,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1222: { // b,x0 a,y:-(r)
-		unhandled("b,x0 a,y:-(r)");
+	case 1222: { // b,x0 a,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1223: { // b,x1 a,y:(r)-n
-		unhandled("b,x1 a,y:(r)-n");
+	case 1223: { // b,x0 a,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1224: { // b,x1 a,y:(r)+n
-		unhandled("b,x1 a,y:(r)+n");
+	case 1224: { // b,x0 a,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1225: { // b,x1 a,y:(r)-
-		unhandled("b,x1 a,y:(r)-");
+	case 1225: { // b,x1 a,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1226: { // b,x1 a,y:(r)+
-		unhandled("b,x1 a,y:(r)+");
+	case 1226: { // b,x1 a,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1227: { // b,x1 a,y:(r)
-		unhandled("b,x1 a,y:(r)");
+	case 1227: { // b,x1 a,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1228: { // b,x1 a,y:(r+n)
-		unhandled("b,x1 a,y:(r+n)");
+	case 1228: { // b,x1 a,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1229: { // b,x1 a,y:-(r)
-		unhandled("b,x1 a,y:-(r)");
+	case 1229: { // b,x1 a,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1230: { // a,x0 b,y:(r)-n
-		unhandled("a,x0 b,y:(r)-n");
+	case 1230: { // b,x1 a,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1231: { // a,x0 b,y:(r)+n
-		unhandled("a,x0 b,y:(r)+n");
+	case 1231: { // b,x1 a,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1232: { // a,x0 b,y:(r)-
-		unhandled("a,x0 b,y:(r)-");
+	case 1232: { // a,x0 b,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1233: { // a,x0 b,y:(r)+
-		unhandled("a,x0 b,y:(r)+");
+	case 1233: { // a,x0 b,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1234: { // a,x0 b,y:(r)
-		unhandled("a,x0 b,y:(r)");
+	case 1234: { // a,x0 b,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1235: { // a,x0 b,y:(r+n)
-		unhandled("a,x0 b,y:(r+n)");
+	case 1235: { // a,x0 b,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1236: { // a,x0 b,y:-(r)
-		unhandled("a,x0 b,y:-(r)");
+	case 1236: { // a,x0 b,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1237: { // a,x1 b,y:(r)-n
-		unhandled("a,x1 b,y:(r)-n");
+	case 1237: { // a,x0 b,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1238: { // a,x1 b,y:(r)+n
-		unhandled("a,x1 b,y:(r)+n");
+	case 1238: { // a,x0 b,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1239: { // a,x1 b,y:(r)-
-		unhandled("a,x1 b,y:(r)-");
+	case 1239: { // a,x1 b,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1240: { // a,x1 b,y:(r)+
-		unhandled("a,x1 b,y:(r)+");
+	case 1240: { // a,x1 b,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1241: { // a,x1 b,y:(r)
-		unhandled("a,x1 b,y:(r)");
+	case 1241: { // a,x1 b,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1242: { // a,x1 b,y:(r+n)
-		unhandled("a,x1 b,y:(r+n)");
+	case 1242: { // a,x1 b,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1243: { // a,x1 b,y:-(r)
-		unhandled("a,x1 b,y:-(r)");
+	case 1243: { // a,x1 b,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1244: { // b,x0 b,y:(r)-n
-		unhandled("b,x0 b,y:(r)-n");
+	case 1244: { // a,x1 b,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1245: { // b,x0 b,y:(r)+n
-		unhandled("b,x0 b,y:(r)+n");
+	case 1245: { // a,x1 b,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1246: { // b,x0 b,y:(r)-
-		unhandled("b,x0 b,y:(r)-");
+	case 1246: { // b,x0 b,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1247: { // b,x0 b,y:(r)+
-		unhandled("b,x0 b,y:(r)+");
+	case 1247: { // b,x0 b,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1248: { // b,x0 b,y:(r)
-		unhandled("b,x0 b,y:(r)");
+	case 1248: { // b,x0 b,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1249: { // b,x0 b,y:(r+n)
-		unhandled("b,x0 b,y:(r+n)");
+	case 1249: { // b,x0 b,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1250: { // b,x0 b,y:-(r)
-		unhandled("b,x0 b,y:-(r)");
+	case 1250: { // b,x0 b,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1251: { // b,x1 b,y:(r)-n
-		unhandled("b,x1 b,y:(r)-n");
+	case 1251: { // b,x0 b,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1252: { // b,x1 b,y:(r)+n
-		unhandled("b,x1 b,y:(r)+n");
+	case 1252: { // b,x0 b,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x0(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1253: { // b,x1 b,y:(r)-
-		unhandled("b,x1 b,y:(r)-");
+	case 1253: { // b,x1 b,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1254: { // b,x1 b,y:(r)+
-		unhandled("b,x1 b,y:(r)+");
+	case 1254: { // b,x1 b,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1255: { // b,x1 b,y:(r)
-		unhandled("b,x1 b,y:(r)");
+	case 1255: { // b,x1 b,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1256: { // b,x1 b,y:(r+n)
-		unhandled("b,x1 b,y:(r+n)");
+	case 1256: { // b,x1 b,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1257: { // b,x1 b,y:-(r)
-		unhandled("b,x1 b,y:-(r)");
+	case 1257: { // b,x1 b,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1258: { // a,x0 y:[abs],y0
-		unhandled("a,x0 y:[abs],y0");
+	case 1258: { // b,x1 b,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1259: { // a,x1 y:[abs],y0
-		unhandled("a,x1 y:[abs],y0");
+	case 1259: { // b,x1 b,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		set_x1(m_tmp1);
+		m_y.write_dword(ea, m_tmp2);
 		break;
 		}
-	case 1260: { // b,x0 y:[abs],y0
-		unhandled("b,x0 y:[abs],y0");
+	case 1260: { // a,x0 y:[abs],y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1261: { // b,x1 y:[abs],y0
-		unhandled("b,x1 y:[abs],y0");
+	case 1261: { // a,x1 y:[abs],y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1262: { // a,x0 y:[abs],y1
-		unhandled("a,x0 y:[abs],y1");
+	case 1262: { // b,x0 y:[abs],y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1263: { // a,x1 y:[abs],y1
-		unhandled("a,x1 y:[abs],y1");
+	case 1263: { // b,x1 y:[abs],y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
 		break;
 		}
-	case 1264: { // b,x0 y:[abs],y1
-		unhandled("b,x0 y:[abs],y1");
+	case 1264: { // a,x0 y:[abs],y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1265: { // b,x1 y:[abs],y1
-		unhandled("b,x1 y:[abs],y1");
+	case 1265: { // a,x1 y:[abs],y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1266: { // a,x0 y:[abs],a
-		unhandled("a,x0 y:[abs],a");
+	case 1266: { // b,x0 y:[abs],y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1267: { // a,x1 y:[abs],a
-		unhandled("a,x1 y:[abs],a");
+	case 1267: { // b,x1 y:[abs],y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
 		break;
 		}
-	case 1268: { // b,x0 y:[abs],a
-		unhandled("b,x0 y:[abs],a");
+	case 1268: { // a,x0 y:[abs],a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1269: { // b,x1 y:[abs],a
-		unhandled("b,x1 y:[abs],a");
+	case 1269: { // a,x1 y:[abs],a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1270: { // a,x0 y:[abs],b
-		unhandled("a,x0 y:[abs],b");
+	case 1270: { // b,x0 y:[abs],a
+		set_x0(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1271: { // a,x1 y:[abs],b
-		unhandled("a,x1 y:[abs],b");
+	case 1271: { // b,x1 y:[abs],a
+		set_x1(m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1272: { // b,x0 y:[abs],b
-		unhandled("b,x0 y:[abs],b");
+	case 1272: { // a,x0 y:[abs],b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1273: { // b,x1 y:[abs],b
-		unhandled("b,x1 y:[abs],b");
+	case 1273: { // a,x1 y:[abs],b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1274: { // a,x0 #[i],y0
-		unhandled("a,x0 #[i],y0");
+	case 1274: { // b,x0 y:[abs],b
+		set_x0(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1275: { // a,x1 #[i],y0
-		unhandled("a,x1 #[i],y0");
+	case 1275: { // b,x1 y:[abs],b
+		set_x1(m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1276: { // b,x0 #[i],y0
-		unhandled("b,x0 #[i],y0");
+	case 1276: { // a,x0 y0,y:[abs]
+		u32 abs = exv;
+		set_x0(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1277: { // b,x1 #[i],y0
-		unhandled("b,x1 #[i],y0");
+	case 1277: { // a,x1 y0,y:[abs]
+		u32 abs = exv;
+		set_x1(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1278: { // a,x0 #[i],y1
-		unhandled("a,x0 #[i],y1");
+	case 1278: { // b,x0 y0,y:[abs]
+		u32 abs = exv;
+		set_x0(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1279: { // a,x1 #[i],y1
-		unhandled("a,x1 #[i],y1");
+	case 1279: { // b,x1 y0,y:[abs]
+		u32 abs = exv;
+		set_x1(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1280: { // b,x0 #[i],y1
-		unhandled("b,x0 #[i],y1");
+	case 1280: { // a,x0 y1,y:[abs]
+		u32 abs = exv;
+		set_x0(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1281: { // b,x1 #[i],y1
-		unhandled("b,x1 #[i],y1");
+	case 1281: { // a,x1 y1,y:[abs]
+		u32 abs = exv;
+		set_x1(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1282: { // a,x0 #[i],a
-		unhandled("a,x0 #[i],a");
+	case 1282: { // b,x0 y1,y:[abs]
+		u32 abs = exv;
+		set_x0(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1283: { // a,x1 #[i],a
-		unhandled("a,x1 #[i],a");
+	case 1283: { // b,x1 y1,y:[abs]
+		u32 abs = exv;
+		set_x1(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1284: { // b,x0 #[i],a
-		unhandled("b,x0 #[i],a");
+	case 1284: { // a,x0 a,y:[abs]
+		u32 abs = exv;
+		set_x0(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1285: { // b,x1 #[i],a
-		unhandled("b,x1 #[i],a");
+	case 1285: { // a,x1 a,y:[abs]
+		u32 abs = exv;
+		set_x1(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1286: { // a,x0 #[i],b
-		unhandled("a,x0 #[i],b");
+	case 1286: { // b,x0 a,y:[abs]
+		u32 abs = exv;
+		set_x0(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1287: { // a,x1 #[i],b
-		unhandled("a,x1 #[i],b");
+	case 1287: { // b,x1 a,y:[abs]
+		u32 abs = exv;
+		set_x1(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1288: { // b,x0 #[i],b
-		unhandled("b,x0 #[i],b");
+	case 1288: { // a,x0 b,y:[abs]
+		u32 abs = exv;
+		set_x0(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1289: { // b,x1 #[i],b
-		unhandled("b,x1 #[i],b");
+	case 1289: { // a,x1 b,y:[abs]
+		u32 abs = exv;
+		set_x1(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1290: { // a,x0 y0,y:[abs]
-		unhandled("a,x0 y0,y:[abs]");
+	case 1290: { // b,x0 b,y:[abs]
+		u32 abs = exv;
+		set_x0(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1291: { // a,x1 y0,y:[abs]
-		unhandled("a,x1 y0,y:[abs]");
+	case 1291: { // b,x1 b,y:[abs]
+		u32 abs = exv;
+		set_x1(m_tmp1);
+		m_y.write_dword(abs, m_tmp2);
 		break;
 		}
-	case 1292: { // b,x0 y0,y:[abs]
-		unhandled("b,x0 y0,y:[abs]");
+	case 1292: { // a,x0 #[i],y0
+		u32 i = exv;
+		set_x0(m_tmp1);
+		set_y0(i);
 		break;
 		}
-	case 1293: { // b,x1 y0,y:[abs]
-		unhandled("b,x1 y0,y:[abs]");
+	case 1293: { // a,x1 #[i],y0
+		u32 i = exv;
+		set_x1(m_tmp1);
+		set_y0(i);
 		break;
 		}
-	case 1294: { // a,x0 y1,y:[abs]
-		unhandled("a,x0 y1,y:[abs]");
+	case 1294: { // b,x0 #[i],y0
+		u32 i = exv;
+		set_x0(m_tmp1);
+		set_y0(i);
 		break;
 		}
-	case 1295: { // a,x1 y1,y:[abs]
-		unhandled("a,x1 y1,y:[abs]");
+	case 1295: { // b,x1 #[i],y0
+		u32 i = exv;
+		set_x1(m_tmp1);
+		set_y0(i);
 		break;
 		}
-	case 1296: { // b,x0 y1,y:[abs]
-		unhandled("b,x0 y1,y:[abs]");
+	case 1296: { // a,x0 #[i],y1
+		u32 i = exv;
+		set_x0(m_tmp1);
+		set_y1(i);
 		break;
 		}
-	case 1297: { // b,x1 y1,y:[abs]
-		unhandled("b,x1 y1,y:[abs]");
+	case 1297: { // a,x1 #[i],y1
+		u32 i = exv;
+		set_x1(m_tmp1);
+		set_y1(i);
 		break;
 		}
-	case 1298: { // a,x0 a,y:[abs]
-		unhandled("a,x0 a,y:[abs]");
+	case 1298: { // b,x0 #[i],y1
+		u32 i = exv;
+		set_x0(m_tmp1);
+		set_y1(i);
 		break;
 		}
-	case 1299: { // a,x1 a,y:[abs]
-		unhandled("a,x1 a,y:[abs]");
+	case 1299: { // b,x1 #[i],y1
+		u32 i = exv;
+		set_x1(m_tmp1);
+		set_y1(i);
 		break;
 		}
-	case 1300: { // b,x0 a,y:[abs]
-		unhandled("b,x0 a,y:[abs]");
+	case 1300: { // a,x0 #[i],a
+		u32 i = exv;
+		set_x0(m_tmp1);
+		set_ah(i);
 		break;
 		}
-	case 1301: { // b,x1 a,y:[abs]
-		unhandled("b,x1 a,y:[abs]");
+	case 1301: { // a,x1 #[i],a
+		u32 i = exv;
+		set_x1(m_tmp1);
+		set_ah(i);
 		break;
 		}
-	case 1302: { // a,x0 b,y:[abs]
-		unhandled("a,x0 b,y:[abs]");
+	case 1302: { // b,x0 #[i],a
+		u32 i = exv;
+		set_x0(m_tmp1);
+		set_ah(i);
 		break;
 		}
-	case 1303: { // a,x1 b,y:[abs]
-		unhandled("a,x1 b,y:[abs]");
+	case 1303: { // b,x1 #[i],a
+		u32 i = exv;
+		set_x1(m_tmp1);
+		set_ah(i);
 		break;
 		}
-	case 1304: { // b,x0 b,y:[abs]
-		unhandled("b,x0 b,y:[abs]");
+	case 1304: { // a,x0 #[i],b
+		u32 i = exv;
+		set_x0(m_tmp1);
+		set_bh(i);
 		break;
 		}
-	case 1305: { // b,x1 b,y:[abs]
-		unhandled("b,x1 b,y:[abs]");
+	case 1305: { // a,x1 #[i],b
+		u32 i = exv;
+		set_x1(m_tmp1);
+		set_bh(i);
 		break;
 		}
-	case 1306: { // a,y:(r)-n y0,a
-		unhandled("a,y:(r)-n y0,a");
+	case 1306: { // b,x0 #[i],b
+		u32 i = exv;
+		set_x0(m_tmp1);
+		set_bh(i);
 		break;
 		}
-	case 1307: { // a,y:(r)+n y0,a
-		unhandled("a,y:(r)+n y0,a");
+	case 1307: { // b,x1 #[i],b
+		u32 i = exv;
+		set_x1(m_tmp1);
+		set_bh(i);
 		break;
 		}
-	case 1308: { // a,y:(r)- y0,a
-		unhandled("a,y:(r)- y0,a");
+	case 1308: { // a,y:(r)-n y0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1309: { // a,y:(r)+ y0,a
-		unhandled("a,y:(r)+ y0,a");
+	case 1309: { // a,y:(r)+n y0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1310: { // a,y:(r) y0,a
-		unhandled("a,y:(r) y0,a");
+	case 1310: { // a,y:(r)- y0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1311: { // a,y:(r+n) y0,a
-		unhandled("a,y:(r+n) y0,a");
+	case 1311: { // a,y:(r)+ y0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1312: { // a,y:-(r) y0,a
-		unhandled("a,y:-(r) y0,a");
+	case 1312: { // a,y:(r) y0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1313: { // b,y:(r)-n y0,b
-		unhandled("b,y:(r)-n y0,b");
+	case 1313: { // a,y:(r+n) y0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1314: { // b,y:(r)+n y0,b
-		unhandled("b,y:(r)+n y0,b");
+	case 1314: { // a,y:-(r) y0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		set_ah(m_tmp2);
 		break;
 		}
-	case 1315: { // b,y:(r)- y0,b
-		unhandled("b,y:(r)- y0,b");
+	case 1315: { // b,y:(r)-n y0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1316: { // b,y:(r)+ y0,b
-		unhandled("b,y:(r)+ y0,b");
+	case 1316: { // b,y:(r)+n y0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1317: { // b,y:(r) y0,b
-		unhandled("b,y:(r) y0,b");
+	case 1317: { // b,y:(r)- y0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1318: { // b,y:(r+n) y0,b
-		unhandled("b,y:(r+n) y0,b");
+	case 1318: { // b,y:(r)+ y0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1319: { // b,y:-(r) y0,b
-		unhandled("b,y:-(r) y0,b");
+	case 1319: { // b,y:(r) y0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
 		break;
 		}
-	case 1320: { // l:(r)-n,a10
+	case 1320: { // b,y:(r+n) y0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 1321: { // b,y:-(r) y0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 1322: { // a,y:[abs] y0,a
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		set_ah(m_tmp2);
+		break;
+		}
+	case 1323: { // b,y:[abs] y0,b
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 1324: { // l:(r)-n,a10
 		unhandled("l:(r)-n,a10");
 		break;
 		}
-	case 1321: { // l:(r)+n,a10
+	case 1325: { // l:(r)+n,a10
 		unhandled("l:(r)+n,a10");
 		break;
 		}
-	case 1322: { // l:(r)-,a10
+	case 1326: { // l:(r)-,a10
 		unhandled("l:(r)-,a10");
 		break;
 		}
-	case 1323: { // l:(r)+,a10
+	case 1327: { // l:(r)+,a10
 		unhandled("l:(r)+,a10");
 		break;
 		}
-	case 1324: { // l:(r),a10
+	case 1328: { // l:(r),a10
 		unhandled("l:(r),a10");
 		break;
 		}
-	case 1325: { // l:(r+n),a10
+	case 1329: { // l:(r+n),a10
 		unhandled("l:(r+n),a10");
 		break;
 		}
-	case 1326: { // l:-(r),a10
+	case 1330: { // l:-(r),a10
 		unhandled("l:-(r),a10");
 		break;
 		}
-	case 1327: { // l:(r)-n,b10
+	case 1331: { // l:(r)-n,b10
 		unhandled("l:(r)-n,b10");
 		break;
 		}
-	case 1328: { // l:(r)+n,b10
+	case 1332: { // l:(r)+n,b10
 		unhandled("l:(r)+n,b10");
 		break;
 		}
-	case 1329: { // l:(r)-,b10
+	case 1333: { // l:(r)-,b10
 		unhandled("l:(r)-,b10");
 		break;
 		}
-	case 1330: { // l:(r)+,b10
+	case 1334: { // l:(r)+,b10
 		unhandled("l:(r)+,b10");
 		break;
 		}
-	case 1331: { // l:(r),b10
+	case 1335: { // l:(r),b10
 		unhandled("l:(r),b10");
 		break;
 		}
-	case 1332: { // l:(r+n),b10
+	case 1336: { // l:(r+n),b10
 		unhandled("l:(r+n),b10");
 		break;
 		}
-	case 1333: { // l:-(r),b10
+	case 1337: { // l:-(r),b10
 		unhandled("l:-(r),b10");
 		break;
 		}
-	case 1334: { // l:(r)-n,x
+	case 1338: { // l:(r)-n,x
 		unhandled("l:(r)-n,x");
 		break;
 		}
-	case 1335: { // l:(r)+n,x
+	case 1339: { // l:(r)+n,x
 		unhandled("l:(r)+n,x");
 		break;
 		}
-	case 1336: { // l:(r)-,x
+	case 1340: { // l:(r)-,x
 		unhandled("l:(r)-,x");
 		break;
 		}
-	case 1337: { // l:(r)+,x
+	case 1341: { // l:(r)+,x
 		unhandled("l:(r)+,x");
 		break;
 		}
-	case 1338: { // l:(r),x
+	case 1342: { // l:(r),x
 		unhandled("l:(r),x");
 		break;
 		}
-	case 1339: { // l:(r+n),x
+	case 1343: { // l:(r+n),x
 		unhandled("l:(r+n),x");
 		break;
 		}
-	case 1340: { // l:-(r),x
+	case 1344: { // l:-(r),x
 		unhandled("l:-(r),x");
 		break;
 		}
-	case 1341: { // l:(r)-n,y
+	case 1345: { // l:(r)-n,y
 		unhandled("l:(r)-n,y");
 		break;
 		}
-	case 1342: { // l:(r)+n,y
+	case 1346: { // l:(r)+n,y
 		unhandled("l:(r)+n,y");
 		break;
 		}
-	case 1343: { // l:(r)-,y
+	case 1347: { // l:(r)-,y
 		unhandled("l:(r)-,y");
 		break;
 		}
-	case 1344: { // l:(r)+,y
+	case 1348: { // l:(r)+,y
 		unhandled("l:(r)+,y");
 		break;
 		}
-	case 1345: { // l:(r),y
+	case 1349: { // l:(r),y
 		unhandled("l:(r),y");
 		break;
 		}
-	case 1346: { // l:(r+n),y
+	case 1350: { // l:(r+n),y
 		unhandled("l:(r+n),y");
 		break;
 		}
-	case 1347: { // l:-(r),y
+	case 1351: { // l:-(r),y
 		unhandled("l:-(r),y");
 		break;
 		}
-	case 1348: { // l:(r)-n,a
+	case 1352: { // l:(r)-n,a
 		unhandled("l:(r)-n,a");
 		break;
 		}
-	case 1349: { // l:(r)+n,a
+	case 1353: { // l:(r)+n,a
 		unhandled("l:(r)+n,a");
 		break;
 		}
-	case 1350: { // l:(r)-,a
+	case 1354: { // l:(r)-,a
 		unhandled("l:(r)-,a");
 		break;
 		}
-	case 1351: { // l:(r)+,a
+	case 1355: { // l:(r)+,a
 		unhandled("l:(r)+,a");
 		break;
 		}
-	case 1352: { // l:(r),a
+	case 1356: { // l:(r),a
 		unhandled("l:(r),a");
 		break;
 		}
-	case 1353: { // l:(r+n),a
+	case 1357: { // l:(r+n),a
 		unhandled("l:(r+n),a");
 		break;
 		}
-	case 1354: { // l:-(r),a
+	case 1358: { // l:-(r),a
 		unhandled("l:-(r),a");
 		break;
 		}
-	case 1355: { // l:(r)-n,b
+	case 1359: { // l:(r)-n,b
 		unhandled("l:(r)-n,b");
 		break;
 		}
-	case 1356: { // l:(r)+n,b
+	case 1360: { // l:(r)+n,b
 		unhandled("l:(r)+n,b");
 		break;
 		}
-	case 1357: { // l:(r)-,b
+	case 1361: { // l:(r)-,b
 		unhandled("l:(r)-,b");
 		break;
 		}
-	case 1358: { // l:(r)+,b
+	case 1362: { // l:(r)+,b
 		unhandled("l:(r)+,b");
 		break;
 		}
-	case 1359: { // l:(r),b
+	case 1363: { // l:(r),b
 		unhandled("l:(r),b");
 		break;
 		}
-	case 1360: { // l:(r+n),b
+	case 1364: { // l:(r+n),b
 		unhandled("l:(r+n),b");
 		break;
 		}
-	case 1361: { // l:-(r),b
+	case 1365: { // l:-(r),b
 		unhandled("l:-(r),b");
 		break;
 		}
-	case 1362: { // l:(r)-n,ab
+	case 1366: { // l:(r)-n,ab
 		unhandled("l:(r)-n,ab");
 		break;
 		}
-	case 1363: { // l:(r)+n,ab
+	case 1367: { // l:(r)+n,ab
 		unhandled("l:(r)+n,ab");
 		break;
 		}
-	case 1364: { // l:(r)-,ab
+	case 1368: { // l:(r)-,ab
 		unhandled("l:(r)-,ab");
 		break;
 		}
-	case 1365: { // l:(r)+,ab
+	case 1369: { // l:(r)+,ab
 		unhandled("l:(r)+,ab");
 		break;
 		}
-	case 1366: { // l:(r),ab
+	case 1370: { // l:(r),ab
 		unhandled("l:(r),ab");
 		break;
 		}
-	case 1367: { // l:(r+n),ab
+	case 1371: { // l:(r+n),ab
 		unhandled("l:(r+n),ab");
 		break;
 		}
-	case 1368: { // l:-(r),ab
+	case 1372: { // l:-(r),ab
 		unhandled("l:-(r),ab");
 		break;
 		}
-	case 1369: { // l:(r)-n,ba
+	case 1373: { // l:(r)-n,ba
 		unhandled("l:(r)-n,ba");
 		break;
 		}
-	case 1370: { // l:(r)+n,ba
+	case 1374: { // l:(r)+n,ba
 		unhandled("l:(r)+n,ba");
 		break;
 		}
-	case 1371: { // l:(r)-,ba
+	case 1375: { // l:(r)-,ba
 		unhandled("l:(r)-,ba");
 		break;
 		}
-	case 1372: { // l:(r)+,ba
+	case 1376: { // l:(r)+,ba
 		unhandled("l:(r)+,ba");
 		break;
 		}
-	case 1373: { // l:(r),ba
+	case 1377: { // l:(r),ba
 		unhandled("l:(r),ba");
 		break;
 		}
-	case 1374: { // l:(r+n),ba
+	case 1378: { // l:(r+n),ba
 		unhandled("l:(r+n),ba");
 		break;
 		}
-	case 1375: { // l:-(r),ba
+	case 1379: { // l:-(r),ba
 		unhandled("l:-(r),ba");
 		break;
 		}
-	case 1376: { // l:[abs],a10
+	case 1380: { // l:[abs],a10
 		unhandled("l:[abs],a10");
 		break;
 		}
-	case 1377: { // l:[abs],b10
+	case 1381: { // l:[abs],b10
 		unhandled("l:[abs],b10");
 		break;
 		}
-	case 1378: { // l:[abs],x
+	case 1382: { // l:[abs],x
 		unhandled("l:[abs],x");
 		break;
 		}
-	case 1379: { // l:[abs],y
+	case 1383: { // l:[abs],y
 		unhandled("l:[abs],y");
 		break;
 		}
-	case 1380: { // l:[abs],a
+	case 1384: { // l:[abs],a
 		unhandled("l:[abs],a");
 		break;
 		}
-	case 1381: { // l:[abs],b
+	case 1385: { // l:[abs],b
 		unhandled("l:[abs],b");
 		break;
 		}
-	case 1382: { // l:[abs],ab
+	case 1386: { // l:[abs],ab
 		unhandled("l:[abs],ab");
 		break;
 		}
-	case 1383: { // l:[abs],ba
+	case 1387: { // l:[abs],ba
 		unhandled("l:[abs],ba");
 		break;
 		}
-	case 1384: { // l:[aa],a10
+	case 1388: { // l:[aa],a10
 		unhandled("l:[aa],a10");
 		break;
 		}
-	case 1385: { // l:[aa],b10
+	case 1389: { // l:[aa],b10
 		unhandled("l:[aa],b10");
 		break;
 		}
-	case 1386: { // l:[aa],x
+	case 1390: { // l:[aa],x
 		unhandled("l:[aa],x");
 		break;
 		}
-	case 1387: { // l:[aa],y
+	case 1391: { // l:[aa],y
 		unhandled("l:[aa],y");
 		break;
 		}
-	case 1388: { // l:[aa],a
+	case 1392: { // l:[aa],a
 		unhandled("l:[aa],a");
 		break;
 		}
-	case 1389: { // l:[aa],b
+	case 1393: { // l:[aa],b
 		unhandled("l:[aa],b");
 		break;
 		}
-	case 1390: { // l:[aa],ab
+	case 1394: { // l:[aa],ab
 		unhandled("l:[aa],ab");
 		break;
 		}
-	case 1391: { // l:[aa],ba
+	case 1395: { // l:[aa],ba
 		unhandled("l:[aa],ba");
 		break;
 		}
-	case 1392: { // a10,l:(r)-n
+	case 1396: { // a10,l:(r)-n
 		unhandled("a10,l:(r)-n");
 		break;
 		}
-	case 1393: { // a10,l:(r)+n
+	case 1397: { // a10,l:(r)+n
 		unhandled("a10,l:(r)+n");
 		break;
 		}
-	case 1394: { // a10,l:(r)-
+	case 1398: { // a10,l:(r)-
 		unhandled("a10,l:(r)-");
 		break;
 		}
-	case 1395: { // a10,l:(r)+
+	case 1399: { // a10,l:(r)+
 		unhandled("a10,l:(r)+");
 		break;
 		}
-	case 1396: { // a10,l:(r)
+	case 1400: { // a10,l:(r)
 		unhandled("a10,l:(r)");
 		break;
 		}
-	case 1397: { // a10,l:(r+n)
+	case 1401: { // a10,l:(r+n)
 		unhandled("a10,l:(r+n)");
 		break;
 		}
-	case 1398: { // a10,l:-(r)
+	case 1402: { // a10,l:-(r)
 		unhandled("a10,l:-(r)");
 		break;
 		}
-	case 1399: { // b10,l:(r)-n
+	case 1403: { // b10,l:(r)-n
 		unhandled("b10,l:(r)-n");
 		break;
 		}
-	case 1400: { // b10,l:(r)+n
+	case 1404: { // b10,l:(r)+n
 		unhandled("b10,l:(r)+n");
 		break;
 		}
-	case 1401: { // b10,l:(r)-
+	case 1405: { // b10,l:(r)-
 		unhandled("b10,l:(r)-");
 		break;
 		}
-	case 1402: { // b10,l:(r)+
+	case 1406: { // b10,l:(r)+
 		unhandled("b10,l:(r)+");
 		break;
 		}
-	case 1403: { // b10,l:(r)
+	case 1407: { // b10,l:(r)
 		unhandled("b10,l:(r)");
 		break;
 		}
-	case 1404: { // b10,l:(r+n)
+	case 1408: { // b10,l:(r+n)
 		unhandled("b10,l:(r+n)");
 		break;
 		}
-	case 1405: { // b10,l:-(r)
+	case 1409: { // b10,l:-(r)
 		unhandled("b10,l:-(r)");
 		break;
 		}
-	case 1406: { // x,l:(r)-n
+	case 1410: { // x,l:(r)-n
 		unhandled("x,l:(r)-n");
 		break;
 		}
-	case 1407: { // x,l:(r)+n
+	case 1411: { // x,l:(r)+n
 		unhandled("x,l:(r)+n");
 		break;
 		}
-	case 1408: { // x,l:(r)-
+	case 1412: { // x,l:(r)-
 		unhandled("x,l:(r)-");
 		break;
 		}
-	case 1409: { // x,l:(r)+
+	case 1413: { // x,l:(r)+
 		unhandled("x,l:(r)+");
 		break;
 		}
-	case 1410: { // x,l:(r)
+	case 1414: { // x,l:(r)
 		unhandled("x,l:(r)");
 		break;
 		}
-	case 1411: { // x,l:(r+n)
+	case 1415: { // x,l:(r+n)
 		unhandled("x,l:(r+n)");
 		break;
 		}
-	case 1412: { // x,l:-(r)
+	case 1416: { // x,l:-(r)
 		unhandled("x,l:-(r)");
 		break;
 		}
-	case 1413: { // y,l:(r)-n
+	case 1417: { // y,l:(r)-n
 		unhandled("y,l:(r)-n");
 		break;
 		}
-	case 1414: { // y,l:(r)+n
+	case 1418: { // y,l:(r)+n
 		unhandled("y,l:(r)+n");
 		break;
 		}
-	case 1415: { // y,l:(r)-
+	case 1419: { // y,l:(r)-
 		unhandled("y,l:(r)-");
 		break;
 		}
-	case 1416: { // y,l:(r)+
+	case 1420: { // y,l:(r)+
 		unhandled("y,l:(r)+");
 		break;
 		}
-	case 1417: { // y,l:(r)
+	case 1421: { // y,l:(r)
 		unhandled("y,l:(r)");
 		break;
 		}
-	case 1418: { // y,l:(r+n)
+	case 1422: { // y,l:(r+n)
 		unhandled("y,l:(r+n)");
 		break;
 		}
-	case 1419: { // y,l:-(r)
+	case 1423: { // y,l:-(r)
 		unhandled("y,l:-(r)");
 		break;
 		}
-	case 1420: { // a,l:(r)-n
+	case 1424: { // a,l:(r)-n
 		unhandled("a,l:(r)-n");
 		break;
 		}
-	case 1421: { // a,l:(r)+n
+	case 1425: { // a,l:(r)+n
 		unhandled("a,l:(r)+n");
 		break;
 		}
-	case 1422: { // a,l:(r)-
+	case 1426: { // a,l:(r)-
 		unhandled("a,l:(r)-");
 		break;
 		}
-	case 1423: { // a,l:(r)+
+	case 1427: { // a,l:(r)+
 		unhandled("a,l:(r)+");
 		break;
 		}
-	case 1424: { // a,l:(r)
+	case 1428: { // a,l:(r)
 		unhandled("a,l:(r)");
 		break;
 		}
-	case 1425: { // a,l:(r+n)
+	case 1429: { // a,l:(r+n)
 		unhandled("a,l:(r+n)");
 		break;
 		}
-	case 1426: { // a,l:-(r)
+	case 1430: { // a,l:-(r)
 		unhandled("a,l:-(r)");
 		break;
 		}
-	case 1427: { // b,l:(r)-n
+	case 1431: { // b,l:(r)-n
 		unhandled("b,l:(r)-n");
 		break;
 		}
-	case 1428: { // b,l:(r)+n
+	case 1432: { // b,l:(r)+n
 		unhandled("b,l:(r)+n");
 		break;
 		}
-	case 1429: { // b,l:(r)-
+	case 1433: { // b,l:(r)-
 		unhandled("b,l:(r)-");
 		break;
 		}
-	case 1430: { // b,l:(r)+
+	case 1434: { // b,l:(r)+
 		unhandled("b,l:(r)+");
 		break;
 		}
-	case 1431: { // b,l:(r)
+	case 1435: { // b,l:(r)
 		unhandled("b,l:(r)");
 		break;
 		}
-	case 1432: { // b,l:(r+n)
+	case 1436: { // b,l:(r+n)
 		unhandled("b,l:(r+n)");
 		break;
 		}
-	case 1433: { // b,l:-(r)
+	case 1437: { // b,l:-(r)
 		unhandled("b,l:-(r)");
 		break;
 		}
-	case 1434: { // ab,l:(r)-n
+	case 1438: { // ab,l:(r)-n
 		unhandled("ab,l:(r)-n");
 		break;
 		}
-	case 1435: { // ab,l:(r)+n
+	case 1439: { // ab,l:(r)+n
 		unhandled("ab,l:(r)+n");
 		break;
 		}
-	case 1436: { // ab,l:(r)-
+	case 1440: { // ab,l:(r)-
 		unhandled("ab,l:(r)-");
 		break;
 		}
-	case 1437: { // ab,l:(r)+
+	case 1441: { // ab,l:(r)+
 		unhandled("ab,l:(r)+");
 		break;
 		}
-	case 1438: { // ab,l:(r)
+	case 1442: { // ab,l:(r)
 		unhandled("ab,l:(r)");
 		break;
 		}
-	case 1439: { // ab,l:(r+n)
+	case 1443: { // ab,l:(r+n)
 		unhandled("ab,l:(r+n)");
 		break;
 		}
-	case 1440: { // ab,l:-(r)
+	case 1444: { // ab,l:-(r)
 		unhandled("ab,l:-(r)");
 		break;
 		}
-	case 1441: { // ba,l:(r)-n
+	case 1445: { // ba,l:(r)-n
 		unhandled("ba,l:(r)-n");
 		break;
 		}
-	case 1442: { // ba,l:(r)+n
+	case 1446: { // ba,l:(r)+n
 		unhandled("ba,l:(r)+n");
 		break;
 		}
-	case 1443: { // ba,l:(r)-
+	case 1447: { // ba,l:(r)-
 		unhandled("ba,l:(r)-");
 		break;
 		}
-	case 1444: { // ba,l:(r)+
+	case 1448: { // ba,l:(r)+
 		unhandled("ba,l:(r)+");
 		break;
 		}
-	case 1445: { // ba,l:(r)
+	case 1449: { // ba,l:(r)
 		unhandled("ba,l:(r)");
 		break;
 		}
-	case 1446: { // ba,l:(r+n)
+	case 1450: { // ba,l:(r+n)
 		unhandled("ba,l:(r+n)");
 		break;
 		}
-	case 1447: { // ba,l:-(r)
+	case 1451: { // ba,l:-(r)
 		unhandled("ba,l:-(r)");
 		break;
 		}
-	case 1448: { // a10,l:[abs]
+	case 1452: { // a10,l:[abs]
 		unhandled("a10,l:[abs]");
 		break;
 		}
-	case 1449: { // b10,l:[abs]
+	case 1453: { // b10,l:[abs]
 		unhandled("b10,l:[abs]");
 		break;
 		}
-	case 1450: { // x,l:[abs]
+	case 1454: { // x,l:[abs]
 		unhandled("x,l:[abs]");
 		break;
 		}
-	case 1451: { // y,l:[abs]
+	case 1455: { // y,l:[abs]
 		unhandled("y,l:[abs]");
 		break;
 		}
-	case 1452: { // a,l:[abs]
+	case 1456: { // a,l:[abs]
 		unhandled("a,l:[abs]");
 		break;
 		}
-	case 1453: { // b,l:[abs]
+	case 1457: { // b,l:[abs]
 		unhandled("b,l:[abs]");
 		break;
 		}
-	case 1454: { // ab,l:[abs]
+	case 1458: { // ab,l:[abs]
 		unhandled("ab,l:[abs]");
 		break;
 		}
-	case 1455: { // ba,l:[abs]
+	case 1459: { // ba,l:[abs]
 		unhandled("ba,l:[abs]");
 		break;
 		}
-	case 1456: { // a10,l:[aa]
+	case 1460: { // a10,l:[aa]
 		unhandled("a10,l:[aa]");
 		break;
 		}
-	case 1457: { // b10,l:[aa]
+	case 1461: { // b10,l:[aa]
 		unhandled("b10,l:[aa]");
 		break;
 		}
-	case 1458: { // x,l:[aa]
+	case 1462: { // x,l:[aa]
 		unhandled("x,l:[aa]");
 		break;
 		}
-	case 1459: { // y,l:[aa]
+	case 1463: { // y,l:[aa]
 		unhandled("y,l:[aa]");
 		break;
 		}
-	case 1460: { // a,l:[aa]
+	case 1464: { // a,l:[aa]
 		unhandled("a,l:[aa]");
 		break;
 		}
-	case 1461: { // b,l:[aa]
+	case 1465: { // b,l:[aa]
 		unhandled("b,l:[aa]");
 		break;
 		}
-	case 1462: { // ab,l:[aa]
+	case 1466: { // ab,l:[aa]
 		unhandled("ab,l:[aa]");
 		break;
 		}
-	case 1463: { // ba,l:[aa]
+	case 1467: { // ba,l:[aa]
 		unhandled("ba,l:[aa]");
 		break;
 		}
-	case 1464: { // x:(r)+n,x0 y:(rh)+n,y0
+	case 1468: { // x:(r)+n,x0 y:(rh)+n,y0
 		unhandled("x:(r)+n,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1465: { // x:(r)+n,x0 y:(rh)+n,y1
+	case 1469: { // x:(r)+n,x0 y:(rh)+n,y1
 		unhandled("x:(r)+n,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1466: { // x:(r)+n,x0 y:(rh)+n,a
+	case 1470: { // x:(r)+n,x0 y:(rh)+n,a
 		unhandled("x:(r)+n,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1467: { // x:(r)+n,x0 y:(rh)+n,b
+	case 1471: { // x:(r)+n,x0 y:(rh)+n,b
 		unhandled("x:(r)+n,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1468: { // x:(r)+n,x1 y:(rh)+n,y0
+	case 1472: { // x:(r)+n,x1 y:(rh)+n,y0
 		unhandled("x:(r)+n,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1469: { // x:(r)+n,x1 y:(rh)+n,y1
+	case 1473: { // x:(r)+n,x1 y:(rh)+n,y1
 		unhandled("x:(r)+n,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1470: { // x:(r)+n,x1 y:(rh)+n,a
+	case 1474: { // x:(r)+n,x1 y:(rh)+n,a
 		unhandled("x:(r)+n,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1471: { // x:(r)+n,x1 y:(rh)+n,b
+	case 1475: { // x:(r)+n,x1 y:(rh)+n,b
 		unhandled("x:(r)+n,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1472: { // x:(r)+n,a y:(rh)+n,y0
+	case 1476: { // x:(r)+n,a y:(rh)+n,y0
 		unhandled("x:(r)+n,a y:(rh)+n,y0");
 		break;
 		}
-	case 1473: { // x:(r)+n,a y:(rh)+n,y1
+	case 1477: { // x:(r)+n,a y:(rh)+n,y1
 		unhandled("x:(r)+n,a y:(rh)+n,y1");
 		break;
 		}
-	case 1474: { // x:(r)+n,a y:(rh)+n,a
+	case 1478: { // x:(r)+n,a y:(rh)+n,a
 		unhandled("x:(r)+n,a y:(rh)+n,a");
 		break;
 		}
-	case 1475: { // x:(r)+n,a y:(rh)+n,b
+	case 1479: { // x:(r)+n,a y:(rh)+n,b
 		unhandled("x:(r)+n,a y:(rh)+n,b");
 		break;
 		}
-	case 1476: { // x:(r)+n,b y:(rh)+n,y0
+	case 1480: { // x:(r)+n,b y:(rh)+n,y0
 		unhandled("x:(r)+n,b y:(rh)+n,y0");
 		break;
 		}
-	case 1477: { // x:(r)+n,b y:(rh)+n,y1
+	case 1481: { // x:(r)+n,b y:(rh)+n,y1
 		unhandled("x:(r)+n,b y:(rh)+n,y1");
 		break;
 		}
-	case 1478: { // x:(r)+n,b y:(rh)+n,a
+	case 1482: { // x:(r)+n,b y:(rh)+n,a
 		unhandled("x:(r)+n,b y:(rh)+n,a");
 		break;
 		}
-	case 1479: { // x:(r)+n,b y:(rh)+n,b
+	case 1483: { // x:(r)+n,b y:(rh)+n,b
 		unhandled("x:(r)+n,b y:(rh)+n,b");
 		break;
 		}
-	case 1480: { // x:(r)+n,x0 y:(rh)-,y0
+	case 1484: { // x:(r)+n,x0 y:(rh)-,y0
 		unhandled("x:(r)+n,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1481: { // x:(r)+n,x0 y:(rh)-,y1
+	case 1485: { // x:(r)+n,x0 y:(rh)-,y1
 		unhandled("x:(r)+n,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1482: { // x:(r)+n,x0 y:(rh)-,a
+	case 1486: { // x:(r)+n,x0 y:(rh)-,a
 		unhandled("x:(r)+n,x0 y:(rh)-,a");
 		break;
 		}
-	case 1483: { // x:(r)+n,x0 y:(rh)-,b
+	case 1487: { // x:(r)+n,x0 y:(rh)-,b
 		unhandled("x:(r)+n,x0 y:(rh)-,b");
 		break;
 		}
-	case 1484: { // x:(r)+n,x1 y:(rh)-,y0
+	case 1488: { // x:(r)+n,x1 y:(rh)-,y0
 		unhandled("x:(r)+n,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1485: { // x:(r)+n,x1 y:(rh)-,y1
+	case 1489: { // x:(r)+n,x1 y:(rh)-,y1
 		unhandled("x:(r)+n,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1486: { // x:(r)+n,x1 y:(rh)-,a
+	case 1490: { // x:(r)+n,x1 y:(rh)-,a
 		unhandled("x:(r)+n,x1 y:(rh)-,a");
 		break;
 		}
-	case 1487: { // x:(r)+n,x1 y:(rh)-,b
+	case 1491: { // x:(r)+n,x1 y:(rh)-,b
 		unhandled("x:(r)+n,x1 y:(rh)-,b");
 		break;
 		}
-	case 1488: { // x:(r)+n,a y:(rh)-,y0
+	case 1492: { // x:(r)+n,a y:(rh)-,y0
 		unhandled("x:(r)+n,a y:(rh)-,y0");
 		break;
 		}
-	case 1489: { // x:(r)+n,a y:(rh)-,y1
+	case 1493: { // x:(r)+n,a y:(rh)-,y1
 		unhandled("x:(r)+n,a y:(rh)-,y1");
 		break;
 		}
-	case 1490: { // x:(r)+n,a y:(rh)-,a
+	case 1494: { // x:(r)+n,a y:(rh)-,a
 		unhandled("x:(r)+n,a y:(rh)-,a");
 		break;
 		}
-	case 1491: { // x:(r)+n,a y:(rh)-,b
+	case 1495: { // x:(r)+n,a y:(rh)-,b
 		unhandled("x:(r)+n,a y:(rh)-,b");
 		break;
 		}
-	case 1492: { // x:(r)+n,b y:(rh)-,y0
+	case 1496: { // x:(r)+n,b y:(rh)-,y0
 		unhandled("x:(r)+n,b y:(rh)-,y0");
 		break;
 		}
-	case 1493: { // x:(r)+n,b y:(rh)-,y1
+	case 1497: { // x:(r)+n,b y:(rh)-,y1
 		unhandled("x:(r)+n,b y:(rh)-,y1");
 		break;
 		}
-	case 1494: { // x:(r)+n,b y:(rh)-,a
+	case 1498: { // x:(r)+n,b y:(rh)-,a
 		unhandled("x:(r)+n,b y:(rh)-,a");
 		break;
 		}
-	case 1495: { // x:(r)+n,b y:(rh)-,b
+	case 1499: { // x:(r)+n,b y:(rh)-,b
 		unhandled("x:(r)+n,b y:(rh)-,b");
 		break;
 		}
-	case 1496: { // x:(r)+n,x0 y:(rh)+,y0
+	case 1500: { // x:(r)+n,x0 y:(rh)+,y0
 		unhandled("x:(r)+n,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1497: { // x:(r)+n,x0 y:(rh)+,y1
+	case 1501: { // x:(r)+n,x0 y:(rh)+,y1
 		unhandled("x:(r)+n,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1498: { // x:(r)+n,x0 y:(rh)+,a
+	case 1502: { // x:(r)+n,x0 y:(rh)+,a
 		unhandled("x:(r)+n,x0 y:(rh)+,a");
 		break;
 		}
-	case 1499: { // x:(r)+n,x0 y:(rh)+,b
+	case 1503: { // x:(r)+n,x0 y:(rh)+,b
 		unhandled("x:(r)+n,x0 y:(rh)+,b");
 		break;
 		}
-	case 1500: { // x:(r)+n,x1 y:(rh)+,y0
+	case 1504: { // x:(r)+n,x1 y:(rh)+,y0
 		unhandled("x:(r)+n,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1501: { // x:(r)+n,x1 y:(rh)+,y1
+	case 1505: { // x:(r)+n,x1 y:(rh)+,y1
 		unhandled("x:(r)+n,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1502: { // x:(r)+n,x1 y:(rh)+,a
+	case 1506: { // x:(r)+n,x1 y:(rh)+,a
 		unhandled("x:(r)+n,x1 y:(rh)+,a");
 		break;
 		}
-	case 1503: { // x:(r)+n,x1 y:(rh)+,b
+	case 1507: { // x:(r)+n,x1 y:(rh)+,b
 		unhandled("x:(r)+n,x1 y:(rh)+,b");
 		break;
 		}
-	case 1504: { // x:(r)+n,a y:(rh)+,y0
+	case 1508: { // x:(r)+n,a y:(rh)+,y0
 		unhandled("x:(r)+n,a y:(rh)+,y0");
 		break;
 		}
-	case 1505: { // x:(r)+n,a y:(rh)+,y1
+	case 1509: { // x:(r)+n,a y:(rh)+,y1
 		unhandled("x:(r)+n,a y:(rh)+,y1");
 		break;
 		}
-	case 1506: { // x:(r)+n,a y:(rh)+,a
+	case 1510: { // x:(r)+n,a y:(rh)+,a
 		unhandled("x:(r)+n,a y:(rh)+,a");
 		break;
 		}
-	case 1507: { // x:(r)+n,a y:(rh)+,b
+	case 1511: { // x:(r)+n,a y:(rh)+,b
 		unhandled("x:(r)+n,a y:(rh)+,b");
 		break;
 		}
-	case 1508: { // x:(r)+n,b y:(rh)+,y0
+	case 1512: { // x:(r)+n,b y:(rh)+,y0
 		unhandled("x:(r)+n,b y:(rh)+,y0");
 		break;
 		}
-	case 1509: { // x:(r)+n,b y:(rh)+,y1
+	case 1513: { // x:(r)+n,b y:(rh)+,y1
 		unhandled("x:(r)+n,b y:(rh)+,y1");
 		break;
 		}
-	case 1510: { // x:(r)+n,b y:(rh)+,a
+	case 1514: { // x:(r)+n,b y:(rh)+,a
 		unhandled("x:(r)+n,b y:(rh)+,a");
 		break;
 		}
-	case 1511: { // x:(r)+n,b y:(rh)+,b
+	case 1515: { // x:(r)+n,b y:(rh)+,b
 		unhandled("x:(r)+n,b y:(rh)+,b");
 		break;
 		}
-	case 1512: { // x:(r)+n,x0 y:(rh),y0
+	case 1516: { // x:(r)+n,x0 y:(rh),y0
 		unhandled("x:(r)+n,x0 y:(rh),y0");
 		break;
 		}
-	case 1513: { // x:(r)+n,x0 y:(rh),y1
+	case 1517: { // x:(r)+n,x0 y:(rh),y1
 		unhandled("x:(r)+n,x0 y:(rh),y1");
 		break;
 		}
-	case 1514: { // x:(r)+n,x0 y:(rh),a
+	case 1518: { // x:(r)+n,x0 y:(rh),a
 		unhandled("x:(r)+n,x0 y:(rh),a");
 		break;
 		}
-	case 1515: { // x:(r)+n,x0 y:(rh),b
+	case 1519: { // x:(r)+n,x0 y:(rh),b
 		unhandled("x:(r)+n,x0 y:(rh),b");
 		break;
 		}
-	case 1516: { // x:(r)+n,x1 y:(rh),y0
+	case 1520: { // x:(r)+n,x1 y:(rh),y0
 		unhandled("x:(r)+n,x1 y:(rh),y0");
 		break;
 		}
-	case 1517: { // x:(r)+n,x1 y:(rh),y1
+	case 1521: { // x:(r)+n,x1 y:(rh),y1
 		unhandled("x:(r)+n,x1 y:(rh),y1");
 		break;
 		}
-	case 1518: { // x:(r)+n,x1 y:(rh),a
+	case 1522: { // x:(r)+n,x1 y:(rh),a
 		unhandled("x:(r)+n,x1 y:(rh),a");
 		break;
 		}
-	case 1519: { // x:(r)+n,x1 y:(rh),b
+	case 1523: { // x:(r)+n,x1 y:(rh),b
 		unhandled("x:(r)+n,x1 y:(rh),b");
 		break;
 		}
-	case 1520: { // x:(r)+n,a y:(rh),y0
+	case 1524: { // x:(r)+n,a y:(rh),y0
 		unhandled("x:(r)+n,a y:(rh),y0");
 		break;
 		}
-	case 1521: { // x:(r)+n,a y:(rh),y1
+	case 1525: { // x:(r)+n,a y:(rh),y1
 		unhandled("x:(r)+n,a y:(rh),y1");
 		break;
 		}
-	case 1522: { // x:(r)+n,a y:(rh),a
+	case 1526: { // x:(r)+n,a y:(rh),a
 		unhandled("x:(r)+n,a y:(rh),a");
 		break;
 		}
-	case 1523: { // x:(r)+n,a y:(rh),b
+	case 1527: { // x:(r)+n,a y:(rh),b
 		unhandled("x:(r)+n,a y:(rh),b");
 		break;
 		}
-	case 1524: { // x:(r)+n,b y:(rh),y0
+	case 1528: { // x:(r)+n,b y:(rh),y0
 		unhandled("x:(r)+n,b y:(rh),y0");
 		break;
 		}
-	case 1525: { // x:(r)+n,b y:(rh),y1
+	case 1529: { // x:(r)+n,b y:(rh),y1
 		unhandled("x:(r)+n,b y:(rh),y1");
 		break;
 		}
-	case 1526: { // x:(r)+n,b y:(rh),a
+	case 1530: { // x:(r)+n,b y:(rh),a
 		unhandled("x:(r)+n,b y:(rh),a");
 		break;
 		}
-	case 1527: { // x:(r)+n,b y:(rh),b
+	case 1531: { // x:(r)+n,b y:(rh),b
 		unhandled("x:(r)+n,b y:(rh),b");
 		break;
 		}
-	case 1528: { // x:(r)-,x0 y:(rh)+n,y0
+	case 1532: { // x:(r)-,x0 y:(rh)+n,y0
 		unhandled("x:(r)-,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1529: { // x:(r)-,x0 y:(rh)+n,y1
+	case 1533: { // x:(r)-,x0 y:(rh)+n,y1
 		unhandled("x:(r)-,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1530: { // x:(r)-,x0 y:(rh)+n,a
+	case 1534: { // x:(r)-,x0 y:(rh)+n,a
 		unhandled("x:(r)-,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1531: { // x:(r)-,x0 y:(rh)+n,b
+	case 1535: { // x:(r)-,x0 y:(rh)+n,b
 		unhandled("x:(r)-,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1532: { // x:(r)-,x1 y:(rh)+n,y0
+	case 1536: { // x:(r)-,x1 y:(rh)+n,y0
 		unhandled("x:(r)-,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1533: { // x:(r)-,x1 y:(rh)+n,y1
+	case 1537: { // x:(r)-,x1 y:(rh)+n,y1
 		unhandled("x:(r)-,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1534: { // x:(r)-,x1 y:(rh)+n,a
+	case 1538: { // x:(r)-,x1 y:(rh)+n,a
 		unhandled("x:(r)-,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1535: { // x:(r)-,x1 y:(rh)+n,b
+	case 1539: { // x:(r)-,x1 y:(rh)+n,b
 		unhandled("x:(r)-,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1536: { // x:(r)-,a y:(rh)+n,y0
+	case 1540: { // x:(r)-,a y:(rh)+n,y0
 		unhandled("x:(r)-,a y:(rh)+n,y0");
 		break;
 		}
-	case 1537: { // x:(r)-,a y:(rh)+n,y1
+	case 1541: { // x:(r)-,a y:(rh)+n,y1
 		unhandled("x:(r)-,a y:(rh)+n,y1");
 		break;
 		}
-	case 1538: { // x:(r)-,a y:(rh)+n,a
+	case 1542: { // x:(r)-,a y:(rh)+n,a
 		unhandled("x:(r)-,a y:(rh)+n,a");
 		break;
 		}
-	case 1539: { // x:(r)-,a y:(rh)+n,b
+	case 1543: { // x:(r)-,a y:(rh)+n,b
 		unhandled("x:(r)-,a y:(rh)+n,b");
 		break;
 		}
-	case 1540: { // x:(r)-,b y:(rh)+n,y0
+	case 1544: { // x:(r)-,b y:(rh)+n,y0
 		unhandled("x:(r)-,b y:(rh)+n,y0");
 		break;
 		}
-	case 1541: { // x:(r)-,b y:(rh)+n,y1
+	case 1545: { // x:(r)-,b y:(rh)+n,y1
 		unhandled("x:(r)-,b y:(rh)+n,y1");
 		break;
 		}
-	case 1542: { // x:(r)-,b y:(rh)+n,a
+	case 1546: { // x:(r)-,b y:(rh)+n,a
 		unhandled("x:(r)-,b y:(rh)+n,a");
 		break;
 		}
-	case 1543: { // x:(r)-,b y:(rh)+n,b
+	case 1547: { // x:(r)-,b y:(rh)+n,b
 		unhandled("x:(r)-,b y:(rh)+n,b");
 		break;
 		}
-	case 1544: { // x:(r)-,x0 y:(rh)-,y0
+	case 1548: { // x:(r)-,x0 y:(rh)-,y0
 		unhandled("x:(r)-,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1545: { // x:(r)-,x0 y:(rh)-,y1
+	case 1549: { // x:(r)-,x0 y:(rh)-,y1
 		unhandled("x:(r)-,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1546: { // x:(r)-,x0 y:(rh)-,a
+	case 1550: { // x:(r)-,x0 y:(rh)-,a
 		unhandled("x:(r)-,x0 y:(rh)-,a");
 		break;
 		}
-	case 1547: { // x:(r)-,x0 y:(rh)-,b
+	case 1551: { // x:(r)-,x0 y:(rh)-,b
 		unhandled("x:(r)-,x0 y:(rh)-,b");
 		break;
 		}
-	case 1548: { // x:(r)-,x1 y:(rh)-,y0
+	case 1552: { // x:(r)-,x1 y:(rh)-,y0
 		unhandled("x:(r)-,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1549: { // x:(r)-,x1 y:(rh)-,y1
+	case 1553: { // x:(r)-,x1 y:(rh)-,y1
 		unhandled("x:(r)-,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1550: { // x:(r)-,x1 y:(rh)-,a
+	case 1554: { // x:(r)-,x1 y:(rh)-,a
 		unhandled("x:(r)-,x1 y:(rh)-,a");
 		break;
 		}
-	case 1551: { // x:(r)-,x1 y:(rh)-,b
+	case 1555: { // x:(r)-,x1 y:(rh)-,b
 		unhandled("x:(r)-,x1 y:(rh)-,b");
 		break;
 		}
-	case 1552: { // x:(r)-,a y:(rh)-,y0
+	case 1556: { // x:(r)-,a y:(rh)-,y0
 		unhandled("x:(r)-,a y:(rh)-,y0");
 		break;
 		}
-	case 1553: { // x:(r)-,a y:(rh)-,y1
+	case 1557: { // x:(r)-,a y:(rh)-,y1
 		unhandled("x:(r)-,a y:(rh)-,y1");
 		break;
 		}
-	case 1554: { // x:(r)-,a y:(rh)-,a
+	case 1558: { // x:(r)-,a y:(rh)-,a
 		unhandled("x:(r)-,a y:(rh)-,a");
 		break;
 		}
-	case 1555: { // x:(r)-,a y:(rh)-,b
+	case 1559: { // x:(r)-,a y:(rh)-,b
 		unhandled("x:(r)-,a y:(rh)-,b");
 		break;
 		}
-	case 1556: { // x:(r)-,b y:(rh)-,y0
+	case 1560: { // x:(r)-,b y:(rh)-,y0
 		unhandled("x:(r)-,b y:(rh)-,y0");
 		break;
 		}
-	case 1557: { // x:(r)-,b y:(rh)-,y1
+	case 1561: { // x:(r)-,b y:(rh)-,y1
 		unhandled("x:(r)-,b y:(rh)-,y1");
 		break;
 		}
-	case 1558: { // x:(r)-,b y:(rh)-,a
+	case 1562: { // x:(r)-,b y:(rh)-,a
 		unhandled("x:(r)-,b y:(rh)-,a");
 		break;
 		}
-	case 1559: { // x:(r)-,b y:(rh)-,b
+	case 1563: { // x:(r)-,b y:(rh)-,b
 		unhandled("x:(r)-,b y:(rh)-,b");
 		break;
 		}
-	case 1560: { // x:(r)-,x0 y:(rh)+,y0
+	case 1564: { // x:(r)-,x0 y:(rh)+,y0
 		unhandled("x:(r)-,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1561: { // x:(r)-,x0 y:(rh)+,y1
+	case 1565: { // x:(r)-,x0 y:(rh)+,y1
 		unhandled("x:(r)-,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1562: { // x:(r)-,x0 y:(rh)+,a
+	case 1566: { // x:(r)-,x0 y:(rh)+,a
 		unhandled("x:(r)-,x0 y:(rh)+,a");
 		break;
 		}
-	case 1563: { // x:(r)-,x0 y:(rh)+,b
+	case 1567: { // x:(r)-,x0 y:(rh)+,b
 		unhandled("x:(r)-,x0 y:(rh)+,b");
 		break;
 		}
-	case 1564: { // x:(r)-,x1 y:(rh)+,y0
+	case 1568: { // x:(r)-,x1 y:(rh)+,y0
 		unhandled("x:(r)-,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1565: { // x:(r)-,x1 y:(rh)+,y1
+	case 1569: { // x:(r)-,x1 y:(rh)+,y1
 		unhandled("x:(r)-,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1566: { // x:(r)-,x1 y:(rh)+,a
+	case 1570: { // x:(r)-,x1 y:(rh)+,a
 		unhandled("x:(r)-,x1 y:(rh)+,a");
 		break;
 		}
-	case 1567: { // x:(r)-,x1 y:(rh)+,b
+	case 1571: { // x:(r)-,x1 y:(rh)+,b
 		unhandled("x:(r)-,x1 y:(rh)+,b");
 		break;
 		}
-	case 1568: { // x:(r)-,a y:(rh)+,y0
+	case 1572: { // x:(r)-,a y:(rh)+,y0
 		unhandled("x:(r)-,a y:(rh)+,y0");
 		break;
 		}
-	case 1569: { // x:(r)-,a y:(rh)+,y1
+	case 1573: { // x:(r)-,a y:(rh)+,y1
 		unhandled("x:(r)-,a y:(rh)+,y1");
 		break;
 		}
-	case 1570: { // x:(r)-,a y:(rh)+,a
+	case 1574: { // x:(r)-,a y:(rh)+,a
 		unhandled("x:(r)-,a y:(rh)+,a");
 		break;
 		}
-	case 1571: { // x:(r)-,a y:(rh)+,b
+	case 1575: { // x:(r)-,a y:(rh)+,b
 		unhandled("x:(r)-,a y:(rh)+,b");
 		break;
 		}
-	case 1572: { // x:(r)-,b y:(rh)+,y0
+	case 1576: { // x:(r)-,b y:(rh)+,y0
 		unhandled("x:(r)-,b y:(rh)+,y0");
 		break;
 		}
-	case 1573: { // x:(r)-,b y:(rh)+,y1
+	case 1577: { // x:(r)-,b y:(rh)+,y1
 		unhandled("x:(r)-,b y:(rh)+,y1");
 		break;
 		}
-	case 1574: { // x:(r)-,b y:(rh)+,a
+	case 1578: { // x:(r)-,b y:(rh)+,a
 		unhandled("x:(r)-,b y:(rh)+,a");
 		break;
 		}
-	case 1575: { // x:(r)-,b y:(rh)+,b
+	case 1579: { // x:(r)-,b y:(rh)+,b
 		unhandled("x:(r)-,b y:(rh)+,b");
 		break;
 		}
-	case 1576: { // x:(r)-,x0 y:(rh),y0
+	case 1580: { // x:(r)-,x0 y:(rh),y0
 		unhandled("x:(r)-,x0 y:(rh),y0");
 		break;
 		}
-	case 1577: { // x:(r)-,x0 y:(rh),y1
+	case 1581: { // x:(r)-,x0 y:(rh),y1
 		unhandled("x:(r)-,x0 y:(rh),y1");
 		break;
 		}
-	case 1578: { // x:(r)-,x0 y:(rh),a
+	case 1582: { // x:(r)-,x0 y:(rh),a
 		unhandled("x:(r)-,x0 y:(rh),a");
 		break;
 		}
-	case 1579: { // x:(r)-,x0 y:(rh),b
+	case 1583: { // x:(r)-,x0 y:(rh),b
 		unhandled("x:(r)-,x0 y:(rh),b");
 		break;
 		}
-	case 1580: { // x:(r)-,x1 y:(rh),y0
+	case 1584: { // x:(r)-,x1 y:(rh),y0
 		unhandled("x:(r)-,x1 y:(rh),y0");
 		break;
 		}
-	case 1581: { // x:(r)-,x1 y:(rh),y1
+	case 1585: { // x:(r)-,x1 y:(rh),y1
 		unhandled("x:(r)-,x1 y:(rh),y1");
 		break;
 		}
-	case 1582: { // x:(r)-,x1 y:(rh),a
+	case 1586: { // x:(r)-,x1 y:(rh),a
 		unhandled("x:(r)-,x1 y:(rh),a");
 		break;
 		}
-	case 1583: { // x:(r)-,x1 y:(rh),b
+	case 1587: { // x:(r)-,x1 y:(rh),b
 		unhandled("x:(r)-,x1 y:(rh),b");
 		break;
 		}
-	case 1584: { // x:(r)-,a y:(rh),y0
+	case 1588: { // x:(r)-,a y:(rh),y0
 		unhandled("x:(r)-,a y:(rh),y0");
 		break;
 		}
-	case 1585: { // x:(r)-,a y:(rh),y1
+	case 1589: { // x:(r)-,a y:(rh),y1
 		unhandled("x:(r)-,a y:(rh),y1");
 		break;
 		}
-	case 1586: { // x:(r)-,a y:(rh),a
+	case 1590: { // x:(r)-,a y:(rh),a
 		unhandled("x:(r)-,a y:(rh),a");
 		break;
 		}
-	case 1587: { // x:(r)-,a y:(rh),b
+	case 1591: { // x:(r)-,a y:(rh),b
 		unhandled("x:(r)-,a y:(rh),b");
 		break;
 		}
-	case 1588: { // x:(r)-,b y:(rh),y0
+	case 1592: { // x:(r)-,b y:(rh),y0
 		unhandled("x:(r)-,b y:(rh),y0");
 		break;
 		}
-	case 1589: { // x:(r)-,b y:(rh),y1
+	case 1593: { // x:(r)-,b y:(rh),y1
 		unhandled("x:(r)-,b y:(rh),y1");
 		break;
 		}
-	case 1590: { // x:(r)-,b y:(rh),a
+	case 1594: { // x:(r)-,b y:(rh),a
 		unhandled("x:(r)-,b y:(rh),a");
 		break;
 		}
-	case 1591: { // x:(r)-,b y:(rh),b
+	case 1595: { // x:(r)-,b y:(rh),b
 		unhandled("x:(r)-,b y:(rh),b");
 		break;
 		}
-	case 1592: { // x:(r)+,x0 y:(rh)+n,y0
+	case 1596: { // x:(r)+,x0 y:(rh)+n,y0
 		unhandled("x:(r)+,x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1593: { // x:(r)+,x0 y:(rh)+n,y1
+	case 1597: { // x:(r)+,x0 y:(rh)+n,y1
 		unhandled("x:(r)+,x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1594: { // x:(r)+,x0 y:(rh)+n,a
+	case 1598: { // x:(r)+,x0 y:(rh)+n,a
 		unhandled("x:(r)+,x0 y:(rh)+n,a");
 		break;
 		}
-	case 1595: { // x:(r)+,x0 y:(rh)+n,b
+	case 1599: { // x:(r)+,x0 y:(rh)+n,b
 		unhandled("x:(r)+,x0 y:(rh)+n,b");
 		break;
 		}
-	case 1596: { // x:(r)+,x1 y:(rh)+n,y0
+	case 1600: { // x:(r)+,x1 y:(rh)+n,y0
 		unhandled("x:(r)+,x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1597: { // x:(r)+,x1 y:(rh)+n,y1
+	case 1601: { // x:(r)+,x1 y:(rh)+n,y1
 		unhandled("x:(r)+,x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1598: { // x:(r)+,x1 y:(rh)+n,a
+	case 1602: { // x:(r)+,x1 y:(rh)+n,a
 		unhandled("x:(r)+,x1 y:(rh)+n,a");
 		break;
 		}
-	case 1599: { // x:(r)+,x1 y:(rh)+n,b
+	case 1603: { // x:(r)+,x1 y:(rh)+n,b
 		unhandled("x:(r)+,x1 y:(rh)+n,b");
 		break;
 		}
-	case 1600: { // x:(r)+,a y:(rh)+n,y0
+	case 1604: { // x:(r)+,a y:(rh)+n,y0
 		unhandled("x:(r)+,a y:(rh)+n,y0");
 		break;
 		}
-	case 1601: { // x:(r)+,a y:(rh)+n,y1
+	case 1605: { // x:(r)+,a y:(rh)+n,y1
 		unhandled("x:(r)+,a y:(rh)+n,y1");
 		break;
 		}
-	case 1602: { // x:(r)+,a y:(rh)+n,a
+	case 1606: { // x:(r)+,a y:(rh)+n,a
 		unhandled("x:(r)+,a y:(rh)+n,a");
 		break;
 		}
-	case 1603: { // x:(r)+,a y:(rh)+n,b
+	case 1607: { // x:(r)+,a y:(rh)+n,b
 		unhandled("x:(r)+,a y:(rh)+n,b");
 		break;
 		}
-	case 1604: { // x:(r)+,b y:(rh)+n,y0
+	case 1608: { // x:(r)+,b y:(rh)+n,y0
 		unhandled("x:(r)+,b y:(rh)+n,y0");
 		break;
 		}
-	case 1605: { // x:(r)+,b y:(rh)+n,y1
+	case 1609: { // x:(r)+,b y:(rh)+n,y1
 		unhandled("x:(r)+,b y:(rh)+n,y1");
 		break;
 		}
-	case 1606: { // x:(r)+,b y:(rh)+n,a
+	case 1610: { // x:(r)+,b y:(rh)+n,a
 		unhandled("x:(r)+,b y:(rh)+n,a");
 		break;
 		}
-	case 1607: { // x:(r)+,b y:(rh)+n,b
+	case 1611: { // x:(r)+,b y:(rh)+n,b
 		unhandled("x:(r)+,b y:(rh)+n,b");
 		break;
 		}
-	case 1608: { // x:(r)+,x0 y:(rh)-,y0
+	case 1612: { // x:(r)+,x0 y:(rh)-,y0
 		unhandled("x:(r)+,x0 y:(rh)-,y0");
 		break;
 		}
-	case 1609: { // x:(r)+,x0 y:(rh)-,y1
+	case 1613: { // x:(r)+,x0 y:(rh)-,y1
 		unhandled("x:(r)+,x0 y:(rh)-,y1");
 		break;
 		}
-	case 1610: { // x:(r)+,x0 y:(rh)-,a
+	case 1614: { // x:(r)+,x0 y:(rh)-,a
 		unhandled("x:(r)+,x0 y:(rh)-,a");
 		break;
 		}
-	case 1611: { // x:(r)+,x0 y:(rh)-,b
+	case 1615: { // x:(r)+,x0 y:(rh)-,b
 		unhandled("x:(r)+,x0 y:(rh)-,b");
 		break;
 		}
-	case 1612: { // x:(r)+,x1 y:(rh)-,y0
+	case 1616: { // x:(r)+,x1 y:(rh)-,y0
 		unhandled("x:(r)+,x1 y:(rh)-,y0");
 		break;
 		}
-	case 1613: { // x:(r)+,x1 y:(rh)-,y1
+	case 1617: { // x:(r)+,x1 y:(rh)-,y1
 		unhandled("x:(r)+,x1 y:(rh)-,y1");
 		break;
 		}
-	case 1614: { // x:(r)+,x1 y:(rh)-,a
+	case 1618: { // x:(r)+,x1 y:(rh)-,a
 		unhandled("x:(r)+,x1 y:(rh)-,a");
 		break;
 		}
-	case 1615: { // x:(r)+,x1 y:(rh)-,b
+	case 1619: { // x:(r)+,x1 y:(rh)-,b
 		unhandled("x:(r)+,x1 y:(rh)-,b");
 		break;
 		}
-	case 1616: { // x:(r)+,a y:(rh)-,y0
+	case 1620: { // x:(r)+,a y:(rh)-,y0
 		unhandled("x:(r)+,a y:(rh)-,y0");
 		break;
 		}
-	case 1617: { // x:(r)+,a y:(rh)-,y1
+	case 1621: { // x:(r)+,a y:(rh)-,y1
 		unhandled("x:(r)+,a y:(rh)-,y1");
 		break;
 		}
-	case 1618: { // x:(r)+,a y:(rh)-,a
+	case 1622: { // x:(r)+,a y:(rh)-,a
 		unhandled("x:(r)+,a y:(rh)-,a");
 		break;
 		}
-	case 1619: { // x:(r)+,a y:(rh)-,b
+	case 1623: { // x:(r)+,a y:(rh)-,b
 		unhandled("x:(r)+,a y:(rh)-,b");
 		break;
 		}
-	case 1620: { // x:(r)+,b y:(rh)-,y0
+	case 1624: { // x:(r)+,b y:(rh)-,y0
 		unhandled("x:(r)+,b y:(rh)-,y0");
 		break;
 		}
-	case 1621: { // x:(r)+,b y:(rh)-,y1
+	case 1625: { // x:(r)+,b y:(rh)-,y1
 		unhandled("x:(r)+,b y:(rh)-,y1");
 		break;
 		}
-	case 1622: { // x:(r)+,b y:(rh)-,a
+	case 1626: { // x:(r)+,b y:(rh)-,a
 		unhandled("x:(r)+,b y:(rh)-,a");
 		break;
 		}
-	case 1623: { // x:(r)+,b y:(rh)-,b
+	case 1627: { // x:(r)+,b y:(rh)-,b
 		unhandled("x:(r)+,b y:(rh)-,b");
 		break;
 		}
-	case 1624: { // x:(r)+,x0 y:(rh)+,y0
+	case 1628: { // x:(r)+,x0 y:(rh)+,y0
 		unhandled("x:(r)+,x0 y:(rh)+,y0");
 		break;
 		}
-	case 1625: { // x:(r)+,x0 y:(rh)+,y1
+	case 1629: { // x:(r)+,x0 y:(rh)+,y1
 		unhandled("x:(r)+,x0 y:(rh)+,y1");
 		break;
 		}
-	case 1626: { // x:(r)+,x0 y:(rh)+,a
+	case 1630: { // x:(r)+,x0 y:(rh)+,a
 		unhandled("x:(r)+,x0 y:(rh)+,a");
 		break;
 		}
-	case 1627: { // x:(r)+,x0 y:(rh)+,b
+	case 1631: { // x:(r)+,x0 y:(rh)+,b
 		unhandled("x:(r)+,x0 y:(rh)+,b");
 		break;
 		}
-	case 1628: { // x:(r)+,x1 y:(rh)+,y0
+	case 1632: { // x:(r)+,x1 y:(rh)+,y0
 		unhandled("x:(r)+,x1 y:(rh)+,y0");
 		break;
 		}
-	case 1629: { // x:(r)+,x1 y:(rh)+,y1
+	case 1633: { // x:(r)+,x1 y:(rh)+,y1
 		unhandled("x:(r)+,x1 y:(rh)+,y1");
 		break;
 		}
-	case 1630: { // x:(r)+,x1 y:(rh)+,a
+	case 1634: { // x:(r)+,x1 y:(rh)+,a
 		unhandled("x:(r)+,x1 y:(rh)+,a");
 		break;
 		}
-	case 1631: { // x:(r)+,x1 y:(rh)+,b
+	case 1635: { // x:(r)+,x1 y:(rh)+,b
 		unhandled("x:(r)+,x1 y:(rh)+,b");
 		break;
 		}
-	case 1632: { // x:(r)+,a y:(rh)+,y0
+	case 1636: { // x:(r)+,a y:(rh)+,y0
 		unhandled("x:(r)+,a y:(rh)+,y0");
 		break;
 		}
-	case 1633: { // x:(r)+,a y:(rh)+,y1
+	case 1637: { // x:(r)+,a y:(rh)+,y1
 		unhandled("x:(r)+,a y:(rh)+,y1");
 		break;
 		}
-	case 1634: { // x:(r)+,a y:(rh)+,a
+	case 1638: { // x:(r)+,a y:(rh)+,a
 		unhandled("x:(r)+,a y:(rh)+,a");
 		break;
 		}
-	case 1635: { // x:(r)+,a y:(rh)+,b
+	case 1639: { // x:(r)+,a y:(rh)+,b
 		unhandled("x:(r)+,a y:(rh)+,b");
 		break;
 		}
-	case 1636: { // x:(r)+,b y:(rh)+,y0
+	case 1640: { // x:(r)+,b y:(rh)+,y0
 		unhandled("x:(r)+,b y:(rh)+,y0");
 		break;
 		}
-	case 1637: { // x:(r)+,b y:(rh)+,y1
+	case 1641: { // x:(r)+,b y:(rh)+,y1
 		unhandled("x:(r)+,b y:(rh)+,y1");
 		break;
 		}
-	case 1638: { // x:(r)+,b y:(rh)+,a
+	case 1642: { // x:(r)+,b y:(rh)+,a
 		unhandled("x:(r)+,b y:(rh)+,a");
 		break;
 		}
-	case 1639: { // x:(r)+,b y:(rh)+,b
+	case 1643: { // x:(r)+,b y:(rh)+,b
 		unhandled("x:(r)+,b y:(rh)+,b");
 		break;
 		}
-	case 1640: { // x:(r)+,x0 y:(rh),y0
+	case 1644: { // x:(r)+,x0 y:(rh),y0
 		unhandled("x:(r)+,x0 y:(rh),y0");
 		break;
 		}
-	case 1641: { // x:(r)+,x0 y:(rh),y1
+	case 1645: { // x:(r)+,x0 y:(rh),y1
 		unhandled("x:(r)+,x0 y:(rh),y1");
 		break;
 		}
-	case 1642: { // x:(r)+,x0 y:(rh),a
+	case 1646: { // x:(r)+,x0 y:(rh),a
 		unhandled("x:(r)+,x0 y:(rh),a");
 		break;
 		}
-	case 1643: { // x:(r)+,x0 y:(rh),b
+	case 1647: { // x:(r)+,x0 y:(rh),b
 		unhandled("x:(r)+,x0 y:(rh),b");
 		break;
 		}
-	case 1644: { // x:(r)+,x1 y:(rh),y0
+	case 1648: { // x:(r)+,x1 y:(rh),y0
 		unhandled("x:(r)+,x1 y:(rh),y0");
 		break;
 		}
-	case 1645: { // x:(r)+,x1 y:(rh),y1
+	case 1649: { // x:(r)+,x1 y:(rh),y1
 		unhandled("x:(r)+,x1 y:(rh),y1");
 		break;
 		}
-	case 1646: { // x:(r)+,x1 y:(rh),a
+	case 1650: { // x:(r)+,x1 y:(rh),a
 		unhandled("x:(r)+,x1 y:(rh),a");
 		break;
 		}
-	case 1647: { // x:(r)+,x1 y:(rh),b
+	case 1651: { // x:(r)+,x1 y:(rh),b
 		unhandled("x:(r)+,x1 y:(rh),b");
 		break;
 		}
-	case 1648: { // x:(r)+,a y:(rh),y0
+	case 1652: { // x:(r)+,a y:(rh),y0
 		unhandled("x:(r)+,a y:(rh),y0");
 		break;
 		}
-	case 1649: { // x:(r)+,a y:(rh),y1
+	case 1653: { // x:(r)+,a y:(rh),y1
 		unhandled("x:(r)+,a y:(rh),y1");
 		break;
 		}
-	case 1650: { // x:(r)+,a y:(rh),a
+	case 1654: { // x:(r)+,a y:(rh),a
 		unhandled("x:(r)+,a y:(rh),a");
 		break;
 		}
-	case 1651: { // x:(r)+,a y:(rh),b
+	case 1655: { // x:(r)+,a y:(rh),b
 		unhandled("x:(r)+,a y:(rh),b");
 		break;
 		}
-	case 1652: { // x:(r)+,b y:(rh),y0
+	case 1656: { // x:(r)+,b y:(rh),y0
 		unhandled("x:(r)+,b y:(rh),y0");
 		break;
 		}
-	case 1653: { // x:(r)+,b y:(rh),y1
+	case 1657: { // x:(r)+,b y:(rh),y1
 		unhandled("x:(r)+,b y:(rh),y1");
 		break;
 		}
-	case 1654: { // x:(r)+,b y:(rh),a
+	case 1658: { // x:(r)+,b y:(rh),a
 		unhandled("x:(r)+,b y:(rh),a");
 		break;
 		}
-	case 1655: { // x:(r)+,b y:(rh),b
+	case 1659: { // x:(r)+,b y:(rh),b
 		unhandled("x:(r)+,b y:(rh),b");
 		break;
 		}
-	case 1656: { // x:(r),x0 y:(rh)+n,y0
+	case 1660: { // x:(r),x0 y:(rh)+n,y0
 		unhandled("x:(r),x0 y:(rh)+n,y0");
 		break;
 		}
-	case 1657: { // x:(r),x0 y:(rh)+n,y1
+	case 1661: { // x:(r),x0 y:(rh)+n,y1
 		unhandled("x:(r),x0 y:(rh)+n,y1");
 		break;
 		}
-	case 1658: { // x:(r),x0 y:(rh)+n,a
+	case 1662: { // x:(r),x0 y:(rh)+n,a
 		unhandled("x:(r),x0 y:(rh)+n,a");
 		break;
 		}
-	case 1659: { // x:(r),x0 y:(rh)+n,b
+	case 1663: { // x:(r),x0 y:(rh)+n,b
 		unhandled("x:(r),x0 y:(rh)+n,b");
 		break;
 		}
-	case 1660: { // x:(r),x1 y:(rh)+n,y0
+	case 1664: { // x:(r),x1 y:(rh)+n,y0
 		unhandled("x:(r),x1 y:(rh)+n,y0");
 		break;
 		}
-	case 1661: { // x:(r),x1 y:(rh)+n,y1
+	case 1665: { // x:(r),x1 y:(rh)+n,y1
 		unhandled("x:(r),x1 y:(rh)+n,y1");
 		break;
 		}
-	case 1662: { // x:(r),x1 y:(rh)+n,a
+	case 1666: { // x:(r),x1 y:(rh)+n,a
 		unhandled("x:(r),x1 y:(rh)+n,a");
 		break;
 		}
-	case 1663: { // x:(r),x1 y:(rh)+n,b
+	case 1667: { // x:(r),x1 y:(rh)+n,b
 		unhandled("x:(r),x1 y:(rh)+n,b");
 		break;
 		}
-	case 1664: { // x:(r),a y:(rh)+n,y0
+	case 1668: { // x:(r),a y:(rh)+n,y0
 		unhandled("x:(r),a y:(rh)+n,y0");
 		break;
 		}
-	case 1665: { // x:(r),a y:(rh)+n,y1
+	case 1669: { // x:(r),a y:(rh)+n,y1
 		unhandled("x:(r),a y:(rh)+n,y1");
 		break;
 		}
-	case 1666: { // x:(r),a y:(rh)+n,a
+	case 1670: { // x:(r),a y:(rh)+n,a
 		unhandled("x:(r),a y:(rh)+n,a");
 		break;
 		}
-	case 1667: { // x:(r),a y:(rh)+n,b
+	case 1671: { // x:(r),a y:(rh)+n,b
 		unhandled("x:(r),a y:(rh)+n,b");
 		break;
 		}
-	case 1668: { // x:(r),b y:(rh)+n,y0
+	case 1672: { // x:(r),b y:(rh)+n,y0
 		unhandled("x:(r),b y:(rh)+n,y0");
 		break;
 		}
-	case 1669: { // x:(r),b y:(rh)+n,y1
+	case 1673: { // x:(r),b y:(rh)+n,y1
 		unhandled("x:(r),b y:(rh)+n,y1");
 		break;
 		}
-	case 1670: { // x:(r),b y:(rh)+n,a
+	case 1674: { // x:(r),b y:(rh)+n,a
 		unhandled("x:(r),b y:(rh)+n,a");
 		break;
 		}
-	case 1671: { // x:(r),b y:(rh)+n,b
+	case 1675: { // x:(r),b y:(rh)+n,b
 		unhandled("x:(r),b y:(rh)+n,b");
 		break;
 		}
-	case 1672: { // x:(r),x0 y:(rh)-,y0
+	case 1676: { // x:(r),x0 y:(rh)-,y0
 		unhandled("x:(r),x0 y:(rh)-,y0");
 		break;
 		}
-	case 1673: { // x:(r),x0 y:(rh)-,y1
+	case 1677: { // x:(r),x0 y:(rh)-,y1
 		unhandled("x:(r),x0 y:(rh)-,y1");
 		break;
 		}
-	case 1674: { // x:(r),x0 y:(rh)-,a
+	case 1678: { // x:(r),x0 y:(rh)-,a
 		unhandled("x:(r),x0 y:(rh)-,a");
 		break;
 		}
-	case 1675: { // x:(r),x0 y:(rh)-,b
+	case 1679: { // x:(r),x0 y:(rh)-,b
 		unhandled("x:(r),x0 y:(rh)-,b");
 		break;
 		}
-	case 1676: { // x:(r),x1 y:(rh)-,y0
+	case 1680: { // x:(r),x1 y:(rh)-,y0
 		unhandled("x:(r),x1 y:(rh)-,y0");
 		break;
 		}
-	case 1677: { // x:(r),x1 y:(rh)-,y1
+	case 1681: { // x:(r),x1 y:(rh)-,y1
 		unhandled("x:(r),x1 y:(rh)-,y1");
 		break;
 		}
-	case 1678: { // x:(r),x1 y:(rh)-,a
+	case 1682: { // x:(r),x1 y:(rh)-,a
 		unhandled("x:(r),x1 y:(rh)-,a");
 		break;
 		}
-	case 1679: { // x:(r),x1 y:(rh)-,b
+	case 1683: { // x:(r),x1 y:(rh)-,b
 		unhandled("x:(r),x1 y:(rh)-,b");
 		break;
 		}
-	case 1680: { // x:(r),a y:(rh)-,y0
+	case 1684: { // x:(r),a y:(rh)-,y0
 		unhandled("x:(r),a y:(rh)-,y0");
 		break;
 		}
-	case 1681: { // x:(r),a y:(rh)-,y1
+	case 1685: { // x:(r),a y:(rh)-,y1
 		unhandled("x:(r),a y:(rh)-,y1");
 		break;
 		}
-	case 1682: { // x:(r),a y:(rh)-,a
+	case 1686: { // x:(r),a y:(rh)-,a
 		unhandled("x:(r),a y:(rh)-,a");
 		break;
 		}
-	case 1683: { // x:(r),a y:(rh)-,b
+	case 1687: { // x:(r),a y:(rh)-,b
 		unhandled("x:(r),a y:(rh)-,b");
 		break;
 		}
-	case 1684: { // x:(r),b y:(rh)-,y0
+	case 1688: { // x:(r),b y:(rh)-,y0
 		unhandled("x:(r),b y:(rh)-,y0");
 		break;
 		}
-	case 1685: { // x:(r),b y:(rh)-,y1
+	case 1689: { // x:(r),b y:(rh)-,y1
 		unhandled("x:(r),b y:(rh)-,y1");
 		break;
 		}
-	case 1686: { // x:(r),b y:(rh)-,a
+	case 1690: { // x:(r),b y:(rh)-,a
 		unhandled("x:(r),b y:(rh)-,a");
 		break;
 		}
-	case 1687: { // x:(r),b y:(rh)-,b
+	case 1691: { // x:(r),b y:(rh)-,b
 		unhandled("x:(r),b y:(rh)-,b");
 		break;
 		}
-	case 1688: { // x:(r),x0 y:(rh)+,y0
+	case 1692: { // x:(r),x0 y:(rh)+,y0
 		unhandled("x:(r),x0 y:(rh)+,y0");
 		break;
 		}
-	case 1689: { // x:(r),x0 y:(rh)+,y1
+	case 1693: { // x:(r),x0 y:(rh)+,y1
 		unhandled("x:(r),x0 y:(rh)+,y1");
 		break;
 		}
-	case 1690: { // x:(r),x0 y:(rh)+,a
+	case 1694: { // x:(r),x0 y:(rh)+,a
 		unhandled("x:(r),x0 y:(rh)+,a");
 		break;
 		}
-	case 1691: { // x:(r),x0 y:(rh)+,b
+	case 1695: { // x:(r),x0 y:(rh)+,b
 		unhandled("x:(r),x0 y:(rh)+,b");
 		break;
 		}
-	case 1692: { // x:(r),x1 y:(rh)+,y0
+	case 1696: { // x:(r),x1 y:(rh)+,y0
 		unhandled("x:(r),x1 y:(rh)+,y0");
 		break;
 		}
-	case 1693: { // x:(r),x1 y:(rh)+,y1
+	case 1697: { // x:(r),x1 y:(rh)+,y1
 		unhandled("x:(r),x1 y:(rh)+,y1");
 		break;
 		}
-	case 1694: { // x:(r),x1 y:(rh)+,a
+	case 1698: { // x:(r),x1 y:(rh)+,a
 		unhandled("x:(r),x1 y:(rh)+,a");
 		break;
 		}
-	case 1695: { // x:(r),x1 y:(rh)+,b
+	case 1699: { // x:(r),x1 y:(rh)+,b
 		unhandled("x:(r),x1 y:(rh)+,b");
 		break;
 		}
-	case 1696: { // x:(r),a y:(rh)+,y0
+	case 1700: { // x:(r),a y:(rh)+,y0
 		unhandled("x:(r),a y:(rh)+,y0");
 		break;
 		}
-	case 1697: { // x:(r),a y:(rh)+,y1
+	case 1701: { // x:(r),a y:(rh)+,y1
 		unhandled("x:(r),a y:(rh)+,y1");
 		break;
 		}
-	case 1698: { // x:(r),a y:(rh)+,a
+	case 1702: { // x:(r),a y:(rh)+,a
 		unhandled("x:(r),a y:(rh)+,a");
 		break;
 		}
-	case 1699: { // x:(r),a y:(rh)+,b
+	case 1703: { // x:(r),a y:(rh)+,b
 		unhandled("x:(r),a y:(rh)+,b");
 		break;
 		}
-	case 1700: { // x:(r),b y:(rh)+,y0
+	case 1704: { // x:(r),b y:(rh)+,y0
 		unhandled("x:(r),b y:(rh)+,y0");
 		break;
 		}
-	case 1701: { // x:(r),b y:(rh)+,y1
+	case 1705: { // x:(r),b y:(rh)+,y1
 		unhandled("x:(r),b y:(rh)+,y1");
 		break;
 		}
-	case 1702: { // x:(r),b y:(rh)+,a
+	case 1706: { // x:(r),b y:(rh)+,a
 		unhandled("x:(r),b y:(rh)+,a");
 		break;
 		}
-	case 1703: { // x:(r),b y:(rh)+,b
+	case 1707: { // x:(r),b y:(rh)+,b
 		unhandled("x:(r),b y:(rh)+,b");
 		break;
 		}
-	case 1704: { // x:(r),x0 y:(rh),y0
+	case 1708: { // x:(r),x0 y:(rh),y0
 		unhandled("x:(r),x0 y:(rh),y0");
 		break;
 		}
-	case 1705: { // x:(r),x0 y:(rh),y1
+	case 1709: { // x:(r),x0 y:(rh),y1
 		unhandled("x:(r),x0 y:(rh),y1");
 		break;
 		}
-	case 1706: { // x:(r),x0 y:(rh),a
+	case 1710: { // x:(r),x0 y:(rh),a
 		unhandled("x:(r),x0 y:(rh),a");
 		break;
 		}
-	case 1707: { // x:(r),x0 y:(rh),b
+	case 1711: { // x:(r),x0 y:(rh),b
 		unhandled("x:(r),x0 y:(rh),b");
 		break;
 		}
-	case 1708: { // x:(r),x1 y:(rh),y0
+	case 1712: { // x:(r),x1 y:(rh),y0
 		unhandled("x:(r),x1 y:(rh),y0");
 		break;
 		}
-	case 1709: { // x:(r),x1 y:(rh),y1
+	case 1713: { // x:(r),x1 y:(rh),y1
 		unhandled("x:(r),x1 y:(rh),y1");
 		break;
 		}
-	case 1710: { // x:(r),x1 y:(rh),a
+	case 1714: { // x:(r),x1 y:(rh),a
 		unhandled("x:(r),x1 y:(rh),a");
 		break;
 		}
-	case 1711: { // x:(r),x1 y:(rh),b
+	case 1715: { // x:(r),x1 y:(rh),b
 		unhandled("x:(r),x1 y:(rh),b");
 		break;
 		}
-	case 1712: { // x:(r),a y:(rh),y0
+	case 1716: { // x:(r),a y:(rh),y0
 		unhandled("x:(r),a y:(rh),y0");
 		break;
 		}
-	case 1713: { // x:(r),a y:(rh),y1
+	case 1717: { // x:(r),a y:(rh),y1
 		unhandled("x:(r),a y:(rh),y1");
 		break;
 		}
-	case 1714: { // x:(r),a y:(rh),a
+	case 1718: { // x:(r),a y:(rh),a
 		unhandled("x:(r),a y:(rh),a");
 		break;
 		}
-	case 1715: { // x:(r),a y:(rh),b
+	case 1719: { // x:(r),a y:(rh),b
 		unhandled("x:(r),a y:(rh),b");
 		break;
 		}
-	case 1716: { // x:(r),b y:(rh),y0
+	case 1720: { // x:(r),b y:(rh),y0
 		unhandled("x:(r),b y:(rh),y0");
 		break;
 		}
-	case 1717: { // x:(r),b y:(rh),y1
+	case 1721: { // x:(r),b y:(rh),y1
 		unhandled("x:(r),b y:(rh),y1");
 		break;
 		}
-	case 1718: { // x:(r),b y:(rh),a
+	case 1722: { // x:(r),b y:(rh),a
 		unhandled("x:(r),b y:(rh),a");
 		break;
 		}
-	case 1719: { // x:(r),b y:(rh),b
+	case 1723: { // x:(r),b y:(rh),b
 		unhandled("x:(r),b y:(rh),b");
 		break;
 		}
-	case 1720: { // x:(r)+n,x0 y0,y:(rh)+n
+	case 1724: { // x:(r)+n,x0 y0,y:(rh)+n
 		unhandled("x:(r)+n,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1721: { // x:(r)+n,x0 y1,y:(rh)+n
+	case 1725: { // x:(r)+n,x0 y1,y:(rh)+n
 		unhandled("x:(r)+n,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1722: { // x:(r)+n,x0 a,y:(rh)+n
+	case 1726: { // x:(r)+n,x0 a,y:(rh)+n
 		unhandled("x:(r)+n,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1723: { // x:(r)+n,x0 b,y:(rh)+n
+	case 1727: { // x:(r)+n,x0 b,y:(rh)+n
 		unhandled("x:(r)+n,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1724: { // x:(r)+n,x1 y0,y:(rh)+n
+	case 1728: { // x:(r)+n,x1 y0,y:(rh)+n
 		unhandled("x:(r)+n,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1725: { // x:(r)+n,x1 y1,y:(rh)+n
+	case 1729: { // x:(r)+n,x1 y1,y:(rh)+n
 		unhandled("x:(r)+n,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1726: { // x:(r)+n,x1 a,y:(rh)+n
+	case 1730: { // x:(r)+n,x1 a,y:(rh)+n
 		unhandled("x:(r)+n,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1727: { // x:(r)+n,x1 b,y:(rh)+n
+	case 1731: { // x:(r)+n,x1 b,y:(rh)+n
 		unhandled("x:(r)+n,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1728: { // x:(r)+n,a y0,y:(rh)+n
+	case 1732: { // x:(r)+n,a y0,y:(rh)+n
 		unhandled("x:(r)+n,a y0,y:(rh)+n");
 		break;
 		}
-	case 1729: { // x:(r)+n,a y1,y:(rh)+n
+	case 1733: { // x:(r)+n,a y1,y:(rh)+n
 		unhandled("x:(r)+n,a y1,y:(rh)+n");
 		break;
 		}
-	case 1730: { // x:(r)+n,a a,y:(rh)+n
+	case 1734: { // x:(r)+n,a a,y:(rh)+n
 		unhandled("x:(r)+n,a a,y:(rh)+n");
 		break;
 		}
-	case 1731: { // x:(r)+n,a b,y:(rh)+n
+	case 1735: { // x:(r)+n,a b,y:(rh)+n
 		unhandled("x:(r)+n,a b,y:(rh)+n");
 		break;
 		}
-	case 1732: { // x:(r)+n,b y0,y:(rh)+n
+	case 1736: { // x:(r)+n,b y0,y:(rh)+n
 		unhandled("x:(r)+n,b y0,y:(rh)+n");
 		break;
 		}
-	case 1733: { // x:(r)+n,b y1,y:(rh)+n
+	case 1737: { // x:(r)+n,b y1,y:(rh)+n
 		unhandled("x:(r)+n,b y1,y:(rh)+n");
 		break;
 		}
-	case 1734: { // x:(r)+n,b a,y:(rh)+n
+	case 1738: { // x:(r)+n,b a,y:(rh)+n
 		unhandled("x:(r)+n,b a,y:(rh)+n");
 		break;
 		}
-	case 1735: { // x:(r)+n,b b,y:(rh)+n
+	case 1739: { // x:(r)+n,b b,y:(rh)+n
 		unhandled("x:(r)+n,b b,y:(rh)+n");
 		break;
 		}
-	case 1736: { // x:(r)+n,x0 y0,y:(rh)-
+	case 1740: { // x:(r)+n,x0 y0,y:(rh)-
 		unhandled("x:(r)+n,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1737: { // x:(r)+n,x0 y1,y:(rh)-
+	case 1741: { // x:(r)+n,x0 y1,y:(rh)-
 		unhandled("x:(r)+n,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1738: { // x:(r)+n,x0 a,y:(rh)-
+	case 1742: { // x:(r)+n,x0 a,y:(rh)-
 		unhandled("x:(r)+n,x0 a,y:(rh)-");
 		break;
 		}
-	case 1739: { // x:(r)+n,x0 b,y:(rh)-
+	case 1743: { // x:(r)+n,x0 b,y:(rh)-
 		unhandled("x:(r)+n,x0 b,y:(rh)-");
 		break;
 		}
-	case 1740: { // x:(r)+n,x1 y0,y:(rh)-
+	case 1744: { // x:(r)+n,x1 y0,y:(rh)-
 		unhandled("x:(r)+n,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1741: { // x:(r)+n,x1 y1,y:(rh)-
+	case 1745: { // x:(r)+n,x1 y1,y:(rh)-
 		unhandled("x:(r)+n,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1742: { // x:(r)+n,x1 a,y:(rh)-
+	case 1746: { // x:(r)+n,x1 a,y:(rh)-
 		unhandled("x:(r)+n,x1 a,y:(rh)-");
 		break;
 		}
-	case 1743: { // x:(r)+n,x1 b,y:(rh)-
+	case 1747: { // x:(r)+n,x1 b,y:(rh)-
 		unhandled("x:(r)+n,x1 b,y:(rh)-");
 		break;
 		}
-	case 1744: { // x:(r)+n,a y0,y:(rh)-
+	case 1748: { // x:(r)+n,a y0,y:(rh)-
 		unhandled("x:(r)+n,a y0,y:(rh)-");
 		break;
 		}
-	case 1745: { // x:(r)+n,a y1,y:(rh)-
+	case 1749: { // x:(r)+n,a y1,y:(rh)-
 		unhandled("x:(r)+n,a y1,y:(rh)-");
 		break;
 		}
-	case 1746: { // x:(r)+n,a a,y:(rh)-
+	case 1750: { // x:(r)+n,a a,y:(rh)-
 		unhandled("x:(r)+n,a a,y:(rh)-");
 		break;
 		}
-	case 1747: { // x:(r)+n,a b,y:(rh)-
+	case 1751: { // x:(r)+n,a b,y:(rh)-
 		unhandled("x:(r)+n,a b,y:(rh)-");
 		break;
 		}
-	case 1748: { // x:(r)+n,b y0,y:(rh)-
+	case 1752: { // x:(r)+n,b y0,y:(rh)-
 		unhandled("x:(r)+n,b y0,y:(rh)-");
 		break;
 		}
-	case 1749: { // x:(r)+n,b y1,y:(rh)-
+	case 1753: { // x:(r)+n,b y1,y:(rh)-
 		unhandled("x:(r)+n,b y1,y:(rh)-");
 		break;
 		}
-	case 1750: { // x:(r)+n,b a,y:(rh)-
+	case 1754: { // x:(r)+n,b a,y:(rh)-
 		unhandled("x:(r)+n,b a,y:(rh)-");
 		break;
 		}
-	case 1751: { // x:(r)+n,b b,y:(rh)-
+	case 1755: { // x:(r)+n,b b,y:(rh)-
 		unhandled("x:(r)+n,b b,y:(rh)-");
 		break;
 		}
-	case 1752: { // x:(r)+n,x0 y0,y:(rh)+
+	case 1756: { // x:(r)+n,x0 y0,y:(rh)+
 		unhandled("x:(r)+n,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1753: { // x:(r)+n,x0 y1,y:(rh)+
+	case 1757: { // x:(r)+n,x0 y1,y:(rh)+
 		unhandled("x:(r)+n,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1754: { // x:(r)+n,x0 a,y:(rh)+
+	case 1758: { // x:(r)+n,x0 a,y:(rh)+
 		unhandled("x:(r)+n,x0 a,y:(rh)+");
 		break;
 		}
-	case 1755: { // x:(r)+n,x0 b,y:(rh)+
+	case 1759: { // x:(r)+n,x0 b,y:(rh)+
 		unhandled("x:(r)+n,x0 b,y:(rh)+");
 		break;
 		}
-	case 1756: { // x:(r)+n,x1 y0,y:(rh)+
+	case 1760: { // x:(r)+n,x1 y0,y:(rh)+
 		unhandled("x:(r)+n,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1757: { // x:(r)+n,x1 y1,y:(rh)+
+	case 1761: { // x:(r)+n,x1 y1,y:(rh)+
 		unhandled("x:(r)+n,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1758: { // x:(r)+n,x1 a,y:(rh)+
+	case 1762: { // x:(r)+n,x1 a,y:(rh)+
 		unhandled("x:(r)+n,x1 a,y:(rh)+");
 		break;
 		}
-	case 1759: { // x:(r)+n,x1 b,y:(rh)+
+	case 1763: { // x:(r)+n,x1 b,y:(rh)+
 		unhandled("x:(r)+n,x1 b,y:(rh)+");
 		break;
 		}
-	case 1760: { // x:(r)+n,a y0,y:(rh)+
+	case 1764: { // x:(r)+n,a y0,y:(rh)+
 		unhandled("x:(r)+n,a y0,y:(rh)+");
 		break;
 		}
-	case 1761: { // x:(r)+n,a y1,y:(rh)+
+	case 1765: { // x:(r)+n,a y1,y:(rh)+
 		unhandled("x:(r)+n,a y1,y:(rh)+");
 		break;
 		}
-	case 1762: { // x:(r)+n,a a,y:(rh)+
+	case 1766: { // x:(r)+n,a a,y:(rh)+
 		unhandled("x:(r)+n,a a,y:(rh)+");
 		break;
 		}
-	case 1763: { // x:(r)+n,a b,y:(rh)+
+	case 1767: { // x:(r)+n,a b,y:(rh)+
 		unhandled("x:(r)+n,a b,y:(rh)+");
 		break;
 		}
-	case 1764: { // x:(r)+n,b y0,y:(rh)+
+	case 1768: { // x:(r)+n,b y0,y:(rh)+
 		unhandled("x:(r)+n,b y0,y:(rh)+");
 		break;
 		}
-	case 1765: { // x:(r)+n,b y1,y:(rh)+
+	case 1769: { // x:(r)+n,b y1,y:(rh)+
 		unhandled("x:(r)+n,b y1,y:(rh)+");
 		break;
 		}
-	case 1766: { // x:(r)+n,b a,y:(rh)+
+	case 1770: { // x:(r)+n,b a,y:(rh)+
 		unhandled("x:(r)+n,b a,y:(rh)+");
 		break;
 		}
-	case 1767: { // x:(r)+n,b b,y:(rh)+
+	case 1771: { // x:(r)+n,b b,y:(rh)+
 		unhandled("x:(r)+n,b b,y:(rh)+");
 		break;
 		}
-	case 1768: { // x:(r)+n,x0 y0,y:(rh)
+	case 1772: { // x:(r)+n,x0 y0,y:(rh)
 		unhandled("x:(r)+n,x0 y0,y:(rh)");
 		break;
 		}
-	case 1769: { // x:(r)+n,x0 y1,y:(rh)
+	case 1773: { // x:(r)+n,x0 y1,y:(rh)
 		unhandled("x:(r)+n,x0 y1,y:(rh)");
 		break;
 		}
-	case 1770: { // x:(r)+n,x0 a,y:(rh)
+	case 1774: { // x:(r)+n,x0 a,y:(rh)
 		unhandled("x:(r)+n,x0 a,y:(rh)");
 		break;
 		}
-	case 1771: { // x:(r)+n,x0 b,y:(rh)
+	case 1775: { // x:(r)+n,x0 b,y:(rh)
 		unhandled("x:(r)+n,x0 b,y:(rh)");
 		break;
 		}
-	case 1772: { // x:(r)+n,x1 y0,y:(rh)
+	case 1776: { // x:(r)+n,x1 y0,y:(rh)
 		unhandled("x:(r)+n,x1 y0,y:(rh)");
 		break;
 		}
-	case 1773: { // x:(r)+n,x1 y1,y:(rh)
+	case 1777: { // x:(r)+n,x1 y1,y:(rh)
 		unhandled("x:(r)+n,x1 y1,y:(rh)");
 		break;
 		}
-	case 1774: { // x:(r)+n,x1 a,y:(rh)
+	case 1778: { // x:(r)+n,x1 a,y:(rh)
 		unhandled("x:(r)+n,x1 a,y:(rh)");
 		break;
 		}
-	case 1775: { // x:(r)+n,x1 b,y:(rh)
+	case 1779: { // x:(r)+n,x1 b,y:(rh)
 		unhandled("x:(r)+n,x1 b,y:(rh)");
 		break;
 		}
-	case 1776: { // x:(r)+n,a y0,y:(rh)
+	case 1780: { // x:(r)+n,a y0,y:(rh)
 		unhandled("x:(r)+n,a y0,y:(rh)");
 		break;
 		}
-	case 1777: { // x:(r)+n,a y1,y:(rh)
+	case 1781: { // x:(r)+n,a y1,y:(rh)
 		unhandled("x:(r)+n,a y1,y:(rh)");
 		break;
 		}
-	case 1778: { // x:(r)+n,a a,y:(rh)
+	case 1782: { // x:(r)+n,a a,y:(rh)
 		unhandled("x:(r)+n,a a,y:(rh)");
 		break;
 		}
-	case 1779: { // x:(r)+n,a b,y:(rh)
+	case 1783: { // x:(r)+n,a b,y:(rh)
 		unhandled("x:(r)+n,a b,y:(rh)");
 		break;
 		}
-	case 1780: { // x:(r)+n,b y0,y:(rh)
+	case 1784: { // x:(r)+n,b y0,y:(rh)
 		unhandled("x:(r)+n,b y0,y:(rh)");
 		break;
 		}
-	case 1781: { // x:(r)+n,b y1,y:(rh)
+	case 1785: { // x:(r)+n,b y1,y:(rh)
 		unhandled("x:(r)+n,b y1,y:(rh)");
 		break;
 		}
-	case 1782: { // x:(r)+n,b a,y:(rh)
+	case 1786: { // x:(r)+n,b a,y:(rh)
 		unhandled("x:(r)+n,b a,y:(rh)");
 		break;
 		}
-	case 1783: { // x:(r)+n,b b,y:(rh)
+	case 1787: { // x:(r)+n,b b,y:(rh)
 		unhandled("x:(r)+n,b b,y:(rh)");
 		break;
 		}
-	case 1784: { // x:(r)-,x0 y0,y:(rh)+n
+	case 1788: { // x:(r)-,x0 y0,y:(rh)+n
 		unhandled("x:(r)-,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1785: { // x:(r)-,x0 y1,y:(rh)+n
+	case 1789: { // x:(r)-,x0 y1,y:(rh)+n
 		unhandled("x:(r)-,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1786: { // x:(r)-,x0 a,y:(rh)+n
+	case 1790: { // x:(r)-,x0 a,y:(rh)+n
 		unhandled("x:(r)-,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1787: { // x:(r)-,x0 b,y:(rh)+n
+	case 1791: { // x:(r)-,x0 b,y:(rh)+n
 		unhandled("x:(r)-,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1788: { // x:(r)-,x1 y0,y:(rh)+n
+	case 1792: { // x:(r)-,x1 y0,y:(rh)+n
 		unhandled("x:(r)-,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1789: { // x:(r)-,x1 y1,y:(rh)+n
+	case 1793: { // x:(r)-,x1 y1,y:(rh)+n
 		unhandled("x:(r)-,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1790: { // x:(r)-,x1 a,y:(rh)+n
+	case 1794: { // x:(r)-,x1 a,y:(rh)+n
 		unhandled("x:(r)-,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1791: { // x:(r)-,x1 b,y:(rh)+n
+	case 1795: { // x:(r)-,x1 b,y:(rh)+n
 		unhandled("x:(r)-,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1792: { // x:(r)-,a y0,y:(rh)+n
+	case 1796: { // x:(r)-,a y0,y:(rh)+n
 		unhandled("x:(r)-,a y0,y:(rh)+n");
 		break;
 		}
-	case 1793: { // x:(r)-,a y1,y:(rh)+n
+	case 1797: { // x:(r)-,a y1,y:(rh)+n
 		unhandled("x:(r)-,a y1,y:(rh)+n");
 		break;
 		}
-	case 1794: { // x:(r)-,a a,y:(rh)+n
+	case 1798: { // x:(r)-,a a,y:(rh)+n
 		unhandled("x:(r)-,a a,y:(rh)+n");
 		break;
 		}
-	case 1795: { // x:(r)-,a b,y:(rh)+n
+	case 1799: { // x:(r)-,a b,y:(rh)+n
 		unhandled("x:(r)-,a b,y:(rh)+n");
 		break;
 		}
-	case 1796: { // x:(r)-,b y0,y:(rh)+n
+	case 1800: { // x:(r)-,b y0,y:(rh)+n
 		unhandled("x:(r)-,b y0,y:(rh)+n");
 		break;
 		}
-	case 1797: { // x:(r)-,b y1,y:(rh)+n
+	case 1801: { // x:(r)-,b y1,y:(rh)+n
 		unhandled("x:(r)-,b y1,y:(rh)+n");
 		break;
 		}
-	case 1798: { // x:(r)-,b a,y:(rh)+n
+	case 1802: { // x:(r)-,b a,y:(rh)+n
 		unhandled("x:(r)-,b a,y:(rh)+n");
 		break;
 		}
-	case 1799: { // x:(r)-,b b,y:(rh)+n
+	case 1803: { // x:(r)-,b b,y:(rh)+n
 		unhandled("x:(r)-,b b,y:(rh)+n");
 		break;
 		}
-	case 1800: { // x:(r)-,x0 y0,y:(rh)-
+	case 1804: { // x:(r)-,x0 y0,y:(rh)-
 		unhandled("x:(r)-,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1801: { // x:(r)-,x0 y1,y:(rh)-
+	case 1805: { // x:(r)-,x0 y1,y:(rh)-
 		unhandled("x:(r)-,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1802: { // x:(r)-,x0 a,y:(rh)-
+	case 1806: { // x:(r)-,x0 a,y:(rh)-
 		unhandled("x:(r)-,x0 a,y:(rh)-");
 		break;
 		}
-	case 1803: { // x:(r)-,x0 b,y:(rh)-
+	case 1807: { // x:(r)-,x0 b,y:(rh)-
 		unhandled("x:(r)-,x0 b,y:(rh)-");
 		break;
 		}
-	case 1804: { // x:(r)-,x1 y0,y:(rh)-
+	case 1808: { // x:(r)-,x1 y0,y:(rh)-
 		unhandled("x:(r)-,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1805: { // x:(r)-,x1 y1,y:(rh)-
+	case 1809: { // x:(r)-,x1 y1,y:(rh)-
 		unhandled("x:(r)-,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1806: { // x:(r)-,x1 a,y:(rh)-
+	case 1810: { // x:(r)-,x1 a,y:(rh)-
 		unhandled("x:(r)-,x1 a,y:(rh)-");
 		break;
 		}
-	case 1807: { // x:(r)-,x1 b,y:(rh)-
+	case 1811: { // x:(r)-,x1 b,y:(rh)-
 		unhandled("x:(r)-,x1 b,y:(rh)-");
 		break;
 		}
-	case 1808: { // x:(r)-,a y0,y:(rh)-
+	case 1812: { // x:(r)-,a y0,y:(rh)-
 		unhandled("x:(r)-,a y0,y:(rh)-");
 		break;
 		}
-	case 1809: { // x:(r)-,a y1,y:(rh)-
+	case 1813: { // x:(r)-,a y1,y:(rh)-
 		unhandled("x:(r)-,a y1,y:(rh)-");
 		break;
 		}
-	case 1810: { // x:(r)-,a a,y:(rh)-
+	case 1814: { // x:(r)-,a a,y:(rh)-
 		unhandled("x:(r)-,a a,y:(rh)-");
 		break;
 		}
-	case 1811: { // x:(r)-,a b,y:(rh)-
+	case 1815: { // x:(r)-,a b,y:(rh)-
 		unhandled("x:(r)-,a b,y:(rh)-");
 		break;
 		}
-	case 1812: { // x:(r)-,b y0,y:(rh)-
+	case 1816: { // x:(r)-,b y0,y:(rh)-
 		unhandled("x:(r)-,b y0,y:(rh)-");
 		break;
 		}
-	case 1813: { // x:(r)-,b y1,y:(rh)-
+	case 1817: { // x:(r)-,b y1,y:(rh)-
 		unhandled("x:(r)-,b y1,y:(rh)-");
 		break;
 		}
-	case 1814: { // x:(r)-,b a,y:(rh)-
+	case 1818: { // x:(r)-,b a,y:(rh)-
 		unhandled("x:(r)-,b a,y:(rh)-");
 		break;
 		}
-	case 1815: { // x:(r)-,b b,y:(rh)-
+	case 1819: { // x:(r)-,b b,y:(rh)-
 		unhandled("x:(r)-,b b,y:(rh)-");
 		break;
 		}
-	case 1816: { // x:(r)-,x0 y0,y:(rh)+
+	case 1820: { // x:(r)-,x0 y0,y:(rh)+
 		unhandled("x:(r)-,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1817: { // x:(r)-,x0 y1,y:(rh)+
+	case 1821: { // x:(r)-,x0 y1,y:(rh)+
 		unhandled("x:(r)-,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1818: { // x:(r)-,x0 a,y:(rh)+
+	case 1822: { // x:(r)-,x0 a,y:(rh)+
 		unhandled("x:(r)-,x0 a,y:(rh)+");
 		break;
 		}
-	case 1819: { // x:(r)-,x0 b,y:(rh)+
+	case 1823: { // x:(r)-,x0 b,y:(rh)+
 		unhandled("x:(r)-,x0 b,y:(rh)+");
 		break;
 		}
-	case 1820: { // x:(r)-,x1 y0,y:(rh)+
+	case 1824: { // x:(r)-,x1 y0,y:(rh)+
 		unhandled("x:(r)-,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1821: { // x:(r)-,x1 y1,y:(rh)+
+	case 1825: { // x:(r)-,x1 y1,y:(rh)+
 		unhandled("x:(r)-,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1822: { // x:(r)-,x1 a,y:(rh)+
+	case 1826: { // x:(r)-,x1 a,y:(rh)+
 		unhandled("x:(r)-,x1 a,y:(rh)+");
 		break;
 		}
-	case 1823: { // x:(r)-,x1 b,y:(rh)+
+	case 1827: { // x:(r)-,x1 b,y:(rh)+
 		unhandled("x:(r)-,x1 b,y:(rh)+");
 		break;
 		}
-	case 1824: { // x:(r)-,a y0,y:(rh)+
+	case 1828: { // x:(r)-,a y0,y:(rh)+
 		unhandled("x:(r)-,a y0,y:(rh)+");
 		break;
 		}
-	case 1825: { // x:(r)-,a y1,y:(rh)+
+	case 1829: { // x:(r)-,a y1,y:(rh)+
 		unhandled("x:(r)-,a y1,y:(rh)+");
 		break;
 		}
-	case 1826: { // x:(r)-,a a,y:(rh)+
+	case 1830: { // x:(r)-,a a,y:(rh)+
 		unhandled("x:(r)-,a a,y:(rh)+");
 		break;
 		}
-	case 1827: { // x:(r)-,a b,y:(rh)+
+	case 1831: { // x:(r)-,a b,y:(rh)+
 		unhandled("x:(r)-,a b,y:(rh)+");
 		break;
 		}
-	case 1828: { // x:(r)-,b y0,y:(rh)+
+	case 1832: { // x:(r)-,b y0,y:(rh)+
 		unhandled("x:(r)-,b y0,y:(rh)+");
 		break;
 		}
-	case 1829: { // x:(r)-,b y1,y:(rh)+
+	case 1833: { // x:(r)-,b y1,y:(rh)+
 		unhandled("x:(r)-,b y1,y:(rh)+");
 		break;
 		}
-	case 1830: { // x:(r)-,b a,y:(rh)+
+	case 1834: { // x:(r)-,b a,y:(rh)+
 		unhandled("x:(r)-,b a,y:(rh)+");
 		break;
 		}
-	case 1831: { // x:(r)-,b b,y:(rh)+
+	case 1835: { // x:(r)-,b b,y:(rh)+
 		unhandled("x:(r)-,b b,y:(rh)+");
 		break;
 		}
-	case 1832: { // x:(r)-,x0 y0,y:(rh)
+	case 1836: { // x:(r)-,x0 y0,y:(rh)
 		unhandled("x:(r)-,x0 y0,y:(rh)");
 		break;
 		}
-	case 1833: { // x:(r)-,x0 y1,y:(rh)
+	case 1837: { // x:(r)-,x0 y1,y:(rh)
 		unhandled("x:(r)-,x0 y1,y:(rh)");
 		break;
 		}
-	case 1834: { // x:(r)-,x0 a,y:(rh)
+	case 1838: { // x:(r)-,x0 a,y:(rh)
 		unhandled("x:(r)-,x0 a,y:(rh)");
 		break;
 		}
-	case 1835: { // x:(r)-,x0 b,y:(rh)
+	case 1839: { // x:(r)-,x0 b,y:(rh)
 		unhandled("x:(r)-,x0 b,y:(rh)");
 		break;
 		}
-	case 1836: { // x:(r)-,x1 y0,y:(rh)
+	case 1840: { // x:(r)-,x1 y0,y:(rh)
 		unhandled("x:(r)-,x1 y0,y:(rh)");
 		break;
 		}
-	case 1837: { // x:(r)-,x1 y1,y:(rh)
+	case 1841: { // x:(r)-,x1 y1,y:(rh)
 		unhandled("x:(r)-,x1 y1,y:(rh)");
 		break;
 		}
-	case 1838: { // x:(r)-,x1 a,y:(rh)
+	case 1842: { // x:(r)-,x1 a,y:(rh)
 		unhandled("x:(r)-,x1 a,y:(rh)");
 		break;
 		}
-	case 1839: { // x:(r)-,x1 b,y:(rh)
+	case 1843: { // x:(r)-,x1 b,y:(rh)
 		unhandled("x:(r)-,x1 b,y:(rh)");
 		break;
 		}
-	case 1840: { // x:(r)-,a y0,y:(rh)
+	case 1844: { // x:(r)-,a y0,y:(rh)
 		unhandled("x:(r)-,a y0,y:(rh)");
 		break;
 		}
-	case 1841: { // x:(r)-,a y1,y:(rh)
+	case 1845: { // x:(r)-,a y1,y:(rh)
 		unhandled("x:(r)-,a y1,y:(rh)");
 		break;
 		}
-	case 1842: { // x:(r)-,a a,y:(rh)
+	case 1846: { // x:(r)-,a a,y:(rh)
 		unhandled("x:(r)-,a a,y:(rh)");
 		break;
 		}
-	case 1843: { // x:(r)-,a b,y:(rh)
+	case 1847: { // x:(r)-,a b,y:(rh)
 		unhandled("x:(r)-,a b,y:(rh)");
 		break;
 		}
-	case 1844: { // x:(r)-,b y0,y:(rh)
+	case 1848: { // x:(r)-,b y0,y:(rh)
 		unhandled("x:(r)-,b y0,y:(rh)");
 		break;
 		}
-	case 1845: { // x:(r)-,b y1,y:(rh)
+	case 1849: { // x:(r)-,b y1,y:(rh)
 		unhandled("x:(r)-,b y1,y:(rh)");
 		break;
 		}
-	case 1846: { // x:(r)-,b a,y:(rh)
+	case 1850: { // x:(r)-,b a,y:(rh)
 		unhandled("x:(r)-,b a,y:(rh)");
 		break;
 		}
-	case 1847: { // x:(r)-,b b,y:(rh)
+	case 1851: { // x:(r)-,b b,y:(rh)
 		unhandled("x:(r)-,b b,y:(rh)");
 		break;
 		}
-	case 1848: { // x:(r)+,x0 y0,y:(rh)+n
+	case 1852: { // x:(r)+,x0 y0,y:(rh)+n
 		unhandled("x:(r)+,x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1849: { // x:(r)+,x0 y1,y:(rh)+n
+	case 1853: { // x:(r)+,x0 y1,y:(rh)+n
 		unhandled("x:(r)+,x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1850: { // x:(r)+,x0 a,y:(rh)+n
+	case 1854: { // x:(r)+,x0 a,y:(rh)+n
 		unhandled("x:(r)+,x0 a,y:(rh)+n");
 		break;
 		}
-	case 1851: { // x:(r)+,x0 b,y:(rh)+n
+	case 1855: { // x:(r)+,x0 b,y:(rh)+n
 		unhandled("x:(r)+,x0 b,y:(rh)+n");
 		break;
 		}
-	case 1852: { // x:(r)+,x1 y0,y:(rh)+n
+	case 1856: { // x:(r)+,x1 y0,y:(rh)+n
 		unhandled("x:(r)+,x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1853: { // x:(r)+,x1 y1,y:(rh)+n
+	case 1857: { // x:(r)+,x1 y1,y:(rh)+n
 		unhandled("x:(r)+,x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1854: { // x:(r)+,x1 a,y:(rh)+n
+	case 1858: { // x:(r)+,x1 a,y:(rh)+n
 		unhandled("x:(r)+,x1 a,y:(rh)+n");
 		break;
 		}
-	case 1855: { // x:(r)+,x1 b,y:(rh)+n
+	case 1859: { // x:(r)+,x1 b,y:(rh)+n
 		unhandled("x:(r)+,x1 b,y:(rh)+n");
 		break;
 		}
-	case 1856: { // x:(r)+,a y0,y:(rh)+n
+	case 1860: { // x:(r)+,a y0,y:(rh)+n
 		unhandled("x:(r)+,a y0,y:(rh)+n");
 		break;
 		}
-	case 1857: { // x:(r)+,a y1,y:(rh)+n
+	case 1861: { // x:(r)+,a y1,y:(rh)+n
 		unhandled("x:(r)+,a y1,y:(rh)+n");
 		break;
 		}
-	case 1858: { // x:(r)+,a a,y:(rh)+n
+	case 1862: { // x:(r)+,a a,y:(rh)+n
 		unhandled("x:(r)+,a a,y:(rh)+n");
 		break;
 		}
-	case 1859: { // x:(r)+,a b,y:(rh)+n
+	case 1863: { // x:(r)+,a b,y:(rh)+n
 		unhandled("x:(r)+,a b,y:(rh)+n");
 		break;
 		}
-	case 1860: { // x:(r)+,b y0,y:(rh)+n
+	case 1864: { // x:(r)+,b y0,y:(rh)+n
 		unhandled("x:(r)+,b y0,y:(rh)+n");
 		break;
 		}
-	case 1861: { // x:(r)+,b y1,y:(rh)+n
+	case 1865: { // x:(r)+,b y1,y:(rh)+n
 		unhandled("x:(r)+,b y1,y:(rh)+n");
 		break;
 		}
-	case 1862: { // x:(r)+,b a,y:(rh)+n
+	case 1866: { // x:(r)+,b a,y:(rh)+n
 		unhandled("x:(r)+,b a,y:(rh)+n");
 		break;
 		}
-	case 1863: { // x:(r)+,b b,y:(rh)+n
+	case 1867: { // x:(r)+,b b,y:(rh)+n
 		unhandled("x:(r)+,b b,y:(rh)+n");
 		break;
 		}
-	case 1864: { // x:(r)+,x0 y0,y:(rh)-
+	case 1868: { // x:(r)+,x0 y0,y:(rh)-
 		unhandled("x:(r)+,x0 y0,y:(rh)-");
 		break;
 		}
-	case 1865: { // x:(r)+,x0 y1,y:(rh)-
+	case 1869: { // x:(r)+,x0 y1,y:(rh)-
 		unhandled("x:(r)+,x0 y1,y:(rh)-");
 		break;
 		}
-	case 1866: { // x:(r)+,x0 a,y:(rh)-
+	case 1870: { // x:(r)+,x0 a,y:(rh)-
 		unhandled("x:(r)+,x0 a,y:(rh)-");
 		break;
 		}
-	case 1867: { // x:(r)+,x0 b,y:(rh)-
+	case 1871: { // x:(r)+,x0 b,y:(rh)-
 		unhandled("x:(r)+,x0 b,y:(rh)-");
 		break;
 		}
-	case 1868: { // x:(r)+,x1 y0,y:(rh)-
+	case 1872: { // x:(r)+,x1 y0,y:(rh)-
 		unhandled("x:(r)+,x1 y0,y:(rh)-");
 		break;
 		}
-	case 1869: { // x:(r)+,x1 y1,y:(rh)-
+	case 1873: { // x:(r)+,x1 y1,y:(rh)-
 		unhandled("x:(r)+,x1 y1,y:(rh)-");
 		break;
 		}
-	case 1870: { // x:(r)+,x1 a,y:(rh)-
+	case 1874: { // x:(r)+,x1 a,y:(rh)-
 		unhandled("x:(r)+,x1 a,y:(rh)-");
 		break;
 		}
-	case 1871: { // x:(r)+,x1 b,y:(rh)-
+	case 1875: { // x:(r)+,x1 b,y:(rh)-
 		unhandled("x:(r)+,x1 b,y:(rh)-");
 		break;
 		}
-	case 1872: { // x:(r)+,a y0,y:(rh)-
+	case 1876: { // x:(r)+,a y0,y:(rh)-
 		unhandled("x:(r)+,a y0,y:(rh)-");
 		break;
 		}
-	case 1873: { // x:(r)+,a y1,y:(rh)-
+	case 1877: { // x:(r)+,a y1,y:(rh)-
 		unhandled("x:(r)+,a y1,y:(rh)-");
 		break;
 		}
-	case 1874: { // x:(r)+,a a,y:(rh)-
+	case 1878: { // x:(r)+,a a,y:(rh)-
 		unhandled("x:(r)+,a a,y:(rh)-");
 		break;
 		}
-	case 1875: { // x:(r)+,a b,y:(rh)-
+	case 1879: { // x:(r)+,a b,y:(rh)-
 		unhandled("x:(r)+,a b,y:(rh)-");
 		break;
 		}
-	case 1876: { // x:(r)+,b y0,y:(rh)-
+	case 1880: { // x:(r)+,b y0,y:(rh)-
 		unhandled("x:(r)+,b y0,y:(rh)-");
 		break;
 		}
-	case 1877: { // x:(r)+,b y1,y:(rh)-
+	case 1881: { // x:(r)+,b y1,y:(rh)-
 		unhandled("x:(r)+,b y1,y:(rh)-");
 		break;
 		}
-	case 1878: { // x:(r)+,b a,y:(rh)-
+	case 1882: { // x:(r)+,b a,y:(rh)-
 		unhandled("x:(r)+,b a,y:(rh)-");
 		break;
 		}
-	case 1879: { // x:(r)+,b b,y:(rh)-
+	case 1883: { // x:(r)+,b b,y:(rh)-
 		unhandled("x:(r)+,b b,y:(rh)-");
 		break;
 		}
-	case 1880: { // x:(r)+,x0 y0,y:(rh)+
+	case 1884: { // x:(r)+,x0 y0,y:(rh)+
 		unhandled("x:(r)+,x0 y0,y:(rh)+");
 		break;
 		}
-	case 1881: { // x:(r)+,x0 y1,y:(rh)+
+	case 1885: { // x:(r)+,x0 y1,y:(rh)+
 		unhandled("x:(r)+,x0 y1,y:(rh)+");
 		break;
 		}
-	case 1882: { // x:(r)+,x0 a,y:(rh)+
+	case 1886: { // x:(r)+,x0 a,y:(rh)+
 		unhandled("x:(r)+,x0 a,y:(rh)+");
 		break;
 		}
-	case 1883: { // x:(r)+,x0 b,y:(rh)+
+	case 1887: { // x:(r)+,x0 b,y:(rh)+
 		unhandled("x:(r)+,x0 b,y:(rh)+");
 		break;
 		}
-	case 1884: { // x:(r)+,x1 y0,y:(rh)+
+	case 1888: { // x:(r)+,x1 y0,y:(rh)+
 		unhandled("x:(r)+,x1 y0,y:(rh)+");
 		break;
 		}
-	case 1885: { // x:(r)+,x1 y1,y:(rh)+
+	case 1889: { // x:(r)+,x1 y1,y:(rh)+
 		unhandled("x:(r)+,x1 y1,y:(rh)+");
 		break;
 		}
-	case 1886: { // x:(r)+,x1 a,y:(rh)+
+	case 1890: { // x:(r)+,x1 a,y:(rh)+
 		unhandled("x:(r)+,x1 a,y:(rh)+");
 		break;
 		}
-	case 1887: { // x:(r)+,x1 b,y:(rh)+
+	case 1891: { // x:(r)+,x1 b,y:(rh)+
 		unhandled("x:(r)+,x1 b,y:(rh)+");
 		break;
 		}
-	case 1888: { // x:(r)+,a y0,y:(rh)+
+	case 1892: { // x:(r)+,a y0,y:(rh)+
 		unhandled("x:(r)+,a y0,y:(rh)+");
 		break;
 		}
-	case 1889: { // x:(r)+,a y1,y:(rh)+
+	case 1893: { // x:(r)+,a y1,y:(rh)+
 		unhandled("x:(r)+,a y1,y:(rh)+");
 		break;
 		}
-	case 1890: { // x:(r)+,a a,y:(rh)+
+	case 1894: { // x:(r)+,a a,y:(rh)+
 		unhandled("x:(r)+,a a,y:(rh)+");
 		break;
 		}
-	case 1891: { // x:(r)+,a b,y:(rh)+
+	case 1895: { // x:(r)+,a b,y:(rh)+
 		unhandled("x:(r)+,a b,y:(rh)+");
 		break;
 		}
-	case 1892: { // x:(r)+,b y0,y:(rh)+
+	case 1896: { // x:(r)+,b y0,y:(rh)+
 		unhandled("x:(r)+,b y0,y:(rh)+");
 		break;
 		}
-	case 1893: { // x:(r)+,b y1,y:(rh)+
+	case 1897: { // x:(r)+,b y1,y:(rh)+
 		unhandled("x:(r)+,b y1,y:(rh)+");
 		break;
 		}
-	case 1894: { // x:(r)+,b a,y:(rh)+
+	case 1898: { // x:(r)+,b a,y:(rh)+
 		unhandled("x:(r)+,b a,y:(rh)+");
 		break;
 		}
-	case 1895: { // x:(r)+,b b,y:(rh)+
+	case 1899: { // x:(r)+,b b,y:(rh)+
 		unhandled("x:(r)+,b b,y:(rh)+");
 		break;
 		}
-	case 1896: { // x:(r)+,x0 y0,y:(rh)
+	case 1900: { // x:(r)+,x0 y0,y:(rh)
 		unhandled("x:(r)+,x0 y0,y:(rh)");
 		break;
 		}
-	case 1897: { // x:(r)+,x0 y1,y:(rh)
+	case 1901: { // x:(r)+,x0 y1,y:(rh)
 		unhandled("x:(r)+,x0 y1,y:(rh)");
 		break;
 		}
-	case 1898: { // x:(r)+,x0 a,y:(rh)
+	case 1902: { // x:(r)+,x0 a,y:(rh)
 		unhandled("x:(r)+,x0 a,y:(rh)");
 		break;
 		}
-	case 1899: { // x:(r)+,x0 b,y:(rh)
+	case 1903: { // x:(r)+,x0 b,y:(rh)
 		unhandled("x:(r)+,x0 b,y:(rh)");
 		break;
 		}
-	case 1900: { // x:(r)+,x1 y0,y:(rh)
+	case 1904: { // x:(r)+,x1 y0,y:(rh)
 		unhandled("x:(r)+,x1 y0,y:(rh)");
 		break;
 		}
-	case 1901: { // x:(r)+,x1 y1,y:(rh)
+	case 1905: { // x:(r)+,x1 y1,y:(rh)
 		unhandled("x:(r)+,x1 y1,y:(rh)");
 		break;
 		}
-	case 1902: { // x:(r)+,x1 a,y:(rh)
+	case 1906: { // x:(r)+,x1 a,y:(rh)
 		unhandled("x:(r)+,x1 a,y:(rh)");
 		break;
 		}
-	case 1903: { // x:(r)+,x1 b,y:(rh)
+	case 1907: { // x:(r)+,x1 b,y:(rh)
 		unhandled("x:(r)+,x1 b,y:(rh)");
 		break;
 		}
-	case 1904: { // x:(r)+,a y0,y:(rh)
+	case 1908: { // x:(r)+,a y0,y:(rh)
 		unhandled("x:(r)+,a y0,y:(rh)");
 		break;
 		}
-	case 1905: { // x:(r)+,a y1,y:(rh)
+	case 1909: { // x:(r)+,a y1,y:(rh)
 		unhandled("x:(r)+,a y1,y:(rh)");
 		break;
 		}
-	case 1906: { // x:(r)+,a a,y:(rh)
+	case 1910: { // x:(r)+,a a,y:(rh)
 		unhandled("x:(r)+,a a,y:(rh)");
 		break;
 		}
-	case 1907: { // x:(r)+,a b,y:(rh)
+	case 1911: { // x:(r)+,a b,y:(rh)
 		unhandled("x:(r)+,a b,y:(rh)");
 		break;
 		}
-	case 1908: { // x:(r)+,b y0,y:(rh)
+	case 1912: { // x:(r)+,b y0,y:(rh)
 		unhandled("x:(r)+,b y0,y:(rh)");
 		break;
 		}
-	case 1909: { // x:(r)+,b y1,y:(rh)
+	case 1913: { // x:(r)+,b y1,y:(rh)
 		unhandled("x:(r)+,b y1,y:(rh)");
 		break;
 		}
-	case 1910: { // x:(r)+,b a,y:(rh)
+	case 1914: { // x:(r)+,b a,y:(rh)
 		unhandled("x:(r)+,b a,y:(rh)");
 		break;
 		}
-	case 1911: { // x:(r)+,b b,y:(rh)
+	case 1915: { // x:(r)+,b b,y:(rh)
 		unhandled("x:(r)+,b b,y:(rh)");
 		break;
 		}
-	case 1912: { // x:(r),x0 y0,y:(rh)+n
+	case 1916: { // x:(r),x0 y0,y:(rh)+n
 		unhandled("x:(r),x0 y0,y:(rh)+n");
 		break;
 		}
-	case 1913: { // x:(r),x0 y1,y:(rh)+n
+	case 1917: { // x:(r),x0 y1,y:(rh)+n
 		unhandled("x:(r),x0 y1,y:(rh)+n");
 		break;
 		}
-	case 1914: { // x:(r),x0 a,y:(rh)+n
+	case 1918: { // x:(r),x0 a,y:(rh)+n
 		unhandled("x:(r),x0 a,y:(rh)+n");
 		break;
 		}
-	case 1915: { // x:(r),x0 b,y:(rh)+n
+	case 1919: { // x:(r),x0 b,y:(rh)+n
 		unhandled("x:(r),x0 b,y:(rh)+n");
 		break;
 		}
-	case 1916: { // x:(r),x1 y0,y:(rh)+n
+	case 1920: { // x:(r),x1 y0,y:(rh)+n
 		unhandled("x:(r),x1 y0,y:(rh)+n");
 		break;
 		}
-	case 1917: { // x:(r),x1 y1,y:(rh)+n
+	case 1921: { // x:(r),x1 y1,y:(rh)+n
 		unhandled("x:(r),x1 y1,y:(rh)+n");
 		break;
 		}
-	case 1918: { // x:(r),x1 a,y:(rh)+n
+	case 1922: { // x:(r),x1 a,y:(rh)+n
 		unhandled("x:(r),x1 a,y:(rh)+n");
 		break;
 		}
-	case 1919: { // x:(r),x1 b,y:(rh)+n
+	case 1923: { // x:(r),x1 b,y:(rh)+n
 		unhandled("x:(r),x1 b,y:(rh)+n");
 		break;
 		}
-	case 1920: { // x:(r),a y0,y:(rh)+n
+	case 1924: { // x:(r),a y0,y:(rh)+n
 		unhandled("x:(r),a y0,y:(rh)+n");
 		break;
 		}
-	case 1921: { // x:(r),a y1,y:(rh)+n
+	case 1925: { // x:(r),a y1,y:(rh)+n
 		unhandled("x:(r),a y1,y:(rh)+n");
 		break;
 		}
-	case 1922: { // x:(r),a a,y:(rh)+n
+	case 1926: { // x:(r),a a,y:(rh)+n
 		unhandled("x:(r),a a,y:(rh)+n");
 		break;
 		}
-	case 1923: { // x:(r),a b,y:(rh)+n
+	case 1927: { // x:(r),a b,y:(rh)+n
 		unhandled("x:(r),a b,y:(rh)+n");
 		break;
 		}
-	case 1924: { // x:(r),b y0,y:(rh)+n
+	case 1928: { // x:(r),b y0,y:(rh)+n
 		unhandled("x:(r),b y0,y:(rh)+n");
 		break;
 		}
-	case 1925: { // x:(r),b y1,y:(rh)+n
+	case 1929: { // x:(r),b y1,y:(rh)+n
 		unhandled("x:(r),b y1,y:(rh)+n");
 		break;
 		}
-	case 1926: { // x:(r),b a,y:(rh)+n
+	case 1930: { // x:(r),b a,y:(rh)+n
 		unhandled("x:(r),b a,y:(rh)+n");
 		break;
 		}
-	case 1927: { // x:(r),b b,y:(rh)+n
+	case 1931: { // x:(r),b b,y:(rh)+n
 		unhandled("x:(r),b b,y:(rh)+n");
 		break;
 		}
-	case 1928: { // x:(r),x0 y0,y:(rh)-
+	case 1932: { // x:(r),x0 y0,y:(rh)-
 		unhandled("x:(r),x0 y0,y:(rh)-");
 		break;
 		}
-	case 1929: { // x:(r),x0 y1,y:(rh)-
+	case 1933: { // x:(r),x0 y1,y:(rh)-
 		unhandled("x:(r),x0 y1,y:(rh)-");
 		break;
 		}
-	case 1930: { // x:(r),x0 a,y:(rh)-
+	case 1934: { // x:(r),x0 a,y:(rh)-
 		unhandled("x:(r),x0 a,y:(rh)-");
 		break;
 		}
-	case 1931: { // x:(r),x0 b,y:(rh)-
+	case 1935: { // x:(r),x0 b,y:(rh)-
 		unhandled("x:(r),x0 b,y:(rh)-");
 		break;
 		}
-	case 1932: { // x:(r),x1 y0,y:(rh)-
+	case 1936: { // x:(r),x1 y0,y:(rh)-
 		unhandled("x:(r),x1 y0,y:(rh)-");
 		break;
 		}
-	case 1933: { // x:(r),x1 y1,y:(rh)-
+	case 1937: { // x:(r),x1 y1,y:(rh)-
 		unhandled("x:(r),x1 y1,y:(rh)-");
 		break;
 		}
-	case 1934: { // x:(r),x1 a,y:(rh)-
+	case 1938: { // x:(r),x1 a,y:(rh)-
 		unhandled("x:(r),x1 a,y:(rh)-");
 		break;
 		}
-	case 1935: { // x:(r),x1 b,y:(rh)-
+	case 1939: { // x:(r),x1 b,y:(rh)-
 		unhandled("x:(r),x1 b,y:(rh)-");
 		break;
 		}
-	case 1936: { // x:(r),a y0,y:(rh)-
+	case 1940: { // x:(r),a y0,y:(rh)-
 		unhandled("x:(r),a y0,y:(rh)-");
 		break;
 		}
-	case 1937: { // x:(r),a y1,y:(rh)-
+	case 1941: { // x:(r),a y1,y:(rh)-
 		unhandled("x:(r),a y1,y:(rh)-");
 		break;
 		}
-	case 1938: { // x:(r),a a,y:(rh)-
+	case 1942: { // x:(r),a a,y:(rh)-
 		unhandled("x:(r),a a,y:(rh)-");
 		break;
 		}
-	case 1939: { // x:(r),a b,y:(rh)-
+	case 1943: { // x:(r),a b,y:(rh)-
 		unhandled("x:(r),a b,y:(rh)-");
 		break;
 		}
-	case 1940: { // x:(r),b y0,y:(rh)-
+	case 1944: { // x:(r),b y0,y:(rh)-
 		unhandled("x:(r),b y0,y:(rh)-");
 		break;
 		}
-	case 1941: { // x:(r),b y1,y:(rh)-
+	case 1945: { // x:(r),b y1,y:(rh)-
 		unhandled("x:(r),b y1,y:(rh)-");
 		break;
 		}
-	case 1942: { // x:(r),b a,y:(rh)-
+	case 1946: { // x:(r),b a,y:(rh)-
 		unhandled("x:(r),b a,y:(rh)-");
 		break;
 		}
-	case 1943: { // x:(r),b b,y:(rh)-
+	case 1947: { // x:(r),b b,y:(rh)-
 		unhandled("x:(r),b b,y:(rh)-");
 		break;
 		}
-	case 1944: { // x:(r),x0 y0,y:(rh)+
+	case 1948: { // x:(r),x0 y0,y:(rh)+
 		unhandled("x:(r),x0 y0,y:(rh)+");
 		break;
 		}
-	case 1945: { // x:(r),x0 y1,y:(rh)+
+	case 1949: { // x:(r),x0 y1,y:(rh)+
 		unhandled("x:(r),x0 y1,y:(rh)+");
 		break;
 		}
-	case 1946: { // x:(r),x0 a,y:(rh)+
+	case 1950: { // x:(r),x0 a,y:(rh)+
 		unhandled("x:(r),x0 a,y:(rh)+");
 		break;
 		}
-	case 1947: { // x:(r),x0 b,y:(rh)+
+	case 1951: { // x:(r),x0 b,y:(rh)+
 		unhandled("x:(r),x0 b,y:(rh)+");
 		break;
 		}
-	case 1948: { // x:(r),x1 y0,y:(rh)+
+	case 1952: { // x:(r),x1 y0,y:(rh)+
 		unhandled("x:(r),x1 y0,y:(rh)+");
 		break;
 		}
-	case 1949: { // x:(r),x1 y1,y:(rh)+
+	case 1953: { // x:(r),x1 y1,y:(rh)+
 		unhandled("x:(r),x1 y1,y:(rh)+");
 		break;
 		}
-	case 1950: { // x:(r),x1 a,y:(rh)+
+	case 1954: { // x:(r),x1 a,y:(rh)+
 		unhandled("x:(r),x1 a,y:(rh)+");
 		break;
 		}
-	case 1951: { // x:(r),x1 b,y:(rh)+
+	case 1955: { // x:(r),x1 b,y:(rh)+
 		unhandled("x:(r),x1 b,y:(rh)+");
 		break;
 		}
-	case 1952: { // x:(r),a y0,y:(rh)+
+	case 1956: { // x:(r),a y0,y:(rh)+
 		unhandled("x:(r),a y0,y:(rh)+");
 		break;
 		}
-	case 1953: { // x:(r),a y1,y:(rh)+
+	case 1957: { // x:(r),a y1,y:(rh)+
 		unhandled("x:(r),a y1,y:(rh)+");
 		break;
 		}
-	case 1954: { // x:(r),a a,y:(rh)+
+	case 1958: { // x:(r),a a,y:(rh)+
 		unhandled("x:(r),a a,y:(rh)+");
 		break;
 		}
-	case 1955: { // x:(r),a b,y:(rh)+
+	case 1959: { // x:(r),a b,y:(rh)+
 		unhandled("x:(r),a b,y:(rh)+");
 		break;
 		}
-	case 1956: { // x:(r),b y0,y:(rh)+
+	case 1960: { // x:(r),b y0,y:(rh)+
 		unhandled("x:(r),b y0,y:(rh)+");
 		break;
 		}
-	case 1957: { // x:(r),b y1,y:(rh)+
+	case 1961: { // x:(r),b y1,y:(rh)+
 		unhandled("x:(r),b y1,y:(rh)+");
 		break;
 		}
-	case 1958: { // x:(r),b a,y:(rh)+
+	case 1962: { // x:(r),b a,y:(rh)+
 		unhandled("x:(r),b a,y:(rh)+");
 		break;
 		}
-	case 1959: { // x:(r),b b,y:(rh)+
+	case 1963: { // x:(r),b b,y:(rh)+
 		unhandled("x:(r),b b,y:(rh)+");
 		break;
 		}
-	case 1960: { // x:(r),x0 y0,y:(rh)
+	case 1964: { // x:(r),x0 y0,y:(rh)
 		unhandled("x:(r),x0 y0,y:(rh)");
 		break;
 		}
-	case 1961: { // x:(r),x0 y1,y:(rh)
+	case 1965: { // x:(r),x0 y1,y:(rh)
 		unhandled("x:(r),x0 y1,y:(rh)");
 		break;
 		}
-	case 1962: { // x:(r),x0 a,y:(rh)
+	case 1966: { // x:(r),x0 a,y:(rh)
 		unhandled("x:(r),x0 a,y:(rh)");
 		break;
 		}
-	case 1963: { // x:(r),x0 b,y:(rh)
+	case 1967: { // x:(r),x0 b,y:(rh)
 		unhandled("x:(r),x0 b,y:(rh)");
 		break;
 		}
-	case 1964: { // x:(r),x1 y0,y:(rh)
+	case 1968: { // x:(r),x1 y0,y:(rh)
 		unhandled("x:(r),x1 y0,y:(rh)");
 		break;
 		}
-	case 1965: { // x:(r),x1 y1,y:(rh)
+	case 1969: { // x:(r),x1 y1,y:(rh)
 		unhandled("x:(r),x1 y1,y:(rh)");
 		break;
 		}
-	case 1966: { // x:(r),x1 a,y:(rh)
+	case 1970: { // x:(r),x1 a,y:(rh)
 		unhandled("x:(r),x1 a,y:(rh)");
 		break;
 		}
-	case 1967: { // x:(r),x1 b,y:(rh)
+	case 1971: { // x:(r),x1 b,y:(rh)
 		unhandled("x:(r),x1 b,y:(rh)");
 		break;
 		}
-	case 1968: { // x:(r),a y0,y:(rh)
+	case 1972: { // x:(r),a y0,y:(rh)
 		unhandled("x:(r),a y0,y:(rh)");
 		break;
 		}
-	case 1969: { // x:(r),a y1,y:(rh)
+	case 1973: { // x:(r),a y1,y:(rh)
 		unhandled("x:(r),a y1,y:(rh)");
 		break;
 		}
-	case 1970: { // x:(r),a a,y:(rh)
+	case 1974: { // x:(r),a a,y:(rh)
 		unhandled("x:(r),a a,y:(rh)");
 		break;
 		}
-	case 1971: { // x:(r),a b,y:(rh)
+	case 1975: { // x:(r),a b,y:(rh)
 		unhandled("x:(r),a b,y:(rh)");
 		break;
 		}
-	case 1972: { // x:(r),b y0,y:(rh)
+	case 1976: { // x:(r),b y0,y:(rh)
 		unhandled("x:(r),b y0,y:(rh)");
 		break;
 		}
-	case 1973: { // x:(r),b y1,y:(rh)
+	case 1977: { // x:(r),b y1,y:(rh)
 		unhandled("x:(r),b y1,y:(rh)");
 		break;
 		}
-	case 1974: { // x:(r),b a,y:(rh)
+	case 1978: { // x:(r),b a,y:(rh)
 		unhandled("x:(r),b a,y:(rh)");
 		break;
 		}
-	case 1975: { // x:(r),b b,y:(rh)
+	case 1979: { // x:(r),b b,y:(rh)
 		unhandled("x:(r),b b,y:(rh)");
 		break;
 		}
-	case 1976: { // x0,x:(r)+n y:(rh)+n,y0
+	case 1980: { // x0,x:(r)+n y:(rh)+n,y0
 		unhandled("x0,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1977: { // x0,x:(r)+n y:(rh)+n,y1
+	case 1981: { // x0,x:(r)+n y:(rh)+n,y1
 		unhandled("x0,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1978: { // x0,x:(r)+n y:(rh)+n,a
+	case 1982: { // x0,x:(r)+n y:(rh)+n,a
 		unhandled("x0,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1979: { // x0,x:(r)+n y:(rh)+n,b
+	case 1983: { // x0,x:(r)+n y:(rh)+n,b
 		unhandled("x0,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1980: { // x1,x:(r)+n y:(rh)+n,y0
+	case 1984: { // x1,x:(r)+n y:(rh)+n,y0
 		unhandled("x1,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1981: { // x1,x:(r)+n y:(rh)+n,y1
+	case 1985: { // x1,x:(r)+n y:(rh)+n,y1
 		unhandled("x1,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1982: { // x1,x:(r)+n y:(rh)+n,a
+	case 1986: { // x1,x:(r)+n y:(rh)+n,a
 		unhandled("x1,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1983: { // x1,x:(r)+n y:(rh)+n,b
+	case 1987: { // x1,x:(r)+n y:(rh)+n,b
 		unhandled("x1,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1984: { // a,x:(r)+n y:(rh)+n,y0
+	case 1988: { // a,x:(r)+n y:(rh)+n,y0
 		unhandled("a,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1985: { // a,x:(r)+n y:(rh)+n,y1
+	case 1989: { // a,x:(r)+n y:(rh)+n,y1
 		unhandled("a,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1986: { // a,x:(r)+n y:(rh)+n,a
+	case 1990: { // a,x:(r)+n y:(rh)+n,a
 		unhandled("a,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1987: { // a,x:(r)+n y:(rh)+n,b
+	case 1991: { // a,x:(r)+n y:(rh)+n,b
 		unhandled("a,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1988: { // b,x:(r)+n y:(rh)+n,y0
+	case 1992: { // b,x:(r)+n y:(rh)+n,y0
 		unhandled("b,x:(r)+n y:(rh)+n,y0");
 		break;
 		}
-	case 1989: { // b,x:(r)+n y:(rh)+n,y1
+	case 1993: { // b,x:(r)+n y:(rh)+n,y1
 		unhandled("b,x:(r)+n y:(rh)+n,y1");
 		break;
 		}
-	case 1990: { // b,x:(r)+n y:(rh)+n,a
+	case 1994: { // b,x:(r)+n y:(rh)+n,a
 		unhandled("b,x:(r)+n y:(rh)+n,a");
 		break;
 		}
-	case 1991: { // b,x:(r)+n y:(rh)+n,b
+	case 1995: { // b,x:(r)+n y:(rh)+n,b
 		unhandled("b,x:(r)+n y:(rh)+n,b");
 		break;
 		}
-	case 1992: { // x0,x:(r)+n y:(rh)-,y0
+	case 1996: { // x0,x:(r)+n y:(rh)-,y0
 		unhandled("x0,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1993: { // x0,x:(r)+n y:(rh)-,y1
+	case 1997: { // x0,x:(r)+n y:(rh)-,y1
 		unhandled("x0,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1994: { // x0,x:(r)+n y:(rh)-,a
+	case 1998: { // x0,x:(r)+n y:(rh)-,a
 		unhandled("x0,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1995: { // x0,x:(r)+n y:(rh)-,b
+	case 1999: { // x0,x:(r)+n y:(rh)-,b
 		unhandled("x0,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 1996: { // x1,x:(r)+n y:(rh)-,y0
+	case 2000: { // x1,x:(r)+n y:(rh)-,y0
 		unhandled("x1,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 1997: { // x1,x:(r)+n y:(rh)-,y1
+	case 2001: { // x1,x:(r)+n y:(rh)-,y1
 		unhandled("x1,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 1998: { // x1,x:(r)+n y:(rh)-,a
+	case 2002: { // x1,x:(r)+n y:(rh)-,a
 		unhandled("x1,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 1999: { // x1,x:(r)+n y:(rh)-,b
+	case 2003: { // x1,x:(r)+n y:(rh)-,b
 		unhandled("x1,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 2000: { // a,x:(r)+n y:(rh)-,y0
+	case 2004: { // a,x:(r)+n y:(rh)-,y0
 		unhandled("a,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 2001: { // a,x:(r)+n y:(rh)-,y1
+	case 2005: { // a,x:(r)+n y:(rh)-,y1
 		unhandled("a,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 2002: { // a,x:(r)+n y:(rh)-,a
+	case 2006: { // a,x:(r)+n y:(rh)-,a
 		unhandled("a,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 2003: { // a,x:(r)+n y:(rh)-,b
+	case 2007: { // a,x:(r)+n y:(rh)-,b
 		unhandled("a,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 2004: { // b,x:(r)+n y:(rh)-,y0
+	case 2008: { // b,x:(r)+n y:(rh)-,y0
 		unhandled("b,x:(r)+n y:(rh)-,y0");
 		break;
 		}
-	case 2005: { // b,x:(r)+n y:(rh)-,y1
+	case 2009: { // b,x:(r)+n y:(rh)-,y1
 		unhandled("b,x:(r)+n y:(rh)-,y1");
 		break;
 		}
-	case 2006: { // b,x:(r)+n y:(rh)-,a
+	case 2010: { // b,x:(r)+n y:(rh)-,a
 		unhandled("b,x:(r)+n y:(rh)-,a");
 		break;
 		}
-	case 2007: { // b,x:(r)+n y:(rh)-,b
+	case 2011: { // b,x:(r)+n y:(rh)-,b
 		unhandled("b,x:(r)+n y:(rh)-,b");
 		break;
 		}
-	case 2008: { // x0,x:(r)+n y:(rh)+,y0
+	case 2012: { // x0,x:(r)+n y:(rh)+,y0
 		unhandled("x0,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 2009: { // x0,x:(r)+n y:(rh)+,y1
+	case 2013: { // x0,x:(r)+n y:(rh)+,y1
 		unhandled("x0,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 2010: { // x0,x:(r)+n y:(rh)+,a
+	case 2014: { // x0,x:(r)+n y:(rh)+,a
 		unhandled("x0,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 2011: { // x0,x:(r)+n y:(rh)+,b
+	case 2015: { // x0,x:(r)+n y:(rh)+,b
 		unhandled("x0,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 2012: { // x1,x:(r)+n y:(rh)+,y0
+	case 2016: { // x1,x:(r)+n y:(rh)+,y0
 		unhandled("x1,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 2013: { // x1,x:(r)+n y:(rh)+,y1
+	case 2017: { // x1,x:(r)+n y:(rh)+,y1
 		unhandled("x1,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 2014: { // x1,x:(r)+n y:(rh)+,a
+	case 2018: { // x1,x:(r)+n y:(rh)+,a
 		unhandled("x1,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 2015: { // x1,x:(r)+n y:(rh)+,b
+	case 2019: { // x1,x:(r)+n y:(rh)+,b
 		unhandled("x1,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 2016: { // a,x:(r)+n y:(rh)+,y0
+	case 2020: { // a,x:(r)+n y:(rh)+,y0
 		unhandled("a,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 2017: { // a,x:(r)+n y:(rh)+,y1
+	case 2021: { // a,x:(r)+n y:(rh)+,y1
 		unhandled("a,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 2018: { // a,x:(r)+n y:(rh)+,a
+	case 2022: { // a,x:(r)+n y:(rh)+,a
 		unhandled("a,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 2019: { // a,x:(r)+n y:(rh)+,b
+	case 2023: { // a,x:(r)+n y:(rh)+,b
 		unhandled("a,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 2020: { // b,x:(r)+n y:(rh)+,y0
+	case 2024: { // b,x:(r)+n y:(rh)+,y0
 		unhandled("b,x:(r)+n y:(rh)+,y0");
 		break;
 		}
-	case 2021: { // b,x:(r)+n y:(rh)+,y1
+	case 2025: { // b,x:(r)+n y:(rh)+,y1
 		unhandled("b,x:(r)+n y:(rh)+,y1");
 		break;
 		}
-	case 2022: { // b,x:(r)+n y:(rh)+,a
+	case 2026: { // b,x:(r)+n y:(rh)+,a
 		unhandled("b,x:(r)+n y:(rh)+,a");
 		break;
 		}
-	case 2023: { // b,x:(r)+n y:(rh)+,b
+	case 2027: { // b,x:(r)+n y:(rh)+,b
 		unhandled("b,x:(r)+n y:(rh)+,b");
 		break;
 		}
-	case 2024: { // x0,x:(r)+n y:(rh),y0
+	case 2028: { // x0,x:(r)+n y:(rh),y0
 		unhandled("x0,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 2025: { // x0,x:(r)+n y:(rh),y1
+	case 2029: { // x0,x:(r)+n y:(rh),y1
 		unhandled("x0,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 2026: { // x0,x:(r)+n y:(rh),a
+	case 2030: { // x0,x:(r)+n y:(rh),a
 		unhandled("x0,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 2027: { // x0,x:(r)+n y:(rh),b
+	case 2031: { // x0,x:(r)+n y:(rh),b
 		unhandled("x0,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 2028: { // x1,x:(r)+n y:(rh),y0
+	case 2032: { // x1,x:(r)+n y:(rh),y0
 		unhandled("x1,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 2029: { // x1,x:(r)+n y:(rh),y1
+	case 2033: { // x1,x:(r)+n y:(rh),y1
 		unhandled("x1,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 2030: { // x1,x:(r)+n y:(rh),a
+	case 2034: { // x1,x:(r)+n y:(rh),a
 		unhandled("x1,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 2031: { // x1,x:(r)+n y:(rh),b
+	case 2035: { // x1,x:(r)+n y:(rh),b
 		unhandled("x1,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 2032: { // a,x:(r)+n y:(rh),y0
+	case 2036: { // a,x:(r)+n y:(rh),y0
 		unhandled("a,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 2033: { // a,x:(r)+n y:(rh),y1
+	case 2037: { // a,x:(r)+n y:(rh),y1
 		unhandled("a,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 2034: { // a,x:(r)+n y:(rh),a
+	case 2038: { // a,x:(r)+n y:(rh),a
 		unhandled("a,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 2035: { // a,x:(r)+n y:(rh),b
+	case 2039: { // a,x:(r)+n y:(rh),b
 		unhandled("a,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 2036: { // b,x:(r)+n y:(rh),y0
+	case 2040: { // b,x:(r)+n y:(rh),y0
 		unhandled("b,x:(r)+n y:(rh),y0");
 		break;
 		}
-	case 2037: { // b,x:(r)+n y:(rh),y1
+	case 2041: { // b,x:(r)+n y:(rh),y1
 		unhandled("b,x:(r)+n y:(rh),y1");
 		break;
 		}
-	case 2038: { // b,x:(r)+n y:(rh),a
+	case 2042: { // b,x:(r)+n y:(rh),a
 		unhandled("b,x:(r)+n y:(rh),a");
 		break;
 		}
-	case 2039: { // b,x:(r)+n y:(rh),b
+	case 2043: { // b,x:(r)+n y:(rh),b
 		unhandled("b,x:(r)+n y:(rh),b");
 		break;
 		}
-	case 2040: { // x0,x:(r)- y:(rh)+n,y0
+	case 2044: { // x0,x:(r)- y:(rh)+n,y0
 		unhandled("x0,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 2041: { // x0,x:(r)- y:(rh)+n,y1
+	case 2045: { // x0,x:(r)- y:(rh)+n,y1
 		unhandled("x0,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 2042: { // x0,x:(r)- y:(rh)+n,a
+	case 2046: { // x0,x:(r)- y:(rh)+n,a
 		unhandled("x0,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 2043: { // x0,x:(r)- y:(rh)+n,b
+	case 2047: { // x0,x:(r)- y:(rh)+n,b
 		unhandled("x0,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 2044: { // x1,x:(r)- y:(rh)+n,y0
+	case 2048: { // x1,x:(r)- y:(rh)+n,y0
 		unhandled("x1,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 2045: { // x1,x:(r)- y:(rh)+n,y1
+	case 2049: { // x1,x:(r)- y:(rh)+n,y1
 		unhandled("x1,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 2046: { // x1,x:(r)- y:(rh)+n,a
+	case 2050: { // x1,x:(r)- y:(rh)+n,a
 		unhandled("x1,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 2047: { // x1,x:(r)- y:(rh)+n,b
+	case 2051: { // x1,x:(r)- y:(rh)+n,b
 		unhandled("x1,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 2048: { // a,x:(r)- y:(rh)+n,y0
+	case 2052: { // a,x:(r)- y:(rh)+n,y0
 		unhandled("a,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 2049: { // a,x:(r)- y:(rh)+n,y1
+	case 2053: { // a,x:(r)- y:(rh)+n,y1
 		unhandled("a,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 2050: { // a,x:(r)- y:(rh)+n,a
+	case 2054: { // a,x:(r)- y:(rh)+n,a
 		unhandled("a,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 2051: { // a,x:(r)- y:(rh)+n,b
+	case 2055: { // a,x:(r)- y:(rh)+n,b
 		unhandled("a,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 2052: { // b,x:(r)- y:(rh)+n,y0
+	case 2056: { // b,x:(r)- y:(rh)+n,y0
 		unhandled("b,x:(r)- y:(rh)+n,y0");
 		break;
 		}
-	case 2053: { // b,x:(r)- y:(rh)+n,y1
+	case 2057: { // b,x:(r)- y:(rh)+n,y1
 		unhandled("b,x:(r)- y:(rh)+n,y1");
 		break;
 		}
-	case 2054: { // b,x:(r)- y:(rh)+n,a
+	case 2058: { // b,x:(r)- y:(rh)+n,a
 		unhandled("b,x:(r)- y:(rh)+n,a");
 		break;
 		}
-	case 2055: { // b,x:(r)- y:(rh)+n,b
+	case 2059: { // b,x:(r)- y:(rh)+n,b
 		unhandled("b,x:(r)- y:(rh)+n,b");
 		break;
 		}
-	case 2056: { // x0,x:(r)- y:(rh)-,y0
+	case 2060: { // x0,x:(r)- y:(rh)-,y0
 		unhandled("x0,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2057: { // x0,x:(r)- y:(rh)-,y1
+	case 2061: { // x0,x:(r)- y:(rh)-,y1
 		unhandled("x0,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2058: { // x0,x:(r)- y:(rh)-,a
+	case 2062: { // x0,x:(r)- y:(rh)-,a
 		unhandled("x0,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2059: { // x0,x:(r)- y:(rh)-,b
+	case 2063: { // x0,x:(r)- y:(rh)-,b
 		unhandled("x0,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2060: { // x1,x:(r)- y:(rh)-,y0
+	case 2064: { // x1,x:(r)- y:(rh)-,y0
 		unhandled("x1,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2061: { // x1,x:(r)- y:(rh)-,y1
+	case 2065: { // x1,x:(r)- y:(rh)-,y1
 		unhandled("x1,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2062: { // x1,x:(r)- y:(rh)-,a
+	case 2066: { // x1,x:(r)- y:(rh)-,a
 		unhandled("x1,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2063: { // x1,x:(r)- y:(rh)-,b
+	case 2067: { // x1,x:(r)- y:(rh)-,b
 		unhandled("x1,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2064: { // a,x:(r)- y:(rh)-,y0
+	case 2068: { // a,x:(r)- y:(rh)-,y0
 		unhandled("a,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2065: { // a,x:(r)- y:(rh)-,y1
+	case 2069: { // a,x:(r)- y:(rh)-,y1
 		unhandled("a,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2066: { // a,x:(r)- y:(rh)-,a
+	case 2070: { // a,x:(r)- y:(rh)-,a
 		unhandled("a,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2067: { // a,x:(r)- y:(rh)-,b
+	case 2071: { // a,x:(r)- y:(rh)-,b
 		unhandled("a,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2068: { // b,x:(r)- y:(rh)-,y0
+	case 2072: { // b,x:(r)- y:(rh)-,y0
 		unhandled("b,x:(r)- y:(rh)-,y0");
 		break;
 		}
-	case 2069: { // b,x:(r)- y:(rh)-,y1
+	case 2073: { // b,x:(r)- y:(rh)-,y1
 		unhandled("b,x:(r)- y:(rh)-,y1");
 		break;
 		}
-	case 2070: { // b,x:(r)- y:(rh)-,a
+	case 2074: { // b,x:(r)- y:(rh)-,a
 		unhandled("b,x:(r)- y:(rh)-,a");
 		break;
 		}
-	case 2071: { // b,x:(r)- y:(rh)-,b
+	case 2075: { // b,x:(r)- y:(rh)-,b
 		unhandled("b,x:(r)- y:(rh)-,b");
 		break;
 		}
-	case 2072: { // x0,x:(r)- y:(rh)+,y0
+	case 2076: { // x0,x:(r)- y:(rh)+,y0
 		unhandled("x0,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2073: { // x0,x:(r)- y:(rh)+,y1
+	case 2077: { // x0,x:(r)- y:(rh)+,y1
 		unhandled("x0,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2074: { // x0,x:(r)- y:(rh)+,a
+	case 2078: { // x0,x:(r)- y:(rh)+,a
 		unhandled("x0,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2075: { // x0,x:(r)- y:(rh)+,b
+	case 2079: { // x0,x:(r)- y:(rh)+,b
 		unhandled("x0,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2076: { // x1,x:(r)- y:(rh)+,y0
+	case 2080: { // x1,x:(r)- y:(rh)+,y0
 		unhandled("x1,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2077: { // x1,x:(r)- y:(rh)+,y1
+	case 2081: { // x1,x:(r)- y:(rh)+,y1
 		unhandled("x1,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2078: { // x1,x:(r)- y:(rh)+,a
+	case 2082: { // x1,x:(r)- y:(rh)+,a
 		unhandled("x1,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2079: { // x1,x:(r)- y:(rh)+,b
+	case 2083: { // x1,x:(r)- y:(rh)+,b
 		unhandled("x1,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2080: { // a,x:(r)- y:(rh)+,y0
+	case 2084: { // a,x:(r)- y:(rh)+,y0
 		unhandled("a,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2081: { // a,x:(r)- y:(rh)+,y1
+	case 2085: { // a,x:(r)- y:(rh)+,y1
 		unhandled("a,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2082: { // a,x:(r)- y:(rh)+,a
+	case 2086: { // a,x:(r)- y:(rh)+,a
 		unhandled("a,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2083: { // a,x:(r)- y:(rh)+,b
+	case 2087: { // a,x:(r)- y:(rh)+,b
 		unhandled("a,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2084: { // b,x:(r)- y:(rh)+,y0
+	case 2088: { // b,x:(r)- y:(rh)+,y0
 		unhandled("b,x:(r)- y:(rh)+,y0");
 		break;
 		}
-	case 2085: { // b,x:(r)- y:(rh)+,y1
+	case 2089: { // b,x:(r)- y:(rh)+,y1
 		unhandled("b,x:(r)- y:(rh)+,y1");
 		break;
 		}
-	case 2086: { // b,x:(r)- y:(rh)+,a
+	case 2090: { // b,x:(r)- y:(rh)+,a
 		unhandled("b,x:(r)- y:(rh)+,a");
 		break;
 		}
-	case 2087: { // b,x:(r)- y:(rh)+,b
+	case 2091: { // b,x:(r)- y:(rh)+,b
 		unhandled("b,x:(r)- y:(rh)+,b");
 		break;
 		}
-	case 2088: { // x0,x:(r)- y:(rh),y0
+	case 2092: { // x0,x:(r)- y:(rh),y0
 		unhandled("x0,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2089: { // x0,x:(r)- y:(rh),y1
+	case 2093: { // x0,x:(r)- y:(rh),y1
 		unhandled("x0,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2090: { // x0,x:(r)- y:(rh),a
+	case 2094: { // x0,x:(r)- y:(rh),a
 		unhandled("x0,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2091: { // x0,x:(r)- y:(rh),b
+	case 2095: { // x0,x:(r)- y:(rh),b
 		unhandled("x0,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2092: { // x1,x:(r)- y:(rh),y0
+	case 2096: { // x1,x:(r)- y:(rh),y0
 		unhandled("x1,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2093: { // x1,x:(r)- y:(rh),y1
+	case 2097: { // x1,x:(r)- y:(rh),y1
 		unhandled("x1,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2094: { // x1,x:(r)- y:(rh),a
+	case 2098: { // x1,x:(r)- y:(rh),a
 		unhandled("x1,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2095: { // x1,x:(r)- y:(rh),b
+	case 2099: { // x1,x:(r)- y:(rh),b
 		unhandled("x1,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2096: { // a,x:(r)- y:(rh),y0
+	case 2100: { // a,x:(r)- y:(rh),y0
 		unhandled("a,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2097: { // a,x:(r)- y:(rh),y1
+	case 2101: { // a,x:(r)- y:(rh),y1
 		unhandled("a,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2098: { // a,x:(r)- y:(rh),a
+	case 2102: { // a,x:(r)- y:(rh),a
 		unhandled("a,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2099: { // a,x:(r)- y:(rh),b
+	case 2103: { // a,x:(r)- y:(rh),b
 		unhandled("a,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2100: { // b,x:(r)- y:(rh),y0
+	case 2104: { // b,x:(r)- y:(rh),y0
 		unhandled("b,x:(r)- y:(rh),y0");
 		break;
 		}
-	case 2101: { // b,x:(r)- y:(rh),y1
+	case 2105: { // b,x:(r)- y:(rh),y1
 		unhandled("b,x:(r)- y:(rh),y1");
 		break;
 		}
-	case 2102: { // b,x:(r)- y:(rh),a
+	case 2106: { // b,x:(r)- y:(rh),a
 		unhandled("b,x:(r)- y:(rh),a");
 		break;
 		}
-	case 2103: { // b,x:(r)- y:(rh),b
+	case 2107: { // b,x:(r)- y:(rh),b
 		unhandled("b,x:(r)- y:(rh),b");
 		break;
 		}
-	case 2104: { // x0,x:(r)+ y:(rh)+n,y0
+	case 2108: { // x0,x:(r)+ y:(rh)+n,y0
 		unhandled("x0,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2105: { // x0,x:(r)+ y:(rh)+n,y1
+	case 2109: { // x0,x:(r)+ y:(rh)+n,y1
 		unhandled("x0,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2106: { // x0,x:(r)+ y:(rh)+n,a
+	case 2110: { // x0,x:(r)+ y:(rh)+n,a
 		unhandled("x0,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2107: { // x0,x:(r)+ y:(rh)+n,b
+	case 2111: { // x0,x:(r)+ y:(rh)+n,b
 		unhandled("x0,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2108: { // x1,x:(r)+ y:(rh)+n,y0
+	case 2112: { // x1,x:(r)+ y:(rh)+n,y0
 		unhandled("x1,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2109: { // x1,x:(r)+ y:(rh)+n,y1
+	case 2113: { // x1,x:(r)+ y:(rh)+n,y1
 		unhandled("x1,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2110: { // x1,x:(r)+ y:(rh)+n,a
+	case 2114: { // x1,x:(r)+ y:(rh)+n,a
 		unhandled("x1,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2111: { // x1,x:(r)+ y:(rh)+n,b
+	case 2115: { // x1,x:(r)+ y:(rh)+n,b
 		unhandled("x1,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2112: { // a,x:(r)+ y:(rh)+n,y0
+	case 2116: { // a,x:(r)+ y:(rh)+n,y0
 		unhandled("a,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2113: { // a,x:(r)+ y:(rh)+n,y1
+	case 2117: { // a,x:(r)+ y:(rh)+n,y1
 		unhandled("a,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2114: { // a,x:(r)+ y:(rh)+n,a
+	case 2118: { // a,x:(r)+ y:(rh)+n,a
 		unhandled("a,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2115: { // a,x:(r)+ y:(rh)+n,b
+	case 2119: { // a,x:(r)+ y:(rh)+n,b
 		unhandled("a,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2116: { // b,x:(r)+ y:(rh)+n,y0
+	case 2120: { // b,x:(r)+ y:(rh)+n,y0
 		unhandled("b,x:(r)+ y:(rh)+n,y0");
 		break;
 		}
-	case 2117: { // b,x:(r)+ y:(rh)+n,y1
+	case 2121: { // b,x:(r)+ y:(rh)+n,y1
 		unhandled("b,x:(r)+ y:(rh)+n,y1");
 		break;
 		}
-	case 2118: { // b,x:(r)+ y:(rh)+n,a
+	case 2122: { // b,x:(r)+ y:(rh)+n,a
 		unhandled("b,x:(r)+ y:(rh)+n,a");
 		break;
 		}
-	case 2119: { // b,x:(r)+ y:(rh)+n,b
+	case 2123: { // b,x:(r)+ y:(rh)+n,b
 		unhandled("b,x:(r)+ y:(rh)+n,b");
 		break;
 		}
-	case 2120: { // x0,x:(r)+ y:(rh)-,y0
+	case 2124: { // x0,x:(r)+ y:(rh)-,y0
 		unhandled("x0,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2121: { // x0,x:(r)+ y:(rh)-,y1
+	case 2125: { // x0,x:(r)+ y:(rh)-,y1
 		unhandled("x0,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2122: { // x0,x:(r)+ y:(rh)-,a
+	case 2126: { // x0,x:(r)+ y:(rh)-,a
 		unhandled("x0,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2123: { // x0,x:(r)+ y:(rh)-,b
+	case 2127: { // x0,x:(r)+ y:(rh)-,b
 		unhandled("x0,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2124: { // x1,x:(r)+ y:(rh)-,y0
+	case 2128: { // x1,x:(r)+ y:(rh)-,y0
 		unhandled("x1,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2125: { // x1,x:(r)+ y:(rh)-,y1
+	case 2129: { // x1,x:(r)+ y:(rh)-,y1
 		unhandled("x1,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2126: { // x1,x:(r)+ y:(rh)-,a
+	case 2130: { // x1,x:(r)+ y:(rh)-,a
 		unhandled("x1,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2127: { // x1,x:(r)+ y:(rh)-,b
+	case 2131: { // x1,x:(r)+ y:(rh)-,b
 		unhandled("x1,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2128: { // a,x:(r)+ y:(rh)-,y0
+	case 2132: { // a,x:(r)+ y:(rh)-,y0
 		unhandled("a,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2129: { // a,x:(r)+ y:(rh)-,y1
+	case 2133: { // a,x:(r)+ y:(rh)-,y1
 		unhandled("a,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2130: { // a,x:(r)+ y:(rh)-,a
+	case 2134: { // a,x:(r)+ y:(rh)-,a
 		unhandled("a,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2131: { // a,x:(r)+ y:(rh)-,b
+	case 2135: { // a,x:(r)+ y:(rh)-,b
 		unhandled("a,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2132: { // b,x:(r)+ y:(rh)-,y0
+	case 2136: { // b,x:(r)+ y:(rh)-,y0
 		unhandled("b,x:(r)+ y:(rh)-,y0");
 		break;
 		}
-	case 2133: { // b,x:(r)+ y:(rh)-,y1
+	case 2137: { // b,x:(r)+ y:(rh)-,y1
 		unhandled("b,x:(r)+ y:(rh)-,y1");
 		break;
 		}
-	case 2134: { // b,x:(r)+ y:(rh)-,a
+	case 2138: { // b,x:(r)+ y:(rh)-,a
 		unhandled("b,x:(r)+ y:(rh)-,a");
 		break;
 		}
-	case 2135: { // b,x:(r)+ y:(rh)-,b
+	case 2139: { // b,x:(r)+ y:(rh)-,b
 		unhandled("b,x:(r)+ y:(rh)-,b");
 		break;
 		}
-	case 2136: { // x0,x:(r)+ y:(rh)+,y0
+	case 2140: { // x0,x:(r)+ y:(rh)+,y0
 		unhandled("x0,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2137: { // x0,x:(r)+ y:(rh)+,y1
+	case 2141: { // x0,x:(r)+ y:(rh)+,y1
 		unhandled("x0,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2138: { // x0,x:(r)+ y:(rh)+,a
+	case 2142: { // x0,x:(r)+ y:(rh)+,a
 		unhandled("x0,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2139: { // x0,x:(r)+ y:(rh)+,b
+	case 2143: { // x0,x:(r)+ y:(rh)+,b
 		unhandled("x0,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2140: { // x1,x:(r)+ y:(rh)+,y0
+	case 2144: { // x1,x:(r)+ y:(rh)+,y0
 		unhandled("x1,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2141: { // x1,x:(r)+ y:(rh)+,y1
+	case 2145: { // x1,x:(r)+ y:(rh)+,y1
 		unhandled("x1,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2142: { // x1,x:(r)+ y:(rh)+,a
+	case 2146: { // x1,x:(r)+ y:(rh)+,a
 		unhandled("x1,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2143: { // x1,x:(r)+ y:(rh)+,b
+	case 2147: { // x1,x:(r)+ y:(rh)+,b
 		unhandled("x1,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2144: { // a,x:(r)+ y:(rh)+,y0
+	case 2148: { // a,x:(r)+ y:(rh)+,y0
 		unhandled("a,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2145: { // a,x:(r)+ y:(rh)+,y1
+	case 2149: { // a,x:(r)+ y:(rh)+,y1
 		unhandled("a,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2146: { // a,x:(r)+ y:(rh)+,a
+	case 2150: { // a,x:(r)+ y:(rh)+,a
 		unhandled("a,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2147: { // a,x:(r)+ y:(rh)+,b
+	case 2151: { // a,x:(r)+ y:(rh)+,b
 		unhandled("a,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2148: { // b,x:(r)+ y:(rh)+,y0
+	case 2152: { // b,x:(r)+ y:(rh)+,y0
 		unhandled("b,x:(r)+ y:(rh)+,y0");
 		break;
 		}
-	case 2149: { // b,x:(r)+ y:(rh)+,y1
+	case 2153: { // b,x:(r)+ y:(rh)+,y1
 		unhandled("b,x:(r)+ y:(rh)+,y1");
 		break;
 		}
-	case 2150: { // b,x:(r)+ y:(rh)+,a
+	case 2154: { // b,x:(r)+ y:(rh)+,a
 		unhandled("b,x:(r)+ y:(rh)+,a");
 		break;
 		}
-	case 2151: { // b,x:(r)+ y:(rh)+,b
+	case 2155: { // b,x:(r)+ y:(rh)+,b
 		unhandled("b,x:(r)+ y:(rh)+,b");
 		break;
 		}
-	case 2152: { // x0,x:(r)+ y:(rh),y0
+	case 2156: { // x0,x:(r)+ y:(rh),y0
 		unhandled("x0,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2153: { // x0,x:(r)+ y:(rh),y1
+	case 2157: { // x0,x:(r)+ y:(rh),y1
 		unhandled("x0,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2154: { // x0,x:(r)+ y:(rh),a
+	case 2158: { // x0,x:(r)+ y:(rh),a
 		unhandled("x0,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2155: { // x0,x:(r)+ y:(rh),b
+	case 2159: { // x0,x:(r)+ y:(rh),b
 		unhandled("x0,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2156: { // x1,x:(r)+ y:(rh),y0
+	case 2160: { // x1,x:(r)+ y:(rh),y0
 		unhandled("x1,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2157: { // x1,x:(r)+ y:(rh),y1
+	case 2161: { // x1,x:(r)+ y:(rh),y1
 		unhandled("x1,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2158: { // x1,x:(r)+ y:(rh),a
+	case 2162: { // x1,x:(r)+ y:(rh),a
 		unhandled("x1,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2159: { // x1,x:(r)+ y:(rh),b
+	case 2163: { // x1,x:(r)+ y:(rh),b
 		unhandled("x1,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2160: { // a,x:(r)+ y:(rh),y0
+	case 2164: { // a,x:(r)+ y:(rh),y0
 		unhandled("a,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2161: { // a,x:(r)+ y:(rh),y1
+	case 2165: { // a,x:(r)+ y:(rh),y1
 		unhandled("a,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2162: { // a,x:(r)+ y:(rh),a
+	case 2166: { // a,x:(r)+ y:(rh),a
 		unhandled("a,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2163: { // a,x:(r)+ y:(rh),b
+	case 2167: { // a,x:(r)+ y:(rh),b
 		unhandled("a,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2164: { // b,x:(r)+ y:(rh),y0
+	case 2168: { // b,x:(r)+ y:(rh),y0
 		unhandled("b,x:(r)+ y:(rh),y0");
 		break;
 		}
-	case 2165: { // b,x:(r)+ y:(rh),y1
+	case 2169: { // b,x:(r)+ y:(rh),y1
 		unhandled("b,x:(r)+ y:(rh),y1");
 		break;
 		}
-	case 2166: { // b,x:(r)+ y:(rh),a
+	case 2170: { // b,x:(r)+ y:(rh),a
 		unhandled("b,x:(r)+ y:(rh),a");
 		break;
 		}
-	case 2167: { // b,x:(r)+ y:(rh),b
+	case 2171: { // b,x:(r)+ y:(rh),b
 		unhandled("b,x:(r)+ y:(rh),b");
 		break;
 		}
-	case 2168: { // x0,x:(r) y:(rh)+n,y0
+	case 2172: { // x0,x:(r) y:(rh)+n,y0
 		unhandled("x0,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2169: { // x0,x:(r) y:(rh)+n,y1
+	case 2173: { // x0,x:(r) y:(rh)+n,y1
 		unhandled("x0,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2170: { // x0,x:(r) y:(rh)+n,a
+	case 2174: { // x0,x:(r) y:(rh)+n,a
 		unhandled("x0,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2171: { // x0,x:(r) y:(rh)+n,b
+	case 2175: { // x0,x:(r) y:(rh)+n,b
 		unhandled("x0,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2172: { // x1,x:(r) y:(rh)+n,y0
+	case 2176: { // x1,x:(r) y:(rh)+n,y0
 		unhandled("x1,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2173: { // x1,x:(r) y:(rh)+n,y1
+	case 2177: { // x1,x:(r) y:(rh)+n,y1
 		unhandled("x1,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2174: { // x1,x:(r) y:(rh)+n,a
+	case 2178: { // x1,x:(r) y:(rh)+n,a
 		unhandled("x1,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2175: { // x1,x:(r) y:(rh)+n,b
+	case 2179: { // x1,x:(r) y:(rh)+n,b
 		unhandled("x1,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2176: { // a,x:(r) y:(rh)+n,y0
+	case 2180: { // a,x:(r) y:(rh)+n,y0
 		unhandled("a,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2177: { // a,x:(r) y:(rh)+n,y1
+	case 2181: { // a,x:(r) y:(rh)+n,y1
 		unhandled("a,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2178: { // a,x:(r) y:(rh)+n,a
+	case 2182: { // a,x:(r) y:(rh)+n,a
 		unhandled("a,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2179: { // a,x:(r) y:(rh)+n,b
+	case 2183: { // a,x:(r) y:(rh)+n,b
 		unhandled("a,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2180: { // b,x:(r) y:(rh)+n,y0
+	case 2184: { // b,x:(r) y:(rh)+n,y0
 		unhandled("b,x:(r) y:(rh)+n,y0");
 		break;
 		}
-	case 2181: { // b,x:(r) y:(rh)+n,y1
+	case 2185: { // b,x:(r) y:(rh)+n,y1
 		unhandled("b,x:(r) y:(rh)+n,y1");
 		break;
 		}
-	case 2182: { // b,x:(r) y:(rh)+n,a
+	case 2186: { // b,x:(r) y:(rh)+n,a
 		unhandled("b,x:(r) y:(rh)+n,a");
 		break;
 		}
-	case 2183: { // b,x:(r) y:(rh)+n,b
+	case 2187: { // b,x:(r) y:(rh)+n,b
 		unhandled("b,x:(r) y:(rh)+n,b");
 		break;
 		}
-	case 2184: { // x0,x:(r) y:(rh)-,y0
+	case 2188: { // x0,x:(r) y:(rh)-,y0
 		unhandled("x0,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2185: { // x0,x:(r) y:(rh)-,y1
+	case 2189: { // x0,x:(r) y:(rh)-,y1
 		unhandled("x0,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2186: { // x0,x:(r) y:(rh)-,a
+	case 2190: { // x0,x:(r) y:(rh)-,a
 		unhandled("x0,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2187: { // x0,x:(r) y:(rh)-,b
+	case 2191: { // x0,x:(r) y:(rh)-,b
 		unhandled("x0,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2188: { // x1,x:(r) y:(rh)-,y0
+	case 2192: { // x1,x:(r) y:(rh)-,y0
 		unhandled("x1,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2189: { // x1,x:(r) y:(rh)-,y1
+	case 2193: { // x1,x:(r) y:(rh)-,y1
 		unhandled("x1,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2190: { // x1,x:(r) y:(rh)-,a
+	case 2194: { // x1,x:(r) y:(rh)-,a
 		unhandled("x1,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2191: { // x1,x:(r) y:(rh)-,b
+	case 2195: { // x1,x:(r) y:(rh)-,b
 		unhandled("x1,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2192: { // a,x:(r) y:(rh)-,y0
+	case 2196: { // a,x:(r) y:(rh)-,y0
 		unhandled("a,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2193: { // a,x:(r) y:(rh)-,y1
+	case 2197: { // a,x:(r) y:(rh)-,y1
 		unhandled("a,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2194: { // a,x:(r) y:(rh)-,a
+	case 2198: { // a,x:(r) y:(rh)-,a
 		unhandled("a,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2195: { // a,x:(r) y:(rh)-,b
+	case 2199: { // a,x:(r) y:(rh)-,b
 		unhandled("a,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2196: { // b,x:(r) y:(rh)-,y0
+	case 2200: { // b,x:(r) y:(rh)-,y0
 		unhandled("b,x:(r) y:(rh)-,y0");
 		break;
 		}
-	case 2197: { // b,x:(r) y:(rh)-,y1
+	case 2201: { // b,x:(r) y:(rh)-,y1
 		unhandled("b,x:(r) y:(rh)-,y1");
 		break;
 		}
-	case 2198: { // b,x:(r) y:(rh)-,a
+	case 2202: { // b,x:(r) y:(rh)-,a
 		unhandled("b,x:(r) y:(rh)-,a");
 		break;
 		}
-	case 2199: { // b,x:(r) y:(rh)-,b
+	case 2203: { // b,x:(r) y:(rh)-,b
 		unhandled("b,x:(r) y:(rh)-,b");
 		break;
 		}
-	case 2200: { // x0,x:(r) y:(rh)+,y0
+	case 2204: { // x0,x:(r) y:(rh)+,y0
 		unhandled("x0,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2201: { // x0,x:(r) y:(rh)+,y1
+	case 2205: { // x0,x:(r) y:(rh)+,y1
 		unhandled("x0,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2202: { // x0,x:(r) y:(rh)+,a
+	case 2206: { // x0,x:(r) y:(rh)+,a
 		unhandled("x0,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2203: { // x0,x:(r) y:(rh)+,b
+	case 2207: { // x0,x:(r) y:(rh)+,b
 		unhandled("x0,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2204: { // x1,x:(r) y:(rh)+,y0
+	case 2208: { // x1,x:(r) y:(rh)+,y0
 		unhandled("x1,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2205: { // x1,x:(r) y:(rh)+,y1
+	case 2209: { // x1,x:(r) y:(rh)+,y1
 		unhandled("x1,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2206: { // x1,x:(r) y:(rh)+,a
+	case 2210: { // x1,x:(r) y:(rh)+,a
 		unhandled("x1,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2207: { // x1,x:(r) y:(rh)+,b
+	case 2211: { // x1,x:(r) y:(rh)+,b
 		unhandled("x1,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2208: { // a,x:(r) y:(rh)+,y0
+	case 2212: { // a,x:(r) y:(rh)+,y0
 		unhandled("a,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2209: { // a,x:(r) y:(rh)+,y1
+	case 2213: { // a,x:(r) y:(rh)+,y1
 		unhandled("a,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2210: { // a,x:(r) y:(rh)+,a
+	case 2214: { // a,x:(r) y:(rh)+,a
 		unhandled("a,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2211: { // a,x:(r) y:(rh)+,b
+	case 2215: { // a,x:(r) y:(rh)+,b
 		unhandled("a,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2212: { // b,x:(r) y:(rh)+,y0
+	case 2216: { // b,x:(r) y:(rh)+,y0
 		unhandled("b,x:(r) y:(rh)+,y0");
 		break;
 		}
-	case 2213: { // b,x:(r) y:(rh)+,y1
+	case 2217: { // b,x:(r) y:(rh)+,y1
 		unhandled("b,x:(r) y:(rh)+,y1");
 		break;
 		}
-	case 2214: { // b,x:(r) y:(rh)+,a
+	case 2218: { // b,x:(r) y:(rh)+,a
 		unhandled("b,x:(r) y:(rh)+,a");
 		break;
 		}
-	case 2215: { // b,x:(r) y:(rh)+,b
+	case 2219: { // b,x:(r) y:(rh)+,b
 		unhandled("b,x:(r) y:(rh)+,b");
 		break;
 		}
-	case 2216: { // x0,x:(r) y:(rh),y0
+	case 2220: { // x0,x:(r) y:(rh),y0
 		unhandled("x0,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2217: { // x0,x:(r) y:(rh),y1
+	case 2221: { // x0,x:(r) y:(rh),y1
 		unhandled("x0,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2218: { // x0,x:(r) y:(rh),a
+	case 2222: { // x0,x:(r) y:(rh),a
 		unhandled("x0,x:(r) y:(rh),a");
 		break;
 		}
-	case 2219: { // x0,x:(r) y:(rh),b
+	case 2223: { // x0,x:(r) y:(rh),b
 		unhandled("x0,x:(r) y:(rh),b");
 		break;
 		}
-	case 2220: { // x1,x:(r) y:(rh),y0
+	case 2224: { // x1,x:(r) y:(rh),y0
 		unhandled("x1,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2221: { // x1,x:(r) y:(rh),y1
+	case 2225: { // x1,x:(r) y:(rh),y1
 		unhandled("x1,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2222: { // x1,x:(r) y:(rh),a
+	case 2226: { // x1,x:(r) y:(rh),a
 		unhandled("x1,x:(r) y:(rh),a");
 		break;
 		}
-	case 2223: { // x1,x:(r) y:(rh),b
+	case 2227: { // x1,x:(r) y:(rh),b
 		unhandled("x1,x:(r) y:(rh),b");
 		break;
 		}
-	case 2224: { // a,x:(r) y:(rh),y0
+	case 2228: { // a,x:(r) y:(rh),y0
 		unhandled("a,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2225: { // a,x:(r) y:(rh),y1
+	case 2229: { // a,x:(r) y:(rh),y1
 		unhandled("a,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2226: { // a,x:(r) y:(rh),a
+	case 2230: { // a,x:(r) y:(rh),a
 		unhandled("a,x:(r) y:(rh),a");
 		break;
 		}
-	case 2227: { // a,x:(r) y:(rh),b
+	case 2231: { // a,x:(r) y:(rh),b
 		unhandled("a,x:(r) y:(rh),b");
 		break;
 		}
-	case 2228: { // b,x:(r) y:(rh),y0
+	case 2232: { // b,x:(r) y:(rh),y0
 		unhandled("b,x:(r) y:(rh),y0");
 		break;
 		}
-	case 2229: { // b,x:(r) y:(rh),y1
+	case 2233: { // b,x:(r) y:(rh),y1
 		unhandled("b,x:(r) y:(rh),y1");
 		break;
 		}
-	case 2230: { // b,x:(r) y:(rh),a
+	case 2234: { // b,x:(r) y:(rh),a
 		unhandled("b,x:(r) y:(rh),a");
 		break;
 		}
-	case 2231: { // b,x:(r) y:(rh),b
+	case 2235: { // b,x:(r) y:(rh),b
 		unhandled("b,x:(r) y:(rh),b");
 		break;
 		}
-	case 2232: { // x0,x:(r)+n y0,y:(rh)+n
+	case 2236: { // x0,x:(r)+n y0,y:(rh)+n
 		unhandled("x0,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2233: { // x0,x:(r)+n y1,y:(rh)+n
+	case 2237: { // x0,x:(r)+n y1,y:(rh)+n
 		unhandled("x0,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2234: { // x0,x:(r)+n a,y:(rh)+n
+	case 2238: { // x0,x:(r)+n a,y:(rh)+n
 		unhandled("x0,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2235: { // x0,x:(r)+n b,y:(rh)+n
+	case 2239: { // x0,x:(r)+n b,y:(rh)+n
 		unhandled("x0,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2236: { // x1,x:(r)+n y0,y:(rh)+n
+	case 2240: { // x1,x:(r)+n y0,y:(rh)+n
 		unhandled("x1,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2237: { // x1,x:(r)+n y1,y:(rh)+n
+	case 2241: { // x1,x:(r)+n y1,y:(rh)+n
 		unhandled("x1,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2238: { // x1,x:(r)+n a,y:(rh)+n
+	case 2242: { // x1,x:(r)+n a,y:(rh)+n
 		unhandled("x1,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2239: { // x1,x:(r)+n b,y:(rh)+n
+	case 2243: { // x1,x:(r)+n b,y:(rh)+n
 		unhandled("x1,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2240: { // a,x:(r)+n y0,y:(rh)+n
+	case 2244: { // a,x:(r)+n y0,y:(rh)+n
 		unhandled("a,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2241: { // a,x:(r)+n y1,y:(rh)+n
+	case 2245: { // a,x:(r)+n y1,y:(rh)+n
 		unhandled("a,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2242: { // a,x:(r)+n a,y:(rh)+n
+	case 2246: { // a,x:(r)+n a,y:(rh)+n
 		unhandled("a,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2243: { // a,x:(r)+n b,y:(rh)+n
+	case 2247: { // a,x:(r)+n b,y:(rh)+n
 		unhandled("a,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2244: { // b,x:(r)+n y0,y:(rh)+n
+	case 2248: { // b,x:(r)+n y0,y:(rh)+n
 		unhandled("b,x:(r)+n y0,y:(rh)+n");
 		break;
 		}
-	case 2245: { // b,x:(r)+n y1,y:(rh)+n
+	case 2249: { // b,x:(r)+n y1,y:(rh)+n
 		unhandled("b,x:(r)+n y1,y:(rh)+n");
 		break;
 		}
-	case 2246: { // b,x:(r)+n a,y:(rh)+n
+	case 2250: { // b,x:(r)+n a,y:(rh)+n
 		unhandled("b,x:(r)+n a,y:(rh)+n");
 		break;
 		}
-	case 2247: { // b,x:(r)+n b,y:(rh)+n
+	case 2251: { // b,x:(r)+n b,y:(rh)+n
 		unhandled("b,x:(r)+n b,y:(rh)+n");
 		break;
 		}
-	case 2248: { // x0,x:(r)+n y0,y:(rh)-
+	case 2252: { // x0,x:(r)+n y0,y:(rh)-
 		unhandled("x0,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2249: { // x0,x:(r)+n y1,y:(rh)-
+	case 2253: { // x0,x:(r)+n y1,y:(rh)-
 		unhandled("x0,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2250: { // x0,x:(r)+n a,y:(rh)-
+	case 2254: { // x0,x:(r)+n a,y:(rh)-
 		unhandled("x0,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2251: { // x0,x:(r)+n b,y:(rh)-
+	case 2255: { // x0,x:(r)+n b,y:(rh)-
 		unhandled("x0,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2252: { // x1,x:(r)+n y0,y:(rh)-
+	case 2256: { // x1,x:(r)+n y0,y:(rh)-
 		unhandled("x1,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2253: { // x1,x:(r)+n y1,y:(rh)-
+	case 2257: { // x1,x:(r)+n y1,y:(rh)-
 		unhandled("x1,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2254: { // x1,x:(r)+n a,y:(rh)-
+	case 2258: { // x1,x:(r)+n a,y:(rh)-
 		unhandled("x1,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2255: { // x1,x:(r)+n b,y:(rh)-
+	case 2259: { // x1,x:(r)+n b,y:(rh)-
 		unhandled("x1,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2256: { // a,x:(r)+n y0,y:(rh)-
+	case 2260: { // a,x:(r)+n y0,y:(rh)-
 		unhandled("a,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2257: { // a,x:(r)+n y1,y:(rh)-
+	case 2261: { // a,x:(r)+n y1,y:(rh)-
 		unhandled("a,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2258: { // a,x:(r)+n a,y:(rh)-
+	case 2262: { // a,x:(r)+n a,y:(rh)-
 		unhandled("a,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2259: { // a,x:(r)+n b,y:(rh)-
+	case 2263: { // a,x:(r)+n b,y:(rh)-
 		unhandled("a,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2260: { // b,x:(r)+n y0,y:(rh)-
+	case 2264: { // b,x:(r)+n y0,y:(rh)-
 		unhandled("b,x:(r)+n y0,y:(rh)-");
 		break;
 		}
-	case 2261: { // b,x:(r)+n y1,y:(rh)-
+	case 2265: { // b,x:(r)+n y1,y:(rh)-
 		unhandled("b,x:(r)+n y1,y:(rh)-");
 		break;
 		}
-	case 2262: { // b,x:(r)+n a,y:(rh)-
+	case 2266: { // b,x:(r)+n a,y:(rh)-
 		unhandled("b,x:(r)+n a,y:(rh)-");
 		break;
 		}
-	case 2263: { // b,x:(r)+n b,y:(rh)-
+	case 2267: { // b,x:(r)+n b,y:(rh)-
 		unhandled("b,x:(r)+n b,y:(rh)-");
 		break;
 		}
-	case 2264: { // x0,x:(r)+n y0,y:(rh)+
+	case 2268: { // x0,x:(r)+n y0,y:(rh)+
 		unhandled("x0,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2265: { // x0,x:(r)+n y1,y:(rh)+
+	case 2269: { // x0,x:(r)+n y1,y:(rh)+
 		unhandled("x0,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2266: { // x0,x:(r)+n a,y:(rh)+
+	case 2270: { // x0,x:(r)+n a,y:(rh)+
 		unhandled("x0,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2267: { // x0,x:(r)+n b,y:(rh)+
+	case 2271: { // x0,x:(r)+n b,y:(rh)+
 		unhandled("x0,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2268: { // x1,x:(r)+n y0,y:(rh)+
+	case 2272: { // x1,x:(r)+n y0,y:(rh)+
 		unhandled("x1,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2269: { // x1,x:(r)+n y1,y:(rh)+
+	case 2273: { // x1,x:(r)+n y1,y:(rh)+
 		unhandled("x1,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2270: { // x1,x:(r)+n a,y:(rh)+
+	case 2274: { // x1,x:(r)+n a,y:(rh)+
 		unhandled("x1,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2271: { // x1,x:(r)+n b,y:(rh)+
+	case 2275: { // x1,x:(r)+n b,y:(rh)+
 		unhandled("x1,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2272: { // a,x:(r)+n y0,y:(rh)+
+	case 2276: { // a,x:(r)+n y0,y:(rh)+
 		unhandled("a,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2273: { // a,x:(r)+n y1,y:(rh)+
+	case 2277: { // a,x:(r)+n y1,y:(rh)+
 		unhandled("a,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2274: { // a,x:(r)+n a,y:(rh)+
+	case 2278: { // a,x:(r)+n a,y:(rh)+
 		unhandled("a,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2275: { // a,x:(r)+n b,y:(rh)+
+	case 2279: { // a,x:(r)+n b,y:(rh)+
 		unhandled("a,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2276: { // b,x:(r)+n y0,y:(rh)+
+	case 2280: { // b,x:(r)+n y0,y:(rh)+
 		unhandled("b,x:(r)+n y0,y:(rh)+");
 		break;
 		}
-	case 2277: { // b,x:(r)+n y1,y:(rh)+
+	case 2281: { // b,x:(r)+n y1,y:(rh)+
 		unhandled("b,x:(r)+n y1,y:(rh)+");
 		break;
 		}
-	case 2278: { // b,x:(r)+n a,y:(rh)+
+	case 2282: { // b,x:(r)+n a,y:(rh)+
 		unhandled("b,x:(r)+n a,y:(rh)+");
 		break;
 		}
-	case 2279: { // b,x:(r)+n b,y:(rh)+
+	case 2283: { // b,x:(r)+n b,y:(rh)+
 		unhandled("b,x:(r)+n b,y:(rh)+");
 		break;
 		}
-	case 2280: { // x0,x:(r)+n y0,y:(rh)
+	case 2284: { // x0,x:(r)+n y0,y:(rh)
 		unhandled("x0,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2281: { // x0,x:(r)+n y1,y:(rh)
+	case 2285: { // x0,x:(r)+n y1,y:(rh)
 		unhandled("x0,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2282: { // x0,x:(r)+n a,y:(rh)
+	case 2286: { // x0,x:(r)+n a,y:(rh)
 		unhandled("x0,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2283: { // x0,x:(r)+n b,y:(rh)
+	case 2287: { // x0,x:(r)+n b,y:(rh)
 		unhandled("x0,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2284: { // x1,x:(r)+n y0,y:(rh)
+	case 2288: { // x1,x:(r)+n y0,y:(rh)
 		unhandled("x1,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2285: { // x1,x:(r)+n y1,y:(rh)
+	case 2289: { // x1,x:(r)+n y1,y:(rh)
 		unhandled("x1,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2286: { // x1,x:(r)+n a,y:(rh)
+	case 2290: { // x1,x:(r)+n a,y:(rh)
 		unhandled("x1,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2287: { // x1,x:(r)+n b,y:(rh)
+	case 2291: { // x1,x:(r)+n b,y:(rh)
 		unhandled("x1,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2288: { // a,x:(r)+n y0,y:(rh)
+	case 2292: { // a,x:(r)+n y0,y:(rh)
 		unhandled("a,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2289: { // a,x:(r)+n y1,y:(rh)
+	case 2293: { // a,x:(r)+n y1,y:(rh)
 		unhandled("a,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2290: { // a,x:(r)+n a,y:(rh)
+	case 2294: { // a,x:(r)+n a,y:(rh)
 		unhandled("a,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2291: { // a,x:(r)+n b,y:(rh)
+	case 2295: { // a,x:(r)+n b,y:(rh)
 		unhandled("a,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2292: { // b,x:(r)+n y0,y:(rh)
+	case 2296: { // b,x:(r)+n y0,y:(rh)
 		unhandled("b,x:(r)+n y0,y:(rh)");
 		break;
 		}
-	case 2293: { // b,x:(r)+n y1,y:(rh)
+	case 2297: { // b,x:(r)+n y1,y:(rh)
 		unhandled("b,x:(r)+n y1,y:(rh)");
 		break;
 		}
-	case 2294: { // b,x:(r)+n a,y:(rh)
+	case 2298: { // b,x:(r)+n a,y:(rh)
 		unhandled("b,x:(r)+n a,y:(rh)");
 		break;
 		}
-	case 2295: { // b,x:(r)+n b,y:(rh)
+	case 2299: { // b,x:(r)+n b,y:(rh)
 		unhandled("b,x:(r)+n b,y:(rh)");
 		break;
 		}
-	case 2296: { // x0,x:(r)- y0,y:(rh)+n
+	case 2300: { // x0,x:(r)- y0,y:(rh)+n
 		unhandled("x0,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2297: { // x0,x:(r)- y1,y:(rh)+n
+	case 2301: { // x0,x:(r)- y1,y:(rh)+n
 		unhandled("x0,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2298: { // x0,x:(r)- a,y:(rh)+n
+	case 2302: { // x0,x:(r)- a,y:(rh)+n
 		unhandled("x0,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2299: { // x0,x:(r)- b,y:(rh)+n
+	case 2303: { // x0,x:(r)- b,y:(rh)+n
 		unhandled("x0,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2300: { // x1,x:(r)- y0,y:(rh)+n
+	case 2304: { // x1,x:(r)- y0,y:(rh)+n
 		unhandled("x1,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2301: { // x1,x:(r)- y1,y:(rh)+n
+	case 2305: { // x1,x:(r)- y1,y:(rh)+n
 		unhandled("x1,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2302: { // x1,x:(r)- a,y:(rh)+n
+	case 2306: { // x1,x:(r)- a,y:(rh)+n
 		unhandled("x1,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2303: { // x1,x:(r)- b,y:(rh)+n
+	case 2307: { // x1,x:(r)- b,y:(rh)+n
 		unhandled("x1,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2304: { // a,x:(r)- y0,y:(rh)+n
+	case 2308: { // a,x:(r)- y0,y:(rh)+n
 		unhandled("a,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2305: { // a,x:(r)- y1,y:(rh)+n
+	case 2309: { // a,x:(r)- y1,y:(rh)+n
 		unhandled("a,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2306: { // a,x:(r)- a,y:(rh)+n
+	case 2310: { // a,x:(r)- a,y:(rh)+n
 		unhandled("a,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2307: { // a,x:(r)- b,y:(rh)+n
+	case 2311: { // a,x:(r)- b,y:(rh)+n
 		unhandled("a,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2308: { // b,x:(r)- y0,y:(rh)+n
+	case 2312: { // b,x:(r)- y0,y:(rh)+n
 		unhandled("b,x:(r)- y0,y:(rh)+n");
 		break;
 		}
-	case 2309: { // b,x:(r)- y1,y:(rh)+n
+	case 2313: { // b,x:(r)- y1,y:(rh)+n
 		unhandled("b,x:(r)- y1,y:(rh)+n");
 		break;
 		}
-	case 2310: { // b,x:(r)- a,y:(rh)+n
+	case 2314: { // b,x:(r)- a,y:(rh)+n
 		unhandled("b,x:(r)- a,y:(rh)+n");
 		break;
 		}
-	case 2311: { // b,x:(r)- b,y:(rh)+n
+	case 2315: { // b,x:(r)- b,y:(rh)+n
 		unhandled("b,x:(r)- b,y:(rh)+n");
 		break;
 		}
-	case 2312: { // x0,x:(r)- y0,y:(rh)-
+	case 2316: { // x0,x:(r)- y0,y:(rh)-
 		unhandled("x0,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2313: { // x0,x:(r)- y1,y:(rh)-
+	case 2317: { // x0,x:(r)- y1,y:(rh)-
 		unhandled("x0,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2314: { // x0,x:(r)- a,y:(rh)-
+	case 2318: { // x0,x:(r)- a,y:(rh)-
 		unhandled("x0,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2315: { // x0,x:(r)- b,y:(rh)-
+	case 2319: { // x0,x:(r)- b,y:(rh)-
 		unhandled("x0,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2316: { // x1,x:(r)- y0,y:(rh)-
+	case 2320: { // x1,x:(r)- y0,y:(rh)-
 		unhandled("x1,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2317: { // x1,x:(r)- y1,y:(rh)-
+	case 2321: { // x1,x:(r)- y1,y:(rh)-
 		unhandled("x1,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2318: { // x1,x:(r)- a,y:(rh)-
+	case 2322: { // x1,x:(r)- a,y:(rh)-
 		unhandled("x1,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2319: { // x1,x:(r)- b,y:(rh)-
+	case 2323: { // x1,x:(r)- b,y:(rh)-
 		unhandled("x1,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2320: { // a,x:(r)- y0,y:(rh)-
+	case 2324: { // a,x:(r)- y0,y:(rh)-
 		unhandled("a,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2321: { // a,x:(r)- y1,y:(rh)-
+	case 2325: { // a,x:(r)- y1,y:(rh)-
 		unhandled("a,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2322: { // a,x:(r)- a,y:(rh)-
+	case 2326: { // a,x:(r)- a,y:(rh)-
 		unhandled("a,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2323: { // a,x:(r)- b,y:(rh)-
+	case 2327: { // a,x:(r)- b,y:(rh)-
 		unhandled("a,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2324: { // b,x:(r)- y0,y:(rh)-
+	case 2328: { // b,x:(r)- y0,y:(rh)-
 		unhandled("b,x:(r)- y0,y:(rh)-");
 		break;
 		}
-	case 2325: { // b,x:(r)- y1,y:(rh)-
+	case 2329: { // b,x:(r)- y1,y:(rh)-
 		unhandled("b,x:(r)- y1,y:(rh)-");
 		break;
 		}
-	case 2326: { // b,x:(r)- a,y:(rh)-
+	case 2330: { // b,x:(r)- a,y:(rh)-
 		unhandled("b,x:(r)- a,y:(rh)-");
 		break;
 		}
-	case 2327: { // b,x:(r)- b,y:(rh)-
+	case 2331: { // b,x:(r)- b,y:(rh)-
 		unhandled("b,x:(r)- b,y:(rh)-");
 		break;
 		}
-	case 2328: { // x0,x:(r)- y0,y:(rh)+
+	case 2332: { // x0,x:(r)- y0,y:(rh)+
 		unhandled("x0,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2329: { // x0,x:(r)- y1,y:(rh)+
+	case 2333: { // x0,x:(r)- y1,y:(rh)+
 		unhandled("x0,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2330: { // x0,x:(r)- a,y:(rh)+
+	case 2334: { // x0,x:(r)- a,y:(rh)+
 		unhandled("x0,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2331: { // x0,x:(r)- b,y:(rh)+
+	case 2335: { // x0,x:(r)- b,y:(rh)+
 		unhandled("x0,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2332: { // x1,x:(r)- y0,y:(rh)+
+	case 2336: { // x1,x:(r)- y0,y:(rh)+
 		unhandled("x1,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2333: { // x1,x:(r)- y1,y:(rh)+
+	case 2337: { // x1,x:(r)- y1,y:(rh)+
 		unhandled("x1,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2334: { // x1,x:(r)- a,y:(rh)+
+	case 2338: { // x1,x:(r)- a,y:(rh)+
 		unhandled("x1,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2335: { // x1,x:(r)- b,y:(rh)+
+	case 2339: { // x1,x:(r)- b,y:(rh)+
 		unhandled("x1,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2336: { // a,x:(r)- y0,y:(rh)+
+	case 2340: { // a,x:(r)- y0,y:(rh)+
 		unhandled("a,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2337: { // a,x:(r)- y1,y:(rh)+
+	case 2341: { // a,x:(r)- y1,y:(rh)+
 		unhandled("a,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2338: { // a,x:(r)- a,y:(rh)+
+	case 2342: { // a,x:(r)- a,y:(rh)+
 		unhandled("a,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2339: { // a,x:(r)- b,y:(rh)+
+	case 2343: { // a,x:(r)- b,y:(rh)+
 		unhandled("a,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2340: { // b,x:(r)- y0,y:(rh)+
+	case 2344: { // b,x:(r)- y0,y:(rh)+
 		unhandled("b,x:(r)- y0,y:(rh)+");
 		break;
 		}
-	case 2341: { // b,x:(r)- y1,y:(rh)+
+	case 2345: { // b,x:(r)- y1,y:(rh)+
 		unhandled("b,x:(r)- y1,y:(rh)+");
 		break;
 		}
-	case 2342: { // b,x:(r)- a,y:(rh)+
+	case 2346: { // b,x:(r)- a,y:(rh)+
 		unhandled("b,x:(r)- a,y:(rh)+");
 		break;
 		}
-	case 2343: { // b,x:(r)- b,y:(rh)+
+	case 2347: { // b,x:(r)- b,y:(rh)+
 		unhandled("b,x:(r)- b,y:(rh)+");
 		break;
 		}
-	case 2344: { // x0,x:(r)- y0,y:(rh)
+	case 2348: { // x0,x:(r)- y0,y:(rh)
 		unhandled("x0,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2345: { // x0,x:(r)- y1,y:(rh)
+	case 2349: { // x0,x:(r)- y1,y:(rh)
 		unhandled("x0,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2346: { // x0,x:(r)- a,y:(rh)
+	case 2350: { // x0,x:(r)- a,y:(rh)
 		unhandled("x0,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2347: { // x0,x:(r)- b,y:(rh)
+	case 2351: { // x0,x:(r)- b,y:(rh)
 		unhandled("x0,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2348: { // x1,x:(r)- y0,y:(rh)
+	case 2352: { // x1,x:(r)- y0,y:(rh)
 		unhandled("x1,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2349: { // x1,x:(r)- y1,y:(rh)
+	case 2353: { // x1,x:(r)- y1,y:(rh)
 		unhandled("x1,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2350: { // x1,x:(r)- a,y:(rh)
+	case 2354: { // x1,x:(r)- a,y:(rh)
 		unhandled("x1,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2351: { // x1,x:(r)- b,y:(rh)
+	case 2355: { // x1,x:(r)- b,y:(rh)
 		unhandled("x1,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2352: { // a,x:(r)- y0,y:(rh)
+	case 2356: { // a,x:(r)- y0,y:(rh)
 		unhandled("a,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2353: { // a,x:(r)- y1,y:(rh)
+	case 2357: { // a,x:(r)- y1,y:(rh)
 		unhandled("a,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2354: { // a,x:(r)- a,y:(rh)
+	case 2358: { // a,x:(r)- a,y:(rh)
 		unhandled("a,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2355: { // a,x:(r)- b,y:(rh)
+	case 2359: { // a,x:(r)- b,y:(rh)
 		unhandled("a,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2356: { // b,x:(r)- y0,y:(rh)
+	case 2360: { // b,x:(r)- y0,y:(rh)
 		unhandled("b,x:(r)- y0,y:(rh)");
 		break;
 		}
-	case 2357: { // b,x:(r)- y1,y:(rh)
+	case 2361: { // b,x:(r)- y1,y:(rh)
 		unhandled("b,x:(r)- y1,y:(rh)");
 		break;
 		}
-	case 2358: { // b,x:(r)- a,y:(rh)
+	case 2362: { // b,x:(r)- a,y:(rh)
 		unhandled("b,x:(r)- a,y:(rh)");
 		break;
 		}
-	case 2359: { // b,x:(r)- b,y:(rh)
+	case 2363: { // b,x:(r)- b,y:(rh)
 		unhandled("b,x:(r)- b,y:(rh)");
 		break;
 		}
-	case 2360: { // x0,x:(r)+ y0,y:(rh)+n
+	case 2364: { // x0,x:(r)+ y0,y:(rh)+n
 		unhandled("x0,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2361: { // x0,x:(r)+ y1,y:(rh)+n
+	case 2365: { // x0,x:(r)+ y1,y:(rh)+n
 		unhandled("x0,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2362: { // x0,x:(r)+ a,y:(rh)+n
+	case 2366: { // x0,x:(r)+ a,y:(rh)+n
 		unhandled("x0,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2363: { // x0,x:(r)+ b,y:(rh)+n
+	case 2367: { // x0,x:(r)+ b,y:(rh)+n
 		unhandled("x0,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2364: { // x1,x:(r)+ y0,y:(rh)+n
+	case 2368: { // x1,x:(r)+ y0,y:(rh)+n
 		unhandled("x1,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2365: { // x1,x:(r)+ y1,y:(rh)+n
+	case 2369: { // x1,x:(r)+ y1,y:(rh)+n
 		unhandled("x1,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2366: { // x1,x:(r)+ a,y:(rh)+n
+	case 2370: { // x1,x:(r)+ a,y:(rh)+n
 		unhandled("x1,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2367: { // x1,x:(r)+ b,y:(rh)+n
+	case 2371: { // x1,x:(r)+ b,y:(rh)+n
 		unhandled("x1,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2368: { // a,x:(r)+ y0,y:(rh)+n
+	case 2372: { // a,x:(r)+ y0,y:(rh)+n
 		unhandled("a,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2369: { // a,x:(r)+ y1,y:(rh)+n
+	case 2373: { // a,x:(r)+ y1,y:(rh)+n
 		unhandled("a,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2370: { // a,x:(r)+ a,y:(rh)+n
+	case 2374: { // a,x:(r)+ a,y:(rh)+n
 		unhandled("a,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2371: { // a,x:(r)+ b,y:(rh)+n
+	case 2375: { // a,x:(r)+ b,y:(rh)+n
 		unhandled("a,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2372: { // b,x:(r)+ y0,y:(rh)+n
+	case 2376: { // b,x:(r)+ y0,y:(rh)+n
 		unhandled("b,x:(r)+ y0,y:(rh)+n");
 		break;
 		}
-	case 2373: { // b,x:(r)+ y1,y:(rh)+n
+	case 2377: { // b,x:(r)+ y1,y:(rh)+n
 		unhandled("b,x:(r)+ y1,y:(rh)+n");
 		break;
 		}
-	case 2374: { // b,x:(r)+ a,y:(rh)+n
+	case 2378: { // b,x:(r)+ a,y:(rh)+n
 		unhandled("b,x:(r)+ a,y:(rh)+n");
 		break;
 		}
-	case 2375: { // b,x:(r)+ b,y:(rh)+n
+	case 2379: { // b,x:(r)+ b,y:(rh)+n
 		unhandled("b,x:(r)+ b,y:(rh)+n");
 		break;
 		}
-	case 2376: { // x0,x:(r)+ y0,y:(rh)-
+	case 2380: { // x0,x:(r)+ y0,y:(rh)-
 		unhandled("x0,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2377: { // x0,x:(r)+ y1,y:(rh)-
+	case 2381: { // x0,x:(r)+ y1,y:(rh)-
 		unhandled("x0,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2378: { // x0,x:(r)+ a,y:(rh)-
+	case 2382: { // x0,x:(r)+ a,y:(rh)-
 		unhandled("x0,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2379: { // x0,x:(r)+ b,y:(rh)-
+	case 2383: { // x0,x:(r)+ b,y:(rh)-
 		unhandled("x0,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2380: { // x1,x:(r)+ y0,y:(rh)-
+	case 2384: { // x1,x:(r)+ y0,y:(rh)-
 		unhandled("x1,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2381: { // x1,x:(r)+ y1,y:(rh)-
+	case 2385: { // x1,x:(r)+ y1,y:(rh)-
 		unhandled("x1,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2382: { // x1,x:(r)+ a,y:(rh)-
+	case 2386: { // x1,x:(r)+ a,y:(rh)-
 		unhandled("x1,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2383: { // x1,x:(r)+ b,y:(rh)-
+	case 2387: { // x1,x:(r)+ b,y:(rh)-
 		unhandled("x1,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2384: { // a,x:(r)+ y0,y:(rh)-
+	case 2388: { // a,x:(r)+ y0,y:(rh)-
 		unhandled("a,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2385: { // a,x:(r)+ y1,y:(rh)-
+	case 2389: { // a,x:(r)+ y1,y:(rh)-
 		unhandled("a,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2386: { // a,x:(r)+ a,y:(rh)-
+	case 2390: { // a,x:(r)+ a,y:(rh)-
 		unhandled("a,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2387: { // a,x:(r)+ b,y:(rh)-
+	case 2391: { // a,x:(r)+ b,y:(rh)-
 		unhandled("a,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2388: { // b,x:(r)+ y0,y:(rh)-
+	case 2392: { // b,x:(r)+ y0,y:(rh)-
 		unhandled("b,x:(r)+ y0,y:(rh)-");
 		break;
 		}
-	case 2389: { // b,x:(r)+ y1,y:(rh)-
+	case 2393: { // b,x:(r)+ y1,y:(rh)-
 		unhandled("b,x:(r)+ y1,y:(rh)-");
 		break;
 		}
-	case 2390: { // b,x:(r)+ a,y:(rh)-
+	case 2394: { // b,x:(r)+ a,y:(rh)-
 		unhandled("b,x:(r)+ a,y:(rh)-");
 		break;
 		}
-	case 2391: { // b,x:(r)+ b,y:(rh)-
+	case 2395: { // b,x:(r)+ b,y:(rh)-
 		unhandled("b,x:(r)+ b,y:(rh)-");
 		break;
 		}
-	case 2392: { // x0,x:(r)+ y0,y:(rh)+
+	case 2396: { // x0,x:(r)+ y0,y:(rh)+
 		unhandled("x0,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2393: { // x0,x:(r)+ y1,y:(rh)+
+	case 2397: { // x0,x:(r)+ y1,y:(rh)+
 		unhandled("x0,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2394: { // x0,x:(r)+ a,y:(rh)+
+	case 2398: { // x0,x:(r)+ a,y:(rh)+
 		unhandled("x0,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2395: { // x0,x:(r)+ b,y:(rh)+
+	case 2399: { // x0,x:(r)+ b,y:(rh)+
 		unhandled("x0,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2396: { // x1,x:(r)+ y0,y:(rh)+
+	case 2400: { // x1,x:(r)+ y0,y:(rh)+
 		unhandled("x1,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2397: { // x1,x:(r)+ y1,y:(rh)+
+	case 2401: { // x1,x:(r)+ y1,y:(rh)+
 		unhandled("x1,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2398: { // x1,x:(r)+ a,y:(rh)+
+	case 2402: { // x1,x:(r)+ a,y:(rh)+
 		unhandled("x1,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2399: { // x1,x:(r)+ b,y:(rh)+
+	case 2403: { // x1,x:(r)+ b,y:(rh)+
 		unhandled("x1,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2400: { // a,x:(r)+ y0,y:(rh)+
+	case 2404: { // a,x:(r)+ y0,y:(rh)+
 		unhandled("a,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2401: { // a,x:(r)+ y1,y:(rh)+
+	case 2405: { // a,x:(r)+ y1,y:(rh)+
 		unhandled("a,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2402: { // a,x:(r)+ a,y:(rh)+
+	case 2406: { // a,x:(r)+ a,y:(rh)+
 		unhandled("a,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2403: { // a,x:(r)+ b,y:(rh)+
+	case 2407: { // a,x:(r)+ b,y:(rh)+
 		unhandled("a,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2404: { // b,x:(r)+ y0,y:(rh)+
+	case 2408: { // b,x:(r)+ y0,y:(rh)+
 		unhandled("b,x:(r)+ y0,y:(rh)+");
 		break;
 		}
-	case 2405: { // b,x:(r)+ y1,y:(rh)+
+	case 2409: { // b,x:(r)+ y1,y:(rh)+
 		unhandled("b,x:(r)+ y1,y:(rh)+");
 		break;
 		}
-	case 2406: { // b,x:(r)+ a,y:(rh)+
+	case 2410: { // b,x:(r)+ a,y:(rh)+
 		unhandled("b,x:(r)+ a,y:(rh)+");
 		break;
 		}
-	case 2407: { // b,x:(r)+ b,y:(rh)+
+	case 2411: { // b,x:(r)+ b,y:(rh)+
 		unhandled("b,x:(r)+ b,y:(rh)+");
 		break;
 		}
-	case 2408: { // x0,x:(r)+ y0,y:(rh)
+	case 2412: { // x0,x:(r)+ y0,y:(rh)
 		unhandled("x0,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2409: { // x0,x:(r)+ y1,y:(rh)
+	case 2413: { // x0,x:(r)+ y1,y:(rh)
 		unhandled("x0,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2410: { // x0,x:(r)+ a,y:(rh)
+	case 2414: { // x0,x:(r)+ a,y:(rh)
 		unhandled("x0,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2411: { // x0,x:(r)+ b,y:(rh)
+	case 2415: { // x0,x:(r)+ b,y:(rh)
 		unhandled("x0,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2412: { // x1,x:(r)+ y0,y:(rh)
+	case 2416: { // x1,x:(r)+ y0,y:(rh)
 		unhandled("x1,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2413: { // x1,x:(r)+ y1,y:(rh)
+	case 2417: { // x1,x:(r)+ y1,y:(rh)
 		unhandled("x1,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2414: { // x1,x:(r)+ a,y:(rh)
+	case 2418: { // x1,x:(r)+ a,y:(rh)
 		unhandled("x1,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2415: { // x1,x:(r)+ b,y:(rh)
+	case 2419: { // x1,x:(r)+ b,y:(rh)
 		unhandled("x1,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2416: { // a,x:(r)+ y0,y:(rh)
+	case 2420: { // a,x:(r)+ y0,y:(rh)
 		unhandled("a,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2417: { // a,x:(r)+ y1,y:(rh)
+	case 2421: { // a,x:(r)+ y1,y:(rh)
 		unhandled("a,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2418: { // a,x:(r)+ a,y:(rh)
+	case 2422: { // a,x:(r)+ a,y:(rh)
 		unhandled("a,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2419: { // a,x:(r)+ b,y:(rh)
+	case 2423: { // a,x:(r)+ b,y:(rh)
 		unhandled("a,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2420: { // b,x:(r)+ y0,y:(rh)
+	case 2424: { // b,x:(r)+ y0,y:(rh)
 		unhandled("b,x:(r)+ y0,y:(rh)");
 		break;
 		}
-	case 2421: { // b,x:(r)+ y1,y:(rh)
+	case 2425: { // b,x:(r)+ y1,y:(rh)
 		unhandled("b,x:(r)+ y1,y:(rh)");
 		break;
 		}
-	case 2422: { // b,x:(r)+ a,y:(rh)
+	case 2426: { // b,x:(r)+ a,y:(rh)
 		unhandled("b,x:(r)+ a,y:(rh)");
 		break;
 		}
-	case 2423: { // b,x:(r)+ b,y:(rh)
+	case 2427: { // b,x:(r)+ b,y:(rh)
 		unhandled("b,x:(r)+ b,y:(rh)");
 		break;
 		}
-	case 2424: { // x0,x:(r) y0,y:(rh)+n
+	case 2428: { // x0,x:(r) y0,y:(rh)+n
 		unhandled("x0,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2425: { // x0,x:(r) y1,y:(rh)+n
+	case 2429: { // x0,x:(r) y1,y:(rh)+n
 		unhandled("x0,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2426: { // x0,x:(r) a,y:(rh)+n
+	case 2430: { // x0,x:(r) a,y:(rh)+n
 		unhandled("x0,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2427: { // x0,x:(r) b,y:(rh)+n
+	case 2431: { // x0,x:(r) b,y:(rh)+n
 		unhandled("x0,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2428: { // x1,x:(r) y0,y:(rh)+n
+	case 2432: { // x1,x:(r) y0,y:(rh)+n
 		unhandled("x1,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2429: { // x1,x:(r) y1,y:(rh)+n
+	case 2433: { // x1,x:(r) y1,y:(rh)+n
 		unhandled("x1,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2430: { // x1,x:(r) a,y:(rh)+n
+	case 2434: { // x1,x:(r) a,y:(rh)+n
 		unhandled("x1,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2431: { // x1,x:(r) b,y:(rh)+n
+	case 2435: { // x1,x:(r) b,y:(rh)+n
 		unhandled("x1,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2432: { // a,x:(r) y0,y:(rh)+n
+	case 2436: { // a,x:(r) y0,y:(rh)+n
 		unhandled("a,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2433: { // a,x:(r) y1,y:(rh)+n
+	case 2437: { // a,x:(r) y1,y:(rh)+n
 		unhandled("a,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2434: { // a,x:(r) a,y:(rh)+n
+	case 2438: { // a,x:(r) a,y:(rh)+n
 		unhandled("a,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2435: { // a,x:(r) b,y:(rh)+n
+	case 2439: { // a,x:(r) b,y:(rh)+n
 		unhandled("a,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2436: { // b,x:(r) y0,y:(rh)+n
+	case 2440: { // b,x:(r) y0,y:(rh)+n
 		unhandled("b,x:(r) y0,y:(rh)+n");
 		break;
 		}
-	case 2437: { // b,x:(r) y1,y:(rh)+n
+	case 2441: { // b,x:(r) y1,y:(rh)+n
 		unhandled("b,x:(r) y1,y:(rh)+n");
 		break;
 		}
-	case 2438: { // b,x:(r) a,y:(rh)+n
+	case 2442: { // b,x:(r) a,y:(rh)+n
 		unhandled("b,x:(r) a,y:(rh)+n");
 		break;
 		}
-	case 2439: { // b,x:(r) b,y:(rh)+n
+	case 2443: { // b,x:(r) b,y:(rh)+n
 		unhandled("b,x:(r) b,y:(rh)+n");
 		break;
 		}
-	case 2440: { // x0,x:(r) y0,y:(rh)-
+	case 2444: { // x0,x:(r) y0,y:(rh)-
 		unhandled("x0,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2441: { // x0,x:(r) y1,y:(rh)-
+	case 2445: { // x0,x:(r) y1,y:(rh)-
 		unhandled("x0,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2442: { // x0,x:(r) a,y:(rh)-
+	case 2446: { // x0,x:(r) a,y:(rh)-
 		unhandled("x0,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2443: { // x0,x:(r) b,y:(rh)-
+	case 2447: { // x0,x:(r) b,y:(rh)-
 		unhandled("x0,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2444: { // x1,x:(r) y0,y:(rh)-
+	case 2448: { // x1,x:(r) y0,y:(rh)-
 		unhandled("x1,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2445: { // x1,x:(r) y1,y:(rh)-
+	case 2449: { // x1,x:(r) y1,y:(rh)-
 		unhandled("x1,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2446: { // x1,x:(r) a,y:(rh)-
+	case 2450: { // x1,x:(r) a,y:(rh)-
 		unhandled("x1,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2447: { // x1,x:(r) b,y:(rh)-
+	case 2451: { // x1,x:(r) b,y:(rh)-
 		unhandled("x1,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2448: { // a,x:(r) y0,y:(rh)-
+	case 2452: { // a,x:(r) y0,y:(rh)-
 		unhandled("a,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2449: { // a,x:(r) y1,y:(rh)-
+	case 2453: { // a,x:(r) y1,y:(rh)-
 		unhandled("a,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2450: { // a,x:(r) a,y:(rh)-
+	case 2454: { // a,x:(r) a,y:(rh)-
 		unhandled("a,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2451: { // a,x:(r) b,y:(rh)-
+	case 2455: { // a,x:(r) b,y:(rh)-
 		unhandled("a,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2452: { // b,x:(r) y0,y:(rh)-
+	case 2456: { // b,x:(r) y0,y:(rh)-
 		unhandled("b,x:(r) y0,y:(rh)-");
 		break;
 		}
-	case 2453: { // b,x:(r) y1,y:(rh)-
+	case 2457: { // b,x:(r) y1,y:(rh)-
 		unhandled("b,x:(r) y1,y:(rh)-");
 		break;
 		}
-	case 2454: { // b,x:(r) a,y:(rh)-
+	case 2458: { // b,x:(r) a,y:(rh)-
 		unhandled("b,x:(r) a,y:(rh)-");
 		break;
 		}
-	case 2455: { // b,x:(r) b,y:(rh)-
+	case 2459: { // b,x:(r) b,y:(rh)-
 		unhandled("b,x:(r) b,y:(rh)-");
 		break;
 		}
-	case 2456: { // x0,x:(r) y0,y:(rh)+
+	case 2460: { // x0,x:(r) y0,y:(rh)+
 		unhandled("x0,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2457: { // x0,x:(r) y1,y:(rh)+
+	case 2461: { // x0,x:(r) y1,y:(rh)+
 		unhandled("x0,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2458: { // x0,x:(r) a,y:(rh)+
+	case 2462: { // x0,x:(r) a,y:(rh)+
 		unhandled("x0,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2459: { // x0,x:(r) b,y:(rh)+
+	case 2463: { // x0,x:(r) b,y:(rh)+
 		unhandled("x0,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2460: { // x1,x:(r) y0,y:(rh)+
+	case 2464: { // x1,x:(r) y0,y:(rh)+
 		unhandled("x1,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2461: { // x1,x:(r) y1,y:(rh)+
+	case 2465: { // x1,x:(r) y1,y:(rh)+
 		unhandled("x1,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2462: { // x1,x:(r) a,y:(rh)+
+	case 2466: { // x1,x:(r) a,y:(rh)+
 		unhandled("x1,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2463: { // x1,x:(r) b,y:(rh)+
+	case 2467: { // x1,x:(r) b,y:(rh)+
 		unhandled("x1,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2464: { // a,x:(r) y0,y:(rh)+
+	case 2468: { // a,x:(r) y0,y:(rh)+
 		unhandled("a,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2465: { // a,x:(r) y1,y:(rh)+
+	case 2469: { // a,x:(r) y1,y:(rh)+
 		unhandled("a,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2466: { // a,x:(r) a,y:(rh)+
+	case 2470: { // a,x:(r) a,y:(rh)+
 		unhandled("a,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2467: { // a,x:(r) b,y:(rh)+
+	case 2471: { // a,x:(r) b,y:(rh)+
 		unhandled("a,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2468: { // b,x:(r) y0,y:(rh)+
+	case 2472: { // b,x:(r) y0,y:(rh)+
 		unhandled("b,x:(r) y0,y:(rh)+");
 		break;
 		}
-	case 2469: { // b,x:(r) y1,y:(rh)+
+	case 2473: { // b,x:(r) y1,y:(rh)+
 		unhandled("b,x:(r) y1,y:(rh)+");
 		break;
 		}
-	case 2470: { // b,x:(r) a,y:(rh)+
+	case 2474: { // b,x:(r) a,y:(rh)+
 		unhandled("b,x:(r) a,y:(rh)+");
 		break;
 		}
-	case 2471: { // b,x:(r) b,y:(rh)+
+	case 2475: { // b,x:(r) b,y:(rh)+
 		unhandled("b,x:(r) b,y:(rh)+");
 		break;
 		}
-	case 2472: { // x0,x:(r) y0,y:(rh)
+	case 2476: { // x0,x:(r) y0,y:(rh)
 		unhandled("x0,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2473: { // x0,x:(r) y1,y:(rh)
+	case 2477: { // x0,x:(r) y1,y:(rh)
 		unhandled("x0,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2474: { // x0,x:(r) a,y:(rh)
+	case 2478: { // x0,x:(r) a,y:(rh)
 		unhandled("x0,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2475: { // x0,x:(r) b,y:(rh)
+	case 2479: { // x0,x:(r) b,y:(rh)
 		unhandled("x0,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2476: { // x1,x:(r) y0,y:(rh)
+	case 2480: { // x1,x:(r) y0,y:(rh)
 		unhandled("x1,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2477: { // x1,x:(r) y1,y:(rh)
+	case 2481: { // x1,x:(r) y1,y:(rh)
 		unhandled("x1,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2478: { // x1,x:(r) a,y:(rh)
+	case 2482: { // x1,x:(r) a,y:(rh)
 		unhandled("x1,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2479: { // x1,x:(r) b,y:(rh)
+	case 2483: { // x1,x:(r) b,y:(rh)
 		unhandled("x1,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2480: { // a,x:(r) y0,y:(rh)
+	case 2484: { // a,x:(r) y0,y:(rh)
 		unhandled("a,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2481: { // a,x:(r) y1,y:(rh)
+	case 2485: { // a,x:(r) y1,y:(rh)
 		unhandled("a,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2482: { // a,x:(r) a,y:(rh)
+	case 2486: { // a,x:(r) a,y:(rh)
 		unhandled("a,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2483: { // a,x:(r) b,y:(rh)
+	case 2487: { // a,x:(r) b,y:(rh)
 		unhandled("a,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2484: { // b,x:(r) y0,y:(rh)
+	case 2488: { // b,x:(r) y0,y:(rh)
 		unhandled("b,x:(r) y0,y:(rh)");
 		break;
 		}
-	case 2485: { // b,x:(r) y1,y:(rh)
+	case 2489: { // b,x:(r) y1,y:(rh)
 		unhandled("b,x:(r) y1,y:(rh)");
 		break;
 		}
-	case 2486: { // b,x:(r) a,y:(rh)
+	case 2490: { // b,x:(r) a,y:(rh)
 		unhandled("b,x:(r) a,y:(rh)");
 		break;
 		}
-	case 2487: { // b,x:(r) b,y:(rh)
+	case 2491: { // b,x:(r) b,y:(rh)
 		unhandled("b,x:(r) b,y:(rh)");
 		break;
 		}
-	case 2488: { // ifcc
+	case 2492: { // ifcc
 		unhandled("ifcc");
 		break;
 		}
-	case 2489: { // ifge
+	case 2493: { // ifge
 		unhandled("ifge");
 		break;
 		}
-	case 2490: { // ifne
+	case 2494: { // ifne
 		unhandled("ifne");
 		break;
 		}
-	case 2491: { // ifpl
+	case 2495: { // ifpl
 		unhandled("ifpl");
 		break;
 		}
-	case 2492: { // ifnn
+	case 2496: { // ifnn
 		unhandled("ifnn");
 		break;
 		}
-	case 2493: { // ifec
+	case 2497: { // ifec
 		unhandled("ifec");
 		break;
 		}
-	case 2494: { // iflc
+	case 2498: { // iflc
 		unhandled("iflc");
 		break;
 		}
-	case 2495: { // ifgt
+	case 2499: { // ifgt
 		unhandled("ifgt");
 		break;
 		}
-	case 2496: { // ifcs
+	case 2500: { // ifcs
 		unhandled("ifcs");
 		break;
 		}
-	case 2497: { // iflt
+	case 2501: { // iflt
 		unhandled("iflt");
 		break;
 		}
-	case 2498: { // ifeq
+	case 2502: { // ifeq
 		unhandled("ifeq");
 		break;
 		}
-	case 2499: { // ifmi
+	case 2503: { // ifmi
 		unhandled("ifmi");
 		break;
 		}
-	case 2500: { // ifnr
+	case 2504: { // ifnr
 		unhandled("ifnr");
 		break;
 		}
-	case 2501: { // ifes
+	case 2505: { // ifes
 		unhandled("ifes");
 		break;
 		}
-	case 2502: { // ifls
+	case 2506: { // ifls
 		unhandled("ifls");
 		break;
 		}
-	case 2503: { // ifle
+	case 2507: { // ifle
 		unhandled("ifle");
 		break;
 		}
-	case 2504: { // ifcc.u
+	case 2508: { // ifcc.u
 		unhandled("ifcc.u");
 		break;
 		}
-	case 2505: { // ifge.u
+	case 2509: { // ifge.u
 		unhandled("ifge.u");
 		break;
 		}
-	case 2506: { // ifne.u
+	case 2510: { // ifne.u
 		unhandled("ifne.u");
 		break;
 		}
-	case 2507: { // ifpl.u
+	case 2511: { // ifpl.u
 		unhandled("ifpl.u");
 		break;
 		}
-	case 2508: { // ifnn.u
+	case 2512: { // ifnn.u
 		unhandled("ifnn.u");
 		break;
 		}
-	case 2509: { // ifec.u
+	case 2513: { // ifec.u
 		unhandled("ifec.u");
 		break;
 		}
-	case 2510: { // iflc.u
+	case 2514: { // iflc.u
 		unhandled("iflc.u");
 		break;
 		}
-	case 2511: { // ifgt.u
+	case 2515: { // ifgt.u
 		unhandled("ifgt.u");
 		break;
 		}
-	case 2512: { // ifcs.u
+	case 2516: { // ifcs.u
 		unhandled("ifcs.u");
 		break;
 		}
-	case 2513: { // iflt.u
+	case 2517: { // iflt.u
 		unhandled("iflt.u");
 		break;
 		}
-	case 2514: { // ifeq.u
+	case 2518: { // ifeq.u
 		unhandled("ifeq.u");
 		break;
 		}
-	case 2515: { // ifmi.u
+	case 2519: { // ifmi.u
 		unhandled("ifmi.u");
 		break;
 		}
-	case 2516: { // ifnr.u
+	case 2520: { // ifnr.u
 		unhandled("ifnr.u");
 		break;
 		}
-	case 2517: { // ifes.u
+	case 2521: { // ifes.u
 		unhandled("ifes.u");
 		break;
 		}
-	case 2518: { // ifls.u
+	case 2522: { // ifls.u
 		unhandled("ifls.u");
 		break;
 		}
-	case 2519: { // ifle.u
+	case 2523: { // ifle.u
 		unhandled("ifle.u");
 		break;
 		}
@@ -22656,19 +26806,55 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 158: { // and #[i],a
-		unhandled("and #[i],a");
+		u32 d_1 = get_a1();
+		u32 i = BIT(opcode, 8, 6);
+		u64 r = d_1 & i;
+		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+		if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+		} else if(BIT(m_ccr, 23)) {
+		m_ccr = m_ccr | CCR_N;
+		}
+		set_a1(r);
 		break;
 		}
 	case 159: { // and #[i],b
-		unhandled("and #[i],b");
+		u32 d_1 = get_b1();
+		u32 i = BIT(opcode, 8, 6);
+		u64 r = d_1 & i;
+		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+		if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+		} else if(BIT(m_ccr, 23)) {
+		m_ccr = m_ccr | CCR_N;
+		}
+		set_b1(r);
 		break;
 		}
 	case 160: { // and #[i],a
-		unhandled("and #[i],a");
+		u32 d_1 = get_a1();
+		u32 i = exv;
+		u64 r = d_1 & i;
+		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+		if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+		} else if(BIT(m_ccr, 23)) {
+		m_ccr = m_ccr | CCR_N;
+		}
+		set_a1(r);
 		break;
 		}
 	case 161: { // and #[i],b
-		unhandled("and #[i],b");
+		u32 d_1 = get_b1();
+		u32 i = exv;
+		u64 r = d_1 & i;
+		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+		if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+		} else if(BIT(m_ccr, 23)) {
+		m_ccr = m_ccr | CCR_N;
+		}
+		set_b1(r);
 		break;
 		}
 	case 162: { // andi #[i],mr
@@ -22940,195 +27126,387 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 222: { // bcc [x]
-		unhandled("bcc [x]");
+		bool cc = test_cc();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 223: { // bge [x]
-		unhandled("bge [x]");
+		bool cc = test_ge();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 224: { // bne [x]
-		unhandled("bne [x]");
+		bool cc = test_ne();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 225: { // bpl [x]
-		unhandled("bpl [x]");
+		bool cc = test_pl();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 226: { // bnn [x]
-		unhandled("bnn [x]");
+		bool cc = test_nn();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 227: { // bec [x]
-		unhandled("bec [x]");
+		bool cc = test_ec();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 228: { // blc [x]
-		unhandled("blc [x]");
+		u32 cc = get_lc();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 229: { // bgt [x]
-		unhandled("bgt [x]");
+		bool cc = test_gt();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 230: { // bcs [x]
-		unhandled("bcs [x]");
+		bool cc = test_cs();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 231: { // blt [x]
-		unhandled("blt [x]");
+		bool cc = test_lt();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 232: { // beq [x]
-		unhandled("beq [x]");
+		bool cc = test_eq();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 233: { // bmi [x]
-		unhandled("bmi [x]");
+		bool cc = test_mi();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 234: { // bnr [x]
-		unhandled("bnr [x]");
+		bool cc = test_nr();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 235: { // bes [x]
-		unhandled("bes [x]");
+		bool cc = test_es();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 236: { // bls [x]
-		unhandled("bls [x]");
+		bool cc = test_ls();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 237: { // ble [x]
-		unhandled("ble [x]");
+		bool cc = test_le();
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 238: { // bcc [x]
-		unhandled("bcc [x]");
+		bool cc = test_cc();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 239: { // bge [x]
-		unhandled("bge [x]");
+		bool cc = test_ge();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 240: { // bne [x]
-		unhandled("bne [x]");
+		bool cc = test_ne();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 241: { // bpl [x]
-		unhandled("bpl [x]");
+		bool cc = test_pl();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 242: { // bnn [x]
-		unhandled("bnn [x]");
+		bool cc = test_nn();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 243: { // bec [x]
-		unhandled("bec [x]");
+		bool cc = test_ec();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 244: { // blc [x]
-		unhandled("blc [x]");
+		u32 cc = get_lc();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 245: { // bgt [x]
-		unhandled("bgt [x]");
+		bool cc = test_gt();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 246: { // bcs [x]
-		unhandled("bcs [x]");
+		bool cc = test_cs();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 247: { // blt [x]
-		unhandled("blt [x]");
+		bool cc = test_lt();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 248: { // beq [x]
-		unhandled("beq [x]");
+		bool cc = test_eq();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 249: { // bmi [x]
-		unhandled("bmi [x]");
+		bool cc = test_mi();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 250: { // bnr [x]
-		unhandled("bnr [x]");
+		bool cc = test_nr();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 251: { // bes [x]
-		unhandled("bes [x]");
+		bool cc = test_es();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 252: { // bls [x]
-		unhandled("bls [x]");
+		bool cc = test_ls();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 253: { // ble [x]
-		unhandled("ble [x]");
+		bool cc = test_le();
+		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
+		if(cc) {
+		m_npc = x;
+		}
 		break;
 		}
 	case 254: { // bcc r
-		unhandled("bcc r");
+		bool cc = test_cc();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 255: { // bge r
-		unhandled("bge r");
+		bool cc = test_ge();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 256: { // bne r
-		unhandled("bne r");
+		bool cc = test_ne();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 257: { // bpl r
-		unhandled("bpl r");
+		bool cc = test_pl();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 258: { // bnn r
-		unhandled("bnn r");
+		bool cc = test_nn();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 259: { // bec r
-		unhandled("bec r");
+		bool cc = test_ec();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 260: { // blc r
-		unhandled("blc r");
+		u32 cc = get_lc();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 261: { // bgt r
-		unhandled("bgt r");
+		bool cc = test_gt();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 262: { // bcs r
-		unhandled("bcs r");
+		bool cc = test_cs();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 263: { // blt r
-		unhandled("blt r");
+		bool cc = test_lt();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 264: { // beq r
-		unhandled("beq r");
+		bool cc = test_eq();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 265: { // bmi r
-		unhandled("bmi r");
+		bool cc = test_mi();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 266: { // bnr r
-		unhandled("bnr r");
+		bool cc = test_nr();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 267: { // bes r
-		unhandled("bes r");
+		bool cc = test_es();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 268: { // bls r
-		unhandled("bls r");
+		bool cc = test_ls();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 269: { // ble r
-		unhandled("ble r");
+		bool cc = test_le();
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		m_npc = m_pc + r;
+		}
 		break;
 		}
 	case 270: { // bchg #[n],x:(r)-n
@@ -23324,67 +27702,235 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 318: { // bclr #[n],x:(r)-n
-		unhandled("bclr #[n],x:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 319: { // bclr #[n],y:(r)-n
-		unhandled("bclr #[n],y:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 320: { // bclr #[n],x:(r)+n
-		unhandled("bclr #[n],x:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 321: { // bclr #[n],y:(r)+n
-		unhandled("bclr #[n],y:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 322: { // bclr #[n],x:(r)-
-		unhandled("bclr #[n],x:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 323: { // bclr #[n],y:(r)-
-		unhandled("bclr #[n],y:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 324: { // bclr #[n],x:(r)+
-		unhandled("bclr #[n],x:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 325: { // bclr #[n],y:(r)+
-		unhandled("bclr #[n],y:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 326: { // bclr #[n],x:(r)
-		unhandled("bclr #[n],x:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 327: { // bclr #[n],y:(r)
-		unhandled("bclr #[n],y:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 328: { // bclr #[n],x:(r+n)
-		unhandled("bclr #[n],x:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 329: { // bclr #[n],y:(r+n)
-		unhandled("bclr #[n],y:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 330: { // bclr #[n],x:-(r)
-		unhandled("bclr #[n],x:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 331: { // bclr #[n],y:-(r)
-		unhandled("bclr #[n],y:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(ea, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 332: { // bclr #[n],x:[abs]
-		unhandled("bclr #[n],x:[abs]");
+		u32 abs = exv;
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(abs);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(abs, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 333: { // bclr #[n],y:[abs]
-		unhandled("bclr #[n],y:[abs]");
+		u32 abs = exv;
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(abs);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(abs, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 334: { // bclr #[n],x:[aa]
@@ -23396,19 +27942,55 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 336: { // bclr #[n],x:[pp]
-		unhandled("bclr #[n],x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(pp);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(pp, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 337: { // bclr #[n],y:[pp]
-		unhandled("bclr #[n],y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(pp);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(pp, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 338: { // bclr #[n],x:[qq]
-		unhandled("bclr #[n],x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(qq);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_x.write_dword(qq, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 339: { // bclr #[n],y:[qq]
-		unhandled("bclr #[n],y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(qq);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		m_y.write_dword(qq, t & ~m);
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 340: { // bclr #[n],x0
@@ -23761,7 +28343,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 368: { // bra r
 		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		m_npc = r;
+		m_npc = m_pc + r;
 		break;
 		}
 	case 369: { // brclr #[n],x:(r)-n,[x]
@@ -23852,108 +28434,108 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		unhandled("brclr #[n],y:[qq],[x]");
 		break;
 		}
-	case 391: { // brclr #[n],x0,[x]
-		unhandled("brclr #[n],x0,[x]");
+	case 391: { // brclr #[n],x0,x
+		unhandled("brclr #[n],x0,x");
 		break;
 		}
-	case 392: { // brclr #[n],x1,[x]
-		unhandled("brclr #[n],x1,[x]");
+	case 392: { // brclr #[n],x1,x
+		unhandled("brclr #[n],x1,x");
 		break;
 		}
-	case 393: { // brclr #[n],y0,[x]
-		unhandled("brclr #[n],y0,[x]");
+	case 393: { // brclr #[n],y0,x
+		unhandled("brclr #[n],y0,x");
 		break;
 		}
-	case 394: { // brclr #[n],y1,[x]
-		unhandled("brclr #[n],y1,[x]");
+	case 394: { // brclr #[n],y1,x
+		unhandled("brclr #[n],y1,x");
 		break;
 		}
-	case 395: { // brclr #[n],a0,[x]
-		unhandled("brclr #[n],a0,[x]");
+	case 395: { // brclr #[n],a0,x
+		unhandled("brclr #[n],a0,x");
 		break;
 		}
-	case 396: { // brclr #[n],b0,[x]
-		unhandled("brclr #[n],b0,[x]");
+	case 396: { // brclr #[n],b0,x
+		unhandled("brclr #[n],b0,x");
 		break;
 		}
-	case 397: { // brclr #[n],a2,[x]
-		unhandled("brclr #[n],a2,[x]");
+	case 397: { // brclr #[n],a2,x
+		unhandled("brclr #[n],a2,x");
 		break;
 		}
-	case 398: { // brclr #[n],b2,[x]
-		unhandled("brclr #[n],b2,[x]");
+	case 398: { // brclr #[n],b2,x
+		unhandled("brclr #[n],b2,x");
 		break;
 		}
-	case 399: { // brclr #[n],a1,[x]
-		unhandled("brclr #[n],a1,[x]");
+	case 399: { // brclr #[n],a1,x
+		unhandled("brclr #[n],a1,x");
 		break;
 		}
-	case 400: { // brclr #[n],b1,[x]
-		unhandled("brclr #[n],b1,[x]");
+	case 400: { // brclr #[n],b1,x
+		unhandled("brclr #[n],b1,x");
 		break;
 		}
-	case 401: { // brclr #[n],a,[x]
-		unhandled("brclr #[n],a,[x]");
+	case 401: { // brclr #[n],a,x
+		unhandled("brclr #[n],a,x");
 		break;
 		}
-	case 402: { // brclr #[n],b,[x]
-		unhandled("brclr #[n],b,[x]");
+	case 402: { // brclr #[n],b,x
+		unhandled("brclr #[n],b,x");
 		break;
 		}
-	case 403: { // brclr #[n],r,[x]
-		unhandled("brclr #[n],r,[x]");
+	case 403: { // brclr #[n],r,x
+		unhandled("brclr #[n],r,x");
 		break;
 		}
-	case 404: { // brclr #[n],n,[x]
-		unhandled("brclr #[n],n,[x]");
+	case 404: { // brclr #[n],n,x
+		unhandled("brclr #[n],n,x");
 		break;
 		}
-	case 405: { // brclr #[n],m,[x]
-		unhandled("brclr #[n],m,[x]");
+	case 405: { // brclr #[n],m,x
+		unhandled("brclr #[n],m,x");
 		break;
 		}
-	case 406: { // brclr #[n],ep,[x]
-		unhandled("brclr #[n],ep,[x]");
+	case 406: { // brclr #[n],ep,x
+		unhandled("brclr #[n],ep,x");
 		break;
 		}
-	case 407: { // brclr #[n],vba,[x]
-		unhandled("brclr #[n],vba,[x]");
+	case 407: { // brclr #[n],vba,x
+		unhandled("brclr #[n],vba,x");
 		break;
 		}
-	case 408: { // brclr #[n],sc,[x]
-		unhandled("brclr #[n],sc,[x]");
+	case 408: { // brclr #[n],sc,x
+		unhandled("brclr #[n],sc,x");
 		break;
 		}
-	case 409: { // brclr #[n],sz,[x]
-		unhandled("brclr #[n],sz,[x]");
+	case 409: { // brclr #[n],sz,x
+		unhandled("brclr #[n],sz,x");
 		break;
 		}
-	case 410: { // brclr #[n],sr,[x]
-		unhandled("brclr #[n],sr,[x]");
+	case 410: { // brclr #[n],sr,x
+		unhandled("brclr #[n],sr,x");
 		break;
 		}
-	case 411: { // brclr #[n],omr,[x]
-		unhandled("brclr #[n],omr,[x]");
+	case 411: { // brclr #[n],omr,x
+		unhandled("brclr #[n],omr,x");
 		break;
 		}
-	case 412: { // brclr #[n],sp,[x]
-		unhandled("brclr #[n],sp,[x]");
+	case 412: { // brclr #[n],sp,x
+		unhandled("brclr #[n],sp,x");
 		break;
 		}
-	case 413: { // brclr #[n],ssh,[x]
-		unhandled("brclr #[n],ssh,[x]");
+	case 413: { // brclr #[n],ssh,x
+		unhandled("brclr #[n],ssh,x");
 		break;
 		}
-	case 414: { // brclr #[n],ssl,[x]
-		unhandled("brclr #[n],ssl,[x]");
+	case 414: { // brclr #[n],ssl,x
+		unhandled("brclr #[n],ssl,x");
 		break;
 		}
-	case 415: { // brclr #[n],la,[x]
-		unhandled("brclr #[n],la,[x]");
+	case 415: { // brclr #[n],la,x
+		unhandled("brclr #[n],la,x");
 		break;
 		}
-	case 416: { // brclr #[n],lc,[x]
-		unhandled("brclr #[n],lc,[x]");
+	case 416: { // brclr #[n],lc,x
+		unhandled("brclr #[n],lc,x");
 		break;
 		}
 	case 417: { // brkcc
@@ -24597,67 +29179,235 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 577: { // bset #[n],x:(r)-n
-		unhandled("bset #[n],x:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_x.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 578: { // bset #[n],y:(r)-n
-		unhandled("bset #[n],y:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_y.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 579: { // bset #[n],x:(r)+n
-		unhandled("bset #[n],x:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_x.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 580: { // bset #[n],y:(r)+n
-		unhandled("bset #[n],y:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_y.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 581: { // bset #[n],x:(r)-
-		unhandled("bset #[n],x:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_x.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 582: { // bset #[n],y:(r)-
-		unhandled("bset #[n],y:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_y.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 583: { // bset #[n],x:(r)+
-		unhandled("bset #[n],x:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_x.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 584: { // bset #[n],y:(r)+
-		unhandled("bset #[n],y:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_y.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 585: { // bset #[n],x:(r)
-		unhandled("bset #[n],x:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_x.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 586: { // bset #[n],y:(r)
-		unhandled("bset #[n],y:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_y.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 587: { // bset #[n],x:(r+n)
-		unhandled("bset #[n],x:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_x.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 588: { // bset #[n],y:(r+n)
-		unhandled("bset #[n],y:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_y.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 589: { // bset #[n],x:-(r)
-		unhandled("bset #[n],x:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_x.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 590: { // bset #[n],y:-(r)
-		unhandled("bset #[n],y:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_y.write_dword(ea, t | m);
+		}
 		break;
 		}
 	case 591: { // bset #[n],x:[abs]
-		unhandled("bset #[n],x:[abs]");
+		u32 abs = exv;
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(abs);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_x.write_dword(abs, t | m);
+		}
 		break;
 		}
 	case 592: { // bset #[n],y:[abs]
-		unhandled("bset #[n],y:[abs]");
+		u32 abs = exv;
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(abs);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_y.write_dword(abs, t | m);
+		}
 		break;
 		}
 	case 593: { // bset #[n],x:[aa]
@@ -24695,11 +29445,29 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 597: { // bset #[n],x:[qq]
-		unhandled("bset #[n],x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(qq);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_x.write_dword(qq, t | m);
+		}
 		break;
 		}
 	case 598: { // bset #[n],y:[qq]
-		unhandled("bset #[n],y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(qq);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		m_y.write_dword(qq, t | m);
+		}
 		break;
 		}
 	case 599: { // bset #[n],x0
@@ -25061,7 +29829,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+1);
 		set_ssl(get_sr());
-		m_npc = r;
+		m_npc = m_pc + r;
 		break;
 		}
 	case 628: { // bsset #[n],x:(r)-n,[x]
@@ -25257,67 +30025,219 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 676: { // btst #[n],x:(r)-n
-		unhandled("btst #[n],x:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 677: { // btst #[n],y:(r)-n
-		unhandled("btst #[n],y:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 678: { // btst #[n],x:(r)+n
-		unhandled("btst #[n],x:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 679: { // btst #[n],y:(r)+n
-		unhandled("btst #[n],y:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 680: { // btst #[n],x:(r)-
-		unhandled("btst #[n],x:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 681: { // btst #[n],y:(r)-
-		unhandled("btst #[n],y:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 682: { // btst #[n],x:(r)+
-		unhandled("btst #[n],x:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 683: { // btst #[n],y:(r)+
-		unhandled("btst #[n],y:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 684: { // btst #[n],x:(r)
-		unhandled("btst #[n],x:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 685: { // btst #[n],y:(r)
-		unhandled("btst #[n],y:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 686: { // btst #[n],x:(r+n)
-		unhandled("btst #[n],x:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 687: { // btst #[n],y:(r+n)
-		unhandled("btst #[n],y:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 688: { // btst #[n],x:-(r)
-		unhandled("btst #[n],x:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 689: { // btst #[n],y:-(r)
-		unhandled("btst #[n],y:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(ea);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 690: { // btst #[n],x:[abs]
-		unhandled("btst #[n],x:[abs]");
+		u32 abs = exv;
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(abs);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 691: { // btst #[n],y:[abs]
-		unhandled("btst #[n],y:[abs]");
+		u32 abs = exv;
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(abs);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 692: { // btst #[n],x:[aa]
@@ -25329,123 +30249,363 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 694: { // btst #[n],x:[pp]
-		unhandled("btst #[n],x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(pp);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 695: { // btst #[n],y:[pp]
-		unhandled("btst #[n],y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(pp);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 696: { // btst #[n],x:[qq]
-		unhandled("btst #[n],x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_x.read_dword(qq);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 697: { // btst #[n],y:[qq]
-		unhandled("btst #[n],y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = m_y.read_dword(qq);
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 698: { // btst #[n],x0
-		unhandled("btst #[n],x0");
+		u32 d = get_x0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 699: { // btst #[n],x1
-		unhandled("btst #[n],x1");
+		u32 d = get_x1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 700: { // btst #[n],y0
-		unhandled("btst #[n],y0");
+		u32 d = get_y0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 701: { // btst #[n],y1
-		unhandled("btst #[n],y1");
+		u32 d = get_y1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 702: { // btst #[n],a0
-		unhandled("btst #[n],a0");
+		u32 d = get_a0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 703: { // btst #[n],b0
-		unhandled("btst #[n],b0");
+		u32 d = get_b0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 704: { // btst #[n],a2
-		unhandled("btst #[n],a2");
+		u32 d = get_a2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 705: { // btst #[n],b2
-		unhandled("btst #[n],b2");
+		u32 d = get_b2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 706: { // btst #[n],a1
-		unhandled("btst #[n],a1");
+		u32 d = get_a1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 707: { // btst #[n],b1
-		unhandled("btst #[n],b1");
+		u32 d = get_b1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 708: { // btst #[n],a
-		unhandled("btst #[n],a");
+		u64 d = get_a();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 709: { // btst #[n],b
-		unhandled("btst #[n],b");
+		u64 d = get_b();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 710: { // btst #[n],r
-		unhandled("btst #[n],r");
+		u32 d = get_r(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 711: { // btst #[n],n
-		unhandled("btst #[n],n");
+		u32 d = get_n(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 712: { // btst #[n],m
-		unhandled("btst #[n],m");
+		u32 d = get_m(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 713: { // btst #[n],ep
-		unhandled("btst #[n],ep");
+		u32 d = get_ep();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 714: { // btst #[n],vba
-		unhandled("btst #[n],vba");
+		u32 d = get_vba();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 715: { // btst #[n],sc
-		unhandled("btst #[n],sc");
+		u32 d = get_sc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 716: { // btst #[n],sz
-		unhandled("btst #[n],sz");
+		u32 d = get_sz();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 717: { // btst #[n],sr
-		unhandled("btst #[n],sr");
+		u32 d = get_sr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 718: { // btst #[n],omr
-		unhandled("btst #[n],omr");
+		u32 d = get_omr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 719: { // btst #[n],sp
-		unhandled("btst #[n],sp");
+		u32 d = get_sp();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 720: { // btst #[n],ssh
-		unhandled("btst #[n],ssh");
+		u32 d = get_ssh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 721: { // btst #[n],ssl
-		unhandled("btst #[n],ssl");
+		u32 d = get_ssl();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 722: { // btst #[n],la
-		unhandled("btst #[n],la");
+		u32 d = get_la();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 723: { // btst #[n],lc
-		unhandled("btst #[n],lc");
+		u32 d = get_lc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 t = d;
+		u32 m = 1 << n;
+		if(t & m) {
+		m_ccr |= CCR_C;
+		} else {
+		m_ccr &= ~CCR_C;
+		}
 		break;
 		}
 	case 724: { // clb a,a
@@ -28207,59 +33367,139 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1279: { // jclr #[n],x:(r)-n,[x]
-		unhandled("jclr #[n],x:(r)-n,[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_x.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1280: { // jclr #[n],y:(r)-n,[x]
-		unhandled("jclr #[n],y:(r)-n,[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_y.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1281: { // jclr #[n],x:(r)+n,[x]
-		unhandled("jclr #[n],x:(r)+n,[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_x.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1282: { // jclr #[n],y:(r)+n,[x]
-		unhandled("jclr #[n],y:(r)+n,[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_y.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1283: { // jclr #[n],x:(r)-,[x]
-		unhandled("jclr #[n],x:(r)-,[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_x.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1284: { // jclr #[n],y:(r)-,[x]
-		unhandled("jclr #[n],y:(r)-,[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_y.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1285: { // jclr #[n],x:(r)+,[x]
-		unhandled("jclr #[n],x:(r)+,[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_x.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1286: { // jclr #[n],y:(r)+,[x]
-		unhandled("jclr #[n],y:(r)+,[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_y.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1287: { // jclr #[n],x:(r),[x]
-		unhandled("jclr #[n],x:(r),[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_x.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1288: { // jclr #[n],y:(r),[x]
-		unhandled("jclr #[n],y:(r),[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_y.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1289: { // jclr #[n],x:(r+n),[x]
-		unhandled("jclr #[n],x:(r+n),[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_x.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1290: { // jclr #[n],y:(r+n),[x]
-		unhandled("jclr #[n],y:(r+n),[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_y.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1291: { // jclr #[n],x:-(r),[x]
-		unhandled("jclr #[n],x:-(r),[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_x.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1292: { // jclr #[n],y:-(r),[x]
-		unhandled("jclr #[n],y:-(r),[x]");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = exv;
+		if(!BIT(m_y.read_dword(ea), n))
+		m_npc = x;
 		break;
 		}
 	case 1293: { // jclr #[n],x:[aa],[x]
@@ -29900,171 +35140,395 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1625: { // lra r,x0
-		unhandled("lra r,x0");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_x0(m_pc + r);
 		break;
 		}
 	case 1626: { // lra r,x1
-		unhandled("lra r,x1");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_x1(m_pc + r);
 		break;
 		}
 	case 1627: { // lra r,y0
-		unhandled("lra r,y0");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_y0(m_pc + r);
 		break;
 		}
 	case 1628: { // lra r,y1
-		unhandled("lra r,y1");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_y1(m_pc + r);
 		break;
 		}
 	case 1629: { // lra r,a0
-		unhandled("lra r,a0");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_a0(m_pc + r);
 		break;
 		}
 	case 1630: { // lra r,b0
-		unhandled("lra r,b0");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_b0(m_pc + r);
 		break;
 		}
 	case 1631: { // lra r,a2
-		unhandled("lra r,a2");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_a2(m_pc + r);
 		break;
 		}
 	case 1632: { // lra r,b2
-		unhandled("lra r,b2");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_b2(m_pc + r);
 		break;
 		}
 	case 1633: { // lra r,a1
-		unhandled("lra r,a1");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_a1(m_pc + r);
 		break;
 		}
 	case 1634: { // lra r,b1
-		unhandled("lra r,b1");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_b1(m_pc + r);
 		break;
 		}
 	case 1635: { // lra r,a
-		unhandled("lra r,a");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_a(m_pc + r);
 		break;
 		}
 	case 1636: { // lra r,b
-		unhandled("lra r,b");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_b(m_pc + r);
 		break;
 		}
 	case 1637: { // lra r,r
-		unhandled("lra r,r");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_r(BIT(opcode, 0, 5) & 7, m_pc + r);
 		break;
 		}
 	case 1638: { // lra r,n
-		unhandled("lra r,n");
+		u32 r = get_r(BIT(opcode, 8, 3) & 7);
+		set_n(BIT(opcode, 0, 5) & 7, m_pc + r);
 		break;
 		}
 	case 1639: { // lra #[i],x0
-		unhandled("lra #[i],x0");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_x0(i);
 		break;
 		}
 	case 1640: { // lra #[i],x1
-		unhandled("lra #[i],x1");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_x1(i);
 		break;
 		}
 	case 1641: { // lra #[i],y0
-		unhandled("lra #[i],y0");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_y0(i);
 		break;
 		}
 	case 1642: { // lra #[i],y1
-		unhandled("lra #[i],y1");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_y1(i);
 		break;
 		}
 	case 1643: { // lra #[i],a0
-		unhandled("lra #[i],a0");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_a0(i);
 		break;
 		}
 	case 1644: { // lra #[i],b0
-		unhandled("lra #[i],b0");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_b0(i);
 		break;
 		}
 	case 1645: { // lra #[i],a2
-		unhandled("lra #[i],a2");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_a2(i);
 		break;
 		}
 	case 1646: { // lra #[i],b2
-		unhandled("lra #[i],b2");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_b2(i);
 		break;
 		}
 	case 1647: { // lra #[i],a1
-		unhandled("lra #[i],a1");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_a1(i);
 		break;
 		}
 	case 1648: { // lra #[i],b1
-		unhandled("lra #[i],b1");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_b1(i);
 		break;
 		}
 	case 1649: { // lra #[i],a
-		unhandled("lra #[i],a");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_a(i);
 		break;
 		}
 	case 1650: { // lra #[i],b
-		unhandled("lra #[i],b");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_b(i);
 		break;
 		}
 	case 1651: { // lra #[i],r
-		unhandled("lra #[i],r");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_r(BIT(opcode, 0, 5) & 7, i);
 		break;
 		}
 	case 1652: { // lra #[i],n
-		unhandled("lra #[i],n");
+		u32 i = (m_pc+exv) & 0xffffff;
+		set_n(BIT(opcode, 0, 5) & 7, i);
 		break;
 		}
 	case 1653: { // lsl #[i],a
-		unhandled("lsl #[i],a");
+		u32 d_h = get_ah();
+		u32 i = BIT(opcode, 1, 5);
+		u32 r = (d_h) << i;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_ah(r);
 		break;
 		}
 	case 1654: { // lsl #[i],b
-		unhandled("lsl #[i],b");
+		u32 d_h = get_bh();
+		u32 i = BIT(opcode, 1, 5);
+		u32 r = (d_h) << i;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_bh(r);
 		break;
 		}
 	case 1655: { // lsl a1,a
-		unhandled("lsl a1,a");
+		u32 d_h = get_ah();
+		u32 s = get_a1();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_ah(r);
 		break;
 		}
 	case 1656: { // lsl a1,b
-		unhandled("lsl a1,b");
+		u32 d_h = get_bh();
+		u32 s = get_a1();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_bh(r);
 		break;
 		}
 	case 1657: { // lsl b1,a
-		unhandled("lsl b1,a");
+		u32 d_h = get_ah();
+		u32 s = get_b1();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_ah(r);
 		break;
 		}
 	case 1658: { // lsl b1,b
-		unhandled("lsl b1,b");
+		u32 d_h = get_bh();
+		u32 s = get_b1();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_bh(r);
 		break;
 		}
 	case 1659: { // lsl x0,a
-		unhandled("lsl x0,a");
+		u32 d_h = get_ah();
+		u32 s = get_x0();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_ah(r);
 		break;
 		}
 	case 1660: { // lsl x0,b
-		unhandled("lsl x0,b");
+		u32 d_h = get_bh();
+		u32 s = get_x0();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_bh(r);
 		break;
 		}
 	case 1661: { // lsl y0,a
-		unhandled("lsl y0,a");
+		u32 d_h = get_ah();
+		u32 s = get_y0();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_ah(r);
 		break;
 		}
 	case 1662: { // lsl y0,b
-		unhandled("lsl y0,b");
+		u32 d_h = get_bh();
+		u32 s = get_y0();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_bh(r);
 		break;
 		}
 	case 1663: { // lsl x1,a
-		unhandled("lsl x1,a");
+		u32 d_h = get_ah();
+		u32 s = get_x1();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_ah(r);
 		break;
 		}
 	case 1664: { // lsl x1,b
-		unhandled("lsl x1,b");
+		u32 d_h = get_bh();
+		u32 s = get_x1();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_bh(r);
 		break;
 		}
 	case 1665: { // lsl y1,a
-		unhandled("lsl y1,a");
+		u32 d_h = get_ah();
+		u32 s = get_y1();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_ah(r);
 		break;
 		}
 	case 1666: { // lsl y1,b
-		unhandled("lsl y1,b");
+		u32 d_h = get_bh();
+		u32 s = get_y1();
+		u32 r = (d_h) << s;
+		m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+		if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+		}
+		if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+		}
+		r &= 0xffffff;
+		if(!r) {
+		m_ccr |= CCR_Z;
+		}
+		set_bh(r);
 		break;
 		}
 	case 1667: { // lsr #[i],a
@@ -33596,99 +39060,123 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 2279: { // movec x:[abs],m
-		unhandled("movec x:[abs],m");
+		u32 abs = exv;
+		set_m(BIT(opcode, 0, 5) & 7, m_x.read_dword(abs));
 		break;
 		}
 	case 2280: { // movec x:[abs],ep
-		unhandled("movec x:[abs],ep");
+		u32 abs = exv;
+		set_ep(m_x.read_dword(abs));
 		break;
 		}
 	case 2281: { // movec x:[abs],vba
-		unhandled("movec x:[abs],vba");
+		u32 abs = exv;
+		set_vba(m_x.read_dword(abs));
 		break;
 		}
 	case 2282: { // movec x:[abs],sc
-		unhandled("movec x:[abs],sc");
+		u32 abs = exv;
+		set_sc(m_x.read_dword(abs));
 		break;
 		}
 	case 2283: { // movec x:[abs],sz
-		unhandled("movec x:[abs],sz");
+		u32 abs = exv;
+		set_sz(m_x.read_dword(abs));
 		break;
 		}
 	case 2284: { // movec x:[abs],sr
-		unhandled("movec x:[abs],sr");
+		u32 abs = exv;
+		set_sr(m_x.read_dword(abs));
 		break;
 		}
 	case 2285: { // movec x:[abs],omr
-		unhandled("movec x:[abs],omr");
+		u32 abs = exv;
+		set_omr(m_x.read_dword(abs));
 		break;
 		}
 	case 2286: { // movec x:[abs],sp
-		unhandled("movec x:[abs],sp");
+		u32 abs = exv;
+		set_sp(m_x.read_dword(abs));
 		break;
 		}
 	case 2287: { // movec x:[abs],ssh
-		unhandled("movec x:[abs],ssh");
+		u32 abs = exv;
+		set_ssh(m_x.read_dword(abs));
 		break;
 		}
 	case 2288: { // movec x:[abs],ssl
-		unhandled("movec x:[abs],ssl");
+		u32 abs = exv;
+		set_ssl(m_x.read_dword(abs));
 		break;
 		}
 	case 2289: { // movec x:[abs],la
-		unhandled("movec x:[abs],la");
+		u32 abs = exv;
+		set_la(m_x.read_dword(abs));
 		break;
 		}
 	case 2290: { // movec x:[abs],lc
-		unhandled("movec x:[abs],lc");
+		u32 abs = exv;
+		set_lc(m_x.read_dword(abs));
 		break;
 		}
 	case 2291: { // movec y:[abs],m
-		unhandled("movec y:[abs],m");
+		u32 abs = exv;
+		set_m(BIT(opcode, 0, 5) & 7, m_y.read_dword(abs));
 		break;
 		}
 	case 2292: { // movec y:[abs],ep
-		unhandled("movec y:[abs],ep");
+		u32 abs = exv;
+		set_ep(m_y.read_dword(abs));
 		break;
 		}
 	case 2293: { // movec y:[abs],vba
-		unhandled("movec y:[abs],vba");
+		u32 abs = exv;
+		set_vba(m_y.read_dword(abs));
 		break;
 		}
 	case 2294: { // movec y:[abs],sc
-		unhandled("movec y:[abs],sc");
+		u32 abs = exv;
+		set_sc(m_y.read_dword(abs));
 		break;
 		}
 	case 2295: { // movec y:[abs],sz
-		unhandled("movec y:[abs],sz");
+		u32 abs = exv;
+		set_sz(m_y.read_dword(abs));
 		break;
 		}
 	case 2296: { // movec y:[abs],sr
-		unhandled("movec y:[abs],sr");
+		u32 abs = exv;
+		set_sr(m_y.read_dword(abs));
 		break;
 		}
 	case 2297: { // movec y:[abs],omr
-		unhandled("movec y:[abs],omr");
+		u32 abs = exv;
+		set_omr(m_y.read_dword(abs));
 		break;
 		}
 	case 2298: { // movec y:[abs],sp
-		unhandled("movec y:[abs],sp");
+		u32 abs = exv;
+		set_sp(m_y.read_dword(abs));
 		break;
 		}
 	case 2299: { // movec y:[abs],ssh
-		unhandled("movec y:[abs],ssh");
+		u32 abs = exv;
+		set_ssh(m_y.read_dword(abs));
 		break;
 		}
 	case 2300: { // movec y:[abs],ssl
-		unhandled("movec y:[abs],ssl");
+		u32 abs = exv;
+		set_ssl(m_y.read_dword(abs));
 		break;
 		}
 	case 2301: { // movec y:[abs],la
-		unhandled("movec y:[abs],la");
+		u32 abs = exv;
+		set_la(m_y.read_dword(abs));
 		break;
 		}
 	case 2302: { // movec y:[abs],lc
-		unhandled("movec y:[abs],lc");
+		u32 abs = exv;
+		set_lc(m_y.read_dword(abs));
 		break;
 		}
 	case 2303: { // movec #[i],m
@@ -33848,195 +39336,267 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 2339: { // movec x:[aa],m
-		unhandled("movec x:[aa],m");
+		u32 aa = BIT(opcode, 8, 6);
+		set_m(BIT(opcode, 0, 5) & 7, m_x.read_dword(aa));
 		break;
 		}
 	case 2340: { // movec x:[aa],ep
-		unhandled("movec x:[aa],ep");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ep(m_x.read_dword(aa));
 		break;
 		}
 	case 2341: { // movec x:[aa],vba
-		unhandled("movec x:[aa],vba");
+		u32 aa = BIT(opcode, 8, 6);
+		set_vba(m_x.read_dword(aa));
 		break;
 		}
 	case 2342: { // movec x:[aa],sc
-		unhandled("movec x:[aa],sc");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sc(m_x.read_dword(aa));
 		break;
 		}
 	case 2343: { // movec x:[aa],sz
-		unhandled("movec x:[aa],sz");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sz(m_x.read_dword(aa));
 		break;
 		}
 	case 2344: { // movec x:[aa],sr
-		unhandled("movec x:[aa],sr");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sr(m_x.read_dword(aa));
 		break;
 		}
 	case 2345: { // movec x:[aa],omr
-		unhandled("movec x:[aa],omr");
+		u32 aa = BIT(opcode, 8, 6);
+		set_omr(m_x.read_dword(aa));
 		break;
 		}
 	case 2346: { // movec x:[aa],sp
-		unhandled("movec x:[aa],sp");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sp(m_x.read_dword(aa));
 		break;
 		}
 	case 2347: { // movec x:[aa],ssh
-		unhandled("movec x:[aa],ssh");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ssh(m_x.read_dword(aa));
 		break;
 		}
 	case 2348: { // movec x:[aa],ssl
-		unhandled("movec x:[aa],ssl");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ssl(m_x.read_dword(aa));
 		break;
 		}
 	case 2349: { // movec x:[aa],la
-		unhandled("movec x:[aa],la");
+		u32 aa = BIT(opcode, 8, 6);
+		set_la(m_x.read_dword(aa));
 		break;
 		}
 	case 2350: { // movec x:[aa],lc
-		unhandled("movec x:[aa],lc");
+		u32 aa = BIT(opcode, 8, 6);
+		set_lc(m_x.read_dword(aa));
 		break;
 		}
 	case 2351: { // movec y:[aa],m
-		unhandled("movec y:[aa],m");
+		u32 aa = BIT(opcode, 8, 6);
+		set_m(BIT(opcode, 0, 5) & 7, m_y.read_dword(aa));
 		break;
 		}
 	case 2352: { // movec y:[aa],ep
-		unhandled("movec y:[aa],ep");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ep(m_y.read_dword(aa));
 		break;
 		}
 	case 2353: { // movec y:[aa],vba
-		unhandled("movec y:[aa],vba");
+		u32 aa = BIT(opcode, 8, 6);
+		set_vba(m_y.read_dword(aa));
 		break;
 		}
 	case 2354: { // movec y:[aa],sc
-		unhandled("movec y:[aa],sc");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sc(m_y.read_dword(aa));
 		break;
 		}
 	case 2355: { // movec y:[aa],sz
-		unhandled("movec y:[aa],sz");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sz(m_y.read_dword(aa));
 		break;
 		}
 	case 2356: { // movec y:[aa],sr
-		unhandled("movec y:[aa],sr");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sr(m_y.read_dword(aa));
 		break;
 		}
 	case 2357: { // movec y:[aa],omr
-		unhandled("movec y:[aa],omr");
+		u32 aa = BIT(opcode, 8, 6);
+		set_omr(m_y.read_dword(aa));
 		break;
 		}
 	case 2358: { // movec y:[aa],sp
-		unhandled("movec y:[aa],sp");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sp(m_y.read_dword(aa));
 		break;
 		}
 	case 2359: { // movec y:[aa],ssh
-		unhandled("movec y:[aa],ssh");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ssh(m_y.read_dword(aa));
 		break;
 		}
 	case 2360: { // movec y:[aa],ssl
-		unhandled("movec y:[aa],ssl");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ssl(m_y.read_dword(aa));
 		break;
 		}
 	case 2361: { // movec y:[aa],la
-		unhandled("movec y:[aa],la");
+		u32 aa = BIT(opcode, 8, 6);
+		set_la(m_y.read_dword(aa));
 		break;
 		}
 	case 2362: { // movec y:[aa],lc
-		unhandled("movec y:[aa],lc");
+		u32 aa = BIT(opcode, 8, 6);
+		set_lc(m_y.read_dword(aa));
 		break;
 		}
 	case 2363: { // movec m,x:[aa]
-		unhandled("movec m,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2364: { // movec ep,x:[aa]
-		unhandled("movec ep,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_ep();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2365: { // movec vba,x:[aa]
-		unhandled("movec vba,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_vba();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2366: { // movec sc,x:[aa]
-		unhandled("movec sc,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_sc();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2367: { // movec sz,x:[aa]
-		unhandled("movec sz,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_sz();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2368: { // movec sr,x:[aa]
-		unhandled("movec sr,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_sr();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2369: { // movec omr,x:[aa]
-		unhandled("movec omr,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_omr();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2370: { // movec sp,x:[aa]
-		unhandled("movec sp,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_sp();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2371: { // movec ssh,x:[aa]
-		unhandled("movec ssh,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_ssh();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2372: { // movec ssl,x:[aa]
-		unhandled("movec ssl,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_ssl();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2373: { // movec la,x:[aa]
-		unhandled("movec la,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_la();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2374: { // movec lc,x:[aa]
-		unhandled("movec lc,x:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_lc();
+		m_x.write_dword(aa, s1);
 		break;
 		}
 	case 2375: { // movec m,y:[aa]
-		unhandled("movec m,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2376: { // movec ep,y:[aa]
-		unhandled("movec ep,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_ep();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2377: { // movec vba,y:[aa]
-		unhandled("movec vba,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_vba();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2378: { // movec sc,y:[aa]
-		unhandled("movec sc,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_sc();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2379: { // movec sz,y:[aa]
-		unhandled("movec sz,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_sz();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2380: { // movec sr,y:[aa]
-		unhandled("movec sr,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_sr();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2381: { // movec omr,y:[aa]
-		unhandled("movec omr,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_omr();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2382: { // movec sp,y:[aa]
-		unhandled("movec sp,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_sp();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2383: { // movec ssh,y:[aa]
-		unhandled("movec ssh,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_ssh();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2384: { // movec ssl,y:[aa]
-		unhandled("movec ssl,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_ssl();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2385: { // movec la,y:[aa]
-		unhandled("movec la,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_la();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2386: { // movec lc,y:[aa]
-		unhandled("movec lc,y:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s1 = get_lc();
+		m_y.write_dword(aa, s1);
 		break;
 		}
 	case 2387: { // movec x0,m
@@ -35600,1251 +41160,1563 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 2699: { // movec m,x0
-		unhandled("movec m,x0");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_x0(s1);
 		break;
 		}
 	case 2700: { // movec ep,x0
-		unhandled("movec ep,x0");
+		u32 s1 = get_ep();
+		set_x0(s1);
 		break;
 		}
 	case 2701: { // movec vba,x0
-		unhandled("movec vba,x0");
+		u32 s1 = get_vba();
+		set_x0(s1);
 		break;
 		}
 	case 2702: { // movec sc,x0
-		unhandled("movec sc,x0");
+		u32 s1 = get_sc();
+		set_x0(s1);
 		break;
 		}
 	case 2703: { // movec sz,x0
-		unhandled("movec sz,x0");
+		u32 s1 = get_sz();
+		set_x0(s1);
 		break;
 		}
 	case 2704: { // movec sr,x0
-		unhandled("movec sr,x0");
+		u32 s1 = get_sr();
+		set_x0(s1);
 		break;
 		}
 	case 2705: { // movec omr,x0
-		unhandled("movec omr,x0");
+		u32 s1 = get_omr();
+		set_x0(s1);
 		break;
 		}
 	case 2706: { // movec sp,x0
-		unhandled("movec sp,x0");
+		u32 s1 = get_sp();
+		set_x0(s1);
 		break;
 		}
 	case 2707: { // movec ssh,x0
-		unhandled("movec ssh,x0");
+		u32 s1 = get_ssh();
+		set_x0(s1);
 		break;
 		}
 	case 2708: { // movec ssl,x0
-		unhandled("movec ssl,x0");
+		u32 s1 = get_ssl();
+		set_x0(s1);
 		break;
 		}
 	case 2709: { // movec la,x0
-		unhandled("movec la,x0");
+		u32 s1 = get_la();
+		set_x0(s1);
 		break;
 		}
 	case 2710: { // movec lc,x0
-		unhandled("movec lc,x0");
+		u32 s1 = get_lc();
+		set_x0(s1);
 		break;
 		}
 	case 2711: { // movec m,x1
-		unhandled("movec m,x1");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_x1(s1);
 		break;
 		}
 	case 2712: { // movec ep,x1
-		unhandled("movec ep,x1");
+		u32 s1 = get_ep();
+		set_x1(s1);
 		break;
 		}
 	case 2713: { // movec vba,x1
-		unhandled("movec vba,x1");
+		u32 s1 = get_vba();
+		set_x1(s1);
 		break;
 		}
 	case 2714: { // movec sc,x1
-		unhandled("movec sc,x1");
+		u32 s1 = get_sc();
+		set_x1(s1);
 		break;
 		}
 	case 2715: { // movec sz,x1
-		unhandled("movec sz,x1");
+		u32 s1 = get_sz();
+		set_x1(s1);
 		break;
 		}
 	case 2716: { // movec sr,x1
-		unhandled("movec sr,x1");
+		u32 s1 = get_sr();
+		set_x1(s1);
 		break;
 		}
 	case 2717: { // movec omr,x1
-		unhandled("movec omr,x1");
+		u32 s1 = get_omr();
+		set_x1(s1);
 		break;
 		}
 	case 2718: { // movec sp,x1
-		unhandled("movec sp,x1");
+		u32 s1 = get_sp();
+		set_x1(s1);
 		break;
 		}
 	case 2719: { // movec ssh,x1
-		unhandled("movec ssh,x1");
+		u32 s1 = get_ssh();
+		set_x1(s1);
 		break;
 		}
 	case 2720: { // movec ssl,x1
-		unhandled("movec ssl,x1");
+		u32 s1 = get_ssl();
+		set_x1(s1);
 		break;
 		}
 	case 2721: { // movec la,x1
-		unhandled("movec la,x1");
+		u32 s1 = get_la();
+		set_x1(s1);
 		break;
 		}
 	case 2722: { // movec lc,x1
-		unhandled("movec lc,x1");
+		u32 s1 = get_lc();
+		set_x1(s1);
 		break;
 		}
 	case 2723: { // movec m,y0
-		unhandled("movec m,y0");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_y0(s1);
 		break;
 		}
 	case 2724: { // movec ep,y0
-		unhandled("movec ep,y0");
+		u32 s1 = get_ep();
+		set_y0(s1);
 		break;
 		}
 	case 2725: { // movec vba,y0
-		unhandled("movec vba,y0");
+		u32 s1 = get_vba();
+		set_y0(s1);
 		break;
 		}
 	case 2726: { // movec sc,y0
-		unhandled("movec sc,y0");
+		u32 s1 = get_sc();
+		set_y0(s1);
 		break;
 		}
 	case 2727: { // movec sz,y0
-		unhandled("movec sz,y0");
+		u32 s1 = get_sz();
+		set_y0(s1);
 		break;
 		}
 	case 2728: { // movec sr,y0
-		unhandled("movec sr,y0");
+		u32 s1 = get_sr();
+		set_y0(s1);
 		break;
 		}
 	case 2729: { // movec omr,y0
-		unhandled("movec omr,y0");
+		u32 s1 = get_omr();
+		set_y0(s1);
 		break;
 		}
 	case 2730: { // movec sp,y0
-		unhandled("movec sp,y0");
+		u32 s1 = get_sp();
+		set_y0(s1);
 		break;
 		}
 	case 2731: { // movec ssh,y0
-		unhandled("movec ssh,y0");
+		u32 s1 = get_ssh();
+		set_y0(s1);
 		break;
 		}
 	case 2732: { // movec ssl,y0
-		unhandled("movec ssl,y0");
+		u32 s1 = get_ssl();
+		set_y0(s1);
 		break;
 		}
 	case 2733: { // movec la,y0
-		unhandled("movec la,y0");
+		u32 s1 = get_la();
+		set_y0(s1);
 		break;
 		}
 	case 2734: { // movec lc,y0
-		unhandled("movec lc,y0");
+		u32 s1 = get_lc();
+		set_y0(s1);
 		break;
 		}
 	case 2735: { // movec m,y1
-		unhandled("movec m,y1");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_y1(s1);
 		break;
 		}
 	case 2736: { // movec ep,y1
-		unhandled("movec ep,y1");
+		u32 s1 = get_ep();
+		set_y1(s1);
 		break;
 		}
 	case 2737: { // movec vba,y1
-		unhandled("movec vba,y1");
+		u32 s1 = get_vba();
+		set_y1(s1);
 		break;
 		}
 	case 2738: { // movec sc,y1
-		unhandled("movec sc,y1");
+		u32 s1 = get_sc();
+		set_y1(s1);
 		break;
 		}
 	case 2739: { // movec sz,y1
-		unhandled("movec sz,y1");
+		u32 s1 = get_sz();
+		set_y1(s1);
 		break;
 		}
 	case 2740: { // movec sr,y1
-		unhandled("movec sr,y1");
+		u32 s1 = get_sr();
+		set_y1(s1);
 		break;
 		}
 	case 2741: { // movec omr,y1
-		unhandled("movec omr,y1");
+		u32 s1 = get_omr();
+		set_y1(s1);
 		break;
 		}
 	case 2742: { // movec sp,y1
-		unhandled("movec sp,y1");
+		u32 s1 = get_sp();
+		set_y1(s1);
 		break;
 		}
 	case 2743: { // movec ssh,y1
-		unhandled("movec ssh,y1");
+		u32 s1 = get_ssh();
+		set_y1(s1);
 		break;
 		}
 	case 2744: { // movec ssl,y1
-		unhandled("movec ssl,y1");
+		u32 s1 = get_ssl();
+		set_y1(s1);
 		break;
 		}
 	case 2745: { // movec la,y1
-		unhandled("movec la,y1");
+		u32 s1 = get_la();
+		set_y1(s1);
 		break;
 		}
 	case 2746: { // movec lc,y1
-		unhandled("movec lc,y1");
+		u32 s1 = get_lc();
+		set_y1(s1);
 		break;
 		}
 	case 2747: { // movec m,a0
-		unhandled("movec m,a0");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_a0(s1);
 		break;
 		}
 	case 2748: { // movec ep,a0
-		unhandled("movec ep,a0");
+		u32 s1 = get_ep();
+		set_a0(s1);
 		break;
 		}
 	case 2749: { // movec vba,a0
-		unhandled("movec vba,a0");
+		u32 s1 = get_vba();
+		set_a0(s1);
 		break;
 		}
 	case 2750: { // movec sc,a0
-		unhandled("movec sc,a0");
+		u32 s1 = get_sc();
+		set_a0(s1);
 		break;
 		}
 	case 2751: { // movec sz,a0
-		unhandled("movec sz,a0");
+		u32 s1 = get_sz();
+		set_a0(s1);
 		break;
 		}
 	case 2752: { // movec sr,a0
-		unhandled("movec sr,a0");
+		u32 s1 = get_sr();
+		set_a0(s1);
 		break;
 		}
 	case 2753: { // movec omr,a0
-		unhandled("movec omr,a0");
+		u32 s1 = get_omr();
+		set_a0(s1);
 		break;
 		}
 	case 2754: { // movec sp,a0
-		unhandled("movec sp,a0");
+		u32 s1 = get_sp();
+		set_a0(s1);
 		break;
 		}
 	case 2755: { // movec ssh,a0
-		unhandled("movec ssh,a0");
+		u32 s1 = get_ssh();
+		set_a0(s1);
 		break;
 		}
 	case 2756: { // movec ssl,a0
-		unhandled("movec ssl,a0");
+		u32 s1 = get_ssl();
+		set_a0(s1);
 		break;
 		}
 	case 2757: { // movec la,a0
-		unhandled("movec la,a0");
+		u32 s1 = get_la();
+		set_a0(s1);
 		break;
 		}
 	case 2758: { // movec lc,a0
-		unhandled("movec lc,a0");
+		u32 s1 = get_lc();
+		set_a0(s1);
 		break;
 		}
 	case 2759: { // movec m,b0
-		unhandled("movec m,b0");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_b0(s1);
 		break;
 		}
 	case 2760: { // movec ep,b0
-		unhandled("movec ep,b0");
+		u32 s1 = get_ep();
+		set_b0(s1);
 		break;
 		}
 	case 2761: { // movec vba,b0
-		unhandled("movec vba,b0");
+		u32 s1 = get_vba();
+		set_b0(s1);
 		break;
 		}
 	case 2762: { // movec sc,b0
-		unhandled("movec sc,b0");
+		u32 s1 = get_sc();
+		set_b0(s1);
 		break;
 		}
 	case 2763: { // movec sz,b0
-		unhandled("movec sz,b0");
+		u32 s1 = get_sz();
+		set_b0(s1);
 		break;
 		}
 	case 2764: { // movec sr,b0
-		unhandled("movec sr,b0");
+		u32 s1 = get_sr();
+		set_b0(s1);
 		break;
 		}
 	case 2765: { // movec omr,b0
-		unhandled("movec omr,b0");
+		u32 s1 = get_omr();
+		set_b0(s1);
 		break;
 		}
 	case 2766: { // movec sp,b0
-		unhandled("movec sp,b0");
+		u32 s1 = get_sp();
+		set_b0(s1);
 		break;
 		}
 	case 2767: { // movec ssh,b0
-		unhandled("movec ssh,b0");
+		u32 s1 = get_ssh();
+		set_b0(s1);
 		break;
 		}
 	case 2768: { // movec ssl,b0
-		unhandled("movec ssl,b0");
+		u32 s1 = get_ssl();
+		set_b0(s1);
 		break;
 		}
 	case 2769: { // movec la,b0
-		unhandled("movec la,b0");
+		u32 s1 = get_la();
+		set_b0(s1);
 		break;
 		}
 	case 2770: { // movec lc,b0
-		unhandled("movec lc,b0");
+		u32 s1 = get_lc();
+		set_b0(s1);
 		break;
 		}
 	case 2771: { // movec m,a2
-		unhandled("movec m,a2");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_a2(s1);
 		break;
 		}
 	case 2772: { // movec ep,a2
-		unhandled("movec ep,a2");
+		u32 s1 = get_ep();
+		set_a2(s1);
 		break;
 		}
 	case 2773: { // movec vba,a2
-		unhandled("movec vba,a2");
+		u32 s1 = get_vba();
+		set_a2(s1);
 		break;
 		}
 	case 2774: { // movec sc,a2
-		unhandled("movec sc,a2");
+		u32 s1 = get_sc();
+		set_a2(s1);
 		break;
 		}
 	case 2775: { // movec sz,a2
-		unhandled("movec sz,a2");
+		u32 s1 = get_sz();
+		set_a2(s1);
 		break;
 		}
 	case 2776: { // movec sr,a2
-		unhandled("movec sr,a2");
+		u32 s1 = get_sr();
+		set_a2(s1);
 		break;
 		}
 	case 2777: { // movec omr,a2
-		unhandled("movec omr,a2");
+		u32 s1 = get_omr();
+		set_a2(s1);
 		break;
 		}
 	case 2778: { // movec sp,a2
-		unhandled("movec sp,a2");
+		u32 s1 = get_sp();
+		set_a2(s1);
 		break;
 		}
 	case 2779: { // movec ssh,a2
-		unhandled("movec ssh,a2");
+		u32 s1 = get_ssh();
+		set_a2(s1);
 		break;
 		}
 	case 2780: { // movec ssl,a2
-		unhandled("movec ssl,a2");
+		u32 s1 = get_ssl();
+		set_a2(s1);
 		break;
 		}
 	case 2781: { // movec la,a2
-		unhandled("movec la,a2");
+		u32 s1 = get_la();
+		set_a2(s1);
 		break;
 		}
 	case 2782: { // movec lc,a2
-		unhandled("movec lc,a2");
+		u32 s1 = get_lc();
+		set_a2(s1);
 		break;
 		}
 	case 2783: { // movec m,b2
-		unhandled("movec m,b2");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_b2(s1);
 		break;
 		}
 	case 2784: { // movec ep,b2
-		unhandled("movec ep,b2");
+		u32 s1 = get_ep();
+		set_b2(s1);
 		break;
 		}
 	case 2785: { // movec vba,b2
-		unhandled("movec vba,b2");
+		u32 s1 = get_vba();
+		set_b2(s1);
 		break;
 		}
 	case 2786: { // movec sc,b2
-		unhandled("movec sc,b2");
+		u32 s1 = get_sc();
+		set_b2(s1);
 		break;
 		}
 	case 2787: { // movec sz,b2
-		unhandled("movec sz,b2");
+		u32 s1 = get_sz();
+		set_b2(s1);
 		break;
 		}
 	case 2788: { // movec sr,b2
-		unhandled("movec sr,b2");
+		u32 s1 = get_sr();
+		set_b2(s1);
 		break;
 		}
 	case 2789: { // movec omr,b2
-		unhandled("movec omr,b2");
+		u32 s1 = get_omr();
+		set_b2(s1);
 		break;
 		}
 	case 2790: { // movec sp,b2
-		unhandled("movec sp,b2");
+		u32 s1 = get_sp();
+		set_b2(s1);
 		break;
 		}
 	case 2791: { // movec ssh,b2
-		unhandled("movec ssh,b2");
+		u32 s1 = get_ssh();
+		set_b2(s1);
 		break;
 		}
 	case 2792: { // movec ssl,b2
-		unhandled("movec ssl,b2");
+		u32 s1 = get_ssl();
+		set_b2(s1);
 		break;
 		}
 	case 2793: { // movec la,b2
-		unhandled("movec la,b2");
+		u32 s1 = get_la();
+		set_b2(s1);
 		break;
 		}
 	case 2794: { // movec lc,b2
-		unhandled("movec lc,b2");
+		u32 s1 = get_lc();
+		set_b2(s1);
 		break;
 		}
 	case 2795: { // movec m,a1
-		unhandled("movec m,a1");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_a1(s1);
 		break;
 		}
 	case 2796: { // movec ep,a1
-		unhandled("movec ep,a1");
+		u32 s1 = get_ep();
+		set_a1(s1);
 		break;
 		}
 	case 2797: { // movec vba,a1
-		unhandled("movec vba,a1");
+		u32 s1 = get_vba();
+		set_a1(s1);
 		break;
 		}
 	case 2798: { // movec sc,a1
-		unhandled("movec sc,a1");
+		u32 s1 = get_sc();
+		set_a1(s1);
 		break;
 		}
 	case 2799: { // movec sz,a1
-		unhandled("movec sz,a1");
+		u32 s1 = get_sz();
+		set_a1(s1);
 		break;
 		}
 	case 2800: { // movec sr,a1
-		unhandled("movec sr,a1");
+		u32 s1 = get_sr();
+		set_a1(s1);
 		break;
 		}
 	case 2801: { // movec omr,a1
-		unhandled("movec omr,a1");
+		u32 s1 = get_omr();
+		set_a1(s1);
 		break;
 		}
 	case 2802: { // movec sp,a1
-		unhandled("movec sp,a1");
+		u32 s1 = get_sp();
+		set_a1(s1);
 		break;
 		}
 	case 2803: { // movec ssh,a1
-		unhandled("movec ssh,a1");
+		u32 s1 = get_ssh();
+		set_a1(s1);
 		break;
 		}
 	case 2804: { // movec ssl,a1
-		unhandled("movec ssl,a1");
+		u32 s1 = get_ssl();
+		set_a1(s1);
 		break;
 		}
 	case 2805: { // movec la,a1
-		unhandled("movec la,a1");
+		u32 s1 = get_la();
+		set_a1(s1);
 		break;
 		}
 	case 2806: { // movec lc,a1
-		unhandled("movec lc,a1");
+		u32 s1 = get_lc();
+		set_a1(s1);
 		break;
 		}
 	case 2807: { // movec m,b1
-		unhandled("movec m,b1");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_b1(s1);
 		break;
 		}
 	case 2808: { // movec ep,b1
-		unhandled("movec ep,b1");
+		u32 s1 = get_ep();
+		set_b1(s1);
 		break;
 		}
 	case 2809: { // movec vba,b1
-		unhandled("movec vba,b1");
+		u32 s1 = get_vba();
+		set_b1(s1);
 		break;
 		}
 	case 2810: { // movec sc,b1
-		unhandled("movec sc,b1");
+		u32 s1 = get_sc();
+		set_b1(s1);
 		break;
 		}
 	case 2811: { // movec sz,b1
-		unhandled("movec sz,b1");
+		u32 s1 = get_sz();
+		set_b1(s1);
 		break;
 		}
 	case 2812: { // movec sr,b1
-		unhandled("movec sr,b1");
+		u32 s1 = get_sr();
+		set_b1(s1);
 		break;
 		}
 	case 2813: { // movec omr,b1
-		unhandled("movec omr,b1");
+		u32 s1 = get_omr();
+		set_b1(s1);
 		break;
 		}
 	case 2814: { // movec sp,b1
-		unhandled("movec sp,b1");
+		u32 s1 = get_sp();
+		set_b1(s1);
 		break;
 		}
 	case 2815: { // movec ssh,b1
-		unhandled("movec ssh,b1");
+		u32 s1 = get_ssh();
+		set_b1(s1);
 		break;
 		}
 	case 2816: { // movec ssl,b1
-		unhandled("movec ssl,b1");
+		u32 s1 = get_ssl();
+		set_b1(s1);
 		break;
 		}
 	case 2817: { // movec la,b1
-		unhandled("movec la,b1");
+		u32 s1 = get_la();
+		set_b1(s1);
 		break;
 		}
 	case 2818: { // movec lc,b1
-		unhandled("movec lc,b1");
+		u32 s1 = get_lc();
+		set_b1(s1);
 		break;
 		}
 	case 2819: { // movec m,a
-		unhandled("movec m,a");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_a(s1);
 		break;
 		}
 	case 2820: { // movec ep,a
-		unhandled("movec ep,a");
+		u32 s1 = get_ep();
+		set_a(s1);
 		break;
 		}
 	case 2821: { // movec vba,a
-		unhandled("movec vba,a");
+		u32 s1 = get_vba();
+		set_a(s1);
 		break;
 		}
 	case 2822: { // movec sc,a
-		unhandled("movec sc,a");
+		u32 s1 = get_sc();
+		set_a(s1);
 		break;
 		}
 	case 2823: { // movec sz,a
-		unhandled("movec sz,a");
+		u32 s1 = get_sz();
+		set_a(s1);
 		break;
 		}
 	case 2824: { // movec sr,a
-		unhandled("movec sr,a");
+		u32 s1 = get_sr();
+		set_a(s1);
 		break;
 		}
 	case 2825: { // movec omr,a
-		unhandled("movec omr,a");
+		u32 s1 = get_omr();
+		set_a(s1);
 		break;
 		}
 	case 2826: { // movec sp,a
-		unhandled("movec sp,a");
+		u32 s1 = get_sp();
+		set_a(s1);
 		break;
 		}
 	case 2827: { // movec ssh,a
-		unhandled("movec ssh,a");
+		u32 s1 = get_ssh();
+		set_a(s1);
 		break;
 		}
 	case 2828: { // movec ssl,a
-		unhandled("movec ssl,a");
+		u32 s1 = get_ssl();
+		set_a(s1);
 		break;
 		}
 	case 2829: { // movec la,a
-		unhandled("movec la,a");
+		u32 s1 = get_la();
+		set_a(s1);
 		break;
 		}
 	case 2830: { // movec lc,a
-		unhandled("movec lc,a");
+		u32 s1 = get_lc();
+		set_a(s1);
 		break;
 		}
 	case 2831: { // movec m,b
-		unhandled("movec m,b");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_b(s1);
 		break;
 		}
 	case 2832: { // movec ep,b
-		unhandled("movec ep,b");
+		u32 s1 = get_ep();
+		set_b(s1);
 		break;
 		}
 	case 2833: { // movec vba,b
-		unhandled("movec vba,b");
+		u32 s1 = get_vba();
+		set_b(s1);
 		break;
 		}
 	case 2834: { // movec sc,b
-		unhandled("movec sc,b");
+		u32 s1 = get_sc();
+		set_b(s1);
 		break;
 		}
 	case 2835: { // movec sz,b
-		unhandled("movec sz,b");
+		u32 s1 = get_sz();
+		set_b(s1);
 		break;
 		}
 	case 2836: { // movec sr,b
-		unhandled("movec sr,b");
+		u32 s1 = get_sr();
+		set_b(s1);
 		break;
 		}
 	case 2837: { // movec omr,b
-		unhandled("movec omr,b");
+		u32 s1 = get_omr();
+		set_b(s1);
 		break;
 		}
 	case 2838: { // movec sp,b
-		unhandled("movec sp,b");
+		u32 s1 = get_sp();
+		set_b(s1);
 		break;
 		}
 	case 2839: { // movec ssh,b
-		unhandled("movec ssh,b");
+		u32 s1 = get_ssh();
+		set_b(s1);
 		break;
 		}
 	case 2840: { // movec ssl,b
-		unhandled("movec ssl,b");
+		u32 s1 = get_ssl();
+		set_b(s1);
 		break;
 		}
 	case 2841: { // movec la,b
-		unhandled("movec la,b");
+		u32 s1 = get_la();
+		set_b(s1);
 		break;
 		}
 	case 2842: { // movec lc,b
-		unhandled("movec lc,b");
+		u32 s1 = get_lc();
+		set_b(s1);
 		break;
 		}
 	case 2843: { // movec m,r
-		unhandled("movec m,r");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2844: { // movec ep,r
-		unhandled("movec ep,r");
+		u32 s1 = get_ep();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2845: { // movec vba,r
-		unhandled("movec vba,r");
+		u32 s1 = get_vba();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2846: { // movec sc,r
-		unhandled("movec sc,r");
+		u32 s1 = get_sc();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2847: { // movec sz,r
-		unhandled("movec sz,r");
+		u32 s1 = get_sz();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2848: { // movec sr,r
-		unhandled("movec sr,r");
+		u32 s1 = get_sr();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2849: { // movec omr,r
-		unhandled("movec omr,r");
+		u32 s1 = get_omr();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2850: { // movec sp,r
-		unhandled("movec sp,r");
+		u32 s1 = get_sp();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2851: { // movec ssh,r
-		unhandled("movec ssh,r");
+		u32 s1 = get_ssh();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2852: { // movec ssl,r
-		unhandled("movec ssl,r");
+		u32 s1 = get_ssl();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2853: { // movec la,r
-		unhandled("movec la,r");
+		u32 s1 = get_la();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2854: { // movec lc,r
-		unhandled("movec lc,r");
+		u32 s1 = get_lc();
+		set_r(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2855: { // movec m,n
-		unhandled("movec m,n");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2856: { // movec ep,n
-		unhandled("movec ep,n");
+		u32 s1 = get_ep();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2857: { // movec vba,n
-		unhandled("movec vba,n");
+		u32 s1 = get_vba();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2858: { // movec sc,n
-		unhandled("movec sc,n");
+		u32 s1 = get_sc();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2859: { // movec sz,n
-		unhandled("movec sz,n");
+		u32 s1 = get_sz();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2860: { // movec sr,n
-		unhandled("movec sr,n");
+		u32 s1 = get_sr();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2861: { // movec omr,n
-		unhandled("movec omr,n");
+		u32 s1 = get_omr();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2862: { // movec sp,n
-		unhandled("movec sp,n");
+		u32 s1 = get_sp();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2863: { // movec ssh,n
-		unhandled("movec ssh,n");
+		u32 s1 = get_ssh();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2864: { // movec ssl,n
-		unhandled("movec ssl,n");
+		u32 s1 = get_ssl();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2865: { // movec la,n
-		unhandled("movec la,n");
+		u32 s1 = get_la();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2866: { // movec lc,n
-		unhandled("movec lc,n");
+		u32 s1 = get_lc();
+		set_n(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2867: { // movec m,m
-		unhandled("movec m,m");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2868: { // movec ep,m
-		unhandled("movec ep,m");
+		u32 s1 = get_ep();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2869: { // movec vba,m
-		unhandled("movec vba,m");
+		u32 s1 = get_vba();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2870: { // movec sc,m
-		unhandled("movec sc,m");
+		u32 s1 = get_sc();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2871: { // movec sz,m
-		unhandled("movec sz,m");
+		u32 s1 = get_sz();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2872: { // movec sr,m
-		unhandled("movec sr,m");
+		u32 s1 = get_sr();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2873: { // movec omr,m
-		unhandled("movec omr,m");
+		u32 s1 = get_omr();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2874: { // movec sp,m
-		unhandled("movec sp,m");
+		u32 s1 = get_sp();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2875: { // movec ssh,m
-		unhandled("movec ssh,m");
+		u32 s1 = get_ssh();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2876: { // movec ssl,m
-		unhandled("movec ssl,m");
+		u32 s1 = get_ssl();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2877: { // movec la,m
-		unhandled("movec la,m");
+		u32 s1 = get_la();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2878: { // movec lc,m
-		unhandled("movec lc,m");
+		u32 s1 = get_lc();
+		set_m(BIT(opcode, 8, 6) & 7, s1);
 		break;
 		}
 	case 2879: { // movec m,ep
-		unhandled("movec m,ep");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_ep(s1);
 		break;
 		}
 	case 2880: { // movec ep,ep
-		unhandled("movec ep,ep");
+		u32 s1 = get_ep();
+		set_ep(s1);
 		break;
 		}
 	case 2881: { // movec vba,ep
-		unhandled("movec vba,ep");
+		u32 s1 = get_vba();
+		set_ep(s1);
 		break;
 		}
 	case 2882: { // movec sc,ep
-		unhandled("movec sc,ep");
+		u32 s1 = get_sc();
+		set_ep(s1);
 		break;
 		}
 	case 2883: { // movec sz,ep
-		unhandled("movec sz,ep");
+		u32 s1 = get_sz();
+		set_ep(s1);
 		break;
 		}
 	case 2884: { // movec sr,ep
-		unhandled("movec sr,ep");
+		u32 s1 = get_sr();
+		set_ep(s1);
 		break;
 		}
 	case 2885: { // movec omr,ep
-		unhandled("movec omr,ep");
+		u32 s1 = get_omr();
+		set_ep(s1);
 		break;
 		}
 	case 2886: { // movec sp,ep
-		unhandled("movec sp,ep");
+		u32 s1 = get_sp();
+		set_ep(s1);
 		break;
 		}
 	case 2887: { // movec ssh,ep
-		unhandled("movec ssh,ep");
+		u32 s1 = get_ssh();
+		set_ep(s1);
 		break;
 		}
 	case 2888: { // movec ssl,ep
-		unhandled("movec ssl,ep");
+		u32 s1 = get_ssl();
+		set_ep(s1);
 		break;
 		}
 	case 2889: { // movec la,ep
-		unhandled("movec la,ep");
+		u32 s1 = get_la();
+		set_ep(s1);
 		break;
 		}
 	case 2890: { // movec lc,ep
-		unhandled("movec lc,ep");
+		u32 s1 = get_lc();
+		set_ep(s1);
 		break;
 		}
 	case 2891: { // movec m,vba
-		unhandled("movec m,vba");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_vba(s1);
 		break;
 		}
 	case 2892: { // movec ep,vba
-		unhandled("movec ep,vba");
+		u32 s1 = get_ep();
+		set_vba(s1);
 		break;
 		}
 	case 2893: { // movec vba,vba
-		unhandled("movec vba,vba");
+		u32 s1 = get_vba();
+		set_vba(s1);
 		break;
 		}
 	case 2894: { // movec sc,vba
-		unhandled("movec sc,vba");
+		u32 s1 = get_sc();
+		set_vba(s1);
 		break;
 		}
 	case 2895: { // movec sz,vba
-		unhandled("movec sz,vba");
+		u32 s1 = get_sz();
+		set_vba(s1);
 		break;
 		}
 	case 2896: { // movec sr,vba
-		unhandled("movec sr,vba");
+		u32 s1 = get_sr();
+		set_vba(s1);
 		break;
 		}
 	case 2897: { // movec omr,vba
-		unhandled("movec omr,vba");
+		u32 s1 = get_omr();
+		set_vba(s1);
 		break;
 		}
 	case 2898: { // movec sp,vba
-		unhandled("movec sp,vba");
+		u32 s1 = get_sp();
+		set_vba(s1);
 		break;
 		}
 	case 2899: { // movec ssh,vba
-		unhandled("movec ssh,vba");
+		u32 s1 = get_ssh();
+		set_vba(s1);
 		break;
 		}
 	case 2900: { // movec ssl,vba
-		unhandled("movec ssl,vba");
+		u32 s1 = get_ssl();
+		set_vba(s1);
 		break;
 		}
 	case 2901: { // movec la,vba
-		unhandled("movec la,vba");
+		u32 s1 = get_la();
+		set_vba(s1);
 		break;
 		}
 	case 2902: { // movec lc,vba
-		unhandled("movec lc,vba");
+		u32 s1 = get_lc();
+		set_vba(s1);
 		break;
 		}
 	case 2903: { // movec m,sc
-		unhandled("movec m,sc");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_sc(s1);
 		break;
 		}
 	case 2904: { // movec ep,sc
-		unhandled("movec ep,sc");
+		u32 s1 = get_ep();
+		set_sc(s1);
 		break;
 		}
 	case 2905: { // movec vba,sc
-		unhandled("movec vba,sc");
+		u32 s1 = get_vba();
+		set_sc(s1);
 		break;
 		}
 	case 2906: { // movec sc,sc
-		unhandled("movec sc,sc");
+		u32 s1 = get_sc();
+		set_sc(s1);
 		break;
 		}
 	case 2907: { // movec sz,sc
-		unhandled("movec sz,sc");
+		u32 s1 = get_sz();
+		set_sc(s1);
 		break;
 		}
 	case 2908: { // movec sr,sc
-		unhandled("movec sr,sc");
+		u32 s1 = get_sr();
+		set_sc(s1);
 		break;
 		}
 	case 2909: { // movec omr,sc
-		unhandled("movec omr,sc");
+		u32 s1 = get_omr();
+		set_sc(s1);
 		break;
 		}
 	case 2910: { // movec sp,sc
-		unhandled("movec sp,sc");
+		u32 s1 = get_sp();
+		set_sc(s1);
 		break;
 		}
 	case 2911: { // movec ssh,sc
-		unhandled("movec ssh,sc");
+		u32 s1 = get_ssh();
+		set_sc(s1);
 		break;
 		}
 	case 2912: { // movec ssl,sc
-		unhandled("movec ssl,sc");
+		u32 s1 = get_ssl();
+		set_sc(s1);
 		break;
 		}
 	case 2913: { // movec la,sc
-		unhandled("movec la,sc");
+		u32 s1 = get_la();
+		set_sc(s1);
 		break;
 		}
 	case 2914: { // movec lc,sc
-		unhandled("movec lc,sc");
+		u32 s1 = get_lc();
+		set_sc(s1);
 		break;
 		}
 	case 2915: { // movec m,sz
-		unhandled("movec m,sz");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_sz(s1);
 		break;
 		}
 	case 2916: { // movec ep,sz
-		unhandled("movec ep,sz");
+		u32 s1 = get_ep();
+		set_sz(s1);
 		break;
 		}
 	case 2917: { // movec vba,sz
-		unhandled("movec vba,sz");
+		u32 s1 = get_vba();
+		set_sz(s1);
 		break;
 		}
 	case 2918: { // movec sc,sz
-		unhandled("movec sc,sz");
+		u32 s1 = get_sc();
+		set_sz(s1);
 		break;
 		}
 	case 2919: { // movec sz,sz
-		unhandled("movec sz,sz");
+		u32 s1 = get_sz();
+		set_sz(s1);
 		break;
 		}
 	case 2920: { // movec sr,sz
-		unhandled("movec sr,sz");
+		u32 s1 = get_sr();
+		set_sz(s1);
 		break;
 		}
 	case 2921: { // movec omr,sz
-		unhandled("movec omr,sz");
+		u32 s1 = get_omr();
+		set_sz(s1);
 		break;
 		}
 	case 2922: { // movec sp,sz
-		unhandled("movec sp,sz");
+		u32 s1 = get_sp();
+		set_sz(s1);
 		break;
 		}
 	case 2923: { // movec ssh,sz
-		unhandled("movec ssh,sz");
+		u32 s1 = get_ssh();
+		set_sz(s1);
 		break;
 		}
 	case 2924: { // movec ssl,sz
-		unhandled("movec ssl,sz");
+		u32 s1 = get_ssl();
+		set_sz(s1);
 		break;
 		}
 	case 2925: { // movec la,sz
-		unhandled("movec la,sz");
+		u32 s1 = get_la();
+		set_sz(s1);
 		break;
 		}
 	case 2926: { // movec lc,sz
-		unhandled("movec lc,sz");
+		u32 s1 = get_lc();
+		set_sz(s1);
 		break;
 		}
 	case 2927: { // movec m,sr
-		unhandled("movec m,sr");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_sr(s1);
 		break;
 		}
 	case 2928: { // movec ep,sr
-		unhandled("movec ep,sr");
+		u32 s1 = get_ep();
+		set_sr(s1);
 		break;
 		}
 	case 2929: { // movec vba,sr
-		unhandled("movec vba,sr");
+		u32 s1 = get_vba();
+		set_sr(s1);
 		break;
 		}
 	case 2930: { // movec sc,sr
-		unhandled("movec sc,sr");
+		u32 s1 = get_sc();
+		set_sr(s1);
 		break;
 		}
 	case 2931: { // movec sz,sr
-		unhandled("movec sz,sr");
+		u32 s1 = get_sz();
+		set_sr(s1);
 		break;
 		}
 	case 2932: { // movec sr,sr
-		unhandled("movec sr,sr");
+		u32 s1 = get_sr();
+		set_sr(s1);
 		break;
 		}
 	case 2933: { // movec omr,sr
-		unhandled("movec omr,sr");
+		u32 s1 = get_omr();
+		set_sr(s1);
 		break;
 		}
 	case 2934: { // movec sp,sr
-		unhandled("movec sp,sr");
+		u32 s1 = get_sp();
+		set_sr(s1);
 		break;
 		}
 	case 2935: { // movec ssh,sr
-		unhandled("movec ssh,sr");
+		u32 s1 = get_ssh();
+		set_sr(s1);
 		break;
 		}
 	case 2936: { // movec ssl,sr
-		unhandled("movec ssl,sr");
+		u32 s1 = get_ssl();
+		set_sr(s1);
 		break;
 		}
 	case 2937: { // movec la,sr
-		unhandled("movec la,sr");
+		u32 s1 = get_la();
+		set_sr(s1);
 		break;
 		}
 	case 2938: { // movec lc,sr
-		unhandled("movec lc,sr");
+		u32 s1 = get_lc();
+		set_sr(s1);
 		break;
 		}
 	case 2939: { // movec m,omr
-		unhandled("movec m,omr");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_omr(s1);
 		break;
 		}
 	case 2940: { // movec ep,omr
-		unhandled("movec ep,omr");
+		u32 s1 = get_ep();
+		set_omr(s1);
 		break;
 		}
 	case 2941: { // movec vba,omr
-		unhandled("movec vba,omr");
+		u32 s1 = get_vba();
+		set_omr(s1);
 		break;
 		}
 	case 2942: { // movec sc,omr
-		unhandled("movec sc,omr");
+		u32 s1 = get_sc();
+		set_omr(s1);
 		break;
 		}
 	case 2943: { // movec sz,omr
-		unhandled("movec sz,omr");
+		u32 s1 = get_sz();
+		set_omr(s1);
 		break;
 		}
 	case 2944: { // movec sr,omr
-		unhandled("movec sr,omr");
+		u32 s1 = get_sr();
+		set_omr(s1);
 		break;
 		}
 	case 2945: { // movec omr,omr
-		unhandled("movec omr,omr");
+		u32 s1 = get_omr();
+		set_omr(s1);
 		break;
 		}
 	case 2946: { // movec sp,omr
-		unhandled("movec sp,omr");
+		u32 s1 = get_sp();
+		set_omr(s1);
 		break;
 		}
 	case 2947: { // movec ssh,omr
-		unhandled("movec ssh,omr");
+		u32 s1 = get_ssh();
+		set_omr(s1);
 		break;
 		}
 	case 2948: { // movec ssl,omr
-		unhandled("movec ssl,omr");
+		u32 s1 = get_ssl();
+		set_omr(s1);
 		break;
 		}
 	case 2949: { // movec la,omr
-		unhandled("movec la,omr");
+		u32 s1 = get_la();
+		set_omr(s1);
 		break;
 		}
 	case 2950: { // movec lc,omr
-		unhandled("movec lc,omr");
+		u32 s1 = get_lc();
+		set_omr(s1);
 		break;
 		}
 	case 2951: { // movec m,sp
-		unhandled("movec m,sp");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_sp(s1);
 		break;
 		}
 	case 2952: { // movec ep,sp
-		unhandled("movec ep,sp");
+		u32 s1 = get_ep();
+		set_sp(s1);
 		break;
 		}
 	case 2953: { // movec vba,sp
-		unhandled("movec vba,sp");
+		u32 s1 = get_vba();
+		set_sp(s1);
 		break;
 		}
 	case 2954: { // movec sc,sp
-		unhandled("movec sc,sp");
+		u32 s1 = get_sc();
+		set_sp(s1);
 		break;
 		}
 	case 2955: { // movec sz,sp
-		unhandled("movec sz,sp");
+		u32 s1 = get_sz();
+		set_sp(s1);
 		break;
 		}
 	case 2956: { // movec sr,sp
-		unhandled("movec sr,sp");
+		u32 s1 = get_sr();
+		set_sp(s1);
 		break;
 		}
 	case 2957: { // movec omr,sp
-		unhandled("movec omr,sp");
+		u32 s1 = get_omr();
+		set_sp(s1);
 		break;
 		}
 	case 2958: { // movec sp,sp
-		unhandled("movec sp,sp");
+		u32 s1 = get_sp();
+		set_sp(s1);
 		break;
 		}
 	case 2959: { // movec ssh,sp
-		unhandled("movec ssh,sp");
+		u32 s1 = get_ssh();
+		set_sp(s1);
 		break;
 		}
 	case 2960: { // movec ssl,sp
-		unhandled("movec ssl,sp");
+		u32 s1 = get_ssl();
+		set_sp(s1);
 		break;
 		}
 	case 2961: { // movec la,sp
-		unhandled("movec la,sp");
+		u32 s1 = get_la();
+		set_sp(s1);
 		break;
 		}
 	case 2962: { // movec lc,sp
-		unhandled("movec lc,sp");
+		u32 s1 = get_lc();
+		set_sp(s1);
 		break;
 		}
 	case 2963: { // movec m,ssh
-		unhandled("movec m,ssh");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_ssh(s1);
 		break;
 		}
 	case 2964: { // movec ep,ssh
-		unhandled("movec ep,ssh");
+		u32 s1 = get_ep();
+		set_ssh(s1);
 		break;
 		}
 	case 2965: { // movec vba,ssh
-		unhandled("movec vba,ssh");
+		u32 s1 = get_vba();
+		set_ssh(s1);
 		break;
 		}
 	case 2966: { // movec sc,ssh
-		unhandled("movec sc,ssh");
+		u32 s1 = get_sc();
+		set_ssh(s1);
 		break;
 		}
 	case 2967: { // movec sz,ssh
-		unhandled("movec sz,ssh");
+		u32 s1 = get_sz();
+		set_ssh(s1);
 		break;
 		}
 	case 2968: { // movec sr,ssh
-		unhandled("movec sr,ssh");
+		u32 s1 = get_sr();
+		set_ssh(s1);
 		break;
 		}
 	case 2969: { // movec omr,ssh
-		unhandled("movec omr,ssh");
+		u32 s1 = get_omr();
+		set_ssh(s1);
 		break;
 		}
 	case 2970: { // movec sp,ssh
-		unhandled("movec sp,ssh");
+		u32 s1 = get_sp();
+		set_ssh(s1);
 		break;
 		}
 	case 2971: { // movec ssh,ssh
-		unhandled("movec ssh,ssh");
+		u32 s1 = get_ssh();
+		set_ssh(s1);
 		break;
 		}
 	case 2972: { // movec ssl,ssh
-		unhandled("movec ssl,ssh");
+		u32 s1 = get_ssl();
+		set_ssh(s1);
 		break;
 		}
 	case 2973: { // movec la,ssh
-		unhandled("movec la,ssh");
+		u32 s1 = get_la();
+		set_ssh(s1);
 		break;
 		}
 	case 2974: { // movec lc,ssh
-		unhandled("movec lc,ssh");
+		u32 s1 = get_lc();
+		set_ssh(s1);
 		break;
 		}
 	case 2975: { // movec m,ssl
-		unhandled("movec m,ssl");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_ssl(s1);
 		break;
 		}
 	case 2976: { // movec ep,ssl
-		unhandled("movec ep,ssl");
+		u32 s1 = get_ep();
+		set_ssl(s1);
 		break;
 		}
 	case 2977: { // movec vba,ssl
-		unhandled("movec vba,ssl");
+		u32 s1 = get_vba();
+		set_ssl(s1);
 		break;
 		}
 	case 2978: { // movec sc,ssl
-		unhandled("movec sc,ssl");
+		u32 s1 = get_sc();
+		set_ssl(s1);
 		break;
 		}
 	case 2979: { // movec sz,ssl
-		unhandled("movec sz,ssl");
+		u32 s1 = get_sz();
+		set_ssl(s1);
 		break;
 		}
 	case 2980: { // movec sr,ssl
-		unhandled("movec sr,ssl");
+		u32 s1 = get_sr();
+		set_ssl(s1);
 		break;
 		}
 	case 2981: { // movec omr,ssl
-		unhandled("movec omr,ssl");
+		u32 s1 = get_omr();
+		set_ssl(s1);
 		break;
 		}
 	case 2982: { // movec sp,ssl
-		unhandled("movec sp,ssl");
+		u32 s1 = get_sp();
+		set_ssl(s1);
 		break;
 		}
 	case 2983: { // movec ssh,ssl
-		unhandled("movec ssh,ssl");
+		u32 s1 = get_ssh();
+		set_ssl(s1);
 		break;
 		}
 	case 2984: { // movec ssl,ssl
-		unhandled("movec ssl,ssl");
+		u32 s1 = get_ssl();
+		set_ssl(s1);
 		break;
 		}
 	case 2985: { // movec la,ssl
-		unhandled("movec la,ssl");
+		u32 s1 = get_la();
+		set_ssl(s1);
 		break;
 		}
 	case 2986: { // movec lc,ssl
-		unhandled("movec lc,ssl");
+		u32 s1 = get_lc();
+		set_ssl(s1);
 		break;
 		}
 	case 2987: { // movec m,la
-		unhandled("movec m,la");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_la(s1);
 		break;
 		}
 	case 2988: { // movec ep,la
-		unhandled("movec ep,la");
+		u32 s1 = get_ep();
+		set_la(s1);
 		break;
 		}
 	case 2989: { // movec vba,la
-		unhandled("movec vba,la");
+		u32 s1 = get_vba();
+		set_la(s1);
 		break;
 		}
 	case 2990: { // movec sc,la
-		unhandled("movec sc,la");
+		u32 s1 = get_sc();
+		set_la(s1);
 		break;
 		}
 	case 2991: { // movec sz,la
-		unhandled("movec sz,la");
+		u32 s1 = get_sz();
+		set_la(s1);
 		break;
 		}
 	case 2992: { // movec sr,la
-		unhandled("movec sr,la");
+		u32 s1 = get_sr();
+		set_la(s1);
 		break;
 		}
 	case 2993: { // movec omr,la
-		unhandled("movec omr,la");
+		u32 s1 = get_omr();
+		set_la(s1);
 		break;
 		}
 	case 2994: { // movec sp,la
-		unhandled("movec sp,la");
+		u32 s1 = get_sp();
+		set_la(s1);
 		break;
 		}
 	case 2995: { // movec ssh,la
-		unhandled("movec ssh,la");
+		u32 s1 = get_ssh();
+		set_la(s1);
 		break;
 		}
 	case 2996: { // movec ssl,la
-		unhandled("movec ssl,la");
+		u32 s1 = get_ssl();
+		set_la(s1);
 		break;
 		}
 	case 2997: { // movec la,la
-		unhandled("movec la,la");
+		u32 s1 = get_la();
+		set_la(s1);
 		break;
 		}
 	case 2998: { // movec lc,la
-		unhandled("movec lc,la");
+		u32 s1 = get_lc();
+		set_la(s1);
 		break;
 		}
 	case 2999: { // movec m,lc
-		unhandled("movec m,lc");
+		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
+		set_lc(s1);
 		break;
 		}
 	case 3000: { // movec ep,lc
-		unhandled("movec ep,lc");
+		u32 s1 = get_ep();
+		set_lc(s1);
 		break;
 		}
 	case 3001: { // movec vba,lc
-		unhandled("movec vba,lc");
+		u32 s1 = get_vba();
+		set_lc(s1);
 		break;
 		}
 	case 3002: { // movec sc,lc
-		unhandled("movec sc,lc");
+		u32 s1 = get_sc();
+		set_lc(s1);
 		break;
 		}
 	case 3003: { // movec sz,lc
-		unhandled("movec sz,lc");
+		u32 s1 = get_sz();
+		set_lc(s1);
 		break;
 		}
 	case 3004: { // movec sr,lc
-		unhandled("movec sr,lc");
+		u32 s1 = get_sr();
+		set_lc(s1);
 		break;
 		}
 	case 3005: { // movec omr,lc
-		unhandled("movec omr,lc");
+		u32 s1 = get_omr();
+		set_lc(s1);
 		break;
 		}
 	case 3006: { // movec sp,lc
-		unhandled("movec sp,lc");
+		u32 s1 = get_sp();
+		set_lc(s1);
 		break;
 		}
 	case 3007: { // movec ssh,lc
-		unhandled("movec ssh,lc");
+		u32 s1 = get_ssh();
+		set_lc(s1);
 		break;
 		}
 	case 3008: { // movec ssl,lc
-		unhandled("movec ssl,lc");
+		u32 s1 = get_ssl();
+		set_lc(s1);
 		break;
 		}
 	case 3009: { // movec la,lc
-		unhandled("movec la,lc");
+		u32 s1 = get_la();
+		set_lc(s1);
 		break;
 		}
 	case 3010: { // movec lc,lc
-		unhandled("movec lc,lc");
+		u32 s1 = get_lc();
+		set_lc(s1);
 		break;
 		}
 	case 3011: { // movec #[i],m
@@ -36981,14 +42853,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
-		set_a(m_p.read_dword(ea));
+		set_ah(m_p.read_dword(ea));
 		break;
 		}
 	case 3034: { // movem p:(r)-n,b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
-		set_b(m_p.read_dword(ea));
+		set_bh(m_p.read_dword(ea));
 		break;
 		}
 	case 3035: { // movem p:(r)-n,r
@@ -37163,14 +43035,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
-		set_a(m_p.read_dword(ea));
+		set_ah(m_p.read_dword(ea));
 		break;
 		}
 	case 3060: { // movem p:(r)+n,b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
-		set_b(m_p.read_dword(ea));
+		set_bh(m_p.read_dword(ea));
 		break;
 		}
 	case 3061: { // movem p:(r)+n,r
@@ -37345,14 +43217,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
-		set_a(m_p.read_dword(ea));
+		set_ah(m_p.read_dword(ea));
 		break;
 		}
 	case 3086: { // movem p:(r)-,b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
-		set_b(m_p.read_dword(ea));
+		set_bh(m_p.read_dword(ea));
 		break;
 		}
 	case 3087: { // movem p:(r)-,r
@@ -37527,14 +43399,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
-		set_a(m_p.read_dword(ea));
+		set_ah(m_p.read_dword(ea));
 		break;
 		}
 	case 3112: { // movem p:(r)+,b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
-		set_b(m_p.read_dword(ea));
+		set_bh(m_p.read_dword(ea));
 		break;
 		}
 	case 3113: { // movem p:(r)+,r
@@ -37698,13 +43570,13 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 3137: { // movem p:(r),a
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
-		set_a(m_p.read_dword(ea));
+		set_ah(m_p.read_dword(ea));
 		break;
 		}
 	case 3138: { // movem p:(r),b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
-		set_b(m_p.read_dword(ea));
+		set_bh(m_p.read_dword(ea));
 		break;
 		}
 	case 3139: { // movem p:(r),r
@@ -37854,13 +43726,13 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 3163: { // movem p:(r+n),a
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		set_a(m_p.read_dword(ea));
+		set_ah(m_p.read_dword(ea));
 		break;
 		}
 	case 3164: { // movem p:(r+n),b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		set_b(m_p.read_dword(ea));
+		set_bh(m_p.read_dword(ea));
 		break;
 		}
 	case 3165: { // movem p:(r+n),r
@@ -38021,14 +43893,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
-		set_a(m_p.read_dword(ea));
+		set_ah(m_p.read_dword(ea));
 		break;
 		}
 	case 3190: { // movem p:-(r),b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
-		set_b(m_p.read_dword(ea));
+		set_bh(m_p.read_dword(ea));
 		break;
 		}
 	case 3191: { // movem p:-(r),r
@@ -38213,16 +44085,16 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
-		u64 s = get_a();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_ah();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3216: { // movem b,p:(r)-n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
-		u64 s = get_b();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_bh();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3217: { // movem r,p:(r)-n
@@ -38421,16 +44293,16 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
-		u64 s = get_a();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_ah();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3242: { // movem b,p:(r)+n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
-		u64 s = get_b();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_bh();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3243: { // movem r,p:(r)+n
@@ -38629,16 +44501,16 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
-		u64 s = get_a();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_ah();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3268: { // movem b,p:(r)-
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
-		u64 s = get_b();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_bh();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3269: { // movem r,p:(r)-
@@ -38837,16 +44709,16 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
-		u64 s = get_a();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_ah();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3294: { // movem b,p:(r)+
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
-		u64 s = get_b();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_bh();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3295: { // movem r,p:(r)+
@@ -39034,15 +44906,15 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 3319: { // movem a,p:(r)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
-		u64 s = get_a();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_ah();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3320: { // movem b,p:(r)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
-		u64 s = get_b();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_bh();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3321: { // movem r,p:(r)
@@ -39216,15 +45088,15 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 3345: { // movem a,p:(r+n)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u64 s = get_a();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_ah();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3346: { // movem b,p:(r+n)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u64 s = get_b();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_bh();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3347: { // movem r,p:(r+n)
@@ -39409,16 +45281,16 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
-		u64 s = get_a();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_ah();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3372: { // movem b,p:-(r)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
-		u64 s = get_b();
-		m_p.write_dword(ea, s);
+		u32 s_h = get_bh();
+		m_p.write_dword(ea, s_h);
 		break;
 		}
 	case 3373: { // movem r,p:-(r)
@@ -39585,12 +45457,12 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3397: { // movem p:[abs],a
 		u32 abs = exv;
-		set_a(m_p.read_dword(abs));
+		set_ah(m_p.read_dword(abs));
 		break;
 		}
 	case 3398: { // movem p:[abs],b
 		u32 abs = exv;
-		set_b(m_p.read_dword(abs));
+		set_bh(m_p.read_dword(abs));
 		break;
 		}
 	case 3399: { // movem p:[abs],r
@@ -39725,14 +45597,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3423: { // movem a,p:[abs]
 		u32 abs = exv;
-		u64 s = get_a();
-		m_p.write_dword(abs, s);
+		u32 s_h = get_ah();
+		m_p.write_dword(abs, s_h);
 		break;
 		}
 	case 3424: { // movem b,p:[abs]
 		u32 abs = exv;
-		u64 s = get_b();
-		m_p.write_dword(abs, s);
+		u32 s_h = get_bh();
+		m_p.write_dword(abs, s_h);
 		break;
 		}
 	case 3425: { // movem r,p:[abs]
@@ -39820,467 +45692,769 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 3439: { // movem p:[aa],x0
-		unhandled("movem p:[aa],x0");
+		u32 aa = BIT(opcode, 8, 6);
+		set_x0(m_p.read_dword(aa));
 		break;
 		}
 	case 3440: { // movem p:[aa],x1
-		unhandled("movem p:[aa],x1");
+		u32 aa = BIT(opcode, 8, 6);
+		set_x1(m_p.read_dword(aa));
 		break;
 		}
 	case 3441: { // movem p:[aa],y0
-		unhandled("movem p:[aa],y0");
+		u32 aa = BIT(opcode, 8, 6);
+		set_y0(m_p.read_dword(aa));
 		break;
 		}
 	case 3442: { // movem p:[aa],y1
-		unhandled("movem p:[aa],y1");
+		u32 aa = BIT(opcode, 8, 6);
+		set_y1(m_p.read_dword(aa));
 		break;
 		}
 	case 3443: { // movem p:[aa],a0
-		unhandled("movem p:[aa],a0");
+		u32 aa = BIT(opcode, 8, 6);
+		set_a0(m_p.read_dword(aa));
 		break;
 		}
 	case 3444: { // movem p:[aa],b0
-		unhandled("movem p:[aa],b0");
+		u32 aa = BIT(opcode, 8, 6);
+		set_b0(m_p.read_dword(aa));
 		break;
 		}
 	case 3445: { // movem p:[aa],a2
-		unhandled("movem p:[aa],a2");
+		u32 aa = BIT(opcode, 8, 6);
+		set_a2(m_p.read_dword(aa));
 		break;
 		}
 	case 3446: { // movem p:[aa],b2
-		unhandled("movem p:[aa],b2");
+		u32 aa = BIT(opcode, 8, 6);
+		set_b2(m_p.read_dword(aa));
 		break;
 		}
 	case 3447: { // movem p:[aa],a1
-		unhandled("movem p:[aa],a1");
+		u32 aa = BIT(opcode, 8, 6);
+		set_a1(m_p.read_dword(aa));
 		break;
 		}
 	case 3448: { // movem p:[aa],b1
-		unhandled("movem p:[aa],b1");
+		u32 aa = BIT(opcode, 8, 6);
+		set_b1(m_p.read_dword(aa));
 		break;
 		}
 	case 3449: { // movem p:[aa],a
-		unhandled("movem p:[aa],a");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ah(m_p.read_dword(aa));
 		break;
 		}
 	case 3450: { // movem p:[aa],b
-		unhandled("movem p:[aa],b");
+		u32 aa = BIT(opcode, 8, 6);
+		set_bh(m_p.read_dword(aa));
 		break;
 		}
 	case 3451: { // movem p:[aa],r
-		unhandled("movem p:[aa],r");
+		u32 aa = BIT(opcode, 8, 6);
+		set_r(BIT(opcode, 0, 6) & 7, m_p.read_dword(aa));
 		break;
 		}
 	case 3452: { // movem p:[aa],n
-		unhandled("movem p:[aa],n");
+		u32 aa = BIT(opcode, 8, 6);
+		set_n(BIT(opcode, 0, 6) & 7, m_p.read_dword(aa));
 		break;
 		}
 	case 3453: { // movem p:[aa],m
-		unhandled("movem p:[aa],m");
+		u32 aa = BIT(opcode, 8, 6);
+		set_m(BIT(opcode, 0, 6) & 7, m_p.read_dword(aa));
 		break;
 		}
 	case 3454: { // movem p:[aa],ep
-		unhandled("movem p:[aa],ep");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ep(m_p.read_dword(aa));
 		break;
 		}
 	case 3455: { // movem p:[aa],vba
-		unhandled("movem p:[aa],vba");
+		u32 aa = BIT(opcode, 8, 6);
+		set_vba(m_p.read_dword(aa));
 		break;
 		}
 	case 3456: { // movem p:[aa],sc
-		unhandled("movem p:[aa],sc");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sc(m_p.read_dword(aa));
 		break;
 		}
 	case 3457: { // movem p:[aa],sz
-		unhandled("movem p:[aa],sz");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sz(m_p.read_dword(aa));
 		break;
 		}
 	case 3458: { // movem p:[aa],sr
-		unhandled("movem p:[aa],sr");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sr(m_p.read_dword(aa));
 		break;
 		}
 	case 3459: { // movem p:[aa],omr
-		unhandled("movem p:[aa],omr");
+		u32 aa = BIT(opcode, 8, 6);
+		set_omr(m_p.read_dword(aa));
 		break;
 		}
 	case 3460: { // movem p:[aa],sp
-		unhandled("movem p:[aa],sp");
+		u32 aa = BIT(opcode, 8, 6);
+		set_sp(m_p.read_dword(aa));
 		break;
 		}
 	case 3461: { // movem p:[aa],ssh
-		unhandled("movem p:[aa],ssh");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ssh(m_p.read_dword(aa));
 		break;
 		}
 	case 3462: { // movem p:[aa],ssl
-		unhandled("movem p:[aa],ssl");
+		u32 aa = BIT(opcode, 8, 6);
+		set_ssl(m_p.read_dword(aa));
 		break;
 		}
 	case 3463: { // movem p:[aa],la
-		unhandled("movem p:[aa],la");
+		u32 aa = BIT(opcode, 8, 6);
+		set_la(m_p.read_dword(aa));
 		break;
 		}
 	case 3464: { // movem p:[aa],lc
-		unhandled("movem p:[aa],lc");
+		u32 aa = BIT(opcode, 8, 6);
+		set_lc(m_p.read_dword(aa));
 		break;
 		}
 	case 3465: { // movem x0,p:[aa]
-		unhandled("movem x0,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_x0();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3466: { // movem x1,p:[aa]
-		unhandled("movem x1,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_x1();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3467: { // movem y0,p:[aa]
-		unhandled("movem y0,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_y0();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3468: { // movem y1,p:[aa]
-		unhandled("movem y1,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_y1();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3469: { // movem a0,p:[aa]
-		unhandled("movem a0,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_a0();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3470: { // movem b0,p:[aa]
-		unhandled("movem b0,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_b0();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3471: { // movem a2,p:[aa]
-		unhandled("movem a2,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_a2();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3472: { // movem b2,p:[aa]
-		unhandled("movem b2,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_b2();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3473: { // movem a1,p:[aa]
-		unhandled("movem a1,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_a1();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3474: { // movem b1,p:[aa]
-		unhandled("movem b1,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_b1();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3475: { // movem a,p:[aa]
-		unhandled("movem a,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s_h = get_ah();
+		m_p.write_dword(aa, s_h);
 		break;
 		}
 	case 3476: { // movem b,p:[aa]
-		unhandled("movem b,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s_h = get_bh();
+		m_p.write_dword(aa, s_h);
 		break;
 		}
 	case 3477: { // movem r,p:[aa]
-		unhandled("movem r,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_r(BIT(opcode, 0, 6) & 7);
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3478: { // movem n,p:[aa]
-		unhandled("movem n,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_n(BIT(opcode, 0, 6) & 7);
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3479: { // movem m,p:[aa]
-		unhandled("movem m,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_m(BIT(opcode, 0, 6) & 7);
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3480: { // movem ep,p:[aa]
-		unhandled("movem ep,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_ep();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3481: { // movem vba,p:[aa]
-		unhandled("movem vba,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_vba();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3482: { // movem sc,p:[aa]
-		unhandled("movem sc,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_sc();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3483: { // movem sz,p:[aa]
-		unhandled("movem sz,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_sz();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3484: { // movem sr,p:[aa]
-		unhandled("movem sr,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_sr();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3485: { // movem omr,p:[aa]
-		unhandled("movem omr,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_omr();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3486: { // movem sp,p:[aa]
-		unhandled("movem sp,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_sp();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3487: { // movem ssh,p:[aa]
-		unhandled("movem ssh,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_ssh();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3488: { // movem ssl,p:[aa]
-		unhandled("movem ssl,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_ssl();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3489: { // movem la,p:[aa]
-		unhandled("movem la,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_la();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3490: { // movem lc,p:[aa]
-		unhandled("movem lc,p:[aa]");
+		u32 aa = BIT(opcode, 8, 6);
+		u32 s = get_lc();
+		m_p.write_dword(aa, s);
 		break;
 		}
 	case 3491: { // movep x:(r)-n,x:[pp]
-		unhandled("movep x:(r)-n,x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3492: { // movep y:(r)-n,x:[pp]
-		unhandled("movep y:(r)-n,x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3493: { // movep x:(r)+n,x:[pp]
-		unhandled("movep x:(r)+n,x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3494: { // movep y:(r)+n,x:[pp]
-		unhandled("movep y:(r)+n,x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3495: { // movep x:(r)-,x:[pp]
-		unhandled("movep x:(r)-,x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3496: { // movep y:(r)-,x:[pp]
-		unhandled("movep y:(r)-,x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3497: { // movep x:(r)+,x:[pp]
-		unhandled("movep x:(r)+,x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3498: { // movep y:(r)+,x:[pp]
-		unhandled("movep y:(r)+,x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3499: { // movep x:(r),x:[pp]
-		unhandled("movep x:(r),x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3500: { // movep y:(r),x:[pp]
-		unhandled("movep y:(r),x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3501: { // movep x:(r+n),x:[pp]
-		unhandled("movep x:(r+n),x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3502: { // movep y:(r+n),x:[pp]
-		unhandled("movep y:(r+n),x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3503: { // movep x:-(r),x:[pp]
-		unhandled("movep x:-(r),x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3504: { // movep y:-(r),x:[pp]
-		unhandled("movep y:-(r),x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3505: { // movep x:(r)-n,y:[pp]
-		unhandled("movep x:(r)-n,y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3506: { // movep y:(r)-n,y:[pp]
-		unhandled("movep y:(r)-n,y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3507: { // movep x:(r)+n,y:[pp]
-		unhandled("movep x:(r)+n,y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3508: { // movep y:(r)+n,y:[pp]
-		unhandled("movep y:(r)+n,y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3509: { // movep x:(r)-,y:[pp]
-		unhandled("movep x:(r)-,y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3510: { // movep y:(r)-,y:[pp]
-		unhandled("movep y:(r)-,y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3511: { // movep x:(r)+,y:[pp]
-		unhandled("movep x:(r)+,y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3512: { // movep y:(r)+,y:[pp]
-		unhandled("movep y:(r)+,y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3513: { // movep x:(r),y:[pp]
-		unhandled("movep x:(r),y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3514: { // movep y:(r),y:[pp]
-		unhandled("movep y:(r),y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3515: { // movep x:(r+n),y:[pp]
-		unhandled("movep x:(r+n),y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3516: { // movep y:(r+n),y:[pp]
-		unhandled("movep y:(r+n),y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3517: { // movep x:-(r),y:[pp]
-		unhandled("movep x:-(r),y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(pp, m_x.read_dword(ea));
 		break;
 		}
 	case 3518: { // movep y:-(r),y:[pp]
-		unhandled("movep y:-(r),y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(pp, m_y.read_dword(ea));
 		break;
 		}
 	case 3519: { // movep x:[pp],x:(r)-n
-		unhandled("movep x:[pp],x:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3520: { // movep x:[pp],y:(r)-n
-		unhandled("movep x:[pp],y:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3521: { // movep x:[pp],x:(r)+n
-		unhandled("movep x:[pp],x:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3522: { // movep x:[pp],y:(r)+n
-		unhandled("movep x:[pp],y:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3523: { // movep x:[pp],x:(r)-
-		unhandled("movep x:[pp],x:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3524: { // movep x:[pp],y:(r)-
-		unhandled("movep x:[pp],y:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3525: { // movep x:[pp],x:(r)+
-		unhandled("movep x:[pp],x:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3526: { // movep x:[pp],y:(r)+
-		unhandled("movep x:[pp],y:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3527: { // movep x:[pp],x:(r)
-		unhandled("movep x:[pp],x:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3528: { // movep x:[pp],y:(r)
-		unhandled("movep x:[pp],y:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3529: { // movep x:[pp],x:(r+n)
-		unhandled("movep x:[pp],x:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3530: { // movep x:[pp],y:(r+n)
-		unhandled("movep x:[pp],y:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3531: { // movep x:[pp],x:-(r)
-		unhandled("movep x:[pp],x:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3532: { // movep x:[pp],y:-(r)
-		unhandled("movep x:[pp],y:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(pp));
 		break;
 		}
 	case 3533: { // movep y:[pp],x:(r)-n
-		unhandled("movep y:[pp],x:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3534: { // movep y:[pp],y:(r)-n
-		unhandled("movep y:[pp],y:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3535: { // movep y:[pp],x:(r)+n
-		unhandled("movep y:[pp],x:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3536: { // movep y:[pp],y:(r)+n
-		unhandled("movep y:[pp],y:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3537: { // movep y:[pp],x:(r)-
-		unhandled("movep y:[pp],x:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3538: { // movep y:[pp],y:(r)-
-		unhandled("movep y:[pp],y:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3539: { // movep y:[pp],x:(r)+
-		unhandled("movep y:[pp],x:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3540: { // movep y:[pp],y:(r)+
-		unhandled("movep y:[pp],y:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3541: { // movep y:[pp],x:(r)
-		unhandled("movep y:[pp],x:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3542: { // movep y:[pp],y:(r)
-		unhandled("movep y:[pp],y:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3543: { // movep y:[pp],x:(r+n)
-		unhandled("movep y:[pp],x:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3544: { // movep y:[pp],y:(r+n)
-		unhandled("movep y:[pp],y:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3545: { // movep y:[pp],x:-(r)
-		unhandled("movep y:[pp],x:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3546: { // movep y:[pp],y:-(r)
-		unhandled("movep y:[pp],y:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(pp));
 		break;
 		}
 	case 3547: { // movep x:[abs],x:[pp]
-		unhandled("movep x:[abs],x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_x.write_dword(pp, m_x.read_dword(abs));
 		break;
 		}
 	case 3548: { // movep y:[abs],x:[pp]
-		unhandled("movep y:[abs],x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_x.write_dword(pp, m_y.read_dword(abs));
 		break;
 		}
 	case 3549: { // movep x:[abs],y:[pp]
-		unhandled("movep x:[abs],y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_y.write_dword(pp, m_x.read_dword(abs));
 		break;
 		}
 	case 3550: { // movep y:[abs],y:[pp]
-		unhandled("movep y:[abs],y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_y.write_dword(pp, m_y.read_dword(abs));
 		break;
 		}
 	case 3551: { // movep x:[pp],x:[abs]
-		unhandled("movep x:[pp],x:[abs]");
+		u32 abs = exv;
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(abs, m_x.read_dword(pp));
 		break;
 		}
 	case 3552: { // movep x:[pp],y:[abs]
-		unhandled("movep x:[pp],y:[abs]");
+		u32 abs = exv;
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(abs, m_x.read_dword(pp));
 		break;
 		}
 	case 3553: { // movep y:[pp],x:[abs]
-		unhandled("movep y:[pp],x:[abs]");
+		u32 abs = exv;
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_x.write_dword(abs, m_y.read_dword(pp));
 		break;
 		}
 	case 3554: { // movep y:[pp],y:[abs]
-		unhandled("movep y:[pp],y:[abs]");
+		u32 abs = exv;
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_y.write_dword(abs, m_y.read_dword(pp));
 		break;
 		}
 	case 3555: { // movep #[i],x:[pp]
@@ -40296,131 +46470,243 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 3557: { // movep x:(r)-n,x:[qq]
-		unhandled("movep x:(r)-n,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3558: { // movep y:(r)-n,x:[qq]
-		unhandled("movep y:(r)-n,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3559: { // movep x:(r)+n,x:[qq]
-		unhandled("movep x:(r)+n,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3560: { // movep y:(r)+n,x:[qq]
-		unhandled("movep y:(r)+n,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3561: { // movep x:(r)-,x:[qq]
-		unhandled("movep x:(r)-,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3562: { // movep y:(r)-,x:[qq]
-		unhandled("movep y:(r)-,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3563: { // movep x:(r)+,x:[qq]
-		unhandled("movep x:(r)+,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3564: { // movep y:(r)+,x:[qq]
-		unhandled("movep y:(r)+,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3565: { // movep x:(r),x:[qq]
-		unhandled("movep x:(r),x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3566: { // movep y:(r),x:[qq]
-		unhandled("movep y:(r),x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3567: { // movep x:(r+n),x:[qq]
-		unhandled("movep x:(r+n),x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3568: { // movep y:(r+n),x:[qq]
-		unhandled("movep y:(r+n),x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3569: { // movep x:-(r),x:[qq]
-		unhandled("movep x:-(r),x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3570: { // movep y:-(r),x:[qq]
-		unhandled("movep y:-(r),x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3571: { // movep x:[qq],x:(r)-n
-		unhandled("movep x:[qq],x:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3572: { // movep x:[qq],y:(r)-n
-		unhandled("movep x:[qq],y:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3573: { // movep x:[qq],x:(r)+n
-		unhandled("movep x:[qq],x:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3574: { // movep x:[qq],y:(r)+n
-		unhandled("movep x:[qq],y:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3575: { // movep x:[qq],x:(r)-
-		unhandled("movep x:[qq],x:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3576: { // movep x:[qq],y:(r)-
-		unhandled("movep x:[qq],y:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3577: { // movep x:[qq],x:(r)+
-		unhandled("movep x:[qq],x:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3578: { // movep x:[qq],y:(r)+
-		unhandled("movep x:[qq],y:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3579: { // movep x:[qq],x:(r)
-		unhandled("movep x:[qq],x:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3580: { // movep x:[qq],y:(r)
-		unhandled("movep x:[qq],y:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3581: { // movep x:[qq],x:(r+n)
-		unhandled("movep x:[qq],x:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3582: { // movep x:[qq],y:(r+n)
-		unhandled("movep x:[qq],y:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3583: { // movep x:[qq],x:-(r)
-		unhandled("movep x:[qq],x:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3584: { // movep x:[qq],y:-(r)
-		unhandled("movep x:[qq],y:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3585: { // movep x:[abs],x:[qq]
-		unhandled("movep x:[abs],x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_x.write_dword(qq, m_x.read_dword(abs));
 		break;
 		}
 	case 3586: { // movep y:[abs],x:[qq]
-		unhandled("movep y:[abs],x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_x.write_dword(qq, m_y.read_dword(abs));
 		break;
 		}
 	case 3587: { // movep x:[qq],x:[abs]
-		unhandled("movep x:[qq],x:[abs]");
+		u32 abs = exv;
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(abs, m_x.read_dword(qq));
 		break;
 		}
 	case 3588: { // movep x:[qq],y:[abs]
-		unhandled("movep x:[qq],y:[abs]");
+		u32 abs = exv;
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(abs, m_x.read_dword(qq));
 		break;
 		}
 	case 3589: { // movep #[i],x:[qq]
@@ -40430,135 +46716,249 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 3590: { // movep x:(r)-n,y:[qq]
-		unhandled("movep x:(r)-n,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3591: { // movep y:(r)-n,y:[qq]
-		unhandled("movep y:(r)-n,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3592: { // movep x:(r)+n,y:[qq]
-		unhandled("movep x:(r)+n,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3593: { // movep y:(r)+n,y:[qq]
-		unhandled("movep y:(r)+n,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3594: { // movep x:(r)-,y:[qq]
-		unhandled("movep x:(r)-,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3595: { // movep y:(r)-,y:[qq]
-		unhandled("movep y:(r)-,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3596: { // movep x:(r)+,y:[qq]
-		unhandled("movep x:(r)+,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3597: { // movep y:(r)+,y:[qq]
-		unhandled("movep y:(r)+,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3598: { // movep x:(r),y:[qq]
-		unhandled("movep x:(r),y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3599: { // movep y:(r),y:[qq]
-		unhandled("movep y:(r),y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3600: { // movep x:(r+n),y:[qq]
-		unhandled("movep x:(r+n),y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3601: { // movep y:(r+n),y:[qq]
-		unhandled("movep y:(r+n),y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3602: { // movep x:-(r),y:[qq]
-		unhandled("movep x:-(r),y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(qq, m_x.read_dword(ea));
 		break;
 		}
 	case 3603: { // movep y:-(r),y:[qq]
-		unhandled("movep y:-(r),y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(qq, m_y.read_dword(ea));
 		break;
 		}
 	case 3604: { // movep y:[qq],x:(r)-n
-		unhandled("movep y:[qq],x:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3605: { // movep y:[qq],y:(r)-n
-		unhandled("movep y:[qq],y:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3606: { // movep y:[qq],x:(r)+n
-		unhandled("movep y:[qq],x:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3607: { // movep y:[qq],y:(r)+n
-		unhandled("movep y:[qq],y:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3608: { // movep y:[qq],x:(r)-
-		unhandled("movep y:[qq],x:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3609: { // movep y:[qq],y:(r)-
-		unhandled("movep y:[qq],y:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3610: { // movep y:[qq],x:(r)+
-		unhandled("movep y:[qq],x:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3611: { // movep y:[qq],y:(r)+
-		unhandled("movep y:[qq],y:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3612: { // movep y:[qq],x:(r)
-		unhandled("movep y:[qq],x:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3613: { // movep y:[qq],y:(r)
-		unhandled("movep y:[qq],y:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3614: { // movep y:[qq],x:(r+n)
-		unhandled("movep y:[qq],x:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3615: { // movep y:[qq],y:(r+n)
-		unhandled("movep y:[qq],y:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3616: { // movep y:[qq],x:-(r)
-		unhandled("movep y:[qq],x:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3617: { // movep y:[qq],y:-(r)
-		unhandled("movep y:[qq],y:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3618: { // movep x:[abs],y:[qq]
-		unhandled("movep x:[abs],y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_y.write_dword(qq, m_x.read_dword(abs));
 		break;
 		}
 	case 3619: { // movep y:[abs],y:[qq]
-		unhandled("movep y:[abs],y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_y.write_dword(qq, m_y.read_dword(abs));
 		break;
 		}
 	case 3620: { // movep #[i],y:[qq]
-		unhandled("movep #[i],y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		u32 i = exv;
+		m_y.write_dword(qq, i);
 		break;
 		}
 	case 3621: { // movep y:[qq],x:[abs]
-		unhandled("movep y:[qq],x:[abs]");
+		u32 abs = exv;
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_x.write_dword(abs, m_y.read_dword(qq));
 		break;
 		}
 	case 3622: { // movep y:[qq],y:[abs]
-		unhandled("movep y:[qq],y:[abs]");
+		u32 abs = exv;
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_y.write_dword(abs, m_y.read_dword(qq));
 		break;
 		}
 	case 3623: { // movep p:(r)-n,x:[pp]
@@ -40778,147 +47178,267 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 3651: { // movep p:[abs],x:[pp]
-		unhandled("movep p:[abs],x:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_x.write_dword(pp, m_p.read_dword(abs));
 		break;
 		}
 	case 3652: { // movep p:[abs],y:[pp]
-		unhandled("movep p:[abs],y:[pp]");
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_y.write_dword(pp, m_p.read_dword(abs));
 		break;
 		}
 	case 3653: { // movep x:[pp],p:[abs]
-		unhandled("movep x:[pp],p:[abs]");
+		u32 abs = exv;
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_p.write_dword(abs, m_x.read_dword(pp));
 		break;
 		}
 	case 3654: { // movep y:[pp],p:[abs]
-		unhandled("movep y:[pp],p:[abs]");
+		u32 abs = exv;
+		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
+		m_p.write_dword(abs, m_y.read_dword(pp));
 		break;
 		}
 	case 3655: { // movep p:(r)-n,x:[qq]
-		unhandled("movep p:(r)-n,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3656: { // movep p:(r)+n,x:[qq]
-		unhandled("movep p:(r)+n,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3657: { // movep p:(r)-,x:[qq]
-		unhandled("movep p:(r)-,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3658: { // movep p:(r)+,x:[qq]
-		unhandled("movep p:(r)+,x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3659: { // movep p:(r),x:[qq]
-		unhandled("movep p:(r),x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3660: { // movep p:(r+n),x:[qq]
-		unhandled("movep p:(r+n),x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3661: { // movep p:-(r),x:[qq]
-		unhandled("movep p:-(r),x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3662: { // movep p:(r)-n,y:[qq]
-		unhandled("movep p:(r)-n,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3663: { // movep p:(r)+n,y:[qq]
-		unhandled("movep p:(r)+n,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3664: { // movep p:(r)-,y:[qq]
-		unhandled("movep p:(r)-,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3665: { // movep p:(r)+,y:[qq]
-		unhandled("movep p:(r)+,y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3666: { // movep p:(r),y:[qq]
-		unhandled("movep p:(r),y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3667: { // movep p:(r+n),y:[qq]
-		unhandled("movep p:(r+n),y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3668: { // movep p:-(r),y:[qq]
-		unhandled("movep p:-(r),y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(qq, m_p.read_dword(ea));
 		break;
 		}
 	case 3669: { // movep x:[qq],p:(r)-n
-		unhandled("movep x:[qq],p:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3670: { // movep x:[qq],p:(r)+n
-		unhandled("movep x:[qq],p:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3671: { // movep x:[qq],p:(r)-
-		unhandled("movep x:[qq],p:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3672: { // movep x:[qq],p:(r)+
-		unhandled("movep x:[qq],p:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3673: { // movep x:[qq],p:(r)
-		unhandled("movep x:[qq],p:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3674: { // movep x:[qq],p:(r+n)
-		unhandled("movep x:[qq],p:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3675: { // movep x:[qq],p:-(r)
-		unhandled("movep x:[qq],p:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_x.read_dword(qq));
 		break;
 		}
 	case 3676: { // movep y:[qq],p:(r)-n
-		unhandled("movep y:[qq],p:(r)-n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3677: { // movep y:[qq],p:(r)+n
-		unhandled("movep y:[qq],p:(r)+n");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3678: { // movep y:[qq],p:(r)-
-		unhandled("movep y:[qq],p:(r)-");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3679: { // movep y:[qq],p:(r)+
-		unhandled("movep y:[qq],p:(r)+");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3680: { // movep y:[qq],p:(r)
-		unhandled("movep y:[qq],p:(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3681: { // movep y:[qq],p:(r+n)
-		unhandled("movep y:[qq],p:(r+n)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3682: { // movep y:[qq],p:-(r)
-		unhandled("movep y:[qq],p:-(r)");
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(ea, m_y.read_dword(qq));
 		break;
 		}
 	case 3683: { // movep p:[abs],x:[qq]
-		unhandled("movep p:[abs],x:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_x.write_dword(qq, m_p.read_dword(abs));
 		break;
 		}
 	case 3684: { // movep p:[abs],y:[qq]
-		unhandled("movep p:[abs],y:[qq]");
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		u32 abs = exv;
+		m_y.write_dword(qq, m_p.read_dword(abs));
 		break;
 		}
 	case 3685: { // movep x:[qq],p:[abs]
-		unhandled("movep x:[qq],p:[abs]");
+		u32 abs = exv;
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(abs, m_x.read_dword(qq));
 		break;
 		}
 	case 3686: { // movep y:[qq],p:[abs]
-		unhandled("movep y:[qq],p:[abs]");
+		u32 abs = exv;
+		u32 qq = 0xffff80 + BIT(opcode, 0, 6);
+		m_p.write_dword(abs, m_y.read_dword(qq));
 		break;
 		}
 	case 3687: { // movep x0,x:[pp]
@@ -41285,12 +47805,12 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3749: { // movep x:[pp],a
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
-		set_a(m_x.read_dword(pp));
+		set_ah(m_x.read_dword(pp));
 		break;
 		}
 	case 3750: { // movep x:[pp],b
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
-		set_b(m_x.read_dword(pp));
+		set_bh(m_x.read_dword(pp));
 		break;
 		}
 	case 3751: { // movep x:[pp],r
@@ -41415,12 +47935,12 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3775: { // movep y:[pp],a
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
-		set_a(m_y.read_dword(pp));
+		set_ah(m_y.read_dword(pp));
 		break;
 		}
 	case 3776: { // movep y:[pp],b
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
-		set_b(m_y.read_dword(pp));
+		set_bh(m_y.read_dword(pp));
 		break;
 		}
 	case 3777: { // movep y:[pp],r
@@ -41555,14 +48075,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3801: { // movep a,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
-		u64 s = get_a();
-		m_x.write_dword(qq, s);
+		u32 s_h = get_ah();
+		m_x.write_dword(qq, s_h);
 		break;
 		}
 	case 3802: { // movep b,x:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
-		u64 s = get_b();
-		m_x.write_dword(qq, s);
+		u32 s_h = get_bh();
+		m_x.write_dword(qq, s_h);
 		break;
 		}
 	case 3803: { // movep r,x:[qq]
@@ -41701,12 +48221,12 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3827: { // movep x:[qq],a
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
-		set_a(m_x.read_dword(qq));
+		set_ah(m_x.read_dword(qq));
 		break;
 		}
 	case 3828: { // movep x:[qq],b
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
-		set_b(m_x.read_dword(qq));
+		set_bh(m_x.read_dword(qq));
 		break;
 		}
 	case 3829: { // movep x:[qq],r
@@ -41841,14 +48361,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3853: { // movep a,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
-		u64 s = get_a();
-		m_y.write_dword(qq, s);
+		u32 s_h = get_ah();
+		m_y.write_dword(qq, s_h);
 		break;
 		}
 	case 3854: { // movep b,y:[qq]
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
-		u64 s = get_b();
-		m_y.write_dword(qq, s);
+		u32 s_h = get_bh();
+		m_y.write_dword(qq, s_h);
 		break;
 		}
 	case 3855: { // movep r,y:[qq]
@@ -41987,12 +48507,12 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3879: { // movep y:[qq],a
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
-		set_a(m_y.read_dword(qq));
+		set_ah(m_y.read_dword(qq));
 		break;
 		}
 	case 3880: { // movep y:[qq],b
 		u32 qq = 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0);
-		set_b(m_y.read_dword(qq));
+		set_bh(m_y.read_dword(qq));
 		break;
 		}
 	case 3881: { // movep y:[qq],r
@@ -43186,7 +49706,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 4173: { // reset
-		unhandled("reset");
+		m_icount = 0;
+		m_npc --;
 		break;
 		}
 	case 4174: { // rti

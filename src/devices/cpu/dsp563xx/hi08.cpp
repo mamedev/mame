@@ -84,6 +84,7 @@ void hi08_device::write(offs_t offset, u8 data)
 	m_isr &= ~ISR_TXDE;
 	if(!(m_isr & ISR_RXDF))
 	    m_isr |= ISR_TRDY;
+	machine().scheduler().synchronize();
 	break;
     }
 }
@@ -179,6 +180,7 @@ u32 hi08_device::hrx_r()
 {
     logerror("hrx_r %06x (%s)\n", m_hrx, machine().describe_context());
     m_isr = (m_isr & ~ISR_TRDY) | ISR_TXDE;
+    machine().scheduler().synchronize();
     return m_hrx;
 }
 
