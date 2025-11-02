@@ -220,6 +220,12 @@ void esq2x40_device::device_add_mconfig(machine_config &config)
 
 void esq2x40_device::write_char(uint8_t data)
 {
+	if (m_ignore_next > 0)
+	{
+		m_ignore_next--;
+		return;
+	}
+
 	// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
 	if (m_lastchar == 0xfa)
 	{
@@ -280,6 +286,10 @@ void esq2x40_device::write_char(uint8_t data)
 				clear();
 				break;
 
+			case 0xe8:  // also cancel attributes
+				m_curattr = 0;
+				break;
+
 			case 0xf5:  // save cursor position
 				m_savedx = m_cursx;
 				m_savedy = m_cursy;
@@ -295,21 +305,21 @@ void esq2x40_device::write_char(uint8_t data)
 				clear();
 				break;
 
+			case 0xff: // light status; ignore the next byte
+				m_ignore_next = 1;
+				break;
+
 			default:
-//                printf("Unknown control code %02x\n", data);
 				break;
 		}
 	}
-	else
+	else if ((data >= 0x20) && (data <= 0x5f))
 	{
-		if ((data >= 0x20) && (data <= 0x5f))
-		{
-			m_chars[m_cursy][m_cursx] = data - ' ';
-			m_attrs[m_cursy][m_cursx] = m_curattr;
-			m_dirty[m_cursy][m_cursx] = 1;
+		m_chars[m_cursy][m_cursx] = data - ' ';
+		m_attrs[m_cursy][m_cursx] = m_curattr;
+		m_dirty[m_cursy][m_cursx] = 1;
 
-			cursor_right();
-		}
+		cursor_right();
 	}
 
 	update_display();

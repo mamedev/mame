@@ -61,6 +61,7 @@ protected:
 	uint8_t m_chars[2][40]{};
 	uint8_t m_attrs[2][40]{};
 	uint8_t m_dirty[2][40]{};
+	int m_ignore_next = 0;
 };
 
 class esq1x22_device : public esqvfd_device {
