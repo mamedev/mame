@@ -15,13 +15,11 @@ Main board
 PCB Labeled M991205-A
 Display controller
 c1 Altera epm7064lc84-7
-c2 tms 27c512-20 - eeprom
+c2 tms 27c512-20 - eeprom - display controller
 c3 hm6116lp-2 - video ram
 c4 p8051ah fujitsu - microcontroller - display controller
-
-main controller
-C5 W78E52B-40 - with internal rom 8kb. - Protected
-c6 tms 27c512-2jl eeprom
+C5 W78E52B-40 - with internal rom 8kb. - main system. Protected
+c6 tms 27c512-2jl eeprom - main system
 c7 hm6116lp-3
 c20 um3567
 ??? DAC0800CN
@@ -29,8 +27,9 @@ c21 Altera epm7128elc84-15
 c22 M27C801
 
 Led Board
+J-3
 Labeled CS111P076 At front back
-
+GH054055 Sticker Near of dsp2
 4x 16x16 led display matrix scroll.
 5 buttons
 1x dip switch 8
