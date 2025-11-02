@@ -82,6 +82,9 @@
     maps to do mip mapping. More information can be found on the 2B manual, on the 'Texturing' and 'Data Format' chapters.
     - The rasterizer supports 128x128 'microtextures' which are typically used to add more details to a texture when it is
 	close enough to the viewer.
+	- Polygons are rendered from front-to-back. A fill buffer is used to track which pixels in the framebuffer have already
+	been drawn to and prevents them from being overwritten. The real hardware does this to ensure that the polygons closest
+	to the camera are rendered first, in case the renderer runs out of time and has to skip ahead to the next frame.
 
 *********************************************************************************************************************************/
 
@@ -461,12 +464,6 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 			/* get our list read to add the triangles */
 			ztri = raster->tri_sorted_list[object.z];
 
-			if ( ztri != nullptr )
-			{
-				while( ztri->next != nullptr )
-					ztri = (triangle *)ztri->next;
-			}
-
 			/* go through the clipped vertex list, adding triangles */
 			for( i = 2; i < clipped_verts; i++ )
 			{
@@ -506,17 +503,8 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 				memcpy( &tri->v[2], &verts_out[i], sizeof( poly_vertex ) );
 
 				/* add to our sorted list */
-				tri->next = nullptr;
-
-				if ( ztri == nullptr )
-				{
-					raster->tri_sorted_list[object.z] = tri;
-				}
-				else
-				{
-					ztri->next = tri;
-				}
-
+				raster->tri_sorted_list[object.z] = tri;
+				tri->next = ztri;
 				ztri = tri;
 			}
 
@@ -693,12 +681,6 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 			/* get our list read to add the triangles */
 			ztri = raster->tri_sorted_list[object.z];
 
-			if ( ztri != nullptr )
-			{
-				while( ztri->next != nullptr )
-					ztri = (triangle *)ztri->next;
-			}
-
 			/* go through the clipped vertex list, adding triangles */
 			for( i = 2; i < clipped_verts; i++ )
 			{
@@ -738,17 +720,8 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 				memcpy( &tri->v[2], &verts_out[i], sizeof( poly_vertex ) );
 
 				/* add to our sorted list */
-				tri->next = nullptr;
-
-				if ( ztri == nullptr )
-				{
-					raster->tri_sorted_list[object.z] = tri;
-				}
-				else
-				{
-					ztri->next = tri;
-				}
-
+				raster->tri_sorted_list[object.z] = tri;
+				tri->next = ztri;
 				ztri = tri;
 			}
 
@@ -927,11 +900,12 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 		return;
 
 	m_poly->destmap().fill(0x00000000, cliprect);
+	m_poly->fillmap().fill(0x00, cliprect);
 
-	for (u8 window = 0; window <= raster->cur_window; window++)
+	for (int window = raster->cur_window; window >= 0; window--)
 	{
 		/* go through the Z levels, and render each bucket */
-		for ( z = raster->max_z; z >= raster->min_z; z-- )
+		for (z = raster->min_z; z <= raster->max_z; z++)
 		{
 			/* see if we have items at this z level */
 			if ( raster->tri_sorted_list[z] != nullptr )
