@@ -17,6 +17,7 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 {
 	model2_state *state = object.state;
 	u32 *const p = &m_destmap.pix(scanline);
+	u8 *const fill = &m_fillmap.pix(scanline);
 	u8  *gamma_value = &state->m_gamma_table[0];
 
 	// extract color information
@@ -59,7 +60,13 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 		x++;
 
 	for (; x < extent.stopx; x += dx)
-		p[x] = color;
+	{
+		if (fill[x] == 0)
+		{
+			p[x] = color;
+			fill[x] = 0xff;
+		}
+	}
 }
 
 #define LERP(X, Y, A) (((X) + ((((Y) - (X)) * (A)) >> 8)) & 0x00ff00ff)
@@ -206,6 +213,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 {
 	model2_state *state = object.state;
 	u32 *const p = &m_destmap.pix(scanline);
+	u8 *const fill = &m_fillmap.pix(scanline);
 
 	/* extract color information */
 	const u16 *colortable_r = &state->m_colorxlat[0x0000/2];
@@ -246,6 +254,9 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 
 	for ( ; x < extent.stopx; x += dx, ooz += dooz, uoz += duoz, voz += dvoz)
 	{
+		if (fill[x] > 0)
+			continue;
+
 		float z = recip_approx(ooz);
 
 		s32 mml = -object.texlod + fast_log2(z);	// equivalent to log2(z^2)
@@ -297,6 +308,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 		tb = gamma_value[tb];
 
 		p[x] = rgb_t(tr, tg, tb);
+		fill[x] = 0xff;
 	}
 }
 
