@@ -93,7 +93,7 @@ void my6_state::display_map(address_map &map)
 void my6_state::display_data_map(address_map &map)
 {
 	map(0xe000, 0xe7ff).ram().share("vram"); // Video ram. 64x64
-	map(0xa000, 0xa000).noprw(); // Input for display controller handled by maincpu
+	map(0xa000, 0xa000).nopr(); // Input for display controller handled by maincpu
 }
 
 void my6_state::machine_start()
