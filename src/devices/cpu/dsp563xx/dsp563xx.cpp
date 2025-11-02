@@ -146,19 +146,13 @@ void dsp563xx_device::execute_run()
 	while(m_icount > 0) {
 		debugger_instruction_hook(m_pc);
 		u32 opcode = m_p.read_dword(m_pc);
-		bool loop = (m_mr & MR_LF) && m_pc == m_la;
 		u16 kmove = t_move[opcode >> 8];
 		u16 knpar = kmove || opcode >= 0x100000 ? 0 : t_npar[opcode];
 		u16 kipar = knpar ? 0 : t_ipar[opcode & 0xff];
 		bool ex = BIT(t_move_ex[kmove >> 6], kmove & 0x3f) || BIT(t_npar_ex[knpar >> 6], knpar & 0x3f);
-		u32 exv;
-		if(ex) {
-			exv = m_p.read_dword(m_pc+1);
-			loop = loop || ((m_mr & MR_LF) && m_pc+1 == m_la);
-		} else
-			exv = 0;
+		u32 exv = ex ? m_p.read_dword(m_pc+1) : 0;
 		m_npc = (m_pc + (ex ? 2 : 1)) & 0xffffff;
-		if(loop) {
+		if((m_mr & MR_LF) && m_npc == m_la) {
 			if(m_lc != 1 || (m_emr & EMR_FV)) {
 				m_lc = m_lc ? m_lc-1 : 0xffff;
 				m_npc = get_ssh();
