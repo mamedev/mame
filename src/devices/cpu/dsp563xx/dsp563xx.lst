@@ -39,7 +39,7 @@
 
 2000.. #i,d                  - d:fvbr1(16) i:imm8(8)
 	%p
-	$d:w($i);
+	$d:wb($i);
 
 2000.. s,d                   - s:fvbr1(13) d:fvbr1(8)
 	m_tmp1 = $s:h;
@@ -561,7 +561,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 
 06c000 do s,expr             - s:sbr_nos(8) expr:exabs()
@@ -572,7 +572,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 
 000203 do forever,expr       - expr:exabs()
@@ -582,7 +582,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 	m_emr |= EMR_FV;
 
@@ -596,7 +596,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 
 06c010 dor s,expr            - s:sbr_nos(8) expr:expcrel()
@@ -607,7 +607,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 
 000202 dor forever,expr      - expr:expcrel()
@@ -617,7 +617,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr-1);
+	set_la($expr);
 	m_mr |= MR_LF;
 	m_emr |= EMR_FV;
 

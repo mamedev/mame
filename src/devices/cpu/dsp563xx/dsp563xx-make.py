@@ -30,6 +30,7 @@ class SlotChange:
     none = 0
     sel1 = 1
     bus24 = 2
+    bus8 = 3
 
 functions = {}
 
@@ -594,11 +595,11 @@ class Source:
                 while pos != len(line) and isa(line[pos]):
                     pos += 1
                 smode = line[spos:pos]
-            if smode != '' and smode != 'w' and smode != 'm' and smode != '1' and smode != 'w1' and smode != 'h' and smode != 'wh':
+            if smode != '' and smode != 'w' and smode != 'm' and smode != '1' and smode != 'w1' and smode != 'h' and smode != 'wh' and smode != 'wb':
                 print("Unexpected slot mode %s" % smode)
                 sys.exit(1)
             smode_id = SlotMode.memory if smode == 'm' else SlotMode.write if 'w' in smode else SlotMode.read
-            schange_id = SlotChange.sel1 if '1' in smode else SlotChange.bus24 if 'h' in smode else SlotChange.none
+            schange_id = SlotChange.sel1 if '1' in smode else SlotChange.bus24 if 'h' in smode else SlotChange.bus8 if 'b' in smode else SlotChange.none
             if sname not in self.slots:
                 self.slots[sname] = [False]*3
             self.slots[sname][smode_id] = True
@@ -658,8 +659,12 @@ class Source:
                                 s += 'set_%s1(%s)' % (slot, sub)
                             elif e[2] == SlotChange.bus24:
                                 s += 'set_%sh(%s)' % (slot, sub)
+                            elif e[2] == SlotChange.bus8:
+                                s += 'set_%sf(%s)' % (slot, sub)
                             else:
                                 s += 'set_%s(%s)' % (slot, sub)
+                        elif (slot == 'x0' or slot == 'x1' or slot == 'y0' or slot == 'y1') and e[2] == SlotChange.bus8:
+                            s += 'set_%sf(%s)' % (slot, sub)
                         else:
                             s += 'set_%s(%s)' % (slot, sub)
                     elif slot in ArrayRegs:

@@ -112,18 +112,24 @@ protected:
 
 	inline void set_a(u64 v) { m_a = v & 0xffffffffffffff; }
 	inline void set_ah(u32 v) { m_a = u64(util::sext(v, 24)) << 24; }
+	inline void set_af(u8 v) { m_a = u64(v) << 48; }
 	inline void set_a2(u8 v) { m_a = (m_a & 0x00ffffffffffff) | (u64(v) << 48); }
 	inline void set_a1(u32 v) { m_a = (m_a & 0xff000000ffffff) | (u64(v & 0xffffff) << 24); }
 	inline void set_a0(u32 v) { m_a = (m_a & 0xffffffff000000) | u64(v & 0xffffff); }
 	inline void set_b(u64 v) { m_b = v & 0xffffffffffffff; }
 	inline void set_bh(u32 v) { m_b = u64(util::sext(v, 24)) << 24; }
+	inline void set_bf(u64 v) { m_b = u64(v) << 48; }
 	inline void set_b2(u8 v) { m_b = (m_b & 0x00ffffffffffff) | (u64(v) << 48); }
 	inline void set_b1(u32 v) { m_b = (m_b & 0xff000000ffffff) | (u64(v & 0xffffff) << 24); }
 	inline void set_b0(u32 v) { m_b = (m_b & 0xffffffff000000) | u64(v & 0xffffff); }
 	inline void set_x0(u32 v) { m_x0 = v & 0xffffff; }
+	inline void set_x0f(u8 v) { m_x0 = u32(v) << 16; }
 	inline void set_x1(u32 v) { m_x1 = v & 0xffffff; }
+	inline void set_x1f(u8 v) { m_x1 = u32(v) << 16; }
 	inline void set_y0(u32 v) { m_y0 = v & 0xffffff; }
+	inline void set_y0f(u8 v) { m_y0 = u32(v) << 16; }
 	inline void set_y1(u32 v) { m_y1 = v & 0xffffff; }
+	inline void set_y1f(u8 v) { m_y1 = u32(v) << 16; }
 	inline void set_r(int index, u32 v) { m_r[index] = v & 0xffffff; }
 	inline void set_n(int index, u32 v) { m_n[index] = v & 0xffffff; }
 	inline void set_m(int index, u32 v) { m_m[index] = v & 0xffffff; }
