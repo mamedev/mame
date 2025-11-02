@@ -88,7 +88,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_lcdc(*this, "lcdc"),
 		m_dsp(*this, "dsp"),
-		m_rombank(*this, "rombank")
+		m_rombank(*this, "rombank"),
+		m_row(*this, "ROW%u", 0U),
+		m_scan(0)
 	{ }
 
 	void virusa(machine_config &config) ATTR_COLD;
@@ -106,6 +108,7 @@ private:
 	required_device<hd44780_device> m_lcdc;
 	required_device<dsp563xx_device> m_dsp;
 	required_memory_bank m_rombank;
+	required_ioport_array<4> m_row;
 
 	void prog_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
@@ -114,12 +117,15 @@ private:
 	void dsp_y_map(address_map &map) ATTR_COLD;
 
 	u8 p1_r();
+	u8 p4_r();
 	void p1_w(u8 data);
 	void p5_w(u8 data);
 
 	u8 p402_r();
 
 	void palette_init(palette_device &palette) ATTR_COLD;
+
+	u8 m_scan;
 };
 
 
@@ -127,6 +133,8 @@ void acvirus_state::machine_start()
 {
 	m_rombank->configure_entries(0, 16, memregion("maincpu")->base(), 0x8000);
 	m_rombank->set_entry(3);
+
+	save_item(NAME(m_scan));
 }
 
 void acvirus_state::machine_reset()
@@ -135,7 +143,7 @@ void acvirus_state::machine_reset()
 
 u8 acvirus_state::p1_r()
 {
-	return 0; // m_lcdc ready?
+	return ~0x10; // m_lcdc ready?
 }
 
 void acvirus_state::p1_w(u8 data)
@@ -146,9 +154,14 @@ void acvirus_state::p1_w(u8 data)
 	m_lcdc->rs_w(BIT(data, 7));
 }
 
+u8 acvirus_state::p4_r()
+{
+	return m_row[m_scan & 3]->read();
+}
 
 void acvirus_state::p5_w(u8 data)
 {
+	m_scan = data & 7;
 	m_rombank->set_entry((data >> 4) & 15);
 }
 
@@ -161,6 +174,7 @@ void acvirus_state::prog_map(address_map &map)
 void acvirus_state::data_map(address_map &map)
 {
 	map(0x0400, 0x0407).rw(m_dsp, FUNC(dsp563xx_device::hi08_r), FUNC(dsp563xx_device::hi08_w));
+	map(0x2000, 0x7fff).ram(); // TODO: RAM banks
 }
 
 void acvirus_state::dsp_p_map(address_map &map)
@@ -191,6 +205,7 @@ void acvirus_state::virusa(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
+	m_maincpu->port_in_cb<4>().set(FUNC(acvirus_state::p4_r));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -222,6 +237,7 @@ void acvirus_state::virusb(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
+	m_maincpu->port_in_cb<4>().set(FUNC(acvirus_state::p4_r));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -255,6 +271,7 @@ void acvirus_state::virusc(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
+	m_maincpu->port_in_cb<4>().set(FUNC(acvirus_state::p4_r));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -279,8 +296,98 @@ void acvirus_state::virusc(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 }
 
-static INPUT_PORTS_START( virus )
+
+static INPUT_PORTS_START( virusa )
+	PORT_START("ROW0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_1) PORT_NAME("Key Follow")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_V) PORT_NAME("Multi")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_2) PORT_NAME("LFO 1: Env Mode")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Q) PORT_NAME("Key Trigger") // hold at boot: LED & Knob tests
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_X) PORT_NAME("Demo: Ctrl") // a.k.a. "System"
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_C) PORT_NAME("Demo: Edit")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_W) PORT_NAME("LFO 2: Env Mode") // hold at boot: Test Knobs
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("ROW1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_T) PORT_NAME("FEnvMod")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_5) PORT_NAME("Distortion")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_0) PORT_NAME("Filters: Select 2")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_B) PORT_NAME("Single")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_9) PORT_NAME("Filters: Select 1")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Y) PORT_NAME("Oscilators: Sync")
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("ROW2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_A) PORT_NAME("Transpose -") // hold at boot: RAM test
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_S) PORT_NAME("Transpose +") // hold at boot: Press a key!
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_E) PORT_NAME("LFO 2: Amount") // hold at boot: "      0      " / "AMP.Release KNOB"
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_NAME("LFO 2: Shape")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_3) PORT_NAME("LFO 1: Amount")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_4) PORT_NAME("LFO 1: Shape") // hold at boot: "Initialize" / "Edit-Buffers"
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Store") // hold at boot to access OS update screen
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("ROW3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_N) PORT_NAME("Value -")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_J) PORT_NAME("Parameter <")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_K) PORT_NAME("Parameter >")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_M) PORT_NAME("Value +")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_6) PORT_NAME("Filter 1: Mode") // hold at boot: ROM/RAM checks
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_7) PORT_NAME("Filter 2: Mode")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_8) PORT_NAME("Filter Routing")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( virusb )
+	PORT_START("ROW0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_1) PORT_NAME("LFO 1: Edit")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_V) PORT_NAME("Multi")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_2) PORT_NAME("LFO 1: Env Mode")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Q) PORT_NAME("LFO 2: Edit") // hold at boot: LED & Knob tests
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_X) PORT_NAME("Demo: Ctrl") // a.k.a. "System"
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_C) PORT_NAME("Demo: Edit")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_W) PORT_NAME("LFO 2: Env Mode") // hold at boot: Test Knobs
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Z) PORT_NAME("Effects") // a.k.a. "EfxEdit"
+
+	PORT_START("ROW1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_T) PORT_NAME("Oscilators: Edit")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_5) PORT_NAME("Filters: Edit")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_0) PORT_NAME("Filters: Select 2")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_B) PORT_NAME("Single")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_9) PORT_NAME("Filters: Select 1")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Y) PORT_NAME("Oscilators: Sync")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_O) PORT_NAME("Part +") // boot screen shows "Indigo"
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("ROW2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_A) PORT_NAME("Transpose -") // hold at boot: RAM test
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_S) PORT_NAME("Transpose +") // hold at boot: "Press a key!"
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_E) PORT_NAME("LFO 2: Amount") // hold at boot: "AMP.Rel0  e KNOB"
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_NAME("LFO 2: Shape")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_3) PORT_NAME("LFO 1: Amount")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_4) PORT_NAME("LFO 1: Shape") // hold at boot: "Initialize" / "Edit-Buffers"
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Store") // hold at boot to access OS update screen
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("ROW3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_N) PORT_NAME("Value -")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_J) PORT_NAME("Parameter <")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_K) PORT_NAME("Parameter >")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_M) PORT_NAME("Value +")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_6) PORT_NAME("Filter 1: Mode") // hold at boot: ROM/RAM checks
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_7) PORT_NAME("Filter 2: Mode")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_8) PORT_NAME("Filter Routing")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_I) PORT_NAME("Part -")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( virusc )
+	// TODO: First review boot sequence for the Virus C
+	//       because the display is not showing anything at boot
+	PORT_INCLUDE(virusb)
+INPUT_PORTS_END
+
 
 ROM_START( virusa )
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -315,9 +422,9 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 1997, virusa,     0, 0, virusa, virus, acvirus_state, empty_init, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 1999, virusb,     0, 0, virusb, virus, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 2002, virusc,     0, 0, virusc, virus, acvirus_state, empty_init, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 2001, virusrck,   0, 0, virusb, virus, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 2002, virusrckxl, 0, 0, virusc, virus, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 2004, viruscl,    0, 0, virusb, virus, acvirus_state, empty_init, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 1997, virusa,     0, 0, virusa, virusa, acvirus_state, empty_init, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 1999, virusb,     0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2002, virusc,     0, 0, virusc, virusc, acvirus_state, empty_init, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2001, virusrck,   0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2002, virusrckxl, 0, 0, virusc, virusc, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2004, viruscl,    0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

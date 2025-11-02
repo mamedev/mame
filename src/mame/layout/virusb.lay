@@ -16,12 +16,12 @@ license:CC0-1.0
 		<!-- body -->
 		<rect>
 			<color state="0" red="0.16" green="0.18" blue="0.16"/>
-			<color state="1" red="0.08" green="0.06" blue="0.08"/>
+			<color state="1" red="0.12" green="0.12" blue="0.12"/>
 			<bounds x="3" y="3" width="39" height="39"/>
 		</rect>
 		<rect>
 			<color state="0" red="0.5" green="0.5" blue="0.5"/>
-			<color state="1" red="0.1" green="0.1" blue="0.1"/>
+			<color state="1" red="0.4" green="0.4" blue="0.4"/>
 			<bounds x="3" y="3" width="1" height="39"/>
 		</rect>
 		<rect>
@@ -578,8 +578,8 @@ license:CC0-1.0
 		<element ref="led" name="LED2"><bounds x="134.5" y="476" width="11" height="11"/></element>
 		<element ref="led" name="LED3"><bounds x="152.5" y="476" width="11" height="11"/></element>
 		<element ref="led" name="LED4"><bounds x="170.5" y="476" width="11" height="11"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- TRANSPOSE [-] --><bounds x="95" y="495" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- TRANSPOSE [+] --><bounds x="140" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW2" inputmask="0x01"><!-- TRANSPOSE [-] --><bounds x="95" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW2" inputmask="0x02"><!-- TRANSPOSE [+] --><bounds x="140" y="495" width="45" height="45"/></element>
 		<element ref="transpose_text"><bounds x="106" y="547" width="66" height="12"/></element>
 		<element ref="panic_text"><bounds x="128" y="560" width="24" height="10"/></element>
 		<element ref="gray_line"><bounds x="109" y="564" width="15" height="1"/></element>
@@ -594,7 +594,7 @@ license:CC0-1.0
 
 		<element ref="led" name="LED5"><bounds x="292" y="108" width="11" height="11"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- SHAPE --><bounds x="320" y="142" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW2" inputmask="0x20"><!-- SHAPE --><bounds x="320" y="142" width="45" height="45"/></element>
 		<element ref="shape_text"><bounds x="325" y="196" width="36" height="12"/></element>
 
 		<element ref="led" name="LED6"><bounds x="380" y="124" width="11" height="11"/></element>
@@ -613,8 +613,8 @@ license:CC0-1.0
 		<element ref="led" name="LED12"><bounds x="292" y="230" width="11" height="11"/></element>
 
 		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- EDIT --><bounds x="230" y="249" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- ENV MODE --><bounds x="275" y="249" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- AMOUNT --><bounds x="320" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW0" inputmask="0x04"><!-- ENV MODE --><bounds x="275" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW2" inputmask="0x10"><!-- AMOUNT --><bounds x="320" y="249" width="45" height="45"/></element>
 
 		<element ref="edit_text"><bounds x="238" y="300" width="29" height="12"/></element>
 		<element ref="env_text"><bounds x="287" y="300" width="21" height="12"/></element>
@@ -641,7 +641,7 @@ license:CC0-1.0
 
 		<element ref="led" name="LED18"><bounds x="292" y="353" width="11" height="11"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- SHAPE --><bounds x="320" y="386" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW2" inputmask="0x08"><!-- SHAPE --><bounds x="320" y="386" width="45" height="45"/></element>
 		<element ref="shape_text"><bounds x="325" y="440" width="36" height="12"/></element>
 
 		<element ref="led" name="LED19"><bounds x="380" y="369" width="11" height="11"/></element>
@@ -659,9 +659,9 @@ license:CC0-1.0
 		<element ref="led" name="LED24"><bounds x="247" y="476" width="11" height="11"/></element>
 		<element ref="led" name="LED25"><bounds x="292" y="476" width="11" height="11"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- EDIT --><bounds x="230" y="495" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- ENV MODE --><bounds x="275" y="495" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- AMOUNT --><bounds x="320" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW0" inputmask="0x08"><!-- EDIT --><bounds x="230" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW0" inputmask="0x40"><!-- ENV MODE --><bounds x="275" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW2" inputmask="0x04"><!-- AMOUNT --><bounds x="320" y="495" width="45" height="45"/></element>
 
 		<element ref="edit_text"><bounds x="238" y="547" width="29" height="12"/></element>
 		<element ref="env_text"><bounds x="287" y="547" width="21" height="12"/></element>
@@ -712,8 +712,8 @@ license:CC0-1.0
 		<element ref="led" name="LED31"><bounds x="733" y="230" width="11" height="11"/></element>
 		<element ref="led" name="LED32"><bounds x="778" y="230" width="11" height="11"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- EDIT --><bounds x="716" y="249" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- SYNC --><bounds x="761" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW1" inputmask="0x01"><!-- EDIT --><bounds x="716" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW1" inputmask="0x20"><!-- SYNC --><bounds x="761" y="249" width="45" height="45"/></element>
 
 		<element ref="edit_text"><bounds x="724" y="300" width="29" height="12"/></element>
 		<element ref="sync_text"><bounds x="769" y="300" width="29" height="12"/></element>
@@ -749,31 +749,31 @@ license:CC0-1.0
 		<element ref="access_logo_text"><bounds x="522" y="430" width="117" height="44"/></element>
 		<element ref="music_electronics_text"><bounds x="645" y="454" width="118" height="14"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- PART [-] --><bounds x="808" y="344" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- PART [+] --><bounds x="853" y="344" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x80"><!-- PART [-] --><bounds x="808" y="344" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW1" inputmask="0x40"><!-- PART [+] --><bounds x="853" y="344" width="45" height="45"/></element>
 
 		<element ref="minus_text"><bounds x="810" y="394" width="5" height="12"/></element>
 		<element ref="part_text"><bounds x="838" y="394" width="30" height="12"/></element>
 		<element ref="plus_text"><bounds x="891" y="394" width="6" height="12"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- PARAM [<] --><bounds x="808" y="419" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- PARAM [>] --><bounds x="853" y="419" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x02"><!-- PARAM [<] --><bounds x="808" y="419" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x04"><!-- PARAM [>] --><bounds x="853" y="419" width="45" height="45"/></element>
 
 		<element ref="less_than_text"><bounds x="808" y="470" width="6" height="12"/></element>
 		<element ref="parameter_text"><bounds x="820" y="470" width="66" height="12"/></element>
 		<element ref="greater_than_text"><bounds x="893" y="470" width="6" height="12"/></element>
 		<element ref="bank_text"><bounds x="843" y="481" width="20" height="9"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- STORE --><bounds x="472" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW2" inputmask="0x40"><!-- STORE --><bounds x="472" y="495" width="45" height="45"/></element>
 		<element ref="store_text"><bounds x="477" y="547" width="35" height="12"/></element>
 
 		<element ref="led" name="LED33"><bounds x="559" y="476" width="11" height="11"/></element>
 		<element ref="led" name="LED34"><bounds x="604" y="476" width="11" height="11"/></element>
 		<element ref="led" name="LED35"><bounds x="649" y="476" width="11" height="11"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- EFFECTS --><bounds x="542" y="495" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- DEMO: CTRL --><bounds x="587" y="495" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- DEMO: EDIT --><bounds x="632" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW0" inputmask="0x80"><!-- EFFECTS --><bounds x="542" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW0" inputmask="0x10"><!-- DEMO: CTRL --><bounds x="587" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW0" inputmask="0x20"><!-- DEMO: EDIT --><bounds x="632" y="495" width="45" height="45"/></element>
 
 		<element ref="effects_text"><bounds x="539" y="547" width="50" height="12"/></element>
 		<element ref="ctrl_text"><bounds x="595" y="547" width="28" height="12"/></element>
@@ -785,8 +785,8 @@ license:CC0-1.0
 		<element ref="led" name="LED36"><bounds x="715" y="476" width="11" height="11"/></element>
 		<element ref="led" name="LED37"><bounds x="760" y="476" width="11" height="11"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- MULTI --><bounds x="698" y="495" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- SINGLE --><bounds x="743" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW0" inputmask="0x02"><!-- MULTI --><bounds x="698" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW1" inputmask="0x08"><!-- SINGLE --><bounds x="743" y="495" width="45" height="45"/></element>
 
 		<element ref="multi_text"><bounds x="703" y="547" width="36" height="12"/></element>
 		<element ref="single_text"><bounds x="744" y="547" width="43" height="12"/></element>
@@ -794,8 +794,8 @@ license:CC0-1.0
 		<element ref="gray_line"><bounds x="703" y="561" width="10" height="1"/></element>
 		<element ref="gray_line"><bounds x="773" y="561" width="10" height="1"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- VALUE [-] --><bounds x="808" y="495" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- VALUE [+] --><bounds x="853" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x01"><!-- VALUE [-] --><bounds x="808" y="495" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x08"><!-- VALUE [+] --><bounds x="853" y="495" width="45" height="45"/></element>
 		<element ref="minus_text"><bounds x="810" y="547" width="6" height="12"/></element>
 		<element ref="value_text"><bounds x="834" y="547" width="36" height="12"/></element>
 		<element ref="plus_text"><bounds x="890" y="547" width="6" height="12"/></element>
@@ -832,10 +832,10 @@ license:CC0-1.0
 
 		<element ref="led" name="LED38"><bounds x="1197" y="230" width="11" height="11"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- EDIT --><bounds x="1180" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW1" inputmask="0x02"><!-- EDIT --><bounds x="1180" y="249" width="45" height="45"/></element>
 		<element ref="edit_text"><bounds x="1188" y="300" width="29" height="12"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- FILT 1 --><bounds x="1225" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x10"><!-- FILT 1 --><bounds x="1225" y="249" width="45" height="45"/></element>
 		<element ref="filt_1_text"><bounds x="1234" y="300" width="27" height="12"/></element>
 
 		<element ref="led" name="LED39"><bounds x="1284" y="230" width="11" height="11"/></element>
@@ -854,14 +854,14 @@ license:CC0-1.0
 		<element ref="bs_text"><bounds x="1300" y="284" width="13" height="12"/></element>
 		<element ref="led" name="LED46"><bounds x="1318" y="284" width="11" height="11"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- FILT 2 --><bounds x="1345" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x20"><!-- FILT 2 --><bounds x="1345" y="249" width="45" height="45"/></element>
 		<element ref="filt_2_text"><bounds x="1352" y="300" width="32" height="12"/></element>
 
 		<element ref="mode_text"><bounds x="1292" y="300" width="29" height="12"/></element>
 		<element ref="gray_line"><bounds x="1264" y="308" width="25" height="1"/></element>
 		<element ref="gray_line"><bounds x="1324" y="308" width="25" height="1"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- FILTER ROUTING --><bounds x="1390" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x40"><!-- FILTER ROUTING --><bounds x="1390" y="249" width="45" height="45"/></element>
 		<element ref="filter_routing_text"><bounds x="1397" y="300" width="83" height="12"/></element>
 
 
@@ -880,8 +880,8 @@ license:CC0-1.0
 		<element ref="led" name="LED51"><bounds x="1520" y="230" width="11" height="11"/></element>
 		<element ref="led" name="LED52"><bounds x="1565" y="230" width="11" height="11"/></element>
 
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- SELECT --><bounds x="1503" y="249" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW0" inputmask="0x01"><!-- SELECT --><bounds x="1548" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW1" inputmask="0x10"><!-- SELECT (Filt1) --><bounds x="1503" y="249" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW1" inputmask="0x04"><!-- SELECT (Filt2) --><bounds x="1548" y="249" width="45" height="45"/></element>
 		<element ref="select_text"><bounds x="1526" y="300" width="44" height="12"/></element>
 
 		<group ref="knob_0_6_12"><!-- ATTACK --><bounds x="1075" y="330" width="77" height="77"/></group>
