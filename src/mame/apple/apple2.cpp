@@ -481,7 +481,7 @@ u8 apple2_state::flags_r(offs_t offset)
 		// check if SHIFT key mod configured
 		if (m_sysconfig->read() & 0x04)
 		{
-			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0 : 0x80) | uFloatingBus7;
 		}
 		return (m_gameio->sw2_r() ? 0x80 : 0) | (read_floatingbus() & 0x7f);
 

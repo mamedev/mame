@@ -2077,7 +2077,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 
 		case 0x63:  // button 2 or SHIFT key
 		case 0x6b:
-			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0 : 0x80) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
