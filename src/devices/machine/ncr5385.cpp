@@ -40,7 +40,7 @@
 // IRQ6 occasionally arrives between end of scsi write code and getting IRQ3.  unclear why it isn't masked out.
 
 // 40us
-unsigned constexpr TEK4404_XFI_OUT_ACK_DELAY = 80'000;
+unsigned constexpr TEK4404_XFI_OUT_ACK_DELAY = 10'000;
 
 
 #include "emu.h"
@@ -213,7 +213,7 @@ void ncr5385_device::scsi_ctrl_changed()
 				ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
 
 		if (m_state != IDLE)
-			m_state_timer->adjust(attotime::from_usec(1000));
+			m_state_timer->adjust(attotime::from_usec(80));
 	}
 	else
 	{
@@ -845,7 +845,7 @@ int ncr5385_device::state_step()
 			else
 			{
 				LOGMASKED(LOG_STATE, "%10s: xfi_out: %s\n", machine().time().as_string(8), remaining() ? "phase change" : "transfer complete");
-				m_int_status |= INT_FUNC_COMPLETE;
+				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
 
 				update_int();
