@@ -8,7 +8,7 @@
 
 ROM_START( dsp56303 )
 	ROM_REGION32_LE( 0xc0*4, "boot", 0 )
-	ROM_LOAD( "boot-303.bin", 0, 0xc0*4, CRC(aee585f6) SHA1(d5b5fb0aa311dd29770ca5a439b6ce3cf70b62c3) )
+	ROM_LOAD( "boot-303.bin", 0, 0xc0*4, CRC(331218e3) SHA1(a1728cfaf31919f619a6c4d579f198c5a4bb9e44))
 ROM_END
 
 dsp56303_device::dsp56303_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
