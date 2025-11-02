@@ -104,7 +104,6 @@ private:
 	void ppi_pc_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dial_timer_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(midi_clock_w);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7810_device> m_panelcpu;
@@ -367,21 +366,6 @@ void mpc60_state::mpc60_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0, 176, 128));
 	palette.set_pen_color(1, rgb_t(15, 73, 119));
-}
-
-// 500 kHz (31250 * 16) to SIO0 RX clock 0, both TX clocks, and all SIO1 RX and TX clocks
-TIMER_DEVICE_CALLBACK_MEMBER(mpc60_state::midi_clock_w)
-{
-	for (int state = 0; state < 2; state++)
-	{
-		m_sio[0]->write_rxc<0>(state);
-		m_sio[0]->write_txc<0>(state);
-		m_sio[0]->write_txc<1>(state);
-		m_sio[1]->write_rxc<0>(state);
-		m_sio[1]->write_rxc<1>(state);
-		m_sio[1]->write_txc<0>(state);
-		m_sio[1]->write_txc<1>(state);
-	}
 }
 
 void mpc60_state::floppies(device_slot_interface &device)
