@@ -30227,7 +30227,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 625: { // bsr [x]
 		u32 x = (m_pc+exv) & 0xffffff;
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		break;
@@ -30235,7 +30235,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 626: { // bsr [x]
 		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		break;
@@ -30243,7 +30243,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 627: { // bsr r
 		u32 r = get_r(BIT(opcode, 8, 3) & 7);
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = m_pc + r;
 		break;
@@ -30342,7 +30342,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30354,7 +30354,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30366,7 +30366,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30378,7 +30378,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30390,7 +30390,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30402,7 +30402,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30414,7 +30414,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30426,7 +30426,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30438,7 +30438,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30450,7 +30450,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30462,7 +30462,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s_h, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30474,7 +30474,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s_h, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30486,7 +30486,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30498,7 +30498,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30510,7 +30510,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30522,7 +30522,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30534,7 +30534,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30546,7 +30546,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30558,7 +30558,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30570,7 +30570,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30582,7 +30582,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30594,7 +30594,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30606,7 +30606,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30618,7 +30618,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30630,7 +30630,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -30642,7 +30642,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 x = (m_pc+exv) & 0xffffff;
 		if(BIT(s, n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		}
@@ -32254,7 +32254,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32268,7 +32268,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32282,7 +32282,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32296,7 +32296,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32310,7 +32310,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32324,7 +32324,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32338,7 +32338,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32352,7 +32352,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32366,7 +32366,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32380,7 +32380,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32394,7 +32394,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32408,7 +32408,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32422,7 +32422,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32436,7 +32436,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32450,7 +32450,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32464,7 +32464,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32478,7 +32478,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32492,7 +32492,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32506,7 +32506,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32520,7 +32520,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32534,7 +32534,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32548,7 +32548,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32562,7 +32562,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32576,7 +32576,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32590,7 +32590,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32604,7 +32604,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32616,7 +32616,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		m_emr |= EMR_FV;
 		break;
@@ -32695,7 +32695,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32709,7 +32709,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32723,7 +32723,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32737,7 +32737,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32751,7 +32751,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32765,7 +32765,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32779,7 +32779,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32793,7 +32793,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32807,7 +32807,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32821,7 +32821,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32835,7 +32835,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32849,7 +32849,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32863,7 +32863,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32877,7 +32877,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32891,7 +32891,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32905,7 +32905,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32919,7 +32919,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32933,7 +32933,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32947,7 +32947,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32961,7 +32961,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32975,7 +32975,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -32989,7 +32989,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -33003,7 +33003,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -33017,7 +33017,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -33031,7 +33031,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -33045,7 +33045,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		break;
 		}
@@ -33057,7 +33057,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
-		set_la(expr);
+		set_la(expr-1);
 		m_mr |= MR_LF;
 		m_emr |= EMR_FV;
 		break;
@@ -35500,7 +35500,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = ea;
 		break;
@@ -35510,7 +35510,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = ea;
 		break;
@@ -35520,7 +35520,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = ea;
 		break;
@@ -35530,7 +35530,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = ea;
 		break;
@@ -35539,7 +35539,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = ea;
 		break;
@@ -35548,7 +35548,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = ea;
 		break;
@@ -35558,7 +35558,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = ea;
 		break;
@@ -35566,7 +35566,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 1577: { // jsr [abs]
 		u32 abs = exv;
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = abs;
 		break;
@@ -35574,7 +35574,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 1578: { // jsr [x]
 		u32 x = BIT(opcode, 0, 12);
 		inc_sp();
-		set_ssh(m_pc+1);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = x;
 		break;

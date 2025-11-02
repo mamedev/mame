@@ -467,19 +467,19 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 
 0d1080 bsr x                 - x:expcrel() over
 	inc_sp();
-	set_ssh(m_pc+2);
+	set_ssh(m_npc);
 	set_ssl(get_sr());
 	m_npc = $x;
 
 050800 bsr x                 - x:pcrel(6, 0) over
 	inc_sp();
-	set_ssh(m_pc+1);
+	set_ssh(m_npc);
 	set_ssl(get_sr());
 	m_npc = $x;
 
 0d1880 bsr r                 - r:ar(8) over
 	inc_sp();
-	set_ssh(m_pc+1);
+	set_ssh(m_npc);
 	set_ssl(get_sr());
 	m_npc = m_pc + $r;
 
@@ -491,7 +491,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0dc0a0 bsset #n,s,x          - s:sbr(8) n:bit5(0) x:expcrel() cond over
 	if(BIT($s:h, $n)) {
 		inc_sp();
-		set_ssh(m_pc+2);
+		set_ssh(m_npc);
 		set_ssl(get_sr());
 		m_npc = $x;
 	}
@@ -561,7 +561,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr);
+	set_la($expr-1);
 	m_mr |= MR_LF;
 
 06c000 do s,expr             - s:sbr_nos(8) expr:exabs()
@@ -572,7 +572,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr);
+	set_la($expr-1);
 	m_mr |= MR_LF;
 
 000203 do forever,expr       - expr:exabs()
@@ -582,7 +582,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr);
+	set_la($expr-1);
 	m_mr |= MR_LF;
 	m_emr |= EMR_FV;
 
@@ -596,7 +596,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr);
+	set_la($expr-1);
 	m_mr |= MR_LF;
 
 06c010 dor s,expr            - s:sbr_nos(8) expr:expcrel()
@@ -607,7 +607,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr);
+	set_la($expr-1);
 	m_mr |= MR_LF;
 
 000202 dor forever,expr      - expr:expcrel()
@@ -617,7 +617,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	inc_sp();
 	set_ssh(m_pc+2);
 	set_ssl(get_sr());
-	set_la($expr);
+	set_la($expr-1);
 	m_mr |= MR_LF;
 	m_emr |= EMR_FV;
 
@@ -685,19 +685,19 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 
 0bc080 jsr ea                - ea:eam1(8) over
 	inc_sp();
-	set_ssh(m_pc+1);
+	set_ssh(m_npc);
 	set_ssl(get_sr());
 	m_npc = $ea;
 
 0bc080 jsr abs               - abs:eam1a(8) over
 	inc_sp();
-	set_ssh(m_pc+2);
+	set_ssh(m_npc);
 	set_ssl(get_sr());
 	m_npc = $abs;
 
 0d0000 jsr x                 - x:abs12(0) over
 	inc_sp();
-	set_ssh(m_pc+1);
+	set_ssh(m_npc);
 	set_ssl(get_sr());
 	m_npc = $x;
 
