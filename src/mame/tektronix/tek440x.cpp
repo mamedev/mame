@@ -75,6 +75,7 @@
 #define LOG_GENERAL (1U << 0)
 #define LOG_MMU (1U << 1)
 #define LOG_FPU (1U << 2)
+#define LOG_SCSI (1U << 3)
 
 #define VERBOSE LOG_GENERAL
 #include "logmacro.h"
@@ -1782,6 +1783,7 @@ m_printer->in_pb_callback().set_constant(0xb0);		// HACK:  vblank always checks 
 		{
 			ncr5385_device &adapter = downcast<ncr5385_device &>(*device);
 
+			LOGMASKED(LOG_SCSI, "ncr5385_device.set_inputline(M68K_IRQ_3)\n");
 			adapter.irq().set_inputline(m_maincpu, M68K_IRQ_3);
 		});
 
