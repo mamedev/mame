@@ -585,7 +585,6 @@ private:
 	void map_w(offs_t offset, u16 data, u16 mem_mask);
 	u8 mapcntl_r();
 	void mapcntl_w(u8 data);
-	void vblank_irq(int state);
 	void sound_w(u8 data);
 	u8 diag_r();
 	void diag_w(u8 data);
@@ -1281,12 +1280,6 @@ void tek440x_state::videocntl_w(u8 data)
 		m_vint->in_w<2>(0);
 
 	m_videocntl = data;
-}
-
-void tek440x_state::vblank_irq(int state)
-{
-	if (state && BIT(m_videocntl, 6))
-		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 }
 
 void tek440x_state::sound_w(u8 data)
