@@ -384,7 +384,10 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0c8080 brclr #n,xy:aa,x      - aa:asa6(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
 0cc000 brclr #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
 048000 brclr #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
-0cc080 brclr #n,s,x          - s:sbr(8) n:bit5(0) cond
+0cc080 brclr #n,s,x          - s:sbr(8) n:bit5(0) x:expcrel() cond
+	if(!BIT($s:h, $n))
+		m_npc = $x;
+
 000210 brkcc                 - cc:cc(0) cond
 0c8020 brset #n,xy:ea,x      - ea:eam1(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
 0c8020 brset #n,xy:abs,x     - abs:eam1a(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
@@ -392,6 +395,9 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0cc020 brset #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
 048020 brset #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
 0cc0a0 brset #n,s,x          - s:sbr(8) n:bit5(0) x:expcrel() cond
+	if(BIT($s:h, $n))
+		m_npc = $x;
+
 0d1000 bscc x                - cc:cc(0) x:expcrel() cond over
 050000 bscc x                - cc:cc(12) x:pcrel(6, 0) cond over
 0d1800 bscc r                - r:ar(8) cc:cc(0) cond over
@@ -401,6 +407,13 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0dc000 bsclr #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
 048080 bsclr #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
 0dc080 bsclr #n,s,x          - s:sbr(8) n:bit5(0) x:expcrel() cond over
+	if(!BIT($s:h, $n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
 0a4020 bset #n,xy:ea         - ea:eam1(8) xy:xyc(6) n:bit5(0)
 	u32 t = $xy:m.read_dword($ea);
 	u32 m = 1 << $n;
@@ -476,6 +489,13 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 0dc020 bsset #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
 0480a0 bsset #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
 0dc0a0 bsset #n,s,x          - s:sbr(8) n:bit5(0) x:expcrel() cond over
+	if(BIT($s:h, $n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
 0b4020 btst #n,xy:ea         - ea:eam1(8) xy:xyc(6) n:bit5(0)
 	u32 t = $xy:m.read_dword($ea);
 	u32 m = 1 << $n;

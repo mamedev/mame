@@ -34844,7 +34844,7 @@ const u64 dsp563xx_disassembler::t_move_ex =
 ;
 
 const u64 dsp563xx_disassembler::t_npar_ex[4] = {
-	0x17e7f3e4208828cc,0xf8bf22a7fe040bf2,0x6739c301c480bebf,0x000010200d822806,
+	0x17e7f7e4208828cc,0xf8bf22a7fe040bf2,0x6739c301c480bebf,0x000010200d822806,
 };
 
 const u32 dsp563xx_disassembler::t_npar_flags[0x100] = {
@@ -35046,7 +35046,7 @@ std::string dsp563xx_disassembler::disasm_npar(u8 knpar, u32 opcode, u32 exv, u3
 	case 39: return util::string_format("brclr #%d,%s:$%06x,$%06x", BIT(opcode, 0, 5), ts_xyc[BIT(opcode, 6, 1)], BIT(opcode, 8, 6), (pc+exv) & 0xffffff);
 	case 40: return util::string_format("brclr #%d,%s:$%06x,$%06x", BIT(opcode, 0, 5), ts_xyc[BIT(opcode, 6, 1)], 0xffffc0 + BIT(opcode, 8, 6), (pc+exv) & 0xffffff);
 	case 41: return util::string_format("brclr #%d,%s:$%06x,$%06x", BIT(opcode, 0, 5), ts_xyc[BIT(opcode, 6, 1)], 0xffff80 + BIT(opcode, 8, 6), (pc+exv) & 0xffffff);
-	case 42: return util::string_format("brclr #%d,%s,x", BIT(opcode, 0, 5), ts_sbr[BIT(opcode, 8, 6)]);
+	case 42: return util::string_format("brclr #%d,%s,$%06x", BIT(opcode, 0, 5), ts_sbr[BIT(opcode, 8, 6)], (pc+exv) & 0xffffff);
 	case 43: return util::string_format("brk%s", ts_cc[BIT(opcode, 0, 4)]);
 	case 44: return util::string_format("brset #%d,%s:%s,$%06x", BIT(opcode, 0, 5), ts_xyc[BIT(opcode, 6, 1)], ts_eam1[BIT(opcode, 8, 6)], (pc+exv) & 0xffffff);
 	case 45: return util::string_format("brset #%d,%s:$%06x,$%06x", BIT(opcode, 0, 5), ts_xyc[BIT(opcode, 6, 1)], exv, (pc+exv) & 0xffffff);

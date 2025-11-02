@@ -341,7 +341,7 @@ class Function:
             elif mode == 'asaq':
                 return '0xffff80 + BIT(opcode, %d, %d)' % (params[0], self.bcount)
             elif mode == 'pcrel':
-                return '(m_pc + BIT(opcode, %d, %d)) & 0xffffff' % (params[0], self.bcount)
+                return '(m_pc + util::sext(BIT(opcode, %d, %d), %d)) & 0xffffff' % (params[0], self.bcount)
             else:
                 print('unsupported range on %s %s' % (mode, self.name))
         elif self.values[0] == 'split-range':

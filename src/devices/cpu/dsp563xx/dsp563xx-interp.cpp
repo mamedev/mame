@@ -28434,108 +28434,212 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		unhandled("brclr #[n],y:[qq],[x]");
 		break;
 		}
-	case 391: { // brclr #[n],x0,x
-		unhandled("brclr #[n],x0,x");
+	case 391: { // brclr #[n],x0,[x]
+		u32 s = get_x0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 392: { // brclr #[n],x1,x
-		unhandled("brclr #[n],x1,x");
+	case 392: { // brclr #[n],x1,[x]
+		u32 s = get_x1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 393: { // brclr #[n],y0,x
-		unhandled("brclr #[n],y0,x");
+	case 393: { // brclr #[n],y0,[x]
+		u32 s = get_y0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 394: { // brclr #[n],y1,x
-		unhandled("brclr #[n],y1,x");
+	case 394: { // brclr #[n],y1,[x]
+		u32 s = get_y1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 395: { // brclr #[n],a0,x
-		unhandled("brclr #[n],a0,x");
+	case 395: { // brclr #[n],a0,[x]
+		u32 s = get_a0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 396: { // brclr #[n],b0,x
-		unhandled("brclr #[n],b0,x");
+	case 396: { // brclr #[n],b0,[x]
+		u32 s = get_b0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 397: { // brclr #[n],a2,x
-		unhandled("brclr #[n],a2,x");
+	case 397: { // brclr #[n],a2,[x]
+		u32 s = get_a2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 398: { // brclr #[n],b2,x
-		unhandled("brclr #[n],b2,x");
+	case 398: { // brclr #[n],b2,[x]
+		u32 s = get_b2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 399: { // brclr #[n],a1,x
-		unhandled("brclr #[n],a1,x");
+	case 399: { // brclr #[n],a1,[x]
+		u32 s = get_a1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 400: { // brclr #[n],b1,x
-		unhandled("brclr #[n],b1,x");
+	case 400: { // brclr #[n],b1,[x]
+		u32 s = get_b1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 401: { // brclr #[n],a,x
-		unhandled("brclr #[n],a,x");
+	case 401: { // brclr #[n],a,[x]
+		u32 s_h = get_ah();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s_h, n))
+		m_npc = x;
 		break;
 		}
-	case 402: { // brclr #[n],b,x
-		unhandled("brclr #[n],b,x");
+	case 402: { // brclr #[n],b,[x]
+		u32 s_h = get_bh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s_h, n))
+		m_npc = x;
 		break;
 		}
-	case 403: { // brclr #[n],r,x
-		unhandled("brclr #[n],r,x");
+	case 403: { // brclr #[n],r,[x]
+		u32 s = get_r(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 404: { // brclr #[n],n,x
-		unhandled("brclr #[n],n,x");
+	case 404: { // brclr #[n],n,[x]
+		u32 s = get_n(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 405: { // brclr #[n],m,x
-		unhandled("brclr #[n],m,x");
+	case 405: { // brclr #[n],m,[x]
+		u32 s = get_m(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 406: { // brclr #[n],ep,x
-		unhandled("brclr #[n],ep,x");
+	case 406: { // brclr #[n],ep,[x]
+		u32 s = get_ep();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 407: { // brclr #[n],vba,x
-		unhandled("brclr #[n],vba,x");
+	case 407: { // brclr #[n],vba,[x]
+		u32 s = get_vba();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 408: { // brclr #[n],sc,x
-		unhandled("brclr #[n],sc,x");
+	case 408: { // brclr #[n],sc,[x]
+		u32 s = get_sc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 409: { // brclr #[n],sz,x
-		unhandled("brclr #[n],sz,x");
+	case 409: { // brclr #[n],sz,[x]
+		u32 s = get_sz();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 410: { // brclr #[n],sr,x
-		unhandled("brclr #[n],sr,x");
+	case 410: { // brclr #[n],sr,[x]
+		u32 s = get_sr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 411: { // brclr #[n],omr,x
-		unhandled("brclr #[n],omr,x");
+	case 411: { // brclr #[n],omr,[x]
+		u32 s = get_omr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 412: { // brclr #[n],sp,x
-		unhandled("brclr #[n],sp,x");
+	case 412: { // brclr #[n],sp,[x]
+		u32 s = get_sp();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 413: { // brclr #[n],ssh,x
-		unhandled("brclr #[n],ssh,x");
+	case 413: { // brclr #[n],ssh,[x]
+		u32 s = get_ssh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 414: { // brclr #[n],ssl,x
-		unhandled("brclr #[n],ssl,x");
+	case 414: { // brclr #[n],ssl,[x]
+		u32 s = get_ssl();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 415: { // brclr #[n],la,x
-		unhandled("brclr #[n],la,x");
+	case 415: { // brclr #[n],la,[x]
+		u32 s = get_la();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
-	case 416: { // brclr #[n],lc,x
-		unhandled("brclr #[n],lc,x");
+	case 416: { // brclr #[n],lc,[x]
+		u32 s = get_lc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 417: { // brkcc
@@ -28691,107 +28795,211 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 455: { // brset #[n],x0,[x]
-		unhandled("brset #[n],x0,[x]");
+		u32 s = get_x0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 456: { // brset #[n],x1,[x]
-		unhandled("brset #[n],x1,[x]");
+		u32 s = get_x1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 457: { // brset #[n],y0,[x]
-		unhandled("brset #[n],y0,[x]");
+		u32 s = get_y0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 458: { // brset #[n],y1,[x]
-		unhandled("brset #[n],y1,[x]");
+		u32 s = get_y1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 459: { // brset #[n],a0,[x]
-		unhandled("brset #[n],a0,[x]");
+		u32 s = get_a0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 460: { // brset #[n],b0,[x]
-		unhandled("brset #[n],b0,[x]");
+		u32 s = get_b0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 461: { // brset #[n],a2,[x]
-		unhandled("brset #[n],a2,[x]");
+		u32 s = get_a2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 462: { // brset #[n],b2,[x]
-		unhandled("brset #[n],b2,[x]");
+		u32 s = get_b2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 463: { // brset #[n],a1,[x]
-		unhandled("brset #[n],a1,[x]");
+		u32 s = get_a1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 464: { // brset #[n],b1,[x]
-		unhandled("brset #[n],b1,[x]");
+		u32 s = get_b1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 465: { // brset #[n],a,[x]
-		unhandled("brset #[n],a,[x]");
+		u32 s_h = get_ah();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s_h, n))
+		m_npc = x;
 		break;
 		}
 	case 466: { // brset #[n],b,[x]
-		unhandled("brset #[n],b,[x]");
+		u32 s_h = get_bh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s_h, n))
+		m_npc = x;
 		break;
 		}
 	case 467: { // brset #[n],r,[x]
-		unhandled("brset #[n],r,[x]");
+		u32 s = get_r(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 468: { // brset #[n],n,[x]
-		unhandled("brset #[n],n,[x]");
+		u32 s = get_n(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 469: { // brset #[n],m,[x]
-		unhandled("brset #[n],m,[x]");
+		u32 s = get_m(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 470: { // brset #[n],ep,[x]
-		unhandled("brset #[n],ep,[x]");
+		u32 s = get_ep();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 471: { // brset #[n],vba,[x]
-		unhandled("brset #[n],vba,[x]");
+		u32 s = get_vba();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 472: { // brset #[n],sc,[x]
-		unhandled("brset #[n],sc,[x]");
+		u32 s = get_sc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 473: { // brset #[n],sz,[x]
-		unhandled("brset #[n],sz,[x]");
+		u32 s = get_sz();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 474: { // brset #[n],sr,[x]
-		unhandled("brset #[n],sr,[x]");
+		u32 s = get_sr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 475: { // brset #[n],omr,[x]
-		unhandled("brset #[n],omr,[x]");
+		u32 s = get_omr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 476: { // brset #[n],sp,[x]
-		unhandled("brset #[n],sp,[x]");
+		u32 s = get_sp();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 477: { // brset #[n],ssh,[x]
-		unhandled("brset #[n],ssh,[x]");
+		u32 s = get_ssh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 478: { // brset #[n],ssl,[x]
-		unhandled("brset #[n],ssl,[x]");
+		u32 s = get_ssl();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 479: { // brset #[n],la,[x]
-		unhandled("brset #[n],la,[x]");
+		u32 s = get_la();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 480: { // brset #[n],lc,[x]
-		unhandled("brset #[n],lc,[x]");
+		u32 s = get_lc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n))
+		m_npc = x;
 		break;
 		}
 	case 481: { // bscc [x]
@@ -29075,107 +29283,315 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 551: { // bsclr #[n],x0,[x]
-		unhandled("bsclr #[n],x0,[x]");
+		u32 s = get_x0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 552: { // bsclr #[n],x1,[x]
-		unhandled("bsclr #[n],x1,[x]");
+		u32 s = get_x1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 553: { // bsclr #[n],y0,[x]
-		unhandled("bsclr #[n],y0,[x]");
+		u32 s = get_y0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 554: { // bsclr #[n],y1,[x]
-		unhandled("bsclr #[n],y1,[x]");
+		u32 s = get_y1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 555: { // bsclr #[n],a0,[x]
-		unhandled("bsclr #[n],a0,[x]");
+		u32 s = get_a0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 556: { // bsclr #[n],b0,[x]
-		unhandled("bsclr #[n],b0,[x]");
+		u32 s = get_b0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 557: { // bsclr #[n],a2,[x]
-		unhandled("bsclr #[n],a2,[x]");
+		u32 s = get_a2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 558: { // bsclr #[n],b2,[x]
-		unhandled("bsclr #[n],b2,[x]");
+		u32 s = get_b2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 559: { // bsclr #[n],a1,[x]
-		unhandled("bsclr #[n],a1,[x]");
+		u32 s = get_a1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 560: { // bsclr #[n],b1,[x]
-		unhandled("bsclr #[n],b1,[x]");
+		u32 s = get_b1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 561: { // bsclr #[n],a,[x]
-		unhandled("bsclr #[n],a,[x]");
+		u32 s_h = get_ah();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s_h, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 562: { // bsclr #[n],b,[x]
-		unhandled("bsclr #[n],b,[x]");
+		u32 s_h = get_bh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s_h, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 563: { // bsclr #[n],r,[x]
-		unhandled("bsclr #[n],r,[x]");
+		u32 s = get_r(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 564: { // bsclr #[n],n,[x]
-		unhandled("bsclr #[n],n,[x]");
+		u32 s = get_n(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 565: { // bsclr #[n],m,[x]
-		unhandled("bsclr #[n],m,[x]");
+		u32 s = get_m(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 566: { // bsclr #[n],ep,[x]
-		unhandled("bsclr #[n],ep,[x]");
+		u32 s = get_ep();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 567: { // bsclr #[n],vba,[x]
-		unhandled("bsclr #[n],vba,[x]");
+		u32 s = get_vba();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 568: { // bsclr #[n],sc,[x]
-		unhandled("bsclr #[n],sc,[x]");
+		u32 s = get_sc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 569: { // bsclr #[n],sz,[x]
-		unhandled("bsclr #[n],sz,[x]");
+		u32 s = get_sz();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 570: { // bsclr #[n],sr,[x]
-		unhandled("bsclr #[n],sr,[x]");
+		u32 s = get_sr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 571: { // bsclr #[n],omr,[x]
-		unhandled("bsclr #[n],omr,[x]");
+		u32 s = get_omr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 572: { // bsclr #[n],sp,[x]
-		unhandled("bsclr #[n],sp,[x]");
+		u32 s = get_sp();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 573: { // bsclr #[n],ssh,[x]
-		unhandled("bsclr #[n],ssh,[x]");
+		u32 s = get_ssh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 574: { // bsclr #[n],ssl,[x]
-		unhandled("bsclr #[n],ssl,[x]");
+		u32 s = get_ssl();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 575: { // bsclr #[n],la,[x]
-		unhandled("bsclr #[n],la,[x]");
+		u32 s = get_la();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 576: { // bsclr #[n],lc,[x]
-		unhandled("bsclr #[n],lc,[x]");
+		u32 s = get_lc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(!BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 577: { // bset #[n],x:(r)-n
@@ -29921,107 +30337,315 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 650: { // bsset #[n],x0,[x]
-		unhandled("bsset #[n],x0,[x]");
+		u32 s = get_x0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 651: { // bsset #[n],x1,[x]
-		unhandled("bsset #[n],x1,[x]");
+		u32 s = get_x1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 652: { // bsset #[n],y0,[x]
-		unhandled("bsset #[n],y0,[x]");
+		u32 s = get_y0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 653: { // bsset #[n],y1,[x]
-		unhandled("bsset #[n],y1,[x]");
+		u32 s = get_y1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 654: { // bsset #[n],a0,[x]
-		unhandled("bsset #[n],a0,[x]");
+		u32 s = get_a0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 655: { // bsset #[n],b0,[x]
-		unhandled("bsset #[n],b0,[x]");
+		u32 s = get_b0();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 656: { // bsset #[n],a2,[x]
-		unhandled("bsset #[n],a2,[x]");
+		u32 s = get_a2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 657: { // bsset #[n],b2,[x]
-		unhandled("bsset #[n],b2,[x]");
+		u32 s = get_b2();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 658: { // bsset #[n],a1,[x]
-		unhandled("bsset #[n],a1,[x]");
+		u32 s = get_a1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 659: { // bsset #[n],b1,[x]
-		unhandled("bsset #[n],b1,[x]");
+		u32 s = get_b1();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 660: { // bsset #[n],a,[x]
-		unhandled("bsset #[n],a,[x]");
+		u32 s_h = get_ah();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s_h, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 661: { // bsset #[n],b,[x]
-		unhandled("bsset #[n],b,[x]");
+		u32 s_h = get_bh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s_h, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 662: { // bsset #[n],r,[x]
-		unhandled("bsset #[n],r,[x]");
+		u32 s = get_r(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 663: { // bsset #[n],n,[x]
-		unhandled("bsset #[n],n,[x]");
+		u32 s = get_n(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 664: { // bsset #[n],m,[x]
-		unhandled("bsset #[n],m,[x]");
+		u32 s = get_m(BIT(opcode, 8, 6) & 7);
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 665: { // bsset #[n],ep,[x]
-		unhandled("bsset #[n],ep,[x]");
+		u32 s = get_ep();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 666: { // bsset #[n],vba,[x]
-		unhandled("bsset #[n],vba,[x]");
+		u32 s = get_vba();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 667: { // bsset #[n],sc,[x]
-		unhandled("bsset #[n],sc,[x]");
+		u32 s = get_sc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 668: { // bsset #[n],sz,[x]
-		unhandled("bsset #[n],sz,[x]");
+		u32 s = get_sz();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 669: { // bsset #[n],sr,[x]
-		unhandled("bsset #[n],sr,[x]");
+		u32 s = get_sr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 670: { // bsset #[n],omr,[x]
-		unhandled("bsset #[n],omr,[x]");
+		u32 s = get_omr();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 671: { // bsset #[n],sp,[x]
-		unhandled("bsset #[n],sp,[x]");
+		u32 s = get_sp();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 672: { // bsset #[n],ssh,[x]
-		unhandled("bsset #[n],ssh,[x]");
+		u32 s = get_ssh();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 673: { // bsset #[n],ssl,[x]
-		unhandled("bsset #[n],ssl,[x]");
+		u32 s = get_ssl();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 674: { // bsset #[n],la,[x]
-		unhandled("bsset #[n],la,[x]");
+		u32 s = get_la();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 675: { // bsset #[n],lc,[x]
-		unhandled("bsset #[n],lc,[x]");
+		u32 s = get_lc();
+		u32 n = BIT(opcode, 0, 5);
+		u32 x = (m_pc+exv) & 0xffffff;
+		if(BIT(s, n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = x;
+		}
 		break;
 		}
 	case 676: { // btst #[n],x:(r)-n
