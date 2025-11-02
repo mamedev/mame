@@ -241,6 +241,11 @@ ROM_START( punifrnd )
 	ROM_LOAD16_WORD_SWAP( "25oh64.ic3", 0x0000, 0x800000, CRC(622ca9b3) SHA1(4206393a4458ffcdb63352e743481865532fe8b5) )
 ROM_END
 
+ROM_START( punistar )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "xm25qh64c.ic3", 0x0000, 0x800000, CRC(72f54f23) SHA1(902955764d0b61decc057eb3afaf2960cf2134c6) )
+ROM_END
+
 ROM_START( pokgoget )
 	ROM_REGION16_BE(0x2000000, "maincpu:spidirect", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "mx25l25645g.u1", 0x0000, 0x2000000, CRC(a76ae22f) SHA1(3fa5eeedb3fe343a7707d76710298377b22b0681) )
@@ -264,6 +269,11 @@ ROM_END
 ROM_START( smkgurasa ) // code is the same, some data area differs, could be different factory defaults, or user data, remove later if redundant
 	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "xm25qh64c.u3", 0x0000, 0x800000, CRC(2c9e82af) SHA1(8c475783eafbeaeb88d62b145758ad3487410222) )
+ROM_END
+
+ROM_START( smkgacha )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "kg25l64.u2", 0x0000, 0x800000, CRC(eb461d92) SHA1(7481e8b3f2eaa9c8d992f3d9c58c1c7e3f27b380) )
 ROM_END
 
 ROM_START( dsgnpal )
@@ -350,6 +360,8 @@ CONS(2021, punij2pk, punirune, 0, generalplus_gpspi_direct, bfspyhnt, generalplu
 // has a link feature
 CONS(2021, punifrnd, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes Punitomo Tsuushin (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
+CONS(2021, punistar, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes Punistarz (pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
 // Pocket Monsters ガチッとゲットだぜ! モンスターボールゴー! - Pocket Monsters is printed on the inner shell, but not the box?
 CONS(2021, pokgoget, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball Go! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // ガチッとゲットだぜ! モンスターボール
@@ -361,8 +373,10 @@ CONS( 2021, smkcatch, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_
 // or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
 
 // is there a subtitle for this one? it's different to the others
-CONS( 201?, smkguras,  0,        0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 201?, smkgurasa, smkguras, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, smkguras,  0,        0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, smkgurasa, smkguras, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+CONS( 2021, smkgacha,  0,        0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gacha (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // there seem to be different versions of this available, is the software the same?
 CONS( 201?, dsgnpal, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
