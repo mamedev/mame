@@ -737,7 +737,7 @@ void tek440x_state::machine_reset()
 
 	m_vint->in_w<0>(0);		// VBL enable
 	m_vint->in_w<1>(0);		// VBL
-//	m_vint->in_w<2>(0);		// VBL
+	m_vint->in_w<2>(0);		// VBL
 
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
@@ -1255,8 +1255,6 @@ u8 tek440x_state::videocntl_r()
 	// page 2.1-92
 	if (m_screen->vblank())
 		ans |= 0x20;
-	else
-		ans |= 0x10;
 
 	if (m_screen->hblank())
 		ans |= 0x40;
@@ -1280,7 +1278,7 @@ void tek440x_state::videocntl_w(u8 data)
 
 	// VBenable was ON, now OFF
 	if (BIT(m_videocntl ^ data, 6) && !BIT(data, 6))
-		m_vint->in_w<1>(0);
+		m_vint->in_w<2>(0);
 
 	m_videocntl = data;
 }
@@ -1723,8 +1721,8 @@ void tek440x_state::tek4404(machine_config &config)
 	m_screen->set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal (guessed), 60 Hz vertical
 	m_screen->set_screen_update(FUNC(tek440x_state::screen_update));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(tek440x_state::vblank_irq));   //m_vint, FUNC(input_merger_all_high_device::in_w<1>));
-//	m_screen->screen_vblank().append(m_vint, FUNC(input_merger_all_high_device::in_w<2>));
+	m_screen->screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
+	m_screen->screen_vblank().append(m_vint, FUNC(input_merger_all_high_device::in_w<2>));
 	PALETTE(config, "palette", FUNC(tek440x_state::palette),2);
 	
 	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
