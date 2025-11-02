@@ -4779,6 +4779,7 @@ void hanakanz_state::momotaro_portmap(address_map &map)
 {
 	daimyojn_portmap(map);
 
+	map(0x39, 0x39).lr8(NAME([] () -> uint8_t { return 0x04; })); // TODO: work around unimplemented USART in the CPU core
 	map(0xe0, 0xe0).r(FUNC(hanakanz_state::technotop_protection_r<0x0d>));
 }
 
@@ -12875,6 +12876,20 @@ ROM_START( daimyojn )
 	ROM_LOAD( "t0171.2b", 0x00000, 0x80000, CRC(464be04c) SHA1(3532ac8d7eaadb2dc33e2c2d9731654176231184) )
 ROM_END
 
+// 麻雀 にぎり一丁 (Mahjong Nigiri Itchō)
+ROM_START( mjnigiri )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "p0382-2.6b", 0x00000, 0x80000, CRC(6474a421) SHA1(60cbde6918b5928ba0bf73c6f7c36b4c5431214f) )
+
+	ROM_REGION( 0x400000, "blitter", 0 )
+	ROM_LOAD( "t0383.7b",  0x000000, 0x200000, CRC(e948ec2e) SHA1(7313ab2c9264886ec6e3c59dc6e837bb2087b6e7) )
+	ROM_LOAD( "t0384.8b",  0x200000, 0x200000, CRC(cbfa4713) SHA1(9201dc4dac74489d4730781d14e8e0239f7f35ea) )
+	// 9b and 11b not populated
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "t0381.2b", 0x00000, 0x80000, CRC(d7705dc6) SHA1(0d4011a994a68a887ce6396126e576266c5b49df) )
+ROM_END
+
 ROM_START( momotaro )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
 	ROM_LOAD( "r0272m1.6e", 0x00000, 0x80000, CRC(71c83332) SHA1(c949cb9e23e5cc77dbd64fc28e62a88f1dc811a3) )
@@ -12889,19 +12904,23 @@ ROM_START( momotaro )
 	ROM_LOAD( "t0271.2b", 0x00000, 0x80000, CRC(c850d7b2) SHA1(8bb69bdea7035c5f8274927f07a4cdf6ed9b32fc) )
 ROM_END
 
-// 麻雀 にぎり一丁 (Mahjong Nigiri Itchō)
-ROM_START( mjnigiri )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "p0382-2.6b", 0x00000, 0x80000, CRC(6474a421) SHA1(60cbde6918b5928ba0bf73c6f7c36b4c5431214f) )
+ROM_START( mjkokuryu )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "r0402-3.6e", 0x00000, 0x80000, CRC(775f1dcf) SHA1(df791ba2ec197292d6f9a391efbef34eaf39e3da) )
 
-	ROM_REGION( 0x400000, "blitter", 0 )
-	ROM_LOAD( "t0383.7b",  0x000000, 0x200000, CRC(e948ec2e) SHA1(7313ab2c9264886ec6e3c59dc6e837bb2087b6e7) )
-	ROM_LOAD( "t0384.8b",  0x200000, 0x200000, CRC(cbfa4713) SHA1(9201dc4dac74489d4730781d14e8e0239f7f35ea) )
-	// 9b and 11b not populated
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "t0403.7b",    0x000000, 0x200000, CRC(43f531db) SHA1(283a53af6830fde1395c52387408c028bc698bf6) )
+	ROM_LOAD( "t0404.8b",    0x200000, 0x200000, CRC(340e36d3) SHA1(ce96c95c17034bbc08be7cfcefada25a270d7f02) )
+	ROM_LOAD( "t0405.9b",    0x400000, 0x200000, CRC(20abe74f) SHA1(9b7916eeec2a130294ac435116d25e2b0f88ed31) )
+	ROM_LOAD( "t0406-1.11b", 0x600000, 0x200000, CRC(c06b00a4) SHA1(b0e8c4e5fbbaea64728543ef3fa3b3a6399ba656) )
 
-	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "t0381.2b", 0x00000, 0x80000, CRC(d7705dc6) SHA1(0d4011a994a68a887ce6396126e576266c5b49df) )
+	ROM_REGION( 0x100000, "oki", 0 )  // samples
+	ROM_LOAD( "t0401.2b", 0x000000, 0x100000, CRC(320953cb) SHA1(49cce865b785ff07aa3fe9a60a100be0ebff20e0) )
+
+	ROM_REGION( 0x8000, "nvram", 0 ) // pre-initialized with 36 months to next inspection (0 by default, so it wouldn't boot past test mode)
+	ROM_LOAD( "nvram", 0x0000, 0x8000,CRC(c2590a33) SHA1(1af61af7200fa84cc96131fb83c9f44aea4c3d01) )
 ROM_END
+
 
 /***************************************************************************
 
@@ -13258,3 +13277,5 @@ GAME( 2002, mjtenho,     0,        daimyojn,  daimyojn,   hanakanz_state, empty_
 GAME( 2004, momotaro,    0,        momotaro,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan, T027-RB-01)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 GAME( 2007, mjnigiri,    0,        mjnigiri,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Nigiri Itcho!! (Japan, T038-PB-002)",                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+GAME( 2008, mjkokuryu,   0,        momotaro,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Kokuryu (Japan, T040-RB-03)",                            MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
