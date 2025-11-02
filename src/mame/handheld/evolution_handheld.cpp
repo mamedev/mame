@@ -113,7 +113,6 @@ ROM_START( yuleyuan )
 	ROM_LOAD( "25l128.bin", 0x0000000, 0x1000000, CRC(51ab49e2) SHA1(ecad532d27efea55031ffd31ac4479c9c4eceae6) )
 ROM_END
 
-
 ROM_START( tomyspt )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD( "mx25l12845e.u3", 0x000000, 0x1000000, CRC(3c8685ed) SHA1(289948c3d9a06db184397bc6a31ea594c404449d) )
@@ -121,6 +120,10 @@ ROM_START( tomyspt )
 	// there was also a FT24C16.u4, blank on dumped unit
 ROM_END
 
+ROM_START( hoppech )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD( "25l128.u3", 0x000000, 0x1000000, CRC(4a983ab2) SHA1(d5571cf0f3fcf872826a2ff8b45be69336b117dd) )
+ROM_END
 
 void evolution_handheldgame_state::init_yuleyuan()
 {
@@ -145,6 +148,9 @@ CONS( 2015, pokexyqz,    0,       0,      evolhh, evolhh, evolution_handheldgame
 CONS( 2015, pokesmqz,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokedex Sun & Moon Pokemon Quiz Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 CONS( 201?, tomyspt,     0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pretty Rhythm Smart Pod Touch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// ほっぺちゃん スイ☆コレ　ホワイト
+CONS( 201?, hoppech,     0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Hoppe-chan Sweet Collection (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // 星座电子宠物机 (virtual pet by 育乐元)
 CONS( 2022, yuleyuan,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
