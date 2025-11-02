@@ -5,18 +5,18 @@
 
 #define FLAG_E      0x0800
 
-#define CLRFLAG(f)  SR&=~(f);
-#define SETFLAG(f)  SR|=(f);
-#define TESTFLAG(f) (SR&(f))
+#define CLRFLAG(f)  SR &= ~(f);
+#define SETFLAG(f)  SR |= (f);
+#define TESTFLAG(f) (SR & (f))
 
-#define EXTRACT(val,sbit,ebit)  (((val)>>sbit)&((1<<((ebit-sbit)+1))-1))
-#define SEX8(val)   ((val&0x80)?(val|0xFFFFFF00):(val&0xFF))
-#define SEX16(val)  ((val&0x8000)?(val|0xFFFF0000):(val&0xFFFF))
-#define ZEX8(val)   ((val)&0xFF)
-#define ZEX16(val)  ((val)&0xFFFF)
-#define SEX(bits,val)   ((val)&(1<<(bits-1))?((val)|(~((1<<bits)-1))):(val&((1<<bits)-1)))
+#define EXTRACT(val, sbit, ebit)  (((val) >> sbit) & ((1 << (((ebit) - (sbit)) + 1)) - 1))
+#define SEXT8(val)   (((val) & 0x80) ? ((val) | 0xffffff00) : ((val) & 0xff))
+#define SEXT16(val)  (((val) & 0x8000) ? ((val) | 0xffff0000) : ((val) & 0xffff))
+#define ZEXT8(val)   ((val) & 0xff)
+#define ZEX1T6(val)  ((val) & 0xffff)
+#define SEXT(bits,val)   ((val) & (1 << ((bits) - 1)) ? ((val) | (~((1 << (bits)) - 1))) : (val & ((1 << (bits)) - 1)))
 
-#define INST(a) uint32_t se3208_disassembler::a(uint16_t Opcode, std::ostream &stream)
+#define INST(a) u32 se3208_disassembler::a(u16 opcode, std::ostream &stream)
 
 
 
@@ -28,17 +28,17 @@ INST(INVALIDOP)
 
 INST(LDB)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,4);
-	uint32_t Index=EXTRACT(Opcode,5,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 4);
+	const u32 index = EXTRACT(opcode, 5, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	if(Index)
-		util::stream_format(stream, "LDB   (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+	if (index)
+		util::stream_format(stream, "LDB   (%%R%d,0x%x),%%R%d", index, offset, src_dst);
 	else
-		util::stream_format(stream, "LDB   (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LDB   (0x%x),%%R%d", index + offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -46,17 +46,17 @@ INST(LDB)
 
 INST(STB)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,4);
-	uint32_t Index=EXTRACT(Opcode,5,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 4);
+	const u32 index = EXTRACT(opcode, 5, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	if(Index)
-		util::stream_format(stream, "STB   %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
+	if (index)
+		util::stream_format(stream, "STB   %%R%d,(%%R%d,0x%x)", src_dst, index, offset);
 	else
-		util::stream_format(stream, "STB   %%R%d,(0x%x)",SrcDst,Index+Offset);
+		util::stream_format(stream, "STB   %%R%d,(0x%x)", src_dst, index + offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -64,19 +64,19 @@ INST(STB)
 
 INST(LDS)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,4);
-	uint32_t Index=EXTRACT(Opcode,5,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 4);
+	const u32 index = EXTRACT(opcode, 5, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	Offset<<=1;
+	offset <<= 1;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	if(Index)
-		util::stream_format(stream, "LDS   (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+	if (index)
+		util::stream_format(stream, "LDS   (%%R%d,0x%x),%%R%d", index, offset, src_dst);
 	else
-		util::stream_format(stream, "LDS   (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LDS   (0x%x),%%R%d", index + offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -84,19 +84,19 @@ INST(LDS)
 
 INST(STS)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,4);
-	uint32_t Index=EXTRACT(Opcode,5,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 4);
+	const u32 index = EXTRACT(opcode, 5, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	Offset<<=1;
+	offset <<= 1;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	if(Index)
-		util::stream_format(stream, "STS   %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
+	if (index)
+		util::stream_format(stream, "STS   %%R%d,(%%R%d,0x%x)", src_dst, index, offset);
 	else
-		util::stream_format(stream, "STS   %%R%d,(0x%x)",SrcDst,Index+Offset);
+		util::stream_format(stream, "STS   %%R%d,(0x%x)", src_dst, index + offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -104,19 +104,19 @@ INST(STS)
 
 INST(LD)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,4);
-	uint32_t Index=EXTRACT(Opcode,5,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 4);
+	const u32 index = EXTRACT(opcode, 5, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	Offset<<=2;
+	offset <<= 2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	if(Index)
-		util::stream_format(stream, "LD    (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+	if (index)
+		util::stream_format(stream, "LD    (%%R%d,0x%x),%%R%d", index, offset, src_dst);
 	else
-		util::stream_format(stream, "LD    (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LD    (0x%x),%%R%d", index + offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -124,19 +124,19 @@ INST(LD)
 
 INST(ST)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,4);
-	uint32_t Index=EXTRACT(Opcode,5,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 4);
+	const u32 index = EXTRACT(opcode, 5, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	Offset<<=2;
+	offset <<= 2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	if(Index)
-		util::stream_format(stream, "ST    %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
+	if (index)
+		util::stream_format(stream, "ST    %%R%d,(%%R%d,0x%x)", src_dst, index, offset);
 	else
-		util::stream_format(stream, "ST    %%R%d,(0x%x)",SrcDst,Index+Offset);
+		util::stream_format(stream, "ST    %%R%d,(0x%x)", src_dst, index + offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -144,17 +144,17 @@ INST(ST)
 
 INST(LDBU)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,4);
-	uint32_t Index=EXTRACT(Opcode,5,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 4);
+	const u32 index = EXTRACT(opcode, 5, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	if(Index)
-		util::stream_format(stream, "LDBU  (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+	if (index)
+		util::stream_format(stream, "LDBU  (%%R%d,0x%x),%%R%d", index, offset, src_dst);
 	else
-		util::stream_format(stream, "LDBU  (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LDBU  (0x%x),%%R%d", index + offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -162,19 +162,19 @@ INST(LDBU)
 
 INST(LDSU)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,4);
-	uint32_t Index=EXTRACT(Opcode,5,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 4);
+	const u32 index = EXTRACT(opcode, 5, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	Offset<<=1;
+	offset <<= 1;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	if(Index)
-		util::stream_format(stream, "LDSU  (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+	if (index)
+		util::stream_format(stream, "LDSU  (%%R%d,0x%x),%%R%d", index, offset, src_dst);
 	else
-		util::stream_format(stream, "LDSU  (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LDSU  (0x%x),%%R%d", index + offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -183,15 +183,15 @@ INST(LDSU)
 
 INST(LERI)
 {
-	uint32_t Imm=EXTRACT(Opcode,0,13);
+	const u32 imm = EXTRACT(opcode, 0, 13);
 
-	if(TESTFLAG(FLAG_E))
-		ER=(EXTRACT(ER,0,17)<<14)|Imm;
+	if (TESTFLAG(FLAG_E))
+		ER = (EXTRACT(ER, 0, 17) << 14) | imm;
 	else
-		ER=SEX(14,Imm);
+		ER = SEXT(14, imm);
 
-	//util::stream_format(stream, "LERI  0x%x\t\tER=%08X",Imm,ER);
-	util::stream_format(stream, "LERI  0x%x",Imm/*,ER*/);
+	//util::stream_format(stream, "LERI  0x%x\t\tER=%08X", imm,ER);
+	util::stream_format(stream, "LERI  0x%x", imm/*, ER*/);
 
 	SETFLAG(FLAG_E);
 	return 0;
@@ -199,15 +199,15 @@ INST(LERI)
 
 INST(LDSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	Offset<<=2;
+	offset <<= 2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	util::stream_format(stream, "LD    (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LD    (%%SP,0x%x),%%R%d", offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -215,15 +215,15 @@ INST(LDSP)
 
 INST(STSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t SrcDst=EXTRACT(Opcode,8,10);
+	u32 offset = EXTRACT(opcode, 0, 7);
+	const u32 src_dst = EXTRACT(opcode, 8, 10);
 
-	Offset<<=2;
+	offset <<= 2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	util::stream_format(stream, "ST    %%R%d,(%%SP,0x%x)",SrcDst,Offset);
+	util::stream_format(stream, "ST    %%R%d,(%%SP,0x%x)", src_dst, offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -231,81 +231,81 @@ INST(STSP)
 
 INST(PUSH)
 {
-	uint32_t Set=EXTRACT(Opcode,0,10);
+	u32 set = EXTRACT(opcode, 0, 10);
 	stream << "PUSH  ";
-	if(Set&(1<<10))
+	if (set & (1 << 10))
 		stream << "%PC-";
-	if(Set&(1<<9))
+	if (set & (1 << 9))
 		stream << "%SR-";
-	if(Set&(1<<8))
+	if (set & (1 << 8))
 		stream << "%ER-";
-	if(Set&(1<<7))
+	if (set & (1 << 7))
 		stream << "%R7-";
-	if(Set&(1<<6))
+	if (set & (1 << 6))
 		stream << "%R6-";
-	if(Set&(1<<5))
+	if (set & (1 << 5))
 		stream << "%R5-";
-	if(Set&(1<<4))
+	if (set & (1 << 4))
 		stream << "%R4-";
-	if(Set&(1<<3))
+	if (set & (1 << 3))
 		stream << "%R3-";
-	if(Set&(1<<2))
+	if (set & (1 << 2))
 		stream << "%R2-";
-	if(Set&(1<<1))
+	if (set & (1 << 1))
 		stream << "%R1-";
-	if(Set&(1<<0))
+	if (set & (1 << 0))
 		stream << "%R0-";
 	return 0;
 }
 
 INST(POP)
 {
-	uint32_t Set=EXTRACT(Opcode,0,10);
-	int Ret=0;
+	u32 set = EXTRACT(opcode, 0, 10);
+	int ret = 0;
 	stream << "POP   ";
-	if(Set&(1<<0))
+	if (set & (1 << 0))
 		stream << "%R0-";
-	if(Set&(1<<1))
+	if (set & (1 << 1))
 		stream << "%R1-";
-	if(Set&(1<<2))
+	if (set & (1 << 2))
 		stream << "%R2-";
-	if(Set&(1<<3))
+	if (set & (1 << 3))
 		stream << "%R3-";
-	if(Set&(1<<4))
+	if (set & (1 << 4))
 		stream << "%R4-";
-	if(Set&(1<<5))
+	if (set & (1 << 5))
 		stream << "%R5-";
-	if(Set&(1<<6))
+	if (set & (1 << 6))
 		stream << "%R6-";
-	if(Set&(1<<7))
+	if (set & (1 << 7))
 		stream << "%R7-";
-	if(Set&(1<<8))
+	if (set & (1 << 8))
 		stream << "%ER-";
-	if(Set&(1<<9))
+	if (set & (1 << 9))
 		stream << "%SR-";
-	if(Set&(1<<10))
+	if (set & (1 << 10))
 	{
 		stream << "%PC-";
 		CLRFLAG(FLAG_E);    //Clear the flag, this is a ret so disassemble will start a new E block
-		Ret=1;
+		ret = 1;
 	}
-	return Ret ? STEP_OUT : 0;
+	return ret ? STEP_OUT : 0;
 }
 
 INST(LEATOSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,9,12);
-	uint32_t Index=EXTRACT(Opcode,3,5);
+	u32 offset = EXTRACT(opcode, 9, 12);
+	const u32 index = EXTRACT(opcode, 3, 5);
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 	else
-		Offset=SEX(4,Offset);
+		offset = SEXT(4, offset);
 
-	if(Index)
-		util::stream_format(stream, "LEA   (%%R%d,0x%x),%%SP",Index,Offset);
+	if (index)
+		util::stream_format(stream, "LEA   (%%R%d,0x%x),%%SP", index, offset);
 	else
-		util::stream_format(stream, "LEA   (0x%x),%%SP",Index+Offset);
+		util::stream_format(stream, "LEA   (0x%x),%%SP", index + offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -313,15 +313,15 @@ INST(LEATOSP)
 
 INST(LEAFROMSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,9,12);
-	uint32_t Index=EXTRACT(Opcode,3,5);
+	u32 offset = EXTRACT(opcode, 9, 12);
+	const u32 index = EXTRACT(opcode, 3, 5);
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 	else
-		Offset=SEX(4,Offset);
+		offset = SEXT(4, offset);
 
-	util::stream_format(stream, "LEA   (%%SP,0x%x),%%R%d",Offset,Index);
+	util::stream_format(stream, "LEA   (%%SP,0x%x),%%R%d", offset, index);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -329,17 +329,17 @@ INST(LEAFROMSP)
 
 INST(LEASPTOSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
+	u32 offset = EXTRACT(opcode, 0, 7);
 
-	Offset<<=2;
+	offset <<= 2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,23)<<8)|(Offset&0xff);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0,23) << 8) | (offset&0xff);
 	else
-		Offset=SEX(10,Offset);
+		offset = SEXT(10, offset);
 
 
-	util::stream_format(stream, "LEA   (%%SP,0x%x),%%SP",Offset);
+	util::stream_format(stream, "LEA   (%%SP,0x%x),%%SP", offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -347,27 +347,27 @@ INST(LEASPTOSP)
 
 INST(MOV)
 {
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,9,11);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 9, 11);
 
-	if(Src==0 && Dst==0)
+	if (src == 0 && dst == 0)
 		util::stream_format(stream, "NOP");
 	else
-		util::stream_format(stream, "MOV   %%SR%d,%%DR%d",Src,Dst);
+		util::stream_format(stream, "MOV   %%SR%d,%%DR%d", src, dst);
 	return 0;
 }
 
 INST(LDI)
 {
-	uint32_t Dst=EXTRACT(Opcode,8,10);
-	uint32_t Imm=EXTRACT(Opcode,0,7);
+	const u32 dst = EXTRACT(opcode, 8, 10);
+	u32 imm = EXTRACT(opcode, 0, 7);
 
-	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(ER,0,27)<<4)|(Imm&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm = (EXTRACT(ER, 0, 27) << 4) | (imm & 0xf);
 	else
-		Imm=SEX8(Imm);
+		imm = SEXT8(imm);
 
-	util::stream_format(stream, "LDI   0x%x,%%R%d",Imm,Dst);
+	util::stream_format(stream, "LDI   0x%x,%%R%d", imm, dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -375,13 +375,13 @@ INST(LDI)
 
 INST(LDBSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,3);
-	uint32_t SrcDst=EXTRACT(Opcode,4,6);
+	u32 offset = EXTRACT(opcode, 0, 3);
+	const u32 src_dst = EXTRACT(opcode, 4, 6);
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	util::stream_format(stream, "LDB   (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LDB   (%%SP,0x%x),%%R%d", offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -389,13 +389,13 @@ INST(LDBSP)
 
 INST(STBSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,3);
-	uint32_t SrcDst=EXTRACT(Opcode,4,6);
+	u32 offset = EXTRACT(opcode, 0, 3);
+	const u32 src_dst = EXTRACT(opcode, 4, 6);
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	util::stream_format(stream, "STB   %%R%d,(%%SP,0x%x)",SrcDst,Offset);
+	util::stream_format(stream, "STB   %%R%d,(%%SP,0x%x)", src_dst, offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -403,15 +403,15 @@ INST(STBSP)
 
 INST(LDSSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,3);
-	uint32_t SrcDst=EXTRACT(Opcode,4,6);
+	u32 offset = EXTRACT(opcode, 0, 3);
+	const u32 src_dst = EXTRACT(opcode, 4, 6);
 
-	Offset<<=1;
+	offset <<= 1;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	util::stream_format(stream, "LDS   (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LDS   (%%SP,0x%x),%%R%d", offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -419,15 +419,15 @@ INST(LDSSP)
 
 INST(STSSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,3);
-	uint32_t SrcDst=EXTRACT(Opcode,4,6);
+	u32 offset = EXTRACT(opcode, 0, 3);
+	const u32 src_dst = EXTRACT(opcode, 4, 6);
 
-	Offset<<=1;
+	offset <<= 1;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	util::stream_format(stream, "STS   %%R%d,(%%SP,0x%x)",SrcDst,Offset);
+	util::stream_format(stream, "STS   %%R%d,(%%SP,0x%x)", src_dst, offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -435,13 +435,13 @@ INST(STSSP)
 
 INST(LDBUSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,3);
-	uint32_t SrcDst=EXTRACT(Opcode,4,6);
+	u32 offset = EXTRACT(opcode, 0, 3);
+	const u32 src_dst = EXTRACT(opcode, 4, 6);
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	util::stream_format(stream, "LDBU  (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LDBU  (%%SP,0x%x),%%R%d", offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -449,15 +449,15 @@ INST(LDBUSP)
 
 INST(LDSUSP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,3);
-	uint32_t SrcDst=EXTRACT(Opcode,4,6);
+	u32 offset = EXTRACT(opcode, 0, 3);
+	const u32 src_dst = EXTRACT(opcode, 4, 6);
 
-	Offset<<=1;
+	offset <<= 1;
 
-	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
+	if (TESTFLAG(FLAG_E))
+		offset = (EXTRACT(ER, 0, 27) << 4) | (offset & 0xf);
 
-	util::stream_format(stream, "LDSU  (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LDSU  (%%SP,0x%x),%%R%d", offset, src_dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -465,17 +465,17 @@ INST(LDSUSP)
 
 INST(ADDI)
 {
-	uint32_t Imm=EXTRACT(Opcode,9,12);
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm2=Imm;
+	const u32 imm = EXTRACT(opcode, 9, 12);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	u32 imm2 = imm;
 
-	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm2 = (EXTRACT(ER, 0, 27) << 4) | (imm2 & 0xf);
 	else
-		Imm2=SEX(4,Imm2);
+		imm2 = SEXT(4, imm2);
 
-	util::stream_format(stream, "ADD   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "ADD   %%SR%d,0x%x,%%DR%d", src, imm2, dst/*, imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -483,17 +483,17 @@ INST(ADDI)
 
 INST(SUBI)
 {
-	uint32_t Imm=EXTRACT(Opcode,9,12);
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm2=Imm;
+	const u32 imm = EXTRACT(opcode, 9, 12);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	u32 imm2 = imm;
 
-	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm2 = (EXTRACT(ER, 0, 27) << 4) | (imm2 & 0xf);
 	else
-		Imm2=SEX(4,Imm2);
+		imm2 = SEXT(4, imm2);
 
-	util::stream_format(stream, "SUB   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "SUB   %%SR%d,0x%x,%%DR%d", src, imm2, dst/*, imm2*/);
 
 	CLRFLAG(FLAG_E);
 
@@ -502,17 +502,17 @@ INST(SUBI)
 
 INST(ADCI)
 {
-	uint32_t Imm=EXTRACT(Opcode,9,12);
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm2=Imm;
+	const u32 imm = EXTRACT(opcode, 9, 12);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	u32 imm2 = imm;
 
-	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm2 = (EXTRACT(ER, 0, 27) << 4) | (imm2 & 0xf);
 	else
-		Imm2=SEX(4,Imm2);
+		imm2 = SEXT(4, imm2);
 
-	util::stream_format(stream, "ADC   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "ADC   %%SR%d,0x%x,%%DR%d", src, imm2, dst/*, imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -520,17 +520,17 @@ INST(ADCI)
 
 INST(SBCI)
 {
-	uint32_t Imm=EXTRACT(Opcode,9,12);
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm2=Imm;
+	const u32 imm = EXTRACT(opcode, 9, 12);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	u32 imm2 = imm;
 
-	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm2 = (EXTRACT(ER, 0, 27) << 4) | (imm2 & 0xf);
 	else
-		Imm2=SEX(4,Imm2);
+		imm2 = SEXT(4, imm2);
 
-	util::stream_format(stream, "SBC   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "SBC   %%SR%d,0x%x,%%DR%d", src, imm2, dst/*, imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -538,17 +538,17 @@ INST(SBCI)
 
 INST(ANDI)
 {
-	uint32_t Imm=EXTRACT(Opcode,9,12);
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm2=Imm;
+	const u32 imm = EXTRACT(opcode, 9, 12);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	u32 imm2 = imm;
 
-	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm2 = (EXTRACT(ER, 0, 27) << 4) | (imm2 & 0xf);
 	else
-		Imm2=SEX(4,Imm2);
+		imm2 = SEXT(4, imm2);
 
-	util::stream_format(stream, "AND   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "AND   %%SR%d,0x%x,%%DR%d", src, imm2, dst/*, imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -556,17 +556,17 @@ INST(ANDI)
 
 INST(ORI)
 {
-	uint32_t Imm=EXTRACT(Opcode,9,12);
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm2=Imm;
+	const u32 imm = EXTRACT(opcode, 9, 12);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	u32 imm2 = imm;
 
-	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm2 = (EXTRACT(ER, 0, 27) << 4) | (imm2 & 0xf);
 	else
-		Imm2=SEX(4,Imm2);
+		imm2 = SEXT(4, imm2);
 
-	util::stream_format(stream, "OR    %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "OR    %%SR%d,0x%x,%%DR%d", src, imm2, dst/*, imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -574,17 +574,17 @@ INST(ORI)
 
 INST(XORI)
 {
-	uint32_t Imm=EXTRACT(Opcode,9,12);
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm2=Imm;
+	const u32 imm = EXTRACT(opcode, 9, 12);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	u32 imm2 = imm;
 
-	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm2 = (EXTRACT(ER, 0, 27) << 4) | (imm2 & 0xf);
 	else
-		Imm2=SEX(4,Imm2);
+		imm2 = SEXT(4, imm2);
 
-	util::stream_format(stream, "XOR   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "XOR   %%SR%d,0x%x,%%DR%d", src, imm2, dst/*, imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -592,16 +592,16 @@ INST(XORI)
 
 INST(CMPI)
 {
-	uint32_t Imm=EXTRACT(Opcode,9,12);
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Imm2=Imm;
+	const u32 imm = EXTRACT(opcode, 9, 12);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	u32 imm2 = imm;
 
-	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm2 = (EXTRACT(ER, 0, 27) << 4) | (imm2 & 0xf);
 	else
-		Imm2=SEX(4,Imm2);
+		imm2 = SEXT(4, imm2);
 
-	util::stream_format(stream, "CMP   %%SR%d,0x%x",Src,Imm2/*,Imm2*/);
+	util::stream_format(stream, "CMP   %%SR%d,0x%x", src, imm2/*, imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -609,16 +609,16 @@ INST(CMPI)
 
 INST(TSTI)
 {
-		uint32_t Imm=EXTRACT(Opcode,9,12);
-	uint32_t Src=EXTRACT(Opcode,3,5);
-	uint32_t Imm2=Imm;
+	const u32 imm = EXTRACT(opcode, 9, 12);
+	const u32 src = EXTRACT(opcode, 3, 5);
+	u32 imm2 = imm;
 
-	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
+	if (TESTFLAG(FLAG_E))
+		imm2 = (EXTRACT(ER, 0, 27) << 4) | (imm2 & 0xf);
 	else
-		Imm2=SEX(4,Imm2);
+		imm2 = SEXT(4, imm2);
 
-	util::stream_format(stream, "TST   %%SR%d,0x%x",Src,Imm2/*,Imm2*/);
+	util::stream_format(stream, "TST   %%SR%d,0x%x", src, imm2/*, imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -626,99 +626,99 @@ INST(TSTI)
 
 INST(ADD)
 {
-	uint32_t Src2=EXTRACT(Opcode,9,11);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
+	const u32 src2 = EXTRACT(opcode, 9, 11);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
 
-	util::stream_format(stream, "ADD   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "ADD   %%SR%d,%%SR%d,%%DR%d", src1, src2, dst);
 	return 0;
 }
 
 INST(SUB)
 {
-	uint32_t Src2=EXTRACT(Opcode,9,11);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
+	const u32 src2 = EXTRACT(opcode, 9, 11);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
 
-	util::stream_format(stream, "SUB   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "SUB   %%SR%d,%%SR%d,%%DR%d", src1, src2, dst);
 	return 0;
 }
 
 INST(ADC)
 {
-	uint32_t Src2=EXTRACT(Opcode,9,11);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
+	const u32 src2 = EXTRACT(opcode, 9, 11);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
 
-	util::stream_format(stream, "ADC   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "ADC   %%SR%d,%%SR%d,%%DR%d", src1, src2, dst);
 	return 0;
 }
 
 INST(SBC)
 {
-	uint32_t Src2=EXTRACT(Opcode,9,11);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
+	const u32 src2 = EXTRACT(opcode, 9, 11);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
 
-	util::stream_format(stream, "SBC   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "SBC   %%SR%d,%%SR%d,%%DR%d", src1, src2, dst);
 	return 0;
 }
 
 INST(AND)
 {
-	uint32_t Src2=EXTRACT(Opcode,9,11);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
+	const u32 src2 = EXTRACT(opcode, 9, 11);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
 
-	util::stream_format(stream, "AND   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "AND   %%SR%d,%%SR%d,%%DR%d", src1, src2, dst);
 	return 0;
 }
 
 INST(OR)
 {
-	uint32_t Src2=EXTRACT(Opcode,9,11);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
+	const u32 src2 = EXTRACT(opcode, 9, 11);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
 
-	util::stream_format(stream, "OR    %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "OR    %%SR%d,%%SR%d,%%DR%d", src1, src2, dst);
 	return 0;
 }
 
 INST(XOR)
 {
-	uint32_t Src2=EXTRACT(Opcode,9,11);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
+	const u32 src2 = EXTRACT(opcode, 9, 11);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
 
-	util::stream_format(stream, "XOR   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "XOR   %%SR%d,%%SR%d,%%DR%d", src1, src2, dst);
 	return 0;
 }
 
 INST(CMP)
 {
-	uint32_t Src2=EXTRACT(Opcode,9,11);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
+	const u32 src2 = EXTRACT(opcode, 9, 11);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
 
-	util::stream_format(stream, "CMP   %%SR%d,%%SR%d",Src1,Src2);
+	util::stream_format(stream, "CMP   %%SR%d,%%SR%d", src1, src2);
 	return 0;
 }
 
 INST(TST)
 {
-	uint32_t Src2=EXTRACT(Opcode,9,11);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
+	const u32 src2 = EXTRACT(opcode, 9, 11);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
 
-	util::stream_format(stream, "TST   %%SR%d,%%SR%d",Src1,Src2);
+	util::stream_format(stream, "TST   %%SR%d,%%SR%d", src1, src2);
 	return 0;
 }
 
 INST(MULS)
 {
-	uint32_t Src2=EXTRACT(Opcode,6,8);
-	uint32_t Src1=EXTRACT(Opcode,3,5);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
+	const u32 src2 = EXTRACT(opcode, 6, 8);
+	const u32 src1 = EXTRACT(opcode, 3, 5);
+	const u32 dst = EXTRACT(opcode, 0, 2);
 
-	util::stream_format(stream, "MUL   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "MUL   %%SR%d,%%SR%d,%%DR%d", src1, src2, dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -726,24 +726,24 @@ INST(MULS)
 
 INST(NEG)
 {
-	uint32_t Dst=EXTRACT(Opcode,9,11);
-	uint32_t Src=EXTRACT(Opcode,3,5);
+	const u32 dst = EXTRACT(opcode, 9, 11);
+	const u32 src = EXTRACT(opcode, 3, 5);
 
-	util::stream_format(stream, "NEG   %%SR%d,%%DR%d",Src,Dst);
+	util::stream_format(stream, "NEG   %%SR%d,%%DR%d", src, dst);
 	return 0;
 }
 
 INST(CALL)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "CALL  0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "CALL  0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_OVER;
@@ -751,15 +751,15 @@ INST(CALL)
 
 INST(JV)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JV    0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JV    0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -767,15 +767,15 @@ INST(JV)
 
 INST(JNV)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JNV   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JNV   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -783,15 +783,15 @@ INST(JNV)
 
 INST(JC)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JC    0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JC    0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -799,15 +799,15 @@ INST(JC)
 
 INST(JNC)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JNC   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JNC   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -815,15 +815,15 @@ INST(JNC)
 
 INST(JP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JP    0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JP    0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -831,15 +831,15 @@ INST(JP)
 
 INST(JM)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JM    0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JM    0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -847,15 +847,15 @@ INST(JM)
 
 INST(JNZ)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JNZ   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JNZ   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -863,15 +863,15 @@ INST(JNZ)
 
 INST(JZ)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JZ    0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JZ    0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -879,15 +879,15 @@ INST(JZ)
 
 INST(JGE)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JGE   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JGE   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -895,15 +895,15 @@ INST(JGE)
 
 INST(JLE)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JLE   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JLE   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -911,15 +911,15 @@ INST(JLE)
 
 INST(JHI)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JHI   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JHI   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -927,15 +927,15 @@ INST(JHI)
 
 INST(JLS)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JLS   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JLS   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -943,15 +943,15 @@ INST(JLS)
 
 INST(JGT)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JGT   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JGT   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
@@ -959,33 +959,31 @@ INST(JGT)
 
 INST(JLT)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JLT   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JLT   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return STEP_COND;
 }
 
-
-
 INST(JMP)
 {
-	uint32_t Offset=EXTRACT(Opcode,0,7);
-	uint32_t Offset2;
+	const u32 offset = EXTRACT(opcode, 0, 7);
+	u32 offset2;
 
-	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
+	if (TESTFLAG(FLAG_E))
+		offset2 = (EXTRACT(ER, 0, 22) << 8) | offset;
 	else
-		Offset2=SEX(8,Offset);
-	Offset2<<=1;
-	util::stream_format(stream, "JMP   0x%x",PC+2+Offset2);
+		offset2 = SEXT(8, offset);
+	offset2 <<= 1;
+	util::stream_format(stream, "JMP   0x%x", PC + 2 + offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -993,9 +991,9 @@ INST(JMP)
 
 INST(JR)
 {
-	uint32_t Src=EXTRACT(Opcode,0,3);
+	const u32 src = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "JR    %%R%d",Src);
+	util::stream_format(stream, "JR    %%R%d", src);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1003,9 +1001,9 @@ INST(JR)
 
 INST(CALLR)
 {
-	uint32_t Src=EXTRACT(Opcode,0,3);
+	const u32 src = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "CALLR %%R%d",Src);
+	util::stream_format(stream, "CALLR %%R%d", src);
 
 	CLRFLAG(FLAG_E);
 	return STEP_OVER;
@@ -1013,15 +1011,15 @@ INST(CALLR)
 
 INST(ASR)
 {
-	uint32_t CS=Opcode&(1<<10);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm=EXTRACT(Opcode,5,9);
-	uint32_t Cnt=EXTRACT(Opcode,5,7);
+	const u32 cs = opcode & (1 << 10);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	const u32 imm = EXTRACT(opcode, 5, 9);
+	const u32 cnt = EXTRACT(opcode, 5, 7);
 
-	if(CS)
-		util::stream_format(stream, "ASR   %%R%d,%%R%d",Cnt,Dst);
+	if (cs)
+		util::stream_format(stream, "ASR   %%R%d,%%R%d", cnt, dst);
 	else
-		util::stream_format(stream, "ASR   %x,%%R%d",Imm,Dst);
+		util::stream_format(stream, "ASR   %x,%%R%d", imm, dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1029,15 +1027,15 @@ INST(ASR)
 
 INST(LSR)
 {
-	uint32_t CS=Opcode&(1<<10);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm=EXTRACT(Opcode,5,9);
-	uint32_t Cnt=EXTRACT(Opcode,5,7);
+	const u32 cs = opcode & (1 << 10);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	const u32 imm = EXTRACT(opcode, 5, 9);
+	const u32 cnt = EXTRACT(opcode, 5, 7);
 
-	if(CS)
-		util::stream_format(stream, "LSR   %%R%d,%%R%d",Cnt,Dst);
+	if (cs)
+		util::stream_format(stream, "LSR   %%R%d,%%R%d", cnt, dst);
 	else
-		util::stream_format(stream, "LSR   %x,%%R%d",Imm,Dst);
+		util::stream_format(stream, "LSR   %x,%%R%d", imm, dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1045,15 +1043,15 @@ INST(LSR)
 
 INST(ASL)
 {
-	uint32_t CS=Opcode&(1<<10);
-	uint32_t Dst=EXTRACT(Opcode,0,2);
-	uint32_t Imm=EXTRACT(Opcode,5,9);
-	uint32_t Cnt=EXTRACT(Opcode,5,7);
+	const u32 cs = opcode & (1 << 10);
+	const u32 dst = EXTRACT(opcode, 0, 2);
+	const u32 imm = EXTRACT(opcode, 5, 9);
+	const u32 cnt = EXTRACT(opcode, 5, 7);
 
-	if(CS)
-		util::stream_format(stream, "ASL   %%R%d,%%R%d",Cnt,Dst);
+	if (cs)
+		util::stream_format(stream, "ASL   %%R%d,%%R%d", cnt, dst);
 	else
-		util::stream_format(stream, "ASL   %x,%%R%d",Imm,Dst);
+		util::stream_format(stream, "ASL   %x,%%R%d", imm, dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1061,9 +1059,9 @@ INST(ASL)
 
 INST(EXTB)
 {
-	uint32_t Dst=EXTRACT(Opcode,0,3);
+	const u32 dst = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "EXTB  %%R%d",Dst);
+	util::stream_format(stream, "EXTB  %%R%d", dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1071,9 +1069,9 @@ INST(EXTB)
 
 INST(EXTS)
 {
-	uint32_t Dst=EXTRACT(Opcode,0,3);
+	const u32 dst = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "EXTS  %%R%d",Dst);
+	util::stream_format(stream, "EXTS  %%R%d", dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1081,60 +1079,60 @@ INST(EXTS)
 
 INST(SET)
 {
-	uint32_t Imm=EXTRACT(Opcode,0,3);
+	const u32 imm = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "SET   0x%x",Imm);
+	util::stream_format(stream, "SET   0x%x", imm);
 	return 0;
 }
 
 INST(CLR)
 {
-	uint32_t Imm=EXTRACT(Opcode,0,3);
+	const u32 imm = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "CLR   0x%x",Imm);
+	util::stream_format(stream, "CLR   0x%x", imm);
 	return 0;
 }
 
 INST(SWI)
 {
-	uint32_t Imm=EXTRACT(Opcode,0,3);
+	const u32 imm = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "SWI   0x%x",Imm);
+	util::stream_format(stream, "SWI   0x%x", imm);
 	return 0;
 }
 
 INST(HALT)
 {
-	uint32_t Imm=EXTRACT(Opcode,0,3);
+	const u32 imm = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "HALT  0x%x",Imm);
+	util::stream_format(stream, "HALT  0x%x", imm);
 	return 0;
 }
 
 INST(MVTC)
 {
-	uint32_t Imm=EXTRACT(Opcode,0,3);
+	const u32 imm = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "MVTC  %%R0,%%CR%d",Imm);
+	util::stream_format(stream, "MVTC  %%R0,%%CR%d", imm);
 	return 0;
 }
 
 INST(MVFC)
 {
-	uint32_t Imm=EXTRACT(Opcode,0,3);
+	const u32 imm = EXTRACT(opcode, 0, 3);
 
-	util::stream_format(stream, "MVFC  %%CR0%d,%%R0",Imm);
+	util::stream_format(stream, "MVFC  %%CR0%d,%%R0", imm);
 	return 0;
 }
 
-se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
+se3208_disassembler::_OP se3208_disassembler::decode_op(u16 opcode)
 {
-	switch(EXTRACT(Opcode,14,15))
+	switch (EXTRACT(opcode, 14, 15))
 	{
 		case 0x0:
 			{
-				uint8_t Op=EXTRACT(Opcode,11,13);
-				switch(Op)
+				const u8 op = EXTRACT(opcode, 11, 13);
+				switch (op)
 				{
 					case 0x0:
 						return &se3208_disassembler::LDB;
@@ -1159,7 +1157,7 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 			return &se3208_disassembler::LERI;
 		case 0x2:
 			{
-				switch(EXTRACT(Opcode,11,13))
+				switch (EXTRACT(opcode, 11, 13))
 				{
 					case 0:
 						return &se3208_disassembler::LDSP;
@@ -1181,7 +1179,7 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 					case 13:
 					case 14:
 					case 15:
-						switch(EXTRACT(Opcode,6,8))
+						switch (EXTRACT(opcode, 6, 8))
 						{
 							case 0:
 								return &se3208_disassembler::ADDI;
@@ -1198,7 +1196,7 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 							case 6:
 								return &se3208_disassembler::XORI;
 							case 7:
-								switch(EXTRACT(Opcode,0,2))
+								switch (EXTRACT(opcode, 0, 2))
 								{
 									case 0:
 										return &se3208_disassembler::CMPI;
@@ -1216,10 +1214,10 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 			}
 			break;
 		case 3:
-			switch(EXTRACT(Opcode,12,13))
+			switch (EXTRACT(opcode, 12, 13))
 			{
 				case 0:
-					switch(EXTRACT(Opcode,6,8))
+					switch (EXTRACT(opcode, 6, 8))
 					{
 						case 0:
 							return &se3208_disassembler::ADD;
@@ -1236,7 +1234,7 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 						case 6:
 							return &se3208_disassembler::XOR;
 						case 7:
-							switch(EXTRACT(Opcode,0,2))
+							switch (EXTRACT(opcode, 0, 2))
 							{
 								case 0:
 									return &se3208_disassembler::CMP;
@@ -1251,7 +1249,7 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 					}
 					break;
 				case 1:     //Jumps
-					switch(EXTRACT(Opcode,8,11))
+					switch (EXTRACT(opcode, 8, 11))
 					{
 						case 0x0:
 							return &se3208_disassembler::JNV;
@@ -1288,13 +1286,13 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 					}
 					break;
 				case 2:
-					if(Opcode&(1<<11))
+					if (opcode & (1 << 11))
 						return &se3208_disassembler::LDI;
 					else    //SP Ops
 					{
-						if(Opcode&(1<<10))
+						if (opcode & (1 << 10))
 						{
-							switch(EXTRACT(Opcode,7,9))
+							switch (EXTRACT(opcode, 7, 9))
 							{
 								case 0:
 									return &se3208_disassembler::LDBSP;
@@ -1312,18 +1310,18 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 						}
 						else
 						{
-							if(Opcode&(1<<9))
+							if (opcode & (1 << 9))
 							{
 								return &se3208_disassembler::LEASPTOSP;
 							}
 							else
 							{
-								if(Opcode&(1<<8))
+								if (opcode & (1 << 8))
 								{
 								}
 								else
 								{
-									switch(EXTRACT(Opcode,4,7))
+									switch (EXTRACT(opcode, 4, 7))
 									{
 										case 0:
 											return &se3208_disassembler::EXTB;
@@ -1348,13 +1346,13 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 					}
 					break;
 				case 3:
-					switch(EXTRACT(Opcode,9,11))
+					switch (EXTRACT(opcode, 9, 11))
 					{
 						case 0:
 						case 1:
 						case 2:
 						case 3:
-							switch(EXTRACT(Opcode,3,4))
+							switch (EXTRACT(opcode, 3, 4))
 							{
 								case 0:
 									return &se3208_disassembler::ASR;
@@ -1369,7 +1367,7 @@ se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 						case 4:
 							return &se3208_disassembler::MULS;
 						case 6:
-							if(Opcode&(1<<3))
+							if (opcode & (1 << 3))
 								return &se3208_disassembler::MVFC;
 							else
 								return &se3208_disassembler::MVTC;
@@ -1390,12 +1388,10 @@ u32 se3208_disassembler::opcode_alignment() const
 
 offs_t se3208_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint16_t Opcode;
-
 	CLRFLAG(FLAG_E);
-	ER=0;
+	ER = 0;
 
-	PC=pc;
-	Opcode=opcodes.r16(pc);
-	return 2 | ((this->*DecodeOp(Opcode))(Opcode, stream)) | SUPPORTED;
+	PC = pc;
+	const u16 opcode = opcodes.r16(pc);
+	return 2 | ((this->*decode_op(opcode))(opcode, stream)) | SUPPORTED;
 }
