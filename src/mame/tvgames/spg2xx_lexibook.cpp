@@ -396,26 +396,24 @@ ROM_END
 
 ROM_START( cybrtvfe )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
-	// Block 0 Calculated Byte Sum of bytes from 0x00000c10 to 0x007fffff is 3482e6f7) in header 3482E6F7
-	// Block 1 Calculated Byte Sum of bytes from 0x00800c10 to 0x00ffffff is 2f5fab76) in header 2F5FAB76
-	// Block 2 Calculated Byte Sum of bytes from 0x01000c10 to 0x017fffff is 29dcb774) in header 29DCB774
-	// Block 3 Calculated Byte Sum of bytes from 0x01800c10 to 0x01ffffff is 2ac8e204) in header 2AC8E204
-	// Block 4 Calculated Byte Sum of bytes from 0x02000c10 to 0x027fffff is 2eb7963d) in header 2EB7963D
-	// Block 5 Calculated Byte Sum of bytes from 0x02800c10 to 0x02ffffff is 372ddefe) in header 372DDEFE
-	// Block 6 Calculated Byte Sum of bytes from 0x03000c10 to 0x037fffff is 129dee7c) in header 129DEE7C
-	// Block 7 Calculated Byte Sum of bytes from 0x03800c10 to 0x03ffffff is 129dee7c) in header 129DEE7C
+	// Block 0 Calculated Byte Sum of bytes from 0x00000c10 to 0x007fffff is 3482e6f7, in header 3482E6F7
+	// Block 1 Calculated Byte Sum of bytes from 0x00800c10 to 0x00ffffff is 2f5fab76, in header 2F5FAB76
+	// Block 2 Calculated Byte Sum of bytes from 0x01000c10 to 0x017fffff is 29dcb774, in header 29DCB774
+	// Block 3 Calculated Byte Sum of bytes from 0x01800c10 to 0x01ffffff is 2ac8e204, in header 2AC8E204
+	// Block 4 Calculated Byte Sum of bytes from 0x02000c10 to 0x027fffff is 2eb7963d, in header 2EB7963D
+	// Block 5 Calculated Byte Sum of bytes from 0x02800c10 to 0x02ffffff is 372ddefe, in header 372DDEFE
+	// Block 6 Calculated Byte Sum of bytes from 0x03000c10 to 0x037fffff is 129dee7c, in header 129DEE7C
+	// Block 7 Calculated Byte Sum of bytes from 0x03800c10 to 0x03ffffff is 129dee7c, in header 129DEE7C
 	ROM_LOAD16_WORD_SWAP( "jl2500fe.u6", 0x0000, 0x4000000, CRC(2fce6685) SHA1(6fc329204fdb401c72884349f29201fb783fe2ea) )
 ROM_END
 
 ROM_START( cybrtvbb )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
-	// there is likely a single bad byte in the 3rd 8Mbyte section as the checksum doesn't match
-	// but that part only contains generic games so it should be possible to locate it
-	// Block 0 Calculated Byte Sum of bytes from 0x00000c10 to 0x007fffff is 2bd64edb) in header 2BD64EDB
-	// Block 1 Calculated Byte Sum of bytes from 0x00800c10 to 0x00ffffff is 30f4f3f0) in header 30F4F3F0
-	// Block 2 Calculated Byte Sum of bytes from 0x01000c10 to 0x017fffff is 2c24e87a) in header 2C24E8D5
-	// Block 3 Calculated Byte Sum of bytes from 0x01800c10 to 0x01ffffff is 320d1f5a) in header 320D1F5A
-	ROM_LOAD16_WORD_SWAP( "jl2500bb.u6", 0x0000, 0x2000000, BAD_DUMP CRC(e7f60274) SHA1(d7253dc380c866aaefced590ff7b8030c4009125) )
+	// Block 0 Calculated Byte Sum of bytes from 0x00000c10 to 0x007fffff is 2bd64edb, in header 2BD64EDB
+	// Block 1 Calculated Byte Sum of bytes from 0x00800c10 to 0x00ffffff is 30f4f3f0, in header 30F4F3F0
+	// Block 2 Calculated Byte Sum of bytes from 0x01000c10 to 0x017fffff is 2c24e8d5, in header 2C24E8D5
+	// Block 3 Calculated Byte Sum of bytes from 0x01800c10 to 0x01ffffff is 320d1f5a, in header 320D1F5A
+	ROM_LOAD16_WORD_SWAP( "jl2500bb.u6", 0x0000, 0x2000000, CRC(8d6e0c99) SHA1(e54660381ff20ecf9b023da7703802f256f7fba5) )
 	ROM_RELOAD(0x2000000,0x2000000)
 ROM_END
 
