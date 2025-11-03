@@ -17,8 +17,8 @@ DEFINE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device, "esq2x40_sq1", "Ensoniq 2x40
 DEFINE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device, "esq2x40_vfx", "Ensoniq 2x40 VFD (VFX Family variant)")
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
-static const uint16_t font[]=
-{           // FEDC BA98 7654 3210
+static const uint16_t font[] = {
+					// FEDC BA98 7654 3210
 	0x0000, // 0000 0000 0000 0000 (space)
 	0x0000, // 0000 0000 0000 0000 ! (not defined)
 	0x0009, // 0000 0000 0000 1001 ".
@@ -121,17 +121,14 @@ esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, co
 	device_t(mconfig, type, tag, owner, clock),
 	m_vfds(std::move(std::get<0>(dimensions))),
 	m_rows(std::get<1>(dimensions)),
-	m_cols(std::get<2>(dimensions))
-{
+	m_cols(std::get<2>(dimensions)) {
 }
 
-void esqvfd_device::device_start()
-{
+void esqvfd_device::device_start() {
 	m_vfds->resolve();
 }
 
-void esqvfd_device::device_reset()
-{
+void esqvfd_device::device_reset() {
 	m_cursx = m_cursy = 0;
 	m_savedx = m_savedy = 0;
 	m_curattr = AT_NORMAL;
@@ -142,14 +139,10 @@ void esqvfd_device::device_reset()
 }
 
 // generic display update; can override from child classes if not good enough
-void esqvfd_device::update_display()
-{
-	for (int row = 0; row < m_rows; row++)
-	{
-		for (int col = 0; col < m_cols; col++)
-		{
-			if (m_dirty[row][col])
-			{
+void esqvfd_device::update_display() {
+	for (int row = 0; row < m_rows; row++) {
+		for (int col = 0; col < m_cols; col++) {
+			if (m_dirty[row][col]) {
 				uint32_t segdata = conv_segments(font[m_chars[row][col]]);
 
 				// digits:
@@ -164,11 +157,9 @@ void esqvfd_device::update_display()
 	}
 }
 
-inline void esqvfd_device::cursor_left()
-{
+inline void esqvfd_device::cursor_left() {
 	m_cursx--;
-	if (m_cursx < 0)
-	{
+	if (m_cursx < 0) {
 		m_cursx += m_cols;
 		m_cursy--;
 		if (m_cursy < 0)
@@ -176,11 +167,9 @@ inline void esqvfd_device::cursor_left()
 	}
 }
 
-inline void esqvfd_device::cursor_right()
-{
+inline void esqvfd_device::cursor_right() {
 	m_cursx++;
-	if (m_cursx >= m_cols)
-	{
+	if (m_cursx >= m_cols) {
 		m_cursx -= m_cols;
 		m_cursy++;
 		if (m_cursy >= m_rows)
@@ -213,26 +202,20 @@ void esqvfd_device::clear() {
 
 /* 2x40 VFD display used in the ESQ-1, VFX-SD, SD-1, and others */
 
-void esq2x40_device::device_add_mconfig(machine_config &config)
-{
+void esq2x40_device::device_add_mconfig(machine_config &config) {
 	config.set_default_layout(layout_esq2by40);
 }
 
-void esq2x40_device::write_char(uint8_t data)
-{
-	if (m_ignore_next > 0)
-	{
-		m_ignore_next--;
+void esq2x40_device::write_char(uint8_t data) {
+	if (m_ignore_next) {
+		m_ignore_next = false;
 		return;
 	}
 
 	// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
-	if (m_lastchar == 0xfa)
-	{
-		for (uint8_t j = 0; j < m_rows; j++)
-		{
-			for (uint8_t i = 0; i < m_cols; i++)
-			{
+	if (m_lastchar == 0xfa) {
+		for (uint8_t j = 0; j < m_rows; j++) {
+			for (uint8_t i = 0; i < m_cols; i++) {
 				if (m_cursy == j && i >= m_cursx && i < m_cursx + data)
 					m_attrs[j][i] |= AT_UNDERLINE;
 				else
@@ -249,15 +232,11 @@ void esq2x40_device::write_char(uint8_t data)
 
 	m_lastchar = data;
 
-	if ((data >= 0x80) && (data < 0xd0))
-	{
+	if ((data >= 0x80) && (data < 0xd0)) {
 		m_cursy = ((data & 0x7f) >= 40) ? 1 : 0;
 		m_cursx = (data & 0x7f) % 40;
-	}
-	else if (data >= 0xd0)
-	{
-		switch (data)
-		{
+	} else if (data >= 0xd0) {
+		switch (data) {
 			case 0xd0:  // blink start
 				m_curattr |= AT_BLINK;
 				break;
@@ -312,9 +291,7 @@ void esq2x40_device::write_char(uint8_t data)
 			default:
 				break;
 		}
-	}
-	else if ((data >= 0x20) && (data <= 0x5f))
-	{
+	} else if ((data >= 0x20) && (data <= 0x5f)) {
 		m_chars[m_cursy][m_cursx] = data - ' ';
 		m_attrs[m_cursy][m_cursx] = m_curattr;
 		m_dirty[m_cursy][m_cursx] = 1;
@@ -325,30 +302,24 @@ void esq2x40_device::write_char(uint8_t data)
 	update_display();
 }
 
-bool esq2x40_device::write_contents(std::ostream &o)
-{
+bool esq2x40_device::write_contents(std::ostream &o) {
 	o.put((char) 0xd6); // clear screen
 
 	uint8_t attrs = 0;
-	for (int row = 0; row < 2; row++)
-	{
+	for (int row = 0; row < 2; row++) {
 		o.put((char) (0x80 + (40 * row))); // move to first column this row
 
-		for (int col = 0; col < 40; col++)
-		{
-			if (m_attrs[row][col] != attrs)
-			{
+		for (int col = 0; col < 40; col++) {
+			if (m_attrs[row][col] != attrs) {
 				attrs = m_attrs[row][col];
 
 				o.put((char) 0xd1); // all attributes off
 
-				if (attrs & AT_BLINK)
-				{
+				if (attrs & AT_BLINK) {
 					o.put((char) 0xd0); // blink on
 				}
 
-				if (attrs & AT_UNDERLINE)
-				{
+				if (attrs & AT_UNDERLINE) {
 					o.put((char) 0xd3); // underline
 				}
 			}
@@ -370,12 +341,10 @@ bool esq2x40_device::write_contents(std::ostream &o)
 
 
 esq2x40_device::esq2x40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, type, tag, owner, clock, make_dimensions<2, 40>(*this))
-{
+	esqvfd_device(mconfig, type, tag, owner, clock, make_dimensions<2, 40>(*this)) {
 }
 esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esq2x40_device(mconfig, ESQ2X40, tag, owner, clock)
-{
+	esq2x40_device(mconfig, ESQ2X40, tag, owner, clock) {
 }
 
 ROM_START( esq2x40_vfx_device )
@@ -383,48 +352,39 @@ ROM_START( esq2x40_vfx_device )
 	ROM_LOAD( "esqvfd_font_vfx.bin", 0, 192, CRC(58dc335b) SHA1(097fc3e1930a49ab61f73ea7a6191c892004f823) )
 ROM_END
 
-const tiny_rom_entry *esq2x40_vfx_device::device_rom_region() const
-{
+const tiny_rom_entry *esq2x40_vfx_device::device_rom_region() const {
 	return ROM_NAME( esq2x40_vfx_device );
 }
 
 esq2x40_vfx_device::esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	esq2x40_device(mconfig, ESQ2X40_VFX, tag, owner, clock),
-	m_font(*this, "font")
-{
+	m_font(*this, "font") {
 }
 
-void esq2x40_vfx_device::device_add_mconfig(machine_config &config)
-{
+void esq2x40_vfx_device::device_add_mconfig(machine_config &config) {
 	// Do not set a default layout. This display must be used
 	// within a layout that includes the VFD elements, such as
 	// vfx.lay, vfxsd.lay or sd1.lay.
 }
 
 // Handles blinking of underline and of entire character,
-void esq2x40_vfx_device::update_display()
-{
-	for (int row = 0; row < m_rows; row++)
-	{
-		for (int col = 0; col < m_cols; col++)
-		{
-			if (m_dirty[row][col])
-			{
+void esq2x40_vfx_device::update_display() {
+	for (int row = 0; row < m_rows; row++) {
+		for (int col = 0; col < m_cols; col++) {
+			if (m_dirty[row][col]) {
 				uint8_t c = m_chars[row][col];
 
 				uint16_t char_segments = m_font[c < 96 ? c : 0];
 				auto attr = m_attrs[row][col];
 				uint16_t segments;
 
-				if ((attr & AT_BLINK) && !m_blink_on)  // something is blinked off
-				{
+				if ((attr & AT_BLINK) && !m_blink_on) {
+					// something is blinked off
 					if (attr & AT_UNDERLINE) // blink the underline off
 						segments = char_segments;
 					else // there is no underline, blink the entire character
 						segments = 0;
-				}
-				else
-				{
+				} else {
 					if (attr & AT_UNDERLINE)
 						segments = char_segments | 0x8000;
 					else
@@ -442,18 +402,14 @@ void esq2x40_vfx_device::update_display()
 
 /* 1x22 display from the VFX (not right, but it'll do for now) */
 
-void esq1x22_device::device_add_mconfig(machine_config &config)
-{
+void esq1x22_device::device_add_mconfig(machine_config &config) {
 	config.set_default_layout(layout_esq1by22);
 }
 
 
-void esq1x22_device::write_char(uint8_t data)
-{
-	if (data >= 0x60)
-	{
-		switch (data)
-		{
+void esq1x22_device::write_char(uint8_t data) {
+	if (data >= 0x60) {
+		switch (data) {
 			case 'f':   // clear screen
 				m_cursx = m_cursy = 0;
 				memset(m_chars, 0, sizeof(m_chars));
@@ -465,17 +421,13 @@ void esq1x22_device::write_char(uint8_t data)
 				printf("Unhandled control code %02x\n", data);
 				break;
 		}
-	}
-	else
-	{
-		if ((data >= 0x20) && (data <= 0x5f))
-		{
+	} else {
+		if ((data >= 0x20) && (data <= 0x5f)) {
 			m_chars[0][m_cursx] = data - ' ';
 			m_dirty[0][m_cursx] = 1;
 			m_cursx++;
 
-			if (m_cursx >= 23)
-			{
+			if (m_cursx >= 23) {
 				m_cursx = 23;
 			}
 		}
@@ -485,71 +437,53 @@ void esq1x22_device::write_char(uint8_t data)
 }
 
 esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, ESQ1X22, tag, owner, clock, make_dimensions<1, 22>(*this))
-{
+	esqvfd_device(mconfig, ESQ1X22, tag, owner, clock, make_dimensions<1, 22>(*this)) {
 }
 
 /* SQ-1 display, I think it's really an LCD but we'll deal with it for now */
-void esq2x40_sq1_device::device_add_mconfig(machine_config &config)
-{
+void esq2x40_sq1_device::device_add_mconfig(machine_config &config) {
 	config.set_default_layout(layout_esq2by40);  // we use the normal 2x40 layout
 }
 
-void esq2x40_sq1_device::write_char(uint8_t data)
-{
-	if (data == 0x09)   // musical note
-	{
+void esq2x40_sq1_device::write_char(uint8_t data) {
+	if (data == 0x09) {
+		// musical note
 		data = '^'; // approximate for now
 	}
 
-	if (m_wait87shift)
-	{
+	if (m_wait87shift) {
 		m_cursy = (data >> 4) & 0xf;
 		m_cursx = data & 0xf;
 		m_wait87shift = false;
-	}
-	else if (m_wait88shift)
-	{
+	} else if (m_wait88shift) {
 		m_wait88shift = false;
-	}
-	else if ((data >= 0x20) && (data <= 0x7f))
-	{
+	} else if ((data >= 0x20) && (data <= 0x7f)) {
 		m_chars[m_cursy][m_cursx] = data - ' ';
 		m_attrs[m_cursy][m_cursx] = m_curattr;
 		m_dirty[m_cursy][m_cursx] = 1;
 		m_cursx++;
 
-		if (m_cursx >= 39)
-		{
+		if (m_cursx >= 39) {
 			m_cursx = 39;
 		}
 
 		update_display();
-	}
-	else if (data == 0x83)
-	{
+	} else if (data == 0x83) {
 		m_cursx = m_cursy = 0;
 		memset(m_chars, 0, sizeof(m_chars));
 		memset(m_attrs, 0, sizeof(m_attrs));
 		memset(m_dirty, 1, sizeof(m_dirty));
-	}
-	else if (data == 0x87)
-	{
+	} else if (data == 0x87) {
 		m_wait87shift = true;
-	}
-	else if (data == 0x88)
-	{
+	} else if (data == 0x88) {
 		m_wait88shift = true;
-	}
-	else
-	{
+	} else {
 //        printf("SQ-1 unhandled display char %02x\n", data);
 	}
 }
 
 esq2x40_sq1_device::esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock, make_dimensions<2, 40>(*this))
-{
+	esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock, make_dimensions<2, 40>(*this)) {
 	m_wait87shift = false;
 	m_wait88shift = false;
 }
