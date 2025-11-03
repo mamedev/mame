@@ -16,4 +16,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="fd5gen">
+		<description>Generation floppy disk CF-5/G</description>
+		<year>1983</year>
+		<publisher>&lt;Sord&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="500459">
+				<rom name="fd5_gen.mfm" size="500459" crc="766ff4bb" sha1="46CD603ED9F65D979F30ABC61B8772F94A7C095A"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
