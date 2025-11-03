@@ -574,26 +574,26 @@ void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t pc9801vm_state::grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret = upd7220_grcg_r((offset + 0x4000) | (m_vram_bank << 16), mem_mask);
+	uint16_t ret = upd7220_grcg_r(offset + 0x4000, mem_mask);
 	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
 void pc9801vm_state::grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-	upd7220_grcg_w((offset + 0x4000) | (m_vram_bank << 16), data, mem_mask);
+	upd7220_grcg_w(offset + 0x4000, data, mem_mask);
 }
 
 uint16_t pc9801vm_state::grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret = upd7220_grcg_r(offset | (m_vram_bank << 16), mem_mask);
+	uint16_t ret = upd7220_grcg_r(offset, mem_mask);
 	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
 void pc9801vm_state::grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-	upd7220_grcg_w(offset | (m_vram_bank << 16), data, mem_mask);
+	upd7220_grcg_w(offset, data, mem_mask);
 }
 
 /*
@@ -1034,6 +1034,7 @@ void pc9801_state::upd7220_1_map(address_map &map)
 	map(0x00000, 0x03fff).ram().share("video_ram_1");
 }
 
+// TODO: this may need the bank reg or the pre-vm models may have had less gvram
 void pc9801_state::upd7220_2_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram().share("video_ram_2");
