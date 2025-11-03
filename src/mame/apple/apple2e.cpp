@@ -2176,14 +2176,10 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 
 		case 0x66: // mouse X1 (IIc only)
 		case 0x6e:
-			if (!m_gameio->is_device_connected())
-				return 0x80 | uFloatingBus7;
 			return (m_x1 ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // mouse Y1 (IIc only)
 		case 0x6f:
-			if (!m_gameio->is_device_connected())
-				return 0x80 | uFloatingBus7;
 			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
