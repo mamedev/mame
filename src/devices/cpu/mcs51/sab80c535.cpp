@@ -78,16 +78,34 @@ u8 sab80c535_device::p5_r()
 	return m_p5 & m_port_in_cb[5]();
 }
 
+void sab80c535_device::adcon_w(u8 data)
+{
+	m_adcon = data;
+}
+
+u8 sab80c535_device::adcon_r()
+{
+	return m_adcon;
+}
+
+u8 sab80c535_device::addat_r()
+{
+	return m_an_func[m_adcon & 7]() * 2;
+}
+
 
 void sab80c535_device::sfr_map(address_map &map)
 {
 	i8052_device::sfr_map(map);
+	map(0xd8, 0xd8).rw(FUNC(sab80c535_device::adcon_r), FUNC(sab80c535_device::adcon_w));
+	map(0xd9, 0xd9).r(FUNC(sab80c535_device::addat_r));
 	map(0xe8, 0xe8).rw(FUNC(sab80c535_device::p4_r), FUNC(sab80c535_device::p4_w));
 	map(0xf8, 0xf8).rw(FUNC(sab80c535_device::p5_r), FUNC(sab80c535_device::p5_w));
 }
 
 sab80c535_device::sab80c535_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: i8052_device(mconfig, SAB80C535, tag, owner, clock, 0)
+	, m_an_func(*this, 0)
 {
 }
 
@@ -96,6 +114,7 @@ void sab80c535_device::device_start()
 	i8052_device::device_start();
 	save_item(NAME(m_p4));
 	save_item(NAME(m_p5));
+	save_item(NAME(m_adcon));
 }
 
 void sab80c535_device::device_reset()
@@ -103,6 +122,7 @@ void sab80c535_device::device_reset()
 	i8052_device::device_reset();
 	m_p4 = 0xff;
 	m_p5 = 0xff;
+	m_adcon = 0x00;
 }
 
 std::unique_ptr<util::disasm_interface> sab80c535_device::create_disassembler()
