@@ -56,6 +56,18 @@ protected:
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
+class spg2xx_cybrtvbb_game_state : public spg2xx_cybrtvfe_game_state
+{
+public:
+	spg2xx_cybrtvbb_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_cybrtvfe_game_state(mconfig, type, tag)
+	{ }
+
+	void cybrtvbb(machine_config& config);
+
+protected:
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
 
 class spg2xx_vsplus_game_state : public spg2xx_lexizeus_game_state
 {
@@ -234,6 +246,13 @@ static INPUT_PORTS_START( lexiseal )
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cybrtvbb )
+	PORT_INCLUDE( lexiseal )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( vsplus )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -289,6 +308,15 @@ void spg2xx_vsplus_game_state::portb_w(offs_t offset, uint16_t data, uint16_t me
 	}
 }
 
+void spg2xx_cybrtvbb_game_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: portc_w %04x %04x masked %04x\n", machine().describe_context(), data, mem_mask, data & mem_mask);
+
+	m_i2cmem->write_sda(BIT(mem_mask, 7) ? BIT(data, 7) : 1);
+	m_i2cmem->write_scl(BIT(mem_mask, 8) ? BIT(data, 8) : 0);
+}
+
+
 void spg2xx_lexiseal_game_state::lexiseal(machine_config &config)
 {
 	non_spg_base(config);
@@ -296,6 +324,15 @@ void spg2xx_lexiseal_game_state::lexiseal(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
+}
+
+void spg2xx_cybrtvbb_game_state::cybrtvbb(machine_config &config)
+{
+	lexiseal(config);
+	m_maincpu->portc_out().set(FUNC(spg2xx_cybrtvbb_game_state::portc_w));
+
+	// cybrtvfe has a position for this too, but it's unpopulated
+	I2C_24C02(config, "i2cmem", 0);
 }
 
 void spg2xx_lexizeus_game_state::lexizeus(machine_config &config)
@@ -489,7 +526,7 @@ CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game
 // marked as SPG260
 CONS( 2010, cybrtvfe,    0,     0,        lexiseal,     lexiseal, spg2xx_cybrtvfe_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Ferrari 105-in-1 (JL2500FE)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // need to hook up seeprom
-CONS( 2010, cybrtvbb,    0,     0,        lexiseal,     lexiseal, spg2xx_cybrtvfe_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Barbie (JL2500BB)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, cybrtvbb,    0,     0,        cybrtvbb,     cybrtvbb, spg2xx_cybrtvbb_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Barbie 75-in-1 (JL2500BB)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited / JungleTac", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
 // There are versions of the Seal 50-in-1 that actually show Lexibook on the boot screen rather than it just being on the unit.  The Seal name was also used for some VT systems
