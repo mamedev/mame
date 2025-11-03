@@ -427,7 +427,7 @@ inline ATTR_FORCE_INLINE uint16_t tms3202x_device::reverse_carry_add(uint16_t ar
 	return result;
 }
 
-template<bool IgnoreARPHack = false>
+template <bool IgnoreARPHack = false>
 inline ATTR_FORCE_INLINE void tms3202x_device::MODIFY_AR_ARP()
 { /* modify address register referenced by ARP */
 	switch (m_opcode.b.l & 0x70)        /* Cases ordered by predicted useage */
@@ -547,7 +547,7 @@ inline ATTR_FORCE_INLINE void tms3202x_device::SHIFT_Preg_TO_ALU()
 	}
 }
 
-template<bool IgnoreARPHack = false>
+template <bool IgnoreARPHack = false>
 inline ATTR_FORCE_INLINE void tms3202x_device::GETDATA()
 {
 	if (m_opcode.b.l & 0x80)
@@ -1010,22 +1010,13 @@ void tms3202x_device::lalk()
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d = m_ALU.d;
 }
-void tms3202x_device::lar_ar0()   { GETDATA(); m_AR[0] = m_ALU.w.l; }
-void tms3202x_device::lar_ar1()   { GETDATA(); m_AR[1] = m_ALU.w.l; }
-void tms3202x_device::lar_ar2()   { GETDATA(); m_AR[2] = m_ALU.w.l; }
-void tms3202x_device::lar_ar3()   { GETDATA(); m_AR[3] = m_ALU.w.l; }
-void tms3202x_device::lar_ar4()   { GETDATA(); m_AR[4] = m_ALU.w.l; }
-void tms3202x_device::lar_ar5()   { GETDATA(); m_AR[5] = m_ALU.w.l; }
-void tms3202x_device::lar_ar6()   { GETDATA(); m_AR[6] = m_ALU.w.l; }
-void tms3202x_device::lar_ar7()   { GETDATA(); m_AR[7] = m_ALU.w.l; }
-void tms3202x_device::lark_ar0()  { m_AR[0] = m_opcode.b.l; }
-void tms3202x_device::lark_ar1()  { m_AR[1] = m_opcode.b.l; }
-void tms3202x_device::lark_ar2()  { m_AR[2] = m_opcode.b.l; }
-void tms3202x_device::lark_ar3()  { m_AR[3] = m_opcode.b.l; }
-void tms3202x_device::lark_ar4()  { m_AR[4] = m_opcode.b.l; }
-void tms3202x_device::lark_ar5()  { m_AR[5] = m_opcode.b.l; }
-void tms3202x_device::lark_ar6()  { m_AR[6] = m_opcode.b.l; }
-void tms3202x_device::lark_ar7()  { m_AR[7] = m_opcode.b.l; }
+
+template <unsigned N>
+void tms3202x_device::lar_ar()   { GETDATA(); m_AR[N] = m_ALU.w.l; }
+
+template <unsigned N>
+void tms3202x_device::lark_ar()  { m_AR[N] = m_opcode.b.l; }
+
 void tms3202x_device::ldp()
 {
 	GETDATA();
@@ -1319,14 +1310,9 @@ void tms3202x_device::sacl()
 	m_ALU.d = (m_ACC.d << (m_opcode.b.h & 7));
 	PUTDATA(m_ALU.w.l);
 }
-void tms3202x_device::sar_ar0()   { PUTDATA(m_AR[0]); }
-void tms3202x_device::sar_ar1()   { PUTDATA(m_AR[1]); }
-void tms3202x_device::sar_ar2()   { PUTDATA(m_AR[2]); }
-void tms3202x_device::sar_ar3()   { PUTDATA(m_AR[3]); }
-void tms3202x_device::sar_ar4()   { PUTDATA(m_AR[4]); }
-void tms3202x_device::sar_ar5()   { PUTDATA(m_AR[5]); }
-void tms3202x_device::sar_ar6()   { PUTDATA(m_AR[6]); }
-void tms3202x_device::sar_ar7()   { PUTDATA(m_AR[7]); }
+
+template<unsigned N>
+void tms3202x_device::sar_ar()   { PUTDATA(m_AR[N]); }
 
 void tms3202x_device::sblk()
 {
@@ -1589,7 +1575,7 @@ const tms3202x_device::tms32025_opcode tms3202x_device::s_opcode_main[256]=
 /*18*/ {1*CLK, &tms3202x_device::sub      },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },{1*CLK, &tms3202x_device::sub       },
 /*20*/ {1*CLK, &tms3202x_device::lac      },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },
 /*28*/ {1*CLK, &tms3202x_device::lac      },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },{1*CLK, &tms3202x_device::lac       },
-/*30*/ {1*CLK, &tms3202x_device::lar_ar0  },{1*CLK, &tms3202x_device::lar_ar1   },{1*CLK, &tms3202x_device::lar_ar2   },{1*CLK, &tms3202x_device::lar_ar3   },{1*CLK, &tms3202x_device::lar_ar4   },{1*CLK, &tms3202x_device::lar_ar5   },{1*CLK, &tms3202x_device::lar_ar6   },{1*CLK, &tms3202x_device::lar_ar7   },
+/*30*/ {1*CLK, &tms3202x_device::lar_ar<0>},{1*CLK, &tms3202x_device::lar_ar<1> },{1*CLK, &tms3202x_device::lar_ar<2> },{1*CLK, &tms3202x_device::lar_ar<3> },{1*CLK, &tms3202x_device::lar_ar<4> },{1*CLK, &tms3202x_device::lar_ar<5>},{1*CLK, &tms3202x_device::lar_ar<6>  },{1*CLK, &tms3202x_device::lar_ar<7> },
 /*38*/ {1*CLK, &tms3202x_device::mpy      },{1*CLK, &tms3202x_device::sqra      },{1*CLK, &tms3202x_device::mpya      },{1*CLK, &tms3202x_device::mpys      },{1*CLK, &tms3202x_device::lt        },{1*CLK, &tms3202x_device::lta       },{1*CLK, &tms3202x_device::ltp       },{1*CLK, &tms3202x_device::ltd       },
 /*40*/ {1*CLK, &tms3202x_device::zalh     },{1*CLK, &tms3202x_device::zals      },{1*CLK, &tms3202x_device::lact      },{1*CLK, &tms3202x_device::addc      },{1*CLK, &tms3202x_device::subh      },{1*CLK, &tms3202x_device::subs      },{1*CLK, &tms3202x_device::subt      },{1*CLK, &tms3202x_device::subc      },
 /*48*/ {1*CLK, &tms3202x_device::addh     },{1*CLK, &tms3202x_device::adds      },{1*CLK, &tms3202x_device::addt      },{1*CLK, &tms3202x_device::rpt       },{1*CLK, &tms3202x_device::xor_      },{1*CLK, &tms3202x_device::or_       },{1*CLK, &tms3202x_device::and_      },{1*CLK, &tms3202x_device::subb      },
@@ -1597,7 +1583,7 @@ const tms3202x_device::tms32025_opcode tms3202x_device::s_opcode_main[256]=
 /*58*/ {3*CLK, &tms3202x_device::tblr     },{2*CLK, &tms3202x_device::tblw      },{1*CLK, &tms3202x_device::sqrs      },{1*CLK, &tms3202x_device::lts       },{2*CLK, &tms3202x_device::macd      },{2*CLK, &tms3202x_device::mac       },{2*CLK, &tms3202x_device::bc        },{2*CLK, &tms3202x_device::bnc       },
 /*60*/ {1*CLK, &tms3202x_device::sacl     },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },{1*CLK, &tms3202x_device::sacl      },
 /*68*/ {1*CLK, &tms3202x_device::sach     },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },{1*CLK, &tms3202x_device::sach      },
-/*70*/ {1*CLK, &tms3202x_device::sar_ar0  },{1*CLK, &tms3202x_device::sar_ar1   },{1*CLK, &tms3202x_device::sar_ar2   },{1*CLK, &tms3202x_device::sar_ar3   },{1*CLK, &tms3202x_device::sar_ar4   },{1*CLK, &tms3202x_device::sar_ar5   },{1*CLK, &tms3202x_device::sar_ar6   },{1*CLK, &tms3202x_device::sar_ar7   },
+/*70*/ {1*CLK, &tms3202x_device::sar_ar<0>},{1*CLK, &tms3202x_device::sar_ar<1> },{1*CLK, &tms3202x_device::sar_ar<2> },{1*CLK, &tms3202x_device::sar_ar<3> },{1*CLK, &tms3202x_device::sar_ar<4> },{1*CLK, &tms3202x_device::sar_ar<5> },{1*CLK, &tms3202x_device::sar_ar<6> },{1*CLK, &tms3202x_device::sar_ar<7> },
 /*78*/ {1*CLK, &tms3202x_device::sst      },{1*CLK, &tms3202x_device::sst1      },{1*CLK, &tms3202x_device::popd      },{1*CLK, &tms3202x_device::zalr      },{1*CLK, &tms3202x_device::spl       },{1*CLK, &tms3202x_device::sph       },{1*CLK, &tms3202x_device::adrk      },{1*CLK, &tms3202x_device::sbrk_ar   },
 /*80*/ {2*CLK, &tms3202x_device::in       },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },
 /*88*/ {2*CLK, &tms3202x_device::in       },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },{2*CLK, &tms3202x_device::in        },
@@ -1607,7 +1593,7 @@ const tms3202x_device::tms32025_opcode tms3202x_device::s_opcode_main[256]=
 /*A8*/ {1*CLK, &tms3202x_device::mpyk     },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },
 /*B0*/ {1*CLK, &tms3202x_device::mpyk     },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },
 /*B8*/ {1*CLK, &tms3202x_device::mpyk     },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },{1*CLK, &tms3202x_device::mpyk      },
-/*C0*/ {1*CLK, &tms3202x_device::lark_ar0 },{1*CLK, &tms3202x_device::lark_ar1  },{1*CLK, &tms3202x_device::lark_ar2  },{1*CLK, &tms3202x_device::lark_ar3  },{1*CLK, &tms3202x_device::lark_ar4  },{1*CLK, &tms3202x_device::lark_ar5  },{1*CLK, &tms3202x_device::lark_ar6  },{1*CLK, &tms3202x_device::lark_ar7  },
+/*C0*/ {1*CLK, &tms3202x_device::lark_ar<0>},{1*CLK, &tms3202x_device::lark_ar<1>},{1*CLK, &tms3202x_device::lark_ar<2>},{1*CLK, &tms3202x_device::lark_ar<3>},{1*CLK, &tms3202x_device::lark_ar<4>},{1*CLK, &tms3202x_device::lark_ar<5>},{1*CLK, &tms3202x_device::lark_ar<6>},{1*CLK, &tms3202x_device::lark_ar<7>},
 /*C8*/ {1*CLK, &tms3202x_device::ldpk     },{1*CLK, &tms3202x_device::ldpk      },{1*CLK, &tms3202x_device::lack      },{1*CLK, &tms3202x_device::rptk      },{1*CLK, &tms3202x_device::addk      },{1*CLK, &tms3202x_device::subk      },{1*CLK, &tms3202x_device::opcodes_CE},{1*CLK, &tms3202x_device::mpyu      },
 /*D0*/ {1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{0*CLK, &tms3202x_device::opcodes_Dx},
 /*D8*/ {1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},{1*CLK, &tms3202x_device::opcodes_Dx},
