@@ -71,6 +71,7 @@ private:
 	void bankswitch_w(uint8_t data);
 	template <uint8_t Which> void vram_w(offs_t offset, uint8_t data);
 	void flipscreen_w(int state) { machine().tilemap().set_flip_all(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0); }
+	void sprite_callback(int &code, int &color, int colbank);
 
 	void prg_map(address_map &map) ATTR_COLD;
 };
@@ -166,13 +167,16 @@ void labyrunr_state::video_start()
 
 ***************************************************************************/
 
+void labyrunr_state::sprite_callback(int &code, int &color, int colbank)
+{
+	color += colbank;
+}
+
 void labyrunr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
-	int base_color = (m_k007121->ctrl_r(6) & 0x30) * 2;
-	int global_x_offset = m_k007121->flipscreen() ? 16 : 40;
 	uint32_t pri_mask = (m_k007121->ctrl_r(3) & 0x20) >> 4;
 
-	m_k007121->sprites_draw(bitmap, cliprect, base_color, global_x_offset, 0, priority_bitmap, pri_mask);
+	m_k007121->sprites_draw(bitmap, cliprect, priority_bitmap, pri_mask);
 }
 
 uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -440,9 +444,11 @@ void labyrunr_state::labyrunr(machine_config &config)
 	m_palette->set_format(palette_device::xBGR_555, 8*16*16, 128);
 
 	K007121(config, m_k007121, 0, gfx_labyrunr, m_palette, "screen");
+	m_k007121->set_sprite_offsets(40, 16);
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k007121->set_flipscreen_cb().set(FUNC(labyrunr_state::flipscreen_w));
+	m_k007121->set_sprite_callback(FUNC(labyrunr_state::sprite_callback));
 
 	K051733(config, "k051733", 24_MHz_XTAL / 2);
 

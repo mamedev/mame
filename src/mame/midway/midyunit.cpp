@@ -3665,14 +3665,14 @@ ROM_END
 
 ROM_START( yunittst )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    // sound CPU
-	ROM_LOAD ( "y_unit_test_snd",  0x000000, 0x90000,	NO_DUMP )
+	ROM_LOAD ( "y_unit_test_snd",  0x000000, 0x90000,   NO_DUMP )
 
 	ROM_REGION16_LE( 0x100000, "maindata", 0 ) // 34010 code
 	ROM_LOAD16_BYTE( "y_unit_test_u105.u105", 0xc0000, 0x20000, CRC(bd29a7d1) SHA1(211905c16874a23840652555757b9d2f2712facb) )
 	ROM_LOAD16_BYTE( "y_unit_test_u89.u89",   0xc0001, 0x20000, CRC(6db6e0cd) SHA1(3f4c7cd48d6606c03195ed9209f7cedbc9efd42d) )
 
 	ROM_REGION( 0x800000, "gfx", 0 )
-	ROM_LOAD ( "y_unit_test_gfx",  0x000000, 0x800000,	NO_DUMP )
+	ROM_LOAD ( "y_unit_test_gfx",  0x000000, 0x800000,  NO_DUMP )
 ROM_END
 
 /*************************************
@@ -3747,4 +3747,4 @@ GAME( 1992, totcarnp2,  totcarn,  yunit_adpcm_6bit_fast,   totcarn,  midyunit_ad
 GAME( 1992, totcarnp1,  totcarn,  yunit_adpcm_6bit_fast,   totcarn,  midyunit_adpcm_state, init_totcarn,   ROT0,              "Midway",           "Total Carnage (prototype, proto v 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )
 
 //Configuring as a generic CVSD, can run on any board
-GAME( 199?, yunittst,   0,		  yunit_cvsd_6bit_slow,    yunittst, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Y-Unit Test ROM (v1.40)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, yunittst,   0,        yunit_cvsd_6bit_slow,    yunittst, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Y-Unit Test ROM (v1.40)", MACHINE_SUPPORTS_SAVE )

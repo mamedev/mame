@@ -47,3 +47,9 @@ void i82371eb_isa_device::config_map(address_map &map)
 //  map(0xb0, 0xb0) GENCFG
 
 }
+
+void i82371eb_isa_device::internal_io_map(address_map &map)
+{
+	i82371sb_isa_device::internal_io_map(map);
+	map(0x00eb, 0x00eb).lw8(NAME([] (offs_t offset, u8 data) { }));
+}

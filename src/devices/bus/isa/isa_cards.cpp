@@ -86,8 +86,10 @@
 #include "ne1000.h"
 #include "ne2000.h"
 #include "np600.h"
+#include "ubpnic.h"
 
 // communication ports
+#include "5080pa.h"
 #include "com.h"
 #include "lpt.h"
 #include "pds.h"
@@ -99,6 +101,7 @@
 #include "finalchs.h"
 #include "hpblp.h"
 #include "opus100pm.h"
+#include "pcat512me.h"
 #include "zxbus_adapter.h"
 
 
@@ -162,6 +165,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("opus108pm", ISA8_OPUS108PM);
 	device.option_add("ibm_speech", ISA8_IBM_SPEECH);
 	device.option_add("zxbus_adapter", ISA8_ZXBUS);
+	device.option_add("ubpnic", ISA8_UBPNIC);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
@@ -180,8 +184,10 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("aha1542c", AHA1542C);
 	device.option_add("aha1542cf", AHA1542CF);
 	device.option_add("aha1542cp", AHA1542CP);
+	device.option_add("5080pa", ISA16_5080PA);
 	device.option_add("amgda", ISA16_AMGDA);
 	device.option_add("gus", ISA16_GUS);
+	device.option_add("pcat512me", ISA16_PCAT512ME);
 	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
 	device.option_add("svga_s3", ISA16_SVGA_S3);
 	device.option_add("svga_dm", ISA16_SVGA_CIRRUS);

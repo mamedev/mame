@@ -44,15 +44,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "machine/i8255.h"
-#include "machine/i8251.h"
-#include "machine/wd_fdc.h"
-#include "video/mc6845.h"
 #include "imagedev/floppy.h"
-#include "bus/rs232/rs232.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80ctc.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
@@ -68,8 +70,8 @@ namespace {
 class m3_state : public driver_device
 {
 public:
-	m3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ctc(*this, "ctc"),
 		m_ppi(*this, "ppi%u", 0U),

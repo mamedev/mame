@@ -67,6 +67,8 @@ public:
 	void mpc900gx(machine_config &config);
 	void se3010(machine_config &config);
 
+	void init_se();
+
 	//static void mpc_prisma_default(device_t *device);
 
 protected:
@@ -501,6 +503,10 @@ void bbcm_state::update_sdb()
 {
 	uint8_t const latch = m_latch->output_state();
 
+	// sound
+	if (!BIT(latch,0))
+		m_sn->write(m_sdb);
+
 	// rtc
 	if (m_mc146818_ce)
 	{
@@ -615,6 +621,17 @@ static INPUT_PORTS_START(bbcm)
 INPUT_PORTS_END
 
 
+void bbcm_state::init_se()
+{
+	bbc_state::init_bbc();
+
+	uint8_t *cmos = memregion("rtc")->base();
+
+	cmos[0x13] |= 0x0f; // *Configure File 15
+	cmos[0x1e] |= 0x10; // *Configure Boot
+}
+
+
 static void bbc_floppies(device_slot_interface &device)
 {
 	device.option_add("525sssd", FLOPPY_525_SSSD);
@@ -651,7 +668,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	RAM(config, m_ram).set_default_size("128K");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 624, 0, 512);
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette).set_entries(16);
@@ -671,7 +688,6 @@ void bbcm_state::bbcmet(machine_config &config)
 	config.set_default_layout(layout_bbcm);
 
 	LS259(config, m_latch);
-	m_latch->q_out_cb<0>().set([this](int state) { if (!state) m_sn->write(m_sdb); });
 	m_latch->q_out_cb<3>().set(m_kbd, FUNC(bbc_kbd_device::write_kb_en));
 	m_latch->q_out_cb<6>().set_output("capslock_led");
 	m_latch->q_out_cb<7>().set_output("shiftlock_led");
@@ -770,10 +786,11 @@ void bbcm_state::bbcm(machine_config &config)
 	centronics.set_output_latch(latch);
 
 	upd7002_device &upd7002(UPD7002(config, "upd7002", 16_MHz_XTAL / 16));
-	upd7002.set_get_analogue_callback(FUNC(bbcm_state::get_analogue_input));
-	upd7002.set_eoc_callback(m_sysvia, FUNC(via6522_device::write_cb1));
+	upd7002.get_analogue_callback().set(m_analog, FUNC(bbc_analogue_slot_device::ch_r));
+	upd7002.eoc_callback().set(m_sysvia, FUNC(via6522_device::write_cb1));
 
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
+	m_analog->set_screen("screen");
 	m_analog->lpstb_handler().set(m_sysvia, FUNC(via6522_device::write_cb2));
 	m_analog->lpstb_handler().append([this](int state) { if (state) m_crtc->assert_light_pen_input(); });
 
@@ -1031,14 +1048,20 @@ ROM_START(bbcm)
 	// page 6  18000  IC37 SWRAM or bottom 16K           // page 14 38000  IC24 View + MOS code
 	// page 7  1C000  IC37 SWRAM or top 16K              // page 15 3C000  IC24 Terminal + Tube host + CFS
 	ROM_REGION(0x44000, "rom", ROMREGION_ERASEFF)
-	ROM_SYSTEM_BIOS(0, "320", "MOS 3.20")
+	ROM_SYSTEM_BIOS(0, "320", "MOS 3.20") // 1986 original release
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS(1, "350", "MOS 3.50")
-	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "329", "MOS 3.29") // FinMOS, unknown source
+	ROMX_LOAD("mos329.ic24", 0x20000, 0x20000, CRC(8dd7338b) SHA1(4604203c70c04a9fd003103deec438fc5bd44839), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(2, "329", "MOS 3.29")
-	ROMX_LOAD("mos329.ic24", 0x20000, 0x20000, CRC(8dd7338b) SHA1(4604203c70c04a9fd003103deec438fc5bd44839), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "343", "MOS 3.43") // Caspl MOS, found on an Acorn ROM Simulator carrier board
+	ROMX_LOAD("caspl_mos343_89.bin", 0x20000, 0x08000, CRC(fa2b881f) SHA1(eb7c09d942f9dac378337094416053df16cb3fe2), ROM_BIOS(2))
+	ROMX_LOAD("caspl_mos343_ab.bin", 0x28000, 0x08000, CRC(704d86e9) SHA1(c3ee6018230c7201a6dfa10162f25d630f12c795), ROM_BIOS(2))
+	ROMX_LOAD("caspl_mos343_cd.bin", 0x30000, 0x08000, CRC(953b7530) SHA1(19c1a59abd817f7011b142177417f7abb9eb3f64), ROM_BIOS(2))
+	ROMX_LOAD("caspl_mos343_ef.bin", 0x38000, 0x08000, CRC(ebc09359) SHA1(24ff90709495adda8a01858c60275193e70b2690), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "350", "MOS 3.50") // 1989 official upgrade
+	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(3))
 
 	ROM_COPY("rom", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
 	ROM_FILL(0x20000, 0x4000, 0xff)
@@ -1052,6 +1075,7 @@ ROM_START(bbcm)
 	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
 	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
 	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(2))
+	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(3))
 ROM_END
 
 
@@ -1411,7 +1435,7 @@ COMP( 1986, bbcmarm,    bbcm,   0,     bbcmarm,    bbcm,   bbcm_state,   init_bb
 COMP( 1987, mpc800,     bbcm,   0,     mpc800,     bbcm,   bbcm_state,   init_bbc,  "G2 Systems",                  "MasterPieCe 800 Series",             MACHINE_NOT_WORKING )
 COMP( 1988, mpc900,     bbcm,   0,     mpc900,     bbcm,   bbcm_state,   init_bbc,  "G2 Systems",                  "MasterPieCe 900 Series",             MACHINE_NOT_WORKING )
 COMP( 1990, mpc900gx,   bbcm,   0,     mpc900gx,   bbcm,   bbcm_state,   init_bbc,  "G2 Systems",                  "MasterPieCe 900GX Series",           MACHINE_NOT_WORKING )
-COMP( 1987, se3010,     bbcm,   0,     se3010,     bbcm,   bbcm_state,   init_bbc,  "Softel Electronics",          "SE3010 Teletext Editing Terminal",   MACHINE_NOT_WORKING )
+COMP( 1987, se3010,     bbcm,   0,     se3010,     bbcm,   bbcm_state,   init_se,   "Softel Electronics",          "SE3010 Teletext Editing Terminal",   MACHINE_NOT_WORKING )
 
 // Jukeboxes
 //COMP( 1988, discmast,   bbcm,   0,     discmast,   bbcm,   bbcm_state,   init_bbc,  "Arbiter Leisure",             "Arbiter Discmaster A-00",            MACHINE_NOT_WORKING )

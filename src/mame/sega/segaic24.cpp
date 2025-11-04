@@ -16,7 +16,10 @@ System 24      68000x2  315-5292   315-5293  315-5294  315-5242        ym2151 da
 
 #include "emu.h"
 #include "segaic24.h"
+
 #include "screen.h"
+
+#include "vr.lh"
 
 
 DEFINE_DEVICE_TYPE(S24TILE,   segas24_tile_device,   "segas24_tile",   "Sega System 24 Tilemap")

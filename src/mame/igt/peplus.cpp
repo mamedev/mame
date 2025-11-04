@@ -201,7 +201,7 @@ A Note about Best Bet Products.
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -357,7 +357,7 @@ private:
 	void peplus_palette(palette_device &palette) const;
 	void handle_lightpen();
 
-	void main_iomap(address_map &map) ATTR_COLD;
+	void main_datamap(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 };
 
@@ -1027,7 +1027,7 @@ void peplus_state::main_map(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void peplus_state::main_iomap(address_map &map)
+void peplus_state::main_datamap(address_map &map)
 {
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
 	map(0x0000, 0x1fff).ram().w(FUNC(peplus_state::cmos_w)).share(m_cmos_ram);
@@ -1415,7 +1415,7 @@ void peplus_state::peplus(machine_config &config)
 	// basic machine hardware
 	I80C32(config, m_maincpu, XTAL(20'000'000) / 2); // 10MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &peplus_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &peplus_state::main_iomap);
+	m_maincpu->set_addrmap(AS_DATA, &peplus_state::main_datamap);
 	m_maincpu->port_out_cb<1>().set(FUNC(peplus_state::paldata_w<0>));
 	m_maincpu->port_out_cb<3>().set(FUNC(peplus_state::paldata_w<1>));
 

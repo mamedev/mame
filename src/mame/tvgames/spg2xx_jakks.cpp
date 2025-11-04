@@ -464,7 +464,7 @@ void jakks_state::mk(machine_config &config)
 	//m_maincpu->portb_in().set(FUNC(jakks_state::base_portb_r));
 	m_maincpu->portc_in().set_ioport("P3");
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 void jakks_state::spg2xx_hmbb(machine_config &config)

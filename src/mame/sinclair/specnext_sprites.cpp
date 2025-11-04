@@ -154,22 +154,23 @@ void specnext_sprites_device::update_sprites_cache()
 				anchor_pattern = anchor->pattern;
 			}
 
-			bool y8 = BIT(sprite_attr[3], 6) ? BIT(spr_cur_attr[4], 0) : 0;
-			spr_cur.y = (y8 << 8) | spr_cur_attr[1];
+			const u8 attr_ext = BIT(sprite_attr[3], 6) ? spr_cur_attr[4] : 0x00;
+
+			spr_cur.y = (BIT(attr_ext, 0) << 8) | spr_cur_attr[1];
 			spr_cur.x = (BIT(spr_cur_attr[2], 0) << 8) | spr_cur_attr[0];
 			spr_cur.rotate = BIT(spr_cur_attr[2], 1);
 			spr_cur.ymirror = BIT(spr_cur_attr[2], 2);
 			spr_cur.xmirror = BIT(spr_cur_attr[2], 3);
 			spr_cur.paloff = BIT(spr_cur_attr[2], 4, 4);
 
-			spr_cur.h = BIT(spr_cur_attr[4], 7) && BIT(sprite_attr[3], 6);
-			bool spr_cur_n6 = BIT(spr_cur_attr[4], 6) && spr_cur.h;
+			spr_cur.h = BIT(attr_ext, 7) && BIT(sprite_attr[3], 6);
+			bool spr_cur_n6 = BIT(attr_ext, 6) && spr_cur.h;
 			spr_cur.pattern = (BIT(spr_cur_attr[3], 0, TOTAL_PATTERN_BITS) << 1) | spr_cur_n6;
 			if (spr_relative && BIT(sprite_attr[4], 0))
 				spr_cur.pattern = (spr_cur.pattern + anchor_pattern) & 0x7f;
 
-			spr_cur.yscale = BIT(spr_cur_attr[4], 1, 2);
-			spr_cur.xscale = BIT(spr_cur_attr[4], 3, 2);
+			spr_cur.yscale = BIT(attr_ext, 1, 2);
+			spr_cur.xscale = BIT(attr_ext, 3, 2);
 			spr_cur.rel_type = BIT(sprite_attr[4], 5) && BIT(sprite_attr[3], 6);
 
 			m_sprites_cache.push_back(spr_cur);
@@ -196,6 +197,34 @@ void specnext_sprites_device::update_config()
 		m_clip_window = rectangle { m_clip_x1 << 1, (m_clip_x2 << 1) | 1, m_clip_y1, m_clip_y2 };
 	m_clip_window.setx(m_clip_window.left() << 1, (m_clip_window.right() << 1) | 1);
 	m_clip_window.offset(m_offset_h, m_offset_v);
+}
+
+u8 specnext_sprites_device::status_r()
+{
+	if (m_sprites_cache.empty()) update_sprites_cache();
+
+	bool max_sprites = 0; // TODO line reached max count allowed
+	bool collision = 0;
+	for (auto s1 = begin(m_sprites_cache); !collision && s1 != end(m_sprites_cache); ++s1)
+	{
+		const u16 x1 = s1->x & 0x1ff;
+		const u16 w1 = 16 << ((s1->rotate & 1) ? s1->yscale : s1->xscale);
+		const u16 y1 = s1->y & 0x1ff;
+		const u16 h1 = 16 << ((s1->rotate & 1) ? s1->xscale : s1->yscale);
+		for (auto s2 = s1 + 1; !collision && s2 != end(m_sprites_cache); ++s2)
+		{
+			const u16 x2 = s2->x & 0x1ff;
+			const u16 w2 = 16 << ((s2->rotate & 1) ? s2->yscale : s2->xscale);
+			const u16 y2 = s2->y & 0x1ff;
+			const u16 h2 = 16 << ((s2->rotate & 1) ? s2->xscale : s2->yscale);
+			bool c = (x1 < x2 + w2) && (x2 < x1 + w1) && (y1 < y2 + h2) && (y2 < y1 + h1);
+			if (c)
+				; // TODO detect if pixel(s) are not transparent
+			collision |= c;
+		}
+	}
+
+	return (max_sprites << 1) | collision;
 }
 
 void specnext_sprites_device::io_w(offs_t addr, u8 data)

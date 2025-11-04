@@ -36,45 +36,50 @@ DEFINE_DEVICE_TYPE(PCVIDEO_PCJR,  pcvideo_pcjr_device,  "pcjr_graphics",       "
 pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
-	m_mc6845(*this, T1000_MC6845_NAME),
+	m_chr_gen(*this, finder_base::DUMMY_TAG),
+	m_mc6845(*this, "mc6845_t1000"),
+	m_palette(*this,"palette"),
+	m_ram(*this, ":" RAM_TAG),
+	m_vram(*this, "vram"),
 	m_mode_control(0),
 	m_color_select(0),
 	m_status(0),
 	m_bank(0),
 	m_pc_framecnt(0),
 	m_displayram(nullptr),
-	m_chr_gen(nullptr),
 	m_chr_size(0),
 	m_ra_offset(0),
 	m_address_data_ff(0),
 	m_update_row_type(-1),
 	m_display_enable(0),
 	m_vsync(0),
-	m_palette_base(0),
-	m_palette(*this,"palette"),
-	m_ram(*this, ":" RAM_TAG),
-	m_vram(*this, "vram")
+	m_palette_base(0)
 {
 }
 
-pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc_t1t_device(mconfig, PCVIDEO_T1000, tag, owner, clock)
+pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_t1t_device(mconfig, PCVIDEO_T1000, tag, owner, clock)
 {
 }
 
-pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock),
-	m_pic8259(*this, ":pic8259"),
+pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock),
+	m_vsync_cb(*this),
 	m_jxkanji(nullptr)
 {
 }
 
 
+void pc_t1t_device::device_start()
+{
+	if (!m_ram->started())
+		throw device_missing_dependencies();
+}
+
 void pcvideo_t1000_device::device_start()
 {
-	if(!m_ram->started())
-		throw device_missing_dependencies();
-	m_chr_gen = machine().root_device().memregion("gfx1")->base();
+	pc_t1t_device::device_start();
+
 	m_bank = 0;
 	m_chr_size = 1;
 	m_ra_offset = 256;
@@ -84,9 +89,8 @@ void pcvideo_t1000_device::device_start()
 
 void pcvideo_pcjr_device::device_start()
 {
-	if(!m_ram->started())
-		throw device_missing_dependencies();
-	m_chr_gen = machine().root_device().memregion("gfx1")->base();
+	pc_t1t_device::device_start();
+
 	m_bank = 0;
 	m_mode_control = 0x08;
 	m_chr_size = 8;
@@ -120,7 +124,7 @@ void pcvideo_t1000_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(14'318'181),912,0,640,262,0,200);
-	screen.set_screen_update(T1000_MC6845_NAME, FUNC(mc6845_device::screen_update));
+	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(pcvideo_t1000_device::pcjr_palette), 32);
 
@@ -140,7 +144,7 @@ void pcvideo_pcjr_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
-	screen.set_screen_update(T1000_MC6845_NAME, FUNC(mc6845_device::screen_update));
+	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(pcvideo_pcjr_device::pcjr_palette), 32);
 
@@ -194,7 +198,7 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_inten_update_row )
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		uint8_t chr = m_displayram[ offset ];
 		uint8_t attr = m_displayram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * m_chr_size + ra * m_ra_offset ];
+		uint8_t data = m_chr_gen[chr * m_chr_size + ra * m_ra_offset];
 		uint16_t fg = m_palette_base + ( attr & 0x0F );
 		uint16_t bg = m_palette_base + ( ( attr >> 4 ) & 0x07 );
 
@@ -225,7 +229,7 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_blink_update_row )
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		uint8_t chr = m_displayram[ offset ];
 		uint8_t attr = m_displayram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * m_chr_size + ra * m_ra_offset ];
+		uint8_t data = m_chr_gen[chr * m_chr_size + ra * m_ra_offset];
 		uint16_t fg = m_palette_base + ( attr & 0x0F );
 		uint16_t bg = m_palette_base + ( ( attr >> 4 ) & 0x07 );
 
@@ -929,7 +933,7 @@ void pcvideo_pcjr_device::write(offs_t offset, uint8_t data)
 		case 12:
 			break;
 		case 15:
-			if(m_jxkanji)
+			if (m_jxkanji)
 				pc_pcjx_bank_w(data);
 			else
 				pc_pcjr_bank_w(data);
@@ -943,9 +947,9 @@ void pcvideo_pcjr_device::write(offs_t offset, uint8_t data)
 
 uint8_t pc_t1t_device::read(offs_t offset)
 {
-	int             data = 0xff;
+	int data = 0xff;
 
-	switch( offset )
+	switch (offset)
 	{
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
@@ -1002,7 +1006,7 @@ void pcvideo_pcjr_device::de_changed(int state)
 void pcvideo_t1000_device::t1000_vsync_changed(int state)
 {
 	m_vsync = state ? 8 : 0;
-	if ( state )
+	if (state)
 	{
 		m_pc_framecnt++;
 	}
@@ -1010,7 +1014,7 @@ void pcvideo_t1000_device::t1000_vsync_changed(int state)
 
 void pcvideo_t1000_device::disable_w(int state)
 {
-	if(state)
+	if (state)
 		m_vram->set_bank(8);
 	else
 		bank_w(m_bank);
@@ -1020,9 +1024,9 @@ void pcvideo_t1000_device::disable_w(int state)
 void pcvideo_pcjr_device::pcjr_vsync_changed(int state)
 {
 	m_vsync = state ? 8 : 0;
-	if ( state )
+	if (state)
 	{
 		m_pc_framecnt++;
 	}
-	m_pic8259->ir5_w(state);
+	m_vsync_cb(state);
 }

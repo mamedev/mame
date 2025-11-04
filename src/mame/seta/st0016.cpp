@@ -13,10 +13,12 @@ DEFINE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device, "st0016_cpu", "ST0016")
 
 void st0016_cpu_device::cpu_internal_map(address_map &map)
 {
-	//map(0x0000, 0x7fff).rom(); ROM, Fixed area
-	//map(0x8000, 0xbfff).bankr("rombank"); ROM, Bankswitched area
-	map(0xc000, 0xcfff).r(FUNC(st0016_cpu_device::sprite_ram_r)).w(FUNC(st0016_cpu_device::sprite_ram_w));
-	map(0xd000, 0xdfff).r(FUNC(st0016_cpu_device::sprite2_ram_r)).w(FUNC(st0016_cpu_device::sprite2_ram_w));
+	// ROM, Fixed area
+	map(0x0000, 0x7fff).lr8(NAME([this](offs_t offset) -> u8 { return m_extrom_cache.read_byte(m_fixedrom_offset + (offset & 0x7fff)); }));
+	// ROM, Bankswitched area
+	map(0x8000, 0xbfff).lr8(NAME([this](offs_t offset) -> u8 { return m_extrom_cache.read_byte((m_rom_bank << 14) | (offset & 0x3fff)); }));
+	map(0xc000, 0xcfff).r(FUNC(st0016_cpu_device::sprite_ram_r<0>)).w(FUNC(st0016_cpu_device::sprite_ram_w<0>));
+	map(0xd000, 0xdfff).r(FUNC(st0016_cpu_device::sprite_ram_r<1>)).w(FUNC(st0016_cpu_device::sprite_ram_w<1>));
 	//map(0xe000, 0xe8ff).ram(); External area, commonly RAM
 	map(0xe900, 0xe9ff).rw("stsnd", FUNC(st0016_device::snd_r), FUNC(st0016_device::snd_w)); // sound regs 8 x $20 bytes, see notes
 	map(0xea00, 0xebff).r(FUNC(st0016_cpu_device::palette_ram_r)).w(FUNC(st0016_cpu_device::palette_ram_w));
@@ -29,10 +31,11 @@ void st0016_cpu_device::cpu_internal_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0xbf).r(FUNC(st0016_cpu_device::vregs_r)).w(FUNC(st0016_cpu_device::vregs_w)); // video/crt regs ?
-	//map(0xe1, 0xe1) ROM bank
+	map(0xe1, 0xe1).w(FUNC(st0016_cpu_device::rom_bank_w));
 	map(0xe2, 0xe2).w(FUNC(st0016_cpu_device::sprite_bank_w));
 	map(0xe3, 0xe4).w(FUNC(st0016_cpu_device::character_bank_w));
 	map(0xe5, 0xe5).w(FUNC(st0016_cpu_device::palette_bank_w));
+	// map(0xe7, 0xe7).w(FUNC(st0016_cpu_device::rom_bank_w)); ROM bank mirror? (only for seta/srmp5.cpp?)
 	map(0xf0, 0xf0).r(FUNC(st0016_cpu_device::dma_r));
 }
 
@@ -52,21 +55,22 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::cpu_internal_io_map), this))
 	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::cpu_internal_map), this))
 	, m_charam_space_config("charam", ENDIANNESS_LITTLE, 8, 21, 0, address_map_constructor(FUNC(st0016_cpu_device::charam_map), this))
+	, m_extrom_space_config("extrom", ENDIANNESS_LITTLE, 8, 22)
 	, m_rom(*this, DEVICE_SELF)
 	, m_spriteram(*this, "spriteram", 0x10000, ENDIANNESS_LITTLE)
 	, m_charram(*this, "charam", 0x200000, ENDIANNESS_LITTLE)
 	, m_paletteram(*this, "paletteram", 0x800, ENDIANNESS_LITTLE)
-	, m_dma_offs_cb(*this)
+	, m_fixedrom_offset(0)
 	, m_game_flag(-1)
-	, m_spr_bank(0)
-	, m_spr2_bank(0)
+	, m_spr_bank{0}
 	, m_pal_bank(0)
 	, m_char_bank(0)
+	, m_rom_bank(0)
 	, m_spr_dx(0)
 	, m_spr_dy(0)
+	, m_vregs{0}
 	, m_ramgfx(0)
 {
-	std::fill(std::begin(m_vregs), std::end(m_vregs), 0);
 }
 
 
@@ -80,7 +84,8 @@ device_memory_interface::space_config_vector st0016_cpu_device::memory_space_con
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_space_config),
 		std::make_pair(AS_IO,      &m_io_space_config),
-		std::make_pair(AS_CHARAM,  &m_charam_space_config)
+		std::make_pair(AS_CHARAM,  &m_charam_space_config),
+		std::make_pair(AS_EXTROM,  &m_extrom_space_config)
 	};
 }
 
@@ -93,8 +98,8 @@ void st0016_cpu_device::device_start()
 {
 	z80_device::device_start();
 	startup();
-	m_dma_offs_cb.resolve();
 	space(AS_CHARAM).specific(m_charam_space);
+	space(AS_EXTROM).cache(m_extrom_cache);
 }
 
 
@@ -179,8 +184,8 @@ void st0016_cpu_device::sprite_bank_w(u8 data)
         xxxx - spriteram  bank1
     xxxx     - spriteram  bank2
 */
-	m_spr_bank = data & SPR_BANK_MASK;
-	m_spr2_bank = (data >> 4) & SPR_BANK_MASK;
+	m_spr_bank[0] = data & SPR_BANK_MASK;
+	m_spr_bank[1] = (data >> 4) & SPR_BANK_MASK;
 }
 
 void st0016_cpu_device::palette_bank_w(u8 data)
@@ -208,25 +213,21 @@ void st0016_cpu_device::character_bank_w(offs_t offset, u8 data)
 	m_char_bank &= CHAR_BANK_MASK;
 }
 
+void st0016_cpu_device::rom_bank_w(u8 data)
+{
+	m_rom_bank = data;
+}
 
+template <unsigned Which>
 u8 st0016_cpu_device::sprite_ram_r(offs_t offset)
 {
-	return m_spriteram[SPR_BANK_SIZE * m_spr_bank + offset];
+	return m_spriteram[SPR_BANK_SIZE * m_spr_bank[Which] + offset];
 }
 
+template <unsigned Which>
 void st0016_cpu_device::sprite_ram_w(offs_t offset, u8 data)
 {
-	m_spriteram[SPR_BANK_SIZE * m_spr_bank + offset] = data;
-}
-
-u8 st0016_cpu_device::sprite2_ram_r(offs_t offset)
-{
-	return m_spriteram[SPR_BANK_SIZE * m_spr2_bank + offset];
-}
-
-void st0016_cpu_device::sprite2_ram_w(offs_t offset, u8 data)
-{
-	m_spriteram[SPR_BANK_SIZE * m_spr2_bank + offset] = data;
+	m_spriteram[SPR_BANK_SIZE * m_spr_bank[Which] + offset] = data;
 }
 
 u8 st0016_cpu_device::palette_ram_r(offs_t offset)
@@ -358,19 +359,13 @@ void st0016_cpu_device::vregs_w(offs_t offset, u8 data)
 		u32 dstadr = (m_vregs[0xa3] | (m_vregs[0xa4] << 8) | (m_vregs[0xa5] << 16)) << 1;
 		u32 length = ((m_vregs[0xa6] | (m_vregs[0xa7] << 8) | ((m_vregs[0xa8] & 0x1f) << 16)) + 1) << 1;
 
-		u32 srclen = (m_rom->bytes());
-		u8 *mem = m_rom->base();
-
-		int xfer_offs = m_dma_offset;
-		if (!m_dma_offs_cb.isnull())
-			xfer_offs = m_dma_offs_cb() * 0x400000;
-		srcadr += xfer_offs;
+		const u32 srclen = std::min<u32>(0x400000, m_rom->bytes());
 
 		while (length > 0)
 		{
 			if (srcadr < srclen && (dstadr < MAX_CHAR_BANK*CHAR_BANK_SIZE))
 			{
-				m_charam_space.write_byte(dstadr, mem[srcadr]);
+				m_charam_space.write_byte(dstadr, m_extrom_cache.read_byte(srcadr));
 				srcadr++;
 				dstadr++;
 				length--;
@@ -437,19 +432,18 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 	*/
 
 	gfx_element *gfx = this->gfx(m_ramgfx);
-	int i, j, lx, ly, x, y, code, offset, length, sx, sy, color, flipx, flipy, scrollx, scrolly/*, plx, ply*/;
 
-	for (i = 0; i < SPR_BANK_SIZE * MAX_SPR_BANK; i += 8)
+	for (int i = 0; i < SPR_BANK_SIZE * MAX_SPR_BANK; i += 8)
 	{
-		x = m_spriteram[i + 4] + ((m_spriteram[i + 5] & 3) << 8);
-		y = m_spriteram[i + 6] + ((m_spriteram[i + 7] & 3) << 8);
+		int x = m_spriteram[i + 4] + ((m_spriteram[i + 5] & 3) << 8);
+		int y = m_spriteram[i + 6] + ((m_spriteram[i + 7] & 3) << 8);
 
-		int use_sizes = (m_spriteram[i + 1] & 0x10);
-		int globalx = (m_spriteram[i + 5] & 0x0c)>>2;
-		int globaly = (m_spriteram[i + 7] & 0x0c)>>2;
+		const bool use_sizes = BIT(m_spriteram[i + 1], 4);
+		const int globalw = (m_spriteram[i + 5] & 0x0c) >> 2;
+		const int globalh = (m_spriteram[i + 7] & 0x0c) >> 2;
 
-		scrollx = (m_vregs[(((m_spriteram[i + 1] & 0x0f) >> 1) << 2) + 0x40] + 256 * m_vregs[(((m_spriteram[i + 1] & 0x0f) >> 1) << 2) + 1 + 0x40]) & 0x3ff;
-		scrolly = (m_vregs[(((m_spriteram[i + 1] & 0x0f) >> 1) << 2) + 2 + 0x40] + 256 * m_vregs[(((m_spriteram[i + 1] & 0x0f) >> 1) << 2) + 3 + 0x40]) & 0x3ff;
+		int scrollx = (m_vregs[(((m_spriteram[i + 1] & 0x0f) >> 1) << 2) + 0x40] + 256 * m_vregs[(((m_spriteram[i + 1] & 0x0f) >> 1) << 2) + 1 + 0x40]) & 0x3ff;
+		int scrolly = (m_vregs[(((m_spriteram[i + 1] & 0x0f) >> 1) << 2) + 2 + 0x40] + 256 * m_vregs[(((m_spriteram[i + 1] & 0x0f) >> 1) << 2) + 3 + 0x40]) & 0x3ff;
 
 		if (!ismacs())
 		{
@@ -477,24 +471,24 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			y += 0x20;
 		}
 
-		if (m_spriteram[i + 3] & 0x80) // end of list
+		if (BIT(m_spriteram[i + 3], 7)) // end of list
 			break;
 
-		offset = m_spriteram[i + 2] + 256 * (m_spriteram[i + 3]);
+		int offset = m_spriteram[i + 2] + 256 * (m_spriteram[i + 3]);
 		offset <<= 3;
 
-		length = m_spriteram[i + 0] + 1 + 256 * (m_spriteram[i + 1] & 1);
+		const int length = m_spriteram[i + 0] + 1 + 256 * (m_spriteram[i + 1] & 1);
 
-		//plx = (m_spriteram[i+5] >> 2) & 0x3;
-		//ply = (m_spriteram[i+7] >> 2) & 0x3;
+		//const int plx = (m_spriteram[i + 5] >> 2) & 0x3;
+		//const int ply = (m_spriteram[i + 7] >> 2) & 0x3;
 
 		if (offset < SPR_BANK_SIZE * MAX_SPR_BANK)
 		{
-			for (j = 0; j < length; j++)
+			for (int j = 0; j < length; j++)
 			{
-				code = m_spriteram[offset] + 256 * m_spriteram[offset + 1];
-				sx = m_spriteram[offset + 4] + ((m_spriteram[offset + 5] & 1) << 8);
-				sy = m_spriteram[offset + 6] + ((m_spriteram[offset + 7] & 1) << 8);
+				const int code = m_spriteram[offset] + 256 * m_spriteram[offset + 1];
+				int sx = m_spriteram[offset + 4] + ((m_spriteram[offset + 5] & 1) << 8);
+				int sy = m_spriteram[offset + 6] + ((m_spriteram[offset + 7] & 1) << 8);
 
 				if (ismacs() && !ismacs1())
 				{
@@ -508,8 +502,9 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 				sx += x;
 				sy += y;
-				color = m_spriteram[offset + 2] & 0x3f;
+				const int color = m_spriteram[offset + 2] & 0x3f;
 
+				int lx, ly;
 				if (use_sizes)
 				{
 					lx = (m_spriteram[offset + 5] >> 2) & 3;
@@ -517,8 +512,8 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				}
 				else
 				{
-					lx = globalx;
-					ly = globaly;
+					lx = globalw;
+					ly = globalh;
 
 				}
 
@@ -530,45 +525,38 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				}
 				*/
 
-				flipx = m_spriteram[offset + 3] & 0x80;
-				flipy = m_spriteram[offset + 3] & 0x40;
+				const bool flipx = BIT(m_spriteram[offset + 3], 7);
+				const bool flipy = BIT(m_spriteram[offset + 3], 6);
 
 				if (ismacs())
 					sy -= (1 << ly) * 8;
 
 				{
-					int x0, y0, i0 = 0;
-					for (x0 = (flipx ? ((1 << lx) - 1) : 0); x0 != (flipx ? -1 : (1 << lx)); x0 += (flipx ? -1 : 1))
+					int i0 = 0;
+					for (int x0 = (flipx ? ((1 << lx) - 1) : 0); x0 != (flipx ? -1 : (1 << lx)); x0 += (flipx ? -1 : 1))
 					{
-						for (y0 = (flipy ? ((1 << ly) - 1) : 0); y0 != (flipy ? -1 : (1 << ly)); y0 += (flipy ? -1 : 1))
+						const int xpos = sx + x0 * 8 + m_spr_dx;
+						for (int y0 = (flipy ? ((1 << ly) - 1) : 0); y0 != (flipy ? -1 : (1 << ly)); y0 += (flipy ? -1 : 1))
 						{
 							// custom draw
-							u16 *destline;
-							int yloop, xloop;
-							int ypos, xpos;
-							int tileno;
-							const u8 *srcgfx;
-							int gfxoffs;
-							ypos = sy + y0 * 8 + m_spr_dy;
-							xpos = sx + x0 * 8 + m_spr_dx;
-							tileno = (code + i0++) & CHAR_BANK_MASK;
+							const int ypos = sy + y0 * 8 + m_spr_dy;
+							const int tileno = (code + i0++) & CHAR_BANK_MASK;
 
-							gfxoffs = 0;
-							srcgfx = gfx->get_data(tileno);
+							int gfxoffs = 0;
+							const u8 *const srcgfx = gfx->get_data(tileno);
 
-							for (yloop = 0; yloop < 8; yloop++)
+							for (int yloop = 0; yloop < 8; yloop++)
 							{
 								u16 drawypos;
 
 								if (!flipy) { drawypos = ypos + yloop; }
 								else { drawypos = (ypos + 8 - 1) - yloop; }
-								destline = &bitmap.pix(drawypos);
+								u16 *const destline = &bitmap.pix(drawypos);
 
-								for (xloop = 0; xloop<8; xloop++)
+								for (int xloop = 0; xloop < 8; xloop++)
 								{
 									u16 drawxpos;
-									int pixdata;
-									pixdata = srcgfx[gfxoffs];
+									const int pixdata = srcgfx[gfxoffs];
 
 									if (!flipx) { drawxpos = xpos + xloop; }
 									else { drawxpos = (xpos + 8 - 1) - xloop; }
@@ -618,11 +606,9 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 void st0016_cpu_device::save_init()
 {
 	save_item(NAME(m_spr_bank));
-	save_item(NAME(m_spr2_bank));
 	save_item(NAME(m_pal_bank));
 	save_item(NAME(m_char_bank));
-	save_item(NAME(m_dma_offset));
-	//save_item(NAME(rom_bank));
+	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_vregs));
 }
 
@@ -630,8 +616,6 @@ void st0016_cpu_device::save_init()
 void st0016_cpu_device::startup()
 {
 	u8 gfx_index = 0;
-
-	m_dma_offset = 0;
 
 	// find first empty slot to decode gfx
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -654,24 +638,22 @@ void st0016_cpu_device::startup()
 void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	gfx_element *gfx = this->gfx(m_ramgfx);
-	int j;
 	//for (j = 0x40 - 8; j >= 0; j -= 8)
-	for (j = 0; j < 0x40; j += 8)
+	for (int j = 0; j < 0x40; j += 8)
 	{
 		if (m_vregs[j + 1] && ((priority && (m_vregs[j + 3] == 0xff)) || ((!priority) && (m_vregs[j + 3] != 0xff))))
 		{
-			int x, y, code, color, flipx, flipy;
 			int i = m_vregs[j + 1] * 0x1000;
 
-			for (x = 0; x < 32 * 2; x++)
+			for (int x = 0; x < 32 * 2; x++)
 			{
-				for (y = 0; y < 8 * 4; y++)
+				for (int y = 0; y < 8 * 4; y++)
 				{
-					code = m_spriteram[i] + 256 * m_spriteram[i + 1];
-					color = m_spriteram[i + 2] & 0x3f;
+					const int code = m_spriteram[i] + 256 * m_spriteram[i + 1];
+					const int color = m_spriteram[i + 2] & 0x3f;
 
-					flipx = m_spriteram[i + 3] & 0x80; // crownpkr test mode doesn't seem to agree with this
-					flipy = m_spriteram[i + 3] & 0x40; // "
+					const bool flipx = BIT(m_spriteram[i + 3], 7); // crownpkr test mode doesn't seem to agree with this
+					const bool flipy = BIT(m_spriteram[i + 3], 6); // "
 
 					if (priority)
 					{
@@ -683,30 +665,24 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 					}
 					else
 					{
-						u16 *destline;
-						int yloop, xloop;
-						int ypos, xpos;
-						const u8 *srcgfx;
-						int gfxoffs;
-						ypos = y * 8 + m_spr_dy;// + ((m_vregs[j + 2] == 0xaf) ? 0x50 : 0); //hack for mayjinsen title screen
-						xpos = x * 8 + m_spr_dx;
-						gfxoffs = 0;
-						srcgfx = gfx->get_data(code);
+						int ypos = y * 8 + m_spr_dy;// + ((m_vregs[j + 2] == 0xaf) ? 0x50 : 0); //hack for mayjinsen title screen
+						int xpos = x * 8 + m_spr_dx;
+						int gfxoffs = 0;
+						const u8 *const srcgfx = gfx->get_data(code);
 
-						for (yloop = 0; yloop < 8; yloop++)
+						for (int yloop = 0; yloop < 8; yloop++)
 						{
 							u16 drawypos;
 
 							if (!flipy) { drawypos = ypos + yloop; }
 							else { drawypos = (ypos + 8 - 1) - yloop; }
-							destline = &bitmap.pix(drawypos);
-							// destline = &bitmap.pix(drawypos ^ 0x07); // hack for dcrown test mode
+							u16 *const destline = &bitmap.pix(drawypos);
+							//u16 *destline = &bitmap.pix(drawypos ^ 0x07); // hack for dcrown test mode
 
-							for (xloop = 0; xloop < 8; xloop++)
+							for (int xloop = 0; xloop < 8; xloop++)
 							{
 								u16 drawxpos;
-								int pixdata;
-								pixdata = srcgfx[gfxoffs];
+								const int pixdata = srcgfx[gfxoffs];
 
 								if (!flipx) { drawxpos = xpos + xloop; }
 								else { drawxpos = (xpos + 8 - 1) - xloop; }

@@ -159,9 +159,6 @@ private:
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
 
-	uint8_t scc_r(offs_t offset);
-	void scc_w(offs_t offset, uint8_t data);
-
 	uint8_t scsi_r(offs_t offset);
 	void scsi_w(offs_t offset, uint8_t data);
 
@@ -538,16 +535,6 @@ void macpdm_state::via2_sifr_w(uint8_t data)
 	}
 }
 
-
-uint8_t macpdm_state::scc_r(offs_t offset)
-{
-	return m_scc->dc_ab_r(offset >> 1);
-}
-
-void macpdm_state::scc_w(offs_t offset, uint8_t data)
-{
-	m_scc->dc_ab_w(offset, data);
-}
 
 uint8_t macpdm_state::fdc_r(offs_t offset)
 {
@@ -1121,7 +1108,7 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);
 
 	map(0x50f00000, 0x50f00000).rw(FUNC(macpdm_state::via1_r), FUNC(macpdm_state::via1_w)).select(0x1e00);
-	map(0x50f04000, 0x50f04000).rw(FUNC(macpdm_state::scc_r), FUNC(macpdm_state::scc_w)).select(0x000e);
+	map(0x50f04000, 0x50f04007).rw(m_scc, FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask64(0xff00ff00ff00ff00);
 	// 50f08000 = ethernet ID PROM
 	// 50f0a000 = MACE ethernet controller
 	map(0x50f10000, 0x50f10000).rw(FUNC(macpdm_state::scsi_r), FUNC(macpdm_state::scsi_w)).select(0xf0);

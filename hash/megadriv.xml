@@ -1156,7 +1156,8 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram"/>
+			<!-- NOTE: invalid header, uses I2C -->
+			<feature name="slot" value="rom_nhlpa"/>
 			<feature name="pcb" value="PWA 100003 REV F?"/>
 			<feature name="u1" value="COLLEGE FOOT BWCF01"/>
 			<feature name="u3" value="GD74LS139"/>
@@ -1781,13 +1782,10 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 	</software>
 
 
-	<software name="collslam" supported="no">
+	<software name="collslam">
 		<description>College Slam (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<notes><![CDATA[
-[EEPROM] Blue stripes at boot
-]]></notes>
 		<info name="serial" value="T-81576"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
@@ -3657,11 +3655,12 @@ Crashes with NTSC machines after EOA logo (verify)
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Moans about [Sega Mega Modem] not hooked up, punts to a red screen
+Moans about [Sega Mega Modem] not hooked up
 ]]></notes>
 		<info name="serial" value="G-4503"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_eeprom"/>
+			<!-- Red screen if "rom_eeprom" is used -->
+			<feature name="slot" value="rom_eeprom_mode1"/>
 			<feature name="pcb" value="171-5878"/>
 			<feature name="ic1" value="MPR-12750A-T"/>
 			<feature name="ic2" value="X24C01P"/>
@@ -4651,6 +4650,7 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_nhlpa"/>
 			<feature name="pcb" value="PWA P10004 REV A"/>
 			<feature name="u1" value="MADDEN 93 JMF302"/>
 			<feature name="u3" value="HD74LS139P"/>
@@ -6206,19 +6206,15 @@ Unsupported [Menacer] peripheral
 
 
 <!-- Only Euro is confirmed -->
-	<software name="nflqb" supported="no">
+	<software name="nflqb">
 		<description>NFL Quarterback Club (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<notes><![CDATA[
-[EEPROM] Blue stripes at boot
-]]></notes>
 		<info name="serial" value="T-81155"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="NFLクォーターバッククラブ'95"/>
 		<part name="cart" interface="megadriv_cart">
-			<!-- TODO: works with rom_nbajam_alt with i2c reads at bit 0 -->
-			<feature name="slot" value="rom_nbajam"/>
+			<feature name="slot" value="rom_nbajamte"/>
 			<feature name="pcb" value="670127 REV 1"/>
 			<feature name="u1" value="NFL QBC"/>
 			<feature name="u2" value="24LC02B/P"/>
@@ -8200,7 +8196,7 @@ Unemulated HeartBeat peripheral
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-16342-s.ic1" size="2097152" crc="6a632503" sha1="2ff45bb056ede0f745e52f8d02c54b4ca724ca4c"/>
 			</dataarea>
-			<dataarea name="fram" size="1024">
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -10650,7 +10646,7 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 Doesn't accept any input
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_jcart"/>
+			<feature name="slot" value="rom_jcart_sampras"/>
 			<feature name="pcb" value="SRJCV1-2"/>
 			<feature name="u1" value="SAMPRAS TENNIS MDST6636"/>   <!-- location not really marked on PCB, using u1 for consistency -->
 			<!-- J-cart version also contains additional ICs for the controller ports -->
@@ -10719,7 +10715,7 @@ Doesn't accept any input
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-16343.ic1" size="2097152" crc="f4951d1f" sha1="7b98b21b7274233e962132bc22a7ccdf548c0ddb"/>
 			</dataarea>
-			<dataarea name="fram" size="1024">
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -10882,7 +10878,7 @@ but dumps still have to be confirmed.
 
 	<software name="16mj2">
 		<description>Shíliù Zhāng Májiàng II (China)</description>
-		<year>199?</year>
+		<year>1993?</year>
 		<publisher>City Man</publisher>
 		<info name="serial" value="GM-95003"/>
 		<info name="alt_title" value="十六張麻將II"/>
@@ -10899,11 +10895,12 @@ but dumps still have to be confirmed.
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Only Flashback portion is present in the dump, the other two entries and menu are missing.
+[CART] unsupported in megadriv
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="3in1fwt" />
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="3-in-1 flashback - world champ. soccer - tecmo world cup 92 (pirate).bin" size="2097152" crc="a8fd28d7" sha1="a0dd99783667af20589d473a2054d4bbd62d943e" status="baddump"/>
+				<rom name="3-in-1 flashback - world champ. soccer - tecmo world cup 92 (pirate).bin" size="2097152" crc="a8fd28d7" sha1="a0dd99783667af20589d473a2054d4bbd62d943e" />
 			</dataarea>
 		</part>
 	</software>
@@ -10913,11 +10910,12 @@ Only Flashback portion is present in the dump, the other two entries and menu ar
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Only Road Rash portion is present in the dump, the other two entries and menu are missing.
+[CART] unsupported in megadriv
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="3in1fwt" />
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="3-in-1 road rash - ms. pac-man - block out (pirate).bin" size="1048576" crc="13c96154" sha1="fd7255c2abdf90698f779a039ea1e560ca19639a" status="baddump"/>
+				<rom name="3-in-1 road rash - ms. pac-man - block out (pirate).bin" size="1048576" crc="13c96154" sha1="fd7255c2abdf90698f779a039ea1e560ca19639a" />
 			</dataarea>
 		</part>
 	</software>
@@ -11500,6 +11498,21 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		</part>
 	</software>
 
+	<software name="rockheaven" cloneof="alexkidd" supported="no">
+		<description>RockHeaven (hack of Alex Kidd Tenkuu Majou)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+[CART] unsupported in megadriv
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rockheaven" />
+			<dataarea name="rom" width="16" endianness="big" size="0x80000">
+				<rom name="rockheaven (unl) [h].bin" size="0x80000" crc="dab4dfdd" sha1="5e5ca20b39122c86b8f662bd8014af674f9dbed7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alien3">
 		<description>Alien³ (Europe, USA, rev. A)</description>
 		<year>1993</year>
@@ -11633,7 +11646,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 	</software>
 
 	<software name="aqlian">
-		<description>Ā Q Liánhuán Pào (Taiwan)</description>
+		<description>Ā Q Liánhuán Pào (Taiwan, unprotected)</description>
 		<year>1995</year>
 		<publisher>C&amp;E</publisher>
 		<info name="alt_title" value="阿Q連環泡"/>
@@ -12512,12 +12525,15 @@ No sound (btanb?)
 		</part>
 	</software>
 
-	<software name="barkley2">
+	<software name="barkley2" supported="no">
 		<description>Barkley Shut Up and Jam! 2 (USA)</description>
 		<year>1995</year>
 		<publisher>Accolade</publisher>
+		<notes><![CDATA[
+[CART] [SRAM] Doesn't save in megadriv, does in teradrive
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram"/>
+			<feature name="slot" value="barkley2"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="barkley shut up and jam 2 (usa).bin" size="2097152" crc="321bb6bd" sha1="b13f13ccc1a21dacd295f30c66695bf97bbeff8d"/>
 			</dataarea>
@@ -12562,15 +12578,16 @@ No sound (btanb?)
 		</part>
 	</software>
 
-	<software name="barver">
+	<software name="barver" cloneof="bbsaga">
 		<description>Barver Battle Saga - Tàikōng Zhànshì - Mófǎ Zhànshì (Taiwan)</description>
 		<year>1996</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Ka Sheng</publisher>
 		<notes><![CDATA[
 https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 ]]></notes>
 		<info name="alt_title" value="太空戰士 魔法戰士"/>
-		<info name="developer" value="Chuanpu"/>
+		<info name="developer" value="ChuanPu Technology" />
+		<info name="language" value="Chinese" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -12708,6 +12725,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<publisher>Creaton Softech</publisher>
 		<info name="alt_title" value="戦棊 - Chinese Battle Chess"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_mjlov"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="chinese battle chess.rom" size="1048576" crc="9d3dde48" sha1="bc256272419564c48e17c6824d734dc9e86c03b5"/>
 			</dataarea>
@@ -13599,6 +13617,21 @@ No [VDP] sprites
 		</part>
 	</software>
 
+	<software name="bbsaga">
+		<description>Brave Battle Saga - Legend of the Magic Warrior (Europe, USA)</description>
+		<year>2018</year>
+		<publisher>PixelHeart / Piko Interactive</publisher>
+		<info name="developer" value="ChuanPu Technology" />
+		<info name="language" value="English" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="Brave Battle Saga - Legend of the Magic Warrior (Europe, USA).bin" size="2097152" crc="f4554624" sha1="894250074e295353b0253b7ec6957439583c9aff" />
+			</dataarea>
+			<dataarea name="sram" size="16384"> <!-- Size to be confirmed. -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="breach">
 		<description>Breach (prototype)</description>
 		<year>1992?</year>
@@ -13630,8 +13663,10 @@ No [VDP] sprites
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_blara95"/>
+			<!-- u2 for 24lc08 -->
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="brian lara cricket (euro) (june 1995).bin" size="1048576" crc="408cf5c3" sha1="032eb1a15c95540b392b52ee17eef7eee6ac436d"/>
+				<rom name="code_masters_brian_lara_crkt_mdbc37f5.u1" size="1048576" crc="408cf5c3" sha1="032eb1a15c95540b392b52ee17eef7eee6ac436d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13641,30 +13676,37 @@ No [VDP] sprites
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_blara95"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="brian lara cricket (euro) (march 1995).bin" size="1048576" crc="90f5c2b7" sha1="0f4bec98af08027fc034b9801c28bb299a04be35"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="brianl96">
+	<software name="brianl96" supported="partial">
 		<description>Brian Lara Cricket 96 (Europe, 199604)</description>
 		<year>1996</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+[CART] [EEPROM] Doesn't save in megadriv, does in teradrive
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_blara"/>
+			<feature name="slot" value="rom_blara96"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="brian lara cricket 96 (euro) (april 1996).bin" size="1048576" crc="fe52f7e1" sha1="3e1ef39e9008a4a55fd57b25948668c8c52ba9e3"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="brianl96a" cloneof="brianl96">
+	<software name="brianl96a" cloneof="brianl96" supported="partial">
 		<description>Brian Lara Cricket 96 (Europe, 199603)</description>
 		<year>1996</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+[CART] [EEPROM] Doesn't save in megadriv, does in teradrive
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_blara"/>
+			<feature name="slot" value="rom_blara96"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mdbl_9844.bin" size="1048576" crc="fa3024af" sha1="0b08788a0f8214c5d07b8e2293f0b954dd05bef5"/>
 			</dataarea>
@@ -13958,6 +14000,546 @@ No [VDP] sprites
 	</software>
 
 	<software name="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, English)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="English" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-en.bin" size="4194304" crc="4318aa05" sha1="740c1473720c964b042ea45c2003717c27cb6e17" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_br" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, Portuguese Brazil)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-br.bin" size="4194304" crc="3c40f1bf" sha1="966466f1dce3dcae5e45dc97ac81c3c36c219864" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_de" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, German)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="German" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-de.bin" size="4194304" crc="86f88e64" sha1="a0168f0c3a2138e9d0018d4d6aebc7218962ac2b" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_es" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, Spanish)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Spanish" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-es.bin" size="4194304" crc="5c2e57ee" sha1="dca233cee535e25189700b4e13c7f3f223ffc188" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_fi" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, Finnish)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Finnish" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fi.bin" size="4194304" crc="0683b619" sha1="dbc9a52f7cf071b7e2ccc7adcf80ab1c663588e6" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_fr" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, French)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="French" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fr.bin" size="4194304" crc="6a9c8fae" sha1="43357f119d89f22c9477ddc4ec3bd64aaf1809e4" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_it" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, Italian)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Italian" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-it.bin" size="4194304" crc="b1db86f5" sha1="9ceda14e78d0709f7bf67b9c9e4e3ee695670757" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_ja" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, Japanese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Japanese" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ja.bin" size="4194304" crc="baa38769" sha1="98287e78fb5a709ec8629e4dbf4f3082f39c8394" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_ko" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, Korean)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Korean" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ko.bin" size="4194304" crc="6fa4b89d" sha1="8f323d456202c61c6cc94999c15a7e6372fa4ec7" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_pt" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, Portuguese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-pt.bin" size="4194304" crc="a57002ef" sha1="b1647709b16507663e17721d4696393b6d095b60" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_ru" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, Russian)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Russian" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ru.bin" size="4194304" crc="061be793" sha1="bc69eb8a80be335e91ec178009017fdea4fb49f7" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory088_zh" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.8, Chinese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Chinese" />
+		<info name="version" value="0.8.8 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-zh.bin" size="4194304" crc="a342ab5e" sha1="8ba5fdf8fd1470929bcf89fa107d94c310c1ac9d" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_en" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, English)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="English" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-en (v0.8.7).bin" size="4194304" crc="cdcb4471" sha1="415140073b7fd090acf75a4f77b04cb0bfd2023b" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_br" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, Portuguese Brazil)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-br (v0.8.7).bin" size="4194304" crc="278ab157" sha1="eab67fb5e69562000a5b854f63cb96416d30135f" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_de" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, German)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="German" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-de (v0.8.7).bin" size="4194304" crc="5726d83f" sha1="ad252bb6cd5e17ff3b658f3a92227632f12ac286" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_es" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, Spanish)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Spanish" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-es (v0.8.7).bin" size="4194304" crc="9de328a7" sha1="78e0e7459e7bedff7f89e3091ee11dba7c981b91" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_fi" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, Finnish)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Finnish" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fi (v0.8.7).bin" size="4194304" crc="2a902ca5" sha1="e3ddc641f924830491cbd751ab285bbae7d00d3d" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_fr" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, French)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="French" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fr (v0.8.7).bin" size="4194304" crc="302ce694" sha1="623ebe9d86f302f9b21e838cf0654ffac5b04626" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_it" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, Italian)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Italian" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-it (v0.8.7).bin" size="4194304" crc="da85803b" sha1="e28cebc4d34042bbe2c768209df0ab7e8e47247c" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_ja" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, Japanese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Japanese" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ja (v0.8.7).bin" size="4194304" crc="14ae0227" sha1="f147d81ab98af6d0a8874ce536d9a11b6091f822" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_ko" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, Korean)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Korean" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ko (v0.8.7).bin" size="4194304" crc="78074bc6" sha1="bf23b5907e095049f2f9f9db231d27e5ce1c4133" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_pt" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, Portuguese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-pt (v0.8.7).bin" size="4194304" crc="3753771e" sha1="59660a82c02e93714919c09c9ffa36fe74d2afba" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_ru" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, Russian)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Russian" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ru (v0.8.7).bin" size="4194304" crc="335f67b3" sha1="0a4c87ed00c7e2125dcb956d346a77bf6a291c34" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory087_zh" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.7, Chinese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Chinese" />
+		<info name="version" value="0.8.7 2025.09" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-zh (v0.8.7).bin" size="4194304" crc="d46f427d" sha1="e9add96055251ca63d10449c3642415c2a77e991" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_en" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, English)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="English" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-en (v0.8.6).bin" size="4194304" crc="35658706" sha1="29d99a7fb14d5f70c6aec3b4cde88c6450baa8cd" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_br" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, Portuguese Brazil)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-br (v0.8.6).bin" size="4194304" crc="c2a6504b" sha1="261625feb2b3d17d26f2e0acd16294aa7fe4b353" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_de" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, German)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="German" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-de (v0.8.6).bin" size="4194304" crc="ea4fec8f" sha1="88388d87d02604878d08022c05e48483899c174b" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_es" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, Spanish)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Spanish" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-es (v0.8.6).bin" size="4194304" crc="35e2f844" sha1="8f15e7f7e3ccfb8b9e31bdbc79e5ed8f25e5fe17" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_fi" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, Finnish)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Finnish" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fi (v0.8.6).bin" size="4194304" crc="ededc29a" sha1="1f130751c08eba8833b57508fd014c081db5fa66" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_fr" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, French)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="French" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fr (v0.8.6).bin" size="4194304" crc="8323661d" sha1="12d7a529fe7fcf49971b14ef8eb6354ce84ea7bf" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_it" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, Italian)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Italian" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-it (v0.8.6).bin" size="4194304" crc="b051daf6" sha1="f754339660382a7ee0d04245051bdfce8fc8973e" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_ja" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, Japanese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Japanese" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ja (v0.8.6).bin" size="4194304" crc="73989cf4" sha1="bb9e139d7f2c685e61337e875f34e0ddf3432cc8" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_ko" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, Korean)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Korean" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ko (v0.8.6).bin" size="4194304" crc="047c6240" sha1="39de56cbbb55e576df755a4d3aec4abfe1238b2e" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_pt" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, Portuguese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-pt (v0.8.6).bin" size="4194304" crc="0c409632" sha1="8d0643e2a5e09d3d2af8f29fe774eff6bdd3ce87" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_ru" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, Russian)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Russian" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ru (v0.8.6).bin" size="4194304" crc="46e1c54a" sha1="75dbcd1960f92997a46c8734d545fb7a1bc37a41" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory086_zh" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.6, Chinese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Chinese" />
+		<info name="version" value="0.8.6 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-zh (v0.8.6).bin" size="4194304" crc="f9b0cecb" sha1="1ec6d2610f12b158ed6e4b4476e3c804ced2614c" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_en" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.5, English)</description>
 		<year>2025</year>
 		<publisher>Andrew DeRosier</publisher>
@@ -13965,7 +14547,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-en.bin" size="4194304" crc="75c4bc1d" sha1="527faa9ce836cd900e29559ad51b6eda28cf5835" />
+				<rom name="doukutsu-en (v0.8.5).bin" size="4194304" crc="75c4bc1d" sha1="527faa9ce836cd900e29559ad51b6eda28cf5835" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -13980,7 +14562,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-br.bin" size="4194304" crc="138e52b9" sha1="ef47fc0a5cf6d8bcd99f3abdeb7033dbe4adc580" />
+				<rom name="doukutsu-br (v0.8.5).bin" size="4194304" crc="138e52b9" sha1="ef47fc0a5cf6d8bcd99f3abdeb7033dbe4adc580" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -13995,7 +14577,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-de.bin" size="4194304" crc="3c249258" sha1="3d7736b4b48b1567cd3648bcc18a87292c6e256b" />
+				<rom name="doukutsu-de (v0.8.5).bin" size="4194304" crc="3c249258" sha1="3d7736b4b48b1567cd3648bcc18a87292c6e256b" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14010,7 +14592,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-es.bin" size="4194304" crc="471a20b8" sha1="3485725a8186e8b74f490ec46c045bd2075774e5" />
+				<rom name="doukutsu-es (v0.8.5).bin" size="4194304" crc="471a20b8" sha1="3485725a8186e8b74f490ec46c045bd2075774e5" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14025,7 +14607,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-fi.bin" size="4194304" crc="0f09b3ef" sha1="bc5b30ac1634c5bd4fb7210801237a8e94b7cec5" />
+				<rom name="doukutsu-fi (v0.8.5).bin" size="4194304" crc="0f09b3ef" sha1="bc5b30ac1634c5bd4fb7210801237a8e94b7cec5" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14040,7 +14622,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-fr.bin" size="4194304" crc="9df9b830" sha1="f9158a4644b3234e667274ec98fd8f0bad0e24a3" />
+				<rom name="doukutsu-fr (v0.8.5).bin" size="4194304" crc="9df9b830" sha1="f9158a4644b3234e667274ec98fd8f0bad0e24a3" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14055,7 +14637,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-it.bin" size="4194304" crc="3bba32e1" sha1="c69c71d150981eca3f75bbef92d3e84f37b1bd51" />
+				<rom name="doukutsu-it (v0.8.5).bin" size="4194304" crc="3bba32e1" sha1="c69c71d150981eca3f75bbef92d3e84f37b1bd51" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14070,7 +14652,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-ja.bin" size="4194304" crc="649348a2" sha1="62b9dc5e472b675516cd1fd75d40d489b50183a7" />
+				<rom name="doukutsu-ja (v0.8.5).bin" size="4194304" crc="649348a2" sha1="62b9dc5e472b675516cd1fd75d40d489b50183a7" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14085,7 +14667,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-ko.bin" size="4194304" crc="b4a41427" sha1="b6b7de9262beeb77ebb9701dc74a10ee4a591d9a" />
+				<rom name="doukutsu-ko (v0.8.5).bin" size="4194304" crc="b4a41427" sha1="b6b7de9262beeb77ebb9701dc74a10ee4a591d9a" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14100,7 +14682,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-pt.bin" size="4194304" crc="b55866d9" sha1="a0b896e0098026ffdf20f2a626f224a16a024fd6" />
+				<rom name="doukutsu-pt (v0.8.5).bin" size="4194304" crc="b55866d9" sha1="a0b896e0098026ffdf20f2a626f224a16a024fd6" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14115,7 +14697,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-ru.bin" size="4194304" crc="c8fc8114" sha1="57f02cc25bda2935706c03c6826a52121ed3cfcd" />
+				<rom name="doukutsu-ru (v0.8.5).bin" size="4194304" crc="c8fc8114" sha1="57f02cc25bda2935706c03c6826a52121ed3cfcd" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14130,7 +14712,7 @@ No [VDP] sprites
 		<info name="version" value="0.8.5 2025.08" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-zh.bin" size="4194304" crc="d66a325e" sha1="080b383f3fd0ec5bece38db80658848aff83783b" />
+				<rom name="doukutsu-zh (v0.8.5).bin" size="4194304" crc="d66a325e" sha1="080b383f3fd0ec5bece38db80658848aff83783b" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -14442,10 +15024,10 @@ No [VDP] sprites
 	</software>
 
 	<software name="cjfuweng">
-		<description>Chāojí Dà Fùwēng (Taiwan)</description>
+		<description>Chāojí Dà Fùwēng (Taiwan, unprotected)</description>
 		<!-- 1994 or 1995 -->
 		<year>1994?</year>
-		<publisher>Gametec</publisher>
+		<publisher>Gamtec</publisher>
 		<notes><![CDATA[
 https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 ]]></notes>
@@ -14774,7 +15356,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
-<!-- Nearly identical to final build save for a few bytes -->
+	<!-- Nearly identical to final build save for a few bytes -->
 	<software name="colleg96p" cloneof="colleg96">
 		<description>College Football USA 96 (prototype 19950621)</description>
 		<year>1995</year>
@@ -15932,7 +16514,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
-<!-- This dump comes from an internal "Confidential Preview" cart at Acclaim USA -->
+	<!-- This dump comes from an internal "Confidential Preview" cart at Acclaim USA -->
 	<software name="cutthrp" cloneof="cutthr">
 		<description>CutThroat Island (prototype)</description>
 		<year>1995</year>
@@ -16016,7 +16598,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
-<!-- This is likely a dump from one of 50 reproduction cartridges, sold on AtariAge, based on an original prototype -->
+	<!-- This is likely a dump from one of 50 reproduction cartridges, sold on AtariAge, based on an original prototype -->
 	<software name="indyheat">
 		<description>Danny Sullivan's Indy Heat (prototype) (pirate)</description>
 		<year>1992</year>
@@ -16064,6 +16646,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
+	<!-- Boots as "Rumble Kids" with a Jp system -->
 	<software name="dashdes">
 		<description>Dashin' Desperadoes (USA)</description>
 		<year>1993</year>
@@ -16310,8 +16893,10 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="Spanish" />
 		<info name="release" value="2020-09-13" />
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="15335424">
-				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 5) (2021-09-13) (Aftermarket) (Unl).bin" size="15335424" crc="98c8962a" sha1="8cbe02b3e6837ede936cf43961ef831c352bd818" />
+			<feature name="slot" value="ssf_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 5) (2021-09-13) (Aftermarket) (Unl).bin" size="0xea0000" crc="98c8962a" sha1="8cbe02b3e6837ede936cf43961ef831c352bd818" />
+				<rom value="0xFF" size="0x160000" offset="0xea0000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -16368,8 +16953,10 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="Spanish" />
 		<info name="release" value="2020-08-27" />
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="15335424">
-				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 3) (2021-08-27) (Aftermarket) (Unl).bin" size="15335424" crc="dda1a052" sha1="44017e148d2b8a6e07cfc9ee8269e028cb6237b7" />
+			<feature name="slot" value="ssf_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 3) (2021-08-27) (Aftermarket) (Unl).bin" size="0xea0000" crc="dda1a052" sha1="44017e148d2b8a6e07cfc9ee8269e028cb6237b7" />
+				<rom value="0xFF" size="0x160000" offset="0xea0000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -16386,8 +16973,10 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="Spanish" />
 		<info name="release" value="2020-09-03" />
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="15335424">
-				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 4) (2021-09-03) (Aftermarket) (Unl).bin" size="15335424" crc="b9a8f84a" sha1="11c42868e173c80fd0af5fb5284855762d74da80" />
+			<feature name="slot" value="ssf_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="Demons of Asteborg (World) (En,Fr,De,Es,It,Pt-BR) (v1.1) (Demo 4) (2021-09-03) (Aftermarket) (Unl).bin" size="0xea0000" crc="b9a8f84a" sha1="11c42868e173c80fd0af5fb5284855762d74da80" />
+				<rom value="0xFF" size="0x160000" offset="0xea0000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -18180,7 +18769,7 @@ No sound in intro opening (verify)
 
 	<software name="fengkuan">
 		<description>Fēngkuáng Táohuāyuán (Taiwan)</description>
-		<year>199?</year>
+		<year>1998?</year>
 		<publisher>Creaton Softech</publisher>
 		<notes><![CDATA[
 https://segaretro.org/Feng_Kuang_Tao_Hua_Yuan
@@ -18208,11 +18797,12 @@ https://segaretro.org/Feng_Kuang_Tao_Hua_Yuan
 
 	<software name="fengshen">
 		<!-- Blanked header -->
-		<description>Fēngshén Yīngjié Chuán (Taiwan)</description>
+		<description>Fēngshén Yīngjié Chuán (Taiwan, unprotected)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
 		<notes><![CDATA[
 https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
+Patches protection checks, original uses Squirrel King cart scheme
 ]]></notes>
 		<info name="alt_title" value="封神英傑傳"/>
 		<part name="cart" interface="megadriv_cart">
@@ -18609,13 +19199,10 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		</part>
 	</software>
 
-	<software name="bighurt" supported="no">
+	<software name="bighurt">
 		<description>Frank Thomas Big Hurt Baseball (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<notes><![CDATA[
-[EEPROM] Blue stripes at boot
-]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_cslam"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -18768,6 +19355,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="seganet"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="game no kanzume otokuyou (jpn).bin" size="3145728" crc="cdad7e6b" sha1="31c66bd13abf4ae8271c09ec5286a0ee0289dbbc"/>
 			</dataarea>
@@ -19336,6 +19924,23 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
+	<software name="gunfight" supported="partial">
+		<description>Gunfight 3 in 1 (Taiwan)</description>
+		<year>1998?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Unsupported [Justifier] or [Menacer] peripheral (joypad works)
+]]></notes>
+		<!-- <info name="developer" value="Gamtec?" /> -->
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_lion3"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom name="gunfight_3_in_1_unl.bin" size="0x080000" crc="8fa43256" sha1="4083d0fc6aa6796a4b12a830dc77a6a380358346"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="gynougj" cloneof="gynoug">
 		<description>Gynoug (Japan)</description>
 		<year>1991</year>
@@ -19426,9 +20031,12 @@ Unemulated [Sega Mega Modem] features
 	</software>
 
 	<software name="heitao2">
-		<description>Hei Tao 2 - Super Big 2 (Taiwan)</description>
+		<description>Hei Tao 2 - Super Big 2 (Taiwan, unprotected)</description>
 		<year>199?</year>
 		<publisher>King Tec</publisher>
+		<notes><![CDATA[
+Patches protection checks, original uses Super Bubble Bobble MD cart scheme
+]]></notes>
 		<info name="serial" value="GM-95301"/>
 		<info name="alt_title" value="黑桃2 大老二 ~ Hei Tao 2 - Da Lao Er (Box)"/>
 		<part name="cart" interface="megadriv_cart">
@@ -19674,6 +20282,43 @@ Unemulated [Sega Mega Modem] features
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="incredible crash dummies, the (usa) (beta).bin" size="1048576" crc="623a920f" sha1="6c1db6d8ec7ace551b70ee60026e4a553d50f964"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="insanepn">
+		<description>Insane Pain</description>
+		<year>2022</year>
+		<publisher>Blast Process Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Insane Pain (2022)(Blast Process Games).bin" size="4194304" crc="e5487539" sha1="f936c2d56c53d70366fb7afd9440066f8b6d4e7e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="insanepn_d1" cloneof="insanepn">
+		<description>Insane Pain (demo v1.0)</description>
+		<year>2020</year>
+		<publisher>Blast Process Games</publisher>
+		<info name="release" value="14-06-2020" />
+		<info name="version" value="demo 1.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3589120">
+				<rom name="INSANEPAIN_demo1.0.bin" size="3589120" crc="f5d38fd5" sha1="c22846e692aefa203d3d08a10ec9bcebd92d597c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="insanepn_d3" cloneof="insanepn">
+		<description>Insane Pain (demo v3.0)</description>
+		<year>2021</year>
+		<publisher>Blast Process Games</publisher>
+		<info name="release" value="21-11-2021" />
+		<info name="version" value="demo 3.0" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="INSANE PAIN_public demo v3.bin" size="4194304" crc="e86d5d70" sha1="849659da6959b10e7de6fd877123d3d4da340241" />
 			</dataarea>
 		</part>
 	</software>
@@ -20180,10 +20825,28 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="jiujim">
-		<description>Jiu Ji Ma Jiang II - Ye Yan Bian (China)</description>
+	<software name="jujimj2">
+		<description>Ju Ji Ma Jiang II - Ye Yan Bian (China, protected)</description>
+		<year>199?</year>
+		<publisher>Sun Green</publisher>
+		<info name="serial" value="GM-95001"/>
+		<info name="alt_title" value="究極麻將II"/>
+		<part name="cart" interface="megadriv_cart">
+			<!-- assumed, cares about $40'0006 returning 0xf0 -->
+			<feature name="slot" value="rom_smouse"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="pretty girl mahjongg (Ch).bin" size="1048576" crc="69f24500" sha1="0b4f63b8de2dcc4359a26c3ff21f910f206b6110"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jiujim" cloneof="jujimj2">
+		<description>Jiu Ji Ma Jiang II - Ye Yan Bian (China, unprotected)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Reads at $40'0006, returning expected value of #$-1000 crashes game
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="jiu ji ma jiang ii - ye yan bian (chi) (unl).bin" size="1048576" crc="e9829b22" sha1="c112602c58f9867377bb6a1204d1d7e49a50aa10"/>
@@ -20221,6 +20884,7 @@ Unemulated [Sega Mega Modem] features
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_nhlpa"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="john madden football '93 - championship edition (usa).bin" size="1048576" crc="ca534b1a" sha1="417acacb9f9ef90d08b3cfb81972a9d8b56f4293"/>
 			</dataarea>
@@ -22051,6 +22715,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<info name="alt_title" value="夢幻水果盤"/>
 		<info name="developer" value="Gamtec"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_777casino"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="meng huan shui guo pan - 777 casino (chi) (unl).bin" size="1048576" crc="42dc03e4" sha1="df20a28d03a2cd481af134ef7602062636c3cc79"/>
 			</dataarea>
@@ -22285,8 +22950,11 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<year>1993</year>
 		<publisher>FCI?</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="might and magic iii - isles of terra (usa) (prototype).bin" size="2097152" crc="6ef7104a" sha1="d366d05644eb59a14baf3c2e7281c1584630c021"/>
+			</dataarea>
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -24361,7 +25029,7 @@ Unemulated [Sega Mega Modem] features
 		<info name="release" value="19911205"/>
 		<info name="alt_title" value="忍者武雷伝説"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_eeprom"/>
+			<feature name="slot" value="rom_eeprom_mode1"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ninja burai densetsu (jpn).bin" size="1048576" crc="a8d828a0" sha1="9cc3419ca7ecaf0d106aa896ffc0266c7145fff7"/>
 			</dataarea>
@@ -24373,6 +25041,7 @@ Unemulated [Sega Mega Modem] features
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- TODO: Doesn't access I2C, crashes in load game menu, probably has none? -->
 			<feature name="slot" value="rom_eeprom"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ninja burai densetsu (may 28, 1991 prototype).bin" size="1048576" crc="49089471" sha1="5c7bf27ec6cc81b9a9888025fbfa6dcb57d3eae5" />
@@ -24475,6 +25144,28 @@ Unemulated [Sega Mega Modem] features
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="normy's beach babe-o-rama (euro, usa).bin" size="1048576" crc="b56a8220" sha1="286d4f922fa9a95740e791c284d141a49983d871"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nyukiki">
+		<description>Nyuushi Chokuzen Check Nanmon Kimon Kiki Kaikai (Japan, Sega Channel)</description>
+		<year>1995</year>
+		<publisher>We Net</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Nyuushi_Chokuzen_Check_Nanmon_Kimon_Kiki_Kaikai
+Incompatible with Teradrive TMSS (missing "SEGA" header at $100)
+]]></notes>
+		<info name="alt_title" value="入試直前チェック難問奇問危機解快" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom name="nyuushi_chokuzen_check_nanmon_kimon_kiki_kaikai_japan_sega_channel.md" size="0x100000" crc="47aebfcb" sha1="4584c60d02d6f82250f0accd737ea96ec496ca8e"/>
+				<!--
+				<rom value="0x53" size="1" offset="0x100" loadflag="fill" />
+				<rom value="0x45" size="1" offset="0x101" loadflag="fill" />
+				<rom value="0x47" size="1" offset="0x102" loadflag="fill" />
+				<rom value="0x41" size="1" offset="0x103" loadflag="fill" />
+				-->
 			</dataarea>
 		</part>
 	</software>
@@ -25163,7 +25854,7 @@ Black screen at intro
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_jcart"/>
+			<feature name="slot" value="rom_jcart_sampras"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mdstee_13.bin" size="1048576" crc="aa8b19bc" sha1="3f73dcabcdf0d781834fcc673533301b82f0e91b"/>
 			</dataarea>
@@ -25175,7 +25866,7 @@ Black screen at intro
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_jcart"/>
+			<feature name="slot" value="rom_jcart_sampras"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="pete sampras tennis (euro, usa) (j-cart).bin" size="1048576" crc="9ef5bbd1" sha1="222a66cdb8865a7f89e5a72418413888bb400176"/>
 			</dataarea>
@@ -25836,6 +26527,28 @@ Black screen
 		</part>
 	</software>
 
+	<software name="plamquiz">
+		<description>Planet Message Quiz (Japan, Sega Channel)</description>
+		<year>1995</year>
+		<publisher>We Net</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Planet_Message_Quiz
+Incompatible with Teradrive TMSS (missing "SEGA" header at $100)
+]]></notes>
+		<info name="alt_title" value="プラネットメッセージクイズ" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom name="planet_message_quiz_japan_sega_channel.md" size="0x100000" crc="f466eedd" sha1="70788e794dfe38ae2fc3839bcc83f23c0a625776"/>
+				<!--
+				<rom value="0x53" size="1" offset="0x100" loadflag="fill" />
+				<rom value="0x45" size="1" offset="0x101" loadflag="fill" />
+				<rom value="0x47" size="1" offset="0x102" loadflag="fill" />
+				<rom value="0x41" size="1" offset="0x103" loadflag="fill" />
+				-->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pocahontu" cloneof="pocahont">
 		<description>Pocahontas (USA)</description>
 		<year>1996</year>
@@ -25850,7 +26563,7 @@ Black screen
 
 	<software name="pokemon">
 		<description>Pocket Monsters</description>
-		<year>199?</year>
+		<year>1999?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_kof99"/>
@@ -25862,7 +26575,7 @@ Black screen
 
 	<software name="pokemona" cloneof="pokemon">
 		<description>Pocket Monsters (alt protection)</description>
-		<year>199?</year>
+		<year>1999?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_pokea"/>
@@ -27557,13 +28270,14 @@ Red screen
 	<software name="sanguo5">
 		<description>Sānguózhì V (Taiwan)</description>
 		<!-- "after '96" -->
-		<year>199?</year>
+		<year>1999?</year>
 		<publisher>SKOB</publisher>
 		<notes><![CDATA[
 https://bootleggames.fandom.com/wiki/San_Guo_Zhi_V
 ]]></notes>
 		<info name="alt_title" value="三國志V"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sanguo5"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="san guo zhi v (chi) (unl).bin" size="2097152" crc="cd7e53d0" sha1="1a3333983f40dd242ad86187e50d1abed68d5ae9"/>
 			</dataarea>
@@ -27843,11 +28557,15 @@ Throws "this game is [...] european megadrive system" even with megadriv system 
 		</part>
 	</software>
 
-	<software name="shanewar">
-		<description>Shane Warne Cricket (Aus)</description>
+	<software name="shanewar" cloneof="brianl96" supported="partial">
+		<description>Shane Warne Cricket (Australia)</description>
 		<year>1997</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+[CART] [EEPROM] Doesn't save in megadriv, does in teradrive
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_blara96"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="shane warne cricket (aus).bin" size="1048576" crc="68865f6f" sha1="4264625be91c3d96edca9c5bfe6259d00ca8b737"/>
 			</dataarea>
@@ -28207,7 +28925,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 
 <!-- undumped original '96 release by Kin Tec known to exist -->
 	<software name="shuihu" cloneof="watermar">
-		<description>Shuǐhǔ - Fēngyún Chuán (Taiwan)</description>
+		<description>Shuǐhǔ - Fēngyún Chuán (Taiwan, unprotected)</description>
 		<year>1999</year>
 		<publisher>Never Ending Soft Team</publisher>
 		<notes><![CDATA[
@@ -28223,9 +28941,12 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 	</software>
 
 	<software name="shuihuzh">
-		<description>Shuǐhǔ Zhuàn (China)</description>
+		<description>Shuǐhǔ Zhuàn (China, unprotected)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<notes><![CDATA[
+Patches protection checks, original uses Squirrel King cart scheme
+]]></notes>
 		<info name="alt_title" value="水滸傳"/>
 		<info name="language" value="Chinese" />
 		<part name="cart" interface="megadriv_cart">
@@ -28670,7 +29391,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="sonic 3c (prototype 0408 - apr 08, 1994, 17.29).bin" size="4194304" crc="59d23df5" sha1="5f96ddccff1e95d82201687b939973c642a05394"/>
 			</dataarea>
-			<dataarea name="fram" size="1024">
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -28684,7 +29405,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="sonic 3c (prototype 0517 - may 17, 1994, 17.08).bin" size="4194304" crc="766c4b81" sha1="d6012af0f7856476892982e50b3d512d606dcb96"/>
 			</dataarea>
-			<dataarea name="fram" size="1024">
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -29127,7 +29848,7 @@ Original scene release which was altered to include a cracktro and bypass the co
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="sonic the hedgehog 3 (pirate).bin" size="2097152" crc="c818f6fd" sha1="bc2b67803bbba89a456a464e679cde4b4bb567fb"/>
 			</dataarea>
-			<dataarea name="fram" size="1024">
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -29150,7 +29871,7 @@ Original scene release which was altered to include a cracktro and bypass the co
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-16263 w43.ic1" size="2097152" crc="9bc192ce" sha1="75e9c4705259d84112b3e697a6c00a0813d47d71"/>
 			</dataarea>
-			<dataarea name="fram" size="1024">
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -29165,7 +29886,7 @@ Original scene release which was altered to include a cracktro and bypass the co
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="sonic the hedgehog 3 (nov 20, 1993 build).bin" size="2097152" crc="ebc0af69" sha1="a4eeec3b3ff2563c03a0036acb9f89815238fd28" />
 			</dataarea>
-			<dataarea name="fram" size="1024">
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -29184,6 +29905,17 @@ Original scene release which was altered to include a cracktro and bypass the co
 				<rom name="sonic 3 5 md 3-11 2.eprom" size="262144" crc="d064c206" sha1="b979be1ce6c7c7accd824146aea50e8cd5ebce5b" offset="0x100000" loadflag="load16_byte" /> <!-- Sonic 3 5 MD 3\11 2 -->
 				<rom name="sonic 3 6 md 3-11 2.eprom" size="262144" crc="fa68199e" sha1="37104cf987361a1a52edae10a30abdf01c42c129" offset="0x180001" loadflag="load16_byte" /> <!-- Sonic 3 6 MD 3\11 2 -->
 				<rom name="sonic 3 7 md 3-11 2.eprom" size="262144" crc="81987c07" sha1="a5c227ea2b7cd388863b4721ac6989800652dfe7" offset="0x180000" loadflag="load16_byte" /> <!-- Sonic 3 7 MD 3\11 2 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic3mp">
+		<description>Sonic The Hedgehog 3 (USA) (movie promo)</description>
+		<year>2024</year>
+		<publisher>Paramount Pictures / Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Sonic The Hedgehog 3 (USA) (movie promo).bin" size="4194304" crc="f9881aae" sha1="691894261033cef1936a2ad9ef594e30241c7e0b" />
 			</dataarea>
 		</part>
 	</software>
@@ -29514,13 +30246,10 @@ Original scene release which was altered to include a cracktro and bypass the co
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<notes><![CDATA[
-Needs slot emulation for the other two games, has no menu but pressing reset button cycles thru them
-$000000 Super Volley Ball (USA)
-$100000 World Championship Soccer II (USA)
-$200000 Super Real Basketball (Euro)
-$040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
+[CART] unsupported in megadriv
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="tectoy_sports"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="mpr-19945-mx.ic1" size="4194304" crc="25da0747" sha1="52bcdeb464aba7da82cbb8ed07242e0910082342" loadflag="load16_word_swap"/>
 			</dataarea>
@@ -30791,6 +31520,7 @@ Freezes at the start of any in-game mode
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_jcart"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="super skidmarks (euro) (j-cart).bin" size="2097152" crc="4a9c62f9" sha1="957850ce688dcf9c5966f6712b4804f0a5b7457d"/>
 			</dataarea>
@@ -30802,6 +31532,8 @@ Freezes at the start of any in-game mode
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- TODO: confirm using J-Cart -->
+			<feature name="slot" value="rom_jcart"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="super skidmarks (euro) (beta).bin" size="2097152" crc="a61a0f0c" sha1="1ec5fb1e7c8adfaf147271bd40454826fffed13e"/>
 			</dataarea>
@@ -31609,7 +32341,7 @@ No BGMs
 
 	<software name="tekkensp">
 		<description>Tekken Special</description>
-		<year>199?</year>
+		<year>1997?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_tekkensp"/>
@@ -31619,8 +32351,9 @@ No BGMs
 		</part>
 	</software>
 
-	<software name="tekkn3sp">
-		<description>Tekken 3 Special</description>
+	<software name="tekkn3sp" cloneof="tekkensp">
+		<!-- reads the protection but patches it with RTS -->
+		<description>Tekken 3 Special (unprotected)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -32440,6 +33173,7 @@ No BGMs
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="吞食天地III"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sanguo5"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="tun shi tian di iii (chi) (simple chinese) (unl).bin" size="2097152" crc="ea57b668" sha1="7040e96c053f29c75cf0524ddb168a83d0fb526f"/>
 			</dataarea>
@@ -32448,10 +33182,11 @@ No BGMs
 
 	<software name="tunshi1" cloneof="tunshi">
 		<description>Tūnshí Tiāndì III (China)</description>
-		<year>199?</year>
+		<year>1997?</year>
 		<publisher>SKOB</publisher>
 		<info name="alt_title" value="吞食天地III"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sanguo5"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="tun shi tian di iii (chi) (unl).bin" size="2097152" crc="b23c4166" sha1="534bf8f951ee30d47df18202246245b998c0eced"/>
 			</dataarea>
@@ -33281,6 +34016,22 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		</part>
 	</software>
 
+	<software name="rockworld" cloneof="waniwani" supported="no">
+		<description>RockWorld (hack of Wani Wani World)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+[CART] unsupported in megadriv
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rockworld" />
+			<dataarea name="rom" width="16" endianness="big" size="0x80000">
+				<rom name="rockworld (unl) [h].bin" size="0x80000" crc="60b5616f" sha1="68366449fd1497538741b5a1949e342202d48948"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="wardner">
 		<description>Wardner (USA)</description>
 		<year>1991</year>
@@ -33757,6 +34508,25 @@ Unsupported [Mega CD]/[Wondermega] cart allowing EBXA format to be played back
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="wonder library (jpn).bin" size="524288" crc="9350e754" sha1="57b97d9ddecfa2e9a75c4a05cd2b7e821210155a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://andlabs.dev/blog/wonder-midi/ -->
+	<software name="wondmidi" supported="no">
+		<description>Wonder MIDI (Japan)</description>
+		<year>1992</year>
+		<publisher>Victor</publisher>
+		<notes><![CDATA[
+Unsupported [Wondermega] cart
+]]></notes>
+		<info name="alt_title" value="ワンダーMIDI"/>
+		<info name="developer" value="Game Arts"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="wonder_midi.bin" size="524288" crc="dc466543" sha1="54ee39f92aad2863eb9a40523155324b8c6e5edd"/>
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -34881,18 +35651,22 @@ Black screen
 		<info name="language" value="English"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sf002"/>
-			<dataarea name="rom" width="16" endianness="big" size="2228224">
-				<rom name="legend of wukong (unl).bin" size="2228224" crc="72f11771" sha1="4ef41e4caccab118014abb8e079c7e5668a4f468"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x400000">
+				<rom name="legend of wukong (unl).bin" size="0x220000" crc="72f11771" sha1="4ef41e4caccab118014abb8e079c7e5668a4f468"/>
+				<rom value="0xFF" size="0x1e0000" offset="0x220000" loadflag="fill" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="wukongc" cloneof="wukong">
+	<software name="wukongc" cloneof="wukong" supported="no">
 		<description>Wùkōng Wàizhuàn (China)</description>
 		<year>1996</year>
 		<publisher>Ming</publisher>
+		<notes><![CDATA[
+[CART] cannot save in megadriv (corrupted kanjis)
+]]></notes>
 		<info name="alt_title" value="悟空外傳"/>
 		<info name="developer" value="Gamtec"/>
 		<info name="language" value="Chinese"/>
@@ -35255,13 +36029,16 @@ Black screen
 		</part>
 	</software>
 
-	<software name="beggarp1">
+	<software name="beggarp1" supported="no">
 		<description>Beggar Prince (rev 1) (Europe, USA)</description>
 		<year>2006</year>
 		<publisher>Super Fighter Team</publisher>
+		<notes><![CDATA[
+[CART] unsupported in megadriv
+]]></notes>
 		<info name="developer" value="Super Fighter Team"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sf001"/>
+			<feature name="slot" value="rom_sf001_beggarp1"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="Beggar Prince (World) (Rev 1) (Aftermarket) (Unl).bin" size="4194304" crc="6332edcc" sha1="1aeaef203c7d55fa678b92776b5b8cbc76533652" />
 			</dataarea>
@@ -35309,10 +36086,14 @@ Black screen
 		</part>
 	</software>
 
-	<software name="yasech">
+	<software name="yasech" supported="no">
 		<description>Yàsè Chuánshuō (China)</description>
 		<year>1995</year>
 		<publisher>Ming</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Ya_Se_Chuan_Shuo
+[CART] cannot save in megadriv
+]]></notes>
 		<info name="serial" value="GM-95403"/>
 		<info name="alt_title" value="亚瑟传说"/>
 		<info name="alt_title" value="帝國王朝 (亞瑟傳說篇) (box)"/>
@@ -35340,9 +36121,12 @@ Black screen
 	</software>
 
 	<software name="yangji" cloneof="yangfam">
-		<description>Yīmén Yīngliè - Yángjiā Jiāng (China)</description>
+		<description>Yīmén Yīngliè - Yángjiā Jiāng (China, unprotected)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Patches protection check, original is a rom_smb
+]]></notes>
 		<info name="alt_title" value="一門英烈 楊家將"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -35777,14 +36561,31 @@ Jumps to unmapped area at PC=0xffd004e8
 <!-- dumps which need ad hoc handlers to be installed in the emulator -->
 
 	<!-- This cart is missing the higher bank containing Dragon Ball game -->
-	<software name="12in1">
-		<description>12 in 1 (incomplete dump)</description>
+	<software name="12in1" supported="partial">
+		<description>12 in 1 (pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mcpir"/>
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="12-in-1 (unl).bin" size="2097152" crc="a98bf454" sha1="7313c20071de0ab1cd84ac1352cb0ed1c4a4afa8" offset="00000"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x400000">
+				<rom name="12-in-1 (unl).bin" size="0x200000" crc="a98bf454" sha1="7313c20071de0ab1cd84ac1352cb0ed1c4a4afa8" offset="0x000000" status="baddump" />
+				<rom value="0xFF" size="0x200000" offset="0x200000" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="18kin1" supported="no">
+		<!-- 9 in 1 with SNS 33 product number known to exist -->
+		<description>1800 in 1 (China, pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+[CART] unsupported in megadriv
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="18kin1" />
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom name="1800-in-1_p1.bin" size="0x200000" crc="5da98cf2" sha1="4b8e673f7821a28e681e10cbb6edd4c74ac93573" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35802,7 +36603,7 @@ Jumps to unmapped area at PC=0xffd004e8
 	</software>
 
 	<software name="bugslife">
-		<description>A Bug's Life</description>
+		<description>A Bug's Life (bootleg?)</description>
 		<year>2000</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -35825,8 +36626,9 @@ Jumps to unmapped area at PC=0xffd004e8
 	</software>
 
 	<software name="chinf3" supported="no">
+		<!-- TODO: rename -->
 		<description>Tenchi wo Kurau III - Sanguo Wai Chuan - Chinese Fighter (China)</description>
-		<year>199?</year>
+		<year>1996?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<notes><![CDATA[
 Crashes during attract or in character select, copy protection
@@ -35866,13 +36668,28 @@ Crashes during attract or in character select, copy protection
 
 	<!-- This contains only the first bank, so most of the games are missing -->
 	<software name="golden10" supported="partial">
-		<description>Golden 10 in 1 (Incomplete Dump)</description>
+		<description>Golden 10 in 1 (pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mcpir"/>
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="golden 10-in-1 (bad dump).bin" size="1048576" crc="4fa3f82b" sha1="04edbd35fe4916f61b516016b492352d96a8de7f" offset="00000" status="baddump"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x400000">
+				<rom name="golden 10-in-1 (bad dump).bin" size="0x100000" crc="4fa3f82b" sha1="04edbd35fe4916f61b516016b492352d96a8de7f" offset="0x000000" status="baddump"/>
+				<rom value="0xFF" size="0x100000" offset="0x100000" loadflag="fill" />
+				<rom value="0xFF" size="0x100000" offset="0x200000" loadflag="fill" />
+				<rom value="0xFF" size="0x100000" offset="0x300000" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldm250" supported="no">
+		<description>Golden Mega 250 in 1 (pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="goldm250"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom name="golden_mega_250-in-1_p1.bin" size="0x200000" crc="f8c4cbd0" sha1="8ef75743740d7d180b64f470ff4666bb15c76c81" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35942,8 +36759,9 @@ Crashes during attract or in character select, copy protection
 	</software>
 
 	<software name="supmagic">
+		<!-- "Super Magican" on title screen -->
 		<description>Líng Huàn Dàoshi - Super Magician (China)</description>
-		<year>199?</year>
+		<year>1994?</year>
 		<publisher>Ming</publisher>
 		<info name="serial" value="GM-95402"/>
 		<info name="alt_title" value="靈幻道士"/>
@@ -35983,7 +36801,7 @@ Crashes during attract or in character select, copy protection
 
 	<software name="majianqr">
 		<description>Jī Májiàng - Zhī Májiàng Qíngrén (China)</description>
-		<year>199?</year>
+		<year>1995?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="姬麻將之 麻將情人"/>
 		<part name="cart" interface="megadriv_cart">
@@ -35996,7 +36814,7 @@ Crashes during attract or in character select, copy protection
 
 	<software name="majianqra" cloneof="majianqr">
 		<description>Jī Májiàng - Zhī Májiàng Qíngrén (China, alt)</description>
-		<year>199?</year>
+		<year>1995?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="姬麻將之 麻將情人"/>
 		<part name="cart" interface="megadriv_cart">
@@ -36007,9 +36825,27 @@ Crashes during attract or in character select, copy protection
 		</part>
 	</software>
 
+	<software name="13mahjnv">
+		<description>Shísān Zhāng Májiàng - Zhōngguó Měinǚ Piān (Taiwan)</description>
+		<year>1993</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<!-- Gamtec? -->
+		<notes><![CDATA[
+https://segaretro.org/Shi_San_Zhang_Ma_Jiang:_Zhong_Guo_Mei_Nv_Pian
+]]></notes>
+		<info name="alt_title" value="十三張麻將 中國美女篇" />
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_soulb" />
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom name="shi san zhang ma jiang_ zhong guo mei nv pian (unl).bin" size="0x100000" crc="9b691779" sha1="68313fb5be300375e7908bf1e3bf2d4c40fbd82c" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokestad">
 		<description>Pokemon Stadium</description>
-		<year>199?</year>
+		<year>2000?</year>
+		<!-- SKOB? -->
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_pokestad"/>
@@ -36020,7 +36856,7 @@ Crashes during attract or in character select, copy protection
 	</software>
 
 	<software name="rockmnx3">
-		<description>Rockman X3 (Taiwan)</description>
+		<description>Rockman X3 (Taiwan, SMB protection)</description>
 		<year>199?</year>
 		<!-- Taiwan Sankyo Fundship -->
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -36035,9 +36871,29 @@ https://segaretro.org/Rockman_X3_(Mega_Drive)
 		</part>
 	</software>
 
+<!--
+rockman x3 (unl).bin [1/2]      xxx3.bin     [1/2]      88.159271%
+rockman x3 (unl).bin [2/2]      xxx3.bin     [2/2]      IDENTICAL
+-->
+	<software name="rockmnx3b" cloneof="rockmnx3" supported="no">
+		<description>Rockman X3 (Taiwan, Gamtec protection)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Punts to a stack trace screen due of protection at $40'0004-6 (works in teradrive)
+Not extensively tested.
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_rx3"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="xxx3.bin" size="2097152" crc="188da9f0" sha1="808d29751b572ada0780dc35d587d99c08ba95b0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="soulblad">
 		<description>Soul Blade</description>
-		<year>199?</year>
+		<year>1997?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_soulb"/>
@@ -36093,8 +36949,9 @@ https://bootleggames.fandom.com/wiki/Squirrel_King
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mcpir"/>
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="super 19-in-1 (pirate).bin" size="2097152" crc="52224f30" sha1="b4c822f8a36083b282cec7c6353ce6bcbc063972" offset="00000" status="baddump"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x400000">
+				<rom name="super 19-in-1 (pirate).bin" size="0x200000" crc="52224f30" sha1="b4c822f8a36083b282cec7c6353ce6bcbc063972" offset="00000" status="baddump"/>
+				<rom value="0xFF" size="0x200000" offset="0x200000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -36247,19 +37104,19 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 
 	<software name="topfight">
 		<description>Top Fighter 2000 MK VIII</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1999</year>
+		<publisher>X Boy</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_topf"/>
+			<feature name="slot" value="rom_lion3"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="top fighter 2000 mk viii (unl).bin" size="2097152" crc="f75519dc" sha1="617be8de1444ae0c6610d73967f3f0e67541b05a" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="topf2k5">
-		<description>Top Fighter 2005</description>
-		<year>199?</year>
+	<software name="topf2k5" cloneof="topfight">
+		<description>Top Fighter 2005 (China, unprotected)</description>
+		<year>2005?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -36272,6 +37129,11 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 		<description>Whac-a-Critter (USA)</description>
 		<year>1993</year>
 		<publisher>Realtec</publisher>
+		<notes><![CDATA[
+Unemulated optional [Smash Controller] peripheral
+https://segaretro.org/Smash_Controller
+]]></notes>
+		<info name="usage" value="Use A + direction to mimic Smash Controller with a pad" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_realtec"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -36380,19 +37242,6 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 		</part>
 	</software>
 
-	<software name="jujimj2">
-		<description>Ju Ji Ma Jiang II</description>
-		<year>199?</year>
-		<publisher>Sun Green</publisher>
-		<info name="serial" value="GM-95001"/>
-		<info name="alt_title" value="究極麻將II"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="pretty girl mahjongg (Ch).bin" size="1048576" crc="69f24500" sha1="0b4f63b8de2dcc4359a26c3ff21f910f206b6110"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- is this set hacked to have the protection removed? -->
 	<software name="truco96">
 		<description>Truco '96 (Argentina, unprotected)</description>
@@ -36422,8 +37271,8 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 	<!-- is this set hacked to have the protection removed? it's more than just a trivial patch however -->
 	<software name="tc2000">
 		<description>TC 2000 (Argentina, unprotected)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1995?</year>
+		<publisher>Miky</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="tc2000.bin" size="1048576" crc="cef91bdb" sha1="80a2f21304cea6876bc07a48dcd1f5e53a5b3adb"/>
@@ -36433,8 +37282,8 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 
 	<software name="tc2000a" cloneof="tc2000">
 		<description>TC 2000 (Argentina, protected)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1995?</year>
+		<publisher>Miky</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_tc2000"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -36500,7 +37349,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 		<description>Magic Bubble</description>
 		<year>1993</year>
 		<publisher>C&amp;E</publisher>
-		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao (Cart)"/>
+		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="magic_bubble.bin" size="524288" crc="3ec61dc1" sha1="134086c458e20eee1ab614e2df64083942311e8c"/>
@@ -36512,7 +37361,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 		<description>Magic Bubble (alt)</description>
 		<year>1993</year>
 		<publisher>C&amp;E</publisher>
-		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao (Cart)"/>
+		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="magic bubble [a1].bin" size="524288" crc="503e0718" sha1="de8037a8cea321ca3f0c03b7a4c36b9fa3b67be2"/>
@@ -36827,9 +37676,13 @@ Unsupported lightgun or mouse?
 	</software>
 
 	<software name="dbfb">
-		<description>Dragon Ball Final Bout (China?)</description>
+		<description>Dragon Ball Final Bout (Taiwan, unprotected)</description>
 		<year>1998</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>DVS Electronic</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Dragon_Ball:_Final_Bout
+Patches protection check, original is a rom_smb
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="dragon ball final bout (unl).bin" size="2097152" crc="63847005" sha1="6014cbf37fbabc51df581f7a93a1f8df09a66665"/>
@@ -37239,8 +38092,9 @@ BGM sometimes goes silent (does several [YM2612] 68k writes without bus)
 	</software>
 
 	<software name="mmprfe">
-		<description>Mighty Morphin Power Rangers - The Fighting Edition (Russia)</description>
-		<year>199?</year>
+		<!-- Has Gamtec style protection, patched with BRA -->
+		<description>Mighty Morphin Power Rangers - The Fighting Edition (Russia, unprotected)</description>
+		<year>1997?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -37591,6 +38445,8 @@ https://bootleggames.fandom.com/wiki/SpongeBob_SquarePants
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Тачки"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- TODO: confirm using J-Cart -->
+			<feature name="slot" value="rom_jcart"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="disney's cars (r).bin" size="2097152" crc="6c5f2530" sha1="654024f969e4b1ee0df4bf88d46f66f5301918ce"/>
 			</dataarea>
@@ -37705,6 +38561,7 @@ https://segaretro.org/Action_Replay_(Mega_Drive)
 Needs own slot type with mountable carts
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="ar" />
 			<dataarea name="rom" width="16" endianness="big" size="32768">
 				<rom name="action replay (euro).bin" size="32768" crc="95ff7c3e" sha1="1e0f246826be4ebc7b99bb3f9de7f1de347122e5"/>
 			</dataarea>
@@ -37889,26 +38746,6 @@ Bad dump of a supposedly Russian version of pele2 (cfr. corrupted MD header at t
 	</software>
 
 <!--
-Aborted attempt to hack out the Rockman X3 protection?
-rockman x3 (unl).bin [1/2]      xxx3.bin     [1/2]      88.159271%
-rockman x3 (unl).bin [2/2]      xxx3.bin     [2/2]      IDENTICAL
--->
-	<software name="rockmnx3b" cloneof="rockmnx3" supported="no">
-		<description>Rockman X3 (bad? hacked?)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<notes><![CDATA[
-Punts to a stack trace screen
-]]></notes>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="xxx3.bin" size="2097152" crc="188da9f0" sha1="808d29751b572ada0780dc35d587d99c08ba95b0" status="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
-
-<!--
 Investigation by Eke:
 this dump has the PC pointing to $1FE1DE, which does not hold any valid 68k program data in the ROM,
 so the game actually does not even starts when the 68k resets => either the dump is incomplete or it
@@ -38033,5 +38870,22 @@ Crashes at startup with megadriv (verify)
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="ssfextest" supported="no">
+		<description>SSF Extended test (v2)</description>
+		<year>2014</year>
+		<publisher>krikzz</publisher>
+		<notes><![CDATA[
+Sample cart for extended SSF support (MEGA-ED)
+[CART] unsupported by megadriv
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="ssf_ex"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="ssf-ex-test.bin" size="0x10000" crc="a819273d" sha1="2c3a8622f15ab4bcb33f0807dc78441885880dd0" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>

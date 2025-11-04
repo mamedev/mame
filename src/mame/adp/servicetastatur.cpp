@@ -88,7 +88,7 @@ public:
 		
 	{ }
 
-	void servicet(machine_config &config);
+	void servicet(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(en_w);
 
@@ -112,7 +112,7 @@ private:
 	void clock_in(int state);
 	void data_in(int state);
 
-	void servicet_io(address_map &map) ATTR_COLD;
+	void servicet_data(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
@@ -140,7 +140,7 @@ void servicet_state::servicet_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void servicet_state::servicet_io(address_map &map)
+void servicet_state::servicet_data(address_map &map)
 {
 	map(0x0070, 0x0070).w(m_lcd, FUNC(hd44780_device::control_w));
 	map(0x0071, 0x0071).r(m_lcd, FUNC(hd44780_device::control_r));
@@ -268,7 +268,7 @@ uint8_t servicet_state::port3_r()
 {
 	uint8_t data = ioport("P3")->read();
 
-	uint8_t sda = m_i2cmem->read_sda();
+	uint8_t const sda = m_i2cmem->read_sda();
 
 	// Clear bit 4 (SDA) and insert actual value from EEPROM
 	data = (data & ~(1 << PORT_3_SDA)) | (sda ? (1 << PORT_3_SDA) : 0);
@@ -397,7 +397,7 @@ void servicet_state::servicet(machine_config &config)
 {
 	I80C31(config, m_maincpu, 11.0592_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &servicet_state::servicet_map);
-	m_maincpu->set_addrmap(AS_IO, &servicet_state::servicet_io);
+	m_maincpu->set_addrmap(AS_DATA, &servicet_state::servicet_data);
 
 	m_maincpu->port_in_cb<1>().set(FUNC(servicet_state::port1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(servicet_state::port1_w));
@@ -405,7 +405,7 @@ void servicet_state::servicet(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(servicet_state::port3_w));
 
 	// I2C EEPROM: 24C16 (2KB) - connected to P3.4 (SDA) and P3.5 (SCL)
-	I2C_24C16(config, "eeprom");
+	I2C_24C16(config, m_i2cmem);
 
 	// SERIAL: WE ARE THE DCE
 	RS232_PORT(config, m_dte, default_rs232_devices, nullptr);

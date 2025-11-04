@@ -147,9 +147,4 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool fdd_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const fdd_format FLOPPY_FDD_FORMAT;

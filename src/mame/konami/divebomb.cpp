@@ -221,15 +221,15 @@ TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
 
 K051316_CB_MEMBER(divebomb_state::zoom_callback_1)
 {
-	*code |= (*color & 0x03) << 8;
-	*color = 0 + ((m_roz_pal >> 4) & 3);
+	code |= (color & 0x03) << 8;
+	color = 0 + ((m_roz_pal >> 4) & 3);
 }
 
 
 K051316_CB_MEMBER(divebomb_state::zoom_callback_2)
 {
-	*code |= (*color & 0x03) << 8;
-	*color = 4 + (m_roz_pal & 3);
+	code |= (color & 0x03) << 8;
+	color = 4 + (m_roz_pal & 3);
 }
 
 

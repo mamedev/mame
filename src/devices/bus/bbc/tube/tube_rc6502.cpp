@@ -14,22 +14,105 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "tube_rc6502.h"
+
+#include "cpu/m6502/w65c02s.h"
+#include "cpu/g65816/g65816.h"
+#include "machine/bankdev.h"
+#include "machine/ram.h"
+#include "machine/tube.h"
+
 #include "softlist_dev.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(BBC_TUBE_RC6502,  bbc_tube_rc6502_device,  "bbc_tube_rc6502",  "ReCo6502 (65C02)")
-DEFINE_DEVICE_TYPE(BBC_TUBE_RC65816, bbc_tube_rc65816_device, "bbc_tube_rc65816", "ReCo6502 (65C816)")
+// ======================> bbc_tube_rc6502_device
+
+class bbc_tube_rc6502_device : public device_t, public device_bbc_tube_interface
+{
+public:
+	bbc_tube_rc6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_tube_rc6502_device(mconfig, BBC_TUBE_RC6502, tag, owner, clock)
+	{
+	}
+
+protected:
+	bbc_tube_rc6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
+		, device_bbc_tube_interface(mconfig, *this)
+		, m_maincpu(*this, "maincpu")
+		, m_bankdev(*this, "bankdev")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_ula(*this, "ula")
+		, m_ram(*this, "ram")
+		, m_config(*this, "config")
+	{
+	}
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	void add_common_devices(machine_config &config);
+
+	virtual uint8_t host_r(offs_t offset) override;
+	virtual void host_w(offs_t offset, uint8_t data) override;
+
+	uint8_t config_r();
+	void register_w(uint8_t data);
+
+	void tube_rc6502_bank(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_bankdev;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_device<tube_device> m_ula;
+	required_device<ram_device> m_ram;
+	required_ioport m_config;
+
+	void prst_w(int state);
+
+private:
+	void tube_rc6502_mem(address_map &map) ATTR_COLD;
+
+	uint8_t m_default;
+	uint8_t m_divider;
+	uint8_t m_banking;
+	uint8_t m_banknum;
+};
+
+
+// ======================> bbc_tube_rc65816_device
+
+class bbc_tube_rc65816_device : public bbc_tube_rc6502_device
+{
+public:
+	bbc_tube_rc65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_tube_rc6502_device(mconfig, BBC_TUBE_RC65816, tag, owner, clock)
+	{
+	}
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+private:
+	void tube_rc65816_mem(address_map &map) ATTR_COLD;
+};
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( tube_rc6502 )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 INPUT_PORTS_START( tube_rc6502 )
@@ -45,14 +128,11 @@ INPUT_PORTS_START( tube_rc6502 )
 	PORT_CONFSETTING(0x01, "Enable")
 INPUT_PORTS_END
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 ioport_constructor bbc_tube_rc6502_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( tube_rc6502 );
 }
+
 
 //-------------------------------------------------
 //  ADDRESS_MAP( tube_rc6502_mem )
@@ -90,8 +170,9 @@ void bbc_tube_rc65816_device::tube_rc65816_mem(address_map &map)
 	map(0x0fef8, 0x0feff).rw(m_ula, FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w));
 }
 
+
 //-------------------------------------------------
-//  ROM( tube_rc6502 )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START( tube_rc6502 )
@@ -112,6 +193,17 @@ ROM_START( tube_rc65816 )
 	ROMX_LOAD("reco6502tube_816.rom", 0x0000, 0x8000, CRC(169a2b8c) SHA1(b9943843f753470b636ee17ad820fa3ccad68249), ROM_BIOS(1))
 ROM_END
 
+const tiny_rom_entry *bbc_tube_rc6502_device::device_rom_region() const
+{
+	return ROM_NAME( tube_rc6502 );
+}
+
+const tiny_rom_entry *bbc_tube_rc65816_device::device_rom_region() const
+{
+	return ROM_NAME( tube_rc65816 );
+}
+
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -120,10 +212,8 @@ void bbc_tube_rc6502_device::add_common_devices(machine_config &config)
 {
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&bbc_tube_rc6502_device::tube_rc6502_bank).set_options(ENDIANNESS_LITTLE, 8, 22, 0x100000);
 
-	/* internal ram */
 	RAM(config, m_ram).set_default_size("512K").set_default_value(0);
 
-	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_6502").set_original("bbc_flop_6502");
 }
 
@@ -153,50 +243,6 @@ void bbc_tube_rc65816_device::device_add_mconfig(machine_config &config)
 	m_ula->prst_handler().set(FUNC(bbc_tube_rc65816_device::prst_w));
 }
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *bbc_tube_rc6502_device::device_rom_region() const
-{
-	return ROM_NAME( tube_rc6502 );
-}
-
-const tiny_rom_entry *bbc_tube_rc65816_device::device_rom_region() const
-{
-	return ROM_NAME( tube_rc65816 );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_tube_rc6502_device - constructor
-//-------------------------------------------------
-
-bbc_tube_rc6502_device::bbc_tube_rc6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_bbc_tube_interface(mconfig, *this)
-	, m_maincpu(*this, "maincpu")
-	, m_bankdev(*this, "bankdev")
-	, m_bank1(*this, "bank1")
-	, m_bank2(*this, "bank2")
-	, m_ula(*this, "ula")
-	, m_ram(*this, "ram")
-	, m_config(*this, "config")
-{
-}
-
-bbc_tube_rc6502_device::bbc_tube_rc6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_tube_rc6502_device(mconfig, BBC_TUBE_RC6502, tag, owner, clock)
-{
-}
-
-bbc_tube_rc65816_device::bbc_tube_rc65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_tube_rc6502_device(mconfig, BBC_TUBE_RC65816, tag, owner, clock)
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -298,3 +344,9 @@ void bbc_tube_rc6502_device::register_w(uint8_t data)
 		break;
 	}
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_RC6502,  device_bbc_tube_interface, bbc_tube_rc6502_device,  "bbc_tube_rc6502",  "ReCo6502 (65C02)")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_RC65816, device_bbc_tube_interface, bbc_tube_rc65816_device, "bbc_tube_rc65816", "ReCo6502 (65C816)")

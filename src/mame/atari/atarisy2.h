@@ -5,17 +5,23 @@
     Atari System 2 hardware
 
 *************************************************************************/
+#ifndef MAME_ATARI_ATARISY2_H
+#define MAME_ATARI_ATARISY2_H
+
+#pragma once
+
+#include "atarimo.h"
+#include "slapstic.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/t11/t11.h"
 #include "machine/gen_latch.h"
-#include "slapstic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "sound/ymopm.h"
-#include "atarimo.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -53,18 +59,18 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void init_ssprint();
-	void init_apb();
-	void init_csprint();
-	void init_paperboy();
-	void init_720();
+	void init_ssprint() ATTR_COLD;
+	void init_apb() ATTR_COLD;
+	void init_csprint() ATTR_COLD;
+	void init_paperboy() ATTR_COLD;
+	void init_720() ATTR_COLD;
 
-	void atarisy2(machine_config &config);
-	void apb(machine_config &config);
-	void paperboy(machine_config &config);
-	void ssprint(machine_config &config);
-	void _720(machine_config &config);
-	void csprint(machine_config &config);
+	void atarisy2(machine_config &config) ATTR_COLD;
+	void apb(machine_config &config) ATTR_COLD;
+	void paperboy(machine_config &config) ATTR_COLD;
+	void ssprint(machine_config &config) ATTR_COLD;
+	void _720(machine_config &config) ATTR_COLD;
+	void csprint(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -167,3 +173,5 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
+
+#endif // MAME_ATARI_ATARISY2_H

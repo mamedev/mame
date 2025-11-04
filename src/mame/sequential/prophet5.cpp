@@ -254,7 +254,7 @@ u8 prophet5_state::adc_r()
 	if (d0 || d1)
 	{
 		LOGMASKED(LOG_ADC, "ADC: Vmux: %f, Vref: %f - lo: %d,  hi: %d\n",
-		          m_adc_vmux, m_adc_vref, d0, d1);
+				  m_adc_vmux, m_adc_vref, d0, d1);
 	}
 
 	const u8 test_points = m_test_points->read();
@@ -315,7 +315,7 @@ void prophet5_state::update_sh()
 			{
 				m_cv[cv_index] = m_vdac;
 				LOGMASKED(LOG_CV, "Set CV: %d - %s to %04x (%f V)\n",
-				          cv_index, CV_NAMES[cv_index], m_dac_latch, m_vdac);
+						  cv_index, CV_NAMES[cv_index], m_dac_latch, m_vdac);
 			}
 		}
 	}

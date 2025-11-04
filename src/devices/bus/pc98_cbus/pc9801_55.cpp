@@ -1,0 +1,259 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
+/**************************************************************************************************
+
+NEC PC-9801-55/-55U/-55L
+
+SCSI interface, running on WD33C93A
+
+TODO:
+- Loops on a routine where both BSY and irq are constantly low after executing a transfer 6 bytes command;
+- DMA / DRQ;
+- PC-9801-55 also runs on this except with vanilla WD33C93 instead;
+
+**************************************************************************************************/
+
+#include "emu.h"
+#include "pc9801_55.h"
+
+DEFINE_DEVICE_TYPE(PC9801_55U, pc9801_55u_device, "pc9801_55u", "NEC PC-9801-55U")
+DEFINE_DEVICE_TYPE(PC9801_55L, pc9801_55l_device, "pc9801_55l", "NEC PC-9801-55L")
+
+pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_scsi_bus(*this, "scsi")
+	, m_wdc(*this, "scsi:7:wdc")
+	, m_space_io_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pc9801_55_device::internal_map), this))
+	, m_dsw1(*this, "DSW1")
+	, m_dsw2(*this, "DSW2")
+{
+}
+
+pc9801_55u_device::pc9801_55u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_55_device(mconfig, PC9801_55U, tag, owner, clock)
+{
+
+}
+
+pc9801_55l_device::pc9801_55l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_55_device(mconfig, PC9801_55L, tag, owner, clock)
+{
+
+}
+
+
+ROM_START( pc9801_55u )
+	ROM_REGION16_LE( 0x10000, "scsi_bios", ROMREGION_ERASEFF )
+	// JNC2B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
+	// JNC3B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
+	ROM_LOAD16_BYTE( "jnc2b_00.bin", 0x000000, 0x008000, CRC(ddace1b7) SHA1(614569be28a90bd385cf8abc193e629e568125b7) )
+	ROM_LOAD16_BYTE( "jnc3b_00.bin", 0x000001, 0x008000, CRC(b8a8a49e) SHA1(7781dab492df889148e070a7da7ead207e18ed04) )
+ROM_END
+
+const tiny_rom_entry *pc9801_55u_device::device_rom_region() const
+{
+	return ROM_NAME( pc9801_55u );
+}
+
+ROM_START( pc9801_55l )
+	ROM_REGION16_LE( 0x10000, "scsi_bios", ROMREGION_ERASEFF )
+	// ETA1B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
+	// ETA3B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
+	ROM_LOAD16_BYTE( "eta1b_00.bin", 0x000000, 0x008000, CRC(300ff6c1) SHA1(6cdee535b77535fe6c4dda4427aeb803fcdea0b8) )
+	ROM_LOAD16_BYTE( "eta3b_00.bin", 0x000001, 0x008000, CRC(44477512) SHA1(182bb45ba0da7a4f9113e268e04ffca8403cf164) )
+ROM_END
+
+const tiny_rom_entry *pc9801_55l_device::device_rom_region() const
+{
+	return ROM_NAME( pc9801_55l );
+}
+
+void pc9801_55_device::scsi_irq_w(int state)
+{
+	m_bus->int_w<3>(BIT(m_port30, 2) && state);
+}
+
+void pc9801_55_device::scsi_drq_w(int state)
+{
+	// TODO: DRQ on C-bus
+	logerror("DRQ %d\n", state);
+}
+
+
+void pc9801_55_device::device_add_mconfig(machine_config &config)
+{
+	NSCSI_BUS(config, m_scsi_bus);
+	// TODO: currently returning default_scsi_devices, checkout if true for PC-98
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("wdc", WD33C93A).machine_config(
+		[this](device_t *device)
+		{
+			wd33c9x_base_device &adapter = downcast<wd33c9x_base_device &>(*device);
+
+			// TODO: unknown clock
+			adapter.set_clock(10'000'000);
+			adapter.irq_cb().set(*this, FUNC(pc9801_55_device::scsi_irq_w));
+			adapter.drq_cb().set(*this, FUNC(pc9801_55_device::scsi_drq_w));
+		}
+	);
+}
+
+static INPUT_PORTS_START( pc9801_55 )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, "PC-9801-55: SCSI board ID") PORT_DIPLOCATION("SCSI_SW1:!1,!2,!3")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPNAME( 0x38, 0x18, "PC-9801-55: Interrupt level") PORT_DIPLOCATION("SCSI_SW1:!4,!5,!6")
+	PORT_DIPSETTING(    0x00, "INT0" )
+	PORT_DIPSETTING(    0x08, "INT1" )
+	PORT_DIPSETTING(    0x10, "INT2" )
+	PORT_DIPSETTING(    0x18, "INT3" )
+	PORT_DIPSETTING(    0x20, "INT5" )
+	PORT_DIPSETTING(    0x28, "INT6" )
+	PORT_DIPSETTING(    0x30, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0xc0, 0x00, "PC-9801-55: DMA channel") PORT_DIPLOCATION("SCSI_SW1:!7,!8")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x40, "1 (prohibited)" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+
+	PORT_START("DSW2")
+	// TODO: understand all valid possible settings of this
+	PORT_DIPNAME( 0x7f, 0x66, "PC-9801-55: machine ID and ROM base address") PORT_DIPLOCATION("SCSI_SW2:!1,!2,!3,!4,!5,!6,!7")
+	PORT_DIPSETTING(    0x66, "i386, 0xdc000-0xdcfff")
+	// ...
+	PORT_DIPNAME( 0x80, 0x80, "PC-9801-55: ROM accessibility at Power-On") PORT_DIPLOCATION("SCSI_SW2:!8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+
+	PORT_START("SCSI_JP")
+	// SW3 and SW4 Jumper settings
+	PORT_CONFNAME( 0x03, 0x00, "PC-9801-55: I/O base address")
+	PORT_CONFSETTING(    0x00, "0xcc0") // 01-02 01 02
+	PORT_CONFSETTING(    0x01, "0xcd0")
+	PORT_CONFSETTING(    0x02, "0xce0")
+	PORT_CONFSETTING(    0x03, "0xcf0")
+INPUT_PORTS_END
+
+ioport_constructor pc9801_55_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( pc9801_55 );
+}
+
+
+device_memory_interface::space_config_vector pc9801_55_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_IO, &m_space_io_config)
+	};
+}
+
+
+void pc9801_55_device::device_validity_check(validity_checker &valid) const
+{
+}
+
+void pc9801_55_device::device_start()
+{
+	save_item(NAME(m_ar));
+	save_item(NAME(m_port30));
+	save_item(NAME(m_pkg_id));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pc9801_55_device::device_reset()
+{
+	m_bus->program_space().install_rom(
+		0xdc000,
+		0xdcfff,
+		memregion(this->subtag("scsi_bios").c_str())->base()
+	);
+
+	m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_55_device::io_map);
+
+	m_pkg_id = 0xfd;
+	m_port30 = 0x40;
+	m_ar = 0;
+}
+
+
+void pc9801_55_device::io_map(address_map &map)
+{
+	map(0x0cc0, 0x0cc0).lrw8(
+		NAME([this] (offs_t offset) { return m_wdc->indir_addr_r(); }),
+		NAME([this] (offs_t offset, u8 data) { m_ar = data; })
+	);
+	map(0x0cc2, 0x0cc2).lrw8(
+		NAME([this] (offs_t offset) {
+			return space(AS_IO).read_byte(m_ar);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			space(AS_IO).write_byte(m_ar, data);
+		})
+	);
+	// TODO: I/O 0xcc4
+}
+
+void pc9801_55_device::internal_map(address_map &map)
+{
+	map(0x00, 0x1f).rw(m_wdc, FUNC(wd33c9x_base_device::dir_r), FUNC(wd33c9x_base_device::dir_w));
+
+	// xx-- ---- ROM bank
+	// ---- x--- MEM1 allow memory access (DMA?)
+	// ---- -x-- IRE1 allow interrupts
+	// ---- --x- WRS1 SCSI bus RST (active low)
+	map(0x30, 0x30).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_port30;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("$30 Memory Bank %02x\n", data);
+			m_wdc->reset_w(!BIT(data, 1));
+			m_port30 = data;
+		})
+	);
+
+	// 0xfd = External SCSI
+	// 0xfe = Built-in SCSI
+	map(0x32, 0x32).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_pkg_id;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("$32 PkgIdRegister %02x\n", data);
+			m_pkg_id = data;
+		})
+	);
+
+	// write <prohibited>, NEC reserved
+	// read:
+	// x--- ---- SCSI RST signal on SCSI bus (active low, drives low when read)
+	// --xx xxxx DSW1 INT and SCSI ID
+	map(0x33, 0x33).lr8(
+		NAME([this] (offs_t offset) {
+			u8 scsi_reset = (m_scsi_bus->ctrl_r() & nscsi_device::S_RST) ? 0x80 : 0;
+			if (!machine().side_effects_disabled())
+				m_scsi_bus->ctrl_w(7, 0, nscsi_device::S_RST);
+			return (m_dsw1->read() & 0x3f) | scsi_reset;
+		})
+	);
+}

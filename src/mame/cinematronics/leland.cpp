@@ -3574,10 +3574,10 @@ GAME( 1987, quarterbc,  quarterb, quarterb, quarterb,   redline_state, init_quar
 GAME( 1988, viper,      0,        lelandi,  dangerz,    redline_state, init_viper,    ROT0,   "Leland Corporation", "Viper (rev 3)", 0 )
 GAME( 1988, teamqb,     0,        lelandi,  teamqb,     redline_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 3)", 0 )
 GAME( 1988, teamqb2,    teamqb,   lelandi,  teamqb,     redline_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 2)", 0 )
-GAME( 1989, aafb,       0,        lelandi,  teamqb,     redline_state, init_aafb,     ROT270, "Leland Corporation", "All American Football (rev E)", 0 )
-GAME( 1989, aafbd2p,    aafb,     lelandi,  aafb2p,     redline_state, init_aafbd2p,  ROT270, "Leland Corporation", "All American Football (rev D, 2 players)", 0 )
-GAME( 1989, aafbc,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev C)", 0 )
-GAME( 1989, aafbb,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev B)", MACHINE_NOT_WORKING )
+GAME( 1989, aafb,       0,        lelandi,  teamqb,     redline_state, init_aafb,     ROT270, "Leland Corporation", "All American Football (Leland, rev E)", 0 )
+GAME( 1989, aafbd2p,    aafb,     lelandi,  aafb2p,     redline_state, init_aafbd2p,  ROT270, "Leland Corporation", "All American Football (Leland, rev D, 2 players)", 0 )
+GAME( 1989, aafbc,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (Leland, rev C)", 0 )
+GAME( 1989, aafbb,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (Leland, rev B)", MACHINE_NOT_WORKING )
 
 /* huge master banks, large slave banks, 80186 sound */
 GAME( 1989, offroad,    0,        lelandi,  offroad,    redline_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 4)", 0 )

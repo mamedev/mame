@@ -26,9 +26,7 @@ public:
 	polepos_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_subcpu2(*this, "sub2"),
-		m_sound_z80(*this, "soundz80bl"),
+		m_subcpu(*this, "sub%u", 1U),
 		m_soundlatch(*this, "soundlatch"),
 		m_namco_sound(*this, "namco"),
 		m_latch(*this, "latch"),
@@ -39,27 +37,26 @@ public:
 		m_view16_memory(*this, "view16_memory"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_52xx_region(*this, "52xx"),
+		m_road_region(*this, "road"),
+		m_scalelut_region(*this, "scalelut"),
+		m_analog_io(*this, {"BRAKE", "ACCEL"}),
+		m_steer_io(*this, "STEER")
 	{ }
 
 	int auto_start_r();
 
-	void init_polepos2();
-
-	void polepos2bi(machine_config &config);
-	void topracern(machine_config &config);
-	void polepos(machine_config &config);
+	void topracern(machine_config &config) ATTR_COLD;
+	void polepos(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-private:
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_subcpu2;
-	optional_device<cpu_device> m_sound_z80;
+	required_device_array<cpu_device, 2> m_subcpu;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<namco_device> m_namco_sound;
 	required_device<ls259_device> m_latch;
@@ -71,31 +68,32 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_region_ptr<uint8_t> m_52xx_region;
+	required_region_ptr<uint8_t> m_road_region;
+	required_region_ptr<uint8_t> m_scalelut_region;
+	required_ioport_array<2> m_analog_io;
+	required_ioport m_steer_io;
 
 	uint8_t m_steer_last = 0;
 	uint8_t m_steer_delta = 0;
 	int16_t m_steer_accum = 0;
-	int16_t m_last_result = 0;
-	int8_t m_last_signed = 0;
-	uint8_t m_last_unsigned = 0;
-	int m_adc_input = 0;
-	int m_auto_start_mask = 0;
+	uint8_t m_adc_input = 0;
+	int8_t m_auto_start_mask = 0;
 
-	uint16_t m_vertical_position_modifier[256];
+	uint16_t m_vertical_position_modifier[256]{};
 	uint16_t m_road16_vscroll = 0;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_tx_tilemap = nullptr;
-	int m_chacl = 0;
+	uint8_t m_chacl = 0;
 	uint16_t m_scroll = 0;
 	uint8_t m_sub_irq_mask = 0;
 
-	uint16_t polepos2_ic25_r(offs_t offset);
 	uint8_t analog_r();
 	uint8_t ready_r();
 	void gasel_w(int state);
 	void sb0_w(int state);
 	void chacl_w(int state);
-	template<bool sub1> void z8002_nvi_enable_w(uint16_t data);
+	template <unsigned Which> void z8002_nvi_enable_w(uint16_t data);
 	uint8_t sprite_r(offs_t offset);
 	void sprite_w(offs_t offset, uint8_t data);
 	uint8_t road_r(offs_t offset);
@@ -123,15 +121,52 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_road(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void zoom_sprite(bitmap_ind16 &bitmap,int big,uint32_t code,uint32_t color,int flipx,int sx,int sy,int sizex,int sizey);
-	void sound_z80_bootleg_iomap(address_map &map) ATTR_COLD;
-	void sound_z80_bootleg_map(address_map &map) ATTR_COLD;
+	void zoom_sprite(bitmap_ind16 &bitmap, bool big, uint32_t code, uint32_t color, bool flipx, int sx, int sy, int sizex, int sizey);
 	void topracern_io(address_map &map) ATTR_COLD;
 	void z8002_map(address_map &map) ATTR_COLD;
 	void z8002_map_1(address_map &map) ATTR_COLD;
 	void z8002_map_2(address_map &map) ATTR_COLD;
 	void z80_io(address_map &map) ATTR_COLD;
 	void z80_map(address_map &map) ATTR_COLD;
+};
+
+// with protection
+class polepos2_state : public polepos_state
+{
+public:
+	polepos2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		polepos_state(mconfig, type, tag)
+	{ }
+
+	void polepos2(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	int16_t m_last_result = 0;
+	int8_t m_last_signed = 0;
+	uint8_t m_last_unsigned = 0;
+
+	uint16_t polepos2_ic25_r(offs_t offset);
+	void polepos2_z8002_map_1(address_map &map) ATTR_COLD;
+};
+
+// bootleg with sound Z80
+class polepos2bi_state : public polepos_state
+{
+public:
+	polepos2bi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		polepos_state(mconfig, type, tag),
+		m_sound_z80(*this, "soundz80bl")
+	{ }
+
+	void polepos2bi(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_sound_z80;
+
+	void sound_z80_bootleg_iomap(address_map &map) ATTR_COLD;
+	void sound_z80_bootleg_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_POLEPOS_H

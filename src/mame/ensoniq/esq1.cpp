@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert
+// copyright-holders:R. Belmont, Olivier Galibert, Felipe Sanches
 /***************************************************************************
 
     ensoniq/esq1.cpp
@@ -53,7 +53,6 @@ IRQ sources are the DUART and the DRQ line from the FDC (SQ-80 only).
 NMI is from the IRQ line on the FDC (again, SQ-80 only).
 
 TODO:
-    - Keyboard
      - Analog filters and VCA on the back end of the 5503 (inaccurate)
      - DUART seems to keep interrupting even after MIDI xmit buffer becomes empty
 
@@ -710,16 +709,16 @@ void esq1_state::sq80(machine_config &config)
 
 static INPUT_PORTS_START( esq1 )
 	PORT_START("volume_slider")
-	PORT_ADJUSTER(255, "Volume")
+	PORT_ADJUSTER(100, "Volume")
 
 	PORT_START("data_entry_slider")
-	PORT_ADJUSTER(255, "Data Entry")
+	PORT_ADJUSTER(100, "Data Entry")
 
 	PORT_START("pitch_wheel")
-	PORT_ADJUSTER(255, "Pitch Wheel")
+	PORT_ADJUSTER(50, "Pitch Wheel")
 
 	PORT_START("mod_wheel")
-	PORT_ADJUSTER(255, "Mod Wheel")
+	PORT_ADJUSTER(0, "Mod Wheel")
 
 	PORT_START("COL0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x84) PORT_NAME("SEQ")

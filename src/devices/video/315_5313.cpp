@@ -2265,7 +2265,7 @@ void sega315_5313_device::vdp_handle_scanline_callback(int scanline)
 		if (get_scanline_counter() == m_irq6_scanline)
 		{
 		//  osd_printf_debug("x %d", get_scanline_counter());
-			m_irq6_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
+			m_irq6_on_timer->adjust(attotime::from_ticks(32, clock() / 4));
 			m_irq6_pending = 1;
 			m_vblank_flag = 1;
 		}

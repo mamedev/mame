@@ -16,16 +16,6 @@
 
 /*************************************
  *
- *  Definitions
- *
- *************************************/
-
-#define R3041_CLOCK         XTAL(25'000'000)
-
-
-
-/*************************************
- *
  *  Machine initialization
  *
  *************************************/
@@ -100,8 +90,8 @@ void turrett_state::cpu_map(address_map &map)
 
 void turrett_state::turrett_sound_map(address_map &map)
 {
-	map(0x0000000, 0x7ffffff).ram().share("bank_a");
-	map(0x8000000, 0xfffffff).ram().share("bank_b");
+	map(0x0000000, 0x7ffffff).ram().share(m_ram_bank[0]);
+	map(0x8000000, 0xfffffff).ram().share(m_ram_bank[1]);
 }
 
 
@@ -178,11 +168,11 @@ uint32_t turrett_state::int_r()
 void turrett_state::int_w(uint32_t data)
 {
 	// TODO
-	logerror("Output write: %08x\n", data);
+	logerror("%s: Output write: %08x\n", machine().describe_context(), data);
 }
 
 
-uint32_t turrett_state::update_inputs(void)
+uint32_t turrett_state::update_inputs()
 {
 	uint32_t val = 0;
 
@@ -191,64 +181,71 @@ uint32_t turrett_state::update_inputs(void)
 	{
 		if (m_inputs_active & 0x00000001)
 		{
-			val = 0x00 | (ioport("PORT.0X")->read() & 0x3f);
-			m_inputs_active &= ~1;
+			val = 0x00 | (m_input_port[0]->read() & 0x3f);
+			if (!machine().side_effects_disabled())
+				m_inputs_active &= ~1;
 		}
 		else if (m_inputs_active & 0x00000002)
 		{
-			val = 0x40 | (ioport("PORT.4X")->read() & 0x3f);
-			m_inputs_active &= ~2;
+			val = 0x40 | (m_input_port[1]->read() & 0x3f);
+			if (!machine().side_effects_disabled())
+				m_inputs_active &= ~2;
 		}
 		else if (m_inputs_active & 0x0000ff00)
 		{
-			uint32_t data = ioport("PORT.CX")->read();
-			uint32_t bits = m_inputs_active >> 8;
+			const uint32_t data = m_input_port[2]->read();
+			const uint32_t bits = m_inputs_active >> 8;
 
 			val = 0xc0;
 
 			for (int i = 0; i < 8; ++i)
 			{
-				if (bits & (1 << i))
+				if (BIT(bits, i))
 				{
 					val |= i << 1;
-					val |= (data >> i) & 1;
-					m_inputs_active &= ~(1 << (i + 8));
+					val |= BIT(data, i);
+					if (!machine().side_effects_disabled())
+						m_inputs_active &= ~(1 << (i + 8));
 					break;
 				}
 			}
 		}
 		else if (m_inputs_active & 0x00ff0000)
 		{
-			uint32_t data = ioport("PORT.DX")->read();
-			uint32_t bits = m_inputs_active >> 16;
+			const uint32_t data = m_input_port[3]->read();
+			const uint32_t bits = m_inputs_active >> 16;
 
 			val = 0xd0;
 
 			for (int i = 0; i < 8; ++i)
 			{
-				if (bits & (1 << i))
+				if (BIT(bits, i))
 				{
 					val |= i << 1;
-					val |= (data >> i) & 1;
-					m_inputs_active &= ~(1 << (i + 16));
+					val |= BIT(data, i);
+					if (!machine().side_effects_disabled())
+						m_inputs_active &= ~(1 << (i + 16));
 					break;
 				}
 			}
 		}
 		else if (m_inputs_active & 0x01000000)
 		{
-			val = 0xe0 | ioport("PORT.EX")->read();
-			m_inputs_active &= ~0x01000000;
+			val = 0xe0 | m_input_port[4]->read();
+			if (!machine().side_effects_disabled())
+				m_inputs_active &= ~0x01000000;
 		}
 		else if (m_inputs_active & 0x02000000)
 		{
-			val = 0xf0 | ioport("PORT.FX")->read();
-			m_inputs_active &= ~0x02000000;
+			val = 0xf0 | m_input_port[5]->read();
+			if (!machine().side_effects_disabled())
+				m_inputs_active &= ~0x02000000;
 		}
 	}
 
 	// Update IRQ state
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, m_inputs_active ? ASSERT_LINE : CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, m_inputs_active ? ASSERT_LINE : CLEAR_LINE);
 	return val;
 }
 
@@ -350,6 +347,8 @@ void turrett_devices(device_slot_interface &device)
 
 void turrett_state::turrett(machine_config &config)
 {
+	constexpr XTAL R3041_CLOCK = XTAL(25'000'000);
+
 	/* basic machine hardware */
 	R3041(config, m_maincpu, R3041_CLOCK);
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
@@ -376,8 +375,8 @@ void turrett_state::turrett(machine_config &config)
 
 	turrett_device &ttsound(TURRETT(config, "ttsound", R3041_CLOCK)); // ?
 	ttsound.set_addrmap(0, &turrett_state::turrett_sound_map);
-	ttsound.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
-	ttsound.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	ttsound.add_route(0, "speaker", 1.0, 1);
+	ttsound.add_route(1, "speaker", 1.0, 0);
 }
 
 
@@ -411,4 +410,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 2001, turrett, 0, turrett, turrett, turrett_state, empty_init, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )
+GAME( 2001, turrett, 0, turrett, turrett, turrett_state, empty_init, ROT0, "Dell Electronics (Namco license)", "Turret Tower - The Enemy Has Arrived", 0 )

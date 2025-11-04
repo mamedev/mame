@@ -541,7 +541,7 @@ INPUT_CHANGED_MEMBER(scorpiontb_state::turbo_changed)
 	{
 		m_turbo = !m_turbo;
 		m_maincpu->set_clock_scale(1 << m_turbo);
-		popmessage("Turbo %s\n", m_turbo ? "ON" : "OFF");
+		//popmessage("Turbo %s\n", m_turbo ? "ON" : "OFF");
 	}
 }
 

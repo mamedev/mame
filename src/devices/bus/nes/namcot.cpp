@@ -23,7 +23,6 @@
 
 #include "emu.h"
 #include "namcot.h"
-#include "ui/uimain.h"
 
 #include "speaker.h"
 
@@ -567,7 +566,7 @@ void nes_namcot163_device::chr_w(offs_t offset, uint8_t data)
 	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
 	{
 		// CIRAM!!!
-		machine().ui().popup_time(10, "CIRAM mapped to VRAM. Please contact MAMEDevs.");
+		logerror("CIRAM mapped to VRAM!\n");
 
 		if (!m_nt_writable[bank & 0x03])
 			return;
@@ -582,7 +581,7 @@ uint8_t nes_namcot163_device::chr_r(offs_t offset)
 	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
 	{
 		// CIRAM!!!
-		machine().ui().popup_time(10, "CIRAM mapped to VRAM. Please contact MAMEDevs.");
+		logerror("CIRAM mapped to VRAM!\n");
 		return m_nt_access[bank & 0x03][offset & 0x3ff];
 	}
 	// or ROM, accessed as usual

@@ -97,7 +97,7 @@ private:
 	DECLARE_MACHINE_START(qdrmfgp2);
 	DECLARE_VIDEO_START(qdrmfgp2);
 
-	uint32_t screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(qdrmfgp2_interrupt);
 	TIMER_CALLBACK_MEMBER(gp2_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_interrupt);
@@ -107,20 +107,20 @@ private:
 	K056832_CB_MEMBER(qdrmfgp_tile_callback);
 	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
 
+	void k054539_map(address_map &map) ATTR_COLD;
 	void qdrmfgp2_map(address_map &map) ATTR_COLD;
-	void qdrmfgp_k054539_map(address_map &map) ATTR_COLD;
 	void qdrmfgp_map(address_map &map) ATTR_COLD;
 };
 
 
 K056832_CB_MEMBER(qdrmfgp_state::qdrmfgp_tile_callback)
 {
-	*color = ((*color>>2) & 0x0f) | m_pal;
+	color = ((color >> 2) & 0x0f) | m_pal;
 }
 
 K056832_CB_MEMBER(qdrmfgp_state::qdrmfgp2_tile_callback)
 {
-	*color = (*color>>1) & 0x7f;
+	color = (color >> 1) & 0x7f;
 }
 
 /***************************************************************************
@@ -155,7 +155,7 @@ VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 
 ***************************************************************************/
 
-uint32_t qdrmfgp_state::screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t qdrmfgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -433,7 +433,7 @@ void qdrmfgp_state::qdrmfgp2_map(address_map &map)
 }
 
 
-void qdrmfgp_state::qdrmfgp_k054539_map(address_map &map)
+void qdrmfgp_state::k054539_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom().region("k054539", 0);
 	map(0x100000, 0x45ffff).ram().share("sndram");
@@ -681,7 +681,7 @@ void qdrmfgp_state::qdrmfgp(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(40, 40+384-1, 16, 16+224-1);
-	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update_qdrmfgp));
+	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -700,7 +700,7 @@ void qdrmfgp_state::qdrmfgp(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	k054539_device &k054539(K054539(config, m_k054539, XTAL(18'432'000)));
-	k054539.set_addrmap(0, &qdrmfgp_state::qdrmfgp_k054539_map);
+	k054539.set_addrmap(0, &qdrmfgp_state::k054539_map);
 	k054539.timer_handler().set(FUNC(qdrmfgp_state::k054539_irq1_gen));
 	k054539.add_route(0, "speaker", 1.0, 0);
 	k054539.add_route(1, "speaker", 1.0, 1);
@@ -725,7 +725,7 @@ void qdrmfgp_state::qdrmfgp2(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(40, 40+384-1, 16, 16+224-1);
-	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update_qdrmfgp));
+	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -744,7 +744,7 @@ void qdrmfgp_state::qdrmfgp2(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
-	k054539.set_addrmap(0, &qdrmfgp_state::qdrmfgp_k054539_map);
+	k054539.set_addrmap(0, &qdrmfgp_state::k054539_map);
 	k054539.add_route(0, "speaker", 1.0, 0);
 	k054539.add_route(1, "speaker", 1.0, 1);
 }

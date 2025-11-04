@@ -20,7 +20,7 @@ Known undumped list (* denotes availablity in HDD folder):
 -->
 <softwarelist name="teradrive_flop" description="Sega Teradrive floppy disk images">
 
-<!--!Operating Systems -->
+<!-- !Operating Systems -->
 
 <!-- DOS/V sets have "for Sega Teradrive" and "IBM Personal System/55" labels -->
 
@@ -65,7 +65,7 @@ Part of a multidisk set?
 		</part>
 	</software>
 
-<!--!Driver disks -->
+<!-- !Driver disks -->
 
 	<software name="drv4" supported="partial">
 		<description>Teradrive Driver Disk (J4.0)</description>

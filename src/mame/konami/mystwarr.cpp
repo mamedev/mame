@@ -204,7 +204,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mystwarr_interrupt)
 	if (scanline == 0)
 		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 
-	/* writes to LSB of 0x410000 port and clears a work RAM flag, almost likely not really necessary. */
+	// writes to LSB of 0x410000 port and clears a work RAM flag, almost likely not really necessary.
 	//m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 }
 
@@ -212,7 +212,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
 {
 	int scanline = param;
 
-	/* irq 4 has an irq routine in metamrph, but it's not really called */
+	// irq 4 has an irq routine in metamrph, but it's not really called
 	//m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 
 	if (scanline == 24)
@@ -262,8 +262,8 @@ void mystwarr_state::irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-/* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
-/* of RAM, but they put 0x10000 there. The CPU can access them all. */
+/* the interface with the 053247 is weird. The chip can address only 0x1000 bytes
+   of RAM, but they put 0x10000 there. The CPU can access them all. */
 uint16_t mystwarr_state::k053247_scattered_word_r(offs_t offset)
 {
 	if (offset & 0x0078)
@@ -290,8 +290,8 @@ void mystwarr_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint
 	}
 }
 
-/* 68000 memory handlers */
-/* Mystic Warriors */
+// 68000 memory handlers
+// Mystic Warriors
 void mystwarr_state::mystwarr_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom(); // main program
@@ -319,7 +319,7 @@ void mystwarr_state::mystwarr_map(address_map &map)
 	map(0x700000, 0x701fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
-/* Metamorphic Force */
+// Metamorphic Force
 void mystwarr_state::metamrph_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom(); // main program
@@ -351,7 +351,7 @@ void mystwarr_state::metamrph_map(address_map &map)
 	map(0x330000, 0x331fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
-/* Violent Storm */
+// Violent Storm
 void mystwarr_state::viostorm_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();     // main program
@@ -479,7 +479,7 @@ void mystwarr_state::mceeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	//logerror("unknown LSB write %x to eeprom\n", data);
 }
 
-/* Martial Champion */
+// Martial Champion
 void mystwarr_state::martchmp_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                 // main program
@@ -497,7 +497,7 @@ void mystwarr_state::martchmp_map(address_map &map)
 	map(0x414000, 0x414001).portr("P1_P2");
 	map(0x414002, 0x414003).portr("P3_P4");
 	map(0x416000, 0x416001).portr("IN0");
-	map(0x416002, 0x416003).r(FUNC(mystwarr_state::eeprom_r));                  // eeprom read
+	map(0x416002, 0x416003).r(FUNC(mystwarr_state::eeprom_r));                  // EEPROM read
 	map(0x418000, 0x41801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x41a000, 0x41a001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x41c000, 0x41c01f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);              // CCU
@@ -509,7 +509,7 @@ void mystwarr_state::martchmp_map(address_map &map)
 	map(0x700000, 0x703fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));          // tile ROM readback
 }
 
-/* Ultimate Battler Dadandarn */
+// Ultimate Battler Dadandarn
 void mystwarr_state::dadandrn_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();                         // main program and data ROM
@@ -543,7 +543,7 @@ void mystwarr_state::dadandrn_map(address_map &map)
 	map(0xe00000, 0xe00001).nopw();    // watchdog
 }
 
-/* Gaiapolis */
+// Gaiapolis
 // a00000 = the 128k tilemap
 // 800000 = the 256k tilemap
 // c00000 = 936 tiles (7fffff window)
@@ -653,7 +653,7 @@ static INPUT_PORTS_START( mystwarr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* game loops if this is set */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   // game loops if this is set
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
@@ -771,7 +771,7 @@ static INPUT_PORTS_START( dadandrn )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW ) /* duplicate required for use */
+	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW ) // duplicate required for use
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -821,7 +821,7 @@ static INPUT_PORTS_START( martchmp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* NCPU game loops if this is set */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   // NCPU game loops if this is set
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
@@ -874,7 +874,7 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 
 	m_mw_irq_control = 0;
 
-	/* konamigx_mixer uses this, so better initialize it */
+	// konamigx_mixer uses this, so better initialize it
 	m_gx_wrport1_0 = 0;
 
 	save_item(NAME(m_mw_irq_control));
@@ -946,8 +946,8 @@ MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 
 void mystwarr_state::mystwarr(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);   /* 16 MHz (confirmed) */
+	// basic machine hardware
+	M68000(config, m_maincpu, 16000000);   // 16 MHz (confirmed)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::mystwarr_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mystwarr_state::mystwarr_interrupt), "screen", 0, 1);
 
@@ -964,7 +964,7 @@ void mystwarr_state::mystwarr(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 //  m_screen->set_refresh_hz(60);
@@ -995,7 +995,7 @@ void mystwarr_state::mystwarr(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	K054321(config, m_k054321, "speaker");
@@ -1003,12 +1003,12 @@ void mystwarr_state::mystwarr(machine_config &config)
 	K054539(config, m_k054539_1, XTAL(18'432'000));
 	m_k054539_1->set_device_rom_tag("k054539");
 	m_k054539_1->timer_handler().set(FUNC(mystwarr_state::k054539_nmi_gen));
-	m_k054539_1->add_route(0, "speaker", 1.0, 1);    /* stereo channels are inverted */
+	m_k054539_1->add_route(0, "speaker", 1.0, 1);    // stereo channels are inverted
 	m_k054539_1->add_route(1, "speaker", 1.0, 0);
 
 	K054539(config, m_k054539_2, XTAL(18'432'000));
 	m_k054539_2->set_device_rom_tag("k054539");
-	m_k054539_2->add_route(0, "speaker", 1.0, 1);    /* stereo channels are inverted */
+	m_k054539_2->add_route(0, "speaker", 1.0, 1);    // stereo channels are inverted
 	m_k054539_2->add_route(1, "speaker", 1.0, 0);
 }
 
@@ -1021,11 +1021,11 @@ void mystwarr_state::viostorm(machine_config &config)
 	m_k053252->set_clock(16000000/2);
 	m_k053252->set_offsets(40, 16);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::viostorm_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(mystwarr_state::metamrph_interrupt));
 
-	/* video hardware */
+	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, viostorm)
 
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_metamrph));
@@ -1066,7 +1066,7 @@ void mystwarr_state::metamrph(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,metamrph)
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::metamrph_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(mystwarr_state::metamrph_interrupt));
 
@@ -1074,7 +1074,7 @@ void mystwarr_state::metamrph(machine_config &config)
 
 	K053250(config, m_k053250_1, 0, m_palette, m_screen, -7, 0);
 
-	/* video hardware */
+	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, metamrph)
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_metamrph));
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(900));
@@ -1093,7 +1093,7 @@ void mystwarr_state::dadandrn(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,dadandrn)
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::dadandrn_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mystwarr_state::ddd_interrupt));
 	config.device_remove("scantimer");
@@ -1102,7 +1102,7 @@ void mystwarr_state::dadandrn(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dadandrn);
 
-	/* video hardware */
+	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
 
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_dadandrn));
@@ -1122,7 +1122,7 @@ void mystwarr_state::gaiapols(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,gaiapols)
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::gaiapols_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mystwarr_state::ddd_interrupt));
 	config.device_remove("scantimer");
@@ -1133,7 +1133,7 @@ void mystwarr_state::gaiapols(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaiapols);
 
-	/* video hardware */
+	// video hardware
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)
 
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_dadandrn));
@@ -1154,7 +1154,7 @@ void mystwarr_state::martchmp(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,martchmp)
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::martchmp_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(mystwarr_state::mchamp_interrupt));
 
@@ -1185,25 +1185,25 @@ void mystwarr_state::martchmp(machine_config &config)
 #define ROM_LOADTILE_BYTE(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(4))
 
 ROM_START( mystwarr )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "128eaa01.20f", 0x000000, 0x40000, CRC(508f249c) SHA1(d27a272ec63e4a39379c4a23fe15c4fb45674cb4) )
 	ROM_LOAD16_BYTE( "128eaa02.20g", 0x000001, 0x40000, CRC(f8ffa352) SHA1(678c59d5fbb85d808e842947621b7f13669d35b5) )
 	ROM_LOAD16_BYTE( "128a03.19f",   0x100000, 0x80000, CRC(e98094f3) SHA1(a3f9b804ff487f792a00ce85a383868ab0b1b5d8) )
 	ROM_LOAD16_BYTE( "128a04.19g",   0x100001, 0x80000, CRC(88c6a3e4) SHA1(7c2361f716a2320730a3dd6723a271e349ad61c3) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("128a05.6b", 0x00000, 0x20000, CRC(0e5194e0) SHA1(83356158d561f1b8e21f6ae5936b61da834a0545) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 0x100000, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 0x100000, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 0x080000, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 0x100000, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 0x100000, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
@@ -1212,38 +1212,38 @@ ROM_START( mystwarr )
 	ROM_LOAD16_BYTE( "128a12.12k", 0x400000, 0x080000, CRC(63de93e2) SHA1(c9a50e7beff1cbbc5d5820664adbd54d52782c54) )
 	ROM_LOAD16_BYTE( "128a11.10k", 0x400001, 0x080000, CRC(4eac941a) SHA1(c0a33f4b975ebee217fd335001839992f4c0bdc8) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "128a06.2d", 0x000000, 0x200000, CRC(88ed598c) SHA1(3c123e26b3a12541df77b368bc0e0d486f5622b6) )
 	ROM_LOAD( "128a07.1d", 0x200000, 0x200000, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "mystwarr.nv", 0x0000, 0x080, CRC(28df2269) SHA1(3f071c97662745a199f96964e2e79f795bd5a391) )
 ROM_END
 
 ROM_START( mystwarru )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "128uaa01.20f", 0x000000, 0x40000, CRC(3a89aafd) SHA1(6d2ebb7e04d262545276c8dbe1c63405e5de4901) )
 	ROM_LOAD16_BYTE( "128uaa02.20g", 0x000001, 0x40000, CRC(de07410f) SHA1(4583cb4402b3b046f185fa6d5a1cfaa8fe0d858c) )
 	ROM_LOAD16_BYTE( "128a03.19f",   0x100000, 0x80000, CRC(e98094f3) SHA1(a3f9b804ff487f792a00ce85a383868ab0b1b5d8) )
 	ROM_LOAD16_BYTE( "128a04.19g",   0x100001, 0x80000, CRC(88c6a3e4) SHA1(7c2361f716a2320730a3dd6723a271e349ad61c3) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("128a05.6b", 0x00000, 0x20000, CRC(0e5194e0) SHA1(83356158d561f1b8e21f6ae5936b61da834a0545) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 0x100000, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 0x100000, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 0x080000, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 0x100000, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 0x100000, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
@@ -1252,10 +1252,10 @@ ROM_START( mystwarru )
 	ROM_LOAD16_BYTE( "128a12.12k", 0x400000, 0x080000, CRC(63de93e2) SHA1(c9a50e7beff1cbbc5d5820664adbd54d52782c54) )
 	ROM_LOAD16_BYTE( "128a11.10k", 0x400001, 0x080000, CRC(4eac941a) SHA1(c0a33f4b975ebee217fd335001839992f4c0bdc8) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "128a06.2d", 0x000000, 0x200000, CRC(88ed598c) SHA1(3c123e26b3a12541df77b368bc0e0d486f5622b6) )
 	ROM_LOAD( "128a07.1d", 0x200000, 0x200000, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
@@ -1265,25 +1265,25 @@ ROM_START( mystwarru )
 ROM_END
 
 ROM_START( mystwarrj )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "128jaa01.20f", 0x000000, 0x40000, CRC(49c37bfe) SHA1(177843899055476c9d2716ba494ac3892993eee5) )
 	ROM_LOAD16_BYTE( "128jaa02.20g", 0x000001, 0x40000, CRC(e39fb3bb) SHA1(0467b51f66c32ffa8fae3b00d43c6d4aa19b24ef) )
 	ROM_LOAD16_BYTE( "128a03.19f",   0x100000, 0x80000, CRC(e98094f3) SHA1(a3f9b804ff487f792a00ce85a383868ab0b1b5d8) )
 	ROM_LOAD16_BYTE( "128a04.19g",   0x100001, 0x80000, CRC(88c6a3e4) SHA1(7c2361f716a2320730a3dd6723a271e349ad61c3) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("128a05.6b", 0x00000, 0x20000, CRC(0e5194e0) SHA1(83356158d561f1b8e21f6ae5936b61da834a0545) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 0x100000, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 0x100000, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 0x080000, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 0x100000, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 0x100000, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
@@ -1292,10 +1292,10 @@ ROM_START( mystwarrj )
 	ROM_LOAD16_BYTE( "128a12.12k", 0x400000, 0x080000, CRC(63de93e2) SHA1(c9a50e7beff1cbbc5d5820664adbd54d52782c54) )
 	ROM_LOAD16_BYTE( "128a11.10k", 0x400001, 0x080000, CRC(4eac941a) SHA1(c0a33f4b975ebee217fd335001839992f4c0bdc8) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "128a06.2d", 0x000000, 0x200000, CRC(88ed598c) SHA1(3c123e26b3a12541df77b368bc0e0d486f5622b6) )
 	ROM_LOAD( "128a07.1d", 0x200000, 0x200000, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
@@ -1305,25 +1305,25 @@ ROM_START( mystwarrj )
 ROM_END
 
 ROM_START( mystwarra )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "128aab01.20f", 0x000000, 0x40000, CRC(3dc89153) SHA1(dd7b315794b07823d380fe2c59ceff93964d5542) )
 	ROM_LOAD16_BYTE( "128aab02.20g", 0x000001, 0x40000, CRC(8fe92ad2) SHA1(f99e6c4bab026fae6becbcf5463ae67081d3b6dd) )
 	ROM_LOAD16_BYTE( "128a03.19f",   0x100000, 0x80000, CRC(e98094f3) SHA1(a3f9b804ff487f792a00ce85a383868ab0b1b5d8) )
 	ROM_LOAD16_BYTE( "128a04.19g",   0x100001, 0x80000, CRC(88c6a3e4) SHA1(7c2361f716a2320730a3dd6723a271e349ad61c3) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("128a05.6b", 0x00000, 0x20000, CRC(0e5194e0) SHA1(83356158d561f1b8e21f6ae5936b61da834a0545) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 0x100000, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 0x100000, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 0x080000, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 0x100000, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 0x100000, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
@@ -1332,10 +1332,10 @@ ROM_START( mystwarra )
 	ROM_LOAD16_BYTE( "128a12.12k", 0x400000, 0x080000, CRC(63de93e2) SHA1(c9a50e7beff1cbbc5d5820664adbd54d52782c54) )
 	ROM_LOAD16_BYTE( "128a11.10k", 0x400001, 0x080000, CRC(4eac941a) SHA1(c0a33f4b975ebee217fd335001839992f4c0bdc8) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "128a06.2d", 0x000000, 0x200000, CRC(88ed598c) SHA1(3c123e26b3a12541df77b368bc0e0d486f5622b6) )
 	ROM_LOAD( "128a07.1d", 0x200000, 0x200000, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
@@ -1345,25 +1345,25 @@ ROM_START( mystwarra )
 ROM_END
 
 ROM_START( mystwarraa )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "128aaa01.20f", 0x000000, 0x40000, CRC(633ead86) SHA1(56d8628f6081e860c4c6109eabd1c1392f669996) )
 	ROM_LOAD16_BYTE( "128aaa02.20g", 0x000001, 0x40000, CRC(69ab81a2) SHA1(545bc298dfc4de05bac15d63a84c10400231a04d) )
 	ROM_LOAD16_BYTE( "128a03.19f",   0x100000, 0x80000, CRC(e98094f3) SHA1(a3f9b804ff487f792a00ce85a383868ab0b1b5d8) )
 	ROM_LOAD16_BYTE( "128a04.19g",   0x100001, 0x80000, CRC(88c6a3e4) SHA1(7c2361f716a2320730a3dd6723a271e349ad61c3) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("128a05.6b", 0x00000, 0x20000, CRC(0e5194e0) SHA1(83356158d561f1b8e21f6ae5936b61da834a0545) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 0x100000, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 0x100000, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 0x080000, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 0x100000, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 0x100000, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
@@ -1372,10 +1372,10 @@ ROM_START( mystwarraa )
 	ROM_LOAD16_BYTE( "128a12.12k", 0x400000, 0x080000, CRC(63de93e2) SHA1(c9a50e7beff1cbbc5d5820664adbd54d52782c54) )
 	ROM_LOAD16_BYTE( "128a11.10k", 0x400001, 0x080000, CRC(4eac941a) SHA1(c0a33f4b975ebee217fd335001839992f4c0bdc8) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "128a06.2d", 0x000000, 0x200000, CRC(88ed598c) SHA1(3c123e26b3a12541df77b368bc0e0d486f5622b6) )
 	ROM_LOAD( "128a07.1d", 0x200000, 0x200000, CRC(db79a66e) SHA1(b7e118ed26bac557038e8ae6cb77f23f3da5646f) )
@@ -1385,32 +1385,32 @@ ROM_START( mystwarraa )
 ROM_END
 
 ROM_START( viostorm )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "168eac01.15h", 0x000001, 0x80000, CRC(9f6b5c81) SHA1(39faf7a5748c68f39915556c909a1a465c9cf003) ) /* 1993. 8.30 Europe */
+	ROM_LOAD16_BYTE( "168eac01.15h", 0x000001, 0x80000, CRC(9f6b5c81) SHA1(39faf7a5748c68f39915556c909a1a465c9cf003) ) // 1993. 8.30 Europe
 	ROM_LOAD16_BYTE( "168eac02.15f", 0x000000, 0x80000, CRC(126ecf03) SHA1(0b29f7a00f0c27dc28150ce852adbc8ed9224662) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("168a05.7c", 0x00000, 0x20000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 0x200000, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 0x200000, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00)
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 0x200000, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 0x200000, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 0x200000, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
 	ROM_LOAD64_WORD( "168a13.17k", 0x000006, 0x200000, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00)
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "168a06.1c", 0x000000, 0x200000, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
 	ROM_LOAD( "168a07.1e", 0x200000, 0x200000, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
@@ -1420,32 +1420,32 @@ ROM_START( viostorm )
 ROM_END
 
 ROM_START( viostormeb )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "168eab01.15h", 0x000001, 0x80000, CRC(4eee6a8e) SHA1(5c83ed2011aa77f590abca4c469fdb565f35dde5) ) /* 1993. 7.26 Europe */
+	ROM_LOAD16_BYTE( "168eab01.15h", 0x000001, 0x80000, CRC(4eee6a8e) SHA1(5c83ed2011aa77f590abca4c469fdb565f35dde5) ) // 1993. 7.26 Europe
 	ROM_LOAD16_BYTE( "168eab02.15f", 0x000000, 0x80000, CRC(8dd8aa4c) SHA1(e7937fe1272b635807ffff08a45a0338d48c376c) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("168a05.7c", 0x00000, 0x20000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 0x200000, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 0x200000, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00)
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 0x200000, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 0x200000, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 0x200000, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
 	ROM_LOAD64_WORD( "168a13.17k", 0x000006, 0x200000, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00)
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "168a06.1c", 0x000000, 0x200000, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
 	ROM_LOAD( "168a07.1e", 0x200000, 0x200000, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
@@ -1455,32 +1455,32 @@ ROM_START( viostormeb )
 ROM_END
 
 ROM_START( viostormu )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "168uac01.15h", 0x000001, 0x80000, CRC(49853530) SHA1(dc8fa1a929848949cb0ad02f5a2a8a5f820fd6c1) ) /* 1993. 8.30 U.S.A. */
+	ROM_LOAD16_BYTE( "168uac01.15h", 0x000001, 0x80000, CRC(49853530) SHA1(dc8fa1a929848949cb0ad02f5a2a8a5f820fd6c1) ) // 1993. 8.30 U.S.A.
 	ROM_LOAD16_BYTE( "168uac02.15f", 0x000000, 0x80000, CRC(055ca6fe) SHA1(31565ea515120555f94c4358b8e1a719c7d092d7) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("168a05.7c", 0x00000, 0x20000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 0x200000, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 0x200000, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00)
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 0x200000, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 0x200000, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 0x200000, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
 	ROM_LOAD64_WORD( "168a13.17k", 0x000006, 0x200000, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00)
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "168a06.1c", 0x000000, 0x200000, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
 	ROM_LOAD( "168a07.1e", 0x200000, 0x200000, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
@@ -1490,59 +1490,59 @@ ROM_START( viostormu )
 ROM_END
 
 ROM_START( viostormub )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "168uab01.15h", 0x000001, 0x80000, CRC(2d6a9fa3) SHA1(a2f82702896eddb11cd2b2f9ed5fff730f6baf0f) ) /* 1993. 7.26 U.S.A. */
+	ROM_LOAD16_BYTE( "168uab01.15h", 0x000001, 0x80000, CRC(2d6a9fa3) SHA1(a2f82702896eddb11cd2b2f9ed5fff730f6baf0f) ) // 1993. 7.26 U.S.A.
 	ROM_LOAD16_BYTE( "168uab02.15f", 0x000000, 0x80000, CRC(0e75f7cc) SHA1(57af86703dc728ba83ca12889246c93b9f8d4576) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("168a05.7c", 0x00000, 0x20000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 0x200000, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 0x200000, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00)
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 0x200000, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 0x200000, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 0x200000, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
 	ROM_LOAD64_WORD( "168a13.17k", 0x000006, 0x200000, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00)
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0)
 	ROM_LOAD( "168a06.1c", 0x000000, 0x200000, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
 	ROM_LOAD( "168a07.1e", 0x200000, 0x200000, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "viostormub.nv", 0x0000, 0x080, CRC(b6937413) SHA1(eabc2ea661201f5ed42ab541aee765480bbdd5bc) )
 ROM_END
 
 ROM_START( viostormubbl ) // this is a bootleg conversion, running on a Metamorphic Force PCB with proto ROM PCB
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "168_ua7_01.bin", 0x000001, 0x80000, CRC(97d3df09) SHA1(3b61409376ed4a2a9d70324c86ed170392526b70) )
 	ROM_LOAD16_BYTE( "168_ua7_02.bin", 0x000000, 0x80000, CRC(2c591f92) SHA1(8bdc149e8270fdf160940fe3b8d616d8c504e985) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("168_a_05.bin", 0x00000, 0x20000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
 	ROM_RELOAD(              0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROMX_LOAD( "168_a_09_h.bin", 0x000000, 0x80000, CRC(4ffd6e92) SHA1(f83ea4cb0248253928d0a474745da5c5d6bb1b4c), ROM_SKIP(4) )
 	ROMX_LOAD( "168_a_09_l.bin", 0x000001, 0x80000, CRC(f657bddd) SHA1(89e9e857f5e3e53c4c1e46b8df51f669a1b8719a), ROM_SKIP(4) )
 	ROMX_LOAD( "168_a_08_h.bin", 0x000002, 0x80000, CRC(143ce52e) SHA1(d1db5b9369ff0750da3db05868fb742bde93618e), ROM_SKIP(4) )
 	ROMX_LOAD( "168_a_08_l.bin", 0x000003, 0x80000, CRC(4f656594) SHA1(675b2da642ad362ab389b52340f41959b5e723b3), ROM_SKIP(4) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_BYTE( "168_a_10_al.bin", 0x000000, 0x080000, CRC(e6570da5) SHA1(b5d68ca1a4b690d11808fcaaf05e8ec12eb6a4d2) )
 	ROM_LOAD64_BYTE( "168_a_10_ah.bin", 0x000001, 0x080000, CRC(e8ce69b1) SHA1(06f355120abef55403ef91f2cbbeb180e09b69ae) )
@@ -1561,10 +1561,10 @@ ROM_START( viostormubbl ) // this is a bootleg conversion, running on a Metamorp
 	ROM_LOAD64_BYTE( "168_a_13_bl.bin", 0x400006, 0x080000, CRC(26326a3c) SHA1(fc7ca1716c8b2e9268c51cdcafe262cbd8e79bf6) )
 	ROM_LOAD64_BYTE( "168_a_13_bh.bin", 0x400007, 0x080000, CRC(3cc402fb) SHA1(37cc7c21e59d641064b653f57b52c66c822114af) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "168_a_06_a.bin", 0x000000, 0x80000, CRC(bf42efc1) SHA1(585af7d15bba1c0c821029c384bd313d28814396) )
 	ROM_LOAD( "168_a_06_b.bin", 0x080000, 0x80000, CRC(97c3e6d2) SHA1(097327b8d5be81fcff745dc7bf108ebcad17f5e7) )
@@ -1575,87 +1575,87 @@ ROM_START( viostormubbl ) // this is a bootleg conversion, running on a Metamorp
 	ROM_LOAD( "168_a_07_c.bin", 0x300000, 0x80000, CRC(31f2a927) SHA1(6ef363462dedf8b2e816968502956dec56d26ddb) )
 	ROM_LOAD( "168_a_07_d.bin", 0x380000, 0x80000, CRC(4a2ea6f6) SHA1(fab0ec82c6a01ad49b1da09c4799fa64847d8644) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "viostormub.nv", 0x0000, 0x080, CRC(b6937413) SHA1(eabc2ea661201f5ed42ab541aee765480bbdd5bc) )
 ROM_END
 
 ROM_START( viostorma )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "168aac01.15h", 0x000001, 0x80000, CRC(3620635c) SHA1(d296ba707a131bd78b401608d6b165b214f4fe61) ) /* 1993. 8.30 Asia */
+	ROM_LOAD16_BYTE( "168aac01.15h", 0x000001, 0x80000, CRC(3620635c) SHA1(d296ba707a131bd78b401608d6b165b214f4fe61) ) // 1993. 8.30 Asia
 	ROM_LOAD16_BYTE( "168aac02.15f", 0x000000, 0x80000, CRC(db679aec) SHA1(233f3ab54125db1035cb0afadb06312ef7bd3e09) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("168a05.7c", 0x00000, 0x20000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 0x200000, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 0x200000, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 0x200000, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 0x200000, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 0x200000, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
 	ROM_LOAD64_WORD( "168a13.17k", 0x000006, 0x200000, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "168a06.1c", 0x000000, 0x200000, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
 	ROM_LOAD( "168a07.1e", 0x200000, 0x200000, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "viostorma.nv", 0x0000, 0x080, CRC(2cfbf966) SHA1(fb9c4a47bac20a7f820a1fa178fc9f9079101cb8) )
 ROM_END
 
 ROM_START( viostormab )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "168aab01.15h", 0x000001, 0x80000, CRC(14f78423) SHA1(13a44e13b9dc1e31e8268485cded3385a84e3482) ) /* 1993. 7.26 Asia */
+	ROM_LOAD16_BYTE( "168aab01.15h", 0x000001, 0x80000, CRC(14f78423) SHA1(13a44e13b9dc1e31e8268485cded3385a84e3482) ) // 1993. 7.26 Asia
 	ROM_LOAD16_BYTE( "168aab02.15f", 0x000000, 0x80000, CRC(3dd1cc83) SHA1(f0d289912994a5dbfc0711fe9aa0a2969f7f8d8e) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("168a05.7c", 0x00000, 0x20000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 0x200000, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 0x200000, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 0x200000, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 0x200000, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 0x200000, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
 	ROM_LOAD64_WORD( "168a13.17k", 0x000006, 0x200000, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "168a06.1c", 0x000000, 0x200000, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
 	ROM_LOAD( "168a07.1e", 0x200000, 0x200000, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "viostormab.nv", 0x0000, 0x080, CRC(38ffce43) SHA1(f0666198562ae7c07c8f805088e882a10c79bcf3) )
 ROM_END
 
 ROM_START( viostormabbl ) // bootleg PCB with no Konami customs and an Oki M6295 for sound
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "c-24", 0x000001, 0x80000, CRC(45fe6ce0) SHA1(96b3c6628a0a1b8db0528843db78704d04270db6) ) /* 1993. 7.26 Asia */
+	ROM_LOAD16_BYTE( "c-24", 0x000001, 0x80000, CRC(45fe6ce0) SHA1(96b3c6628a0a1b8db0528843db78704d04270db6) ) // 1993. 7.26 Asia
 	ROM_LOAD16_BYTE( "c-28", 0x000000, 0x80000, CRC(937d23d1) SHA1(31a22c2dab63c9d3b541e3f463bf4b61411024c8) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "rom4", 0x000000, 0x100000, CRC(3d543183) SHA1(a1c5eba8ce6e32ef5f256e2e17b0e7eb79ec32c4) )
 	ROM_LOADTILE_WORD( "rom3", 0x000002, 0x100000, CRC(377e394c) SHA1(f9acc9d033f13a00e5079f292e9ebe92d71866e1) )
@@ -1674,251 +1674,251 @@ ROM_START( viostormabbl ) // bootleg PCB with no Konami customs and an Oki M6295
 	ROM_LOAD( "c-23", 0x00000, 0x80000, CRC(b8eb1ae0) SHA1(312137ca03e9e6a101a8c1ccda635007819ff542) )
 	ROM_LOAD( "c-21", 0x80000, 0x80000, CRC(7fee16d6) SHA1(7dd2b9cdadc524e3af4adfa1755d1601bbbd340d) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "viostormabbl.nv", 0x0000, 0x080, CRC(38ffce43) SHA1(f0666198562ae7c07c8f805088e882a10c79bcf3) )
 ROM_END
 
 
 ROM_START( viostormj )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "168jac01.b01", 0x000001, 0x80000, CRC(f8be1225) SHA1(8c38ca218c0005c60a48cd3a43b5460b63a851e7) ) /* 1993. 8.30 Japan */
+	ROM_LOAD16_BYTE( "168jac01.b01", 0x000001, 0x80000, CRC(f8be1225) SHA1(8c38ca218c0005c60a48cd3a43b5460b63a851e7) ) // 1993. 8.30 Japan
 	ROM_LOAD16_BYTE( "168jac02.b02", 0x000000, 0x80000, CRC(f42fd1e5) SHA1(3b17c3039d800487f6117595050e7896a413db04) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("168a05.7c", 0x00000, 0x20000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 0x200000, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 0x200000, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 0x200000, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 0x200000, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 0x200000, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
 	ROM_LOAD64_WORD( "168a13.17k", 0x000006, 0x200000, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
 
-	/* road generator */
+	// road generator
 	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "168a06.1c", 0x000000, 0x200000, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
 	ROM_LOAD( "168a07.1e", 0x200000, 0x200000, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "viostormj.nv", 0x0000, 0x080, CRC(32f5d8bc) SHA1(0c486ce80b62bfaf4f3c0be7653c0beaf4cfafbd) )
 ROM_END
 
 ROM_START( metamrph )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "224eaa01.15h", 0x000001, 0x40000, CRC(30962c2b) SHA1(ae1b2f92881bb0f386b6a413c1da507e73c29382) )
 	ROM_LOAD16_BYTE( "224eaa02.15f", 0x000000, 0x40000, CRC(e314330a) SHA1(728a18d604eca58409551e52b7dc18e2d807700a) )
 	ROM_LOAD16_BYTE( "224a03",       0x100001, 0x80000, CRC(a5bedb01) SHA1(5e7a0b93af654ba6a87be8d449c7080a0f0e2a43) )
 	ROM_LOAD16_BYTE( "224a04",       0x100000, 0x80000, CRC(ada53ba4) SHA1(f77bf854dff1f8f718579fe6d3730066708396e2) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 0x100000, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 0x100000, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 0x200000, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 0x200000, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 0x200000, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 0x200000, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
-	/* K053250 linescroll/zoom thingy */
+	// K053250 linescroll/zoom thingy
 	ROM_REGION( 0x40000, "k053250_1", 0 )
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "224a06", 0x000000, 0x200000, CRC(972f6abe) SHA1(30907495fc49fe3424c092b074c1dc137aa14306) )
 	ROM_LOAD( "224a07", 0x200000, 0x100000, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "metamrph.nv", 0x0000, 0x080, CRC(2c51229a) SHA1(7f056792cc44ec3d4aacc33c825ab796a913488e) )
 ROM_END
 
-ROM_START( metamrphe ) /* alternate set - possibly a bugfix version. Only 2 adjusted bytes causing a swap in commands */
-	/* main program */
+ROM_START( metamrphe ) // alternate set - possibly a bugfix version. Only 2 adjusted bytes causing a swap in commands
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3.15h",        0x000001, 0x40000, CRC(8b9f1ba3) SHA1(cccbaf117800a030c8218a91740dc98182a27901) )
 	ROM_LOAD16_BYTE( "224eaa02.15f", 0x000000, 0x40000, CRC(e314330a) SHA1(728a18d604eca58409551e52b7dc18e2d807700a) )
 	ROM_LOAD16_BYTE( "224a03",       0x100001, 0x80000, CRC(a5bedb01) SHA1(5e7a0b93af654ba6a87be8d449c7080a0f0e2a43) )
 	ROM_LOAD16_BYTE( "224a04",       0x100000, 0x80000, CRC(ada53ba4) SHA1(f77bf854dff1f8f718579fe6d3730066708396e2) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 0x100000, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 0x100000, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 0x200000, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 0x200000, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 0x200000, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 0x200000, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
-	/* K053250 linescroll/zoom thingy */
+	// K053250 linescroll/zoom thingy
 	ROM_REGION( 0x40000, "k053250_1", 0 )
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "224a06", 0x000000, 0x200000, CRC(972f6abe) SHA1(30907495fc49fe3424c092b074c1dc137aa14306) )
 	ROM_LOAD( "224a07", 0x200000, 0x100000, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "metamrph.nv", 0x0000, 0x080, CRC(2c51229a) SHA1(7f056792cc44ec3d4aacc33c825ab796a913488e) )
 ROM_END
 
 ROM_START( metamrpha )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "224aaa01.15h", 0x000001, 0x40000, CRC(12515518) SHA1(7c47ce7ee9817b5f3f516dda021028a0b0a2941f) )
 	ROM_LOAD16_BYTE( "224aaa02.15f", 0x000000, 0x40000, CRC(04ed41df) SHA1(a966aa887f286b528d122aceee957ca2d9fdedb6) )
 	ROM_LOAD16_BYTE( "224a03",       0x100001, 0x80000, CRC(a5bedb01) SHA1(5e7a0b93af654ba6a87be8d449c7080a0f0e2a43) )
 	ROM_LOAD16_BYTE( "224a04",       0x100000, 0x80000, CRC(ada53ba4) SHA1(f77bf854dff1f8f718579fe6d3730066708396e2) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 0x100000, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 0x100000, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 0x200000, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 0x200000, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 0x200000, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 0x200000, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
-	/* K053250 linescroll/zoom thingy */
+	// K053250 linescroll/zoom thingy
 	ROM_REGION( 0x40000, "k053250_1", 0 )
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "224a06", 0x000000, 0x200000, CRC(972f6abe) SHA1(30907495fc49fe3424c092b074c1dc137aa14306) )
 	ROM_LOAD( "224a07", 0x200000, 0x100000, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "metamrpha.nv", 0x0000, 0x080, CRC(6d34a4f2) SHA1(6ec2645ee4375d4924c3cfed2285224af6d19f4c) )
 ROM_END
 
 ROM_START( metamrphu )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "224uaa01.15h", 0x000001, 0x40000, CRC(e1d9b516) SHA1(387ed5ce87af376c0568e39187330a4585dc499a) )
 	ROM_LOAD16_BYTE( "224uaa02.15f", 0x000000, 0x40000, CRC(289c926b) SHA1(5a5129fd85afc4fee97155e28bff89d3bb497b59) )
 	ROM_LOAD16_BYTE( "224a03",       0x100001, 0x80000, CRC(a5bedb01) SHA1(5e7a0b93af654ba6a87be8d449c7080a0f0e2a43) )
 	ROM_LOAD16_BYTE( "224a04",       0x100000, 0x80000, CRC(ada53ba4) SHA1(f77bf854dff1f8f718579fe6d3730066708396e2) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 0x100000, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 0x100000, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 0x200000, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 0x200000, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 0x200000, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 0x200000, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
-	/* K053250 linescroll/zoom thingy */
+	// K053250 linescroll/zoom thingy
 	ROM_REGION( 0x40000, "k053250_1", 0 )
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "224a06", 0x000000, 0x200000, CRC(972f6abe) SHA1(30907495fc49fe3424c092b074c1dc137aa14306) )
 	ROM_LOAD( "224a07", 0x200000, 0x100000, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "metamrphu.nv", 0x0000, 0x080, CRC(1af2f855) SHA1(5f2fbb172f56867ee6f782cda8da65451b02435e) )
 ROM_END
 
 ROM_START( metamrphj )
-	/* main program */
+	// main program
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "224jaa01.15h", 0x000001, 0x40000, CRC(558d2602) SHA1(2dbc16fcc07436ca7eff8d070196348f272b8723) )
 	ROM_LOAD16_BYTE( "224jaa02.15f", 0x000000, 0x40000, CRC(9b252ace) SHA1(efe8cd942f3d4e2366d9af0fb9647d2a4aeac2c9) )
 	ROM_LOAD16_BYTE( "224a03",       0x100001, 0x80000, CRC(a5bedb01) SHA1(5e7a0b93af654ba6a87be8d449c7080a0f0e2a43) )
 	ROM_LOAD16_BYTE( "224a04",       0x100000, 0x80000, CRC(ada53ba4) SHA1(f77bf854dff1f8f718579fe6d3730066708396e2) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 0x100000, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 0x100000, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 0x200000, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 0x200000, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 0x200000, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 0x200000, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
-	/* K053250 linescroll/zoom thingy */
+	// K053250 linescroll/zoom thingy
 	ROM_REGION( 0x40000, "k053250_1", 0 )
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "224a06", 0x000000, 0x200000, CRC(972f6abe) SHA1(30907495fc49fe3424c092b074c1dc137aa14306) )
 	ROM_LOAD( "224a07", 0x200000, 0x100000, CRC(61b2f97a) SHA1(34bf835d6361c7809d40fa20fd238c9e2a84b101) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "metamrphj.nv", 0x0000, 0x080, CRC(30497478) SHA1(60acfbd25ac29c7b5a2571e274704205fc64424a) )
 ROM_END
 
 ROM_START( mtlchamp )
-	/* main program */
+	// main program
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234eab01.20f", 0x000000, 0x40000, CRC(7c4d1e50) SHA1(f943b955aa66f0892c20df7a94fc8bf070bf4624) )
 	ROM_LOAD16_BYTE( "234eab02.20g", 0x000001, 0x40000, CRC(d8bc85c9) SHA1(40a13b4139dd24c06378c6bd982ef3f5fd646dcc) )
 	ROM_LOAD16_BYTE( "234_d03.19f",  0x300000, 0x80000, CRC(abb577c6) SHA1(493f11a10a4d5b62d755ff8274e77d898544944f) )
 	ROM_LOAD16_BYTE( "234_d04.19g",  0x300001, 0x80000, CRC(030a1925) SHA1(03783488950c9f27af5948e7b9f6a609c2df6e0b) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("234_d05.6b", 0x00000, 0x20000, CRC(efb6bcaa) SHA1(4fb24b89a50b341871945547859278a6e2f5e002) )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 0x100000, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 0x100000, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 0x080000, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 0x200000, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 0x200000, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
@@ -1927,35 +1927,35 @@ ROM_START( mtlchamp )
 	ROM_LOAD16_BYTE( "234a12.12k", 0x800000, 0x100000, CRC(c7f2b099) SHA1(b72b80feb52560a5a42a1db39b059ac8bca27c10) )
 	ROM_LOAD16_BYTE( "234a11.10k", 0x800001, 0x100000, CRC(82923713) SHA1(a36cd3b2c9d36e93a3c25ba1d4e162f3d92e06ae) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "234a06.2d", 0x000000, 0x200000, CRC(12d32384) SHA1(ecd6cd752b0e20339e17a7652ed843fbb43f7595) )
 	ROM_LOAD( "234a07.1d", 0x200000, 0x200000, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "mtlchamp.nv", 0x0000, 0x080, CRC(cd47858e) SHA1(8effdcd631516d537f956509111cb3d4d18040db) )
 ROM_END
 
 ROM_START( mtlchamp1 )
-	/* main program */
+	// main program
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234eaa01.20f", 0x000000, 0x40000, CRC(8fa731db) SHA1(e2ed81762070a764f51aae36ce03859b5d86520d) )
 	ROM_LOAD16_BYTE( "234eaa02.20g", 0x000001, 0x40000, CRC(e7b50b54) SHA1(594391a37479e6973aadd1fc866671c306a75497) )
 	ROM_LOAD16_BYTE( "234_d03.19f",  0x300000, 0x80000, CRC(abb577c6) SHA1(493f11a10a4d5b62d755ff8274e77d898544944f) )
 	ROM_LOAD16_BYTE( "234_d04.19g",  0x300001, 0x80000, CRC(030a1925) SHA1(03783488950c9f27af5948e7b9f6a609c2df6e0b) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("234_d05.6b", 0x00000, 0x20000, CRC(efb6bcaa) SHA1(4fb24b89a50b341871945547859278a6e2f5e002) )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 0x100000, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 0x100000, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 0x080000, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 0x200000, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 0x200000, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
@@ -1964,35 +1964,35 @@ ROM_START( mtlchamp1 )
 	ROM_LOAD16_BYTE( "234a12.12k", 0x800000, 0x100000, CRC(c7f2b099) SHA1(b72b80feb52560a5a42a1db39b059ac8bca27c10) )
 	ROM_LOAD16_BYTE( "234a11.10k", 0x800001, 0x100000, CRC(82923713) SHA1(a36cd3b2c9d36e93a3c25ba1d4e162f3d92e06ae) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "234a06.2d", 0x000000, 0x200000, CRC(12d32384) SHA1(ecd6cd752b0e20339e17a7652ed843fbb43f7595) )
 	ROM_LOAD( "234a07.1d", 0x200000, 0x200000, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "mtlchamp1.nv", 0x0000, 0x080, CRC(202f6968) SHA1(38fc82a77896607c7fc09b75309f80048b52eb05) )
 ROM_END
 
 ROM_START( mtlchampa )
-	/* main program */
+	// main program
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234aaa01.20f", 0x000000, 0x40000, CRC(32c70e65) SHA1(10103ba403656d962bafe970a4ad0b2a9bed0ffe) )
 	ROM_LOAD16_BYTE( "234aaa02.20g", 0x000001, 0x40000, CRC(2f666d52) SHA1(97765ef89e9b9ed36e7039f31f4d57187c6bb6e5) )
 	ROM_LOAD16_BYTE( "234_d03.19f",  0x300000, 0x80000, CRC(abb577c6) SHA1(493f11a10a4d5b62d755ff8274e77d898544944f) )
 	ROM_LOAD16_BYTE( "234_d04.19g",  0x300001, 0x80000, CRC(030a1925) SHA1(03783488950c9f27af5948e7b9f6a609c2df6e0b) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("234_d05.6b", 0x00000, 0x20000, CRC(efb6bcaa) SHA1(4fb24b89a50b341871945547859278a6e2f5e002) )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 0x100000, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 0x100000, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 0x080000, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 0x200000, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 0x200000, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
@@ -2001,35 +2001,35 @@ ROM_START( mtlchampa )
 	ROM_LOAD16_BYTE( "234a12.12k", 0x800000, 0x100000, CRC(c7f2b099) SHA1(b72b80feb52560a5a42a1db39b059ac8bca27c10) )
 	ROM_LOAD16_BYTE( "234a11.10k", 0x800001, 0x100000, CRC(82923713) SHA1(a36cd3b2c9d36e93a3c25ba1d4e162f3d92e06ae) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "234a06.2d", 0x000000, 0x200000, CRC(12d32384) SHA1(ecd6cd752b0e20339e17a7652ed843fbb43f7595) )
 	ROM_LOAD( "234a07.1d", 0x200000, 0x200000, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "mtlchampa.nv", 0x0000, 0x080, CRC(79a6f420) SHA1(c2889bbb86a3f56d4f5544b6dadede0c715c59ca) )
 ROM_END
 
 ROM_START( mtlchampj )
-	/* main program */
+	// main program
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234jaa01.20f", 0x000000, 0x40000, CRC(76c3c568) SHA1(14c0009804fcedd8a3e5a105cc871dd6cd4cf7b3) )
 	ROM_LOAD16_BYTE( "234jaa02.20g", 0x000001, 0x40000, CRC(95eec0aa) SHA1(11f1986d792951d6d5b3740b435dab2a2f4e6cbd) )
 	ROM_LOAD16_BYTE( "234_d03.19f",  0x300000, 0x80000, CRC(abb577c6) SHA1(493f11a10a4d5b62d755ff8274e77d898544944f) )
 	ROM_LOAD16_BYTE( "234_d04.19g",  0x300001, 0x80000, CRC(030a1925) SHA1(03783488950c9f27af5948e7b9f6a609c2df6e0b) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("234_d05.6b", 0x00000, 0x20000, CRC(efb6bcaa) SHA1(4fb24b89a50b341871945547859278a6e2f5e002) )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 0x100000, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 0x100000, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 0x080000, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 0x200000, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 0x200000, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
@@ -2038,35 +2038,35 @@ ROM_START( mtlchampj )
 	ROM_LOAD16_BYTE( "234a12.12k", 0x800000, 0x100000, CRC(c7f2b099) SHA1(b72b80feb52560a5a42a1db39b059ac8bca27c10) )
 	ROM_LOAD16_BYTE( "234a11.10k", 0x800001, 0x100000, CRC(82923713) SHA1(a36cd3b2c9d36e93a3c25ba1d4e162f3d92e06ae) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "234a06.2d", 0x000000, 0x200000, CRC(12d32384) SHA1(ecd6cd752b0e20339e17a7652ed843fbb43f7595) )
 	ROM_LOAD( "234a07.1d", 0x200000, 0x200000, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "mtlchampj.nv", 0x0000, 0x080, CRC(e311816f) SHA1(1e8ece157e6b3978d11bc9a4a6015c6004f7a375) )
 ROM_END
 
 ROM_START( mtlchampu )
-	/* main program */
+	// main program
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234uae01.20f", 0x000000, 0x40000, CRC(acecfec9) SHA1(656e76037338c81d543308572bb59664933809be) )
 	ROM_LOAD16_BYTE( "234uae02.20g", 0x000001, 0x40000, CRC(c54ccf65) SHA1(538e70e607c26ce3be4534a1c0195d411ecbeff4) )
 	ROM_LOAD16_BYTE( "234_d03.19f",  0x300000, 0x80000, CRC(abb577c6) SHA1(493f11a10a4d5b62d755ff8274e77d898544944f) )
 	ROM_LOAD16_BYTE( "234_d04.19g",  0x300001, 0x80000, CRC(030a1925) SHA1(03783488950c9f27af5948e7b9f6a609c2df6e0b) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("234_d05.6b", 0x00000, 0x20000, CRC(efb6bcaa) SHA1(4fb24b89a50b341871945547859278a6e2f5e002) )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 0x100000, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 0x100000, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 0x080000, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 0x200000, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 0x200000, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
@@ -2075,35 +2075,35 @@ ROM_START( mtlchampu )
 	ROM_LOAD16_BYTE( "234a12.12k", 0x800000, 0x100000, CRC(c7f2b099) SHA1(b72b80feb52560a5a42a1db39b059ac8bca27c10) )
 	ROM_LOAD16_BYTE( "234a11.10k", 0x800001, 0x100000, CRC(82923713) SHA1(a36cd3b2c9d36e93a3c25ba1d4e162f3d92e06ae) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "234a06.2d", 0x000000, 0x200000, CRC(12d32384) SHA1(ecd6cd752b0e20339e17a7652ed843fbb43f7595) )
 	ROM_LOAD( "234a07.1d", 0x200000, 0x200000, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "mtlchampu.nv", 0x0000, 0x080, CRC(182f146a) SHA1(e938324a5c24f53f19759388ec85d2ae603b8a5b) )
 ROM_END
 
 ROM_START( mtlchampu1 )
-	/* main program */
+	// main program
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "234uad01.20f", 0x000000, 0x40000, CRC(5f6c8d09) SHA1(5850398cb9582973b400eaa82d84b7d07c87f779) )
 	ROM_LOAD16_BYTE( "234uad02.20g", 0x000001, 0x40000, CRC(15ca4fb2) SHA1(f3025f0d54ce20717207ce219fd9e07b808eda34) )
 	ROM_LOAD16_BYTE( "234_d03.19f",  0x300000, 0x80000, CRC(abb577c6) SHA1(493f11a10a4d5b62d755ff8274e77d898544944f) )
 	ROM_LOAD16_BYTE( "234_d04.19g",  0x300001, 0x80000, CRC(030a1925) SHA1(03783488950c9f27af5948e7b9f6a609c2df6e0b) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("234_d05.6b", 0x00000, 0x20000, CRC(efb6bcaa) SHA1(4fb24b89a50b341871945547859278a6e2f5e002) )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 0x100000, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 0x100000, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 0x080000, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 0x200000, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 0x200000, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
@@ -2112,175 +2112,175 @@ ROM_START( mtlchampu1 )
 	ROM_LOAD16_BYTE( "234a12.12k", 0x800000, 0x100000, CRC(c7f2b099) SHA1(b72b80feb52560a5a42a1db39b059ac8bca27c10) )
 	ROM_LOAD16_BYTE( "234a11.10k", 0x800001, 0x100000, CRC(82923713) SHA1(a36cd3b2c9d36e93a3c25ba1d4e162f3d92e06ae) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "234a06.2d", 0x000000, 0x200000, CRC(12d32384) SHA1(ecd6cd752b0e20339e17a7652ed843fbb43f7595) )
 	ROM_LOAD( "234a07.1d", 0x200000, 0x200000, CRC(05ee239f) SHA1(f4e6e7568dc73666a2b5e0c3fe743432e0436464) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "mtlchampu1.nv", 0x0000, 0x080, CRC(f5d84df7) SHA1(a14dca3ca275a754f1f46eab220a24b77ada23a5) )
 ROM_END
 
 ROM_START( gaiapols )
-	/* main program */
+	// main program
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "123e07.24m", 0x000000, 0x100000, CRC(f1a1db0f) SHA1(1394b8a57493cbc8d5bf555d363ad844a2407d98) )
 	ROM_LOAD16_BYTE( "123e09.19l", 0x000001, 0x100000, CRC(4b3b57e7) SHA1(1415ddc1393a468705d7a37d054ab6b08d0eb205) )
 
-	/* 68k data */
+	// 68k data
 	ROM_LOAD16_BYTE( "123eaf11.19p", 0x200000, 0x040000, CRC(9c324ade) SHA1(c78b7884f538d285b389c0c46d415a40da844d0d) )
 	ROM_LOAD16_BYTE( "123eaf12.17p", 0x200001, 0x040000, CRC(1dfa14c5) SHA1(540700edbe3dbbd76e3b9e2d2acc416940730a9b) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("123e13.9c", 0x00000, 0x40000, CRC(e772f822) SHA1(2a5cdfc0aacad56cbef8bdbe8319e7ff4ab71eee) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "123e16.2t", 0x000000, 0x100000, CRC(a3238200) SHA1(9ea073f7611b5c0b328c707c97ef174634c303bc) )
 	ROM_LOADTILE_WORD( "123e17.2x", 0x000002, 0x100000, CRC(bd0b9fb9) SHA1(1714c19d2123b8fd4cfedb66d13bdcee6fc77576) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "123e19.34u", 0x000000, 0x200000, CRC(219a7c26) SHA1(0f24873523f91379862e0d4317fc42b8a10d412e) )
 	ROM_LOAD64_WORD( "123e21.34y", 0x000002, 0x200000, CRC(1888947b) SHA1(41a046cbcd2406add2ff48cb82a1353d9ac5fa3c) )
 	ROM_LOAD64_WORD( "123e18.36u", 0x000004, 0x200000, CRC(3719b6d4) SHA1(25ef6e8c3c7f151f1cee063356bdd56c713356ea) )
 	ROM_LOAD64_WORD( "123e20.36y", 0x000006, 0x200000, CRC(490a6f64) SHA1(81b1acc74ce834399005a748eae50b3d633fa469) )
 
-	/* K053536 roz tiles */
+	// K053536 ROZ tiles
 	ROM_REGION( 0x180000, "gfx3", 0 )
 	ROM_LOAD( "123e04.32n", 0x000000, 0x080000, CRC(0d4d5b8b) SHA1(d3fb0c77ad46ee9b9c704be6f174258aa051aa71) )
 	ROM_LOAD( "123e05.29n", 0x080000, 0x080000, CRC(7d123f3e) SHA1(f9752e96515dc965aae04e01dfa813fcc4cbccd6) )
 	ROM_LOAD( "123e06.26n", 0x100000, 0x080000, CRC(fa50121e) SHA1(4596a9b0a6cc67f259182098d3976234b6ed8cb6) )
 
-	/* K053936 map data */
+	// K053936 map data
 	ROM_REGION( 0xa0000, "gfx4", 0 )
 	ROM_LOAD( "123e01.36j", 0x000000, 0x20000, CRC(9dbc9678) SHA1(4183eb833d0d1cd710fac32071df7ebcb7a9c812) )
 	ROM_LOAD( "123e02.34j", 0x020000, 0x40000, CRC(b8e3f500) SHA1(254c665b7aa534990e899fe8f54c3f24e8126fba) )
 	ROM_LOAD( "123e03.36m", 0x060000, 0x40000, CRC(fde4749f) SHA1(7f9c09d11dcb16d72046c7605570c3a29e279fa9) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "123e14.2g", 0x000000, 0x200000, CRC(65dfd3ff) SHA1(57e13c05f420747c1c2010cc5340dd70e2c28971) )
 	ROM_LOAD( "123e15.2m", 0x200000, 0x200000, CRC(7017ff07) SHA1(37ecd54f2c757c5385305ab726d9f66aa1afd456) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "gaiapols.nv", 0x0000, 0x080, CRC(44c78184) SHA1(19343b47b60bf4e212d844fce28e7a1bd54c7012) )
 ROM_END
 
 ROM_START( gaiapolsu )
-	/* main program */
+	// main program
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "123e07.24m", 0x000000, 0x100000, CRC(f1a1db0f) SHA1(1394b8a57493cbc8d5bf555d363ad844a2407d98) )
 	ROM_LOAD16_BYTE( "123e09.19l", 0x000001, 0x100000, CRC(4b3b57e7) SHA1(1415ddc1393a468705d7a37d054ab6b08d0eb205) )
 
-	/* 68k data */
+	// 68k data
 	ROM_LOAD16_BYTE( "123uaf11.19p", 0x200000, 0x040000, CRC(39dc1298) SHA1(ce9e41ac6f52e20f13ad86fb0d47c0d6e838250e) )
 	ROM_LOAD16_BYTE( "123uaf12.17p", 0x200001, 0x040000, CRC(c633cf52) SHA1(370be5557a271699342b7d771ebadf7021a27ae3) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("123e13.9c", 0x00000, 0x40000, CRC(e772f822) SHA1(2a5cdfc0aacad56cbef8bdbe8319e7ff4ab71eee) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "123e16.2t", 0x000000, 0x100000, CRC(a3238200) SHA1(9ea073f7611b5c0b328c707c97ef174634c303bc) )
 	ROM_LOADTILE_WORD( "123e17.2x", 0x000002, 0x100000, CRC(bd0b9fb9) SHA1(1714c19d2123b8fd4cfedb66d13bdcee6fc77576) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "123e19.34u", 0x000000, 0x200000, CRC(219a7c26) SHA1(0f24873523f91379862e0d4317fc42b8a10d412e) )
 	ROM_LOAD64_WORD( "123e21.34y", 0x000002, 0x200000, CRC(1888947b) SHA1(41a046cbcd2406add2ff48cb82a1353d9ac5fa3c) )
 	ROM_LOAD64_WORD( "123e18.36u", 0x000004, 0x200000, CRC(3719b6d4) SHA1(25ef6e8c3c7f151f1cee063356bdd56c713356ea) )
 	ROM_LOAD64_WORD( "123e20.36y", 0x000006, 0x200000, CRC(490a6f64) SHA1(81b1acc74ce834399005a748eae50b3d633fa469) )
 
-	/* K053536 roz tiles */
+	// K053536 ROZ tiles
 	ROM_REGION( 0x180000, "gfx3", 0 )
 	ROM_LOAD( "123e04.32n", 0x000000, 0x080000, CRC(0d4d5b8b) SHA1(d3fb0c77ad46ee9b9c704be6f174258aa051aa71) )
 	ROM_LOAD( "123e05.29n", 0x080000, 0x080000, CRC(7d123f3e) SHA1(f9752e96515dc965aae04e01dfa813fcc4cbccd6) )
 	ROM_LOAD( "123e06.26n", 0x100000, 0x080000, CRC(fa50121e) SHA1(4596a9b0a6cc67f259182098d3976234b6ed8cb6) )
 
-	/* K053936 map data */
+	// K053936 map data
 	ROM_REGION( 0xa0000, "gfx4", 0 )
 	ROM_LOAD( "123e01.36j", 0x000000, 0x20000, CRC(9dbc9678) SHA1(4183eb833d0d1cd710fac32071df7ebcb7a9c812) )
 	ROM_LOAD( "123e02.34j", 0x020000, 0x40000, CRC(b8e3f500) SHA1(254c665b7aa534990e899fe8f54c3f24e8126fba) )
 	ROM_LOAD( "123e03.36m", 0x060000, 0x40000, CRC(fde4749f) SHA1(7f9c09d11dcb16d72046c7605570c3a29e279fa9) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "123e14.2g", 0x000000, 0x200000, CRC(65dfd3ff) SHA1(57e13c05f420747c1c2010cc5340dd70e2c28971) )
 	ROM_LOAD( "123e15.2m", 0x200000, 0x200000, CRC(7017ff07) SHA1(37ecd54f2c757c5385305ab726d9f66aa1afd456) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "gaiapolsu.nv", 0x0000, 0x080, CRC(7ece27b6) SHA1(f0671c5e6db665c86afcef563ff1dbcbf083b380) )
 ROM_END
 
 ROM_START( gaiapolsj )
-	/* main program */
+	// main program
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "123e07.24m", 0x000000, 0x100000, CRC(f1a1db0f) SHA1(1394b8a57493cbc8d5bf555d363ad844a2407d98) )
 	ROM_LOAD16_BYTE( "123e09.19l", 0x000001, 0x100000, CRC(4b3b57e7) SHA1(1415ddc1393a468705d7a37d054ab6b08d0eb205) )
 
-	/* 68k data */
+	// 68k data
 	ROM_LOAD16_BYTE( "123jaf11.19p", 0x200000, 0x040000, CRC(19919571) SHA1(e4fbbdd4003f18631e5723bb85a7fa60e57f2d2a) )
 	ROM_LOAD16_BYTE( "123jaf12.17p", 0x200001, 0x040000, CRC(4246e595) SHA1(d5fe0b1dfe2a0c64b3e62820dea5094cc0f5bd12) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("123e13.9c", 0x00000, 0x40000, CRC(e772f822) SHA1(2a5cdfc0aacad56cbef8bdbe8319e7ff4ab71eee) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "123e16.2t", 0x000000, 0x100000, CRC(a3238200) SHA1(9ea073f7611b5c0b328c707c97ef174634c303bc) )
 	ROM_LOADTILE_WORD( "123e17.2x", 0x000002, 0x100000, CRC(bd0b9fb9) SHA1(1714c19d2123b8fd4cfedb66d13bdcee6fc77576) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "123e19.34u", 0x000000, 0x200000, CRC(219a7c26) SHA1(0f24873523f91379862e0d4317fc42b8a10d412e) )
 	ROM_LOAD64_WORD( "123e21.34y", 0x000002, 0x200000, CRC(1888947b) SHA1(41a046cbcd2406add2ff48cb82a1353d9ac5fa3c) )
 	ROM_LOAD64_WORD( "123e18.36u", 0x000004, 0x200000, CRC(3719b6d4) SHA1(25ef6e8c3c7f151f1cee063356bdd56c713356ea) )
 	ROM_LOAD64_WORD( "123e20.36y", 0x000006, 0x200000, CRC(490a6f64) SHA1(81b1acc74ce834399005a748eae50b3d633fa469) )
 
-	/* K053536 roz tiles */
+	// K053536 ROZ tiles
 	ROM_REGION( 0x180000, "gfx3", 0 )
 	ROM_LOAD( "123e04.32n", 0x000000, 0x080000, CRC(0d4d5b8b) SHA1(d3fb0c77ad46ee9b9c704be6f174258aa051aa71) )
 	ROM_LOAD( "123e05.29n", 0x080000, 0x080000, CRC(7d123f3e) SHA1(f9752e96515dc965aae04e01dfa813fcc4cbccd6) )
 	ROM_LOAD( "123e06.26n", 0x100000, 0x080000, CRC(fa50121e) SHA1(4596a9b0a6cc67f259182098d3976234b6ed8cb6) )
 
-	/* K053936 map data */
+	// K053936 map data
 	ROM_REGION( 0xa0000, "gfx4", 0 )
 	ROM_LOAD( "123e01.36j", 0x000000, 0x20000, CRC(9dbc9678) SHA1(4183eb833d0d1cd710fac32071df7ebcb7a9c812) )
 	ROM_LOAD( "123e02.34j", 0x020000, 0x40000, CRC(b8e3f500) SHA1(254c665b7aa534990e899fe8f54c3f24e8126fba) )
 	ROM_LOAD( "123e03.36m", 0x060000, 0x40000, CRC(fde4749f) SHA1(7f9c09d11dcb16d72046c7605570c3a29e279fa9) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "123e14.2g", 0x000000, 0x200000, CRC(65dfd3ff) SHA1(57e13c05f420747c1c2010cc5340dd70e2c28971) )
 	ROM_LOAD( "123e15.2m", 0x200000, 0x200000, CRC(7017ff07) SHA1(37ecd54f2c757c5385305ab726d9f66aa1afd456) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "gaiapolsj.nv", 0x0000, 0x080, CRC(c4b970df) SHA1(d4a24b4950ee33a832342c752c24b58e033d9240) )
 ROM_END
 
 ROM_START( mmaulers )
-	/* main program */
+	// main program
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "170eaa07.24m", 0x000000, 0x80000, CRC(5458bd93) SHA1(d27a29076be3c745e3efdb1c528b07bd5d8aff1c) )
 	ROM_LOAD16_BYTE( "170eaa09.19l", 0x000001, 0x80000, CRC(99c95c7b) SHA1(7f22930c2fe21205ccd01b80566d6bc31fea34d2) )
 	ROM_LOAD16_BYTE( "170a08.21m",   0x100000, 0x40000, CRC(03c59ba2) SHA1(041473fe5f9004bfb7ca767c2004154c27f726ff) )
 	ROM_LOAD16_BYTE( "170a10.17l",   0x100001, 0x40000, CRC(8a340909) SHA1(3e2ef2642e792cdc38b3442df67377ed9e70d3ab) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("170a13.9c", 0x00000, 0x40000, CRC(2ebf4d1c) SHA1(33a3f4153dfdc46cc223d216a17ef9428c09129d) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "170a16.2t", 0x000000, 0x100000, CRC(41fee912) SHA1(73cf167ac9fc42cb8048a87b6c6d1c3c0ae3c2e2) )
 	ROM_LOADTILE_WORD( "170a17.2x", 0x000002, 0x100000, CRC(96957c91) SHA1(b12d356f8a015ec0984bdb86da9c569eb0c67880) )
 	ROM_LOADTILE_BYTE( "170a24.5r", 0x000004, 0x080000, CRC(562ad4bd) SHA1(f55b29142ea39f090244f0945a56760bab25c7a7) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "170a19.34u", 0x000000, 0x200000, CRC(be835141) SHA1(b76e1da45bf602dd9eb30fb8b7181cea2e820c3d) )
 	ROM_LOAD64_WORD( "170a21.34y", 0x000002, 0x200000, CRC(bcb68136) SHA1(1d453f59d832b8ea99cf0a60a917edce5c1c90a0) )
@@ -2289,45 +2289,93 @@ ROM_START( mmaulers )
 	ROM_LOAD16_BYTE( "170a23.29y", 0x800000, 0x100000, CRC(6b5390e4) SHA1(0c5066bc86e782db4b64c2a604aed89ae99af005) )
 	ROM_LOAD16_BYTE( "170a22.32y", 0x800001, 0x100000, CRC(21628106) SHA1(1e025ff53caa5cbbf7695f8a77736d59f8a8af1b) )
 
-	/* K053536 roz plane */
+	// K053536 ROZ plane
 	ROM_REGION( 0x180000, "gfx3", 0 )
 	ROM_LOAD( "170a04.33n", 0x000000, 0x80000, CRC(64b9a73b) SHA1(8b984bfd8bdf6d93ad223fca46a4f958a0edb2be) )
 	ROM_LOAD( "170a05.30n", 0x080000, 0x80000, CRC(f2c101d0) SHA1(d80045c9a02db08ea6c851bdc12826862e11c381) )
 	ROM_LOAD( "170a06.27n", 0x100000, 0x80000, CRC(b032e59b) SHA1(482300c683db20c2b2fc6e007b8f7e35373e3c00) )
 
-	/* K053936 tilemap data */
+	// K053936 tilemap data
 	ROM_REGION( 0x80000, "gfx4", 0 )
 	ROM_LOAD( "170a02.34j", 0x000000, 0x40000, CRC(b040cebf) SHA1(4d1ba4ee60fd7caf678837ec6f4d68fcbce1ccf2) )
 	ROM_LOAD( "170a03.36m", 0x040000, 0x40000, CRC(7fb412b2) SHA1(f603a8f0becf88e345f4b7a68cf018962a255a1e) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD("170a14.2g", 0x000000, 0x200000, CRC(83317cda) SHA1(c5398c5959ef3ea73835e13db69660dd28c31486) )
 	ROM_LOAD("170a15.2m", 0x200000, 0x200000, CRC(d4113ae9) SHA1(e234d06f462e3db64455c384c2f42174f9ef9c6a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "mmaulers.nv", 0x0000, 0x080, CRC(8324f517) SHA1(4697d091a1924e1a5d6c3ffc64a40fd36eebe557) )
 ROM_END
 
+ROM_START( mmaulersu )
+	// main program
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "170uaa07.24m", 0x000000, 0x80000, CRC(50164e3b) SHA1(47bec109e42a6c0040d6e2da651428c30d43e30d) )
+	ROM_LOAD16_BYTE( "170uaa09.19l", 0x000001, 0x80000, CRC(f9f161d5) SHA1(52ed1bded6dc3bafddc1e37d0974cfca054bffd4) )
+	ROM_LOAD16_BYTE( "170a08.21m",   0x100000, 0x40000, CRC(03c59ba2) SHA1(041473fe5f9004bfb7ca767c2004154c27f726ff) )
+	ROM_LOAD16_BYTE( "170a10.17l",   0x100001, 0x40000, CRC(8a340909) SHA1(3e2ef2642e792cdc38b3442df67377ed9e70d3ab) )
+
+	// sound program
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD("170a13.9c", 0x00000, 0x40000, CRC(2ebf4d1c) SHA1(33a3f4153dfdc46cc223d216a17ef9428c09129d) )
+
+	// tiles
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
+	ROM_LOADTILE_WORD( "170a16.2t", 0x000000, 0x100000, CRC(41fee912) SHA1(73cf167ac9fc42cb8048a87b6c6d1c3c0ae3c2e2) )
+	ROM_LOADTILE_WORD( "170a17.2x", 0x000002, 0x100000, CRC(96957c91) SHA1(b12d356f8a015ec0984bdb86da9c569eb0c67880) )
+	ROM_LOADTILE_BYTE( "170a24.5r", 0x000004, 0x080000, CRC(562ad4bd) SHA1(f55b29142ea39f090244f0945a56760bab25c7a7) )
+
+	// sprites
+	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
+	ROM_LOAD64_WORD( "170a19.34u", 0x000000, 0x200000, CRC(be835141) SHA1(b76e1da45bf602dd9eb30fb8b7181cea2e820c3d) )
+	ROM_LOAD64_WORD( "170a21.34y", 0x000002, 0x200000, CRC(bcb68136) SHA1(1d453f59d832b8ea99cf0a60a917edce5c1c90a0) )
+	ROM_LOAD64_WORD( "170a18.36u", 0x000004, 0x200000, CRC(e1e3c8d2) SHA1(2c94fcedd1dcef3d3332af358ae8a67dea507216) )
+	ROM_LOAD64_WORD( "170a20.36y", 0x000006, 0x200000, CRC(ccb4d88c) SHA1(064b4dab0ca6e5a1fa2fc2e9bbb19c7499830ee1) )
+	ROM_LOAD16_BYTE( "170a23.29y", 0x800000, 0x100000, CRC(6b5390e4) SHA1(0c5066bc86e782db4b64c2a604aed89ae99af005) )
+	ROM_LOAD16_BYTE( "170a22.32y", 0x800001, 0x100000, CRC(21628106) SHA1(1e025ff53caa5cbbf7695f8a77736d59f8a8af1b) )
+
+	// K053536 ROZ plane
+	ROM_REGION( 0x180000, "gfx3", 0 )
+	ROM_LOAD( "170a04.33n", 0x000000, 0x80000, CRC(64b9a73b) SHA1(8b984bfd8bdf6d93ad223fca46a4f958a0edb2be) )
+	ROM_LOAD( "170a05.30n", 0x080000, 0x80000, CRC(f2c101d0) SHA1(d80045c9a02db08ea6c851bdc12826862e11c381) )
+	ROM_LOAD( "170a06.27n", 0x100000, 0x80000, CRC(b032e59b) SHA1(482300c683db20c2b2fc6e007b8f7e35373e3c00) )
+
+	// K053936 tilemap data
+	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_LOAD( "170a02.34j", 0x000000, 0x40000, CRC(b040cebf) SHA1(4d1ba4ee60fd7caf678837ec6f4d68fcbce1ccf2) )
+	ROM_LOAD( "170a03.36m", 0x040000, 0x40000, CRC(7fb412b2) SHA1(f603a8f0becf88e345f4b7a68cf018962a255a1e) )
+
+	// sound data
+	ROM_REGION( 0x400000, "k054539", 0 )
+	ROM_LOAD("170a14.2g", 0x000000, 0x200000, CRC(83317cda) SHA1(c5398c5959ef3ea73835e13db69660dd28c31486) )
+	ROM_LOAD("170a15.2m", 0x200000, 0x200000, CRC(d4113ae9) SHA1(e234d06f462e3db64455c384c2f42174f9ef9c6a) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
+	ROM_LOAD( "mmaulersu.nv", 0x0000, 0x080, CRC(dce91748) SHA1(17b2c2b5b699d3e875c6e2e3dbd81401ca3517d4) )
+ROM_END
+
+
 ROM_START( dadandrn )
-	/* main program */
+	// main program
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "170jaa07.24m", 0x000000, 0x80000, CRC(6a55e828) SHA1(06be9a45fdddcc826a33ff8d6eb595e11b98a31f) )
 	ROM_LOAD16_BYTE( "170jaa09.19l", 0x000001, 0x80000, CRC(9e821cd8) SHA1(51e9c3b0a187db62cfcdff23ecaf3205f368f4e0) )
 	ROM_LOAD16_BYTE( "170a08.21m",   0x100000, 0x40000, CRC(03c59ba2) SHA1(041473fe5f9004bfb7ca767c2004154c27f726ff) )
 	ROM_LOAD16_BYTE( "170a10.17l",   0x100001, 0x40000, CRC(8a340909) SHA1(3e2ef2642e792cdc38b3442df67377ed9e70d3ab) )
 
-	/* sound program */
+	// sound program
 	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD("170a13.9c", 0x00000, 0x40000, CRC(2ebf4d1c) SHA1(33a3f4153dfdc46cc223d216a17ef9428c09129d) )
 
-	/* tiles */
+	// tiles
 	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "170a16.2t", 0x000000, 0x100000, CRC(41fee912) SHA1(73cf167ac9fc42cb8048a87b6c6d1c3c0ae3c2e2) )
 	ROM_LOADTILE_WORD( "170a17.2x", 0x000002, 0x100000, CRC(96957c91) SHA1(b12d356f8a015ec0984bdb86da9c569eb0c67880) )
 	ROM_LOADTILE_BYTE( "170a24.5r", 0x000004, 0x080000, CRC(562ad4bd) SHA1(f55b29142ea39f090244f0945a56760bab25c7a7) )
 
-	/* sprites */
+	// sprites
 	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "170a19.34u", 0x000000, 0x200000, CRC(be835141) SHA1(b76e1da45bf602dd9eb30fb8b7181cea2e820c3d) )
 	ROM_LOAD64_WORD( "170a21.34y", 0x000002, 0x200000, CRC(bcb68136) SHA1(1d453f59d832b8ea99cf0a60a917edce5c1c90a0) )
@@ -2336,23 +2384,23 @@ ROM_START( dadandrn )
 	ROM_LOAD16_BYTE( "170a23.29y", 0x800000, 0x100000, CRC(6b5390e4) SHA1(0c5066bc86e782db4b64c2a604aed89ae99af005) )
 	ROM_LOAD16_BYTE( "170a22.32y", 0x800001, 0x100000, CRC(21628106) SHA1(1e025ff53caa5cbbf7695f8a77736d59f8a8af1b) )
 
-	/* K053536 roz plane */
+	// K053536 ROZ plane
 	ROM_REGION( 0x180000, "gfx3", 0 )
 	ROM_LOAD( "170a04.33n", 0x000000, 0x80000, CRC(64b9a73b) SHA1(8b984bfd8bdf6d93ad223fca46a4f958a0edb2be) )
 	ROM_LOAD( "170a05.30n", 0x080000, 0x80000, CRC(f2c101d0) SHA1(d80045c9a02db08ea6c851bdc12826862e11c381) )
 	ROM_LOAD( "170a06.27n", 0x100000, 0x80000, CRC(b032e59b) SHA1(482300c683db20c2b2fc6e007b8f7e35373e3c00) )
 
-	/* K053936 tilemap data */
+	// K053936 tilemap data
 	ROM_REGION( 0x80000, "gfx4", 0 )
 	ROM_LOAD( "170a02.34j", 0x000000, 0x40000, CRC(b040cebf) SHA1(4d1ba4ee60fd7caf678837ec6f4d68fcbce1ccf2) )
 	ROM_LOAD( "170a03.36m", 0x040000, 0x40000, CRC(7fb412b2) SHA1(f603a8f0becf88e345f4b7a68cf018962a255a1e) )
 
-	/* sound data */
+	// sound data
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD("170a14.2g", 0x000000, 0x200000, CRC(83317cda) SHA1(c5398c5959ef3ea73835e13db69660dd28c31486) )
 	ROM_LOAD("170a15.2m", 0x200000, 0x200000, CRC(d4113ae9) SHA1(e234d06f462e3db64455c384c2f42174f9ef9c6a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "dadandrn.nv", 0x0000, 0x080, CRC(346ae0cf) SHA1(1f79b2e21766f7a971c7d0f618700deb8a32f78a) )
 ROM_END
 
@@ -2364,6 +2412,7 @@ GAME( 1993, mystwarra,    mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_
 GAME( 1993, mystwarraa,   mystwarr, mystwarr,   mystwarr, mystwarr_state, empty_init, ROT0,  "Konami",  "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, mmaulers,     0,        dadandrn,   dadandrn, mystwarr_state, empty_init, ROT0,  "Konami",  "Monster Maulers (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mmaulersu,    mmaulers, dadandrn,   dadandrn, mystwarr_state, empty_init, ROT0,  "Konami",  "Monster Maulers (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, dadandrn,     mmaulers, dadandrn,   dadandrn, mystwarr_state, empty_init, ROT0,  "Konami",  "Kyukyoku Sentai Dadandarn (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, viostorm,     0,        viostorm,   viostorm, mystwarr_state, empty_init, ROT0,  "Konami",  "Violent Storm (ver EAC)", MACHINE_IMPERFECT_GRAPHICS )

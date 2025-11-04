@@ -33,18 +33,99 @@ Flying Age           NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=34
 Halloween Party     YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=35
 Olympian Games      YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=36
 The Circus           NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=37
-Treasure Hunting     NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=38
+Treasure Hunting    YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=38
 World War II         NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=39
 Ra's Scepter        YES
 Hawaii              YES
 
 Notes:
-* Is "Hawaii" the same game as "Treasure Hunting"?
 * The dslayrr sets appear to be pre-setup, have passwords set(?)
 * Game information in the rom entries comes from `AstroGame/data/setup2.txt` or `AstroGame/INF.ini`
 
-*/
+***ASTRO PASSWORDS***
 
+rasce: Ra's Scepter
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | No Use  | 1          | 197456  | 2          | 620630  |
+| 3          | 358461  | 4          | 681043  | 5          | 427638  |
+| 6          | 851976  | 7          | 725631  |            |         |
++------------+---------+------------+---------+------------+---------+
+
+blackbd: Black Beard
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | No Use  | 1          | 503954  | 2          | 962167  |
+| 3          | 198570  | 4          | 393719  | 5          | 619234  |
+| 6          | 473581  | 7          | 715992  |            |         |
++------------+---------+------------+---------+------------+---------+
+
+hawaii: Hawaii
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | No Use  | 1          | 743910  | 2          | 581237  |
+| 3          | 942658  | 4          | 621071  | 5          | 025376  |
+| 6          | 291165  | 7          | 139766  |            |         |
++------------+---------+------------+---------+------------+---------+
+
+dslayrr: Dragon Slayer
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | No Use  | 1          | 219570  | 2          | 092917  |
+| 3          | 591323  | 4          | 783627  | 5          | 971135  |
+| 6          | 243755  | 7          | 868149  |            |         |
++------------+---------+------------+---------+------------+---------+
+
+oligam: Olympian Games
++------------+-------+------------+-------+------------+-------+
+| Password # | Code  | Password # | Code  | Password # | Code  |
++------------+-------+------------+-------+------------+-------+
+| OFF (0)    | NoUse | 1          | 7816  | 2          | 3149  |
+| 3          | 5937  | 4          | 1314  | 5          | 8940  |
+| 6          | 7352  | 7          | 6301  |            |       |
++------------+-------+------------+-------+------------+-------+
+
+hwparty: Halloween Party
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | NoUse   | 1          | 694358  | 2          | 445385  |
+| 3          | 795213  | 4          | 584168  | 5          | 691423  |
+| 6          | 381139  | 7          | 814868  |            |         |
++------------+---------+------------+---------+------------+---------+
+
+treasurh: Treasure Hunting
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | NoUse   | 1          | 785314  | 2          | 685423  |
+| 3          | 154753  | 4          | 984258  | 5          | 356274  |
+| 6          | 218415  | 7          | 594156  |            |         |
++------------+---------+------------+---------+------------+---------+
+
+carnivac: Carnival
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | NoUse   | 1          | 632419  | 2          | 705642  |
+| 3          | 187396  | 4          | 521879  | 5          | 937364  |
+| 6          | 306471  | 7          | 891026  |            |         |
++------------+---------+------------+---------+------------+---------+
+
+santacl: Santa Claus
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | NoUse   | 1          | 642614  | 2          | 389713  |
+| 3          | 112369  | 4          | 357899  | 5          | 962346  |
+| 6          | 789113  | 7          | 230125  |            |         |
++------------+---------+------------+---------+------------+---------+
+
+*/
 
 #include "emu.h"
 
@@ -104,7 +185,7 @@ void astropc_state::astropc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &astropc_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:12.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	// TODO: copied from misc/matrix.cpp, verify if this has a working super I/O
+	// TODO: copied from misc/matrix.cpp, should really use fdc37c93x instead
 	DS1287(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->set_binary(true);
 	m_rtc->set_epoch(1980);
@@ -322,6 +403,22 @@ ROM_START( hwparty )
 	ROM_LOAD( "halloween_us.23.a.img", 0x0000, 0x7a80000, CRC(65d3877f) SHA1(076035bd55189a186368ae42463ab7471be1583c) )
 ROM_END
 
+ // Pallas GX1 REV:B - AMD Geode CS5530A-UCE, SMC FDC37C932APM. Sub board with ROMs, ASTRO M and ASTRO V102PX-013 customs
+ROM_START( treasurh )
+	// GAME NAME    : TREASURE HUNTING
+	// GAME TYPE    : MULTI-LINER
+	// DEVELOPER    : ASTRO CORP
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0) /* motherboard bios */
+	ROM_LOAD( "phoenixbios_e586 bios.u16", 0x0000, 0x040000, CRC(885e3cde) SHA1(ff90cda4383a119c7f54545c11fa432505e66c1b) )
+
+	ROM_REGION(0x20000, "rom", 0) // on subboard
+	ROM_LOAD16_BYTE( "thus-47.1", 0x00000, 0x010000, CRC(49951369) SHA1(b9362b3046f2e3f974ec1c40fb2dabd42406f359) )
+	ROM_LOAD16_BYTE( "thus-47.2", 0x00001, 0x010000, CRC(6700e29b) SHA1(97f8e1738e9257f831f11d9fb609f4fcabc0318e) )
+
+	ROM_REGION(0x8000000, "drive", 0)
+	ROM_LOAD( "halloween_us.23.a.img", 0x0000000, 0x3d20000, CRC(6ebf4568) SHA1(f0db56d8f7ba9969570a108159ec4621a57a392c) )
+ROM_END
+
 
 // The following games use an Artemis II sub board and may need to be moved to a separate driver
 // The Artemis II sub board has 2x M68K ROMs and 2x LY621024SL RAMs on the upper side,
@@ -383,6 +480,8 @@ GAME( 2004,  hawaii,   0,       astropc, astropc, astropc_state, init_astropc, R
 GAME( 2005,  oligam,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Olympian Games (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 2005,  rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Ra's Scepter (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 2005,  treasurh, 0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Treasure Hunting (US.09.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Artemis II games

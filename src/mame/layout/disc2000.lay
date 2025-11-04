@@ -261,7 +261,7 @@ license:CC0-1.0
 		</element>
 
 
-		<element name="lamp1" ref="ladder">
+		<element name="lamp01" ref="ladder">
 			<bounds x="175" y="320" width="45" height="25" />
 		</element>
 
