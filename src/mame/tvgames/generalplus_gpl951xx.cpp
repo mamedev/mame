@@ -256,6 +256,11 @@ ROM_START( pokebala )
 	ROM_LOAD16_WORD_SWAP( "mx25l25645g.u4", 0x0000, 0x2000000, CRC(e35d434a) SHA1(74061831b25476ec8aa7dec5f9d64ff79b0db88e) )
 ROM_END
 
+ROM_START( pokeissh )
+	ROM_REGION16_BE(0x2000000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l25645g.u1", 0x0000, 0x2000000, CRC(1eaf3457) SHA1(a7f16ad7abfc13c67d8e50f462882a771b6777ab) )
+ROM_END
+
 ROM_START( smkcatch )
 	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "gpr25l64.u2", 0x0000, 0x800000,  CRC(e2f52c4a) SHA1(f79862d27152cff8f96151c672d9762a3897a593) )
@@ -366,6 +371,8 @@ CONS(2021, punistar, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplu
 CONS(2021, pokgoget, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball Go! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // ガチッとゲットだぜ! モンスターボール
 CONS(2021, pokebala, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(2021, pokeissh, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Pokemon to Issho! Pokeball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // 2020 (device) / 2021 (box) version of Sumikko Gurashi a cloud shaped device
 // Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)

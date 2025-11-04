@@ -347,6 +347,11 @@ ROM_START( tmydistb )
 	ROM_LOAD( "gpr25l64.u5", 0x0000, 0x800000, CRC(01e5a892) SHA1(b9164173e707eb69cd7d50ce69f3368de7e7390f) )
 ROM_END
 
+ROM_START( banaquap )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u8", 0x0000, 0x800000, CRC(3a434fe0) SHA1(34c55bebe7451d9046311b6c704e0e66347f5a39) )
+ROM_END
+
 ROM_START( intrtvg )
 	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
@@ -445,6 +450,11 @@ ROM_START( segdis16 )
 
 	DISK_REGION( "sdcard" ) // 8GB SD Card (might just be user data)
 	DISK_IMAGE( "segdis16", 0, SHA1(63cf1290c8ed78355b96b4e23885d11d7e2bd25d) )
+ROM_END
+
+ROM_START( segcarsh )
+	ROM_REGION( 0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx25l12833.sfrom1", 0x0000, 0x1000000, CRC(46a350fc) SHA1(1efa026abce3f2bd8a7e32519c4705dbdcfc5919) )
 ROM_END
 
 
@@ -546,6 +556,9 @@ CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_g
 // ドラえもんステップアップパソコン
 CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Step Up PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// uses GPL32630A has GPspispi header  マーメイドアクアポット
+CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge PreCure Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
 // company is called 深圳市飞讯互动科技有限公司
 // surface details erased on SoC for both of these
 // very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
@@ -606,6 +619,9 @@ CONS( 2021, sumipc21,            0,        0,      gpl32612, gpl32612, generalpl
 // uses GPL32611
 // ディズニーキャラクターズ マジカルパッド ～ガールズレッスン～
 CONS( 2016, segdis16,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney Characters Magical Pad -Girls Lesson- (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32611
+CONS( 201?, segcarsh,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney Cars Shake It! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32600A
 // マウスでバトル!! 恐竜図鑑パソコン
