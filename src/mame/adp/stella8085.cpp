@@ -28,12 +28,12 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8256.h"
 #include "machine/i8279.h"
 #include "machine/mc146818.h"
 #include "machine/msm6242.h"
-#include "bus/rs232/rs232.h"
 #include "sound/beep.h"
 
 #include "speaker.h"
