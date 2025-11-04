@@ -258,8 +258,8 @@ void i8256_device::reset_timer()
 	{
 		divider = 1024;
 	}
-	const attotime time = attotime::from_hz((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) / divider);
-	m_timer->adjust(time, 0, time);
+	const attotime TIME = attotime::from_hz((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) / divider);
+	m_timer->adjust(TIME, 0, TIME);
 }
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
