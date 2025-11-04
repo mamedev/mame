@@ -301,7 +301,7 @@ uint8_t servicet_state::gsg_scramble(uint8_t data)
 
 uint8_t servicet_state::gsg_r(offs_t offset)
 {
-	uint8_t data = std::rand();
+	uint8_t data = 0xff;
 
 	switch (offset & 0x70)
 	{
