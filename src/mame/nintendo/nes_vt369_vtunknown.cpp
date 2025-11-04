@@ -832,6 +832,14 @@ ROM_START( lxcypkpp ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcypkfz ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl1895fz.u2", 0x00000, 0x4000000, CRC(6346a6cb) SHA1(a8172119fa49c90813f9a2b4341abbb4bd86f8ab) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+
 ROM_START( lxcmc250 ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
@@ -1279,6 +1287,7 @@ CONS( 200?, lxcmcyfzb, lxcmcyfz,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_s
 CONS( 201?, lxcypkdp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Disney Princess (JL1895DP)", MACHINE_NOT_WORKING )
 CONS( 201?, lxcypksp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Spider-Man (JL1895SP-2)", MACHINE_NOT_WORKING )
 CONS( 201?, lxcypkpp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Paw Patrol (JL1895PA)", MACHINE_NOT_WORKING )
+CONS( 201?, lxcypkfz,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Frozen (JL1895FZ)", MACHINE_NOT_WORKING )
 
 CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse (JL2800MN)", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes (JL2800PL)", MACHINE_NOT_WORKING )
