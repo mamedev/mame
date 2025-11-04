@@ -621,7 +621,7 @@ license:CC0-1.0
 		<group ref="knob"><bounds x="209" y="115" width="77" height="77"/></group>
 		<element ref="rate_text"><bounds x="235" y="196" width="28" height="12"/></element>
 
-		<element ref="led" name="led_lfo1"><bounds x="292" y="108" width="11" height="11"/></element>
+		<element ref="led" name="7.a"><bounds x="292" y="108" width="11" height="11"/></element>
 
 		<element ref="button" inputtag="ROW2" inputmask="0x20"><!-- SHAPE --><bounds x="320" y="142" width="45" height="45"/></element>
 		<element ref="shape_text"><bounds x="325" y="196" width="36" height="12"/></element>
@@ -670,7 +670,7 @@ license:CC0-1.0
 		<group ref="knob"><bounds x="209" y="360" width="77" height="77"/></group>
 		<element ref="rate_text"><bounds x="235" y="440" width="28" height="12"/></element>
 
-		<element ref="led" name="led_lfo2"><bounds x="292" y="353" width="11" height="11"/></element>
+		<element ref="led" name="7.a"><bounds x="292" y="353" width="11" height="11"/></element>
 
 		<element ref="button" inputtag="ROW2" inputmask="0x08"><!-- SHAPE --><bounds x="320" y="386" width="45" height="45"/></element>
 		<element ref="shape_text"><bounds x="325" y="440" width="36" height="12"/></element>

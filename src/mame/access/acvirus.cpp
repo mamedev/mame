@@ -94,7 +94,8 @@ public:
 		m_knob(*this, "knob_%u", 0U),
 		m_leds(*this, "leds"),
 		m_scan(0),
-		m_an_select(0)
+		m_an_select(0),
+		m_led_pattern(0)
 	{ }
 
 	void virusa(machine_config &config) ATTR_COLD;
@@ -136,6 +137,7 @@ private:
 
 	u8 m_scan;
 	u8 m_an_select;
+	u8 m_led_pattern;
 };
 
 
@@ -146,6 +148,7 @@ void acvirus_state::machine_start()
 
 	save_item(NAME(m_scan));
 	save_item(NAME(m_an_select));
+	save_item(NAME(m_led_pattern));
 }
 
 void acvirus_state::machine_reset()
@@ -177,15 +180,22 @@ u8 acvirus_state::p4_r()
 
 void acvirus_state::p4_w(u8 data)
 {
+	if (BIT(m_scan, 3))
+	{
+		m_led_pattern = data;
+	}
 	m_leds->write_mx(data);
 }
 
 void acvirus_state::p5_w(u8 data)
 {
-	m_scan = data & 7;
 	m_rombank->set_entry((data >> 4) & 15);
 
-	m_leds->write_my(1 << m_scan);
+	m_scan = data & 15;
+	if (!BIT(data, 3))
+		m_leds->matrix(1 << (m_scan & 7), m_led_pattern);
+	else
+		m_leds->clear();
 }
 
 void acvirus_state::prog_map(address_map &map)
@@ -196,8 +206,9 @@ void acvirus_state::prog_map(address_map &map)
 
 void acvirus_state::data_map(address_map &map)
 {
+	map(0x0000, 0x7fff).ram();
 	map(0x0400, 0x0407).rw(m_dsp, FUNC(dsp563xx_device::hi08_r), FUNC(dsp563xx_device::hi08_w));
-	map(0x0408, 0x7fff).ram(); // TODO: RAM banks
+	map(0x8000, 0xffff).ram(); // TODO: RAM banks
 }
 
 void acvirus_state::dsp_p_map(address_map &map)
@@ -295,7 +306,7 @@ void acvirus_state::virusb(machine_config &config)
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
-	PWM_DISPLAY(config, m_leds).set_size(7, 8);
+	PWM_DISPLAY(config, m_leds).set_size(8, 8);
 
 	DSP56311(config, m_dsp, 108_MHz_XTAL);
 	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
