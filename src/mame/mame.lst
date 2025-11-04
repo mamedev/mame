@@ -28933,9 +28933,11 @@ milton
 raaspec
 vectrex
 
-@source:mips/mips.cpp
+@source:mips/mips_i2000.cpp
 rc2030
 rs2030
+
+@source:mips/mips_r3030.cpp
 rc3230
 rs3230
 
