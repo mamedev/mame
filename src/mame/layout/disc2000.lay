@@ -333,7 +333,7 @@ license:CC0-1.0
 		<element name="lamp01" ref="button_risk" inputtag="INPUTS" inputmask="0x01">
 			<bounds x="395" y="480" width="35" height="35" />
 		</element>
-		
+
 
 
 		<element name="disc02" ref="disk_1symbol">
