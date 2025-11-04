@@ -42,17 +42,20 @@ used XTA (8-bit IDE) harddisks.
 */
 
 #include "emu.h"
-#include "machine/genpc.h"
-#include "machine/pckeybrd.h"
-#include "machine/nvram.h"
-#include "machine/bankdev.h"
+
 #include "pc_t1t.h"
-#include "sound/sn76496.h"
-#include "cpu/i86/i86.h"
-#include "cpu/i86/i286.h"
+
 #include "bus/pc_joy/pc_joy.h"
+#include "cpu/i86/i286.h"
+#include "cpu/i86/i86.h"
+#include "machine/genpc.h"
+#include "machine/nvram.h"
+#include "machine/pckeybrd.h"
+#include "sound/sn76496.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
+
 
 DECLARE_DEVICE_TYPE(T1000_MOTHERBOARD, t1000_mb_device)
 
@@ -73,6 +76,70 @@ void t1000_mb_device::device_start()
 
 DEFINE_DEVICE_TYPE(T1000_MOTHERBOARD, t1000_mb_device, "t1000_mb", "Tandy 1000 Motherboard")
 
+class t1000_keyboard_device : public pc_keyboard_device
+{
+public:
+	t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
+
+DEFINE_DEVICE_TYPE(T1000_KEYB, t1000_keyboard_device, "t1000_keyb", "Tandy 1000 Keyboard")
+
+/* 90-key Tandy Keyboard layout, used on earlier models
+   later models use the Tandy Enhanced Keyboard with a standard 101-key Enhanced AT layout */
+static INPUT_PORTS_START( t1000_keyboard )
+	PORT_INCLUDE(pc_keyboard)
+
+	PORT_MODIFY("pc_keyboard_2")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Up") PORT_CODE(KEYCODE_UP) /*                             29  A9 */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left") PORT_CODE(KEYCODE_LEFT) /*                             2B  AB */
+
+	PORT_MODIFY("pc_keyboard_3")
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE   /* Caps Lock                   3A  BA */
+
+	PORT_MODIFY("pc_keyboard_4")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE /* Num Lock                    45  C5 */
+	/* Hold corresponds to Scroll Lock, but pauses the system when pressed - leaving unmapped by default to avoid conflicting with the UI Toggle key */
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hold")     /*                            46  C6 */
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 \\") PORT_CODE(KEYCODE_7_PAD) /* Keypad 7                    47  C7 */
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 ~") PORT_CODE(KEYCODE_8_PAD) /* Keypad 8                    48  C8 */
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD) /* Keypad 9  (PgUp)            49  C9 */
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Down") PORT_CODE(KEYCODE_DOWN) /*                             4A  CA */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 4 |") PORT_CODE(KEYCODE_4_PAD) /* Keypad 4                    4B  CB */
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 6") PORT_CODE(KEYCODE_6_PAD) /* Keypad 6                    4D  CD */
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Right") PORT_CODE(KEYCODE_RIGHT) /*                             4E  CE */
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 1 (End)") PORT_CODE(KEYCODE_1_PAD) /* Keypad 1  (End)             4F  CF */
+
+	PORT_MODIFY("pc_keyboard_5")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 2 `") PORT_CODE(KEYCODE_2_PAD) /* Keypad 2                    50  D0 */
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 3 (PgDn)") PORT_CODE(KEYCODE_3_PAD) /* Keypad 3  (PgDn)            51  D1 */
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 0") PORT_CODE(KEYCODE_0_PAD) /* Keypad 0                    52  D2 */
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP - (Del)") PORT_CODE(KEYCODE_MINUS_PAD) /* - Delete                    53  D3 */
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_STOP) /* Break                       54  D4 */
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Insert") PORT_CODE(KEYCODE_PLUS_PAD) /* + Insert                    55  D5 */
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_DEL_PAD) /* .                           56  D6 */
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD) /* Enter                       57  D7 */
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME) /* HOME                        58  D8 */
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11) /* F11                         59  D9 */
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12                         5a  Da */
+INPUT_PORTS_END
+
+t1000_keyboard_device::t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_keyboard_device(mconfig, T1000_KEYB, tag, owner, clock)
+{
+	m_type = KEYBOARD_TYPE::PC;
+}
+
+ioport_constructor t1000_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(t1000_keyboard);
+}
+
+
+namespace {
+
 class tandy1000_state : public driver_device
 {
 public:
@@ -84,18 +151,17 @@ public:
 		, m_mb(*this, "mb")
 		, m_video(*this, "pcvideo_t1000")
 		, m_ram(*this, RAM_TAG)
-		, m_vram_bank(0) { }
+		, m_vram_bank(0)
+	{
+	}
 
-	void tandy1000_common(machine_config &config);
-	void tandy1000_90key(machine_config &config);
-	void tandy1000_101key(machine_config &config);
-	void t1000tl(machine_config &config);
-	void t1000tl2(machine_config &config);
-	void t1000sx(machine_config &config);
-	void t1000rl(machine_config &config);
-	void t1000sl2(machine_config &config);
-	void t1000hx(machine_config &config);
-	void t1000tx(machine_config &config);
+	void t1000tl(machine_config &config) ATTR_COLD;
+	void t1000tl2(machine_config &config) ATTR_COLD;
+	void t1000sx(machine_config &config) ATTR_COLD;
+	void t1000rl(machine_config &config) ATTR_COLD;
+	void t1000sl2(machine_config &config) ATTR_COLD;
+	void t1000hx(machine_config &config) ATTR_COLD;
+	void t1000tx(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -103,13 +169,34 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 
-// Memory regions for the machines that support rom banking
-	optional_device<address_map_bank_device> m_biosbank;
+	// Memory regions for the machines that support ROM banking
+	optional_memory_bank m_biosbank;
 
 	required_device<pc_keyboard_device> m_keyboard;
 	required_device<t1000_mb_device> m_mb;
 	required_device<pcvideo_t1000_device> m_video;
 	required_device<ram_device> m_ram;
+
+	struct
+	{
+		uint8_t low = 0, high = 0;
+	} m_eeprom_ee[0x40]; /* only 0 to 4 used in hx, addressing seems to allow this */
+
+	int m_eeprom_state = 0;
+	int m_eeprom_clock = 0;
+	uint8_t m_eeprom_oper = 0;
+	uint16_t m_eeprom_data = 0;
+
+	uint8_t m_tandy_data[8]{};
+
+	uint8_t m_tandy_bios_bank = 0;    /* I/O port FFEAh */
+	uint8_t m_tandy_ppi_porta = 0, m_tandy_ppi_ack = 0;
+	uint8_t m_tandy_ppi_portb = 0, m_tandy_ppi_portc = 0;
+	uint8_t m_vram_bank = 0;
+
+	void tandy1000_common(machine_config &config) ATTR_COLD;
+	void tandy1000_90key(machine_config &config) ATTR_COLD;
+	void tandy1000_101key(machine_config &config) ATTR_COLD;
 
 	void pc_t1t_p37x_w(offs_t offset, uint8_t data);
 	uint8_t pc_t1t_p37x_r(offs_t offset);
@@ -131,24 +218,8 @@ private:
 
 	DECLARE_MACHINE_RESET(tandy1000rl);
 
-	struct
-	{
-		uint8_t low = 0, high = 0;
-	} m_eeprom_ee[0x40]; /* only 0 to 4 used in hx, addressing seems to allow this */
-
-	int m_eeprom_state = 0;
-	int m_eeprom_clock = 0;
-	uint8_t m_eeprom_oper = 0;
-	uint16_t m_eeprom_data = 0;
-
-	uint8_t m_tandy_data[8]{};
-
-	uint8_t m_tandy_bios_bank = 0;    /* I/O port FFEAh */
-	uint8_t m_tandy_ppi_porta = 0, m_tandy_ppi_ack = 0;
-	uint8_t m_tandy_ppi_portb = 0, m_tandy_ppi_portc = 0;
-	uint8_t m_vram_bank = 0;
-	static void cfg_fdc_35(device_t *device);
-	static void cfg_fdc_525(device_t *device);
+	static void cfg_fdc_35(device_t *device) ATTR_COLD;
+	static void cfg_fdc_525(device_t *device) ATTR_COLD;
 
 	void biosbank_map(address_map &map) ATTR_COLD;
 	void tandy1000_16_io(address_map &map) ATTR_COLD;
@@ -397,56 +468,59 @@ uint8_t tandy1000_state::vram_r(offs_t offset)
 void tandy1000_state::vram_w(offs_t offset, uint8_t data)
 {
 	uint8_t vram_base = (m_ram->size() >> 17) - 1;
-	if((m_vram_bank - vram_base) == (offset >> 17))
+	if ((m_vram_bank - vram_base) == (offset >> 17))
 		m_ram->pointer()[offset & 0x1ffff] = data;
 }
 
 void tandy1000_state::tandy1000_set_bios_bank()
 {
+	// TODO: why does this generate a 4-bit bank number when there are only ever eight banks?
 	int bank;
 
-	if ( m_tandy_bios_bank & 0x10 )
-	{
-		if (m_tandy_bios_bank & 0x04 )
-		{
-			bank = (m_tandy_bios_bank & 3) + 8;
-		}
-		else
-		{
-			bank = m_tandy_bios_bank & 3;
-		}
-	}
+	if (BIT(m_tandy_bios_bank, 4))
+		bank = (m_tandy_bios_bank & 0x03) | (BIT(m_tandy_bios_bank, 2) << 3);
 	else
-	{
 		bank = m_tandy_bios_bank & 0x0f;
-	}
 
-	m_biosbank->set_bank( bank );
+	m_biosbank->set_entry(bank & 0x07);
 }
 
 MACHINE_RESET_MEMBER(tandy1000_state, tandy1000rl)
 {
 	m_tandy_bios_bank = 6;
+
 	tandy1000_set_bios_bank();
 }
 
 void tandy1000_state::machine_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128*1024) - 1, &m_ram->pointer()[128*1024]);
-	if(m_maincpu->space(AS_PROGRAM).data_width() == 8)
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)), write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)));
+	if (m_maincpu->space(AS_PROGRAM).data_width() == 8)
+	{
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(
+				m_ram->size() - (128*1024), 640*1024 - 1,
+				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)),
+				write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)));
+	}
 	else
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)), write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
+	{
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(
+				m_ram->size() - (128*1024), 640*1024 - 1,
+				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)),
+				write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)),
+				0xffff);
+	}
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
+
+	if (m_biosbank)
+		m_biosbank->configure_entries(0, 8, memregion("rom")->base(), 0x10000);
 
 	m_eeprom_state = 0;
 }
 
 uint8_t tandy1000_state::tandy1000_bank_r(offs_t offset)
 {
-	uint8_t data = 0xFF;
+	uint8_t data = 0xff;
 
 	logerror( "%s: tandy1000_bank_r: offset = %x\n", machine().describe_context(), offset );
 
@@ -520,67 +594,6 @@ static INPUT_PORTS_START( t1000 )
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 INPUT_PORTS_END
 
-/* 90-key Tandy Keyboard layout, used on earlier models
-   later models use the Tandy Enhanced Keyboard with a standard 101-key Enhanced AT layout */
-static INPUT_PORTS_START( t1000_keyboard )
-	PORT_INCLUDE(pc_keyboard)
-
-	PORT_MODIFY("pc_keyboard_2")
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Up") PORT_CODE(KEYCODE_UP) /*                             29  A9 */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left") PORT_CODE(KEYCODE_LEFT) /*                             2B  AB */
-
-	PORT_MODIFY("pc_keyboard_3")
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE   /* Caps Lock                   3A  BA */
-
-	PORT_MODIFY("pc_keyboard_4")
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE /* Num Lock                    45  C5 */
-	/* Hold corresponds to Scroll Lock, but pauses the system when pressed - leaving unmapped by default to avoid conflicting with the UI Toggle key */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hold")     /*                            46  C6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 \\") PORT_CODE(KEYCODE_7_PAD) /* Keypad 7                    47  C7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 ~") PORT_CODE(KEYCODE_8_PAD) /* Keypad 8                    48  C8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD) /* Keypad 9  (PgUp)            49  C9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Down") PORT_CODE(KEYCODE_DOWN) /*                             4A  CA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 4 |") PORT_CODE(KEYCODE_4_PAD) /* Keypad 4                    4B  CB */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 6") PORT_CODE(KEYCODE_6_PAD) /* Keypad 6                    4D  CD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Right") PORT_CODE(KEYCODE_RIGHT) /*                             4E  CE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 1 (End)") PORT_CODE(KEYCODE_1_PAD) /* Keypad 1  (End)             4F  CF */
-
-	PORT_MODIFY("pc_keyboard_5")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 2 `") PORT_CODE(KEYCODE_2_PAD) /* Keypad 2                    50  D0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 3 (PgDn)") PORT_CODE(KEYCODE_3_PAD) /* Keypad 3  (PgDn)            51  D1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 0") PORT_CODE(KEYCODE_0_PAD) /* Keypad 0                    52  D2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP - (Del)") PORT_CODE(KEYCODE_MINUS_PAD) /* - Delete                    53  D3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_STOP) /* Break                       54  D4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Insert") PORT_CODE(KEYCODE_PLUS_PAD) /* + Insert                    55  D5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_DEL_PAD) /* .                           56  D6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD) /* Enter                       57  D7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME) /* HOME                        58  D8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11) /* F11                         59  D9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12                         5a  Da */
-INPUT_PORTS_END
-
-class t1000_keyboard_device : public pc_keyboard_device
-{
-public:
-	t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-protected:
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-};
-
-DEFINE_DEVICE_TYPE(T1000_KEYB, t1000_keyboard_device, "t1000_keyb", "Tandy 1000 Keyboard")
-
-t1000_keyboard_device::t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pc_keyboard_device(mconfig, T1000_KEYB, tag, owner, clock)
-{
-	m_type = KEYBOARD_TYPE::PC;
-}
-
-ioport_constructor t1000_keyboard_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(t1000_keyboard);
-}
-
 
 
 void tandy1000_state::tandy1000_map(address_map &map)
@@ -606,14 +619,8 @@ void tandy1000_state::tandy1000_bank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
-	map(0xe0000, 0xeffff).m(m_biosbank, FUNC(address_map_bank_device::amap16));
+	map(0xe0000, 0xeffff).bankr(m_biosbank);
 	map(0xf0000, 0xfffff).rom().region("rom", 0x70000);
-}
-
-void tandy1000_state::biosbank_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x80000, 0xfffff).rom().region("rom", 0);
 }
 
 void tandy1000_state::tandy1000_16_io(address_map &map)
@@ -657,7 +664,7 @@ void tandy1000_state::tandy1000_286_bank_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x000fffff);
 	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
-	map(0xe0000, 0xeffff).m(m_biosbank, FUNC(address_map_bank_device::amap16));
+	map(0xe0000, 0xeffff).bankr(m_biosbank);
 	map(0xf0000, 0xfffff).rom().region("rom", 0x70000);
 }
 
@@ -700,6 +707,8 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 	/* video hardware */
 	PCVIDEO_T1000(config, m_video, 0);
 	m_video->set_screen("pcvideo_t1000:screen");
+	m_video->set_chr_gen_tag("gfx1");
+
 	GFXDECODE(config, "gfxdecode", "pcvideo_t1000:palette", gfx_t1000);
 
 	/* sound hardware */
@@ -775,8 +784,6 @@ void tandy1000_state::t1000rl(machine_config &config)
 
 	tandy1000_101key(config);
 
-	ADDRESS_MAP_BANK(config, "biosbank").set_map(&tandy1000_state::biosbank_map).set_options(ENDIANNESS_LITTLE, 16, 20, 0x10000);
-
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
 
 	m_ram->set_extra_options("384K");
@@ -817,8 +824,6 @@ void tandy1000_state::t1000tl(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_286_bank_map);
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_bank_io);
-
-	ADDRESS_MAP_BANK(config, "biosbank").set_map(&tandy1000_state::biosbank_map).set_options(ENDIANNESS_LITTLE, 16, 20, 0x10000);
 }
 
 void tandy1000_state::t1000tx(machine_config &config)
@@ -895,7 +900,7 @@ ROM_END
 
 
 ROM_START( t1000tl )
-	ROM_REGIoN(0x10000, "bios", ROMREGION_ERASE00)
+	ROM_REGION(0x10000, "bios", ROMREGION_ERASE00)
 
 	ROM_REGION(0x80000, "romcs0", 0)
 	// These 2 sets most likely have the same contents
@@ -1003,6 +1008,8 @@ ROM_START( t1000tl2 )
 	ROM_REGION(0x08000,"gfx1", 0)
 	ROM_LOAD("8079027.u24", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
+
+} // anonymous namespace
 
 
 // tandy 1000

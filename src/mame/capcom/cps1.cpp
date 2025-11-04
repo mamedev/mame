@@ -1612,16 +1612,7 @@ INPUT_PORTS_END
    ('Ctrl') or "P1 Button 2" ('Alt') during the bootup test. Button 1 will load the Scroll (Background) test,
    and Button 2 will load an Obj (Sprite) viewer. */
 static INPUT_PORTS_START( ffight )
-	PORT_INCLUDE( cps1_2b )
-
-#if 0
-/* The button below is not officially documented and does not exist on the control panel, probably a leftover.
-   Pressing it will allow you to escape from grabs and choke holds instantly. */
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME ("P1 Button 3 (Cheat)")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME ("P2 Button 3 (Cheat)")
-#endif
+	PORT_INCLUDE( cps1_3b )
 
 	PORT_START("DSWA")
 	CPS1_COINAGE_1( "SW(A)" )

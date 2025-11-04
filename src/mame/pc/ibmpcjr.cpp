@@ -2,6 +2,8 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 
+#include "pc_t1t.h"
+
 #include "cpu/i86/i86.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
@@ -13,7 +15,6 @@
 #include "machine/ram.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
-#include "pc_t1t.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -636,7 +637,10 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	serport.cts_handler().set("ins8250", FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	PCVIDEO_PCJR(config, "pcvideo_pcjr", 0).set_screen("pcvideo_pcjr:screen");
+	auto &video(PCVIDEO_PCJR(config, "pcvideo_pcjr", 0));
+	video.set_screen("pcvideo_pcjr:screen");
+	video.set_chr_gen_tag("gfx1");
+	video.vsync_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr:palette", gfx_pcjr);
 
