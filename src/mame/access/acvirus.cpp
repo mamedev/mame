@@ -87,9 +87,11 @@ public:
 	acvirus_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_banked_ram(*this, "banked_ram", 4 * 0x8000, ENDIANNESS_LITTLE),
 		m_lcdc(*this, "lcdc"),
 		m_dsp(*this, "dsp"),
 		m_rombank(*this, "rombank"),
+		m_rambank(*this, "rambank"),
 		m_row(*this, "ROW%u", 0U),
 		m_knob(*this, "knob_%u", 0U),
 		m_leds(*this, "leds"),
@@ -110,9 +112,11 @@ protected:
 
 private:
 	required_device<sab80c535_device> m_maincpu;
+	memory_share_creator<u8> m_banked_ram;
 	required_device<hd44780_device> m_lcdc;
 	required_device<dsp563xx_device> m_dsp;
 	required_memory_bank m_rombank;
+	required_memory_bank m_rambank;
 	required_ioport_array<4> m_row;
 
 	void prog_map(address_map &map) ATTR_COLD;
@@ -145,6 +149,9 @@ void acvirus_state::machine_start()
 {
 	m_rombank->configure_entries(0, 16, memregion("maincpu")->base(), 0x8000);
 	m_rombank->set_entry(3);
+
+	m_rambank->configure_entries(0, 4, m_banked_ram, 0x8000);
+	m_rambank->set_entry(0);
 
 	save_item(NAME(m_scan));
 	save_item(NAME(m_an_select));
@@ -190,6 +197,9 @@ void acvirus_state::p5_w(u8 data)
 {
 	m_rombank->set_entry((data >> 4) & 15);
 
+	if (BIT(data, 3))
+		m_rambank->set_entry((data >> 4) & 3);
+
 	m_scan = data & 15;
 	m_leds->matrix(1 << m_scan, m_led_pattern);
 }
@@ -204,7 +214,7 @@ void acvirus_state::data_map(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
 	map(0x0400, 0x0407).rw(m_dsp, FUNC(dsp563xx_device::hi08_r), FUNC(dsp563xx_device::hi08_w));
-	map(0x8000, 0xffff).ram(); // TODO: RAM banks
+	map(0x8000, 0xffff).bankrw(m_rambank);
 }
 
 void acvirus_state::dsp_p_map(address_map &map)
