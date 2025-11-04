@@ -24939,7 +24939,18 @@ ROM_END
   Tried any input on the real hardware without luck.
 
 */
-ROM_START( scmaster )
+ROM_START( scmaster )  // ver 1.1
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u6.bin",  0x00000, 0x10000, CRC(a8613a65) SHA1(91d5c9f2a84671c55bff3f14a01eacd2454511b1) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "u29.bin", 0x00000, 0x20000, CRC(98bd34b6) SHA1(e3ff6536eb421ed2e2f5d4354099078ba4ae5671) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "u41.bin", 0x00000, 0x40000, CRC(ece34be2) SHA1(fdfaaffb12a7f6de6bf21b46ad50e845abc00734) )
+ROM_END
+
+ROM_START( scmastera )  // ver 1.0
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512.u6",  0x00000, 0x10000, CRC(4eef290a) SHA1(27cca383de49d5f0072ecdda11591b78727469c6) )
 
@@ -30561,7 +30572,8 @@ GAME( 2006, halltsk,     0,        nfm,      nfm,       cmaster_state,  init_tsk
 
 
 // Super Cherry Master sets...
-GAMEL(1994, scmaster,    0,         unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
+GAMEL(1994, scmaster,    0,         unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.1)",                                   0,    layout_unkch )
+GAMEL(1994, scmastera,   scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
 GAMEL(1994, animalhsb,   scmaster,  rolling,  unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Animal House (set 3)",                                         0,    layout_unkch )
 GAMEL(1994, animalhsc,   scmaster,  rolling,  unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Animal House (set 4)",                                         0,    layout_unkch )
 
