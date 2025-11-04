@@ -85,7 +85,7 @@ public:
 		m_lcd(*this, "hd44780"),
 		m_dte(*this, "dte"),
 		m_io_keys(*this, "IN%u", 0U)
-		
+
 	{ }
 
 	void servicet(machine_config &config) ATTR_COLD;
@@ -286,17 +286,17 @@ void servicet_state::port3_w(uint8_t data)
 
 uint8_t servicet_state::gsg_scramble(uint8_t data)
 {
-    bool d1 = BIT(data,1);
-    bool d2 = BIT(data,2);
-    bool d3 = BIT(data,3);
+	bool d1 = BIT(data,1);
+	bool d2 = BIT(data,2);
+	bool d3 = BIT(data,3);
 
-    // zero d1-d3
-    data &= ~(0b1110);
+	// zero d1-d3
+	data &= ~(0b1110);
 
-    // d1 and d3 are swapped
-    data |= (d3 << 1) | (d2 << 2) | (d1 << 3);
+	// d1 and d3 are swapped
+	data |= (d3 << 1) | (d2 << 2) | (d1 << 3);
 
-    return data;
+	return data;
 }
 
 uint8_t servicet_state::gsg_r(offs_t offset)
@@ -360,24 +360,24 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 
 void servicet_state::data_in(int state)
 {
-    m_datain = state;
+	m_datain = state;
 }
 
 void servicet_state::clock_in(int state)
 {
-    if (state)
-    {
-        // --- INPUT SHIFT CHAIN (U20 + U19, 74HC4094) ---
-        uint16_t chain = (m_u19 << 8) | m_u20;
-        chain = ((chain << 1) | m_datain) & 0xFFFF;
-        m_u20 = chain & 0xFF;
-        m_u19 = (chain >> 8) & 0xFF;
+	if (state)
+	{
+		// --- INPUT SHIFT CHAIN (U20 + U19, 74HC4094) ---
+		uint16_t chain = (m_u19 << 8) | m_u20;
+		chain = ((chain << 1) | m_datain) & 0xFFFF;
+		m_u20 = chain & 0xFF;
+		m_u19 = (chain >> 8) & 0xFF;
 
-        // --- OUTPUT SHIFT REGISTER (U13, 74HC165) ---
-        int q7 = (m_u13 >> 7) & 1;
-        m_dte->write_txd(q7);
-        m_u13 = (m_u13 << 1) & 0xFF;
-    }
+		// --- OUTPUT SHIFT REGISTER (U13, 74HC165) ---
+		int q7 = (m_u13 >> 7) & 1;
+		m_dte->write_txd(q7);
+		m_u13 = (m_u13 << 1) & 0xFF;
+	}
 }
 
 void servicet_state::enable_in(int newval)

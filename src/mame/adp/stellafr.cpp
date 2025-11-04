@@ -324,7 +324,7 @@ void stellafr_state::mux_w(uint8_t data)
 	m_st->write_dtr(enanz1);
 	m_st->write_rts(0);
 
-	
+
 }
 
 void stellafr_state::mux2_w(uint8_t data)
