@@ -2599,8 +2599,14 @@ u32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitm
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
 
-	for(int layer = 3; layer >= 0; layer--)
-		m_tiles->draw(screen, m_sys24_bitmap, cliprect, layer<<1, 0, 0);
+	for (int layer = 3; layer >= 2; layer--)
+	{
+		m_tiles->draw(screen, m_sys24_bitmap, cliprect, layer << 1, 0, 1);
+		m_tiles->draw(screen, m_sys24_bitmap, cliprect, (layer << 1) | 1, 0, 1);
+	}
+
+	for (int layer = 1; layer >= 0; layer--)
+		m_tiles->draw(screen, m_sys24_bitmap, cliprect, layer << 1, 0, 0);
 
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 

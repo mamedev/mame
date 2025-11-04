@@ -350,6 +350,11 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 	if(vscr & 0x8000)
 		return;
 
+	if (flags & 1)
+		tile_layer[layer]->map_pen_to_layer(0, 0, TILEMAP_PIXEL_LAYER0);
+	else
+		tile_layer[layer]->map_pen_to_layer(0, 0, TILEMAP_PIXEL_TRANSPARENT);
+
 	if(ctrl & 0x6000) {
 		// Special window/scroll modes
 		if(layer & 1)
