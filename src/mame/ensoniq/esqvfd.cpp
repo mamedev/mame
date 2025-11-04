@@ -126,6 +126,16 @@ esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, co
 
 void esqvfd_device::device_start() {
 	m_vfds->resolve();
+	save_item(NAME(m_cursx));
+	save_item(NAME(m_cursy));
+	save_item(NAME(m_savedx));
+	save_item(NAME(m_savedy));
+	save_item(NAME(m_curattr));
+	save_item(NAME(m_chars));
+	save_item(NAME(m_attrs));
+	save_item(NAME(m_dirty));
+	save_item(NAME(m_lastchar));
+	save_item(NAME(m_blink_on));
 }
 
 void esqvfd_device::device_reset() {
@@ -133,6 +143,7 @@ void esqvfd_device::device_reset() {
 	m_savedx = m_savedy = 0;
 	m_curattr = AT_NORMAL;
 	m_lastchar = 0;
+	m_blink_on = false;
 	memset(m_chars, 0, sizeof(m_chars));
 	memset(m_attrs, 0, sizeof(m_attrs));
 	memset(m_dirty, 1, sizeof(m_attrs));
@@ -207,13 +218,8 @@ void esq2x40_device::device_add_mconfig(machine_config &config) {
 }
 
 void esq2x40_device::write_char(uint8_t data) {
-	if (m_ignore_next) {
-		m_ignore_next = false;
-		return;
-	}
-
-	// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
 	if (m_lastchar == 0xfa) {
+		// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
 		for (uint8_t j = 0; j < m_rows; j++) {
 			for (uint8_t i = 0; i < m_cols; i++) {
 				if (m_cursy == j && i >= m_cursx && i < m_cursx + data)
@@ -227,6 +233,11 @@ void esq2x40_device::write_char(uint8_t data) {
 
 		m_lastchar = 0;
 		update_display();
+		return;
+	} else if (m_lastchar == 0xff) {
+		// 0xff light commands are followed by a byte indicating the light and
+		// its requested status. Ignore this.
+		m_lastchar = 0;
 		return;
 	}
 
@@ -284,8 +295,7 @@ void esq2x40_device::write_char(uint8_t data) {
 				clear();
 				break;
 
-			case 0xff: // light status; ignore the next byte
-				m_ignore_next = 1;
+			case 0xff: // light status; ignore. Next byte will also be ignored.
 				break;
 
 			default:
