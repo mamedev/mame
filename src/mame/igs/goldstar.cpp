@@ -3103,8 +3103,7 @@ void unkch_state::bankswitch_w(uint8_t data)
 	m_vidreg = data & 0x7f;
  	membank("bank1")->set_entry(BIT(data, 7));
 	m_tile_bank = data & 0x01;
-	popmessage("unkchx_videreg: %02x", data);
-	logerror("unkchx_videreg: %02x\n", data);
+//	popmessage("unkchx_videreg: %02x", data);
 }
 
 
@@ -12031,9 +12030,9 @@ static INPUT_PORTS_START( unkchx )
 	PORT_DIPNAME( 0x01, 0x01, "Double Up Feature" )         PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Double Up Type" )            PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x00, "3 Cards" )
+	PORT_DIPSETTING(    0x02, "5 Cards" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -30579,8 +30578,8 @@ GAME( 1996, cherry96a,   scmaster,  unkch,    unkch4,    unkch_state,    init_un
 
 GAME( 1998, rolling,     scmaster,  rolling,  unkch4,    unkch_state,    empty_init,     ROT0, "bootleg", "Rolling",                                                      MACHINE_NOT_WORKING ) // inputs, outputs
 
-GAMEL(199?, cmast97bl18, cmast97,   unkchx,   unkchx,    unkch_state,    empty_init,     ROT0, "bootleg", "Cherry Master '97 (v1.8, bootleg)",                            0,    layout_unkchx )
-GAMEL(199?, cmast97bl16, cmast97,   unkchx,   unkchx,    unkch_state,    empty_init,     ROT0, "bootleg", "Cherry Master '97 (v1.6, bootleg)",                            0,    layout_unkchx )
+GAMEL(1997, cmast97bl18, cmast97,   unkchx,   unkchx,    unkch_state,    empty_init,     ROT0, "bootleg", "Cherry Master '97 (v1.8, bootleg)",                            0,    layout_unkchx )
+GAMEL(1997, cmast97bl16, cmast97,   unkchx,   unkchx,    unkch_state,    empty_init,     ROT0, "bootleg", "Cherry Master '97 (v1.6, bootleg)",                            0,    layout_unkchx )
 
 
 // ******************* Stealth sets *******************
