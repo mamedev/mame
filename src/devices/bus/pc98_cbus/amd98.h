@@ -39,7 +39,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 	void ay3_address_w(uint8_t data);
 	void ay3_data_latch_w(uint8_t data);
 

@@ -24,7 +24,7 @@ private:
 	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<pc80s31k_device> m_fdd_if;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 // device type definition

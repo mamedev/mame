@@ -44217,7 +44217,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		</part>
 	</software>
 
-	<software name="silentsr">
+	<software name="silentsr" supported="yes">
 		<description>The Silent Service - Chinmoku no Kantai</description>
 		<year>1991</year>
 		<publisher>ジーエーエム (GAM)</publisher>

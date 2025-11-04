@@ -71,11 +71,11 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 
 void sb16_ct2720_device::device_start()
 {
-	m_bus->install_device(0x0000, 0xffff, *this, &sb16_ct2720_device::io_map);
 }
 
 void sb16_ct2720_device::device_reset()
 {
+	m_bus->install_device(0x0000, 0xffff, *this, &sb16_ct2720_device::io_map);
 }
 
 void sb16_ct2720_device::io_map(address_map &map)

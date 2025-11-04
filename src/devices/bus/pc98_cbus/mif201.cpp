@@ -45,26 +45,31 @@ void mif201_device::device_add_mconfig(machine_config &config)
 
 void mif201_device::device_start()
 {
-	// sheet claims i8251-1 having swapped ports compared to i8251-2 but micromus just uses
-	// $e2d2 for control, assume typo.
-	m_bus->install_io(0xe2d0, 0xe2d3,
-		read8sm_delegate(*this, [this](offs_t offset) { return m_uart[0]->read(offset); }, "uart1_r"),
-		write8sm_delegate(*this, [this](offs_t offset, u8 data) { m_uart[0]->write(offset, data); }, "uart1_w")
-	);
-	m_bus->install_io(0xe4d0, 0xe4d3,
-		read8sm_delegate(*this, [this](offs_t offset) { return m_uart[1]->read(offset); }, "uart2_r"),
-		write8sm_delegate(*this, [this](offs_t offset, u8 data) { m_uart[1]->write(offset, data); }, "uart2_w")
-	);
-	m_bus->install_io(0xe6d0, 0xe6d3,
-		read8sm_delegate(*this, [this](offs_t offset) { return m_pit->read(offset); }, "pit_low_r"),
-		write8sm_delegate(*this, [this](offs_t offset, u8 data) { m_pit->write(offset, data); }, "pit_low_w")
-	);
-	m_bus->install_io(0xe7d0, 0xe7d3,
-		read8sm_delegate(*this, [this](offs_t offset) { return m_pit->read(offset | 2); }, "pit_high_r"),
-		write8sm_delegate(*this, [this](offs_t offset, u8 data) { m_pit->write(offset | 2, data); }, "pit_high_w")
-	);
 }
 
 void mif201_device::device_reset()
 {
+	m_bus->install_device(0x0000, 0xffff, *this, &mif201_device::io_map);
+}
+
+void mif201_device::io_map(address_map &map)
+{
+	// sheet claims i8251-1 having swapped ports compared to i8251-2 but micromus just uses
+	// $e2d2 for control, assume typo.
+	map(0xe2d0, 0xe2d3).lrw8(
+		NAME([this](offs_t offset) { return m_uart[0]->read(offset); }),
+		NAME([this](offs_t offset, u8 data) { m_uart[0]->write(offset, data); })
+	).umask16(0x00ff);
+	map(0xe4d0, 0xe4d3).lrw8(
+		NAME([this](offs_t offset) { return m_uart[1]->read(offset); }),
+		NAME([this](offs_t offset, u8 data) { m_uart[1]->write(offset, data); })
+	).umask16(0x00ff);
+	map(0xe6d0, 0xe6d3).lrw8(
+		NAME([this](offs_t offset) { return m_pit->read(offset); }),
+		NAME([this](offs_t offset, u8 data) { m_pit->write(offset, data); })
+	).umask16(0x00ff);
+	map(0xe7d0, 0xe7d3).lrw8(
+		NAME([this](offs_t offset) { return m_pit->read(offset | 2); }),
+		NAME([this](offs_t offset, u8 data) { m_pit->write(offset | 2, data); })
+	).umask16(0x00ff);
 }

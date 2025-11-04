@@ -32,7 +32,7 @@ private:
 	// called back by the MPU401 core to set the IRQ line state
 	void mpu_irq_out(int state);
 
-	void map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<mpu401_device> m_mpu401;

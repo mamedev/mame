@@ -46,13 +46,13 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void io_map(address_map &map) ATTR_COLD;
+
 	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ym2608_device> m_opn3;
 private:
 
-//  u16 m_io_base, m_joy_sel;
-
-	uint8_t m_ext_reg;
+	u8 m_ext_reg;
 };
 
 

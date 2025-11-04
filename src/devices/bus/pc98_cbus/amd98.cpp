@@ -148,6 +148,9 @@ void amd98_device::device_reset()
 
 void amd98_device::io_map(address_map &map)
 {
+	// TODO: configurable PnP, needs dip/jumper sheet
+	map(0xf0, 0xf0).lr8(NAME([] () { return 0x18; }));
+
 	map(0xd8, 0xd8).w(m_ay1, FUNC(ay8910_device::address_w));
 	map(0xd9, 0xd9).w(m_ay2, FUNC(ay8910_device::address_w));
 	map(0xda, 0xda).rw(m_ay1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
@@ -160,8 +163,6 @@ void amd98_device::io_map(address_map &map)
 		NAME([this] (offs_t offset) { return m_pit->read(3); }),
 		NAME([this] (offs_t offset, u8 data) { m_pit->write(3, data); })
 	);
-	// TODO: configurable PnP, needs dip/jumper sheet
-	map(0xf0, 0xf0).lr8(NAME([] () { return 0x18; }));
 }
 
 void amd98_device::ay3_address_w(uint8_t data)

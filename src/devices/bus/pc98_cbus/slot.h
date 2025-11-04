@@ -117,8 +117,6 @@ public:
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
 	}
 
-	void flush_install_io(const char *client_tag, u16 old_io, u16 new_io, u16 size, read8sm_delegate rhandler, write8sm_delegate whandler);
-
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;

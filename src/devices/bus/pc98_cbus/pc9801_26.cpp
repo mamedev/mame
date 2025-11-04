@@ -141,13 +141,12 @@ ioport_constructor pc9801_26_device::device_input_ports() const
 
 u16 pc9801_26_device::read_io_base()
 {
-	return ((ioport("JP6A4")->read() & 1) << 8) + 0x0088;
+	return (ioport("JP6A4")->read() & 1) << 8;
 }
 
 void pc9801_26_device::device_start()
 {
 	m_rom_base = 0;
-	m_io_base = 0;
 
 	save_item(NAME(m_joy_sel));
 }
@@ -161,6 +160,7 @@ void pc9801_26_device::device_reset()
 	memory_region *rom_region = memregion(this->subtag("sound_bios").c_str());
 	const u32 rom_size = rom_region->bytes() - 1;
 
+	// TODO: make most of this a C-Bus root responsibility
 	if (m_rom_base == 0)
 		m_rom_base = current_rom;
 
@@ -182,16 +182,7 @@ void pc9801_26_device::device_reset()
 	m_rom_base = current_rom;
 
 	// install I/O ports
-	u16 current_io = read_io_base();
-	m_bus->flush_install_io(
-		this->tag(),
-		m_io_base,
-		current_io,
-		3,
-		read8sm_delegate(*this, FUNC(pc9801_26_device::opn_r)),
-		write8sm_delegate(*this, FUNC(pc9801_26_device::opn_w))
-	);
-	m_io_base = current_io;
+	m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_26_device::io_map);
 
 	// read INT line
 	m_int_level = m_irq_jp->read() & 3;
@@ -201,30 +192,8 @@ void pc9801_26_device::device_validity_check(validity_checker &valid) const
 {
 }
 
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-// TODO: leftover mirrors? Doesn't match to what installs above
-uint8_t pc9801_26_device::opn_r(offs_t offset)
+void pc9801_26_device::io_map(address_map &map)
 {
-	if((offset & 1) == 0)
-	{
-		return offset & 4 ? 0xff : m_opn->read(offset >> 1);
-	}
-	else // odd
-	{
-		logerror("Read to undefined port [%02x]\n", offset+0x188);
-		return 0xff;
-	}
-}
-
-
-void pc9801_26_device::opn_w(offs_t offset, uint8_t data)
-{
-	if((offset & 5) == 0)
-		m_opn->write(offset >> 1, data);
-	else // odd
-		logerror("PC9801-26: Write to undefined port [%02x] %02x\n", offset+0x188, data);
+	const u16 io_base = read_io_base();
+	map(0x0088 | io_base, 0x008b | io_base).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
 }

@@ -140,79 +140,37 @@ const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 
 void pc9801_118_device::device_start()
 {
-	// hardwired on this board
-	const u16 m_io_base = 0x0188;
-	m_bus->install_io(0xa460, 0xa463, read8sm_delegate(*this, FUNC(pc9801_118_device::id_r)), write8sm_delegate(*this, FUNC(pc9801_118_device::ext_w)));
-
-	m_bus->install_io(
-		m_io_base,
-		m_io_base + 7,
-		read8sm_delegate(*this, FUNC(pc9801_118_device::opn3_r)),
-		write8sm_delegate(*this, FUNC(pc9801_118_device::opn3_w))
-	);
-
 	save_item(NAME(m_ext_reg));
 }
 
 void pc9801_118_device::device_reset()
 {
-	// TODO: is this enabled or disabled at boot?
-	m_ext_reg = 1;
+	m_bus->install_device(0x0000, 0xffff, *this, &pc9801_118_device::io_map);
+
+	// assume disabled on boot
+	m_ext_reg = 0;
 }
 
 void pc9801_118_device::device_validity_check(validity_checker &valid) const
 {
 }
 
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-
-uint8_t pc9801_118_device::opn3_r(offs_t offset)
+void pc9801_118_device::io_map(address_map &map)
 {
-	if(((offset & 5) == 0) || m_ext_reg )
-		return m_opn3->read(offset >> 1);
-	else // odd
-	{
-		//printf("PC9801-118: Read to undefined port [%02x]\n",offset+0x188);
-		return 0xff;
-	}
-}
+	// hardwired on this board
+	map(0x0188, 0x018f).rw(m_opn3, FUNC(ym2608_device::read), FUNC(ym2608_device::write)).umask16(0x00ff);
 
-
-void pc9801_118_device::opn3_w(offs_t offset, uint8_t data)
-{
-	if( ((offset & 5) == 0) || m_ext_reg )
-		m_opn3->write(offset >> 1,data);
-	//else // odd
-	//  printf("PC9801-118: Write to undefined port [%02x] %02x\n",offset+0x188,data);
+	map(0xa460, 0xa460).rw(FUNC(pc9801_118_device::id_r), FUNC(pc9801_118_device::ext_w));
 }
 
 uint8_t pc9801_118_device::id_r(offs_t offset)
 {
-	if(offset == 0)
-	{
-		logerror("OPN3 EXT read ID [%02x]\n",offset);
-		// TODO: confirm ID
-		// by assumption we make this same as later CanBe releases, may or may not be right
-		return 0x80 | (m_ext_reg & 1);
-	}
-
-	logerror("OPN3 EXT read unk [%02x]\n", offset);
-	return 0xff;
+	return 0x80 | (m_ext_reg & 1);
 }
 
 void pc9801_118_device::ext_w(offs_t offset, uint8_t data)
 {
-	if(offset == 0)
-	{
-		m_ext_reg = data & 1;
-		if(data & 2)
-			logerror("%s: extended register %02x write\n", machine().describe_context(), data);
-		return;
-	}
-
-	logerror("%s: EXT write unk %02x -> [%02x]\n", machine().describe_context(), data, offset);
+	m_ext_reg = BIT(data, 0);
+	if (m_ext_reg)
+		popmessage("PC9801-118: extended CS4231 enable");
 }

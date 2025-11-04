@@ -6,6 +6,7 @@ FDD 2D 320KB C-Bus bridge interface
 
 For original 1st gen PC-98 only (VM already won't check the range), connects to the back thru
 the 5" FLOPPY DISK port (not the 2DD option)
+Built-in only, no actual card exists (TBD)
 
 **************************************************************************************************/
 
@@ -32,10 +33,10 @@ void fdd_2d_bridge_device::device_start()
 
 void fdd_2d_bridge_device::device_reset()
 {
-	m_bus->install_device(0x0050, 0x0057, *this, &fdd_2d_bridge_device::io_map);
+	m_bus->install_device(0x0000, 0x00ff, *this, &fdd_2d_bridge_device::io_map);
 }
 
 void fdd_2d_bridge_device::io_map(address_map &map)
 {
-	map(0, 7).m(m_fdd_if, FUNC(pc80s31k_device::host_map)).umask16(0xff00);
+	map(0x0050, 0x0057).m(m_fdd_if, FUNC(pc80s31k_device::host_map)).umask16(0xff00);
 }

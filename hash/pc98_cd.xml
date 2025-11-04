@@ -1404,7 +1404,7 @@ Media for undumped pc9821xa12
 		<year>1997</year>
 		<publisher>フォアナイン (Fournine)</publisher>
 		<info name="serial" value="FNN-003"/>
-		<info name="alt_title" value="カナン　～約束の地～" />
+		<info name="alt_title" value="カナン ～約束の地～" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="canaan - yakusoku no chi (japan)" sha1="5044b38ae088af496427f5a6d3a832b443bbb937" />
@@ -1488,7 +1488,7 @@ Media for undumped pc9821xa12
 		<description>Chuushaki - Hirasawa Nurse School</description>
 		<year>1996</year>
 		<publisher>アーヴォリオ (Aypio)</publisher>
-		<info name="alt_title" value="注射器　Ｈｉｒａｓａｗａ　Ｎｕｒｓｅ　Ｓｃｈｏｏｌ" />
+		<info name="alt_title" value="注射器 Ｈｉｒａｓａｗａ Ｎｕｒｓｅ Ｓｃｈｏｏｌ" />
 		<info name="release" value="19960726" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1997,7 +1997,7 @@ Not extensively tested
 		<year>1994</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="serial" value="HMF-130 / 2TD-3012"/>
-		<info name="alt_title" value="どきどきディスクＣＤ版　第１巻　クラブＤ．Ｏ．事務局" />
+		<info name="alt_title" value="どきどきディスクＣＤ版 第１巻 クラブＤ．Ｏ．事務局" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doki doki disk cd-ban vol. 1 (japan)" sha1="8bf3875f21ba28d30b7e837344d5560b15fe32e3" />
@@ -2616,7 +2616,7 @@ Not extensively tested
 		<description>Etemible - Tenjou Mukyuu</description>
 		<year>1995</year>
 		<publisher>グローディア (Glodia)</publisher>
-		<info name="alt_title" value="エテミブル　～天壌無窮～" />
+		<info name="alt_title" value="エテミブル ～天壌無窮～" />
 		<info name="release" value="19950203" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
@@ -2992,7 +2992,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		-->
 		<description>Gokichi-kun Series - Igo Kinenban CD</description>
 		<year>1995</year>
-		<publisher>ジーエーエム　(GAM)</publisher>
+		<publisher>ジーエーエム (GAM)</publisher>
 		<info name="alt_title" value="碁キチくんシリーズ 囲碁記念版CD" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3177,7 +3177,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<year>1997</year>
 		<publisher>フォスター (Foster)</publisher>
 		<info name="serial" value="CBF-0007"/>
-		<info name="alt_title" value="花の記憶　～第ニ章～" />
+		<info name="alt_title" value="花の記憶 ～第ニ章～" />
 		<info name="release" value="199702xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3368,7 +3368,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<year>1993</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="serial" value="HME-152 / MTC-1051"/>
-		<info name="alt_title" value="イフ　Ｉｎｖｉｔａｔｉｏｎｓ　ｆｒｏｍ　Ｆａｎｔａｓｔｉｃ　Ｓｔｏｒｉｅｓ" />
+		<info name="alt_title" value="イフ Ｉｎｖｉｔａｔｉｏｎｓ ｆｒｏｍ Ｆａｎｔａｓｔｉｃ Ｓｔｏｒｉｅｓ" />
 		<info name="release" value="199306xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3407,7 +3407,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<year>1993</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="serial" value="HMF-228 / 2TD-3003"/>
-		<info name="alt_title" value="イフ２　Ｉｎｖｉｔａｔｉｏｎｓ　ｆｒｏｍ　Ｆａｎｔａｓｔｉｃ　Ｓｔｏｒｉｅｓ" />
+		<info name="alt_title" value="イフ２ Ｉｎｖｉｔａｔｉｏｎｓ ｆｒｏｍ Ｆａｎｔａｓｔｉｃ Ｓｔｏｒｉｅｓ" />
 		<info name="release" value="19931119" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3427,7 +3427,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<year>1995</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="serial" value="2TD-3021"/>
-		<info name="alt_title" value="イフ３　Ｉｎｖｉｔａｔｉｏｎｓ　ｆｒｏｍ　Ｆａｎｔａｓｔｉｃ　Ｓｔｏｒｉｅｓ" />
+		<info name="alt_title" value="イフ３ Ｉｎｖｉｔａｔｉｏｎｓ ｆｒｏｍ Ｆａｎｔａｓｔｉｃ Ｓｔｏｒｉｅｓ" />
 		<info name="release" value="199504xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3988,7 +3988,7 @@ Fails on "Can't find the CD-ROM", loads NECCD.SYS
 		<description>Record of Lodoss War II - Goshiki no Maryuu</description>
 		<year>1994</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
-		<info name="alt_title" value="ロードス島戦記Ⅱ　～五色の魔竜～" />
+		<info name="alt_title" value="ロードス島戦記Ⅱ ～五色の魔竜～" />
 		<info name="release" value="19940527" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Hozon-you Kidou Disk" />
@@ -4532,7 +4532,7 @@ Missing boot floppy
 		<description>Ms. Detective File #1 - Iwami Ginzan Satsujin Jiken</description>
 		<year>1993</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="ミス・ディテクティヴ　ファイル#1　石見銀山殺人事件" />
+		<info name="alt_title" value="ミス・ディテクティヴ ファイル#1 石見銀山殺人事件" />
 		<info name="release" value="19930417" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -4558,7 +4558,7 @@ Missing boot floppy
 		<description>Ms. Detective File #2 - Sugata-naki Irainin</description>
 		<year>1993</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="ミス・ディテクティヴ　ファイル#2　姿なき依頼人" />
+		<info name="alt_title" value="ミス・ディテクティヴ ファイル#2 姿なき依頼人" />
 		<info name="release" value="19931029" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
@@ -5319,7 +5319,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 Missing boot floppy
 ]]></notes>
 		<info name="serial" value="DWDC4023"/>
-		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.4　オルゴール" />
+		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ Vol.4 オルゴール" />
 		<info name="release" value="199412xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6012,7 +6012,7 @@ Missing boot floppy
 		<year>1995</year>
 		<publisher>工画堂 (Kogado)</publisher>
 		<info name="serial" value="9214-55HM10" />
-		<info name="alt_title" value="シュヴァルツシルトEX　鉄鎖の星群" />
+		<info name="alt_title" value="シュヴァルツシルトEX 鉄鎖の星群" />
 		<info name="release" value="19950718" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6200,7 +6200,7 @@ Missing boot floppy
 		-->
 		<description>The Silent Service - Chinmoku no Kantai</description>
 		<year>1993</year>
-		<publisher>ジーエーエム　(GAM)</publisher>
+		<publisher>ジーエーエム (GAM)</publisher>
 		<info name="serial" value="DWPC3808" />
 		<info name="alt_title" value="沈黙の艦隊" />
 		<info name="release" value="19930410" />
@@ -6840,7 +6840,7 @@ Missing install floppy
 [PC9801-86] no sound, keeps pushing IRQ clears with FIFO control at $a468
 ]]></notes>
 		<info name="serial" value="ENP-7020" />
-		<info name="alt_title" value="ウルティマⅧ　～ペイガン～" />
+		<info name="alt_title" value="ウルティマⅧ ～ペイガン～" />
 		<info name="release" value="19951122" />
 		<info name="usage" value="Sports The Chronicle of Pagan copy protection (initials)" />
 		<part name="cdrom" interface="cdrom">
@@ -6859,6 +6859,11 @@ Missing install floppy
 		<description>U.S. Navy Fighters Gold</description>
 		<year>1996</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<notes><![CDATA[
+Requires 16MB minimum on Windows 95, and a DOS env
+Runs too sluggish on pc9821ap2, requires better HW
+No sound with [PC9801-86] on intro and main menu (verify)
+]]></notes>
 		<info name="alt_title" value="Ｕ．Ｓ．ネイビーファイターズ ゴールド" />
 		<info name="release" value="19960426" />
 		<part name="cdrom" interface="cdrom">
@@ -6887,8 +6892,7 @@ Missing install floppy
 		</part>
 	</software>
 
-	<!-- Garbled text -->
-	<software name="umanari2" supported="no">
+	<software name="umanari2" supported="yes">
 		<!--
 		Origin: redump.org
 		<rom name="Umanari 1 Furlong Theater 2 (Japan).bin" size="9781968" crc="d352a37f" sha1="043617b7f2dca879d4ab379a12c380800c275055"/>
@@ -6906,7 +6910,6 @@ Missing install floppy
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!-- Hangs at the text / voice selection screen -->
 	<software name="vastness" supported="no">
 		<!--
 		Origin: redump.org
@@ -6920,6 +6923,10 @@ Missing install floppy
 		<description>Vastness - Kuukyo no Ikenie-tachi</description>
 		<year>1995</year>
 		<publisher>CD Bros.</publisher>
+		<notes><![CDATA[
+EMS issues once installed
+Old note: Hangs at the text / voice selection screen (verify)
+]]></notes>
 		<info name="serial" value="HMF-132 / CB-001"/>
 		<info name="alt_title" value="ヴアーストニス 空虚の生贄達" />
 		<info name="release" value="199502xx" />
@@ -6930,8 +6937,7 @@ Missing install floppy
 		</part>
 	</software>
 
-	<!-- Sounds play but nothing shows up on screen -->
-	<software name="venus" supported="no">
+	<software name="venus" supported="yes">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -6943,6 +6949,7 @@ Missing install floppy
 		<description>Venus &amp; Mug-R</description>
 		<year>1994</year>
 		<publisher>ソフトウェアハウスぱせり (Software House Parsley)</publisher>
+		<info name="usage" value="Prepare a floppy /s, run INST.EXE to install, needs GDC 2.5 MHz setting in gameplay" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="venus &amp; mug-r" sha1="e5baf67106a20b95a6eb7ee40ba0ed01eb3084cc" />
@@ -7243,8 +7250,7 @@ Missing install floppy
 		</part>
 	</software>
 
-	<!-- Garbled text -->
-	<software name="yumemi" supported="no">
+	<software name="yumemi" supported="yes">
 		<!--
 		Origin: redump.org
 		<rom name="Yumemizaka (Japan).bin" size="178062864" crc="c7f5ef68" sha1="d86e9185d5372efc5404dada1d01be250d8a1d7a"/>
@@ -7253,6 +7259,7 @@ Missing install floppy
 		<description>Yumemizaka</description>
 		<year>1995</year>
 		<publisher>ユーミソフト (U-me Soft)</publisher>
+		<!-- uses exact same installer as venus -->
 		<info name="alt_title" value="夢見坂" />
 		<info name="release" value="19950714" />
 		<part name="cdrom" interface="cdrom">
@@ -7349,7 +7356,7 @@ Missing install floppy
 		<year>1996</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="serial" value="MCD-008"/>
-		<info name="alt_title" value="ＣＤ‐ＲＯＭ美少女戦士コレクション　～遊ディスクスペシャル～" />
+		<info name="alt_title" value="ＣＤ‐ＲＯＭ美少女戦士コレクション ～遊ディスクスペシャル～" />
 		<info name="release" value="199604xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7378,7 +7385,7 @@ Missing install floppy
 		<description>Yuurou - Transient Sands</description>
 		<year>1996</year>
 		<publisher>ハーベスト (Hervest)</publisher>
-		<info name="alt_title" value="憂楼 　－Ｔｒａｎｓｉｅｎｔ　Ｓａｎｄｓ－" />
+		<info name="alt_title" value="憂楼  －Ｔｒａｎｓｉｅｎｔ Ｓａｎｄｓ－" />
 		<info name="release" value="19960802" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
