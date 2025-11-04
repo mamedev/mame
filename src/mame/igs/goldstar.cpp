@@ -890,7 +890,6 @@ private:
 	uint8_t m_vblank_irq_enable = 0U;
 	uint8_t m_vidreg = 0U;
 	uint8_t m_reelbank = 0U;
-	uint8_t m_current_bank = 0U;
 
 	void bankswitch_w(uint8_t data);
 	void coincount_w(uint8_t data);
