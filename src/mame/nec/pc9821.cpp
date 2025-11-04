@@ -29,8 +29,10 @@ TODO (pc9821as):
 - Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
 
 TODO (pc9821ce):
-- Needs SCSI to boot stuff, or 2.5" option IDE for 98NOTE;
-- Can't boot any floppy, thinks it's never ready/leaves motor off;
+- Throws random TIMER errors at POST (soft reset to bypass);
+- Takes forever to load a floppy, throws (A)bort / (R)etry / (F)ail on DOS;
+- 3.5" floppies won't load without changing SDIP floppy to Fixed Mode,
+  while 5.25" floppies want specifically Auto-Detect instead;
 
 TODO (pc9821cx3):
 - Incomplete bank mapping, keeps looping over the same routine when hopping to PnP BIOS after
@@ -1311,6 +1313,7 @@ ROM_START( pc9821ce )
 	// 0x0c000 sound BIOS
 	// 0x10000 sound BIOS copy
 	// 0x16000 <to be identified>
+	// 0x18000 IDE BIOS
 	// 0x1a000 setup menu
 	ROM_COPY( "biosrom", 0x38000, 0x28000, 0x08000 )
 	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x08000 )
@@ -1324,8 +1327,9 @@ ROM_START( pc9821ce )
 	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
 
 	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
-	// Uses SCSI not IDE
-//  LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 
