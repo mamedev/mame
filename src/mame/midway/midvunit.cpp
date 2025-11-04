@@ -135,32 +135,32 @@ uint32_t midvunit_state::port0_r()
 
 	if (!machine().side_effects_disabled())
 	{
-		// Neutral hat Vorrang vor allen Gängen
+		// neutral has priority
 		if (!(val & 0x0020))
 		{
-			m_shifter_state = 0; // Neutral gedrückt
+			m_shifter_state = 0; // Neutral
 		}
 		else if (!(val & 0x0400))
 		{
-			m_shifter_state = 1; // Gang 1
+			m_shifter_state = 1; // Gear 1
 		}
 		else if (!(val & 0x0800))
 		{
-			m_shifter_state = 2; // Gang 2
+			m_shifter_state = 2; // Gear 2
 		}
 		else if (!(val & 0x1000))
 		{
-			m_shifter_state = 4; // Gang 3
+			m_shifter_state = 4; // Gear 3
 		}
 		else if (!(val & 0x2000))
 		{
-			m_shifter_state = 8; // Gang 4
+			m_shifter_state = 8; // Gear 4
 		}
 
 		m_last_port0 = val;
 	}
 
-	// Bits 10–13 (0x3C00) repräsentieren den Schaltzustand
+	// Bits 10–13 (0x3C00) represent gear state
 	val = (val | 0x3c00) ^ (m_shifter_state << 10);
 
 	return (val << 16) | val;
