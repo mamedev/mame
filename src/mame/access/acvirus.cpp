@@ -180,11 +180,10 @@ u8 acvirus_state::p4_r()
 
 void acvirus_state::p4_w(u8 data)
 {
-	if (BIT(m_scan, 3))
-	{
-		m_led_pattern = data;
-	}
 	m_leds->write_mx(data);
+
+	if (BIT(m_scan, 3))
+		m_led_pattern = data;
 }
 
 void acvirus_state::p5_w(u8 data)
@@ -192,10 +191,7 @@ void acvirus_state::p5_w(u8 data)
 	m_rombank->set_entry((data >> 4) & 15);
 
 	m_scan = data & 15;
-	if (!BIT(data, 3))
-		m_leds->matrix(1 << (m_scan & 7), m_led_pattern);
-	else
-		m_leds->clear();
+	m_leds->matrix(1 << m_scan, m_led_pattern);
 }
 
 void acvirus_state::prog_map(address_map &map)
