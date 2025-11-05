@@ -20863,9 +20863,12 @@ Black screen [FDC] keeps reading chrn=(0, 0, 3, 256) in 2dd mode
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
 		<notes><![CDATA[
 Black screen, around PC=1fc76. Extensively uses 9821 [PEGC] MMIO.
+16 color mode has a column to the right shifted by one pixel on intro and gameplay
+Optional support for unsupported [graphic] and [sound] options
 ]]></notes>
 		<info name="alt_title" value="フラッシュバック" />
 		<info name="release" value="19940422" />
+		<info name="usage" value="Requires HDD DOS install" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1329680">

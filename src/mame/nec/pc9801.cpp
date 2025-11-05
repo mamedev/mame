@@ -1778,7 +1778,10 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(NAME(m_egc.start));
 	save_item(NAME(m_egc.mask));
 
-	save_item(NAME(m_grcg.mode));
+	save_item(STRUCT_MEMBER(m_grcg, mode));
+	//	save_pointer(STRUCT_MEMBER(m_grcg, tile), 4);
+	save_item(STRUCT_MEMBER(m_grcg, tile_index));
+
 	save_item(NAME(m_vram_bank));
 }
 
@@ -1860,6 +1863,12 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 	}
 
 	m_dac1bit_disable = true;
+
+	// flashb in particular don't initialize the mask in 16 color mode
+	m_egc.regs[0] = 0xfff0;
+	m_egc.regs[1] = 0x00ff;
+	m_egc.mask = 0xffff;
+	m_egc.regs[7] = 0x000f;
 }
 
 MACHINE_RESET_MEMBER(pc9801bx_state,pc9801bx2)
