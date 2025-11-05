@@ -64,7 +64,7 @@ license:CC0-1.0
 	<element name="transparent"><rect><color red="0.0" green="0.0" blue="0.0" alpha="0.0"/></rect></element>
 	<element name="knob_outer"><disk><color red="0.0" green="0.0" blue="0.0" alpha="0.0"/></disk></element>
 	<element name="knob_value">
-		<simplecounter maxstate="100" digits="1"><color red="0.8" green="0.8" blue="0.8"/></simplecounter>
+		<simplecounter maxstate="127" digits="1"><color red="0.8" green="0.8" blue="0.8"/></simplecounter>
 	</element>
 	<group name="knob">
 		<element ref="knob_outer" id="knob_~knob_input~"><bounds x="0" y="0" width="68" height="68"/></element>
