@@ -426,8 +426,13 @@ public:
 		return *this;
 	}
 
+#ifdef __ALTIVEC__
+	static u32 bilinear_filter(const u32 &rgb00, const u32 &rgb01, const u32 &rgb10, const u32 &rgb11, u8 u, u8 v);
+	void bilinear_filter_rgbaint(const u32 &rgb00, const u32 &rgb01, const u32 &rgb10, const u32 &rgb11, u8 u, u8 v);
+#else
 	static u32 bilinear_filter(u32 rgb00, u32 rgb01, u32 rgb10, u32 rgb11, u8 u, u8 v) noexcept;
 	void bilinear_filter_rgbaint(u32 rgb00, u32 rgb01, u32 rgb10, u32 rgb11, u8 u, u8 v) noexcept;
+#endif
 
 protected:
 	s32 m_a;
