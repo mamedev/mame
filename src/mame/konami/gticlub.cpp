@@ -279,6 +279,7 @@ protected:
 		, m_analog(*this, "AN%u", 0U)
 		, m_ports(*this, "IN%u", 0)
 		, m_pcb_digit(*this, "pcbdigit%u", 0U)
+		, m_pcb_output(*this, "pcboutput%u", 0U)
 		, m_cg_view(*this, "cg_view")
 	{ }
 
@@ -300,7 +301,9 @@ protected:
 	optional_memory_bank_array<2> m_cgboard_bank;
 	optional_ioport_array<4> m_analog;
 	required_ioport_array<4> m_ports;
+	output_finder<3> m_pcb_digit;
 	output_finder<2> m_pcb_digit;
+	output_finder<1> m_pcb_output;
 	memory_view m_cg_view;
 
 	bool m_sound_irq_enabled = false;
@@ -434,6 +437,11 @@ void gticlub_base_state::sysreg_w(offs_t offset, uint8_t data)
 		case 0:
 		case 1:
 			m_pcb_digit[offset] = bitswap<7>(~data,0,1,2,3,4,5,6);
+			break;
+
+		case 2:
+			// GTI club drive commands
+			m_pcb_output[0] = data;
 			break;
 
 		case 3:
