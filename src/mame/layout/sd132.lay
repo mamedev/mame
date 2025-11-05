@@ -119,9 +119,9 @@
 			<color red="0.2" green="0.2" blue="0.2" />
 		</rect>
 	</element>
-	<element name="rect_vfx">
+	<element name="rect_sd1">
 		<rect>
-			<color red="0.16078" green="0.61176" blue="0.63922" />
+			<color red="0.85882" green="0.37255" blue="0.41569" />
 		</rect>
 	</element>
 	<element name="rect_glass">
@@ -237,8 +237,8 @@
 	<element name="text_L_data_entry">
 		<text string="Data Entry" align="1" />
 	</element>
-	<element name="text_cart">
-		<text string="Cart" />
+	<element name="text_bankset">
+		<text string="BankSet" />
 	</element>
 	<element name="text_sounds">
 		<text string="Sounds" />
@@ -474,8 +474,11 @@
 	<element name="text_ensoniq">
 		<text string="ensoniq" />
 	</element>
-	<element name="text_L_vfx_sd">
-		<text string="VFX-SD" align="1" />
+	<element name="text_3__2__v__o__i__c__e">
+		<text string="3  2  V  O  I  C  E" />
+	</element>
+	<element name="text_L_sd_1">
+		<text string="SD-1" align="1" />
 	</element>
 	<element name="text_L_patch_select">
 		<text string="Patch Select" align="1" />
@@ -937,7 +940,7 @@
 		<element ref="triangle_up">
 			<bounds x="52.5" y="30" width="5" height="2.5" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="0" y="102" width="90" height="1.2" />
 		</element>
 		<element ref="text_L_volume">
@@ -967,10 +970,10 @@
 		<element ref="rect_glass">
 			<bounds x="0" y="8" width="245" height="67.5" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="0" y="102" width="245" height="1.2" />
 		</element>
-		<element ref="text_cart">
+		<element ref="text_bankset">
 			<bounds x="0" y="97.7" width="15" height="4.3" />
 		</element>
 		<element ref="text_sounds">
@@ -1128,16 +1131,16 @@
 		<element ref="rect_white">
 			<bounds x="87.5" y="35.5" width="17.5" height="0.25" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="60" y="12.5" width="55" height="0.5" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="0" y="102" width="58.5" height="1.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="60" y="102" width="58.5" height="1.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="120" y="102" width="60" height="1.2" />
 		</element>
 		<element ref="text_L_replace">
@@ -1525,13 +1528,13 @@
 		<element ref="drawing_modulation">
 			<bounds x="83.5" y="26" width="4" height="66" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="0" y="99" width="28" height="1.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="29.5" y="99" width="35.5" height="1.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="66.5" y="99" width="41.5" height="1.2" />
 		</element>
 		<element ref="text_L_patch">
@@ -2067,13 +2070,13 @@
 		<element ref="drawing_modulation">
 			<bounds x="70" y="26" width="4" height="66" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="0" y="99" width="18.5" height="1.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="20" y="99" width="31.5" height="1.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="53" y="99" width="33" height="1.2" />
 		</element>
 		<element ref="text_L_patch">
@@ -2408,7 +2411,7 @@
 		</element>
 	</group>
 	<group name="CompactVolumeSlider">
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="0" y="102" width="30" height="1.2" />
 		</element>
 		<element ref="text_L_volume">
@@ -2421,7 +2424,7 @@
 		</group>
 	</group>
 	<group name="PatchSelects">
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="0" y="102" width="40" height="1.2" />
 		</element>
 		<element ref="text_L_patch_select">
@@ -2441,7 +2444,7 @@
 		<element ref="triangle_up">
 			<bounds x="5" y="30" width="5" height="2.5" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="0" y="102" width="63" height="1.2" />
 		</element>
 		<element ref="text_L_data_entry">
@@ -2467,10 +2470,10 @@
 		<element ref="rect_panel">
 			<bounds x="0" y="0" width="845" height="121.5" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="209" y="102" width="27" height="1.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="479" y="102" width="24.5" height="1.2" />
 		</element>
 		<element ref="rect_body_down">
@@ -2484,6 +2487,9 @@
 		</element>
 		<element ref="logo">
 			<bounds x="760" y="90" width="72" height="13" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="13" y="97.5" width="67" height="7" />
 		</element>
 		<element ref="rect_body">
 			<bounds x="-156" y="-32" width="20" height="334.5" />
@@ -2518,8 +2524,12 @@
 		<element ref="text_ensoniq">
 			<bounds x="765" y="92" width="62" height="9" />
 		</element>
-		<element ref="text_L_vfx_sd">
-			<bounds x="13" y="77.5" width="67" height="27" />
+		<element ref="text_3__2__v__o__i__c__e">
+			<bounds x="14" y="98.5" width="65" height="5" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</element>
+		<element ref="text_L_sd_1">
+			<bounds x="13" y="67.5" width="67" height="27" />
 		</element>
 		<element name="lights" ref="light_16">
 			<bounds x="-56" y="137.62" width="5" height="0.72222" />
@@ -2550,10 +2560,10 @@
 		<element ref="rect_panel">
 			<bounds x="-95" y="-10" width="575" height="105.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="-1" y="89" width="27" height="1.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="269" y="89" width="24.5" height="1.2" />
 		</element>
 		<group ref="Sliders">
@@ -2579,10 +2589,10 @@
 		<element ref="rect_panel">
 			<bounds x="-95" y="-10" width="575" height="105.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="-1" y="89" width="27" height="1.2" />
 		</element>
-		<element ref="rect_vfx">
+		<element ref="rect_sd1">
 			<bounds x="269" y="89" width="24.5" height="1.2" />
 		</element>
 		<group ref="Sliders">
