@@ -302,7 +302,6 @@ protected:
 	optional_ioport_array<4> m_analog;
 	required_ioport_array<4> m_ports;
 	output_finder<3> m_pcb_digit;
-	output_finder<2> m_pcb_digit;
 	output_finder<1> m_pcb_output;
 	memory_view m_cg_view;
 
@@ -492,6 +491,7 @@ void gticlub_base_state::soundtimer_ack_w(uint16_t data)
 void gticlub_base_state::machine_start()
 {
 	m_pcb_digit.resolve();
+	m_pcb_output.resolve();
 
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
