@@ -362,7 +362,10 @@ TIMER_CALLBACK_MEMBER(esq5505_state::floppy_motor_on)
 	{
 		floppy_image_device *floppy = m_floppy_connector->get_device();
 		if (floppy)
+		{
 			floppy->mon_w(motor_on ? CLEAR_LINE : ASSERT_LINE);  // active low
+			m_panel->set_floppy_active(motor_on);
+		}
 	}
 }
 
