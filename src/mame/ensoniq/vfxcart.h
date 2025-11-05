@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "diimage.h"
-
 class ensoniq_vfx_cartridge:
 	public device_t,
 	public device_image_interface

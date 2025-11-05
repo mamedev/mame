@@ -12,7 +12,7 @@ ensoniq_vfx_cartridge::ensoniq_vfx_cartridge(
 		const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
-		u32 clock )
+		u32 clock)
 	: device_t(mconfig, ENSONIQ_VFX_CARTRIDGE, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 {}
@@ -22,13 +22,15 @@ ensoniq_vfx_cartridge::~ensoniq_vfx_cartridge() {}
 u8 ensoniq_vfx_cartridge::read(offs_t offset) {
 	m_state = state::IDLE;
 	auto v = m_storage[offset & MASK];
-	if (offset > 0x7f00) LOG("R %04x -> %02x\r\n", offset, v);
+	if (offset > 0x7f00)
+		LOG("R %04x -> %02x\r\n", offset, v);
 	return v;
 }
 
 void ensoniq_vfx_cartridge::write(offs_t offset, u8 data) {
 	if (!m_is_writable) {
-		if (offset > 0x7f00) LOG("!W %04x  (%02x)\r\n", offset, data);
+		if (offset > 0x7f00)
+			LOG("!W %04x  (%02x)\r\n", offset, data);
 		return;
 	}
 
@@ -67,7 +69,8 @@ void ensoniq_vfx_cartridge::write(offs_t offset, u8 data) {
 			break;
 
 		case state::WR:
-			if (offset > 0x7f00) LOG("W %04x :  %02x\r\n", offset, data);
+			if (offset > 0x7f00)
+				LOG("W %04x :  %02x\r\n", offset, data);
 			m_storage[offset] = data;
 			break;
 	}

@@ -183,6 +183,7 @@
 #include <cstdarg>
 #include <cstdio>
 
+
 // #define VERBOSE 1
 #include "logmacro.h"
 
@@ -334,13 +335,11 @@ void esq5505_state::cartridge_loaded(bool loaded)
 
 void esq5505_state::cartridge_load(ensoniq_vfx_cartridge *cart)
 {
-	(void) cart;
 	cartridge_loaded(true);
 }
 
 void esq5505_state::cartridge_unload(ensoniq_vfx_cartridge *cart)
 {
-	(void) cart;
 	cartridge_loaded(false);
 }
 
@@ -380,11 +379,6 @@ void esq5505_state::update_floppy_inputs()
 {
 	// update the "Disk Ready" input
 	int state = (m_floppy_is_active && m_floppy_is_loaded) ? ASSERT_LINE : CLEAR_LINE;
-#if VERBOSE
-	static int prev_state = 0;
-	if (prev_state != state) LOG("ip0 -> %d\n", state);
-	prev_state = state;
-#endif
 	m_duart->ip0_w(state);
 
 	// Also update the DOC IRQ in case there's a pending disk change to handle.
@@ -414,20 +408,19 @@ void esq5505_state::floppy_loaded(bool loaded)
 
 void esq5505_state::floppy_load(floppy_image_device *floppy)
 {
-	(void) floppy;
 	floppy_loaded(true);
 }
 
 void esq5505_state::floppy_unload(floppy_image_device *floppy)
 {
-	(void) floppy;
 	floppy_loaded(false);
 }
 
 void esq5505_state::update_docirq_to_maincpu()
 {
 	bool floppy_dskchg_irq = m_floppy_is_active && m_floppy_dskchg;
-	if (floppy_dskchg_irq) LOG("docirq (m68k_irq1) due to disk change = %d\n", floppy_dskchg_irq);
+	if (floppy_dskchg_irq)
+		LOG("docirq (m68k_irq1) due to disk change = %d\n", floppy_dskchg_irq);
 	if (floppy_dskchg_irq && m_floppy_is_loaded)
 	{
 		// The drives that Ensoniq use only _pulse_ DSKCHG for a brief time, when a disk is in the drive.
@@ -435,16 +428,12 @@ void esq5505_state::update_docirq_to_maincpu()
 		LOG("Scheduling DSKCHG reset\n");
 		m_dskchg_reset_timer->adjust(attotime::from_nsec(500));
 	}
-	bool v = m_otis_irq || floppy_dskchg_irq;
-	if (v != m_docirq)
+	bool updated_irq = m_otis_irq || floppy_dskchg_irq;
+	if (updated_irq != m_docirq)
 	{
-		LOG("docirq (m68k_irq1) -> %d\n", v);
-		m_maincpu->set_input_line(M68K_IRQ_1, v);
-		m_docirq = v;
-	}
-	else
-	{
-		// LOG("m68k irq1 -- %d\n", v);
+		LOG("docirq (m68k_irq1) -> %d\n", updated_irq);
+		m_maincpu->set_input_line(M68K_IRQ_1, updated_irq);
+		m_docirq = updated_irq;
 	}
 }
 
@@ -452,13 +441,8 @@ void esq5505_state::otis_irq(int irq)
 {
 	if (irq != m_otis_irq)
 	{
-		// LOG("otis_irq -> %d\n", irq);
 		m_otis_irq = irq;
 		update_docirq_to_maincpu();
-	}
-	else
-	{
-		// LOG("otis_irq -- %d\n", irq);
 	}
 }
 
