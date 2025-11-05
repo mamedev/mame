@@ -70,6 +70,7 @@
 #include "cpu/mcs51/sab80c535.h"
 #include "machine/intelfsh.h"
 #include "video/hd44780.h"
+#include "video/pwm.h"
 
 #include "emupal.h"
 #include "speaker.h"
@@ -91,8 +92,10 @@ public:
 		m_rombank(*this, "rombank"),
 		m_row(*this, "ROW%u", 0U),
 		m_knob(*this, "knob_%u", 0U),
+		m_leds(*this, "leds"),
 		m_scan(0),
-		m_an_select(0)
+		m_an_select(0),
+		m_led_pattern(0)
 	{ }
 
 	void virusa(machine_config &config) ATTR_COLD;
@@ -122,6 +125,7 @@ private:
 	u8 p4_r();
 	void p1_w(u8 data);
 	void p3_w(u8 data);
+	void p4_w(u8 data);
 	void p5_w(u8 data);
 
 	u8 p402_r();
@@ -129,9 +133,11 @@ private:
 	void palette_init(palette_device &palette) ATTR_COLD;
 
 	required_ioport_array<32> m_knob;
+	optional_device<pwm_display_device> m_leds;
 
 	u8 m_scan;
 	u8 m_an_select;
+	u8 m_led_pattern;
 };
 
 
@@ -142,6 +148,7 @@ void acvirus_state::machine_start()
 
 	save_item(NAME(m_scan));
 	save_item(NAME(m_an_select));
+	save_item(NAME(m_led_pattern));
 }
 
 void acvirus_state::machine_reset()
@@ -171,10 +178,20 @@ u8 acvirus_state::p4_r()
 	return m_row[m_scan & 3]->read();
 }
 
+void acvirus_state::p4_w(u8 data)
+{
+	m_leds->write_mx(data);
+
+	if (BIT(m_scan, 3))
+		m_led_pattern = data;
+}
+
 void acvirus_state::p5_w(u8 data)
 {
-	m_scan = data & 7;
 	m_rombank->set_entry((data >> 4) & 15);
+
+	m_scan = data & 15;
+	m_leds->matrix(1 << m_scan, m_led_pattern);
 }
 
 void acvirus_state::prog_map(address_map &map)
@@ -185,8 +202,9 @@ void acvirus_state::prog_map(address_map &map)
 
 void acvirus_state::data_map(address_map &map)
 {
+	map(0x0000, 0x7fff).ram();
 	map(0x0400, 0x0407).rw(m_dsp, FUNC(dsp563xx_device::hi08_r), FUNC(dsp563xx_device::hi08_w));
-	map(0x2000, 0x7fff).ram(); // TODO: RAM banks
+	map(0x8000, 0xffff).ram(); // TODO: RAM banks
 }
 
 void acvirus_state::dsp_p_map(address_map &map)
@@ -260,6 +278,7 @@ void acvirus_state::virusb(machine_config &config)
 	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(acvirus_state::p3_w));
 	m_maincpu->port_in_cb<4>().set(FUNC(acvirus_state::p4_r));
+	m_maincpu->port_out_cb<4>().set(FUNC(acvirus_state::p4_w));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
 	m_maincpu->an0_func().set([this] { return m_knob[4*0 + m_an_select]->read(); });
 	m_maincpu->an1_func().set([this] { return m_knob[4*1 + m_an_select]->read(); });
@@ -282,6 +301,8 @@ void acvirus_state::virusb(machine_config &config)
 	/* Actual device is LM16255 */
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
+
+	PWM_DISPLAY(config, m_leds).set_size(8, 8);
 
 	DSP56311(config, m_dsp, 108_MHz_XTAL);
 	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
