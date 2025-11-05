@@ -31,6 +31,7 @@ class SlotChange:
     sel1 = 1
     bus24 = 2
     bus8 = 3
+    bus48 = 4
 
 functions = {}
 
@@ -304,12 +305,16 @@ class Function:
                 return '$%%0%dx' % ((self.bcount + 3) // 4)
             elif mode == 'immm':
                 return '$%x'
+            elif mode == 'imms':
+                return '%s$%x'
             elif mode == 'bit' or mode == 'shift':
                 return '%d'
             elif mode == 'asap' or mode == 'asaq' or mode == 'pcrel' or mode == 'abs':
                 return '$%06x'                
-        if self.name == 'exabs' or self.name == 'expcrel' or self.name == 'eximm' or self.name == 'exoff' or self.name == 'eam1a' or self.name == 'eam1i':
+        if self.name == 'exabs' or self.name == 'expcrel' or self.name == 'eximm' or self.name == 'exco' or self.name == 'eam1a' or self.name == 'eam1i':
             return '$%06x'
+        elif self.name == 'exoff':
+            return '%s$%x'
         return '[' + self.name + ']'
 
     def brange(self, bit, bc):
@@ -335,6 +340,8 @@ class Function:
             mode = self.values[2]
             if mode == 'imm' or mode == 'bit' or mode == 'shift' or mode == 'abs':
                 return 'BIT(opcode, %d, %d)' % (params[0], self.bcount)
+            elif mode == 'imms':
+                return 'util::sext(opcode >> %d, %d)' % (params[0], self.bcount)
             elif mode == 'immm':
                 return '0x800000 >> BIT(opcode, %d, %d)' % (params[0], self.bcount)
             elif mode == 'asap':
@@ -351,6 +358,8 @@ class Function:
             mode = self.values[3]
             if mode == 'imm' or mode == 'bit' or mode == 'shift':
                 return 'bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
+            elif mode == 'imms':
+                return 'util::sext(bitswap<%d>(opcode%s%s), %d)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2), self.bcount)
             elif mode == 'asap':
                 return '0xffffc0 + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
             elif mode == 'asaq':
@@ -359,7 +368,7 @@ class Function:
                 return '(m_pc + util::sext(bitswap<%d>(opcode%s%s), %d)) & 0xffffff' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2), self.bcount)
             else:
                 print('unsupported split-range on %s %s' % (mode, self.name))
-        elif self.name == 'exabs' or self.name == 'eximm' or self.name == 'exoff' or self.name == 'eam1a' or self.name == 'eam1i':
+        elif self.name == 'exabs' or self.name == 'eximm' or self.name == 'exoff' or self.name == 'exco' or self.name == 'eam1a' or self.name == 'eam1i':
             return 'exv'
         elif self.name == 'expcrel':
             return '(m_pc+exv) & 0xffffff'
@@ -384,6 +393,8 @@ class Function:
             mode = self.values[2]
             if mode == 'imm' or mode == 'bit' or mode == 'shift' or mode == 'abs':
                 return ', BIT(opcode, %d, %d)' % (params[0], self.bcount)
+            elif mode == 'imms':
+                return ', BIT(opcode, %d) ? "-" : "+", std::abs(util::sext(opcode >> %d, %d))' % (self.bcount - 1, params[0], self.bcount)
             elif mode == 'immm':
                 return ', 0x800000 >> BIT(opcode, %d, %d)' % (params[0], self.bcount)
             elif mode == 'asap':
@@ -398,14 +409,18 @@ class Function:
             mode = self.values[3]
             if mode == 'imm' or mode == 'bit' or mode == 'shift':
                 return ', bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
+            elif mode == 'imms':
+                return ', BIT(opcode, %d) ? "-" : "+", std::abs(util::sext(bitswap<%d>(opcode%s%s), %d))' % (params[0] + b1 - 1, self.bcount, self.brange(params[0], b1), self.brange(params[1], b2), self.bcount)
             elif mode == 'asap':
                 return ', 0xffffc0 + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
             elif mode == 'asaq':
                 return ', 0xffff80 + bitswap<%d>(opcode%s%s)' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2))
             elif mode == 'pcrel':
                 return ', (pc + util::sext(bitswap<%d>(opcode%s%s), %d)) & 0xffffff' % (self.bcount, self.brange(params[0], b1), self.brange(params[1], b2), self.bcount)
-        elif self.name == 'exabs' or self.name == 'eximm' or self.name == 'exoff' or self.name == 'eam1a' or self.name == 'eam1i':
+        elif self.name == 'exabs' or self.name == 'eximm' or self.name == 'exco' or self.name == 'eam1a' or self.name == 'eam1i':
             return ', exv'
+        elif self.name == 'exoff':
+            return ', BIT(exv, 23) ? "-" : "+", std::abs(util::sext(exv, 24))'
         elif self.name == 'expcrel':
             return ', (pc+exv) & 0xffffff'
         return ''
@@ -413,7 +428,6 @@ class Function:
 Function("acc", 1, ["single", ['a', 'b']])
 Function("nacc", -1, ["single", ['b', 'a']])
 Function("xyr", 1, ["single", ['x', 'y']])
-Function("dao2", 2, ["single-alt", [None, "b", "x", "y", "x0", "y0", "x1", "y1", None, "a", "x", "y", "x0", "y0", "x1", "y1"]])
 Function("daos", 1, ["single", ['x0', 'y0', 'x1', 'y1']])
 Function("daos3", 2, ["single-alt", ['b', None, None, None, 'x0', 'y0', 'x1', 'y1', 'a', None, None, None, 'x0', 'y0', 'x1', 'y1']])
 Function("dao3", 1, ["single", [None, None, 'a1', 'b1', 'x0', 'y0', 'x1', 'y1']])
@@ -454,8 +468,8 @@ Function("expcrel", 0, ["pass"])
 Function("exabs", 0, ["pass"])
 Function("exco", 0, ["pass"])
 Function("pcrel", 2, ["split-range", 5, 512, "pcrel"])
-Function("sda7", 2, ["split-range", 1, 128, "imm"])
-Function("sda7b", 2, ["split-range", 4, 128, "imm"])
+Function("sda7", 2, ["split-range", 1, 128, "imms"])
+Function("sda7b", 2, ["split-range", 4, 128, "imms"])
 Function("abs12", 1, ["range", 4096, "abs"])
 Function("fobr", 1, ["single", [None, None, None, None, 'x0', 'x1', 'y0', 'y1',
                                 'a0', 'b0', 'a2', 'b2', 'a1', 'b1', 'a', 'b']])
@@ -484,7 +498,7 @@ Function("damo1_a",  1, ["single", ['x0', 'y0', 'x1', 'y1', 'x0', 'y0', 'x1', 'y
 Function("damo1_b", -1, ["single", ['x0', 'y0', 'x0', 'y0', 'y1', 'x0', 'y0', 'x1']])
 Function("damo2", 1, ["single", ['y1', 'x0', 'y0', 'x1']])
 
-NormalRegs = ['a', 'a0', 'a1', 'a2', 'b', 'b0', 'b1', 'b2', 'x0', 'x1', 'y0', 'y1', 'ep', 'vba', 'sc', 'sz', 'sr', 'omr', 'sp', 'ssh', 'ssl', 'la', 'lc', 'mr', 'ccr', 'com', 'eom']
+NormalRegs = ['a', 'a0', 'a1', 'a2', 'b', 'b0', 'b1', 'b2', 'x0', 'x1', 'y0', 'y1', 'a10', 'b10', 'ab', 'ba', 'x', 'y', 'ep', 'vba', 'sc', 'sz', 'sr', 'omr', 'sp', 'ssh', 'ssl', 'la', 'lc', 'mr', 'ccr', 'com', 'eom']
 ArrayRegs = ['r', 'n', 'm']
 IndirectRegs = ['(r)-n', '(r)+n', '(r)-', '(r)+', '(r)', '(r+n)', '-(r)']
 DasmFlags = ['over', 'cond', 'out']
@@ -595,11 +609,11 @@ class Source:
                 while pos != len(line) and isa(line[pos]):
                     pos += 1
                 smode = line[spos:pos]
-            if smode != '' and smode != 'w' and smode != 'm' and smode != '1' and smode != 'w1' and smode != 'h' and smode != 'wh' and smode != 'wb':
+            if smode != '' and smode != 'w' and smode != 'm' and smode != '1' and smode != 'w1' and smode != 'h' and smode != 'wh' and smode != 'wb' and smode != 'l' and smode != 'wl':
                 print("Unexpected slot mode %s" % smode)
                 sys.exit(1)
             smode_id = SlotMode.memory if smode == 'm' else SlotMode.write if 'w' in smode else SlotMode.read
-            schange_id = SlotChange.sel1 if '1' in smode else SlotChange.bus24 if 'h' in smode else SlotChange.bus8 if 'b' in smode else SlotChange.none
+            schange_id = SlotChange.sel1 if '1' in smode else SlotChange.bus24 if 'h' in smode else SlotChange.bus8 if 'b' in smode else SlotChange.bus48 if 'l' in smode else SlotChange.none
             if sname not in self.slots:
                 self.slots[sname] = [False]*3
             self.slots[sname][smode_id] = True
@@ -639,6 +653,8 @@ class Source:
                             s += e[0] + '_1'
                         elif e[2] == SlotChange.bus24:
                             s += e[0] + '_h'
+                        elif e[2] == SlotChange.bus48:
+                            s += e[0] + '_l'
                         else:
                             s += e[0]
                     else:
@@ -661,6 +677,8 @@ class Source:
                                 s += 'set_%sh(%s)' % (slot, sub)
                             elif e[2] == SlotChange.bus8:
                                 s += 'set_%sf(%s)' % (slot, sub)
+                            elif e[2] == SlotChange.bus48:
+                                s += 'set_%sl(%s)' % (slot, sub)
                             else:
                                 s += 'set_%s(%s)' % (slot, sub)
                         elif (slot == 'x0' or slot == 'x1' or slot == 'y0' or slot == 'y1') and e[2] == SlotChange.bus8:
@@ -688,6 +706,8 @@ class Source:
                         print('\t\tu32 %s_1 = get_%s1();' % (slot, inst), file=f)
                     elif e[2] == SlotChange.bus24:
                         print('\t\tu32 %s_h = get_%sh();' % (slot, inst), file=f)
+                    elif e[2] == SlotChange.bus48:
+                        print('\t\tu64 %s_l = get_%sl();' % (slot, inst), file=f)
                     else:
                         print("unhandled SlotChange %d" % e[2])
             if type(e) == list:
@@ -703,6 +723,8 @@ class Source:
                             changes = []
                             for line in self.text:
                                 self.ab_scan_gen(f, slot, inst, line, changes)
+                        elif inst == 'a10' or inst == 'b10' or inst == 'ab' or inst == 'ba' or inst == 'x' or inst == 'y':
+                            print('\t\tu64 %s = get_%s();' % (slot, inst), file=f)
                         else:
                             print('\t\tu32 %s = get_%s();' % (slot, inst), file=f)
                     elif inst in ArrayRegs:
@@ -922,7 +944,10 @@ class Instruction:
             if type(s) == str:
                 da += s
             else:
-                da += s.format()
+                fmt = s.format()
+                if fmt == '%s$%x' and da[-1] == '+':
+                    da = da[:-1]
+                da += fmt
                 param += s.param()
         if param:
             return 'util::string_format("' + da + '"' + param + ')'

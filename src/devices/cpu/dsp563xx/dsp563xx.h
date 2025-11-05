@@ -45,6 +45,8 @@ protected:
 		CCR_L = 0x40,
 		CCR_S = 0x80,
 
+		MR_S0 = 0x08,
+		MR_S1 = 0x10,
 		MR_SC = 0x20,
 		MR_DM = 0x40,
 		MR_LF = 0x80,
@@ -98,7 +100,7 @@ protected:
 	u64 m_a, m_b;
 	u32 m_tmp1, m_tmp2;
 	std::array<u32, 16> m_stackh, m_stackl;
-	u32 m_pc, m_la, m_lc, m_vba;
+	u32 m_pc, m_la, m_lc, m_temp_lc, m_vba;
 	u32 m_x0, m_x1, m_y0, m_y1;
 	u32 m_ep;
 	u32 m_omr;
@@ -108,20 +110,27 @@ protected:
 	u32 m_npc;
 	u8 m_sc, m_emr, m_mr, m_ccr, m_hard_omr;
 	bool m_skip;
+	bool m_rep;
 	int m_icount;
 
 	inline void set_a(u64 v) { m_a = v & 0xffffffffffffff; }
-	inline void set_ah(u32 v) { m_a = u64(util::sext(v, 24)) << 24; }
+	inline void set_ah(u32 v) { set_a(u64(util::sext(v, 24)) << 24); }
 	inline void set_af(u8 v) { m_a = u64(v) << 48; }
 	inline void set_a2(u8 v) { m_a = (m_a & 0x00ffffffffffff) | (u64(v) << 48); }
 	inline void set_a1(u32 v) { m_a = (m_a & 0xff000000ffffff) | (u64(v & 0xffffff) << 24); }
 	inline void set_a0(u32 v) { m_a = (m_a & 0xffffffff000000) | u64(v & 0xffffff); }
+	inline void set_a10(u64 v) { set_a(util::sext(v, 48)); }
+	inline void set_al(u64 v) { set_a(util::sext(v, 48)); }
 	inline void set_b(u64 v) { m_b = v & 0xffffffffffffff; }
-	inline void set_bh(u32 v) { m_b = u64(util::sext(v, 24)) << 24; }
+	inline void set_bh(u32 v) { set_b(u64(util::sext(v, 24)) << 24); }
 	inline void set_bf(u64 v) { m_b = u64(v) << 48; }
 	inline void set_b2(u8 v) { m_b = (m_b & 0x00ffffffffffff) | (u64(v) << 48); }
 	inline void set_b1(u32 v) { m_b = (m_b & 0xff000000ffffff) | (u64(v & 0xffffff) << 24); }
 	inline void set_b0(u32 v) { m_b = (m_b & 0xffffffff000000) | u64(v & 0xffffff); }
+	inline void set_b10(u64 v) { set_b(util::sext(v, 48)); }
+	inline void set_bl(u64 v) { set_b(util::sext(v, 48)); }
+	inline void set_ab(u64 v) { set_ah(v >> 24); set_bh(v); }
+	inline void set_ba(u64 v) { set_bh(v >> 24); set_ah(v); }
 	inline void set_x0(u32 v) { m_x0 = v & 0xffffff; }
 	inline void set_x0f(u8 v) { m_x0 = u32(v) << 16; }
 	inline void set_x1(u32 v) { m_x1 = v & 0xffffff; }
@@ -130,12 +139,14 @@ protected:
 	inline void set_y0f(u8 v) { m_y0 = u32(v) << 16; }
 	inline void set_y1(u32 v) { m_y1 = v & 0xffffff; }
 	inline void set_y1f(u8 v) { m_y1 = u32(v) << 16; }
+	inline void set_x(u64 v) { m_x1 = v >> 24; m_x0 = v & 0xffffff; }
+	inline void set_y(u64 v) { m_y1 = v >> 24; m_y0 = v & 0xffffff; }
 	inline void set_r(int index, u32 v) { m_r[index] = v & 0xffffff; }
 	inline void set_n(int index, u32 v) { m_n[index] = v & 0xffffff; }
 	inline void set_m(int index, u32 v) { m_m[index] = v & 0xffffff; }
 	inline void set_ep(u32 v) { m_ep = v; }
 	inline void set_la(u32 v) { m_la = v; }
-	inline void set_lc(u32 v) { m_lc = v; }
+	inline void set_lc(u32 v) { m_lc = v & 0xffffff; }
 	inline void set_omr(u32 v) { m_omr = v; }
 	inline void set_sc(u32 v) { m_sc = v; }
 	inline void set_sp(u32 v) { m_sp = v; }
@@ -154,15 +165,23 @@ protected:
 	inline u32 get_a2() const { return m_a >> 48; }
 	inline u32 get_a1() const { return (m_a >> 24) & 0xffffff; }
 	inline u32 get_a0() const { return m_a & 0xffffff; }
+	inline u64 get_a10() const { return m_a & 0xffffffffffff; }
+	inline u64 get_al() const { return m_a & 0xffffffffffff; }
 	inline u64 get_b() const { return m_b; }
 	inline u32 get_bh() const { return std::clamp(s32(m_b >> 24), -0x00800000, 0x007fffff) & 0xffffff; }
 	inline u32 get_b2() const { return m_b >> 48; }
 	inline u32 get_b1() const { return (m_b >> 24) & 0xffffff; }
 	inline u32 get_b0() const { return m_b & 0xffffff; }
+	inline u64 get_b10() const { return m_b & 0xffffffffffff; }
+	inline u64 get_bl() const { return m_b & 0xffffffffffff; }
+	inline u64 get_ab() const { return u32(get_ah()) << 24 | get_bh(); }
+	inline u64 get_ba() const { return u32(get_bh()) << 24 | get_ah(); }
 	inline u32 get_x0() const { return m_x0; }
 	inline u32 get_x1() const { return m_x1; }
+	inline u64 get_x() const { return u64(m_x1) << 24 | m_x0; }
 	inline u32 get_y0() const { return m_y0; }
 	inline u32 get_y1() const { return m_y1; }
+	inline u64 get_y() const { return u64(m_y1) << 24 | m_y0; }
 	inline u32 get_r(int index) const { return m_r[index]; }
 	inline u32 get_n(int index) const { return m_n[index]; }
 	inline u32 get_m(int index) const { return m_m[index]; }
@@ -211,6 +230,12 @@ protected:
 	}
 
 	inline void add_r(int reg, s32 delta) { m_r[reg] = calc_add_r(reg, delta); }
+
+	u64 do_add56(u64 v1, u64 v2);
+	u64 do_sub56(u64 v1, u64 v2);
+	u64 do_asl56(u8 n, u64 v);
+	u64 do_asr56(u8 n, u64 v);
+	void do_tst56(u64 v);
 };
 
 #endif
