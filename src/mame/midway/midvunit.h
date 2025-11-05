@@ -177,7 +177,6 @@ protected:
 	required_ioport m_dsw;
 
 	uint8_t m_adc_shift = 0;
-	uint16_t m_last_port0 = 0;
 	uint8_t m_shifter_state = 0;
 	uint8_t m_galil_input_index = 0;
 	uint8_t m_galil_input_length = 0;

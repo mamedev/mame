@@ -72,7 +72,6 @@ void midvunit_state::machine_start()
 	midvunit_base_state::machine_start();
 
 	save_item(NAME(m_adc_shift));
-	save_item(NAME(m_last_port0));
 	save_item(NAME(m_shifter_state));
 	save_item(NAME(m_galil_input_index));
 	save_item(NAME(m_galil_input_length));
@@ -135,29 +134,18 @@ uint32_t midvunit_state::port0_r()
 
 	if (!machine().side_effects_disabled())
 	{
+		// make sure the shift controls are mutually exclusive
 		// neutral has priority
 		if (!(val & 0x0020))
-		{
 			m_shifter_state = 0; // Neutral
-		}
 		else if (!(val & 0x0400))
-		{
 			m_shifter_state = 1; // Gear 1
-		}
 		else if (!(val & 0x0800))
-		{
 			m_shifter_state = 2; // Gear 2
-		}
 		else if (!(val & 0x1000))
-		{
 			m_shifter_state = 4; // Gear 3
-		}
 		else if (!(val & 0x2000))
-		{
 			m_shifter_state = 8; // Gear 4
-		}
-
-		m_last_port0 = val;
 	}
 
 	// Bits 10–13 (0x3C00) represent gear state
@@ -165,7 +153,6 @@ uint32_t midvunit_state::port0_r()
 
 	return (val << 16) | val;
 }
-
 
 /*************************************
  *
@@ -755,15 +742,15 @@ static INPUT_PORTS_START( midvunit )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) // Slam Switch
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Enter") PORT_CODE(KEYCODE_F2) // Test switch
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("4th Gear")    // 4th
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("3rd Gear")    // 3rd
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("2nd Gear")    // 2nd
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("1st Gear")    // 1st
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5)  PORT_NAME("Neutral Gear")
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Neutral Gear")
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_COIN3)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_VOLUME_DOWN)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_VOLUME_UP)
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_BUTTON9) PORT_NAME("4th Gear")    // 4th
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_NAME("3rd Gear")    // 3rd
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_NAME("2nd Gear")    // 2nd
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("1st Gear")    // 1st
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
