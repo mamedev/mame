@@ -154,7 +154,6 @@ uint32_t midvunit_state::port0_r()
 	return (val << 16) | val;
 }
 
-
 /*************************************
  *
  *  ADC input ports
