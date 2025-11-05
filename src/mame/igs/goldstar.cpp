@@ -614,6 +614,7 @@ private:
 	void cmast97_portmap(address_map &map) ATTR_COLD;
 	void jpknight_portmap(address_map &map) ATTR_COLD;
 	void cm97_vid_reg_w(uint8_t data);
+	void cm97_bgcolor_w(uint8_t data);
 	uint8_t m_bgcolor = 0;
 };
 
@@ -3087,13 +3088,13 @@ void wingco_state::fever_outp_w(offs_t offset, uint8_t data)
 
 void cmast97_state::cm97_vid_reg_w(uint8_t data)
 {
-	uint8_t nogirl_dsw = !BIT(ioport("DSW1")->read(), 3);
 	m_reel_bank = data & 0x03;
 	m_gfx_view.select(!BIT(data, 3));
-	m_bgcolor = m_reel_bank != 0 ? 0x0f : 0x0b;
+}
 
-	if((m_bgcolor == 0x0f) & nogirl_dsw)
-		m_bgcolor = 0x09;
+void cmast97_state::cm97_bgcolor_w(uint8_t data)
+{
+	m_bgcolor = data;
 }
 
 
@@ -3954,6 +3955,7 @@ void cmast97_state::cmast97_portmap(address_map &map)
 	map(0x00, 0x00).lw8(NAME([this] (uint8_t data) { logerror("Port 0:m_enable:%02x\n", data);m_enable_reg = data; } ));
 	map(0x01, 0x01).lw8(NAME([this] (uint8_t data) { m_tile_bank = (data & 0x0c) >> 2; if (data & 0xf3) logerror("unk tile bank w: %02x\n", data); }));
 	map(0x02, 0x02).w(FUNC(cmast97_state::cm97_vid_reg_w));	
+	map(0x03, 0x03).w(FUNC(cmast97_state::cm97_bgcolor_w));
 
 	map(0x09, 0x09).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x0a, 0x0b).w("aysnd", FUNC(ay8910_device::data_address_w));
