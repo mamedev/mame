@@ -36,7 +36,7 @@ private:
 	required_device_array<i8251_device, 2> m_uart;
 	required_device<pit8253_device>  m_pit;
 
-//  void map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 

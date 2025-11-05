@@ -142,8 +142,9 @@ void dt7_state::dt7_irq(int state)
 	// the audio CPU also has a 'serial' interrupt populated?
 	// and the boards can be linked together
 
-	// triggering this prevents our other timer? interrupt from working however?
-	//m_audiocpu->set_input_line(NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
+	// amongst other things this interrupt copies input data to where the 68k can see it
+	// although triggering it here might not be correct as the game just ends up showing 'mach race'
+	// m_audiocpu->set_input_line(NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -172,6 +173,10 @@ void dt7_state::eeprom_w(u8 data)
 
 u8 dt7_state::read_port_2()
 {
+	// input/coin data is read in bits 0/1
+	// it's probably latched by toggling bit 2 low->high and shifted by toggling bit 3
+	// it gets put in RAM then worked on by the external interrupt
+
 	logerror("%s: read port 2\n", machine().describe_context());
 	return m_ioport_state;
 }

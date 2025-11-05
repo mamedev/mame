@@ -17745,6 +17745,7 @@ mjchuuka
 mjdchuka
 mjflove
 mjgnight
+mjkokuryu
 mjmyorn2
 mjmyornt
 mjmyorntr
@@ -17754,6 +17755,7 @@ mjmyuniv
 mjmyunivh
 mjmywrld
 mjmywrldt
+mjnigiri
 mjreach1
 mjreach1a
 mjschuka
@@ -19460,6 +19462,8 @@ rhhc152
 supreme
 table108
 throwbck
+touma560
+touma568
 toumapet
 
 @source:handheld/chessking.cpp
@@ -19471,8 +19475,11 @@ dbridgec
 @source:handheld/evolution_handheld.cpp
 buttdtct
 evolhh
+hoppech
+pokesmqz
 pokexyqz
 smkatsum
+tomyspt
 yuleyuan
 
 @source:handheld/gameking.cpp
@@ -20004,6 +20011,15 @@ talkingbb
 
 @source:handheld/talkingfb.cpp
 talkingfb
+
+@source:handheld/tama_4u.cpp
+tama4u
+
+@source:handheld/tama_id.cpp
+tamaid
+
+@source:handheld/tama_mix.cpp
+tamamixm
 
 @source:handheld/teammate.cpp
 teammate
@@ -20593,6 +20609,8 @@ cbaai
 cbonus
 cherry96
 cherry96a
+cherry98
+cherry98a
 chry10
 chryangl
 chryangla
@@ -20809,6 +20827,7 @@ roypok96c
 schery97
 schery97a
 scmaster
+scmastera
 skdelux2k
 skdelux99
 skill98
@@ -22390,6 +22409,7 @@ virtpool
 @source:itech/itech8.cpp
 arlingtn
 arlingtna
+arlingtni
 dynobop
 gpgolf
 gpgolfa
@@ -28915,9 +28935,11 @@ milton
 raaspec
 vectrex
 
-@source:mips/mips.cpp
+@source:mips/mips_i2000.cpp
 rc2030
 rs2030
+
+@source:mips/mips_r3030.cpp
 rc3230
 rs3230
 
@@ -33105,6 +33127,7 @@ trvhanga
 spdamjes
 
 @source:misc/spool99.cpp
+scardy2k
 spool99
 spool99a
 spool99b
@@ -35756,11 +35779,13 @@ lxpcsp
 matet100
 matet220
 matet300
+micac250
 myaasa
 myaass
 mymman
 retror30
 rminitv
+tvkunio1
 typo240
 
 @source:nintendo/nes_vt369_vtunknown.cpp
@@ -35786,7 +35811,9 @@ gtct885
 h12p1000
 hkb502
 hkb502a
+jl1810gr
 jl2050
+jl2377
 lexi30
 lpgm240
 lxcap
@@ -35797,19 +35824,25 @@ lxcmc250
 lxcmcy
 lxcmcyba
 lxcmcybt
+lxcmcyco
 lxcmcycr
 lxcmcydp
 lxcmcydpn
 lxcmcyfd
 lxcmcyfz
+lxcmcyfza
+lxcmcyfzb
+lxcmcyls
 lxcmcypj
 lxcmcypp
 lxcmcyppa
 lxcmcysp
+lxcmcyspa
 lxcmcyspn
 lxcmcysw
 lxcyber
 lxcypkdp
+lxcypkfz
 lxcypkpp
 lxcypksp
 matet10
@@ -44038,6 +44071,7 @@ shine
 
 @source:skeleton/shoken_md06.cpp
 petitlot
+polarstar2
 
 @source:skeleton/si5500.cpp
 si5500
@@ -44090,6 +44124,9 @@ tamapix
 @source:skeleton/tavernie.cpp
 cpu09
 ivg09
+
+@source:skeleton/tc_manhattan.cpp
+triplec
 
 @source:skeleton/tecnbras.cpp
 tecnbras
@@ -47106,9 +47143,12 @@ wrlshunt
 
 @source:tvgames/generalplus_gpl16250_spi.cpp
 anpanbd
+anpaneng
 anpanm15
 bk139in1
 bkrankp
+lxcympp
+lxcymsm
 lxcyrace
 pokegac2
 pokegac2y
@@ -47126,6 +47166,7 @@ bftetris
 bubltea
 dsgnpal
 pokebala
+pokeissh
 pokgoget
 punifrnd
 punij1m
@@ -47133,6 +47174,7 @@ punij1pk
 punij1pu
 punij2pk
 punirune
+punistar
 segapet1
 segapet1a
 segapet2
@@ -47140,6 +47182,7 @@ segapet2a
 segapet3
 segapet3a
 smkcatch
+smkgacha
 smkguras
 smkgurasa
 wiwcs
@@ -47155,6 +47198,7 @@ anpanm19
 arcadege
 ardancem
 bananlap
+banaquap
 bandolap
 bandplap
 bandslap
@@ -47176,6 +47220,7 @@ pocketmr
 pokepeac
 rotom2
 saikyopc
+segcarsh
 segdis16
 smatomo
 spicanot
@@ -47207,6 +47252,7 @@ rs70_648
 @source:tvgames/myaatari.cpp
 kuniotv
 myaatari
+pachdmi
 
 @source:tvgames/pubint_storyreader.cpp
 pi_stry
@@ -47415,6 +47461,8 @@ tvtchsb
 
 @source:tvgames/spg2xx_lexibook.cpp
 arcade3d
+cybrtvbb
+cybrtvfe
 lexizeus
 lexiseal
 discpal

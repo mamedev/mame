@@ -31,7 +31,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<i8255_device> m_ppi;

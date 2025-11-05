@@ -2420,17 +2420,6 @@ if (MACHINES["M68340"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/mcf5206e.h,MACHINES["MCF5206E"] = true
----------------------------------------------------
-
-if (MACHINES["MCF5206E"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mcf5206e.cpp",
-		MAME_DIR .. "src/devices/machine/mcf5206e.h",
-	}
-end
 
 ---------------------------------------------------
 --

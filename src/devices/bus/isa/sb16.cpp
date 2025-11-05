@@ -388,7 +388,8 @@ void sb16_lle_device::sb16_data(address_map &map)
 	map(0x0004, 0x0004).mirror(0xff00).rw(FUNC(sb16_lle_device::mode_r), FUNC(sb16_lle_device::mode_w));
 	map(0x0005, 0x0005).mirror(0xff00).rw(FUNC(sb16_lle_device::dac_ctrl_r), FUNC(sb16_lle_device::dac_ctrl_w));
 	map(0x0006, 0x0006).mirror(0xff00).r(FUNC(sb16_lle_device::dma_stat_r));
-//  map(0x0007, 0x0007) // unknown, readback status of stereo f/f?
+	// unknown, readback status of stereo f/f? (doom)
+	map(0x0007, 0x0007).mirror(0xff00).lr8(NAME([] () { return 0; }));
 	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(sb16_lle_device::ctrl8_r), FUNC(sb16_lle_device::ctrl8_w));
 	map(0x0009, 0x0009).mirror(0xff00).w(FUNC(sb16_lle_device::rate_w));
 	map(0x000A, 0x000A).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_cnt_lo_r));
@@ -433,6 +434,7 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 	m_cpu->port_out_cb<1>().set(FUNC(sb16_lle_device::p1_w));
 	m_cpu->port_in_cb<2>().set(FUNC(sb16_lle_device::p2_r));
 	m_cpu->port_out_cb<2>().set(FUNC(sb16_lle_device::p2_w));
+	m_cpu->port_in_cb<3>().set_constant(0xff); // spammy
 
 	SPEAKER(config, "speaker", 2).front();
 

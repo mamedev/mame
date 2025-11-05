@@ -1387,8 +1387,6 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x11100000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
 	map(0x11200000, 0x112fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
 	map(0x11300000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
-	map(0x11400000, 0x1140ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
-	map(0x12800000, 0x1281ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 	map(0x11400000, 0x1140ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask16(0x00ff).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
@@ -1424,8 +1422,6 @@ void model2c_state::model2c_crx_mem(address_map &map)
 
 	map(0x11000000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
 	map(0x11200000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
-	map(0x11400000, 0x1140ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
-	map(0x12800000, 0x1281ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 	map(0x11400000, 0x1140ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask16(0x00ff).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);

@@ -29,8 +29,10 @@ TODO (pc9821as):
 - Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
 
 TODO (pc9821ce):
-- Needs SCSI to boot stuff, or 2.5" option IDE for 98NOTE;
-- Can't boot any floppy, thinks it's never ready/leaves motor off;
+- Throws random TIMER errors at POST (soft reset to bypass);
+- Takes forever to load a floppy, throws (A)bort / (R)etry / (F)ail on DOS;
+- 3.5" floppies won't load without changing SDIP floppy to Fixed Mode,
+  while 5.25" floppies want specifically Auto-Detect instead;
 
 TODO (pc9821cx3):
 - Incomplete bank mapping, keeps looping over the same routine when hopping to PnP BIOS after
@@ -260,16 +262,16 @@ uint8_t pc9821_state::ext2_video_ff_r()
 //      case 0x01: 200 line color / b&w mode (i/o 0x68 -> 0x02)
 //      case 0x02: Odd-numbered raster mask  (i/o 0x68 -> 0x08)
 		case 0x03: res = m_video_ff[DISPLAY_REG]; break; // display reg
-//      case 0x04: palette mode (i/o 0x6a -> 0x00)
+		case 0x04: res = m_ex_video_ff[ANALOG_16_MODE]; break; // palette mode (i/o 0x6a -> 0x00)
 //      case 0x05: GDC sync mode (i/o 0x6a -> 0x40)
 //      case 0x06: unknown (i/o 0x6a -> 0x44)
 //      case 0x07: EGC compatibility mode (i/o 0x6a -> 0x04)
-//      case 0x08: Protected mode f/f (i/o 0x6a -> 0x06)
-//      case 0x09: GDC clock #0 (i/o 0x6a -> 0x82)
+		case 0x08: res = m_ex_video_ff[6 >> 1]; break; // Protected mode f/f (i/o 0x6a -> 0x06)
+		case 0x09: res = m_ex_video_ff[0x82 >> 1]; break; // GDC clock #0 (i/o 0x6a -> 0x82)
 		case 0x0a: res = m_ex_video_ff[ANALOG_256_MODE]; break; // 256 color mode
 //      case 0x0b: VRAM access mode (i/o 0x6a -> 0x62)
 //      case 0x0c: unknown
-//      case 0x0d: VRAM boundary mode (i/o 0x6a -> 0x68)
+		case 0x0d: res = m_ex_video_ff[0x68 >> 1]; break; // VRAM boundary mode (i/o 0x6a -> 0x68)
 //      case 0x0e: 65,536 color GFX mode (i/o 0x6a -> 0x22)
 //      case 0x0f: 65,536 color palette mode (i/o 0x6a -> 0x24)
 //      case 0x10: unknown (i/o 0x6a -> 0x6a)
@@ -1311,6 +1313,7 @@ ROM_START( pc9821ce )
 	// 0x0c000 sound BIOS
 	// 0x10000 sound BIOS copy
 	// 0x16000 <to be identified>
+	// 0x18000 IDE BIOS
 	// 0x1a000 setup menu
 	ROM_COPY( "biosrom", 0x38000, 0x28000, 0x08000 )
 	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x08000 )
@@ -1324,8 +1327,9 @@ ROM_START( pc9821ce )
 	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
 
 	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
-	// Uses SCSI not IDE
-//  LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 

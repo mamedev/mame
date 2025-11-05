@@ -49216,7 +49216,7 @@ Battle screen status bar flickers
 		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).cue" size="129" crc="2c2b2088" sha1="a9cd8b80b8f7f239dc945bdcd61472dafc6b775f"/>
 		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).bin" size="567194208" crc="7471d971" sha1="96e0f7a3387621f044b53722e341b7b566529743"/>
 		-->
-		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan)</description>
+		<description>Choujikuu Yousai Macross - Ai Oboete Imasu ka (Japan)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="cdrom">

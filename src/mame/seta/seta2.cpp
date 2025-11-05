@@ -97,7 +97,6 @@ blnctry:
 #include "seta2.h"
 
 #include "cpu/m68000/mcf5206e.h"
-#include "machine/mcf5206e.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
@@ -2497,14 +2496,13 @@ void funcube_state::funcube2(machine_config &config)
 	funcube(config);
 	MCF5206E(config.replace(), m_maincpu, XTAL(25'447'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube2_map);
+	downcast<mcf5206e_device &>(*m_maincpu).gpio_r_cb().set_ioport("BATTERY");
 
 	m_sub->read_port4().set([]() -> u8 { return 0; }); // unused
 
 	// video hardware
 	m_screen->set_visarea(0x0, 0x140-1, 0x00, 0xf0-1);
 	m_screen->screen_vblank().set(FUNC(funcube_state::screen_vblank));
-	// TODO: check me in mcf5206e core
-	// should take autovector 0x64
 	m_screen->screen_vblank().append_inputline(m_maincpu, 1);
 }
 

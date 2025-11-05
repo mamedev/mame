@@ -57,6 +57,7 @@ void pc9801_14_device::device_add_mconfig(machine_config &config)
 	PIT8253(config, m_pit);
 	m_pit->set_clk<2>(1'996'800 / 8);
 	m_pit->out_handler<2>().set([this] (int state) {
+		// TODO: may require inverted polarity
 		m_bus->int_w<5>(state);
 	});
 

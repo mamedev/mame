@@ -4278,7 +4278,7 @@ if opt_tool(CPUS, "MN10300") then
 end
 
 --------------------------------------------------
--- DSP 563xx
+-- Motorola DSP563xx
 --@src/devices/cpu/dsp563xx/dsp563xx.h,CPUS["DSP563XX"] = true
 --------------------------------------------------
 
@@ -4298,6 +4298,8 @@ if CPUS["DSP563XX"] then
 		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56364.h",
 		MAME_DIR .. "src/devices/cpu/dsp563xx/hi08.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp563xx/hi08.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/shi.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/shi.h",
 	}
 end
 

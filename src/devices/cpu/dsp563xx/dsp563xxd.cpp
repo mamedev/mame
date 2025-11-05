@@ -42,5 +42,5 @@ offs_t dsp563xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const
     } else if(!smove.empty() && kipar)
 	s = "move " + smove;
     stream << s;
-    return ex ? 2 : 1;
+    return (ex ? 2 : 1) | t_npar_flags[knpar] | SUPPORTED;
 }

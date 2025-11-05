@@ -8,7 +8,7 @@
 
 #include "emu.h"
 
-//#include "bus/midi/midi.h"
+#include "bus/midi/midi.h"
 #include "cpu/i86/i186.h"
 #include "cpu/upd7810/upd7810.h"
 #include "formats/dfi_dsk.h"
@@ -21,8 +21,11 @@
 #include "formats/pc_dsk.h"
 #include "formats/td0_dsk.h"
 #include "imagedev/floppy.h"
+#include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"
+#include "machine/input_merger.h"
+#include "machine/mb89371.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
@@ -30,6 +33,8 @@
 
 #include "emupal.h"
 #include "screen.h"
+
+#include "mpc60.lh"
 
 namespace {
 
@@ -45,6 +50,10 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0")
 		, m_ppi(*this, "ppi")
+		, m_sio(*this, "sio%u", 0)
+		, m_midiclock(*this, "midiclock")
+		, m_loled(*this, "loledlatch")
+		, m_hiled(*this, "hiledlatch")
 		, m_keys(*this, "Y%u", 0)
 		, m_drums(*this, "PB%u", 0)
 		, m_dataentry(*this, "DATAENTRY")
@@ -54,6 +63,7 @@ public:
 		, m_last_dial(0)
 		, m_count_dial(0)
 		, m_quadrature_phase(0)
+		, m_ppi_portc(0)
 	{
 	}
 
@@ -63,6 +73,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 nvram_r(offs_t offset);
@@ -70,6 +81,8 @@ private:
 	void fdc_tc_w(u8 data);
 
 	static void floppies(device_slot_interface &device);
+
+	void mpc60_palette(palette_device &palette) const;
 
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -97,6 +110,9 @@ private:
 	required_device<upd72065_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<i8255_device> m_ppi;
+	required_device_array<mb89371_device, 2> m_sio;
+	required_device<clock_device> m_midiclock;
+	required_device<hc259_device> m_loled, m_hiled;
 	required_ioport_array<8> m_keys;
 	required_ioport_array<4> m_drums;
 	required_ioport  m_dataentry;
@@ -105,6 +121,8 @@ private:
 
 	uint8_t m_key_scan_row, m_drum_scan_row, m_variation_slider;
 	int m_last_dial, m_count_dial, m_quadrature_phase;
+
+	uint8_t m_ppi_portc;
 };
 
 void mpc60_state::machine_start()
@@ -113,6 +131,15 @@ void mpc60_state::machine_start()
 	subdevice<nvram_device>("nvram")->set_base(&m_nvram_data[0], 0x800);
 
 	save_pointer(NAME(m_nvram_data), 0x800);
+}
+
+void mpc60_state::machine_reset()
+{
+	// all CTS lines are connected to GND
+	m_sio[0]->write_cts<0>(CLEAR_LINE);
+	m_sio[0]->write_cts<1>(CLEAR_LINE);
+	m_sio[1]->write_cts<0>(CLEAR_LINE);
+	m_sio[1]->write_cts<1>(CLEAR_LINE);
 }
 
 u8 mpc60_state::nvram_r(offs_t offset)
@@ -133,7 +160,7 @@ void mpc60_state::fdc_tc_w(u8 data)
 
 void mpc60_state::mem_map(address_map &map)
 {
-	map(0x00000, 0x7ffff).ram();
+	map(0x00000, 0x7ffff).ram();    // 4x 81C4256 256Kx4 DRAM
 	map(0xbf000, 0xbffff).rw(FUNC(mpc60_state::nvram_r), FUNC(mpc60_state::nvram_w)).umask16(0x00ff);
 	map(0xc0000, 0xfffff).rom().region("program", 0);
 }
@@ -147,6 +174,12 @@ void mpc60_state::io_map(address_map &map)
 	map(0x00b2, 0x00b2).r("lcdc", FUNC(hd61830_device::data_r));
 	map(0x00b4, 0x00b4).w("lcdc", FUNC(hd61830_device::control_w));
 	map(0x00b6, 0x00b6).w("lcdc", FUNC(hd61830_device::data_w));
+	map(0x0100, 0x0107).m(m_sio[1], FUNC(mb89371_device::map<0>)).umask16(0x00ff);
+	map(0x0110, 0x0117).m(m_sio[1], FUNC(mb89371_device::map<1>)).umask16(0x00ff);
+	map(0x0120, 0x0127).m(m_sio[0], FUNC(mb89371_device::map<0>)).umask16(0x00ff);
+	map(0x0130, 0x0137).m(m_sio[0], FUNC(mb89371_device::map<1>)).umask16(0x00ff);
+	map(0x01c0, 0x01df).w(m_loled, FUNC(hc259_device::write_a3)).umask16(0x00ff);
+	map(0x01e0, 0x01ff).w(m_hiled, FUNC(hc259_device::write_a3)).umask16(0x00ff);
 	map(0x0200, 0x0207).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
@@ -313,18 +346,26 @@ uint8_t mpc60_state::ppi_pb_r()
 // PC3 = mute analog in?
 // PC4 = TC/UB (I-0055 sync chip)
 // PC5 = SMT/CLK (I-0055 sync chip)
-// PC6 = FDC motor on
+// PC6 = FDC motor on and drive select (DS0)
 // PC7 = Something to do with the ADC
 void mpc60_state::ppi_pc_w(uint8_t data)
 {
-	// TBD: when should we actually do this?
-	if (BIT(data, 0) && m_floppy->get_device())
+	// drive select is tied to bit 6 along with motor on
+	if (BIT(data, 6) && !BIT(m_ppi_portc, 6) && m_floppy->get_device())
 	{
 		m_fdc->set_floppy(m_floppy->get_device());
 	}
 
 	m_fdc->reset_w(BIT(data, 0));
 	m_floppy->get_device()->mon_w(BIT(data, 6) ^ 1);
+
+	m_ppi_portc = data;
+}
+
+void mpc60_state::mpc60_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(0, 176, 128));
+	palette.set_pen_color(1, rgb_t(15, 73, 119));
 }
 
 void mpc60_state::floppies(device_slot_interface &device)
@@ -448,7 +489,7 @@ static INPUT_PORTS_START(mpc60)
 	PORT_ADJUSTER(100, "NOTE VARIATION") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpc60_state::variation_changed), 1)
 
 	PORT_START("DATAENTRY")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CODE_DEC(KEYCODE_F14) PORT_CODE_INC(KEYCODE_F15)
 INPUT_PORTS_END
 
 void mpc60_state::mpc60(machine_config &config)
@@ -463,6 +504,7 @@ void mpc60_state::mpc60(machine_config &config)
 
 	UPD78C11(config, m_panelcpu, 12_MHz_XTAL);
 	m_panelcpu->set_addrmap(AS_PROGRAM, &mpc60_state::panel_map);
+	m_panelcpu->txd_func().set(m_sio[0], FUNC(mb89371_device::write_rxd<0>));
 	m_panelcpu->pa_in_cb().set(FUNC(mpc60_state::subcpu_pa_r));
 	m_panelcpu->pb_in_cb().set(FUNC(mpc60_state::subcpu_pb_r));
 	m_panelcpu->pb_out_cb().set(FUNC(mpc60_state::subcpu_pb_w));
@@ -474,18 +516,46 @@ void mpc60_state::mpc60(machine_config &config)
 	m_panelcpu->an3_func().set(FUNC(mpc60_state::an3_r));
 	m_panelcpu->an4_func().set(FUNC(mpc60_state::an4_r));
 
-	//MB89371(config, "sio01", 20_MHz_XTAL / 4);
-	//MB89371(config, "sio23", 20_MHz_XTAL / 4);
+	// IC24 and IC25
+	INPUT_MERGER_ANY_HIGH(config, "rxrdy").output_handler().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
+	INPUT_MERGER_ANY_HIGH(config, "txrdy").output_handler().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
+
+	MIDI_PORT(config, "mdin1", midiin_slot, "midiin").rxd_handler().set(m_sio[1], FUNC(mb89371_device::write_rxd<0>));
+	MIDI_PORT(config, "mdin2", midiin_slot, "midiin").rxd_handler().set(m_sio[1], FUNC(mb89371_device::write_rxd<1>));
+	MIDI_PORT(config, "mdout1", midiout_slot, "midiout");
+	MIDI_PORT(config, "mdout2", midiout_slot, "midiout");
+	MIDI_PORT(config, "mdout3", midiout_slot, "midiout");
+	MIDI_PORT(config, "mdout4", midiout_slot, "midiout");
+
+	// IC7 - Rx 0 is panel and 1 is RS-232 DB-25 (never supported, port was physically
+	//       removed in favor of SCSI later), Tx is MIDI out 3 & 4
+	MB89371(config, m_sio[0], 20_MHz_XTAL / 4);
+	m_sio[0]->rxrdy_handler<0>().set("rxrdy", FUNC(input_merger_device::in_w<0>));
+	m_sio[0]->txrdy_handler<0>().set("txrdy", FUNC(input_merger_device::in_w<0>));
+	m_sio[0]->txrdy_handler<1>().set("txrdy", FUNC(input_merger_device::in_w<1>));
+	m_sio[0]->txd_handler<0>().set("mdout3", FUNC(midi_port_device::write_txd));
+	m_sio[0]->txd_handler<1>().set("mdout4", FUNC(midi_port_device::write_txd));
+
+	// IC8 - Rx is MIDI in 1 & 2, Tx is MIDI out 1 & 2
+	MB89371(config, m_sio[1], 20_MHz_XTAL / 4);
+	m_sio[1]->rxrdy_handler<0>().set("rxrdy", FUNC(input_merger_device::in_w<1>));
+	m_sio[1]->rxrdy_handler<0>().set("rxrdy", FUNC(input_merger_device::in_w<2>));
+	m_sio[1]->txrdy_handler<0>().set("txrdy", FUNC(input_merger_device::in_w<2>));
+	m_sio[1]->txrdy_handler<1>().set("txrdy", FUNC(input_merger_device::in_w<3>));
+	m_sio[1]->txd_handler<0>().set("mdout1", FUNC(midi_port_device::write_txd));
+	m_sio[1]->txd_handler<1>().set("mdout2", FUNC(midi_port_device::write_txd));
 
 	I8255(config, m_ppi); // MB89255A-P-C
 	m_ppi->in_pb_callback().set(FUNC(mpc60_state::ppi_pb_r));
 	m_ppi->out_pc_callback().set(FUNC(mpc60_state::ppi_pc_w));
 
+	INPUT_MERGER_ANY_HIGH(config, "drq1").output_handler().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+
 	UPD72065(config, m_fdc, 16_MHz_XTAL / 4); // μPD72066C (clocked by SED9420CAC)
-	m_fdc->set_ready_line_connected(false); // RDY tied to VDD (TODO: drive ready signal connected to PPI's PB2 instead)
+	m_fdc->set_ready_line_connected(false); // RDY tied to VDD
 	m_fdc->set_select_lines_connected(false);
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
-	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w)); // FIXME: delayed and combined with DRQAD
+	m_fdc->drq_wr_callback().set("drq1", FUNC(input_merger_device::in_w<0>)); // FIXME: delayed and combined with DRQAD
 
 	FLOPPY_CONNECTOR(config, m_floppy, mpc60_state::floppies, "35dd", add_formats).enable_sound(true);
 
@@ -500,11 +570,43 @@ void mpc60_state::mpc60(machine_config &config)
 	screen.set_visarea(0, 240-1, 0, 64-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+	PALETTE(config, "palette", FUNC(mpc60_state::mpc60_palette), 2);
+
+	HC259(config, m_loled);
+	m_loled->q_out_cb<0>().set_output("led0");  // count in
+	m_loled->q_out_cb<1>().set_output("led1");  // 2nd seq
+	m_loled->q_out_cb<2>().set_output("led2");  // transpose
+	m_loled->q_out_cb<3>().set_output("led3");  // auto punch
+	m_loled->q_out_cb<4>().set_output("led4");  // wait for key
+	m_loled->q_out_cb<5>().set_output("led5");  // edit loop
+	m_loled->q_out_cb<6>().set_output("led6");  // disk
+	m_loled->q_out_cb<7>().set_output("led7");
+
+	HC259(config, m_hiled);
+	m_hiled->q_out_cb<0>().set_output("led8");
+	m_hiled->q_out_cb<1>().set_output("led9");  // after
+	m_hiled->q_out_cb<2>().set_output("led10"); // full level
+	m_hiled->q_out_cb<3>().set_output("led11"); // bank 2
+	m_hiled->q_out_cb<4>().set_output("led12"); // 16 levels
+	m_hiled->q_out_cb<5>().set_output("led13"); // play
+	m_hiled->q_out_cb<6>().set_output("led14"); // over dub
+	m_hiled->q_out_cb<7>().set_output("led15"); // record
 
 	TIMER(config, "dialtimer").configure_periodic(FUNC(mpc60_state::dial_timer_tick), attotime::from_hz(60.0));
 
+	// MIDI rate of 31250 Hz times 16
+	CLOCK(config, m_midiclock, 500_kHz_XTAL);
+	m_midiclock->signal_handler().set(m_sio[0], FUNC(mb89371_device::write_rxc<0>));
+	m_midiclock->signal_handler().append(m_sio[0], FUNC(mb89371_device::write_txc<0>));
+	m_midiclock->signal_handler().append(m_sio[0], FUNC(mb89371_device::write_txc<1>));
+	m_midiclock->signal_handler().append(m_sio[1], FUNC(mb89371_device::write_rxc<0>));
+	m_midiclock->signal_handler().append(m_sio[1], FUNC(mb89371_device::write_rxc<1>));
+	m_midiclock->signal_handler().append(m_sio[1], FUNC(mb89371_device::write_txc<0>));
+	m_midiclock->signal_handler().append(m_sio[1], FUNC(mb89371_device::write_txc<1>));
+
 	//L4003(config, "voicelsi", 35.84_MHz_XTAL);
+
+	config.set_default_layout(layout_mpc60);
 }
 
 ROM_START(mpc60)

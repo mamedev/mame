@@ -40,6 +40,11 @@ const tiny_rom_entry *dsp56364_device::device_rom_region() const
 	return ROM_NAME(dsp56364);
 }
 
+void dsp56364_device::device_add_mconfig(machine_config &config)
+{
+	DSP5636X_SHI(config, m_shi);
+}
+
 
 void dsp56364_device::p_map(address_map &map)
 {
@@ -50,6 +55,7 @@ void dsp56364_device::p_map(address_map &map)
 void dsp56364_device::x_map(address_map &map)
 {
 	map(0x000000, 0x0003ff).ram();
+	map(0xffff90, 0xffff94).m(m_shi, FUNC(dsp5636x_shi_device::map));
 }
 
 void dsp56364_device::y_map(address_map &map)
@@ -57,4 +63,4 @@ void dsp56364_device::y_map(address_map &map)
 	map(0x000000, 0x0005ff).ram();
 }
 
-DEFINE_DEVICE_TYPE(DSP56364, dsp56364_device, "dsp56364", "DSP 56364")
+DEFINE_DEVICE_TYPE(DSP56364, dsp56364_device, "dsp56364", "Motorola DSP56364")

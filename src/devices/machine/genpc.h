@@ -9,6 +9,8 @@
 #ifndef MAME_MACHINE_GENPC_H
 #define MAME_MACHINE_GENPC_H
 
+#pragma once
+
 #include "imagedev/cassette.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"

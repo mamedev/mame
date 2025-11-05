@@ -676,12 +676,14 @@ public:
 				{ &model2_renderer::draw_scanline_tex<true>, this } },
 		m_state(state),
 		m_destmap(512, 512),
+		m_fillmap(512, 512),
 		m_xoffs(90),
 		m_yoffs(-8)
 	{
 	}
 
 	bitmap_rgb32 &destmap() { return m_destmap; }
+	bitmap_ind8 &fillmap() { return m_fillmap; }
 
 	void model2_3d_render(triangle *tri, const rectangle &cliprect);
 	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
@@ -698,6 +700,7 @@ private:
 
 	model2_state &m_state;
 	bitmap_rgb32 m_destmap;
+	bitmap_ind8 m_fillmap;
 	int16_t m_xoffs, m_yoffs;
 
 	template <bool Translucent>

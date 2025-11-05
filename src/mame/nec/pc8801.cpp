@@ -289,6 +289,13 @@ void pc8801_state::dma_mem_w(offs_t offset, u8 data)
 	m_work_ram[offset & 0xffff] = data;
 }
 
+// the pc8801 appears to just to dma memr and iow cycles if verify mode is set
+uint8_t pc8801_state::dackv(offs_t offset)
+{
+	m_crtc->dack_w(dma_mem_r(offset));
+	return 0;
+}
+
 uint8_t pc8801_state::alu_r(offs_t offset)
 {
 	uint8_t b, r, g;
@@ -1701,6 +1708,7 @@ void pc8801_state::pc8801(machine_config &config)
 	// CH0: 5-inch floppy DMA
 	// CH1: 8-inch floppy DMA, SCSI CD-ROM interface (on MA/MC)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
+	m_dma->verify_cb<2>().set(FUNC(pc8801_state::dackv));
 	// CH3: <autoload only?>
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::clock_irq_w), attotime::from_hz(600));

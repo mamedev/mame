@@ -36,7 +36,6 @@ public:
 protected:
 	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void io_map(address_map &map) ATTR_COLD;
 	u8 pcm_control_r();
 	void pcm_control_w(u8 data);
 
@@ -60,12 +59,11 @@ protected:
 
 	void opna_map(address_map &map) ATTR_COLD;
 
-	u8 opna_r(offs_t offset);
-	void opna_w(offs_t offset, u8 data);
 	virtual u8 id_r();
 	void mask_w(u8 data);
 
 	u8 m_mask;
+	virtual void io_map(address_map &map) ATTR_COLD;
 
 private:
 	int queue_count();
@@ -84,7 +82,6 @@ private:
 	void dac_transfer();
 
 	u8 m_joy_sel;
-	u16 m_io_base;
 };
 
 class pc9801_speakboard_device : public pc9801_86_device
@@ -95,15 +92,13 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	u8 opna_slave_r(offs_t offset);
-	void opna_slave_w(offs_t offset, u8 data);
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void io_map(address_map &map) override ATTR_COLD;
 private:
 	required_device<ym2608_device>  m_opna_slave;
 };
@@ -116,15 +111,13 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	u8 opn2c_r(offs_t offset);
-	void opn2c_w(offs_t offset, u8 data);
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void io_map(address_map &map) override ATTR_COLD;
 private:
 	required_device<ym3438_device>  m_opn2c;
 

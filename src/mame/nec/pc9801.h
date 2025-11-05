@@ -208,7 +208,6 @@ protected:
 
 	uint8_t pc9801_a0_r(offs_t offset);
 	void pc9801_a0_w(offs_t offset, uint8_t data);
-	uint8_t f0_r(offs_t offset);
 
 	uint8_t m_nmi_ff = 0;
 

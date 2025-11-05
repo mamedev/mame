@@ -115,7 +115,6 @@ A21 |30| CE1
 
 #include "emu.h"
 #include "bfm_ad5.h"
-#include "machine/mcf5206e.h"
 #include "bfm_sc45_helper.h"
 #include "speaker.h"
 
@@ -168,7 +167,7 @@ void adder5_state::ad5_map(address_map &map)
 	map(0x80000000, 0x8000ffff).ram();
 	map(0x80800000, 0x8080ffff).ram();
 
-	map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+//	map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
 }
 
 INPUT_PORTS_START( bfm_ad5 )
@@ -185,7 +184,6 @@ void adder5_state::bfm_ad5(machine_config &config)
 	MCF5206E(config, m_maincpu, 40000000); /* MCF5206eFT */
 	m_maincpu->set_addrmap(AS_PROGRAM, &adder5_state::ad5_map);
 	m_maincpu->set_periodic_int(FUNC(adder5_state::ad5_fake_timer_int), attotime::from_hz(1000));
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	SPEAKER(config, "speaker", 2).front();
 	/* unknown sound */

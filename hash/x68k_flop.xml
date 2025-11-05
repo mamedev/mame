@@ -13645,7 +13645,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	<software name="starmobl">
 		<description>Star Mobile</description>
 		<year>1991</year>
-		<publisher>M・N・M</publisher>
+		<publisher>Ｍ．Ｎ．Ｍ．ソフトウェア (M.N.M. Software)</publisher>
 		<info name="alt_title" value="スターモビール" />
 		<info name="release" value="19910620" />
 		<part name="flop1" interface="floppy_5_25">
@@ -13676,10 +13676,11 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars - Attack on the Death Star</description>
+		<description>Star Wars: Attack on the Death Star</description>
 		<year>1991</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="release" value="19911213" />
+		<info name="developer" value="M.N.M. Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
@@ -13695,9 +13696,10 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="starwarsd" cloneof="starwars">
-		<description>Star Wars - Attack on the Death Star (demo)</description>
+		<description>Star Wars: Attack on the Death Star (demo)</description>
 		<year>1991</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<info name="developer" value="M.N.M. Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="star wars attack on the death star (demo) (1991)(mnm software).dim" size="1261824" crc="f960d9e4" sha1="fe6095a1c92d184b51a5ee8f06cb7bc990898c80" />
@@ -14655,7 +14657,7 @@ omake: has bgm_demo.bat file for [MIDI] playback in Human68k (which throws Abort
 	<software name="thrice">
 		<description>Thrice</description>
 		<year>1991</year>
-		<publisher>M・N・M</publisher>
+		<publisher>Ｍ．Ｎ．Ｍ．ソフトウェア (M.N.M. Software)</publisher>
 		<info name="alt_title" value="スライス" />
 		<info name="release" value="19910209" />
 		<part name="flop1" interface="floppy_5_25">

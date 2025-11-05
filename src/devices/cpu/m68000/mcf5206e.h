@@ -336,6 +336,7 @@ public:
 	auto set_irq_acknowledge_callback() ATTR_COLD { return m_sim->irq_vector_cb.bind(); }
 
 	// Parallel Port
+	auto gpio_r_cb() { return m_gpio_r_cb.bind(); }
 	auto gpio_w_cb() { return m_gpio_w_cb.bind(); }
 	void gpio_pin_w(int pin, int state);
 	void gpio_port_w(u8 state);
@@ -367,12 +368,13 @@ protected:
 	void execute_set_input(int inputnum, int state) override;
 
 	virtual space_config_vector memory_space_config() const override;
-	address_space_config m_coldfire_register_map;
+	address_space_config m_mbar_config;
 	address_space_config m_coldfire_vector_map;
 
 private:
+	bool is_mbar_access(offs_t offset);
 
-	void coldfire_register_map(address_map &map) ATTR_COLD;
+	void mbar_map(address_map &map) ATTR_COLD;
 	void coldfire_vector_map(address_map &map) ATTR_COLD;
 
 	void init_regs(bool first_init);
@@ -491,30 +493,29 @@ private:
 	devcb_write_line write_tx1, write_tx2;
 
 	/* parallel port */
-	// just an 8 bit gpio port
-	inline u8 ppddr_r(){ return m_ppddr; }
-	inline u8 ppdat_r(){ return (m_ppdat_in | (m_ppdat_out & m_ppddr)); }
+	u8 ppddr_r();
+	u8 ppdat_r();
 
 	void ppddr_w(u8 data);
 	void ppdat_w(u8 data);
 
 	u8 m_ppddr;
-	u8 m_ppdat_in;
 	u8 m_ppdat_out;
+	devcb_read8 m_gpio_r_cb;
 	devcb_write8 m_gpio_w_cb;
 
 	/* MBUS Module */
 	// I2C host/device but Motorola
 	void mbus_sda_w(int state){ write_sda(state); }
 	void mbus_scl_w(int state){ write_scl(state); }
-	void mbus_irq_w(int state){ m_sim->set_external_interrupt(MBUS_IRQ, state); }
+	void mbus_irq_w(int state){ m_sim->set_internal_interrupt_request(MBUS_IRQ, state); }
 	required_device<coldfire_mbus_device> m_mbus;
 	devcb_write_line write_sda, write_scl;
 
 	/* DMA Modules */
 	required_device_array<coldfire_dma_device, 2> m_dma;
-	void dma0_irq_w(int state){ m_sim->set_external_interrupt(DMA_0_IRQ, state); }
-	void dma1_irq_w(int state){ m_sim->set_external_interrupt(DMA_1_IRQ, state); }
+	void dma0_irq_w(int state){ m_sim->set_internal_interrupt_request(DMA_0_IRQ, state); }
+	void dma1_irq_w(int state){ m_sim->set_internal_interrupt_request(DMA_1_IRQ, state); }
 
 };
 

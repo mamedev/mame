@@ -468,8 +468,8 @@ u8 apple2_state::flags_r(offs_t offset)
 	// Y output of 74LS251 at H14 read as D7
 	switch (offset)
 	{
-	case 0: // cassette in (accidentally read at $C068 by ProDOS to attempt IIgs STATE register)
-		return (m_cassette->input() > 0.0 ? 0x80 : 0) | uFloatingBus7;
+	case 0: // cassette in, inverted (accidentally read at $C068 by ProDOS to attempt IIgs STATE register)
+		return (m_cassette->input() > 0.0 ? 0 : 0x80) | uFloatingBus7;
 
 	case 1:  // button 0
 		return (m_gameio->sw0_r() ? 0x80 : 0) | uFloatingBus7;
@@ -477,13 +477,8 @@ u8 apple2_state::flags_r(offs_t offset)
 	case 2:  // button 1
 		return (m_gameio->sw1_r() ? 0x80 : 0) | uFloatingBus7;
 
-	case 3:  // button 2
-		// check if SHIFT key mod configured
-		if (m_sysconfig->read() & 0x04)
-		{
-			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
-		}
-		return (m_gameio->sw2_r() ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+	case 3:  // button 2, inverted (or SHIFT key, with SHIFT key mod)
+		return ((m_gameio->sw2_r() || ((m_sysconfig->read() & 0x04) && (m_kbspecial->read() & 0x06))) ? 0 : 0x80) | uFloatingBus7;
 
 	case 4:  // joy 1 X axis
 		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;

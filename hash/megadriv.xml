@@ -8529,6 +8529,7 @@ Unemulated HeartBeat peripheral
 		<info name="serial" value="G-4091 (JPN)"/>
 		<info name="release" value="19930114 (JPN)"/>
 		<info name="alt_title" value="ベア・ナックルII 死闘への鎮魂歌"/>
+		<!-- co-developed with Ancient, Shout!Designworks, M.N.M Software and H.I.C. -->
 		<sharedfeat name="compatibility" value="PAL,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -29029,6 +29030,8 @@ Patches protection checks, original uses Squirrel King cart scheme
 		<info name="serial" value="T-48093"/>
 		<info name="release" value="19930611"/>
 		<info name="alt_title" value="スラップファイト"/>
+		<info name="developer" value="Toaplan"/>
+		<!-- Supervised by M.N.M. Software -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="slap fight md (jpn).bin" size="1048576" crc="d6695695" sha1="3cb992c70b4a5880a3e5f89211f29fe90486c0e0"/>

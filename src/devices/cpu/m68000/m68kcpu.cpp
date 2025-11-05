@@ -829,12 +829,6 @@ bool m68000_musashi_device::memory_translate(int spacenum, int intention, offs_t
 
 
 
-
-
-
-
-
-
 void m68000_musashi_device::execute_run()
 {
 	m_initial_cycles = m_icount;

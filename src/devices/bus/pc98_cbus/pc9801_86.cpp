@@ -207,33 +207,11 @@ void pc9801_86_device::device_validity_check(validity_checker &valid) const
 
 u16 pc9801_86_device::read_io_base()
 {
-	return ((ioport("OPNA_DSW")->read() & 1) << 8) + 0x188;
+	return ((ioport("OPNA_DSW")->read() & 1) << 8);
 }
 
 void pc9801_86_device::device_start()
 {
-	// TODO: uninstall option from dip
-	m_bus->program_space().install_rom(
-		0xcc000,
-		0xcffff,
-		memregion(this->subtag("sound_bios").c_str())->base()
-	);
-	// TODO: who wins if 2+ PC-9801-86 or mixed -73/-86 are mounted?
-	m_bus->install_device(0xa460, 0xa46f, *this, &pc9801_86_device::io_map);
-	m_bus->install_io(0xa66c, 0xa66f,
-		read8sm_delegate(*this, [this](offs_t o){ return o == 2 ? m_pcm_mute : 0xff; }, "pcm_mute_r"),
-		write8sm_delegate(*this, [this](offs_t o, u8 d){
-			if(o == 2)
-			{
-				m_pcm_mute = d;
-				m_ldac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
-				m_rdac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
-			}
-		}, "pcm_mute_w")
-	);
-
-	m_io_base = 0;
-
 	m_dac_timer = timer_alloc(FUNC(pc9801_86_device::dac_tick), this);
 	save_item(NAME(m_count));
 	save_item(NAME(m_queue));
@@ -242,22 +220,21 @@ void pc9801_86_device::device_start()
 
 void pc9801_86_device::device_reset()
 {
-	u16 current_io = read_io_base();
-	m_bus->flush_install_io(
-		this->tag(),
-		m_io_base,
-		current_io,
-		7,
-		read8sm_delegate(*this, FUNC(pc9801_86_device::opna_r)),
-		write8sm_delegate(*this, FUNC(pc9801_86_device::opna_w))
+	// TODO: uninstall option from dip
+	m_bus->program_space().install_rom(
+		0xcc000,
+		0xcffff,
+		memregion(this->subtag("sound_bios").c_str())->base()
 	);
-	m_io_base = current_io;
+
+	m_bus->install_device(0x0000, 0xffff, *this, &pc9801_86_device::io_map);
 
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
 	m_pcmirq = m_init = false;
 	m_irq_rate = 0;
 	m_pcm_ctrl = m_pcm_mode = 0;
+
 	// Starts off with DACs muted (os2warp3 will burp a lot while initializing OS)
 	m_pcm_mute = 0x01;
 	m_ldac->set_output_gain(ALL_OUTPUTS, 0.0);
@@ -272,24 +249,99 @@ void pc9801_86_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-
-u8 pc9801_86_device::opna_r(offs_t offset)
+void pc9801_86_device::io_map(address_map &map)
 {
-	if((offset & 1) == 0)
-		return m_opna->read(offset >> 1);
-	else // odd
-	{
-		logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + m_io_base);
-		return 0xff;
-	}
-}
+	const u16 io_base = read_io_base();
 
-void pc9801_86_device::opna_w(offs_t offset, u8 data)
-{
-	if((offset & 1) == 0)
-		m_opna->write(offset >> 1,data);
-	else // odd
-		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + m_io_base, data);
+	// TODO: mask ports
+	map(0x0188 + io_base, 0x018f + io_base).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write)).umask16(0x00ff);
+	map(0xa460, 0xa460).rw(FUNC(pc9801_86_device::id_r), FUNC(pc9801_86_device::mask_w));
+//  map(0xa462, 0xa462) μPD6380 for PC9801-73 control
+//  map(0xa464, 0xa464) μPD6380 for PC9801-73 data
+	map(0xa466, 0xa466).lrw8(
+		NAME([this] () {
+			u8 res = 0;
+			// FIFO full
+			res |= (queue_count() == QUEUE_SIZE) << 7;
+			// FIFO empty
+			res |= !queue_count() << 6;
+			// recording overflow
+			res |= 0 << 5;
+			// DAC clock
+			res |= m_pcm_clk << 0;
+			return res;
+		}),
+		NAME([this] (u8 data) {
+			const u8 line_select = data >> 5;
+			m_vol[line_select] = data & 0x0f;
+			logerror("$a466 volume control [%02x] %02x\n", line_select, data & 0xf);
+		})
+	);
+	map(0xa468, 0xa468).rw(FUNC(pc9801_86_device::pcm_control_r), FUNC(pc9801_86_device::pcm_control_w));
+	map(0xa46a, 0xa46a).lrw8(
+		NAME([this] () {
+			return m_pcm_mode;
+		}),
+		NAME([this] (u8 data) {
+			if(m_pcm_ctrl & 0x20)
+			{
+				// TODO: may fall over with the irq logic math
+				// queue_count() < (0xff + 1) << 7 = 0x8000 -> always true
+				if (data == 0xff)
+					popmessage("pc9801_86: $a46a irq_rate == 0xff");
+				m_irq_rate = (data + 1) * 128;
+				LOGDAC("$a468 irq_rate %d (%02x)\n", m_irq_rate, data);
+			}
+			else
+			{
+				m_pcm_mode = data;
+				LOGDAC("$a468 pcm_mode %02x\n", data);
+				LOGDAC("\tclock %d quantization %d-bit output %d mode %d\n"
+					, BIT(data, 7)
+					, BIT(data, 6) ? 16 : 8
+					// 3 = stereo, 2 Left only, 1 Right only, 0 = No PCM output
+					, (data >> 4) & 3
+					// TODO: unknown purpose, normally 2, apparently set by AVSDRV differently
+					, data & 3
+				);
+			}
+		})
+	);
+	map(0xa46c, 0xa46c).lrw8(
+		NAME([this] () {
+			// TODO: recording mode
+			(void)this;
+			return 0;
+		}),
+		NAME([this] (u8 data) {
+			// HACK: on overflow make sure to single step the FIFO enough to claim some space back
+			// os2warp3 initializes the full buffer with 0x00 then quickly pretends
+			// that DAC already catched up by the time the actual startup/shutdown chimes are sent.
+			if (queue_count() == QUEUE_SIZE)
+			{
+				dac_transfer();
+				logerror("Warning: $a46c write with FIFO overflow %02x\n", m_pcm_mode);
+			}
+
+			if(queue_count() < QUEUE_SIZE)
+			{
+				m_queue[m_head++] = data;
+				m_head %= QUEUE_SIZE;
+				m_count++;
+			}
+		})
+	);
+
+	// xxxx xxx- <unused>
+	// ---- ---x PCM mute
+	map(0xa66e, 0xa66e).lrw8(
+		NAME([this] (offs_t offset) { return m_pcm_mute; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pcm_mute = data;
+			m_ldac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
+			m_rdac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
+		})
+	);
 }
 
 u8 pc9801_86_device::pcm_control_r()
@@ -328,87 +380,6 @@ void pc9801_86_device::pcm_control_w(u8 data)
 	m_pcm_ctrl = data & ~0x10;
 }
 
-// $a460 base
-void pc9801_86_device::io_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x00, 0x00).rw(FUNC(pc9801_86_device::id_r), FUNC(pc9801_86_device::mask_w));
-//  map(0x02, 0x02) μPD6380 for PC9801-73 control
-//  map(0x04, 0x04) μPD6380 for PC9801-73 data
-	map(0x06, 0x06).lrw8(
-		NAME([this] () {
-			u8 res = 0;
-			// FIFO full
-			res |= (queue_count() == QUEUE_SIZE) << 7;
-			// FIFO empty
-			res |= !queue_count() << 6;
-			// recording overflow
-			res |= 0 << 5;
-			// DAC clock
-			res |= m_pcm_clk << 0;
-			return res;
-		}),
-		NAME([this] (u8 data) {
-			const u8 line_select = data >> 5;
-			m_vol[line_select] = data & 0x0f;
-			logerror("$a466 volume control [%02x] %02x\n", line_select, data & 0xf);
-		})
-	);
-	map(0x08, 0x08).rw(FUNC(pc9801_86_device::pcm_control_r), FUNC(pc9801_86_device::pcm_control_w));
-	map(0x0a, 0x0a).lrw8(
-		NAME([this] () {
-			return m_pcm_mode;
-		}),
-		NAME([this] (u8 data) {
-			if(m_pcm_ctrl & 0x20)
-			{
-				// TODO: may fall over with the irq logic math
-				// queue_count() < (0xff + 1) << 7 = 0x8000 -> always true
-				if (data == 0xff)
-					popmessage("pc9801_86: $a46a irq_rate == 0xff");
-				m_irq_rate = (data + 1) * 128;
-				LOGDAC("$a468 irq_rate %d (%02x)\n", m_irq_rate, data);
-			}
-			else
-			{
-				m_pcm_mode = data;
-				LOGDAC("$a468 pcm_mode %02x\n", data);
-				LOGDAC("\tclock %d quantization %d-bit output %d mode %d\n"
-					, BIT(data, 7)
-					, BIT(data, 6) ? 16 : 8
-					// 3 = stereo, 2 Left only, 1 Right only, 0 = No PCM output
-					, (data >> 4) & 3
-					// TODO: unknown purpose, normally 2, apparently set by AVSDRV differently
-					, data & 3
-				);
-			}
-		})
-	);
-	map(0x0c, 0x0c).lrw8(
-		NAME([this] () {
-			// TODO: recording mode
-			(void)this;
-			return 0;
-		}),
-		NAME([this] (u8 data) {
-			// HACK: on overflow make sure to single step the FIFO enough to claim some space back
-			// os2warp3 initializes the full buffer with 0x00 then quickly pretends
-			// that DAC already catched up by the time the actual startup/shutdown chimes are sent.
-			if (queue_count() == QUEUE_SIZE)
-			{
-				dac_transfer();
-				logerror("Warning: $a46c write with FIFO overflow %02x\n", m_pcm_mode);
-			}
-
-			if(queue_count() < QUEUE_SIZE)
-			{
-				m_queue[m_head++] = data;
-				m_head %= QUEUE_SIZE;
-				m_count++;
-			}
-		})
-	);
-}
 
 /*
  * xxxx ---- ID
@@ -555,8 +526,6 @@ void pc9801_speakboard_device::device_add_mconfig(machine_config &config)
 void pc9801_speakboard_device::device_start()
 {
 	pc9801_86_device::device_start();
-
-	m_bus->install_io(0x0588, 0x058f, read8sm_delegate(*this, FUNC(pc9801_speakboard_device::opna_slave_r)), write8sm_delegate(*this, FUNC(pc9801_speakboard_device::opna_slave_w)));
 }
 
 void pc9801_speakboard_device::device_reset()
@@ -564,23 +533,10 @@ void pc9801_speakboard_device::device_reset()
 	pc9801_86_device::device_reset();
 }
 
-u8 pc9801_speakboard_device::opna_slave_r(offs_t offset)
+void pc9801_speakboard_device::io_map(address_map &map)
 {
-	if((offset & 1) == 0)
-		return m_opna_slave->read(offset >> 1);
-	else // odd
-	{
-		logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + 0x588);
-		return 0xff;
-	}
-}
-
-void pc9801_speakboard_device::opna_slave_w(offs_t offset, u8 data)
-{
-	if((offset & 1) == 0)
-		m_opna_slave->write(offset >> 1,data);
-	else // odd
-		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + 0x588, data);
+	pc9801_86_device::io_map(map);
+	map(0x0588, 0x058f).rw(m_opna_slave, FUNC(ym2608_device::read), FUNC(ym2608_device::write)).umask16(0x00ff);
 }
 
 //**************************************************************************
@@ -628,8 +584,6 @@ u8 otomichan_kai_device::id_r()
 void otomichan_kai_device::device_start()
 {
 	pc9801_86_device::device_start();
-
-	m_bus->install_io(0x0788, 0x078f, read8sm_delegate(*this, FUNC(otomichan_kai_device::opn2c_r)), write8sm_delegate(*this, FUNC(otomichan_kai_device::opn2c_w)));
 }
 
 void otomichan_kai_device::device_reset()
@@ -637,21 +591,8 @@ void otomichan_kai_device::device_reset()
 	pc9801_86_device::device_reset();
 }
 
-u8 otomichan_kai_device::opn2c_r(offs_t offset)
+void otomichan_kai_device::io_map(address_map &map)
 {
-	if((offset & 1) == 0)
-		return m_opn2c->read(offset >> 1);
-	else // odd
-	{
-		logerror("%s: Read to undefined port [%02x]\n", machine().describe_context(), offset + 0x788);
-		return 0xff;
-	}
-}
-
-void otomichan_kai_device::opn2c_w(offs_t offset, u8 data)
-{
-	if((offset & 1) == 0)
-		m_opn2c->write(offset >> 1, data);
-	else // odd
-		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + 0x788, data);
+	pc9801_86_device::io_map(map);
+	map(0x0788, 0x078f).rw(m_opn2c, FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask16(0x00ff);
 }
