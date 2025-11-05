@@ -2280,6 +2280,7 @@ license:CC0-1.0
 		<publisher>Personal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K. This is release 5, the earliest version ever published for Apple ][." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-11 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2295,6 +2296,7 @@ license:CC0-1.0
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 32K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2310,6 +2312,7 @@ license:CC0-1.0
 		<publisher>Programma Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 32K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-13 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2325,6 +2328,7 @@ license:CC0-1.0
 		<publisher>Creative Computing Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-16 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2340,6 +2344,7 @@ license:CC0-1.0
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-16 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3393,6 +3398,7 @@ license:CC0-1.0
 		<publisher>Crystal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-08-25 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3914,6 +3920,7 @@ license:CC0-1.0
 		<publisher>Personal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 16K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-09 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3929,6 +3936,7 @@ license:CC0-1.0
 		<publisher>Personal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 16K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-09 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3944,6 +3952,7 @@ license:CC0-1.0
 		<publisher>Personal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 24K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-09 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3989,6 +3998,7 @@ license:CC0-1.0
 		<publisher>Crystalware</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -4004,6 +4014,7 @@ license:CC0-1.0
 		<publisher>Adventure International</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -5406,6 +5417,7 @@ license:CC0-1.0
 		<publisher>MUSE Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive and a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-04-11 redumped: 2020-04-17 to fix incorrectly set sector type (it was incorrectly set to 15-sector) -->
 
 		<part name="flop0" interface="floppy_5_25">
@@ -6723,6 +6735,7 @@ license:CC0-1.0
 		<publisher>United Software of America</publisher>
 		<info name="usage" value="Runs on any Apple ][ with 48K and requires a 13-sector drive." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-09-10 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -6891,6 +6904,7 @@ license:CC0-1.0
 		<publisher>California Pacific Computer</publisher>
 		<info name="usage" value="Runs on any Apple ][ with 32K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-10-07 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -8291,6 +8305,7 @@ license:CC0-1.0
 		<publisher>United Software of America</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2021-11-03 -->
 		<!-- "Star Dance" is a 1981 action game developed by Gustavo Fernandez and distributed by United Software of America. It requires a 13-sector drive but otherwise runs on any Apple ][ with 48K. -->
 
@@ -9101,6 +9116,7 @@ license:CC0-1.0
 		<publisher>Adventure International</publisher>
 		<info name="usage" value="Requires a 13-sector floppy drive and a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2022-02-23 -->
 		<!-- "His Majesty's Ship "Impetuous"" is a 1980 adventure game written by Robert Lafore, ported to the Apple ][ by David Fox and Corey Kosak, and distributed by Adventure International. It requires a 13-sector floppy drive and a 48K Apple ][+ or later. -->
 
@@ -9133,6 +9149,7 @@ license:CC0-1.0
 		<publisher>Instant Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive and a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2022-02-24 -->
 		<!-- "Skybombers II" is a 1980 action game developed by Al Floeter and distributed by Instant Software. It requires a 13-sector drive and a 48K Apple ][+ or later. -->
 
@@ -10115,6 +10132,7 @@ license:CC0-1.0
 		<publisher>Crystal Software</publisher>
 		<info name="usage" value="Requires a 48K Apple ][+ or later with a 13-sector drive." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2022-03-17 -->
 		<!-- "Galactic Quest" is a 1980 simulation game developed by John and Patty Bell, and distributed by Crystal Software. It requires a 48K Apple ][+ or later with a 13-sector drive. -->
 
@@ -12978,6 +12996,7 @@ license:CC0-1.0
 		<info name="programmer" value="Robert J. McCredie" />
 		<info name="usage" value="Requires a 13-sector drive, integer basic, and runs on an Apple ][." />
 		<sharedfeat name="compatibility" value="A2" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2023-02-26 by DefaultGen -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -14919,6 +14938,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bruce Wallace" />
 		<info name="usage" value="Runs on any Apple ][ with 32K and a 13-sector drive." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-06-06 -->
 		<!-- action game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -15634,6 +15654,7 @@ license:CC0-1.0
 		<info name="programmer" value="Matthew Jew" />
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2022-02-24 -->
 		<!-- strategy game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -17662,6 +17683,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 48K Apple ][+ or later with a 13-sector drive and Applesoft in ROM." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2024-08-30 -->
 		<!-- strategy game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -20820,6 +20842,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 13-sector drive and a 48K Apple ][+ or later." />
 		<info name="version" value="1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-01-03 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -20893,6 +20916,7 @@ license:CC0-1.0
 		<info name="programmer" value="Jim Connelley" />
 		<info name="usage" value="Requires a 13-sector drive and a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-05-08 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -20913,6 +20937,7 @@ license:CC0-1.0
 		<info name="version" value="revision 1" />
 		<!-- This is revision 1, no title screen and boots on a 13-sector drive. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-01-06 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -20933,6 +20958,7 @@ license:CC0-1.0
 		<info name="version" value="revision 2" />
 		<!-- This is revision 2, which fixes unspecified bugs and adds a graphical title screen. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-01-06 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -34804,6 +34830,7 @@ license:CC0-1.0
 		<info name="programmer" value="Jon Freeman" />
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-03-29 -->
 		<!-- strategy game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -39615,6 +39642,7 @@ license:CC0-1.0
 		<info name="programmer" value="Kieth Yilt" />
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2024-06-16 -->
 		<!-- action game -->
 		<part name="flop1" interface="floppy_5_25">
