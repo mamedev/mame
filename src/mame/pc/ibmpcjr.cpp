@@ -642,7 +642,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	video.set_chr_gen_tag("gfx1");
 	video.vsync_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
-	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr:palette", gfx_pcjr);
+	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr", gfx_pcjr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
