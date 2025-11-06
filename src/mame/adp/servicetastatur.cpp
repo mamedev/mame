@@ -161,9 +161,9 @@ static INPUT_PORTS_START( servicet )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START) PORT_NAME("OK")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("F4")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START)       PORT_NAME("OK")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4)     PORT_NAME("F4")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN1") // P1.1
@@ -225,32 +225,9 @@ uint8_t servicet_state::port1_r()
 	*/
 	uint8_t data = m_port1;
 
-	switch (m_port1)
-	{
-	case 0xfb:
-	{
-		data = ioport("IN2")->read(); // F3, F1, F2
-		break;
-	}
-	case 0xfd:
-	{
-		data = ioport("IN1")->read(); // Right, Left, Down
-		break;
-	}
-	case 0xfe:
-	{
-		data = ioport("IN0")->read(); // OK, F4, Up
-		break;
-	}
-	case 0xff:
-	{
-		// 0xff default
-		break;
-	}
-	default:
-		logerror("Invalid write to P1 %02d",data);
-		break;
-	}
+	if (BIT(m_port1, 0)==0) data &= m_io_keys[0]->read();
+	if (BIT(m_port1, 1)==0) data &= m_io_keys[1]->read();
+	if (BIT(m_port1, 2)==0) data &= m_io_keys[2]->read();
 
 	return data;
 }
@@ -268,7 +245,7 @@ INPUT_CHANGED_MEMBER(servicet_state::en_w)
 
 uint8_t servicet_state::port3_r()
 {
-	uint8_t data = ioport("P3")->read();
+	uint8_t data = m_io_keys[3]->read();
 
 	uint8_t const SDA = m_i2cmem->read_sda();
 
@@ -326,7 +303,7 @@ uint8_t servicet_state::gsg_r(offs_t offset)
 		break;
 	}
 	default:
-		popmessage("Read jack shit %02X", offset);
+		popmessage("Read unknown %02X", offset);
 	}
 	return data;
 }
