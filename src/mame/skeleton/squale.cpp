@@ -739,7 +739,11 @@ ROM_START( squale )
 	ROM_SYSTEM_BIOS(0, "v201", "Version 2.1")
 	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(0) )
 
-	// place ROM v1.2 signature here.
+	ROM_SYSTEM_BIOS(1, "v12a", "Version 1.2a")
+	ROMX_LOAD( "sqmon_1_2a.bin", 0x0000, 0x1000, CRC(67B5B66F) SHA1(3e28de3b559c2c22dcc2c59f06b76e73e564861d), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "v12b", "Version 1.2b")
+	ROMX_LOAD( "sqmon_1_2b.bin", 0x0000, 0x1000, CRC(c8635598) SHA1(fd944be3c17ec2be2de91c705e90214ca55aa63c), ROM_BIOS(2) )
 ROM_END
 
 } // anonymous namespace
