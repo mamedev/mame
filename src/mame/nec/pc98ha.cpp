@@ -128,8 +128,10 @@ void pc98lt_state::fdc_ctrl_w(offs_t offset, u8 data)
 	else
 		m_fdc->set_ready_line_connected(1);
 
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
-	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
+	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(!BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
+
+	// TODO: uses PC88VA/2DD style timer
 }
 
 void pc98lt_state::lt_map(address_map &map)
@@ -417,7 +419,7 @@ void pc98ha_state::machine_start()
 
 static void pc9801_floppies(device_slot_interface &device)
 {
-//  device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525dd", FLOPPY_525_DD);
 	device.option_add("525hd", FLOPPY_525_HD);
 //  device.option_add("35hd", FLOPPY_35_HD);
 }
@@ -473,7 +475,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, false, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
-//  m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
+//	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
 	FLOPPY_CONNECTOR(config, "upd765:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
 

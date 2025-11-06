@@ -59826,6 +59826,9 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		<description>Kurayami</description>
 		<year>1996</year>
 		<publisher>メロディ (Melody)</publisher>
+		<notes><![CDATA[
+Cannot install, tests [FDC] chrn=(0, 0, 6, 1024) on disk 2 swap (same as sangofgt)
+]]></notes>
 		<info name="alt_title" value="暗闇" />
 		<info name="release" value="19960726" />
 		<part name="flop1" interface="floppy_5_25">

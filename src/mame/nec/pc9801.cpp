@@ -316,6 +316,7 @@ void pc9801_state::sasi_ctrl_w(uint8_t data)
 
 void pc9801_state::pc9801_map(address_map &map)
 {
+	map(0x00000, 0x9ffff).rw(m_ram, FUNC(ram_device::read_no_mirror), FUNC(ram_device::write_no_mirror));
 	map(0xa0000, 0xa3fff).rw(FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w)); //TVRAM
 	map(0xa8000, 0xbffff).rw(FUNC(pc9801_state::gvram_r), FUNC(pc9801_state::gvram_w)); //bitmap VRAM
 //  map(0xcc000, 0xcffff).rom().region("sound_bios", 0); //sound BIOS
@@ -869,8 +870,10 @@ void pc9801_state::ipl_bank(address_map &map)
 	map(0x00000, 0x2ffff).rom().region("ipl", 0);
 }
 
-void pc9801vm_state::pc9801ux_map(address_map &map)
+void pc9801vm_state::pc9801vm_map(address_map &map)
 {
+	map(0x000000, 0x09ffff).rw(m_ram, FUNC(ram_device::read_no_mirror), FUNC(ram_device::write_no_mirror));
+
 	map(0x0a0000, 0x0a3fff).rw(FUNC(pc9801vm_state::tvram_r), FUNC(pc9801vm_state::tvram_w));
 	map(0x0a4000, 0x0a4fff).rw(FUNC(pc9801vm_state::pc9801rs_knjram_r), FUNC(pc9801vm_state::pc9801rs_knjram_w));
 	map(0x0a8000, 0x0bffff).rw(FUNC(pc9801vm_state::grcg_gvram_r), FUNC(pc9801vm_state::grcg_gvram_w));
@@ -904,11 +907,30 @@ void pc9801vm_state::pc9801ux_io(address_map &map)
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 }
 
+void pc9801vm_state::pc9801ux_map(address_map &map)
+{
+	pc9801vm_map(map);
+	map(0x100000, 0x7fffff).rw(FUNC(pc9801vm_state::ram_ext_r), FUNC(pc9801vm_state::ram_ext_w));
+}
+
+void pc9801vm_state::pc9801vx_map(address_map &map)
+{
+	pc9801vm_map(map);
+	map(0x100000, 0x8fffff).rw(FUNC(pc9801vm_state::ram_ext_r), FUNC(pc9801vm_state::ram_ext_w));
+}
+
+void pc9801vm_state::pc9801dx_map(address_map &map)
+{
+	pc9801vm_map(map);
+	map(0x100000, 0xefffff).rw(FUNC(pc9801vm_state::ram_ext_r), FUNC(pc9801vm_state::ram_ext_w));
+}
+
 void pc9801vm_state::pc9801rs_map(address_map &map)
 {
-	pc9801ux_map(map);
+	pc9801vm_map(map);
 //  map(0x0d8000, 0x0d9fff).rom().region("ide",0);
 	map(0x0da000, 0x0dbfff).ram(); // ide ram
+	map(0x100000, 0xefffff).rw(FUNC(pc9801vm_state::ram_ext_r), FUNC(pc9801vm_state::ram_ext_w));
 	map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xfe8000, 0xffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
@@ -961,8 +983,13 @@ void pc9801bx_state::pc9801bx2_map(address_map &map)
 //  map(0x000da000, 0x000dbfff).ram(); // ide ram (declared in RS)
 //  map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::pc9821_grcg_gvram0_r), FUNC(pc9821_state::pc9821_grcg_gvram0_w));
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0x00100000, 0x00efffff).rw(FUNC(pc9801bx_state::ram_ext_r), FUNC(pc9801bx_state::ram_ext_w));
+
+	map(0x01000000, 0x013fffff).rw(FUNC(pc9801bx_state::ram_ext_16m_r), FUNC(pc9801bx_state::ram_ext_16m_w));
 	map(0xffee8000, 0xffefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xfffe8000, 0xffffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0x00f00000, 0x00ffffff).view(m_hole_15M_view);
+	m_hole_15M_view[0](0x00f00000, 0x00ffffff).rw(FUNC(pc9801bx_state::ram_ext_15m_r), FUNC(pc9801bx_state::ram_ext_15m_w));
 }
 
 u8 pc9801bx_state::i486_cpu_mode_r(offs_t offset)
@@ -1000,11 +1027,29 @@ void pc9801bx_state::gdc_31kHz_w(offs_t offset, u8 data)
 //      popmessage("31kHz register set %02x, contact MAMEdev", data);
 }
 
+u8 pc9801bx_state::hole_15m_control_r(offs_t offset)
+{
+	return m_hole_15m;
+}
+
+void pc9801bx_state::hole_15m_control_w(offs_t offset, u8 data)
+{
+	m_hole_15m = data;
+	if (BIT(data, 2))
+		m_hole_15M_view.select(0);
+	else
+		m_hole_15M_view.disable();
+
+	if (data & 0xfb)
+		popmessage("hole_15m_control_w: undocumented trigger %02x", data);
+}
+
 void pc9801bx_state::pc9801bx2_io(address_map &map)
 {
 	pc9801us_io(map);
 	// NOP legacy SDIP bank access
 	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) { a20_ctrl_w(3, data); }));
+	map(0x043b, 0x043b).rw(FUNC(pc9801bx_state::hole_15m_control_r), FUNC(pc9801bx_state::hole_15m_control_w));
 	map(0x0534, 0x0534).r(FUNC(pc9801bx_state::i486_cpu_mode_r));
 	map(0x09a8, 0x09a8).rw(FUNC(pc9801bx_state::gdc_31kHz_r), FUNC(pc9801bx_state::gdc_31kHz_w));
 	map(0x8f1f, 0x8f1f).lw8(NAME([this] (offs_t offset, u8 data) {
@@ -1016,18 +1061,9 @@ void pc9801bx_state::pc9801bx2_io(address_map &map)
 	}));
 }
 
-/*uint8_t pc9801_state::winram_r(offs_t offset)
-{
-    offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
-    return
-}
-
-
-void pc9801_state::winram_w(offs_t offset, uint8_t data)
-{
-    offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
-}*/
-
+/*
+ * uPD7220 maps
+ */
 
 void pc9801_state::upd7220_1_map(address_map &map)
 {
@@ -1735,13 +1771,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
-	int ram_size = m_ram->size() - (640*1024);
-
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	space.install_ram(0, (ram_size < 0) ? m_ram->size() - 1 : (640*1024) - 1, m_ram->pointer());
-	if(ram_size > 0)
-		space.install_ram(1024*1024, (1024*1024) + ram_size - 1, &m_ram->pointer()[(640*1024)]);
-
 	save_item(NAME(m_sasi_data));
 	save_item(NAME(m_sasi_data_enable));
 	save_item(NAME(m_sasi_ctrl));
@@ -2173,7 +2202,6 @@ void pc9801_state::pc9801(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801f)
 
-	// TODO: maybe force dips to avoid beep error
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 
 	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
@@ -2217,7 +2245,8 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 	pc9801_ide(config);
 	UPD4990A(config, m_rtc);
 
-	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,3712K,7808K,14M");
+	// RAM 640KB ~ 14.6MB (with dedicated memory slot)
+	RAM(config, m_ram).set_default_size("2M").set_extra_options("640K,4M,8M,14M,15M");
 
 	m_fdc_2hd->intrq_wr_callback().set(FUNC(pc9801vm_state::fdc_irq_w));
 	m_fdc_2hd->drq_wr_callback().set(FUNC(pc9801vm_state::fdc_drq_w));
@@ -2235,24 +2264,26 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 {
 	pc9801rs(config);
 	V30(config.replace(), m_maincpu, 10000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801vm_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	m_ram->set_default_size("640K").set_extra_options("640K"); // ???
+	// RAM 384KB (VM0/VM2/VM4) ~ 640KB (VM21/VM11)
+	m_ram->set_default_size("640K").set_extra_options("384K");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801_common)
 }
 
 // UV is essentially a VM with 3.5 drives
-// Released as UV2 (384KB RAM), UV21 (640KB RAM) then UV11 (UV21 but smaller?)
+// Released as UV2, UV21 then UV11 (UV21 but smaller?)
 void pc9801vm_state::pc9801uv(machine_config &config)
 {
 	pc9801vm(config);
 
 	config_floppy_35hd(config);
 
+	// RAM 384KB (UV2) ~ 640KB (UV21/ UV11)
 	m_ram->set_default_size("640K").set_extra_options("384K");
 }
 
@@ -2267,24 +2298,39 @@ void pc9801vm_state::pc9801ux(machine_config &config)
 
 	config_floppy_35hd(config);
 //  AM9157A(config, "i8237", 10000000); // unknown clock
+
+	// RAM 640 KB ~ 6.6MB
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("640K,4M,7M");
+
+	// 20MB SASI HDD (UV41 only)
 }
 
 void pc9801vm_state::pc9801dx(machine_config &config)
 {
 	pc9801rs(config);
 	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 12000000));
-	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
+	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801dx_map);
 	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
 	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_525hd(config);
 //  AM9157A(config, "i8237", 10000000); // unknown clock
+
+	// RAM 640KB ~ 14.6MB
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("640K,4M,8M,14M,15M");
 }
 
 void pc9801vm_state::pc9801vx(machine_config &config)
 {
 	pc9801ux(config);
+	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801vx_map);
+	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
+	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
+	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_525hd(config);
 
@@ -2292,8 +2338,10 @@ void pc9801vm_state::pc9801vx(machine_config &config)
 	// Reportedly has a bug with a RMW op, details TBD
 	// ...
 
-	// minimum RAM: 640 kB
-	// maximum RAM: 8.6 MB
+	// RAM 640 KB ~ 8.6MB
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("640K,4M,7M,8M,9M");
+
 	// GDC & EGC, DAC1BIT built-in
 	// Either 2x 5.25 or 2x 3.5 internal floppy drives
 	// 4x C-Bus slots (3x plus 1x dedicated RAM?)
@@ -2316,6 +2364,10 @@ void pc9801us_state::pc9801us(machine_config &config)
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	PC98_SDIP(config, "sdip", 0);
+
+	// RAM 640KB ~ 14.6MB
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("640K,4M,8M,14M,15M");
 }
 
 void pc9801us_state::pc9801fs(machine_config &config)
@@ -2338,6 +2390,10 @@ void pc9801us_state::pc9801fs(machine_config &config)
 //  m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	PC98_SDIP(config, "sdip", 0);
+
+	// RAM 640KB ~ 14.6MB
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("640K,4M,8M,14M,15M");
 }
 
 void pc9801bx_state::pc9801bx2(machine_config &config)
@@ -2356,8 +2412,10 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 
 	PC98_SDIP(config, "sdip", 0);
 
-	// minimum RAM: 1.8 / 3.6 MB (?)
-	// maximum RAM: 19.6 MB
+	// RAM 1.8 MB (U2/M2) / 3.6 MB (U7) ~ 19.6 MB (from EMS?)
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("640K,4M,7M,14M,20M");
+
 	// GDC & EGC, DAC1BIT built-in
 	// 2x 3.5/5.25 internal floppy drives or 1x 3.5 and 120MB IDE HDD
 	// 1x mountable File Bay

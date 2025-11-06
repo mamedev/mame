@@ -50,6 +50,9 @@ public:
 	u8 read(offs_t offset)              { return m_pointer[offset % m_size]; }
 	void write(offs_t offset, u8 data)  { m_pointer[offset % m_size] = data; }
 
+	u8 read_no_mirror(offs_t offset)    { if (offset < m_size) {return m_pointer[offset]; } return 0xff; }
+	void write_no_mirror(offs_t offset, u8 data) { if (offset < m_size) { m_pointer[offset] = data; } }
+
 	// inline configuration helpers
 	ram_device &set_default_size(char const *default_size) { m_default_size = default_size; return *this; }
 	ram_device &set_extra_options(char const *extra_options)
