@@ -28,7 +28,7 @@ u8 ensoniq_vfx_cartridge::read(offs_t offset) {
 }
 
 void ensoniq_vfx_cartridge::write(offs_t offset, u8 data) {
-	if (!m_is_writable) {
+	if (!m_is_writeable) {
 		if (offset > 0x7f00)
 			LOG("!W %04x  (%02x)\r\n", offset, data);
 		return;
@@ -106,8 +106,8 @@ std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_load() 
 	// This is to prevent users from loading a readonly EEPROM cartridge file,
 	// making changes to it, and quitting MAME expecting the image to have been written back,
 	// which could not happen because the file was read-only.
-	m_is_writable = !is_readonly() && (filetype() == "eeprom" || filetype() == "sc32"); // Ensoniq StorCart-32
-	LOG("- loaded %d bytes, cartridge is %s\r\n", n, m_is_writable ? "Writable" : "Read-Only");
+	m_is_writeable = !is_readonly() && (filetype() == "eeprom" || filetype() == "sc32"); // Ensoniq StorCart-32
+	LOG("- loaded %d bytes, cartridge is %s\r\n", n, m_is_writeable ? "Writeable" : "Read-Only");
 
 	if (!m_load_cb.isnull()) {
 		m_load_cb(this);
@@ -117,15 +117,6 @@ std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_load() 
 }
 
 std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_create(int format_type, util::option_resolution *format_options) {
-	auto type = filetype();
-	if (!(type == "eeprom" || type == "sc32")) {
-		return std::make_pair(image_error::INVALIDIMAGE, "Can only create an EEPROM cartridge (.eeprom or .sc32)");
-	}
-
-	if (is_readonly()) {
-		return std::make_pair(image_error::INVALIDIMAGE, "Cannot create a read-only image");
-	}
-
 	LOG("Creating empty cartridge data in '%s'\r\n", filename());
 	std::fill(std::begin(m_storage), std::end(m_storage), 0);
 	m_storage[0x7ffe] = 0x05;
@@ -133,7 +124,12 @@ std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_create(
 	fseek(0, SEEK_SET);
 	fwrite(&m_storage[0], m_storage.size());
 
-	m_is_writable = true;
+	// By definition, if we create a cartridge image, is kind of has to be a writable one: a completely empty
+	// read-only cartridge makes no sense!
+	// This allows users to create a cartridge image with a ".rom" or ".cart" extension, write to it _once_,
+	// in this session, until it is unloaded; and whenever in the future they load it again, it will be
+	// detected as ROM (_not_ EEPROM) by its file extension.
+	m_is_writeable = true;
 
 	// Creating a cartridge also loads it.
 	if (!m_load_cb.isnull()) {
@@ -146,7 +142,7 @@ std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_create(
 void ensoniq_vfx_cartridge::call_unload() {
 	// If the current file is writable and is a writeable (EEPROM) file, write the data back
 	LOG("Unloading cartridge '%s'\r\n", filename());
-	if (!is_readonly() && m_is_writable) {
+	if (!is_readonly() && m_is_writeable) {
 		LOG("Writing cartridge data to '%s'\r\n", filename());
 		fseek(0, SEEK_SET);
 		fwrite(&m_storage[0], m_storage.size());

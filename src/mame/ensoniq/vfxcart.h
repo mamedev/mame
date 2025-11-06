@@ -57,7 +57,7 @@ private:
 	};
 	state m_state = state::IDLE;
 	std::array<uint8_t, SIZE> m_storage;
-	bool m_is_writable;
+	bool m_is_writeable;
 
 	load_cb m_load_cb;
 	unload_cb m_unload_cb;
