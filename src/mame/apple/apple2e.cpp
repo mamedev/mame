@@ -868,7 +868,7 @@ void apple2e_state::memexp_w(offs_t offset, u8 data)
 			break;
 
 		case 3:
-//            printf("Write %02x to RAM[%x]\n", data, m_liveptr);
+//			printf("Write %02x to RAM[%x]\n", data, m_exp_liveptr);
 			if (m_exp_liveptr <= m_exp_addrmask)
 			{
 				m_exp_ram[m_exp_liveptr] = data;
@@ -912,7 +912,7 @@ void apple2e_state::machine_start()
 	m_inh_bank = 0;
 
 	m_migpage = 0;
-	memset(m_migram, 0, 0x200);
+	memset(m_migram, 0, sizeof(m_migram));
 
 	// expansion RAM size
 	if (m_ram_size > (128*1024))
@@ -1278,6 +1278,8 @@ void apple2e_state::machine_reset()
 	}
 
 	m_exp_bankhior = 0xf0;
+	memset(m_exp_regs, 0, sizeof(m_exp_regs));
+	m_exp_wptr = m_exp_liveptr = 0;
 
 	// sync up the banking with the variables.
 	lcrom_update();
