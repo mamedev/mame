@@ -122,6 +122,7 @@ private:
 	void prog_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
 	void dsp_p_map(address_map &map) ATTR_COLD;
+	void virusc_dsp_p_map(address_map &map) ATTR_COLD;
 	void dsp_x_map(address_map &map) ATTR_COLD;
 	void dsp_y_map(address_map &map) ATTR_COLD;
 
@@ -222,6 +223,12 @@ void acvirus_state::dsp_p_map(address_map &map)
 	map(0x20000, 0x3ffff).ram();
 }
 
+void acvirus_state::virusc_dsp_p_map(address_map &map)
+{
+	map(0x00c00, 0x00fff).ram(); // FIXME: configured extension of internal RAM
+	map(0x20000, 0x3ffff).ram();
+}
+
 void acvirus_state::dsp_x_map(address_map &map)
 {
 	map(0x20000, 0x3ffff).ram();
@@ -269,6 +276,8 @@ void acvirus_state::virusa(machine_config &config)
 	/* Actual device is LM16255 */
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
+
+	PWM_DISPLAY(config, m_leds).set_size(8, 8);
 
 	DSP56303(config, m_dsp, 66_MHz_XTAL);
 	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
@@ -348,8 +357,10 @@ void acvirus_state::virusc(machine_config &config)
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
+	PWM_DISPLAY(config, m_leds).set_size(8, 8);
+
 	DSP56362(config, m_dsp, 136_MHz_XTAL);
-	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
+	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::virusc_dsp_p_map);
 	m_dsp->set_addrmap(dsp563xx_device::AS_X, &acvirus_state::dsp_x_map);
 	m_dsp->set_addrmap(dsp563xx_device::AS_Y, &acvirus_state::dsp_y_map);
 	m_dsp->set_hard_omr(0xe);
