@@ -90,18 +90,20 @@ Connectors:
 
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
+
+#include "stellafr.lh"
 
 //#define VERBOSE 1
 #include "logmacro.h"
-
-#include "stellafr.lh"
 
 namespace {
 

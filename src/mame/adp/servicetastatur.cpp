@@ -40,10 +40,12 @@ ___| XTAL  80C31          +KEYPAD+       |__
 */
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/mcs51/i80c51.h"
 #include "machine/i2cmem.h"
 #include "video/hd44780.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -268,10 +270,10 @@ uint8_t servicet_state::port3_r()
 {
 	uint8_t data = ioport("P3")->read();
 
-	uint8_t const sda = m_i2cmem->read_sda();
+	uint8_t const SDA = m_i2cmem->read_sda();
 
 	// Clear bit 4 (SDA) and insert actual value from EEPROM
-	data = (data & ~(1 << PORT_3_SDA)) | (sda ? (1 << PORT_3_SDA) : 0);
+	data = (data & ~(1 << PORT_3_SDA)) | (SDA ? (1 << PORT_3_SDA) : 0);
 
 	return data;
 }
@@ -353,7 +355,7 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 	}
 	default:
 	{
-		popmessage("Garbage write: %02X to %04X\n", data, offset);
+		popmessage("Unknown write: %02X to %04X\n", data, offset);
 	}
 	}
 }
@@ -369,14 +371,14 @@ void servicet_state::clock_in(int state)
 	{
 		// --- INPUT SHIFT CHAIN (U20 + U19, 74HC4094) ---
 		uint16_t chain = (m_u19 << 8) | m_u20;
-		chain = ((chain << 1) | m_datain) & 0xFFFF;
-		m_u20 = chain & 0xFF;
-		m_u19 = (chain >> 8) & 0xFF;
+		chain = ((chain << 1) | m_datain) & 0xffff;
+		m_u20 = chain & 0xff;
+		m_u19 = (chain >> 8) & 0xff;
 
 		// --- OUTPUT SHIFT REGISTER (U13, 74HC165) ---
 		int q7 = (m_u13 >> 7) & 1;
 		m_dte->write_txd(q7);
-		m_u13 = (m_u13 << 1) & 0xFF;
+		m_u13 = (m_u13 << 1) & 0xff;
 	}
 }
 
