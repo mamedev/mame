@@ -190,9 +190,7 @@ void menu_main::populate()
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	// DISABLE SELECT NEW MACHINE & FAVORITES
-	if (!machine().options().skip_gameinfo())
-	{
+
 	if (!mame_machine_manager::instance()->favorite().is_favorite(machine()))
 		item_append(_("menu-main", "Add To Favorites"), 0, (void *)FAVORITE);
 	else
