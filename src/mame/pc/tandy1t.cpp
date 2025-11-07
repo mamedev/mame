@@ -38,7 +38,27 @@ Tandy 1000 (80386) variations:
 
 According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html
 the 286 based Tandy 1000 TL/2, TL/3, RLX, RLX-B and the 8086 based Tandy 1000RL & RL-HD
-used XTA (8-bit IDE) harddisks.
+used XTA (8-bit IDE) hard disks.
+
+TODO:
+* The Tandy 1000 did not have a built-in DMA controller - the DMA
+  controller was supplied on a memory expansion board if present.  With
+  the base 128K RAM, the DMA controller should not be present.
+* The original Tandy 1000 used an 8255 PPI for the keyboard interface
+  before it was integrated into a custom chip for the Tandy 1000A.
+* Wait states when accessing the sound chip.
+* Sound output multiplexing control.
+* Internal speaker disable for Tandy 1000A and later.
+* Other missing I/O.
+* Correct clock frequencies for later models.
+* "Export" models (different clock crystals, probably different video
+  timings).
+* Tandy 1000A control port 3DD.
+* Correct DIP switches/jumpers for each model.
+* Properly combine interrupt/DMA signals from ISA but and onboard
+  peripherals.
+* Work out exactly which machines have the EEPROM present.
+
 */
 
 #include "emu.h"
@@ -48,8 +68,10 @@ used XTA (8-bit IDE) harddisks.
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
+#include "machine/eepromser.h"
 #include "machine/genpc.h"
 #include "machine/nvram.h"
+#include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "sound/sn76496.h"
 
@@ -150,6 +172,9 @@ public:
 		, m_mb(*this, "mb")
 		, m_video(*this, "pcvideo_t1000")
 		, m_ram(*this, RAM_TAG)
+		, m_eeprom(*this, "eeprom")
+		, m_isa_slots(*this, "isa%u", 1U)
+		, m_plus_slot(*this, "plus")
 		, m_vram_bank(0)
 	{
 	}
@@ -176,6 +201,9 @@ private:
 	required_device<t1000_mb_device> m_mb;
 	required_device<pcvideo_t1000_device> m_video;
 	required_device<ram_device> m_ram;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device_array<isa8_slot_device, 5> m_isa_slots;
+	optional_device<isa8_slot_device> m_plus_slot;
 
 	struct
 	{
@@ -187,11 +215,10 @@ private:
 	uint8_t m_eeprom_oper = 0;
 	uint16_t m_eeprom_data = 0;
 
-	uint8_t m_tandy_data[8]{};
-
 	uint8_t m_tandy_bios_bank = 0;    /* I/O port FFEAh */
 	uint8_t m_tandy_ppi_porta = 0, m_tandy_ppi_ack = 0;
 	uint8_t m_tandy_ppi_portb = 0, m_tandy_ppi_portc = 0;
+	uint8_t m_tandy_clock_speed = 1;
 	uint8_t m_vram_bank = 0;
 
 	void tandy1000_common(machine_config &config) ATTR_COLD;
@@ -199,12 +226,11 @@ private:
 	void tandy1000_101key(machine_config &config) ATTR_COLD;
 	void t1000x(machine_config &config) ATTR_COLD;
 
-	void pc_t1t_p37x_w(offs_t offset, uint8_t data);
-	uint8_t pc_t1t_p37x_r(offs_t offset);
-
 	void tandy1000_pio_w(offs_t offset, uint8_t data);
 	void tandy1000x_pio_w(offs_t offset, uint8_t data);
 	uint8_t tandy1000_pio_r(offs_t offset);
+	uint8_t tandy1000x_pio_r(offs_t offset);
+	uint8_t tandy1000hx_pio_r(offs_t offset);
 	uint8_t tandy1000_bank_r(offs_t offset);
 	void tandy1000_bank_w(offs_t offset, uint8_t data);
 	void nmi_vram_bank_w(uint8_t data);
@@ -216,14 +242,17 @@ private:
 
 	int tandy1000_read_eeprom();
 	void tandy1000_write_eeprom(uint8_t data);
+	uint8_t tandy1000hx_eeprom_out_r();
+	void tandy1000hx_eeprom_w(uint8_t data);
 	void tandy1000_set_bios_bank();
+
+	TIMER_CALLBACK_MEMBER(update_clock);
 
 	DECLARE_MACHINE_RESET(tandy1000rl);
 
 	static void cfg_fdc_35(device_t *device) ATTR_COLD;
 	static void cfg_fdc_525(device_t *device) ATTR_COLD;
 
-	void biosbank_map(address_map &map) ATTR_COLD;
 	void tandy1000_16_io(address_map &map) ATTR_COLD;
 	void tandy1000_286_map(address_map &map) ATTR_COLD;
 	void tandy1000_286_bank_map(address_map &map) ATTR_COLD;
@@ -231,6 +260,7 @@ private:
 	void tandy1000_bank_map(address_map &map) ATTR_COLD;
 	void tandy1000_io(address_map &map) ATTR_COLD;
 	void tandy1000x_io(address_map &map) ATTR_COLD;
+	void tandy1000hx_io(address_map &map) ATTR_COLD;
 	void tandy1000_map(address_map &map) ATTR_COLD;
 	void tandy1000tx_io(address_map &map) ATTR_COLD;
 };
@@ -356,34 +386,17 @@ void tandy1000_state::tandy1000_write_eeprom(uint8_t data)
 	m_eeprom_clock=data&4;
 }
 
-void tandy1000_state::pc_t1t_p37x_w(offs_t offset, uint8_t data)
+void tandy1000_state::tandy1000hx_eeprom_w(uint8_t data)
 {
-//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", m_maincpu->pc( ),offset, data));
-	if (offset!=4)
-		logerror("T1T_p37x_w %.5x #%d $%02x\n", m_maincpu->pc( ),offset, data);
-	m_tandy_data[offset]=data;
-	switch( offset )
-	{
-		case 4:
-			tandy1000_write_eeprom(data);
-			break;
-	}
-}
-
-uint8_t tandy1000_state::pc_t1t_p37x_r(offs_t offset)
-{
-	int data = m_tandy_data[offset];
-//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", m_maincpu->pc( ), offset, data));
-	return data;
+	m_eeprom->di_write(BIT(data, 0));
+	m_eeprom->cs_write(BIT(data, 1));
+	m_eeprom->clk_write(BIT(data, 2));
 }
 
 /* this is for tandy1000hx
    hopefully this works for all x models
    must not be a ppi8255 chip
    (think custom chip)
-   port c:
-   bit 4 input eeprom data in
-   bit 3 output turbo mode
 */
 
 void tandy1000_state::tandy1000_pio_w(offs_t offset, uint8_t data)
@@ -391,12 +404,11 @@ void tandy1000_state::tandy1000_pio_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 1:
+		// FIXME: bit 4 is internal speaker disable for 1000A and later
 		// FIXME: bits 5 and 6 control sound multiplexing
 		m_tandy_ppi_portb = data;
 		m_mb->m_pit8253->write_gate2(BIT(data, 0));
-		m_mb->pc_speaker_set_spkrdata(data & 0x02);
-		// SX enables keyboard from bit 3, others bit 6, hopefully there's no conflict
-		m_keyboard->enable(data & 0x48);
+		m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
 		if (data & 0x80)
 		{
 			m_mb->m_pic8259->ir1_w(0);
@@ -404,6 +416,8 @@ void tandy1000_state::tandy1000_pio_w(offs_t offset, uint8_t data)
 		}
 		break;
 	case 2:
+		// bit 1 = Multi-Data
+		// bit 2 = Multi-Clock
 		m_tandy_ppi_portc = data;
 		break;
 	}
@@ -412,14 +426,16 @@ void tandy1000_state::tandy1000_pio_w(offs_t offset, uint8_t data)
 void tandy1000_state::tandy1000x_pio_w(offs_t offset, uint8_t data)
 {
 	tandy1000_pio_w(offset, data);
-
 	switch (offset)
 	{
 	case 2:
-		if (data & 8)
-			m_maincpu->set_clock_scale(1);
-		else
-			m_maincpu->set_clock_scale(0.5);
+		if (BIT(data, 3) != m_tandy_clock_speed)
+		{
+			m_tandy_clock_speed = BIT(data, 3);
+			machine().scheduler().synchronize(
+					timer_expired_delegate(FUNC(tandy1000_state::update_clock), this),
+					m_tandy_clock_speed);
+		}
 		break;
 	}
 }
@@ -448,10 +464,40 @@ uint8_t tandy1000_state::tandy1000_pio_r(offs_t offset)
 		data = m_tandy_ppi_portb;
 		break;
 	case 2:
-//      if (tandy1000hx) {
-//      data=m_tandy_ppi_portc; // causes problems (setuphx)
-		if (!tandy1000_read_eeprom()) data &= ~0x10;
-//  }
+		data = m_tandy_ppi_portc | 0xf0; // low four bits can be read back
+		if (!m_mb->pit_out2())
+			data &= ~0x20;
+		break;
+	}
+	return data;
+}
+
+uint8_t tandy1000_state::tandy1000x_pio_r(offs_t offset)
+{
+	uint8_t data = tandy1000_pio_r(offset);
+	switch (offset)
+	{
+	case 2:
+		// bit 4 = video RAM size (0 = 128K, 1 = 256K)
+		// bit 6 = monochrome mode (0 = color monitor, 1 = 350 line monochrome monitor)
+		// bit 7 = 0 (reserved)
+		if (!tandy1000_read_eeprom()) data &= ~0x10; // hack to satisfy the 16-bit machines until they can be made to work with a proper 93C46 device
+		break;
+	}
+	return data;
+}
+
+uint8_t tandy1000_state::tandy1000hx_pio_r(offs_t offset)
+{
+	uint8_t data = tandy1000x_pio_r(offset);
+	switch (offset)
+	{
+	case 2:
+		// bit 4 = EEPROM data
+		if (m_eeprom->do_read())
+			data |= 0x10;
+		else
+			data &= ~0x10;
 		break;
 	}
 	return data;
@@ -507,6 +553,21 @@ void tandy1000_state::tandy1000_set_bios_bank()
 	m_biosbank->set_entry(bank & 0x07);
 }
 
+TIMER_CALLBACK_MEMBER(tandy1000_state::update_clock)
+{
+	// FIXME: correct clocks for later models
+	// FIXME: work out exactly what's affected by speed change for each model
+	auto const clock = XTAL(28'636'363) / (param ? 4 : 6);
+	m_maincpu->set_clock(clock);
+	for (auto &slot : m_isa_slots)
+	{
+		if (slot)
+			slot->set_clock(clock);
+	}
+	if (m_plus_slot)
+		m_plus_slot->set_clock(clock);
+}
+
 MACHINE_RESET_MEMBER(tandy1000_state, tandy1000rl)
 {
 	m_tandy_bios_bank = 6;
@@ -532,7 +593,8 @@ void tandy1000_state::machine_start()
 				write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)),
 				0xffff);
 	}
-	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
+	if (subdevice<nvram_device>("nvram"))
+		subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 
 	if (m_biosbank)
 		m_biosbank->configure_entries(0, 8, memregion("rom")->base(), 0x10000);
@@ -633,14 +695,22 @@ void tandy1000_state::tandy1000_io(address_map &map)
 	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
 	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr8496_device::write));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
+	map(0x0378, 0x037a).mirror(0x0004).rw("lpt", FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
 }
 
 void tandy1000_state::tandy1000x_io(address_map &map)
 {
 	tandy1000_io(map);
-	map(0x0060, 0x0063).w(FUNC(tandy1000_state::tandy1000x_pio_w));
+	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000x_pio_r), FUNC(tandy1000_state::tandy1000x_pio_w));
+}
+
+void tandy1000_state::tandy1000hx_io(address_map &map)
+{
+	tandy1000x_io(map);
+	map(0x0060, 0x0063).r(FUNC(tandy1000_state::tandy1000hx_pio_r));
+	map(0x037c, 0x037f).unmaprw(); // parallel port is not mirrored when EEPROM is present
+	map(0x037c, 0x037c).w(FUNC(tandy1000_state::tandy1000hx_eeprom_w));
 }
 
 void tandy1000_state::tandy1000_bank_map(address_map &map)
@@ -655,26 +725,25 @@ void tandy1000_state::tandy1000_16_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
-	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000x_pio_w));
+	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000x_pio_r), FUNC(tandy1000_state::tandy1000x_pio_w));
 	map(0x0065, 0x0065).w(FUNC(tandy1000_state::devctrl_w));
 	map(0x00a0, 0x00a0).r(FUNC(tandy1000_state::unk_r));
 	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr8496_device::write));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
-	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
+	map(0x0378, 0x037a).rw("lpt", FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
+	map(0x037c, 0x037c).w(FUNC(tandy1000_state::tandy1000_write_eeprom));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
 	map(0xffe8, 0xffe8).w(FUNC(tandy1000_state::vram_bank_w));
 }
 
 void tandy1000_state::tandy1000_bank_io(address_map &map)
 {
-	map.unmap_value_high();
 	tandy1000_16_io(map);
 	map(0xffea, 0xffeb).rw(FUNC(tandy1000_state::tandy1000_bank_r), FUNC(tandy1000_state::tandy1000_bank_w));
 }
 
 void tandy1000_state::tandy1000tx_io(address_map &map)
 {
-	map.unmap_value_high();
 	tandy1000_16_io(map);
 	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
 }
@@ -727,6 +796,8 @@ GFXDECODE_END
 
 void tandy1000_state::tandy1000_common(machine_config &config)
 {
+	// FIXME: pass correct clocks in
+
 	T1000_MOTHERBOARD(config, m_mb, 0);
 	m_mb->set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
@@ -740,15 +811,12 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_video, gfx_t1000);
 
 	/* sound hardware */
-	NCR8496(config, "sn76496", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mb:mono", 0.80);
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NCR8496(config, "sn76496", XTAL(14'318'181) / 4).add_route(ALL_OUTPUTS, "mb:mono", 0.80);
 
 	isa8_slot_device &isa_fdc(ISA8_SLOT(config, "isa_fdc", 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)); // FIXME: determine ISA bus clock
 	isa_fdc.set_option_machine_config("fdc_xt", cfg_fdc_35);
 
-	ISA8_SLOT(config, "isa_lpt", 0, "mb:isa", pc_isa8_cards, "lpt", true);
-	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true);
+	PC_LPT(config, "lpt").irq_handler().set(m_mb->m_pic8259, FUNC(pic8259_device::ir7_w));
 
 	PC_JOY(config, "pc_joy");
 
@@ -773,7 +841,7 @@ void tandy1000_state::tandy1000_101key(machine_config &config)
 
 void tandy1000_state::t1000x(machine_config &config)
 {
-	I8088(config, m_maincpu, XTAL(28'636'363) / 3);
+	I8088(config, m_maincpu, XTAL(28'636'363) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_map);
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000x_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -797,32 +865,32 @@ void tandy1000_state::t1000(machine_config &config)
 
 	subdevice<isa8_slot_device>("isa_fdc")->set_option_machine_config("fdc_xt", cfg_fdc_525);
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-
 	m_ram->set_extra_options("256K, 384K");
+
+	for (unsigned i = 0; 3 > i; ++i)
+		ISA8_SLOT(config, m_isa_slots[i], XTAL(14'318'181) / 3, "mb:isa", pc_isa8_cards, nullptr, false);
 }
 
 void tandy1000_state::t1000hx(machine_config &config)
 {
 	t1000x(config);
 
-	// plus cards are ISA with a nonstandard connector
-	ISA8_SLOT(config, "plus1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000hx_io);
 
 	m_ram->set_extra_options("256K, 384K");
+
+	EEPROM_93C46_16BIT(config, m_eeprom);
+
+	// plus cards are ISA with a nonstandard connector
+	ISA8_SLOT(config, m_plus_slot, XTAL(28'636'363) / 4, "mb:isa", pc_isa8_cards, nullptr, false);
 }
 
 void tandy1000_state::t1000sx(machine_config &config)
 {
 	t1000x(config);
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	for (unsigned i = 0; 5 > i; ++i)
+		ISA8_SLOT(config, m_isa_slots[i], XTAL(28'636'363) / 4, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	m_ram->set_extra_options("384K");
 }
@@ -838,14 +906,19 @@ void tandy1000_state::t1000rl(machine_config &config)
 
 	tandy1000_101key(config);
 
+	m_ram->set_extra_options("384K");
+
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
 
-	m_ram->set_extra_options("384K");
+	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 void tandy1000_state::t1000sl2(machine_config &config)
 {
 	t1000rl(config);
+
 	m_maincpu->set_clock(XTAL(24'000'000) / 3);
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
@@ -865,6 +938,10 @@ void tandy1000_state::t1000tl2(machine_config &config)
 
 	tandy1000_101key(config);
 
+	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
@@ -883,6 +960,7 @@ void tandy1000_state::t1000tl(machine_config &config)
 void tandy1000_state::t1000tx(machine_config &config)
 {
 	t1000tl2(config);
+
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000tx_io);
 
 	config.device_remove("pc_keyboard");
@@ -987,6 +1065,8 @@ ROM_START( t1000hx )
 
 	ROM_REGION(0x08000,"gfx1", 0)
 	ROM_LOAD("8079027.u31", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location, probably internal to "big blue" at u31
+
+	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( t1000sx )
@@ -1040,8 +1120,8 @@ ROM_START( t1000sl2 )
 	ROM_REGION(0x08000,"gfx1", 0)
 	ROM_LOAD("8079027.u25", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
 
-	ROM_REGION(0x80, "nmc9246n", 0)
-	ROM_LOAD("seeprom.bin", 0, 0x80, CRC(4fff41df) SHA1(41a7009694550c017996932beade608cff968f4a))
+	ROM_REGION16_LE(0x80, "eeprom", 0)
+	ROM_LOAD("nmc9246n.bin", 0, 0x80, CRC(4fff41df) SHA1(41a7009694550c017996932beade608cff968f4a))
 ROM_END
 
 
