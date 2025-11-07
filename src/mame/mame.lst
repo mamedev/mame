@@ -33468,6 +33468,9 @@ wmsboom
 wmstopb
 yukongld
 
+@source:misc/wren.cpp
+wren
+
 @source:misc/xtom3d.cpp
 pumpipx2
 pumpipx2p
