@@ -83,6 +83,7 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 	const rgb_t fallback_color = palette().pen_color(0x800);
 	const u16 pen_base = (m_layer2_palette_select ? m_palette_alt_offset : m_palette_base_offset) | (m_palette_offset << 4);
 	const u16 x_min = (((clip.left() - offset_h) >> 1) + m_scroll_x) % info[0];
+	const bool x_overscan = m_scroll_x >= info[0] && info[3] == 256;
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		const u16 y = (vpos - offset_v + m_scroll_y) % info[1];
@@ -115,7 +116,7 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 			}
 
 			++x %= info[0];
-			if (x == 0 && info[4] != 1)
+			if (x == 0 && !x_overscan)
 				scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * info[4]);
 			else
 				scr += info[3];
@@ -141,6 +142,7 @@ void specnext_layer2_device::draw_16(screen_device &screen, bitmap_rgb32 &bitmap
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
 	const u16 pen_base = (m_layer2_palette_select ? m_palette_alt_offset : m_palette_base_offset) | (m_palette_offset << 4);
 	const u16 x_min = (((clip.left() - offset_h) >> 1) + m_scroll_x) % info[0];
+	const bool x_overscan = m_scroll_x >= info[0] && info[3] == 256;
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		const u16 y = (vpos - offset_v + m_scroll_y) % info[1];
@@ -182,7 +184,7 @@ void specnext_layer2_device::draw_16(screen_device &screen, bitmap_rgb32 &bitmap
 			}
 
 			++x %= info[0];
-			if (x == 0  && info[4] != 1)
+			if (x == 0  && !x_overscan)
 				scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * info[4]);
 			else
 				scr += info[3];

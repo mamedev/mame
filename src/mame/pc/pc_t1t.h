@@ -5,18 +5,20 @@
 
 #pragma once
 
-#include "video/mc6845.h"
-#include "machine/ram.h"
 #include "machine/bankdev.h"
-#include "machine/pic8259.h"
+#include "machine/ram.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 
 #define T1000_SCREEN_NAME   "screen"
-#define T1000_MC6845_NAME   "mc6845_t1000"
 
-class pc_t1t_device :  public device_t, public device_video_interface
+class pc_t1t_device :  public device_t, public device_video_interface, public device_palette_interface
 {
 public:
+	// configuration
+	template <typename T> pc_t1t_device &set_chr_gen_tag(T &&tag) { m_chr_gen.set_tag(std::forward<T>(tag)); return *this; }
+
 	void t1000_de_changed(int state);
 	uint8_t read(offs_t offset);
 
@@ -55,7 +57,25 @@ protected:
 	// construction/destruction
 	pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_start() override ATTR_COLD;
+	virtual uint32_t palette_entries() const noexcept override { return 32; }
+
+	void palette_init() ATTR_COLD;
+
+	int mode_control_r();
+	void color_select_w(int data);
+	int color_select_r();
+	int status_r();
+	void lightpen_strobe_w(int data);
+	void vga_index_w(int data);
+	int vga_data_r();
+	int bank_r();
+
+	required_region_ptr<uint8_t> m_chr_gen;
 	required_device<mc6845_device> m_mc6845;
+	required_device<ram_device> m_ram;
+	required_device<address_map_bank_device> m_vram;
+
 	uint8_t m_mode_control, m_color_select;
 	uint8_t m_status;
 
@@ -67,31 +87,15 @@ protected:
 
 	uint8_t *m_displayram;
 
-	uint8_t  *m_chr_gen;
-	uint8_t  m_chr_size;
+	uint8_t m_chr_size;
 	uint16_t m_ra_offset;
 
-	uint8_t   m_address_data_ff;
+	uint8_t m_address_data_ff;
 
-	int     m_update_row_type;
-	uint8_t   m_display_enable;
-	uint8_t   m_vsync;
-	uint8_t   m_palette_base;
-
-	void pcjr_palette(palette_device &palette) const;
-
-	int mode_control_r();
-	void color_select_w(int data);
-	int color_select_r();
-	int status_r();
-	void lightpen_strobe_w(int data);
-	void vga_index_w(int data);
-	int vga_data_r();
-	int bank_r();
-
-	required_device<palette_device> m_palette;
-	required_device<ram_device> m_ram;
-	required_device<address_map_bank_device> m_vram;
+	int m_update_row_type;
+	uint8_t m_display_enable;
+	uint8_t m_vsync;
+	uint8_t m_palette_base;
 };
 
 class pcvideo_t1000_device :  public pc_t1t_device
@@ -125,6 +129,9 @@ public:
 	// construction/destruction
 	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// configuration
+	auto vsync_callback() { return m_vsync_cb.bind(); }
+
 	void write(offs_t offset, uint8_t data);
 
 	void de_changed(int state);
@@ -135,8 +142,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
-	required_device<pic8259_device> m_pic8259;
-	uint8_t   *m_jxkanji;
+	devcb_write_line m_vsync_cb;
+	const uint8_t *m_jxkanji;
 
 private:
 	void pc_pcjr_mode_switch();

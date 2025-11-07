@@ -5,7 +5,7 @@
 NEC PC-H[yper] 98
 
 TODO:
-- NESA bus in place of C-Bus plus a billion of overrides from the base PC-98 ...
+- NESA bus in place of C-Bus plus a billion overrides from the base PC-98 ...
 - needs a specific chargen "FONT24.ROM" for anything that isn't a H98S;
 - Hookup AGDC upd72120_device;
 
@@ -173,8 +173,9 @@ void pc_hyper98_state::pc_h98s(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc_hyper98_state, pc_h98)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_hyper98_state, pc_h98)
 
+	// RAM 1.6 MB ~ 45.6 MB
 	m_ram->set_default_size("14M");
-	// TODO: extra options, 1.6MB up to 45.6MB
+	m_ram->set_extra_options("2M,4M,8M,16M,32M,46M");
 }
 
 // Stolen from pc9821

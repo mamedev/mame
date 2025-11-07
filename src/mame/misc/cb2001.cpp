@@ -1630,7 +1630,7 @@ ROM_START( cb5 ) // DYNA CB5 V1.4 in bookkeeping screen
 	ROM_REGION( 0x100000, "gfx", 0 ) // not dumped for this set, but seems to work fine. Pics of another PCB show D9801 marked on the flash, so it could be different.
 	ROM_LOAD( "flash", 0x000000, 0x100000, BAD_DUMP CRC(07d711a6) SHA1(6b5a4017eb1d31dc184831f85d786331f4a8e01f) )
 
-	ROM_REGION( 0x200, "proms", 0 )
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
 	ROM_LOAD( "n82s135n.2b", 0x000, 0x100, CRC(502be98c) SHA1(4591d1d5cfe9e83032705139e630dfa5df79689a) )
 	ROM_LOAD( "n82s135n.2d", 0x100, 0x100, CRC(bb1865c9) SHA1(58acf909dd6de519d9675482d130b697856e1bf4) )
 ROM_END
@@ -1642,7 +1642,7 @@ ROM_START( cb5_13 ) // Wing W4 board + DYNA D9701 subboard; DYNA CB5 V1.3 in boo
 	ROM_REGION( 0x100000, "gfx", 0 ) // not dumped for this set, but seems to work fine. Pics of another PCB show D9801 marked on the flash, so it could be different.
 	ROM_LOAD( "flash", 0x000000, 0x100000, BAD_DUMP CRC(07d711a6) SHA1(6b5a4017eb1d31dc184831f85d786331f4a8e01f) )
 
-	ROM_REGION( 0x200, "proms", 0 )
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
 	ROM_LOAD( "n82s135n.2b", 0x000, 0x100, CRC(502be98c) SHA1(4591d1d5cfe9e83032705139e630dfa5df79689a) )
 	ROM_LOAD( "n82s135n.2d", 0x100, 0x100, CRC(bb1865c9) SHA1(58acf909dd6de519d9675482d130b697856e1bf4) )
 ROM_END
@@ -1654,7 +1654,7 @@ ROM_START( cb5_11) // Wing W4 board + DYNA D9701 subboard; DYNA CB5 V1.1 in book
 	ROM_REGION( 0x100000, "gfx", 0 ) // not dumped for this set, but seems to work fine. Pics of another PCB show D9801 marked on the flash, so it could be different.
 	ROM_LOAD( "flash", 0x000000, 0x100000, BAD_DUMP CRC(07d711a6) SHA1(6b5a4017eb1d31dc184831f85d786331f4a8e01f) )
 
-	ROM_REGION( 0x200, "proms", 0 )
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
 	ROM_LOAD( "n82s135n.2b", 0x000, 0x100, CRC(502be98c) SHA1(4591d1d5cfe9e83032705139e630dfa5df79689a) )
 	ROM_LOAD( "n82s135n.2d", 0x100, 0x100, CRC(bb1865c9) SHA1(58acf909dd6de519d9675482d130b697856e1bf4) )
 ROM_END
@@ -1739,6 +1739,30 @@ ROM_START( tripjack ) // DYNA D9805 PCB; DYNA TRJ V1.6G in bookkeeping screen
 	ROM_LOAD( "82s135.11b", 0x100, 0x100, CRC(9940ef22) SHA1(42b0c6410d8db34e0316e95b7b7007abc3098341) )
 ROM_END
 
+ROM_START( tripjack11 ) // DYNA D9702 PCB; DYNA TRJ V1.1 in bookkeeping screen
+	ROM_REGION16_LE( 0x40000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "tj_11d.11f", 0x20000, 0x20000, CRC(cf27aaa8) SHA1(1c8dd217992ecdc4a94572e0b53fb2f82b7db281) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD( "tj_1d.12b", 0x00000, 0x80000, CRC(82f39c9a) SHA1(063e5747bf69266eaee977f48a0e7d5e642d070e) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "82s135.9b",  0x000, 0x100, CRC(2d2237fb) SHA1(9b71801bd465d2a823f648f4d3c1823b5ba3340e) )
+	ROM_LOAD( "82s135.11b", 0x100, 0x100, CRC(9940ef22) SHA1(42b0c6410d8db34e0316e95b7b7007abc3098341) )
+ROM_END
+
+ROM_START( tripjack07 ) // DYNA D9702 PCB; DYNA TRJ2 V0.7 in bookkeeping screen
+	ROM_REGION16_LE( 0x40000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "11f", 0x20000, 0x20000, CRC(618f1bac) SHA1(e39c96333e91f3ef001a31646dbe31fa7befa3c9) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD( "tj_1d.12b", 0x00000, 0x80000, CRC(82f39c9a) SHA1(063e5747bf69266eaee977f48a0e7d5e642d070e) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "82s135.9b",  0x000, 0x100, CRC(2d2237fb) SHA1(9b71801bd465d2a823f648f4d3c1823b5ba3340e) )
+	ROM_LOAD( "82s135.11b", 0x100, 0x100, CRC(9940ef22) SHA1(42b0c6410d8db34e0316e95b7b7007abc3098341) )
+ROM_END
+
 ROM_START( crzybell ) // DYNA D9401 PCB; DYNA CRBL1 V1.2D in bookkeeping screen
 	ROM_REGION16_LE( 0x40000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "cbl12d.6e", 0x20000, 0x20000, CRC(a5d43b00) SHA1(b89fd8eb7675b3dd4f47bf95326da1b881997a56) )
@@ -1812,6 +1836,8 @@ GAME( 1997, cb5_13,       cb5,       cb5,       cb5,       cb2001_state, init_sm
 GAME( 1997, cb5_11,       cb5,       cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Cherry Bonus V Five (V1.1)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mystjb,       0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Mystery J & B (V1.3G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tripjack,     0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Triple Jack (V1.6G)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tripjack11,   tripjack,  scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Triple Jack (V1.1)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tripjack07,   tripjack,  scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Triple Jack (V0.7)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, crzybell,     0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Crazy Bell (V1.2D)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, nmondop,      0,         cb2001,    cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "New Mondo Plus (V0.6I)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, pdouble8 ,    0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna & MK Electronics", "Premium Double Eight (V5.3FA)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

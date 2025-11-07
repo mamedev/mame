@@ -1116,21 +1116,41 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT1, 4, 0):     // SEXT1   dst,src
-				PARAM0 = (int8_t)PARAM1;
+				PARAM0 = int8_t(uint8_t(PARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT1, 4, 1):
-				temp32 = (int8_t)PARAM1;
+				temp32 = int8_t(uint8_t(PARAM1));
 				flags = FLAGS32_NZ(temp32);
 				PARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT2, 4, 0):     // SEXT2   dst,src
-				PARAM0 = (int16_t)PARAM1;
+				PARAM0 = int16_t(uint16_t(PARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT2, 4, 1):
-				temp32 = (int16_t)PARAM1;
+				temp32 = int16_t(uint16_t(PARAM1));
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_BFXU, 4, 0):      // BFXU    dst,src,shift,width[,f]
+				PARAM0 = rotr_32(PARAM1, PARAM2 + PARAM3) >> (-int32_t(PARAM3) & 0x1f);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_BFXU, 4, 1):
+				temp32 = rotr_32(PARAM1, PARAM2 + PARAM3) >> (-int32_t(PARAM3) & 0x1f);
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_BFXS, 4, 0):      // BFXS    dst,src,shift,width[,f]
+				PARAM0 = uint32_t(int32_t(rotr_32(PARAM1, PARAM2 + PARAM3)) >> (-int32_t(PARAM3) & 0x1f));
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_BFXS, 4, 1):
+				temp32 = uint32_t(int32_t(rotr_32(PARAM1, PARAM2 + PARAM3)) >> (-int32_t(PARAM3) & 0x1f));
 				flags = FLAGS32_NZ(temp32);
 				PARAM0 = temp32;
 				break;
@@ -1767,31 +1787,51 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT1, 8, 0):     // DSEXT   dst,src,BYTE
-				DPARAM0 = (int8_t)PARAM1;
+				DPARAM0 = int8_t(uint8_t(PARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT1, 8, 1):
-				temp64 = (int8_t)PARAM1;
+				temp64 = int8_t(uint8_t(PARAM1));
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT2, 8, 0):     // DSEXT   dst,src,WORD
-				DPARAM0 = (int16_t)PARAM1;
+				DPARAM0 = int16_t(uint16_t(PARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT2, 8, 1):
-				temp64 = (int16_t)PARAM1;
+				temp64 = int16_t(uint16_t(PARAM1));
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT4, 8, 0):     // DSEXT   dst,src,DWORD
-				DPARAM0 = (int32_t)PARAM1;
+				DPARAM0 = int32_t(uint32_t(PARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SEXT4, 8, 1):
-				temp64 = (int32_t)PARAM1;
+				temp64 = int32_t(uint32_t(PARAM1));
+				flags = FLAGS64_NZ(temp64);
+				DPARAM0 = temp64;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_BFXU, 8, 0):      // BFXU    dst,src,shift,width[,f]
+				DPARAM0 = rotr_64(DPARAM1, DPARAM2 + DPARAM3) >> (-int64_t(DPARAM3) & 0x3f);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_BFXU, 8, 1):
+				temp64 = rotr_64(DPARAM1, DPARAM2 + DPARAM3) >> (-int64_t(DPARAM3) & 0x3f);
+				flags = FLAGS64_NZ(temp64);
+				DPARAM0 = temp64;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_BFXS, 8, 0):      // BFXS    dst,src,shift,width[,f]
+				DPARAM0 = uint64_t(int64_t(rotr_64(DPARAM1, DPARAM2 + DPARAM3)) >> (-int64_t(DPARAM3) & 0x3f));
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_BFXS, 8, 1):
+				temp64 = uint64_t(int64_t(rotr_64(DPARAM1, DPARAM2 + DPARAM3)) >> (-int64_t(DPARAM3) & 0x3f));
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;

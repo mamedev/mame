@@ -799,19 +799,23 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="airhckey">
-		<!-- Original images (Redump)
+	<software name="airhckey_us" cloneof="airhckey">
+		<!--
+		http://redump.org/disc/1878
 		<rom name="Air Hockey (USA).cue" size="82" crc="c2df3c01" sha1="9c9e9d36b63a1769adf0a660372da00a13a31e22"/>
 		<rom name="Air Hockey (USA).bin" size="157318224" crc="b453fcb9" sha1="4cdba4e968f03fe26ebe57d4cc02186ddccab64f"/>
 		-->
 		<description>Air Hockey (USA)</description>
 		<year>2002</year>
 		<publisher>Mud Duck Productions</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Sucess"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-01467"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="air hockey (usa)" sha1="a2f058f4c087804b89ee4bf0f7acf1c2becf8480"/>
+				<disk name="Air Hockey (USA)" sha1="48c1b98f5dc7f3c451e50714e473a454422a8a8c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -835,8 +839,9 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="alienres">
-		<!-- Original images (Redump)
+	<software name="alienres_us" cloneof="alienres">
+		<!--
+		http://redump.org/disc/7489
 		<rom name="Alien Resurrection (USA).cue" size="454" crc="d97017ce" sha1="63515660b2cea328fded6df84feb9151a3416f87"/>
 		<rom name="Alien Resurrection (USA) (Track 1).bin" size="270035472" crc="f9b6964f" sha1="fd64d8357e90a1a9e9448519835ecee6b65c0cf4"/>
 		<rom name="Alien Resurrection (USA) (Track 2).bin" size="15292704" crc="f3c18581" sha1="7e8fbb82eafff3b68c2a8ea8235af5bb3ddb5c2f"/>
@@ -846,17 +851,21 @@ The game freezes when loading (after the intro)
 		<description>Alien Resurrection (USA)</description>
 		<year>2000</year>
 		<publisher>Fox Interactive</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Argonaut Games"/>
+		<info name="language" value="English" />
 		<info name="serial" value="SLUS-00633"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="alien resurrection (usa)" sha1="a5c6b0c879e523ac7b19c209ac9c06eaf1ab3a01"/>
+				<disk name="Alien Resurrection (USA)" sha1="79de3fd8c2541398a4f26f7a81a617946fd1cbfa"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="alientri">
-		<!-- Original images (Redump)
+	<software name="alientri_us" cloneof="alientri">
+		<!--
+		http://redump.org/disc/11034
 		<rom name="Alien Trilogy (USA).cue" size="2946" crc="5c405f2c" sha1="c8b03a82e71770a4145a9cb613333d76ad6b8319"/>
 		<rom name="Alien Trilogy (USA) (Track 01).bin" size="160763904" crc="af79a74f" sha1="6e97cfeb41c9e60ec1b8d1f5c308c7ca450f1f58"/>
 		<rom name="Alien Trilogy (USA) (Track 02).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
@@ -888,11 +897,13 @@ The game freezes when loading (after the intro)
 		<description>Alien Trilogy (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="developer" value="Probe Entertainment"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00007"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="alien trilogy (usa)" sha1="34268b5750155db04b9dd25991d98f428ae5fa68"/>
+				<disk name="Alien Trilogy (USA)" sha1="29b7f1384cef58ec2404a1aa53a30da71f2fa0fb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -28853,7 +28864,7 @@ The game freezes when loading (after the intro)
 		<description>Ultimate 8 Ball (USA)</description>
 		<year>1999</year>
 		<publisher>THQ</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Mirage"/>
 		<info name="language" value="English" />
 		<info name="serial" value="SLUS-00864"/>
@@ -37488,6 +37499,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat (Japan)</description>
 		<year>1995</year>
 		<publisher>Namco Hometek</publisher>
+		<info name="alt_title" value="エースコンバット"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="release" value="19950630"/>
@@ -37509,6 +37521,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat 2 (Japan)</description>
 		<year>1997</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="エースコンバット２"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="serial" value="SLPS-00830"/>
@@ -37530,6 +37543,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat 2 (Japan, rev. 1) (PlayStation the Best)</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="エースコンバット２"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="serial" value="SLPS-91146"/>
@@ -37555,6 +37569,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat 3: Electrosphere (Japan)</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="エースコンバット３　エレクトロスフィア"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="serial" value="SLPS-02020 / SLPS-02021 / SLPS-91214 / SLPS-91215"/>
@@ -37585,6 +37600,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Ace Combat 3: Electrosphere (Japan, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="エースコンバット３　エレクトロスフィア"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="Japanese"/>
 		<info name="serial" value="SCPS-45397 / SCPS-45398"/>
@@ -37704,6 +37720,7 @@ The game only boot on PAL
 		<description>Action Bass (Japan)</description>
 		<year>1999</year>
 		<publisher>Syscom Entertainment</publisher>
+		<info name="alt_title" value="アクション・バス"/>
 		<info name="developer" value="Vingt-et-un"/>
 		<info name="language" value="English"/>
 		<info name="serial" value="SLPS-02482"/>
@@ -37725,6 +37742,7 @@ The game only boot on PAL
 		<description>AirRace Championship (Japan)</description>
 		<year>1999</year>
 		<publisher>Xing Entertainment</publisher>
+		<info name="alt_title" value="エアレース・チャンピオンシップ"/>
 		<info name="developer" value="Xing Entertainment"/>
 		<info name="language" value="English"/>
 		<info name="serial" value="SLPS-01879"/>
@@ -37732,6 +37750,124 @@ The game only boot on PAL
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="AirRace Championship (Japan)" sha1="74f6d9150d6ab868c55db706f115fe56a77ebfb8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alicecyb" supported="partial">
+		<!--
+		http://redump.org/disc/30600
+		<rom name="Alice in Cyberland (Japan).cue" size="92" crc="7816df95" sha1="8b466c13af2b512a4d3fc788936c990c431e658e"/>
+		<rom name="Alice in Cyberland (Japan).bin" size="597330384" crc="393a14a9" sha1="e4adfc633a6f2931fa224ef7a1798440d06ca7e4"/>
+		-->
+		<description>Alice in Cyberland (Japan)</description>
+		<year>1996</year>
+		<publisher>Glams</publisher>
+		<notes><![CDATA[
+Battle screen status bar flickers
+]]></notes>
+		<info name="alt_title" value="ありす イン サイバーランド"/>
+		<info name="barcode" value="4 934878 080139"/>
+		<info name="developer" value="Glams"/>
+		<info name="language" value="Japanese"/>
+		<info name="release" value="19961220" />
+		<info name="serial" value="SLPS-00636" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alice in Cyberland (Japan)" sha1="f6270815e00919f9c8c2812d05fd37c16b29ec80"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alientri_jp" cloneof="alientri">
+		<!--
+		http://redump.org/disc/7842
+		<rom name="Alien Trilogy (Japan).cue" size="2998" crc="e7c3bc2a" sha1="63a1d6ba5032afcdb3059cbcb437967e8eba6406"/>
+		<rom name="Alien Trilogy (Japan) (Track 01).bin" size="175075824" crc="3fb0fc43" sha1="cd55ce298f15de41e40ece720744fafbd0b37f52"/>
+		<rom name="Alien Trilogy (Japan) (Track 02).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
+		<rom name="Alien Trilogy (Japan) (Track 03).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Japan) (Track 04).bin" size="23291856" crc="287ade2c" sha1="f227355211002fb443158c9e5f40363f4fccc542"/>
+		<rom name="Alien Trilogy (Japan) (Track 05).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 06).bin" size="20878704" crc="3057a026" sha1="7b06b643b1bff914b0ad0627f12e3cb387ed0384"/>
+		<rom name="Alien Trilogy (Japan) (Track 07).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 08).bin" size="25156992" crc="a557b5b5" sha1="fa0fe4fdfd8529e65701b55356c213be5a6f00d7"/>
+		<rom name="Alien Trilogy (Japan) (Track 09).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 10).bin" size="23656416" crc="9f903fd3" sha1="5c4a15890b5fb18e4af47692576cefd535447858"/>
+		<rom name="Alien Trilogy (Japan) (Track 11).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 12).bin" size="23971584" crc="ea8087b9" sha1="98a830ed2f97ef6d10410ca9a74295d21be07304"/>
+		<rom name="Alien Trilogy (Japan) (Track 13).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 14).bin" size="31338048" crc="8cc928c9" sha1="0565310ce097532b59b49c2867e909b09a31b4f4"/>
+		<rom name="Alien Trilogy (Japan) (Track 15).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 16).bin" size="45880464" crc="ea4ed819" sha1="31e7fd1ee8bf3369a2a577b0ab67eb17a5dcd433"/>
+		<rom name="Alien Trilogy (Japan) (Track 17).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 18).bin" size="30093840" crc="6d8e3f22" sha1="961509c24b8d924e4a4149457c2daa78f69ec78a"/>
+		<rom name="Alien Trilogy (Japan) (Track 19).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 20).bin" size="26281248" crc="f5497e7a" sha1="cd31909c8cbf0492a7db558bbe07a2827f195384"/>
+		<rom name="Alien Trilogy (Japan) (Track 21).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 22).bin" size="28826112" crc="41daff43" sha1="29a73ee12b68ab333c5f0ab2ed11a86a582764fc"/>
+		<rom name="Alien Trilogy (Japan) (Track 23).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 24).bin" size="24079776" crc="66184a47" sha1="57aa0fc6d02bc387973646243cd89afd24cab02e"/>
+		<rom name="Alien Trilogy (Japan) (Track 25).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Japan) (Track 26).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
+		-->
+		<description>Alien Trilogy (Japan)</description>
+		<year>1996</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="alt_title" value="エイリアン・トリロジー"/>
+		<info name="developer" value="Probe Entertainment"/>
+		<info name="language" value="Japanese"/>
+		<info name="serial" value="SLPS-00332" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alien Trilogy (Japan)" sha1="c0b2198fafec3c8412848f2a0aae39cb79fa1e6c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alive">
+		<!--
+		http://redump.org/disc/22866
+		<rom name="Alive (Japan) (Disc 1).cue" size="88" crc="2dd8addc" sha1="10c2804f78fa4d81fe364f5ed7dad88178f2ec8b"/>
+		<rom name="Alive (Japan) (Disc 1).bin" size="726314064" crc="558c21d6" sha1="85af83f53db08e60eafd18e5e557f265ad171a31"/>
+
+		http://redump.org/disc/22867
+		<rom name="Alive (Japan) (Disc 2).cue" size="88" crc="2c858b0d" sha1="41c079a221dbe09b6016522fca63510a33b13460"/>
+		<rom name="Alive (Japan) (Disc 2).bin" size="722473248" crc="5cc244bb" sha1="986d8f4c0817af897c2980f6e92449d2ba858cf7"/>
+
+		http://redump.org/disc/22868
+		<rom name="Alive (Japan) (Disc 3).cue" size="88" crc="9a9e6b7d" sha1="ab7a8a4efeecb03f5ba68d68848089f319b742f1"/>
+		<rom name="Alive (Japan) (Disc 3).bin" size="722242752" crc="ae8706ab" sha1="b752103c873011b18cf9a181148bb38e434a3cac"/>
+		-->
+		<description>Alive (Japan)</description>
+		<year>1998</year>
+		<publisher>General Entertainment</publisher>
+		<info name="alt_title" value="アライブ"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/> <!-- on disc 1 -->
+		<info name="developer" value="General Entertainment"/>
+		<info name="language" value="Japanese"/>
+		<info name="release" value="19980806" />
+		<info name="serial" value="SLPS-01527" />
+		<info name="serial" value="SLPS-01528" />
+		<info name="serial" value="SLPS-01529" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Disc 1"/>
+			<diskarea name="cdrom">
+				<disk name="Alive (Japan) (Disc 1)" sha1="e0f2c5cba5869a7f75596066b3a3fe6acd020bc9"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Disc 2"/>
+			<diskarea name="cdrom">
+				<disk name="Alive (Japan) (Disc 2)" sha1="398e7acefa96953b9a82ca7c1858963fa6bb2b4d"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Disc 3"/>
+			<diskarea name="cdrom">
+				<disk name="Alive (Japan) (Disc 3)" sha1="aa9bcab83043cdd1f109d22821c7df5b14381874"/>
 			</diskarea>
 		</part>
 	</software>
@@ -37994,6 +38130,73 @@ The game only boot on PAL
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="side by side special 2000 (japan)" sha1="54852d8dc86435e0cde03fdc86272d84e14d5a01"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smcourt_jp" cloneof="smcourt">
+		<!--
+		http://redump.org/disc/4925
+		<rom name="Smash Court (Japan).cue" size="85" crc="12b91c77" sha1="1dee0b3b8b7749b0734892553a7ba497f2b05a3b"/>
+		<rom name="Smash Court (Japan).bin" size="545515824" crc="5fcdbbe1" sha1="aebe42dc8937301a543e6969afb4016ceb9d06fa"/>
+		-->
+		<description>Smash Court (Japan)</description>
+		<year>1996</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="スマッシュコート"/>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-00450"/>
+		<info name="serial" value="SLPS-91053"/>
+		<info name="serial" value="SLPS-91407"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Smash Court (Japan)" sha1="c16696a92a477a859f2764635399aed680adc9e9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smcourt2_jp" cloneof="smcourt2">
+		<!--
+		http://redump.org/disc/7200
+		<rom name="Smash Court 2 (Japan).cue" size="87" crc="3ff91e56" sha1="02d1acba0dccf0a5aee8326e6b79a051cb146ccb"/>
+		<rom name="Smash Court 2 (Japan).bin" size="381950688" crc="349e8767" sha1="85f98090ca52544d2fcf2c4ed63bd6dbd86dbbcb"/>
+		-->
+		<description>Smash Court 2 (Japan)</description>
+		<year>1998</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="スマッシュコート2"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-01693"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Smash Court 2 (Japan)" sha1="a9b4d17c68357ea5f4382afe640ff088fd25da67"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smcourt3">
+		<!--
+		http://redump.org/disc/9131
+		<rom name="Smash Court 3 (Japan).cue" size="87" crc="eafc622a" sha1="add24f3b8be35761a0c754e8eaa5e2d65d504ba5"/>
+		<rom name="Smash Court 3 (Japan).bin" size="366312240" crc="a6f77079" sha1="de0d9dd58fea085b56702db6936c7e8697b0ba45"/>
+		-->
+		<description>Smash Court 3 (Japan)</description>
+		<year>2000</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="スマッシュコート3"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-03001"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Smash Court 3 (Japan)" sha1="cd664dbda2b81b3aa4ed0727a948d2eec529ca60"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38579,64 +38782,6 @@ The game only boot on PAL
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="arubarea no otome - uruwashi no seikishitachi (japan) [slps-01578]" sha1="cae3c71afe8ca63d5c6052bcfd2641f2a48e94e2" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- boot OK, battle screen status bar flickers -->
-	<software name="alicecyb" supported="partial">
-		<!--
-		Unknown source
-		<rom name="Alice in Cyberland (Japan) [SLPS-00636].bin" size="597330384" crc="393a14a9" sha1="e4adfc633a6f2931fa224ef7a1798440d06ca7e4"/>
-		<rom name="Alice in Cyberland (Japan) [SLPS-00636].cue" size="105" crc="b943d494" sha1="772633a74d40b8e2867ded1d13e10880bce064af"/>
-		-->
-		<description>Alice in Cyberland (Japan)</description>
-		<year>1996</year>
-		<publisher>Glams</publisher>
-		<info name="serial" value="SLPS-00636" />
-		<info name="release" value="19961220" />
-		<info name="alt_title" value="ありす イン サイバーランド"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="alice in cyberland (japan) [slps-00636]" sha1="69f365f86e99b6c86069433343ad1c5169ee69ab" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- boot OK -->
-	<software name="alive">
-		<!--
-		Unknown source
-		<rom name="Alive (Japan) (Disc 1) [SLPS-01527].bin" size="726314064" crc="093c79b2" sha1="300ceca2918ae9114f4a14bbd4e1a0ff1220d64a"/>
-		<rom name="Alive (Japan) (Disc 1) [SLPS-01527].cue" size="99" crc="de2666da" sha1="36e5208e86efbc437078657ea2cceae4a80735b0"/>
-
-		<rom name="Alive (Japan) (Disc 2) [SLPS-01528].bin" size="722473248" crc="3cad6bca" sha1="8c8ebc670dcf4ef553efca3bd5404ca847f1f483"/>
-		<rom name="Alive (Japan) (Disc 2) [SLPS-01528].cue" size="99" crc="e4834cda" sha1="7e86e48740e3295947564bfff817634e5f57cd04"/>
-
-		<rom name="Alive (Japan) (Disc 3) [SLPS-01529].bin" size="722242752" crc="37d3fa85" sha1="c90230c12bcc210ed573258032cf6b8f3e983ee4"/>
-		<rom name="Alive (Japan) (Disc 3) [SLPS-01529].cue" size="99" crc="d99c9e5b" sha1="f3f7fb6af89975185bd339e7167e144376e49a8c"/>
-		-->
-		<description>Alive (Japan)</description>
-		<year>1998</year>
-		<publisher>General Entertainment</publisher>
-		<info name="serial" value="SLPS-01527~SLPS-01529" />
-		<info name="release" value="19980806" />
-		<info name="alt_title" value="アライブ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom1" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="alive (japan) (disc 1) [slps-01527]" sha1="0118f568691d56e37ca279351b73caab2cc6bc8b" status="baddump"/>
-			</diskarea>
-		</part>
-		<part name="cdrom2" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="alive (japan) (disc 2) [slps-01528]" sha1="426d3cebb2af600348c97a511b3e516c34d0cdf0" status="baddump"/>
-			</diskarea>
-		</part>
-		<part name="cdrom3" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="alive (japan) (disc 3) [slps-01529]" sha1="24f53f08e4458793c675aec99ac99e03eb282c80" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -41980,6 +42125,7 @@ The game only boot on PAL
 		<description>Darkseed (Japan)</description>
 		<year>1995</year>
 		<publisher>GaGa Communications</publisher>
+		<info name="alt_title" value="ダークシード"/>
 		<info name="developer" value="Cyberdreams"/>
 		<info name="language" value="Japanese" />
 		<info name="release" value="19951027"/>
@@ -49070,7 +49216,7 @@ The game only boot on PAL
 		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).cue" size="129" crc="2c2b2088" sha1="a9cd8b80b8f7f239dc945bdcd61472dafc6b775f"/>
 		<rom name="Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2).bin" size="567194208" crc="7471d971" sha1="96e0f7a3387621f044b53722e341b7b566529743"/>
 		-->
-		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan)</description>
+		<description>Choujikuu Yousai Macross - Ai Oboete Imasu ka (Japan)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -57866,6 +58012,7 @@ The game only boot on PAL
 		<description>Transport Tycoon 3D: SL Kara Hajimeyou!! (Japan)</description>
 		<year>1998</year>
 		<publisher>Ocean</publisher>
+		<info name="alt_title" value="トランスポートタイクーン３Ｄ　ＳＬからはじめよう！！"/>
 		<info name="developer" value="MicroProse" />
 		<info name="developer" value="Digital Amusement" />
 		<info name="language" value="Japanese"/>
@@ -60756,7 +60903,7 @@ The game only boot on PAL
 		<description>Action Man - Mission Xtreme (Europe) (with EDC)</description>
 		<year>2000</year>
 		<publisher>Hasbro Interactive</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Interactive Studios"/>
 		<info name="language" value="Danish" />
 		<info name="language" value="Dutch" />
@@ -60920,7 +61067,7 @@ Scrambled graphics when shooting the ball
 		<description>Pool Shark (Europe)</description>
 		<year>1999</year>
 		<publisher>Gremlin Interactive</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Mirage"/>
 		<info name="language" value="English" />
 		<info name="serial" value="SLES-01537"/>
@@ -61258,7 +61405,7 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>Air Combat (Europe) (with EDC)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="English"/>
 		<info name="serial" value="SCES-00007#"/>
@@ -61266,6 +61413,263 @@ During gameplay, the commentary speech audio is playing too fast
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Air Combat (Europe) (EDC)" sha1="850c846a275f1183d9afd6b1ff537c5f4e5b9730"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="airhckey">
+		<!--
+		http://redump.org/disc/21849
+		<rom name="Air Hockey (Europe).cue" size="208" crc="6a973291" sha1="ae7e3b6b25a6d30212b0f71b1245a82a520bb6d7"/>
+		<rom name="Air Hockey (Europe) (Track 1).bin" size="159616128" crc="1f195cf0" sha1="9146986485bc8c362f4aedbf962c77a0fec20cd3"/>
+		<rom name="Air Hockey (Europe) (Track 2).bin" size="42688800" crc="8a322cf1" sha1="632cb32ce4c7edd6cd7e2aa88cd2b631f88d5b96"/>
+		-->
+		<description>Air Hockey (Europe)</description>
+		<year>2002</year>
+		<publisher>Midas Games</publisher>
+		<info name="barcode" value="8 713399 012067"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Sucess"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-03743"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Air Hockey (Europe)" sha1="412589972fa804407beacad2efc2d54598008292"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pm2001">
+		<!--
+		http://redump.org/disc/795
+		<rom name="Alex Ferguson's Player Manager 2001 (Europe).cue" size="672" crc="b8883e3e" sha1="a6110b8332a4a927cadfebcafa04d3fdbc78d3e8"/>
+		<rom name="Alex Ferguson's Player Manager 2001 (Europe) (Track 1).bin" size="52221456" crc="b7519ba5" sha1="70008a947c514d3303e230432aa177271755adf3"/>
+		<rom name="Alex Ferguson's Player Manager 2001 (Europe) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
+		<rom name="Alex Ferguson's Player Manager 2001 (Europe) (Track 3).bin" size="10075968" crc="a6d2a92f" sha1="e6197b27bad9c8ce693930d70f7cb37139ab325f"/>
+		<rom name="Alex Ferguson's Player Manager 2001 (Europe) (Track 4).bin" size="27407856" crc="8c80937e" sha1="4557895f4954be3a4ce3f802b7b493aed7b96f69"/>
+		<rom name="Alex Ferguson's Player Manager 2001 (Europe) (Track 5).bin" size="10936800" crc="d786ed68" sha1="ea3b156235b3554b5d522054f83c811a3fc3188e"/>
+		-->
+		<description>Alex Ferguson's Player Manager 2001 (Europe)</description>
+		<year>2000</year>
+		<publisher>3DO</publisher>
+		<info name="barcode" value="7 90561 51512 8"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Anco"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-03150"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alex Ferguson's Player Manager 2001 (Europe)" sha1="40bb5ffb372c81f1e717b8de500dcfe2fe64cc35"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pm2002">
+		<!--
+		http://redump.org/disc/3755
+		<rom name="Alex Ferguson's Player Manager 2002 (Europe).cue" size="672" crc="28a4395e" sha1="c8b731eb0af9f90fa9d94f8068fe719a70f8a608"/>
+		<rom name="Alex Ferguson's Player Manager 2002 (Europe) (Track 1).bin" size="63703920" crc="b2a33a55" sha1="433d07c33bfe200bd9cd982318d1564483002d92"/>
+		<rom name="Alex Ferguson's Player Manager 2002 (Europe) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
+		<rom name="Alex Ferguson's Player Manager 2002 (Europe) (Track 3).bin" size="10075968" crc="a6d2a92f" sha1="e6197b27bad9c8ce693930d70f7cb37139ab325f"/>
+		<rom name="Alex Ferguson's Player Manager 2002 (Europe) (Track 4).bin" size="27407856" crc="8c80937e" sha1="4557895f4954be3a4ce3f802b7b493aed7b96f69"/>
+		<rom name="Alex Ferguson's Player Manager 2002 (Europe) (Track 5).bin" size="10936800" crc="d786ed68" sha1="ea3b156235b3554b5d522054f83c811a3fc3188e"/>
+		-->
+		<description>Alex Ferguson's Player Manager 2002 (Europe)</description>
+		<year>2002</year>
+		<publisher>Ubi Soft Entertainment</publisher>
+		<info name="barcode" value="3 307212 811354"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Anco"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-03775"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alex Ferguson's Player Manager 2002 (Europe)" sha1="12e0d5d5ff661e331a450fe9b79b309a1c07529c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alfredch">
+		<!--
+		http://redump.org/disc/12423
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It).cue" size="1737" crc="5011b3ba" sha1="541fcc29ceebe67b3bbac8d59db7a4d5378792a0"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="43147440" crc="be439359" sha1="dcde4444488e64246888a665ce5553ef053105db"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="21316176" crc="9334a542" sha1="b51f978c485b75f38c57411e77fca65f1652b36b"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 03).bin" size="13818000" crc="8587df80" sha1="0190ad3b08a8352c2b2ef93259b458db3c455c87"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 04).bin" size="8467200" crc="efdacddf" sha1="9dcfcd1775785e1a0395e93ccc974deb74bb4503"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 05).bin" size="20271888" crc="8e5eca88" sha1="d1a2b11892426868fefffd9bbf2c81537974d52c"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 06).bin" size="46722480" crc="181bc9f2" sha1="70713c3304186efe050e1a58969bed4c79406c4d"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 07).bin" size="39722928" crc="3b798890" sha1="11eec39f97887be59820434cd267e3061cc39f3d"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 08).bin" size="57369984" crc="700c7fe0" sha1="4981f74b7241edb4538bebb88f2c4a5d3ab79ac1"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 09).bin" size="39177264" crc="50d2b9a6" sha1="ea9151bdc93d7ed89f3e965fbbd1b3b10374e1ef"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 10).bin" size="46459056" crc="a5655167" sha1="2eff21555a427a4bceeae728f976aca2280d08dd"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 11).bin" size="25832016" crc="a3327949" sha1="da60e2d86de641e65b0a45ae2d9ee085d4c421a3"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 12).bin" size="12432672" crc="e98a067f" sha1="f80182dad0a39d4c102167541ccb1f62abc2a205"/>
+		<rom name="Alfred Chicken (Europe) (En,Fr,De,Es,It) (Track 13).bin" size="37575552" crc="e381ddf5" sha1="d7f2a17bb308b6e6d4a408c024abf64a35ee90b2"/>
+		-->
+		<description>Alfred Chicken (Europe)</description>
+		<year>2002</year>
+		<publisher>Mobius Entertainment</publisher>
+		<info name="barcode" value="7 11719 35302 7"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Mobius Entertainment"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SCES-03817"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alfred Chicken (Europe) (En,Fr,De,Es,It)" sha1="0477fc5989464df8526fcf98a8496225ca72eb1a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alienres">
+		<!--
+		http://redump.org/disc/876
+		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It).cue" size="534" crc="aacc72e6" sha1="c0ccc7192c4c99a88c3b3f3bd59d36ae52fb6096"/>
+		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It) (Track 1).bin" size="503850144" crc="03e470ae" sha1="5642c4f4ba6f06323778ae29c59c6dc863d49f55"/>
+		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It) (Track 2).bin" size="15292704" crc="f3c18581" sha1="7e8fbb82eafff3b68c2a8ea8235af5bb3ddb5c2f"/>
+		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It) (Track 3).bin" size="18545520" crc="f344ed5b" sha1="6e55ee9c136cccb28c1b85c9b6c61be426a1b954"/>
+		<rom name="Alien Resurrection (Europe) (En,Fr,De,Es,It) (Track 4).bin" size="32104800" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
+		-->
+		<description>Alien Resurrection (Europe)</description>
+		<year>2000</year>
+		<publisher>Fox Interactive</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Argonaut Games"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-02913"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alien Resurrection (Europe) (En,Fr,De,Es,It)" sha1="06a51043f8163f3c96cc88ff25c900940d3427b8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alientri">
+		<!--
+		http://redump.org/disc/882
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It).cue" size="3388" crc="e9ed03e7" sha1="75f047e3db8b87f44d9704796df8351e69e27c8c"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 01).bin" size="252882336" crc="fbc7c66d" sha1="edb3c1e0569bb5f7fc7af1b0edf665c686dd7004"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 02).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 03).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 04).bin" size="22939056" crc="97eefb15" sha1="db693d26d7b345381859c4f1d6ef51f2c98baaf1"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 05).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 06).bin" size="20878704" crc="3057a026" sha1="7b06b643b1bff914b0ad0627f12e3cb387ed0384"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 07).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 08).bin" size="25156992" crc="a557b5b5" sha1="fa0fe4fdfd8529e65701b55356c213be5a6f00d7"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 09).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 10).bin" size="23656416" crc="9f903fd3" sha1="5c4a15890b5fb18e4af47692576cefd535447858"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 11).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 12).bin" size="23971584" crc="ea8087b9" sha1="98a830ed2f97ef6d10410ca9a74295d21be07304"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 13).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 14).bin" size="31338048" crc="8cc928c9" sha1="0565310ce097532b59b49c2867e909b09a31b4f4"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 15).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 16).bin" size="45880464" crc="ea4ed819" sha1="31e7fd1ee8bf3369a2a577b0ab67eb17a5dcd433"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 17).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 18).bin" size="30093840" crc="6d8e3f22" sha1="961509c24b8d924e4a4149457c2daa78f69ec78a"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 19).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 20).bin" size="26281248" crc="f5497e7a" sha1="cd31909c8cbf0492a7db558bbe07a2827f195384"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 21).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 22).bin" size="28826112" crc="41daff43" sha1="29a73ee12b68ab333c5f0ab2ed11a86a582764fc"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 23).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 24).bin" size="24079776" crc="66184a47" sha1="57aa0fc6d02bc387973646243cd89afd24cab02e"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 25).bin" size="1582896" crc="e6570310" sha1="56a9638194e68415099d6260ffcd91e374a24583"/>
+		<rom name="Alien Trilogy (Europe) (En,Fr,Es,It) (Track 26).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
+		-->
+		<description>Alien Trilogy (Europe)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="developer" value="Probe Entertainment"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-00101"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alien Trilogy (Europe) (En,Fr,Es,It)" sha1="3970f8a265c6bd77431310c6dca8691da0764f2c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alientri_fr" cloneof="alientri">
+		<!--
+		http://redump.org/disc/47280
+		<rom name="Alien Trilogy (France) (Demo).cue" size="474" crc="7bd19bcd" sha1="cdc94df25f3370c9429db98ba92c16e953588cb9"/>
+		<rom name="Alien Trilogy (France) (Demo) (Track 1).bin" size="63355824" crc="165b3bac" sha1="ec076843bb85e3053908f1b24166a0840919da62"/>
+		<rom name="Alien Trilogy (France) (Demo) (Track 2).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
+		<rom name="Alien Trilogy (France) (Demo) (Track 3).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (France) (Demo) (Track 4).bin" size="32459952" crc="8da33568" sha1="8ce4b9414b18d4860dfddbc83e7b175e4e12e8dd"/>
+		-->
+		<description>Alien Trilogy (France, demo)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="developer" value="Probe Entertainment"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-00288"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alien Trilogy (France) (Demo)" sha1="f0cba6204a0c765f272044252158e10002d186d0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="alientri_de" cloneof="alientri">
+		<!--
+		http://redump.org/disc/189
+		<rom name="Alien Trilogy (Germany).cue" size="3050" crc="c4d4027c" sha1="1c7303e390a79765ab98765536c03bd76579661f"/>
+		<rom name="Alien Trilogy (Germany) (Track 01).bin" size="251562864" crc="f9679915" sha1="5cebf938d7ba9210958e49a5cc110e98ac435308"/>
+		<rom name="Alien Trilogy (Germany) (Track 02).bin" size="23708160" crc="da2e8129" sha1="04ceb31999716a3088c4eb69b15982ad62bd226b"/>
+		<rom name="Alien Trilogy (Germany) (Track 03).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 04).bin" size="23291856" crc="287ade2c" sha1="f227355211002fb443158c9e5f40363f4fccc542"/>
+		<rom name="Alien Trilogy (Germany) (Track 05).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 06).bin" size="21231504" crc="101aa55a" sha1="5f5dfcfc605425f6870a0201c29e588fc92c83fe"/>
+		<rom name="Alien Trilogy (Germany) (Track 07).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 08).bin" size="25509792" crc="24b8a5c6" sha1="8523eaf2e32602a790a6e6af2f01a49c69b0e526"/>
+		<rom name="Alien Trilogy (Germany) (Track 09).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 10).bin" size="24009216" crc="274aa48a" sha1="0a761bde1c005f7118a09a692882e56982a884da"/>
+		<rom name="Alien Trilogy (Germany) (Track 11).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 12).bin" size="24324384" crc="df9ac939" sha1="2f8d747227cfd6f607e2b50b16590ef3b68948e4"/>
+		<rom name="Alien Trilogy (Germany) (Track 13).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 14).bin" size="31690848" crc="401a5fa2" sha1="8f04582c988616f54059e6d5d07c493919076fe1"/>
+		<rom name="Alien Trilogy (Germany) (Track 15).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 16).bin" size="46233264" crc="b1c534fe" sha1="05370b6c76dbcbf8d6e393bb54204787c6ba3f81"/>
+		<rom name="Alien Trilogy (Germany) (Track 17).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 18).bin" size="30446640" crc="af2034a3" sha1="74489c829f806b1b57446ce9ff3fbc170f0402cf"/>
+		<rom name="Alien Trilogy (Germany) (Track 19).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 20).bin" size="26634048" crc="f0d96675" sha1="c0aae10a6883947bb09d1de8272160d318870e5c"/>
+		<rom name="Alien Trilogy (Germany) (Track 21).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 22).bin" size="29178912" crc="0f0d2d6c" sha1="0f8963af3659e0609941210bd3f2331c8a2159d9"/>
+		<rom name="Alien Trilogy (Germany) (Track 23).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 24).bin" size="24432576" crc="9d970fa9" sha1="cbcb75162371475a97d6b2daed10ff4a77d68145"/>
+		<rom name="Alien Trilogy (Germany) (Track 25).bin" size="1935696" crc="f6d728ba" sha1="c586974e3cd94550ed98d9eb3eb48e0eb55c8c94"/>
+		<rom name="Alien Trilogy (Germany) (Track 26).bin" size="32516400" crc="e719f252" sha1="5fc838d653f0e4221b1048e88e5ba4117712e41d"/>
+		-->
+		<description>Alien Trilogy (Germany)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="developer" value="Probe Entertainment"/>
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-00246"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alien Trilogy (Germany)" sha1="de48d0af62d983d0d65859d00f49415ff12c3364"/>
 			</diskarea>
 		</part>
 	</software>
@@ -61308,7 +61712,7 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>Amerzone: The Explorer's Legacy (Europe)</description>
 		<year>1999</year>
 		<publisher>Microïds</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Microïds"/>
 		<info name="language" value="English"/>
 		<info name="serial" value="SLES-02347 / SLES-12347"/>
@@ -61338,7 +61742,7 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>Amerzone: Das Testament des Forschungsreisenden (Germany)</description>
 		<year>1999</year>
 		<publisher>Microïds</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Microïds"/>
 		<info name="language" value="German"/>
 		<info name="serial" value="SLES-02348 / SLES-12348"/>
@@ -61368,7 +61772,7 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>Amerzone: El Legado del Explorador (Spain)</description>
 		<year>1999</year>
 		<publisher>Microïds</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Microïds"/>
 		<info name="language" value="Spanish"/>
 		<info name="serial" value="SLES-02349 / SLES-12349"/>
@@ -61398,7 +61802,7 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>Amerzone: Il Testamento dell'Esploratore (Italy)</description>
 		<year>1999</year>
 		<publisher>Microïds</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Microïds"/>
 		<info name="language" value="Italian"/>
 		<info name="serial" value="SLES-02350 / SLES-12350"/>
@@ -61428,7 +61832,7 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>Amerzone: O Testamento do Explorador (Portugal)</description>
 		<year>1999</year>
 		<publisher>Microïds</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Microïds"/>
 		<info name="language" value="Portuguese"/>
 		<info name="serial" value="SLES-02429 / SLES-12429"/>
@@ -61458,7 +61862,7 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>L'Amerzone (France)</description>
 		<year>1999</year>
 		<publisher>Microïds</publisher>
-		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
 		<info name="developer" value="Microïds"/>
 		<info name="language" value="French"/>
 		<info name="serial" value="SLES-02346 / SLES-12346"/>
@@ -61494,6 +61898,48 @@ During gameplay, the commentary speech audio is playing too fast
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Anastasia (Europe) (En,Fr,De,Nl)" sha1="fbefa124869a040d653301ee7ebc08d75e5e537d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smcourt2">
+		<!--
+		http://redump.org/disc/5500
+		<rom name="Anna Kournikova's Smash Court Tennis (Europe) (Rev 1).cue" size="119" crc="8f6ccdab" sha1="99d1f1864e3bce4c8f1e2772a378c2e7d9f23e94"/>
+		<rom name="Anna Kournikova's Smash Court Tennis (Europe) (Rev 1).bin" size="379662192" crc="9b59eec7" sha1="fe27bedeb0160af682be2573733118d52e480202"/>
+		-->
+		<description>Anna Kournikova's Smash Court Tennis (Europe, rev. 1)</description>
+		<year>1999</year>
+		<publisher>Namco</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SCES-01833#"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Anna Kournikova's Smash Court Tennis (Europe) (Rev 1)" sha1="300fc7a85c8f3a219a542a0e990ee50b811831b9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smcourt2_a" cloneof="smcourt2">
+		<!--
+		http://redump.org/disc/61311
+		<rom name="Anna Kournikova's Smash Court Tennis (Europe).cue" size="111" crc="dd7252e5" sha1="49a592cbf2b899e4c483f7226c6dbb40bbfc1e71"/>
+		<rom name="Anna Kournikova's Smash Court Tennis (Europe).bin" size="379662192" crc="ae16491c" sha1="a53cea5320ee73cb31ebde5b74d653a1c2183e36"/>
+		-->
+		<description>Anna Kournikova's Smash Court Tennis (Europe)</description>
+		<year>1999</year>
+		<publisher>Namco</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SCES-01833"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Anna Kournikova's Smash Court Tennis (Europe)" sha1="63088c5219358430c0c7da72aa56cd265b49b600"/>
 			</diskarea>
 		</part>
 	</software>
@@ -61704,6 +62150,60 @@ During gameplay, the commentary speech audio is playing too fast
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="demo one (version 4) (germany)" sha1="61e2f82aebbed4a44887554cc99d0779ce6973e6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fm2001" cloneof="pm2001">
+		<!--
+		http://redump.org/disc/30413
+		<rom name="DSF Fussball Manager 2001 (Germany).cue" size="627" crc="f318f4b1" sha1="209a06d704773240f0c53238cd8ea7faf2599656"/>
+		<rom name="DSF Fussball Manager 2001 (Germany) (Track 1).bin" size="50116416" crc="623d4ace" sha1="935be040f610d2df84e4fc73a01095456da06ba2"/>
+		<rom name="DSF Fussball Manager 2001 (Germany) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
+		<rom name="DSF Fussball Manager 2001 (Germany) (Track 3).bin" size="10075968" crc="a6d2a92f" sha1="e6197b27bad9c8ce693930d70f7cb37139ab325f"/>
+		<rom name="DSF Fussball Manager 2001 (Germany) (Track 4).bin" size="27407856" crc="8c80937e" sha1="4557895f4954be3a4ce3f802b7b493aed7b96f69"/>
+		<rom name="DSF Fussball Manager 2001 (Germany) (Track 5).bin" size="10936800" crc="d786ed68" sha1="ea3b156235b3554b5d522054f83c811a3fc3188e"/>
+		-->
+		<description>DSF Fussball Manager 2001 (Germany)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft Entertainment</publisher>
+		<info name="alt_title" value="DSF Fußball Manager 2001"/>
+		<info name="barcode" value="3 307212 809160"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Anco"/>
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-03402"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="DSF Fussball Manager 2001 (Germany)" sha1="6fc21f25a893ccf0384201f0d91321e6eb014404"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fm2002" cloneof="pm2002">
+		<!--
+		http://redump.org/disc/6113
+		<rom name="DSF Fussball Manager 2002 (Germany).cue" size="627" crc="68c33ee7" sha1="9aaa2399844a02713b60af758871f6593fa59bb5"/>
+		<rom name="DSF Fussball Manager 2002 (Germany) (Track 1).bin" size="63525168" crc="748ab177" sha1="71deadf79aec782c44aeca5da36260b0aefd4fb7"/>
+		<rom name="DSF Fussball Manager 2002 (Germany) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
+		<rom name="DSF Fussball Manager 2002 (Germany) (Track 3).bin" size="10075968" crc="a6d2a92f" sha1="e6197b27bad9c8ce693930d70f7cb37139ab325f"/>
+		<rom name="DSF Fussball Manager 2002 (Germany) (Track 4).bin" size="27407856" crc="8c80937e" sha1="4557895f4954be3a4ce3f802b7b493aed7b96f69"/>
+		<rom name="DSF Fussball Manager 2002 (Germany) (Track 5).bin" size="10936800" crc="d786ed68" sha1="ea3b156235b3554b5d522054f83c811a3fc3188e"/>
+		-->
+		<description>DSF Fussball Manager 2002 (Germany)</description>
+		<year>2002</year>
+		<publisher>Ubi Soft Entertainment</publisher>
+		<info name="alt_title" value="DSF Fußball Manager 2002"/>
+		<info name="barcode" value="3 307212 812665"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Anco"/>
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-03864"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="DSF Fussball Manager 2002 (Germany)" sha1="0d6da63be41645d481bed83c094e33d63170263d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -62213,6 +62713,32 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
+	<software name="grm2001" cloneof="pm2001">
+		<!--
+		http://redump.org/disc/29319
+		<rom name="Guy Roux Manager 2001 (France).cue" size="602" crc="69b3eea3" sha1="64674c287178e9cdd0448d086c04067441cb63f3"/>
+		<rom name="Guy Roux Manager 2001 (France) (Track 1).bin" size="50109360" crc="29941264" sha1="e16f2ee2e3bbbd3527a0c31e67f91306c5e11e86"/>
+		<rom name="Guy Roux Manager 2001 (France) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
+		<rom name="Guy Roux Manager 2001 (France) (Track 3).bin" size="10075968" crc="a6d2a92f" sha1="e6197b27bad9c8ce693930d70f7cb37139ab325f"/>
+		<rom name="Guy Roux Manager 2001 (France) (Track 4).bin" size="27407856" crc="8c80937e" sha1="4557895f4954be3a4ce3f802b7b493aed7b96f69"/>
+		<rom name="Guy Roux Manager 2001 (France) (Track 5).bin" size="10936800" crc="d786ed68" sha1="ea3b156235b3554b5d522054f83c811a3fc3188e"/>
+		-->
+		<description>Guy Roux Manager 2001 (France)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft Entertainment</publisher>
+		<info name="barcode" value="3 307212 809146"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Anco"/>
+		<info name="language" value="French" />
+		<info name="serial" value="SLES-03403"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Guy Roux Manager 2001 (France)" sha1="8c2eb38d226730f8d8fbaded9fbd7b8a566e4107"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/1659/ -->
 	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
 	<software name="lemans24" cloneof="tdlemans" supported="no">
@@ -62351,6 +62877,26 @@ During gameplay, the commentary speech audio is playing too fast
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="music - music creation for the playstation (europe) (en,fr,de,es,it)" sha1="649244a6b54e3759871ab7dc6bcd0841a3471570"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smcourt">
+		<!--
+		http://redump.org/disc/25906
+		<rom name="Namco Tennis Smash Court (Europe).cue" size="99" crc="a0b01ed8" sha1="1cdc9681b4041a45025b71d6f56b4a5bcdf24781"/>
+		<rom name="Namco Tennis Smash Court (Europe).bin" size="545515824" crc="d4560741" sha1="5d70c9c7a01027702e36ba06b02efd0da4fe0865"/>
+		-->
+		<description>Namco Tennis Smash Court (Europe)</description>
+		<year>1996</year>
+		<publisher>Namco</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SCES-00263"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Namco Tennis Smash Court (Europe)" sha1="b18e26cb2f9b4309e368ec7c845c933c9620b892"/>
 			</diskarea>
 		</part>
 	</software>
@@ -62631,6 +63177,32 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
+	<software name="spm2001" cloneof="pm2001">
+		<!--
+		http://redump.org/disc/29319
+		<rom name="Sportweek Player Manager 2001 (Netherlands).cue" size="667" crc="dfbad3c8" sha1="537b3ab0c5754340e2a446da1c19fd3958f21845"/>
+		<rom name="Sportweek Player Manager 2001 (Netherlands) (Track 1).bin" size="50045856" crc="6ba38d2c" sha1="4bf70ce298440212a177ff6b75ce3ebe7c54be66"/>
+		<rom name="Sportweek Player Manager 2001 (Netherlands) (Track 2).bin" size="1935696" crc="d77f3b66" sha1="189650fbab0313b7dce5b5ffbaaccb88cec6a4e0"/>
+		<rom name="Sportweek Player Manager 2001 (Netherlands) (Track 3).bin" size="10075968" crc="a6d2a92f" sha1="e6197b27bad9c8ce693930d70f7cb37139ab325f"/>
+		<rom name="Sportweek Player Manager 2001 (Netherlands) (Track 4).bin" size="27407856" crc="8c80937e" sha1="4557895f4954be3a4ce3f802b7b493aed7b96f69"/>
+		<rom name="Sportweek Player Manager 2001 (Netherlands) (Track 5).bin" size="10936800" crc="d786ed68" sha1="ea3b156235b3554b5d522054f83c811a3fc3188e"/>
+		-->
+		<description>Sportweek Player Manager 2001 (Netherlands)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft Entertainment</publisher>
+		<info name="barcode" value="3 307212 810128"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Anco"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-03569"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Sportweek Player Manager 2001 (Netherlands)" sha1="00a0814523c857cc249d5f01859906725e59a677"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/1184/ -->
 	<software name="spyroe" cloneof="spyro">
 		<description>Spyro the Dragon (Europe)</description>
@@ -62691,15 +63263,19 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>TechnoMage: Return of Eternity (Europe)</description>
 		<year>2001</year>
 		<publisher>Sunflowers</publisher>
+		<notes><![CDATA[
+Missing subchannel Q LibCrypt protection
+]]></notes>
 		<info name="barcode" value="3 546430 016589"/>
-		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="copy_protection" value="LibCrypt"/>
 		<info name="developer" value="Sunflowers"/>
 		<info name="language" value="English"/>
 		<info name="serial" value="SLES-03241"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="TechnoMage - Return of Eternity (Europe)" sha1="0cf66669228c6b73c22732ae252523485024e5ee"/>
+				<disk name="TechnoMage - Return of Eternity (Europe)" sha1="0cf66669228c6b73c22732ae252523485024e5ee" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -62713,15 +63289,19 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>TechnoMage: De Terugkeer der Eeuwigheid (Netherlands)</description>
 		<year>2001</year>
 		<publisher>Sunflowers</publisher>
+		<notes><![CDATA[
+Missing subchannel Q LibCrypt protection
+]]></notes>
 		<info name="barcode" value="3 546430 018217"/>
-		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="copy_protection" value="LibCrypt"/>
 		<info name="developer" value="Sunflowers"/>
 		<info name="language" value="Dutch"/>
 		<info name="serial" value="SLES-03245"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands)" sha1="66181e2610e4a01fbc5111b48c13cc34ec19eeb4"/>
+				<disk name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands)" sha1="66181e2610e4a01fbc5111b48c13cc34ec19eeb4" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -62735,15 +63315,19 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>TechnoMage: Die Rüeckkehr der Ewigkeit (Germany)</description>
 		<year>2001</year>
 		<publisher>Sunflowers</publisher>
+		<notes><![CDATA[
+Missing subchannel Q LibCrypt protection
+]]></notes>
 		<info name="barcode" value="4 018008 300561"/>
-		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="copy_protection" value="LibCrypt"/>
 		<info name="developer" value="Sunflowers"/>
 		<info name="language" value="German"/>
 		<info name="serial" value="SLES-02831"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany)" sha1="28464bf227d75597a190f7a19db49f6efb164e30"/>
+				<disk name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany)" sha1="28464bf227d75597a190f7a19db49f6efb164e30" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -62757,15 +63341,20 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>Technomage: El Retorno de la Eternidad (Spain)</description>
 		<year>2001</year>
 		<publisher>Sunflowers</publisher>
+		<notes><![CDATA[
+Missing subchannel Q LibCrypt protection
+]]></notes>
 		<info name="barcode" value="3 546430 016602"/>
-		<info name="copy_protection" value="Error Detection and Correction / LibCrypt / Anti-modchip"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="copy_protection" value="LibCrypt"/>
+		<info name="copy_protection" value="Anti-modchip"/>
 		<info name="developer" value="Sunflowers"/>
 		<info name="language" value="Spanish"/>
 		<info name="serial" value="SLES-03244"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Technomage - El Retorno de la Eternidad (Spain)" sha1="ec8de298b3308891ac3705ab010b721c686661e3"/>
+				<disk name="Technomage - El Retorno de la Eternidad (Spain)" sha1="ec8de298b3308891ac3705ab010b721c686661e3" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -62779,15 +63368,19 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>TechnoMage: En Quête de L'Eternité (France)</description>
 		<year>2001</year>
 		<publisher>Sunflowers</publisher>
+		<notes><![CDATA[
+Missing subchannel Q LibCrypt protection
+]]></notes>
 		<info name="barcode" value="3 546430 016596"/>
-		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="copy_protection" value="LibCrypt"/>
 		<info name="developer" value="Sunflowers"/>
 		<info name="language" value="French"/>
 		<info name="serial" value="SLES-03242"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="TechnoMage - En Quete de L'Eternite (France)" sha1="1f91b7fddbd089fa0304c2b3f35a96fca2235b44"/>
+				<disk name="TechnoMage - En Quete de L'Eternite (France)" sha1="1f91b7fddbd089fa0304c2b3f35a96fca2235b44" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -62801,15 +63394,19 @@ During gameplay, the commentary speech audio is playing too fast
 		<description>TechnoMage: Ritorno all'Eternitá (Italy)</description>
 		<year>2001</year>
 		<publisher>Sunflowers</publisher>
+		<notes><![CDATA[
+Missing subchannel Q LibCrypt protection
+]]></notes>
 		<info name="barcode" value="3 546430 018224"/>
-		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="copy_protection" value="LibCrypt"/>
 		<info name="developer" value="Sunflowers"/>
 		<info name="language" value="Italian"/>
 		<info name="serial" value="SLES-03243"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="TechnoMage - Ritorno all'Eternita (Italy)" sha1="4c21ba6694b26a2421a06f4c88cdc9e2fc3be6db"/>
+				<disk name="TechnoMage - Ritorno all'Eternita (Italy)" sha1="4c21ba6694b26a2421a06f4c88cdc9e2fc3be6db" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>

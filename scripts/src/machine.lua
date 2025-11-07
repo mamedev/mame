@@ -2420,17 +2420,6 @@ if (MACHINES["M68340"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/mcf5206e.h,MACHINES["MCF5206E"] = true
----------------------------------------------------
-
-if (MACHINES["MCF5206E"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mcf5206e.cpp",
-		MAME_DIR .. "src/devices/machine/mcf5206e.h",
-	}
-end
 
 ---------------------------------------------------
 --
@@ -3450,7 +3439,9 @@ end
 --
 --@src/devices/machine/spg2xx.h,MACHINES["SPG2XX"] = true
 --@src/devices/machine/spg110.h,MACHINES["SPG2XX"] = true
---@src/devices/machine/generalplus_gpl16250soc.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/generalplus_gpl162xx_soc.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/generalplus_gpl1625x_soc.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/generalplus_gpl951xx_soc.h,MACHINES["SPG2XX"] = true
 ---------------------------------------------------
 
 if (MACHINES["SPG2XX"]~=null) then
@@ -3469,10 +3460,14 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg110.h",
 		MAME_DIR .. "src/devices/machine/spg110_video.cpp",
 		MAME_DIR .. "src/devices/machine/spg110_video.h",
-		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc.cpp",
-		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc.h",
-		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc_video.cpp",
-		MAME_DIR .. "src/devices/machine/generalplus_gpl16250soc_video.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl162xx_soc.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl162xx_soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl1625x_soc.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl1625x_soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl162xx_soc_video.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl162xx_soc_video.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.h",
 		MAME_DIR .. "src/devices/machine/spg_renderer.cpp",
 		MAME_DIR .. "src/devices/machine/spg_renderer.h",
 	}

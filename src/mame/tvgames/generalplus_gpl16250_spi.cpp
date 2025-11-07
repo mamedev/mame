@@ -155,6 +155,14 @@ ROM_START( anpanm15 )
 	ROM_LOAD16_WORD_SWAP( "mx25l12835f.ic3", 0x0000, 0x1000000, CRC(47c36cbd) SHA1(f1cae506e21c1795401004d79f6bb1b1d982d657) )
 ROM_END
 
+ROM_START( anpaneng )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "w25q128fv.u11", 0x0000, 0x1000000, CRC(d204d646) SHA1(0b2f9f2d91a078b5fba687d73079b2b5665b33d4) )
+ROM_END
+
 ROM_START( pokegach )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
@@ -202,6 +210,21 @@ ROM_START( lxcyrace )
 	ROM_LOAD( "25q128.u2", 0x0000, 0x1000000, CRC(4489c99d) SHA1(792d6d224584fe1f3349c64a59aa79a587dd8c17) )
 ROM_END
 
+ROM_START( lxcymsm )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(96b3ee5c) SHA1(f1e6bf46a4503877074310506d1acc4607dac331) )
+ROM_END
+
+ROM_START( lxcympp )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(570b669c) SHA1(e7fcae662c8c8cae18cf1151d6caefacfe1e9fda) )
+ROM_END
 
 void generalplus_gpspispi_game_state::init_spi()
 {
@@ -260,6 +283,8 @@ CONS(2014, anpanbd,  0, 0, generalplus_gpspispi,         gcm394, generalplus_gps
 //  それいけ！アンパンマン」みんなで！育脳マット
 CONS(2015, anpanm15, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Minnade! Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
+CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Anpanman: Touch de English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2015, pokegach,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha (20150902, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -281,3 +306,5 @@ CONS(2015, pokegac2y, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, general
 CONS(202?, bk139in1,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "<unknown>", "BornKid 32 Bit Preloaded 139-in-1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // same unknown hardware as above, fewer games
 CONS(2021, lxcyrace,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Racing (JL3150)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, lxcymsm,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Superman (JL3180SU)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, lxcympp,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Paw Patrol (JL3180PA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

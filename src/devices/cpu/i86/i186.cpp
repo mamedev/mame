@@ -198,19 +198,30 @@ void i80186_cpu_device::execute_run()
 	{
 		if ((m_dma[0].drq_state && (m_dma[0].control & ST_STOP)) || (m_dma[1].drq_state && (m_dma[1].control & ST_STOP)))
 		{
-			int channel = m_last_dma ? 0 : 1;
-			m_last_dma = !m_last_dma;
-			if (!(m_dma[1].drq_state && (m_dma[1].control & ST_STOP)))
-				channel = 0;
-			else if (!(m_dma[0].drq_state && (m_dma[0].control & ST_STOP)))
-				channel = 1;
-			else if ((m_dma[0].control & CHANNEL_PRIORITY) && !(m_dma[1].control & CHANNEL_PRIORITY))
-				channel = 0;
-			else if ((m_dma[1].control & CHANNEL_PRIORITY) && !(m_dma[0].control & CHANNEL_PRIORITY))
-				channel = 1;
-			m_icount--;
-			drq_callback(channel);
-			continue;
+			// A real '186 has some latency after writing to the DMA registers before a transfer will fire.
+			// mpc60 has a continuous RAM 0 to RAM 0 transfer running on channel 0 for unknown reasons, and
+			// without this latency a transfer can fire between the IRQ handler resetting the source address
+			// and destination address, resulting in the DMA turning from an expensive NOP into a memmove.
+			if (!m_dma_latency)
+			{
+				int channel = m_last_dma ? 0 : 1;
+				m_last_dma = !m_last_dma;
+				if (!(m_dma[1].drq_state && (m_dma[1].control & ST_STOP)))
+					channel = 0;
+				else if (!(m_dma[0].drq_state && (m_dma[0].control & ST_STOP)))
+					channel = 1;
+				else if ((m_dma[0].control & CHANNEL_PRIORITY) && !(m_dma[1].control & CHANNEL_PRIORITY))
+					channel = 0;
+				else if ((m_dma[1].control & CHANNEL_PRIORITY) && !(m_dma[0].control & CHANNEL_PRIORITY))
+					channel = 1;
+				m_icount--;
+				drq_callback(channel);
+				continue;
+			}
+		}
+		if (m_dma_latency > 0)
+		{
+			m_dma_latency--;
 		}
 		if (m_seg_prefix_next)
 		{
@@ -721,6 +732,7 @@ void i80186_cpu_device::device_start()
 	save_item(NAME(m_mem.peripheral));
 	save_item(NAME(m_reloc));
 	save_item(NAME(m_last_dma));
+	save_item(NAME(m_dma_latency));
 
 	// zerofill
 	memset(m_timer, 0, sizeof(m_timer));
@@ -729,6 +741,7 @@ void i80186_cpu_device::device_start()
 	memset(&m_mem, 0, sizeof(mem_state));
 	m_reloc = 0;
 	m_last_dma = 0;
+	m_dma_latency = 0;
 
 	m_timer[0].int_timer = timer_alloc(FUNC(i80186_cpu_device::timer_elapsed), this);
 	m_timer[1].int_timer = timer_alloc(FUNC(i80186_cpu_device::timer_elapsed), this);
@@ -1259,10 +1272,13 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 
 	if (which == 2)
 	{
-		if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
-			drq_callback(0);
-		if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
-			drq_callback(1);
+		if (!m_dma_latency)
+		{
+			if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
+				drq_callback(0);
+			if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
+				drq_callback(1);
+		}
 		if ((m_timer[0].control & 0x800c) == 0x8008)
 			inc_timer(0);
 		if ((m_timer[1].control & 0x800c) == 0x8008)
@@ -1491,7 +1507,12 @@ void i80186_cpu_device::update_dma_control(int which, int new_control)
 		new_control = (new_control & ~ST_STOP) | (d->control & ST_STOP);
 	new_control &= ~CHG_NOCHG;
 
-	LOGMASKED(LOG_DMA, "Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
+	if (which > 0)
+	logerror("Initiated DMA %d - count = %04X, source = %08X (%s), dest = %08X (%s)\n", which, d->count,
+		d->source,
+		d->control & SRC_MIO ? "I/O" : "MEM",
+		d->dest,
+		d->control & DEST_MIO ? "I/O" : "MEM");
 
 	/* set the new control register */
 	d->control = new_control;
@@ -1959,6 +1980,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d lower source address = %04X\n", m_pc, (offset - 0x60) / 8, data);
 			which = (offset - 0x60) / 8;
 			m_dma[which].source = (m_dma[which].source & ~0x0ffff) | (data & 0x0ffff);
+			m_dma_latency = 8;
 			break;
 
 		case 0x61:
@@ -1966,6 +1988,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d upper source address = %04X\n", m_pc, (offset - 0x61) / 8, data);
 			which = (offset - 0x61) / 8;
 			m_dma[which].source = (m_dma[which].source & ~0xf0000) | ((data << 16) & 0xf0000);
+			m_dma_latency = 8;
 			break;
 
 		case 0x62:
@@ -1973,6 +1996,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d lower dest address = %04X\n", m_pc, (offset - 0x62) / 8, data);
 			which = (offset - 0x62) / 8;
 			m_dma[which].dest = (m_dma[which].dest & ~0x0ffff) | (data & 0x0ffff);
+			m_dma_latency = 8;
 			break;
 
 		case 0x63:
@@ -1980,6 +2004,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d upper dest address = %04X\n", m_pc, (offset - 0x63) / 8, data);
 			which = (offset - 0x63) / 8;
 			m_dma[which].dest = (m_dma[which].dest & ~0xf0000) | ((data << 16) & 0xf0000);
+			m_dma_latency = 8;
 			break;
 
 		case 0x64:
@@ -1987,6 +2012,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d transfer count = %04X\n", m_pc, (offset - 0x64) / 8, data);
 			which = (offset - 0x64) / 8;
 			m_dma[which].count = data;
+			m_dma_latency = 8;
 			break;
 
 		case 0x65:

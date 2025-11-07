@@ -52,7 +52,7 @@ enum
 	SSF2,                        /* Super Street Fighter 2 */
 	CM_2IN1,                     /* CodeMasters 2in1 : Psycho Pinball + Micro Machines */
 	GAME_KANDUME,                /* Game no Kandume Otokuyou */
-//	RADICA,                      /* Radica TV games, handled in sega/megadriv_rad.cpp */
+//  RADICA,                      /* Radica TV games, handled in sega/megadriv_rad.cpp */
 
 	TILESMJ2,                    /* 16 Mahjong Tiles II */
 	BUGSLIFE,                    /* A Bug's Life */

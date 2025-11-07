@@ -149,15 +149,15 @@ void megadrive_hb_ssf_ex_device::device_reset()
  */
 void megadrive_hb_ssf_ex_device::time_f0_w(offs_t offset, u16 data, u16 mem_mask)
  {
- 	logerror("time_f0_w %04x & %04x (%s)\n", data, mem_mask, BIT(data, 15) ? "valid" : "ignored");
- 	if (BIT(data, 15))
- 	{
+	logerror("time_f0_w %04x & %04x (%s)\n", data, mem_mask, BIT(data, 15) ? "valid" : "ignored");
+	if (BIT(data, 15))
+	{
 		m_sram_view.select(BIT(data, 13));
 
 		// m_led_output = BIT(data, 12);
 
- 		m_rom_bank[0]->set_entry(data & 0x1f);
- 	}
+		m_rom_bank[0]->set_entry(data & 0x1f);
+	}
 }
 
 void megadrive_hb_ssf_ex_device::cart_map(address_map &map)

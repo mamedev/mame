@@ -52,7 +52,7 @@ void screen_ula_device::draw_border(bitmap_rgb32 &bitmap, const rectangle &clipr
 	u8 pap_attr = border_color << 3;
 	if ((m_ula_type == ULA_TYPE_NEXT) && m_ulanext_en)
 		pap_attr = border_color << m_pap_shift;
-	else if (m_ulap_en && (screen_mode() == 6))
+	else if (screen_mode() == 6)
 		pap_attr = 0x40 | (~m_port_ff_reg & 0x38);
 	const rgb_t pap = parse_attribute(pap_attr).first;
 

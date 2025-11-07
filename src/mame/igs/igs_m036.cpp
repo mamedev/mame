@@ -668,6 +668,24 @@ ROM_START( cjbq )
 ROM_END
 
 
+// 超级接龙 (Chāojí Jiēlóng). PCB-0799-02-IU-1. Has an Altera EPM3032.
+ROM_START( cjjl )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "igs036.u16", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "system_v100cn.u18", 0x000000, 0x200000, CRC(cca9f4c0) SHA1(4df69657804b6da4508958a7d1b40089669e4a5a) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "sp_v100cn.u27", 0x000000, 0x800000, CRC(b9b6d289) SHA1(dd3cbe47cc0201e897d34ca182f9c0ec6899c929) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "cg_v100cn.u28", 0x000000, 0x800000, CRC(af10d242) SHA1(926e44ebae4d60071fb72b1a4495eb353aee6ab4) )
+	ROM_LOAD( "cg_v100cn.u30", 0x800000, 0x800000, CRC(a451f944) SHA1(6756dbd8c6f890b01ed7767ac754a274b6ba5b13) )
+ROM_END
+
+
 // 超级干瞪眼 (Chāojí Gān Dèngyǎn). Has an Altera EPM3032.
 ROM_START( cjgdy )
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -879,6 +897,8 @@ GAME( 200?, sydh,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<syd
 GAME( 200?, xyddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<xyddz_key>,    ROT0, "IGS",           "Xiaoyao Dou Dizhu (V216CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 200?, cjbq,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<cjbq_key>,     ROT0, "IGS",           "Chaoji Bie Qi (V205CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 200?, cjjl,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<cjjl_key>,     ROT0, "IGS",           "Chaoji Jielong (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2009, cjgdy,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<cjgdy_key>,    ROT0, "IGS",           "Chaoji Gan Dengyan (V110CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

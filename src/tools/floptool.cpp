@@ -18,6 +18,7 @@
 
 #include "osdcomm.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdarg>
@@ -42,7 +43,9 @@ static void display_usage(const char *first_argument)
 	fprintf(stderr, "       %s flophashes input_format filesystem <image>                             -- List hashes for each file on a floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s flopread input_format filesystem <image> <path> <outputfile>           -- Extract a file from a floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s flopwrite input_format filesystem <image> <inputfile> <path>           -- Write a file into a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s flopchmeta format filesystem <image> [<path>] [-<name> <value> ...]    -- Change metadata for a file or volume on a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s flopchmeta format filesystem <image> [<path>] [-<name> <value> ...]    -- Change metadata for a file, directory or volume on a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s floprename input_format filesystem <image> <oldpath> <newpath>         -- Rename a file or directory on a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s flopremove input_format filesystem <image> <path>                      -- Remove a file or empty directory from a floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s hddir filesystem <image>                                               -- List the contents of a hard disk image\n", exe_name.c_str());
 	fprintf(stderr, "       %s hdhashes filesystem <image>                                            -- List hashes for each file on a hard disk image\n", exe_name.c_str());
 	fprintf(stderr, "       %s hdread filesystem <image> <path> <outputfile>                          -- Extract a file from a hard disk image\n", exe_name.c_str());
@@ -930,6 +933,108 @@ static int flopchmeta(int argc, char *argv[])
 	return 0;
 }
 
+
+static int floprename(int argc, char *argv[])
+{
+	if(argc!=7) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage(argv[0]);
+		return 1;
+	}
+
+	image_handler ih;
+	ih.set_on_disk_path(argv[4]);
+
+	const floppy_format_info *source_format = find_floppy_source_format(argv[2], ih);
+	if(!source_format)
+		return 1;
+
+	auto fs = formats.find_filesystem_format_by_key(argv[3]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[3]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_write()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement writing\n", argv[2]);
+		return 1;
+	}
+
+	if(ih.floppy_load(*source_format)) {
+		fprintf(stderr, "Error: Loading as format '%s' failed\n", source_format->m_format->name());
+		return 1;
+	}
+
+	if(ih.floppy_mount_fs(*fs)) {
+		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
+		return 1;
+	}
+
+	std::vector<std::string> opath = ih.path_split(argv[5]);
+	std::vector<std::string> npath = ih.path_split(argv[6]);
+	std::error_condition err = ih.get_fs().second->rename(opath, npath);
+	if(err) {
+		fprintf(stderr, "Renaming failed: %s\n", err.message().c_str());
+		return 1;
+	}
+
+	ih.fs_to_floppy();
+	if(ih.floppy_save(*source_format))
+		return 1;
+
+	return 0;
+}
+
+static int flopremove(int argc, char *argv[])
+{
+	if(argc!=6) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage(argv[0]);
+		return 1;
+	}
+
+	image_handler ih;
+	ih.set_on_disk_path(argv[4]);
+
+	const floppy_format_info *source_format = find_floppy_source_format(argv[2], ih);
+	if(!source_format)
+		return 1;
+
+	auto fs = formats.find_filesystem_format_by_key(argv[3]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[3]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_write()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement writing\n", argv[2]);
+		return 1;
+	}
+
+	if(ih.floppy_load(*source_format)) {
+		fprintf(stderr, "Error: Loading as format '%s' failed\n", source_format->m_format->name());
+		return 1;
+	}
+
+	if(ih.floppy_mount_fs(*fs)) {
+		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
+		return 1;
+	}
+
+	std::vector<std::string> path = ih.path_split(argv[5]);
+	std::error_condition err = ih.get_fs().second->remove(path);
+	if(err) {
+		fprintf(stderr, "Deletion failed: %s\n", err.message().c_str());
+		return 1;
+	}
+
+	ih.fs_to_floppy();
+	if(ih.floppy_save(*source_format))
+		return 1;
+
+	return 0;
+}
+
 static int version(int argc, char *argv[])
 {
 	extern const char build_version[];
@@ -963,6 +1068,10 @@ int CLIB_DECL main(int argc, char *argv[])
 			return flopwrite(argc, argv);
 		else if(!core_stricmp("flopchmeta", argv[1]))
 			return flopchmeta(argc, argv);
+		else if(!core_stricmp("floprename", argv[1]))
+			return floprename(argc, argv);
+		else if(!core_stricmp("flopremove", argv[1]))
+			return flopremove(argc, argv);
 		else if(!core_stricmp("hddir", argv[1]))
 			return hddir(argc, argv);
 		else if(!core_stricmp("hdhashes", argv[1]))

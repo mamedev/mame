@@ -21,7 +21,6 @@ Pluto 8: ColdFire 5475
 
 #include "emu.h"
 #include "cpu/m68000/mcf5206e.h"
-#include "machine/mcf5206e.h"
 #include "speaker.h"
 
 
@@ -52,7 +51,7 @@ void jpmsys7_state::jpmsys7_map(address_map &map)
 	map(0x20000018, 0x2000001b).nopw(); // large data upload like astra/pluto?
 	map(0x50000000, 0x50001fff).ram();
 
-	map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+//	map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
 }
 
 static INPUT_PORTS_START(  jpmsys7 )
@@ -62,7 +61,6 @@ void jpmsys7_state::jpmsys7(machine_config &config)
 {
 	MCF5206E(config, m_maincpu, 40000000);  // seems to be a Coldfire of some kind
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys7_state::jpmsys7_map);
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	SPEAKER(config, "speaker", 2).front();
 	/* unknown sound (probably DMA driven DAC) */

@@ -5,22 +5,22 @@ Virtual analog filters:
 
 * VA_LPF4 / va_lpf4_device
 
-	An ideal (linear) 4th order, resonant low-pass filter.
+    An ideal (linear) 4th order, resonant low-pass filter.
 
-	Cutoff frequency and resonance can either be provided by calling class
-	methods, or via input streams.
+    Cutoff frequency and resonance can either be provided by calling class
+    methods, or via input streams.
 
-	The frequency CV is in Hz, and the resonance CV is the feedback gain (0-4).
-	The meaning of CV can be different in subclasses: it will typically match
-	the type of inputs in the emulated hardware.
+    The frequency CV is in Hz, and the resonance CV is the feedback gain (0-4).
+    The meaning of CV can be different in subclasses: it will typically match
+    the type of inputs in the emulated hardware.
 
 * CEM3320_LPF4 / cem3320_lpf4_device:
 
-	A CEM3320 configured as a 4th order low-pass filter, with optional resonance
-	control.
+    A CEM3320 configured as a 4th order low-pass filter, with optional resonance
+    control.
 
-	The frequency CV is the voltage applied to pin 12. The resonance CV is the
-	voltage applied to resistor R_RC, connected to pin 9.
+    The frequency CV is the voltage applied to pin 12. The resonance CV is the
+    voltage applied to resistor R_RC, connected to pin 9.
 */
 
 #ifndef MAME_SOUND_VA_VCF_H
