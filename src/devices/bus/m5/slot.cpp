@@ -112,7 +112,7 @@ struct m5_slot
 // Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
 static const m5_slot slot_list[] =
 {
-	{EM_5,"em-5"},
+	{EM_5,"em_5"},
 	{MEM64KBI,"64kbi"},
 	{MEM64KBF,"64kbf"},
 	{MEM64KRX,"64krx"}

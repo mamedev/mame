@@ -23,7 +23,6 @@ TODO:
     - SI-5 serial interface (8251, ROM)
     - ramdisk for KRX Memory expansion
     - rewrite fd5 floppy as unpluggable device
-    - move dipswitch declaration to softwarelist file?
     - 64krx: get windows ROM version with cpm & ramdisk support (Stuchlik S.E.I. version)
 
     - brno mod: make the dsk image writeable
@@ -36,14 +35,16 @@ TODO:
 
 CHANGELOG:
 
-08.07.2025
+07.11.2025
 	- fd5 floppy emulation works but only with rom hack
 	- updated Sord m5 www links
 	- added fd5 utility disk to software list - not original dump, made from program listings
 	- added support of optional sram in Basic-F and Basic-G cartridges. Works only if shortname(softlist) is used
+	- marked 32/64KB RAM expansions EM-5, 64KBI, 64KBF, 64KRX as supported in sofwarelist
+	- reenabled and refactored memory banking
 
-	- brno mod: used rom including basic-i
-	- brno mod: reenabled and fixed memory banking 
+	- brno mod: switched to rom including basic-i
+	- brno mod: reenabled and refactored memory banking 
 
 10.02.2016
     - fixed bug: crash if rom card was only cart
@@ -110,15 +111,15 @@ Version LZR ( 2C )
 |            |  DISABLED R&W
 +------------+
 
-      0   0   0   1   1   2   2   2   3   3   4   4   4   5   5   6   6
-kB    0   4   8   2   6   0   4   8   2   6   0   4   8   2   6   0   4
-      +-------+-------------------+
-ROM   |MONITOR|      BASIC-F      |
-      +-------+-------+-------+---+---+-------+-------+-------+-------+
-RAM   |       |       |       |       |       |       |       |       |
-      +-------+-------+-------+-------+-------+-------+-------+-------+
-CART  |       |       |       |       |       |       |       |       |
-      +-------+-------+-------+-------+-------+-------+-------+-------+
+    0   0   0   1   1   2   2   2   3   3   4   4   4   5   5   6   6
+kB  0   4   8   2   6   0   4   8   2   6   0   4   8   2   6   0   4
+    +-------+-------------------+
+ROM |MONITOR|      BASIC-F      |
+    +-------+-------+-------+---+---+-------+-------+-------+-------+
+RAM |       |       |       |       |       |       |       |       |
+    +-------+-------+-------+-------+-------+-------+-------+-------+
+CART|       |       |       |       |       |       |       |       |
+    +-------+-------+-------+-------+-------+-------+-------+-------+
 
 
 Mode
@@ -334,6 +335,8 @@ public:
 		, m_cart2(*this, "cartslot2")
 		, m_centronics(*this, "centronics")
 		, m_ram(*this, RAM_TAG)
+		, m_rom_view(*this, "rom")
+		, m_cart_view(*this, "cart")
 		, m_reset(*this, "RESET")
 		, m_DIPS(*this, "DIPS")
 		, m_motor_timer(nullptr)
@@ -356,6 +359,8 @@ protected:
 	optional_device<m5_cart_slot_device> m_cart2;
 	required_device<centronics_device> m_centronics;
 	optional_device<ram_device> m_ram;
+	memory_view m_rom_view;
+	memory_view m_cart_view;
 	required_ioport m_reset;
 	optional_ioport m_DIPS;
 
@@ -402,10 +407,13 @@ private:
 	void fd5_mem(address_map &map) ATTR_COLD;
 	void m5_io(address_map &map) ATTR_COLD;
 	void m5_mem(address_map &map) ATTR_COLD;
+	u8 cart_window_r(offs_t offset);
+	void cart_window_w(offs_t offset, u8 data);
 
 	u8 m_ram_mode = 0;
 	u8 m_ram_type = 0;
 	memory_region *m_cart_rom = nullptr;
+	std::unique_ptr<u8[]> m_ignore_writes;
 
 	// floppy state for fd5
 	u8 m_fd5_data = 0;
@@ -421,7 +429,6 @@ class brno_state : public m5_state
 public:
 	brno_state(const machine_config &mconfig, device_type type, const char *tag)
 		: m5_state(mconfig, type, tag)
-		, m_rom_view(*this, "rom")
 		, m_rom12_view(*this, "rom12")
 		, m_wdfdc(*this, "wd")
 		, m_floppy0(*this, "wd:0")
@@ -442,6 +449,7 @@ private:
 	void ramen_w(u8 data);
 	void fd_w(u8 data);
 	u8 cartrom_r(offs_t offset);
+	void cartrom_w(offs_t offset, u8 data);
 
 	static void floppy_formats(format_registration &fr);
 
@@ -450,7 +458,6 @@ private:
 	void brno_io(address_map &map) ATTR_COLD;
 	void m5_mem_brno(address_map &map) ATTR_COLD;
 
-	memory_view m_rom_view;
 	memory_view m_rom12_view;
 	required_device<wd2797_device> m_wdfdc;
 	required_device<floppy_connector> m_floppy0;
@@ -460,10 +467,6 @@ private:
 	u8 m_rammap[16]{}; // memory map
 };
 
-
-//**************************************************************************
-//  MEMORY BANKING
-//**************************************************************************
 
 void m5_state::write_centronics_busy(int state)
 {
@@ -538,7 +541,9 @@ void m5_state::com_w(u8 data)
 	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-
+//**************************************************************************
+//  MEMORY BANKING
+//**************************************************************************
 
 //**************************************************************************
 //  64KBI support for oldest memory module
@@ -553,11 +558,6 @@ void m5_state::mem64KBI_w(offs_t offset, u8 data) //out 0x6c
 {
 	if (m_ram_type != MEM64KBI) return;
 
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
-	memory_region *ram_region = memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
-
 	if (m_ram_mode == BIT(data, 0))
 		return;
 
@@ -565,40 +565,20 @@ void m5_state::mem64KBI_w(offs_t offset, u8 data) //out 0x6c
 
 	//if 32kb only mode don't map top ram
 	if (m_ram_mode && (m_DIPS->read() & 4) != 4)
-	{
-		program.install_ram(0x0000, 0x6fff, ram_region->base());
-	}
+		m_rom_view.select(2); // 64kb RAM
 	else
-	{
-		program.install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
-		program.unmap_write(0x0000, 0x1fff);
-
-		//if AUTOSTART is on don't load any ROM cart
-		if (m_cart && (m_DIPS->read() & 2) != 2)
-		{
-			program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
-			program.unmap_write(0x2000, 0x3fff);
-		}
-		else
-			program.unmap_readwrite(0x2000, 0x3fff);
-	}
+		m_rom_view.select(1); // 32kb RAM, ROMs are preconfigured in machine_start
 
 	logerror("64KBI: ROM %s", m_ram_mode == 0 ? "enabled\n" : "disabled\n");
 }
 
 //**************************************************************************
-//  64KBF paging
+//  64KBF banking
 //**************************************************************************
 
 void m5_state::mem64KBF_w(u8 data) //out 0x30
 {
 	if (m_ram_type != MEM64KBF) return;
-
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str()); //ROM region of the cart
-	memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());   //RAM region of the cart
-	memory_region *rom_region=memregion(region_tag.assign(m_cart->tag()).append(M5SLOT_ROM_REGION_TAG).c_str()); //region where clasic ROM cartridge resides
 
 	if (m_ram_mode == data)
 		return;
@@ -608,15 +588,23 @@ void m5_state::mem64KBF_w(u8 data) //out 0x30
 	switch(m_ram_mode)
 	{
 		case 0:
-			program.unmap_write(0x0000, 0x6fff);
+			/*program.unmap_write(0x0000, 0x6fff);
 			membank("bank1r")->set_base(memregion("maincpu")->base());
 			membank("bank2r")->set_base(m_cart_rom->base());
 			membank("bank3r")->set_base(m_cart_rom->base()+0x2000);
 			membank("bank4r")->set_base(m_cart_rom->base()+0x4000);
 			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
+			*/
+			membank("bank1r")->set_entry(1); membank("bank1w")->set_entry(1);
+			membank("bank2r")->set_entry(1); membank("bank2w")->set_entry(1);
+			membank("bank3r")->set_entry(1); membank("bank3w")->set_entry(1);
+			membank("bank4r")->set_entry(1); membank("bank4w")->set_entry(1);
+			membank("bank5r")->set_entry(0); membank("bank5w")->set_entry(0);
+			membank("bank6r")->set_entry(0); membank("bank6w")->set_entry(0);
 			break;
 		case 1:
+			/*
 			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
 			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
 			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
@@ -627,8 +615,16 @@ void m5_state::mem64KBF_w(u8 data) //out 0x30
 			membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
 			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
+			*/
+			membank("bank1r")->set_entry(0); membank("bank1w")->set_entry(0);
+			membank("bank2r")->set_entry(0); membank("bank2w")->set_entry(0);
+			membank("bank3r")->set_entry(0); membank("bank3w")->set_entry(0);
+			membank("bank4r")->set_entry(0); membank("bank4w")->set_entry(0);
+			membank("bank5r")->set_entry(0); membank("bank5w")->set_entry(0);
+			membank("bank6r")->set_entry(0); membank("bank6w")->set_entry(0);
 			break;
 		case 2:
+			/*
 			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
 			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
 			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
@@ -639,8 +635,16 @@ void m5_state::mem64KBF_w(u8 data) //out 0x30
 			membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
 			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
+			*/
+			membank("bank1r")->set_entry(1); membank("bank1w")->set_entry(0);
+			membank("bank2r")->set_entry(0); membank("bank2w")->set_entry(0);
+			membank("bank3r")->set_entry(0); membank("bank3w")->set_entry(0);
+			membank("bank4r")->set_entry(0); membank("bank4w")->set_entry(0);
+			membank("bank5r")->set_entry(0); membank("bank5w")->set_entry(0);
+			membank("bank6r")->set_entry(0); membank("bank6w")->set_entry(0);
 			break;
 		case 3:
+			/*
 			program.unmap_write(0x0000, 0x6fff);
 			membank("bank1r")->set_base(ram_region->base()+0x0000);
 			membank("bank2r")->set_base(ram_region->base()+0x2000);
@@ -648,8 +652,16 @@ void m5_state::mem64KBF_w(u8 data) //out 0x30
 			membank("bank4r")->set_base(ram_region->base()+0x6000);
 			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
+			*/
+			membank("bank1r")->set_entry(0); membank("bank1w")->set_entry(1);
+			membank("bank2r")->set_entry(0); membank("bank2w")->set_entry(1);
+			membank("bank3r")->set_entry(0); membank("bank3w")->set_entry(1);
+			membank("bank4r")->set_entry(0); membank("bank4w")->set_entry(1);
+			membank("bank5r")->set_entry(0); membank("bank5w")->set_entry(0);
+			membank("bank6r")->set_entry(0); membank("bank6w")->set_entry(0);
 			break;
 		case 4:
+			/*
 			program.unmap_write(0x0000, 0x3fff);
 			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
 			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
@@ -659,8 +671,16 @@ void m5_state::mem64KBF_w(u8 data) //out 0x30
 			membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
 			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
+			*/
+			membank("bank1r")->set_entry(0); membank("bank1w")->set_entry(1);
+			membank("bank2r")->set_entry(0); membank("bank2w")->set_entry(1);
+			membank("bank3r")->set_entry(0); membank("bank3w")->set_entry(0);
+			membank("bank4r")->set_entry(0); membank("bank4w")->set_entry(0);
+			membank("bank5r")->set_entry(0); membank("bank5w")->set_entry(0);
+			membank("bank6r")->set_entry(0); membank("bank6w")->set_entry(0);
 			break;
 		case 5:
+			/*
 			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
 			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
 			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
@@ -671,8 +691,16 @@ void m5_state::mem64KBF_w(u8 data) //out 0x30
 			membank("bank4r")->set_base(m_cart_rom->base()+0x4000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
 			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
+			*/
+			membank("bank1r")->set_entry(1); membank("bank1w")->set_entry(0);
+			membank("bank2r")->set_entry(1); membank("bank2w")->set_entry(0);
+			membank("bank3r")->set_entry(1); membank("bank3w")->set_entry(0);
+			membank("bank4r")->set_entry(1); membank("bank4w")->set_entry(0);
+			membank("bank5r")->set_entry(0); membank("bank5w")->set_entry(0);
+			membank("bank6r")->set_entry(0); membank("bank6w")->set_entry(0);
 			break;
-		case 6:
+		case 6: //replace Basic-F with pluged other rom cart
+			/*
 			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
 			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
 			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
@@ -683,20 +711,16 @@ void m5_state::mem64KBF_w(u8 data) //out 0x30
 			membank("bank4r")->set_base(rom_region->base()+0x4000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
 			membank("bank5r")->set_base(ram_region->base()+0x8000);     membank("bank5w")->set_base(ram_region->base()+0x8000);
 			membank("bank6r")->set_base(ram_region->base()+0xc000);     membank("bank6w")->set_base(ram_region->base()+0xc000);
+			*/
+			membank("bank1r")->set_entry(1); membank("bank1w")->set_entry(0);
+			membank("bank2r")->set_entry(2); membank("bank2w")->set_entry(0);
+			membank("bank3r")->set_entry(2); membank("bank3w")->set_entry(0);
+			membank("bank4r")->set_entry(2); membank("bank4w")->set_entry(0);
+			membank("bank5r")->set_entry(0); membank("bank5w")->set_entry(0);
+			membank("bank6r")->set_entry(0); membank("bank6w")->set_entry(0);
 			break;
-		case 7: //probably this won't work - it should redirect rw to another ram module
-			program.install_write_bank(0x0000,0x1fff,membank("bank1w"));
-			program.install_write_bank(0x2000,0x3fff,membank("bank2w"));
-			program.install_write_bank(0x4000,0x5fff,membank("bank3w"));
-			program.install_write_bank(0x6000,0x6fff,membank("bank4w"));
-			program.install_readwrite_bank(0x7000,0x7fff,membank("sram"));
-			membank("bank1r")->set_base(rom_region->base()+0x0000);     membank("bank1w")->set_base(rom_region->base()+0x0000);
-			membank("bank2r")->set_base(rom_region->base()+0x2000);     membank("bank2w")->set_base(rom_region->base()+0x2000);
-			membank("bank3r")->set_base(rom_region->base()+0x4000);     membank("bank3w")->set_base(rom_region->base()+0x4000);
-			membank("bank4r")->set_base(rom_region->base()+0x6000);     membank("bank4w")->set_base(rom_region->base()+0x6000);
-			membank("sram")->set_base(rom_region->base()+0x7000);
-			membank("bank5r")->set_base(rom_region->base()+0x8000);     membank("bank5w")->set_base(rom_region->base()+0x8000);
-			membank("bank6r")->set_base(rom_region->base()+0xc000);     membank("bank6w")->set_base(rom_region->base()+0xc000);
+		case 7: //reserve whole address space for other hardware
+			m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0xffff);
 			break;
 	}
 
@@ -704,7 +728,7 @@ void m5_state::mem64KBF_w(u8 data) //out 0x30
 }
 
 //**************************************************************************
-//  64KRX paging
+//  64KRX banking
 //**************************************************************************
 
 void m5_state::mem64KRX_w(offs_t offset, u8 data) //out 0x7f
@@ -712,38 +736,56 @@ void m5_state::mem64KRX_w(offs_t offset, u8 data) //out 0x7f
 	if (m_ram_type != MEM64KRX) return;
 	if (m_ram_mode == data) return;
 
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
-	memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
+	//address_space &program = m_maincpu->space(AS_PROGRAM);
+	//std::string region_tag;
+	//m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
+	//memory_region *ram_region=memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
 
 	m_ram_mode = data;
 
+	/*
 	BIT(m_ram_mode, 0) ? membank("bank1r")->set_base(memregion("maincpu")->base())  :   membank("bank1r")->set_base(ram_region->base());
 	BIT(m_ram_mode, 1) ? membank("bank2r")->set_base(m_cart_rom->base())            :   membank("bank2r")->set_base(ram_region->base()+0x2000);
 	BIT(m_ram_mode, 2) ? membank("bank3r")->set_base(m_cart_rom->base()+0x2000)     :   membank("bank3r")->set_base(ram_region->base()+0x4000);
+	*/
 
+	// it seem no matter RAM/ROM selected writes allways go to ram
+	membank("bank1r")->set_entry(BIT(m_ram_mode, 0)); //membank("bank1w")->set_entry(BIT(m_ram_mode, 0));
+	membank("bank2r")->set_entry(BIT(m_ram_mode, 1)); //membank("bank2w")->set_entry(BIT(m_ram_mode, 1));
+	membank("bank3r")->set_entry(BIT(m_ram_mode, 2)); //membank("bank3w")->set_entry(BIT(m_ram_mode, 2));
+	
 	if ((m_DIPS->read() & 0x01))
 	{
+		/*
 		BIT(m_ram_mode, 4) ? membank("bank5r")->set_base(m_cart_rom->base()+0x6000) :   membank("bank5r")->set_base(ram_region->base()+0x8000);
 		BIT(m_ram_mode, 5) ? membank("bank6r")->set_base(m_cart_rom->base()+0xa000) :   membank("bank6r")->set_base(ram_region->base()+0xc000);
+		*/
+		membank("bank5r")->set_entry(BIT(m_ram_mode, 4)); //membank("bank5w")->set_entry(BIT(m_ram_mode, 4));
+		membank("bank6r")->set_entry(BIT(m_ram_mode, 5)); //membank("bank6w")->set_entry(BIT(m_ram_mode, 5));
 	}
 	else
 	{
+		/*
 		BIT(m_ram_mode, 6) ? membank("bank5r")->set_base(m_cart_rom->base()+0xe000) :   membank("bank5r")->set_base(ram_region->base()+0x8000);
 		BIT(m_ram_mode, 7) ? membank("bank6r")->set_base(m_cart_rom->base()+0x12000):   membank("bank6r")->set_base(ram_region->base()+0xc000);
-	}
-
-	//if KRX ROM is paged out page in cart ROM if any
-	if (m_cart && BIT(m_ram_mode, 1) == 0 )
-	{
-		program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
-		program.unmap_write(0x2000, 0x6fff);
+		*/
+		membank("bank5r")->set_entry(BIT(m_ram_mode, 6) ? 2:0); //membank("bank5w")->set_entry(BIT(m_ram_mode, 6));
+		membank("bank6r")->set_entry(BIT(m_ram_mode, 7) ? 2:0); //membank("bank6w")->set_entry(BIT(m_ram_mode, 7));
 	}
 
 	logerror("64KRX RAM mode set to %02x\n", m_ram_mode);
 }
 
+u8 m5_state::cart_window_r(offs_t offset)
+{
+ 	return m_cart ? m_cart->read_rom(offset) : 0xff;
+}
+
+void m5_state::cart_window_w(offs_t offset, u8 data)
+{
+    if (m_cart)
+        m_cart->write_ram(offset, data);
+}
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -756,8 +798,34 @@ void m5_state::mem64KRX_w(offs_t offset, u8 data) //out 0x7f
 void m5_state::m5_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).rom().region("maincpu", 0); //monitor rom(bios)
-	map(0x7000, 0x7fff).ram();                      //4kb internal RAM
+	//map(0x0000, 0x1fff).rom().region("maincpu", 0); //monitor rom(bios)
+	//map(0x7000, 0x7fff).ram();                      //4kb internal RAM
+
+	map(0x0000, 0xffff).view(m_rom_view);
+	map(0x7000, 0x7fff).ram();
+
+	// for 64KBF, 64KRX memory modules
+	m_rom_view[0](0x0000, 0x1fff).bankr("bank1r").bankw("bank1w");
+	m_rom_view[0](0x2000, 0x3fff).bankr("bank2r").bankw("bank2w");
+	m_rom_view[0](0x4000, 0x5fff).bankr("bank3r").bankw("bank3w");
+	m_rom_view[0](0x6000, 0x6fff).bankr("bank4r").bankw("bank4w");
+	//m_rom_view[0](0x7000, 0x7fff).ram();
+	m_rom_view[0](0x8000, 0xbfff).bankr("bank5r").bankw("bank5w");
+	m_rom_view[0](0xc000, 0xffff).bankr("bank6r").bankw("bank6w");
+
+	// for EM-5/64KBI memory modules
+	m_rom_view[1](0x0000, 0xffff).ram().share("ram"); //64kb
+	m_rom_view[1](0x0000, 0x1fff).rom().region("maincpu", 0x0000).unmapw(); //always monitor rom
+	m_rom_view[1](0x2000, 0x6fff).view(m_cart_view);
+	//m_rom_view[1](0x7000, 0x7fff).ram().share("internal");
+
+	m_rom_view[2](0x0000, 0xffff).ram().share("ram"); //64kb
+	//m_rom_view[2](0x7000, 0x7fff).ram().share("internal");
+
+	// for cartridge rom
+	m_cart_view[0](0x2000, 0x6fff).ram(); //no cart
+	m_cart_view[1](0x2000, 0x6fff).rw(FUNC(m5_state::cart_window_r), FUNC(m5_state::cart_window_w)); //cart or ram
+
 
 }
 
@@ -1184,17 +1252,16 @@ void brno_state::m5_mem_brno(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).view(m_rom_view);
-	m_rom_view[0](0x0000, 0xffff).rw(FUNC(brno_state::ramdisk_r),			  // rest is RAMdisk
+	m_rom_view[0](0x0000, 0xffff).rw(FUNC(brno_state::ramdisk_r),			  // where isn't ROM map RAMdisk
 		FUNC(brno_state::ramdisk_w));
 
 	// boot config
-	m_rom_view[0](0x0000, 0x1fff).rom().region("maincpu", 0x0000).unmapw(); // monitor ROM
-	m_rom_view[0](0x2000, 0x3fff).view(m_rom12_view);						// ROM1 or ROM2, selected by m_rom1_view
-	m_rom_view[0](0x7000, 0x7fff).ram().share("internal");                  // interní RAM
-	m_rom12_view[0](0x2000, 0x3fff).rom().region("maincpu", 0x2000).unmapw();				  // ROM1
-	m_rom12_view[1](0x2000, 0x3fff).rom().region("maincpu", 0x4000).unmapw();				  // ROM2 - Basic-I
-	//m_rom12_view[2](0x2000, 0x3fff).unmaprw();												  // cart if any
-	m_rom12_view[2](0x2000, 0x3fff).r(FUNC(brno_state::cartrom_r)).unmapw();
+	m_rom_view[0](0x0000, 0x1fff).rom().region("maincpu", 0x0000).unmapw();	  // monitor ROM
+	m_rom_view[0](0x2000, 0x3fff).view(m_rom12_view);						  // ROM1,ROM2 or cart, selected by m_rom12_view
+	m_rom_view[0](0x7000, 0x7fff).ram().share("internal");					  // internal RAM
+	m_rom12_view[0](0x2000, 0x3fff).rom().region("maincpu", 0x2000).unmapw(); // ROM1
+	m_rom12_view[1](0x2000, 0x3fff).rom().region("maincpu", 0x4000).unmapw(); // ROM2 - Basic-I
+	m_rom12_view[2](0x2000, 0x3fff).r(FUNC(brno_state::cartrom_r)).unmapw();  // cartridge ROM
 
 	// Ramdisk only
 	m_rom_view[1](0x0000, 0xffff).rw(FUNC(brno_state::ramdisk_r),
@@ -1223,9 +1290,9 @@ void brno_state::brno_io(address_map &map)
 	map(0x40, 0x40).mirror(0xff0f).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x50).mirror(0xff0f).rw(FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
 	map(0x60, 0x61).mirror(0xff02).rw("sio", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x64, 0x64).select(0xf000).mirror(0x0f03).w(FUNC(brno_state::mmu_w));         //  MMU - page select (ramdisk memory paging)
+	map(0x64, 0x64).select(0xf000).mirror(0x0f03).w(FUNC(brno_state::mmu_w));         //  MMU - page select (ramdisk memory paging), uses also A12-A15
 	map(0x68, 0x68).mirror(0xff03).w(FUNC(brno_state::romsel_w));                     //  CASEN
-	map(0x6c, 0x6c).mirror(0xff03).w(FUNC(brno_state::ramen_w));                     //  RAMEN
+	map(0x6c, 0x6c).mirror(0xff03).w(FUNC(brno_state::ramen_w));                      //  RAMEN
 	map(0x70, 0x73).mirror(0xff00).rw("pio", FUNC(i8255_device::read), FUNC(i8255_device::write)); //  PIO
 	map(0x78, 0x7b).mirror(0xff00).rw(m_wdfdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));   //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a -sector #, 7b - data
 	map(0x7c, 0x7c).mirror(0xff03).w(FUNC(brno_state::fd_w));                         //  drive select
@@ -1267,7 +1334,6 @@ void brno_state::romsel_w(u8 data) //out 6b
 		m_rom12_view.select(1);
 	else if (data == 0)
 		m_rom12_view.select(0);
-
 
 	if (BRNO_DEBUG) logerror("CASEN change: out (&6b),%x\n",data);
 }
@@ -1347,9 +1413,6 @@ void m5_state::machine_start()
 	// register for state saving
 	save_item(NAME(m_fd5_data));
 	save_item(NAME(m_fd5_com));
-	//save_item(NAME(m_intra));
-	//save_item(NAME(m_ibf));
-	//save_item(NAME(m_obf));
 	save_item(NAME(m_centronics_busy));
 	m_motor_timer = timer_alloc(FUNC(m5_state::FDC_MOTOR_TIMEOUT_cb), this); //SED9420 trigger-in emulate
 }
@@ -1358,6 +1421,9 @@ void m5_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	std::string region_tag;
+	uint32_t rom_size = 0;
+	m_ignore_writes = std::make_unique<u8[]>(0x2000);
+	u8 entry = 1;
 
 	//is ram/rom cart plugged in?
 	if (m_cart1->exists())
@@ -1395,35 +1461,34 @@ void m5_state::machine_reset()
 		m_cart_rom = memregion(region_tag.assign(m_cart_ram->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
 		memory_region *ram_region = memregion(region_tag.assign(m_cart_ram->tag()).append(":ram").c_str());
 
+
+		if (m_cart) rom_size = m_cart->get_rom_size();
+
 		switch (m_ram_type)
 		{
 			case EM_5:
-				program.install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
-				program.unmap_write(0x0000, 0x1fff);
-				program.install_readwrite_handler(0x8000, 0xffff, read8sm_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::read_ram)), write8sm_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::write_ram)));
+				m_rom_view.select(1); //preconfigured view for easy handling roms at 0x0000-0x6fff
 				if (m_cart)
 				{
-					program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
-					program.unmap_write(0x2000, 0x6fff);
+					program.install_read_handler(0x2000, 0x2000 + rom_size - 1, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
+					program.unmap_write(0x2000, 0x2000 + rom_size - 1);
 				}
+				else
+					program.unmap_readwrite(0x2000, 0x6fff);
 				break;
 
 			case MEM64KBI:
-				program.install_rom(0x0000, 0x1fff, memregion("maincpu")->base());
-				program.unmap_write(0x0000, 0x1fff);
-				program.install_ram(0x8000, 0xffff, ram_region->base()+0x8000);
+				m_rom_view.select(1); //preconfigured view for easy handling roms at 0x0000-0x6fff
 
 				//if AUTOSTART is on then page out cart and start tape loading
-				if (m_cart && ((m_DIPS->read() & 2) != 2))
-				{
-					program.install_read_handler(0x2000, 0x3fff, read8sm_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
-					program.unmap_write(0x2000, 0x3fff);
-				}
+				if (rom_size > 0 && ((m_DIPS->read() & 2) != 2))
+					m_cart_view.select(1); //sets cart handler
 				else
-					program.unmap_readwrite(0x2000, 0x6fff); //monitor rom is testing this area for 0xFFs otherwise thinks there is some ROM cart plugged in
+					m_cart_view.select(0); //sets ram
 
 				break;
 			case MEM64KBF:
+				/*
 				program.unmap_write(0x0000, 0x6fff);
 				membank("bank1r")->set_base(memregion("maincpu")->base());
 				membank("bank2r")->set_base(m_cart_rom->base());
@@ -1431,24 +1496,99 @@ void m5_state::machine_reset()
 				membank("bank4r")->set_base(m_cart_rom->base()+0x4000);
 				membank("bank5r")->set_base(ram_region->base()+0x8000); membank("bank5w")->set_base(ram_region->base()+0x8000);
 				membank("bank6r")->set_base(ram_region->base()+0xc000); membank("bank6w")->set_base(ram_region->base()+0xc000);
+				*/
+				// ram entries
+
+				if (m_cart)
+				{
+					//replace 64Kbf Basic-F with rom cart, works only with mode 6
+					memory_region* rom_region = memregion(region_tag.assign(m_cart->tag()).append(M5SLOT_ROM_REGION_TAG).c_str());
+					membank("bank2r")->configure_entry(2, rom_region->base());
+					membank("bank3r")->configure_entry(2, rom_region->base() + 0x2000);
+					membank("bank4r")->configure_entry(2, rom_region->base() + 0x4000);
+				}								
+				membank("bank1r")->configure_entry(0, ram_region->base() + 0x0000);  membank("bank1w")->configure_entry(0, ram_region->base() + 0x0000);
+				membank("bank2r")->configure_entry(0, ram_region->base() + 0x2000);  membank("bank2w")->configure_entry(0, ram_region->base() + 0x2000);
+				membank("bank3r")->configure_entry(0, ram_region->base() + 0x4000);  membank("bank3w")->configure_entry(0, ram_region->base() + 0x4000);
+				membank("bank4r")->configure_entry(0, ram_region->base() + 0x6000);  membank("bank4w")->configure_entry(0, ram_region->base() + 0x6000);
+				membank("bank5r")->configure_entry(0, ram_region->base() + 0x8000);  membank("bank5w")->configure_entry(0, ram_region->base() + 0x8000);
+				membank("bank6r")->configure_entry(0, ram_region->base() + 0xc000);  membank("bank6w")->configure_entry(0, ram_region->base() + 0xc000);
+				// rom entries
+				membank("bank1r")->configure_entry(1, memregion("maincpu")->base()); membank("bank1w")->configure_entry(1, m_ignore_writes.get());
+				membank("bank2r")->configure_entry(1, m_cart_rom->base());			 membank("bank2w")->configure_entry(1, m_ignore_writes.get());
+				membank("bank3r")->configure_entry(1, m_cart_rom->base() + 0x2000);	 membank("bank3w")->configure_entry(1, m_ignore_writes.get());
+				membank("bank4r")->configure_entry(1, m_cart_rom->base() + 0x4000);	 membank("bank4w")->configure_entry(1, m_ignore_writes.get());
+
+				m_rom_view.select(0);
+				// Mode 0 as default
+				membank("bank1r")->set_entry(1); membank("bank1w")->set_entry(1);
+				membank("bank2r")->set_entry(1); membank("bank2w")->set_entry(1);
+				membank("bank3r")->set_entry(1); membank("bank3w")->set_entry(1);
+				membank("bank4r")->set_entry(1); membank("bank4w")->set_entry(1);
+				membank("bank5r")->set_entry(0); membank("bank5w")->set_entry(0);
+				membank("bank6r")->set_entry(0); membank("bank6w")->set_entry(0);
+
 				break;
+
 			case MEM64KRX:
+
+				/*
 				membank("bank1r")->set_base(memregion("maincpu")->base());    membank("bank1w")->set_base(ram_region->base());
 				membank("bank2r")->set_base(m_cart_rom->base());            membank("bank2w")->set_base(ram_region->base()+0x2000);
 				membank("bank3r")->set_base(m_cart_rom->base()+0x2000);     membank("bank3w")->set_base(ram_region->base()+0x4000);
 				membank("bank4r")->set_base(ram_region->base()+0x6000);     membank("bank4w")->set_base(ram_region->base()+0x6000);
+				*/
 
-				//page in BASIC or MSX
+				membank("bank1r")->configure_entry(0, ram_region->base() + 0x0000);  membank("bank1w")->configure_entry(0, ram_region->base() + 0x0000);
+				membank("bank2r")->configure_entry(0, ram_region->base() + 0x2000);  membank("bank2w")->configure_entry(0, ram_region->base() + 0x2000);
+				membank("bank3r")->configure_entry(0, ram_region->base() + 0x4000);  membank("bank3w")->configure_entry(0, ram_region->base() + 0x4000);
+				membank("bank4r")->configure_entry(0, ram_region->base() + 0x6000);  membank("bank4w")->configure_entry(0, ram_region->base() + 0x6000);
+				membank("bank5r")->configure_entry(0, ram_region->base() + 0x8000);  membank("bank5w")->configure_entry(0, ram_region->base() + 0x8000);
+				membank("bank6r")->configure_entry(0, ram_region->base() + 0xc000);  membank("bank6w")->configure_entry(0, ram_region->base() + 0xc000);
+
+				membank("bank1r")->configure_entry(1, memregion("maincpu")->base()); membank("bank1w")->configure_entry(1, m_ignore_writes.get());
+				membank("bank2r")->configure_entry(1, m_cart_rom->base());			 membank("bank2w")->configure_entry(1, m_ignore_writes.get());
+				membank("bank3r")->configure_entry(1, m_cart_rom->base() + 0x2000);  membank("bank3w")->configure_entry(1, m_ignore_writes.get());
+				membank("bank4r")->configure_entry(1, m_cart_rom->base() + 0x4000);  membank("bank4w")->configure_entry(1, m_ignore_writes.get());
+				membank("bank5r")->configure_entry(1, m_cart_rom->base() + 0x6000);	 membank("bank5w")->configure_entry(1, m_ignore_writes.get());
+				membank("bank6r")->configure_entry(1, m_cart_rom->base() + 0xa000);	 membank("bank6w")->configure_entry(1, m_ignore_writes.get());
+
+				membank("bank5r")->configure_entry(2, m_cart_rom->base() + 0xe000);
+				membank("bank6r")->configure_entry(2, m_cart_rom->base() + 0x12000);
+
+				
+				//select BASIC or MSX
 				if ((m_DIPS->read() & 0x01))
 				{
+					/*
 					membank("bank5r")->set_base(m_cart_rom->base()+0x6000); membank("bank5w")->set_base(ram_region->base()+0x8000);
 					membank("bank6r")->set_base(m_cart_rom->base()+0xa000); membank("bank6w")->set_base(ram_region->base()+0xc000);
+					*/
+					//BASIC-G and BASIC-F
+					entry = 1;
+					
+					
 				}
 				else
 				{
+					/*
 					membank("bank5r")->set_base(m_cart_rom->base()+0xe000);  membank("bank5w")->set_base(ram_region->base()+0x8000);
 					membank("bank6r")->set_base(m_cart_rom->base()+0x12000); membank("bank6w")->set_base(ram_region->base()+0xc000);
+					*/
+					//MSX
+					entry = 2;
 				}
+
+				m_rom_view.select(0);
+
+				// it seem no matter RAM/ROM selected writes allways go to ram
+				membank("bank1r")->set_entry(1);	 membank("bank1w")->set_entry(0);
+				membank("bank2r")->set_entry(1);	 membank("bank2w")->set_entry(0);
+				membank("bank3r")->set_entry(1);	 membank("bank3w")->set_entry(0);
+				membank("bank4r")->set_entry(0);	 membank("bank4w")->set_entry(0);
+				membank("bank5r")->set_entry(entry); membank("bank5w")->set_entry(0);
+				membank("bank6r")->set_entry(entry); membank("bank6w")->set_entry(0);
+
 				break;
 
 			default:
@@ -1496,7 +1636,7 @@ void brno_state::machine_start()
 void brno_state::machine_reset()
 {
 
-	address_space& program = m_maincpu->space(AS_PROGRAM);
+	//address_space& program = m_maincpu->space(AS_PROGRAM);
 
 	//is ram/rom cart plugged in?
 	if (m_cart1->exists())
