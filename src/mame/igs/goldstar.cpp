@@ -459,7 +459,6 @@ public:
 	void crazybonb(machine_config &config) ATTR_COLD;
 	void cutylineb(machine_config &config) ATTR_COLD;
 	void eldoradd(machine_config &config) ATTR_COLD;
-	void eldoraddoa(machine_config &config) ATTR_COLD;
 	void jkrmast(machine_config &config) ATTR_COLD;
 	void ll3(machine_config &config) ATTR_COLD;
 	void nfm(machine_config &config) ATTR_COLD;
@@ -566,7 +565,6 @@ private:
 	void cmtetriskr_portmap(address_map &map) ATTR_COLD;
 	void cmv4zg_portmap(address_map &map) ATTR_COLD;
 	void crazybon_portmap(address_map &map) ATTR_COLD;
-	void eldoraddoa_portmap(address_map &map) ATTR_COLD;
 	void jkrmast_map(address_map &map) ATTR_COLD;
 	void jkrmast_portmap(address_map &map) ATTR_COLD;
 	void ll3_map(address_map &map) ATTR_COLD;
@@ -596,6 +594,8 @@ public:
 
 	void cmast97(machine_config &config) ATTR_COLD;
 	void jpknight(machine_config &config) ATTR_COLD;
+
+	void init_cm97() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -4124,40 +4124,22 @@ void cmaster_state::ll3_portmap(address_map &map)
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 }
 
-void cmaster_state::eldoraddoa_portmap(address_map &map)  // TODO: incomplete!
+void cmaster_state::animalhs_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 
 	map(0x01, 0x01).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x10, 0x10).portr("DSW1");
-	map(0x11, 0x11).portr("DSW2");
-	map(0x12, 0x12).portr("DSW3");
-	map(0x13, 0x13).portr("DSW4");
-	map(0x20, 0x20).portr("IN2").lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; }));  // TODO: other bits are used, too
-	map(0x21, 0x21).portr("IN0");
-	map(0x22, 0x22).portr("IN1");
-	map(0x23, 0x23).lr8(NAME([] () -> uint8_t { return 0xff; }));  // checks battery level here, among other things, writes should be lamps
-}
-
-void cmaster_state::animalhs_portmap(address_map &map)  // TODO: incomplete, maybe share base with above eldoraddoa_portmap once both have been verified
-{
-	map.global_mask(0xff);
-
-	map(0x01, 0x01).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x10, 0x10).portr("DSW1");
-	map(0x11, 0x11).portr("DSW2");
-	map(0x12, 0x12).portr("DSW3");
-	map(0x13, 0x13).portr("DSW4");
-	//map(0x60, 0x60).portr("IN2").lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; }));  // TODO: other bits are used, too
-	map(0x60, 0x60).lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; }));  // TODO: other bits are used, too
-	map(0x61, 0x61).portr("IN0").w(FUNC(goldstar_state::p2_lamps_w)); // it seems lamps
-	map(0x62, 0x62).portr("IN1").w(FUNC(cmaster_state::coincount_w));
-	//map(0x63, 0x63).lr8(NAME([] () -> uint8_t { return 0xff; }));  // checks battery level here, among other things, writes should be lamps
-	map(0x63, 0x63).portr("IN2");
+	map(0x10, 0x10).portr("DSW1");  // ok inv
+	map(0x11, 0x11).portr("DSW2");  // ok inv
+	map(0x12, 0x12).portr("DSW3");  // ok
+	map(0x13, 0x13).nopw();  // unknown
+	map(0x20, 0x20).mirror(0x40).portr("DSW6");
+	map(0x20, 0x20).mirror(0x40).lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; }));  // TODO: other bits are used, too
+	map(0x21, 0x21).mirror(0x40).portr("IN0").w(FUNC(goldstar_state::p2_lamps_w)); // it seems lamps
+	map(0x22, 0x22).mirror(0x40).portr("IN1").w(FUNC(cmaster_state::coincount_w));
+	map(0x23, 0x23).mirror(0x40).portr("IN2").w(FUNC(cmaster_state::girl_scroll_w));
 }
 
 void cmaster_state::cmast91_portmap(address_map &map)
@@ -6383,8 +6365,8 @@ static INPUT_PORTS_START( cmast97 )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Double Up Game" )          PORT_DIPLOCATION("DSW1:!1")
-	PORT_DIPSETTING(    0x01, "Used" )
-	PORT_DIPSETTING(    0x00, "Not Use" )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x02, 0x00, "Double Up Game Type" )     PORT_DIPLOCATION("DSW1:!2")
 	PORT_DIPSETTING(    0x02, "Red / Black" )
 	PORT_DIPSETTING(    0x00, "Big / Small" )
@@ -6392,8 +6374,8 @@ static INPUT_PORTS_START( cmast97 )
 	PORT_DIPSETTING(    0x04, "Even" )
 	PORT_DIPSETTING(    0x00, "Loss" )
 	PORT_DIPNAME( 0x08, 0x08, "Double Up Girl Display" )  PORT_DIPLOCATION("DSW1:!4")
-	PORT_DIPSETTING(    0x08, "Displayed" )
-	PORT_DIPSETTING(    0x00, "Un-displayed" )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x10, 0x10, "Payout Speed" )            PORT_DIPLOCATION("DSW1:!5")
 	PORT_DIPSETTING(    0x10, "Payout SW" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
@@ -15942,8 +15924,9 @@ void cmaster_state::crazybonb(machine_config &config)
 
 void cmaster_state::animalhs(machine_config &config)
 {
-	crazybonb(config);
+	pkrmast(config);
 
+	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::super972_decrypted_opcodes_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::animalhs_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::animalhs_portmap);
 
@@ -15953,16 +15936,12 @@ void cmaster_state::animalhs(machine_config &config)
 	m_gfxdecode->set_info(gfx_animalhs);
 	m_palette->set_init(FUNC(cmaster_state::cmast91_palette));
 
-	subdevice<ay8910_device>("aysnd")->port_a_read_callback().set_ioport("DSW5");
-	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("DSW6");
+	subdevice<ay8910_device>("aysnd")->port_a_read_callback().set_ioport("DSW4");
+	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("DSW5");
+
+	m_enable_reg = 0x1b;
 }
 
-void cmaster_state::eldoraddoa(machine_config &config)
-{
-	animalhs(config);
-
-	m_maincpu->set_addrmap(AS_IO, &cmaster_state::eldoraddoa_portmap);
-}
 
 void wingco_state::megaline(machine_config &config)
 {
@@ -30474,6 +30453,12 @@ void cmaster_state::init_noved()
 	m_palette->update();
 }
 
+void cmast97_state::init_cm97()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x4d9a] = 0x08;  // fix video register
+}
+
 
 } // anonymous namespace
 
@@ -30516,9 +30501,9 @@ GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g
 GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangla, ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // DYNA CB3  V1.40 string, playable, but still has protections
 
-GAME(  1991, eldoraddoa, eldoradd, eldoraddoa,animalhs,cmaster_state,  init_eldoraddoa,ROT0, "Dyna",              "El Dorado (V1.4D)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // improve GFX drawing, correct palette decode, I/O, etc
-GAMEL( 1991, animalhs,   0,        animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 1)",                  0,                 layout_animalhs ) // improve GFX drawing, correct palette decode
-GAME(  1991, animalhsa,  animalhs, animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, etc
+GAME(  1991, eldoraddoa, eldoradd, animalhs, animalhs, cmaster_state,  init_eldoraddoa,ROT0, "Dyna",              "El Dorado (V1.4D)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // improve GFX drawing, correct palette decode, girls support if applies
+GAMEL( 1991, animalhs,   0,        animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 1)",                  0,                 layout_animalhs ) // improve GFX drawing, correct palette decode, girls support if applies
+GAME(  1991, animalhsa,  animalhs, animalhs, animalhs, cmaster_state,  init_animalhs,  ROT0, "Suns Co Ltd.",      "Animal House (V1.0, set 2)",                  MACHINE_NOT_WORKING ) // improve GFX drawing, correct palette decode, I/O, girls support if applies
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,   ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // SKY SUPERCB 1.0 string, playable, but still has protections
@@ -30617,7 +30602,7 @@ GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_ini
 GAME(  1991, eldoraddo,  eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddob, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V2.0D)",                           MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddoc, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1J)",                           MACHINE_NOT_WORKING ) // different GFX hw?
-GAMEL( 1996, cmast97,    0,        cmast97,  cmast97,  cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             0,    layout_cmast97 )
+GAMEL( 1996, cmast97,    0,        cmast97,  cmast97,  cmast97_state,  init_cm97,      ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             0,    layout_cmast97 )
 GAMEL( 1997, cmast97a,   cmast97,  cmast97,  cmast97a, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2, no girls)",   0,    layout_cmast97 )
 GAMEL( 1996, cmast97b,   cmast97,  cmast97,  cmast97a, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 3, no girls)",   0,    layout_cmast97 )
 GAMEL( 1996, cmast97i,   cmast97,  cmast97,  cmast97i, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     0,    layout_cmast97 )
