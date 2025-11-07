@@ -106,11 +106,16 @@ public:
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
 
 	// configuration access
-	template<std::size_t Line> auto int_cb() { return m_int_callback[Line].bind(); }
+	template<std::size_t Line> auto int_cb() { return m_int_cb[Line].bind(); }
+//	template<std::size_t Line> auto drq_cb() { return m_drq_cb[Line].bind(); }
+//	template<std::size_t Line> auto dma_r() { return m_dma_in_cb[Line].bind(); }
+//	template<std::size_t Line> auto dma_w() { return m_dma_out_cb[Line].bind(); }
 
 	address_space &program_space() const { return *m_memspace; }
 	address_space &io_space() const { return *m_iospace; }
-	template<int I> void int_w(bool state) { m_int_callback[I](state); }
+	template<int I> void int_w(int state) { m_int_cb[I](state); }
+//	template<int I> void drq_w(int state) { m_drq_cb[I](state); }
+
 	template<typename R, typename W> void install_io(offs_t start, offs_t end, R rhandler, W whandler);
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
 	{
@@ -126,7 +131,8 @@ private:
 //  device_pc9801_slot_card_interface *m_card;
 	required_address_space m_memspace;
 	required_address_space m_iospace;
-	devcb_write_line::array<7> m_int_callback;
+	devcb_write_line::array<7> m_int_cb;
+//	devcb_write_line::array<4> m_drq_cb;
 };
 
 

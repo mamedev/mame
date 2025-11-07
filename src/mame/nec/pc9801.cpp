@@ -2023,6 +2023,9 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	m_cbus[0]->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
 	m_cbus[0]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
 	m_cbus[0]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
+//	m_cbus[0]->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
+//	m_dmac->in_ior_callback<0>().set([] () { printf("read\n"); return 0xff; });
+//	m_dmac->out_iow_callback<0>().set([] (u8 data) { printf("write %02x\n", data); });
 
 	PC98_CBUS_SLOT(config, m_cbus[1], pc98_cbus_devices, nullptr);
 	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);

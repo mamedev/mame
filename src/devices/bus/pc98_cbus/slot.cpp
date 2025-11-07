@@ -69,12 +69,15 @@ device_pc9801cbus_card_interface::~device_pc9801cbus_card_interface()
 //  pc98_cbus_slot_device - constructor
 //-------------------------------------------------
 
-pc98_cbus_slot_device::pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PC98_CBUS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_memspace(*this, finder_base::DUMMY_TAG, -1),
-	m_iospace(*this, finder_base::DUMMY_TAG, -1),
-	m_int_callback(*this)
+pc98_cbus_slot_device::pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC98_CBUS_SLOT, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
+	, m_memspace(*this, finder_base::DUMMY_TAG, -1)
+	, m_iospace(*this, finder_base::DUMMY_TAG, -1)
+	, m_int_cb(*this)
+//	, m_drq_cb(*this)
+//	, m_dma_in_cb(*this, 0)
+//	, m_dma_out_cb(*this)
 {
 }
 

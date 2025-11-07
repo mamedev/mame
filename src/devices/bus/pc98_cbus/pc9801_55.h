@@ -57,9 +57,12 @@ private:
 	void io_map(address_map &map) ATTR_COLD;
 	void internal_map(address_map &map) ATTR_COLD;
 
+	void flush_rom_bank();
 	u8 m_ar;
 	u8 m_port30;
 	u8 m_pkg_id;
+	u8 m_rom_bank;
+	bool m_dma_enable;
 };
 
 class pc9801_55u_device : public pc9801_55_device

@@ -5,10 +5,10 @@
 NEC PC-9801-55/-55U/-55L
 
 SCSI interface, running on WD33C93A
+HDDs apparently needs to be with 8 heads and 25 cylinders only
 
 TODO:
-- Loops on a routine where both BSY and irq are constantly low after executing a transfer 6 bytes command;
-- DMA / DRQ;
+- Requires C-Bus root implementation for DMA DACK to work;
 - PC-9801-55 also runs on this except with vanilla WD33C93 instead;
 
 **************************************************************************************************/
@@ -77,9 +77,19 @@ void pc9801_55_device::scsi_irq_w(int state)
 
 void pc9801_55_device::scsi_drq_w(int state)
 {
-	// TODO: DRQ on C-bus
-	logerror("DRQ %d\n", state);
+	// TODO: needs a C-Bus root
+//	m_bus->drq_w<0>(state);
 }
+
+//u8 pc9801_55_device::dma_r()
+//{
+//	return m_wdc->dma_r();
+//}
+//
+//void pc9801_55_device::dma_w(u8 data)
+//{
+//	m_wdc->dma_w(data);
+//}
 
 
 void pc9801_55_device::device_add_mconfig(machine_config &config)
@@ -172,7 +182,9 @@ void pc9801_55_device::device_start()
 {
 	save_item(NAME(m_ar));
 	save_item(NAME(m_port30));
+	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_pkg_id));
+	save_item(NAME(m_dma_enable));
 }
 
 
@@ -182,24 +194,29 @@ void pc9801_55_device::device_start()
 
 void pc9801_55_device::device_reset()
 {
-	m_bus->program_space().install_rom(
-		0xdc000,
-		0xdcfff,
-		memregion(this->subtag("scsi_bios").c_str())->base()
-	);
-
+	m_rom_bank = 0;
+	flush_rom_bank();
 	m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_55_device::io_map);
 
 	m_pkg_id = 0xfd;
-	m_port30 = 0x40;
+	m_port30 = 0x00;
 	m_ar = 0;
+	m_dma_enable = false;
 }
 
+void pc9801_55_device::flush_rom_bank()
+{
+	m_bus->program_space().install_rom(
+		0xdc000,
+		0xdcfff,
+		memregion(this->subtag("scsi_bios").c_str())->base() + m_rom_bank * 0x1000
+	);
+}
 
 void pc9801_55_device::io_map(address_map &map)
 {
 	map(0x0cc0, 0x0cc0).lrw8(
-		NAME([this] (offs_t offset) { return m_wdc->indir_addr_r(); }),
+		NAME([this] (offs_t offset) { return m_wdc->status_r(); }),
 		NAME([this] (offs_t offset, u8 data) { m_ar = data; })
 	);
 	map(0x0cc2, 0x0cc2).lrw8(
@@ -210,7 +227,29 @@ void pc9801_55_device::io_map(address_map &map)
 			space(AS_IO).write_byte(m_ar, data);
 		})
 	);
-	// TODO: I/O 0xcc4
+	map(0x0cc4, 0x0cc4).lrw8(
+		// -x-- ---- Interrupt by TCI DMA TCO signal
+		// ---- --xx DMA channel switch status
+		NAME([this] (offs_t offset) {
+			logerror("Read Name Status I/O\n");
+			return 0;
+		}),
+		// ---x ---- TCIR reset TC interrupt
+		// ---- x--- TCMR reset TC interrupt mask
+		// ---- -x-- TCMS set TC interrupt mask
+		// ---- --x- DMER reset DMA enable
+		// ---- ---x DMES set DMA enable
+		// TODO: who wins if both bits of a couple are enabled?
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("Write Interrupt Control I/O %02x\n", data);
+			if (BIT(data, 1))
+				m_dma_enable = false;
+			if (BIT(data, 0))
+				m_dma_enable = true;
+			if ((data & 3) == 3)
+				popmessage("pc9801_55.cpp: DMA enable undocumented write %02x", data);
+		})
+	);
 }
 
 void pc9801_55_device::internal_map(address_map &map)
@@ -228,6 +267,12 @@ void pc9801_55_device::internal_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			logerror("$30 Memory Bank %02x\n", data);
 			m_wdc->reset_w(!BIT(data, 1));
+
+			if ((data & 0xc0) != (m_port30 & 0xc0))
+			{
+				m_rom_bank = data >> 6;
+				flush_rom_bank();
+			}
 			m_port30 = data;
 		})
 	);
