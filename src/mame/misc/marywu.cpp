@@ -60,7 +60,7 @@ private:
 	uint8_t m_selected_7seg_module = 0;
 
 	output_finder<32> m_digits;
-	output_finder<48> m_leds;
+	output_finder<40> m_leds;
 	required_ioport_array<4> m_inputs;
 };
 
@@ -134,7 +134,7 @@ void marywu_state::ay2_port_b_w(uint8_t data)
 
 void marywu_state::p3_port_w(uint8_t data) // 1 led are used.
 {
-	for (uint8_t i = 0; i < 8; i++)
+	for (uint8_t i = 0; i < 0; i++)
 		m_leds[i + 32] = BIT(data, i);
 }
 
@@ -197,7 +197,7 @@ void marywu_state::marywu(machine_config &config)
 	maincpu.set_addrmap(AS_DATA, &marywu_state::data_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 	maincpu.port_in_cb<1>().set_ioport("P1");
-	maincpu.port_out_cb<3>().set(FUNC(p3_port_w));
+	maincpu.port_out_cb<3>().set(FUNC(p3_port_w)); // Seem to be LED output. start blinking if error occured.
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
