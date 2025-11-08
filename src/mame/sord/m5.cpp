@@ -377,7 +377,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(FDC_MOTOR_TIMEOUT_cb);
-	TIMER_CALLBACK_MEMBER(fdc_irq_timer_cb);
 	emu_timer *m_motor_timer = nullptr;
 
 private:
@@ -1089,14 +1088,6 @@ TIMER_CALLBACK_MEMBER(m5_state::FDC_MOTOR_TIMEOUT_cb)
 	m_floppy0->mon_w(1); //timeout -> turn motor off
 }
 
-TIMER_CALLBACK_MEMBER(m5_state::fdc_irq_timer_cb)
-{
-	if (m_fd5cpu)
-	{
-		if (FD5_DEBUG) LOG("FD5 CPU IRQ ASSERTED NOW\n");
-		m_fd5cpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	}
-}
 
 //-------------------------------------------------
 //  fd5_com_w - 0x50
