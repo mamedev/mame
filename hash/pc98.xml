@@ -59822,13 +59822,11 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 	</software>
 
-	<software name="kurayami" supported="no">
+	<!-- Disk 2 copy protection repaired by hand -->
+	<software name="kurayami" supported="yes">
 		<description>Kurayami</description>
 		<year>1996</year>
 		<publisher>メロディ (Melody)</publisher>
-		<notes><![CDATA[
-Cannot install, tests [FDC] chrn=(0, 1, 9, 256)  on disk 2 swap (same as sangofgt)
-]]></notes>
 		<info name="alt_title" value="暗闇" />
 		<info name="release" value="19960726" />
 		<part name="flop1" interface="floppy_5_25">
@@ -59839,9 +59837,9 @@ Cannot install, tests [FDC] chrn=(0, 1, 9, 256)  on disk 2 swap (same as sangofg
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="952316">
+			<dataarea name="flop" size="1283008">
 				<!-- baddump: as note above -->
-				<rom name="kurayami (1996)(melody)(disk 2 of 5)[req install].fdd" size="952316" crc="38cdfb19" sha1="bcc9537c2d24bb62acbe44c8683bfdb03561d945" offset="0" status="baddump" />
+				<rom name="kurayami (1996)(melody)(disk 2 of 5)[req install].d88" size="1283008" crc="18febc6a" sha1="9294a37c1474a2210b1f01aef8c1bd18320c8d17" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
