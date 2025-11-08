@@ -52,7 +52,8 @@ private:
 	void ay1_port_b_w(uint8_t data);
 	void ay2_port_a_w(uint8_t data);
 	void ay2_port_b_w(uint8_t data);
-	uint8_t keyboard_r();
+	void p3_port_w(uint8_t data);
+    uint8_t keyboard_r();
 	void data_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 
