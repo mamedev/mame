@@ -351,8 +351,18 @@ void acvirus_state::virusc(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(acvirus_state::p3_w));
 	m_maincpu->port_in_cb<4>().set(FUNC(acvirus_state::p4_r));
+	m_maincpu->port_out_cb<4>().set(FUNC(acvirus_state::p4_w));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
+	m_maincpu->an0_func().set([this] { return m_knob[4*0 + m_an_select]->read(); });
+	m_maincpu->an1_func().set([this] { return m_knob[4*1 + m_an_select]->read(); });
+	m_maincpu->an2_func().set([this] { return m_knob[4*2 + m_an_select]->read(); });
+	m_maincpu->an3_func().set([this] { return m_knob[4*3 + m_an_select]->read(); });
+	m_maincpu->an4_func().set([this] { return m_knob[4*4 + m_an_select]->read(); });
+	m_maincpu->an5_func().set([this] { return m_knob[4*5 + m_an_select]->read(); });
+	m_maincpu->an6_func().set([this] { return m_knob[4*6 + m_an_select]->read(); });
+	m_maincpu->an7_func().set([this] { return m_knob[4*7 + m_an_select]->read(); });
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
@@ -478,6 +488,105 @@ INPUT_PORTS_START( virusa_knobs )
 INPUT_PORTS_END
 
 
+INPUT_PORTS_START( virusc_knobs )
+	PORT_START("knob_0")
+	PORT_ADJUSTER(64, "LFOs: Rate") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_1")
+	PORT_ADJUSTER(64, "Effects: Send") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_2")
+	PORT_ADJUSTER(64, "Master Volume") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_3")
+	PORT_ADJUSTER(64, "Osc: Shape") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_4")
+	PORT_ADJUSTER(64, "Effects: Delay / Rev Time") PORT_MINMAX(0, 127) // "Delay Decay"
+
+	PORT_START("knob_5")
+	PORT_ADJUSTER(64, "Effects: Intensity") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_6")
+	PORT_ADJUSTER(64, "Effects: Type / Mix") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_7")
+	PORT_ADJUSTER(64, "Effects: Feedback / Damping") PORT_MINMAX(0, 127) // "Delay Feedback"
+
+	PORT_START("knob_8")
+	PORT_ADJUSTER(64, "Mix: Osc Bal") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_9")
+	PORT_ADJUSTER(64, "Soft Knob 1") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_10")
+	PORT_ADJUSTER(64, "Soft Knob 2 / Value") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_11")
+	PORT_ADJUSTER(64, "Mix: Sub Osc") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_12")
+	PORT_ADJUSTER(64, "Osc: Wave Sel / PW") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_13")
+	PORT_ADJUSTER(64, "Osc: Detune") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_14")
+	PORT_ADJUSTER(64, "Osc: FM Amount") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_15")
+	PORT_ADJUSTER(64, "Osc: Semitone") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_16")
+	PORT_ADJUSTER(64, "Amp: Attack") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_17")
+	PORT_ADJUSTER(64, "Filters: Attack") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_18")
+	PORT_ADJUSTER(64, "Filters: Cutoff 2") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_19")
+	PORT_ADJUSTER(64, "Amp: Decay") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_20")
+	PORT_ADJUSTER(64, "Mix: Osc Vol") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_21")
+	PORT_ADJUSTER(64, "Filters: Cutoff") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_22")
+	PORT_ADJUSTER(64, "Mix: Noise") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_23")
+	PORT_ADJUSTER(64, "Mix: Ring Mod") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_24")
+	PORT_ADJUSTER(64, "Filters: Release") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_25")
+	PORT_ADJUSTER(64, "Filters: Balance") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_26")
+	PORT_ADJUSTER(64, "Amp: Sustain") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_27")
+	PORT_ADJUSTER(64, "Amp: Release") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_28")
+	PORT_ADJUSTER(64, "Filters: Decay") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_29")
+	PORT_ADJUSTER(64, "Filters: Sustain") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_30")
+	PORT_ADJUSTER(64, "Filters: Resonance") PORT_MINMAX(0, 127)
+
+	PORT_START("knob_31")
+	PORT_ADJUSTER(64, "Filters: Env Amount") PORT_MINMAX(0, 127)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( virusa )
 	PORT_INCLUDE( virusa_knobs )
 
@@ -592,7 +701,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( virusc )
-	PORT_INCLUDE( virusa_knobs )
+	PORT_INCLUDE( virusc_knobs )
 
 	PORT_START("ROW0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_1) PORT_NAME("ArpEdit")
