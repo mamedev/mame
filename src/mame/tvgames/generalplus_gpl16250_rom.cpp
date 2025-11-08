@@ -491,7 +491,6 @@ void tkmag220_game_state::machine_reset()
 	//m_maincpu->set_paldisplaybank_high_hack(0);
 	//m_maincpu->set_pal_sprites_hack(0x000);
 	//m_maincpu->set_pal_back_hack(0x000);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 
@@ -583,7 +582,6 @@ void beijuehh_game_state::machine_reset()
 	//m_maincpu->set_paldisplaybank_high_hack(0);
 	//m_maincpu->set_pal_sprites_hack(0x000);
 	//m_maincpu->set_pal_back_hack(0x000);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 	//m_maincpu->set_alt_extrasprite_hack(1);
 	m_maincpu->set_legacy_video_mode();
 }
@@ -606,7 +604,6 @@ void gameu_handheld_game_state::gameu(machine_config &config)
 void gormiti_game_state::machine_reset()
 {
 	gcm394_game_state::machine_reset();
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 uint16_t gameu_handheld_game_state::cs0_r(offs_t offset)
@@ -664,7 +661,6 @@ void gameu_handheld_game_state::machine_start()
 void gameu_handheld_game_state::machine_reset()
 {
 	gcm394_game_state::machine_reset();
-	m_maincpu->set_alt_tile_addressing_hack(1);
 	m_upperbase = 0;
 }
 
@@ -681,10 +677,7 @@ void gameu_handheld_game_state::init_gameu()
 									 8, 7, 13, 15, 4, 5,  12, 10);
 	}
 
-	m_maincpu->set_alt_tile_addressing_hack(0);
 	m_maincpu->set_disallow_resolution_control();
-
-
 }
 
 void gameu_handheld_game_state::init_gameu50()

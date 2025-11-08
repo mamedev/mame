@@ -399,7 +399,7 @@ void spg_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screen
 	}
 }
 
-void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_tilemaps, bool use_alt_tile_addressing, uint32_t palbank, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
+void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_tilemaps, uint32_t palbank, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
 {
 	const uint32_t attr = tilemapregs[0];
 	const uint32_t ctrl = tilemapregs[1];
@@ -484,15 +484,15 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 
 	uint32_t words_per_tile;
 
+	words_per_tile = bits_per_row * tile_h;
+
 	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
-	if (has_extended_tilemaps && use_alt_tile_addressing)
+	if (has_extended_tilemaps)
 	{
-		words_per_tile = 8;
+		if (m_video_regs_7f & 0x0004)
+			words_per_tile = 8;
 	}
-	else
-	{
-		words_per_tile = bits_per_row * tile_h;
-	}
+
 
 	int realxscroll = xscroll;
 	if (row_scroll)
@@ -555,7 +555,7 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;
 
-		if (has_extended_tilemaps && use_alt_tile_addressing)
+		if (has_extended_tilemaps && (m_video_regs_7f & 0x0004))
 		{
 			// in this mode what would be the 'palette' bits get used for extra tile bits (even if the usual 'extended table' mode is disabled?)
 			// used by smartfp
@@ -722,6 +722,11 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 		{
 			// paccon and smartfp use this mode
 			words_per_tile = 8;
+		}
+		else
+		{
+			// extended address bits only used in direct mode, jak_prr and other GPAC500 games rely on this
+			tile &= 0xffff;
 		}
 	}
 

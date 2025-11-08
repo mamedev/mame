@@ -37,7 +37,6 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_rowscroll(*this, "^rowscroll"),
 	m_rowzoom(*this, "^rowzoom"),
 	m_alt_extrasprite_hack(0),
-	m_alt_tile_addressing(0),
 	m_use_legacy_mode(false),
 	m_disallow_resolution_control(false),
 	m_renderer(*this, "renderer")
@@ -254,7 +253,6 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_spriteram));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_maxgfxelement));
-	save_item(NAME(m_alt_tile_addressing));
 }
 
 void gcm394_base_video_device::device_reset()
@@ -409,10 +407,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page0_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page1_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
+			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page0_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
+			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page1_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
+			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
+			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
 			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_alt_extrasprite_hack ? true : false, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
 		}
@@ -792,14 +790,19 @@ void gcm394_base_video_device::video_dma_size_trigger_w(address_space &space, ui
 
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_707e_spritebank, m_707f );
 
-	// sprite DMA can only write to spriteram
+	// sprite DMA can only write to spriteram (just like on spg2xx)
 	int dest = m_videodma_dest & 0x03ff;
 	int size = m_videodma_size & 0x03ff;
 
+	// on spg2xx size 0 means full transfer, with a < condition in the loop rather than <=
+	// jak_spmm seems to indicate that it differs here
+
 	for (int i = 0; i <= size; i++)
 	{
-		uint16_t dat = space.read_word(m_videodma_source+i);
-		space.write_word(0x7400 + ((dest + i) & 0x3ff), dat);
+		uint16_t dat = space.read_word(m_videodma_source + i);
+
+		if ((dest + i) < 0x400)
+			space.write_word(0x7400 + dest + i, dat);
 	}
 
 	m_videodma_size = 0x0000;
