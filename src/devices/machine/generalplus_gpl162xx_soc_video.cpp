@@ -328,17 +328,25 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
 
-	uint32_t page0_addr = (m_page0_addr_msb << 16) | m_page0_addr_lsb;
-	uint32_t page1_addr = (m_page1_addr_msb << 16) | m_page1_addr_lsb;
-	uint32_t page2_addr = (m_page2_addr_msb << 16) | m_page2_addr_lsb;
-	uint32_t page3_addr = (m_page3_addr_msb << 16) | m_page3_addr_lsb;
+	// graphic data segments/bases
+	uint32_t page0_addr;
+	uint32_t page1_addr;
+	uint32_t page2_addr;
+	uint32_t page3_addr;
 
-	if (m_use_legacy_mode)
+	if (m_707f & 0x0040) // FREE == 1
 	{
-		page0_addr = page0_addr * 0x40;
-		page1_addr = page1_addr * 0x40;
-		page2_addr = page2_addr * 0x40;
-		page3_addr = page3_addr * 0x40;
+		page0_addr = ((m_page0_addr_msb & 0x07ff) << 16) | m_page0_addr_lsb;
+		page1_addr = ((m_page1_addr_msb & 0x07ff) << 16) | m_page1_addr_lsb;
+		page2_addr = ((m_page2_addr_msb & 0x07ff) << 16) | m_page2_addr_lsb;
+		page3_addr = ((m_page3_addr_msb & 0x07ff) << 16) | m_page3_addr_lsb;
+	}
+	else // FREE == 0
+	{
+		page0_addr = m_page0_addr_lsb * 0x40;
+		page1_addr = m_page1_addr_lsb * 0x40;
+		page2_addr = m_page2_addr_lsb * 0x40;
+		page3_addr = m_page3_addr_lsb * 0x40;
 	}
 
 
@@ -394,11 +402,16 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	address_space &mem = m_cpu->space(AS_PROGRAM);
 
+	uint32_t sprites_addr;
 
-	uint32_t sprites_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
-
-	if (m_use_legacy_mode)
-		sprites_addr *= 0x40;
+	if (m_707f & 0x0040) // FREE == 1
+	{
+		sprites_addr = ((m_sprite_702d_gfxbase_msb & 0x07ff) << 16) | m_sprite_7022_gfxbase_lsb;
+	}
+	else
+	{
+		sprites_addr = m_sprite_7022_gfxbase_lsb * 0x40;
+	}
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
