@@ -502,10 +502,9 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
 	if (has_extended_tilemaps)
 	{
-		if (m_video_regs_7f & 0x0004)
+		if (m_video_regs_7f & 0x0004) // TX_DIRECT
 			words_per_tile = 8;
 	}
-
 
 	int realxscroll = xscroll;
 	if (row_scroll)
@@ -568,17 +567,16 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;
 
-		if (has_extended_tilemaps && (m_video_regs_7f & 0x0004))
+		if (has_extended_tilemaps && (m_video_regs_7f & 0x0004)) // TX_DIRECT
 		{
-			// in this mode what would be the 'palette' bits get used for extra tile bits (even if the usual 'extended table' mode is disabled?)
-			// used by smartfp
 			uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
 			if (realx0 & 1)
 				exattribute >>= 8;
 			else
 				exattribute &= 0x00ff;
 
-			tile |= (exattribute & 0x07) << 16;
+			// when TX_DIRECT is used the attributes become extra addressing bits (smartfp)
+			tile |= (exattribute & 0xff) << 16;
 			//blendlevel = 0x1f; // hack
 		}
 		else if ((ctrl & 2) == 0)
