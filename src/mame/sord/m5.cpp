@@ -1092,8 +1092,10 @@ TIMER_CALLBACK_MEMBER(m5_state::FDC_MOTOR_TIMEOUT_cb)
 TIMER_CALLBACK_MEMBER(m5_state::fdc_irq_timer_cb)
 {
 	if (m_fd5cpu)
+	{
 		if (FD5_DEBUG) LOG("FD5 CPU IRQ ASSERTED NOW\n");
 		m_fd5cpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	}
 }
 
 //-------------------------------------------------
