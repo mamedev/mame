@@ -328,27 +328,6 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
 
-	// graphic data segments/bases
-	uint32_t page0_addr;
-	uint32_t page1_addr;
-	uint32_t page2_addr;
-	uint32_t page3_addr;
-
-	if (m_707f & 0x0040) // FREE == 1
-	{
-		page0_addr = ((m_page0_addr_msb & 0x07ff) << 16) | m_page0_addr_lsb;
-		page1_addr = ((m_page1_addr_msb & 0x07ff) << 16) | m_page1_addr_lsb;
-		page2_addr = ((m_page2_addr_msb & 0x07ff) << 16) | m_page2_addr_lsb;
-		page3_addr = ((m_page3_addr_msb & 0x07ff) << 16) | m_page3_addr_lsb;
-	}
-	else // FREE == 0
-	{
-		page0_addr = m_page0_addr_lsb * 0x40;
-		page1_addr = m_page1_addr_lsb * 0x40;
-		page2_addr = m_page2_addr_lsb * 0x40;
-		page3_addr = m_page3_addr_lsb * 0x40;
-	}
-
 
 	if (0)
 	{
@@ -371,10 +350,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 			"p2attr dw:%01x dh:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d xs: %04x ys %04x\n"
 			"p3attr dw:%01x dh:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d xs: %04x ys %04x\n"
 			"palbank %04x 707e: %04x 707f: %04x tvc703c: %04x spr7042: %04x\n",
-			(ctrl0 & 0xfe00) >> 9, BIT(ctrl0, 8), BIT(ctrl0, 7), BIT(ctrl0, 6), BIT(ctrl0, 5), BIT(ctrl0, 4), BIT(ctrl0, 3), BIT(ctrl0, 2), BIT(ctrl0, 1), BIT(ctrl0, 0), page0_addr, m_tmap0_regs[2], m_tmap0_regs[3],
-			(ctrl1 & 0xfe00) >> 9, BIT(ctrl1, 8), BIT(ctrl1, 7), BIT(ctrl1, 6), BIT(ctrl1, 5), BIT(ctrl1, 4), BIT(ctrl1, 3), BIT(ctrl1, 2), BIT(ctrl1, 1), BIT(ctrl1, 0), page1_addr, m_tmap1_regs[2], m_tmap1_regs[3],
-			(ctrl2 & 0xfe00) >> 9, BIT(ctrl2, 8), BIT(ctrl2, 7), BIT(ctrl2, 6), BIT(ctrl2, 5), BIT(ctrl2, 4), BIT(ctrl2, 3), BIT(ctrl2, 2), BIT(ctrl2, 1), BIT(ctrl2, 0), page2_addr, m_tmap2_regs[2], m_tmap2_regs[3],
-			(ctrl3 & 0xfe00) >> 9, BIT(ctrl3, 8), BIT(ctrl3, 7), BIT(ctrl3, 6), BIT(ctrl3, 5), BIT(ctrl3, 4), BIT(ctrl3, 3), BIT(ctrl3, 2), BIT(ctrl3, 1), BIT(ctrl3, 0), page3_addr, m_tmap3_regs[2], m_tmap3_regs[3],
+			(ctrl0 & 0xfe00) >> 9, BIT(ctrl0, 8), BIT(ctrl0, 7), BIT(ctrl0, 6), BIT(ctrl0, 5), BIT(ctrl0, 4), BIT(ctrl0, 3), BIT(ctrl0, 2), BIT(ctrl0, 1), BIT(ctrl0, 0), m_page0_addr_lsb, m_tmap0_regs[2], m_tmap0_regs[3],
+			(ctrl1 & 0xfe00) >> 9, BIT(ctrl1, 8), BIT(ctrl1, 7), BIT(ctrl1, 6), BIT(ctrl1, 5), BIT(ctrl1, 4), BIT(ctrl1, 3), BIT(ctrl1, 2), BIT(ctrl1, 1), BIT(ctrl1, 0), m_page1_addr_lsb, m_tmap1_regs[2], m_tmap1_regs[3],
+			(ctrl2 & 0xfe00) >> 9, BIT(ctrl2, 8), BIT(ctrl2, 7), BIT(ctrl2, 6), BIT(ctrl2, 5), BIT(ctrl2, 4), BIT(ctrl2, 3), BIT(ctrl2, 2), BIT(ctrl2, 1), BIT(ctrl2, 0), m_page2_addr_lsb, m_tmap2_regs[2], m_tmap2_regs[3],
+			(ctrl3 & 0xfe00) >> 9, BIT(ctrl3, 8), BIT(ctrl3, 7), BIT(ctrl3, 6), BIT(ctrl3, 5), BIT(ctrl3, 4), BIT(ctrl3, 3), BIT(ctrl3, 2), BIT(ctrl3, 1), BIT(ctrl3, 0), m_page3_addr_lsb, m_tmap3_regs[2], m_tmap3_regs[3],
 			BIT(attr0, 15), BIT(attr0, 14), (attr0 >> 12) & 3, (attr0 >> 8) & 15, 8 << ((attr0 >> 6) & 3), 8 << ((attr0 >> 4) & 3), BIT(attr0, 3), BIT(attr0, 2), 2 * ((attr0 & 3) + 1), m_tmap0_scroll[0], m_tmap0_scroll[1],
 			BIT(attr1, 15), BIT(attr1, 14), (attr1 >> 12) & 3, (attr1 >> 8) & 15, 8 << ((attr1 >> 6) & 3), 8 << ((attr1 >> 4) & 3), BIT(attr1, 3), BIT(attr1, 2), 2 * ((attr1 & 3) + 1), m_tmap1_scroll[0], m_tmap1_scroll[1],
 			BIT(attr2, 15), BIT(attr2, 14), (attr2 >> 12) & 3, (attr2 >> 8) & 15, 8 << ((attr2 >> 6) & 3), 8 << ((attr2 >> 4) & 3), BIT(attr2, 3), BIT(attr2, 2), 2 * ((attr2 & 3) + 1), m_tmap2_scroll[0], m_tmap2_scroll[1],
@@ -419,10 +398,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page0_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
-			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page1_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
-			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
-			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
+			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, m_page0_addr_msb, m_page0_addr_lsb, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
+			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, m_page1_addr_msb, m_page1_addr_lsb, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
+			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, m_page2_addr_msb, m_page2_addr_lsb, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
+			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, m_page3_addr_msb, m_page3_addr_lsb, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
 			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
 		}
