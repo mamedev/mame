@@ -136,7 +136,8 @@ private:
 
 	u8 p402_r();
 
-	void palette_init(palette_device &palette) ATTR_COLD;
+	void red_palette_init(palette_device &palette) ATTR_COLD;
+	void green_palette_init(palette_device &palette) ATTR_COLD;
 
 	required_ioport_array<32> m_knob;
 	optional_device<pwm_display_device> m_leds;
@@ -240,10 +241,16 @@ void acvirus_state::dsp_y_map(address_map &map)
 	map(0x20000, 0x3ffff).ram();
 }
 
-void acvirus_state::palette_init(palette_device &palette)
+void acvirus_state::green_palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(142, 241, 0));
 	palette.set_pen_color(1, rgb_t(0, 48, 0));
+}
+
+void acvirus_state::red_palette_init(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t(70, 23, 26));
+	palette.set_pen_color(1, rgb_t(234, 56, 57));
 }
 
 void acvirus_state::virusa(machine_config &config)
@@ -272,7 +279,7 @@ void acvirus_state::virusa(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(acvirus_state::palette_init), 2);
+	PALETTE(config, "palette", FUNC(acvirus_state::green_palette_init), 2);
 
 	/* Actual device is LM16255 */
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
@@ -318,7 +325,7 @@ void acvirus_state::virusb(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(acvirus_state::palette_init), 2);
+	PALETTE(config, "palette", FUNC(acvirus_state::green_palette_init), 2);
 
 	/* Actual device is LM16255 */
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
@@ -354,7 +361,7 @@ void acvirus_state::virusc(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(acvirus_state::palette_init), 2);
+	PALETTE(config, "palette", FUNC(acvirus_state::red_palette_init), 2);
 
 	/* Actual device is LM16255 */
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
