@@ -748,6 +748,19 @@ void gcm394_base_video_device::sprite_7042_extra_w(uint16_t data)
 	m_7042_sprite = data;
 	m_renderer->set_video_reg_42(data);
 
+	// format is
+	// NNNN NNNN ZRMD rBCE
+	//
+	// N = number of sprites to draw
+	// Z = global sprite zoom enable
+	// R = global sprite rotate enable
+	// M = global sprite mosaic enable
+	// D = direct addressing enable
+	// r = sprite round robin mode
+	// B = blend mode (0 = use 702a for blending, 1 = use individual sprite blending)
+	// C = co-ordinate mode
+	// E = sprite enable
+	
 	//popmessage("extra modes %04x\n", data);
 }
 
@@ -779,15 +792,14 @@ void gcm394_base_video_device::video_dma_size_trigger_w(address_space &space, ui
 
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_707e_spritebank, m_707f );
 
-	// jak_spmm sets dest to 0 when it wants to write to spriteram, looks intentional?
-	// does something else force writes to go to spriteram or does 0 always just mean there?
-	if (m_videodma_dest == 0)
-		m_videodma_dest = 0x7400;
+	// sprite DMA can only write to spriteram
+	int dest = m_videodma_dest & 0x03ff;
+	int size = m_videodma_size & 0x03ff;
 
-	for (int i = 0; i <= m_videodma_size; i++)
+	for (int i = 0; i <= size; i++)
 	{
 		uint16_t dat = space.read_word(m_videodma_source+i);
-		space.write_word(m_videodma_dest + i, dat);
+		space.write_word(0x7400 + ((dest + i) & 0x3ff), dat);
 	}
 
 	m_videodma_size = 0x0000;
@@ -814,22 +826,6 @@ uint16_t gcm394_base_video_device::video_707c_r()
 	return 0x8000;
 }
 
-/* 707f is VERY important, lots of rendering codepaths in the code depend on the value it returns.
-
-   all operations in the code based on 707f are bit based, usually read register, set / clear a bit
-   and then write register, or read register and test an individual bit.
-
-   our current codeflow means that bits are only ever set, not cleared.
-
-   are the bits triggers? acks? enables? status flags?
-
-   in wrlshunt this ends up being set to  02f9   ---- --x- xxxx x--x
-   and in smartfp it ends up being set to 0065   ---- ---- -xx- -x-x
-
-   is this because wrlshunt uses more layers?
-*/
-
-
 uint16_t gcm394_base_video_device::video_707f_r()
 {
 	uint16_t retdata = m_renderer->get_video_reg_7f();
@@ -840,22 +836,26 @@ void gcm394_base_video_device::video_707f_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data);
 
-	for (int i = 0; i < 16; i++)
-	{
-		uint16_t mask = 1 << i;
-
-		if ((m_707f & mask) != (data & mask))
-		{
-			if (data & mask)
-			{
-				LOGMASKED(LOG_GCM394_VIDEO, "\tbit %04x Low -> High\n", mask);
-			}
-			else
-			{
-				LOGMASKED(LOG_GCM394_VIDEO, "\tbit %04x High -> Low\n", mask);
-			}
-		}
-	}
+	// Format for GPL1625x / GPAC800
+	//
+	// S000 MMDF EfIV BDCP
+	//
+	// S# = SAVE_ROM (0 = normal mode, 1 = ROM saving mode, uses even line data for odd lines)
+	// MM = FB_MONO (0 = RGB, 1 = Mono, 2 = 2bpp, 3 = 4bpp)
+	// D* = SPR25D (0 = disable virtual 3D sprites, 1 = enable)
+	// F = FB_FORMAT (0 = RGB565, 1 = RGBG)
+	// E = FB_EN (0 = Half-line base mode, 1 = Frame base mode)
+	// f = FREE (0 = 22 bit addressing, 1 = 27 bit addressing)
+	// I* = VGA_NOINTL (0 = VGA interlace mode 640x480, 1 = VGA-non interlace mode, 640x240)
+	// V* = VGA_EN  (0 = QVGA / 320x240, 1 = VGA / 640x480)
+	// B = TX_BOTUP (0 = top to bottom layers, 1 = bottom to top layers)
+	// D = TX_DIRECT (0 = relative addressing, 1 = direct addressing)
+	// C = TCHAR (0 = disable transparent tile, 1 = enable transparent tile - only works in relative address mode)
+	// P = PPU_EN
+	//
+	// # not on GPL16250 (GPAC500 only?)
+	// * not on GPL1622x / GPL1623x / GPAC500
+	//
 
 	m_707f = data;
 	m_renderer->set_video_reg_7f(data);

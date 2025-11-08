@@ -663,6 +663,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 
 	const spg_renderer_device::blend_enable_t blend = (attr & 0x4000) ? BlendOn : BlendOff;
 	spg_renderer_device::flipx_t flip_x = (attr & 0x0004) ? FlipXOn : FlipXOff;
+	bool flip_y = (attr & 0x0008);
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
@@ -672,43 +673,55 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 	static const uint8_t s_blend_levels[4] = { 0x08, 0x10, 0x18, 0x20 };
 	uint8_t blendlevel = s_blend_levels[m_video_regs_2a & 3];
 
-	uint32_t words_per_tile;
+	uint32_t words_per_tile = bits_per_row * tile_h;
+;
 
-	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
-	if (extended_sprites_mode && ((m_video_regs_42 & 0x0010) == 0x10))
-	{
-		// paccon and smartfp use this mode
-		words_per_tile = 8;
-
-		if (!alt_extrasprite_hack) // 1 extra word for each sprite
-		{
-			// before or after the 0 tile check?
-			tile |= (spriteram[(base_addr / 4) + 0x400] & 0x01ff) << 16;
-			blendlevel = ((spriteram[(base_addr / 4) + 0x400] & 0x3e00) >> 9);
-		}
-		else // jak_prft - no /4 to offset in this mode - 4 extra words per sprite instead ? (or is RAM content incorrect for one of these cases?)
-		{
-			tile |= spriteram[(base_addr) + 0x400] << 16;
-			blendlevel = ((spriteram[(base_addr) + 0x400] & 0x3e00) >> 9);
-		}
-	}
-	else
-	{
-		words_per_tile = bits_per_row * tile_h;
-	}
-
-
-	bool flip_y = (attr & 0x0008);
-
-	// various games don't want the flip bits in the usual place, wrlshunt for example, there's probably a bit to control this
-	// and likewise these bits probably now have a different meaning, so this shouldn't be trusted
-	// beijuehh does NOT want this either (see characters in 'empire fighter')
 	if (extended_sprites_mode)
 	{
-		if (highres || alt_extrasprite_hack)
+		// 7400 format on GPL162xx is
+		//
+		// 7400 - NNNN NNNN NNNN NNNN (N = sprite tile number/address)
+		// 7401 - AAAA AAXX XXXX XXXX (A = Angle or Y1[5:0], X = Xpos/X0[9:0])
+		// 7402 - ZZZZ ZZYY YYYY YYYY (Z = Zoom, or Y2[5:0], Y = Ypos/Y0[9:0])
+		// 7403 - pbDD PPPP VVHH FFCC (p = Palette Bank, b = blend, D = depth, P = palette, V = vertical size, H = horizontal size, F = flip, C = colour)
+
+		if (m_video_regs_7f & 0x0200) // 'virtual 3D' sprite mode (GPAC800 / GPL16250 only) has 4 extra entries per sprite
 		{
+			// 2nd sprite bank is...
+			// 
+			// 7400 - MMBB BBBB NNNN NNNN - M = Mosaic, B = blend level, N = sprite/tile number/adddress)    Attribute 1 of sprite 0 
+			// 7401 - YYYY YYXX XXXX XXXX - Y = Y3[5:0]             X = X1[9:0]                              X1 of sprite 0
+			// 7402 - YYyy yyXX XXXX XXXX - Y = Y3[7:6] y = Y1[9:6] X = X2[9:0]                              X2 of sprite 0
+			// 7403 - YYyy yyXX XXXX XXXX - Y = Y3[9:8] y = Y2[9:6] X = X3[9:0]                              X3 of sprite 0
+			// 7404 - Attribute 1 of sprite 1
+			// ....
+			//
+			// Normally Zoom/Rotate functions are disabled in this mode, as the attributes are use for co-ordinate data
+			// but setting Flip to 0x3 causes them to be used (ignoring flip) instead of the extra co-ordinates
 			flip_x = FlipXOff;
 			flip_y = 0;
+
+			tile |= (spriteram[(base_addr)+0x400] & 0x00ff) << 16;
+			blendlevel = ((spriteram[(base_addr)+0x400] & 0x3f00) >> 8);
+		}
+		else // regular extended mode, just 1 extra entry per sprite
+		{
+			// 2nd sprite bank is...
+			// 7400 - MMBB BBBB NNNN NNNN - M = Mosaic, B = blend level, N = sprite/tile number/adddress)    Attribute 1 of sprite 0 
+			// ....
+			
+			// before or after the 0 tile check?
+			tile |= (spriteram[(base_addr / 4) + 0x400] & 0x00ff) << 16;
+			blendlevel = ((spriteram[(base_addr / 4) + 0x400] & 0x3f00) >> 8);
+		}
+
+		blendlevel >>= 1; // hack, drawing code expects 5 bits, not 6
+
+		// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
+		if (m_video_regs_42 & 0x0010) // direct addressing mode
+		{
+			// paccon and smartfp use this mode
+			words_per_tile = 8;
 		}
 	}
 
