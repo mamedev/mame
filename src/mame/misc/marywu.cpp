@@ -197,7 +197,7 @@ void marywu_state::marywu(machine_config &config)
 	maincpu.set_addrmap(AS_DATA, &marywu_state::data_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 	maincpu.port_in_cb<1>().set_ioport("P1");
-	maincpu.port_out_cb<3>().set(FUNC(p3_port_w)); // Seem to be LED output. start blinking if error occured.
+	maincpu.port_out_cb<3>().set(FUNC(marywu_state::p3_port_w)); // Seem to be LED output. start blinking if error occured.
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
