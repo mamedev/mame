@@ -36,7 +36,6 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_space_read_cb(*this, 0),
 	m_rowscroll(*this, "^rowscroll"),
 	m_rowzoom(*this, "^rowzoom"),
-	m_alt_extrasprite_hack(0),
 	m_use_legacy_mode(false),
 	m_disallow_resolution_control(false),
 	m_renderer(*this, "renderer")
@@ -412,7 +411,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
 			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
-			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_alt_extrasprite_hack ? true : false, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
+			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);

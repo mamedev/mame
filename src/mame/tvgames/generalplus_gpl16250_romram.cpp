@@ -423,7 +423,6 @@ void jak_pf_game_state::machine_reset()
 void jak_prft_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
-	m_maincpu->set_alt_extrasprite_hack(1);
 }
 
 

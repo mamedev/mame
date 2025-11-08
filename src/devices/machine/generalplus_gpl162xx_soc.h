@@ -58,7 +58,6 @@ public:
 
 	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
 
-	void set_alt_extrasprite_hack(int alt_extrasprite_hack) { m_spg_video->set_alt_extrasprite(alt_extrasprite_hack); }
 	void set_legacy_video_mode() { m_spg_video->set_legacy_video_mode(); }
 	void set_disallow_resolution_control() { m_spg_video->set_disallow_resolution_control(); }
 

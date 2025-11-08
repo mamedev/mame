@@ -582,7 +582,6 @@ void beijuehh_game_state::machine_reset()
 	//m_maincpu->set_paldisplaybank_high_hack(0);
 	//m_maincpu->set_pal_sprites_hack(0x000);
 	//m_maincpu->set_pal_back_hack(0x000);
-	//m_maincpu->set_alt_extrasprite_hack(1);
 	m_maincpu->set_legacy_video_mode();
 }
 

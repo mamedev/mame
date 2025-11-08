@@ -610,7 +610,7 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	}
 }
 
-void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprites_mode, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprites_mode, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
 {
 	uint32_t tilegfxdata_addr = spritegfxdata_addr;
 	uint32_t tile = spriteram[base_addr + 0];
@@ -782,7 +782,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 	}
 }
 
-void spg_renderer_device::draw_sprites(bool read_from_csspace, int extended_sprites_mode, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
+void spg_renderer_device::draw_sprites(bool read_from_csspace, int extended_sprites_mode, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
 {
 	if (!(m_video_regs_42 & 0x0001))
 	{
@@ -799,7 +799,7 @@ void spg_renderer_device::draw_sprites(bool read_from_csspace, int extended_spri
 
 	for (uint32_t n = 0; n < sprlimit; n++)
 	{
-		draw_sprite(read_from_csspace, extended_sprites_mode, alt_extrasprite_hack, palbank, highres, cliprect, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
+		draw_sprite(read_from_csspace, extended_sprites_mode, palbank, highres, cliprect, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
 	}
 }
 
