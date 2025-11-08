@@ -391,7 +391,7 @@ uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 	if((m_font_addr & 0x7c00) == 0x0800)
 		return m_kanji_rom[pcg_offset | 0];
 
-	// rxtrain wants the LR setting for PCG area ...
+	// rxtrain wants the LR setting for PCG area
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 	{
 		pcg_offset |= (!m_video_ff[KAC_REG] << 12);
@@ -849,12 +849,6 @@ void pc9801vm_state::artic_wait_w(u8 data)
 	m_maincpu->spin_until_time(attotime::from_nsec(600));
 }
 
-uint8_t pc9801vm_state::midi_r()
-{
-	/* unconnect, needed by Amaranth KH to boot */
-	return 0xff;
-}
-
 uint8_t pc9801_state::pic_r(offs_t offset)
 {
 	return ((offset >= 4) ? m_pic2 : m_pic1)->read(offset & 3);
@@ -881,7 +875,7 @@ void pc9801vm_state::pc9801vm_map(address_map &map)
 	map(0x0e8000, 0x0fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
-void pc9801vm_state::pc9801ux_io(address_map &map)
+void pc9801vm_state::pc9801vm_io(address_map &map)
 {
 //  map.unmap_value_high();
 	pc9801_common_io(map);
@@ -937,14 +931,13 @@ void pc9801vm_state::pc9801rs_map(address_map &map)
 
 void pc9801vm_state::pc9801rs_io(address_map &map)
 {
-//  map.unmap_value_high();
-	pc9801ux_io(map);
+	map.unmap_value_high();
+	pc9801vm_io(map);
 	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_hack_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
 	map(0x0640, 0x064f).rw(FUNC(pc9801vm_state::ide_cs0_r), FUNC(pc9801vm_state::ide_cs0_w));
 	map(0x0740, 0x074f).rw(FUNC(pc9801vm_state::ide_cs1_r), FUNC(pc9801vm_state::ide_cs1_w));
 	map(0x1e8c, 0x1e8f).noprw(); // temp
 	map(0xbfdb, 0xbfdb).w(FUNC(pc9801vm_state::mouse_freq_w));
-	map(0xe0d0, 0xe0d3).r(FUNC(pc9801vm_state::midi_r));
 }
 
 void pc9801us_state::pc9801us_io(address_map &map)
@@ -1050,6 +1043,7 @@ void pc9801bx_state::pc9801bx2_io(address_map &map)
 	// NOP legacy SDIP bank access
 	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) { a20_ctrl_w(3, data); }));
 	map(0x043b, 0x043b).rw(FUNC(pc9801bx_state::hole_15m_control_r), FUNC(pc9801bx_state::hole_15m_control_w));
+	map(0x0530, 0x0533).lr8(NAME([] () { return 0; })); // SIMM control unit
 	map(0x0534, 0x0534).r(FUNC(pc9801bx_state::i486_cpu_mode_r));
 	map(0x09a8, 0x09a8).rw(FUNC(pc9801bx_state::gdc_31kHz_r), FUNC(pc9801bx_state::gdc_31kHz_w));
 	map(0x8f1f, 0x8f1f).lw8(NAME([this] (offs_t offset, u8 data) {
@@ -2013,6 +2007,8 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
+//	PC98_CBUS_ROOT(config, "cbus", 0);
+
 	PC98_CBUS_SLOT(config, m_cbus[0], pc98_cbus_devices, "pc9801_26");
 	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
 	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
@@ -2194,7 +2190,7 @@ void pc9801_state::config_floppy_35hd(machine_config &config)
 
 void pc9801_state::pc9801(machine_config &config)
 {
-	I8086(config, m_maincpu, 5000000); // 5 MHz for vanilla, 8 MHz for direct children
+	I8086(config, m_maincpu, 5'000'000); // 5 MHz for vanilla, 8 MHz for direct children
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -2205,6 +2201,7 @@ void pc9801_state::pc9801(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801f)
 
+	// RAM 128KB (vanilla/F1/F2) ~ 256KB (F3/M2/M3) ~ 640KB (max)
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 
 	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
@@ -2223,11 +2220,11 @@ void pc9801_state::pc9801(machine_config &config)
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
 }
 
-void pc9801vm_state::pc9801rs(machine_config &config)
+void pc9801vm_state::pc9801vm(machine_config &config)
 {
-	I386SX(config, m_maincpu, MAIN_CLOCK_X1*8); // unknown clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801rs_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801rs_io);
+	V30(config, m_maincpu, 10'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801vm_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801vm_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pc9801_common(config);
@@ -2240,16 +2237,15 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_ipl).set_map(&pc9801vm_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
+	// RAM 384KB (VM0/VM2/VM4) ~ 640KB (VM21/VM11)
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("384K");
+
 	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801_common)
 
 	m_dmac->set_clock(MAIN_CLOCK_X1*8); // unknown clock
 
-	pc9801_ide(config);
 	UPD4990A(config, m_rtc);
-
-	// RAM 640KB ~ 14.6MB (with dedicated memory slot)
-	RAM(config, m_ram).set_default_size("2M").set_extra_options("640K,4M,8M,14M,15M");
 
 	m_fdc_2hd->intrq_wr_callback().set(FUNC(pc9801vm_state::fdc_irq_w));
 	m_fdc_2hd->drq_wr_callback().set(FUNC(pc9801vm_state::fdc_drq_w));
@@ -2260,25 +2256,12 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 
 //  DAC_1BIT(config, m_dac1bit, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
 	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	// analog mode optional on earlier VM, with PC-9801-24 gfx board
 	PALETTE(config, m_palette, FUNC(pc9801vm_state::pc9801_palette), 16 + 16);
 }
 
-void pc9801vm_state::pc9801vm(machine_config &config)
-{
-	pc9801rs(config);
-	V30(config.replace(), m_maincpu, 10000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801vm_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	// RAM 384KB (VM0/VM2/VM4) ~ 640KB (VM21/VM11)
-	m_ram->set_default_size("640K").set_extra_options("384K");
-
-	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801_common)
-}
-
-// UV is essentially a VM with 3.5 drives
+// UV is essentially a VM with 3.5" drives
 // Released as UV2, UV21 then UV11 (UV21 but smaller?)
 void pc9801vm_state::pc9801uv(machine_config &config)
 {
@@ -2292,10 +2275,10 @@ void pc9801vm_state::pc9801uv(machine_config &config)
 
 void pc9801vm_state::pc9801ux(machine_config &config)
 {
-	pc9801rs(config);
+	pc9801vm(config);
 	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
-	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
+	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801vm_io);
 	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
@@ -2311,15 +2294,18 @@ void pc9801vm_state::pc9801ux(machine_config &config)
 
 void pc9801vm_state::pc9801dx(machine_config &config)
 {
-	pc9801rs(config);
+	pc9801vm(config);
 	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 12000000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801dx_map);
-	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
+	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801vm_io);
 	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_525hd(config);
 //  AM9157A(config, "i8237", 10000000); // unknown clock
+
+	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
 
 	// RAM 640KB ~ 14.6MB
 	m_ram->set_default_size("2M");
@@ -2328,10 +2314,10 @@ void pc9801vm_state::pc9801dx(machine_config &config)
 
 void pc9801vm_state::pc9801vx(machine_config &config)
 {
-	pc9801ux(config);
+	pc9801vm(config);
 	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801vx_map);
-	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
+	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801vm_io);
 	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
@@ -2340,6 +2326,8 @@ void pc9801vm_state::pc9801vx(machine_config &config)
 	// TODO: EGC initial buggy revision
 	// Reportedly has a bug with a RMW op, details TBD
 	// ...
+	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
 
 	// RAM 640 KB ~ 8.6MB
 	m_ram->set_default_size("2M");
@@ -2348,6 +2336,24 @@ void pc9801vm_state::pc9801vx(machine_config &config)
 	// GDC & EGC, DAC1BIT built-in
 	// Either 2x 5.25 or 2x 3.5 internal floppy drives
 	// 4x C-Bus slots (3x plus 1x dedicated RAM?)
+}
+
+void pc9801vm_state::pc9801rs(machine_config &config)
+{
+	pc9801vm(config);
+	I386SX(config.replace(), m_maincpu, MAIN_CLOCK_X1*8); // 16 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801rs_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801rs_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
+
+	pc9801_ide(config);
+
+	// RAM 640KB ~ 14.6MB (with dedicated memory slot)
+	m_ram->set_default_size("2M");
+	m_ram->set_extra_options("640K,4M,8M,14M,15M");
 }
 
 void pc9801us_state::pc9801us(machine_config &config)
@@ -2417,7 +2423,7 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 
 	// RAM 1.8 MB (U2/M2) / 3.6 MB (U7) ~ 19.6 MB (from EMS?)
 	m_ram->set_default_size("2M");
-	m_ram->set_extra_options("640K,4M,7M,14M,20M");
+	m_ram->set_extra_options("640K,4M,7M,8M,14M,20M");
 
 	// GDC & EGC, DAC1BIT built-in
 	// 2x 3.5/5.25 internal floppy drives or 1x 3.5 and 120MB IDE HDD
@@ -2550,7 +2556,7 @@ ROM_END
 /*
 VM - V30 8/10
 
-TODO: missing itf roms, if they exist
+missing itf roms, if they exist
 */
 
 ROM_START( pc9801vm )
@@ -2985,7 +2991,70 @@ void pc9801vm_state::init_pc9801vm_kanji()
 
 // "vanilla" class (i86, E/F/M)
 COMP( 1982, pc9801,     0,        0, pc9801,    pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801",   MACHINE_NOT_WORKING ) // genuine dump
+//COMP(1983, pc9801e
 COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING ) // genuine dump
+//COMP(1984, pc9801m2
+//COMP(1985, pc9801m3
+
+// VM class (V30)
+//COMP(1985, pc9801u2
+//COMP(1985, pc9801vf2
+COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING ) // genuine dump
+
+// VX class (i286 + V30, first model using an EGC)
+// original VX0/VX2/VX4 released in Nov 1986, minor updates with OS pre-installed etc. in 1987
+// (PC-9801VX4/WN PC-9801VX41/WN)
+COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING )
+
+// CV class (V30, compact version with monitor built-in like a Macintosh)
+//COMP(1988, pc9801cv
+
+// RX class (i286 + V30)
+COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING )
+COMP( 1988, pc9801rx,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING )
+
+// RA class (i386dx + V30)
+//COMP(1988, pc9801ra
+
+// RS class (i386sx)
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     0 )
+//COMP( 1991, pc9801ds
+//COMP( 1991, pc9801cs
+//COMP( 1992, pc9801fx
+
+// DX class (i286)
+COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801DX",                     MACHINE_NOT_WORKING )
+
+// DA class (i386DX + SDIP and EMS)
+//COMP( 1991, pc9801da
+
+// UF class (V30HL, Tower form factor)
+//COMP( 1991, pc9801uf
+//COMP( 1991, pc9801ur
+
+// FS class (i386SX + ?)
+COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING )
+
+// US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
+COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING )
+
+// FA class (i486sx)
+//COMP( 1992, pc9801fa
+
+// BX class (i486sx2, official nickname "98 FELLOW", the lower end of PC-9821 line at this point)
+//COMP( 1993, pc9801bx
+COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING )
+//COMP( 1993, pc9801bx3
+//COMP( 1995, pc9801bx4
+
+// BS class (i486sx, "98 FELLOW")
+//COMP( 1993, pc9801bs2
+
+// BA class (i486dx2, "98 FELLOW")
+//COMP( 1993, pc9801ba
+//COMP( 1993, pc9801ba2
+//COMP( 1995, pc9801ba3
 
 // N5200 (started as a vanilla PC-98 business line derivative,
 //        eventually diverged into its own thing and incorporated various Hyper 98 features.
@@ -3004,18 +3073,6 @@ COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, empty_in
 // JX series
 // ...
 
-// VM class (V30)
-COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING ) // genuine dump
-// UV class (V30)
-COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING ) // genuine dump
-
-// UX class (i286)
-COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING )
-
-// VX class (first model using an EGC)
-// original VX0/VX2/VX4 released in Nov 1986, minor updates with OS pre-installed etc. in 1987
-COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING )
-
 // XA/XL class (1120 x 750 true color, nicknamed "High-reso")
 // ...
 
@@ -3027,33 +3084,14 @@ COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_p
 // OP-98 ("Office Processor", released around '91. Reports claims to be H98-like, with extra connectivity with NEC 7200 workstation)
 // ...
 
-// CV class (V30, compact version with monitor built-in like a Macintosh)
-// ...
-
-// RS class (i386SX)
-COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING )
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     0 )
-// DX class (i286)
-COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801DX",                     MACHINE_NOT_WORKING )
-// DA class (i386SX + SDIP and EMS)
-// ...
-// UF/UR/US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
-COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING )
-// FS class (i386SX + ?)
-COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING )
-// FA class (i486SX)
-// ...
-// BX class (official nickname "98 FELLOW", last releases prior to 9821 line)
-COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING )
-
 // PC-98GS (Multimedia PC, exclusive video mode "Extended Screen Graphics", -73 sound board (a superset of later -86), superimposition)
 // ...
 
 // Epson class knockoffs -> cfr. pc9801_epson.cpp
 
-// PC9821 -> cfr. pc9821.cpp
+// PC-9821 -> cfr. pc9821.cpp
 
-// PC98DO (PC88+PC98, V33 + μPD70008AC)
+// PC-98DO (PC88+PC98, V33 + μPD70008AC)
 // ...
 
 // PC-98LT / PC-98HA -> cfr. pc98ha.cpp

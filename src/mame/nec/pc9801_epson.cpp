@@ -177,7 +177,7 @@ void pc98_epson_state::epson_base_io(address_map &map)
 
 void pc98_epson_state::pc286vs_io(address_map &map)
 {
-	pc9801ux_io(map);
+	pc9801vm_io(map);
 	epson_base_io(map);
 }
 

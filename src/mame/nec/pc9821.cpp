@@ -476,7 +476,7 @@ void pc9821_state::pc9821_map(address_map &map)
 void pc9821_state::pc9821_io(address_map &map)
 {
 	// later SW expects unmapped C-Bus accesses to return high for proper card detection
-	// cfr. entax, amarankh, freebsd21
+	// cfr. entax, amarankh, freebsd21, gods
 	map.unmap_value_high();
 	pc9801bx2_io(map);
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
