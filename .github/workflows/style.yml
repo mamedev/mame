@@ -1,0 +1,78 @@
+name: Style Check
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - "src/**.cpp"
+      - "src/**.h"
+
+jobs:
+  stylecheck:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Run style check
+        id: style-check
+        run: echo "reviews=$(python3 scripts/build/style.py --base-sha ${{ github.event.pull_request.base.sha }} | jq -s -c .)" >> $GITHUB_OUTPUT
+
+      - name: Delete previous bot review comments
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const comments = await github.paginate(
+              github.rest.pulls.listReviewComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                per_page: 100,
+              }
+            );
+            for (const comment of comments) {
+              if (comment.user && comment.user.login === "github-actions[bot]") {
+                  await github.rest.pulls.deleteReviewComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    comment_id: comment.id
+                  });
+              }
+            }
+
+      - name: Post review comments
+        uses: actions/github-script@v8
+        id: post-comments
+        env:
+          REVIEWS: ${{ steps.style-check.outputs.reviews }}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const reviews = JSON.parse(process.env.REVIEWS || "[]");
+
+            if (reviews.length === 0) {
+              console.info("Review list empty.");
+              return;
+            }
+
+            console.debug("Reviews: ", reviews);
+
+            for (const r of reviews) {
+                await github.rest.pulls.createReviewComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number,
+                  body: r.body,
+                  commit_id: context.sha,
+                  path: r.path,
+                  side: "RIGHT",
+                  line: r.line,
+                });
+            }
