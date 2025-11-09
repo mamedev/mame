@@ -63,6 +63,7 @@
 
 #include "emu.h"
 
+#include "bus/midi/midi.h"
 #include "cpu/dsp563xx/dsp56303.h"
 #include "cpu/dsp563xx/dsp56311.h"
 #include "cpu/dsp563xx/dsp56362.h"
@@ -96,9 +97,11 @@ public:
 		m_row(*this, "ROW%u", 0U),
 		m_knob(*this, "knob_%u", 0U),
 		m_leds(*this, "leds"),
+		m_mdin(*this, "mdin"),
 		m_scan(0),
 		m_an_select(0),
-		m_led_pattern(0)
+		m_led_pattern(0),
+		m_mdin_bit(false)
 	{ }
 
 	void virusa(machine_config &config) ATTR_COLD;
@@ -128,6 +131,7 @@ private:
 	void dsp_y_map(address_map &map) ATTR_COLD;
 
 	u8 p1_r();
+	u8 p3_r();
 	u8 p4_r();
 	void p1_w(u8 data);
 	void p3_w(u8 data);
@@ -141,10 +145,12 @@ private:
 
 	required_ioport_array<32> m_knob;
 	optional_device<pwm_display_device> m_leds;
+	optional_device<midi_port_device> m_mdin;
 
 	u8 m_scan;
 	u8 m_an_select;
 	u8 m_led_pattern;
+	bool m_mdin_bit;
 };
 
 
@@ -159,6 +165,7 @@ void acvirus_state::machine_start()
 	save_item(NAME(m_scan));
 	save_item(NAME(m_an_select));
 	save_item(NAME(m_led_pattern));
+	save_item(NAME(m_mdin_bit));
 }
 
 void acvirus_state::machine_reset()
@@ -168,6 +175,12 @@ void acvirus_state::machine_reset()
 u8 acvirus_state::p1_r()
 {
 	return ~0x10; // m_lcdc ready?
+}
+
+
+u8 acvirus_state::p3_r()
+{
+	return m_mdin_bit ? 0xfe : 0xff; // MIDI in at P3.0
 }
 
 void acvirus_state::p1_w(u8 data)
@@ -300,12 +313,21 @@ void acvirus_state::virusa(machine_config &config)
 
 void acvirus_state::virusb(machine_config &config)
 {
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(
+		[this] (int state) { m_mdin_bit = state; }
+	);
+
+	auto &mdout(MIDI_PORT(config, "mdout"));
+	midiout_slot(mdout);
+
 	SAB80C535(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(acvirus_state::p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(acvirus_state::p3_w));
+	m_maincpu->port_out_cb<3>().append(mdout, FUNC(midi_port_device::write_txd)).bit(1);
 	m_maincpu->port_in_cb<4>().set(FUNC(acvirus_state::p4_r));
 	m_maincpu->port_out_cb<4>().set(FUNC(acvirus_state::p4_w));
 	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
