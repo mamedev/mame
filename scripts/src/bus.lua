@@ -5571,6 +5571,8 @@ if (BUSES["PC98_CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc98_cbus/mpu_pc98.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/options.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/options.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_02.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_02.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_14.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_14.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/pc9801_26.cpp",
@@ -5591,6 +5593,41 @@ if (BUSES["PC98_CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc98_cbus/wavestar.h",
 	}
 end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/pc98_54simm/slot.h,BUSES["PC98_54SIMM"] = true
+---------------------------------------------------
+
+if (BUSES["PC98_54SIMM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pc98_54simm/options.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_54simm/options.h",
+		MAME_DIR .. "src/devices/bus/pc98_54simm/simm.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_54simm/simm.h",
+		MAME_DIR .. "src/devices/bus/pc98_54simm/slot.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_54simm/slot.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/pc98_61simm/slot.h,BUSES["PC98_61SIMM"] = true
+---------------------------------------------------
+
+if (BUSES["PC98_61SIMM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pc98_61simm/options.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_61simm/options.h",
+		MAME_DIR .. "src/devices/bus/pc98_61simm/simm.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_61simm/simm.h",
+		MAME_DIR .. "src/devices/bus/pc98_61simm/slot.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_61simm/slot.h",
+	}
+end
+
 
 ---------------------------------------------------
 --

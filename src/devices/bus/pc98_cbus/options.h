@@ -8,5 +8,6 @@
 
 void pc88va_cbus_devices(device_slot_interface &device);
 void pc98_cbus_devices(device_slot_interface &device);
+void pc98_cbus_ram_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_PC98_CBUS_OPTIONS_H

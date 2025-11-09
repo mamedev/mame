@@ -26,7 +26,6 @@ TODO:
 #include "emu.h"
 
 #include "pc9801_14.h"
-
 #include "speaker.h"
 
 

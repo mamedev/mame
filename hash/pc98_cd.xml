@@ -374,6 +374,12 @@ Slackware-based distro, cfr. plamo3x
 		<description>Windows NT 4.0 Workstation</description>
 		<year>1996</year>
 		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+Triggers [pc98_kbd] 0x96 command at install startup
+Triggers tons of [DMA] 32-bit space registers at install startup
+]]></notes>
+		<!-- NOTE: Win NT will ask disks in inverse order, so disk #3 first then #2, finally #1 -->
+		<info name="usage" value="From an HDD installed DOS, format three floppies then run WINNT.EXE in PC98 folder. Requires 16MB or more RAM." />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="windows nt 4.0 workstation (disc 1)" sha1="32fb5639983ba8c3e726ce9b3291a9a14b37facd" />

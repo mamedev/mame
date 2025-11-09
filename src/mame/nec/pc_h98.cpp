@@ -174,8 +174,8 @@ void pc_hyper98_state::pc_h98s(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_hyper98_state, pc_h98)
 
 	// RAM 1.6 MB ~ 45.6 MB
-	m_ram->set_default_size("14M");
-	m_ram->set_extra_options("2M,4M,8M,16M,32M,46M");
+//  m_ram->set_default_size("14M");
+//  m_ram->set_extra_options("2M,4M,8M,16M,32M,46M");
 }
 
 // Stolen from pc9821

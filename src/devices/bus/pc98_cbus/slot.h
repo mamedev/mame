@@ -69,7 +69,21 @@
 //**************************************************************************
 
 
+class pc98_cbus_root_device : public device_t,
+							  public device_memory_interface
+{
+public:
+	pc98_cbus_root_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+protected:
+	virtual space_config_vector memory_space_config() const override;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD;
+private:
+	address_space_config m_space_mem_config;
+	address_space_config m_space_io_config;
+};
 
 //class pc98_cbus_slot_device;
 
@@ -107,16 +121,15 @@ public:
 
 	// configuration access
 	template<std::size_t Line> auto int_cb() { return m_int_cb[Line].bind(); }
-//	template<std::size_t Line> auto drq_cb() { return m_drq_cb[Line].bind(); }
-//	template<std::size_t Line> auto dma_r() { return m_dma_in_cb[Line].bind(); }
-//	template<std::size_t Line> auto dma_w() { return m_dma_out_cb[Line].bind(); }
+//  template<std::size_t Line> auto drq_cb() { return m_drq_cb[Line].bind(); }
+//  template<std::size_t Line> auto dma_r() { return m_dma_in_cb[Line].bind(); }
+//  template<std::size_t Line> auto dma_w() { return m_dma_out_cb[Line].bind(); }
 
 	address_space &program_space() const { return *m_memspace; }
 	address_space &io_space() const { return *m_iospace; }
 	template<int I> void int_w(int state) { m_int_cb[I](state); }
-//	template<int I> void drq_w(int state) { m_drq_cb[I](state); }
+//  template<int I> void drq_w(int state) { m_drq_cb[I](state); }
 
-	template<typename R, typename W> void install_io(offs_t start, offs_t end, R rhandler, W whandler);
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
@@ -132,11 +145,11 @@ private:
 	required_address_space m_memspace;
 	required_address_space m_iospace;
 	devcb_write_line::array<7> m_int_cb;
-//	devcb_write_line::array<4> m_drq_cb;
+//  devcb_write_line::array<4> m_drq_cb;
 };
 
 
-// device type definition
+DECLARE_DEVICE_TYPE(PC98_CBUS_ROOT, pc98_cbus_root_device)
 DECLARE_DEVICE_TYPE(PC98_CBUS_SLOT, pc98_cbus_slot_device)
 
 #endif // MAME_BUS_PC98_CBUS_SLOT_H

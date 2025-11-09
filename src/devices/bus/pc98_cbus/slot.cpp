@@ -28,12 +28,37 @@ TODO:
 #include "slot.h"
 
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
+DEFINE_DEVICE_TYPE(PC98_CBUS_ROOT, pc98_cbus_root_device, "pc98_cbus_root", "PC-98 C-Bus root")
 DEFINE_DEVICE_TYPE(PC98_CBUS_SLOT, pc98_cbus_slot_device, "pc98_cbus_slot", "PC-98 C-Bus slot")
 
+//**************************************************************************
+//  DEVICE PC9801 ROOT INTERFACE
+//**************************************************************************
+
+pc98_cbus_root_device::pc98_cbus_root_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, PC98_CBUS_ROOT, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_mem_config("mem_space", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor())
+	, m_space_io_config("io_space", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor())
+{
+}
+
+device_memory_interface::space_config_vector pc98_cbus_root_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_PROGRAM, &m_space_mem_config),
+		std::make_pair(AS_IO, &m_space_io_config)
+	};
+}
+
+void pc98_cbus_root_device::device_start()
+{
+}
+
+void pc98_cbus_root_device::device_config_complete()
+{
+	// ...
+}
 
 
 //**************************************************************************
@@ -75,9 +100,9 @@ pc98_cbus_slot_device::pc98_cbus_slot_device(const machine_config &mconfig, cons
 	, m_memspace(*this, finder_base::DUMMY_TAG, -1)
 	, m_iospace(*this, finder_base::DUMMY_TAG, -1)
 	, m_int_cb(*this)
-//	, m_drq_cb(*this)
-//	, m_dma_in_cb(*this, 0)
-//	, m_dma_out_cb(*this)
+//  , m_drq_cb(*this)
+//  , m_dma_in_cb(*this, 0)
+//  , m_dma_out_cb(*this)
 {
 }
 
@@ -102,28 +127,4 @@ void pc98_cbus_slot_device::device_start()
 {
 //  m_card = dynamic_cast<device_pc9801_slot_card_interface *>(get_card_device());
 }
-
-template<typename R, typename W> void pc98_cbus_slot_device::install_io(offs_t start, offs_t end, R rhandler, W whandler)
-{
-	int buswidth = m_iospace->data_width();
-	switch(buswidth)
-	{
-		case 8:
-			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0);
-			break;
-		case 16:
-			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
-			break;
-		case 32:
-			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
-			break;
-		default:
-			fatalerror("PC-9801 C-bus: Bus width %d not supported\n", buswidth);
-	}
-}
-
-template void pc98_cbus_slot_device::install_io<read8_delegate,    write8_delegate   >(offs_t start, offs_t end, read8_delegate rhandler,    write8_delegate whandler);
-template void pc98_cbus_slot_device::install_io<read8s_delegate,   write8s_delegate  >(offs_t start, offs_t end, read8s_delegate rhandler,   write8s_delegate whandler);
-template void pc98_cbus_slot_device::install_io<read8sm_delegate,  write8sm_delegate >(offs_t start, offs_t end, read8sm_delegate rhandler,  write8sm_delegate whandler);
-template void pc98_cbus_slot_device::install_io<read8smo_delegate, write8smo_delegate>(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
 

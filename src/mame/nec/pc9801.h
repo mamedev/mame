@@ -27,7 +27,6 @@
 #include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd4991a.h"
@@ -143,7 +142,6 @@ public:
 		, m_ppi_mouse(*this, "ppi_mouse")
 		, m_fdc_2hd(*this, "fdc_2hd")
 		, m_fdc_2dd(*this, "fdc_2dd")
-		, m_ram(*this, RAM_TAG)
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
 		, m_cbus(*this, "cbus%d", 0)
@@ -174,7 +172,6 @@ protected:
 	// (I/O $90-$93 is a "simplified" version)
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
-	optional_device<ram_device> m_ram;
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
 	required_device_array<pc98_cbus_slot_device, 2> m_cbus;
@@ -395,9 +392,6 @@ public:
 protected:
 	TIMER_CALLBACK_MEMBER(fdc_trigger);
 
-	u8 ram_ext_r(offs_t offset) { return m_ram->read_no_mirror(offset + 0x100000); }
-	void ram_ext_w(offs_t offset, u8 data) { return m_ram->write_no_mirror(offset + 0x100000, data); }
-
 	void pc9801vm_map(address_map &map) ATTR_COLD;
 	void pc9801vm_io(address_map &map) ATTR_COLD;
 
@@ -581,11 +575,6 @@ protected:
 
 	DECLARE_MACHINE_START(pc9801bx2);
 	DECLARE_MACHINE_RESET(pc9801bx2);
-
-	u8 ram_ext_15m_r(offs_t offset) { return m_ram->read_no_mirror(offset + 0xf00000); }
-	void ram_ext_15m_w(offs_t offset, u8 data) { return m_ram->write_no_mirror(offset + 0xf00000, data); }
-	u8 ram_ext_16m_r(offs_t offset) { return m_ram->read_no_mirror(offset + 0x1000000); }
-	void ram_ext_16m_w(offs_t offset, u8 data) { return m_ram->write_no_mirror(offset + 0x1000000, data); }
 
 	virtual void hole_15m_control_w(offs_t offset, u8 data);
 	u8 hole_15m_control_r(offs_t offset);

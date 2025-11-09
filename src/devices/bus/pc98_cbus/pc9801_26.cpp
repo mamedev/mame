@@ -2,14 +2,19 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-NEC PC-9801-26 sound card
+NEC PC-9801-26(K) sound card
 
 Legacy sound card for PC-98xx family, composed by a single YM2203
+
+NOTES:
+- The only known difference between -26 and -26K is that former draws its clock from C-Bus root.
+  This makes the card to misbehave with 286+ machines.
 
 TODO:
 - DE-9 output writes (cfr. page 419 of PC-9801 Bible, needs software testing the functionality)
 - understand if dips can be read by SW;
 - configurable irq level needs a binding flush in C-bus handling;
+- Eventually emulate -26 clock style, currently hardwired as -26K;
 
 **************************************************************************************************/
 

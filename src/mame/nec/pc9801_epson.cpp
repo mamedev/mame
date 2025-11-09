@@ -48,6 +48,11 @@ Notes:
 #include "emu.h"
 #include "pc9801_epson.h"
 
+#include "bus/pc98_54simm/options.h"
+#include "bus/pc98_54simm/slot.h"
+#include "bus/pc98_61simm/options.h"
+#include "bus/pc98_61simm/slot.h"
+
 template <unsigned which> void pc98_epson_state::shadow_ipl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// TODO: shadow register 0x6a may actually be write deprotect
@@ -143,9 +148,9 @@ void pc98_epson_state::pc286vs_map(address_map &map)
 {
 	pc9801ux_map(map);
 	map(0x0e8000, 0x0fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
-	map(0x100000, 0xefffff).rw(FUNC(pc98_epson_state::ram_ext_r), FUNC(pc98_epson_state::ram_ext_w));
+//  map(0x100000, 0xefffff).rw(FUNC(pc98_epson_state::ram_ext_r), FUNC(pc98_epson_state::ram_ext_w));
 	// would hang the machine with following and 15M
-//	map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+//  map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xfe8000, 0xffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
@@ -355,8 +360,8 @@ void pc98_epson_state::pc286vs(machine_config &config)
 	config_base_epson(config);
 
 	// RAM 640KB ~ 14.6MB
-	m_ram->set_default_size("2M");
-	m_ram->set_extra_options("640K,4M,8M,14M,15M");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("640K,4M,8M,14M,15M");
 
 	// TODO: DMA type & clock
 }
@@ -371,9 +376,9 @@ void pc98_epson_state::pc286u(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	// RAM 640KB ~ 8.6MB
-	m_ram->set_default_size("640K");
+//  m_ram->set_default_size("640K");
 	// TODO: how?
-	m_ram->set_extra_options("4M,8M,9M");
+//  m_ram->set_extra_options("4M,8M,9M");
 
 	// TODO: DMA type & clock
 }
@@ -390,8 +395,8 @@ void pc98_epson_state::pc386m(machine_config &config)
 	config_base_epson(config);
 
 	// RAM: 640KB ~ 14.6MB
-	m_ram->set_default_size("2M");
-	m_ram->set_extra_options("640K,4M,8M,14M,15M");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("640K,4M,8M,14M,15M");
 
 	// 2 3.5 floppy drives
 	// ...
@@ -409,8 +414,8 @@ void pc98_epson_state::pc486se(machine_config &config)
 	pit_clock_config(config, xtal/8); // unknown, passes "ERR:TM" test
 
 	// RAM 1.6 MB ~ 17.6 MB
-	m_ram->set_default_size("2M");
-	m_ram->set_extra_options("4M,8M,14M,16M,18M");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("4M,8M,14M,16M,18M");
 
 	// "dedicated internal memory slot x 1"
 	// "dedicated video board" slot
@@ -428,8 +433,8 @@ void pc98_epson_state::pc486mu(machine_config &config)
 	pit_clock_config(config, xtal/8); // unknown, passes "ERR:TM" test
 
 	// RAM: 5.6 MB ~ 61.6 MB
-	m_ram->set_default_size("6M");
-	m_ram->set_extra_options("8M,14M,16M,32M,48M,62M");
+//  m_ram->set_default_size("6M");
+//  m_ram->set_extra_options("8M,14M,16M,32M,48M,62M");
 
 	// CL-GD5428
 
