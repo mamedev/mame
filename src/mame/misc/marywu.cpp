@@ -59,7 +59,7 @@ private:
 	uint8_t m_selected_7seg_module = 0;
 
 	output_finder<32> m_digits;
-	output_finder<40> m_leds;
+	output_finder<31> m_leds;
 	required_ioport_array<4> m_inputs;
 };
 
@@ -127,7 +127,7 @@ void marywu_state::ay2_port_a_w(uint8_t data)
 void marywu_state::ay2_port_b_w(uint8_t data)
 {
 	// we only have 30 LEDs. The last 2 bits in this port are unused.
-	for (uint8_t i = 0; i < 8; i++)
+	for (uint8_t i = 0; i < 7; i++)
 		m_leds[i + 24] = BIT(data, i);
 }
 
