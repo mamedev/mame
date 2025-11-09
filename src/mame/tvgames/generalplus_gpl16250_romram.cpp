@@ -317,7 +317,6 @@ void wrlshunt_game_state::machine_reset()
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(1);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 void wrlshunt_game_state::init_wrlshunt()
@@ -398,7 +397,6 @@ void jak_s500_game_state::machine_reset()
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 
@@ -425,8 +423,6 @@ void jak_pf_game_state::machine_reset()
 void jak_prft_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
-	//m_maincpu->set_alt_tile_addressing_hack(0);
-	m_maincpu->set_alt_extrasprite_hack(1);
 }
 
 

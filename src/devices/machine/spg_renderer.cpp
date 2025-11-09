@@ -399,7 +399,7 @@ void spg_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screen
 	}
 }
 
-void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_tilemaps, bool use_alt_tile_addressing, uint32_t palbank, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
+void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_tilemaps, uint32_t palbank, const rectangle& cliprect, uint32_t scanline, int priority, uint16_t tilegfxdata_addr_msb, uint16_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
 {
 	const uint32_t attr = tilemapregs[0];
 	const uint32_t ctrl = tilemapregs[1];
@@ -414,9 +414,22 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 		return;
 	}
 
+	// graphic data segments/bases
+	uint32_t tilegfxdata_addr_full;
+
+	if (m_video_regs_7f & 0x0040) // FREE == 1
+	{
+		tilegfxdata_addr_full = ((tilegfxdata_addr_msb & 0x07ff) << 16) | tilegfxdata_addr;
+	}
+	else // FREE == 0 (default / legacy)
+	{
+		tilegfxdata_addr_full = tilegfxdata_addr * 0x40;
+	}
+
+
 	if (ctrl & 0x0001) // Bitmap / Linemap mode! (basically screen width tile mode)
 	{
-		draw_linemap(has_extended_tilemaps, cliprect, scanline, priority, tilegfxdata_addr, scrollregs, tilemapregs, spc, paletteram);
+		draw_linemap(has_extended_tilemaps, cliprect, scanline, priority, tilegfxdata_addr_full, scrollregs, tilemapregs, spc, paletteram);
 		return;
 	}
 
@@ -484,14 +497,13 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 
 	uint32_t words_per_tile;
 
+	words_per_tile = bits_per_row * tile_h;
+
 	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
-	if (has_extended_tilemaps && use_alt_tile_addressing)
+	if (has_extended_tilemaps)
 	{
-		words_per_tile = 8;
-	}
-	else
-	{
-		words_per_tile = bits_per_row * tile_h;
+		if (m_video_regs_7f & 0x0004) // TX_DIRECT
+			words_per_tile = 8;
 	}
 
 	int realxscroll = xscroll;
@@ -513,10 +525,10 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	const int endpos = (screenwidth + tile_w) / tile_w;
 
 	int upperpalselect = 0;
-	if (has_extended_tilemaps && (tilegfxdata_addr & 0x80000000))
-		upperpalselect = 1;
 
-	tilegfxdata_addr &= 0x7ffffff;
+	// smartfp
+	if (has_extended_tilemaps && (tilegfxdata_addr_msb & 0x8000))
+		upperpalselect = 1;
 
 	for (uint32_t x0 = 0; x0 < endpos; x0++)
 	{
@@ -555,17 +567,16 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;
 
-		if (has_extended_tilemaps && use_alt_tile_addressing)
+		if (has_extended_tilemaps && (m_video_regs_7f & 0x0004)) // TX_DIRECT
 		{
-			// in this mode what would be the 'palette' bits get used for extra tile bits (even if the usual 'extended table' mode is disabled?)
-			// used by smartfp
 			uint16_t exattribute = (ctrl & 0x0004) ? spc.read_word(exattributemap_rambase) : spc.read_word(exattributemap_rambase + tile_address / 2);
 			if (realx0 & 1)
 				exattribute >>= 8;
 			else
 				exattribute &= 0x00ff;
 
-			tile |= (exattribute & 0x07) << 16;
+			// when TX_DIRECT is used the attributes become extra addressing bits (smartfp)
+			tile |= (exattribute & 0xff) << 16;
 			//blendlevel = 0x1f; // hack
 		}
 		else if ((ctrl & 2) == 0)
@@ -606,11 +617,11 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 		palette_offset <<= nc_bpp;
 
 		const int drawx = (x0 * tile_w) - (realxscroll & (tile_w - 1));
-		draw_tilestrip(read_from_csspace, screenwidth, drawwidthmask, blend, flip_x, cliprect, tile_h, tile_w, tilegfxdata_addr, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
+		draw_tilestrip(read_from_csspace, screenwidth, drawwidthmask, blend, flip_x, cliprect, tile_h, tile_w, tilegfxdata_addr_full, tile, tile_scanline, drawx, flip_y, palette_offset, nc_bpp, bits_per_row, words_per_tile, spc, paletteram, blendlevel);
 	}
 }
 
-void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprites_mode, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprites_mode, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
 {
 	uint32_t tilegfxdata_addr = spritegfxdata_addr;
 	uint32_t tile = spriteram[base_addr + 0];
@@ -663,6 +674,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 
 	const spg_renderer_device::blend_enable_t blend = (attr & 0x4000) ? BlendOn : BlendOff;
 	spg_renderer_device::flipx_t flip_x = (attr & 0x0004) ? FlipXOn : FlipXOff;
+	bool flip_y = (attr & 0x0008);
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
@@ -672,43 +684,60 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 	static const uint8_t s_blend_levels[4] = { 0x08, 0x10, 0x18, 0x20 };
 	uint8_t blendlevel = s_blend_levels[m_video_regs_2a & 3];
 
-	uint32_t words_per_tile;
+	uint32_t words_per_tile = bits_per_row * tile_h;
+;
 
-	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
-	if (extended_sprites_mode && ((m_video_regs_42 & 0x0010) == 0x10))
-	{
-		// paccon and smartfp use this mode
-		words_per_tile = 8;
-
-		if (!alt_extrasprite_hack) // 1 extra word for each sprite
-		{
-			// before or after the 0 tile check?
-			tile |= (spriteram[(base_addr / 4) + 0x400] & 0x01ff) << 16;
-			blendlevel = ((spriteram[(base_addr / 4) + 0x400] & 0x3e00) >> 9);
-		}
-		else // jak_prft - no /4 to offset in this mode - 4 extra words per sprite instead ? (or is RAM content incorrect for one of these cases?)
-		{
-			tile |= spriteram[(base_addr) + 0x400] << 16;
-			blendlevel = ((spriteram[(base_addr) + 0x400] & 0x3e00) >> 9);
-		}
-	}
-	else
-	{
-		words_per_tile = bits_per_row * tile_h;
-	}
-
-
-	bool flip_y = (attr & 0x0008);
-
-	// various games don't want the flip bits in the usual place, wrlshunt for example, there's probably a bit to control this
-	// and likewise these bits probably now have a different meaning, so this shouldn't be trusted
-	// beijuehh does NOT want this either (see characters in 'empire fighter')
 	if (extended_sprites_mode)
 	{
-		if (highres || alt_extrasprite_hack)
+		// 7400 format on GPL162xx is
+		//
+		// 7400 - NNNN NNNN NNNN NNNN (N = sprite tile number/address)
+		// 7401 - AAAA AAXX XXXX XXXX (A = Angle or Y1[5:0], X = Xpos/X0[9:0])
+		// 7402 - ZZZZ ZZYY YYYY YYYY (Z = Zoom, or Y2[5:0], Y = Ypos/Y0[9:0])
+		// 7403 - pbDD PPPP VVHH FFCC (p = Palette Bank, b = blend, D = depth, P = palette, V = vertical size, H = horizontal size, F = flip, C = colour)
+
+		if (m_video_regs_7f & 0x0200) // 'virtual 3D' sprite mode (GPAC800 / GPL16250 only) has 4 extra entries per sprite
 		{
+			// 2nd sprite bank is...
+			// 
+			// 7400 - MMBB BBBB NNNN NNNN - M = Mosaic, B = blend level, N = sprite/tile number/adddress)    Attribute 1 of sprite 0 
+			// 7401 - YYYY YYXX XXXX XXXX - Y = Y3[5:0]             X = X1[9:0]                              X1 of sprite 0
+			// 7402 - YYyy yyXX XXXX XXXX - Y = Y3[7:6] y = Y1[9:6] X = X2[9:0]                              X2 of sprite 0
+			// 7403 - YYyy yyXX XXXX XXXX - Y = Y3[9:8] y = Y2[9:6] X = X3[9:0]                              X3 of sprite 0
+			// 7404 - Attribute 1 of sprite 1
+			// ....
+			//
+			// Normally Zoom/Rotate functions are disabled in this mode, as the attributes are use for co-ordinate data
+			// but setting Flip to 0x3 causes them to be used (ignoring flip) instead of the extra co-ordinates
 			flip_x = FlipXOff;
 			flip_y = 0;
+
+			tile |= (spriteram[(base_addr)+0x400] & 0x00ff) << 16;
+			blendlevel = ((spriteram[(base_addr)+0x400] & 0x3f00) >> 8);
+		}
+		else // regular extended mode, just 1 extra entry per sprite
+		{
+			// 2nd sprite bank is...
+			// 7400 - MMBB BBBB NNNN NNNN - M = Mosaic, B = blend level, N = sprite/tile number/adddress)    Attribute 1 of sprite 0 
+			// ....
+			
+			// before or after the 0 tile check?
+			tile |= (spriteram[(base_addr / 4) + 0x400] & 0x00ff) << 16;
+			blendlevel = ((spriteram[(base_addr / 4) + 0x400] & 0x3f00) >> 8);
+		}
+
+		blendlevel >>= 1; // hack, drawing code expects 5 bits, not 6
+
+		// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
+		if (m_video_regs_42 & 0x0010) // direct addressing mode
+		{
+			// paccon and smartfp use this mode
+			words_per_tile = 8;
+		}
+		else
+		{
+			// extended address bits only used in direct mode, jak_prr and other GPAC500 games rely on this
+			tile &= 0xffff;
 		}
 	}
 
@@ -764,7 +793,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 	}
 }
 
-void spg_renderer_device::draw_sprites(bool read_from_csspace, int extended_sprites_mode, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
+void spg_renderer_device::draw_sprites(bool read_from_csspace, int extended_sprites_mode, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
 {
 	if (!(m_video_regs_42 & 0x0001))
 	{
@@ -781,7 +810,7 @@ void spg_renderer_device::draw_sprites(bool read_from_csspace, int extended_spri
 
 	for (uint32_t n = 0; n < sprlimit; n++)
 	{
-		draw_sprite(read_from_csspace, extended_sprites_mode, alt_extrasprite_hack, palbank, highres, cliprect, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
+		draw_sprite(read_from_csspace, extended_sprites_mode, palbank, highres, cliprect, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
 	}
 }
 
