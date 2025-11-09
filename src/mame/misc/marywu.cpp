@@ -134,7 +134,7 @@ void marywu_state::ay2_port_b_w(uint8_t data)
 
 void marywu_state::p3_port_w(uint8_t data) // 1 led are used.
 {
-	for (uint8_t i = 0; i < 0; i++)
+	for (uint8_t i = 0; i < 6; i++)
 		m_leds[i + 32] = BIT(data, i);
 }
 
