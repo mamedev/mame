@@ -104,6 +104,7 @@ public:
 		m_mdin_bit(false)
 	{ }
 
+	void virus_common(machine_config &config) ATTR_COLD;
 	void virusa(machine_config &config) ATTR_COLD;
 	void virusb(machine_config &config) ATTR_COLD;
 	void virusc(machine_config &config) ATTR_COLD;
@@ -122,6 +123,9 @@ private:
 	required_memory_bank m_rombank;
 	required_memory_bank m_rambank;
 	required_ioport_array<8> m_row;
+	required_ioport_array<32> m_knob;
+	required_device<pwm_display_device> m_leds;
+	required_device<midi_port_device> m_mdin;
 
 	void prog_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
@@ -142,10 +146,6 @@ private:
 
 	void red_palette_init(palette_device &palette) ATTR_COLD;
 	void green_palette_init(palette_device &palette) ATTR_COLD;
-
-	required_ioport_array<32> m_knob;
-	optional_device<pwm_display_device> m_leds;
-	optional_device<midi_port_device> m_mdin;
 
 	u8 m_scan;
 	u8 m_an_select;
@@ -266,52 +266,7 @@ void acvirus_state::red_palette_init(palette_device &palette)
 	palette.set_pen_color(1, rgb_t(234, 56, 57));
 }
 
-void acvirus_state::virusa(machine_config &config)
-{
-	SAB80C535(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
-	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
-	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
-	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
-	m_maincpu->port_out_cb<3>().set(FUNC(acvirus_state::p3_w));
-	m_maincpu->port_in_cb<4>().set(FUNC(acvirus_state::p4_r));
-	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
-	m_maincpu->an0_func().set([this] { return m_knob[4*0 + m_an_select]->read(); });
-	m_maincpu->an1_func().set([this] { return m_knob[4*1 + m_an_select]->read(); });
-	m_maincpu->an2_func().set([this] { return m_knob[4*2 + m_an_select]->read(); });
-	m_maincpu->an3_func().set([this] { return m_knob[4*3 + m_an_select]->read(); });
-	m_maincpu->an4_func().set([this] { return m_knob[4*4 + m_an_select]->read(); });
-	m_maincpu->an5_func().set([this] { return m_knob[4*5 + m_an_select]->read(); });
-	m_maincpu->an6_func().set([this] { return m_knob[4*6 + m_an_select]->read(); });
-	m_maincpu->an7_func().set([this] { return m_knob[4*7 + m_an_select]->read(); });
-
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
-	screen.set_size(6*16, 8*2+1);
-	screen.set_visarea_full();
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", FUNC(acvirus_state::green_palette_init), 2);
-
-	/* Actual device is LM16255 */
-	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
-	m_lcdc->set_lcd_size(2, 16);
-
-	PWM_DISPLAY(config, m_leds).set_size(8, 8);
-
-	DSP56303(config, m_dsp, 66_MHz_XTAL);
-	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
-	m_dsp->set_addrmap(dsp563xx_device::AS_X, &acvirus_state::dsp_x_map);
-	m_dsp->set_addrmap(dsp563xx_device::AS_Y, &acvirus_state::dsp_y_map);
-	m_dsp->set_hard_omr(0xe);
-
-	SPEAKER(config, "speaker", 2).front();
-
-	config.set_default_layout(layout_virusa);
-}
-
-void acvirus_state::virusb(machine_config &config)
+void acvirus_state::virus_common(machine_config &config)
 {
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(
 		[this] (int state) { m_mdin_bit = state; }
@@ -320,7 +275,6 @@ void acvirus_state::virusb(machine_config &config)
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
 
-	SAB80C535(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
@@ -347,13 +301,36 @@ void acvirus_state::virusb(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(acvirus_state::green_palette_init), 2);
-
 	/* Actual device is LM16255 */
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
 	PWM_DISPLAY(config, m_leds).set_size(8, 8);
+
+	SPEAKER(config, "speaker", 2).front();
+}
+
+void acvirus_state::virusa(machine_config &config)
+{
+	SAB80C535(config, m_maincpu, XTAL(12'000'000));
+
+	virus_common(config);
+
+	DSP56303(config, m_dsp, 66_MHz_XTAL);
+	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
+	m_dsp->set_addrmap(dsp563xx_device::AS_X, &acvirus_state::dsp_x_map);
+	m_dsp->set_addrmap(dsp563xx_device::AS_Y, &acvirus_state::dsp_y_map);
+	m_dsp->set_hard_omr(0xe);
+
+	PALETTE(config, "palette", FUNC(acvirus_state::green_palette_init), 2);
+	config.set_default_layout(layout_virusa);
+}
+
+void acvirus_state::virusb(machine_config &config)
+{
+	SAB80C535(config, m_maincpu, XTAL(12'000'000));
+
+	virus_common(config);
 
 	DSP56311(config, m_dsp, 108_MHz_XTAL);
 	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::dsp_p_map);
@@ -361,45 +338,15 @@ void acvirus_state::virusb(machine_config &config)
 	m_dsp->set_addrmap(dsp563xx_device::AS_Y, &acvirus_state::dsp_y_map);
 	m_dsp->set_hard_omr(0xe);
 
-	SPEAKER(config, "speaker", 2).front();
-
+	PALETTE(config, "palette", FUNC(acvirus_state::green_palette_init), 2);
 	config.set_default_layout(layout_virusb);
 }
 
 void acvirus_state::virusc(machine_config &config)
 {
 	SAB80C535(config, m_maincpu, XTAL(24'000'000)); // 515 really
-	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
-	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
-	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
-	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
-	m_maincpu->port_out_cb<3>().set(FUNC(acvirus_state::p3_w));
-	m_maincpu->port_in_cb<4>().set(FUNC(acvirus_state::p4_r));
-	m_maincpu->port_out_cb<4>().set(FUNC(acvirus_state::p4_w));
-	m_maincpu->port_out_cb<5>().set(FUNC(acvirus_state::p5_w));
-	m_maincpu->an0_func().set([this] { return m_knob[4*0 + m_an_select]->read(); });
-	m_maincpu->an1_func().set([this] { return m_knob[4*1 + m_an_select]->read(); });
-	m_maincpu->an2_func().set([this] { return m_knob[4*2 + m_an_select]->read(); });
-	m_maincpu->an3_func().set([this] { return m_knob[4*3 + m_an_select]->read(); });
-	m_maincpu->an4_func().set([this] { return m_knob[4*4 + m_an_select]->read(); });
-	m_maincpu->an5_func().set([this] { return m_knob[4*5 + m_an_select]->read(); });
-	m_maincpu->an6_func().set([this] { return m_knob[4*6 + m_an_select]->read(); });
-	m_maincpu->an7_func().set([this] { return m_knob[4*7 + m_an_select]->read(); });
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
-	screen.set_size(6*16, 8*2+1);
-	screen.set_visarea_full();
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", FUNC(acvirus_state::red_palette_init), 2);
-
-	/* Actual device is LM16255 */
-	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
-	m_lcdc->set_lcd_size(2, 16);
-
-	PWM_DISPLAY(config, m_leds).set_size(8, 8);
+	virus_common(config);
 
 	DSP56362(config, m_dsp, 136_MHz_XTAL);
 	m_dsp->set_addrmap(dsp563xx_device::AS_P, &acvirus_state::virusc_dsp_p_map);
@@ -407,7 +354,8 @@ void acvirus_state::virusc(machine_config &config)
 	m_dsp->set_addrmap(dsp563xx_device::AS_Y, &acvirus_state::dsp_y_map);
 	m_dsp->set_hard_omr(0xe);
 
-	SPEAKER(config, "speaker", 2).front();
+	PALETTE(config, "palette", FUNC(acvirus_state::red_palette_init), 2);
+	// TODO: config.set_default_layout(layout_virusc);
 }
 
 
