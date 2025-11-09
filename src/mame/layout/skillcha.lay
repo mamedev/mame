@@ -3,7 +3,7 @@
 license:CC0-1.0
 copyright-holders: Roberto Fresca
 
-  Wing W7 - Skill Chance control panel.
+  Wing W7 - Skill Chance (alt) control panel.
 
 -->
 <mamelayout version="2">
@@ -199,18 +199,18 @@ copyright-holders: Roberto Fresca
 		</element>
 
 
-		<element name="lamp3" ref="bet_b" inputtag="IN0" inputmask="0x20">
+		<element name="lamp2" ref="bet_b" inputtag="IN0" inputmask="0x20">
 			<bounds x="0.05" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp3" ref="bet" inputtag="IN0" inputmask="0x20">
+		<element name="lamp2" ref="bet" inputtag="IN0" inputmask="0x20">
 			<bounds x="0.07" y="3.10" width="0.46" height="0.20" />
 		</element>
 
 
-		<element name="lamp2" ref="take_b" inputtag="IN0" inputmask="0x10">
+		<element name="lamp1" ref="take_b" inputtag="IN0" inputmask="0x10">
 			<bounds x="0.75" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp2" ref="take" inputtag="IN0" inputmask="0x10">
+		<element name="lamp1" ref="take" inputtag="IN0" inputmask="0x10">
 			<bounds x="0.77" y="3.10" width="0.46" height="0.20" />
 		</element>
 
@@ -231,18 +231,18 @@ copyright-holders: Roberto Fresca
 		</element>
 
 
-		<element name="lamp4" ref="big_b" inputtag="IN0" inputmask="0x40">
+		<element name="lamp0" ref="big_b" inputtag="IN0" inputmask="0x40">
 			<bounds x="2.7" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp4" ref="small" inputtag="IN0" inputmask="0x40">
+		<element name="lamp0" ref="small" inputtag="IN0" inputmask="0x40">
 			<bounds x="2.72" y="3.10" width="0.46" height="0.20" />
 		</element>
 
 
-		<element name="lamp5" ref="start_b" inputtag="IN0" inputmask="0x80">
+		<element name="lamp11" ref="start_b" inputtag="IN0" inputmask="0x80">
 			<bounds x="3.45" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp5" ref="start" inputtag="IN0" inputmask="0x80">
+		<element name="lamp11" ref="start" inputtag="IN0" inputmask="0x80">
 			<bounds x="3.47" y="3.10" width="0.46" height="0.20" />
 		</element>
 

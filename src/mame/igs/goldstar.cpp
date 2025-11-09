@@ -297,6 +297,7 @@
 #include "roypok96.lh"
 #include "skill98.lh"
 #include "skillch.lh"
+#include "skillcha.lh"
 #include "tonypok.lh"
 #include "unkch.lh"
 #include "unkchx.lh"
@@ -12924,7 +12925,15 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( megaline )
 
-	PORT_INCLUDE( cmv4_player )  // IN0 - Plater 1 IOPort 0x40
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_CODE(KEYCODE_B) PORT_NAME("Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_CODE(KEYCODE_C) PORT_NAME("D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  PORT_CODE(KEYCODE_X) PORT_NAME("Take")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_CODE(KEYCODE_Z) PORT_NAME("Bet / Stop All")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_CODE(KEYCODE_V) PORT_NAME("Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )       PORT_CODE(KEYCODE_N) PORT_NAME("Start / Stop Seq")
 
 	PORT_START("IN1")  // Player 2 - IOPort 0x60
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN1-1")
@@ -13084,7 +13093,7 @@ static INPUT_PORTS_START( megaline )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin / 200 Credits" )
 
-	PORT_DIPNAME( 0x80, 0x80, "Reel Stop" )              PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPNAME( 0x80, 0x00, "Reel Stop" )              PORT_DIPLOCATION("DSW4:8")
 	PORT_DIPSETTING(    0x80, "Auto Stop" )
 	PORT_DIPSETTING(    0x00, "Manual Stop" )
 
@@ -31128,8 +31137,8 @@ GAME(  1986, feverchw4,  feverch,  lucky8t,  lucky8t,  wingco_state,   empty_ini
 // --- Wing W-7 hardware ---
 GAMEL( 1991, megaline,   0,        megaline, megaline, wingco_state,   init_mgln,      ROT0, "Fun World",         "Mega Lines (Wing W-7 System)",                             0,          layout_megaline )
 GAMEL( 1986, skillch,    0,        megaline, megaline, wingco_state,   init_skch,      ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 1, 62-98 main)",                    0,          layout_skillch )
-GAMEL( 1986, skillcha,   skillch,  megaline, skillcha, wingco_state,   init_skcha,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2, 53-98 main)",                    0,          layout_skillch )
-GAMEL( 1986, skillchb,   skillch,  megaline, megaline, wingco_state,   init_skchb,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 3, 62-98 main)",                    MACHINE_NOT_WORKING,          layout_skillch ) // needs verifying, but seems to work
+GAMEL( 1986, skillcha,   skillch,  megaline, skillcha, wingco_state,   init_skcha,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2, 53-98 main)",                    0,          layout_skillcha )
+GAMEL( 1986, skillchb,   skillch,  megaline, megaline, wingco_state,   init_skchb,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 3, 62-98 main)",                    0,          layout_skillcha )
 
 // --- Wing W-8 hardware ---
 GAMEL( 1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    init_bonch,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                0,          layout_bonusch )  // M80C51F MCU
