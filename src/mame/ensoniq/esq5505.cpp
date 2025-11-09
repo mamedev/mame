@@ -362,7 +362,7 @@ TIMER_CALLBACK_MEMBER(esq5505_state::floppy_motor_on)
 		floppy_image_device *floppy = m_floppy_connector->get_device();
 		if (floppy)
 		{
-			floppy->mon_w(motor_on ? CLEAR_LINE : ASSERT_LINE);  // active low
+			floppy->mon_w(!motor_on);  // active low
 			m_panel->set_floppy_active(motor_on);
 		}
 	}
@@ -378,8 +378,7 @@ TIMER_CALLBACK_MEMBER(esq5505_state::floppy_dskchg_reset)
 void esq5505_state::update_floppy_inputs()
 {
 	// update the "Disk Ready" input
-	int state = (m_floppy_is_active && m_floppy_is_loaded) ? ASSERT_LINE : CLEAR_LINE;
-	m_duart->ip0_w(state);
+	m_duart->ip0_w(m_floppy_is_active && m_floppy_is_loaded);
 
 	// Also update the DOC IRQ in case there's a pending disk change to handle.
 	update_docirq_to_maincpu();
@@ -641,7 +640,7 @@ void esq5505_state::duart_output(uint8_t data)
 	    VFX-SD & SD-1 (32):
 	    bits 0/1/2 = analog sel
 	    bit 3 = SSEL (disk side)
-	    bit 4 = DSEL (Drive Delect and floppy Motor On)
+	    bit 4 = DSEL (Drive Select and floppy Motor On)
 	    bit 6 = ESPHALT
 	    bit 7 = SACK (?)
 	*/
@@ -671,8 +670,8 @@ void esq5505_state::duart_output(uint8_t data)
 		}
 		else
 		{
-			floppy->ss_w(((data & 8) >> 3) ^ 1); // bit 3, inverted -> floppy
-			m_floppy_is_active = (data & 16) != 0; // bit 4 is used to activate the floppy:
+			floppy->ss_w(!BIT(data, 3)); // bit 3, inverted -> floppy
+			m_floppy_is_active = BIT(data, 4); // bit 4 is used to activate the floppy:
 			if (m_floppy_is_active)
 			{
 				// immediately assert DISK SELECT (active low)
