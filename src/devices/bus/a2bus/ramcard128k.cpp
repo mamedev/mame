@@ -57,6 +57,11 @@ void a2bus_ssramcard_device::device_start()
 
 void a2bus_ssramcard_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_ssramcard_device::reset_from_bus()
+{
 	m_inh_state = INH_NONE;
 	m_dxxx_bank = 0;
 	m_main_bank = 0;

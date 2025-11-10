@@ -71,6 +71,11 @@ void a2bus_softcard_device::device_start()
 
 void a2bus_softcard_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_softcard_device::reset_from_bus()
+{
 	m_bEnabled = false;
 
 	m_FirstZ80Boot = true;
@@ -167,9 +172,4 @@ void a2bus_softcard_device::dma_w(offs_t offset, uint8_t data)
 			slot_dma_write(offset&0xfff, data);
 		}
 	}
-}
-
-bool a2bus_softcard_device::take_c800()
-{
-	return false;
 }

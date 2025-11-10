@@ -38,7 +38,8 @@ protected:
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
-	virtual bool take_c800() override;
+	virtual bool take_c800() const override;
+	virtual void reset_from_bus() override;
 
 	uint8_t *m_rom;
 };

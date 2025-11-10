@@ -59,6 +59,11 @@ void a2bus_agat7ram_device::device_start()
 
 void a2bus_agat7ram_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_agat7ram_device::reset_from_bus()
+{
 	m_inh_state = INH_NONE;
 	m_main_bank = 0;
 	m_csr = 0;

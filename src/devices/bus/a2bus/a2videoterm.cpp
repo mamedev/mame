@@ -119,6 +119,8 @@ protected:
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 	uint8_t m_ram[512*4];
 
@@ -328,6 +330,11 @@ void a2bus_videx80_device::device_start()
 void a2bus_videx80_device::device_reset()
 {
 	m_rambank = 0;
+}
+
+void a2bus_videx80_device::reset_from_bus()
+{
+	m_crtc->reset(); // possibly not hooked up for some clones
 }
 
 

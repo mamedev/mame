@@ -22,6 +22,7 @@ public:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual u8 read_c800(u16 offset) override;
+	virtual bool take_c800() const override { return true; }
 
 protected:
 	// device_t implementation
@@ -199,6 +200,12 @@ void a2bus_uniprint_device::device_start()
 
 
 void a2bus_uniprint_device::device_reset()
+{
+	reset_from_bus();
+}
+
+
+void a2bus_uniprint_device::reset_from_bus()
 {
 	m_ack_latch = 0x01U;
 }
