@@ -483,6 +483,7 @@ public:
 	void init_cmtetriskr() ATTR_COLD;
 	void init_cmv4() ATTR_COLD;
 	void init_cmv823() ATTR_COLD;
+	void init_cmpap() ATTR_COLD;
 	void init_crazybonb() ATTR_COLD;
 	void init_cutya() ATTR_COLD;
 	void init_eldoraddoa() ATTR_COLD;
@@ -3152,7 +3153,7 @@ void cmaster_state::anhs_reel_reg_w(uint8_t data)
 {
 /*
   Video Reels Register
-	7 6 5 4 3 2 1 0
+    7 6 5 4 3 2 1 0
     | | | | | | | |
     | | | | | +-+-+----- m_bgcolor
     | | | | +----------- reel/girl enable -> to update girls or reels
@@ -5668,7 +5669,7 @@ static INPUT_PORTS_START( eldoradoa )
 	PORT_DIPNAME( 0x10, 0x00, "Show Girls" )            PORT_DIPLOCATION("DSW5:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	// 0xe0 --> skill mode / stops. same as animalhs 
+	// 0xe0 --> skill mode / stops. same as animalhs
 
 	PORT_MODIFY("DSW6")
 	PORT_DIPNAME( 0x01, 0x01, "DSW6" )                  PORT_DIPLOCATION("DSW6:1")
@@ -16306,7 +16307,7 @@ void cmaster_state::animalhs(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::animalhs_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::animalhs_portmap);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);	
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -17385,6 +17386,35 @@ ROM_START( cmv801 )
 
 	ROM_REGION( 0x10000, "user1", 0 )  // taken from other set, was missing in this dump
 	ROM_LOAD( "27512.u53",  0x0000, 0x10000, BAD_DUMP CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // pal
+	ROM_LOAD( "prom2.287", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom3.287", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )  // something else?
+	ROM_LOAD( "prom1.287", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( cmpap )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sub-pcb.bin", 0x4000, 0x4000, CRC(b5fa0e25) SHA1(b5808d8f0f3051156b2f3a2fcf89d4506f29b5e2) )
+	ROM_CONTINUE(            0x0000, 0x4000 )
+	ROM_CONTINUE(            0xc000, 0x4000 )
+	ROM_CONTINUE(            0x8000, 0x4000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "m5.256",   0x00000, 0x8000, CRC(19cc1d67) SHA1(47487f9362bfb36a32100ed772960628844462bf) )
+	ROM_LOAD( "m6.256",   0x08000, 0x8000, CRC(63b3df4e) SHA1(9bacd23da598805ec18ec5ad15cab95d71eb9262) )
+	ROM_LOAD( "m7.256",   0x10000, 0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "m3.64",     0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "m4.64",     0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "m1.64",     0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "m2.64",     0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "27512.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
 	ROM_REGION( 0x200, "proms", 0 )  // pal
 	ROM_LOAD( "prom2.287", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
@@ -29090,6 +29120,43 @@ void cmaster_state::init_cmv823()
 }
 
 
+void cmaster_state::init_cmpap()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i += 0x80)
+	{
+		if ((i & 0xc000) != 0x8000)
+		{
+			std::swap_ranges(&rom[i + 0x00], &rom[i + 0x08], &rom[i + 0x08]);
+			std::swap_ranges(&rom[i + 0x08], &rom[i + 0x10], &rom[i + 0x18]);
+			std::swap_ranges(&rom[i + 0x10], &rom[i + 0x18], &rom[i + 0x18]);
+			std::swap_ranges(&rom[i + 0x20], &rom[i + 0x28], &rom[i + 0x38]);
+			std::swap_ranges(&rom[i + 0x50], &rom[i + 0x58], &rom[i + 0x48]);
+			std::swap_ranges(&rom[i + 0x60], &rom[i + 0x68], &rom[i + 0x70]);
+			std::swap_ranges(&rom[i + 0x68], &rom[i + 0x70], &rom[i + 0x70]);
+			std::swap_ranges(&rom[i + 0x70], &rom[i + 0x78], &rom[i + 0x78]);
+		}
+	}
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		if ((i & 0xc000) != 0x8000)
+		{
+			switch (i & 0x20)
+			{
+				case 0x00: BIT(rom[i], 6) ? rom[i] = bitswap<8>(rom[i] ^ 0x12, 3, 6, 5, 1, 4, 2, 7, 0) : rom[i] = bitswap<8>(rom[i] ^ 0x88, 4, 6, 5, 3, 1, 2, 7, 0); break;
+				case 0x20: BIT(rom[i], 0) ? rom[i] = bitswap<8>(rom[i] ^ 0x88, 3, 6, 5, 1, 7, 2, 4, 0) : rom[i] = bitswap<8>(rom[i] ^ 0x12, 4, 6, 5, 7, 1, 2, 3, 0);  break;
+			}
+		}
+	}
+
+//  forcing PPI mode 0 for all, and A, B & C as input.
+	rom[0x0076] = 0x9b;
+	rom[0x007a] = 0x9b;
+}
+
+
 void cmaster_state::init_hamhouse()
 {
 	init_cmv4();
@@ -30614,8 +30681,8 @@ void cmaster_state::init_animalhs()
 	 // Fix Test Mode bad string pointer - (perhaps bad decryption)
 	 // animalhs & animalhsa
 	rom[0x5d5d] = 0xeb;
-	rom[0x5d5e] = 0x82;	
-	
+	rom[0x5d5e] = 0x82;
+
 	// Fix attract mode bad jump & stack crash
 	// animalhsa (fix compatible with animalhs code)
 	rom[0x26b7] = 0x4e;
@@ -30953,8 +31020,9 @@ GAME(  1994, chryanglb,  ncb3,     chryanglb, chryanglb, cmaster_state, init_chr
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
-GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  init_cmv823,    ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.23)",     0,                 layout_cmv4 )  // encrypted
-GAMEL( 198?, cmv801,     cmv823,   cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.01)",     0,                 layout_cmv4 )  // says ED-96 where the manufacturer is on some games...
+GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  init_cmv823,    ROT0, "Corsica",             "Cherry Master (ED-96, Corsica CM v8.23)",     0,                   layout_cmv4 )  // encrypted
+GAMEL( 198?, cmv801,     cmv823,   cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",             "Cherry Master (ED-96, Corsica CM v8.01)",     0,                   layout_cmv4 )  // says ED-96 where the manufacturer is on some games...
+GAMEL( 198?, cmpap,      0,        cm,       cmv801,   cmaster_state,  init_cmpap,     ROT0, "Pick-A-Party Brazil", "Cherry Master (ED-98, Pick-A-Party)",         MACHINE_NOT_WORKING, layout_cmv4 )  // probably works correctly, needs i/o checking
 
 
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
