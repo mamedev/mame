@@ -165,11 +165,12 @@
 #include "bus/midi/midi.h"
 #include "cpu/es5510/es5510.h"
 #include "cpu/m68000/m68000.h"
-#include "formats/esq16_dsk.h"
-#include "imagedev/floppy.h"
 #include "esqlcd.h"
 #include "esqpanel.h"
 #include "esqvfd.h"
+#include "formats/esq16_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
@@ -352,6 +353,7 @@ void esq5505_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_ESQIMG_FORMAT);
+	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 TIMER_CALLBACK_MEMBER(esq5505_state::floppy_motor_on)
