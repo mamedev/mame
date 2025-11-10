@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="sd132_flop" description="Ensoniq SD-1 32 Voice Disk Images">
 
-<software name="os400">
+<software name="os400" supported="yes">
 	<description>SD-1 Sequencer OS version 4.00</description>
 	<year>1991</year>
 	<publisher>Ensoniq</publisher>
@@ -18,7 +18,7 @@ license:CC0-1.0
 
 </software>
 
-<software name="os410">
+<software name="os410" supported="yes">
 	<description>SD-1 Sequencer OS version 4.10</description>
 	<year>1992</year>
 	<publisher>Ensoniq</publisher>
@@ -31,7 +31,7 @@ license:CC0-1.0
 
 </software>
 
-<software name="sd1_32_demo1">
+<software name="sd1_32_demo1" supported="yes">
 	<description>SD-1 32 Voice Demo Disk #1</description>
 	<year>1992</year>
 	<publisher>Ensoniq</publisher>
@@ -44,7 +44,7 @@ license:CC0-1.0
 
 </software>
 
-<software name="multi_demo1">
+<software name="multi_demo1" supported="yes">
 	<description>Multi-Product Demo Disk #1</description>
 	<year>1992</year>
 	<publisher>Ensoniq</publisher>
@@ -57,7 +57,7 @@ license:CC0-1.0
 
 </software>
 
-<software name="multi_demo2">
+<software name="multi_demo2" supported="yes">
 	<description>Multi-Product Demo Disk #2</description>
 	<year>1993</year>
 	<publisher>Ensoniq</publisher>
@@ -70,7 +70,7 @@ license:CC0-1.0
 
 </software>
 
-<software name="sq32_demo1">
+<software name="sq32_demo1" supported="yes">
 	<description>SQ 32 Voice Demo Disk #2</description>
 	<year>1993</year>
 	<publisher>Ensoniq</publisher>
