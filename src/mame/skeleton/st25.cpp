@@ -87,7 +87,7 @@ void st25_state::program_map(address_map &map)
 
 void st25_state::io_map(address_map &map)
 {
-	/* map(0x8000, 0x8000).w(); */
+	// map(0x8000, 0x8000).w();
 }
 
 void st25_state::data_map(address_map &map)
@@ -98,7 +98,6 @@ void st25_state::data_map(address_map &map)
 
 static INPUT_PORTS_START(st25)
 	PORT_START("IN0")
-
 INPUT_PORTS_END
 
 
@@ -124,9 +123,7 @@ void st25_state::st25(machine_config &config)
 	SCN2681(config, "uart", 3.6864_MHz_XTAL); // Philips SCC2692AC1N28
 
 	// Sound hardware
-
 	SPEAKER(config, "mono").front_center();
-
 	OKIM6376(config, "oki", 4_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5); // Divider not verified
 }
 
@@ -139,7 +136,6 @@ ROM_START(stakeoff)
 
 	ROM_REGION(0x80000, "oki", 0)
 	ROM_LOAD("27c040.ic1",   0x00000, 0x80000, CRC(d9592e5e) SHA1(5de917a1c584a39a85e6f356d25924a65eaddf89))
-
 ROM_END
 
 } // anonymous namespace
