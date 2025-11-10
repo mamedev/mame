@@ -49,6 +49,7 @@ Infos can be found at https://wiki.goldserie.de/index.php?title=Spiel_und_System
 #include "emu.h"
 
 #include "cpu/nec/v25.h"
+
 #include "machine/mc68681.h"
 #include "machine/timekpr.h"
 #include "sound/okim6376.h"
@@ -86,7 +87,7 @@ void st25_state::program_map(address_map &map)
 
 void st25_state::io_map(address_map &map)
 {
-	// map(0x8000, 0x8000).w();
+	/* map(0x8000, 0x8000).w(); */
 }
 
 void st25_state::data_map(address_map &map)
