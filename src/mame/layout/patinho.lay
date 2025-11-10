@@ -244,6 +244,27 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<disk state="0"><color red="0.3" green="0.02" blue="0.02" /></disk>
 	</element>
 
+	<element name="switch" defstate="0">
+		<image state="0">
+		<data><![CDATA[
+			<svg width="24" height="46">
+				<polyline style="fill:#808080" points="6,0 18,0 24,17  24,29 0,29 0,17"/>
+				<rect style="fill:#303030" x="6" y="0" width="12" height="4"/>
+				<polyline style="fill:#505050" points="6,4 18,4 24,29 0,29"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1">
+		<data><![CDATA[
+			<svg width="24" height="46">
+				<polyline style="fill:#808080" points="6,46 18,46 24,29  24,17 0,17 0,29"/>
+				<rect style="fill:#303030" x="6" y="40" width="12" height="4"/>
+				<polyline style="fill:#505050" points="6,42 18,42 24,17 0,17"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+
 	<element name="button" defstate="0">
 		<!-- button_surrond_border -->
 		<disk>
@@ -550,6 +571,10 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 				<bounds x="~lamp_x~" y="480" width="11" height="11" />
 			</element>
 		</repeat>
+
+		<element ref="str_OCTAL"><bounds x="129" y="774" width="32" height="12"/></element>
+		<element ref="str_HEXADECIMAL"><bounds x="129" y="892" width="64" height="12"/></element>
+
 
 		<element ref="str_rc"><bounds x="805" y="527" width="240" height="16" /></element>
 
@@ -930,6 +955,18 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<element ref="memory_rect">
 			<bounds x="381" y="946" width="311" height="67"/>
 		</element>
+
+		<repeat count="12">
+			<param name="i" start="0" increment="1"/>
+			<param name="x_label" start="157" increment="85"/>
+			<param name="x_switch" start="160" increment="85"/>
+			<param name="mask" start="0x800" rshift="1" />
+
+			<element ref="str_num_~i~"><bounds x="~x_label~" y="780" width="18" height="16"/></element>
+			<element name="rc~i~" ref="switch" inputtag="rc" inputmask="~mask~">
+				<bounds x="~x_switch~" y="830" width="20" height="30"/>
+			</element>
+		</repeat>
 
 		<!-- define 'MODO DE OPERACAO' lines -->
 		<repeat count="6">
@@ -1319,15 +1356,6 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<element ref="str_memoria"><bounds x="1070" y="711" width="80" height="16"/></element>
 
 		<element ref="str_memoria_spaces"><bounds x="284" y="154" width="115" height="16"/></element>
-
-		<repeat count="12">
-			<param name="i" start="0" increment="1"/>
-			<param name="x" start="157" increment="85"/>
-			<element ref="str_num_~i~"><bounds x="~x~" y="780" width="18" height="16"/></element>
-		</repeat>
-
-		<element ref="str_OCTAL"><bounds x="129" y="774" width="32" height="12"/></element>
-		<element ref="str_HEXADECIMAL"><bounds x="129" y="892" width="64" height="12"/></element>
 
 		<repeat count="3">
 			<param name="y1" start="169" increment="120"/>
