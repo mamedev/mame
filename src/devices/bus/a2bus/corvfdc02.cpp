@@ -118,7 +118,7 @@ void a2bus_corvfdc02_device::device_reset()
 	m_timer->adjust(attotime::never);
 }
 
-void a2bus_corvfdc01_device::reset_from_bus()
+void a2bus_corvfdc02_device::reset_from_bus()
 {
 	m_fdc->reset();
 }

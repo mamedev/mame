@@ -23,6 +23,7 @@ public:
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual u8 read_c800(u16 offset) override;
 	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 protected:
 	// device_t implementation

@@ -119,7 +119,7 @@ void a2bus_ace2x00_device::device_reset()
 	m_rom = device().machine().root_device().memregion("maincpu")->base();
 }
 
-void a2bus_ace2x00_device::reset_from_bus()
+void a2bus_ace2x00_slot6_device::reset_from_bus()
 {
 	m_iwm->reset();
 }
