@@ -53,15 +53,19 @@ def check_spdx_header(lines):
     while i < len(lines) and not lines[i].strip():
         i += 1
 
-    if i >= len(lines) or not LICENSE_RE.match(lines[i]):
-        errors.append((i + 1, "Missing or incorrect // license: header"))
+    if i >= len(lines):
+        errors.append((i + 1, "Missing // license: header"))
+    elif not LICENSE_RE.match(lines[i]) or not lines[i].split(':', 1)[1].strip():
+        errors.append((i + 1, "Incorrect or empty // license: header"))
 
     i += 1
     while i < len(lines) and not lines[i].strip():
         i += 1
 
-    if i >= len(lines) or not COPYRIGHT_RE.match(lines[i]):
-        errors.append((i + 1, "Missing or incorrect // copyright-holders: header"))
+    if i >= len(lines):
+        errors.append((i + 1, "Missing // copyright-holders: header"))
+    elif not COPYRIGHT_RE.match(lines[i]) or not lines[i].split(':', 1)[1].strip():
+        errors.append((i + 1, "Incorrect or empty // copyright-holders: header"))
 
     return errors
 
