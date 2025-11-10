@@ -1850,6 +1850,10 @@ void adsp21062_device::sharcop_relative_jump()
 		else
 		{
 			CHANGE_PC(m_core->pc + util::sext(address, 24));
+
+			// if a flag is causing the instruction to jump to itself, eat the remaining cycles
+			if (address == 0 && (cond & 0xf) >= 0x9 && (cond & 0xf) <= 0xc)
+				eat_cycles(m_core->icount);
 		}
 	}
 }
@@ -2704,6 +2708,8 @@ void adsp21062_device::sharcop_push_pop_stacks()
 
 void adsp21062_device::sharcop_nop()
 {
+	if (m_core->flag_stalled)
+		eat_cycles(m_core->icount);
 }
 
 /*****************************************************************************/

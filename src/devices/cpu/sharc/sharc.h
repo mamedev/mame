@@ -378,6 +378,7 @@ private:
 		SHARC_DMA_OP dma_op[12];
 		uint32_t dma_status;
 		bool write_stalled;
+		bool flag_stalled;
 
 		int32_t interrupt_active;
 

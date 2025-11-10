@@ -1076,6 +1076,8 @@ void adsp21062_device::execute_run()
 
 			m_core->opcode = m_program->read_qword(m_core->pc);
 
+			m_core->flag_stalled = false;
+
 			// handle looping
 			if (m_core->pc == m_core->laddr.addr)
 			{
@@ -1101,6 +1103,10 @@ void adsp21062_device::execute_run()
 					else
 					{
 						CHANGE_PC(TOP_PC());
+
+						// if a flag is causing us to loop, stall
+						if ((condition & 0xf) >= 0x9 && (condition & 0xf) <= 0xc)
+							m_core->flag_stalled = true;
 					}
 
 					m_core->astat = m_core->astat_old;
