@@ -41,13 +41,49 @@ jobs:
 
             if (comments.length > 0) {
               console.debug("Reviews: ", reviews);
-              await github.rest.pulls.createReview({
+
+              // Get previous reviews from github-actions[bot]
+              const { data: existingReviews } = await github.rest.pulls.listReviews({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: context.payload.pull_request.number,
-                event: "COMMENT",
-                comments,
               });
+
+              const botReview = existingReviews.find(review => review.user.login === "github-actions[bot]");
+
+              let existingComments = [];
+              if (botReview) {
+                // List comments for the bot's review
+                const { data: reviewComments } = await github.rest.pulls.listCommentsForReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number,
+                  review_id: botReview.id,
+                });
+                existingComments = reviewComments;
+              }
+
+              // Filter out comments that already exist
+              const newComments = comments.filter(newComment => {
+                return !existingComments.some(existingComment =>
+                  existingComment.path === newComment.path &&
+                  existingComment.line === newComment.line &&
+                  existingComment.body === newComment.body
+                );
+              });
+
+              if (newComments.length > 0) {
+                console.debug("Posting new comments: ", newComments);
+                await github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number,
+                  event: "COMMENT",
+                  comments: newComments,
+                });
+              } else {
+                console.info("All comments already exist, skipping review creation.");
+              }
             } else {
               console.info("Review list empty.");
             }
