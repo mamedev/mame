@@ -16,7 +16,7 @@
     BASIC firmware card in slot 0 of an original Apple II, though
     they will load Applesoft onto a language card if one is present
     there.  Compatible revisions print "APPLE II PLUS OR ROMCARD"
-    when successfully booted on any system.
+    when successfully booted on any non-Integer BASIC system.
 
 *********************************************************************/
 
