@@ -20,19 +20,19 @@ jobs:
 
       - name: Run style check
         id: style-check
-        run: echo "reviews=$(python3 scripts/build/style.py --base-sha ${{ github.event.pull_request.base.sha }} | jq -s -c .)" >> $GITHUB_OUTPUT
+        run: echo "comments=$(python3 scripts/build/style.py --base-sha ${{ github.event.pull_request.base.sha }} | jq -s -c .)" >> $GITHUB_OUTPUT
 
       - name: Post review
         uses: actions/github-script@v8
         id: post-comments
         env:
-          COMMENTS: ${{ steps.style-check.outputs.reviews }}
+          COMMENTS: ${{ steps.style-check.outputs.comments }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const reviews = JSON.parse(process.env.COMMENTS || "[]");
+            const review_comments = JSON.parse(process.env.COMMENTS || "[]");
 
-            const comments = reviews.map(r => ({
+            const comments = review_comments.map(r => ({
               path: r.path,
               line: r.line,
               side: "RIGHT",
