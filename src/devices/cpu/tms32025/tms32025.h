@@ -160,7 +160,7 @@ protected:
 
 	PAIR      m_oldacc;
 	uint32_t  m_memaccess;
-	ATTR_FORCE_INLINE bool is_mem_access_external() { return m_memaccess >= 0x800; }
+	bool is_mem_access_external() { return m_memaccess >= 0x800; }
 	int       m_icount;
 	bool      m_waiting_for_serial_frame;
 

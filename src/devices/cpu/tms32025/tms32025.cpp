@@ -412,7 +412,7 @@ inline void tms3202x_device::MODIFY_ARP(int data)
 	m_STR0 |= 0x0400;
 }
 
-inline uint16_t tms3202x_device::reverse_carry_add(uint16_t arg0, uint16_t arg1)
+uint16_t tms3202x_device::reverse_carry_add(uint16_t arg0, uint16_t arg1)
 {
 	uint16_t result = 0;
 	int carry = 0;
