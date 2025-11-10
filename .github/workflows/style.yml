@@ -22,42 +22,15 @@ jobs:
         id: style-check
         run: echo "reviews=$(python3 scripts/build/style.py --base-sha ${{ github.event.pull_request.base.sha }} | jq -s -c .)" >> $GITHUB_OUTPUT
 
-      - name: Dismiss previous review
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const pr = context.payload.pull_request;
-            const reviews = await github.paginate(
-              github.rest.pulls.listReviews,
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                per_page: 100,
-              }
-            );
-            for (const review of reviews) {
-              if (review.user && review.user.login === "github-actions[bot]") {
-                  await github.rest.pulls.dismissReview({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    pull_number: pr.number,
-                    review_id: review.id,
-                    message: "Dismissing previous automated review"
-                  });
-              }
-            }
-
       - name: Post review
         uses: actions/github-script@v8
         id: post-comments
         env:
-          REVIEWS: ${{ steps.style-check.outputs.reviews }}
+          COMMENTS: ${{ steps.style-check.outputs.reviews }}
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const reviews = JSON.parse(process.env.REVIEWS || "[]");
+            const reviews = JSON.parse(process.env.COMMENTS || "[]");
 
             const comments = reviews.map(r => ({
               path: r.path,
