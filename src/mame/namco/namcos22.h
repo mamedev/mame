@@ -288,9 +288,6 @@ protected:
 	void namcos22_dspram16_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 pdp_status_r();
 	u16 pdp_begin_r();
-	u16 dsp_hold_signal_r();
-	void dsp_hold_ack_w(u16 data);
-	void dsp_xf_output_w(u16 data);
 	void point_address_w(u16 data);
 	void point_loword_iw(u16 data);
 	void point_hiword_w(u16 data);

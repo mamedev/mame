@@ -1942,21 +1942,23 @@ inline void tms3202x_device::process_timer(int clocks)
 void tms3202x_device::execute_run()
 {
 	/**** Respond to external hold signal */
-	if (m_hold_in() == ASSERT_LINE) {
-		if (!m_hold) {
-			m_hold_ack_out(ASSERT_LINE);  /* Hold-Ack (active low) */
-			m_hold = true;
-		}
+	if (!m_hold_in.isunset()) {
+		if (m_hold_in() == ASSERT_LINE) {
+			if (!m_hold) {
+				m_hold_ack_out(ASSERT_LINE);  /* Hold-Ack (active low) */
+				m_hold = true;
+			}
 
-		if (HM || is_mem_access_external()) {
-			m_icount = 0;   /* Exit */
-			return;
+			if (HM || is_mem_access_external()) {
+				m_icount = 0;   /* Exit */
+				return;
+			}
 		}
-	}
-	else if (m_hold) {
-		m_hold_ack_out(CLEAR_LINE);   /* Hold-Ack (active low) */
-		process_timer(3);
-		m_hold = false;
+		else if (m_hold) {
+			m_hold_ack_out(CLEAR_LINE);   /* Hold-Ack (active low) */
+			process_timer(3);
+			m_hold = false;
+		}
 	}
 
 	/**** If idling, update timer and/or exit execution, but test for irqs first */

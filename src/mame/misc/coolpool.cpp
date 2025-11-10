@@ -174,7 +174,6 @@ protected:
 
 	void misc_w(uint16_t data);
 	uint16_t dsp_bio_line_r();
-	uint16_t dsp_hold_line_r();
 
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
 
@@ -628,12 +627,6 @@ uint16_t _9ballsht_state::dsp_bio_line_r()
 }
 
 
-uint16_t _9ballsht_state::dsp_hold_line_r()
-{
-	return CLEAR_LINE;  // ???
-}
-
-
 /*************************************
  *
  *  IOP ROM and DAC access
@@ -985,8 +978,8 @@ void _9ballsht_state::_9ballsht(machine_config &config)
 	dsp.set_addrmap(AS_PROGRAM, &_9ballsht_state::dsp_pgm_map);
 	dsp.set_addrmap(AS_IO, &_9ballsht_state::nballsht_dsp_io_map);
 	dsp.bio_in_cb().set(FUNC(_9ballsht_state::dsp_bio_line_r));
-	dsp.hold_in_cb().set(FUNC(_9ballsht_state::dsp_hold_line_r));
-//  dsp.hold_ack_out_cb().set(FUNC(_9ballsht_state::dsp_HOLDA_signal_w));
+	//dsp.hold_in_cb().set(FUNC(_9ballsht_state::dsp_hold_line_r));
+	//dsp.hold_ack_out_cb().set(FUNC(_9ballsht_state::dsp_HOLDA_signal_w));
 
 	GENERIC_LATCH_16(config, m_main2dsp);
 	// ??? I have no idea who should generate this!

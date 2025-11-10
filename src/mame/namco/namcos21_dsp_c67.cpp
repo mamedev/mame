@@ -129,7 +129,7 @@ void namcos21_dsp_c67_device::device_add_mconfig(machine_config &config)
 	dspmaster.set_addrmap(AS_PROGRAM, &namcos21_dsp_c67_device::master_dsp_program);
 	dspmaster.set_addrmap(AS_DATA, &namcos21_dsp_c67_device::master_dsp_data);
 	dspmaster.set_addrmap(AS_IO, &namcos21_dsp_c67_device::master_dsp_io);
-	dspmaster.hold_in_cb().set_constant(0);
+	//dspmaster.hold_in_cb().set_constant(0);
 	dspmaster.hold_ack_out_cb().set_nop();
 	dspmaster.xf_out_cb().set(FUNC(namcos21_dsp_c67_device::dsp_xf_w));
 
