@@ -130,7 +130,7 @@ private:
 
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
-	void sio_map(address_map &map) ATTR_COLD;
+	void spec_io_map(address_map &map) ATTR_COLD;
 
 	void daisy_interrupt(int state);
 
@@ -279,8 +279,7 @@ void s8k_state::io_map(address_map &map)
 	0040 - 007F    Tape                    TCU 0040 - 004F
 	0080 - 0FFF    Other Memory Devices    None
 	1000 - 1FFF    Tape Devices            9-Track 1000 - 101F
-	2000 - 200F    Reserved
-	2010 - 6FFF    Reserved
+	2000 - 6FFF    Reserved                FPP 2000 - 200F
 	7000 - 8FFF    Disk Devices
 					- SMD                  7FF0 - 7FFF
 					- WDC/mWDC-II          8000 - 80FF
@@ -302,7 +301,7 @@ void s8k_state::io_map(address_map &map)
 	//map(0xffe9, 0xffe9).w(FUNC(s8k_state::reset());
 }
 
-void s8k_state::sio_map(address_map &map)
+void s8k_state::spec_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00f0, 0x20fc).rw(FUNC(s8k_state::mmu_cmd_r), FUNC(s8k_state::mmu_cmd_w));
@@ -458,7 +457,7 @@ void s8k_state::s8k(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &s8k_state::mem_map);
 	m_maincpu->set_addrmap(AS_DATA, &s8k_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &s8k_state::io_map);
-	m_maincpu->set_addrmap(z8001_device::AS_SIO, &s8k_state::sio_map);
+	m_maincpu->set_addrmap(z8001_device::AS_SIO, &s8k_state::spec_io_map);
 	m_maincpu->nmiack().set(FUNC(s8k_state::nmiack_r));
 	m_maincpu->viack().set("s8k_16_daisy", FUNC(s8k_16_daisy_device::viack_r));
 	m_maincpu->ns().set(FUNC(s8k_state::normal_led_w));
