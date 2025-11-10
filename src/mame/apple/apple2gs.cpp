@@ -656,7 +656,10 @@ u8 apple2gs_state::apple2gs_read_vector(offs_t offset)
 	// regardless of the language card config.
 	if (!(m_shadow & SHAD_IOLC))
 	{
-		return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
+		if (m_inh_slot != -1 && (m_slotdevice[m_inh_slot]->inh_type() & INH_READ) == INH_READ)
+			return m_slotdevice[m_inh_slot]->read_inh_rom(offset | 0xFFE0);
+		else
+			return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
 	}
 	else    // else vector fetches from bank 0 RAM
 	{
