@@ -43,7 +43,8 @@ jobs:
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     pull_number: pr.number,
-                    review_id: review.id
+                    review_id: review.id,
+                    message: "Dismissing previous automated review"
                   });
               }
             }
@@ -79,4 +80,4 @@ jobs:
             }
             if (comments.length > 50) {
               console.error("More than 50 comments");
-            } 
+            }
