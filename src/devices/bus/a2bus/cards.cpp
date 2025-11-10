@@ -260,7 +260,6 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("videoterm", A2BUS_VIDEOTERM);           // Videx VideoTerm
 	device.option_add("ssc", A2BUS_SSC);                       // Apple Super Serial Card
 	device.option_add("ssi", APRICORN_SSI);                    // Apricorn Super Serial Imager
-	device.option_add("swyft", A2BUS_SWYFT);                   // IAI SwyftCard
 	device.option_add("themill", A2BUS_THEMILL);               // Stellation Two The Mill (6809 card)
 	device.option_add("sam", A2BUS_SAM);                       // SAM Software Automated Mouth (8-bit DAC + speaker)
 	device.option_add("alfam2", A2BUS_ALFAM2);                 // ALF Apple Music II

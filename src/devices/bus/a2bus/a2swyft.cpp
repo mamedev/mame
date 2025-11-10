@@ -4,7 +4,8 @@
 
     a2swyft.c
 
-    Implementation of the IAI SwyftCard
+    Implementation of the IAI SwyftCard. This card was designed to
+    occupy slot 3 of an enhanced Apple IIe.
 
 *********************************************************************/
 
@@ -97,6 +98,7 @@ void a2bus_swyft_device::device_start()
 
 void a2bus_swyft_device::device_reset()
 {
+	// TODO: card uses both /RES and a dedicated power-on reset circuit
 	reset_from_bus();
 }
 
