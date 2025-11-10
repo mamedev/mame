@@ -143,7 +143,6 @@ public:
 	virtual uint16_t inh_end() { return INH_END_INVALID; }
 	virtual bool inh_check(uint16_t offset, bool bIsWrite) { return false; }
 	virtual int inh_type() { return INH_NONE; }
-	virtual void bus_reset() { }
 
 	device_a2bus_card_interface *next() const { return m_next; }
 

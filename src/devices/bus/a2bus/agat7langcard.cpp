@@ -65,6 +65,7 @@ void a2bus_agat7langcard_device::device_reset()
 	m_main_bank = 0;
 	m_csr = 0;
 	m_mode = 0;
+	recalc_slot_inh();
 }
 
 void a2bus_agat7langcard_device::do_io(int offset)

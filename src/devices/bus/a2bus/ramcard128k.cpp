@@ -61,6 +61,7 @@ void a2bus_ssramcard_device::device_reset()
 	m_dxxx_bank = 0;
 	m_main_bank = 0;
 	m_last_offset = -1;
+	recalc_slot_inh();
 }
 
 void a2bus_ssramcard_device::do_io(int offset)

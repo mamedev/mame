@@ -883,9 +883,6 @@ void apple2gs_state::machine_reset()
 	auxbank_update();
 	update_slotrom_banks();
 
-	// reset the slots
-	m_a2bus->reset_bus();
-
 	// Apple-specific initial state
 	m_scc->ctsa_w(0);
 	m_scc->dcda_w(0);
