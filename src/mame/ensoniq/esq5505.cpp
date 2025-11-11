@@ -178,6 +178,7 @@
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
 #include "emupal.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "vfxcart.h"
 
@@ -845,12 +846,18 @@ void esq5505_state::vfxsd(machine_config &config, int panel_type)
 
 	WD1772(config, m_fdc, 8000000);
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
+
+	// software list
+	SOFTWARE_LIST(config, "vfxsd_flop").set_original("vfxsd_flop");
 }
 
 void esq5505_state::sd1(machine_config &config, int panel_type)
 {
 	// Like the VFX-SD but with its own panel type
 	vfxsd(config, panel_type);
+
+	// software list
+	SOFTWARE_LIST(config, "sd1_flop").set_original("sd1_flop");
 }
 
 // Like the sd1, but with some clock speeds faster.
@@ -864,6 +871,9 @@ void esq5505_state::sd132(machine_config &config, int panel_type)
 	m_maincpu->set_clock(clock);
 	m_otis->set_clock(clock);
 	m_pump->set_clock(clock);
+
+	// software list
+	SOFTWARE_LIST(config, "sd132_flop").set_original("sd132_flop");
 }
 
 // 32-voice machines with the VFX-SD type config
