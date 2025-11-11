@@ -46,17 +46,6 @@ TODO:
 
 <!-- !Games -->
 
-	<software name="aerial" supported="yes">
-		<description>Aerial</description>
-		<year>2022</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1436542">
-				<rom name="aerial.wav" size="1436542" crc="00ee6c4b" sha1="5427c15ba6b0f907ee5acc49bd926adbf891308f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alien" supported="partial">
 		<description>Alien</description>
 		<year>19??</year>
@@ -91,39 +80,6 @@ Sets back color = 1 (blue) over blue text in color mode, incompatible? (verify)
 			<dataarea name="cass" size="4042286">
 				<!-- .mzt to .wav converted -->
 				<rom name="cg-75.wav" size="4042286" crc="d4a5b5a3" sha1="3ca52d1a7c3c765b32de005202d5ce3fce6032af" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="antair" supported="yes">
-		<description>AntAir</description>
-		<year>2024</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1028250">
-				<rom name="antair.wav" size="1028250" crc="62abec02" sha1="13a276a9695a643ed93e710389ab3ba6028c1904" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ascend" supported="yes">
-		<description>Ascend</description>
-		<year>2022</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1257731">
-				<rom name="ascend.wav" size="1257731" crc="d6cb8ac7" sha1="02d66d62f59bad892b7ba04f825cf8f78602224d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="battlot" supported="yes">
-		<description>Battlot</description>
-		<year>20??</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1432478">
-				<rom name="battlot.wav" size="1432478" crc="5249a6a7" sha1="55ffbf05008627306448cd16903b1a8e96b54a44" />
 			</dataarea>
 		</part>
 	</software>
@@ -165,39 +121,6 @@ Sets back color = 1 (blue) over blue text in color mode, incompatible? (verify)
 		</part>
 	</software>
 
-	<software name="bootskel" supported="yes">
-		<description>Bootskell</description>
-		<year>20??</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1481656">
-				<rom name="bootskell.wav" size="1481656" crc="9be175c1" sha1="e53fcb3b9d341b65302ee6e0b7efd3148c13bafc" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cacorm" supported="yes">
-		<description>Cacorm</description>
-		<year>2022</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1240885">
-				<rom name="cacorm.wav" size="1240885" crc="202e5cda" sha1="f310f65a6782f1c2693f083871f4313fbb1c0165" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cavit" supported="yes">
-		<description>Cavit</description>
-		<year>20??</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1605732">
-				<rom name="cavit.wav" size="1605732" crc="0c44d81c" sha1="e54d79229708ecadde54ca8582bf29a0862b0e3d" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cnonball" supported="yes">
 		<description>Cannon Ball</description>
 		<year>1983</year>
@@ -208,17 +131,6 @@ Sets back color = 1 (blue) over blue text in color mode, incompatible? (verify)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="2751116">
 				<rom name="wb-1001.wav" size="2751116" crc="8eaa7c93" sha1="117cc70757cdaf5ea71a2454fd62e534d6d26784" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cracky" supported="yes">
-		<description>Cracky</description>
-		<year>2023</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1183849">
-				<rom name="cracky.wav" size="1183849" crc="066496f0" sha1="5037b74aedd86cef9ef2ad24f16b086261332fa5" />
 			</dataarea>
 		</part>
 	</software>
@@ -276,8 +188,8 @@ Provided sheet page shows game in Color, is it the purpose of side B? (verify)
 
 	<software name="dradrive" supported="yes">
 		<description>DraDra Drive</description>
-		<year>1982</year>
-		<publisher>Isoro Valza</publisher>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
 		<info name="usage" value="mz1z001 LOAD" />
 		<sharedfeat name="compatibility" value="MONO"/>
 		<part name="cass1" interface="mz_cass">
@@ -401,17 +313,6 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		</part>
 	</software>
 
-	<software name="guntus" supported="yes">
-		<description>Guntus</description>
-		<year>2022</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1566968">
-				<rom name="guntus.wav" size="1566968" crc="f2d2b75f" sha1="f39ba4edf8199f898aabb4c25ad546f5e316ce18" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hangman" supported="yes">
 		<description>Hangman</description>
 		<year>19??</year>
@@ -502,17 +403,6 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		</part>
 	</software>
 
-	<software name="hopman" supported="yes">
-		<description>Hopman</description>
-		<year>2023</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1260355">
-				<rom name="hopman.wav" size="1260355" crc="2df0da07" sha1="4e170c973b81f278e6073a9fcc4eb85d7bd1848c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hopnhop" supported="partial">
 		<description>Hop'n'Hop</description>
 		<year>1983</year>
@@ -554,17 +444,6 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="10047002">
 				<rom name="iceblock.wav" size="10047002" crc="7a351254" sha1="8ee7c107715f8cfea10b2948b58a0da2afdaf2c3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="impetus" supported="yes">
-		<description>Impetus</description>
-		<year>20??</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1899548">
-				<rom name="impetus.wav" size="1899548" crc="c028a95e" sha1="e54ebf2b3bd0b99f0710ff0ec43725fb2bd379ff728d79229708ecadde54ca8582bf29a0862b0e3d" />
 			</dataarea>
 		</part>
 	</software>
@@ -656,50 +535,6 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		</part>
 	</software>
 
-	<software name="lift" supported="yes">
-		<description>Lift</description>
-		<year>2021</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1236901">
-				<rom name="lift.wav" size="1236901" crc="aefe4a3b" sha1="e016642567061d5d6b952ed69f656cf2d0808b22" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mazy" supported="yes">
-		<description>Mazy</description>
-		<year>20??</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1272270">
-				<rom name="mazy.wav" size="1272270" crc="b6d82072" sha1="4f1a56f55dcd64385253c30a888d9b87228a4325" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mazy2" supported="yes">
-		<description>Mazy 2</description>
-		<year>2025</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1392692">
-				<rom name="mazy2.wav" size="1392692" crc="e0328dfb" sha1="6a1ddf98672f31b5aa7ba9b3b7b2c0435e389075" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mieyen" supported="yes">
-		<description>Mieyen</description>
-		<year>2025</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1207472">
-				<rom name="mieyen.wav" size="1207472" crc="cf7a289d" sha1="7fa2c39fffabff1f204405f1329cb9bc2c9b44a7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mj05" supported="yes">
 		<description>MJ-05</description>
 		<year>1983</year>
@@ -787,17 +622,6 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		</part>
 	</software>
 
-	<software name="neuras" supported="yes">
-		<description>Neuras</description>
-		<year>20??</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1287227">
-				<rom name="neuras.wav" size="1287227" crc="0e0efe9d" sha1="bdacd8f5244fc477f414e6234731984f17eeb2e8" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ninjahse" supported="yes">
 		<description>Ninja House</description>
 		<year>1983</year>
@@ -806,17 +630,6 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="3625703">
 				<rom name="ninja house.wav" size="3625703" crc="018d4cce" sha1="0fb0494013ca5ffa1cb91f43817096f2cdb9effe" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="osotos" supported="yes">
-		<description>Osotos</description>
-		<year>2024</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1400645">
-				<rom name="osotos.wav" size="1400645" crc="9f4c2490" sha1="be7749145d595a8e6a432d63dee5c5107f5a954b" />
 			</dataarea>
 		</part>
 	</software>
@@ -944,16 +757,6 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		</part>
 	</software>
 
-	<software name="ruptus" supported="yes">
-		<description>Ruptus</description>
-		<year>20??</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1621424">
-				<rom name="ruptus.wav" size="1621424" crc="745f8ae9" sha1="e45e2a0fda5bc4f8701ece714e2bab16ece5ab7a" />
-			</dataarea>
-		</part>
-	</software>
 	<software name="scrlgame" supported="partial">
 		<description>Scroll Game</description>
 		<year>19??</year>
@@ -1049,17 +852,6 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="2992512">
 				<rom name="wb-1026.wav" size="2992512" crc="638e1cb9" sha1="4de8ad5e0543cd487b820e242684f8fff101a2e0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="svellas" supported="yes">
-		<description>Svellas</description>
-		<year>2025</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1235865">
-				<rom name="svellas.wav" size="1235865" crc="30e27e99" sha1="cb3bd4e917bd1a8de4c8fbb090f1daee363757ae" />
 			</dataarea>
 		</part>
 	</software>
@@ -1189,17 +981,6 @@ Has issues displaying title screen in color mode, incompatible? (verify)
 		</part>
 	</software>
 
-	<software name="yewdow" supported="yes">
-		<description>Yewdow</description>
-		<year>2023</year>
-		<publisher>Inufuto</publisher>
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1391523">
-				<rom name="yewdow.wav" size="1391523" crc="40354f84" sha1="45ea9fa73e29d2605287d25741ee3db71a43517b" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="yuurei" supported="yes">
 		<description>Yuurei</description>
 		<year>19??</year>
@@ -1225,4 +1006,226 @@ Has issues displaying title screen in color mode, incompatible? (verify)
 		</part>
 	</software>
 
+	<!-- Homebrew Games -->
+
+	<software name="aerial" supported="yes">
+		<description>Aerial</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1436542">
+				<rom name="aerial.wav" size="1436542" crc="00ee6c4b" sha1="5427c15ba6b0f907ee5acc49bd926adbf891308f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antair" supported="yes">
+		<description>AntAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1028250">
+				<rom name="antair.wav" size="1028250" crc="62abec02" sha1="13a276a9695a643ed93e710389ab3ba6028c1904" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ascend" supported="yes">
+		<description>Ascend</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1257731">
+				<rom name="ascend.wav" size="1257731" crc="d6cb8ac7" sha1="02d66d62f59bad892b7ba04f825cf8f78602224d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot" supported="yes">
+		<description>Battlot</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1432478">
+				<rom name="battlot.wav" size="1432478" crc="5249a6a7" sha1="55ffbf05008627306448cd16903b1a8e96b54a44" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootskel" supported="yes">
+		<description>Bootskell</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1481656">
+				<rom name="bootskell.wav" size="1481656" crc="9be175c1" sha1="e53fcb3b9d341b65302ee6e0b7efd3148c13bafc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm" supported="yes">
+		<description>Cacorm</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1240885">
+				<rom name="cacorm.wav" size="1240885" crc="202e5cda" sha1="f310f65a6782f1c2693f083871f4313fbb1c0165" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavit" supported="yes">
+		<description>Cavit</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1605732">
+				<rom name="cavit.wav" size="1605732" crc="0c44d81c" sha1="e54d79229708ecadde54ca8582bf29a0862b0e3d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky" supported="yes">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1183849">
+				<rom name="cracky.wav" size="1183849" crc="066496f0" sha1="5037b74aedd86cef9ef2ad24f16b086261332fa5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus" supported="yes">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1566968">
+				<rom name="guntus.wav" size="1566968" crc="f2d2b75f" sha1="f39ba4edf8199f898aabb4c25ad546f5e316ce18" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman" supported="yes">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1260355">
+				<rom name="hopman.wav" size="1260355" crc="2df0da07" sha1="4e170c973b81f278e6073a9fcc4eb85d7bd1848c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impetus" supported="yes">
+		<description>Impetus</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1899548">
+				<rom name="impetus.wav" size="1899548" crc="c028a95e" sha1="e54ebf2b3bd0b99f0710ff0ec43725fb2bd379ff728d79229708ecadde54ca8582bf29a0862b0e3d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift" supported="yes">
+		<description>Lift</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1236901">
+				<rom name="lift.wav" size="1236901" crc="aefe4a3b" sha1="e016642567061d5d6b952ed69f656cf2d0808b22" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy" supported="yes">
+		<description>Mazy</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1272270">
+				<rom name="mazy.wav" size="1272270" crc="b6d82072" sha1="4f1a56f55dcd64385253c30a888d9b87228a4325" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy2" supported="yes">
+		<description>Mazy 2</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1392692">
+				<rom name="mazy2.wav" size="1392692" crc="e0328dfb" sha1="6a1ddf98672f31b5aa7ba9b3b7b2c0435e389075" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mieyen" supported="yes">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1207472">
+				<rom name="mieyen.wav" size="1207472" crc="cf7a289d" sha1="7fa2c39fffabff1f204405f1329cb9bc2c9b44a7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras" supported="yes">
+		<description>Neuras</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1287227">
+				<rom name="neuras.wav" size="1287227" crc="0e0efe9d" sha1="bdacd8f5244fc477f414e6234731984f17eeb2e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osotos" supported="yes">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1400645">
+				<rom name="osotos.wav" size="1400645" crc="9f4c2490" sha1="be7749145d595a8e6a432d63dee5c5107f5a954b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus" supported="yes">
+		<description>Ruptus</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1621424">
+				<rom name="ruptus.wav" size="1621424" crc="745f8ae9" sha1="e45e2a0fda5bc4f8701ece714e2bab16ece5ab7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svellas" supported="yes">
+		<description>Svellas</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1235865">
+				<rom name="svellas.wav" size="1235865" crc="30e27e99" sha1="cb3bd4e917bd1a8de4c8fbb090f1daee363757ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow" supported="yes">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1391523">
+				<rom name="yewdow.wav" size="1391523" crc="40354f84" sha1="45ea9fa73e29d2605287d25741ee3db71a43517b" />
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>
