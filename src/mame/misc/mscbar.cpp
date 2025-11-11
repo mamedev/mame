@@ -52,7 +52,7 @@
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
-// #include "mscbar.lh"
+#include "mscbar.lh"
 
 
 namespace {
@@ -255,7 +255,7 @@ void mscbar_state::mscbar(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
     HOPPER(config, m_hopper, attotime::from_msec(100));
 	/* Video */
-	// config.set_default_layout(layout_mscbar);
+	config.set_default_layout(layout_mscbar);
 
 
 	/* Keyboard & display interface */
