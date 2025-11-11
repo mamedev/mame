@@ -1,14 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!-- 
 Software list of Sharp MZ-2000 snapshots, created to provide support for software that will run as a snapshot image in MAME but (currently) not in the original media.
-
-The initial snapshots fall into 4 categories:
-1. Software which can only be sourced in snapshot format.
-2. Software which can be sourced in original cassette tape format, but will not currently load in MAME, even using MZT to WAV conversion.
-3. Software which can be sourced in original cassette tape format, but will not currently load in MAME, but is included in the mz2000_cass software list in MZT format. MZT to WAV conversion may be successful but a snapshot has been included instead of removing the MZT file from mz2000_cass.
-4. Software which can be sourced in original floppy disk format, but will not currently load in MAME.
 -->
 <softwarelist name="mz2000_snap" description="Sharp MZ-2000 snapshots">
 
