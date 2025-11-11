@@ -52,7 +52,7 @@
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
-#include "mscbar.lh"
+// #include "mscbar.lh"
 
 
 namespace {
@@ -253,9 +253,9 @@ void mscbar_state::mscbar(machine_config &config)
 	maincpu.port_out_cb<1>().set(FUNC(p1_port_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-   HOPPER(config, m_hopper, attotime::from_msec(100));
+    HOPPER(config, m_hopper, attotime::from_msec(100));
 	/* Video */
-	config.set_default_layout(layout_mscbar);
+	// config.set_default_layout(layout_mscbar);
 
 
 	/* Keyboard & display interface */
@@ -277,7 +277,6 @@ void mscbar_state::mscbar(machine_config &config)
 	ay2.port_a_write_callback().set(FUNC(mscbar_state::ay2_port_a_w));
 	ay2.port_b_write_callback().set(FUNC(mscbar_state::ay2_port_b_w));
     OKIM6295(config, m_oki,  XTAL(10'738'635) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.00);  // Clock frequency & pin 7 not verified
-
 }
 
 void mscbar_state::machine_start()
@@ -285,8 +284,6 @@ void mscbar_state::machine_start()
 	m_digits.resolve();
 	m_leds.resolve();
 }
-
-
 
 ROM_START( mscbar )
 
