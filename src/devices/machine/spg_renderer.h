@@ -13,11 +13,11 @@ class spg_renderer_device : public device_t
 public:
 	spg_renderer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void draw_sprites(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space& spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit);
-	void draw_page(const rectangle& cliprect, uint32_t scanline, int priority, uint16_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which);
-	void new_line(const rectangle& cliprect);
+	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t *paletteram, uint16_t *spriteram, int sprlimit);
+	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint16_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram, uint16_t *scrollram, uint32_t which);
+	void new_line(const rectangle &cliprect);
 
-	void apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline);
+	void apply_saturation_and_fade(bitmap_rgb32 &bitmap, const rectangle &cliprect, int scanline);
 
 	void set_video_reg_1c(uint16_t val) { m_video_regs_1c = val; update_vcmp_table(); }
 	void set_video_reg_1d(uint16_t val) { m_video_regs_1d = val; update_vcmp_table(); }
@@ -49,7 +49,7 @@ public:
 	uint16_t get_video_reg_42(void) { return m_video_regs_42; }
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
-	void set_video_spaces(address_space* cpuspace) { m_cpuspace = cpuspace; }
+	void set_video_spaces(address_space *cpuspace) { m_cpuspace = cpuspace; }
 
 protected:
 	spg_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -59,12 +59,11 @@ protected:
 
 private:
 	template<bool Blend, bool FlipX>
-	inline void draw_tilestrip(uint32_t screenwidth, uint32_t drawwidthmask, const rectangle& cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t* palette, uint8_t blendlevel);
-	inline void draw_tilestrip(uint32_t screenwidth, uint32_t drawwidthmask, bool blend, bool flip_x, const rectangle& cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram, uint8_t blendlevel);
-	inline void draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space& spc, uint16_t* paletteram, uint16_t* spriteram);
+	inline void draw_tilestrip(uint32_t screenwidth, uint32_t drawwidthmask, const rectangle &cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t *palette, uint8_t blendlevel);
+	inline void draw_tilestrip(uint32_t screenwidth, uint32_t drawwidthmask, bool blend, bool flip_x, const rectangle &cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t *paletteram, uint8_t blendlevel);
+	inline void draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t *paletteram, uint16_t *spriteram);
 
-	void get_tilemap_dimensions(const uint32_t attr, uint32_t &total_width, uint32_t &y_mask, uint32_t &screenwidth);
-	void draw_linemap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram);
+	void draw_linemap(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram);
 	inline uint8_t mix_channel(uint8_t a, uint8_t b, uint8_t alpha);
 	void update_vcmp_table();
 	void update_palette_lookup(void);
@@ -88,10 +87,10 @@ private:
 	uint32_t m_ycmp_table[480];
 
 	devcb_read16 m_space_read_cb;
-	address_space* m_cpuspace;
+	address_space *m_cpuspace;
 
 	bool m_brightness_or_saturation_dirty;
-	uint16_t m_linebuf[640];
+	uint16_t m_linebuf[320];
 };
 
 DECLARE_DEVICE_TYPE(SPG_RENDERER, spg_renderer_device)

@@ -750,7 +750,7 @@ void gcm394_base_video_device::sprite_7042_extra_w(uint16_t data)
 	// B = blend mode (0 = use 702a for blending, 1 = use individual sprite blending)
 	// C = co-ordinate mode
 	// E = sprite enable
-	
+
 	//popmessage("extra modes %04x\n", data);
 }
 

@@ -78,7 +78,7 @@ inline uint8_t spg_renderer_device::mix_channel(uint8_t bottom, uint8_t top, uin
 }
 
 template<bool Blend, bool FlipX>
-void spg_renderer_device::draw_tilestrip(uint32_t screenwidth, uint32_t drawwidthmask, const rectangle& cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t* paletteram, uint8_t blendlevel)
+void spg_renderer_device::draw_tilestrip(uint32_t screenwidth, uint32_t drawwidthmask, const rectangle &cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t *paletteram, uint8_t blendlevel)
 {
 	const uint32_t yflipmask = flip_y ? tile_h - 1 : 0;
 	uint32_t m = tilegfxdata_addr + words_per_tile * tile + bits_per_row * (tile_scanline ^ yflipmask);
@@ -127,7 +127,7 @@ void spg_renderer_device::draw_tilestrip(uint32_t screenwidth, uint32_t drawwidt
 }
 
 
-void spg_renderer_device::draw_linemap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space &spc, uint16_t* paletteram)
+void spg_renderer_device::draw_linemap(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram)
 {
 	if ((scanline < 0) || (scanline >= 240))
 		return;
@@ -249,7 +249,7 @@ void spg_renderer_device::update_vcmp_table()
 	}
 }
 
-void spg_renderer_device::draw_tilestrip(uint32_t screenwidth, uint32_t drawwidthmask, bool blend, bool flip_x, const rectangle& cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram, uint8_t blendlevel)
+void spg_renderer_device::draw_tilestrip(uint32_t screenwidth, uint32_t drawwidthmask, bool blend, bool flip_x, const rectangle &cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t *paletteram, uint8_t blendlevel)
 {
 	if (blend)
 	{
@@ -275,14 +275,7 @@ void spg_renderer_device::draw_tilestrip(uint32_t screenwidth, uint32_t drawwidt
 	}
 }
 
-void spg_renderer_device::get_tilemap_dimensions(const uint32_t attr, uint32_t &total_width, uint32_t &y_mask, uint32_t &screenwidth)
-{
-	total_width = 512;
-	y_mask = 0x100;
-	screenwidth = 320;
-}
-
-void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t scanline, int priority, uint16_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
+void spg_renderer_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint16_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram, uint16_t *scrollram, uint32_t which)
 {
 	const uint32_t attr = tilemapregs[0];
 	const uint32_t ctrl = tilemapregs[1];
@@ -319,8 +312,9 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t scanline
 			return;
 	}
 
-	uint32_t total_width, y_mask, screenwidth;
-	get_tilemap_dimensions(attr, total_width, y_mask, screenwidth);
+	const uint32_t total_width = 512;
+	uint32_t y_mask = 0x100;
+	const uint32_t screenwidth = 320;
 
 	const uint32_t drawwidthmask = total_width - 1;
 	y_mask--; // turn into actual mask
@@ -339,15 +333,14 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t scanline
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	//const uint32_t words_per_tile = bits_per_row * tile_h;
 	const bool row_scroll = (ctrl & 0x0010);
 
 	// Max blend level (3) should result in 100% opacity, per docs
 	// Min blend level (0) should result in 25% opacity, per docs
 	static const uint8_t s_blend_levels[4] = { 0x08, 0x10, 0x18, 0x20 };
-	uint8_t blendlevel = s_blend_levels[m_video_regs_2a & 3];
+	const uint8_t blendlevel = s_blend_levels[m_video_regs_2a & 3];
 
-	uint32_t words_per_tile = bits_per_row * tile_h;
+	const uint32_t words_per_tile = bits_per_row * tile_h;
 
 	int realxscroll = xscroll;
 
@@ -413,7 +406,7 @@ void spg_renderer_device::draw_page(const rectangle& cliprect, uint32_t scanline
 	}
 }
 
-void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void spg_renderer_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t *paletteram, uint16_t *spriteram)
 {
 	uint32_t tilegfxdata_addr = spritegfxdata_addr;
 	uint32_t tile = spriteram[base_addr + 0];
@@ -431,15 +424,10 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t scanli
 		return;
 	}
 
-	uint32_t screenwidth;
-	uint32_t screenheight;
-	uint32_t xmask;
-	uint32_t ymask;
-
-	screenwidth = 320;
-	screenheight = 256;
-	xmask = 0x1ff;
-	ymask = 0x1ff;
+	const uint32_t screenwidth = 320;
+	const uint32_t screenheight  = 256;
+	const uint32_t xmask = 0x1ff;
+	const uint32_t ymask = 0x1ff;
 
 	const uint32_t tile_h = 8 << ((attr & 0x00c0) >> 6);
 	const uint32_t tile_w = 8 << ((attr & 0x0030) >> 4);
@@ -510,7 +498,7 @@ void spg_renderer_device::draw_sprite(const rectangle& cliprect, uint32_t scanli
 	}
 }
 
-void spg_renderer_device::draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
+void spg_renderer_device::draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t *paletteram, uint16_t *spriteram, int sprlimit)
 {
 	if (!(m_video_regs_42 & 0x0001))
 		return;
@@ -521,7 +509,7 @@ void spg_renderer_device::draw_sprites(const rectangle &cliprect, uint32_t scanl
 	}
 }
 
-void spg_renderer_device::new_line(const rectangle& cliprect)
+void spg_renderer_device::new_line(const rectangle &cliprect)
 {
 	update_palette_lookup();
 
@@ -586,9 +574,9 @@ void spg_renderer_device::update_palette_lookup()
 	m_brightness_or_saturation_dirty = false;
 }
 
-void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
+void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32 &bitmap, const rectangle &cliprect, int scanline)
 {
-	uint32_t* src = &bitmap.pix(scanline, cliprect.min_x);
+	uint32_t *src = &bitmap.pix(scanline, cliprect.min_x);
 
 	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 	{

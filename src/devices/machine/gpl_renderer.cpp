@@ -127,7 +127,7 @@ inline uint8_t gpl_renderer_device::mix_channel(uint8_t bottom, uint8_t top, uin
 }
 
 template<bool Blend, bool FlipX>
-void gpl_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screenwidth, uint32_t drawwidthmask, const rectangle& cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t* paletteram, uint8_t blendlevel)
+void gpl_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screenwidth, uint32_t drawwidthmask, const rectangle &cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t *paletteram, uint8_t blendlevel)
 {
 	const uint32_t yflipmask = flip_y ? tile_h - 1 : 0;
 	uint32_t m = tilegfxdata_addr + words_per_tile * tile + bits_per_row * (tile_scanline ^ yflipmask);
@@ -195,7 +195,7 @@ void gpl_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screen
 	}
 }
 
-void gpl_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screenwidth, uint32_t drawwidthmask, bool blend, bool flip_x, const rectangle& cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space& spc, uint16_t* paletteram, uint8_t blendlevel)
+void gpl_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screenwidth, uint32_t drawwidthmask, bool blend, bool flip_x, const rectangle &cliprect, uint32_t tile_h, uint32_t tile_w, uint32_t tilegfxdata_addr, uint32_t tile, uint32_t tile_scanline, int drawx, bool flip_y, uint32_t palette_offset, const uint32_t nc_bpp, const uint32_t bits_per_row, const uint32_t words_per_tile, address_space &spc, uint16_t *paletteram, uint8_t blendlevel)
 {
 	if (blend)
 	{
@@ -221,7 +221,7 @@ void gpl_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screen
 	}
 }
 
-void gpl_renderer_device::draw_linemap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram)
+void gpl_renderer_device::draw_linemap(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram)
 {
 	uint32_t ctrl = tilemapregs[1];
 
@@ -316,7 +316,7 @@ void gpl_renderer_device::draw_linemap(const rectangle& cliprect, uint32_t scanl
 	}
 }
 
-void gpl_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprites_mode, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void gpl_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprites_mode, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t *paletteram, uint16_t *spriteram)
 {
 	uint32_t tilegfxdata_addr = spritegfxdata_addr;
 	uint32_t tile = spriteram[base_addr + 0];
@@ -393,8 +393,8 @@ void gpl_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 	if (m_video_regs_7f & 0x0200) // 'virtual 3D' sprite mode (GPAC800 / GPL16250 only) has 4 extra entries per sprite
 	{
 		// 2nd sprite bank is...
-		// 
-		// 7400 - MMBB BBBB NNNN NNNN - M = Mosaic, B = blend level, N = sprite/tile number/adddress)    Attribute 1 of sprite 0 
+		//
+		// 7400 - MMBB BBBB NNNN NNNN - M = Mosaic, B = blend level, N = sprite/tile number/adddress)    Attribute 1 of sprite 0
 		// 7401 - YYYY YYXX XXXX XXXX - Y = Y3[5:0]             X = X1[9:0]                              X1 of sprite 0
 		// 7402 - YYyy yyXX XXXX XXXX - Y = Y3[7:6] y = Y1[9:6] X = X2[9:0]                              X2 of sprite 0
 		// 7403 - YYyy yyXX XXXX XXXX - Y = Y3[9:8] y = Y2[9:6] X = X3[9:0]                              X3 of sprite 0
@@ -412,7 +412,7 @@ void gpl_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 	else // regular extended mode, just 1 extra entry per sprite
 	{
 		// 2nd sprite bank is...
-		// 7400 - MMBB BBBB NNNN NNNN - M = Mosaic, B = blend level, N = sprite/tile number/adddress)    Attribute 1 of sprite 0 
+		// 7400 - MMBB BBBB NNNN NNNN - M = Mosaic, B = blend level, N = sprite/tile number/adddress)    Attribute 1 of sprite 0
 		// ....
 
 		// before or after the 0 tile check?
@@ -483,7 +483,7 @@ void gpl_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprit
 	}
 }
 
-void gpl_renderer_device::draw_sprites(bool read_from_csspace, int extended_sprites_mode, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void gpl_renderer_device::draw_sprites(bool read_from_csspace, int extended_sprites_mode, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t *paletteram, uint16_t *spriteram)
 {
 	if (!(m_video_regs_42 & 0x0001))
 		return;
@@ -499,7 +499,7 @@ void gpl_renderer_device::draw_sprites(bool read_from_csspace, int extended_spri
 	}
 }
 
-void gpl_renderer_device::new_line(const rectangle& cliprect)
+void gpl_renderer_device::new_line(const rectangle &cliprect)
 {
 	update_palette_lookup();
 
@@ -509,7 +509,7 @@ void gpl_renderer_device::new_line(const rectangle& cliprect)
 	}
 }
 
-void gpl_renderer_device::draw_page(bool read_from_csspace, uint32_t palbank, const rectangle& cliprect, uint32_t scanline, int priority, uint16_t tilegfxdata_addr_msb, uint16_t tilegfxdata_addr, uint16_t* scrollregs, uint16_t* tilemapregs, address_space& spc, uint16_t* paletteram, uint16_t* scrollram, uint32_t which)
+void gpl_renderer_device::draw_page(bool read_from_csspace, uint32_t palbank, const rectangle &cliprect, uint32_t scanline, int priority, uint16_t tilegfxdata_addr_msb, uint16_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram, uint16_t *scrollram, uint32_t which)
 {
 	const uint32_t attr = tilemapregs[0];
 	const uint32_t ctrl = tilemapregs[1];
@@ -593,7 +593,6 @@ void gpl_renderer_device::draw_page(bool read_from_csspace, uint32_t palbank, co
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	//const uint32_t words_per_tile = bits_per_row * tile_h;
 	const bool row_scroll = (ctrl & 0x0010);
 
 	// Max blend level (3) should result in 100% opacity, per docs
@@ -704,7 +703,7 @@ void gpl_renderer_device::draw_page(bool read_from_csspace, uint32_t palbank, co
 	}
 }
 
-void gpl_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
+void gpl_renderer_device::apply_saturation_and_fade(bitmap_rgb32 &bitmap, const rectangle &cliprect, int scanline)
 {
 	uint32_t* src = &bitmap.pix(scanline, cliprect.min_x);
 
