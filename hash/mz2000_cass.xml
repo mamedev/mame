@@ -61,7 +61,7 @@ TODO:
 		<description>Alien</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
-		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<notes><![CDATA[Remove Alien BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Alien Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
 		<info name="usage" value="mz1z001 LOAD" />
 		<part name="cass1" interface="mz_cass">
 			<feature name="part_id" value="Part 1 - BASIC"/>
@@ -227,7 +227,7 @@ Sets back color = 1 (blue) over blue text in color mode, incompatible? (verify)
 		<description>Dining Kitchen</description>
 		<year>1982</year>
 		<publisher>Isoro Valza</publisher>
-		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<notes><![CDATA[Remove Dining Kitchen BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Dining Kitchen Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
 		<info name="usage" value="mz1z002 LOAD" />
 		<part name="cass1" interface="mz_cass">
 			<feature name="part_id" value="Part 1 - BASIC"/>
@@ -355,8 +355,8 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		<description>Frogger</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
-		<info name="usage" value="mz1z002 LOAD" />
 		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
+		<info name="usage" value="mz1z002 LOAD" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="3637100">
 				<rom name="frogger.wav" size="3637100" crc="b1f07d79" sha1="fce4d6b4cbafd263df08520b4128839db2eae76c" />
@@ -517,7 +517,7 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		<description>Hop'n'Hop</description>
 		<year>1983</year>
 		<publisher>Unknown</publisher>
-		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<notes><![CDATA[Remove Hop'n'Hop BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Hop'n'Hop Monitor cassette image and the game will run.]]></notes>
 		<info name="usage" value="mz1z002 LOAD" />
 		<part name="cass1" interface="mz_cass">
 			<feature name="part_id" value="Part 1 - BASIC"/>
@@ -628,7 +628,7 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		<description>Ka-G</description>
 		<year>1984</year>
 		<publisher>Puck</publisher>
-		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<notes><![CDATA[Remove Ka-G BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Ka-G Monitor cassette image and the game will run.]]></notes>
 		<info name="usage" value="mz1z001 LOAD" />
 		<part name="cass1" interface="mz_cass">
 			<feature name="part_id" value="Part 1 - BASIC"/>
@@ -958,7 +958,7 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		<description>Scroll Game</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
-		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<notes><![CDATA[Remove Scroll Game BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Scroll Game Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
 		<info name="usage" value="mz1z001 LOAD" />
 		<part name="cass1" interface="mz_cass">
 			<feature name="part_id" value="Part 1 - BASIC"/>
