@@ -46,6 +46,37 @@ TODO:
 
 <!-- !Games -->
 
+	<software name="aerial" supported="yes">
+		<description>Aerial</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1436542">
+				<rom name="aerial.wav" size="1436542" crc="00ee6c4b" sha1="5427c15ba6b0f907ee5acc49bd926adbf891308f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alien" supported="partial">
+		<description>Alien</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1 - BASIC"/>
+			<dataarea name="cass" size="1623868">
+				<rom name="alien - basic.wav" size="1623868" crc="67220cc4" sha1="13b3052621bf0d167f47dc700a8a8a29da06f278" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2 - MONITOR"/>
+			<dataarea name="cass" size="1220396">
+				<rom name="alien - monitor.wav" size="1220396" crc="9b13c558" sha1="699289b9edd53bd1f0f209811ce1ad32c9d834fe" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amtennis" supported="yes">
 		<description>Amateur Tennis</description>
 		<year>1982</year>
@@ -64,32 +95,162 @@ Sets back color = 1 (blue) over blue text in color mode, incompatible? (verify)
 		</part>
 	</software>
 
-	<software name="bombrman" supported="no">
+	<software name="antair" supported="yes">
+		<description>AntAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1028250">
+				<rom name="antair.wav" size="1028250" crc="62abec02" sha1="13a276a9695a643ed93e710389ab3ba6028c1904" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ascend" supported="yes">
+		<description>Ascend</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1257731">
+				<rom name="ascend.wav" size="1257731" crc="d6cb8ac7" sha1="02d66d62f59bad892b7ba04f825cf8f78602224d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot" supported="yes">
+		<description>Battlot</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1432478">
+				<rom name="battlot.wav" size="1432478" crc="5249a6a7" sha1="55ffbf05008627306448cd16903b1a8e96b54a44" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batljava" supported="yes">
+		<description>Battle Of The Java Sea</description>
+		<year>19??</year>
+		<publisher>Epoch</publisher>
+		<info name="usage" value="mz1z002 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2819753">
+				<rom name="battle of the java sea.wav" size="2819753" crc="b2d7829d" sha1="9152de99447631ea9d5920c526dfdc6c2d6c06f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battltnk" supported="yes">
+		<description>Battle Tank</description>
+		<year>19??</year>
+		<publisher>K. Kuromusha</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10859">
+				<rom name="battle tank.mzt" size="10859" crc="73fd1690" sha1="525fa26ed945cc70397cb18653d85bfb41891cac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombrman" supported="yes">
 		<description>Bomber Man</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="WB-1003"/>
 		<info name="alt_title" value="爆弾男"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="3944464">
-				<rom name="wb-1003.wav" size="3944464" crc="da852425" sha1="03c5b8694b7482c6af696fef5338d05c3d86c70e" />
+			<dataarea name="cass" size="3673436">
+				<rom name="wb-1003.wav" size="3673436" crc="ae0f190c" sha1="d0ce1457dc66b42b6aaa88dfd7a30445cd11a163" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cnonball" supported="no">
+	<software name="bootskel" supported="yes">
+		<description>Bootskell</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1481656">
+				<rom name="bootskell.wav" size="1481656" crc="9be175c1" sha1="e53fcb3b9d341b65302ee6e0b7efd3148c13bafc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm" supported="yes">
+		<description>Cacorm</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1240885">
+				<rom name="cacorm.wav" size="1240885" crc="202e5cda" sha1="f310f65a6782f1c2693f083871f4313fbb1c0165" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavit" supported="yes">
+		<description>Cavit</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1605732">
+				<rom name="cavit.wav" size="1605732" crc="0c44d81c" sha1="e54d79229708ecadde54ca8582bf29a0862b0e3d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cnonball" supported="yes">
 		<description>Cannon Ball</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<notes><![CDATA[
-CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
-]]></notes>
 		<info name="usage" value="IPL" />
 		<info name="serial" value="WB-1001"/>
 		<info name="alt_title" value="キャノンボール"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1386284">
-				<rom name="wb-1001.wav" size="1386284" crc="461ce2f5" sha1="8d859095b18ac5aab348a205f3734340e6b5290b" />
+			<dataarea name="cass" size="2751116">
+				<rom name="wb-1001.wav" size="2751116" crc="8eaa7c93" sha1="117cc70757cdaf5ea71a2454fd62e534d6d26784" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky" supported="yes">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1183849">
+				<rom name="cracky.wav" size="1183849" crc="066496f0" sha1="5037b74aedd86cef9ef2ad24f16b086261332fa5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dining" supported="partial">
+		<description>Dining Kitchen</description>
+		<year>1982</year>
+		<publisher>Isoro Valza</publisher>
+		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<info name="usage" value="mz1z002 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1 - BASIC"/>
+			<dataarea name="cass" size="3170428">
+				<rom name="dining kitchen - basic.wav" size="3170428" crc="3f07e33c" sha1="a6b48d5c3d6c6408a12b6ceab719de60540a163d" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2 - MONITOR"/>
+			<dataarea name="cass" size="2136044">
+				<rom name="dining kitchen - monitor.wav" size="2136044" crc="ee9c2e3e" sha1="8fa55d451aa259dac8d01e4f7b04e67c83a697b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="donghunt" supported="yes">
+		<description>Dong Hunter</description>
+		<year>1982</year>
+		<publisher>Isoro Valza</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3136420">
+				<rom name="dong hunter.wav" size="3136420" crc="e094c3ca" sha1="02c20d5b32422353d915b597252d5633273f48e5" />
 			</dataarea>
 		</part>
 	</software>
@@ -109,6 +270,44 @@ Provided sheet page shows game in Color, is it the purpose of side B? (verify)
 			<dataarea name="cass" size="3834030">
 				<!-- .mzt to .wav converted -->
 				<rom name="e-g014.wav" size="3834030" crc="f1e236db" sha1="b332d179c96cf57a8b73efaf2bac6bbb16f655b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dradrive" supported="yes">
+		<description>DraDra Drive</description>
+		<year>1982</year>
+		<publisher>Isoro Valza</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<sharedfeat name="compatibility" value="MONO"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1813248">
+				<rom name="dradra drive.wav" size="1813248" crc="8e6f0bd1" sha1="71e3b0c6a61f3b922255b93f16e727a76d8ecc1d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="escpmisn" supported="yes">
+		<description>Escape Mission</description>
+		<year>19??</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2193472">
+				<rom name="escape mission.wav" size="2193472" crc="5e8c5336" sha1="09c5885b1658148197ec6820d5fb91cbc471b364" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explorer" supported="yes">
+		<description>Explorer</description>
+		<year>1989</year>
+		<publisher>T. Yamashita</publisher>		
+		<info name="usage" value="mz1z001 LOAD"/>
+		<info name="alt_title" value="エクスプローラ" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2963924">
+				<rom name="explorer.wav" size="2963924" crc="96eb0523" sha1="a10f7c510dbfe7b349c32f6f086f6d0d3b6d7d2c" />
 			</dataarea>
 		</part>
 	</software>
@@ -139,6 +338,44 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		</part>
 	</software>
 
+	<software name="fireresc" supported="partial">
+		<description>Fire Rescue</description>
+		<year>19??</year>
+		<publisher>Tatsuya Fujishi</publisher>		
+		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
+		<info name="usage" value="mz1z001 LOAD"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2109484">
+				<rom name="fire rescue.wav" size="2109484" crc="beb73ccb" sha1="f750a9354d050be4ad0e49b21a97e77af86a34b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger" supported="partial">
+		<description>Frogger</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="mz1z002 LOAD" />
+		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3637100">
+				<rom name="frogger.wav" size="3637100" crc="b1f07d79" sha1="fce4d6b4cbafd263df08520b4128839db2eae76c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galawars" supported="yes">
+		<description>Galactica Wars</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1518928">
+				<rom name="galactica wars.wav" size="1518928" crc="8b983c40" sha1="b1237fbfd7f3de143da3a2ba05759ee8a6a6509b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gangman" supported="yes">
 		<description>Gang Man</description>
 		<year>1983</year>
@@ -148,6 +385,41 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="3474088">
 				<rom name="gangman.wav" size="3474088" crc="41ac815e" sha1="0441e79bf3a1a31eb931b76db20d6a41c6e23ecd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golgo13" supported="yes">
+		<description>Golgo 13</description>
+		<year>1983</year>
+		<publisher>Pony Inc.</publisher>
+		<info name="usage" value="mz1z002 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3023106">
+				<rom name="golgo 13.wav" size="3023106" crc="9fce0e55" sha1="eaf6c552c78b2e677a351999b614d39230a8662c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus" supported="yes">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1566968">
+				<rom name="guntus.wav" size="1566968" crc="f2d2b75f" sha1="f39ba4edf8199f898aabb4c25ad546f5e316ce18" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangman" supported="yes">
+		<description>Hangman</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="759511">
+				<rom name="hangman.wav" size="759511" crc="63137327" sha1="3987e981254a12d9cbdd2fb83c962262ad33ca37" />
 			</dataarea>
 		</part>
 	</software>
@@ -177,19 +449,28 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		</part>
 	</software>
 
-	<software name="help" supported="no">
+	<software name="help" supported="yes">
 		<description>Help!</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<notes><![CDATA[
-CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
-]]></notes>
 		<info name="serial" value="WB-1009"/>
 		<info name="usage" value="IPL"/>
 		<sharedfeat name="compatibility" value="COLOR"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1489708">
-				<rom name="wb-1009.wav" size="1489708" crc="523985e0" sha1="f4a0f20d698caf5dd597ea17b59e5a351f49f1f2" />
+			<dataarea name="cass" size="2978300">
+				<rom name="wb-1009.wav" size="2978300" crc="ce1782a9" sha1="2d95ec51ea849c6645cdcd11142e074921bb9eae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hispdmob" supported="yes">
+		<description>High Speed Mobile Force</description>
+		<year>1982</year>
+		<publisher>X'Tal Soft</publisher>
+		<info name="usage" value="mz1z001 MON" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3342593">
+				<rom name="high speed mobile force.wav" size="3342593" crc="fb11a35d" sha1="57915232bd2cb9654d5338e9f69b5dfa1c22b566" />
 			</dataarea>
 		</part>
 	</software>
@@ -198,31 +479,68 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		<description>Hitsuja~i!</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<notes><![CDATA[
-CHECK SUM ERROR
-]]></notes>
 		<info name="serial" value="WB-1007"/>
 		<info name="alt_title" value="ひつじゃ～い!"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1887532">
-				<rom name="wb-1007.wav" size="1887532" crc="6fc27604" sha1="d3031ad40cb5c4bfc4a7afd8ddd7a16bbf345e70" />
+			<dataarea name="cass" size="3842204">
+				<rom name="wb-1007.wav" size="3842204" crc="50c87fb4" sha1="2ae6a762e663c6be764bff4e7c6cbc753bc5cdc2" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="hiyokof" supported="no">
+	<software name="hiyokof" supported="yes">
 		<description>Hiyoko Fighter</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<notes><![CDATA[
-CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
-]]></notes>
 		<info name="serial" value="WB-1005"/>
 		<info name="alt_title" value="ヒヨコファイター"/>
 		<info name="usage" value="IPL"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1566764">
-				<rom name="wb-1005.wav" size="1566764" crc="08c2d4a3" sha1="1325773c7f640c1f86186c1d5608cdff7995d007" />
+			<dataarea name="cass" size="3149644">
+				<rom name="wb-1005.wav" size="3149644" crc="9bda3e9d" sha1="596ec39d76ea8cd77727af8410dde44a443226af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman" supported="yes">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1260355">
+				<rom name="hopman.wav" size="1260355" crc="2df0da07" sha1="4e170c973b81f278e6073a9fcc4eb85d7bd1848c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopnhop" supported="partial">
+		<description>Hop'n'Hop</description>
+		<year>1983</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<info name="usage" value="mz1z002 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1 - BASIC"/>
+			<dataarea name="cass" size="1862844">
+				<rom name="hop'n'hop - basic.wav" size="1862844" crc="7b048377" sha1="6e4f5be9d94559da24afcc754a4d91be6304a78d" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2 - MONITOR"/>
+			<dataarea name="cass" size="885196">
+				<rom name="hop'n'hop - monitor.wav" size="885196" crc="ca344dfc" sha1="a311aec2cf5b2528727028bed333612e301d0994" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hovratck" supported="yes">
+		<description>Hover Attack</description>
+		<year>1985</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3875500">
+				<rom name="hoverattack.wav" size="3875500" crc="cd69db18" sha1="acaccc8f4581b49af30bd3d83b15aa48aaa5f1db" />
 			</dataarea>
 		</part>
 	</software>
@@ -236,6 +554,17 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="10047002">
 				<rom name="iceblock.wav" size="10047002" crc="7a351254" sha1="8ee7c107715f8cfea10b2948b58a0da2afdaf2c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impetus" supported="yes">
+		<description>Impetus</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1899548">
+				<rom name="impetus.wav" size="1899548" crc="c028a95e" sha1="e54ebf2b3bd0b99f0710ff0ec43725fb2bd379ff728d79229708ecadde54ca8582bf29a0862b0e3d" />
 			</dataarea>
 		</part>
 	</software>
@@ -295,18 +624,199 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
-	<software name="mj05" supported="no">
+	<software name="kag" supported="partial">
+		<description>Ka-G</description>
+		<year>1984</year>
+		<publisher>Puck</publisher>
+		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1 - BASIC"/>
+			<dataarea name="cass" size="3076284">
+				<rom name="ka-g - basic.wav" size="3076284" crc="c3343bf0" sha1="a0ce13ab056b030ef8ad910397420d7c9fe357af" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2 - MONITOR"/>
+			<dataarea name="cass" size="3231708">
+				<rom name="ka-g - monitor.wav" size="3231708" crc="35988d55" sha1="7881724fd14d05734c5a68309baff5352d9bd2e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kwarterk" supported="yes">
+		<description>Kwarterka</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="mz1z001 MON" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="904909">
+				<rom name="kwarterka.wav" size="904909" crc="f6ad2f85" sha1="fb0116bb7911140ba26bc016c2ee63fdc8b55628" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift" supported="yes">
+		<description>Lift</description>
+		<year>2021</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1236901">
+				<rom name="lift.wav" size="1236901" crc="aefe4a3b" sha1="e016642567061d5d6b952ed69f656cf2d0808b22" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy" supported="yes">
+		<description>Mazy</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1272270">
+				<rom name="mazy.wav" size="1272270" crc="b6d82072" sha1="4f1a56f55dcd64385253c30a888d9b87228a4325" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy2" supported="yes">
+		<description>Mazy 2</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1392692">
+				<rom name="mazy2.wav" size="1392692" crc="e0328dfb" sha1="6a1ddf98672f31b5aa7ba9b3b7b2c0435e389075" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mieyen" supported="yes">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1207472">
+				<rom name="mieyen.wav" size="1207472" crc="cf7a289d" sha1="7fa2c39fffabff1f204405f1329cb9bc2c9b44a7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mj05" supported="yes">
 		<description>MJ-05</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<notes><![CDATA[
-Loading error, boots with Z80 clock set at 3.2 MHz (80%)
-]]></notes>
 		<info name="serial" value="WB-1008"/>
 		<info name="usage" value="IPL"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="6366398">
-				<rom name="wb-1008.wav" size="6366398" crc="d7335aad" sha1="a26dd12e064b02d18ba673bb4633762aa38cca09" />
+			<dataarea name="cass" size="2924460">
+				<rom name="wb-1008.wav" size="2924460" crc="6b8f82e4" sha1="d87d59d3924fefc89a9d01194709cbd7544c2230" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mock" supported="yes">
+		<description>Mock In Dynamite House</description>
+		<year>1983</year>
+		<publisher>Ookado</publisher>
+		<info name="usage" value="mz1z002 MON" />
+		<info name="alt_title" value="懐かしくプレイ"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2255523">
+				<rom name="mock.wav" size="2255523" crc="3ac11331" sha1="41d08df78ac937122ca5dac41437d078ecc0f545" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstapc" supported="yes">
+		<description>Monsta Panic</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="mz1z002 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8441">
+				<rom name="Monsta Panic.mzt" size="8441" crc="dfc2afbd" sha1="814e1a92b2c2ba3befb7d11b00e2df0d55d9f7a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monsthse" supported="yes">
+		<description>Monster House</description>
+		<year>1983</year>
+		<publisher>Falcom Co.LTD</publisher>
+		<info name="usage" value="mz1z001 MON" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8820506">
+				<rom name="monster house.wav" size="8820506" crc="9c96c099" sha1="39da273c8aedc9f7f0ce96c5443771788b5e41d6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystryhs" supported="yes">
+		<description>Mystery House</description>
+		<year>1982</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="cass" size="696801">
+				<rom name="mystery house-p1.wav" size="696801" crc="181be75d" sha1="8e9c94af63ce7028a7201e87234ffccf3d614432" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="cass" size="1719150">
+				<rom name="mystery house-p1.wav" size="1719150" crc="21735a70" sha1="e1a0883e88b15016107c159bfc7f0025d7774da7" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mz_cass">
+			<feature name="part_id" value="Part 3"/>
+			<dataarea name="cass" size="4236423">
+				<rom name="mystery house-p3.wav" size="4236423" crc="b591172a" sha1="26857055f387cdd988f11259f65285d464bb22e3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystyhs2" supported="yes">
+		<description>Mystery House II Vol. 2</description>
+		<year>19??</year>
+		<publisher>Micro Cabin Soft</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4866897">
+				<rom name="mystery house ii vol 2.wav" size="4866897" crc="f2c19ab9" sha1="ccf9ecf409532911bf3ad554e15371318c23ebe5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras" supported="yes">
+		<description>Neuras</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1287227">
+				<rom name="neuras.wav" size="1287227" crc="0e0efe9d" sha1="bdacd8f5244fc477f414e6234731984f17eeb2e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjahse" supported="yes">
+		<description>Ninja House</description>
+		<year>1983</year>
+		<publisher>X'tal Soft</publisher>
+		<info name="usage" value="mz1z001 MON" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3625703">
+				<rom name="ninja house.wav" size="3625703" crc="018d4cce" sha1="0fb0494013ca5ffa1cb91f43817096f2cdb9effe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osotos" supported="yes">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1400645">
+				<rom name="osotos.wav" size="1400645" crc="9f4c2490" sha1="be7749145d595a8e6a432d63dee5c5107f5a954b" />
 			</dataarea>
 		</part>
 	</software>
@@ -328,11 +838,49 @@ Loading error, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
+	<software name="penguin" supported="partial">
+		<description>Penguin Village</description>
+		<year>1984</year>
+		<publisher>Pony Inc.</publisher>		
+		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
+		<info name="usage" value="mz1z002 LOAD"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6141030">
+				<rom name="penguin village.wav" size="6141030" crc="3fa54df8" sha1="7d00fcb9b650f6b6147fd529aa3a34cc42557721" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="piranha" supported="partial">
+		<description>Piranha-Kun no Isshukan</description>
+		<year>19??</year>
+		<publisher>Enix</publisher>		
+		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
+		<info name="usage" value="mz1z001 LOAD"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3581468">
+				<rom name="piranha.wav" size="3581468" crc="de098825" sha1="aea27b80d9e56d3f73809149e28332425a2954c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polaris" supported="yes">
+		<description>Polaris</description>
+		<year>1983</year>
+		<publisher>Carry Lab</publisher>
+		<info name="alt_title" value="ポラリス"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3407004">
+				<rom name="wb-1004.wav" size="3407004" crc="5a057afe" sha1="6724d9406c100a05cc7912f9611675638bc6791b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="plrstar2" supported="no">
 		<description>Polar Star II</description>
 		<year>1983</year>
 		<publisher>Hyo-Kin Soft</publisher>
-				<notes><![CDATA[Loads but gameplay won't start]]></notes>
+		<notes><![CDATA[Loads but gameplay won't start]]></notes>
 		<info name="usage" value="IPL"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="6078700">
@@ -341,29 +889,24 @@ Loading error, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
-	<software name="powrfail" supported="no">
+	<software name="powrfail" supported="yes">
 		<description>Power Fail</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<notes><![CDATA[
-CHECK SUM ERROR
-]]></notes>
 		<info name="serial" value="WB-1004"/>
 		<info name="alt_title" value="パワーフェイル"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="2145580">
-				<rom name="wb-1004.wav" size="2145580" crc="eecf0e2a" sha1="8263a0ba92c6e9f3d94fed0d7005591841d4d826" />
+			<dataarea name="cass" size="4402220">
+				<rom name="wb-1004.wav" size="4402220" crc="bad6f1e" sha1="79b1cd1debfb95f368b3d34943018fe5182ca6d2" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="puckman" supported="no">
+	<software name="puckman" supported="partial">
 		<description>Puck Man</description>
 		<year>1982</year>
 		<publisher>Carry Lab</publisher>
-		<notes><![CDATA[
-Gets stuck during loading
-]]></notes>
+		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
 		<info name="usage" value="mz1z002 MON" />
 		<info name="serial" value="CG-29"/>
 		<info name="alt_title" value="パックマン"/>
@@ -371,6 +914,62 @@ Gets stuck during loading
 			<dataarea name="cass" size="2772284">
 				<!-- .mzt to .wav converted -->
 				<rom name="cg-29.wav" size="2772284" crc="7f8325d8" sha1="ff34f3159d07b0c281b660852d1b407a7fcc66d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pucknboy" supported="partial">
+		<description>Puckn Boy</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>		
+		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
+		<info name="usage" value="mz1z002 MON"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3522118">
+				<rom name="pucknboy.wav" size="3522118" crc="7b5a7d4e" sha1="ecad43660f273219fe4d13a404f94c474049c9fa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runner" supported="partial">
+		<description>Runner</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1128">
+				<rom name="runner.mzt" size="1128" crc="c5b77e06" sha1="e9998a8fd83ec35d54b875fda993857786510f1f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus" supported="yes">
+		<description>Ruptus</description>
+		<year>20??</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1621424">
+				<rom name="ruptus.wav" size="1621424" crc="745f8ae9" sha1="e45e2a0fda5bc4f8701ece714e2bab16ece5ab7a" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="scrlgame" supported="partial">
+		<description>Scroll Game</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[Remove BASIC cassette image once loading completes and Ready prompt will display. Type RUN and hit ENTER and insert and start the Monitor cassette image. Once loading completes remove the Monitor cassette image and the game will run.]]></notes>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1 - BASIC"/>
+			<dataarea name="cass" size="1596">
+				<rom name="scroll game - basic.mzt" size="1596" crc="5b01ddac" sha1="5ee33fda2b90abbf84d23a04e02443195a7dcf3f" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2 - MONITOR"/>
+			<dataarea name="cass" size="256">
+				<rom name="scroll game - monitor.mzt" size="256" crc="8527a275" sha1="0ad4d0a9cd32393cd766c6942cc2c3cf8d1edaff" />
 			</dataarea>
 		</part>
 	</software>
@@ -390,6 +989,56 @@ Gets stuck during loading
 		</part>
 	</software>
 
+	<software name="spcruise" supported="yes">
+		<description>Space Cruiser</description>
+		<year>1983</year>
+		<publisher>Taito</publisher>
+		<info name="usage" value="IPL"/>
+		<info name="alt_title" value="スペース・クルーザー"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="7025900">
+				<rom name="spacecruiser.wav" size="7025900" crc="6bddda30" sha1="815567a83d4c73cf9376bd3cfa064976ce27310a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spclaser" supported="partial">
+		<description>Space Laser</description>
+		<year>19??</year>
+		<publisher>Toshio Fukui</publisher>		
+		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
+		<info name="usage" value="mz1z001 LOAD"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1361964">
+				<rom name="spacelaser.wav" size="1361964" crc="d3240a68" sha1="811ca92d3cdf410cc3763afa4f414313d4a82bfd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprgmstr" supported="yes">
+		<description>Spring Monster</description>
+		<year>1982</year>
+		<publisher>Isoro Valza</publisher>		
+		<info name="usage" value="mz1z001 MON"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1715364">
+				<rom name="stagbeetle.wav" size="1715364" crc="1414cfbd" sha1="1ae8bd1b3508998fd592f3cd581a1a7488447b3e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stagbtle" supported="yes">
+		<description>Stag Beetle</description>
+		<year>1982</year>
+		<publisher>Pony Canyon</publisher>		
+		<info name="usage" value="mz1z001 MON"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="929929">
+				<rom name="stagbeetle.wav" size="929929" crc="c29685da" sha1="658202b499266fd1e0014efe6f139d14a54162ce" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprdoor" supported="yes">
 		<description>Super Doors</description>
 		<year>1983</year>
@@ -404,18 +1053,26 @@ Gets stuck during loading
 		</part>
 	</software>
 
-	<software name="thespidr" supported="no">
+	<software name="svellas" supported="yes">
+		<description>Svellas</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1235865">
+				<rom name="svellas.wav" size="1235865" crc="30e27e99" sha1="cb3bd4e917bd1a8de4c8fbb090f1daee363757ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thespidr" supported="yes">
 		<description>The Spider</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<notes><![CDATA[
-CHECK SUM ERROR
-]]></notes>
 		<info name="serial" value="WB-1006"/>
 		<info name="alt_title" value="ザ・スパイダー"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="3149100">
-				<rom name="wb-1006.wav" size="3149100" crc="eec8674f" sha1="231d55c6cbb48fe88676fec31f014c6002788b5f" />
+			<dataarea name="cass" size="6608172">
+				<rom name="wb-1006.wav" size="6608172" crc="bfc5507d" sha1="b39acb7246d31cd2dc8a8e4a6ad7640b1b1158c8" />
 			</dataarea>
 		</part>
 	</software>
@@ -431,6 +1088,30 @@ CHECK SUM ERROR
 			<dataarea name="cass" size="5464539">
 				<!-- .mzt to .wav converted -->
 				<rom name="k28h5013.flac" size="5464539" crc="6b10e3f7" sha1="3a9b1d1ec98fac3e1faf79dc524f0476ddb31434" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflet" supported="yes">
+		<description>Star Fleet</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>		
+		<info name="usage" value="mz1z001 LOAD"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3192699">
+				<rom name="starfleet.wav" size="3192699" crc="707184fd" sha1="4f6b7031008f1a6eb6c460c0e0fc99d9cf071ef2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrek" supported="yes">
+		<description>Star Trek</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="874047">
+				<rom name="star trek.wav" size="874047" crc="512d57a6" sha1="e2d0fac7ca54eb2aca95fce64293c56f29e7a951" />
 			</dataarea>
 		</part>
 	</software>
@@ -451,18 +1132,28 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
-	<software name="vegecrsh">
+	<software name="vegecrsh" supported="yes">
 		<description>Vegetable Crash</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-		<notes><![CDATA[
-CHECK SUM ERROR
-]]></notes>
 		<info name="serial" value="WB-1002"/>
 		<info name="alt_title" value="ベジタブルクラッシュ"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="1233964">
-				<rom name="wb-1002.wav" size="1233964" crc="953f5d0e" sha1="527f9bfef1fd0a923ce982ef971602c86820c26b" />
+			<dataarea name="cass" size="2398908">
+				<rom name="wb-1002.wav" size="2398908" crc="337ad732" sha1="6c34c4542ea152d197b3ce487b44173cf0115acb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volkswgn" supported="partial">
+		<description>Volkswagen's Journey Part 2</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>		
+		<notes><![CDATA[Remove cassette image once loading completes and software will then run]]></notes>
+		<info name="usage" value="mz1z001 LOAD"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2823820">
+				<rom name="volkswagen's journey part 2.wav" size="2823820" crc="d13e2b6c" sha1="ce1e37ad9a591327378e8f756c47c28e00dbe34c" />
 			</dataarea>
 		</part>
 	</software>
@@ -494,6 +1185,29 @@ Has issues displaying title screen in color mode, incompatible? (verify)
 			<dataarea name="cass" size="2808920">
 				<!-- .mzt to .wav converted -->
 				<rom name="tm2-005.wav" size="2808920" crc="7e1b4fbe" sha1="62feba7d00fd5df883830c6913afd979b43411df" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow" supported="yes">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1391523">
+				<rom name="yewdow.wav" size="1391523" crc="40354f84" sha1="45ea9fa73e29d2605287d25741ee3db71a43517b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yuurei" supported="yes">
+		<description>Yuurei</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>		
+		<info name="usage" value="mz1z001 LOAD"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1912580">
+				<rom name="yuurei.wav" size="1912580" crc="56a64438" sha1="5613691f9f3dfc82c34e01e28eb13cb924466c02" />
 			</dataarea>
 		</part>
 	</software>
