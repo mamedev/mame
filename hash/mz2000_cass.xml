@@ -1124,7 +1124,7 @@ Has issues displaying title screen in color mode, incompatible? (verify)
 		<publisher>Inufuto</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="1899548">
-				<rom name="impetus.wav" size="1899548" crc="c028a95e" sha1="e54ebf2b3bd0b99f0710ff0ec43725fb2bd379ff728d79229708ecadde54ca8582bf29a0862b0e3d" />
+				<rom name="impetus.wav" size="1899548" crc="c028a95e" sha1="ebf2b3bd0b99f0710ff0ec43725fb2bd379ff728" />
 			</dataarea>
 		</part>
 	</software>
