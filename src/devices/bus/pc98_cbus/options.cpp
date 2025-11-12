@@ -65,5 +65,11 @@ void pc88va_cbus_devices(device_slot_interface &device)
 	device.option_add("mpu_pc98",   MPU_PC98);
 }
 
-
+// https://man.openbsd.org/cbus.4
+void luna88k2_cbus_devices(device_slot_interface &device)
+{
+	// Allied Telesis CentreCOM LA-98
+	device.option_add("pc9801_86",  PC9801_86);
+	// PCMCIA options
+}
 
