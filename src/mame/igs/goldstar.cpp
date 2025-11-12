@@ -491,6 +491,7 @@ public:
 	void init_hamhouse() ATTR_COLD;
 	void init_hamhouse9() ATTR_COLD;
 	void init_jkrmast() ATTR_COLD;
+	void init_jkrmastc() ATTR_COLD;
 	void decrypt_ll3() ATTR_COLD;
 	void init_ll3() ATTR_COLD;
 	void init_ll3b() ATTR_COLD;
@@ -1437,7 +1438,7 @@ VIDEO_START_MEMBER(cmaster_state, amaztsk)
 	m_reel_tilemap[1]->set_scroll_cols(64);
 	m_reel_tilemap[2]->set_scroll_cols(64);
 
-//	m_reel_tilemap[0]->set_transparent_pen(15);
+//  m_reel_tilemap[0]->set_transparent_pen(15);
 	m_reel_tilemap[1]->set_transparent_pen(15);
 	m_reel_tilemap[2]->set_transparent_pen(15);
 
@@ -1447,7 +1448,7 @@ VIDEO_START_MEMBER(cmaster_state, amaztsk)
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_cherrym_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-//	m_enable_reg = 0x0b;
+//  m_enable_reg = 0x0b;
 
 }
 
@@ -2182,11 +2183,11 @@ uint32_t unkch_state::screen_update_unkchx(screen_device &screen, bitmap_rgb32 &
 uint32_t cmaster_state::screen_update_amaztsk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
-//	popmessage("screen update: %02x", m_enable_reg);
+//  popmessage("screen update: %02x", m_enable_reg);
 	if (!(m_enable_reg & 0x01))
 		return 0;
 
-	
+
 	if (m_enable_reg == 0x0b)
 	{
 		for (int i = 0; i < 64; i++)
@@ -2219,8 +2220,8 @@ uint32_t cmaster_state::screen_update_amaztsk(screen_device &screen, bitmap_rgb3
 
 	}
 
-//	if (m_enable_reg & 0x02)
-//		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+//  if (m_enable_reg & 0x02)
+//      m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -3225,7 +3226,7 @@ void cmaster_state::anhs_reel_reg_w(uint8_t data)
 {
 /*
   Video Reels Register
-	7 6 5 4 3 2 1 0
+    7 6 5 4 3 2 1 0
     | | | | | | | |
     | | | | | +-+-+----- m_bgcolor
     | | | | +----------- reel/girl enable -> to update girls or reels
@@ -5758,7 +5759,7 @@ static INPUT_PORTS_START( eldoradoa )
 	PORT_DIPNAME( 0x10, 0x00, "Show Girls" )            PORT_DIPLOCATION("DSW5:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	// 0xe0 --> skill mode / stops. same as animalhs 
+	// 0xe0 --> skill mode / stops. same as animalhs
 
 	PORT_MODIFY("DSW6")
 	PORT_DIPNAME( 0x01, 0x01, "DSW6" )                  PORT_DIPLOCATION("DSW6:1")
@@ -16536,7 +16537,7 @@ void cmaster_state::animalhs(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::animalhs_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::animalhs_portmap);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);	
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -20315,6 +20316,29 @@ ROM_START( jkrmastb )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "n82s129.u28",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
+ROM_END
+
+ROM_START( jkrmastc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.bin", 0x4000, 0x4000, CRC(e62ea3d9) SHA1(b1347301f2502a535ea897472198be167327b21f) )
+	ROM_CONTINUE(           0x0000, 0x4000 )
+	ROM_CONTINUE(           0xc000, 0x4000 )
+	ROM_CONTINUE(           0x8000, 0x4000 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "b.l5", 0x00000, 0x20000, CRC(73b96601) SHA1(8a35210a0277874e88a3c8e31aab22128660ce04) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "a.j5", 0x00000, 0x20000, CRC(2e567f2c) SHA1(efbfe38b2014d30b5d1e41396e88f7c9b659df93) )
+
+	ROM_REGION( 0x200, "colours", 0 )
+	ROM_LOAD( "n82s147a.s8", 0x000, 0x200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	// filled at init()
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n82s129.h3",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
 ROM_END
 
 /*
@@ -28396,6 +28420,13 @@ void cmaster_state::init_jkrmast()
 	init_palnibbles();
 }
 
+void cmaster_state::init_jkrmastc()
+{
+	// TODO: decryption
+
+	init_palnibbles();
+}
+
 void cmaster_state::init_pkrmast()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -30910,8 +30941,8 @@ void cmaster_state::init_animalhs()
 	 // Fix Test Mode bad string pointer - (perhaps bad decryption)
 	 // animalhs & animalhsa
 	rom[0x5d5d] = 0xeb;
-	rom[0x5d5e] = 0x82;	
-	
+	rom[0x5d5e] = 0x82;
+
 	// Fix attract mode bad jump & stack crash
 	// animalhsa (fix compatible with animalhs code)
 	rom[0x26b7] = 0x4e;
@@ -31325,6 +31356,7 @@ GAMEL( 1991, tonypok,    0,         cm,        tonypok,   cmaster_state, init_to
 GAME(  1999, jkrmast,    0,         jkrmast,   jkrmast,   cmaster_state, init_jkrmast,   ROT0, "Pick-A-Party USA",   "Joker Master 2000 Special Edition (V515)",     0 )
 GAME(  1999, jkrmasta,   jkrmast,   jkrmast,   jkrmast,   cmaster_state, init_jkrmast,   ROT0, "Pick-A-Party USA",   "Joker Master 2000 Special Edition (V512/513)", 0 )
 GAME(  1999, jkrmastb,   jkrmast,   jkrmast,   jkrmastb,  cmaster_state, init_jkrmast,   ROT0, "Pick-A-Party USA",   "Joker Master 2000 Special Edition (V512)",     0 )
+GAME(  1997, jkrmastc,   jkrmast,   jkrmast,   jkrmastb,  cmaster_state, init_jkrmastc,  ROT0, "Pick-A-Party USA",   "Joker Master 2000 Special Edition (V1C)",      MACHINE_NOT_WORKING ) // encrypted
 GAME(  1993, pkrmast,    0,         pkrmast,   pkrmast,   cmaster_state, init_pkrmast,   ROT0, "Fun USA",            "Poker Master (ED-1993, dual game, set 1)",     0 ) // puts FUN USA 95H N/G  V2.20 in NVRAM
 GAME(  1993, pkrmasta,   pkrmast,   pkrmast,   pkrmast,   cmaster_state, init_pkrmast,   ROT0, "Fun USA",            "Poker Master (ED-1993, dual game, set 2)",     0 ) // puts PM93 JAN 29/1996 V1.52 in NVRAM
 GAME(  1993, missbingo,  pkrmast,   pkrmast,   pkrmast,   cmaster_state, init_pkrmast,   ROT0, "Fun USA",            "Miss Bingo (Poker Master HW, dual game)",      0 )
