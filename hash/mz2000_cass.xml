@@ -70,12 +70,10 @@ TODO:
 		<description>Amateur Tennis</description>
 		<year>1982</year>
 		<publisher>Carry Lab</publisher>
-		<notes><![CDATA[
-Sets back color = 1 (blue) over blue text in color mode, incompatible? (verify)
-]]></notes>
 		<info name="usage" value="IPL" />
 		<info name="serial" value="CG-75"/>
 		<info name="alt_title" value="アマテニス"/>
+		<sharedfeat name="compatibility" value="MONO"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="4042286">
 				<!-- .mzt to .wav converted -->
@@ -338,6 +336,19 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 		</part>
 	</software>
 
+	<software name="harvestca" cloneof="harvestc" supported="yes">
+		<description>Harvest (Alt)</description>
+		<year>1983?</year>
+		<publisher>マイクロネット (Micronet)</publisher>
+		<info name="usage" value="mz1z002 MON" />
+		<sharedfeat name="compatibility" value="COLOR"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4634005">
+				<rom name="harvest_color.wav" size="4634005" crc="4873e959" sha1="f017bcc3eba354099196ec4aed5692d4c971ed60" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="harvestg" cloneof="harvestc" supported="no">
 		<description>Harvest (Monochrome)</description>
 		<year>1983?</year>
@@ -349,6 +360,7 @@ Bacteria: goes in Monitor TS-2000, fails to load second part
 			</dataarea>
 		</part>
 	</software>
+
 
 	<software name="help" supported="yes">
 		<description>Help!</description>
@@ -924,6 +936,19 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
+	<software name="sstreama" cloneof="sstream" supported="yes">
+		<description>Star Stream</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="usage" value="IPL" />
+		<sharedfeat name="compatibility" value="COLOR"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4980140">
+				<rom name="star stream.wav" size="4980140" crc="65e7f917" sha1="4a18cc6d1b6e85cf44d57cf5823343e55bf5f41b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vegecrsh" supported="yes">
 		<description>Vegetable Crash</description>
 		<year>1983</year>
@@ -958,6 +983,18 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="26752">
 				<rom name="vosque2000.mzt" size="26752" crc="56f9000e" sha1="93319cecc92ffe7305ff1b8ecb26d0fd2db3bd47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vosque2ka" cloneof="vosque2k" supported="yes">
+		<description>Vosque 2000 (Alt)</description>
+		<year>19??</year>
+		<!-- TODO: from title, check spelling on tape cover -->
+		<publisher>d.B Soft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5882700">
+				<rom name="vosque2000.wav" size="5882700" crc="266ec15e" sha1="bb10728ded373b0296048b0b9dd3485d16d8ee72"/>
 			</dataarea>
 		</part>
 	</software>
