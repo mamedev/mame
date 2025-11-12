@@ -91,9 +91,8 @@ private:
 	void mscbar_program_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_selected_7seg_module = 0;
-	uint8_t       m_coin_counter = 0;
-
-	output_finder<32> m_digits;
+    
+    output_finder<32> m_digits;
 	output_finder<34> m_leds;
 	required_ioport_array<4> m_inputs;
 	optional_device<okim6295_device> m_oki;
