@@ -29,8 +29,8 @@ MZ80A ToDo:
 
 #include "emupal.h"
 #include "screen.h"
-#include "speaker.h"
 #include "softlist_dev.h"
+#include "speaker.h"
 
 #include "formats/mz_cas.h"
 
@@ -322,7 +322,6 @@ void mz80_state::mz80k(machine_config &config)
 	m_cassette->set_interface("mz_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mz80k_cass");
-
 }
 
 void mz80_state::mz80kj(machine_config &config)
@@ -338,7 +337,6 @@ void mz80_state::mz80a(machine_config &config)
 	mz80k(config);
 
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(mz80_state::screen_update_mz80a));
-
 }
 
 
