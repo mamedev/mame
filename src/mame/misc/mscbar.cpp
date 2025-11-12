@@ -146,28 +146,24 @@ INPUT_PORTS_END
 
 void mscbar_state::ay1_port_a_w(uint8_t data)
 {
-	data = data ^ 0xff; 
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i] = BIT(data, i);
 }
 
 void mscbar_state::ay1_port_b_w(uint8_t data)
 {
-	data = data ^ 0xff; 
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i + 8] = BIT(data, i);
 }
 
 void mscbar_state::ay2_port_a_w(uint8_t data)
 {
-	data = data ^ 0xff; 
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i + 16] = BIT(data, i);
 }
 
 void mscbar_state::ay2_port_b_w(uint8_t data)
 {
-	data = data ^ 0xff; 
 	for (uint8_t i = 0; i < 6; i++)
     m_leds[i + 24] = BIT(data, i);
 	m_leds[32] = BIT(data, 6);
@@ -183,7 +179,6 @@ m_hopper->motor_w(BIT(data, 3));
 
 void mscbar_state::p3_port_w(uint8_t data)  // bit 3 and 5 are used.
 {
-	data = data ^ 0xff; 
 	m_leds[30] = BIT(data, 3);
 	m_leds[31] = BIT(data, 5);
 	
