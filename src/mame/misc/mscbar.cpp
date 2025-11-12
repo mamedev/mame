@@ -248,21 +248,20 @@ void mscbar_state::mscbar(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &mscbar_state::mscbar_program_map);
 	maincpu.set_addrmap(AS_DATA, &mscbar_state::mscbar_data_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
-	maincpu.port_out_cb<3>().set(FUNC(p3_port_w));
-	maincpu.port_out_cb<1>().set(FUNC(p1_port_w));
+	maincpu.port_out_cb<1>().set(FUNC(mscbar_state::p1_port_w));
+	maincpu.port_out_cb<3>().set(FUNC(mscbar_state::p3_port_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
     HOPPER(config, m_hopper, attotime::from_msec(100));
+	
 	/* Video */
 	config.set_default_layout(layout_mscbar);
-
 
 	/* Keyboard & display interface */
 	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635) / 6));
 	kbdc.out_sl_callback().set(FUNC(mscbar_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(mscbar_state::keyboard_r));          // keyboard Return Lines
 	kbdc.out_disp_callback().set(FUNC(mscbar_state::display_7seg_data_w));
-
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
