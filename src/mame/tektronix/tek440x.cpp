@@ -536,7 +536,6 @@ public:
 		m_timer(*this, "timer"),
 		m_rtc(*this, "rtc"),
 		m_scsi(*this, "scsi:7:ncr5385"),
-		m_vint(*this, "vint"),
 		m_screen(*this, "screen"),
 		m_acia(*this, "acia"),
 		m_fpu(*this, "fpu"),
@@ -639,7 +638,6 @@ private:
 	required_device<am9513_device> m_timer;
 	required_device<mc146818_device> m_rtc;
 	required_device<ncr5385_device> m_scsi;
-	required_device<input_merger_all_high_device> m_vint;
 	required_device<screen_device> m_screen;
 	required_device<mos6551_device> m_acia;
 	required_device<ns32081_device> m_fpu;
@@ -668,6 +666,7 @@ private:
 	bool m_boot;
 	u8 m_map_control;
 	u8 m_latched_map_control;		// latched until user mode access (page 2.1-54)
+	u8 m_vint_enable;				// VIntEn also used to hold U4438 in reset state
 	
 	u8 m_printer_pc;
 	bool m_kb_rdata;
@@ -735,10 +734,8 @@ void tek440x_state::machine_reset()
 	mapcntl_w(0);
 	videocntl_w(0);
 
-	m_vint->in_w<0>(0);		// VBL enable
-	m_vint->in_w<1>(0);		// VBL
-	m_vint->in_w<2>(0);		// VBL
-
+	m_vint_enable = 0;
+	
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
 }
@@ -1274,12 +1271,13 @@ void tek440x_state::videocntl_w(u8 data)
 		LOG("m_videocntl ScreenPan  %2d\n", data & 15);
 	}
 
-	m_vint->in_w<0>(BIT(data, 6));
-
-	// VBenable was ON, now OFF
-	if (BIT(m_videocntl ^ data, 6) && !BIT(data, 6))
-		m_vint->in_w<2>(0);
-
+	m_vint_enable = BIT(data, 6);
+	if (!m_vint_enable)
+	{
+		// VIntEn resets U4438 pulling VSyncInt high
+		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+	}
+	
 	m_videocntl = data;
 }
 
@@ -1706,17 +1704,20 @@ void tek440x_state::tek4404(machine_config &config)
 	m_vm->set_addr_width(23);
 	m_vm->set_endianness(ENDIANNESS_BIG);
 
-	INPUT_MERGER_ALL_HIGH(config, m_vint);
-	m_vint->output_handler().set_inputline(m_maincpu, M68K_IRQ_6);
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal (guessed), 60 Hz vertical
 	m_screen->set_screen_update(FUNC(tek440x_state::screen_update));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
-	m_screen->screen_vblank().append(m_vint, FUNC(input_merger_all_high_device::in_w<2>));
+	m_screen->screen_vblank().set([this](int state)
+    {
+		printf("vblank %d\n", state);
+		if (state && m_vint_enable)
+		{
+			m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
+		}
+    });
 	PALETTE(config, "palette", FUNC(tek440x_state::palette),2);
 	
 	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
