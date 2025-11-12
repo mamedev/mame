@@ -71,10 +71,14 @@ public:
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
+	void set_view(memory_view::memory_view_entry &view) { m_view = &view; };
 
 	virtual space_config_vector memory_space_config() const override;
 	address_space &program_space() const { return *m_space; }
 
+	auto bus_error_callback() { return m_out_bus_error_cb.bind(); }
+
+	auto bevnt() { return m_out_bevnt_cb.bind(); }
 	auto birq4() { return m_out_birq4_cb.bind(); }
 	auto birq5() { return m_out_birq6_cb.bind(); }
 	auto birq6() { return m_out_birq6_cb.bind(); }
@@ -84,13 +88,18 @@ public:
 	void install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask=0xffffffff);
 
 	void init_w();
+	void bus_error_w(int state) { m_out_bus_error_cb(state); }
 
+	void bevnt_w(int state) { m_out_bevnt_cb(state); }
 	void birq4_w(int state) { m_out_birq4_cb(state); }
 	void birq5_w(int state) { m_out_birq5_cb(state); }
 	void birq6_w(int state) { m_out_birq6_cb(state); }
 	void birq7_w(int state) { m_out_birq7_cb(state); }
 
 	void bdmr_w(int state) { m_out_bdmr_cb(state); }
+
+	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	const address_space_config m_program_config;
 
@@ -106,10 +115,14 @@ protected:
 
 	// internal state
 	required_address_space m_space;
+	memory_view::memory_view_entry *m_view;
 
 private:
 	using card_vector = std::vector<std::reference_wrapper<device_qbus_card_interface> >;
 
+	devcb_write_line m_out_bus_error_cb;
+
+	devcb_write_line m_out_bevnt_cb;
 	devcb_write_line m_out_birq4_cb;
 	devcb_write_line m_out_birq5_cb;
 	devcb_write_line m_out_birq6_cb;

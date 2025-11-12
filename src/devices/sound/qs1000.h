@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "sound/okiadpcm.h"
 #include "dirom.h"
 
@@ -59,7 +59,7 @@ public:
 	uint8_t p3_r();
 	void p3_w(uint8_t data);
 
-	void qs1000_io_map(address_map &map) ATTR_COLD;
+	void qs1000_data_map(address_map &map) ATTR_COLD;
 	void qs1000_prg_map(address_map &map) ATTR_COLD;
 
 protected:

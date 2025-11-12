@@ -813,6 +813,12 @@ void upd7801_device::write_pc(uint8_t data)
 	m_pc_out_cb(data);
 }
 
+void upd7810_device::write_smh(uint8_t data)
+{
+	if (!BIT(SMH, 2) && BIT(data, 2)) IRR |= INTFST;
+	SMH = data;
+}
+
 void upd7810_device::upd7810_take_irq()
 {
 	uint16_t vector = 0;

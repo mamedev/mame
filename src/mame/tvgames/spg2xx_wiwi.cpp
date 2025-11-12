@@ -30,9 +30,12 @@ public:
 	void init_wiwi18();
 
 protected:
+	void machine_reset() override ATTR_COLD;
 
 private:
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	uint8_t m_numbanks;
 };
 
 class spg2xx_game_marc101_state : public spg2xx_game_state
@@ -120,6 +123,13 @@ private:
 	bool m_toggle2;
 	emu_timer *m_pulse_timer2 = nullptr;
 };
+
+void spg2xx_game_wiwi18_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+	int len = memregion("maincpu")->bytes();
+	m_numbanks = len / 0x800000;
+}
 
 TIMER_CALLBACK_MEMBER(spg2xx_game_marc101_state::toggle_tick)
 {
@@ -697,15 +707,30 @@ INPUT_PORTS_END
 
 void spg2xx_game_wiwi18_state::init_wiwi18()
 {
-	// workaround for security checks on startup
-
+	// workaround for checks on startup, probably needs timer readback on port bits in core?
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-	if (rom[0x1ca259]==0x4e04) rom[0x1ca259] = 0xf165; // wiwi18
-	if (rom[0x1355a4]==0x4e04) rom[0x1355a4] = 0xf165; // foxsport
+	int len = memregion("maincpu")->bytes();
 
-	if (rom[0x362e1c]==0x4e04) rom[0x362e1c] = 0xf165; // lexifit
-	if (rom[0x4c7f4d]==0x4e04) rom[0x4c7f4d] = 0xf165; // lexifit (2nd bank)
+	uint16_t ident2[6] = { 0x92c3, 0x9902, 0x42c4, 0x4e04, 0xee01, 0xee00 };
 
+	for (int i = 0; i < (len / 2) - 6; i++)
+	{
+		bool found = true;
+		for (int j = 0; j < 6; j++)
+		{
+			uint16_t cmp1 = ident2[j];
+			uint16_t cmp2 = rom[i + j];
+
+			if (cmp1 != cmp2)
+				found = false;
+		}
+
+		if (found)
+		{
+			logerror("found problematic code at %08x\n", i + 3);
+			rom[i + 3] = 0xf165;
+		}
+	}
 }
 
 void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -728,12 +753,14 @@ void spg2xx_game_wiwi18_state::portb_w(offs_t offset, uint16_t data, uint16_t me
 		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
 		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
+	// bankswitch code runs in RAM, but on startup game accesses here (with direction bits set in a way that we can't mask)
+	// so we have this hack to only bank if we're executing from RAM
 	if (m_maincpu->pc() < 0x2000)
 	{
-		if ((data & 0x0003) == 0x0000)
-			switch_bank(1);
-		else
-			switch_bank(0);
+		int bank = data & 0x3;
+		bank ^= 3;
+
+		switch_bank(bank & (m_numbanks-1));
 	}
 }
 
@@ -958,6 +985,16 @@ ROM_START( lexifit )
 	ROM_LOAD16_WORD_SWAP( "lexibook_tv_fitness_center.bin", 0x000000, 0x1000000, CRC(38021230) SHA1(2b949d723a475bfac23d9da4d1a30ea71b332ccb) )
 ROM_END
 
+ROM_START( inmotion )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "mx26l25722mc.bin", 0x000000, 0x2000000, CRC(81125997) SHA1(824607a3665b1351bccf27de4885a26ca86b40a5) )
+ROM_END
+
+ROM_START( wiii3spt )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vii3_7.bin", 0x000000, 0x2000000, CRC(f9176352) SHA1(ec05432c6d5a94a3eba0ece74c3cf3feeada007f) )
+ROM_END
+
 ROM_START( marc101 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "m489.u6", 0x0000000, 0x4000000, CRC(0a01695f) SHA1(1a13c5eb9dffdc91fc68a98e8f35bd8a019a8373) )
@@ -1001,6 +1038,12 @@ CONS( 200?, wiwi18,   0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, 
 CONS( 2009, lexifit,  0,        0, rad_skat, lexifit, spg2xx_game_wiwi18_state, init_wiwi18, "Lexibook",              "TV Fitness Center (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, foxsport, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "Excalibur Electronics", "Fox Sports 7 in 1 Sports Games Plug n' Play", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// doesn't really have 198 games, closer to 20, with duplicates starting on different levels
+// as with the above sets, inputs aren't currently hooked up, menu can be used by modifying 0x100f in RAM (it's 0x1010 for wiwi18)
+CONS( 200?, inmotion, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "Grafix", "IN Motion - Motion Controlled Video Games Console (Hot Game 198 in 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, wiii3spt, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, init_wiwi18, "BL", "Wiii3 TV Entertainment System (7-in-1 Sports)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // thtere is another 'Drahtlose Spielekonsole 48-in-1' with '11 hyper sports games' (including Running) which are clearly SunPlus and would fit here, with the 37 non-hyper sports games presumably again being a NES/Famiclone cart
 

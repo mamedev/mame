@@ -11,7 +11,7 @@
 #pragma once
 
 #include "cpu/tms34010/tms34010.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/adc0844.h"
 #include "machine/mc68681.h"
 #include "machine/scn_pci.h"
@@ -196,7 +196,7 @@ private:
 	void drmath_data(address_map &map) ATTR_COLD;
 	void drmath_prg(address_map &map) ATTR_COLD;
 	void hostmem(address_map &map) ATTR_COLD;
-	void soundmem_io(address_map &map) ATTR_COLD;
+	void soundmem_data(address_map &map) ATTR_COLD;
 	void soundmem_prg(address_map &map) ATTR_COLD;
 	void vgbmem(address_map &map) ATTR_COLD;
 };

@@ -411,6 +411,27 @@ ROM_START( bldwolfj ) // note, ROM codes are ER not ES even if the content of so
 	ROM_LOAD( "er11-.tpg",   0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
 ROM_END
 
+ROM_START( miade )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "es-00.e1",   0x00000, 0x10000, CRC(e0e7d6a6) SHA1(fdbb0407320cd1adbde6ffa3bba6d0e9eb85edf6) )
+	ROM_LOAD( "es-01.e3",   0x10000, 0x10000, CRC(9fea3189) SHA1(0692df6df533dfe55f61df8aa0c5c11944ba3ae3) )
+	ROM_LOAD( "es-02.e4",   0x20000, 0x10000, CRC(798b6400) SHA1(02a644fd6f11e9118ba926cf18c1de263808c06e) )
+	// these were present in the sockets for 0x30000/0x40000, but appear to be unused?
+	ROM_LOAD( "backmap.e5", 0x30000, 0x10000, CRC(49b9cdd6) SHA1(9eca546196e4da469448dd38a0656e604f558da4) )
+	ROM_LOAD( "data.h1",    0x40000, 0x10000, CRC(6231b10e) SHA1(8b436da15e1602b34f0fad7653d9a1689ca32c96) )
+	// Rom sockets 0x50000 - 0x70000 are unused
+	ROM_LOAD( "es-05.j1",   0x80000, 0x10000, CRC(551fa331) SHA1(a70c627c572ba1b8029f61eae6eaad9825c56339) )
+	ROM_LOAD( "es-06.j3",   0x90000, 0x10000, CRC(ab91aac8) SHA1(81d820c8b70281a4a52f7ec75a3c54377011d9d9) )
+	ROM_LOAD( "es-07.j4",   0xa0000, 0x10000, CRC(8d15a3d0) SHA1(afae081ee5e0de359cae6a7ea8401237c5ab7095) )
+	ROM_LOAD( "es-08.j5",   0xb0000, 0x10000, CRC(38f06039) SHA1(cc394f161b2c4423cd2da763701ceaad7d27f741) )
+	ROM_LOAD( "es-09.l1",   0xc0000, 0x10000, CRC(b718c47d) SHA1(1d5b2ec819b0848e5b883373887445a63ebddb06) )
+	ROM_LOAD( "es-10.l3",   0xd0000, 0x10000, CRC(08507b27) SHA1(fb5109e7ed7a0c010a33a7334e32d9d89f3c823e) )
+	// Rom sockets 0xe0000 - 0x100000 are unused
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "es-11.d10",   0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
+ROM_END
+
 } // Anonymous namespace
 
 
@@ -419,3 +440,5 @@ ROM_END
 GAME( 1988, battlera, 0,        battlera, battlera, battlera_state, empty_init, ROT0, "Data East Corporation", "Battle Rangers (World)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bldwolf,  battlera, battlera, battlera, battlera_state, empty_init, ROT0, "Data East USA",         "Bloody Wolf (US)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bldwolfj, battlera, battlera, battlera, battlera_state, empty_init, ROT0, "Data East Corporation", "Narazumono Sentoubutai Bloody Wolf (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// VCOK16AM92UC046AU691 written on PCB, ROMSTAR label, serial "NO. BW 0234"
+GAME( 1988, miade,    battlera, battlera, battlera, battlera_state, empty_init, ROT0, "Data East USA",         "M.I.A. - Missing in Action (Data East, 12/22/88, US, prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

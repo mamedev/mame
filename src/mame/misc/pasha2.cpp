@@ -82,7 +82,7 @@ Notes:
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"

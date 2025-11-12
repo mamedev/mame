@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese, Matthew Daniels
 /*
     Sega Model 2: i960KB + (5x TGP) or (2x SHARC) or (2x TGPx4)
     System 24 tilemaps
@@ -7,19 +7,15 @@
     (68000 + YM3438 + 2x MultiPCM) or (68000 + SCSP)
 
     Hardware and protection reverse-engineering and general assistance by ElSemi.
-    MAME driver by R. Belmont, Olivier Galibert, ElSemi and Angelo Salese.
+    MAME driver by R. Belmont, Olivier Galibert, ElSemi, Angelo Salese and Matthew Daniels.
 
     TODO:
-    - Mip Mapping still needs to be properly sorted in the renderer;
-    - sound comms still needs some work (sometimes m68k doesn't get some commands or play them with a delay);
     - outputs and artwork (for gearbox indicators);
     - clean-ups;
 
     TODO (per-game issues)
     - doa, doaa: corrupted sound, eventually becomes silent;
     - dynamcopc: corrupts palette for 2d;
-    - fvipers: enables timers, but then irq register is empty, hence it crashes with an
-      "interrupt halt" at POST (regression, worked around);
     - hpyagu98: stops with 'Error #1' message during boot.
       Also writes to the 0x600000-0x62ffff range in main CPU program map;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
@@ -29,8 +25,6 @@
               bypass it by entering then exiting service mode;
     - sgt24h: has input analog issues, steering doesn't center when neutral,
       gas and brake pedals pulses instead of being fixed;
-    - stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
-    - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...
@@ -129,18 +123,17 @@ void model2_state::timers_w(offs_t offset, u32 data, u32 mem_mask)
 template <int TNum>
 TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 {
-	int bit = TNum + 2;
-
 	if(m_timerrun[TNum] == 0)
 		return;
 
 	m_timers[TNum]->reset();
 
-	m_intreq |= (1<<bit);
-	if(m_intena & 1<<bit)
-		m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
-	//printf("%08x %08x (%08x)\n",m_intreq,m_intena,1<<bit);
-	model2_check_irq_state();
+	const u32 line = 1 << (TNum + 2);
+	if (m_intena & line)
+	{
+		m_intreq |= line;
+		irq_update();
+	}
 
 	m_timervals[TNum] = 0xfffff;
 	m_timerrun[TNum] = 0;
@@ -270,11 +263,7 @@ void model2_state::machine_reset()
 	m_geo_write_start_address = 0;
 	m_geo_read_start_address = 0;
 
-	const int irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
-	for (auto irq : irq_type)
-	{
-		m_maincpu->set_input_line(irq, CLEAR_LINE);
-	}
+	irq_update();
 }
 
 void model2_state::reset_model2_scsp()
@@ -519,9 +508,9 @@ u32 model2_tgp_state::copro_inv_r(offs_t offset)
 	u32 result = m_copro_tgp_tables[index | 0x8000];
 	u8 bexp = (m_copro_inv_base >> 23) & 0xff;
 	u8 exp = (result >> 23) + (0x7f - bexp);
-	result = (result & 0x807fffff) | (exp << 23);
-	if(m_copro_inv_base & 0x80000000)
-		result ^= 0x80000000;
+	result = (result & 0x007fffff) | (exp << 23);
+	if (m_copro_inv_base & 0x80000000 && offset)
+		result |= 0x80000000;
 	return result;
 }
 
@@ -607,9 +596,6 @@ void model2_tgp_state::copro_fifo_w(u32 data)
 	}
 	else
 		m_copro_fifo_in->push(u32(data));
-
-	// 1 wait state for i960; prevents Manx TT course select rotation bug
-	m_maincpu->spin_until_time(attotime::from_nsec(40));
 }
 
 
@@ -761,12 +747,11 @@ void model2c_state::copro_function_port_w(offs_t offset, u32 data)
 
 void model2c_state::copro_tgpx4_map(address_map &map)
 {
-	map(0x00000000, 0x00007fff).ram().share("copro_tgpx4_program");
+	map(0x00000000, 0x00000fff).ram().share("copro_tgpx4_program");
 }
 
 void model2c_state::copro_tgpx4_data_map(address_map &map)
 {
-//  map(0x00000000, 0x000003ff) internal RAM
 	map(0x00400000, 0x00407fff).ram().share("bufferram").mirror(0x003f8000);
 	map(0x00800000, 0x009fffff).rom().region("copro_data",0); // ROM data
 }
@@ -932,42 +917,27 @@ u32 model2_state::irq_enable_r()
 void model2_state::irq_ack_w(u32 data)
 {
 	m_intreq &= data;
-
-	model2_check_irqack_state(data ^ 0xffffffff);
+	irq_update();
 }
 
 void model2_state::irq_enable_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_intena);
-	model2_check_irq_state();
-}
 
-void model2_state::model2_check_irq_state()
-{
-	return;
-
-	/* TODO: vf2 and fvipers hangs with an irq halt on POST, disabled for now */
-	const int irq_type[12]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
-
-	for(int i=0;i<12;i++)
+	const u32 line = 1 << 10;
+	if ((m_uart->status_r() & 0x03) && (m_intena & line))
 	{
-		if (m_intena & (1<<i) && m_intreq & (1<<i))
-		{
-			m_maincpu->set_input_line(irq_type[i], ASSERT_LINE);
-			return;
-		}
+		m_intreq |= line;
+		irq_update();
 	}
 }
 
-void model2_state::model2_check_irqack_state(u32 data)
+void model2_state::irq_update()
 {
-	const int irq_type[12]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
-
-	for(int i=0;i<12;i++)
-	{
-		if(data & 1<<i)
-			m_maincpu->set_input_line(irq_type[i], CLEAR_LINE);
-	}
+	m_maincpu->set_input_line(I960_IRQ0, m_intreq & 0b0000'0000'0001 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(I960_IRQ1, m_intreq & 0b0000'0000'0010 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(I960_IRQ2, m_intreq & 0b0011'1111'1100 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(I960_IRQ3, m_intreq & 0b1100'0000'0000 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 u8 model2_state::model2_serial_r(offs_t offset)
@@ -1056,14 +1026,14 @@ void model2_tgp_state::tex1_w(offs_t offset, u32 data)
 	}
 }
 
-u16 model2_state::lumaram_r(offs_t offset)
+u8 model2_state::lumaram_r(offs_t offset)
 {
 	return m_lumaram[offset];
 }
 
-void model2_state::lumaram_w(offs_t offset, u16 data, u16 mem_mask)
+void model2_state::lumaram_w(offs_t offset, u8 data)
 {
-	COMBINE_DATA(&m_lumaram[offset]);
+	m_lumaram[offset] = data;
 }
 
 /* Top Skater reads here and discards the result */
@@ -1135,8 +1105,6 @@ void model2_state::model2_base_mem(address_map &map)
 	// format is xGGGGGRRRRRBBBBB (512x400)
 	map(0x11600000, 0x1167ffff).rw(FUNC(model2_state::fbvram_bankA_r), FUNC(model2_state::fbvram_bankA_w)).flags(i960_cpu_device::BURST); // framebuffer A (last bronx title screen)
 	map(0x11680000, 0x116fffff).rw(FUNC(model2_state::fbvram_bankB_r), FUNC(model2_state::fbvram_bankB_w)).flags(i960_cpu_device::BURST); // framebuffer B
-
-	map(0x12800000, 0x1281ffff).rw(FUNC(model2_state::lumaram_r), FUNC(model2_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 }
 
 /* common map for 5881 protection */
@@ -1272,8 +1240,11 @@ void model2_tgp_state::model2_tgp_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2_tgp_state::copro_ctl1_r), FUNC(model2_tgp_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2_tgp_state::geo_ctl1_w));
 
+	map(0x10800000, 0x10800003).nopr(); // polygon count register
+
 	map(0x12000000, 0x121fffff).ram().w(FUNC(model2o_state::tex0_w)).mirror(0x200000).share("textureram0").flags(i960_cpu_device::BURST);   // texture RAM 0
 	map(0x12400000, 0x125fffff).ram().w(FUNC(model2o_state::tex1_w)).mirror(0x200000).share("textureram1").flags(i960_cpu_device::BURST);   // texture RAM 1
+	map(0x12800000, 0x1281ffff).rw(FUNC(model2_tgp_state::lumaram_r), FUNC(model2_tgp_state::lumaram_w)).umask32(0x000000ff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 }
 
 /* original Model 2 overrides */
@@ -1416,8 +1387,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x11100000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
 	map(0x11200000, 0x112fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
 	map(0x11300000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
-	map(0x11400000, 0x1140ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
-	map(0x12800000, 0x1281ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
+	map(0x11400000, 0x1140ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask16(0x00ff).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
@@ -1452,8 +1422,7 @@ void model2c_state::model2c_crx_mem(address_map &map)
 
 	map(0x11000000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
 	map(0x11200000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
-	map(0x11400000, 0x1140ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
-	map(0x12800000, 0x1281ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
+	map(0x11400000, 0x1140ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask16(0x00ff).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c80000, 0x01c80001).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w)).umask16(0x00ff);
@@ -2432,67 +2401,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 
 	if(scanline == 384)
 	{
-		m_intreq |= (1<<0);
-		if(m_intena & 1<<0)
-			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
-		model2_check_irq_state();
+		const u32 line = 1 << 0;
+		if (m_intena & line)
+		{
+			m_intreq |= line;
+			irq_update();
+		}
 		if (m_m2comm != nullptr)
 			m_m2comm->check_vint_irq();
 	}
-	else if(scanline == 0)
-	{
-		/* From sound to main CPU (TODO: what enables this?) */
-		m_intreq |= (1<<10);
-		if(m_intena & 1<<10)
-			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
-		model2_check_irq_state();
-	}
 }
 
-#ifdef UNUSED_FUNCTION
 void model2_state::sound_ready_w(int state)
 {
-	if(state)
+	// sound interrupt is asserted if either RxRDY or TxRDY is active
+	const u32 line = 1 << 10;
+	if ((m_uart->status_r() & 0x03) && (m_intena & line))
 	{
-		m_intreq |= (1<<10);
-		if(m_intena & 1<<10)
-			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
-		model2_check_irq_state();
+		m_intreq |= line;
+		irq_update();
 	}
-}
-#endif
-
-TIMER_DEVICE_CALLBACK_MEMBER(model2c_state::model2c_interrupt)
-{
-	int scanline = param;
-
-	if(scanline == 384)
-	{
-		m_intreq |= (1<<0);
-		if(m_intena & 1<<0)
-			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
-		model2_check_irq_state();
-		if (m_m2comm != nullptr)
-			m_m2comm->check_vint_irq();
-	}
-	else if(scanline == 0)
-	{
-		m_intreq |= (1<<10);
-		if(m_intena & 1<<10)
-			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
-		model2_check_irq_state();
-	}
-	#if 0
-	else if(scanline == 0)
-	{
-		// TODO: irq source? Scroll allocation in dynamcopc?
-		// it's actually a timer 0 irq, doesn't seem necessary
-		m_intreq |= (1<<2);
-		if(m_intena & 1<<2)
-			m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
-		model2_check_irq_state();
-	}
-	#endif
 }
 
 /* Model 2 sound board emulation */
@@ -2583,8 +2511,8 @@ void model2_state::model2_scsp(machine_config &config)
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
-//  m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
-//  m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
+	m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
+	m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
@@ -2628,6 +2556,8 @@ void model2o_state::model2o(machine_config &config)
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
 	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
+	m_uart->rxrdy_handler().set(FUNC(model2o_state::sound_ready_w));
+	m_uart->txrdy_handler().set(FUNC(model2o_state::sound_ready_w));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
@@ -3038,7 +2968,7 @@ void model2c_state::model2c(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2c_state::model2c_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86235(config, m_copro_tgpx4, 20_MHz_XTAL);
 	m_copro_tgpx4->set_addrmap(AS_PROGRAM, &model2c_state::copro_tgpx4_map);
@@ -7675,10 +7605,10 @@ GAME( 1998, pltkids,    0,        model2b_5881, pltkids,   model2b_state, init_p
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 GAME( 1996, skisuprg,   0,        skisuprg,     skisuprg,  model2c_state, empty_init,    ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, stcc,       0,        stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stccb,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stcca,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stcco,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1996, stcc,       0,        stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAMEL(1996, stccb,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAMEL(1996, stcca,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAMEL(1996, stcco,      stcc,     stcc,         indy500,   model2c_state, empty_init,    ROT0, "Sega",   "Sega Touring Car Championship", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_vr )
 GAME( 1996, waverunr,   0,        waverunr,     waverunr,  model2c_state, empty_init,    ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, bel,        0,        bel,          bel,       model2c_state, empty_init,    ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,       0,        hotd,         hotd,      model2c_state, empty_init,    ROT0, "Sega",   "The House of the Dead (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

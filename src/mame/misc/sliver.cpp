@@ -66,7 +66,7 @@ Notes:
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
@@ -148,7 +148,7 @@ private:
 	void oki_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 	void sliver_map(address_map &map) ATTR_COLD;
-	void soundmem_io(address_map &map) ATTR_COLD;
+	void soundmem_data(address_map &map) ATTR_COLD;
 	void soundmem_prg(address_map &map) ATTR_COLD;
 };
 
@@ -321,26 +321,19 @@ void sliver_state::io_offset_w(offs_t offset, uint8_t data)
 
 void sliver_state::io_data_w(offs_t offset, uint8_t data)
 {
-	if (m_io_offset < IO_SIZE)
-	{
-		int tmpx, tmpy;
-		m_io_reg[m_io_offset] = data;
+	int tmpx, tmpy;
+	m_io_reg[m_io_offset] = data;
 
-		// TODO: this doesn't match ZR36050 control registers
-		// is it really accessing FPGA instead, simplifying Zoran access?
-		tmpy = m_io_reg[0x1a] + (m_io_reg[0x1b] << 8) - m_io_reg[0x20]; //0x20  ???
-		tmpx = m_io_reg[0x1e] + (m_io_reg[0x1f] << 8);
+	// TODO: this doesn't match ZR36050 control registers
+	// is it really accessing FPGA instead, simplifying Zoran access?
+	tmpy = m_io_reg[0x1a] + (m_io_reg[0x1b] << 8) - m_io_reg[0x20]; //0x20  ???
+	tmpx = m_io_reg[0x1e] + (m_io_reg[0x1f] << 8);
 
-		if (tmpy != m_jpeg_y || tmpx != m_jpeg_x)
-		{
-			m_jpeg_x = tmpx;
-			m_jpeg_y = tmpy;
-			render_jpeg();
-		}
-	}
-	else
+	if (tmpy != m_jpeg_y || tmpx != m_jpeg_x)
 	{
-		logerror("I/O access out of range: %x\n", m_io_offset);
+		m_jpeg_x = tmpx;
+		m_jpeg_y = tmpy;
+		render_jpeg();
 	}
 }
 
@@ -393,7 +386,7 @@ void sliver_state::soundmem_prg(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void sliver_state::soundmem_io(address_map &map)
+void sliver_state::soundmem_data(address_map &map)
 {
 	map(0x0100, 0x0100).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0101, 0x0101).r(m_soundlatch, FUNC(generic_latch_8_device::read));
@@ -526,7 +519,7 @@ void sliver_state::sliver(machine_config &config)
 
 	I8051(config, m_audiocpu, 8000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sliver_state::soundmem_prg);
-	m_audiocpu->set_addrmap(AS_IO, &sliver_state::soundmem_io);
+	m_audiocpu->set_addrmap(AS_DATA, &sliver_state::soundmem_data);
 	m_audiocpu->port_out_cb<1>().set(FUNC(sliver_state::oki_setbank));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

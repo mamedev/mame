@@ -108,7 +108,7 @@ void gt155_device::sound_stream_update(sound_stream& stream)
 			}
 		}
 
-		stream.put_int_clamp(0, i, left >> 11, 32678);
+		stream.put_int_clamp(0, i, left >> 11, 32768);
 		stream.put_int_clamp(1, i, right >> 11, 32768);
 	}
 }

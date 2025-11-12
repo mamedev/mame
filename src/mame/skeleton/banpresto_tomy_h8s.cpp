@@ -46,8 +46,8 @@ Takara / Tomy "VS medal" series (games show produced by Amodio and Tomy copyrigh
     TM-08 - Yujo Gattai Shishigami-o - 友情合体獣神王
 almost surely more
 
-Banpresto ??? series:
-    BPCT1P - ??? - ???
+Banpresto CommuTouch series:
+    BPCT1P - Anpanman CommuTouch - アンパンマンコミュタッチ
 */
 
 
@@ -229,7 +229,7 @@ ROM_START( yujogs )
 	ROM_LOAD( "tm08-s_ver1.0.ic4", 0x000000, 0x100000, CRC(51632db2) SHA1(acc85dfc5250384775f58c66619ec0b701d0b218) )
 ROM_END
 
-ROM_START( unkbpmed )
+ROM_START( anpanmct ) // uses touch screen
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "bpct1p_ver1.0.rom1", 0x000000, 0x400000, CRC(2a0326cf) SHA1(623617d1ffb686673caee3c345b6052b4c5d4af7) )
 
@@ -252,4 +252,4 @@ GAME( 2007, youkai,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0,
 GAME( 2007, satoyama, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Satoyama Grand Prix",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, gyakyu,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Ginga Yakyu",                                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, yujogs,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Yujo Gattai Shishigami-o",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // title to be verified, inferred from some strings related to characters
-GAME( 200?, unkbpmed, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "unknown Banpresto medal game",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, anpanmct, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Anpanman CommuTouch",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

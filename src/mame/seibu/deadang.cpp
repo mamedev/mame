@@ -46,6 +46,8 @@ Dip locations and factory settings verified with US manual
 
 #include "emu.h"
 
+#include "sei80bu.h"
+
 #include "seibusound.h"
 
 #include "cpu/nec/nec.h"
@@ -799,7 +801,7 @@ void deadang_state::deadang(machine_config &config)
 	m_audiocpu->set_addrmap(AS_OPCODES, &deadang_state::sound_decrypted_opcodes_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
+	SEI80BU(config, "sei80bu", XTAL(14'318'181) / 4).set_device_rom_tag("audiocpu");
 
 	config.set_maximum_quantum(attotime::from_hz(60)); // the game stops working with higher interleave rates..
 

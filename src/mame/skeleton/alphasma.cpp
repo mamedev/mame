@@ -45,7 +45,7 @@ public:
 
 protected:
 	required_device<mc68hc11_cpu_device> m_maincpu;
-	required_device_array<hd44780_device, 2> m_lcdc;
+	required_device_array<ks0066_device, 2> m_lcdc;
 	required_device<nvram_device> m_nvram;
 	memory_share_creator<uint8_t> m_nvram_base;
 	required_memory_bank m_rambank;

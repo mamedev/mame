@@ -126,9 +126,9 @@ void vl70_state::p6_w(u8 data)
 	if((cur_p6 & P6_LCD_ENABLE) && !(data & P6_LCD_ENABLE)) {
 		if(!(cur_p6 & P6_LCD_RW)) {
 			if(cur_p6 & P6_LCD_RS)
-				m_lcd->data_write(cur_pa);
+				m_lcd->data_w(cur_pa);
 			else
-				m_lcd->control_write(cur_pa);
+				m_lcd->control_w(cur_pa);
 		}
 	}
 
@@ -168,9 +168,9 @@ u8 vl70_state::pa_r()
 		if(cur_p6 & P6_LCD_RW)
 		{
 			if(cur_p6 & P6_LCD_RS)
-				return m_lcd->data_read();
+				return m_lcd->data_r();
 			else
-				return m_lcd->control_read();
+				return m_lcd->control_r();
 		} else
 			return 0x00;
 	}

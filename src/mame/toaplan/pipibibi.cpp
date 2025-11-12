@@ -15,7 +15,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 /*
 * Name        Board No      Maker         Game name
@@ -477,10 +476,10 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1991, pipibibs,    0,        pipibibs,     pipibibs,   pipibibi_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pipibibsa,   pipibibs, pipibibs,     pipibibs,   pipibibi_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pipibibsp,   pipibibs, pipibibs,     pipibibsp,  pipibibi_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (prototype)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibs,    0,        pipibibs,     pipibibs,   pipibibi_state        , empty_init,      ROT0, "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsa,   pipibibs, pipibibs,     pipibibs,   pipibibi_state,         empty_init,      ROT0, "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsp,   pipibibs, pipibibs,     pipibibsp,  pipibibi_state,         empty_init,      ROT0, "Toaplan", "Pipi & Bibis / Whoopee!! (prototype)",                MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pipibibsbl,  pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, init_pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (Ryouta Kikaku bootleg, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pipibibsbl2, pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, empty_init,    ROT0,   "bootleg",                 "Pipi & Bibis / Whoopee!! (bootleg, decrypted)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map, not scrambled
-GAME( 1991, pipibibsbl3, pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, empty_init,    ROT0,   "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (Ryouta Kikaku bootleg, decrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsbl,  pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, init_pipibibsbl, ROT0, "bootleg", "Pipi & Bibis / Whoopee!! (bootleg, encrypted)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsbl2, pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, empty_init,      ROT0, "bootleg", "Pipi & Bibis / Whoopee!! (bootleg, decrypted set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map, not scrambled
+GAME( 1991, pipibibsbl3, pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, empty_init,      ROT0, "bootleg", "Pipi & Bibis / Whoopee!! (bootleg, decrypted set 2)", MACHINE_SUPPORTS_SAVE )

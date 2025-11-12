@@ -17,37 +17,37 @@ class st0016_cpu_device : public z80_device, public device_gfx_interface, public
 public:
 	enum
 	{
-		AS_CHARAM = AS_OPCODES + 1
+		AS_CHARAM = AS_OPCODES + 1,
+		AS_EXTROM
 	};
-
-	typedef device_delegate<u8 ()> dma_offs_delegate;
 
 	st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32);
 
-	template <typename... T> void set_dma_offs_callback(T &&... args) { m_dma_offs_cb.set(std::forward<T>(args)...); }
-
+	// configurations
+	void set_fixedrom_offset(u32 offset) { m_fixedrom_offset = offset; }
 	void set_game_flag(u32 flag) { m_game_flag = flag; }
+
+	// read/write handlers
+	void rom_bank_w(u8 data);
 
 	void draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	// device-level overrides
+	const address_space_config m_io_space_config;
+	const address_space_config m_space_config;
+	const address_space_config m_charam_space_config;
+	const address_space_config m_extrom_space_config;
+
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	const address_space_config m_io_space_config;
-	const address_space_config m_space_config;
-	const address_space_config m_charam_space_config;
-
-	virtual space_config_vector memory_space_config() const override;
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 private:
-	bool ismacs() const { return m_game_flag & 0x80; }
-	bool ismacs1() const { return (m_game_flag & 0x180) == 0x180; }
-	bool ismacs2() const { return (m_game_flag & 0x180) == 0x080; }
-
 	static constexpr unsigned MAX_SPR_BANK   = 0x10;
 	static constexpr unsigned MAX_CHAR_BANK  = 0x10000;
 	static constexpr unsigned MAX_PAL_BANK   = 4;
@@ -67,19 +67,27 @@ private:
 	memory_share_creator<u8> m_charram;
 	memory_share_creator<u8> m_paletteram;
 
-	u8 m_dma_offset;
-	dma_offs_delegate m_dma_offs_cb;
+	u32 m_fixedrom_offset;
 	u32 m_game_flag;
 
 	memory_access<21, 0, 0, ENDIANNESS_LITTLE>::specific m_charam_space;
+	memory_access<22, 0, 0, ENDIANNESS_LITTLE>::cache m_extrom_cache;
+
+	u32 m_spr_bank[2], m_pal_bank, m_char_bank, m_rom_bank;
+	int m_spr_dx, m_spr_dy;
+
+	u8 m_vregs[0xc0];
+	u8 m_ramgfx;
+
+	bool ismacs() const { return m_game_flag & 0x80; }
+	bool ismacs1() const { return (m_game_flag & 0x180) == 0x180; }
+	bool ismacs2() const { return (m_game_flag & 0x180) == 0x080; }
 
 	void sprite_bank_w(u8 data);
 	void palette_bank_w(u8 data);
 	void character_bank_w(offs_t offset, u8 data);
-	u8 sprite_ram_r(offs_t offset);
-	void sprite_ram_w(offs_t offset, u8 data);
-	u8 sprite2_ram_r(offs_t offset);
-	void sprite2_ram_w(offs_t offset, u8 data);
+	template <unsigned Which> u8 sprite_ram_r(offs_t offset);
+	template <unsigned Which> void sprite_ram_w(offs_t offset, u8 data);
 	u8 palette_ram_r(offs_t offset);
 	void palette_ram_w(offs_t offset, u8 data);
 	u8 charam_bank_r(offs_t offset);
@@ -96,20 +104,13 @@ private:
 
 	void startup();
 
-	u32 m_spr_bank, m_spr2_bank, m_pal_bank, m_char_bank;
-	int m_spr_dx, m_spr_dy;
-
-	u8 m_vregs[0xc0];
-	u8 m_ramgfx;
-
 	void cpu_internal_io_map(address_map &map) ATTR_COLD;
 	void cpu_internal_map(address_map &map) ATTR_COLD;
 	void charam_map(address_map &map) ATTR_COLD;
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device)
-
 
 #endif // MAME_SETA_ST0016_H

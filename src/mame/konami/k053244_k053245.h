@@ -6,7 +6,7 @@
 #pragma once
 
 
-#define K053244_CB_MEMBER(_name) void _name(int *code, int *color, int *priority)
+#define K053244_CB_MEMBER(_name) void _name(int &code, int &color, int &priority)
 
 
 class k053244_device : public device_t, public device_gfx_interface
@@ -17,9 +17,9 @@ class k053244_device : public device_t, public device_gfx_interface
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_6bpp);
 
 public:
-	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority)>;
+	using sprite_delegate = device_delegate<void (int &code, int &color, int &priority)>;
 
-	k053244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k053244_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
 	void set_bpp(int bpp);
@@ -33,9 +33,9 @@ public:
 	void k053245_w(offs_t offset, u8 data);
 	u8 k053244_r(offs_t offset);
 	void k053244_w(offs_t offset, u8 data);
-	void bankselect(int bank); // used by TMNT2, Asterix and Premier Soccer for ROM testing
+	void bankselect(u32 bank); // used by TMNT2, Asterix and Premier Soccer for ROM testing
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
-	void set_z_rejection(int zcode); // common to k053244/5
+	void set_z_rejection(s32 zcode); // common to k053244/5
 
 protected:
 	// device-level overrides
@@ -43,19 +43,20 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	// internal state
-	std::unique_ptr<uint16_t[]>  m_ram;
-	std::unique_ptr<uint16_t[]>  m_buffer;
-	required_region_ptr<uint8_t> m_sprite_rom;
+	static constexpr u32 RAM_SIZE = 0x800;
 
-	int m_dx, m_dy;
+	// internal state
+	std::unique_ptr<u16[]>  m_ram;
+	std::unique_ptr<u16[]>  m_buffer;
+	required_region_ptr<u8> m_sprite_rom;
+
+	s32 m_dx, m_dy;
 	bool m_priority_shadows;
 	sprite_delegate m_k053244_cb;
 
-	uint8_t  m_regs[0x10];    // 053244
-	int      m_rombank;       // 053244
-	int      m_ramsize;
-	int      m_z_rejection;
+	u8  m_regs[0x10];    // 053244
+	u32 m_rombank;       // 053244
+	s32 m_z_rejection;
 
 	void clear_buffer();
 	void update_buffer();

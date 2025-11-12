@@ -134,12 +134,12 @@ private:
 	required_shared_ptr<uint16_t> m_workram;
 
 	/* video-related */
-	int         m_avac_bits[4]{};
-	int         m_avac_occupancy[4]{};
-	int         m_layer_colorbase[4]{};
-	int         m_layer_pri[4]{};
-	int         m_avac_vrc = 0;
-	int         m_sprite_colorbase = 0;
+	int32_t     m_avac_bits[4]{};
+	int32_t     m_avac_occupancy[4]{};
+	uint16_t    m_layer_colorbase[4]{};
+	int32_t     m_layer_pri[4]{};
+	int32_t     m_avac_vrc = 0;
+	uint16_t    m_sprite_colorbase = 0;
 
 	/* misc */
 	uint16_t    m_cur_control2 = 0U;
@@ -158,38 +158,38 @@ private:
 	uint16_t control2_r();
 	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_irq_w(uint16_t data);
-	uint32_t screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gijoe_interrupt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
-	void gijoe_objdma();
+	void object_dma();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
-	void gijoe_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
 K053246_CB_MEMBER(gijoe_state::sprite_callback)
 {
-	int pri = (*color & 0x03e0) >> 4;
+	int pri = (color & 0x03e0) >> 4;
 
 	if (pri <= m_layer_pri[3])
-		*priority_mask = 0;
+		priority_mask = 0;
 	else if (pri >  m_layer_pri[3] && pri <= m_layer_pri[2])
-		*priority_mask = 0xff00;
+		priority_mask = 0xff00;
 	else if (pri >  m_layer_pri[2] && pri <= m_layer_pri[1])
-		*priority_mask = 0xff00 | 0xf0f0;
+		priority_mask = 0xff00 | 0xf0f0;
 	else if (pri >  m_layer_pri[1] && pri <= m_layer_pri[0])
-		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
+		priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
 	else
-		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa;
+		priority_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa;
 
-	*color = m_sprite_colorbase | (*color & 0x001f);
+	color = m_sprite_colorbase | (color & 0x001f);
 }
 
 K056832_CB_MEMBER(gijoe_state::tile_callback)
 {
-	int tile = *code;
+	int tile = code;
 
 	if (tile >= 0xf000 && tile <= 0xf4ff)
 	{
@@ -209,10 +209,10 @@ K056832_CB_MEMBER(gijoe_state::tile_callback)
 			m_avac_occupancy[layer] |= 0x00f0;
 			tile |= m_avac_bits[2];
 		}
-		*code = tile;
+		code = tile;
 	}
 
-	*color = (*color >> 2 & 0x0f) | m_layer_colorbase[layer];
+	color = (color >> 2 & 0x0f) | m_layer_colorbase[layer];
 }
 
 void gijoe_state::video_start()
@@ -235,7 +235,7 @@ void gijoe_state::video_start()
 	save_item(NAME(m_layer_pri));
 }
 
-uint32_t gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gijoe_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
 	int layer[4];
@@ -243,7 +243,7 @@ uint32_t gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &b
 	int mask = 0;
 
 	// update tile offsets
-	m_k056832->read_avac(&vrc_mode, &vrc_new);
+	m_k056832->read_avac(vrc_mode, vrc_new);
 
 	if (vrc_mode)
 	{
@@ -288,7 +288,7 @@ uint32_t gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &b
 	    written to the layer's X-scroll register otherwise the chip expects totally
 	    different alignment values.
 	*/
-	if (m_k056832->read_register(0x14) == 2)
+	if (m_k056832->word_r(0x14) == 2)
 	{
 		m_k056832->set_layer_offs(0,  2, 0);
 		m_k056832->set_layer_offs(1,  4, 0);
@@ -354,7 +354,7 @@ void gijoe_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-void gijoe_state::gijoe_objdma()
+void gijoe_state::object_dma()
 {
 	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	uint16_t *src_head, *src_tail, *dst_head, *dst_tail;
@@ -385,7 +385,7 @@ TIMER_CALLBACK_MEMBER(gijoe_state::dmaend_callback)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
+INTERRUPT_GEN_MEMBER(gijoe_state::interrupt)
 {
 	// global interrupt masking (*this game only)
 	if (!m_k056832->is_irq_enabled(0))
@@ -393,7 +393,7 @@ INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
 
 	if (m_k053246->k053246_is_irq_enabled())
 	{
-		gijoe_objdma();
+		object_dma();
 
 		// 42.7us(clr) + 341.3us(xfer) delay at 6Mhz dotclock
 		m_dmadelay_timer->adjust(JOE_DMADELAY);
@@ -409,7 +409,7 @@ void gijoe_state::sound_irq_w(uint16_t data)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-void gijoe_state::gijoe_map(address_map &map)
+void gijoe_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x100fff).ram().share("spriteram");                               // Sprites
@@ -507,8 +507,8 @@ void gijoe_state::gijoe(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // 16MHz Confirmed
-	m_maincpu->set_addrmap(AS_PROGRAM, &gijoe_state::gijoe_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gijoe_state::gijoe_interrupt));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gijoe_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gijoe_state::interrupt));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL / 4); // Amuse & confirmed. Z80E at 8MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gijoe_state::sound_map);
@@ -518,7 +518,7 @@ void gijoe_state::gijoe(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 24, 312, 262, 16, 240); // measured 59.637Hz
-	screen.set_screen_update(FUNC(gijoe_state::screen_update_gijoe));
+	screen.set_screen_update(FUNC(gijoe_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();

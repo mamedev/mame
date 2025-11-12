@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "wd1007a.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 //#include "imagedev/chd_hd.h"
 
 DEFINE_DEVICE_TYPE(WD1007A, wd1007a_device, "wd1007a", "WD1007A ESDI HDC")

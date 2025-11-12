@@ -157,7 +157,8 @@ bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sects[i].actual_size = 128 << img[pos++];
 					error = img[pos++];
 					sects[i].deleted = (error & 0x20) == 0x20;
-					sects[i].bad_crc = (error & 0x0e) == 0x0e;
+					sects[i].bad_data_crc = (error & 0x0e) == 0x0e;
+					sects[i].bad_addr_crc = false;
 					sects[i].data = &img[pos];
 					pos += sects[i].actual_size;
 					LOG_FORMATS("Read        %02X    %02X    %02X    %02X    %04X  %04X  %s\n", i, sects[i].track, sects[i].head, sects[i].sector, 128 << sects[i].size, sects[i].actual_size, result[error]);
@@ -167,7 +168,8 @@ bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					LOG_FORMATS("Unreadable sector on track %02d sector %02X head %02d\n", track, i, hnum);
 					sects[i].actual_size = 0;
 					sects[i].deleted = false;
-					sects[i].bad_crc = false;
+					sects[i].bad_data_crc = false;
+					sects[i].bad_addr_crc = false;
 					sects[i].data = nullptr;
 					LOG_FORMATS("Unread      %02X    %02X    %02X    %02X    %04X  %04X  %s\n", i, sects[i].track, sects[i].head, sects[i].sector, sects[i].size, sects[i].actual_size, "Unreadable");
 					//return false;

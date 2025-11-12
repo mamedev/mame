@@ -62,8 +62,8 @@ public:
 
 private:
 	template<int Chip> uint8_t k051316_ramrom_r(offs_t offset);
-	void chqflag_bankswitch_w(uint8_t data);
-	void chqflag_vreg_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void vreg_w(uint8_t data);
 	void select_analog_ctrl_w(uint8_t data);
 	uint8_t analog_read_r();
 	void k007232_bankswitch_w(uint8_t data);
@@ -73,9 +73,9 @@ private:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051960_CB_MEMBER(sprite_callback);
-	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void chqflag_map(address_map &map) ATTR_COLD;
-	void chqflag_sound_map(address_map &map) ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -83,9 +83,9 @@ protected:
 
 private:
 	/* misc */
-	int m_k051316_readroms = 0;
-	int m_last_vreg = 0xff;
-	int m_analog_ctrl = 0;
+	int32_t m_k051316_readroms = 0;
+	int32_t m_last_vreg = 0xff;
+	int32_t m_analog_ctrl = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -114,8 +114,8 @@ K051960_CB_MEMBER(chqflag_state::sprite_callback)
 {
 	enum { sprite_colorbase = 0 };
 
-	*priority = (*color & 0x10) ? 0 : GFX_PMASK_1;
-	*color = sprite_colorbase + (*color & 0x0f);
+	priority = (color & 0x10) ? 0 : GFX_PMASK_1;
+	color = sprite_colorbase + (color & 0x0f);
 }
 
 /***************************************************************************
@@ -128,16 +128,16 @@ K051316_CB_MEMBER(chqflag_state::zoom_callback_1)
 {
 	enum { zoom_colorbase_1 = 256 / 16 };
 
-	*code |= ((*color & 0x03) << 8);
-	*color = zoom_colorbase_1 + ((*color & 0x3c) >> 2);
+	code |= ((color & 0x03) << 8);
+	color = zoom_colorbase_1 + ((color & 0x3c) >> 2);
 }
 
 K051316_CB_MEMBER(chqflag_state::zoom_callback_2)
 {
 	enum { zoom_colorbase_2 = 512 / 256 };
 
-	*code |= ((*color & 0x0f) << 8);
-	*color = zoom_colorbase_2 + ((*color & 0x10) >> 4);
+	code |= ((color & 0x0f) << 8);
+	color = zoom_colorbase_2 + ((color & 0x10) >> 4);
 }
 
 /***************************************************************************
@@ -146,7 +146,7 @@ K051316_CB_MEMBER(chqflag_state::zoom_callback_2)
 
 ***************************************************************************/
 
-uint32_t chqflag_state::screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chqflag_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -168,7 +168,7 @@ uint8_t chqflag_state::k051316_ramrom_r(offs_t offset)
 		return m_k051316[Chip]->read(offset);
 }
 
-void chqflag_state::chqflag_bankswitch_w(uint8_t data)
+void chqflag_state::bankswitch_w(uint8_t data)
 {
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	int bankaddress = data & 0x1f;
@@ -181,7 +181,7 @@ void chqflag_state::chqflag_bankswitch_w(uint8_t data)
 	/* other bits unknown/unused */
 }
 
-void chqflag_state::chqflag_vreg_w(uint8_t data)
+void chqflag_state::vreg_w(uint8_t data)
 {
 	/* bits 0 & 1 = coin counters */
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 0));
@@ -224,7 +224,7 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 	m_last_vreg = data;
 
 	//if ((data & 0xf8) && (data & 0xf8) != 0x88)
-	//  popmessage("chqflag_vreg_w %02x",data);
+	//  popmessage("vreg_w %02x",data);
 
 	/* other bits unknown. bit 5 is used. */
 }
@@ -243,7 +243,7 @@ uint8_t chqflag_state::analog_read_r()
 
 /****************************************************************************/
 
-void chqflag_state::chqflag_map(address_map &map)
+void chqflag_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1fff).view(m_bank1000);
@@ -255,8 +255,8 @@ void chqflag_state::chqflag_map(address_map &map)
 	map(0x2800, 0x2fff).r(FUNC(chqflag_state::k051316_ramrom_r<1>)).w(m_k051316[1], FUNC(k051316_device::write)); /* 051316 zoom/rotation (chip 2) */
 	map(0x3000, 0x3000).w("soundlatch", FUNC(generic_latch_8_device::write));                    /* sound code # */
 	map(0x3001, 0x3001).w("soundlatch2", FUNC(generic_latch_8_device::write));                  /* cause interrupt on audio CPU */
-	map(0x3002, 0x3002).w(FUNC(chqflag_state::chqflag_bankswitch_w));                     /* bankswitch control */
-	map(0x3003, 0x3003).w(FUNC(chqflag_state::chqflag_vreg_w));                           /* enable K051316 ROM reading */
+	map(0x3002, 0x3002).w(FUNC(chqflag_state::bankswitch_w));                     /* bankswitch control */
+	map(0x3003, 0x3003).w(FUNC(chqflag_state::vreg_w));                           /* enable K051316 ROM reading */
 	map(0x3100, 0x3100).portr("DSW1");                               /* DIPSW #1  */
 	map(0x3200, 0x3200).portr("IN1");                                /* COINSW, STARTSW, test mode */
 	map(0x3201, 0x3201).portr("IN0");                                /* DIPSW #3, SW 4 */
@@ -288,7 +288,7 @@ void chqflag_state::k007232_bankswitch_w(uint8_t data)
 	m_k007232[1]->set_bank(bank_A, bank_B);
 }
 
-void chqflag_state::chqflag_sound_map(address_map &map)
+void chqflag_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); /* ROM */
 	map(0x8000, 0x87ff).ram(); /* RAM */
@@ -405,17 +405,17 @@ void chqflag_state::machine_reset()
 	m_k051316_readroms = 0;
 	m_analog_ctrl = 0;
 
-	chqflag_vreg_w(0);
+	vreg_w(0);
 }
 
 void chqflag_state::chqflag(machine_config &config)
 {
 	// basic machine hardware
 	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on pcb)
-	m_maincpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chqflag_state::main_map);
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on pcb
-	m_audiocpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &chqflag_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -426,7 +426,7 @@ void chqflag_state::chqflag(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320-16, 264, 16, 240); // measured Vsync 59.17hz
-	screen.set_screen_update(FUNC(chqflag_state::screen_update_chqflag));
+	screen.set_screen_update(FUNC(chqflag_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);

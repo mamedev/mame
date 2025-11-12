@@ -89,9 +89,17 @@ ROM_START( kuniotv )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( pachdmi )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mx29lb160db.u2", 0x000000, 0x200000, CRC(b7d361b5) SHA1(92c20c58db24cc16f8c393334055a34cd35c720e) )
+ROM_END
+
 } // anonymous namespace
 
 CONS( 2021, myaatari,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "dreamGEAR", "My Arcade Atari (DGUNL-7013, Micro Player Pro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // HDMI stick, runs the Famicom titles using an emulator
 CONS( 2021, kuniotv,       0,              0,      myaatari, myaatari, myaatari_state, empty_init, "Lithon", "Kunio-kun TV (5-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// unbranded box, generic looking Pac-Man logo, runs arcade version with copyrights stripped out
+CONS( 2021, pachdmi,       0,              0,      myaatari, myaatari, myaatari_state, empty_init, "<unknown>", "Pac-Man HDMI TV Plug & Play", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

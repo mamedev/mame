@@ -25,6 +25,9 @@
 
 #include "luna_kbd.h"
 
+#include "bus/pc98_cbus/options.h"
+#include "bus/pc98_cbus/slot.h"
+
 #include "cpu/m88000/m88000.h"
 #include "cpu/z180/hd647180x.h"
 
@@ -176,6 +179,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_spc(*this, "scsi%u:7:spc", 0U)
 		, m_net(*this, "net%u", 0U)
+		, m_cbus_root(*this, "cbus_root")
 		, m_eprom(*this, "eprom")
 		, m_fzrom(*this, "fzrom")
 	{
@@ -191,6 +195,7 @@ protected:
 	required_device<mc146818_device> m_rtc;
 	required_device_array<mb89352_device, 2> m_spc;
 	required_device_array<am7990_device, 2> m_net;
+	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_region_ptr<u32> m_eprom;
 	required_region_ptr<u8> m_fzrom;
 
@@ -344,8 +349,11 @@ void luna88k2_state::cpu_map(address_map &map)
 
 	// 0x8100'0000 ext board A
 	// 0x8300'0000 ext board B
-	// 0x9000'0000 pc-98 ext board
-	// 0x9100'0000 pc-9801 irq 4
+	// https://man.openbsd.org/pcexmem.4
+	map(0x9000'0000, 0x90ff'ffff).rw(m_cbus_root, FUNC(pc98_cbus_root_device::mem_r), FUNC(pc98_cbus_root_device::mem_w));
+	// 0x9100'0000 pc-9801 irq 4 (?)
+	map(0x9100'0000, 0x9100'ffff).rw(m_cbus_root, FUNC(pc98_cbus_root_device::io_r), FUNC(pc98_cbus_root_device::io_w));
+
 
 	map(0xe100'0000, 0xe100'003f).m(m_spc[0], FUNC(mb89352_device::map)).umask32(0xff000000);
 	map(0xe100'0040, 0xe100'007f).m(m_spc[1], FUNC(mb89352_device::map)).umask32(0xff000000);
@@ -588,6 +596,11 @@ void luna88k2_state::luna88k2(machine_config &config)
 	m_net[1]->intr_out().set(net_irq, FUNC(input_merger_any_low_device::in_w<1>));
 	m_net[1]->dma_in().set(FUNC(luna88k2_state::net_r));
 	m_net[1]->dma_out().set(FUNC(luna88k2_state::net_w));
+
+	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	// TODO: interrupts
+
+	PC98_CBUS_SLOT(config, "cbus0", 0, m_cbus_root, luna88k2_cbus_devices, nullptr);
 }
 
 u32 luna_88k_state_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)

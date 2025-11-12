@@ -3131,20 +3131,24 @@ ROM_START( pdcj )
 	ROM_LOAD16_WORD_SWAP( "chip2.u3", 0x800000, 0x400000, CRC(4fb335ac) SHA1(d6499816acb3da5c4f6a582bd3104c707422eb34) )
 ROM_END
 
-void spg2xx_game_state::init_crc()
+void spg2xx_game_state::init_crc(int blocks, int crclocation)
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
-	const int length = memregion("maincpu")->bytes();
+	const int length = memregion("maincpu")->bytes() / blocks;
 	const uint8_t* rom = memregion("maincpu")->base();
 
-	uint32_t checksum = 0x00000000;
-	// the first 0x10 bytes are where the "chksum:xxxxxxxx " string is listed, so skip over them
-	for (int i = 0x10; i < length; i++)
+	for (int block = 0; block < blocks; block++)
 	{
-		checksum += rom[i];
-	}
+		const uint8_t* rom2 = rom + block * 0x800000;
+		uint32_t checksum = 0x00000000;
+		// the first 0x10 bytes are where the "chksum:xxxxxxxx " string is listed, so skip over them
+		for (int i = 0x10 + crclocation; i < length; i++)
+		{
+			checksum += rom2[i];
+		}
 
-	logerror("Calculated Byte Sum of bytes from 0x10 to 0x%08x is %08x)\n", length - 1, checksum);
+		logerror("Block %d Calculated Byte Sum of bytes from 0x%08x to 0x%08x is %08x, in header %c%c%c%c%c%c%c%c\n", block, (block * 0x800000) + 0x10 + crclocation, (block * 0x800000) + length - 1, checksum, rom2[crclocation+7], rom2[crclocation+8], rom2[crclocation+9], rom2[crclocation+10], rom2[crclocation+11], rom2[crclocation+12], rom2[crclocation+13], rom2[crclocation+14]);
+	}
 }
 
 

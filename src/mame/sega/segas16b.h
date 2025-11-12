@@ -16,7 +16,7 @@
 #include "sega16sp.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
@@ -181,7 +181,7 @@ protected:
 	void lockonph_sound_iomap(address_map &map) ATTR_COLD;
 	void lockonph_sound_map(address_map &map) ATTR_COLD;
 	void map_fpointbla(address_map &map) ATTR_COLD;
-	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
 	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_portmap(address_map &map) ATTR_COLD;

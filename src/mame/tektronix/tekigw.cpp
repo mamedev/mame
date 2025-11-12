@@ -81,7 +81,7 @@ diags>
 #include "imagedev/harddriv.h"
 
 // graphics
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "video/mc6845.h"
 #include "screen.h"
 

@@ -58,6 +58,7 @@ public:
 	template <unsigned Ch> auto in_ior_cb() { return m_in_ior_cb[Ch].bind(); }
 	template <unsigned Ch> auto out_iow_cb() { return m_out_iow_cb[Ch].bind(); }
 	template <unsigned Ch> auto out_dack_cb() { return m_out_dack_cb[Ch].bind(); }
+	template <unsigned Ch> auto verify_cb() { return m_verify_cb[Ch].bind(); }
 
 	// This should be set for systems that map the DMAC registers into the memory space rather than as I/O ports (e.g. radio86)
 	void set_reverse_rw_mode(bool flag) { m_reverse_rw = flag; }
@@ -105,6 +106,7 @@ private:
 	// channel accessors
 	devcb_read8::array<4> m_in_ior_cb;
 	devcb_write8::array<4> m_out_iow_cb;
+	devcb_read8::array<4> m_verify_cb; // verify sets no rw lines so just pass the address for the driver to handle
 	devcb_write_line::array<4> m_out_dack_cb;
 
 	struct

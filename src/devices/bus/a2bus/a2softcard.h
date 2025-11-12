@@ -34,7 +34,7 @@ protected:
 
 	// overrides of standard a2bus slot functions
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override;
+	virtual void reset_from_bus() override;
 
 private:
 	required_device<cpu_device> m_z80;

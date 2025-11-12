@@ -51,7 +51,7 @@ protected:
 
 private:
 	// video-related
-	bool          m_k88games_priority = false;
+	bool          m_priority = false;
 	bool          m_videobank = false;
 	bool          m_zoomreadroms = false;
 	uint8_t       m_speech_chip = 0;
@@ -71,7 +71,7 @@ private:
 	memory_view m_k051316_view;
 	memory_view m_palette_view;
 
-	void k88games_5f84_w(uint8_t data);
+	void _5f84_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
 	void speech_control_w(uint8_t data);
 	void speech_msg_w(uint8_t data);
@@ -98,8 +98,8 @@ K052109_CB_MEMBER(_88games_state::tile_callback)
 {
 	static const int layer_colorbase[] = { 1024 / 16, 0 / 16, 256 / 16 };
 
-	*code |= ((*color & 0x0f) << 8) | (bank << 12);
-	*color = layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+	code |= ((color & 0x0f) << 8) | (bank << 12);
+	color = layer_colorbase[layer] + ((color & 0xf0) >> 4);
 }
 
 
@@ -113,8 +113,8 @@ K051960_CB_MEMBER(_88games_state::sprite_callback)
 {
 	enum { sprite_colorbase = 512 / 16 };
 
-	*priority = (*color & 0x20) >> 5;   // ???
-	*color = sprite_colorbase + (*color & 0x0f);
+	priority = (color & 0x20) >> 5;   // ???
+	color = sprite_colorbase + (color & 0x0f);
 }
 
 
@@ -128,8 +128,8 @@ K051316_CB_MEMBER(_88games_state::zoom_callback)
 {
 	enum { zoom_colorbase = 768 / 16 };
 
-	*code |= ((*color & 0x07) << 8);
-	*color = zoom_colorbase + ((*color & 0x38) >> 3) + ((*color & 0x80) >> 4);
+	code |= ((color & 0x07) << 8);
+	color = zoom_colorbase + ((color & 0x38) >> 3) + ((color & 0x80) >> 4);
 }
 
 /***************************************************************************
@@ -140,7 +140,7 @@ K051316_CB_MEMBER(_88games_state::zoom_callback)
 
 uint32_t _88games_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_k88games_priority)
+	if (m_priority)
 	{
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);   // tile 0
 		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
@@ -169,7 +169,7 @@ uint32_t _88games_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-void _88games_state::k88games_5f84_w(uint8_t data)
+void _88games_state::_5f84_w(uint8_t data)
 {
 	// bits 0/1 coin counters
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
@@ -246,7 +246,7 @@ void _88games_state::main_map(address_map &map)
 	m_k051316_view[0](0x3800, 0x3fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));
 	m_k051316_view[1](0x3800, 0x3fff).rw(m_k051316, FUNC(k051316_device::rom_r), FUNC(k051316_device::write));
 	map(0x4000, 0x7fff).rw(FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
-	map(0x5f84, 0x5f84).w(FUNC(_88games_state::k88games_5f84_w));
+	map(0x5f84, 0x5f84).w(FUNC(_88games_state::_5f84_w));
 	map(0x5f88, 0x5f88).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x5f8c, 0x5f8c).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x5f90, 0x5f90).w(FUNC(_88games_state::sh_irqtrigger_w));
@@ -411,7 +411,7 @@ void _88games_state::banking_callback(uint8_t data)
 	// bit 6 is unknown, 1 most of the time
 
 	// bit 7 controls layer priority
-	m_k88games_priority = BIT(data, 7);
+	m_priority = BIT(data, 7);
 }
 
 void _88games_state::machine_start()
@@ -423,7 +423,7 @@ void _88games_state::machine_start()
 	save_item(NAME(m_videobank));
 	save_item(NAME(m_zoomreadroms));
 	save_item(NAME(m_speech_chip));
-	save_item(NAME(m_k88games_priority));
+	save_item(NAME(m_priority));
 }
 
 void _88games_state::machine_reset()
@@ -433,7 +433,7 @@ void _88games_state::machine_reset()
 	m_k051316_view.select(0);
 	m_palette_view.disable();
 	m_speech_chip = 0;
-	m_k88games_priority = false;
+	m_priority = false;
 }
 
 void _88games_state::_88games(machine_config &config)

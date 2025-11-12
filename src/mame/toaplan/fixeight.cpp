@@ -5,6 +5,7 @@
 
 #include "gp9001.h"
 #include "toaplan_coincounter.h"
+#include "toaplan_txtilemap.h"
 #include "toaplan_v25_tables.h"
 #include "toaplipt.h"
 
@@ -18,7 +19,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name
@@ -64,9 +64,6 @@ class fixeight_state : public driver_device
 public:
 	fixeight_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_tx_videoram(*this, "tx_videoram")
-		, m_tx_lineselect(*this, "tx_lineselect")
-		, m_tx_linescroll(*this, "tx_linescroll")
 		, m_tx_gfxram(*this, "tx_gfxram")
 		, m_shared_ram(*this, "shared_ram")
 		, m_maincpu(*this, "maincpu")
@@ -74,7 +71,7 @@ public:
 		, m_vdp(*this, "gp9001")
 		, m_oki(*this, "oki")
 		, m_eeprom(*this, "eeprom")
-		, m_gfxdecode(*this, "gfxdecode")
+		, m_tx_tilemap(*this, "tx_tilemap")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 	{ }
@@ -89,8 +86,6 @@ protected:
 	void fixeight_68k_mem(address_map &map) ATTR_COLD;
 	void fixeight_v25_mem(address_map &map) ATTR_COLD;
 
-	void create_tx_tilemap(int dx = 0, int dx_flipped = 0) ATTR_COLD;
-
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	void tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -98,18 +93,10 @@ protected:
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
 
-	void tx_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-
 	void sound_reset_w(u8 data);
-	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
-	required_shared_ptr<u16> m_tx_videoram;
-	optional_shared_ptr<u16> m_tx_lineselect; // originals only
-	optional_shared_ptr<u16> m_tx_linescroll; // originals only
-	optional_shared_ptr<u16> m_tx_gfxram; // originals only
 	void reset_audiocpu(int state);
 
+	optional_shared_ptr<u16> m_tx_gfxram; // originals only
 	optional_shared_ptr<u8> m_shared_ram; // originals only - 8 bit RAM shared between 68K and sound CPU
 
 	required_device<m68000_base_device> m_maincpu;
@@ -117,7 +104,7 @@ protected:
 	required_device<gp9001vdp_device> m_vdp;
 	required_device<okim6295_device> m_oki;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom; // originals only
-	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<toaplan_txtilemap_device> m_tx_tilemap;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	bitmap_ind8 m_custom_priority_bitmap;
@@ -164,32 +151,6 @@ void fixeight_state::reset_audiocpu(int state)
 }
 
 
-TILE_GET_INFO_MEMBER(fixeight_state::get_text_tile_info)
-{
-	const u16 attrib = m_tx_videoram[tile_index];
-	const u32 tile_number = attrib & 0x3ff;
-	const u32 color = attrib >> 10;
-	tileinfo.set(0,
-			tile_number,
-			color,
-			0);
-}
-
-void fixeight_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_tx_videoram[offset]);
-	if (offset < 64*32)
-		m_tx_tilemap->mark_tile_dirty(offset);
-}
-
-void fixeight_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	/*** Line-Scroll RAM for Text Layer ***/
-	COMBINE_DATA(&m_tx_linescroll[offset]);
-
-	m_tx_tilemap->set_scrollx(offset, m_tx_linescroll[offset]);
-}
-
 void fixeight_state::screen_vblank(int state)
 {
 	// rising edge
@@ -200,22 +161,12 @@ void fixeight_state::screen_vblank(int state)
 }
 
 
-void fixeight_state::create_tx_tilemap(int dx, int dx_flipped)
-{
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fixeight_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
-	m_tx_tilemap->set_scroll_rows(8*32); /* line scrolling */
-	m_tx_tilemap->set_scroll_cols(1);
-	m_tx_tilemap->set_scrolldx(dx, dx_flipped);
-	m_tx_tilemap->set_transparent_pen(0);
-}
-
 u32 fixeight_bootleg_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
 	m_vdp->render_vdp(bitmap, cliprect);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
+	m_tx_tilemap->draw_tilemap_bootleg(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -223,8 +174,6 @@ void fixeight_bootleg_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-
-	create_tx_tilemap();
 
 	/* This bootleg has additional layer offsets on the VDP */
 	m_vdp->set_tm_extra_offsets(0, -0x1d6 - 26, -0x1ef - 15, 0, 0);
@@ -241,8 +190,7 @@ void fixeight_state::video_start()
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
 
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
-	create_tx_tilemap(0x1d5, 0x16a);
+	m_tx_tilemap->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
 }
 
 
@@ -251,21 +199,7 @@ u32 fixeight_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
 	m_vdp->render_vdp(bitmap, cliprect);
-
-	rectangle clip = cliprect;
-
-	/* it seems likely that flipx can be set per line! */
-	/* however, none of the games does it, and emulating it in the */
-	/* MAME tilemap system without being ultra slow would be tricky */
-	m_tx_tilemap->set_flip(m_tx_lineselect[0] & 0x8000 ? 0 : TILEMAP_FLIPX);
-
-	/* line select is used for 'for use in' and '8ing' screen on bbakraid, 'Raizing' logo on batrider */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		clip.min_y = clip.max_y = y;
-		m_tx_tilemap->set_scrolly(0, m_tx_lineselect[y] - y);
-		m_tx_tilemap->draw(screen, bitmap, clip, 0);
-	}
+	m_tx_tilemap->draw_tilemap(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -278,7 +212,7 @@ void fixeight_state::tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 	if (oldword != data)
 	{
 		COMBINE_DATA(&m_tx_gfxram[offset]);
-		m_gfxdecode->gfx(0)->mark_dirty(offset/32);
+		m_tx_tilemap->gfx(0)->mark_dirty(offset/32);
 	}
 }
 
@@ -434,9 +368,9 @@ void fixeight_state::fixeight_68k_mem(address_map &map)
 	map(0x280000, 0x28ffff).rw(FUNC(fixeight_state::shared_ram_r), FUNC(fixeight_state::shared_ram_w)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(fixeight_state::tx_videoram_w)).share(m_tx_videoram);
-	map(0x502000, 0x5021ff).ram().share(m_tx_lineselect);
-	map(0x503000, 0x5031ff).ram().w(FUNC(fixeight_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x500000, 0x501fff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::videoram_r), FUNC(toaplan_txtilemap_device::videoram_w));
+	map(0x502000, 0x5021ff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::lineselect_r), FUNC(toaplan_txtilemap_device::lineselect_w));
+	map(0x503000, 0x5031ff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::linescroll_r), FUNC(toaplan_txtilemap_device::linescroll_w));
 	map(0x600000, 0x60ffff).ram().w(FUNC(fixeight_state::tx_gfxram_w)).share(m_tx_gfxram);
 	map(0x700000, 0x700001).w(FUNC(fixeight_state::sound_reset_w)).umask16(0x00ff).cswidth(16);
 	map(0x800000, 0x800001).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
@@ -464,7 +398,7 @@ void fixeight_bootleg_state::fixeightbl_68k_mem(address_map &map)
 	map(0x20001c, 0x20001d).portr("DSWA");
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(fixeight_bootleg_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x500000, 0x501fff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::videoram_r), FUNC(toaplan_txtilemap_device::videoram_w));
 	map(0x700000, 0x700001).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
 	map(0x800000, 0x87ffff).rom().region("maincpu", 0x80000);
 }
@@ -536,12 +470,14 @@ void fixeight_state::fixeight(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(fixeight_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp, 27_MHz_XTAL);
 	m_vdp->set_palette(m_palette);
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+
+	TOAPLAN_TXTILEMAP(config, m_tx_tilemap, 27_MHz_XTAL, m_palette, gfx);
+	m_tx_tilemap->set_offset(0x1d5, 0, 0x16a, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -578,12 +514,13 @@ void fixeight_bootleg_state::fixeightbl(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(fixeight_bootleg_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp, 27_MHz_XTAL);
 	m_vdp->set_palette(m_palette);
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
+
+	TOAPLAN_TXTILEMAP(config, m_tx_tilemap, 27_MHz_XTAL, m_palette, gfx_textrom);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

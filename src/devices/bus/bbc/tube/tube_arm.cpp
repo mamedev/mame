@@ -83,8 +83,10 @@ ROM_START( tube_arm )
 	ROMX_LOAD("armeval_101.rom", 0x0000, 0x4000, CRC(cab85473) SHA1(f86bbc4894e62725b8ef22d44e7f44d37c98ac14), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "100", "Executive v1.00 (6th June 1986)")
 	ROMX_LOAD("armeval_100.rom", 0x0000, 0x4000, CRC(ed80462a) SHA1(ba33eaf1a23cfef6fc1b88aa516ca2b3693e69d9), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "005", "Brazil v-.005 (8th August 1986)")
-	ROMX_LOAD("brazil_005.rom", 0x0000, 0x4000, CRC(7c27c098) SHA1(abcc71cbc43489e89a87aac64e67b17daef5895a), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "006", "Brazil v-.006 (11th July 1986)")
+	ROMX_LOAD("brazil_006.rom", 0x0000, 0x4000, CRC(9bafcc1c) SHA1(bfa252de2af0d20db87af554fff99f158e267ace), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "005", "Brazil v-.005 (8th August 1986)")
+	ROMX_LOAD("brazil_005.rom", 0x0000, 0x4000, CRC(7c27c098) SHA1(abcc71cbc43489e89a87aac64e67b17daef5895a), ROM_BIOS(3))
 ROM_END
 
 const tiny_rom_entry *bbc_tube_arm_device::device_rom_region() const

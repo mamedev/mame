@@ -5,14 +5,19 @@
 
 #pragma once
 
-#include "cpu/m6800/m6801.h"
-#include "cpu/m6809/m6809.h"
 #include "c117.h"
-#include "sound/dac.h"
-#include "sound/namco.h"
 #include "namco_c116.h"
 #include "namco_c123tmap.h"
+#include "namcos1_sprite.h"
+
+#include "cpu/m6800/m6801.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/74157.h"
+#include "sound/dac.h"
+#include "sound/namco.h"
+
+#include <utility>
+
 
 class namcos1_state : public driver_device
 {
@@ -25,12 +30,11 @@ public:
 		m_mcu(*this, "mcu"),
 		m_c116(*this, "c116"),
 		m_c117(*this, "c117"),
+		m_spritegen(*this, "spritegen"),
 		m_c123tmap(*this, "c123tmap"),
 		m_dac(*this, "dac%u", 0U),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_spriteram(*this, "spriteram"),
 		m_triram(*this, "triram"),
-		m_rom(*this, "user1"),
+		m_rom(*this, "mainrom"),
 		m_soundbank(*this, "soundbank"),
 		m_mcubank(*this, "mcubank"),
 		m_io_in(*this, "IN%u", 0U),
@@ -76,11 +80,10 @@ protected:
 	required_device<hd63701v0_cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_device<namco_c117_device> m_c117;
+	required_device<namcos1_sprite_device> m_spritegen;
 	required_device<namco_c123tmap_device> m_c123tmap;
 	required_device_array<dac_8bit_r2r_device, 2> m_dac;
-	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<u8> m_spriteram;
 	required_shared_ptr<u8> m_triram;
 	required_region_ptr<u8> m_rom;
 
@@ -109,7 +112,6 @@ protected:
 	u8 m_strobe = 0;
 	u8 m_strobe_count = 0;
 	u8 m_stored_input[2]{};
-	bool m_copy_sprites = false;
 	u8 m_drawmode_table[16]{};
 
 	void subres_w(int state);
@@ -123,7 +125,6 @@ protected:
 	void mcu_patch_w(u8 data);
 	u8 berabohm_buttons_r(offs_t offset);
 	u8 faceoff_inputs_r(offs_t offset);
-	void spriteram_w(offs_t offset, u8 data);
 	void _3dcs_w(offs_t offset, u8 data);
 	u8 no_key_r(offs_t offset);
 	void no_key_w(offs_t offset, u8 data);
@@ -138,9 +139,11 @@ protected:
 	void key_type_2_init(int key_id);
 	void key_type_3_init(int key_id, int reg, int rng, int swap4_arg, int swap4, int bottom4, int top4);
 
+	std::pair<bool, u8 const *> sprite_shadow_cb(u8 color);
+	u32 sprite_pri_cb(u8 attr1, u8 attr2);
+	u32 sprite_bank_cb(u32 code, u32 bank);
 	void TilemapCB(u16 code, int &tile, int &mask);
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 

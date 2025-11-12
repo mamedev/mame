@@ -13,7 +13,7 @@
 #pragma once
 
 #include "cpu/i86/i186.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "bus/scsi/scsi.h"
@@ -255,7 +255,7 @@ private:
 	bool m_voice_enabled = false;
 
 	void nimbus_io(address_map &map) ATTR_COLD;
-	void nimbus_iocpu_io(address_map &map) ATTR_COLD;
+	void nimbus_iocpu_data(address_map &map) ATTR_COLD;
 	void nimbus_iocpu_mem(address_map &map) ATTR_COLD;
 	void nimbus_mem(address_map &map) ATTR_COLD;
 

@@ -85,7 +85,7 @@ protected:
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override { return false; }
+	virtual void reset_from_bus() override;
 
 private:
 	void irq_w(int state);
@@ -110,7 +110,6 @@ protected:
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override { return false; }
 
 private:
 	a2bus_mcms1_device *m_card1;    // card 1 for passthrough

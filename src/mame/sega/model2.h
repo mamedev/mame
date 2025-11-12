@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese, Matthew Daniels
 #ifndef MAME_SEGA_MODEL2_H
 #define MAME_SEGA_MODEL2_H
 
@@ -80,7 +80,7 @@ public:
 	required_shared_ptr<u32> m_textureram1;
 	std::unique_ptr<u16[]> m_palram;
 	std::unique_ptr<u16[]> m_colorxlat;
-	std::unique_ptr<u16[]> m_lumaram;
+	std::unique_ptr<u8[]> m_lumaram;
 	u8 m_gamma_table[256]{};
 	std::unique_ptr<model2_renderer> m_poly;
 
@@ -151,9 +151,6 @@ protected:
 	std::unique_ptr<raster_state> m_raster;
 	std::unique_ptr<geo_state> m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
-//  u32 m_soundack;
-	void model2_check_irq_state();
-	void model2_check_irqack_state(u32 data);
 	u8 m_gearsel = 0;
 	u8 m_lightgun_mux = 0;
 
@@ -193,6 +190,7 @@ protected:
 	void irq_ack_w(u32 data);
 	u32 irq_enable_r();
 	void irq_enable_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void irq_update();
 	u8 model2_serial_r(offs_t offset);
 	void model2_serial_w(offs_t offset, u8 data);
 	void horizontal_sync_w(u16 data);
@@ -206,8 +204,8 @@ protected:
 	void geo_init(memory_region *polygon_rom);
 	u32 render_mode_r();
 	void render_mode_w(u32 data);
-	u16 lumaram_r(offs_t offset);
-	void lumaram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 lumaram_r(offs_t offset);
+	void lumaram_w(offs_t offset, u8 data);
 	u16 fbvram_bankA_r(offs_t offset);
 	void fbvram_bankA_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 fbvram_bankB_r(offs_t offset);
@@ -224,7 +222,7 @@ protected:
 	void reset_model2_scsp();
 	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  void screen_vblank_model2(int state);
-//  void sound_ready_w(int state);
+	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
 
@@ -571,11 +569,12 @@ private:
 class model2c_state : public model2_state
 {
 public:
-	model2c_state(const machine_config &mconfig, device_type type, const char *tag)
-		: model2_state(mconfig, type, tag),
-		  m_copro_tgpx4(*this, "copro_tgpx4"),
-		  m_copro_tgpx4_program(*this, "copro_tgpx4_program")
-	{}
+	model2c_state(const machine_config &mconfig, device_type type, const char *tag) :
+		model2_state(mconfig, type, tag),
+		m_copro_tgpx4(*this, "copro_tgpx4"),
+		m_copro_tgpx4_program(*this, "copro_tgpx4_program")
+	{
+	}
 
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);
@@ -599,8 +598,6 @@ protected:
 	u32 copro_fifo_r();
 	void copro_fifo_w(u32 data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
-
 	void model2c_crx_mem(address_map &map) ATTR_COLD;
 	void model2c_5881_mem(address_map &map) ATTR_COLD;
 	void copro_tgpx4_map(address_map &map) ATTR_COLD;
@@ -621,15 +618,23 @@ struct m2_poly_extra_data
 	model2_state *  state;
 	u32      lumabase;
 	u32      colorbase;
-	u32 *    texsheet;
+	u8       checker;
+	u32 *    texsheet[2];
 	u32      texwidth;
 	u32      texheight;
-	u32      texx, texy;
+	u32      texx;
+	u32      texy;
+	u8       texwrapx;
+	u8       texwrapy;
 	u8       texmirrorx;
 	u8       texmirrory;
+	u8       utex;
+	u8       utexminlod;
+	u32      utexx;
+	u32      utexy;
+	s32      texlod;
 	u8       luma;
 };
-
 
 static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 {
@@ -660,96 +665,46 @@ static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4>
 {
 public:
-	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
-
-public:
 	using triangle = model2_state::triangle;
 
-	model2_renderer(model2_state& state)
-		: poly_manager<float, m2_poly_extra_data, 4>(state.machine())
-		, m_state(state)
-		, m_destmap(512, 512)
+	model2_renderer(model2_state& state) :
+		poly_manager<float, m2_poly_extra_data, 4>(state.machine()),
+		m_render_callbacks{
+				{ &model2_renderer::draw_scanline_solid<false>, this },
+				{ &model2_renderer::draw_scanline_solid<true>, this },
+				{ &model2_renderer::draw_scanline_tex<false>, this },
+				{ &model2_renderer::draw_scanline_tex<true>, this } },
+		m_state(state),
+		m_destmap(512, 512),
+		m_fillmap(512, 512),
+		m_xoffs(90),
+		m_yoffs(-8)
 	{
-		m_renderfuncs[0] = &model2_renderer::model2_3d_render_0;
-		m_renderfuncs[1] = &model2_renderer::model2_3d_render_1;
-		m_renderfuncs[2] = &model2_renderer::model2_3d_render_2;
-		m_renderfuncs[3] = &model2_renderer::model2_3d_render_3;
-		m_renderfuncs[4] = &model2_renderer::model2_3d_render_4;
-		m_renderfuncs[5] = &model2_renderer::model2_3d_render_5;
-		m_renderfuncs[6] = &model2_renderer::model2_3d_render_6;
-		m_renderfuncs[7] = &model2_renderer::model2_3d_render_7;
-		m_xoffs = 90;
-		m_yoffs = -8;
 	}
 
-	bitmap_rgb32& destmap() { return m_destmap; }
+	bitmap_rgb32 &destmap() { return m_destmap; }
+	bitmap_ind8 &fillmap() { return m_fillmap; }
 
 	void model2_3d_render(triangle *tri, const rectangle &cliprect);
 	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
 	void set_yoffset(int16_t yoffs) { m_yoffs = yoffs; }
 
-	/* checker = 0, textured = 0, transparent = 0 */
-	#define MODEL2_FUNC 0
-	#define MODEL2_FUNC_NAME    model2_3d_render_0
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
+	template <bool Translucent>
+	void draw_scanline_solid(int32_t scanline, const extent_t &extent, const m2_poly_extra_data &object, int threadid);
 
-	/* checker = 0, textured = 0, translucent = 1 */
-	#define MODEL2_FUNC 1
-	#define MODEL2_FUNC_NAME    model2_3d_render_1
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 0, textured = 1, translucent = 0 */
-	#define MODEL2_FUNC 2
-	#define MODEL2_FUNC_NAME    model2_3d_render_2
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 0, textured = 1, translucent = 1 */
-	#define MODEL2_FUNC 3
-	#define MODEL2_FUNC_NAME    model2_3d_render_3
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 1, textured = 0, translucent = 0 */
-	#define MODEL2_FUNC 4
-	#define MODEL2_FUNC_NAME    model2_3d_render_4
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 1, textured = 0, translucent = 1 */
-	#define MODEL2_FUNC 5
-	#define MODEL2_FUNC_NAME    model2_3d_render_5
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 1, textured = 1, translucent = 0 */
-	#define MODEL2_FUNC 6
-	#define MODEL2_FUNC_NAME    model2_3d_render_6
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	/* checker = 1, textured = 1, translucent = 1 */
-	#define MODEL2_FUNC 7
-	#define MODEL2_FUNC_NAME    model2_3d_render_7
-	#include "model2rd.ipp"
-	#undef MODEL2_FUNC
-	#undef MODEL2_FUNC_NAME
-
-	scanline_render_func m_renderfuncs[8];
+	template <bool Translucent>
+	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const m2_poly_extra_data &object, int threadid);
 
 private:
-	model2_state& m_state;
+	render_delegate m_render_callbacks[4];
+
+	model2_state &m_state;
 	bitmap_rgb32 m_destmap;
-	int16_t m_xoffs = 0, m_yoffs = 0;
+	bitmap_ind8 m_fillmap;
+	int16_t m_xoffs, m_yoffs;
+
+	template <bool Translucent>
+	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const s32 miplevel, s32 fu, s32 fv);
 };
 
 typedef model2_renderer::vertex_t poly_vertex;
@@ -793,6 +748,7 @@ struct model2_state::triangle
 	u16             z = 0;
 	u16             texheader[4] = { 0, 0, 0, 0 };
 	u8              luma = 0;
+	s32             texlod = 0;
 	int16_t         viewport[4] = { 0, 0, 0, 0 };
 	int16_t         center[2] = { 0, 0 };
 	u8              window = 0;
@@ -810,6 +766,7 @@ struct model2_state::quad_m2
 	u16             z = 0;
 	u16             texheader[4] = { 0, 0, 0, 0 };
 	u8              luma = 0;
+	s32             texlod = 0;
 };
 
 /*******************************************
@@ -849,7 +806,7 @@ struct model2_state::raster_state
 	u16             min_z = 0;                      // Minimum sortable Z value
 	u16             max_z = 0;                      // Maximum sortable Z value
 	u16             texture_ram[0x10000];           // Texture RAM pointer
-	u8              log_ram[0x40000];               // Log RAM pointer
+	u8              log_ram[0x8000];                // Log RAM pointer
 	u8              cur_window = 0;                 // Current window
 	plane           clip_plane[4][4];               // Polygon clipping planes
 };

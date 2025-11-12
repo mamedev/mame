@@ -829,12 +829,6 @@ bool m68000_musashi_device::memory_translate(int spacenum, int intention, offs_t
 
 
 
-
-
-
-
-
-
 void m68000_musashi_device::execute_run()
 {
 	m_initial_cycles = m_icount;
@@ -2033,6 +2027,18 @@ void m68000_musashi_device::define_state(void)
 			state_add(M68K_URP_APTR, "URP", m_mmu_urp_aptr);
 			state_add(M68K_SRP_APTR, "SRP", m_mmu_srp_aptr);
 		}
+	}
+
+	if (m_cpu_type == CPU_TYPE_COLDFIRE)
+	{
+		state_add(COLDFIRE_ROMBAR0, "ROMBAR0", m_rombar[0]);
+		state_add(COLDFIRE_ROMBAR1, "ROMBAR1", m_rombar[1]);
+		state_add(COLDFIRE_RAMBAR0, "RAMBAR0", m_rambar[0]);
+		state_add(COLDFIRE_RAMBAR1, "RAMBAR1", m_rambar[1]);
+		state_add(COLDFIRE_EDRAMBAR, "EDRAMBAR", m_edrambar);
+		state_add(COLDFIRE_SECMBAR, "SECMBAR", m_secmbar);
+		state_add(COLDFIRE_MPCR, "MPCR", m_mpcr);
+		state_add(COLDFIRE_MBAR, "MBAR", m_mbar);
 	}
 }
 

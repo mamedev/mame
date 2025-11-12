@@ -11448,6 +11448,66 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cpbarrel">
+		<description>Captain Barrel</description>
+		<year>2024</year>
+		<publisher>Neo Byte Force</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="captain-p1.bin" offset="0x000000" size="0x100000" crc="6da1737d" sha1="49c8dafb1448bcbf706fcb5b3e713119d421d964" />
+				<rom loadflag="load16_word_swap" name="captain-p2.bin" offset="0x100000" size="0x100000" crc="f6f90237" sha1="c92b2ab39a2d01cd7c83ececa72dda0a50f429d0" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="captain-s1.bin" crc="9785df9c" sha1="e07bfa3f729a0b9ce8daff3c6bc0367fd7ce1a2c" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="captain-m1.bin" crc="ed6260d2" sha1="4aea38615117ea96b5e744ce49dd0578ca39a501" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="captain-v1.bin" offset="0x000000" size="0x800000" crc="8cfcceb7" sha1="6657b89d0b0cf6b27ec6cd051eb73d83efa025a2" />
+				<rom name="captain-v2.bin" offset="0x800000" size="0x800000" crc="d1080962" sha1="e017e5211c2701ee454ea28bba87b05ccc385c11" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<rom loadflag="load16_byte" name="captain-c1.bin" offset="0x000000" size="0x200000" crc="bce671cd" sha1="755e4091871d6db28fc3cbb43f7662b48dd2bb57" />
+				<rom loadflag="load16_byte" name="captain-c2.bin" offset="0x000001" size="0x200000" crc="843e16ac" sha1="4288905ef92f813b540e38702477c76dc5146312" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cybforce">
+		<description>Cyborg Force</description>
+		<year>2023</year>
+		<publisher>Neo Byte Force</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x400000">
+				<rom loadflag="load16_word_swap" name="cyborg-p1.bin" offset="0x000000" size="0x100000" crc="89e1c728" sha1="4b996f42373d77969c490534858aa0906d110685" />
+				<rom loadflag="load16_word_swap" name="cyborg-p2.bin" offset="0x100000" size="0x300000" crc="e4a8b27a" sha1="cbdf21414a5be59664dfd363b4d62ba0c8b05847" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="cyborg-s1.bin" crc="5bd29810" sha1="cfa054dfa027e3617ba1a1f25a043f03a25676fd" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x010000" name="cyborg-m1.bin" crc="06da3cec" sha1="034c250229920891edc70fecb5844e12a7c1c1bd" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="cyborg-v1.bin" offset="0x000000" size="0x800000" crc="dc50718c" sha1="e4150bc3625a60be197d629444906a8663a4aebe" />
+				<rom name="cyborg-v2.bin" offset="0x800000" size="0x800000" crc="8135d5a8" sha1="186a516ed0fbc1d39f96385513de2ad662511559" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="cyborg-c1.bin" offset="0x000000" size="0x1000000" crc="77078687" sha1="9485bcc2af6f59ebce57a6b19f215db712f93278" />
+				<rom loadflag="load16_byte" name="cyborg-c2.bin" offset="0x000001" size="0x1000000" crc="a5abdb83" sha1="cfc54c46ae6a593a9d2f4fdd1ee0d27877f55c20" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ddragon1">
 		<description>Double Dragon One (beta 2, 20250903)</description>
 		<year>2025</year>
@@ -11874,6 +11934,36 @@ license:CC0-1.0
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="dod-c1.bin" offset="0x000000" size="0x1400000" crc="050ee046" sha1="ca5a02ba92f7bdbedbb7c0c881eb3cf454140918" />
 				<rom loadflag="load16_byte" name="dod-c2.bin" offset="0x000001" size="0x1400000" crc="eff26754" sha1="d846093dd2c30daeba4e17ac7946155e62ca25a7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hypernoid">
+		<description>Hypernoid</description>
+		<year>2021</year>
+		<publisher>NeoHomeBrew</publisher>
+		<info name="version" value="Ver. 20211128" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="447.p1" offset="0x000000" size="0x100000" crc="e024fa76" sha1="6ef393ad80ec80e30929f07c95305d97fca3ad22" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<rom name="447.s1" offset="0x000000" size="0x20000" crc="bb82ab71" sha1="307f420446c2d411a65b59543b61c21d0360536b" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x80000">
+				<rom name="447.m1" offset="0x000000" size="0x80000" crc="6c8eaacc" sha1="6bc065be18db6830a4c94b424f9380d38da6f8b7" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="447.v1" offset="0x000000" size="0x400000" crc="dafa1bdd" sha1="743a5ad24a3dba04ce8f3e2d95ebd5ca83fd9f98" />
+				<rom name="447.v2" offset="0x400000" size="0x400000" crc="85ad8283" sha1="8abcf48a353dcd4777608b13471608f7290d89a5" />
+				<rom name="447.v3" offset="0x800000" size="0x400000" crc="86c27f0c" sha1="85b740e0224d5ea09b600683dec6fe532a723355" />
+				<rom name="447.v4" offset="0xC00000" size="0x400000" crc="a3982244" sha1="7191909d7264df3dc417dc76cee53291986d84e9" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<rom loadflag="load16_byte" name="447.c1" offset="0x000000" size="0x200000" crc="41d6140a" sha1="862b95ca1fe2b75d7ead0de8ac50c1b8a049c774" />
+				<rom loadflag="load16_byte" name="447.c2" offset="0x000001" size="0x200000" crc="36f35df2" sha1="22715561d5383263e41563fcb060f83a0c544531" />
 			</dataarea>
 		</part>
 	</software>

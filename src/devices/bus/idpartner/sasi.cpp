@@ -159,7 +159,7 @@ void idpartner_sasi_device::req_w(int state)
 void idpartner_sasi_device::io_w(int state)
 {
 	if (state)
-		m_sasi->write(0); // clears lateched data
+		m_sasi->write(0); // clears latched data
 }
 
 void idpartner_sasi_device::device_add_mconfig(machine_config &config)

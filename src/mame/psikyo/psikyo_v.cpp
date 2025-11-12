@@ -104,7 +104,7 @@ void psikyo_state::switch_bgbanks(u8 tmap, u8 bank)
 	}
 }
 
-VIDEO_START_MEMBER(psikyo_state,psikyo)
+void psikyo_state::video_start()
 {
 	m_spritelist = std::make_unique<sprite_t[]>(0x800/2*8*8);
 	m_sprite_ptr_pre = m_spritelist.get();
@@ -128,7 +128,7 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 
 VIDEO_START_MEMBER(psikyo_state,sngkace)
 {
-	VIDEO_START_CALL_MEMBER( psikyo );
+	psikyo_state::video_start();
 
 	switch_bgbanks(0, 0); // sngkace / samuraia don't use banking
 	switch_bgbanks(1, 1); // They share "gfx2" to save memory on other boards
@@ -196,7 +196,7 @@ void psikyo_state::get_sprites()
 		return;
 
 	/* Look for "end of sprites" marker in the sprites list */
-	for (int offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)   // skip last "sprite"
+	for (int offs = 0; offs < (0x800 - 2) / 2; offs += 2 / 2)   // skip last "sprite"
 	{
 		/* Get next entry in the list */
 		u16 sprite = spritelist[offs];
@@ -287,7 +287,7 @@ void psikyo_state::get_sprites()
 // until I work out why it makes a partial copy of the sprite list, and how best to apply it
 // sprite placement of the explosion graphic seems incorrect compared to the original sets? (no / different zoom support?)
 // it might be a problem with the actual bootleg
-void psikyo_state::get_sprites_bootleg()
+void psikyo_bootleg_state::get_sprites_bootleg()
 {
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	m_sprite_ctrl = m_spriteram->buffer()[0x1ffe / 4] & 0xffff;
@@ -303,7 +303,7 @@ void psikyo_state::get_sprites_bootleg()
 		return;
 
 	/* Look for "end of sprites" marker in the sprites list */
-	for (int offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)   // skip last "sprite"
+	for (int offs = 0; offs < (0x800 - 2) / 2; offs += 2 / 2)   // skip last "sprite"
 	{
 		/* Get next entry in the list */
 		u16 sprite = spritelist[offs];
@@ -469,7 +469,7 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 */
 	for (int layer = 0; layer < 2; layer++)
 	{
-		/* For gfx banking for s1945jn/gunbird/btlkroad */
+		/* For gfx banking for s1945n/gunbird/btlkroad */
 		if (m_ka302c_banking)
 		{
 			switch_bgbanks(layer, (layer_ctrl[layer] & 0x400) >> 10);
@@ -548,7 +548,7 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 
 */
 
-u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 psikyo_bootleg_state::screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u32 bgpen = 0;
 	int i, layers_ctrl = -1;
@@ -589,7 +589,7 @@ u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bit
 */
 	for (int layer = 0; layer < 2; layer++)
 	{
-		/* For gfx banking for s1945jn/gunbird/btlkroad */
+		/* For gfx banking for s1945n/gunbird/btlkroad */
 		if (m_ka302c_banking)
 		{
 			switch_bgbanks(layer, (layer_ctrl[layer] & 0x400) >> 10);
@@ -672,7 +672,7 @@ void psikyo_state::screen_vblank(int state)
 	}
 }
 
-void psikyo_state::screen_vblank_bootleg(int state)
+void psikyo_bootleg_state::screen_vblank_bootleg(int state)
 {
 	// rising edge
 	if (state)

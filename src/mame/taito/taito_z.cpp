@@ -1599,7 +1599,7 @@ void contcirc_state::contcirc_map(address_map &map)
 	map(0x080000, 0x083fff).ram();
 	map(0x084000, 0x087fff).ram().share("share1");
 	map(0x090001, 0x090001).w(FUNC(contcirc_state::contcirc_out_w));    /* road palette bank, sub CPU reset, 3d glasses control */
-	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
+	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));   /* palette */
 	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x300000, 0x301fff).rw(m_tc0150rod, FUNC(tc0150rod_device::word_r), FUNC(tc0150rod_device::word_w));    /* "root ram" */
@@ -1629,7 +1629,7 @@ void chasehq_state::chasehq_map(address_map &map)
 	map(0x800000, 0x800001).w(FUNC(chasehq_state::cpua_ctrl_w));
 	map(0x820001, 0x820001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
 	map(0x820003, 0x820003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
+	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));  /* palette */
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xd00000, 0xd007ff).ram().share("spriteram");
@@ -1653,7 +1653,7 @@ void contcirc_state::enforce_map(address_map &map)
 	map(0x200001, 0x200001).w(FUNC(contcirc_state::contcirc_out_w));
 	map(0x300000, 0x3006ff).ram().share("spriteram");
 	map(0x400000, 0x401fff).rw(m_tc0150rod, FUNC(tc0150rod_device::word_r), FUNC(tc0150rod_device::word_w));    /* "root ram" ??? */
-	map(0x500000, 0x500007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
+	map(0x500000, 0x500007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));   /* palette */
 	map(0x600000, 0x60ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x620000, 0x62000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
@@ -1747,7 +1747,7 @@ void nightstr_state::nightstr_map(address_map &map)
 	map(0x800000, 0x800001).w(FUNC(nightstr_state::cpua_ctrl_w));
 	map(0x820001, 0x820001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
 	map(0x820003, 0x820003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
+	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));  /* palette */
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xd00000, 0xd007ff).ram().share("spriteram");
@@ -1770,7 +1770,7 @@ void taitoz_z80_sound_state::aquajack_map(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
 	map(0x200000, 0x200001).w(FUNC(taitoz_z80_sound_state::cpua_ctrl_w));  // not needed, but it's probably like the others
-	map(0x300000, 0x300007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
+	map(0x300000, 0x300007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));  /* palette */
 	map(0x800000, 0x801fff).rw(m_tc0150rod, FUNC(tc0150rod_device::word_r), FUNC(tc0150rod_device::word_w));
 	map(0xa00000, 0xa0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0xa20000, 0xa2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
@@ -1799,7 +1799,7 @@ void spacegun_state::spacegun_map(address_map &map)
 	map(0x500000, 0x5005ff).ram().share("spriteram");
 	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
-	map(0xb00000, 0xb00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
+	map(0xb00000, 0xb00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));   /* palette */
 }
 
 void spacegun_state::spacegun_cpub_map(address_map &map)
@@ -3217,6 +3217,8 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
+	m_tc0110pcr->set_shift(0);
+	m_tc0110pcr->set_color_callback(FUNC(contcirc_state::color_xrgb555));
 
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
@@ -3276,6 +3278,8 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
+	m_tc0110pcr->set_shift(0);
+	m_tc0110pcr->set_color_callback(FUNC(chasehq_state::color_xbgr555));
 
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
@@ -3338,6 +3342,8 @@ void contcirc_state::enforce(machine_config &config)
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
+	m_tc0110pcr->set_shift(0);
+	m_tc0110pcr->set_color_callback(FUNC(contcirc_state::color_xrgb555));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3535,6 +3541,8 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
+	m_tc0110pcr->set_shift(0);
+	m_tc0110pcr->set_color_callback(FUNC(nightstr_state::color_xbgr555));
 
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
@@ -3596,6 +3604,8 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
+	m_tc0110pcr->set_shift(0);
+	m_tc0110pcr->set_color_callback(FUNC(taitoz_z80_sound_state::color_xbgr555));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -3662,6 +3672,8 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
+	m_tc0110pcr->set_shift(0);
+	m_tc0110pcr->set_color_callback(FUNC(spacegun_state::color_xrgb555));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

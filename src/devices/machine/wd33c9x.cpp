@@ -538,10 +538,15 @@ void wd33c9x_base_device::indir_w(offs_t offset, uint8_t data)
 
 uint8_t wd33c9x_base_device::indir_addr_r()
 {
-	// Trick to push the interrupt flag after the fifo is empty to help cps3
+	// HACK: push the interrupt flag after the fifo is empty to help cps3
 	return m_regs[AUXILIARY_STATUS] & 0x01 ? m_regs[AUXILIARY_STATUS] & 0x7f : m_regs[AUXILIARY_STATUS];
 }
 
+// PC-9801-55 definitely doesn't want the hack
+uint8_t wd33c9x_base_device::status_r()
+{
+	return m_regs[AUXILIARY_STATUS];
+}
 
 //-------------------------------------------------
 //  indir_addr_w
@@ -570,7 +575,9 @@ uint8_t wd33c9x_base_device::indir_reg_r()
 			// in advanced mode; the processor must retrieve
 			// the Identify message from the target by reading the
 			// Data Register.
-			fatalerror("%s: The host should never access the data register without DBR set.\n", shortname());
+			if (!machine().side_effects_disabled())
+				fatalerror("%s: The host should never access the data register without DBR set.\n", shortname());
+			return 0;
 		}
 		bool was_full = data_fifo_full();
 		ret = data_fifo_pop();

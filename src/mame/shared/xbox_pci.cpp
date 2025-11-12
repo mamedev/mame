@@ -9,6 +9,8 @@
 #include "machine/pci.h"
 #include "machine/idectrl.h"
 
+#include "cpu/dsp563xx/dsp56362.h"
+
 #include <functional>
 
 #define LOG_AUDIO (1U << 1)
@@ -1041,8 +1043,15 @@ void mcpx_apu_device::apu_mmio(address_map &map)
 	map(0x00000000, 0x00007ffff).rw(FUNC(mcpx_apu_device::apu_r), FUNC(mcpx_apu_device::apu_w));
 }
 
+void mcpx_apu_device::p_map(address_map &map)
+{
+	map(0xc00000, 0xc01fff).ram();
+	//map(0x002000, 0x002fff).r(FUNC(mcpx_apu_device::test_r));
+}
+
 mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pci_device(mconfig, MCPX_APU, tag, owner, clock),
+	gpdsp(*this, "gpdsp"),
 	cpu(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -1065,11 +1074,21 @@ void mcpx_apu_device::device_start()
 	apust.space = &cpu->space();
 	apust.timer = timer_alloc(FUNC(mcpx_apu_device::audio_update), this);
 	apust.timer->enable(false);
+	gpdsp->set_disable();
 }
 
 void mcpx_apu_device::device_reset()
 {
 	pci_device::device_reset();
+}
+
+void mcpx_apu_device::device_add_mconfig(machine_config &config)
+{
+	DSP56362(config, gpdsp, 10'000'000);
+	gpdsp->set_hard_omr(0); // try to reset at 0xc00000
+	gpdsp->set_addrmap(dsp56362_device::AS_P, &mcpx_apu_device::p_map);
+	//m_dsp->set_addrmap(dsp56364_device::AS_X, &mcpx_apu_device::x_map);
+	//m_dsp->set_addrmap(dsp56364_device::AS_Y, &mcpx_apu_device::y_map);
 }
 
 TIMER_CALLBACK_MEMBER(mcpx_apu_device::audio_update)

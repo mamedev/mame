@@ -107,6 +107,11 @@ void a2bus_themill_device::device_start()
 
 void a2bus_themill_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_themill_device::reset_from_bus()
+{
 	m_bEnabled = false;
 	m_flipAddrSpace = false;
 	m_6809Mode = (m_cfgsw->read() & 1) ? true : false;
@@ -329,9 +334,4 @@ void a2bus_themill_device::dma_w(offs_t offset, uint8_t data)
 			slot_dma_write(offset, data);
 		}
 	}
-}
-
-bool a2bus_themill_device::take_c800()
-{
-	return false;
 }

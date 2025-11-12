@@ -77,16 +77,14 @@ class dbz_state : public driver_device
 public:
 	dbz_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_bg1_videoram(*this, "bg1_videoram"),
-		m_bg2_videoram(*this, "bg2_videoram"),
+		m_bg_videoram(*this, "bg%u_videoram", 1U),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_k053252(*this, "k053252"),
 		m_k056832(*this, "k056832"),
-		m_k053936_1(*this, "k053936_1"),
-		m_k053936_2(*this, "k053936_2"),
+		m_k053936(*this, "k053936_%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_dsw2(*this, "DSW2")
 	{ }
@@ -105,18 +103,16 @@ protected:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_bg1_videoram;
-	required_shared_ptr<uint16_t> m_bg2_videoram;
+	required_shared_ptr_array<uint16_t, 2> m_bg_videoram;
 
 	/* video-related */
-	tilemap_t    *m_bg1_tilemap = nullptr;
-	tilemap_t    *m_bg2_tilemap = nullptr;
-	int          m_layer_colorbase[6]{};
-	int          m_layerpri[5]{};
-	int          m_sprite_colorbase = 0;
+	tilemap_t    *m_bg_tilemap[2]{};
+	uint16_t     m_layer_colorbase[6]{};
+	int32_t      m_layerpri[5]{};
+	uint16_t     m_sprite_colorbase = 0;
 
 	/* misc */
-	int           m_control = 0;
+	uint16_t     m_control = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -125,94 +121,73 @@ private:
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<k056832_device> m_k056832;
-	required_device<k053936_device> m_k053936_1;
-	required_device<k053936_device> m_k053936_2;
+	required_device_array<k053936_device, 2> m_k053936;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_ioport m_dsw2;
 
-	void dbzcontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dbz_sound_cause_nmi(uint16_t data);
-	void dbz_bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dbz_bg1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dbz_irq2_ack_w(int state);
-	TILE_GET_INFO_MEMBER(get_dbz_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_dbz_bg1_tile_info);
-	uint32_t screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(dbz_scanline);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_cause_nmi_w(uint16_t data);
+	template <unsigned Which> void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void irq2_ack_w(int state);
+	template <unsigned Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	void dbz_map(address_map &map) ATTR_COLD;
 	void dbz2bl_map(address_map &map) ATTR_COLD;
-	void dbz_sound_io_map(address_map &map) ATTR_COLD;
-	void dbz_sound_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
 K056832_CB_MEMBER(dbz_state::tile_callback)
 {
-	*color = (m_layer_colorbase[layer] << 1) + ((*color & 0x3c) >> 2);
+	color = (m_layer_colorbase[layer] << 1) + ((color & 0x3c) >> 2);
 }
 
 K053246_CB_MEMBER(dbz_state::sprite_callback)
 {
-	int pri = (*color & 0x3c0) >> 5;
+	const int pri = (color & 0x3c0) >> 5;
 
 	if (pri <= m_layerpri[3])
-		*priority_mask = 0xff00;
+		priority_mask = 0xff00;
 	else if (pri > m_layerpri[3] && pri <= m_layerpri[2])
-		*priority_mask = 0xfff0;
+		priority_mask = 0xfff0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority_mask = 0xfffc;
+		priority_mask = 0xfffc;
 	else
-		*priority_mask = 0xfffe;
+		priority_mask = 0xfffe;
 
-	*color = (m_sprite_colorbase << 1) + (*color & 0x1f);
+	color = (m_sprite_colorbase << 1) + (color & 0x1f);
 }
 
 /* Background Tilemaps */
-
-void dbz_state::dbz_bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+template <unsigned Which>
+void dbz_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_bg2_videoram[offset]);
-	m_bg2_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_bg_videoram[Which][offset]);
+	m_bg_tilemap[Which]->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg2_tile_info)
+template <unsigned Which>
+TILE_GET_INFO_MEMBER(dbz_state::get_bg_tile_info)
 {
-	int tileno, colour, flag;
+	const uint32_t tileno = m_bg_videoram[Which][tile_index * 2 + 1] & 0x7fff;
+	const uint32_t colour = (m_bg_videoram[Which][tile_index * 2] & 0x000f);
+	const uint8_t flag = BIT(m_bg_videoram[Which][tile_index * 2], 7) ? TILE_FLIPX : 0;
 
-	tileno = m_bg2_videoram[tile_index * 2 + 1] & 0x7fff;
-	colour = (m_bg2_videoram[tile_index * 2] & 0x000f);
-	flag = (m_bg2_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
-
-	tileinfo.set(0, tileno, colour + (m_layer_colorbase[5] << 1), flag);
-}
-
-void dbz_state::dbz_bg1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_bg1_videoram[offset]);
-	m_bg1_tilemap->mark_tile_dirty(offset / 2);
-}
-
-TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
-{
-	int tileno, colour, flag;
-
-	tileno = m_bg1_videoram[tile_index * 2 + 1] & 0x7fff;
-	colour = (m_bg1_videoram[tile_index * 2] & 0x000f);
-	flag = (m_bg1_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
-
-	tileinfo.set(1, tileno, colour + (m_layer_colorbase[4] << 1), flag);
+	tileinfo.set(Which, tileno, colour + (m_layer_colorbase[4 + Which] << 1), flag);
 }
 
 void dbz_state::video_start()
 {
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_dbz_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_dbz_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_bg_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_bg_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
-	m_bg1_tilemap->set_transparent_pen(0);
-	m_bg2_tilemap->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
 
 	if (!strcmp(machine().system().name, "dbz"))
 		m_k056832->set_layer_offs(0, -34, -16);
@@ -223,25 +198,25 @@ void dbz_state::video_start()
 	m_k056832->set_layer_offs(3, -31, -16); // ?
 }
 
-uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dbz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[6] = { k053251_device::CI3, k053251_device::CI4, k053251_device::CI4, k053251_device::CI4, k053251_device::CI2, k053251_device::CI1 };
-	int layer[5], plane, new_colorbase;
+	int layer[5];
 
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
 
-	for (plane = 0; plane < 6; plane++)
+	for (int plane = 0; plane < 6; plane++)
 	{
-		new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
+		const int new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 		if (m_layer_colorbase[plane] != new_colorbase)
 		{
 			m_layer_colorbase[plane] = new_colorbase;
 			if (plane <= 3)
 				m_k056832->mark_plane_dirty(plane);
 			else if (plane == 4)
-				m_bg1_tilemap->mark_all_dirty();
+				m_bg_tilemap[0]->mark_all_dirty();
 			else if (plane == 5)
-				m_bg2_tilemap->mark_all_dirty();
+				m_bg_tilemap[1]->mark_all_dirty();
 		}
 	}
 
@@ -261,7 +236,7 @@ uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitma
 
 	screen.priority().fill(0, cliprect);
 
-	for (plane = 0; plane < 5; plane++)
+	for (int plane = 0; plane < 5; plane++)
 	{
 		int flag, pri;
 
@@ -276,53 +251,50 @@ uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitma
 			pri = 1 << (plane - 1);
 		}
 
-		if(layer[plane] == 4)
-			m_k053936_2->zoom_draw(screen, bitmap, cliprect, m_bg1_tilemap, flag, pri, 1);
-		else if(layer[plane] == 5)
-			m_k053936_1->zoom_draw(screen, bitmap, cliprect, m_bg2_tilemap, flag, pri, 1);
+		if (layer[plane] == 4)
+			m_k053936[1]->zoom_draw(screen, bitmap, cliprect, m_bg_tilemap[0], flag, pri, 1);
+		else if (layer[plane] == 5)
+			m_k053936[0]->zoom_draw(screen, bitmap, cliprect, m_bg_tilemap[1], flag, pri, 1);
 		else
 			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], flag, pri);
 	}
 
-	m_k053246->k053247_sprites_draw( bitmap, cliprect);
+	m_k053246->k053247_sprites_draw(bitmap, cliprect);
 	return 0;
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::scanline)
 {
-	int scanline = param;
+	const int scanline = param;
 
-	if(scanline == 256) // vblank-out irq
+	if (scanline == 256) // vblank-out irq
 		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 
-	if(scanline == 0 && m_k053246->k053246_is_irq_enabled()) // vblank-in irq
+	if (scanline == 0 && m_k053246->k053246_is_irq_enabled()) // vblank-in irq
 		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE); // auto-acks apparently
 }
 
 #if 0
-uint16_t dbz_state::dbzcontrol_r()
+uint16_t dbz_state::control_r()
 {
 	return m_control;
 }
 #endif
 
-void dbz_state::dbzcontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void dbz_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 10 = enable '246 readback */
 
 	COMBINE_DATA(&m_control);
 
-	if (data & 0x400)
-		m_k053246->k053246_set_objcha_line( ASSERT_LINE);
-	else
-		m_k053246->k053246_set_objcha_line( CLEAR_LINE);
+	m_k053246->k053246_set_objcha_line(BIT(data, 10) ? ASSERT_LINE : CLEAR_LINE);
 
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
-void dbz_state::dbz_sound_cause_nmi(uint16_t data)
+void dbz_state::sound_cause_nmi_w(uint16_t data)
 {
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
@@ -332,33 +304,31 @@ void dbz_state::dbz_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x480000, 0x48ffff).ram();
-	map(0x490000, 0x491fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  // '157 RAM is mirrored twice
-	map(0x492000, 0x493fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0x490000, 0x491fff).mirror(0x002000).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  // '157 RAM is mirrored twice
 	map(0x498000, 0x49ffff).r(m_k056832, FUNC(k056832_device::rom_word_8000_r));  // code near a60 in dbz2, subroutine at 730 in dbz
 	map(0x4a0000, 0x4a0fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w));
 	map(0x4a1000, 0x4a3fff).ram();
 	map(0x4a8000, 0x4abfff).ram().w("palette", FUNC(palette_device::write16)).share("palette"); // palette
 	map(0x4c0000, 0x4c0001).r(m_k053246, FUNC(k053247_device::k053246_r));
-	map(0x4c0000, 0x4c0007).w(m_k053246, FUNC(k053247_device::k053246_w));
-	map(0x4c4000, 0x4c4007).w(m_k053246, FUNC(k053247_device::k053246_w));
+	map(0x4c0000, 0x4c0007).mirror(0x004000).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x4c8000, 0x4c8007).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x4cc000, 0x4cc03f).w(m_k056832, FUNC(k056832_device::word_w));
-	map(0x4d0000, 0x4d001f).w(m_k053936_1, FUNC(k053936_device::ctrl_w));
-	map(0x4d4000, 0x4d401f).w(m_k053936_2, FUNC(k053936_device::ctrl_w));
+	map(0x4d0000, 0x4d001f).w(m_k053936[0], FUNC(k053936_device::ctrl_w));
+	map(0x4d4000, 0x4d401f).w(m_k053936[1], FUNC(k053936_device::ctrl_w));
 	map(0x4e0000, 0x4e0001).portr("P1_P2");
 	map(0x4e0002, 0x4e0003).portr("SYSTEM_DSW1");
 	map(0x4e4000, 0x4e4001).lr8(NAME([this]() { return uint8_t(m_dsw2->read()); }));
 	map(0x4e8000, 0x4e8001).noprw();
-	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::dbzcontrol_w));
+	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::control_w));
 	map(0x4f0000, 0x4f0000).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x4f4000, 0x4f4001).w(FUNC(dbz_state::dbz_sound_cause_nmi));
+	map(0x4f4000, 0x4f4001).w(FUNC(dbz_state::sound_cause_nmi_w));
 	map(0x4f8000, 0x4f801f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00);      // 252
 	map(0x4fc000, 0x4fc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);   // 251
 
-	map(0x500000, 0x501fff).ram().w(FUNC(dbz_state::dbz_bg2_videoram_w)).share("bg2_videoram");
-	map(0x508000, 0x509fff).ram().w(FUNC(dbz_state::dbz_bg1_videoram_w)).share("bg1_videoram");
-	map(0x510000, 0x513fff).rw(m_k053936_1, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
-	map(0x518000, 0x51bfff).rw(m_k053936_2, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
+	map(0x500000, 0x501fff).ram().w(FUNC(dbz_state::bg_videoram_w<1>)).share(m_bg_videoram[1]);
+	map(0x508000, 0x509fff).ram().w(FUNC(dbz_state::bg_videoram_w<0>)).share(m_bg_videoram[0]);
+	map(0x510000, 0x513fff).rw(m_k053936[0], FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
+	map(0x518000, 0x51bfff).rw(m_k053936[1], FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
 	map(0x600000, 0x6fffff).nopr();             // PSAC 1 ROM readback window
 	map(0x700000, 0x7fffff).nopr();             // PSAC 2 ROM readback window
 }
@@ -371,7 +341,7 @@ void dbz_state::dbz2bl_map(address_map &map)
 	map(0x4ccf00, 0x4ccf3f).w(m_k056832, FUNC(k056832_device::word_w));
 
 	map(0x4d4000, 0x4d401f).unmapw();
-	map(0x4d4f00, 0x4d4f1f).w(m_k053936_2, FUNC(k053936_device::ctrl_w));
+	map(0x4d4f00, 0x4d4f1f).w(m_k053936[1], FUNC(k053936_device::ctrl_w));
 
 	map(0x4e4000, 0x4e4001).unmapr();
 	map(0x4e0004, 0x4e0005).lr8(NAME([this]() { return uint8_t(m_dsw2->read()); }));
@@ -384,7 +354,7 @@ void dbz_state::dbz2bl_map(address_map &map)
 /* dbz sound */
 /* IRQ: from YM2151.  NMI: from 68000.  Port 0: write to ack NMI */
 
-void dbz_state::dbz_sound_map(address_map &map)
+void dbz_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).ram();
@@ -393,7 +363,7 @@ void dbz_state::dbz_sound_map(address_map &map)
 	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
-void dbz_state::dbz_sound_io_map(address_map &map)
+void dbz_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).nopw();
@@ -518,13 +488,13 @@ INPUT_PORTS_END
 /**********************************************************************************/
 
 static GFXDECODE_START( gfx_dbz )
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_packed_msb, 0, 512 )
-	GFXDECODE_ENTRY( "gfx4", 0, gfx_16x16x4_packed_msb, 0, 512 )
+	GFXDECODE_ENTRY( "roztiles0", 0, gfx_16x16x4_packed_msb, 0, 512 )
+	GFXDECODE_ENTRY( "roztiles1", 0, gfx_16x16x4_packed_msb, 0, 512 )
 GFXDECODE_END
 
 /**********************************************************************************/
 
-void dbz_state::dbz_irq2_ack_w(int state)
+void dbz_state::irq2_ack_w(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 }
@@ -539,12 +509,10 @@ void dbz_state::machine_start()
 
 void dbz_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 5; i++)
+	for (int i = 0; i < 5; i++)
 		m_layerpri[i] = 0;
 
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		m_layer_colorbase[i] = 0;
 
 	m_sprite_colorbase = 0;
@@ -556,11 +524,11 @@ void dbz_state::dbz(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dbz_state::dbz_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(dbz_state::dbz_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(dbz_state::scanline), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, 4000000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dbz_state::dbz_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &dbz_state::dbz_sound_io_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dbz_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &dbz_state::sound_io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -568,7 +536,7 @@ void dbz_state::dbz(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 40*8);
 	screen.set_visarea(0, 48*8-1, 0, 32*8-1);
-	screen.set_screen_update(FUNC(dbz_state::screen_update_dbz));
+	screen.set_screen_update(FUNC(dbz_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_dbz);
@@ -587,16 +555,16 @@ void dbz_state::dbz(machine_config &config)
 
 	K053251(config, m_k053251, 0);
 
-	K053936(config, m_k053936_1, 0);
-	m_k053936_1->set_wrap(1);
-	m_k053936_1->set_offsets(-46, -16);
+	K053936(config, m_k053936[0], 0);
+	m_k053936[0]->set_wrap(1);
+	m_k053936[0]->set_offsets(-46, -16);
 
-	K053936(config, m_k053936_2, 0);
-	m_k053936_2->set_wrap(1);
-	m_k053936_2->set_offsets(-46, -16);
+	K053936(config, m_k053936[1], 0);
+	m_k053936[1]->set_wrap(1);
+	m_k053936[1]->set_offsets(-46, -16);
 
 	K053252(config, m_k053252, 16000000/2);
-	m_k053252->int1_ack().set(FUNC(dbz_state::dbz_irq2_ack_w));
+	m_k053252->int1_ack().set(FUNC(dbz_state::irq2_ack_w));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -645,12 +613,12 @@ ROM_START( dbz )
 	ROM_LOAD64_WORD( "222a07.1l", 0x000006, 0x200000, CRC(430bc873) SHA1(ea483195bb7f20ef3df7cfba153e5f6f8d53e5f9) )
 
 	/* K053536 PSAC-2 #1 */
-	ROM_REGION( 0x200000, "gfx3", 0)
-	ROM_LOAD( "222a08.25k", 0x000000, 0x200000, CRC(6410ee1b) SHA1(2296aafd3ba25f63a12130f7b58de53e88f14e92) )
+	ROM_REGION( 0x200000, "roztiles0", 0)
+	ROM_LOAD( "222a09.25l", 0x000000, 0x200000, CRC(f7b3f070) SHA1(50ebd8cfcda292a3df5664de50f9212108d58923) )
 
 	/* K053536 PSAC-2 #2 */
-	ROM_REGION( 0x200000, "gfx4", 0)
-	ROM_LOAD( "222a09.25l", 0x000000, 0x200000, CRC(f7b3f070) SHA1(50ebd8cfcda292a3df5664de50f9212108d58923) )
+	ROM_REGION( 0x200000, "roztiles1", 0)
+	ROM_LOAD( "222a08.25k", 0x000000, 0x200000, CRC(6410ee1b) SHA1(2296aafd3ba25f63a12130f7b58de53e88f14e92) )
 
 	/* sound data */
 	ROM_REGION( 0x40000, "oki", 0)
@@ -680,12 +648,12 @@ ROM_START( dbza )
 	ROM_LOAD64_WORD( "222a07.1l", 0x000006, 0x200000, CRC(430bc873) SHA1(ea483195bb7f20ef3df7cfba153e5f6f8d53e5f9) )
 
 	/* K053536 PSAC-2 #1 */
-	ROM_REGION( 0x200000, "gfx3", 0)
-	ROM_LOAD( "222a08.25k", 0x000000, 0x200000, CRC(6410ee1b) SHA1(2296aafd3ba25f63a12130f7b58de53e88f14e92) )
+	ROM_REGION( 0x200000, "roztiles0", 0)
+	ROM_LOAD( "222a09.25l", 0x000000, 0x200000, CRC(f7b3f070) SHA1(50ebd8cfcda292a3df5664de50f9212108d58923) )
 
 	/* K053536 PSAC-2 #2 */
-	ROM_REGION( 0x200000, "gfx4", 0)
-	ROM_LOAD( "222a09.25l", 0x000000, 0x200000, CRC(f7b3f070) SHA1(50ebd8cfcda292a3df5664de50f9212108d58923) )
+	ROM_REGION( 0x200000, "roztiles1", 0)
+	ROM_LOAD( "222a08.25k", 0x000000, 0x200000, CRC(6410ee1b) SHA1(2296aafd3ba25f63a12130f7b58de53e88f14e92) )
 
 	/* sound data */
 	ROM_REGION( 0x40000, "oki", 0)
@@ -715,14 +683,14 @@ ROM_START( dbz2 )
 	ROM_LOAD64_WORD( "ds-o04.1l", 0x000006, 0x200000, CRC(b5df6676) SHA1(194cfce460ccd29e2cceec577aae4ec936ae88e5) )
 
 	/* K053536 PSAC-2 #1 */
-	ROM_REGION( 0x400000, "gfx3", 0)
-	ROM_LOAD( "ds-p01.25k", 0x000000, 0x200000, CRC(1c7aad68) SHA1(a5296cf12cec262eede55397ea929965576fea81) )
-	ROM_LOAD( "ds-p02.27k", 0x200000, 0x200000, CRC(e4c3a43b) SHA1(f327f75fe82f8aafd2cfe6bdd3a426418615974b) )
-
-	/* K053536 PSAC-2 #2 */
-	ROM_REGION( 0x400000, "gfx4", 0)
+	ROM_REGION( 0x400000, "roztiles0", 0)
 	ROM_LOAD( "ds-p03.25l", 0x000000, 0x200000, CRC(1eaa671b) SHA1(1875eefc6f2c3fc8feada56bfa6701144e8ef64b) )
 	ROM_LOAD( "ds-p04.27l", 0x200000, 0x200000, CRC(5845ff98) SHA1(73b4c3f439321ce9c462119fe933e7cbda8cd498) )
+
+	/* K053536 PSAC-2 #2 */
+	ROM_REGION( 0x400000, "roztiles1", 0)
+	ROM_LOAD( "ds-p01.25k", 0x000000, 0x200000, CRC(1c7aad68) SHA1(a5296cf12cec262eede55397ea929965576fea81) )
+	ROM_LOAD( "ds-p02.27k", 0x200000, 0x200000, CRC(e4c3a43b) SHA1(f327f75fe82f8aafd2cfe6bdd3a426418615974b) )
 
 	/* sound data */
 	ROM_REGION( 0x40000, "oki", 0)
@@ -752,14 +720,14 @@ ROM_START( dbz2bl )
 	ROM_LOAD64_WORD( "ds-o04.1l", 0x000006, 0x200000, BAD_DUMP CRC(b5df6676) SHA1(194cfce460ccd29e2cceec577aae4ec936ae88e5) )
 
 	// K053536 PSAC-2 #1 equivalent
-	ROM_REGION( 0x400000, "gfx3", 0)
-	ROM_LOAD( "ds-p01.25k", 0x000000, 0x200000, BAD_DUMP CRC(1c7aad68) SHA1(a5296cf12cec262eede55397ea929965576fea81) )
-	ROM_LOAD( "ds-p02.27k", 0x200000, 0x200000, BAD_DUMP CRC(e4c3a43b) SHA1(f327f75fe82f8aafd2cfe6bdd3a426418615974b) )
-
-	// K053536 PSAC-2 #2 equivalent
-	ROM_REGION( 0x400000, "gfx4", 0)
+	ROM_REGION( 0x400000, "roztiles0", 0)
 	ROM_LOAD( "ds-p03.25l", 0x000000, 0x200000, BAD_DUMP CRC(1eaa671b) SHA1(1875eefc6f2c3fc8feada56bfa6701144e8ef64b) )
 	ROM_LOAD( "ds-p04.27l", 0x200000, 0x200000, BAD_DUMP CRC(5845ff98) SHA1(73b4c3f439321ce9c462119fe933e7cbda8cd498) )
+
+	// K053536 PSAC-2 #2 equivalent
+	ROM_REGION( 0x400000, "roztiles1", 0)
+	ROM_LOAD( "ds-p01.25k", 0x000000, 0x200000, BAD_DUMP CRC(1c7aad68) SHA1(a5296cf12cec262eede55397ea929965576fea81) )
+	ROM_LOAD( "ds-p02.27k", 0x200000, 0x200000, BAD_DUMP CRC(e4c3a43b) SHA1(f327f75fe82f8aafd2cfe6bdd3a426418615974b) )
 
 	ROM_REGION( 0x40000, "oki", 0)
 	ROM_LOAD( "pcm.7c", 0x000000, 0x40000, CRC(b58c884a) SHA1(0e2a7267e9dff29c9af25558081ec9d56629bc43) )

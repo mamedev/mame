@@ -195,7 +195,7 @@ void a2bus_device::reset_bus()
 		auto card = get_a2bus_card(slot);
 		if (card != nullptr)
 		{
-			card->bus_reset();
+			card->reset_from_bus();
 		}
 	}
 }

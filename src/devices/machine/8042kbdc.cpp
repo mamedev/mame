@@ -293,10 +293,14 @@ uint8_t kbdc8042_device::data_r(offs_t offset)
 		if (m_mouse.on)
 			at_8042_check_mouse();
 
-		if (m_keyboard.received || m_mouse.received)
-			data |= 1;
-		if (m_sending)
-			data |= 2;
+		// cfr. pciagp PC=E140A, can't possibly send a "received" if the update isn't running
+		if (m_update_timer->expire() != attotime::never)
+		{
+			if (m_keyboard.received || m_mouse.received)
+				data |= 1;
+			if (m_sending)
+				data |= 2;
+		}
 
 		m_sending = 0; /* quicker than normal */
 		data |= 4; /* selftest ok */

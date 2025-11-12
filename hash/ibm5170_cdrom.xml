@@ -8459,7 +8459,7 @@ Installation and Open Circulation CDs are bootable.
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="English, Norwegian" />
 			<diskarea name="cdrom">
-				<disk name="en-us,no-no windows nt 3.1 service pack 2.chd" sha1="f3fee15a27e2b12754780221557bcb45f94547f6" />
+				<disk name="en-us,no-no windows nt 3.1 service pack 2" sha1="f3fee15a27e2b12754780221557bcb45f94547f6" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">

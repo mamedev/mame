@@ -26,7 +26,7 @@ ToDo:
 #include "emu.h"
 #include "genpin.h"
 #include "cpu/i86/i86.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/i8155.h"
 #include "machine/i8256.h"
 #include "machine/nvram.h"
@@ -64,11 +64,11 @@ private:
 	u8 ay8910_inputs_r();
 	void sound_rombank_w(u8 data);
 
-	void mephisto_8051_io(address_map &map) ATTR_COLD;
+	void mephisto_8051_data(address_map &map) ATTR_COLD;
 	void mephisto_8051_map(address_map &map) ATTR_COLD;
 	void mephisto_map(address_map &map) ATTR_COLD;
 	void sport2k_map(address_map &map) ATTR_COLD;
-	void sport2k_8051_io(address_map &map) ATTR_COLD;
+	void sport2k_8051_data(address_map &map) ATTR_COLD;
 
 	u8 m_ay8910_data = 0U;
 	bool m_ay8910_bdir = false;
@@ -164,16 +164,16 @@ void mephisto_state::mephisto_8051_map(address_map &map)
 	map(0x8000, 0xffff).bankr("soundbank");
 }
 
-void mephisto_state::mephisto_8051_io(address_map &map)
+void mephisto_state::mephisto_8051_data(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0800).w(FUNC(mephisto_state::sound_rombank_w));
 	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::data_w));
 }
 
-void mephisto_state::sport2k_8051_io(address_map &map)
+void mephisto_state::sport2k_8051_data(address_map &map)
 {
-	mephisto_8051_io(map);
+	mephisto_8051_data(map);
 	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 }
 
@@ -233,7 +233,7 @@ void mephisto_state::mephisto(machine_config &config)
 
 	i8051_device &soundcpu(I8051(config, "soundcpu", XTAL(12'000'000)));
 	soundcpu.set_addrmap(AS_PROGRAM, &mephisto_state::mephisto_8051_map); // EA tied high for external program ROM
-	soundcpu.set_addrmap(AS_IO, &mephisto_state::mephisto_8051_io);
+	soundcpu.set_addrmap(AS_DATA, &mephisto_state::mephisto_8051_data);
 	soundcpu.port_in_cb<1>().set(FUNC(mephisto_state::ay8910_read));
 	soundcpu.port_out_cb<1>().set(FUNC(mephisto_state::ay8910_write));
 	soundcpu.port_out_cb<3>().set(FUNC(mephisto_state::t0_t1_w));
@@ -256,7 +256,7 @@ void mephisto_state::sport2k(machine_config &config)
 {
 	mephisto(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::sport2k_map);
-	subdevice<i8051_device>("soundcpu")->set_addrmap(AS_IO, &mephisto_state::sport2k_8051_io);
+	subdevice<i8051_device>("soundcpu")->set_addrmap(AS_DATA, &mephisto_state::sport2k_8051_data);
 
 	YM3812(config, "ymsnd", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.5);
 }

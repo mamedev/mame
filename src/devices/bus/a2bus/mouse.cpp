@@ -109,6 +109,7 @@ protected:
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void reset_from_bus() override;
 
 private:
 	void pia_out_a(uint8_t data);
@@ -401,6 +402,12 @@ void a2bus_mouse_device::set_port_c_in(int32_t param)
 {
 	const uint8_t data = uint8_t(uint32_t(param));
 	m_mcu->pc_w(data);
+}
+
+void a2bus_mouse_device::reset_from_bus()
+{
+	m_mcu->reset();
+	m_pia->reset();
 }
 
 } // anonymous namespace

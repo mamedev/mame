@@ -75,7 +75,7 @@ void jx8p_synth_device::device_add_mconfig(machine_config &config)
 {
 	I8031(config, m_synthcpu, 12_MHz_XTAL); // 8051-319 (EA tied to GND)
 	m_synthcpu->set_addrmap(AS_PROGRAM, &jx8p_synth_device::prog_map);
-	m_synthcpu->set_addrmap(AS_IO, &jx8p_synth_device::ext_map);
+	m_synthcpu->set_addrmap(AS_DATA, &jx8p_synth_device::ext_map);
 
 	I8155(config, m_ramio, 0); // µPD8155HC
 	m_ramio->out_pa_callback().set(FUNC(jx8p_synth_device::prescale_w));
@@ -88,7 +88,7 @@ void superjx_synth_device::device_add_mconfig(machine_config &config)
 {
 	I8031(config, m_synthcpu, 12_MHz_XTAL); // MBL8031AH-P-G
 	m_synthcpu->set_addrmap(AS_PROGRAM, &superjx_synth_device::prog_map);
-	m_synthcpu->set_addrmap(AS_IO, &superjx_synth_device::ext_map);
+	m_synthcpu->set_addrmap(AS_DATA, &superjx_synth_device::ext_map);
 
 	I8155(config, m_ramio, 0); // µPD8155HC-2
 	m_ramio->out_pa_callback().set(FUNC(superjx_synth_device::prescale_w));

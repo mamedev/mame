@@ -14,27 +14,56 @@ public:
 	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_is_st0032(int is_st0032) { m_is_st0032 = is_st0032; }
 	void set_is_jclub2(int is_jclub2) { m_is_jclub2 = is_jclub2; }
 
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool update_visible_area);
 
-	uint16_t gfxram_r(offs_t offset, uint16_t mem_mask = ~0);
-	void gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	virtual uint16_t gfxram_r(offs_t offset, uint16_t mem_mask = ~0);
+	virtual void gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint16_t regs_r(offs_t offset);
-	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	virtual uint16_t regs_r(offs_t offset);
+	virtual void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t sprram_r(offs_t offset);
 	void sprram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
+	// sprites
+	struct sprite_list_t
+	{
+		int num = 0;
+		int sprite = 0;
+		int xoffs = 0;
+		int yoffs = 0;
+	};
+
+	st0020_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-private:
-	// see if we can handle the difference between this and the st0032 in here, or if we need another device
-	int m_is_st0032;
+	void gfxram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	// blitter
+	void do_blit_w(uint16_t data);
+
+	// tilemaps
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	TILEMAP_MAPPER_MEMBER(scan_16x16);
+
+	virtual int tmap_offset(int i);
+	virtual int tmap_priority(int i);
+	virtual int tmap_is_enabled(int i);
+	virtual uint32_t get_tile_color(int i, uint32_t color);
+	void tmap_st0020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	virtual uint32_t get_sprite_color(uint32_t color);
+	virtual void draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void draw_single_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, sprite_list_t &list);
+
+	// CRTC
+	virtual int get_crtc_top();
+	virtual int get_crtc_bottom();
 
 	// per-game hack
 	int m_is_jclub2;
@@ -43,34 +72,41 @@ private:
 	std::unique_ptr<uint16_t[]> m_gfxram;
 	std::unique_ptr<uint16_t[]> m_spriteram;
 	std::unique_ptr<uint16_t[]> m_regs;
-
-	void regs_st0020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void regs_st0032_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	int m_gfxram_bank = 0;
-	void gfxram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	// blitter
 	optional_region_ptr<uint8_t> m_rom_ptr;
-	void do_blit_w(uint16_t data);
 
-	// tilemaps
-	tilemap_t *m_tmap[4]{};
+	tilemap_t *m_tmap[4];
+	uint32_t m_gfxram_bank;
+};
 
-	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	TILEMAP_MAPPER_MEMBER(scan_16x16);
+class st0032_device : public st0020_device
+{
+public:
+	st0032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	int tmap_offset(int i);
-	int tmap_priority(int i);
-	int tmap_is_enabled(int i);
-	void tmap_st0020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void tmap_st0032_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	virtual uint16_t gfxram_r(offs_t offset, uint16_t mem_mask = ~0) override;
+	virtual void gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	virtual uint16_t regs_r(offs_t offset) override;
+	virtual void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+protected:
+	virtual int tmap_offset(int i) override;
+	virtual int tmap_priority(int i) override;
+	virtual int tmap_is_enabled(int i) override;
+	virtual uint32_t get_tile_color(int i, uint32_t color) override;
+	virtual uint32_t get_sprite_color(uint32_t color) override;
+	virtual int get_crtc_top() override;
+	virtual int get_crtc_bottom() override;
 
 	// sprites
-	void draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	virtual void draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority) override;
+
+private:
+	void tmap_st0032_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 DECLARE_DEVICE_TYPE(ST0020_SPRITES, st0020_device)
+DECLARE_DEVICE_TYPE(ST0032_SPRITES, st0032_device)
 
 
 #endif // MAME_SETA_ST0020_H

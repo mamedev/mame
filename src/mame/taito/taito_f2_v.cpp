@@ -28,6 +28,11 @@ enum
 
 /***********************************************************************************/
 
+rgb_t taitof2_state::color_xbgr555(u16 data)
+{
+	return rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
+
 TC0100SCN_CB_MEMBER(mjnquest_state::tmap_cb)
 {
 	*code = (*code & 0x7fff) | (m_gfxbank << 15);

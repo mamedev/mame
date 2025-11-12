@@ -608,6 +608,7 @@ public:
 	inline u32 f_get_pt() const { return (m_flags >> F_PT_BITS) & 15; }
 
 	virtual void dump_map(std::vector<memory_entry> &map) const;
+	bool is_handler_in_map(std::vector<memory_entry> &map, offs_t begin, offs_t end, handler_entry *handler) const;
 
 	virtual std::string name() const = 0;
 	virtual void enumerate_references(handler_entry::reflist &refs) const;

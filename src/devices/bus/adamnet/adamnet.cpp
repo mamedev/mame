@@ -261,6 +261,10 @@ void adamnet_devices(device_slot_interface &device)
 {
 	device.option_add("ddp", ADAM_DDP);
 	device.option_add("fdc", ADAM_FDC);
+	device.option_add("fdc_320kb", ADAM_FDC_320KB);
+	device.option_add("fdc_a720dipi", ADAM_FDC_A720DIPI);
+	device.option_add("fdc_fp720at", ADAM_FDC_FP720AT);
+	device.option_add("fdc_mihddd", ADAM_FDC_MIHDDD);
 	device.option_add("kb", ADAM_KB);
 	device.option_add("prn", ADAM_PRN);
 	device.option_add("spi", ADAM_SPI);

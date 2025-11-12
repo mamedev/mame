@@ -87,6 +87,11 @@ void a2bus_mcms1_device::device_reset()
 	m_mcms->set_bus_device(this);
 }
 
+void a2bus_mcms1_device::reset_from_bus()
+{
+	m_mcms->reset();
+}
+
 // read once at c0n0 to disable 125 Hz IRQs
 // read once at c0n1 to enable 125 Hz IRQs
 uint8_t a2bus_mcms1_device::read_c0nx(uint8_t offset)

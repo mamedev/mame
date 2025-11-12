@@ -3,8 +3,6 @@
 const fs = require("fs");
 const path = require("path");
 
-const hasOwn = Object.prototype.hasOwnProperty;
-
 // ============================================================================
 // [Tokenizer]
 // ============================================================================
@@ -82,7 +80,6 @@ class Tokenizer {
 
 function parseEnum(input) {
   const map = Object.create(null);
-  const hasOwn = Object.prototype.hasOwnProperty;
   const tokenizer = new Tokenizer(input, tokenizerPatterns);
 
   var value = -1;
@@ -105,7 +102,7 @@ function parseEnum(input) {
         value++;
       }
 
-      if (!hasOwn.call(map, symbol))
+      if (!Object.hasOwn(map, symbol))
         map[symbol] = value;
       else
         console.log(`${symbol} already defined, skipping...`);
@@ -173,7 +170,7 @@ function stringifyEnum(map, options) {
       if (name.startsWith(stripPrefix))
         name = name.substring(stripPrefix.length);
       else
-        throw Error(`Cannot strip prefix '${stripPrefix}' in '${key}'`);
+        throw Error(`Cannot strip prefix '${stripPrefix}' in '${k}'`);
     }
 
     table.push({ name: name, value: map[k] });
@@ -231,8 +228,8 @@ function stringifyEnum(map, options) {
     return s;
   }
 
-  output += `static const char ${outputPrefix}String[] =\n` + buildStringData() + `\n`;
-  output += `static const ${indexType} ${outputPrefix}Index[] = {\n` + buildIndexData() + `};\n`;
+  output += `static const char ${outputPrefix}_data[] =\n` + buildStringData() + `\n`;
+  output += `static const ${indexType} ${outputPrefix}_index[] = {\n` + buildIndexData() + `};\n`;
 
   return output;
 }
@@ -336,7 +333,7 @@ class Generator {
       if (!enumName)
         throw Error(`Missing 'enum' in '${def[0]}`);
 
-      if (hasOwn.call(this.enumMap, enumName))
+      if (Object.hasOwn(this.enumMap, enumName))
         throw new Error(`Enumeration '${enumName}' is already defined`);
 
       const startIndex = src.lastIndexOf("\n", def.index) + 1;
@@ -378,7 +375,7 @@ class Generator {
       if (!enumName)
         throwError(`Missing 'name' in '${def[0]}`);
 
-      if (!hasOwn.call(this.enumMap, enumName))
+      if (!Object.hasOwn(this.enumMap, enumName))
         throw new Error(`Enumeration '${enumName}' not found`);
 
       console.log(`  Injecting Enum: ${enumName}`);

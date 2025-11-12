@@ -29,6 +29,7 @@ public:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
 
 protected:
 	// device_t implementation
@@ -360,6 +361,12 @@ void a2bus_pic_device::device_start()
 
 
 void a2bus_pic_device::device_reset()
+{
+	reset_from_bus();
+}
+
+
+void a2bus_pic_device::reset_from_bus()
 {
 	ioport_value const sw1(m_input_sw1->read());
 	ioport_value const x(m_input_x->read());

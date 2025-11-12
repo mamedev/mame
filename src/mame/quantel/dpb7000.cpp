@@ -145,10 +145,10 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	template <int StoreNum> uint32_t store_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t stencil_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t brush_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template <int StoreNum> u32 store_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 stencil_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 brush_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void fddcpu_map(address_map &map) ATTR_COLD;
@@ -157,11 +157,11 @@ private:
 	void tablet_program_map(address_map &map) ATTR_COLD;
 	void tablet_data_map(address_map &map) ATTR_COLD;
 
-	void csr_w(uint8_t data);
-	uint8_t csr_r();
+	void csr_w(u8 data);
+	u8 csr_r();
 
-	uint16_t cpu_ctrlbus_r();
-	void cpu_ctrlbus_w(uint16_t data);
+	u16 cpu_ctrlbus_r();
+	void cpu_ctrlbus_w(u16 data);
 
 	TIMER_CALLBACK_MEMBER(req_a_w);
 	TIMER_CALLBACK_MEMBER(req_b_w);
@@ -173,18 +173,18 @@ private:
 	int get_heads_for_disk_group(int group_index);
 	void fdd_index_callback(floppy_image_device *floppy, int state);
 	void seek_fdd_to_cylinder();
-	uint8_t fdd_ctrl_r();
-	uint8_t fdd_cmd_r();
-	void fddcpu_p1_w(uint8_t data);
-	uint8_t fddcpu_p2_r();
-	void fddcpu_p2_w(uint8_t data);
+	u8 fdd_ctrl_r();
+	u8 fdd_cmd_r();
+	void fddcpu_p1_w(u8 data);
+	u8 fddcpu_p2_r();
+	void fddcpu_p2_w(u8 data);
 	void fddcpu_debug_rx(int state);
 
-	bool handle_command(uint16_t data);
-	void store_address_w(uint8_t card, uint16_t data);
-	void combiner_reg_w(uint16_t data);
+	bool handle_command(u16 data);
+	void store_address_w(u8 card, u16 data);
+	void combiner_reg_w(u16 data);
 
-	enum : uint16_t
+	enum : u16
 	{
 		SYSCTRL_AUTO_START      = 0x0001,
 		SYSCTRL_REQ_B_EN        = 0x0020,
@@ -193,8 +193,8 @@ private:
 		SYSCTRL_REQ_B_IN        = 0x8000
 	};
 
-	uint16_t cpu_sysctrl_r();
-	void cpu_sysctrl_w(uint16_t data);
+	u16 cpu_sysctrl_r();
+	void cpu_sysctrl_w(u16 data);
 	void update_req_irqs();
 
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -203,8 +203,8 @@ private:
 	void advance_line_count();
 	void toggle_line_clock();
 	void process_sample();
-	void process_byte_from_disc(uint8_t data_byte);
-	uint8_t process_byte_to_disc();
+	void process_byte_from_disc(u8 data_byte);
+	u8 process_byte_to_disc();
 
 	required_device<m68000_device> m_maincpu;
 	required_device_array<acia6850_device, 3> m_acia;
@@ -213,8 +213,8 @@ private:
 	required_device_array<rs232_port_device, 2> m_rs232;
 	required_device<sy6545_1_device> m_crtc;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint16_t> m_vdu_ram;
-	required_region_ptr<uint8_t> m_vdu_char_rom;
+	required_shared_ptr<u16> m_vdu_ram;
+	required_region_ptr<u8> m_vdu_char_rom;
 	required_ioport m_baud_dip;
 	required_ioport m_auto_start;
 
@@ -229,13 +229,13 @@ private:
 	// Floppy Drive
 	floppy_image_device *m_floppy;
 	std::deque<int> m_fdd_debug_rx_bits;
-	uint32_t m_fdd_debug_rx_bit_count;
-	uint32_t m_fdd_debug_rx_byte_count;
-	uint32_t m_fdd_debug_rx_recv_count;
-	uint8_t m_fdd_ctrl;
-	uint8_t m_fdd_port1;
-	uint8_t m_fdd_track;
-	uint8_t m_fdd_side;
+	u32 m_fdd_debug_rx_bit_count;
+	u32 m_fdd_debug_rx_byte_count;
+	u32 m_fdd_debug_rx_recv_count;
+	u8 m_fdd_ctrl;
+	u8 m_fdd_port1;
+	u8 m_fdd_track;
+	u8 m_fdd_side;
 	fdc_pll_t m_fdd_pll;
 
 	// Timers
@@ -256,7 +256,7 @@ private:
 		FRAMESTORE_COUNT
 	};
 
-	enum : uint16_t
+	enum : u16
 	{
 		DGROUP_TYPE_INVALID0        = 0,
 		DGROUP_TYPE_80MB_CDC        = 1,
@@ -273,108 +273,108 @@ private:
 	};
 
 	// Computer Card
-	uint8_t m_csr;
-	uint16_t m_sys_ctrl;
+	u8 m_csr;
+	u16 m_sys_ctrl;
 
 	// Disc Sequencer Card
-	uint16_t m_diskseq_cyl_from_cpu;    // AE/BH
-	uint16_t m_diskseq_cmd_word_from_cpu; // DD/CC
-	uint8_t m_diskseq_cmd;
-	uint8_t m_diskseq_cmd_to_ctrl;
-	uint8_t m_diskseq_status;       // BC
+	u16 m_diskseq_cyl_from_cpu;    // AE/BH
+	u16 m_diskseq_cmd_word_from_cpu; // DD/CC
+	u8 m_diskseq_cmd;
+	u8 m_diskseq_cmd_to_ctrl;
+	u8 m_diskseq_status;       // BC
 	bool m_diskseq_cyl_read_pending;
 	bool m_diskseq_cyl_write_pending;
 	bool m_diskseq_use_hdd_pending;
-	uint16_t m_diskseq_command_stride;
+	u16 m_diskseq_command_stride;
 
 	// Disc Data Buffer Card
-	uint16_t m_diskbuf_ram_addr;
-	uint8_t m_diskbuf_ram[14 * 0x800];
-	uint16_t m_diskbuf_data_count;
+	u16 m_diskbuf_ram_addr;
+	u8 m_diskbuf_ram[14 * 0x800];
+	u16 m_diskbuf_data_count;
 
 	// Output Timing Card
-	uint16_t m_cursor_origin_x;
-	uint16_t m_cursor_origin_y;
-	uint16_t m_cursor_size_x;
-	uint16_t m_cursor_size_y;
-	uint8_t m_output_csflags;
-	uint8_t m_output_cpflags;
-	required_region_ptr<uint8_t> m_output_cursor;
-	required_region_ptr<uint8_t> m_output_hlines;
-	required_region_ptr<uint8_t> m_output_hflags;
-	required_region_ptr<uint8_t> m_output_vlines;
-	required_region_ptr<uint8_t> m_output_vflags;
+	u16 m_cursor_origin_x;
+	u16 m_cursor_origin_y;
+	u16 m_cursor_size_x;
+	u16 m_cursor_size_y;
+	u8 m_output_csflags;
+	u8 m_output_cpflags;
+	required_region_ptr<u8> m_output_cursor;
+	required_region_ptr<u8> m_output_hlines;
+	required_region_ptr<u8> m_output_hflags;
+	required_region_ptr<u8> m_output_vlines;
+	required_region_ptr<u8> m_output_vflags;
 
 	// Brush Address Card
-	required_region_ptr<uint8_t> m_brushaddr_pal;
-	uint8_t m_line_clock;
-	uint16_t m_line_count;
-	uint16_t m_line_length;
-	uint16_t m_brush_addr_func;
-	uint8_t m_brush_addr_cmd;
-	uint8_t m_bif;
-	uint8_t m_bixos;
-	uint8_t m_biyos;
-	uint16_t m_bxlen;
-	uint16_t m_bylen;
-	uint16_t m_bxlen_counter;
-	uint16_t m_bylen_counter;
-	uint8_t m_brush_press_lum;
-	uint8_t m_brush_press_chr;
-	std::unique_ptr<uint8_t[]> m_framestore_chr[2];
-	std::unique_ptr<uint8_t[]> m_framestore_lum[2];
-	std::unique_ptr<uint8_t[]> m_framestore_ext[2];
+	required_region_ptr<u8> m_brushaddr_pal;
+	u8 m_line_clock;
+	u16 m_line_count;
+	u16 m_line_length;
+	u16 m_brush_addr_func;
+	u8 m_brush_addr_cmd;
+	u8 m_bif;
+	u8 m_bixos;
+	u8 m_biyos;
+	u16 m_bxlen;
+	u16 m_bylen;
+	u16 m_bxlen_counter;
+	u16 m_bylen_counter;
+	u8 m_brush_press_lum;
+	u8 m_brush_press_chr;
+	std::unique_ptr<u8[]> m_framestore_chr[2];
+	std::unique_ptr<u8[]> m_framestore_lum[2];
+	std::unique_ptr<u8[]> m_framestore_ext[2];
 
 	// Brush Store Card
-	uint8_t m_bs_y_latch;
-	uint8_t m_bs_u_latch;
-	uint8_t m_bs_v_latch;
-	std::unique_ptr<uint8_t[]> m_brushstore_chr;
-	std::unique_ptr<uint8_t[]> m_brushstore_lum;
-	std::unique_ptr<uint8_t[]> m_brushstore_ext;
+	u8 m_bs_y_latch;
+	u8 m_bs_u_latch;
+	u8 m_bs_v_latch;
+	std::unique_ptr<u8[]> m_brushstore_chr;
+	std::unique_ptr<u8[]> m_brushstore_lum;
+	std::unique_ptr<u8[]> m_brushstore_ext;
 
 	// Store Address Card
-	uint16_t m_rhscr[2];
-	uint16_t m_rvscr[2];
-	uint16_t m_rzoom[2];
-	uint16_t m_fld_sel[2];
-	uint16_t m_window_enable[2];
-	uint16_t m_cxpos[2];
-	uint16_t m_cypos[2];
-	uint16_t m_ca0;
-	required_region_ptr<uint8_t> m_storeaddr_protx;
-	required_region_ptr<uint8_t> m_storeaddr_proty;
-	required_region_ptr<uint8_t> m_storeaddr_xlnib;
-	required_region_ptr<uint8_t> m_storeaddr_xmnib;
-	required_region_ptr<uint8_t> m_storeaddr_xhnib;
-	required_region_ptr<uint8_t> m_storeaddr_pal_blank;
+	u16 m_rhscr[2];
+	u16 m_rvscr[2];
+	u16 m_rzoom[2];
+	u16 m_fld_sel[2];
+	u16 m_window_enable[2];
+	u16 m_cxpos[2];
+	u16 m_cypos[2];
+	u16 m_ca0;
+	required_region_ptr<u8> m_storeaddr_protx;
+	required_region_ptr<u8> m_storeaddr_proty;
+	required_region_ptr<u8> m_storeaddr_xlnib;
+	required_region_ptr<u8> m_storeaddr_xmnib;
+	required_region_ptr<u8> m_storeaddr_xhnib;
+	required_region_ptr<u8> m_storeaddr_pal_blank;
 
 	// Combiner Card
-	uint8_t m_cursor_y;
-	uint8_t m_cursor_u;
-	uint8_t m_cursor_v;
-	uint8_t m_ext_store_flags;
+	u8 m_cursor_y;
+	u8 m_cursor_u;
+	u8 m_cursor_v;
+	u8 m_ext_store_flags;
 	bool m_select_matte[2];
-	uint8_t m_matte_ext[2];
-	uint8_t m_matte_y[2];
-	uint8_t m_matte_u[2];
-	uint8_t m_matte_v[2];
+	u8 m_matte_ext[2];
+	u8 m_matte_y[2];
+	u8 m_matte_u[2];
+	u8 m_matte_v[2];
 
 	// Keyboard
 	required_device<i8039_device> m_keybcpu;
 	required_ioport_array<8> m_keybc_cols;
-	uint8_t keyboard_p1_r();
-	uint8_t keyboard_p2_r();
-	void keyboard_p1_w(uint8_t data);
-	void keyboard_p2_w(uint8_t data);
+	u8 keyboard_p1_r();
+	u8 keyboard_p2_r();
+	void keyboard_p1_w(u8 data);
+	void keyboard_p2_w(u8 data);
 	int keyboard_t0_r();
 	int keyboard_t1_r();
-	uint8_t m_keybc_latched_bit;
-	uint8_t m_keybc_p1_data;
-	uint8_t m_keybc_tx;
+	u8 m_keybc_latched_bit;
+	u8 m_keybc_p1_data;
+	u8 m_keybc_tx;
 
 	// TDS Box
-	enum tds_press_state : uint32_t
+	enum tds_press_state : u32
 	{
 		STATE_IDLE,
 		STATE_PRESS_IN,
@@ -386,28 +386,28 @@ private:
 	required_device<scn2681_device> m_tds_duart;
 	required_ioport m_tds_dips;
 	required_ioport m_pen_switches;
-	uint8_t tds_p1_r();
-	uint8_t tds_p2_r();
-	uint8_t tds_p3_r();
-	uint8_t tds_p4_r();
-	void tds_p1_w(uint8_t data);
-	void tds_p2_w(uint8_t data);
-	void tds_dac_w(uint8_t data);
-	void tds_convert_w(uint8_t data);
-	uint8_t tds_adc_r();
-	uint8_t tds_pen_switches_r();
+	u8 tds_p1_r();
+	u8 tds_p2_r();
+	u8 tds_p3_r();
+	u8 tds_p4_r();
+	void tds_p1_w(u8 data);
+	void tds_p2_w(u8 data);
+	void tds_dac_w(u8 data);
+	void tds_convert_w(u8 data);
+	u8 tds_adc_r();
+	u8 tds_pen_switches_r();
 	void duart_b_w(int state);
 	TIMER_CALLBACK_MEMBER(tablet_tx_tick);
 	TIMER_CALLBACK_MEMBER(tds_adc_tick);
 	TIMER_CALLBACK_MEMBER(tds_press_tick);
-	uint8_t m_tds_dac_value;
-	uint8_t m_tds_dac_offset;
+	u8 m_tds_dac_value;
+	u8 m_tds_dac_offset;
 	float m_tds_dac_percent;
 	bool m_tds_adc_busy;
-	uint8_t m_tds_adc_value;
-	uint8_t m_tds_p1_data;
-	uint32_t m_tds_press_state;
-	uint8_t m_tds_pressure_shift;
+	u8 m_tds_adc_value;
+	u8 m_tds_p1_data;
+	u32 m_tds_press_state;
+	u8 m_tds_pressure_shift;
 	emu_timer *m_tds_adc_timer;
 	emu_timer *m_tds_press_timer;
 	bool m_tds_in_proximity;
@@ -418,26 +418,26 @@ private:
 	required_ioport m_pen_x;
 	required_ioport m_pen_y;
 	required_ioport m_pen_press;
-	uint8_t tablet_p2_r(offs_t offset, uint8_t mem_mask);
-	void tablet_p2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint8_t tablet_p3_r(offs_t offset, uint8_t mem_mask);
-	void tablet_p3_w(offs_t offset, uint8_t data, uint8_t mem_mask);
+	u8 tablet_p2_r(offs_t offset, u8 mem_mask);
+	void tablet_p2_w(offs_t offset, u8 data, u8 mem_mask);
+	u8 tablet_p3_r(offs_t offset, u8 mem_mask);
+	void tablet_p3_w(offs_t offset, u8 data, u8 mem_mask);
 	TIMER_CALLBACK_MEMBER(tablet_irq_tick);
-	uint8_t tablet_rdl_r();
-	uint8_t tablet_rdh_r();
-	uint8_t m_tablet_p2_data;
-	uint8_t m_tablet_p3_data;
-	uint8_t m_tablet_mux;
-	uint8_t m_tablet_drq;
-	uint16_t m_tablet_dip_shifter;
-	uint16_t m_tablet_counter_latch;
+	u8 tablet_rdl_r();
+	u8 tablet_rdh_r();
+	u8 m_tablet_p2_data;
+	u8 m_tablet_p3_data;
+	u8 m_tablet_mux;
+	u8 m_tablet_drq;
+	u16 m_tablet_dip_shifter;
+	u16 m_tablet_counter_latch;
 	emu_timer *m_tablet_tx_timer;
 	emu_timer *m_tablet_irq_timer;
-	uint8_t m_tablet_tx_bit;
-	uint16_t m_tablet_pen_x;
-	uint16_t m_tablet_pen_y;
-	uint16_t m_tablet_pen_switches;
-	uint8_t m_tablet_state;
+	u8 m_tablet_tx_bit;
+	u16 m_tablet_pen_x;
+	u16 m_tablet_pen_y;
+	u16 m_tablet_pen_switches;
+	u8 m_tablet_state;
 
 	// Table HLE
 	TIMER_CALLBACK_MEMBER(tablet_hle_tick);
@@ -445,32 +445,32 @@ private:
 	emu_timer *m_tablet_hle_timer;
 
 	// Filter Card
-	int8_t m_filter_x_coeffs[12];
-	int8_t m_filter_y_coeffs[8];
-	uint8_t m_incoming_lum;
-	uint8_t m_incoming_chr;
+	s8 m_filter_x_coeffs[12];
+	s8 m_filter_y_coeffs[8];
+	u8 m_incoming_lum;
+	u8 m_incoming_chr;
 	bool m_buffer_lum;
 
 	// Size Card
-	uint32_t m_size_dsx_ddx;
-	uint32_t m_size_dsy_ddx;
-	uint32_t m_size_dsx_ddy;
-	uint32_t m_size_dsy_ddy;
-	uint8_t m_size_frac_origin_sx_dx;
-	uint8_t m_size_frac_origin_sy_dx;
-	uint8_t m_size_frac_origin_sx_dy;
-	uint8_t m_size_frac_origin_sy_dy;
-	int16_t m_size_dxdx_counter;
-	int16_t m_size_dydy_counter;
-	uint16_t m_size_dest_x;
-	uint16_t m_size_dest_y;
+	u32 m_size_dsx_ddx;
+	u32 m_size_dsy_ddx;
+	u32 m_size_dsx_ddy;
+	u32 m_size_dsy_ddy;
+	u8 m_size_frac_origin_sx_dx;
+	u8 m_size_frac_origin_sy_dx;
+	u8 m_size_frac_origin_sx_dy;
+	u8 m_size_frac_origin_sy_dy;
+	s16 m_size_dxdx_counter;
+	s16 m_size_dydy_counter;
+	u16 m_size_dest_x;
+	u16 m_size_dest_y;
 
 	// Brush Processor Card
-	required_region_ptr<uint8_t> m_brushproc_prom;
-	required_region_ptr<uint16_t> m_brushproc_pal;
+	required_region_ptr<u8> m_brushproc_prom;
+	required_region_ptr<u16> m_brushproc_pal;
 
 	// Utility
-	std::unique_ptr<uint32_t[]> m_yuv_lut;
+	std::unique_ptr<u32[]> m_yuv_lut;
 };
 
 void dpb7000_state::main_map(address_map &map)
@@ -829,9 +829,9 @@ void dpb7000_state::machine_start()
 	// Frame Store Cards, 640x1024
 	for (int i = 0; i < 2; i++)
 	{
-		m_framestore_chr[i] = std::make_unique<uint8_t[]>(10 * 0x10000);
-		m_framestore_lum[i] = std::make_unique<uint8_t[]>(10 * 0x10000);
-		m_framestore_ext[i] = std::make_unique<uint8_t[]>(10 * 0x10000);
+		m_framestore_chr[i] = std::make_unique<u8[]>(10 * 0x10000);
+		m_framestore_lum[i] = std::make_unique<u8[]>(10 * 0x10000);
+		m_framestore_ext[i] = std::make_unique<u8[]>(10 * 0x10000);
 	}
 	save_pointer(&m_framestore_chr[0][0], "m_framestore_chr[0]", 10 * 0x10000);
 	save_pointer(&m_framestore_lum[0][0], "m_framestore_lum[0]", 10 * 0x10000);
@@ -844,9 +844,9 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_bs_y_latch));
 	save_item(NAME(m_bs_u_latch));
 	save_item(NAME(m_bs_v_latch));
-	m_brushstore_chr = std::make_unique<uint8_t[]>(0x10000);
-	m_brushstore_lum = std::make_unique<uint8_t[]>(0x10000);
-	m_brushstore_ext = std::make_unique<uint8_t[]>(0x10000);
+	m_brushstore_chr = std::make_unique<u8[]>(0x10000);
+	m_brushstore_lum = std::make_unique<u8[]>(0x10000);
+	m_brushstore_ext = std::make_unique<u8[]>(0x10000);
 	save_pointer(&m_brushstore_chr[0], "m_brushstore_chr", 0x10000);
 	save_pointer(&m_brushstore_lum[0], "m_brushstore_lum", 0x10000);
 	save_pointer(&m_brushstore_ext[0], "m_brushstore_ext", 0x10000);
@@ -931,19 +931,19 @@ void dpb7000_state::machine_start()
 	m_tablet_hle_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::tablet_hle_tick), this));
 	m_tablet_hle_timer->adjust(attotime::never);
 
-	m_yuv_lut = std::make_unique<uint32_t[]>(0x1000000);
-	for (uint16_t u = 0; u < 256; u++)
+	m_yuv_lut = std::make_unique<u32[]>(0x1000000);
+	for (u16 u = 0; u < 256; u++)
 	{
-		for (uint16_t v = 0; v < 256; v++)
+		for (u16 v = 0; v < 256; v++)
 		{
-			for (uint16_t y = 0; y < 256; y++)
+			for (u16 y = 0; y < 256; y++)
 			{
 				float fr = y + 1.4075f * (v - 128);
 				float fg = y - 0.3455f * (u - 128) - (0.7169f * (v - 128));
 				float fb = y + 1.7790f * (u - 128);
-				uint8_t r = (fr < 0.0f) ? 0 : (fr > 255.0f ? 255 : (uint8_t)fr);
-				uint8_t g = (fg < 0.0f) ? 0 : (fg > 255.0f ? 255 : (uint8_t)fg);
-				uint8_t b = (fb < 0.0f) ? 0 : (fb > 255.0f ? 255 : (uint8_t)fb);
+				u8 r = (fr < 0.0f) ? 0 : (fr > 255.0f ? 255 : (u8)fr);
+				u8 g = (fg < 0.0f) ? 0 : (fg > 255.0f ? 255 : (u8)fg);
+				u8 b = (fb < 0.0f) ? 0 : (fb > 255.0f ? 255 : (u8)fb);
 				m_yuv_lut[(u << 16) | (v << 8) | y] = 0xff000000 | (r << 16) | (g << 8) | b;
 			}
 		}
@@ -1123,9 +1123,9 @@ MC6845_UPDATE_ROW(dpb7000_state::crtc_update_row)
 
 	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t code = (uint8_t)m_vdu_ram[((ma + column) & 0x7ff)];
-		uint16_t addr = code << 4 | (ra & 0x0f);
-		uint8_t data = m_vdu_char_rom[addr & 0xfff];
+		u8 code = (u8)m_vdu_ram[((ma + column) & 0x7ff)];
+		u16 addr = code << 4 | (ra & 0x0f);
+		u8 data = m_vdu_char_rom[addr & 0xfff];
 
 		if (column == cursor_x)
 		{
@@ -1148,21 +1148,21 @@ MC6845_ON_UPDATE_ADDR_CHANGED(dpb7000_state::crtc_addr_changed)
 {
 }
 
-void dpb7000_state::csr_w(uint8_t data)
+void dpb7000_state::csr_w(u8 data)
 {
 	LOGMASKED(LOG_CSR, "%s: Card Select write: %02x (%04x)\n", machine().describe_context(), data & 0x0f, data);
 	m_csr = data & 0x0f;
 }
 
-uint8_t dpb7000_state::csr_r()
+u8 dpb7000_state::csr_r()
 {
 	LOGMASKED(LOG_CSR, "%s: Card Select read(?): %02x\n", machine().describe_context(), m_csr);
 	return m_csr;
 }
 
-uint16_t dpb7000_state::cpu_ctrlbus_r()
+u16 dpb7000_state::cpu_ctrlbus_r()
 {
-	uint16_t ret = 0;
+	u16 ret = 0;
 	switch (m_csr)
 	{
 	case 0:
@@ -1186,11 +1186,11 @@ uint16_t dpb7000_state::cpu_ctrlbus_r()
 	{
 		if (m_brush_addr_cmd == 3) // Framestore Read
 		{
-			const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
-			const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
+			const u16 x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
+			const u16 y = m_cypos[1] + (m_bylen_counter - m_bylen);
 
-			uint32_t pix_idx = y * 800 + x;
-			uint8_t &chr = m_ca0 ? m_bs_v_latch : m_bs_u_latch;
+			u32 pix_idx = y * 800 + x;
+			u8 &chr = m_ca0 ? m_bs_v_latch : m_bs_u_latch;
 			if (!BIT(m_brush_addr_func, 5))
 			{
 				if (BIT(m_brush_addr_func, 7))
@@ -1222,15 +1222,15 @@ uint16_t dpb7000_state::cpu_ctrlbus_r()
 			}
 		}
 
-		uint16_t data = (uint16_t)m_bs_y_latch;
+		u16 data = (u16)m_bs_y_latch;
 		if (m_ca0)
 		{
-			data |= (uint16_t)m_bs_v_latch << 8;
+			data |= (u16)m_bs_v_latch << 8;
 			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Store Card color latches read (VY): %04x\n\n", machine().describe_context(), data);
 		}
 		else
 		{
-			data |= (uint16_t)m_bs_u_latch << 8;
+			data |= (u16)m_bs_u_latch << 8;
 			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Store Card color latches read (UY): %04x\n", machine().describe_context(), data);
 		}
 		m_ca0 = 1 - m_ca0;
@@ -1254,7 +1254,7 @@ uint16_t dpb7000_state::cpu_ctrlbus_r()
 	return ret;
 }
 
-void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
+void dpb7000_state::store_address_w(u8 card, u16 data)
 {
 	switch ((data >> 12) & 7)
 	{
@@ -1302,79 +1302,79 @@ void dpb7000_state::store_address_w(uint8_t card, uint16_t data)
 	}
 }
 
-void dpb7000_state::combiner_reg_w(uint16_t data)
+void dpb7000_state::combiner_reg_w(u16 data)
 {
-	const uint8_t reg_idx = (data >> 10) & 0xf;
+	const u8 reg_idx = (data >> 10) & 0xf;
 	switch (reg_idx)
 	{
 		case 0: // Output Timing CS Flags
-			LOGMASKED(LOG_OUTPUT_TIMING, "%s: Output Timing Card CS Register write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_output_csflags = (uint8_t)(data & 0x0003);
+			LOGMASKED(LOG_OUTPUT_TIMING, "%s: Output Timing Card CS Register write: %02x\n", machine().describe_context(), (u8)data);
+			m_output_csflags = (u8)(data & 0x0003);
 			break;
 		case 1: // CY
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Constant Y write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_cursor_y = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Constant Y write: %02x\n", machine().describe_context(), (u8)data);
+			m_cursor_y = (u8)data;
 			break;
 		case 2: // CV
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Constant V write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_cursor_v = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Constant V write: %02x\n", machine().describe_context(), (u8)data);
+			m_cursor_v = (u8)data;
 			break;
 		case 3: // CU
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Constant U write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_cursor_u = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Constant U write: %02x\n", machine().describe_context(), (u8)data);
+			m_cursor_u = (u8)data;
 			break;
 		case 4: // ES
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Ext. Store Flags (ES) write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_ext_store_flags = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Ext. Store Flags (ES) write: %02x\n", machine().describe_context(), (u8)data);
+			m_ext_store_flags = (u8)data;
 			break;
 		case 5: // EI
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Ext I Matte (EI) write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_matte_ext[0] = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Ext I Matte (EI) write: %02x\n", machine().describe_context(), (u8)data);
+			m_matte_ext[0] = (u8)data;
 			break;
 		case 6: // EII
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Ext II Matte (EII) write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_matte_ext[1] = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Ext II Matte (EII) write: %02x\n", machine().describe_context(), (u8)data);
+			m_matte_ext[1] = (u8)data;
 			break;
 		case 7: // Output Timing CP Flags
-			LOGMASKED(LOG_OUTPUT_TIMING, "%s: Output Timing Card CP Register write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_output_cpflags = (uint8_t)(data & 0x001f);
+			LOGMASKED(LOG_OUTPUT_TIMING, "%s: Output Timing Card CP Register write: %02x\n", machine().describe_context(), (u8)data);
+			m_output_cpflags = (u8)(data & 0x001f);
 			break;
 		case 8: // IS
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I Select (IS) write: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I Select (IS) write: %02x\n", machine().describe_context(), (u8)data);
 			m_select_matte[0] = BIT(data, 0);
 			break;
 		case 9: // IY
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I Y (IY) write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_matte_y[0] = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I Y (IY) write: %02x\n", machine().describe_context(), (u8)data);
+			m_matte_y[0] = (u8)data;
 			break;
 		case 10: // IU
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I U (IU) write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_matte_u[0] = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I U (IU) write: %02x\n", machine().describe_context(), (u8)data);
+			m_matte_u[0] = (u8)data;
 			break;
 		case 11: // IV
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I V (IV) write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_matte_v[0] = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte I V (IV) write: %02x\n", machine().describe_context(), (u8)data);
+			m_matte_v[0] = (u8)data;
 			break;
 		case 12: // IIS
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II Select (IIS) write: %02x\n", machine().describe_context(), (uint8_t)data);
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II Select (IIS) write: %02x\n", machine().describe_context(), (u8)data);
 			m_select_matte[1] = BIT(data, 0);
 			break;
 		case 13: // IIY
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II Y (IIY) write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_matte_y[1] = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II Y (IIY) write: %02x\n", machine().describe_context(), (u8)data);
+			m_matte_y[1] = (u8)data;
 			break;
 		case 14: // IIU
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II U (IIU) write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_matte_u[1] = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II U (IIU) write: %02x\n", machine().describe_context(), (u8)data);
+			m_matte_u[1] = (u8)data;
 			break;
 		case 15: // IIV
-			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II V (IIV) write: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_matte_v[1] = (uint8_t)data;
+			LOGMASKED(LOG_COMBINER, "%s: Combiner Card Matte II V (IIV) write: %02x\n", machine().describe_context(), (u8)data);
+			m_matte_v[1] = (u8)data;
 			break;
 	}
 }
 
-bool dpb7000_state::handle_command(uint16_t data)
+bool dpb7000_state::handle_command(u16 data)
 {
 	//printf("handle_command %d, cxpos %d, cypos %d\n", m_brush_addr_cmd, m_cxpos[1], m_cypos[1]);
 	switch (m_brush_addr_cmd)
@@ -1403,16 +1403,16 @@ bool dpb7000_state::handle_command(uint16_t data)
 	        if (!BIT(data, 5 + i))
 	        {
 	            m_bylen_counter = m_bylen;
-	            for (uint16_t y = m_cypos[1]; m_bylen_counter != 0x1000; m_bylen_counter++, y = (y + 1) & 0xfff)
+	            for (u16 y = m_cypos[1]; m_bylen_counter != 0x1000; m_bylen_counter++, y = (y + 1) & 0xfff)
 	            {
 	                if (y >= 768)
 	                    continue;
 
-	                uint8_t *lum = &m_framestore_lum[i][y * 800];
-	                uint8_t *chr = &m_framestore_chr[i][y * 800];
-	                uint8_t *ext = &m_framestore_ext[i][y * 800];
+	                u8 *lum = &m_framestore_lum[i][y * 800];
+	                u8 *chr = &m_framestore_chr[i][y * 800];
+	                u8 *ext = &m_framestore_ext[i][y * 800];
 	                m_bxlen_counter = m_bxlen;
-	                for (uint16_t x = m_cxpos[1]; m_bxlen_counter != 0x1000; m_bxlen_counter++, x = (x + 1) & 0xfff)
+	                for (u16 x = m_cxpos[1]; m_bxlen_counter != 0x1000; m_bxlen_counter++, x = (x + 1) & 0xfff)
 	                {
 	                    if (x >= 800)
 	                        continue;
@@ -1438,13 +1438,13 @@ bool dpb7000_state::handle_command(uint16_t data)
 		const bool s1_disable = BIT(data, 5);
 		const bool s2_disable = BIT(data, 6);
 
-		const uint16_t sel_1 = (uint16_t)s1_disable << 5;
-		const uint16_t sel_2 = (uint16_t)s2_disable << 4;
-		const uint16_t sel_ext = ext_en << 6;
-		const uint16_t fcs = BIT(data, 13);
+		const u16 sel_1 = (u16)s1_disable << 5;
+		const u16 sel_2 = (u16)s2_disable << 4;
+		const u16 sel_ext = ext_en << 6;
+		const u16 fcs = BIT(data, 13);
 
-		const uint16_t prom_addr = (fcs << 8) | (use_brush ? 0x80 : 0x00) | sel_ext | sel_1 | sel_2 | bitswap<4>(data, 1, 2, 3, 4);
-		const uint8_t prom_data = m_brushproc_prom[prom_addr];
+		const u16 prom_addr = (fcs << 8) | (use_brush ? 0x80 : 0x00) | sel_ext | sel_1 | sel_2 | bitswap<4>(data, 1, 2, 3, 4);
+		const u8 prom_data = m_brushproc_prom[prom_addr];
 
 		const bool brush_zero = BIT(data, 12);
 		const bool oe1 = BIT(prom_data, 0);
@@ -1459,20 +1459,20 @@ bool dpb7000_state::handle_command(uint16_t data)
 		const bool word_width = BIT(prom_data, 4);
 		const bool use_k_data = BIT(~prom_data, 6);
 		const bool brush_invert = BIT(~data, 11);
-		const uint16_t pal_addr_extra = (BIT(prom_data, 5) << 8) | (brush_invert << 9);
+		const u16 pal_addr_extra = (BIT(prom_data, 5) << 8) | (brush_invert << 9);
 
-		const uint16_t brushaddr_pal_addr = (uint16_t)bitswap<4>(data, 1, 2, 3, 4) | (1 << 4) | (1 << 5) | (0 << 7) | (BIT(data, 5) << 8) | (1 << 9) | (1 << 10);
-		const uint8_t brushaddr_pal_val = m_brushaddr_pal[brushaddr_pal_addr];
+		const u16 brushaddr_pal_addr = (u16)bitswap<4>(data, 1, 2, 3, 4) | (1 << 4) | (1 << 5) | (0 << 7) | (BIT(data, 5) << 8) | (1 << 9) | (1 << 10);
+		const u8 brushaddr_pal_val = m_brushaddr_pal[brushaddr_pal_addr];
 
 		int ext_idx = BIT(brushaddr_pal_val, 1) ? 1 : 0;
 
-		uint8_t *store_1[2] = { &m_framestore_lum[0][0], &m_framestore_chr[0][0] };
-		uint8_t *store_2[2] = { &m_framestore_lum[1][0], &m_framestore_chr[1][0] };
-		uint8_t pressure[2] = { m_brush_press_lum, m_brush_press_chr };
+		u8 *store_1[2] = { &m_framestore_lum[0][0], &m_framestore_chr[0][0] };
+		u8 *store_2[2] = { &m_framestore_lum[1][0], &m_framestore_chr[1][0] };
+		u8 pressure[2] = { m_brush_press_lum, m_brush_press_chr };
 
-		uint16_t bxlen = m_bxlen;//(((m_bxlen << 3) | (m_bixos & 7)) >> (m_bif & 3)) & 0xfff;
-		uint16_t bylen = m_bylen;//(((m_bylen << 3) | (m_biyos & 7)) >> ((m_bif >> 2) & 3)) & 0xfff;
-		//uint16_t width = 0x1000 - bxlen;
+		u16 bxlen = m_bxlen;//(((m_bxlen << 3) | (m_bixos & 7)) >> (m_bif & 3)) & 0xfff;
+		u16 bylen = m_bylen;//(((m_bylen << 3) | (m_biyos & 7)) >> ((m_bif >> 2) & 3)) & 0xfff;
+		//u16 width = 0x1000 - bxlen;
 		//if (m_brush_addr_cmd == 8)
 		m_ca0 = 0;
 		//printf("\n%sing %dx%d brush at %d,%d (data %04x) (Store %d)\n", m_brush_addr_cmd == 8 ? "Draw" : "Wip", 0x1000 - m_bxlen, 0x1000 - m_bylen, m_cxpos[1], m_cypos[1], data, !s1_disable ? 1 : (!s2_disable ? 2 : 0));
@@ -1484,28 +1484,28 @@ bool dpb7000_state::handle_command(uint16_t data)
 			LOGMASKED(LOG_BRUSH_DRAWS, "    PROMAddr:%03x PROMVal:%02x OE1:%d OE2:%d OE3:%d OE4:%d MSEL:%d 16BIT:%d\n", prom_addr, prom_data, oe1, oe2, oe3, oe4, mask_sel, word_width);
 		}
 
-		for (uint16_t y = m_cypos[1], bly = bylen; bly != 0x1000; bly++, y = (y + 1) & 0xfff)
+		for (u16 y = m_cypos[1], bly = bylen; bly != 0x1000; bly++, y = (y + 1) & 0xfff)
 		{
 			if (y >= 768)
 				continue;
 
-			uint32_t line_idx = y * 800;
-			for (uint16_t x = m_cxpos[1], blx = bxlen; blx != 0x1000; blx++, x = (x + 1) & 0xfff)
+			u32 line_idx = y * 800;
+			for (u16 x = m_cxpos[1], blx = bxlen; blx != 0x1000; blx++, x = (x + 1) & 0xfff)
 			{
 				if (x >= 800)
 					continue;
 
 				if (m_output_cpflags & 0x0c)
 				{
-					const uint16_t x_nib_addr = (x >> 1) & 0x3ff;
-					uint16_t x_xlnib = m_storeaddr_xlnib[x_nib_addr] & 0xe;
-					uint16_t x_xmnib = (m_storeaddr_xmnib[x_nib_addr] & 0x0f) << 4;
-					uint16_t x_xhnib = (m_storeaddr_xhnib[x_nib_addr] & 0x0f) << 8;
-					uint16_t remapped_x = x_xhnib | x_xmnib | x_xlnib | (x & 1);
+					const u16 x_nib_addr = (x >> 1) & 0x3ff;
+					u16 x_xlnib = m_storeaddr_xlnib[x_nib_addr] & 0xe;
+					u16 x_xmnib = (m_storeaddr_xmnib[x_nib_addr] & 0x0f) << 4;
+					u16 x_xhnib = (m_storeaddr_xhnib[x_nib_addr] & 0x0f) << 8;
+					u16 remapped_x = x_xhnib | x_xmnib | x_xlnib | (x & 1);
 
-					uint16_t prot_addr = (BIT(~m_output_cpflags, 2) << 8) | (BIT(~m_output_cpflags, 3) << 9);
-					uint16_t prot_x_addr = (remapped_x >> 4) & 0xff;
-					uint16_t prot_y_addr = ((y - 8) >> 2) & 0xff;
+					u16 prot_addr = (BIT(~m_output_cpflags, 2) << 8) | (BIT(~m_output_cpflags, 3) << 9);
+					u16 prot_x_addr = (remapped_x >> 4) & 0xff;
+					u16 prot_y_addr = ((y - 8) >> 2) & 0xff;
 					const bool prot_x = m_storeaddr_protx[prot_addr | prot_x_addr] & 1;
 					const bool prot_y = m_storeaddr_proty[prot_addr | prot_y_addr] & 1;
 
@@ -1516,13 +1516,13 @@ bool dpb7000_state::handle_command(uint16_t data)
 					}
 				}
 
-				uint32_t pix_idx = line_idx + x;
+				u32 pix_idx = line_idx + x;
 
-				uint8_t uv_bsel = x & 1;
+				u8 uv_bsel = x & 1;
 
-				uint8_t fixed_chr = (uv_bsel ? m_bs_v_latch : m_bs_u_latch);
-				uint8_t brush_values[2] = { m_bs_y_latch, fixed_chr };
-				uint8_t brush_ext = 0xff;
+				u8 fixed_chr = (uv_bsel ? m_bs_v_latch : m_bs_u_latch);
+				u8 brush_values[2] = { m_bs_y_latch, fixed_chr };
+				u8 brush_ext = 0xff;
 
 				if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 				{
@@ -1530,11 +1530,11 @@ bool dpb7000_state::handle_command(uint16_t data)
 				}
 				if (use_brush)
 				{
-					uint16_t bx = ((((blx - bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
-					uint16_t by = ((((bly - bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
-					uint16_t uv_bx = ((x & 1) ? (bx | 1) : (bx & ~1));
-					uint8_t brush_lum = m_brushstore_lum[by * 256 + bx];
-					uint8_t brush_chr = m_brushstore_chr[by * 256 + uv_bx];
+					u16 bx = ((((blx - bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
+					u16 by = ((((bly - bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
+					u16 uv_bx = ((x & 1) ? (bx | 1) : (bx & ~1));
+					u8 brush_lum = m_brushstore_lum[by * 256 + bx];
+					u8 brush_chr = m_brushstore_chr[by * 256 + uv_bx];
 					brush_ext = ext_en ? m_brushstore_ext[by * 256 + bx] : brush_lum;
 					brush_values[0] = (fcs || !lum_en) ? m_bs_y_latch : brush_lum;
 					brush_values[1] = (fcs || !chr_en) ? fixed_chr : brush_chr;
@@ -1551,33 +1551,33 @@ bool dpb7000_state::handle_command(uint16_t data)
 
 				for (int ch = 0; ch < 2; ch++)
 				{
-					uint8_t s1_data = store_1[ch][pix_idx];
-					uint8_t s2_data = store_2[ch][pix_idx];
-					//uint8_t sext_data = m_framestore_ext[!s2_disable ? 1 : 0][pix_idx];
-					uint8_t sext_data = m_framestore_ext[ext_idx][pix_idx];
+					u8 s1_data = store_1[ch][pix_idx];
+					u8 s2_data = store_2[ch][pix_idx];
+					//u8 sext_data = m_framestore_ext[!s2_disable ? 1 : 0][pix_idx];
+					u8 sext_data = m_framestore_ext[ext_idx][pix_idx];
 
-					uint8_t brush_data = brush_values[ch];
-					uint8_t brush_ext_data = use_k_data ? brush_ext : 0xff;
-					uint8_t other_data = 0x00;
-					uint8_t pressure_data = pressure[ch];
-					uint8_t press_product = (uint8_t)((brush_ext_data * pressure_data + 0x0080) >> 8);
+					u8 brush_data = brush_values[ch];
+					u8 brush_ext_data = use_k_data ? brush_ext : 0xff;
+					u8 other_data = 0x00;
+					u8 pressure_data = pressure[ch];
+					u8 press_product = (u8)((brush_ext_data * pressure_data + 0x0080) >> 8);
 					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 					{
 						LOGMASKED(LOG_BRUSH_DRAWS, "        brush ext (%02x) * pressure (%02x) = %02x\n", brush_ext_data, pressure_data, press_product);
 					}
 
-					uint8_t mask_multiplicand = 0x00;
+					u8 mask_multiplicand = 0x00;
 					if (brush_zero)
 						mask_multiplicand = (mask_sel ? sext_data : 0xff);
 
-					uint8_t press_result = (uint8_t)((press_product * mask_multiplicand + 0x0080) >> 8);
+					u8 press_result = (u8)((press_product * mask_multiplicand + 0x0080) >> 8);
 					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 					{
 						LOGMASKED(LOG_BRUSH_DRAWS, "        press product (%02x) * mask multiplicand (%02x) = %02x\n\n", press_product, mask_multiplicand, press_result);
 					}
-					uint16_t pal_addr = (uint8_t)bitswap<8>(press_result, 0, 1, 2, 3, 4, 5, 6, 7) | pal_addr_extra;
-					uint16_t pal_data = m_brushproc_pal[pal_addr];
-					uint8_t pal_value = (uint8_t)pal_data;
+					u16 pal_addr = (u8)bitswap<8>(press_result, 0, 1, 2, 3, 4, 5, 6, 7) | pal_addr_extra;
+					u16 pal_data = m_brushproc_pal[pal_addr];
+					u8 pal_value = (u8)pal_data;
 					bool pal_sel = BIT(pal_data, 8);
 					bool pal_invert = BIT(pal_data, 9);
 
@@ -1620,10 +1620,10 @@ bool dpb7000_state::handle_command(uint16_t data)
 						LOGMASKED(LOG_BRUSH_DRAWS, "        Before-comp brush data %02x, other data %02x\n", brush_data, other_data);
 					}
 
-					uint8_t comp_a = brush_data;
-					uint8_t comp_b = other_data;
+					u8 comp_a = brush_data;
+					u8 comp_b = other_data;
 
-					uint8_t alu_out = 0x00;
+					u8 alu_out = 0x00;
 					bool final_add = false;
 					if (comp_a < comp_b)
 					{
@@ -1646,18 +1646,18 @@ bool dpb7000_state::handle_command(uint16_t data)
 					if (pal_invert)
 						brush_data = ~brush_data;
 
-					uint16_t out_product = (uint16_t)alu_out * (uint16_t)pal_value;
+					u16 out_product = (u16)alu_out * (u16)pal_value;
 					if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 					{
 						LOGMASKED(LOG_BRUSH_DRAWS, "        ALU out %02x, out product %04x (%02x * %02x), PALSel:%d, PALInv:%d\n", alu_out, out_product, alu_out, pal_value, pal_sel, pal_invert);
 					}
-					uint8_t final_msb = 0;
-					uint8_t final_lsb = 0;
+					u8 final_msb = 0;
+					u8 final_lsb = 0;
 					if (!word_width)
 					{
-						uint16_t alu_a = (other_data << 8) | s2_data;
-						uint16_t alu_b = out_product;
-						uint16_t final_alu_out = (final_add ? (alu_a + alu_b) : (alu_a - alu_b));
+						u16 alu_a = (other_data << 8) | s2_data;
+						u16 alu_b = out_product;
+						u16 final_alu_out = (final_add ? (alu_a + alu_b) : (alu_a - alu_b));
 
 						final_msb = (pal_sel ? (final_alu_out >> 8) : brush_data);
 						final_lsb = final_msb;
@@ -1676,11 +1676,11 @@ bool dpb7000_state::handle_command(uint16_t data)
 					}
 					else
 					{
-						uint16_t alu_a = (other_data << 8) | s2_data;
-						uint16_t alu_b = out_product;
-						uint16_t final_alu_out = (final_add ? (alu_a + alu_b) : (alu_a - alu_b));
+						u16 alu_a = (other_data << 8) | s2_data;
+						u16 alu_b = out_product;
+						u16 final_alu_out = (final_add ? (alu_a + alu_b) : (alu_a - alu_b));
 						final_msb = (pal_sel ? (final_alu_out >> 8) : brush_data);
-						final_lsb = (uint8_t)final_alu_out;
+						final_lsb = (u8)final_alu_out;
 
 						if ((m_cxpos[1] == 0x16 && m_cypos[1] == 0xda) || (m_cxpos[1] == 0x216 && m_cypos[1] == 0x58) || data == 0x39d1)
 						{
@@ -1750,9 +1750,9 @@ bool dpb7000_state::handle_command(uint16_t data)
 		break;
 	case 12: // Copy to Brush Store
 	{
-		uint8_t *store_lum = !BIT(data, 5) ? &m_framestore_lum[0][0] : (!BIT(data, 6) ? &m_framestore_lum[1][0] : nullptr);
-		uint8_t *store_chr = !BIT(data, 5) ? &m_framestore_chr[0][0] : (!BIT(data, 6) ? &m_framestore_chr[1][0] : nullptr);
-		uint8_t *store_ext = !BIT(data, 5) ? &m_framestore_ext[0][0] : (!BIT(data, 6) ? &m_framestore_ext[1][0] : nullptr);
+		u8 *store_lum = !BIT(data, 5) ? &m_framestore_lum[0][0] : (!BIT(data, 6) ? &m_framestore_lum[1][0] : nullptr);
+		u8 *store_chr = !BIT(data, 5) ? &m_framestore_chr[0][0] : (!BIT(data, 6) ? &m_framestore_chr[1][0] : nullptr);
+		u8 *store_ext = !BIT(data, 5) ? &m_framestore_ext[0][0] : (!BIT(data, 6) ? &m_framestore_ext[1][0] : nullptr);
 		if (!BIT(data, 7) || true)
 			store_lum = nullptr;
 		if (!BIT(data, 8))
@@ -1761,21 +1761,21 @@ bool dpb7000_state::handle_command(uint16_t data)
 			store_ext = nullptr;
 
 		m_ca0 = 0;
-		for (uint32_t y = m_cypos[1], bly = m_bylen; bly != 0x1000; bly++, y = (y + 1) & 0xfff)
+		for (u32 y = m_cypos[1], bly = m_bylen; bly != 0x1000; bly++, y = (y + 1) & 0xfff)
 		{
 			if (y >= 256)
 				continue;
 
-			const uint32_t line_idx = y * 800;
-			for (uint32_t x = m_cxpos[1], blx = m_bxlen; blx != 0x1000; blx++, x = (x + 1) & 0xfff)
+			const u32 line_idx = y * 800;
+			for (u32 x = m_cxpos[1], blx = m_bxlen; blx != 0x1000; blx++, x = (x + 1) & 0xfff)
 			{
 				if (x >= 256)
 					continue;
 
-				const uint32_t pix_idx = line_idx + x;
-				const uint16_t bx = x;//((((blx - m_bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
-				const uint16_t by = y;//((((bly - m_bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
-				const uint16_t uv_bx = ((x & 1) ? (bx | 1) : (bx & ~1));
+				const u32 pix_idx = line_idx + x;
+				const u16 bx = x;//((((blx - m_bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
+				const u16 by = y;//((((bly - m_bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
+				const u16 uv_bx = ((x & 1) ? (bx | 1) : (bx & ~1));
 				if (store_lum)
 					m_brushstore_lum[by * 256 + bx] = store_lum[pix_idx];
 				if (store_chr)
@@ -1799,7 +1799,7 @@ bool dpb7000_state::handle_command(uint16_t data)
 	return true;
 }
 
-void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
+void dpb7000_state::cpu_ctrlbus_w(u16 data)
 {
 	switch (m_csr)
 	{
@@ -1838,7 +1838,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 	case 1: // Disk Sequencer Card, disk access
 	{
-		const uint8_t hi_nybble = data >> 12;
+		const u8 hi_nybble = data >> 12;
 		if (hi_nybble == 0)
 		{
 			m_diskseq_cyl_from_cpu = data & 0x3ff;
@@ -2139,7 +2139,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		if (BIT(data, 15))
 		{
 			static const char *const coeff_names[8] = { "Y-3", "Y-2", "Y-1", "Y (LSB)", "Y (MSB)", "Y+1", "Y+2", "Y+3" };
-			const uint16_t coeff_idx = ((data >> 8) & 0xf) - 2;
+			const u16 coeff_idx = ((data >> 8) & 0xf) - 2;
 			switch ((data >> 8) & 0xf)
 			{
 			case 2: // Y-3
@@ -2161,7 +2161,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		else
 		{
 			static const char *const coeff_names[12] = { "X-5", "X-4", "X-3", "X-2", "X-1", "X (LSB)", "X (MSB)", "X+1", "X+2", "X+3", "X+4", "X+5" };
-			const uint16_t coeff_idx = ((data >> 8) & 0xf) - 1;
+			const u16 coeff_idx = ((data >> 8) & 0xf) - 1;
 			switch ((data >> 8) & 0xf)
 			{
 			case 1: // X-5
@@ -2188,29 +2188,29 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 	case 7: // Disk Data Buffer RAM
 		LOGMASKED(LOG_DDB, "%s: Disc Data Buffer Card RAM write: %04x = %04x\n", machine().describe_context(), m_diskbuf_ram_addr, data);
-		m_diskbuf_ram[m_diskbuf_ram_addr++] = (uint8_t)data;
+		m_diskbuf_ram[m_diskbuf_ram_addr++] = (u8)data;
 		break;
 
 	case 8: // Brush Store Card color latches
-		m_bs_y_latch = (uint8_t)data;
+		m_bs_y_latch = (u8)data;
 		if (m_ca0)
 		{
 			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Store Card color latches (VY): %04x\n\n", machine().describe_context(), data);
-			m_bs_v_latch = (uint8_t)(data >> 8);
+			m_bs_v_latch = (u8)(data >> 8);
 		}
 		else
 		{
 			LOGMASKED(LOG_CTRLBUS | LOG_BRUSH_ADDR | LOG_BRUSH_LATCH, "%s: Brush Store Card color latches (UY): %04x\n", machine().describe_context(), data);
-			m_bs_u_latch = (uint8_t)(data >> 8);
+			m_bs_u_latch = (u8)(data >> 8);
 		}
 		if (m_brush_addr_cmd == 4) // Framestore Write
 		{
-			const uint8_t chr = m_ca0 ? m_bs_v_latch : m_bs_u_latch;
+			const u8 chr = m_ca0 ? m_bs_v_latch : m_bs_u_latch;
 			if (!BIT(m_brush_addr_func, 5))
 			{
-				const uint16_t x = m_cxpos[0] + (m_bxlen_counter - m_bxlen);
-				const uint16_t y = m_cypos[0] + (m_bylen_counter - m_bylen);
-				uint32_t pix_idx = y * 800 + x;
+				const u16 x = m_cxpos[0] + (m_bxlen_counter - m_bxlen);
+				const u16 y = m_cypos[0] + (m_bylen_counter - m_bylen);
+				u32 pix_idx = y * 800 + x;
 
 				if (BIT(m_brush_addr_func, 7))
 				{
@@ -2230,9 +2230,9 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			}
 			if (!BIT(m_brush_addr_func, 6))
 			{
-				const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
-				const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
-				uint32_t pix_idx = y * 800 + x;
+				const u16 x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
+				const u16 y = m_cypos[1] + (m_bylen_counter - m_bylen);
+				u32 pix_idx = y * 800 + x;
 
 				if (BIT(m_brush_addr_func, 7))
 				{
@@ -2306,10 +2306,10 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 
 	case 10: // Output Timing Card - cursor registers; Combiner Card
 	{
-		const uint8_t hi_bits = (data >> 14) & 3;
+		const u8 hi_bits = (data >> 14) & 3;
 		if (hi_bits == 0) // Cursor Parameters
 		{
-			const uint8_t reg = (data >> 12) & 3;
+			const u8 reg = (data >> 12) & 3;
 			switch (reg)
 			{
 			case 0: // Cursor X Origin
@@ -2406,7 +2406,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 		{
 			unsigned char sector_buffer[256];
 			int start_sector = m_diskbuf_ram_addr >> 8;
-			uint16_t ram_addr = m_diskbuf_ram_addr;
+			u16 ram_addr = m_diskbuf_ram_addr;
 			if (m_diskseq_command_stride != 1)
 			{
 				for (int sector = start_sector; sector < 19200 / 256; sector++, image_lba++)
@@ -2513,18 +2513,18 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::execute_hdd_command)
 	req_b_w(1);
 }
 
-uint16_t dpb7000_state::cpu_sysctrl_r()
+u16 dpb7000_state::cpu_sysctrl_r()
 {
-	const uint16_t ctrl = m_sys_ctrl &~ SYSCTRL_AUTO_START;
-	const uint16_t auto_start = m_auto_start->read() ? SYSCTRL_AUTO_START : 0;
-	const uint16_t ret = ctrl | auto_start;
+	const u16 ctrl = m_sys_ctrl &~ SYSCTRL_AUTO_START;
+	const u16 auto_start = m_auto_start->read() ? SYSCTRL_AUTO_START : 0;
+	const u16 ret = ctrl | auto_start;
 	//LOGMASKED(LOG_SYS_CTRL, "%s: CPU read from System Control: %04x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-void dpb7000_state::cpu_sysctrl_w(uint16_t data)
+void dpb7000_state::cpu_sysctrl_w(u16 data)
 {
-	const uint16_t mask = (SYSCTRL_REQ_A_EN | SYSCTRL_REQ_B_EN);
+	const u16 mask = (SYSCTRL_REQ_A_EN | SYSCTRL_REQ_B_EN);
 	LOGMASKED(LOG_IRQ, "%s: CPU to Control Bus write: %04x\n", machine().describe_context(), data);
 	m_sys_ctrl &= ~mask;
 	m_sys_ctrl |= (data & mask);
@@ -2548,13 +2548,13 @@ void dpb7000_state::update_req_irqs()
 	m_maincpu->set_input_line(4, take_irq_b ? ASSERT_LINE : CLEAR_LINE);
 }
 
-uint8_t dpb7000_state::fdd_ctrl_r()
+u8 dpb7000_state::fdd_ctrl_r()
 {
 	// D4: Command Tag Flag
 	// D5: Restore Flag
 	// D6: Cylinder Tag Flag
 	// D7: Debug Switch
-	const uint8_t ret = m_fdd_ctrl;
+	const u8 ret = m_fdd_ctrl;
 	m_fdd_ctrl &= ~0x70;
 	LOGMASKED(LOG_FDC_CTRL, "%s: Floppy CPU Ctrl Read: %02x\n", machine().describe_context(), ret);
 	return ret;
@@ -2574,8 +2574,8 @@ void dpb7000_state::toggle_line_clock()
 
 void dpb7000_state::process_sample()
 {
-	const uint16_t x = m_size_dest_x;
-	const uint16_t y = m_size_dest_y;
+	const u16 x = m_size_dest_x;
+	const u16 y = m_size_dest_y;
 
 	//m_size_dsx_ddx = 0x100;
 	//m_size_dsy_ddy = 0x100;
@@ -2598,7 +2598,7 @@ void dpb7000_state::process_sample()
 
 			case 4: // Framestore Write
 			{
-				uint32_t pix_idx = y * 800 + x;
+				u32 pix_idx = y * 800 + x;
 				if (!BIT(m_brush_addr_func, 5))
 				{
 					if (BIT(m_brush_addr_func, 7))
@@ -2624,7 +2624,7 @@ void dpb7000_state::process_sample()
 
 	if (m_size_dxdx_counter <= 0)
 	{
-		m_size_dxdx_counter += 0x100;//(int16_t)(m_size_dsx_ddx & 0x7fff);
+		m_size_dxdx_counter += 0x100;//(s16)(m_size_dsx_ddx & 0x7fff);
 		m_size_dest_x++;
 	}
 	m_size_dxdx_counter -= 0x100;
@@ -2638,7 +2638,7 @@ void dpb7000_state::process_sample()
 
 		if (m_size_dydy_counter <= 0)
 		{
-			m_size_dydy_counter += 0x100;//(int16_t)(m_size_dsy_ddy & 0x7fff);
+			m_size_dydy_counter += 0x100;//(s16)(m_size_dsy_ddy & 0x7fff);
 			m_size_dest_y++;
 			//if (m_size_dsx_ddx != 0x100) printf("dydy counter is <= 0, resetting dydy counter to %04x, dxdx counter to 0, dest X to %d, dest Y to %d\n", m_size_dydy_counter, m_size_dest_x, m_size_dest_y);
 		}
@@ -2657,22 +2657,22 @@ void dpb7000_state::process_sample()
 	}
 }
 
-uint8_t dpb7000_state::process_byte_to_disc()
+u8 dpb7000_state::process_byte_to_disc()
 {
 	if (!m_diskseq_cyl_write_pending)
 		return 0;
 
-	uint8_t lum = 0;
-	uint8_t chr = 0;
+	u8 lum = 0;
+	u8 chr = 0;
 	switch (m_brush_addr_cmd)
 	{
 		case 3: // Framestore Read
 		{
 			if (!BIT(m_brush_addr_func, 5))
 			{
-				const uint16_t x = m_cxpos[0] + (m_bxlen_counter - m_bxlen);
-				const uint16_t y = m_cypos[0] + (m_bylen_counter - m_bylen);
-				uint32_t pix_idx = y * 800 + x;
+				const u16 x = m_cxpos[0] + (m_bxlen_counter - m_bxlen);
+				const u16 y = m_cypos[0] + (m_bylen_counter - m_bylen);
+				u32 pix_idx = y * 800 + x;
 
 				if (BIT(m_brush_addr_func, 9))
 				{
@@ -2693,9 +2693,9 @@ uint8_t dpb7000_state::process_byte_to_disc()
 
 			if (!BIT(m_brush_addr_func, 6))
 			{
-				const uint16_t x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
-				const uint16_t y = m_cypos[1] + (m_bylen_counter - m_bylen);
-				uint32_t pix_idx = y * 800 + x;
+				const u16 x = m_cxpos[1] + (m_bxlen_counter - m_bxlen);
+				const u16 y = m_cypos[1] + (m_bylen_counter - m_bylen);
+				u32 pix_idx = y * 800 + x;
 
 				if (BIT(m_brush_addr_func, 9))
 				{
@@ -2717,7 +2717,7 @@ uint8_t dpb7000_state::process_byte_to_disc()
 		}
 	}
 
-	const uint8_t ret = m_buffer_lum ? lum : chr;
+	const u8 ret = m_buffer_lum ? lum : chr;
 
 	m_buffer_lum = !m_buffer_lum;
 	if (m_buffer_lum)
@@ -2747,7 +2747,7 @@ uint8_t dpb7000_state::process_byte_to_disc()
 	return ret;
 }
 
-void dpb7000_state::process_byte_from_disc(uint8_t data_byte)
+void dpb7000_state::process_byte_from_disc(u8 data_byte)
 {
 	if (!m_diskseq_cyl_read_pending)
 		return;
@@ -2772,22 +2772,22 @@ void dpb7000_state::process_byte_from_disc(uint8_t data_byte)
 
 bool dpb7000_state::is_disk_group_fdd(int group_index)
 {
-	constexpr uint16_t GROUP_SHIFTS[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
-	uint16_t val = (m_config_sw34->read() >> GROUP_SHIFTS[group_index]) & 7;
+	constexpr u16 GROUP_SHIFTS[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
+	u16 val = (m_config_sw34->read() >> GROUP_SHIFTS[group_index]) & 7;
 	return val == DGROUP_TYPE_FLOPPY;
 }
 
 bool dpb7000_state::is_disk_group_hdd(int group_index)
 {
-	constexpr uint16_t GROUP_SHIFTS[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
-	uint16_t val = (m_config_sw34->read() >> GROUP_SHIFTS[group_index]) & 7;
+	constexpr u16 GROUP_SHIFTS[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
+	u16 val = (m_config_sw34->read() >> GROUP_SHIFTS[group_index]) & 7;
 	return val == DGROUP_TYPE_80MB_CDC || val == DGROUP_TYPE_160MB_FUJITSU || val == DGROUP_TYPE_330MB_FUJITSU;
 }
 
 int dpb7000_state::get_heads_for_disk_group(int group_index)
 {
-	constexpr uint16_t GROUP_SHIFTS[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
-	uint16_t val = (m_config_sw34->read() >> GROUP_SHIFTS[group_index]) & 7;
+	constexpr u16 GROUP_SHIFTS[3] = { DGROUP_0_SHIFT, DGROUP_1_SHIFT, DGROUP_2_SHIFT };
+	u16 val = (m_config_sw34->read() >> GROUP_SHIFTS[group_index]) & 7;
 	switch (val)
 	{
 		case DGROUP_TYPE_FLOPPY:
@@ -2813,16 +2813,16 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 		LOGMASKED(LOG_COMMANDS, "Reading cylinder from floppy\n");
 		m_fdd_pll.read_reset(machine().time());
 
-		constexpr uint16_t PREGAP_MARK = 0xaaaa;
-		constexpr uint16_t SYNC_MARK = 0x9125;
+		constexpr u16 PREGAP_MARK = 0xaaaa;
+		constexpr u16 SYNC_MARK = 0x9125;
 
 		m_floppy->ss_w(m_fdd_side);
 
 		bool seen_pregap = false;
 		bool in_track = false;
 		int curr_bit = -1;
-		uint16_t curr_window = 0;
-		uint16_t bit_idx = 0;
+		u16 curr_window = 0;
+		u16 bit_idx = 0;
 
 		attotime tm = machine().time();
 		attotime limit = machine().time() + attotime::from_ticks(1, 6); // One revolution at 360rpm on a Shugart SA850
@@ -2853,7 +2853,7 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 				}
 				else if (seen_pregap && in_track && bit_idx == 16)
 				{
-					uint8_t data_byte = (uint8_t)bitswap<16>((uint16_t)curr_window, 15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0);
+					u8 data_byte = (u8)bitswap<16>((u16)curr_window, 15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0);
 					switch (m_diskseq_cmd)
 					{
 					case 4: // Read Track
@@ -2925,13 +2925,13 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 
 void dpb7000_state::seek_fdd_to_cylinder()
 {
-	uint16_t floppy_cyl = (uint16_t)m_floppy->get_cyl();
+	u16 floppy_cyl = (u16)m_floppy->get_cyl();
 	if (floppy_cyl != m_diskseq_cyl_from_cpu && m_diskseq_cyl_from_cpu < 78 && m_floppy != nullptr)
 	{
 		if (m_diskseq_cyl_from_cpu < floppy_cyl)
 		{
 			m_floppy->dir_w(1);
-			for (uint16_t i = m_diskseq_cyl_from_cpu; i < floppy_cyl; i++)
+			for (u16 i = m_diskseq_cyl_from_cpu; i < floppy_cyl; i++)
 			{
 				m_floppy->stp_w(1);
 				m_floppy->stp_w(0);
@@ -2941,7 +2941,7 @@ void dpb7000_state::seek_fdd_to_cylinder()
 		else
 		{
 			m_floppy->dir_w(0);
-			for (uint16_t i = floppy_cyl; i < m_diskseq_cyl_from_cpu; i++)
+			for (u16 i = floppy_cyl; i < m_diskseq_cyl_from_cpu; i++)
 			{
 				m_floppy->stp_w(1);
 				m_floppy->stp_w(0);
@@ -2952,10 +2952,10 @@ void dpb7000_state::seek_fdd_to_cylinder()
 	}
 }
 
-void dpb7000_state::fddcpu_p1_w(uint8_t data)
+void dpb7000_state::fddcpu_p1_w(u8 data)
 {
 	LOGMASKED(LOG_FDC_PORT, "%s: Floppy CPU Port 1 Write: %02x\n", machine().describe_context(), data);
-	const uint8_t old_value = m_fdd_port1;
+	const u8 old_value = m_fdd_port1;
 	m_fdd_port1 = data;
 
 	floppy_image_device *newflop = m_floppy0->get_device();
@@ -3009,14 +3009,14 @@ void dpb7000_state::fddcpu_p1_w(uint8_t data)
 	}
 }
 
-void dpb7000_state::fddcpu_p2_w(uint8_t data)
+void dpb7000_state::fddcpu_p2_w(u8 data)
 {
 	m_fdd_serial->write_txd(BIT(data, 4));
 }
 
-uint8_t dpb7000_state::fddcpu_p2_r()
+u8 dpb7000_state::fddcpu_p2_r()
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 	if (m_fdd_debug_rx_byte_count)
 	{
 		ret |= m_fdd_debug_rx_bits[0] << 3;
@@ -3036,7 +3036,7 @@ uint8_t dpb7000_state::fddcpu_p2_r()
 	return ret;
 }
 
-uint8_t dpb7000_state::fdd_cmd_r()
+u8 dpb7000_state::fdd_cmd_r()
 {
 	LOGMASKED(LOG_FDC_CMD, "%s: Floppy CPU command read: %02x\n", m_diskseq_cmd_to_ctrl);
 	return m_diskseq_cmd_to_ctrl;
@@ -3056,25 +3056,25 @@ void dpb7000_state::fddcpu_debug_rx(int state)
 	}
 }
 
-uint8_t dpb7000_state::keyboard_p1_r()
+u8 dpb7000_state::keyboard_p1_r()
 {
 	LOGMASKED(LOG_KEYBC, "%s: Port 1 read\n", machine().describe_context());
 	return 0;
 }
 
-uint8_t dpb7000_state::keyboard_p2_r()
+u8 dpb7000_state::keyboard_p2_r()
 {
 	LOGMASKED(LOG_KEYBC, "%s: Port 2 read\n", machine().describe_context());
 	return 0;
 }
 
-void dpb7000_state::keyboard_p1_w(uint8_t data)
+void dpb7000_state::keyboard_p1_w(u8 data)
 {
 	LOGMASKED(LOG_KEYBC, "%s: Port 1 write: %02x\n", machine().describe_context(), data);
-	const uint8_t old_data = m_keybc_p1_data;
+	const u8 old_data = m_keybc_p1_data;
 	m_keybc_p1_data = data;
-	const uint8_t col = data & 0x0f;
-	const uint8_t lowered = old_data & ~data;
+	const u8 col = data & 0x0f;
+	const u8 lowered = old_data & ~data;
 	if (BIT(lowered, 7))
 	{
 		m_keybc_latched_bit = BIT(m_keybc_cols[col]->read(), (data >> 4) & 7);
@@ -3085,7 +3085,7 @@ void dpb7000_state::keyboard_p1_w(uint8_t data)
 	}
 }
 
-void dpb7000_state::keyboard_p2_w(uint8_t data)
+void dpb7000_state::keyboard_p2_w(u8 data)
 {
 	LOGMASKED(LOG_KEYBC, "%s: Port 2 write: %02x\n", machine().describe_context(), data);
 	m_keybc_tx = BIT(~data, 7);
@@ -3099,17 +3099,17 @@ int dpb7000_state::keyboard_t0_r()
 
 int dpb7000_state::keyboard_t1_r()
 {
-	uint8_t data = m_keybc_latched_bit;
+	u8 data = m_keybc_latched_bit;
 	//m_keybc_latched_bit = 0;
 	LOGMASKED(LOG_KEYBC, "%s: T1 read: %d\n", machine().describe_context(), data);
 	return data;
 }
 
-void dpb7000_state::tds_dac_w(uint8_t data)
+void dpb7000_state::tds_dac_w(u8 data)
 {
 	m_tds_dac_value = ~data;
-	uint16_t offset = 0x67 * m_tds_dac_value;
-	m_tds_dac_offset = (uint8_t)(offset >> 8);
+	u16 offset = 0x67 * m_tds_dac_value;
+	m_tds_dac_offset = (u8)(offset >> 8);
 	m_tds_dac_percent = std::clamp(m_tds_dac_value / 255.0f, 0.0f, 1.0f);
 	LOGMASKED(LOG_TDS, "%s: TDS DAC Write: %02x (%f)\n", machine().describe_context(), data, m_tds_dac_percent);
 }
@@ -3154,15 +3154,15 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::tds_adc_tick)
 {
 	m_tds_adc_busy = false;
 
-	uint16_t value = m_tds_dac_offset;
+	u16 value = m_tds_dac_offset;
 	if (m_tds_press_state != STATE_IDLE)
 	{
 		value += (m_pen_press->read() >> m_tds_pressure_shift);
 	}
-	m_tds_adc_value = (value >= 0xf8 ? 0xf7 : (uint8_t)value);
+	m_tds_adc_value = (value >= 0xf8 ? 0xf7 : (u8)value);
 }
 
-void dpb7000_state::tds_convert_w(uint8_t data)
+void dpb7000_state::tds_convert_w(u8 data)
 {
 	LOGMASKED(LOG_TDS, "%s: TDS ADC Convert Start: %02x\n", machine().describe_context(), data);
 
@@ -3171,15 +3171,15 @@ void dpb7000_state::tds_convert_w(uint8_t data)
 	m_tds_adc_timer->adjust(attotime::from_ticks(8, 120000));
 }
 
-uint8_t dpb7000_state::tds_adc_r()
+u8 dpb7000_state::tds_adc_r()
 {
 	LOGMASKED(LOG_TDS, "%s: TDS ADC Read: %02x (DAC value %02x)\n", machine().describe_context(), m_tds_adc_value, m_tds_dac_value);
 	return m_tds_adc_value;
 }
 
-uint8_t dpb7000_state::tds_pen_switches_r()
+u8 dpb7000_state::tds_pen_switches_r()
 {
-	uint8_t data = 0;//m_pen_switches->read() << 4;
+	u8 data = 0;//m_pen_switches->read() << 4;
 	LOGMASKED(LOG_TDS, "%s: TDS Pen Switches Read: %02x\n", machine().describe_context(), data);
 	return data;
 }
@@ -3203,38 +3203,38 @@ void dpb7000_state::duart_b_w(int state)
 	//printf("B%d ", state);
 }
 
-uint8_t dpb7000_state::tds_p1_r()
+u8 dpb7000_state::tds_p1_r()
 {
-	const uint8_t latched = m_tds_p1_data & 0x80;
-	const uint8_t adc_not_busy = m_tds_adc_busy ? 0x00 : 0x20;
-	uint8_t data = m_tds_dips->read() | adc_not_busy | latched;
+	const u8 latched = m_tds_p1_data & 0x80;
+	const u8 adc_not_busy = m_tds_adc_busy ? 0x00 : 0x20;
+	u8 data = m_tds_dips->read() | adc_not_busy | latched;
 	LOGMASKED(LOG_TDS, "%s: TDS Port 1 Read, %02x\n", machine().describe_context(), data);
 	return data;
 }
 
-uint8_t dpb7000_state::tds_p2_r()
+u8 dpb7000_state::tds_p2_r()
 {
-	uint8_t data = 0x02 | (m_keybc_tx << 3);
+	u8 data = 0x02 | (m_keybc_tx << 3);
 	LOGMASKED(LOG_TDS, "%s: TDS Port 2 Read, %02x\n", machine().describe_context(), data);
 	return data;
 }
 
-uint8_t dpb7000_state::tds_p3_r()
+u8 dpb7000_state::tds_p3_r()
 {
 	LOGMASKED(LOG_TDS, "%s: TDS Port 3 Read, %02x\n", machine().describe_context(), 0);
 	return 0;
 }
 
-uint8_t dpb7000_state::tds_p4_r()
+u8 dpb7000_state::tds_p4_r()
 {
 	LOGMASKED(LOG_TDS, "%s: TDS Port 4 Read, %02x\n", machine().describe_context(), 0);
 	return 0;
 }
 
-void dpb7000_state::tds_p1_w(uint8_t data)
+void dpb7000_state::tds_p1_w(u8 data)
 {
 	LOGMASKED(LOG_TDS, "%s: TDS Port 1 Write = %02x\n", machine().describe_context(), data);
-	const uint8_t old = m_tds_p1_data;
+	const u8 old = m_tds_p1_data;
 	m_tds_p1_data = data;
 	if (BIT(old & ~data, 0))
 	{
@@ -3243,7 +3243,7 @@ void dpb7000_state::tds_p1_w(uint8_t data)
 	}
 }
 
-void dpb7000_state::tds_p2_w(uint8_t data)
+void dpb7000_state::tds_p2_w(u8 data)
 {
 	LOGMASKED(LOG_TDS, "%s: TDS Port 2 Write = %02x\n", machine().describe_context(), data);
 }
@@ -3265,13 +3265,13 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_hle_tick)
 		m_tablet_pen_x = m_pen_x->read();
 		m_tablet_pen_y = 4799 - m_pen_y->read();
 		m_tablet_pen_switches = m_pen_switches->read();
-		uint8_t data[5] =
+		u8 data[5] =
 		{
-			(uint8_t)(0x40 | (BIT(m_tablet_pen_switches, 1) << 2) | (BIT(m_tablet_pen_y, 12) << 1) | BIT(m_tablet_pen_x, 12)),
-			(uint8_t)(m_tablet_pen_x & 0x003f),
-			(uint8_t)((m_tablet_pen_x & 0x0fc0) >> 6),
-			(uint8_t)(m_tablet_pen_y & 0x003f),
-			(uint8_t)((m_tablet_pen_y & 0x0fc0) >> 6)
+			(u8)(0x40 | (BIT(m_tablet_pen_switches, 1) << 2) | (BIT(m_tablet_pen_y, 12) << 1) | BIT(m_tablet_pen_x, 12)),
+			(u8)(m_tablet_pen_x & 0x003f),
+			(u8)((m_tablet_pen_x & 0x0fc0) >> 6),
+			(u8)(m_tablet_pen_y & 0x003f),
+			(u8)((m_tablet_pen_y & 0x0fc0) >> 6)
 		};
 
 		for (int i = 0; i < 5; i++)
@@ -3287,18 +3287,18 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_hle_tick)
 	}
 }
 
-uint8_t dpb7000_state::tablet_p2_r(offs_t offset, uint8_t mem_mask)
+u8 dpb7000_state::tablet_p2_r(offs_t offset, u8 mem_mask)
 {
-	const uint8_t dip_bit = BIT(m_tablet_dip_shifter, 15) << 7;
-	const uint8_t led_bit = (BIT(~m_tablet_p3_data, 5) << 6);
-	const uint8_t pen_prox = m_pen_prox->read() << 5;
-	uint8_t data = dip_bit | led_bit | pen_prox | (m_tablet_p2_data & 0x1f);
+	const u8 dip_bit = BIT(m_tablet_dip_shifter, 15) << 7;
+	const u8 led_bit = (BIT(~m_tablet_p3_data, 5) << 6);
+	const u8 pen_prox = m_pen_prox->read() << 5;
+	u8 data = dip_bit | led_bit | pen_prox | (m_tablet_p2_data & 0x1f);
 
 	LOGMASKED(LOG_TABLET, "%s: Tablet Port 2 Read = %02x & %02x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
-void dpb7000_state::tablet_p2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void dpb7000_state::tablet_p2_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	LOGMASKED(LOG_TABLET, "%s: Tablet Port 2 Write: %02x & %02x\n", machine().describe_context(), data, mem_mask);
 
@@ -3311,7 +3311,7 @@ void dpb7000_state::tablet_p2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 
 	if (BIT(mem_mask, 4))
 	{
-		uint8_t old_drq = m_tablet_drq;
+		u8 old_drq = m_tablet_drq;
 		m_tablet_drq = BIT(data, 4);
 		LOGMASKED(LOG_TABLET, "Tablet DRQ: %d\n", m_tablet_drq);
 		LOGMASKED(LOG_TABLET, "Clearing tablet CPU IRQ\n");
@@ -3343,14 +3343,14 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_irq_tick)
 	m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
-uint8_t dpb7000_state::tablet_p3_r(offs_t offset, uint8_t mem_mask)
+u8 dpb7000_state::tablet_p3_r(offs_t offset, u8 mem_mask)
 {
-	uint8_t data = m_tablet_p3_data;
+	u8 data = m_tablet_p3_data;
 	LOGMASKED(LOG_TABLET, "%s: Tablet Port 3 Read = %02x & %02x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
-void dpb7000_state::tablet_p3_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void dpb7000_state::tablet_p3_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	LOGMASKED(LOG_TABLET, "%s: Tablet Port 3 Write: %02x & %02x\n", machine().describe_context(), data, mem_mask);
 
@@ -3359,11 +3359,11 @@ void dpb7000_state::tablet_p3_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 		m_tablet_tx_bit = BIT(data, 7);
 	}
 
-	const uint8_t old = m_tablet_p3_data;
+	const u8 old = m_tablet_p3_data;
 	m_tablet_p3_data = data;
 
-	const uint8_t lowered = old & ~data;
-	const uint8_t raised = ~old & data;
+	const u8 lowered = old & ~data;
+	const u8 raised = ~old & data;
 
 	if (BIT(lowered, 5))
 	{
@@ -3378,42 +3378,42 @@ void dpb7000_state::tablet_p3_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	}
 }
 
-uint8_t dpb7000_state::tablet_rdh_r()
+u8 dpb7000_state::tablet_rdh_r()
 {
-	uint8_t data = (m_tablet_counter_latch >> 8);
+	u8 data = (m_tablet_counter_latch >> 8);
 	LOGMASKED(LOG_TABLET, "%s: Tablet RDH Read (Mux %d): %02x\n", machine().describe_context(), m_tablet_mux, data);
 	return data;
 }
 
-uint8_t dpb7000_state::tablet_rdl_r()
+u8 dpb7000_state::tablet_rdl_r()
 {
 	//if (m_tablet_mux == 3)
 		//m_tablet_state = 0;
 
 	m_tablet_counter_latch = machine().rand() & 0xfff;
 	LOGMASKED(LOG_TABLET, "%s: Random latch: %04x\n", machine().describe_context(), m_tablet_counter_latch);
-	uint8_t data = (uint8_t)m_tablet_counter_latch;
+	u8 data = (u8)m_tablet_counter_latch;
 	LOGMASKED(LOG_TABLET, "%s: Tablet RDL Read (Mux %d): %02x\n", machine().describe_context(), m_tablet_mux, data);
 	return data;
 }
 
-uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint16_t upper_flag_addr = (uint16_t)((m_output_cpflags & 3) << 8);
+	const u16 upper_flag_addr = (u16)((m_output_cpflags & 3) << 8);
 
 	// TODO: Implement the Store Address Card in a more accurate manner, and implement framestore scan-out and flag handling accordingly.
-	int32_t y_addr[2] = { m_rvscr[0], m_rvscr[1] };
-	int32_t dest_y = 0;
-	uint8_t matte_chr[2][2] = { { m_matte_u[0], m_matte_v[0] }, { m_matte_u[1], m_matte_v[1] } };
+	s32 y_addr[2] = { m_rvscr[0], m_rvscr[1] };
+	s32 dest_y = 0;
+	u8 matte_chr[2][2] = { { m_matte_u[0], m_matte_v[0] }, { m_matte_u[1], m_matte_v[1] } };
 	bool seen_rvr = false;
 	bool started_scanout = false;
-	for (int32_t y = 0; y < 625; y++)
+	for (s32 y = 0; y < 625; y++)
 	{
-		const uint8_t vlines = m_output_vlines[y + 0x18f] & 0x0f;
+		const u8 vlines = m_output_vlines[y + 0x18f] & 0x0f;
 
-		const uint8_t hlines = m_output_hlines[0xa0 + 70] & 0x0f;
-		const uint16_t flag_addr = (hlines & 0x0f) | ((vlines & 0x0f) << 4);
-		const uint8_t hflags = m_output_hflags[flag_addr | upper_flag_addr] & 0x0f;
+		const u8 hlines = m_output_hlines[0xa0 + 70] & 0x0f;
+		const u16 flag_addr = (hlines & 0x0f) | ((vlines & 0x0f) << 4);
+		const u8 hflags = m_output_hflags[flag_addr | upper_flag_addr] & 0x0f;
 		const bool palette = BIT(hflags, 3);
 
 		if (!BIT(hflags, 1))
@@ -3448,42 +3448,42 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 		const bool use_ext_store2_matte = !(blank_2_q && !BIT(m_ext_store_flags, 1));
 		const bool invert_a = palette ? BIT(~m_ext_store_flags, 3) : BIT(m_ext_store_flags, 2);
 		const bool invert_b = !invert_a;
-		const uint8_t ext_src_invert = BIT(m_ext_store_flags, 4) ? 0xff : 0x00;
-		const uint8_t ext_a_mask = (invert_a ? 0xff : 0x00);
-		const uint8_t ext_b_mask = (invert_b ? 0xff : 0x00);
+		const u8 ext_src_invert = BIT(m_ext_store_flags, 4) ? 0xff : 0x00;
+		const u8 ext_a_mask = (invert_a ? 0xff : 0x00);
+		const u8 ext_b_mask = (invert_b ? 0xff : 0x00);
 
-		const int32_t y_line1 = y_addr[0] * 800;
-		const int32_t y_line2 = y_addr[1] * 800;
+		const s32 y_line1 = y_addr[0] * 800;
+		const s32 y_line2 = y_addr[1] * 800;
 
-		uint32_t *d = &bitmap.pix(dest_y);
-		int32_t x_addr[2] = { m_rhscr[0] & ~1, m_rhscr[1] & ~1 };
-		for (int32_t x = 0; x < 800; x++, x_addr[0] = (x_addr[0] + 1) % 800, x_addr[1] = (x_addr[1] + 1) % 800)
+		u32 *d = &bitmap.pix(dest_y);
+		s32 x_addr[2] = { m_rhscr[0] & ~1, m_rhscr[1] & ~1 };
+		for (s32 x = 0; x < 800; x++, x_addr[0] = (x_addr[0] + 1) % 800, x_addr[1] = (x_addr[1] + 1) % 800)
 		{
-			const uint8_t uv_sel1 = x_addr[0] & 1;
-			const uint8_t uv_sel2 = x_addr[1] & 1;
+			const u8 uv_sel1 = x_addr[0] & 1;
+			const u8 uv_sel2 = x_addr[1] & 1;
 
-			const uint32_t pix_idx1 = y_line1 + x_addr[0];
-			const uint32_t pix_idx2 = y_line2 + x_addr[1];
+			const u32 pix_idx1 = y_line1 + x_addr[0];
+			const u32 pix_idx2 = y_line2 + x_addr[1];
 
-			const uint16_t lum1 = use_store1_matte ? m_matte_y[0] : m_framestore_lum[0][pix_idx1];
-			const uint16_t chr1 = use_store1_matte ? matte_chr[0][uv_sel1] : m_framestore_chr[0][pix_idx1];
-			const uint16_t ext1 = use_ext_store1_matte ? m_matte_ext[0] : (m_framestore_ext[0][pix_idx1] ^ ext_src_invert);
+			const u16 lum1 = use_store1_matte ? m_matte_y[0] : m_framestore_lum[0][pix_idx1];
+			const u16 chr1 = use_store1_matte ? matte_chr[0][uv_sel1] : m_framestore_chr[0][pix_idx1];
+			const u16 ext1 = use_ext_store1_matte ? m_matte_ext[0] : (m_framestore_ext[0][pix_idx1] ^ ext_src_invert);
 
-			const uint16_t lum2 = use_store2_matte ? m_matte_y[1] : m_framestore_lum[1][pix_idx2];
-			const uint16_t chr2 = use_store2_matte ? matte_chr[0][uv_sel2] : m_framestore_chr[1][pix_idx2];
-			const uint16_t ext2 = use_ext_store2_matte ? m_matte_ext[1] : (m_framestore_ext[1][pix_idx2] ^ ext_src_invert);
+			const u16 lum2 = use_store2_matte ? m_matte_y[1] : m_framestore_lum[1][pix_idx2];
+			const u16 chr2 = use_store2_matte ? matte_chr[0][uv_sel2] : m_framestore_chr[1][pix_idx2];
+			const u16 ext2 = use_ext_store2_matte ? m_matte_ext[1] : (m_framestore_ext[1][pix_idx2] ^ ext_src_invert);
 
-			const uint8_t ext_product = (uint8_t)(((ext1 * ext2) + 0x0080) >> 8);
-			const uint8_t ext_a = ext_product ^ ext_a_mask;
-			const uint8_t ext_b = ext_product ^ ext_b_mask;
+			const u8 ext_product = (u8)(((ext1 * ext2) + 0x0080) >> 8);
+			const u8 ext_a = ext_product ^ ext_a_mask;
+			const u8 ext_b = ext_product ^ ext_b_mask;
 
-			const uint16_t lum1_product = ((lum1 * ext_a) + 0x0080) >> 8;
-			const uint16_t lum2_product = ((lum2 * ext_b) + 0x0080) >> 8;
-			const uint16_t chr1_product = ((chr1 * ext_a) + 0x0080) >> 8;
-			const uint16_t chr2_product = ((chr2 * ext_b) + 0x0080) >> 8;
+			const u16 lum1_product = ((lum1 * ext_a) + 0x0080) >> 8;
+			const u16 lum2_product = ((lum2 * ext_b) + 0x0080) >> 8;
+			const u16 chr1_product = ((chr1 * ext_a) + 0x0080) >> 8;
+			const u16 chr2_product = ((chr2 * ext_b) + 0x0080) >> 8;
 
-			const uint8_t lum_sum = (uint8_t)std::min<uint16_t>(lum1_product + lum2_product, 255);
-			const uint8_t chr_sum = (uint8_t)std::min<uint16_t>(chr1_product + chr2_product, 255);
+			const u8 lum_sum = (u8)std::min<u16>(lum1_product + lum2_product, 255);
+			const u8 chr_sum = (u8)std::min<u16>(chr1_product + chr2_product, 255);
 
 			*d++ = 0xff000000 | (lum_sum << 8) | chr_sum;
 		}
@@ -3502,27 +3502,27 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 		}
 	}
 
-	const uint32_t cursor_rgb = m_yuv_lut[(m_cursor_u << 16) | (m_cursor_v << 8) | m_cursor_y];
-	uint16_t cursor_origin_y_counter = m_cursor_origin_y;
-	uint16_t cursor_y_size = m_cursor_size_y;
-	uint16_t cursor_y_index = 0;
+	const u32 cursor_rgb = m_yuv_lut[(m_cursor_u << 16) | (m_cursor_v << 8) | m_cursor_y];
+	u16 cursor_origin_y_counter = m_cursor_origin_y;
+	u16 cursor_y_size = m_cursor_size_y;
+	u16 cursor_y_index = 0;
 
-	for (int32_t dst_y = 0; dst_y < 625; dst_y++)
+	for (s32 dst_y = 0; dst_y < 625; dst_y++)
 	{
-		uint16_t cursor_origin_x_counter = m_cursor_origin_x;
-		uint16_t cursor_x_size = m_cursor_size_x;
-		uint16_t cursor_x_index = 0;
+		u16 cursor_origin_x_counter = m_cursor_origin_x;
+		u16 cursor_x_size = m_cursor_size_x;
+		u16 cursor_x_index = 0;
 
-		uint32_t *d = &bitmap.pix(dst_y);
-		for (int32_t x = 0; x < 800; x += 2)
+		u32 *d = &bitmap.pix(dst_y);
+		for (s32 x = 0; x < 800; x += 2)
 		{
-			const uint32_t u = (d[x] << 16) & 0xff0000;
-			const uint32_t v = (d[x | 1] << 8) & 0x00ff00;
-			const uint32_t y0 = (d[x] >> 8) & 0x0000ff;
-			const uint32_t y1 = (d[x | 1] >> 8) & 0x0000ff;
+			const u32 u = (d[x] << 16) & 0xff0000;
+			const u32 v = (d[x | 1] << 8) & 0x00ff00;
+			const u32 y0 = (d[x] >> 8) & 0x0000ff;
+			const u32 y1 = (d[x | 1] >> 8) & 0x0000ff;
 
-			uint32_t combined[2] = { m_yuv_lut[u | v | y0], m_yuv_lut[u | v | y1] };
-			for (int32_t h = 0; h < 2; h++)
+			u32 combined[2] = { m_yuv_lut[u | v | y0], m_yuv_lut[u | v | y1] };
+			for (s32 h = 0; h < 2; h++)
 			{
 				if (m_output_csflags)
 				{
@@ -3530,11 +3530,11 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 					const bool cursor_enable = cursor_in_window && (cursor_x_index < 0x20 && cursor_y_index < 0x20);
 					if (cursor_enable)
 					{
-						const uint16_t cursor_addr_x = cursor_x_index ^ 0x10;
-						const uint16_t cursor_addr_y = cursor_y_index ^ 0x10;
-						const uint16_t cursor_addr = (cursor_addr_y << 5) | cursor_addr_x;
+						const u16 cursor_addr_x = cursor_x_index ^ 0x10;
+						const u16 cursor_addr_y = cursor_y_index ^ 0x10;
+						const u16 cursor_addr = (cursor_addr_y << 5) | cursor_addr_x;
 
-						const uint8_t cursor_data = m_output_cursor[cursor_addr];
+						const u8 cursor_data = m_output_cursor[cursor_addr];
 
 						bool cursor_bit = true;
 						bool cursor_colored = true;
@@ -3603,19 +3603,19 @@ uint32_t dpb7000_state::combined_screen_update(screen_device &screen, bitmap_rgb
 }
 
 template <int StoreNum>
-uint32_t dpb7000_state::store_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 dpb7000_state::store_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (0)
 	{
 		for (int py = 0; py < 768; py++)
 		{
-			const uint8_t *src_lum = &m_framestore_lum[StoreNum][py * 800];
-			const uint8_t *src_chr = &m_framestore_chr[StoreNum][py * 800];
-			uint32_t *dst = &bitmap.pix(py);
+			const u8 *src_lum = &m_framestore_lum[StoreNum][py * 800];
+			const u8 *src_chr = &m_framestore_chr[StoreNum][py * 800];
+			u32 *dst = &bitmap.pix(py);
 			for (int px = 0; px < 800; px += 2)
 			{
-				const uint32_t u = *src_chr++ << 16;
-				const uint32_t v = *src_chr++ << 8;
+				const u32 u = *src_chr++ << 16;
+				const u32 v = *src_chr++ << 8;
 				*dst++ = m_yuv_lut[u | v | *src_lum++];
 				*dst++ = m_yuv_lut[u | v | *src_lum++];
 			}
@@ -3624,21 +3624,21 @@ uint32_t dpb7000_state::store_debug_screen_update(screen_device &screen, bitmap_
 	return 0;
 }
 
-uint32_t dpb7000_state::stencil_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 dpb7000_state::stencil_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (0)
 	{
 		for (int py = 0; py < 768; py++)
 		{
-			const uint8_t *src_ext1 = &m_framestore_ext[0][py * 800];
-			const uint8_t *src_ext2 = &m_framestore_ext[1][py * 800];
-			uint32_t *dst = &bitmap.pix(py);
+			const u8 *src_ext1 = &m_framestore_ext[0][py * 800];
+			const u8 *src_ext2 = &m_framestore_ext[1][py * 800];
+			u32 *dst = &bitmap.pix(py);
 			for (int px = 0; px < 800; px++, src_ext1++, src_ext2++)
 			{
-				const uint16_t h = (uint8_t)px >> 4;
-				const uint16_t pal_blank_addr = ((h << 12) & 0xe000) | ((py << 3) & 0x1800) | (BIT(h, 0) << 10) | ((py << 2) & 0x3f0) | ((h >> 4) & 0xf);
-				const uint8_t blank_val = m_storeaddr_pal_blank[pal_blank_addr];
-				const uint32_t blank_color = ((blank_val & 3) != 3) ? 0x000000ff : 0;
+				const u16 h = (u8)px >> 4;
+				const u16 pal_blank_addr = ((h << 12) & 0xe000) | ((py << 3) & 0x1800) | (BIT(h, 0) << 10) | ((py << 2) & 0x3f0) | ((h >> 4) & 0xf);
+				const u8 blank_val = m_storeaddr_pal_blank[pal_blank_addr];
+				const u32 blank_color = ((blank_val & 3) != 3) ? 0x000000ff : 0;
 				*dst++ = 0xff000000 | (*src_ext1 << 16) | (*src_ext2 << 8) | blank_color;
 			}
 		}
@@ -3646,17 +3646,17 @@ uint32_t dpb7000_state::stencil_debug_screen_update(screen_device &screen, bitma
 	return 0;
 }
 
-uint32_t dpb7000_state::brush_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 dpb7000_state::brush_debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (0)
 	{
 		for (int y = 0; y < 256; y++)
 		{
-			const uint8_t *src_lum = &m_brushstore_lum[y * 256];
-			const uint8_t *src_chr = &m_brushstore_chr[y * 256];
-			const uint8_t *src_ext = &m_brushstore_ext[y * 256];
-			uint32_t *dst_lc = &bitmap.pix(y);
-			uint32_t *dst_ext = &bitmap.pix(y + 256);
+			const u8 *src_lum = &m_brushstore_lum[y * 256];
+			const u8 *src_chr = &m_brushstore_chr[y * 256];
+			const u8 *src_ext = &m_brushstore_ext[y * 256];
+			u32 *dst_lc = &bitmap.pix(y);
+			u32 *dst_ext = &bitmap.pix(y + 256);
 			for (int x = 0; x < 256; x++)
 			{
 				dst_lc[x] = (0xff << 24) | (src_lum[x] << 16) | (src_lum[x] << 8) | src_lum[x];

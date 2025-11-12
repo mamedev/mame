@@ -25,6 +25,7 @@ public:
 
 	void st22xx_bbl338(machine_config &config);
 	void st22xx_dphh8213(machine_config &config);
+	void st22xx_cutepet(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -38,6 +39,7 @@ private:
 
 	void st22xx_bbl338_map(address_map &map) ATTR_COLD;
 	void st22xx_dphh8213_map(address_map &map) ATTR_COLD;
+	void st22xx_cutepet_map(address_map &map) ATTR_COLD;
 
 	required_device<screen_device> m_screen;
 	required_device<bl_handhelds_lcdc_device> m_lcdc;
@@ -226,6 +228,15 @@ void st22xx_bbl338_state::st22xx_dphh8213_map(address_map &map)
 	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
 }
 
+void st22xx_bbl338_state::st22xx_cutepet_map(address_map &map)
+{
+	map(0x0000000, 0x03fffff).rom().region("maincpu", 0);
+
+	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
+	map(0x0604100, 0x0604100).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
+}
+
+
 void st22xx_bbl338_state::st22xx_bbl338_map(address_map &map)
 {
 	//map(0x0000000, 0x0003fff).rom().region("internal", 0); // not dumped, so ensure any accesses here are logged
@@ -315,6 +326,22 @@ static INPUT_PORTS_START(dphh8213)
 	PORT_BIT(0xf6, IP_ACTIVE_LOW, IPT_UNUSED) // probably unused
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(cutepet)
+	PORT_START("IN1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PORTC")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 {
@@ -341,6 +368,12 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
 
 	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
+}
+
+void st22xx_bbl338_state::st22xx_cutepet(machine_config &config)
+{
+	st22xx_dphh8213(config);
+	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_cutepet_map);
 }
 
 void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
@@ -388,6 +421,13 @@ ROM_START( dphh8213 )
 	ROM_FILL( 0x00009f, 2, 0xea ) // NOP out SPI check
 ROM_END
 
+ROM_START( cutepet )
+	// internal area not used?
+
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m29w320dt.u2", 0x00000, 0x400000, CRC(157e208f) SHA1(78069c524f214d763c0b216aa3de487b65a84034) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -397,4 +437,8 @@ COMP( 201?, bbl338,   0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim
 COMP( 201?, class200, 0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim_state, empty_init, "<unknown>", "Color LCD Classic Game 200-in-1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // no manufacturer name or product code anywhere
 
 // Language controlled by port bit, set at factory, low resolution
+// different menu protection compared to the st2302u_bbl_spi.cpp sets (games can be selected, but cursor doesn't update)
 COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// seems to be this hardware type, but different LCDC?
+COMP( 201?, cutepet,  0,      0,      st22xx_cutepet, cutepet,   st22xx_bbl338_state, empty_init, "Dream Cube", "Cute Pet Park", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -151,6 +151,7 @@ private:
 	mem_state       m_mem;
 	bool            m_last_dma;
 
+	int m_dma_latency;
 	uint16_t m_reloc;
 
 	address_space_config m_program_config;

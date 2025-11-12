@@ -90,10 +90,12 @@ Note
 **************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -113,13 +115,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_main(*this, "mainram"),
 		m_vram(*this, "vram"),
-		m_cram(*this, "cram")
+		m_cram(*this, "cram"),
+		m_maincpu_rom(*this, "maincpu")
 	{ }
 
-	void vcarn(machine_config &config);
-	void spool99(machine_config &config);
+	void vcarn(machine_config &config) ATTR_COLD;
+	void spool99(machine_config &config) ATTR_COLD;
 
-	void init_spool99();
+	void init_spool99() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -133,6 +136,7 @@ private:
 	required_shared_ptr<uint8_t> m_main;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
+	required_region_ptr<uint8_t> m_maincpu_rom;
 
 	tilemap_t *m_sc0_tilemap = nullptr;
 
@@ -152,13 +156,10 @@ private:
 
 TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
 {
-	int code = ((m_vram[tile_index*2+1]<<8) | (m_vram[tile_index*2+0]));
-	int color = m_cram[tile_index*2+0];
+	int const code = ((m_vram[tile_index * 2 + 1] << 8) | (m_vram[tile_index * 2]));
+	int const color = m_cram[tile_index * 2];
 
-	tileinfo.set(0,
-			code & 0x3fff,
-			color & 0x1f,
-			0);
+	tileinfo.set(0, code & 0x3fff, color & 0x1f, 0);
 }
 
 void spool99_state::video_start()
@@ -175,24 +176,22 @@ uint32_t spool99_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 void spool99_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
-	m_sc0_tilemap->mark_tile_dirty(offset/2);
+	m_sc0_tilemap->mark_tile_dirty(offset / 2);
 }
 
 void spool99_state::cram_w(offs_t offset, uint8_t data)
 {
 	m_cram[offset] = data;
-	m_sc0_tilemap->mark_tile_dirty(offset/2);
+	m_sc0_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
 
 uint8_t spool99_state::spool99_io_r(offs_t offset)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
 //  if(!(io_switch))
 	{
-		switch(offset+0xaf00)
+		switch(offset + 0xaf00)
 		{
 			case 0xafd8: return ioport("COIN1")->read();
 //          case 0xafd9: return 1;
@@ -213,9 +212,9 @@ uint8_t spool99_state::spool99_io_r(offs_t offset)
 			case 0xaff8: return m_oki->read();
 		}
 	}
-//  printf("%04x %d\n",offset+0xaf00,io_switch);
+//  printf("%04x %d\n", offset + 0xaf00, io_switch);
 
-	return ROM[0xaf00+offset];
+	return m_maincpu_rom[0xaf00 + offset];
 }
 
 
@@ -239,7 +238,7 @@ void spool99_state::eeprom_dataline_w(uint8_t data)
 
 void spool99_state::spool99_map(address_map &map)
 {
-	map(0x0000, 0x00ff).ram().share("mainram");
+	map(0x0000, 0x00ff).ram().share(m_main);
 	map(0x0100, 0xaeff).rom().region("maincpu", 0x100).nopw();
 	map(0xaf00, 0xafff).r(FUNC(spool99_state::spool99_io_r));
 	map(0xafed, 0xafed).w(FUNC(spool99_state::eeprom_resetline_w));
@@ -250,17 +249,15 @@ void spool99_state::spool99_map(address_map &map)
 	map(0xb000, 0xb3ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 
 	map(0xb800, 0xdfff).ram().share("nvram");
-	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share("vram");
-	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share("cram");
+	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share(m_vram);
+	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share(m_cram);
 }
 
 uint8_t spool99_state::vcarn_io_r(offs_t offset)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
 //  if(!(io_switch))
 	{
-		switch(offset+0xa700)
+		switch(offset + 0xa700)
 		{
 			case 0xa720: return ioport("SERVICE1")->read();//attract mode
 			case 0xa722: return ioport("COIN1")->read();
@@ -279,14 +276,14 @@ uint8_t spool99_state::vcarn_io_r(offs_t offset)
 
 		}
 	}
-//  printf("%04x\n",offset+0xa700);
+//  printf("%04x\n", offset + 0xa700);
 
-	return ROM[0xa700+offset];
+	return m_maincpu_rom[0xa700 + offset];
 }
 
 void spool99_state::vcarn_map(address_map &map)
 {
-	map(0x0000, 0x00ff).ram().share("mainram");
+	map(0x0000, 0x00ff).ram().share(m_main);
 	map(0x0100, 0xa6ff).rom().region("maincpu", 0x100).nopw();
 	map(0xa700, 0xa7ff).r(FUNC(spool99_state::vcarn_io_r));
 	map(0xa745, 0xa745).w(FUNC(spool99_state::eeprom_resetline_w));
@@ -298,8 +295,8 @@ void spool99_state::vcarn_map(address_map &map)
 
 	map(0xb000, 0xdfff).ram().share("nvram");
 //  map(0xdf00, 0xdfff).rw(FUNC(spool99_state::vcarn_io_r), FUNC(spool99_state::vcarn_io_w)).share("vcarn_io");
-	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share("vram");
-	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share("cram");
+	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share(m_vram);
+	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share(m_cram);
 }
 
 
@@ -371,7 +368,7 @@ INPUT_PORTS_END
 
 void spool99_state::spool99(machine_config &config)
 {
-	Z80(config, m_maincpu, 24000000/8);
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spool99_state::spool99_map);
 	m_maincpu->set_vblank_int("screen", FUNC(spool99_state::irq0_line_hold));
 
@@ -392,7 +389,7 @@ void spool99_state::spool99(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH); // pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
@@ -401,6 +398,7 @@ void spool99_state::vcarn(machine_config &config)
 {
 	spool99(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spool99_state::vcarn_map);
+	m_maincpu->set_clock(12_MHz_XTAL / 4);
 
 	subdevice<screen_device>("screen")->set_visarea(0*8, 64*8-1, 1*8, 31*8-1); //512x240, raw guess
 }
@@ -410,7 +408,7 @@ ROM_START( spool99 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code
 	ROM_LOAD( "v.36.u2", 0x00000, 0x10000, CRC(29527f38) SHA1(bf302f4c6eb53ea55fe1ace7bc9bc7a68ad269e6) )
 
-	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "u32.bin", 0x00000, 0x40000, CRC(1b7aa54c) SHA1(87fc4da8d2a85bc3ce00d8f0f03fef0027e8454a) )
 
 	ROM_REGION( 0x080000, "gfx", 0 )
@@ -422,7 +420,7 @@ ROM_START( spool99a )
 	ROM_LOAD( "sp99v.u2",   0x00000, 0x10000, CRC(ca6cf364) SHA1(1be82af26db6730e00c01581ac0bea2057c2f1c6) ) // first half empty!
 	ROM_CONTINUE(           0x00000, 0x10000) // 0x0000 - 0xafff used
 
-	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "272001.u32", 0x00000, 0x40000, CRC(1b7aa54c) SHA1(87fc4da8d2a85bc3ce00d8f0f03fef0027e8454a) )
 
 	ROM_REGION( 0x080000, "gfx", 0 )
@@ -434,7 +432,7 @@ ROM_START( spool99b )
 	ROM_LOAD( "u2.bin",  0x00000, 0x10000, CRC(488dd1bf) SHA1(7289b639fa56722d1f60d8c4bda566d726f8e00b) ) // first half empty!
 	ROM_CONTINUE(        0x00000, 0x10000) // 0x0000 - 0xafff used
 
-	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "u32.bin", 0x00000, 0x40000, CRC(1b7aa54c) SHA1(87fc4da8d2a85bc3ce00d8f0f03fef0027e8454a) )
 
 	ROM_REGION( 0x080000, "gfx", 0 )
@@ -446,11 +444,24 @@ ROM_START( spool99c )
 	ROM_LOAD( "u2_v26.bin",  0x00000, 0x10000, CRC(df8b561e) SHA1(bd2321e1154a45fc5abca15a37cb0b04023466bf) ) // first half empty!
 	ROM_CONTINUE(            0x00000, 0x10000) // 0x0000 - 0xafff used
 
-	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "u32_v26.bin", 0x00000, 0x40000, CRC(1b7aa54c) SHA1(87fc4da8d2a85bc3ce00d8f0f03fef0027e8454a) )
 
 	ROM_REGION( 0x080000, "gfx", 0 )
 	ROM_LOAD( "u15_v26.bin", 0x00000, 0x80000, CRC(3d79f3df) SHA1(4ba2a09cba94889d29feca481667326da7757061) )
+ROM_END
+
+// bootleg PCB. Different layout but almost same components. Has a Dallas 1230Y-100 NVRAM.
+ROM_START( scardy2k )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code
+	ROM_LOAD( "3.u10", 0x00000, 0x10000, CRC(4daddc0c) SHA1(c0dec75f9395dcd582a4472f071ddfb0aadcf3af) ) // AM27C010, 0xxxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(      0x00000, 0x10000) // 0x0000 - 0xafff used
+
+	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_LOAD( "1.u24", 0x00000, 0x40000, CRC(1b7aa54c) SHA1(87fc4da8d2a85bc3ce00d8f0f03fef0027e8454a) ) // MX27C2000, matches the spool99 sets
+
+	ROM_REGION( 0x080000, "gfx", 0 )
+	ROM_LOAD( "2.u15", 0x00000, 0x80000, CRC(a179633e) SHA1(352583b1697e4fd4f70857f4f8a3875002cc2fe3) ) // M27C4001
 ROM_END
 
 ROM_START( vcarn )
@@ -458,7 +469,7 @@ ROM_START( vcarn )
 	ROM_LOAD( "3.u2",  0x00000, 0x10000, CRC(e7c33032) SHA1(e769c83b6d2b48e347ad6112b4379f6e16bcc6e0) ) // first half empty!
 	ROM_CONTINUE(      0x00000, 0x10000) // 0x0000 - 0xafff used
 
-	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x080000, "oki", 0 )
 	ROM_LOAD( "1.u32", 0x00000, 0x80000, CRC(8a0aa6b5) SHA1(dc39cb26607fabdcb3e74a60943cf88456172d09) )
 
 	ROM_REGION( 0x080000, "gfx", 0 )
@@ -476,8 +487,9 @@ void spool99_state::init_spool99()
 } // anonymous namespace
 
 
-GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.36)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.33)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, spool99b,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.31)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, spool99c,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.26)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.36)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.33)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99b,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.31)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99c,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.26)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 2000, scardy2k,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "bootleg (CV)",        "Super Card Y2000K (Version 0.26)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1998?, vcarn,     0,        vcarn,      spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", MACHINE_SUPPORTS_SAVE ) // claims '98, '99 printed on PCB

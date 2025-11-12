@@ -317,9 +317,9 @@ u8 mu100_state::p1_r()
 		if((m_cur_p2 & P2_LCD_ENABLE)) {
 			if(m_cur_p2 & P2_LCD_RW) {
 				if(m_cur_p2 & P2_LCD_RS)
-					return m_lcd->data_read();
+					return m_lcd->data_r();
 				else
-					return m_lcd->control_read();
+					return m_lcd->control_r();
 			} else
 				return 0x00;
 		}
@@ -343,9 +343,9 @@ void mu100_state::p2_w(u8 data)
 		if((m_cur_p2 & P2_LCD_ENABLE) && !(data & P2_LCD_ENABLE)) {
 			if(!(m_cur_p2 & P2_LCD_RW)) {
 				if(m_cur_p2 & P2_LCD_RS)
-					m_lcd->data_write(m_cur_p1);
+					m_lcd->data_w(m_cur_p1);
 				else
-					m_lcd->control_write(m_cur_p1);
+					m_lcd->control_w(m_cur_p1);
 			}
 		}
 		m_lcd->set_contrast((data >> 3) & 7);
@@ -544,7 +544,7 @@ ROM_END
 ROM_START( mu100b )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	// MU-100B v1.08 (Nov. 28, 1997)
-	ROM_LOAD16_WORD_SWAP( "xu50710.bin", 0x000000, 0x200000, CRC(4b10bd27) SHA1(12d7c6e1bce7974b34916e1bfa5057ab55867476) )
+	ROM_LOAD16_WORD_SWAP( "xu50710.ic11", 0x000000, 0x200000, CRC(4b10bd27) SHA1(12d7c6e1bce7974b34916e1bfa5057ab55867476) )
 
 	ROM_REGION32_LE( 0x1800000, "swp30", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD( "sx518b0.ic34", 0x0000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
@@ -558,6 +558,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 1997, mu100,  0,     0, mu100,  mu100, mu100_state,  empty_init, "Yamaha", "MU100",                    MACHINE_NOT_WORKING )
-SYST( 1997, mu100r, mu100, 0, mu100r, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version",   MACHINE_NOT_WORKING )
-SYST( 1998, mu100b, mu100, 0, mu100b, mu100, mu100_state,  empty_init, "Yamaha", "MU100 Screenless version", MACHINE_NOT_WORKING )
+SYST( 1997, mu100,  0,     0, mu100,  mu100, mu100_state,  empty_init, "Yamaha", "MU100",                    MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
+SYST( 1997, mu100r, mu100, 0, mu100r, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version",   MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
+SYST( 1998, mu100b, mu100, 0, mu100b, mu100, mu100_state,  empty_init, "Yamaha", "MU100 Screenless version", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )

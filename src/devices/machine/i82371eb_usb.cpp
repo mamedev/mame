@@ -2,10 +2,10 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-    PIIX4E USB interface
+PIIX4E USB interface (UHCI)
 
-    TODO:
-    - Actual USB ports;
+TODO:
+- Actual USB ports;
 
 **************************************************************************************************/
 

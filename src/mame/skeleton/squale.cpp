@@ -79,6 +79,7 @@ TODO
 
 #include "emu.h"
 
+#include "bus/centronics/ctronics.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6809/m6809.h"
@@ -89,6 +90,8 @@ TODO
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "video/ef9365.h"
+
+#include "formats/flex_dsk.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -136,19 +139,15 @@ private:
 	void fdc_sel1_w(uint8_t data);
 	uint8_t fdc_sel1_r();
 	uint8_t pia_u72_porta_r();
-	uint8_t pia_u72_portb_r();
 	uint8_t pia_u75_porta_r();
 	uint8_t pia_u75_portb_r();
 	void pia_u72_porta_w(uint8_t data);
-	void pia_u72_portb_w(uint8_t data);
 	void pia_u75_porta_w(uint8_t data);
 
 	uint8_t ay_porta_r();
 	uint8_t ay_portb_r();
 
 	void pia_u72_ca2_w(int state);
-	void pia_u72_cb2_w(int state);
-
 	void pia_u75_cb2_w(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
@@ -178,6 +177,8 @@ private:
 	required_device<wd1770_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<generic_slot_device> m_cart;
+
+	static void floppy_formats(format_registration &fr);
 };
 
 /*****************************************
@@ -316,6 +317,12 @@ uint8_t squale_state::fdc_sel1_r()
 	LOG("%s: read fdc_sel1_r 0x%.2X\n",machine().describe_context(),data);
 
 	return data;
+}
+
+void squale_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
 }
 
 /**********************************
@@ -470,35 +477,6 @@ void squale_state::pia_u75_cb2_w(int state)
 	{
 		cart_addr_counter_reset = 0;
 	}
-}
-
-/**********************************
-*      Printer I/O Handlers      *
-***********************************/
-
-uint8_t squale_state::pia_u72_portb_r()
-{
-	// U72 PIA Port B : Printer data bus
-
-	uint8_t data = 0xff;
-
-	LOG("%s: read pia_u72_portb_r\n",machine().describe_context());
-
-	return data;
-}
-
-void squale_state::pia_u72_portb_w(uint8_t data)
-{
-	// U72 PIA Port B : Printer data bus
-
-	LOG("%s: write pia_u72_portb_w : 0x%.2X\n",machine().describe_context(),data);
-}
-
-void squale_state::pia_u72_cb2_w(int state)
-{
-	// U72 PIA CB2 : Printer Data Strobe line
-
-	LOG("%s: U72 PIA Port CB2 Set to %d\n", machine().describe_context(),state);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( squale_state::cart_load )
@@ -680,11 +658,10 @@ void squale_state::squale(machine_config &config)
 	/* Cartridge pia */
 	PIA6821(config, m_pia_u72);
 	m_pia_u72->readpa_handler().set(FUNC(squale_state::pia_u72_porta_r));
-	m_pia_u72->readpb_handler().set(FUNC(squale_state::pia_u72_portb_r));
 	m_pia_u72->writepa_handler().set(FUNC(squale_state::pia_u72_porta_w));
-	m_pia_u72->writepb_handler().set(FUNC(squale_state::pia_u72_portb_w));
+	m_pia_u72->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pia_u72->ca2_handler().set(FUNC(squale_state::pia_u72_ca2_w));
-	m_pia_u72->cb2_handler().set(FUNC(squale_state::pia_u72_cb2_w));
+	m_pia_u72->cb2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 
 	/* Keyboard pia */
 	PIA6821(config, m_pia_u75);
@@ -720,10 +697,16 @@ void squale_state::squale(machine_config &config)
 
 	TIMER(config, "squale_sl").configure_scanline(FUNC(squale_state::squale_scanline), "screen", 0, 10);
 
+	/* Printer slot */
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.ack_handler().set(m_pia_u72, FUNC(pia6821_device::cb1_w));
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(latch);
+
 	/* Floppy */
 	WD1770(config, m_fdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, "wd1770:0", squale_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1770:1", squale_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:0", squale_floppies, "525qd", squale_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd1770:1", squale_floppies, "525qd", squale_state::floppy_formats).enable_sound(true);
 	//SOFTWARE_LIST(config, "flop525_list").set_original("squale_flop");   // list does not exist
 
 	/* Cartridge slot */
@@ -739,7 +722,11 @@ ROM_START( squale )
 	ROM_SYSTEM_BIOS(0, "v201", "Version 2.1")
 	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(0) )
 
-	// place ROM v1.2 signature here.
+	ROM_SYSTEM_BIOS(1, "v12a", "Version 1.2a")
+	ROMX_LOAD( "sqmon_1_2a.bin", 0x0000, 0x1000, CRC(67B5B66F) SHA1(3e28de3b559c2c22dcc2c59f06b76e73e564861d), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "v12b", "Version 1.2b")
+	ROMX_LOAD( "sqmon_1_2b.bin", 0x0000, 0x1000, CRC(c8635598) SHA1(fd944be3c17ec2be2de91c705e90214ca55aa63c), ROM_BIOS(2) )
 ROM_END
 
 } // anonymous namespace

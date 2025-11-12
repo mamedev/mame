@@ -133,7 +133,12 @@ void a2_video_device::res_w(int state)
 	m_hires = state;
 }
 
-void a2_video_device::dhires_w(int state)
+void a2_video_device::an2_w(int state)
+{
+	m_an2 = state;
+}
+
+void a2_video_device::an3_w(int state)
 {
 	// select double hi-res
 	screen().update_now();
@@ -146,11 +151,6 @@ void a2_video_device::dhires_w(int state)
 	}
 
 	m_dhires = !state;
-}
-
-void a2_video_device::an2_w(int state)
-{
-	m_an2 = state;
 }
 
 void a2_video_device::a80col_w(bool b80Col)

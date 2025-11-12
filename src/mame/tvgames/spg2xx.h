@@ -51,7 +51,7 @@ public:
 	void tmntmutm(machine_config &config);
 
 
-	void init_crc();
+	void init_crc(int blocks = 1, int crclocation = 0);
 	void init_tvsprt10();
 	void init_itvphone();
 

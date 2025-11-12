@@ -193,6 +193,11 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
+rgb_t othunder_state::color_xrgb555(u16 data)
+{
+	return rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+}
+
 u32 othunder_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3];

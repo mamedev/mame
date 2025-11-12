@@ -2,11 +2,11 @@
 // copyright-holders:
 /**************************************************************************************************
 
-VIA VT6306 generic FireWire IEEE 1394a card
+VIA VT6306 generic FireWire IEEE 1394a card (OHCI)
 
 - paired with USB 2.0 controller on a Sunix UFC3212V 4x USB 3x Firewire card
   (as multifunction, at .3 while USB takes .0/.1/.2)
-- midway/midzeus.cpp crusnexo/thegrid uses regular IEEE 1394 ports.
+- midway/midzeus.cpp crusnexo & thegrid uses regular IEEE 1394 ports.
 - skeleton/pegasos2.cpp uses an on-board version of this.
 - PHY has default vendor ID=0x004063, device ID=306000, Compliance Level=1
 

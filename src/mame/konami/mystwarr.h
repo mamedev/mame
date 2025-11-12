@@ -39,16 +39,16 @@ private:
 	std::unique_ptr<uint8_t[]> m_decoded;
 
 	uint8_t m_mw_irq_control = 0;
-	int m_cur_sound_region = 0;
-	int m_layer_colorbase[6]{};
-	int m_oinprion = 0;
-	int m_cbparam = 0;
-	int m_sprite_colorbase = 0;
-	int m_sub1_colorbase = 0;
-	int m_last_psac_colorbase = 0;
-	int m_gametype = 0;
-	int m_roz_enable = 0;
-	int m_roz_rombank = 0;
+	int32_t m_cur_sound_region = 0;
+	uint16_t m_layer_colorbase[6]{};
+	int32_t m_oinprion = 0;
+	int32_t m_cbparam = 0;
+	int32_t m_sprite_colorbase = 0;
+	int32_t m_sub1_colorbase = 0;
+	int32_t m_last_psac_colorbase = 0;
+	int32_t m_gametype = 0;
+	int32_t m_roz_enable = 0;
+	int32_t m_roz_rombank = 0;
 	tilemap_t *m_ult_936_tilemap = nullptr;
 	uint16_t m_clip = 0;
 	uint8_t m_last_alpha_tile_mix_code = 0;

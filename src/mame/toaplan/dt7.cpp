@@ -15,6 +15,7 @@
     - service mode doesn't display properly
     - currently only coins up with service button
     - sound dies after one stage?
+    - merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
 */
 
 
@@ -141,8 +142,9 @@ void dt7_state::dt7_irq(int state)
 	// the audio CPU also has a 'serial' interrupt populated?
 	// and the boards can be linked together
 
-	// triggering this prevents our other timer? interrupt from working however?
-	//m_audiocpu->set_input_line(NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
+	// amongst other things this interrupt copies input data to where the 68k can see it
+	// although triggering it here might not be correct as the game just ends up showing 'mach race'
+	// m_audiocpu->set_input_line(NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -171,6 +173,10 @@ void dt7_state::eeprom_w(u8 data)
 
 u8 dt7_state::read_port_2()
 {
+	// input/coin data is read in bits 0/1
+	// it's probably latched by toggling bit 2 low->high and shifted by toggling bit 3
+	// it gets put in RAM then worked on by the external interrupt
+
 	logerror("%s: read port 2\n", machine().describe_context());
 	return m_ioport_state;
 }
@@ -585,7 +591,7 @@ ROM_START( dt7 )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
 	/* It's a NEC V25 (PLCC94) (encrypted program uploaded by main CPU) */
-	/* Note, same markings as other games found in toaplan2.cpp, but table is different! */
+	/* Note, same markings as other games found in toaplan/toaplan2.cpp, but table is different! */
 
 	ROM_REGION( 0x400000, "gp9001_0", 0 )
 	ROM_LOAD( "3a.49", 0x000000, 0x080000, CRC(ba8e378c) SHA1(d5eb4a839d6b3c2b9bf0bd87f06859a01a2c0cbf) )

@@ -1,9 +1,8 @@
 // This file is part of AsmJit project <https://asmjit.com>
 //
-// See asmjit.h or LICENSE.md for license and copyright information
+// See <asmjit/core.h> or LICENSE.md for license and copyright information
 // SPDX-License-Identifier: Zlib
 
-const hasOwn = Object.prototype.hasOwnProperty;
 function nop(x) { return x; }
 
 // Generator - Constants
@@ -93,11 +92,11 @@ class ObjectUtils {
         return a === b;
 
       for (let k in a)
-        if (!hasOwn.call(b, k) || !ObjectUtils.equals(a[k], b[k]))
+        if (!Object.hasOwn(b, k) || !ObjectUtils.equals(a[k], b[k]))
           return false;
 
       for (let k in b)
-        if (!hasOwn.call(a, k))
+        if (!Object.hasOwn(a, k))
           return false;
     }
 
@@ -112,11 +111,11 @@ class ObjectUtils {
       return ObjectUtils.equals(a, b);
 
     for (let k in a)
-      if (!hasOwn.call(except, k) && (!hasOwn.call(b, k) || !ObjectUtils.equals(a[k], b[k])))
+      if (!Object.hasOwn(except, k) && (!Object.hasOwn(b, k) || !ObjectUtils.equals(a[k], b[k])))
         return false;
 
     for (let k in b)
-      if (!hasOwn.call(except, k) && !hasOwn.call(a, k))
+      if (!Object.hasOwn(except, k) && !Object.hasOwn(a, k))
         return false;
 
     return true;
@@ -124,14 +123,14 @@ class ObjectUtils {
 
   static findKey(map, keys) {
     for (let key in keys)
-      if (hasOwn.call(map, key))
+      if (Object.hasOwn(map, key))
         return key;
     return undefined;
   }
 
   static hasAny(map, keys) {
     for (let key in keys)
-      if (hasOwn.call(map, key))
+      if (Object.hasOwn(map, key))
         return true;
     return false;
   }
@@ -139,15 +138,15 @@ class ObjectUtils {
   static and(a, b) {
     const out = Object.create(null);
     for (let k in a)
-      if (hasOwn.call(b, k))
+      if (Object.hasOwn(b, k))
         out[k] = true;
     return out;
   }
 
   static xor(a, b) {
     const out = Object.create(null);
-    for (let k in a) if (!hasOwn.call(b, k)) out[k] = true;
-    for (let k in b) if (!hasOwn.call(a, k)) out[k] = true;
+    for (let k in a) if (!Object.hasOwn(b, k)) out[k] = true;
+    for (let k in b) if (!Object.hasOwn(a, k)) out[k] = true;
     return out;
   }
 }
@@ -215,6 +214,9 @@ exports.ArrayUtils = ArrayUtils;
 class StringUtils {
   static asString(x) { return String(x); }
 
+  static makeEnumName(name) {
+    return name ? name.charAt(0).toUpperCase() + name.substring(1) : "";
+  }
   static countOf(s, pattern) {
     if (!pattern)
       FATAL(`Pattern cannot be empty`);
@@ -421,8 +423,8 @@ class StringUtils {
     priorityArray.forEach((str, index) => { map[str] = index; });
 
     return function(a, b) {
-      const ax = hasOwn.call(map, a) ? map[a] : Infinity;
-      const bx = hasOwn.call(map, b) ? map[b] : Infinity;
+      const ax = Object.hasOwn(map, a) ? map[a] : Infinity;
+      const bx = Object.hasOwn(map, b) ? map[b] : Infinity;
       return ax != bx ? ax - bx : a < b ? -1 : a > b ? 1 : 0;
     }
   }
@@ -481,7 +483,7 @@ exports.IndexedArray = IndexedArray;
 //   a) static const char* const* instNames = { "add", "mov", "vpunpcklbw" };
 //
 //   b) static const char instNames[] = { "add\0" "mov\0" "vpunpcklbw\0" };
-//      static const uint16_t instNameIndex[] = { 0, 4, 8 };
+//      static const uint16_t _inst_name_index[] = { 0, 4, 8 };
 //
 // The latter (b) has an advantage that it doesn't have to be relocated by the linker, which saves
 // a lot of space in the resulting binary and a lot of CPU cycles (and memory) when the linker loads
@@ -513,8 +515,8 @@ class IndexedString {
       }
       else {
         for (i = 0, len = k.length; i < len; i++) {
-          kp = k.substr(i);
-          if (!hasOwn.call(partialMap, kp) || partialMap[kp].length < len)
+          kp = k.substring(i);
+          if (!Object.hasOwn(partialMap, kp) || partialMap[kp].length < len)
             partialMap[kp] = k;
         }
       }
@@ -583,7 +585,7 @@ class IndexedString {
     if (this.size === -1)
       FATAL(`IndexedString.getIndex(): Not indexed yet, call index()`);
 
-    if (!hasOwn.call(this.map, k))
+    if (!Object.hasOwn(this.map, k))
       FATAL(`IndexedString.getIndex(): Key '${k}' not found.`);
 
     return this.map[k];

@@ -1037,10 +1037,10 @@ void i386_device::i386_task_switch(uint16_t selector, uint8_t nested)
 
 	CHANGE_PC(m_eip);
 
-	m_CPL = (m_sreg[SS].flags >> 5) & 3;
 
 	int t_bit = READ32(tss+0x64) & 1;
 	if(t_bit) m_dr[6] |= (1 << 15); //If the T bit of the new TSS is set, set the BT bit of DR6.
+	m_CPL = (m_sreg[SS].flags >> 5) & 3;
 
 	m_dr[7] &= ~(0x155); //Clear all of the local enable bits from DR7.
 

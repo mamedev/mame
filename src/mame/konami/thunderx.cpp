@@ -181,15 +181,15 @@ static const int layer_colorbase[] = { 768 / 16, 0 / 16, 256 / 16 };
 
 K052109_CB_MEMBER(thunderx_state_base::tile_callback)
 {
-	*code |= ((*color & 0x1f) << 8) | (bank << 13);
-	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x1f) << 8) | (bank << 13);
+	color = layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 K052109_CB_MEMBER(scontra_state::gbusters_tile_callback)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
-	*code |= ((*color & 0x0d) << 8) | ((*color & 0x10) << 5) | (bank << 12);
-	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x0d) << 8) | ((color & 0x10) << 5) | (bank << 12);
+	color = layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 
@@ -206,15 +206,15 @@ K051960_CB_MEMBER(thunderx_state_base::sprite_callback)
 	/* Sprite priority 1 means appear behind background, used only to mask sprites */
 	/* in the foreground */
 	/* Sprite priority 3 means don't draw (not used) */
-	switch (*color & 0x30)
+	switch (color & 0x30)
 	{
-		case 0x00: *priority = 0; break;
-		case 0x10: *priority = GFX_PMASK_2 | GFX_PMASK_1; break;
-		case 0x20: *priority = GFX_PMASK_2; break;
-		case 0x30: *priority = 0xffff; break;
+		case 0x00: priority = 0; break;
+		case 0x10: priority = GFX_PMASK_2 | GFX_PMASK_1; break;
+		case 0x20: priority = GFX_PMASK_2; break;
+		case 0x30: priority = 0xffff; break;
 	}
 
-	*color = sprite_colorbase + (*color & 0x0f);
+	color = sprite_colorbase + (color & 0x0f);
 }
 
 

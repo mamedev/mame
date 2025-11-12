@@ -10,7 +10,7 @@
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/eepromser.h"
 #include "emupal.h"
 #include "screen.h"
@@ -163,7 +163,7 @@ void ikt5a_state::ikt5a(machine_config &config)
 {
 	I80C51(config, m_maincpu, 15_MHz_XTAL / 2); // PCB 80C51BH-2 (clock uncertain)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ikt5a_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &ikt5a_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &ikt5a_state::ext_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(ikt5a_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(ikt5a_state::p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(ikt5a_state::p3_r));

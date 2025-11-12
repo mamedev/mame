@@ -34,7 +34,7 @@ determines both the COP watchdog timeout and the real-time interrupt rate
 #define LOG_COP     (1U << 4)
 
 //#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_IOPORT | LOG_TIMER | LOG_COP)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGINT(...)     LOGMASKED(LOG_INT,    __VA_ARGS__)

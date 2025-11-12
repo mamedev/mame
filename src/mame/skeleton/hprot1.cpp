@@ -56,7 +56,7 @@ Infinite loop is reached at address 0x7699
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -95,7 +95,7 @@ private:
 	void henry_p3_w(uint8_t data);
 	void hprot1_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
-	void i80c31_io(address_map &map) ATTR_COLD;
+	void i80c31_data(address_map &map) ATTR_COLD;
 	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
@@ -137,7 +137,7 @@ void hprot1_state::init_hprot1()
 
 //P1.4 => WhatchDog Input (after timeout resets CPU)
 
-void hprot1_state::i80c31_io(address_map &map)
+void hprot1_state::i80c31_data(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
 /*TODO: verify the mirror mask value for the HD44780 device */
@@ -255,7 +255,7 @@ void hprot1_state::hprot1(machine_config &config)
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
-	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
+	m_maincpu->set_addrmap(AS_DATA, &hprot1_state::i80c31_data);
 	m_maincpu->port_in_cb<1>().set_ioport("inputs");
 	m_maincpu->port_out_cb<1>().set(FUNC(hprot1_state::henry_p1_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(hprot1_state::henry_p3_w));
@@ -287,7 +287,7 @@ void hprot1_state::hprotr8a(machine_config &config)
 
 	I80C31(config.replace(), m_maincpu, 11059200); // value of X1 crystal on the PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
-	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
+	m_maincpu->set_addrmap(AS_DATA, &hprot1_state::i80c31_data);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -305,7 +305,7 @@ void hprot1_state::hprot2r6(machine_config &config)
 
 	I80C31(config.replace(), m_maincpu, 11059200); // value of X1 crystal on the PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
-	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
+	m_maincpu->set_addrmap(AS_DATA, &hprot1_state::i80c31_data);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -139,7 +139,6 @@ public:
 		, m_shared(*this, "shared")
 		, m_framebuffer(*this, "framebuffer")
 		, m_cop_ram(*this, "cop_ram")
-		, m_st0016_bank(*this, "st0016_bank")
 	{ }
 
 	void speglsht(machine_config &config) ATTR_COLD;
@@ -159,8 +158,6 @@ private:
 	required_shared_ptr<uint32_t> m_framebuffer;
 	required_shared_ptr<uint32_t> m_cop_ram;
 
-	required_memory_bank m_st0016_bank;
-
 	bitmap_ind16 m_bitmap;
 	uint32_t m_videoreg;
 
@@ -175,6 +172,7 @@ private:
 
 	void st0016_rom_bank_w(uint8_t data);
 	void speglsht_mem(address_map &map) ATTR_COLD;
+	void st0016_extrom_map(address_map &map) ATTR_COLD;
 	void st0016_io(address_map &map) ATTR_COLD;
 	void st0016_mem(address_map &map) ATTR_COLD;
 };
@@ -182,41 +180,26 @@ private:
 
 void speglsht_state::st0016_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr(m_st0016_bank);
-	//map(0xc000, 0xcfff).rw(FUNC(speglsht_state::st0016_sprite_ram_r), FUNC(speglsht_state::st0016_sprite_ram_w));
-	//map(0xd000, 0xdfff).rw(FUNC(speglsht_state::st0016_sprite2_ram_r), FUNC(speglsht_state::st0016_sprite2_ram_w));
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xe87f).ram();
-	//map(0xe900, 0xe9ff) // sound - internal
-	//map(0xea00, 0xebff).rw(FUNC(speglsht_state::st0016_palette_ram_r), FUNC(speglsht_state::st0016_palette_ram_w));
-	//map(0xec00, 0xec1f).rw(FUNC(speglsht_state::st0016_character_ram_r), FUNC(speglsht_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram().share(m_shared);
 }
 
 void speglsht_state::machine_start()
 {
-	m_st0016_bank->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
 }
 
-// common rombank? should go in seta/st0016.cpp with larger address space exposed?
-void speglsht_state::st0016_rom_bank_w(uint8_t data)
+
+void speglsht_state::st0016_extrom_map(address_map &map)
 {
-	m_st0016_bank->set_entry(data);
+	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
 }
-
 
 void speglsht_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//map(0x00, 0xbf).rw(FUNC(speglsht_state::st0016_vregs_r), FUNC(speglsht_state::st0016_vregs_w));
-	map(0xe1, 0xe1).w(FUNC(speglsht_state::st0016_rom_bank_w));
-	//map(0xe2, 0xe2).w(FUNC(speglsht_state::st0016_sprite_bank_w));
-	//map(0xe3, 0xe4).w(FUNC(speglsht_state::st0016_character_bank_w));
-	//map(0xe5, 0xe5).w(FUNC(speglsht_state::st0016_palette_bank_w));
 	map(0xe6, 0xe6).nopw();
 	map(0xe7, 0xe7).nopw();
-	//map(0xf0, 0xf0).r(FUNC(speglsht_state::st0016_dma_r));
 }
 
 uint32_t speglsht_state::shared_r(offs_t offset)
@@ -425,6 +408,7 @@ void speglsht_state::speglsht(machine_config &config)
 	ST0016_CPU(config, m_maincpu, XTAL(42'954'545) / 6); // 7.159 MHz (42.9545 MHz / 6)
 	m_maincpu->set_addrmap(AS_PROGRAM, &speglsht_state::st0016_mem);
 	m_maincpu->set_addrmap(AS_IO, &speglsht_state::st0016_io);
+	m_maincpu->set_addrmap(st0016_cpu_device::AS_EXTROM, &speglsht_state::st0016_extrom_map);
 	m_maincpu->set_vblank_int("screen", FUNC(speglsht_state::irq0_line_hold));
 	m_maincpu->set_screen("screen");
 
@@ -451,7 +435,7 @@ void speglsht_state::speglsht(machine_config &config)
 }
 
 ROM_START( speglsht )
-	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "sx004-07.u70", 0x000000, 0x200000, CRC(2d759cc4) SHA1(9fedd829190b2aab850b2f1088caaec91e8715dd) ) /* Noted as "ZPRO0" IE: Z80 (ST0016) Program 0 */
 	/* U71 unpopulated, Noted as ZPRO1 */
 

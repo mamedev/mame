@@ -72,6 +72,8 @@ protected:
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 private:
 	void w65c02_mem(address_map &map) ATTR_COLD;
@@ -163,6 +165,11 @@ void a2bus_superdrive_device::device_reset()
 {
 	m_bank_select = 0;
 	m_side = 0;
+}
+
+void a2bus_superdrive_device::reset_from_bus()
+{
+	m_fdc->reset();
 }
 
 

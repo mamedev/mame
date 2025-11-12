@@ -92,6 +92,8 @@ Notes:
 
 #include "emu.h"
 
+#include "sei80bu.h"
+
 #include "seibusound.h"
 
 #include "cpu/m68000/m68000.h"
@@ -893,7 +895,7 @@ void toki_state::toki(machine_config &config)
 	m_audiocpu->set_addrmap(AS_OPCODES, &toki_state::toki_audio_opcodes_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
+	SEI80BU(config, "sei80bu", XTAL(14'318'181) / 4).set_device_rom_tag("audiocpu");
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);

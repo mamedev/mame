@@ -1,0 +1,1237 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:m1macrophage
+-->
+<mamelayout version="2">
+	<!-- case elements -->
+
+	<element name="panel"><rect><color red="0.15" green="0.15" blue="0.15"/></rect></element>
+	<element name="separator"><rect><color red="0.33" green="0.33" blue="0.33"/></rect></element>
+	<element name="wood"><rect><color red="0.43" green="0.20" blue="0.16"/></rect></element>
+	<element name="dark_wood"><rect><color red="0.18" green="0.11" blue="0.11"/></rect></element>
+
+	<element name="script_warning" defstate="1">
+		<text state="1" string="*** to control knobs and wheels with a mouse, enable the layout plugin ***">
+			<color red="0.84" green="0.84" blue="0.84"/>
+		</text>
+	</element>
+
+	<!-- multi-track section elements -->
+
+	<element name="multitrack_label">
+		<rect><color red="0.15" green="0.15" blue="0.15"/></rect>
+		<text string="MULTI-TRACK CONTROLLER"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+
+	<element name="multitrack_box">
+		<image><data><![CDATA[
+			<svg width="330" height="250">
+				<rect fill="none" stroke="#d4d4d4" stroke-width="2" x="1" y="1" width="328" height="248" rx="12" ry="12"/>
+				<rect fill="#d4d4d4" stroke="none" x="30" y="76" width="270" height="2"/>
+				<rect fill="#d4d4d4" stroke="none" x="109" y="187" width="2" height="53"/>
+				<rect fill="#d4d4d4" stroke="none" x="220" y="187" width="2" height="53"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="txt_track">
+		<rect><color red="0.15" green="0.15" blue="0.15"/></rect>
+		<text string="TRACK"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+
+	<element name="txt_seq">
+		<text string="SEQUENCER"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+
+	<element name="txt_arp">
+		<text string="ARPEGGIATOR"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+
+	<element name="txt_stack">
+		<text string="STACK MODE"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+
+	<!-- parameters section elements -->
+
+	<element name="parameters_label">
+		<rect><color red="0.15" green="0.15" blue="0.15"/></rect>
+		<text string="PARAMETERS"><color red="0.75" green="0.75" blue="0.75"/></text>
+	</element>
+
+	<element name="parameters_box">
+		<image><data><![CDATA[
+			<svg width="356" height="250">
+				<!-- outline -->
+				<rect fill="none" stroke="#bfbfbf" stroke-width="2" x="1" y="1" width="354" height="248" rx="12" ry="12"/>
+
+				<!-- horizontal lines -->
+				<g fill="#bfbfbf" stroke="none">
+					<rect x="25" y="19" width="132" height="1"/>
+					<rect x="25" y="190" width="132" height="1"/>
+					<rect x="180" y="19" width="122" height="1"/>
+					<rect x="180" y="159" width="122" height="1"/>
+					<rect x="180" y="224" width="122" height="1"/>
+				</g>
+
+				<!-- brackets -->
+				<g fill="none" stroke="#bfbfbf" stroke-width="0.5">
+					<polyline transform="translate(18, 69)" points="7,0 0,0 0,60 7,60"/>
+					<polyline transform="translate(18, 160)" points="7,0 0,0 0,19 7,19"/>
+					<polyline transform="translate(172, 59)" points="7,0 0,0 0,60 7,60"/>
+				</g>
+
+				<!-- waveforms -->
+				<g fill="none" stroke="#bfbfbf" stroke-width="0.5">
+					<polyline transform="translate(46, 133)" points="0,5 6,0 6,5"/>
+					<polyline transform="translate(46, 143)" points="0,5 3,0 6,5"/>
+					<polyline transform="translate(46, 152)" points="0,5 0,0 3,0 3,5 6,5"/>
+					<polyline transform="translate(61, 222)" points="0,5 3,0 6,5"/>
+					<polyline transform="translate(106, 221)" points="0,5 3,5 3,0 5,0 5,5 8,5"/>
+					<polyline transform="translate(220, 142)" points="0,5 3,0 6,5"/>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="parameters">
+		<rect>
+			<color red="0" green="0" blue="0" alpha="0"/>
+			<bounds x="0" y="0" width="356" height="250"/>
+		</rect>
+
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15"/>
+			<bounds x="60" y="15" width="65" height="10"/>
+		</rect>
+		<text string="OSCILLATOR">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="60" y="15" width="65" height="10"/>
+		</text>
+		<text string="00" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="30" width="20" height="9"/>
+		</text>
+		<text string="COARSE FREQUENCY" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="30" width="110" height="9"/>
+		</text>
+		<text string="01" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="40" width="20" height="9"/>
+		</text>
+		<text string="FINE FREQUENCY" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="40" width="110" height="9"/>
+		</text>
+		<text string="02" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="50" width="20" height="9"/>
+		</text>
+		<text string="GLIDE RATE" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="50" width="110" height="9"/>
+		</text>
+		<text string="03" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="60" width="20" height="9"/>
+		</text>
+		<text string="LFO  0 = OFF  1 = ON" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="60" width="110" height="9"/>
+		</text>
+		<text string="04" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="70" width="20" height="9"/>
+		</text>
+		<text string="ENVELOPE AMOUNT" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="70" width="110" height="9"/>
+		</text>
+		<text string="05" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="80" width="20" height="9"/>
+		</text>
+		<text string="0 = NORM  1 = INVERT" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="80" width="110" height="9"/>
+		</text>
+		<text string="06" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="90" width="20" height="9"/>
+		</text>
+		<text string="ATTACK" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="90" width="110" height="9"/>
+		</text>
+		<text string="07" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="100" width="20" height="9"/>
+		</text>
+		<text string="DECAY" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="100" width="110" height="9"/>
+		</text>
+		<text string="08" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="110" width="20" height="9"/>
+		</text>
+		<text string="SUSTAIN" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="110" width="110" height="9"/>
+		</text>
+		<text string="09" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="120" width="20" height="9"/>
+		</text>
+		<text string="RELEASE" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="120" width="110" height="9"/>
+		</text>
+		<text string="10" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="130" width="20" height="9"/>
+		</text>
+		<text string="0 = OFF  1 = ON" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="60" y="130" width="95" height="9"/>
+		</text>
+		<text string="11" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="140" width="20" height="9"/>
+		</text>
+		<text string="0 = OFF  1 = ON" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="60" y="140" width="95" height="9"/>
+		</text>
+		<text string="12" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="150" width="20" height="9"/>
+		</text>
+		<text string="0 = OFF  1 = ON" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="60" y="150" width="95" height="9"/>
+		</text>
+		<text string="13" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="160" width="20" height="9"/>
+		</text>
+		<text string="PULSE WIDTH" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="160" width="110" height="9"/>
+		</text>
+		<text string="14" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="170" width="20" height="9"/>
+		</text>
+		<text string="LFO  0 = OFF  1 = ON" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="170" width="110" height="9"/>
+		</text>
+
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15"/>
+			<bounds x="80" y="185" width="25" height="10"/>
+		</rect>
+		<text string="LFO">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="80" y="185" width="25" height="10"/>
+		</text>
+		<text string="15" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="200" width="20" height="9"/>
+		</text>
+		<text string="FREQUENCY" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="200" width="110" height="9"/>
+		</text>
+		<text string="16" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="210" width="20" height="9"/>
+		</text>
+		<text string="PROGRAMMED AMOUNT" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="210" width="110" height="9"/>
+		</text>
+		<text string="17" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="25" y="220" width="20" height="9"/>
+		</text>
+		<text string="0 =" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="45" y="220" width="30" height="9"/>
+		</text>
+		<text string="1 =" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="90" y="220" width="30" height="9"/>
+		</text>
+
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15"/>
+			<bounds x="223" y="15" width="39" height="10"/>
+		</rect>
+		<text string="FILTER">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="223" y="15" width="39" height="10"/>
+		</text>
+		<text string="18" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="30" width="20" height="9"/>
+		</text>
+		<text string="OSC / NOISE MIXER" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="30" width="110" height="9"/>
+		</text>
+		<text string="19" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="40" width="20" height="9"/>
+		</text>
+		<text string="CUTOFF FREQUENCY" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="40" width="110" height="9"/>
+		</text>
+		<text string="20" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="50" width="20" height="9"/>
+		</text>
+		<text string="RESONANCE" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="50" width="110" height="9"/>
+		</text>
+		<text string="21" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="60" width="20" height="9"/>
+		</text>
+		<text string="ENVELOPE AMOUNT" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="60" width="110" height="9"/>
+		</text>
+		<text string="22" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="70" width="20" height="9"/>
+		</text>
+		<text string="0 = NORM  1 = INVERT" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="70" width="110" height="9"/>
+		</text>
+		<text string="23" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="80" width="20" height="9"/>
+		</text>
+		<text string="ATTACK" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="80" width="110" height="9"/>
+		</text>
+		<text string="24" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="90" width="20" height="9"/>
+		</text>
+		<text string="DECAY" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="90" width="110" height="9"/>
+		</text>
+		<text string="25" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="100" width="20" height="9"/>
+		</text>
+		<text string="SUSTAIN" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="100" width="110" height="9"/>
+		</text>
+		<text string="26" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="110" width="20" height="9"/>
+		</text>
+		<text string="RELEASE" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="110" width="110" height="9"/>
+		</text>
+		<text string="27" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="120" width="20" height="9"/>
+		</text>
+		<text string="LFO  0 = OFF  1 = ON" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="120" width="110" height="9"/>
+		</text>
+		<text string="28" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="130" width="20" height="9"/>
+		</text>
+		<text string="KEY 0 = OFF 1 = HALF 2 = FULL" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="130" width="135" height="9"/>
+		</text>
+		<text string="29" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="140" width="20" height="9"/>
+		</text>
+		<text string="OSC       MOD  AMOUNT" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="140" width="110" height="9"/>
+		</text>
+
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15"/>
+			<bounds x="214" y="155" width="54" height="10"/>
+		</rect>
+		<text string="AMPLIFIER">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="214" y="155" width="54" height="10"/>
+		</text>
+		<text string="30" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="170" width="20" height="9"/>
+		</text>
+		<text string="ATTACK" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="170" width="110" height="9"/>
+		</text>
+		<text string="31" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="180" width="20" height="9"/>
+		</text>
+		<text string="DECAY" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="180" width="110" height="9"/>
+		</text>
+		<text string="32" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="190" width="20" height="9"/>
+		</text>
+		<text string="SUSTAIN" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="190" width="110" height="9"/>
+		</text>
+		<text string="33" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="200" width="20" height="9"/>
+		</text>
+		<text string="RELEASE" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="200" width="110" height="9"/>
+		</text>
+		<text string="34" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="210" width="20" height="9"/>
+		</text>
+		<text string="VOICE VOLUME" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="210" width="110" height="9"/>
+		</text>
+
+		<text string="35" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="180" y="230" width="20" height="9"/>
+		</text>
+		<text string="0 = NORM  1 = UNISON" align="1">
+			<color red="0.75" green="0.75" blue="0.75"/>
+			<bounds x="200" y="230" width="110" height="9"/>
+		</text>
+	</element>
+
+	<!-- control and select sections elements -->
+
+	<element name="control_label">
+		<rect><color red="0.15" green="0.15" blue="0.15"/></rect>
+		<text string="CONTROL"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+
+	<element name="select_label">
+		<rect><color red="0.15" green="0.15" blue="0.15"/></rect>
+		<text string="SELECT"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+
+	<element name="control_select_box">
+		<image><data><![CDATA[
+			<svg width="160" height="250">
+				<rect fill="none" stroke="#d4d4d4" stroke-width="2" x="1" y="1" width="158" height="248" rx="12" ry="12"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<!-- button, knob and wheel labels -->
+
+	<repeat count="10">
+		<param name="i" start="0" increment="1"/>
+		<element name="txt_num_~i~">
+			<text string="~i~"><color red="0.84" green="0.84" blue="0.84"/></text>
+		</element>
+	</repeat>
+	<element name="txt_record">
+		<text string="RECORD"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_legato">
+		<text string="LEGATO"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_bottom_1">
+		<text string="SEQ A"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_bottom_2">
+		<text string="SEQ B"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_bottom_3">
+		<text string="UP/DOWN"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_bottom_4">
+		<text string="ASSIGN"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_bottom_5">
+		<text string="STACK A"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_bottom_6">
+		<text string="STACK B"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_control_1">
+		<text string="PROGRAM"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_control_2">
+		<text string="PARAMETER"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_control_3">
+		<text string="VALUE"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_track_volume">
+		<text string="TRACK VOLUME"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_speed">
+		<text string="SPEED"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_master_tune">
+		<text string="MASTER TUNE"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_master_volume">
+		<text string="MASTER VOLUME"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_pitch">
+		<text string="PITCH"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+	<element name="txt_mod">
+		<text string="MOD"><color red="0.84" green="0.84" blue="0.84"/></text>
+	</element>
+
+	<!-- display elements -->
+
+	<element name="display">
+		<rect><color state="0" red="0.24" green="0.14" blue="0.15"/></rect>
+	</element>
+	<element name="digit">
+		<led7seg><color state="0" red="0.93" green="0.46" blue="0.46"/></led7seg>
+	</element>
+
+	<!-- button elements -->
+
+	<element name="led">
+		<disk>
+			<color state="0" red="0.40" green="0.16" blue="0.16"/>
+			<color state="1" red="0.93" green="0.46" blue="0.46"/>
+		</disk>
+	</element>
+
+	<element name="button">
+		<image state="0"><data><![CDATA[
+			<svg width="22" height="22">
+				<rect fill="#b5b5b5" stroke="#000000" stroke-width="1" x="1" y="1" width="20" height="20" rx="2" ry="2"/>
+			</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+			<svg width="22" height="22">
+				<rect fill="#535353" stroke="#000000" stroke-width="1" x="1" y="1" width="20" height="20" rx="2" ry="2"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="red_button">
+		<image state="0"><data><![CDATA[
+			<svg width="22" height="22">
+				<rect fill="#a13a33" stroke="#000000" stroke-width="1" x="1" y="1" width="20" height="20" rx="2" ry="2"/>
+			</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+			<svg width="22" height="22">
+				<rect fill="#692a27" stroke="#000000" stroke-width="1" x="1" y="1" width="20" height="20" rx="2" ry="2"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<group name="led_button">
+		<bounds x="0" y="0" width="50" height="50"/>
+		<element ref="led" name="~led~"><bounds x="20" y="0" width="10" height="10"/></element>
+		<element ref="button" inputtag="~input~" inputmask="~mask~">
+			<bounds x="14" y="15" width="22" height="22"/>
+		</element>
+		<element ref="~label~"><bounds x="0" y="41" width="50" height="9"/></element>
+	</group>
+
+	<group name="record_button">
+		<bounds x="0" y="0" width="50" height="50"/>
+		<element ref="led" name="~led~"><bounds x="20" y="0" width="10" height="10"/></element>
+		<element ref="red_button" inputtag="key_row_1" inputmask="~mask~">
+			<bounds x="14" y="15" width="22" height="22"/>
+		</element>
+		<element ref="txt_record"><bounds x="0" y="41" width="50" height="9"/></element>
+	</group>
+
+	<group name="select_button">
+		<bounds x="0" y="0" width="22" height="35"/>
+		<element ref="button" inputtag="~input~" inputmask="~mask~">
+			<bounds x="0" y="0" width="22" height="22"/>
+		</element>
+		<element ref="txt_num_~label~"><bounds x="2" y="26" width="18" height="9"/></element>
+	</group>
+
+	<!-- knob elements -->
+
+	<element name="knob_background">
+		<image><data><![CDATA[
+			<svg width="50" height="50">
+				<!-- tickmarks around the knob -->
+				<g stroke="#d4d4d4" stroke-width="0.5" transform="translate(24.5, 24.5)>
+					<line x1="0" y1="0" x2="0" y2="-25"/>
+					<line transform="rotate(30)" x1="0" y1="0" x2="0" y2="-24"/>
+					<line transform="rotate(60)" x1="0" y1="0" x2="0" y2="-24"/>
+					<line transform="rotate(90)" x1="0" y1="0" x2="0" y2="-24"/>
+					<line transform="rotate(120)" x1="0" y1="0" x2="0" y2="-24"/>
+					<line transform="rotate(150)" x1="0" y1="0" x2="0" y2="-24"/>
+					<line transform="rotate(210)" x1="0" y1="0" x2="0" y2="-24"/>
+					<line transform="rotate(240)" x1="0" y1="0" x2="0" y2="-24"/>
+					<line transform="rotate(270)" x1="0" y1="0" x2="0" y2="-24"/>
+					<line transform="rotate(300)" x1="0" y1="0" x2="0" y2="-24"/>
+					<line transform="rotate(330)" x1="0" y1="0" x2="0" y2="-24"/>
+				</g>
+
+				<!-- outer and inner knob -->
+				<circle fill="#1a1a1a" cx="24.5" cy="24.5" r="20"/>
+				<circle fill="#535353" cx="24.5" cy="24.5" r="13"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="master_knob_numbers_tune">
+		<rect>
+			<color red="0" green="0" blue="0" alpha="0"/>
+			<bounds x="0" y="0" width="70" height="65"/>
+		</rect>
+		<text string="5" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="19" y="55" width="8" height="8"/>
+		</text>
+		<text string="4" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="8" y="44" width="8" height="8"/>
+		</text>
+		<text string="3" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="4" y="30" width="8" height="8"/>
+		</text>
+		<text string="2" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="8" y="17" width="8" height="8"/>
+		</text>
+		<text string="1" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="19" y="5" width="8" height="8"/>
+		</text>
+		<text string="0" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="33" y="2" width="8" height="8"/>
+		</text>
+		<text string="1" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="48" y="5" width="8" height="8"/>
+		</text>
+		<text string="2" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="59" y="17" width="8" height="8"/>
+		</text>
+		<text string="3" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="63" y="30" width="8" height="8"/>
+		</text>
+		<text string="4" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="59" y="44" width="8" height="8"/>
+		</text>
+		<text string="5" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="48" y="55" width="8" height="8"/>
+		</text>
+	</element>
+
+	<element name="master_knob_numbers_volume">
+		<rect>
+			<color red="0" green="0" blue="0" alpha="0"/>
+			<bounds x="0" y="0" width="70" height="65"/>
+		</rect>
+		<text string="0" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="19" y="55" width="8" height="8"/>
+		</text>
+		<text string="1" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="8" y="44" width="8" height="8"/>
+		</text>
+		<text string="2" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="4" y="30" width="8" height="8"/>
+		</text>
+		<text string="3" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="8" y="17" width="8" height="8"/>
+		</text>
+		<text string="4" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="19" y="5" width="8" height="8"/>
+		</text>
+		<text string="5" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="33" y="2" width="8" height="8"/>
+		</text>
+		<text string="6" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="48" y="5" width="8" height="8"/>
+		</text>
+		<text string="7" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="59" y="17" width="8" height="8"/>
+		</text>
+		<text string="8" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="63" y="30" width="8" height="8"/>
+		</text>
+		<text string="9" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="59" y="44" width="8" height="8"/>
+		</text>
+		<text string="10" align="1">
+			<color red="0.84" green="0.84" blue="0.84"/>
+			<bounds x="48" y="55" width="8" height="8"/>
+		</text>
+	</element>
+
+	<element name="knob_value">
+		<simplecounter digits="1"><color red="1" green="1" blue="1"/></simplecounter>
+	</element>
+
+	<element name="knob_value_cover">
+		<rect><color red="0" green="0" blue="0" alpha="0"/></rect>
+	</element>
+
+	<group name="knob">
+		<bounds x="0" y="0" width="50" height="50"/>
+		<element ref="knob_background" id="~input~">
+			<bounds x="0" y="0" width="50" height="50"/>
+		</element>
+		<element ref="knob_value" inputtag="~input~" inputmask="0xffff" inputraw="yes">
+			<bounds x="10" y="20" width="30" height="10"/>
+		</element>
+		<element ref="knob_value_cover" clickthrough="no">
+			<bounds x="10" y="20" width="30" height="10"/>
+		</element>
+	</group>
+
+	<group name="labeled_knob">
+		<bounds x="0" y="0" width="70" height="60"/>
+		<group ref="knob"><bounds x="10" y="0" width="50" height="50"/></group>
+		<element ref="~label~"><bounds x="0" y="50" width="70" height="9"/></element>
+	</group>
+
+	<group name="master_knob">
+		<bounds x="0" y="0" width="70" height="75"/>
+		<group ref="knob"><bounds x="10" y="10" width="50" height="50"/></group>
+		<element ref="master_knob_numbers_~label~"><bounds x="0" y="0" width="70" height="65"/></element>
+		<element ref="txt_master_~label~"><bounds x="0" y="66" width="70" height="9"/></element>
+	</group>
+
+	<!-- wheel elements -->
+
+	<element name="wheel_background">
+		<rect><color red="0.10" green="0.10" blue="0.10"/></rect>
+	</element>
+
+	<element name="wheel_dent">
+		<rect><color red="0.33" green="0.33" blue="0.33"/></rect>
+	</element>
+
+	<group name="wheel">
+		<bounds x="0" y="0" width="30" height="145"/>
+		<element ref="wheel_background" id="~input~">
+			<bounds x="3" y="0" width="24" height="130"/>
+		</element>
+		<element ref="wheel_dent" id="~input~_dent">
+			<animate inputtag="~input~" inputmask="0xffff"/>
+			<bounds state="100" x="3" y="0" width="24" height="10"/>
+			<bounds state="0" x="3" y="120" width="24" height="10"/>
+		</element>
+		<element ref="~label~"><bounds x="0" y="135" width="30" height="10"/></element>
+	</group>
+
+	<!-- keyboard elements -->
+
+	<element name="white_key">
+		<rect>
+			<color state="0" red="0.91" green="0.91" blue="0.91"/>
+			<color state="1" red="0.45" green="0.45" blue="0.45"/>
+		</rect>
+	</element>
+
+	<element name="black_key">
+		<rect>
+			<bounds x="0" y="0" width="27" height="200"/>
+			<color red="0" green="0" blue="0"/>
+		</rect>
+		<rect>
+			<bounds x="2" y="0" width="23" height="198"/>
+			<color state="0" red="0.10" green="0.10" blue="0.10"/>
+			<color state="1" red="0.40" green="0.40" blue="0.40"/>
+		</rect>
+	</element>
+
+	<group name="octave_pair">
+		<bounds x="0" y="0" width="686" height="300"/>
+
+		<!-- first octave -->
+
+		<element ref="white_key" inputtag="~input_1~" inputmask="0x01"><!-- C -->
+			<bounds x="0" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_1~" inputmask="0x04"><!-- D -->
+			<bounds x="49" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_1~" inputmask="0x10"><!-- E -->
+			<bounds x="98" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_1~" inputmask="0x20"><!-- F -->
+			<bounds x="147" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_1~" inputmask="0x80"><!-- G -->
+			<bounds x="196" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_2~" inputmask="0x02"><!-- A -->
+			<bounds x="245" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_2~" inputmask="0x08"><!-- B -->
+			<bounds x="294" y="0" width="47" height="300"/>
+		</element>
+
+		<element ref="black_key" inputtag="~input_1~" inputmask="0x02"><!-- C# -->
+			<bounds x="30" y="0" width="27" height="200"/>
+		</element>
+		<element ref="black_key" inputtag="~input_1~" inputmask="0x08"><!-- D# -->
+			<bounds x="88" y="0" width="27" height="200"/>
+		</element>
+		<element ref="black_key" inputtag="~input_1~" inputmask="0x40"><!-- F# -->
+			<bounds x="177" y="0" width="27" height="200"/>
+		</element>
+		<element ref="black_key" inputtag="~input_2~" inputmask="0x01"><!-- G# -->
+			<bounds x="230" y="0" width="27" height="200"/>
+		</element>
+		<element ref="black_key" inputtag="~input_2~" inputmask="0x04"><!-- A# -->
+			<bounds x="284" y="0" width="27" height="200"/>
+		</element>
+
+		<!-- second octave -->
+
+		<element ref="white_key" inputtag="~input_2~" inputmask="0x10"><!-- C -->
+			<bounds x="343" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_2~" inputmask="0x40"><!-- D -->
+			<bounds x="392" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_3~" inputmask="0x01"><!-- E -->
+			<bounds x="441" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_3~" inputmask="0x02"><!-- F -->
+			<bounds x="490" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_3~" inputmask="0x08"><!-- G -->
+			<bounds x="539" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_3~" inputmask="0x20"><!-- A -->
+			<bounds x="588" y="0" width="47" height="300"/>
+		</element>
+		<element ref="white_key" inputtag="~input_3~" inputmask="0x80"><!-- B -->
+			<bounds x="637" y="0" width="47" height="300"/>
+		</element>
+
+		<element ref="black_key" inputtag="~input_2~" inputmask="0x20"><!-- C# -->
+			<bounds x="373" y="0" width="27" height="200"/>
+		</element>
+		<element ref="black_key" inputtag="~input_2~" inputmask="0x80"><!-- D# -->
+			<bounds x="431" y="0" width="27" height="200"/>
+		</element>
+		<element ref="black_key" inputtag="~input_3~" inputmask="0x04"><!-- F# -->
+			<bounds x="520" y="0" width="27" height="200"/>
+		</element>
+		<element ref="black_key" inputtag="~input_3~" inputmask="0x10"><!-- G# -->
+			<bounds x="573" y="0" width="27" height="200"/>
+		</element>
+		<element ref="black_key" inputtag="~input_3~" inputmask="0x40"><!-- A# -->
+			<bounds x="627" y="0" width="27" height="200"/>
+		</element>
+	</group>
+
+
+	<view name="Default Layout">
+		<bounds x="0" y="0" width="1520" height="700"/>
+
+		<!-- case -->
+
+		<collection name="script warning">
+			<element ref="script_warning" id="warning"><bounds x="360" y="0" width="800" height="18"/></element>
+		</collection>
+
+		<element ref="panel"><bounds x="30" y="20" width="1465" height="320"/></element>
+		<element ref="separator"><bounds x="30" y="340" width="1465" height="10"/></element>
+		<element ref="wood"><bounds x="5" y="0" width="25" height="660"/></element>
+		<element ref="dark_wood"><bounds x="30" y="350" width="18" height="310"/></element>
+		<element ref="dark_wood"><bounds x="1477" y="350" width="18" height="310"/></element>
+		<element ref="wood"><bounds x="1495" y="0" width="25" height="660"/></element>
+
+		<param name="input" value="pitch_wheel"/>
+		<param name="label" value="txt_pitch"/>
+		<group ref="wheel"><bounds x="75" y="164" width="20" height="145"/></group>
+
+		<param name="input" value="mod_wheel"/>
+		<param name="label" value="txt_mod"/>
+		<group ref="wheel"><bounds x="150" y="164" width="20" height="145"/></group>
+
+		<param name="input" value="tune_knob"/>
+		<param name="label" value="tune"/>
+		<group ref="master_knob"><bounds x="1350" y="100" width="70" height="75"/></group>
+
+		<param name="input" value="master_volume_knob"/>
+		<param name="label" value="volume"/>
+		<group ref="master_knob"><bounds x="1350" y="210" width="70" height="75"/></group>
+
+		<!-- multi-track section -->
+
+		<element ref="multitrack_box"><bounds x="218" y="60" width="330" height="250"/></element>
+		<element ref="multitrack_label"><bounds x="291" y="54" width="184" height="14"/></element>
+
+		<element ref="txt_track"><bounds x="361" y="132" width="44" height="11"/></element>
+		<element ref="txt_seq"><bounds x="233" y="295" width="80" height="11"/></element>
+		<element ref="txt_arp"><bounds x="343" y="295" width="80" height="11"/></element>
+		<element ref="txt_stack"><bounds x="453" y="295" width="80" height="11"/></element>
+
+		<param name="input" value="track_volume_knob"/>
+		<param name="label" value="txt_track_volume"/>
+		<group ref="labeled_knob"><bounds x="238" y="160" width="70" height="60"/></group>
+
+		<param name="mask" value="0x40"/>
+		<param name="led" value="led_record_track"/>
+		<group ref="record_button"><bounds x="330" y="160" width="50" height="50"/></group>
+
+		<param name="input" value="key_row_1"/>
+		<param name="mask" value="0x80"/>
+		<param name="label" value="txt_legato"/>
+		<param name="led" value="led_legato"/>
+		<group ref="led_button"><bounds x="385" y="160" width="50" height="50"/></group>
+
+		<param name="input" value="speed_knob"/>
+		<param name="label" value="txt_speed"/>
+		<group ref="labeled_knob"><bounds x="458" y="160" width="70" height="60"/></group>
+
+		<repeat count="6">
+			<param name="i" start="1" increment="1"/>
+			<param name="x" start="220" increment="55"/>
+			<param name="mask" start="0x01" lshift="1"/>
+
+			<param name="input" value="key_row_2"/>
+			<param name="label" value="txt_num_~i~"/>
+			<param name="led" value="led_track_~i~"/>
+			<group ref="led_button"><bounds x="~x~" y="80" width="50" height="50"/></group>
+
+			<param name="input" value="key_row_3"/>
+			<param name="label" value="txt_bottom_~i~"/>
+			<param name="led" value="led_bottom_~i~"/>
+			<group ref="led_button"><bounds x="~x~" y="240" width="50" height="50"/></group>
+		</repeat>
+
+		<!-- parameters section -->
+
+		<element ref="parameters_box"><bounds x="575" y="60" width="356" height="250"/></element>
+		<element ref="parameters"><bounds x="575" y="60" width="356" height="250"/></element>
+		<element ref="parameters_label"><bounds x="703" y="54" width="100" height="14"/></element>
+
+		<!-- control section -->
+
+		<element ref="control_select_box"><bounds x="955" y="60" width="160" height="250"/></element>
+		<element ref="control_label"><bounds x="1000" y="54" width="70" height="14"/></element>
+
+		<element ref="display"><bounds x="1015" y="80" width="40" height="34"/></element>
+		<element ref="digit" name="digit_1"><bounds x="1016" y="87" width="15" height="20"/></element>
+		<element ref="digit" name="digit_2"><bounds x="1039" y="87" width="15" height="20"/></element>
+
+		<param name="input" value="key_row_1"/>
+		<repeat count="3">
+			<param name="i" start="1" increment="1"/>
+			<param name="x" start="957" increment="55"/>
+			<param name="mask" start="0x04" lshift="1"/>
+			<param name="label" value="txt_control_~i~"/>
+			<param name="led" value="led_control_~i~"/>
+			<group ref="led_button"><bounds x="~x~" y="122" width="50" height="50"/></group>
+		</repeat>
+
+		<param name="input" value="value_knob"/>
+		<param name="label" value="txt_control_3"/>
+		<group ref="labeled_knob"><bounds x="1000" y="173" width="70" height="60"/></group>
+
+		<param name="mask" value="0x20"/>
+		<param name="led" value="led_record"/>
+		<group ref="record_button"><bounds x="1010" y="240" width="50" height="50"/></group>
+
+		<!-- select section -->
+
+		<element ref="control_select_box"><bounds x="1145" y="60" width="160" height="250"/></element>
+		<element ref="select_label"><bounds x="1195" y="54" width="60" height="14"/></element>
+
+		<!-- select buttons 1-6 (rows 1-2) -->
+		<param name="input" value="key_row_0"/>
+		<repeat count="2">
+			<param name="labelstart" start="1" increment="3"/>
+			<param name="maskstart" start="0x02" lshift="3"/>
+			<param name="y" start="95" increment="53"/>
+			<repeat count="3">
+				<param name="x" start="1160" increment="55"/>
+				<param name="mask" start="~maskstart~" lshift="1"/>
+				<param name="label" start="~labelstart~" increment="1"/>
+				<group ref="select_button"><bounds x="~x~" y="~y~" width="22" height="35"/></group>
+			</repeat>
+		</repeat>
+
+		<!-- select button 7 (row 3) -->
+		<param name="input" value="key_row_0"/>
+		<param name="mask" value="0x80"/>
+		<param name="label" value="7"/>
+		<group ref="select_button"><bounds x="1160" y="201" width="22" height="35"/></group>
+
+		<!-- select buttons 8-9 (row 3) -->
+		<param name="input" value="key_row_1"/>
+		<param name="mask" value="0x01"/>
+		<param name="label" value="8"/>
+		<group ref="select_button"><bounds x="1215" y="201" width="22" height="35"/></group>
+		<param name="mask" value="0x02"/>
+		<param name="label" value="9"/>
+		<group ref="select_button"><bounds x="1270" y="201" width="22" height="35"/></group>
+
+		<!-- select button 0 (row 4) -->
+		<param name="input" value="key_row_0"/>
+		<param name="mask" value="0x01"/>
+		<param name="label" value="0"/>
+		<group ref="select_button"><bounds x="1215" y="255" width="22" height="35"/></group>
+
+		<!-- keyboard -->
+
+		<param name="input_1" value="key_row_8"/>
+		<param name="input_2" value="key_row_9"/>
+		<param name="input_3" value="key_row_10"/>
+		<group ref="octave_pair"><bounds x="52" y="350" width="686" height="300"/></group>
+
+		<param name="input_1" value="key_row_11"/>
+		<param name="input_2" value="key_row_12"/>
+		<param name="input_3" value="key_row_13"/>
+		<group ref="octave_pair"><bounds x="738" y="350" width="686" height="300"/></group>
+
+		<element ref="white_key" inputtag="key_row_14" inputmask="0x01">
+			<bounds x="1424" y="350" width="47" height="300"/>
+		</element>
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				local view = file.views["Default Layout"]
+				install_slider_callbacks(view)
+
+				add_knob(view, "track_volume_knob", "track_volume_knob", 1.2, HORIZONTAL)
+				add_knob(view, "speed_knob", "speed_knob", 1.2, HORIZONTAL)
+				add_knob(view, "value_knob", "value_knob", 2, HORIZONTAL)
+				add_knob(view, "tune_knob", "tune_knob", 2, HORIZONTAL)
+				add_knob(view, "master_volume_knob", "master_volume_knob", 1.2, HORIZONTAL)
+
+				add_slider(view, "pitch_wheel", "pitch_wheel_dent", "pitch_wheel")
+				add_slider(view, "mod_wheel", "mod_wheel_dent", "mod_wheel")
+
+				view.items["warning"]:set_state(0)
+			end)
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-----------------------------------------------------------------------
+		VERTICAL = 0
+		HORIZONTAL = 1
+
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
+		function add_knob(view, clickarea_id, port_name, scale, drag_direction)
+			table.insert(widgets, {
+				clickarea     = get_layout_item(view, clickarea_id),
+				field         = get_port_field(port_name),
+				is_knob       = true,
+				scale         = scale,
+				is_horizontal = (drag_direction == HORIZONTAL) })
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			local field_msg = "Needs to either be an IPT_ADJUSTER, or an analog port with auto-center."
+			if field == nil then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			if field.is_analog and (not field.centerdelta or field.centerdelta == 0) then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			return field
+		end
+
+		local function release_pointer(pointer_id)
+			if pointers[pointer_id] then
+				local field = widgets[pointers[pointer_id].selected_widget].field
+				if field.is_analog then
+					field:clear_value()
+				end
+			end
+			pointers[pointer_id] = nil
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				release_pointer(id)
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						pointers[id] = {
+							selected_widget = i,
+							relative = relative,
+							start_x = x,
+							start_y = y,
+							start_value = widgets[i].field.port:read() }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's position.
+
+			local pointer = pointers[id]
+			local widget = widgets[pointer.selected_widget]
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				if widget.is_horizontal then
+					local step_x = value_range / (widget.scale * widget.clickarea.bounds.width)
+					new_value = pointer.start_value + (x - pointer.start_x) * step_x
+				else
+					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+					new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				end
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
+
+			if widget.field.is_analog then
+				widget.field:set_value(new_value)
+			else
+				widget.field.user_value = new_value
+			end
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function forget_pointers()
+			for id, pointer in pairs(pointers) do
+				release_pointer(id)
+			end
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
+</mamelayout>

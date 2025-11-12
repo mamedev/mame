@@ -38,7 +38,7 @@
 #define LOG_IRQ  (1U << 1)
 #define LOG_BT   (1U << 2)
 #define LOG_LCDC (1U << 3)
-#define VERBOSE LOG_IRQ
+
 //#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"
 

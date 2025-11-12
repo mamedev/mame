@@ -141,7 +141,6 @@ PL1 = Compact Flash Slot
 #include "awpvid.h"
 
 #include "bfm_sc45_helper.h"
-#include "machine/mcf5206e.h"
 #include "speaker.h"
 
 #include "bfm_sc5.lh"
@@ -277,7 +276,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 	map(0x40000000, 0x4000ffff).ram();
 
 	// peripherals
-	map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+//	map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
 }
 
 INPUT_PORTS_START( bfm_sc5 )
@@ -340,7 +339,6 @@ void bfm_sc5_state::bfm_sc5(machine_config &config)
 {
 	MCF5206E(config, m_maincpu, 40000000); /* MCF5206eFT */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc5_state::sc5_map);
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

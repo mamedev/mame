@@ -256,6 +256,7 @@ public:
 		, m_ncr53cf96(*this, "scsi:7:ncr53cf96")
 		, m_btc_trackball(*this, "upd%u", 1)
 		, m_maincpu(*this, "maincpu")
+		, m_duart(*this, "duart")
 	{
 	}
 
@@ -286,6 +287,7 @@ protected:
 	optional_device_array<upd4701_device, 2> m_btc_trackball;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<mb89371_device> m_duart;
 
 	uint32_t *m_dma_data_ptr;
 	uint32_t m_dma_offset;
@@ -402,7 +404,8 @@ void konamigv_state::konamigv_map(address_map &map)
 	map(0x1f100004, 0x1f100007).portr("P2");
 	map(0x1f100008, 0x1f10000b).portr("P3_P4");
 	map(0x1f180000, 0x1f180003).portw("EEPROMOUT");
-	map(0x1f680000, 0x1f68001f).rw("mb89371", FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
+	map(0x1f680000, 0x1f680007).rw(m_duart, FUNC(mb89371_device::read<0>), FUNC(mb89371_device::write<0>)).umask32(0x00ff00ff);
+	map(0x1f680008, 0x1f68000f).rw(m_duart, FUNC(mb89371_device::read<1>), FUNC(mb89371_device::write<1>)).umask32(0x00ff00ff);
 	map(0x1f780000, 0x1f780003).nopw(); // watchdog?
 }
 
@@ -502,6 +505,8 @@ void konamigv_state::machine_reset()
 	m_dma_offset = 0;
 	m_dma_size = 0;
 	m_dma_requested = m_dma_is_write = false;
+
+	m_duart->write_cts<0>(CLEAR_LINE);
 }
 
 void simpbowl_state::machine_start()
@@ -573,7 +578,7 @@ void konamigv_state::konamigv(machine_config &config)
 	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this));
 	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
 
-	MB89371(config, "mb89371", 0);
+	MB89371(config, m_duart, 4_MHz_XTAL);
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	NSCSI_BUS(config, "scsi");

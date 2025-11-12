@@ -43,11 +43,6 @@ public:
 		}
 	}
 
-	virtual bool take_c800() override
-	{
-		return false;
-	}
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD
 	{

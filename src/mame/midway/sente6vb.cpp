@@ -55,10 +55,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "sound/flt_rc.h"
 #include "sound/mm5837.h"
 #include "sente6vb.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
+#include "machine/rescap.h"
 #include "speaker.h"
 
 #define LOG_CEM_WRITES (1U << 1)
@@ -131,14 +133,18 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	mm5837_stream_device &noise(MM5837_STREAM(config, "noise", 0));
 //  noise.set_vdd(-6.5);   // seems too low -- possible the mapping in mm5837 is wrong
 	noise.set_vdd(-8.0);
+	noise.add_route(ALL_OUTPUTS, "ac_noise", 1.0);
+
+	filter_rc_device &ac_noise(FILTER_RC(config, "ac_noise"));
+	ac_noise.set_rc(filter_rc_device::HIGHPASS, RES_K(68) + RES_K(1), 0, 0, CAP_U(2.2)); // R19, R20, C115
 
 	for (auto &cem_device : m_cem_device)
 	{
 		CEM3394(config, cem_device, 0);
-		cem_device->set_vco_zero_freq(431.894);
-		cem_device->set_filter_zero_freq(1300.0);
-		cem_device->add_route(ALL_OUTPUTS, "mono", 0.90);
-		noise.add_route(0, *cem_device, 0.5);
+		cem_device->configure(RES_K(301), CAP_U(0.002), CAP_U(0.033), CAP_U(10)); // R1, C1, C11, C3 on voice 0 (U1)
+		cem_device->configure_limit_pw(true);
+		cem_device->add_route(ALL_OUTPUTS, "mono", 0.50);
+		ac_noise.add_route(0, *cem_device, 1.0);
 	}
 }
 

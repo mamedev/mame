@@ -14,12 +14,14 @@ Refs:
 
 #define LOG_CTRL  (1U << 1)
 #define LOG_DATA  (1U << 2)
+#define LOG_EXEC  (1U << 3)
 
-#define VERBOSE ( LOG_GENERAL /*| LOG_CTRL | LOG_DATA*/ )
+//#define VERBOSE ( LOG_GENERAL /*| LOG_CTRL | LOG_DATA*/ | LOG_EXEC )
 #include "logmacro.h"
 
 #define LOGCTRL(...) LOGMASKED(LOG_CTRL, __VA_ARGS__)
 #define LOGDATA(...) LOGMASKED(LOG_DATA, __VA_ARGS__)
+#define LOGEXEC(...) LOGMASKED(LOG_EXEC, __VA_ARGS__)
 
 
 // device type definition
@@ -82,6 +84,7 @@ TIMER_CALLBACK_MEMBER(specnext_copper_device::timer_callback)
 
 	if (m_copper_dout == 1) // if we are on MOVE, clear the output for the next cycle
 	{
+		LOGEXEC("MOVE(%02x, %02x)\n", (m_copper_list_data >> 8) & 0x7f, m_copper_list_data & 0xff);
 		m_out_nextreg_cb((m_copper_list_data >> 8) & 0x7f, m_copper_list_data & 0xff);
 		m_copper_dout = 0;
 	}

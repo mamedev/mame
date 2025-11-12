@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "screen.h"
 #include "emupal.h"
 #include "video/upd7220.h"

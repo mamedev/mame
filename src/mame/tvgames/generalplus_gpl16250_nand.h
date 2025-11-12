@@ -6,7 +6,7 @@
 #pragma once
 
 #include "generalplus_gpl16250.h"
-#include "machine/generalplus_gpl16250soc.h"
+#include "machine/generalplus_gpl1625x_soc.h"
 #include "generalplus_gpl16250_m.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

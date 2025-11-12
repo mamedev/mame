@@ -75,6 +75,7 @@ protected:
 
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual void reset_from_bus() override;
 
 private:
 	required_device<smc91c96_device> m_netinf;
@@ -122,6 +123,12 @@ void a2bus_lancegs_device::device_start()
 
 void a2bus_lancegs_device::device_reset()
 {
+	m_shadow = false;
+}
+
+void a2bus_lancegs_device::reset_from_bus()
+{
+	m_netinf->reset();
 	m_shadow = false;
 }
 

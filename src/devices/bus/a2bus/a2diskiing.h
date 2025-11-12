@@ -41,6 +41,7 @@ protected:
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void reset_from_bus() override;
 
 	required_device<diskii_fdc_device> m_wozfdc;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -91,7 +92,9 @@ protected:
 		}
 	}
 
-	virtual bool take_c800() override { return true; }
+	virtual bool take_c800() const override { return true; }
+
+	virtual void reset_from_bus() override;
 
 private:
 	int m_c800_bank;

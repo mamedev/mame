@@ -92,7 +92,7 @@
 
 #include "emu.h"
 #include "cpu/m6805/m68hc05.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/okim9810.h"
 #include "speaker.h"
 

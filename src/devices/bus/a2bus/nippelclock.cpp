@@ -79,6 +79,11 @@ void a2bus_nippelclock_device::device_reset()
 {
 }
 
+void a2bus_nippelclock_device::reset_from_bus()
+{
+	m_rtc->reset();
+}
+
 
 /*-------------------------------------------------
     read_c0nx - called for reads from this card's c0nx space

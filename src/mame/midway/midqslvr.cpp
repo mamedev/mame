@@ -275,7 +275,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/pci-smbus.h"

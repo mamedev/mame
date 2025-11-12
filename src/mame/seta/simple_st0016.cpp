@@ -38,57 +38,69 @@ class st0016_state : public driver_device
 {
 public:
 	st0016_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_subcpu(*this, "sub"),
-		m_screen(*this, "screen"),
-		m_mainbank(*this, "mainbank"),
-		m_system(*this, "SYSTEM"),
-		m_dsw(*this, "DSW%u", 1U)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_screen(*this, "screen")
+		, m_system(*this, "SYSTEM")
+		, m_dsw(*this, "DSW%u", 1U)
 	{ }
 
 	void st0016(machine_config &config) ATTR_COLD;
 	void renju(machine_config &config) ATTR_COLD;
-	void mayjinsn(machine_config &config) ATTR_COLD;
 
 	void init_crownpkr() ATTR_COLD;
 	void init_dcrown() ATTR_COLD;
 	void init_nratechu() ATTR_COLD;
-	void init_mayjinsn() ATTR_COLD;
-	void init_mayjisn2() ATTR_COLD;
 	void init_renju() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
-private:
-	uint8_t m_mux_port;
-	uint32_t m_latches[8];
+	uint8_t m_mux_port = 0;
 
 	required_device<st0016_cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
 	required_device<screen_device> m_screen;
-
-	required_memory_bank m_mainbank;
 
 	required_ioport m_system;
 	required_ioport_array<2> m_dsw;
 
 	uint8_t mux_r();
 	void mux_select_w(uint8_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+	void extrom_mem(address_map &map) ATTR_COLD;
+	void st0016_io(address_map &map) ATTR_COLD;
+	void st0016_mem(address_map &map) ATTR_COLD;
+};
+
+class mayjinsn_state : public st0016_state
+{
+public:
+	mayjinsn_state(const machine_config &mconfig, device_type type, const char *tag)
+		: st0016_state(mconfig, type, tag)
+		, m_subcpu(*this, "sub")
+	{ }
+
+	void mayjinsn(machine_config &config) ATTR_COLD;
+
+	void init_mayjinsn() ATTR_COLD;
+	void init_mayjisn2() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	uint32_t m_latches[8]{};
+
+	required_device<cpu_device> m_subcpu;
+
 	uint32_t latch32_r(offs_t offset);
 	void latch32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t latch8_r(offs_t offset);
 	void latch8_w(offs_t offset, uint8_t data);
 
-	void rom_bank_w(uint8_t data);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-
-	void renju_mem(address_map &map) ATTR_COLD;
-	void st0016_io(address_map &map) ATTR_COLD;
 	void st0016_m2_io(address_map &map) ATTR_COLD;
-	void st0016_mem(address_map &map) ATTR_COLD;
 	void v810_mem(address_map &map) ATTR_COLD;
 };
 
@@ -101,28 +113,29 @@ private:
 
 void st0016_state::machine_start()
 {
-	m_mainbank->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
-
 	m_mux_port = 0;
-	std::fill(std::begin(m_latches), std::end(m_latches), 0);
 
 	save_item(NAME(m_mux_port));
+}
+
+void mayjinsn_state::machine_start()
+{
+	st0016_state::machine_start();
+	std::fill(std::begin(m_latches), std::end(m_latches), 0);
+
 	save_item(NAME(m_latches));
+}
+
+void st0016_state::extrom_mem(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
 }
 
 void st0016_state::st0016_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xe87f).ram(); // common ram
 	map(0xf000, 0xffff).ram(); // work ram
-}
-
-void st0016_state::renju_mem(address_map &map)
-{
-	st0016_mem(map);
-	map(0x0000, 0x7fff).rom().region("maincpu", 0x200000);
 }
 
 
@@ -135,7 +148,7 @@ uint8_t st0016_state::mux_r()
 */
 	int retval = m_system->read() & 0x0f;
 
-	switch(m_mux_port & 0x30)
+	switch (m_mux_port & 0x30)
 	{
 		case 0x00: retval |= ((m_dsw[0]->read() & 1) << 4) | ((m_dsw[0]->read() & 0x10) << 1)
 								| ((m_dsw[1]->read() & 1) << 6) | ((m_dsw[1]->read() & 0x10) <<3); break;
@@ -155,11 +168,6 @@ void st0016_state::mux_select_w(uint8_t data)
 	m_mux_port = data;
 }
 
-void st0016_state::rom_bank_w(uint8_t data)
-{
-	m_mainbank->set_entry(data);
-}
-
 void st0016_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
@@ -168,7 +176,6 @@ void st0016_state::st0016_io(address_map &map)
 	map(0xc2, 0xc2).r(FUNC(st0016_state::mux_r)).nopw();
 	map(0xc3, 0xc3).portr("P2").nopw();
 	map(0xe0, 0xe0).nopw(); // renju = $40, neratte = 0
-	map(0xe1, 0xe1).w(FUNC(st0016_state::rom_bank_w));
 	map(0xe6, 0xe6).nopw(); // banking ? ram bank ? shared rambank ?
 	map(0xe7, 0xe7).nopw(); // watchdog
 }
@@ -180,55 +187,60 @@ void st0016_state::st0016_io(address_map &map)
  *
  *************************************/
 
-uint32_t st0016_state::latch32_r(offs_t offset)
+uint32_t mayjinsn_state::latch32_r(offs_t offset)
 {
-	if(!offset)
-		m_latches[2] &= ~2;
+	if (!machine().side_effects_disabled())
+	{
+		if (!offset)
+			m_latches[2] &= ~2;
+	}
 	return m_latches[offset];
 }
 
-void st0016_state::latch32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void mayjinsn_state::latch32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if(!offset)
+	if (!offset)
 		m_latches[2] |= 1;
 	COMBINE_DATA(&m_latches[offset]);
 	machine().scheduler().synchronize();
 }
 
-uint8_t st0016_state::latch8_r(offs_t offset)
+uint8_t mayjinsn_state::latch8_r(offs_t offset)
 {
-	if(!offset)
-		m_latches[2] &= ~1;
+	if (!machine().side_effects_disabled())
+	{
+		if (!offset)
+			m_latches[2] &= ~1;
+	}
 	return m_latches[offset];
 }
 
-void st0016_state::latch8_w(offs_t offset, uint8_t data)
+void mayjinsn_state::latch8_w(offs_t offset, uint8_t data)
 {
-	if(!offset)
+	if (!offset)
 		m_latches[2] |= 2;
 	m_latches[offset] = data;
 	machine().scheduler().synchronize();
 }
 
-void st0016_state::v810_mem(address_map &map)
+void mayjinsn_state::v810_mem(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).ram();
 	map(0x80000000, 0x8001ffff).ram();
 	map(0xc0000000, 0xc001ffff).ram();
-	map(0x40000000, 0x4000000f).r(FUNC(st0016_state::latch32_r)).w(FUNC(st0016_state::latch32_w));
+	map(0x40000000, 0x4000000f).r(FUNC(mayjinsn_state::latch32_r)).w(FUNC(mayjinsn_state::latch32_w));
 	map(0xfff80000, 0xffffffff).rom().region("sub", 0);
 }
 
-void st0016_state::st0016_m2_io(address_map &map)
+void mayjinsn_state::st0016_m2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xc0, 0xc3).r(FUNC(st0016_state::latch8_r)).w(FUNC(st0016_state::latch8_w));
-	map(0xd0, 0xd0).portr("P1").w(FUNC(st0016_state::mux_select_w));
+	map(0xc0, 0xc3).r(FUNC(mayjinsn_state::latch8_r)).w(FUNC(mayjinsn_state::latch8_w));
+	map(0xd0, 0xd0).portr("P1").w(FUNC(mayjinsn_state::mux_select_w));
 	map(0xd1, 0xd1).portr("P2").nopw();
-	map(0xd2, 0xd2).r(FUNC(st0016_state::mux_r)).nopw();
+	map(0xd2, 0xd2).r(FUNC(mayjinsn_state::mux_r)).nopw();
 	map(0xd3, 0xd3).portr("P2").nopw();
 	map(0xe0, 0xe0).nopw();
-	map(0xe1, 0xe1).w(FUNC(st0016_state::rom_bank_w));
 	map(0xe6, 0xe6).nopw(); // banking ? ram bank ? shared rambank ?
 	map(0xe7, 0xe7).nopw(); // watchdog
 }
@@ -596,6 +608,7 @@ void st0016_state::st0016(machine_config &config)
 	ST0016_CPU(config, m_maincpu, XTAL(48'000'000) / 6); // 8 MHz (48 MHz / 6) verified from nratechu (https://www.youtube.com/watch?v=scKF95t4-lU)
 	m_maincpu->set_addrmap(AS_PROGRAM, &st0016_state::st0016_mem);
 	m_maincpu->set_addrmap(AS_IO, &st0016_state::st0016_io);
+	m_maincpu->set_addrmap(st0016_cpu_device::AS_EXTROM, &st0016_state::extrom_mem);
 	m_maincpu->set_screen(m_screen);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(st0016_state::interrupt), "screen", 0, 1);
@@ -616,14 +629,14 @@ void st0016_state::st0016(machine_config &config)
 	m_maincpu->add_route(1, "speaker", 1.0, 1);
 }
 
-void st0016_state::mayjinsn(machine_config &config)
+void mayjinsn_state::mayjinsn(machine_config &config)
 {
 	st0016(config);
 
-	m_maincpu->set_addrmap(AS_IO, &st0016_state::st0016_m2_io);
+	m_maincpu->set_addrmap(AS_IO, &mayjinsn_state::st0016_m2_io);
 
 	V810(config, m_subcpu, 10000000); //25 Mhz ?
-	m_subcpu->set_addrmap(AS_PROGRAM, &st0016_state::v810_mem);
+	m_subcpu->set_addrmap(AS_PROGRAM, &mayjinsn_state::v810_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 }
@@ -631,7 +644,7 @@ void st0016_state::mayjinsn(machine_config &config)
 void st0016_state::renju(machine_config &config)
 {
 	st0016(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &st0016_state::renju_mem);
+	m_maincpu->set_fixedrom_offset(0x200000);
 }
 
 /*************************************
@@ -672,14 +685,14 @@ Note:
 */
 
 ROM_START( renju ) // PCB E51-00001-A
-	ROM_REGION( 0x280000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "renjyu-1.u31", 0x000000, 0x200000, CRC(e0fdbe9b) SHA1(52d31024d1a88b8fcca1f87366fcaf80e3c387a1) )
 	ROM_LOAD( "rnj2.u32",     0x200000, 0x080000, CRC(2015289c) SHA1(5223b6d3dbe4657cd63cf5b527eaab84cf23587a) )
 ROM_END
 
 // ねらってチュー (Neratte Chū) / NERATTE CHU
 ROM_START( nratechu ) // PCB E56-00002 (almost identical to above). "1.10 1996/05/25 21:05 Programming by ITEC" string
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "sx012-01.u31", 0x000000, 0x080000, CRC(6ca01d57) SHA1(065848f19ecf2dc1f7bbc7ddd87bca502e4b8b16) )
 	ROM_LOAD( "sx012-02.u32", 0x100000, 0x100000, CRC(40a4e354) SHA1(8120ce8deee6805050a5b083a334c3743c09566b) )
 	// U33 not populated
@@ -687,7 +700,7 @@ ROM_START( nratechu ) // PCB E56-00002 (almost identical to above). "1.10 1996/0
 ROM_END
 
 ROM_START( crownpkr ) // PCB E56-00002. "1.20 1997/05/30 19:00 Programming by K&S string"
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "cpu120.u31", 0x000000, 0x080000, CRC(9c47920b) SHA1(bdc3f16cc7bf84102a24e6f58a1fb329bf90920b) ) // hand written label NEC D27C4000D / AMD 27C400
 	// U32 not populated
 	// U33 not populated
@@ -695,7 +708,7 @@ ROM_START( crownpkr ) // PCB E56-00002. "1.20 1997/05/30 19:00 Programming by K&
 ROM_END
 
 ROM_START( premline ) // original Seta PCB with sanded logos. The spaces for the 2 banks of 8 switches aren't populated.
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "pl-0.u31", 0x000000, 0x080000, CRC(3679a297) SHA1(9f29cfecdb51babc0ad9e15b6d5000834af6f481) )
 	ROM_LOAD( "pl-1.u32", 0x080000, 0x080000, CRC(fd2b53ee) SHA1(784886f90a2b6b812a8c44de1e17a216518e1830) )
 	ROM_LOAD( "pl-2.u33", 0x100000, 0x080000, CRC(309c103c) SHA1(c17483f332e364a8664f36750bf3325c340168f5) )
@@ -703,7 +716,7 @@ ROM_START( premline ) // original Seta PCB with sanded logos. The spaces for the
 ROM_END
 
 ROM_START( dcrown ) // PCB E51-00001 (almost identical to above)
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "dc1.u31", 0x000000, 0x80000, CRC(e55200b8) SHA1(20a968dc895bb636b064c29b4b53c6ffa49fea36) )
 	ROM_LOAD( "dc2.u32", 0x080000, 0x80000, CRC(05b6192f) SHA1(6af6e7b2c681f2791a7f89a528a95eb976c8ba84) )
 	ROM_LOAD( "dc3.u33", 0x100000, 0x80000, CRC(f23c1975) SHA1(118d6054922a733d23363c53bb331d84c78e50ad) )
@@ -711,7 +724,7 @@ ROM_START( dcrown ) // PCB E51-00001 (almost identical to above)
 ROM_END
 
 ROM_START( dcrowna ) // PCB E51-00001 (almost identical to above)
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "dcn-0.u31", 0x000000, 0x080000, CRC(5dd0615d) SHA1(b859994bd79229da4c687deefe1997313724b26e) ) // U31 @ 1C
 	ROM_LOAD( "dcn-1.u32", 0x080000, 0x080000, CRC(6c6f14e7) SHA1(2a3474e44420cc78e3ead777eb91481c4bb46eef) ) // U32 @ 1D
 	ROM_LOAD( "dcn-2.u33", 0x100000, 0x080000, CRC(e9401a5e) SHA1(db24ebe5a0073c7c1c2da957772e223545f3c778) ) // U33 @ 1E
@@ -720,7 +733,7 @@ ROM_END
 
 // 韓国花札 GO-STOP (Kankoku Hanafuda GO-STOP)
 ROM_START( gostop )
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "go-stop_rom1.u31",0x000000, 0x80000, CRC(93decaa2) SHA1(a30958b76dfe5752a341ecdc950119c10e864586) )
 	ROM_LOAD( "go-stop_rom2.u32",0x080000, 0x80000, CRC(3c5402ff) SHA1(bdc38922b5cbad0150adf9c6cc0fefc5705a16a2) )
 ROM_END
@@ -820,12 +833,12 @@ E52-00001
 */
 
 ROM_START(mayjinsn )
-	ROM_REGION( 0x180000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "sx003.05d", 0x000000, 0x80000, CRC(2be6d620) SHA1(113db888fb657d45be55708bbbf9a9ac159a9636) )
 	ROM_LOAD( "sx003.06",  0x080000, 0x80000, CRC(f0553386) SHA1(8915cb3ce03b9a12612694caec9bbec6de4dd070) )
 	ROM_LOAD( "sx003.07d", 0x100000, 0x80000, CRC(8db281c3) SHA1(f8b488dd28010f01f789217a4d62ba2116e06e94) )
 
-	ROM_REGION32_LE( 0x20000*4, "sub", 0 ) // V810 code
+	ROM_REGION32_LE( 0x80000, "sub", 0 ) // V810 code
 	ROM_LOAD32_BYTE( "sx003.04", 0x00003, 0x20000, CRC(fa15459f) SHA1(4163ab842943705c550f137abbdd2cb51ba5390f) )
 	ROM_LOAD32_BYTE( "sx003.03", 0x00002, 0x20000, CRC(71a438ea) SHA1(613bab6a59aa1bced2ab37177c61a0fd7ce7e64f) )
 	ROM_LOAD32_BYTE( "sx003.02", 0x00001, 0x20000, CRC(61911eed) SHA1(1442b3867b85120ba652ec8205d74332addffb67) )
@@ -833,10 +846,10 @@ ROM_START(mayjinsn )
 ROM_END
 
 ROM_START(mayjisn2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "sx007-05.8b", 0x00000, 0x100000, CRC(b13ea605) SHA1(75c067df02c988f170c24153d3852c472355fc9d) )
 
-	ROM_REGION32_LE( 0x20000*4, "sub", 0 ) // V810 code
+	ROM_REGION32_LE( 0x80000, "sub", 0 ) // V810 code
 	ROM_LOAD32_BYTE( "sx007-04.4b", 0x00003, 0x20000, CRC(fa15459f) SHA1(4163ab842943705c550f137abbdd2cb51ba5390f) )
 	ROM_LOAD32_BYTE( "sx007-03.4j", 0x00002, 0x20000, CRC(71a438ea) SHA1(613bab6a59aa1bced2ab37177c61a0fd7ce7e64f) )
 	ROM_LOAD32_BYTE( "sx007-02.4m", 0x00001, 0x20000, CRC(61911eed) SHA1(1442b3867b85120ba652ec8205d74332addffb67) )
@@ -869,12 +882,12 @@ void st0016_state::init_dcrown()
 	m_maincpu->set_game_flag(3);
 }
 
-void st0016_state::init_mayjinsn()
+void mayjinsn_state::init_mayjinsn()
 {
 	m_maincpu->set_game_flag(4 /*| 0x80*/);
 }
 
-void st0016_state::init_mayjisn2()
+void mayjinsn_state::init_mayjisn2()
 {
 	m_maincpu->set_game_flag(4);
 }
@@ -888,15 +901,15 @@ void st0016_state::init_mayjisn2()
  *
  *************************************/
 
-GAME( 1994, renju,      0,      renju,    renju,    st0016_state, init_renju,    ROT0, "Visco",            "Renju Kizoku - Kira Kira Gomoku Narabe (ver. 1.0)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, init_nratechu, ROT0, "Seta",             "Neratte Chu (ver. 1.10)",                            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",                                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop",                           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, renju,      0,      renju,    renju,    st0016_state,   init_renju,    ROT0, "Visco",            "Renju Kizoku - Kira Kira Gomoku Narabe (ver. 1.0)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state,   init_nratechu, ROT0, "Seta",             "Neratte Chu (ver. 1.10)",                            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, mayjinsn_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",                                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state,   init_renju,    ROT0, "Visco",            "Koi Koi Shimasho - Super Real Hanafuda",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state,   init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop",                           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 // Not working
-GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, crownpkr,   0,      st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "<unknown>",        "Crown Poker (ver. 1.20)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
-GAME( 199?, premline,   0,      st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "MK Electronics",   "Premiums Line",           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
-GAME( 1994, dcrown,     0,      st0016,   dcrown,   st0016_state, init_dcrown,   ROT0, "Nippon Data Kiki", "Dream Crown (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
-GAME( 1994, dcrowna,    dcrown, st0016,   dcrown,   st0016_state, init_dcrown,   ROT0, "Nippon Data Kiki", "Dream Crown (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the Insert Coin text has been translated to English and no (c) is uploaded
+GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   mayjinsn_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, crownpkr,   0,      st0016,   crownpkr, st0016_state,   init_crownpkr, ROT0, "<unknown>",        "Crown Poker (ver. 1.20)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
+GAME( 199?, premline,   0,      st0016,   crownpkr, st0016_state,   init_crownpkr, ROT0, "MK Electronics",   "Premiums Line",           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
+GAME( 1994, dcrown,     0,      st0016,   dcrown,   st0016_state,   init_dcrown,   ROT0, "Nippon Data Kiki", "Dream Crown (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
+GAME( 1994, dcrowna,    dcrown, st0016,   dcrown,   st0016_state,   init_dcrown,   ROT0, "Nippon Data Kiki", "Dream Crown (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the Insert Coin text has been translated to English and no (c) is uploaded

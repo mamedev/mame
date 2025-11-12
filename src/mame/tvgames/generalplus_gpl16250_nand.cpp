@@ -861,7 +861,6 @@ void generalplus_gpac800_game_state::machine_reset()
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 

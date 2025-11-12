@@ -118,6 +118,11 @@ void a2bus_cmsscsi_device::device_reset()
 	m_rombank = 0;
 }
 
+void a2bus_cmsscsi_device::reset_from_bus()
+{
+	m_ncr5380->reset();
+}
+
 
 /*-------------------------------------------------
     read_c0nx - called for reads from this card's c0nx space

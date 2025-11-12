@@ -152,7 +152,8 @@ u8 st0016_device::snd_r(offs_t offset)
 {
 	if (offset < 0x100)
 	{
-		m_stream->update();
+		if (!machine().side_effects_disabled())
+			m_stream->update();
 		return m_voice[offset >> 5].reg_r(offset & 0x1f);
 	}
 	return 0;

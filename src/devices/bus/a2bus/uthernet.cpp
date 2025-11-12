@@ -52,6 +52,8 @@ protected:
 	// write_c0nx - called for writes to this card's c0nx space
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override { m_netinf->write(offset,data); }
 
+	virtual void reset_from_bus() override { m_netinf->reset(); }
+
 private:
 	required_device<cs8900a_device> m_netinf;
 

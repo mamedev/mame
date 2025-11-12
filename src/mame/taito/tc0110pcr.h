@@ -9,13 +9,15 @@
 class tc0110pcr_device : public device_t, public device_palette_interface
 {
 public:
+	using color_delegate = device_delegate<rgb_t (uint16_t data)>;
 	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	// configurations
+	void set_shift(uint8_t shift) { m_shift = shift; }
+	template <typename... T> void set_color_callback(T &&... args) { m_color_cb.set(std::forward<T>(args)...); }
+
 	u16 word_r(offs_t offset);
-	void word_w(offs_t offset, u16 data); /* color index goes up in step of 2 */
-	void step1_word_w(offs_t offset, u16 data);   /* color index goes up in step of 1 */
-	void step1_rbswap_word_w(offs_t offset, u16 data);    /* swaps red and blue components */
-	void step1_4bpg_word_w(offs_t offset, u16 data);  /* only 4 bits per color gun */
+	void word_w(offs_t offset, u16 data);
 
 	void restore_colors();
 
@@ -31,9 +33,13 @@ protected:
 private:
 	static const unsigned TC0110PCR_RAM_SIZE = 0x2000 / 2;
 
-	std::unique_ptr<uint16_t[]>     m_ram;
-	int          m_type;
-	int          m_addr;
+	// internal states
+	std::unique_ptr<uint16_t[]> m_ram;
+	uint16_t m_addr;
+
+	// configurations
+	uint8_t m_shift;
+	color_delegate m_color_cb;
 };
 
 DECLARE_DEVICE_TYPE(TC0110PCR, tc0110pcr_device)

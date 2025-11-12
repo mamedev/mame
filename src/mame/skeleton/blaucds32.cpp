@@ -74,7 +74,7 @@ Keyboard PCB
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 #include "machine/6821pia.h"
 

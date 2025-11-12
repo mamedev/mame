@@ -528,14 +528,6 @@ void i8086_common_cpu_device::device_reset()
 {
 	m_ZeroVal = 1;
 	m_ParityVal = 1;
-	m_regs.w[AX] = 0;
-	m_regs.w[CX] = 0;
-	m_regs.w[DX] = 0;
-	m_regs.w[BX] = 0;
-	m_regs.w[SP] = 0;
-	m_regs.w[BP] = 0;
-	m_regs.w[SI] = 0;
-	m_regs.w[DI] = 0;
 	m_sregs[ES] = 0;
 	m_sregs[CS] = 0xffff;
 	m_sregs[SS] = 0;

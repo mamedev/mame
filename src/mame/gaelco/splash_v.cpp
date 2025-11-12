@@ -2,7 +2,7 @@
 // copyright-holders:Manuel Abadia, David Haywood
 /***************************************************************************
 
-  splash.c
+  gaelco/splash_v.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -25,8 +25,8 @@
 
     Word | Bit(s)            | Description
     -----+-FEDCBA98-76543210-+--------------------------
-      0  | -------- xxxxxxxx | sprite code (low 8 bits)
-      0  | ----xxxx -------- | sprite code (high 4 bits)
+      0  | -------- xxxxxxxx | tile code (low 8 bits)
+      0  | ----xxxx -------- | tile code (high 4 bits)
       0  | xxxx---- -------- | color
 
     Tilemap 1: (32*32, 16x16 tiles)
@@ -35,16 +35,16 @@
     -----+-FEDCBA98-76543210-+--------------------------
       0  | -------- -------x | flip y
       0  | -------- ------x- | flip x
-      0  | -------- xxxxxx-- | sprite code (low 6 bits)
-      0  | ----xxxx -------- | sprite code (high 4 bits)
+      0  | -------- xxxxxx-- | tile code (low 6 bits)
+      0  | ----xxxx -------- | tile code (high 4 bits)
       0  | xxxx---- -------- | color
 */
 
 TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap0)
 {
-	int data = m_videoram[tile_index];
-	int attr = data >> 8;
-	int code = data & 0xff;
+	const int data = m_videoram[tile_index];
+	const int attr = data >> 8;
+	const int code = data & 0xff;
 
 	tileinfo.set(0,
 			code + ((0x20 + (attr & 0x0f)) << 8),
@@ -54,9 +54,9 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap0)
 
 TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap1)
 {
-	int data = m_videoram[(0x1000/2) + tile_index];
-	int attr = data >> 8;
-	int code = data & 0xff;
+	const int data = m_videoram[(0x1000 / 2) + tile_index];
+	const int attr = data >> 8;
+	const int code = data & 0xff;
 
 	tileinfo.set(1,
 			(code >> 2) + ((0x30 + (attr & 0x0f)) << 6),
@@ -78,55 +78,66 @@ void splash_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int sy = cliprect.min_y; sy <= cliprect.max_y; sy++)
+	{
+		const int count = (sy & 0xff) << 9;
+		uint16_t *const dst = &bitmap.pix(sy);
+		for (int sx = cliprect.min_x; sx <= cliprect.max_x; sx++)
+		{
+			int color = m_pixelram[count + ((sx + 9) & 0x1ff)] & 0xff;
+			dst[sx] = 0x300 + color;
+		}
+	}
+}
+
+void roldfrog_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
 	int colxor = 0; /* splash and some bitmap modes in roldfrog */
 	int swaps = 0;
 
-	if (m_bitmap_type == 1) /* roldfrog */
+	if (m_bitmap_mode[0] == 0x0000)
 	{
-		if (m_bitmap_mode[0] == 0x0000)
-		{
-			colxor = 0x7f;
-		}
-		else if (m_bitmap_mode[0] == 0x0100)
-		{
-			swaps = 1;
-		}
-		else if (m_bitmap_mode[0] == 0x0200)
-		{
-			colxor = 0x55;
-		}
-		else if (m_bitmap_mode[0] == 0x0300)
-		{
-			swaps = 2;
-			colxor = 0x7f;
-		}
-		else if (m_bitmap_mode[0] == 0x0400)
-		{
-			swaps = 3;
-		}
-		else if (m_bitmap_mode[0] == 0x0500)
-		{
-			swaps = 4;
-		}
-		else if (m_bitmap_mode[0] == 0x0600)
-		{
-			swaps = 5;
-			colxor = 0x7f;
-		}
-		else if (m_bitmap_mode[0] == 0x0700)
-		{
-			swaps = 6;
-			colxor = 0x55;
-		}
+		colxor = 0x7f;
+	}
+	else if (m_bitmap_mode[0] == 0x0100)
+	{
+		swaps = 1;
+	}
+	else if (m_bitmap_mode[0] == 0x0200)
+	{
+		colxor = 0x55;
+	}
+	else if (m_bitmap_mode[0] == 0x0300)
+	{
+		swaps = 2;
+		colxor = 0x7f;
+	}
+	else if (m_bitmap_mode[0] == 0x0400)
+	{
+		swaps = 3;
+	}
+	else if (m_bitmap_mode[0] == 0x0500)
+	{
+		swaps = 4;
+	}
+	else if (m_bitmap_mode[0] == 0x0600)
+	{
+		swaps = 5;
+		colxor = 0x7f;
+	}
+	else if (m_bitmap_mode[0] == 0x0700)
+	{
+		swaps = 6;
+		colxor = 0x55;
 	}
 
-	int count = 0;
-	for (int sy=0;sy<256;sy++)
+	for (int sy = cliprect.min_y; sy <= cliprect.max_y; sy++)
 	{
-		for (int sx=0;sx<512;sx++)
+		const int count = (sy & 0xff) << 9;
+		uint16_t *const dst = &bitmap.pix(sy);
+		for (int sx = cliprect.min_x; sx <= cliprect.max_x; sx++)
 		{
-			int color = m_pixelram[count]&0xff;
-			count++;
+			int color = m_pixelram[count + ((sx + 9) & 0x1ff)] & 0xff;
 
 			switch (swaps)
 			{
@@ -150,12 +161,11 @@ void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				break;
 			}
 
-			if (sy >= cliprect.min_y && sy <= cliprect.max_y && sx-9 >= cliprect.min_x && sx-9 <= cliprect.max_x)
-				bitmap.pix(sy, sx-9) = 0x300+(color^colxor);
+			dst[sx] = 0x300 + (color ^ colxor);
 		}
 	}
-
 }
+
 /***************************************************************************
 
     Start the video hardware emulation.
@@ -204,43 +214,45 @@ void splash_state::video_start()
 
 void splash_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	for (i = 0x400-4; i >= 0; i -= 4)
+	for (int i = 0x400 - 4; i >= 0; i -= 4)
 	{
-		int sx = m_spriteram[i+2] & 0xff;
-		int sy = (240 - (m_spriteram[i+1] & 0xff)) & 0xff;
-		int attr = m_spriteram[i+3] & 0xff;
-		int attr2 = m_spriteram[i+0x400] >> m_sprite_attr2_shift;
-		int number = (m_spriteram[i] & 0xff) + (attr & 0xf)*256;
+		int sx = m_spriteram[i + 2] & 0xff;
+		const int sy = (240 - (m_spriteram[i + 1] & 0xff)) & 0xff;
+		const int attr = m_spriteram[i + 3] & 0xff;
+		const int attr2 = m_spriteram[i + 0x400] >> m_sprite_attr2_shift;
+		const int number = (m_spriteram[i] & 0xff) + ((attr & 0xf) << 8);
 
-		if (attr2 & 0x80) sx += 256;
+		if (BIT(attr2, 7)) sx += 256;
 
-		gfx->transpen(bitmap,cliprect,number,
-			0x10 + (attr2 & 0x0f),attr & 0x40,attr & 0x80,
-			sx-8,sy,0);
+		gfx->transpen(bitmap, cliprect,
+				number,
+				0x10 + (attr2 & 0x0f),
+				BIT(attr, 6), BIT(attr, 7),
+				sx - 8, sy, 0);
 	}
 }
 
 void funystrp_state::funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	for (i = 0x400-4; i >= 0; i -= 4)
+	for (int i = 0x400 - 4; i >= 0; i -= 4)
 	{
-		int sx = m_spriteram[i+2] & 0xff;
-		int sy = (240 - (m_spriteram[i+1] & 0xff)) & 0xff;
-		int attr = m_spriteram[i+3] & 0xff;
-		int attr2 = m_spriteram[i+0x400] >> m_sprite_attr2_shift;
-		int number = (m_spriteram[i] & 0xff) + (attr & 0xf)*256;
+		int sx = m_spriteram[i + 2] & 0xff;
+		const int sy = (240 - (m_spriteram[i + 1] & 0xff)) & 0xff;
+		const int attr = m_spriteram[i + 3] & 0xff;
+		const int attr2 = m_spriteram[i + 0x400] >> m_sprite_attr2_shift;
+		const int number = (m_spriteram[i] & 0xff) + ((attr & 0xf) << 8);
 
-		if (attr2 & 0x80) sx += 256;
+		if (BIT(attr2, 7)) sx += 256;
 
-		gfx->transpen(bitmap,cliprect,number,
-			(attr2 & 0x7f),attr & 0x40,attr & 0x80,
-			sx-8,sy,0);
+		gfx->transpen(bitmap,cliprect,
+				number,
+				(attr2 & 0x7f),
+				BIT(attr, 6), BIT(attr, 7),
+				sx - 8, sy, 0);
 	}
 }
 
@@ -273,7 +285,7 @@ uint32_t funystrp_state::screen_update_funystrp(screen_device &screen, bitmap_in
 	draw_bitmap(bitmap, cliprect);
 
 	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	/*Sprite chip is similar but not the same*/
+	// Sprite chip is similar but not the same
 	funystrp_draw_sprites(bitmap, cliprect);
 	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

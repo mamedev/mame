@@ -7,7 +7,7 @@
 #pragma once
 
 #include "isa.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 
 class lrk331_device : public device_t, public device_isa16_card_interface
 {

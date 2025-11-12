@@ -899,20 +899,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  TMS9928A_INTERFACE( vdc_intf )
-//-------------------------------------------------
-
-void adam_state::vdc_int_w(int state)
-{
-	if (state && !m_vdp_nmi)
-	{
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	}
-
-	m_vdp_nmi = state;
-}
-
-//-------------------------------------------------
 //  M6801_INTERFACE( m6801_intf )
 //-------------------------------------------------
 
@@ -971,7 +957,6 @@ void adam_state::machine_start()
 	save_item(NAME(m_data_in));
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_spindis));
-	save_item(NAME(m_vdp_nmi));
 }
 
 
@@ -1035,7 +1020,7 @@ void adam_state::adam(machine_config &config)
 	// video hardware
 	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");
 	m_vdc->set_vram_size(0x4000);
-	m_vdc->int_callback().set(FUNC(adam_state::vdc_int_w));
+	m_vdc->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
@@ -1051,7 +1036,12 @@ void adam_state::adam(machine_config &config)
 	ADAMNET_SLOT(config, "net2", m_adamnet, adamnet_devices, "prn");
 	ADAMNET_SLOT(config, "net3", m_adamnet, adamnet_devices, "ddp");
 	ADAMNET_SLOT(config, "net4", m_adamnet, adamnet_devices, "fdc");
-	ADAMNET_SLOT(config, "net5", m_adamnet, adamnet_devices, "fdc").set_option_device_input_defaults("fdc", device_iptdef_drive2);
+	adamnet_slot_device &net5(ADAMNET_SLOT(config, "net5", m_adamnet, adamnet_devices, "fdc"));
+	net5.set_option_device_input_defaults("fdc", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_320kb", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_a720dipi", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_fp720at", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_mihddd", device_iptdef_drive2);
 	ADAMNET_SLOT(config, "net6", m_adamnet, adamnet_devices, nullptr);
 	ADAMNET_SLOT(config, "net7", m_adamnet, adamnet_devices, nullptr);
 	ADAMNET_SLOT(config, "net8", m_adamnet, adamnet_devices, nullptr);

@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
@@ -117,7 +117,7 @@ void vdm7932x_state::vdm7932x(machine_config &config) // all clocks unverified
 	I8031(config, m_subcpu, 24.0734_MHz_XTAL / 4); // Intel P8031AH (for keyboard?)
 	m_subcpu->port_in_cb<3>().set(FUNC(vdm7932x_state::i8031_p3_r));
 	m_subcpu->set_addrmap(AS_PROGRAM, &vdm7932x_state::sub_map);
-	m_subcpu->set_addrmap(AS_IO, &vdm7932x_state::subx_map);
+	m_subcpu->set_addrmap(AS_DATA, &vdm7932x_state::subx_map);
 
 	PIT8253(config, "pit", 0); // UM8253-5
 

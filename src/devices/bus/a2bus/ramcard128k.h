@@ -41,6 +41,7 @@ protected:
 	virtual uint16_t inh_start() override { return 0xd000; }
 	virtual uint16_t inh_end() override { return 0xffff; }
 	virtual int inh_type() override;
+	virtual void reset_from_bus() override;
 
 private:
 	void do_io(int offset);

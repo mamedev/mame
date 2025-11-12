@@ -59,7 +59,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void segaufoh8(machine_config &config);
+	void segaufoh8(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<h83007_device> m_maincpu;
@@ -144,10 +144,23 @@ void segaufoh8_state::segaufoh8(machine_config &config)
 
 ROM_START( ufo7 )
 	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "epr-23795c.ic408", 0x00000, 0x80000, CRC(0b2b0e26) SHA1(c40d61a4d37301ab8eb191151f80b1035d39ee1a) )
+ROM_END
+
+
+ROM_START( ufo7b )
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP( "epr-23795b.ic408", 0x00000, 0x80000, CRC(ca153fc7) SHA1(f21878deaff2c86896912a8a0a4b17b44e5ef65c) )
+ROM_END
+
+ROM_START( ufo7a )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "epr-23795a.ic408", 0x00000, 0x80000, CRC(9ea1f4e9) SHA1(3503afe209156906ae7e45f12fa17fa863d7ae17) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 2001, ufo7,  0, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20011112 in string in ROM
+GAME( 2003, ufo7,  0,    segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (rev. C)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20030226 in string in ROM
+GAME( 2001, ufo7b, ufo7, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (rev. B)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20011112 in string in ROM
+GAME( 2001, ufo7a, ufo7, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (rev. A)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20011112 in string in ROM

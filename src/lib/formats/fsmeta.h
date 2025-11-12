@@ -105,16 +105,16 @@ struct meta_description {
 	meta_name m_name;
 	meta_value m_default;
 	bool m_ro;
-	std::function<void (const meta_value &)> m_validator;
+	std::function<bool (const meta_value &)> m_validator;
 	const char *m_tooltip;
 
 	template <typename T>
-	meta_description(meta_name name, T def, bool ro, std::function<void(meta_value)> validator, const char *tooltip) :
+	meta_description(meta_name name, T def, bool ro, std::function<bool(meta_value)> validator, const char *tooltip) :
 		meta_description(name, meta_value(def), ro, std::move(validator), tooltip)
 	{}
 
 private:
-	meta_description(meta_name name, meta_value &&def, bool ro, std::function<void(meta_value)> &&validator, const char *tooltip) :
+	meta_description(meta_name name, meta_value &&def, bool ro, std::function<bool(meta_value)> &&validator, const char *tooltip) :
 		m_name(name), m_default(std::move(def)), m_ro(ro), m_validator(validator), m_tooltip(tooltip)
 	{}
 };

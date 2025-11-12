@@ -99,9 +99,9 @@ K051960_CB_MEMBER(ultraman_state::sprite_callback)
 {
 	enum { sprite_colorbase = 3072 / 16 };
 
-	*priority = (*color & 0x80) ? 0 : GFX_PMASK_1;
-	*color = sprite_colorbase + ((*color & 0x7e) >> 1);
-	*shadow = 0;
+	priority = (color & 0x80) ? 0 : GFX_PMASK_1;
+	color = sprite_colorbase + ((color & 0x7e) >> 1);
+	shadow = 0;
 }
 
 
@@ -116,8 +116,8 @@ K051316_CB_MEMBER(ultraman_state::zoom_callback)
 {
 	enum { zoom_colorbase = (1024 * Which) / 16 };
 
-	*code |= ((*color & 0x07) << 8) | (m_bank[Which] << 11);
-	*color = zoom_colorbase + ((*color & 0xf8) >> 3);
+	code |= ((color & 0x07) << 8) | (m_bank[Which] << 11);
+	color = zoom_colorbase + ((color & 0xf8) >> 3);
 }
 
 /***************************************************************************

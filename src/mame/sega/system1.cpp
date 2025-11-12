@@ -589,7 +589,7 @@ void system1_state::mcu_control_w(u8 data)
 }
 
 
-void system1_state::mcu_io_w(offs_t offset, u8 data)
+void system1_state::mcu_data_w(offs_t offset, u8 data)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -609,7 +609,7 @@ void system1_state::mcu_io_w(offs_t offset, u8 data)
 }
 
 
-u8 system1_state::mcu_io_r(offs_t offset)
+u8 system1_state::mcu_data_r(offs_t offset)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -858,9 +858,9 @@ void system1_state::sound_map(address_map &map)
  *
  *************************************/
 
-void system1_state::mcu_io_map(address_map &map)
+void system1_state::mcu_data_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(system1_state::mcu_io_r), FUNC(system1_state::mcu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(system1_state::mcu_data_r), FUNC(system1_state::mcu_data_w));
 }
 
 
@@ -2285,7 +2285,7 @@ void system1_state::mcu(machine_config &config)
 	m_maincpu->remove_vblank_int();
 
 	I8751(config, m_mcu, SOUND_CLOCK);
-	m_mcu->set_addrmap(AS_IO, &system1_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &system1_state::mcu_data_map);
 	m_mcu->port_out_cb<1>().set(FUNC(system1_state::mcu_control_w));
 
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 16));

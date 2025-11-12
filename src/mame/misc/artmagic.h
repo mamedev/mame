@@ -83,7 +83,7 @@ private:
 	inline uint16_t *address_to_vram(offs_t *address);
 
 	void main_map(address_map &map) ATTR_COLD;
-	void shtstar_guncpu_io_map(address_map &map) ATTR_COLD;
+	void shtstar_guncpu_data_map(address_map &map) ATTR_COLD;
 	void shtstar_guncpu_map(address_map &map) ATTR_COLD;
 	void shtstar_map(address_map &map) ATTR_COLD;
 	void shtstar_subcpu_map(address_map &map) ATTR_COLD;

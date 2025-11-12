@@ -410,7 +410,7 @@ void othunder_state::othunder_map(address_map &map)
 	map(0x080000, 0x08ffff).ram();
 	map(0x090000, 0x09000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 //  map(0x09000c, 0x09000d).nopw();   /* ?? (keeps writing 0x77) */
-	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
+	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));   /* palette */
 	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x300001, 0x300001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
@@ -625,6 +625,8 @@ void othunder_state::othunder(machine_config &config)
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
+	m_tc0110pcr->set_shift(0);
+	m_tc0110pcr->set_color_callback(FUNC(othunder_state::color_xrgb555));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

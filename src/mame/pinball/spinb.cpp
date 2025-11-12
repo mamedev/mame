@@ -59,7 +59,7 @@ ToDo:
 #include "emu.h"
 #include "genpin.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
 #include "machine/7474.h"
@@ -157,7 +157,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dmd_io(address_map &map) ATTR_COLD;
+	void dmd_data(address_map &map) ATTR_COLD;
 	void dmd_mem(address_map &map) ATTR_COLD;
 	void audio_map(address_map &map) ATTR_COLD;
 	void spinb_map(address_map &map) ATTR_COLD;
@@ -256,7 +256,7 @@ void spinb_state::dmd_mem(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void spinb_state::dmd_io(address_map &map)
+void spinb_state::dmd_data(address_map &map)
 {
 	map(0x0000, 0x1fff).w(FUNC(spinb_state::dmdram_w));
 	map(0x0000, 0xffff).r(FUNC(spinb_state::dmdram_r));
@@ -1003,7 +1003,7 @@ void spinb_state::dmd(machine_config &config)
 {
 	I8031(config, m_dmdcpu, XTAL(16'000'000));
 	m_dmdcpu->set_addrmap(AS_PROGRAM, &spinb_state::dmd_mem);
-	m_dmdcpu->set_addrmap(AS_IO, &spinb_state::dmd_io);
+	m_dmdcpu->set_addrmap(AS_DATA, &spinb_state::dmd_data);
 	m_dmdcpu->port_out_cb<1>().set(FUNC(spinb_state::p1_w));
 	m_dmdcpu->port_in_cb<3>().set(FUNC(spinb_state::p3_r));
 	m_dmdcpu->port_out_cb<3>().set(FUNC(spinb_state::p3_w));

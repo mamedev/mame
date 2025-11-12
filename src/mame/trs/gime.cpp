@@ -1238,7 +1238,11 @@ void gime_device::new_frame()
 
 	/* latch in the video position */
 	m_video_position = get_video_base();
-	m_line_in_row = m_gime_registers[0x0C] & 0x0F;
+
+	/* latch in the vertical scroll position */
+	m_line_in_row = m_gime_registers[0x00] & 0x80 ? 0 : m_gime_registers[0x0C] & 0x0F;
+	if (m_line_in_row >= get_lines_per_row())
+		m_line_in_row = 0;
 
 	/* update the geometry, as appropriate */
 	if (legacy_video_changed)
@@ -1312,7 +1316,6 @@ void gime_device::update_border(uint16_t physical_scanline)
 
 void gime_device::record_border_scanline(uint16_t physical_scanline)
 {
-	m_line_in_row = 0;
 	update_border(physical_scanline);
 	update_value(&m_scanlines[physical_scanline].m_line_in_row, uint8_t(~0));
 }

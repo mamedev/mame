@@ -241,7 +241,8 @@ bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sectors[interleave[i]].actual_size = sector_size;
 				sectors[interleave[i]].size = sector_size >> 8;
 				sectors[interleave[i]].deleted = false;
-				sectors[interleave[i]].bad_crc = false;
+				sectors[interleave[i]].bad_data_crc = false;
+				sectors[interleave[i]].bad_addr_crc = false;
 				sectors[interleave[i]].data = &sector_data[sector_offset];
 
 				/*auto const [err, actual] =*/ read_at(io, file_offset, sectors[interleave[i]].data, sector_size); // FIXME: check for errors and premature EOF

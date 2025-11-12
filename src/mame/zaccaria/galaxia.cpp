@@ -853,6 +853,26 @@ ROM_START( astrowar )
 	ROM_LOAD( "astro.3d",  0x00400, 0x0400, CRC(822505aa) SHA1(f9d3465e14bb850a286f8b4f42aa0a4044413b67) )
 ROM_END
 
+
+// different code and also different GFX (one of the enemies differs). Alt version or bootleg?
+ROM_START( astrowara )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.8h",   0x00000, 0x0400, CRC(73d45b59) SHA1(84699b7c64d2d75048868204940c3ba6d8066e79) )
+	ROM_LOAD( "4.10h",  0x00400, 0x0400, CRC(01c471cf) SHA1(609036141f5296ca5d5000fc68046e891ae8fbba) )
+	ROM_LOAD( "5.11h",  0x00800, 0x0400, CRC(2ce443b1) SHA1(d49c84f126532dac8b88225b59244075299d3ca0) )
+	ROM_LOAD( "6.13h",  0x00c00, 0x0400, CRC(e085c293) SHA1(1244917ead0811e0f1095e90c410c216e9e0b840) )
+	ROM_LOAD( "7.8i",   0x01000, 0x0400, CRC(80078a6c) SHA1(d4f1e7ef29285a934cc37333a2cfbb8900f2ae97) )
+	ROM_LOAD( "8.10i",  0x02000, 0x0400, CRC(9535d0a9) SHA1(d76099989e0ddc11e6b009193e1d5d2892735080) )
+	ROM_LOAD( "9.11i",  0x02400, 0x0400, CRC(f3bea168) SHA1(4356daec105e931b7222d1534ed34a575ad7f2ff) )
+	ROM_LOAD( "10.13i", 0x02800, 0x0400, CRC(c2a07996) SHA1(c8b2ae8e4d298bff922e2f6e51d458cf9823cde3) )
+	ROM_LOAD( "11.11l", 0x02c00, 0x0400, CRC(b59423cb) SHA1(2a265bde6a85af3ef1e2036e863999e815bc8ee0) )
+	ROM_LOAD( "12.13l", 0x03000, 0x0400, CRC(be0356c2) SHA1(72cebc0b3fc5bd83f71e0931c70996357aae24c6) )
+
+	ROM_REGION( 0x0800, "tiles", 0 )
+	ROM_LOAD( "1.1d", 0x00000, 0x0400, CRC(c63187ed) SHA1(114b9770640e6d4e18bc155754e5043d9d96651d) )
+	ROM_LOAD( "2.3d", 0x00400, 0x0400, CRC(d301503d) SHA1(13b85f3d39e864ffea49b347db106b11d859e332) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -861,8 +881,9 @@ ROM_END
     Game Drivers
 *******************************************************************************/
 
-//    YEAR, NAME,     PARENT,  MACHINE,  INPUT,    CLASS,          INIT,       SCREEN, COMPANY,            FULLNAME,          FLAGS
-GAME( 1979, galaxia,  0,       galaxia,  galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, galaxiaa, galaxia, galaxiaa, galaxiaa, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protected?
-GAME( 1979, galaxiab, galaxia, galaxia,  galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, astrowar, 0,       astrowar, astrowar, astrowar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Astro Wars",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,       SCREEN, COMPANY,            FULLNAME,             FLAGS
+GAME( 1979, galaxia,   0,        galaxia,  galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 1)",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxiaa,  galaxia,  galaxiaa, galaxiaa, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 2)",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protected?
+GAME( 1979, galaxiab,  galaxia,  galaxia,  galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 3)",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, astrowar,  0,        astrowar, astrowar, astrowar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Astro Wars (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, astrowara, astrowar, astrowar, astrowar, astrowar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Astro Wars (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

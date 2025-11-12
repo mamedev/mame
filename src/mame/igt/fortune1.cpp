@@ -292,7 +292,7 @@
 #include "emu.h"
 
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/ds1215.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -455,7 +455,7 @@ private:
 	void babypkr_palette(palette_device &palette) const;
 
 	void i8751_map(address_map &map) ATTR_COLD;
-	void i8751_io_port(address_map &map) ATTR_COLD;
+	void i8751_data_port(address_map &map) ATTR_COLD;
 	void i8051_sound_mem(address_map &map) ATTR_COLD;
 	void i8051_sound_port(address_map &map) ATTR_COLD;
 
@@ -1102,7 +1102,7 @@ void babypkr_state::i8751_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void babypkr_state::i8751_io_port(address_map &map)
+void babypkr_state::i8751_data_port(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("nvram");
 	map(0x4900, 0x49ff).rw(FUNC(babypkr_state::bp_timekeep_r), FUNC(babypkr_state::bp_timekeep_w));
@@ -1493,7 +1493,7 @@ void babypkr_state::babypkr(machine_config &config)
 	// most likely romless or eprom
 	i8031_device &soundcpu(I8031(config.replace(), m_soundcpu, CPU_CLOCK));
 	soundcpu.set_addrmap(AS_PROGRAM, &babypkr_state::i8051_sound_mem);
-	soundcpu.set_addrmap(AS_IO, &babypkr_state::i8051_sound_port);
+	soundcpu.set_addrmap(AS_DATA, &babypkr_state::i8051_sound_port);
 	soundcpu.port_in_cb<0>().set(FUNC(babypkr_state::baby_sound_p0_r));
 	soundcpu.port_out_cb<0>().set(FUNC(babypkr_state::baby_sound_p0_w));
 	soundcpu.port_in_cb<1>().set(FUNC(babypkr_state::baby_sound_p1_r));
@@ -1519,7 +1519,7 @@ void babypkr_state::bpoker(machine_config &config)
 
 	i8751_device &maincpu(I8751(config.replace(), m_maincpu, XTAL(6'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &babypkr_state::i8751_map);
-	maincpu.set_addrmap(AS_IO, &babypkr_state::i8751_io_port);
+	maincpu.set_addrmap(AS_DATA, &babypkr_state::i8751_data_port);
 	maincpu.set_vblank_int("screen", FUNC(babypkr_state::irq0_line_assert));
 	maincpu.port_in_cb<0>().set_constant(0);
 	maincpu.port_out_cb<1>().set(FUNC(babypkr_state::bpoker_p1_data_w));

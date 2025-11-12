@@ -1,0 +1,1385 @@
+....00                       -
+....26 abs d                 - d:acc(3)
+....21 adc s,d               - s:xyr(4) d:acc(3)
+....10 add s,d               - s:nacc(3) d:acc(3)
+	$d:w(do_add56(util::sext($s, 56), $d));
+
+....20 add s,d               - s:xyr(4) d:acc(3)
+	$d:w(do_add56(util::sext($s:l, 48), $d));
+
+....40 add s,d               - s:daos(4) d:acc(3)
+	$d:w(do_add56(util::sext(u64($s:h) << 24, 48), $d));
+
+....12 addl s,d              - s:nacc(3) d:acc(3)
+....02 addr s,d              - s:nacc(3) d:acc(3)
+....46 and s,d               - s:daos(4) d:acc(3)
+	u32 r = $d:1 & $s;
+	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+	if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+	} else if(BIT(r, 23)) {
+		m_ccr = m_ccr | CCR_N;
+	}
+	$d:w1(r);
+
+....32 asl d                 - d:acc(3)
+	$d:w(do_asl56(1, $d));
+
+....22 asr d                 - d:acc(3)
+	$d:w(do_asr56(1, $d));
+
+....13 clr d                 - d:acc(3)
+	$d:w(0);
+	m_ccr = (m_ccr & ~(CCR_E|CCR_N|CCR_V)) | (CCR_U|CCR_Z);
+
+....05 cmp s,d               - s:nacc(3) d:acc(3)
+	(void)do_sub56(util::sext($s, 56), $d);
+
+....45 cmp s,d               - s:daos(4) d:acc(3)
+	(void)do_sub56(util::sext(u64($s:h) << 24, 48), $d);
+
+....07 cmpm s,d              - s:daos3(4, 3) d:acc(3)
+....43 eor s,d               - s:daos(4) d:acc(3)
+	u32 r = $d:1 ^ $s;
+	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+	if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+	} else if(BIT(r, 23)) {
+		m_ccr = m_ccr | CCR_N;
+	}
+	$d:w1(r);
+
+....33 lsl d                 - d:acc(3)
+....23 lsr d                 - d:acc(3)
+....82 mac +s1,s2,d          - s1:damo1_a(4) s2:damo1_b(4) d:acc(3) +:sign(2)
+....83 maccr +s1,s2,d        - s1:damo1_a(4) s2:damo1_b(4) d:acc(3) +:sign(2)
+....1d max a,b               -
+....15 maxm a,b              -
+....80 mpy +s1,s2,d          - s1:damo1_a(4) s2:damo1_b(4) d:acc(3) +:sign(2)
+....81 mpyr +s1,s2,d         - s1:damo1_a(4) s2:damo1_b(4) d:acc(3) +:sign(2)
+....36 neg d                 - d:acc(3)
+....17 not d                 - d:acc(3)
+....42 or s,d                - s:daos(4) d:acc(3)
+	u32 r = $d:1 | $s;
+	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+	if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+	} else if(BIT(r, 23)) {
+		m_ccr = m_ccr | CCR_N;
+	}
+	$d:w1(r);
+
+....11 rnd d                 - d:acc(3)
+....37 rol d                 - d:acc(3)
+....27 ror d                 - d:acc(3)
+....25 sbc s,d               - s:xyr(4) d:acc(3)
+....14 sub s,d               - s:nacc(3) d:acc(3)
+	$d:w(do_sub56(util::sext($s, 56), $d));
+
+....24 sub s,d               - s:xyr(4) d:acc(3)
+	$d:w(do_sub56(util::sext($s:l, 48), $d));
+
+....44 sub s,d               - s:daos(4) d:acc(3)
+	$d:w(do_sub56(util::sext(u64($s:h) << 24, 48), $d));
+
+....16 subl s,d              - s:nacc(3) d:acc(3)
+....06 subr s,d              - s:nacc(3) d:acc(3)
+....01 tfr s,d               - s:daos3(4, 3) d:acc(3)
+
+....03 tst d                 - d:acc(3)
+	do_tst56($d);
+
+2000..                       -
+
+2000.. #i,d                  - d:fvbr1(16) i:imm8(8)
+	%p
+	$d:wb($i);
+
+2000.. s,d                   - s:fvbr1(13) d:fvbr1(8)
+	m_tmp1 = $s:h;
+	%p
+	$d:wh(m_tmp1);
+
+2040.. ea                    - ea:eam4(8)
+	(void)($ea);
+
+40c0.. xy:ea,d               - d:fvbr1s(20, 16) xy:xyc(19) ea:eam1(8)
+	m_tmp1 = $xy:m.read_dword($ea);
+	%p
+	$d:wh(m_tmp1);
+
+4040.. s,xy:ea               - s:fvbr1s(20, 16) xy:xyc(19) ea:eam1(8)
+	m_tmp1 = $s:h;
+	%p
+	$xy:m.write_dword($ea, m_tmp1);
+
+40c0.. xy:abs,d              - d:fvbr1s(20, 16) xy:xyc(19) abs:eam1a(8)
+	m_tmp1 = $xy:m.read_dword($abs);
+	%p
+	$d:wh(m_tmp1);
+
+4040.. s,xy:abs              - s:fvbr1s(20, 16) xy:xyc(19) abs:eam1a(8)
+	m_tmp1 = $s:h;
+	%p
+	$xy:m.write_dword($abs, m_tmp1);
+
+40c0.. #i,d                  - d:fvbr1s(20, 16) i:eam1i(8)
+	%p
+	$d:wh($i);
+
+48c0.. #i,d                  - d:fvbr1s(20, 16) i:eam1i(8)
+	%p
+	$d:wh($i);
+
+4080.. xy:aa,d               - d:fvbr1s(20, 16) xy:xyc(19) aa:asa6(8)
+	m_tmp1 = $xy:m.read_dword($aa);
+	%p
+	$d:wh(m_tmp1);
+
+4000.. s,xy:aa               - s:fvbr1s(20, 16) xy:xyc(19) aa:asa6(8)
+	m_tmp1 = $s:h;
+	%p
+	$xy:m.write_dword($aa, m_tmp1);
+
+1080.. x:ea,d1 s2,d2         - d1:tbrx(18) s2:acc(17) d2:yreg(16) ea:eam1(8)
+	m_tmp1 = m_x.read_dword($ea);
+	m_tmp2 = $s2:h;
+	%p
+	$d1:wh(m_tmp1);
+	$d2:wh(m_tmp2);
+
+1000.. s1,x:ea s2,d2         - s1:tbrx(18) s2:acc(17) d2:yreg(16) ea:eam1(8)
+	m_tmp1 = $s1:h;
+	m_tmp2 = $s2:h;
+	%p
+	m_x.write_dword($ea, m_tmp1);
+	$d2:wh(m_tmp2);
+
+1080.. x:abs,d1 s2,d2        - d1:tbrx(18) s2:acc(17) d2:yreg(16) abs:eam1a(8)
+	m_tmp1 = m_x.read_dword($abs);
+	m_tmp2 = $s2:h;
+	%p
+	$d1:wh(m_tmp1);
+	$d2:wh(m_tmp2);
+
+1000.. s1,x:abs s2,d2        - s1:tbrx(18) s2:acc(17) d2:yreg(16) abs:eam1a(8)
+	m_tmp1 = $s1:h;
+	m_tmp2 = $s2:h;
+	%p
+	m_x.write_dword($abs, m_tmp1);
+	$d2:wh(m_tmp2);
+
+
+1080.. #i,d1 s2,d2           - d1:tbrx(18) s2:acc(17) d2:yreg(16) i:eam1i(8)
+	m_tmp1 = $s2:h;
+	%p
+	$d2:wh(m_tmp1);
+	$d1:wh($i);
+
+0800.. a,x:ea x0,a           - ea:eam1(8)
+	m_tmp1 = get_ah();
+	m_tmp2 = get_x0();
+	%p
+	m_x.write_dword($ea, m_tmp1);
+	set_ah(m_tmp2);
+
+0900.. b,x:ea x0,b           - ea:eam1(8)
+	m_tmp1 = get_bh();
+	m_tmp2 = get_x0();
+	%p
+	m_x.write_dword($ea, m_tmp1);
+	set_bh(m_tmp2);
+
+0800.. a,x:abs x0,a          - abs:eam1a(8)
+	m_tmp1 = get_ah();
+	m_tmp2 = get_x0();
+	%p
+	m_x.write_dword($abs, m_tmp1);
+	set_ah(m_tmp2);
+
+0900.. b,x:abs x0,b          - abs:eam1a(8)
+	m_tmp1 = get_bh();
+	m_tmp2 = get_x0();
+	%p
+	m_x.write_dword($abs, m_tmp1);
+	set_bh(m_tmp2);
+
+10c0.. s1,d1 y:ea,d2         - d2:tbry(18) s1:acc(17) d1:xreg(16) ea:eam1(8)
+	m_tmp1 = $s1:h;
+	m_tmp2 = m_y.read_dword($ea);
+	%p
+	$d1:wh(m_tmp1);
+	$d2:wh(m_tmp2);
+
+1040.. s1,d1 s2,y:ea         - s2:tbry(18) s1:acc(17) d1:xreg(16) ea:eam1(8)
+	m_tmp1 = $s1:h;
+	m_tmp2 = $s2:h;
+	%p
+	$d1:wh(m_tmp1);
+	m_y.write_dword($ea, m_tmp2);
+
+10c0.. s1,d1 y:abs,d2        - d2:tbry(18) s1:acc(17) d1:xreg(16) abs:eam1a(8)
+	m_tmp1 = $s1:h;
+	m_tmp2 = m_y.read_dword($abs);
+	%p
+	$d1:wh(m_tmp1);
+	$d2:wh(m_tmp2);
+
+1040.. s1,d1 s2,y:abs        - s2:tbry(18) s1:acc(17) d1:xreg(16) abs:eam1a(8)
+	m_tmp1 = $s1:h;
+	m_tmp2 = $s2:h;
+	%p
+	$d1:wh(m_tmp1);
+	m_y.write_dword($abs, m_tmp2);
+
+10c0.. s1,d1 #i,d2           - d2:tbry(18) s1:acc(17) d1:xreg(16) i:eam1i(8)
+	m_tmp1 = $s1:h;
+	%p
+	$d1:wh(m_tmp1);
+	$d2:wh($i);
+
+0880.. a,y:ea y0,a           - ea:eam1(8)
+	m_tmp1 = get_ah();
+	m_tmp2 = get_y0();
+	%p
+	m_y.write_dword($ea, m_tmp1);
+	set_ah(m_tmp2);
+
+0980.. b,y:ea y0,b           - ea:eam1(8)
+	m_tmp1 = get_bh();
+	m_tmp2 = get_y0();
+	%p
+	m_y.write_dword($ea, m_tmp1);
+	set_bh(m_tmp2);
+
+0880.. a,y:abs y0,a          - abs:eam1a(8)
+	m_tmp1 = get_ah();
+	m_tmp2 = get_y0();
+	%p
+	m_y.write_dword($abs, m_tmp1);
+	set_ah(m_tmp2);
+
+0980.. b,y:abs y0,b          - abs:eam1a(8)
+	m_tmp1 = get_bh();
+	m_tmp2 = get_y0();
+	%p
+	m_y.write_dword($abs, m_tmp1);
+	set_bh(m_tmp2);
+
+40c0.. l:ea,d                - d:lmr(19, 16) ea:eam1(8)
+	m_tmp1 = m_x.read_dword($ea);
+	m_tmp2 = m_y.read_dword($ea);
+	%p
+	$d:wl(m_tmp1 << 24 | m_tmp2);
+
+40c0.. l:abs,d               - d:lmr(19, 16) abs:eam1a(8)
+	m_tmp1 = m_x.read_dword($abs);
+	m_tmp2 = m_y.read_dword($abs);
+	%p
+	$d:wl(m_tmp1 << 24 | m_tmp2);
+
+4080.. l:aa,d                - d:lmr(19, 16) aa:asa6(8)
+	m_tmp1 = m_x.read_dword($aa);
+	m_tmp2 = m_y.read_dword($aa);
+	%p
+	$d:wl(m_tmp1 << 24 | m_tmp2);
+
+4040.. s,l:ea                - s:lmr(19, 16) ea:eam1(8)
+	m_tmp1 = $s:l >> 24;
+	m_tmp2 = $s:l & 0xffffff;
+	%p
+	m_x.write_dword($ea, m_tmp1);
+	m_y.write_dword($ea, m_tmp2);
+
+4040.. s,l:abs               - s:lmr(19, 16) abs:eam1a(8)
+	m_tmp1 = $s:l >> 24;
+	m_tmp2 = $s:l & 0xffffff;
+	%p
+	m_x.write_dword($abs, m_tmp1);
+	m_y.write_dword($abs, m_tmp2);
+
+4000.. s,l:aa                - s:lmr(19, 16) aa:asa6(8)
+	m_tmp1 = $s:l >> 24;
+	m_tmp2 = $s:l & 0xffffff;
+	%p
+	m_x.write_dword($aa, m_tmp1);
+	m_y.write_dword($aa, m_tmp2);
+
+c080.. x:eax,d1 y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) d1:tbrx(18) d2:tbry(16)
+8080.. x:eax,d1 s2,y:eay     - eax:xyeax(8) eay:xyeay(20, 13, 10) d1:tbrx(18) s2:tbry(16)
+c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2:tbry(16)
+8000.. s1,x:eax s2,y:eay     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) s2:tbry(16)
+2020.. ifcc                  - cc:cc(8)
+2030.. ifcc.u                - cc:cc(8)
+
+000000                       -
+0a70c0 move xy:(r+o),d       - xy:xyc(16) r:ar(8) d:sbr(0) o:exoff()
+	$d:wh($xy:m.read_dword($r + $o));
+
+0a7080 move s,xy:(r+o)       - xy:xyc(16) r:ar(8) s:sbr(0) o:exoff()
+	$xy:m.write_dword($r + $o, $s:h);
+
+020090 move xy:(r+o),d       - xy:xyc(5) o:sda7(11, 6) r:ar(8) d:fobr(0)
+	$d:wh($xy:m.read_dword($r + $o));
+
+020080 move s,xy:(r+o)       - xy:xyc(5) o:sda7(11, 6) r:ar(8) s:fobr(0)
+	$xy:m.write_dword($r + $o, $s:h);
+
+014080 add #i,d              - i:imm6(8) d:acc(3)
+	$d = do_add56(u64($i) << 24, $d);
+
+0140c0 add #i,d              - d:acc(3) i:eximm()
+	$d = do_add56(util::sext($i << 24, 48), $d);
+
+014086 and #i,d              - i:imm6(8) d:acc(3)
+	u32 r = $d:1 & $i;
+	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+	if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+	} else if(BIT(r, 23)) {
+		m_ccr = m_ccr | CCR_N;
+	}
+	$d:w1(r);
+
+0140c6 and #i,d              - d:acc(3) i:eximm()
+	u32 r = $d:1 & $i;
+	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+	if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+	} else if(BIT(r, 23)) {
+		m_ccr = m_ccr | CCR_N;
+	}
+	$d:w1(r);
+
+0000b8 andi #i,ctrl          - i:imm8(8) ctrl:ctrl(0)
+	$ctrl:w($ctrl & $i);
+
+0c1d00 asl #i,s2,d           - i:shift6(1) s2:acc(7) d:acc(0)
+	$d:w(do_asl56($i, $s2));
+
+0c1e40 asl s1,s2,d           - s2:acc(4) s1:actrl(1) d:acc(0)
+	$d:w(do_asl56($s1, $s2));
+
+0c1c00 asr #i,s2,d           - i:shift6(1) s2:acc(7) d:acc(0)
+	$d:w(do_asr56($i, $s2));
+
+0c1e60 asr s1,s2,d           - s2:acc(4) s1:actrl(1) d:acc(0)
+	$d:w(do_asr56($s1, $s2));
+
+0d1040 bcc x                 - cc:cc(0) x:expcrel() cond
+	if($cc) {
+		m_npc = $x;
+	}
+
+050400 bcc x                 - cc:cc(12) x:pcrel(6, 0) cond
+	if($cc) {
+		m_npc = $x;
+	}
+
+0d1840 bcc r                 - r:ar(8) cc:cc(0) cond
+	if($cc) {
+ 		m_npc = m_pc + $r;
+	}
+
+0b4000 bchg #n,xy:ea         - ea:eam1(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($ea);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+	$xy:m.write_dword($ea, t ^ m);
+
+0b4000 bchg #n,xy:abs        - abs:eam1a(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($abs);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+	$xy:m.write_dword($abs, t ^ m);
+
+0b0000 bchg #n,xy:aa         - aa:asa6(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($aa);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+	$xy:m.write_dword($aa, t ^ m);
+
+0b8000 bchg #n,xy:pp         - pp:asa6p(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($pp);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+	$xy:m.write_dword($pp, t ^ m);
+
+014000 bchg #n,xy:qq         - qq:asa6q(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($qq);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+	$xy:m.write_dword($qq, t ^ m);
+
+0bc040 bchg #n,d             - d:sbr(8) n:bit5(0)
+	u32 t = $d:h;
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+	$d:wh(t ^ m);
+
+0a4000 bclr #n,xy:ea         - ea:eam1(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($ea);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+		$xy:m.write_dword($ea, t & ~m);
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+0a4000 bclr #n,xy:abs        - abs:eam1a(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($abs);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+		$xy:m.write_dword($abs, t & ~m);
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+0a0000 bclr #n,xy:aa         - aa:asa6(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($aa);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+		$xy:m.write_dword($aa, t & ~m);
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+0a8000 bclr #n,xy:pp         - pp:asa6p(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($pp);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+		$xy:m.write_dword($pp, t & ~m);
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+010000 bclr #n,xy:qq         - qq:asa6q(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($qq);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+		$xy:m.write_dword($qq, t & ~m);
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+0ac040 bclr #n,d             - d:sbr(8) n:bit5(0)
+	u32 t = $d:h;
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+	$d:wh(t & ~m);
+
+0d10c0 bra x                 - x:expcrel()
+	m_npc = $x;
+
+050c00 bra x                 - x:pcrel(6, 0)
+	m_npc = $x;
+
+0d18c0 bra r                 - r:ar(8)
+	m_npc = m_pc + $r;
+
+0c8000 brclr #n,xy:ea,x      - ea:eam1(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(BIT($xy:m.read_dword($ea), $n))
+		m_npc = $x;
+
+0c8000 brclr #n,xy:abs,x     - abs:eam1a(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(!BIT($xy:m.read_dword($abs), $n))
+		m_npc = $x;
+
+0c8080 brclr #n,xy:aa,x      - aa:asa6(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(!BIT($xy:m.read_dword($aa), $n))
+		m_npc = $x;
+
+0cc000 brclr #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(!BIT($xy:m.read_dword($pp), $n))
+		m_npc = $x;
+
+048000 brclr #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(!BIT($xy:m.read_dword($qq), $n))
+		m_npc = $x;
+
+0cc080 brclr #n,s,x          - s:sbr(8) n:bit5(0) x:expcrel() cond
+	if(!BIT($s:h, $n))
+		m_npc = $x;
+
+000210 brkcc                 - cc:cc(0) cond
+	if($cc) {
+		m_npc = get_la()+1;
+		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
+		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
+		dec_sp();
+		set_la(get_ssh());
+		set_lc(get_ssl());
+		dec_sp();
+	}
+
+0c8020 brset #n,xy:ea,x      - ea:eam1(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(BIT($xy:m.read_dword($ea), $n))
+		m_npc = $x;
+
+0c8020 brset #n,xy:abs,x     - abs:eam1a(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(BIT($xy:m.read_dword($abs), $n))
+		m_npc = $x;
+
+0c80a0 brset #n,xy:aa,x      - aa:asa6(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(BIT($xy:m.read_dword($aa), $n))
+		m_npc = $x;
+
+0cc020 brset #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(BIT($xy:m.read_dword($pp), $n))
+		m_npc = $x;
+
+048020 brset #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:expcrel() cond
+	if(BIT($xy:m.read_dword($qq), $n))
+		m_npc = $x;
+
+0cc0a0 brset #n,s,x          - s:sbr(8) n:bit5(0) x:expcrel() cond
+	if(BIT($s:h, $n))
+		m_npc = $x;
+
+0d1000 bscc x                - cc:cc(0) x:expcrel() cond over
+	if($cc) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+050000 bscc x                - cc:cc(12) x:pcrel(6, 0) cond over
+	if($cc) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0d1800 bscc r                - r:ar(8) cc:cc(0) cond over
+	if($cc) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = m_pc + $r;
+	}
+
+0d8000 bsclr #n,xy:ea,x      - ea:eam1(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(!BIT($xy:m.read_dword($ea), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0d8000 bsclr #n,xy:abs,x     - abs:eam1a(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(!BIT($xy:m.read_dword($abs), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0d8080 bsclr #n,xy:aa,x      - aa:asa6(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(!BIT($xy:m.read_dword($aa), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0dc000 bsclr #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(!BIT($xy:m.read_dword($pp), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+048080 bsclr #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(!BIT($xy:m.read_dword($qq), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0dc080 bsclr #n,s,x          - s:sbr(8) n:bit5(0) x:expcrel() cond over
+	if(!BIT($s:h, $n)) {
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0a4020 bset #n,xy:ea         - ea:eam1(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($ea);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+		$xy:m.write_dword($ea, t | m);
+	}
+
+0a4020 bset #n,xy:abs        - abs:eam1a(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($abs);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+		$xy:m.write_dword($abs, t | m);
+	}
+
+0a0020 bset #n,xy:aa         - aa:asa6(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($aa);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+		$xy:m.write_dword($aa, t | m);
+	}
+
+0a8020 bset #n,xy:pp         - pp:asa6p(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($pp);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+		$xy:m.write_dword($pp, t | m);
+	}
+
+010020 bset #n,xy:qq         - qq:asa6q(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($qq);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+		$xy:m.write_dword($qq, t | m);
+	}
+
+0ac060 bset #n,d             - d:sbr(8) n:bit5(0)
+	u32 t = $d:h;
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+	$d:wh(t | m);
+
+0d1080 bsr x                 - x:expcrel() over
+	inc_sp();
+	set_ssh(m_npc);
+	set_ssl(get_sr());
+	m_npc = $x;
+
+050800 bsr x                 - x:pcrel(6, 0) over
+	inc_sp();
+	set_ssh(m_npc);
+	set_ssl(get_sr());
+	m_npc = $x;
+
+0d1880 bsr r                 - r:ar(8) over
+	inc_sp();
+	set_ssh(m_npc);
+	set_ssl(get_sr());
+	m_npc = m_pc + $r;
+
+0d8020 bsset #n,xy:ea,x      - ea:eam1(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(BIT($xy:m.read_dword($ea), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0d8020 bsset #n,xy:abs,x     - abs:eam1a(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(BIT($xy:m.read_dword($abs), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0d80a0 bsset #n,xy:aa,x      - aa:asa6(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(BIT($xy:m.read_dword($aa), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0dc020 bsset #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(BIT($xy:m.read_dword($pp), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0480a0 bsset #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:expcrel() cond over
+	if(BIT($xy:m.read_dword($qq), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0dc0a0 bsset #n,s,x          - s:sbr(8) n:bit5(0) x:expcrel() cond over
+	if(BIT($s:h, $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0b4020 btst #n,xy:ea         - ea:eam1(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($ea);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+0b4020 btst #n,xy:abs        - abs:eam1a(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($abs);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+0b0020 btst #n,xy:aa         - aa:asa6(8) xy:xyc(6) n:bit5(0)
+0b8020 btst #n,xy:pp         - pp:asa6p(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($pp);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+014020 btst #n,xy:qq         - qq:asa6q(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($qq);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+0bc060 btst #n,d             - d:sbr(8) n:bit5(0)
+	u32 t = $d;
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
+
+00c3c0 clb s,d               - s:acc(1) d:acc(0)
+014085 cmp #i,d              - i:imm6(8) d:acc(3)
+	(void)do_sub56(u64($i) << 24, $d);
+
+0140c5 cmp #i,d              - d:acc(3) i:eximm()
+	(void)do_sub56(util::sext(u64($i) << 24, 48), $d);
+
+0c1ff0 cmpu s1,s2            - s1:daos3(1, 0) s2:acc(0)
+000200 debug                 -
+000300 debugcc               - cc:cc(0)
+00000a dec d                 - d:acc(0)
+018040 div s,d               - s:daos(4) d:acc(3)
+012480 dmacss +s1,s2,d       - ss:ss(8, 6) d:acc(5) +:sign(4) s1:damo4_a(0) s2:damo4_b(0)
+064000 do xy:ea,expr         - ea:eam1(8) xy:xyc(6) expr:exabs()
+060000 do xy:aa,expr         - aa:asa6(8) xy:xyc(6) expr:exabs()
+060080 do #i,expr            - i:imm12(0, 8) expr:exabs()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	set_lc($i);
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+
+06c000 do s,expr             - s:sbr_nos(8) expr:exabs()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	set_lc($s);
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+
+000203 do forever,expr       - expr:exabs()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+	m_emr |= EMR_FV;
+
+064010 dor xy:ea,expr        - ea:eam1(8) xy:xyc(6) expr:expcrel()
+060010 dor xy:aa,expr        - aa:asa6(8) xy:xyc(6) expr:expcrel()
+060090 dor #i,expr           - i:imm12(0, 8) expr:expcrel()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	set_lc($i);
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+
+06c010 dor s,expr            - s:sbr_nos(8) expr:expcrel()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	set_lc($s);
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+
+000202 dor forever,expr      - expr:expcrel()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+	m_emr |= EMR_FV;
+
+00008c enddo                 -
+014083 eor #i,d              - i:imm6(8) d:acc(3)
+	u32 r = $d:1 ^ $i;
+	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+	if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+	} else if(BIT(r, 23)) {
+		m_ccr = m_ccr | CCR_N;
+	}
+	$d:w1(r);
+
+0140c3 eor #i,d              - d:acc(3) i:eximm()
+	u32 r = $d:1 ^ $i;
+	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+	if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+	} else if(BIT(r, 23)) {
+		m_ccr = m_ccr | CCR_N;
+	}
+	$d:w1(r);
+
+0c1a00 extract s1,s2,d       - s1:actrl(1) s2:acc(4)
+0c1800 extract #co,s2,d      - s2:acc(4) d:acc(0) co:exco()
+0c1a80 extractu s1,s2,d      - s1:actrl(1) s2:acc(4)
+0c1880 extractu #co,s2,d     - s2:acc(4) d:acc(0) co:exco()
+000005 illegal               -
+000008 inc d                 - d:acc(0)
+0c1b00 insert s1,s2,d        - s1:actrl(1) s2:dao3b(4)
+0c1900 insert #co,s2,d       - s2:dao3b(4) d:acc(0) co:exco()
+0e0000 jcc x                 - cc:cc(12) x:abs12(0) cond
+	if($cc) {
+		m_npc = $x;
+	}
+
+0ac0a0 jcc ea                - ea:eam1(8) cc:cc(0) cond
+	if($cc) {
+		m_npc = $ea;
+	}
+
+0ac0a0 jcc abs               - abs:eam1a(8) cc:cc(0) cond
+	if($cc) {
+		m_npc = $abs;
+	}
+
+0a4080 jclr #n,xy:ea,x       - ea:eam1(8) xy:xyc(6) n:bit5(0) x:exabs() cond
+	if(!BIT($xy:m.read_dword($ea), $n))
+		m_npc = $x;
+
+0a0080 jclr #n,xy:aa,x       - aa:asa6(8) xy:xyc(6) n:bit5(0) x:exabs() cond
+	if(!BIT($xy:m.read_dword($aa), $n))
+		m_npc = $x;
+
+0a8080 jclr #n,xy:pp,x       - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:exabs() cond
+	if(!BIT($xy:m.read_dword($pp), $n))
+		m_npc = $x;
+
+018080 jclr #n,xy:qq,x       - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:exabs() cond
+	if(!BIT($xy:m.read_dword($qq), $n))
+		m_npc = $x;
+
+0ac000 jclr #n,s,x           - s:sbr(8) n:bit5(0) x:exabs() cond
+	if(!BIT($s:h, $n))
+		m_npc = $x;
+
+0ac080 jmp ea                - ea:eam1(8)
+	m_npc = $ea;
+
+0ac080 jmp abs               - abs:eam1a(8)
+	m_npc = $abs;
+
+0c0000 jmp x                 - x:abs12(0)
+	m_npc = $x;
+
+0f0000 jscc x                - cc:cc(12) x:abs12(0) cond over
+	if($cc) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0bc0a0 jscc ea               - ea:eam1(8) cc:cc(0) cond over
+	if($cc) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $ea;
+	}
+
+0bc0a0 jscc abs              - abs:eam1a(8) cc:cc(0) cond over
+	if($cc) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $abs;
+	}
+
+0b4080 jsclr #n,xy:ea,x      - ea:eam1(8) xy:xyc(6) n:bit5(0) x:exabs() cond over
+	if(!BIT($xy:m.read_dword($ea), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0b0080 jsclr #n,xy:aa,x      - aa:asa6(8) xy:xyc(6) n:bit5(0) x:exabs() cond over
+	if(!BIT($xy:m.read_dword($aa), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0b8080 jsclr #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:exabs() cond over
+	if(!BIT($xy:m.read_dword($pp), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+01c080 jsclr #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:exabs() cond over
+	if(!BIT($xy:m.read_dword($qq), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0bc000 jsclr #n,s,x          - s:sbr(8) n:bit5(0) x:exabs() cond over
+	if(!BIT($s:h, $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0a40a0 jset #n,xy:ea,x       - ea:eam1(8) xy:xyc(6) n:bit5(0) x:exabs() cond
+	if(BIT($xy:m.read_dword($ea), $n))
+		m_npc = $x;
+
+0a00a0 jset #n,xy:aa,x       - aa:asa6(8) xy:xyc(6) n:bit5(0) x:exabs() cond
+	if(BIT($xy:m.read_dword($aa), $n))
+		m_npc = $x;
+
+0a80a0 jset #n,xy:pp,x       - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:exabs() cond
+	if(BIT($xy:m.read_dword($pp), $n))
+		m_npc = $x;
+
+0180a0 jset #n,xy:qq,x       - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:exabs() cond
+	if(BIT($xy:m.read_dword($qq), $n))
+		m_npc = $x;
+
+0ac020 jset #n,s,x           - s:sbr(8) n:bit5(0) x:exabs() cond
+	if(BIT($s:h, $n))
+		m_npc = $x;
+
+0bc080 jsr ea                - ea:eam1(8) over
+	inc_sp();
+	set_ssh(m_npc);
+	set_ssl(get_sr());
+	m_npc = $ea;
+
+0bc080 jsr abs               - abs:eam1a(8) over
+	inc_sp();
+	set_ssh(m_npc);
+	set_ssl(get_sr());
+	m_npc = $abs;
+
+0d0000 jsr x                 - x:abs12(0) over
+	inc_sp();
+	set_ssh(m_npc);
+	set_ssl(get_sr());
+	m_npc = $x;
+
+0b40a0 jsset #n,xy:ea,x      - ea:eam1(8) xy:xyc(6) n:bit5(0) x:exabs() cond over
+	if(BIT($xy:m.read_dword($ea), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0b00a0 jsset #n,xy:aa,x      - aa:asa6(8) xy:xyc(6) n:bit5(0) x:exabs() cond over
+	if(BIT($xy:m.read_dword($aa), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0b80a0 jsset #n,xy:pp,x      - pp:asa6p(8) xy:xyc(6) n:bit5(0) x:exabs() cond over
+	if(BIT($xy:m.read_dword($pp), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+01c0a0 jsset #n,xy:qq,x      - qq:asa6q(8) xy:xyc(6) n:bit5(0) x:exabs() cond over
+	if(BIT($xy:m.read_dword($qq), $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+0bc020 jsset #n,s,x          - s:sbr(8) n:bit5(0) x:exabs() cond over
+	if(BIT($s:h, $n)) {
+		inc_sp();
+		set_ssh(m_npc);
+		set_ssl(get_sr());
+		m_npc = $x;
+	}
+
+04c000 lra r,d               - r:ar(8) d:fvbr1(0)
+	$d:w(m_pc + $r);
+
+044040 lra #i,d              - d:fvbr1(0) i:expcrel()
+	$d:w($i);
+
+0c1e80 lsl #i,d              - i:shift5(1) d:acc(0)
+	u32 r = ($d:h) << $i;
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+	if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+	}
+	if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+	}
+	r &= 0xffffff;
+	if(!r) {
+		m_ccr |= CCR_Z;
+	}
+	$d:wh(r);
+
+0c1e10 lsl s,d               - s:actrl(1) d:acc(0)
+	u32 r = ($d:h) << $s;
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+	if(BIT(r, 24)) {
+		m_ccr |= CCR_C;
+	}
+	if(BIT(r, 23)) {
+		m_ccr |= CCR_N;
+	}
+	r &= 0xffffff;
+	if(!r) {
+		m_ccr |= CCR_Z;
+	}
+	$d:wh(r);
+
+0c1ec0 lsr #i,d              - i:shift5(1) d:acc(0)
+0c1e30 lsr s,d               - s:actrl(1) d:acc(0)
+044000 lua ea,d              - ea:eam4(8) d:fvbr1(0)
+	$d:wh($ea);
+
+040000 lua (r+o),d           - r:ar(8) o:sda7b(11, 4) d:agu(0)
+	$d:w($r + $o);
+
+0100c2 mac +s,#i,d           - i:imm5m(8) s:damo2(4) d:acc(3) +:sign(2)
+0141c2 maci +#i,s,d          - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
+012680 macss +s1,s2,d        - ss:ss1(6) d:acc(5) +:sign(4) s1:damo4_a(0) s2:damo4_b(0)
+0100c3 maccr +s,#i,d         - i:imm5m(8) s:damo2(4) d:acc(3) +:sign(2)
+0141c3 macri +#i,s,d         - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
+0c1b80 merge s,d             - s:dao3(1) d:acc(0)
+05c020 movec xy:ea,d1        - ea:eam1(8) xy:xyc(6) d1:fvbr2(0)
+	$d1:wh($xy:m.read_dword($ea));
+
+054020 movec s1,xy:ea        - ea:eam1(8) xy:xyc(6) s1:fvbr2(0)
+	$xy:m.write_dword($ea, $s1:h);
+
+05c020 movec xy:abs,d1       - abs:eam1a(8) xy:xyc(6) d1:fvbr2(0)
+	$d1:wh($xy:m.read_dword($abs));
+
+05c020 movec #i,d1           - i:eam1i(8) d1:fvbr2(0)
+	$d1:wh($i);
+
+054020 movec s1,xy:abs       - abs:eam1a(8) xy:xyc(6) s1:fvbr2(0)
+	$xy:m.write_dword($abs, $s1:h);
+
+058020 movec xy:aa,d1        - aa:asa6(8) xy:xyc(6) d1:fvbr2(0)
+	$d1:wh($xy:m.read_dword($aa));
+
+050020 movec s1,xy:aa        - aa:asa6(8) xy:xyc(6) s1:fvbr2(0)
+	$xy:m.write_dword($aa, $s1:h);
+
+04c0a0 movec s2,d1           - s2:sbr(8) d1:fvbr2(0)
+	$d1:w($s2);
+
+0440a0 movec s1,d2           - d2:sbr(8) s1:fvbr2(0)
+	$d2:w($s1);
+
+0500a0 movec #i,d1           - i:imm8(8) d1:fvbr2(0)
+	$d1:w($i);
+
+07c080 movem p:ea,d          - ea:eam1(8) d:sbr(0)
+	$d:wh(m_p.read_dword($ea));
+
+074080 movem s,p:ea          - ea:eam1(8) s:sbr(0)
+	m_p.write_dword($ea, $s:h);
+
+07c080 movem p:abs,d         - abs:eam1a(8) d:sbr(0)
+	$d:wh(m_p.read_dword($abs));
+
+074080 movem s,p:abs         - abs:eam1a(8) s:sbr(0)
+	m_p.write_dword($abs, $s:h);
+
+078000 movem p:aa,d          - aa:asa6(8) d:sbr(0)
+	$d:wh(m_p.read_dword($aa));
+
+070000 movem s,p:aa          - aa:asa6(8) s:sbr(0)
+	m_p.write_dword($aa, $s:h);
+
+08c080 movep xym:ea,xyp:pp   - xyp:xyc(16) ea:eam1(8) xym:xyc(6) pp:asa6p(0)
+	$xyp:m.write_dword($pp, $xym:m.read_dword($ea));
+
+084080 movep xyp:pp,xym:ea   - xyp:xyc(16) ea:eam1(8) xym:xyc(6) pp:asa6p(0)
+	$xym:m.write_dword($ea, $xyp:m.read_dword($pp));
+
+08c080 movep xym:abs,xyp:pp  - xyp:xyc(16) abs:eam1a(8) xym:xyc(6) pp:asa6p(0)
+	$xyp:m.write_dword($pp, $xym:m.read_dword($abs));
+
+084080 movep xyp:pp,xym:abs  - xyp:xyc(16) abs:eam1a(8) xym:xyc(6) pp:asa6p(0)
+	$xym:m.write_dword($abs, $xyp:m.read_dword($pp));
+
+08c080 movep #i,xyp:pp       - xyp:xyc(16) i:eam1i(8) pp:asa6p(0)
+	$xyp:m.write_dword($pp, $i);
+
+07c000 movep xym:ea,x:qq     - ea:eam1(8) xym:xyc(6) qq:asa6q(0)
+	m_x.write_dword($qq, $xym:m.read_dword($ea));
+
+074000 movep x:qq,xym:ea     - ea:eam1(8) xym:xyc(6) qq:asa6q(0)
+	$xym:m.write_dword($ea, m_x.read_dword($qq));
+
+07c000 movep xym:abs,x:qq    - abs:eam1a(8) xym:xyc(6) qq:asa6q(0)
+	m_x.write_dword($qq, $xym:m.read_dword($abs));
+
+074000 movep x:qq,xym:abs    - abs:eam1a(8) xym:xyc(6) qq:asa6q(0)
+	$xym:m.write_dword($abs, m_x.read_dword($qq));
+
+07c000 movep #i,x:qq         - i:eam1i(8) qq:asa6q(0)
+	m_x.write_dword($qq, $i);
+
+078080 movep xym:ea,y:qq     - ea:eam1(8) xym:xyc(6) qq:asa6q(0)
+	m_y.write_dword($qq, $xym:m.read_dword($ea));
+
+070080 movep y:qq,xym:ea     - ea:eam1(8) xym:xyc(6) qq:asa6q(0)
+	$xym:m.write_dword($ea, m_y.read_dword($qq));
+
+078080 movep xym:abs,y:qq    - abs:eam1a(8) xym:xyc(6) qq:asa6q(0)
+	m_y.write_dword($qq, $xym:m.read_dword($abs));
+
+078080 movep #i,y:qq         - i:eam1i(8) qq:asa6q(0)
+	m_y.write_dword($qq, $i);
+
+070080 movep y:qq,xym:abs    - abs:eam1a(8) xym:xyc(6) qq:asa6q(0)
+	$xym:m.write_dword($abs, m_y.read_dword($qq));
+
+08c040 movep p:ea,xyp:pp     - xyp:xyc(16) ea:eam1(8) pp:asa6p(0)
+	$xyp:m.write_dword($pp, m_p.read_dword($ea));
+
+084040 movep xyp:pp,p:ea     - xyp:xyc(16) ea:eam1(8) pp:asa6p(0)
+	m_p.write_dword($ea, $xyp:m.read_dword($pp));
+
+08c040 movep p:abs,xyp:pp    - xyp:xyc(16) abs:eam1a(8) pp:asa6p(0)
+	$xyp:m.write_dword($pp, m_p.read_dword($abs));
+
+084040 movep xyp:pp,p:abs    - xyp:xyc(16) abs:eam1a(8) pp:asa6p(0)
+	m_p.write_dword($abs, $xyp:m.read_dword($pp));
+
+00c000 movep p:ea,xyp:qq     - xyp:xyc(6) ea:eam1(8) qq:asa6q(0)
+	$xyp:m.write_dword($qq, m_p.read_dword($ea));
+
+008000 movep xyp:qq,p:ea     - xyp:xyc(6) ea:eam1(8) qq:asa6q(0)
+	m_p.write_dword($ea, $xyp:m.read_dword($qq));
+
+00c000 movep p:abs,xyp:qq    - xyp:xyc(6) abs:eam1a(8) qq:asa6q(0)
+	$xyp:m.write_dword($qq, m_p.read_dword($abs));
+
+008000 movep xyp:qq,p:abs    - xyp:xyc(6) abs:eam1a(8) qq:asa6q(0)
+	m_p.write_dword($abs, $xyp:m.read_dword($qq));
+
+08c000 movep s,xyp:pp        - xyp:xyc(16) s:sbr(8) pp:asa6p(0)
+	$xyp:m.write_dword($pp, $s);
+
+084000 movep xyp:pp,d        - xyp:xyc(16) d:sbr(8) pp:asa6p(0)
+	$d:wh($xyp:m.read_dword($pp));
+
+04c080 movep s,x:qq          - s:sbr(8) qq:asa6qs(6, 0)
+	m_x.write_dword($qq, $s:h);
+
+044080 movep x:qq,d          - d:sbr(8) qq:asa6qs(6, 0)
+	$d:wh(m_x.read_dword($qq));
+
+04c020 movep s,y:qq          - s:sbr(8) qq:asa6qs(6, 0)
+	m_y.write_dword($qq, $s:h);
+
+044020 movep y:qq,d          - d:sbr(8) qq:asa6qs(6, 0)
+	$d:wh(m_y.read_dword($qq));
+
+0100c0 mpy +s,#i,d           - i:imm5m(8) s:damo2(4) d:acc(3) +:sign(2)
+012780 mpyss +s1,s2,d        - ss:ss1(6) d:acc(5) +:sign(4) s1:damo4_a(0) s2:damo4_b(0)
+0141c0 mpyi +#i,s,d          - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
+0100c1 mpyr +s,#i,d          - i:imm5m(8) s:damo2(4) d:acc(3) +:sign(2)
+0141c1 mpyri +#i,s,d         - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
+01d815 norm r,d              - r:ar(8) d:acc(3)
+0c1e20 normf s,d             - s:actrl(1) d:acc(0)
+014082 or #i,d               - i:imm6(8) d:acc(3)
+	u32 r = $d:1 | $i;
+	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+	if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+	} else if(BIT(r, 23)) {
+		m_ccr = m_ccr | CCR_N;
+	}
+	$d:w1(r);
+
+0140c2 or #i,d               - d:acc(3) i:eximm()
+	u32 r = $d:1 | $i;
+	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
+	if(!r) {
+		m_ccr = m_ccr | CCR_Z;
+	} else if(BIT(r, 23)) {
+		m_ccr = m_ccr | CCR_N;
+	}
+	$d:w1(r);
+
+0000f8 ori #i,ctrl           - i:imm8(8) ctrl:ctrl(0)
+	$ctrl:w($ctrl | $i);
+
+000003 pflush                -
+000001 pflushun              -
+000002 pfree                 -
+0bc081 plock ea              - ea:eam1(8)
+0bc081 plock abs             - abs:eam1a(8)
+00000f plockr x              - x:expcrel()
+0ac081 punlock ea            - ea:eam1(8)
+0ac081 punlock abs           - abs:eam1a(8)
+00000e punlockr x            - x:expcrel()
+064020 rep xy:ea             - ea:eam1(8) xy:xyc(6)
+	m_temp_lc = get_lc();
+	set_lc($xy:m.read_dword($ea));
+	m_rep = true;
+
+060020 rep xy:aa             - aa:asa6(8) xy:xyc(6)
+	m_temp_lc = get_lc();
+	set_lc($xy:m.read_dword($aa));
+	m_rep = true;
+
+0600a0 rep #i                - i:imm12(0, 8)
+	m_temp_lc = get_lc();
+	set_lc($i);
+	m_rep = true;
+
+06c020 rep s                 - s:sbr(8)
+	m_temp_lc = get_lc();
+	set_lc($s:h);
+	m_rep = true;
+
+000084 reset                 -
+	m_icount = 0;
+	m_npc --;
+
+000004 rti                   - out
+	m_npc = get_ssh();
+	set_sr(get_ssl());
+	dec_sp();
+
+00000c rts                   - out
+	m_npc = get_ssh();
+	dec_sp();
+
+000087 stop                  -
+014084 sub #i,d              - i:imm6(8) d:acc(3)
+	$d = do_sub56(u64($i) << 24, $d);
+
+0140c4 sub #i,d              - d:acc(3) i:eximm()
+	$d = do_sub56(util::sext($i << 24, 48), $d);
+
+020000 tcc s1,d1             - cc:cc(12) s1:daos3(4, 3) d1:acc(3)
+030000 tcc s1,d1 s2,d2       - cc:cc(12) s2:ar(8) s1:daos3(4, 3) d1:acc(3) d2:ar(0)
+020800 tcc s2,d2             - cc:cc(12) s2:ar(8) d2:ar(0)
+000006 trap                  -
+000010 trapcc                - cc:cc(0) cond
+0ac0c0 vsl s,i,l:ea          - s:acc(16) ea:eam1(8) i:imm1(4)
+0ac0c0 vsl s,i,l:abs         - s:acc(16) abs:eam1a(8) i:imm1(4)
+000086 wait                  -

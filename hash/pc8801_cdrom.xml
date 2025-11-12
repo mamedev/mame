@@ -9,22 +9,155 @@ license:CC0-1.0
 PC-8801-31 SW list
 
 TODO:
-- Add Mirrors dump (ones floating around are in .ccd/.sub/.img format);
-- Add DIOS CD-ROM Ban dump (undumped?)
 - Reportedly later Koei and Falcom releases can optionally load the correlated audio CD soundtracks.
   Pinpoint how exactly they detect the presence of a valid CD-ROM, add candidates here.
 
 -->
 
-	<software name="takabako" supported="no">
+	<software name="takabako" supported="partial">
 		<description>CD Takarabako</description>
 		<year>1989</year>
 		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Game transfers not extensively tested
+]]></notes>
 		<info name="alt_title" value="ＣＤたから箱"/>
+		<info name="usage" value="Insert empty 2D images for game disk to save (i.e. 2HD won't work)"/>
+		<sharedfeat name="mouseport_default" value="mouse" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cd takarabako (japan)" sha1="fa04ebd2556c6508a2401e9a261b8bce843164c0"/>
+				<!-- baddump: missing indices from track 3 -->
+				<disk name="cd takarabako (japan)" sha1="fa04ebd2556c6508a2401e9a261b8bce843164c0" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="takabakoa" cloneof="takabako" supported="partial">
+		<description>CD Takarabako (alt)</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Game transfers not extensively tested
+]]></notes>
+		<info name="alt_title" value="ＣＤたから箱"/>
+		<info name="usage" value="Insert empty 2D images for game disk to save (i.e. 2HD won't work)"/>
+		<sharedfeat name="mouseport_default" value="mouse" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<!-- baddump: missing indices from track 3 -->
+				<disk name="cd takarabako (japan) (alt)" sha1="1975f9f054ca1827fdf0c3eb2c8ba0dc4b4357b0" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dioscd" supported="no">
+		<description>Dios CD-ROM ban</description>
+		<year>1990</year>
+		<publisher>ザインソフト (Zain Soft)</publisher>
+		<notes><![CDATA[
+[i8214] Overruns VRTC with ei reti during initial ADPCM setup
+Main menu is heavily glitched (needs tvram misc_ctrl bit 4 off)
+Eventually crashes in opening after first speech, or in-game
+Known to have [FDC] copy protection for user disk creation (the .d88 dump won't load in MAME)
+]]></notes>
+		<info name="release" value="19900308"/>
+		<info name="alt_title" value="ディオス CD-ROM版"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3269649">
+				<rom name="dios.mfi" size="3269649" crc="a36302de" sha1="f076d7ae6f6de8abb2037f30a4eee99e43191f61"/>
+			</dataarea>
+		</part>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<!-- baddump: missing indices from track 3 -->
+				<disk name="dios (japan)" sha1="d7023222681862904756422c1465abeb3b09bd07" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mirrors" supported="partial">
+		<description>Mirrors</description>
+		<year>1990</year>
+		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Bogus [redbook] during intro with track 5 while fade-out without waiting enough (btanb?)
+[redbook] 2 seconds offset on title screen
+]]></notes>
+		<info name="release" value="19901210"/>
+		<info name="alt_title" value="ミラーズ"/>
+		<info name="usage" value="Select second option, insert Save Disk first then Main and Game Disks to quickly test (no save)"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Main Disk" />
+			<dataarea name="flop" size="416688">
+				<rom name="mirrors (disk 1 - main disk).d88" size="416688" crc="2905491c" sha1="675dec0ec292fd470b39d7df0aa75aa823c7725d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Game Disk" />
+			<dataarea name="flop" size="416688">
+				<rom name="mirrors (disk 2 - game disk).d88" size="416688" crc="09b62c02" sha1="326bafd5e8fc1233deb812569348913cd223f21e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Save Disk" />
+			<dataarea name="flop" size="416688">
+				<rom name="mirrors (disk 3 - save disk).d88" size="416688" crc="dafab296" sha1="54c60e9f3faff56c2923c5f4e2e87e2e7158d1f8"/>
+			</dataarea>
+		</part>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mirrors (japan)" sha1="5ffb6dd65d125379ff020359454d11432ebdee6f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mirrorsa" cloneof="mirrors" supported="partial">
+		<description>Mirrors (alt)</description>
+		<year>1990</year>
+		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Same as mirrors set
+]]></notes>
+		<info name="release" value="19901210"/>
+		<info name="alt_title" value="ミラーズ"/>
+		<info name="usage" value="Select second option, insert Save Disk first then Main and Game Disks to quickly test (no save)"/>
+		<!--combined image-->
+		<!--rom name="mirrors.d88" size="1250128" crc="6534e06f" sha1="d704a29480c476b50638e7c7ac28fcd5f91fa376"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Main Disk" />
+			<dataarea name="flop" size="416688">
+				<rom name="mirrors_01.d88" size="416688" crc="17934f60" sha1="4379da035a8c4d5b0bf503151e401f72b061ff59"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Game Disk" />
+			<dataarea name="flop" size="416752">
+				<rom name="mirrors_02.d88" size="416752" crc="7268e16b" sha1="e5507ca27a6f23b79dee92f900c2320d3c1d9f94"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Save Disk" />
+			<dataarea name="flop" size="416688">
+				<rom name="mirrors_03.d88" size="416688" crc="4dbe9a3e" sha1="0fff6446fd85c5826ee1d40942d185d71e676f92"/>
+			</dataarea>
+		</part>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mirrors (japan)" sha1="5ffb6dd65d125379ff020359454d11432ebdee6f"/>
 			</diskarea>
 		</part>
 	</software>

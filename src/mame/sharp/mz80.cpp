@@ -22,10 +22,6 @@ MZ80A ToDo:
 - Disk uses ports D8-DC
 - Keyboard issues listed below
 
-MZ80B
-- Makes extensive use of io ports
-- D000-FFFF is banked ram
-
 ****************************************************************************/
 
 #include "emu.h"

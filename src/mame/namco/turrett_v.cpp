@@ -10,23 +10,18 @@
 #include "machine/idectrl.h"
 #include "turrett.h"
 
+#include <algorithm>
 
 
-inline uint8_t clamp_5bit(int8_t val)
+static inline uint8_t clamp_5bit(int8_t val)
 {
-	if (val < 0)
-		return 0;
-
-	if (val > 31)
-		return 31;
-
-	return val;
+	return std::clamp<int8_t>(val, 0, 31);
 }
 
 
 uint32_t turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int page = (m_video_ctrl & 1) ^ 1;
+	const int page = BIT(~m_video_ctrl, 0);
 
 	const uint16_t *vram = m_video_ram[page].get();
 
@@ -50,15 +45,15 @@ uint32_t turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
 			{
-				uint16_t srcpix = *src++;
+				const uint16_t srcpix = *src++;
 
-				uint8_t src_b = srcpix & 0x1f;
-				uint8_t src_g = (srcpix >> 5) & 0x1f;
-				uint8_t src_r = (srcpix >> 10) & 0x1f;
+				const uint8_t src_b = srcpix & 0x1f;
+				const uint8_t src_g = (srcpix >> 5) & 0x1f;
+				const uint8_t src_r = (srcpix >> 10) & 0x1f;
 
-				uint8_t dst_b = clamp_5bit(src_b + fade_b);
-				uint8_t dst_g = clamp_5bit(src_g + fade_g);
-				uint8_t dst_r = clamp_5bit(src_r + fade_r);
+				const uint8_t dst_b = clamp_5bit(src_b + fade_b);
+				const uint8_t dst_g = clamp_5bit(src_g + fade_g);
+				const uint8_t dst_r = clamp_5bit(src_r + fade_r);
 
 				*dest++ = (dst_r << 10) | (dst_g << 5) | dst_b;
 			}
@@ -94,8 +89,8 @@ uint32_t turrett_state::write_video_ram(uint16_t data)
 		{
 			int address = m_y_pos * X_VISIBLE + m_x_pos;
 
-			uint16_t *vramptr = &m_video_ram[m_video_ctrl & 1][address];
-			uint16_t srcpix = data;
+			uint16_t *vramptr = &m_video_ram[BIT(m_video_ctrl, 0)][address];
+			const uint16_t srcpix = data;
 			uint16_t dstpix = data;
 
 			// Blending enabled?
@@ -103,16 +98,16 @@ uint32_t turrett_state::write_video_ram(uint16_t data)
 			{
 				dstpix = *vramptr;
 
-				uint8_t src_b = srcpix & 0x1f;
-				uint8_t src_g = (srcpix >> 5) & 0x1f;
-				uint8_t src_r = (srcpix >> 10) & 0x1f;
+				const uint8_t src_b = srcpix & 0x1f;
+				const uint8_t src_g = (srcpix >> 5) & 0x1f;
+				const uint8_t src_r = (srcpix >> 10) & 0x1f;
 
 				uint8_t dst_b = dstpix & 0x1f;
 				uint8_t dst_g = (dstpix >> 5) & 0x1f;
 				uint8_t dst_r = (dstpix >> 10) & 0x1f;
 
 				// Additive
-				if (m_video_ctrl & 2)
+				if (BIT(m_video_ctrl, 1))
 				{
 					dst_b = clamp_5bit(src_b + dst_b);
 					dst_g = clamp_5bit(src_g + dst_g);
@@ -151,7 +146,7 @@ uint32_t turrett_state::write_video_ram(uint16_t data)
 }
 
 
-void turrett_state::update_video_addr(void)
+void turrett_state::update_video_addr()
 {
 	// Handle auto-increment
 	if (m_dx == m_x_mod)
@@ -268,7 +263,7 @@ void turrett_state::video_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			else if (mem_mask == 0x0000ffff)
 			{
-				if (data & 0x4000)
+				if (BIT(data, 14))
 					m_hotspot_y = data;
 				else
 					m_hotspot_x = data;
@@ -293,7 +288,7 @@ TIMER_CALLBACK_MEMBER( turrett_state::dma_complete )
 
 void turrett_state::dma_w(offs_t offset, uint32_t data)
 {
-	int bank = ((offset & 2) >> 1) ^ 1;
+	const int bank = BIT(~offset, 1);
 
 	if ((offset & 1) == 0)
 	{
@@ -305,10 +300,10 @@ void turrett_state::dma_w(offs_t offset, uint32_t data)
 		uint32_t words = data & 0x0fffffff;
 
 		// IDE to DRAM
-		if (data & 0x10000000)
+		if (BIT(data, 28))
 		{
 			uint32_t addr = m_dma_addr[bank];
-			uint16_t *ram = bank ? m_bank_b : m_bank_a;
+			uint16_t *const ram = m_ram_bank[bank];
 
 			while (words--)
 			{
@@ -320,11 +315,11 @@ void turrett_state::dma_w(offs_t offset, uint32_t data)
 			m_dma_addr[bank] = addr;
 		}
 		// IDE to video RAM
-		else if (data & 0x40000000)
+		else if (BIT(data, 30))
 		{
 			while (words--)
 			{
-				uint16_t data = m_ata->cs0_r(0);
+				const uint16_t data = m_ata->cs0_r(0);
 
 				// TODO: Verify if this is correct
 				if ((data & 0xc400) == 0xc400)
@@ -349,16 +344,16 @@ void turrett_state::dma_w(offs_t offset, uint32_t data)
 			clocks = 500; // TODO
 		}
 		// RAM to video RAM
-		else if (data & 0x80000000)
+		else if (BIT(data, 31))
 		{
 			uint32_t addr = m_dma_addr[bank];
-			uint16_t *ram = bank ? m_bank_b : m_bank_a;
+			uint16_t *const ram = m_ram_bank[bank];
 
 			//bool first = true; // Does it matter?
 
 			while (words--)
 			{
-				uint16_t val = ram[addr++];
+				const uint16_t val = ram[addr++];
 				//++clocks;
 
 				switch (val & 0xc400)

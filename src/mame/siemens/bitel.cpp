@@ -13,7 +13,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/mcs48/mcs48.h"
 //#include "video/saa5350.h"
 

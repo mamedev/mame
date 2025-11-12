@@ -66,7 +66,7 @@ ToDo:
 #include "genpin.h"
 #include "cpu/m6502/w65c02.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/6522via.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"
@@ -120,7 +120,7 @@ private:
 	void pca002_map(address_map &map) ATTR_COLD;
 	void pca003_map(address_map &map) ATTR_COLD;
 	void pca008_map(address_map &map) ATTR_COLD;
-	void pca020_io_map(address_map &map) ATTR_COLD;
+	void pca020_data_map(address_map &map) ATTR_COLD;
 	void pca020_mem_map(address_map &map) ATTR_COLD;
 	void machine_start() override ATTR_COLD;
 	void machine_reset() override ATTR_COLD;
@@ -242,7 +242,7 @@ void alvg_state::pca020_mem_map(address_map &map)
 	map(0x8000, 0xffff).bankr("dmd");
 }
 
-void alvg_state::pca020_io_map(address_map &map)
+void alvg_state::pca020_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram().share("vram");
@@ -574,7 +574,7 @@ void alvg_state::pca020(machine_config &config)
 	/* basic machine hardware */
 	I8031(config, m_dmdcpu, XTAL(12'000'000));
 	m_dmdcpu->set_addrmap(AS_PROGRAM, &alvg_state::pca020_mem_map);
-	m_dmdcpu->set_addrmap(AS_IO, &alvg_state::pca020_io_map);
+	m_dmdcpu->set_addrmap(AS_DATA, &alvg_state::pca020_data_map);
 	m_dmdcpu->port_out_cb<1>().set(FUNC(alvg_state::dmd_port1_w));
 	m_dmdcpu->port_in_cb<1>().set(FUNC(alvg_state::dmd_port1_r));
 	m_dmdcpu->port_out_cb<3>().set(FUNC(alvg_state::dmd_port3_w));

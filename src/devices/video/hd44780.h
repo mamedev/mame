@@ -26,13 +26,10 @@ DECLARE_DEVICE_TYPE(SED1278,  sed1278_device)
 DECLARE_DEVICE_TYPE(KS0066,   ks0066_device)
 
 
-class hd44780_device : public device_t
+class hd44780_base_device : public device_t
 {
 public:
 	typedef device_delegate<void (bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state)> pixel_update_delegate;
-
-	// construction/destruction
-	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
@@ -58,14 +55,13 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hd44780_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 	TIMER_CALLBACK_MEMBER(blink_tick);
@@ -127,41 +123,47 @@ private:
 };
 
 
-class hd44780u_device : public hd44780_device
+class hd44780_device : public hd44780_base_device
+{
+public:
+	// construction/destruction
+	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+
+class hd44780u_device : public hd44780_base_device
 {
 public:
 	// construction/destruction
 	hd44780u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static auto parent_rom_device_type() { return &HD44780; }
-
 protected:
 	// device_t implementation
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
-class sed1278_device : public hd44780_device
+class sed1278_device : public hd44780_base_device
 {
 public:
 	// construction/destruction
 	sed1278_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static auto parent_rom_device_type() { return &HD44780; }
-
 protected:
 	// device_t implementation
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
-class ks0066_device : public hd44780_device
+class ks0066_device : public hd44780_base_device
 {
 public:
 	// construction/destruction
 	ks0066_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	static auto parent_rom_device_type() { return &HD44780; }
 
 protected:
 	// device_t implementation

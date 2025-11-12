@@ -127,9 +127,9 @@ u16 mu128_state::pe_r()
 	if(BIT(m_pe, 4)) {
 		if(BIT(m_pe, 0)) {
 			if(BIT(m_pe, 2))
-				return m_lcd->data_read() << 8;
+				return m_lcd->data_r() << 8;
 			else
-				return m_lcd->control_read() << 8;
+				return m_lcd->control_r() << 8;
 		} else
 			return 0x0000;
 	}
@@ -142,9 +142,9 @@ void mu128_state::pe_w(u16 data)
 	if(BIT(m_pe, 4) && !BIT(data, 4)) {
 		if(!BIT(data, 0)) {
 			if(BIT(data, 2))
-				m_lcd->data_write(data >> 8);
+				m_lcd->data_w(data >> 8);
 			else
-				m_lcd->control_write(data >> 8);
+				m_lcd->control_w(data >> 8);
 		}
 	}
 
@@ -241,4 +241,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1998, mu128, 0, 0, mu128,  mu128, mu128_state, empty_init, "Yamaha", "MU128", MACHINE_NOT_WORKING )
+CONS( 1998, mu128, 0, 0, mu128,  mu128, mu128_state, empty_init, "Yamaha", "MU128", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )

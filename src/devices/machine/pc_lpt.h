@@ -32,7 +32,7 @@ public:
 	uint8_t data_r();
 	void data_w(uint8_t data);
 	uint8_t status_r();
-	uint8_t control_r( );
+	uint8_t control_r();
 	void control_w(uint8_t data);
 
 protected:

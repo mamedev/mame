@@ -1,5 +1,7 @@
 # **3rdparty** #
 
+aescbc - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+
 asio - [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
 asmjit - [zlib license](http://opensource.org/licenses/Zlib)

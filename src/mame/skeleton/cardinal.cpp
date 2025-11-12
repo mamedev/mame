@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "bus/rs232/rs232.h"
 #include "machine/eepromser.h"
 #include "sound/spkrdev.h"
@@ -129,7 +129,7 @@ void cardinal_state::cardinal(machine_config &config)
 {
 	i8031_device &maincpu(I8031(config, "maincpu", 7.3728_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &cardinal_state::prog_map);
-	maincpu.set_addrmap(AS_IO, &cardinal_state::ext_map);
+	maincpu.set_addrmap(AS_DATA, &cardinal_state::ext_map);
 	maincpu.port_in_cb<1>().set(FUNC(cardinal_state::p1_r));
 	maincpu.port_out_cb<1>().set(FUNC(cardinal_state::p1_w));
 	maincpu.port_in_cb<3>().set_ioport("P3");

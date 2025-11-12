@@ -102,6 +102,8 @@ protected:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 	required_device<pia6821_device> m_pia;
 	required_device<msm5832_device> m_msm5832;
@@ -187,6 +189,11 @@ void a2bus_timemasterho_device::device_reset()
 {
 	m_msm5832->cs_w(ASSERT_LINE);   // CS is tied to Vcc
 	m_started = true;
+}
+
+void a2bus_timemasterho_device::reset_from_bus()
+{
+	m_pia->reset();
 }
 
 

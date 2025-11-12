@@ -130,10 +130,17 @@ void a2bus_hsscsi_device::device_start()
 
 void a2bus_hsscsi_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_hsscsi_device::reset_from_bus()
+{
 	m_rambank = 0;
 	m_rombank = 0;
 	m_dma_addr = m_dma_size = 0;
 	m_c0ne = m_c0nf = 0;
+
+	m_ncr5380->reset();
 }
 
 

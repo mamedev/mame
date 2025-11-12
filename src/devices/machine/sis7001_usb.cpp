@@ -2,11 +2,11 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-    SiS 7001 USB Host controller
+SiS 7001 USB Host controller (OHCI)
 
-    TODO:
-    - Stub interface, to be merged with pci-usb;
-    - PCI values omitted from docs, assumes same as OpenHCI;
+TODO:
+- Stub interface, to be merged with pci-usb;
+- PCI values omitted from docs, assumes same as OpenHCI;
 
 **************************************************************************************************/
 

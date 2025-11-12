@@ -10,7 +10,7 @@
 
 
     IIe: base of this driver.  64K RAM, slot 0 language card emulation without the double-read requirement,
-         lowercase and SHIFT key on button 2, Open and Solid Apple buttons on joy buttons 0 and 1,
+         lowercase, Open and Solid Apple buttons on joy buttons 0 and 1,
          auxiliary slot, built-in 80 column support if extra RAM added.
 
          Physical slot 0 was eliminated thanks to the built-in language card.
@@ -36,11 +36,12 @@
 
     IIe enhanced: 65C02 CPU with more instructions, MouseText in the character generator.
 
-    IIe platinum: Like enhanced but with added numeric keypad and extended 80-column card
-         included in the box.  Keypad CLEAR generates ESC by default, one hardware mod
-         made it generate CTRL-X instead.  (new keyboard encoder ROM?)
+    IIe Platinum: Like enhanced but with added numeric keypad and extended 80-column card
+         included in the box.  SHIFT key on button 2, keypad CLEAR generates ESC by default,
+         one hardware mod made it generate CTRL-X instead.  (new keyboard encoder ROM?)
 
-    NOTE: On real IIe and IIe enhanced h/w, pressing SHIFT and paddle button 2 will
+    NOTE: On IIe Platinum h/w (or IIe and IIe enhanced, if pad X6 on the motherboard
+    is soldered to enable the SHIFT key mod), pressing SHIFT and paddle button 2 will
     short out the power supply and cause a safety shutdown.  (We don't emulate
     this "feature", and it was relatively rare in real life as Apple joysticks only
     had buttons 0 and 1 normally).
@@ -251,8 +252,6 @@ public:
 		m_printer_conn(*this, "parallel"),
 		m_printer_out(*this, "laserprnout")
 	{
-		m_accel_laser = false;
-		m_has_laser_mouse = false;
 		m_isiic = false;
 		m_isiicplus = false;
 		m_iscec = false;
@@ -262,8 +261,11 @@ public:
 		m_isace2200 = false;
 		m_ace2200_axxx_bank = false;
 		m_pal = false;
+		m_shift_key_mod = false;
 		m_cur_floppy = nullptr;
 		m_devsel = 0;
+		m_has_laser_mouse = false;
+		m_accel_laser = false;
 		m_laser_speed = 0;
 		m_laser_fdc_on = false;
 	}
@@ -341,7 +343,6 @@ public:
 	void laserprn_w(u8 data);
 	TIMER_CALLBACK_MEMBER(update_laserprn_strobe);
 	u8 c000_iic_r(offs_t offset);
-	void c000_iic_w(offs_t offset, u8 data);
 	u8 c080_r(offs_t offset);
 	void c080_w(offs_t offset, u8 data);
 	u8 c100_r(offs_t offset);
@@ -428,7 +429,7 @@ public:
 	bool m_35sel, m_hdsel, m_intdrive;
 
 private:
-	int m_speaker_state, m_cassette_state, m_cassette_out;
+	int m_speaker_state, m_cassette_state;
 
 	double m_joystick_x1_time, m_joystick_y1_time, m_joystick_x2_time, m_joystick_y2_time;
 
@@ -442,7 +443,7 @@ private:
 
 	bool m_an0, m_an1, m_an2, m_an3;
 
-	bool m_vbl, m_vblmask;
+	bool m_vblmask;
 
 	bool m_xy, m_x0edge, m_y0edge;
 	bool m_x0, m_x1, m_y0, m_y1;
@@ -460,20 +461,21 @@ private:
 	bool m_intc8rom;
 	bool m_reset_latch;
 
-	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_pal;
+	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000;
+	bool m_pal, m_shift_key_mod;
 	u8 m_migram[0x800];
 	u16 m_migpage;
 
 	bool m_isace500, m_isace2200, m_ace_cnxx_bank, m_ace2200_axxx_bank;
 	u16 m_ace500rombank;
 
+	bool m_has_laser_mouse;
+	bool m_laser_fdc_on;
+	bool m_accel_laser;
 	bool m_accel_unlocked;
 	bool m_accel_fast;
 	bool m_accel_present;
 	bool m_accel_temp_slowdown;
-	bool m_accel_laser;
-	bool m_has_laser_mouse;
-	bool m_laser_fdc_on;
 	int m_accel_stage;
 	u32 m_accel_speed;
 	u8 m_accel_slotspk, m_accel_gameio, m_laser_speed;
@@ -505,7 +507,7 @@ private:
 	u8 *m_exp_ram;
 	int m_exp_wptr, m_exp_liveptr;
 
-	void do_io(int offset, bool is_iic);
+	void do_io(int offset);
 	u8 read_floatingbus();
 	void update_slotrom_banks();
 	void lc_update(int offset, bool writing);
@@ -866,7 +868,7 @@ void apple2e_state::memexp_w(offs_t offset, u8 data)
 			break;
 
 		case 3:
-//            printf("Write %02x to RAM[%x]\n", data, m_liveptr);
+//			printf("Write %02x to RAM[%x]\n", data, m_exp_liveptr);
 			if (m_exp_liveptr <= m_exp_addrmask)
 			{
 				m_exp_ram[m_exp_liveptr] = data;
@@ -895,7 +897,6 @@ void apple2e_state::machine_start()
 	m_speaker_state = 0;
 	m_speaker->level_w(m_speaker_state);
 	m_cassette_state = 0;
-	m_cassette_out = 0;
 	if (m_cassette)
 	{
 		m_cassette->output(-1.0f);
@@ -911,7 +912,7 @@ void apple2e_state::machine_start()
 	m_inh_bank = 0;
 
 	m_migpage = 0;
-	memset(m_migram, 0, 0x200);
+	memset(m_migram, 0, sizeof(m_migram));
 
 	// expansion RAM size
 	if (m_ram_size > (128*1024))
@@ -1091,7 +1092,6 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_ramrd));
 	save_item(NAME(m_ramwrt));
 	save_item(NAME(m_ioudis));
-	save_item(NAME(m_vbl));
 	save_item(NAME(m_vblmask));
 	save_item(NAME(m_romswitch));
 	save_item(NAME(m_irqmask));
@@ -1183,7 +1183,7 @@ void apple2e_state::machine_reset()
 	m_lcwriteenable = true;
 
 	m_video->monohgr_w(m_iscecm);
-	m_vbl = m_vblmask = false;
+	m_vblmask = false;
 	m_irqmask = 0;
 	m_strobe = 0;
 	m_franklin_last_fkeys = 0;
@@ -1278,6 +1278,8 @@ void apple2e_state::machine_reset()
 	}
 
 	m_exp_bankhior = 0xf0;
+	memset(m_exp_regs, 0, sizeof(m_exp_regs));
+	m_exp_wptr = m_exp_liveptr = 0;
 
 	// sync up the banking with the variables.
 	lcrom_update();
@@ -1317,10 +1319,7 @@ void apple2e_state::raise_irq(int irq)
 {
 	m_irqmask |= (1 << irq);
 
-	if (m_irqmask)
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 void apple2e_state::lower_irq(int irq)
@@ -1358,8 +1357,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 
 	if (scanline == 192)
 	{
-		m_vbl = true;
-
 		if (m_vblmask)
 		{
 			raise_irq(IRQ_VBL);
@@ -1733,68 +1730,78 @@ void apple2e_state::cec_lcrom_update()
 }
 
 // most softswitches don't care about read vs write, so handle them here
-void apple2e_state::do_io(int offset, bool is_iic)
+void apple2e_state::do_io(int offset)
 {
-	if(machine().side_effects_disabled()) return;
+	if (machine().side_effects_disabled())
+		return;
 
 	// Handle C058-C05F according to IOUDIS
-	if ((offset & 0x58) == 0x58)
+	if ((offset & 0xf8) == 0x58)
 	{
 		// IIc-specific switches
-		if (((m_isiic || m_isace500) && (!m_accel_unlocked)) && (!m_ioudis))
+		if ((m_isiic || m_isace500) && (!m_ioudis))
 		{
 			switch (offset)
 			{
 				case 0x58:  // DisXY
-					m_xy = false; break;
+					m_xy = false;
+					break;
 
 				case 0x59:  // EnbXY
-					m_xy = true; break;
+					m_xy = true;
+					break;
 
 				case 0x5a:  // DisVBL
 					lower_irq(IRQ_VBL);
-					m_vblmask = false; break;
+					m_vblmask = false;
+					break;
 
 				case 0x5b:  // EnVBL
-					m_vblmask = true; break;
+					m_vblmask = true;
+					break;
 
 				case 0x5c:  // RisX0Edge
-					m_x0edge = false; break;
+					m_x0edge = false;
+					break;
 
 				case 0x5d:  // FalX0Edge
-					m_x0edge = true; break;
+					m_x0edge = true;
+					break;
 
 				case 0x5e:  // RisY0Edge
-					if (!m_ioudis)
-					{
-						m_y0edge = false;
-					}
+					m_y0edge = false;
 					break;
 
 				case 0x5f:  // FalY0Edge
-					if (!m_ioudis)
-					{
-						m_y0edge = true;
-					}
+					m_y0edge = true;
 					break;
 			}
-		}
 
-		// IIe does not have IOUDIS (ref: on-h/w tests by TomCh)
-		if ((m_ioudis) || (!m_isiic && !m_isace500))
+			return;
+		}
+		else // IIe does not have IOUDIS (ref: on-h/w tests by TomCh)
 		{
 			switch (offset)
 			{
 				case 0x5e:  // SETDHIRES
-					m_video->dhires_w(0);
+					m_video->an3_w(0);
 					break;
 
 				case 0x5f:  // CLRDHIRES
-					m_video->dhires_w(1);
+					m_video->an3_w(1);
 					break;
 			}
 		}
-// ComputerEyes seems to indicate that the annuciators get tickled regardless of the IOUDIS state.
+
+		/*
+		Fall through to annunciators, which is correct for the IIe.
+
+		The IIc Technical Reference says: "if the IOUDis switch is on, both
+		reading from and writing to addresses C058 through C05D are reserved".
+		The IIc does not have an internal gameio port, and the annunciators
+		are not available on the external DE-9 connector, so even if state
+		changes, it can't go anywhere, and can't be read back.
+		*/
 	}
 
 	if ((offset & 0xf0) == 0x30) // speaker, $C030 is really 30-3f
@@ -1821,7 +1828,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
 		}
 
-		if (is_iic)
+		if (m_isiic)
 		{
 			// Apple IIc Tech Reference 1st edition lists this softswitch at $c028 while
 			// the 2nd edition lists it at $c02x.  Both the IIc and IIc Plus will respond to
@@ -1843,7 +1850,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 	switch (offset)
 	{
 		case 0x40:  // utility strobe (not available on IIc)
-			if (!is_iic)
+			if (!m_isiic)
 			{
 				m_gameio->strobe_w(0);
 				m_gameio->strobe_w(1);
@@ -1937,9 +1944,8 @@ void apple2e_state::do_io(int offset, bool is_iic)
 		// trigger joypad read
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			if ((is_iic) || (m_isace500))
+			if ((m_isiic) || (m_isace500))
 			{
-				m_vbl = false;
 				lower_irq(IRQ_VBL);
 			}
 
@@ -1978,7 +1984,6 @@ void apple2e_state::do_io(int offset, bool is_iic)
 
 u8 apple2e_state::c000_r(offs_t offset)
 {
-	if(machine().side_effects_disabled()) return read_floatingbus();
 	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
@@ -1990,8 +1995,9 @@ u8 apple2e_state::c000_r(offs_t offset)
 	{
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
-				u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-				m_strobe = 0;
+				const u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+				if (!machine().side_effects_disabled())
+					m_strobe = 0;
 				return rv;
 			}
 
@@ -2042,30 +2048,31 @@ u8 apple2e_state::c000_r(offs_t offset)
 
 		case 0x26:  // Ace 2x00 DIP switches
 			if (m_isace2200)
-			{
 				return (m_sysconfig->read() & 0x80) | uFloatingBus7;
-			}
 			break;
 
 		case 0x27: // Ace 2x00 F key strobe
 			if (m_isace2200)
 			{
-				m_strobe = 0;
 				const u8 rv = m_franklin_strobe;
-				m_franklin_strobe = 0x80;
+				if (!machine().side_effects_disabled())
+				{
+					m_strobe = 0;
+					m_franklin_strobe = 0x80;
+				}
 				return rv;
 			}
 			break;
 
-		case 0x60: // cassette in
+		case 0x60: // cassette in, inverted
 		case 0x68:
 			if (m_cassette)
 			{
-				return (m_cassette->input() > 0.0 ? 0x80 : 0) | uFloatingBus7;
+				return (m_cassette->input() > 0.0 ? 0 : 0x80) | uFloatingBus7;
 			}
 			return uFloatingBus7;
 
-		case 0x61:  // button 0 or Open Apple
+		case 0x61:  // button 0 or Open Apple (or mouse button 1 on IIc)
 		case 0x69:
 			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
@@ -2073,53 +2080,54 @@ u8 apple2e_state::c000_r(offs_t offset)
 		case 0x6a:
 			return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x63:  // button 2 or SHIFT key
+		case 0x63:  // button 2, inverted (or SHIFT key, on IIe Platinum)
 		case 0x6b:
-			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_gameio->sw2_r() || ((m_shift_key_mod) && (m_kbspecial->read() & 0x06))) ? 0 : 0x80) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x65:  // joy 1 Y axis
 		case 0x6d:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x66: // joy 2 X axis
 		case 0x6e:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // joy 2 Y axis
 		case 0x6f:
-			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+			if (!m_gameio->is_device_connected())
+				return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
-			return (m_ioudis ? 0x00 : 0x80) | uFloatingBus7;
-
-		case 0x79: case 0x7b: case 0x7d: case 0x7f:  // read DHIRES
-			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
+		// Apple IIe Technical Reference (1985/1987) lists RDIOUDIS and RDDHIRES,
+		// but this this is incorrect: they only exist on the IIc.
 
 		default:
-			do_io(offset, false);
+			do_io(offset);
 
 			if (m_accel_unlocked)
 			{
-				if (offset == 0x5b)
+				if (offset == 0x5b) // Zip status flags
 				{
+					// bits 0-1 are cache size; [8, 16, 32, 64]kB
+					const u8 b01 = 0x03;
+					// bit 3 is set if a temporary delay is active due to slot or softswitch access
+					const u8 b3 = m_accel_temp_slowdown ? 0x08 : 0x00;
+					// bit 4 is set if the Zip is disabled
+					const u8 b4 = m_accel_fast ? 0x00 : 0x10;
 					// bit 7 is a 1.0035 millisecond clock; the value changes every 0.50175 milliseconds
-					const int time = machine().time().as_ticks(1.0f / 0.00050175f);
-					if (time & 1)
-					{
-						return 0x03;
-					}
-					else
-					{
-						return 0x83;
-					}
+					const int time = machine().time().as_ticks(1.0F / 0.00050175F);
+					const u8 b7 = (time & 1) ? 0x80 : 0x00;
+					return b7 | b4 | b3 | b01;
 				}
 				else if (offset == 0x5c)
 				{
@@ -2132,9 +2140,65 @@ u8 apple2e_state::c000_r(offs_t offset)
 	return read_floatingbus();
 }
 
+u8 apple2e_state::c000_iic_r(offs_t offset)
+{
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+
+	switch (offset)
+	{
+		case 0x15:  // read & reset mouse X0 interrupt flag
+			lower_irq(IRQ_MOUSEXY);
+			return (m_xirq ? 0x80 : 0x00) | m_transchar;
+
+		case 0x17:  // read & reset mouse Y0 interrupt flag
+			lower_irq(IRQ_MOUSEXY);
+			return (m_yirq ? 0x80 : 0x00) | m_transchar;
+
+		case 0x19:  // read VBLINT (does not reset, see Apple IIc Technical Note #9)
+			return ((m_irqmask & (1 << IRQ_VBL)) ? 0x80 : 0x00) | m_transchar;
+
+		case 0x40:  // read XYMask (IIc only)
+			return (m_xy ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0x41:  // read VBL mask (IIc only)
+			return (m_vblmask ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0x42:  // read X0Edge (IIc only)
+			return (m_x0edge ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0x43:  // read Y0Edge (IIc only)
+			return (m_y0edge ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0x60: // 40/80 column switch (IIc and Franklin ACE 500 only)
+			return ((m_sysconfig.read_safe(0) & 0x40) ? 0x80 : 0) | uFloatingBus7;
+
+		case 0x63:  // mouse button 2, inverted (no other function on IIc)
+		case 0x6b:
+			return (m_mouseb->read() ? 0 : 0x80) | uFloatingBus7;
+
+		case 0x66: // mouse X1 (IIc only)
+		case 0x6e:
+			return (m_x1 ? 0x80 : 0) | uFloatingBus7;
+
+		case 0x67: // mouse Y1 (IIc only)
+		case 0x6f:
+			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
+
+		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
+			do_io(offset);  // side-effect reset paddle timers and VBL interrupt
+			return (m_ioudis ? 0x80 : 0x00) | uFloatingBus7;
+
+		case 0x79: case 0x7b: case 0x7d: case 0x7f:  // read DHIRES
+			do_io(offset);  // side-effect reset paddle timers and VBL interrupt
+			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
+	}
+
+	return c000_r(offset);
+}
+
 u8 apple2e_state::c000_laser_r(offs_t offset)
 {
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	switch (offset)
 	{
@@ -2333,16 +2397,8 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			m_video->altcharset_w(true);
 			break;
 
-		case 0x20:  // cassette output
-			if (m_cassette)
-			{
-				m_cassette_out ^= 1;
-				m_cassette->output(m_cassette_out ? 1.0f : -1.0f);
-			}
-			break;
-
 		case 0x5a:  // Zip accelerator unlock
-			if (m_sysconfig.read_safe(0) & 0x10)
+			if ((m_isiicplus) || (m_sysconfig.read_safe(0) & 0x10))
 			{
 				if (data == 0x5a)
 				{
@@ -2365,6 +2421,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 					accel_normal_speed();
 				}
 			}
+			do_io(offset);
 			break;
 
 		case 0x5b: // Zip full speed
@@ -2373,6 +2430,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 				m_accel_fast = true;
 				accel_full_speed();
 			}
+			do_io(offset);
 			break;
 
 		case 0x5c: // Zip slot/speaker flags
@@ -2380,6 +2438,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			{
 				m_accel_slotspk = data;
 			}
+			do_io(offset);
 			break;
 
 		case 0x5f: // Zip game I/O flags
@@ -2387,14 +2446,11 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			{
 				m_accel_gameio = data;
 			}
-			else
-			{
-				do_io(offset, false);
-			}
+			do_io(offset);
 			break;
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
-		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d:
+		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			if (m_isace2200)
 			{
 				if (offset == 0x78)
@@ -2413,314 +2469,32 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 				// card may have banked auxram; get a new bank pointer
 				m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
 			}
-			do_io(offset, false);    // make sure it also side-effect resets the paddles as documented
-			break;
 
-		case 0x7e:  // SETIOUDIS
-			m_ioudis = true; break;
-
-		case 0x7f:  // CLRIOUDIS
-			m_ioudis = false; break;
-
-		default:
-			do_io(offset, false);
-			break;
-	}
-}
-
-u8 apple2e_state::c000_iic_r(offs_t offset)
-{
-	if(machine().side_effects_disabled()) return read_floatingbus();
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
-
-	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
-	{
-		return m_transchar | m_strobe;
-	}
-
-	switch (offset)
-	{
-		case 0x10:  // read any key down, reset keyboard strobe
+			if (m_isiic)  // CLRIOUDIS does not exist on IIe
 			{
-				u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-				m_strobe = 0;
-				return rv;
-			}
-
-		case 0x11:  // read LCRAM2 (LC Dxxx bank), also reads like $C010 without strobe reset
-			return (m_lcram2 ? 0x80 : 0x00) | m_transchar;
-
-		case 0x12:  // read LCRAM (is LC readable?)
-			return (m_lcram ? 0x80 : 0x00) | m_transchar;
-
-		case 0x13:  // read RAMRD
-			return (m_ramrd ? 0x80 : 0x00) | m_transchar;
-
-		case 0x14:  // read RAMWRT
-			return (m_ramwrt ? 0x80 : 0x00) | m_transchar;
-
-		case 0x15:  // read & reset mouse X0 interrupt flag
-			lower_irq(IRQ_MOUSEXY);
-			return (m_xirq ? 0x80 : 0x00) | m_transchar;
-
-		case 0x16:  // read ALTZP
-			return (m_altzp ? 0x80 : 0x00) | m_transchar;
-
-		case 0x17:  // read & reset mouse Y0 interrupt flag
-			lower_irq(IRQ_MOUSEXY);
-			return (m_yirq ? 0x80 : 0x00) | m_transchar;
-
-		case 0x18:  // read 80STORE
-			return (m_video->get_80store() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x19:  // read VBL
-			return (m_vbl ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1a:  // read TEXT
-			return (m_video->get_graphics() ? 0x00 : 0x80) | m_transchar;
-
-		case 0x1b:  // read MIXED
-			return (m_video->get_mix() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1c:  // read PAGE2
-			return (m_video->get_page2() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1d:  // read HIRES
-			return (m_video->get_hires() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1e:  // read ALTCHARSET
-			return (m_video->get_altcharset() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x1f:  // read 80COL
-			return (m_video->get_80col() ? 0x80 : 0x00) | m_transchar;
-
-		case 0x40:  // read XYMask (IIc only)
-			return m_xy ? 0x80 : 0x00;
-
-		case 0x41:  // read VBL mask (IIc only)
-			return m_vblmask ? 0x80 : 0x00;
-
-		case 0x42:  // read X0Edge (IIc only)
-			return m_x0edge ? 0x80 : 0x00;
-
-		case 0x43:  // read Y0Edge (IIc only)
-			return m_y0edge ? 0x80 : 0x00;
-
-		case 0x60: // 40/80 column switch (IIc and Franklin ACE 500 only)
-			return ((m_sysconfig.read_safe(0) & 0x40) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x61:  // button 0 or Open Apple or mouse button 1
-		case 0x69:
-			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x62:  // button 1 or Solid Apple
-		case 0x6a:
-			return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x63:  // mouse button 2 (no other function on IIc)
-		case 0x6b:
-			return (m_mouseb->read() ? 0 : 0x80) | uFloatingBus7;
-
-		case 0x64:  // joy 1 X axis
-		case 0x6c:
-			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x65:  // joy 1 Y axis
-		case 0x6d:
-			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x66: // mouse X1 (IIc only)
-		case 0x6e:
-			return (m_x1 ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x67: // mouse Y1 (IIc only)
-		case 0x6f:
-			return (m_y1 ? 0x80 : 0) | uFloatingBus7;
-
-		case 0x78: case 0x7a: case 0x7c: case 0x7e:  // read IOUDIS
-			m_vbl = false;
-			lower_irq(IRQ_VBL);
-			return (m_ioudis ? 0x00 : 0x80) | uFloatingBus7;
-
-		case 0x79: case 0x7b: case 0x7d: case 0x7f:  // read DHIRES
-			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
-
-		default:
-			do_io(offset, true);
-			if ((m_accel_unlocked) && (offset == 0x5c))
-			{
-				return m_accel_slotspk;
-			}
-			break;
-	}
-
-	return read_floatingbus();
-}
-
-void apple2e_state::c000_iic_w(offs_t offset, u8 data)
-{
-	if(machine().side_effects_disabled()) return;
-
-	if ((offset & 0xf0) == 0x10) // clear keyboard latch, $C010 is really 10-1F
-	{
-		m_strobe = 0;
-		return;
-	}
-
-	switch (offset)
-	{
-		case 0x00:  // 80STOREOFF
-			m_video->a80store_w(false);
-			auxbank_update();
-			break;
-
-		case 0x01:  // 80STOREON
-			m_video->a80store_w(true);
-			auxbank_update();
-			break;
-
-		case 0x02:  // RAMRDOFF
-			m_ramrd = false;
-			auxbank_update();
-			break;
-
-		case 0x03:  // RAMRDON
-			m_ramrd = true;
-			auxbank_update();
-			break;
-
-		case 0x04:  // RAMWRTOFF
-			m_ramwrt = false;
-			auxbank_update();
-			break;
-
-		case 0x05:  // RAMWRTON
-			m_ramwrt = true;
-			auxbank_update();
-			break;
-
-		case 0x06:  // INTCXROMOFF
-			m_intcxrom = false;
-			update_slotrom_banks();
-			break;
-
-		case 0x07:  // INTCXROMON
-			m_intcxrom = true;
-			update_slotrom_banks();
-			break;
-
-		case 0x08:  // ALTZPOFF
-			m_altzp = false;
-			auxbank_update();
-			break;
-
-		case 0x09:  // ALTZPON
-			m_altzp = true;
-			auxbank_update();
-			break;
-
-		case 0x0a:  // SETINTC3ROM
-			m_slotc3rom = false;
-			update_slotrom_banks();
-			break;
-
-		case 0x0b:  // SETSLOTC3ROM
-			m_slotc3rom = true;
-			update_slotrom_banks();
-			break;
-
-		case 0x0c:  // 80COLOFF
-			m_video->a80col_w(false);
-			break;
-
-		case 0x0d:  // 80COLON
-			m_video->a80col_w(true);
-			break;
-
-		case 0x0e:  // ALTCHARSETOFF
-			m_video->altcharset_w(false);
-			break;
-
-		case 0x0f:  // ALTCHARSETON
-			m_video->altcharset_w(true);
-			break;
-
-		case 0x5a:  // IIC+ accelerator unlock
-			if (m_isiicplus)
-			{
-				if (data == 0x5a)
+				switch (offset)
 				{
-					m_accel_stage++;
-					if (m_accel_stage == 4)
-					{
-						m_accel_unlocked = true;
-					}
-				}
-				else if (data == 0xa5)
-				{
-					// lock
-					m_accel_unlocked = false;
-					m_accel_stage = 0;
-				}
-				else if (m_accel_unlocked)
-				{
-					m_accel_fast = false;
-					accel_normal_speed();
-				}
-				else
-				{
-					do_io(offset, true);
+					case 0x78:  // IIc mirror of SETIOUDIS used by the mouse firmware
+					case 0x7a:
+					case 0x7c:
+					case 0x7e:  // SETIOUDIS
+						m_ioudis = true;
+						break;
+
+					case 0x79:  // IIc mirror of CLRIOUDIS used by the mouse firmware
+					case 0x7b:
+					case 0x7d:
+					case 0x7f:  // CLRIOUDIS
+						m_ioudis = false;
+						break;
 				}
 			}
-			break;
 
-		case 0x5b:  // Set fast speed on any write
-			if (m_accel_unlocked)
-			{
-				m_accel_fast = true;
-				accel_full_speed();
-			}
-			do_io(offset, true);
-			break;
-
-		case 0x5c:
-			if (m_accel_unlocked)
-			{
-				m_accel_slotspk = data;
-			}
-			do_io(offset, true);
-			break;
-
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
-				if (m_auxslotdevice)
-				{
-					m_auxslotdevice->write_c07x(offset & 0xf, data);
-
-					// card may have banked auxram; get a new bank pointer
-					m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
-				}
-				break;
-
-		case 0x78:  // IIc mirror of SETIOUDIS used by the mouse firmware
-		case 0x7a:
-		case 0x7c:
-		case 0x7e:  // SETIOUDIS
-			m_ioudis = true;
-			m_vbl = false;
-			lower_irq(IRQ_VBL);
-			break;
-
-		case 0x79:  // IIc mirror of CLRIOUDIS used by the mouse firmware
-		case 0x7b:
-		case 0x7d:
-		case 0x7f:  // CLRIOUDIS
-			m_ioudis = false;
-			m_vbl = false;
-			lower_irq(IRQ_VBL);
+			do_io(offset);  // side-effect reset paddle timers and VBL interrupt
 			break;
 
 		default:
-			do_io(offset, true);
+			do_io(offset);
 			break;
 	}
 }
@@ -2863,7 +2637,7 @@ u8 apple2e_state::laser_mouse_r(offs_t offset)
 			return (m_yirq ? 0x80 : 0) | uFloatingBus7;
 
 		case 0xe: // VBL interrupt status
-			return ((m_irqmask & IRQ_VBL) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_irqmask & (1 << IRQ_VBL)) ? 0x80 : 0x00) | uFloatingBus7;
 	}
 
 	return 0xff;
@@ -3713,7 +3487,7 @@ void apple2e_state::base_map(address_map &map)
 void apple2e_state::apple2c_map(address_map &map)
 {
 	base_map(map);
-	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
+	map(0xc000, 0xc07f).r(FUNC(apple2e_state::c000_iic_r));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 }
@@ -3721,7 +3495,7 @@ void apple2e_state::apple2c_map(address_map &map)
 void apple2e_state::apple2c_memexp_map(address_map &map)
 {
 	base_map(map);
-	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
+	map(0xc000, 0xc07f).r(FUNC(apple2e_state::c000_iic_r));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0c0, 0xc0c3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
@@ -3744,7 +3518,7 @@ void apple2e_state::laser128_map(address_map &map)
 void apple2e_state::ace500_map(address_map &map)
 {
 	base_map(map);
-	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
+	map(0xc000, 0xc07f).r(FUNC(apple2e_state::c000_iic_r));
 	map(0xc0a8, 0xc0ab).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
 	map(0xc0b0, 0xc0bf).rw(FUNC(apple2e_state::ace500_c0bx_r), FUNC(apple2e_state::ace500_c0bx_w));
@@ -3994,7 +3768,7 @@ INPUT_PORTS_END
 	*/
 
 	/*
-	  Apple IIe platinum key matrix
+	  Apple IIe Platinum key matrix
 
 	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
 	      |     |     |     |     |     |     |     |     |     |     |
@@ -5232,11 +5006,12 @@ void apple2e_state::tk3000(machine_config &config)
 void apple2e_state::apple2ep(machine_config &config)
 {
 	apple2ee(config);
+	m_shift_key_mod = true; // see Apple IIe Technical Note #9
 }
 
 void apple2e_state::apple2eppal(machine_config &config)
 {
-	apple2ee(config);
+	apple2ep(config);
 	m_maincpu->set_clock(1016966);
 	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
@@ -5250,6 +5025,10 @@ void apple2e_state::apple2c(machine_config &config)
 
 	// IIc and friends have no cassette port
 	config.device_remove(A2_CASSETTE_TAG);
+
+	// IIc has no internal gameio port, only the external connector
+	config.device_remove("gameio");
+	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::joystick_options, nullptr);
 
 	config.device_remove("sl1");   // IIc has no slots, of course :)
 	config.device_remove("sl2");

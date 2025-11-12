@@ -3776,6 +3776,7 @@ omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard
 		<description>The Curse of Mars</description>
 		<year>1988?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="developer" value="M.N.M. Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="the curse of mars.2d" size="327680" crc="2d7eceae" sha1="e50d56313904d5c246abddac3293a0dd51aeca36"/>
@@ -3787,6 +3788,7 @@ omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard
 		<description>The Curse of Mars (alt)</description>
 		<year>1988?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="developer" value="M.N.M. Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="mars.2d" size="327680" crc="7a879e8c" sha1="476ede9ca7a83d57eaf6e14d06cfb7592f75988c"/>

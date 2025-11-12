@@ -17,29 +17,42 @@
 
 #include "emu.h"
 #include "scsi_acorn.h"
+
+#include "bus/nscsi/devices.h"
 #include "machine/upd71071.h"
 #include "machine/wd33c9x.h"
-#include "bus/nscsi/devices.h"
 
 
 namespace {
 
-// ======================> arc_scsi_aka31_device
+// ======================> arc_scsi_aka30_device
 
-class arc_scsi_aka31_device :
-	public device_t,
-	public device_archimedes_podule_interface
+class arc_scsi_aka30_device : public device_t, public device_archimedes_podule_interface
 {
 public:
 	// construction/destruction
-	arc_scsi_aka31_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_scsi_aka30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: arc_scsi_aka30_device(mconfig, ARC_SCSI_AKA30, tag, owner, clock)
+	{
+	}
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	arc_scsi_aka31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	arc_scsi_aka30_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, type, tag, owner, clock)
+		, device_archimedes_podule_interface(mconfig, *this)
+		, m_wd33c93(*this, "scsi:7:wd33c93a")
+		, m_dmac(*this, "dma")
+		, m_podule_rom(*this, "podule_rom")
+		, m_memory_page(0)
+		, m_interrupt_status(0)
+		, m_sbic_int(0)
+		, m_dmac_int(0)
+	{
+	}
 
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -66,13 +79,16 @@ private:
 };
 
 
-// ======================> arc_scsi_aka32_device
+// ======================> arc_scsi_aka31_device
 
-class arc_scsi_aka32_device : public arc_scsi_aka31_device
+class arc_scsi_aka31_device : public arc_scsi_aka30_device
 {
 public:
 	// construction/destruction
-	arc_scsi_aka32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_scsi_aka31_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: arc_scsi_aka30_device(mconfig, ARC_SCSI_AKA31, tag, owner, clock)
+	{
+	}
 
 protected:
 	// optional information overrides
@@ -80,14 +96,31 @@ protected:
 };
 
 
-void arc_scsi_aka31_device::ioc_map(address_map &map)
+// ======================> arc_scsi_aka32_device
+
+class arc_scsi_aka32_device : public arc_scsi_aka30_device
+{
+public:
+	// construction/destruction
+	arc_scsi_aka32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: arc_scsi_aka30_device(mconfig, ARC_SCSI_AKA32, tag, owner, clock)
+	{
+	}
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+
+void arc_scsi_aka30_device::ioc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | (((m_memory_page & 0x3f) << 11) & 0xf800)]; })).umask32(0x000000ff);
 	map(0x2000, 0x2fff).lrw8([this]() { return m_interrupt_status; }, "isr_r", [this](u8 data) { m_dmac_int = 0; update_interrupts(); }, "clrint_w").umask32(0x000000ff);
 	map(0x3000, 0x3000).mirror(0x0fff).lw8(NAME([this](u8 data) { m_memory_page = data; m_wd33c93->reset_w(BIT(data, 7)); update_interrupts(); }));
 }
 
-void arc_scsi_aka31_device::memc_map(address_map &map)
+void arc_scsi_aka30_device::memc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).lr16(NAME([this](offs_t offset) { return m_podule_ram[offset | (((m_memory_page & 0x3f) << 11) & 0xf800)]; })).umask32(0x0000ffff);
 	map(0x2000, 0x2007).mirror(0x0ff8).rw(m_wd33c93, FUNC(wd33c93a_device::indir_r), FUNC(wd33c93a_device::indir_w)).umask32(0x000000ff);
@@ -100,9 +133,16 @@ void arc_scsi_aka31_device::memc_map(address_map &map)
 //  ROM( aka31 )
 //-------------------------------------------------
 
+ROM_START( aka30 )
+	ROM_REGION(0x10000, "podule_rom", 0)
+	ROM_LOAD("aka30_0273,210-02.rom", 0x0000, 0x8000, CRC(850ab784) SHA1(6d52381fed7cfd0bd16e21566c2a5bcff98b72c0))
+	ROM_RELOAD(0x8000, 0x8000)
+ROM_END
+
 ROM_START( aka31 )
 	ROM_REGION(0x10000, "podule_rom", 0)
-	ROM_LOAD("aka31_0273,210-03_scsi_id_prom.rom", 0x0000, 0x10000, CRC(d8a51876) SHA1(fedbd8d8dafb225b931c76704ccb93d4ebdaea10))
+	ROM_LOAD("aka31_0273,210-03_scsi_id_prom.rom", 0x0000, 0x8000, CRC(21350ead) SHA1(1c2a2761a861d1560b6a245c5015059c2d0f71e7))
+	ROM_RELOAD(0x8000, 0x8000)
 ROM_END
 
 ROM_START( aka32 )
@@ -114,6 +154,11 @@ ROM_START( aka32 )
 	ROM_SYSTEM_BIOS(2, "aka32", "AKA32")
 	ROMX_LOAD("aka32_acorn_cdfs_version_2.20.rom", 0x0000, 0x10000, CRC(65d74620) SHA1(42bddbe2841de7085371c5fe11d7c9b152070886), ROM_BIOS(2))
 ROM_END
+
+const tiny_rom_entry *arc_scsi_aka30_device::device_rom_region() const
+{
+	return ROM_NAME( aka30 );
+}
 
 const tiny_rom_entry *arc_scsi_aka31_device::device_rom_region() const
 {
@@ -130,7 +175,7 @@ const tiny_rom_entry *arc_scsi_aka32_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void arc_scsi_aka31_device::device_add_mconfig(machine_config &config)
+void arc_scsi_aka30_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
@@ -157,43 +202,11 @@ void arc_scsi_aka31_device::device_add_mconfig(machine_config &config)
 }
 
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  arc_scsi_aka31_device - constructor
-//-------------------------------------------------
-
-arc_scsi_aka31_device::arc_scsi_aka31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_archimedes_podule_interface(mconfig, *this)
-	, m_wd33c93(*this, "scsi:7:wd33c93a")
-	, m_dmac(*this, "dma")
-	, m_podule_rom(*this, "podule_rom")
-	, m_memory_page(0)
-	, m_interrupt_status(0)
-	, m_sbic_int(0)
-	, m_dmac_int(0)
-{
-}
-
-arc_scsi_aka31_device::arc_scsi_aka31_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: arc_scsi_aka31_device(mconfig, ARC_SCSI_AKA31, tag, owner, clock)
-{
-}
-
-arc_scsi_aka32_device::arc_scsi_aka32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: arc_scsi_aka31_device(mconfig, ARC_SCSI_AKA32, tag, owner, clock)
-{
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void arc_scsi_aka31_device::device_start()
+void arc_scsi_aka30_device::device_start()
 {
 	m_podule_ram = std::make_unique<u16[]>(0x8000);
 
@@ -206,7 +219,7 @@ void arc_scsi_aka31_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void arc_scsi_aka31_device::device_reset()
+void arc_scsi_aka30_device::device_reset()
 {
 	m_memory_page = 0x00;
 }
@@ -216,7 +229,7 @@ void arc_scsi_aka31_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-void arc_scsi_aka31_device::update_interrupts()
+void arc_scsi_aka30_device::update_interrupts()
 {
 	// SBIC interrupt
 	if (m_sbic_int)
@@ -249,5 +262,6 @@ void arc_scsi_aka31_device::update_interrupts()
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
+DEFINE_DEVICE_TYPE_PRIVATE(ARC_SCSI_AKA30, device_archimedes_podule_interface, arc_scsi_aka30_device, "arc_scsi_aka30", "Acorn AKA30 SCSI Expansion Card")
 DEFINE_DEVICE_TYPE_PRIVATE(ARC_SCSI_AKA31, device_archimedes_podule_interface, arc_scsi_aka31_device, "arc_scsi_aka31", "Acorn AKA31 SCSI Expansion Card")
 DEFINE_DEVICE_TYPE_PRIVATE(ARC_SCSI_AKA32, device_archimedes_podule_interface, arc_scsi_aka32_device, "arc_scsi_aka32", "Acorn AKA32 CDFS & SCSI Expansion Card")

@@ -70,6 +70,7 @@ protected:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual bool take_c800() const override { return true; }
 
 	required_device<upd1990a_device> m_upd1990ac;
 	required_region_ptr<uint8_t> m_rom;

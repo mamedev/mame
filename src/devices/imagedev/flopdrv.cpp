@@ -512,8 +512,8 @@ void legacy_floppy_image_device::device_start()
 	m_wpt = 1;
 	//m_out_wpt_func(m_wpt);
 
-	/* not at track 0 */
-	m_tk00 = 1;
+	/* at track 0 */
+	m_tk00 = 0;
 	//m_out_tk00_func(m_tk00);
 
 	/* motor off */

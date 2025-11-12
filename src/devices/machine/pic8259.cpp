@@ -195,13 +195,16 @@ uint8_t pic8259_device::read(offs_t offset)
 				{
 					data = 0x80 | m_current_level;
 
-					if (!m_level_trig_mode && (!m_master || !BIT(m_slave, m_current_level)))
-						m_irr &= ~(1 << m_current_level);
+					if (!machine().side_effects_disabled())
+					{
+						if (!m_level_trig_mode && (!m_master || !BIT(m_slave, m_current_level)))
+							m_irr &= ~(1 << m_current_level);
 
-					if (!m_auto_eoi)
-						m_isr |= 1 << m_current_level;
+						if (!m_auto_eoi)
+							m_isr |= 1 << m_current_level;
 
-					m_irq_timer->adjust(attotime::zero);
+						m_irq_timer->adjust(attotime::zero);
+					}
 				}
 			}
 			else

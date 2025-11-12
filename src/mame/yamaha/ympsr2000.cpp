@@ -34,10 +34,17 @@ private:
 	void lcdc_map(address_map &map) ATTR_COLD;
 
 	void machine_start() override ATTR_COLD;
+	void palette_init(palette_device &palette);
 };
 
 void psr2000_state::machine_start()
 {
+}
+
+void psr2000_state::palette_init(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t(0x36, 0x41, 0xcf));
+	palette.set_pen_color(1, rgb_t(0xdb, 0xe9, 0xff));
 }
 
 void psr2000_state::psr2000(machine_config &config)
@@ -45,7 +52,7 @@ void psr2000_state::psr2000(machine_config &config)
 	SH7709(config, m_maincpu, 10_MHz_XTAL*4, ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psr2000_state::map);
 
-	auto &palette = PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+	auto &palette = PALETTE(config, "palette", FUNC(psr2000_state::palette_init), 2);
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
 	screen.set_refresh_hz(60);

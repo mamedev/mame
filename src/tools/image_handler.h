@@ -87,7 +87,7 @@ public:
 	bool floppy_load(const floppy_format_info &format);
 	bool floppy_save(const floppy_format_info &format) const;
 
-	void floppy_create(const floppy_create_info &format, fs::meta_data meta);
+	bool floppy_create(const floppy_create_info &format, fs::meta_data meta);
 	bool floppy_mount_fs(const filesystem_format &format);
 	bool hd_mount_fs(const filesystem_format &format);
 	void fs_to_floppy();

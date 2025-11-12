@@ -17,7 +17,7 @@
 #include "bus/ata/atadev.h"
 #include "bus/ata/ataintf.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/z80/z80.h"
 #include "machine/7200fifo.h"
 #include "machine/bankdev.h"

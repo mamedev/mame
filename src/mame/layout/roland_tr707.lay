@@ -268,10 +268,10 @@ the visibility and style of elements that differ between the two.
 		<element ref="sunken"><bounds x="0" y="0" width="38" height="216"/></element>
 		<element ref="sliderwell"><bounds x="11" y="53" width="16" height="116"/></element>
 		<element ref="transparent" id="slider_area_~slider_i~">
-			<bounds x="0" y="38" width="38" height="184"/>
+			<bounds x="0" y="38" width="38" height="146"/>
 		</element>
 		<element ref="sliderknob" id="slider_knob_~slider_i~">
-			<animate inputtag="SLIDER_~slider_i~" inputmask="0x7f"/>
+			<animate inputtag="SLIDER_~slider_i~" inputmask="0xffff"/>
 			<bounds state="100" x="7" y="38" width="24" height="50"/>
 			<bounds state="0" x="7" y="134" width="24" height="50"/>
 		</element>
@@ -289,7 +289,7 @@ the visibility and style of elements that differ between the two.
 			<bounds x="0" y="16" width="38" height="189"/>
 		</element>
 		<element ref="mastersliderknob" id="master_volume_knob">
-			<animate inputtag="VOLUME" inputmask="07f"/>
+			<animate inputtag="VOLUME" inputmask="0xffff"/>
 			<bounds state="100" x="7" y="16" width="24" height="50"/>
 			<bounds state="0" x="7" y="155" width="24" height="50"/>
 		</element>
@@ -762,7 +762,7 @@ the visibility and style of elements that differ between the two.
 		<element ref="txt_fast"><bounds x="1477" y="612" width="42" height="15"/></element>
 		<element ref="tempo_well"><bounds x="1366" y="480" width="130" height="130"/></element>
 		<element ref="tempo_knob" id="tempo_knob"><bounds x="1381" y="495" width="100" height="100"/></element>
-		<element ref="tempo_value" inputtag="TEMPO" inputmask="0x7f" inputraw="yes">
+		<element ref="tempo_value" inputtag="TEMPO" inputmask="0xffff" inputraw="yes">
 			<bounds x="1386" y="533" width="90" height="24"/>
 		</element>
 		<element ref="transparent" clickthrough="no"><bounds x="1381" y="495" width="100" height="100"/></element>
@@ -960,8 +960,8 @@ the visibility and style of elements that differ between the two.
 				is_knob     = false })
 		end
 
-		-- A sweep between 0 and 100 requires moving the pointer by
-		-- `scale * clickarea.height` pixes.
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
 		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
 			table.insert(widgets, {
 				clickarea = get_layout_item(view, clickarea_id),
@@ -1031,15 +1031,18 @@ the visibility and style of elements that differ between the two.
 			end
 
 			-- A widget is selected. Update its state based on the pointer's Y
-			-- position. It is assumed the attached IO field is an
-			-- IPT_ADJUSTER with a range of 0-100 (the default).
+			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
 
 			local pointer = pointers[id]
 			local widget = widgets[pointer.selected_widget]
 
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
 			local new_value
 			if widget.is_knob then
-				local step_y = 100.0 / (widget.scale * widget.clickarea.bounds.height)
+				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
 				new_value = pointer.start_value + (pointer.start_y - y) * step_y
 			else
 				local knob_half_height = widget.slider_knob.bounds.height / 2
@@ -1049,17 +1052,17 @@ the visibility and style of elements that differ between the two.
 				if pointer.relative then
 					-- User clicked on the knob. The new value will depend on how
 					--  much the knob was dragged.
-					new_value = pointer.start_value - 100 * (y - pointer.start_y) / (max_y - min_y)
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
 				else
 					-- User clicked elsewhere on the slider. The new value will depend on
 					-- the absolute position of the click.
-					new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
 				end
 			end
 
 			new_value = math.floor(new_value + 0.5)
-			if new_value < 0 then new_value = 0 end
-			if new_value > 100 then new_value = 100 end
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
 			widget.field.user_value = new_value
 		end
 

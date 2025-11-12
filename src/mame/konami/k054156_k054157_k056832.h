@@ -8,7 +8,7 @@
 #include "k055555.h" // still needs k055555_get_palette_index
 #include "tilemap.h"
 
-#define K056832_CB_MEMBER(_name) void _name(int layer, int *code, int *color, int *flags, int *priority, u16 attr)
+#define K056832_CB_MEMBER(_name) void _name(int layer, int &code, int &color, int &flags, int &priority, u16 attr)
 
 #define K056832_PAGE_COUNT 16
 
@@ -31,15 +31,15 @@ class k055555_device;
 class k056832_device : public device_t, public device_gfx_interface
 {
 public:
-	using tile_delegate = device_delegate<void (int layer, int *code, int *color, int *flags, int *priority, u16 attr)>;
+	using tile_delegate = device_delegate<void (int layer, int &code, int &color, int &flags, int &priority, u16 attr)>;
 
-	template <typename T> k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag)
+	template <typename T> k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&mixer_tag)
 		: k056832_device(mconfig, tag, owner, clock)
 	{
 		m_k055555.set_tag(std::forward<T>(mixer_tag));
 	}
 
-	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename... T> void set_tile_callback(T &&... args) { m_k056832_cb.set(std::forward<T>(args)...); }
 
@@ -88,16 +88,15 @@ public:
 	void b_w(offs_t offset, u8 data);
 	void mark_plane_dirty(int num);
 	void mark_all_tilemaps_dirty();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, uint32_t flags, uint32_t priority);
-	void tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, uint32_t flags, uint32_t priority);
-	void tilemap_draw_dj(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, u32 flags, u32 priority);
+	void tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, u32 flags, u32 priority);
+	void tilemap_draw_dj(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority);
 	void set_layer_association(int status);
 	int get_layer_association() { return m_layer_association; }
-	void set_layer_offs(int layer, int offsx, int offsy);
-	void set_lsram_page(int logical_page, int physical_page, int physical_offset);
+	void set_layer_offs(int layer, s32 offsx, s32 offsy);
+	void set_lsram_page(int logical_page, s32 physical_page, s32 physical_offset);
 	int is_irq_enabled(int irqline);
-	void read_avac(int *mode, int *data);
-	int read_register(int regnum);
+	void read_avac(int &mode, int &data);
 	int get_current_rambank();
 	int get_lookup(int bits); /* Asterix */
 	void set_tile_bank(int bank); /* Asterix */
@@ -117,15 +116,15 @@ private:
 	tilemap_t *m_tilemap[K056832_PAGE_COUNT]{};
 	bitmap_ind16 *m_pixmap[K056832_PAGE_COUNT]{};
 
-	std::vector<uint16_t> m_videoram;
+	std::vector<u16> m_videoram;
 
-	uint16_t  m_regs[0x20];    // 157/832 regs group 1
-	uint16_t  m_regsb[4];      // 157/832 regs group 2, board dependent
+	u16  m_regs[0x20];    // 157/832 regs group 1
+	u16  m_regsb[4];      // 157/832 regs group 2, board dependent
 
-	required_region_ptr<uint8_t> m_rombase;   // pointer to tile gfx data
+	required_region_ptr<u8> m_rombase;   // pointer to tile gfx data
 
-	int       m_num_gfx_banks; // depends on size of graphics ROMs
-	int       m_cur_gfx_banks; // cached info for K056832_regs[0x1a]
+	s32       m_num_gfx_banks; // depends on size of graphics ROMs
+	s32       m_cur_gfx_banks; // cached info for K056832_regs[0x1a]
 
 	tile_delegate m_k056832_cb;
 
@@ -137,32 +136,32 @@ private:
 	// ROM readback involves reading 2 halves of a word
 	// from the same location in a row.  Reading the
 	// RAM window resets this state so you get the first half.
-	int       m_rom_half = 0;
+	s32       m_rom_half = 0;
 
 	// locally cached values
-	int       m_layer_assoc_with_page[K056832_PAGE_COUNT];
-	int       m_layer_offs[8][2];
-	int       m_lsram_page[8][2];
-	int32_t   m_x[8];  // 0..3 left
-	int32_t   m_y[8];  // 0..3 top
-	int32_t   m_w[8];  // 0..3 width  -> 1..4 pages
-	int32_t   m_h[8];  // 0..3 height -> 1..4 pages
-	int32_t   m_dx[8]; // scroll
-	int32_t   m_dy[8]; // scroll
-	uint32_t  m_line_dirty[K056832_PAGE_COUNT][8];
-	uint8_t   m_all_lines_dirty[K056832_PAGE_COUNT];
-	uint8_t   m_page_tile_mode[K056832_PAGE_COUNT];
-	int       m_last_colorbase[K056832_PAGE_COUNT];
-	uint8_t   m_layer_tile_mode[8];
-	int       m_default_layer_association;
-	int       m_layer_association;
-	int       m_active_layer;
-	int       m_selected_page;
-	int       m_selected_page_x4096;
+	s32       m_layer_assoc_with_page[K056832_PAGE_COUNT];
+	s32       m_layer_offs[8][2];
+	s32       m_lsram_page[8][2];
+	s32       m_x[8];  // 0..3 left
+	s32       m_y[8];  // 0..3 top
+	s32       m_w[8];  // 0..3 width  -> 1..4 pages
+	s32       m_h[8];  // 0..3 height -> 1..4 pages
+	s32       m_dx[8]; // scroll
+	s32       m_dy[8]; // scroll
+	u32       m_line_dirty[K056832_PAGE_COUNT][8];
+	u8        m_all_lines_dirty[K056832_PAGE_COUNT];
+	u8        m_page_tile_mode[K056832_PAGE_COUNT];
+	s32       m_last_colorbase[K056832_PAGE_COUNT];
+	u8        m_layer_tile_mode[8];
+	s32       m_default_layer_association;
+	s32       m_layer_association;
+	s32       m_active_layer;
+	s32       m_selected_page;
+	s32       m_selected_page_x4096;
 	bool      m_linemap_enabled;
 	bool      m_use_ext_linescroll;
 	bool      m_uses_tile_banks;
-	int       m_cur_tile_bank;
+	s32       m_cur_tile_bank;
 
 	optional_device<k055555_device> m_k055555;  /* used to choose colorbase */
 
@@ -192,7 +191,7 @@ private:
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
 
 	template<class BitmapClass>
-	void tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
+	void tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority);
 	int update_linemap(int page);
 
 	void create_gfx();

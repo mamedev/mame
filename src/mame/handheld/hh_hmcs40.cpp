@@ -54,6 +54,7 @@ known chips:
  @A29     HD38820  1981, Coleco Pac-Man (ver 2)
  @A32     HD38820  1982, Gakken Super Cobra
  *A38     HD38820  1982, Entex Crazy Climber
+ *A39     HD38820  1982, Entex Super Cobra
  @A42     HD38820  1982, Entex Stargate
  @A43     HD38820  1982, Entex Turtles
  @A45     HD38820  1982, Coleco Donkey Kong

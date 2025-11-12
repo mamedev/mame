@@ -2018,8 +2018,7 @@ bool ppc_device::generate_opcode(drcuml_block &block, compiler_state *compiler, 
 			return true;
 
 		case 0x07:  /* MULLI */
-			UML_MULS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), (int16_t)G_SIMM(op));
-																							// muls    rd,rd,ra,simm
+			UML_MULSLW(block, R32(G_RD(op)), R32(G_RA(op)), (int16_t)G_SIMM(op));
 			return true;
 
 		case 0x9:  /* DOZI (POWER) */

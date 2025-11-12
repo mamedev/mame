@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 #include "sound/sn76496.h"
 
@@ -32,7 +32,7 @@ public:
 
 	void write_rxd(int state);
 
-	void wangpc_keyboard_io(address_map &map) ATTR_COLD;
+	void wangpc_keyboard_data(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides

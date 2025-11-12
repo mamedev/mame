@@ -174,7 +174,7 @@ the MSM5205-derived interrupt assigned to the NMI line instead.
 #include "emu.h"
 
 #include "cpu/m6502/m6502.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
 #include "machine/gen_latch.h"

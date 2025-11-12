@@ -273,7 +273,9 @@ protected:
 	u32 m_ic_data[M68K_IC_SIZE];      /* instruction cache content data */
 	bool   m_ic_valid[M68K_IC_SIZE];     /* instruction cache valid flags */
 
-
+	// coldfire
+	u32 m_rombar[2], m_rambar[2];
+	u32 m_edrambar, m_secmbar, m_mbar, m_mpcr;
 
 	/* 68307 / 68340 internal address map */
 	address_space *m_internal;

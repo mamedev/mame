@@ -7805,7 +7805,7 @@ void setaroul_state::setaroul(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0, -0x1);
 	m_spritegen->set_bg_xoffsets(0, 0x2);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
@@ -9097,7 +9097,7 @@ void jockeyc_state::jockeyc(machine_config &config)
 	m_spritegen->set_fg_yoffsets(-0x12+8, 0x0e);
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	// devices

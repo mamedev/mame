@@ -336,7 +336,8 @@ bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sects[i].track   = track / 2;
 					sects[i].head    = track % 2;
 					sects[i].sector  = (header >> 8) & 0xff;
-					sects[i].bad_crc = (header >> 4) & 0x02;
+					sects[i].bad_data_crc = (header >> 4) & 0x02;
+					sects[i].bad_addr_crc = false;
 					sects[i].deleted = false;
 					ssize = header & 0x03;
 					sects[i].size = ssize;

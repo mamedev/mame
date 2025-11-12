@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="sd132_flop" description="Ensoniq SD-1 32 Voice Disk Images">
+
+<software name="os400" supported="yes">
+	<description>SD-1 Sequencer OS version 4.00</description>
+	<year>1991</year>
+	<publisher>Ensoniq</publisher>
+
+	<part name="flop" interface="floppy_3_5">
+		<dataarea name="flop" size="819200">
+			<rom name="SD1_OS_4_00.img" size="819200" crc="e218f989" sha1="6ba14f4ff2ad99800478893716d9c14a61a7eb38" />
+		</dataarea>
+	</part>
+
+</software>
+
+<software name="os410" supported="yes">
+	<description>SD-1 Sequencer OS version 4.10</description>
+	<year>1992</year>
+	<publisher>Ensoniq</publisher>
+
+	<part name="flop" interface="floppy_3_5">
+		<dataarea name="flop" size="819200">
+			<rom name="SD1_OS_4_10.img" size="819200" crc="82fb69a4" sha1="152a1147ccb0424a9e8d96ca948c085fadcaf361" />
+		</dataarea>
+	</part>
+
+</software>
+
+<software name="sd1_32_demo1" supported="yes">
+	<description>SD-1 32 Voice Demo Disk #1</description>
+	<year>1992</year>
+	<publisher>Ensoniq</publisher>
+
+	<part name="flop" interface="floppy_3_5">
+		<dataarea name="flop" size="819200">
+			<rom name="SD1_32Voice_DemoDisk1.img" size="819200" crc="7cfb73c5" sha1="0e5f8a3b64674d56d40346e62f7a095ace83bb55" />
+		</dataarea>
+	</part>
+
+</software>
+
+<software name="multi_demo1" supported="yes">
+	<description>Multi-Product Demo Disk #1</description>
+	<year>1992</year>
+	<publisher>Ensoniq</publisher>
+
+	<part name="flop" interface="floppy_3_5">
+		<dataarea name="flop" size="819200">
+			<rom name="MultiProductDemoDisk1.img" size="819200" crc="2a5456a1" sha1="c9ab9199fac474c01751ba0d1678dcd72ff57834" />
+		</dataarea>
+	</part>
+
+</software>
+
+<software name="multi_demo2" supported="yes">
+	<description>Multi-Product Demo Disk #2</description>
+	<year>1993</year>
+	<publisher>Ensoniq</publisher>
+
+	<part name="flop" interface="floppy_3_5">
+		<dataarea name="flop" size="819200">
+			<rom name="MultiProductDemoDisk2.img" size="819200" crc="4f017eaf" sha1="65f3734cfab0fd79ec192674383be7b76e45d5b3" />
+		</dataarea>
+	</part>
+
+</software>
+
+<software name="sq32_demo1" supported="yes">
+	<description>SQ 32 Voice Demo Disk #2</description>
+	<year>1993</year>
+	<publisher>Ensoniq</publisher>
+
+	<part name="flop" interface="floppy_3_5">
+		<dataarea name="flop" size="819200">
+			<rom name="SQ_32Voice_DemoDisk1.img" size="819200" crc="91ba0cc0" sha1="c7e3f803122ce9b8b860724a064c40bd9747da41" />
+		</dataarea>
+	</part>
+
+</software>
+
+</softwarelist>
