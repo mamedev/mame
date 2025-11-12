@@ -5404,6 +5404,22 @@ static INPUT_PORTS_START( cmv801 )
 	// Test Mode For Disp. Of Doll not working
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cmpap )
+	PORT_INCLUDE( cmv801 )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )  PORT_DIPLOCATION("DSW2:!1,!2,!3")  // OK
+	PORT_DIPSETTING(    0x07, "30%" )
+	PORT_DIPSETTING(    0x06, "35%" )
+	PORT_DIPSETTING(    0x05, "40%" )
+	PORT_DIPSETTING(    0x04, "45%" )
+	PORT_DIPSETTING(    0x03, "50%" )
+	PORT_DIPSETTING(    0x02, "55%" )
+	PORT_DIPSETTING(    0x01, "60%" )
+	PORT_DIPSETTING(    0x00, "65%" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( cmv4 )
 	PORT_INCLUDE( cmv4_player )
 
@@ -29365,8 +29381,8 @@ void cmaster_state::init_cmpap()
 	}
 
 //  forcing PPI mode 0 for all, and A, B & C as input.
-	rom[0x0076] = 0x9b;
 	rom[0x007a] = 0x9b;
+	rom[0x007e] = 0x9b;
 }
 
 
@@ -31235,7 +31251,7 @@ GAME(  1994, chryanglb,  ncb3,     chryanglb, chryanglb, cmaster_state, init_chr
 // cherry master hardware has a rather different mem map, but is basically the same
 GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  init_cmv823,    ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.23)",     0,                 layout_cmv4 )  // encrypted
 GAMEL( 198?, cmv801,     cmv823,   cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.01)",     0,                 layout_cmv4 )  // says ED-96 where the manufacturer is on some games...
-GAMEL( 198?, cmpap,      0,        cm,       cmv801,   cmaster_state,  init_cmpap,     ROT0, "Pick-A-Party Brazil", "Cherry Master (ED-98, Pick-A-Party)",       MACHINE_NOT_WORKING, layout_cmv4 )  // probably works correctly, needs i/o checking
+GAMEL( 198?, cmpap,      0,        cm,       cmpap,    cmaster_state,  init_cmpap,     ROT0, "Pick-A-Party Brazil", "Cherry Master (ED-98, Pick-A-Party)",       0,                 layout_cmv4 )
 
 
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
