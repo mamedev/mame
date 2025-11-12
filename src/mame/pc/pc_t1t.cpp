@@ -193,13 +193,13 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_inten_update_row )
 	if (y == 0) logerror("t1000_text_inten_update_row\n");
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = m_displayram[ offset ];
-		uint8_t attr = m_displayram[ offset +1 ];
-		uint8_t data = m_chr_gen[chr * m_chr_size + ra * m_ra_offset];
-		uint16_t fg = m_palette_base + ( attr & 0x0F );
-		uint16_t bg = m_palette_base + ( ( attr >> 4 ) & 0x07 );
+		uint16_t const offset = ((ma + i) << 1) & 0x3fff;
+		uint8_t const chr = m_displayram[offset];
+		uint8_t const attr = m_displayram[offset + 1];
+		uint16_t const fg = m_palette_base + (attr & 0x0f);
+		uint16_t const bg = m_palette_base + ((attr >> 4) & 0x07);
 
+		uint8_t data = m_chr_gen[chr * m_chr_size + ra * m_ra_offset];
 		if (i == cursor_x && (m_pc_framecnt & 0x08))
 			data = 0xff;
 
@@ -222,26 +222,22 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_blink_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = m_displayram[ offset ];
-		uint8_t attr = m_displayram[ offset +1 ];
-		uint8_t data = m_chr_gen[chr * m_chr_size + ra * m_ra_offset];
-		uint16_t fg = m_palette_base + ( attr & 0x0F );
-		uint16_t bg = m_palette_base + ( ( attr >> 4 ) & 0x07 );
+		uint16_t const offset = ((ma + i) << 1) & 0x3fff;
+		uint8_t const chr = m_displayram[offset];
+		uint8_t const attr = m_displayram[offset | 1];
+		uint16_t const fg = m_palette_base + (attr & 0x0f);
+		uint16_t const bg = m_palette_base + ((attr >> 4) & 0x07);
 
-		if ( i == cursor_x )
+		uint8_t data = m_chr_gen[chr * m_chr_size + ra * m_ra_offset];
+		if (i == cursor_x)
 		{
-			if ( m_pc_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
+			if (m_pc_framecnt & 0x08)
+				data = 0xff;
 		}
 		else
 		{
-			if ( ( attr & 0x80 ) && ( m_pc_framecnt & 0x10 ) )
-			{
+			if ((attr & 0x80) && (m_pc_framecnt & 0x10))
 				data = 0x00;
-			}
 		}
 
 		*p++ = pal[BIT(data, 7) ? fg : bg];
@@ -262,11 +258,11 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = m_displayram[ offset ];
-		uint8_t attr = m_displayram[ offset +1 ];
-		uint16_t fg = m_palette_base + ( attr & 0x07 );
-		uint16_t bg = m_palette_base + ( ( attr >> 4 ) & 0x07 );
+		uint16_t const offset = ((ma + i) << 1) & 0x3fff;
+		uint8_t chr = m_displayram[offset];
+		uint8_t const attr = m_displayram[offset | 1];
+		uint16_t const fg = m_palette_base + (attr & 0x07);
+		uint16_t const bg = m_palette_base + ((attr >> 4) & 0x07);
 		uint16_t code = chr & 0x1f;
 		if((attr & 0x88) == 0x88)
 		{
@@ -299,20 +295,20 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_4bpp_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + ( ra << 13 );
+	uint8_t const *const vid = m_displayram + (ra << 13);
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data = vid[offset];
+		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
+		uint8_t data;
 
+		data = vid[offset];
 		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
 		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
 		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
 		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
 
-		data = vid[offset + 1];
-
+		data = vid[offset | 1];
 		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
 		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
 		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
@@ -325,24 +321,24 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + ( ra << 13 );
+	uint8_t const *const vid = m_displayram + (ra << 13);
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data = vid[offset];
+		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
+		uint8_t data;
 
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data >> 6) & 0x03)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data >> 4) & 0x03)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data >> 2) & 0x03)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data >> 0) & 0x03)]];
+		data = vid[offset];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 6, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 4, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 2, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 0, 2)]];
 
-		data = vid[offset + 1];
-
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data >> 6) & 0x03)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data >> 4) & 0x03)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data >> 2) & 0x03)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data >> 0) & 0x03)]];
+		data = vid[offset | 1];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 6, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 4, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 2, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 0, 2)]];
 	}
 }
 
@@ -351,22 +347,22 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjr_gfx_2bpp_high_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + ( ra << 13 );
+	uint8_t const *const vid = m_displayram + (ra << 13);
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data0 = vid[offset];
-		uint8_t data1 = vid[offset + 1];
+		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
+		uint8_t const data0 = vid[offset];
+		uint8_t const data1 = vid[offset | 1];
 
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data0 >> 7) & 0x01) | ((data1 >> 6) & 0x02)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data0 >> 6) & 0x01) | ((data1 >> 5) & 0x02)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data0 >> 5) & 0x01) | ((data1 >> 4) & 0x02)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data0 >> 4) & 0x01) | ((data1 >> 3) & 0x02)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data0 >> 3) & 0x01) | ((data1 >> 2) & 0x02)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data0 >> 2) & 0x01) | ((data1 >> 1) & 0x02)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data0 >> 1) & 0x01) | ((data1 >> 0) & 0x02)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | ((data0 >> 0) & 0x01) | ((data1 << 1) & 0x02)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 7) | (BIT(data1, 7) << 1)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 6) | (BIT(data1, 6) << 1)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 5) | (BIT(data1, 5) << 1)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 4) | (BIT(data1, 4) << 1)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 3) | (BIT(data1, 3) << 1)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 2) | (BIT(data1, 2) << 1)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 1) | (BIT(data1, 1) << 1)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 0) | (BIT(data1, 0) << 1)]];
 	}
 }
 
@@ -375,24 +371,23 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_tga_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + ( ra << 13 );
+	uint8_t const *const vid = m_displayram + (ra << 13);
 
 	if (y == 0) logerror("t1000_gfx_2bpp_tga_update_row\n");
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data = vid[offset];
-		uint8_t data2 = vid[offset + 1] << 1;
+		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
+		uint8_t const data0 = vid[offset];
+		uint8_t const data1 = vid[offset | 1];
 
-		*p++ = pal[m_reg.data[0x10 | (((data2 & 0x100) | (data & 0x80)) >> 7)]];
-		*p++ = pal[m_reg.data[0x10 | (((data2 & 0x080) | (data & 0x40)) >> 6)]];
-		*p++ = pal[m_reg.data[0x10 | (((data2 & 0x040) | (data & 0x20)) >> 5)]];
-		*p++ = pal[m_reg.data[0x10 | (((data2 & 0x020) | (data & 0x10)) >> 4)]];
-
-		*p++ = pal[m_reg.data[0x10 | (((data2 & 0x010) | (data & 0x08)) >> 3)]];
-		*p++ = pal[m_reg.data[0x10 | (((data2 & 0x008) | (data & 0x04)) >> 2)]];
-		*p++ = pal[m_reg.data[0x10 | (((data2 & 0x004) | (data & 0x02)) >> 1)]];
-		*p++ = pal[m_reg.data[0x10 | (((data2 & 0x002) | (data & 0x01)) >> 0)]];
+		*p++ = pal[m_reg.data[0x10 | BIT(data0, 7) | (BIT(data1, 7) << 1)]];
+		*p++ = pal[m_reg.data[0x10 | BIT(data0, 6) | (BIT(data1, 6) << 1)]];
+		*p++ = pal[m_reg.data[0x10 | BIT(data0, 5) | (BIT(data1, 5) << 1)]];
+		*p++ = pal[m_reg.data[0x10 | BIT(data0, 4) | (BIT(data1, 4) << 1)]];
+		*p++ = pal[m_reg.data[0x10 | BIT(data0, 3) | (BIT(data1, 3) << 1)]];
+		*p++ = pal[m_reg.data[0x10 | BIT(data0, 2) | (BIT(data1, 2) << 1)]];
+		*p++ = pal[m_reg.data[0x10 | BIT(data0, 1) | (BIT(data1, 1) << 1)]];
+		*p++ = pal[m_reg.data[0x10 | BIT(data0, 0) | (BIT(data1, 0) << 1)]];
 	}
 }
 
@@ -401,16 +396,17 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_1bpp_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + ( ra << 13 );
-	uint8_t fg = m_palette_base + m_reg.data[0x11];
-	uint8_t bg = m_palette_base + m_reg.data[0x10];
+	uint8_t const *const vid = m_displayram + (ra << 13);
+	uint8_t const fg = m_palette_base + m_reg.data[0x11];
+	uint8_t const bg = m_palette_base + m_reg.data[0x10];
 
 	if (y == 0) logerror("t1000_gfx_1bpp_update_row\n");
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x1fff;
-		uint8_t data = vid[offset];
+		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
+		uint8_t data;
 
+		data = vid[offset];
 		*p++ = pal[BIT(data, 7) ? fg : bg];
 		*p++ = pal[BIT(data, 6) ? fg : bg];
 		*p++ = pal[BIT(data, 5) ? fg : bg];
@@ -420,8 +416,7 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_1bpp_update_row )
 		*p++ = pal[BIT(data, 1) ? fg : bg];
 		*p++ = pal[BIT(data, 0) ? fg : bg];
 
-		data = vid[offset + 1];
-
+		data = vid[offset | 1];
 		*p++ = pal[BIT(data, 7) ? fg : bg];
 		*p++ = pal[BIT(data, 6) ? fg : bg];
 		*p++ = pal[BIT(data, 5) ? fg : bg];
