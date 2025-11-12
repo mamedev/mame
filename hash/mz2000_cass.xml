@@ -937,7 +937,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 	</software>
 
 	<software name="sstreama" cloneof="sstream" supported="yes">
-		<description>Star Stream</description>
+		<description>Star Stream (Alt)</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="usage" value="IPL" />
