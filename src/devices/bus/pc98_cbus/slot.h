@@ -58,6 +58,7 @@
                             <B>          <A>
 
 **********************************************************************/
+
 #ifndef MAME_BUS_PC98_CBUS_SLOT_H
 #define MAME_BUS_PC98_CBUS_SLOT_H
 
@@ -75,77 +76,85 @@ class pc98_cbus_root_device : public device_t,
 public:
 	pc98_cbus_root_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	u16 mem_r(offs_t offset, u16 mem_mask = ~0);
+	void mem_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 mem_slot_r(offs_t offset, u16 mem_mask = ~0);
+	void mem_slot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 io_r(offs_t offset, u16 mem_mask = ~0);
+	void io_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void remap(int space_id, offs_t start, offs_t end);
+
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
+	{
+		space(AS_IO).install_device(addrstart, addrend, device, map, unitmask);
+	}
+
+	void add_slot(const char *tag);
+	void add_slot(device_slot_interface *slot);
+
+	// from C-bus to host
+	template<std::size_t Line> auto int_cb() { return m_int_cb[Line].bind(); }
+
+	// from card to C-Bus
+	void int_w(int Line, int state) { m_int_cb[Line](state); }
+
 protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_config_complete() override ATTR_COLD;
+
+	std::forward_list<device_slot_interface *> m_slot_list;
 private:
 	address_space_config m_space_mem_config;
 	address_space_config m_space_io_config;
+
+	devcb_write_line::array<7> m_int_cb;
+//	devcb_write_line::array<4> m_drq_cb;
 };
 
-//class pc98_cbus_slot_device;
 
-#if 0
-class device_pc9801_slot_card_interface : public device_slot_card_interface
+class device_pc98_cbus_slot_interface : public device_interface
 {
-	friend class pc98_cbus_slot_device;
+	friend class pc98_cbus_root_device;
 
 public:
-	// construction/destruction
-	device_pc9801_slot_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_pc9801_card_interface();
+	virtual ~device_pc98_cbus_slot_interface();
+
+	virtual void remap(int space_id, offs_t start, offs_t end) {}
+
+	void set_bus(pc98_cbus_root_device *cbus_device) { m_bus = cbus_device; }
+
+	device_pc98_cbus_slot_interface(const machine_config &mconfig, device_t &device);
+
+	pc98_cbus_root_device     *m_bus;
 };
-#endif
 
-// ======================> pc98_cbus_slot_device
-
-class pc98_cbus_slot_device : public device_t, public device_slot_interface
+class pc98_cbus_slot_device : public device_t
+							, public device_slot_interface
+							, public device_pc98_cbus_slot_interface
 {
 public:
-	// construction/destruction
-	template <typename T>
-	pc98_cbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: pc98_cbus_slot_device(mconfig, tag, owner, (uint32_t)0)
+	template <typename T, typename U>
+	pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cbus_tag, U &&opts, const char *dflt, bool fixed = false)
+		: pc98_cbus_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
-		set_fixed(false);
+		set_fixed(fixed);
+		m_bus.set_tag(std::forward<T>(cbus_tag));
 	}
 	pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
-	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
-
-	// configuration access
-	template<std::size_t Line> auto int_cb() { return m_int_cb[Line].bind(); }
-//  template<std::size_t Line> auto drq_cb() { return m_drq_cb[Line].bind(); }
-//  template<std::size_t Line> auto dma_r() { return m_dma_in_cb[Line].bind(); }
-//  template<std::size_t Line> auto dma_w() { return m_dma_out_cb[Line].bind(); }
-
-	address_space &program_space() const { return *m_memspace; }
-	address_space &io_space() const { return *m_iospace; }
-	template<int I> void int_w(int state) { m_int_cb[I](state); }
-//  template<int I> void drq_w(int state) { m_drq_cb[I](state); }
-
-	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
-	{
-		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
-	}
-
 protected:
-	// device_t implementation
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_config_complete() override;
+	pc98_cbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-private:
-//  device_pc9801_slot_card_interface *m_card;
-	required_address_space m_memspace;
-	required_address_space m_iospace;
-	devcb_write_line::array<7> m_int_cb;
-//  devcb_write_line::array<4> m_drq_cb;
+	virtual void device_start() override ATTR_COLD;
+
+	// configuration
+	required_device<pc98_cbus_root_device> m_bus;
 };
 
 

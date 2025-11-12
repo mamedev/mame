@@ -25,6 +25,7 @@
 // ======================> pc9801_86_device
 
 class pc9801_86_device : public device_t
+					   , public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction
@@ -53,7 +54,6 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(dac_tick);
 
-	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ym2608_device>  m_opna;
 	required_device<input_merger_device> m_irqs;
 
@@ -64,6 +64,7 @@ protected:
 
 	u8 m_mask;
 	virtual void io_map(address_map &map) ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
 	int queue_count();

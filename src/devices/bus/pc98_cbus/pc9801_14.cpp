@@ -20,6 +20,7 @@ TODO:
 
 - Known games with PC9801-14 support
   gamepac1 - flappy
+  albatros (maybe? Reads $188 at startup but doesn't do anything with it?)
 
 **************************************************************************************************/
 
@@ -39,7 +40,7 @@ DEFINE_DEVICE_TYPE(PC9801_14, pc9801_14_device, "pc9801_14", "NEC PC-9801-14")
 
 pc9801_14_device::pc9801_14_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_14, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_ppi(*this, "ppi")
 	, m_pit(*this, "pit")
 	, m_tms(*this, "tms")
@@ -57,7 +58,7 @@ void pc9801_14_device::device_add_mconfig(machine_config &config)
 	m_pit->set_clk<2>(1'996'800 / 8);
 	m_pit->out_handler<2>().set([this] (int state) {
 		// TODO: may require inverted polarity
-		m_bus->int_w<5>(state);
+		m_bus->int_w(5, state);
 	});
 
 	I8255(config, m_ppi);
@@ -116,15 +117,25 @@ void pc9801_14_device::device_start()
 
 void pc9801_14_device::device_reset()
 {
-	// assumed, loads up in n88bas61 with switch.n88 setup
-	m_bus->program_space().install_rom(
-		0xcc000,
-		0xcffff,
-		memregion(this->subtag("sound_bios").c_str())->base()
-	);
-
-	m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_14_device::io_map);
 }
+
+void pc9801_14_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		// assumed, loads up in n88bas61 with switch.n88 setup
+		m_bus->space(AS_PROGRAM).install_rom(
+			0xcc000,
+			0xcffff,
+			memregion(this->subtag("sound_bios").c_str())->base()
+		);
+	}
+	else if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_14_device::io_map);
+	}
+}
+
 
 void pc9801_14_device::io_map(address_map &map)
 {

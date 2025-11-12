@@ -57,13 +57,14 @@ TODO (pc9801ux):
 #include "emu.h"
 #include "pc9801.h"
 
+#include "bus/nec_fdd/pc80s31k.h"
 #include "bus/pc98_54simm/options.h"
 #include "bus/pc98_54simm/slot.h"
 #include "bus/pc98_61simm/options.h"
 #include "bus/pc98_61simm/slot.h"
 
-#include "bus/pc98_cbus/amd98.h"
 #include "bus/pc98_cbus/options.h"
+
 #include "machine/input_merger.h"
 
 void pc98_base_state::rtc_w(uint8_t data)
@@ -321,9 +322,11 @@ void pc9801_state::sasi_ctrl_w(uint8_t data)
 
 void pc9801_state::pc9801_map(address_map &map)
 {
-//  map(0x00000, 0x9ffff).rw("cbus_ram", FUNC(ram_device::read_no_mirror), FUNC(ram_device::write_no_mirror));
+	map.unmap_value_high();
+	map(0x00000, 0x9ffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_r), FUNC(pc98_cbus_root_device::mem_w));
 	map(0xa0000, 0xa3fff).rw(FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w)); //TVRAM
 	map(0xa8000, 0xbffff).rw(FUNC(pc9801_state::gvram_r), FUNC(pc9801_state::gvram_w)); //bitmap VRAM
+	map(0xc0000, 0xdffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_slot_r), FUNC(pc98_cbus_root_device::mem_slot_w));
 //  map(0xcc000, 0xcffff).rom().region("sound_bios", 0); //sound BIOS
 	map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
 	map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
@@ -341,7 +344,6 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0030, 0x0033).rw(m_sio_rs, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
-	map(0x0050, 0x0057).lr8(NAME([] (offs_t offset) { return 0xff; })).umask16(0xff00);
 	map(0x0050, 0x0053).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / host FDD 2d (PC-80S31K)
 	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
@@ -357,8 +359,11 @@ void pc9801_state::pc9801_common_io(address_map &map)
 
 void pc9801_state::pc9801_io(address_map &map)
 {
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw("cbus_root", FUNC(pc98_cbus_root_device::io_r), FUNC(pc98_cbus_root_device::io_w));
 	pc9801_common_io(map);
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::dmapg4_w)).umask16(0xff00);
+	map(0x0050, 0x0057).m("fdd_2d", FUNC(pc80s31k_device::host_map)).umask16(0xff00);
 	map(0x0068, 0x0068).w(FUNC(pc9801_state::pc9801_video_ff_w)); //mode FF / <undefined>
 	map(0x0080, 0x0080).rw(FUNC(pc9801_state::sasi_data_r), FUNC(pc9801_state::sasi_data_w));
 	map(0x0082, 0x0082).rw(FUNC(pc9801_state::sasi_status_r), FUNC(pc9801_state::sasi_ctrl_w));
@@ -457,7 +462,10 @@ void pc9801vm_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 uint8_t pc9801vm_state::a20_ctrl_r(offs_t offset)
 {
 	if(offset == 0)
-		return 0;
+	{
+		// for amd98 ID port
+		return m_cbus_root->io_r(0xf0 >> 1, 0x00ff);
+	}
 	if(offset == 0x01)
 		return (m_gate_a20 ^ 1) | 0xfe;
 	else if(offset == 0x03)
@@ -871,21 +879,23 @@ void pc9801_state::ipl_bank(address_map &map)
 
 void pc9801vm_state::pc9801vm_map(address_map &map)
 {
-//  map(0x000000, 0x09ffff).rw(m_ram, FUNC(ram_device::read_no_mirror), FUNC(ram_device::write_no_mirror));
+	map(0x000000, 0x09ffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_r), FUNC(pc98_cbus_root_device::mem_w));
 
 	map(0x0a0000, 0x0a3fff).rw(FUNC(pc9801vm_state::tvram_r), FUNC(pc9801vm_state::tvram_w));
 	map(0x0a4000, 0x0a4fff).rw(FUNC(pc9801vm_state::pc9801rs_knjram_r), FUNC(pc9801vm_state::pc9801rs_knjram_w));
 	map(0x0a8000, 0x0bffff).rw(FUNC(pc9801vm_state::grcg_gvram_r), FUNC(pc9801vm_state::grcg_gvram_w));
+	map(0x0c0000, 0x0dffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_slot_r), FUNC(pc98_cbus_root_device::mem_slot_w));
+
 	map(0x0e0000, 0x0e7fff).rw(FUNC(pc9801vm_state::grcg_gvram0_r), FUNC(pc9801vm_state::grcg_gvram0_w));
 	map(0x0e8000, 0x0fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
 void pc9801vm_state::pc9801vm_io(address_map &map)
 {
+	map(0x0000, 0xffff).rw(m_cbus_root, FUNC(pc98_cbus_root_device::io_r), FUNC(pc98_cbus_root_device::io_w));
 //  map.unmap_value_high();
 	pc9801_common_io(map);
 	map(0x0020, 0x002f).w(FUNC(pc9801vm_state::dmapg8_w)).umask16(0xff00);
-//  map(0x0050, 0x0057).noprw(); // 2dd ppi?
 	map(0x005c, 0x005f).r(FUNC(pc9801vm_state::timestamp_r)); // artic
 	map(0x005f, 0x005f).w(FUNC(pc9801vm_state::artic_wait_w));
 	map(0x0068, 0x006b).w(FUNC(pc9801vm_state::pc9801rs_video_ff_w)).umask16(0x00ff); //mode FF / <undefined>
@@ -944,6 +954,7 @@ void pc9801vm_state::pc9801rs_io(address_map &map)
 {
 	map.unmap_value_high();
 	pc9801vm_io(map);
+	map(0x00f0, 0x00f0).lr8(NAME([] () { return 0; }));
 	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_hack_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
 	map(0x0640, 0x064f).rw(FUNC(pc9801vm_state::ide_cs0_r), FUNC(pc9801vm_state::ide_cs0_w));
 	map(0x0740, 0x074f).rw(FUNC(pc9801vm_state::ide_cs1_r), FUNC(pc9801vm_state::ide_cs1_w));
@@ -2023,40 +2034,14 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
-//  PC98_CBUS_ROOT(config, "cbus", 0);
-
-	PC98_CBUS_SLOT(config, m_cbus[0], pc98_cbus_devices, "pc9801_26");
-	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
-	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
-	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
-	m_cbus[0]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
-//  m_cbus[0]->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
-//  m_dmac->in_ior_callback<0>().set([] () { printf("read\n"); return 0xff; });
-//  m_dmac->out_iow_callback<0>().set([] (u8 data) { printf("write %02x\n", data); });
-
-	PC98_CBUS_SLOT(config, m_cbus[1], pc98_cbus_devices, nullptr);
-	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
-	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
-	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
-	m_cbus[1]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<1>));
-//  TODO: six max slots
-
-	INPUT_MERGER_ANY_HIGH(config, "ir3").output_handler().set("pic8259_master", FUNC(pic8259_device::ir3_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir5").output_handler().set("pic8259_master", FUNC(pic8259_device::ir5_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir6").output_handler().set("pic8259_master", FUNC(pic8259_device::ir6_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir9").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir12").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir4_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir13").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
+	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	m_cbus_root->int_cb<0>().set("pic8259_master", FUNC(pic8259_device::ir3_w));
+	m_cbus_root->int_cb<1>().set("pic8259_master", FUNC(pic8259_device::ir5_w));
+	m_cbus_root->int_cb<2>().set("pic8259_master", FUNC(pic8259_device::ir6_w));
+	m_cbus_root->int_cb<3>().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
+	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
+	m_cbus_root->int_cb<5>().set("pic8259_slave", FUNC(pic8259_device::ir4_w));
+	m_cbus_root->int_cb<6>().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
 }
 
 void pc9801_state::pc9801_sasi(machine_config &config)
@@ -2163,7 +2148,6 @@ void pc9801_state::pc9801_common(machine_config &config)
 
 	config_keyboard(config);
 	pc9801_mouse(config);
-	pc9801_cbus(config);
 
 	pc9801_serial(config);
 
@@ -2211,6 +2195,14 @@ void pc9801_state::pc9801(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	pc9801_cbus(config);
+	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc98_cbus_devices, "pc9801_26");
+	PC98_CBUS_SLOT(config, "cbus1", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus2", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus3", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus4", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus5", 0, "cbus_root", pc98_cbus_devices, nullptr);
+
 	pc9801_common(config);
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_beep_portc_w));
 
@@ -2218,9 +2210,7 @@ void pc9801_state::pc9801(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801f)
 
 	// RAM 128KB (vanilla/F1/F2) ~ 256KB (F3/M2/M3) ~ 640KB (max)
-	pc98_cbus_slot_device &ram_slot(PC98_CBUS_SLOT(config, "cbus_ram", pc98_cbus_ram_devices, "640kb"));
-	ram_slot.set_memspace(m_maincpu, AS_PROGRAM);
-	ram_slot.set_iospace(m_maincpu, AS_IO);
+	PC98_CBUS_SLOT(config, "cbus_ram", 0, "cbus_root", pc98_cbus_ram_devices, "640kb");
 //  RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 
 	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
@@ -2237,6 +2227,8 @@ void pc9801_state::pc9801(machine_config &config)
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
+
+	PC80S31K(config, "fdd_2d", XTAL(31'948'800) / 8);
 }
 
 void pc9801vm_state::pc9801vm(machine_config &config)
@@ -2247,6 +2239,12 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pc9801_common(config);
+	pc9801_cbus(config);
+	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc98_cbus_devices, "pc9801_26");
+	PC98_CBUS_SLOT(config, "cbus1", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus2", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus3", 0, "cbus_root", pc98_cbus_devices, nullptr);
+
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801vm_state::ppi_sys_dac_portc_w));
 	// TODO: verify if it needs invert();
 	m_pit->out_handler<1>().set( m_dac1bit, FUNC(speaker_sound_device::level_w));
@@ -2257,9 +2255,7 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_ipl).set_map(&pc9801vm_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
 	// RAM 384KB (VM0/VM2/VM4) ~ 640KB (VM21/VM11)
-	pc98_cbus_slot_device &ram_slot(PC98_CBUS_SLOT(config, "cbus_ram", pc98_cbus_ram_devices, "640kb"));
-	ram_slot.set_memspace(m_maincpu, AS_PROGRAM);
-	ram_slot.set_iospace(m_maincpu, AS_IO);
+	PC98_CBUS_SLOT(config, "cbus_ram", 0, "cbus_root", pc98_cbus_ram_devices, "640kb");
 //  RAM(config, m_ram).set_default_size("640K").set_extra_options("384K");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)

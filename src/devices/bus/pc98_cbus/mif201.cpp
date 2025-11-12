@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(MIF201, mif201_device, "mif201", "Micro Musician VA MIF-201 M
 
 mif201_device::mif201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIF201, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_uart(*this, "uart%u", 1U)
 	, m_pit(*this, "pit")
 {
@@ -29,7 +29,7 @@ mif201_device::mif201_device(const machine_config &mconfig, const char *tag, dev
 
 //void mif201_device::irq_out(int state)
 //{
-//  m_bus->int_w<2>(state);
+//  m_bus->int_w(2, state);
 //}
 
 
@@ -49,7 +49,14 @@ void mif201_device::device_start()
 
 void mif201_device::device_reset()
 {
-	m_bus->install_device(0x0000, 0xffff, *this, &mif201_device::io_map);
+}
+
+void mif201_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0xffff, *this, &mif201_device::io_map);
+	}
 }
 
 void mif201_device::io_map(address_map &map)

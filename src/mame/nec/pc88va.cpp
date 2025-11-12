@@ -767,7 +767,7 @@ void pc88va_state::io_map(address_map &map)
 //  map(0x0158, 0x0159) Interruption Mode Modification (strobe), changes i8214 mode to i8259, cannot be changed back
 //  map(0x015c, 0x015f) NMI mask port (strobe port)
 //  map(0x0160, 0x016f) V50 DMAC
-//  map(0x0180, 0x0180) read by Olteus
+//  map(0x0180, 0x0180) read by olteus and micromus (?)
 	map(0x0184, 0x0187).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 //  map(0x0188, 0x018b) V50 ICU
 //  map(0x0190, 0x0191) System Port 5
@@ -941,6 +941,15 @@ void pc88va_state::io_map(address_map &map)
 	);
 
 //  map(0x1000, 0xfeff) PC-88VA expansion boards
+	// TODO: really +0x800, or mif_201 itself needs the bump instead?
+	map(0x1000, 0xfeff).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) {
+			return m_cbus_root->io_r(offset + 0x800, mem_mask);
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			m_cbus_root->io_w(offset + 0x800, data, mem_mask);
+		})
+	);
 //  map(0xe2d2, 0xe2d2) MIDI status in micromus
 //  map(0xff00, 0xffff).noprw(); // CPU internal use
 }
@@ -1409,31 +1418,18 @@ void pc88va_state::pc88va_sasi(machine_config &config)
 // cfr. schematics pg. 260, "external bus, videoboard connector"
 void pc88va_state::pc88va_cbus(machine_config &config)
 {
-	PC98_CBUS_SLOT(config, m_cbus[0], pc88va_cbus_devices, nullptr);
-	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
-	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
-	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<4>().set("ir10", FUNC(input_merger_device::in_w<0>));
-
-	PC98_CBUS_SLOT(config, m_cbus[1], pc88va_cbus_devices, nullptr);
-	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
-	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
-	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<4>().set("ir10", FUNC(input_merger_device::in_w<1>));
+	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	m_cbus_root->int_cb<0>().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
+	m_cbus_root->int_cb<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
+	m_cbus_root->int_cb<2>().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
+	m_cbus_root->int_cb<3>().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
+	// TODO: or ir3_w?
+	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
 
 	// TODO: check actual number of slots for each VA iteration
-
-	INPUT_MERGER_ANY_HIGH(config, "ir3").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
-	INPUT_MERGER_ANY_HIGH(config, "ir5").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
-	INPUT_MERGER_ANY_HIGH(config, "ir6").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
-	INPUT_MERGER_ANY_HIGH(config, "ir9").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir10").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
+	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc88va_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus1", 0, "cbus_root", pc88va_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus2", 0, "cbus_root", pc88va_cbus_devices, nullptr);
 }
 
 void pc88va_state::pc88va(machine_config &config)

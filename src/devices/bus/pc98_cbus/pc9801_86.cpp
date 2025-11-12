@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device, "pc98_otomichan_kai", "M
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opna(*this, "opna")
 	, m_irqs(*this, "irqs")
 	, m_ldac(*this, "ldac")
@@ -83,7 +83,7 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	// TC55257CFL-10 (U15)
 	// unknown chip (most likely surface scratched) U3)
 
-	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) { m_bus->int_w<5>(state); });
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) { m_bus->int_w(5, state); });
 
 	SPEAKER(config, "speaker", 2).front();
 	YM2608(config, m_opna, 7.987_MHz_XTAL); // actually YM2608B
@@ -220,15 +220,6 @@ void pc9801_86_device::device_start()
 
 void pc9801_86_device::device_reset()
 {
-	// TODO: uninstall option from dip
-	m_bus->program_space().install_rom(
-		0xcc000,
-		0xcffff,
-		memregion(this->subtag("sound_bios").c_str())->base()
-	);
-
-	m_bus->install_device(0x0000, 0xffff, *this, &pc9801_86_device::io_map);
-
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
 	m_pcmirq = m_init = false;
@@ -244,6 +235,21 @@ void pc9801_86_device::device_reset()
 	memset(&m_queue[0], 0, QUEUE_SIZE);
 }
 
+void pc9801_86_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_bus->space(AS_PROGRAM).install_rom(
+			0xcc000,
+			0xcffff,
+			memregion(this->subtag("sound_bios").c_str())->base()
+		);
+	}
+	else if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0xffff, *this, &pc9801_86_device::io_map);
+	}
+}
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
@@ -368,7 +374,7 @@ void pc9801_86_device::pcm_control_w(u8 data)
 	if(!(data & 0x10))
 	{
 		LOGDAC("\tIRQ clear\n");
-		//m_bus->int_w<5>(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
+		//m_bus->int_w(5, m_fmirq ? ASSERT_LINE : CLEAR_LINE);
 		if(!(queue_count() < m_irq_rate) || !(data & 0x80))
 		{
 			//TODO: this needs research

@@ -144,7 +144,7 @@ public:
 		, m_fdc_2dd(*this, "fdc_2dd")
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
-		, m_cbus(*this, "cbus%d", 0)
+		, m_cbus_root(*this, "cbus_root")
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
@@ -174,7 +174,7 @@ protected:
 	optional_device<upd765a_device> m_fdc_2dd;
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
-	required_device_array<pc98_cbus_slot_device, 2> m_cbus;
+	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 private:

@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26/K")
 
 pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_26, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opn(*this, "opn")
 	, m_joy(*this, "joy_p%u", 1U)
 	, m_irq_jp(*this, "JP6A1_JP6A3")
@@ -46,13 +46,8 @@ void pc9801_26_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	YM2203(config, m_opn, 15.9744_MHz_XTAL / 4); // divider not verified
 	m_opn->irq_handler().set([this] (int state) {
-		switch(m_int_level & 3)
-		{
-			case 0: m_bus->int_w<0>(state); break;
-			case 1: m_bus->int_w<4>(state); break;
-			case 2: m_bus->int_w<6>(state); break;
-			case 3: m_bus->int_w<5>(state); break;
-		}
+		const int int_levels[4] = { 0, 4, 6, 5 };
+		m_bus->int_w(int_levels[m_int_level & 3], state);
 	});
 	/*
 	 * xx-- ---- IRSTx interrupt status 0/1
@@ -158,44 +153,41 @@ void pc9801_26_device::device_start()
 
 void pc9801_26_device::device_reset()
 {
-	// install the ROM to the physical program space
-	u8 rom_setting = ioport("JP6A2")->read() & 7;
-	static const u32 rom_addresses[8] = { 0xc8000, 0xcc000, 0xd0000, 0xd4000, 0, 0, 0, 0 };
-	u32 current_rom = rom_addresses[rom_setting & 7];
-	memory_region *rom_region = memregion(this->subtag("sound_bios").c_str());
-	const u32 rom_size = rom_region->bytes() - 1;
-
-	// TODO: make most of this a C-Bus root responsibility
-	if (m_rom_base == 0)
-		m_rom_base = current_rom;
-
-	if (m_rom_base != 0)
-	{
-		logerror("%s: uninstall ROM at %08x-%08x\n", machine().describe_context(), m_rom_base, m_rom_base + rom_size);
-		m_bus->program_space().unmap_readwrite(m_rom_base, m_rom_base + rom_size);
-	}
-	if (current_rom != 0)
-	{
-		logerror("%s: install ROM at %08x-%08x\n", machine().describe_context(), current_rom, current_rom + rom_size);
-		m_bus->program_space().unmap_readwrite(current_rom, current_rom + rom_size);
-		m_bus->program_space().install_rom(
-			current_rom,
-			current_rom + rom_size,
-			rom_region->base()
-		);
-	}
-	m_rom_base = current_rom;
-
-	// install I/O ports
-	m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_26_device::io_map);
-
 	// read INT line
 	m_int_level = m_irq_jp->read() & 3;
 }
 
-void pc9801_26_device::device_validity_check(validity_checker &valid) const
+void pc9801_26_device::remap(int space_id, offs_t start, offs_t end)
 {
+	if (space_id == AS_PROGRAM)
+	{
+		const u8 rom_setting = ioport("JP6A2")->read() & 7;
+		static const u32 rom_addresses[8] = { 0xc8000, 0xcc000, 0xd0000, 0xd4000, 0, 0, 0, 0 };
+		const u32 start_address = rom_addresses[rom_setting & 7];
+		memory_region *rom_region = memregion(this->subtag("sound_bios").c_str());
+		const u32 rom_size = rom_region->bytes() - 1;
+
+		if (start_address != 0)
+		{
+			const u32 end_address = start_address + rom_size;
+			logerror("%s: map ROM at %08x-%08x\n", this->tag(), start_address, end_address);
+			m_bus->space(AS_PROGRAM).install_rom(
+				start_address,
+				end_address,
+				rom_region->base()
+			);
+		}
+		else
+		{
+			logerror("%s: ROM is disconnected\n", this->tag());
+		}
+	}
+	else if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_26_device::io_map);
+	}
 }
+
 
 void pc9801_26_device::io_map(address_map &map)
 {

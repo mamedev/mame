@@ -24,6 +24,7 @@
 
 class pc9801_55_device : public device_t
 					   , public device_memory_interface
+ 					   , public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction
@@ -45,9 +46,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
-	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<nscsi_bus_device> m_scsi_bus;
 	required_device<wd33c9x_base_device> m_wdc;
 	address_space_config m_space_io_config;
@@ -57,7 +58,6 @@ private:
 	void io_map(address_map &map) ATTR_COLD;
 	void internal_map(address_map &map) ATTR_COLD;
 
-	void flush_rom_bank();
 	u8 m_ar;
 	u8 m_port30;
 	u8 m_pkg_id;
