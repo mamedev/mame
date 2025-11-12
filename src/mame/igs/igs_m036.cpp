@@ -796,7 +796,7 @@ ROM_START( hyleyuan )
 	ROM_LOAD( "gfx.u4", 0xc000000, 0x4000000, CRC(39f2cdfe) SHA1(73ba10eebd2efb0e153033d23f572cf489ea8db1) ) // "
 ROM_END
 
-// 小丑嘉年华 (Xiǎochǒu Jiāniánhuá)
+// 小丑嘉年华 (Xiǎochǒu Jiāniánhuá) - PCB-1014-00-KF-1
 ROM_START( xcjnh )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
