@@ -285,10 +285,10 @@ void mscbar_state::machine_start()
 
 ROM_START( mscbar )
 
-	ROM_REGION( 0x01000, "boot", 0 )
+	ROM_REGION( 0x01000, "maincpu", 0 )
 	ROM_LOAD( "at89c51-24pc.u1", 0x00000, 0x01000, CRC(67C00C5A) SHA1(f889522b6fff3f487183ff49e1144c9fe27cbb3e) ) // actual CPU is a ATMEL AT89C51-24PC. Unprotected. Has the internal program code on it.
 
-	ROM_REGION( 0x10000, "prg", 0 )
+	ROM_REGION( 0x10000, "eeprom", 0 )
 	ROM_LOAD( "w27c512.u12", 0x0000, 0x10000, CRC(735147D8) SHA1(df2431f85224443eda4346a10183021f60d858a0) )
 
 	ROM_REGION( 0x200000, "oki", 0 ) // adpcm rom - 8 bank
