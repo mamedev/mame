@@ -108,7 +108,7 @@ private:
 
 	void main_program_map(address_map &map) ATTR_COLD;
 	void audio_program_map(address_map &map) ATTR_COLD;
-	void adpcm_bank(uint8_t data) ATTR_COLD;
+	void adpcm_bank_w(uint8_t data) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 	void hd63484_map(address_map &map) ATTR_COLD;
 };
@@ -143,7 +143,7 @@ void huangyeh_m68k_state::audio_program_map(address_map &map)
 	map(0xf8e0, 0xf8e0).lw8(NAME([this] (offs_t offset, u8 data) { m_soundlatch->acknowledge_w(); }));
 }
 
-void huangyeh_m68k_state::adpcm_bank(uint8_t data)
+void huangyeh_m68k_state::adpcm_bank_w(uint8_t data)
 {
 
 		m_oki->set_rom_bank(data & 0x01);
