@@ -1388,12 +1388,11 @@ void stvcd_device::cmd_get_buffer_partition_sector_number()
 
 	uint32_t bufnum = cr3>>8;
 
-	LOGCMD("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
 	cr1 = cd_stat;
 	cr2 = 0;
 	cr3 = 0;
 	if(cr1 & 0xff || cr2 || cr3 & 0xff || cr4)
-		LOGWARN("Get # sectors used with params %04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
+		LOGWARN("Get Sector Number issued with params %04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
 
 	// is the partition empty?
 	if (partitions[bufnum].size == -1)
@@ -1405,6 +1404,8 @@ void stvcd_device::cmd_get_buffer_partition_sector_number()
 		cr4 = partitions[bufnum].numblks;
 		//LOGWARN("Partition %08x %04x\n",bufnum,cr4);
 	}
+
+	LOGCMD("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
 
 	//LOGWARN("%04x\n",cr4);
 	if(cr4 == 0)
@@ -1450,7 +1451,7 @@ void stvcd_device::cmd_get_actual_data_size()
 	cr2 = (calcsize & 0xffff);
 	cr3 = 0;
 	cr4 = 0;
-	hirqreg |= (CMOK|ESEL);
+	hirqreg |= (CMOK);
 	status_type = 1;
 }
 
