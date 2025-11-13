@@ -938,21 +938,21 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 void model2_state::draw_framebuffer( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	u16 *fbvram = &(m_screen->frame_number() & 1 ? m_fbvramB[0] : m_fbvramA[0]);
-	// TODO: halved crtc values?
-	int xoffs = (-m_crtc_xoffset)/2;
-	int yoffs = m_crtc_yoffset/2;
+	int xoffs = -m_crtc_xoffset;
+	int yoffs = (512 - 384) - m_crtc_yoffset;
 
 	for (int y = cliprect.min_y; y < cliprect.max_y; ++y)
 	{
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
 			int offset = (x + xoffs) + (y + yoffs)*512;
-			int b = (fbvram[offset] >> 0) & 0x1f;
-			int r = (fbvram[offset] >> 5) & 0x1f;
-			int g = (fbvram[offset] >> 10) & 0x1f;
-			r = pal5bit(r);
-			g = pal5bit(g);
-			b = pal5bit(b);
+			// assuming the scroll color table is used
+			int r = m_colorxlat[0x0080 / 2 + ((fbvram[offset] >> 5) & 0x1f) * 0x100];
+			int g = m_colorxlat[0x4080 / 2 + ((fbvram[offset] >> 10) & 0x1f) * 0x100];
+			int b = m_colorxlat[0x8080 / 2 + ((fbvram[offset] >> 0) & 0x1f) * 0x100];
+			r = m_gamma_table[r];
+			g = m_gamma_table[g];
+			b = m_gamma_table[b];
 			bitmap.pix(y, x) = r << 16 | g << 8 | b;
 		}
 	}
@@ -2595,6 +2595,22 @@ void model2_state::video_start()
 
 u32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// if the scroll color table was written to, we need to refresh the palette
+	if (m_palette_dirty)
+	{
+		for (int i = 0; i < 0x1000; i++)
+		{
+			u16 palcolor = m_palram[i];
+			u8 r = m_colorxlat[0x0080 / 2 + ((palcolor >> 0) & 0x1f) * 0x100];
+			u8 g = m_colorxlat[0x4080 / 2 + ((palcolor >> 5) & 0x1f) * 0x100];
+			u8 b = m_colorxlat[0x8080 / 2 + ((palcolor >> 10) & 0x1f) * 0x100];
+			r = m_gamma_table[r];
+			g = m_gamma_table[g];
+			b = m_gamma_table[b];
+			m_palette->set_pen_color(i, r, g, b);
+		}
+	}
+
 	//logerror("--- frame ---\n");
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
