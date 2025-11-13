@@ -10,6 +10,8 @@
     tracked through PORT_CONFIG
 
     TODO:
+    * identify ctc channel for INT purpose
+    * interrupt DMA on INT
     * improve zxnDMA
     * contention
     * internal_port_enable() support
@@ -2509,10 +2511,8 @@ void specnext_state::line_irq_adjust()
 {
 	if (m_nr_22_line_interrupt_en && (m_nr_23_line_interrupt <= m_video_timings.max_vc))
 	{
-		u16 vtarget = m_nr_23_line_interrupt
-			? cvc_to_vpos(m_nr_23_line_interrupt)
-			: m_video_timings.max_vc;
-		m_irq_line_timer->adjust(m_screen->time_until_pos(vtarget, m_video_timings.min_hactive << 1));
+		u16 vtarget = m_nr_23_line_interrupt ? (m_nr_23_line_interrupt - 1) : m_video_timings.max_vc;
+		m_irq_line_timer->adjust(m_screen->time_until_pos(cvc_to_vpos(vtarget), m_clip256x192.right()));
 	}
 	else
 		m_irq_line_timer->reset();
