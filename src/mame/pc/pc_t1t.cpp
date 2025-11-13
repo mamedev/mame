@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "pc_t1t.h"
 
-#include "machine/ram.h"
 #include "screen.h"
 
 
@@ -33,20 +32,28 @@ enum
 DEFINE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device, "tandy_1000_graphics", "Tandy 1000 Graphics Adapter")
 DEFINE_DEVICE_TYPE(PCVIDEO_PCJR,  pcvideo_pcjr_device,  "pcjr_graphics",       "PC Jr Graphics Adapter")
 
-pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+
+pc_t1t_device::pc_t1t_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		uint8_t addrbits) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_palette_interface(mconfig, *this),
+	device_memory_interface(mconfig, *this),
+	m_vram_config("vram", ENDIANNESS_LITTLE, 8, addrbits, 0, address_map_constructor(FUNC(pc_t1t_device::default_map), this)),
 	m_chr_gen(*this, finder_base::DUMMY_TAG),
 	m_mc6845(*this, "mc6845_t1000"),
-	m_ram(*this, ":" RAM_TAG),
-	m_vram(*this, "vram"),
+	m_display_base(0),
+	m_window_base(0),
 	m_mode_control(0),
 	m_color_select(0),
 	m_status(0),
 	m_bank(0),
 	m_pc_framecnt(0),
-	m_displayram(nullptr),
 	m_chr_size(0),
 	m_ra_offset(0),
 	m_address_data_ff(0),
@@ -57,13 +64,33 @@ pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pc_t1t_device(mconfig, PCVIDEO_T1000, tag, owner, clock)
+pcvideo_t1000_device::pcvideo_t1000_device(
+		const machine_config &mconfig,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock) :
+	pcvideo_t1000_device(mconfig, PCVIDEO_T1000, tag, owner, clock, 17)
 {
 }
 
-pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock),
+pcvideo_t1000_device::pcvideo_t1000_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		uint8_t addrbits) :
+	pc_t1t_device(mconfig, type, tag, owner, clock, addrbits),
+	m_disable(false)
+{
+}
+
+pcvideo_pcjr_device::pcvideo_pcjr_device(
+		const machine_config &mconfig,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock) :
+	pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock, 17),
 	m_vsync_cb(*this),
 	m_jxkanji(nullptr)
 {
@@ -72,101 +99,7 @@ pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const ch
 
 void pc_t1t_device::device_start()
 {
-	if (!m_ram->started())
-		throw device_missing_dependencies();
-
-	palette_init();
-}
-
-void pcvideo_t1000_device::device_start()
-{
-	pc_t1t_device::device_start();
-
-	m_bank = 0;
-	m_chr_size = 1;
-	m_ra_offset = 256;
-	m_vram->space(0).install_ram(0, 128*1024 - 1, m_ram->pointer());
-}
-
-
-void pcvideo_pcjr_device::device_start()
-{
-	pc_t1t_device::device_start();
-
-	m_bank = 0;
-	m_mode_control = 0x08;
-	m_chr_size = 8;
-	m_ra_offset = 1;
-	if(!strncmp(machine().system().name, "ibmpcjx", 7))
-	{
-		m_jxkanji = machine().root_device().memregion("kanji")->base();
-		m_vram->space(0).install_ram(0, 128*1024 - 1, memshare(":vram")->ptr()); // TODO: fix when this is really understood
-	}
-	else
-	{
-		m_jxkanji = nullptr;
-		m_vram->space(0).install_ram(0, 128*1024 - 1, m_ram->pointer());
-	}
-}
-
-
-/***************************************************************************
-
-    Static declarations
-
-***************************************************************************/
-
-void pc_t1t_device::vram_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x20000, 0x3ffff).noprw();
-}
-
-void pcvideo_t1000_device::device_add_mconfig(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(14'318'181),912,0,640,262,0,200);
-	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
-
-	MC6845(config, m_mc6845, XTAL(14'318'181)/8);
-	m_mc6845->set_screen(T1000_SCREEN_NAME);
-	m_mc6845->set_show_border_area(false);
-	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(pc_t1t_device::crtc_update_row));
-	m_mc6845->out_de_callback().set(FUNC(pc_t1t_device::t1000_de_changed));
-	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_t1000_device::t1000_vsync_changed));
-
-	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-}
-
-
-void pcvideo_pcjr_device::device_add_mconfig(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
-	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
-
-	MC6845(config, m_mc6845, XTAL(14'318'181)/16);
-	m_mc6845->set_screen(T1000_SCREEN_NAME);
-	m_mc6845->set_show_border_area(false);
-	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(pcvideo_pcjr_device::crtc_update_row));
-	m_mc6845->out_de_callback().set(FUNC(pcvideo_pcjr_device::de_changed));
-	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_pcjr_device::pcjr_vsync_changed));
-
-	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-}
-
-
-/***************************************************************************
-
-    Methods
-
-***************************************************************************/
-
-// Initialise the CGA palette
-void pc_t1t_device::palette_init()
-{
+	// Initialise the CGA palette
 	static constexpr rgb_t tga_palette[16] =
 	{
 		{ 0x00, 0x00, 0x00 }, { 0x00, 0x00, 0xaa }, { 0x00, 0xaa, 0x00 }, { 0x00, 0xaa, 0xaa },
@@ -184,6 +117,87 @@ void pc_t1t_device::palette_init()
 		set_pen_color(16 + i, pal4bit(i), pal4bit(i), pal4bit(i));
 }
 
+void pcvideo_t1000_device::device_start()
+{
+	pc_t1t_device::device_start();
+
+	m_bank = 0;
+	m_chr_size = 1;
+	m_ra_offset = 256;
+}
+
+void pcvideo_pcjr_device::device_start()
+{
+	pc_t1t_device::device_start();
+
+	space(0).cache(m_vram);
+
+	m_bank = 0;
+	m_mode_control = 0x08;
+	m_chr_size = 8;
+	m_ra_offset = 1;
+	if(!strncmp(machine().system().name, "ibmpcjx", 7))
+		m_jxkanji = machine().root_device().memregion("kanji")->base();
+	else
+		m_jxkanji = nullptr;
+}
+
+
+device_memory_interface::space_config_vector pc_t1t_device::memory_space_config() const
+{
+	return space_config_vector{ std::make_pair(0, &m_vram_config) };
+}
+
+
+void pc_t1t_device::default_map(address_map &map)
+{
+	map.unmap_value_high();
+}
+
+
+/***************************************************************************
+
+    Static declarations
+
+***************************************************************************/
+
+void pcvideo_t1000_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'318'181),912,0,640,262,0,200);
+	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
+
+	MC6845(config, m_mc6845, XTAL(14'318'181)/8);
+	m_mc6845->set_screen(T1000_SCREEN_NAME);
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
+	m_mc6845->set_update_row_callback(FUNC(pc_t1t_device::crtc_update_row));
+	m_mc6845->out_de_callback().set(FUNC(pc_t1t_device::t1000_de_changed));
+	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_t1000_device::t1000_vsync_changed));
+}
+
+
+void pcvideo_pcjr_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
+	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
+
+	MC6845(config, m_mc6845, XTAL(14'318'181)/16);
+	m_mc6845->set_screen(T1000_SCREEN_NAME);
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
+	m_mc6845->set_update_row_callback(FUNC(pcvideo_pcjr_device::crtc_update_row));
+	m_mc6845->out_de_callback().set(FUNC(pcvideo_pcjr_device::de_changed));
+	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_pcjr_device::pcjr_vsync_changed));
+}
+
+
+/***************************************************************************
+
+    Methods
+
+***************************************************************************/
 
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_inten_update_row )
 {
@@ -194,8 +208,9 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_inten_update_row )
 	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t const offset = ((ma + i) << 1) & 0x3fff;
-		uint8_t const chr = m_displayram[offset];
-		uint8_t const attr = m_displayram[offset + 1];
+		uint16_t const vram = space(0).read_word(m_display_base | offset);
+		uint8_t const chr = vram & 0x00ff;
+		uint8_t const attr = vram >> 8;
 		uint16_t const fg = m_palette_base + (attr & 0x0f);
 		uint16_t const bg = m_palette_base + ((attr >> 4) & 0x07);
 
@@ -223,8 +238,9 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_blink_update_row )
 	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t const offset = ((ma + i) << 1) & 0x3fff;
-		uint8_t const chr = m_displayram[offset];
-		uint8_t const attr = m_displayram[offset | 1];
+		uint16_t const vram = space(0).read_word(m_display_base | offset);
+		uint8_t const chr = vram & 0x00ff;
+		uint8_t const attr = vram >> 8;
 		uint16_t const fg = m_palette_base + (attr & 0x0f);
 		uint16_t const bg = m_palette_base + ((attr >> 4) & 0x07);
 
@@ -259,18 +275,18 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t const offset = ((ma + i) << 1) & 0x3fff;
-		uint8_t chr = m_displayram[offset];
-		uint8_t const attr = m_displayram[offset | 1];
+		uint8_t chr = space(0).read_byte(m_display_base + offset);
+		uint8_t const attr = space(0).read_byte(m_display_base + offset + 1);
 		uint16_t const fg = m_palette_base + (attr & 0x07);
 		uint16_t const bg = m_palette_base + ((attr >> 4) & 0x07);
 		uint16_t code = chr & 0x1f;
 		if((attr & 0x88) == 0x88)
 		{
-			code = m_displayram[ offset - 2 ] & 0x1f;
+			code = space(0).read_byte(m_display_base + offset - 2) & 0x1f;
 			code = (code << 8) + chr;
 		}
 		else if(attr & 0x80)
-			code = (code << 8) + m_displayram[ offset + 2 ];
+			code = (code << 8) + space(0).read_byte(m_display_base + offset + 2);
 		else
 			code = chr;
 
@@ -295,24 +311,21 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_4bpp_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + (ra << 13);
+	uint32_t const rowbase = m_display_base | ((ra << 13) & 0x7fff);
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
-		uint8_t data;
+		uint16_t const offset = ((ma + i) << 1) & 0x1fff;
+		uint16_t const data = space(0).read_word(rowbase | offset);
 
-		data = vid[offset];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
-
-		data = vid[offset | 1];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data >> 4)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | (data & 0x0f)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  4, 4)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  4, 4)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  0, 4)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  0, 4)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 12, 4)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 12, 4)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  8, 4)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  8, 4)]];
 	}
 }
 
@@ -321,24 +334,21 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + (ra << 13);
+	uint32_t const rowbase = m_display_base | ((ra << 13) & 0x7fff);
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
-		uint8_t data;
+		uint16_t const offset = ((ma + i) << 1) & 0x1fff;
+		uint16_t const data = space(0).read_word(rowbase | offset);
 
-		data = vid[offset];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 6, 2)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 4, 2)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 2, 2)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 0, 2)]];
-
-		data = vid[offset | 1];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 6, 2)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 4, 2)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 2, 2)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 0, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  6, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  4, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  2, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  0, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 14, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 12, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data, 10, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data,  8, 2)]];
 	}
 }
 
@@ -347,22 +357,21 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjr_gfx_2bpp_high_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + (ra << 13);
+	uint32_t const rowbase = m_display_base | ((ra << 13) & 0x7fff);
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
-		uint8_t const data0 = vid[offset];
-		uint8_t const data1 = vid[offset | 1];
+		uint16_t const offset = ((ma + i) << 1) & 0x1fff;
+		uint16_t const data = space(0).read_word(rowbase | offset);
 
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 7) | (BIT(data1, 7) << 1)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 6) | (BIT(data1, 6) << 1)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 5) | (BIT(data1, 5) << 1)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 4) | (BIT(data1, 4) << 1)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 3) | (BIT(data1, 3) << 1)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 2) | (BIT(data1, 2) << 1)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 1) | (BIT(data1, 1) << 1)]];
-		*p++ = pal[m_palette_base + m_reg.data[0x10 | BIT(data0, 0) | (BIT(data1, 0) << 1)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | bitswap<2>(data, 15, 7)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | bitswap<2>(data, 14, 6)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | bitswap<2>(data, 13, 5)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | bitswap<2>(data, 12, 4)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | bitswap<2>(data, 11, 3)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | bitswap<2>(data, 10, 2)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | bitswap<2>(data,  9, 1)]];
+		*p++ = pal[m_palette_base + m_reg.data[0x10 | bitswap<2>(data,  8, 0)]];
 	}
 }
 
@@ -371,23 +380,22 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_tga_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + (ra << 13);
+	uint32_t const rowbase = m_display_base | ((ra << 13) & 0x7fff);
 
 	if (y == 0) logerror("t1000_gfx_2bpp_tga_update_row\n");
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
-		uint8_t const data0 = vid[offset];
-		uint8_t const data1 = vid[offset | 1];
+		uint16_t const offset = ((ma + i) << 1) & 0x1fff;
+		uint16_t const data = space(0).read_word(rowbase | offset);
 
-		*p++ = pal[m_reg.data[0x10 | BIT(data0, 7) | (BIT(data1, 7) << 1)]];
-		*p++ = pal[m_reg.data[0x10 | BIT(data0, 6) | (BIT(data1, 6) << 1)]];
-		*p++ = pal[m_reg.data[0x10 | BIT(data0, 5) | (BIT(data1, 5) << 1)]];
-		*p++ = pal[m_reg.data[0x10 | BIT(data0, 4) | (BIT(data1, 4) << 1)]];
-		*p++ = pal[m_reg.data[0x10 | BIT(data0, 3) | (BIT(data1, 3) << 1)]];
-		*p++ = pal[m_reg.data[0x10 | BIT(data0, 2) | (BIT(data1, 2) << 1)]];
-		*p++ = pal[m_reg.data[0x10 | BIT(data0, 1) | (BIT(data1, 1) << 1)]];
-		*p++ = pal[m_reg.data[0x10 | BIT(data0, 0) | (BIT(data1, 0) << 1)]];
+		*p++ = pal[m_reg.data[0x10 | bitswap<2>(data, 15, 7)]];
+		*p++ = pal[m_reg.data[0x10 | bitswap<2>(data, 14, 6)]];
+		*p++ = pal[m_reg.data[0x10 | bitswap<2>(data, 13, 5)]];
+		*p++ = pal[m_reg.data[0x10 | bitswap<2>(data, 12, 4)]];
+		*p++ = pal[m_reg.data[0x10 | bitswap<2>(data, 11, 3)]];
+		*p++ = pal[m_reg.data[0x10 | bitswap<2>(data, 10, 2)]];
+		*p++ = pal[m_reg.data[0x10 | bitswap<2>(data,  9, 1)]];
+		*p++ = pal[m_reg.data[0x10 | bitswap<2>(data,  8, 0)]];
 	}
 }
 
@@ -396,35 +404,32 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_1bpp_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
-	uint8_t const *const vid = m_displayram + (ra << 13);
+	uint32_t const rowbase = m_display_base | ((ra << 13) & 0x7fff);
 	uint8_t const fg = m_palette_base + m_reg.data[0x11];
 	uint8_t const bg = m_palette_base + m_reg.data[0x10];
 
 	if (y == 0) logerror("t1000_gfx_1bpp_update_row\n");
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t const offset = ((ma + i ) << 1) & 0x1fff;
-		uint8_t data;
+		uint16_t const offset = ((ma + i) << 1) & 0x1fff;
+		uint16_t const data = space(0).read_word(rowbase | offset);
 
-		data = vid[offset];
-		*p++ = pal[BIT(data, 7) ? fg : bg];
-		*p++ = pal[BIT(data, 6) ? fg : bg];
-		*p++ = pal[BIT(data, 5) ? fg : bg];
-		*p++ = pal[BIT(data, 4) ? fg : bg];
-		*p++ = pal[BIT(data, 3) ? fg : bg];
-		*p++ = pal[BIT(data, 2) ? fg : bg];
-		*p++ = pal[BIT(data, 1) ? fg : bg];
-		*p++ = pal[BIT(data, 0) ? fg : bg];
-
-		data = vid[offset | 1];
-		*p++ = pal[BIT(data, 7) ? fg : bg];
-		*p++ = pal[BIT(data, 6) ? fg : bg];
-		*p++ = pal[BIT(data, 5) ? fg : bg];
-		*p++ = pal[BIT(data, 4) ? fg : bg];
-		*p++ = pal[BIT(data, 3) ? fg : bg];
-		*p++ = pal[BIT(data, 2) ? fg : bg];
-		*p++ = pal[BIT(data, 1) ? fg : bg];
-		*p++ = pal[BIT(data, 0) ? fg : bg];
+		*p++ = pal[BIT(data,  7) ? fg : bg];
+		*p++ = pal[BIT(data,  6) ? fg : bg];
+		*p++ = pal[BIT(data,  5) ? fg : bg];
+		*p++ = pal[BIT(data,  4) ? fg : bg];
+		*p++ = pal[BIT(data,  3) ? fg : bg];
+		*p++ = pal[BIT(data,  2) ? fg : bg];
+		*p++ = pal[BIT(data,  1) ? fg : bg];
+		*p++ = pal[BIT(data,  0) ? fg : bg];
+		*p++ = pal[BIT(data, 15) ? fg : bg];
+		*p++ = pal[BIT(data, 14) ? fg : bg];
+		*p++ = pal[BIT(data, 13) ? fg : bg];
+		*p++ = pal[BIT(data, 12) ? fg : bg];
+		*p++ = pal[BIT(data, 11) ? fg : bg];
+		*p++ = pal[BIT(data, 10) ? fg : bg];
+		*p++ = pal[BIT(data,  9) ? fg : bg];
+		*p++ = pal[BIT(data,  8) ? fg : bg];
 	}
 }
 
@@ -479,7 +484,7 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::crtc_update_row )
 
 void pcvideo_t1000_device::mode_switch()
 {
-	switch( m_mode_control & 0x3B )
+	switch (m_mode_control & 0x3B)
 	{
 	case 0x08: case 0x09:
 		m_update_row_type = T1000_TEXT_INTEN;
@@ -488,7 +493,7 @@ void pcvideo_t1000_device::mode_switch()
 		m_update_row_type = T1000_TEXT_BLINK;
 		break;
 	case 0x0A: case 0x0B: case 0x2A: case 0x2B:
-		switch( m_bank & 0xc0 )
+		switch (m_bank & 0xc0)
 		{
 		case 0x00:
 		case 0x40:
@@ -518,7 +523,7 @@ void pcvideo_t1000_device::mode_switch()
 		break;
 	case 0x18: case 0x19: case 0x1A: case 0x1B:
 	case 0x38: case 0x39: case 0x3A: case 0x3B:
-		switch( m_bank & 0xc0 )
+		switch (m_bank & 0xc0)
 		{
 		case 0x00:
 		case 0x40:
@@ -573,7 +578,7 @@ void pcvideo_pcjr_device::pc_pcjr_mode_switch()
 		m_update_row_type = T1000_GFX_2BPP;
 
 		/* Check for high resolution mode */
-		if ( ( m_bank & 0xc0 ) == 0xc0 )
+		if ((m_bank & 0xc0) == 0xc0)
 			m_update_row_type = PCJR_GFX_2BPP_HIGH;
 
 		/* Check for 640x200 b/w 2 shades mode */
@@ -773,7 +778,7 @@ int pc_t1t_device::vga_data_r()
 }
 
 /*
- * 3df RW   display bank, access bank, mode
+ * 03DF RW   display bank, access bank, mode
  * bit 0-2  Identifies the page of main memory being displayed in units of 16K.
  *          0: 0K, 1: 16K...7: 112K. In 32K modes (bits 6-7 = 2) only 0,2,4 and
  *          6 are valid, as the next page will also be used.
@@ -783,9 +788,12 @@ int pc_t1t_device::vga_data_r()
  *     6-7  Display mode. 0: Text, 1: 16K graphics mode (4,5,6,8)
  *          2: 32K graphics mode (9,Ah)
  */
-void pcvideo_t1000_device::bank_w(int data)
+void pcvideo_t1000_device::bank_w(uint16_t data)
 {
-	int dram, vram;
+	if (m_disable)
+		return;
+
+	uint32_t dram, vram;
 	if ((data&0xc0)==0xc0) /* needed for lemmings */
 	{
 		dram = (m_bank & 0x06);// | ((m_bank & 0x1800) >> 8);
@@ -796,18 +804,18 @@ void pcvideo_t1000_device::bank_w(int data)
 		dram = (m_bank & 0x07);// | ((m_bank & 0x1800) >> 8);
 		vram = ((m_bank & 0x38) >> 3);// | ((m_bank & 0x6000) >> 10);
 	}
-	m_displayram = m_ram->pointer() + (dram << 14);
-	if(m_disable)
-		return;
-	m_vram->set_bank(vram);
-	if((m_bank & 0xc0) != (data & 0xc0))
+	m_display_base = dram << 14;
+	m_window_base = vram << 14;
+
+	// FIXME: this won't ever get hit because write(...) updates m_bank before calling this function
+	if ((m_bank & 0xc0) != (data & 0xc0))
 		mode_switch();
 }
 
 
-void pcvideo_pcjr_device::pc_pcjr_bank_w(int data)
+void pcvideo_pcjr_device::pc_pcjr_bank_w(uint8_t data)
 {
-	int dram, vram;
+	uint32_t dram, vram;
 	m_bank = data;
 	/* it seems the video ram is mapped to the last 128K of main memory */
 	if ((data&0xc0)==0xc0) /* needed for lemmings */
@@ -820,30 +828,11 @@ void pcvideo_pcjr_device::pc_pcjr_bank_w(int data)
 		dram = (data & 0x07);
 		vram = (data & 0x38) >> 3;
 	}
-	m_vram->set_bank(vram);
-	m_displayram = m_ram->pointer() + (dram << 14);
-	if((m_bank & 0xc0) != (data & 0xc0))
-		pc_pcjr_mode_switch();
-}
+	m_display_base = dram << 14;
+	m_window_base = vram << 14;
 
-void pcvideo_pcjr_device::pc_pcjx_bank_w(int data)
-{
-	int dram, vram;
-	m_bank = data;
-	if ((data&0xc0)==0xc0) /* needed for lemmings */
-	{
-		dram = (data & 0x06);
-		vram = (data & 0x30) >> 3;
-	}
-	else
-	{
-		dram = (data & 0x07);
-		vram = (data & 0x38) >> 3;
-	}
-	m_vram->set_bank(vram);
-	/* this certainly isn't correct but otherwise the memory test stomps on the vram */
-	m_displayram = (uint8_t *)memshare(":vram")->ptr() + (dram << 14);
-	if((m_bank & 0xc0) != (data & 0xc0))
+	// FIXME: this won't ever get hit because m_bank was updated just a few lines ago
+	if ((m_bank & 0xc0) != (data & 0xc0))
 		pc_pcjr_mode_switch();
 }
 
@@ -899,7 +888,7 @@ void pcvideo_t1000_device::write(offs_t offset, uint8_t data)
 
 void pcvideo_pcjr_device::write(offs_t offset, uint8_t data)
 {
-	switch( offset )
+	switch (offset)
 	{
 		case 0: case 4:
 			m_mc6845->address_w(data);
@@ -924,10 +913,7 @@ void pcvideo_pcjr_device::write(offs_t offset, uint8_t data)
 		case 12:
 			break;
 		case 15:
-			if (m_jxkanji)
-				pc_pcjx_bank_w(data);
-			else
-				pc_pcjr_bank_w(data);
+			pc_pcjr_bank_w(data);
 			break;
 
 		default:
@@ -982,6 +968,47 @@ uint8_t pc_t1t_device::read(offs_t offset)
 	return data;
 }
 
+
+uint8_t pcvideo_t1000_device::vram_window8_r(address_space &space, offs_t offset)
+{
+	if (!m_disable)
+		return this->space(0).read_byte(m_window_base | (offset & 0x7fff));
+	else
+		return space.unmap();
+}
+
+uint16_t pcvideo_t1000_device::vram_window16_r(address_space &space, offs_t offset)
+{
+	if (!m_disable)
+		return this->space(0).read_word(m_window_base | ((offset << 1) & 0x7fff));
+	else
+		return space.unmap();
+}
+
+uint8_t pcvideo_pcjr_device::vram_window_r(offs_t offset)
+{
+	return m_vram.read_byte(m_window_base | (offset & 0x7fff));
+}
+
+
+void pcvideo_t1000_device::vram_window8_w(offs_t offset, uint8_t data)
+{
+	if (!m_disable)
+		space(0).write_byte(m_window_base | (offset & 0x7fff), data);
+}
+
+void pcvideo_t1000_device::vram_window16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (!m_disable)
+		space(0).write_word(m_window_base | ((offset << 1) & 0x7fff), data, mem_mask);
+}
+
+void pcvideo_pcjr_device::vram_window_w(offs_t offset, uint8_t data)
+{
+	m_vram.write_byte(m_window_base | (offset & 0x7fff), data);
+}
+
+
 void pc_t1t_device::t1000_de_changed(int state)
 {
 	m_display_enable = state ? 0 : 1;
@@ -1005,10 +1032,6 @@ void pcvideo_t1000_device::t1000_vsync_changed(int state)
 
 void pcvideo_t1000_device::disable_w(int state)
 {
-	if (state)
-		m_vram->set_bank(8);
-	else
-		bank_w(m_bank);
 	m_disable = state ? true : false;
 }
 
