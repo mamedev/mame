@@ -1274,6 +1274,20 @@ template <u8 Lsb> void specnext_state::mf_port_w(offs_t addr, u8 data)
 	m_mf->port_mf_disable_wr_w(port_multiface_io_en() && (Lsb == port_mf_disable_io_a));
 	m_mf->clock_w();
 	bank_update(0, 2);
+
+	if (Lsb == 0x1f && m_nr_08_dac_en && port_dac_sd1_ABCD_1f0f4f5f_io_en())
+	{
+		m_dac[0]->data_w(data);
+		m_dac[1]->data_w(data);
+		m_dac[2]->data_w(data);
+		m_dac[3]->data_w(data);
+	}
+	else if (Lsb == 0x3f && m_nr_08_dac_en && port_dac_stereo_AD_3f5f_io_en())
+	{
+		m_dac[0]->data_w(data);
+		m_dac[3]->data_w(data);
+	}
+
 	m_mf->port_mf_enable_rd_w(0);
 	m_mf->port_mf_disable_rd_w(0);
 }
@@ -2928,19 +2942,10 @@ void specnext_state::map_io(address_map &map)
 
 	map(0x0037, 0x0037).mirror(0xff00).r(FUNC(specnext_state::kempston_md_r<1>));
 
-	// TODO resolve conflicts mf+joy+DAC: 1f, 3f
-	//map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() -> u8 { return 0x00; /* Joy1,2*/ })).lw8(NAME([this](u8 data) {
-	//  if (m_nr_08_dac_en)
-	//      m_dac[0]->data_w(data);
-	//}));
 	map(0x00f1, 0x00f1).mirror(0xff00).lw8(NAME([this](u8 data) {
 		if (m_nr_08_dac_en)
 			m_dac[0]->data_w(data);
 	}));
-	//map(0x003f, 0x003f).mirror(0xff00).lw8(NAME([this](u8 data) {
-	//  if (m_nr_08_dac_en)
-	//      m_dac[0]->data_w(data);
-	//}));
 	map(0x000f, 0x000f).mirror(0xff00).lw8(NAME([this](u8 data) {
 		if (m_nr_08_dac_en)
 			m_dac[1]->data_w(data);
