@@ -94,6 +94,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_acrtc(*this, "acrtc")
 		, m_soundlatch(*this, "soundlatch")
+	    , m_oki(*this, "oki")
 	{ }
 
 	void wlzb(machine_config &config) ATTR_COLD;
@@ -103,9 +104,11 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd63484_device> m_acrtc;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<okim6295_device> m_oki;
 
 	void main_program_map(address_map &map) ATTR_COLD;
 	void audio_program_map(address_map &map) ATTR_COLD;
+	void adpcm_bank(uint8_t data) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 	void hd63484_map(address_map &map) ATTR_COLD;
 };
@@ -133,10 +136,17 @@ void huangyeh_m68k_state::audio_program_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf880, 0xf881).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xf890, 0xf890).w(FUNC(huangyeh_m68k_state::adpcm_bank)); 
 	map(0xf8a0, 0xf8a0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xf8d0, 0xf8d0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 //  map(0xf8e0, 0xf8e0).w soundlatch acknowledge or NMI ack
 	map(0xf8e0, 0xf8e0).lw8(NAME([this] (offs_t offset, u8 data) { m_soundlatch->acknowledge_w(); }));
+}
+
+void huangyeh_m68k_state::adpcm_bank(uint8_t data)
+{
+
+		m_oki->set_rom_bank(data & 0x01);
 }
 
 void huangyeh_m68k_state::ramdac_map(address_map &map)
@@ -237,7 +247,7 @@ void huangyeh_m68k_state::wlzb(machine_config &config)
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", 8.448_MHz_XTAL / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki, 8.448_MHz_XTAL / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
