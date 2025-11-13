@@ -27,95 +27,13 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="advoka" supported="yes">
-		<description>Advoka</description>
-		<year>19??</year>
-		<publisher>BBG-Software</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="16615">
-				<rom name="advoka.mzf" size="16615" crc="0240d602" sha1="47ff824a494651304f12ed4e157836cc98729b34"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bdash" supported="yes">
-		<description>Boulder Dash</description>
-		<year>1989</year>
-		<publisher>Jozef Jendruch</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="20832">
-				<rom name="boulder dash.mzf" size="20832" crc="de9384fd" sha1="182fd35cdef077bc5489ae1eb216ffc59fae83e1"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="blizzard" supported="yes">
-		<description>Blizzard</description>
-		<year>19??</year>
-		<publisher>Unknown</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="8115860">
-				<rom name="blizzard.wav" size="8115860" crc="62240189" sha1="d3b76e56152a4ca17610958d97c90c7639b78b26"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="breakout" supported="yes">
+	<software name="breakout" supported="no">
 		<description>Break out-800</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="6786">
 				<rom name="break out-800.mzf" size="6786" crc="bc569aa0" sha1="2dac626d921e7be058c8db0bc17e6594213ec72d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="carrier2" supported="yes">
-		<description>Carrier ][</description>
-		<year>1984</year>
-		<publisher>BBG-Software</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="9995636">
-				<rom name="carrier ][.wav" size="9995636" crc="f7ac3541" sha1="1fbfdcc0771771265ed9a2e659302af638664482"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->		
-	<software name="carrier2a" cloneof="carrier2" supported="yes">
-		<description>Carrier ][ (Joystick version)</description>
-		<year>1984</year>
-		<publisher>BBG Software</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="8096132">
-				<rom name="carrier ][ joy.wav" size="8096132" crc="8e767a5f" sha1="07af62b7dc934171b6bb5f5ce1191680f7cbaf06"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="colossus" supported="yes">
-		<description>Colossus Chess</description>
-		<year>1986</year>
-		<publisher>M. Bryant</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="12500900">
-				<rom name="colossus.wav" size="12500900" crc="2447e9d3" sha1="0cb529c4193749ed1a19db130f6e8c936cdded0e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="crzyclmb" supported="yes">
-		<description>Hell Diver Crazy Climber</description>
-		<year>19??</year>
-		<publisher>A.Y.A. Production</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="8717444">
-				<rom name="crazy climber.wav" size="8717444" crc="298fc6b9" sha1="3b0c420722eaf9c6918a20391cfd60d8baa46988"/>
 			</dataarea>
 		</part>
 	</software>
@@ -128,88 +46,6 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="15793">
 				<rom name="cyrus is chess.mzf" size="15793" crc="54a2d5f8" sha1="8320c396430b6f73d9dc769dbbfec42314c2fa76"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="dispatch" supported="yes">
-		<description>Dispatcher</description>
-		<year>19??</year>
-		<publisher>Phoenix</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="10728092">
-				<rom name="dispatcher.wav" size="10728092" crc="7ca53b42" sha1="8660708cf4158059e7b93c68e3bb2e51df04b880"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="drop" supported="yes">
-		<description>The Drop</description>
-		<year>19??</year>
-		<publisher>Unknown</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="6005972">
-				<rom name="drop.wav" size="6005972" crc="4225b0a3" sha1="adef5d011b5c6ab873a5384eb3c0b67504e2453a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="eugea" supported="yes">
-		<description>Eugea</description>
-		<year>1989</year>
-		<publisher>K. Furuhata</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="14331380">
-				<rom name="eugea.wav" size="14331380" crc="472761b9" sha1="8e2882c23d5e2a5f53bbed91acd20506bbc70d10"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="express" supported="yes">
-		<description>ITA Express</description>
-		<year>1991</year>
-		<publisher>Pro Sharp Upravil Datelsoft</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="15745">
-				<rom name="express.mzf" size="15745" crc="569fe265" sha1="d006d0e33bd329a83aceeba87d31ddaf4d4222bd"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fantgrve" supported="yes">
-		<description>Fantastic Grove</description>
-		<year>1984</year>
-		<publisher>BBG Software</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="28228">
-				<rom name="fantastic grove.mzf" size="28228" crc="951e699f" sha1="cb65684af0c98520d1a0d92a0350dd509248222f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="galao" supported="yes">
-		<description>Galao</description>
-		<year>19??</year>
-		<publisher>Unknown</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="6725420">
-				<rom name="galao.wav" size="6725420" crc="14f8d5e5" sha1="3d74fd2f859549991f893869ba7b6aec77e1806c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="galaoa" cloneof="galao" supported="yes">
-		<description>Galao (Joystick version)</description>
-		<year>19??</year>
-		<publisher>Unknown</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="6725636">
-				<rom name="galao joy.wav" size="6725636" crc="93db9455" sha1="45903e2567798a96c3e7ec7b3154ce340b091bb2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -236,7 +72,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="james" supported="yes">
+	<software name="james" supported="no">
 		<description>James v1.0c (Cz)</description>
 		<year>19??</year>
 		<publisher>Pilsoft</publisher>
@@ -247,24 +83,11 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<!-- MZF to WAV conversion -->	
-	<software name="moty" supported="yes">
-		<description>Moty</description>
-		<year>1985</year>
-		<publisher>BBG Software</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="14707916">
-				<rom name="moty.wav" size="14707916" crc="67281542" sha1="95e55656fa45dfaa94db5297a3786392d64c6cea"/>
-			</dataarea>
-		</part>
-	</software>
-
 <!-- Cassette contains both an MZ-700 and an MZ-800 version. Proper tagging pending. -->
-	<software name="mucmac" supported="yes">
+	<software name="mucmac">
 		<description>Muc Mac</description>
 		<year>19??</year>
 		<publisher>BBG Software</publisher>
-
 <!--
         <part name="cass1" interface="mz_cass">
             <dataarea name="cass" size="16585">
@@ -295,25 +118,13 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="pcgrally" supported="yes">
+	<software name="pcgrally" supported="no">
 		<description>PCG Rally</description>
 		<year>1983</year>
 		<publisher>Namco/HAL Laboratory</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="11856">
 				<rom name="pcgrally.mzf" size="11856" crc="cbdc2558" sha1="711aea4d33feab497c2f6888489fc31d504719e2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="sideroll" supported="yes">
-		<description>Side Roll</description>
-		<year>1988</year>
-		<publisher>K. Furuhata</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="14510036">
-				<rom name="sideroll.wav" size="14510036" crc="167076e3" sha1="9b8a19cd256bfa54e8ab6642c3ab5c26bd2ddd73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -340,36 +151,6 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="wooky" supported="yes">
-		<description>Wooky</description>
-		<year>19??</year>
-		<publisher>Albertz &amp; Schittennelm</publisher>
-		<part name="cass1" interface="mz_cass">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="7529">
-				<rom name="wookya.mzf" size="7529" crc="a18ba08d" sha1="9056c1b2200f86a3a08c1e18df977243883b539e"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mz_cass">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="47744">
-				<rom name="wookyb.mzf" size="47744" crc="55e002c8" sha1="2c0c8cff60ac4c8c89f613523cb3ab22eac8a13a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MZF to WAV conversion -->	
-	<software name="zaxxon" supported="yes">
-		<description>Zaxxon</description>
-		<year>1988</year>
-		<publisher>Shakami Software</publisher>
-		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="13499516">
-				<rom name="zaxxon.wav" size="13499516" crc="c3a8d91a" sha1="253d2689438aea8da406f5566f6ae96a1671b3e4"/>
-			</dataarea>
-		</part>
-	</software>
-
 <!-- MZ-821 SHARP Basic Trainer (Germany) -->
 
 	<software name="egg" supported="no">
@@ -389,7 +170,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="adrsdata" supported="yes">
+	<software name="adrsdata" supported="no">
 		<description>Adress Data</description>
 		<year>19??</year>
 		<publisher>BBG Software</publisher>
