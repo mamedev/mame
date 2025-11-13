@@ -1,6 +1,89 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 // Contains STV1 and STV2 code. STV2 starts at line 2210.
+/**************************************************************************************************
+
+TODO (VDP1):
+- Decidedly too fast in drawing. Real HW has serious penalties in the pipeline;
+- Off with CEF/BEF handling, several entries hangs;
+- Correct FB erase/swap timings,
+  i.e. stuff that erases too soon and expect the idle bit to stay in draw state
+  cfr. kiwames (STV), blaztorn VS screen in PvP env;
+- Given the above, SCU VDP1 end irq event should probably be corrected and
+  internalized to fire at will. Pinpoint exactly when and the likely HW
+  implications involved.
+  also cfr. batmanfr (STV) gameplay, nightstr (draws in auto mode), others;
+- Illegal sprite entries, most of them are actually off with timing?
+  Needs serious tests on real HW about behaviour;
+- Mixing with VDP2 (has priority per dot mode and other caveats)
+  also cfr. basically any MD Sega Ages;
+- Polygon vertices goes wrong place in some places,
+  cfr. blaztorn match intro, twcup98 (STV) team select world cup,
+  sandor (STV) match moai sub-game, other places;
+- FB rotation framebuffer (shared with VDP2)
+  cfr. capgen4 Yoko/Tate Modes;
+- Zooming rounding errors in some places
+  cfr. groovef VS Zoom-In animation, flag stripes in Sega soccer/baseball games;
+- Some if not all wireframes sports stippled oblique polylines
+  cfr. gnine96 stadium select;
+- Off with transparent pixel flag in some places
+  cfr. jeworaclj, vhydlid;
+- Investigate bad colors in some places
+  cfr. dariusg intro, 3dwarvesu after continue;
+- Some places are known to effectively glitch out in special cases with wrong pitch set
+  cfr. suikoenb (STV), fill others;
+- 8 bpp support - now we always draw as 16 bpp, but this is not a problem since
+  VDP2 interprets framebuffer as 8 bpp in these cases (ETA: verify this statement);
+
+TODO (VDP2):
+- Mixing with VDP1;
+- Blending is incorrectly enabled on some places
+  cfr. decathlt gameplay, dragndrm title screen, Data East logo in the Magical Drop games;
+- Incomplete/buggy Color Calculation
+  cfr. reversed fade in/out for dokyuif title transition,
+  shienryu stage 2 background colors on statues (caused by special color calculation usage,
+  per dot ...),
+  scud zoom-in on melee attacks with pink backgrounds (TODO: reinvestigate this),
+  dinoisl;
+- Incomplete/buggy window effects
+  cfr. gpanicss gal select, one of the Wangan games (TODO: find which),
+  cknight2j bugged map transition;
+- VRAM cycle pattern section needs to be better encapsulated and investigated thru real HW
+  also cfr. several "minor GFX" glitches scattered across, kingbox on gameplay, columns Sega Ages
+  logo;
+- Missing mosaic effect
+  cfr. Saturn BIOS memory screens, capgen2 Choh Makai Mura map transitions (obviously);
+- Per-scanline raster effects, at very least Color Offset section is eligible to those
+  cfr. elevact2, ogrebatl, probably htheros missing crowd;
+- ODD and H/V Counters needs to be fine tuned with real HW tests.
+  Also PAL modes are wrong and basically untested;
+- Interlace Modes should be better emulated;
+- Verify Exclusive Screen Modes a.k.a. "VGA";
+- Missing "Reduction Enable", a.k.a. zooming limiters;
+- A plethora of other miscellaneous missing effects here and there,
+  cfr. most correlated notes near popmessage fns;
+- Shadow code handling, checkout portions marked with code smell
+  (double conditional over contradicting conditions!?)
+  also cfr. mfpool & voiceido gameplay;
+- Performance gets quite dire in some selected places, may be shared with VDP1,
+  may be useful to investigate culprit
+  cfr. decathlt gameplay, kingobox main menu, htheros intro;
+- EXBG a.k.a. MPEG/Genlock layer source;
+- gekkakis gameplay enables undocumented BGON bit 6 as an alias for text layer (currently hidden),
+  investigate;
+- Back layer isn't drawn in biohaz, investigate;
+- Bogus Title Screen blinking for vhydlid and probably other T&E Soft games, investigate;
+- Verify batmanfr crashing before final boss (assuming it's reproducible),
+  prime suspect VDP2 overrunning a buffer on the complicated ROZ setup it does for Riddler screen;
+- Verify hanagumi ending (there are sources sporting bad tiles, it's most likely fixed a long
+  time ago);
+- Verify rsgun Xiga final boss implications with rotation read controls
+  (should still be wrong as per current);
+- Verify sandor (STV) martial artist dry towel sub-game (overall screen setup looked
+  wrong, saw from a thuntk playthrough with unknown MAME version used);
+
+
+**************************************************************************************************/
 /*
 
 STV - VDP1
