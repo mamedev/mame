@@ -42,6 +42,8 @@
 // 40us
 unsigned constexpr TEK4404_XFI_OUT_ACK_DELAY = 10'000;
 
+// define USE_TEK4404_CHANGES  to work on tek4404 driver
+
 
 #include "emu.h"
 #include "ncr5385.h"
@@ -194,8 +196,11 @@ void ncr5385_device::device_reset()
 
 attotime ncr5385_device::scsi_data_byte_period()
 {
-//	return attotime::zero;
+#ifdef USE_TEK4404_CHANGES
 	return attotime::from_nsec(200);
+#else
+	return attotime::zero;
+#endif
 }
 
 void ncr5385_device::scsi_ctrl_changed()
@@ -807,6 +812,7 @@ int ncr5385_device::state_step()
 
 			if (m_cnt == 0)
 			{
+#ifdef USE_TEK4404_CHANGES
 				// REQUIRED delay for tek4404 to write successfully
 				
 				// Tek4404 expects to be able to call 2 functions that clear any pending state and setup an
@@ -830,6 +836,7 @@ int ncr5385_device::state_step()
 
 				delay = TEK4404_XFI_OUT_ACK_DELAY;
 				LOGMASKED(LOG_STATE, "%10s: XFI_OUT_ACK delay %d\n", machine().time().as_string(8), delay);
+#endif
 			}
 
 		}

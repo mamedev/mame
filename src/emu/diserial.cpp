@@ -204,6 +204,10 @@ void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_c
 	{
 		m_rcv_bit_count++;
 	}
+#ifndef USE_TEK4404_CHANGES
+	receive_register_reset();
+#endif
+
 }
 
 void device_serial_interface::receive_register_reset()
