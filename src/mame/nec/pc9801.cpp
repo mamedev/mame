@@ -2016,6 +2016,7 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
 	m_cbus_root->int_cb<5>().set("pic8259_slave", FUNC(pic8259_device::ir4_w));
 	m_cbus_root->int_cb<6>().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
+	m_cbus_root->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
 }
 
 void pc9801_state::pc9801_sasi(machine_config &config)
@@ -2094,6 +2095,9 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_dmac->out_eop_callback().set(FUNC(pc9801_state::tc_w));
 	m_dmac->in_memr_callback().set(FUNC(pc9801_state::dma_read_byte));
 	m_dmac->out_memw_callback().set(FUNC(pc9801_state::dma_write_byte));
+	m_dmac->in_ior_callback<0>().set([this] () { return m_cbus_root->dack_r(0); });
+	m_dmac->out_iow_callback<0>().set([this] (u8 data) { return m_cbus_root->dack_w(0, data); });
+
 	m_dmac->in_ior_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
 	m_dmac->out_dack_callback<0>().set(FUNC(pc9801_state::dack0_w));

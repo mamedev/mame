@@ -46,7 +46,10 @@ pc98_cbus_root_device::pc98_cbus_root_device(const machine_config &mconfig, cons
 	, m_space_mem_config("mem_space", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor())
 	, m_space_io_config("io_space", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor())
 	, m_int_cb(*this)
+	, m_drq_cb(*this)
 {
+	std::fill(std::begin(m_dma_device), std::end(m_dma_device), nullptr);
+	std::fill(std::begin(m_dma_eop), std::end(m_dma_eop), false);
 }
 
 device_memory_interface::space_config_vector pc98_cbus_root_device::memory_space_config() const
@@ -80,7 +83,6 @@ void pc98_cbus_root_device::device_config_complete()
 void pc98_cbus_root_device::add_slot(const char *tag)
 {
 	device_t *dev = subdevice(tag);
-	//printf(tag);
 	add_slot(dynamic_cast<device_slot_interface *>(dev));
 }
 
@@ -134,6 +136,24 @@ void pc98_cbus_root_device::io_w(offs_t offset, u16 data, u16 mem_mask)
 	space(AS_IO).write_word(offset << 1, data, mem_mask);
 }
 
+uint8_t pc98_cbus_root_device::dack_r(int line)
+{
+	if (m_dma_device[line])
+		return m_dma_device[line]->dack_r(line);
+	return 0xff;
+}
+
+void pc98_cbus_root_device::dack_w(int line, uint8_t data)
+{
+	if (m_dma_device[line])
+		m_dma_device[line]->dack_w(line, data);
+}
+
+void pc98_cbus_root_device::set_dma_channel(uint8_t channel, device_pc98_cbus_slot_interface *dev, bool do_eop)
+{
+	m_dma_device[channel] = dev;
+	m_dma_eop[channel] = do_eop;
+}
 
 
 //**************************************************************************
@@ -148,6 +168,16 @@ device_pc98_cbus_slot_interface::device_pc98_cbus_slot_interface(const machine_c
 device_pc98_cbus_slot_interface::~device_pc98_cbus_slot_interface()
 {
 }
+
+uint8_t device_pc98_cbus_slot_interface::dack_r(int line)
+{
+	return 0;
+}
+
+void device_pc98_cbus_slot_interface::dack_w(int line, uint8_t data)
+{
+}
+
 
 pc98_cbus_slot_device::pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pc98_cbus_slot_device(mconfig, PC98_CBUS_SLOT, tag, owner, clock)

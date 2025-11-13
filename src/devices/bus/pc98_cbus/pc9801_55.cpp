@@ -10,7 +10,12 @@ HDDs apparently needs to be with 8 heads and 25 cylinders only
 https://www7b.biglobe.ne.jp/~drachen6jp/98scsi.html
 
 TODO:
-- Requires C-Bus root implementation for DMA DACK to work;
+- hangs on wdc core with a Negate ACK command when not initiator;
+- Wants to read "NEC" around PC=dc632, currently reads " SE" (from nscsi/hd.cpp " SEAGATE" inquiry)
+- Wants specifically -ss 256 in chdman;
+- Throws Unhandled command LOCATE/POSITION_TO_ELEMENT/SEEK_10 (10): 2b 00 ff ff ff ff 00 00 00 00
+  (non fatal?)
+- Manages to install msdos622 after all above but doesn't mark HDD as bootable (?);
 - PC-9801-55 also runs on this except with vanilla WD33C93 instead;
 
 **************************************************************************************************/
@@ -80,20 +85,24 @@ void pc9801_55_device::scsi_irq_w(int state)
 
 void pc9801_55_device::scsi_drq_w(int state)
 {
-	// TODO: needs a C-Bus root
-//	m_bus->drq_w(0, state);
+	m_bus->drq_w(0, state);
 }
 
-//u8 pc9801_55_device::dma_r()
-//{
-//	return m_wdc->dma_r();
-//}
-//
-//void pc9801_55_device::dma_w(u8 data)
-//{
-//	m_wdc->dma_w(data);
-//}
+u8 pc9801_55_device::dack_r(int line)
+{
+	//if (!m_dma_enable)
+	//	return 0xff;
+	const u8 res = m_wdc->dma_r();
+	return res;
+}
 
+void pc9801_55_device::dack_w(int line, u8 data)
+{
+	//if (!m_dma_enable)
+	//	return;
+
+	m_wdc->dma_w(data);
+}
 
 void pc9801_55_device::device_add_mconfig(machine_config &config)
 {
@@ -190,6 +199,8 @@ void pc9801_55_device::device_start()
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_pkg_id));
 	save_item(NAME(m_dma_enable));
+
+	m_bus->set_dma_channel(0, this, false);
 }
 
 
@@ -232,10 +243,16 @@ void pc9801_55_device::io_map(address_map &map)
 	);
 	map(0x0cc2, 0x0cc2).lrw8(
 		NAME([this] (offs_t offset) {
+			//const u8 reg = m_ar;
+			//if (m_ar <= 0x19)
+			//	m_ar ++;
+
 			return space(0).read_byte(m_ar);
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			space(0).write_byte(m_ar, data);
+			//if (m_ar <= 0x19)
+			//	m_ar ++;
 		})
 	);
 	map(0x0cc4, 0x0cc4).lrw8(
@@ -313,3 +330,5 @@ void pc9801_55_device::internal_map(address_map &map)
 		})
 	);
 }
+
+
