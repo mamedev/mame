@@ -273,6 +273,7 @@ private:
 	bool m_render_mode = false;
 	bool m_render_test_mode = false;
 	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
+	bool m_palette_dirty = false;
 
 	u32 *geo_process_command( geo_state *geo, u32 opcode, u32 *input, bool *end_code );
 	// geo commands
