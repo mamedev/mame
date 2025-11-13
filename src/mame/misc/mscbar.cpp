@@ -70,7 +70,7 @@ public:
 	{ }
 
 	void mscbar(machine_config &config);
-	void mscbar_adpcm_bank(uint8_t data) ATTR_COLD;
+	void mscbar_adpcm_bank_w(uint8_t data) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -212,7 +212,7 @@ void mscbar_state::display_7seg_data_w(uint8_t data)
 	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
 }
 
-void mscbar_state::mscbar_adpcm_bank(uint8_t data)
+void mscbar_state::mscbar_adpcm_bank_w(uint8_t data)
 {
 
 		m_oki->set_rom_bank(data & 0x07);
@@ -231,7 +231,7 @@ void mscbar_state::mscbar_data_map(address_map &map)
 	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x9000, 0x9000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xb000, 0xb000).w(FUNC(mscbar_state::mscbar_adpcm_bank)); // 8 adpcm bank rom.
+	map(0xb000, 0xb000).w(FUNC(mscbar_state::mscbar_adpcm_bank_w)); // 8 adpcm bank rom.
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* HM6116LP-3: 2kb of Static RAM */
 
 }
