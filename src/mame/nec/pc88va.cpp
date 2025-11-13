@@ -1426,7 +1426,7 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	// TODO: or ir3_w?
 	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
 
-	// TODO: check actual number of slots for each VA iteration
+	// should be 3 slots for each iteration here
 	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus1", 0, "cbus_root", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus2", 0, "cbus_root", pc88va_cbus_devices, nullptr);

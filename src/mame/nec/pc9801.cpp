@@ -328,8 +328,8 @@ void pc9801_state::pc9801_map(address_map &map)
 	map(0xa8000, 0xbffff).rw(FUNC(pc9801_state::gvram_r), FUNC(pc9801_state::gvram_w)); //bitmap VRAM
 	map(0xc0000, 0xdffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_slot_r), FUNC(pc98_cbus_root_device::mem_slot_w));
 //  map(0xcc000, 0xcffff).rom().region("sound_bios", 0); //sound BIOS
-	map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
-	map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
+//	map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
+//	map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
 	map(0xe8000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -1157,14 +1157,6 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
-
-	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2HD BIOS" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
-	PORT_CONFNAME( 0x02, 0x02, "Load floppy 2DD BIOS" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( No ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc9801rs )
@@ -1204,7 +1196,7 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_DIPSETTING(    0x80, "V30" )
 	PORT_DIPSETTING(    0x00, "I386" )
 
-	PORT_MODIFY("ROM_LOAD")
+	PORT_START("BIOS_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
@@ -1863,28 +1855,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 {
 	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
-	uint8_t op_mode;
-	uint8_t *ROM;
-	uint8_t *PRG = memregion("fdc_data")->base();
-
-	// TODO: this loading shouldn't happen dynamically but actually be tied to specific floppy configs
-	// pc9801 has no floppy as default
-	// pc9801f has an internal 2DD disk drive
-	// pc9801m has an internal 2HD
-	// and ofc you can actually mount external units,
-	// cfr. PC-9801-08 (2dd), PC-9801-15 (8' unit) and likely others.
-	ROM = memregion("fdc_bios_2dd")->base();
-	op_mode = (ioport("ROM_LOAD")->read() & 2) >> 1;
-
-	for(int i=0;i<0x1000;i++)
-		ROM[i] = PRG[i+op_mode*0x8000];
-
-	ROM = memregion("fdc_bios_2hd")->base();
-	op_mode = ioport("ROM_LOAD")->read() & 1;
-
-	for(int i=0;i<0x1000;i++)
-		ROM[i] = PRG[i+op_mode*0x8000+0x10000];
-
 	m_beeper->set_state(0);
 }
 
@@ -1906,7 +1876,7 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 
 	if(memregion("ide"))
 	{
-		if(!(ioport("ROM_LOAD")->read() & 4))
+		if(!(ioport("BIOS_LOAD")->read() & 4))
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base());
 		else
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
@@ -2203,15 +2173,16 @@ void pc9801_state::pc9801(machine_config &config)
 	PC98_CBUS_SLOT(config, "cbus4", 0, "cbus_root", pc98_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus5", 0, "cbus_root", pc98_cbus_devices, nullptr);
 
+	// RAM 128KB (vanilla/F1/F2) ~ 256KB (F3/M2/M3) ~ 640KB (max)
+	// TODO: really dedicates this space in N slots above
+	PC98_CBUS_SLOT(config, "cbus_ram", 0, "cbus_root", pc98_cbus_ram_devices, "640kb");
+//  RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
+
 	pc9801_common(config);
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_beep_portc_w));
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801f)
-
-	// RAM 128KB (vanilla/F1/F2) ~ 256KB (F3/M2/M3) ~ 640KB (max)
-	PC98_CBUS_SLOT(config, "cbus_ram", 0, "cbus_root", pc98_cbus_ram_devices, "640kb");
-//  RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 
 	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
 	m_fdc_2dd->intrq_wr_callback().set(FUNC(pc9801_state::fdc_2dd_irq));
@@ -2229,6 +2200,18 @@ void pc9801_state::pc9801(machine_config &config)
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
 
 	PC80S31K(config, "fdd_2d", XTAL(31'948'800) / 8);
+}
+
+void pc9801_state::pc9801f(machine_config &config)
+{
+	pc9801(config);
+	PC98_CBUS_SLOT(config.replace(), "cbus1", 0, "cbus_root", pc98_cbus_devices, "fdd_2dd");
+}
+
+void pc9801_state::pc9801m(machine_config &config)
+{
+	pc9801(config);
+	PC98_CBUS_SLOT(config.replace(), "cbus1", 0, "cbus_root", pc98_cbus_devices, "fdd_2hd");
 }
 
 void pc9801vm_state::pc9801vm(machine_config &config)
@@ -2500,12 +2483,6 @@ ROM_START( pc9801 )
 	ROM_LOAD16_BYTE( "ruq1g 06.bin", 0x04000, 0x2000, CRC(d4ea8a62) SHA1(c899ea64ce8652a5b6976d62466efe2864cfb049) )
 	ROM_LOAD16_BYTE( "ruq4g 06.bin", 0x04001, 0x2000, CRC(c1470ae5) SHA1(4eb31b2ad0b8f0dfad99bb67ada9e5853d5af4a1) )
 
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2dd", ROMREGION_ERASEFF )
-
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2hd", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x80000, "chargen", 0 )
 	// TODO: original dump, needs heavy bitswap mods
 	ROM_LOAD( "sfz4w 00.bin",   0x00000, 0x02000, CRC(11197271) SHA1(8dbd2f25daeed545ea2c74d849f0a209ceaf4dd7) )
@@ -2546,15 +2523,39 @@ ROM_START( pc9801f )
 	ROM_LOAD16_BYTE( "urm05-02.bin", 0x10000, 0x4000, CRC(ffefec65) SHA1(106e0d920e857e59da12225a489ca2756ca405c1) )
 	ROM_LOAD16_BYTE( "urm06-02.bin", 0x10001, 0x4000, CRC(1147760b) SHA1(4e0299091dfd53ac7988d40c5a6775a10389faac) )
 
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2dd", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "chargen", 0 )
+	// note: ROM labels of following two may be swapped
+	//original is a bad dump, this is taken from i386 model
+	ROM_LOAD( "d23128c-17.bin", 0x00000, 0x00800, BAD_DUMP CRC(eea57180) SHA1(4aa037c684b72ad4521212928137d3369174eb1e) )
+	//bad dump, 8x16 charset? (it's on the kanji board)
+	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) )
 
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2hd", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	// original pc9801f dump, half size
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_CONTINUE(                      0x20000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_CONTINUE(                      0x20001, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_CONTINUE(                      0x60000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	ROM_CONTINUE(                      0x60001, 0x4000  )
 
-	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF )
-	// 2dd fdc bios, presumably bad size (should be 0x800 for each rom)
-	ROM_LOAD16_BYTE( "urf01-01.bin", 0x00000, 0x4000, BAD_DUMP CRC(2f5ae147) SHA1(69eb264d520a8fc826310b4fce3c8323867520ee) )
-	ROM_LOAD16_BYTE( "urf02-01.bin", 0x00001, 0x4000, BAD_DUMP CRC(62a86928) SHA1(4160a6db096dbeff18e50cbee98f5d5c1a29e2d1) )
-	ROM_LOAD( "2hdif.rom", 0x10000, 0x1000, BAD_DUMP CRC(9652011b) SHA1(b607707d74b5a7d3ba211825de31a8f32aec8146) ) // needs dumping from a board
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	// raw extracted from pc9801vm (after driver_init conversion)
+	ROM_LOAD( "kanji.bin", 0, 0x100000, BAD_DUMP CRC(2de4336f) SHA1(dd783d4dca5812561f853ad0307ae90420292f09) )
+
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
+ROM_END
+
+/*
+M2 - 8086 8
+*/
+
+ROM_START( pc9801m2 )
+	ROM_REGION16_LE( 0x18000, "ipl", ROMREGION_ERASEFF )
+	// from CSCP package, same as F?
+	ROM_LOAD( "ipl_efm.rom", 0x00000, 0x18000, BAD_DUMP CRC(be00c88b) SHA1(1e7c0e61db5441f2a91c56c4085a7024c8d07c10) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	// note: ROM labels of following two may be swapped
@@ -2580,6 +2581,8 @@ ROM_START( pc9801f )
 
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 ROM_END
+
+
 
 /*
 VM - V30 8/10
@@ -3019,10 +3022,10 @@ void pc9801vm_state::init_pc9801vm_kanji()
 
 // "vanilla" class (i86, E/F/M)
 COMP( 1982, pc9801,     0,        0, pc9801,    pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801",   MACHINE_NOT_WORKING ) // genuine dump
-//COMP(1983, pc9801e
-COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING ) // genuine dump
-//COMP(1984, pc9801m2
-//COMP(1985, pc9801m3
+//COMP(1983, pc9801e same with 8MHz CPU bump
+COMP( 1983, pc9801f,    pc9801,   0, pc9801f,   pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1984, pc9801m2,   pc9801,   0, pc9801m,   pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801M2", MACHINE_NOT_WORKING )
+//COMP(1985, pc9801m3 same with slotted SASI + 20MB
 
 // VM class (V30)
 //COMP(1985, pc9801u2

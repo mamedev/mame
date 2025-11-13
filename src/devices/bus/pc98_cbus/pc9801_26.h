@@ -41,6 +41,7 @@ protected:
 private:
 	required_device<ym2203_device>  m_opn;
 	required_device_array<msx_general_purpose_port_device, 2U> m_joy;
+	required_memory_region m_bios;
 	required_ioport m_irq_jp;
 
 	void io_map(address_map &map) ATTR_COLD;

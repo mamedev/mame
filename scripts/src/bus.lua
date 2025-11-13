@@ -5563,6 +5563,10 @@ if (BUSES["PC98_CBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/pc98_cbus/amd98.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/amd98.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2dd.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2dd.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2hd.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2hd.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/mif201.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/mif201.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/mpu_pc98.cpp",

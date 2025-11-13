@@ -76,6 +76,7 @@ private:
 	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 	std::vector<u8> m_queue;
+	optional_memory_region m_bios;
 	required_device<msx_general_purpose_port_device> m_joy;
 
 	emu_timer *m_dac_timer;

@@ -52,6 +52,7 @@ private:
 	required_device<nscsi_bus_device> m_scsi_bus;
 	required_device<wd33c9x_base_device> m_wdc;
 	address_space_config m_space_io_config;
+	required_memory_region m_bios;
 	required_ioport m_dsw1;
 	required_ioport m_dsw2;
 

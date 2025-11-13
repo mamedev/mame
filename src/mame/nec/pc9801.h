@@ -156,6 +156,8 @@ public:
 	}
 
 	void pc9801(machine_config &config);
+	void pc9801f(machine_config &config);
+	void pc9801m(machine_config &config);
 
 	void init_pc9801_kanji();
 

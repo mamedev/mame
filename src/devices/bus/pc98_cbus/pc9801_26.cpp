@@ -37,6 +37,7 @@ pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *ta
 	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opn(*this, "opn")
 	, m_joy(*this, "joy_p%u", 1U)
+	, m_bios(*this, "bios")
 	, m_irq_jp(*this, "JP6A1_JP6A3")
 {
 }
@@ -92,7 +93,7 @@ void pc9801_26_device::device_add_mconfig(machine_config &config)
 // to load a different bios for slots:
 // -cbus0 pc9801_26,bios=N
 ROM_START( pc9801_26 )
-	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	// PC9801_26k is a minor change that applies to 286+ CPUs
 	ROM_SYSTEM_BIOS( 0,  "26k",     "nec26k" )
 	ROMX_LOAD( "26k_wyka01_00.bin", 0x0000, 0x2000, CRC(f071bf69) SHA1(f3cdef94e9fee116cf4a9b54881e77c6cd903815), ROM_SKIP(1) | ROM_BIOS(0) )
@@ -164,22 +165,20 @@ void pc9801_26_device::remap(int space_id, offs_t start, offs_t end)
 		const u8 rom_setting = ioport("JP6A2")->read() & 7;
 		static const u32 rom_addresses[8] = { 0xc8000, 0xcc000, 0xd0000, 0xd4000, 0, 0, 0, 0 };
 		const u32 start_address = rom_addresses[rom_setting & 7];
-		memory_region *rom_region = memregion(this->subtag("sound_bios").c_str());
-		const u32 rom_size = rom_region->bytes() - 1;
 
 		if (start_address != 0)
 		{
-			const u32 end_address = start_address + rom_size;
-			logerror("%s: map ROM at %08x-%08x\n", this->tag(), start_address, end_address);
+			const u32 end_address = start_address + 0x3fff;
+			logerror("map ROM at 0x%08x-0x%08x\n", start_address, end_address);
 			m_bus->space(AS_PROGRAM).install_rom(
 				start_address,
 				end_address,
-				rom_region->base()
+				m_bios->base()
 			);
 		}
 		else
 		{
-			logerror("%s: ROM is disconnected\n", this->tag());
+			logerror("ROM is disconnected\n");
 		}
 	}
 	else if (space_id == AS_IO)

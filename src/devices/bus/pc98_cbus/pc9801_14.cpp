@@ -44,6 +44,7 @@ pc9801_14_device::pc9801_14_device(const machine_config &mconfig, const char *ta
 	, m_ppi(*this, "ppi")
 	, m_pit(*this, "pit")
 	, m_tms(*this, "tms")
+	, m_bios(*this, "bios")
 {
 }
 
@@ -86,7 +87,7 @@ void pc9801_14_device::device_add_mconfig(machine_config &config)
 }
 
 ROM_START( pc9801_14 )
-	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "vfz01_00.bin", 0x0001, 0x2000, CRC(3b227477) SHA1(85474b0550d58395ae9ca53658f93ad2f87fdd4d) )
 	ROM_LOAD16_BYTE( "vfz02_00.bin", 0x0000, 0x2000, CRC(a386ab6b) SHA1(5b014c5de1b8e41a412cafd61d7e9d18abdeb6be) )
 ROM_END
@@ -124,10 +125,11 @@ void pc9801_14_device::remap(int space_id, offs_t start, offs_t end)
 	if (space_id == AS_PROGRAM)
 	{
 		// assumed, loads up in n88bas61 with switch.n88 setup
+		logerror("map ROM at 0xcc000-0xcffff\n");
 		m_bus->space(AS_PROGRAM).install_rom(
 			0xcc000,
 			0xcffff,
-			memregion(this->subtag("sound_bios").c_str())->base()
+			m_bios->base()
 		);
 	}
 	else if (space_id == AS_IO)

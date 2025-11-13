@@ -60,6 +60,7 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type ty
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
 	, m_queue(QUEUE_SIZE)
+	, m_bios(*this, "bios")
 	, m_joy(*this, "joy_port")
 {
 }
@@ -131,13 +132,11 @@ void pc9801_86_device::opna_reset_routes_config(machine_config &config)
 // to load a different bios for slots:
 // -cbusX pc9801_86,bios=N
 ROM_START( pc9801_86 )
-	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	// following roms are unchecked and of dubious quality
 	// we currently mark bios names based off where they originally belonged to, lacking of a better info
 	// supposedly these are -86 roms according to eikanwa2 sound card detection,
 	// loading a -26 rom in a -86 environment causes an hang there.
-	// TODO: several later machines (i.e. CanBe) really has an internal -86 with sound BIOS data coming directly from the machine ROM
-	// it also sports different ID mapping at $a460
 	ROM_SYSTEM_BIOS( 0,  "86rx",    "nec86rx" )
 	ROMX_LOAD( "sound_rx.rom",    0x0000, 0x4000, BAD_DUMP CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1,  "86mu",    "epson86mu" )
@@ -239,10 +238,11 @@ void pc9801_86_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		logerror("map ROM at 0x000cc000-0x000cffff\n");
 		m_bus->space(AS_PROGRAM).install_rom(
 			0xcc000,
 			0xcffff,
-			memregion(this->subtag("sound_bios").c_str())->base()
+			m_bios->base()
 		);
 	}
 	else if (space_id == AS_IO)
@@ -498,7 +498,7 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 //**************************************************************************
 
 ROM_START( pc9801_spb )
-	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "spb lh5764 ic21_pink.bin",    0x0001, 0x2000, CRC(5bcefa1f) SHA1(ae88e45d411bf5de1cb42689b12b6fca0146c586) )
 	ROM_LOAD16_BYTE( "spb lh5764 ic22_green.bin",   0x0000, 0x2000, CRC(a7925ced) SHA1(3def9ee386ab6c31436888261bded042cd64a0eb) )
 ROM_END
@@ -558,7 +558,7 @@ otomichan_kai_device::otomichan_kai_device(const machine_config &mconfig, const 
 }
 
 ROM_START( pc98_otomichan_kai )
-	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	// TODO: "compatible" with SpeakBoard, does it even uses a ROM altogether? low-res PCB pic doesn't help at all.
 	ROM_LOAD16_BYTE( "spb lh5764 ic21_pink.bin",    0x0001, 0x2000, BAD_DUMP CRC(5bcefa1f) SHA1(ae88e45d411bf5de1cb42689b12b6fca0146c586) )
 	ROM_LOAD16_BYTE( "spb lh5764 ic22_green.bin",   0x0000, 0x2000, BAD_DUMP CRC(a7925ced) SHA1(3def9ee386ab6c31436888261bded042cd64a0eb) )

@@ -5,6 +5,8 @@
 #include "options.h"
 
 #include "amd98.h"
+#include "fdd_2dd.h"
+#include "fdd_2hd.h"
 #include "pc9801_02.h"
 #include "pc9801_14.h"
 #include "pc9801_26.h"
@@ -35,6 +37,11 @@ void pc98_cbus_devices(device_slot_interface &device)
 	device.option_add("wavestar",   QVISION_WAVESTAR);
 
 	// File Bay
+	// for first gen only
+	device.option_add("fdd_2dd",    FDD_2DD_BRIDGE);
+	device.option_add("fdd_2hd",    FDD_2HD_BRIDGE);
+	// PC-9801-08 (2dd, external unit)
+	// PC-9801-15 (8' unit)
 
 	// doujinshi HW
 // MAD Factory / Doujin Hard (同人ハード)

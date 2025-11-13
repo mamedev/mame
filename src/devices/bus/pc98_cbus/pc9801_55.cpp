@@ -28,6 +28,7 @@ pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type ty
 	, m_scsi_bus(*this, "scsi")
 	, m_wdc(*this, "scsi:7:wdc")
 	, m_space_io_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pc9801_55_device::internal_map), this))
+	, m_bios(*this, "bios")
 	, m_dsw1(*this, "DSW1")
 	, m_dsw2(*this, "DSW2")
 {
@@ -47,7 +48,7 @@ pc9801_55l_device::pc9801_55l_device(const machine_config &mconfig, const char *
 
 
 ROM_START( pc9801_55u )
-	ROM_REGION16_LE( 0x10000, "scsi_bios", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	// JNC2B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
 	// JNC3B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
 	ROM_LOAD16_BYTE( "jnc2b_00.bin", 0x000000, 0x008000, CRC(ddace1b7) SHA1(614569be28a90bd385cf8abc193e629e568125b7) )
@@ -60,7 +61,7 @@ const tiny_rom_entry *pc9801_55u_device::device_rom_region() const
 }
 
 ROM_START( pc9801_55l )
-	ROM_REGION16_LE( 0x10000, "scsi_bios", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	// ETA1B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
 	// ETA3B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
 	ROM_LOAD16_BYTE( "eta1b_00.bin", 0x000000, 0x008000, CRC(300ff6c1) SHA1(6cdee535b77535fe6c4dda4427aeb803fcdea0b8) )
@@ -210,10 +211,11 @@ void pc9801_55_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		logerror("map ROM at 0x000dc000-0x000dcfff (bank %d)\n", m_rom_bank);
 		m_bus->space(AS_PROGRAM).install_rom(
 			0xdc000,
 			0xdcfff,
-			memregion(this->subtag("scsi_bios").c_str())->base() + m_rom_bank * 0x1000
+			m_bios->base() + m_rom_bank * 0x1000
 		);
 	}
 	else if (space_id == AS_IO)
