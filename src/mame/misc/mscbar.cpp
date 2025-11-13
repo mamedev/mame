@@ -45,7 +45,6 @@
 #include "emu.h"
 
 #include "cpu/mcs51/i80c51.h"
-#include "cpu/mcs51/i80c52.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/i8279.h"
