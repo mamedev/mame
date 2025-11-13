@@ -320,7 +320,6 @@ void cdicdic_device::play_raw_group(const uint8_t *data)
 
 void cdicdic_device::play_xa_group(const uint8_t coding, const uint8_t *data, const uint16_t idx)
 {
-	static const uint16_t s_4bit_header_offsets[8] = { 4, 5, 6, 7, 12, 13, 14, 15 };
 	static const uint16_t HEADER_OFFSET_4BIT[8] = { 4, 5, 6, 7, 12, 13, 14, 15 };
 	static const uint16_t HEADER_OFFSET_8BIT[4] = { 4, 5, 6, 7 };
 	static const uint16_t DATA_OFFSET_4BIT[8] = { 16, 16, 17, 17, 18, 18, 19, 19 };
