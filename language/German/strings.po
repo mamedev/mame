@@ -1716,18 +1716,23 @@ msgstr " (Standard)"
 msgid "No plugins found"
 msgstr "Keine Erweiterungen gefunden"
 
-#: src/frontend/mame/ui/quitmenu.cpp:37
+#: src/frontend/mame/ui/quitmenu.cpp:24
 #, c-format
-msgid ""
-"Are you sure you want to quit?\n"
-"\n"
-"Press %1$s to quit\n"
-"Press %2$s to return to emulation"
+msgctxt "menu-quit"
+msgid "Are you sure you want to quit?"
+msgstr "Sind Sie sicher, dass Sie die Emulation verlassen wollen?"
+
+#: src/frontend/mame/ui/quitmenu.cpp:35
+#, c-format
+msgctxt "menu-quit"
+msgid "Quit"
 msgstr ""
-"Sind Sie sicher, dass Sie die Emulation verlassen wollen?\n"
-"\n"
-"Zum Beenden drücken Sie %1$s\n"
-"Um zur Emulation zurückzukehren drücken Sie %2$s"
+
+#: src/frontend/mame/ui/quitmenu.cpp:36
+#, c-format
+msgctxt "menu-quit"
+msgid "Return to emulation"
+msgstr ""
 
 #: src/frontend/mame/ui/info_pty.cpp:22
 msgid "Pseudo Terminals"

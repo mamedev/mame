@@ -1702,18 +1702,23 @@ msgstr " (預設)"
 msgid "No plugins found"
 msgstr "未找到外掛"
 
-#: src/frontend/mame/ui/quitmenu.cpp:37
+#: src/frontend/mame/ui/quitmenu.cpp:24
 #, c-format
-msgid ""
-"Are you sure you want to quit?\n"
-"\n"
-"Press %1$s to quit\n"
-"Press %2$s to return to emulation"
+msgctxt "menu-quit"
+msgid "Are you sure you want to quit?"
+msgstr "確定要退出嗎？"
+
+#: src/frontend/mame/ui/quitmenu.cpp:35
+#, c-format
+msgctxt "menu-quit"
+msgid "Quit"
 msgstr ""
-"確定要退出嗎？\n"
-"\n"
-"按 %1$s 退出 \n"
-"按 %2$s 繼續模擬"
+
+#: src/frontend/mame/ui/quitmenu.cpp:36
+#, c-format
+msgctxt "menu-quit"
+msgid "Return to emulation"
+msgstr ""
 
 #: src/frontend/mame/ui/info_pty.cpp:22
 msgid "Pseudo Terminals"

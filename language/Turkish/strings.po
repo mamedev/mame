@@ -1709,18 +1709,23 @@ msgstr " (varsayılan)"
 msgid "No plugins found"
 msgstr "Eklenti bulunamadı"
 
-#: src/frontend/mame/ui/quitmenu.cpp:37
+#: src/frontend/mame/ui/quitmenu.cpp:24
 #, c-format
-msgid ""
-"Are you sure you want to quit?\n"
-"\n"
-"Press %1$s to quit\n"
-"Press %2$s to return to emulation"
+msgctxt "menu-quit"
+msgid "Are you sure you want to quit?"
+msgstr "Çıkmak istediğinize emin misiniz?"
+
+#: src/frontend/mame/ui/quitmenu.cpp:35
+#, c-format
+msgctxt "menu-quit"
+msgid "Quit"
 msgstr ""
-"Çıkmak istediğinize emin misiniz?\n"
-"\n"
-"Çıkmak için %1$s'e basın\n"
-"Dönmek için %2$s'e basın"
+
+#: src/frontend/mame/ui/quitmenu.cpp:36
+#, c-format
+msgctxt "menu-quit"
+msgid "Return to emulation"
+msgstr ""
 
 #: src/frontend/mame/ui/info_pty.cpp:22
 msgid "Pseudo Terminals"
