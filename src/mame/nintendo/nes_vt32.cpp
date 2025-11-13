@@ -542,9 +542,8 @@ CONS( 201?, k10_2l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empt
 
 CONS( 2022, tvkunio1,  0, 0,  nes_vt32_2mb, nes_vt32, nes_vt32_unk_state, empty_init, "Arc System Works", "Kunio-kun TV! Bikkuri Nekketsu Shin Kiroku! Harukanaru Kin Medal (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // yellow unit
 
-// writes 07 to the encryption register, currently unsupported
 CONS( 202?, micac250, 0,        0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Micro Arcade 250-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// writes 07 to the encryption register, currently unsupported
+// title screen shows Finger Pump, box shows Finger Dancing
 CONS( 201?, fingerd,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Orb Gaming", "Finger Dancing", MACHINE_NOT_WORKING )
 
