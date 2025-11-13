@@ -514,7 +514,10 @@ ROM_START( wol260 )
 	ROM_LOAD( "js28f256m29ewh.u1", 0x00000, 0x2000000, CRC(ccb08b50) SHA1(089335c001085cfae94db6ea39e31388674581ed) )
 ROM_END
 
-
+ROM_START( g3_800 )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "g3_800in1.bin", 0x00000, 0x4000000, CRC(df326924) SHA1(38c26ea96fbf3ba80526072d07209f19b04812e9) )
+ROM_END
 
 void nes_vt42xx_state::init_rfcp168()
 {
@@ -587,6 +590,9 @@ CONS( 201?, g5_500,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, ini
 CONS( 201?, g6_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G6 666 in 1 Handheld", MACHINE_NOT_WORKING )
 CONS( 201?, g7_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G7 666 in 1 Handheld", MACHINE_NOT_WORKING )
 CONS( 202?, g9_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// 64Mbytes, must have banking
+CONS( 202?, g3_800,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "G3 800 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // highly scrambled
 CONS( 201?, hhgc319,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_hhgc319, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
