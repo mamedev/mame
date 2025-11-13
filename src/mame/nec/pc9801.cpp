@@ -1450,10 +1450,14 @@ void pc9801_state::set_dma_channel(int channel, int state)
 }
 
 /*
-ch1 cs-4231a
-ch2 FDC
-ch3 SCSI
-*/
+ * ch0 expansion slot or internal SASI/SCSI
+ * ch1 memory refresh on vanilla/VM classes, expansion slot or internal HDD setting otherwise
+ * ch2 1MB FDC
+ * ch3 640KB FDC
+ *
+ * NOTE: PC-H98, PC-98RL & PC-98XL very different and changes configuration
+ * depending on boot mode. cfr. io_dma.txt
+ */
 
 void pc9801_state::dack0_w(int state) { /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
 void pc9801_state::dack1_w(int state) { /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
