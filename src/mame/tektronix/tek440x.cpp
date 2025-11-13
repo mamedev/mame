@@ -1256,6 +1256,9 @@ u8 tek440x_state::videocntl_r()
 	if (m_screen->hblank())
 		ans |= 0x40;
 		
+	// SoundRdy always..
+	ans |= 0x08;
+		
 	return ans;
 }
 
