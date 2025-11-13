@@ -264,8 +264,7 @@ uint8_t m24_keyboard_device::p2_r()
 	// respect to the other, to produce the required "quadrature" encoding,
 	// which lets the MCU determine the direction of movement.
 	return (m_keypress << 7) | m_mousebtn->read() |
-	  ((mx+1) & 2) >> 1 | (mx & 2) |
-	  (my & 2) << 1 | ((my+1) & 2) << 2;
+      BIT(mx+1, 1) | BIT(mx, 1) << 1 | BIT(my, 1) << 2 | BIT(my+1, 1) << 3;
 }
 
 int m24_keyboard_device::t0_r()
