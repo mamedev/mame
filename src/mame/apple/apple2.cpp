@@ -20,6 +20,10 @@ II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB p
     ROM contains original non-autostart Monitor and Integer BASIC; apparently
     Autostart + Integer is also possible.
 
+    To boot a floppy disk from the monitor, assuming the disk controller is in
+    slot 6, input the command 6^P (where ^P stands for control-P).  The monitor
+    command ^B will enter BASIC directly.
+
 II Plus: RAM options reduced to 16/32/48 KB.
     ROM expanded to 12KB from $D000-$FFFF containing Applesoft BASIC and
     the Autostart Monitor.  Applesoft is a licensed version of Microsoft's
