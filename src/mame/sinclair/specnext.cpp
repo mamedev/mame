@@ -2440,6 +2440,7 @@ void specnext_state::nr_14_global_transparent_rgb_w(u8 data)
 {
 	m_nr_14_global_transparent_rgb = data;
 	m_ula_scr->set_global_transparent(data);
+	m_tiles->set_global_transparent(data);
 	m_lores->set_global_transparent(data);
 	m_layer2->set_global_transparent(data);
 }

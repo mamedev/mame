@@ -129,14 +129,14 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 						*(prio + 1) |= pcode;
 					}
 				}
-			}
-			if (off2)
-			{
-				hpos -= 1;
-				pix -= 1;
-				prio -= 1;
-				x2 -= 1;
-				off2 = false;
+				if (off2)
+				{
+					hpos -= 1;
+					pix -= 1;
+					prio -= 1;
+					x2 -= 1;
+					off2 = false;
+				}
 			}
 			x2 %= SCREEN_AREA.width() << 1;
 			if (x2 == 0)
