@@ -152,7 +152,7 @@ void nes_vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
 	}
 	else if (data == 0x00)
 	{
-		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(false);
+		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(0x00);
 	}
 	else if (data == 0xc0)
 	{
@@ -174,7 +174,7 @@ void nes_vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
 
 		*/
 		m_ppu_chr_data_scramble = 1;
-		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(false);
+		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(0x00);
 	}
 }
 
