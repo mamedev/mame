@@ -27,7 +27,6 @@
 #include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd4991a.h"
@@ -45,14 +44,7 @@
 
 #include "video/upd7220.h"
 
-#include "bus/cbus/amd98.h"
-#include "bus/cbus/pc9801_26.h"
-#include "bus/cbus/pc9801_55.h"
-#include "bus/cbus/pc9801_86.h"
-#include "bus/cbus/pc9801_118.h"
-#include "bus/cbus/mpu_pc98.h"
-#include "bus/cbus/pc9801_cbus.h"
-#include "bus/cbus/sb16_ct2720.h"
+#include "bus/pc98_cbus/slot.h"
 
 #include "pc98_cd.h"
 #include "pc98_kbd.h"
@@ -62,12 +54,12 @@
 #include "bus/ata/atadev.h"
 #include "bus/ata/ataintf.h"
 
-#include "debugger.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
+#include "formats/img_dsk.h"
 #include "formats/pc98_dsk.h"
 #include "formats/pc98fdi_dsk.h"
 #include "formats/fdd_dsk.h"
@@ -148,12 +140,11 @@ public:
 		, m_dsw1(*this, "DSW1")
 		, m_dsw2(*this, "DSW2")
 		, m_ppi_mouse(*this, "ppi_mouse")
-		, m_fdc_2hd(*this, "upd765_2hd")
-		, m_fdc_2dd(*this, "upd765_2dd")
-		, m_ram(*this, RAM_TAG)
+		, m_fdc_2hd(*this, "fdc_2hd")
+		, m_fdc_2dd(*this, "fdc_2dd")
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
-		, m_cbus(*this, "cbus%d", 0)
+		, m_cbus_root(*this, "cbus_root")
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
@@ -165,6 +156,8 @@ public:
 	}
 
 	void pc9801(machine_config &config);
+	void pc9801f(machine_config &config);
+	void pc9801m(machine_config &config);
 
 	void init_pc9801_kanji();
 
@@ -181,10 +174,9 @@ protected:
 	// (I/O $90-$93 is a "simplified" version)
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
-	optional_device<ram_device> m_ram;
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
-	required_device_array<pc9801_slot_device, 2> m_cbus;
+	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 private:
@@ -199,7 +191,7 @@ protected:
 	DECLARE_MACHINE_START(pc9801_common);
 	DECLARE_MACHINE_RESET(pc9801_common);
 
-	void config_video(machine_config &config);
+	virtual void config_video(machine_config &config);
 	void config_keyboard(machine_config &config);
 	void pc9801_mouse(machine_config &config);
 	void pc9801_cbus(machine_config &config);
@@ -215,7 +207,6 @@ protected:
 
 	uint8_t pc9801_a0_r(offs_t offset);
 	void pc9801_a0_w(offs_t offset, uint8_t data);
-	uint8_t f0_r(offs_t offset);
 
 	uint8_t m_nmi_ff = 0;
 
@@ -389,6 +380,7 @@ public:
 	{
 	}
 
+	virtual void config_video(machine_config &config) override;
 	void pc9801vm(machine_config &config);
 	void pc9801uv(machine_config &config);
 
@@ -402,10 +394,14 @@ public:
 protected:
 	TIMER_CALLBACK_MEMBER(fdc_trigger);
 
+	void pc9801vm_map(address_map &map) ATTR_COLD;
+	void pc9801vm_io(address_map &map) ATTR_COLD;
+
 	void pc9801rs_io(address_map &map) ATTR_COLD;
 	void pc9801rs_map(address_map &map) ATTR_COLD;
-	void pc9801ux_io(address_map &map) ATTR_COLD;
 	void pc9801ux_map(address_map &map) ATTR_COLD;
+	void pc9801vx_map(address_map &map) ATTR_COLD;
+	void pc9801dx_map(address_map &map) ATTR_COLD;
 
 	uint16_t grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -467,8 +463,6 @@ private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
-
-	uint8_t midi_r();
 
 	// 286-based machines except for PC98XA
 	u8 dma_access_ctrl_r(offs_t offset);
@@ -571,6 +565,7 @@ class pc9801bx_state : public pc9801us_state
 public:
 	pc9801bx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801us_state(mconfig, type, tag)
+		, m_hole_15M_view(*this, "hole_15M_view")
 	{
 	}
 
@@ -583,6 +578,12 @@ protected:
 	DECLARE_MACHINE_START(pc9801bx2);
 	DECLARE_MACHINE_RESET(pc9801bx2);
 
+	virtual void hole_15m_control_w(offs_t offset, u8 data);
+	u8 hole_15m_control_r(offs_t offset);
+
+	u8 m_hole_15m;
+
+	memory_view m_hole_15M_view;
 private:
 	u8 i486_cpu_mode_r(offs_t offset);
 	u8 gdc_31kHz_r(offs_t offset);

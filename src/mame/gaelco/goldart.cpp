@@ -43,7 +43,7 @@
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/ds5002fp.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
@@ -331,7 +331,7 @@ void goldart_state::goldart(machine_config &config)
 	// basic machine hardware
 	ds5002fp_device &maincpu(DS5002FP(config, "maincpu", 32_MHz_XTAL / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &goldart_state::main_prgmap);
-	maincpu.set_addrmap(AS_IO, &goldart_state::main_datamap);
+	maincpu.set_addrmap(AS_DATA, &goldart_state::main_datamap);
 	maincpu.set_vblank_int("screen", FUNC(goldart_state::irq0_line_hold));
 	// only uses port 1?
 	maincpu.port_out_cb<1>().set(FUNC(goldart_state::port1_w));

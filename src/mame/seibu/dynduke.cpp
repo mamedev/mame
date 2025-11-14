@@ -65,6 +65,8 @@
 
 #include "emu.h"
 
+#include "sei80bu.h"
+
 #include "seibusound.h"
 
 #include "cpu/nec/nec.h"
@@ -638,7 +640,7 @@ void dynduke_state::dynduke(machine_config &config)
 	audiocpu.set_addrmap(AS_OPCODES, &dynduke_state::sound_decrypted_opcodes_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
+	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 14.318181_MHz_XTAL / 4));
 	sei80bu.set_addrmap(AS_PROGRAM, &dynduke_state::sei80bu_encrypted_full_map);
 
 	config.set_maximum_quantum(attotime::from_hz(3600));

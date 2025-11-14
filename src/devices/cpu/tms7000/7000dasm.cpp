@@ -361,7 +361,6 @@ offs_t tms7000_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 {
 	int opcode, i/*, size = 1*/;
 	offs_t pos = pc;
-	char tmpbuf[32];
 
 	opcode = opcodes.r8(pos++);
 
@@ -399,28 +398,23 @@ offs_t tms7000_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 						util::stream_format(stream, of[j].opstr[k], (int8_t)b);
 						break;
 					case UI16:
-						c = (uint16_t)params.r8(pos++);
-						c <<= 8;
-						c += params.r8(pos++);
+						c = (uint16_t)params.r16(pos);
+						pos += 2;
 						util::stream_format(stream, of[j].opstr[k], (unsigned int)c);
 						break;
 					case I16:
-						d = (int16_t)params.r8(pos++);
-						d <<= 8;
-						d += params.r8(pos++);
+						d = (int16_t)params.r16(pos);
+						pos += 2;
 						util::stream_format(stream, of[j].opstr[k], (signed int)d);
 						break;
 					case PCREL:
 						b = (int8_t)params.r8(pos++);
-						sprintf(tmpbuf, "$%04X", pc+2+k+b);
-						util::stream_format(stream, of[j].opstr[k], tmpbuf);
+						util::stream_format(stream, of[j].opstr[k], util::string_format(">%04X", pc+2+k+b));
 						break;
 					case PCABS:
-						c = (uint16_t)params.r8(pos++);
-						c <<= 8;
-						c += params.r8(pos++);
-						sprintf(tmpbuf, "$%04X", c);
-						util::stream_format(stream, of[j].opstr[k], tmpbuf);
+						c = (uint16_t)params.r16(pos);
+						pos += 2;
+						util::stream_format(stream, of[j].opstr[k], util::string_format(">%04X", c));
 						break;
 					case TRAP:
 						vector = 0xffff - ((0xff - opcode) * 2);

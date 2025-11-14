@@ -39,7 +39,7 @@ Namco System 86 Video Hardware
 
 void namcos86_state::namcos86_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	u8 const *color_prom = memregion("proms")->base();
 	static constexpr int resistances[4] = { 2200, 1000, 470, 220 };
 
 	// compute the color output resistor weights
@@ -122,7 +122,6 @@ void namcos86_state::video_start()
 {
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_backcolor));
-	save_item(NAME(m_copy_sprites));
 }
 
 
@@ -132,9 +131,9 @@ void namcos86_state::video_start()
 
 ***************************************************************************/
 
-void namcos86_state::tilebank_select_w(offs_t offset, uint8_t data)
+void namcos86_state::tilebank_select_w(offs_t offset, u8 data)
 {
-	uint32_t const bit = BIT(offset, 10);
+	u32 const bit = BIT(offset, 10);
 	if (m_tilebank != bit)
 	{
 		m_tilebank = bit;
@@ -142,19 +141,9 @@ void namcos86_state::tilebank_select_w(offs_t offset, uint8_t data)
 	}
 }
 
-void namcos86_state::backcolor_w(uint8_t data)
+void namcos86_state::backcolor_w(u8 data)
 {
 	m_backcolor = data;
-}
-
-
-void namcos86_state::spriteram_w(offs_t offset, uint8_t data)
-{
-	m_spriteram[offset] = data;
-
-	// a write to this offset tells the sprite chip to buffer the sprite list
-	if (offset == 0x1ff2)
-		m_copy_sprites = true;
 }
 
 
@@ -164,92 +153,21 @@ void namcos86_state::spriteram_w(offs_t offset, uint8_t data)
 
 ***************************************************************************/
 
-/*
-sprite format:
-
-0-3  scratchpad RAM
-4-9  CPU writes here, hardware copies from here to 10-15
-10   xx------  X size (16, 8, 32, 4)
-10   --x-----  X flip
-10   ---xx---  X offset inside 32x32 tile
-10   -----xxx  tile bank
-11   xxxxxxxx  tile number
-12   xxxxxxx-  color
-12   -------x  X position MSB
-13   xxxxxxxx  X position
-14   xxx-----  priority
-14   ---xx---  Y offset inside 32x32 tile
-14   -----xx-  Y size (16, 8, 32, 4)
-14   -------x  Y flip
-15   xxxxxxxx  Y position
-*/
-
-void namcos86_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 namcos86_state::sprite_pri_cb(u8 attr1, u8 attr2)
 {
-	const uint8_t *source = &m_spriteram[0x2000-0x20]; // the last is NOT a sprite
-	const uint8_t *finish = &m_spriteram[0x1800];
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-
-	int const sprite_xoffs = m_spriteram[0x1ff5] + ((m_spriteram[0x1ff4] & 1) << 8);
-	int const sprite_yoffs = m_spriteram[0x1ff7];
-
-	int const bank_sprites = m_gfxdecode->gfx(0)->elements() / 8;
-
-	static const int sprite_size[4] = { 16, 8, 32, 4 };
-
-	while (source >= finish)
-	{
-		int const attr1 = source[10];
-		int const attr2 = source[14];
-		int color = source[12];
-		bool flipx = BIT(attr1, 5);
-		bool flipy = BIT(attr2, 0);
-		int const sizex = sprite_size[(attr1 & 0xc0) >> 6];
-		int const sizey = sprite_size[(attr2 & 0x06) >> 1];
-		int const tx = (attr1 & 0x18) & (~(sizex - 1));
-		int const ty = (attr2 & 0x18) & (~(sizey - 1));
-		int sx = source[13] + ((color & 0x01) << 8);
-		int sy = -source[15] - sizey;
-		int sprite = source[11];
-		int const sprite_bank = attr1 & 7;
-		int const priority = (source[14] & 0xe0) >> 5;
-		uint32_t const pri_mask = (0xff << (priority + 1)) & 0xff;
-
-		sprite &= bank_sprites - 1;
-		sprite += sprite_bank * bank_sprites;
-		color = color >> 1;
-
-		sx += sprite_xoffs;
-		sy -= sprite_yoffs;
-
-		if (flip_screen())
-		{
-			sx = -sx - sizex;
-			sy = -sy - sizey;
-			flipx = !flipx;
-			flipy = !flipy;
-		}
-
-		sy++;   // sprites are buffered and delayed by one scanline
-
-		gfx->set_source_clip(tx, sizex, ty, sizey);
-		gfx->prio_transpen(bitmap, cliprect,
-				sprite,
-				color,
-				flipx, flipy,
-				sx & 0x1ff,
-				((sy + 16) & 0xff) - 16,
-				screen.priority(), pri_mask, 0xf);
-
-		source -= 0x10;
-	}
+	int const priority = (attr2 & 0xe0) >> 5;
+	return (0xff << (priority + 1)) & 0xff;
 }
 
-
-uint32_t namcos86_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 namcos86_state::sprite_bank_cb(u32 code, u32 bank)
 {
-	// flip screen is embedded in the sprite control registers
-	flip_screen_set(BIT(m_spriteram[0x1ff6], 0));
+	int const bank_sprites = m_spritegen->gfx(0)->elements() / 8;
+	code &= bank_sprites - 1;
+	return code + (bank * bank_sprites);
+}
+
+u32 namcos86_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
 	m_tilegen[0]->init_scroll(flip_screen());
 	m_tilegen[1]->init_scroll(flip_screen());
 
@@ -266,7 +184,7 @@ uint32_t namcos86_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 	}
 
-	draw_sprites(screen,bitmap,cliprect);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -276,15 +194,6 @@ void namcos86_state::screen_vblank(int state)
 	// rising edge
 	if (state)
 	{
-		if (m_copy_sprites)
-		{
-			for (int i = 0x1800; i < 0x2000; i += 16)
-			{
-				for (int j = 10; j < 16; j++)
-					m_spriteram[i + j] = m_spriteram[i + j - 6];
-			}
-
-			m_copy_sprites = false;
-		}
+		m_spritegen->copy_sprites();
 	}
 }

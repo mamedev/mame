@@ -48,7 +48,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/ins8250.h"
 #include "speaker.h"
 
@@ -77,7 +77,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 
-	void mem_io(address_map &map) ATTR_COLD;
+	void mem_data(address_map &map) ATTR_COLD;
 	void mem_prg(address_map &map) ATTR_COLD;
 
 	// i80188
@@ -161,7 +161,7 @@ void megaturbo2_state::mem_prg(address_map &map)
 	map(0x0000, 0xffff).rom().region("mcu", 0);
 }
 
-void megaturbo2_state::mem_io(address_map &map)
+void megaturbo2_state::mem_data(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0xa000, 0xa007).rw("uart", FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
@@ -249,7 +249,7 @@ void megaturbo2_state::megaturbo2(machine_config &config)
 
 	I8031(config, m_mcu, MCU_CLOCK);
 	m_mcu->set_addrmap(AS_PROGRAM, &megaturbo2_state::mem_prg);
-	m_mcu->set_addrmap(AS_IO, &megaturbo2_state::mem_io);
+	m_mcu->set_addrmap(AS_DATA, &megaturbo2_state::mem_data);
 
 	ns16450_device &uart(NS16450(config, "uart", 10_MHz_XTAL / 8));
 	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));

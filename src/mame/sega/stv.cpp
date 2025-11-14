@@ -81,7 +81,7 @@ offsets:
     0x001f PORT-AD (8ch, write: bits 0-2 - set channel, read: channel data with autoinc channel number)
 */
 
-uint8_t stv_state::stv_ioga_r(offs_t offset)
+uint8_t stv_state::ioga_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -117,7 +117,7 @@ uint8_t stv_state::stv_ioga_r(offs_t offset)
 	return res;
 }
 
-void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
+void stv_state::ioga_w(offs_t offset, uint8_t data)
 {
 	if(offset & 0x10 && !machine().side_effects_disabled())
 		logerror("Writing to mirror %08x %02x?\n",offset * 2 + 1,data);
@@ -165,7 +165,7 @@ uint8_t stv_state::critcrsh_ioga_r(offs_t offset)
 			res |= (ioport("PORTC")->read() & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
 			break;
 		default:
-			res = stv_ioga_r(offset);
+			res = ioga_r(offset);
 			break;
 	}
 
@@ -182,7 +182,7 @@ void stv_state::critcrsh_ioga_w(offs_t offset, uint8_t data)
 			m_cc_digits[1] = bcd2hex[data & 0x0f];
 			break;
 		default:
-			stv_ioga_w(offset, data);
+			ioga_w(offset, data);
 			break;
 	}
 }
@@ -203,7 +203,7 @@ uint8_t stv_state::magzun_ioga_r(offs_t offset)
 		case 0x19:
 			res = 0;
 			break;
-		default: res = stv_ioga_r(offset); break;
+		default: res = ioga_r(offset); break;
 	}
 
 	return res;
@@ -215,7 +215,7 @@ void stv_state::magzun_ioga_w(offs_t offset, uint8_t data)
 	{
 		case 0x13: m_serial_tx = (data << 8) | (m_serial_tx & 0xff); break;
 		case 0x15: m_serial_tx = (data & 0xff) | (m_serial_tx & 0xff00); break;
-		default: stv_ioga_w(offset,data); break;
+		default: ioga_w(offset,data); break;
 	}
 }
 
@@ -229,7 +229,7 @@ uint8_t stv_state::stvmp_ioga_r(offs_t offset)
 		case 0x03:
 			if(m_port_sel & 0x10) // joystick select <<< this is obviously wrong, this bit only selects PORTE direction
 			{
-				res = stv_ioga_r(offset);
+				res = ioga_r(offset);
 			}
 			else // mahjong panel select
 			{
@@ -240,7 +240,7 @@ uint8_t stv_state::stvmp_ioga_r(offs_t offset)
 				}
 			}
 			break;
-		default: res = stv_ioga_r(offset); break;
+		default: res = ioga_r(offset); break;
 	}
 
 	return res;
@@ -252,7 +252,7 @@ void stv_state::stvmp_ioga_w(offs_t offset, uint8_t data)
 	{
 		case 0x09: m_mux_data = data ^ 0xff; break;
 		case 0x11: m_port_sel = data; break;
-		default:   stv_ioga_w(offset,data); break;
+		default:   ioga_w(offset,data); break;
 	}
 }
 
@@ -260,7 +260,7 @@ void stv_state::hop_ioga_w(offs_t offset, uint8_t data)
 {
 	if ((offset * 2 + 1) == 7)
 		m_hopper->motor_w(data & 0x80);
-	stv_ioga_w(offset, data);
+	ioga_w(offset, data);
 }
 
 
@@ -979,22 +979,22 @@ void stv_state::stv_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().mirror(0x20000000).region("bios", 0); // bios
 	map(0x00100000, 0x0010007f).rw(m_smpc_hle, FUNC(smpc_hle_device::read), FUNC(smpc_hle_device::write));
-	map(0x00180000, 0x0018ffff).rw(FUNC(stv_state::saturn_backupram_r), FUNC(stv_state::saturn_backupram_w)).share("share1");
+	map(0x00180000, 0x0018ffff).rw(FUNC(stv_state::backupram_r), FUNC(stv_state::backupram_w)).share("share1");
 	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
-	map(0x00400000, 0x0040003f).rw(FUNC(stv_state::stv_ioga_r), FUNC(stv_state::stv_ioga_w)).umask32(0x00ff00ff);
+	map(0x00400000, 0x0040003f).rw(FUNC(stv_state::ioga_r), FUNC(stv_state::ioga_w)).umask32(0x00ff00ff);
 	map(0x01000000, 0x017fffff).w(FUNC(stv_state::minit_w));
 	map(0x01800000, 0x01ffffff).w(FUNC(stv_state::sinit_w));
 	map(0x02000000, 0x04ffffff).rom().mirror(0x20000000).region("abus", 0); // cartridge
 	/* Sound */
-	map(0x05a00000, 0x05afffff).rw(FUNC(stv_state::saturn_soundram_r), FUNC(stv_state::saturn_soundram_w));
+	map(0x05a00000, 0x05afffff).rw(FUNC(stv_state::soundram_r), FUNC(stv_state::soundram_w));
 	map(0x05b00000, 0x05b00fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
 	/* VDP1 */
-	map(0x05c00000, 0x05c7ffff).rw(FUNC(stv_state::saturn_vdp1_vram_r), FUNC(stv_state::saturn_vdp1_vram_w));
-	map(0x05c80000, 0x05cbffff).rw(FUNC(stv_state::saturn_vdp1_framebuffer0_r), FUNC(stv_state::saturn_vdp1_framebuffer0_w));
-	map(0x05d00000, 0x05d0001f).rw(FUNC(stv_state::saturn_vdp1_regs_r), FUNC(stv_state::saturn_vdp1_regs_w));
-	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(stv_state::saturn_vdp2_vram_r), FUNC(stv_state::saturn_vdp2_vram_w));
-	map(0x05f00000, 0x05f7ffff).rw(FUNC(stv_state::saturn_vdp2_cram_r), FUNC(stv_state::saturn_vdp2_cram_w));
-	map(0x05f80000, 0x05fbffff).rw(FUNC(stv_state::saturn_vdp2_regs_r), FUNC(stv_state::saturn_vdp2_regs_w));
+	map(0x05c00000, 0x05c7ffff).rw(FUNC(stv_state::vdp1_vram_r), FUNC(stv_state::vdp1_vram_w));
+	map(0x05c80000, 0x05cbffff).rw(FUNC(stv_state::vdp1_framebuffer0_r), FUNC(stv_state::vdp1_framebuffer0_w));
+	map(0x05d00000, 0x05d0001f).rw(FUNC(stv_state::vdp1_regs_r), FUNC(stv_state::vdp1_regs_w));
+	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(stv_state::vdp2_vram_r), FUNC(stv_state::vdp2_vram_w));
+	map(0x05f00000, 0x05f7ffff).rw(FUNC(stv_state::vdp2_cram_r), FUNC(stv_state::vdp2_cram_w));
+	map(0x05f80000, 0x05fbffff).rw(FUNC(stv_state::vdp2_regs_r), FUNC(stv_state::vdp2_regs_w));
 	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //rw(FUNC(stv_state::saturn_scu_r), FUNC(stv_state::saturn_scu_w));
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
 	map(0x60000000, 0x600003ff).nopw();
@@ -1022,7 +1022,7 @@ void stv_state::stvmp_mem(address_map &map)
 void stv_state::hopper_mem(address_map &map)
 {
 	stv_mem(map);
-	map(0x00400000, 0x0040003f).rw(FUNC(stv_state::stv_ioga_r), FUNC(stv_state::hop_ioga_w)).umask32(0x00ff00ff);
+	map(0x00400000, 0x0040003f).rw(FUNC(stv_state::ioga_r), FUNC(stv_state::hop_ioga_w)).umask32(0x00ff00ff);
 }
 
 void stv_state::stvcd_mem(address_map &map)
@@ -1136,12 +1136,12 @@ void stv_state::stv(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 352, 263, 0, 224);
-	m_screen->set_screen_update(FUNC(stv_state::screen_update_stv_vdp2));
+	m_screen->set_screen_update(FUNC(stv_state::screen_update_vdp2));
 	PALETTE(config, m_palette).set_entries(2048+(2048*2)); //standard palette + extra memory for rgb brightness.
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
 
-	MCFG_VIDEO_START_OVERRIDE(stv_state,stv_vdp2)
+	MCFG_VIDEO_START_OVERRIDE(stv_state,vdp2_video_start)
 
 	SPEAKER(config, "speaker", 2).front();
 

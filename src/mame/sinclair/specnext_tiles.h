@@ -33,7 +33,7 @@ public:
 	void clip_y1_w(u8 clip_y1) { m_clip_y1 = clip_y1; }
 	void clip_y2_w(u8 clip_y2) { m_clip_y2 = clip_y2; }
 
-	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode = 0xff);
+	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode = 0xff, u8 priority_mask = 0xff);
 
 protected:
 	static constexpr u8 OVER_BORDER = 32;

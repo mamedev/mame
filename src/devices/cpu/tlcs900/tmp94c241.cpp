@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR,Felipe Sanches
+// copyright-holders:AJR, Felipe Sanches
 /****************************************************************************
 
     Toshiba TMP94C241 microcontroller

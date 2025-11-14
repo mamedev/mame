@@ -104,7 +104,7 @@ super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/pic16x8x/pic16x8x.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
@@ -228,7 +228,7 @@ private:
 	uint16_t m_input_matrix = 0;
 	//uint16_t m_prot_data = 0;
 
-	void mcu_io(address_map &map) ATTR_COLD;
+	void mcu_data(address_map &map) ATTR_COLD;
 	void rbmk_mem(address_map &map) ATTR_COLD;
 	void rbspm_mem(address_map &map) ATTR_COLD;
 	void ssanguoj_mem(address_map &map) ATTR_COLD;
@@ -240,9 +240,9 @@ private:
 	void input_matrix_w(uint16_t data);
 	void tilebank_w(uint16_t data);
 	void reels_toggle_w(uint16_t data);
-	uint8_t mcu_io_r(offs_t offset);
-	void mcu_io_w(offs_t offset, uint8_t data);
-	void mcu_io_mux_w(uint8_t data);
+	uint8_t mcu_data_r(offs_t offset);
+	void mcu_data_w(offs_t offset, uint8_t data);
+	void mcu_data_mux_w(uint8_t data);
 	uint16_t eeprom_r();
 	void eeprom_w(uint16_t data);
 	void hgly_eeprom_w(uint16_t data);
@@ -638,7 +638,7 @@ void gms_2layers_state::smatch03_mem(address_map &map)
 }
 
 
-uint8_t gms_2layers_state::mcu_io_r(offs_t offset)
+uint8_t gms_2layers_state::mcu_data_r(offs_t offset)
 {
 	if (m_mux_data & 8)
 	{
@@ -656,7 +656,7 @@ uint8_t gms_2layers_state::mcu_io_r(offs_t offset)
 	return 0xff;
 }
 
-void gms_2layers_state::mcu_io_w(offs_t offset, uint8_t data)
+void gms_2layers_state::mcu_data_w(offs_t offset, uint8_t data)
 {
 	if (m_mux_data & 8) { m_ymsnd->write(offset & 1, data); }
 	else if (m_mux_data & 4)
@@ -668,14 +668,14 @@ void gms_2layers_state::mcu_io_w(offs_t offset, uint8_t data)
 		printf("Warning: mux data W = %02x", m_mux_data);
 }
 
-void gms_2layers_state::mcu_io_mux_w(uint8_t data)
+void gms_2layers_state::mcu_data_mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
 }
 
-void gms_2layers_state::mcu_io(address_map &map)
+void gms_2layers_state::mcu_data(address_map &map)
 {
-	map(0x0ff00, 0x0ffff).rw(FUNC(gms_2layers_state::mcu_io_r), FUNC(gms_2layers_state::mcu_io_w));
+	map(0x0ff00, 0x0ffff).rw(FUNC(gms_2layers_state::mcu_data_r), FUNC(gms_2layers_state::mcu_data_w));
 }
 
 
@@ -2735,8 +2735,8 @@ void gms_2layers_state::rbmk(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gms_2layers_state::irq1_line_hold));
 
 	AT89C4051(config, m_mcu, 22_MHz_XTAL / 4); // frequency isn't right
-	m_mcu->set_addrmap(AS_IO, &gms_2layers_state::mcu_io);
-	m_mcu->port_out_cb<3>().set(FUNC(gms_2layers_state::mcu_io_mux_w));
+	m_mcu->set_addrmap(AS_DATA, &gms_2layers_state::mcu_data);
+	m_mcu->port_out_cb<3>().set(FUNC(gms_2layers_state::mcu_data_mux_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbmk);
 

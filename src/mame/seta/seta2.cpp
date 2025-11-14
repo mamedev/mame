@@ -97,7 +97,6 @@ blnctry:
 #include "seta2.h"
 
 #include "cpu/m68000/mcf5206e.h"
-#include "machine/mcf5206e.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
@@ -786,9 +785,9 @@ void funcube_touchscreen_device::tra_callback()
 
 // Main CPU
 
-uint32_t funcube_state::debug_r()
+uint16_t funcube_state::debug_r()
 {
-	uint32_t ret = m_in_debug->read();
+	uint16_t ret = m_in_debug->read();
 
 	// This bits let you move the crosshair in the inputs / touch panel test with a joystick
 	if (!(m_screen->frame_number() % 3))
@@ -802,20 +801,17 @@ void funcube_state::funcube_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00400000, 0x00400003).r(FUNC(funcube_state::debug_r));
-	map(0x00400004, 0x00400007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
+	map(0x00400002, 0x00400003).r(FUNC(funcube_state::debug_r));
+	map(0x00400006, 0x00400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).nopw();
 
 	map(0x00500001, 0x00500001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
 	map(0x00500003, 0x00500003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
 
 	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w));
-	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");  // Palette
+	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
 	map(0x00860000, 0x0086003f).rw(FUNC(funcube_state::vregs_r), FUNC(funcube_state::vregs_w));
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask32(0x00ff00ff);
-
-	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
-	map(0xffffe000, 0xffffffff).ram();    // SRAM
 }
 
 void funcube_state::funcube2_map(address_map &map)
@@ -823,7 +819,7 @@ void funcube_state::funcube2_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00500000, 0x00500003).r(FUNC(funcube_state::debug_r));
+	map(0x00500002, 0x00500003).r(FUNC(funcube_state::debug_r));
 	map(0x00500004, 0x00500007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
 
 	map(0x00600001, 0x00600001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
@@ -835,7 +831,7 @@ void funcube_state::funcube2_map(address_map &map)
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask32(0x00ff00ff);
 
-	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
+//	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
 }
 
@@ -2433,17 +2429,6 @@ void seta2_state::telpacfl(machine_config &config)
                                Funcube series
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(funcube_state::funcube_interrupt)
-{
-	int scanline = param;
-
-	if (scanline == 368)
-		m_maincpu->set_input_line(1, HOLD_LINE);
-
-	if (scanline == 0)
-		m_maincpu->set_input_line(2, HOLD_LINE);
-}
-
 void funcube_state::machine_start()
 {
 	seta2_state::machine_start();
@@ -2462,11 +2447,12 @@ void funcube_state::machine_reset()
 	m_funcube_leds = 0;
 }
 
+// original on EVA board, no Coldfire
 void funcube_state::funcube(machine_config &config)
 {
-	MCF5206E(config, m_maincpu, XTAL(25'447'000));
+	// TODO: check exact type and clock
+	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(funcube_state::funcube_interrupt), "screen", 0, 1);
 
 	H83007(config, m_sub, FUNCUBE_SUB_CPU_CLOCK);
 	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
@@ -2475,8 +2461,6 @@ void funcube_state::funcube(machine_config &config)
 	m_sub->read_porta().set(FUNC(funcube_state::outputs_r));
 	m_sub->write_porta().set(FUNC(funcube_state::outputs_w));
 	m_sub->write_portb().set(FUNC(funcube_state::leds_w));
-
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
@@ -2492,6 +2476,7 @@ void funcube_state::funcube(machine_config &config)
 	m_screen->set_visarea(0x0+1, 0x140-1+1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(funcube_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(funcube_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
@@ -2509,12 +2494,16 @@ void funcube_state::funcube(machine_config &config)
 void funcube_state::funcube2(machine_config &config)
 {
 	funcube(config);
+	MCF5206E(config.replace(), m_maincpu, XTAL(25'447'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube2_map);
+	downcast<mcf5206e_device &>(*m_maincpu).gpio_r_cb().set_ioport("BATTERY");
 
 	m_sub->read_port4().set([]() -> u8 { return 0; }); // unused
 
 	// video hardware
 	m_screen->set_visarea(0x0, 0x140-1, 0x00, 0xf0-1);
+	m_screen->screen_vblank().set(FUNC(funcube_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 1);
 }
 
 
@@ -2750,9 +2739,11 @@ ROM_END
 
 void funcube_state::init_funcube()
 {
-	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
+//	uint16_t *main_cpu = (uint16_t *) memregion("maincpu")->base();
+//
+//	main_cpu[0x064/2] = 0x0000;
+//	main_cpu[0x066/2] = 0x042a; // PIC protection?
 
-	main_cpu[0x064/4] = 0x0000042a; // PIC protection?
 }
 
 void funcube_state::init_funcube2()

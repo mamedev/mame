@@ -17,7 +17,7 @@ TODO: figure out keycodes (are they translated externally?)
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -158,7 +158,7 @@ void sk101bl_state::sk101bl(machine_config &config)
 {
 	I80C31(config, m_maincpu, 11.0592_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sk101bl_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &sk101bl_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &sk101bl_state::ext_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(sk101bl_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(sk101bl_state::p1_w));
 	m_maincpu->port_out_cb<3>().set("alarm", FUNC(speaker_sound_device::level_w)).bit(3);

@@ -9,7 +9,7 @@
 #include "rtpc_kbdc.h"
 
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"

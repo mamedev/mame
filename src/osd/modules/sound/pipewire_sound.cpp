@@ -576,6 +576,9 @@ osd::audio_info sound_pipewire::get_information()
 	result.m_generation = m_generation;
 	uint32_t node = 0;
 	for(auto &inode : m_nodes) {
+		if(inode.second.m_sinks == 0 && inode.second.m_sources == 0)
+			continue;
+
 		result.m_nodes[node].m_name = inode.second.m_name;
 		result.m_nodes[node].m_display_name = inode.second.m_name;
 		result.m_nodes[node].m_id = inode.second.m_osdid;

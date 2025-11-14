@@ -118,7 +118,7 @@ VIDEO_START_MEMBER(nmk16_state, bioship)
 	m_tx_tilemap->set_scrolldx(92, 92);
 }
 
-VIDEO_START_MEMBER(nmk16_state,macross)
+VIDEO_START_MEMBER(nmk16_state,manybloc)
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&nmk16_state::common_get_bg_tile_info<0, 1>))), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
 	m_bg_tilemap[1] = nullptr;
@@ -127,6 +127,12 @@ VIDEO_START_MEMBER(nmk16_state,macross)
 	m_tx_tilemap->set_transparent_pen(15);
 
 	video_init();
+	// no tilemap offset in this hardware? need to verification
+}
+
+VIDEO_START_MEMBER(nmk16_state,macross)
+{
+	VIDEO_START_CALL_MEMBER(manybloc);
 	m_bg_tilemap[0]->set_scrolldx(92, 92);
 	m_tx_tilemap->set_scrolldx(92, 92);
 }

@@ -40,7 +40,7 @@ protected:
 	// device_a2bus_card_interface overrides
 	virtual u8 read_c0nx(u8 offset) override;
 	virtual void write_c0nx(u8 offset, u8 data) override;
-	virtual bool take_c800() override { return false; }
+	virtual void reset_from_bus() override;
 
 private:
 	// object finders
@@ -69,6 +69,11 @@ u8 a2bus_noisemaker_device::read_c0nx(u8 offset)
 void a2bus_noisemaker_device::write_c0nx(u8 offset, u8 data)
 {
 	m_psg->address_data_w(offset & 1, data);
+}
+
+void a2bus_noisemaker_device::reset_from_bus()
+{
+	m_psg->reset();
 }
 
 void a2bus_noisemaker_device::device_add_mconfig(machine_config &config)

@@ -240,11 +240,6 @@ Are the following undumped or mistranslated (check also if available in TOSEC)?
  - Blue Blood disks (at least Vol. 1-6 and CG set Vol. 1 according to gradiusm)
  - S.F.3.D Original Operation V by Cross Media Soft
 
-Not included:
- - ミラーズ (19901210) by Studio Wing, uses CDROM (>PC8801MC)
- - DIOS CD-ROM版 (19900308) by Zain Soft, uses CDROM [is it ripped?]
- - CDたから箱 (198912xx) by NEC, uses CDROM (>PC8801MC) [is it ripped?]
-
 To investigate:
  - 銀河英雄伝説2DXキット (199105xx) by Bothtec: this is only the DX kit, while
    銀河英雄伝説2DXセット below I guess is the set containing both the game and the kit...
@@ -10535,6 +10530,9 @@ Not extensively tested
 		<description>Dragon Slayer - Eiyuu Densetsu</description>
 		<year>1989</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Uses [redbook] audio CD on PC-8801MC
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説"/>
@@ -23532,43 +23530,6 @@ Should be supported by [PC8001mkIISR] too
 			<feature name="part_id" value="User" />
 			<dataarea name="flop" size="348848">
 				<rom name="mirai (a) (user).d88" size="348848" crc="c48a30ff" sha1="a617d9ffd52c74bf2455af5f63659262a76dd00a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- TODO: consider moving to pc8801_cdrom.xml -->
-	<software name="mirrors" supported="no">
-		<description>Mirrors</description>
-		<year>1990</year>
-		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
-		<notes><![CDATA[
-No CD-Rom support
-FDC stalls [Tries to match CHRN=(00 00 0x 01) with existing N=03, 2DD image?]
-]]></notes>
-		<info name="release" value="19901210"/>
-		<info name="alt_title" value="ミラーズ"/>
-		<info name="usage" value="Works on PC8801MC only (needs CD-ROM support) or in MA+ with specific EXP i/f"/>
-		<!--combined image-->
-		<!--rom name="mirrors.d88" size="1250128" crc="6534e06f" sha1="d704a29480c476b50638e7c7ac28fcd5f91fa376"/-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Save" />
-			<dataarea name="flop" size="416688">
-				<rom name="mirrors_01.d88" size="416688" crc="17934f60" sha1="4379da035a8c4d5b0bf503151e401f72b061ff59"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Game" />
-			<dataarea name="flop" size="416752">
-				<rom name="mirrors_02.d88" size="416752" crc="7268e16b" sha1="e5507ca27a6f23b79dee92f900c2320d3c1d9f94"/>
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Main" />
-			<dataarea name="flop" size="416688">
-				<rom name="mirrors_03.d88" size="416688" crc="4dbe9a3e" sha1="0fff6446fd85c5826ee1d40942d185d71e676f92"/>
 			</dataarea>
 		</part>
 	</software>

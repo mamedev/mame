@@ -54,12 +54,17 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual uint8_t dack_r(int line) override;
+	virtual void dack_w(int line, uint8_t data) override;
+	virtual void eop_w(int state) override;
+	void update_dreq_mapping(int dreq, int logical);
+
 private:
 	const address_space_config m_space_config;
 
-	required_device<n82077aa_device> m_pc_fdc;
-	required_device_array<ns16550_device, 2> m_pc_com;
-	required_device<pc_lpt_device> m_pc_lpt;
+	required_device<n82077aa_device> m_fdc;
+	required_device_array<ns16550_device, 2> m_com;
+	required_device<pc_lpt_device> m_lpt;
 	memory_view m_logical_view;
 
 	devcb_write_line m_irq1_callback;
@@ -75,6 +80,8 @@ private:
 	u8 m_index = 0;
 	u8 m_logical_index = 0;
 	bool m_activate[9]{};
+	int m_dreq_mapping[4];
+	int m_last_dma_line;
 
 	u8 m_lock_sequence_index = 0;
 
@@ -90,24 +97,25 @@ private:
 	void request_irq(int irq, int state);
 	void request_dma(int dreq, int state);
 
-	u8 m_pc_fdc_irq_line = 6;
-	u8 m_pc_fdc_drq_line = 2;
-//  u8 m_pc_fdc_mode;
-	u16 m_pc_fdc_address = 0x3f0;
+	u8 m_fdc_irq_line = 6;
+	u8 m_fdc_drq_line = 2;
+//  u8 m_fdc_mode;
+	u16 m_fdc_address = 0x3f0;
+	u8 m_fdc_f0, m_fdc_f1;
 
 	void irq_floppy_w(int state);
 	void drq_floppy_w(int state);
 
-	u8 m_pc_lpt_irq_line = 7;
-	u8 m_pc_lpt_drq_line = 4;
-//  u8 m_pc_lpt_mode;
-	u16 m_pc_lpt_address = 0x378;
+	u8 m_lpt_irq_line = 7;
+	u8 m_lpt_drq_line = 4;
+//  u8 m_lpt_mode;
+	u16 m_lpt_address = 0x378;
 
 	void irq_parallel_w(int state);
 
-	u16 m_pc_com_address[2]{};
-	u8 m_pc_com_irq_line[2]{};
-	u8 m_pc_com_control[2]{};
+	u16 m_com_address[2]{};
+	u8 m_com_irq_line[2]{};
+	u8 m_com_control[2]{};
 
 	void irq_serial1_w(int state);
 	void txd_serial1_w(int state);

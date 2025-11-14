@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="sd1_flop" description="Ensoniq SD-1 Disk Images">
+
+<software name="os3" supported="yes">
+	<description>SD-1 Sequencer OS version 3.0</description>
+	<year>1990</year>
+	<publisher>Ensoniq</publisher>
+
+	<part name="flop" interface="floppy_3_5">
+		<dataarea name="flop" size="819200">
+			<rom name="SD1_OS_3.img" size="819200" crc="c745d33b" sha1="5616fada3e834c6f153e23ff30675f7113b8bed4" />
+		</dataarea>
+	</part>
+
+</software>
+
+</softwarelist>

@@ -3,7 +3,7 @@
 // thanks-to:Michael Strutts, Marco Cassili
 /***************************************************************************
 
-  video.c
+  8080bw_v.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -40,6 +40,45 @@ void rollingc_state::rollingc_palette(palette_device &palette) const
 	palette.set_pen_color(0x06, 0xff, 0x80, 0x00); // orange
 }
 
+void cosmo_state::palette_init(palette_device &palette) const
+{
+	// character palette is 1bpp
+	for (int i = 0; i < 8; i++)
+	{
+		palette.set_pen_color(i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+	}
+
+	uint8_t starmap[4];
+
+	// Stars need 64 entries (2 bits per colour)
+	starmap[0] = 0;
+	starmap[1] = 80;
+	starmap[2] = 80;
+	starmap[3] = 255;
+
+	uint8_t bit0, bit1, r, g, b;
+
+	for (int i = 0; i < 64; i++)
+	{
+		// bit 5 = red @ 10k Ohm, bit 4 = red @ 10k Ohm
+		bit0 = BIT(i, 1);
+		bit1 = BIT(i, 4);
+		r = starmap[(bit1 << 1) | bit0];
+
+		// bit 3 = green @ 10k Ohm, bit 2 = green @ 10k Ohm
+		bit0 = BIT(i, 0);
+		bit1 = BIT(i, 5);
+		g = starmap[(bit1 << 1) | bit0];
+
+		// bit 1 = blue @ 10k Ohm, bit 0 = blue @ 10k Ohm
+		bit0 = BIT(i, 2);
+		bit1 = BIT(i, 3);
+		b = starmap[(bit1 << 1) | bit0];
+
+		// set the RGB color
+		palette.set_pen_color(i + 8, r, g, b);
+	}
+}
 
 void _8080bw_state::sflush_palette(palette_device &palette) const
 {
@@ -296,7 +335,34 @@ uint32_t _8080bw_state::screen_update_lupin3(screen_device &screen, bitmap_rgb32
 }
 
 
-uint32_t _8080bw_state::screen_update_cosmo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+// To draw everything 4 times the horizontal size
+
+void cosmo_state::set_pixel(bitmap_rgb32 &bitmap, uint8_t y, uint32_t x, int color)
+{
+	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
+	{
+		if (m_flip_screen)
+			bitmap.pix(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), (MW8080BW_HPIXCOUNT * 4) - 1 - x) = m_palette->pen_color(color);
+		else
+			bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = m_palette->pen_color(color);
+	}
+}
+
+void cosmo_state::set_8_pixels(bitmap_rgb32 &bitmap, uint8_t y, uint32_t x, uint8_t data, int fore_color, int back_color)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		set_pixel(bitmap, y, x, (data & 0x01) ? fore_color : back_color);
+		set_pixel(bitmap, y, x + 1, (data & 0x01) ? fore_color : back_color);
+		set_pixel(bitmap, y, x + 2, (data & 0x01) ? fore_color : back_color);
+		set_pixel(bitmap, y, x + 3, (data & 0x01) ? fore_color : back_color);
+
+		x = x + 4;
+		data = data >> 1;
+	}
+}
+
+uint32_t cosmo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (offs_t offs = 0; offs < m_main_ram.bytes(); offs++)
 	{
@@ -308,14 +374,115 @@ uint32_t _8080bw_state::screen_update_cosmo(screen_device &screen, bitmap_rgb32 
 		uint8_t data = m_main_ram[offs];
 		uint8_t fore_color = m_colorram[color_address] & 0x07;
 
-		set_8_pixels(bitmap, y, x, data, fore_color, 0);
+		set_8_pixels(bitmap, y, (x * 4), data, fore_color, 0);
 	}
 
-	clear_extra_columns(bitmap, 0);
+	// Stars
+	stars_update_origin();
+
+	// render stars
+
+
+	// iterate over scanlines
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint32_t star_offs = m_star_rng_origin + y * 1024;
+		star_offs %= STAR_RNG_PERIOD;
+		stars_draw_row(bitmap, 1024, y, star_offs, 0xff);
+	}
+
+	// clear_extra_columns(bitmap, 0);
 
 	return 0;
 }
 
+void cosmo_state::stars_init()
+{
+	m_stars_sidescroll = 0;
+	m_star_speed = 3;
+	m_bright_star = 0;
+	m_rng_offs = 0;
+
+	uint32_t shiftreg = 0;
+
+	// precalculate the RNG
+	for (int i = 0; i < STAR_RNG_PERIOD; i++)
+	{
+		// stars are enabled if the upper 7 bits are 1 (ignoring highest bit)
+		int const enabled = ((shiftreg & 0x0fe00) == 0x0fe00); // was 1fe01 * 1fe00
+
+		// color comes from the next 6 bits
+		int const color = (~shiftreg & 0x1f8) >> 3;
+
+		// store the color value in the low 6 bits and the enable flag in the upper bit
+		m_stars[i] = color | (enabled << 7);
+
+		// the LFSR is fed based on the XOR of bit 12 and the inverse of bit 0
+		shiftreg = (shiftreg >> 1) | ((((shiftreg >> 12) ^ ~shiftreg) & 1) << 16);
+	}
+}
+
+void cosmo_state::stars_update_origin()
+{
+	int const curframe = m_screen->frame_number();
+
+	// only update on a different frame
+	if (curframe != m_star_rng_origin_frame)
+	{
+
+		int per_frame_delta = 2 - m_star_speed; // (speed horizontal)
+
+		if (m_stars_sidescroll) per_frame_delta += 4096;
+
+		int total_delta = per_frame_delta * (curframe - m_star_rng_origin_frame);
+
+		// we can't just use % here because mod of a negative number is undefined
+		while (total_delta < 0)
+			total_delta += STAR_RNG_PERIOD;
+
+		// now that everything is positive, do the mod
+		m_star_rng_origin = (m_star_rng_origin + total_delta) % STAR_RNG_PERIOD;
+		m_star_rng_origin_frame = curframe;
+	}
+}
+
+void cosmo_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs, uint8_t starmask)
+{
+	// ensure our star offset is valid
+	star_offs %= STAR_RNG_PERIOD;
+
+	// iterate over the specified number of 6MHz pixels
+	for (int x = 0; x < maxx; x++)
+	{
+		// Brightness, toggled every star but forced low on every second block of 4 pixels group
+		if (y & 0x01)
+		{
+			if ((x % 32) > 15) m_bright_star = 0;
+		}
+		else
+		{
+			if ((x % 32) < 16) m_bright_star = 0;
+		}
+
+		uint8_t const star = m_stars[star_offs++];
+		star_offs %= STAR_RNG_PERIOD;
+		if ((star & 0x80) != 0 && (star & starmask) != 0)
+		{
+			if (bitmap.pix(y, x) == m_palette->pen_color(0))
+			{
+				if (m_bright_star)
+					bitmap.pix(y, x) = m_palette->pen_color((star & 0x3f) + 8);
+				else
+					bitmap.pix(y, x) = m_palette->pen_color((star & 0x0f) + 8);
+
+			}
+		}
+		else
+		{
+			m_bright_star ^= 1;  // only toggles if no star?
+		}
+	}
+}
 
 uint32_t _8080bw_state::screen_update_indianbt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
