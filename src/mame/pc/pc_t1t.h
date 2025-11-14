@@ -141,6 +141,7 @@ public:
 
 	// configuration
 	auto vsync_callback() { return m_vsync_cb.bind(); }
+	template <typename T> pcvideo_pcjr_device &set_kanji_tag(T &&tag) { m_jxkanji.set_tag(std::forward<T>(tag)); return *this; }
 
 	void write(offs_t offset, uint8_t data);
 
@@ -156,8 +157,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::cache m_vram;
+	optional_region_ptr<uint8_t> m_jxkanji;
 	devcb_write_line m_vsync_cb;
-	const uint8_t *m_jxkanji;
 
 private:
 	void pc_pcjr_mode_switch();

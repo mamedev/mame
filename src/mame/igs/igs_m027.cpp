@@ -1205,6 +1205,62 @@ INPUT_PORTS_START( tswxp )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( mgfx )
+	PORT_INCLUDE(mahjong_kbd_joy)
+
+	PORT_MODIFY("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW1", 0x10, EQUALS, 0x10)  // 投幣
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW1", 0x10, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 退幣
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPNAME( 0x06, 0x06, "Key-In Rate" )              PORT_DIPLOCATION("SW1:2,3")    // 開分比率
+	PORT_DIPSETTING(    0x06, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x02, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x08, 0x08, "Credit Limit" )             PORT_DIPLOCATION("SW1:4")      // 進分上限
+	PORT_DIPSETTING(    0x08, "100" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Mode" )              PORT_DIPLOCATION("SW1:5")      // 進分方式
+	PORT_DIPSETTING(    0x10, "Coin Acceptor" )                                           // 投幣       (uses coin rate)
+	PORT_DIPSETTING(    0x00, "Key-In" )                                                  // 開分       (uses key-in rate)
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )              PORT_DIPLOCATION("SW1:6")      // 退分方式
+	PORT_DIPSETTING(    0x20, "Return Coins" )                                            // 退幣       (uses hopper to pay out credits)
+	PORT_DIPSETTING(    0x00, "Key-Out" )                                                 // 洗分       (just clears credits)
+	PORT_DIPNAME( 0xc0, 0xc0, "Minimum Bet" )              PORT_DIPLOCATION("SW1:7,8")    // 最小押注
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Controls) )          PORT_DIPLOCATION("SW2:2")      // 操作方式
+	PORT_DIPSETTING(    0x02, "Mahjong" )                                                 // 按鍵
+	PORT_DIPSETTING(    0x00, DEF_STR(Joystick) )                                         // 搖桿
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW2:3")      // 示範音樂
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                              // 無
+	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                               // 有
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR(Coinage) )           PORT_DIPLOCATION("SW2:4,5")    // 投幣比率
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x18, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x10, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x08, DEF_STR(1C_3C) )
+	PORT_DIPNAME( 0xe0, 0xe0, "Lottery Rate" )             PORT_DIPLOCATION("SW2:6,7,8")  // 彩票比率   (what does this actually do?)
+	PORT_DIPSETTING(    0xe0, "1:1" )
+	PORT_DIPSETTING(    0xc0, "1:2" )
+	PORT_DIPSETTING(    0xa0, "1:5" )
+	PORT_DIPSETTING(    0x80, "1:6" )
+	PORT_DIPSETTING(    0x60, "1:7" )
+	PORT_DIPSETTING(    0x40, "1:8" )
+	PORT_DIPSETTING(    0x20, "1:9" )
+	PORT_DIPSETTING(    0x00, "1:10" )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( slqz3 )
 	PORT_INCLUDE(mahjong_test)
 	PORT_INCLUDE(slqz3_dip_switches)
@@ -4776,7 +4832,7 @@ GAME(  2001, cjsxp,         0,        cjsxp,        cjsxp,         igs_m027_stat
 GAME(  2000, tshs,          0,        zhongguo,     tshs,          igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V201CN)", 0 )
 GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // unemulated sound chips
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
-GAME(  2000, mgfx,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // inputs, outputs, Oki banking
+GAME(  2000, mgfx,          0,        mgzz,         mgfx,          igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // inputs, outputs, Oki banking
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255

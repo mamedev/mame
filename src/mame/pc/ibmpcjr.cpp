@@ -702,6 +702,8 @@ void pcjr_state::ibmpcjx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjx_map);
 	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjx_io);
 
+	m_video->set_kanji_tag("kanji");
+
 	config.device_remove("fdc:0");
 	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats, true);
 	FLOPPY_CONNECTOR(config, "fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats, true);

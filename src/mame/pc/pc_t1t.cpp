@@ -91,8 +91,8 @@ pcvideo_pcjr_device::pcvideo_pcjr_device(
 		device_t *owner,
 		uint32_t clock) :
 	pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock, 17),
-	m_vsync_cb(*this),
-	m_jxkanji(nullptr)
+	m_jxkanji(*this, finder_base::DUMMY_TAG),
+	m_vsync_cb(*this)
 {
 }
 
@@ -136,10 +136,9 @@ void pcvideo_pcjr_device::device_start()
 	m_mode_control = 0x08;
 	m_chr_size = 8;
 	m_ra_offset = 1;
-	if(!strncmp(machine().system().name, "ibmpcjx", 7))
-		m_jxkanji = machine().root_device().memregion("kanji")->base();
-	else
-		m_jxkanji = nullptr;
+
+	if ((m_jxkanji.finder_tag() != finder_base::DUMMY_TAG) && !m_jxkanji)
+		throw emu_fatalerror("%s: kanji ROM region %s configured but not found", tag(), m_jxkanji.finder_tag());
 }
 
 
@@ -873,7 +872,7 @@ void pcvideo_t1000_device::write(offs_t offset, uint8_t data)
 		case 12:
 			break;
 		case 13:
-			m_bank = (data << 8) | (m_bank & 0xff);
+			m_bank = (uint16_t(data) << 8) | (m_bank & 0x00ff);
 			bank_w(m_bank);
 			break;
 		case 14:
