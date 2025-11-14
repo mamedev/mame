@@ -591,8 +591,8 @@ CONS( 201?, g6_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, ini
 CONS( 201?, g7_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G7 666 in 1 Handheld", MACHINE_NOT_WORKING )
 CONS( 202?, g9_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// 64Mbytes, must have banking
-CONS( 202?, g3_800,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "G3 800 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// 64Mbytes, same banking as fapocket, but no fake cart switch / port
+CONS( 202?, g3_800,   0,  0,  nes_vt42xx_fa, nes_vt42xx, nes_vt42xx_fapocket_state, empty_init, "<unknown>", "G3 800 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // highly scrambled
 CONS( 201?, hhgc319,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_hhgc319, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
