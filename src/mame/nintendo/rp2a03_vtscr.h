@@ -20,15 +20,15 @@ class rp2a03_vtscr : public rp2a03_core_device {
 public:
 	rp2a03_vtscr(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_next_scramble(uint8_t scr);
-	void set_scramble(uint8_t scr);
+	void set_next_scramble(bool scr);
+	void set_scramble(bool scr);
 
 protected:
 	class mi_decrypt : public mi_default {
 	public:
 
-		uint8_t m_scramble_en = 0x00;
-		uint8_t m_next_scramble = 0x00;
+		bool m_scramble_en = false;
+		bool m_next_scramble = false;
 
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
