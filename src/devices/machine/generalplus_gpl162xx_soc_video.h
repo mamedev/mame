@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "spg_renderer.h"
+#include "gpl_renderer.h"
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 #include "emupal.h"
@@ -232,7 +232,7 @@ protected:
 	bool m_use_legacy_mode; // could be related to the 'unused' bits in the palete bank select being set, but uncertain
 	bool m_disallow_resolution_control;
 
-	required_device<spg_renderer_device> m_renderer;
+	required_device<gpl_renderer_device> m_renderer;
 
 	address_space* m_cpuspace;
 	address_space* m_cs_space;

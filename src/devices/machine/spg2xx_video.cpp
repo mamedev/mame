@@ -110,11 +110,11 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(false, false, 0, cliprect, scanline, i, 0, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
-			m_renderer->draw_page(false, false, 0, cliprect, scanline, i, 0, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
-			m_renderer->draw_sprites(false, 0, 0, false, cliprect, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
+			m_renderer->draw_page(cliprect, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
+			m_renderer->draw_page(cliprect, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
+			m_renderer->draw_sprites(cliprect, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
-
+		
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
 	}
 
