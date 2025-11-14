@@ -476,6 +476,10 @@ ROM_START( tvkunio1 )
 	ROM_LOAD( "mx29lv160dt.u3", 0x00000, 0x200000, CRC(4f502bff) SHA1(5c91c46c8b3b837cf98a5519d71117164c23a721) )
 ROM_END
 
+ROM_START( fingerd )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl256n11tai02.u2", 0x00000, 0x2000000, CRC(58829d3c) SHA1(fab3b9914ec61f289509344b2d3f8a8b2f5bb5ba) )
+ROM_END
 
 } // anonymous namespace
 
@@ -536,7 +540,10 @@ CONS( 2020, lxpcpp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 CONS( 201?, k10_5l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (5 languages)", MACHINE_NOT_WORKING )
 CONS( 201?, k10_2l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (2 languages)", MACHINE_NOT_WORKING )
 
+CONS( 2022, tvkunio1,  0, 0,  nes_vt32_2mb, nes_vt32, nes_vt32_unk_state, empty_init, "Arc System Works", "Kunio-kun TV! Bikkuri Nekketsu Shin Kiroku! Harukanaru Kin Medal (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // yellow unit
+
 CONS( 202?, micac250, 0,        0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Micro Arcade 250-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2022, tvkunio1,  0, 0,  nes_vt32_2mb, nes_vt32, nes_vt32_unk_state, empty_init, "Arc System Works", "Kunio-kun TV! Bikkuri Nekketsu Shin Kiroku! Harukanaru Kin Medal (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // yellow unit
+// title screen shows Finger Pump, box shows Finger Dancing
+CONS( 201?, fingerd,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Orb Gaming", "Finger Dancing", MACHINE_NOT_WORKING )
 
