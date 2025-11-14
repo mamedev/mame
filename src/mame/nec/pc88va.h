@@ -52,8 +52,9 @@ public:
 		, m_fdd(*this, "upd765:%u", 0U)
 		, m_pic2(*this, "pic8259_slave")
 		, m_rtc(*this, "rtc")
-		, m_cbus(*this, "cbus%d", 0)
-		, m_mouse_port(*this, "mouseport") // labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
+		, m_cbus_root(*this, "cbus_root")
+		// labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
+		, m_mouse_port(*this, "mouseport")
 		, m_opna(*this, "opna")
 		, m_speaker(*this, "speaker")
 		, m_palram(*this, "palram")
@@ -122,7 +123,7 @@ private:
 //  required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<upd4990a_device> m_rtc;
-	required_device_array<pc98_cbus_slot_device, 2> m_cbus;
+	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<ym2608_device> m_opna;
 	required_device<speaker_device> m_speaker;

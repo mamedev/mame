@@ -20,6 +20,7 @@
 //**************************************************************************
 
 class sb16_ct2720_device : public device_t
+     				     , public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction
@@ -35,10 +36,10 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
 	void io_map(address_map &map) ATTR_COLD;
 
-	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ymf262_device> m_opl3;
 	required_device<ct1745_mixer_device> m_mixer;
 	required_device<dac_16bit_r2r_device> m_ldac;

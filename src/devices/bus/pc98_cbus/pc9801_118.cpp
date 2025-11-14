@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118
 
 pc9801_118_device::pc9801_118_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opn3(*this, "opn3")
 {
 }
@@ -57,7 +57,7 @@ void pc9801_118_device::device_add_mconfig(machine_config &config)
 	// actually YMF297-F (YMF288 + OPL3 compatible FM sources), unknown clock / divider
 	// 5B is near both CS-4232 and this
 	YM2608(config, m_opn3, XTAL_5B * 2 / 5);
-	m_opn3->irq_handler().set([this] (int state) { m_bus->int_w<5>(state); });
+	m_opn3->irq_handler().set([this] (int state) { m_bus->int_w(5, state); });
 //  m_opn3->port_a_read_callback().set(FUNC(pc9801_118_device::opn_porta_r));
 //  m_opn3->port_b_write_callback().set(FUNC(pc9801_118_device::opn_portb_w));
 	m_opn3->add_route(ALL_OUTPUTS, "speaker", 1.00, 0);
@@ -145,15 +145,18 @@ void pc9801_118_device::device_start()
 
 void pc9801_118_device::device_reset()
 {
-	m_bus->install_device(0x0000, 0xffff, *this, &pc9801_118_device::io_map);
-
 	// assume disabled on boot
 	m_ext_reg = 0;
 }
 
-void pc9801_118_device::device_validity_check(validity_checker &valid) const
+void pc9801_118_device::remap(int space_id, offs_t start, offs_t end)
 {
+	if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0xffff, *this, &pc9801_118_device::io_map);
+	}
 }
+
 
 void pc9801_118_device::io_map(address_map &map)
 {

@@ -233,7 +233,8 @@ private:
 	uint8_t tandy1000hx_pio_r(offs_t offset);
 	uint8_t tandy1000_bank_r(offs_t offset);
 	void tandy1000_bank_w(offs_t offset, uint8_t data);
-	void nmi_vram_bank_w(uint8_t data);
+	void tandy1000_nmi_vram_bank_w(uint8_t data);
+	void tandy1000x_nmi_vram_bank_w(uint8_t data);
 	void vram_bank_w(uint8_t data);
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
@@ -503,11 +504,18 @@ uint8_t tandy1000_state::tandy1000hx_pio_r(offs_t offset)
 	return data;
 }
 
-void tandy1000_state::nmi_vram_bank_w(uint8_t data)
+void tandy1000_state::tandy1000_nmi_vram_bank_w(uint8_t data)
 {
 	m_mb->nmi_enable_w(data & 0x80);
+
 	vram_bank_w(data & 0x1e);
-	m_video->disable_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void tandy1000_state::tandy1000x_nmi_vram_bank_w(uint8_t data)
+{
+	tandy1000_nmi_vram_bank_w(data);
+
+	m_video->disable_w(BIT(data, 0));
 }
 
 void tandy1000_state::vram_bank_w(uint8_t data)
@@ -577,7 +585,7 @@ MACHINE_RESET_MEMBER(tandy1000_state, tandy1000rl)
 
 void tandy1000_state::machine_start()
 {
-	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128*1024) - 1, &m_ram->pointer()[128*1024]);
+	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128 * 1024) - 1, &m_ram->pointer()[128 * 1024]);
 	if (m_maincpu->space(AS_PROGRAM).data_width() == 8)
 	{
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(
@@ -593,6 +601,9 @@ void tandy1000_state::machine_start()
 				write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)),
 				0xffff);
 	}
+
+	m_video->space(0).install_ram(0, (128 * 1024) - 1, &m_ram->pointer()[0]);
+
 	if (subdevice<nvram_device>("nvram"))
 		subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 
@@ -683,7 +694,7 @@ INPUT_PORTS_END
 void tandy1000_state::tandy1000_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
+	map(0xb8000, 0xbffff).rw(m_video, FUNC(pcvideo_t1000_device::vram_window8_r), FUNC(pcvideo_t1000_device::vram_window8_w));
 	map(0xe0000, 0xfffff).rom().region("bios", 0);
 }
 
@@ -692,7 +703,7 @@ void tandy1000_state::tandy1000_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
 	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
-	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
+	map(0x00a0, 0x00a0).mirror(0x0007).w(FUNC(tandy1000_state::tandy1000_nmi_vram_bank_w));
 	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr8496_device::write));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x0378, 0x037a).mirror(0x0004).rw("lpt", FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
@@ -703,6 +714,7 @@ void tandy1000_state::tandy1000x_io(address_map &map)
 {
 	tandy1000_io(map);
 	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000x_pio_r), FUNC(tandy1000_state::tandy1000x_pio_w));
+	map(0x00a0, 0x00a0).mirror(0x0007).w(FUNC(tandy1000_state::tandy1000x_nmi_vram_bank_w));
 }
 
 void tandy1000_state::tandy1000hx_io(address_map &map)
@@ -716,7 +728,7 @@ void tandy1000_state::tandy1000hx_io(address_map &map)
 void tandy1000_state::tandy1000_bank_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
+	map(0xb8000, 0xbffff).rw(m_video, FUNC(pcvideo_t1000_device::vram_window16_r), FUNC(pcvideo_t1000_device::vram_window16_w));
 	map(0xe0000, 0xeffff).bankr(m_biosbank);
 	map(0xf0000, 0xfffff).rom().region("rom", 0x70000);
 }
@@ -745,14 +757,14 @@ void tandy1000_state::tandy1000_bank_io(address_map &map)
 void tandy1000_state::tandy1000tx_io(address_map &map)
 {
 	tandy1000_16_io(map);
-	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
+	map(0x00a0, 0x00a0).mirror(0x0007).w(FUNC(tandy1000_state::tandy1000x_nmi_vram_bank_w));
 }
 
 void tandy1000_state::tandy1000_286_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x000fffff);
-	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
+	map(0xb8000, 0xbffff).rw(m_video, FUNC(pcvideo_t1000_device::vram_window16_r), FUNC(pcvideo_t1000_device::vram_window16_w));
 	map(0xe0000, 0xfffff).rom().region("bios", 0);
 }
 
@@ -760,7 +772,7 @@ void tandy1000_state::tandy1000_286_bank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x000fffff);
-	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
+	map(0xb8000, 0xbffff).rw(m_video, FUNC(pcvideo_t1000_device::vram_window16_r), FUNC(pcvideo_t1000_device::vram_window16_w));
 	map(0xe0000, 0xeffff).bankr(m_biosbank);
 	map(0xf0000, 0xfffff).rom().region("rom", 0x70000);
 }

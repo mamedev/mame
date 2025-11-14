@@ -243,6 +243,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
 	device.option_add("ieee488", A2BUS_IEEE488);               // Apple II IEEE-488 Interface Card
 	device.option_add("romcard", A2BUS_ROMCARDUSER);           // Apple II ROM Card that loads a custom ROM image
+	device.option_add("romcardfp", A2BUS_ROMCARDFP);           // Apple II ROM Card with Autostart Monitor + Applesoft BASIC
 	device.option_add("romcardint", A2BUS_ROMCARDINT);         // Apple II ROM Card with Autostart Monitor + Integer BASIC
 }
 

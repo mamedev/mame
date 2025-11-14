@@ -323,8 +323,14 @@ void model2c_state::machine_reset()
 void model2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
-	u16 color = m_palram[offset];
-	m_palette->set_pen_color(offset, pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
+	u16 palcolor = m_palram[offset];
+	u8 r = m_colorxlat[0x0080 / 2 + ((palcolor >> 0) & 0x1f) * 0x100];
+	u8 g = m_colorxlat[0x4080 / 2 + ((palcolor >> 5) & 0x1f) * 0x100];
+	u8 b = m_colorxlat[0x8080 / 2 + ((palcolor >> 10) & 0x1f) * 0x100];
+	r = m_gamma_table[r];
+	g = m_gamma_table[g];
+	b = m_gamma_table[b];
+	m_palette->set_pen_color(offset, r, g, b);
 }
 
 u16 model2_state::palette_r(offs_t offset)
@@ -335,6 +341,10 @@ u16 model2_state::palette_r(offs_t offset)
 void model2_state::colorxlat_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_colorxlat[offset]);
+
+	// if writing to the scroll color table, mark the palette as dirty
+	if ((offset & 0xff) == 0x80 / 2)
+		m_palette_dirty = true;
 }
 
 u16 model2_state::colorxlat_r(offs_t offset)
@@ -789,7 +799,7 @@ void model2_state::push_geo_data(u32 data)
 
 u32 model2_state::geo_prg_r(offs_t offset)
 {
-	popmessage("Read from Geometry FIFO at %08x, contact MAMEdev",offset*4);
+	popmessage("Read from Geometry FIFO at %08x", offset * 4);
 	return 0xffffffff;
 }
 
@@ -879,7 +889,7 @@ void model2_state::geo_w(offs_t offset, u32 data)
 					if(function == 1)
 					{
 						r |= ((address>>10)&3)<<29; // Eye Mode, used by Sega Rally on car select
-						//popmessage("Eye mode %02x? Contact MAMEdev",function);
+						//popmessage("Eye mode %02x?",function);
 					}
 				}
 				push_geo_data(r);
@@ -7575,9 +7585,9 @@ GAME( 1994, vstrikero,  vstriker, model2b,      vstriker,  model2b_state, empty_
 GAME( 1995, fvipers,    0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fvipersb,   fvipers,  model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Fighting Vipers (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, gunblade,   0,        gunblade,     gunblade,  model2b_state, empty_init,    ROT0, "Sega",   "Gunblade NY (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500,    0,        indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500d,   indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500to,  indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1995, indy500,    0,        indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_vr)
+GAMEL(1995, indy500d,   indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_vr)
+GAMEL(1995, indy500to,  indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS, layout_vr)
 GAME( 1995, von,        0,        model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On - Twin (Export)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, vonu,       von,      model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On - Twin (USA, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, vonj,       von,      model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On - Twin (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

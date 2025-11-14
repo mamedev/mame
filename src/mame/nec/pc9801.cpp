@@ -57,13 +57,14 @@ TODO (pc9801ux):
 #include "emu.h"
 #include "pc9801.h"
 
+#include "bus/nec_fdd/pc80s31k.h"
 #include "bus/pc98_54simm/options.h"
 #include "bus/pc98_54simm/slot.h"
 #include "bus/pc98_61simm/options.h"
 #include "bus/pc98_61simm/slot.h"
 
-#include "bus/pc98_cbus/amd98.h"
 #include "bus/pc98_cbus/options.h"
+
 #include "machine/input_merger.h"
 
 void pc98_base_state::rtc_w(uint8_t data)
@@ -321,12 +322,14 @@ void pc9801_state::sasi_ctrl_w(uint8_t data)
 
 void pc9801_state::pc9801_map(address_map &map)
 {
-//  map(0x00000, 0x9ffff).rw("cbus_ram", FUNC(ram_device::read_no_mirror), FUNC(ram_device::write_no_mirror));
+	map.unmap_value_high();
+	map(0x00000, 0x9ffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_r), FUNC(pc98_cbus_root_device::mem_w));
 	map(0xa0000, 0xa3fff).rw(FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w)); //TVRAM
 	map(0xa8000, 0xbffff).rw(FUNC(pc9801_state::gvram_r), FUNC(pc9801_state::gvram_w)); //bitmap VRAM
+	map(0xc0000, 0xdffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_slot_r), FUNC(pc98_cbus_root_device::mem_slot_w));
 //  map(0xcc000, 0xcffff).rom().region("sound_bios", 0); //sound BIOS
-	map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
-	map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
+//	map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
+//	map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
 	map(0xe8000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -341,7 +344,6 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0030, 0x0033).rw(m_sio_rs, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
-	map(0x0050, 0x0057).lr8(NAME([] (offs_t offset) { return 0xff; })).umask16(0xff00);
 	map(0x0050, 0x0053).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / host FDD 2d (PC-80S31K)
 	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
@@ -357,8 +359,11 @@ void pc9801_state::pc9801_common_io(address_map &map)
 
 void pc9801_state::pc9801_io(address_map &map)
 {
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw("cbus_root", FUNC(pc98_cbus_root_device::io_r), FUNC(pc98_cbus_root_device::io_w));
 	pc9801_common_io(map);
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::dmapg4_w)).umask16(0xff00);
+	map(0x0050, 0x0057).m("fdd_2d", FUNC(pc80s31k_device::host_map)).umask16(0xff00);
 	map(0x0068, 0x0068).w(FUNC(pc9801_state::pc9801_video_ff_w)); //mode FF / <undefined>
 	map(0x0080, 0x0080).rw(FUNC(pc9801_state::sasi_data_r), FUNC(pc9801_state::sasi_data_w));
 	map(0x0082, 0x0082).rw(FUNC(pc9801_state::sasi_status_r), FUNC(pc9801_state::sasi_ctrl_w));
@@ -457,7 +462,10 @@ void pc9801vm_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 uint8_t pc9801vm_state::a20_ctrl_r(offs_t offset)
 {
 	if(offset == 0)
-		return 0;
+	{
+		// for amd98 ID port
+		return m_cbus_root->io_r(0xf0 >> 1, 0x00ff);
+	}
 	if(offset == 0x01)
 		return (m_gate_a20 ^ 1) | 0xfe;
 	else if(offset == 0x03)
@@ -871,21 +879,23 @@ void pc9801_state::ipl_bank(address_map &map)
 
 void pc9801vm_state::pc9801vm_map(address_map &map)
 {
-//  map(0x000000, 0x09ffff).rw(m_ram, FUNC(ram_device::read_no_mirror), FUNC(ram_device::write_no_mirror));
+	map(0x000000, 0x09ffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_r), FUNC(pc98_cbus_root_device::mem_w));
 
 	map(0x0a0000, 0x0a3fff).rw(FUNC(pc9801vm_state::tvram_r), FUNC(pc9801vm_state::tvram_w));
 	map(0x0a4000, 0x0a4fff).rw(FUNC(pc9801vm_state::pc9801rs_knjram_r), FUNC(pc9801vm_state::pc9801rs_knjram_w));
 	map(0x0a8000, 0x0bffff).rw(FUNC(pc9801vm_state::grcg_gvram_r), FUNC(pc9801vm_state::grcg_gvram_w));
+	map(0x0c0000, 0x0dffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_slot_r), FUNC(pc98_cbus_root_device::mem_slot_w));
+
 	map(0x0e0000, 0x0e7fff).rw(FUNC(pc9801vm_state::grcg_gvram0_r), FUNC(pc9801vm_state::grcg_gvram0_w));
 	map(0x0e8000, 0x0fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
 void pc9801vm_state::pc9801vm_io(address_map &map)
 {
+	map(0x0000, 0xffff).rw(m_cbus_root, FUNC(pc98_cbus_root_device::io_r), FUNC(pc98_cbus_root_device::io_w));
 //  map.unmap_value_high();
 	pc9801_common_io(map);
 	map(0x0020, 0x002f).w(FUNC(pc9801vm_state::dmapg8_w)).umask16(0xff00);
-//  map(0x0050, 0x0057).noprw(); // 2dd ppi?
 	map(0x005c, 0x005f).r(FUNC(pc9801vm_state::timestamp_r)); // artic
 	map(0x005f, 0x005f).w(FUNC(pc9801vm_state::artic_wait_w));
 	map(0x0068, 0x006b).w(FUNC(pc9801vm_state::pc9801rs_video_ff_w)).umask16(0x00ff); //mode FF / <undefined>
@@ -944,6 +954,7 @@ void pc9801vm_state::pc9801rs_io(address_map &map)
 {
 	map.unmap_value_high();
 	pc9801vm_io(map);
+	map(0x00f0, 0x00f0).lr8(NAME([] () { return 0; }));
 	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_hack_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
 	map(0x0640, 0x064f).rw(FUNC(pc9801vm_state::ide_cs0_r), FUNC(pc9801vm_state::ide_cs0_w));
 	map(0x0740, 0x074f).rw(FUNC(pc9801vm_state::ide_cs1_r), FUNC(pc9801vm_state::ide_cs1_w));
@@ -1146,14 +1157,6 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
-
-	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2HD BIOS" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
-	PORT_CONFNAME( 0x02, 0x02, "Load floppy 2DD BIOS" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( No ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc9801rs )
@@ -1193,7 +1196,7 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_DIPSETTING(    0x80, "V30" )
 	PORT_DIPSETTING(    0x00, "I386" )
 
-	PORT_MODIFY("ROM_LOAD")
+	PORT_START("BIOS_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
@@ -1447,10 +1450,14 @@ void pc9801_state::set_dma_channel(int channel, int state)
 }
 
 /*
-ch1 cs-4231a
-ch2 FDC
-ch3 SCSI
-*/
+ * ch0 expansion slot or internal SASI/SCSI
+ * ch1 memory refresh on vanilla/VM classes, expansion slot or internal HDD setting otherwise
+ * ch2 1MB FDC
+ * ch3 640KB FDC
+ *
+ * NOTE: PC-H98, PC-98RL & PC-98XL very different and changes configuration
+ * depending on boot mode. cfr. io_dma.txt
+ */
 
 void pc9801_state::dack0_w(int state) { /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
 void pc9801_state::dack1_w(int state) { /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
@@ -1852,28 +1859,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 {
 	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
-	uint8_t op_mode;
-	uint8_t *ROM;
-	uint8_t *PRG = memregion("fdc_data")->base();
-
-	// TODO: this loading shouldn't happen dynamically but actually be tied to specific floppy configs
-	// pc9801 has no floppy as default
-	// pc9801f has an internal 2DD disk drive
-	// pc9801m has an internal 2HD
-	// and ofc you can actually mount external units,
-	// cfr. PC-9801-08 (2dd), PC-9801-15 (8' unit) and likely others.
-	ROM = memregion("fdc_bios_2dd")->base();
-	op_mode = (ioport("ROM_LOAD")->read() & 2) >> 1;
-
-	for(int i=0;i<0x1000;i++)
-		ROM[i] = PRG[i+op_mode*0x8000];
-
-	ROM = memregion("fdc_bios_2hd")->base();
-	op_mode = ioport("ROM_LOAD")->read() & 1;
-
-	for(int i=0;i<0x1000;i++)
-		ROM[i] = PRG[i+op_mode*0x8000+0x10000];
-
 	m_beeper->set_state(0);
 }
 
@@ -1895,7 +1880,7 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 
 	if(memregion("ide"))
 	{
-		if(!(ioport("ROM_LOAD")->read() & 4))
+		if(!(ioport("BIOS_LOAD")->read() & 4))
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base());
 		else
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
@@ -2023,40 +2008,15 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
-//  PC98_CBUS_ROOT(config, "cbus", 0);
-
-	PC98_CBUS_SLOT(config, m_cbus[0], pc98_cbus_devices, "pc9801_26");
-	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
-	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
-	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
-	m_cbus[0]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
-//  m_cbus[0]->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
-//  m_dmac->in_ior_callback<0>().set([] () { printf("read\n"); return 0xff; });
-//  m_dmac->out_iow_callback<0>().set([] (u8 data) { printf("write %02x\n", data); });
-
-	PC98_CBUS_SLOT(config, m_cbus[1], pc98_cbus_devices, nullptr);
-	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
-	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
-	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
-	m_cbus[1]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<1>));
-//  TODO: six max slots
-
-	INPUT_MERGER_ANY_HIGH(config, "ir3").output_handler().set("pic8259_master", FUNC(pic8259_device::ir3_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir5").output_handler().set("pic8259_master", FUNC(pic8259_device::ir5_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir6").output_handler().set("pic8259_master", FUNC(pic8259_device::ir6_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir9").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir12").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir4_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir13").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
+	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	m_cbus_root->int_cb<0>().set("pic8259_master", FUNC(pic8259_device::ir3_w));
+	m_cbus_root->int_cb<1>().set("pic8259_master", FUNC(pic8259_device::ir5_w));
+	m_cbus_root->int_cb<2>().set("pic8259_master", FUNC(pic8259_device::ir6_w));
+	m_cbus_root->int_cb<3>().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
+	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
+	m_cbus_root->int_cb<5>().set("pic8259_slave", FUNC(pic8259_device::ir4_w));
+	m_cbus_root->int_cb<6>().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
+	m_cbus_root->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
 }
 
 void pc9801_state::pc9801_sasi(machine_config &config)
@@ -2135,6 +2095,9 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_dmac->out_eop_callback().set(FUNC(pc9801_state::tc_w));
 	m_dmac->in_memr_callback().set(FUNC(pc9801_state::dma_read_byte));
 	m_dmac->out_memw_callback().set(FUNC(pc9801_state::dma_write_byte));
+	m_dmac->in_ior_callback<0>().set([this] () { return m_cbus_root->dack_r(0); });
+	m_dmac->out_iow_callback<0>().set([this] (u8 data) { return m_cbus_root->dack_w(0, data); });
+
 	m_dmac->in_ior_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
 	m_dmac->out_dack_callback<0>().set(FUNC(pc9801_state::dack0_w));
@@ -2163,7 +2126,6 @@ void pc9801_state::pc9801_common(machine_config &config)
 
 	config_keyboard(config);
 	pc9801_mouse(config);
-	pc9801_cbus(config);
 
 	pc9801_serial(config);
 
@@ -2211,17 +2173,24 @@ void pc9801_state::pc9801(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	pc9801_cbus(config);
+	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc98_cbus_devices, "pc9801_26");
+	PC98_CBUS_SLOT(config, "cbus1", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus2", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus3", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus4", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus5", 0, "cbus_root", pc98_cbus_devices, nullptr);
+
+	// RAM 128KB (vanilla/F1/F2) ~ 256KB (F3/M2/M3) ~ 640KB (max)
+	// TODO: really dedicates this space in N slots above
+	PC98_CBUS_SLOT(config, "cbus_ram", 0, "cbus_root", pc98_cbus_ram_devices, "640kb");
+//  RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
+
 	pc9801_common(config);
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_beep_portc_w));
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801f)
-
-	// RAM 128KB (vanilla/F1/F2) ~ 256KB (F3/M2/M3) ~ 640KB (max)
-	pc98_cbus_slot_device &ram_slot(PC98_CBUS_SLOT(config, "cbus_ram", pc98_cbus_ram_devices, "640kb"));
-	ram_slot.set_memspace(m_maincpu, AS_PROGRAM);
-	ram_slot.set_iospace(m_maincpu, AS_IO);
-//  RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 
 	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
 	m_fdc_2dd->intrq_wr_callback().set(FUNC(pc9801_state::fdc_2dd_irq));
@@ -2237,6 +2206,20 @@ void pc9801_state::pc9801(machine_config &config)
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
+
+	PC80S31K(config, "fdd_2d", XTAL(31'948'800) / 8);
+}
+
+void pc9801_state::pc9801f(machine_config &config)
+{
+	pc9801(config);
+	PC98_CBUS_SLOT(config.replace(), "cbus1", 0, "cbus_root", pc98_cbus_devices, "fdd_2dd");
+}
+
+void pc9801_state::pc9801m(machine_config &config)
+{
+	pc9801(config);
+	PC98_CBUS_SLOT(config.replace(), "cbus1", 0, "cbus_root", pc98_cbus_devices, "fdd_2hd");
 }
 
 void pc9801vm_state::pc9801vm(machine_config &config)
@@ -2247,6 +2230,12 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pc9801_common(config);
+	pc9801_cbus(config);
+	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc98_cbus_devices, "pc9801_26");
+	PC98_CBUS_SLOT(config, "cbus1", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus2", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus3", 0, "cbus_root", pc98_cbus_devices, nullptr);
+
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801vm_state::ppi_sys_dac_portc_w));
 	// TODO: verify if it needs invert();
 	m_pit->out_handler<1>().set( m_dac1bit, FUNC(speaker_sound_device::level_w));
@@ -2257,9 +2246,7 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_ipl).set_map(&pc9801vm_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
 	// RAM 384KB (VM0/VM2/VM4) ~ 640KB (VM21/VM11)
-	pc98_cbus_slot_device &ram_slot(PC98_CBUS_SLOT(config, "cbus_ram", pc98_cbus_ram_devices, "640kb"));
-	ram_slot.set_memspace(m_maincpu, AS_PROGRAM);
-	ram_slot.set_iospace(m_maincpu, AS_IO);
+	PC98_CBUS_SLOT(config, "cbus_ram", 0, "cbus_root", pc98_cbus_ram_devices, "640kb");
 //  RAM(config, m_ram).set_default_size("640K").set_extra_options("384K");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
@@ -2504,12 +2491,6 @@ ROM_START( pc9801 )
 	ROM_LOAD16_BYTE( "ruq1g 06.bin", 0x04000, 0x2000, CRC(d4ea8a62) SHA1(c899ea64ce8652a5b6976d62466efe2864cfb049) )
 	ROM_LOAD16_BYTE( "ruq4g 06.bin", 0x04001, 0x2000, CRC(c1470ae5) SHA1(4eb31b2ad0b8f0dfad99bb67ada9e5853d5af4a1) )
 
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2dd", ROMREGION_ERASEFF )
-
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2hd", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x80000, "chargen", 0 )
 	// TODO: original dump, needs heavy bitswap mods
 	ROM_LOAD( "sfz4w 00.bin",   0x00000, 0x02000, CRC(11197271) SHA1(8dbd2f25daeed545ea2c74d849f0a209ceaf4dd7) )
@@ -2550,15 +2531,39 @@ ROM_START( pc9801f )
 	ROM_LOAD16_BYTE( "urm05-02.bin", 0x10000, 0x4000, CRC(ffefec65) SHA1(106e0d920e857e59da12225a489ca2756ca405c1) )
 	ROM_LOAD16_BYTE( "urm06-02.bin", 0x10001, 0x4000, CRC(1147760b) SHA1(4e0299091dfd53ac7988d40c5a6775a10389faac) )
 
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2dd", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "chargen", 0 )
+	// note: ROM labels of following two may be swapped
+	//original is a bad dump, this is taken from i386 model
+	ROM_LOAD( "d23128c-17.bin", 0x00000, 0x00800, BAD_DUMP CRC(eea57180) SHA1(4aa037c684b72ad4521212928137d3369174eb1e) )
+	//bad dump, 8x16 charset? (it's on the kanji board)
+	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) )
 
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2hd", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	// original pc9801f dump, half size
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_CONTINUE(                      0x20000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_CONTINUE(                      0x20001, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_CONTINUE(                      0x60000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	ROM_CONTINUE(                      0x60001, 0x4000  )
 
-	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF )
-	// 2dd fdc bios, presumably bad size (should be 0x800 for each rom)
-	ROM_LOAD16_BYTE( "urf01-01.bin", 0x00000, 0x4000, BAD_DUMP CRC(2f5ae147) SHA1(69eb264d520a8fc826310b4fce3c8323867520ee) )
-	ROM_LOAD16_BYTE( "urf02-01.bin", 0x00001, 0x4000, BAD_DUMP CRC(62a86928) SHA1(4160a6db096dbeff18e50cbee98f5d5c1a29e2d1) )
-	ROM_LOAD( "2hdif.rom", 0x10000, 0x1000, BAD_DUMP CRC(9652011b) SHA1(b607707d74b5a7d3ba211825de31a8f32aec8146) ) // needs dumping from a board
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	// raw extracted from pc9801vm (after driver_init conversion)
+	ROM_LOAD( "kanji.bin", 0, 0x100000, BAD_DUMP CRC(2de4336f) SHA1(dd783d4dca5812561f853ad0307ae90420292f09) )
+
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
+ROM_END
+
+/*
+M2 - 8086 8
+*/
+
+ROM_START( pc9801m2 )
+	ROM_REGION16_LE( 0x18000, "ipl", ROMREGION_ERASEFF )
+	// from CSCP package, same as F?
+	ROM_LOAD( "ipl_efm.rom", 0x00000, 0x18000, BAD_DUMP CRC(be00c88b) SHA1(1e7c0e61db5441f2a91c56c4085a7024c8d07c10) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	// note: ROM labels of following two may be swapped
@@ -2584,6 +2589,8 @@ ROM_START( pc9801f )
 
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 ROM_END
+
+
 
 /*
 VM - V30 8/10
@@ -3023,10 +3030,10 @@ void pc9801vm_state::init_pc9801vm_kanji()
 
 // "vanilla" class (i86, E/F/M)
 COMP( 1982, pc9801,     0,        0, pc9801,    pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801",   MACHINE_NOT_WORKING ) // genuine dump
-//COMP(1983, pc9801e
-COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING ) // genuine dump
-//COMP(1984, pc9801m2
-//COMP(1985, pc9801m3
+//COMP(1983, pc9801e same with 8MHz CPU bump
+COMP( 1983, pc9801f,    pc9801,   0, pc9801f,   pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1984, pc9801m2,   pc9801,   0, pc9801m,   pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801M2", MACHINE_NOT_WORKING )
+//COMP(1985, pc9801m3 same with slotted SASI + 20MB
 
 // VM class (V30)
 //COMP(1985, pc9801u2

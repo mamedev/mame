@@ -5,15 +5,16 @@
 
 #pragma once
 
-#include "machine/bankdev.h"
-#include "machine/ram.h"
 #include "video/mc6845.h"
 
-#include "emupal.h"
 
 #define T1000_SCREEN_NAME   "screen"
 
-class pc_t1t_device :  public device_t, public device_video_interface, public device_palette_interface
+class pc_t1t_device :
+		public device_t,
+		public device_video_interface,
+		public device_palette_interface,
+		public device_memory_interface
 {
 public:
 	// configuration
@@ -29,8 +30,6 @@ public:
 	MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row );
 	MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row );
 	MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row );
-
-	void vram_map(address_map &map) ATTR_COLD;
 
 protected:
 	// used in tandy1000hx; used in pcjr???
@@ -55,12 +54,11 @@ protected:
 	};
 
 	// construction/destruction
-	pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrbits);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual uint32_t palette_entries() const noexcept override { return 32; }
-
-	void palette_init() ATTR_COLD;
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 	int mode_control_r();
 	void color_select_w(int data);
@@ -71,10 +69,14 @@ protected:
 	int vga_data_r();
 	int bank_r();
 
+	void default_map(address_map &map) ATTR_COLD;
+
+	const address_space_config m_vram_config;
+
 	required_region_ptr<uint8_t> m_chr_gen;
 	required_device<mc6845_device> m_mc6845;
-	required_device<ram_device> m_ram;
-	required_device<address_map_bank_device> m_vram;
+
+	uint32_t m_display_base, m_window_base;
 
 	uint8_t m_mode_control, m_color_select;
 	uint8_t m_status;
@@ -84,8 +86,6 @@ protected:
 	uint16_t m_bank;
 
 	int m_pc_framecnt;
-
-	uint8_t *m_displayram;
 
 	uint8_t m_chr_size;
 	uint16_t m_ra_offset;
@@ -98,30 +98,40 @@ protected:
 	uint8_t m_palette_base;
 };
 
+
 class pcvideo_t1000_device :  public pc_t1t_device
 {
 public:
-	// construction/destruction
 	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void write(offs_t offset, uint8_t data);
+
+	uint8_t vram_window8_r(address_space &space, offs_t offset);
+	uint16_t vram_window16_r(address_space &space, offs_t offset);
+	void vram_window8_w(offs_t offset, uint8_t data);
+	void vram_window16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 	void disable_w(int state);
 
 protected:
+	pcvideo_t1000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrbits);
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 private:
 	void mode_switch();
 	void vga_data_w(int data);
-	void bank_w(int data);
+	void bank_w(uint16_t data);
 	void mode_control_w(int data);
-	bool m_disable = false;
 
 	void t1000_vsync_changed(int state);
+
+	bool m_disable;
 };
 
 DECLARE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device)
+
 
 class pcvideo_pcjr_device :  public pc_t1t_device
 {
@@ -134,6 +144,9 @@ public:
 
 	void write(offs_t offset, uint8_t data);
 
+	uint8_t vram_window_r(offs_t offset);
+	void vram_window_w(offs_t offset, uint8_t data);
+
 	void de_changed(int state);
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
 	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
@@ -142,14 +155,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
+	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::cache m_vram;
 	devcb_write_line m_vsync_cb;
 	const uint8_t *m_jxkanji;
 
 private:
 	void pc_pcjr_mode_switch();
 	void pc_pcjr_vga_data_w(int data);
-	void pc_pcjr_bank_w(int data);
-	void pc_pcjx_bank_w(int data);
+	void pc_pcjr_bank_w(uint8_t data);
 
 	void pcjr_vsync_changed(int state);
 

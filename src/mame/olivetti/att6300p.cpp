@@ -50,6 +50,7 @@
 
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i286.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
@@ -321,6 +322,7 @@ private:
 	uint16_t m_trapio_reg[4][4];
 
 	static void cfg_m20_format(device_t *device);
+	static void cfg_no_serial_mouse(device_t *device);
 	void kbc_map(address_map &map) ATTR_COLD;
 
 	void att6300p_io_map(address_map &map) ATTR_COLD;
@@ -914,6 +916,12 @@ void att6300p_state::cfg_m20_format(device_t *device)
 	device->subdevice<floppy_connector>("fdc:1")->set_formats(att6300p_state::floppy_formats);
 }
 
+void att6300p_state::cfg_no_serial_mouse(device_t *device)
+{
+	/* Don't attach serial mouse, since there's a proprietary mouse */
+	device->subdevice<rs232_port_device>("serport0")->set_default_option(nullptr);
+}
+
 void att6300p_state::att6300p(machine_config &config)
 {
 	I80286(config, m_maincpu, 12_MHz_XTAL / 2);
@@ -974,9 +982,9 @@ void att6300p_state::att6300p(machine_config &config)
 	ISA8_SLOT(config, "mb1", 0, m_isabus, pc_isa8_cards, "cga_m24", true);
 	ISA8_SLOT(config, "mb2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
 	ISA8_SLOT(config, "mb3", 0, m_isabus, pc_isa8_cards, "lpt", true);
-	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
 
-	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, "hdc", false);
 	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, m_isabus, pc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa4", 0, m_isabus, pc_isa8_cards, nullptr, false);
@@ -1046,4 +1054,4 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME      FLAGS
-COMP( 1985, att6300p,  0,       0,      att6300p, att6300p, att6300p_state, empty_init, "AT&T",     "6300 Plus",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, att6300p,  0,       0,      att6300p, att6300p, att6300p_state, empty_init, "AT&T",     "6300 Plus",  MACHINE_SUPPORTS_SAVE )

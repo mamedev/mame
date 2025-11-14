@@ -19689,13 +19689,17 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="goldnax3">
-		<description>Golden Axe III (Japan)</description>
+	<software name="goldnax3" supported="partial">
+		<description>Golden Axe III (Japan, Europe?)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Intro has [VDP] HINT issues
+]]></notes>
 		<info name="serial" value="G-4093 (JPN)"/>
 		<info name="release" value="19930625"/>
 		<info name="alt_title" value="ゴールデンアックスIII"/>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="golden axe iii (jpn).bin" size="1048576" crc="c7862ea3" sha1="cd9ecc1df4e01d69af9bebcf45bbd944f1b17f9f"/>

@@ -38,6 +38,7 @@ public:
 	pcjr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_video(*this, "pcvideo_pcjr"),
 		m_pic8259(*this, "pic8259"),
 		m_pit8253(*this, "pit8253"),
 		m_speaker(*this, "speaker"),
@@ -66,6 +67,7 @@ private:
 	TIMER_CALLBACK_MEMBER(kb_signal);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<pcvideo_pcjr_device> m_video;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8253_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
@@ -126,11 +128,19 @@ INPUT_PORTS_END
 
 void pcjr_state::machine_start()
 {
-	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
+	auto const ramsize = m_ram->size();
+	m_maincpu->space(AS_PROGRAM).install_ram(0, ramsize - 1, m_ram->pointer());
 
 	m_pc_int_delay_timer = timer_alloc(FUNC(pcjr_state::delayed_irq), this);
 	m_pcjr_watchdog = timer_alloc(FUNC(pcjr_state::watchdog_expired), this);
 	m_keyb_signal_timer = timer_alloc(FUNC(pcjr_state::kb_signal), this);
+
+	// TODO: fix when this is really understood
+	memory_share *const vram = memshare("vram");
+	if (vram)
+		m_video->space(0).install_ram(0, (128 * 1024) - 1, &vram[0]);
+	else
+		m_video->space(0).install_ram(0, (128 * 1024) - 1, m_ram->pointer());
 }
 
 void pcjr_state::machine_reset()
@@ -555,7 +565,7 @@ GFXDECODE_END
 void pcjr_state::ibmpcjr_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xb8000, 0xbffff).m("pcvideo_pcjr:vram", FUNC(address_map_bank_device::amap8));
+	map(0xb8000, 0xbffff).rw(m_video, FUNC(pcvideo_pcjr_device::vram_window_r), FUNC(pcvideo_pcjr_device::vram_window_w));
 	map(0xd0000, 0xdffff).r(m_cart2, FUNC(generic_slot_device::read_rom));
 	map(0xe0000, 0xeffff).r(m_cart1, FUNC(generic_slot_device::read_rom));
 	map(0xf0000, 0xfffff).rom().region("bios", 0);
@@ -575,7 +585,7 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x02f8, 0x02ff).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x0378, 0x037b).rw("lpt_0", FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
-	map(0x03d0, 0x03df).r("pcvideo_pcjr", FUNC(pcvideo_pcjr_device::read)).w("pcvideo_pcjr", FUNC(pcvideo_pcjr_device::write));
+	map(0x03d0, 0x03df).rw(m_video, FUNC(pcvideo_pcjr_device::read), FUNC(pcvideo_pcjr_device::write));
 }
 
 void pcjr_state::ibmpcjx_map(address_map &map)
@@ -583,7 +593,7 @@ void pcjr_state::ibmpcjx_map(address_map &map)
 	map.unmap_value_high();
 	map(0x80000, 0x9ffff).ram().share("vram"); // TODO: remove this part of vram hack
 	map(0x80000, 0xb7fff).rom().region("kanji", 0);
-	map(0xb8000, 0xbffff).m("pcvideo_pcjr:vram", FUNC(address_map_bank_device::amap8));
+	map(0xb8000, 0xbffff).rw(m_video, FUNC(pcvideo_pcjr_device::vram_window_r), FUNC(pcvideo_pcjr_device::vram_window_w));
 	map(0xd0000, 0xdffff).r(m_cart1, FUNC(generic_slot_device::read_rom));
 	map(0xe0000, 0xfffff).rom().region("bios", 0);
 }
@@ -637,10 +647,10 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	serport.cts_handler().set("ins8250", FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	auto &video(PCVIDEO_PCJR(config, "pcvideo_pcjr", 0));
-	video.set_screen("pcvideo_pcjr:screen");
-	video.set_chr_gen_tag("gfx1");
-	video.vsync_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	PCVIDEO_PCJR(config, m_video, 0);
+	m_video->set_screen("pcvideo_pcjr:screen");
+	m_video->set_chr_gen_tag("gfx1");
+	m_video->vsync_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr", gfx_pcjr);
 

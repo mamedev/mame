@@ -4903,11 +4903,14 @@ Fails autobooting (has CONFIG.SYS/AUTOEXEC.BAT)
 		</part>
 	</software>
 
-	<software name="albatros">
+	<software name="albatros" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Albatross</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<notes><![CDATA[
+Has optional [PC-9801-14] support
+]]></notes>
 		<info name="alt_title" value="アルバトロス" />
 		<info name="usage" value="Runs best on 8086-based machines (e.g. PC-9801F)" />
 		<part name="flop1" interface="floppy_5_25">
@@ -16693,10 +16696,14 @@ Optional [AMD-98] support, no sound (uses PIT registers)
 		</part>
 	</software>
 
-	<software name="doom">
+	<software name="doom" supported="partial">
 		<description>Doom</description>
 		<year>1994</year>
 		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+No DAC sound for [PC9801-86]
+Needs DSP hookup for [SB16]
+]]></notes>
 		<info name="release" value="19941209" />
 		<info name="usage" value="Requires HDD installation and a PC-9821 computer. Run INSTALL.EXE from DOS." />
 		<part name="flop1" interface="floppy_5_25">

@@ -9,6 +9,7 @@
 #include "slot.h"
 
 class pc9801_02_128kb_device : public device_t
+							 , public device_pc98_cbus_slot_interface
 {
 public:
 	pc9801_02_128kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -16,14 +17,14 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
-	required_device<pc98_cbus_slot_device> m_bus;
-
 	std::vector<u16> m_ram;
 };
 
 class pc9801_02_256kb_device : public device_t
+							 , public device_pc98_cbus_slot_interface
 {
 public:
 	pc9801_02_256kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -31,14 +32,14 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
-	required_device<pc98_cbus_slot_device> m_bus;
-
 	std::vector<u16> m_ram;
 };
 
 class pc9801_02_384kb_device : public device_t
+							 , public device_pc98_cbus_slot_interface
 {
 public:
 	pc9801_02_384kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -46,14 +47,14 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
-	required_device<pc98_cbus_slot_device> m_bus;
-
 	std::vector<u16> m_ram;
 };
 
 class pc9801_02_512kb_device : public device_t
+							 , public device_pc98_cbus_slot_interface
 {
 public:
 	pc9801_02_512kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -61,14 +62,14 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
-	required_device<pc98_cbus_slot_device> m_bus;
-
 	std::vector<u16> m_ram;
 };
 
 class pc9801_02_640kb_device : public device_t
+							 , public device_pc98_cbus_slot_interface
 {
 public:
 	pc9801_02_640kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -76,10 +77,9 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
-	required_device<pc98_cbus_slot_device> m_bus;
-
 	std::vector<u16> m_ram;
 };
 

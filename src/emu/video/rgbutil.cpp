@@ -362,7 +362,7 @@ const VECS16 scale_table[256] =
 
 } // anonymous namespace
 
-u32 rgbaint_t::bilinear_filter(const u32 &rgb00, const u32 &rgb01, const u32 &rgb10, const u32 &rgb11, u8 u, u8 v)
+u32 rgbaint_t::bilinear_filter(const u32 rgb00, const u32 rgb01, const u32 rgb10, const u32 rgb11, u8 u, u8 v)
 {
 	const VECS32 zero = vec_splat_s32(0);
 
@@ -405,7 +405,7 @@ u32 rgbaint_t::bilinear_filter(const u32 &rgb00, const u32 &rgb01, const u32 &rg
 	return result;
 }
 
-void rgbaint_t::bilinear_filter_rgbaint(const u32 &rgb00, const u32 &rgb01, const u32 &rgb10, const u32 &rgb11, u8 u, u8 v)
+void rgbaint_t::bilinear_filter_rgbaint(const u32 rgb00, const u32 rgb01, const u32 rgb10, const u32 rgb11, u8 u, u8 v)
 {
 	const VECS32 zero = vec_splat_s32(0);
 

@@ -22,6 +22,7 @@
 // ======================> amd98_device
 
 class amd98_device : public device_t
+                   , public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction
@@ -38,6 +39,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
 private:
 	void io_map(address_map &map) ATTR_COLD;
 	void ay3_address_w(uint8_t data);
@@ -45,7 +48,6 @@ private:
 
 	uint8_t m_ay3_latch, m_ay3_ff;
 
-	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ay8910_device>  m_ay1;
 	required_device<ay8910_device>  m_ay2;
 	required_device<ay8910_device>  m_ay3;
