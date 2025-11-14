@@ -851,6 +851,7 @@
 
 	<!-- Group definitions -->
 	<group name="Sliders">
+		<bounds x="0" y="15" width="90" height="88.2" />
 		<element ref="triangle_down">
 			<bounds x="52.5" y="55" width="5" height="2.5" />
 		</element>
@@ -884,6 +885,7 @@
 		</group>
 	</group>
 	<group name="DisplayAndButtons">
+		<bounds x="0" y="8" width="245" height="95.2" />
 		<element ref="rect_glass">
 			<bounds x="0" y="8" width="245" height="67.5" />
 		</element>
@@ -1030,6 +1032,7 @@
 		</element>
 	</group>
 	<group name="Buttons">
+		<bounds x="0" y="8.2" width="180" height="95.0" />
 		<element ref="rect_white">
 			<bounds x="15" y="75.5" width="10" height="0.1" />
 		</element>
@@ -1281,6 +1284,7 @@
 		</element>
 	</group>
 	<group name="BackPanel">
+		<bounds x="0" y="0" width="845" height="32" />
 		<element ref="rect_body">
 			<bounds x="0" y="0" width="845" height="32" />
 		</element>
@@ -1340,6 +1344,7 @@
 		</element>
 	</group>
 	<group name="WheelArea">
+		<bounds x="0" y="0" width="108" height="122" />
 		<element ref="rect_panel">
 			<bounds x="0" y="0" width="108" height="122" />
 		</element>
@@ -1388,6 +1393,7 @@
 		</group>
 	</group>
 	<group name="full_keyboard">
+		<bounds x="0.0" y="0" width="845.0" height="138" />
 		<element ref="full_keyboard_background" id="full_keyboard_background">
 			<bounds x="0" y="0" width="845" height="138" />
 			<color red="0.33333" green="0.33333" blue="0.33333" />
@@ -1882,6 +1888,7 @@
 		</element>
 	</group>
 	<group name="NarrowWheelArea">
+		<bounds x="0" y="0" width="86" height="122" />
 		<element ref="rect_panel">
 			<bounds x="0" y="0" width="86" height="122" />
 		</element>
@@ -1930,6 +1937,7 @@
 		</group>
 	</group>
 	<group name="playable_keyboard">
+		<bounds x="0.0" y="0" width="516.0" height="138" />
 		<element ref="playable_keyboard_background" id="playable_keyboard_background">
 			<bounds x="0" y="0" width="516" height="138" />
 			<color red="0.33333" green="0.33333" blue="0.33333" />
@@ -2232,6 +2240,7 @@
 		</element>
 	</group>
 	<group name="CompactVolumeSlider">
+		<bounds x="0" y="15" width="35" height="88.2" />
 		<element ref="rect_vfx">
 			<bounds x="0" y="102" width="30" height="1.2" />
 		</element>
@@ -2245,6 +2254,7 @@
 		</group>
 	</group>
 	<group name="PatchSelects">
+		<bounds x="0" y="55" width="40" height="48.2" />
 		<element ref="rect_vfx">
 			<bounds x="0" y="102" width="40" height="1.2" />
 		</element>
@@ -2259,6 +2269,7 @@
 		</element>
 	</group>
 	<group name="CompactValueSlider">
+		<bounds x="0" y="15" width="63.0" height="88.2" />
 		<element ref="triangle_down">
 			<bounds x="5" y="55" width="5" height="2.5" />
 		</element>
