@@ -65,6 +65,12 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_symtable->add("wpdata", symbol_table::READ_ONLY, &m_wpdata);
 	m_symtable->add("wpsize", symbol_table::READ_ONLY, &m_wpsize);
 
+	/* add device symbols to the global symbol table */
+	for(auto &symbol : machine.root_device().get_device_symbols())
+	{
+		m_symtable->add(symbol.name(), symbol.getter(), symbol.setter());
+	}
+
 	screen_device_enumerator screen_enumerator = screen_device_enumerator(m_machine.root_device());
 	screen_device_enumerator::iterator iter = screen_enumerator.begin();
 	const uint32_t count = (uint32_t)screen_enumerator.count();
