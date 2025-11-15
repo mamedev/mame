@@ -12,6 +12,7 @@
 #import "debugconsole.h"
 #import "debugview.h"
 #import "disassemblyview.h"
+#import "srcdebugview.h"
 
 #include "debugger.h"
 #include "debug/debugcon.h"
@@ -24,7 +25,7 @@
 @implementation MAMEDisassemblyViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	NSScrollView    *dasmScroll;
+	NSScrollView    *dasmScroll, *srcdbgScroll;
 	NSView          *expressionContainer;
 	NSPopUpButton   *actionButton;
 	NSRect          expressionFrame;
@@ -75,8 +76,6 @@
 	[expressionField release];
 	[expressionContainer addSubview:subviewButton];
 	[subviewButton release];
-	[[window contentView] addSubview:expressionContainer];
-	[expressionContainer release];
 
 	// create the disassembly view
 	dasmView = [[MAMEDisassemblyView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
@@ -93,8 +92,6 @@
 	[dasmScroll setDrawsBackground:NO];
 	[dasmScroll setDocumentView:dasmView];
 	[dasmView release];
-	[[window contentView] addSubview:dasmScroll];
-	[dasmScroll release];
 
 	// create the action popup
 	actionButton = [[self class] newActionButtonWithFrame:NSMakeRect(0,
@@ -104,8 +101,6 @@
 	[actionButton setAutoresizingMask:(NSViewMaxXMargin | NSViewMinYMargin)];
 	[actionButton setFont:[NSFont systemFontOfSize:[defaultFont pointSize]]];
 	[dasmView insertActionItemsInMenu:[actionButton menu] atIndex:1];
-	[[window contentView] addSubview:actionButton];
-	[actionButton release];
 
 	// set default state
 	[dasmView selectSubviewForDevice:machine->debugger().console().get_visible_cpu()];
@@ -123,7 +118,81 @@
 													  borderType:[dasmScroll borderType]
 													 controlSize:NSControlSizeRegular
 												   scrollerStyle:NSScrollerStyleOverlay];
+
+	// create enclosing disasembly group
+	NSRect groupRect = NSUnionRect(NSUnionRect([expressionContainer frame], [dasmScroll frame]), [actionButton frame]);
+	dissasemblyGroupView = [[NSView alloc] initWithFrame:groupRect];
+	[dissasemblyGroupView addSubview:expressionContainer];
+	[dissasemblyGroupView addSubview:dasmScroll];
+	[dissasemblyGroupView addSubview:actionButton];
+	[dissasemblyGroupView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+	[expressionContainer release];
+	[dasmScroll release];
+	[actionButton release];
+	[[window contentView] addSubview:dissasemblyGroupView];
+	[dissasemblyGroupView release];
+
 	[self cascadeWindowWithDesiredSize:desired forView:dasmScroll];
+
+	NSRect bounds = [dissasemblyGroupView bounds];
+
+	// create the source debug view
+	srcdbgView = [[MAMESrcDebugView alloc] initWithFrame:NSMakeRect(bounds.origin.x,
+																	bounds.origin.y,
+																	bounds.size.width,
+																	bounds.size.height-22) machine:*machine];
+	[srcdbgView selectSubviewForDevice:machine->debugger().console().get_visible_cpu()];
+	[srcdbgView setExpression:@"curpc"];
+	[srcdbgView maximumFrameSize]; // called to correctly setup source
+	[srcdbgView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+	srcdbgScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(bounds.origin.x,
+																  bounds.origin.y,
+																  bounds.size.width,
+																  bounds.size.height-22)];
+	[srcdbgScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+	[srcdbgScroll setHasHorizontalScroller:YES];
+	[srcdbgScroll setHasVerticalScroller:YES];
+	[srcdbgScroll setAutohidesScrollers:YES];
+	[srcdbgScroll setBorderType:NSBezelBorder];
+	[srcdbgScroll setDrawsBackground:NO];
+	[srcdbgScroll setDocumentView:srcdbgView];
+	[srcdbgView release];
+
+	// create the source popup button
+	sourceButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(bounds.origin.x+23,
+																   bounds.origin.y+bounds.size.height-22,
+																   bounds.size.width-23,
+																   19)];
+	[sourceButton setAutoresizingMask:(NSViewWidthSizable | NSViewMaxXMargin | NSViewMinYMargin)];
+	[sourceButton setBezelStyle:NSBezelStyleShadowlessSquare];
+	[sourceButton setFocusRingType:NSFocusRingTypeNone];
+	[sourceButton setFont:defaultFont];
+	[sourceButton setTarget:self];
+	[sourceButton setAction:@selector(changeSubview:)];
+	[[sourceButton cell] setArrowPosition:NSPopUpArrowAtBottom];
+	[srcdbgView insertSubviewItemsInMenu:[sourceButton menu] atIndex:0];
+
+	// create action button for source group
+	actionButton = [[self class] newActionButtonWithFrame:NSMakeRect(bounds.origin.x,
+																	 bounds.origin.y+bounds.size.height-22,
+																	 22,
+																	 22)];
+	[actionButton setAutoresizingMask:(NSViewMaxXMargin | NSViewMinYMargin)];
+	[actionButton setFont:[NSFont systemFontOfSize:[defaultFont pointSize]]];
+	[srcdbgView insertActionItemsInMenu:[actionButton menu] atIndex:1];
+
+	// create source container to group together the popup and debug view
+	srcdbgGroupView = [[NSView alloc] initWithFrame:bounds];
+	[srcdbgGroupView addSubview:srcdbgScroll];
+	[srcdbgGroupView addSubview:sourceButton];
+	[srcdbgGroupView addSubview:actionButton];
+	[srcdbgGroupView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+	[srcdbgScroll release];
+	[sourceButton release];
+	[actionButton release];
+	[srcdbgGroupView setHidden:YES];
+	[[window contentView] addSubview:srcdbgGroupView];
+	[srcdbgGroupView release];
 
 	// don't forget the result
 	return self;
@@ -135,8 +204,29 @@
 }
 
 
+- (void)setDisasemblyView:(BOOL)value {
+	[dissasemblyGroupView setHidden:value];
+	[srcdbgGroupView setHidden:!value];
+}
+
+
+- (BOOL) getDisasemblyView {
+	return ![dissasemblyGroupView isHidden];
+}
+
+
 - (id <MAMEDebugViewExpressionSupport>)documentView {
 	return dasmView;
+}
+
+
+- (void) setSourceButton:(int)index {
+	[sourceButton selectItemAtIndex:index];
+}
+
+
+- (IBAction)sourceDebugBarChanged:(id)sender {
+	[srcdbgView setSourceIndex:[sender tag]];
 }
 
 
@@ -173,44 +263,32 @@
 
 
 - (IBAction)debugToggleBreakpoint:(id)sender {
-	if ([dasmView cursorVisible])
+	MAMEDisassemblyView *visibleView = [dissasemblyGroupView isHidden] ? (MAMEDisassemblyView *)srcdbgView : dasmView;
+	NSNumber *num = [visibleView selectedAddress];
+
+	if (num)
 	{
-		device_t &device = *[dasmView source]->device();
-		offs_t const address = [dasmView selectedAddress];
-		const debug_breakpoint *bp = device.debug()->breakpoint_find(address);
-
-		// if it doesn't exist, add a new one
-		if (bp == nullptr)
+		if ([visibleView cursorVisible])
 		{
-			uint32_t const bpnum = device.debug()->breakpoint_set(address);
-			machine->debugger().console().printf("Breakpoint %X set\n", bpnum);
-		}
-		else
-		{
-			int const bpnum = bp->index();
-			device.debug()->breakpoint_clear(bpnum);
-			machine->debugger().console().printf("Breakpoint %X cleared\n", (uint32_t)bpnum);
-		}
+			device_t &device = *[visibleView source]->device();
 
-		// fail to do this and the display doesn't update
-		machine->debug_view().update_all();
-		machine->debugger().refresh_display();
-	}
-}
+			offs_t const address = [num unsignedIntValue];
+			const debug_breakpoint *bp = device.debug()->breakpoint_find(address);
 
+			// if it doesn't exist, add a new one
+			if (bp == nullptr)
+			{
+				uint32_t const bpnum = device.debug()->breakpoint_set(address);
+				machine->debugger().console().printf("Breakpoint %X set\n", bpnum);
+			}
+			else
+			{
+				int const bpnum = bp->index();
+				device.debug()->breakpoint_clear(bpnum);
+				machine->debugger().console().printf("Breakpoint %X cleared\n", (uint32_t)bpnum);
+			}
 
-- (IBAction)debugToggleBreakpointEnable:(id)sender {
-	if ([dasmView cursorVisible])
-	{
-		device_t &device = *[dasmView source]->device();
-		offs_t const address = [dasmView selectedAddress];
-		const debug_breakpoint *bp = device.debug()->breakpoint_find(address);
-		if (bp != nullptr)
-		{
-			device.debug()->breakpoint_enable(bp->index(), !bp->enabled());
-			machine->debugger().console().printf("Breakpoint %X %s\n",
-												 (uint32_t)bp->index(),
-												 bp->enabled() ? "enabled" : "disabled");
+			// fail to do this and the display doesn't update
 			machine->debug_view().update_all();
 			machine->debugger().refresh_display();
 		}
@@ -218,9 +296,43 @@
 }
 
 
+- (IBAction)debugToggleBreakpointEnable:(id)sender {
+	MAMEDisassemblyView *visibleView = [dissasemblyGroupView isHidden] ? (MAMEDisassemblyView *)srcdbgView : dasmView;
+	NSNumber *num = [visibleView selectedAddress];
+
+	if (num)
+	{
+		if ([visibleView cursorVisible])
+		{
+			device_t &device = *[visibleView source]->device();
+
+			offs_t const address = [num unsignedIntValue];
+			const debug_breakpoint *bp = device.debug()->breakpoint_find(address);
+			if (bp != nullptr)
+			{
+				device.debug()->breakpoint_enable(bp->index(), !bp->enabled());
+				machine->debugger().console().printf("Breakpoint %X %s\n",
+													 (uint32_t)bp->index(),
+													 bp->enabled() ? "enabled" : "disabled");
+				machine->debug_view().update_all();
+				machine->debugger().refresh_display();
+			}
+		}
+	}
+}
+
+
 - (IBAction)debugRunToCursor:(id)sender {
-	if ([dasmView cursorVisible])
-		[dasmView source]->device()->debug()->go([dasmView selectedAddress]);
+	MAMEDisassemblyView *visibleView = [dissasemblyGroupView isHidden] ? (MAMEDisassemblyView *)srcdbgView : dasmView;
+	NSNumber *num = [visibleView selectedAddress];
+
+	if (num)
+	{
+		if ([dasmView cursorVisible])
+		{
+			[dasmView source]->device()->debug()->go([num unsignedIntValue]);
+		}
+	}
 }
 
 
@@ -249,14 +361,19 @@
 
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
+	MAMEDisassemblyView *visibleView = [dissasemblyGroupView isHidden] ? (MAMEDisassemblyView *)srcdbgView : dasmView;
 	SEL const action = [item action];
 	BOOL const inContextMenu = ([item menu] == [dasmView menu]);
-	BOOL const haveCursor = [dasmView cursorVisible];
+	BOOL const haveCursor = [visibleView cursorVisible];
 
 	const debug_breakpoint *breakpoint = nullptr;
 	if (haveCursor)
 	{
-		breakpoint = [dasmView source]->device()->debug()->breakpoint_find([dasmView selectedAddress]);
+		NSNumber *num = [visibleView selectedAddress];
+		if (num)
+		{
+			breakpoint = [visibleView source]->device()->debug()->breakpoint_find([num unsignedIntValue]);
+		}
 	}
 
 	if (action == @selector(debugToggleBreakpoint:))

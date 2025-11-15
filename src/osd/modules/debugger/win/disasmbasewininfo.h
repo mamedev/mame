@@ -17,6 +17,8 @@
 
 namespace osd::debugger::win {
 
+class disasmview_info;
+
 class disasmbasewin_info : public editwin_info
 {
 public:
@@ -27,9 +29,13 @@ public:
 	virtual void restore_configuration_from_node(util::xml::data_node const &node) override;
 
 protected:
+	void enable_disasm_menu_options(bool enable);
 	virtual void update_menu() override;
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
 	virtual void save_configuration_to_node(util::xml::data_node &node) override;
+
+protected:
+	HMENU m_optionsmenu;
 };
 
 } // namespace osd::debugger::win

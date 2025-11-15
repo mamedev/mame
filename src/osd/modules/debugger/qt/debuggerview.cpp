@@ -79,18 +79,9 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 	int const contentHeight = height() - (fullWidth ? 0 : horizontalScrollBar()->height());
 	m_view->set_visible_size(debug_view_xy(lineWidth, contentHeight / fontHeight));
 
-	// Handle the scroll bars
-	int const horizontalScrollCharDiff = m_view->total_size().x - m_view->visible_size().x;
-	horizontalScrollBar()->setRange(0, (std::max)(0, horizontalScrollCharDiff));
+	updateScrollRangesAndValues();
 	horizontalScrollBar()->setPageStep(lineWidth - 1);
-
-	int const verticalScrollCharDiff = m_view->total_size().y - m_view->visible_size().y;
-	int const verticalScrollSize = (std::max)(0, verticalScrollCharDiff);
-	bool const atEnd = verticalScrollBar()->value() == verticalScrollBar()->maximum();
-	verticalScrollBar()->setRange(0, verticalScrollSize);
 	verticalScrollBar()->setPageStep((contentHeight / fontHeight) - 1);
-	if (m_preferBottom && atEnd)
-		verticalScrollBar()->setValue(verticalScrollSize);
 
 	const auto palette = QApplication::palette();
 
@@ -194,7 +185,8 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 
 			// There is a touchy interplay between font height, drawing difference, visible position, etc
 			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
-			painter.drawText(x * fontWidth, (y * fontHeight + (fontHeight * 0.80)), text);
+			// Second parameter (baseline) can't be too low or underscores will get overwritten by next line
+			painter.drawText(x * fontWidth, (y * fontHeight + int(float(fontHeight) * 0.75)), text);
 		}
 	}
 }
@@ -367,12 +359,16 @@ void DebuggerView::addItemsToContextMenu(QMenu *menu)
 }
 
 
+// Triggered from QScrollBar::valueChanged signal to send new GUI scrollbar
+// value back to the debug_view
 void DebuggerView::verticalScrollSlot(int value)
 {
 	m_view->set_visible_position(debug_view_xy(horizontalScrollBar()->value(), value));
 }
 
 
+// Triggered from QScrollBar::valueChanged signal to send new GUI scrollbar
+// value back to the debug_view
 void DebuggerView::horizontalScrollSlot(int value)
 {
 	m_view->set_visible_position(debug_view_xy(value, verticalScrollBar()->value()));
@@ -415,15 +411,44 @@ void DebuggerView::pasteSlot()
 }
 
 
+// Called to inform us when the debug_view has been updated
 void DebuggerView::debuggerViewUpdate(debug_view &debugView, void *osdPrivate)
 {
 	// Get a handle to the DebuggerView being updated and redraw
 	DebuggerView *dView = reinterpret_cast<DebuggerView *>(osdPrivate);
-	dView->verticalScrollBar()->setValue(dView->view()->visible_position().y);
-	dView->horizontalScrollBar()->setValue(dView->view()->visible_position().x);
+
+	dView->updateScrollRangesAndValues();
 	dView->viewport()->update();
 	dView->update();
 	emit dView->updated();
+}
+
+
+// Update the range and current value of horizontal & vertical scrollbars.
+// There's a sensitive ordering here, and the ranges should not be modified
+// outside of this helper
+void DebuggerView::updateScrollRangesAndValues()
+{
+	// m_view's m_topleft may get overwritten when calling setRange below
+	// (as setRange can overwrite the scrollbar's prior value with something
+	// safely in the new range, thus triggerring the QScrollBar::valueChanged signal
+	// which will send that new "safe" scrollbar value back to m_view,
+	// ovewriting m_topleft).  Cache it now before it's overwritten.
+	debug_view_xy orig_visible_pos = m_view->visible_position();
+
+	// Adjust scrollbar ranges
+	int const horizontalScrollCharDiff = m_view->total_size().x - m_view->visible_size().x;
+	horizontalScrollBar()->setRange(0, (std::max)(0, horizontalScrollCharDiff));
+	int const verticalScrollCharDiff = m_view->total_size().y - m_view->visible_size().y;
+	int const verticalScrollSize = (std::max)(0, verticalScrollCharDiff);
+	verticalScrollBar()->setRange(0, verticalScrollSize);
+
+	// Update the scrollbar values with what we cached from m_view
+	verticalScrollBar()->setValue(orig_visible_pos.y);
+	horizontalScrollBar()->setValue(orig_visible_pos.x);
+	bool const atEnd = verticalScrollBar()->value() == verticalScrollBar()->maximum();
+	if (m_preferBottom && atEnd)
+		verticalScrollBar()->setValue(verticalScrollSize);
 }
 
 } // namespace osd::debugger::qt

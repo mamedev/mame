@@ -84,8 +84,11 @@ private:
 	void execute_quit(const std::vector<std::string_view> &params);
 	void execute_do(const std::vector<std::string_view> &params);
 	void execute_step(const std::vector<std::string_view> &params);
+	void execute_step_source(const std::vector<std::string_view> &params);
 	void execute_over(const std::vector<std::string_view> &params);
+	void execute_over_source(const std::vector<std::string_view> &params);
 	void execute_out(const std::vector<std::string_view> &params);
+	void execute_out_source(const std::vector<std::string_view> &params);
 	void execute_go(const std::vector<std::string_view> &params);
 	void execute_go_vblank(const std::vector<std::string_view> &params);
 	void execute_go_interrupt(const std::vector<std::string_view> &params);
@@ -102,6 +105,7 @@ private:
 	void execute_next(const std::vector<std::string_view> &params);
 	void execute_cpulist(const std::vector<std::string_view> &params);
 	void execute_time(const std::vector<std::string_view> &params);
+	void execute_srcdbg_set_offset(const std::vector<std::string_view> &params);
 	void execute_comment_add(const std::vector<std::string_view> &params);
 	void execute_comment_del(const std::vector<std::string_view> &params);
 	void execute_comment_save(const std::vector<std::string_view> &params);
