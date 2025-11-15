@@ -16,6 +16,7 @@
 // ======================> mpu_pc98_device
 
 class mif201_device : public device_t
+                    , public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction
@@ -31,12 +32,12 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
-	required_device<pc98_cbus_slot_device> m_bus;
 	required_device_array<i8251_device, 2> m_uart;
 	required_device<pit8253_device>  m_pit;
 
-//  void map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 

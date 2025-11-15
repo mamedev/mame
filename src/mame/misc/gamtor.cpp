@@ -16,19 +16,13 @@
   and dies during what it calls 'EEPROM test' (investigate - is it hooked up in the coldfire
   peripheral area?)
 
-  llcharm ->
-    'maincpu' (014902D2): unmapped program memory write to 000000D8 = 00000000 & FFFFFFFF
-    'maincpu' (01490312): unmapped program memory write to 000000B8 = 0BB19C00 & FFFFFFFF
-    'maincpu' (0149031C): unmapped program memory write to 000000D8 = 00000001 & FFFFFFFF
-    'maincpu' (01490312): unmapped program memory write to 000000B8 = 038B9C00 & FFFFFFFF
-    'maincpu' (0149031C): unmapped program memory write to 000000D8 = 00000001 & FFFFFFFF
+  Update: calls MBUS in Coldfire (i2c), which currently is tied to machine().rand() ...
 
 */
 
 
 #include "emu.h"
 #include "cpu/m68000/mcf5206e.h"
-#include "machine/mcf5206e.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
 
@@ -156,7 +150,6 @@ void gaminator_state::gaminator_map(address_map &map)
 	map(0x440a0000, 0x440bffff).rw("vga", FUNC(gamtor_vga_device::mem_r), FUNC(gamtor_vga_device::mem_w));
 
 	map(0xe0000000, 0xe00001ff).ram(); // nvram?
-	map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
 }
 
 static INPUT_PORTS_START(  gaminator )
@@ -168,8 +161,6 @@ void gaminator_state::gaminator(machine_config &config)
 {
 	MCF5206E(config, m_maincpu, 40000000); /* definitely Coldfire, model / clock uncertain */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gaminator_state::irq6_line_hold)); // irq6 seems to be needed to get past the ROM checking
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);

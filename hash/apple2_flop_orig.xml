@@ -980,7 +980,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="orbitron">
+	<software name="orbitron" supported="no">
 		<description>Orbitron</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
@@ -1209,8 +1209,8 @@ license:CC0-1.0
 		<description>Raster Blaster</description>
 		<year>1981</year>
 		<publisher>BudgeCo</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, //e or //c." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C" />
 		<!-- Dump released: 2018-10-26 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1291,7 +1291,9 @@ license:CC0-1.0
 		<description>Russki Duck</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility problems caused by the copy protection, it will not run on later models." />
+		<info name="author" value="Eric Knopp" />
+		<info name="author" value="Alan Merrell" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-01-24 -->
 
@@ -1446,7 +1448,7 @@ license:CC0-1.0
 		<description>Space Eggs</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+, or an unenhanced Apple //e. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+, or unenhanced Apple //e. Due to copy protection, it will not run on 65C02-based models." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2018-10-31 -->
 
@@ -1664,7 +1666,8 @@ license:CC0-1.0
 		<description>Trick Shot</description>
 		<year>1981</year>
 		<publisher>IDSI</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. It will not run on later models." />
+		<info name="protection" value="Protect-O-Disk" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-08-23 -->
 
@@ -1851,8 +1854,8 @@ license:CC0-1.0
 		<description>Eggs-It</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-02-21 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1881,8 +1884,8 @@ license:CC0-1.0
 		<description>Gamma Goblins</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on 65C02-based models." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-02-27 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1978,8 +1981,8 @@ license:CC0-1.0
 		<description>Beer Run</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on 65C02-based models." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-03-10 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1993,8 +1996,8 @@ license:CC0-1.0
 		<description>Phaser Fire</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-03-11 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2008,8 +2011,8 @@ license:CC0-1.0
 		<description>Bug Attack</description>
 		<year>1981</year>
 		<publisher>Cavalier Computer</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on 65C02-based models." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-03-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2038,8 +2041,8 @@ license:CC0-1.0
 		<description>High Orbit</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-03-14 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2280,6 +2283,7 @@ license:CC0-1.0
 		<publisher>Personal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K. This is release 5, the earliest version ever published for Apple ][." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-11 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2295,6 +2299,7 @@ license:CC0-1.0
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 32K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2310,6 +2315,7 @@ license:CC0-1.0
 		<publisher>Programma Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 32K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-13 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2325,6 +2331,7 @@ license:CC0-1.0
 		<publisher>Creative Computing Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-16 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2340,6 +2347,7 @@ license:CC0-1.0
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-04-16 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2383,7 +2391,7 @@ license:CC0-1.0
 		<description>Neptune</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-04-27 -->
 
@@ -2458,8 +2466,9 @@ license:CC0-1.0
 		<description>Juggler</description>
 		<year>1982</year>
 		<publisher>IDSI</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or Apple ][+. Due to compatibility problems created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<info name="protection" value="Protect-O-Disk" />
+		<info name="usage" value="Requires a 48K Apple ][ or Apple ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-05-06 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3010,9 +3019,10 @@ license:CC0-1.0
 		<description>Quadrant 6112</description>
 		<year>1982</year>
 		<publisher>Sensible Software</publisher>
-		<info name="usage" value="Requires an Apple ][ or ][+ with 48K. Due to compatibility issues created by the copy protection, it will not run on later models. Even with a compatible ROM file, this game triggers bugs in several emulators, resulting in crashes or spontaneous reboots." />
+		<info name="usage" value="Requires an Apple ][ or ][+ with 48K. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-07-01 -->
+		<!-- This game triggers bugs in several emulators, resulting in crashes or spontaneous reboots. -->
 		<!-- Tested for several minutes in MAME on 2019-07-03 with no obvious crashes. Will leave tagged as working unless reports say otherwise. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3393,6 +3403,7 @@ license:CC0-1.0
 		<publisher>Crystal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-08-25 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3862,6 +3873,7 @@ license:CC0-1.0
 		<publisher>MUSE Software</publisher>
 		<info name="usage" value="Requires an Apple ][ with Integer BASIC ROM and at least 32K. Due to reliance on Integer ROM, it will not run on later models." />
 		<sharedfeat name="compatibility" value="A2" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-01 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3914,6 +3926,7 @@ license:CC0-1.0
 		<publisher>Personal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 16K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-09 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3929,6 +3942,7 @@ license:CC0-1.0
 		<publisher>Personal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 16K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-09 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3944,6 +3958,7 @@ license:CC0-1.0
 		<publisher>Personal Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 24K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-09 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3957,7 +3972,8 @@ license:CC0-1.0
 		<description>Bloody Murder</description>
 		<year>1979</year>
 		<publisher>Stoneware</publisher>
-		<info name="usage" value="Requires an original Apple ][ with 48K and Integer BASIC in ROM." />
+		<info name="author" value="Arthur Wells, Jr." />
+		<info name="usage" value="Requires an Apple ][ with 48K and Integer BASIC in ROM." />
 		<sharedfeat name="compatibility" value="A2" />
 		<!-- Dump released: 2019-11-12 -->
 
@@ -3972,8 +3988,9 @@ license:CC0-1.0
 		<description>The Best of MUSE</description>
 		<year>1980</year>
 		<publisher>MUSE Software</publisher>
-		<info name="usage" value="Requires an original Apple ][ with 32K and Integer BASIC in ROM." />
+		<info name="usage" value="Requires an Apple ][ with 32K and Integer BASIC in ROM." />
 		<sharedfeat name="compatibility" value="A2" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3989,6 +4006,7 @@ license:CC0-1.0
 		<publisher>Crystalware</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -4004,6 +4022,7 @@ license:CC0-1.0
 		<publisher>Adventure International</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-11-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -4663,7 +4682,7 @@ license:CC0-1.0
 		<description>Horizon V</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires an Apple ][ or Apple ][+. Due to restrictive copy protection, it will not boot on later models." />
+		<info name="usage" value="Requires an Apple ][ or Apple ][+. Due to restrictive copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2020-01-22 -->
 
@@ -5406,6 +5425,7 @@ license:CC0-1.0
 		<publisher>MUSE Software</publisher>
 		<info name="usage" value="Requires a 13-sector drive and a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-04-11 redumped: 2020-04-17 to fix incorrectly set sector type (it was incorrectly set to 15-sector) -->
 
 		<part name="flop0" interface="floppy_5_25">
@@ -6723,6 +6743,7 @@ license:CC0-1.0
 		<publisher>United Software of America</publisher>
 		<info name="usage" value="Runs on any Apple ][ with 48K and requires a 13-sector drive." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-09-10 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -6891,6 +6912,7 @@ license:CC0-1.0
 		<publisher>California Pacific Computer</publisher>
 		<info name="usage" value="Runs on any Apple ][ with 32K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-10-07 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -6904,8 +6926,10 @@ license:CC0-1.0
 		<description>Time Lord</description>
 		<year>????</year>
 		<publisher>Ramware</publisher>
-		<info name="usage" value="Requires an original Apple ][ with 48K and Integer BASIC in ROM." />
+		<info name="author" value="Michael Prescott" />
+		<info name="usage" value="Requires an Apple ][ with 48K and Integer BASIC in ROM." />
 		<sharedfeat name="compatibility" value="A2" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-10-07 -->
 		<!-- The program is undated and release year is unknown. -->
 
@@ -8291,6 +8315,7 @@ license:CC0-1.0
 		<publisher>United Software of America</publisher>
 		<info name="usage" value="Requires a 13-sector drive but otherwise runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2021-11-03 -->
 		<!-- "Star Dance" is a 1981 action game developed by Gustavo Fernandez and distributed by United Software of America. It requires a 13-sector drive but otherwise runs on any Apple ][ with 48K. -->
 
@@ -8305,7 +8330,7 @@ license:CC0-1.0
 		<description>Disk Organizer (version 2.6)</description>
 		<year>1982</year>
 		<publisher>Sensible Software</publisher>
-		<info name="usage" value="Requires an Apple ][, ][+, or unenhanced //e with 48K." />
+		<info name="usage" value="Requires an Apple ][, ][+, or unenhanced //e with 48K. It will not run on 65C02-based models." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2021-11-03 -->
 		<!-- "Disk Organizer" is a 1982 disk utility developed and distributed by Sensible Software. This is version 2.6. It requires an Apple ][, ][+, or unenhanced //e with 48K. -->
@@ -8948,7 +8973,9 @@ license:CC0-1.0
 		<description>Space Adventure: Episode One</description>
 		<year>1981</year>
 		<publisher>Sierra Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+." />
+		<info name="author" value="Alick Dziabczenko" />
+		<info name="protection" value="Protect-O-Disk" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it does not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2022-02-19 -->
 		<!-- "Space Adventure: Episode One" is a 1981 action game developed by Alick Dziabczenko and distributed by Sierra Software. It requires a 48K Apple ][ or ][+. Due to aggressive copy protection, it does not run on later models. -->
@@ -9101,6 +9128,7 @@ license:CC0-1.0
 		<publisher>Adventure International</publisher>
 		<info name="usage" value="Requires a 13-sector floppy drive and a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2022-02-23 -->
 		<!-- "His Majesty's Ship "Impetuous"" is a 1980 adventure game written by Robert Lafore, ported to the Apple ][ by David Fox and Corey Kosak, and distributed by Adventure International. It requires a 13-sector floppy drive and a 48K Apple ][+ or later. -->
 
@@ -9131,8 +9159,10 @@ license:CC0-1.0
 		<description>Skybombers II</description>
 		<year>1980</year>
 		<publisher>Instant Software</publisher>
+		<info name="author" value="Al Floeter" />
 		<info name="usage" value="Requires a 13-sector drive and a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2022-02-24 -->
 		<!-- "Skybombers II" is a 1980 action game developed by Al Floeter and distributed by Instant Software. It requires a 13-sector drive and a 48K Apple ][+ or later. -->
 
@@ -9147,6 +9177,7 @@ license:CC0-1.0
 		<description>Three Mile Island</description>
 		<year>1979</year>
 		<publisher>MUSE Software</publisher>
+		<info name="author" value="Richard Orban" />
 		<info name="usage" value="Requires a 48K Apple ][ with Integer BASIC in ROM." />
 		<sharedfeat name="compatibility" value="A2" />
 		<!-- Dump released: 2022-02-24 -->
@@ -10115,6 +10146,7 @@ license:CC0-1.0
 		<publisher>Crystal Software</publisher>
 		<info name="usage" value="Requires a 48K Apple ][+ or later with a 13-sector drive." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2022-03-17 -->
 		<!-- "Galactic Quest" is a 1980 simulation game developed by John and Patty Bell, and distributed by Crystal Software. It requires a 48K Apple ][+ or later with a 13-sector drive. -->
 
@@ -10424,7 +10456,7 @@ license:CC0-1.0
 		<description>Computer Foosball</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2022-05-26 -->
 		<!-- "Computer Foosball" is a 1981 sports game developed by Keithen Hayenga and distributed by Sirius Software. It requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models. -->
@@ -12976,8 +13008,9 @@ license:CC0-1.0
 		<info name="developer" value="Argon Games" />
 		<info name="programmer" value="Stephen G. Walburn" />
 		<info name="programmer" value="Robert J. McCredie" />
-		<info name="usage" value="Requires a 13-sector drive, integer basic, and runs on an Apple ][." />
+		<info name="usage" value="Requires a 13-sector drive, Integer BASIC, and runs on an Apple ][." />
 		<sharedfeat name="compatibility" value="A2" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2023-02-26 by DefaultGen -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -13049,7 +13082,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Sensible Software</publisher>
 		<info name="programmer" value="Marv Long" />
-		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later systems." />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2023-07-27 -->
 		<!-- action game -->
@@ -14919,6 +14952,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bruce Wallace" />
 		<info name="usage" value="Runs on any Apple ][ with 32K and a 13-sector drive." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-06-06 -->
 		<!-- action game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -15634,6 +15668,7 @@ license:CC0-1.0
 		<info name="programmer" value="Matthew Jew" />
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2022-02-24 -->
 		<!-- strategy game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -17330,7 +17365,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="choplftr">
+	<software name="choplftr" supported="no">
 		<description>Choplifter</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
@@ -17662,6 +17697,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 48K Apple ][+ or later with a 13-sector drive and Applesoft in ROM." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2024-08-30 -->
 		<!-- strategy game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -20588,7 +20624,8 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Micro Lab</publisher>
 		<info name="programmer" value="Bill Basham" />
-		<info name="usage" value="Requires a 48K Apple ][ or Apple ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="protection" value="Protect-O-Disk" />
+		<info name="usage" value="Requires a 48K Apple ][ or Apple ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-10-14 -->
 		<!-- action game -->
@@ -20774,8 +20811,7 @@ license:CC0-1.0
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Doug Carlston" />
 		<info name="programmer" value="Brian Crouch" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+." />
-		<!-- Due to compatibility problems created by the copy protection, it will not run on later models. -->
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-05-01 -->
 		<!-- educational game -->
@@ -20820,6 +20856,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 13-sector drive and a 48K Apple ][+ or later." />
 		<info name="version" value="1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-01-03 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -20893,6 +20930,7 @@ license:CC0-1.0
 		<info name="programmer" value="Jim Connelley" />
 		<info name="usage" value="Requires a 13-sector drive and a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-05-08 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -20913,6 +20951,7 @@ license:CC0-1.0
 		<info name="version" value="revision 1" />
 		<!-- This is revision 1, no title screen and boots on a 13-sector drive. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-01-06 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -20933,6 +20972,7 @@ license:CC0-1.0
 		<info name="version" value="revision 2" />
 		<!-- This is revision 2, which fixes unspecified bugs and adds a graphical title screen. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2020-01-06 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -22458,7 +22498,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gendrift">
+	<software name="gendrift" supported="no">
 		<description>Genetic Drift</description>
 		<year>1981</year>
 		<publisher>Brøderbund Software</publisher>
@@ -22889,8 +22929,8 @@ license:CC0-1.0
 		<info name="developer" value="StarCraft" />
 		<info name="programmer" value="M. Tomita" />
 		<info name="programmer" value="Shigeya Suzuki" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+.  It will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, //e or IIgs. It will not run on an Apple //c." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2GS" />
 		<!-- Dump released: 2019-02-24 -->
 		<!-- strategy game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -23956,7 +23996,8 @@ license:CC0-1.0
 		<publisher>Sierra On-Line</publisher>
 		<info name="alt_title" value="Jawbreaker" />
 		<info name="programmer" value="Chuck Bueche (Chuckles)" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
+		<info name="protection" value="Spiradisc System" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-09-21 -->
 		<!-- action game -->
@@ -24768,7 +24809,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Scott Schram" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-03-17 -->
 		<!-- action game -->
@@ -24871,8 +24912,8 @@ license:CC0-1.0
 		<description>Lazer Silk (Gebelli Software)</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="programmer" value="Eric Knoff" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="programmer" value="Eric Knopp" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-03-21 -->
 		<!-- action game -->
@@ -24888,7 +24929,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Softsmith</publisher>
 		<info name="original_publisher" value="Gebelli Software" />
-		<info name="programmer" value="Eric Knoff" />
+		<info name="programmer" value="Eric Knopp" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-14 -->
@@ -25378,7 +25419,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Chuck Bueche (Chuckles)" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to conflicts created by the copy protection, it will not run on later models." />
+		<info name="protection" value="Spiradisc System" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-02-23 -->
 		<!-- action game -->
@@ -27134,7 +27176,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bob Neumann" />
 		<info name="programmer" value="Megan Stine" />
 		<info name="programmer" value="H. William Stine" />
-		<info name="usage" value="Requires a 48K Apple ][+ or unenhanced //e. Due to issues unrelated to the copy protection, it does not run on later machines." />
+		<info name="usage" value="Requires a 48K Apple ][+ or unenhanced //e. Due to issues unrelated to the copy protection, it does not run on later machines without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2P,A2E" />
 		<!-- Dump released: 2022-08-02 -->
 		<!-- educational disk-based magazine published by Scholastic between 1983 and 1992. -->
@@ -30339,10 +30381,9 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>COMPUTER:applications</publisher>
 		<info name="developer" value="COMPUTER:applications" />
-		<info name="usage" value="Requires an Apple ][ or Apple ][+ with 48K" />
+		<info name="usage" value="Requires an Apple ][ or Apple ][+ with 48K. Due to copy protection, it does not boot on later models without nonstandard firmware." />
 		<info name="version" value="A1" />
 		<sharedfeat name="compatibility" value="A2,A2P" />
-		<!-- Due to aggressive copy protection, it does not boot on later models. -->
 		<!-- Dump released: 2024-03-17 -->
 		<!-- disk utility program -->
 		<part name="flop1" interface="floppy_5_25">
@@ -31135,7 +31176,8 @@ license:CC0-1.0
 		<description>Pest Patrol</description>
 		<year>1982</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
+		<info name="protection" value="Spiradisc System" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-10-25 -->
 		<!-- action game -->
@@ -32496,7 +32538,7 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Olaf Lubeck" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility problems caused by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-11-19 -->
 		<!-- action game -->
@@ -33712,7 +33754,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="seafox">
+	<software name="seafox" supported="no">
 		<description>Sea Fox</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
@@ -33793,8 +33835,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="David Snider" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-02-28 -->
 		<!-- action game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -34233,7 +34275,7 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Chris Jochumson" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility problems caused by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-10-30 -->
 		<!-- action game -->
@@ -34719,7 +34761,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Tony Suzuki" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-03-25 -->
 		<!-- action game -->
@@ -34804,6 +34846,7 @@ license:CC0-1.0
 		<info name="programmer" value="Jon Freeman" />
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2019-03-29 -->
 		<!-- strategy game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -39242,7 +39285,7 @@ license:CC0-1.0
 		<year>1980</year>
 		<publisher>On-Line Systems</publisher>
 		<info name="programmer" value="Warren Schwader" />
-		<info name="usage" value="Requires an original Apple ][ with 48K and Integer BASIC in ROM." />
+		<info name="usage" value="Requires an Apple ][ with 48K and Integer BASIC in ROM." />
 		<sharedfeat name="compatibility" value="A2" />
 		<!-- Dump released: 2019-12-02 -->
 		<!-- action game -->
@@ -39615,6 +39658,7 @@ license:CC0-1.0
 		<info name="programmer" value="Kieth Yilt" />
 		<info name="usage" value="Requires a 13-sector drive but otherwise Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl6_default" value="diskiing13" />
 		<!-- Dump released: 2024-06-16 -->
 		<!-- action game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -42174,7 +42218,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
 		<info name="programmer" value="Nasir Gebelli" />
-		<info name="usage" value="Runs on a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later systems." />
+		<info name="usage" value="Runs on a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2023-07-26 -->
 		<!-- action game -->

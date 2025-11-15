@@ -215,10 +215,6 @@ private:
 	uint32_t lba_from_time();
 
 	static uint8_t get_sector_count_for_coding(uint8_t coding);
-	void decode_xa_mono(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
-	void decode_xa_mono8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
-	void decode_xa_stereo(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
-	void decode_xa_stereo8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
 
 	static const int16_t s_xa_filter_coef[4][2];
 	static const int32_t s_samples_per_sector;

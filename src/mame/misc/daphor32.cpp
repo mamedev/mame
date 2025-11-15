@@ -254,4 +254,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT  CLASS          INIT         COMPANY          FULLNAME      FLAGS
-COMP( 1983, daphor32, 0,      0,      daphor32,  0,     daphor_state,  empty_init,  "Dasit S.P.A.",  "Daphor 32",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1983, daphor32, 0,      0,      daphor32,  0,     daphor_state,  empty_init,  "Dasit S.p.A.",  "Daphor 32",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

@@ -80,7 +80,7 @@ public:
 	required_shared_ptr<u32> m_textureram1;
 	std::unique_ptr<u16[]> m_palram;
 	std::unique_ptr<u16[]> m_colorxlat;
-	std::unique_ptr<u16[]> m_lumaram;
+	std::unique_ptr<u8[]> m_lumaram;
 	u8 m_gamma_table[256]{};
 	std::unique_ptr<model2_renderer> m_poly;
 
@@ -204,8 +204,8 @@ protected:
 	void geo_init(memory_region *polygon_rom);
 	u32 render_mode_r();
 	void render_mode_w(u32 data);
-	u16 lumaram_r(offs_t offset);
-	void lumaram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 lumaram_r(offs_t offset);
+	void lumaram_w(offs_t offset, u8 data);
 	u16 fbvram_bankA_r(offs_t offset);
 	void fbvram_bankA_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 fbvram_bankB_r(offs_t offset);
@@ -273,6 +273,7 @@ private:
 	bool m_render_mode = false;
 	bool m_render_test_mode = false;
 	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
+	bool m_palette_dirty = false;
 
 	u32 *geo_process_command( geo_state *geo, u32 opcode, u32 *input, bool *end_code );
 	// geo commands
@@ -569,11 +570,12 @@ private:
 class model2c_state : public model2_state
 {
 public:
-	model2c_state(const machine_config &mconfig, device_type type, const char *tag)
-		: model2_state(mconfig, type, tag),
-		  m_copro_tgpx4(*this, "copro_tgpx4"),
-		  m_copro_tgpx4_program(*this, "copro_tgpx4_program")
-	{}
+	model2c_state(const machine_config &mconfig, device_type type, const char *tag) :
+		model2_state(mconfig, type, tag),
+		m_copro_tgpx4(*this, "copro_tgpx4"),
+		m_copro_tgpx4_program(*this, "copro_tgpx4_program")
+	{
+	}
 
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);
@@ -618,13 +620,20 @@ struct m2_poly_extra_data
 	u32      lumabase;
 	u32      colorbase;
 	u8       checker;
-	u32 *    texsheet[6];
-	u32      texwidth[6];
-	u32      texheight[6];
-	u32      texx[6];
-	u32      texy[6];
+	u32 *    texsheet[2];
+	u32      texwidth;
+	u32      texheight;
+	u32      texx;
+	u32      texy;
+	u8       texwrapx;
+	u8       texwrapy;
 	u8       texmirrorx;
 	u8       texmirrory;
+	u8       utex;
+	u8       utexminlod;
+	u32      utexx;
+	u32      utexy;
+	s32      texlod;
 	u8       luma;
 };
 
@@ -657,39 +666,46 @@ static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4>
 {
 public:
-	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
-
-public:
 	using triangle = model2_state::triangle;
 
-	model2_renderer(model2_state& state)
-		: poly_manager<float, m2_poly_extra_data, 4>(state.machine())
-		, m_state(state)
-		, m_destmap(512, 512)
+	model2_renderer(model2_state& state) :
+		poly_manager<float, m2_poly_extra_data, 4>(state.machine()),
+		m_render_callbacks{
+				{ &model2_renderer::draw_scanline_solid<false>, this },
+				{ &model2_renderer::draw_scanline_solid<true>, this },
+				{ &model2_renderer::draw_scanline_tex<false>, this },
+				{ &model2_renderer::draw_scanline_tex<true>, this } },
+		m_state(state),
+		m_destmap(512, 512),
+		m_fillmap(512, 512),
+		m_xoffs(90),
+		m_yoffs(-8)
 	{
-		m_xoffs = 90;
-		m_yoffs = -8;
 	}
 
-	bitmap_rgb32& destmap() { return m_destmap; }
+	bitmap_rgb32 &destmap() { return m_destmap; }
+	bitmap_ind8 &fillmap() { return m_fillmap; }
 
 	void model2_3d_render(triangle *tri, const rectangle &cliprect);
 	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
 	void set_yoffset(int16_t yoffs) { m_yoffs = yoffs; }
 
 	template <bool Translucent>
-	void draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
+	void draw_scanline_solid(int32_t scanline, const extent_t &extent, const m2_poly_extra_data &object, int threadid);
 
 	template <bool Translucent>
-	void draw_scanline_tex(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
+	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const m2_poly_extra_data &object, int threadid);
 
 private:
-	model2_state& m_state;
+	render_delegate m_render_callbacks[4];
+
+	model2_state &m_state;
 	bitmap_rgb32 m_destmap;
-	int16_t m_xoffs = 0, m_yoffs = 0;
+	bitmap_ind8 m_fillmap;
+	int16_t m_xoffs, m_yoffs;
 
 	template <bool Translucent>
-	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv);
+	u32 fetch_bilinear_texel(const m2_poly_extra_data& object, const s32 miplevel, s32 fu, s32 fv);
 };
 
 typedef model2_renderer::vertex_t poly_vertex;
@@ -733,6 +749,7 @@ struct model2_state::triangle
 	u16             z = 0;
 	u16             texheader[4] = { 0, 0, 0, 0 };
 	u8              luma = 0;
+	s32             texlod = 0;
 	int16_t         viewport[4] = { 0, 0, 0, 0 };
 	int16_t         center[2] = { 0, 0 };
 	u8              window = 0;
@@ -750,6 +767,7 @@ struct model2_state::quad_m2
 	u16             z = 0;
 	u16             texheader[4] = { 0, 0, 0, 0 };
 	u8              luma = 0;
+	s32             texlod = 0;
 };
 
 /*******************************************
@@ -789,7 +807,7 @@ struct model2_state::raster_state
 	u16             min_z = 0;                      // Minimum sortable Z value
 	u16             max_z = 0;                      // Maximum sortable Z value
 	u16             texture_ram[0x10000];           // Texture RAM pointer
-	u8              log_ram[0x40000];               // Log RAM pointer
+	u8              log_ram[0x8000];                // Log RAM pointer
 	u8              cur_window = 0;                 // Current window
 	plane           clip_plane[4][4];               // Polygon clipping planes
 };

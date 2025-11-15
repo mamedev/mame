@@ -305,7 +305,7 @@ Compiled by Robbbert
 	</software>
 	<software name="dodge">
 		<description>Dodgem</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="serial" value="311ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -923,7 +923,7 @@ Compiled by Robbbert
 	</software>
 	<software name="checkers">
 		<description>Checkers</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -970,7 +970,7 @@ Compiled by Robbbert
 	</software>
 	<software name="nuclear">
 		<description>Nuclear Reaction</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -981,7 +981,7 @@ Compiled by Robbbert
 	</software>
 	<software name="pielob">
 		<description>Pie Lob</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1290,7 +1290,7 @@ Compiled by Robbbert
 	<software name="cadas">
 		<description>Cassette Disk database system</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Global Software Network</publisher>
 		<info name="developer" value="Bob Stafford"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">

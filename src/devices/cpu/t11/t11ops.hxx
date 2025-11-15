@@ -279,7 +279,8 @@
 
 /* Extended Instruction Set -- SIMH impl */
 
-int t11_device::_mul(int src, int src2, int *psw) {
+int t11_device::_mul(int src, int src2, int *psw)
+{
 	int dst;
 	int N, Z, V, C;
 
@@ -297,42 +298,51 @@ int t11_device::_mul(int src, int src2, int *psw) {
 	return dst;
 }
 
-#define MUL_M(s)    \
-int sreg, dreg, source, dest, result, ea = 0, _psw = PSW; \
-EIS_SWAP; GET_SW_##s; GET_DW_RG; \
-result = _mul(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
-PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
+#define MUL_M(s) \
+		int sreg, dreg, source, dest, result, ea = 0, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _mul(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
 
-#define MUL_R(s)    \
-int sreg, dreg, source, dest, result, _psw = PSW; \
-EIS_SWAP; GET_SW_##s; GET_DW_RG; \
-result = _mul(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
-PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
+#define MUL_R(s) \
+		int sreg, dreg, source, dest, result, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _mul(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
 
-int t11_device::_div(int source, int source1, int src2, int *remainder, int *psw) {
+int t11_device::_div(int source, int source1, int src2, int *remainder, int *psw)
+{
 	int src, dst = 0;
 	int N, Z, V, C;
 
 	src = (((uint32_t) source) << 16) | source1;
-	if (src2 == 0) {
+	if (src2 == 0)
+	{
 		N = 0;                                  /* J11,11/70 compat */
 		Z = V = C = 1;                          /* N = 0, Z = 1 */
 		if (c_insn_set & IS_VM2) Z = 0;
-	} else if ((((uint32_t)src) == 020000000000) && (src2 == 0177777)) {
+	}
+	else if ((((uint32_t)src) == 020000000000) && (src2 == 0177777))
+	{
 		V = 1;                                  /* J11,11/70 compat */
 		N = Z = C = 0;                          /* N = Z = 0 */
-	} else {
+	}
+	else
+	{
 		if (GET_SIGN_W (src2))
 			src2 = src2 | ~077777;
 		if (GET_SIGN_W (source))
 			src = src | ~017777777777;
 		dst = src / src2;
 		N = (dst < 0);                              /* N set on 32b result */
-		if ((dst > 077777) || (dst < -0100000)) {
+		if ((dst > 077777) || (dst < -0100000))
+		{
 			V = 1;                                  /* J11,11/70 compat */
 			Z = C = 0;                              /* Z = C = 0 */
 			if (c_insn_set & IS_VM2) N = 0;
-		} else {
+		}
+		else
+		{
 			Z = GET_ZERO (dst);
 			V = C = 0;
 		}
@@ -342,19 +352,20 @@ int t11_device::_div(int source, int source1, int src2, int *remainder, int *psw
 	return dst;
 }
 
-#define DIV_M(s)    \
-int sreg, dreg, source, dest, result, remainder = 0, ea = 0, _psw = PSW; \
-EIS_SWAP; GET_SW_##s; GET_DW_RG; \
-result = _div(dest, REGD(dreg|1), source, &remainder, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
-if (!(PSW & VFLAG)) { REGW((dreg|1)) = remainder; PUT_DW_DREG(result); }
+#define DIV_M(s) \
+		int sreg, dreg, source, dest, result, remainder = 0, ea = 0, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _div(dest, REGD(dreg|1), source, &remainder, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		if (!(PSW & VFLAG)) { REGW((dreg|1)) = remainder; PUT_DW_DREG(result); }
 
-#define DIV_R(s)    \
-int sreg, dreg, source, dest, result, remainder = 0, _psw = PSW; \
-EIS_SWAP; GET_SW_##s; GET_DW_RG; \
-result = _div(dest, REGD(dreg|1), source, &remainder, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
-if (!(PSW & VFLAG)) { REGW((dreg|1)) = remainder; PUT_DW_DREG(result); }
+#define DIV_R(s) \
+		int sreg, dreg, source, dest, result, remainder = 0, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _div(dest, REGD(dreg|1), source, &remainder, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		if (!(PSW & VFLAG)) { REGW((dreg|1)) = remainder; PUT_DW_DREG(result); }
 
-int t11_device::_ash(int source, int dest, int *psw) {
+int t11_device::_ash(int source, int dest, int *psw)
+{
 	int src, src2, dst, sign, i;
 	int N, Z, V, C;
 
@@ -366,50 +377,56 @@ int t11_device::_ash(int source, int dest, int *psw) {
 	src2 = dest & 077;
 	sign = GET_SIGN_W (source);
 	src = sign? source | ~077777: source;
-	if (src2 == 0) {                            /* [0] */
+	if (src2 == 0)                              /* [0] */
+	{
 		dst = src;
 		V = C = 0;
-		}
-	else if (src2 <= 15) {                      /* [1,15] */
+	}
+	else if (src2 <= 15)                        /* [1,15] */
+	{
 		dst = src << src2;
 		i = (src >> (16 - src2)) & 0177777;
 		V = (i != ((dst & 0100000)? 0177777: 0));
 		C = (i & 1);
-		}
-	else if (src2 <= 31) {                      /* [16,31] */
+	}
+	else if (src2 <= 31)                        /* [16,31] */
+	{
 		dst = 0;
 		V = (src != 0);
 		C = (src << (src2 - 16)) & 1;
-		}
-	else if (src2 == 32) {                      /* [32] = -32 */
+	}
+	else if (src2 == 32)                        /* [32] = -32 */
+	{
 		dst = -sign;
 		V = 0;
 		C = sign;
-		}
-	else {                                      /* [33,63] = -31,-1 */
+	}
+	else                                        /* [33,63] = -31,-1 */
+	{
 		dst = (src >> (64 - src2)) | (-sign << (src2 - 32));
 		V = 0;
 		C = ((src >> (63 - src2)) & 1);
-		}
+	}
 	N = GET_SIGN_W (dst);
 	Z = GET_ZERO (dst);
 	*psw = (*psw & ~15) | ((N&1) << 3) | ((Z&1) << 2) | ((V&1) << 1) | (C&1);
 	return dst & 0177777;
 }
 
-#define ASH_M(s)    \
-int sreg, dreg, source, dest, result, _psw = PSW, ea = 0; \
-EIS_SWAP; GET_SW_##s; GET_DW_RG; \
-result = _ash(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
-PUT_DW_DREG(result)
+#define ASH_M(s) \
+		int sreg, dreg, source, dest, result, _psw = PSW, ea = 0; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _ash(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result)
 
-#define ASH_R(s)    \
-int sreg, dreg, source, dest, result, _psw = PSW; \
-EIS_SWAP; GET_SW_##s; GET_DW_RG; \
-result = _ash(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
-PUT_DW_DREG(result)
+#define ASH_R(s) \
+		int sreg, dreg, source, dest, result, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _ash(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result)
 
-int t11_device::_ashc(int source, int source1, int dest, int *psw) {
+int t11_device::_ashc(int source, int source1, int dest, int *psw)
+{
 	int src, src2, dst, sign, i;
 	int N, Z, V, C;
 
@@ -422,26 +439,30 @@ int t11_device::_ashc(int source, int source1, int dest, int *psw) {
 	sign = GET_SIGN_W (source);
 
 	src = (((uint32_t) source) << 16) | source1;
-	if (src2 == 0) {                            /* [0] */
+	if (src2 == 0)                              /* [0] */
+	{
 		dst = src;
 		V = C = 0;
-		}
-	else if (src2 <= 31) {                      /* [1,31] */
+	}
+	else if (src2 <= 31)                        /* [1,31] */
+	{
 		dst = ((uint32_t) src) << src2;
 		i = (src >> (32 - src2)) | (-sign << src2);
 		V = (i != ((dst & 020000000000)? -1: 0));
 		C = (i & 1);
-		}
-	else if (src2 == 32) {                      /* [32] = -32 */
+	}
+	else if (src2 == 32)                        /* [32] = -32 */
+	{
 		dst = -sign;
 		V = 0;
 		C = sign;
-		}
-	else {                                      /* [33,63] = -31,-1 */
+	}
+	else                                        /* [33,63] = -31,-1 */
+	{
 		dst = (src >> (64 - src2)) | (-sign << (src2 - 32));
 		V = 0;
 		C = ((src >> (63 - src2)) & 1);
-		}
+	}
 	i = (dst >> 16) & 0177777;
 	N = GET_SIGN_W (i);
 	Z = GET_ZERO (dst | i);
@@ -449,17 +470,17 @@ int t11_device::_ashc(int source, int source1, int dest, int *psw) {
 	return dst;
 }
 
-#define ASHC_M(s)    \
-int sreg, dreg, source, dest, result, ea = 0, _psw = PSW; \
-EIS_SWAP; GET_SW_##s; GET_DW_RG; \
-result = _ashc(dest, REGD(dreg|1), source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
-PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
+#define ASHC_M(s) \
+		int sreg, dreg, source, dest, result, ea = 0, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _ashc(dest, REGD(dreg|1), source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
 
-#define ASHC_R(s)    \
-int sreg, dreg, source, dest, result, _psw = PSW; \
-EIS_SWAP; GET_SW_##s; GET_DW_RG; \
-result = _ashc(dest, REGD(dreg|1), source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
-PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
+#define ASHC_R(s) \
+		int sreg, dreg, source, dest, result, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _ashc(dest, REGD(dreg|1), source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
 
 
 void t11_device::trap_to(uint16_t vector)
@@ -1124,7 +1145,7 @@ void t11_device::xor_ded(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 30;
 void t11_device::xor_ix(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 30; { XOR_M(IX);  } }
 void t11_device::xor_ixd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 36; { XOR_M(IXD); } }
 
-void t11_device::ash_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { ASH_R(RG);  } }   // XXX icount is fake
+void t11_device::ash_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { ASH_R(RG);  } }   // FIXME: icount is fake
 void t11_device::ash_rgd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { ASH_M(RGD); } }
 void t11_device::ash_in(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 21; { ASH_M(IN);  } }
 void t11_device::ash_ind(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 27; { ASH_M(IND); } }
@@ -1133,7 +1154,7 @@ void t11_device::ash_ded(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; 
 void t11_device::ash_ix(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 30; { ASH_M(IX);  } }
 void t11_device::ash_ixd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 36; { ASH_M(IXD); } }
 
-void t11_device::ashc_rg(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 12; { ASHC_R(RG);  } }  // XXX icount is fake
+void t11_device::ashc_rg(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 12; { ASHC_R(RG);  } }  // FIXME: icount is fake
 void t11_device::ashc_rgd(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 21; { ASHC_M(RGD); } }
 void t11_device::ashc_in(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { ASHC_M(IN);  } }
 void t11_device::ashc_ind(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 27; { ASHC_M(IND); } }
@@ -1142,7 +1163,7 @@ void t11_device::ashc_ded(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 30; 
 void t11_device::ashc_ix(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; { ASHC_M(IX);  } }
 void t11_device::ashc_ixd(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 36; { ASHC_M(IXD); } }
 
-void t11_device::mul_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { MUL_R(RG);  } }   // XXX icount is fake
+void t11_device::mul_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { MUL_R(RG);  } }   // FIXME: icount is fake
 void t11_device::mul_rgd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { MUL_M(RGD); } }
 void t11_device::mul_in(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 21; { MUL_M(IN);  } }
 void t11_device::mul_ind(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 27; { MUL_M(IND); } }
@@ -1151,7 +1172,7 @@ void t11_device::mul_ded(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; 
 void t11_device::mul_ix(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 30; { MUL_M(IX);  } }
 void t11_device::mul_ixd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 36; { MUL_M(IXD); } }
 
-void t11_device::div_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { DIV_R(RG);  } }   // XXX icount is fake
+void t11_device::div_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { DIV_R(RG);  } }   // FIXME: icount is fake
 void t11_device::div_rgd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { DIV_M(RGD); } }
 void t11_device::div_in(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 21; { DIV_M(IN);  } }
 void t11_device::div_ind(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 27; { DIV_M(IND); } }

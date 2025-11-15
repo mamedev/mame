@@ -330,7 +330,8 @@ protected:
 		int actual_size;
 		uint8_t *data;
 		bool deleted;
-		bool bad_crc;
+		bool bad_data_crc;
+		bool bad_addr_crc;
 	};
 
 	struct desc_gcr_sector

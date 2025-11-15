@@ -428,6 +428,7 @@ void mz800_state::mz800(machine_config &config)
 
 	config.device_remove("cass_list");
 	SOFTWARE_LIST(config, "cass_list").set_original("mz800_cass");
+	SOFTWARE_LIST(config, "cass_list_700").set_compatible("mz700_cass");
 
 	/* devices */
 	m_pit->set_clk<0>(XTAL(17'734'470)/16);

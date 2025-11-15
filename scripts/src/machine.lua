@@ -2420,17 +2420,6 @@ if (MACHINES["M68340"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/mcf5206e.h,MACHINES["MCF5206E"] = true
----------------------------------------------------
-
-if (MACHINES["MCF5206E"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mcf5206e.cpp",
-		MAME_DIR .. "src/devices/machine/mcf5206e.h",
-	}
-end
 
 ---------------------------------------------------
 --
@@ -3481,6 +3470,8 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.h",
 		MAME_DIR .. "src/devices/machine/spg_renderer.cpp",
 		MAME_DIR .. "src/devices/machine/spg_renderer.h",
+		MAME_DIR .. "src/devices/machine/gpl_renderer.cpp",
+		MAME_DIR .. "src/devices/machine/gpl_renderer.h",
 	}
 end
 

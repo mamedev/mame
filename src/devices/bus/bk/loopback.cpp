@@ -26,7 +26,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD { m_data = 0; };
+	virtual void device_reset() override ATTR_COLD { m_data = 0; }
 
 	virtual uint16_t io_r() override;
 	virtual void io_w(uint16_t data, bool word) override;

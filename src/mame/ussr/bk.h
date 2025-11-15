@@ -11,6 +11,7 @@
 #pragma once
 
 #include "1801vp014.h"
+#include "vm1timer.h"
 
 #include "bus/bk/parallel.h"
 #include "bus/bk/carts.h"
@@ -21,9 +22,9 @@
 #include "machine/pdp11.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "vm1timer.h"
 
 #include "emupal.h"
+
 
 class bk_state : public driver_device
 {

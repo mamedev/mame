@@ -1036,7 +1036,12 @@ void adam_state::adam(machine_config &config)
 	ADAMNET_SLOT(config, "net2", m_adamnet, adamnet_devices, "prn");
 	ADAMNET_SLOT(config, "net3", m_adamnet, adamnet_devices, "ddp");
 	ADAMNET_SLOT(config, "net4", m_adamnet, adamnet_devices, "fdc");
-	ADAMNET_SLOT(config, "net5", m_adamnet, adamnet_devices, "fdc").set_option_device_input_defaults("fdc", device_iptdef_drive2);
+	adamnet_slot_device &net5(ADAMNET_SLOT(config, "net5", m_adamnet, adamnet_devices, "fdc"));
+	net5.set_option_device_input_defaults("fdc", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_320kb", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_a720dipi", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_fp720at", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_mihddd", device_iptdef_drive2);
 	ADAMNET_SLOT(config, "net6", m_adamnet, adamnet_devices, nullptr);
 	ADAMNET_SLOT(config, "net7", m_adamnet, adamnet_devices, nullptr);
 	ADAMNET_SLOT(config, "net8", m_adamnet, adamnet_devices, nullptr);

@@ -17,13 +17,21 @@
 class nscsi_cdrom_pc8801_30_device : public nscsi_cdrom_device
 {
 public:
-	nscsi_cdrom_pc8801_30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	nscsi_cdrom_pc8801_30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	int16_t get_channel_sample(offs_t offset) { return cdda->get_channel_sample(offset); };
+	virtual void fader_control_w(u8 data);
 
 protected:
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void scsi_command() override;
-	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
+	virtual bool scsi_command_done(u8 command, u8 length) override;
+//	virtual attotime scsi_data_command_delay() override;
+
+	virtual TIMER_CALLBACK_MEMBER(cdda_fader_cb);
 private:
 	void nec_set_audio_start_position();
 	void nec_set_audio_stop_position();
@@ -37,14 +45,20 @@ private:
 		PCE_CD_CDDA_PAUSED
 	};
 
-	uint32_t  m_current_frame = 0;
-	uint32_t  m_end_frame = 0;
-	uint32_t  m_last_frame = 0;
-	uint8_t   m_cdda_status = 0;
-	uint8_t   m_cdda_play_mode = 0;
+	u32  m_current_frame;
+	u32  m_end_frame;
+	u32  m_last_frame;
+	u8   m_cdda_status;
+	u8   m_cdda_play_mode;
 
-	uint8_t   m_end_mark = 0;
+	u8   m_end_mark;
 
+	void cdda_end_mark_cb(int state);
+
+	u8   m_fader_ctrl;
+	double    m_cdda_volume;
+
+	emu_timer *m_cdda_fader_timer;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_PC8801_30, nscsi_cdrom_pc8801_30_device)

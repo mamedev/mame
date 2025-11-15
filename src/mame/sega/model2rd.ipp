@@ -17,6 +17,7 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 {
 	model2_state *state = object.state;
 	u32 *const p = &m_destmap.pix(scanline);
+	u8 *const fill = &m_fillmap.pix(scanline);
 	u8  *gamma_value = &state->m_gamma_table[0];
 
 	// extract color information
@@ -59,87 +60,151 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 		x++;
 
 	for (; x < extent.stopx; x += dx)
-		p[x] = color;
+	{
+		if (fill[x] == 0)
+		{
+			p[x] = color;
+			fill[x] = 0xff;
+		}
+	}
 }
 
+#define LERP(X, Y, A) (((X) + ((((Y) - (X)) * (A)) >> 8)) & 0x00ff00ff)
+
 template <bool Translucent>
-u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, const u32 miplevel, const float fu, const float fv )
+u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, const s32 miplevel, s32 u, s32 v)
 {
-	constexpr float lodfactor[6] = { 256.0F, 128.0F, 64.0F, 32.0F, 16.0F, 8.0F };
-	u32  tex_mirr_x = object.texmirrorx;
-	u32  tex_mirr_y = object.texmirrory;
-	u32  tex_width = object.texwidth[miplevel];
-	u32  tex_height = object.texheight[miplevel];
-	u32 *sheet = object.texsheet[miplevel];
-	u32  tex_x = object.texx[miplevel];
-	u32  tex_y = object.texy[miplevel];
-	u32  tex_x_mask = tex_width - 1;
-	u32  tex_y_mask = tex_height - 1;
-	s32  u = fu * lodfactor[miplevel];
-	s32  v = fv * lodfactor[miplevel];
-	u32  t, tex1, tex2, tex3, tex4, frac1, frac2, frac3, frac4;
-	int u2, u2n;
-	int v2, v2n;
+	u32 tex_wrap_x = object.texwrapx;
+	u32 tex_wrap_y = object.texwrapy;
+	u32 tex_mirr_x = object.texmirrorx;
+	u32 tex_mirr_y = object.texmirrory;
+	u32 tex_width, tex_height;
+	u32 tex_x, tex_y;
+	u32* sheet;
 
-	u2 = u >> 8;
-	v2 = v >> 8;
-
-	if (tex_mirr_x && ((u2 & tex_width) != 0)) // Only flip if even number of tilings
+	if (miplevel == -1)
 	{
-		u2 = (u2 ^ tex_x_mask) & tex_x_mask;
-		u2n = std::max(0, u2 - 1); // Ensure sample is inside texture
+		// microtexture
+		tex_width = 128;
+		tex_height = 128;
+		tex_x = object.utexx;
+		tex_y = object.utexy;
+		sheet = object.texsheet[1];
+		u <<= 1 << object.utexminlod;
+		v <<= 1 << object.utexminlod;
 	}
 	else
 	{
-		u2 &= tex_x_mask;
-		u2n = std::min(u2 + 1, (int)tex_x_mask); // Ensure sample is inside texture
-	}
-	if (tex_mirr_y && ((v2 & tex_height) != 0)) // Only flip if even number of tilings
-	{
-		v2 = (v2 ^ tex_y_mask) & tex_y_mask;
-		v2n = std::max(0, v2 - 1); // Ensure sample is inside texture
-	}
-	else
-	{
-		v2 &= tex_y_mask;
-		v2n = std::min(v2 + 1, (int)tex_y_mask);  // Ensure sample is inside texture
+		// regular texture
+		tex_width = object.texwidth >> miplevel;
+		tex_height = object.texheight >> miplevel;
+		tex_x = ((object.texx - 2048) >> miplevel) & 2047;
+		tex_y = ((object.texy - 1024) >> miplevel) & 1023;
+		sheet = object.texsheet[miplevel & 1];
+		u >>= miplevel;
+		v >>= miplevel;
 	}
 
-	frac1 = u & 0xff;
-	frac2 = 0x100 - frac1;
-	frac3 = v & 0xff;
-	frac4 = 0x100 - frac3;
-	tex1 = get_texel(tex_x, tex_y, u2, v2, sheet);
-	tex2 = get_texel(tex_x, tex_y, u2n, v2, sheet);
-	tex3 = get_texel(tex_x, tex_y, u2, v2n, sheet);
-	tex4 = get_texel(tex_x, tex_y, u2n, v2n, sheet);
+	if (tex_mirr_x && (u & (tex_width << 8)))
+		u = ~u;
+
+	if (tex_mirr_y && (v & (tex_height << 8)))
+		v = ~v;
+
+	// subtract 1/2 texel
+	u -= 0x80;
+	v -= 0x80;
+
+	// extract the fractions to use as blending factors
+	u32 ufrac = u & 0xff;
+	u32 vfrac = v & 0xff;
+
+	// get the four texel locations and confine to texture dimensions
+	u32 u0 = (u >> 8) & (tex_width - 1);
+	u32 u1 = (u0 + 1) & (tex_width - 1);
+	u32 v0 = (v >> 8) & (tex_height - 1);
+	u32 v1 = (v0 + 1) & (tex_height - 1);
+
+	// clamp the texture coordinates if smooth wrapping is not enabled
+	if (!tex_wrap_x && u1 == 0)
+	{
+		if (ufrac >= 0x80)
+			u0 = u1, u1++, ufrac = 0;     // left edge of texture
+		else
+			u1 = u0, u0--, ufrac = 0x100; // right edge of texture
+	}
+
+	if (!tex_wrap_y && v1 == 0)
+	{
+		if (vfrac >= 0x80)
+			v0 = 0, v1++, vfrac = 0;      // top edge of texture
+		else
+			v1 = v0, v0--, vfrac = 0x100; // bottom edge of texture
+	}
+
+	// read the four texels from the texture sheet 
+	u32 tex00 = get_texel(tex_x, tex_y, u0, v0, sheet) << 4;
+	u32 tex01 = get_texel(tex_x, tex_y, u1, v0, sheet) << 4;
+	u32 tex10 = get_texel(tex_x, tex_y, u0, v1, sheet) << 4;
+	u32 tex11 = get_texel(tex_x, tex_y, u1, v1, sheet) << 4;
+
 	if (Translucent)
 	{
-		u32 alp1 = (tex1 + 1) >> 4;
-		u32 alp2 = (tex2 + 1) >> 4;
-		u32 alp3 = (tex3 + 1) >> 4;
-		u32 alp4 = (tex4 + 1) >> 4;
-		u32 alp = alp1 * frac2 * frac4 + alp2 * frac1 * frac4 + alp3 * frac2 * frac3 + alp4 * frac1 * frac3;
-		if (alp >= 0x8000)
-			return 0xffffffff;
+		// pack the alpha components into the upper 16 bits
+		if (tex00 != 0xf0) tex00 |= 0x00800000;
+		if (tex01 != 0xf0) tex01 |= 0x00800000;
+		if (tex10 != 0xf0) tex10 |= 0x00800000;
+		if (tex11 != 0xf0) tex11 |= 0x00800000;
 
-		// Anti Alpha Highlighted Edges
-		tex1 &= alp1 - 1;
-		tex2 &= alp2 - 1;
-		tex3 &= alp3 - 1;
-		tex4 &= alp4 - 1;
-		u32 maxValidTex = std::max(std::max(std::max(tex1, tex2), tex3), tex4);
-		if (alp1)
-			tex1 = maxValidTex;
-		if (alp2)
-			tex2 = maxValidTex;
-		if (alp3)
-			tex3 = maxValidTex;
-		if (alp4)
-			tex4 = maxValidTex;
+		// if a texel is transparent, it takes the luma value of the neighboring texel
+		if (tex00 == 0x000000f0) tex00 = tex01 & 0xff;
+		if (tex01 == 0x000000f0) tex01 = tex00 & 0xff;
+		if (tex10 == 0x000000f0) tex10 = tex11 & 0xff;
+		if (tex11 == 0x000000f0) tex11 = tex10 & 0xff;
 	}
-	t = (tex1 * frac2 * frac4) + (tex2 * frac1 * frac4) + (tex3 * frac2 * frac3) + (tex4 * frac1 * frac3);
-	return t >> 8;
+
+	// linearly interpolate between left and right texels
+	u32 tex0x = LERP(tex00, tex01, ufrac);
+	u32 tex1x = LERP(tex10, tex11, ufrac);
+
+	if (Translucent)
+	{
+		if (tex0x == 0x000000f0) tex0x = tex1x & 0xff;
+		if (tex1x == 0x000000f0) tex1x = tex0x & 0xff;
+	}
+
+	// calculate the final bilinear filtered texel
+	return LERP(tex0x, tex1x, vfrac);
+}
+
+// mostly copied from video/voodoo_render.cpp
+inline s32 ATTR_FORCE_INLINE fast_log2(float value)
+{
+	// return 0 for negative values; should never happen
+	if (UNEXPECTED(value < 0.0f))
+		return 0;
+
+	// we only need the exponent and highest 7 bits of mantissa
+	u32 ival = f2u(value) >> 16;
+
+	// extract exponent
+	s32 exp = (ival >> 7) - 127;
+
+	// use top 7 bits of mantissa to look up fractional log2
+	static u8 const s_log2_table[128] =
+	{
+		  0,   2,   5,   8,  11,  14,  16,  19,  22,  25,  27,  30,  33,  35,  38,  40,
+		 43,  46,  48,  51,  53,  56,  58,  61,  63,  65,  68,  70,  73,  75,  77,  80,
+		 82,  84,  87,  89,  91,  93,  96,  98, 100, 102, 104, 106, 109, 111, 113, 115,
+		117, 119, 121, 123, 125, 127, 129, 132, 134, 136, 138, 140, 141, 143, 145, 147,
+		149, 151, 153, 155, 157, 159, 161, 162, 164, 166, 168, 170, 172, 173, 175, 177,
+		179, 181, 182, 184, 186, 188, 189, 191, 193, 194, 196, 198, 200, 201, 203, 205,
+		206, 208, 209, 211, 213, 214, 216, 218, 219, 221, 222, 224, 225, 227, 229, 230,
+		232, 233, 235, 236, 238, 239, 241, 242, 244, 245, 247, 248, 250, 251, 253, 254
+	};
+
+	// combine and return result
+	return (exp << 8) | s_log2_table[ival & 127];
 }
 
 // textured render path
@@ -148,12 +213,13 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 {
 	model2_state *state = object.state;
 	u32 *const p = &m_destmap.pix(scanline);
+	u8 *const fill = &m_fillmap.pix(scanline);
 
 	/* extract color information */
 	const u16 *colortable_r = &state->m_colorxlat[0x0000/2];
 	const u16 *colortable_g = &state->m_colorxlat[0x4000/2];
 	const u16 *colortable_b = &state->m_colorxlat[0x8000/2];
-	const u16 *lumaram = &state->m_lumaram[0];
+	const u8 *lumaram = &state->m_lumaram[0];
 	u32  colorbase = object.colorbase;
 	u32  lumabase = object.lumabase;
 	u8   checker = object.checker;
@@ -162,14 +228,11 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	float uoz = extent.param[1].start;
 	float voz = extent.param[2].start;
 	float dooz = extent.param[0].dpdx;
-	float dudxoz = extent.param[1].dpdx;
-	float dvdxoz = extent.param[2].dpdx;
-	float dudyoz = extent.param[1].dpdy;
-	float dvdyoz = extent.param[2].dpdy;
-	float norm = sqrtf( std::max(dudxoz * dudxoz + dvdxoz * dvdxoz, dudyoz * dudyoz + dvdyoz * dvdyoz) );
-	int  tr, tg, tb;
-	u32 t, t2;
-	u8 luma;
+	float duoz = extent.param[1].dpdx;
+	float dvoz = extent.param[2].dpdx;
+
+	// calculate maximum mipmap level from texture dimensions; we go down to 2x2
+	s32 max_level = 30 - count_leading_zeros_32(std::min(object.texwidth, object.texheight));
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;
 
@@ -178,47 +241,74 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	colortable_b += ((colorbase >> 10) & 0x1f) << 8;
 
 	int x = extent.startx;
-	int dx = checker ? 2 : 1;
-	if (checker && !((x ^ scanline) & 1))
-		x++;
-
-	for (; x < extent.stopx; x += dx, uoz += dudxoz, voz += dvdxoz, ooz += dooz)
+	int dx = 1;
+	if (checker)
 	{
-		float z = recip_approx(ooz);
-		float mml = log2f(norm * z) - 2.0F; // No parts are squared so no need for the usual 0.5 factor
-		u32 level = std::min(std::max(0, (int)mml), 4); // We need room for one more level for trilinear
-		float fu = uoz * z;
-		float fv = voz * z;
+		// if the first pixel is transparent, skip to the next one
+		if (!((x ^ scanline) & 1))
+			x++, ooz += dooz, uoz += duoz, voz += dvoz;
 
-		t = fetch_bilinear_texel<Translucent>(object, level, fu, fv);
-		if (t == 0xffffffff)
+		// increment by 2 pixels each time, skipping every other pixel
+		dx = 2, dooz *= 2.0f, duoz *= 2.0f, dvoz *= 2.0f;
+	}
+
+	for ( ; x < extent.stopx; x += dx, ooz += dooz, uoz += duoz, voz += dvoz)
+	{
+		if (fill[x] > 0)
 			continue;
 
-		t2 = fetch_bilinear_texel<Translucent>(object, level + 1, fu, fv);
-		if (t2 != 0xffffffff)
+		float z = recip_approx(ooz);
+
+		s32 mml = -object.texlod + fast_log2(z);	// equivalent to log2(z^2)
+		s32 level = std::clamp(mml >> 7, 0, max_level);
+
+		// we give texture coordinates 8 fractional bits
+		s32 u = (s32)(uoz * z * 256.0f);
+		s32 v = (s32)(voz * z * 256.0f);
+
+		u32 t = fetch_bilinear_texel<Translucent>(object, level, u, v);
+
+		if (mml > 0 && level < max_level)
 		{
-			// Trilinear combination
-			int frac = int((mml - level) * 256.0F);
-			frac = std::min(std::max(frac, 0), 256);
-			t = ((256 - frac) * t + frac * t2) >> 8;
+			u32 t2 = fetch_bilinear_texel<Translucent>(object, level + 1, u, v);
+			s32 frac = (mml & 127) << 1;
+			t = LERP(t, t2, frac);
+		}
+		else if (object.utex && mml < 0)
+		{
+			// microtexture; blend up to almost 50%
+			u32 t2 = fetch_bilinear_texel<Translucent>(object, -1, u, v);
+			s32 frac = std::min(-mml >> object.utexminlod, 127);
+			t = LERP(t, t2, frac);
 		}
 
-		// Trilinear combination has 8 bits of precision, and the table needs t to be shifted by 3 on the left
-		luma = (u32)lumaram[lumabase + (t >> (8 - 3))] * object.luma / 256;
+		if (Translucent)
+		{
+			// if alpha is less than 50%, discard
+			if (t < 0x00400000)
+				continue;
+
+			// remove the alpha value; no longer needed
+			t &= 0xff;
+		}
+
+		// filtered texel has 8 bits of precision but translator map has 128 (7-bit) entries; need to shift right by 1
+		u8 luma = (u32)lumaram[lumabase + (t >> 1)] * object.luma / 256;
 
 		// Virtua Striker sets up a luma of 0x40 for national flags on bleachers, fix here.
 		luma = std::min(int(luma), 0x3f);
 
 		/* we have the 6 bits of luma information along with 5 bits per color component */
 		/* now build and index into the master color lookup table and extract the raw RGB values */
-		tr = colortable_r[(luma)] & 0xff;
-		tg = colortable_g[(luma)] & 0xff;
-		tb = colortable_b[(luma)] & 0xff;
+		u32 tr = colortable_r[(luma)] & 0xff;
+		u32 tg = colortable_g[(luma)] & 0xff;
+		u32 tb = colortable_b[(luma)] & 0xff;
 		tr = gamma_value[tr];
 		tg = gamma_value[tg];
 		tb = gamma_value[tb];
 
 		p[x] = rgb_t(tr, tg, tb);
+		fill[x] = 0xff;
 	}
 }
 

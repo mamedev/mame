@@ -50,6 +50,7 @@
 
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i286.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
@@ -60,12 +61,12 @@
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"
-
-#include "softlist_dev.h"
 
 
 namespace {
@@ -321,6 +322,7 @@ private:
 	uint16_t m_trapio_reg[4][4];
 
 	static void cfg_m20_format(device_t *device);
+	static void cfg_no_serial_mouse(device_t *device);
 	void kbc_map(address_map &map) ATTR_COLD;
 
 	void att6300p_io_map(address_map &map) ATTR_COLD;
@@ -406,9 +408,9 @@ void att6300p_state::trapio_cb(uint32_t data)
 	uint8_t flags = (data>>24) & 0xf;
 
 	m_trapio_reg[m_trapio_reg_idx][0] = flags | (addr & 0xf) << 4;
-	m_trapio_reg[m_trapio_reg_idx][1] = ((addr>>4) & 0xf);
+	m_trapio_reg[m_trapio_reg_idx][1] = (addr >> 4) & 0xf;
 	m_trapio_reg[m_trapio_reg_idx][2] = val & 0xff;
-	m_trapio_reg[m_trapio_reg_idx][3] = ((addr >> 8) & 0xf);
+	m_trapio_reg[m_trapio_reg_idx][3] = (addr >> 8) & 0xf;
 
 	m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
 
@@ -782,7 +784,7 @@ void att6300p_state::vxlaten_w(offs_t offset, uint8_t data)
 
 uint8_t att6300p_state::bitread_r(offs_t offset)
 {
-	  return (m_protected ? B_VIRT_BR_PROTECTEN : 0) |
+	return (m_protected ? B_VIRT_BR_PROTECTEN : 0) |
 		(m_sanity_active ? 0 : B_VIRT_BR__SANITYNMI) |
 		(m_trapio_active ? 0 : B_VIRT_BR__TRAPIO) |
 		(m_nmi_active ? B_VIRT_BR_NMI: 0) |
@@ -856,47 +858,49 @@ void att6300p_state::att6300p_vio_map(address_map &map)
 	map(0x3fe0, 0x3fe0).mirror(0x001f).rw(FUNC(att6300p_state::cltrap_r), FUNC(att6300p_state::cltrap_w));
 }
 
+// Off switches read as 1, On switches as 0.
 static INPUT_PORTS_START( att6300p )
 	PORT_START("DSW1")
 
-	PORT_DIPNAME( 0x01, 0x00, "Drive B Type")
-	PORT_DIPSETTING(    0x00, "96 TPI" )
-	PORT_DIPSETTING(    0x01, "48 TPI" )
-	PORT_DIPNAME( 0x02, 0x00, "Drive A Type")
-	PORT_DIPSETTING(    0x00, "96 TPI" )
-	PORT_DIPSETTING(    0x02, "48 TPI" )
-	PORT_DIPNAME( 0x0c, 0x00, "Hard Disk Type")
+	PORT_DIPNAME( 0x01, 0x01, "Drive B Type")           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, "96 TPI" )
+	PORT_DIPSETTING(    0x00, "48 TPI" )
+	PORT_DIPNAME( 0x02, 0x02, "Drive A Type")           PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, "96 TPI" )
+	PORT_DIPSETTING(    0x00, "48 TPI" )
+	PORT_DIPNAME( 0x04, 0x04, "Hard Disk 1 Type")       PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x40, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPNAME( 0x30, 0x10, "Display Type")
-	PORT_DIPSETTING(    0x00, "Monochrome" )
-	PORT_DIPSETTING(    0x10, "Color 80x25" )
-	PORT_DIPSETTING(    0x20, "Color 40x25" )
-	PORT_DIPNAME( 0xc0, 0x80, "Number of floppy drives")
-	PORT_DIPSETTING(    0xc0, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
-	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPNAME( 0x08, 0x08, "Hard Disk 0 Type")       PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPNAME( 0x30, 0x20, "Display Type")           PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPSETTING(    0x10, "Color 40x25" )
+	PORT_DIPSETTING(    0x20, "Color 80x25" )
+	PORT_DIPSETTING(    0x30, "Monochrome" )
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")    PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
 
 	PORT_START("DSW2")
 
-	PORT_DIPNAME( 0x0f, 0x0b, "Motherboard RAM banks")
+	PORT_DIPNAME( 0x0f, 0x0b, "Motherboard RAM banks")  PORT_DIPLOCATION("DSW2:1,2,3,4")
 	PORT_DIPSETTING(    0x01, "128K - 128/0")
 	PORT_DIPSETTING(    0x02, "256K - 128/128")
 	PORT_DIPSETTING(    0x08, "512K - 512/0")
 	PORT_DIPSETTING(    0x09, "640K - 128/512")
 	PORT_DIPSETTING(    0x0a, "640K - 512/128")
 	PORT_DIPSETTING(    0x0b, "1M - 512/512")
-	PORT_DIPNAME( 0x10, 0x00, "80287 installed")
-	PORT_DIPSETTING(    0x00, DEF_STR(No) )
-	PORT_DIPSETTING(    0x10, DEF_STR(Yes) )
-	PORT_DIPNAME( 0x40, 0x40, "HDD ROM")
-	PORT_DIPSETTING(    0x00, "External" )
-	PORT_DIPSETTING(    0x40, "Internal" )
-	PORT_DIPNAME( 0x80, 0x00, "EPROM Size")
-	PORT_DIPSETTING(    0x00, "32K" )
-	PORT_DIPSETTING(    0x80, "64K" )
+	PORT_DIPNAME( 0x10, 0x10, "80287 installed")        PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x10, DEF_STR(No) )
+	PORT_DIPNAME( 0x40, 0x40, "HDD ROM")                PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x00, "Internal" )
+	PORT_DIPSETTING(    0x40, "External" )
+	PORT_DIPNAME( 0x80, 0x80, "EPROM Size")             PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x00, "64K" )
+	PORT_DIPSETTING(    0x80, "32K" )
 INPUT_PORTS_END
 
 void att6300p_state::floppy_formats(format_registration &fr)
@@ -910,6 +914,12 @@ void att6300p_state::cfg_m20_format(device_t *device)
 {
 	device->subdevice<floppy_connector>("fdc:0")->set_formats(att6300p_state::floppy_formats);
 	device->subdevice<floppy_connector>("fdc:1")->set_formats(att6300p_state::floppy_formats);
+}
+
+void att6300p_state::cfg_no_serial_mouse(device_t *device)
+{
+	/* Don't attach serial mouse, since there's a proprietary mouse */
+	device->subdevice<rs232_port_device>("serport0")->set_default_option(nullptr);
 }
 
 void att6300p_state::att6300p(machine_config &config)
@@ -972,9 +982,9 @@ void att6300p_state::att6300p(machine_config &config)
 	ISA8_SLOT(config, "mb1", 0, m_isabus, pc_isa8_cards, "cga_m24", true);
 	ISA8_SLOT(config, "mb2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
 	ISA8_SLOT(config, "mb3", 0, m_isabus, pc_isa8_cards, "lpt", true);
-	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
 
-	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, "hdc", false);
 	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, m_isabus, pc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa4", 0, m_isabus, pc_isa8_cards, nullptr, false);
@@ -1044,4 +1054,4 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME      FLAGS
-COMP( 1985, att6300p,  0,       0,      att6300p, att6300p, att6300p_state, empty_init, "AT&T",     "6300 Plus",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, att6300p,  0,       0,      att6300p, att6300p, att6300p_state, empty_init, "AT&T",     "6300 Plus",  MACHINE_SUPPORTS_SAVE )

@@ -39,7 +39,6 @@ Ra's Scepter        YES
 Hawaii              YES
 
 Notes:
-* Is "Hawaii" the same game as "Treasure Hunting"? No
 * The dslayrr sets appear to be pre-setup, have passwords set(?)
 * Game information in the rom entries comes from `AstroGame/data/setup2.txt` or `AstroGame/INF.ini`
 
@@ -186,7 +185,7 @@ void astropc_state::astropc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &astropc_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:12.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	// TODO: copied from misc/matrix.cpp, verify if this has a working super I/O
+	// TODO: copied from misc/matrix.cpp, should really use fdc37c93x instead
 	DS1287(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->set_binary(true);
 	m_rtc->set_epoch(1980);

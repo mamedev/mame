@@ -27,44 +27,42 @@
 //   the group enable bit is set (emulation mirrors that behavior).
 
 #include "emu.h"
-#include "xavix.h"
-
-#define VERBOSE (0)
+#include "xavix_sound.h"
 
 #define LOG_CFG        (1U << 1)
 #define LOG_TEMPO      (1U << 2)
-#define LOG_TIMER      (1U << 3)
-#define LOG_IRQ        (1U << 4)
-#define LOG_VOICE      (1U << 5)
-#define LOG_WAVE       (1U << 6)
-#define LOG_ENV        (1U << 7)
-#define LOG_ENV_DATA   (1U << 8)
-#define LOG_PITCH      (1U << 9)
-#define LOG_SCAN       (1U << 10)
-#define LOG_CLIP       (1U << 11)
-#define LOG_NOISE      (1U << 12)
+#define LOG_VOICE      (1U << 3)
+#define LOG_WAVE       (1U << 4)
+#define LOG_ENV        (1U << 5)
+#define LOG_ENV_DATA   (1U << 6)
+#define LOG_PITCH      (1U << 7)
+#define LOG_SCAN       (1U << 8)
+#define LOG_CLIP       (1U << 9)
+#define LOG_NOISE      (1U << 10)
 
-//#define LOGCTX(mask, fmt, ...) LOGMASKED((mask), "%s: " fmt, machine().describe_context(), ##__VA_ARGS__)
+#define VERBOSE (0)
 #include "logmacro.h"
 
+
+namespace {
+
+// Internal sequencer rate works out to be 167'791 Hz.
+// - default cyclerate at reset is 0x0f; 2 phase updates per 16-state frame -> CORE_CLK / (( cyclerate + 1 ) * 8 )
+// - titles never seem to change cyclerate, and if they did, it's not possible to dynamically change the MAME stream after stream_alloc.
+// - 42Mhz CPU devices also run their sound core at 21MHz.
+// - DAC timing knobs:
+//     - lead/lag shift the latch strobe within the 16-cycle frame,
+//     - gap!=0 issues a second write strobe (at 3−lag+gap), duplicating the held sample within the frame.
+//     - no titles found that change these from the defaults, so unable to test.
+//   These alter *when* a channel is latched (and can duplicate it), but not the state-machine rate itself.
+
+constexpr uint8_t MIXER_ORDER_MULTIPLEX[16] = { 0x0, 0xa, 0x7, 0xd, 0xc, 0x6, 0xb, 0x1, 0x4, 0xe, 0x3, 0x9, 0x8, 0x2, 0xf, 0x5 };
+constexpr uint8_t MIXER_ORDER_BROADCAST[16] = { 0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf };
+constexpr int AMP_TABLE[8] = { 2, 4, 8, 12, 16, 20, 20, 20 };
+
+} // anonymous namespace
+
 DEFINE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device, "xavix_sound", "XaviX Sound")
-
-namespace
-{
-	// Internal sequencer rate works out to be 167'791 Hz.
-	// - default cyclerate at reset is 0x0f; 2 phase updates per 16-state frame -> CORE_CLK / (( cyclerate + 1 ) * 8 )
-	// - titles never seem to change cyclerate, and if they did, it's not possible to dynamically change the MAME stream after stream_alloc.
-	// - 42Mhz CPU devices also run their sound core at 21MHz.
-	// - DAC timing knobs:
-	//     - lead/lag shift the latch strobe within the 16-cycle frame,
-	//     - gap!=0 issues a second write strobe (at 3−lag+gap), duplicating the held sample within the frame.
-	//     - no titles found that change these from the defaults, so unable to test.
-	//   These alter *when* a channel is latched (and can duplicate it), but not the state-machine rate itself.
-
-	static constexpr uint8_t MIXER_ORDER_MULTIPLEX[16] = { 0x0, 0xa, 0x7, 0xd, 0xc, 0x6, 0xb, 0x1, 0x4, 0xe, 0x3, 0x9, 0x8, 0x2, 0xf, 0x5 };
-	static constexpr uint8_t MIXER_ORDER_BROADCAST[16] = { 0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf };
-	static constexpr int AMP_TABLE[8] = { 2, 4, 8, 12, 16, 20, 20, 20 };
-}
 
 xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XAVIX_SOUND, tag, owner, clock)
@@ -194,14 +192,14 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream)
 
 	while (num_samples-- != 0)
 	{
-		const uint8_t* visit_order = m_mix.dac ? MIXER_ORDER_BROADCAST : MIXER_ORDER_MULTIPLEX;
+		const uint8_t (&visit_order)[16] = m_mix.dac ? MIXER_ORDER_BROADCAST : MIXER_ORDER_MULTIPLEX;
 
 		// capacity (00=16ch, 01=8ch, 1x=4ch), applied to the *visit order* like the hardware does.
 		const uint8_t cap = m_mix.capacity & 0x03;
 		const int allowed_channels = (cap & 0x02) ? 4 : (cap & 0x01) ? 8 : 16;
 
 		LOGMASKED(LOG_SCAN, "[scan] order=%s capacity=%u allowed=%d\n",
-			m_mix.dac ? "broadcast" : "multiplex", unsigned(cap), allowed_channels);
+			m_mix.dac ? "broadcast" : "multiplex", cap, allowed_channels);
 
 		int64_t total_l = 0;
 		int64_t total_r = 0;
@@ -263,7 +261,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream)
 					else if (m_voice[v].type == 2 || m_voice[v].type == 0)
 					{
 						LOGMASKED(LOG_WAVE, "[wave] v=%2d loop -> %06x\n",
-							v, unsigned(m_voice[v].loop_position >> 14));
+							v, m_voice[v].loop_position >> 14);
 						if ((m_voice[v].position >> 14) != (m_voice[v].loop_position >> 14))
 							m_voice[v].position = m_voice[v].loop_position;
 					}
@@ -271,7 +269,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream)
 				else
 				{
 					// inverted sign-magnitude to signed PCM
-					wv = ((raw & 0x7f) == 0) ? 0x80 : (uint8_t)((~raw & 0x80) | (raw & 0x7f));
+					wv = ((raw & 0x7f) == 0) ? 0x80 : uint8_t((~raw & 0x80) | (raw & 0x7f));
 					sample = int32_t(wv) - 128;
 				}
 			}
@@ -303,29 +301,25 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream)
 			}
 		}
 
-		auto apply_final_gain = [&](int64_t x) -> int64_t
-		{
-			// capacity: 00=16ch, 01=8ch, 1x=4ch
-			const uint8_t cap = m_mix.capacity & 0x03;
-			const int allowed = (cap & 0x02) ? 4 : (cap & 0x01) ? 8 : 16;
-			const int amp = m_mix.gain;
+		auto apply_final_gain =
+			[cap = uint8_t(m_mix.capacity & 0x03), amp = int(m_mix.gain)] (int64_t x) -> int64_t
+			{
+				// capacity: 00=16ch, 01=8ch, 1x=4ch
+				const int allowed = (cap & 0x02) ? 4 : (cap & 0x01) ? 8 : 16;
 
-			// post-mix is multiplied by the amp code and divided by ~1000;
-			// approximate that non-power-of-two divide with a 3/128 fixed-point factor.
-			// this is imperfect as it will depend on the analgue path implementation surrounding the XaviX core
-			// which will likely vary based on the physical characteristics of the device.
-			int64_t y = x * int64_t(amp) * int64_t(allowed) * 3;
-			return (y >= 0) ? ((y + 64) >> 7) : -(((-y) + 64) >> 7);
-		};
+				// post-mix is multiplied by the amp code and divided by ~1000;
+				// approximate that non-power-of-two divide with a 3/128 fixed-point factor.
+				// this is imperfect as it will depend on the analgue path implementation surrounding the XaviX core
+				// which will likely vary based on the physical characteristics of the device.
+				int64_t y = x * int64_t(amp) * int64_t(allowed) * 3;
+				return (y >= 0) ? ((y + 64) >> 7) : -(((-y) + 64) >> 7);
+			};
 
 		total_l = apply_final_gain(total_l);
 		total_r = apply_final_gain(total_r);
 
 		if (total_l > 32767 || total_l < -32768 || total_r > 32767 || total_r < -32768)
-		{
-			LOGMASKED(LOG_CLIP, "[clip] L=%lld R=%lld\n",
-				(long long)total_l, (long long)total_r);
-		}
+			LOGMASKED(LOG_CLIP, "[clip] L=%d R=%d\n", total_l, total_r);
 
 		int32_t out_l = (total_l > 32767) ? 32767 : (total_l < -32768 ? -32768 : int32_t(total_l));
 		int32_t out_r = (total_r > 32767) ? 32767 : (total_r < -32768 ? -32768 : int32_t(total_r));
@@ -355,7 +349,7 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 	const int base = voice * 0x10;
 
 	LOGMASKED(LOG_VOICE, "[voice] enable v=%2d update_only=%d type(prev)=%u env_mode(prev)=%u\n",
-		voice, update_only ? 1 : 0, unsigned(m_voice[voice].type & 3), unsigned(m_voice[voice].env_mode & 3));
+		voice, update_only ? 1 : 0, m_voice[voice].type & 3, m_voice[voice].env_mode & 3);
 
 	// Wave registers
 	const uint16_t wave_control = (m_readregs_cb(base + 0x1) << 8) | m_readregs_cb(base + 0x0);
@@ -367,10 +361,10 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 
 	// Envelope registers
 	const uint8_t  env_config = m_readregs_cb(base + 0x8);
-	const uint16_t env_addr_left = (m_readregs_cb(base + 0xB) << 8) | m_readregs_cb(base + 0xA);
-	const uint16_t env_addr_right = (m_readregs_cb(base + 0xD) << 8) | m_readregs_cb(base + 0xC);
-	const uint8_t  env_addr_bank = m_readregs_cb(base + 0xE);
-	//const uint8_t  env_vol_reg = m_readregs_cb(base + 0xF); // unused but read for completeness
+	const uint16_t env_addr_left = (m_readregs_cb(base + 0xb) << 8) | m_readregs_cb(base + 0xa);
+	const uint16_t env_addr_right = (m_readregs_cb(base + 0xd) << 8) | m_readregs_cb(base + 0xc);
+	const uint8_t  env_addr_bank = m_readregs_cb(base + 0xe);
+	//const uint8_t  env_vol_reg = m_readregs_cb(base + 0xf); // unused but read for completeness
 	//(void)env_vol_reg;
 
 	// Always refresh fields that may be live-tweaked from RAM
@@ -386,11 +380,11 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 		"[voice] v=%2d regs type=%u rate=%u bank=%02x start=%06x loop=%06x\n"
 		"  vm=%u vol=%u env_bank=%02x la=%04x ra=%04x\n",
 		voice,
-		unsigned(new_type), unsigned(new_rate), unsigned(wave_addr_bank),
-		unsigned((wave_addr_bank << 16) | wave_addr),
-		unsigned((wave_addr_bank << 16) | wave_loop_addr),
-		unsigned(m_voice[voice].env_mode), unsigned(m_voice[voice].vol),
-		unsigned(m_voice[voice].env_bank), unsigned(env_addr_left), unsigned(env_addr_right));
+		new_type, new_rate, wave_addr_bank,
+		(wave_addr_bank << 16) | wave_addr,
+		(wave_addr_bank << 16) | wave_loop_addr,
+		m_voice[voice].env_mode, m_voice[voice].vol,
+		m_voice[voice].env_bank, env_addr_left, env_addr_right);
 
 	if (new_type == 1 && m_voice[voice].noise_state == 0)
 		m_voice[voice].noise_state = wave_addr ? wave_addr : 0xace1u;
@@ -436,9 +430,7 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 		const uint16_t start_l = env_addr_left;
 		const uint16_t start_r = env_addr_right;
 
-		auto inc_low_nibble = [](uint16_t x) {
-			return uint16_t((x & 0xfff0) | ((x + 1) & 0x000f));
-			};
+		auto inc_low_nibble = [] (uint16_t x) { return uint16_t((x & 0xfff0) | ((x + 1) & 0x000f)); };
 
 		// Fetch first envelope levels
 		const uint8_t v_l = fetch_env_byte_direct(voice, false, start_l);
@@ -463,22 +455,23 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 
 	else if (m_voice[voice].env_mode == 2)
 	{
-		const int regbase = voice * 0x10;
 		// VM2 streams: seed both sides from their 16-bit ROM addresses
 		m_voice[voice].env_pos_left = env_addr_left;
 		m_voice[voice].env_pos_right = env_addr_right;
 
-		auto prime_side = [&](int channel) {
-			uint32_t& pos = channel ? m_voice[voice].env_pos_right : m_voice[voice].env_pos_left;
-			uint8_t& lvl = channel ? m_voice[voice].env_vol_right : m_voice[voice].env_vol_left;
-			const uint16_t addr = uint16_t(pos & 0xffff);
-			const uint8_t  val = fetch_env_byte_direct(voice, channel, addr);
-			lvl = val;
+		auto prime_side =
+			[this, voice, regbase = voice * 0x10] (int channel)
+			{
+				uint32_t &pos = channel ? m_voice[voice].env_pos_right : m_voice[voice].env_pos_left;
+				uint8_t &lvl = channel ? m_voice[voice].env_vol_right : m_voice[voice].env_vol_left;
+				const uint16_t addr = uint16_t(pos & 0xffff);
+				const uint8_t val = fetch_env_byte_direct(voice, channel, addr);
+				lvl = val;
 
-			if (channel) m_writeregs_cb(regbase + 0x0c, uint8_t(addr)); // ra low mirror
-			else       m_writeregs_cb(regbase + 0x0a, uint8_t(addr)); // la low mirror
+				if (channel) m_writeregs_cb(regbase + 0x0c, uint8_t(addr)); // ra low mirror
+				else       m_writeregs_cb(regbase + 0x0a, uint8_t(addr)); // la low mirror
 
-			pos = uint16_t(addr + 1);
+				pos = uint16_t(addr + 1);
 			};
 
 		prime_side(0);
@@ -515,7 +508,7 @@ void xavix_sound_device::sound_volume_w(uint8_t data)
 {
 	m_stream->update();
 	set_mastervol(data);
-	LOGMASKED(LOG_CFG, "[cfg] mixer mastervol=%u\n", unsigned(data));
+	LOGMASKED(LOG_CFG, "[cfg] mixer mastervol=%u\n", data);
 }
 
 uint8_t xavix_sound_device::sound_mixer_r()
@@ -685,12 +678,6 @@ uint8_t xavix_sound_device::fetch_env_byte_direct(int voice, int channel, uint16
 	const uint32_t rom = (uint32_t(bank) << 16) | uint32_t(addr);
 	const uint8_t  val = m_readsamples_cb(rom);
 
-	// One-shot “first fetch” debug per voice & side to verify addressing.
-	static bool first_seen[16][2] = { { false } };
-	const int side = channel ? 1 : 0;
-	if (!first_seen[voice][side])
-		first_seen[voice][side] = true;
-
 	return val;
 }
 
@@ -698,9 +685,9 @@ void xavix_sound_device::step_envelope(int voice)
 {
 	xavix_voice& v = m_voice[voice];
 
-	bool& logged_start = v.log_env_started;
-	bool& logged_stop = v.log_env_stopped;
-	bool& logged_pause = v.log_env_paused;
+	bool &logged_start = v.log_env_started;
+	bool &logged_stop = v.log_env_stopped;
+	bool &logged_pause = v.log_env_paused;
 
 	// If the voice is disabled, clear flags so next enable logs a fresh START.
 	if (!v.enabled)
@@ -722,13 +709,13 @@ void xavix_sound_device::step_envelope(int voice)
 			"[env] start v=%2d vm=%u wm=%u gn=%u tp[%u]=%02x cr=%u period=%u\n"
 			"  env_bank=%02x la_base=%04x ra_base=%04x\n"
 			"  l=%02x r=%02x posl=%04x posr=%04x wbank=%02x waddr=%06x loop=%06x rate=%u\n",
-			voice, unsigned(v.env_mode & 3), unsigned(v.type & 3), unsigned(v.vol & 0x0f),
-			unsigned(group), unsigned(tp), unsigned(m_cyclerate_div + 1), unsigned(period),
-			unsigned(v.env_bank), unsigned(v.env_rom_base_left), unsigned(v.env_rom_base_right),
-			unsigned(v.env_vol_left), unsigned(v.env_vol_right),
-			unsigned(v.env_pos_left & 0xffff), unsigned(v.env_pos_right & 0xffff),
-			unsigned(v.bank), unsigned((v.bank << 16) | (v.position >> 14)),
-			unsigned(v.loop_position >> 14), unsigned(v.rate));
+			voice, v.env_mode & 3, v.type & 3, v.vol & 0x0f,
+			group, tp, m_cyclerate_div + 1, period,
+			v.env_bank, v.env_rom_base_left, v.env_rom_base_right,
+			v.env_vol_left, v.env_vol_right,
+			v.env_pos_left & 0xffff, v.env_pos_right & 0xffff,
+			v.bank, (v.bank << 16) | (v.position >> 14),
+			v.loop_position >> 14, v.rate);
 
 		logged_start = true;
 		logged_stop = false;
@@ -740,7 +727,7 @@ void xavix_sound_device::step_envelope(int voice)
 	if (v.env_period_samples != target_period)
 	{
 		const uint32_t oldp = v.env_period_samples ? v.env_period_samples : 1;
-		v.env_countdown = (uint64_t)v.env_countdown * target_period / oldp;
+		v.env_countdown = uint64_t(v.env_countdown) * target_period / oldp;
 		v.env_period_samples = target_period;
 	}
 
@@ -750,7 +737,7 @@ void xavix_sound_device::step_envelope(int voice)
 		if (!logged_pause)
 		{
 			LOGMASKED(LOG_ENV, "[env] pause  v=%2d vm=%u tp=%02x\n",
-				voice, unsigned(v.env_mode & 3), unsigned(m_tempo_div[voice & 3]));
+				voice, v.env_mode & 3, m_tempo_div[voice & 3]);
 			logged_pause = true;
 		}
 		return; // tempo paused (tp==0)
@@ -758,7 +745,7 @@ void xavix_sound_device::step_envelope(int voice)
 	else if (logged_pause)
 	{
 		LOGMASKED(LOG_ENV, "[env] resume v=%2d vm=%u tp=%02x\n",
-			voice, unsigned(v.env_mode & 3), unsigned(m_tempo_div[voice & 3]));
+			voice, v.env_mode & 3, m_tempo_div[voice & 3]);
 		logged_pause = false;
 	}
 	if (v.env_countdown) { v.env_countdown--; return; }
@@ -772,7 +759,7 @@ void xavix_sound_device::step_envelope(int voice)
 		v.env_vol_right = m_readregs_cb(base + 0xc); // RA
 		if ((v.env_vol_left | v.env_vol_right) == 0 && !logged_stop)
 		{
-			LOGMASKED(LOG_ENV, "[env] stop   v=%2d vm=0 wm=%u L=00 R=00\n", voice, unsigned(v.type & 3));
+			LOGMASKED(LOG_ENV, "[env] stop   v=%2d vm=0 wm=%u L=00 R=00\n", voice, v.type & 3);
 			logged_stop = true;
 		}
 		return;
@@ -781,33 +768,32 @@ void xavix_sound_device::step_envelope(int voice)
 	// VM1: nibble-table
 	if (v.env_mode == 1)
 	{
-		auto advance_nibble = [](uint16_t value) {
-			return uint16_t((value & 0xfff0) | ((value + 1) & 0x000f));
-		};
+		auto step_side =
+			[this, voice, &v] (int channel)
+			{
+				auto advance_nibble = [] (uint16_t value) { return uint16_t((value & 0xfff0) | ((value + 1) & 0x000f)); };
 
-		auto step_side = [&](int channel)
-		{
-			if (channel ? !v.env_active_right : !v.env_active_left)
-				return;
+				if (channel ? !v.env_active_right : !v.env_active_left)
+					return;
 
-			uint32_t &ptr32 = channel ? v.env_pos_right : v.env_pos_left;
-			const uint16_t ptr = uint16_t(ptr32);
-			const uint8_t level = fetch_env_byte_direct(voice, channel, ptr);
+				uint32_t &ptr32 = channel ? v.env_pos_right : v.env_pos_left;
+				const uint16_t ptr = uint16_t(ptr32);
+				const uint8_t level = fetch_env_byte_direct(voice, channel, ptr);
 
-			if (channel)
-				v.env_vol_right = level;
-			else
-				v.env_vol_left = level;
+				if (channel)
+					v.env_vol_right = level;
+				else
+					v.env_vol_left = level;
 
-			const uint16_t next_ptr = advance_nibble(ptr);
-			ptr32 = next_ptr;
+				const uint16_t next_ptr = advance_nibble(ptr);
+				ptr32 = next_ptr;
 
-			const int regbase = voice * 0x10;
-			if (channel)
-				m_writeregs_cb(regbase + 0x0c, uint8_t(next_ptr));
-			else
-				m_writeregs_cb(regbase + 0x0a, uint8_t(next_ptr));
-		};
+				const int regbase = voice * 0x10;
+				if (channel)
+					m_writeregs_cb(regbase + 0x0c, uint8_t(next_ptr));
+				else
+					m_writeregs_cb(regbase + 0x0a, uint8_t(next_ptr));
+			};
 
 		step_side(0);
 		step_side(1);
@@ -817,7 +803,7 @@ void xavix_sound_device::step_envelope(int voice)
 			if (!logged_stop)
 			{
 				LOGMASKED(LOG_ENV, "[env] stop   v=%2d vm=1 wm=%u L=%02x R=%02x\n",
-					voice, unsigned(v.type & 3), unsigned(v.env_vol_left), unsigned(v.env_vol_right));
+					voice, v.type & 3, v.env_vol_left, v.env_vol_right);
 				logged_stop = true;
 			}
 			v.env_active_left = 0;
@@ -828,29 +814,28 @@ void xavix_sound_device::step_envelope(int voice)
 	// VM2: linear ROM stream per side
 	if (v.env_mode == 2)
 	{
-		const int regbase = voice * 0x10;
+		auto step_side =
+			[this, voice, &v, regbase = voice * 0x10] (int channel)
+			{
+				if (channel ? !v.env_active_right : !v.env_active_left)
+					return;
 
-		auto step_side = [&](int channel)
-		{
-			if (channel ? !v.env_active_right : !v.env_active_left)
-				return;
+				uint32_t &ptr32 = channel ? v.env_pos_right : v.env_pos_left;
+				const uint16_t ptr = uint16_t(ptr32);
+				const uint8_t level = fetch_env_byte_direct(voice, channel, ptr);
 
-			uint32_t &ptr32 = channel ? v.env_pos_right : v.env_pos_left;
-			const uint16_t ptr = uint16_t(ptr32);
-			const uint8_t level = fetch_env_byte_direct(voice, channel, ptr);
+				if (channel)
+					v.env_vol_right = level;
+				else
+					v.env_vol_left = level;
 
-			if (channel)
-				v.env_vol_right = level;
-			else
-				v.env_vol_left = level;
+				if (channel)
+					m_writeregs_cb(regbase + 0x0c, uint8_t(ptr));
+				else
+					m_writeregs_cb(regbase + 0x0a, uint8_t(ptr));
 
-			if (channel)
-				m_writeregs_cb(regbase + 0x0c, uint8_t(ptr));
-			else
-				m_writeregs_cb(regbase + 0x0a, uint8_t(ptr));
-
-			ptr32 = uint16_t(ptr + 1);
-		};
+				ptr32 = uint16_t(ptr + 1);
+			};
 
 		step_side(0);
 		step_side(1);
@@ -860,7 +845,7 @@ void xavix_sound_device::step_envelope(int voice)
 			if (!logged_stop)
 			{
 				LOGMASKED(LOG_ENV, "[env] stop   v=%2d vm=2 wm=%u L=%02x R=%02x\n",
-					voice, unsigned(v.type & 3), unsigned(v.env_vol_left), unsigned(v.env_vol_right));
+					voice, v.type & 3, v.env_vol_left, v.env_vol_right);
 				logged_stop = true;
 			}
 			v.env_active_left = false;
@@ -871,13 +856,14 @@ void xavix_sound_device::step_envelope(int voice)
 	// VM3: exponential-ish decay
 	if (v.env_mode == 3)
 	{
-		auto decay = [](uint8_t x) -> uint8_t
-		{
-			const uint8_t high = x >> 4;
-			const uint8_t low = x & 0x0f;
-			const uint8_t subtract = high + (low ? 1 : 0);
-			return (subtract >= x) ? 0 : uint8_t(x - subtract);
-		};
+		auto decay =
+			[] (uint8_t x) -> uint8_t
+			{
+				const uint8_t high = x >> 4;
+				const uint8_t low = x & 0x0f;
+				const uint8_t subtract = high + (low ? 1 : 0);
+				return (subtract >= x) ? 0 : uint8_t(x - subtract);
+			};
 
 		v.env_vol_left = decay(v.env_vol_left);
 		v.env_vol_right = decay(v.env_vol_right);
@@ -887,7 +873,7 @@ void xavix_sound_device::step_envelope(int voice)
 			if (!logged_stop)
 			{
 				LOGMASKED(LOG_ENV, "[env] stop   v=%2d vm=3 wm=%u (decayed)\n",
-					voice, unsigned(v.type & 3));
+					voice, v.type & 3);
 				logged_stop = true;
 			}
 			v.env_active_left = false;
@@ -910,259 +896,14 @@ void xavix_sound_device::step_pitch(int voice)
 	const uint32_t target = uint32_t(wave_control >> 2);
 	const uint32_t old = v.rate;
 
-	if (v.rate < target)      v.rate += 1;
-	else if (v.rate > target) v.rate -= 1;
+	if (v.rate < target)
+		v.rate += 1;
+	else if (v.rate > target)
+		v.rate -= 1;
 
 	if (v.rate != old)
+	{
 		LOGMASKED(LOG_PITCH, "[pitch] v=%2d %u->%u target=%u\n",
 			voice, old, v.rate, target);
-}
-
-uint8_t xavix_state::sound_current_page() const
-{
-	return m_sound_regbase & 0x3f;
-}
-
-uint8_t xavix_state::sound_regram_read_cb(offs_t offset)
-{
-	// 0x00 would be zero page memory; assume it's not valid
-	if ((m_sound_regbase & 0x3f) != 0x00)
-	{
-		const uint16_t memorybase = (m_sound_regbase & 0x3f) << 8;
-		return m_mainram[memorybase + offset];
 	}
-	return 0x00;
-}
-
-void xavix_state::sound_regram_write_cb(offs_t offset, u8 data)
-{
-	if ((m_sound_regbase & 0x3f) != 0x00)
-	{
-		const uint16_t memorybase = (m_sound_regbase & 0x3f) << 8;
-		m_mainram[memorybase + offset] = data;
-	}
-}
-
-uint8_t xavix_state::sound_voice_startstop_r(offs_t offset)
-{
-	return m_soundreg16_0[offset];
-}
-
-void xavix_state::sound_voice_startstop_w(offs_t offset, uint8_t data)
-{
-	LOGMASKED(LOG_VOICE, "[voice] startstop offs=%d data=%02x prev=%02x\n",
-		offset, data, m_soundreg16_0[offset]);
-	for (int i = 0; i < 8; i++)
-	{
-		const int voice_state      = BIT(data, i);
-		const int old_voice_state  = BIT(m_soundreg16_0[offset], i);
-		if (voice_state != old_voice_state)
-		{
-			const int voice = (offset * 8 + i);
-			if (voice_state) m_sound->enable_voice(voice, false);
-			else             m_sound->disable_voice(voice);
-		}
-	}
-	m_soundreg16_0[offset] = data;
-}
-
-uint8_t xavix_state::sound_voice_updateenv_r(offs_t offset)
-{
-	// On real hardware, might be read-only or always return 0.
-	return 0x00;
-}
-
-void xavix_state::sound_voice_updateenv_w(offs_t offset, uint8_t data)
-{
-	LOGMASKED(LOG_ENV, "[env] update offs=%d mask=%02x\n", offset, data);
-	for (int i = 0; i < 8; i++)
-	{
-		if (BIT(data, i))
-		{
-			const int voice = (offset * 8 + i);
-			m_sound->enable_voice(voice, true);
-		}
-	}
-}
-
-uint8_t xavix_state::sound_voice_status_r(offs_t offset)
-{
-	uint8_t ret = 0x00;
-	for (int i = 0; i < 8; i++)
-	{
-		const int voice = (offset * 8 + i);
-		if (m_sound->is_voice_enabled(voice))
-			ret |= 1 << i;
-	}
-	return ret;
-}
-
-uint8_t xavix_state::sound_regbase_r()
-{
-	return m_sound_regbase & 0x3f; // upper bits read as 0
-}
-
-void xavix_state::sound_regbase_w(uint8_t data)
-{
-	// upper 6 bits of RAM address where the per-voice register sets live
-	m_sound_regbase = data & 0x3f;
-}
-
-uint8_t xavix_state::sound_cyclerate_r()
-{
-	return m_cyclerate;
-}
-
-void xavix_state::sound_cyclerate_w(uint8_t data)
-{
-	m_cyclerate = data; // store for readback / debug
-	if (m_sound) m_sound->set_cyclerate(data);
-	LOGMASKED(LOG_CFG, "[cfg] cyclerate=%02x\n", m_cyclerate);
-}
-
-uint8_t xavix_state::sound_volume_r() { return m_sound->sound_volume_r(); }
-void    xavix_state::sound_volume_w(uint8_t data) { m_sound->sound_volume_w(data); }
-
-uint8_t xavix_state::sound_mixer_r() { return m_sound->sound_mixer_r(); }
-void    xavix_state::sound_mixer_w(uint8_t data) { m_sound->sound_mixer_w(data); }
-
-uint8_t xavix_state::sound_dac_control_r() { return m_sound->dac_control_r(); }
-void    xavix_state::sound_dac_control_w(uint8_t data) { m_sound->dac_control_w(data); }
-
-// tempo registers
-uint8_t xavix_state::sound_tp0_r() { return m_tp[0]; }
-uint8_t xavix_state::sound_tp1_r() { return m_tp[1]; }
-uint8_t xavix_state::sound_tp2_r() { return m_tp[2]; }
-uint8_t xavix_state::sound_tp3_r() { return m_tp[3]; }
-
-void xavix_state::sound_tp0_w(uint8_t data)
-{
-	m_tp[0] = data;
-	if (m_sound) m_sound->set_tempo(0, data);
-	LOGMASKED(LOG_TEMPO, "[tempo] tp[%d]=%02x\n", 0, data);
-	reprogram_sound_timer(0);
-}
-
-void xavix_state::sound_tp1_w(uint8_t data)
-{
-	m_tp[1] = data;
-	if (m_sound) m_sound->set_tempo(1, data);
-	LOGMASKED(LOG_TEMPO, "[tempo] tp[%d]=%02x\n", 1, data);
-	reprogram_sound_timer(1);
-}
-
-void xavix_state::sound_tp2_w(uint8_t data)
-{
-	m_tp[2] = data;
-	if (m_sound) m_sound->set_tempo(2, data);
-	LOGMASKED(LOG_TEMPO, "[tempo] tp[%d]=%02x\n", 2, data);
-	reprogram_sound_timer(2);
-}
-
-void xavix_state::sound_tp3_w(uint8_t data)
-{
-	m_tp[3] = data;
-	if (m_sound) m_sound->set_tempo(3, data);
-	LOGMASKED(LOG_TEMPO, "[tempo] tp[%d]=%02x\n", 3, data);
-	reprogram_sound_timer(3);
-}
-
-uint8_t xavix_state::sound_irq_status_r()
-{
-	// UK e-kara carts check the upper nibble for sound-timer IRQ source
-	return m_sound_irqstatus;
-}
-
-void xavix_state::sound_irq_status_w(uint8_t data)
-{
-	const uint8_t old_enable = m_sound_irqstatus & 0x0f;
-
-	const uint8_t clear_mask = (data >> 4) & 0x0f;
-	if (clear_mask)
-		m_sound_irqstatus &= ~(clear_mask << 4);
-
-	const uint8_t new_enable = data & 0x0f;
-	m_sound_irqstatus = (m_sound_irqstatus & 0xf0) | new_enable;
-
-	const uint8_t pending = (m_sound_irqstatus >> 4) & 0x0f;
-	LOGMASKED(LOG_IRQ, "[irq] status_w %02x old_en=%02x new_en=%02x clear=%02x pending=%02x\n",
-		data, old_enable, new_enable, clear_mask, pending);
-
-	const uint8_t changed = old_enable ^ new_enable;
-	if (changed)
-	{
-		for (int t = 0; t < 4; t++)
-			if (changed & (1 << t))
-				reprogram_sound_timer(t);
-	}
-
-	refresh_sound_irq_state();
-	update_irqs();
-}
-
-// used by ekara (UK cartridges), rad_bass, rad_crdn
-TIMER_CALLBACK_MEMBER(xavix_state::sound_timer_done)
-{
-	// param = timer number 0,1,2 or 3
-	const uint8_t enable_mask = 1U << param;
-	if (!BIT(m_sound_irqstatus, param))
-		return;
-
-	m_sound_irqstatus |= (enable_mask << 4);
-	LOGMASKED(LOG_TIMER, "[timer] %d latch pending=%02x\n",
-		param, (m_sound_irqstatus >> 4) & 0x0f);
-	refresh_sound_irq_state();
-	update_irqs();
-}
-
-void xavix_state::refresh_sound_irq_state()
-{
-	const uint8_t enable = m_sound_irqstatus & 0x0f;
-	const uint8_t pending = (m_sound_irqstatus >> 4) & 0x0f;
-
-	if (enable & pending)
-		m_irqsource |= 0x80;
-	else
-		m_irqsource &= ~0x80;
-
-	LOGMASKED(LOG_IRQ,   "[irq] line %s enable=%02x pending=%02x\n",
-		((enable & pending) ? "assert" : "clear"), enable, pending);
-}
-
-void xavix_state::reprogram_sound_timer(int index)
-{
-	if (index < 0 || index >= 4)
-		return;
-	if (!m_sound_timer[index])
-		return;
-
-	const uint8_t mask = 1U << index;
-	if (!(m_sound_irqstatus & mask))
-	{
-		LOGMASKED(LOG_TIMER, "[timer] %d stop (enable=0)\n", index);
-		m_sound_timer[index]->adjust(attotime::never, index);
-		return;
-	}
-
-	const uint8_t tempo = m_tp[index];
-	if (tempo == 0)
-	{
-		LOGMASKED(LOG_TIMER, "[timer] %d stop (tempo=0)\n", index);
-		m_sound_timer[index]->adjust(attotime::never, index);
-		return;
-	}
-
-	const double frequency = m_sound->tempo_tick_hz(tempo);
-	if (frequency <= 0.0)
-	{
-		LOGMASKED(LOG_TIMER, "[timer] %d stop (period unavailable)\n", index);
-		m_sound_timer[index]->adjust(attotime::never, index);
-		return;
-	}
-
-	const attotime period = attotime::from_hz(frequency);
-	const std::string period_text = period.as_string(18);
-	m_sound_timer[index]->adjust(period, index, period);
-	LOGMASKED(LOG_TIMER, "[timer] %d arm tempo=%02x freq=%.6fHz period=%s\n",
-		index, tempo, frequency, period_text.c_str());
 }

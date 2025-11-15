@@ -93,7 +93,8 @@ namespace {
 #define A2GS_MASTER_CLOCK (XTAL(28'636'363))
 #define A2GS_14M    (A2GS_MASTER_CLOCK/2)
 #define A2GS_7M     (A2GS_MASTER_CLOCK/4)
-#define A2GS_1M     (A2GS_MASTER_CLOCK/28)
+#define A2GS_2_8M   (A2GS_MASTER_CLOCK/10)
+#define A2GS_1M     (XTAL(1021800))
 
 #define A2GS_UPPERBANK_TAG "inhbank"
 #define A2GS_AUXUPPER_TAG "inhaux"
@@ -519,7 +520,7 @@ private:
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(A2GS_1M);
 		}
 	}
 
@@ -539,11 +540,11 @@ private:
 
 		if (isfast)
 		{
-			m_maincpu->set_unscaled_clock(A2GS_14M/5);
+			m_maincpu->set_unscaled_clock(A2GS_2_8M);
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(A2GS_1M);
 		}
 	}
 
@@ -655,7 +656,10 @@ u8 apple2gs_state::apple2gs_read_vector(offs_t offset)
 	// regardless of the language card config.
 	if (!(m_shadow & SHAD_IOLC))
 	{
-		return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
+		if (m_inh_slot != -1 && (m_slotdevice[m_inh_slot]->inh_type() & INH_READ) == INH_READ)
+			return m_slotdevice[m_inh_slot]->read_inh_rom(offset | 0xFFE0);
+		else
+			return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
 	}
 	else    // else vector fetches from bank 0 RAM
 	{
@@ -847,7 +851,7 @@ void apple2gs_state::machine_reset()
 	m_slow_counter = 0;
 
 	// always assert full speed on reset
-	m_maincpu->set_unscaled_clock(A2GS_14M/5);
+	m_maincpu->set_unscaled_clock(A2GS_2_8M);
 	m_last_speed = true;
 
 	m_sndglu_ctrl = 0;
@@ -881,9 +885,6 @@ void apple2gs_state::machine_reset()
 	// RESEARCH: how does RESET affect LC state and aux banking states?
 	auxbank_update();
 	update_slotrom_banks();
-
-	// reset the slots
-	m_a2bus->reset_bus();
 
 	// Apple-specific initial state
 	m_scc->ctsa_w(0);
@@ -971,7 +972,7 @@ void apple2gs_state::update_speed()
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(isfast ? A2GS_14M / 5 : A2GS_1M);
+			m_maincpu->set_unscaled_clock(isfast ? A2GS_2_8M : A2GS_1M);
 		}
 		m_last_speed = isfast;
 	}
@@ -1696,8 +1697,8 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x46:  // INTFLAG
 			return (m_an3 ? INTFLAG_AN3 : 0x00) | m_intflag;
 
-		case 0x60: // button 3 on IIgs
-			return (m_gameio->sw3_r() ? 0x80 : 0x00) | uFloatingBus7;
+		case 0x60: // button 3 on IIgs, inverted
+			return (m_gameio->sw3_r() ? 0 : 0x80) | uFloatingBus7;
 
 		case 0x61: // button 0 or Open Apple
 			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
@@ -1707,8 +1708,8 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x62: // button 1 or Option
 			return ((m_gameio->sw1_r() || (m_adb_p3_last & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x63: // button 2 or SHIFT key
-			return (m_gameio->sw2_r() ? 0x80 : 0x00) | uFloatingBus7;
+		case 0x63: // button 2, inverted (no shift key mod)
+			return (m_gameio->sw2_r() ? 0 : 0x80) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
@@ -3743,7 +3744,7 @@ INPUT_PORTS_END
 void apple2gs_state::apple2gs(machine_config &config)
 {
 	/* basic machine hardware */
-	G65816(config, m_maincpu, A2GS_MASTER_CLOCK/10);
+	G65816(config, m_maincpu, A2GS_2_8M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
@@ -3811,7 +3812,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	ADDRESS_MAP_BANK(config, A2GS_C300_TAG).set_map(&apple2gs_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
 
 	/* serial */
-	SCC85C30(config, m_scc, A2GS_14M / 2);
+	SCC85C30(config, m_scc, A2GS_7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
@@ -3842,7 +3843,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	A2BUS_SLOT(config, "sl6", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
 	A2BUS_SLOT(config, "sl7", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
 
-	IWM(config, m_iwm, A2GS_7M, A2GS_MASTER_CLOCK/14);
+	IWM(config, m_iwm, A2GS_7M, A2GS_1M*2);
 	m_iwm->phases_cb().set(FUNC(apple2gs_state::phases_w));
 	m_iwm->sel35_cb().set(FUNC(apple2gs_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(apple2gs_state::devsel_w));

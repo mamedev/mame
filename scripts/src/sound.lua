@@ -1102,6 +1102,18 @@ end
 
 
 ---------------------------------------------------
+-- Texas Instruments TMS3631
+--@src/devices/sound/tms3631.h,SOUNDS["TMS3631"] = true
+---------------------------------------------------
+
+if (SOUNDS["TMS3631"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/tms3631.cpp",
+		MAME_DIR .. "src/devices/sound/tms3631.h",
+	}
+end
+
+---------------------------------------------------
 -- Texas Instruments TMS5100-series speech synthesizers
 --@src/devices/sound/tms5110.h,SOUNDS["TMS5110"] = true
 ---------------------------------------------------

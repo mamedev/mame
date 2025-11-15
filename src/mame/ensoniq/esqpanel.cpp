@@ -13,6 +13,7 @@
 #include "vfx.lh"
 #include "vfxsd.lh"
 #include "sd1.lh"
+#include "sd132.lh"
 
 #include <algorithm>
 
@@ -679,6 +680,32 @@ void esqpanel_device::set_button(uint8_t button, bool pressed)
 	}
 }
 
+void esqpanel_device::key_down(uint8_t key, uint8_t velocity)
+{
+	if (velocity < 1)
+		velocity = 1;
+	else if (velocity > 127)
+		velocity = 127;
+
+	xmit_char(0x80 | (key & 0x3f));
+	xmit_char(velocity);
+}
+
+void esqpanel_device::key_pressure(uint8_t key, uint8_t pressure)
+{
+	if (pressure > 127)
+		pressure = 127;
+
+	xmit_char(0x40 | (key & 0x3f));
+	xmit_char(pressure);
+}
+
+void esqpanel_device::key_up(uint8_t key)
+{
+	xmit_char(key & 0x3f);
+	xmit_char(0x40);
+}
+
 /* panel with 1x22 VFD display used in the EPS-16 and EPS-16 Plus */
 
 void esqpanel1x22_device::device_add_mconfig(machine_config &config)
@@ -719,8 +746,10 @@ void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 		config.set_default_layout(layout_vfx);
 	else if (m_panel_type == VFX_SD)
 		config.set_default_layout(layout_vfxsd);
-	else if (m_panel_type == SD_1 || m_panel_type == SD_1_32)
+	else if (m_panel_type == SD_1)
 		config.set_default_layout(layout_sd1);
+	else if (m_panel_type == SD_1_32)
+		config.set_default_layout(layout_sd132);
 	else // lowest common demonimator as the default: just the VFD.
 		config.set_default_layout(layout_esq2by40_vfx);
 }
@@ -752,7 +781,7 @@ bool esqpanel2x40_vfx_device::write_contents(std::ostream &o)
 }
 
 void esqpanel2x40_vfx_device::update_lights() {
-	// set the lights according to their status and bllink phase.
+	// set the lights according to their status and blink phase.
 	int32_t lights = 0;
 	int32_t bit = 1;
 	for (int i = 0; i < 16; i++)
@@ -763,6 +792,9 @@ void esqpanel2x40_vfx_device::update_lights() {
 		}
 		bit <<= 1;
 	}
+	// We use the next bit, 16, for the floppy LED
+	if (m_floppy_active)
+		lights |= 1 << 16;
 	m_lights = lights;
 }
 
@@ -810,6 +842,22 @@ static INPUT_PORTS_START(esqpanel2x40_vfx_device)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), 32 + i)
 	}
 
+	PORT_START("patch_select")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD);
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::patch_select_change), 1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD);
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::patch_select_change), 1)
+
+	PORT_START("analog_pitch_bend")
+	PORT_BIT(0x3ff, 0x200, IPT_PADDLE) PORT_NAME("Pitch Bend") PORT_MINMAX(0, 0x3ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(128)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 0)
+
+	PORT_START("analog_mod_wheel")
+	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
+	configurer.field_alloc(IPT_ADJUSTER, 0x3ff, 0x3ff, "Modulation");
+	configurer.field_set_min_max(0, 0x3ff);
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 2)
+
 	PORT_START("analog_data_entry")
 	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
 	configurer.field_alloc(IPT_ADJUSTER, 0x200, 0x3ff, "Data Entry");
@@ -821,6 +869,19 @@ static INPUT_PORTS_START(esqpanel2x40_vfx_device)
 	configurer.field_alloc(IPT_ADJUSTER, 0x3ff, 0x3ff, "Volume");
 	configurer.field_set_min_max(0, 0x3ff);
 	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 5)
+
+	for (int i = 0; i < 61; i++) {
+		std::string port_name = util::string_format("key_%d", i);
+		PORT_START(port_name.c_str());
+		PORT_BIT(0x3fff, 0x0, IPT_PADDLE)
+		PORT_GM_NOTE(36 + i)
+
+		// the following must be set ot MAME complains, but we don't use them:
+		// we always pass the values through explicitly, overriding anything else.
+		PORT_SENSITIVITY(1) PORT_KEYDELTA(1) PORT_CENTERDELTA(1)
+
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::key_change), i)
+	}
 
 INPUT_PORTS_END
 
@@ -836,13 +897,61 @@ INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::button_change)
 	esqpanel_device::set_button(param, newval != 0);
 }
 
+// A Patch Select button is pressed on the internal panel
+INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::patch_select_change)
+{
+	// Update the internal state from the full value of the port: presented as an analog value!
+	int value = (field.port().read() & 0x03) * 250;
+	set_analog_value(1, value << 6);
+}
+
 // An anlog value was changed on the internal panel
 INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::analog_value_change)
 {
 	int channel = param;
 	int clamped = std::clamp((int)newval, 0, 1023);
 	int value = clamped << 6;
-	esqpanel_device::set_analog_value(channel, value);
+	set_analog_value(channel, value);
+}
+
+// An key changed on the internal panel
+INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::key_change)
+{
+	uint8_t key = param & 0x3f;
+	uint8_t velocity = newval & 0x7f;
+
+	if (velocity == 0)
+	{
+		uint8_t old_pressure = (oldval >> 7) & 0x7f;
+		if (old_pressure != 0)
+		{
+			// there was pressure before; reset the pressure to zero before the key-up event.
+			key_pressure(key, 0);
+		}
+		key_up(key);
+	}
+	else
+	{
+		uint8_t old_velocity = oldval & 0x7f;
+		uint8_t pressure = (newval >> 7) & 0x7f;
+
+		if (old_velocity == 0)
+		{
+			// this is a key down event. Might also include an ensuing pressure event.
+			key_down(key, velocity);
+		}
+
+		if (pressure != 0)
+		{
+			// if we have pressure, then it is (also) a pressure event.
+			key_pressure(key, pressure);
+		}
+	}
+}
+
+void esqpanel2x40_vfx_device::set_floppy_active(bool floppy_active) {
+	m_floppy_active = floppy_active;
+	update_lights();
 }
 
 ioport_value esqpanel2x40_vfx_device::get_adjuster_value(required_ioport &ioport)

@@ -26,7 +26,7 @@ public:
 
 protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD {};
+	virtual void device_start() override ATTR_COLD {}
 
 	virtual uint16_t io_r() override;
 

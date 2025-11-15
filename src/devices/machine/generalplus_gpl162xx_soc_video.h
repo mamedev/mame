@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "spg_renderer.h"
+#include "gpl_renderer.h"
 #include "cpu/unsp/unsp.h"
 #include "screen.h"
 #include "emupal.h"
@@ -32,8 +32,6 @@ public:
 	void write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data);
 
 	//void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
-	void set_alt_tile_addressing(int alt_tile_addressing) { m_alt_tile_addressing = alt_tile_addressing; }
-	void set_alt_extrasprite(int alt_extrasprite_hack) { m_alt_extrasprite_hack = alt_extrasprite_hack; }
 	void set_legacy_video_mode() { m_use_legacy_mode = true; }
 	void set_disallow_resolution_control() { m_disallow_resolution_control = true; }
 
@@ -231,12 +229,10 @@ protected:
 	//int m_pal_displaybank_high;
 	//int m_pal_sprites;
 	//int m_pal_back;
-	int m_alt_extrasprite_hack;
-	int m_alt_tile_addressing;
 	bool m_use_legacy_mode; // could be related to the 'unused' bits in the palete bank select being set, but uncertain
 	bool m_disallow_resolution_control;
 
-	required_device<spg_renderer_device> m_renderer;
+	required_device<gpl_renderer_device> m_renderer;
 
 	address_space* m_cpuspace;
 	address_space* m_cs_space;

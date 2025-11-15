@@ -1,1197 +1,3274 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 
-  <!-- Decoration definitions -->
-  <element name="triangle_up">
-	<image>
-	  <data>
-		<![CDATA[
-		  <svg width="2" height="1" viewBox="0 0 2 1">
-		  <path stroke="none" fill="#ffffff" d="M0 1H2L 1 0Z" />
-		  </svg>
+	<!-- Decoration definitions -->
+	<element name="triangle_up">
+		<image>
+			<bounds x="0" y="0" width="2" height="1" />
+			<data>
+				<![CDATA[
+					<svg width="2" height="1" viewBox="0 0 2 1">
+						<path stroke="none" fill="#ffffff" d="M0 1H2L 1 0Z" />
+					</svg>
 
-		]]></data>
-	</image>
-  </element>
-  <element name="triangle_down">
-	<image>
-	  <data>
-		<![CDATA[
-		  <svg width="2" height="1" viewBox="0 0 2 1">
-		  <path stroke="none" fill="#ffffff" d="M0 0H2L1 1Z" />
-		  </svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="triangle_down">
+		<image>
+			<bounds x="0" y="0" width="2" height="1" />
+			<data>
+				<![CDATA[
+					<svg width="2" height="1" viewBox="0 0 2 1">
+						<path stroke="none" fill="#ffffff" d="M0 0H2L1 1Z" />
+					</svg>
 
-		]]></data>
-	</image>
-  </element>
-  <element name="rect_222222">
-	<rect>
-	  <color red="0.133" green="0.133" blue="0.133" />
-	</rect>
-  </element>
-  <element name="rect_000000">
-	<rect>
-	  <color red="0" green="0" blue="0" />
-	</rect>
-  </element>
-  <element name="rect_db5f6a">
-	<rect>
-	  <color red="0.859" green="0.373" blue="0.416" />
-	</rect>
-  </element>
-  <element name="rect_ffffff">
-	<rect>
-	  <color red="1" green="1" blue="1" />
-	</rect>
-  </element>
+				]]></data>
+		</image>
+	</element>
+	<element name="logo">
+		<image>
+			<bounds x="0" y="0" width="72" height="1" />
+			<data>
+				<![CDATA[
+					<svg width="72" height="13" viewBox="0 0 72 13">
+						<rect x="0.5" y="0.5" width="71" height="12" rx="1" fill="none" stroke-width="1" stroke="white" />
+					</svg>
 
-  <!-- VFD -->
-  <!-- The VFD elements -->
-  <element name="segments" defstate="0">
-	<led14seg>
-	  <color red="0.45" green="1.0" blue="0.95" />
-	</led14seg>
-  </element>
+				]]></data>
+		</image>
+	</element>
+	<element name="drawing_storage_cutout">
+		<image>
+			<bounds x="0" y="0" width="118" height="96" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="118" height="96" viewBox="0 0 118 96">
+						<path d="M 0 0 H 118 L 108 10 H 10 Z" fill="#101010" stroke="none" />
+						<path d="M 0 0 V 96 L 10 10 Z" fill="#101010" stroke="none" />
+						<path d="M 118 0 V 96 L 108 10 Z" fill="#303030" stroke="none" />
+						<path d="M 0 96 H 119 L 108 10 H 10 Z" fill="#282828" stroke="none" />
+					</svg>
 
-  <element name="dot" defstate="0">
-	<disk statemask="0x4000" state="0"><color red="0.06" green="0.12" blue="0.10" /></disk>
-	<disk statemask="0x4000" state="0x4000"><color red="0.45" green="1.00" blue="0.95" /></disk>
-  </element>
+				]]></data>
+		</image>
+	</element>
+	<element name="drawing_wheel_and_floppy_area">
+		<image>
+			<bounds x="0" y="0" width="118" height="161" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="118" height="161" viewBox="0 0 118 161">
+						<rect x="0" y="0" width="5" height="161" rx="0" fill="#101010" stroke="none" />
+						<rect x="113" y="0" width="5" height="161" rx="0" fill="#303030" stroke="none" />
+						<path d="M 0 0 H 118 L 113 13 H 5 Z" fill="#101010" stroke="none" />
+					</svg>
 
-  <element name="underline" defstate="0">
-	<rect statemask="0x8000" state="0"><color red="0.06" green="0.12" blue="0.10" /></rect>
-	<rect statemask="0x8000" state="0x8000"><color red="0.45" green="1.00" blue="0.95" /></rect>
-  </element>
+				]]></data>
+		</image>
+	</element>
+	<element name="drawing_floppy">
+		<image>
+			<bounds x="0" y="0" width="102" height="36" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="102" height="36" viewBox="0 0 102 36">
+						<rect x="0" y="0" width="102" height="5" rx="0" fill="#444444" stroke="none" />
+						<rect x="0" y="5" width="102" height="31" rx="0" fill="#333333" stroke="none" />
+						<path d="M 3 6 H 74 V 3 H 99 V 20 H 74 V 16 H 3 Z" fill="#2a2a2a" stroke="none" />
+						<path d="M 5 9 H 97 V 13 H 5 Z" fill="#222222" stroke="none" />
+						<path d="M 63 22.5 H 68 V 24.5 H 63 Z" fill="#112211" stroke="none" />
+						<path d="M 74 21 h 25 v 26 H 74 Z" fill="#2a2a2a" stroke="none" />
+					</svg>
 
-  <group name="vfd_cell">
-	<bounds x="0" y="0" width="342" height="572" />
-	<element ref="segments" name="~input~"><bounds x="50" y="69" width="214" height="311" /></element>
-	<element ref="dot" name="~input~"><bounds x="253" y="337" width="42" height="42" /></element>
-	<element ref="underline" name="~input~"><bounds x="43" y="441" width="183" height="25" /></element>
-  </group>
+				]]></data>
+		</image>
+	</element>
+	<element name="drawing_pitch_bend">
+		<image>
+			<bounds x="0" y="0" width="4" height="66" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="4" height="66" viewBox="0 0 4 66">
+						<path d="M 0.25 0.25 H 3.5 L 2 30 Z M 0.25 65.75 H 3.5 L 2 36 Z" fill="none" stroke="#ffffff" stroke-width="0.5" />
+						<circle cx="2" cy="33" r="1" fill="#ffffff" stroke="none" />
+					</svg>
 
-  <element name="vfd_background">
-	<rect>
-	  <color red="0.0" green="0.0" blue="0.0" />
-	</rect>
-  </element>
+				]]></data>
+		</image>
+	</element>
+	<element name="drawing_modulation">
+		<image>
+			<bounds x="0" y="0" width="4" height="66" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="4" height="66" viewBox="0 0 4 66">
+						<path d="M 0.25 0.25 H 3 L 2 65.75 Z" fill="none" stroke="#ffffff" stroke-width="0.5" />
+					</svg>
 
-  <group name="vfd">
-	<element ref="vfd_background">
-	  <bounds x="0" y="0" width="13680" height="1144" />
+				]]></data>
+		</image>
+	</element>
+	<element name="rect_black">
+		<rect>
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+	<element name="rect_panel">
+		<rect>
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="rect_sd1">
+		<rect>
+			<color red="0.85882" green="0.37255" blue="0.41569" />
+		</rect>
+	</element>
+	<element name="rect_glass">
+		<rect>
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+	<element name="rect_white">
+		<rect>
+			<color red="1" green="1" blue="1" />
+		</rect>
+	</element>
+	<element name="rect_body_down">
+		<rect>
+			<color red="0.062745" green="0.062745" blue="0.062745" />
+		</rect>
+	</element>
+	<element name="rect_body_up">
+		<rect>
+			<color red="0.18824" green="0.18824" blue="0.18824" />
+		</rect>
+	</element>
+	<element name="rect_body">
+		<rect>
+			<color red="0.12549" green="0.12549" blue="0.12549" />
+		</rect>
+	</element>
+	<element name="ellipse_screwhead">
+		<disk>
+			<color red="0.21961" green="0.21961" blue="0.21961" />
+		</disk>
+	</element>
+	<element name="full_keyboard_background">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="845.0" height="138" viewBox="0 0 845.0 138"><rect width="845.0" height="138" rx="2" ry="2" fill="white" stroke="none"/></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="playable_keyboard_background">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="516.0" height="138" viewBox="0 0 516.0 138"><rect width="516.0" height="138" rx="2" ry="2" fill="white" stroke="none"/></svg>
+				]]></data>
+		</image>
 	</element>
 
-	<!-- VFDs -->
-	<repeat count="2">
-	  <param name="s" start="0" increment="40" />
-	  <param name="y" start="0" increment="572" />
-	  <repeat count="40">
-		<param name="n" start="~s~" increment="1" />
-		<param name="x" start="0" increment="342" />
+	<!-- VFD definitions -->
+	<element name="segments" defstate="0">
+		<led14seg>
+			<color red="0.45098" green="1" blue="0.94902" />
+		</led14seg>
+	</element>
+	<element name="dot" defstate="0">
+		<disk statemask="0x4000" state="0">
+			<color red="0.058824" green="0.12157" blue="0.10196" />
+		</disk>
+		<disk statemask="0x4000" state="0x4000">
+			<color red="0.45098" green="1" blue="0.94902" />
+		</disk>
+	</element>
+	<element name="underline" defstate="0">
+		<rect state="0" statemask="0x8000">
+			<color red="0.058824" green="0.12157" blue="0.10196" />
+		</rect>
+		<rect state="0x8000" statemask="0x8000">
+			<color red="0.45098" green="1" blue="0.94902" />
+		</rect>
+	</element>
+	<group name="vfd_cell">
+		<bounds x="0" y="0" width="342" height="572" />
+		<element name="~input~" ref="segments">
+			<bounds x="50" y="69" width="214" height="311" />
+		</element>
+		<element name="~input~" ref="dot">
+			<bounds x="253" y="337" width="42" height="42" />
+		</element>
+		<element name="~input~" ref="underline">
+			<bounds x="43" y="411" width="183" height="25" />
+		</element>
+	</group>
+	<element name="vfd_background">
+		<rect>
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+	<group name="vfd">
+		<element ref="vfd_background">
+			<bounds x="0" y="0" width="13680" height="1144" />
+		</element>
+		<!-- VFDs -->
+		<repeat count="2">
+			<param name="s" start="0" increment="40" />
+			<param name="y" start="0" increment="572" />
+			<repeat count="40">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="0" increment="342" />
 
-		<param name="input" value="vfd~n~" />
-		<group ref="vfd_cell">
-		  <bounds x="~x~" y="~y~" width="342" height="572" />
+				<param name="input" value="vfd~n~" />
+				<group ref="vfd_cell">
+					<bounds x="~x~" y="~y~" width="342" height="572" />
+				</group>
+			</repeat>
+		</repeat>
+	</group>
+
+	<!-- Text items -->
+	<element name="text_L_volume">
+		<text string="Volume" align="1" />
+	</element>
+	<element name="text_L_data_entry">
+		<text string="Data Entry" align="1" />
+	</element>
+	<element name="text_bankset">
+		<text string="BankSet" />
+	</element>
+	<element name="text_sounds">
+		<text string="Sounds" />
+	</element>
+	<element name="text_presets">
+		<text string="Presets" />
+	</element>
+	<element name="text_seq">
+		<text string="Seq" />
+	</element>
+	<element name="text_0">
+		<text string="0" />
+	</element>
+	<element name="text_1">
+		<text string="1" />
+	</element>
+	<element name="text_2">
+		<text string="2" />
+	</element>
+	<element name="text_3">
+		<text string="3" />
+	</element>
+	<element name="text_4">
+		<text string="4" />
+	</element>
+	<element name="text_5">
+		<text string="5" />
+	</element>
+	<element name="text_6">
+		<text string="6" />
+	</element>
+	<element name="text_7">
+		<text string="7" />
+	</element>
+	<element name="text_8">
+		<text string="8" />
+	</element>
+	<element name="text_9">
+		<text string="9" />
+	</element>
+	<element name="text_L_replace">
+		<text string="Replace" align="1" />
+	</element>
+	<element name="text_L_program">
+		<text string="Program" align="1" />
+	</element>
+	<element name="text_L_select">
+		<text string="Select" align="1" />
+	</element>
+	<element name="text_L_voice">
+		<text string="Voice" align="1" />
+	</element>
+	<element name="text_L_copy">
+		<text string="Copy" align="1" />
+	</element>
+	<element name="text_L_write">
+		<text string="Write" align="1" />
+	</element>
+	<element name="text_L_compare">
+		<text string="Compare" align="1" />
+	</element>
+	<element name="text_L_patch">
+		<text string="Patch" align="1" />
+	</element>
+	<element name="text_L_midi">
+		<text string="MIDI" align="1" />
+	</element>
+	<element name="text_L_effects">
+		<text string="Effects" align="1" />
+	</element>
+	<element name="text_L_key">
+		<text string="Key" align="1" />
+	</element>
+	<element name="text_L_zone">
+		<text string="Zone" align="1" />
+	</element>
+	<element name="text_L_trans_">
+		<text string="Trans-" align="1" />
+	</element>
+	<element name="text_L_pose">
+		<text string="pose" align="1" />
+	</element>
+	<element name="text_L_release">
+		<text string="Release" align="1" />
+	</element>
+	<element name="text_L_pan">
+		<text string="Pan" align="1" />
+	</element>
+	<element name="text_L_timbre">
+		<text string="Timbre" align="1" />
+	</element>
+	<element name="text_L_wave">
+		<text string="Wave" align="1" />
+	</element>
+	<element name="text_L_mod">
+		<text string="Mod" align="1" />
+	</element>
+	<element name="text_L_mixer">
+		<text string="Mixer" align="1" />
+	</element>
+	<element name="text_L_control">
+		<text string="Control" align="1" />
+	</element>
+	<element name="text_L_pitch">
+		<text string="Pitch" align="1" />
+	</element>
+	<element name="text_L_filters">
+		<text string="Filters" align="1" />
+	</element>
+	<element name="text_L_output">
+		<text string="Output" align="1" />
+	</element>
+	<element name="text_L_lfo">
+		<text string="LFO" align="1" />
+	</element>
+	<element name="text_L_env1">
+		<text string="Env1" align="1" />
+	</element>
+	<element name="text_L_env2">
+		<text string="Env2" align="1" />
+	</element>
+	<element name="text_L_env3">
+		<text string="Env3" align="1" />
+	</element>
+	<element name="text_tracks">
+		<text string="Tracks" />
+	</element>
+	<element name="text_1_6">
+		<text string="1-6" />
+	</element>
+	<element name="text_7_12">
+		<text string="7-12" />
+	</element>
+	<element name="text_L_rec">
+		<text string="Rec" align="1" />
+	</element>
+	<element name="text_L_stop">
+		<text string="Stop" align="1" />
+	</element>
+	<element name="text_L__cont">
+		<text string="/Cont" align="1" />
+	</element>
+	<element name="text_L_play">
+		<text string="Play" align="1" />
+	</element>
+	<element name="text_L_click">
+		<text string="Click" align="1" />
+	</element>
+	<element name="text_L_seq">
+		<text string="Seq" align="1" />
+	</element>
+	<element name="text_L_locate">
+		<text string="Locate" align="1" />
+	</element>
+	<element name="text_L_song">
+		<text string="Song" align="1" />
+	</element>
+	<element name="text_L_track">
+		<text string="Track" align="1" />
+	</element>
+	<element name="text_L_master">
+		<text string="Master" align="1" />
+	</element>
+	<element name="text_L_storage">
+		<text string="Storage" align="1" />
+	</element>
+	<element name="text_edit">
+		<text string="Edit" />
+	</element>
+	<element name="text_L_system">
+		<text string="System" align="1" />
+	</element>
+	<element name="text_L_sequencer">
+		<text string="Sequencer" align="1" />
+	</element>
+	<element name="text_L_performance">
+		<text string="Performance" align="1" />
+	</element>
+	<element name="text_L_programming">
+		<text string="Programming" align="1" />
+	</element>
+	<element name="text_L_cartridge">
+		<text string="Cartridge" align="1" />
+	</element>
+	<element name="text_L_power">
+		<text string="Power" align="1" />
+	</element>
+	<element name="text_L_line">
+		<text string="Line" align="1" />
+	</element>
+	<element name="text_L_fuse">
+		<text string="Fuse" align="1" />
+	</element>
+	<element name="text_midi">
+		<text string="MIDI" />
+	</element>
+	<element name="text_L_thru">
+		<text string="Thru" align="1" />
+	</element>
+	<element name="text_L_out">
+		<text string="Out" align="1" />
+	</element>
+	<element name="text_L_in">
+		<text string="In" align="1" />
+	</element>
+	<element name="text_L_ft__sw_">
+		<text string="Ft. Sw." align="1" />
+	</element>
+	<element name="text_L_pedal_cv">
+		<text string="Pedal•CV" align="1" />
+	</element>
+	<element name="text_L_left">
+		<text string="Left" align="1" />
+	</element>
+	<element name="text_L_right">
+		<text string="Right" align="1" />
+	</element>
+	<element name="text_mono">
+		<text string="Mono" />
+	</element>
+	<element name="text_aux__out">
+		<text string="Aux. Out" />
+	</element>
+	<element name="text_main_out">
+		<text string="Main Out" />
+	</element>
+	<element name="text_L_phones">
+		<text string="Phones" align="1" />
+	</element>
+	<element name="text_L_music_production_synthesizer">
+		<text string="MUSIC PRODUCTION SYNTHESIZER" align="1" />
+	</element>
+	<element name="text_ensoniq">
+		<text string="ensoniq" />
+	</element>
+	<element name="text_L_sd_1">
+		<text string="SD-1" align="1" />
+	</element>
+	<element name="text_L_patch_select">
+		<text string="Patch Select" align="1" />
+	</element>
+
+	<element name="plugin_warning" defstate="1">
+		<rect state="1">
+			<color red="0.69804" green="0.69804" blue="0.69804" />
+		</rect>
+		<text string="This view requires the layout plugin." align="0" state="1">
+			<color red="0.73333" green="0.17255" blue="0.17255" />
+		</text>
+	</element>
+	<!-- Button shapes -->
+	<element name="button_15_5_dark">
+		<image state="0">
+			<color red="0.066667" green="0.066667" blue="0.066667" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+		<image state="1">
+			<color red="1" green="1" blue="1" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="button_15_5_screen">
+		<image state="0">
+			<color red="0.16471" green="0.16471" blue="0.16471" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+		<image state="1">
+			<color red="1" green="1" blue="1" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="button_15_10_light">
+		<image state="0">
+			<color red="0.73333" green="0.73333" blue="0.73333" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+		<image state="1">
+			<color red="1" green="1" blue="1" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="button_15_10_medium">
+		<image state="0">
+			<color red="0.46667" green="0.46667" blue="0.46667" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+		<image state="1">
+			<color red="1" green="1" blue="1" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="button_15_5_light">
+		<image state="0">
+			<color red="0.73333" green="0.73333" blue="0.73333" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+		<image state="1">
+			<color red="1" green="1" blue="1" />
+			<data>
+				<![CDATA[
+					<svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="psel_9_12">
+		<image state="0">
+			<color red="0.73333" green="0.73333" blue="0.73333" />
+			<data>
+				<![CDATA[
+					<svg width="9" height="12" viewBox="0 0 9 12"><rect x="0" y="0" width="9" height="12" rx="0" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+		<image state="1">
+			<color red="1" green="1" blue="1" />
+			<data>
+				<![CDATA[
+					<svg width="9" height="12" viewBox="0 0 9 12"><rect x="0" y="0" width="9" height="12" rx="0" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+
+	<!-- Light items -->
+	<element name="light_15">
+		<rect state="0" statemask="0x8000">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x8000" statemask="0x8000">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_13">
+		<rect state="0" statemask="0x2000">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x2000" statemask="0x2000">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_7">
+		<rect state="0" statemask="0x0080">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0080" statemask="0x0080">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_14">
+		<rect state="0" statemask="0x4000">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x4000" statemask="0x4000">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_6">
+		<rect state="0" statemask="0x0040">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0040" statemask="0x0040">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_4">
+		<rect state="0" statemask="0x0010">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0010" statemask="0x0010">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_12">
+		<rect state="0" statemask="0x1000">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x1000" statemask="0x1000">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_3">
+		<rect state="0" statemask="0x0008">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0008" statemask="0x0008">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_11">
+		<rect state="0" statemask="0x0800">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0800" statemask="0x0800">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_2">
+		<rect state="0" statemask="0x0004">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0004" statemask="0x0004">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_10">
+		<rect state="0" statemask="0x0400">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0400" statemask="0x0400">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_1">
+		<rect state="0" statemask="0x0002">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0002" statemask="0x0002">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_9">
+		<rect state="0" statemask="0x0200">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0200" statemask="0x0200">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_5">
+		<rect state="0" statemask="0x0020">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0020" statemask="0x0020">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_0">
+		<rect state="0" statemask="0x0001">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0001" statemask="0x0001">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_8">
+		<rect state="0" statemask="0x0100">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x0100" statemask="0x0100">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+	<element name="light_16">
+		<rect state="0" statemask="0x10000">
+			<color red="0.066667" green="0.13333" blue="0.066667" />
+		</rect>
+		<rect state="0x10000" statemask="0x10000">
+			<color red="0.13333" green="1" blue="0.13333" />
+		</rect>
+	</element>
+
+	<!-- Slider definitions -->
+	<element name="invisible_rect">
+		<rect>
+			<color red="0" green="0" blue="0" alpha="0" />
+		</rect>
+	</element>
+	<element name="slider_frame">
+		<rect>
+			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<bounds x="0" y="0" width="8" height="24" />
+		</rect>
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.5" y="0.5" width="7" height="23" />
+		</rect>
+	</element>
+	<element name="slider_knob">
+		<rect>
+			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<bounds x="0.75" y="0.75" width="6.5" height="4" />
+		</rect>
+		<rect>
+			<color red="0.33333" green="0.33333" blue="0.33333" />
+			<bounds x="0.75" y="0.75" width="6.5" height="0.75" />
+		</rect>
+		<rect>
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0.75" y="2.5" width="6.5" height="0.25" />
+		</rect>
+		<rect>
+			<color red="0.33333" green="0.33333" blue="0.33333" />
+			<bounds x="0.75" y="2.75" width="6.5" height="0.25" />
+		</rect>
+		<rect>
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0.75" y="4" width="6.5" height="0.75" />
+		</rect>
+	</element>
+	<group name="slider">
+		<element ref="slider_frame">
+			<bounds x="0" y="0" width="8" height="24" />
+		</element>
+		<element ref="invisible_rect" id="slider_~slider_id~">
+			<bounds x="0.75" y="0.75" width="6.5" height="22.5" />
+		</element>
+		<element ref="slider_knob" id="slider_knob_~slider_id~">
+			<animate inputtag="~port_name~" inputmask="0x7f" />
+			<bounds x="0.75" y="0.75" width="6.5" height="4" state="1023" />
+			<bounds x="0.75" y="19.25" width="6.5" height="4" state="0" />
+		</element>
+	</group>
+	<element name="wheel_frame">
+		<rect>
+			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<bounds x="0" y="0" width="13" height="66" />
+		</rect>
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds x="1.5" y="1.5" width="10" height="63" />
+		</rect>
+	</element>
+	<element name="wheel_body">
+		<rect>
+			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<bounds x="3" y="5" width="7" height="56" />
+		</rect>
+	</element>
+	<element name="wheel_knob">
+		<rect>
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="3" y="5" width="7" height="3" />
+		</rect>
+		<rect>
+			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<bounds x="3" y="8" width="7" height="4" />
+		</rect>
+		<rect>
+			<color red="0.33333" green="0.33333" blue="0.33333" />
+			<bounds x="3" y="12" width="7" height="3" />
+		</rect>
+	</element>
+	<group name="wheel">
+		<element ref="wheel_frame">
+			<bounds x="0" y="0" width="13" height="66" />
+		</element>
+		<element ref="wheel_body">
+			<bounds x="3" y="5" width="7" height="56" />
+		</element>
+		<element ref="invisible_rect" id="wheel_~wheel_id~">
+			<bounds x="2" y="2" width="9" height="62" />
+		</element>
+		<element ref="wheel_knob" id="wheel_knob_~wheel_id~">
+			<animate inputtag="~port_name~" inputmask="0x7f" />
+			<bounds x="3" y="5" width="7" height="10" state="0" />
+			<bounds x="3" y="51" width="7" height="10" state="1023" />
+		</element>
+	</group>
+
+	<!-- Key Shape definitions -->
+	<element name="keyshape_0">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="22.5" height="138" viewBox="0 0 22.5 138"><path d="M 0 0 V 137 a 1 1 0 0 0 1 1 h 20.5 a 1 1 0 0 0 1 -1 V 90 H 13 V 0 Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_2">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="22.5" height="138" viewBox="0 0 22.5 138"><path d="M 4.6 0 V 90 H 0 V 137 a 1 1 0 0 0 1 1 h 20.5 a 1 1 0 0 0 1 -1 V 90 H 17.6 V 0 Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_4">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="22.5" height="138" viewBox="0 0 22.5 138"><path d="M 9.2 0 V 90 H 0 V 137 a 1 1 0 0 0 1 1 h 20.5 a 1 1 0 0 0 1 -1 V 0 Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_5">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="22.5" height="138" viewBox="0 0 22.5 138"><path d="M 0 0 V 137 a 1 1 0 0 0 1 1 h 20.5 a 1 1 0 0 0 1 -1 V 90 H 11.7 V 0 Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_7">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="22.5" height="138" viewBox="0 0 22.5 138"><path d="M 3.3 0 V 90 H 0 V 137 a 1 1 0 0 0 1 1 h 20.5 a 1 1 0 0 0 1 -1 V 90 H 15.3 V 0 Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_9">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="22.5" height="138" viewBox="0 0 22.5 138"><path d="M 6.9 0 V 90 H 0 V 137 a 1 1 0 0 0 1 1 h 20.5 a 1 1 0 0 0 1 -1 V 90 H 18.9 V 0 Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_11">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="22.5" height="138" viewBox="0 0 22.5 138"><path d="M 10.5 0 V 90 H 0 V 137 a 1 1 0 0 0 1 1 h 20.5 a 1 1 0 0 0 1 -1 V 0 Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_12">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="22.5" height="138" viewBox="0 0 22.5 138"><path d="M 0 0 V 137 a 1 1 0 0 0 1 1 h 20.5 a 1 1 0 0 0 1 -1 V 0 Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_1">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="12.0" height="88" viewBox="0 0 12.0 88"><path d="M 0 0 V 87 a 1 1 0 0 0 1 1 h 10 a 1 1 0 0 0 1 -1 V 0  Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_3">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="12.0" height="88" viewBox="0 0 12.0 88"><path d="M 0 0 V 87 a 1 1 0 0 0 1 1 h 10 a 1 1 0 0 0 1 -1 V 0  Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_6">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="12.0" height="88" viewBox="0 0 12.0 88"><path d="M 0 0 V 87 a 1 1 0 0 0 1 1 h 10 a 1 1 0 0 0 1 -1 V 0  Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_8">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="12.0" height="88" viewBox="0 0 12.0 88"><path d="M 0 0 V 87 a 1 1 0 0 0 1 1 h 10 a 1 1 0 0 0 1 -1 V 0  Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="keyshape_10">
+		<image>
+			<data>
+				<![CDATA[
+					<svg width="12.0" height="88" viewBox="0 0 12.0 88"><path d="M 0 0 V 87 a 1 1 0 0 0 1 1 h 10 a 1 1 0 0 0 1 -1 V 0  Z" fill="white" stroke="none" /></svg>
+				]]></data>
+		</image>
+	</element>
+
+	<!-- Group definitions -->
+	<group name="Sliders">
+		<bounds x="0" y="15" width="90" height="88.2" />
+		<element ref="triangle_down">
+			<bounds x="52.5" y="55" width="5" height="2.5" />
+		</element>
+		<element ref="triangle_up">
+			<bounds x="52.5" y="30" width="5" height="2.5" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="0" y="102" width="90" height="1.2" />
+		</element>
+		<element ref="text_L_volume">
+			<bounds x="0" y="97.7" width="35" height="4.3" />
+		</element>
+		<element ref="text_L_data_entry">
+			<bounds x="47.5" y="97.7" width="35" height="4.3" />
+		</element>
+		<element ref="button_15_5_dark" id="button_63__decrement" inputtag="buttons_32" inputmask="0x80000000">
+			<bounds x="47.5" y="60" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_62__increment" inputtag="buttons_32" inputmask="0x40000000">
+			<bounds x="47.5" y="35" width="15" height="5" />
+		</element>
+		<param name="slider_id" value="volume" />
+		<param name="port_name" value="analog_volume" />
+		<group ref="slider">
+			<bounds x="0" y="15" width="20" height="60" />
 		</group>
-
-	  </repeat>
-	</repeat>
-  </group>
-
-  <!-- Text items -->
-  <element name="text_bankset">
-	<text string="BankSet" />
-  </element>
-  <element name="text_sounds">
-	<text string="Sounds" />
-  </element>
-  <element name="text_presets">
-	<text string="Presets" />
-  </element>
-  <element name="text_0">
-	<text string="0" />
-  </element>
-  <element name="text_1">
-	<text string="1" />
-  </element>
-  <element name="text_2">
-	<text string="2" />
-  </element>
-  <element name="text_3">
-	<text string="3" />
-  </element>
-  <element name="text_4">
-	<text string="4" />
-  </element>
-  <element name="text_5">
-	<text string="5" />
-  </element>
-  <element name="text_6">
-	<text string="6" />
-  </element>
-  <element name="text_7">
-	<text string="7" />
-  </element>
-  <element name="text_8">
-	<text string="8" />
-  </element>
-  <element name="text_9">
-	<text string="9" />
-  </element>
-  <element name="text_L_replace">
-	<text string="Replace" align="1" />
-  </element>
-  <element name="text_L_program">
-	<text string="Program" align="1" />
-  </element>
-  <element name="text_L_select">
-	<text string="Select" align="1" />
-  </element>
-  <element name="text_L_voice">
-	<text string="Voice" align="1" />
-  </element>
-  <element name="text_L_copy">
-	<text string="Copy" align="1" />
-  </element>
-  <element name="text_L_write">
-	<text string="Write" align="1" />
-  </element>
-  <element name="text_L_compare">
-	<text string="Compare" align="1" />
-  </element>
-  <element name="text_L_patch">
-	<text string="Patch" align="1" />
-  </element>
-  <element name="text_L_midi">
-	<text string="MIDI" align="1" />
-  </element>
-  <element name="text_L_effects">
-	<text string="Effects" align="1" />
-  </element>
-  <element name="text_L_key">
-	<text string="Key" align="1" />
-  </element>
-  <element name="text_L_zone">
-	<text string="Zone" align="1" />
-  </element>
-  <element name="text_L_trans_">
-	<text string="Trans-" align="1" />
-  </element>
-  <element name="text_L_pose">
-	<text string="pose" align="1" />
-  </element>
-  <element name="text_L_release">
-	<text string="Release" align="1" />
-  </element>
-  <element name="text_L_volume">
-	<text string="Volume" align="1" />
-  </element>
-  <element name="text_L_pan">
-	<text string="Pan" align="1" />
-  </element>
-  <element name="text_L_timbre">
-	<text string="Timbre" align="1" />
-  </element>
-  <element name="text_L_wave">
-	<text string="Wave" align="1" />
-  </element>
-  <element name="text_L_mod">
-	<text string="Mod" align="1" />
-  </element>
-  <element name="text_L_mixer">
-	<text string="Mixer" align="1" />
-  </element>
-  <element name="text_L_control">
-	<text string="Control" align="1" />
-  </element>
-  <element name="text_L_pitch">
-	<text string="Pitch" align="1" />
-  </element>
-  <element name="text_L_filters">
-	<text string="Filters" align="1" />
-  </element>
-  <element name="text_L_output">
-	<text string="Output" align="1" />
-  </element>
-  <element name="text_L_lfo">
-	<text string="LFO" align="1" />
-  </element>
-  <element name="text_L_env1">
-	<text string="Env1" align="1" />
-  </element>
-  <element name="text_L_env2">
-	<text string="Env2" align="1" />
-  </element>
-  <element name="text_L_env3">
-	<text string="Env3" align="1" />
-  </element>
-  <element name="text_L_data_entry">
-	<text string="Data Entry" align="1" />
-  </element>
-  <element name="text_L_performance">
-	<text string="Performance" align="1" />
-  </element>
-  <element name="text_L_programming">
-	<text string="Programming" align="1" />
-  </element>
-  <element name="text_seq">
-	<text string="Seq" />
-  </element>
-  <element name="text_tracks">
-	<text string="Tracks" />
-  </element>
-  <element name="text_1_6">
-	<text string="1-6" />
-  </element>
-  <element name="text_7_12">
-	<text string="7-12" />
-  </element>
-  <element name="text_L_rec">
-	<text string="Rec" align="1" />
-  </element>
-  <element name="text_L_stop">
-	<text string="Stop" align="1" />
-  </element>
-  <element name="text_L__cont">
-	<text string="/Cont" align="1" />
-  </element>
-  <element name="text_L_play">
-	<text string="Play" align="1" />
-  </element>
-  <element name="text_L_click">
-	<text string="Click" align="1" />
-  </element>
-  <element name="text_L_seq">
-	<text string="Seq" align="1" />
-  </element>
-  <element name="text_L_locate">
-	<text string="Locate" align="1" />
-  </element>
-  <element name="text_L_song">
-	<text string="Song" align="1" />
-  </element>
-  <element name="text_L_track">
-	<text string="Track" align="1" />
-  </element>
-  <element name="text_L_master">
-	<text string="Master" align="1" />
-  </element>
-  <element name="text_L_storage">
-	<text string="Storage" align="1" />
-  </element>
-  <element name="text_edit">
-	<text string="Edit" />
-  </element>
-  <element name="text_L_system">
-	<text string="System" align="1" />
-  </element>
-  <element name="text_L_sequencer">
-	<text string="Sequencer" align="1" />
-  </element>
-  <!-- Button shapes -->
-  <element name="button_15_10_light">
-	<image state="0">
-	  <color red="0.733" green="0.733" blue="0.733" />
-	  <data>
-		<![CDATA[
-		  <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
-		]]></data>
-	</image>
-	<image state="1">
-	  <color red="1" green="1" blue="1" />
-	  <data>
-		<![CDATA[
-		  <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
-		]]></data>
-	</image>
-  </element>
-  <element name="button_15_10_medium">
-	<image state="0">
-	  <color red="0.467" green="0.467" blue="0.467" />
-	  <data>
-		<![CDATA[
-		  <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
-		]]></data>
-	</image>
-	<image state="1">
-	  <color red="1" green="1" blue="1" />
-	  <data>
-		<![CDATA[
-		  <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
-		]]></data>
-	</image>
-  </element>
-  <element name="button_15_5_dark">
-	<image state="0">
-	  <color red="0.2" green="0.2" blue="0.2" />
-	  <data>
-		<![CDATA[
-		  <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
-		]]></data>
-	</image>
-	<image state="1">
-	  <color red="1" green="1" blue="1" />
-	  <data>
-		<![CDATA[
-		  <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
-		]]></data>
-	</image>
-  </element>
-  <element name="button_15_5_light">
-	<image state="0">
-	  <color red="0.733" green="0.733" blue="0.733" />
-	  <data>
-		<![CDATA[
-		  <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
-		]]></data>
-	</image>
-	<image state="1">
-	  <color red="1" green="1" blue="1" />
-	  <data>
-		<![CDATA[
-		  <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
-		]]></data>
-	</image>
-  </element>
-
-  <!-- Light items -->
-  <element name="light_15">
-	<rect state="0" statemask="0x8000">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x8000" statemask="0x8000">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_13">
-	<rect state="0" statemask="0x2000">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x2000" statemask="0x2000">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_7">
-	<rect state="0" statemask="0x0080">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0080" statemask="0x0080">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_14">
-	<rect state="0" statemask="0x4000">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x4000" statemask="0x4000">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_6">
-	<rect state="0" statemask="0x0040">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0040" statemask="0x0040">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_4">
-	<rect state="0" statemask="0x0010">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0010" statemask="0x0010">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_12">
-	<rect state="0" statemask="0x1000">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x1000" statemask="0x1000">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_3">
-	<rect state="0" statemask="0x0008">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0008" statemask="0x0008">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_11">
-	<rect state="0" statemask="0x0800">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0800" statemask="0x0800">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_2">
-	<rect state="0" statemask="0x0004">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0004" statemask="0x0004">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_10">
-	<rect state="0" statemask="0x0400">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0400" statemask="0x0400">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_1">
-	<rect state="0" statemask="0x0002">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0002" statemask="0x0002">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_9">
-	<rect state="0" statemask="0x0200">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0200" statemask="0x0200">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_5">
-	<rect state="0" statemask="0x0020">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0020" statemask="0x0020">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_0">
-	<rect state="0" statemask="0x0001">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0001" statemask="0x0001">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-  <element name="light_8">
-	<rect state="0" statemask="0x0100">
-	  <color red="0.0667" green="0.133" blue="0.0667" />
-	</rect>
-	<rect state="0x0100" statemask="0x0100">
-	  <color red="0.133" green="1" blue="0.133" />
-	</rect>
-  </element>
-
-  <!-- Slider definitions -->
-  <element name="invisible_rect">
-	<rect>
-	  <color red="0" green="0" blue="0" />
-	</rect>
-  </element>
-  <element name="slider_frame">
-	<rect>
-	  <color red="0.2" green="0.2" blue="0.2" />
-	  <bounds x="0" y="0" width="8" height="24" />
-	</rect>
-	<rect>
-	  <color red="0" green="0" blue="0" />
-	  <bounds x="0.5" y="0.5" width="7" height="23" />
-	</rect>
-  </element>
-  <element name="slider_knob">
-	<rect>
-	  <color red="0.2" green="0.2" blue="0.2" />
-	  <bounds x="0.75" y="0.75" width="6.5" height="4" />
-	</rect>
-	<rect>
-	  <color red="0.267" green="0.267" blue="0.267" />
-	  <bounds x="0.75" y="0.75" width="6.5" height="0.75" />
-	</rect>
-	<rect>
-	  <color red="0.133" green="0.133" blue="0.133" />
-	  <bounds x="0.75" y="2.5" width="6.5" height="0.25" />
-	</rect>
-	<rect>
-	  <color red="0.267" green="0.267" blue="0.267" />
-	  <bounds x="0.75" y="2.75" width="6.5" height="0.25" />
-	</rect>
-	<rect>
-	  <color red="0.133" green="0.133" blue="0.133" />
-	  <bounds x="0.75" y="4" width="6.5" height="0.75" />
-	</rect>
-  </element>
-  <group name="slider">
-	<element ref="slider_frame">
-	  <bounds x="0" y="0" width="8" height="24" />
-	</element>
-	<element ref="invisible_rect" id="slider_~slider_id~">
-	  <bounds x="0.75" y="0.75" width="6.5" height="22.5" />
-	</element>
-	<element ref="slider_knob" id="slider_knob_~slider_id~">
-	  <animate inputtag="~port_name~" inputmask="0x7f" />
-	  <bounds x="0.75" y="0.75" width="6.5" height="4" state="1023" />
-	  <bounds x="0.75" y="19.25" width="6.5" height="4" state="0" />
-	</element>
-  </group>
-
-  <!-- Panel Group -->
-  <group name="panel">
-	<element ref="rect_222222">
-	  <bounds x="-95" y="-10" width="545" height="108" />
-	</element>
-	<element ref="rect_000000">
-	  <bounds x="25" y="-5" width="230" height="67.5" />
-	</element>
-	<element ref="triangle_down">
-	  <bounds x="-37.5" y="50" width="5" height="2.5" />
-	</element>
-	<element ref="triangle_up">
-	  <bounds x="-37.5" y="25" width="5" height="2.5" />
-	</element>
-	<element ref="rect_db5f6a">
-	  <bounds x="-90" y="92.5" width="415" height="0.5" />
-	</element>
-	<element ref="rect_db5f6a">
-	  <bounds x="270" y="92.5" width="55" height="0.5" />
-	</element>
-	<element ref="rect_db5f6a">
-	  <bounds x="327.5" y="92.5" width="55" height="0.5" />
-	</element>
-	<element ref="rect_db5f6a">
-	  <bounds x="385" y="92.5" width="60" height="0.5" />
-	</element>
-	<element ref="rect_ffffff">
-	  <bounds x="285" y="66" width="7.5" height="0.25" />
-	</element>
-	<element ref="rect_ffffff">
-	  <bounds x="307.5" y="66" width="7.5" height="0.25" />
-	</element>
-	<element ref="rect_ffffff">
-	  <bounds x="327.5" y="26" width="17.5" height="0.25" />
-	</element>
-	<element ref="rect_ffffff">
-	  <bounds x="355" y="26" width="17.5" height="0.25" />
-	</element>
-	<element ref="rect_db5f6a">
-	  <bounds x="327.5" y="4.5" width="55" height="0.5" />
-	</element>
-	<group ref="vfd">
-	  <bounds x="37.5" y="22.678" width="205" height="17.143" />
-
+		<param name="slider_id" value="data_entry" />
+		<param name="port_name" value="analog_data_entry" />
+		<group ref="slider">
+			<bounds x="70" y="15" width="20" height="60" />
+		</group>
 	</group>
-	<element ref="text_bankset">
-	  <bounds x="25" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_sounds">
-	  <bounds x="40" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_presets">
-	  <bounds x="55" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_0">
-	  <bounds x="105" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_1">
-	  <bounds x="120" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_2">
-	  <bounds x="135" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_3">
-	  <bounds x="150" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_4">
-	  <bounds x="165" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_5">
-	  <bounds x="180" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_6">
-	  <bounds x="195" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_7">
-	  <bounds x="210" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_8">
-	  <bounds x="225" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_9">
-	  <bounds x="240" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_replace">
-	  <bounds x="270" y="63.9" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_program">
-	  <bounds x="270" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_select">
-	  <bounds x="385" y="63.9" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_voice">
-	  <bounds x="385" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_copy">
-	  <bounds x="400" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_write">
-	  <bounds x="415" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_compare">
-	  <bounds x="430" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_patch">
-	  <bounds x="270" y="41.4" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_select">
-	  <bounds x="270" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_midi">
-	  <bounds x="285" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_effects">
-	  <bounds x="300" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_key">
-	  <bounds x="270" y="23.9" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_zone">
-	  <bounds x="270" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_trans_">
-	  <bounds x="285" y="23.9" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_pose">
-	  <bounds x="285" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_release">
-	  <bounds x="300" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_volume">
-	  <bounds x="270" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_pan">
-	  <bounds x="285" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_timbre">
-	  <bounds x="300" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_wave">
-	  <bounds x="385" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_mod">
-	  <bounds x="400" y="41.4" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_mixer">
-	  <bounds x="400" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_program">
-	  <bounds x="415" y="41.4" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_control">
-	  <bounds x="415" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_effects">
-	  <bounds x="430" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_pitch">
-	  <bounds x="385" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_pitch">
-	  <bounds x="400" y="23.9" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_mod">
-	  <bounds x="400" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_filters">
-	  <bounds x="415" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_output">
-	  <bounds x="430" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_lfo">
-	  <bounds x="385" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_env1">
-	  <bounds x="400" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_env2">
-	  <bounds x="415" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_env3">
-	  <bounds x="430" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_volume">
-	  <bounds x="-90" y="87.5" width="35" height="4.3" />
-	</element>
-	<element ref="text_L_data_entry">
-	  <bounds x="-42.5" y="87.5" width="35" height="4.3" />
-	</element>
-	<element ref="text_L_performance">
-	  <bounds x="270" y="87.5" width="35" height="4.3" />
-	</element>
-	<element ref="text_L_programming">
-	  <bounds x="385" y="87.5" width="35" height="4.3" />
-	</element>
-	<element ref="text_seq">
-	  <bounds x="70" y="87.5" width="15" height="4.3" />
-	</element>
-	<element ref="text_tracks">
-	  <bounds x="292.5" y="63.9" width="15" height="4.3" />
-	</element>
-	<element ref="text_1_6">
-	  <bounds x="285" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_7_12">
-	  <bounds x="300" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_rec">
-	  <bounds x="327.5" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_stop">
-	  <bounds x="342.5" y="63.9" width="15" height="4.3" />
-	</element>
-	<element ref="text_L__cont">
-	  <bounds x="342.5" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_play">
-	  <bounds x="357.5" y="68.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_click">
-	  <bounds x="327.5" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_seq">
-	  <bounds x="342.5" y="41.4" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_control">
-	  <bounds x="342.5" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_locate">
-	  <bounds x="357.5" y="45.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_song">
-	  <bounds x="327.5" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_seq">
-	  <bounds x="342.5" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_track">
-	  <bounds x="357.5" y="28.2" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_master">
-	  <bounds x="327.5" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_storage">
-	  <bounds x="342.5" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_midi">
-	  <bounds x="357.5" y="6.4" width="15" height="4.3" />
-	</element>
-	<element ref="text_L_control">
-	  <bounds x="357.5" y="10.7" width="15" height="4.3" />
-	</element>
-	<element ref="text_edit">
-	  <bounds x="345" y="23.9" width="10" height="4.3" />
-	</element>
-	<element ref="text_L_system">
-	  <bounds x="327.5" y="0.2" width="35" height="4.3" />
-	</element>
-	<element ref="text_L_sequencer">
-	  <bounds x="327.5" y="87.5" width="25" height="4.3" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00100000" ref="button_15_10_light" id="button_52__cartbankset">
-	  <bounds x="25" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00200000" ref="button_15_10_light" id="button_53__sounds">
-	  <bounds x="40" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00400000" ref="button_15_10_light" id="button_54__presets">
-	  <bounds x="55" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00800000" ref="button_15_10_medium" id="button_55__0">
-	  <bounds x="105" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x01000000" ref="button_15_10_medium" id="button_56__1">
-	  <bounds x="120" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x02000000" ref="button_15_10_medium" id="button_57__2">
-	  <bounds x="135" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00004000" ref="button_15_10_medium" id="button_46__3">
-	  <bounds x="150" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00008000" ref="button_15_10_medium" id="button_47__4">
-	  <bounds x="165" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00010000" ref="button_15_10_medium" id="button_48__5">
-	  <bounds x="180" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00020000" ref="button_15_10_medium" id="button_49__6">
-	  <bounds x="195" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000008" ref="button_15_10_medium" id="button_35__7">
-	  <bounds x="210" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000004" ref="button_15_10_medium" id="button_34__8">
-	  <bounds x="225" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x02000000" ref="button_15_10_medium" id="button_25__9">
-	  <bounds x="240" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x20000000" ref="button_15_10_medium" id="button_29_replace_program">
-	  <bounds x="270" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000020" ref="button_15_10_medium" id="button_5_select_voice">
-	  <bounds x="385" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000200" ref="button_15_10_medium" id="button_9_copy">
-	  <bounds x="400" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000008" ref="button_15_10_medium" id="button_3_write">
-	  <bounds x="415" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000100" ref="button_15_10_medium" id="button_8_compare">
-	  <bounds x="430" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x04000000" ref="button_15_5_dark" id="button_26_patch_select">
-	  <bounds x="270" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x08000000" ref="button_15_5_dark" id="button_27_midi">
-	  <bounds x="285" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x10000000" ref="button_15_5_dark" id="button_28_effects">
-	  <bounds x="300" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000080" ref="button_15_5_dark" id="button_39_key_zone">
-	  <bounds x="270" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000100" ref="button_15_5_dark" id="button_40_transpose">
-	  <bounds x="285" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000200" ref="button_15_5_dark" id="button_41_release">
-	  <bounds x="300" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000010" ref="button_15_5_dark" id="button_36_volume">
-	  <bounds x="270" y="15" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000020" ref="button_15_5_dark" id="button_37_pan">
-	  <bounds x="285" y="15" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000040" ref="button_15_5_dark" id="button_38_timbre">
-	  <bounds x="300" y="15" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000010" ref="button_15_5_dark" id="button_4_wave">
-	  <bounds x="385" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000040" ref="button_15_5_dark" id="button_6_mod_mixer">
-	  <bounds x="400" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000004" ref="button_15_5_dark" id="button_2_program_control">
-	  <bounds x="415" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000080" ref="button_15_5_dark" id="button_7_effects">
-	  <bounds x="430" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000800" ref="button_15_5_dark" id="button_11_pitch">
-	  <bounds x="385" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00002000" ref="button_15_5_dark" id="button_13_pitch_mod">
-	  <bounds x="400" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00008000" ref="button_15_5_dark" id="button_15_filters">
-	  <bounds x="415" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00020000" ref="button_15_5_dark" id="button_17_output">
-	  <bounds x="430" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00000400" ref="button_15_5_dark" id="button_10_lfo">
-	  <bounds x="385" y="15" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00001000" ref="button_15_5_dark" id="button_12_env1">
-	  <bounds x="400" y="15" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00004000" ref="button_15_5_dark" id="button_14_env2">
-	  <bounds x="415" y="15" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00010000" ref="button_15_5_dark" id="button_16_env3">
-	  <bounds x="430" y="15" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00040000" ref="button_15_5_dark" id="button_50__display_below_left">
-	  <bounds x="80" y="52.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00001000" ref="button_15_5_dark" id="button_44__display_below_middle">
-	  <bounds x="142.5" y="52.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00002000" ref="button_15_5_dark" id="button_45__display_below_right">
-	  <bounds x="200" y="52.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x04000000" ref="button_15_5_dark" id="button_58__display_above_left">
-	  <bounds x="80" y="0" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000400" ref="button_15_5_dark" id="button_42__diplay_above_center">
-	  <bounds x="142.5" y="0" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000800" ref="button_15_5_dark" id="button_43__display_above_right">
-	  <bounds x="200" y="0" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x80000000" ref="button_15_5_dark" id="button_63__decrement">
-	  <bounds x="-42.5" y="55" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x40000000" ref="button_15_5_dark" id="button_62__increment">
-	  <bounds x="-42.5" y="30" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00080000" ref="button_15_10_light" id="button_51__seq">
-	  <bounds x="70" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x40000000" ref="button_15_10_medium" id="button_30_1_6">
-	  <bounds x="285" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x80000000" ref="button_15_10_medium" id="button_31_7_12">
-	  <bounds x="300" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00080000" ref="button_15_10_medium" id="button_19_rec">
-	  <bounds x="327.5" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00400000" ref="button_15_10_medium" id="button_22_stop__cont">
-	  <bounds x="342.5" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00800000" ref="button_15_10_medium" id="button_23_play">
-	  <bounds x="357.5" y="72.5" width="15" height="10" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000001" ref="button_15_5_dark" id="button_32_click">
-	  <bounds x="327.5" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00040000" ref="button_15_5_dark" id="button_18_seq_control">
-	  <bounds x="342.5" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x00000002" ref="button_15_5_dark" id="button_33_locate">
-	  <bounds x="357.5" y="50" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x10000000" ref="button_15_5_dark" id="button_60_song">
-	  <bounds x="327.5" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x08000000" ref="button_15_5_dark" id="button_59_seq">
-	  <bounds x="342.5" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_32" inputmask="0x20000000" ref="button_15_5_dark" id="button_61_track">
-	  <bounds x="357.5" y="32.5" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00100000" ref="button_15_5_light" id="button_20_master">
-	  <bounds x="327.5" y="15" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x00200000" ref="button_15_5_light" id="button_21_storage">
-	  <bounds x="342.5" y="15" width="15" height="5" />
-	</element>
-	<element inputtag="buttons_0" inputmask="0x01000000" ref="button_15_5_light" id="button_24_midi_control">
-	  <bounds x="357.5" y="15" width="15" height="5" />
-	</element>
-	<element name="lights" ref="light_15">
-	  <bounds x="30" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_13">
-	  <bounds x="45" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_7">
-	  <bounds x="60" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_14">
-	  <bounds x="110" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_6">
-	  <bounds x="125" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_4">
-	  <bounds x="140" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_12">
-	  <bounds x="155" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_3">
-	  <bounds x="170" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_11">
-	  <bounds x="185" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_2">
-	  <bounds x="200" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_10">
-	  <bounds x="215" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_1">
-	  <bounds x="230" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_9">
-	  <bounds x="245" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_5">
-	  <bounds x="435" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_0">
-	  <bounds x="290" y="72.9" width="5" height="3.3333" />
-	</element>
-	<element name="lights" ref="light_8">
-	  <bounds x="305" y="72.9" width="5" height="3.3333" />
-	</element>
-	<param name="slider_id" value="data_entry" />
-	<param name="port_name" value="analog_data_entry" />
-	<group ref="slider">
-	  <bounds x="-20" y="10" width="20" height="60" />
+	<group name="DisplayAndButtons">
+		<bounds x="0" y="8" width="245" height="95.2" />
+		<element ref="rect_glass">
+			<bounds x="0" y="8" width="245" height="67.5" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="0" y="102" width="245" height="1.2" />
+		</element>
+		<element ref="text_bankset">
+			<bounds x="0" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_sounds">
+			<bounds x="15" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_presets">
+			<bounds x="30" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_seq">
+			<bounds x="45" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_0">
+			<bounds x="95" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_1">
+			<bounds x="110" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_2">
+			<bounds x="125" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_3">
+			<bounds x="140" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_4">
+			<bounds x="155" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_5">
+			<bounds x="170" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_6">
+			<bounds x="185" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_7">
+			<bounds x="200" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_8">
+			<bounds x="215" y="97.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_9">
+			<bounds x="230" y="97.7" width="15" height="4.3" />
+		</element>
+		<group ref="vfd">
+			<bounds x="12" y="32.509" width="221" height="18.481" />
+		</group>
+		<element ref="button_15_5_screen" id="button_50__display_below_left" inputtag="buttons_32" inputmask="0x00040000">
+			<bounds x="60" y="65.5" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_screen" id="button_44__display_below_middle" inputtag="buttons_32" inputmask="0x00001000">
+			<bounds x="126" y="65.5" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_screen" id="button_45__display_below_right" inputtag="buttons_32" inputmask="0x00002000">
+			<bounds x="192" y="65.5" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_screen" id="button_58__display_above_left" inputtag="buttons_32" inputmask="0x04000000">
+			<bounds x="60" y="13" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_screen" id="button_42__diplay_above_center" inputtag="buttons_32" inputmask="0x00000400">
+			<bounds x="126" y="13" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_screen" id="button_43__display_above_right" inputtag="buttons_32" inputmask="0x00000800">
+			<bounds x="193" y="13" width="15" height="5" />
+		</element>
+		<element ref="button_15_10_light" id="button_52__cartbankset" inputtag="buttons_32" inputmask="0x00100000">
+			<bounds x="0" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_light" id="button_53__sounds" inputtag="buttons_32" inputmask="0x00200000">
+			<bounds x="15" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_light" id="button_54__presets" inputtag="buttons_32" inputmask="0x00400000">
+			<bounds x="30" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_light" id="button_51__seq" inputtag="buttons_32" inputmask="0x00080000">
+			<bounds x="45" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_55__0" inputtag="buttons_32" inputmask="0x00800000">
+			<bounds x="95" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_56__1" inputtag="buttons_32" inputmask="0x01000000">
+			<bounds x="110" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_57__2" inputtag="buttons_32" inputmask="0x02000000">
+			<bounds x="125" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_46__3" inputtag="buttons_32" inputmask="0x00004000">
+			<bounds x="140" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_47__4" inputtag="buttons_32" inputmask="0x00008000">
+			<bounds x="155" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_48__5" inputtag="buttons_32" inputmask="0x00010000">
+			<bounds x="170" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_49__6" inputtag="buttons_32" inputmask="0x00020000">
+			<bounds x="185" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_35__7" inputtag="buttons_32" inputmask="0x00000008">
+			<bounds x="200" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_34__8" inputtag="buttons_32" inputmask="0x00000004">
+			<bounds x="215" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_25__9" inputtag="buttons_0" inputmask="0x02000000">
+			<bounds x="230" y="82" width="15" height="10" />
+		</element>
+		<element name="lights" ref="light_15">
+			<bounds x="5" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_13">
+			<bounds x="20" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_7">
+			<bounds x="35" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_14">
+			<bounds x="100" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_6">
+			<bounds x="115" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_4">
+			<bounds x="130" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_12">
+			<bounds x="145" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_3">
+			<bounds x="160" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_11">
+			<bounds x="175" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_2">
+			<bounds x="190" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_10">
+			<bounds x="205" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_1">
+			<bounds x="220" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_9">
+			<bounds x="235" y="82.4" width="5" height="3.3333" />
+		</element>
 	</group>
-	<param name="slider_id" value="volume" />
-	<param name="port_name" value="analog_volume" />
-	<group ref="slider">
-	  <bounds x="-90" y="10" width="20" height="60" />
+	<group name="Buttons">
+		<bounds x="0" y="8.2" width="180" height="95.0" />
+		<element ref="rect_white">
+			<bounds x="15" y="75.5" width="7.5" height="0.25" />
+		</element>
+		<element ref="rect_white">
+			<bounds x="37.5" y="75.5" width="7.5" height="0.25" />
+		</element>
+		<element ref="rect_white">
+			<bounds x="60" y="35.5" width="17.5" height="0.25" />
+		</element>
+		<element ref="rect_white">
+			<bounds x="87.5" y="35.5" width="17.5" height="0.25" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="60" y="12.5" width="55" height="0.5" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="0" y="102" width="58.5" height="1.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="60" y="102" width="58.5" height="1.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="120" y="102" width="60" height="1.2" />
+		</element>
+		<element ref="text_L_replace">
+			<bounds x="0" y="73.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_program">
+			<bounds x="0" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_select">
+			<bounds x="120" y="73.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_voice">
+			<bounds x="120" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_copy">
+			<bounds x="135" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_write">
+			<bounds x="150" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_compare">
+			<bounds x="165" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_patch">
+			<bounds x="0" y="53.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_select">
+			<bounds x="0" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_midi">
+			<bounds x="15" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_effects">
+			<bounds x="30" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_key">
+			<bounds x="0" y="33.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_zone">
+			<bounds x="0" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_trans_">
+			<bounds x="15" y="33.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_pose">
+			<bounds x="15" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_release">
+			<bounds x="30" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_volume">
+			<bounds x="0" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_pan">
+			<bounds x="15" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_timbre">
+			<bounds x="30" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_wave">
+			<bounds x="120" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_mod">
+			<bounds x="135" y="53.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_mixer">
+			<bounds x="135" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_program">
+			<bounds x="150" y="53.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_control">
+			<bounds x="150" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_effects">
+			<bounds x="165" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_pitch">
+			<bounds x="120" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_pitch">
+			<bounds x="135" y="33.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_mod">
+			<bounds x="135" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_filters">
+			<bounds x="150" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_output">
+			<bounds x="165" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_lfo">
+			<bounds x="120" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_env1">
+			<bounds x="135" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_env2">
+			<bounds x="150" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_env3">
+			<bounds x="165" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_tracks">
+			<bounds x="22.5" y="73.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_1_6">
+			<bounds x="15" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_7_12">
+			<bounds x="30" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_rec">
+			<bounds x="60" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_stop">
+			<bounds x="75" y="73.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L__cont">
+			<bounds x="75" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_play">
+			<bounds x="90" y="77.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_click">
+			<bounds x="60" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_seq">
+			<bounds x="75" y="53.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_control">
+			<bounds x="75" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_locate">
+			<bounds x="90" y="57.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_song">
+			<bounds x="60" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_seq">
+			<bounds x="75" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_track">
+			<bounds x="90" y="37.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_master">
+			<bounds x="60" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_storage">
+			<bounds x="75" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_midi">
+			<bounds x="90" y="13.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_control">
+			<bounds x="90" y="17.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_edit">
+			<bounds x="77.5" y="33.4" width="10" height="4.3" />
+		</element>
+		<element ref="text_L_system">
+			<bounds x="60" y="8.2" width="35" height="4.3" />
+		</element>
+		<element ref="text_L_sequencer">
+			<bounds x="60" y="97.7" width="25" height="4.3" />
+		</element>
+		<element ref="text_L_performance">
+			<bounds x="0" y="97.7" width="35" height="4.3" />
+		</element>
+		<element ref="text_L_programming">
+			<bounds x="120" y="97.7" width="35" height="4.3" />
+		</element>
+		<element ref="button_15_10_medium" id="button_29_replace_program" inputtag="buttons_0" inputmask="0x20000000">
+			<bounds x="0" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_5_select_voice" inputtag="buttons_0" inputmask="0x00000020">
+			<bounds x="120" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_9_copy" inputtag="buttons_0" inputmask="0x00000200">
+			<bounds x="135" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_3_write" inputtag="buttons_0" inputmask="0x00000008">
+			<bounds x="150" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_8_compare" inputtag="buttons_0" inputmask="0x00000100">
+			<bounds x="165" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_5_dark" id="button_26_patch_select" inputtag="buttons_0" inputmask="0x04000000">
+			<bounds x="0" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_27_midi" inputtag="buttons_0" inputmask="0x08000000">
+			<bounds x="15" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_28_effects" inputtag="buttons_0" inputmask="0x10000000">
+			<bounds x="30" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_39_key_zone" inputtag="buttons_32" inputmask="0x00000080">
+			<bounds x="0" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_40_transpose" inputtag="buttons_32" inputmask="0x00000100">
+			<bounds x="15" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_41_release" inputtag="buttons_32" inputmask="0x00000200">
+			<bounds x="30" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_36_volume" inputtag="buttons_32" inputmask="0x00000010">
+			<bounds x="0" y="22" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_37_pan" inputtag="buttons_32" inputmask="0x00000020">
+			<bounds x="15" y="22" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_38_timbre" inputtag="buttons_32" inputmask="0x00000040">
+			<bounds x="30" y="22" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_4_wave" inputtag="buttons_0" inputmask="0x00000010">
+			<bounds x="120" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_6_mod_mixer" inputtag="buttons_0" inputmask="0x00000040">
+			<bounds x="135" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_2_program_control" inputtag="buttons_0" inputmask="0x00000004">
+			<bounds x="150" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_7_effects" inputtag="buttons_0" inputmask="0x00000080">
+			<bounds x="165" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_11_pitch" inputtag="buttons_0" inputmask="0x00000800">
+			<bounds x="120" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_13_pitch_mod" inputtag="buttons_0" inputmask="0x00002000">
+			<bounds x="135" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_15_filters" inputtag="buttons_0" inputmask="0x00008000">
+			<bounds x="150" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_17_output" inputtag="buttons_0" inputmask="0x00020000">
+			<bounds x="165" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_10_lfo" inputtag="buttons_0" inputmask="0x00000400">
+			<bounds x="120" y="22" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_12_env1" inputtag="buttons_0" inputmask="0x00001000">
+			<bounds x="135" y="22" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_14_env2" inputtag="buttons_0" inputmask="0x00004000">
+			<bounds x="150" y="22" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_16_env3" inputtag="buttons_0" inputmask="0x00010000">
+			<bounds x="165" y="22" width="15" height="5" />
+		</element>
+		<element ref="button_15_10_medium" id="button_30_1_6" inputtag="buttons_0" inputmask="0x40000000">
+			<bounds x="15" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_31_7_12" inputtag="buttons_0" inputmask="0x80000000">
+			<bounds x="30" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_19_rec" inputtag="buttons_0" inputmask="0x00080000">
+			<bounds x="60" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_22_stop__cont" inputtag="buttons_0" inputmask="0x00400000">
+			<bounds x="75" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_10_medium" id="button_23_play" inputtag="buttons_0" inputmask="0x00800000">
+			<bounds x="90" y="82" width="15" height="10" />
+		</element>
+		<element ref="button_15_5_dark" id="button_32_click" inputtag="buttons_32" inputmask="0x00000001">
+			<bounds x="60" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_18_seq_control" inputtag="buttons_0" inputmask="0x00040000">
+			<bounds x="75" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_33_locate" inputtag="buttons_32" inputmask="0x00000002">
+			<bounds x="90" y="62" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_60_song" inputtag="buttons_32" inputmask="0x10000000">
+			<bounds x="60" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_59_seq" inputtag="buttons_32" inputmask="0x08000000">
+			<bounds x="75" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_61_track" inputtag="buttons_32" inputmask="0x20000000">
+			<bounds x="90" y="42" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_light" id="button_20_master" inputtag="buttons_0" inputmask="0x00100000">
+			<bounds x="60" y="22" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_light" id="button_21_storage" inputtag="buttons_0" inputmask="0x00200000">
+			<bounds x="75" y="22" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_light" id="button_24_midi_control" inputtag="buttons_0" inputmask="0x01000000">
+			<bounds x="90" y="22" width="15" height="5" />
+		</element>
+		<element name="lights" ref="light_5">
+			<bounds x="170" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_0">
+			<bounds x="20" y="82.4" width="5" height="3.3333" />
+		</element>
+		<element name="lights" ref="light_8">
+			<bounds x="35" y="82.4" width="5" height="3.3333" />
+		</element>
 	</group>
-  </group>
+	<group name="BackPanel">
+		<bounds x="0" y="0" width="845" height="32" />
+		<element ref="rect_body">
+			<bounds x="0" y="0" width="845" height="32" />
+		</element>
+		<element ref="rect_white">
+			<bounds x="477" y="14.3" width="87" height="0.25" />
+		</element>
+		<element ref="rect_white">
+			<bounds x="690" y="14.3" width="38" height="0.25" />
+		</element>
+		<element ref="rect_white">
+			<bounds x="740" y="14.3" width="38" height="0.25" />
+		</element>
+		<element ref="ellipse_screwhead">
+			<bounds x="2" y="18" width="6" height="6" />
+		</element>
+		<element ref="ellipse_screwhead">
+			<bounds x="837" y="18" width="6" height="6" />
+		</element>
+		<element ref="text_L_power">
+			<bounds x="97" y="10" width="10" height="4.3" />
+		</element>
+		<element ref="text_L_line">
+			<bounds x="131" y="10" width="8" height="4.3" />
+		</element>
+		<element ref="text_L_fuse">
+			<bounds x="165" y="10" width="10" height="4.3" />
+		</element>
+		<element ref="text_midi">
+			<bounds x="477" y="10" width="87" height="4.3" />
+		</element>
+		<element ref="text_L_thru">
+			<bounds x="480" y="14.55" width="8" height="4.3" />
+		</element>
+		<element ref="text_L_out">
+			<bounds x="518" y="14.55" width="8" height="4.3" />
+		</element>
+		<element ref="text_L_in">
+			<bounds x="558" y="14.55" width="4" height="4.3" />
+		</element>
+		<element ref="text_L_ft__sw_">
+			<bounds x="640" y="10" width="12" height="4.3" />
+		</element>
+		<element ref="text_L_pedal_cv">
+			<bounds x="663" y="10" width="17" height="4.3" />
+		</element>
+		<element ref="text_L_left">
+			<bounds x="692" y="10" width="8" height="4.3" />
+		</element>
+		<element ref="text_L_right">
+			<bounds x="717" y="10" width="10" height="4.3" />
+		</element>
+		<element ref="text_mono">
+			<bounds x="690" y="14.55" width="38" height="4.3" />
+		</element>
+		<element ref="text_aux__out">
+			<bounds x="690" y="5.7" width="38" height="4.3" />
+		</element>
+		<element ref="text_L_left">
+			<bounds x="742" y="10" width="8" height="4.3" />
+		</element>
+		<element ref="text_L_right">
+			<bounds x="767" y="10" width="10" height="4.3" />
+		</element>
+		<element ref="text_mono">
+			<bounds x="740" y="14.55" width="38" height="4.3" />
+		</element>
+		<element ref="text_main_out">
+			<bounds x="740" y="5.7" width="38" height="4.3" />
+		</element>
+		<element ref="text_L_phones">
+			<bounds x="790" y="10" width="15" height="4.3" />
+		</element>
+	</group>
+	<group name="WheelArea">
+		<bounds x="0" y="0" width="108" height="122" />
+		<element ref="rect_panel">
+			<bounds x="0" y="0" width="108" height="122" />
+		</element>
+		<element ref="drawing_pitch_bend">
+			<bounds x="46.5" y="26" width="4" height="66" />
+		</element>
+		<element ref="drawing_modulation">
+			<bounds x="83.5" y="26" width="4" height="66" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="0" y="99" width="28" height="1.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="29.5" y="99" width="35.5" height="1.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="66.5" y="99" width="41.5" height="1.2" />
+		</element>
+		<element ref="text_L_patch">
+			<bounds x="31" y="5.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_select">
+			<bounds x="31" y="9.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_pitch">
+			<bounds x="29.5" y="94.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_mod">
+			<bounds x="66.5" y="94.7" width="15" height="4.3" />
+		</element>
+		<element ref="psel_9_12" id="patch_select_1" inputtag="patch_select" inputmask="0x2">
+			<bounds x="6" y="2" width="9" height="12" />
+		</element>
+		<element ref="psel_9_12" id="patch_select_0" inputtag="patch_select" inputmask="0x1">
+			<bounds x="21" y="2" width="9" height="12" />
+		</element>
+		<param name="wheel_id" value="pitch_bend" />
+		<param name="port_name" value="analog_pitch_bend" />
+		<group ref="wheel">
+			<bounds x="29.5" y="26" width="13" height="66" />
+		</group>
+		<param name="wheel_id" value="mod_wheel" />
+		<param name="port_name" value="analog_mod_wheel" />
+		<group ref="wheel">
+			<bounds x="66.5" y="26" width="13" height="66" />
+		</group>
+	</group>
+	<group name="full_keyboard">
+		<bounds x="0.0" y="0" width="845.0" height="138" />
+		<element ref="full_keyboard_background" id="full_keyboard_background">
+			<bounds x="0" y="0" width="845" height="138" />
+			<color red="0.33333" green="0.33333" blue="0.33333" />
+		</element>
+		<element ref="keyshape_0" id="full_keyboard_key_0" clickthrough="no">
+			<bounds x="0" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_2" id="full_keyboard_key_2" clickthrough="no">
+			<bounds x="23.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_4" id="full_keyboard_key_4" clickthrough="no">
+			<bounds x="47" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_5" id="full_keyboard_key_5" clickthrough="no">
+			<bounds x="70.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_7" id="full_keyboard_key_7" clickthrough="no">
+			<bounds x="94" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_9" id="full_keyboard_key_9" clickthrough="no">
+			<bounds x="117.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_11" id="full_keyboard_key_11" clickthrough="no">
+			<bounds x="141" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_0" id="full_keyboard_key_12" clickthrough="no">
+			<bounds x="164.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_2" id="full_keyboard_key_14" clickthrough="no">
+			<bounds x="188" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_4" id="full_keyboard_key_16" clickthrough="no">
+			<bounds x="211.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_5" id="full_keyboard_key_17" clickthrough="no">
+			<bounds x="235" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_7" id="full_keyboard_key_19" clickthrough="no">
+			<bounds x="258.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_9" id="full_keyboard_key_21" clickthrough="no">
+			<bounds x="282" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_11" id="full_keyboard_key_23" clickthrough="no">
+			<bounds x="305.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_0" id="full_keyboard_key_24" clickthrough="no">
+			<bounds x="329" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_2" id="full_keyboard_key_26" clickthrough="no">
+			<bounds x="352.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_4" id="full_keyboard_key_28" clickthrough="no">
+			<bounds x="376" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_5" id="full_keyboard_key_29" clickthrough="no">
+			<bounds x="399.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_7" id="full_keyboard_key_31" clickthrough="no">
+			<bounds x="423" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_9" id="full_keyboard_key_33" clickthrough="no">
+			<bounds x="446.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_11" id="full_keyboard_key_35" clickthrough="no">
+			<bounds x="470" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_0" id="full_keyboard_key_36" clickthrough="no">
+			<bounds x="493.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_2" id="full_keyboard_key_38" clickthrough="no">
+			<bounds x="517" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_4" id="full_keyboard_key_40" clickthrough="no">
+			<bounds x="540.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_5" id="full_keyboard_key_41" clickthrough="no">
+			<bounds x="564" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_7" id="full_keyboard_key_43" clickthrough="no">
+			<bounds x="587.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_9" id="full_keyboard_key_45" clickthrough="no">
+			<bounds x="611" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_11" id="full_keyboard_key_47" clickthrough="no">
+			<bounds x="634.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_0" id="full_keyboard_key_48" clickthrough="no">
+			<bounds x="658" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_2" id="full_keyboard_key_50" clickthrough="no">
+			<bounds x="681.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_4" id="full_keyboard_key_52" clickthrough="no">
+			<bounds x="705" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_5" id="full_keyboard_key_53" clickthrough="no">
+			<bounds x="728.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_7" id="full_keyboard_key_55" clickthrough="no">
+			<bounds x="752" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_9" id="full_keyboard_key_57" clickthrough="no">
+			<bounds x="775.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_11" id="full_keyboard_key_59" clickthrough="no">
+			<bounds x="799" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_12" id="full_keyboard_key_60" clickthrough="no">
+			<bounds x="822.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_1" id="full_keyboard_key_1" clickthrough="no">
+			<bounds x="14.55" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_3" id="full_keyboard_key_3" clickthrough="no">
+			<bounds x="42.65" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_6" id="full_keyboard_key_6" clickthrough="no">
+			<bounds x="83.75" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_8" id="full_keyboard_key_8" clickthrough="no">
+			<bounds x="110.85" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_10" id="full_keyboard_key_10" clickthrough="no">
+			<bounds x="137.95" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_1" id="full_keyboard_key_13" clickthrough="no">
+			<bounds x="179.05" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_3" id="full_keyboard_key_15" clickthrough="no">
+			<bounds x="207.15" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_6" id="full_keyboard_key_18" clickthrough="no">
+			<bounds x="248.25" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_8" id="full_keyboard_key_20" clickthrough="no">
+			<bounds x="275.35" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_10" id="full_keyboard_key_22" clickthrough="no">
+			<bounds x="302.45" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_1" id="full_keyboard_key_25" clickthrough="no">
+			<bounds x="343.55" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_3" id="full_keyboard_key_27" clickthrough="no">
+			<bounds x="371.65" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_6" id="full_keyboard_key_30" clickthrough="no">
+			<bounds x="412.75" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_8" id="full_keyboard_key_32" clickthrough="no">
+			<bounds x="439.85" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_10" id="full_keyboard_key_34" clickthrough="no">
+			<bounds x="466.95" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_1" id="full_keyboard_key_37" clickthrough="no">
+			<bounds x="508.05" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_3" id="full_keyboard_key_39" clickthrough="no">
+			<bounds x="536.15" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_6" id="full_keyboard_key_42" clickthrough="no">
+			<bounds x="577.25" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_8" id="full_keyboard_key_44" clickthrough="no">
+			<bounds x="604.35" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_10" id="full_keyboard_key_46" clickthrough="no">
+			<bounds x="631.45" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_1" id="full_keyboard_key_49" clickthrough="no">
+			<bounds x="672.55" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_3" id="full_keyboard_key_51" clickthrough="no">
+			<bounds x="700.65" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_6" id="full_keyboard_key_54" clickthrough="no">
+			<bounds x="741.75" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_8" id="full_keyboard_key_56" clickthrough="no">
+			<bounds x="768.85" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_10" id="full_keyboard_key_58" clickthrough="no">
+			<bounds x="795.95" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+	</group>
+	<group name="NarrowWheelArea">
+		<bounds x="0" y="0" width="86" height="122" />
+		<element ref="rect_panel">
+			<bounds x="0" y="0" width="86" height="122" />
+		</element>
+		<element ref="drawing_pitch_bend">
+			<bounds x="37" y="26" width="4" height="66" />
+		</element>
+		<element ref="drawing_modulation">
+			<bounds x="70" y="26" width="4" height="66" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="0" y="99" width="18.5" height="1.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="20" y="99" width="31.5" height="1.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="53" y="99" width="33" height="1.2" />
+		</element>
+		<element ref="text_L_patch">
+			<bounds x="31" y="5.4" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_select">
+			<bounds x="31" y="9.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_pitch">
+			<bounds x="20" y="94.7" width="15" height="4.3" />
+		</element>
+		<element ref="text_L_mod">
+			<bounds x="53" y="94.7" width="15" height="4.3" />
+		</element>
+		<element ref="psel_9_12" id="patch_select_1" inputtag="patch_select" inputmask="0x2">
+			<bounds x="6" y="2" width="9" height="12" />
+		</element>
+		<element ref="psel_9_12" id="patch_select_0" inputtag="patch_select" inputmask="0x1">
+			<bounds x="21" y="2" width="9" height="12" />
+		</element>
+		<param name="wheel_id" value="pitch_bend" />
+		<param name="port_name" value="analog_pitch_bend" />
+		<group ref="wheel">
+			<bounds x="20" y="26" width="13" height="66" />
+		</group>
+		<param name="wheel_id" value="mod_wheel" />
+		<param name="port_name" value="analog_mod_wheel" />
+		<group ref="wheel">
+			<bounds x="53" y="26" width="13" height="66" />
+		</group>
+	</group>
+	<group name="playable_keyboard">
+		<bounds x="0.0" y="0" width="516.0" height="138" />
+		<element ref="playable_keyboard_background" id="playable_keyboard_background">
+			<bounds x="0" y="0" width="516" height="138" />
+			<color red="0.33333" green="0.33333" blue="0.33333" />
+		</element>
+		<element ref="keyshape_0" id="playable_keyboard_key_0" clickthrough="no">
+			<bounds x="0" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_2" id="playable_keyboard_key_2" clickthrough="no">
+			<bounds x="23.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_4" id="playable_keyboard_key_4" clickthrough="no">
+			<bounds x="47" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_5" id="playable_keyboard_key_5" clickthrough="no">
+			<bounds x="70.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_7" id="playable_keyboard_key_7" clickthrough="no">
+			<bounds x="94" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_9" id="playable_keyboard_key_9" clickthrough="no">
+			<bounds x="117.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_11" id="playable_keyboard_key_11" clickthrough="no">
+			<bounds x="141" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_0" id="playable_keyboard_key_12" clickthrough="no">
+			<bounds x="164.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_2" id="playable_keyboard_key_14" clickthrough="no">
+			<bounds x="188" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_4" id="playable_keyboard_key_16" clickthrough="no">
+			<bounds x="211.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_5" id="playable_keyboard_key_17" clickthrough="no">
+			<bounds x="235" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_7" id="playable_keyboard_key_19" clickthrough="no">
+			<bounds x="258.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_9" id="playable_keyboard_key_21" clickthrough="no">
+			<bounds x="282" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_11" id="playable_keyboard_key_23" clickthrough="no">
+			<bounds x="305.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_0" id="playable_keyboard_key_24" clickthrough="no">
+			<bounds x="329" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_2" id="playable_keyboard_key_26" clickthrough="no">
+			<bounds x="352.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_4" id="playable_keyboard_key_28" clickthrough="no">
+			<bounds x="376" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_5" id="playable_keyboard_key_29" clickthrough="no">
+			<bounds x="399.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_7" id="playable_keyboard_key_31" clickthrough="no">
+			<bounds x="423" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_9" id="playable_keyboard_key_33" clickthrough="no">
+			<bounds x="446.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_11" id="playable_keyboard_key_35" clickthrough="no">
+			<bounds x="470" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_12" id="playable_keyboard_key_36" clickthrough="no">
+			<bounds x="493.5" y="0" width="22.5" height="138" />
+			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_1" id="playable_keyboard_key_1" clickthrough="no">
+			<bounds x="14.55" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_3" id="playable_keyboard_key_3" clickthrough="no">
+			<bounds x="42.65" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_6" id="playable_keyboard_key_6" clickthrough="no">
+			<bounds x="83.75" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_8" id="playable_keyboard_key_8" clickthrough="no">
+			<bounds x="110.85" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_10" id="playable_keyboard_key_10" clickthrough="no">
+			<bounds x="137.95" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_1" id="playable_keyboard_key_13" clickthrough="no">
+			<bounds x="179.05" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_3" id="playable_keyboard_key_15" clickthrough="no">
+			<bounds x="207.15" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_6" id="playable_keyboard_key_18" clickthrough="no">
+			<bounds x="248.25" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_8" id="playable_keyboard_key_20" clickthrough="no">
+			<bounds x="275.35" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_10" id="playable_keyboard_key_22" clickthrough="no">
+			<bounds x="302.45" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_1" id="playable_keyboard_key_25" clickthrough="no">
+			<bounds x="343.55" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_3" id="playable_keyboard_key_27" clickthrough="no">
+			<bounds x="371.65" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_6" id="playable_keyboard_key_30" clickthrough="no">
+			<bounds x="412.75" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_8" id="playable_keyboard_key_32" clickthrough="no">
+			<bounds x="439.85" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+		<element ref="keyshape_10" id="playable_keyboard_key_34" clickthrough="no">
+			<bounds x="466.95" y="0" width="12" height="88" />
+			<color state="0" red="0.078431" green="0.078431" blue="0.078431" />
+			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
+			<color state="127" red="0.098039" green="0.63137" blue="0.30196" />
+			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
+			<color state="255" red="0.80784" green="0.24706" blue="0.023529" />
+		</element>
+	</group>
+	<group name="CompactVolumeSlider">
+		<bounds x="0" y="15" width="35" height="88.2" />
+		<element ref="rect_sd1">
+			<bounds x="0" y="102" width="30" height="1.2" />
+		</element>
+		<element ref="text_L_volume">
+			<bounds x="0" y="97.7" width="35" height="4.3" />
+		</element>
+		<param name="slider_id" value="volume" />
+		<param name="port_name" value="analog_volume" />
+		<group ref="slider">
+			<bounds x="0" y="15" width="20" height="60" />
+		</group>
+	</group>
+	<group name="PatchSelects">
+		<bounds x="0" y="55" width="40" height="48.2" />
+		<element ref="rect_sd1">
+			<bounds x="0" y="102" width="40" height="1.2" />
+		</element>
+		<element ref="text_L_patch_select">
+			<bounds x="0" y="97.7" width="35" height="4.3" />
+		</element>
+		<element ref="psel_9_12" id="patch_select_1" inputtag="patch_select" inputmask="0x2">
+			<bounds x="0" y="55" width="9" height="12" />
+		</element>
+		<element ref="psel_9_12" id="patch_select_0" inputtag="patch_select" inputmask="0x1">
+			<bounds x="15" y="55" width="9" height="12" />
+		</element>
+	</group>
+	<group name="CompactValueSlider">
+		<bounds x="0" y="15" width="63.0" height="88.2" />
+		<element ref="triangle_down">
+			<bounds x="5" y="55" width="5" height="2.5" />
+		</element>
+		<element ref="triangle_up">
+			<bounds x="5" y="30" width="5" height="2.5" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="0" y="102" width="63" height="1.2" />
+		</element>
+		<element ref="text_L_data_entry">
+			<bounds x="0" y="97.7" width="35" height="4.3" />
+		</element>
+		<element ref="button_15_5_dark" id="button_63__decrement" inputtag="buttons_32" inputmask="0x80000000">
+			<bounds x="0" y="60" width="15" height="5" />
+		</element>
+		<element ref="button_15_5_dark" id="button_62__increment" inputtag="buttons_32" inputmask="0x40000000">
+			<bounds x="0" y="35" width="15" height="5" />
+		</element>
+		<param name="slider_id" value="data_entry" />
+		<param name="port_name" value="analog_data_entry" />
+		<group ref="slider">
+			<bounds x="20" y="15" width="20" height="60" />
+		</group>
+	</group>
 
-  <!-- Panel View -->
-  <view name="Panel">
-	<group ref="panel" />
-  </view>
-  <script>
-	<![CDATA[
-	  -- file is the layout file object
-	  -- set a function to call after resolving tags
-	  file:set_resolve_tags_callback(
-		function ()
-		  -- file.device is the device that caused the layout to be loaded
-		  -- in this case, it's the esqpanel2x40_vfx object.
+	<view name="Full">
+		<element ref="rect_black">
+			<bounds x="-156" y="-32" width="1023" height="334.5" />
+		</element>
+		<element ref="rect_panel">
+			<bounds x="0" y="0" width="845" height="121.5" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="209" y="102" width="27" height="1.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="479" y="102" width="24.5" height="1.2" />
+		</element>
+		<element ref="rect_body_down">
+			<bounds x="720" y="22" width="56" height="27" />
+		</element>
+		<element ref="rect_body_up">
+			<bounds x="721.5" y="23.5" width="53" height="24" />
+		</element>
+		<element ref="rect_body">
+			<bounds x="0" y="121.5" width="845" height="170" />
+		</element>
+		<element ref="logo">
+			<bounds x="760" y="90" width="72" height="13" />
+		</element>
+		<element ref="rect_body">
+			<bounds x="-156" y="-32" width="20" height="334.5" />
+		</element>
+		<element ref="rect_body">
+			<bounds x="847" y="-32" width="20" height="334.5" />
+		</element>
+		<element ref="rect_body">
+			<bounds x="-134" y="-32" width="132" height="334.5" />
+		</element>
+		<element ref="drawing_storage_cutout">
+			<bounds x="-127" y="13" width="118" height="96" />
+		</element>
+		<element ref="drawing_wheel_and_floppy_area">
+			<bounds x="-127" y="129.5" width="118" height="162" />
+		</element>
+		<element ref="drawing_floppy">
+			<bounds x="-119" y="129.5" width="102" height="13" />
+		</element>
+		<element ref="ellipse_screwhead">
+			<bounds x="2" y="129.5" width="6" height="6" />
+		</element>
+		<element ref="ellipse_screwhead">
+			<bounds x="837" y="129.5" width="6" height="6" />
+		</element>
+		<element ref="text_L_cartridge">
+			<bounds x="720" y="17.7" width="56" height="4.3" />
+		</element>
+		<element ref="text_L_music_production_synthesizer">
+			<bounds x="13" y="7" width="200" height="4.3" />
+		</element>
+		<element ref="text_ensoniq">
+			<bounds x="765" y="92" width="62" height="9" />
+		</element>
+		<element ref="text_L_sd_1">
+			<bounds x="13" y="77.5" width="67" height="27" />
+		</element>
+		<element name="lights" ref="light_16">
+			<bounds x="-56" y="137.62" width="5" height="0.72222" />
+		</element>
+		<group ref="Sliders">
+			<bounds x="120" y="15" width="90" height="88.2" />
+		</group>
+		<group ref="DisplayAndButtons">
+			<bounds x="235" y="8" width="245" height="95.2" />
+		</group>
+		<group ref="Buttons">
+			<bounds x="505" y="8.2" width="180" height="95" />
+		</group>
+		<group ref="BackPanel">
+			<bounds x="0" y="-32" width="845" height="32" />
+		</group>
+		<group ref="WheelArea">
+			<bounds x="-122" y="169.5" width="108" height="122" />
+		</group>
+		<group ref="full_keyboard" id="full_keyboard">
+			<bounds x="0" y="153.5" width="845" height="138" />
+		</group>
+		<element ref="plugin_warning" id="plugin_warning">
+			<bounds x="14.5" y="112.52" width="682" height="45.467" />
+		</element>
+	</view>
+	<view name="Compact">
+		<element ref="rect_panel">
+			<bounds x="-95" y="-10" width="575" height="105.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="-1" y="89" width="27" height="1.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="269" y="89" width="24.5" height="1.2" />
+		</element>
+		<group ref="Sliders">
+			<bounds x="-90" y="2" width="90" height="88.2" />
+		</group>
+		<group ref="DisplayAndButtons">
+			<bounds x="25" y="-5" width="245" height="95.2" />
+		</group>
+		<group ref="Buttons">
+			<bounds x="295" y="-4.8" width="180" height="95" />
+		</group>
+		<group ref="NarrowWheelArea">
+			<bounds x="-95" y="127.2" width="86" height="122" />
+		</group>
+		<group ref="playable_keyboard" id="playable_keyboard">
+			<bounds x="-9" y="118.42" width="489" height="130.78" />
+		</group>
+		<element ref="plugin_warning" id="plugin_warning">
+			<bounds x="0.83333" y="106.82" width="383.33" height="25.556" />
+		</element>
+	</view>
+	<view name="Panel">
+		<element ref="rect_panel">
+			<bounds x="-95" y="-10" width="575" height="105.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="-1" y="89" width="27" height="1.2" />
+		</element>
+		<element ref="rect_sd1">
+			<bounds x="269" y="89" width="24.5" height="1.2" />
+		</element>
+		<group ref="Sliders">
+			<bounds x="-90" y="2" width="90" height="88.2" />
+		</group>
+		<group ref="DisplayAndButtons">
+			<bounds x="25" y="-5" width="245" height="95.2" />
+		</group>
+		<group ref="Buttons">
+			<bounds x="295" y="-4.8" width="180" height="95" />
+		</group>
+		<element ref="plugin_warning" id="plugin_warning">
+			<bounds x="0.83333" y="29.822" width="383.33" height="25.556" />
+		</element>
+	</view>
+	<view name="Tablet">
+		<element ref="rect_panel">
+			<bounds x="-5" y="-10" width="285" height="205.4" />
+		</element>
+		<group ref="CompactVolumeSlider">
+			<bounds x="0" y="2" width="35" height="88.2" />
+		</group>
+		<group ref="DisplayAndButtons">
+			<bounds x="30" y="-5" width="245" height="95.2" />
+		</group>
+		<group ref="Buttons">
+			<bounds x="95" y="95.4" width="180" height="95" />
+		</group>
+		<group ref="PatchSelects">
+			<bounds x="0" y="142.2" width="40" height="48.2" />
+		</group>
+		<group ref="CompactValueSlider">
+			<bounds x="32" y="102.2" width="63" height="88.2" />
+		</group>
+		<element ref="plugin_warning" id="plugin_warning">
+			<bounds x="42.5" y="86.367" width="190" height="12.667" />
+		</element>
+	</view>
+	<script>
+		<![CDATA[
+			-- Keep track of the pointer managers
+			pointer_managers = {}
 
-		  for view_name, view in pairs(file.views) do
-			install_slider_callbacks(view)
+			-- file is the layout file object
+			-- set a function to call after resolving tags
+			file:set_resolve_tags_callback(
+				function ()
+					for view_name, view in pairs(file.views) do
+						-- Hide the warning about requiring the Layout plugin.
+						view.items["plugin_warning"]:set_state(0)
 
-			add_vertical_slider(view, "slider_volume", "slider_knob_volume", "analog_volume")
-			add_vertical_slider(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry")
+						local manager = PointerManager:create(view)
+						pointer_managers[view_name] = manager
 
-			-- TODO: Display a warning about how to enable sliders
-			-- view.items["warning"]:set_state(0)
-		  end
-		end
-	  )
 
-	  -----------------------------------------------------------------------
-	  -- Simplified Slider library starts.
-	  -- Can be copied as-is to other layouts.
-	  -- It is simplified from its source:
-	  -- * This one never reads from the port, only writes to it.
-	  -- * Only when clickling on the knob itself does it start to drag the knob.
-	  -- * The value is calculated based on the position of the knob within the click area.
-	  -----------------------------------------------------------------------
-	  local sliders = {}   -- Stores slider information.
-	  local pointers = {}  -- Tracks pointer state.
+						if view.unqualified_name == "Full" then
+							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
+							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
+							manager:addHandler(SliderHandler:create(view, "wheel_pitch_bend", "wheel_knob_pitch_bend", "analog_pitch_bend", true, true))
+							manager:addHandler(SliderHandler:create(view, "wheel_mod_wheel", "wheel_knob_mod_wheel", "analog_mod_wheel", true, false))
+							manager:addHandler(KeyboardHandler:create(view, "full_keyboard_background", "full_keyboard_key_", "key_", 3, 5))
+						end
 
-	  function clamp(x)
-		if x < 0 then return 0 elseif x > 1023 then return 1023 else return x end
-	  end
+						if view.unqualified_name == "Compact" then
+							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
+							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
+							manager:addHandler(SliderHandler:create(view, "wheel_pitch_bend", "wheel_knob_pitch_bend", "analog_pitch_bend", true, true))
+							manager:addHandler(SliderHandler:create(view, "wheel_mod_wheel", "wheel_knob_mod_wheel", "analog_mod_wheel", true, false))
+							manager:addHandler(KeyboardHandler:create(view, "playable_keyboard_background", "playable_keyboard_key_", "key_", 4, 3))
+						end
 
-	  -- The knob's Y position must be animated using <animate inputtag="{port_name}">.
-	  -- The click area's vertical size must exactly span the range of the
-	  -- knob's movement.
-	  function add_vertical_slider(view, clickarea_id, knob_id, port_name)
-		local slider = {}
+						if view.unqualified_name == "Panel" then
+							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
+							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
+						end
 
-		slider.clickarea = view.items[clickarea_id]
-		if slider.clickarea == nil then
-		  emu.print_error("Slider element: '" .. clickarea_id .. "' not found.")
-		  return
-		end
+						if view.unqualified_name == "Tablet" then
+							manager:addHandler(SliderHandler:create(view, "slider_volume", "slider_knob_volume", "analog_volume"))
+							manager:addHandler(SliderHandler:create(view, "slider_data_entry", "slider_knob_data_entry", "analog_data_entry"))
+						end
 
-		slider.knob = view.items[knob_id]
-		if slider.knob == nil then
-		  emu.print_error("Slider knob element: '" .. knob_id .. "' not found.")
-		  return
-		end
+					end
+				end
+			)
 
-		local port = file.device:ioport(port_name)
-		if port == nil then
-		  emu.print_error("Port: '" .. port_name .. "' not found.")
-		  return
-		end
+			-----------------------------------------------------------------------
+			-- Keys and Sliders library starts.
+			-- Can be copied as-is to other layouts.
+			-- It is simplified from the original Slider library:
+			-- * This one never reads from the port, only writes to it.
+			-- * Only when clickling on the knob itself does it start to drag the knob.
+			-- * The value is calculated based on the position of the knob within the click area.
+			-- But also extended to handle keys on piano-like keyboard.
+			-----------------------------------------------------------------------
 
-		slider.field = nil
-		for k, val in pairs(port.fields) do
-		  slider.field = val
-		  break
-		end
-		if slider.field == nil then
-		  emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
-		  return
-		end
-
-		table.insert(sliders, slider)
-	  end
-
-	  local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
-		-- If a button is not pressed, reset the state of the current pointer.
-		if btn & 1 == 0 then
-		  pointers[id] = nil
-		  return
-		end
-
-		-- If a button was just pressed, find the affected slider, if any.
-		if dn & 1 ~= 0 then
-		  for i = 1, #sliders do
-			if sliders[i].knob.bounds:includes(x, y) then
-			  local clickarea = sliders[i].clickarea
-			  local knob = sliders[i].knob
-			  local dy = y - knob.bounds.y0
-			  pointers[id] = {
-				selected_slider = i,
-				dy = dy -- position within the knob where it was clicked
-			  }
-			  break
+			local function clamp(x, min, max)
+				if x < min then return min elseif x > max then return max else return x end
 			end
-		  end
-		end
 
-		-- If there is no slider selected by the current pointer, we are done.
-		if pointers[id] == nil then
-		  return
-		end
+			local function find_ioport(port_name)
+				local port
 
-		-- A slider is selected. Update state and, indirectly, slider knob position,
-		-- based on the pointer's Y position. The attached IO field must be
-		-- an IPT_ADJUSTER with a range of 0-1023.
+				if port_name:byte(1) == string.byte(":") then
+					port = machine.ioport.ports[port_name]
+				else
+					port = file.device:ioport(port_name)
+				end
 
-		local pointer = pointers[id]
-		local slider = sliders[pointer.selected_slider]
-		local knob = slider.knob
-		local clickarea = slider.clickarea
+				if port == nil then
+					emu.print_error("Port: '" .. port_name .. "' not found.")
+				end
 
-		local yy = y - pointer.dy
-		local fraction = (yy - clickarea.bounds.y0) / (clickarea.bounds.height - knob.bounds.height)
-		local new_value = 1023 * (1 - fraction)
-		new_value = math.floor(new_value + 0.5)
-		clamped_value = clamp(new_value)
-		slider.field.user_value = clamped_value
-	  end
+				return port
+			end
 
-	  local function pointer_left(type, id, dev, x, y, up, cnt)
-		pointers[id] = nil
-	  end
+			local function find_ioport_field(port_name)
+				local port = find_ioport(port_name)
+				if port == nil then
+					return nil
+				end
 
-	  local function pointer_aborted(type, id, dev, x, y, up, cnt)
-		pointers[id] = nil
-	  end
+				local field
+				for k, val in pairs(port.fields) do
+					field = val
+					break
+				end
 
-	  local function forget_pointers()
-		pointers = {}
-	  end
+				if field == nil then
+					emu.print_error("Port: '" .. port_name .."' does not seem to have any fields.")
+				end
 
-	  function install_slider_callbacks(view)
-		view:set_pointer_updated_callback(pointer_updated)
-		view:set_pointer_left_callback(pointer_left)
-		view:set_pointer_aborted_callback(pointer_aborted)
-		view:set_forget_pointers_callback(forget_pointers)
-	  end
-	  -----------------------------------------------------------------------
-	  -- Slider library ends.
-	  -----------------------------------------------------------------------
+				return field
+			end
+
+			local function set_field_value(field, new_value)
+				if field.is_analog then
+					field:set_value(new_value)
+				else
+					field.user_value = new_value
+				end
+			end
+
+			PointerManager = {}
+
+			function PointerManager:create(view)
+				local instance = {
+					view = view,
+					pointers = {},     -- Tracks pointer state.
+					handlers = {},     -- the handlers for each target
+
+					-- No setmetatable in the layout plugin. Manually copy methods across.
+					addHandler = self.addHandler,
+					pointerUpdated = self.pointerUpdated,
+					releasePointer = self.releasePointer,
+					pointerLeft = self.pointerLeft,
+					pointerAborted = self.pointerAborted,
+					forgetPointers = self.forgetPointers,
+					registerCallbacks = self.registerCallbacks,
+					unregisterCallbacks = self.unregisterCallbacks,
+				}
+
+				instance:registerCallbacks()
+				return instance
+			end
+
+			function PointerManager:addHandler(handler)
+				table.insert(self.handlers, handler)
+			end
+
+			function PointerManager:pointerUpdated(type, id, dev, x, y, btn, dn, up, cnt)
+				local pointer = self.pointers[id]
+				if pointer == nil then
+					pointer = { id = id, active = nil }
+					self.pointers[id] = pointer
+				end
+
+				-- If button 1 is released, reset the state of the current pointer.
+				if up & 1 ~= 0 then
+					self:releasePointer(id)
+					return
+				end
+
+				if pointer.active ~= nil then
+					-- give the current active handler a stab at this event.
+					-- if it wants to continue processing these events, it returns itself;
+					-- if it is done, it will return nil, thus allowing this method to look
+					-- for a different handler.
+
+					pointer.active = pointer.active.handler:pointerUpdated(pointer.active, type, id, dev, x, y, btn, dn, up, cnt)
+				end
+
+				if pointer.active == nil then
+					-- No current active handler state, let's see if any handler wants to claim this event.
+					for i, handler in ipairs(self.handlers) do
+						pointer.active = handler:pointerUpdated(nil, type, id, dev, x, y, btn, dn, up, cnt)
+						if pointer.active ~= nil then
+							break
+						end
+					end
+				end
+			end
+
+			function PointerManager:releasePointer(id)
+				local pointer = self.pointers[id]
+
+				if pointer ~= nil then
+					if pointer.active ~= nil then
+						pointer.active.handler:releasePointer(id, pointer.active)
+					end
+					pointer.active = nil
+				end
+
+				self.pointers[id] = nil
+			end
+
+			function PointerManager:pointerLeft(type, id, dev, x, y, up, cnt)
+				self:releasePointer(id)
+			end
+
+			function PointerManager:pointerAborted(type, id, dev, x, y, up, cnt)
+				self:releasePointer(id)
+			end
+
+			function PointerManager:forgetPointers()
+				for id, pointer in pairs(self.pointers) do
+					self:releasePointer(id)
+				end
+				self.pointers = {}
+			end
+
+			function PointerManager:registerCallbacks()
+				self.view:set_pointer_updated_callback(function(type, id, dev, x, y, btn, dn, up, cnt)
+					self:pointerUpdated(type, id, dev, x, y, btn, dn, up, cnt)
+				end)
+
+				self.view:set_pointer_left_callback(function(type, id, dev, x, y, up, cnt)
+					self:pointerLeft(type, id, dev, x, y, up, cnt)
+				end)
+
+				self.view:set_pointer_aborted_callback(function(type, id, dev, x, y, up, cnt)
+					self:pointerAborted(type, id, dev, x, y, up, cnt)
+				end)
+
+				self.view:set_forget_pointers_callback(function()
+					self:forgetPointers()
+				end)
+			end
+
+			function PointerManager:unregisterCallbacks()
+				self.view:set_pointer_updated_callback(nil)
+				self.view:set_pointer_left_callback(nil)
+				self.view:set_pointer_aborted_callback(nil)
+				self.view:set_forget_pointers_callback(nil)
+			end
+
+			--
+			-- The Slider Handler
+			--
+
+			SliderHandler = {}
+
+			-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+			-- The click area's vertical size must exactly span the range of the
+			-- knob's movement.
+
+			function SliderHandler:create(view, clickarea_id, knob_id, port_name, invert, autocenter)
+				local instance = {
+					view = view,
+					invert = invert,
+					autocenter = autocenter,
+					clickarea = view.items[clickarea_id],
+					knob = view.items[knob_id],
+					field = find_ioport_field(port_name),
+
+					-- No setmetatable in the layout plugin. Manually copy methods across.
+					pointerUpdated = self.pointerUpdated,
+					releasePointer = self.releasePointer,
+				}
+
+				if instance.clickarea == nil then
+					emu.print_error("Slider element: '" .. clickarea_id .. "' not found.")
+					return nil
+				end
+
+				if instance.knob == nil then
+					emu.print_error("Slider knob element: '" .. knob_id .. "' not found.")
+					return nil
+				end
+
+				if instance.field == nil then
+					return nil
+				end
+
+				return instance
+			end
+
+			function SliderHandler:pointerUpdated(state, type, id, dev, x, y, btn, dn, up, cnt)
+				if dn & 1 ~= 0 then
+					-- It's a button press
+					if self.knob.bounds:includes(x, y) then
+						return {
+							handler = self,
+							dy = y - self.knob.bounds.y0
+						}
+					end
+				else
+					if state == nil then
+						-- not a down event, and not already claimed - not for us to handle.
+						return nil
+					end
+
+					-- not a button down (up is also handled elsewhere), so it must be a move
+					local yy = y - state.dy
+					local fraction = (yy - self.clickarea.bounds.y0) / (self.clickarea.bounds.height - self.knob.bounds.height)
+					local new_value = 1023 * (1 - fraction)
+					if self.invert then
+						new_value = 1023 - new_value
+					end
+					new_value = math.floor(new_value + 0.5)
+					clamped_value = clamp(new_value, 0, 1023)
+					set_field_value(self.field, clamped_value)
+					return state
+				end
+				return nil
+			end
+
+			function SliderHandler:releasePointer(id, state)
+				if self.autocenter then
+					set_field_value(self.field, 512)
+				end
+				return nil
+			end
+
+			--
+			-- The Keyboard Handler
+			--
+
+			local octave_shift = 164.5
+			local w_white = 22.5
+			local f_white = w_white / (w_white + 1)
+			local l_black = 88
+			local l_white = 138
+			local y_12 = (l_black + 2) / l_white
+			local y_12_0 = l_black / l_white
+
+			local strike_both_bottom = l_black - 3
+			local strike_both_top = l_black - 43
+
+			local strike_white_low_bottom = l_white - 3
+			local strike_white_low_top = l_white - 43
+
+			local strike_white_break = (strike_both_bottom + strike_white_low_top) / 2
+
+			local pressure_length = 25
+			local pressure_hysteresis = 3
+
+			-- The ranges where we can find the tops of the 12 keys within an octave
+			local k12 = {
+				{ key=0, x0=0, x1=79027/1000000, black=false, l = l_white },
+				{ key=1, x0=1769/20000, x1=807/5000, black=true, l = l_black },
+				{ key=2, x0=8541/50000, x1=4997/20000, black=false, l = l_white },
+				{ key=3, x0=25927/100000, x1=16611/50000, black=true, l = l_black },
+				{ key=4, x0=8541/25000, x1=42067/100000, black=false, l = l_white },
+				{ key=5, x0=1707/4000, x1=4997/10000, black=false, l = l_white },
+				{ key=6, x0=1591/3125, x1=58207/100000, black=true, l = l_black },
+				{ key=7, x0=59149/100000, x1=16611/25000, black=false, l = l_white },
+				{ key=8, x0=33693/50000, x1=74681/100000, black=true, l = l_black },
+				{ key=9, x0=75623/100000, x1=41459/50000, black=false, l = l_white },
+				{ key=10, x0=4193/5000, x1=18231/20000, black=true, l = l_black },
+				{ key=11, x0=92097/100000, x1=3106/3125, black=false, l = l_white },
+			}
+
+			-- 85 equally sized ranges that each contain exactly one key, and the key
+			-- thaty they contain, so we can check for being outside the edge
+			local x_to_k12 = {
+				k12[1], k12[1], k12[1], k12[1], k12[1], k12[1], k12[1],
+				k12[2], k12[2], k12[2], k12[2], k12[2], k12[2], k12[2],
+				k12[3], k12[3], k12[3], k12[3], k12[3], k12[3], k12[3], k12[3],
+				k12[4], k12[4], k12[4], k12[4], k12[4], k12[4], k12[4],
+				k12[5], k12[5], k12[5], k12[5], k12[5], k12[5], k12[5],
+				k12[6], k12[6], k12[6], k12[6], k12[6], k12[6], k12[6],
+				k12[7], k12[7], k12[7], k12[7], k12[7], k12[7], k12[7],
+				k12[8], k12[8], k12[8], k12[8], k12[8], k12[8], k12[8],
+				k12[9], k12[9], k12[9], k12[9], k12[9], k12[9], k12[9],
+				k12[10], k12[10], k12[10], k12[10], k12[10], k12[10], k12[10],
+				k12[11], k12[11], k12[11], k12[11], k12[11], k12[11], k12[11],
+				k12[12], k12[12], k12[12], k12[12], k12[12], k12[12], k12[12],
+			}
+
+			local makeFindKey = function(n_octaves)
+				local octaves_width = n_octaves * octave_shift
+				local full_width = octaves_width + w_white
+
+				local function find_12_key(x, y, w, h)
+					if x > octaves_width then
+						return 12 * n_octaves
+					end
+
+					local octave, kx = math.modf((x / w) * (full_width / octave_shift))
+					if octave == n_octaves then
+						return 12 * octave
+					end
+
+					local ki = math.floor(85 * kx)
+					local candidate = x_to_k12[ki + 1]
+					if candidate == nil then
+						return nil
+					end
+					local ci = 12 * octave + candidate.key
+					if candidate.x0 <= kx and kx <= candidate.x1 then
+						if candidate.black then
+							rel_y = y / h
+							if rel_y <= y_12_0 then
+								return ci
+							else
+								return nil
+							end
+						else
+							return ci
+						end
+					else
+						return nil
+					end
+				end
+
+				local function find_7_key(x, w)
+					local octave, kx = math.modf((x / w) * (full_width / octave_shift))
+					local ki, kkx = math.modf(7 * kx)
+					if kkx <= f_white then
+						if ki < 3 then
+							return 12 * octave + 2 * ki
+						else
+							return 12 * octave + 2 * ki - 1
+						end
+					end
+					return nil
+				end
+
+				return function (x, y, w, h)
+					rel_y = y / h
+					if rel_y < 0 or 1 < rel_y then
+						return nil
+					elseif rel_y < y_12 then
+						return find_12_key(x, y, w, h)
+					else
+						return find_7_key(x, w)
+					end
+				end
+			end
+
+			KeyboardHandler = {}
+
+			function KeyboardHandler:create(view, clickarea_id, key_id_prefix, port_prefix, from_octave, n_octaves)
+				local instance = {
+					view = view,
+					clickarea = view.items[clickarea_id],
+					from_octave = from_octave,
+					n_octaves = n_octaves,
+					from_key = from_key,
+					n_keys = n_keys,
+					keys = {},
+					findKey = makeFindKey(n_octaves),  -- plain function call to create the function!
+
+					-- No setmetatable in the layout plugin. Manually copy methods across.
+					pointerUpdated = self.pointerUpdated,
+					releasePointer = self.releasePointer,
+					keyDown = self.keyDown,
+					velocity = self.velocity,
+					pressure = self.pressure,
+				}
+
+				if instance.clickarea == nil then
+					emu.print_error("Keyboard click area '"..clickarea_id.."' not found.")
+					return nil
+				end
+
+				local from_key = 12 * from_octave
+				local n_keys = 12 * n_octaves + 1
+
+				for i = 0, n_keys -1 do
+					local key_info = k12[(i % 12) + 1]
+					local key = {
+						id = key_id_prefix .. i,
+						velocity = 0,
+						pressure = 0,
+						info = key_info,
+						black = key_info.black,
+						l = key_info.l,
+					}
+
+					key.item = view.items[key.id]
+					if key.item == nil then
+						emu.print_error("Key item '"..key.id.."' not found.")
+						return nil
+					end
+
+					key.field = find_ioport_field(port_prefix .. (from_key + i - 36))
+					if key.field == nil then
+						return nil
+					end
+
+					function key:setVelocity(velocity)
+						if velocity ~= self.velocity or self.pressure ~= 0 then
+							self.velocity = velocity & 0x7f
+							self.pressure = 0
+							set_field_value(self.field, self.velocity)
+						end
+					end
+
+					function key:setPressure(pressure)
+						if pressure ~= self.pressure then
+							self.pressure = pressure & 0x7f
+							set_field_value(self.field, (self.pressure << 7) | self.velocity)
+						end
+					end
+
+					key.item:set_animation_state_callback(function()
+						new_state = 0
+						if key.pressure > 0 then
+							new_state = 128 + key.pressure
+						elseif key.velocity > 0 then
+							new_state = key.velocity
+						else
+							new_state = 0
+						end
+						if new_state ~= key.animation_state then
+							key.animation_state = new_state
+						end
+						return new_state
+					end)
+
+					table.insert(instance.keys, key)
+				end
+
+				return instance
+			end
+
+			function KeyboardHandler:velocity(state)
+
+				local function velocityWithin(pos, top, bottom)
+					local fraction = (bottom - pos) / (bottom - top)
+					local velocity = math.floor(1.5 + 126 * fraction)
+					velocity = clamp(velocity, 1, 127)
+					return velocity
+				end
+
+				local key = state.key
+				local h = state.key.item.bounds.height
+
+				local y = (state.y / h) * state.key.l
+				if state.key.black or y < strike_white_break then
+					return velocityWithin(y, strike_both_top, strike_both_bottom)
+				else
+					return velocityWithin(y, strike_white_low_top, strike_white_low_bottom)
+				end
+			end
+
+			function KeyboardHandler:pressure(state)
+				local key = state.key
+				local h = state.key.item.bounds.height
+
+				local y = (state.y / h) * key.l
+				local y_max = (state.max_y / h) * key.l
+
+				local fraction = ((y_max - pressure_hysteresis) - y) / pressure_length
+				local pressure = math.floor(0.5 + 127 * fraction)
+				pressure = clamp(pressure, 0, 127)
+				return pressure
+			end
+
+			function KeyboardHandler:keyDown(x, y)
+				local bounds = self.clickarea.bounds
+				local w = bounds.width
+				local h = bounds.height
+				local dx = x - bounds.x0
+				local dy = y - bounds.y0
+
+				local state = {
+					handler = self,
+				}
+				local key_number = self.findKey(dx, dy, w, h)
+
+				state.key_number = key_number
+				state.key = nil
+				if key_number ~= nil then
+					local key = self.keys[key_number + 1]
+					if key ~= nil then
+						state.key = key
+						-- coordinates within the key of the latest pointer position
+						state.x = x - key.item.bounds.x0
+						state.y = y - key.item.bounds.y0
+						state.max_y = state.y
+						state.key:setVelocity(self:velocity(state))
+					end
+				end
+
+				-- return the state to track this movement, claiming it as ours.
+				return state
+			end
+
+			function KeyboardHandler:pointerUpdated(state, type, id, dev, x, y, btn, dn, up, cnt)
+				local bounds = self.clickarea.bounds
+				if bounds:includes(x, y) and (dn & 1 ~= 0) then
+					-- This is a key down event on the keyboard, claim the pointer.
+					return self:keyDown(x, y)
+				end
+
+				if state ~= nil then
+					-- not a key down event, but a move after we claimed the pointer after a key down event
+
+					local w = bounds.width
+					local h = bounds.height
+					local dx = x - bounds.x0
+					local dy = y - bounds.y0
+
+					local new_key_number = self.findKey(dx, dy, w, h)
+
+					if new_key_number ~= state.key_number then
+						-- this is a move across, or on, or off, keys
+						if state.key ~= nil then
+							state.key:setVelocity(0)
+						end
+
+						-- store the new key number, which may be nil, in the state.
+						state.key_number = new_key_number
+
+						if new_key_number ~= nil then
+							-- it's a move onto a new key, treat it as a key-down event
+							state.key = self.keys[new_key_number + 1]
+
+							if state.key ~= nil then
+								state.x = x - state.key.item.bounds.x0
+								state.y = y - state.key.item.bounds.y0
+								state.max_y = state.y
+								state.key:setVelocity(self:velocity(state))
+							end
+						else
+							-- set the key to nil as well.
+							state.key = nil
+						end
+					else
+						if state.key ~= nil then
+							-- we're remaining on the same key
+							state.x = x - state.key.item.bounds.x0
+							state.y = y - state.key.item.bounds.y0
+							if state.y > state.max_y then
+								state.max_y = state.y
+							end
+
+							-- this is a potential change in key pressure.
+							state.key:setPressure(self:pressure(state))
+						end
+						-- else we're remaining between keys and return the same state.
+					end
+
+					-- return the same state, still claiming this pointer
+					return state
+
+				end
+
+				return nil
+			end
+
+			function KeyboardHandler:releasePointer(id, state)
+				if state.key ~= nil then
+					state.key:setVelocity(0)
+				end
+			end
+
+			-----------------------------------------------------------------------
+			-- Slider library ends.
+			-----------------------------------------------------------------------
 
 
 
-	]]></script>
+		]]></script>
 </mamelayout>
 

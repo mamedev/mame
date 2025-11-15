@@ -546,6 +546,8 @@ private:
 	void op_set(Assembler &a, const uml::instruction &inst);
 	void op_mov(Assembler &a, const uml::instruction &inst);
 	void op_sext(Assembler &a, const uml::instruction &inst);
+	void op_bfxu(Assembler &a, const uml::instruction &inst);
+	void op_bfxs(Assembler &a, const uml::instruction &inst);
 	void op_roland(Assembler &a, const uml::instruction &inst);
 	void op_rolins(Assembler &a, const uml::instruction &inst);
 	void op_add(Assembler &a, const uml::instruction &inst);
@@ -617,13 +619,13 @@ private:
 	void emit_or_m64_p64(Assembler &a, Mem const &memref_lo, Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
 	void emit_xor_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
 	void emit_xor_m64_p64(Assembler &a, Mem const &memref_lo, Mem const &memref_hi, be_parameter const &param, const uml::instruction &inst);
-	void emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
-	void emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const uml::instruction &inst);
+	void emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags);
+	void emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags);
+	void emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags);
+	void emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags);
+	void emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags);
+	void emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags);
+	void emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags);
 
 	void alu_op_param(Assembler &a, Inst::Id const opcode_lo, Inst::Id const opcode_hi, Gp const &lo, Gp const &hi, be_parameter const &param, bool const saveflags);
 	void alu_op_param(Assembler &a, Inst::Id const opcode_lo, Inst::Id const opcode_hi, Mem const &lo, Mem const &hi, be_parameter const &param, bool const saveflags);
@@ -724,6 +726,8 @@ inline void drcbe_x86::generate_one(Assembler &a, const uml::instruction &inst)
 	case uml::OP_SET:     op_set(a, inst);        break; // SET     dst,c
 	case uml::OP_MOV:     op_mov(a, inst);        break; // MOV     dst,src[,c]
 	case uml::OP_SEXT:    op_sext(a, inst);       break; // SEXT    dst,src
+	case uml::OP_BFXU:    op_bfxu(a, inst);       break; // BFXU    dst,src1,src2,src3
+	case uml::OP_BFXS:    op_bfxs(a, inst);       break; // BFXS    dst,src1,src2,src3
 	case uml::OP_ROLAND:  op_roland(a, inst);     break; // ROLAND  dst,src1,src2,src3
 	case uml::OP_ROLINS:  op_rolins(a, inst);     break; // ROLINS  dst,src1,src2,src3
 	case uml::OP_ADD:     op_add(a, inst);        break; // ADD     dst,src1,src2[,f]
@@ -1013,8 +1017,8 @@ inline bool drcbe_x86::can_skip_upper_load(Assembler &a, uint32_t *memref, Gp co
 //  drcbe_x86 - constructor
 //-------------------------------------------------
 
-drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits) :
-	drcbe_interface(drcuml, cache, device)
+drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
+	: drcbe_interface(drcuml, cache, device)
 	, m_hash(cache, modes, addrbits, ignorebits)
 	, m_map(cache, 0)
 	, m_log_asmjit(nullptr)
@@ -2022,19 +2026,19 @@ void drcbe_x86::emit_xor_m64_p64(Assembler &a, Mem const &memref_lo, Mem const &
 //  pair of registers from a 64-bit parameter
 //-------------------------------------------------
 
-void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const instruction &inst)
+void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags)
 {
-	int saveflags = inst.flags() != 0;
+	bool const saveflags = flags != 0;
 	if (param.is_immediate())
 	{
 		int count = param.immediate() & 63;
-		if (!inst.flags() && count == 0)
+		if (!flags && count == 0)
 			;// skip
 		else
 		{
 			while (count >= 32)
 			{
-				if (inst.flags() != 0)
+				if (flags != 0)
 				{
 					a.shld(reghi, reglo, 31);                                           // shld  reghi,reglo,31
 					a.shl(reglo, 31);                                                   // shl   reglo,31
@@ -2047,7 +2051,7 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 					count -= 32;
 				}
 			}
-			if (inst.flags() != 0 || count > 0)
+			if (flags != 0 || count > 0)
 			{
 				a.shld(reghi, reglo, count);                                            // shld  reghi,reglo,count
 				if (saveflags && count != 0) a.pushfd();                                // pushf
@@ -2085,7 +2089,7 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 		a.test(ecx, 0x20);                                                              // test  ecx,0x20
 		a.short_().jz(skip1);                                                           // jz    skip1
-		if (inst.flags() != 0)
+		if (flags != 0)
 		{
 			a.sub(ecx, 31);                                                             // sub   ecx,31
 			a.shld(reghi, reglo, 31);                                                   // shld  reghi,reglo,31
@@ -2136,19 +2140,19 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 //  pair of registers from a 64-bit parameter
 //-------------------------------------------------
 
-void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const instruction &inst)
+void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags)
 {
-	int saveflags = inst.flags() != 0;
+	bool const saveflags = flags != 0;
 	if (param.is_immediate())
 	{
 		int count = param.immediate() & 63;
-		if (!inst.flags() && count == 0)
+		if (!flags && count == 0)
 			;// skip
 		else
 		{
 			while (count >= 32)
 			{
-				if (inst.flags() != 0)
+				if (flags != 0)
 				{
 					a.shrd(reglo, reghi, 31);                                           // shrd  reglo,reghi,31
 					a.shr(reghi, 31);                                                   // shr   reghi,31
@@ -2161,7 +2165,7 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 					count -= 32;
 				}
 			}
-			if (inst.flags() != 0 || count > 0)
+			if (flags != 0 || count > 0)
 			{
 				a.shrd(reglo, reghi, count);                                            // shrd  reglo,reghi,count
 				if (saveflags && count != 0) a.pushfd();                                // pushf
@@ -2207,7 +2211,7 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 		a.test(ecx, 0x20);                                                              // test  ecx,0x20
 		a.short_().jz(skip1);                                                           // jz    skip1
-		if (inst.flags() != 0)
+		if (flags != 0)
 		{
 			a.sub(ecx, 31);                                                             // sub   ecx,31
 			a.shrd(reglo, reghi, 31);                                                   // shrd  reglo,reghi,31
@@ -2266,19 +2270,19 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 //  pair of registers from a 64-bit parameter
 //-------------------------------------------------
 
-void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const instruction &inst)
+void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags)
 {
-	int saveflags = inst.flags() != 0;
+	bool const saveflags = flags != 0;
 	if (param.is_immediate())
 	{
 		int count = param.immediate() & 63;
-		if (!inst.flags() && count == 0)
+		if (!flags && count == 0)
 			;// skip
 		else
 		{
 			while (count >= 32)
 			{
-				if (inst.flags() != 0)
+				if (flags != 0)
 				{
 					a.shrd(reglo, reghi, 31);                                           // shrd  reglo,reghi,31
 					a.sar(reghi, 31);                                                   // sar   reghi,31
@@ -2291,7 +2295,7 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 					count -= 32;
 				}
 			}
-			if (inst.flags() != 0 || count > 0)
+			if (flags != 0 || count > 0)
 			{
 				a.shrd(reglo, reghi, count);                                            // shrd  reglo,reghi,count
 				if (saveflags && count != 0) a.pushfd();                                              // pushf
@@ -2337,7 +2341,7 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 		a.test(ecx, 0x20);                                                              // test  ecx,0x20
 		a.short_().jz(skip1);                                                           // jz    skip1
-		if (inst.flags() != 0)
+		if (flags != 0)
 		{
 			a.sub(ecx, 31);                                                             // sub   ecx,31
 			a.shrd(reglo, reghi, 31);                                                   // shrd  reglo,reghi,31
@@ -2396,9 +2400,9 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 //  pair of registers from a 64-bit parameter
 //-------------------------------------------------
 
-void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const instruction &inst)
+void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags)
 {
-	int saveflags = inst.flags() != 0;
+	bool const saveflags = flags != 0;
 
 	Gp tempreg = esi;
 	if ((reglo == tempreg) || (reghi == tempreg))
@@ -2412,7 +2416,7 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	if (param.is_immediate())
 	{
 		int count = param.immediate() & 63;
-		if (!inst.flags() && count == 0)
+		if (!flags && count == 0)
 		{
 			// skip
 		}
@@ -2420,7 +2424,7 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		{
 			while (count >= 32)
 			{
-				if (inst.flags() != 0)
+				if (flags != 0)
 				{
 					a.mov(ecx, reglo);
 					a.shld(reglo, reghi, 31);
@@ -2470,7 +2474,7 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.cmp(ecx, 32);
 		a.short_().jl(skip1);
 
-		if (inst.flags())
+		if (flags)
 		{
 			Label const shift_loop = a.new_label();
 
@@ -2523,9 +2527,9 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 //  pair of registers from a 64-bit parameter
 //-------------------------------------------------
 
-void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const instruction &inst)
+void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags)
 {
-	int saveflags = inst.flags() != 0;
+	bool const saveflags = flags != 0;
 
 	Gp tempreg = esi;
 	if ((reglo == tempreg) || (reghi == tempreg))
@@ -2539,7 +2543,7 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	if (param.is_immediate())
 	{
 		int count = param.immediate() & 63;
-		if (!inst.flags() && count == 0)
+		if (!flags && count == 0)
 		{
 			// skip
 		}
@@ -2547,7 +2551,7 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		{
 			while (count >= 32)
 			{
-				if (inst.flags() != 0)
+				if (flags != 0)
 				{
 					a.mov(tempreg, reglo);
 					a.shrd(reglo, reghi, 31);
@@ -2599,7 +2603,7 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.short_().jl(skip1);
 
 		a.bind(shift_loop);
-		if (inst.flags() != 0)
+		if (flags != 0)
 		{
 			a.sub(ecx, 31);
 			a.mov(tempreg, reglo);
@@ -2649,7 +2653,7 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 //  pair of registers from a 64-bit parameter
 //-------------------------------------------------
 
-void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const instruction &inst)
+void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags)
 {
 	Label loop = a.new_label();
 	Label skipall = a.new_label();
@@ -2677,9 +2681,9 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.rcl(reghi, 1);
 
 	a.bind(skipall);
-	if (inst.flags())
+	if (flags)
 	{
-		if (inst.flags() & FLAG_C)
+		if (flags & FLAG_C)
 			calculate_status_flags(a, reglo, FLAG_Z);
 		else
 			a.test(reglo, reglo);
@@ -2697,7 +2701,7 @@ void drcbe_x86::emit_rcl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 //  pair of registers from a 64-bit parameter
 //-------------------------------------------------
 
-void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, const instruction &inst)
+void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, be_parameter const &param, u8 flags)
 {
 	Label loop = a.new_label();
 	Label skipall = a.new_label();
@@ -2725,9 +2729,9 @@ void drcbe_x86::emit_rcr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	a.rcr(reglo, 1);
 
 	a.bind(skipall);
-	if (inst.flags())
+	if (flags)
 	{
-		if (inst.flags() & FLAG_C)
+		if (flags & FLAG_C)
 			calculate_status_flags(a, reglo, FLAG_Z);
 		else
 			a.test(reglo, reglo);
@@ -4587,6 +4591,400 @@ void drcbe_x86::op_sext(Assembler &a, const instruction &inst)
 
 
 //-------------------------------------------------
+//  op_bfxu - process a BFXU opcode
+//-------------------------------------------------
+
+void drcbe_x86::op_bfxu(Assembler &a, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_flags(inst, FLAG_S | FLAG_Z);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
+	be_parameter shiftp(*this, inst.param(2), PTYPE_MRI);
+	be_parameter widthp(*this, inst.param(3), PTYPE_MRI);
+
+	if (inst.size() == 4)
+	{
+		// 32-bit form
+		if (widthp.is_immediate_value(0))
+		{
+			// undefined behaviour - do something
+			if (inst.flags() || dstp.is_int_register())
+			{
+				Gp const dstreg = dstp.select_register(eax);
+
+				a.xor_(dstreg, dstreg);
+
+				emit_mov_p32_r32(a, dstp, dstreg);
+			}
+			else if (dstp.is_memory())
+			{
+				a.mov(MABS(dstp.memory(), 4), 0);
+			}
+		}
+		else
+		{
+			Gp dstreg;
+
+			if (widthp.is_immediate())
+			{
+				const unsigned width = widthp.immediate() & 31;
+
+				dstreg = dstp.select_register(eax);
+
+				if (!shiftp.is_immediate())
+					emit_mov_r32_p32(a, ecx, shiftp);
+				emit_mov_r32_p32(a, dstreg, srcp);
+
+				if (shiftp.is_immediate())
+				{
+					const unsigned shift = shiftp.immediate() & 31;
+
+					a.ror(dstreg, shift);
+				}
+				else
+				{
+					a.ror(dstreg, cl);
+				}
+				a.and_(dstreg, util::make_bitmask<uint32_t>(width));
+			}
+			else
+			{
+				Gp const widthreg = widthp.select_register(edx);
+				dstreg = dstp.select_register(eax, widthp);
+
+				if (!shiftp.is_immediate())
+					emit_mov_r32_p32(a, ecx, shiftp);
+				emit_mov_r32_p32(a, widthreg, widthp);
+				emit_mov_r32_p32(a, dstreg, srcp);
+
+				if (shiftp.is_immediate())
+					a.mov(ecx, shiftp.immediate() & 31);
+				a.add(ecx, widthreg);
+				a.ror(dstreg, cl);
+				a.mov(ecx, widthreg);
+				a.neg(ecx);
+				a.and_(ecx, 31);
+				a.shr(dstreg, cl);
+			}
+
+			emit_mov_p32_r32(a, dstp, dstreg);
+		}
+	}
+	else if (inst.size() == 8)
+	{
+		// 64-bit form
+		if (widthp.is_immediate())
+		{
+			be_parameter maskp(*this, uml::parameter(util::make_bitmask<u64>(widthp.immediate() & 63)), PTYPE_I);
+
+			Gp const dstreg = dstp.select_register(eax, shiftp);
+
+			emit_mov_r64_p64(a, dstreg, edx, srcp);
+			emit_ror_r64_p64(a, dstreg, edx, shiftp, FLAGS_NONE);
+			emit_and_r64_p64(a, dstreg, edx, maskp, inst);
+			emit_mov_p64_r64(a, dstp, dstreg, edx);
+		}
+		else
+		{
+			Gp const dstreg = dstp.select_register(eax, shiftp);
+
+			// first make the mask
+			Label large = a.new_label();
+			Label shift = a.new_label();
+
+			emit_mov_r32_p32(a, ecx, widthp);
+
+			a.mov(eax, ~u32(0));
+			a.test(ecx, 0x20);
+			a.short_().jnz(large);
+			a.mov(dword_ptr(esp, 4), 0);
+			a.and_(ecx, 31);
+			a.shl(eax, cl);
+			a.not_(eax);
+			a.mov(dword_ptr(esp), eax);
+			a.short_().jmp(shift);
+
+			a.bind(large);
+
+			a.mov(dword_ptr(esp), eax);
+			a.and_(ecx, 31);
+			a.shl(eax, cl);
+			a.not_(eax);
+			a.mov(dword_ptr(esp, 4), eax);
+
+			a.bind(shift);
+
+			// shift the field into position
+			emit_mov_r64_p64(a, dstreg, edx, srcp);
+			emit_ror_r64_p64(a, dstreg, edx, shiftp, FLAGS_NONE);
+
+			// apply the mask
+			a.and_(dstreg, dword_ptr(esp));
+			if (inst.flags() & FLAG_Z)
+			{
+				a.pushfd();
+				a.and_(edx, dword_ptr(esp, 8));
+				emit_combine_z_flags(a);
+			}
+			else
+			{
+				a.and_(edx, dword_ptr(esp, 4));
+			}
+
+			emit_mov_p64_r64(a, dstp, dstreg, edx);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  op_bfxs - process a BFXS opcode
+//-------------------------------------------------
+
+void drcbe_x86::op_bfxs(Assembler &a, const instruction &inst)
+{
+	// validate instruction
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_flags(inst, FLAG_S | FLAG_Z);
+
+	// normalize parameters
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
+	be_parameter shiftp(*this, inst.param(2), PTYPE_MRI);
+	be_parameter widthp(*this, inst.param(3), PTYPE_MRI);
+
+	if (inst.size() == 4)
+	{
+		// 32-bit form
+		if (widthp.is_immediate_value(0))
+		{
+			// undefined behaviour - do something
+			if (inst.flags() || dstp.is_int_register())
+			{
+				Gp const dstreg = dstp.select_register(eax);
+
+				a.xor_(dstreg, dstreg);
+
+				emit_mov_p32_r32(a, dstp, dstreg);
+			}
+			else if (dstp.is_memory())
+			{
+				a.mov(MABS(dstp.memory(), 4), 0);
+			}
+		}
+		else
+		{
+			Gp dstreg;
+
+			if (widthp.is_immediate())
+			{
+				dstreg = dstp.select_register(eax, shiftp);
+
+				const unsigned width = widthp.immediate() & 31;
+
+				emit_mov_r32_p32(a, dstreg, srcp);
+
+				if (shiftp.is_immediate())
+				{
+					const unsigned shift = shiftp.immediate() & 31;
+
+					a.ror(dstreg, (width + shift) & 31);
+				}
+				else
+				{
+					a.mov(ecx, width);
+					if (shiftp.is_int_register())
+						a.add(ecx, shiftp.select_register(edx));
+					else
+						a.add(ecx, MABS(shiftp.memory()));
+					a.ror(dstreg, cl);
+				}
+				a.sar(dstreg, -int(width) & 31);
+			}
+			else if (shiftp.is_immediate_value(0))
+			{
+				dstreg = dstp.select_register(eax);
+
+				emit_mov_r32_p32(a, ecx, widthp);
+				emit_mov_r32_p32(a, dstreg, srcp);
+
+				a.ror(dstreg, cl);
+				a.neg(ecx);
+				a.and_(ecx, 31);
+				a.sar(dstreg, cl);
+			}
+			else
+			{
+				Gp const widthreg = widthp.select_register(edx);
+				dstreg = dstp.select_register(eax, widthp);
+
+				if (!shiftp.is_immediate())
+					emit_mov_r32_p32(a, ecx, shiftp);
+				emit_mov_r32_p32(a, widthreg, widthp);
+				emit_mov_r32_p32(a, dstreg, srcp);
+
+				if (shiftp.is_immediate())
+					a.mov(ecx, shiftp.immediate() & 31);
+				a.add(ecx, widthreg);
+				a.ror(dstreg, cl);
+				a.mov(ecx, widthreg);
+				a.neg(ecx);
+				a.and_(ecx, 31);
+				a.sar(dstreg, cl);
+			}
+
+			emit_mov_p32_r32(a, dstp, dstreg);
+		}
+	}
+	else if (inst.size() == 8)
+	{
+		// 64-bit form
+		Gp dstreg;
+
+		if (widthp.is_immediate())
+		{
+			be_parameter rshiftp(*this, uml::parameter(-int64_t(widthp.immediate()) & 63), PTYPE_I);
+
+			dstreg = dstp.select_register(eax);
+
+			if (shiftp.is_immediate())
+			{
+				be_parameter rotp(*this, uml::parameter((shiftp.immediate() + widthp.immediate()) & 63), PTYPE_I);
+
+				emit_mov_r64_p64(a, dstreg, edx, srcp);
+				emit_ror_r64_p64(a, dstreg, edx, rotp, FLAGS_NONE);
+			}
+			else
+			{
+				Gp tempreg = esi;
+				if (dstreg == tempreg)
+					tempreg = edi;
+				if (dstreg == tempreg)
+					tempreg = ebp;
+				assert(dstreg != tempreg);
+				a.mov(dword_ptr(esp), tempreg);
+
+				emit_mov_r32_p32(a, ecx, shiftp);
+				emit_mov_r64_p64(a, dstreg, edx, srcp);
+
+				// if the count is at least 32, swap the halves
+				Label small = a.new_label();
+
+				a.add(ecx, widthp.immediate() & 63);
+				a.test(ecx, 0x20);
+				a.short_().jz(small);
+				a.xchg(dstreg, edx);
+				a.bind(small);
+				a.and_(ecx, 31);
+
+				// do the extended rotate
+				reset_last_upper_lower_reg();
+				a.mov(tempreg, edx);
+				a.shrd(edx, dstreg, cl);
+				a.shrd(dstreg, tempreg, cl);
+
+				a.mov(tempreg, dword_ptr(esp));
+			}
+
+			emit_sar_r64_p64(a, dstreg, edx, rshiftp, inst.flags());
+		}
+		else
+		{
+			dstreg = dstp.select_register(eax, widthp);
+
+			Gp tempreg = esi;
+			if (dstreg == tempreg)
+				tempreg = edi;
+			if (dstreg == tempreg)
+				tempreg = ebp;
+			assert(dstreg != tempreg);
+			a.mov(dword_ptr(esp), tempreg);
+
+			// calculate the required rotation
+			emit_mov_r32_p32(a, ecx, widthp);
+			if (shiftp.is_immediate_value(0))
+				;
+			else if (shiftp.is_immediate())
+				a.add(ecx, shiftp.immediate());
+			else if (shiftp.is_int_register())
+				a.add(ecx, shiftp.select_register(edx));
+			else if (shiftp.is_memory())
+				a.add(ecx, MABS(shiftp.memory()));
+
+			emit_mov_r64_p64(a, dstreg, edx, srcp);
+
+			// if the count is at least 32, swap the halves
+			Label small_ror = a.new_label();
+
+			a.test(ecx, 0x20);
+			a.short_().jz(small_ror);
+			a.xchg(dstreg, edx);
+			a.bind(small_ror);
+			a.and_(ecx, 31);
+
+			// do the extended rotate
+			reset_last_upper_lower_reg();
+			a.mov(tempreg, edx);
+			a.shrd(edx, dstreg, cl);
+			a.shrd(dstreg, tempreg, cl);
+
+			a.mov(tempreg, dword_ptr(esp));
+
+			// now do the shift
+			Label small_sar = a.new_label();
+			Label no_shift, done;
+			if (inst.flags())
+			{
+				no_shift = a.new_label();
+				done = a.new_label();
+			}
+
+			emit_mov_r32_p32(a, ecx, widthp);
+			a.neg(ecx);
+			a.test(ecx, 0x20);
+			a.short_().jz(small_sar);
+			a.mov(dstreg, edx);
+			a.sar(edx, 31);
+			a.bind(small_sar);
+			a.and_(ecx, 31);
+			if (inst.flags())
+				a.short_().jz(no_shift);
+
+			a.shrd(dstreg, edx, cl);
+			if (inst.flags() & FLAG_Z)
+				a.pushfd();
+			a.sar(edx, cl);
+
+			// zero-bit shifts don't update the flags
+			if (inst.flags())
+			{
+				a.short_().jmp(done);
+
+				a.bind(no_shift);
+				if (inst.flags() & FLAG_Z)
+				{
+					a.test(eax, eax);
+					a.pushfd();
+				}
+				a.test(edx, edx);
+				a.bind(done);
+				if (inst.flags() & FLAG_Z)
+					emit_combine_z_flags(a);
+			}
+		}
+
+		emit_mov_p64_r64(a, dstp, dstreg, edx);
+	}
+}
+
+
+//-------------------------------------------------
 //  op_roland - process an ROLAND opcode
 //-------------------------------------------------
 
@@ -4636,7 +5034,7 @@ void drcbe_x86::op_roland(Assembler &a, const instruction &inst)
 	{
 		// 64-bit form
 		emit_mov_r64_p64(a, dstreg, edx, srcp);                                         // mov   edx:dstreg,srcp
-		emit_rol_r64_p64(a, dstreg, edx, shiftp, inst);                                 // rol   edx:dstreg,shiftp
+		emit_rol_r64_p64(a, dstreg, edx, shiftp, FLAGS_NONE);                           // rol   edx:dstreg,shiftp
 		emit_and_r64_p64(a, dstreg, edx, maskp, inst);                                  // and   edx:dstreg,maskp
 		emit_mov_p64_r64(a, dstp, dstreg, edx);                                         // mov   dstp,edx:dstreg
 	}
@@ -4696,7 +5094,7 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 	{
 		// 64-bit form
 		emit_mov_r64_p64(a, eax, edx, srcp);                                            // mov   edx:eax,srcp
-		emit_rol_r64_p64(a, eax, edx, shiftp, inst);                                    // rol   edx:eax,shiftp
+		emit_rol_r64_p64(a, eax, edx, shiftp, FLAGS_NONE);                              // rol   edx:eax,shiftp
 		if (maskp.is_immediate())
 		{
 			a.and_(eax, maskp.immediate());                                             // and   eax,maskp
@@ -6213,7 +6611,7 @@ void drcbe_x86::op_shl(Assembler &a, const instruction &inst)
 		{
 			// general case
 			emit_mov_r64_p64(a, dstreg, edx, src1p);
-			emit_shl_r64_p64(a, dstreg, edx, src2p, inst);
+			emit_shl_r64_p64(a, dstreg, edx, src2p, inst.flags());
 		}
 		emit_mov_p64_r64(a, dstp, dstreg, edx);
 	}
@@ -6270,7 +6668,7 @@ void drcbe_x86::op_shr(Assembler &a, const instruction &inst)
 	{
 		// general case
 		emit_mov_r64_p64(a, dstreg, edx, src1p);                                        // mov   edx:dstreg,[src1p]
-		emit_shr_r64_p64(a, dstreg, edx, src2p, inst);                                  // shr   edx:dstreg,src2p
+		emit_shr_r64_p64(a, dstreg, edx, src2p, inst.flags());                          // shr   edx:dstreg,src2p
 		emit_mov_p64_r64(a, dstp, dstreg, edx);                                         // mov   dstp,edx:dstreg
 	}
 }
@@ -6326,7 +6724,7 @@ void drcbe_x86::op_sar(Assembler &a, const instruction &inst)
 	{
 		// general case
 		emit_mov_r64_p64(a, dstreg, edx, src1p);                                        // mov   edx:dstreg,[src1p]
-		emit_sar_r64_p64(a, dstreg, edx, src2p, inst);                                  // sar   edx:dstreg,src2p
+		emit_sar_r64_p64(a, dstreg, edx, src2p, inst.flags());                          // sar   edx:dstreg,src2p
 		emit_mov_p64_r64(a, dstp, dstreg, edx);                                         // mov   dstp,edx:dstreg
 	}
 }
@@ -6382,7 +6780,7 @@ void drcbe_x86::op_rol(Assembler &a, const instruction &inst)
 	{
 		// general case
 		emit_mov_r64_p64(a, dstreg, edx, src1p);                                        // mov   edx:dstreg,[src1p]
-		emit_rol_r64_p64(a, dstreg, edx, src2p, inst);                                  // rol   edx:dstreg,src2p
+		emit_rol_r64_p64(a, dstreg, edx, src2p, inst.flags());                          // rol   edx:dstreg,src2p
 		emit_mov_p64_r64(a, dstp, dstreg, edx);                                         // mov   dstp,edx:dstreg
 	}
 }
@@ -6438,7 +6836,7 @@ void drcbe_x86::op_ror(Assembler &a, const instruction &inst)
 	{
 		// general case
 		emit_mov_r64_p64(a, dstreg, edx, src1p);                                        // mov   edx:dstreg,[src1p]
-		emit_ror_r64_p64(a, dstreg, edx, src2p, inst);                                  // ror   edx:dstreg,src2p
+		emit_ror_r64_p64(a, dstreg, edx, src2p, inst.flags());                          // ror   edx:dstreg,src2p
 		emit_mov_p64_r64(a, dstp, dstreg, edx);                                         // mov   dstp,edx:dstreg
 	}
 }
@@ -6494,7 +6892,7 @@ void drcbe_x86::op_rolc(Assembler &a, const instruction &inst)
 	{
 		// general case
 		emit_mov_r64_p64_keepflags(a, dstreg, edx, src1p);                              // mov   edx:dstreg,[src1p]
-		emit_rcl_r64_p64(a, dstreg, edx, src2p, inst);                                  // rcl   edx:dstreg,src2p
+		emit_rcl_r64_p64(a, dstreg, edx, src2p, inst.flags());                          // rcl   edx:dstreg,src2p
 		emit_mov_p64_r64(a, dstp, dstreg, edx);                                         // mov   dstp,edx:dstreg
 	}
 }
@@ -6550,7 +6948,7 @@ void drcbe_x86::op_rorc(Assembler &a, const instruction &inst)
 	{
 		// general case
 		emit_mov_r64_p64_keepflags(a, dstreg, edx, src1p);                              // mov   edx:dstreg,[src1p]
-		emit_rcr_r64_p64(a, dstreg, edx, src2p, inst);                                  // rcr   edx:dstreg,src2p
+		emit_rcr_r64_p64(a, dstreg, edx, src2p, inst.flags());                          // rcr   edx:dstreg,src2p
 		emit_mov_p64_r64(a, dstp, dstreg, edx);                                         // mov   dstp,edx:dstreg
 	}
 }

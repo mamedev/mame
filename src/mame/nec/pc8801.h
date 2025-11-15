@@ -74,6 +74,8 @@ protected:
 	virtual UPD3301_FETCH_ATTRIBUTE( attr_fetch ) override;
 
 	virtual uint8_t dma_mem_r(offs_t offset) override;
+	void dma_mem_w(offs_t offset, u8 data);
+	uint8_t dackv(offs_t offset);
 
 	virtual uint8_t dictionary_rom_r(offs_t offset);
 	virtual bool dictionary_rom_enable();

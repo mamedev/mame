@@ -4903,11 +4903,14 @@ Fails autobooting (has CONFIG.SYS/AUTOEXEC.BAT)
 		</part>
 	</software>
 
-	<software name="albatros">
+	<software name="albatros" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Albatross</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<notes><![CDATA[
+Has optional [PC-9801-14] support
+]]></notes>
 		<info name="alt_title" value="アルバトロス" />
 		<info name="usage" value="Runs best on 8086-based machines (e.g. PC-9801F)" />
 		<part name="flop1" interface="floppy_5_25">
@@ -11370,10 +11373,13 @@ Game directory on autobootable disk
 		</part>
 	</software>
 
-	<software name="macroscp">
-		<description>Choujikuu Yousai Macross - Complete Pack HD Senyou</description>
+	<software name="macroscp" supported="partial">
+		<description>Choujikuu Yousai Macross - SkullLeader Complete Pack HD Senyou</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<notes><![CDATA[
+Battle gameplay leaves trails with the mouse, [EGC]?
+]]></notes>
 		<info name="alt_title" value="超時空要塞マクロス スカル・リーダー コンプリートパック ＨＤ専用" />
 		<info name="release" value="19950714" />
 		<part name="flop1" interface="floppy_5_25">
@@ -16690,10 +16696,14 @@ Optional [AMD-98] support, no sound (uses PIT registers)
 		</part>
 	</software>
 
-	<software name="doom">
+	<software name="doom" supported="partial">
 		<description>Doom</description>
 		<year>1994</year>
 		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+No DAC sound for [PC9801-86]
+Needs DSP hookup for [SB16]
+]]></notes>
 		<info name="release" value="19941209" />
 		<info name="usage" value="Requires HDD installation and a PC-9821 computer. Run INSTALL.EXE from DOS." />
 		<part name="flop1" interface="floppy_5_25">
@@ -20860,9 +20870,12 @@ Black screen [FDC] keeps reading chrn=(0, 0, 3, 256) in 2dd mode
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
 		<notes><![CDATA[
 Black screen, around PC=1fc76. Extensively uses 9821 [PEGC] MMIO.
+16 color mode has a column to the right shifted by one pixel on intro and gameplay
+Optional support for unsupported [graphic] and [sound] options
 ]]></notes>
 		<info name="alt_title" value="フラッシュバック" />
 		<info name="release" value="19940422" />
+		<info name="usage" value="Requires HDD DOS install" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1329680">
@@ -44214,7 +44227,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		</part>
 	</software>
 
-	<software name="silentsr">
+	<software name="silentsr" supported="yes">
 		<description>The Silent Service - Chinmoku no Kantai</description>
 		<year>1991</year>
 		<publisher>ジーエーエム (GAM)</publisher>
@@ -59816,7 +59829,8 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 	</software>
 
-	<software name="kurayami" supported="no">
+	<!-- Disk 2 copy protection repaired by hand -->
+	<software name="kurayami" supported="yes">
 		<description>Kurayami</description>
 		<year>1996</year>
 		<publisher>メロディ (Melody)</publisher>
@@ -59830,8 +59844,9 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="952316">
-				<rom name="kurayami (1996)(melody)(disk 2 of 5)[req install].fdd" size="952316" crc="38cdfb19" sha1="bcc9537c2d24bb62acbe44c8683bfdb03561d945" offset="0" />
+			<dataarea name="flop" size="1283008">
+				<!-- baddump: as note above -->
+				<rom name="kurayami (1996)(melody)(disk 2 of 5)[req install].d88" size="1283008" crc="18febc6a" sha1="9294a37c1474a2210b1f01aef8c1bd18320c8d17" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
