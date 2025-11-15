@@ -1082,7 +1082,8 @@ INPUT_PORTS_START(sixtrak)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sixtrak_state::wheel_moved), WHEEL_PITCH)
 
 	PORT_START("wheel_1")  // Mod wheel. R2, 100K linear.
-	PORT_ADJUSTER(0, "MOD") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sixtrak_state::wheel_moved), WHEEL_MOD)
+	PORT_ADJUSTER(0, "MOD")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sixtrak_state::wheel_moved), WHEEL_MOD)
 
 	PORT_START("track_volume_knob")  // Knob, R119(?), 10K linear.
 	PORT_ADJUSTER(100, "TRACK VOL")
@@ -1097,13 +1098,15 @@ INPUT_PORTS_START(sixtrak)
 	PORT_ADJUSTER(50, "TUNE")
 
 	PORT_START("master_volume_knob")  // Knob, R197, 10K audio taper.
-	PORT_ADJUSTER(100, "MASTER VOL") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sixtrak_state::master_volume_changed), 0)
+	PORT_ADJUSTER(100, "MASTER VOL")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sixtrak_state::master_volume_changed), 0)
 
 	// The default value is for a calibration well within spec.
 	// Required offset when inverting 0V: +/- 0.9 mV.
 	// Actual offset with the default below: -0.008 mV.
 	PORT_START("trimmer_dac_inverter")  // Trimmer, R1205, 100k linear.
-	PORT_ADJUSTER(111, "TRIMMER: DAC INVERTER") PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sixtrak_state::dac_trimmer_changed), 0)
+	PORT_ADJUSTER(111, "TRIMMER: DAC INVERTER") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sixtrak_state::dac_trimmer_changed), 0)
 INPUT_PORTS_END
 
 // The firmware version can be displayed by pressing RECORD TRACK and SELECT 5.
