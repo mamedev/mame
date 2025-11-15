@@ -2241,22 +2241,6 @@ void namcos22_state::pdp_handle_commands(u16 offs)
 	}
 }
 
-u16 namcos22_state::dsp_hold_signal_r()
-{
-	/* STUB */
-	return 0;
-}
-
-void namcos22_state::dsp_hold_ack_w(u16 data)
-{
-	/* STUB */
-}
-
-void namcos22_state::dsp_xf_output_w(u16 data)
-{
-	/* STUB */
-}
-
 void namcos22_state::dsp_unk2_w(u16 data)
 {
 	/**
@@ -3749,9 +3733,9 @@ void namcos22_state::namcos22(machine_config &config)
 	master.set_addrmap(AS_DATA, &namcos22_state::master_dsp_data);
 	master.set_addrmap(AS_IO, &namcos22_state::master_dsp_io);
 	master.bio_in_cb().set(FUNC(namcos22_state::pdp_status_r));
-	master.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
-	master.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
-	master.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
+	//master.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
+	//master.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
+	//master.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	master.dr_in_cb().set(FUNC(namcos22_state::master_serial_io_r));
 	master.set_vblank_int("screen", FUNC(namcos22_state::dsp_vblank_irq));
 	TIMER(config, "dsp_serial").configure_periodic(FUNC(namcos22_state::dsp_serial_pulse), attotime::from_hz(SERIAL_IO_PERIOD));
@@ -3761,9 +3745,9 @@ void namcos22_state::namcos22(machine_config &config)
 	slave.set_addrmap(AS_DATA, &namcos22_state::slave_dsp_data);
 	slave.set_addrmap(AS_IO, &namcos22_state::slave_dsp_io);
 	slave.bio_in_cb().set(FUNC(namcos22_state::dsp_slave_bioz_r));
-	slave.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
-	slave.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
-	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
+	//slave.hold_in_cb().set(FUNC(namcos22_state::dsp_hold_signal_r));
+	//slave.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
+	//slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
 
 	NAMCO_C74(config, m_mcu, 49.152_MHz_XTAL/3); // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
