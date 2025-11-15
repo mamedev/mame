@@ -166,6 +166,16 @@ license:CC0-1.0
 		<element ref="6_text"><bounds x="60" y="62" width="13" height="12"/></element>
 	</group>
 
+	<element name="saturation_placeholder">
+		<image><data><![CDATA[
+			<svg width="28" height="50">
+				<path fill="#666666" stroke="none" d="
+					m 2.675,0 -2.7,6.1 c 17.4,6.4 24.5,25.6 18.6,41.1
+					l 6,2.9 c 7.6,-18.8 -0.9,-42.1 -21.9,-50.1 z
+			</svg>
+		]]></data></image>
+	</element>
+
 	<group name="knob_saturation">
 		<!-- FIXME: This one should have dots only in the left half
 		    and the word "SATURATION" along a circular path to the right.
@@ -173,6 +183,7 @@ license:CC0-1.0
 		-->
 		<element ref="gray_line"><bounds x="36.5" y="15" width="4" height="8"/></element>
 		<group ref="knob_base"><bounds x="0" y="7" width="77" height="59"/></group>
+		<element ref="saturation_placeholder"><bounds x="47" y="6" width="32" height="52"/></element>
 
 		<element ref="minus6_text"><bounds x="0" y="62" width="19" height="12"/></element>
 		<element ref="0_text"><bounds x="36" y="0" width="6" height="12"/></element>
@@ -250,13 +261,79 @@ license:CC0-1.0
 
 	<element name="filter_connector">
 		<image><data><![CDATA[
-			<svg width="260" height="28">
-				<g stroke="#a9abab" stroke-width="1px" fill="none">
+			<svg width="254" height="28">
+				<g stroke="##666666" stroke-width="1px" fill="none">
 					<rect x="1" y="1" width="186" height="16" rx="8" ry="8"/>
-					<path transform="translate(187, 8)" d="
-						m 0,1 h 4 c 4,0 7,2 7,5 v 8
-						c 0,3 3,5 6,5 h 10 m 34,0 h 12"/>
+					<path d="
+						m 254,27 h -12
+						m -32.5,0 h -5.5 c -3,0 -6,-2.5 -6,-5.5
+						v -6.4 c 0,-3 -3,-6.1 -7,-6.1 h -4.5"/>
 				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="osc_connector">
+		<image><data><![CDATA[
+			<svg width="380" height="28">
+				<g stroke="#666666" stroke-width="1px" fill="none">
+					<rect x="1" y="1" width="378" height="16" rx="8" ry="8"/>
+					<path d="
+						m 310,27.5 h 15.5 c 2.6,0 4.5,-1.6 4.5,-4 v -7
+						m -65.5,11 h 11
+						m -57,0 h 11"/>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="filt_mode_lines">
+		<image><data><![CDATA[
+			<svg width="81" height="79">
+				<path stroke="#666666" stroke-width="1px" fill="none" d="
+					m 14,0 v 78.5 h -14
+					m 67,-78.5 v 78.5 h 14"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="bpm_outline">
+		<image><data><![CDATA[
+			<svg width="79" height="20">
+				<path fill="#666666" stroke="none" d="
+					m 10,0 c -5,0 -10,4 -10,10 0,5 4,10 10,10 h 58 c 5,0 10,-4 10,-10 0,-5 -4,-10 -10,-10 z
+					m 7,2 h 44 c 4,0 8,3 8,8 v 0 c 0,4 -4,8 -8,8 h -44 c -4,0 -8,-3 -8,-8 v -0 c 0,-4 4,-8 8,-8 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="multisingle_rect">
+		<image><data><![CDATA[
+			<svg width="81" height="13">
+				<rect stroke="#666666" stroke-width="1px" fill="none" x="0.5" y="0.5" width="80" height="12"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="lfos_mod_lines">
+		<image><data><![CDATA[
+			<svg width="266" height="209">
+				<path stroke="#666666" stroke-width="1px" fill="none" d="
+					m 4.5,208.5 h -4 v -101
+					m 91,101 h -4 v -101
+					m 90,101 h -4 v -101
+					m 92,101 h -4 v -101
+					m -8,-12 h 10 v -94
+					m -226,94 h 10 v -75"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="effects_lines">
+		<image><data><![CDATA[
+			<svg width="11" height="60">
+				<path stroke="#666666" stroke-width="1px" fill="none" d="
+					m 0,59.5 h 10.5 v -59"/>
 			</svg>
 		]]></data></image>
 	</element>
@@ -445,7 +522,7 @@ license:CC0-1.0
 	<element name="semitone_text"><text string="SEMITONE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="detune_2_3_text"><text string="DETUNE 2/3"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="audition_text"><text string="AUDITION"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="audition_text"><text string="AUDITION"><color red="0.4" green="0.4" blue="0.4"/></text></element>
 
 	<element name="fm_amount_text"><text string="FM AMOUNT"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
@@ -460,7 +537,7 @@ license:CC0-1.0
 	<element name="undo_text"><text string="UNDO"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
 	<element name="transpose_text"><text string="TRANSPOSE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
-	<element name="panic_text"><text string="PANIC"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="panic_text"><text string="PANIC"><color red="0.4" green="0.4" blue="0.4"/></text></element>
 	<element name="store_text"><text string="STORE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
 	<element name="multisingle_text"><text string="MULTISINGLE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
@@ -472,17 +549,17 @@ license:CC0-1.0
 	<element name="soft_knob_2_text"><text string="SOFT KNOB 2"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="value_white_text"><text string="VALUE"><color red="1.0" green="1.0" blue="1.0"/></text></element>
 
-	<element name="minus_text"><text string="-"><color red="0.8" green="0.8" blue="0.8"/></text></element>
-	<element name="part_text"><text string="PART"><color red="0.8" green="0.8" blue="0.8"/></text></element>
-	<element name="plus_text"><text string="+"><color red="0.8" green="0.8" blue="0.8"/></text></element>
-	<element name="demo_text"><text string="DEMO"><color red="0.8" green="0.8" blue="0.8"/></text></element>
-
 	<element name="less_than_text"><text string="&lt;"><color red="0.8" green="0.8" blue="0.8"/></text></element>
-	<element name="parameter_text"><text string="PARAMETER"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="part_text"><text string="PART"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="greater_than_text"><text string="&gt;"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="demo_text"><text string="DEMO"><color red="0.4" green="0.4" blue="0.4"/></text></element>
+
+	<element name="parameter_text"><text string="PARAMETER"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="bank_text"><text string="BANK"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
+	<element name="minus_text"><text string="-"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="value_text"><text string="VALUE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="plus_text"><text string="+"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="program_text"><text string="PROGRAM"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
 	<element name="mix_text"><text string="MIX"><color red="0.8" green="0.8" blue="0.8"/></text></element>
@@ -537,8 +614,8 @@ license:CC0-1.0
 		<element ref="wood"><bounds x="15" y="14" width="50" height="592"/></element><!-- Left -->
 		<element ref="wood"><bounds x="1635" y="14" width="50" height="592"/></element><!-- Right -->
 
-		<element ref="access_logo_text"><bounds x="138" y="44" width="117" height="44"/></element>
-		<element ref="virus_logo_text"><bounds x="339" y="50" width="257" height="50"/></element>
+		<element ref="access_logo_text"><bounds x="138" y="30" width="117" height="44"/></element>
+		<element ref="virus_logo_text"><bounds x="330" y="30" width="257" height="50"/></element>
 		<element ref="virus_slogan_text"><bounds x="1333" y="575" width="260" height="14"/></element>
 
 		<element ref="outlines"><bounds x="0" y="0" width="1700" height="620"/></element>
@@ -579,7 +656,7 @@ license:CC0-1.0
 		<element ref="master_volume_text"><bounds x="90" y="185" width="96" height="12"/></element>
 
 <!-- ARP -->
-		<element ref="arp_text"><bounds x="107" y="214" width="29" height="16"/></element>
+		<element ref="arp_text"><bounds x="107" y="209" width="29" height="16"/></element>
 
 		<element ref="led" name=""><!-- 0A0 --><bounds x="123" y="233" width="11" height="11"/></element>
 		<element ref="led" name=""><!-- 0A3 --><bounds x="168" y="233" width="11" height="11"/></element>
@@ -591,7 +668,9 @@ license:CC0-1.0
 		<element ref="arp_on_text"><bounds x="151" y="300" width="42" height="12"/></element>
 
 <!-- LFOS/MOD -->
-		<element ref="lfos_mod_text"><bounds x="225" y="94" width="77" height="16"/></element>
+		<element ref="lfos_mod_text"><bounds x="225" y="90" width="77" height="16"/></element>
+
+		<element ref="lfos_mod_lines"><bounds x="275" y="108" width="266" height="209"/></element>
 
 		<element ref="led" name=""><bounds x="373" y="106" width="11" height="11"/></element>
 		<element ref="1_text"><bounds x="388" y="106" width="7" height="12"/></element>
@@ -712,7 +791,9 @@ license:CC0-1.0
 
 
 <!-- EFFECTS -->
-		<element ref="effects_text"><bounds x="109" y="345" width="67" height="16"/></element>
+		<element ref="effects_text"><bounds x="109" y="342" width="67" height="16"/></element>
+
+		<element ref="effects_lines"><bounds x="200" y="376" width="11" height="60"/></element>
 
 		<element ref="led" name=""><!-- 0A1 --><bounds x="123" y="362" width="11" height="11"/></element>
 		<element ref="button" inputtag="ROW0" inputmask="0x02"><!-- EDIT --><bounds x="106" y="378" width="45" height="45"/></element>
@@ -766,28 +847,29 @@ license:CC0-1.0
 		<element ref="damping_text"><bounds x="391" y="553" width="51" height="12"/></element>
 
 <!-- OSCILLATORS -->
-		<element ref="oscillators_text"><bounds x="651" y="94" width="108" height="16"/></element>
+		<element ref="oscillators_text"><bounds x="651" y="90" width="108" height="16"/></element>
 
 		<group ref="knob_wave"><!-- SHAPE --><bounds x="653" y="118" width="88" height="74"/></group>
 		<param name="knob_input" value="knob_3"/>
 		<group ref="knob"><bounds x="656" y="118" width="88" height="74"/></group>
-		<element ref="shape_text"><bounds x="677" y="196" width="36" height="12"/></element>
+		<element ref="shape_text"><bounds x="677" y="200" width="36" height="12"/></element>
 
 		<group ref="knob_0_6_12"><!-- WAVE SEL / PW --><bounds x="762" y="118" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_12"/>
 		<group ref="knob"><bounds x="762" y="118" width="77" height="77"/></group>
-		<element ref="wave_sel_slash_pw_text"><bounds x="757" y="196" width="86" height="12"/></element>
+		<element ref="wave_sel_slash_pw_text"><bounds x="757" y="200" width="86" height="12"/></element>
 
 		<group ref="knob_48"><!-- SEMITONE --><bounds x="865" y="118" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_15"/>
 		<group ref="knob"><bounds x="865" y="118" width="77" height="77"/></group>
-		<element ref="semitone_text"><bounds x="873" y="196" width="59" height="12"/></element>
+		<element ref="semitone_text"><bounds x="873" y="200" width="59" height="12"/></element>
 
 		<group ref="knob_0_6_12"><!-- DETUNE 2/3 --><bounds x="967" y="118" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_13"/>
 		<group ref="knob"><bounds x="967" y="118" width="77" height="77"/></group>
-		<element ref="detune_2_3_text"><bounds x="968" y="196" width="74" height="12"/></element>
+		<element ref="detune_2_3_text"><bounds x="968" y="200" width="74" height="12"/></element>
 
+		<element ref="osc_connector"><bounds x="669" y="197" width="380" height="28"/></element>
 
 		<element ref="led" name="4.3"><!-- 4B3 --><bounds x="670" y="230" width="11" height="11"/></element>
 		<element ref="led" name="4.4"><!-- 4B4 --><bounds x="715" y="230" width="11" height="11"/></element>
@@ -799,9 +881,9 @@ license:CC0-1.0
 		<element ref="sync_text"><bounds x="706" y="300" width="29" height="12"/></element>
 		<element ref="audition_text"><bounds x="679" y="314" width="38" height="9"/></element>
 
-		<group ref="knob_0_6_12"><!-- FM AMOUNT --><bounds x="762" y="226" width="77" height="77"/></group>
+		<group ref="knob_0_6_12"><!-- FM AMOUNT --><bounds x="762" y="222" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_14"/>
-		<group ref="knob"><bounds x="762" y="226" width="77" height="77"/></group>
+		<group ref="knob"><bounds x="762" y="222" width="77" height="77"/></group>
 		<element ref="fm_amount_text"><bounds x="767" y="300" width="66" height="12"/></element>
 
 		<element ref="osc_1_text"><bounds x="858" y="215" width="29" height="12"/></element>
@@ -857,6 +939,7 @@ license:CC0-1.0
 
 		<element ref="led" name=""><!-- 4A2 --><bounds x="496" y="432" width="11" height="11"/></element>
 		<element ref="bpm_text"><bounds x="515" y="433" width="21" height="12"/></element>
+		<element ref="bpm_outline"><bounds x="482" y="428" width="79" height="20"/></element>
 
 		<element ref="button" inputtag="ROW2" inputmask="0x02"><!-- UNDO --><bounds x="582" y="419" width="45" height="45"/></element>
 		<element ref="undo_text"><bounds x="587" y="471" width="35" height="12"/></element>
@@ -889,6 +972,7 @@ license:CC0-1.0
 		<element ref="button" inputtag="ROW2" inputmask="0x40"><!-- SINGLE --><bounds x="687" y="495" width="45" height="45"/></element>
 
 		<element ref="multisingle_text"><bounds x="655" y="459" width="66" height="9"/></element>
+		<element ref="multisingle_rect"><bounds x="647" y="456" width="81" height="13"/></element>
 		<element ref="multi_text"><bounds x="646" y="547" width="36" height="12"/></element>
 		<element ref="single_text"><bounds x="687" y="547" width="43" height="12"/></element>
 		<element ref="category_text"><bounds x="690" y="558" width="38" height="8"/></element>
@@ -905,16 +989,16 @@ license:CC0-1.0
 		<param name="knob_input" value="knob_10"/>
 		<group ref="knob"><bounds x="859" y="467" width="77" height="77"/></group>
 		<element ref="soft_knob_2_text"><bounds x="858" y="547" width="81" height="12"/></element>
-		<element ref="dark_grey_rect"><bounds x="878" y="561" width="42" height="13"/></element>
+		<element ref="dark_grey_rect"><bounds x="878" y="561" width="42" height="14"/></element>
 		<element ref="value_white_text"><bounds x="881" y="563" width="36" height="12"/></element>
 
 
 		<element ref="button" inputtag="ROW3" inputmask="0x02"><!-- PART [-] --><bounds x="959" y="343" width="45" height="45"/></element>
 		<element ref="button" inputtag="ROW3" inputmask="0x10"><!-- PART [+] --><bounds x="1004" y="343" width="45" height="45"/></element>
 
-		<element ref="minus_text"><bounds x="964" y="394" width="5" height="12"/></element>
+		<element ref="less_than_text"><bounds x="964" y="394" width="5" height="12"/></element>
 		<element ref="part_text"><bounds x="989" y="393" width="30" height="12"/></element>
-		<element ref="plus_text"><bounds x="1045" y="394" width="6" height="12"/></element>
+		<element ref="greater_than_text"><bounds x="1045" y="394" width="6" height="12"/></element>
 		<element ref="demo_text"><bounds x="995" y="408" width="20" height="9"/></element>
 		<element ref="gray_line"><bounds x="962" y="409" width="30" height="1"/></element>
 		<element ref="gray_line"><bounds x="1019" y="409" width="30" height="1"/></element>
@@ -925,17 +1009,17 @@ license:CC0-1.0
 		<element ref="less_than_text"><bounds x="962" y="470" width="6" height="12"/></element>
 		<element ref="parameter_text"><bounds x="971" y="470" width="66" height="12"/></element>
 		<element ref="greater_than_text"><bounds x="1047" y="470" width="6" height="12"/></element>
-		<element ref="bank_text"><bounds x="994" y="1004" width="20" height="9"/></element>
+		<element ref="bank_text"><bounds x="994" y="481" width="20" height="9"/></element>
 
 		<element ref="button" inputtag="ROW3" inputmask="0x08"><!-- VALUE [-] --><bounds x="959" y="494" width="45" height="45"/></element>
 		<element ref="button" inputtag="ROW3" inputmask="0x40"><!-- VALUE [+] --><bounds x="1004" y="494" width="45" height="45"/></element>
-		<element ref="minus_text"><bounds x="963" y="548" width="6" height="12"/></element>
+		<element ref="minus_text"><bounds x="961" y="548" width="10" height="12"/></element>
 		<element ref="value_text"><bounds x="986" y="546" width="36" height="12"/></element>
 		<element ref="plus_text"><bounds x="1044" y="548" width="6" height="12"/></element>
 		<element ref="program_text"><bounds x="987" y="558" width="36" height="9"/></element>
 
 <!-- MIX -->
-		<element ref="mix_text"><bounds x="1078" y="94" width="29" height="16"/></element>
+		<element ref="mix_text"><bounds x="1078" y="90" width="29" height="16"/></element>
 
 		<group ref="knob_1plus2"><!-- OSC BAL --><bounds x="1080" y="119" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_8"/>
@@ -964,31 +1048,32 @@ license:CC0-1.0
 
 
 <!-- FILTERS -->
-		<element ref="filters_text"><bounds x="1191" y="94" width="68" height="16"/></element>
+		<element ref="filters_text"><bounds x="1191" y="90" width="68" height="16"/></element>
 
 		<group ref="knob_0_6_12"><!-- CUTOFF --><bounds x="1195" y="119" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_21"/>
 		<group ref="knob"><bounds x="1195" y="119" width="77" height="77"/></group>
-		<element ref="cutoff_text"><bounds x="1211" y="196" width="44" height="12"/></element>
+		<element ref="cutoff_text"><bounds x="1211" y="200" width="44" height="12"/></element>
 
 		<group ref="knob_0_6_12"><!-- RESONANCE --><bounds x="1298" y="119" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_30"/>
 		<group ref="knob"><bounds x="1298" y="119" width="77" height="77"/></group>
-		<element ref="resonance_text"><bounds x="1303" y="197" width="66" height="12"/></element>
+		<element ref="resonance_text"><bounds x="1303" y="200" width="66" height="12"/></element>
 
 		<group ref="knob_0_6_12"><!-- ENV AMOUNT --><bounds x="1401" y="119" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_31"/>
 		<group ref="knob"><bounds x="1401" y="119" width="77" height="77"/></group>
-		<element ref="env_amount_text"><bounds x="1404" y="197" width="69" height="12"/></element>
+		<element ref="env_amount_text"><bounds x="1404" y="200" width="69" height="12"/></element>
 
-		<element ref="filter_connector"><bounds x="1294" y="193" width="260" height="28"/></element>
+		<element ref="filter_connector"><bounds x="1293" y="197" width="254" height="28"/></element>
 
 		<group ref="knob_1plus2"><!-- FILTER BALANCE --><bounds x="1504" y="119" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_25"/>
 		<group ref="knob"><bounds x="1504" y="119" width="77" height="77"/></group>
-		<element ref="filter_balance_text"><bounds x="1500" y="196" width="84" height="12"/></element>
-		<element ref="filt_1_text"><bounds x="1506" y="213" width="27" height="12"/></element>
-		<element ref="filt_2_text"><bounds x="1551" y="213" width="28" height="12"/></element>
+		<element ref="filter_balance_text"><bounds x="1500" y="200" width="84" height="12"/></element>
+		<element ref="filt_1_text"><bounds x="1506" y="216" width="27" height="12"/></element>
+		<element ref="filt_2_text"><bounds x="1551" y="216" width="28" height="12"/></element>
+		<element ref="filt_mode_lines"><bounds x="1374" y="230" width="81" height="79"/></element>
 
 		<group ref="knob_6"><!-- CUTOFF 2 --><bounds x="1195" y="226" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_18"/>
@@ -1032,29 +1117,29 @@ license:CC0-1.0
 		<element ref="button" inputtag="ROW4" inputmask="0x40"><!-- SELECT (Filt2) --><bounds x="1542" y="250" width="45" height="45"/></element>
 		<element ref="select_text"><bounds x="1520" y="300" width="44" height="12"/></element>
 
-		<group ref="knob_0_6_12"><!-- ATTACK --><bounds x="1195" y="334" width="77" height="77"/></group>
+		<group ref="knob_0_6_12"><!-- ATTACK --><bounds x="1195" y="330" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_17"/>
-		<group ref="knob"><bounds x="1195" y="334" width="77" height="77"/></group>
+		<group ref="knob"><bounds x="1195" y="330" width="77" height="77"/></group>
 		<element ref="attack_text"><bounds x="1211" y="406" width="44" height="12"/></element>
 
-		<group ref="knob_0_6_12"><!-- DECAY --><bounds x="1298" y="334" width="77" height="77"/></group>
+		<group ref="knob_0_6_12"><!-- DECAY --><bounds x="1298" y="330" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_28"/>
-		<group ref="knob"><bounds x="1298" y="334" width="77" height="77"/></group>
+		<group ref="knob"><bounds x="1298" y="330" width="77" height="77"/></group>
 		<element ref="decay_text"><bounds x="1318" y="406" width="37" height="12"/></element>
 
-		<group ref="knob_0_6_12"><!-- SUSTAIN --><bounds x="1401" y="334" width="77" height="77"/></group>
+		<group ref="knob_0_6_12"><!-- SUSTAIN --><bounds x="1401" y="330" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_29"/>
-		<group ref="knob"><bounds x="1401" y="334" width="77" height="77"/></group>
+		<group ref="knob"><bounds x="1401" y="330" width="77" height="77"/></group>
 		<element ref="sustain_text"><bounds x="1414" y="406" width="51" height="12"/></element>
 
-		<group ref="knob_0_6_12"><!-- RELEASE --><bounds x="1504" y="334" width="77" height="77"/></group>
+		<group ref="knob_0_6_12"><!-- RELEASE --><bounds x="1504" y="330" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_24"/>
-		<group ref="knob"><bounds x="1504" y="334" width="77" height="77"/></group>
+		<group ref="knob"><bounds x="1504" y="330" width="77" height="77"/></group>
 		<element ref="release_text"><bounds x="1517" y="406" width="51" height="12"/></element>
 
 
 <!-- AMPLIFIER -->
-		<element ref="amplifier_text"><bounds x="1191" y="444" width="90" height="16"/></element>
+		<element ref="amplifier_text"><bounds x="1191" y="440" width="90" height="16"/></element>
 
 		<group ref="knob_0_6_12"><!-- ATTACK --><bounds x="1195" y="467" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_16"/>
