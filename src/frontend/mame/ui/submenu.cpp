@@ -43,7 +43,8 @@ std::vector<submenu::option> submenu::misc_options()
 			{ option_type::UI,   N_("Skip BIOS selection menu"),                OPTION_SKIP_BIOS_MENU },
 			{ option_type::UI,   N_("Skip software part selection menu"),       OPTION_SKIP_PARTS_MENU },
 			{ option_type::UI,   N_("Info auto audit"),                         OPTION_INFO_AUTO_AUDIT },
-			{ option_type::UI,   N_("Hide romless machine from available list"),OPTION_HIDE_ROMLESS } };
+			{ option_type::UI,   N_("Hide romless machine from available list"),OPTION_HIDE_ROMLESS },
+			{ option_type::EMU,  N_("Pause game on menu"),                      OPTION_PAUSE_GAME_ON_MENU }};
 }
 
 std::vector<submenu::option> submenu::advanced_options()
