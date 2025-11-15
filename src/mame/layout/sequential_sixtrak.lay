@@ -755,10 +755,10 @@ copyright-holders:m1macrophage
 
 	<group name="wheel">
 		<bounds x="0" y="0" width="30" height="145"/>
-		<element ref="wheel_background" id="~input~">
+		<element ref="wheel_background" id="~id~">
 			<bounds x="3" y="0" width="24" height="130"/>
 		</element>
-		<element ref="wheel_dent" id="~input~_dent">
+		<element ref="wheel_dent" id="~id~_dent">
 			<animate inputtag="~input~" inputmask="0xffff"/>
 			<bounds state="100" x="3" y="0" width="24" height="10"/>
 			<bounds state="0" x="3" y="120" width="24" height="10"/>
@@ -888,11 +888,13 @@ copyright-holders:m1macrophage
 		<element ref="dark_wood"><bounds x="1477" y="350" width="18" height="310"/></element>
 		<element ref="wood"><bounds x="1495" y="0" width="25" height="660"/></element>
 
-		<param name="input" value="pitch_wheel"/>
+		<param name="id" value="pitch_wheel"/>
+		<param name="input" value="wheel_0"/>
 		<param name="label" value="txt_pitch"/>
 		<group ref="wheel"><bounds x="75" y="164" width="20" height="145"/></group>
 
-		<param name="input" value="mod_wheel"/>
+		<param name="id" value="mod_wheel"/>
+		<param name="input" value="wheel_1"/>
 		<param name="label" value="txt_mod"/>
 		<group ref="wheel"><bounds x="150" y="164" width="20" height="145"/></group>
 
@@ -1050,8 +1052,8 @@ copyright-holders:m1macrophage
 				add_knob(view, "tune_knob", "tune_knob", 2, HORIZONTAL)
 				add_knob(view, "master_volume_knob", "master_volume_knob", 1.2, HORIZONTAL)
 
-				add_slider(view, "pitch_wheel", "pitch_wheel_dent", "pitch_wheel")
-				add_slider(view, "mod_wheel", "mod_wheel_dent", "mod_wheel")
+				add_slider(view, "pitch_wheel", "pitch_wheel_dent", "wheel_0")
+				add_slider(view, "mod_wheel", "mod_wheel_dent", "wheel_1")
 
 				view.items["warning"]:set_state(0)
 			end)
