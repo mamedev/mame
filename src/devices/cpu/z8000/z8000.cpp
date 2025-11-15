@@ -204,8 +204,12 @@ uint16_t z8002_device::RDMEM_W(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
+	// TODO: REMOVE THIS!
 	/* hack for m20 driver: BIOS accesses 0x7f0000 and expects a segmentation violation */
-	if (addr >= 0x7f0000) {
+	if ((addr >= 0x7f0000) &&
+		(!(strncmp(machine().system().name, "m20", 3)) ||
+		!(strncmp(machine().system().name, "m40", 3)) ||
+		!(strncmp(machine().system().name, "m44", 3)))) {
 		m_irq_req = Z8000_SEGTRAP;
 		return 0xffff;
 	}
