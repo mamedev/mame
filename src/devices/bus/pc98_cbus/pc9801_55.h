@@ -60,6 +60,7 @@ private:
 
 	void io_map(address_map &map) ATTR_COLD;
 	void internal_map(address_map &map) ATTR_COLD;
+	void increment_addr();
 
 	u8 m_ar;
 	u8 m_port30;

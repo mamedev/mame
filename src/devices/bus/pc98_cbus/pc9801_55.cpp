@@ -12,10 +12,13 @@ https://www7b.biglobe.ne.jp/~drachen6jp/98scsi.html
 TODO:
 - hangs on wdc core with a Negate ACK command when not initiator;
 - Wants to read "NEC" around PC=dc632, currently reads " SE" (from nscsi/hd.cpp " SEAGATE" inquiry)
-- Wants specifically -ss 256 in chdman;
+\- Wants specifically -ss 256 in chdman, DOS will throw a "run-time error R6003 otherwise".
+\- Should really require a nscsi/hd.cpp subclass, seems to detect 130 MB hdd from mode sense 6 pages
+   no matter the actual HDD options ...
 - Throws Unhandled command LOCATE/POSITION_TO_ELEMENT/SEEK_10 (10): 2b 00 ff ff ff ff 00 00 00 00
   (non fatal?)
-- Manages to install msdos622 after all above but doesn't mark HDD as bootable (?);
+- Manages to install msdos622 after all above but doesn't mark HDD as bootable;
+- Sometimes BIOS fails to boot entirely, why?
 - PC-9801-55 also runs on this except with vanilla WD33C93 instead;
 
 **************************************************************************************************/
@@ -235,6 +238,16 @@ void pc9801_55_device::remap(int space_id, offs_t start, offs_t end)
 	}
 }
 
+// required by MS-DOS to actually detect the disk size for format.
+// Mimic wdc33c9x core here
+void pc9801_55_device::increment_addr()
+{
+	if (machine().side_effects_disabled()) return;
+
+	if (m_ar <= 0x19)
+		m_ar ++;
+}
+
 void pc9801_55_device::io_map(address_map &map)
 {
 	map(0x0cc0, 0x0cc0).lrw8(
@@ -243,16 +256,13 @@ void pc9801_55_device::io_map(address_map &map)
 	);
 	map(0x0cc2, 0x0cc2).lrw8(
 		NAME([this] (offs_t offset) {
-			//const u8 reg = m_ar;
-			//if (m_ar <= 0x19)
-			//	m_ar ++;
-
-			return space(0).read_byte(m_ar);
+			const u8 reg = m_ar;
+			increment_addr();
+			return space(0).read_byte(reg);
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			space(0).write_byte(m_ar, data);
-			//if (m_ar <= 0x19)
-			//	m_ar ++;
+			increment_addr();
 		})
 	);
 	map(0x0cc4, 0x0cc4).lrw8(
