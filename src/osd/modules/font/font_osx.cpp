@@ -9,6 +9,7 @@
 
 #ifdef SDLMAME_MACOSX
 
+#include "corestr.h"
 #include "emucore.h"
 #include "fileio.h"
 #include "osdcore.h"
@@ -52,9 +53,30 @@ private:
 	CGFloat m_height, m_baseline;
 };
 
-bool osd_font_osx::open(std::string const &font_path, std::string const &name, int &height)
+bool osd_font_osx::open(std::string const &font_path, std::string const &_name, int &height)
 {
-	osd_printf_verbose("osd_font_osx::open: name=\"%s\"\n", name);
+	osd_printf_verbose("osd_font_osx::open: name=\"%s\"\n", _name);
+
+	std::string name(_name);
+
+	if (name.find('|') != std::string::npos)
+	{
+		// Handle the "Font Family|Style" type of font name, by
+		// modifying the name to be more likely a PostScript name:
+		// - Style is separated from family name by '-', not '|'.
+		strreplace(name, "|", "-");
+		// - Spaces within the name are removed.
+		strreplace(name, " ", "");
+		std::string regular("-Regular");
+
+		// - The "Regular" style is not spelled out.
+		if (name.rfind(regular) == name.length() - regular.length())
+		{
+			name = name.substr(0, name.length() - regular.length());
+		}
+
+		osd_printf_verbose("osd_font_osx::open: candidate PostScript name=\"%s\"\n", name);
+	}
 
 	CFStringRef font_name;
 	if (name == "default")
