@@ -837,3 +837,44 @@ if (_OPTIONS["osd"] == "sdl") then
 
 	strip()
 end
+
+--------------------------------------------------
+-- romcopy
+--------------------------------------------------
+
+project("romcopy")
+--uuid ("01234567-89ab-cdef-0123-456789abcdef01") -- TODO: add a real UUID here
+kind "ConsoleApp"
+
+flags {
+	"Symbols", -- always include minimum symbols for executables
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then
+	targetdir(MAME_DIR)
+end
+
+links {
+	"utils",
+	"7z",
+	"ocore_" .. _OPTIONS["osd"],
+	ext_lib("zlib"),
+	ext_lib("zstd"),
+	ext_lib("utf8proc"),
+}
+
+includedirs {
+	MAME_DIR .. "src/osd",
+	MAME_DIR .. "src/lib/util",
+}
+
+files {
+	MAME_DIR .. "src/tools/romcopy.cpp",
+}
+
+configuration { "mingw*" or "vs*" }
+	targetextension ".exe"
+
+configuration { }
+
+strip()
